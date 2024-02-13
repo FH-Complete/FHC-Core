@@ -30,7 +30,7 @@ class Anrechnung_model extends DB_Model
 	 */
 	public function createAnrechnungsantrag(
 		$prestudent_id, $studiensemester_kurzbz, $lehrveranstaltung_id,
-		$begruendung_id, $dms_id, $anmerkung_student = null
+		$begruendung_id, $dms_id, $anmerkung_student = null, $begruendung_ects = null, $begruendung_lvinhalt = null
 	)
 	{
 		// Start DB transaction
@@ -44,6 +44,8 @@ class Anrechnung_model extends DB_Model
 			'dms_id' => $dms_id,
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'anmerkung_student' => $anmerkung_student,
+			'begruendung_ects' => $begruendung_ects,
+			'begruendung_lvinhalt' => $begruendung_lvinhalt,
 			'insertvon' => $this->_uid
 		));
 		

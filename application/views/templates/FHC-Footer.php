@@ -100,8 +100,8 @@
 	// Tabulator 5 JS
 	if ($tabulator5 === true) generateJSsInclude('vendor/olifolkerd/tabulator5/dist/js/tabulator.min.js');
 
-	// Tinymce 4 JS
-	if ($tinymce4 === true) generateJSsInclude('vendor/tinymce/tinymce4/tinymce.min.js');
+	// Tinymce 3 JS
+	if ($tinymce3 === true) generateJSsInclude('include/tiny_mce/tiny_mce.js');
 
 	// Tinymce 5 JS
 	if ($tinymce5 === true) generateJSsInclude('vendor/tinymce/tinymce5/tinymce.min.js');
@@ -122,7 +122,12 @@
 		generateJSsInclude('vendor/npm-asset/primevue/column/column.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/calendar/calendar.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/skeleton/skeleton.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/timeline/timeline.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/multiselect/multiselect.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/autocomplete/autocomplete.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/overlaypanel/overlaypanel.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/datatable/datatable.min.js');
+        // TODO check ob notwendig
 		generateJSsInclude('vendor/npm-asset/primevue/toast/toast.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/toastservice/toastservice.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/confirmdialog/confirmdialog.min.js');

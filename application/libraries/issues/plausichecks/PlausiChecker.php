@@ -7,6 +7,7 @@ abstract class PlausiChecker
 {
 	protected $_ci; // code igniter instance
 	protected $_config; // configuration parameters for this plausicheck
+	protected $_db; // database for queries
 
 	public function __construct($configurationParams = null)
 	{
@@ -15,8 +16,8 @@ abstract class PlausiChecker
 		// set configuration
 		$this->_config = $configurationParams;
 
-		// load libraries
-		$this->_ci->load->library('issues/PlausicheckLib'); // load plausicheck library
+		// get database for queries
+		$this->_db = new DB_Model();
 	}
 
 	/**

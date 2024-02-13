@@ -3,6 +3,9 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class ReihungstestJob extends JOB_Controller
 {
+
+	const LAST_DAYS_PRESTUDENTSTATUS = 5;
+
 	/**
 	 * Constructor
 	 */
@@ -464,7 +467,7 @@ class ReihungstestJob extends JOB_Controller
 		$this->PrestudentstatusModel->addJoin('public.tbl_person', 'person_id');
 
 		$yesterdays_applicants_arr = $this->PrestudentstatusModel->loadWhere('
-			status_kurzbz = \'Interessent\' AND
+			status_kurzbz IN (\'Interessent\', \'Bewerber\') AND
 			typ = \'b\' AND
 			bestaetigtam = current_date - 1
 		');
@@ -727,33 +730,27 @@ class ReihungstestJob extends JOB_Controller
 			tbl_reihungstest.reihungstest_id,
 			tbl_studienplan.studienplan_id,
 			tbl_reihungstest.studiensemester_kurzbz,
-			tbl_studienordnung.studiengang_kz
+			tbl_studienordnung.studiengang_kz,
+			tbl_studienplan.orgform_kurzbz
 		FROM
 			public.tbl_reihungstest
-			JOIN public.tbl_rt_studienplan ON(tbl_rt_studienplan.reihungstest_id=tbl_reihungstest.reihungstest_id)
-			JOIN lehre.tbl_studienplan USING(studienplan_id)
-			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+				JOIN public.tbl_rt_studienplan ON(tbl_rt_studienplan.reihungstest_id=tbl_reihungstest.reihungstest_id)
+				JOIN lehre.tbl_studienplan USING(studienplan_id)
+				JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 		WHERE
-			NOT EXISTS(
-				SELECT 1 FROM lehre.tbl_studienplan_semester
-				WHERE studienplan_id=tbl_rt_studienplan.studienplan_id
-					AND tbl_studienplan_semester.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz
+			EXISTS (
+				SELECT studienplan_id
+				FROM lehre.tbl_studienordnung sordnung
+					JOIN lehre.tbl_studienplan USING (studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
+				WHERE sordnung.studiengang_kz = tbl_studienordnung.studiengang_kz
+					AND tbl_studienplan_semester.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
+					AND tbl_studienplan.studienplan_id NOT IN
+					(
+						SELECT studienplan_id FROM tbl_rt_studienplan WHERE reihungstest_id = tbl_reihungstest.reihungstest_id
+					)
 			)
-			AND tbl_reihungstest.datum >= now()
-			AND NOT EXISTS(
-				SELECT
-					1
-				FROM
-					public.tbl_rt_studienplan rtstp
-					JOIN lehre.tbl_studienplan stp USING(studienplan_id)
-					JOIN lehre.tbl_studienordnung sto USING(studienordnung_id)
-					JOIN lehre.tbl_studienplan_semester stpsem USING(studienplan_id)
-				WHERE
-					sto.studiengang_kz=tbl_studienordnung.studiengang_kz
-					AND rtstp.reihungstest_id=tbl_reihungstest.reihungstest_id
-					AND stpsem.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz
-			)
-		";
+			AND tbl_reihungstest.datum >= now()";
 
 		$db = new DB_Model();
 		$result_rt = $db->execReadOnlyQuery($qry);
@@ -763,7 +760,9 @@ class ReihungstestJob extends JOB_Controller
 				// find an active studyplan for the same degree program with is valid in this semester
 				$result_stpl = $this->StudienplanModel->getStudienplaeneBySemester(
 					$row_rt->studiengang_kz,
-					$row_rt->studiensemester_kurzbz
+					$row_rt->studiensemester_kurzbz,
+					null,
+					$row_rt->orgform_kurzbz
 				);
 
 				if (hasData($result_stpl)) {
@@ -826,7 +825,7 @@ class ReihungstestJob extends JOB_Controller
 						AND tbl_studiengang.typ IN ('b', 'm')
 				)
 				SELECT * FROM prst
-				WHERE prestudenstatus_datum >= (SELECT CURRENT_DATE - 1)
+				WHERE prestudenstatus_datum >= (SELECT CURRENT_DATE - ". self::LAST_DAYS_PRESTUDENTSTATUS .")
 				AND (studiengang_typ = 'b' OR (studiengang_typ = 'm' AND EXISTS (SELECT 1 /* Master Studiengänge berücksichtigen wenn auch Bachelor im gleichen Semester */
 																					FROM prst prstb
 																					WHERE studiengang_typ = 'b'
@@ -868,7 +867,8 @@ class ReihungstestJob extends JOB_Controller
 							tbl_person.nachname,
 							tbl_person.vorname,
 							tbl_prestudent.*,
-							tbl_studiengang.typ AS studiengang_typ
+							tbl_studiengang.typ AS studiengang_typ,
+							tbl_prestudentstatus.datum
 						FROM PUBLIC.tbl_person
 							JOIN PUBLIC.tbl_prestudent USING (person_id)
 							JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
@@ -901,7 +901,7 @@ class ReihungstestJob extends JOB_Controller
 								$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
 									= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
 							}
-							elseif ($rowNiedrPrios->laststatus == 'Bewerber')
+							elseif ($rowNiedrPrios->laststatus == 'Bewerber' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum)
 							{
 								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
 								$lastStatus = $this->PrestudentstatusModel->getLastStatus($rowNiedrPrios->prestudent_id);
@@ -927,7 +927,7 @@ class ReihungstestJob extends JOB_Controller
 										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
 								}
 							}
-							elseif ($rowNiedrPrios->laststatus == 'Wartender')
+							elseif ($rowNiedrPrios->laststatus == 'Wartender' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum)
 							{
 								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
 								// Mail zur Info an Assistenz schicken

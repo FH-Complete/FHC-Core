@@ -341,6 +341,31 @@ if ($studiengang_kz != '' && $stsem_von != '' && $stsem_nach != '')
 								{
 									$stundensatz = new mitarbeiter($row_lem->mitarbeiter_uid);
 									$lem_obj->stundensatz = $stundensatz->stundensatz;
+
+									if(defined('DIENSTVERHAELTNIS_SUPPORT') && DIENSTVERHAELTNIS_SUPPORT)
+									{
+										$qry = "
+										SELECT
+											stundensatz
+										FROM
+											hr.tbl_stundensatz
+										WHERE
+											uid=".$db->db_add_param($row_lem->mitarbeiter_uid)."
+											AND gueltig_von <= ".$db->db_add_param($stsem_nach_obj->ende)."
+											AND COALESCE(gueltig_bis, '2999-12-31') >= ".$db->db_add_param($stsem_nach_obj->start)."
+											AND stundensatztyp = 'lehre'
+										ORDER BY gueltig_von desc
+										LIMIT 1
+										";
+
+										if($result_stundensatz = $db->db_query($qry))
+										{
+											if($row_stundensatz = $db->db_fetch_object($result_stundensatz))
+											{
+												$lem_obj->stundensatz = $row_stundensatz->stundensatz;
+											}
+										}
+									}
 								}
 								// Wenn VILESCI_STUNDENSATZ_VORRUECKUNG nachbeschaeftigungsart ist, wird
 								// bei echten Dienstvertraegen mit voller inkludierter Lehre (-1) der Stundensatz auf null gesetzt
@@ -355,21 +380,68 @@ if ($studiengang_kz != '' && $stsem_von != '' && $stsem_nach != '')
 										$stundensatz = new mitarbeiter($row_lem->mitarbeiter_uid);
 										$lem_obj->stundensatz = $stundensatz->stundensatz;
 
-										$bisverwendung = new bisverwendung();
-										if(!$bisverwendung->getVerwendungRange($row_lem->mitarbeiter_uid, $stsem_nach_obj->start, $stsem_nach_obj->ende))
+										if(defined('DIENSTVERHAELTNIS_SUPPORT') && DIENSTVERHAELTNIS_SUPPORT)
 										{
-											$bisverwendung->getLastAktVerwendung($row_lem->mitarbeiter_uid);
-											$bisverwendung->result[] = $bisverwendung;
-										}
+											$qry = "
+											SELECT
+												stundensatz
+											FROM
+												hr.tbl_stundensatz
+											WHERE
+												uid=".$db->db_add_param($row_lem->mitarbeiter_uid)."
+												AND gueltig_von <= ".$db->db_add_param($stsem_nach_obj->ende)."
+												AND COALESCE(gueltig_bis, '2999-12-31') >= ".$db->db_add_param($stsem_nach_obj->start)."
+												AND stundensatztyp = 'lehre'
+											ORDER BY gueltig_von desc
+											LIMIT 1
+											";
 
-										foreach($bisverwendung->result as $row_verwendung)
-										{
-											// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
-											// geliefert da dies im Vertrag inkludiert ist.
-											if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
+											if($result_stundensatz = $db->db_query($qry))
 											{
-												$lem_obj->stundensatz = '';
-												break;
+												if($row_stundensatz = $db->db_fetch_object($result_stundensatz))
+												{
+													$lem_obj->stundensatz = $row_stundensatz->stundensatz;
+												}
+											}
+
+											$qry = "
+											SELECT
+												1
+											FROM
+												hr.tbl_dienstverhaeltnis dv
+											WHERE
+												dv.mitarbeiter_uid=".$db->db_add_param($row_lem->mitarbeiter_uid)."
+												AND dv.von <= ".$db->db_add_param($stsem_nach_obj->ende)."
+												AND COALESCE(dv.bis, '2999-12-31') >= ".$db->db_add_param($stsem_nach_obj->start)."
+												AND vertragsart_kurzbz='echterdv'
+											";
+
+											if($result_dienstverhaeltnis = $db->db_query($qry))
+											{
+												if($db->db_num_rows($result_dienstverhaeltnis)>0)
+												{
+													$lem_obj->stundensatz = '';
+												}
+											}
+										}
+										else
+										{
+											$bisverwendung = new bisverwendung();
+											if(!$bisverwendung->getVerwendungRange($row_lem->mitarbeiter_uid, $stsem_nach_obj->start, $stsem_nach_obj->ende))
+											{
+												$bisverwendung->getLastAktVerwendung($row_lem->mitarbeiter_uid);
+												$bisverwendung->result[] = $bisverwendung;
+											}
+
+											foreach($bisverwendung->result as $row_verwendung)
+											{
+												// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+												// geliefert da dies im Vertrag inkludiert ist.
+												if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
+												{
+													$lem_obj->stundensatz = '';
+													break;
+												}
 											}
 										}
 									}

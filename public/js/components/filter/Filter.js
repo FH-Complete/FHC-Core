@@ -55,6 +55,7 @@ export const CoreFilterCmpt = {
 		},
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
+		// TODO check to remove
 		tabulatorAdditionalColumns: Array,
 		tableOnly: Boolean,
 		reload: Boolean,
@@ -66,6 +67,7 @@ export const CoreFilterCmpt = {
 		newBtnClass: [String, Array, Object],
 		newBtnDisabled: Boolean,
 		newBtnLabel: String,
+		// TODO soll im master kommen?
 		idField: String,
 		parentIdField: String
 	},
@@ -140,11 +142,14 @@ export const CoreFilterCmpt = {
 				{
 					// If the column has to be displayed or not
 					col.visible = selectedFields.indexOf(col.field) >= 0;
+					// TODO additionalCols wieder löschen?
+					// if (col.formatter == 'rowSelection')
+					// 	col.visible = true;
 					if (
 						col.formatter == 'rowSelection'
 						|| (this.tabulatorAdditionalColumns && this.tabulatorAdditionalColumns.indexOf(col.field) >= 0)
 					)
-						col.visible = true;
+
 
 					if (col.hasOwnProperty('resizable'))
 						col.resizable = col.visible;
@@ -152,6 +157,14 @@ export const CoreFilterCmpt = {
 			}
 
 			return columns;
+		},
+		fieldIdsForVisibilty() {
+			if (!this.tableBuilt)
+				return [];
+			return this.tabulator.getColumns().filter(col => {
+				let def = col.getDefinition();
+				return !def.frozen && def.title;
+			}).map(col => col.getField());
 		},
 		fieldNames() {
 			if (!this.tableBuilt)
@@ -179,7 +192,8 @@ export const CoreFilterCmpt = {
 	methods: {
 		reloadTable() {
 			if (this.tableOnly)
-				this.tabulator.reload();
+				// TODO check, vorher reload() gewesen
+				this.tabulator.setData();
 			else
 				this.getFilter();
 		},
@@ -199,7 +213,7 @@ export const CoreFilterCmpt = {
 
 			if (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length)
 				this.tabulatorHasSelector = true;
-
+			// TODO check ob im core bleiben soll
 			if (this.idField) {
 				// enable nested tabulator if parent Id given
 				if (this.parentIdField) tabulatorOptions.dataTree = true;
@@ -223,6 +237,7 @@ export const CoreFilterCmpt = {
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
+			// TODO check ob im core so bleiben soll
 			// if nested tabulator, restructure data
 			if (this.parentIdField && this.idField) {
 				this.tabulator.on("dataLoading", data => {
@@ -515,6 +530,7 @@ export const CoreFilterCmpt = {
 				this.getFilter
 			);
 		},
+		// TODO check ob im core so bleiben soll
 		// append child to it's parent
 		appendChild(data, child) {
 			// get parent id
@@ -580,7 +596,7 @@ export const CoreFilterCmpt = {
 		<div :id="'filterCollapsables' + idExtra">
 
 			<div class="d-flex flex-row justify-content-between flex-wrap">
-				<div v-if="newBtnShow || reload || $slots.search || $slots.actions" class="d-flex gap-3 align-items-baseline flex-wrap">
+				<div v-if="newBtnShow || reload || $slots.search || $slots.actions" class="d-flex gap-2 align-items-baseline flex-wrap">
 					<button v-if="newBtnShow" class="btn btn-primary" :class="newBtnClass" :title="newBtnLabel ? undefined : 'New'" :aria-label="newBtnLabel ? undefined : 'New'" @click="$emit('click:new', $event)" :disabled="newBtnDisabled">
 						<span class="fa-solid fa-plus" aria-hidden="true"></span>
 						{{ newBtnLabel }}
@@ -608,7 +624,7 @@ export const CoreFilterCmpt = {
 				:id="'collapseColumns' + idExtra"
 				class="card-body collapse"
 				:data-bs-parent="'#filterCollapsables' + idExtra"
-				:fields="fields"
+				:fields="fieldIdsForVisibilty"
 				:selected="selectedFields"
 				:names="fieldNames"
 				@hide="tabulator.hideColumn($event)"

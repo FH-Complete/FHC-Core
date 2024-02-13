@@ -111,6 +111,8 @@ class requestAnrechnung extends Auth_Controller
 		$lehrveranstaltung_id = $this->input->post('lv_id');
 		$studiensemester_kurzbz = $this->input->post('studiensemester');
 		$bestaetigung = $this->input->post('bestaetigung');
+		$begruendung_ects = $this->input->post('begruendung_ects');
+		$begruendung_lvinhalt = $this->input->post('begruendung_lvinhalt');
 
 		// Validate data
 		if (empty($_FILES['uploadfile']['name']))
@@ -121,7 +123,9 @@ class requestAnrechnung extends Auth_Controller
 		if (isEmptyString($begruendung_id) ||
 			isEmptyString($anmerkung) ||
 			isEmptyString($lehrveranstaltung_id) ||
-			isEmptyString($studiensemester_kurzbz))
+			isEmptyString($studiensemester_kurzbz) ||
+			isEmptyString($begruendung_ects) ||
+			isEmptyString($begruendung_lvinhalt))
 		{
 			return $this->outputJsonError($this->p->t('ui', 'errorFelderFehlen'));
 		}
@@ -148,10 +152,10 @@ class requestAnrechnung extends Auth_Controller
 			return $this->outputJsonError($this->p->t('anrechnung', 'antragBereitsGestellt'));
 		}
 		
-		// Exit if application is not for actual studysemester
-		if (!self::_applicationIsForActualSS($studiensemester_kurzbz))
+		// Exit if application is a past ( < actual ) studysemester
+		if (self::_applicationIsPastSS($studiensemester_kurzbz))
 		{
-			return $this->outputJsonError($this->p->t('anrechnung', 'antragNurImAktSS'));
+			return $this->outputJsonError($this->p->t('anrechnung', 'antragNichtFuerVerganganeSS'));
 		}
 		
 		// Upload document
@@ -172,7 +176,9 @@ class requestAnrechnung extends Auth_Controller
 			$lehrveranstaltung_id,
 			$begruendung_id,
 			$lastInsert_dms_id,
-			$anmerkung
+			$anmerkung,
+            $begruendung_ects,
+            $begruendung_lvinhalt
 		);
 		
 		if (isError($result))
@@ -306,18 +312,21 @@ class requestAnrechnung extends Auth_Controller
 	}
 
 	/**
-	 * Check if applications' study semester is actual study semester.
+	 * Check if applications' study semester is < actual study semester.
 	 *
 	 * @param $studiensemester_kurzbz
 	 * @return bool
 	 */
-	private function _applicationIsForActualSS($studiensemester_kurzbz)
+	private function _applicationIsPastSS($studiensemester_kurzbz)
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$result = $this->StudiensemesterModel->getNearest();
-		$actual_ss = getData($result)[0]->studiensemester_kurzbz;
+		$actual_ss = getData($result)[0];
 
-		return $studiensemester_kurzbz == $actual_ss;
+		$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
+		$anrechnung_ss = getData($result)[0];
+
+		return $anrechnung_ss->ende < $actual_ss->start;
 	}
 
 	private function _LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id)

@@ -31,7 +31,7 @@ require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/zeitaufzeichnung.class.php');
 require_once('../../../include/projekt.class.php');
-require_once('../../../include/bisverwendung.class.php');
+require_once('../../../include/vertragsbestandteil.class.php');
 
 if ((isset($_GET['uid'])) && (isset($_GET['day'])))
 {
@@ -57,18 +57,8 @@ if ((isset($_GET['uid'])) && (isset($_GET['day'])))
 
 	$day = $_GET['day'];
 
-	$verwendung = new bisverwendung();
-
-	$verwendung->getVerwendungDatum($uid, $day);
-	$homeoffice = false;
-
-	foreach ($verwendung->result as $v)
-	{
-		if ($v->homeoffice)
-		{
-			$homeoffice = true;
-		}
-	}
+    $vbt = new vertragsbestandteil();
+    $homeoffice = $vbt->hasHomeoffice($uid, $day);
 
 	echo json_encode($homeoffice);
 
