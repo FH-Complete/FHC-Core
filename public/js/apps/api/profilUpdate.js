@@ -39,8 +39,7 @@ export default {
         return axios.post(url, dms, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-      },
-    
+      },   
    
     
       getProfilRequestFiles: function (requestID) {

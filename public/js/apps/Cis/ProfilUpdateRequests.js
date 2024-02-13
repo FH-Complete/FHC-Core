@@ -245,6 +245,7 @@ const app = Vue.createApp({
     },
   },
   mounted() {
+
     if (!(sessionStorage.getItem("showAll") === null)) {
       //? converting string into a boolean: https://sentry.io/answers/how-can-i-convert-a-string-to-a-boolean-in-javascript/
       this.showAll = sessionStorage.getItem("showAll")==="true";

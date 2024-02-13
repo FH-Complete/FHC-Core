@@ -24,7 +24,6 @@ class ProfilUpdate extends Auth_Controller
 			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
 			
-			
 		]);
 		
 
@@ -35,6 +34,7 @@ class ProfilUpdate extends Auth_Controller
 		$this->load->model('person/Person_model','PersonModel');
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 
 
 		$this->load->library('DmsLib');
@@ -311,6 +311,25 @@ class ProfilUpdate extends Auth_Controller
 		echo json_encode($res);
 	}
 
+	
+	private function checkIfPermissionsContainStudentOE($student_uid){
+
+		$oe_berechtigung = $this->permissionlib->getOE_isEntitledFor('student/stammdaten');
+		
+		//? query that checks if the oe_berechtigungen is contained in the organisations_einheiten that are connected to the studiengang of the student
+		$query ="SELECT TRUE
+		FROM public.tbl_student
+		JOIN public.tbl_prestudent ON public.tbl_student.prestudent_id = public.tbl_prestudent.prestudent_id
+		JOIN public.tbl_studiengang ON tbl_prestudent.studiengang_kz = public.tbl_studiengang.studiengang_kz
+		JOIN public.tbl_organisationseinheit ON public.tbl_organisationseinheit.oe_kurzbz = public.tbl_studiengang.oe_kurzbz
+		WHERE public.tbl_student.student_uid = ? AND public.tbl_studiengang.oe_kurzbz IN ?
+		LIMIT 1;";
+		//TODO: hardcoded student_uid replace with variable student_uid
+		$res = $this->StudentModel->execReadOnlyQuery($query,[$student_uid,$oe_berechtigung]);
+		return hasData($res) ? true : false;
+		
+	}
+
 
 	public function acceptProfilRequest(){
 
@@ -331,6 +350,17 @@ class ProfilUpdate extends Auth_Controller
 		if(!isset($id) || !isset($uid) || !isset($personID) || !isset($requested_change) || !isset($topic)){
 			return json_encode(error("missing required information"));
 		}
+
+		$is_mitarbeiter_profil_update = getData($this->MitarbeiterModel->isMitarbeiter($uid));
+		$is_student_profil_update = getData($this->StudentModel->isStudent($uid));
+
+		
+		//? check if the permissions are set correctly
+		if(
+			$this->permissionlib->isBerechtigt('student/stammdaten:rw') && $is_student_profil_update && $this->checkIfPermissionsContainStudentOE($uid) || 
+			$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten:rw') && $is_mitarbeiter_profil_update 
+		)
+		{
 		
 		if(is_array($requested_change) && array_key_exists("adresse_id",$requested_change)){
 			$insertID = $this->handleAdresse($requested_change, $personID);
@@ -369,17 +399,37 @@ class ProfilUpdate extends Auth_Controller
 				return;
 			}
 		}
-		
+
 		echo json_encode($this->setStatusOnUpdateRequest($id, "accepted", $status_message, $requested_change));
+	}else{
+		show_error("You have not the necessary permissions to accept this profil_update");
+	}
+		
+		
 	}
 
 	public function denyProfilRequest(){
 		
 		$_POST = json_decode($this->input->raw_input_stream,true);
 		$id = $this->input->post('profil_update_id',true);
+		$uid = $this->input->post('uid',true);
 		$status_message = $this->input->post('status_message',true);
+
+		$is_mitarbeiter_profil_update = getData($this->MitarbeiterModel->isMitarbeiter($uid));
+		$is_student_profil_update = getData($this->StudentModel->isStudent($uid));
+
+
+		if(
+			$this->permissionlib->isBerechtigt('student/stammdaten:rw') && $is_student_profil_update && $this->checkIfPermissionsContainStudentOE($uid) || 
+			$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten:rw') && $is_mitarbeiter_profil_update 
+		)
+		{
+			echo json_encode($this->setStatusOnUpdateRequest($id, "rejected", $status_message));
+		}else{
+			show_error("You have not the necessary permissions to accept this profil_update");
+		}
 		
-		echo json_encode($this->setStatusOnUpdateRequest($id, "rejected", $status_message));
+		
 	}
 
 	private function updateRequestedChange($id, $requested_change){
