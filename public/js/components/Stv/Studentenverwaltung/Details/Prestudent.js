@@ -2,7 +2,7 @@ import {CoreRESTClient} from '../../../../RESTClient.js';
 import FormForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
 import TblHistory from "./Prestudent/History.js";
-/*import TblStatus from "./Prestudent/Status.js";*/
+import TblStatus from "./Prestudent/Status.js";
 
 export default {
 	components: {
@@ -10,7 +10,7 @@ export default {
 		FormForm,
 		FormInput,
 		TblHistory,
-/*		TblStatus*/
+		TblStatus
 	},
 	inject: {
 		lists: {
@@ -541,18 +541,26 @@ export default {
 		</form-form>
 		
 		<br>
-		<div class="row mb-3">
-			<div class="col-6">
+		
+		<div class="col-12 pb-3">
+			<legend>Status</legend>
+			<TblStatus :prestudent_id="modelValue.prestudent_id"></TblStatus>		
+		</div>
+		
+		<hr>
+		
+<!--		<div class="row mb-3">
+			<div class="col-8">
 				<legend>Status</legend>
-<!--				<TblStatus :prestudent_id="modelValue.prestudent_id"></TblStatus>	-->	
-			</div>
+				<TblStatus :prestudent_id="modelValue.prestudent_id"></TblStatus>		
+			</div>-->
 			
-			<div class="col-6">
+			<div class="col-8">
 				<legend>Gesamthistorie</legend>
 				<TblHistory :person_id="modelValue.person_id"></TblHistory>		
 			</div>
 				
-		</div>
+<!--		</div>-->
 
 	
 		

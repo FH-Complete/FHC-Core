@@ -157,9 +157,19 @@ class Prestudent extends FHC_Controller
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
-
 		$this->outputJson(getData($result) ?: []);
+	}
 
+	public function getHistoryPrestudent($prestudent_id)
+	{
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$result = $this->PrestudentModel->getHistoryPrestudent($prestudent_id);
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+		$this->outputJson(getData($result) ?: []);
 	}
 
 	public function getBezeichnungZgv()
