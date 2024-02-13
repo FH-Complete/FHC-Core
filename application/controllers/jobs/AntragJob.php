@@ -322,6 +322,39 @@ class AntragJob extends JOB_Controller
 						$this->logError(getError($result));
 					} else {
 						$count++;
+						
+						$datum_kp = new DateTime($prestudent->datum);
+						$dataMail = array(
+							'name'=> trim($prestudent->vorname . ' '. $prestudent->nachname),
+							'vorname' => $prestudent->vorname,
+							'nachname' => $prestudent->nachname,
+							'pers_kz'=> $prestudent->matrikelnr,
+							'stg' => $prestudent->bezeichnung,
+							'lvbezeichnung' => $prestudent->lvbezeichnung,
+							'datum_kp' => $datum_kp->format('d.m.Y'),
+							'studiensemester'=> $prestudent->studiensemester_kurzbz,
+							'Orgform'=> $prestudent->orgform,
+							'prestudent_id' => $prestudent->prestudent_id,
+							'fristablauf' => $dateDeadline->format('d.m.Y')
+						);
+
+						$email = $this->StudentModel->getEmailFH($this->StudentModel->getUID($prestudent->prestudent_id));
+						// Mail to Student
+						if (!sendSanchoMail('Sancho_Mail_Antrag_W_DL_Stud', $dataMail, $email, 'Wiederholung: Frist abgelaufen')) {
+							$this->logWarning("Failed to send Notification to " . $email);
+						}
+
+						$result = $this->StudiengangModel->load($prestudent->studiengang_kz);
+						if (!hasData($result)) {
+							$this->logWarning('No Studiengang found');
+							continue;
+						}
+						$studiengang = current(getData($result));
+						$email = $studiengang->email;
+						// Mail to Assistenz
+						if (!sendSanchoMail('Sancho_Mail_Antrag_W_DL_Assist', $dataMail, $email, 'Wiederholung: Frist abgelaufen')) {
+							$this->logWarning("Failed to send Notification to " . $email);
+						}
 					}
 				}
 			}
