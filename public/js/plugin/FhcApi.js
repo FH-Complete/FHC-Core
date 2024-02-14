@@ -46,7 +46,7 @@ export default {
 			if (response.config?.errorHandling == 'off'
 				|| response.config?.errorHandling === false
 				|| response.config?.errorHandling == 'fail')
-				return response;
+				return response.data; //return {...response.data, ...{meta: { response }}};
 			
 			// NOTE(chris): loop through errors
 			if (response.data.errors)
@@ -54,7 +54,7 @@ export default {
 					err => (response.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, response.config.form)
 				);
 
-			return response;
+			return response.data; //return {...response.data, ...{meta: { response }}}; // TODO(chris): save meta data in meta?
 		}, error => {
 			if (error.code == 'ERR_CANCELED')
 				return new Promise(() => {});
