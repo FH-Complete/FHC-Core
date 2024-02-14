@@ -239,6 +239,23 @@ class ProfilUpdate extends Auth_Controller
 		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilUpdateModel->getProfilUpdatesWhere(["uid"=>$this->uid]);
 		
+		//? the user cannot delete a zustelladresse/kontakt
+		if( isset($payload->delete) && $payload->{$identifier=="kontakt_id"? "zustellung":"zustelladresse"}){
+			echo json_encode(error("cannot delete resource marked as zustellung"));
+			return;
+		 }
+		 
+		 //? if the user tries to delete a adresse, checks whether the adresse is a heimatadresse, if so an error is raised
+		 if( isset($payload->delete) && $identifier == "adresse_id"){
+			$adr = $this->AdresseModel->load($payload->$identifier);
+			$adr = getData($adr)[0];
+			if($adr->heimatadresse){
+				echo json_encode(error("cannot delete adresse marked as heimatadresse"));
+				return;
+			}
+			
+		 }
+
 		if($res){
 		$pending_changes = array_filter($res, function($element) {
 			return $element->status == 'pending';
@@ -246,11 +263,9 @@ class ProfilUpdate extends Auth_Controller
 		foreach($pending_changes as $update_request){
 			$existing_change = $update_request->requested_change;
 			
-			 //? the user cannot delete a zustelladresse/kontakt
-			 if( isset($payload->delete) && $payload->{$identifier=="kontakt_id"? "zustellung":"zustelladresse"}){
-				echo json_encode(error("cannot delete resource marked as zustellung"));
-				return;
-			 }
+			 
+			 
+
 			 //? the user can add as many new kontakt/adresse as he likes
 			 if( !isset($payload->add) && property_exists($existing_change,$identifier) && property_exists($payload,$identifier) && $existing_change->$identifier == $payload->$identifier){
 				//? the kontakt_id / adresse_id of a change has to be unique 
