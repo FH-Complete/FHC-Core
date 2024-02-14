@@ -32,7 +32,7 @@ export default {
                     //? if the adresse was already saved
                     return false;
                 }
-                return this.zustellAdressenCount>0 && this.data.zustelladresse;
+                return this.zustellAdressenCount.length && this.data.zustelladresse;
             }
             //? if this.zustellAdressenCount is still not set by the api call and is still null
             return false;
@@ -62,7 +62,7 @@ export default {
     created(){
         Vue.$fhcapi.UserData.getZustellAdresse().then(res => {
             
-            this.zustellAdressenCount = res.data?.length;
+            this.zustellAdressenCount = res.data;
         })
         this.originalValue = JSON.stringify(this.data);
         
