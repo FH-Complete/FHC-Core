@@ -23,7 +23,6 @@ class ProfilUpdate extends Auth_Controller
 			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'handleDupplicateZustellKontakte' => ['student/anrechnung_beantragen:r', 'user:r'],
 			
 			
 		]);
@@ -247,8 +246,12 @@ class ProfilUpdate extends Auth_Controller
 		foreach($pending_changes as $update_request){
 			$existing_change = $update_request->requested_change;
 			
+			 //? the user cannot delete a zustelladresse/kontakt
+			 if( isset($payload->delete) && $payload->{$identifier=="kontakt_id"? "zustellung":"zustelladresse"}){
+				echo json_encode(error("cannot delete resource marked as zustellung"));
+				return;
+			 }
 			 //? the user can add as many new kontakt/adresse as he likes
-			 
 			 if( !isset($payload->add) && property_exists($existing_change,$identifier) && property_exists($payload,$identifier) && $existing_change->$identifier == $payload->$identifier){
 				//? the kontakt_id / adresse_id of a change has to be unique 
 				echo json_encode(error("cannot change the same resource twice"));
@@ -458,8 +461,15 @@ class ProfilUpdate extends Auth_Controller
 			$requested_change['insertamum'] = "NOW()";
 			$requested_change['insertvon'] = getAuthUID();
 			$insertID = $this->KontaktModel->insert($requested_change);
-			//TODO: check if the user has two zustelladressen or zustellkontakte
-			$this->handleDupplicateZustellKontakte($requested_change['zustellung']);
+			$insert_kontakt_id = $insertID;
+			if(isError($insert_kontakt_id)){
+				show_error("was not able to insert new kontakt");
+			}
+			$insert_kontakt_id = hasData($insert_kontakt_id)? getData($insert_kontakt_id):null;
+			if($insert_kontakt_id){
+				$this->handleDupplicateZustellKontakte($requested_change['zustellung'],$insert_kontakt_id);
+			}
+			
 			
 		}
 		//! DELETE
@@ -469,8 +479,18 @@ class ProfilUpdate extends Auth_Controller
 		//! UPDATE
 		else{
 			$requested_change['updateamum']="NOW()";
-			$requested_change['updatemvon']=getAuthUID();
-			$this->KontaktModel->update($kontakt_id,$requested_change);
+			$requested_change['updatevon']=getAuthUID();
+			var_dump($requested_change);
+			
+			$update_kontakt_id = $this->KontaktModel->update($kontakt_id,$requested_change);
+
+			if(isError($update_kontakt_id)){
+				show_error("was not able to update kontakt");
+			}
+			$update_kontakt_id = hasData($update_kontakt_id) ? getData($update_kontakt_id) : null;
+			if($update_kontakt_id){
+				$this->handleDupplicateZustellKontakte($requested_change['zustellung'],$update_kontakt_id);
+			}
 		}
 		return isset($insertID) ? $insertID : null;
 	}
@@ -498,7 +518,15 @@ class ProfilUpdate extends Auth_Controller
 			$requested_change['person_id'] = $personID;
 			//TODO: zustelladresse, heimatadresse, rechnungsadresse und nation werden nicht beachtet
 			$insertID = $this->AdresseModel->insert($requested_change);
-			
+			$insert_adresse_id = $insertID;
+			if(isError($insert_adresse_id)){
+				show_error("was not able to insert new adresse");
+			}
+			$insert_adresse_id = hasData($insert_adresse_id) ? getData($insert_adresse_id) : null;
+			if($insert_adresse_id){
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'],$insert_adresse_id);
+			}
+		
 		}
 		//! DELETE
 		elseif(array_key_exists('delete',$requested_change) && $requested_change['delete']){
@@ -508,33 +536,64 @@ class ProfilUpdate extends Auth_Controller
 		else{
 			$requested_change['updateamum']	= "NOW()";
 			$requested_change['updatevon'] = getAuthUID();
-			$this->AdresseModel->update($adresse_id,$requested_change);
+			$update_adresse_id = $this->AdresseModel->update($adresse_id,$requested_change);
+			if(isError($update_adresse_id)){
+				show_error("was not able to insert new adresse");
+			}
+			$update_adresse_id = hasData($update_adresse_id) ? getData($update_adresse_id) : null;
+			if($update_adresse_id){
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'],$update_adresse_id);
+			}
 		}
 		return isset($insertID)? $insertID : null;
 	}
 
 
-	public function handleDupplicateZustellKontakte($zustellung){
+	private function handleDupplicateZustellKontakte($zustellung, $kontakt_id){
+		if($zustellung){
+			$this->PersonModel->addSelect("public.tbl_kontakt.kontakt_id");
+			$this->PersonModel->addJoin("public.tbl_kontakt","public.tbl_kontakt.person_id = public.tbl_person.person_id");
+			$zustellKontakteArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id"=>$this->pid, "zustellung"=>TRUE]);
+			if(!isSuccess($zustellKontakteArray)){
+				return error("error when querying zustellkontakte");
+			}
+			$zustellKontakteArray = hasData($zustellKontakteArray) ? getData($zustellKontakteArray) : null;
 
-		$this->PersonModel->addSelect("public.tbl_kontakt.kontakt_id");
-		$this->PersonModel->addJoin("public.tbl_kontakt","public.tbl_kontakt.person_id = public.tbl_person.person_id");
-		$zustellKontakteCount = $this->PersonModel->loadWhere(["public.tbl_person.person_id"=>$this->pid, "zustellung"=>TRUE]);
-		if(!isSuccess($zustellKontakteCount)){
-			return error("error in the query");
+			if($zustellung && count($zustellKontakteArray)>0){
+				$zustellKontakteArray = array_filter($zustellKontakteArray, function($kontakt) use ($kontakt_id){
+					return $kontakt->kontakt_id != $kontakt_id;
+				});
+				foreach($zustellKontakteArray as $kontakt){
+					$this->KontaktModel->update($kontakt->kontakt_id,["zustellung"=>FALSE]);
+				}
+				
+			}
 		}
-		$zustellKontakteCount = hasData($zustellKontakteCount) ? getData($zustellKontakteCount) : null;
-		
+	}
 
-		if($zustellung && count($zustellKontakteCount)>0){
-			echo $zustellKontakteCount[0];
+	private function handleDupplicateZustellAdressen($zustellung, $adresse_id){
+		if($zustellung){
+			$this->PersonModel->addSelect("public.tbl_adresse.adresse_id");
+			$this->PersonModel->addJoin("public.tbl_adresse","public.tbl_adresse.person_id = public.tbl_person.person_id");
+			$zustellAdressenArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id"=>$this->pid, "zustelladresse"=>TRUE]);
+			if(!isSuccess($zustellAdressenArray)){
+				return error("error when querying zustelladressen");
+			}
+			$zustellAdressenArray = hasData($zustellAdressenArray) ? getData($zustellAdressenArray) : null;
+
+			if($zustellung && count($zustellAdressenArray)>0){
+				
+				$zustellAdressenArray = array_filter($zustellAdressenArray, function($adresse) use ($adresse_id){
+				
+					return $adresse->adresse_id != $adresse_id;
+				});
+				foreach($zustellAdressenArray as $adresse){
+					$this->AdresseModel->update($adresse->adresse_id,["zustelladresse"=>FALSE]);
+				}
+				
+			}
 		}
 	}
 
-	private function getZustelladressenCount(){
-		
-	}
-
-	public function getZustellkontakteCount(){
-		
-	}
+	
 }

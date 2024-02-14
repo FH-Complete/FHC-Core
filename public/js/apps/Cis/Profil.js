@@ -36,7 +36,7 @@ Vue.$collapseFormatter  = function(data){
 
   
 
-const app = Vue.createApp({
+const testapp = Vue.createApp({
 	
 	components: {
 		StudentProfil,
@@ -268,4 +268,4 @@ const app = Vue.createApp({
 	
 	
 });
-app.mount("#content");
+testapp.mount("#content");

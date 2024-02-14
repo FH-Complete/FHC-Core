@@ -61,7 +61,6 @@ export default {
         },
     },
     created(){
-        console.log(this.getZustelladressenCount)
         this.originalValue = JSON.stringify(this.data);
         this.zustellAdressenCount = this.zustellAdresseCount();
         
