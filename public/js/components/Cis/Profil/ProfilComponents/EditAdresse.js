@@ -32,7 +32,7 @@ export default {
                     //? if the adresse was already saved
                     return false;
                 }
-                return this.zustellAdressenCount > 0 && this.data.zustelladresse;
+                return this.zustellAdressenCount>0 && this.data.zustelladresse;
             }
             //? if this.zustellAdressenCount is still not set by the api call and is still null
             return false;
@@ -62,7 +62,7 @@ export default {
     created(){
         Vue.$fhcapi.UserData.getZustellAdresse().then(res => {
             
-            this.zustellAdressenCount = res.data;
+            this.zustellAdressenCount = res.data?.length;
         })
         this.originalValue = JSON.stringify(this.data);
         
@@ -72,6 +72,7 @@ export default {
      <div class="gy-3 row justify-content-center align-items-center">
      
      
+     <!-- warning message for too many zustellungs Adressen -->
      <div v-if="showZustellAdressenWarning" class="col-12 ">
      <div class="card bg-danger mx-2">
      <div class="card-body text-white ">
@@ -79,6 +80,9 @@ export default {
      </div>
      </div>
      </div>
+     <!-- End of warning -->
+
+
      <div class="col-12 ">
         
        

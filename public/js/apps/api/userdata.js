@@ -43,4 +43,11 @@ export default {
       `cis.php/Cis/Profil/getZustellAdresse`;
     return axios.get(url);
   },
+
+  getZustellKontakt: function () {
+    const url =
+      FHC_JS_DATA_STORAGE_OBJECT.app_root +
+      `cis.php/Cis/Profil/getZustellKontakt`;
+    return axios.get(url);
+  },
 };

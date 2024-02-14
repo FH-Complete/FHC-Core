@@ -8,6 +8,7 @@ export default {
         return{
            
             originalValue:null,
+            zustellKontaktCount:null,
         }
     },
     methods:{
@@ -27,6 +28,20 @@ export default {
         },
     },
     computed:{
+        showZustellKontakteWarning: function(){
+            if(this.zustellKontaktCount){
+                
+                if(this.zustellKontaktCount.includes(this.data.kontakt_id)){
+                    //? if the adresse was already saved
+                    return false;
+                }
+                return this.zustellKontaktCount>0 && this.data.zustellung;
+            }
+            //? if this.zustellAdressenCount is still not set by the api call and is still null
+            return false;
+            
+
+        },
         isChanged: function(){
             //? returns true if the original passed data object was changed 
             if(!this.data.kontakt || !this.data.kontakttyp) {return false;}
@@ -35,14 +50,30 @@ export default {
     },
     created(){
 
-        this.originalValue = JSON.stringify(this.data);
+        Vue.$fhcapi.UserData.getZustellKontakt().then(res => {
+            
+            this.zustellKontaktCount = res.data?.length;
+        })
        
+        this.originalValue = JSON.stringify(this.data);
         
     },
     template:
     `
+    
     <div class="gy-3 row align-items-center justify-content-center">    
     
+    
+    <!-- warning message for too many zustellungs Kontakte -->
+    <div v-if="showZustellKontakteWarning" class="col-12 ">
+    <div class="card bg-danger mx-2">
+    <div class="card-body text-white ">
+    <span>!Achtung: Eine deiner Kontakte ist bereits als Zustellungskontakt gespeichert, sind sie sicher, dass sie den aktuellen Kontakt stattdessen als Zustellkontakt speichern wollen?</span>
+    </div>
+    </div>
+    </div>
+    <!-- End of warning -->
+
     <div v-if="!data.kontakt_id" class="col-12">
         
     

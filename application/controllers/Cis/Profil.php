@@ -23,6 +23,7 @@ class Profil extends Auth_Controller
 			'isMitarbeiter' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'isStudent' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getZustellAdresse' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'getZustellKontakt' => ['student/anrechnung_beantragen:r', 'user:r'],
 			
 		]);
 
@@ -99,6 +100,16 @@ class Profil extends Auth_Controller
 			return $item->adresse_id;
 		},$adressen_res);
 		echo json_encode($adressen_res);
+	}
+
+	public function getZustellKontakt(){
+		$this->KontaktModel->addSelect(["kontakt_id"]);
+		$kontakt_res = $this->KontaktModel->loadWhere(['person_id'=>$this->pid, 'zustellung'=>true]);
+		$kontakt_res = hasData($kontakt_res) ? getData($kontakt_res): null;
+		$kontakt_res = array_map(function($item){
+			return $item->kontakt_id;
+		},$kontakt_res);
+		echo json_encode($kontakt_res);
 	}
 
 
