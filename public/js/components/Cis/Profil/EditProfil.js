@@ -12,6 +12,8 @@ export default {
   props: {
     value: Object,
     title: String,
+    zustelladressenCount: Function,
+    zustellkontakteCount: Function,
     /*
      * NOTE(chris):
      * Hack to expose in "emits" declared events to $props which we use
@@ -41,6 +43,8 @@ export default {
   provide(){
     return {
       updateFileID: this.updateFileIDFunction,
+      zustellAdresseCount:this.zustelladressenCount,
+      zustellKontaktCount:this.zustellkontakteCount,
     }
   }, 
 
@@ -144,6 +148,7 @@ export default {
     return BsModal.popup.bind(this)(null, options);
   },
   template: `
+
   <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     
   <template v-if="title" v-slot:title>
@@ -158,7 +163,6 @@ export default {
       </ol>
     </nav>
 
-   
     <edit-profil-select @submit="submitProfilChange" v-model:breadcrumb="breadcrumb" v-model:topic="topic" v-model:profilUpdate="profilUpdate" ariaLabel="test" :list="editData"></edit-profil-select>
    
 

@@ -23,6 +23,8 @@ class ProfilUpdate extends Auth_Controller
 			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'handleDupplicateZustellKontakte' => ['student/anrechnung_beantragen:r', 'user:r'],
+			
 			
 		]);
 		
@@ -332,6 +334,7 @@ class ProfilUpdate extends Auth_Controller
 
 
 	public function acceptProfilRequest(){
+		
 
 		$_POST = json_decode($this->input->raw_input_stream,true);
 		$id = $this->input->post('profil_update_id',true);
@@ -455,6 +458,8 @@ class ProfilUpdate extends Auth_Controller
 			$requested_change['insertamum'] = "NOW()";
 			$requested_change['insertvon'] = getAuthUID();
 			$insertID = $this->KontaktModel->insert($requested_change);
+			//TODO: check if the user has two zustelladressen or zustellkontakte
+			$this->handleDupplicateZustellKontakte($requested_change['zustellung']);
 			
 		}
 		//! DELETE
@@ -485,6 +490,7 @@ class ProfilUpdate extends Auth_Controller
 		
 		//! ADD
 		if(array_key_exists('add',$requested_change) && $requested_change['add']){
+			
 			//? removes add flag
 			unset($requested_change['add']);
 			$requested_change['insertamum']="NOW()";
@@ -492,6 +498,7 @@ class ProfilUpdate extends Auth_Controller
 			$requested_change['person_id'] = $personID;
 			//TODO: zustelladresse, heimatadresse, rechnungsadresse und nation werden nicht beachtet
 			$insertID = $this->AdresseModel->insert($requested_change);
+			
 		}
 		//! DELETE
 		elseif(array_key_exists('delete',$requested_change) && $requested_change['delete']){
@@ -504,5 +511,30 @@ class ProfilUpdate extends Auth_Controller
 			$this->AdresseModel->update($adresse_id,$requested_change);
 		}
 		return isset($insertID)? $insertID : null;
+	}
+
+
+	public function handleDupplicateZustellKontakte($zustellung){
+
+		$this->PersonModel->addSelect("public.tbl_kontakt.kontakt_id");
+		$this->PersonModel->addJoin("public.tbl_kontakt","public.tbl_kontakt.person_id = public.tbl_person.person_id");
+		$zustellKontakteCount = $this->PersonModel->loadWhere(["public.tbl_person.person_id"=>$this->pid, "zustellung"=>TRUE]);
+		if(!isSuccess($zustellKontakteCount)){
+			return error("error in the query");
+		}
+		$zustellKontakteCount = hasData($zustellKontakteCount) ? getData($zustellKontakteCount) : null;
+		
+
+		if($zustellung && count($zustellKontakteCount)>0){
+			echo $zustellKontakteCount[0];
+		}
+	}
+
+	private function getZustelladressenCount(){
+		
+	}
+
+	public function getZustellkontakteCount(){
+		
 	}
 }

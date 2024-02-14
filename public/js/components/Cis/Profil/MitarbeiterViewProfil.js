@@ -15,6 +15,7 @@ export default {
     ProfilEmails,
     ProfilInformation,
   },
+  inject: ['collapseFunction'],
   data() {
     return {
       collapseIconFunktionen: true,
@@ -45,7 +46,7 @@ export default {
             headerFilter: false,
             formatter: "responsiveCollapse",
             maxWidth: 40,
-            headerClick: this.$parent.collapseFunction,
+            headerClick: this.collapseFunction,
           },
           {
             title: "Bezeichnung",

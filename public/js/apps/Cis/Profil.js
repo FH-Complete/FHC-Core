@@ -57,8 +57,9 @@ const app = Vue.createApp({
 	//? use function syntax for provide so that we can access `this`
 	provide() {
 		return {
-		
-			
+
+			getZustellkontakteCount: this.zustellKontakteCount,
+			getZustelladressenCount: this.zustellAdressenCount,
 			collapseFunction:  (e, column)=> {
 		
 				//* check if property doesn't exist already and add it to the reactive this properties
@@ -121,7 +122,36 @@ const app = Vue.createApp({
 		}
 		
 	},
+	methods:{
+		zustellAdressenCount(){
+			if(!this.data || !this.data.adressen){
+				
+				return null;
+			}
+
+			return this.data.adressen.filter(adresse => {
+				return adresse.zustelladresse;
+			}).map(adr => {
+				
+				return adr.adresse_id;
+			});
+			
+		},
+
+		zustellKontakteCount(){
+			if(!this.data || !this.data.kontakte){
+				return null;
+			}
+
+			return this.data.kontakte.filter(kontakt => {
+				return kontakt.zustellung;
+			}).map(kon =>{
+				return kon.kontakt_id;
+			});
+		},
+	},
 	computed:{
+		
 
 		filteredEditData(){
 			if(!this.data){
@@ -218,12 +248,8 @@ const app = Vue.createApp({
 				this.notFoundUID=uid;
 			}else{
 				this.view = res.data?.view;
-
 				this.data = res.data?.data;
-			
-				
 			}
-			
 			
 		});
 	},

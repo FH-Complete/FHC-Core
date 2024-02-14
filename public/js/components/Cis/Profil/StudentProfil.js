@@ -24,7 +24,7 @@ export default {
     FetchProfilUpdates,
 
   },
-  inject:['sortProfilUpdates'],
+  inject:['sortProfilUpdates','collapseFunction','getZustellkontakteCount','getZustelladressenCount'],
   data() {
     return {
       
@@ -51,7 +51,7 @@ export default {
             headerFilter: false,
             formatter: "responsiveCollapse",
             maxWidth: 40,
-            headerClick: this.$parent.collapseFunction,
+            headerClick: this.collapseFunction,
           },
           {
             title: "Betriebsmittel",
@@ -97,6 +97,8 @@ export default {
       EditProfil.popup({ 
           value:JSON.parse(JSON.stringify(this.editData)),
           title:"Profil bearbeiten",
+          zustelladressenCount:this.getZustelladressenCount,
+          zustellkontakteCount:this.getZustellkontakteCount,
         }).then((popup_result) => {
           if(popup_result){
             Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
@@ -212,7 +214,7 @@ export default {
               <div v-if="data.profilUpdates" class="row mb-3">
                 <div class="col">
                   <!-- MOBILE PROFIL UPDATES -->  
-                  <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                  <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates"></fetch-profil-updates>
                 </div>
               </div>
 
@@ -398,7 +400,7 @@ export default {
                 <div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
                 <div class="col mb-3">
                     <!-- PROFIL UPDATES -->
-                    <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                    <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates"></fetch-profil-updates>
                 </div>    
                 </div>
 

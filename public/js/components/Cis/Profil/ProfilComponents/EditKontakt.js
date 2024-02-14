@@ -8,9 +8,11 @@ export default {
         return{
            
             originalValue:null,
-            zustellKontaktCount:null,
+            zustellKontakteCount:null,
+           
         }
     },
+    inject:["zustellKontaktCount"],
     methods:{
         updateValue: function(event,bind){
 
@@ -29,13 +31,13 @@ export default {
     },
     computed:{
         showZustellKontakteWarning: function(){
-            if(this.zustellKontaktCount){
+            if(this.zustellKontakteCount){
                 
-                if(this.zustellKontaktCount.includes(this.data.kontakt_id)){
+                if(this.zustellKontakteCount.includes(this.data.kontakt_id)){
                     //? if the adresse was already saved
                     return false;
                 }
-                return this.zustellKontaktCount.length && this.data.zustellung;
+                return this.zustellKontakteCount.length && this.data.zustellung;
             }
             //? if this.zustellAdressenCount is still not set by the api call and is still null
             return false;
@@ -50,13 +52,9 @@ export default {
     },
     created(){
 
-        Vue.$fhcapi.UserData.getZustellKontakt().then(res => {
-            
-            this.zustellKontaktCount = res.data;
-        })
        
         this.originalValue = JSON.stringify(this.data);
-        
+        this.zustellKontakteCount = this.zustellKontaktCount();
     },
     template:
     `

@@ -6,6 +6,7 @@ export default {
             default: false,
         },
     },
+    inject:["zustellAdresseCount"],
     data(){
         return{
             originalValue:null,
@@ -60,15 +61,12 @@ export default {
         },
     },
     created(){
-        Vue.$fhcapi.UserData.getZustellAdresse().then(res => {
-            
-            this.zustellAdressenCount = res.data;
-        })
+        console.log(this.getZustelladressenCount)
         this.originalValue = JSON.stringify(this.data);
+        this.zustellAdressenCount = this.zustellAdresseCount();
         
     },
     template:`
-   
      <div class="gy-3 row justify-content-center align-items-center">
      
      

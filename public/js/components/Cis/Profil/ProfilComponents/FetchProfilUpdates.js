@@ -6,9 +6,9 @@ export default {
       type: Object,
     },
   },
+  inject:['getZustellkontakteCount','getZustelladressenCount'],
 
   emits: ["fetchUpdates"],
-
   data() {
     return {};
   },
@@ -88,13 +88,13 @@ export default {
         withFiles: withFiles,
         topic: updateRequest.topic,
         files: files,
+        
       };
 
       //?TODO: check if updateRequest.uid is a mitarbeiter, if so add the flag isMitarbeiter:true
       if(view === "EditAdresse"){
-        console.log("uid",updateRequest.uid);
         const isMitarbeiter = await Vue.$fhcapi.UserData.isMitarbeiter(updateRequest.uid).then(res => res.data);
-        console.log(typeof(isMitarbeiter));
+
         if(isMitarbeiter){
           content['isMitarbeiter']=isMitarbeiter;
         }
@@ -112,6 +112,8 @@ export default {
         EditProfil.popup({
           value: content,
           title: updateRequest.topic,
+          zustellkontakteCount:this.getZustellkontakteCount,
+          zustelladressenCount:this.getZustelladressenCount,
         })
           .then((res) => {
             if (res === true) {
@@ -127,7 +129,6 @@ export default {
   created() {},
   computed: {},
   template: `
-   
     <div  class="card text-nowrap" >
                       <div class="card-header">
                       Profil Updates

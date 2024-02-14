@@ -26,7 +26,7 @@ export default {
     RoleInformation,
     ProfilInformation,
   },
-  inject: ['sortProfilUpdates','collapseFunction'],
+  inject: ['sortProfilUpdates','collapseFunction','getZustellkontakteCount','getZustelladressenCount'],
   data() {
     return {
 
@@ -158,6 +158,8 @@ export default {
 
       EditProfil.popup({ 
           value:JSON.parse(JSON.stringify(this.editData)),
+          zustelladressenCount:this.getZustelladressenCount,
+          zustellkontakteCount:this.getZustellkontakteCount,
           title:"Profil bearbeiten",
         }).then((popup_result) => {
           if(popup_result){
@@ -241,7 +243,7 @@ export default {
   },
 
   template: ` 
-
+ 
   <div class="container-fluid text-break fhc-form"  >
     
           <div class="row">
@@ -273,7 +275,7 @@ export default {
               <div v-if="data.profilUpdates" class="row mb-3">
                 <div class="col">
                   <!-- MOBILE PROFIL UPDATES -->  
-                  <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                  <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates" ></fetch-profil-updates>
                 </div>
               </div>
 
