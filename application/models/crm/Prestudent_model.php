@@ -754,8 +754,10 @@ class Prestudent_model extends DB_Model
 				ps.anmerkung,
 				ps.bestaetigtvon,
 				ps.insertamum,
+				TO_CHAR(ps.insertamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_insertamum,
 				ps.insertvon,
 				ps.updateamum,
+				TO_CHAR(ps.updateamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_updateamum,
 				ps.updatevon
 			FROM public.tbl_prestudentstatus ps
 			JOIN public.tbl_student st USING (prestudent_id)
@@ -767,6 +769,8 @@ class Prestudent_model extends DB_Model
 			and lv.studiensemester_kurzbz = ps.studiensemester_kurzbz
 			ORDER BY datum DESC
 		";
+
+	//	var_dump($query);
 
 		return $this->execQuery($query, array($prestudent_id));
 	}

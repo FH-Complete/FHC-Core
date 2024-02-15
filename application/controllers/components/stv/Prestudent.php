@@ -160,18 +160,6 @@ class Prestudent extends FHC_Controller
 		$this->outputJson(getData($result) ?: []);
 	}
 
-	public function getHistoryPrestudent($prestudent_id)
-	{
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-
-		$result = $this->PrestudentModel->getHistoryPrestudent($prestudent_id);
-		if (isError($result))
-		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-		}
-		$this->outputJson(getData($result) ?: []);
-	}
-
 	public function getBezeichnungZgv()
 	{
 		$this->load->model('codex/Zgv_model', 'ZgvModel');
@@ -262,6 +250,46 @@ class Prestudent extends FHC_Controller
 		$this->GsstudientypModel->addOrder('gsstudientyp_kurzbz');
 
 		$result = $this->GsstudientypModel->load();
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+		$this->outputJson($result);
+	}
+
+	public function getStudiensemester()
+	{
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$this->StudiensemesterModel->addOrder('start', 'DESC');
+		$this->StudiensemesterModel->addLimit(20);
+
+		$result = $this->StudiensemesterModel->load();
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+		$this->outputJson($result);
+	}
+
+	public function getStudienplaene($prestudent_id)
+	{
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$result = $this->PrestudentModel->loadWhere(
+			array('prestudent_id' => $prestudent_id)
+		);
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+
+		$result = current(getData($result));
+		$studiengang_kz = $result->studiengang_kz;
+
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+
+		$this->StudienplanModel->addOrder('studienplan_id', 'DESC');
+
+		$result = $this->StudienplanModel->getStudienplaene($studiengang_kz);
+
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
