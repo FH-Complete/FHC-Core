@@ -16,7 +16,7 @@
 const DEBUG = false;
 
 // Default veil timeout (milliseconds)
-const VEIL_TIMEOUT = 1000;
+const VEIL_TIMEOUT = 5000;
 
 //--------------------------------------------------------------------------------------------------------------------
 // Constants
