@@ -115,31 +115,27 @@ class Profil extends Auth_Controller
 
 	private function viewMitarbeiterProfil($uid)
 	{
-		
 		$mailverteiler_res = $this->getMailverteiler($uid);
 		$benutzer_funktion_res = $this->getBenutzerFunktion($uid);
 		$benutzer_res = $this->getBenutzerAlias($uid);
 		$person_res = $this->getPersonInfo($uid);
 		$mitarbeiter_res = $this->getMitarbeiterInfo($uid);
 		$telefon_res = $this->getTelefonInfo($uid);
-		
-
 
 		$res = new stdClass();
 		$res->username = $uid;
-
 
 		//? Person Info
 		foreach($person_res as $key => $val){
 			$res->$key = $val;
 		}
-
+	
 		//? Mitarbeiter Info
 		foreach ($mitarbeiter_res as $key => $val) {
 			$res->$key = $val;
 
 		}
-		//? Email Info 
+
 		$intern_email = array();
 		$intern_email["type"] = "intern";
 		$intern_email["email"] = $uid . "@" . DOMAIN;
@@ -148,32 +144,23 @@ class Profil extends Auth_Controller
 		$extern_email["email"] = $benutzer_res->alias . "@" . DOMAIN;
 		$res->emails = array($intern_email, $extern_email);
 
-		//? Benutzerfunktion Info
 		$res->funktionen = $benutzer_funktion_res;
-
-		//? Mailverteiler Info
 		$res->mailverteiler = $mailverteiler_res;
-
 		$res->standort_telefon = isset($telefon_res)? $telefon_res->kontakt : null;
 
 		return $res;
-
 	}
 
 
 
 	private function viewStudentProfil($uid)
 	{
-
 		$mailverteiler_res = $this->getMailverteiler($uid);
 		$person_res = $this->getPersonInfo($uid);
 		$student_res = $this->getStudentInfo($uid);
 		$matr_res = $this->getMatrikelNummer($uid);
 
-		
-
 		$res = new stdClass();
-
 		$res->username = $uid;
 
 		//? Person Information
@@ -185,7 +172,6 @@ class Profil extends Auth_Controller
 		foreach ($student_res as $key => $value) {
 			$res->$key = $value;
 		}
-		
 
 		$intern_email = array();
 		$intern_email["type"] = "intern";
@@ -196,8 +182,6 @@ class Profil extends Auth_Controller
 		$res->mailverteiler = $mailverteiler_res;
 
 		return $res;
-
-
 	}
 
 	private function mitarbeiterProfil()
@@ -215,7 +199,6 @@ class Profil extends Auth_Controller
 		$mitarbeiter_res = $this->getMitarbeiterInfo($this->uid);
 
 		$res = new stdClass();
-
 		$res->username = $this->uid;
 
 		//? Person Information
@@ -243,9 +226,7 @@ class Profil extends Auth_Controller
 		$res->emails = [$intern_email, $extern_email];
 
 		$res->funktionen = $benutzer_funktion_res;
-
 		$res->standort_telefon = $telefon_res;
-
 		$res->profilUpdates = $profilUpdates;
 
 		return $res;
@@ -265,10 +246,7 @@ class Profil extends Auth_Controller
 		$matr_res = $this->getMatrikelNummer($this->uid);
 		$profilUpdates = $this->getProfilUpdates($this->uid);
 
-
 		$res = new stdClass();
-
-
 		$res->username = $this->uid;
 
 		//? Person Information
@@ -291,11 +269,7 @@ class Profil extends Auth_Controller
 		$res->kontakte = $kontakte_res;
 		$res->mittel = $betriebsmittelperson_res;
 		$res->matrikelnummer = $matr_res->matr_nr;
-		
 		$res->zuttritsgruppen = $zutrittsgruppe_res;
-
-
-
 		$res->mailverteiler = $mailverteiler_res;
 		$res->profilUpdates = $profilUpdates;
 	
@@ -305,34 +279,26 @@ class Profil extends Auth_Controller
 	public function getView($uid)
 	{
 		//TODO: refactor
-
 		$uid = $uid != "Profil" ? $uid : null;
-
-
 
 		$isMitarbeiter = null;
 		if ($uid) {
-
 			if (isSuccess($this->PersonModel->addSelect(["person_id"]))) {
 				$pid = $this->PersonModel->getByUid($uid);
 				$pid = hasData($pid) ? getData($pid)[0] : null;
-
 			}
 			if (!$pid) {
 				//! if no Person_ID was found, null is returned and the vue component will show a 404 View
 				return null;
 			}
-
 			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
 		} else
 			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($this->uid);
-
 
 		if (isError($isMitarbeiter)) {
 			//catch error
 		}
 		$isMitarbeiter = hasData($isMitarbeiter) ? getData($isMitarbeiter) : null;
-
 
 		$res = new stdClass();
 
@@ -359,8 +325,6 @@ class Profil extends Auth_Controller
 
 			}
 		}
-
-
 		echo json_encode($res);
 
 	}
@@ -368,7 +332,7 @@ class Profil extends Auth_Controller
 	public function foto_sperre_function($value) //TODO: refactor function
 	{
 		//? Nur der Index User hat die Erlaubniss das Profilbild zu sperren 
-		$res = $this->PersonModel->update($this->pid, array("foto_sperre" => $value));
+		$res = $this->PersonModel->update($this->pid, ["foto_sperre" => $value]);
 
 		if (isError($res)) {
 			echo json_encode("error encountered when updating foto_sperre");

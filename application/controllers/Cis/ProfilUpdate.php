@@ -23,6 +23,7 @@ class ProfilUpdate extends Auth_Controller
 			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
+			"sendMailTest" => ['student/anrechnung_beantragen:r', 'user:r'],
 			
 			
 		]);
@@ -50,6 +51,28 @@ class ProfilUpdate extends Auth_Controller
 	public function index(){
 		$this->load->view('Cis/ProfilUpdate');
 	}
+
+	public function sendMailTest(){
+		$this->load->helper('hlp_sancho_helper');
+		$isStudent_res = $this->StudentModel->isStudent($this->uid);
+		if(!isSuccess($isStudent_res)){
+			show_error("was not able to check whether the uid is a student");
+		}
+		$isStudent_res = getData($isStudent_res);
+		if($isStudent_res){
+			//? Send email to the Studiengangsassistentinnen
+			$this->PersonModel->addSelect(["public.tbl_studiengang.email"]);
+			$this->PersonModel->addJoin("public.tbl_prestudent","public.tbl_person.person_id = public.tbl_prestudent.person_id");
+			$this->PersonModel->addJoin("public.tbl_studiengang","public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
+			$this->PersonModel->loadWhere(["public.tbl_person.person_id"=>$this->pid,"public.tbl_prestudent."]);
+			
+		}else{
+			//? user is not a student therefore he is a mitarbeiter, send email to Personalverwaltung
+		}
+		//$vorlage_kurzbz, $vorlage_data, $to, $subject
+		//sendSanchoMail("MessageMailTXT",["href"=>'test'],"simongschnell@gmail.com","subject");
+	}
+
 
 	public function show($dms_id){
 	
@@ -263,9 +286,6 @@ class ProfilUpdate extends Auth_Controller
 		foreach($pending_changes as $update_request){
 			$existing_change = $update_request->requested_change;
 			
-			 
-			 
-
 			 //? the user can add as many new kontakt/adresse as he likes
 			 if( !isset($payload->add) && property_exists($existing_change,$identifier) && property_exists($payload,$identifier) && $existing_change->$identifier == $payload->$identifier){
 				//? the kontakt_id / adresse_id of a change has to be unique 
@@ -332,22 +352,25 @@ class ProfilUpdate extends Auth_Controller
 	}
 
 	
-	private function checkIfPermissionsContainStudentOE($student_uid){
+	private function getOE_from_student($student_uid){
 
-		$oe_berechtigung = $this->permissionlib->getOE_isEntitledFor('student/stammdaten');
-		
-		//? query that checks if the oe_berechtigungen is contained in the organisations_einheiten that are connected to the studiengang of the student
-		$query ="SELECT TRUE
+		//? returns the oe_einheit eines Studenten 
+		$query ="SELECT public.tbl_studiengang.oe_kurzbz
 		FROM public.tbl_student
-		JOIN public.tbl_prestudent ON public.tbl_student.prestudent_id = public.tbl_prestudent.prestudent_id
-		JOIN public.tbl_studiengang ON tbl_prestudent.studiengang_kz = public.tbl_studiengang.studiengang_kz
-		JOIN public.tbl_organisationseinheit ON public.tbl_organisationseinheit.oe_kurzbz = public.tbl_studiengang.oe_kurzbz
-		WHERE public.tbl_student.student_uid = ? AND public.tbl_studiengang.oe_kurzbz IN ?
-		LIMIT 1;";
-		//TODO: hardcoded student_uid replace with variable student_uid
-		$res = $this->StudentModel->execReadOnlyQuery($query,[$student_uid,$oe_berechtigung]);
-		return hasData($res) ? true : false;
+		JOIN public.tbl_studiengang ON tbl_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
+		WHERE public.tbl_student.student_uid = ?;";
 		
+		$res = $this->StudentModel->execReadOnlyQuery($query,[$student_uid]);
+		if(!isSuccess($res)){
+			show_error("was not able to query the oe_einheit of Student: ".$student_uid);
+		}
+		$res = hasData($res) ? getData($res) : [];
+		$res = array_map(
+			function($item){
+			return $item->oe_kurzbz;
+			},$res
+		);
+		return $res;
 	}
 
 
@@ -378,8 +401,8 @@ class ProfilUpdate extends Auth_Controller
 		
 		//? check if the permissions are set correctly
 		if(
-			$this->permissionlib->isBerechtigt('student/stammdaten:rw') && $is_student_profil_update && $this->checkIfPermissionsContainStudentOE($uid) || 
-			$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten:rw') && $is_mitarbeiter_profil_update 
+			$this->permissionlib->isBerechtigt('student/stammdaten',"suid",$this->getOE_from_student($uid)) && $is_student_profil_update || 
+			$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten',"suid") && $is_mitarbeiter_profil_update 
 		)
 		{
 		
@@ -441,8 +464,8 @@ class ProfilUpdate extends Auth_Controller
 
 
 		if(
-			$this->permissionlib->isBerechtigt('student/stammdaten:rw') && $is_student_profil_update && $this->checkIfPermissionsContainStudentOE($uid) || 
-			$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten:rw') && $is_mitarbeiter_profil_update 
+			$this->permissionlib->isBerechtigt('student/stammdaten',"suid",$this->getOE_from_student($uid)) && $is_student_profil_update || 
+			$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten',"suid") && $is_mitarbeiter_profil_update 
 		)
 		{
 			echo json_encode($this->setStatusOnUpdateRequest($id, "rejected", $status_message));

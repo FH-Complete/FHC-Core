@@ -88,6 +88,8 @@ class Profil_update_model extends DB_Model
 		$res =[];
 		
 		if($studentBerechtigung) {
+
+			
 			//? Nur wenn der/die AssistentIn auch die Berechtigung in der gleichen Organisationseinheit des Studenten hat
 			$parameters = [];
 			$query="
@@ -95,10 +97,9 @@ class Profil_update_model extends DB_Model
 			profil_update_id, tbl_profil_update.uid, (tbl_person.vorname || ' ' || tbl_person.nachname) AS name , topic, requested_change, tbl_profil_update.updateamum, tbl_profil_update.updatevon, tbl_profil_update.insertamum, tbl_profil_update.insertvon, status, status_timestamp, status_message, attachment_id 
 			FROM public.tbl_profil_update 
 			JOIN public.tbl_student ON public.tbl_student.student_uid=public.tbl_profil_update.uid
-			JOIN public.tbl_prestudent ON public.tbl_prestudent.prestudent_id=public.tbl_student.prestudent_id
-			JOIN public.tbl_person ON public.tbl_prestudent.person_id=public.tbl_person.person_id
-			JOIN public.tbl_studiengang ON public.tbl_studiengang.studiengang_kz=public.tbl_prestudent.studiengang_kz
-			JOIN public.tbl_organisationseinheit ON public.tbl_organisationseinheit.oe_kurzbz=public.tbl_studiengang.oe_kurzbz
+			JOIN public.tbl_benutzer ON public.tbl_benutzer.uid = public.tbl_student.student_uid
+			JOIN public.tbl_person ON public.tbl_benutzer.person_id=public.tbl_person.person_id
+			JOIN public.tbl_studiengang ON public.tbl_studiengang.studiengang_kz=public.tbl_student.studiengang_kz
 			Where public.tbl_studiengang.oe_kurzbz IN ? ";
 			$parameters[]=$oe_berechtigung;
 			if($whereClause){
