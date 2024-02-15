@@ -43,7 +43,7 @@ export default{
                
                  
    
-                <div @['show.bs.collapse']="collapseOpen=true;" @['hide.bs.collapse']="collapseOpen=false;" class="mt-1 collapse" id="quickLinks">
+                <div @[\`show.bs.collapse\`]="collapseOpen=true;" @[\`hide.bs.collapse\`]="collapseOpen=false;" class="mt-1 collapse" id="quickLinks">
                   
                   <div class="list-group">
                    

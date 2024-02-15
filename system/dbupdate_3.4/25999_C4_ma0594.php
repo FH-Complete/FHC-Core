@@ -89,7 +89,16 @@
             echo '<br>public.tbl_profil_update: table created';
     }
 
-    
+    if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE campus.tbl_dms_kategorie.kategorie_kurzbz = 'profil_aenderung' LIMIT 1"))
+    {
+      
+        $qry = "INSERT INTO campus.tbl_dms_kategorie VALUES ('profil_aenderung','Dokumente für Profil Änderungen','Dokumente die Belegen ob man eine neue Adresse angemeldet hat oder seinen Namen geändert hat','dokumente',NULL,NULL);";
+
+        if(!$db->db_query($qry))
+            echo '<strong>INSERT OF DMS_KATEGORIE profil_aenderung ERROR : '.$db->db_last_error().'</strong><br>';
+        else
+            echo '<br>INSERT OF DMS_KATEGORIE profil_aenderung was successful';
+    }
     //? would add a column if the column is missing in the table
   /*   if(!$result = @$db->db_query("SELECT topic FROM public.tbl_profil_update LIMIT 1"))
     {

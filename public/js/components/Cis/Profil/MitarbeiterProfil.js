@@ -242,7 +242,7 @@ export default {
 
   },
 
-  template: ` 
+  template: /*html*/` 
  
   <div class="container-fluid text-break fhc-form"  >
     
@@ -253,7 +253,6 @@ export default {
               <div class="row mb-3">
                 <div class="col">
                 <!-- MOBILE QUICK LINKS -->     
-                  <quick-links :mobile="true"></quick-links>
                 </div>
               </div>
 
