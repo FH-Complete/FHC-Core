@@ -54,6 +54,7 @@ class ProfilUpdate extends Auth_Controller
 
 	public function sendMailTest(){
 		$this->load->helper('hlp_sancho_helper');
+		$emails = [];
 		
 		$isStudent_res = $this->StudentModel->isStudent($this->uid);
 		if(!isSuccess($isStudent_res)){
@@ -76,7 +77,8 @@ class ProfilUpdate extends Auth_Controller
 			echo json_encode($res);
 			
 		}else{
-			
+			//? user is not a student therefore he is a mitarbeiter, send email to Personalverwaltung
+			//? use constant variable MAIL_GST to mail to the personalverwaltung
 			$this->MitarbeiterModel->addSelect([TRUE]);
 			$this->MitarbeiterModel->addJoin("public.tbl_benutzer","public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid");
 			//? check if the the userID is a mitarbeiter and if the benutzer is active
@@ -85,16 +87,15 @@ class ProfilUpdate extends Auth_Controller
 				show_error("was not able to query the mitarbeiter and benutzer by the uid: ". $this->uid);
 			}
 			if(hasData($res)){
-				echo json_encode(MAIL_GST);
+				array_push($emails,MAIL_GST);
 			}else{
 				show_error("no Mitarbeiter with uid: ".$this->uid ." found");
 			}
 			
-			//? user is not a student therefore he is a mitarbeiter, send email to Personalverwaltung
-			//? use constant variable MAIL_GST to mail to the personalverwaltung
 		}
 		//$vorlage_kurzbz, $vorlage_data, $to, $subject
-		//sendSanchoMail("MessageMailTXT",["href"=>'test'],"simongschnell@gmail.com","subject");
+		$mail_res=sendSanchoMail("MessagecatchemMailTXT",["href"=>'test'],"ma0594@fh-technikum.at","test");
+		var_dump($mail_res);
 	}
 
 
