@@ -1281,35 +1281,28 @@ $filters = array(
 	),
 	array(
 		'app' => 'core',
-		'dataset_name' => 'AnwesenheitenByLektor',
-		'filter_kurzbz' => 'anwByLektor',
-		'description' => '{AnwesenheitenByLektor}',
-		'sort' => 2,
+		'dataset_name' => 'anrechnungTableData',
+		'filter_kurzbz' => 'AnrechnungTable',
+		'description' => '{Alle Anrechnungen}',
+		'sort' => 1,
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "Anwesenheiten By Lektor",
+				"name": "AnrechnungTable",
 				"columns": [
-					{"name": "Vorname"},
-					{"name": "Nachname"},
-					{"name": "Aktuelles Datum"},
-					{"name": "Summe"}
+					{"name": "studiengang_kz"},
+					{"name": "stg_bezeichnung"},
+					{"name": "studiensemester_kurzbz"},
+					{"name": "student"},
+					{"name": "lv_bezeichnung"},
+					{"name": "dokument_bezeichnung"},
+					{"name": "anmerkung_student"},
+					{"name": "status_kurzbz"}
 				],
-				"filters": [
-					{
-						"name": "Aktuelles Datum",
-						"operation": "ncontains",
-						"condition": "anw"
-					},
-					{
-						"name": "Aktuelles Datum",
-						"operation": "contains",
-						"condition": "abw"
-					}
-				]
+				"filters": []
 			}
 		',
-		'oe_kurzbz' => null,
+		'oe_kurzbz' => null
 	)
 );
 
