@@ -57,6 +57,7 @@ export default {
         this.zustellKontakteCount = this.zustellKontaktCount();
     },
     template:
+    /*html*/
     `
     
     <div class="gy-3 row align-items-center justify-content-center">    
@@ -96,7 +97,7 @@ export default {
         <!-- rendering KONTAKT emails -->
    
 
-        <div  class="form-underline">
+        <div class="form-underline">
         <div class="form-underline-titel">{{data.kontakttyp?data.kontakttyp:'Kontakt'}}</div>
     
         <input :disabled="data.kontakttyp?false:true"  class="form-control"   :value="data.kontakt" @input="updateValue($event,'kontakt')" :placeholder="data.kontakt">

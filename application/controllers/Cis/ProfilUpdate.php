@@ -54,6 +54,7 @@ class ProfilUpdate extends Auth_Controller
 
 	public function sendMailTest(){
 		$this->load->helper('hlp_sancho_helper');
+		
 		$isStudent_res = $this->StudentModel->isStudent($this->uid);
 		if(!isSuccess($isStudent_res)){
 			show_error("was not able to check whether the uid is a student");
@@ -61,13 +62,36 @@ class ProfilUpdate extends Auth_Controller
 		$isStudent_res = getData($isStudent_res);
 		if($isStudent_res){
 			//? Send email to the Studiengangsassistentinnen
-			$this->PersonModel->addSelect(["public.tbl_studiengang.email"]);
-			$this->PersonModel->addJoin("public.tbl_prestudent","public.tbl_person.person_id = public.tbl_prestudent.person_id");
-			$this->PersonModel->addJoin("public.tbl_studiengang","public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
-			$this->PersonModel->loadWhere(["public.tbl_person.person_id"=>$this->pid,"public.tbl_prestudent."]);
+			$this->StudentModel->addSelect(["public.tbl_studiengang.email"]);
+			$this->StudentModel->addJoin("public.tbl_benutzer","public.tbl_benutzer.uid = public.tbl_student.student_uid");
+			$this->StudentModel->addJoin("public.tbl_prestudent","public.tbl_benutzer.person_id = public.tbl_prestudent.person_id");
+			$this->StudentModel->addJoin("public.tbl_prestudentstatus","public.tbl_prestudentstatus.prestudent_id = public.tbl_prestudent.prestudent_id");
+			$this->StudentModel->addJoin("public.tbl_studiengang","public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
+			//? multiple checks
+			//* check if the benutzer itself is active
+			//* check if the student status is Student or Diplomand (active students)
+			$this->StudentModel->db->where_in("public.tbl_prestudentstatus.status_kurzbz",['Student','Diplomand']);
+			$res = $this->StudentModel->loadWhere(["public.tbl_benutzer.aktiv"=>TRUE,"public.tbl_student.student_uid"=>$this->uid]);
+			$res = hasData($res) ? getData($res) : null;
+			echo json_encode($res);
 			
 		}else{
+			
+			$this->MitarbeiterModel->addSelect([TRUE]);
+			$this->MitarbeiterModel->addJoin("public.tbl_benutzer","public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid");
+			//? check if the the userID is a mitarbeiter and if the benutzer is active
+			$res = $this->MitarbeiterModel->loadWhere(["public.tbl_mitarbeiter.mitarbeiter_uid"=>$this->uid,"public.tbl_benutzer.aktiv"=>TRUE]);
+			if(!isSuccess($res)){
+				show_error("was not able to query the mitarbeiter and benutzer by the uid: ". $this->uid);
+			}
+			if(hasData($res)){
+				echo json_encode(MAIL_GST);
+			}else{
+				show_error("no Mitarbeiter with uid: ".$this->uid ." found");
+			}
+			
 			//? user is not a student therefore he is a mitarbeiter, send email to Personalverwaltung
+			//? use constant variable MAIL_GST to mail to the personalverwaltung
 		}
 		//$vorlage_kurzbz, $vorlage_data, $to, $subject
 		//sendSanchoMail("MessageMailTXT",["href"=>'test'],"simongschnell@gmail.com","subject");
