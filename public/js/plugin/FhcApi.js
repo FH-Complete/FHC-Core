@@ -37,6 +37,16 @@ export default {
 			return [uri, data, config];
 		}
 
+		function _clean_return_value(response) {
+			const result = response.data;
+			delete response.data;
+			if (!result.meta)
+				result.meta = {response};
+			else
+				result.meta.response = response;
+			return result;
+		}
+
 		const fhcApiAxios = axios.create({
 			timeout: 5000,
 			baseURL: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"
@@ -46,7 +56,7 @@ export default {
 			if (response.config?.errorHandling == 'off'
 				|| response.config?.errorHandling === false
 				|| response.config?.errorHandling == 'fail')
-				return response.data; //return {...response.data, ...{meta: { response }}};
+				return _clean_return_value(response);
 			
 			// NOTE(chris): loop through errors
 			if (response.data.errors)
@@ -54,7 +64,7 @@ export default {
 					err => (response.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, response.config.form)
 				);
 
-			return response.data; //return {...response.data, ...{meta: { response }}}; // TODO(chris): save meta data in meta?
+			return _clean_return_value(response);
 		}, error => {
 			if (error.code == 'ERR_CANCELED')
 				return new Promise(() => {});
