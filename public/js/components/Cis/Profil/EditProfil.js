@@ -103,14 +103,7 @@ export default {
       }
     },
 
-    uploadFiles: async function (files) {
-      let updatedFiles = [];
-
-      if (this.editData.updateID) {
-        
-      }
-
-      
+    uploadFiles: async function (files) {  
       
       if (files[0].type !== "application/x.fhc-dms+json"){
         let formData = new FormData();

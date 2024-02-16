@@ -52,8 +52,13 @@ class ProfilUpdate extends Auth_Controller
 	}
 
 
-	private function sendEmail_onProfilUpdate_acceptionRejection($uid){
-
+	private function sendEmail_onProfilUpdate_response($uid,$topic,$status){
+		$this->load->helper('hlp_sancho_helper');
+		$email = $uid . "@" . DOMAIN;
+		$mail_res = sendSanchoMail("profil_update_response",['topic'=>$topic,'status'=>$status,'href'=>'https://c3p0.ma0594.technikum-wien.at/fh-core/cis.php/Cis/Profil'],$email,("Profil Änderung ".$status));
+		if(!$mail_res){
+			show_error("failed to send email to " . $email);
+		}
 	}
 
 
@@ -208,7 +213,6 @@ class ProfilUpdate extends Auth_Controller
 			];
 			
             $tmp_res=$this->dmslib->upload($dms , 'files', array("jpg", "png", "pdf"));
-			var_dump($tmp_res);
 			$tmp_res = hasData($tmp_res)? getData($tmp_res) : null;
 			array_push($res,$tmp_res);
 		}
@@ -345,7 +349,7 @@ class ProfilUpdate extends Auth_Controller
 			
 			//? sends emails to the correspondents of the $uid
 			$this->sendEmail_onProfilUpdate_insertion($this->uid,$json->topic);
-			echo json_encode($insertID);
+			echo json_encode(success($insertID));
 		}
 	}
 
@@ -364,10 +368,7 @@ class ProfilUpdate extends Auth_Controller
 			//catch error
 		}else{
 			$updateID = hasData($updateID)? getData($updateID)[0]: null;
-			$editTimestamp = $this->ProfilUpdateModel->getTimestamp($updateID,true);
-			
-			$date = success(date_create($editTimestamp)->format('d.m.Y')); 
-			echo json_encode($date);
+			echo json_encode(success($updateID));
 		}
 	}
 
@@ -479,7 +480,7 @@ class ProfilUpdate extends Auth_Controller
 				return;
 			}
 		}
-
+		$this->sendEmail_onProfilUpdate_response($uid,$topic,"accepted");
 		echo json_encode($this->setStatusOnUpdateRequest($id, "accepted", $status_message, $requested_change));
 	}else{
 		show_error("You have not the necessary permissions to accept this profil_update");
@@ -493,6 +494,7 @@ class ProfilUpdate extends Auth_Controller
 		$_POST = json_decode($this->input->raw_input_stream,true);
 		$id = $this->input->post('profil_update_id',true);
 		$uid = $this->input->post('uid',true);
+		$topic = $this->input->post('topic',true);
 		$status_message = $this->input->post('status_message',true);
 
 		$is_mitarbeiter_profil_update = getData($this->MitarbeiterModel->isMitarbeiter($uid));
@@ -504,6 +506,7 @@ class ProfilUpdate extends Auth_Controller
 			$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten',"suid") && $is_mitarbeiter_profil_update 
 		)
 		{
+			$this->sendEmail_onProfilUpdate_response($uid,$topic,"rejected");
 			echo json_encode($this->setStatusOnUpdateRequest($id, "rejected", $status_message));
 		}else{
 			show_error("You have not the necessary permissions to accept this profil_update");
@@ -554,7 +557,6 @@ class ProfilUpdate extends Auth_Controller
 		else{
 			$requested_change['updateamum']="NOW()";
 			$requested_change['updatevon']=getAuthUID();
-			var_dump($requested_change);
 			
 			$update_kontakt_id = $this->KontaktModel->update($kontakt_id,$requested_change);
 
