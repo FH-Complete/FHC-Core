@@ -13,7 +13,8 @@ export default {
 		selectedData: Array,
 		columnData: Array,
 		stgL: Array,
-		stgA: Array
+		stgA: Array,
+		filter: String
 	},
 	emits: [
 		'update:columnData',
@@ -39,7 +40,7 @@ export default {
 	},
 	methods: {
 		reload(stg) {
-			this.table.replaceData(this.ajaxUrl + (stg || ''));
+			this.table.setData(this.ajaxUrl + (stg || ''));
 		},
 		download() {
 			this.table.download("csv", "data.csv", {
@@ -80,7 +81,7 @@ export default {
 		{
 			let val = cell.getValue();
 			if (!val)
-				return '';
+				return '&nbsp;';
 			let date = new Date(val);
 			return date.toLocaleDateString();
 		}
@@ -90,7 +91,7 @@ export default {
 			movableColumns: true,
 			maxHeight: '50vh',
 			layout: "fitDataFill",
-			ajaxURL: this.ajaxUrl,
+			ajaxURL: this.ajaxUrl + (this.filter || ''),
 			persistence: { // NOTE(chris): do not store column titles
 				sort: true, //persist column sorting
 				filter: true, //persist filters
@@ -110,7 +111,8 @@ export default {
 				headerSort: false
 			}, {
 				field: 'studierendenantrag_id',
-				title: '#'
+				title: '#',
+				sorter: 'number'
 			}, {
 				field: 'bezeichnung',
 				title: this.$p.t('lehre', 'studiengang'),
@@ -201,7 +203,7 @@ export default {
 						this.$refs.modalGrundPre.innerHTML = val;
 					});
 
-					return val ? link : '';
+					return val ? link : '&nbsp;';
 				}
 			}, {
 				field: 'dms_id',
@@ -209,7 +211,7 @@ export default {
 				formatter: (cell, formatterParams, onRendered) => {
 					let val = cell.getValue();
 					if (!val)
-						return '';
+						return '&nbsp;';
 					let link = document.createElement('a');
 					link.href = FHC_JS_DATA_STORAGE_OBJECT.app_root +
 						FHC_JS_DATA_STORAGE_OBJECT.ci_router +
@@ -337,6 +339,9 @@ export default {
 						button.addEventListener('click', () => this.showLVs(cell.getData()));
 						container.append(button);
 					}
+
+					if (container.innerHTML == '')
+						container.innerHTML = '&nbsp;';
 
 					return container;
 				}

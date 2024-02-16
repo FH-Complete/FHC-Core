@@ -47,6 +47,9 @@ $saved = isset($saved) && $saved === true;
 		<p>
 			<?php echo $this->p->t('uhstat', 'uhstat1AnmeldungEinleitungstext') ?>
 		</p>
+		<p>
+			<?php echo $this->p->t('uhstat', 'uhstat1EinleitungSvnrtext') ?>
+		</p>
 		<br>
 		<?php if ($editPermission): ?>
 			<?php if (isset($successMessage) && !isEmptyString($successMessage)): ?>
