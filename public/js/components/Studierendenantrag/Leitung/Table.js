@@ -234,7 +234,19 @@ export default {
 
 					container.className = "d-flex gap-2";
 
-					if ((data.typ == 'Abmeldung' || data.typ == 'AbmeldungStgl' || data.typ == 'Unterbrechung') && (data.status == 'Genehmigt' || data.status == 'Beeinsprucht' || data.status == 'EinspruchAbgelehnt' || data.status == 'EmailVersandt')) {
+					let allowed_status_for_download = [];
+					switch (data.typ) {
+						case 'Abmeldung':
+							allowed_status_for_download = ['Genehmigt'];
+							break;
+						case 'AbmeldungStgl':
+							allowed_status_for_download = ['Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt', 'Abgemeldet'];
+							break;
+						case 'Unterbrechung':
+							allowed_status_for_download = ['Genehmigt', 'EmailVersandt'];
+							break;
+					}
+					if (allowed_status_for_download.includes(data.status)) {
 						// NOTE(chris): Download PDF
 						let button = document.createElement('a');
 						// NOTE(chris): phrasen in attribues don't work if they are not preloaded
