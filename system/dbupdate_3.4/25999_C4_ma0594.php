@@ -1,6 +1,6 @@
 <?php
     
-    if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_profil_update_status LIMIT 1"))
+     if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_profil_update_status LIMIT 1"))
     {
 
         $qry = " CREATE TABLE public.tbl_profil_update_status (
@@ -88,10 +88,10 @@
         else
             echo '<br>public.tbl_profil_update: table created';
     }
-
-    if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE campus.tbl_dms_kategorie.kategorie_kurzbz = 'profil_aenderung' LIMIT 1"))
+ 
+    if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz = 'profil_aenderung' LIMIT 1"))
     {
-      
+      echo "HELLLOUUU";
         $qry = "INSERT INTO campus.tbl_dms_kategorie VALUES ('profil_aenderung','Dokumente für Profil Änderungen','Dokumente die Belegen ob man eine neue Adresse angemeldet hat oder seinen Namen geändert hat','dokumente',NULL,NULL);";
 
         if(!$db->db_query($qry))

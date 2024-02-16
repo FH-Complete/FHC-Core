@@ -23,7 +23,6 @@ class ProfilUpdate extends Auth_Controller
 			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
-			"sendMailTest" => ['student/anrechnung_beantragen:r', 'user:r'],
 			
 			
 		]);
@@ -52,50 +51,77 @@ class ProfilUpdate extends Auth_Controller
 		$this->load->view('Cis/ProfilUpdate');
 	}
 
-	public function sendMailTest(){
+
+	private function sendEmail_onProfilUpdate_acceptionRejection($uid){
+
+	}
+
+
+	private function sendEmail_onProfilUpdate_insertion($uid,$topic){
 		$this->load->helper('hlp_sancho_helper');
 		$emails = [];
-		
-		$isStudent_res = $this->StudentModel->isStudent($this->uid);
-		if(!isSuccess($isStudent_res)){
-			show_error("was not able to check whether the uid is a student");
+
+		$isMitarbeiter_res = $this->MitarbeiterModel->isMitarbeiter($uid);
+		if(isError($isMitarbeiter_res)){
+			show_error("was not able to check whether ".$uid." is a mitarbeiter");
 		}
-		$isStudent_res = getData($isStudent_res);
-		if($isStudent_res){
-			//? Send email to the Studiengangsassistentinnen
-			$this->StudentModel->addSelect(["public.tbl_studiengang.email"]);
-			$this->StudentModel->addJoin("public.tbl_benutzer","public.tbl_benutzer.uid = public.tbl_student.student_uid");
-			$this->StudentModel->addJoin("public.tbl_prestudent","public.tbl_benutzer.person_id = public.tbl_prestudent.person_id");
-			$this->StudentModel->addJoin("public.tbl_prestudentstatus","public.tbl_prestudentstatus.prestudent_id = public.tbl_prestudent.prestudent_id");
-			$this->StudentModel->addJoin("public.tbl_studiengang","public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
-			//? multiple checks
-			//* check if the benutzer itself is active
-			//* check if the student status is Student or Diplomand (active students)
-			$this->StudentModel->db->where_in("public.tbl_prestudentstatus.status_kurzbz",['Student','Diplomand']);
-			$res = $this->StudentModel->loadWhere(["public.tbl_benutzer.aktiv"=>TRUE,"public.tbl_student.student_uid"=>$this->uid]);
-			$res = hasData($res) ? getData($res) : null;
-			echo json_encode($res);
-			
-		}else{
+		$isMitarbeiter_res = getData($isMitarbeiter_res);
+		
+		//! if the $uid is a mitarbeiter and student, only the hr is notified by email
+		if($isMitarbeiter_res){
 			//? user is not a student therefore he is a mitarbeiter, send email to Personalverwaltung
 			//? use constant variable MAIL_GST to mail to the personalverwaltung
 			$this->MitarbeiterModel->addSelect([TRUE]);
 			$this->MitarbeiterModel->addJoin("public.tbl_benutzer","public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid");
 			//? check if the the userID is a mitarbeiter and if the benutzer is active
-			$res = $this->MitarbeiterModel->loadWhere(["public.tbl_mitarbeiter.mitarbeiter_uid"=>$this->uid,"public.tbl_benutzer.aktiv"=>TRUE]);
-			if(!isSuccess($res)){
-				show_error("was not able to query the mitarbeiter and benutzer by the uid: ". $this->uid);
+			$res = $this->MitarbeiterModel->loadWhere(["public.tbl_mitarbeiter.mitarbeiter_uid"=>$uid,"public.tbl_benutzer.aktiv"=>TRUE]);
+			if(isError($res)){
+				show_error("was not able to query the mitarbeiter and benutzer by the uid: ". $uid);
 			}
 			if(hasData($res)){
 				array_push($emails,MAIL_GST);
 			}else{
-				show_error("no Mitarbeiter with uid: ".$this->uid ." found");
+				show_error("no Mitarbeiter with uid: ".$uid ." found");
 			}
-			
+		}else{
+			//? if it is not a mitarbeiter, check whether it is a student and send email to studiengang
+			$isStudent_res = $this->StudentModel->isStudent($uid);
+			if(isError($isStudent_res)){
+				show_error("was not able to check whether ".$uid." is a student");
+			}
+			$isStudent_res = getData($isStudent_res);
+			if($isStudent_res){
+				//? Send email to the Studiengangsassistentinnen
+				$this->StudentModel->addSelect(["public.tbl_studiengang.email"]);
+				$this->StudentModel->addJoin("public.tbl_benutzer","public.tbl_benutzer.uid = public.tbl_student.student_uid");
+				$this->StudentModel->addJoin("public.tbl_prestudent","public.tbl_benutzer.person_id = public.tbl_prestudent.person_id");
+				$this->StudentModel->addJoin("public.tbl_prestudentstatus","public.tbl_prestudentstatus.prestudent_id = public.tbl_prestudent.prestudent_id");
+				$this->StudentModel->addJoin("public.tbl_studiengang","public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
+				//* check if the benutzer itself is active
+				//* check if the student status is Student or Diplomand (active students)
+				$this->StudentModel->db->where_in("public.tbl_prestudentstatus.status_kurzbz",['Student','Diplomand']);
+				$res = $this->StudentModel->loadWhere(["public.tbl_benutzer.aktiv"=>TRUE,"public.tbl_student.student_uid"=>$uid]);
+				if(isError($res)){
+					show_error(getData($res));
+				}else{
+					$res = hasData($res) ? getData($res) : [];
+					foreach($res as $emailObj){
+						array_push($emails,$emailObj->email);
+					}
+				}
+			}
 		}
-		//$vorlage_kurzbz, $vorlage_data, $to, $subject
-		$mail_res=sendSanchoMail("MessagecatchemMailTXT",["href"=>'test'],"ma0594@fh-technikum.at","test");
-		var_dump($mail_res);
+		$mail_res =[];
+		//? sending email
+		foreach($emails as $email){
+			array_push($mail_res,sendSanchoMail("profil_update",['uid'=>$uid,'topic'=>$topic,'href'=>'https://c3p0.ma0594.technikum-wien.at/fh-core/cis.php/Cis/ProfilUpdate'],$email,("Profil Änderung von ".$uid)));
+		}
+		foreach($mail_res as $m_res){
+			if(!$m_res){
+				show_error("error occured when sending email.");		
+			}
+		}
+		
 	}
 
 
@@ -134,8 +160,6 @@ class ProfilUpdate extends Auth_Controller
 		}
 		
 	}
-
-
 
 
 	public function insertFile($replace){
@@ -183,15 +207,14 @@ class ProfilUpdate extends Auth_Controller
 				"insertamum"=>"NOW()",
 			];
 			
-            $tmp_res=$this->dmslib->upload($dms , 'files');
-			
+            $tmp_res=$this->dmslib->upload($dms , 'files', array("jpg", "png", "pdf"));
+			var_dump($tmp_res);
 			$tmp_res = hasData($tmp_res)? getData($tmp_res) : null;
 			array_push($res,$tmp_res);
 		}
 
 		echo json_encode($res);
 	}
-
 
 
 	private function deleteOldVersionFile($dms_id){
@@ -217,9 +240,6 @@ class ProfilUpdate extends Auth_Controller
 		//? returns a result for each deleted dms_file
 		return $res;
 	}
-
-	
-
 
 
 	public function selectProfilRequest(){
@@ -262,27 +282,18 @@ class ProfilUpdate extends Auth_Controller
 
 	public function insertProfilRequest()
 	{
-		//! deprecated code
-		//? Name of user is now queried in the database table model Profil_update_model.php
-		/* $name = $this->PersonModel->getFullName($this->uid);
-		if(isError($name)){
-			// error handling
-			var_dump($name);
-			return;
-		} */
-
 		$json = json_decode($this->input->raw_input_stream);
+
 		$payload = $json->payload;
-		
 		$identifier = property_exists($json->payload,"kontakt_id")? "kontakt_id" : (property_exists($json->payload,"adresse_id")? "adresse_id" : null);
 		
 		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid,"status"=>"pending" ];
+		
 		//? insert fileID in the dataset if sent with post request
 		if(isset($json->fileID)){
 			$data['attachment_id'] = $json->fileID;
 			
 		} 
-		
 
 		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilUpdateModel->getProfilUpdatesWhere(["uid"=>$this->uid]);
@@ -293,49 +304,49 @@ class ProfilUpdate extends Auth_Controller
 			return;
 		 }
 		 
-		 //? if the user tries to delete a adresse, checks whether the adresse is a heimatadresse, if so an error is raised
-		 if( isset($payload->delete) && $identifier == "adresse_id"){
+		//? if the user tries to delete a adresse, checks whether the adresse is a heimatadresse, if so an error is raised
+		if( isset($payload->delete) && $identifier == "adresse_id"){
 			$adr = $this->AdresseModel->load($payload->$identifier);
 			$adr = getData($adr)[0];
 			if($adr->heimatadresse){
 				echo json_encode(error("cannot delete adresse marked as heimatadresse"));
 				return;
 			}
-			
-		 }
+		}
 
 		if($res){
 		$pending_changes = array_filter($res, function($element) {
 			return $element->status == 'pending';
 		});
+
 		foreach($pending_changes as $update_request){
 			$existing_change = $update_request->requested_change;
 			
-			 //? the user can add as many new kontakt/adresse as he likes
+			 //? the user can add as many new kontakte/adressen as he likes
 			 if( !isset($payload->add) && property_exists($existing_change,$identifier) && property_exists($payload,$identifier) && $existing_change->$identifier == $payload->$identifier){
 				//? the kontakt_id / adresse_id of a change has to be unique 
 				echo json_encode(error("cannot change the same resource twice"));
 				return;
 			}
 			
+			//? if it is not updating any kontakt/adresse, the topic has to be unique
 			elseif(!$identifier && $update_request->topic == $json->topic ){
-				//? if it is not a delete or add request than the topic has to be unique
 				echo json_encode(error("A request to change " . $json->topic . " is already open"));
 				return;
 			}
 		}}
 		
-			$insertID = $this->ProfilUpdateModel->insert($data);
-				
-			if(isError($insertID)){
-				//catch error
-			}else{
-				$insertID = hasData($insertID)? getData($insertID): null;
-				$editTimestamp = $this->ProfilUpdateModel->getTimestamp($insertID);
-				
-				$date = success(date_create($editTimestamp)->format('d.m.Y'));
-				echo json_encode($date);
-			}
+		$insertID = $this->ProfilUpdateModel->insert($data);
+			
+		if(isError($insertID)){
+			show_error(getData($insertID));
+		}else{
+			$insertID = hasData($insertID)? getData($insertID): null;
+			
+			//? sends emails to the correspondents of the $uid
+			$this->sendEmail_onProfilUpdate_insertion($this->uid,$json->topic);
+			echo json_encode($insertID);
+		}
 	}
 
 	public function updateProfilRequest()

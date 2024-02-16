@@ -90,14 +90,7 @@ export default {
         return axios.post(url, requestID);
       },
 
-      sendMailTest: function(){
-        const url =
-        FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/sendMailTest`;
   
-        return axios.get(url);
-      },
     
     
 
