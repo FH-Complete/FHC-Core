@@ -441,7 +441,12 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					{
 						// Unklar: welche Version der Daten soll behalten werden?
 						$msg_error[] = 'Beide Personen haben UHSTAT1 Daten. Können nicht zusammengelegt werden.<br>
-						Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
+						Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können:<br>
+						<a href="'.APP_ROOT.'index.ci.php/codex/UHSTAT1?person_id='.$personToDelete.'" target="_blank">zum UHSTAT von Person A</a>
+						/
+						<a href="'.APP_ROOT.'index.ci.php/codex/UHSTAT1?person_id='.$personToKeep.'" target="_blank">zum UHSTAT von Person B</a>
+						<br>';
+
 						$error = true;
 					}
 					else
@@ -1523,7 +1528,7 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 			$messageOutput .= '<br/>'.$value;
 		}
 	}
-	echo '<br><br><div contenteditable="true" style="width: 100%; height : 150px; border : 1px dotted grey; overflow-y:auto; text-align: left; font-size: 9pt">' . $messageOutput . '</div><br>';
+	echo '<br><br><div contenteditable="false" style="width: 100%; height : 150px; border : 1px dotted grey; overflow-y:auto; text-align: left; font-size: 9pt">' . $messageOutput . '</div><br>';
 
 	// Tabellen anzeigen
 	echo '<form name="form_table" action="personen_wartung.php?filter='.$db->convert_html_chars($filter).'&person_id_1='.$person_id_1.'&person_id_2='.$person_id_2.'" method="POST">';
