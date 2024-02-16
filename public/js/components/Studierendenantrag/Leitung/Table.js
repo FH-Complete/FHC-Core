@@ -245,6 +245,9 @@ export default {
 						case 'Unterbrechung':
 							allowed_status_for_download = ['Genehmigt', 'EmailVersandt'];
 							break;
+						case 'Wiederholung':
+							allowed_status_for_download = ['Abgemeldet'];
+							break;
 					}
 					if (allowed_status_for_download.includes(data.status)) {
 						// NOTE(chris): Download PDF

@@ -22688,6 +22688,25 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'grund_Wiederholung_deadline',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'negative kommissionelle Beurteilung und keine fristgerechte Bekanntgabe der Wiederholung des Studienjahres',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'negative assessment by the committee and no timely announcement of the repetition of the academic year',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// Personalverwaltung begin
 	array(
 		'app' => 'core',
