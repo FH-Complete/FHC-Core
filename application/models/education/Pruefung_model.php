@@ -180,7 +180,11 @@ class Pruefung_model extends DB_Model
 		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, pss.orgform_kurzbz, g.orgform_kurzbz)=o.orgform_kurzbz');
 		$this->addJoin('campus.tbl_studierendenantrag a', 'ps.prestudent_id=a.prestudent_id and a.typ=' . $this->escape(Studierendenantrag_model::TYP_WIEDERHOLUNG), 'LEFT');
 
+		$this->db->group_start();
 		$this->db->where_in("get_rolle_prestudent(ps.prestudent_id, null)", $this->config->item('antrag_prestudentstatus_whitelist'));
+		// NOTE(chris): If the status of the Antrag is DEREGISTERED the prestudentstatus must be Abbrecher which is not in the whitelist
+		$this->db->or_where("campus.get_status_studierendenantrag(a.studierendenantrag_id)", Studierendenantragstatus_model::STATUS_DEREGISTERED);
+		$this->db->group_end();
 
 		$this->db->where("g.aktiv", true);
 

@@ -1413,6 +1413,16 @@ class AntragLib
 			if (hasData($result))
 				return success(-1);
 
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
+				'prestudent_id' => $prestudent_id,
+				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
+				'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_DEREGISTERED
+			]);
+			if (isError($result))
+				return $result;
+			if (hasData($result))
+				return success(-1);
+
 			return success(0);
 		}
 		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id]);
