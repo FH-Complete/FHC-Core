@@ -120,13 +120,19 @@ export default {
 						if (!c.includes('form-check-input') && !c.includes('btn-check'))
 							classes.push('form-check-input');
 						break;
+					case 'color':
+						if (!c.includes('form-control-color'))
+							classes.push('form-control-color');
+						if (!c.includes('form-control'))
+							classes.push('form-control');
+						break;
 					case 'autocomplete':
 					case 'datepicker':
 						classes.push('p-0');
 						classes.push('border-0');
-					case 'color':
-						if (!c.includes('form-control-color'))
-							classes.push('form-control-color');
+						if (!c.includes('form-control'))
+							classes.push('form-control');
+						break;
 					case 'text':
 					case 'number':
 					case 'password':
