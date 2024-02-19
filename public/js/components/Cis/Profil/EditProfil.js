@@ -1,12 +1,14 @@
 import BsModal from "../../Bootstrap/Modal.js";
 import Alert from "../../Bootstrap/Alert.js";
 import EditProfilSelect from "./EditProfilSelect.js";
+import Loader from "../../../components/Loader.js"
 
 export default {
   components: {
     BsModal,
     Alert,
     EditProfilSelect,
+    Loader
   },
   mixins: [BsModal],
   props: {
@@ -34,6 +36,7 @@ export default {
       editData: this.value,
       fileID:null,
       breadcrumb: null,
+      loading:false,
 
       result: false,
       info: null,
@@ -68,6 +71,7 @@ export default {
         //? inserts new row in public.tbl_cis_profil_update
         //* calls the update api call if an update field is present in the data that was passed to the modal
         const handleApiResponse = (res) => {
+          this.$refs.loaderRef.hide();
           if (res.data.error == 0) {
             this.result = true;
             this.hide();
@@ -83,6 +87,11 @@ export default {
           }
         };
 
+        //? shows the loading modal and hides the EditProfil modal without returning the result promise
+        this.$refs.loaderRef.show();
+        //* v-show on EditProfil modal binded to this.loading
+        this.loading=true;
+        
         this.editData.updateID
           ? Vue.$fhcapi.ProfilUpdate.updateProfilRequest(
               this.topic,
@@ -135,22 +144,26 @@ export default {
       //? if the topic was passed through the prop add it to the component
       this.topic = this.editData.topic;
     }
+    
   },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
+    
   },
   popup(options) {
     return BsModal.popup.bind(this)(null, options);
   },
   template: `
-
-  <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
+  <loader ref="loaderRef"></loader>
+  <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     
   <template v-if="title" v-slot:title>
       {{title }}  
     </template>
     <template v-slot:default>
-
+    
+    <div >
+    
     <nav aria-label="breadcrumb" class="ps-2  ">
       <ol class="breadcrumb ">
         <li class="breadcrumb-item"  v-for="element in breadcrumb">{{element}}</li>
@@ -159,11 +172,11 @@ export default {
     </nav>
 
     <edit-profil-select @submit="submitProfilChange" v-model:breadcrumb="breadcrumb" v-model:topic="topic" v-model:profilUpdate="profilUpdate" ariaLabel="test" :list="editData"></edit-profil-select>
-   
+    </div>
 
     </template>
     <!-- optional footer -->
-    <template   v-slot:footer>
+    <template  v-slot:footer>
       
     <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>    
       <button :disabled="!profilUpdate"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
