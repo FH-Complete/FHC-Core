@@ -53,12 +53,18 @@ class ProfilUpdate extends Auth_Controller
 
 
 	private function sendEmail_onProfilUpdate_response($uid,$topic,$status){
+		
 		$this->load->helper('hlp_sancho_helper');
 		$email = $uid . "@" . DOMAIN;
-		$mail_res = sendSanchoMail("profil_update_response",['topic'=>$topic,'status'=>$status,'href'=>'https://c3p0.ma0594.technikum-wien.at/fh-core/cis.php/Cis/Profil'],$email,("Profil Änderung ".$status));
+		
+		//? translation of the english version of the status to german
+		$status_de = $status == 'accepted' ? 'akzeptiert' : 'abgelehnt';
+
+		$mail_res = sendSanchoMail("profil_update_response",['topic'=>$topic,'status_de'=>$status_de,'status_en'=>$status,'href'=>'https://c3p0.ma0594.technikum-wien.at/fh-core/cis.php/Cis/Profil'],$email,("Profil Änderung ".$status));
 		if(!$mail_res){
 			show_error("failed to send email to " . $email);
 		}
+		var_dump($mail_res);
 	}
 
 
@@ -481,6 +487,7 @@ class ProfilUpdate extends Auth_Controller
 			}
 		}
 		$this->sendEmail_onProfilUpdate_response($uid,$topic,"accepted");
+		
 		echo json_encode($this->setStatusOnUpdateRequest($id, "accepted", $status_message, $requested_change));
 	}else{
 		show_error("You have not the necessary permissions to accept this profil_update");
