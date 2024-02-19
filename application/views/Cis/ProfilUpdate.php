@@ -8,8 +8,9 @@ $includesArray = ['title'=> 'Profil Änderungen',
 $this->load->view('templates/CISHTML-Header',$includesArray);
 ?>
 
-<div id="content">
 
+<div id="content">
+<profil-update-view id="<?php echo isset($profil_update_id)?$profil_update_id:null ?>"></profil-update-view>
 </div>
 
 <?php $this->load->view('templates/CISHTML-Footer',$includesArray); ?>

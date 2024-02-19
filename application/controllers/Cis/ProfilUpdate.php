@@ -12,6 +12,7 @@ class ProfilUpdate extends Auth_Controller
 	public function __construct(){
 		parent::__construct([
 			'index' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
+			'id' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
 			'getProfilUpdateWithPermission' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
 			'acceptProfilRequest'=>['student/stammdaten:rw','mitarbeiter/stammdaten:rw'],
 			'denyProfilRequest'=>['student/stammdaten:rw','mitarbeiter/stammdaten:rw'],
@@ -23,6 +24,7 @@ class ProfilUpdate extends Auth_Controller
 			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
+			
 			
 			
 		]);
@@ -51,6 +53,9 @@ class ProfilUpdate extends Auth_Controller
 		$this->load->view('Cis/ProfilUpdate');
 	}
 
+	public function id($profil_update_id=null){
+		$this->load->view('Cis/ProfilUpdate',['profil_update_id'=>$profil_update_id]);
+	}
 
 	private function sendEmail_onProfilUpdate_response($uid,$topic,$status){
 		
@@ -60,15 +65,15 @@ class ProfilUpdate extends Auth_Controller
 		//? translation of the english version of the status to german
 		$status_de = $status == 'accepted' ? 'akzeptiert' : 'abgelehnt';
 
-		$mail_res = sendSanchoMail("profil_update_response",['topic'=>$topic,'status_de'=>$status_de,'status_en'=>$status,'href'=>'https://c3p0.ma0594.technikum-wien.at/fh-core/cis.php/Cis/Profil'],$email,("Profil Änderung ".$status));
+		$mail_res = sendSanchoMail("profil_update_response",['topic'=>$topic,'status_de'=>$status_de,'status_en'=>$status,'href'=>APP_ROOT.'Cis/Profil'],$email,("Profil Änderung ".$status));
 		if(!$mail_res){
 			show_error("failed to send email to " . $email);
 		}
-		var_dump($mail_res);
 	}
 
 
-	private function sendEmail_onProfilUpdate_insertion($uid,$topic){
+	private function sendEmail_onProfilUpdate_insertion($uid,$profil_update_id,$topic){
+		
 		$this->load->helper('hlp_sancho_helper');
 		$emails = [];
 
@@ -125,7 +130,7 @@ class ProfilUpdate extends Auth_Controller
 		$mail_res =[];
 		//? sending email
 		foreach($emails as $email){
-			array_push($mail_res,sendSanchoMail("profil_update",['uid'=>$uid,'topic'=>$topic,'href'=>'https://c3p0.ma0594.technikum-wien.at/fh-core/cis.php/Cis/ProfilUpdate'],$email,("Profil Änderung von ".$uid)));
+			array_push($mail_res,sendSanchoMail("profil_update",['uid'=>$uid,'topic'=>$topic,'href'=>APP_ROOT.'Cis/ProfilUpdate/id/'.$profil_update_id],$email,("Profil Änderung von ".$uid)));
 		}
 		foreach($mail_res as $m_res){
 			if(!$m_res){
@@ -153,7 +158,7 @@ class ProfilUpdate extends Auth_Controller
 			{
 				// Get file to be downloaded from DMS
 				$newFilename= $this->uid."/document_".$dms_id;
-				$download = $this->dmslib->download($dms_id, $newFilename);
+				$download = $this->dmslib->download($dms_id);
 				if (isError($download)) return $download;
 				
 				// Download file
@@ -219,6 +224,7 @@ class ProfilUpdate extends Auth_Controller
 			];
 			
             $tmp_res=$this->dmslib->upload($dms , 'files', array("jpg", "png", "pdf"));
+			
 			$tmp_res = hasData($tmp_res)? getData($tmp_res) : null;
 			array_push($res,$tmp_res);
 		}
@@ -292,6 +298,7 @@ class ProfilUpdate extends Auth_Controller
 
 	public function insertProfilRequest()
 	{
+		
 		$json = json_decode($this->input->raw_input_stream);
 
 		$payload = $json->payload;
@@ -354,7 +361,7 @@ class ProfilUpdate extends Auth_Controller
 			$insertID = hasData($insertID)? getData($insertID): null;
 			
 			//? sends emails to the correspondents of the $uid
-			$this->sendEmail_onProfilUpdate_insertion($this->uid,$json->topic);
+			$this->sendEmail_onProfilUpdate_insertion($this->uid,$insertID,$json->topic);
 			echo json_encode(success($insertID));
 		}
 	}
@@ -374,6 +381,7 @@ class ProfilUpdate extends Auth_Controller
 			//catch error
 		}else{
 			$updateID = hasData($updateID)? getData($updateID)[0]: null;
+			//TODO: should an email be sent to the responsable people when the user changes his profil update
 			echo json_encode(success($updateID));
 		}
 	}

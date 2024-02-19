@@ -114,6 +114,7 @@ export default {
         await Vue.$fhcapi.ProfilUpdate.insertFile(formData,this.editData.updateID).then(res => {
           return res.data?.map((file) => file.dms_id);
         })
+        
         :
         //? fresh insert of new attachment
         await Vue.$fhcapi.ProfilUpdate.insertFile(formData).then(res => {
