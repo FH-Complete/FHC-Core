@@ -98,7 +98,7 @@ class FHCAPI_Controller extends FHC_Controller
 
 	/**
 	 * @param array					$data
-	 * @param string (optional)		$type
+	 * @param string				$type (optional)
 	 * @return void
 	 */
 	public function addError($data, $type = null)
@@ -169,6 +169,33 @@ class FHCAPI_Controller extends FHC_Controller
 		$this->setData($data);
 		$this->setStatus(self::STATUS_SUCCESS);
 		exit;
+	}
+
+	/**
+	 * @param array					$error
+	 * @param string				$type (optional)
+	 * @return void
+	 */
+	protected function terminateWithError($error, $type = null)
+	{
+		$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		$this->addError($error, $type);
+		$this->setStatus(self::STATUS_ERROR);
+		exit;
+	}
+
+	/**
+	 * @param stdclass				$result
+	 * @param string				$errortype
+	 * @return void
+	 */
+	protected function checkForErrors($result, $errortype = self::ERROR_TYPE_GENERAL)
+	{
+		// TODO(chris): IMPLEMENT!
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), $errortype);
+		}
+		return $result->retval;
 	}
 
 	// TODO(chris): complete list
