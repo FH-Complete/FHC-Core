@@ -89,6 +89,10 @@ class FHCAPI_Controller extends FHC_Controller
 		// For JSON Requests (as opposed to multipart/form-data) get the $_POST variable from the input stream instead
 		if ($this->input->get_request_header('Content-Type', true) == 'application/json')
 			$_POST = json_decode($this->security->xss_clean($this->input->raw_input_stream), true);
+		elseif (isset($_POST['_jsondata'])) {
+			$_POST = array_merge($_POST, json_decode($_POST['_jsondata'], true));
+			unset($_POST['_jsondata']);
+		}
 	}
 
 
