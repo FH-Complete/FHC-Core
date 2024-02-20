@@ -24,7 +24,7 @@ export default {
     FetchProfilUpdates,
 
   },
-  inject:['sortProfilUpdates','collapseFunction','getZustellkontakteCount','getZustelladressenCount'],
+  inject:['sortProfilUpdates','collapseFunction','getZustellkontakteCount','getZustelladressenCount','setLoading'],
   data() {
     return {
       
@@ -99,6 +99,7 @@ export default {
           title:"Profil bearbeiten",
           zustelladressenCount:this.getZustelladressenCount,
           zustellkontakteCount:this.getZustellkontakteCount,
+          setLoading:this.setLoading,
         }).then((popup_result) => {
           if(popup_result){
             Vue.$fhcapi.ProfilUpdate.selectProfilRequest()

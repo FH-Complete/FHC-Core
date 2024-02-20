@@ -16,6 +16,7 @@ export default {
     title: String,
     zustelladressenCount: Function,
     zustellkontakteCount: Function,
+    setLoading:Function,
     /*
      * NOTE(chris):
      * Hack to expose in "emits" declared events to $props which we use
@@ -71,7 +72,10 @@ export default {
         //? inserts new row in public.tbl_cis_profil_update
         //* calls the update api call if an update field is present in the data that was passed to the modal
         const handleApiResponse = (res) => {
-          this.$refs.loaderRef.hide();
+          //? toggles the loading to false and closes the loading modal
+          this.loading = false;
+          this.setLoading(false);
+
           if (res.data.error == 0) {
             this.result = true;
             this.hide();
@@ -87,13 +91,13 @@ export default {
           }
         };
 
-        //? shows the loading modal and hides the EditProfil modal without returning the result promise
-        this.$refs.loaderRef.show();
         //* v-show on EditProfil modal binded to this.loading
+        //? hides the EditProfil modal and shows the loading modal by calling a callback that was passed as prop from the parent component
         this.loading=true;
+        this.setLoading(true);
         
         this.editData.updateID
-          ? Vue.$fhcapi.ProfilUpdate.updateProfilRequest(
+          ?  Vue.$fhcapi.ProfilUpdate.updateProfilRequest(
               this.topic,
               this.profilUpdate,
               this.editData.updateID,
@@ -101,7 +105,7 @@ export default {
             ).then((res) => {
               handleApiResponse(res);
             })
-          : Vue.$fhcapi.ProfilUpdate.insertProfilRequest(
+          :  Vue.$fhcapi.ProfilUpdate.insertProfilRequest(
               this.topic,
               this.profilUpdate,
               this.fileID? this.fileID[0]: null
@@ -140,6 +144,7 @@ export default {
   },
   computed: {},
   created() {
+    
     if (this.editData.topic) {
       //? if the topic was passed through the prop add it to the component
       this.topic = this.editData.topic;
@@ -148,13 +153,11 @@ export default {
   },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
-    
   },
   popup(options) {
     return BsModal.popup.bind(this)(null, options);
   },
   template: `
-  <loader ref="loaderRef"></loader>
   <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     
   <template v-if="title" v-slot:title>
@@ -177,7 +180,8 @@ export default {
     </template>
     <!-- optional footer -->
     <template  v-slot:footer>
-      
+    <loader  ref="loaderRef" :timeout="0"></loader>
+        
     <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>    
       <button :disabled="!profilUpdate"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
     </template>

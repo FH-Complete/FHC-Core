@@ -4,6 +4,8 @@ import MitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterProfil.js"
 import ViewStudentProfil from "../../components/Cis/Profil/StudentViewProfil.js";
 import ViewMitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterViewProfil.js";
 import fhcapifactory from "../api/fhcapifactory.js";
+import Loading from "../../components/Loader.js";
+
 
 Vue.$fhcapi = fhcapifactory;
 Vue.$collapseFormatter  = function(data){
@@ -43,10 +45,12 @@ const testapp = Vue.createApp({
 		MitarbeiterProfil,
 		ViewStudentProfil,
 		ViewMitarbeiterProfil,
+		Loading,
 	},
 	data() {
 		return {
-			
+			//? loading property is used for showing/hiding the loading modal
+			loading:false,
 			view:null,
 			data:null,
 			// notfound is null by default, but contains an UID if no user exists with that UID
@@ -57,7 +61,10 @@ const testapp = Vue.createApp({
 	//? use function syntax for provide so that we can access `this`
 	provide() {
 		return {
-
+			setLoading: (newValue)=>{
+				console.log(this);
+				this.loading = newValue;
+			},
 			getZustellkontakteCount: this.zustellKontakteCount,
 			getZustelladressenCount: this.zustellAdressenCount,
 			collapseFunction:  (e, column)=> {
@@ -236,6 +243,14 @@ const testapp = Vue.createApp({
 	  
 	},
 
+	watch:{
+		loading:function(newValue,oldValue){
+			if(newValue){this.$refs.loadingModalRef.show();}else{
+				this.$refs.loadingModalRef.hide();
+			}
+		}
+	},
+
 
 	created(){
 
@@ -261,8 +276,11 @@ const testapp = Vue.createApp({
 			<h3>Es wurden keine oder mehrere Profile für {{this.notFoundUID}} gefunden</h3>
 
 		</div>
-
-		<component v-else :is="view" :data="data" :editData="filteredEditData" ></component>
+		<div v-else>
+		<loading ref="loadingModalRef" :timeout="0"></loading>
+		<component  :is="view" :data="data" :editData="filteredEditData" ></component>
+		</div>
+		
 	
 	</div>`
 	

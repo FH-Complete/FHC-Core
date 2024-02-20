@@ -26,11 +26,10 @@ export default {
     RoleInformation,
     ProfilInformation,
   },
-  inject: ['sortProfilUpdates','collapseFunction','getZustellkontakteCount','getZustelladressenCount'],
+  inject: ['sortProfilUpdates','collapseFunction','getZustellkontakteCount','getZustelladressenCount','setLoading'],
   data() {
     return {
 
-     
       
       funktionen_table_options: {
         height: 300,
@@ -141,9 +140,6 @@ export default {
   
   methods: {
 
-   
-
-    
 
     fetchProfilUpdates: function(){
       Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res)=>{
@@ -161,7 +157,10 @@ export default {
           zustelladressenCount:this.getZustelladressenCount,
           zustellkontakteCount:this.getZustellkontakteCount,
           title:"Profil bearbeiten",
+          setLoading:this.setLoading,
+
         }).then((popup_result) => {
+          console.log("hello test");
           if(popup_result){
             Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
             .then((res) =>{
@@ -178,6 +177,7 @@ export default {
             });
           }
         }).catch((e) => {
+          console.log("catch");
           // Wenn der User das Modal abbricht ohne Änderungen
          
         });
