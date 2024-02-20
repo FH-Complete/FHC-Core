@@ -9,6 +9,7 @@ export default {
     inject:["zustellAdresseCount"],
     data(){
         return{
+            nationenList:[],
             originalValue:null,
             zustellAdressenCount:null,
         }
@@ -61,6 +62,15 @@ export default {
         },
     },
     created(){
+        
+        Vue.$fhcapi.UserData.getAllNationen().then(res => {
+            this.nationenList = res.data;
+        });
+
+        //? same for Gemeinde
+        /* Vue.$fhcapi.UserData.getAllNationen().then(res => {
+            this.nationenList = res.data;
+        }); */
         this.originalValue = JSON.stringify(this.data);
         this.zustellAdressenCount = this.zustellAdresseCount();
         
@@ -95,6 +105,7 @@ export default {
             
             
         </div>
+      
       
         <div  class="col-12 col-sm-9 col-xl-12 col-xxl-9 order-1">
 
@@ -143,6 +154,25 @@ export default {
             <input  class="form-control" :value="data.plz" @input="updateValue($event,'plz')" :placeholder="data.plz">
         
             </div>
+        </div>
+        <div class="col-6 order-5">
+        <div class="form-underline ">
+        <div class="form-underline-titel">Gemeinde</div>
+
+        <input  class="form-control" :value="data.gemeinde" @input="updateValue($event,'gemeinde')" :placeholder="data.gemeinde">
+    
+        </div>
+        </div>
+        <div class="col-6 order-5 ">
+        <div class="form-underline ">
+        <div class="form-underline-titel">nation</div>
+            <select  :value="data.nation" @change="updateValue($event,'nation')" class="form-select" aria-label="Select Kontakttyp">
+                <option selected></option>
+                <option :value="nation.code" v-for="nation in nationenList">{{nation.langtext}}</option>
+            
+            </select> 
+        
+        </div>
         </div>
        
     </div>

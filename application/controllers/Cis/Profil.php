@@ -24,6 +24,7 @@ class Profil extends Auth_Controller
 			'isStudent' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getZustellAdresse' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getZustellKontakt' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'getAllNationen' => ['student/anrechnung_beantragen:r', 'user:r'],
 			
 		]);
 
@@ -353,6 +354,63 @@ class Profil extends Auth_Controller
 	}
 
 
+	public function getAllNationen(){
+		$this->load->model('codex/Nation_model',"NationModel");
+		$this->NationModel->addSelect(["nation_code as code","langtext"]);
+		$nation_res = $this->NationModel->load();
+		if(isError($nation_res)){
+			show_error("error while trying to query table codex.tbl_nation");
+		}
+		$nation_res = hasData($nation_res) ? getData($nation_res) : null;
+		echo json_encode($nation_res);
+
+	}
+
+	//TODO: use the old query check to get the correct values to display for the user in case he selected the nation Austria (A)
+	/* if($_POST['nation']=='A')
+	{
+		if(is_numeric($_POST['plz']) && $_POST['plz']<32000)
+		{
+			$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower(".$db->db_add_param($_POST['gemeinde']).")
+					AND plz=".$db->db_add_param($_POST['plz']);
+			if($db->db_query($qry))
+			{
+				if($row = $db->db_fetch_object())
+				{
+					$adresse->gemeinde = $row->name;
+				}
+				else
+				{
+					$error = true;
+					$errormsg = 'Gemeinde ist ungueltig';
+					$return = false;
+				}
+			}
+			else
+			{
+				$error = true;
+				$errormsg = 'Fehler beim Ermitteln der Gemeinde';
+				$return = false;
+			}
+		}
+		else
+		{
+			$error = true;
+			$errormsg = 'Postleitzahl ist fuer diese Nation ungueltig';
+			$return = false;
+		}
+	} */
+	public function getAllGemeinden(){
+		$this->load->model('public/Gemeinde_model',"NationModel");
+		$this->NationModel->addSelect(["langtext"]);
+		$nation_res = $this->NationModel->load();
+		if(isError($nation_res)){
+			show_error("error while trying to query table codex.tbl_nation");
+		}
+		$nation_res = hasData($nation_res) ? getData($nation_res) : null;
+		echo json_encode($nation_res);
+
+	}
 
 
 	//? queries the Mailverteiler of a benutzer
@@ -564,9 +622,9 @@ class Profil extends Auth_Controller
 		$adresse_res = null;
 		if (
 
-			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort","zustelladresse"])) &&
+			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort","zustelladresse","gemeinde","nation"])) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC")) &&
-			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz"))
+			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz")) 
 		) {
 			$adresse_res = $this->AdresseModel->loadWhere(array("person_id" => $pid));
 			if (isError($adresse_res)) {

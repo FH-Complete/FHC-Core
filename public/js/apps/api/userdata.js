@@ -1,13 +1,11 @@
 export default {
   //! API Calls for Profil Views
 
-
-
-  getMitarbeiter: function (student_id) {
+  getAllNationen:function(){
     const url =
       FHC_JS_DATA_STORAGE_OBJECT.app_root +
-      `cis.php/api/v1/crm/Student/getStudent`;
-    return axios.get(url,{student_id:student_id});
+      `cis.php/Cis/Profil/getAllNationen`;
+    return axios.get(url);
   },
 
   getView: function (uid) {
