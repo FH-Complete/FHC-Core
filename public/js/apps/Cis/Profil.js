@@ -62,7 +62,7 @@ const testapp = Vue.createApp({
 	provide() {
 		return {
 			setLoading: (newValue)=>{
-				console.log(this);
+				
 				this.loading = newValue;
 			},
 			getZustellkontakteCount: this.zustellKontakteCount,
@@ -273,7 +273,7 @@ const testapp = Vue.createApp({
 	
 		<div v-if="notFoundUID">
 		
-			<h3>Es wurden keine oder mehrere Profile für {{this.notFoundUID}} gefunden</h3>
+			<h3>Es wurde keine Person mit der UID {{this.notFoundUID}} gefunden</h3>
 
 		</div>
 		<div v-else>

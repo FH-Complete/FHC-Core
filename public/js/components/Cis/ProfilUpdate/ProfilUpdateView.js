@@ -2,6 +2,7 @@
 import { CoreFilterCmpt } from "../../filter/Filter.js";
 import AcceptDenyUpdate from "./AcceptDenyUpdate.js";
 import Alert from "../../../components/Bootstrap/Alert.js";
+import Loading from "../../../components/Loader.js";
 
 
 const sortProfilUpdates = (ele1, ele2) => {
@@ -25,6 +26,7 @@ const sortProfilUpdates = (ele1, ele2) => {
 export default{
   components: {
     CoreFilterCmpt,
+    Loading,
   },
   props:{
     id:{
@@ -33,7 +35,7 @@ export default{
   },
   data() {
     return {
-      
+      loading:false,
       showAll: false,
       events:[],
       profil_update_id:Number(this.id),
@@ -234,9 +236,12 @@ export default{
     },
   },
   methods: {
+    setLoading: function(newValue){
+      this.loading = newValue;
+    },
    
     showModal: function (value) {
-      AcceptDenyUpdate.popup({ value: value })
+      AcceptDenyUpdate.popup({ value: value, setLoading:this.setLoading })
         .then((res) => {
           
           //? refetches the data, if any request was denied or accepted
@@ -252,6 +257,15 @@ export default{
       //? store the selected view in the session storage of the browser
       sessionStorage.setItem("showAll", event.target.value);
     },
+  },
+  watch:{
+    loading: function(newValue, oldValue){
+      if(newValue){
+        this.$refs.loadingModalRef.show();
+      }else{
+        this.$refs.loadingModalRef.hide();
+      }
+    }
   },
 
   mounted() {
@@ -289,7 +303,7 @@ export default{
   
     </div>
 
- 
+    <loading ref="loadingModalRef" :timeout="0"></loading>
     
     <core-filter-cmpt title="Update Requests"  ref="UpdatesTable" :tabulatorEvents="events" :tabulator-options="profil_updates_table_options" tableOnly :sideMenu="false" />
 

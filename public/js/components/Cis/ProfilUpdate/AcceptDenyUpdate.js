@@ -19,6 +19,10 @@ export default {
     value: {
       type: Object,
     },
+    setLoading:{
+      type: Function,
+    },
+
     /*
      * NOTE(chris):
      * Hack to expose in "emits" declared events to $props which we use
@@ -34,6 +38,7 @@ export default {
   data() {
     return {
       data: this.value,
+      loading: false,
       //? result is returned from the Promise when the modal is closed
       result: false,
       info: null,
@@ -48,7 +53,11 @@ export default {
           `/Cis/ProfilUpdate/show/${dms_id}`;
     },
     acceptRequest: function () {
+      this.loading = true;
+      this.setLoading(true);
       Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(this.data).then((res) => {
+        this.setLoading(false);
+        this.loading = false;
         this.result = true;
       }).catch((e) => {
         Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
@@ -56,9 +65,12 @@ export default {
       this.hide();
     },
 
-    denyRequest: function () {
-      
+    denyRequest: async function () {
+      this.loading = true;
+      this.setLoading(true);
       Vue.$fhcapi.ProfilUpdate.denyProfilRequest(this.data).then((res) => {
+        this.setLoading(false);
+        this.loading = false;
         this.result = true;
       }).catch((e) => {
         Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
