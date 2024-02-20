@@ -23718,6 +23718,26 @@ array(
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'person',
+		'phrase' => 'habilitation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Habilitation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Habilitation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
 		'phrase' => 'funktion',
 		'insertvon' => 'system',
 		'phrases' => array(
