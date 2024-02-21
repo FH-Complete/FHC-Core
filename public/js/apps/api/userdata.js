@@ -1,6 +1,13 @@
 export default {
   //! API Calls for Profil Views
 
+  getGemeinden: function(nation,zip=null){
+    const url =
+      FHC_JS_DATA_STORAGE_OBJECT.app_root +
+      `cis.php/Cis/Profil/getGemeinden`;
+    return axios.get(url,{params:{nation:nation,zip:zip}});
+  },
+
   getAllNationen:function(){
     const url =
       FHC_JS_DATA_STORAGE_OBJECT.app_root +

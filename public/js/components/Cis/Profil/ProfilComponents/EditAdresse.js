@@ -9,12 +9,29 @@ export default {
     inject:["zustellAdresseCount"],
     data(){
         return{
+            gemeinden:[],
+            selectedNation:null,
             nationenList:[],
             originalValue:null,
             zustellAdressenCount:null,
         }
     },
     methods:{
+       
+
+        getGemeinde: function(){
+            //? only query the gemeinde is the nation is Austria and the PLZ is greater than 999 and less than 32000
+            if(this.data.nation && this.data.nation ==="A" && (this.data.plz && (this.data.plz >999 && this.data.plz <32000))){
+                Vue.$fhcapi.UserData.getGemeinden(this.data.nation,this.data.plz).then(res => {
+                    
+                    if(res.data.length){
+                        this.gemeinden = res.data;
+                    }
+                })
+            }else{
+                this.gemeinden = [];
+            }
+        },
         updateValue: function(event,bind){
             //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid 
             if(bind ==="zustelladresse" ){
@@ -38,20 +55,6 @@ export default {
             }
             //? if this.zustellAdressenCount is still not set by the api call and is still null
             return false;
-            
-
-        },
-        ortLayoutClasses: function(){
-            return this.showKontaktTyp?[
-                'col-12', 
-                'col-sm-7',
-                'col-xl-12',
-                'col-xxl-7',
-            ]:['col-12'];
-        },
-        showKontaktTyp: function(){
-            let kontaktTypen = ["Nebenwohnsitz","Hauptwohnsitz"];
-            return kontaktTypen.includes(this.data.typ) || !this.data.typ
         },
         isChanged: function(){
             if(!this.data.strasse || !this.data.plz || !this.data.ort || !this.data.typ){
@@ -61,23 +64,23 @@ export default {
             return this.originalValue !== JSON.stringify(this.data);
         },
     },
+   
     created(){
         
         Vue.$fhcapi.UserData.getAllNationen().then(res => {
             this.nationenList = res.data;
+            this.getGemeinde();
         });
 
-        //? same for Gemeinde
-        /* Vue.$fhcapi.UserData.getAllNationen().then(res => {
-            this.nationenList = res.data;
-        }); */
+
         this.originalValue = JSON.stringify(this.data);
         this.zustellAdressenCount = this.zustellAdresseCount();
         
     },
     template:`
+
      <div class="gy-3 row justify-content-center align-items-center">
-     
+     <pre> {{JSON.stringify(gemeinden,null,2)}}</pre>
      
      <!-- warning message for too many zustellungs Adressen -->
      <div v-if="showZustellAdressenWarning" class="col-12 ">
@@ -151,22 +154,24 @@ export default {
             <div class="form-underline ">
             <div class="form-underline-titel">PLZ</div>
     
-            <input  class="form-control" :value="data.plz" @input="updateValue($event,'plz')" :placeholder="data.plz">
+            <input  class="form-control" :value="data.plz" @input="updateValue($event,'plz')" @input="getGemeinde" :placeholder="data.plz">
         
             </div>
         </div>
         <div class="col-6 order-5">
+       
         <div class="form-underline ">
         <div class="form-underline-titel">Gemeinde</div>
-
-        <input  class="form-control" :value="data.gemeinde" @input="updateValue($event,'gemeinde')" :placeholder="data.gemeinde">
-    
+        <input :value="data.gemeinde" @input="updateValue($event,'gemeinde')"  type="text" class="form-control" id="gemeineInput" list="gemeindeOptions">
+        <datalist id="gemeindeOptions">
+          <option v-for="option in gemeinden" :value="option">
+        </datalist>
         </div>
         </div>
         <div class="col-6 order-5 ">
         <div class="form-underline ">
         <div class="form-underline-titel">nation</div>
-            <select  :value="data.nation" @change="updateValue($event,'nation')" class="form-select" aria-label="Select Kontakttyp">
+            <select  :value="data.nation" @change="updateValue($event,'nation')" @change="getGemeinde" class="form-select" aria-label="Select Kontakttyp">
                 <option selected></option>
                 <option :value="nation.code" v-for="nation in nationenList">{{nation.langtext}}</option>
             
