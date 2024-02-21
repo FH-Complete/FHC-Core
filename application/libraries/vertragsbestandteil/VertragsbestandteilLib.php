@@ -32,6 +32,8 @@ class VertragsbestandteilLib
 	protected $DienstverhaeltnisModel;
 	/** @var Vertragsbestandteil_model */
 	protected $VertragsbestandteilModel;
+	/** @var Benutzer_model */
+	protected $BenutzerModel;
 	/** 
 	 * @var GehaltsbestandteilLib
 	 */
@@ -49,6 +51,9 @@ class VertragsbestandteilLib
 		$this->CI->load->model('vertragsbestandteil/Vertragsbestandteil_model', 
 			'VertragsbestandteilModel');
 		$this->VertragsbestandteilModel = $this->CI->VertragsbestandteilModel;
+		$this->CI->load->model('person/benutzer_model', 
+			'BenutzerModel');
+		$this->BenutzerModel = $this->CI->BenutzerModel;
 		$this->CI->load->library('vertragsbestandteil/GehaltsbestandteilLib', 
 			null, 'GehaltsbestandteilLib');
 		$this->GehaltsbestandteilLib = $this->CI->GehaltsbestandteilLib;
@@ -383,6 +388,21 @@ class VertragsbestandteilLib
 		);
 	}
 	
+	/**
+	 * like endDienstverhaeltnis, but also sets aktiv flag to false
+	 */
+	public function deactivateDienstverhaeltnis(Dienstverhaeltnis $dv, $enddate, $deactivate)
+	{
+		$result = $this->endDienstverhaeltnis($dv, $enddate);
+		if ( $result === true)
+		{
+			if (!$deactivate) return $result;
+			$result = $this->BenutzerModel->update(array('uid' => $dv->getMitarbeiter_uid()), array('aktiv' => false));
+		} 
+		
+		return $result;
+	}
+
 	public function endDienstverhaeltnis(Dienstverhaeltnis $dv, $enddate)
 	{
 		if( $dv->getBis() !== null && $dv->getBis() < $enddate ) 
