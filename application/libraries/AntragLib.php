@@ -1302,7 +1302,7 @@ class AntragLib
 	 * 						retval -2 means other Antrag pending;
 	 * 						retval -3 means in blacklist stg
 	 */
-	public function getPrestudentUnterbrechungsBerechtigt($prestudent_id, $studiensemester_kurzbz = null)
+	public function getPrestudentUnterbrechungsBerechtigt($prestudent_id, $studiensemester_kurzbz = null, $datum_wiedereinstieg = null)
 	{
 		$result = $this->_ci->PrestudentModel->load($prestudent_id);
 		if (isError($result))
@@ -1320,18 +1320,10 @@ class AntragLib
 		if (!hasData($result))
 			return success(0);
 		$result = current(getData($result));
+		$prestudent_stdsem = $result->studiensemester_kurzbz;
 		$datumStatus = $result->datum;
-		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist'))) {
-			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
-				'prestudent_id' => $prestudent_id,
-				'typ' => Studierendenantrag_model::TYP_UNTERBRECHUNG,
-				'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED
-			]);
-			if (isError($result))
-				return $result;
-			if (hasData($result))
-				return success(-1);
-
+		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist'))
+			&& $result->status_kurzbz != 'Unterbrecher') {
 			return success(0);
 		}
 		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id]);
@@ -1339,7 +1331,8 @@ class AntragLib
 			return $result;
 		if (!hasData($result))
 			return success(1);
-		$result= getData($result);
+
+		$result = getData($result);
 		foreach ($result as $antrag)
 		{
 			if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG || $antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL)
@@ -1349,11 +1342,11 @@ class AntragLib
 				elseif($antrag->status == Studierendenantragstatus_model::STATUS_APPROVED && $antrag->datum > $datumStatus)
 					return success(-2);
 			}
-			if ($studiensemester_kurzbz && $antrag->typ == Studierendenantrag_model::TYP_UNTERBRECHUNG)
+			if ($antrag->typ == Studierendenantrag_model::TYP_UNTERBRECHUNG)
 			{
-				// NOTE(chris): check if this is an old or canceled one
-				if ($antrag->studiensemester_kurzbz == $studiensemester_kurzbz && $antrag->status != Studierendenantragstatus_model::STATUS_CANCELLED)
-					return success(-1);
+				// NOTE(chris): Ignore canceled ones
+				if ($antrag->status == Studierendenantragstatus_model::STATUS_CANCELLED)
+					continue;
 			}
 			if ($antrag->typ == Studierendenantrag_model::TYP_WIEDERHOLUNG)
 			{
@@ -1362,6 +1355,17 @@ class AntragLib
 			}
 		}
 
+		if (!$studiensemester_kurzbz) {
+			$sems = $this->getSemesterForUnterbrechung($prestudent_id, $prestudent_stdsem);
+			if (!count(array_filter($sems, function ($item) {
+				return !$item['disabled'];
+			})))
+				return success(-1);
+		} else {
+			if ($this->_ci->StudierendenantragModel->hasRunningUnterbrechungBetween($prestudent_id, $studiensemester_kurzbz, $datum_wiedereinstieg))
+				return success(-1);
+		}
+		
 		return success(1);
 	}
 
@@ -1552,53 +1556,43 @@ class AntragLib
 		return success($resultDetails);
 	}
 
-	public function getSemesterForUnterbrechung($studiensemester_kurzbz)
+	/**
+	 * Rearrange the free semester slots for a new Unterbrechung
+	 * 
+	 * @param integer		$prestudent_id
+	 * @param string		$studiensemester_kurzbz
+	 * 
+	 * @return array
+	 */
+	public function getSemesterForUnterbrechung($prestudent_id, $studiensemester_kurzbz)
 	{
-		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-
-		$semester = [];
-
-		$result = $this->_ci->StudiensemesterModel->getNextFrom($studiensemester_kurzbz);
-		if (!hasData($result))
-			return $semester;
-		$nextSem = current(getData($result));
-
-		$semester[0] = [
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'wiedereinstieg' => [$nextSem]
-		];
-
-		$result = $this->_ci->StudiensemesterModel->getNextFrom($nextSem->studiensemester_kurzbz);
-		if (!hasData($result))
-			return $semester;
-
-		$currSemester = current(getData($result));
-		$followingSemester = [$currSemester];
-
-		$max = $this->_ci->config->item('unterbrecher_semester_max_length');
-		if(!$max || $max < 1)
-			$max = 2;
-
-		for ($i = 1; $i < $max; $i++) {
-			$result = $this->_ci->StudiensemesterModel->getNextFrom($currSemester->studiensemester_kurzbz);
-			if (!hasData($result))
-				break;
-			$currSemester = current(getData($result));
-			$followingSemester[] = $currSemester;
-		}
-
-		$semester[1] = [
-			'studiensemester_kurzbz' => $nextSem->studiensemester_kurzbz,
-			'wiedereinstieg' => $followingSemester
-		];
-
-		//remove last Semester of the array
-		array_pop($followingSemester);
-
-		foreach ($followingSemester as $sem)
-			$semester[0]['wiedereinstieg'][] = $sem;
-
-		return $semester;
+		$result = $this->_ci->StudierendenantragModel->getFreeSlotsForUnterbrechung($prestudent_id, $studiensemester_kurzbz);
+		if (isError($result))
+			return [];
+		$result = getData($result);
+		if (!$result)
+			return [];
+		return array_reduce($result, function ($carry, $item) {
+			if (!isset($carry[$item->von]))
+				$carry[$item->von] = [
+					'studiensemester_kurzbz' => $item->von,
+					'wiedereinstieg' => [],
+					'disabled' => true
+				];
+			
+			$carry[$item->von]['wiedereinstieg'][] = [
+				'studiensemester_kurzbz' => $item->bis,
+				'start' => $item->ende,
+				'disabled' => (boolean)$item->studierendenantrag_id
+			];
+			
+			if ($carry[$item->von]['disabled'] && !$item->studierendenantrag_id) {
+				$carry[$item->von]['disabled'] = false;
+			}
+			
+			return $carry;
+		}, []);
+		return $result;
 	}
 
 	public function getAktivePrestudentenInStgs($studiengaenge, $query)

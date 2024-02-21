@@ -287,4 +287,98 @@ class Studierendenantrag_model extends DB_Model
 
 		return $this->loadWhere($where);
 	}
+
+	/**
+	 * Checks if the Prestudent has an active Unterbrechung between
+	 * the start of the given semester and the given enddate.
+	 * If the enddate is omitted the end of the given semester is used.
+	 *
+	 * @param integer		$prestudent_id
+	 * @param string		$studiensemester_kurzbz
+	 * @param string		$enddate					(optional)
+	 *
+	 * @return boolean
+	 */
+	public function hasRunningUnterbrechungBetween($prestudent_id, $studiensemester, $enddate = null)
+	{
+		$start = '(SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=' . $this->db->escape($studiensemester) . ')';
+		$end = $enddate
+			? $this->db->escape($enddate)
+			: '(SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=' . $this->db->escape($studiensemester) . ')';
+
+		$this->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+		$this->db->where([
+			'prestudent_id' => $prestudent_id,
+			'typ' => Studierendenantrag_model::TYP_UNTERBRECHUNG,
+			'campus.get_status_studierendenantrag(studierendenantrag_id) !=' => Studierendenantragstatus_model::STATUS_CANCELLED,
+			'start < ' . $end => null,
+			'datum_wiedereinstieg > ' . $start => null,
+		]);
+		return (boolean)$this->db->count_all_results($this->dbTable);
+	}
+
+	/**
+	 * Gets free semester slots for a new Unterbrechung.
+	 *
+	 * @param integer		$prestudent_id
+	 * @param string		$studiensemester_kurzbz		(optional)
+	 *
+	 * @return stdClass
+	 */
+	public function getFreeSlotsForUnterbrechung($prestudent_id, $studiensemester = null)
+	{
+		$max_starters = 2;
+		$max_length = max(
+			2,
+			(integer)$this->config->item('unterbrecher_semester_max_length')
+		);
+
+
+		$subquery = '';
+		if ($studiensemester)
+			$subquery = 'SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=?';
+		else
+			$subquery = 'SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=public.get_stdsem_prestudent (?, null)';
+
+		$sql = "WITH numbered_sems AS (
+		    SELECT
+		        a.studiensemester_kurzbz AS von,
+		        b.studiensemester_kurzbz AS bis,
+		        a.start AS start,
+		        b.start AS ende,
+		        ROW_NUMBER() OVER (
+		            PARTITION BY a.studiensemester_kurzbz
+		            ORDER BY b.start
+		        ) AS row_number
+		    FROM public.tbl_studiensemester a
+		    LEFT JOIN public.tbl_studiensemester b ON (b.start > a.ende)
+		),
+		last_sems AS (
+		    SELECT *
+		    FROM numbered_sems 
+		    WHERE numbered_sems.row_number <= ?
+		)
+		SELECT s.von, s.bis, s.start, s.ende, studierendenantrag_id
+		FROM last_sems s
+		LEFT JOIN (
+			SELECT studierendenantrag_id, start, datum_wiedereinstieg AS ende 
+			FROM campus.tbl_studierendenantrag 
+			LEFT JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+			WHERE typ=? 
+			AND campus.get_status_studierendenantrag(studierendenantrag_id) != ?
+			AND prestudent_id=?
+		) a ON (s.start < a.ende AND s.ende > a.start)
+		WHERE s.start >= (" . $subquery . ")
+		ORDER BY s.start, s.ende
+		LIMIT ?;";
+
+		return $this->execQuery($sql, [
+			$max_length,
+			self::TYP_UNTERBRECHUNG,
+			Studierendenantragstatus_model::STATUS_CANCELLED,
+			$prestudent_id,
+			$studiensemester ?: $prestudent_id,
+			$max_length * $max_starters
+		]);
+	}
 }

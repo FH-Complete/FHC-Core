@@ -256,7 +256,7 @@ export default {
 							:id="'studierendenantrag-form-abmeldung-' + uuid + '-stsem'"
 							@input="currentWiedereinstieg = ''"
 							>
-							<option v-for="(stsem, index) in data.studiensemester" :key="index" :value="index">
+							<option v-for="(stsem, index) in data.studiensemester" :key="index" :value="index" :disabled="stsem.disabled">
 								{{stsem.studiensemester_kurzbz}}
 							</option>
 						</select>
@@ -280,7 +280,7 @@ export default {
 					</div>
 					<div v-else>
 						<select v-model="currentWiedereinstieg" class="form-select">
-							<option v-for="sem in data.studiensemester[stsem].wiedereinstieg" :key="sem.studiensemester_kurzbz" :value="sem.start">
+							<option v-for="sem in data.studiensemester[stsem].wiedereinstieg" :key="sem.studiensemester_kurzbz" :value="sem.start" :disabled="sem.disabled">
 								{{sem.studiensemester_kurzbz}}
 							</option>
 						</select>
