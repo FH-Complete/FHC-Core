@@ -234,7 +234,11 @@ class Profil extends Auth_Controller
 		return $res;
 	}
 
-
+	/**
+	 * function that returns the data used for the corresponding view
+	 * @access private 
+	 * @return stdClass all the information corresponding to a view of a user
+	 */
 	private function studentProfil()
 	{
 		$betriebsmittelperson_res = $this->getBetriebsmittelInfo($this->pid);
@@ -278,6 +282,12 @@ class Profil extends Auth_Controller
 		return $res;
 	}
 
+	/**
+	 * function that returns the data used for the corresponding view
+	 * @access public
+	 * @param  boolean $uid the userID used to identify which information should be retrieved for which view 
+	 * @return stdClass all the information corresponding to a view of a user
+	 */
 	public function getView($uid)
 	{
 		//TODO: refactor
@@ -331,30 +341,33 @@ class Profil extends Auth_Controller
 
 	}
 
-	public function foto_sperre_function($value) //TODO: refactor function
+	/**
+	 * update column foto_sperre in public.tbl_person
+	 * @access public
+	 * @param  boolean $value  new value for the column
+	 * @return boolean the new value added to the column in public.tbl_person
+	 */
+	public function foto_sperre_function($value) 
 	{
-		//? Nur der Index User hat die Erlaubniss das Profilbild zu sperren 
 		$res = $this->PersonModel->update($this->pid, ["foto_sperre" => $value]);
-
 		if (isError($res)) {
-			echo json_encode("error encountered when updating foto_sperre");
-			return;
-			// error handling
-		} else {
-			//? select the value of the column foto_sperre to return 
-			if (isSuccess($this->PersonModel->addSelect("foto_sperre"))) {
-				$res = $this->PersonModel->load($this->pid);
-				if (isError($res)) {
-					// error handling
-				}
-				$res = hasData($res) ? getData($res)[0] : null;
-			}
-
+			show_error("error while trying to update table public.tbl_person");
+		} 
+		$this->PersonModel->addSelect("foto_sperre");
+		$res = $this->PersonModel->load($this->pid);
+		if (isError($res)) {
+			show_error("error while trying to query table public.tbl_person");
 		}
+		$res = hasData($res) ? getData($res)[0] : null;
 		echo json_encode($res);
 	}
 
-
+	/**
+	 * gets all nations in the table bis.tbl_nation
+	 *
+	 * @access public
+	 * @return array all the nations in table bis.tbl_nation
+	 */
 	public function getAllNationen(){
 		$this->load->model('codex/Nation_model',"NationModel");
 		$this->NationModel->addSelect(["nation_code as code","langtext"]);
@@ -364,18 +377,22 @@ class Profil extends Auth_Controller
 		}
 		$nation_res = hasData($nation_res) ? getData($nation_res) : null;
 		echo json_encode($nation_res);
-
 	}
 
-
+	/**
+	 * gets specific gemeinden which are related to the ZIP and the Nation passed in the body of the get request
+	 * @access public
+	 * @var    $_GET function uses GET request payload
+	 * @return boolean the new value added to the column in public.tbl_person
+	 */
 	public function getGemeinden(){
-		
+		/** @var $nation value parsed out of the body of the get request */	
 		$nation = $this->input->get('nation',true);
-		//? json_decode on zip to transform zip from string to integer
+		/** @var $zip value parsed out of the body of the get request and converted to a php integer with json_decode */
 		$zip = json_decode($this->input->get('zip',true));
 		
 		$this->load->model('codex/Gemeinde_model',"GemeindeModel");
-		$this->GemeindeModel->addSelect(["name"]);
+		$this->GemeindeModel->addSelect(["DISTINCT name"]);
 		if($nation == "A"){
 			if(isset($zip) && $zip>999 && $zip <32000){
 
@@ -395,272 +412,274 @@ class Profil extends Auth_Controller
 		}else{
 			echo json_encode(error("Nation was not 'A' (Austria)"));
 		}
-		
-
 	}
 
-
-	//? queries the Mailverteiler of a benutzer
+	/**
+	 * gets all the mailverteiler using the tables: tbl_benutzer, tbl_benutzergruppe, tbl_gruppe
+	 * @access private
+	 * @param  integer $uid  the userID used to retrieve the mailverteiler 
+	 * @return array returns the mailvertailer corresponding to a userID 
+	 */
 	private function getMailverteiler($uid){
-		$mailverteiler_res = null;
-		if (
-			isSuccess($this->PersonModel->addSelect('gruppe_kurzbz, beschreibung')) &&
-			isSuccess($this->PersonModel->addJoin('tbl_benutzer', 'person_id')) &&
-			isSuccess($this->PersonModel->addJoin('tbl_benutzergruppe', 'uid')) &&
-			isSuccess($this->PersonModel->addJoin('tbl_gruppe', 'gruppe_kurzbz'))
-		) {
+		$this->PersonModel->addSelect('gruppe_kurzbz, beschreibung');
+		$this->PersonModel->addJoin('tbl_benutzer', 'person_id');
+		$this->PersonModel->addJoin('tbl_benutzergruppe', 'uid');
+		$this->PersonModel->addJoin('tbl_gruppe', 'gruppe_kurzbz');
 
-			$mailverteiler_res = $this->PersonModel->loadWhere(array('mailgrp' => true, 'uid' => $uid));
-			if (isError($mailverteiler_res)) {
-				// catch error
-			}
-			$mailverteiler_res = hasData($mailverteiler_res) ? getData($mailverteiler_res) : null;
-
-			$mailverteiler_res = array_map(function ($element) {
-				$element->mailto = "mailto:" . $element->gruppe_kurzbz . "@" . DOMAIN;
-				return $element; }, $mailverteiler_res);
+		$mailverteiler_res = $this->PersonModel->loadWhere(array('mailgrp' => true, 'uid' => $uid));
+		if (isError($mailverteiler_res)) {
+			show_error("was not able the query the table public.tbl_benutzer:".getData($mailverteiler_res));
 		}
-
-		
+		$mailverteiler_res = hasData($mailverteiler_res) ? getData($mailverteiler_res) : null;
+		$mailverteiler_res = array_map(function ($element) {
+			$element->mailto = "mailto:" . $element->gruppe_kurzbz . "@" . DOMAIN;
+			return $element; 
+		}, $mailverteiler_res);
 		return $mailverteiler_res;
 	}
 
+	/**
+	 * gets all the Benutzerfunktionen of a corresponding user
+	 * @access private
+	 * @param  integer $uid  the userID used to retrieve the Benutzerfunktionen 
+	 * @return array returns the Benutzerfunktionen corresponding to a userID 
+	 */
 	private function getBenutzerFunktion($uid){
-		$benutzer_funktion_res = null;
-		if (
-			//! Summe der Wochenstunden wird jetzt in der hr/tbl_dienstverhaeltnis gespeichert
-			isSuccess($this->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as Bezeichnung", "tbl_organisationseinheit.bezeichnung as Organisationseinheit", "datum_von as Gültig_von", "datum_bis as Gültig_bis", "wochenstunden as Wochenstunden"])) &&
-			isSuccess($this->BenutzerfunktionModel->addJoin("tbl_organisationseinheit", "oe_kurzbz"))
-		) {
-			$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere(array('uid' => $uid));
-			if (isError($benutzer_funktion_res)) {
-				// error handling
-			} else {
-				$benutzer_funktion_res = hasData($benutzer_funktion_res) ? getData($benutzer_funktion_res) : null;
-			}
+		$this->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as Bezeichnung", "tbl_organisationseinheit.bezeichnung as Organisationseinheit", "datum_von as Gültig_von", "datum_bis as Gültig_bis", "wochenstunden as Wochenstunden"]);
+		$this->BenutzerfunktionModel->addJoin("tbl_organisationseinheit", "oe_kurzbz");
+	
+		$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere(array('uid' => $uid));
+		if (isError($benutzer_funktion_res)) {
+			show_error("was not able the query the table public.tbl_benutzerfunktion:".getData($benutzer_funktion_res));
 		}
-		
+		$benutzer_funktion_res = hasData($benutzer_funktion_res) ? getData($benutzer_funktion_res) : null;
 		return $benutzer_funktion_res;
 	}
 
+	/**
+	 * gets all the Betriebsmittel of a corresponding user
+	 * @access private
+	 * @param  integer $uid  the userID used to retrieve the Betriebsmittel 
+	 * @return array returns the Betriebsmittel corresponding to a userID 
+	 */
 	private function getBetriebsmittelInfo($pid){
-		$betriebsmittelperson_res = null;
-		if (
+		$this->BetriebsmittelpersonModel->addSelect(["CONCAT(betriebsmitteltyp, ' ' ,beschreibung) as Betriebsmittel", "nummer as Nummer", "ausgegebenam as Ausgegeben_am"]);
 
-			isSuccess($this->BetriebsmittelpersonModel->addSelect(["CONCAT(betriebsmitteltyp, ' ' ,beschreibung) as Betriebsmittel", "nummer as Nummer", "ausgegebenam as Ausgegeben_am"]))
-
-		) {
-			//? betriebsmittel are not needed in a view
-			$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel($pid);
-			if (isError($betriebsmittelperson_res)) {
-				// error handling
-			} else {
-				$betriebsmittelperson_res = hasData($betriebsmittelperson_res) ? getData($betriebsmittelperson_res) : null;
-			}
+		//? betriebsmittel are not needed in a view
+		$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel($pid);
+		if (isError($betriebsmittelperson_res)) {
+			show_error("was not able the query the table public.tbl_betriebsmittelperson:".getData($betriebsmittelperson_res));
 		}
+		$betriebsmittelperson_res = hasData($betriebsmittelperson_res) ? getData($betriebsmittelperson_res) : null;
 		return $betriebsmittelperson_res;
 	}
 
+	/**
+	 * gets the alias of a corresponding user
+	 * @access private
+	 * @param  integer $uid the userID used to get the alias
+	 * @return string the alias of the userID
+	 */
 	private function getBenutzerAlias($uid){
-		$benutzer_res = null;
-		if (isSuccess($this->BenutzerModel->addSelect(["alias"]))) {
-			$benutzer_res = $this->BenutzerModel->load([$uid]);
-			if (isError($benutzer_res)) {
-				// error handling
-			} else {
-				$benutzer_res = hasData($benutzer_res) ? getData($benutzer_res)[0] : null;
-			}
+		$this->BenutzerModel->addSelect(["alias"]);
+		$benutzer_res = $this->BenutzerModel->load([$uid]);
+		if (isError($benutzer_res)) {
+			show_error("was not able the query the table public.tbl_benutzer:".getData($benutzer_res));
+		} else {
+			$benutzer_res = hasData($benutzer_res) ? getData($benutzer_res)[0] : null;
 		}
+	
 		return $benutzer_res;
 	}
 
+	/**
+	 * gets the person information corresponding to a user
+	 * @access private
+	 * @param  integer $uid the userID used to get the person information
+	 * @param  integer $geburtsInfo flag wether to add the columns gebort, gebdatum, foto_sperre or not
+	 * @return array all the person informaion corresponding to a userID
+	 */
 	private function getPersonInfo($uid, $geburtsInfo = null){
-		
-		$person_res = null;
 		$selectClause = ["foto", "anrede", "titelpost as postnomen", "titelpre as titel", "vorname", "nachname"];
-		//? $geburtsInfo flag checks whether gebort and gebdatum should also be added to the query
+		/** @param integer $geburtsInfo */
 		if($geburtsInfo){
 			array_push($selectClause,"gebort");
 			array_push($selectClause,"gebdatum");
 			array_push($selectClause,"foto_sperre");
 		}
-		if (
-			isSuccess($this->BenutzerModel->addSelect($selectClause))
-			&& isSuccess($this->BenutzerModel->addJoin("tbl_person", "person_id"))
-		) {
-
-			$person_res = $this->BenutzerModel->load([$uid]);
-			if (isError($person_res)) {
-				// error handling
-			} else {
-				$person_res = hasData($person_res) ? getData($person_res)[0] : null;
-			}
+		$this->BenutzerModel->addSelect($selectClause);
+		$this->BenutzerModel->addJoin("tbl_person", "person_id");
+	
+		$person_res = $this->BenutzerModel->load([$uid]);
+		if (isError($person_res)) {
+			show_error("was not able the query the table public.tbl_benutzer:".getData($person_res));
+		} else {
+			$person_res = hasData($person_res) ? getData($person_res)[0] : null;
 		}
+		
 		return $person_res;
 	}
 
+	/**
+	 * gets the mitarbeiter information corresponding to a user
+	 * @access private
+	 * @param  integer $uid the userID used to get the mitarbeiter information
+	 * @return array all the mitarbeiter informaion corresponding to a userID
+	 */
 	private function getMitarbeiterInfo($uid){
-		$mitarbeiter_res = null;
-		if (
-			isSuccess($this->MitarbeiterModel->addSelect(["kurzbz", "telefonklappe", "alias", "ort_kurzbz"]))
-			&& isSuccess($this->MitarbeiterModel->addJoin("tbl_benutzer", "tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid"))
-		) {
-			$mitarbeiter_res = $this->MitarbeiterModel->load($uid);
-			if (isError($mitarbeiter_res)) {
-				// error handling
-			} else {
-				$mitarbeiter_res = hasData($mitarbeiter_res) ? getData($mitarbeiter_res)[0] : null;
-			}
+		$this->MitarbeiterModel->addSelect(["kurzbz", "telefonklappe", "alias", "ort_kurzbz"]);
+		$this->MitarbeiterModel->addJoin("tbl_benutzer", "tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid");
+		$mitarbeiter_res = $this->MitarbeiterModel->load($uid);
+		if (isError($mitarbeiter_res)) {
+			show_error("was not able the query the table public.tbl_mitarbeiter:".getData($mitarbeiter_res));
+		} else {
+			$mitarbeiter_res = hasData($mitarbeiter_res) ? getData($mitarbeiter_res)[0] : null;
 		}
+	
 		return $mitarbeiter_res;
 	}
 
+	/**
+	 * gets the telefon information corresponding to a user
+	 * @access private
+	 * @param  integer $uid the userID used to get the telefon information
+	 * @return array all the telefon informaion corresponding to a userID
+	 */
 	private function getTelefonInfo($uid){
-		$telefon_res = null;
-		if (
-			isSuccess($this->MitarbeiterModel->addSelect(["kontakt"])) &&
-			isSuccess($this->MitarbeiterModel->addJoin("tbl_kontakt", "tbl_mitarbeiter.standort_id = tbl_kontakt.standort_id"))
-
-
-		) {
-			$this->MitarbeiterModel->addLimit(1);
-			$telefon_res = $this->MitarbeiterModel->loadWhere(["mitarbeiter_uid" => $uid, "kontakttyp" => "telefon"]);
-			if (isError($telefon_res)) {
-				// error handling
-			} else {
-				$telefon_res = hasData($telefon_res) ? getData($telefon_res)[0] : null;
-			}
+		$this->MitarbeiterModel->addSelect(["kontakt"]);
+		$this->MitarbeiterModel->addJoin("tbl_kontakt", "tbl_mitarbeiter.standort_id = tbl_kontakt.standort_id");
+		$this->MitarbeiterModel->addLimit(1);
+		$telefon_res = $this->MitarbeiterModel->loadWhere(["mitarbeiter_uid" => $uid, "kontakttyp" => "telefon"]);
+		if (isError($telefon_res)) {
+			show_error("was not able the query the table public.tbl_mitarbeiter:".getData($telefon_res));
 		}
+		$telefon_res = hasData($telefon_res) ? getData($telefon_res)[0] : null;
 		return $telefon_res;
-
-		
 	}
 
-
+	/**
+	 * gets the student information corresponding to a user
+	 * @access private
+	 * @param  integer $uid the userID used to get the student information
+	 * @return array all the student informaion corresponding to a userID
+	 */
 	private function getStudentInfo($uid){
-
-		$student_res = null;
-
-		//? personenkennzeichen ist die Spalte Matrikelnr in der Tabelle Student
-		if (
-			isSuccess($this->StudentModel->addSelect(['tbl_studiengang.bezeichnung as studiengang', 'tbl_student.semester', 'tbl_student.verband', 'tbl_student.gruppe', 'tbl_student.matrikelnr as personenkennzeichen']))
-			&& isSuccess($this->StudentModel->addJoin('tbl_studiengang', "tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz"))
-		) {
-			$student_res = $this->StudentModel->load([$uid]);
-			if (isError($student_res)) {
-				// catch error
-			}
-			$student_res = hasData($student_res) ? getData($student_res)[0] : null;
-
+		$this->StudentModel->addSelect(['tbl_studiengang.bezeichnung as studiengang', 'tbl_student.semester', 'tbl_student.verband', 'tbl_student.gruppe', 'tbl_student.matrikelnr as personenkennzeichen']);
+		$this->StudentModel->addJoin('tbl_studiengang', "tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz");
+		
+		$student_res = $this->StudentModel->load([$uid]);
+		if (isError($student_res)) {
+			show_error("was not able the query the table public.tbl_student:".getData($student_res));
 		}
-
+		$student_res = hasData($student_res) ? getData($student_res)[0] : null;
 		return $student_res;
 	}
 
-
+	/**
+	 * gets the profil updates corresponding to a user
+	 * @access private
+	 * @param  integer $uid the userID used to get the profil updates
+	 * @return array all the profil updates corresponding to a userID
+	 */
 	private function getProfilUpdates($uid){
-		$profilUpdates = null;
 		$profilUpdates = $this->ProfilUpdateModel->getProfilUpdatesWhere(['uid'=>$uid]);
 		if(isError($profilUpdates)){
-			//error handling
-		}else{
-			//? array containing all the requested profil information changes from the current user
-			$profilUpdates = hasData($profilUpdates) ? getData($profilUpdates) : null;
-			
-		} 
+			show_error("was not able the query the table public.tbl_profil_update:".getData($profilUpdates));
+		}
+		$profilUpdates = hasData($profilUpdates) ? getData($profilUpdates) : null;
 		return $profilUpdates;
 	}
 
+	/**
+	 * gets the Matrikelnummer corresponding to a user
+	 * @access private
+	 * @param  integer $uid the userID used to get the Matrikelnummer
+	 * @return integer the Matrikelnummer corresponding to a userID
+	 */
 	private function getMatrikelNummer($uid){
-		$matr_res = null;
-		if (
-			isSuccess($this->BenutzerModel->addSelect(["matr_nr"]))
-			&& isSuccess($this->BenutzerModel->addJoin("tbl_person", "person_id"))
-		) {
-			$matr_res = $this->BenutzerModel->load([$uid]);
-			if (isError($matr_res)) {
-				// catch error
-			} else {
-				$matr_res = hasData($matr_res) ? getData($matr_res)[0] : [];
-
-			}
+		$this->BenutzerModel->addSelect(["matr_nr"]);
+		$this->BenutzerModel->addJoin("tbl_person", "person_id");
+	
+		$matr_res = $this->BenutzerModel->load([$uid]);
+		if (isError($matr_res)) {
+			show_error("was not able the query the table public.tbl_benutzer:".getData($matr_res));
 		}
+		$matr_res = hasData($matr_res) ? getData($matr_res)[0] : [];
 		return $matr_res;
 	}
 
+	/**
+	 * gets the Zutrittsgruppen corresponding to a user
+	 * @access private
+	 * @param  integer $uid the userID used to get the Zutrittsgruppen
+	 * @return array all the Zutrittsgruppen corresponding to a userID
+	 */
 	private function getZutrittsgruppen($uid){
-		$zutrittsgruppe_res = null;
-		if (
-
-			isSuccess($this->BenutzergruppeModel->addSelect(['bezeichnung']))
-			&& isSuccess($this->BenutzergruppeModel->addJoin('tbl_gruppe', 'gruppe_kurzbz'))
-		) {
-			$zutrittsgruppe_res = $this->BenutzergruppeModel->loadWhere(array("uid" => $uid, "zutrittssystem" => true));
-			if (isError($zutrittsgruppe_res)) {
-				// catch error
-			}
-			$zutrittsgruppe_res = hasData($zutrittsgruppe_res) ? getData($zutrittsgruppe_res) : null;
-
+		$this->BenutzergruppeModel->addSelect(['bezeichnung']);
+		$this->BenutzergruppeModel->addJoin('tbl_gruppe', 'gruppe_kurzbz');
+	
+		$zutrittsgruppe_res = $this->BenutzergruppeModel->loadWhere(array("uid" => $uid, "zutrittssystem" => true));
+		if (isError($zutrittsgruppe_res)) {
+			show_error("was not able the query the table public.tbl_benutzergruppe:".getData($zutrittsgruppe_res));
 		}
+		$zutrittsgruppe_res = hasData($zutrittsgruppe_res) ? getData($zutrittsgruppe_res) : null;
 		return $zutrittsgruppe_res;
 	}
 
+	/**
+	 * gets the address information corresponding to a user
+	 * @access private
+	 * @param  integer $uid the userID used to get the address information
+	 * @return array all the address information corresponding to a userID
+	 */
 	private function getAdressenInfo($pid){
-		$adresse_res = null;
-		if (
-
-			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort","zustelladresse","gemeinde","nation"])) &&
-			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC")) &&
-			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz")) 
-		) {
-			$adresse_res = $this->AdresseModel->loadWhere(array("person_id" => $pid));
-			if (isError($adresse_res)) {
-				// error handling
-			} else {
-				$adresse_res = hasData($adresse_res) ? getData($adresse_res) : null;
-			}
-		}
+		$adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort","zustelladresse","gemeinde","nation"]);
+		$adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC");
+		$adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz");
 		
+		$adresse_res = $this->AdresseModel->loadWhere(["person_id" => $pid]);
+		if (isError($adresse_res)) {
+			show_error("was not able the query the table public.tbl_adresse:".getData($adresse_res));
+		}
+		$adresse_res = hasData($adresse_res) ? getData($adresse_res) : null;
 		return $adresse_res;
 	}
 
+	/**
+	 * gets the kontakt information corresponding to a user
+	 * @access private
+	 * @param  integer $uid the userID used to get the kontakt information
+	 * @return array all the kontakt information corresponding to a userID
+	 */
 	private function getKontaktInfo($pid){
-		$kontakte_res = null;
-		if (
-
-			//? kontaktdaten soll auch nur der user selbst sehen
-			//DISTINCT ON (kontakttyp)
-			isSuccess($this->KontaktModel->addSelect(['kontakttyp','kontakt_id','kontakt', 'tbl_kontakt.anmerkung', 'tbl_kontakt.zustellung'])) &&
-			isSuccess($this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT')) &&
-			isSuccess($this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT')) &&
-			isSuccess($this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum'))
-		) {
-			$kontakte_res = $this->KontaktModel->loadWhere(array('person_id' => $pid));
-			if (isError($kontakte_res)) {
-				// handle error	
-			} else {
-				$kontakte_res = hasData($kontakte_res) ? getData($kontakte_res) : null;
-				
-				
-			}
-
+		$this->KontaktModel->addSelect(['kontakttyp','kontakt_id','kontakt', 'tbl_kontakt.anmerkung', 'tbl_kontakt.zustellung']);
+		$this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT');
+		$this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT');
+		$this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum');
+	
+		$kontakte_res = $this->KontaktModel->loadWhere(['person_id' => $pid]);
+		if (isError($kontakte_res)) {
+			show_error("was not able the query the table public.tbl_kontakt:".getData($kontakte_res));
 		}
-		
+		$kontakte_res = hasData($kontakte_res) ? getData($kontakte_res) : null;		
 		return $kontakte_res;
 	}
 
+	/**
+	 * gets the date of issue of the FH access card corresponding to a user
+	 * @access private
+	 * @param  integer $uid the userID used to get the date of issue of the FH access card
+	 * @return string the date of issue of the FH access card corresponding to a userID
+	 */
 	private function getZutrittskarteDatum($uid){
-		$zutrittskarte_ausgegebenam = null;
 		$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittelByUid($uid, "Zutrittskarte");
 		if (isError($zutrittskarte_ausgegebenam)) {
-			// error handling
-		} else {
-			$zutrittskarte_ausgegebenam = hasData($zutrittskarte_ausgegebenam) ? getData($zutrittskarte_ausgegebenam)[0]->ausgegebenam : null;
-			//? formats the date from 01-01-2000 to 01.01.2000
-			$zutrittskarte_ausgegebenam = str_replace("-", ".", $zutrittskarte_ausgegebenam);
-		}
+			show_error("was not able the query the table wavi.tbl_bentriebsmittelperson:".getData($zutrittskarte_ausgegebenam));
+		} 
+		$zutrittskarte_ausgegebenam = hasData($zutrittskarte_ausgegebenam) ? getData($zutrittskarte_ausgegebenam)[0]->ausgegebenam : null;
 
-		
+		//? formats date from 01-01-2000 to 01.01.2000
+		$zutrittskarte_ausgegebenam = str_replace("-", ".", $zutrittskarte_ausgegebenam);
 		return $zutrittskarte_ausgegebenam;
 	}
 
