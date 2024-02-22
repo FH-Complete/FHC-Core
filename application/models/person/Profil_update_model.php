@@ -62,12 +62,11 @@ class Profil_update_model extends DB_Model
 		$this->addJoin("public.tbl_benutzer", "public.tbl_benutzer.uid = public.tbl_profil_update.uid");
 		$this->addJoin("public.tbl_person", "public.tbl_person.person_id = public.tbl_benutzer.person_id");
 		$res = $this->loadWhere($whereClause);
-		if (isError($res)) {
-			return error("Could not load public.tbl_profil_update with whereClause");
+		if(isError($res)){
+			return $res;
 		}
-		$res = hasData($res) ? getData($res) : [];
-		if ($res) {
-			foreach ($res as $request) {
+		if(hasData($res)){
+			foreach (getData($res) as $request) {
 				$this->formatProfilRequest($request);
 			}
 		}
