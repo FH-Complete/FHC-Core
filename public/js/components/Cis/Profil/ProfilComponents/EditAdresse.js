@@ -1,5 +1,9 @@
 export default {
+    components:{
+        AutoComplete: primevue.autocomplete
+    },
     props:{
+        
         data:Object,
         isMitarbeiter:{
             type: Boolean,
@@ -16,9 +20,17 @@ export default {
             zustellAdressenCount:null,
         }
     },
+    watch:{
+        'data.gemeinde': function(newValue, oldValue){
+            this.$emit('profilUpdate',this.isChanged?this.data:null);
+        },
+    },
     methods:{
-       
 
+        autocompleteSearch: function(event){
+            this.gemeinden = this.gemeinden.map(gemeinde => gemeinde);     
+        },
+       
         getGemeinde: function(){
             //? only query the gemeinde is the nation is Austria and the PLZ is greater than 999 and less than 32000
             if(this.data.nation && this.data.nation ==="A" && (this.data.plz && (this.data.plz >999 && this.data.plz <32000))){
@@ -32,6 +44,7 @@ export default {
                 this.gemeinden = [];
             }
         },
+
         updateValue: function(event,bind){
             //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid 
             if(bind ==="zustelladresse" ){
@@ -43,6 +56,7 @@ export default {
             this.$emit('profilUpdate',this.isChanged?this.data:null);
         },
     },
+
     computed:{
         showZustellAdressenWarning: function(){
             if(this.zustellAdressenCount){
@@ -57,7 +71,7 @@ export default {
             return false;
         },
         isChanged: function(){
-            if(!this.data.strasse || !this.data.plz || !this.data.ort || !this.data.typ){
+            if(!this.data.strasse || !this.data.plz || !this.data.ort || !this.data.typ ){
                
                 return false;
             }
@@ -76,9 +90,9 @@ export default {
         this.originalValue = JSON.stringify(this.data);
         this.zustellAdressenCount = this.zustellAdresseCount();
         
-    },
-    template:`
-
+    },       
+    
+    template:/*html*/`
      <div class="gy-3 row justify-content-center align-items-center">
      
      
@@ -113,7 +127,7 @@ export default {
         <div  class="col-12 col-sm-9 col-xl-12 col-xxl-9 order-1">
 
         <div class="form-underline ">
-        <div class="form-underline-titel">Strasse</div>
+        <div class="form-underline-titel">Strasse*</div>
         <input  class="form-control" :value="data.strasse" @input="updateValue($event,'strasse')" :placeholder="data.strasse">
         
         </div>
@@ -124,7 +138,7 @@ export default {
         <div class=" order-2 order-sm-4 order-xl-3 order-xxl-4 col-12 col-sm-5  col-xl-8 col-xxl-5  ">
             
             <div  class="form-underline">
-                <div class="form-underline-titel">Kontakttyp</div>
+                <div class="form-underline-titel">Kontakttyp*</div>
         
                 <select  :value="data.typ" @change="updateValue($event,'typ')" class="form-select" aria-label="Select Kontakttyp">
                     <option selected></option>
@@ -145,14 +159,14 @@ export default {
         <div  class="order-3 order-sm-3 order-xl-2 order-xxl-3 col-12 col-sm-7 col-xl-12 col-xxl-7 " >
             
             <div class="form-underline ">
-            <div class="form-underline-titel">Ort</div>
+            <div class="form-underline-titel">Ort*</div>
             <input  class="form-control" :value="data.ort" @input="updateValue($event,'ort')" :placeholder="data.ort">
         
             </div>
         </div>
         <div  class="order-4 order-sm-2 order-xl-4 order-xxl-2 col-12 col-sm-3 col-xl-4 col-xxl-3 ">
             <div class="form-underline ">
-            <div class="form-underline-titel">PLZ</div>
+            <div class="form-underline-titel">PLZ*</div>
     
             <input  class="form-control" :value="data.plz" @input="updateValue($event,'plz')" @input="getGemeinde" :placeholder="data.plz">
         
@@ -161,16 +175,13 @@ export default {
         <div class="col-6 order-5">
        
         <div class="form-underline ">
-        <div class="form-underline-titel">Gemeinde</div>
-        <input :value="data.gemeinde" @input="updateValue($event,'gemeinde')"  type="text" class="form-control" id="gemeineInput" list="gemeindeOptions">
-        <datalist id="gemeindeOptions">
-          <option v-for="option in gemeinden" :value="option">
-        </datalist>
+        <div class="form-underline-titel">Gemeinde*</div>
+        <auto-complete class="w-100" v-model="data.gemeinde" dropdown :forceSelection="data.nation ==='A'?true:false" :suggestions="gemeinden" @complete="autocompleteSearch" ></auto-complete>
         </div>
         </div>
         <div class="col-6 order-5 ">
         <div class="form-underline ">
-        <div class="form-underline-titel">nation</div>
+        <div class="form-underline-titel">Nation*</div>
             <select  :value="data.nation" @change="updateValue($event,'nation')" @change="getGemeinde" class="form-select" aria-label="Select Kontakttyp">
                 <option selected></option>
                 <option :value="nation.code" v-for="nation in nationenList">{{nation.langtext}}</option>
