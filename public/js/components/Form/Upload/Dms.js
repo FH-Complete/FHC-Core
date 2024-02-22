@@ -75,7 +75,7 @@ export default {
 	<div class="form-upload-dms">
 		<input ref="upload" class="form-control" :class="inputClass" :id="id" :name="name" :multiple="multiple" type="file" @change="addFiles">
 		<ul v-if="modelValue.length && multiple && !noList" class="list-unstyled m-0">
-			<li v-for="(file, index) in modelValue" :key="index" class="d-flex mx-1 mt-1">
+			<li v-for="(file, index) in modelValue" :key="index" class="d-flex mx-1 mt-1 align-items-start">
 				<span class="col-auto"><i class="fa fa-file me-1"></i></span>
 				<span class="col">{{ file.name }}</span>
 				<button class="col-auto btn btn-outline-secondary btn-p-0" @click="removeFile(index)">

@@ -11,7 +11,6 @@ export default {
 		'changed'
 	],
 	props: {
-		// TODO(chris): rename to config?
 		config: {
 			type: [String, Object],
 			required: true
