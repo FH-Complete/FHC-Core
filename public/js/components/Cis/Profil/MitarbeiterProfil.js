@@ -251,7 +251,8 @@ export default {
              
               <div class="row mb-3">
                 <div class="col">
-                <!-- MOBILE QUICK LINKS -->     
+                <!-- MOBILE QUICK LINKS --> 
+                <quick-links :mobile="true"></quick-links>    
                 </div>
               </div>
 

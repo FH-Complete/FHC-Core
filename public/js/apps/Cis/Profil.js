@@ -1,11 +1,9 @@
-//import ProfilView from "../../components/Cis/Profil/Profil.js";
 import StudentProfil from "../../components/Cis/Profil/StudentProfil.js";
 import MitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterProfil.js";
 import ViewStudentProfil from "../../components/Cis/Profil/StudentViewProfil.js";
 import ViewMitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterViewProfil.js";
 import fhcapifactory from "../api/fhcapifactory.js";
 import Loading from "../../components/Loader.js";
-
 
 Vue.$fhcapi = fhcapifactory;
 Vue.$collapseFormatter  = function(data){
@@ -38,7 +36,7 @@ Vue.$collapseFormatter  = function(data){
 
   
 
-const testapp = Vue.createApp({
+const profilApp = Vue.createApp({
 	
 	components: {
 		StudentProfil,
@@ -214,7 +212,7 @@ const testapp = Vue.createApp({
 				},
 				Private_Kontakte: {
 				  title:"Private Kontakte" ,
-				  data:this.data.kontakte.filter(item => {
+				  data:this.data.kontakte?.filter(item => {
 					return !this.data.profilUpdates?.some((update) => update.status ==='pending' && update.requested_change?.kontakt_id === item.kontakt_id);
 				  }).map(kontakt => {
 					return {
@@ -225,7 +223,7 @@ const testapp = Vue.createApp({
 				 },
 				Private_Adressen: {
 				  title: "Private Adressen",
-				  data:this.data.adressen.filter(item => {
+				  data:this.data.adressen?.filter(item => {
 					return !this.data.profilUpdates?.some(update => {
 					  return  update.status ==='pending' &&  update.requested_change?.adresse_id == item.adresse_id;
 					})
@@ -254,10 +252,9 @@ const testapp = Vue.createApp({
 
 	created(){
 
-		let path = location.pathname;
+		//? uid contains the last part of the uri
+		let uid = location.pathname.split('/').pop();
 		
-		let uid = path.substring(path.lastIndexOf('/')).replace("/","");
-
 		Vue.$fhcapi.UserData.getView(uid).then((res)=>{
 			if(!res.data){
 				this.notFoundUID=uid;
@@ -286,4 +283,5 @@ const testapp = Vue.createApp({
 	
 	
 });
-testapp.mount("#content");
+
+profilApp.mount("#content");

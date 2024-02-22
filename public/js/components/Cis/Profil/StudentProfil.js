@@ -182,7 +182,7 @@ export default {
    
   },
 
-  template: ` 
+  template:/*html*/ ` 
 
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 

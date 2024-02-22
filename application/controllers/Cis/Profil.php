@@ -46,6 +46,7 @@ class Profil extends Auth_Controller
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Public methods
+	
 
 	/**
 	 * index loads the Profil view
@@ -57,16 +58,14 @@ class Profil extends Auth_Controller
 		$this->load->view('Cis/Profil');
 	}
 
-
+	/**
+	 * redirects to the index function (needed to allow calling this URI)
+	 * @access public
+	 * @return void 
+	 */
 	public function View($uid)
 	{
-
-		if ($uid === $this->uid) {
-			$this->index();
-		} else {
-			$this->load->view('Cis/Profil');
-		}
-
+		$this->load->view('Cis/Profil');
 	}
 
 	/**
@@ -135,38 +134,22 @@ class Profil extends Auth_Controller
 
 	/**
 	 * function that returns the data used for the corresponding view
+	 * the client side parses the @param $uid and calls this function to get the data to the correct view 
 	 * @access public
 	 * @param  boolean $uid the userID used to identify which information should be retrieved for which view 
-	 * @return stdClass all the information corresponding to a view of a user
+	 * @return stdClass all the data corresponding to a view of a user
 	 */
 	public function getView($uid)
 	{
-		//TODO: refactor
-		$uid = $uid != "Profil" ? $uid : null;
-
-		$isMitarbeiter = null;
-		if ($uid) {
-			if (isSuccess($this->PersonModel->addSelect(["person_id"]))) {
-				$pid = $this->PersonModel->getByUid($uid);
-				$pid = hasData($pid) ? getData($pid)[0] : null;
-			}
-			if (!$pid) {
-				//! if no Person_ID was found, null is returned and the vue component will show a 404 View
-				return null;
-			}
-			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
-		} else
-			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($this->uid);
-
-		if (isError($isMitarbeiter)) {
-			//catch error
-		}
-		$isMitarbeiter = hasData($isMitarbeiter) ? getData($isMitarbeiter) : null;
-
 		$res = new stdClass();
-
-		if ($uid == $this->uid || !$uid) {
-			// if the $uid is empty, then no payload was supplied and the own profile is being requested
+		
+		// if parsing the URL did not found a UID then the UID of the logged in user is used
+		if($uid =="Profil" || $uid == $this->uid){
+			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($this->uid);
+			if (isError($isMitarbeiter)) {
+				show_error("error while checking if UID: ".$this->uid." is a mitarbeiter");
+			}
+			$isMitarbeiter = getData($isMitarbeiter);
 			if ($isMitarbeiter) {
 				$res->view = "MitarbeiterProfil";
 				$res->data = $this->mitarbeiterProfil();
@@ -176,8 +159,23 @@ class Profil extends Auth_Controller
 				$res->data = $this->studentProfil();
 				$res->data->pid = $this->pid;
 			}
-		} elseif ($uid) {
-			// if an $uid was passed as payload to the function then the user is trying to view another profile
+		}
+		// UID is availabe when accessing Profil/View/:uid
+		else{ 
+			$this->PersonModel->addSelect(["person_id"]);
+			$pid = $this->PersonModel->getByUid($uid);
+			if(isError($pid)){
+				show_error("error while trying to update table public.tbl_person while searching for a person with UID: ".$uid);
+			}
+			$pid = hasData($pid) ? getData($pid)[0] : null;
+			if(!$pid){
+				show_error("Person with UID: ".$uid." does not exist");
+			}
+			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
+			if (isError($isMitarbeiter)) {
+				show_error("error while checking if UID: ".$uid." is a mitarbeiter");
+			}
+			$isMitarbeiter = getData($isMitarbeiter);
 			if ($isMitarbeiter) {
 				$res->view = "ViewMitarbeiterProfil";
 				$res->data = $this->viewMitarbeiterProfil($uid);
@@ -185,11 +183,9 @@ class Profil extends Auth_Controller
 			} else {
 				$res->view = "ViewStudentProfil";
 				$res->data = $this->viewStudentProfil($uid);
-
 			}
 		}
 		echo json_encode($res);
-
 	}
 
 	/**
@@ -245,7 +241,8 @@ class Profil extends Auth_Controller
 		$zip = json_decode($this->input->get('zip', true));
 
 		$this->load->model('codex/Gemeinde_model', "GemeindeModel");
-		$this->GemeindeModel->addSelect(["DISTINCT name"]);
+		$this->GemeindeModel->addDistinct();
+		$this->GemeindeModel->addSelect(["name"]);
 		if ($nation == "A") {
 			if (isset($zip) && $zip > 999 && $zip < 32000) {
 

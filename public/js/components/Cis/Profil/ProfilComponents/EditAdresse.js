@@ -80,7 +80,7 @@ export default {
     template:`
 
      <div class="gy-3 row justify-content-center align-items-center">
-     <pre> {{JSON.stringify(gemeinden,null,2)}}</pre>
+     
      
      <!-- warning message for too many zustellungs Adressen -->
      <div v-if="showZustellAdressenWarning" class="col-12 ">
