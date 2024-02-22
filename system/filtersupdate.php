@@ -1280,24 +1280,25 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
-		'app' => 'core',
-		'dataset_name' => 'anrechnungTableData',
-		'filter_kurzbz' => 'AnrechnungTable',
-		'description' => '{Alle Anrechnungen}',
+		'app' => 'extension',
+		'dataset_name' => 'exampledata',
+		'filter_kurzbz' => 'ExampleData',
+		'description' => '{Beispieldaten Filter}',
 		'sort' => 1,
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "AnrechnungTable",
+				"name": "Alle Beispieldaten",
 				"columns": [
-					{"name": "studiengang_kz"},
-					{"name": "stg_bezeichnung"},
-					{"name": "studiensemester_kurzbz"},
-					{"name": "student"},
-					{"name": "lv_bezeichnung"},
+					{"name": "uid"},
+					{"name": "stringval"},
+					{"name": "integerval"},
+					{"name": "dateval"},
+					{"name": "booleanval"},
+					{"name": "moneyval"},
 					{"name": "dokument_bezeichnung"},
-					{"name": "anmerkung_student"},
-					{"name": "status_kurzbz"}
+					{"name": "textval"},
+					{"name": "examplestatus_kurzbz"}
 				],
 				"filters": []
 			}
