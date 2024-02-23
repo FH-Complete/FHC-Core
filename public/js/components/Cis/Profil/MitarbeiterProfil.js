@@ -160,7 +160,7 @@ export default {
           setLoading:this.setLoading,
 
         }).then((popup_result) => {
-          console.log("hello test");
+          
           if(popup_result){
             Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
             .then((res) =>{

@@ -234,6 +234,13 @@ const profilApp = Vue.createApp({
 					  data:kontakt
 					}})
 				 },
+				 Password_Change : {
+					title:"Passwort Ändern",
+					view:"ChangePassword",
+					data:{
+					  test:"testvalue",
+					  }
+					},
 				},
 			 
 			};

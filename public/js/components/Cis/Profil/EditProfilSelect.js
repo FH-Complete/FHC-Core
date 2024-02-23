@@ -71,7 +71,7 @@ export default {
               typ: null,
               plz: null,
               ort: null,
-              zustelladresse:false,
+              zustelladresse: false,
             }
           : {
               //? add flag
@@ -133,47 +133,30 @@ export default {
   },
   mounted() {},
 
-  template: `
+  template: /*html*/ `
     <template v-if="!view">
-    
-    <div  class="list-group">
-    <template v-for="item in data">
-      <div class="d-flex flex-row align-items-center">
-      <button style="position:relative" type="button" class=" list-group-item list-group-item-action" @click="updateOptions($event,item)" >
-      
-        <p v-if="item.title" class="my-1"   >{{item.title}}</p>
-        <!-- this is used for multiple elements in the select -->
-        <div class="my-2 me-4" v-else>
-        <component  :is="item.listview" v-bind="item"></component>
-        </div>
-      </button>
-      <button v-if="item.listview" @click="deleteItem(item)" type="button" class="mx-3 btn btn-danger btn-circle"><i class="fa fa-trash"></i>
+      <div  class="list-group">
+        <template v-for="item in data">
+          <div class="d-flex flex-row align-items-center">
+            <button style="position:relative" type="button" class=" list-group-item list-group-item-action" @click="updateOptions($event,item)" >
+              <!-- render title of options -->
+              <p v-if="item.title" class="my-1"   >{{item.title}}</p>
+              <!-- else render list view of items -->
+              <div v-else class="my-2 me-4" >
+                <component :is="item.listview" v-bind="item"></component>
+              </div>
+            </button>
+            <button v-if="item.listview" @click="deleteItem(item)" type="button" class="mx-3 btn btn-danger btn-circle"><i class="fa fa-trash"></i>
+          </div>
+        </template>
       </div>
-      </template>
-    </div>
-    <div v-if="Array.isArray(data)" class="mt-4 d-flex justify-content-center">
-      
-      <button @click="addItem" type="button" class="btn btn-primary btn-circle"><i class="fa fa-plus"></i>
-      
-    </div>
-    
+      <div v-if="Array.isArray(data)" class="mt-4 d-flex justify-content-center">
+        <button @click="addItem" type="button" class="btn btn-primary btn-circle"><i class="fa fa-plus"></i>
+      </div>
     </template>
     
-
-    <div v-else-if="view==='text_input'" class="form-underline">
-   
-      <div class="form-underline-titel">{{data.titel?data.titel:'titel'}}</div>
-
-      <input  class="form-control" @input="$emit('update:profilUpdate',data.value)"  v-model="data.value" :placeholder="data.value">
-    </div>
-
-
-    <!-- if it not a normal text input field then reder the custom edit input component -->
-    <!-- custom component is required to emit an profilUpdate event to register the new entered value --> 
     <template v-else>
-    
-      <!-- receives two events, one for normal data update and one when a file has to be stored to the database -->
-      <component @profilUpdate="profilUpdateEmit"   :is="view" v-bind="properties" :data="data" ></component>
+      <component @profilUpdate="profilUpdateEmit" :is="view" v-bind="properties" :data="data" ></component>
     </template>
    `,
 };

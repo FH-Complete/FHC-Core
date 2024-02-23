@@ -149,6 +149,15 @@ class Content_model extends DB_Model
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []
+					},
+					{
+						"content_id": 1000007,
+						"template_kurzbz": "redirect",
+						"titel": "Anrechnung",
+						"content": "<content><url><![CDATA[' . site_url('/lehre/anrechnung/RequestAnrechnung') . ']]></url><target><![CDATA[]]></target></content>",
+						"menu_open": false,
+						"aktiv": true,
+						"childs": []
 					}
 				]
 			}');
