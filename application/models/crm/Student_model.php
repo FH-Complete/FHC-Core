@@ -67,6 +67,27 @@ class Student_model extends DB_Model
 		return $result->retval[0]->student_uid;
 	}
 
+	/**
+	 * Get students UID by PrestudentID.
+	 * @param $prestudent_id
+	 * @return mixed
+	 */
+	public function checkIfUID($prestudent_id)
+	{
+		$this->addSelect('student_uid');
+
+		$result = $this->loadWhere(
+			array('prestudent_id' => $prestudent_id)
+		);
+
+		if (!hasData($result))
+		{
+			return error($result);
+		}
+
+		return $result->retval[0]->student_uid;
+	}
+
 	public function searchStudent($filter)
 	{
 		$this->addSelect('vorname, nachname, gebdatum, person.person_id, student_uid');

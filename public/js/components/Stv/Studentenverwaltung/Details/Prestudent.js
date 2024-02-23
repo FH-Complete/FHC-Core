@@ -28,9 +28,20 @@ export default {
 			from: 'hasPrestudentPermission',
 			default: false
 		},
+		hasAssistenzPermission: {
+			from: 'hasAssistenzPermission',
+			default: false
+		},
+		hasAdminPermission: {
+			from: 'hasAdminPermission',
+			default: false
+		},
+		defaultSemester: {
+			from: 'defaultSemester',
+		}
 	},
 	props: {
-		modelValue: Object
+		modelValue: Object,
 	},
 	data(){
 		return {
@@ -541,6 +552,8 @@ export default {
 		</form-form>
 		
 		<br>
+
+<!--		{{defaultSemester}} | {{hasAdminPermission}} | {{hasAdminPermission}}-->
 		
 		<div class="col-12 pb-3">
 			<legend>Status</legend>
@@ -549,18 +562,13 @@ export default {
 		
 		<hr>
 		
-<!--		<div class="row mb-3">
-			<div class="col-8">
-				<legend>Status</legend>
-				<TblStatus :prestudent_id="modelValue.prestudent_id"></TblStatus>		
-			</div>-->
-			
-			<div class="col-8">
-				<legend>Gesamthistorie</legend>
-				<TblHistory :person_id="modelValue.person_id"></TblHistory>		
-			</div>
+		
+		<div class="col-8">
+			<legend>Gesamthistorie</legend>
+			<TblHistory :person_id="modelValue.person_id"></TblHistory>		
+		</div>
 				
-<!--		</div>-->
+
 
 	
 		

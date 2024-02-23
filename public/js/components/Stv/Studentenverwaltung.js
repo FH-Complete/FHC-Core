@@ -51,7 +51,12 @@ export default {
 			hasBpkPermission: this.permissions['student/bpk'],
 			hasAliasPermission: this.permissions['student/alias'],
 			hasPrestudentPermission: this.permissions['basis/prestudent'],
-			lists: this.lists
+			hasAssistenzPermissionForStgs: this.permissions['assistenz_stgs'],
+			hasSchreibrechtAss: this.permissions['assistenz_schreibrechte'],
+			hasAdminPermission: this.permissions['admin'],
+			//hasPermissionToSkipStatusCheck: this.permission['student/keine_studdatuspruefung'],
+			lists: this.lists,
+			defaultSemester: this.defaultSemester
 		}
 	},
 	data() {

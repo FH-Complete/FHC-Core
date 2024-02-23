@@ -11,6 +11,35 @@ export default{
 		FormForm,
 		FormInput,
 	},
+	inject: {
+		defaultSemester: {
+			from: 'defaultSemester',
+		},
+		hasPermissionToSkipStatusCheck: {
+			from: 'hasPermissionToSkipStatusCheck',
+			default: false
+		},
+		hasPrestudentPermission: {
+			from: 'hasPrestudentPermission',
+			default: false
+		},
+		hasAssistenzPermission: {
+			from: 'hasAssistenzPermission',
+			default: false
+		},
+		hasAdminPermission: {
+			from: 'hasAdminPermission',
+			default: false
+		},
+		hasAssistenzPermissionForStgs: {
+			from: 'hasAssistenzPermissionForStgs',
+			default: false
+		},
+		hasSchreibrechtAss: {
+			from: 'hasSchreibrechtAss',
+			default: false
+		}
+	},
 	props: {
 		prestudent_id: String
 	},
@@ -94,11 +123,11 @@ export default{
 			tabulatorEvents: [],
 			statusData: {},
 			listStudiensemester: [],
-			//maySem: [0,1,2,4,6,7],
 			maxSem:  Array.from({ length: 11 }, (_, index) => index),
 			listStudienplaene: [],
 			aufnahmestufen: {'': '-- keine Auswahl --', 1: 1, 2: 2, 3: 3},
-			listStatusgruende: []
+			listStatusgruende: [],
+			statusId: {}
 		}
 	},
 	computed: {
@@ -106,19 +135,25 @@ export default{
 			return this.listStatusgruende.filter(grund => grund.status_kurzbz == this.statusData.status_kurzbz);
 		},
 	},
-	methods:{
-		actionNewStatus(){
+	methods: {
+		actionNewStatus() {
 			console.log("Action: Neuen Status hinzufügen");
+			this.statusData.status_kurzbz = 'Interessent';
+			this.statusData.studiensemester_kurzbz = this.defaultSemester;
+			this.statusData.ausbildungssemester = 1;
+			this.statusData.datum = this.getDefaultDate();
+			this.statusData.bestaetigtam = this.getDefaultDate();
 			this.$refs.newStatusModal.show();
 		},
 		actionEditStatus(status, stdsem, ausbildungssemester){
 			console.log("Action: Status bearbeiten: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
-			this.loadStatus({
+			this.statusId = {
 				'prestudent_id': this.prestudent_id,
 				'status_kurzbz': status,
 				'studiensemester_kurzbz': stdsem,
 				'ausbildungssemester': ausbildungssemester
-			}).then(() => {
+			};
+			this.loadStatus(this.statusId).then(() => {
 				if(this.statusData)
 					this.$refs.editStatusModal.show();
 			});
@@ -126,8 +161,19 @@ export default{
 		actionDeleteStatus(status, stdsem, ausbildungssemester){
 			console.log("Action: Status löschen: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
 			//this.$refs.deleteStatusModal.show();
+			this.statusId = {
+				'prestudent_id': this.prestudent_id,
+				'status_kurzbz': status,
+				'studiensemester_kurzbz': stdsem,
+				'ausbildungssemester': ausbildungssemester
+			};
 
-			this.loadStatus({
+			this.loadStatus(this.statusId).then(() => {
+				if(this.statusData)
+					this.$refs.deleteStatusModal.show();
+			});
+
+/*			this.loadStatus({
 				'prestudent_id': this.prestudent_id,
 				'status_kurzbz': status,
 				'studiensemester_kurzbz': stdsem,
@@ -135,7 +181,7 @@ export default{
 			}).then(() => {
 				if(this.statusData)
 					this.$refs.deleteStatusModal.show();
-			});
+			});*/
 		},
 		actionAdvanceStatus(status, stdsem, ausbildungssemester){
 			console.log("Action: Status vorrücken: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
@@ -155,7 +201,7 @@ export default{
 								this.$refs.deleteStatusModal.show();
 						});*/
 		},
-		addNewStatus(statusData){
+		addNewStatus(){
 			CoreRESTClient.post('components/stv/Status/addNewStatus/' + this.prestudent_id,
 				this.statusData
 		).then(response => {
@@ -171,11 +217,60 @@ export default{
 					});
 				}
 			}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Speichern Status aufgetreten');
+				if (error.response) {
+					console.log(error.response);
+					this.$fhcAlert.alertError(error.response.data);
+				}
 			}).finally(() => {
 				window.scrollTo(0, 0);
 				this.reload();
 			});
+		},
+		deleteStatus(status_id){
+			return CoreRESTClient.post('components/stv/Status/deleteStatus/',
+				status_id)
+				.then(
+					result => {
+						if(!result.data.error) {
+							this.$fhcAlert.alertSuccess('Löschen erfolgreich');
+							this.hideModal('deleteStatusModal');
+							this.resetModal();
+						}
+						else
+						{
+							const errorData = result.data.retval;
+							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
+						}
+/*						return result;*/
+					}).catch(error => {
+					this.$fhcAlert.alertError('Fehler bei Löschen von Status aufgetreten');
+				}).finally(() => {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
+		},
+		editStatus(status_id){
+			return CoreRESTClient.post('components/stv/Status/updateStatus/' + this.prestudent_id,
+				this.statusData)
+				.then(
+					result => {
+						if(!result.data.error) {
+							this.$fhcAlert.alertSuccess('Bearbeitung Status erfolgreich');
+							this.hideModal('editStatusModal');
+							this.resetModal();
+						}
+						else
+						{
+							const errorData = result.data.retval;
+							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
+						}
+						/*						return result;*/
+					}).catch(error => {
+					this.$fhcAlert.alertError('Fehler beim Bearbeiten des Status aufgetreten');
+				}).finally(() => {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
 		},
 		loadStatus(status_id){
 			return CoreRESTClient.post('components/stv/Status/loadStatus/',
@@ -201,7 +296,12 @@ export default{
 		},
 		resetModal(){
 			this.statusData = {};
+			this.statusId = {};
 		},
+		getDefaultDate() {
+			const today = new Date();
+			return today;
+		}
 	},
 	created(){
 		CoreRESTClient
@@ -230,13 +330,23 @@ export default{
 		<div class="stv-list h-100 pt-3">
 		
 		
-		<p>TestData</p>
+<!--		<p>TestData</p>
 		{{statusData}}
+		<hr>-->
+<!--		Berechtigungen:
+			Skip Check: {{hasPermissionToSkipStatusCheck}} |
+			Admin: {{hasAdminPermission}} |
+			Studiengaenge: {{hasAssistenzPermissionForStgs}} |
+			Schreibrecht ASS: {{hasSchreibrechtAss}}-->
+		
+<!--		<hr>
+		<p>{{statusId}}</p>	-->
 		
 			<!--Modal: Add New Status-->
 			<BsModal ref="newStatusModal">
+			<!--TODO(manu) check stati: in FAs Absolvent, Abbrecher, Wartender nicht in Liste-->
 				<template #title>Neuen Status hinzufügen</template>
-				
+							
 					<form-form class="row g-3" ref="statusData">
 					
 						<div class="row mb-3">
@@ -256,6 +366,8 @@ export default{
 									<option  value="Unterbrecher">UnterbrecherIn</option>
 									<option  value="Diplomand">DiplomandIn</option>
 									<option  value="Incoming">Incoming</option>
+									<option  value="Absolvent">AbsolventIn</option>
+									<option  value="Abbrecher">AbbrecherIn</option>
 								</form-input>
 							</div>
 						</div>
@@ -267,8 +379,8 @@ export default{
 									type="select"
 									name="studiensemester_kurzbz" 
 									v-model="statusData['studiensemester_kurzbz']"
-								> <!--TODO(manu) default aktueller Eintrag-->
-									<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
+								>
+									<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz"  :selected="sem.studiensemester_kurzbz === defaultSemester">{{sem.studiensemester_kurzbz}}</option>
 								</form-input>
 							</div>
 						</div>
@@ -280,7 +392,7 @@ export default{
 									type="select" 
 									:readonly="readonly" 
 									name="ausbildungssemester" 
-									v-model="statusData['ausbildungssemester']"
+									v-model="statusData.ausbildungssemester"
 								>
 								 <option v-for="number in maxSem" :key="number" :value="number">{{ number }}</option>
 								</form-input>
@@ -294,7 +406,7 @@ export default{
 									type="DatePicker" 
 									:readonly="readonly" 
 									name="datum" 
-									v-model="statusData['datum']"
+									v-model="statusData.datum"
 									auto-apply
 									:enable-time-picker="false"
 									format="dd.MM.yyyy"
@@ -310,7 +422,7 @@ export default{
 									type="DatePicker" 
 									:readonly="readonly" 
 									name="datum" 
-									v-model="statusData['bestaetigtam']"
+									v-model="statusData.bestaetigtam"
 									auto-apply
 									:enable-time-picker="false"
 									format="dd.MM.yyyy"
@@ -320,7 +432,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">
-							<label for="bewerbung_abgeschicktamum" class="form-label col-sm-4">B. abgeschickt am</label>
+							<label for="bewerbung_abgeschicktamum" class="form-label col-sm-4">Bewerbung abgeschickt am</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="DatePicker" 
@@ -399,6 +511,7 @@ export default{
 			
 			<!--Modal: Edit Status-->
 			<BsModal ref="editStatusModal">
+			<!--TODO(manu) check stati: in FAs Absolvent, Abbrecher, Wartender nicht in Liste-->
 				<template #title>Status bearbeiten</template>
 					<form-form class="row g-3" ref="statusData">
 					
@@ -419,6 +532,8 @@ export default{
 									<option  value="Unterbrecher">UnterbrecherIn</option>
 									<option  value="Diplomand">DiplomandIn</option>
 									<option  value="Incoming">Incoming</option>
+									<option  value="Absolvent">AbsolventIn</option>
+									<option  value="Abbrecher">AbbrecherIn</option>
 								</form-input>
 							</div>
 						</div>
@@ -432,7 +547,7 @@ export default{
 									v-model="statusData['studiensemester_kurzbz']"
 								> <!--TODO(manu) default aktueller Eintrag-->
 									<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
-								</form-input>f
+								</form-input>
 							</div>
 						</div>
 						<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false)-->
@@ -555,7 +670,7 @@ export default{
 					</form-form>
 					
 				<template #footer>
-						<button type="button" class="btn btn-primary" @click="editStatus()">OK</button>
+						<button type="button" class="btn btn-primary" @click="editStatus(statusId)">OK</button>
 				</template>
 								
 			</BsModal>
@@ -565,10 +680,25 @@ export default{
 				<template #title>Status löschen</template> 
 				<template #default>
 					<p>Prestudentstatus {{statusData.status_kurzbz}} (id: {{statusData.prestudent_id}}  
-					/ {{statusData.studiensemester_kurzbz}}) im {{statusData.ausbildungssemester}}. Ausbildungssemester wirklich löschen?</p>
-				</template>									
+					/ {{statusData.studiensemester_kurzbz}}) im {{statusData.ausbildungssemester}}. Ausbildungssemester wirklich löschen?</p>					
+				</template>	
+<!--				<template #footer>
+					<button 
+						ref="Close" 
+						type="button" 
+						class="btn btn-primary" 
+						@click="deleteStatus({
+							'prestudent_id': statusData.prestudent_id,
+							'status_kurzbz': statusData.studiensemester_kurzbz,
+							'studiensemester_kurzbz': statusData.studiensemester_kurzbz,
+							'ausbildungssemester': statusData.ausbildungssemester
+						})">OK</button>
+				</template>	-->							
+<!--				<template #footer>
+					<button ref="Close" type="button" class="btn btn-primary" @click="deleteStatus(statusData.prestudent_id, statusData.status_kurzbz, statusData.ausbildungssemester, statusData.studiensemester_kurzbz)">OK</button>
+				</template>-->
 				<template #footer>
-					<button ref="Close" type="button" class="btn btn-primary" @click="deleteStatus()">OK</button>
+					<button ref="Close" type="button" class="btn btn-primary" @click="deleteStatus(statusId)">OK</button>
 				</template>
 			</BsModal>
 			
