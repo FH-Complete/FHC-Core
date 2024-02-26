@@ -29,8 +29,9 @@ export default {
 			switch (this.data.status)
 			{
 				case 'Erstellt': return 'info';
+				case 'Zurueckgezogen': return 'danger';
 				case 'Genehmigt': return 'success';
-				default: return 'info';
+				default: return 'warning';
 			}
 		},
 		loadUrl() {

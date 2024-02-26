@@ -29,9 +29,10 @@ export default {
 			switch (this.data?.status)
 			{
 				case 'Erstellt': return 'info';
-				case 'Genehmigt':
+				case 'Zurueckgezogen': return 'danger';
+				case 'EinspruchAbgelehnt':
 				case 'Abgemeldet': return 'success';
-				default: return 'info';
+				default: return 'warning';
 			}
 		},
 		loadUrl() {

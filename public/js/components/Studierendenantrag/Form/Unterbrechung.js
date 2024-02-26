@@ -37,9 +37,11 @@ export default {
 			switch (this.data.status)
 			{
 				case 'Erstellt': return 'info';
-				case 'Genehmigt': return 'success';
-				case 'Zurueckgezogen': return 'danger';
-				default: return 'info';
+				case 'Zurueckgezogen':
+				case 'Abgelehnt': return 'danger';
+				case 'Genehmigt':
+				case 'EmailVersandt': return 'success';
+				default: return 'warning';
 			}
 		},
 		loadUrl() {

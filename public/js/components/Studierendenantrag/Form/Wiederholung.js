@@ -35,11 +35,13 @@ export default {
 		statusSeverity() {
 			switch (this.data.status)
 			{
-				case 'Erstellt': return 'info';
+				case 'Offen':
+				case 'Erstellt':
+				case 'ErsteAufforderungVersandt': return 'info';
 				case 'Genehmigt': return 'success';
 				case 'Verzichtet':
 				case 'Abgemeldet': return 'danger';
-				default: return 'info';
+				default: return 'warning';
 			}
 		},
 		loadUrl() {
