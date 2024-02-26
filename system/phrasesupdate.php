@@ -4424,7 +4424,7 @@ When on hold, the date is only a reminder.',
 				'sprache' => 'German',
 				'text' => 'Wir möchten Sie darauf aufmerksam machen, dass bei der Überweisung *immer* die Rechnungsnummer als Zahlungsreferenz anzuführen ist.
 						Andernfalls erfolgt keine automatische Zahlungszuordnung und es kann zu einer Verzögerung der Darstellung des aktuellen Zahlungsstatus
-						der Rechnung im CIS kommen.
+						der Rechnung im Campus Informations-System kommen.
 						<br/>
 						<br/>
 						Im Falle dass der Betrag an ein falsches Konto überwiesen wurde, bitten wir Sie höflichst sich an Ihre Bank zu wenden.
@@ -4439,7 +4439,7 @@ When on hold, the date is only a reminder.',
 			array(
 				'sprache' => 'English',
 				'text' => 'We would like to draw your attention to the fact that the invoice number must *always* be quoted as the payment reference when making a bank transfer.
-							Otherwise, no automatic payment allocation will take place and there may be a delay in displaying the current payment status of the invoice in CIS.
+							Otherwise, no automatic payment allocation will take place and there may be a delay in displaying the current payment status of the invoice in Campus Informations-System.
 							<br />
 							<br />
 							In the event that the amount has been transferred to an incorrect account, we kindly ask you to contact your bank.
@@ -4513,7 +4513,7 @@ When on hold, the date is only a reminder.',
 				'sprache' => 'English',
 				'text' => 'Foreign bank transfers:
 											<br />
-											In the case of foreign bank transfers, the charges are to be paid by the
+											In the case of foreign bank transfers, the charges are to be paid by
 											<br />
 											the payer in addition to the invoice amounts.',
 				'description' => '',
@@ -4622,7 +4622,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			array(
 				'sprache' => 'English',
 				'text' => 'In this case, please check your spam folder. If the invoice has not been sent, please inform us at <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.
-The invoice will be sent to you again. <u><strong>The amount is only to be transferred after receipt of the invoice</strong></u>',
+The invoice will be sent to you again. <u><strong>The amount is only to be transferred after receipt of the invoice!</strong></u>',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4714,7 +4714,7 @@ The invoice will be sent to you again. <u><strong>The amount is only to be trans
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Please contact your study program assistant. The outstanding invoice will be canceled.',
+				'text' => 'Please contact your degree program assistant. The outstanding invoice will be canceled.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
