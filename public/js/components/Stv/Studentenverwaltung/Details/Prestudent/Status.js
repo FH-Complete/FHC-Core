@@ -186,11 +186,16 @@ export default{
 		actionAdvanceStatus(status, stdsem, ausbildungssemester){
 			console.log("Action: Status vorrücken: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
 			//this.$refs.deleteStatusModal.show();
-
-			/*			this.loadStatus(status_id).then(() => {
-							if(this.statusData.bankverbindung_id)
-								this.$refs.deleteStatusModal.show();
-						});*/
+			this.statusId = {
+				'prestudent_id': this.prestudent_id,
+				'status_kurzbz': status,
+				'studiensemester_kurzbz': stdsem,
+				'ausbildungssemester': ausbildungssemester
+			};
+			this.loadStatus(this.statusId).then(() => {
+				if(this.statusData)
+					this.advanceStatus(this.statusId);
+			});
 		},
 		actionConfirmStatus(status, stdsem, ausbildungssemester){
 			console.log("Action: Status bestätigen: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
@@ -226,6 +231,33 @@ export default{
 				this.reload();
 			});
 		},
+		advanceStatus(statusId){
+			return CoreRESTClient.post('components/stv/Status/advanceStatus/' +
+				this.statusId.prestudent_id + '/' +
+				this.statusId.status_kurzbz + '/' +
+				this.statusId.studiensemester_kurzbz + '/' +
+				this.statusId.ausbildungssemester)
+				.then(
+					result => {
+						if(!result.data.error) {
+							this.$fhcAlert.alertSuccess('Vorrückung Status erfolgreich');
+						}
+						else
+						{
+							const errorData = result.data.retval;
+							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
+						}
+						/*						return result;*/
+					}).catch(error => {
+					if (error.response) {
+						console.log(error.response);
+						this.$fhcAlert.alertError(error.response.data);
+					}
+				}).finally(() => {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
+		},
 		deleteStatus(status_id){
 			return CoreRESTClient.post('components/stv/Status/deleteStatus/',
 				status_id)
@@ -243,14 +275,21 @@ export default{
 						}
 /*						return result;*/
 					}).catch(error => {
-					this.$fhcAlert.alertError('Fehler bei Löschen von Status aufgetreten');
+					if (error.response) {
+						//console.log(error.response);
+						this.$fhcAlert.alertError(error.response.data);
+					}
 				}).finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
 				});
 		},
-		editStatus(status_id){
-			return CoreRESTClient.post('components/stv/Status/updateStatus/' + this.prestudent_id,
+		editStatus(){
+			return CoreRESTClient.post('components/stv/Status/updateStatus/' +
+				this.statusId.prestudent_id + '/' +
+				this.statusId.status_kurzbz + '/' +
+				this.statusId.studiensemester_kurzbz + '/' +
+				this.statusId.ausbildungssemester,
 				this.statusData)
 				.then(
 					result => {
@@ -266,7 +305,10 @@ export default{
 						}
 						/*						return result;*/
 					}).catch(error => {
-					this.$fhcAlert.alertError('Fehler beim Bearbeiten des Status aufgetreten');
+					if (error.response) {
+						console.log(error.response);
+						this.$fhcAlert.alertError(error.response.data);
+					}
 				}).finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
@@ -330,17 +372,17 @@ export default{
 		<div class="stv-list h-100 pt-3">
 		
 		
-<!--		<p>TestData</p>
+		<p>TestData</p>
 		{{statusData}}
-		<hr>-->
+		<hr>
 <!--		Berechtigungen:
 			Skip Check: {{hasPermissionToSkipStatusCheck}} |
 			Admin: {{hasAdminPermission}} |
 			Studiengaenge: {{hasAssistenzPermissionForStgs}} |
 			Schreibrecht ASS: {{hasSchreibrechtAss}}-->
 		
-<!--		<hr>
-		<p>{{statusId}}</p>	-->
+		<hr>
+		<p>{{statusId}}</p>	
 		
 			<!--Modal: Add New Status-->
 			<BsModal ref="newStatusModal">
@@ -515,6 +557,8 @@ export default{
 				<template #title>Status bearbeiten</template>
 					<form-form class="row g-3" ref="statusData">
 					
+					 <input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
+					
 						<div class="row mb-3">
 							<label for="status_kurzbz" class="form-label col-sm-4">Rolle</label>
 							<div class="col-sm-6">
@@ -524,6 +568,7 @@ export default{
 									v-model="statusData['status_kurzbz']"
 									name="status_kurzbz"
 									type="select"
+									disabled
 									>
 									<option  value="Interessent">InteressentIn</option>
 									<option  value="Bewerber">BewerberIn</option>
@@ -670,7 +715,7 @@ export default{
 					</form-form>
 					
 				<template #footer>
-						<button type="button" class="btn btn-primary" @click="editStatus(statusId)">OK</button>
+						<button type="button" class="btn btn-primary" @click="editStatus()">OK</button>
 				</template>
 								
 			</BsModal>

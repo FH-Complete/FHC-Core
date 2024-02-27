@@ -55,7 +55,6 @@ class Status extends FHC_Controller
 		}*/
 
 		//check rights
-		//get Studiengang von prestudent_id
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->PrestudentModel->addJoin('public.tbl_person p', 'ON (p.person_id = public.tbl_prestudent.person_id)');
 		$result = $this->PrestudentModel->load([
@@ -75,8 +74,8 @@ class Status extends FHC_Controller
 		$zgv_code = $result->zgv_code;
 
 		//TODO(Manu) check: Annahme, dass hier immer suid bei Berechtigung STG vergeben wird!
-		$granted_Ass = $this->permissionlib->getSTG_isEntitledFor('assistenz');
-		$granted_Adm = $this->permissionlib->getSTG_isEntitledFor('admin');
+		$granted_Ass = $this->permissionlib->getSTG_isEntitledFor('assistenz') ? $this->permissionlib->getSTG_isEntitledFor('assistenz') : [];
+		$granted_Adm = $this->permissionlib->getSTG_isEntitledFor('admin') ? $this->permissionlib->getSTG_isEntitledFor('admin') : [];
 		$granted = array_merge($granted_Ass, $granted_Adm);
 
 		if(!in_array($stg, $granted)){
@@ -88,7 +87,6 @@ class Status extends FHC_Controller
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 
-		//var_dump($_POST);
 		$uid = getAuthUID();
 		$status_kurzbz = $this->input->post('status_kurzbz');
 		$ausbildungssemester = $this->input->post('ausbildungssemester');
@@ -100,7 +98,7 @@ class Status extends FHC_Controller
 		$anmerkung  = $this->input->post('anmerkung');
 		$statusgrund_id = $this->input->post('statusgrund_id');
 		$rt_stufe = $this->input->post('rt_stufe');
-		$bestaetigtvon = $this->input->post('bestaetigtvon');
+		$bestaetigtvon = $uid;
 
 		// Start DB transaction
 		//$this->db->trans_start(false);
@@ -123,10 +121,11 @@ class Status extends FHC_Controller
 			$ausbildungssemester = $lastStatusData->ausbildungssemester;
 		}
 
-		if($status_kurzbz != 'Student')
+		//Todo(manu) check if this check makes sense?
+/*		if($status_kurzbz != 'Student')
 		{
 			$ausbildungssemester = $lastStatusData->ausbildungssemester;
-		}
+		}*/
 
 		//check if Rolle already exists
 		$result = $this->PrestudentstatusModel->checkIfExistingPrestudentRolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester);
@@ -134,8 +133,13 @@ class Status extends FHC_Controller
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson(getError($result));
-			//return $this->outputJson("DEBUG: in Funktion checkIfExistingPrestudentRolle");
 		}
+		if($result->retval == '1')
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result->code);
+		}
+
 
 		//Check ob Reihungstest berücksichtigt werden soll
 		if(REIHUNGSTEST_CHECK)
@@ -185,7 +189,24 @@ class Status extends FHC_Controller
 			//TODO(manu) Wartender NICHT in Liste!? nur in diesem Code
 			//FAS: Aufnahme ist möglich: Beispiel prestudent_id = 129629
 
-			$result = $this->PrestudentstatusModel->checkIfExistingBewerberstatus($prestudent_id);
+			$result = $this->PrestudentstatusModel->checkIfExistingBewerberstatus($prestudent_id, $name);
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			if($result->retval == "0")
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson($result->code);
+			}
+		}
+
+		//check if studentrolle already exists
+		if($status_kurzbz == 'Student')
+		{
+			$this->load->model('crm/Student_model', 'StudentModel');
+			$result = $this->StudentModel->checkIfExistingStudentRolle($prestudent_id);
 			if (isError($result))
 			{
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -215,12 +236,8 @@ class Status extends FHC_Controller
 			{
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				return $this->outputJson(getError($result));
-				//return $this->outputJson("DEBUG: in Funktion checkIfValidStatusHistory");
 			}
-			$statusArr = $result; //wenn return result ok
-
 		}
-
 
 		$result = $this->PrestudentstatusModel->insert(
 			[
@@ -243,8 +260,7 @@ class Status extends FHC_Controller
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			//return $this->outputJson(getError($result));
-			return $this->outputJson("DEBUG: in insert Funktion");
+			return $this->outputJson(getError($result));
 		}
 
 		return $this->outputJsonSuccess(true);
@@ -258,8 +274,6 @@ class Status extends FHC_Controller
 		$status_kurzbz = $this->input->post('status_kurzbz');
 		$ausbildungssemester = $this->input->post('ausbildungssemester');
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
-		//echo $prestudent_id . $status_kurzbz . $ausbildungssemester . $studiensemester_kurzbz;
-
 
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 
@@ -281,29 +295,74 @@ class Status extends FHC_Controller
 		}
 		else
 		{
-			//var_dump($result);
 			$this->outputJsonSuccess(current(getData($result)));
 		}
 	}
 
 	public function deleteStatus()
 	{
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
 		$prestudent_id = $this->input->post('prestudent_id');
 		$status_kurzbz = $this->input->post('status_kurzbz');
 		$ausbildungssemester = $this->input->post('ausbildungssemester');
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
-/*		var_dump($prestudent_id);
-		var_dump($status_kurzbz);*/
 
-		//var_dump($_POST);
+		//TODO(Manu) check: warum sind beim Löschen andere Berechtigungen?
+		//ich darf keine Stati anlegen, aber löschen, wenn mehr als einer übrig???
+/*		$granted_Ass = $this->permissionlib->getSTG_isEntitledFor('assistenz');
+		$granted_Adm = $this->permissionlib->getSTG_isEntitledFor('admin');
+		$granted = array_merge($granted_Ass, $granted_Adm);
 
-		//Todo(manu)
-		//Löschen auch aus anderen Tabellen
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$result = $this->PrestudentModel->load([
+			'prestudent_id'=> $prestudent_id,
+		]);
+		if(isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		$result = current(getData($result));
+		$stg = $result->studiengang_kz;
 
-		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		if(!in_array($stg, $granted))
+		{
+			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}*/
 
+		$isBerechtigtAdmin = $this->permissionlib->isBerechtigt('admin', null, 'suid');
+		$isBerechtigtNoStudstatusCheck = $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung', null, 'suid');
+
+
+		if($status_kurzbz=="Student" && !$isBerechtigtAdmin && !$isBerechtigtNoStudstatusCheck)
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson("Studentenrolle kann nur durch den Administrator geloescht werden");
+		}
+
+
+		if(!$isBerechtigtAdmin && !$isBerechtigtNoStudstatusCheck)
+		{
+			//check if last status
+			$result = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id);
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson($result);
+			}
+			if($result->retval == "1")
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson($result->code);
+			}
+		}
+
+		//Delete Status
 		$result = $this->PrestudentstatusModel->delete(
 			array(
 				'prestudent_id' => $prestudent_id,
@@ -312,20 +371,88 @@ class Status extends FHC_Controller
 				'studiensemester_kurzbz' => $studiensemester_kurzbz
 			)
 		);
-
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			$this->outputJson($result);
 		}
-		elseif (!hasData($result)) {
+		elseif(!hasData($result)) {
 			$this->outputJson($result);
 		}
-		return $this->outputJsonSuccess(current(getData($result)));
+		//return $this->outputJsonSuccess(current(getData($result)));
+
+		// Delete Studentlehrverband if no Status left
+		$result = $this->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
+
+		if(isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		if(!hasData($result))
+		{
+			//get student_uid
+			$this->load->model('crm/Student_model', 'StudentModel');
+			$result = $this->StudentModel->checkIfUid($prestudent_id);
+			if(isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			$student_uid = $result->retval;
+
+			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+			$result = $this->StudentlehrverbandModel->delete(
+				array(
+					'student_uid' => $student_uid,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz
+				)
+			);
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				$this->outputJson("Fehler beim Löschen der Lehrverbandszuordnung");
+			}
+			if(!hasData($result)) {
+				$this->outputJson($result);
+			}
+			return $this->outputJsonSuccess(true);
+		}
+		//TODO(manu) $this->db->trans_start(false); and rollback?
+		//TODO(manu) ganzen Prestudenten löschen, wenn kein Eintrag mehr
+		return $this->outputJsonSuccess(true);
+
+
 	}
 
-	public function updateStatus($prestudent_id)
+	public function updateStatus($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
 	{
+		//TODO(Manu) check: Annahme, dass hier immer suid bei Berechtigung STG vergeben wird!
+		$granted_Ass = $this->permissionlib->getSTG_isEntitledFor('assistenz') ? $this->permissionlib->getSTG_isEntitledFor('assistenz') : [];
+		$granted_Adm = $this->permissionlib->getSTG_isEntitledFor('admin') ? $this->permissionlib->getSTG_isEntitledFor('admin') : [];
+		$granted = array_merge($granted_Ass, $granted_Adm);
+
+		//get Studiengang von prestudent_id
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$result = $this->PrestudentModel->load([
+			'prestudent_id'=> $key_prestudent_id,
+		]);
+		if(isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		$result = current(getData($result));
+
+		$stg = $result->studiengang_kz;
+
+		if(!in_array($stg, $granted)){
+			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}
+		//var_dump($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester);
+
 		/*		$this->load->library('form_validation');
 
 
@@ -337,10 +464,8 @@ class Status extends FHC_Controller
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 
-		var_dump($_POST);
-
 		$uid = getAuthUID();
-		//$prestudent_id = $this->input->post('prestudent_id');
+		$prestudent_id = $this->input->post('prestudent_id');
 		$status_kurzbz = $this->input->post('status_kurzbz');
 		$ausbildungssemester = $this->input->post('ausbildungssemester');
 		$datum = $this->input->post('datum');
@@ -348,23 +473,74 @@ class Status extends FHC_Controller
 		$bewerbung_abgeschicktamum = $this->input->post('bewerbung_abgeschicktamum');
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
 		$studienplan_id = $this->input->post('studienplan_id');
-		$anmerkung  = $this->input->post('anmerkung ');
+		$anmerkung  = $this->input->post('anmerkung');
 		$statusgrund_id = $this->input->post('statusgrund_id');
 		$rt_stufe = $this->input->post('rt_stufe');
-		$bestaetigtvon = $this->input->post('bestaetigtvon');
+		$bestaetigtvon = $uid;
 
 		// Start DB transaction
 		//$this->db->trans_start(false);
 
+		//check if Rolle already exists
+		if(($key_studiensemester_kurzbz != $studiensemester_kurzbz)
+			|| ($key_ausbildungssemester != $ausbildungssemester))
+			{
+				$result = $this->PrestudentstatusModel->checkIfExistingPrestudentRolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester);
+				if (isError($result))
+				{
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+					return $this->outputJson(getError($result));
+				}
+				if($result->retval == '1')
+				{
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+					return $this->outputJson($result->code);
+				}
+			}
+
+		//TODO(Manu) permission not working here...
+		$hasPermissionToSkipStatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studdatuspruefung');
+		/*		var_dump($hasPermissionToSkipStatusCheck);
+
+				$basis =  $this->permissionlib->isBerechtigt('basis/prestudent');
+				var_dump($basis);*/
+		if(!$hasPermissionToSkipStatusCheck)
+		{
+			//Block STATUSCHECKS
+			//bei update wohl nicht?
+/*			$new_status_datum = isset($datum) ? $datum  : date('Y-m-d');
+			$result = $this->PrestudentstatusModel->checkDatumNewStatus($new_status_datum);
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}*/
+
+			$new_status_datum = isset($datum) ? $datum  : date('Y-m-d');
+
+			$result = $this->PrestudentstatusModel->checkIfValidStatusHistory($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $new_status_datum, $ausbildungssemester);
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+				//return $this->outputJson("DEBUG: in Funktion checkIfValidStatusHistory");
+			}
+			$statusArr = $result; //wenn return result ok
+
+		}
+
 		$result = $this->PrestudentstatusModel->update(
+			[
+				'prestudent_id' => $key_prestudent_id,
+				'status_kurzbz' => $key_status_kurzbz,
+				'studiensemester_kurzbz' => $key_studiensemester_kurzbz,
+				'ausbildungssemester' => $key_ausbildungssemester,
+			],
 			[
 				'prestudent_id' => $prestudent_id,
 				'status_kurzbz' => $status_kurzbz,
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'ausbildungssemester' => $ausbildungssemester,
-			],
-			[
-
 				'bewerbung_abgeschicktamum' => $bewerbung_abgeschicktamum,
 				'studienplan_id' => $studienplan_id,
 				'anmerkung' => $anmerkung,
@@ -382,7 +558,186 @@ class Status extends FHC_Controller
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson(getError($result));
 		}
+		if (!hasData($result)) {
+			return error('No Statusdata vorhanden');
+		}
 		return $this->outputJsonSuccess(true);
+	}
+
+	public function advanceStatus($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
+	{
+		//TODO(Manu) check: Annahme, dass hier immer suid bei Berechtigung STG vergeben wird!
+		$granted_Ass = $this->permissionlib->getSTG_isEntitledFor('assistenz') ? $this->permissionlib->getSTG_isEntitledFor('assistenz') : [];
+		$granted_Adm = $this->permissionlib->getSTG_isEntitledFor('admin') ? $this->permissionlib->getSTG_isEntitledFor('admin') : [];
+		$granted = array_merge($granted_Ass, $granted_Adm);
+
+		//get Studiengang von prestudent_id
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$result = $this->PrestudentModel->load([
+			'prestudent_id'=> $key_prestudent_id,
+		]);
+		if(isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		$result = current(getData($result));
+
+		$stg = $result->studiengang_kz;
+
+		if(!in_array($stg, $granted)){
+			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}
+
+		//Data Vorrücken
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+
+		$result = $this->PrestudentstatusModel->loadWhere(
+			array(
+				'prestudent_id' => $key_prestudent_id,
+				'status_kurzbz' => $key_status_kurzbz,
+				'ausbildungssemester' => $key_ausbildungssemester,
+				'studiensemester_kurzbz' => $key_studiensemester_kurzbz
+			)
+		);
+
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson($result);
+		}
+
+		elseif (!hasData($result)) {
+			$this->outputJson($result);
+		}
+		else
+		{
+			$statusData = current(getData($result));
+		}
+
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$result = $this->StudiensemesterModel->getNextFrom($key_studiensemester_kurzbz);
+
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		$studiensem_next = current(getData($result));
+		$studiensem_next = $studiensem_next->studiensemester_kurzbz;
+
+		$ausbildungssem_next = $key_ausbildungssemester+1;
+
+		//check if Rolle already exists
+		$result = $this->PrestudentstatusModel->checkIfExistingPrestudentRolle($key_prestudent_id, $key_status_kurzbz, $studiensem_next, $ausbildungssem_next);
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		if($result->retval == '1')
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result->code);
+		}
+
+		//check if studentrolle already exists
+		if($key_status_kurzbz == 'Student')
+		{
+			$this->load->model('crm/Student_model', 'StudentModel');
+			$result = $this->StudentModel->checkIfExistingStudentRolle($key_prestudent_id);
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			if ($result->retval == "0")
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson($result->code);
+			}
+		}
+
+		//insert prestudentstatus
+		$uid = getAuthUID();
+		$result = $this->PrestudentstatusModel->insert(
+			[
+				'prestudent_id' => $key_prestudent_id,
+				'status_kurzbz' => $key_status_kurzbz,
+				'studiensemester_kurzbz' => $studiensem_next,
+				'ausbildungssemester' => $ausbildungssem_next,
+				'insertamum' => date('c'),
+				'insertvon' => $uid,
+				'bestaetigtam' => date('c'),
+				'bestaetigtvon' => $uid,
+				'studienplan_id' => $statusData->studienplan_id,
+				'datum' => date('c'),
+				'anmerkung' => $statusData->anmerkung
+
+			]
+		);
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			//return $this->outputJson(getError($result));
+			return $this->outputJson("DEBUG: in insert Funktion");
+		}
+
+		//Studentlehrverband anlegen
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$result = $this->StudentModel->checkIfUid($key_prestudent_id);
+		if(isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		$student_uid = $result->retval;
+
+		//check if Lehrverband exists
+		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+		$result = $this->StudentlehrverbandModel->checkIfLehrverbandExists($student_uid, $studiensem_next);
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		if ($result->retval == "0")
+		{
+			//load Data Lehrverband
+			$result = $this->StudentlehrverbandModel->load(
+				[
+					'student_uid' => $student_uid,
+					'studiensemester_kurzbz' => $key_studiensemester_kurzbz
+				]);
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+
+				return $this->outputJson("Error in insert Studentlehrverband");
+			}
+			$lvbData = current(getData($result));
+
+			$result = $this->StudentlehrverbandModel->insert(
+				[
+					'student_uid' => $student_uid,
+					'studiensemester_kurzbz' => $studiensem_next,
+					'semester' => $ausbildungssem_next,
+					'verband' => $lvbData->verband,
+					'gruppe' => $lvbData->gruppe,
+					'insertamum' => date('c'),
+					'insertvon' => $uid,
+					'studiengang_kz' => $lvbData->studiengang_kz
+				]);
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+
+				return $this->outputJson("Error in insert Studentlehrverband");
+			}
+		}
+		return $this->outputJsonSuccess(true);
+
 	}
 
 }

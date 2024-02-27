@@ -345,7 +345,7 @@ class Prestudentstatus_model extends DB_Model
 	 * @param string $status_kurzbz
 	 * @param string $studiensemester_kurzbz
 	 * @param integer $ausbildungssemester
-	 * @return error if already exists, success if not
+	 * @return 1: if Rolle exists, 0: if it doesn't
 	 * Copy from studentDBDML.php
 	 */
 	public function checkIfExistingPrestudentRolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
@@ -369,12 +369,13 @@ class Prestudentstatus_model extends DB_Model
 		{
 			return error($result);
 		}
-		elseif (!hasData($result)) {
-			return success($result);
+		elseif (!hasData($result))
+		{
+			return success(0);
 		}
 		else
 		{
-			return error('Diese Rolle ist bereits vorhanden: ' . $prestudent_id . ' / ' . $studiensemester_kurzbz  . ' : ' . $status_kurzbz . ' /' . $ausbildungssemester . ')');
+			return success("1","Diese Rolle ist bereits vorhanden!");
 		}
 	}
 
@@ -383,7 +384,7 @@ class Prestudentstatus_model extends DB_Model
 	 * @param integer $prestudent_id
 	 * @return error if no bewerberstatus, success if existing
 	 */
-	public function checkIfExistingBewerberstatus($prestudent_id)
+	public function checkIfExistingBewerberstatus($prestudent_id, $name = null)
 	{
 		$qry = "SELECT
 					*
@@ -400,12 +401,58 @@ class Prestudentstatus_model extends DB_Model
 		{
 			return error($result);
 		}
-		elseif (!hasData($result)) {
-			return error("Person muss zuerst zum Bewerber gemacht werden! " . $prestudent_id );
+		elseif (!hasData($result))
+		{
+			$person = $name ? $name : "Person";
+			return success("0",  $person . " muss zuerst zum Bewerber gemacht werden!");
 		}
 		else
 		{
 			return success($result);
+		}
+	}
+
+	/**
+	 * Check if there is only one prestudentstatus left
+	 * @param integer $prestudent_id
+	 * @return success("1") if last prestudentstatusentry, else success("0")
+	 */
+	public function checkIfLastStatusEntry($prestudent_id)
+	{
+		$qry = "SELECT
+					COUNT(*) as anzahl
+				FROM 
+				    public.tbl_prestudentstatus
+				WHERE
+					prestudent_id = ? ";
+
+		$result = $this->execQuery($qry, array($prestudent_id));
+
+		if (isError($result))
+		{
+			return error($result);
+		}
+		else
+		{
+			$resultObject = current(getData($result));
+
+			if (property_exists($resultObject, 'anzahl'))
+			{
+				$anzahl = (int) $resultObject->anzahl;
+				if ($anzahl <= 1 )
+				{
+					return success ("1", "Die letzte Rolle kann nur durch den Administrator geloescht werden");
+					//return error("Die letzte Rolle kann nur durch den Administrator geloescht werden");
+				}
+				else
+					return success("0", $anzahl . " Rollen vorhanden");
+					//return success($anzahl);
+
+			}
+			else
+			{
+				return error("PrestudentstatusModel: Error During Check if Last Status Entry.");
+			}
 		}
 	}
 
@@ -456,8 +503,6 @@ class Prestudentstatus_model extends DB_Model
 		$studiensemester = current($result->retval);
 		$new_status_semesterstart = $studiensemester->start;
 
-		//print_r($new_status_semesterstart);
-
 		//get all prestudentstati
 		$resultPs = $this->getAllPrestudentstatiWithStudiensemester($prestudent_id);
 		if (isError($resultPs))
@@ -474,9 +519,6 @@ class Prestudentstatus_model extends DB_Model
 
 		foreach ($resultArr as $row)
 		{
-/*			print_r($row->studiensemester_start . " >= " . $row->datum  . " UND ");
-			print_r($new_status_semesterstart  . " >= " . $new_status_datum . " ? ");*/
-
 			$studiensemester_start = new DateTime($row->studiensemester_start);
 			$status_datum = new DateTime ($row->datum);
 
@@ -498,17 +540,14 @@ class Prestudentstatus_model extends DB_Model
 			}
 			elseif($new_status_datum_form <= $status_datum && $new_status_semesterstart_form <= $studiensemester_start){
 				$statusArr[] = $row;
-				//print_r( "cond 2 met\n");
 
 			}
 			else
 			{
 				return error("Datum des Statuseintrags muss nach dem Statusdatum, das Semesterstartdatum nach Semesterstartdatum des vorherigen Statuseintrags sein");
-				//	print_r( "cond not met" . $count . "\n");
 			}
 
 		}
-		//var_dump($statusArr);
 
 		$endstatusArr = array('Absolvent', 'Abbrecher');
 		// Über alle gespeicherten Status gehen und Statusabfolge prüfen
@@ -526,7 +565,6 @@ class Prestudentstatus_model extends DB_Model
 			}
 
 			// wenn Unterbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
-			//TODO(Manu) check, warum hier automatisch ausbildungssemester korrigiert wird
 			if (
 				$curr_status_kurzbz == 'Unterbrecher' && isset($next_status) && $next_status->status_kurzbz == 'Unterbrecher'
 				&& $curr_status_ausbildungssemester != $next_status->ausbildungssemester
@@ -536,7 +574,6 @@ class Prestudentstatus_model extends DB_Model
 			}
 
 			// wenn Abbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
-			//TODO(Manu) check, warum hier automatisch ausbildungssemester korrigiert wird
 			if (
 				isset($next_status) && $curr_status_kurzbz == 'Unterbrecher'
 				&& $next_status->status_kurzbz == 'Abbrecher' && $curr_status_ausbildungssemester != $next_status->ausbildungssemester
@@ -561,47 +598,10 @@ class Prestudentstatus_model extends DB_Model
 		return $resultPs;
 	}
 
-	public function miniFunction()
-	{
-		$array = [
-			'key1' => 'value1',
-			'key2' => 'value2',
-			'key3' => 'value3'
-		];
-
-		return $array;
-	}
-
-	public function checkStatusabfolge($statusArr)
-	{
-		$endstatusArr = array('Absolvent', 'Abbrecher');
-		$statusArr = json_decode($statusArr);
-
-		//var_dump($statusArr);
-		var_dump($statusArr[0]->status_kurzbz);
-		// Prüfungen den Prestudentstatus betreffend
-		// Über alle gespeicherten Status gehen und Statusabfolge prüfen
-/*		for ($i = 0; $i < count($statusArr); $i++) {
-			$curr_status = $statusArr[$i];
-			$curr_status_kurzbz = $curr_status->status_kurzbz;
-			$curr_status_ausbildungssemester = $curr_status->ausbildungssemester;
-			$next_idx = $i - 1; //absteigend sortiert, nächster Status ist vorheriger Eintrag
-			$next_status = isset($statusArr[$next_idx]) ? $statusArr[$next_idx] : null;
-
-			// Abbrecher- oder Absolventenstatus muss Endstatus sein
-			if (isset($next_status) && in_array($curr_status_kurzbz, $endstatusArr)) {
-
-				return error("Nach Abbrecher- und Absolventenstatus darf kein anderer Status mehr eingetragen werden");
-			}
-		}*/
-
-		return $endstatusArr;
-
-	}
-
 	public function getAllPrestudentstatiWithStudiensemester($prestudent_id, $old_status_studiensemester_kurzbz = '', $old_status_ausbildungssemester = '')
 	{
 
+		//Todo(manu) check isNewStatus
 		$isNewStatus =  $old_status_studiensemester_kurzbz == '' && $old_status_ausbildungssemester == '';
 
 		$qry = "
@@ -629,26 +629,6 @@ class Prestudentstatus_model extends DB_Model
 		}
 
 		return $result;
-
-
-
-/*		$this->addSelect($this->dbTable . '.status_kurzbz');
-		$this->addSelect($this->dbTable . '.studiensemester_kurzbz');
-		$this->addSelect($this->dbTable . '.ausbildungssemester');
-		$this->addSelect($this->dbTable . '.datum');
-		$this->addSelect('s.start AS studiensemester_start');
-
-		$this->addJoin('public.tbl_studiensemester s', 'studiensemester_kurzbz');
-		$this->addOrder($this->dbTable . '.datum', 'DESC');
-		$this->addOrder($this->dbTable . '.insertamum', 'DESC');
-
-		$this->addOrder($this->dbTable . '.ext_id', 'DESC');
-
-		return $this->loadWhere([
-			'prestudent_id' => $prestudent_id
-			]
-		);*/
-
 
 	}
 

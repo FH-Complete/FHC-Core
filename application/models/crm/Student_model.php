@@ -80,12 +80,20 @@ class Student_model extends DB_Model
 			array('prestudent_id' => $prestudent_id)
 		);
 
-		if (!hasData($result))
+		if(isError($result))
 		{
-			return error($result);
+			return error("0", "Error while checking student_uid");
 		}
 
-		return $result->retval[0]->student_uid;
+		if (!hasData($result))
+		{
+			return success("0","Keine Student_uid vorhanden");
+		}
+
+		$student_uid = $result->retval[0]->student_uid;
+
+		return success ($student_uid);
+
 	}
 
 	public function searchStudent($filter)
@@ -112,5 +120,46 @@ class Student_model extends DB_Model
 	public function getEmailFH($student_uid)
 	{
 		return $student_uid . '@' . DOMAIN;
+	}
+
+	/**
+	 * Check if StudentenRolle already exists
+	 * @param integer $prestudent_id
+	 * @return 0 if not exists, count(rollen) if it does
+	 * Copy from studentDBDML.php
+	 */
+	public function checkIfExistingStudentRolle($prestudent_id)
+	{
+		$qry = "SELECT 
+    				count(*) as anzahl 
+				FROM 
+				    public.tbl_student 
+				WHERE 
+				    prestudent_id = ? ";
+
+		$result = $this->execQuery($qry, array($prestudent_id));
+
+		if (isError($result))
+		{
+			return error($result);
+		}
+		else {
+			$resultObject = current(getData($result));
+
+			if (property_exists($resultObject, 'anzahl')) {
+				$resultValue = (int) $resultObject->anzahl;
+
+				if ($resultValue > 0)
+				{
+					return success($resultValue, $resultValue . " vorhandene Rollen");
+				}
+				else
+				{
+					return success("0", "Ein Studentenstatus kann hier nur hinzugefuegt werden wenn die Person bereits Student ist. Um einen Bewerber zum Studenten zu machen waehlen Sie bitte unter 'Status aendern' den Punkt 'Student'");
+				}
+			} else {
+				return error("StudentModel: Error During Check if Existing Student Rolle.");
+			}
+		}
 	}
 }

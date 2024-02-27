@@ -741,6 +741,10 @@ class Prestudent_model extends DB_Model
 
 		if(isError($result))
 		{
+			return getData($result);
+		}
+		if($result->retval != "0")
+		{
 			$query = "
 			SELECT 
 				ps.status_kurzbz, 
@@ -778,7 +782,7 @@ class Prestudent_model extends DB_Model
 		{
 			$query = "
 				SELECT 
-					ps.status_kurzbz, 
+					ps.status_kurzbz2, 
 					ps.studiensemester_kurzbz, 
 					ps.ausbildungssemester, 
 					CASE WHEN ps.status_kurzbz IN ('Student', 'Diplomand') THEN CONCAT(lv.semester, lv.verband, lv.gruppe) END AS lehrverband, 
@@ -813,8 +817,6 @@ class Prestudent_model extends DB_Model
 			";
 
 		}
-
-
 		return $this->execQuery($query, array($prestudent_id));
 	}
 }
