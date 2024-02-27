@@ -24157,7 +24157,7 @@ array(
 		)
 	),
 	array(
-		'app' => 'extension',
+		'app' => 'fhctemplate',
 		'category' => 'global',
 		'phrase' => 'datensatz',
 		'insertvon' => 'system',
@@ -24177,7 +24177,7 @@ array(
 		)
 	),
 	array(
-		'app' => 'extension',
+		'app' => 'fhctemplate',
 		'category' => 'global',
 		'phrase' => 'datensatzGenehmigen',
 		'insertvon' => 'system',
@@ -24197,7 +24197,7 @@ array(
 		)
 	),
 	array(
-		'app' => 'extension',
+		'app' => 'fhctemplate',
 		'category' => 'global',
 		'phrase' => 'datensatzAblehnen',
 		'insertvon' => 'system',
@@ -24217,7 +24217,7 @@ array(
 		)
 	),
 	array(
-		'app' => 'extension',
+		'app' => 'fhctemplate',
 		'category' => 'global',
 		'phrase' => 'datensatzAnlegen',
 		'insertvon' => 'system',
@@ -24237,7 +24237,7 @@ array(
 		)
 	),
 	array(
-		'app' => 'extension',
+		'app' => 'fhctemplate',
 		'category' => 'global',
 		'phrase' => 'datensatzBearbeiten',
 		'insertvon' => 'system',
@@ -24291,6 +24291,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'All rejected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'dokument',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'aktionen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aktionen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Actions',
 				'description' => '',
 				'insertvon' => 'system'
 			)

@@ -1280,9 +1280,9 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
-		'app' => 'extension',
+		'app' => 'fhctemplate',
 		'dataset_name' => 'exampledata',
-		'filter_kurzbz' => 'ExampleData',
+		'filter_kurzbz' => 'exampledata',
 		'description' => '{Beispieldaten Filter}',
 		'sort' => 1,
 		'default_filter' => true,
