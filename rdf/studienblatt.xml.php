@@ -269,11 +269,23 @@ foreach($uid_arr as $uid)
 			echo "\t\t<studienplan_sprache><![CDATA[".$studienplan->sprache."]]></studienplan_sprache>\n";
 			echo "\t\t<regelstudiendauer><![CDATA[".$studienplan->regelstudiendauer."]]></regelstudiendauer>\n";
 
-			$akadgrad = new akadgrad();
-			$akadgrad->getAkadgradStudent($student->uid);
+			// Abschlussgrad ermitteln
+			// Erst aus Studienordnung, wenn nicht gesetzt aus akadgrad-Tabelle
 
-			echo "\t\t<akadgrad><![CDATA[".$akadgrad->titel."]]></akadgrad>\n";
-			echo "\t\t<akadgrad_kurzbz><![CDATA[".$akadgrad->akadgrad_kurzbz."]]></akadgrad_kurzbz>\n";
+			if ($studienordnung->akadgrad_id != '')
+			{
+				$akadgrad = new akadgrad($studienordnung->akadgrad_id);
+				echo "\t\t<akadgrad><![CDATA[".$akadgrad->titel."]]></akadgrad>\n";
+				echo "\t\t<akadgrad_kurzbz><![CDATA[".$akadgrad->akadgrad_kurzbz."]]></akadgrad_kurzbz>\n";
+			}
+			else
+			{
+				$akadgrad = new akadgrad();
+				$akadgrad->getAkadgradStudent($student->uid);
+
+				echo "\t\t<akadgrad><![CDATA[".$akadgrad->titel."]]></akadgrad>\n";
+				echo "\t\t<akadgrad_kurzbz><![CDATA[".$akadgrad->akadgrad_kurzbz."]]></akadgrad_kurzbz>\n";
+			}
 
 			//für ao. Studierende wird die StgKz der Lehrveranstaltungen benötigt, die sie besuchen
 			$lv_studiengang_kz='';
