@@ -25,7 +25,9 @@ export default {
 		'action:object',
 		'action:objectionDeny',
 		'action:objectionApprove',
-		'action:cancel'
+		'action:cancel',
+		'action:pause',
+		'action:unpause'
 	],
 	data() {
 		return {
@@ -59,6 +61,29 @@ export default {
 			).then(res => {
 				this.historyData = res.data.retval.sort((a, b) => a.insertamum > b.insertamum);
 			});
+		},
+		getHistoryStatus(data, index) {
+			if (data.insertvon == 'Studienabbruch')
+				return this.$p.t('studierendenantrag/status_stop');
+			if (index > 0 && this.historyData[index-1].studierendenantrag_statustyp_kurzbz == 'Pause') {
+				if (index > 1 && this.historyData[index-2].studierendenantrag_statustyp_kurzbz != 'Pause') {
+					// NOTE(chris): this is a AbmeldungStgl Pause right after a manual Pause
+					if (data.studierendenantrag_statustyp_kurzbz == 'Pause')
+						return data.typ;
+					// NOTE(chris): this is a manual Pause resumed
+					else
+						return data.typ + ' (' + this.$p.t('studierendenantrag/status_unpaused') + ')';
+				}
+				// NOTE(chris): a series of pause stati always starts with a manual and alternate afterwards
+				let i = 2;
+				while (index-i > 0 && this.historyData[index-i].studierendenantrag_statustyp_kurzbz == 'Pause') i++;
+				if (data.studierendenantrag_statustyp_kurzbz == 'Pause')
+					i++;
+				return i%2
+					? data.typ
+					: data.typ + ' (' + this.$p.t('studierendenantrag/status_unpaused') + ')';
+			}
+			return data.typ;
 		},
 		showHistoryGrund(grund) {
 			this.$refs.modalGrund.$el.addEventListener(
@@ -153,9 +178,13 @@ export default {
 					autocomplete: true,
 				},
 				formatter: (cell, formatterParams, onRendered) => {
+					let data = cell.getData();
+					let status = cell.getValue();
+					if (data.status_insertvon == 'Studienabbruch' && data.status == 'Pause')
+						status = this.$p.t('studierendenantrag/status_stop');
 					let link = document.createElement('a');
 					link.href = "#";
-					link.innerHTML = cell.getValue();
+					link.innerHTML = status;
 					link.addEventListener('click', e => {
 						e.preventDefault();
 						this.lastHistoryClickedId = cell.getData().studierendenantrag_id;
@@ -261,6 +290,56 @@ export default {
 							'content/pdfExport.php?xml=Antrag' + data.typ + '.xml.php&xsl=Antrag' + data.typ + '&id=' + data.studierendenantrag_id + '&output=pdf';
 						container.append(button);
 					}
+					
+					if (data.typ == 'Wiederholung' && (data.status == 'ErsteAufforderungVersandt' || data.status == 'ZweiteAufforderungVersandt')) {
+						// NOTE(chris): Pause
+						let button = document.createElement('button');
+						let icon = document.createElement('i');
+						let span = document.createElement('span');
+
+						icon.className = "fa-solid fa-pause";
+						icon.setAttribute('aria-hidden', true);
+						icon.setAttribute('title', this.$p.t('studierendenantrag', 'btn_pause'));
+
+						span.className = "fa-sr-only";
+						span.append(this.$p.t('studierendenantrag', 'btn_pause'));
+
+						button.append(icon);
+						button.append(span);
+						button.className = "btn btn-outline-secondary";
+						button.addEventListener('click', () => this.$emit('action:pause', [cell.getData()]));
+						container.append(button);
+					}
+
+					let canUnpause = data.status == 'Pause' && !['AbmeldungStgl', 'Studienabbruch'].includes(data.status_insertvon);
+					if (!canUnpause && data.status == 'Pause' && data.status_insertvon == 'AbmeldungStgl') {
+						canUnpause = cell.getTable().getData().filter(row => 
+							row.prestudent_id == data.prestudent_id 
+							&& row.typ == 'AbmeldungStgl' 
+							&& row.status == 'Zurueckgezogen' 
+							&& row.status_insertamum == data.status_insertamum
+						).length;
+					}
+					if (canUnpause) {
+						// NOTE(chris): Unpause
+						let button = document.createElement('button');
+						let icon = document.createElement('i');
+						let span = document.createElement('span');
+
+						icon.className = "fa-solid fa-play";
+						icon.setAttribute('aria-hidden', true);
+						icon.setAttribute('title', this.$p.t('studierendenantrag', 'btn_unpause'));
+
+						span.className = "fa-sr-only";
+						span.append(this.$p.t('studierendenantrag', 'btn_unpause'));
+
+						button.append(icon);
+						button.append(span);
+						button.className = "btn btn-outline-secondary";
+						button.addEventListener('click', () => this.$emit('action:unpause', [cell.getData()]));
+						container.append(button);
+					}
+
 					if (data.typ == 'AbmeldungStgl' && data.status == 'Genehmigt') {
 						// NOTE(chris): Object
 						let button = document.createElement('button');
@@ -392,10 +471,10 @@ export default {
 			<template #title>{{$p.t('studierendenantrag', 'title_history', {id: lastHistoryClickedId})}}</template>
 			<core-fetch-cmpt ref="historyLoader" :api-function="getHistory">
 				<table v-if="historyData.length" class="table">
-					<tr v-for="status in historyData" :key="status.studierendenantrag_status_id">
+					<tr v-for="(status, index) in historyData" :key="status.studierendenantrag_status_id">
 						<td>{{(new Date(status.insertamum)).toLocaleString()}}</td>
 						<td>{{status.insertvon}}</td>
-						<td>{{status.typ}}</td>
+						<td>{{getHistoryStatus(status, index)}}</td>
 						<td>
 							<a v-if="status.grund" href="#modal-grund" data-bs-toggle="modal" @click="showHistoryGrund(status.grund)">
 								{{$p.t('studierendenantrag', 'antrag_grund')}}

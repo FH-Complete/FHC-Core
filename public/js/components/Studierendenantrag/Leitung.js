@@ -184,6 +184,44 @@ export default {
 				.then(this.showValidation)
 				.catch(this.showError);
 		},
+		actionPause(evt) {
+			var antraege = evt || this.selectedData;
+			this.$refs.loader.show();
+			axios
+				.all(
+					antraege.map(
+						antrag => axios.post(
+							FHC_JS_DATA_STORAGE_OBJECT.app_root +
+							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+							'/components/Antrag/Leitung/pauseAntrag/',
+							{
+								studierendenantrag_id: antrag.studierendenantrag_id
+							}
+						)
+					)
+				)
+				.then(this.showValidation)
+				.catch(this.showError);
+		},
+		actionUnpause(evt) {
+			var antraege = evt || this.selectedData;
+			this.$refs.loader.show();
+			axios
+				.all(
+					antraege.map(
+						antrag => axios.post(
+							FHC_JS_DATA_STORAGE_OBJECT.app_root +
+							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+							'/components/Antrag/Leitung/unpauseAntrag/',
+							{
+								studierendenantrag_id: antrag.studierendenantrag_id
+							}
+						)
+					)
+				)
+				.then(this.showValidation)
+				.catch(this.showError);
+		},
 		actionObject(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
@@ -347,6 +385,8 @@ export default {
 			@action:objectionDeny="actionoObjectionDeny"
 			@action:objectionApprove="actionObjectionApprove"
 			@action:cancel="actionCancel"
+			@action:pause="actionPause"
+			@action:unpause="actionUnpause"
 			@reload="reload"
 			>
 		</leitung-table>

@@ -62,9 +62,11 @@ class AntragLib
 			'insertvon' => $insertvon
 		]);
 
-		// NOTE(chris): remove "preabbrecher" statusgrund for Stgl-Abmeldungen if set
+		// NOTE(chris): remove "preabbrecher" statusgrund and paused stati for sibling Anträge for Stgl-Abmeldungen if set
 		$res = $this->_ci->StudierendenantragModel->load($antrag_id);
 		if (hasData($res) && current(getData($res))->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL) {
+			$this->unpauseAntrag($antrag_id, Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL);
+
 			$this->_ci->PrestudentstatusModel->addSelect('tbl_status_grund.statusgrund_kurzbz');
 			$res = $this->_ci->PrestudentstatusModel->getLastStatusWithStgEmail(current(getData($res))->prestudent_id, '', 'Student');
 			if (hasData($res) && current(getData($res))->statusgrund_kurzbz == 'preabbrecher') {
@@ -80,6 +82,67 @@ class AntragLib
 			}
 		}
 
+		return $result;
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 * @param string		$insertvon
+	 *
+	 * @return stdClass
+	 */
+	public function pauseAntrag($antrag_id, $insertvon)
+	{
+		switch ($insertvon) {
+			case Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL:
+				$result = $this->_ci->StudierendenantragstatusModel->stopAntraegeForAbmeldungStgl($antrag_id);
+				break;
+			case Studierendenantragstatus_model::INSERTVON_DEREGISTERED:
+				$result = $this->_ci->StudierendenantragstatusModel->stopAntraegeForAbbruchBy($antrag_id);
+				break;
+			default:
+				$result = $this->_ci->StudierendenantragstatusModel->insert([
+					'studierendenantrag_id' => $antrag_id,
+					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_PAUSE,
+					'insertvon' => $insertvon
+				]);
+				break;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 * @param string		$insertvon
+	 *
+	 * @return stdClass
+	 */
+	public function unpauseAntrag($antrag_id, $insertvon)
+	{
+		if ($insertvon == Studierendenantragstatus_model::INSERTVON_DEREGISTERED)
+			return error($this->p->t('studierendenantrag', 'error_no_right'));
+		if ($insertvon == Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL) {
+			return $this->_ci->StudierendenantragstatusModel->resumeAntraegeForAbmeldungStgl($antrag_id);
+		}
+		// NOTE(chris): get last status that is not pause
+		$this->_ci->StudierendenantragstatusModel->addOrder('insertamum');
+		$this->_ci->StudierendenantragstatusModel->addLimit(1);
+		$result = $this->_ci->StudierendenantragstatusModel->loadWhere([
+			'studierendenantrag_id' => $antrag_id,
+			'studierendenantrag_statustyp_kurzbz !=' => Studierendenantragstatus_model::STATUS_PAUSE
+		]);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_antragstatus', ['id' => $antrag_id]));
+		$status = current(getData($result));
+
+		$result = $this->_ci->StudierendenantragstatusModel->insert([
+			'studierendenantrag_id' => $antrag_id,
+			'studierendenantrag_statustyp_kurzbz' => $status->studierendenantrag_statustyp_kurzbz,
+			'insertvon' => $insertvon
+		]);
 		return $result;
 	}
 
@@ -190,6 +253,10 @@ class AntragLib
 						$vorlage ='Sancho_Mail_Antrag_A_Approve';
 						$subject = $this->_ci->p->t('studierendenantrag', 'mail_subject_A_Approve');
 
+						$result = $this->pauseAntrag($studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_DEREGISTERED);
+						if (isError($result))
+							$errors[] = getError($result);
+
 						$result = $this->_ci->prestudentlib->setAbbrecher(
                             $antrag->prestudent_id,
                             $antrag->studiensemester_kurzbz,
@@ -229,6 +296,10 @@ class AntragLib
 						sendSanchoMail($vorlage, $data, $prestudent_status->email, $subject);
 					}
 				} else { // ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL)
+					$result = $this->pauseAntrag($studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL);
+					if (isError($result))
+						$errors[] = getError($result);
+					
 					$result = $this->_ci->PrestudentstatusModel->getLastStatusWithStgEmail($antrag->prestudent_id, '', 'Student');
 					if (isError($result))
 					{
@@ -340,6 +411,10 @@ class AntragLib
 		if (isError($result))
 			return $result;
 		else {
+			$result = $this->pauseAntrag($studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_DEREGISTERED);
+			// NOTE(chris): here we should have error handling but at the
+			// moment there is no way to notify the user for "soft" errors
+
 			$result = $this->_ci->prestudentlib->setAbbrecher(
                 $antrag->prestudent_id,
                 $antrag->studiensemester_kurzbz,
@@ -1224,10 +1299,10 @@ class AntragLib
 	 * @param integer		$prestudent_id
 	 *
 	 * @return \stdClass	on success retval 0 means not a student;
-     *                      retval 1 means Berechtigt;
-     *                      retval -1 means has already an Antrag pending;
-     *                      retval -2 means other Antrag pending;
-     *                      retval -3 means in blacklist stg
+	 *                      retval 1 means Berechtigt;
+	 *                      retval -1 means has already an Antrag pending;
+	 *                      retval -2 means other Antrag pending;
+	 *                      retval -3 means in blacklist stg
 	 */
 	public function getPrestudentAbmeldeBerechtigt($prestudent_id)
 	{
@@ -1251,12 +1326,24 @@ class AntragLib
 
 		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist_abmeldung'))) {
 			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
-                'prestudent_id' => $prestudent_id,
-                'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED
-            ], [
-                Studierendenantrag_model::TYP_ABMELDUNG,
-                Studierendenantrag_model::TYP_ABMELDUNG_STGL
-            ]);
+				'prestudent_id' => $prestudent_id,
+				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED
+			], [
+				Studierendenantrag_model::TYP_ABMELDUNG,
+				Studierendenantrag_model::TYP_ABMELDUNG_STGL
+			]);
+			if (isError($result))
+				return $result;
+			if (hasData($result))
+				return success(-1);
+
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
+				'prestudent_id' => $prestudent_id,
+				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_PAUSE
+			], [
+				Studierendenantrag_model::TYP_ABMELDUNG,
+				Studierendenantrag_model::TYP_ABMELDUNG_STGL
+			]);
 			if (isError($result))
 				return $result;
 			if (hasData($result))
@@ -1297,7 +1384,7 @@ class AntragLib
 	 * @param string		$studiensemester_kurzbz		(optional)
 	 *
 	 * @return \stdClass	on success retval 0 means not a student;
-     *                      retval 1 means Berechtigt;
+	 *                      retval 1 means Berechtigt;
 	 * 						retval -1 means has already an Antrag pending;
 	 * 						retval -2 means other Antrag pending;
 	 * 						retval -3 means in blacklist stg
@@ -1410,7 +1497,7 @@ class AntragLib
 			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
 				'prestudent_id' => $prestudent_id,
 				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
-				'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED
+				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED
 			]);
 			if (isError($result))
 				return $result;
@@ -1420,7 +1507,17 @@ class AntragLib
 			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
 				'prestudent_id' => $prestudent_id,
 				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
-				'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_DEREGISTERED
+				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_DEREGISTERED
+			]);
+			if (isError($result))
+				return $result;
+			if (hasData($result))
+				return success(-1);
+
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
+				'prestudent_id' => $prestudent_id,
+				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
+				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_PAUSE
 			]);
 			if (isError($result))
 				return $result;
@@ -1510,6 +1607,7 @@ class AntragLib
 
 		$resultDetails->status = $resultAntrag->status;
 		$resultDetails->statustyp = $resultAntrag->statustyp;
+		$resultDetails->status_insertvon = $resultAntrag->status_insertvon;
 		$resultDetails->grund = $resultAntrag->grund;
 		$resultDetails->studierendenantrag_id = $resultAntrag->studierendenantrag_id;
 		$resultDetails->typ = $resultAntrag->typ;
@@ -1522,7 +1620,7 @@ class AntragLib
 	public function getDetailsForAntrag($studierendenantrag_id)
 	{
 		$where = [
-			'studierendenantrag_id' => $studierendenantrag_id
+			's.studierendenantrag_id' => $studierendenantrag_id
 		];
 
 		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere($where);
@@ -1904,6 +2002,26 @@ class AntragLib
 	 *
 	 * @return boolean
 	 */
+	public function isEntitledToPauseAntrag($antrag_id)
+	{
+		return ($this->hasAccessToAntrag($antrag_id, 'student/antragfreigabe') || $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag'));
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
+	public function isEntitledToUnpauseAntrag($antrag_id)
+	{
+		return $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag');
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
 	public function isEntitledToReopenAntrag($antrag_id)
 	{
 		return $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag');
@@ -1937,6 +2055,36 @@ class AntragLib
 	public function isEntitledToRejectAntrag($antrag_id)
 	{
 		return $this->hasAccessToAntrag($antrag_id, 'student/antragfreigabe');
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
+	public function antragCanBeManualPaused($antrag_id)
+	{
+		$this->_ci->StudierendenantragModel->db->where_not_in('campus.get_status_studierendenantrag(studierendenantrag_id)', [
+			Studierendenantragstatus_model::STATUS_DEREGISTERED,
+			Studierendenantragstatus_model::STATUS_APPROVED,
+			Studierendenantragstatus_model::STATUS_PAUSE
+		]);
+		$result = $this->_ci->StudierendenantragModel->loadWhere([
+			'studierendenantrag_id' => $antrag_id,
+			'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG
+		]);
+
+		return hasData($result);
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
+	public function antragCanBeManualUnpaused($antrag_id)
+	{
+		return $this->_ci->StudierendenantragModel->isManuallyPaused($antrag_id);
 	}
 
 	/**

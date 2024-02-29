@@ -62,6 +62,22 @@ if($result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_statust
 	}
 }
 
+if($result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_statustyp WHERE studierendenantrag_statustyp_kurzbz = 'Pause' "))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO campus.tbl_studierendenantrag_statustyp
+			(studierendenantrag_statustyp_kurzbz, bezeichnung)
+			VALUES
+			('Pause', '{\"Pausiert\",\"Paused\"}');
+			";
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_studierendenantrag_statustyp (insert): '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>campus.tbl_studierendenantrag_statustyp: "Pause" added';
+	}
+}
+
 if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag LIMIT 1"))
 {
 	$qry = "CREATE TABLE campus.tbl_studierendenantrag (

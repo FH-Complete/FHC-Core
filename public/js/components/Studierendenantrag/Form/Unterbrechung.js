@@ -37,6 +37,7 @@ export default {
 			switch (this.data.status)
 			{
 				case 'Erstellt': return 'info';
+				case 'Pause':
 				case 'Zurueckgezogen':
 				case 'Abgelehnt': return 'danger';
 				case 'Genehmigt':
@@ -76,8 +77,12 @@ export default {
 				result => {
 					this.data = result.data.retval;
 					if (this.data.status) {
+						const msg = (this.data.status == 'Pause' && this.data.status_insertvon == "Studienabbruch") ? Vue.computed(() => {
+							let status = this.$p.t('studierendenantrag/status_stop');
+							return this.$p.t('studierendenantrag', 'status_x', {status});
+						}) : Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp}));
 						this.$emit("setStatus", {
-							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
+							msg,
 							severity: this.statusSeverity
 						});
 					}

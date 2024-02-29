@@ -316,6 +316,10 @@ class AntragJob extends JOB_Controller
 				} else {
 					$deregisterStatus = getData($result);
 
+					$result = $this->antraglib->pauseAntrag($prestudent->studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_DEREGISTERED);
+					if (isError($result))
+						$this->logError(getError($result));
+
 					$result = $this->prestudentlib->setAbbrecher($prestudent->prestudent_id, '', $insertvon);
 					if (isError($result)) {
 						$this->StudierendenantragstatusModel->delete($deregisterStatus);
@@ -425,6 +429,10 @@ class AntragJob extends JOB_Controller
 					$this->logError(getError($result));
 				else {
 					$deregisterStatus = getData($result);
+
+					$result = $this->antraglib->pauseAntrag($antrag->studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_DEREGISTERED);
+					if (isError($result))
+						$this->logError(getError($result));
 
 					$result = $this->prestudentlib->setAbbrecher(
 	                    $antrag->prestudent_id,
