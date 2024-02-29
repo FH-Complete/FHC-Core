@@ -253,7 +253,8 @@ class Wiederholung extends FHC_Controller
 			if (!hasData($result))
 				return $this->outputJsonError($this->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $antrag_id]));
 			$antrag = current(getData($result));
-			if ($antrag->status != Studierendenantragstatus_model::STATUS_CREATED && $antrag->status != Studierendenantragstatus_model::STATUS_LVSASSIGNED)
+			if ($antrag->status != Studierendenantragstatus_model::STATUS_CREATED
+				&& $antrag->status != Studierendenantragstatus_model::STATUS_LVSASSIGNED)
 				return $this->outputJsonError($this->p->t('studierendenantrag', 'error_antrag_locked'));
 		}
 

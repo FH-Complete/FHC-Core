@@ -56,7 +56,13 @@ class Studierendenantrag_model extends DB_Model
 		$this->addJoin('public.tbl_person', 'person_id');
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
 		$this->addJoin('public.tbl_studiensemester ss', 'studiensemester_kurzbz');
-		$this->addJoin('public.tbl_prestudentstatus ps', 'ps.prestudent_id=p.prestudent_id AND ps.studiensemester_kurzbz=ss.studiensemester_kurzbz AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, ss.studiensemester_kurzbz)', 'LEFT');
+		$this->addJoin(
+			'public.tbl_prestudentstatus ps',
+			'ps.prestudent_id=p.prestudent_id 
+			AND ps.studiensemester_kurzbz=ss.studiensemester_kurzbz 
+			AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, ss.studiensemester_kurzbz)',
+			'LEFT'
+		);
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
 		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, stg.orgform_kurzbz)');
 		$this->addJoin(
@@ -78,7 +84,9 @@ class Studierendenantrag_model extends DB_Model
 
 	public function loadActiveForStudiengaenge($studiengaenge)
 	{
-		// NOTE(chris): get language before changing things in the global db object because getUserLanguage() might use it and it should not have been tampered with
+		// NOTE(chris): get language before changing things in the global
+		// db object because getUserLanguage() might use it and it should
+		// not have been tampered with
 		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
 
 		$this->db->group_start();
@@ -242,11 +250,24 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect($this->dbTable . '.grund');
 		$this->addSelect($this->dbTable . '.dms_id');
 		$this->addSelect('s.insertvon AS status_insertvon');
-		$this->addSelect("(SELECT count(1) FROM campus.tbl_studierendenantrag_status WHERE studierendenantrag_id = " . $this->dbTable . ".studierendenantrag_id AND studierendenantrag_statustyp_kurzbz = 'Genehmigt') AS isapproved", false);
+		$this->addSelect(
+			"(SELECT count(1) FROM campus.tbl_studierendenantrag_status WHERE studierendenantrag_id = " .
+			$this->dbTable .
+			".studierendenantrag_id AND studierendenantrag_statustyp_kurzbz = 'Genehmigt') AS isapproved",
+			false
+		);
 
 		$this->addJoin('public.tbl_prestudent p', 'prestudent_id', 'RIGHT');
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
-		$this->addJoin('public.tbl_prestudentstatus ps', 'ps.prestudent_id=p.prestudent_id AND ps.studiensemester_kurzbz=' . $this->dbTable . '.studiensemester_kurzbz AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, ' . $this->dbTable . '.studiensemester_kurzbz)', 'LEFT');
+		$this->addJoin(
+			'public.tbl_prestudentstatus ps',
+			'ps.prestudent_id=p.prestudent_id AND ps.studiensemester_kurzbz=' .
+			$this->dbTable .
+			'.studiensemester_kurzbz AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, ' .
+			$this->dbTable .
+			'.studiensemester_kurzbz)',
+			'LEFT'
+		);
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
 		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, stg.orgform_kurzbz)');
 		$this->addJoin(
@@ -260,7 +281,13 @@ class Studierendenantrag_model extends DB_Model
 			'LEFT'
 		);
 		
-		$this->db->where("(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=p.prestudent_id AND status_kurzbz='Student' LIMIT 1) IS NOT NULL", null, false);
+		$this->db->where("(
+			SELECT status_kurzbz 
+			FROM public.tbl_prestudentstatus 
+			WHERE prestudent_id=p.prestudent_id 
+			AND status_kurzbz='Student' 
+			LIMIT 1
+		) IS NOT NULL", null, false);
 
 
 		return $this->loadWhere([

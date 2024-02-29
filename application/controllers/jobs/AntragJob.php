@@ -172,7 +172,16 @@ class AntragJob extends JOB_Controller
 			$cc = $leitung['Details']->email;
 
 			// NOTE(chris): Sancho mail
-			if (sendSanchoMail("Sancho_Mail_Antrag_Stgl", $data, $to, 'Anträge - Aktion(en) erforderlich', DEFAULT_SANCHO_HEADER_IMG, DEFAULT_SANCHO_FOOTER_IMG, '', $cc))
+			if (sendSanchoMail(
+				"Sancho_Mail_Antrag_Stgl",
+				$data,
+				$to,
+				'Anträge - Aktion(en) erforderlich',
+				DEFAULT_SANCHO_HEADER_IMG,
+				DEFAULT_SANCHO_FOOTER_IMG,
+				'',
+				$cc
+			))
 				$count++;
 		}
 
@@ -316,7 +325,10 @@ class AntragJob extends JOB_Controller
 				} else {
 					$deregisterStatus = getData($result);
 
-					$result = $this->antraglib->pauseAntrag($prestudent->studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_DEREGISTERED);
+					$result = $this->antraglib->pauseAntrag(
+						$prestudent->studierendenantrag_id,
+						Studierendenantragstatus_model::INSERTVON_DEREGISTERED
+					);
 					if (isError($result))
 						$this->logError(getError($result));
 
@@ -401,7 +413,10 @@ class AntragJob extends JOB_Controller
 		$this->StudierendenantragModel->addSelect('s.insertamum');
 		$this->StudierendenantragModel->addSelect('s.insertvon');
 
-		$this->StudierendenantragModel->db->where_in('public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)', $this->config->item('antrag_prestudentstatus_whitelist'));
+		$this->StudierendenantragModel->db->where_in(
+			'public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)',
+			$this->config->item('antrag_prestudentstatus_whitelist')
+		);
 
 		$result = $this->StudierendenantragModel->getWithLastStatusWhere([
             'typ' => Studierendenantrag_model::TYP_ABMELDUNG_STGL,
@@ -479,7 +494,6 @@ class AntragJob extends JOB_Controller
 							$this->logWarning("Failed to send Notification to " . $email);
 						}
 					}
-
 				}
 			}
 			$this->logInfo($count . "/" . count($antraege) . " Students set to Abbrecher");
