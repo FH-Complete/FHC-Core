@@ -198,6 +198,7 @@ export default {
 	<div class="stv-details-details h-100 pb-3">
 		<form-form ref="form" class="stv-details-prestudent" @submit.prevent="updatePrestudent">
 		<div class="position-sticky top-0 z-1">
+		<!--TODO(manu) Button inactiv setzen, wenn keine Änderungen-->
 			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" >Speichern</button>
 		</div>
 		<!--<form ref="form">-->

@@ -743,7 +743,7 @@ class Prestudent_model extends DB_Model
 		{
 			return getData($result);
 		}
-		if($result->retval != "0")
+		if($result->retval == "0") //wenn kein studentlehrband eingetragen
 		{
 			$query = "
 			SELECT 
@@ -782,7 +782,7 @@ class Prestudent_model extends DB_Model
 		{
 			$query = "
 				SELECT 
-					ps.status_kurzbz2, 
+					ps.status_kurzbz, 
 					ps.studiensemester_kurzbz, 
 					ps.ausbildungssemester, 
 					CASE WHEN ps.status_kurzbz IN ('Student', 'Diplomand') THEN CONCAT(lv.semester, lv.verband, lv.gruppe) END AS lehrverband, 

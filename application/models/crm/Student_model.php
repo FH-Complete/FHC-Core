@@ -82,7 +82,7 @@ class Student_model extends DB_Model
 
 		if(isError($result))
 		{
-			return error("0", "Error while checking student_uid");
+			return error( "Error while checking student_uid");
 		}
 
 		if (!hasData($result))

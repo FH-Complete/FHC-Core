@@ -200,11 +200,13 @@ export default{
 		actionConfirmStatus(status, stdsem, ausbildungssemester){
 			console.log("Action: Status bestätigen: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
 			//this.$refs.deleteStatusModal.show();
-
-			/*			this.loadStatus(status_id).then(() => {
-							if(this.statusData.bankverbindung_id)
-								this.$refs.deleteStatusModal.show();
-						});*/
+			this.statusId = {
+				'prestudent_id': this.prestudent_id,
+				'status_kurzbz': status,
+				'studiensemester_kurzbz': stdsem,
+				'ausbildungssemester': ausbildungssemester
+			};
+			console.log(this.statusId);
 		},
 		addNewStatus(){
 			CoreRESTClient.post('components/stv/Status/addNewStatus/' + this.prestudent_id,
@@ -590,7 +592,7 @@ export default{
 									type="select"
 									name="studiensemester_kurzbz" 
 									v-model="statusData['studiensemester_kurzbz']"
-								> <!--TODO(manu) default aktueller Eintrag-->
+								>
 									<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
 								</form-input>
 							</div>

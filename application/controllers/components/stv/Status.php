@@ -111,7 +111,14 @@ class Status extends FHC_Controller
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson(getError($result));
 		}
-		$lastStatusData = current(getData($result));
+		elseif(!hasData($result))
+		{
+			$lastStatusData = [];
+/*			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson("donn holt nittan");*/
+		}
+		else
+			$lastStatusData = current(getData($result));
 		//var_dump($lastStatusData);
 
 		//Different handling depending on newStatus
@@ -214,7 +221,7 @@ class Status extends FHC_Controller
 			}
 		}
 
-		//TODO(Manu) permission not working here...
+		//TODO(Manu) check permission...
 		$hasPermissionToSkipStatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studdatuspruefung');
 		/*		var_dump($hasPermissionToSkipStatusCheck);
 
@@ -309,8 +316,9 @@ class Status extends FHC_Controller
 		$status_kurzbz = $this->input->post('status_kurzbz');
 		$ausbildungssemester = $this->input->post('ausbildungssemester');
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		$deletePrestudent = false;
 
-		//TODO(Manu) check: warum sind beim Löschen andere Berechtigungen?
+		//TODO(Manu) check permissions: warum sind beim Löschen andere Berechtigungen?
 		//ich darf keine Stati anlegen, aber löschen, wenn mehr als einer übrig???
 /*		$granted_Ass = $this->permissionlib->getSTG_isEntitledFor('assistenz');
 		$granted_Adm = $this->permissionlib->getSTG_isEntitledFor('admin');
@@ -346,22 +354,28 @@ class Status extends FHC_Controller
 		}
 
 
-		if(!$isBerechtigtAdmin && !$isBerechtigtNoStudstatusCheck)
+		//check if last status
+		$result = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id);
+		if (isError($result))
 		{
-			//check if last status
-			$result = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id);
-			if (isError($result))
-			{
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson($result);
-			}
-			if($result->retval == "1")
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}
+		if($result->retval == "1")
+		{
+			//Berechtigungen nach Check prüfen!
+			if(!$isBerechtigtAdmin && !$isBerechtigtNoStudstatusCheck)
 			{
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				return $this->outputJson($result->code);
 			}
+			else
+			{
+				$deletePrestudent = true;
+			}
 		}
 
+		//TODO(manu) $this->db->trans_start(false); and rollback?
 		//Delete Status
 		$result = $this->PrestudentstatusModel->delete(
 			array(
@@ -376,28 +390,30 @@ class Status extends FHC_Controller
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			$this->outputJson($result);
 		}
-		elseif(!hasData($result)) {
+		if(!hasData($result)) {
 			$this->outputJson($result);
 		}
-		//return $this->outputJsonSuccess(current(getData($result)));
 
-		// Delete Studentlehrverband if no Status left
+		//Delete Studentlehrverband if no Status left
 		$result = $this->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
 
-		if(isError($result))
-		{
+		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson(getError($result));
 		}
-		if(!hasData($result))
+		if (!hasData($result))
 		{
 			//get student_uid
 			$this->load->model('crm/Student_model', 'StudentModel');
 			$result = $this->StudentModel->checkIfUid($prestudent_id);
-			if(isError($result))
+			if (isError($result))
 			{
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				return $this->outputJson(getError($result));
+			}
+			if (!hasData($result))
+			{
+				$this->outputJson($result);
 			}
 			$student_uid = $result->retval;
 
@@ -413,16 +429,42 @@ class Status extends FHC_Controller
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				$this->outputJson("Fehler beim Löschen der Lehrverbandszuordnung");
 			}
-			if(!hasData($result)) {
+			if (!hasData($result))
+			{
+				$this->outputJson($result);
+				var_dump("no data2");
+			}
+			$this->outputJsonSuccess(true);
+
+		}
+
+		//Delete Prestudent if no data is left
+		if($deletePrestudent)
+		{
+			//TODO(manu) check all connected tables and delete them
+			//es wird noch auf prestudent_dokumentprestudent verwiesen
+			//löschen zuerst von Doks
+			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+			$result = $this->PrestudentModel->delete(
+				array(
+					'prestudent_id' => $prestudent_id
+				)
+			);
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				$this->outputJson($result);
 			}
-			return $this->outputJsonSuccess(true);
+			if(!hasData($result))
+			{
+				$this->outputJson($result);
+			}
+			$this->outputJson($result);
+
+
 		}
-		//TODO(manu) $this->db->trans_start(false); and rollback?
-		//TODO(manu) ganzen Prestudenten löschen, wenn kein Eintrag mehr
+
 		return $this->outputJsonSuccess(true);
-
-
 	}
 
 	public function updateStatus($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
@@ -498,7 +540,7 @@ class Status extends FHC_Controller
 				}
 			}
 
-		//TODO(Manu) permission not working here...
+		//TODO(Manu) check permissions
 		$hasPermissionToSkipStatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studdatuspruefung');
 		/*		var_dump($hasPermissionToSkipStatusCheck);
 

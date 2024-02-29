@@ -504,13 +504,19 @@ class Prestudentstatus_model extends DB_Model
 		$new_status_semesterstart = $studiensemester->start;
 
 		//get all prestudentstati
+		//TODO(manu) errorlogic
 		$resultPs = $this->getAllPrestudentstatiWithStudiensemester($prestudent_id);
 		if (isError($resultPs))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($resultPs));
+			$resultArr = [];
 		}
-		$resultArr = $resultPs->retval;
+		if(!hasData($resultPs))
+		{
+			$resultArr = [];
+		}
+		else
+			$resultArr = $resultPs->retval;
+
 		$statusArr = array();
 
 		$newStatusInserted = false;
@@ -625,7 +631,7 @@ class Prestudentstatus_model extends DB_Model
 			return error($result);
 		}
 		if (!hasData($result)) {
-			return error('No Statusdata vorhanden');
+			return success("0",'No Statusdata vorhanden');
 		}
 
 		return $result;
