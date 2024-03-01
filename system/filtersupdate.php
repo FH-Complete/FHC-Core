@@ -378,7 +378,8 @@ $filters = array(
 					{"name" : "FoerderfallId"},
 					{"name" : "LeistungsdatenId"},
 					{"name" : "startjahr"},
-					{"name" : "endjahr"}
+					{"name" : "endjahr"},
+					{"name" : "Uebermittelt"}
 				],
 				"filters": []
 			}

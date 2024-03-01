@@ -2584,13 +2584,16 @@ if(!$error)
 		}
 		else
 		{
+			if(defined('FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE') && isset(unserialize(FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE)[$_POST['buchungstyp_kurzbz']]))
+				$kostenstelle = unserialize(FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE)[$_POST['buchungstyp_kurzbz']];
+
 			foreach ($person_ids as $person_id)
 			{
 				if($person_id!='')
 				{
 					$buchung = new konto();
 					$buchung->person_id = $person_id;
-					$buchung->studiengang_kz = $_POST['studiengang_kz'];
+					$buchung->studiengang_kz = isset($kostenstelle) ? $kostenstelle : $_POST['studiengang_kz'];
 					$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 					$buchung->buchungsnr_verweis='';
 					$buchung->betrag = $_POST['betrag'];
