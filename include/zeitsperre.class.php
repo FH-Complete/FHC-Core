@@ -633,5 +633,75 @@ class zeitsperre extends basis_db
 		return true;
 	}
 
+	/**
+	 * Laedt alle Zeitsperren eines Benutzers (bzw. einer OE) für Ical Export
+	 * @param $uid bzw Array($uids)
+	 * @param $bisgrenze wenn true werden nur die Zeitsperren des
+	 * aktuellen Geschaeftsjahres geholt (1.9.-31.8.)
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getZeitsperrenForIcal($uid, $bisgrenze=true)
+	{
+		if(!is_array($uid))
+			$uid = [$uid];
+
+		$qry = "SELECT
+					zeitsperretyp_kurzbz,
+					bezeichnung,
+					mitarbeiter_uid,
+					CONCAT(vondatum, ' ', std1.beginn) AS von,
+					CONCAT(bisdatum, ' ', std2.ende) AS bis,
+					vondatum, vonstunde, bisdatum, bisstunde,
+					p.vorname, p.nachname
+				FROM campus.tbl_zeitsperre zs
+					JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz)
+				    JOIN public.tbl_benutzer bn ON (bn.uid = zs.mitarbeiter_uid)
+				    JOIN public.tbl_person p ON (bn.person_id = p.person_id)
+					LEFT JOIN lehre.tbl_stunde std1 ON (std1.stunde = zs.vonstunde)
+					LEFT JOIN lehre.tbl_stunde std2 ON (std2.stunde = zs.bisstunde)
+				WHERE mitarbeiter_uid in (". $this->db_implode4SQL($uid) . ")";
+
+		if($bisgrenze)
+		{
+			$qry.=" AND (
+							(date_part('month',vondatum)>=9 AND date_part('year', vondatum)>='".(date('Y')-1)."')
+							OR
+							(date_part('month',vondatum)<9 AND date_part('year', vondatum)>='".(date('Y'))."')
+						)";
+		}
+
+		$qry.= " ORDER BY vondatum DESC";
+
+		var_dump($qry);
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new zeitsperre();
+
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->zeitsperretyp_kurzbz = $row->zeitsperretyp_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->vondatum = $row->vondatum;
+				$obj->vonstunde = $row->vonstunde;
+				$obj->bisdatum = $row->bisdatum;
+				$obj->bisstunde = $row->bisstunde;
+				$obj->von = $row->von;
+				$obj->bis = $row->bis;
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Zeitsperren für ical';
+			return false;
+		}
+	}
+
 }
 ?>

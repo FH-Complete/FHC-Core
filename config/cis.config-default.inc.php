@@ -155,6 +155,9 @@ define('LVPLAN_KATEGORIE', 'StundenplanTW');
 // Key zum Verschluesseln des LV-Plan Google Links
 define('LVPLAN_CYPHER_KEY',pack('H*', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'));
 
+// Key zum Verschluesseln Zeitsperren/Zeitverfügbarkeiten
+define('ZEITSPERREN_CYPHER_KEY',pack('H*', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'));
+
 // Gibt an ob Termine aus dem Vorsemester nach der Semesterhaelfte des Folgesemesters
 // noch im pers. LVPan aufscheinen.
 // true | false
