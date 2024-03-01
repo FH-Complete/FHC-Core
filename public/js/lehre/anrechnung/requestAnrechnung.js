@@ -138,17 +138,17 @@ var requestAnrechnung = {
 
         switch (status_kurzbz) {
             case ANRECHNUNGSTATUS_APPROVED:
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-success');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-success-subtle');
                 break;
             case ANRECHNUNGSTATUS_REJECTED:
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-danger');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-danger-subtle');
                 break;
             case '':
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-info');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-info-subtle');
                 $('#requestAnrechnung-status_kurzbz').text(FHC_PhrasesLib.t("ui", "neu"));
                 break;
             default:
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-warning-subtle');
                 $('#requestAnrechnung-status_kurzbz').text(FHC_PhrasesLib.t("ui", "inBearbeitung"));
         }
     },
@@ -186,7 +186,7 @@ var requestAnrechnung = {
 
             // Show sperre panel
             $('#requestAnrechnung-sperre')
-                .removeClass('hidden')
+                .removeClass('visually-hidden')
                 .html(function(){
                     let sperregrund = FHC_PhrasesLib.t('global', 'bearbeitungGesperrt') + ': ';
 
@@ -232,11 +232,11 @@ var requestAnrechnung = {
     formatAnrechnungIsApplied: function (antragdatum, dms_id, filename){
         $('#requestAnrechnung-antragdatum').text(antragdatum);
         $('#requestAnrechnung-status_kurzbz').text(FHC_PhrasesLib.t("ui", "inBearbeitung"));
-        $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
+        $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-warning-subtle');
 
         // Display File-Downloadlink
         $('#requestAnrechnung-downloadDocLink')
-            .removeClass('hidden')
+            .removeClass('visually-hidden')
             .attr('href', 'RequestAnrechnung/download?dms_id=' + dms_id)
             .html(filename);
 
@@ -286,7 +286,7 @@ var requestAnrechnung = {
         {
             $('#requestAnrechnung-maxEctsUeberschrittenMsg')
                 .html("<br><b>Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz ist überschritten. </b><i class=\"fa fa-lg fa-info-circle\"></i></br>")
-                .addClass('bg-danger text-danger')
+                .addClass('bg-danger-subtle')
                 .tooltip({
                     title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),
                     placement: 'right',
@@ -347,7 +347,7 @@ var requestAnrechnung = {
                     ? [(sumEctsSchulisch + sumEctsBeruflich + ects), sumEctsSchulisch, (sumEctsBeruflich  + ects)] // beruflich
                     : [(sumEctsSchulisch + sumEctsBeruflich + ects), (sumEctsSchulisch + ects), sumEctsBeruflich])) // schulisch
             .append('<i class="fa fa-lg fa-info-circle"></i>')
-            .addClass('bg-danger text-danger')
+            .addClass('bg-danger-subtle')
             .tooltip({
                 title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),
                 placement: 'right',
