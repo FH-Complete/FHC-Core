@@ -28,9 +28,9 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
             CONSTRAINT tbl_ereignis_pkey PRIMARY KEY (ereignis_kurzbz)
         );
 
-        COMMENT ON TABLE hr.tbl_frist_status IS E'Key-Table of fristen (deadline) events';
+        COMMENT ON TABLE hr.tbl_frist_ereignis IS E'Key-Table of fristen (deadline) events';
 
-        CREATE TABLE IF NOT EXISTS hr.tbl_frist_status
+        CREATE TABLE IF NOT EXISTS hr.tbl_frist_status (
             status_kurzbz character varying(32) NOT NULL,
             bezeichnung varchar(32),
             CONSTRAINT tbl_frist_status_pk PRIMARY KEY (status_kurzbz)
@@ -38,17 +38,27 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 
         COMMENT ON TABLE hr.tbl_frist_status IS E'Key-Table of fristen status (new, done)';
 
-        ALTER TABLE hr.tbl_frist ADD CONSTRAINT hr.tbl_frist_mitarbeiter_uid_fk FOREIGN KEY (mitarbeiter_uid)
+        ALTER TABLE hr.tbl_frist ADD CONSTRAINT tbl_frist_mitarbeiter_uid_fk FOREIGN KEY (mitarbeiter_uid)
 		REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
 		ON DELETE SET NULL ON UPDATE CASCADE;
 
-        ALTER TABLE hr.tbl_frist ADD CONSTRAINT hr.tbl_frist_ereignis_kurzbz_fk FOREIGN KEY (ereignis_kurzbz)
+        ALTER TABLE hr.tbl_frist ADD CONSTRAINT tbl_frist_ereignis_kurzbz_fk FOREIGN KEY (ereignis_kurzbz)
 		REFERENCES hr.tbl_frist_ereignis (ereignis_kurzbz) MATCH FULL
 		ON DELETE SET NULL ON UPDATE CASCADE;
 
-        ALTER TABLE hr.tbl_frist ADD CONSTRAINT hr.tbl_frist_status_kurzbz_fk FOREIGN KEY (status_kurzbz)
+        ALTER TABLE hr.tbl_frist ADD CONSTRAINT tbl_frist_status_kurzbz_fk FOREIGN KEY (status_kurzbz)
 		REFERENCES hr.tbl_frist_status (status_kurzbz) MATCH FULL
 		ON DELETE SET NULL ON UPDATE CASCADE;
+
+        GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_frist TO vilesci;
+        GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_frist_status TO vilesci;
+        GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_frist_ereignis TO vilesci;
+
+        INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung) VALUES('neu','Neu');
+        INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung) VALUES('erledigt','Erledigt');
+
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung) VALUES('dv_beginn','DV Beginn');
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung) VALUES('dv_ende','DV Ende');
 
 
 
