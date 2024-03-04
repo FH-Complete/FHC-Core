@@ -111,8 +111,6 @@ export default {
 				}
 			});*/
 
-
-
 		},
 		detectChanges() {
 			const delta = {};
@@ -537,7 +535,7 @@ export default {
 						</form-input>
 					</div>
 					
-					<div class="row mb-3">
+<!--					<div class="row mb-3">
 						<form-input
 							container-class="col-5"
 							label="MentorIn"
@@ -546,7 +544,7 @@ export default {
 							name="mentor"
 							>
 						</form-input>
-					</div>
+					</div>-->
 				
 			</fieldset>
 		

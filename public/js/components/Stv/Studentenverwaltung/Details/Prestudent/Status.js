@@ -206,7 +206,10 @@ export default{
 				'studiensemester_kurzbz': stdsem,
 				'ausbildungssemester': ausbildungssemester
 			};
-			console.log(this.statusId);
+			this.loadStatus(this.statusId).then(() => {
+				if(this.statusData)
+					this.confirmStatus(this.statusId);
+			});
 		},
 		addNewStatus(){
 			CoreRESTClient.post('components/stv/Status/addNewStatus/' + this.prestudent_id,
@@ -243,6 +246,33 @@ export default{
 					result => {
 						if(!result.data.error) {
 							this.$fhcAlert.alertSuccess('Vorrückung Status erfolgreich');
+						}
+						else
+						{
+							const errorData = result.data.retval;
+							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
+						}
+						/*						return result;*/
+					}).catch(error => {
+					if (error.response) {
+						console.log(error.response);
+						this.$fhcAlert.alertError(error.response.data);
+					}
+				}).finally(() => {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
+		},
+		confirmStatus(statusId){
+			return CoreRESTClient.post('components/stv/Status/confirmStatus/' +
+				this.statusId.prestudent_id + '/' +
+				this.statusId.status_kurzbz + '/' +
+				this.statusId.studiensemester_kurzbz + '/' +
+				this.statusId.ausbildungssemester)
+				.then(
+					result => {
+						if(!result.data.error) {
+							this.$fhcAlert.alertSuccess('Bestätigung Status erfolgreich');
 						}
 						else
 						{
@@ -356,7 +386,7 @@ export default{
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		CoreRESTClient
-			.get('components/stv/Prestudent/getStudienplaene/' + this.modelValue.prestudent_id)
+			.get('components/stv/Prestudent/getStudienplaene/' + this.prestudent_id)
 			.then(result => CoreRESTClient.getData(result.data) || [])
 			.then(result => {
 				this.listStudienplaene = result;
@@ -388,7 +418,6 @@ export default{
 		
 			<!--Modal: Add New Status-->
 			<BsModal ref="newStatusModal">
-			<!--TODO(manu) check stati: in FAs Absolvent, Abbrecher, Wartender nicht in Liste-->
 				<template #title>Neuen Status hinzufügen</template>
 							
 					<form-form class="row g-3" ref="statusData">
@@ -428,7 +457,7 @@ export default{
 								</form-input>
 							</div>
 						</div>
-						<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false)-->
+						<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false) 100 Semester-->
 						<div class="row mb-3">
 							<label for="ausbildungssemester" class="form-label col-sm-4">Ausbildungssemester</label>
 							<div class="col-sm-6">
@@ -729,21 +758,6 @@ export default{
 					<p>Prestudentstatus {{statusData.status_kurzbz}} (id: {{statusData.prestudent_id}}  
 					/ {{statusData.studiensemester_kurzbz}}) im {{statusData.ausbildungssemester}}. Ausbildungssemester wirklich löschen?</p>					
 				</template>	
-<!--				<template #footer>
-					<button 
-						ref="Close" 
-						type="button" 
-						class="btn btn-primary" 
-						@click="deleteStatus({
-							'prestudent_id': statusData.prestudent_id,
-							'status_kurzbz': statusData.studiensemester_kurzbz,
-							'studiensemester_kurzbz': statusData.studiensemester_kurzbz,
-							'ausbildungssemester': statusData.ausbildungssemester
-						})">OK</button>
-				</template>	-->							
-<!--				<template #footer>
-					<button ref="Close" type="button" class="btn btn-primary" @click="deleteStatus(statusData.prestudent_id, statusData.status_kurzbz, statusData.ausbildungssemester, statusData.studiensemester_kurzbz)">OK</button>
-				</template>-->
 				<template #footer>
 					<button ref="Close" type="button" class="btn btn-primary" @click="deleteStatus(statusId)">OK</button>
 				</template>

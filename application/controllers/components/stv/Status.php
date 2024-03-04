@@ -100,9 +100,6 @@ class Status extends FHC_Controller
 		$rt_stufe = $this->input->post('rt_stufe');
 		$bestaetigtvon = $uid;
 
-		// Start DB transaction
-		//$this->db->trans_start(false);
-
 		//GET lastStatus
 		$result = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
@@ -114,12 +111,9 @@ class Status extends FHC_Controller
 		elseif(!hasData($result))
 		{
 			$lastStatusData = [];
-/*			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson("donn holt nittan");*/
 		}
 		else
 			$lastStatusData = current(getData($result));
-		//var_dump($lastStatusData);
 
 		//Different handling depending on newStatus
 		if($status_kurzbz == 'Absolvent' || $status_kurzbz == 'Diplomand')
@@ -251,6 +245,9 @@ class Status extends FHC_Controller
 			}
 		}
 
+		// Start DB transaction
+		$this->db->trans_start(false);
+
 		$result = $this->PrestudentstatusModel->insert(
 			[
 				'prestudent_id' => $prestudent_id,
@@ -269,13 +266,21 @@ class Status extends FHC_Controller
 				'rt_stufe' => $rt_stufe
 			]
 		);
-		if (isError($result))
+
+		// Transaction complete!
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === false || isError($result))
 		{
+			$this->db->trans_rollback();
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson(getError($result));
 		}
-
-		return $this->outputJsonSuccess(true);
+		else
+		{
+			$this->db->trans_commit();
+			return $this->outputJsonSuccess(true);
+		}
 	}
 
 	public function loadStatus()
@@ -380,6 +385,9 @@ class Status extends FHC_Controller
 			}
 		}
 
+		// Start DB transaction
+		$this->db->trans_start(false);
+
 		//TODO(manu) $this->db->trans_start(false); and rollback?
 		//Delete Status
 		$result = $this->PrestudentstatusModel->delete(
@@ -390,14 +398,21 @@ class Status extends FHC_Controller
 				'studiensemester_kurzbz' => $studiensemester_kurzbz
 			)
 		);
-		if (isError($result))
+
+		// Transaction complete!
+		$this->db->trans_complete();
+
+		if ( $this->db->trans_status() === false || isError($result))
 		{
+			$this->db->trans_rollback();
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson($result);
+			return $this->outputJson($result);
 		}
 		if(!hasData($result)) {
 			$this->outputJson($result);
 		}
+
+		$this->db->trans_commit();
 
 		//Delete Studentlehrverband if no Status left
 		$result = $this->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
@@ -706,6 +721,9 @@ class Status extends FHC_Controller
 			}
 		}
 
+		// Start DB transaction
+		$this->db->trans_start(false);
+
 		//insert prestudentstatus
 		$uid = getAuthUID();
 		$result = $this->PrestudentstatusModel->insert(
@@ -721,14 +739,17 @@ class Status extends FHC_Controller
 				'studienplan_id' => $statusData->studienplan_id,
 				'datum' => date('c'),
 				'anmerkung' => $statusData->anmerkung
-
 			]
 		);
-		if (isError($result))
+
+		// Transaction complete!
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === false || isError($result))
 		{
+			$this->db->trans_rollback();
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			//return $this->outputJson(getError($result));
-			return $this->outputJson("DEBUG: in insert Funktion");
+			return $this->outputJson(getError($result));
 		}
 
 		//Studentlehrverband anlegen
@@ -778,13 +799,105 @@ class Status extends FHC_Controller
 				]);
 			if (isError($result))
 			{
+				$this->db->trans_rollback();
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 
 				return $this->outputJson("Error in insert Studentlehrverband");
 			}
 		}
+		$this->db->trans_commit();
+		return $this->outputJsonSuccess(true);
+	}
+
+	public function confirmStatus($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
+	{
+		$uid = getAuthUID();
+		//TODO(Manu) check: Annahme, dass hier immer suid bei Berechtigung STG vergeben wird!
+		$granted_Ass = $this->permissionlib->getSTG_isEntitledFor('assistenz') ? $this->permissionlib->getSTG_isEntitledFor('assistenz') : [];
+		$granted_Adm = $this->permissionlib->getSTG_isEntitledFor('admin') ? $this->permissionlib->getSTG_isEntitledFor('admin') : [];
+		$granted = array_merge($granted_Ass, $granted_Adm);
+
+		//get Studiengang von prestudent_id
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$result = $this->PrestudentModel->load([
+			'prestudent_id'=> $key_prestudent_id,
+		]);
+		if(isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		$result = current(getData($result));
+
+		$stg = $result->studiengang_kz;
+
+		if(!in_array($stg, $granted)){
+			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}
+
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+
+		$result = $this->PrestudentstatusModel->loadWhere(
+			array(
+				'prestudent_id' => $key_prestudent_id,
+				'status_kurzbz' => $key_status_kurzbz,
+				'ausbildungssemester' => $key_ausbildungssemester,
+				'studiensemester_kurzbz' => $key_studiensemester_kurzbz
+			)
+		);
+
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson($result);
+		}
+
+		elseif (!hasData($result)) {
+			$this->outputJson($result);
+		}
+		else
+		{
+			$statusData = current(getData($result));
+		}
+
+		//check if Status is unconfirmed.. TODO(manu) check further conditions? Status < Student
+		if($statusData->bestaetigtam != NULL)
+		{
+			$result = "Der Status ist bereits bestätigt!";
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}
+
+		//check if Bewerbung abgeschickt
+		if($statusData->bewerbung_abgeschicktamum == NULL)
+		{
+			$result = "Die Bewerbung wurde noch nicht abgeschickt und kann deshalb nicht bestaetigt werden!";
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}
+
+		$result = $this->PrestudentstatusModel->update(
+			[
+				'prestudent_id' => $key_prestudent_id,
+				'status_kurzbz' => $key_status_kurzbz,
+				'studiensemester_kurzbz' => $key_studiensemester_kurzbz,
+				'ausbildungssemester' => $key_ausbildungssemester,
+			],
+			[
+				'bestaetigtam' => date('c'),
+				'bestaetigtvon' => $uid
+			]
+		);
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		if (!hasData($result)) {
+			return error('No Statusdata vorhanden');
+		}
 		return $this->outputJsonSuccess(true);
 
 	}
-
 }
