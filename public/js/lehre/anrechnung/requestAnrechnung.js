@@ -62,7 +62,7 @@ $(function(){
                     var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
 
                     // Add to Checkbox text
-                    $(this).closest('label').append(msgBeiEctsUeberschreitung);
+                    $(this).closest('div').append(msgBeiEctsUeberschreitung);
                 }
                  return;
             }
@@ -76,7 +76,7 @@ $(function(){
                     var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
 
                     // Add to Checkbox text
-                    $(this).closest('label').append(msgBeiEctsUeberschreitung);
+                    $(this).closest('div').append(msgBeiEctsUeberschreitung);
                 }
             }
 
@@ -196,7 +196,7 @@ var requestAnrechnung = {
                     else if (is_blocked){
                         sperregrund += FHC_PhrasesLib.t('anrechnung', 'benotungDerLV');
                     }
-                    return "<b>"+ sperregrund + "</b>";
+                    return "<span class='fw-bold'>"+ sperregrund + "</span>";
                 })
 
             // Disable all form elements
@@ -204,7 +204,7 @@ var requestAnrechnung = {
         }
     },
     initTooltips: function (){
-        $('[data-toggle="tooltip"]').tooltip({
+        $('[data-bs-toggle="tooltip"]').tooltip({
                 delay: { "show": 200, "hide": 200 },
                 html: true
             }
@@ -281,11 +281,11 @@ var requestAnrechnung = {
         if(
             (parseFloat($('#sumEctsSchulisch').text())) > 60 ||
             (parseFloat($('#sumEctsBeruflich').text())) > 60 ||
-            (parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90
+            (parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90 
         )
         {
             $('#requestAnrechnung-maxEctsUeberschrittenMsg')
-                .html("<br><b>Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz ist überschritten. </b><i class=\"fa fa-lg fa-info-circle\"></i></br>")
+                .html("<span class='flex-fill fw-bold'>Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz ist überschritten. </span><i class='mx-4 fa fa-lg fa-info-circle'></i>")
                 .addClass('bg-danger-subtle')
                 .tooltip({
                     title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),
@@ -296,6 +296,14 @@ var requestAnrechnung = {
     },
     alertIfMaxEctsExceededInsideBegruendungsbox: function(){
         let status_kurzbz = $('#requestAnrechnung-status_kurzbz').data('status_kurzbz');
+                    
+        
+                //TODO: used for debugging
+                /* 
+                    var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
+
+                    // Add to Checkbox text
+                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('div').append(msgBeiEctsUeberschreitung); */
 
         if (status_kurzbz != ' ' && status_kurzbz != ANRECHNUNGSTATUS_APPROVED)
         {
@@ -309,7 +317,7 @@ var requestAnrechnung = {
             {
                 return;
             }
-
+            
             // If max ECTS is ecceeded
             if (begruendung_id == 4)
             {
@@ -321,7 +329,7 @@ var requestAnrechnung = {
                     var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
 
                     // Add to Checkbox text
-                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('label').append(msgBeiEctsUeberschreitung);
+                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('div').append(msgBeiEctsUeberschreitung);
                 }
             }
             else
@@ -334,18 +342,22 @@ var requestAnrechnung = {
                     var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
 
                     // Add to Checkbox text
-                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('label').append(msgBeiEctsUeberschreitung);
+                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('div').append(msgBeiEctsUeberschreitung);
                 }
             }
         }
     },
     getMsgBeiEctsUeberschreitung: function(begruendung_id, ects, sumEctsSchulisch, sumEctsBeruflich){
 
-        return $('<span id="sumEctsMsg"></span>')
-            .html(FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTextBeiUeberschreitung",
+        const phraseUsed = '<span class="d-block">Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz wird überschritten.</span><span class=" fw-bold">Bisherige ECTS + ECTS dieser LV: Total: {0} [ Schulisch: {1}  | Beruflich: {2}  ]</span>&emsp;';
+
+        //TODO: needed:
+        /* FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTextBeiUeberschreitung",
                 begruendung_id == 4
                     ? [(sumEctsSchulisch + sumEctsBeruflich + ects), sumEctsSchulisch, (sumEctsBeruflich  + ects)] // beruflich
-                    : [(sumEctsSchulisch + sumEctsBeruflich + ects), (sumEctsSchulisch + ects), sumEctsBeruflich])) // schulisch
+                    : [(sumEctsSchulisch + sumEctsBeruflich + ects), (sumEctsSchulisch + ects), sumEctsBeruflich]) */
+        return $('<div class="p-1" id="sumEctsMsg"></div>')
+            .html(phraseUsed) // schulisch
             .append('<i class="fa fa-lg fa-info-circle"></i>')
             .addClass('bg-danger-subtle')
             .tooltip({

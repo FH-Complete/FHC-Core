@@ -99,10 +99,10 @@ $this->load->view(
 									<div class="card">
 										<div class="card-header">
 											<span class="text-uppercase fw-bold"><?php echo $this->p->t('anrechnung', 'antrag'); ?></span>&emsp;
-											<span  data-toggle="tooltip" data-bs-placement="right"
+											<div class="d-inline"  data-bs-toggle="tooltip" data-bs-placement="right"
 												  data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungInfoTooltipText'); ?>">
 												<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
-											</span>
+											</div>
 											<span class="float-end"><?php echo $this->p->t('anrechnung', 'antragdatum'); ?>: <span
 														id="requestAnrechnung-antragdatum"><?php echo !empty($anrechnungData->anrechnung_id) ? $anrechnungData->insertamum : '-' ?></span></span>
 										</div>
@@ -134,8 +134,8 @@ $this->load->view(
 											</tr>
                                             <tr>
                                                 <th>
-                                                    <?php echo $this->p->t('anrechnung', 'bisherAngerechneteEcts'); ?>
-                                                    <div class="d-inline" data-toggle="tooltip" data-bs-placement="right"
+                                                    <?php echo $this->p->t('anrechnung', 'bisherAngerechneteEcts'); ?>&emsp;
+                                                    <div class="d-inline" data-bs-toggle="tooltip" data-bs-placement="right"
                                                         data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungEctsTooltipText'); ?>">
                                                         <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
                                                     </div>
@@ -144,7 +144,7 @@ $this->load->view(
                                                     Total ECTS: <span id="sumEctsTotal"><?php echo number_format($antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich, 1) ?></span>
                                                     [ Schulisch: <span id="sumEctsSchulisch"><?php echo $antragData->sumEctsSchulisch ?></span> |
                                                     Beruflich: <span id="sumEctsBeruflich"><?php echo $antragData->sumEctsBeruflich ?></span> ]
-                                                    <span id="requestAnrechnung-maxEctsUeberschrittenMsg"></span>
+                                                    <div class="p-1 d-inline-flex align-items-center" id="requestAnrechnung-maxEctsUeberschrittenMsg"></div>
                                                 </td>
                                             </tr>
 											<tr>
@@ -167,31 +167,39 @@ $this->load->view(
 								<div class="col-12">
 									<div class="border border-dark border-3 rounded p-3" >
 										<p ><?php echo $this->p->t('anrechnung', 'antragStellenText'); ?></p>
+										
 										<div class="ps-3 ">
 										
-											<div class="form-check mb-1">
+											<div  class="form-check mb-1">
+											
 												<input class="form-check-input" type="radio" name="begruendung" value="1" <?php echo $anrechnungData->begruendung_id == '1' ? 'checked' : ''; ?> required />
 												<?php echo $this->p->t('anrechnung', 'antragStellenWegenZeugnis'); ?>&emsp;
-												<div class="d-inline" id="requestAnrechnung-anrechnungGrundZeugnisTooltip" data-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
+												<div class="d-inline" id="requestAnrechnung-anrechnungGrundZeugnisTooltip" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
 														data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundZeugnisTooltipText'); ?>" >
 													<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
 												</div>
+											
 											</div>
+										
 											<div class="form-check mb-1">
+											
 												<input class="form-check-input" type="radio" name="begruendung" value="5" <?php echo $anrechnungData->begruendung_id == '5' ? 'checked' : ''; ?>  required />
 												<?php echo $this->p->t('anrechnung', 'antragStellenWegenHochschulzeugnis'); ?>&emsp;
-												<div class="d-inline" id="requestAnrechnung-anrechnungGrundHochschulzeugnisTooltip" data-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
+												<div class="d-inline" id="requestAnrechnung-anrechnungGrundHochschulzeugnisTooltip" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
                                                       data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundZeugnisTooltipText'); ?>">
                                                 	<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
                                                 </div>
+										
 											</div>
 											<div class="form-check mb-1">
+											
 												<input class="form-check-input" type="radio" name="begruendung" value="4" <?php echo $anrechnungData->begruendung_id == '4' ? 'checked' : ''; ?>  required />
 												<?php echo $this->p->t('anrechnung', 'antragStellenWegenPraxis'); ?>&emsp;
-												<div class="d-inline" id="requestAnrechnung-anrechnungGrundBerufTooltip" data-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
+												<div class="d-inline" id="requestAnrechnung-anrechnungGrundBerufTooltip" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
 													  data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundBerufTooltipText'); ?>">
 													<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
 												</div>
+											
 											</div>
 											
                                         
@@ -206,7 +214,7 @@ $this->load->view(
                                     <div class="card">
                                         <div class="card-header">
                                             <span class="fw-bold"><?php echo $this->p->t('anrechnung', 'begruendungEcts'); ?></span>&emsp;
-                                            <div class="d-inline" data-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungBegruendungEctsTooltipText'); ?>">
+                                            <div class="d-inline" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungBegruendungEctsTooltipText'); ?>">
                                                 <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
                                             </div>
 											
@@ -225,7 +233,7 @@ $this->load->view(
                                     <div class="card">
                                         <div class="card-header">
                                             <span class="fw-bold"><?php echo $this->p->t('anrechnung', 'begruendungLvinhalt'); ?></span>&emsp;
-                                            <div class="d-inline" data-toggle="tooltip" data-bs-placement="right"
+                                            <div class="d-inline" data-bs-toggle="tooltip" data-bs-placement="right"
                                                   data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungBegruendungLvinhaltTooltipText'); ?>">
                                                 <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
                                             </div>
@@ -246,7 +254,7 @@ $this->load->view(
 									<div class="card">
 										<div class="card-header">
 											<span class="fw-bold"><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></span>&emsp;
-											<div class="d-inline" data-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundAllgemeinTooltipText'); ?>">
+											<div class="d-inline" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundAllgemeinTooltipText'); ?>">
 												<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
 											</div>
 										</div>
@@ -255,7 +263,7 @@ $this->load->view(
 												<input class="form-control flex-fill" type="file" id="requestAnrechnung-uploadfile"
 														name="uploadfile" accept=".pdf" size="50" data-maxsize="<?php echo (int)ini_get('upload_max_filesize') * 1024 * 1024 ?>"
 														required>
-												<div class="mx-4 " id="requestAnrechnung-uploadTooltip" data-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
+												<div class="mx-4 " id="requestAnrechnung-uploadTooltip" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
 											   		data-bs-title="<?php echo $this->p->t('ui', 'uploadTooltipText'); ?>">
 													<i class="fa fa-lg fa-question-circle-o" aria-hidden="true"></i>
 												</div>
@@ -279,7 +287,7 @@ $this->load->view(
 											<div class="card">
 												<div class="card-header">
 													<span class="fw-bold"><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></span>&emsp;
-													<div class="d-inline" data-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungInfoTooltipText'); ?>">
+													<div class="d-inline" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungInfoTooltipText'); ?>">
 														<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
 													</div>
 												</div>
