@@ -219,6 +219,11 @@ class Status extends FHC_Controller
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				return $this->outputJson(getError($result));
 			}
+			if($result->retval == "0")
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson($result->code);
+			}
 		}
 
 		//TODO(Manu) check permission...
