@@ -356,7 +356,7 @@ export default{
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		CoreRESTClient
-			.get('components/stv/Prestudent/getStudienplaene/' + this.prestudent_id)
+			.get('components/stv/Prestudent/getStudienplaene/' + this.modelValue.prestudent_id)
 			.then(result => CoreRESTClient.getData(result.data) || [])
 			.then(result => {
 				this.listStudienplaene = result;

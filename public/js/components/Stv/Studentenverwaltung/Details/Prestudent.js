@@ -554,24 +554,17 @@ export default {
 		
 		<br>
 
-<!--		{{defaultSemester}} | {{hasAdminPermission}} | {{hasAdminPermission}}-->
-		
-		<div class="col-12 pb-3">
-			<legend>Status</legend>
-			<TblStatus :prestudent_id="modelValue.prestudent_id"></TblStatus>		
-		</div>
-		
-		<hr>
-		
 		
 		<div class="col-8">
 			<legend>Gesamthistorie</legend>
 			<TblHistory :person_id="modelValue.person_id"></TblHistory>		
 		</div>
+		
+<!--		<div class="col-12 pb-3">
+			<legend>Status</legend>
+			<TblStatus :prestudent_id="modelValue.prestudent_id"></TblStatus>		
+		</div>-->
 				
-
-
-	
 		
 	</div>
 	`

@@ -143,7 +143,8 @@ class Student_model extends DB_Model
 		{
 			return error($result);
 		}
-		else {
+		else
+		{
 			$resultObject = current(getData($result));
 
 			if (property_exists($resultObject, 'anzahl')) {
