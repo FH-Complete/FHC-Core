@@ -306,11 +306,24 @@ class AntragJob extends JOB_Controller
 
 			foreach ($prestudents as $prestudent)
 			{
-				$result = $this->prestudentlib->setAbbrecher($prestudent->prestudent_id, $prestudent->studiensemester_kurzbz, $insertvon);
-				if (isError($result))
+				$result = $this->StudierendenantragstatusModel->insert([
+					'studierendenantrag_id' => $prestudent->studierendenantrag_id,
+					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_DEREGISTERED,
+					'insertvon' => 'AntragJob'
+				]);
+				if (isError($result)) {
 					$this->logError(getError($result));
-				else
-					$count++;
+				} else {
+					$deregisterStatus = getData($result);
+
+					$result = $this->prestudentlib->setAbbrecher($prestudent->prestudent_id, '', $insertvon);
+					if (isError($result)) {
+						$this->StudierendenantragstatusModel->delete($deregisterStatus);
+						$this->logError(getError($result));
+					} else {
+						$count++;
+					}
+				}
 			}
 			$this->logInfo($count . " Students set to Abbrecher");
 		}
