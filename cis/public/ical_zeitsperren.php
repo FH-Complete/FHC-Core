@@ -19,9 +19,16 @@
  * 			Manuela Thamer 			<manuela.thamer@technikum-wien.at>
  */
 /**
- * Dieses Script liefert Zeitverfügbarkeiten und -sperren des übergebenen Parameters (uid oder OE)
+ * Dieses Script liefert Zeitverfügbarkeiten und -sperren des übergebenen Parameters (uid, foreign_uid oder oekurz_bz)
  *
- * Aufruf: http://www.example.com/cis/public/ical_zeitsperren.php/[uid_or_oe_kurzbz]
+ * Aufruf: link + [params]
+ * link: URL:',APP_ROOT'/fhcomplete/cis/public/ical_zeitsperren.php/cipher_encryption/
+ * [params]
+ * uid=oesi (Termine: "ZEITSPERRE" bzw."VERFUEGBAR", Bezeichnungen der Zeitsperren)
+ * oe_kurzbz=SystemEntwicklungCore (Termine: "ZEITSPERRE" bzw."VERFUEGBAR", "NAME MITARBEITER")
+ * foreign_uid=oesi (Termine: "ZEITSPERRE" bzw."VERFUEGBAR", "NAME MITARBEITER")
+ * Beispielaufruf php
+ * echo "<a href=" . APP_ROOT. "cis/public/ical_zeitsperren.php/cipher_encryption/".encryptData('uid=oesi',ZEITSPERREN_CYPHER_KEY).">Beispielaufruf <a/>";
  */
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/benutzer.class.php');
@@ -30,50 +37,63 @@ require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/benutzerfunktion.class.php');
 
-$user = get_uid();
-
 $params = mb_substr($_SERVER['PATH_INFO'],1);
 $paramsArray = explode('/',$params);
-$private = false;
 
 if ($paramsArray[0] == 'cipher_encryption')
 {
-	$uid = decryptData($paramsArray[1],ZEITSPERREN_CYPHER_KEY);
-	$private = true;
+	$string = decryptData($paramsArray[1],ZEITSPERREN_CYPHER_KEY);
+}
+$delimiter = "=";
+
+$position = strpos($string, $delimiter);
+if ($position !== false)
+{
+	$substring = substr($string, 0, $position);
 }
 else
 {
-	$uid = $paramsArray[0];
+	die('invalid Parameterformat');
 }
 
-$bn = new benutzer();
-if(!$bn->load($uid))
+$private = ($substring == 'uid') ? true : false;
+
+if($substring == 'uid' || $substring == 'foreign_uid')
 {
+	$uid =  substr($string, $position + 1);
+	$bn = new benutzer();
+	if(!$bn->load($uid))
+		die('uid' . $uid . ' not found');
+	$filename = $uid;
+}
+elseif($substring == 'oe_kurzbz')
+{
+	$oe = substr($string, $position + 1);
+
 	//check if valid Oe
 	$bf = new benutzerfunktion();
-	if($bf->getOeFunktionen($uid, 'oezuordnung'))
+	if ($bf->getOeFunktionen($oe, 'oezuordnung'))
 	{
 		$uidArr = array();
 
-		foreach($bf->result as $uid)
-		{
+		foreach ($bf->result as $uid) {
 			$uidArr[] = $uid->uid;
 		}
 
-		if($uidArr == null)
-			die('User or oe_kurzbz not found');
+		if ($uidArr == null)
+			die('oe_kurzbz not found');
 		else
 			$uid = $uidArr;
+		$filename = $oe;
 	}
-	else
-		die('User or oe_kurzbz invalid');
-
+}
+else
+{
+	die('Parameter not valid');
 }
 
-$private = $user == $uid ? true : false;
-
 header("Content-Type: text/calendar; charset=UTF-8");
-header("Content-disposition: filename=".$uid."_Zeitsperren_Verfuegbarkeiten.ics");
+header("Content-disposition: filename=".$filename."_Zeitsperren_Verfuegbarkeiten.ics");
 
 echo "BEGIN:VCALENDAR\n";
 echo "VERSION:2.0\n";
