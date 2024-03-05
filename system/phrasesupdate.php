@@ -24506,60 +24506,83 @@ array(
 		)
 	),
 	
-	//TODO(Manu) finish merge 
-/*		'phrase' => 'firma_zusatz',
-		'phrases' => array(
+	//TODO(Manu) location missing!
 	array(
 		'app' => 'core',
 		'category' => 'person',
-		'phrase' => 'standort',
+		'phrase' => 'firma_zusatz',
+		'phrases' => array(
+			array(
 				'sprache' => 'German',
 				'text' => 'Firmenzusatz',
-				<<<<<<< HEAD
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
 				'text' => 'add.company info',
-				<<<<<<< HEAD
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
 		'phrase' => 'firma',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
 				'text' => 'Firma',
-				<<<<<<< HEAD
-				'text' => 'location',
-				
-				<<<<<<< HEAD
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'company',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'adresse_new',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
 				'text' => 'Adresse anlegen',
-				
-				<<<<<<< HEAD
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
 				'text' => 'create address',
-				<<<<<<< HEAD
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'adresse_edit',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
 				'text' => 'Adresse bearbeiten',
-				
-				<<<<<<< HEAD
-				'text' => 'edit address',
-				
-				<<<<<<< HEAD
-		'category' => 'person',
-		'phrase' => 'adresse_delete',
-		'phrases' => array(
+				'description' => '',
+				'insertvon' => 'system'
+			),
 			array(
-				'sprache' => 'German',
-				'text' => 'Adresse löschen',
-				
-				<<<<<<< HEAD
-				'text' => 'delete address',
-	
-	*/
-	
+				'sprache' => 'English',
+				'text' => 'edit address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'person',
