@@ -127,13 +127,26 @@ export default{
 			listStudienplaene: [],
 			aufnahmestufen: {'': '-- keine Auswahl --', 1: 1, 2: 2, 3: 3},
 			listStatusgruende: [],
-			statusId: {}
+			statusId: {},
+			gruendeLength: {}
 		}
 	},
 	computed: {
 		gruende() {
 			return this.listStatusgruende.filter(grund => grund.status_kurzbz == this.statusData.status_kurzbz);
 		},
+/*		gruendeLength() {
+			//return Object.keys(this.gruende).length;
+			return 33;
+		}*/
+	},
+	watch: {
+		data: {
+			handler(n) {
+				const start = this.status_kurzbz;
+			},
+			deep: true
+		}
 	},
 	methods: {
 		actionNewStatus() {
@@ -407,6 +420,9 @@ export default{
 		<p>TestData</p>
 		{{statusData}}
 		<hr>
+		{{gruende}}
+		{{gruendeLength}}
+		
 <!--		Berechtigungen:
 			Skip Check: {{hasPermissionToSkipStatusCheck}} |
 			Admin: {{hasAdminPermission}} |
@@ -558,9 +574,8 @@ export default{
 								</form-input>
 							</div>
 						</div>
-						
-						<!--TODO(manu): ganzes Feld ausblenden, wenn kein Statusgrund?-->
-						<div class="row mb-3">
+										
+						<div v-if="gruende.length > 0" class="row mb-3">
 							<label for="grund" class="form-label col-sm-4">Grund</label>
 							<div class="col-sm-6">
 								<form-input 
@@ -584,7 +599,6 @@ export default{
 			
 			<!--Modal: Edit Status-->
 			<BsModal ref="editStatusModal">
-			<!--TODO(manu) check stati: in FAs Absolvent, Abbrecher, Wartender nicht in Liste-->
 				<template #title>Status bearbeiten</template>
 					<form-form class="row g-3" ref="statusData">
 					
@@ -728,8 +742,7 @@ export default{
 							</div>
 						</div>
 						
-						<!--TODO(manu): ganzes Feld ausblenden, wenn kein Statusgrund?-->
-						<div class="row mb-3">
+						<div v-if="gruende.length > 0" class="row mb-3">
 							<label for="grund" class="form-label col-sm-4">Grund</label>
 							<div class="col-sm-6">
 								<form-input 
