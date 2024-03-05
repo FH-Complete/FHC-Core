@@ -24505,8 +24505,25 @@ array(
 			)
 		)
 	),
-	
-	//TODO(Manu) location missing!
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'standort',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Standort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'location',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'person',
