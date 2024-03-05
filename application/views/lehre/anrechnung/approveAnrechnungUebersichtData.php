@@ -218,7 +218,7 @@ $filterWidgetArray = array(
             func_tableBuilt(this);
         },
         tableWidgetFooter: {
-			selectButtons: true
+			selectButtons: false
 		},
 		selectableCheck: function(row){
             return func_selectableCheck(row);

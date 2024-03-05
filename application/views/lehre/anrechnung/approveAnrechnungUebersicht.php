@@ -5,11 +5,12 @@ $this->load->view(
 		'title' => $this->p->t('anrechnung', 'anrechnungenGenehmigen'),
 		'jquery3' => true,
 		'jqueryui1' => true,
-		'bootstrap3' => true,
+		'bootstrap5' => true,
 		'fontawesome4' => true,
 		'tabulator4' => true,
 		'ajaxlib' => true,
 		'dialoglib' => true,
+        'cis'=>true,
 		'tablewidget' => true,
 		'phrases' => array(
 			'global' => array(
@@ -80,7 +81,7 @@ $this->load->view(
 			)
 		),
 		'customJSs' => array(
-			'public/js/bootstrapper.js',
+			//'public/js/bootstrapper5.js',
 			'public/js/lehre/anrechnung/approveAnrechnungUebersicht.js'
 		)
 	)
@@ -89,20 +90,23 @@ $this->load->view(
 
 <div id="page-wrapper">
     <div class="container-fluid">
-        <!-- title -->
+        <!-- header -->
         <div class="row">
-            <div class="col-lg-12 page-header">
-                <h3>
+            <div class="col-12 mt-5 mb-3 pb-2 border-bottom">
+                <h3 class="fw-normal ">
 					<?php echo $this->p->t('anrechnung', 'anrechnungenGenehmigen'); ?>
-                    <small>| <?php echo ucfirst($this->p->t('global', 'uebersicht')); ?></small>
+                    <small class="text-secondary fs-6">| <?php echo ucfirst($this->p->t('global', 'uebersicht')); ?></small>
                 </h3>
             </div>
         </div>
+    
+        <!-- end header -->
+
         <!-- dropdown studiensemester -->
         <div class="row">
-            <div class="col-lg-12">
-                <form id="formApproveAnrechnungUebersicht" class="form-inline" action="" method="get" data-readonly="<?php echo json_encode($hasReadOnlyAccess)?>" data-createaccess="<?php echo json_encode($hasCreateAnrechnungAccess)?>">
-                    <div class="form-group">
+            <div class="col-12">
+                <form id="formApproveAnrechnungUebersicht" class="row align-items-center" action="" method="get" data-readonly="<?php echo json_encode($hasReadOnlyAccess)?>" data-createaccess="<?php echo json_encode($hasCreateAnrechnungAccess)?>">
+                    <div class="col-auto">
 						<?php
 						echo $this->widgetlib->widget(
 							'Studiensemester_widget',
@@ -111,13 +115,15 @@ $this->load->view(
 							),
 							array(
 								'name' => 'studiensemester',
-								'id' => 'studiensemester'
+								'id'=>'studiensemester',
+                                'class'=>'form-select w-auto ',
 							)
 						);
 						?>
                     </div>
+                    
                     <button type="submit"
-                            class="btn btn-default form-group"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
+                            class="btn btn-outline-secondary col-auto"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
                 </form>
             </div>
         </div>
@@ -132,6 +138,7 @@ $this->load->view(
             <div class="panel panel-default panel-body" style="display: none"
                  id="approveAnrechnungUebersicht-begruendung-panel">
                 <div>
+                
                     <h4 class="panel panel-body panel-danger text-danger"><?php echo $this->p->t('anrechnung', 'genehmigungenNegativQuestion'); ?></h4>
                     &nbsp;<b><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?>
                     <span class="text-danger">
@@ -193,35 +200,35 @@ $this->load->view(
         <!-- Filter buttons / Submit buttons-->
         <div class="row">
             <!-- Filter buttons -->
-            <div class="col-xs-4 col-md-5">
+            <div class="col-4 col-md-5">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
-                        <button id="show-inProgressDP" class="btn btn-default btn-clearfilter" type="button"
+                        <button id="show-inProgressDP" class="btn btn-outline-secondary btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
                                 title="<?php echo $this->p->t('ui', 'alleInBearbeitungSTGL'); ?>">
                                     <i class='fa fa-eye'></i>
                         </button>
-                        <button id="show-inProgressLektor" class="btn btn-default btn-clearfilter" type="button"
+                        <button id="show-inProgressLektor" class="btn btn-outline-secondary btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
                                 title="<?php echo $this->p->t('ui', 'alleInBearbeitungLektor'); ?>"><i
                                     class='fa fa-clock-o'></i>
                         </button>
-                        <button id="show-recommended" class="btn btn-default btn-clearfilter" type="button"
+                        <button id="show-recommended" class="btn btn-outline-secondary btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
                                 title="<?php echo $this->p->t('ui', 'nurEmpfohleneAnzeigen'); ?>"><i
                                     class='fa fa-thumbs-o-up'></i>
                         </button>
-                        <button id="show-not-recommended" class="btn btn-default btn-clearfilter" type="button"
+                        <button id="show-not-recommended" class="btn btn-outline-secondary btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
                                 title="<?php echo $this->p->t('ui', 'nurNichtEmpfohleneAnzeigen'); ?>"><i
                                     class='fa fa-thumbs-o-down'></i>
                         </button>
-                        <button id="show-approved" class="btn btn-default btn-clearfilter" type="button"
+                        <button id="show-approved" class="btn btn-outline-secondary btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
                                 title="<?php echo $this->p->t('ui', 'nurGenehmigteAnzeigen'); ?>"><i
                                     class='fa fa-check'></i>
                         </button>
-                        <button id="show-rejected" class="btn btn-default btn-clearfilter" type="button"
+                        <button id="show-rejected" class="btn btn-outline-secondary btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
                                 title="<?php echo $this->p->t('ui', 'nurAbgelehnteAnzeigen'); ?>"><i
                                     class='fa fa-times'></i>

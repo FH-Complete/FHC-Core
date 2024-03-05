@@ -73,8 +73,8 @@ $this->load->view(
     <div class="container-fluid">
         <!-- header -->
         <div class="row">
-            <div class="col-12 mt-4 mb-3 pb-2 border-bottom">
-                <h3 class="fw-normal mt-2 mb-1">
+            <div class="col-12 mt-5 mb-3 pb-2 border-bottom">
+                <h3 class="fw-normal">
 					<?php echo $this->p->t('anrechnung', 'anerkennungNachgewiesenerKenntnisse'); ?>
                     <small class="text-secondary fs-6">| <?php echo $this->p->t('anrechnung', 'antragStellen'); ?></small>
                 </h3>
