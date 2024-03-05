@@ -56,13 +56,32 @@ export default {
 			listStgTyp: [],
 			listFoerderrelevant: [],
 			initialFormData: {},
-			deltaArray: [],
-			actionUpdate: false,
+			deltaArray: {},
+			actionUpdate: false
 		};
 	},
 	computed: {
+		deltaLength() {
+			return Object.keys(this.deltaArray).length;
+		}
 	},
 	watch: {
+		data: {
+			// TODO(chris): use @input instead?
+			handler(n) {
+
+				const delta = {};
+				for (const key in this.data) {
+					if (this.data[key] !== this.initialFormData[key]) {
+						delta[key] = this.data[key];
+						this.actionUpdate = true;
+					}
+				}
+				//this.deltaArray.push(delta);
+				this.deltaArray = delta;
+			},
+			deep: true
+		}
 	},
 
 	methods: {
@@ -78,13 +97,6 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updatePrestudent(){
-			this.detectChanges();
-
-/*			this.$nextTick(() => {
-
-				if (this.actionUpdate) {
-					console.log("Action");*/
-					//todo(manu) checken, ob überhaupt eine Änderung vorgenommen wurde
 					CoreRESTClient.post('components/stv/Prestudent/updatePrestudent/' + this.modelValue.prestudent_id,
 						this.deltaArray
 					).then(response => {
@@ -105,14 +117,9 @@ export default {
 					}).finally(() => {
 						window.scrollTo(0, 0);
 					});
-
-/*				} else {
-					console.log("no action");
-				}
-			});*/
-
 		},
-		detectChanges() {
+/* //besser im watch teil, dann wird Änderung immer verfolgt
+detectChanges() {
 			const delta = {};
 			for (const key in this.data) {
 				if (this.data[key] !== this.initialFormData[key]) {
@@ -121,7 +128,7 @@ export default {
 				}
 			}
 			this.deltaArray.push(delta);
-		},
+		},*/
 	},
 	created() {
 		this.loadPrestudent();
@@ -196,13 +203,11 @@ export default {
 	<div class="stv-details-details h-100 pb-3">
 		<form-form ref="form" class="stv-details-prestudent" @submit.prevent="updatePrestudent">
 		<div class="position-sticky top-0 z-1">
-		<!--TODO(manu) Button inactiv setzen, wenn keine Änderungen-->
-			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" >Speichern</button>
+			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!deltaLength">Speichern</button>
 		</div>
-		<!--<form ref="form">-->
 			<fieldset class="overflow-hidden">
 				<legend>Zugangsvoraussetzungen für {{modelValue.nachname}} {{modelValue.vorname}}</legend>
-	<!--				<template v-if="data">-->
+
 						<div class="row mb-3">
 							<form-input
 								container-class="col-3"
@@ -552,8 +557,8 @@ export default {
 		
 		<br>
 
-		
-		<div class="col-8">
+					
+		<div class="col-8 d-flex justify-content-center">
 			<legend>Gesamthistorie</legend>
 			<TblHistory :person_id="modelValue.person_id"></TblHistory>		
 		</div>
