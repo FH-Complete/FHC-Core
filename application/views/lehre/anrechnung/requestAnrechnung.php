@@ -14,6 +14,7 @@ $this->load->view(
 		'fontawesome4' => true,
 		'ajaxlib' => true,
 		'dialoglib' => true,
+		'cis'=>true,
 		'phrases' => array(
 			'global' => array(
 				'anerkennungNachgewiesenerKenntnisse',
@@ -306,7 +307,7 @@ $this->load->view(
 									<div class="border border-3 rounded border-dark p-3" >
 										
 											<div class="form-check">
-											<input class="form-check-input" type="checkbox" name="bestaetigung" required>
+											<input class="form-check-input border-3" type="checkbox" name="bestaetigung" required>
 											<small  class=" fw-bold"><?php echo $this->p->t('anrechnung', 'bestaetigungstext'); ?></small>
 											</div>
 									</div>
