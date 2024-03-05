@@ -346,15 +346,25 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 <hbox>
 	<label value="Note" control="student-noten-menulist-note"/>
 	<menulist id="student-noten-menulist-note" disabled="true"
-	          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
-	          ref="http://www.technikum-wien.at/note/liste"
-	          oncommand="StudentNoteSpeichern()">
+				xmlns:NOTE="http://www.technikum-wien.at/note/rdf#"
+				datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
+				ref="http://www.technikum-wien.at/note/liste"
+				oncommand="StudentNoteSpeichern()">
 		<template>
-			<menupopup>
-				<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
-	        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
-				  		  uri="rdf:*"/>
+			<rule NOTE:aktiv='false'>
+				<menupopup>
+					<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+								label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+								uri="rdf:*" style="text-decoration:line-through;"/>
 				</menupopup>
+			</rule>
+			<rule>
+				<menupopup>
+					<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+								label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+								uri="rdf:*"/>
+				</menupopup>
+			</rule>
 		</template>
 	</menulist>
 	<label value="Punkte" control="student-noten-textbox-punkte" hidden="<?php echo $punktehidden; ?>"/>

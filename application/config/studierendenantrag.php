@@ -126,6 +126,7 @@ $config['antrag_job_systemuser'] = '';
  * @var array			Array of tbl_status.status_kurzbz's
  */
 $config['antrag_prestudentstatus_whitelist'] = ['Student', 'Diplomand'];
+$config['antrag_prestudentstatus_whitelist_abmeldung'] = ['Student', 'Diplomand', 'Unterbrecher'];
 
 
 /**

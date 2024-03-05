@@ -57,7 +57,7 @@ if (!$db->db_query($query) || !$db->db_num_rows())
 <antraege>
 	<?php while($row = $db->db_fetch_object()) { ?>
 	<antrag>
-        <name><![CDATA[<?= trim($row->vorname . $row->nachname); ?>]]></name>
+        <name><![CDATA[<?= trim($row->vorname . ' ' . $row->nachname); ?>]]></name>
         <studiengang><![CDATA[<?= $row->bezeichnung; ?>]]></studiengang>
         <organisationsform><![CDATA[<?= $row->bezeichnung_mehrsprachig; ?>]]></organisationsform>
         <personenkz><![CDATA[<?= $row->matrikelnr; ?>]]></personenkz>

@@ -30,9 +30,10 @@ class SearchBarLib
 	const ERROR_WRONG_SEARCHSTR = 'ERR002';
 	const ERROR_NO_TYPES = 'ERR003';
 	const ERROR_WRONG_TYPES = 'ERR004';
+	const ERROR_NOT_AUTH = 'ERR005';
 
 	// List of allowed types of search
-	const ALLOWED_TYPES = ['mitarbeiter', 'organisationunit', 'raum', 'person', 'student', 'prestudent', 'document', 'cms'];
+	const ALLOWED_TYPES = ['mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'organisationunit', 'raum', 'person', 'student', 'prestudent', 'document', 'cms'];
 
 	const PHOTO_IMG_URL = '/cis/public/bild.php?src=person&person_id=';
 
@@ -108,6 +109,92 @@ class SearchBarLib
 		return $result;
 	}
 
+	private function _mitarbeiter_ohne_zuordnung($searchstr, $type) 
+	{
+		$dbModel = new DB_Model();
+
+		$sql = '
+			SELECT
+				\''.$type.'\' AS type,
+				b.uid AS uid,
+				p.person_id AS person_id,
+				p.vorname || \' \' || p.nachname AS name,
+				ARRAY_AGG(DISTINCT(org.bezeichnung)) AS organisationunit_name,
+				COALESCE(b.alias, b.uid) || \''.'@'.DOMAIN.'\' AS email,
+				TRIM(COALESCE(k.kontakt, \'\') || \' \' || COALESCE(m.telefonklappe, \'\')) AS phone,
+				\''.base_url(self::PHOTO_IMG_URL).'\' || p.person_id AS photo_url, 
+				ARRAY_AGG(DISTINCT(stdkst.bezeichnung)) AS standardkostenstelle 
+			  FROM public.tbl_mitarbeiter m
+			  JOIN public.tbl_benutzer b ON(b.uid = m.mitarbeiter_uid)
+			  LEFT JOIN (
+				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
+				  FROM public.tbl_benutzerfunktion bf
+				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
+				 WHERE bf.funktion_kurzbz = \'kstzuordnung\'
+				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
+				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
+				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
+			) stdkst ON stdkst.uid = b.uid 
+			  JOIN public.tbl_person p USING(person_id)
+			  LEFT JOIN (
+				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
+				  FROM public.tbl_benutzerfunktion bf
+				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
+				 WHERE bf.funktion_kurzbz = \'oezuordnung\'
+				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
+				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
+				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
+			) org ON org.uid = b.uid 
+		     LEFT JOIN (
+				SELECT kontakt, standort_id
+				  FROM public.tbl_kontakt
+				 WHERE kontakttyp = \'telefon\'
+			) k ON(k.standort_id = m.standort_id)
+			 WHERE 
+				(stdkst.bezeichnung IS NULL 
+				OR org.bezeichnung IS NULL) 
+				AND (
+			' .
+			$this->buildSearchClause(
+				$dbModel, 
+				array('b.uid', 'p.vorname', 'p.nachname'), 
+				$searchstr
+			) .
+			'
+				)
+		      GROUP BY type, b.uid, p.person_id, name, email, m.telefonklappe, phone
+		';
+
+		$employees = $dbModel->execReadOnlyQuery($sql);
+		
+		// If something has been found then return it
+		if (hasData($employees)) return getData($employees);
+
+		// Otherwise return an empty array
+		return array();
+	}
+
+	protected function buildSearchClause(DB_Model $dbModel, array $columns, $searchstr)
+	{
+		$document			 = implode(' || \' \' || ', $columns);
+		$query				 = '\'' . implode(':* & ', explode(' ', trim($searchstr))) . ':*\'';
+		$reversequery		 = '\'*:' . implode(' & *:', explode(' ', trim($searchstr))) . '\'';
+		$nospacequery		 = '\'' . implode('', explode(' ', trim($searchstr))) . ':*\'';
+
+		$searchclause = <<<EOSC
+			to_tsvector(lower(regexp_replace({$document}, '[[:punct:]]', ' ', 'g'))) @@ to_tsquery(lower({$query}))
+			OR
+			to_tsvector(reverse(lower(regexp_replace({$document}, '[[:punct:]]', ' ', 'g')))) @@ to_tsquery(reverse(lower({$reversequery})))
+			OR
+			to_tsvector(lower(regexp_replace({$document}, '[[:punct:]]', ' ', 'g'))) @@ to_tsquery(lower({$nospacequery}))
+	
+EOSC;
+
+		return $searchclause;
+	}
+
 	/**
 	 * Search for employees
 	 */
@@ -129,34 +216,38 @@ class SearchBarLib
 			  FROM public.tbl_mitarbeiter m
 			  JOIN public.tbl_benutzer b ON(b.uid = m.mitarbeiter_uid)
 			  JOIN (
-				SELECT o.bezeichnung, bf.uid
+				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
 				  FROM public.tbl_benutzerfunktion bf
 				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
 				 WHERE bf.funktion_kurzbz = \'kstzuordnung\'
 				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
 				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
-				GROUP BY o.bezeichnung, bf.uid
+				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
 			) stdkst ON stdkst.uid = b.uid 
 			  JOIN public.tbl_person p USING(person_id)
 			  JOIN (
-				SELECT o.bezeichnung, bf.uid
+				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
 				  FROM public.tbl_benutzerfunktion bf
 				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
 				 WHERE bf.funktion_kurzbz = \'oezuordnung\'
 				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
 				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
-				GROUP BY o.bezeichnung, bf.uid
+				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
 			) org ON org.uid = b.uid 
 		     LEFT JOIN (
 				SELECT kontakt, standort_id
 				  FROM public.tbl_kontakt
 				 WHERE kontakttyp = \'telefon\'
 			) k ON(k.standort_id = m.standort_id)
-			 WHERE b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			    OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			    OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			    OR org.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			    OR stdkst.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			 WHERE ' .
+			$this->buildSearchClause(
+				$dbModel, 
+				array('b.uid', 'p.vorname', 'p.nachname', 'org.bezeichnung', 'stdkst.bezeichnung'), 
+				$searchstr
+			) .
+			'
 		      GROUP BY type, b.uid, p.person_id, name, email, m.telefonklappe, phone
 		');
 
@@ -178,15 +269,17 @@ class SearchBarLib
 			SELECT
 				\''.$type.'\' AS type,
 				o.oe_kurzbz AS oe_kurzbz,
-				o.bezeichnung AS name,
+				\'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS name,
 				oParent.oe_kurzbz AS parentoe_kurzbz,
-				oParent.bezeichnung AS parentoe_name,
+				(CASE WHEN oParent.bezeichnung IS NOT NULL THEN \'[\' || otParent.bezeichnung || \'] \' || oParent.bezeichnung END) AS parentoe_name,
 				ARRAY_AGG(DISTINCT(bfLeader.uid)) AS leader_uid,
 				ARRAY_AGG(DISTINCT(bfLeader.vorname || \' \' || bfLeader.nachname)) AS leader_name,
 				COUNT(bfCount.benutzerfunktion_id) AS number_of_people,
 				(CASE WHEN o.mailverteiler = TRUE THEN o.oe_kurzbz || \''.'@'.DOMAIN.'\' END) AS mailgroup
 			  FROM public.tbl_organisationseinheit o
+			  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
 		     LEFT JOIN public.tbl_organisationseinheit oParent ON(oParent.oe_kurzbz = o.oe_parent_kurzbz)
+			 LEFT JOIN public.tbl_organisationseinheittyp otParent ON(oParent.organisationseinheittyp_kurzbz = otParent.organisationseinheittyp_kurzbz)
 		     LEFT JOIN (
 				SELECT benutzerfunktion_id, oe_kurzbz
 				  FROM public.tbl_benutzerfunktion
@@ -204,9 +297,14 @@ class SearchBarLib
 				   AND (datum_bis IS NULL OR datum_bis >= NOW())
 				   AND b.aktiv = TRUE
 			) bfLeader ON(bfLeader.oe_kurzbz = o.oe_kurzbz)
-			 WHERE o.oe_kurzbz ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			    OR o.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-		      GROUP BY type, o.oe_kurzbz, o.bezeichnung, oParent.oe_kurzbz, oParent.bezeichnung
+			 WHERE ' .
+			$this->buildSearchClause(
+				$dbModel, 
+				array('o.oe_kurzbz', 'o.bezeichnung', 'ot.bezeichnung'), 
+				$searchstr
+			) .
+			'
+		      GROUP BY type, o.oe_kurzbz, o.bezeichnung, ot.bezeichnung, oParent.oe_kurzbz, oParent.bezeichnung, otParent.bezeichnung
 		');
 
 		// If something has been found

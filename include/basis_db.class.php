@@ -163,6 +163,44 @@ abstract class db extends basis
 		return $rows;
 	}
 
+	/**
+	 * Replace the password names with the related passwords in a SQL string, to decrypt data from the DB
+	 */
+	protected function replaceSQLDecryptionPassword($sql)
+	{
+		$newSQL = null;
+
+		// If the global constant CI_ENVIRONMENT is not defined then return a failure
+		if (!defined('CI_ENVIRONMENT')) return null;
+
+		if(!defined('BASEPATH'))
+			define('BASEPATH', 'LEGACY_WORKAROUND'); // little trick to load a CI config file
+
+		// Tries to include the CI config file that contains password for the database encryption
+		// If the include fails then return a failure
+		if (!include(dirname(__FILE__).'/../application/config/'.CI_ENVIRONMENT.'/db_crypt.php')) return null;
+
+		// Array that will contains all the DB decryption password
+		$decryptionPasswordsArray = array();
+		// Array that will contains all the DB decryption password names
+		$decryptionPasswordNamesArray = array();
+
+		// For each password found in the config array
+		foreach ($config['encryption_passwords'] as $name => $password)
+		{
+			// Copy the password name using this template: '{$'<password name>'}'
+			$decryptionPasswordArray[] = $password;
+			$decryptionPasswordNamesArray[] = '${'.$name.'}';
+		}
+
+		// Replace the password names with the password values
+		$newSQL = str_replace($decryptionPasswordNamesArray, $decryptionPasswordArray, $sql);
+
+		// In case the replacement is a failure
+		if ($newSQL == '' || $newSQL == null) return null;
+
+		return $newSQL; // OK
+	}
 }
 require_once(dirname(__FILE__).'/'.DB_SYSTEM.'.class.php');
 

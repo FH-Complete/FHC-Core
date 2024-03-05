@@ -85,7 +85,6 @@ if(isset($_GET['prestudent']) && $_GET['prestudent']=='false')
 else
 	$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('assistenz'));
 
-//var_dump($berechtigung);
 array_unique($berechtigt_studiengang);
 $stg_kz_query='';
 if (count($berechtigt_studiengang)>0)
@@ -309,6 +308,24 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 						<VERBAND:orgform><![CDATA['.$orgform.']]></VERBAND:orgform>
 					</RDF:Description>
 
+					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/bewerber/reihungstestangemeldet/teilgenommen" >
+						<VERBAND:name>Teilgenommen</VERBAND:name>
+						<VERBAND:stg><![CDATA['.$stg_kurzbz.']]></VERBAND:stg>
+						<VERBAND:stg_kz><![CDATA['.$stg_kz.']]></VERBAND:stg_kz>
+						<VERBAND:stsem><![CDATA['.$stsem->studiensemester_kurzbz.']]></VERBAND:stsem>
+						<VERBAND:typ>bewerberrtangemeldetteilgenommen</VERBAND:typ>
+						<VERBAND:orgform><![CDATA['.$orgform.']]></VERBAND:orgform>
+					</RDF:Description>
+					
+					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/bewerber/reihungstestangemeldet/nichtteilgenommen" >
+						<VERBAND:name>Nicht teilgenommen</VERBAND:name>
+						<VERBAND:stg><![CDATA['.$stg_kurzbz.']]></VERBAND:stg>
+						<VERBAND:stg_kz><![CDATA['.$stg_kz.']]></VERBAND:stg_kz>
+						<VERBAND:stsem><![CDATA['.$stsem->studiensemester_kurzbz.']]></VERBAND:stsem>
+						<VERBAND:typ>bewerberrtangemeldetnichtteilgenommen</VERBAND:typ>
+						<VERBAND:orgform><![CDATA['.$orgform.']]></VERBAND:orgform>
+					</RDF:Description>
+
 					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/aufgenommen" >
 						<VERBAND:name>Aufgenommen</VERBAND:name>
 						<VERBAND:stg><![CDATA['.$stg_kurzbz.']]></VERBAND:stg>
@@ -364,9 +381,16 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 			$orgform_sequence[$stg_kz].= "\n\t\t\t</RDF:li>\n";
 			
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
-			$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber\">\n";
+			$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber\">\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestnichtangemeldet\" />\n";
-			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet\" />\n";
+			
+			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
+			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet\">\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet/teilgenommen\" />\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet/nichtteilgenommen\" />\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t</RDF:Seq>";
+			$orgform_sequence[$stg_kz].= "\n\t\t\t</RDF:li>\n";
+			
 			$orgform_sequence[$stg_kz].= "\t\t\t\t</RDF:Seq>";
 			$orgform_sequence[$stg_kz].= "\n\t\t\t</RDF:li>\n";
 			
@@ -663,6 +687,22 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><![CDATA[<?php echo $stsem->studiensemester_kurzbz; ?>]]></VERBAND:stsem>
 				<VERBAND:typ><![CDATA[bewerberrtangemeldet]]></VERBAND:typ>
 			</RDF:Description>
+			
+			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/bewerber/reihungstestangemeldet/teilgenommen'; ?>" >
+				<VERBAND:name><![CDATA[Teilgenommen]]></VERBAND:name>
+				<VERBAND:stg><![CDATA[<?php echo $stg_kurzbz; ?>]]></VERBAND:stg>
+				<VERBAND:stg_kz><![CDATA[<?php echo $row->studiengang_kz; ?>]]></VERBAND:stg_kz>
+				<VERBAND:stsem><![CDATA[<?php echo $stsem->studiensemester_kurzbz; ?>]]></VERBAND:stsem>
+				<VERBAND:typ><![CDATA[bewerberrtangemeldetteilgenommen]]></VERBAND:typ>
+			</RDF:Description>
+			
+			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/bewerber/reihungstestangemeldet/nichtteilgenommen'; ?>" >
+				<VERBAND:name><![CDATA[Nicht teilgenommen]]></VERBAND:name>
+				<VERBAND:stg><![CDATA[<?php echo $stg_kurzbz; ?>]]></VERBAND:stg>
+				<VERBAND:stg_kz><![CDATA[<?php echo $row->studiengang_kz; ?>]]></VERBAND:stg_kz>
+				<VERBAND:stsem><![CDATA[<?php echo $stsem->studiensemester_kurzbz; ?>]]></VERBAND:stsem>
+				<VERBAND:typ><![CDATA[bewerberrtangemeldetnichtteilgenommen]]></VERBAND:typ>
+			</RDF:Description>
 
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/aufgenommen'; ?>" >
 				<VERBAND:name><![CDATA[Aufgenommen]]></VERBAND:name>
@@ -874,9 +914,15 @@ draw_orgformpart($stg_kz);
 					echo "\n\t\t\t</RDF:li>\n";
 					
 					echo "\t\t\t<RDF:li>";
-					echo "\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber\">\n";
+					echo "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber\">\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber/reihungstestnichtangemeldet\" />\n";
-					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet\" />\n";
+					echo "\t\t\t<RDF:li>";
+					echo "\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet\">\n";
+					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet/teilgenommen\" />\n";
+					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet/nichtteilgenommen\" />\n";
+					echo "\t\t\t\t</RDF:Seq>";
+					echo "\n\t\t\t</RDF:li>\n";
+					
 					echo "\t\t\t\t</RDF:Seq>";
 					echo "\n\t\t\t</RDF:li>\n";
 
