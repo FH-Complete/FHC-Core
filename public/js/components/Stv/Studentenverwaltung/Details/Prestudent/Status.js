@@ -135,6 +135,18 @@ export default{
 		gruende() {
 			return this.listStatusgruende.filter(grund => grund.status_kurzbz == this.statusData.status_kurzbz);
 		},
+/*		gruendeLength() {
+			//return Object.keys(this.gruende).length;
+			return 33;
+		}*/
+	},
+	watch: {
+		data: {
+			handler(n) {
+				const start = this.status_kurzbz;
+			},
+			deep: true
+		}
 	},
 	methods: {
 		actionNewStatus() {
@@ -407,6 +419,9 @@ export default{
 		
 		<p>TestData</p>
 		{{statusData}}
+		<hr>
+		{{gruende}}
+		{{gruendeLength}}
 		
 <!--		Berechtigungen:
 			Skip Check: {{hasPermissionToSkipStatusCheck}} |
