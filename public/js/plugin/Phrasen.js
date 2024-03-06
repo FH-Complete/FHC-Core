@@ -25,8 +25,8 @@ const phrasen = {
 		if (Array.isArray(category))
 			return Promise.all(category.map(cat => this.loadCategory(cat)));
 		if (!loadingModules[category])
-			loadingModules[category] = this.config.globalProperties.$fhcApi
-				.get('/api/frontend/v1/phrasen/loadModule/' + category)
+			loadingModules[category] = this.config.globalProperties
+				.$fhcApi.factory.phrasen.loadCategory(category)
 				.then(res => res?.data ? extractCategory(res.data, category) : {})
 				.then(res => {
 					categories[category] = res;
