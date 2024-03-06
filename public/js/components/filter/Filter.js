@@ -75,7 +75,6 @@ export const CoreFilterCmpt = {
 			dataset: null,
 			datasetMetadata: null,
 			selectedFields: null,
-			notSelectedFields: null,
 			filterFields: null,
 
 			availableFilters: null,
@@ -267,7 +266,6 @@ export const CoreFilterCmpt = {
 				this.datasetMetadata = data.datasetMetadata;
 				this.fields = data.fields;
 				this.selectedFields = data.selectedFields;
-				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
 				this.filterFields = [];
 
 				for (let i = 0; i < data.datasetMetadata.length; i++)
