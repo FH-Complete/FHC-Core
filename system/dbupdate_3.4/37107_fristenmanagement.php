@@ -8,7 +8,8 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		$qry = "
         CREATE TABLE IF NOT EXISTS hr.tbl_frist (
             frist_id bigserial NOT NULL,
-            mitarbeiter_uid character varying(32) NOT NULL,
+            mitarbeiter_uid character varying(32),
+            verantwortlich_uid character varying(32),
             ereignis_kurzbz character varying(32) NOT NULL,
             bezeichnung varchar(255),
             datum date,
@@ -42,6 +43,10 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
 		ON DELETE SET NULL ON UPDATE CASCADE;
 
+        ALTER TABLE hr.tbl_frist ADD CONSTRAINT tbl_frist_verantwortlich_uid_fk FOREIGN KEY (verantwortlich_uid)
+		REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
+		ON DELETE SET NULL ON UPDATE CASCADE;
+
         ALTER TABLE hr.tbl_frist ADD CONSTRAINT tbl_frist_ereignis_kurzbz_fk FOREIGN KEY (ereignis_kurzbz)
 		REFERENCES hr.tbl_frist_ereignis (ereignis_kurzbz) MATCH FULL
 		ON DELETE SET NULL ON UPDATE CASCADE;
@@ -55,6 +60,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
         GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_frist_ereignis TO vilesci;
 
         INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung) VALUES('neu','Neu');
+        INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung) VALUES('in_bearbeitung','In Bearbeitung');
         INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung) VALUES('erledigt','Erledigt');
 
         INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung) VALUES('dv_beginn','DV Beginn');
