@@ -62,7 +62,7 @@ const phrasen = {
 
 export default {
 	install(app, options) {
-		app.use(FhcApi);
+		app.use(FhcApi, options?.fhcApi || undefined);
 		app.config.globalProperties.$p = {
 			t: phrasen.t,
 			loadCategory: cat => phrasen.loadCategory.call(app, cat),
