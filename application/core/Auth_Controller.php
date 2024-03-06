@@ -7,6 +7,10 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
  */
 abstract class Auth_Controller extends FHC_Controller
 {
+	// Special Permissions
+	const PERM_ANONYMOUS = 'anonymous'; // Everyone
+	const PERM_LOGGED = 'logged_in'; // Every registered user
+
 	/**
 	 * Extends this controller if authentication is required
 	 */
@@ -14,11 +18,32 @@ abstract class Auth_Controller extends FHC_Controller
 	{
         parent::__construct();
 
-		// Loads authentication library and starts authentication
-		$this->load->library('AuthLib');
+		if (!is_array($requiredPermissions) || isEmptyArray($requiredPermissions))
+			show_error('The given permissions is not a valid array or it is an empty one');
+		
+		if (!isset($requiredPermissions[$this->router->method]))
+			show_error('The given permission array does not contain the given method or is not correctly set');
+		
+		$anonAllowed = false;
+		if ($requiredPermissions[$this->router->method] == self::PERM_ANONYMOUS)
+			$anonAllowed = true;
+		elseif (is_array($requiredPermissions[$this->router->method])
+			&& in_array(self::PERM_ANONYMOUS, $requiredPermissions[$this->router->method]))
+			$anonAllowed = true;
 
-		// Checks if the caller is allowed to access to this content
-		$this->_isAllowed($requiredPermissions);
+		if ($anonAllowed) {
+			// Loads authentication library without authentication
+			$this->load->library('AuthLib', [false]);
+
+			// Loads helper since it would only be called on authentication
+			$this->load->helper('hlp_authentication');
+		} else {
+			// Loads authentication library and starts authentication
+			$this->load->library('AuthLib');
+
+			// Checks if the caller is allowed to access to this content
+			$this->_isAllowed($requiredPermissions);
+		}
 	}
 
 	/**
