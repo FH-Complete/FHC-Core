@@ -1,3 +1,5 @@
+import FhcApi from './FhcApi.js';
+
 const categories = Vue.reactive({});
 const loadingModules = {};
 
@@ -23,13 +25,11 @@ const phrasen = {
 		if (Array.isArray(category))
 			return Promise.all(category.map(cat => this.loadCategory(cat)));
 		if (!loadingModules[category])
-			loadingModules[category] = axios
-				.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/phrasen/loadModule/' + category)
+			loadingModules[category] = this.config.globalProperties.$fhcApi
+				.get('/api/frontend/v1/phrasen/loadModule/' + category)
+				.then(res => res?.data ? extractCategory(res.data, category) : {})
 				.then(res => {
-					if (res?.data?.data)
-						categories[category] = extractCategory(res.data.data, category);
-					else
-						categories[category] = {};
+					categories[category] = res;
 				});
 		return loadingModules[category];
 	},
@@ -62,6 +62,11 @@ const phrasen = {
 
 export default {
 	install(app, options) {
-		app.config.globalProperties.$p = phrasen;
+		app.use(FhcApi);
+		app.config.globalProperties.$p = {
+			t: phrasen.t,
+			loadCategory: cat => phrasen.loadCategory.call(app, cat),
+			t_ref: phrasen.t_ref
+		};
 	}
 }

@@ -5,8 +5,12 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class Phrasen extends FHC_Controller
+class Phrasen extends FHCAPI_Controller
 {
+	public function __construct()
+	{
+		parent::__construct(['loadModule' => [self::PERM_ANONYMOUS]]);
+	}
 	
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
@@ -17,11 +21,6 @@ class Phrasen extends FHC_Controller
 	public function loadModule($module)
 	{
 		$this->load->library('PhrasesLib', [$module], 'pj');
-		$this->outputJson([
-			'data' => json_decode($this->pj->getJSON()),
-			'meta' => [
-				'status' => FHCAPI_Controller::STATUS_SUCCESS
-			]
-		]);
+		$this->terminateWithSuccess(json_decode($this->pj->getJSON()));
 	}
 }
