@@ -1,5 +1,5 @@
 import FhcAlert from './FhcAlert.js';
-import FhcApiFactory from '../apps/api/fhcapifactory.js';
+import FhcApiFactory from '../api/fhcapifactory.js';
 
 
 export default {
