@@ -176,6 +176,12 @@ class FilterCmptLib
 		// Read the all session for this filter component
 		$session = $this->getSession();
 
+		// Was there an error before?
+		if (is_object($session)) {
+			$this->_setSession(null);
+			$session = null;
+		}
+
 		// If session is NOT empty -> a filter was already loaded
 		if ($session != null)
 		{
@@ -265,6 +271,11 @@ class FilterCmptLib
 						)
 					);
 				}
+			}
+			else
+			{
+				$this->_setSession(error('Entries in the DB missing!'));
+				return;
 			}
 		}
 

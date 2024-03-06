@@ -41,7 +41,14 @@ class Filter extends FHC_Controller
 	 */
 	public function getFilter()
 	{
-		$this->outputJsonSuccess($this->filtercmptlib->getSession());
+		$session = $this->filtercmptlib->getSession();
+		if (is_object($session)) {
+			// If stdClass it is an retval object
+			if (isError($session))
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson($session);
+		} else
+			$this->outputJsonSuccess($session);
 	}
 
 	/**

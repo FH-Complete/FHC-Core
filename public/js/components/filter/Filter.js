@@ -296,7 +296,9 @@ export const CoreFilterCmpt = {
 			}
 			else
 			{
-				console.error(CoreRESTClient.getError(response));
+				// NOTE(chris): this should never happen -> error should have been
+				// catched before by the Fetch component.
+				console.error(response.retval);
 			}
 		},
 		/**
