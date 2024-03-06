@@ -250,6 +250,16 @@ export default {
 						message += 'Line Number: ' + error.line + '\n';
 
 					$fhcAlert.alertSystemError(message);
+				},
+				auth(error) {
+					const $fhcAlert = app.config.globalProperties.$fhcAlert;
+
+
+					var message = '';
+					message += 'Controller name: ' + error.controller + '\n';
+					message += 'Method name: ' + error.method + '\n';
+					message += 'Required permissions: ' + error.required_permissions
+					$fhcAlert.alertDefault('error', error.message, message);
 				}
 			}
 		};
