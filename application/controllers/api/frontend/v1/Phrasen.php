@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * TODO(chris): depricated
+ *
  */
 class Phrasen extends FHC_Controller
 {
@@ -17,6 +17,11 @@ class Phrasen extends FHC_Controller
 	public function loadModule($module)
 	{
 		$this->load->library('PhrasesLib', [$module], 'pj');
-		$this->outputJsonSuccess(json_decode($this->pj->getJSON()));
+		$this->outputJson([
+			'data' => json_decode($this->pj->getJSON()),
+			'meta' => [
+				'status' => FHCAPI_Controller::STATUS_SUCCESS
+			]
+		]);
 	}
 }

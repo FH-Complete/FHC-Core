@@ -24,10 +24,10 @@ const phrasen = {
 			return Promise.all(category.map(cat => this.loadCategory(cat)));
 		if (!loadingModules[category])
 			loadingModules[category] = axios
-				.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Phrasen/loadModule/' + category)
+				.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/phrasen/loadModule/' + category)
 				.then(res => {
-					if (res.data.retval)
-						categories[category] = extractCategory(res.data.retval, category);
+					if (res?.data?.data)
+						categories[category] = extractCategory(res.data.data, category);
 					else
 						categories[category] = {};
 				});
