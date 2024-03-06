@@ -17,6 +17,15 @@ var tabulator = null; // Set in tableBuilt function.
 // Array with accumulated LV ECTS by Prestudent. Used to find out if max ECTS are exceeded.
 var selectedPrestudentWithAccumulatedLvEcts = [];
 
+
+
+let ttw = $('div[tableUniqueId="approveAnrechnungUebersicht"]');
+ttw.tabulator("on","tableBuilt", function(){
+    console.log("this is just a test");
+});
+
+
+
 // -----------------------------------------------------------------------------------------------------------------
 // Mutators - setter methods to manipulate table data when entering the tabulator
 // -----------------------------------------------------------------------------------------------------------------
@@ -147,6 +156,8 @@ var format_ectsSumBisherUndNeu = function(cell, formatterParams, onRendered){
 
 // Formats the rows
 function func_rowFormatter(row){
+    
+
     let status_kurzbz = row.getData().status_kurzbz;
 
     // If status is anything else then 'Bearbeitet von STGL-Leitung'
@@ -157,7 +168,7 @@ function func_rowFormatter(row){
 
         // ...but leave url links selectable
         row.getCell('dokument_bezeichnung').getElement().firstChild.style["pointerEvents"] = "auto";
-        row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
+        //row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
 
         // Color background grey
         row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
@@ -660,16 +671,16 @@ var approveAnrechnung = {
 
         switch (status_kurzbz) {
             case ANRECHNUNGSTATUS_APPROVED:
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-success');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-success-subtle');
                 break;
             case ANRECHNUNGSTATUS_REJECTED:
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-danger');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-danger-subtle');
                 break;
             case '':
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-info');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-info-subtle');
                 break;
             default:
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-warning-subtle');
         }
     },
     disableEditElements: function()

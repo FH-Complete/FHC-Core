@@ -562,6 +562,7 @@ var FHC_TableWidget = {
 
 				// Renders the tabulator
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator(options);
+				
 			}
 		}
 

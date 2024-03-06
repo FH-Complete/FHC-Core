@@ -215,7 +215,8 @@ $filterWidgetArray = array(
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
         tableBuilt: function(){
-            func_tableBuilt(this);
+			
+            //func_tableBuilt(this);
         },
         tableWidgetFooter: {
 			selectButtons: false
@@ -224,7 +225,7 @@ $filterWidgetArray = array(
             return func_selectableCheck(row);
         },
         rowFormatter:function(row){
-            func_rowFormatter(row);
+            func_rowFormatter(row,this);
         },
         rowSelectionChanged:function(data, rows){
             func_rowSelectionChanged(data, rows);
@@ -253,6 +254,7 @@ $filterWidgetArray = array(
 		ectsSumSchulisch: {visible: false, headerFilter:"input", align:"right"},
 		ectsSumBeruflich: {visible: false, headerFilter:"input", align:"right"},
 		begruendung: {headerFilter:"input", visible: true},
+		
 		student: {headerFilter:"input"},
 		zgv: {headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams: paramLookup_dokBez},
