@@ -143,9 +143,6 @@ export const CoreFilterCmpt = {
 					e.g. column with rowSelection checkboxes or with custom formatted action buttons */
 					col.visible = selectedFields.indexOf(col.field) >= 0 || fields.indexOf(col.field) == -1;
 
-					if (col.formatter == 'rowSelection')
-						col.visible = true;
-
 					if (col.hasOwnProperty('resizable'))
 						col.resizable = col.visible;
 				}
@@ -187,18 +184,27 @@ export const CoreFilterCmpt = {
 	methods: {
 		reloadTable() {
 			if (this.tableOnly)
-				// TODO check, vorher reload() gewesen
 				this.tabulator.setData();
 			else
 				this.getFilter();
 		},
-		initTabulator() {
+		async initTabulator() {
+			let placeholder = '< Phrasen Plugin not loaded! >';
+			if (this.$p) {
+				await this.$p.loadCategory('ui');
+				placeholder = this.$p.t('ui/keineDatenVorhanden');
+			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
 				height: 500,
-				layout: "fitColumns",
+				layout: "fitDataStretch",
 				movableColumns: true,
-				reactiveData: true
+				columnDefaults:{
+					tooltip: true,
+				},
+				placeholder,
+				reactiveData: true,
+				persistence: true
 			}, ...(this.tabulatorOptions || {})};
 
 			if (!this.tableOnly) {
@@ -276,9 +282,9 @@ export const CoreFilterCmpt = {
 			}
 		},
 		_updateTabulator() {
+			this.tabulatorHasSelector = this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
-			this.tabulatorHasSelector = this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 		},
 		/**
 		 *
@@ -476,7 +482,7 @@ export const CoreFilterCmpt = {
 		 *
 		 */
 		handlerRemoveCustomFilter: function(event) {
-			filterId = event.currentTarget.getAttribute("href").substring(1);
+			let filterId = event.currentTarget.getAttribute("href").substring(1);
 			if (filterId === this.selectedFilter)
 				this.selectedFilter = null;
 			//

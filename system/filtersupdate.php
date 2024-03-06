@@ -378,7 +378,8 @@ $filters = array(
 					{"name" : "FoerderfallId"},
 					{"name" : "LeistungsdatenId"},
 					{"name" : "startjahr"},
-					{"name" : "endjahr"}
+					{"name" : "endjahr"},
+					{"name" : "Uebermittelt"}
 				],
 				"filters": []
 			}
@@ -1349,6 +1350,32 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'fhctemplate',
+		'dataset_name' => 'exampledata',
+		'filter_kurzbz' => 'exampledata',
+		'description' => '{Beispieldaten Filter}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Alle Beispieldaten",
+				"columns": [
+					{"name": "uid"},
+					{"name": "stringval"},
+					{"name": "integerval"},
+					{"name": "dateval"},
+					{"name": "booleanval"},
+					{"name": "moneyval"},
+					{"name": "dokument_bezeichnung"},
+					{"name": "textval"},
+					{"name": "examplestatus_kurzbz"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null
 	)
 );
 

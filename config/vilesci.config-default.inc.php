@@ -283,7 +283,7 @@ define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
 			'StudiengebuehrRestzahlung' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrRestzahlung'),
 			'OEH' => array('OEH')
 	))
-));
+);
 
 // Spezialnoten die am Zeunigs und Diplomasupplement ignoriert werden
 define('ZEUGNISNOTE_NICHT_ANZEIGEN',serialize(array('iar', 'nz')));
@@ -294,5 +294,14 @@ define ('DEFAULT_LEHRMODUS','regulaer');
 
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,110]);
+
+//Buchungstypen die fix auf eine bestimmte Kostenstelle gebucht werden sollen
+//Buchungstyp => Studiengang_kz
+define('FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE', serialize(
+	array(
+		'Test_1' => 0,
+		'Test_2' => 2
+	)
+));
 
 ?>
