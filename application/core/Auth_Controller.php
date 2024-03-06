@@ -25,6 +25,9 @@ abstract class Auth_Controller extends FHC_Controller
 	 * Checks if the caller is allowed to access to this content with the given permissions
 	 * If it is not allowed will set the HTTP header with code 401
 	 * Wrapper for permissionlib->isEntitled
+	 *
+	 * @param array					$requiredPermissions
+	 * @return void
 	 */
 	private function _isAllowed($requiredPermissions)
 	{
@@ -34,28 +37,43 @@ abstract class Auth_Controller extends FHC_Controller
 		// Checks if this user is entitled to access to this content
 		if (!$this->permissionlib->isEntitled($requiredPermissions, $this->router->method))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_UNAUTHORIZED); // set the HTTP header as unauthorized
-
-			$this->load->library('EPrintfLib'); // loads the EPrintfLib to format the output
-
-			// Prints the main error message
-			$this->eprintflib->printError('You are not allowed to access to this content');
-			// Prints the called controller name
-			$this->eprintflib->printInfo('Controller name: '.$this->router->class);
-			// Prints the called controller method name
-			$this->eprintflib->printInfo('Method name: '.$this->router->method);
-			// Prints the required permissions needed to access to this method
-			$this->eprintflib->printInfo('Required permissions: '.$this->_rpsToString($requiredPermissions, $this->router->method));
-
+			$this->_outputAuthError($requiredPermissions);
 			exit; // immediately terminate the execution
 		}
 	}
 
 	/**
+	 * Outputs an error message and sets the HTTP Header.
+	 * This function is protected so that it can be overwritten.
+	 *
+	 * @param array					$requiredPermissions
+	 * @return void
+	 */
+	protected function _outputAuthError($requiredPermissions)
+	{
+		$this->output->set_status_header(REST_Controller::HTTP_UNAUTHORIZED); // set the HTTP header as unauthorized
+
+		$this->load->library('EPrintfLib'); // loads the EPrintfLib to format the output
+
+		// Prints the main error message
+		$this->eprintflib->printError('You are not allowed to access to this content');
+		// Prints the called controller name
+		$this->eprintflib->printInfo('Controller name: '.$this->router->class);
+		// Prints the called controller method name
+		$this->eprintflib->printInfo('Method name: '.$this->router->method);
+		// Prints the required permissions needed to access to this method
+		$this->eprintflib->printInfo('Required permissions: '.$this->_rpsToString($requiredPermissions, $this->router->method));
+	}
+
+	/**
 	 * Converts an array of permissions to a string that contains them as a comma separated list
 	 * Ex: "<permission 1>, <permission 2>, <permission 3>"
+	 *
+	 * @param array					$requiredPermissions
+	 * @param string				$method
+	 * @return void
 	 */
-	private function _rpsToString($requiredPermissions, $method)
+	final protected function _rpsToString($requiredPermissions, $method)
 	{
 		$strRequiredPermissions = ''; // string that contains all the required permissions needed to access to this method
 
