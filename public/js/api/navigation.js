@@ -15,12 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import search from "./search.js";
-import phrasen from "./phrasen.js";
-import navigation from "./navigation.js";
-
 export default {
-    search,
-    phrasen,
-    navigation
+	getHeader(navigation_page) {
+		return this.$fhcApi.get(
+			'/api/frontend/v1/navigation/header',
+			{ navigation_page }
+		);
+	},
+	getMenu: function(navigation_page) {
+		return this.$fhcApi.get(
+			'/api/frontend/v1/navigation/menu',
+			{ navigation_page }
+		);
+	}
 };
+
