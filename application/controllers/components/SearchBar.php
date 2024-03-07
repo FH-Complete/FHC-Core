@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * TODO(chris): depricated
+ * TODO(chris): deprecated
  */
 class SearchBar extends FHC_Controller
 {

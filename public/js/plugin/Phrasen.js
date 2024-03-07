@@ -34,7 +34,7 @@ const phrasen = {
 		return loadingModules[category];
 	},
 	t_ref(category, phrase, params) {
-		console.warn('depricated');
+		console.warn('deprecated');
 		return Vue.computed(() => this.t(category, phrase, params));
 	},
 	t(category, phrase, params) {
