@@ -1,5 +1,5 @@
-import {CoreFilterCmpt} from '../components/Filter.js';
-import {CoreNavigationCmpt} from '../components/Navigation.js';
+import {CoreFilterCmpt} from '../components/filter/Filter.js';
+import {CoreNavigationCmpt} from '../components/navigation/Navigation.js';
 import verticalsplit from "../components/verticalsplit/verticalsplit.js";
 import searchbar from "../components/searchbar/searchbar.js";
 import fhcapifactory from "./api/fhcapifactory.js";

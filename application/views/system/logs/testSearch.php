@@ -1,13 +1,11 @@
 <?php
 	$includesArray = array(
 		'title' => 'Test Search',
-		'jquery3' => true,
 		'bootstrap5' => true,
 		'fontawesome6' => true,
-		'tablesorter2' => true,
+		'tabulator5' => true,
+		'axios027' => true,
 		'vue3' => true,
-		'ajaxlib' => true,
-		'jqueryui1' => true,
 		'filtercomponent' => true,
 		'navigationcomponent' => true,
 		'phrases' => array(
@@ -18,7 +16,6 @@
 			'public/css/components/verticalsplit.css',
 			'public/css/components/searchbar.css',
 		),
-		'customJSs' => array('vendor/axios/axios/axios.min.js'),
 		'customJSModules' => array('public/js/apps/TestSearch.js')
 	);
 
