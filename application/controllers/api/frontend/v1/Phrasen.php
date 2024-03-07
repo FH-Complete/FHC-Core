@@ -9,7 +9,9 @@ class Phrasen extends FHCAPI_Controller
 {
 	public function __construct()
 	{
-		parent::__construct(['loadModule' => [self::PERM_ANONYMOUS]]);
+		parent::__construct([
+			'loadModule' => self::PERM_ANONYMOUS
+		]);
 	}
 	
 	//------------------------------------------------------------------------------------------------------------------
