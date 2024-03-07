@@ -10,7 +10,7 @@ export default {
             default: false,
         },
     },
-    inject:["zustellAdresseCount"],
+    inject:["getZustelladressenCount"],
     data(){
         return{
             gemeinden:[],
@@ -88,7 +88,7 @@ export default {
 
 
         this.originalValue = JSON.stringify(this.data);
-        this.zustellAdressenCount = this.zustellAdresseCount();
+        this.zustellAdressenCount = this.getZustelladressenCount();
         
     },       
     

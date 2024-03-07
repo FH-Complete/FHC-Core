@@ -22,12 +22,13 @@ export default {
     RoleInformation,
     ProfilInformation,
     FetchProfilUpdates,
+    EditProfil
 
   },
-  inject:['sortProfilUpdates','collapseFunction','getZustellkontakteCount','getZustelladressenCount','setLoading'],
+  inject:['sortProfilUpdates','collapseFunction'],
   data() {
     return {
-      
+      showModal: false,
       collapseIconBetriebsmittel: true,
       zutrittsgruppen_table_options: {
         height: 200,
@@ -92,30 +93,37 @@ export default {
       });
     },
     
-    showModal() {
-
-      EditProfil.popup({ 
-          value:JSON.parse(JSON.stringify(this.editData)),
-          title:"Profil bearbeiten",
-          zustelladressenCount:this.getZustelladressenCount,
-          zustellkontakteCount:this.getZustellkontakteCount,
-          setLoading:this.setLoading,
-        }).then((popup_result) => {
-          if(popup_result){
-            Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
-            .then((res) =>{
-              if(!res.error){
-                this.data.profilUpdates = res.data.sort(this.sortProfilUpdates);
-              }else{
-                alert("Error when fetching profile updates: " +res.data);
-              }
-            })
-            .catch(err=>alert(err));
+    hideEditProfilModal: function(){
+      
+      //? checks the editModal component property result, if the user made a successful request or not
+      if(this.$refs.editModal.result){
+        Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
+        .then((request) =>{
+          if(!request.error){
+            this.data.profilUpdates = request.data;
+            this.data.profilUpdates.sort(this.sortProfilUpdates);
+            
+          }else{
+            console.log("Error when fetching profile updates: " +res.data);
           }
-        }).catch((e) => {
-          // Wenn der User das Modal abbricht ohne Änderungen
-         
+        })
+        .catch(err=>{
+          console.log(err);
         });
+      }else{
+        // when modal was closed without submitting request
+      }
+      this.showModal=false;
+     
+    },
+
+    showEditProfilModal() {
+      this.showModal = true;
+      // after a state change, wait for the DOM updates to complete
+      Vue.nextTick(()=>{
+        this.$refs.editModal.show();
+      });
+      
     },
    
   },
@@ -185,6 +193,7 @@ export default {
   template:/*html*/ ` 
 
   <div class="container-fluid text-break fhc-form"  >
+  <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="Profil bearbeiten" ></edit-profil>
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
@@ -201,7 +210,7 @@ export default {
   
               <div class="row ">
               <div class="col mb-3">
-              <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+              <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                 <div class="row">
                   <div class="col-2">
                     <i class="fa fa-edit"></i>
@@ -387,7 +396,7 @@ export default {
   
                 <div class="row d-none d-md-block">
                 <div class="col mb-3">
-                <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                   <div class="row">
                     <div class="col-2">
                       <i class="fa fa-edit"></i>

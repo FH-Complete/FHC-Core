@@ -12,7 +12,7 @@ export default {
            
         }
     },
-    inject:["zustellKontaktCount"],
+    inject:["getZustellkontakteCount"],
     methods:{
         updateValue: function(event,bind){
 
@@ -54,7 +54,7 @@ export default {
 
        
         this.originalValue = JSON.stringify(this.data);
-        this.zustellKontakteCount = this.zustellKontaktCount();
+        this.zustellKontakteCount = this.getZustellkontakteCount();
     },
     template:
     /*html*/

@@ -26,10 +26,10 @@ export default {
     RoleInformation,
     ProfilInformation,
   },
-  inject: ['sortProfilUpdates','collapseFunction','getZustellkontakteCount','getZustelladressenCount','setLoading'],
+  inject: ['sortProfilUpdates','collapseFunction'],
   data() {
     return {
-
+      showModal:false,
       
       funktionen_table_options: {
         height: 300,
@@ -139,7 +139,38 @@ export default {
 	},
   
   methods: {
+    hideEditProfilModal: function(){
+      
+      //? checks the editModal component property result, if the user made a successful request or not
+      if(this.$refs.editModal.result){
+        Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
+        .then((request) =>{
+          if(!request.error){
+            this.data.profilUpdates = request.data;
+            this.data.profilUpdates.sort(this.sortProfilUpdates);
+            
+          }else{
+            console.log("Error when fetching profile updates: " +res.data);
+          }
+        })
+        .catch(err=>{
+          console.log(err);
+        });
+      }else{
+        // when modal was closed without submitting request
+      }
+      this.showModal=false;
+     
+    },
 
+    showEditProfilModal() {
+      this.showModal = true;
+      // after a state change, wait for the DOM updates to complete
+      Vue.nextTick(()=>{
+        this.$refs.editModal.show();
+      });
+      
+    },
 
     fetchProfilUpdates: function(){
       Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res)=>{
@@ -149,42 +180,7 @@ export default {
         }
       });
     },
-  
-    showModal() {
 
-      EditProfil.popup({ 
-          value:JSON.parse(JSON.stringify(this.editData)),
-          zustelladressenCount:this.getZustelladressenCount,
-          zustellkontakteCount:this.getZustellkontakteCount,
-          title:"Profil bearbeiten",
-          setLoading:this.setLoading,
-
-        }).then((popup_result) => {
-          
-          if(popup_result){
-            Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
-            .then((res) =>{
-              if(!res.error){
-                this.data.profilUpdates = res.data;
-                this.data.profilUpdates.sort(this.sortProfilUpdates);
-                
-              }else{
-                console.log("Error when fetching profile updates: " +res.data);
-              }
-            })
-            .catch(err=>{
-              console.log(err);
-            });
-          }
-        }).catch((e) => {
-          console.log("catch");
-          // Wenn der User das Modal abbricht ohne Änderungen
-         
-        });
-    },
-  
-    
-    
   },
 
   computed: {
@@ -244,7 +240,7 @@ export default {
 
   template: /*html*/` 
   <div class="container-fluid text-break fhc-form"  >
-    
+    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="Profil bearbeiten"></edit-profil>
           <div class="row">
           
               <div  class="d-md-none col-12 ">
@@ -260,7 +256,7 @@ export default {
 
               <div class="row mb-3 ">
               <div class="col">
-              <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+              <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                 <div class="row">
                   <div class="col-auto">
                     <i class="fa fa-edit"></i>
@@ -423,7 +419,7 @@ export default {
 
                 <div class="row d-none d-md-block ">
                 <div class="col mb-3">
-                <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                   <div class="row">
                     <div class="col-auto">
                       <i class="fa fa-edit"></i>

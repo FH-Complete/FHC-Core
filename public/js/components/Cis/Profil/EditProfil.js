@@ -16,7 +16,6 @@ export default {
     title: String,
     zustelladressenCount: Function,
     zustellkontakteCount: Function,
-    setLoading:Function,
     /*
      * NOTE(chris):
      * Hack to expose in "emits" declared events to $props which we use
@@ -43,12 +42,10 @@ export default {
       info: null,
     };
   },
-
+  inject:["setLoading"],
   provide(){
     return {
       updateFileID: this.updateFileIDFunction,
-      zustellAdresseCount:this.zustelladressenCount,
-      zustellKontaktCount:this.zustellkontakteCount,
     }
   }, 
 
@@ -164,13 +161,10 @@ export default {
       {{title }}  
     </template>
     <template v-slot:default>
-    
     <div >
-    
     <nav aria-label="breadcrumb" class="ps-2  ">
       <ol class="breadcrumb ">
         <li class="breadcrumb-item"  v-for="element in breadcrumb">{{element}}</li>
-      
       </ol>
     </nav>
 

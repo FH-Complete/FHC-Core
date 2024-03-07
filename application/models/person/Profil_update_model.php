@@ -70,6 +70,7 @@ class Profil_update_model extends DB_Model
 				$this->formatProfilRequest($request);
 			}
 		}
+		
 		return $res;
 
 	}

@@ -268,7 +268,7 @@ class ProfilUpdate extends Auth_Controller
 		if(isset($id)) $whereClause['id'] = $id;
 		
 		$res= $this->ProfilUpdateModel->getProfilUpdatesWhere($whereClause);
-
+		$res = hasData($res) ? getData($res) : null;
 		echo json_encode($res);
 		
 	}
@@ -314,6 +314,10 @@ class ProfilUpdate extends Auth_Controller
 
 		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilUpdateModel->getProfilUpdatesWhere(["uid"=>$this->uid]);
+		if(isError($res)){
+			show_error("Error occured while querying the profil update requests of UID: ".$uid);
+		}
+		$res = hasData($res)? getData($res):null;
 		
 		//? the user cannot delete a zustelladresse/kontakt
 		if( isset($payload->delete) && $payload->{$identifier=="kontakt_id"? "zustellung":"zustelladresse"}){
