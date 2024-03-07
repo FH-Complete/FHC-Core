@@ -78,6 +78,8 @@ class Status extends FHC_Controller
 		$granted_Adm = $this->permissionlib->getSTG_isEntitledFor('admin') ? $this->permissionlib->getSTG_isEntitledFor('admin') : [];
 		$granted = array_merge($granted_Ass, $granted_Adm);
 
+		$isStudent = false;
+
 		if(!in_array($stg, $granted)){
 			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -142,7 +144,7 @@ class Status extends FHC_Controller
 		}
 
 
-		//Check ob Reihungstest berücksichtigt werden soll
+		//Check Reihungstest
 		if(REIHUNGSTEST_CHECK)
 		{
 			if($status_kurzbz=='Bewerber' && !$reihungstest_angetreten)
@@ -218,6 +220,10 @@ class Status extends FHC_Controller
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				return $this->outputJson($result->code);
 			}
+			if($result->retval != "0")
+			{
+				$isStudent = true;
+			}
 		}
 
 		//TODO(Manu) check permission...
@@ -243,6 +249,25 @@ class Status extends FHC_Controller
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				return $this->outputJson(getError($result));
 			}
+
+			//check if Bismeldestichtag erreicht
+			$this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
+			$result = $this->BismeldestichtagModel->checkIfMeldestichtagErreicht($new_status_datum);
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			if($result->retval == "1")
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result->code));
+			}
+/*			if($result->retval == "0")
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson($result->code);
+			}*/
 		}
 
 		// Start DB transaction
@@ -276,11 +301,61 @@ class Status extends FHC_Controller
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson(getError($result));
 		}
-		else
+
+		if($isStudent)
 		{
-			$this->db->trans_commit();
-			return $this->outputJsonSuccess(true);
+			//Studentlehrverband anlegen
+			$this->load->model('crm/Student_model', 'StudentModel');
+			$result = $this->StudentModel->checkIfUid($prestudent_id);
+			if (isError($result)) {
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			$student_uid = $result->retval;
+
+			//check if Lehrverband exists
+			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+			$result = $this->StudentlehrverbandModel->checkIfLehrverbandExists($student_uid, $studiensemester_kurzbz);
+			if (isError($result)) {
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			if ($result->retval == "0") {
+				//load Data Lehrverband
+				$result = $this->StudentlehrverbandModel->load(
+					[
+						'student_uid' => $student_uid,
+						'studiensemester_kurzbz' => $studiensemester_kurzbz
+					]);
+				if (isError($result)) {
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+
+					return $this->outputJson("Error in insert Studentlehrverband");
+				}
+				$lvbData = current(getData($result));
+
+				$result = $this->StudentlehrverbandModel->insert(
+					[
+						'student_uid' => $student_uid,
+						'studiensemester_kurzbz' => $studiensemester_kurzbz,
+						'semester' => $ausbildungssemester,
+						'verband' => $lvbData->verband,
+						'gruppe' => $lvbData->gruppe,
+						'insertamum' => date('c'),
+						'insertvon' => $uid,
+						'studiengang_kz' => $lvbData->studiengang_kz
+					]);
+				if (isError($result)) {
+					$this->db->trans_rollback();
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+
+					return $this->outputJson("Error in insert Studentlehrverband");
+				}
+			}
 		}
+		$this->db->trans_commit();
+		return $this->outputJsonSuccess(true);
+
 	}
 
 	public function loadStatus()

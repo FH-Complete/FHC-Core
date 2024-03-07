@@ -593,7 +593,7 @@ class Prestudentstatus_model extends DB_Model
 				isset($next_status) && $curr_status_kurzbz == 'Diplomand' && $next_status->status_kurzbz == 'Student'
 			)
 			{
-				return error("Nach Diplomantenstatus darf kein Studentenstatus mehr eingetragen werden");
+				return error("Nach Diplomandenstatus darf kein Studentenstatus mehr eingetragen werden");
 			}
 
 		}
@@ -611,7 +611,7 @@ class Prestudentstatus_model extends DB_Model
 		$isNewStatus =  $old_status_studiensemester_kurzbz == '' && $old_status_ausbildungssemester == '';
 
 		$qry = "
-		SELECT public.tbl_prestudentstatus.status_kurzbz, 
+				SELECT public.tbl_prestudentstatus.status_kurzbz, 
 				public.tbl_prestudentstatus.studiensemester_kurzbz, 
 				public.tbl_prestudentstatus.ausbildungssemester, 
 				public.tbl_prestudentstatus.datum, 
