@@ -37,17 +37,17 @@
 			</div>
 			<div>
 
-				<searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></searchbar>
+				<core-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></core-searchbar>
 				
-				<verticalsplit>
+				<core-verticalsplit>
 					<template #top>
-						<searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunctiondummy"></searchbar>
+						<core-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunctiondummy"></core-searchbar>
 					</template>
 					<template #bottom>
 						<!-- Filter component -->
 						<core-filter-cmpt filter-type="LogsViewer" @nw-new-entry="newSideMenuEntryHandler"></core-filter-cmpt>
 					</template>
-				</verticalsplit>				
+				</core-verticalsplit>				
 
 			</div>
 		</div>
