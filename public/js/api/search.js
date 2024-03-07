@@ -1,12 +1,10 @@
 export default {
-  search: function(searchsettings) {
-      const url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
-                + 'index.ci.php/components/SearchBar/search';
-      return axios.post(url, searchsettings);
-  },
-  searchdummy: function(searchsettings) {
-      const url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
-                + 'public/js/apps/api/dummyapi.php/Search';
-      return axios.post(url, searchsettings);
-  }
+	search(searchsettings) {
+		const url = '/api/frontend/v1/searchbar/search';
+		return this.$fhcApi.post(url, searchsettings);
+	},
+	searchdummy(searchsettings) {
+		const url = 'public/js/apps/api/dummyapi.php/Search';
+		return this.$fhcApi.post(url, searchsettings);
+	}
 };

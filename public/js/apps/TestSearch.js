@@ -2,6 +2,7 @@ import {CoreFilterCmpt} from '../components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../components/navigation/Navigation.js';
 import CoreVerticalsplit from "../components/verticalsplit/verticalsplit.js";
 import CoreSearchbar from "../components/searchbar/searchbar.js";
+import FhcApi from "../plugin/FhcApi.js";
 
 const app = Vue.createApp({
 	components: {
@@ -183,11 +184,12 @@ const app = Vue.createApp({
 			this.appSideMenuEntries = payload;
 		},
 		searchfunction(searchsettings) {
-			return Vue.$fhcapi.Search.search(searchsettings);  
+			return this.$fhcApi.factory.search.search(searchsettings);  
 		},
 		searchfunctiondummy(searchsettings) {
-			return Vue.$fhcapi.Search.searchdummy(searchsettings);  
+			return this.$fhcApi.factory.search.searchdummy(searchsettings);  
 		}
 	}
 });
+app.use(FhcApi)
 app.mount('#main');

@@ -4,6 +4,7 @@
 		'bootstrap5' => true,
 		'fontawesome6' => true,
 		'tabulator5' => true,
+		'primevue3' => true,
 		'axios027' => true,
 		'vue3' => true,
 		'filtercomponent' => true,
@@ -15,6 +16,7 @@
 		'customCSSs' => array(
 			'public/css/components/verticalsplit.css',
 			'public/css/components/searchbar.css',
+			'public/css/components/primevue.css',
 		),
 		'customJSModules' => array('public/js/apps/TestSearch.js')
 	);
