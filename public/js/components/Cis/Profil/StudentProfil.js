@@ -8,7 +8,7 @@ import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 import FetchProfilUpdates from "./ProfilComponents/FetchProfilUpdates.js";
-import EditProfil from "./EditProfil.js";
+import EditProfil from "./ProfilModal/EditProfil.js";
 
 export default {
   components: {

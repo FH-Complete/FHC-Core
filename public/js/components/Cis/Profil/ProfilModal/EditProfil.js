@@ -1,7 +1,7 @@
-import BsModal from "../../Bootstrap/Modal.js";
-import Alert from "../../Bootstrap/Alert.js";
+import BsModal from "../../../Bootstrap/Modal.js";
+import Alert from "../../../Bootstrap/Alert.js";
 import EditProfilSelect from "./EditProfilSelect.js";
-import Loader from "../../../components/Loader.js"
+import Loader from "../../../Loader.js"
 
 export default {
   components: {

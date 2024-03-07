@@ -1,6 +1,6 @@
 
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
-import EditProfil from "./EditProfil.js";
+import EditProfil from "./ProfilModal/EditProfil.js";
 import Adresse from "./ProfilComponents/Adresse.js";
 import Kontakt from "./ProfilComponents/Kontakt.js";
 import FetchProfilUpdates from "./ProfilComponents/FetchProfilUpdates.js";

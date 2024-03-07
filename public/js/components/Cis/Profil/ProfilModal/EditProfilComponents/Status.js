@@ -1,5 +1,5 @@
-import Adresse from "./Adresse.js";
-import Kontakt from "./Kontakt.js";
+import Adresse from "../../ProfilComponents/Adresse.js";
+import Kontakt from "../../ProfilComponents/Kontakt.js";
 
 export default {
   components: {

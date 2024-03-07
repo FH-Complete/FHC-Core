@@ -1,4 +1,4 @@
-import EditProfil from "../EditProfil.js";
+import EditProfil from "../ProfilModal/EditProfil.js";
 //? EditProfil is the modal used to edit the profil updates
 export default {
   props: {

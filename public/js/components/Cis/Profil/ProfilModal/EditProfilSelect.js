@@ -1,9 +1,9 @@
-import Kontakt from "./ProfilComponents/Kontakt.js";
-import EditKontakt from "./ProfilComponents/EditKontakt.js";
-import Adresse from "./ProfilComponents/Adresse.js";
-import EditAdresse from "./ProfilComponents/EditAdresse.js";
-import Status from "./ProfilComponents/Status.js";
-import TextInputDokument from "./ProfilComponents/TextInputDokument.js";
+import Kontakt from "../ProfilComponents/Kontakt.js";
+import EditKontakt from "./EditProfilComponents/EditKontakt.js";
+import Adresse from "../ProfilComponents/Adresse.js";
+import EditAdresse from "./EditProfilComponents/EditAdresse.js";
+import Status from "./EditProfilComponents/Status.js";
+import TextInputDokument from "./EditProfilComponents/TextInputDokument.js";
 
 export default {
   components: {

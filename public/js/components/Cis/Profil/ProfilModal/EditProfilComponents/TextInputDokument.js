@@ -1,4 +1,4 @@
-import Dms from "../../../Form/Upload/Dms.js";
+import Dms from "../../../../Form/Upload/Dms.js";
 
 export default {
   data() {
