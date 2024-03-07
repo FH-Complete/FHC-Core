@@ -216,7 +216,7 @@ $filterWidgetArray = array(
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
         tableBuilt: function(){
 			
-            //func_tableBuilt(this);
+            func_tableBuilt(this);
         },
         tableWidgetFooter: {
 			selectButtons: false

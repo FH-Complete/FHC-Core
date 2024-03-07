@@ -562,7 +562,7 @@ var FHC_TableWidget = {
 
 				// Renders the tabulator
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator(options);
-				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","tableBuilt",()=>{console.log("table build")});
+				//tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","tableBuilt",()=>{console.log("table build")});
 				
 				
 			}

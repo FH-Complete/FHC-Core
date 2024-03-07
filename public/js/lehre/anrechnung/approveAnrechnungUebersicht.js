@@ -19,12 +19,6 @@ var selectedPrestudentWithAccumulatedLvEcts = [];
 
 
 
-let ttw = $('div[tableUniqueId="approveAnrechnungUebersicht"]');
-ttw.tabulator("on","tableBuilt", function(){
-    console.log("this is just a test");
-});
-
-
 
 // -----------------------------------------------------------------------------------------------------------------
 // Mutators - setter methods to manipulate table data when entering the tabulator
@@ -79,22 +73,20 @@ function func_tableBuilt(table) {
     // Store table in global var
     tabulator = table;
 
-    table.addColumn(
-        {
-            title: "Details",
-            field: 'details',
-            align: "center",
-            width: 100,
-            formatter: "link",
-            formatterParams:{
-                label:"Details",
-                url:function(cell){
-                    return  BASE_URL + "/" + APPROVE_ANRECHNUNG_DETAIL_URI + "?anrechnung_id=" + cell.getData().anrechnung_id
-                },
-                target:"_blank"
-            }
-        }, true  // place column on the very left
-    );
+    table.tabulator("addColumn",{
+        title: "Details",
+        field: 'details',
+        align: "center",
+        width: 100,
+        formatter: "link",
+        formatterParams:{
+            label:"Details",
+            url:function(cell){
+                return  BASE_URL + "/" + APPROVE_ANRECHNUNG_DETAIL_URI + "?anrechnung_id=" + cell.getData().anrechnung_id
+            },
+            target:"_blank"
+        }
+    }, true);   // place column on the very left
 
     // Set focus on filterbutton
     let filters = table.getFilters();
@@ -252,12 +244,19 @@ function tableWidgetHook_selectAllButton(tableWidgetDiv){
 }
 
 
-$(function(){
 
+
+$(function(){
     const genehmigung_panel = $('#approveAnrechnungUebersicht-genehmigung-panel');
     const begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
     const hasReadOnlyAccess = $('#formApproveAnrechnungUebersicht').data('readonly');
     const hasCreateAnrechnungAccess = $('#formApproveAnrechnungUebersicht').data('createaccess');
+
+
+
+
+    var tab = $('div[tableUniqueId="approveAnrechnungUebersicht"]'); 
+    tab.on("tableBuilt",()=>func_tableBuilt(tab));
 
     // Pruefen ob Promise unterstuetzt wird
     // Tabulator funktioniert nicht mit IE
@@ -363,7 +362,7 @@ $(function(){
 
         begruendung_panel.css('display', 'none');
 
-        if (genehmigung_panel.is(":hidden"))
+        if (genehmigung_panel.is(":hidden")) 
         {
             // Show begruendung panel if is hidden
             genehmigung_panel.slideDown(400, function() {

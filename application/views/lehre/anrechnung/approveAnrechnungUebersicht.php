@@ -132,7 +132,7 @@ $this->load->view(
             </div>
         </div>
         <!-- Tabelle -->
-        <div class="row">
+        <div class="row mb-4">
             <div class="col-12">
                 <?php $this->load->view('lehre/anrechnung/approveAnrechnungUebersichtData.php'); ?>
             </div>
