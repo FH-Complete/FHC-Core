@@ -52,6 +52,8 @@ require_once('dbupdate_3.4/33714_erhoehter_studienbeitrag_fuer_drittsaatenangeho
 require_once('dbupdate_3.4/33003_bis_meldung_personal.php');
 require_once('dbupdate_3.4/36275_zeitaufzeichnung_karenz.php');
 require_once('dbupdate_3.4/21620_neues_feld_zum_erfassen_des_ESI.php');
+require_once('dbupdate_3.4/36530_bis_internationsalisierung_codextabelle_neuerungen.php');
+require_once('dbupdate_3.4/34543_ux_template.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
