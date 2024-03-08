@@ -96,7 +96,7 @@ $this->load->view(
     <div class="container-fluid">
         <!-- header -->
         <div class="row">
-            <div class="col-12 mt-5 mb-3 pb-2 border-bottom">
+            <div class="col-12 mt-4 mb-2 page-header border-bottom">
                 <h3 class="fw-normal ">
 					<?php echo $this->p->t('anrechnung', 'anrechnungenGenehmigen'); ?>
                     <small class="text-secondary fs-6">| <?php echo ucfirst($this->p->t('global', 'uebersicht')); ?></small>

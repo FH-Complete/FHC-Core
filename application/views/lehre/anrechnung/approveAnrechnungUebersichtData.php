@@ -214,10 +214,7 @@ $filterWidgetArray = array(
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        tableBuilt: function(){
-			
-            func_tableBuilt(this);
-        },
+        
         tableWidgetFooter: {
 			selectButtons: false
 		},
@@ -227,10 +224,12 @@ $filterWidgetArray = array(
         rowFormatter:function(row){
             func_rowFormatter(row,this);
         },
-        rowSelectionChanged:function(data, rows){
-            func_rowSelectionChanged(data, rows);
-        },
-        tooltips: function(cell){
+		columnDefaults:{
+			tooltip:true,
+		}
+		//! not working
+		columnDefaults:{
+        tooltip:function(e, cell, onRendered){
             return func_tooltips(cell);
         }
 	 }', // tabulator properties

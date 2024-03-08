@@ -73,7 +73,8 @@ function func_tableBuilt(table) {
     // Store table in global var
     tabulator = table;
 
-    table.tabulator("addColumn",{
+
+    table.find("#tableWidgetTabulator").tabulator("addColumn",{
         title: "Details",
         field: 'details',
         align: "center",
@@ -89,7 +90,8 @@ function func_tableBuilt(table) {
     }, true);   // place column on the very left
 
     // Set focus on filterbutton
-    let filters = table.getFilters();
+   
+    let filters = table.find("#tableWidgetTabulator").tabulator("getFilters");
     if (filters.length > 0){
         approveAnrechnung.focusFilterbuttonIfTableStartsWithStoredFilter(filters);
     }
@@ -181,18 +183,21 @@ function func_selectableCheck(row){
 // Calculate dynamically sum of all LV ECTS by Student and display, when maximum ECTS are exceeded.
 // data = selected data, rows = selected rows
 function func_rowSelectionChanged(data, rows){
-
+    
     if (tabulator != null)
     {
         // Sum up over all anzurechnenden LV-ECTS by Prestudent
         selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(data);
 
         // Loop through all active rows
-        var rowManager = tabulator.rowManager;
-        for (var i = 0; i < rowManager.activeRows.length; i++) {
+        var selectedRows = tabulator.find("#tableWidgetTabulator").tabulator("getSelectedRows");
+        for (var i = 0; i < selectedRows.length; i++) {
 
             // Reinitialize row -> triggers formatters.
-            rowManager.activeRows[i].reinitialize();
+            //selectedRows[i].rerenderRowCells(true);
+            //! rowManager.activeRows[i].reinitialize();
+            selectedRows[i].reformat();
+            
         }
 
         // Show number of selected rows.
@@ -202,8 +207,9 @@ function func_rowSelectionChanged(data, rows){
 
 // Returns tooltip
 function func_tooltips(cell) {
+    console.log(cell);
     // Return tooltip if row is unselectable
-    if (!func_selectableCheck(cell.getRow())){
+    if (true || !func_selectableCheck(cell.getRow())){
         return FHC_PhrasesLib.t("ui", "nichtSelektierbarAufgrundVon") + 'Status';
     }
 }
@@ -253,11 +259,28 @@ $(function(){
     const hasCreateAnrechnungAccess = $('#formApproveAnrechnungUebersicht').data('createaccess');
 
 
-
-
-    var tab = $('div[tableUniqueId="approveAnrechnungUebersicht"]'); 
-    tab.on("tableBuilt",()=>func_tableBuilt(tab));
-
+    $(document).on("tableInit", function(event, table) {
+        
+       table.find("#tableWidgetTabulator").tabulator("on","tableBuilt",()=>{
+        func_tableBuilt(table)
+        var el =$('#download-csv');
+        
+        $('#download-csv').click( function()
+			{
+                console.log("here")
+				// BOM for correct UTF-8 char output
+				table.find("#tableWidgetTabulator").tabulator("download", "csv", "data.csv", { bom:true });
+		})
+        console.log(el);
+        });
+       table.find("#tableWidgetTabulator").tabulator("on","rowSelectionChanged",func_rowSelectionChanged);
+       
+        /*  table.tabulator("on","dataLoaded", function() {
+            // do something
+            console.log("data was loaded");
+        }); */
+    });
+	
     // Pruefen ob Promise unterstuetzt wird
     // Tabulator funktioniert nicht mit IE
     var canPromise = !! window.Promise;
