@@ -18,9 +18,11 @@
 import search from "./search.js";
 import phrasen from "./phrasen.js";
 import navigation from "./navigation.js";
+import filter from "./filter.js";
 
 export default {
     search,
     phrasen,
-    navigation
+    navigation,
+    filter
 };
