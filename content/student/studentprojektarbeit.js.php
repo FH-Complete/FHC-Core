@@ -1367,6 +1367,7 @@ function StudentProjektbetreuerLoadMitarbeiterDaten()
 
 	req.add('type', 'getstundensatz');
 	req.add('person_id', person_id);
+	req.add('studiensemester_kurzbz', getStudiensemester())
 
 	var response = req.executePOST();
 

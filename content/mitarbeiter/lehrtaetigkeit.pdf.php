@@ -26,7 +26,6 @@ require_once('../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../include/lehreinheit.class.php');
 require_once('../../include/projektbetreuer.class.php');
 require_once('../../include/projektarbeit.class.php');
-require_once('../../include/bisverwendung.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/phrasen.class.php');
 require_once('../../include/benutzerberechtigung.class.php');

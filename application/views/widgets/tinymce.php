@@ -5,5 +5,6 @@
 		plugins: [<?php echo $plugins; ?>],
 		toolbar: "<?php echo $toolbar; ?>"
 	});
-	</script>
-	<<?=$selector?> name="<?=$name?>" style="<?=$style?>"><?=$text?></<?=$selector?>>
+</script>
+<<?=$selector?> name="<?=$name?>" style="<?=$style?>"><?=$text?></<?=$selector?>>
+

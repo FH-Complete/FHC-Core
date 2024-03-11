@@ -129,6 +129,8 @@ define('MAILVERTEILER_SPERRE', true);
 // Bezeichnung des Campus
 define('CAMPUS_NAME','FH Technikum Wien');
 
+define('CI_ENVIRONMENT', 'development'); // Code igniter environment variable
+
 // Anzahl der Tag die eine Nachricht am Pinboard angezeigt wird.
 define("MAXNEWSALTER",60);
 // Anzahl der Newseintraege die maximal angezeigt werden
@@ -293,6 +295,5 @@ define ('DEFAULT_ALLIN_DIENSTVERTRAG',[111]);
 
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,111]);
-
 
 ?>

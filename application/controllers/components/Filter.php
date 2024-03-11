@@ -26,6 +26,9 @@ class Filter extends FHC_Controller
 		// Loads authentication library and starts authentication
 		$this->load->library('AuthLib');
 
+		// Loads the FiltersModel
+		$this->load->model('system/Filters_model', 'FiltersModel');
+
 		// Loads the FilterCmptLib with HTTP GET/POST parameters
 		$this->_startFilterCmptLib();
 	}

@@ -53,7 +53,9 @@ export const CoreFetchCmpt = {
 		 *
 		 */
 		fetchData: function() {
-	        	this.loading = true; // loader started
+			this.loading = true; // loader started
+			this.error = false;
+			this.errorMessage = null;
 
 			// Checks if the apifunction is a callable function
 			if (typeof this.apiFunction == "function")
@@ -91,13 +93,16 @@ export const CoreFetchCmpt = {
 		 *
 		 */
 		successHandler: function(response) {
-			this.$emit('dataFetched', response.data); // trigger the event dataFetched
+			this.$emit('dataFetched', response ? response.data : undefined); // trigger the event dataFetched
 		},
 		/**
 		 *
 		 */
 		errorHandler: function(error) {
-			this.setError(error.message);
+			if (error.response.data.retval)
+				this.setError(error.response.data.retval);
+			else
+				this.setError(error.message);
 		},
 		/**
 		 *
@@ -107,12 +112,12 @@ export const CoreFetchCmpt = {
 		}
 	},
 	template: `
-		<slot v-if="loading">
+		<slot v-if="loading" name="loading">
 			<div class="fetch-loader">Loading...</div>
 		</slot>
-		<slot v-if="error">
+		<slot v-else-if="error" name="error" :error-message="errorMessage">
 			<div class="fetch-error">{{ errorMessage }}</div>
 		</slot>
+		<slot v-else></slot>
 	`
 };
-

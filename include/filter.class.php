@@ -230,8 +230,10 @@ class filter extends basis_db
 	 */
 	public function loadValues($sql, $valuename, $showvalue)
 	{
-
 		$this->values = array();
+
+		// In case a decryption function is used then perform password substitution
+		$sql = $this->replaceSQLDecryptionPassword($sql);
 
 		if($this->db_query($sql))
 		{

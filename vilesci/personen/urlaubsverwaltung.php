@@ -34,6 +34,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/addon.class.php');
 require_once('../../include/benutzerfunktion.class.php');
+require_once('../../include/phrasen.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -63,6 +64,16 @@ $message='';
 $error=false;
 $mlAbgeschickt = '';
 
+//Phrasen
+$sprache = getSprache();
+$p = new phrasen($sprache);
+
+//Default-Wert für Max-Intervall in Tagen für Zeitsperre, über Config veränderbar
+$maxDauerZS = 730;
+
+if (defined('CIS_ZEITSPERREN_MAX_DAUER') && CIS_ZEITSPERREN_MAX_DAUER != '') {
+	$maxDauerZS = CIS_ZEITSPERREN_MAX_DAUER;
+}
 //prüfen, ob addon casetime aktiviert ist
 $addon_obj = new addon();
 $addoncasetime = $addon_obj->checkActiveAddon("casetime");
@@ -205,6 +216,24 @@ if(isset($_POST['save']))
 	if(!$berechtigt)
 		die('Sie haben keine Berechtigung für diese Aktion');
 
+	//Validierungen Felder Bis-Datum und Von-Datum
+	if($vondatum > $bisdatum)
+	{
+		$errormsg = $p->t('zeitsperre/vonDatumGroesserAlsBisDatum').'! ';
+		$error=true;
+	}
+
+	//Check if Bisdatum zu weit in der Zukunft
+	$von = new DateTime($vondatum);
+	$bis = new DateTime($bisdatum);
+
+	$intervall = $bis->diff($von);
+	if ($intervall->days > $maxDauerZS)
+	{
+		$error=true;
+		$errormsg = $p->t('zeitsperre/bisDatumGroesserMax');
+	}
+
 	//Speichern der Daten
 	$zeitsperre = new zeitsperre();
 
@@ -224,6 +253,8 @@ if(isset($_POST['save']))
 		$zeitsperre->new=true;
 		$zeitsperre->mitarbeiter_uid=$uid;
 	}
+
+
 
 	if(!$error)
 	{

@@ -20,7 +20,7 @@ class Rueckstellung_model extends DB_Model
 		$this->addLimit(1);
 		$this->addJoin('tbl_rueckstellung_status', 'status_kurzbz');
 		$this->addSelect('*,
-							array_to_json(bezeichnung_mehrsprachig::varchar[])->>'.$language_index . 'as bezeichnung');
+							array_to_json(bezeichnung_mehrsprachig::varchar[])->>'.$language_index . ' as bezeichnung');
 		$this->addOrder('datum_bis', 'DESC');
 		
 		$where['person_id'] = $person_id;

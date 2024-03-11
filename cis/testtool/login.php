@@ -126,10 +126,6 @@ if (isset($_REQUEST['prestudent']))
 			$rt->getReihungstestPerson($ps->person_id);
 			if (isset($rt->result[0]))
 				$reihungstest_id = $rt->result[0]->reihungstest_id;
-			else
-			{
-				$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
-			}
 		}
 		else
 		{
@@ -138,10 +134,6 @@ if (isset($_REQUEST['prestudent']))
 				// TODO Was ist wenn da mehrere Zurueckkommen?!
 				if (isset($rt->result[0]))
 					$reihungstest_id = $rt->result[0]->reihungstest_id;
-				else
-				{
-					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
-				}
 			}
 			else
 			{
@@ -434,6 +426,26 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 				});';
 		?>
 
+		$(document).bind('cut copy paste', function(e)
+		{
+			if (document.querySelector('.frage'))
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("keydown", function (e)
+		{
+			if (((e.ctrlKey || e.metaKey) && e.keyCode === 85) || e.keyCode === 123)
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("contextmenu", function (e)
+		{
+			e.preventDefault();
+		});
 		// If Browser is any other than Mozilla Firefox and the test includes any MathML,
 		// show message to use Mozilla Firefox
 		var ua = navigator.userAgent;

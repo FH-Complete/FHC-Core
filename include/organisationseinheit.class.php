@@ -977,6 +977,36 @@ class organisationseinheit extends basis_db
 		}
 	}
 	
-	
+	public function getRoots()
+	{
+		$qry = "SELECT *
+				FROM public.tbl_organisationseinheit
+				WHERE oe_parent_kurzbz IS NULL AND aktiv
+				ORDER BY organisationseinheittyp_kurzbz, bezeichnung";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new organisationseinheit();
+				
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
+				$obj->lehre = $this->db_parse_bool($row->lehre);
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
+			return false;
+		}
+	}
 }
 ?>

@@ -159,7 +159,7 @@ FROM
         (
             SELECT
                 /* lehrauftraege also planned with dummies, therefore personalnummer is needed */
-                ma.personalnummer,
+                ma.personalnummer::text,
                 lema.lehreinheit_id,
                 lv.lehrveranstaltung_id,
                 lv.bezeichnung                                      AS "lv_bezeichnung",
@@ -179,7 +179,7 @@ FROM
                     ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
                     END                                             AS "lv_oe_kurzbz",
                 (person.nachname || \' \' || person.vorname)        AS "lektor",
-                TRUNC(lema.semesterstunden, 1)                      AS "stunden",
+                TRUNC(lema.semesterstunden, 2)                      AS "stunden",
                 lema.stundensatz,
                 TRUNC((lema.semesterstunden * lema.stundensatz), 2) AS "betrag",
                 vertrag_id,
@@ -219,7 +219,7 @@ FROM
             (SELECT
                  uid
              FROM
-                 public.tbl_benutzer JOIN public.tbl_mitarbeiter ma 
+                 public.tbl_benutzer JOIN public.tbl_mitarbeiter ma
                     ON tbl_benutzer.uid = ma.mitarbeiter_uid
              WHERE
                  person_id = tmp_projektbetreuung.person_id
@@ -272,7 +272,7 @@ FROM
                     pa.lehreinheit_id,
                     lv.lehrveranstaltung_id,
                     lv.bezeichnung                                                                      AS "lv_bezeichnung",
-                    pa.projektarbeit_id                                                                 AS "projektarbeit_id",
+                    pa.projektarbeit_id::text                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     stg.studiengang_kz,
                     upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
@@ -414,7 +414,7 @@ $filterWidgetArray = array(
         row_index: {visible: false},
         personalnummer: {visible: false, headerFilter:"input"},
 		auftrag: {
-			headerFilter:"input", widthGrow: 2, 
+			headerFilter:"input", widthGrow: 2,
 			bottomCalc:"count", bottomCalcFormatter:function(cell){return "'. ucfirst($this->p->t('global', 'anzahl')). ': " + cell.getValue();}
 		},
 		stg_typ_kurzbz: {headerFilter:"input"},
@@ -432,9 +432,9 @@ $filterWidgetArray = array(
         person_id: {visible: false, headerFilter:"input"},
         lv_oe_kurzbz: {headerFilter:"input"},
         lektor: {headerFilter:"input", widthGrow: 2},
-        stunden: {align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
+        stunden: {align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:2},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
-            bottomCalc:"sum", bottomCalcParams:{precision:1}},
+            bottomCalc:"sum", bottomCalcParams:{precision:2}},
         stundensatz: {visible: true, align:"right", formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator},
         betrag: {align:"right", formatter: form_formatNulltoStringNumber,

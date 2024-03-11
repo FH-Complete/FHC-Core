@@ -144,6 +144,8 @@ if (isset($_GET['projektarbeit_id']))
 	$params .= '&projektarbeit_id='. $_GET['projektarbeit_id'];
 if (isset($_GET['betreuerart_kurzbz']))
 	$params .= '&betreuerart_kurzbz='. $_GET['betreuerart_kurzbz'];
+if (isset($_GET['id']))
+	$params .= '&id='. $_GET['id'];
 
 
 // Logeintrag bei Download von Zahlungsbestaetigungen

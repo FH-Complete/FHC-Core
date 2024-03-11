@@ -216,14 +216,24 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<row>
 										<label value="Note" control="student-pruefung-menulist-note"/>
 										<menulist id="student-pruefung-menulist-note" disabled="true"
-										          datasources="<?php echo APP_ROOT; ?>rdf/note.rdf.php" flex="1"
-										          ref="http://www.technikum-wien.at/note/liste" >
+												  xmlns:NOTE="http://www.technikum-wien.at/note/rdf#"
+												  datasources="<?php echo APP_ROOT; ?>rdf/note.rdf.php" flex="1"
+												  ref="http://www.technikum-wien.at/note/liste" >
 											<template>
-												<menupopup>
-													<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
-										        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
-													  		  uri="rdf:*"/>
+												<rule NOTE:aktiv='false'>
+													<menupopup>
+														<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+																  label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+																  uri="rdf:*" style="text-decoration:line-through;"/>
 													</menupopup>
+												</rule>
+												<rule>
+													<menupopup>
+														<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+																  label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+																  uri="rdf:*"/>
+													</menupopup>
+												</rule>
 											</template>
 										</menulist>
 									</row>

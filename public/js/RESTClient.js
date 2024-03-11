@@ -22,7 +22,7 @@
 const CORE_REST_CLIENT_DEBUG = false;
 
 // Default timeout (milliseconds)
-const CORE_REST_CLIENT_TIMEOUT = 1000;
+const CORE_REST_CLIENT_TIMEOUT = 5000;
 
 //--------------------------------------------------------------------------------------------------------------------
 // Constants

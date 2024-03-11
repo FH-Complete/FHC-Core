@@ -114,12 +114,15 @@ else
 	$format_highlight->setFgColor(15);
 	$format_highlight->setBorder(1);
 	$format_highlight->setBorderColor('white');
+	$format_highlight->setAlign('left');
+	$format_highlight->setNumFormat(49);
 
 	$format_highlightright=& $workbook->addFormat();
 	$format_highlightright->setFgColor(15);
 	$format_highlightright->setBorder(1);
 	$format_highlightright->setBorderColor('white');
 	$format_highlightright->setAlign('right');
+	$format_highlightright->setNumFormat(49);
 
 	$format_highlightright_date=& $workbook->addFormat();
 	$format_highlightright_date->setFgColor(15);
@@ -318,17 +321,23 @@ else
 
 					$worksheet->write($lines,1,$elem->uid);
 					$worksheet->write($lines,2,$elem->nachname.$inc);
-					$worksheet->write($lines,3,$elem->vorname);
-					//wenn Wahlname vorhanden überschreibt dieser den Vornamen
-					$worksheet->write($lines,3,$elem->wahlname);
-					$worksheet->write($lines,4,'="'.$elem->semester.$elem->verband.$elem->gruppe.'"');
-					$worksheet->write($lines,5,'="'.trim($elem->matrikelnr).'"',$format_highlight);
+					if( NULL !== $elem->wahlname )
+					{
+						//wenn Wahlname vorhanden überschreibt dieser den Vornamen
+						$worksheet->write($lines,3,$elem->wahlname);
+					}
+					else
+					{
+						$worksheet->write($lines,3,$elem->vorname);
+					}
+					$worksheet->write($lines,4,$elem->semester.$elem->verband.$elem->gruppe);
+					$worksheet->write($lines,5,trim($elem->matrikelnr),$format_highlight);
 					$worksheet->write($lines,6, $note, $format_highlightright);
 
 					// Nachprüfung
 					if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
 					{
-						$worksheet->write($lines,8, '="'.trim($elem->matrikelnr).'"', $format_highlight);
+						$worksheet->write($lines,8, trim($elem->matrikelnr), $format_highlight);
 						$pr = new Pruefung();
 						$pr->getPruefungen($elem->uid, "Termin2", $lvid, $sem);
 						$output2 = $pr->result;
@@ -349,7 +358,7 @@ else
 					// Nachprüfung
 					if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 					{
-						$worksheet->write($lines,12, '="'.trim($elem->matrikelnr).'"', $format_highlight);
+						$worksheet->write($lines,12, trim($elem->matrikelnr), $format_highlight);
 						$pr = new Pruefung();
 						$pr->getPruefungen($elem->uid, "Termin3", $lvid, $sem);
 						$output3 = $pr->result;

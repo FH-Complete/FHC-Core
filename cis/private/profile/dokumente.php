@@ -31,6 +31,7 @@ require_once('../../../include/akte.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/webservicelog.class.php');
+require_once('../../../include/studierendenantrag.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -228,6 +229,28 @@ echo '</SELECT><br /><br />';
 // Wenn es für das übergebene Studiensemester keinen PreStudentStatus gibt, werden nur Abschlussdokumente angezeigt 
 if (in_array($stsem, $stsem_arr))
 {
+	$studierendenantrag = new studierendenantrag();
+	if ($studierendenantrag->loadUserAntrag($student_studiengang->prestudent_id, $stsem) && $studierendenantrag->result) {
+		echo '<h2>' . $p->t('studierendenantrag/antraege_header') . '</h2>';
+		echo '<table class="tablesorter" style="width:auto;">
+				<thead>
+				<tr>
+					<th></th>
+					<th>'.$p->t('global/name').'</th>
+				</tr>
+				</thead>
+				<tbody>';
+		foreach ($studierendenantrag->result as $antrag) {
+			$path = "../pdfExport.php?xsl=Antrag" . $antrag->typ . "&xml=Antrag" . $antrag->typ . ".xml.php&uid=" . $uid . "&id=" . $antrag->studierendenantrag_id;
+			echo '<tr>';
+			echo '<td><img src="../../../skin/images/pdfpic.gif" /></td>';
+			echo '<td><a href="'.$path.'">' . $p->t('studierendenantrag/title_' . $antrag->typ) . '</a></td>';
+			echo '</tr>';
+		}
+		echo '</tbody></table>';
+	}
+
+
 	$konto = new konto();
 	
 	$buchungstypen = array();
