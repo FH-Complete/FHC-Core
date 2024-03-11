@@ -33,7 +33,7 @@ $this->load->view(
 			<studierendenantrag-antrag
 				:prestudent-id="<?= $prestudent_id; ?>"
 				antrag-type="<?= $antrag_type; ?>"
-				:studierendenantrag-id="<?= $studierendenantrag_id; ?>"
+				:studierendenantrag-id="<?= $studierendenantrag_id ?: 'undefined'; ?>"
 				v-model:info-array="infoArray"
 				v-model:status-msg="status.msg"
 				v-model:status-severity="status.severity"
