@@ -181,11 +181,12 @@ class FHCAPI_Controller extends Auth_Controller
 	/**
 	 * @param array					$error
 	 * @param string				$type (optional)
+	 * @param integer				$status (optional)
 	 * @return void
 	 */
-	protected function terminateWithError($error, $type = null)
+	protected function terminateWithError($error, $type = null, $status = REST_Controller::HTTP_INTERNAL_SERVER_ERROR)
 	{
-		$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		$this->output->set_status_header($status);
 		$this->addError($error, $type);
 		$this->setStatus(self::STATUS_ERROR);
 		exit;
