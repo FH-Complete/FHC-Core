@@ -71,11 +71,20 @@ export default{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
+
+
+							//let disableButton = false;
+							//const rowData = this.row.getData();
+
+
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
 
 							let button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+								button.className = 'btn btn-outline-secondary btn-action disabled';
+							else
+								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-forward"></i>';
 							button.title = 'Status vorrücken';
 							button.addEventListener('click', () =>
@@ -84,7 +93,10 @@ export default{
 							container.append(button);
 
 							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+								button.className = 'btn btn-outline-secondary btn-action disabled';
+							else
+								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-check"></i>';
 							button.title = 'Status bestätigen';
 							button.addEventListener('click', () =>
@@ -93,7 +105,10 @@ export default{
 							container.append(button);
 
 							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+								button.className = 'btn btn-outline-secondary btn-action disabled';
+							else
+								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.title = 'Status bearbeiten';
 							button.addEventListener('click', (event) =>
@@ -102,7 +117,10 @@ export default{
 							container.append(button);
 
 							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+								button.className = 'btn btn-outline-secondary btn-action disabled';
+							else
+								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = 'Status löschen';
 							button.addEventListener('click', () =>
@@ -115,6 +133,14 @@ export default{
 						frozen: true
 					},
 				],
+				rowFormatter: (row) => {
+					const rowData = row.getData();
+					if (this.dataMeldestichtag && this.dataMeldestichtag > rowData.datum)
+					{
+						row.getElement().classList.add('disabled');
+
+					}
+				},
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
@@ -128,17 +154,15 @@ export default{
 			aufnahmestufen: {'': '-- keine Auswahl --', 1: 1, 2: 2, 3: 3},
 			listStatusgruende: [],
 			statusId: {},
-			gruendeLength: {}
+			gruendeLength: {},
+			dataMeldestichtag: null,
+			stichtag: {}
 		}
 	},
 	computed: {
 		gruende() {
 			return this.listStatusgruende.filter(grund => grund.status_kurzbz == this.statusData.status_kurzbz);
 		},
-/*		gruendeLength() {
-			//return Object.keys(this.gruende).length;
-			return 33;
-		}*/
 	},
 	watch: {
 		data: {
@@ -185,16 +209,6 @@ export default{
 				if(this.statusData)
 					this.$refs.deleteStatusModal.show();
 			});
-
-/*			this.loadStatus({
-				'prestudent_id': this.prestudent_id,
-				'status_kurzbz': status,
-				'studiensemester_kurzbz': stdsem,
-				'ausbildungssemester': ausbildungssemester
-			}).then(() => {
-				if(this.statusData)
-					this.$refs.deleteStatusModal.show();
-			});*/
 		},
 		actionAdvanceStatus(status, stdsem, ausbildungssemester){
 			console.log("Action: Status vorrücken: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
@@ -227,7 +241,7 @@ export default{
 		addNewStatus(){
 			CoreRESTClient.post('components/stv/Status/addNewStatus/' + this.prestudent_id,
 				this.statusData
-		).then(response => {
+			).then(response => {
 				if (!response.data.error) {
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.hideModal('newStatusModal');
@@ -318,7 +332,7 @@ export default{
 							const errorData = result.data.retval;
 							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
 						}
-/*						return result;*/
+						/*						return result;*/
 					}).catch(error => {
 					if (error.response) {
 						//console.log(error.response);
@@ -412,16 +426,25 @@ export default{
 				this.listStatusgruende = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+		CoreRESTClient
+			.get('components/stv/Status/getLastBismeldestichtag/')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.dataMeldestichtag = result[0].meldestichtag;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 		<div class="stv-list h-100 pt-3">
 		
 		
 		<p>TestData</p>
-		{{statusData}}
-		<hr>
-		{{gruende}}
-		{{gruendeLength}}
+
+		Bismeldestichtag
+		{{dataMeldestichtag }}
+		
+		
+
 		
 <!--		Berechtigungen:
 			Skip Check: {{hasPermissionToSkipStatusCheck}} |
@@ -601,6 +624,10 @@ export default{
 			<BsModal ref="editStatusModal">
 				<template #title>Status bearbeiten</template>
 					<form-form class="row g-3" ref="statusData">
+					
+					<div v-if="statusData.datum < dataMeldestichtag ">
+						<b>Meldestichtag erreicht - Bearbeiten nicht mehr möglich</b>
+					</div>
 					
 					 <input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
 					

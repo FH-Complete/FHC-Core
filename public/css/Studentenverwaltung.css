@@ -40,6 +40,13 @@ html {
 	width: 0%;
 }
 
+.tabulator-row.disabled.tabulator-row-odd .tabulator-cell {
+	color: var(--gray-400);
+}
+.tabulator-row.disabled.tabulator-row-even .tabulator-cell {
+	color: var(--gray-500);
+}
+
 @media (min-width: 768px) {
 	#sidebarMenu {
 		visibility: visible!important;

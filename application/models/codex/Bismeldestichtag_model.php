@@ -1,7 +1,6 @@
 <?php
 class Bismeldestichtag_model extends DB_Model
 {
-
 	/**
 	 * Constructor
 	 */
@@ -54,9 +53,29 @@ class Bismeldestichtag_model extends DB_Model
 	 * @param $status_datum
 	 * @return boolean true wenn erreicht, oder false
 	 */
-	public function checkIfMeldestichtagErreicht($status_datum)
+	public function checkIfMeldestichtagErreicht($status_datum, $studiensemester_kurzbz = null)
 	{
 		$erreicht = false;
+
+		if (isset($studiensemester_kurzbz))
+		{
+			// Studiensemesterende holen
+			$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+			$result = $this->StudiensemesterModel->loadWhere(
+				array(
+					'studiensemester_kurzbz' => $studiensemester_kurzbz
+				)
+			);
+			if(isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			$result = current(getData($result));
+
+			$studiensemester_ende = $result->ende;
+		}
+
 		// letztes erreichtes Bismeldedatum holen
 		$result = $this->getLastReachedMeldestichtag();
 		if (isError($result))
@@ -68,13 +87,17 @@ class Bismeldestichtag_model extends DB_Model
 		}
 		$stichtag = current(getData($result));
 		$stichtag = $stichtag->meldestichtag;
-		var_dump($status_datum . " < " . $stichtag . "?");
 
 		// Prüfen, ob Studentstatusdatum oder Studiensemester vor dem Stichtagsdatum liegen
 		if (isset($statusDatum))
 		{
 			if (isset($stichtag))
 				$erreicht = $statusDatum < $stichtag;
+		}
+
+		if (isset($studiensemester_ende))
+		{
+			$erreicht = $erreicht || $studiensemester_ende < $stichtag;
 		}
 
 		if($erreicht)
