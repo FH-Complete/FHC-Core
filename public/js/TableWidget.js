@@ -161,6 +161,42 @@ var FHC_TableWidget = {
 		FHC_TableWidget._renderDataset(tableWidgetDiv, data);
 
 		FHC_TableWidget._turnOnEvents(tableWidgetDiv); // turns all the events off
+
+		FHC_TableWidget._onTableBuilt(tableWidgetDiv, data);
+	},
+
+
+	_onTableBuilt: function(tableWidgetDiv, data) {
+		var options = FHC_TableWidget._getRepresentationOptions(data);
+
+		tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","tableBuilt",()=>{
+
+			if (typeof options.tableWidgetHeader == 'undefined' ||
+			(typeof options.tableWidgetHeader != 'undefined' && options.tableWidgetHeader != false))
+			{
+				// renders the table headers
+				var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
+				tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);	
+			}
+			
+			
+			// makes the table headers toggle visibility when clicking on them
+			tableWidgetDiv.find('.btn-select-col').on('click', function()
+			{
+				var selected = this.value;
+				
+				tableWidgetDiv.find("#tableWidgetTabulator").tabulator('toggleColumn', selected);
+
+				// toggle class to color button as selected / deselected
+				$(this).toggleClass('btn-select-col-selected').blur();	// blur removes automatic focus
+			})
+
+				
+			
+		
+			
+
+		})
 	},
 
 	/**
@@ -263,18 +299,7 @@ var FHC_TableWidget = {
 			})
 
 			// Click-Event to toggle column-picker columns
-			//! was changed to be added when the table was built first
-			tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","tableBuilt",()=>{
-				tableWidgetDiv.find('.btn-select-col').on('click', function()
-			{
-				var selected = this.value;
-				
-				tableWidgetDiv.find("#tableWidgetTabulator").tabulator('toggleColumn', selected);
-
-				// toggle class to color button as selected / deselected
-				$(this).toggleClass('btn-select-col-selected').blur();	// blur removes automatic focus
-			})
-			});
+			//! this event was moved to the _onTableBuilt function
 			
 		}
 	},
@@ -298,6 +323,8 @@ var FHC_TableWidget = {
 		{
 			FHC_TableWidget._renderDatasetTabulator(tableWidgetDiv, data); // ...render the tabulator GUI
 		}
+
+		
 	},
 
 	/**
@@ -545,13 +572,18 @@ var FHC_TableWidget = {
 			if (data.hasOwnProperty("dataset") && $.isArray(data.dataset))
 			{
 				if (options == null) options = {};
-
+				
+				options.columnDefaults={
+					// set header tooltip with column title
+					//! the old keyword is tooltipsHeader, the new keyword for the option is headerTooltip
+					headerTooltip: (typeof options.columnDefaults.tooltipsHeader == 'undefined') ? true : options.columnDefaults.tooltipsHeader
+				}
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
                 options.persistence = (typeof options.persistence == 'undefined') ? true : options.persistence;			// enables persistence (default store in localStorage if available, else in cookie)
                 options.persistenceID = (typeof options.persistenceID == 'undefined') ?  data.tableUniqueId : options.persistenceID;  // persistenceID to store persistence data seperately for multiple tables
 				options.movableColumns = (typeof options.movableColumns == 'undefined') ? true : options.movableColumns;				// allows changing column order
-				options.tooltipsHeader = (typeof options.tooltipsHeader == 'undefined') ? true : options.tooltipsHeader;					// set header tooltip with column title
+				
 				options.placeholder = _func_placeholder();	// display text when table is empty
 
 				// OLD tabulator v4
@@ -569,13 +601,10 @@ var FHC_TableWidget = {
 
 				// Renders the tabulator
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator(options);
+
+				//! the following callbacks need to be attached after the table has built in tabulator version 5+
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","rowSelectionChanged",_func_rowSelectionChanged);
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","columnVisibilityChanged",_func_columnVisibilityChanged);
-				
-				// notify other js files that work on the tabulator instance that the tabulator is initialized by triggering the event tableInit
-				
-				
-				
 				
 			}
 		}
@@ -593,12 +622,10 @@ var FHC_TableWidget = {
 				var tabulatorHeaderHTML = _renderTabulatorHeaderHTML(tableWidgetDiv);
 				tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
 
-				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","tableBuilt",()=>{
-					
-					// Render the collapsable div triggered by button in tableWidgetHeader
-					var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
-					tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
-				});
+
+				// Render the collapsable div triggered by button in tableWidgetHeader
+				//! this rendering was moved to the _onTableBuilt function
+				
 			}
 		
 		

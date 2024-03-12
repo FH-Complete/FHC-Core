@@ -238,7 +238,7 @@ $filterWidgetArray = array(
 		begruendung_id: {visible: false, headerFilter:"input"},
 		dms_id: {visible: false, headerFilter:"input"},
 		schreibberechtigt: {
-			formatter:"tickCross", align:"center", 
+			formatter:"tickCross", hozAlign:"center", 
 		    headerFilter:"tickCross", headerFilterParams:{tristate: true}, headerFilterFunc: hf_schreibberechtigt
 		},
 		studiensemester_kurzbz: {visible: false, headerFilter:"input"},
@@ -247,22 +247,22 @@ $filterWidgetArray = array(
 		orgform_kurzbz: {headerFilter:"input"},
 		ausbildungssemester: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
-		ects: {headerFilter:"input", align:"center"},
+		ects: {headerFilter:"input", hozAlign:"center"},
 		ectsSumBisherUndNeu: {formatter: format_ectsSumBisherUndNeu},
-		ectsSumSchulisch: {visible: false, headerFilter:"input", align:"right"},
-		ectsSumBeruflich: {visible: false, headerFilter:"input", align:"right"},
+		ectsSumSchulisch: {visible: false, headerFilter:"input", hozAlign:"right"},
+		ectsSumBeruflich: {visible: false, headerFilter:"input", hozAlign:"right"},
 		begruendung: {headerFilter:"input", visible: true},
 		
 		student: {headerFilter:"input"},
 		zgv: {headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams: paramLookup_dokBez},
 		anmerkung_student: {headerFilter:"input"},
-		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
-		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
+		antragsdatum: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate},
+		empfehlung_anrechnung: {headerFilter:"input", hozAlign:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false, headerFilter:"input"},
 		status_bezeichnung: {headerFilter:"input"},
 		prestudent_id: {visible: false, headerFilter:"input"},
-		empfehlungsanfrageAm: {visible: false, align:"center", headerFilter:"input", mutator: mut_formatStringDate},
+		empfehlungsanfrageAm: {visible: false, hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlungsanfrageAn: {visible: false, headerFilter:"input"}
 	 }', // col properties
 );
