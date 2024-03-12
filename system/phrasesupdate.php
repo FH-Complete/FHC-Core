@@ -2284,26 +2284,6 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'person',
-		'phrase' => 'plz',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'plz',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'code',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'person',
 		'phrase' => 'postleitzahl',
 		'insertvon' => 'system',
 		'phrases' => array(
