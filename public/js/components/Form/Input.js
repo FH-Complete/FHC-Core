@@ -7,9 +7,16 @@ export default {
 	components: {
 		FhcFragment
 	},
-	inject: [
-		'$registerToForm'
-	],
+	inject: {
+		registerToForm: {
+			from: '$registerToForm',
+			default: null
+		},
+		clearValidationForName: {
+			from: '$clearValidationForName',
+			default: null
+		}
+	},
 	props: {
 		bsFeedback: Boolean,
 		noAutoClass: Boolean,
@@ -22,7 +29,8 @@ export default {
 	data() {
 		return {
 			valid: undefined,
-			feedback: []
+			feedback: [],
+			modelValueDummy: undefined
 		}
 	},
 	computed: {
@@ -31,8 +39,9 @@ export default {
 				return true;
 			if (this.containerClass)
 				return true;
-			if (this.autoContainerClass)
-				return true;
+			for (const prop in this.autoContainerClass)
+				if (Object.hasOwn(this.autoContainerClass, prop))
+					return true;
 			return false;
 		},
 		acc() {
@@ -111,13 +120,19 @@ export default {
 						if (!c.includes('form-check-input') && !c.includes('btn-check'))
 							classes.push('form-check-input');
 						break;
+					case 'color':
+						if (!c.includes('form-control-color'))
+							classes.push('form-control-color');
+						if (!c.includes('form-control'))
+							classes.push('form-control');
+						break;
 					case 'autocomplete':
 					case 'datepicker':
 						classes.push('p-0');
 						classes.push('border-0');
-					case 'color':
-						if (!c.includes('form-control-color'))
-							classes.push('form-control-color');
+						if (!c.includes('form-control'))
+							classes.push('form-control');
+						break;
 					case 'text':
 					case 'number':
 					case 'password':
@@ -145,9 +160,13 @@ export default {
 		},
 		modelValueCmp: {
 			get() {
+				if (this.$attrs.modelValue === undefined)
+					return this.modelValueDummy;
 				return this.$attrs.modelValue;
 			},
 			set(v) {
+				if (this.$attrs.modelValue === undefined)
+					this.modelValueDummy = v;
 				this.$emit('update:modelValue', v);
 			}
 		},
@@ -171,12 +190,26 @@ export default {
 			this.valid = undefined;
 			this.feedback = [];
 		},
+		clearValidationForThisName() {
+			if (this.valid === undefined)
+				return;
+			if (this.clearValidationForName && this.name)
+				this.clearValidationForName(this.name);
+			else
+				this.clearValidation();
+		},
 		setFeedback(valid, feedback) {
 			if (!feedback)
 				feedback = [];
 			if (!Array.isArray(feedback))
 				feedback = [feedback];
 			this.valid = valid;
+			// NOTE(chris): On a list of radios/checkboxes only add the feedback message to the last item
+			if (this.name && (this.lcType == 'radio' || this.lcType == 'checkbox')) {
+				const selector = 'input[type="' + this.lcType + '"][name="' + this.name + '"]';
+				if ([...this.$el.parentNode.querySelectorAll(selector)].pop() != this.$refs.input)
+					return;
+			}
 			this.feedback = feedback;
 		},
 		_loadComponents() {
@@ -198,19 +231,20 @@ export default {
 		this._loadComponents();
 	},
 	mounted() {
-		if (this.$registerToForm)
-			this.$registerToForm(this);
+		if (this.registerToForm)
+			this.registerToForm(this);
 	},
 	template: `
 	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
 		<label v-if="$attrs.label && lcType != 'radio' && lcType != 'checkbox'" :for="idCmp">{{$attrs.label}}</label>
-		<input v-if="tag == 'input'" :type="lcType" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
-		<textarea v-else-if="tag == 'textarea'" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)"></textarea>
-		<select v-else-if="tag == 'select'" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
+		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
+		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)"></textarea>
+		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
 			<slot></slot>
 		</select>
 		<component
 			v-else-if="tag == 'VueDatePicker'"
+			ref="input"
 			:is="tag"
 			:type="type"
 			v-model="modelValueCmp"
@@ -220,12 +254,13 @@ export default {
 			:class="validationClass"
 			:input-class-name=
 			"[...Object.entries({'form-control': !noAutoClass, 'is-valid': valid === true, 'is-invalid': valid === false}).reduce((a,[k,v]) => {if(v) a.push(k);return a}, []), ...($attrs['input-class-name'] ? $attrs['input-class-name'].split(' ') : [])].join(' ')"
-			@update:model-value="clearValidation"
+			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>
 		</component>
 		<component
 			v-else-if="tag == 'PvAutocomplete'"
+			ref="input"
 			:is="tag"
 			:type="type"
 			v-model="modelValueCmp"
@@ -234,12 +269,13 @@ export default {
 			:input-props="{name}"
 			:class="validationClass"
 			:input-class="[...Object.entries({'form-control': !noAutoClass, 'is-valid': valid === true, 'is-invalid': valid === false}).reduce((a,[k,v]) => {if(v) a.push(k);return a}, []), ...($attrs['input-class'] ? $attrs['input-class'].split(' ') : [])].join(' ')"
-			@update:model-value="clearValidation"
+			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>
 		</component>
 		<component
 			v-else-if="tag == 'UploadDms'"
+			ref="input"
 			:is="tag"
 			:type="type"
 			v-model="modelValueCmp"
@@ -249,12 +285,13 @@ export default {
 			:class="validationClass"
 			:input-class="validationClass"
 			:no-list="inputGroup"
-			@update:model-value="clearValidation"
+			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>
 		</component>
 		<component
 			v-else
+			ref="input"
 			:is="tag"
 			:type="type"
 			v-model="modelValueCmp"
@@ -262,7 +299,7 @@ export default {
 			:id="idCmp"
 			:name="name"
 			:class="validationClass"
-			@update:model-value="clearValidation"
+			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>
 		</component>

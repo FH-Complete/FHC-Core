@@ -54,6 +54,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/vertrag.class.php');
 require_once('../../include/benutzergruppe.class.php');
 require_once('../../include/bisverwendung.class.php');
+require_once('../../include/stundensatz.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -543,50 +544,60 @@ if(!$error)
 				$lem->new=true;
 
 				$fixangestellt=false;
-				//Stundensatz aus tbl_mitarbeiter holen
-				$mitarbeiter = new mitarbeiter();
-				if ($mitarbeiter->load($_POST['mitarbeiter_uid']))
+				//"lehre" Stundensatz aus hr.tbl_stundensatz holen
+				
+				$studiensemester = new studiensemester();
+				if (!$studiensemester->load($_POST['studiensemester_kurzbz']))
 				{
-					$fixangestellt = $mitarbeiter->fixangestellt;
-					$lem->stundensatz = $mitarbeiter->stundensatz;
+					$return = false;
+					$error = true;
+					$errormsg = 'Fehler beim Laden des Studiensemesters';
+				}
 
-					if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
-						&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
+				if (!$error)
+				{
+					$mitarbeiter = new mitarbeiter();
+					if ($mitarbeiter->load($_POST['mitarbeiter_uid']))
 					{
-						$stsem = new studiensemester();
-						$stsem->load($semester_aktuell);
-						$bisverwendung = new bisverwendung();
-						$data = $mitarbeiter->stundensatz;
-						if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
+						$fixangestellt = $mitarbeiter->fixangestellt;
+						
+						$stundensatz = new stundensatz();
+						$stundensatz->getStundensatzDatum($mitarbeiter->uid, $studiensemester->start, $studiensemester->ende, 'lehre');
+						$lem->stundensatz = $stundensatz->stundensatz;
+						
+						if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+							&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
 						{
-							$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
-							$bisverwendung->result[] = $bisverwendung;
-						}
-
-						foreach($bisverwendung->result as $row_verwendung)
-						{
-							// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
-							// geliefert da dies im Vertrag inkludiert ist.
-
-							if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
+							$stsem = new studiensemester();
+							$stsem->load($semester_aktuell);
+							$bisverwendung = new bisverwendung();
+							
+							if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
 							{
-								$fixangestellt = true;
-								$lem->stundensatz = '';
-
-								break;
+								$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
+								$bisverwendung->result[] = $bisverwendung;
+							}
+							
+							foreach($bisverwendung->result as $row_verwendung)
+							{
+								// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+								// geliefert da dies im Vertrag inkludiert ist.
+								
+								if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
+								{
+									$fixangestellt = true;
+									$lem->stundensatz = '';
+									break;
+								}
 							}
 						}
 					}
 					else
 					{
-						$lem->stundensatz = $mitarbeiter->stundensatz;
+						$error=true;
+						$return=false;
+						$errormsg='Mitarbeiter '.$db->convert_html_chars($_POST['mitarbeiter_uid']).' wurde nicht gefunden';
 					}
-				}
-				else
-				{
-					$error=true;
-					$return=false;
-					$errormsg='Mitarbeiter '.$db->convert_html_chars($_POST['mitarbeiter_uid']).' wurde nicht gefunden';
 				}
 
 				$maxstunden=9999;
@@ -1556,49 +1567,61 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
 	{
-		if(isset($_POST['mitarbeiter_uid']))
+		if(isset($_POST['mitarbeiter_uid']) && isset($_POST['studiensemester_kurzbz']))
 		{
-			$mitarbeiter = new mitarbeiter();
-			if($mitarbeiter->load($_POST['mitarbeiter_uid']))
+			$studiensemester = new studiensemester();
+			if (!$studiensemester->load($_POST['studiensemester_kurzbz']))
 			{
-				if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
-					&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
+				$return = false;
+				$error = true;
+				$errormsg = 'Fehler beim Laden des Studiensemesters';
+			}
+			
+			if (!$error)
+			{
+				$mitarbeiter = new mitarbeiter();
+				if($mitarbeiter->load($_POST['mitarbeiter_uid']))
 				{
-					$stsem = new studiensemester();
-					$stsem->load($semester_aktuell);
-					$bisverwendung = new bisverwendung();
-					$data = $mitarbeiter->stundensatz;
-					if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
+					$stundensatz = new stundensatz();
+					$stundensatz->getStundensatzDatum($mitarbeiter->uid, $studiensemester->start, $studiensemester->ende, 'lehre');
+					$data = $stundensatz->stundensatz;
+					
+					if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+						&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
 					{
-						$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
-						$bisverwendung->result[] = $bisverwendung;
-					}
-
-					foreach($bisverwendung->result as $row_verwendung)
-					{
-
-						// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
-						// geliefert da dies im Vertrag inkludiert ist.
-						if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
+						$stsem = new studiensemester();
+						$stsem->load($semester_aktuell);
+						$bisverwendung = new bisverwendung();
+						if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
 						{
-							$data = '';
-							break;
+							$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
+							$bisverwendung->result[] = $bisverwendung;
+						}
+						
+						foreach($bisverwendung->result as $row_verwendung)
+						{
+							
+							// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+							// geliefert da dies im Vertrag inkludiert ist.
+							if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
+							{
+								$data = '';
+								break;
+							}
 						}
 					}
+					$return = true;
 				}
 				else
-					$data = $mitarbeiter->stundensatz;
-				$return = true;
-			}
-			else
-			{
-				$errormsg = 'Fehler beim Laden des Mitarbeitenden';
-				$return = false;
+				{
+					$errormsg = 'Fehler beim Laden des Mitarbeitenden';
+					$return = false;
+				}
 			}
 		}
 		else
 		{
-			$errormsg = 'MitarbeitendeUID muss uebergeben werden';
+			$errormsg = 'MitarbeitendeUID und Studiensemester muessen uebergeben werden';
 			$return = false;
 		}
 	}

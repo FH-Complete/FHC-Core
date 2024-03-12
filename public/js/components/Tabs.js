@@ -11,14 +11,14 @@ export default {
 		'changed'
 	],
 	props: {
-		// TODO(chris): rename to config?
 		config: {
 			type: [String, Object],
 			required: true
 		},
 		default: String,
 		modelValue: [String, Number, Boolean, Array, Object, Date, Function, Symbol],
-		vertical: Boolean
+		vertical: Boolean,
+		border: Boolean
 	},
 	data() {
 		return {
@@ -62,7 +62,6 @@ export default {
 					.then(this.initConfig)
 					.catch(this.$fhcAlert.handleSystemError);
 
-			console.log(config);
 			const tabs = {};
 
 			if (Array.isArray(config)) {
@@ -104,7 +103,7 @@ export default {
 		this.initConfig(this.config);
 	},
 	template: `
-	<div class="fhc-tabs d-flex" :class="vertical ? 'align-items-stretch' : 'flex-column'" v-if="Object.keys(tabs).length">
+	<div class="fhc-tabs d-flex" :class="vertical ? 'align-items-stretch gap-3' : (border ? 'flex-column' : 'flex-column gap-3')" v-if="Object.keys(tabs).length">
 		<div class="nav" :class="vertical ? 'nav-pills flex-column' : 'nav-tabs'">
 			<div
 				v-for="tab in tabs"
@@ -118,7 +117,7 @@ export default {
 				{{tab.title}}
 			</div>
 		</div>
-		<div :style="vertical ? '' : 'flex: 1 1 0%; height: 0%'" class="overflow-auto p-3" :class="vertical ? '' : 'border-bottom border-start border-end'">
+		<div :style="vertical ? '' : 'flex: 1 1 0%; height: 0%'" class="overflow-auto flex-grow-1" :class="vertical || !border ? '' : 'p-3 border-bottom border-start border-end'">
 			<keep-alive>
 				<component ref="current" :is="currentTab.component" v-model="value" :config="currentTab.config"></component>
 			</keep-alive>

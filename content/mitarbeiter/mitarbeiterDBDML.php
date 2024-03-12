@@ -40,6 +40,8 @@ require_once('../../include/vertrag.class.php');
 require_once('../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../include/wawi_konto.class.php');
 require_once('../../include/addon.class.php');
+require_once('../../include/stundensatz.class.php');
+
 
 $user = get_uid();
 
@@ -93,7 +95,6 @@ if(!$error)
 			$mitarbeiter->geburtsnation = $_POST['geburtsnation'];
 			$mitarbeiter->sprache = $_POST['sprache'];
 			$mitarbeiter->kurzbz = $_POST['kurzbezeichnung'];
-			$mitarbeiter->stundensatz = $_POST['stundensatz'];
 			$mitarbeiter->telefonklappe = $_POST['telefonklappe'];
 			$mitarbeiter->lektor = ($_POST['lektor']=='true'?true:false);
 			$mitarbeiter->fixangestellt = ($_POST['fixangestellt']=='true'?true:false);
@@ -806,6 +807,61 @@ if(!$error)
 			$error = false;
 			$return = true;
 			$errormsg = "";
+		}
+	}
+	else if (isset($_POST['type']) && $_POST['type'] === 'updateStundensatz')
+	{
+		$mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+		$stundenbetrag = $_POST['stundensatz'];
+		$datum_von = $_POST['datum_von'];
+		$datum_bis = $_POST['datum_bis'];
+		$unternehmen = $_POST['unternehmen'];
+		$stundensatztyp = $_POST['typ'];
+		if (isset($_POST['stundensatz_id']))
+		{
+			$stundensatz = new stundensatz();
+			$stundensatz->load($_POST['stundensatz_id']);
+			$stundensatz->new = false;
+		}
+		else
+		{
+			$stundensatz = new stundensatz();
+			$stundensatz->new = true;
+		}
+
+		$stundensatz->uid = $mitarbeiter_uid;
+		$stundensatz->stundensatztyp = $stundensatztyp;
+		$stundensatz->stundensatz = $stundenbetrag;
+		$stundensatz->oe_kurzbz = $unternehmen;
+		$stundensatz->gueltig_von = $datum_von;
+		$stundensatz->gueltig_bis = $datum_bis;
+		$stundensatz->insertvon = $user;
+		$stundensatz->updatevon = $user;
+		$stundensatz->insertamum = date('Y-m-d H:i:s');
+		$stundensatz->updateamum = date('Y-m-d H:i:s');
+		
+		if ($stundensatz->save())
+		{
+			$data = $stundensatz->stundensatz_id;
+			$return = true;
+		}
+		else
+		{
+			$errormsg = $stundensatz->errormsg;
+			$return = false;
+		}
+	}
+	else if (isset($_POST['type']) && $_POST['type'] === 'deleteStundensatz')
+	{
+		$stundensatz = new stundensatz();
+		if ($stundensatz->delete($_POST['stundensatz_id']))
+		{
+			$return = true;
+		}
+		else
+		{
+			$return = false;
+			$errormsg = $stundensatz->errormsg;
 		}
 	}
 	else

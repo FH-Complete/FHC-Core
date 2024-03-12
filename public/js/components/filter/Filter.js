@@ -135,9 +135,9 @@ export const CoreFilterCmpt = {
 				for (let col of columns)
 				{
 					// If the column has to be displayed or not
-					col.visible = selectedFields.indexOf(col.field) >= 0;
-					if (col.formatter == 'rowSelection')
-						col.visible = true;
+					/* fields.indexOf(col.field) == -1; ensures displaying formatter colums
+					e.g. column with rowSelection checkboxes or with custom formatted action buttons */
+					col.visible = selectedFields.indexOf(col.field) >= 0 || fields.indexOf(col.field) == -1;
 
 					if (col.hasOwnProperty('resizable'))
 						col.resizable = col.visible;
@@ -184,13 +184,23 @@ export const CoreFilterCmpt = {
 			else
 				this.getFilter();
 		},
-		initTabulator() {
+		async initTabulator() {
+			let placeholder = '< Phrasen Plugin not loaded! >';
+			if (this.$p) {
+				await this.$p.loadCategory('ui');
+				placeholder = this.$p.t('ui/keineDatenVorhanden');
+			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
 				height: 500,
-				layout: "fitColumns",
+				layout: "fitDataStretch",
 				movableColumns: true,
-				reactiveData: true
+				columnDefaults:{
+					tooltip: true,
+				},
+				placeholder,
+				reactiveData: true,
+				persistence: true
 			}, ...(this.tabulatorOptions || {})};
 
 			if (!this.tableOnly) {
@@ -264,6 +274,7 @@ export const CoreFilterCmpt = {
 				this.filterName = data.filterName;
 				this.dataset = data.dataset;
 				this.datasetMetadata = data.datasetMetadata;
+
 				this.fields = data.fields;
 				this.selectedFields = data.selectedFields;
 				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
@@ -434,7 +445,7 @@ export const CoreFilterCmpt = {
 		 *
 		 */
 		handlerRemoveCustomFilter: function(event) {
-			filterId = event.currentTarget.getAttribute("href").substring(1);
+			let filterId = event.currentTarget.getAttribute("href").substring(1);
 			if (filterId === this.selectedFilter)
 				this.selectedFilter = null;
 			//
@@ -520,7 +531,7 @@ export const CoreFilterCmpt = {
 
 			<div class="d-flex flex-row justify-content-between flex-wrap">
 				<div v-if="newBtnShow || reload || $slots.actions" class="d-flex gap-2 align-items-baseline flex-wrap">
-					<button v-if="newBtnShow" class="btn btn-outline-secondary" :class="newBtnClass" :title="newBtnLabel ? undefined : 'New'" :aria-label="newBtnLabel ? undefined : 'New'" @click="$emit('click:new', $event)" :disabled="newBtnDisabled">
+					<button v-if="newBtnShow" class="btn btn-primary" :class="newBtnClass" :title="newBtnLabel ? undefined : 'New'" :aria-label="newBtnLabel ? undefined : 'New'" @click="$emit('click:new', $event)" :disabled="newBtnDisabled">
 						<span class="fa-solid fa-plus" aria-hidden="true"></span>
 						{{ newBtnLabel }}
 					</button>
