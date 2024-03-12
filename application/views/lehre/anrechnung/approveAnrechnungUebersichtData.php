@@ -209,8 +209,13 @@ $filterWidgetArray = array(
 		layout: "fitColumns",           // fit columns to width of table
 		persistenceID: "approveAnrechnungUebersicht_V1",
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
-        index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
+	    columnDefaults:{
+			headerFilterPlaceholder: " ",
+			tooltip:function(e, cell, onRendered){
+				return func_tooltips(cell);
+			},
+		},
+		index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
@@ -225,12 +230,6 @@ $filterWidgetArray = array(
             func_rowFormatter(row,this);
         },
 		
-		//! not working
-		columnDefaults:{
-			tooltip:function(e, cell, onRendered){
-				return func_tooltips(cell);
-			}
-        }
 	 }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
 		anrechnung_id: {visible: false, headerFilter:"input"},

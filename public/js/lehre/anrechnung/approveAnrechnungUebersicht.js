@@ -74,7 +74,7 @@ function func_tableBuilt(table) {
     table.tabulator("addColumn",{
         title: "Details",
         field: 'details',
-        hozAlign: "center",
+        hozAlign: 'center',
         width: 100,
         formatter: "link",
         formatterParams:{
@@ -148,7 +148,6 @@ var format_ectsSumBisherUndNeu = function(cell, formatterParams, onRendered){
 // Formats the rows
 function func_rowFormatter(row){
     
-
     let status_kurzbz = row.getData().status_kurzbz;
 
     // If status is anything else then 'Bearbeitet von STGL-Leitung'
@@ -168,6 +167,7 @@ function func_rowFormatter(row){
 
 // Formats row selectable/unselectable
 function func_selectableCheck(row){
+    console.log("entered here in selectable check")
     let status_kurzbz = row.getData().status_kurzbz;
 
     return (
@@ -187,13 +187,17 @@ function func_rowSelectionChanged(data, rows){
         selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(data);
 
         // Loop through all active rows
-        var selectedRows = tabulator.find("#tableWidgetTabulator").tabulator("getSelectedRows");
-        for (var i = 0; i < selectedRows.length; i++) {
+        // rowManager
+        //! getting the rowManager throught the tabulator instance saved in the window object (saved in the jquery_wrapper) of the browser
+        var rowManager = window.table.rowManager;
+        for (var i = 0; i < rowManager.activeRows.length; i++) {
 
             // Reinitialize row -> triggers formatters.
             //selectedRows[i].rerenderRowCells(true);
-            //! rowManager.activeRows[i].reinitialize();
-            selectedRows[i].reformat();
+            //selectedRows[i].reformat();
+            
+            rowManager.activeRows[i].reinitialize();
+            
             
         }
 
@@ -204,7 +208,7 @@ function func_rowSelectionChanged(data, rows){
 
 // Returns tooltip
 function func_tooltips(cell) {
-    console.log(cell);
+    console.log("TOOLTIP DEBUG",cell);
     // Return tooltip if row is unselectable
     if (true || !func_selectableCheck(cell.getRow())){
         return FHC_PhrasesLib.t("ui", "nichtSelektierbarAufgrundVon") + 'Status';
@@ -263,7 +267,7 @@ $(function(){
         func_tableBuilt($("#tableWidgetTabulator"))
         
        
-       //table.tabulator("on","rowSelectionChanged",func_rowSelectionChanged);
+        $("#tableWidgetTabulator").tabulator("on","rowSelectionChanged",func_rowSelectionChanged);
        
         /*  table.tabulator("on","dataLoaded", function() {
             // do something

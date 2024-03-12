@@ -572,7 +572,8 @@ var FHC_TableWidget = {
 			if (data.hasOwnProperty("dataset") && $.isArray(data.dataset))
 			{
 				if (options == null) options = {};
-				
+				console.log("header tooltips here:",options.columnDefaults.tooltipsHeader);
+				console.log("tooltips here:",options.columnDefaults.tooltip);
 				options.columnDefaults={
 					// set header tooltip with column title
 					//! the old keyword is tooltipsHeader, the new keyword for the option is headerTooltip
