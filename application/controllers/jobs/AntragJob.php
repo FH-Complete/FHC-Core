@@ -19,6 +19,8 @@ class AntragJob extends JOB_Controller
 		// Loads SanchoHelper
 		$this->load->helper('hlp_sancho_helper');
 
+		$this->load->library('AntragLib');
+
 		// Load Model
 		$this->load->model('education/Studierendenantrag_model', 'StudierendenantragModel');
 		$this->load->model('education/Studierendenantragstatus_model', 'StudierendenantragstatusModel');
@@ -387,8 +389,6 @@ class AntragJob extends JOB_Controller
 	public function handleAbmeldungenStglDeadline()
 	{
 		$this->logInfo('Start Job handleAbmeldungenStglDeadline');
-
-		$this->load->library('AntragLib');
 
 		$insertvon = $this->config->item('antrag_job_systemuser');
 		if (!$insertvon) {
