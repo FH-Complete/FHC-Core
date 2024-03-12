@@ -1,15 +1,14 @@
 <?php
 if (! defined('DB_NAME')) exit('No direct script access allowed');
 
-if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table_name='tbl_dienstverhaeltnis' AND table_schema='hr'"))
+if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table_name='tbl_frist' AND table_schema='hr'"))
 {
 	if ($db->db_num_rows($result) == 0)
 	{
 		$qry = "
         CREATE TABLE IF NOT EXISTS hr.tbl_frist (
             frist_id bigserial NOT NULL,
-            mitarbeiter_uid character varying(32),
-            verantwortlich_uid character varying(32),
+            mitarbeiter_uid character varying(32),            
             ereignis_kurzbz character varying(32) NOT NULL,
             bezeichnung varchar(255),
             datum date,
@@ -40,10 +39,6 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
         COMMENT ON TABLE hr.tbl_frist_status IS E'Key-Table of fristen status (new, done)';
 
         ALTER TABLE hr.tbl_frist ADD CONSTRAINT tbl_frist_mitarbeiter_uid_fk FOREIGN KEY (mitarbeiter_uid)
-		REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
-		ON DELETE SET NULL ON UPDATE CASCADE;
-
-        ALTER TABLE hr.tbl_frist ADD CONSTRAINT tbl_frist_verantwortlich_uid_fk FOREIGN KEY (verantwortlich_uid)
 		REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
 		ON DELETE SET NULL ON UPDATE CASCADE;
 
