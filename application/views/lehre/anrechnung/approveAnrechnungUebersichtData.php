@@ -224,9 +224,7 @@ $filterWidgetArray = array(
         rowFormatter:function(row){
             func_rowFormatter(row,this);
         },
-		columnDefaults:{
-			tooltip:true
-		},
+		
 		//! not working
 		columnDefaults:{
 			tooltip:function(e, cell, onRendered){

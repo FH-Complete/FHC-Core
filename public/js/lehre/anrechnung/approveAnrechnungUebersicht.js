@@ -69,15 +69,12 @@ function hf_schreibberechtigt(headerValue, rowValue){
 // Adds column details
 // Sets focus on filterbutton, if table starts with stored filter.
 function func_tableBuilt(table) {
-
     // Store table in global var
     tabulator = table;
-
-
-    table.find("#tableWidgetTabulator").tabulator("addColumn",{
+    table.tabulator("addColumn",{
         title: "Details",
         field: 'details',
-        align: "center",
+        hozAlign: "center",
         width: 100,
         formatter: "link",
         formatterParams:{
@@ -252,28 +249,21 @@ function tableWidgetHook_selectAllButton(tableWidgetDiv){
 
 
 
+
+
 $(function(){
     const genehmigung_panel = $('#approveAnrechnungUebersicht-genehmigung-panel');
     const begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
     const hasReadOnlyAccess = $('#formApproveAnrechnungUebersicht').data('readonly');
     const hasCreateAnrechnungAccess = $('#formApproveAnrechnungUebersicht').data('createaccess');
-
-
-    $(document).on("tableInit", function(event, table) {
+   
+   
+    $(document).on("tableInit", function(event) {
+     
+        func_tableBuilt($("#tableWidgetTabulator"))
         
-       table.find("#tableWidgetTabulator").tabulator("on","tableBuilt",()=>{
-        func_tableBuilt(table)
-        var el =$('#download-csv');
-        
-        $('#download-csv').click( function()
-			{
-                console.log("here")
-				// BOM for correct UTF-8 char output
-				table.find("#tableWidgetTabulator").tabulator("download", "csv", "data.csv", { bom:true });
-		})
-        console.log(el);
-        });
-       table.find("#tableWidgetTabulator").tabulator("on","rowSelectionChanged",func_rowSelectionChanged);
+       
+       //table.tabulator("on","rowSelectionChanged",func_rowSelectionChanged);
        
         /*  table.tabulator("on","dataLoaded", function() {
             // do something

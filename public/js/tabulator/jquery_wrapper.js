@@ -57,6 +57,7 @@
                           }
                           console.log(props);
                           console.log('bhbuilt end');
+						  $(document).trigger("tableInit");
                         });
 
 			//retrieve properties on prototype

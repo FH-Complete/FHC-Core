@@ -263,15 +263,19 @@ var FHC_TableWidget = {
 			})
 
 			// Click-Event to toggle column-picker columns
-			tableWidgetDiv.find('.btn-select-col').on('click', function()
+			//! was changed to be added when the table was built first
+			tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","tableBuilt",()=>{
+				tableWidgetDiv.find('.btn-select-col').on('click', function()
 			{
 				var selected = this.value;
-
+				
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator('toggleColumn', selected);
 
 				// toggle class to color button as selected / deselected
 				$(this).toggleClass('btn-select-col-selected').blur();	// blur removes automatic focus
 			})
+			});
+			
 		}
 	},
 
@@ -550,19 +554,27 @@ var FHC_TableWidget = {
 				options.tooltipsHeader = (typeof options.tooltipsHeader == 'undefined') ? true : options.tooltipsHeader;					// set header tooltip with column title
 				options.placeholder = _func_placeholder();	// display text when table is empty
 
-				if (typeof options.rowSelectionChanged == 'undefined')
-				{
-					options.rowSelectionChanged = function(data, rows){
-						_func_rowSelectionChanged(data, rows);
-					};
-				}
-				options.columnVisibilityChanged = function(column, visible) {
-					_func_columnVisibilityChanged(column, visible);
-				};
+				// OLD tabulator v4
+				// if (typeof options.rowSelectionChanged == 'undefined')
+				// {
+				// 	options.rowSelectionChanged = function(data, rows){
+				// 		_func_rowSelectionChanged(data, rows);
+				// 	};
+				// }
+				
+				// OLD tabulator v4
+				// options.columnVisibilityChanged = function(column, visible) {
+				// 	_func_columnVisibilityChanged(column, visible);
+				// };
 
 				// Renders the tabulator
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator(options);
-				//tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","tableBuilt",()=>{console.log("table build")});
+				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","rowSelectionChanged",_func_rowSelectionChanged);
+				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","columnVisibilityChanged",_func_columnVisibilityChanged);
+				
+				// notify other js files that work on the tabulator instance that the tabulator is initialized by triggering the event tableInit
+				
+				
 				
 				
 			}
@@ -573,16 +585,23 @@ var FHC_TableWidget = {
 		// -------------------------------------------------------------------------------------------------------------
 
 		// Render tableWidgetHeader
-		if (typeof options.tableWidgetHeader == 'undefined' ||
+		
+			
+			if (typeof options.tableWidgetHeader == 'undefined' ||
 			(typeof options.tableWidgetHeader != 'undefined' && options.tableWidgetHeader != false))
-		{
-			var tabulatorHeaderHTML = _renderTabulatorHeaderHTML(tableWidgetDiv);
-			tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
+			{
+				var tabulatorHeaderHTML = _renderTabulatorHeaderHTML(tableWidgetDiv);
+				tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
 
-			// Render the collapsable div triggered by button in tableWidgetHeader
-			var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
-			tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
-		}
+				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","tableBuilt",()=>{
+					
+					// Render the collapsable div triggered by button in tableWidgetHeader
+					var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
+					tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
+				});
+			}
+		
+		
 
 		/**
 		 * 	tableWidgetFooter is NOT rendered by default.
@@ -795,7 +814,7 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv){
 }
 
 // Returns collapsable HTML element for TableWidget header buttons
-function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
+function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns){
 
 	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
 
@@ -810,7 +829,7 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 	tabulatorHeaderCollapseHTML += '<div class="panel-heading" role="tab" id="headingOne">';
 	tabulatorHeaderCollapseHTML += '<h5 class="panel-title">';
 	tabulatorHeaderCollapseHTML += '' +
-		'<a role="button" data-toggle="collapse" data-parent="#accordion" ' +
+		'<a role="button" data-bs-toggle="collapse" data-bs-parent="#accordion" ' +
 		'href="#selectColumns-' + tableUniqueId + '" ' +
 		'aria-expanded="false" aria-controls="selectColumns">' +
 		FHC_PhrasesLib.t("ui", "spaltenEinstellen") +
