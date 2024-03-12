@@ -71,11 +71,20 @@ export default{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
+
+
+							//let disableButton = false;
+							//const rowData = this.row.getData();
+
+
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
 
 							let button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+								button.className = 'btn btn-outline-secondary btn-action disabled';
+							else
+								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-forward"></i>';
 							button.title = 'Status vorrücken';
 							button.addEventListener('click', () =>
@@ -84,7 +93,10 @@ export default{
 							container.append(button);
 
 							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+								button.className = 'btn btn-outline-secondary btn-action disabled';
+							else
+								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-check"></i>';
 							button.title = 'Status bestätigen';
 							button.addEventListener('click', () =>
@@ -93,7 +105,10 @@ export default{
 							container.append(button);
 
 							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+								button.className = 'btn btn-outline-secondary btn-action disabled';
+							else
+								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.title = 'Status bearbeiten';
 							button.addEventListener('click', (event) =>
@@ -102,7 +117,10 @@ export default{
 							container.append(button);
 
 							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+								button.className = 'btn btn-outline-secondary btn-action disabled';
+							else
+								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = 'Status löschen';
 							button.addEventListener('click', () =>
@@ -115,6 +133,14 @@ export default{
 						frozen: true
 					},
 				],
+				rowFormatter: (row) => {
+					const rowData = row.getData();
+					if (this.dataMeldestichtag && this.dataMeldestichtag > rowData.datum)
+					{
+						row.getElement().classList.add('disabled');
+
+					}
+				},
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
@@ -127,13 +153,24 @@ export default{
 			listStudienplaene: [],
 			aufnahmestufen: {'': '-- keine Auswahl --', 1: 1, 2: 2, 3: 3},
 			listStatusgruende: [],
-			statusId: {}
+			statusId: {},
+			gruendeLength: {},
+			dataMeldestichtag: null,
+			stichtag: {}
 		}
 	},
 	computed: {
 		gruende() {
 			return this.listStatusgruende.filter(grund => grund.status_kurzbz == this.statusData.status_kurzbz);
 		},
+	},
+	watch: {
+		data: {
+			handler(n) {
+				const start = this.status_kurzbz;
+			},
+			deep: true
+		}
 	},
 	methods: {
 		actionNewStatus() {
@@ -172,16 +209,6 @@ export default{
 				if(this.statusData)
 					this.$refs.deleteStatusModal.show();
 			});
-
-/*			this.loadStatus({
-				'prestudent_id': this.prestudent_id,
-				'status_kurzbz': status,
-				'studiensemester_kurzbz': stdsem,
-				'ausbildungssemester': ausbildungssemester
-			}).then(() => {
-				if(this.statusData)
-					this.$refs.deleteStatusModal.show();
-			});*/
 		},
 		actionAdvanceStatus(status, stdsem, ausbildungssemester){
 			console.log("Action: Status vorrücken: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
@@ -200,16 +227,21 @@ export default{
 		actionConfirmStatus(status, stdsem, ausbildungssemester){
 			console.log("Action: Status bestätigen: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
 			//this.$refs.deleteStatusModal.show();
-
-			/*			this.loadStatus(status_id).then(() => {
-							if(this.statusData.bankverbindung_id)
-								this.$refs.deleteStatusModal.show();
-						});*/
+			this.statusId = {
+				'prestudent_id': this.prestudent_id,
+				'status_kurzbz': status,
+				'studiensemester_kurzbz': stdsem,
+				'ausbildungssemester': ausbildungssemester
+			};
+			this.loadStatus(this.statusId).then(() => {
+				if(this.statusData)
+					this.confirmStatus(this.statusId);
+			});
 		},
 		addNewStatus(){
 			CoreRESTClient.post('components/stv/Status/addNewStatus/' + this.prestudent_id,
 				this.statusData
-		).then(response => {
+			).then(response => {
 				if (!response.data.error) {
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.hideModal('newStatusModal');
@@ -258,6 +290,33 @@ export default{
 					this.reload();
 				});
 		},
+		confirmStatus(statusId){
+			return CoreRESTClient.post('components/stv/Status/confirmStatus/' +
+				this.statusId.prestudent_id + '/' +
+				this.statusId.status_kurzbz + '/' +
+				this.statusId.studiensemester_kurzbz + '/' +
+				this.statusId.ausbildungssemester)
+				.then(
+					result => {
+						if(!result.data.error) {
+							this.$fhcAlert.alertSuccess('Bestätigung Status erfolgreich');
+						}
+						else
+						{
+							const errorData = result.data.retval;
+							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
+						}
+						/*						return result;*/
+					}).catch(error => {
+					if (error.response) {
+						console.log(error.response);
+						this.$fhcAlert.alertError(error.response.data);
+					}
+				}).finally(() => {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
+		},
 		deleteStatus(status_id){
 			return CoreRESTClient.post('components/stv/Status/deleteStatus/',
 				status_id)
@@ -273,7 +332,7 @@ export default{
 							const errorData = result.data.retval;
 							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
 						}
-/*						return result;*/
+						/*						return result;*/
 					}).catch(error => {
 					if (error.response) {
 						//console.log(error.response);
@@ -367,14 +426,26 @@ export default{
 				this.listStatusgruende = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+		CoreRESTClient
+			.get('components/stv/Status/getLastBismeldestichtag/')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.dataMeldestichtag = result[0].meldestichtag;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 		<div class="stv-list h-100 pt-3">
 		
 		
 		<p>TestData</p>
-		{{statusData}}
-		<hr>
+
+		Bismeldestichtag
+		{{dataMeldestichtag }}
+		
+		
+
+		
 <!--		Berechtigungen:
 			Skip Check: {{hasPermissionToSkipStatusCheck}} |
 			Admin: {{hasAdminPermission}} |
@@ -386,7 +457,6 @@ export default{
 		
 			<!--Modal: Add New Status-->
 			<BsModal ref="newStatusModal">
-			<!--TODO(manu) check stati: in FAs Absolvent, Abbrecher, Wartender nicht in Liste-->
 				<template #title>Neuen Status hinzufügen</template>
 							
 					<form-form class="row g-3" ref="statusData">
@@ -426,7 +496,7 @@ export default{
 								</form-input>
 							</div>
 						</div>
-						<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false)-->
+						<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false) 100 Semester-->
 						<div class="row mb-3">
 							<label for="ausbildungssemester" class="form-label col-sm-4">Ausbildungssemester</label>
 							<div class="col-sm-6">
@@ -527,9 +597,8 @@ export default{
 								</form-input>
 							</div>
 						</div>
-						
-						<!--TODO(manu): ganzes Feld ausblenden, wenn kein Statusgrund?-->
-						<div class="row mb-3">
+										
+						<div v-if="gruende.length > 0" class="row mb-3">
 							<label for="grund" class="form-label col-sm-4">Grund</label>
 							<div class="col-sm-6">
 								<form-input 
@@ -553,9 +622,12 @@ export default{
 			
 			<!--Modal: Edit Status-->
 			<BsModal ref="editStatusModal">
-			<!--TODO(manu) check stati: in FAs Absolvent, Abbrecher, Wartender nicht in Liste-->
 				<template #title>Status bearbeiten</template>
 					<form-form class="row g-3" ref="statusData">
+					
+					<div v-if="statusData.datum < dataMeldestichtag ">
+						<b>Meldestichtag erreicht - Bearbeiten nicht mehr möglich</b>
+					</div>
 					
 					 <input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
 					
@@ -590,7 +662,7 @@ export default{
 									type="select"
 									name="studiensemester_kurzbz" 
 									v-model="statusData['studiensemester_kurzbz']"
-								> <!--TODO(manu) default aktueller Eintrag-->
+								>
 									<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
 								</form-input>
 							</div>
@@ -697,8 +769,7 @@ export default{
 							</div>
 						</div>
 						
-						<!--TODO(manu): ganzes Feld ausblenden, wenn kein Statusgrund?-->
-						<div class="row mb-3">
+						<div v-if="gruende.length > 0" class="row mb-3">
 							<label for="grund" class="form-label col-sm-4">Grund</label>
 							<div class="col-sm-6">
 								<form-input 
@@ -727,21 +798,6 @@ export default{
 					<p>Prestudentstatus {{statusData.status_kurzbz}} (id: {{statusData.prestudent_id}}  
 					/ {{statusData.studiensemester_kurzbz}}) im {{statusData.ausbildungssemester}}. Ausbildungssemester wirklich löschen?</p>					
 				</template>	
-<!--				<template #footer>
-					<button 
-						ref="Close" 
-						type="button" 
-						class="btn btn-primary" 
-						@click="deleteStatus({
-							'prestudent_id': statusData.prestudent_id,
-							'status_kurzbz': statusData.studiensemester_kurzbz,
-							'studiensemester_kurzbz': statusData.studiensemester_kurzbz,
-							'ausbildungssemester': statusData.ausbildungssemester
-						})">OK</button>
-				</template>	-->							
-<!--				<template #footer>
-					<button ref="Close" type="button" class="btn btn-primary" @click="deleteStatus(statusData.prestudent_id, statusData.status_kurzbz, statusData.ausbildungssemester, statusData.studiensemester_kurzbz)">OK</button>
-				</template>-->
 				<template #footer>
 					<button ref="Close" type="button" class="btn btn-primary" @click="deleteStatus(statusId)">OK</button>
 				</template>

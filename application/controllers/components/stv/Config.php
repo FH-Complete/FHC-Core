@@ -31,6 +31,10 @@ class Config extends FHC_Controller
 			'title' => 'PreStudentIn',
 			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js'
 		];
+		$result['status'] = [
+			'title' => 'Status',
+			'component' => './Stv/Studentenverwaltung/Details/Status.js'
+		];
 		$result['noten'] = [
 			'title' => 'Noten',
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js'

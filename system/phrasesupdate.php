@@ -22868,6 +22868,177 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'notiz_new',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Notiz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'notiz_edit',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notiz bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'verfasser',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verfasser*in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'author',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'bearbeiter',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bearbeiter*in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'editor',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'erledigt',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'erledigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'completed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'letzte_aenderung',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'letzte Änderung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Last updated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldRequired',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} ist erforderlich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Input Field {field} is required',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldNotNumeric',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} darf nur Zahlen enthalten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Field {Field} must contain only numbers.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldNoValidEmail',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} muss eine gültige Email-Adresse enthalten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The field {field} must contain a valid email address.',
+				'description' => '',
+				'insertvon' => 'system'
+				)
+		)
+	)
 	// Personalverwaltung begin
 	array(
 		'app' => 'core',
@@ -23549,7 +23720,6 @@ array(
 			)
 		)
 	),
-
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'person',
@@ -23590,8 +23760,6 @@ array(
 			)
 		)
 	),
-
-
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'person',
@@ -23672,9 +23840,6 @@ array(
 			)
 		)
 	),
-
-
-
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'core',
@@ -25186,7 +25351,6 @@ array(
 			)
 		)
 	),
-
 );
 
 

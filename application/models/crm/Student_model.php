@@ -82,7 +82,7 @@ class Student_model extends DB_Model
 
 		if(isError($result))
 		{
-			return error("0", "Error while checking student_uid");
+			return error( "Error while checking student_uid");
 		}
 
 		if (!hasData($result))
@@ -143,7 +143,8 @@ class Student_model extends DB_Model
 		{
 			return error($result);
 		}
-		else {
+		else
+		{
 			$resultObject = current(getData($result));
 
 			if (property_exists($resultObject, 'anzahl')) {

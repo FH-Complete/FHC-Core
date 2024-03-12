@@ -734,58 +734,15 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getHistoryPrestudent($prestudent_id)
 	{
-		//TODO(Manu) refactor
-		$this->load->model('crm/Student_model', 'StudentModel');
-
-		$result = $this->StudentModel->checkIfUID($prestudent_id);
-
-		if(isError($result))
-		{
-			return getData($result);
-		}
-		if($result->retval != "0")
-		{
-			$query = "
-			SELECT 
-				ps.status_kurzbz, 
-				ps.studiensemester_kurzbz, 
-				ps.ausbildungssemester,
-				ps.datum, 
-				TO_CHAR(ps.datum::timestamp, 'DD.MM.YYYY') AS format_datum,
-				sp.bezeichnung, 
-				ps.bestaetigtam, 
-				TO_CHAR(ps.bestaetigtam::timestamp, 'DD.MM.YYYY') AS format_bestaetigtam,
-				ps.bewerbung_abgeschicktamum,
-				TO_CHAR(ps.bewerbung_abgeschicktamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_bewerbung_abgeschicktamum,
-				stg.statusgrund_kurzbz,
-				ps.orgform_kurzbz,
-				ps.prestudent_id,
-				sp.studienplan_id,
-				ps.anmerkung,
-				ps.bestaetigtvon,
-				ps.insertamum,
-				TO_CHAR(ps.insertamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_insertamum,
-				ps.insertvon,
-				ps.updateamum,
-				TO_CHAR(ps.updateamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_updateamum,
-				ps.updatevon
-			FROM public.tbl_prestudentstatus ps
-			LEFT JOIN public.tbl_student st USING (prestudent_id)
-			LEFT JOIN public.tbl_studiengang sg ON (st.studiengang_kz = sg.studiengang_kz)
-			LEFT JOIN lehre.tbl_studienplan sp USING (studienplan_id)
-			LEFT JOIN public.tbl_status_grund stg USING (statusgrund_id)
-			WHERE prestudent_id = ?
-			ORDER BY datum DESC		
-		";
-		}
-		else
-		{
-			$query = "
-				SELECT 
-					ps.status_kurzbz2, 
+		$query = "
+					SELECT 
+					ps.status_kurzbz, 
 					ps.studiensemester_kurzbz, 
-					ps.ausbildungssemester, 
-					CASE WHEN ps.status_kurzbz IN ('Student', 'Diplomand') THEN CONCAT(lv.semester, lv.verband, lv.gruppe) END AS lehrverband, 
+					ps.ausbildungssemester,
+					CASE WHEN ps.status_kurzbz IN ('Student', 'Diplomand')
+					THEN CONCAT(lv.semester, lv.verband, lv.gruppe)
+					ELSE ''
+					END AS lehrverband, 
 					ps.datum, 
 					TO_CHAR(ps.datum::timestamp, 'DD.MM.YYYY') AS format_datum,
 					sp.bezeichnung, 
@@ -804,19 +761,26 @@ class Prestudent_model extends DB_Model
 					ps.insertvon,
 					ps.updateamum,
 					TO_CHAR(ps.updateamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_updateamum,
-					ps.updatevon
-				FROM public.tbl_prestudentstatus ps
-				JOIN public.tbl_student st USING (prestudent_id)
-				JOIN public.tbl_studentlehrverband lv ON (st.student_uid = lv.student_uid)
-				JOIN public.tbl_studiengang sg ON (lv.studiengang_kz = sg.studiengang_kz)
-				LEFT JOIN lehre.tbl_studienplan sp USING (studienplan_id)
-				LEFT JOIN public.tbl_status_grund stg USING (statusgrund_id)
+					ps.updatevon 
+				FROM 
+					public.tbl_prestudentstatus ps
+				JOIN 
+					public.tbl_student st USING (prestudent_id)
+				JOIN 
+					public.tbl_studiengang sg ON (st.studiengang_kz = sg.studiengang_kz)
+				LEFT JOIN 
+					lehre.tbl_studienplan sp USING (studienplan_id) 
+				LEFT JOIN 
+					public.tbl_status_grund stg USING (statusgrund_id) 
+				LEFT JOIN 
+					public.tbl_studentlehrverband lv ON 
+						(st.student_uid = lv.student_uid 
+							 AND st.student_uid IS NOT NULL 
+							 AND lv.studiensemester_kurzbz = ps.studiensemester_kurzbz)
 				WHERE prestudent_id = ?
-				and lv.studiensemester_kurzbz = ps.studiensemester_kurzbz
 				ORDER BY datum DESC
-			";
+		";
 
-		}
 		return $this->execQuery($query, array($prestudent_id));
 	}
 }
