@@ -170,7 +170,7 @@ class Wiederholung extends FHC_Controller
 				return $this->outputJsonError(['db' => $this->p->t('studierendenantrag', 'error_no_prestudentstatus', [
 					'prestudent_id' => $prestudent_id
 				])]);
-			if (!in_array(current(getData($result))->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist')))
+			if (!in_array(current(getData($result))->status_kurzbz, $this->config->item('antrag_prestudentstatus_whitelist')))
 				return $this->outputJsonError(['db' => $this->p->t('studierendenantrag', 'error_no_student')]);
 		}
 		elseif ($result == -2)
