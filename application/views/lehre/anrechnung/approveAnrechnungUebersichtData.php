@@ -225,12 +225,13 @@ $filterWidgetArray = array(
             func_rowFormatter(row,this);
         },
 		columnDefaults:{
-			tooltip:true,
-		}
+			tooltip:true
+		},
 		//! not working
 		columnDefaults:{
-        tooltip:function(e, cell, onRendered){
-            return func_tooltips(cell);
+			tooltip:function(e, cell, onRendered){
+				return func_tooltips(cell);
+			}
         }
 	 }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
