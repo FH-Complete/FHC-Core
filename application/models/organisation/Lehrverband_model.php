@@ -14,28 +14,36 @@ class Lehrverband_model extends DB_Model
 
 	/**
 	 * Check if Lehrverband already exists
-	 * @param string $student_id
-	 * @param string $studiensemester_kurzbz
-	 * @return 1: if Rolle exists, 0: if it doesn't
+	 * @param Integer $studiengang_kz
+	 * @param Integer $semester
+	 * @param char $verband
+	 * @param char $gruppe
+	 * @return 1: if Lehrverband exists, 0: if it doesn't
 	 */
-	public function checkIfLehrverbandExists($student_uid, $studiensemester_kurzbz)
+	public function checkIfLehrverbandExists($studiengang_kz, $semester, $verband, $gruppe)
 	{
 		$qry = "SELECT
 					*
 				FROM 
-				    public.tbl_studentlehrverband
+				    public.tbl_lehrverband
 				WHERE
-					student_uid = ? 
+					studiengang_kz = ? 
 				AND
-				    studiensemester_kurzbz = ?";
+				    semester = ?
+				AND
+				    verband = ?
+				AND
+				    gruppe = ?
+				    
+				    ";
 
-		$result = $this->execQuery($qry, array($student_uid, $studiensemester_kurzbz));
+		$result = $this->execQuery($qry, array($studiengang_kz, $semester, $verband, $gruppe));
 
-		if (isError($result))
+		if(isError($result))
 		{
 			return error($result);
 		}
-		elseif (!hasData($result))
+		elseif(!hasData($result))
 		{
 			return success("0", "Kein Lehrverband vorhanden!");
 		}
