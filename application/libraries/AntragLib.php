@@ -1664,8 +1664,26 @@ class AntragLib
 		);
 		if (isError($result))
 			return $result;
-		if (!hasData($result))
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', $antrag));
+		if (!hasData($result)) {
+			$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails(
+				$antrag->prestudent_id,
+				null,
+				$antrag->insertamum
+			);
+			if (isError($result))
+				return $result;
+			if (!hasData($result))
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', $antrag));
+			$tmp = current(getData($result));
+			$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+			$res = $this->_ci->StudiensemesterModel->load($antrag->studiensemester_kurzbz);
+			if (hasData($res))
+				$tmp->studienjahr_kurzbz = current(getData($res))->studienjahr_kurzbz;
+			else
+				$tmp->studienjahr_kurzbz = '';
+			// NOTE(chris): the semester might not be correct on this fallback so we disable it
+			$tmp->semester = '';
+		}
 
 		$result = current(getData($result));
 
