@@ -557,7 +557,7 @@ var FHC_TableWidget = {
 	 * The data to be displayed are retrived from the parameter data
 	 */
 	_renderDatasetTabulator: function(tableWidgetDiv, data) {
-
+		
 		// Checks if options were given and returns them
 		var options = FHC_TableWidget._getRepresentationOptions(data);
 		// Checks if record fields definitions were given and returns them
@@ -641,6 +641,7 @@ var FHC_TableWidget = {
  		 */
 		if (typeof options.tableWidgetFooter != 'undefined' && options.tableWidgetFooter != null)
 		{
+			console.log("this are the options i am intereseted in:",options)
 			var tabulatorFooterHTML = _renderTabulatorFooterHTML(options.tableWidgetFooter);
 			tableWidgetDiv.find('#tableWidgetFooter').append(tabulatorFooterHTML);
 		}
@@ -718,7 +719,7 @@ var FHC_TableWidget = {
 	_getRepresentationOptions: function(data) {
 
 		var options = {}; // eventually contains options fot the representation
-
+		console.log("here is the data before it was parsed",data.datasetRepresentationOptions)
 		// Checks if options were given
 		if (data.hasOwnProperty("datasetRepresentationOptions") && data.datasetRepresentationOptions != "")
 		{
@@ -730,7 +731,7 @@ var FHC_TableWidget = {
 				options = tmpOptions;
 			}
 		}
-
+		
 		return options;
 	},
 
@@ -909,10 +910,11 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns
 function _renderTabulatorFooterHTML(tableWidgetFooterOptions){
 
 	var tabulatorFooterHTML = '';
-
+	console.log("footer options",tableWidgetFooterOptions)
 	// If property selectButtons is true, render 'Alle auswaehlen / Alle abwaehlen' buttons
 	if (typeof tableWidgetFooterOptions.selectButtons != 'undefined' && tableWidgetFooterOptions.selectButtons == true)
 	{
+		
 		tabulatorFooterHTML += '<div class="btn-toolbar" role="toolbar">';
 		tabulatorFooterHTML += '<div class="btn-group" role="group">';
 		tabulatorFooterHTML += '' +

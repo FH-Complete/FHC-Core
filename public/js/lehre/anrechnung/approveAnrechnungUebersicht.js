@@ -179,7 +179,7 @@ function func_selectableCheck(row){
 
 // Calculate dynamically sum of all LV ECTS by Student and display, when maximum ECTS are exceeded.
 // data = selected data, rows = selected rows
-function func_rowSelectionChanged(data, rows){
+function func_rowSelectionChanged(data, rows, tabulatorInstance){
     
     if (tabulator != null)
     {
@@ -187,15 +187,12 @@ function func_rowSelectionChanged(data, rows){
         selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(data);
 
         // Loop through all active rows
-        // rowManager
-        //! getting the rowManager throught the tabulator instance saved in the window object (saved in the jquery_wrapper) of the browser
-        var rowManager = window.table.rowManager;
+        
+        var rowManager = tabulatorInstance.rowManager;
+
         for (var i = 0; i < rowManager.activeRows.length; i++) {
 
             // Reinitialize row -> triggers formatters.
-            //selectedRows[i].rerenderRowCells(true);
-            //selectedRows[i].reformat();
-            
             rowManager.activeRows[i].reinitialize();
             
             
@@ -261,18 +258,14 @@ $(function(){
     const hasReadOnlyAccess = $('#formApproveAnrechnungUebersicht').data('readonly');
     const hasCreateAnrechnungAccess = $('#formApproveAnrechnungUebersicht').data('createaccess');
    
-   
-    $(document).on("tableInit", function(event) {
-     
+    // tableInit is called in the jquery_wrapper when the tableBuilt event was finished
+    $(document).on("tableInit", function(event,tabulatorInstance) {
+     console.log("instance",tabulatorInstance);
         func_tableBuilt($("#tableWidgetTabulator"))
         
+        // event rowSelectionChanged now has to be attached to the tabulator after instantiation and after the tableBuilt event
+        $("#tableWidgetTabulator").tabulator("on","rowSelectionChanged",(data,rows)=>{func_rowSelectionChanged(data,rows,tabulatorInstance)});
        
-        $("#tableWidgetTabulator").tabulator("on","rowSelectionChanged",func_rowSelectionChanged);
-       
-        /*  table.tabulator("on","dataLoaded", function() {
-            // do something
-            console.log("data was loaded");
-        }); */
     });
 	
     // Pruefen ob Promise unterstuetzt wird
@@ -301,6 +294,7 @@ $(function(){
         approveAnrechnung.disableCreateAnrechnungButton();
     }
 
+    //! this function should not be needed in the approveAnrechnungUebersicht
     // Set status alert color
     approveAnrechnung.setStatusAlertColor();
 
@@ -664,14 +658,11 @@ $(function(){
     // Break Genehmigung abgeben
     $('#approveAnrechnungUebersicht-empfehlung-abbrechen').click(function(){
         genehmigung_panel.slideUp('slow');
-
     })
 
     // Break Ablehnung abgeben
     $('#approveAnrechnungUebersicht-begruendung-abbrechen').click(function(){
-
         begruendung_panel.slideUp('slow');
-
     })
 
     // Copy Begruendung into textarea

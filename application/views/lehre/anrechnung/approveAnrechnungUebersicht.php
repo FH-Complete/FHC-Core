@@ -193,7 +193,7 @@ $this->load->view(
                 <!-- Action Button 'Abbrechen'-->
                 <div class="mb-4 d-flex justify-content-end">
                     <button id="approveAnrechnungUebersicht-empfehlung-abbrechen"
-                            class="btn btn-outline-secondary btn-w200" type="reset">
+                            class="me-1 btn btn-outline-secondary btn-w200" type="reset">
 						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                     </button>
                     <button id="approveAnrechnungUebersicht-approve-anrechnungen-confirm"

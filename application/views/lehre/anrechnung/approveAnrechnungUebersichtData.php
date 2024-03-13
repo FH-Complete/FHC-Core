@@ -204,24 +204,19 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')),
 		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAn'))
 	),
+
 	'datasetRepOptions' => '{
+		
 		height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
 		persistenceID: "approveAnrechnungUebersicht_V1",
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    columnDefaults:{
-			headerFilterPlaceholder: " ",
-			tooltip:function(e, cell, onRendered){
-				return func_tooltips(cell);
-			},
-		},
 		index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        
         tableWidgetFooter: {
-			selectButtons: false
+			selectButtons: true  // tableWidgetFooter properties are checked in _renderTabulatorFooterHTML function
 		},
 		selectableCheck: function(row){
             return func_selectableCheck(row);
@@ -229,8 +224,15 @@ $filterWidgetArray = array(
         rowFormatter:function(row){
             func_rowFormatter(row,this);
         },
+		columnDefaults:{
+			headerFilterPlaceholder: " ",
+			tooltip:function(e, cell, onRendered){
+				return func_tooltips(cell);
+			}
+		}
 		
 	 }', // tabulator properties
+
 	'datasetRepFieldsDefs' => '{
 		anrechnung_id: {visible: false, headerFilter:"input"},
 		lehrveranstaltung_id: {visible: false, headerFilter:"input"},

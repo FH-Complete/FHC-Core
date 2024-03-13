@@ -57,7 +57,7 @@
                           }
                           console.log(props);
                           console.log('bhbuilt end');
-						  $(document).trigger("tableInit");
+						  $(document).trigger("tableInit",[this]);
                         });
 
 			//retrieve properties on prototype
