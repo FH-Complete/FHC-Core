@@ -1,100 +1,106 @@
 export default {
-    components:{
-        AutoComplete: primevue.autocomplete
-    },
-    props:{
-        
-        data:Object,
-        isMitarbeiter:{
-            type: Boolean,
-            default: false,
-        },
-    },
-    inject:["getZustelladressenCount"],
-    data(){
-        return{
-            gemeinden:[],
-            selectedNation:null,
-            nationenList:[],
-            originalValue:null,
-            zustellAdressenCount:null,
-        }
-    },
-    watch:{
-        'data.gemeinde': function(newValue, oldValue){
-            this.$emit('profilUpdate',this.isChanged?this.data:null);
-        },
-    },
-    methods:{
+  components: {
+    AutoComplete: primevue.autocomplete,
+  },
 
-        autocompleteSearch: function(event){
-            this.gemeinden = this.gemeinden.map(gemeinde => gemeinde);     
-        },
-       
-        getGemeinde: function(){
-            //? only query the gemeinde is the nation is Austria and the PLZ is greater than 999 and less than 32000
-            if(this.data.nation && this.data.nation ==="A" && (this.data.plz && (this.data.plz >999 && this.data.plz <32000))){
-                Vue.$fhcapi.UserData.getGemeinden(this.data.nation,this.data.plz).then(res => {
-                    
-                    if(res.data.length){
-                        this.gemeinden = res.data;
-                    }
-                })
-            }else{
-                this.gemeinden = [];
+  props: {
+    data: Object,
+    isMitarbeiter: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
+  inject: ["getZustelladressenCount"],
+
+  data() {
+    return {
+      gemeinden: [],
+      selectedNation: null,
+      nationenList: [],
+      originalValue: null,
+      zustellAdressenCount: null,
+    };
+  },
+
+  watch: {
+    "data.gemeinde": function (newValue, oldValue) {
+      this.$emit("profilUpdate", this.isChanged ? this.data : null);
+    },
+  },
+  
+  methods: {
+    autocompleteSearch: function (event) {
+      this.gemeinden = this.gemeinden.map((gemeinde) => gemeinde);
+    },
+
+    getGemeinde: function () {
+      //? only query the gemeinde is the nation is Austria and the PLZ is greater than 999 and less than 32000
+      if (
+        this.data.nation &&
+        this.data.nation === "A" &&
+        this.data.plz &&
+        this.data.plz > 999 &&
+        this.data.plz < 32000
+      ) {
+        Vue.$fhcapi.UserData.getGemeinden(this.data.nation, this.data.plz).then(
+          (res) => {
+            if (res.data.length) {
+              this.gemeinden = res.data;
             }
-        },
-
-        updateValue: function(event,bind){
-            //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid 
-            if(bind ==="zustelladresse" ){
-                this.data[bind] = event.target.checked;
-            }else{
-                this.data[bind] = event.target.value === "" ? null : event.target.value;
-            }
-            
-            this.$emit('profilUpdate',this.isChanged?this.data:null);
-            // update the zustellAdressen count
-            this.zustellAdressenCount = this.getZustelladressenCount();
-        },
+          }
+        );
+      } else {
+        this.gemeinden = [];
+      }
     },
 
-    computed:{
-        showZustellAdressenWarning: function(){
-            if(this.zustellAdressenCount){
-                
-                if(this.zustellAdressenCount.includes(this.data.adresse_id)){
-                    //? if the adresse was already saved
-                    return false;
-                }
-                return this.zustellAdressenCount.length && this.data.zustelladresse;
-            }
-            //? if this.zustellAdressenCount is still not set by the api call and is still null
-            return false;
-        },
-        isChanged: function(){
-            if(!this.data.strasse || !this.data.plz || !this.data.ort || !this.data.typ ){
-               
-                return false;
-            }
-            return this.originalValue !== JSON.stringify(this.data);
-        },
+    updateValue: function (event, bind) {
+      //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid
+      if (bind === "zustelladresse") {
+        this.data[bind] = event.target.checked;
+      } else {
+        this.data[bind] = event.target.value === "" ? null : event.target.value;
+      }
+
+      this.$emit("profilUpdate", this.isChanged ? this.data : null);
+      // update the zustellAdressen count
+      this.zustellAdressenCount = this.getZustelladressenCount();
     },
-   
-    created(){
-        
-        Vue.$fhcapi.UserData.getAllNationen().then(res => {
-            this.nationenList = res.data;
-            this.getGemeinde();
-        });
+  },
 
+  computed: {
+    showZustellAdressenWarning: function () {
+      // if zustellAdressenCount is not 0 and the own kontakt has the flag zustellung set to true
+      if (!this.zustellAdressenCount.includes(this.data.adresse_id)) {
+        return this.data.zustelladresse && this.zustellAdressenCount.length;
+      }
+      return this.zustellAdressenCount.length >= 2 && this.data.zustelladresse;
+    },
+    isChanged: function () {
+      if (
+        !this.data.strasse ||
+        !this.data.plz ||
+        !this.data.ort ||
+        !this.data.typ
+      ) {
+        return false;
+      }
+      return this.originalValue !== JSON.stringify(this.data);
+    },
+  },
 
-        this.originalValue = JSON.stringify(this.data);
-        this.zustellAdressenCount = this.getZustelladressenCount();
-        
-    },       
-    
-    template:/*html*/`
+  created() {
+    Vue.$fhcapi.UserData.getAllNationen().then((res) => {
+      this.nationenList = res.data;
+      this.getGemeinde();
+    });
+
+    this.originalValue = JSON.stringify(this.data);
+    this.zustellAdressenCount = this.getZustelladressenCount();
+  },
+
+  template: /*html*/ `
      <div class="gy-3 row justify-content-center align-items-center">
      
      <!-- warning message for too many zustellungs Adressen -->
@@ -193,6 +199,5 @@ export default {
         </div>
        
     </div>
-    `
-
+    `,
 };

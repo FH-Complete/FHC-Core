@@ -1,39 +1,39 @@
 import EditProfil from "../ProfilModal/EditProfil.js";
 //? EditProfil is the modal used to edit the profil updates
 export default {
-  components:{EditProfil},
+  components: { EditProfil },
   props: {
     data: {
       type: Object,
     },
   },
-  inject:['getZustellkontakteCount','getZustelladressenCount'],
+
+  inject: ["getZustellkontakteCount", "getZustelladressenCount"],
 
   emits: ["fetchUpdates"],
+
   data() {
     return {
-      showUpdateModal:false,
-      content:null,
-      editProfilTitle:"Profil bearbeiten",
+      showUpdateModal: false,
+      content: null,
+      editProfilTitle: "Profil bearbeiten",
     };
   },
-  methods: {
 
-    hideEditProfilModal: function(){
-      
+  methods: {
+    hideEditProfilModal: function () {
       //? checks the editModal component property result, if the user made a successful request or not
-      if(this.$refs.updateEditModal.result){
+      if (this.$refs.updateEditModal.result) {
         this.$emit("fetchUpdates");
-      }else{
+      } else {
         // when modal was closed without submitting request
       }
-      this.showUpdateModal=false;
-     
+      this.showUpdateModal = false;
     },
 
     async showEditProfilModal(updateRequest) {
       let view = this.getView(updateRequest.topic, updateRequest.status);
-      
+
       let data = null;
       let content = null;
       let files = null;
@@ -45,12 +45,15 @@ export default {
           value: updateRequest.requested_change.value,
         };
 
-        const filesFromDatabase = await Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(updateRequest.profil_update_id).then(res=>{
-          return res.data;
-        });
+        const filesFromDatabase =
+          await Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(
+            updateRequest.profil_update_id
+          ).then((res) => {
+            return res.data;
+          });
 
-        files= filesFromDatabase;
-        if(files){
+        files = filesFromDatabase;
+        if (files) {
           withFiles = true;
         }
       } else {
@@ -64,17 +67,18 @@ export default {
         withFiles: withFiles,
         topic: updateRequest.topic,
         files: files,
-        
       };
 
       //?TODO: check if updateRequest.uid is a mitarbeiter, if so add the flag isMitarbeiter:true
-      if(view === "EditAdresse"){
-        const isMitarbeiter = await Vue.$fhcapi.UserData.isMitarbeiter(updateRequest.uid).then(res => res.data);
+      if (view === "EditAdresse") {
+        const isMitarbeiter = await Vue.$fhcapi.UserData.isMitarbeiter(
+          updateRequest.uid
+        ).then((res) => res.data);
 
-        if(isMitarbeiter){
-          content['isMitarbeiter']=isMitarbeiter;
+        if (isMitarbeiter) {
+          content["isMitarbeiter"] = isMitarbeiter;
         }
-      } 
+      }
 
       //? adds the status information if the profil update request was rejected or accepted
       if (updateRequest.status !== "pending") {
@@ -91,11 +95,10 @@ export default {
       if (content) {
         this.showUpdateModal = true;
         // after a state change, wait for the DOM updates to complete
-        Vue.nextTick(()=>{
+        Vue.nextTick(() => {
           this.$refs.updateEditModal.show();
         });
       }
-      
     },
 
     deleteRequest: function (item) {
@@ -111,8 +114,7 @@ export default {
       );
     },
     getView: function (topic, status) {
-
-      if(!(status === "pending")){
+      if (!(status === "pending")) {
         return "Status";
       }
 
@@ -141,11 +143,10 @@ export default {
       }
     },
 
-
     // OLD way to open the editProfil modal, which was dynamically added to the html and then removed
     async openModal(updateRequest) {
       let view = this.getView(updateRequest.topic, updateRequest.status);
-      
+
       let data = null;
       let content = null;
       let files = null;
@@ -157,12 +158,15 @@ export default {
           value: updateRequest.requested_change.value,
         };
 
-        const filesFromDatabase = await Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(updateRequest.profil_update_id).then(res=>{
-          return res.data;
-        });
+        const filesFromDatabase =
+          await Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(
+            updateRequest.profil_update_id
+          ).then((res) => {
+            return res.data;
+          });
 
-        files= filesFromDatabase;
-        if(files){
+        files = filesFromDatabase;
+        if (files) {
           withFiles = true;
         }
       } else {
@@ -176,17 +180,18 @@ export default {
         withFiles: withFiles,
         topic: updateRequest.topic,
         files: files,
-        
       };
 
       //?TODO: check if updateRequest.uid is a mitarbeiter, if so add the flag isMitarbeiter:true
-      if(view === "EditAdresse"){
-        const isMitarbeiter = await Vue.$fhcapi.UserData.isMitarbeiter(updateRequest.uid).then(res => res.data);
+      if (view === "EditAdresse") {
+        const isMitarbeiter = await Vue.$fhcapi.UserData.isMitarbeiter(
+          updateRequest.uid
+        ).then((res) => res.data);
 
-        if(isMitarbeiter){
-          content['isMitarbeiter']=isMitarbeiter;
+        if (isMitarbeiter) {
+          content["isMitarbeiter"] = isMitarbeiter;
         }
-      } 
+      }
 
       //? adds the status information if the profil update request was rejected or accepted
       if (updateRequest.status !== "pending") {
@@ -200,8 +205,8 @@ export default {
         EditProfil.popup({
           value: content,
           title: updateRequest.topic,
-          zustellkontakteCount:this.getZustellkontakteCount,
-          zustelladressenCount:this.getZustelladressenCount,
+          zustellkontakteCount: this.getZustellkontakteCount,
+          zustelladressenCount: this.getZustelladressenCount,
         })
           .then((res) => {
             if (res === true) {
@@ -214,11 +219,11 @@ export default {
       }
     },
   },
-  created() {
 
-   
-  },
+  created() {},
+
   computed: {},
+  
   template: `
     <div  class="card " >
     

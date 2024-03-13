@@ -1,16 +1,14 @@
-
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 import EditProfil from "./ProfilModal/EditProfil.js";
 import Adresse from "./ProfilComponents/Adresse.js";
 import Kontakt from "./ProfilComponents/Kontakt.js";
 import FetchProfilUpdates from "./ProfilComponents/FetchProfilUpdates.js";
-import Mailverteiler from "./ProfilComponents/Mailverteiler.js"; 
+import Mailverteiler from "./ProfilComponents/Mailverteiler.js";
 import AusweisStatus from "./ProfilComponents/FhAusweisStatus.js";
 import QuickLinks from "./ProfilComponents/QuickLinks.js";
-import ProfilEmails from "./ProfilComponents/ProfilEmails.js"
+import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
-
 
 export default {
   components: {
@@ -26,11 +24,13 @@ export default {
     RoleInformation,
     ProfilInformation,
   },
-  inject: ['sortProfilUpdates','collapseFunction'],
+
+  inject: ["sortProfilUpdates", "collapseFunction"],
+
   data() {
     return {
-      showModal:false,
-      
+      showModal: false,
+
       funktionen_table_options: {
         height: 300,
         layout: "fitColumns",
@@ -91,6 +91,7 @@ export default {
           },
         ],
       },
+
       betriebsmittel_table_options: {
         height: 300,
         layout: "fitColumns",
@@ -134,59 +135,53 @@ export default {
   },
 
   props: {
-		data: Object,
+    data: Object,
     editData: Object,
-	},
-  
+  },
+
   methods: {
-    hideEditProfilModal: function(){
-      
+    hideEditProfilModal: function () {
       //? checks the editModal component property result, if the user made a successful request or not
-      if(this.$refs.editModal.result){
+      if (this.$refs.editModal.result) {
         Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
-        .then((request) =>{
-          if(!request.error){
-            this.data.profilUpdates = request.data;
-            this.data.profilUpdates.sort(this.sortProfilUpdates);
-            
-          }else{
-            console.log("Error when fetching profile updates: " +res.data);
-          }
-        })
-        .catch(err=>{
-          console.log(err);
-        });
-      }else{
+          .then((request) => {
+            if (!request.error) {
+              this.data.profilUpdates = request.data;
+              this.data.profilUpdates.sort(this.sortProfilUpdates);
+            } else {
+              console.log("Error when fetching profile updates: " + res.data);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
         // when modal was closed without submitting request
       }
-      this.showModal=false;
-     
+      this.showModal = false;
     },
 
     showEditProfilModal() {
       this.showModal = true;
       // after a state change, wait for the DOM updates to complete
-      Vue.nextTick(()=>{
+      Vue.nextTick(() => {
         this.$refs.editModal.show();
       });
-      
     },
 
-    fetchProfilUpdates: function(){
-      Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res)=>{
-        if(!res.error){
-          this.data.profilUpdates = res.data?.length ? res.data.sort(this.sortProfilUpdates) : null ; 
+    fetchProfilUpdates: function () {
+      Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res) => {
+        if (!res.error) {
+          this.data.profilUpdates = res.data?.length
+            ? res.data.sort(this.sortProfilUpdates)
+            : null;
         }
       });
     },
-
   },
 
   computed: {
-
-    
-
-     profilInformation() {
+    profilInformation() {
       if (!this.data) {
         return {};
       }
@@ -198,9 +193,8 @@ export default {
         Anrede: this.data.anrede,
         Titel: this.data.titel,
         Postnomen: this.data.postnomen,
-        foto_sperre:this.data.foto_sperre,
-        foto:this.data.foto,
-
+        foto_sperre: this.data.foto_sperre,
+        foto: this.data.foto,
       };
     },
 
@@ -213,20 +207,21 @@ export default {
         Geburtsdatum: this.data.gebdatum,
         Geburtsort: this.data.gebort,
         Kurzzeichen: this.data.kurzbz,
-        Telefon:  (this.data.standort_telefon?this.data.standort_telefon:"") + " " + this.data.telefonklappe,
+        Telefon:
+          (this.data.standort_telefon ? this.data.standort_telefon : "") +
+          " " +
+          this.data.telefonklappe,
         Büro: this.data.ort_kurzbz,
       };
     },
-
-
   },
- 
+
   created() {
     //? sorts the profil Updates: pending -> accepted -> rejected
     this.data.profilUpdates?.sort(this.sortProfilUpdates);
   },
+  
   mounted() {
-    
     this.$refs.betriebsmittelTable.tabulator.on("tableBuilt", () => {
       this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
     });
@@ -234,10 +229,9 @@ export default {
     this.$refs.funktionenTable.tabulator.on("tableBuilt", () => {
       this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
     });
-
   },
 
-  template: /*html*/` 
+  template: /*html*/ ` 
   <div class="container-fluid text-break fhc-form"  >
   
     <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="Profil bearbeiten"></edit-profil>

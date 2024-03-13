@@ -1,57 +1,53 @@
-
 export default {
+  props: {
+    data: Object,
+  },
+
+  data() {
+    return {
+      originalValue: null,
+      zustellKontakteCount: null,
+    };
+  },
+
+  inject: ["getZustellkontakteCount"],
+
+  methods: {
+    updateValue: function (event, bind) {
+      if (bind === "zustellung") {
+        this.data[bind] = event.target.checked;
+      } else {
+        //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid
+        this.data[bind] = event.target.value === "" ? null : event.target.value;
+      }
+      this.$emit("profilUpdate", this.isChanged ? this.data : null);
+      this.zustellKontakteCount = this.getZustellkontakteCount();
+    },
+  },
+
+  computed: {
+    showZustellKontakteWarning: function () {
+      // if zustellKontakteCount is not 0 and the own kontakt has the flag zustellung set to true
+      if (!this.zustellKontakteCount.includes(this.data.kontakt_id)) {
+        return this.data.zustellung && this.zustellKontakteCount.length;
+      }
+      return this.zustellKontakteCount.length >= 2 && this.data.zustellung;
+    },
+    isChanged: function () {
+      //? returns true if the original passed data object was changed
+      if (!this.data.kontakt || !this.data.kontakttyp) {
+        return false;
+      }
+      return JSON.stringify(this.data) !== this.originalValue;
+    },
+  },
+
+  created() {
+    this.originalValue = JSON.stringify(this.data);
+    this.zustellKontakteCount = this.getZustellkontakteCount();
+  },
   
-    props:{
-        data:Object,
-    },
-    data(){
-        return{
-           
-            originalValue:null,
-            zustellKontakteCount:null,
-           
-        }
-    },
-    inject:["getZustellkontakteCount"],
-    methods:{
-
-        
-        updateValue: function(event,bind){
-
-            if(bind === 'zustellung'){
-                this.data[bind] = event.target.checked;    
-            }else{
-                //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid
-                this.data[bind] = event.target.value === ""  ? null: event.target.value;
-            }
-            
-            
-            this.$emit('profilUpdate',this.isChanged?this.data:null);
-            this.zustellKontakteCount = this.getZustellkontakteCount();
-            
-        },
-    },
-    computed:{
-        showZustellKontakteWarning: function(){
-            // if zustellKontakteCount is not 0 and the own kontakt has the flag zustellung set to true
-            if(!this.zustellKontakteCount.includes(this.data.kontakt_id)){
-                return this.data.zustellung && this.zustellKontakteCount.length 
-            }
-            return this.zustellKontakteCount.length >=2 && this.data.zustellung;
-        },
-        isChanged: function(){
-            //? returns true if the original passed data object was changed 
-            if(!this.data.kontakt || !this.data.kontakttyp) {return false;}
-            return JSON.stringify(this.data) !== this.originalValue;
-        }
-    },
-    created(){
-
-       
-        this.originalValue = JSON.stringify(this.data);
-        this.zustellKontakteCount = this.getZustellkontakteCount();
-    },
-    template:
+  template:
     /*html*/
     `
     
@@ -132,5 +128,5 @@ export default {
    
     </div>
   </div>
-    `
+    `,
 };
