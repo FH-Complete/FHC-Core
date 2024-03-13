@@ -36,7 +36,7 @@ else
 
 
 $query = "
-	SELECT stg.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, public.get_absem_prestudent(a.prestudent_id, NULL) AS semester, (SELECT pt.text FROM system.tbl_phrase p JOIN system.tbl_phrasentext pt USING(phrase_id) WHERE p.category=" . $db->db_add_param('studierendenantrag', FHC_STRING) . " AND p.phrase=" . $db->db_add_param('grund_Wiederholung_deadline', FHC_STRING) . " AND pt.sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . " LIMIT 1) AS grund
+	SELECT stg.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, pss.ausbildungssemester AS semester, (SELECT pt.text FROM system.tbl_phrase p JOIN system.tbl_phrasentext pt USING(phrase_id) WHERE p.category=" . $db->db_add_param('studierendenantrag', FHC_STRING) . " AND p.phrase=" . $db->db_add_param('grund_Wiederholung_deadline', FHC_STRING) . " AND pt.sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . " LIMIT 1) AS grund
 	FROM
 	campus.tbl_studierendenantrag a
 	JOIN public.tbl_student USING (prestudent_id)
