@@ -27,13 +27,13 @@ export default {
       organisationunit: organisationunit
     },
     template: `
-          <form ref="searchform" class="d-flex me-3 position-relative" action="javascript:void(0);" 
+          <form ref="searchform" class="d-flex me-3" action="javascript:void(0);" 
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
             <div class="input-group me-2 bg-white">
                 <input ref="searchbox" @keyup="this.search" @focus="this.showsearchresult" 
-                    v-model="this.searchsettings.searchstr" class="form-control"
-                    type="search" placeholder="Suche..." aria-label="Search">
-                <button ref="settingsbutton" @click="this.togglesettings" class="btn btn-light border-start" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
+                    v-model="this.searchsettings.searchstr" class="form-control" 
+                    type="search" placeholder="Search" aria-label="Search">
+                <button ref="settingsbutton" @click="this.togglesettings" class="btn btn-outline-secondary" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
             </div>            
         
             <div v-show="this.showresult" ref="result" 
@@ -46,7 +46,6 @@ export default {
               <template v-else="" v-for="res in this.searchresult">
                 <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
                 <employee v-else-if="res.type === 'mitarbeiter'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
-                <employee v-else-if="res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                 <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
                 <raum v-else-if="res.type === 'raum'" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
                 <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
@@ -79,13 +78,16 @@ export default {
         calcSearchResultExtent: function() {
             var rect = this.$refs.searchbox.getBoundingClientRect();
             //console.log(window.innerWidth + ' ' + window.innerHeight + ' ' + JSON.stringify(rect));
-             this.$refs.result.style.height = Math.floor(window.innerHeight * 0.80) + 'px';
+            this.$refs.result.style.top = Math.floor(rect.bottom + 3) + 'px';
+            this.$refs.result.style.right = Math.floor(window.innerWidth - rect.right) + 'px';
+            this.$refs.result.style.width = Math.floor(window.innerWidth * 0.75) + 'px';
+            this.$refs.result.style.height = Math.floor(window.innerHeight * 0.75) + 'px';
         },
         search: function() {
             if( this.searchtimer !== null ) {
                 clearTimeout(this.searchtimer);
             }
-            if( this.searchsettings.searchstr.length >= 2 ) {
+            if( this.searchsettings.searchstr.length >= 3 ) {
                 this.calcSearchResultExtent();
                 this.searchtimer = setTimeout(
                     this.callsearchapi,
