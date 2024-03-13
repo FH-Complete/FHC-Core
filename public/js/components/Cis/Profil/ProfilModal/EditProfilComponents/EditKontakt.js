@@ -14,6 +14,10 @@ export default {
     },
     inject:["getZustellkontakteCount"],
     methods:{
+
+        getNewKontanteCount:function(){
+            console.log(this.getZustellkontakteCount());
+        },
         updateValue: function(event,bind){
 
             if(bind === 'zustellung'){
@@ -25,12 +29,13 @@ export default {
             
             
             this.$emit('profilUpdate',this.isChanged?this.data:null);
-            
+            this.zustellKontakteCount = this.getZustellkontakteCount();
             
         },
     },
     computed:{
         showZustellKontakteWarning: function(){
+
             if(this.zustellKontakteCount){
                 
                 if(this.zustellKontakteCount.includes(this.data.kontakt_id)){
@@ -61,8 +66,7 @@ export default {
     `
     
     <div class="gy-3 row align-items-center justify-content-center">    
-    
-    
+
     <!-- warning message for too many zustellungs Kontakte -->
     <div v-if="showZustellKontakteWarning" class="col-12 ">
     <div class="card bg-danger mx-2">

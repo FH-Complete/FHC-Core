@@ -174,7 +174,6 @@ export default {
 
     fetchProfilUpdates: function(){
       Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res)=>{
-        
         if(!res.error){
           this.data.profilUpdates = res.data?.length ? res.data.sort(this.sortProfilUpdates) : null ; 
         }
@@ -240,6 +239,7 @@ export default {
 
   template: /*html*/` 
   <div class="container-fluid text-break fhc-form"  >
+  
     <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="Profil bearbeiten"></edit-profil>
           <div class="row">
           

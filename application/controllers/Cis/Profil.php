@@ -246,7 +246,7 @@ class Profil extends Auth_Controller
 		if ($nation == "A") {
 			if (isset($zip) && $zip > 999 && $zip < 32000) {
 
-				$gemeinde_res = $this->GemeindeModel->loadWhere(['ortschaftskennziffer' => $zip]);
+				$gemeinde_res = $this->GemeindeModel->loadWhere(['plz' => $zip]);
 				if (isError($gemeinde_res)) {
 					show_error("error while trying to query bis.tbl_gemeinde");
 				}

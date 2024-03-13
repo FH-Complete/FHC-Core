@@ -148,11 +148,36 @@ const profilApp = Vue.createApp({
 				return null;
 			}
 
+
 			return this.data.kontakte.filter(kontakt => {
 				return kontakt.zustellung;
 			}).map(kon =>{
 				return kon.kontakt_id;
 			});
+
+			//TODO counting the zustellKontakte/Adresse does not work correctly
+			/* let kontakteArray = [];
+			
+			if(this.data.profilUpdates.length){
+				kontakteArray = kontakteArray.concat(this.data.profilUpdates.filter((update)=>
+				{
+					
+					return update.requested_change.zustellung;
+				}).map((kontant)=>{
+					return kontant.requested_change.kontakt_id
+				}))
+
+			}
+			
+			if(!this.data.profilUpdates.length || !this.data.kontakte.every(kontakt=> this.data.profilUpdates.some(update=>update.requested_change.kontakt_id == kontakt.kontakt_id))){
+				kontakteArray = kontakteArray.concat(this.data.kontakte.filter(kontakt => {
+					return kontakt.zustellung;
+				}).map(kon =>{
+					return kon.kontakt_id;
+				}));
+			}
+			
+			return [...(new Set(kontakteArray))]; */
 		},
 	},
 	computed:{
@@ -234,13 +259,13 @@ const profilApp = Vue.createApp({
 					  data:kontakt
 					}})
 				 },
-				 Password_Change : {
-					title:"Passwort Ändern",
-					view:"ChangePassword",
-					data:{
-					  test:"testvalue",
-					  }
-					},
+				//  Password_Change : {
+				// 	title:"Passwort Ändern",
+				// 	view:"ChangePassword",
+				// 	data:{
+				// 	  test:"testvalue",
+				// 	  }
+				// 	},
 				},
 			 
 			};

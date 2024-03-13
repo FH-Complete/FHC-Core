@@ -1,6 +1,7 @@
 import EditProfil from "../ProfilModal/EditProfil.js";
 //? EditProfil is the modal used to edit the profil updates
 export default {
+  components:{EditProfil},
   props: {
     data: {
       type: Object,
@@ -10,9 +11,93 @@ export default {
 
   emits: ["fetchUpdates"],
   data() {
-    return {};
+    return {
+      showUpdateModal:false,
+      content:null,
+      editProfilTitle:"Profil bearbeiten",
+    };
   },
   methods: {
+
+    hideEditProfilModal: function(){
+      
+      //? checks the editModal component property result, if the user made a successful request or not
+      if(this.$refs.updateEditModal.result){
+        this.$emit("fetchUpdates");
+      }else{
+        // when modal was closed without submitting request
+      }
+      this.showUpdateModal=false;
+     
+    },
+
+    async showEditProfilModal(updateRequest) {
+      let view = this.getView(updateRequest.topic, updateRequest.status);
+      
+      let data = null;
+      let content = null;
+      let files = null;
+      let withFiles = false;
+
+      if (view === "TextInputDokument") {
+        data = {
+          titel: updateRequest.topic,
+          value: updateRequest.requested_change.value,
+        };
+
+        const filesFromDatabase = await Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(updateRequest.profil_update_id).then(res=>{
+          return res.data;
+        });
+
+        files= filesFromDatabase;
+        if(files){
+          withFiles = true;
+        }
+      } else {
+        data = updateRequest.requested_change;
+      }
+
+      content = {
+        updateID: updateRequest.profil_update_id,
+        view: view,
+        data: data,
+        withFiles: withFiles,
+        topic: updateRequest.topic,
+        files: files,
+        
+      };
+
+      //?TODO: check if updateRequest.uid is a mitarbeiter, if so add the flag isMitarbeiter:true
+      if(view === "EditAdresse"){
+        const isMitarbeiter = await Vue.$fhcapi.UserData.isMitarbeiter(updateRequest.uid).then(res => res.data);
+
+        if(isMitarbeiter){
+          content['isMitarbeiter']=isMitarbeiter;
+        }
+      } 
+
+      //? adds the status information if the profil update request was rejected or accepted
+      if (updateRequest.status !== "pending") {
+        content["status"] = updateRequest.status;
+        content["status_message"] = updateRequest.status_message;
+        content["status_timestamp"] = updateRequest.status_timestamp;
+      }
+
+      //? update data of the reactive content
+      this.content = content;
+      this.editProfilTitle = updateRequest.topic;
+
+      //? only show the popup if also the right content is available
+      if (content) {
+        this.showUpdateModal = true;
+        // after a state change, wait for the DOM updates to complete
+        Vue.nextTick(()=>{
+          this.$refs.updateEditModal.show();
+        });
+      }
+      
+    },
+
     deleteRequest: function (item) {
       Vue.$fhcapi.ProfilUpdate.deleteProfilRequest(item.profil_update_id).then(
         (res) => {
@@ -55,6 +140,9 @@ export default {
           break;
       }
     },
+
+
+    // OLD way to open the editProfil modal, which was dynamically added to the html and then removed
     async openModal(updateRequest) {
       let view = this.getView(updateRequest.topic, updateRequest.status);
       
@@ -126,15 +214,20 @@ export default {
       }
     },
   },
-  created() {},
+  created() {
+
+   
+  },
   computed: {},
   template: `
-    <div  class="card text-nowrap" >
+    <div  class="card " >
+    
+    <edit-profil v-if="showUpdateModal" ref="updateEditModal" @hideBsModal="hideEditProfilModal" :value="content" :title="editProfilTitle"></edit-profil>
                       <div class="card-header">
                       Profil Updates
                       </div>
                       <div class="card-body" >
-    <div class="table-responsive">
+    <div class="table-responsive text-nowrap">
         <table class="m-0  table  table-hover">
             <thead >
                 <tr >
@@ -155,11 +248,11 @@ export default {
                 
                 <div class="d-flex flex-row justify-content-evenly">
                 <template v-if="item.topic.toLowerCase().includes('delete')">
-                <div  class="align-middle text-center"><i role="button" @click="openModal(item)" class="fa fa-eye"></i></div>
+                <div  class="align-middle text-center"><i role="button" @click="showEditProfilModal(item)" class="fa fa-eye"></i></div>
                 </template>
 
                 <template v-else >
-                <div class="align-middle text-center" ><i style="color:#00639c" @click="openModal(item)" role="button" class="fa fa-edit"></i></div>
+                <div class="align-middle text-center" ><i style="color:#00639c" @click="showEditProfilModal(item)" role="button" class="fa fa-edit"></i></div>
                 </template>
                 
                 <div class="align-middle text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></div>
@@ -172,7 +265,7 @@ export default {
                 
                 <td  class="align-middle text-center">
                 <div class="d-flex flex-row justify-content-evenly">
-                <i  role="button" @click="openModal(item)" class="fa fa-eye"></i>
+                <i  role="button" @click="showEditProfilModal(item)" class="fa fa-eye"></i>
                 </div>
                 </td>
                 

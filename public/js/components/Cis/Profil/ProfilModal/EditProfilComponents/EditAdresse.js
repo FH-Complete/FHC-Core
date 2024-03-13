@@ -54,6 +54,8 @@ export default {
             }
             
             this.$emit('profilUpdate',this.isChanged?this.data:null);
+            // update the zustellAdressen count
+            this.zustellAdressenCount = this.getZustelladressenCount();
         },
     },
 
@@ -94,7 +96,6 @@ export default {
     
     template:/*html*/`
      <div class="gy-3 row justify-content-center align-items-center">
-     
      
      <!-- warning message for too many zustellungs Adressen -->
      <div v-if="showZustellAdressenWarning" class="col-12 ">
