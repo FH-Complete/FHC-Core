@@ -383,6 +383,7 @@ class Studierendenantrag_model extends DB_Model
 
 		$sql = "WITH numbered_sems AS (
 		    SELECT
+		        a.studienjahr_kurzbz AS studienjahr_kurzbz,
 		        a.studiensemester_kurzbz AS von,
 		        b.studiensemester_kurzbz AS bis,
 		        a.start AS start,
@@ -399,7 +400,7 @@ class Studierendenantrag_model extends DB_Model
 		    FROM numbered_sems 
 		    WHERE numbered_sems.row_number <= ?
 		)
-		SELECT s.von, s.bis, s.start, s.ende, studierendenantrag_id
+		SELECT s.von, s.bis, s.start, s.ende, studierendenantrag_id, studienjahr_kurzbz
 		FROM last_sems s
 		LEFT JOIN (
 			SELECT studierendenantrag_id, start, datum_wiedereinstieg AS ende 

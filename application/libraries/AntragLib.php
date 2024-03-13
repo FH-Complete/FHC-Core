@@ -1688,6 +1688,7 @@ class AntragLib
 		return array_reduce($result, function ($carry, $item) {
 			if (!isset($carry[$item->von]))
 				$carry[$item->von] = [
+					'studienjahr_kurzbz' => $item->studienjahr_kurzbz,
 					'studiensemester_kurzbz' => $item->von,
 					'wiedereinstieg' => [],
 					'disabled' => true

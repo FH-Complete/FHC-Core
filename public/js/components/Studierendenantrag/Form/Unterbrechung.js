@@ -65,6 +65,18 @@ export default {
 				return datumUnformatted;
 			let datum = new Date(datumUnformatted);
 			return datum.toLocaleDateString();
+		},
+		semesterOffsets() {
+			if (!this.data || !this.data.studiensemester)
+				return [];
+			return Object.values(this.data.studiensemester)
+				.filter(el => !el.disabled)
+				.map(el => el.studiensemester_kurzbz);
+		},
+		semester() {
+			if (!this.stsem)
+				return '';
+			return this.data.semester + this.semesterOffsets.indexOf(this.stsem);
 		}
 	},
 	methods: {
@@ -242,7 +254,7 @@ export default {
 						<tr>
 							<th>{{$p.t('lehre', 'semester')}}</th>
 							<td align="right" v-if="data.studierendenantrag_id">{{data.semester}}</td>
-							<td align="right" v-else>{{stsem === null ? '' : data.studiensemester[stsem].semester}}</td>
+							<td align="right" v-else>{{semester}}</td>
 						</tr>
 					</table>
 				</div>
