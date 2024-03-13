@@ -148,17 +148,10 @@ const profilApp = Vue.createApp({
 				return null;
 			}
 
-
-			return this.data.kontakte.filter(kontakt => {
-				return kontakt.zustellung;
-			}).map(kon =>{
-				return kon.kontakt_id;
-			});
-
-			//TODO counting the zustellKontakte/Adresse does not work correctly
-			/* let kontakteArray = [];
+			//TODO: not sure if how it is implemented is the best way
+			let kontakteArray = [];
 			
-			if(this.data.profilUpdates.length){
+			if(this.data.profilUpdates?.length){
 				kontakteArray = kontakteArray.concat(this.data.profilUpdates.filter((update)=>
 				{
 					
@@ -169,7 +162,7 @@ const profilApp = Vue.createApp({
 
 			}
 			
-			if(!this.data.profilUpdates.length || !this.data.kontakte.every(kontakt=> this.data.profilUpdates.some(update=>update.requested_change.kontakt_id == kontakt.kontakt_id))){
+			if(!this.data.profilUpdates?.length || !this.data.kontakte.filter(kontakt => kontakt.zustellung).every(kontakt=> this.data.profilUpdates.some(update=>update.requested_change.kontakt_id == kontakt.kontakt_id))){
 				kontakteArray = kontakteArray.concat(this.data.kontakte.filter(kontakt => {
 					return kontakt.zustellung;
 				}).map(kon =>{
@@ -177,7 +170,15 @@ const profilApp = Vue.createApp({
 				}));
 			}
 			
-			return [...(new Set(kontakteArray))]; */
+			return [...(new Set(kontakteArray))]; 
+
+			// OLD version
+			// return this.data.kontakte.filter(kontakt => {
+			// 	return kontakt.zustellung;
+			// }).map(kon =>{
+			// 	return kon.kontakt_id;
+			// });
+
 		},
 	},
 	computed:{

@@ -15,9 +15,7 @@ export default {
     inject:["getZustellkontakteCount"],
     methods:{
 
-        getNewKontanteCount:function(){
-            console.log(this.getZustellkontakteCount());
-        },
+        
         updateValue: function(event,bind){
 
             if(bind === 'zustellung'){
@@ -35,19 +33,11 @@ export default {
     },
     computed:{
         showZustellKontakteWarning: function(){
-
-            if(this.zustellKontakteCount){
-                
-                if(this.zustellKontakteCount.includes(this.data.kontakt_id)){
-                    //? if the adresse was already saved
-                    return false;
-                }
-                return this.zustellKontakteCount.length && this.data.zustellung;
+            // if zustellKontakteCount is not 0 and the own kontakt has the flag zustellung set to true
+            if(!this.zustellKontakteCount.includes(this.data.kontakt_id)){
+                return this.data.zustellung && this.zustellKontakteCount.length 
             }
-            //? if this.zustellAdressenCount is still not set by the api call and is still null
-            return false;
-            
-
+            return this.zustellKontakteCount.length >=2 && this.data.zustellung;
         },
         isChanged: function(){
             //? returns true if the original passed data object was changed 
