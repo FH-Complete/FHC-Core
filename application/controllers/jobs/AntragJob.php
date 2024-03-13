@@ -625,9 +625,9 @@ class AntragJob extends JOB_Controller
 				}
 
 				$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
-				$result = $this->PrestudentstatusModel->loadLastWithStgDetails($prestudent->prestudent_id, $prestudent->studiensemester_kurzbz);
+				$result = $this->StudierendenantragModel->getStgAndSem($prestudent->studierendenantrag_id);
 				if (hasData($result)) {
-					$ausbildungssemester = current(getData($result))->semester;
+					$ausbildungssemester = current(getData($result))->ausbildungssemester;
 				}
 
 				$dataMail = array(

@@ -184,7 +184,11 @@ class Studierendenantrag_model extends DB_Model
 
 		$this->addJoin(
 			'public.tbl_prestudentstatus s',
-			$this->dbTable . '.prestudent_id=s.prestudent_id AND ' . $this->dbTable . '.studiensemester_kurzbz=s.studiensemester_kurzbz'
+			$this->dbTable . '.prestudent_id=s.prestudent_id 
+			AND ' .
+			$this->dbTable . '.studiensemester_kurzbz=s.studiensemester_kurzbz 
+			AND ' .
+			$this->dbTable . '.insertamum > s.insertamum'
 		);
 		$this->addJoin('public.tbl_prestudent p', $this->dbTable . '.prestudent_id=p.prestudent_id');
 		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
@@ -195,8 +199,6 @@ class Studierendenantrag_model extends DB_Model
 		$this->addOrder('s.ext_id', 'DESC');
 
 		$this->addLimit(1);
-
-		$this->db->where_in('s.status_kurzbz', $this->config->item('antrag_prestudentstatus_whitelist'));
 
 		return $this->loadWhere([
 			$this->pk => $antrag_id

@@ -1583,15 +1583,16 @@ class AntragLib
 		return success($result);
 	}
 
+	/**
+	 * Gets details for the latest Antrag of one or more types
+	 *
+	 * @param integer		$prestudent_id
+	 * @param array|string	$typ
+	 *
+	 * @return \stdClass
+	 */
 	public function getDetailsForLastAntrag($prestudent_id, $typ = null)
 	{
-		$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails($prestudent_id);
-		if (isError($result))
-			return $result;
-		if (!hasData($result))
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', ['prestudent_id' => $prestudent_id]));
-		$resultDetails = current(getData($result));
-
 		$where = [
 			'prestudent_id' => $prestudent_id
 		];
@@ -1620,18 +1621,16 @@ class AntragLib
 				'prestudent_id' => $prestudent_id
 			]));
 
-		$resultDetails->status = $resultAntrag->status;
-		$resultDetails->statustyp = $resultAntrag->statustyp;
-		$resultDetails->status_insertvon = $resultAntrag->status_insertvon;
-		$resultDetails->grund = $resultAntrag->grund;
-		$resultDetails->studierendenantrag_id = $resultAntrag->studierendenantrag_id;
-		$resultDetails->typ = $resultAntrag->typ;
-		$resultDetails->datum = $resultAntrag->datum;
-		$resultDetails->studiensemester_kurzbz = $resultAntrag->studiensemester_kurzbz;
-
-		return success($resultDetails);
+		return $this->addDetailsToAntrag($resultAntrag);
 	}
 
+	/**
+	 * Gets details for a specific Antrag
+	 *
+	 * @param integer		$studierendenantrag_id
+	 *
+	 * @return \stdClass
+	 */
 	public function getDetailsForAntrag($studierendenantrag_id)
 	{
 		$where = [
@@ -1646,27 +1645,41 @@ class AntragLib
 			return error($this->_ci->p->t('studierendenantrag', "error_no_antrag_found", ['id' => $studierendenantrag_id]));
 		$resultAntrag = current(getData($result));
 
-		$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails($resultAntrag->prestudent_id, $resultAntrag->studiensemester_kurzbz);
+		return $this->addDetailsToAntrag($resultAntrag);
+	}
+
+	/**
+	 * Helper function for getDetailsForAntrag and getDetailsForLastAntrag
+	 *
+	 * @param \stdClass		$antrag
+	 *
+	 * @return \stdClass
+	 */
+	protected function addDetailsToAntrag($antrag)
+	{
+		$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails(
+			$antrag->prestudent_id,
+			$antrag->studiensemester_kurzbz,
+			$antrag->insertamum
+		);
 		if (isError($result))
 			return $result;
-		if (!hasData($result)) {
-			$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails($resultAntrag->prestudent_id);
-			if (isError($result))
-				return $result;
-			if (!hasData($result))
-				return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', $resultAntrag));
-		}
-		$resultDetails = current(getData($result));
+		if (!hasData($result))
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', $antrag));
 
-		$resultDetails->status = $resultAntrag->status;
-		$resultDetails->statustyp = $resultAntrag->statustyp;
-		$resultDetails->grund = $resultAntrag->grund;
-		$resultDetails->studierendenantrag_id = $resultAntrag->studierendenantrag_id;
-		$resultDetails->typ = $resultAntrag->typ;
-		$resultDetails->dms_id = $resultAntrag->dms_id;
-		$resultDetails->datum_wiedereinstieg = $resultAntrag->datum_wiedereinstieg;
+		$result = current(getData($result));
 
-		return success($resultDetails);
+		$result->status = $antrag->status;
+		$result->statustyp = $antrag->statustyp;
+		$result->status_insertvon = $antrag->status_insertvon;
+		$result->grund = $antrag->grund;
+		$result->studierendenantrag_id = $antrag->studierendenantrag_id;
+		$result->typ = $antrag->typ;
+		$result->datum = $antrag->datum;
+		$result->dms_id = $antrag->dms_id;
+		$result->datum_wiedereinstieg = $antrag->datum_wiedereinstieg;
+
+		return success($result);
 	}
 
 	/**
