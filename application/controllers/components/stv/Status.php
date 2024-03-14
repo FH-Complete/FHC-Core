@@ -117,11 +117,11 @@ class Status extends FHC_Controller
 
 		//Different handling depending on newStatus
 		//Todo(manu) check if these checks makes sense?
-/*		if($status_kurzbz == 'Absolvent' || $status_kurzbz == 'Diplomand')
-		{
-			//$studiensemester = $semester_aktuell; //TODO(Manu) oder ist hier defaultsemester gemeint?
-			$ausbildungssemester = $lastStatusData->ausbildungssemester;
-		}*/
+		/*		if($status_kurzbz == 'Absolvent' || $status_kurzbz == 'Diplomand')
+				{
+					//$studiensemester = $semester_aktuell; //TODO(Manu) oder ist hier defaultsemester gemeint?
+					$ausbildungssemester = $lastStatusData->ausbildungssemester;
+				}*/
 
 		/*		if($status_kurzbz != 'Student')
 				{
@@ -293,6 +293,8 @@ class Status extends FHC_Controller
 			return $this->outputJson(getError($result));
 		}
 
+
+
 		if($isStudent)
 		{
 			$this->load->model('crm/Student_model', 'StudentModel');
@@ -322,6 +324,16 @@ class Status extends FHC_Controller
 			$gruppe = $studentData->gruppe == '' ? '' : $studentData->gruppe;
 			$studiengang_kz = $studentData->studiengang_kz;
 
+			//Handle Abbrecher and Unterbrecher
+			//TODO (manu) implement later with multiactions
+			// not active yet: works only for "status ändern" in FAS
+			/*			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
+						{
+							$ausbildungssemester = 0;
+							$gruppe = '';
+							$verband = $status_kurzbz == 'Abbrecher' ? 'A' : 'B';
+						}*/
+
 			//process studentlehrverband
 			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 			$result = $this->StudentlehrverbandModel->processStudentlehrverband($student_uid, $studiengang_kz, $ausbildungssemester, $verband, $gruppe, $studiensemester_kurzbz);
@@ -331,7 +343,29 @@ class Status extends FHC_Controller
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				return $this->outputJson($result->code);
 			}
+
+			//Student updaten (fuer Abbrecher und Unterbrecher)
+			//not active yet: works only for "status ändern" in FAS
+			/*			$result = $this->StudentModel->update(
+							[
+								'student_uid' => $student_uid
+							],
+							[
+								'studiengang_kz' => $studiengang_kz,
+								'semester' => $ausbildungssemester,
+								'verband' => $verband,
+								'gruppe' => $gruppe,
+								'updateamum' => date('c'),
+								'updatevon' => $uid
+						]);
+						if ($this->db->trans_status() === false || isError($result))
+						{
+							$this->db->trans_rollback();
+							$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+							return $this->outputJson($result->code);
+						}*/
 		}
+
 		$this->db->trans_commit();
 
 		return $this->outputJsonSuccess(true);
@@ -740,6 +774,8 @@ class Status extends FHC_Controller
 
 	public function advanceStatus($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
 	{
+		$isStudent = false;
+
 		//get Studiengang von prestudent_id
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$result = $this->PrestudentModel->load([
@@ -809,6 +845,7 @@ class Status extends FHC_Controller
 		}
 		if($result->retval == '1')
 		{
+			$isStudent = true;
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson($result->code);
 		}
@@ -831,7 +868,7 @@ class Status extends FHC_Controller
 		}
 
 		// Start DB transaction
-		$this->db->trans_start(false);
+		$this->db->trans_begin();
 
 		//insert prestudentstatus
 		$uid = getAuthUID();
@@ -851,18 +888,13 @@ class Status extends FHC_Controller
 			]
 		);
 
-		// Transaction complete!
-		$this->db->trans_complete();
-
-		if ($this->db->trans_status() === false || isError($result))
+		if (isError($result))
 		{
 			$this->db->trans_rollback();
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson(getError($result));
 		}
 
-		//TODO(manu)-> check if student, was wenn kein Studentstatus
-		//Studentlehrverband anlegen
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$result = $this->StudentModel->checkIfUid($key_prestudent_id);
 		if(isError($result))
@@ -872,56 +904,34 @@ class Status extends FHC_Controller
 		}
 		$student_uid = $result->retval;
 
-		//check if Studentlehrverband exists
+		//process studentlehrverband
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-		$result = $this->StudentlehrverbandModel->checkIfStudentlehrverbandExists($student_uid, $studiensem_next);
-		if (isError($result))
-		{
+		$result = $this->StudentlehrverbandModel->loadWhere(
+			array(
+				'student_uid' => $student_uid,
+				'studiensemester_kurzbz' => $key_studiensemester_kurzbz
+			)
+		);
+		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
+			$this->outputJson($result);
 		}
-		if ($result->retval == "0")
-		{
-			//load Data Studentlehrverband
-			$result = $this->StudentlehrverbandModel->load(
-				[
-					'student_uid' => $student_uid,
-					'studiensemester_kurzbz' => $key_studiensemester_kurzbz
-				]);
-			if (isError($result))
-			{
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-
-				return $this->outputJson("Error in insert Studentlehrverband");
-			}
-			$lvbData = current(getData($result));
-		//	var_dump($lvbData);
-
-			//Check Lehrverband!
-			//check if exists lvb mit studiengang_kz, semester, verband
-/*			$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
-			$result = $this->LehrverbandModel->checkIfLehrverbandExists($student_uid, $studiensem_next);*/
-
-
-			$result = $this->StudentlehrverbandModel->insert(
-				[
-					'student_uid' => $student_uid,
-					'studiensemester_kurzbz' => $studiensem_next,
-					'semester' => $ausbildungssem_next,
-					'verband' => $lvbData->verband,
-					'gruppe' => $lvbData->gruppe,
-					'insertamum' => date('c'),
-					'insertvon' => $uid,
-					'studiengang_kz' => $lvbData->studiengang_kz
-				]);
-			if (isError($result))
-			{
-				$this->db->trans_rollback();
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-
-				return $this->outputJson("Error in insert Studentlehrverband");
-			}
+		if (!hasData($result)) {
+			$this->outputJson($result);
 		}
+
+		//Data of current Semester
+		$studentlvbData = current(getData($result));
+
+		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+				$result = $this->StudentlehrverbandModel->processStudentlehrverband($student_uid, $studentlvbData->studiengang_kz, $ausbildungssem_next, $studentlvbData->verband, $studentlvbData->gruppe, $studiensem_next);
+				if ($this->db->trans_status() === false || isError($result))
+				{
+					$this->db->trans_rollback();
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+					return $this->outputJson($result->code);
+				}
+
 		$this->db->trans_commit();
 
 		return $this->outputJsonSuccess(true);
