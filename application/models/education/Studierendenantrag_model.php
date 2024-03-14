@@ -144,6 +144,7 @@ class Studierendenantrag_model extends DB_Model
 		$lang = 'SELECT index FROM public.tbl_sprache WHERE sprache=' . $this->escape(getUserLanguage());
 
 		$this->addSelect('*');
+		$this->addSelect($this->dbTable . '.grund AS grund');
 		$this->addSelect('s.studierendenantrag_statustyp_kurzbz status');
 		$this->addSelect('s.insertvon status_insertvon');
 		$this->addSelect('t.bezeichnung[(' . $lang . ')] statustyp');
