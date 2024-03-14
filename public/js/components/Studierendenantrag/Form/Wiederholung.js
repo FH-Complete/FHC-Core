@@ -35,11 +35,14 @@ export default {
 		statusSeverity() {
 			switch (this.data.status)
 			{
-				case 'Erstellt': return 'info';
+				case 'Offen':
+				case 'Erstellt':
+				case 'ErsteAufforderungVersandt': return 'info';
 				case 'Genehmigt': return 'success';
+				case 'Pause':
 				case 'Verzichtet':
 				case 'Abgemeldet': return 'danger';
-				default: return 'info';
+				default: return 'warning';
 			}
 		},
 		loadUrl() {
@@ -67,8 +70,12 @@ export default {
 						this.data.statustyp = this.$p.t('studierendenantrag', 'status_open');
 					}
 					this.$emit('update:status', this.data.status);
+					const msg = (this.data.status == 'Pause' && this.data.status_insertvon == "Studienabbruch") ? Vue.computed(() => {
+						let status = this.$p.t('studierendenantrag/status_stop');
+						return this.$p.t('studierendenantrag', 'status_x', {status});
+					}) : Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp}));
 					this.$emit("setStatus", {
-						msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
+						msg,
 						severity: this.statusSeverity
 					});
 					return result;
