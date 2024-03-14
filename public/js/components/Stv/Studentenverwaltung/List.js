@@ -112,11 +112,14 @@ export default {
 			this.lastSelected = first ? undefined : this.selected;
 			if (url)
 				url = CoreRESTClient._generateRouterURI(url);
-			if (!this.$refs.table.tableBuilt)
-				this.$refs.table.tabulator.on("tableBuilt", () => {
-					this.$refs.table.tabulator.setData(url);
-				});
-			else
+			if (!this.$refs.table.tableBuilt) {
+				if (!this.$refs.table.tabulator) {
+					this.tabulatorOptions.ajaxURL = url;
+				} else
+					this.$refs.table.tabulator.on("tableBuilt", () => {
+						this.$refs.table.tabulator.setData(url);
+					});
+			} else
 				this.$refs.table.tabulator.setData(url);
 		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component

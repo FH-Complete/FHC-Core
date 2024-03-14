@@ -18,8 +18,8 @@
 import FhcStudentenverwaltung from "../components/Stv/Studentenverwaltung.js";
 import fhcapifactory from "./api/fhcapifactory.js";
 
-import FhcAlert from "../plugin/FhcAlert.js";
-import FhcPhrasen from "../plugin/Phrasen.js";
+import FhcApi from "../plugin/FhcApi.js";
+import Phrasen from "../plugin/Phrasen.js";
 
 //import PrimeVue form "../../../../index.ci.php/public/js/components/primevue/config/config.esm.min.js");
 //const PrimeVue = await import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/public/js/components/primevue/config/config.esm.min.js").default;
@@ -47,7 +47,7 @@ import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_route
 				overlay: 1100
 			}
 		})
-		.use(FhcAlert)
-		.use(FhcPhrasen)
+		.use(FhcApi)
+		.use(Phrasen)
 		.mount('#main');
 });

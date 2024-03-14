@@ -43,13 +43,14 @@
 	font-size: 1rem;
 }
 
-.tabulator-row.tabulator-selectable:focus {
-	box-shadow: 0 0 0 .24rem rgba(13,110,253,.25);
-	z-index: 1;
-	outline: 0;
-
 .tabulator-cell .btn {
 	padding: 0 .5rem;
 	max-height: 22px;
 	min-width: 30px;
+}
+
+.tabulator-row.tabulator-selectable:focus {
+	box-shadow: 0 0 0 .24rem rgba(13,110,253,.25);
+	z-index: 1;
+	outline: 0;
 }
