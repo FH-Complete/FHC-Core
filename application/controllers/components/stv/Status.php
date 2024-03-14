@@ -187,7 +187,7 @@ class Status extends FHC_Controller
 		//check if bewerberstatus exists
 		if($status_kurzbz == 'Aufgenommener' || $status_kurzbz == 'Wartender')
 		{
-			//TODO(manu) Wartender NICHT in Liste!? nur in diesem Code
+			//TODO(manu) erst später für multiactions releveant
 			//FAS: Aufnahme ist möglich: Beispiel prestudent_id = 129629
 
 			$result = $this->PrestudentstatusModel->checkIfExistingBewerberstatus($prestudent_id, $name);
@@ -346,24 +346,31 @@ class Status extends FHC_Controller
 
 			//Student updaten (fuer Abbrecher und Unterbrecher)
 			//not active yet: works only for "status ändern" in FAS
-			/*			$result = $this->StudentModel->update(
-							[
-								'student_uid' => $student_uid
-							],
-							[
-								'studiengang_kz' => $studiengang_kz,
-								'semester' => $ausbildungssemester,
-								'verband' => $verband,
-								'gruppe' => $gruppe,
-								'updateamum' => date('c'),
-								'updatevon' => $uid
-						]);
-						if ($this->db->trans_status() === false || isError($result))
-						{
-							$this->db->trans_rollback();
-							$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-							return $this->outputJson($result->code);
-						}*/
+			//Later for multiactions
+
+			/*
+			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
+			{
+				$result = $this->StudentModel->update(
+								[
+									'student_uid' => $student_uid
+								],
+								[
+									'studiengang_kz' => $studiengang_kz,
+									'semester' => $ausbildungssemester,
+									'verband' => $verband,
+									'gruppe' => $gruppe,
+									'updateamum' => date('c'),
+									'updatevon' => $uid
+							]);
+							if ($this->db->trans_status() === false || isError($result))
+							{
+								$this->db->trans_rollback();
+								$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+								return $this->outputJson($result->code);
+							}
+				}
+			*/
 		}
 
 		$this->db->trans_commit();

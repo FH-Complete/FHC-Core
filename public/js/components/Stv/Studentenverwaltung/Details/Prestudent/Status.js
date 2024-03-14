@@ -58,7 +58,7 @@ export default{
 					{title: "BestätigtAm", field: "format_bestaetigtam"},
 					{title: "AbgeschicktAm", field: "format_bewerbung_abgeschicktamum"},
 					{title: "Statusgrund", field: "statusgrund_kurzbz", visible: false},
-					{title: "Organisationsform", field: "ps.orgform_kurzbz", visible: false},
+					{title: "Organisationsform", field: "orgform_kurzbz", visible: false},
 					{title: "PrestudentInId", field: "prestudent_id", visible: false},
 					{title: "StudienplanId", field: "studienplan_id", visible: false},
 					{title: "Anmerkung", field: "anmerkung", visible: false},
