@@ -19,6 +19,8 @@ class AntragJob extends JOB_Controller
 		// Loads SanchoHelper
 		$this->load->helper('hlp_sancho_helper');
 
+		$this->load->library('AntragLib');
+
 		// Load Model
 		$this->load->model('education/Studierendenantrag_model', 'StudierendenantragModel');
 		$this->load->model('education/Studierendenantragstatus_model', 'StudierendenantragstatusModel');
@@ -172,7 +174,16 @@ class AntragJob extends JOB_Controller
 			$cc = $leitung['Details']->email;
 
 			// NOTE(chris): Sancho mail
-			if (sendSanchoMail("Sancho_Mail_Antrag_Stgl", $data, $to, 'Anträge - Aktion(en) erforderlich', DEFAULT_SANCHO_HEADER_IMG, DEFAULT_SANCHO_FOOTER_IMG, '', $cc))
+			if (sendSanchoMail(
+				"Sancho_Mail_Antrag_Stgl",
+				$data,
+				$to,
+				'Anträge - Aktion(en) erforderlich',
+				DEFAULT_SANCHO_HEADER_IMG,
+				DEFAULT_SANCHO_FOOTER_IMG,
+				'',
+				$cc
+			))
 				$count++;
 		}
 
@@ -316,12 +327,52 @@ class AntragJob extends JOB_Controller
 				} else {
 					$deregisterStatus = getData($result);
 
+					$result = $this->antraglib->pauseAntrag(
+						$prestudent->studierendenantrag_id,
+						Studierendenantragstatus_model::INSERTVON_DEREGISTERED
+					);
+					if (isError($result))
+						$this->logError(getError($result));
+
 					$result = $this->prestudentlib->setAbbrecher($prestudent->prestudent_id, '', $insertvon);
 					if (isError($result)) {
 						$this->StudierendenantragstatusModel->delete($deregisterStatus);
 						$this->logError(getError($result));
 					} else {
 						$count++;
+						
+						$datum_kp = new DateTime($prestudent->datum);
+						$dataMail = array(
+							'name'=> trim($prestudent->vorname . ' '. $prestudent->nachname),
+							'vorname' => $prestudent->vorname,
+							'nachname' => $prestudent->nachname,
+							'pers_kz'=> $prestudent->matrikelnr,
+							'stg' => $prestudent->bezeichnung,
+							'lvbezeichnung' => $prestudent->lvbezeichnung,
+							'datum_kp' => $datum_kp->format('d.m.Y'),
+							'studiensemester'=> $prestudent->studiensemester_kurzbz,
+							'Orgform'=> $prestudent->orgform,
+							'prestudent_id' => $prestudent->prestudent_id,
+							'fristablauf' => $dateDeadline->format('d.m.Y')
+						);
+
+						$email = $this->StudentModel->getEmailFH($this->StudentModel->getUID($prestudent->prestudent_id));
+						// Mail to Student
+						if (!sendSanchoMail('Sancho_Mail_Antrag_W_DL_Stud', $dataMail, $email, 'Wiederholung: Frist abgelaufen')) {
+							$this->logWarning("Failed to send Notification to " . $email);
+						}
+
+						$result = $this->StudiengangModel->load($prestudent->studiengang_kz);
+						if (!hasData($result)) {
+							$this->logWarning('No Studiengang found');
+							continue;
+						}
+						$studiengang = current(getData($result));
+						$email = $studiengang->email;
+						// Mail to Assistenz
+						if (!sendSanchoMail('Sancho_Mail_Antrag_W_DL_Assist', $dataMail, $email, 'Wiederholung: Frist abgelaufen')) {
+							$this->logWarning("Failed to send Notification to " . $email);
+						}
 					}
 				}
 			}
@@ -338,8 +389,6 @@ class AntragJob extends JOB_Controller
 	public function handleAbmeldungenStglDeadline()
 	{
 		$this->logInfo('Start Job handleAbmeldungenStglDeadline');
-
-		$this->load->library('AntragLib');
 
 		$insertvon = $this->config->item('antrag_job_systemuser');
 		if (!$insertvon) {
@@ -364,7 +413,10 @@ class AntragJob extends JOB_Controller
 		$this->StudierendenantragModel->addSelect('s.insertamum');
 		$this->StudierendenantragModel->addSelect('s.insertvon');
 
-		$this->StudierendenantragModel->db->where_in('public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)', $this->config->item('antrag_prestudentstatus_whitelist'));
+		$this->StudierendenantragModel->db->where_in(
+			'public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)',
+			$this->config->item('antrag_prestudentstatus_whitelist')
+		);
 
 		$result = $this->StudierendenantragModel->getWithLastStatusWhere([
             'typ' => Studierendenantrag_model::TYP_ABMELDUNG_STGL,
@@ -392,6 +444,10 @@ class AntragJob extends JOB_Controller
 					$this->logError(getError($result));
 				else {
 					$deregisterStatus = getData($result);
+
+					$result = $this->antraglib->pauseAntrag($antrag->studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_DEREGISTERED);
+					if (isError($result))
+						$this->logError(getError($result));
 
 					$result = $this->prestudentlib->setAbbrecher(
 	                    $antrag->prestudent_id,
@@ -438,7 +494,6 @@ class AntragJob extends JOB_Controller
 							$this->logWarning("Failed to send Notification to " . $email);
 						}
 					}
-
 				}
 			}
 			$this->logInfo($count . "/" . count($antraege) . " Students set to Abbrecher");
@@ -569,12 +624,6 @@ class AntragJob extends JOB_Controller
 					}
 				}
 
-				$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
-				$result = $this->PrestudentstatusModel->loadLastWithStgDetails($prestudent->prestudent_id, $prestudent->studiensemester_kurzbz);
-				if (hasData($result)) {
-					$ausbildungssemester = current(getData($result))->semester;
-				}
-
 				$dataMail = array(
 					'name'=> trim($prestudent->vorname . ' '. $prestudent->nachname),
 					'vorname' => $prestudent->vorname,
@@ -591,7 +640,7 @@ class AntragJob extends JOB_Controller
 					'fristablauf' => $fristende->format('d.m.Y'),
 					'pre_wiederholer_sem' => $next_sem,
 					'wiederholer_sem' => $sem_after_next_sem,
-					'sem' => $ausbildungssemester
+					'sem' => $prestudent->ausbildungssemester
 				);
 
 				// NOTE(chris): Sancho mail
