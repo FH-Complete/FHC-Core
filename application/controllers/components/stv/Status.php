@@ -562,6 +562,7 @@ class Status extends FHC_Controller
 	public function updateStatus($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
 	{
 		$isStudent = false;
+		$isBerechtigtNoStudstatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
 
 		//get Studiengang von prestudent_id
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
@@ -584,16 +585,6 @@ class Status extends FHC_Controller
 			return $this->outputJson($result);
 		}
 
-		//var_dump($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester);
-
-		/*		$this->load->library('form_validation');
-
-
-				if ($this->form_validation->run() == false)
-				{
-					return $this->outputJsonError($this->form_validation->error_array());
-				}*/
-
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 
@@ -612,17 +603,19 @@ class Status extends FHC_Controller
 		$bestaetigtvon = $uid;
 
 		//check if Bismeldestichtag erreicht
-		if(!isBerechtigtNoStudstatusCheck)
+		if(!$isBerechtigtNoStudstatusCheck)
 		{
+			//Fas only check datum
 			$this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
-			$result = $this->BismeldestichtagModel->checkIfMeldestichtagErreicht($datum, $studiensemester_kurzbz);
+/*			$result = $this->BismeldestichtagModel->checkIfMeldestichtagErreicht($datum, $studiensemester_kurzbz);*/
+			$result = $this->BismeldestichtagModel->checkIfMeldestichtagErreicht($datum);
 			if (isError($result)) {
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				return $this->outputJson(getError($result));
 			}
 			if ($result->retval == "1") {
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				//return $this->outputJson(getError($result->code));
+				//return $this->outputJson($result->code);
 				//Fehlermeldung überschrieben, passender
 				return $this->outputJson("Meldestichtag erreicht - Bearbeiten nicht mehr möglich");
 			}
@@ -671,8 +664,6 @@ class Status extends FHC_Controller
 		{
 			//Block STATUSCHECKS
 
-			//$new_status_datum = isset($datum) ? $datum  : date('Y-m-d');
-
 			$result = $this->PrestudentstatusModel->checkIfValidStatusHistory($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $datum, $ausbildungssemester);
 			if (isError($result))
 			{
@@ -683,62 +674,10 @@ class Status extends FHC_Controller
 
 
 		// Start DB transaction
-		$this->db->trans_start(false);
-
-		if($isStudent)
-		{
-			//check Studentlehrverband
-			$this->load->model('crm/Student_model', 'StudentModel');
-			$result = $this->StudentModel->checkIfUid($prestudent_id);
-			if (isError($result)) {
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson(getError($result));
-			}
-			$student_uid = $result->retval;
-
-			//check if Lehrverband exists
-			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-			$result = $this->StudentlehrverbandModel->checkIfStudentlehrverbandExists($student_uid, $studiensemester_kurzbz);
-			if (isError($result)) {
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson(getError($result));
-			}
-			if ($result->retval == "0") {
-				//load Data Studentlehrverband
-				$result = $this->StudentlehrverbandModel->load(
-					[
-						'student_uid' => $student_uid,
-						'studiensemester_kurzbz' => $studiensemester_kurzbz
-					]);
-				if (isError($result)) {
-					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-
-					return $this->outputJson("Error in insert Studentlehrverband");
-				}
-				$lvbData = current(getData($result));
-
-				$result = $this->StudentlehrverbandModel->insert(
-					[
-						'student_uid' => $student_uid,
-						'studiensemester_kurzbz' => $studiensemester_kurzbz,
-						'semester' => $ausbildungssemester,
-						'verband' => $lvbData->verband,
-						'gruppe' => $lvbData->gruppe,
-						'insertamum' => date('c'),
-						'insertvon' => $uid,
-						'studiengang_kz' => $lvbData->studiengang_kz
-					]);
-
-				if (isError($result))
-				{
-					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-
-					return $this->outputJson("Error during insert Studentlehrverband");
-				}
-			}
-		}
+		$this->db->trans_begin();
 
 		//update status
+		var_dump($ausbildungssemester, $studiensemester_kurzbz);
 		$result = $this->PrestudentstatusModel->update(
 			[
 				'prestudent_id' => $key_prestudent_id,
@@ -747,7 +686,6 @@ class Status extends FHC_Controller
 				'ausbildungssemester' => $key_ausbildungssemester,
 			],
 			[
-				'prestudent_id' => $prestudent_id,
 				'status_kurzbz' => $status_kurzbz,
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'ausbildungssemester' => $ausbildungssemester,
@@ -763,17 +701,53 @@ class Status extends FHC_Controller
 				'rt_stufe' => $rt_stufe
 			]
 		);
-
-		// Transaction complete!
-		$this->db->trans_complete();
-
-		if ($this->db->trans_status() === false || isError($result))
+		if (isError($result))
 		{
 			$this->db->trans_rollback();
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson(getError($result));
 		}
 
+
+		if($isStudent)
+		{
+			//check Studentlehrverband
+			$this->load->model('crm/Student_model', 'StudentModel');
+			$result = $this->StudentModel->checkIfUid($prestudent_id);
+			if (isError($result)) {
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			$student_uid = $result->retval;
+
+			//process studentlehrverband
+			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+			$result = $this->StudentlehrverbandModel->loadWhere(
+				array(
+					'student_uid' => $student_uid,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz
+				)
+			);
+			if (isError($result)) {
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				$this->outputJson($result);
+			}
+			if (!hasData($result)) {
+				$this->outputJson($result);
+			}
+
+			//Data of current Semester
+			$studentlvbData = current(getData($result));
+
+			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+			$result = $this->StudentlehrverbandModel->processStudentlehrverband($student_uid,  $studentlvbData->studiengang_kz, $ausbildungssemester, $studentlvbData->verband, $studentlvbData->gruppe, $studiensemester_kurzbz);
+			if ($this->db->trans_status() === false || isError($result))
+			{
+				$this->db->trans_rollback();
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson($result->code);
+			}
+		}
 
 		$this->db->trans_commit();
 		return $this->outputJsonSuccess(true);
@@ -931,13 +905,13 @@ class Status extends FHC_Controller
 		$studentlvbData = current(getData($result));
 
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-				$result = $this->StudentlehrverbandModel->processStudentlehrverband($student_uid, $studentlvbData->studiengang_kz, $ausbildungssem_next, $studentlvbData->verband, $studentlvbData->gruppe, $studiensem_next);
-				if ($this->db->trans_status() === false || isError($result))
-				{
-					$this->db->trans_rollback();
-					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-					return $this->outputJson($result->code);
-				}
+		$result = $this->StudentlehrverbandModel->processStudentlehrverband($student_uid, $studentlvbData->studiengang_kz, $ausbildungssem_next, $studentlvbData->verband, $studentlvbData->gruppe, $studiensem_next);
+		if ($this->db->trans_status() === false || isError($result))
+		{
+			$this->db->trans_rollback();
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result->code);
+		}
 
 		$this->db->trans_commit();
 
@@ -1017,6 +991,10 @@ class Status extends FHC_Controller
 				'ausbildungssemester' => $key_ausbildungssemester,
 			],
 			[
+				'prestudent_id' => $key_prestudent_id,
+				'status_kurzbz' => $key_status_kurzbz,
+				'studiensemester_kurzbz' => $key_studiensemester_kurzbz,
+				'ausbildungssemester' => $key_ausbildungssemester,
 				'bestaetigtam' => date('c'),
 				'bestaetigtvon' => $uid,
 				'updateamum' => date('c'),
