@@ -38,6 +38,8 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/funktion.class.php');
 require_once('../../include/wawi_kostenstelle.class.php');
 require_once('../../include/log.class.php');
+require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/datum.class.php');
 
 /*
  * TODOs
@@ -60,6 +62,7 @@ BEschreibungstexte bestehender Rechte
 
  */
 $user = get_uid();
+$datum = new datum();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -68,7 +71,14 @@ if (!$db = new basis_db())
 	die('Fehler beim öffnen der Datenbankverbindung');
 
 if(!$rechte->isBerechtigt('basis/berechtigung'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($rechte->errormsg);
+
+$mitarbeiter = new mitarbeiter($user);
+$userKuerzel = $user;
+if ($mitarbeiter->kurzbz != '')
+{
+	$userKuerzel = $mitarbeiter->kurzbz;
+}
 
 //$reloadstr = '';  // neuladen der liste im oberen frame
 $htmlstr = '';
@@ -104,7 +114,27 @@ if(isset($_POST['delete']) && $_POST['delete'] != '')
 
 	$ber = new benutzerberechtigung();
 	if(!$ber->delete($benutzerberechtigung_id))
+	{
 		$errorstr .= 'Datensatz konnte nicht gel&ouml;scht werden!';
+	}
+	else
+	{
+		//Log schreiben
+		$log = new log();
+
+		$logdata = var_export((array) $ber, true);
+		$log->new = true;
+		$log->sql = $logdata;
+		$log->sqlundo = 'Kein Undo vorhanden';
+		$log->executetime = date('Y-m-d H:i:s');
+		$log->mitarbeiter_uid = $user;
+		$log->beschreibung = 'Berechtigung gelöscht';
+
+		if(!$log->save())
+		{
+			$errorstr .= "<span style='color: red'><b>Fehler beim schreiben des Log-Eintrags</b></span><br>";
+		}
+	}
 
 	//$reloadstr .= "<script type='text/javascript'>";
 	//$reloadstr .= "	parent.uebersicht.location.href='benutzerberechtigung_uebersicht.php';";
@@ -172,7 +202,13 @@ if(isset($_POST['uebertragen']) && $_POST['uebertragen_nach'] != '')
 	//echo '<pre>', var_dump($_POST), '</pre>';exit();
 	if($rechte->isBerechtigt('basis/berechtigung', null, 'suid'))
 	{
+		$mitarbeiter = new mitarbeiter($_POST['uid']);
 		$uidVon = $_POST['uid'];
+		if ($mitarbeiter->kurzbz != '')
+		{
+			$uidVon = $mitarbeiter->kurzbz;
+		}
+
 		$copyTo = $_POST['uebertragen_nach'];
 
 		if (isset($_POST['dataset']))
@@ -215,12 +251,12 @@ if(isset($_POST['uebertragen']) && $_POST['uebertragen_nach'] != '')
 				$ber->uid = $copyTo;
 				$ber->funktion_kurzbz = $funktion_kurzbz;
 				$ber->studiensemester_kurzbz = $studiensemester_kurzbz;
-				$ber->start = $start;
+				$ber->start = date('Y-m-d');
 				$ber->ende = $ende;
 				$ber->updateamum = date('Y-m-d H:i:s');
 				$ber->updatevon = $user;
 				$ber->kostenstelle_id = $kostenstelle_id;
-				$ber->anmerkung = 'Kopiert von UID '.$uidVon.($anmerkung!=''?'. Anmerkung von UID '.$uidVon.': '.$anmerkung:'');
+				$ber->anmerkung = 'Kp '.$uidVon.($anmerkung != '' ? ': '.$anmerkung : '');
 
 				if(!$ber->save())
 				{
@@ -589,14 +625,16 @@ $oe = new organisationseinheit();
 $oe->getAll();
 foreach ($oe->result AS $row)
 {
-	$oe_arr[$row->oe_kurzbz] = $row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung;
+	$oe_arr[$row->oe_kurzbz]['bezeichnung'] = $row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung;
+	$oe_arr[$row->oe_kurzbz]['aktiv'] = $row->aktiv;
 }
 
 $kostenstelle = new wawi_kostenstelle();
 $kostenstelle->getAll();
 foreach ($kostenstelle->result AS $row)
 {
-	$kst_arr[$row->kostenstelle_id] = $row->bezeichnung;
+	$kst_arr[$row->kostenstelle_id]['bezeichnung'] = $row->bezeichnung;
+	$kst_arr[$row->kostenstelle_id]['aktiv'] = $row->aktiv;
 }
 
 if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
@@ -622,7 +660,8 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$name = new benutzer();
 		$name->load($uid);
 
-		$htmlstr .= "Berechtigungen von <b>".$name->nachname." ".$name->vorname." (".$uid.")</b>";
+		$htmlstr .= "Berechtigungen von <b>".$name->nachname." ".$name->vorname." (".$uid.")</b> <a href='".CIS_ROOT."cis/private/profile/index.php?uid=".$uid."' target='_blank'>Zum CIS-Profil</a>";
+
 		$message = '';
 		$class = '';
 		$messageString = '';
@@ -798,7 +837,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	$htmlstr .= "		<td align='center'><input type='checkbox' name='dataset[0][negativ]'></td>";
 
 	//Start
-	$htmlstr .= "		<td nowrap><input class='datepicker_datum' type='text' name='dataset[0][start]' value='' size='10' maxlength='10'></td>";
+	$htmlstr .= "		<td nowrap><input class='datepicker_datum' type='text' name='dataset[0][start]' value='".date('Y-m-d')."' size='10' maxlength='10'></td>";
 
 	//Ende
 	$htmlstr .= "		<td nowrap><input class='datepicker_datum' type='text' name='dataset[0][ende]' value='' size='10' maxlength='10'></td>";
@@ -816,7 +855,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	// Tabelle für bestehende Berechtigungen
 	////////////////
 
-	$htmlstr .= "<p style='font-size: small' id='anzahl'></p>";
+	$htmlstr .= "<div class='pull-left' style='font-size: small' id='anzahl'></div><div class='pull-right' style='font-size: smaller'>STRG+ALT+T fügt Datum ein</div>";
 	$htmlstr .= "<form id='formRechte' action='benutzerberechtigung_details.php?uid=".$uid."&funktion_kurzbz=".$funktion_kurzbz."' method='POST'>";
 
 	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>";
@@ -849,6 +888,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				
 				</tr></thead><tbody>";
 
+	$countInaktiveUndWawi = 0;
 	foreach($rights->berechtigungen as $b)
 	{
 		switch($filter)
@@ -891,6 +931,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		if ($b->ende!='' && strtotime($b->ende) < $heute || $b->rolle_kurzbz == 'wawi' || substr($b->berechtigung_kurzbz, 0, 4) == 'wawi')
 		{
 			$htmlstr .= "	<tr class='row_berechtigung ausgeblendet' id='".$b->benutzerberechtigung_id."'>";
+			$countInaktiveUndWawi++;
 		}
 		else
 		{
@@ -961,9 +1002,10 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		else
 		{
 			$htmlstr .= "		<td class='oe_column'>";
-			$htmlstr .= "			<span style='display: none'>".($b->oe_kurzbz != '' ? $oe_arr[$b->oe_kurzbz] : '')."</span>";
+			$htmlstr .= "			<span style='display: none'>".($b->oe_kurzbz != '' ? $oe_arr[$b->oe_kurzbz]['bezeichnung'] : '')."</span>";
 			$htmlstr .= "			<input type='hidden' name='dataset[$b->benutzerberechtigung_id][oe_kurzbz]' value='$b->oe_kurzbz'>";
-			$htmlstr .= "			<input type='text' class='oe_kurzbz_autocomplete $inaktiv_class' value='".($b->oe_kurzbz != '' ? $oe_arr[$b->oe_kurzbz] : '')."'>";
+				$style = isset($oe_arr[$b->oe_kurzbz]) && $oe_arr[$b->oe_kurzbz]['aktiv'] == false? 'style="text-decoration: line-through"' : '';
+			$htmlstr .= "			<input $style type='text' class='oe_kurzbz_autocomplete $inaktiv_class' value='".($b->oe_kurzbz != '' ? $oe_arr[$b->oe_kurzbz]['bezeichnung'] : '')."'>";
 			$htmlstr .= "		</td>";
 		}
 
@@ -971,7 +1013,8 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		<td class='ks_column'>";
 		$htmlstr .= "			<span style='display: none'>".$b->kostenstelle_id."</span>";
 		$htmlstr .= "			<input type='hidden' name='dataset[$b->benutzerberechtigung_id][kostenstelle_id]' value='$b->kostenstelle_id'>";
-		$htmlstr .= "			<input type='text' class='kostenstelle_autocomplete $inaktiv_class' value='".($b->kostenstelle_id != '' ? $kst_arr[$b->kostenstelle_id] : '')."'>";
+			$style = isset($kst_arr[$b->kostenstelle_id]) && $kst_arr[$b->kostenstelle_id]['aktiv'] == false ? 'style="text-decoration: line-through"' : '';
+		$htmlstr .= "			<input $style type='text' class='kostenstelle_autocomplete $inaktiv_class' value='".($b->kostenstelle_id != '' ? $kst_arr[$b->kostenstelle_id]['bezeichnung'] : '')."'>";
 		$htmlstr .= "		</td>";
 
 
@@ -1061,29 +1104,33 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	$htmlstr .= "</tbody></table>";
 	
 	//Button zum einblenden ausgeblendeter Zeilen
-	$htmlstr .= "<button type='button' class='btn btn-default' onclick='show_hidden()'>Inaktive und WaWi anzeigen</button>";
-	
+	if ($countInaktiveUndWawi > 0)
+	{
+		$htmlstr .= "<button type='button' class='btn btn-default' onclick='show_hidden()'>Inaktive und WaWi anzeigen</button>";
+	}
+
+	// Speichern und Aktions-Bereich
 	$htmlstr .= '<div id="bottomArea" >
 					<div class="input-group">
 						<button id="ButtonNeu" type="button" class="btn btn-default" name="schick" onclick="return submitNeuesRecht()" style="margin-bottom: 10px">Neues Recht speichern</button>
 						<button id="ButtonSpeichern" type="submit" class="btn btn-default" name="schick" onclick="return validateSpeichern()" style="margin-bottom: 10px">Änderungen Speichern</button>
 						<div class="form-inline multi-options" style="">
 							<div class="input-group" style="width: 180px;">
-								<input type="text" id="input_uebertragen_nach" name="uebertragen_nach" class="form-control benutzer_autocomplete" placeholder="Zu UID übertragen">
+								<input type="text" id="input_uebertragen_nach" name="uebertragen_nach" class="form-control benutzer_autocomplete" placeholder="Zu UID übertragen" disabled>
 								<div class="input-group-btn">
-									<button class="btn btn-default" type="submit" id="button_uebertragen" name="uebertragen" onclick="return validateUebertragen()">
+									<button class="btn btn-default" type="submit" id="button_uebertragen" name="uebertragen" onclick="return validateUebertragen()" disabled>
 										<i class="glyphicon glyphicon-transfer" style="line-height: unset"></i>
 									</button>
 								</div>
 							</div>
-							<button type="submit" id="button_mehrfachbeenden" name="setDate_multi" value="setDate_multi" class="btn btn-default" onclick="return validateBeenden()">Ende setzen</button>
-							<button type="submit" id="button_mehrfachloeschen" name="delete_multi" value="delete_multi" class="btn btn-warning" onclick="return validateDeleteMulti()">Markierte löschen</button>
+							<button type="submit" id="button_mehrfachbeenden" name="setDate_multi" value="setDate_multi" class="btn btn-default" onclick="return validateBeenden()" disabled>Ende setzen</button>
+							<button type="submit" id="button_mehrfachloeschen" name="delete_multi" value="delete_multi" class="btn btn-warning" onclick="return validateDeleteMulti()" disabled>Markierte löschen</button>
 						</div>
 						<div class="form-inline multi-options" style="">
 							<div class="input-group" style="width: 180px;">
-								<input type="text" id="input_anmerkung_multi" maxlength="256" name="anmerkung_multi" class="form-control" placeholder="Mehrfach-Anmerkung" style="width: 390px;">
+								<input type="text" id="input_anmerkung_multi" maxlength="256" name="anmerkung_multi" class="form-control" placeholder="Mehrfach-Anmerkung" style="width: 390px;" disabled>
 								<div class="input-group-btn">
-									<button class="btn btn-default" type="submit" id="button_anmerkung_multi" name="save_anmerkung_multi" onclick="return validateAnmerkungMulti()">
+									<button class="btn btn-default" type="submit" id="button_anmerkung_multi" name="save_anmerkung_multi" onclick="return validateAnmerkungMulti()" disabled>
 										<i class="glyphicon glyphicon-ok" style="line-height: unset"></i>
 									</button>
 								</div>
@@ -1106,6 +1153,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
 	<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" type="text/css" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css">
+	<script type="text/javascript" src="../../include/tiny_mce/tiny_mce.js"></script>
 	<script src="../../include/js/mailcheck.js"></script>
 	<script src="../../include/js/datecheck.js"></script>
 <!--	<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>-->
@@ -1425,12 +1473,31 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		{
 			display: none;
 		}
-		.multi-options
-		{
-			display: none;
-		}
+		/*.multi-options*/
+		/*{*/
+		/*	display: none;*/
+		/*}*/
 	</style>
 	<script type="text/javascript">
+		$.tablesorter.addParser({
+			id: "customDate",
+			is: function(s) {
+				//return false;
+				//use the above line if you don\'t want table sorter to auto detected this parser
+				// match dd.mm.yyyy e.g. 01.01.2001 as regex
+				//return /\d{1,4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2} .*/.test(s);
+				return /\d{1,2}.\d{1,2}.\d{1,4} \d{1,2}:\d{1,2} .*/.test(s);
+			},
+			// replace regex-wildcards and return new date
+			format: function(s) {
+				s = s.replace(/\-/g," ");
+				s = s.replace(/:/g," ");
+				s = s.replace(/\./g," ");
+				s = s.split(" ");
+				return $.tablesorter.formatFloat(new Date(s[2], s[1]-1, s[0], s[3], s[4]).getTime());
+			},
+			type: "numeric"
+		});
 		$(document).ready(function()
 		{
 			// $("[data-toggle=\"popover\"]").popover();
@@ -1459,28 +1526,35 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				 });
 
 			$("#t1").tablesorter(
-				{
-					sortList: [[0,0],[1,0],[2,0],[4,0]],
-					widgets: ["filter"],
-					headers: {0:{sorter:false},6:{sorter:false, filter:false},10:{sorter:false, filter:false},11:{sorter:false, filter:false}},
-					widgetOptions : {	filter_functions : {
-							// Add select menu to this column
-							0 : {
-								"Aktive" : function(e, n, f, i, $r, c, data) { return /a/.test(e); },
-								"Wartende" : function(e, n, f, i, $r, c, data) { return /b/.test(e); },
-								"Inaktive" : function(e, n, f, i, $r, c, data) { return /c/.test(e); }
-							}
-						}},
-					// Um die Werte im Dropdown sortieren zu können
-					textExtraction: function(node) {
-						// Check if option selected is set
-						if ($(node).find('option:selected').text() != "") {
-							return $(node).find('option:selected').text();
+			{
+				sortList: [[0,0],[1,0],[2,0],[4,0]],
+				widgets: ["filter"],
+				headers: {0:{sorter:false},6:{sorter:false, filter:false},10:{sorter:false, filter:false},11:{sorter:false, filter:false}},
+				widgetOptions : {	filter_functions : {
+						// Add select menu to this column
+						0 : {
+							"Aktive" : function(e, n, f, i, $r, c, data) { return /a/.test(e); },
+							"Wartende" : function(e, n, f, i, $r, c, data) { return /b/.test(e); },
+							"Inaktive" : function(e, n, f, i, $r, c, data) { return /c/.test(e); }
 						}
-						// Otherwise return text
-						else return $(node).text();
+					}},
+				// Um die Werte im Dropdown sortieren zu können
+				textExtraction: function(node) {
+					// Check if option selected is set
+					if ($(node).find('option:selected').text() != "") {
+						return $(node).find('option:selected').text();
 					}
-				});
+					// Otherwise return text
+					else return $(node).text();
+				}
+			});
+			$("#t2").tablesorter(
+			{
+				sortList: [[0,1]],
+				widgets: ["filter"],
+				headers: { 0: { sorter: "customDate"}},
+				widgetOptions : {}
+			});
 			//document.berechtigung_neu.rolle_kurzbz.focus();
 
 			// Breite des Autocompletes korrigieren um das Springen zu verhindern
@@ -1639,13 +1713,15 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			$(".auswahlcheckbox").change(function() {
 				if ($(".auswahlcheckbox:checked").length > 0)
 				{
-					// Zeige den Bereich an, wenn mindestens eine Checkbox ausgewählt ist
-					$(".multi-options").show();
+					// Aktiviere Inputs, wenn mindestens eine Checkbox ausgewählt ist
+					$(".multi-options input[type=text]").prop('disabled', false);
+					$(".multi-options").find("button").prop('disabled', false);
 				}
 				else
 				{
-					// Verberge den Bereich, wenn keine Checkbox ausgewählt ist
-					$(".multi-options").hide();
+					// Deaktiviere Inputs, wenn keine Checkbox ausgewählt ist
+					$(".multi-options input[type=text]").prop('disabled', true);
+					$(".multi-options").find("button").prop('disabled', true);
 				}
 			});
 
@@ -1686,6 +1762,33 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				// Aktualisieren Sie die Variable, um den Status zu speichern
 				isButtonDisabled = !filled;
 			});
+
+			$('input[type="text"]').on('keydown', function(e){
+				if(e.ctrlKey && e.altKey && e.keyCode == 84){ // Wenn Strg + Alt + T gedrückt wird
+					e.preventDefault();
+					insertDatumAtCursor(this);
+				}
+			});
+
+			function insertDatumAtCursor(input){
+				var startPos = input.selectionStart;
+				var endPos = input.selectionEnd;
+				var currentDate = getCurrentDateAndUser();
+				var text = $(input).val();
+				var newText = text.substring(0, startPos) + currentDate + text.substring(endPos, text.length);
+				$(input).val(newText);
+				$(input).prop('selectionStart', startPos + currentDate.length);
+				$(input).prop('selectionEnd', startPos + currentDate.length);
+			}
+
+			function getCurrentDateAndUser()
+			{
+				var today = new Date();
+				var dd = String(today.getDate()).padStart(2, '0');
+				var mm = String(today.getMonth() + 1).padStart(2, '0'); // Januar ist 0!
+				var yyyy = today.getFullYear();
+				return dd + '.' + mm + '.' + yyyy+ ' <?php echo $userKuerzel; ?>: ';
+			}
 
 			//if (typeof $("#filterTableDataset").checkboxes === 'function')
 			//	$("#filterTableDataset").checkboxes("range", true);

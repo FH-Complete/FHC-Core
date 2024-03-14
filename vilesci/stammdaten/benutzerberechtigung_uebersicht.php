@@ -62,9 +62,9 @@ $(document).ready(function()
 
 	$("#t1").tablesorter(
 	{
-		sortList: [[0,0],[1,0],[2,0]], 
-		widgets: ["zebra"], 
-		headers: {4:{sorter:false}} 
+		sortList: [[4,0],[0,0],[1,0],[2,0]], 
+		widgets: ["zebra", "filter", "stickyHeaders"] 
+		//headers: {4:{sorter:false}} 
 	});
 	$("#t2").tablesorter(
 	{
@@ -75,11 +75,11 @@ $(document).ready(function()
 		widgetOptions : {	filter_functions:  
 							{ 
 								// Add select menu to this column 
-								6 : { 
-								"Ja" : function(e, n, f, i, $r, c, data) { return e == "Ja" || e == "" },
-								"Nein" : function(e, n, f, i, $r, c, data) { return /Nein/.test(e); } 
-								}, 
 								7 : { 
+								"Ja" : function(e, n, f, i, $r, c, data) { return e === "Ja" || /^\s*$/.test(e); },
+								"Nein" : function(e, n, f, i, $r, c, data) { return e === "Nein" || /^\s*$/.test(e); } 
+								}, 
+								8 : { 
 								"Aktiv" : function(e, n, f, i, $r, c, data) { return $r.find("div").hasClass( "buttonGreen" ); }, 
 								"Inaktiv" : function(e, n, f, i, $r, c, data) { return $r.find("div").hasClass( "buttonRed" ) || $r.find("div").hasClass( "buttonYellow" ); } 
 								} 
@@ -96,8 +96,8 @@ $(document).ready(function()
 							{ 
 								// Add select menu to this column 
 								6 : { 
-								"Ja" : function(e, n, f, i, $r, c, data) { return /Ja/.test(e); }, 
-								"Nein" : function(e, n, f, i, $r, c, data) { return /Nein/.test(e); } 
+								"Ja" : function(e, n, f, i, $r, c, data) { return e === "Ja" || /^\s*$/.test(e); },
+								"Nein" : function(e, n, f, i, $r, c, data) { return e === "Nein" || /^\s*$/.test(e); } 
 								}, 
 								7 : { 
 								"Aktiv" : function(e, n, f, i, $r, c, data) { return $r.find("div").hasClass( "buttonGreen" ); }, 
@@ -135,7 +135,7 @@ $(document).ready(function()
 		widgetOptions : {	filter_functions:  
 							{ 
 								// Add select menu to this column 
-								3 : { 
+								4 : { 
 								"Ja" : function(e, n, f, i, $r, c, data) { return /Ja/.test(e); }, 
 								"Nein" : function(e, n, f, i, $r, c, data) { return /Nein/.test(e); } 
 								}
@@ -263,7 +263,7 @@ if(!$rechte->isBerechtigt('basis/berechtigung'))
 $htmlstr = "";
 
 $searchstr = (isset($_GET['searchstr'])?$_GET['searchstr']:'');
-$benutzerart = (isset($_GET['benutzerart'])?$_GET['benutzerart']:'');
+$benutzerart = (isset($_GET['benutzerart'])?$_GET['benutzerart']:'mitarbeiter');
 $benutzeraktiv = (isset($_GET['aktiv'])?$_GET['aktiv']:'aktiv');
 $berechtigung_kurzbz = (isset($_GET['berechtigung_kurzbz'])?$_GET['berechtigung_kurzbz']:'');
 $rolle_kurzbz = (isset($_GET['rolle_kurzbz'])?$_GET['rolle_kurzbz']:'');

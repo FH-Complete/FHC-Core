@@ -31,7 +31,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('basis/berechtigung'))
-	die('Sie habe keine Rechte um diese Seite anzuzeigen');
+	die($rechte->errormsg);
 //echo '<pre>', var_dump($_POST), '</pre>';exit();
 $rolle_kurzbz = filter_input(INPUT_GET, 'rolle_kurzbz');
 $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
@@ -172,7 +172,7 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 					url: 'berechtigungrolle.php',
 					data: data,
 					type: 'POST',
-					dataType: "json",
+					dataType: 'json',
 					success: function(data)
 					{
 						if(data.status!='ok')
@@ -182,15 +182,23 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 						}
 						else
 						{
-							html = '<td style=""></td><td style="">'+recht+'</td><td style="text-align: right;">'+art+'</td>';
-							console.log('#'+rolle_kurzbz+'_'+recht);
-							$('#'+rolle_kurzbz+'_'+recht).html(html);
+							//location.reload(true);
+							window.location.reload(true)
+							// html = '<td style=""></td><td style="">'+recht+'</td><td style="text-align: right;">'+art+'</td>';
+							// console.log('#'+rolle_kurzbz+'_'+recht);
+							// $('#'+rolle_kurzbz+'_'+recht).html(html);
 						}
 					},
 					error: function(data)
 					{
 						//error
-						console.log('error2');
+						console.log('AJAX-Fehler in Error-Methode: ' + data.status + ' - ' + data.error);
+
+						location.reload(true);
+					},
+					stop: function (data)
+					{
+						location.reload(true);
 					}
 				});
 			}
@@ -199,6 +207,46 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 			button
 			{
 				line-height: 9pt;
+			}
+			table.tablesorter tr:hover td
+			{
+				/*pointer-events: none !important;*/
+			}
+			table.tablesorter tr.odd:hover td
+			{
+				background-color: #d3d3d3 !important;
+			}
+			table.tablesorter tr.even:hover td
+			{
+				background-color: #efefef !important;
+			}
+			table.tablesorter tr.odd:hover td.difference
+			{
+				background-color: #b2b2b2 !important;
+				/*border-top: 1px solid #aaa;*/
+				/*border-bottom: 1px solid #aaa;*/
+			}
+			table.tablesorter tr.even:hover td.difference
+			{
+				background-color: #b2b2b2 !important;
+				/*border-top: 1px solid #aaa;*/
+				/*border-bottom: 1px solid #aaa;*/
+			}
+			.difference
+			{
+				background-color: #b2b2b2 !important;
+				border-top: 1px solid #aaa;
+				border-bottom: 1px solid #aaa;
+			}
+			/*.difference:hover*/
+			/*{*/
+			/*	background-color: #b2b2b2 !important;*/
+			/*	border-top: 1px solid #aaa;*/
+			/*	border-bottom: 1px solid #aaa;*/
+			/*}*/
+			.tablesorter
+			{
+				border-collapse: collapse !important;
 			}
 		</style>
 	</head>
@@ -423,7 +471,7 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 													{
 														echo '	<tr id="'.$rolle1.'_'.$recht.'">
 																	<td style="">'.$recht.'</td>
-																	<td style="background-color: #a5a5a5">'.$rollen1Arr[$recht].'</td>
+																	<td class="difference">'.$rollen1Arr[$recht].'</td>
 																	<td style="text-align: right;"><button type="button" onclick="saveRecht(\''.$rolle2.'\', \''.$recht.'\', \''.$rollen1Arr[$recht].'\')"> -> </button></td>
 																</tr>';
 													}
@@ -447,9 +495,9 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 												else
 												{
 													echo '	<tr id="'.$rolle1.'_'.$recht.'">
-																<td style="background-color: #a5a5a5; ">&nbsp;</td>
-																<td style="background-color: #a5a5a5;">&nbsp;</td>
-																<td style="background-color: #a5a5a5; text-align: right;"></td>
+																<td class="difference" style="">&nbsp;</td>
+																<td class="difference"style="">&nbsp;</td>
+																<td class="difference"style=" text-align: right;"></td>
 															</tr>';
 												}
 											}
@@ -496,7 +544,7 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 											echo '	<tr id="'.$rolle2.'_'.$recht.'">
 														<td style="text-align: left;"><button type="button" onclick="saveRecht(\''.$rolle1.'\', \''.$recht.'\', \''.$rollen2Arr[$recht].'\')"> <- </button></td>
 														<td style="">'.$recht.'</td>
-														<td style="background-color: #a5a5a5;">'.$rollen2Arr[$recht].'</td>
+														<td class="difference" style="">'.$rollen2Arr[$recht].'</td>
 													</tr>';
 										}
 										elseif (!array_key_exists($recht, $rollen1Arr))
@@ -519,9 +567,9 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 									else
 									{
 										echo '	<tr id="'.$rolle2.'_'.$recht.'">
-													<td style="background-color: #a5a5a5;"></td>
-													<td style="background-color: #a5a5a5;">&nbsp;</td>
-													<td style="background-color: #a5a5a5;">&nbsp;</td>
+													<td class="difference" style=""></td>
+													<td class="difference" style="">&nbsp;</td>
+													<td class="difference" style="">&nbsp;</td>
 												</tr>';
 									}
 								}
