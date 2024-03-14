@@ -173,6 +173,7 @@ class Pruefung_model extends DB_Model
 		$this->addSelect('a.studierendenantrag_id');
 		$this->addSelect('a.typ');
 		$this->addSelect('campus.get_status_studierendenantrag(a.studierendenantrag_id) status');
+		$this->addSelect('pss.ausbildungssemester');
 
 		$this->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
 		$this->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');

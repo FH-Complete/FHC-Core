@@ -624,12 +624,6 @@ class AntragJob extends JOB_Controller
 					}
 				}
 
-				$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
-				$result = $this->StudierendenantragModel->getStgAndSem($prestudent->studierendenantrag_id);
-				if (hasData($result)) {
-					$ausbildungssemester = current(getData($result))->ausbildungssemester;
-				}
-
 				$dataMail = array(
 					'name'=> trim($prestudent->vorname . ' '. $prestudent->nachname),
 					'vorname' => $prestudent->vorname,
@@ -646,7 +640,7 @@ class AntragJob extends JOB_Controller
 					'fristablauf' => $fristende->format('d.m.Y'),
 					'pre_wiederholer_sem' => $next_sem,
 					'wiederholer_sem' => $sem_after_next_sem,
-					'sem' => $ausbildungssemester
+					'sem' => $prestudent->ausbildungssemester
 				);
 
 				// NOTE(chris): Sancho mail
