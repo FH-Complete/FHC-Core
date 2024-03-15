@@ -260,7 +260,7 @@ $(function(){
    
     // tableInit is called in the jquery_wrapper when the tableBuilt event was finished
     $(document).on("tableInit", function(event,tabulatorInstance) {
-     console.log("instance",tabulatorInstance);
+     
         func_tableBuilt($("#tableWidgetTabulator"))
         
         // event rowSelectionChanged now has to be attached to the tabulator after instantiation and after the tableBuilt event

@@ -6,6 +6,7 @@ $this->load->view(
 		'jquery3' => true,
 		'jqueryui1' => true,
 		'bootstrap5' => true,
+		'cis'=>true,
 		'fontawesome4' => true,
 		'ajaxlib' => true,
 		'dialoglib' => true,
@@ -66,7 +67,7 @@ $this->load->view(
     <div class="container-fluid">
         <!-- header  -->
         <div class="row">
-            <div class="col-12 my-4 page-header border-bottom">
+            <div class="col-12 my-4 border-bottom">
                 <h3 class="fw-normal ">
 					<?php echo $this->p->t('anrechnung', 'anrechnungenGenehmigen'); ?>
                     <small class="text-secondary fs-6">| <?php echo $this->p->t('global', 'detailsicht'); ?></small>
