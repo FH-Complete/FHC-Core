@@ -134,7 +134,7 @@ $this->load->view(
                                                 <th class="col-5">
 													<?php echo $this->p->t('anrechnung', 'bisherAngerechneteEcts'); ?>
                                                     <span class="approveAnrechnungDetail-anrechnungEctsTooltip"
-                                                          data-bs-toggle="tooltip" data-bs-placement="right"
+                                                          data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
                                                           title="<?php echo $this->p->t('anrechnung', 'anrechnungEctsTooltipText'); ?>">
 													<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
 												</span>
