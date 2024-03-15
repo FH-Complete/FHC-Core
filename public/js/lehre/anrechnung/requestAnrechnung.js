@@ -279,9 +279,10 @@ var requestAnrechnung = {
     alertIfMaxEctsExceeded: function(){
 
         if(
-            (parseFloat($('#sumEctsSchulisch').text())) > 60 ||
-            (parseFloat($('#sumEctsBeruflich').text())) > 60 ||
-            (parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90 
+            true
+            // (parseFloat($('#sumEctsSchulisch').text())) > 60 ||
+            // (parseFloat($('#sumEctsBeruflich').text())) > 60 ||
+            // (parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90 
         )
         {
             $('#requestAnrechnung-maxEctsUeberschrittenMsg')
@@ -297,14 +298,7 @@ var requestAnrechnung = {
     alertIfMaxEctsExceededInsideBegruendungsbox: function(){
         let status_kurzbz = $('#requestAnrechnung-status_kurzbz').data('status_kurzbz');
                     
-        
-                //TODO: used for debugging
-                /* 
-                    var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
-
-                    // Add to Checkbox text
-                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('div').append(msgBeiEctsUeberschreitung); */
-
+   
         if (status_kurzbz != ' ' && status_kurzbz != ANRECHNUNGSTATUS_APPROVED)
         {
             var ectsLv = parseFloat($('#ects').text());
@@ -351,11 +345,6 @@ var requestAnrechnung = {
 
         const phraseUsed = '<span class="d-block">Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz wird überschritten.</span><span class=" fw-bold">Bisherige ECTS + ECTS dieser LV: Total: {0} [ Schulisch: {1}  | Beruflich: {2}  ]</span>&emsp;';
 
-        //TODO: needed:
-        /* FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTextBeiUeberschreitung",
-                begruendung_id == 4
-                    ? [(sumEctsSchulisch + sumEctsBeruflich + ects), sumEctsSchulisch, (sumEctsBeruflich  + ects)] // beruflich
-                    : [(sumEctsSchulisch + sumEctsBeruflich + ects), (sumEctsSchulisch + ects), sumEctsBeruflich]) */
         return $('<div class="p-1" id="sumEctsMsg"></div>')
             .html(phraseUsed) // schulisch
             .append('<i class="fa fa-lg fa-info-circle"></i>')

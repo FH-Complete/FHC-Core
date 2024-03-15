@@ -145,7 +145,7 @@ $this->load->view(
                                                     Total ECTS: <span id="sumEctsTotal"><?php echo number_format($antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich, 1) ?></span>
                                                     [ Schulisch: <span id="sumEctsSchulisch"><?php echo $antragData->sumEctsSchulisch ?></span> |
                                                     Beruflich: <span id="sumEctsBeruflich"><?php echo $antragData->sumEctsBeruflich ?></span> ]
-                                                    <div class="p-1 d-inline-flex align-items-center" id="requestAnrechnung-maxEctsUeberschrittenMsg"></div>
+                                                    <div class="p-1 align-items-center" id="requestAnrechnung-maxEctsUeberschrittenMsg"></div>
                                                 </td>
                                             </tr>
 											<tr>
