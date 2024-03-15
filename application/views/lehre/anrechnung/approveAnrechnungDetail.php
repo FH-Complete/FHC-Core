@@ -143,7 +143,7 @@ $this->load->view(
                                                     Total: <span id="sumEctsTotal"><?php echo number_format($antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich, 1) ?></span>
                                                     [Schulisch: <span id="sumEctsSchulisch" value="<?php echo $antragData->sumEctsSchulisch ?>"><?php echo $antragData->sumEctsSchulisch ?></span> /
                                                     Beruflich: <span id="sumEctsBeruflich" value="<?php echo $antragData->sumEctsBeruflich ?>"><?php echo $antragData->sumEctsBeruflich ?></span> ]
-                                                    <span id="sumEctsMsg"></span>
+                                                    <div class="p-1 align-items-center" id="sumEctsMsg"></div>
                                                 </td>
                                             </tr>
 											
