@@ -55,3 +55,9 @@
 }
 
 
+/* html attribute disabled and title don't work together, sets the pointer-event to auto in order to see the title toolip */
+.btn:disabled {
+    pointer-events: auto !important;
+    cursor: default;
+}
+
