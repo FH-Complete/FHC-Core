@@ -225,7 +225,7 @@ function func_selectableCheck(row){
 // Adds column status
 function func_tableBuilt(table) {
     // Add status column to table
-    table.addColumn(
+    table.tabulator("addColumn",
         {
             title: "<i class='fa fa-user-o'></i>",
             field: "status",
@@ -496,6 +496,18 @@ $(function() {
     window.addEventListener('resize', function(){
         $('#tableWidgetTabulator').tabulator('setHeight', $(window).height() * 0.50);
         $('#tableWidgetTabulator').tabulator('redraw', true);
+    });
+
+    // tableInit is called in the jquery_wrapper when the tableBuilt event was finished
+    $(document).on("tableInit", function(event,tabulatorInstance) {
+     
+        func_tableBuilt($("#tableWidgetTabulator"))
+        
+        // event renderStarted needs to be attached as a callback to the tableBuilt event in tabulator5
+        $("#tableWidgetTabulator").tabulator("on","renderStarted",()=>{func_renderStarted(tabulatorInstance)});
+        // event renderStarted needs to be attached as a callback to the tableBuilt event in tabulator5
+        $("#tableWidgetTabulator").tabulator("on","rowUpdated",(row)=>{func_rowUpdated(row)});
+       
     });
 
     // Show all rows

@@ -346,7 +346,6 @@ $filterWidgetArray = array(
 		layout: "fitColumns",			// fit columns to width of table
 		layoutColumnsOnNewData: true,	// ajust column widths to the data each time TableWidget is loaded
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
 	    groupBy:"lehrveranstaltung_id",
 	    groupToggleElement:"header",	//toggle group on click anywhere in the group header
 	    groupHeader: function(value, count, data, group){
@@ -361,22 +360,16 @@ $filterWidgetArray = array(
             return func_selectableCheck(row);
         },
         initialFilter: func_initialFilter(),
-        rowUpdated:function(row){
-             func_rowUpdated(row);
-        },
         rowFormatter:function(row)
         {
             func_rowFormatter(row);
         },
-        renderStarted:function(){
-            func_renderStarted(this);
-        },
-        tableBuilt: function(){
-            func_tableBuilt(this);
-        },
 		tableWidgetFooter: {
 			selectButtons: true
-		}
+		},
+        columnDefaults:{
+            headerFilterPlaceholder: " ",
+        }
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         // column status is built dynamically in funcTableBuilt(),

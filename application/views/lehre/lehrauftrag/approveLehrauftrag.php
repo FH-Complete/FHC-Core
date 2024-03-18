@@ -6,10 +6,12 @@ $this->load->view(
         'jquery3' => true,
         'jqueryui1' => true,
         'jquerycheckboxes1' => true,
-        'bootstrap3' => true,
+        'bootstrap5' => true,
         'fontawesome4' => true,
         'sbadmintemplate3' => true,
-        'tabulator4' => true,
+        'tabulator5' => true,
+        'tabulator5JQuery' => true,
+        'cis'=>true,
         'momentjs2' => true,
         'ajaxlib' => true,
         'dialoglib' => true,
@@ -88,9 +90,13 @@ $this->load->view(
             )
         ),
         'customJSs' => array(
-                'public/js/bootstrapper.js',
+               
                 'public/js/lehre/lehrauftrag/approveLehrauftrag.js'
-        )
+        ),
+        'customCSSs' => array(
+               
+            'public/css/navbar.css'
+    )
     )
 );
 ?>

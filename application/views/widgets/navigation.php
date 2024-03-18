@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+<nav class="fhc-navbar fhc-navbar-default fhc-navbar-static-top" role="navigation" style="margin-bottom: 0">
 	<?php
 		// Header
 		echo $this->widgetlib->widget('NavigationHeaderWidget');
