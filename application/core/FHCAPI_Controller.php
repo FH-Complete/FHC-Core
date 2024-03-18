@@ -89,6 +89,10 @@ class FHCAPI_Controller extends FHC_Controller
 		// For JSON Requests (as opposed to multipart/form-data) get the $_POST variable from the input stream instead
 		if ($this->input->get_request_header('Content-Type', true) == 'application/json')
 			$_POST = json_decode($this->security->xss_clean($this->input->raw_input_stream), true);
+		elseif (isset($_POST['_jsondata'])) {
+			$_POST = array_merge($_POST, json_decode($_POST['_jsondata'], true));
+			unset($_POST['_jsondata']);
+		}
 	}
 
 
@@ -98,7 +102,7 @@ class FHCAPI_Controller extends FHC_Controller
 
 	/**
 	 * @param array					$data
-	 * @param string (optional)		$type
+	 * @param string				$type (optional)
 	 * @return void
 	 */
 	public function addError($data, $type = null)
@@ -169,6 +173,33 @@ class FHCAPI_Controller extends FHC_Controller
 		$this->setData($data);
 		$this->setStatus(self::STATUS_SUCCESS);
 		exit;
+	}
+
+	/**
+	 * @param array					$error
+	 * @param string				$type (optional)
+	 * @return void
+	 */
+	protected function terminateWithError($error, $type = null)
+	{
+		$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		$this->addError($error, $type);
+		$this->setStatus(self::STATUS_ERROR);
+		exit;
+	}
+
+	/**
+	 * @param stdclass				$result
+	 * @param string				$errortype
+	 * @return void
+	 */
+	protected function checkForErrors($result, $errortype = self::ERROR_TYPE_GENERAL)
+	{
+		// TODO(chris): IMPLEMENT!
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), $errortype);
+		}
+		return $result->retval;
 	}
 
 	// TODO(chris): complete list

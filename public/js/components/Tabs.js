@@ -11,7 +11,6 @@ export default {
 		'changed'
 	],
 	props: {
-		// TODO(chris): rename to config?
 		config: {
 			type: [String, Object],
 			required: true
@@ -118,7 +117,7 @@ export default {
 				{{tab.title}}
 			</div>
 		</div>
-		<div :style="vertical ? '' : 'flex: 1 1 0%; height: 0%'" class="overflow-auto" :class="vertical || !border ? '' : 'p-3 border-bottom border-start border-end'">
+		<div :style="vertical ? '' : 'flex: 1 1 0%; height: 0%'" class="overflow-auto flex-grow-1" :class="vertical || !border ? '' : 'p-3 border-bottom border-start border-end'">
 			<keep-alive>
 				<component ref="current" :is="currentTab.component" v-model="value" :config="currentTab.config"></component>
 			</keep-alive>

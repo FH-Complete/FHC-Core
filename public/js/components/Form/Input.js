@@ -120,13 +120,19 @@ export default {
 						if (!c.includes('form-check-input') && !c.includes('btn-check'))
 							classes.push('form-check-input');
 						break;
+					case 'color':
+						if (!c.includes('form-control-color'))
+							classes.push('form-control-color');
+						if (!c.includes('form-control'))
+							classes.push('form-control');
+						break;
 					case 'autocomplete':
 					case 'datepicker':
 						classes.push('p-0');
 						classes.push('border-0');
-					case 'color':
-						if (!c.includes('form-control-color'))
-							classes.push('form-control-color');
+						if (!c.includes('form-control'))
+							classes.push('form-control');
+						break;
 					case 'text':
 					case 'number':
 					case 'password':
@@ -200,13 +206,9 @@ export default {
 			this.valid = valid;
 			// NOTE(chris): On a list of radios/checkboxes only add the feedback message to the last item
 			if (this.name && (this.lcType == 'radio' || this.lcType == 'checkbox')) {
-				let n = this.$el.nextSibling;
-				for (; n; n = n.nextSibling)
-					if (n.nodeType == 1
-						&& n.__vueParentComponent?.ctx?.lcType == this.lcType
-						&& n.__vueParentComponent?.ctx?.name == this.name
-						)
-						return;
+				const selector = 'input[type="' + this.lcType + '"][name="' + this.name + '"]';
+				if ([...this.$el.parentNode.querySelectorAll(selector)].pop() != this.$refs.input)
+					return;
 			}
 			this.feedback = feedback;
 		},

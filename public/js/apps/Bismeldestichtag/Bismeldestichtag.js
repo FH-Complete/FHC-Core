@@ -24,6 +24,8 @@ import {CoreRESTClient} from '../../RESTClient.js';
 import {CoreFetchCmpt} from '../../components/Fetch.js';
 import {BismeldestichtagAPIs} from './API.js';
 
+import Phrasen from '../../plugin/Phrasen.js';
+
 const bismeldestichtagApp = Vue.createApp({
 	data: function() {
 		return {
@@ -187,4 +189,4 @@ const bismeldestichtagApp = Vue.createApp({
 	}
 });
 
-bismeldestichtagApp.mount('#main');
+bismeldestichtagApp.use(Phrasen).mount('#main');

@@ -52,6 +52,45 @@ export default {
 			baseURL: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"
 		});
 
+		fhcApiAxios.interceptors.request.use(config => {
+			if (config.method != 'post' || !config.data)
+				return config;
+
+			if (config.data instanceof FormData)
+				return config;
+			
+			if (!Object.values(config.data).every(item => {
+				if (item instanceof FileList)
+					return false;
+				if (Array.isArray(item))
+					return item.every(i => !(i instanceof File));
+				return true;
+			})) {
+				const newData = Object.entries(config.data).reduce((nd, [key, item]) => {
+					if (item instanceof FileList) {
+						for (const file of item)
+							nd.FormData.append(key + (item.length > 1 ? '[]' : ''), file);
+					} else if (Array.isArray(item)) {
+						if (item.every(i => !(i instanceof File))) {
+							nd.jsondata[key] = item;
+						} else {
+							item.forEach(file => nd.FormData.append(key + (item.length > 1 ? '[]' : ''), file));
+						}
+					} else {
+						nd.jsondata[key] = item;
+					}
+					return nd;
+				}, {
+					FormData: new FormData(),
+					jsondata: {}
+				});
+				newData.FormData.append('_jsondata', JSON.stringify(newData.jsondata));
+				config.data = newData.FormData;
+			}
+
+			return config;
+		});
+
 		fhcApiAxios.interceptors.response.use(response => {
 			if (response.config?.errorHandling == 'off'
 				|| response.config?.errorHandling === false
