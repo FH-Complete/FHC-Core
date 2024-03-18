@@ -240,6 +240,28 @@ function checkZeilenUmbruch()
 		);
 	}
 
+	// Anwesenheiten neu
+	if(CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet)
+	{
+
+		$link='';
+		$name='';
+		$text='';
+
+		$name = 'Anwesenheiten NEU';
+		$link= APP_ROOT."index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&stsem=$angezeigtes_stsem";
+
+		$menu[]=array
+		(
+			'id'=>'core_menu_anwesenheitslisten',
+			'position'=>'40',
+			'name'=> $name,
+			'icon'=>'../../../skin/images/button_listen.png',
+			'link'=>$link,
+			'text'=>$text
+		);
+	}
+
 	//FEEDBACK
 	if((!defined('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN) && $angemeldet)
 	{
