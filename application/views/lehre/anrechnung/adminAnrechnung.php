@@ -3,11 +3,13 @@ $includesArray = array(
     'title' => $this->p->t('anrechnung', 'anrechnungenVerwalten'),
     'jquery3' => true,
     'jqueryui1' => true,
-    'bootstrap3' => true,
+    'bootstrap5' => true,
     'fontawesome6' => true,
     'ajaxlib' => true,
     'dialoglib' => true,
-    'tabulator4' => true,
+    'tabulator5' => true,
+    'tabulator5JQuery' => true,
+    'cis'=>true,
     'tablewidget' => true,
     'sbadmintemplate3' => true,
     'navigationwidget' => true,
@@ -48,7 +50,8 @@ $includesArray = array(
         'public/js/lehre/anrechnung/adminAnrechnung.js'
     ),
     'customCSSs' => array(
-        'public/css/sbadmin2/tablesort_bootstrap.css'
+        'public/css/sbadmin2/tablesort_bootstrap.css',
+        'public/css/lehre/anrechnung.css',
     )
 );
 
@@ -63,24 +66,22 @@ $this->load->view('templates/FHC-Header', $includesArray);
         <div class="container-fluid">
 
             <!--Titel-->
-            <div class="page-header">
+            <div class="my-4 border-bottom page-header">
                 <h3><?php echo $this->p->t('anrechnung', 'anrechnungenVerwalten'); ?></h3>
-            </div><br>
+            </div>
 
             <!--Untertitel-->
-            <h4><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumFestlegen'); ?></h4><br>
-
-            <div class="row">
-                <div class="col-xs-4">
-                    <button class="btn btn-primary azrOpenModal" data-toggle="modal" data-target="#azrModal">
-                        <i class="fa fa-plus"></i> <?php echo $this->p->t('anrechnung', 'anrechnungszeitraumHinzufuegen'); ?>
-                    </button>
-                </div>
-            </div>
+            <h4 class="my-4"><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumFestlegen'); ?></h4>
+            
+            
+            <button class="btn btn-primary azrOpenModal" data-bs-toggle="modal" data-bs-target="#azrModal"  >
+                <i class="fa fa-plus"></i> <?php echo $this->p->t('anrechnung', 'anrechnungszeitraumHinzufuegen'); ?>
+            </button>
+              
 
             <!-- Tabelle -->
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-12">
                     <?php $this->load->view('lehre/anrechnung/adminAnrechnungData.php'); ?>
                 </div>
             </div>
@@ -91,14 +92,14 @@ $this->load->view('templates/FHC-Header', $includesArray);
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="azrModalLabel"></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body my-4">
                         <div class="row">
                             <input type="hidden" id="anrechnungszeitraum_id" value="">
                             <input type="hidden" id="defaultStudiensemester_kurzbz" value="<?php echo $studiensemester_kurzbz ?>">
-                            <div class="col-xs-4">
-                                <label for="studiensemester" class="small">Studiensemester</label>
+                            <div class="col-4">
+                                <label for="studiensemester" class="fw-bold small">Studiensemester</label>
                                 <?php
                                 echo $this->widgetlib->widget(
                                     'Studiensemester_widget',
@@ -107,17 +108,18 @@ $this->load->view('templates/FHC-Header', $includesArray);
                                     ),
                                     array(
                                         'name' => 'studiensemester',
-                                        'id' => 'studiensemester'
+                                        'id' => 'studiensemester',
+                                        'class'=>'form-select w-auto ',
                                     )
                                 );
                                 ?>
                             </div>
-                            <div class="col-xs-4">
-                                <label for="azrStart" class="small">Anr.-Zeitraum Start</label>
+                            <div class="col-4">
+                                <label for="azrStart" class="fw-bold small">Anr.-Zeitraum Start</label>
                                 <input type="date" id="azrStart" value="" class="form-control" required>
                             </div>
-                            <div class="col-xs-4">
-                                <label for="azrEnde" class="small">Anr.-Zeitraum Ende</label>
+                            <div class="col-4">
+                                <label for="azrEnde" class="fw-bold small">Anr.-Zeitraum Ende</label>
                                 <input type="date" id="azrEnde" value="" class="form-control" required>
                             </div>
                         </div>
