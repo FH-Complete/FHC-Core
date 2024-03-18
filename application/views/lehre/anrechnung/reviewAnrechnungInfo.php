@@ -50,7 +50,7 @@
       </div>
     </div>
   </div>
-   <!--    Nachweisdokumente: Voraussetzung panel -->
+   <!--  Nachweisdokumente: Voraussetzung panel -->
   <div class="accordion-item">
     <h2 class="accordion-header">
         <div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#Nachweisdokumente" aria-expanded="false" aria-controls="Nachweisdokumente">

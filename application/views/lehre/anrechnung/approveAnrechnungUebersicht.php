@@ -173,11 +173,11 @@ $this->load->view(
                 <!-- Action Button 'Abbrechen'-->
                 <div class="mb-4 d-flex justify-content-end" >
                     <button id="approveAnrechnungUebersicht-begruendung-abbrechen"
-                            class="btn btn-outline-secondary btn-w200 ms-1" type="reset">
+                            class="me-1 btn btn-outline-secondary btn-w200 " type="reset">
 						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                     </button>
                     <button id="approveAnrechnungUebersicht-reject-anrechnungen-confirm"
-                            class="btn btn-primary btn-w200 ms-1" type="button">
+                            class="btn btn-primary btn-w200 " type="button">
 						<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                     </button>
                 </div>

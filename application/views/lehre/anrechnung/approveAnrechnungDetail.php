@@ -427,13 +427,13 @@ $this->load->view(
 
             <div class="col-4">
 				<!-- -Statusleiste -->
-                <div class="alert text-center">
+                <div class="mb-5 alert text-center">
                     Status: <b><span class="text-uppercase" id="approveAnrechnungDetail-status_kurzbz"
                              data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
                             <?php echo $anrechnungData->status; ?>
                         </span></b>
                 </div>
-                <br>
+                
 				<!-- Infopanels -->
 				<?php $this->load->view('lehre/anrechnung/reviewAnrechnungInfo'); ?>
             </div>
