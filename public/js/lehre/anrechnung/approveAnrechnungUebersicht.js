@@ -263,7 +263,7 @@ $(function(){
      
         func_tableBuilt($("#tableWidgetTabulator"))
         
-        // event rowSelectionChanged now has to be attached to the tabulator after instantiation and after the tableBuilt event
+        // event rowSelectionChanged needs to be attached as a callback to the tableBuilt event in tabulator5
         $("#tableWidgetTabulator").tabulator("on","rowSelectionChanged",(data,rows)=>{func_rowSelectionChanged(data,rows,tabulatorInstance)});
        
     });

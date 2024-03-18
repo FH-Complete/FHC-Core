@@ -157,15 +157,11 @@ $filterWidgetArray = array(
 		persistentLayout:true,
 		persistentSort:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
 	    initialHeaderFilter: [{field:"empfehlungsberechtigt", value: true}], 
         index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        tableBuilt: function(){
-            func_tableBuilt(this);
-        },
         tableWidgetFooter: {
 			selectButtons: true
 		},
@@ -175,12 +171,12 @@ $filterWidgetArray = array(
         rowFormatter:function(row){
             func_rowFormatter(row);
         },
-         rowUpdated:function(row){
-            func_rowUpdated(row);
-        },
-        tooltips: function(cell){
-            return func_tooltips(cell);
-        }
+        columnDefaults:{
+			headerFilterPlaceholder: " ",
+			tooltip:(cell)=>{func_tooltips(cell)},
+			
+		}
+        
 	 }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
 		empfehlungsberechtigt: {formatter:"tickCross", align:"center", headerTooltip:"Berechtigt wenn man die LV leitet oder wenn der LV keine LV-Leitung zugeordnet ist.",

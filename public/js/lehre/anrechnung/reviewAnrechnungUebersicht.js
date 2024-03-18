@@ -59,7 +59,7 @@ function hf_empfehlungsberechtigt(headerValue, rowValue){
 
 // Adds column details
 function func_tableBuilt(table) {
-    table.addColumn(
+    table.tabulator("addColumn",
         {
             title: "Details",
             field: 'details',
@@ -149,6 +149,7 @@ function paramLookup_dokBez(cell){
  * (Ignore rows that are approved, rejected or in request for recommendation)
  */
 function tableWidgetHook_selectAllButton(tableWidgetDiv){
+    
     var resultRows = tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
         .filter(row =>
             row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
@@ -172,6 +173,16 @@ $(function(){
         window.location.href='about:blank';
         return;
     }
+
+
+    $(document).on("tableInit", function(event,tabulatorInstance) {
+     
+        func_tableBuilt($("#tableWidgetTabulator"))
+
+        // event rowUpdated needs to be attached as a callback to the tableBuilt event in tabulator5
+        $("#tableWidgetTabulator").tabulator("on","rowUpdated",(row)=>{func_rowUpdated(row)})
+       
+    });
 
     // Redraw table on resize to fit tabulators height to windows height
     window.addEventListener('resize', function(){
@@ -432,16 +443,16 @@ var reviewAnrechnung = {
 
         switch (status_kurzbz) {
             case ANRECHNUNGSTATUS_APPROVED:
-                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-success');
+                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('bg-success-subtle');
                 break;
             case ANRECHNUNGSTATUS_REJECTED:
-                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-danger');
+                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('bg-danger-subtle');
                 break;
             case '':
-                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-info');
+                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('bg-info-subtle');
                 break;
             default:
-                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
+                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('bg-warning-subtle');
         }
     },
     copyIntoTextarea: function(elem){

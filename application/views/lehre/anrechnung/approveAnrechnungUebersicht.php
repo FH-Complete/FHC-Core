@@ -185,11 +185,11 @@ $this->load->view(
             
             <div class="border border-1 mb-4" style="display: none"
                  id="approveAnrechnungUebersicht-genehmigung-panel">
-                <div>
+                <div class="mb-4">
                     <h4 class="card card-body border-success text-success my-3"><?php echo $this->p->t('anrechnung', 'genehmigungenPositivQuestion'); ?></h4>
                     <div class="ps-2 mb-4"><?php echo $this->p->t('anrechnung', 'genehmigungenPositiv'); ?></div>
                 </div>
-                <br>
+                
                 <!-- Action Button 'Abbrechen'-->
                 <div class="mb-4 d-flex justify-content-end">
                     <button id="approveAnrechnungUebersicht-empfehlung-abbrechen"
