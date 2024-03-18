@@ -3,7 +3,7 @@
 
 // Add Edit and Update Buttons to table rows
 function func_tableBuilt(table) {
-    table.addColumn(
+    table.tabulator("addColumn",
         {
             title: "Aktion",
             align: "center",
@@ -39,7 +39,7 @@ var addActionButtons = function(cell) {
     editBtn.innerHTML = "<i class=\"fa fa-edit\"></i>";
     editBtn.classList.add("azrEditBtn");
     editBtn.classList.add("btn");
-    editBtn.classList.add("btn-default");
+    editBtn.classList.add("btn-outline-secondary");
     editBtn.addEventListener("click", function(){
         adminAnrechnung.editRow(cell);
     });
@@ -52,7 +52,7 @@ var addActionButtons = function(cell) {
     delBtn.innerHTML = "<i class=\"fa fa-times\"></i>";
     delBtn.classList.add("azrDeleteBtn");
     delBtn.classList.add("btn");
-    delBtn.classList.add("btn-default");
+    delBtn.classList.add("btn-outline-secondary");
     delBtn.style.marginLeft = '5px';
     delBtn.addEventListener("click", function(){
         adminAnrechnung.deleteRow(cell);
@@ -69,6 +69,11 @@ var addActionButtons = function(cell) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 $(function () {
+
+    $(document).on("tableInit", function(event,tabulatorInstance) {
+        // tablutBuilt has to be attached as a callback the the tabulator in tabulator5
+        func_tableBuilt($("#tableWidgetTabulator"))
+    });
 
     // Empty Modal fields on 'Anrechnungszeitraum hinzufuegen'
     $(document).on('click', '.azrOpenModal', function(){
