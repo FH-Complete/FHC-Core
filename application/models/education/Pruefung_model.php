@@ -87,7 +87,13 @@ class Pruefung_model extends DB_Model
         $this->addJoin('public.tbl_person pers', 'person_id');
         $this->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid');
         $this->addJoin('public.tbl_studiengang g', 'ps.studiengang_kz=g.studiengang_kz');
-        $this->addJoin('public.tbl_prestudentstatus pss', 'pss.prestudent_id=ps.prestudent_id AND pss.studiensemester_kurzbz=le.studiensemester_kurzbz AND pss.status_kurzbz=get_rolle_prestudent(ps.prestudent_id, le.studiensemester_kurzbz)', 'LEFT');
+        $this->addJoin(
+        	'public.tbl_prestudentstatus pss',
+        	'pss.prestudent_id=ps.prestudent_id 
+        	AND pss.studiensemester_kurzbz=le.studiensemester_kurzbz 
+        	AND pss.status_kurzbz=get_rolle_prestudent(ps.prestudent_id, le.studiensemester_kurzbz)',
+        	'LEFT'
+        );
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
 		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, pss.orgform_kurzbz, g.orgform_kurzbz)=o.orgform_kurzbz');
 		$this->db->join('campus.tbl_studierendenantrag a', 'ps.prestudent_id=a.prestudent_id and a.typ = ?', 'LEFT', false);
@@ -167,6 +173,7 @@ class Pruefung_model extends DB_Model
 		$this->addSelect('a.studierendenantrag_id');
 		$this->addSelect('a.typ');
 		$this->addSelect('campus.get_status_studierendenantrag(a.studierendenantrag_id) status');
+		$this->addSelect('pss.ausbildungssemester');
 
 		$this->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
 		$this->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
@@ -175,12 +182,20 @@ class Pruefung_model extends DB_Model
 		$this->addJoin('public.tbl_person pers', 'person_id');
 		$this->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid');
 		$this->addJoin('public.tbl_studiengang g', 'ps.studiengang_kz=g.studiengang_kz');
-		$this->addJoin('public.tbl_prestudentstatus pss', 'pss.prestudent_id=ps.prestudent_id AND pss.studiensemester_kurzbz=le.studiensemester_kurzbz AND pss.status_kurzbz=get_rolle_prestudent(ps.prestudent_id, le.studiensemester_kurzbz)', 'LEFT');
+		$this->addJoin(
+			'public.tbl_prestudentstatus pss',
+			'pss.prestudent_id=ps.prestudent_id 
+			AND pss.studiensemester_kurzbz=le.studiensemester_kurzbz 
+			AND pss.status_kurzbz=get_rolle_prestudent(ps.prestudent_id, le.studiensemester_kurzbz)',
+			'LEFT'
+		);
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
 		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, pss.orgform_kurzbz, g.orgform_kurzbz)=o.orgform_kurzbz');
-		$this->addJoin('campus.tbl_studierendenantrag a', 'ps.prestudent_id=a.prestudent_id and a.typ=' . $this->escape(Studierendenantrag_model::TYP_WIEDERHOLUNG), 'LEFT');
-
-		$this->db->where_in("get_rolle_prestudent(ps.prestudent_id, null)", $this->config->item('antrag_prestudentstatus_whitelist'));
+		$this->addJoin(
+			'campus.tbl_studierendenantrag a',
+			'ps.prestudent_id=a.prestudent_id and a.typ=' . $this->escape(Studierendenantrag_model::TYP_WIEDERHOLUNG),
+			'LEFT'
+		);
 
 		$this->db->where("g.aktiv", true);
 
@@ -237,6 +252,8 @@ class Pruefung_model extends DB_Model
 			$this->db->where("p.datum > ", $minDate->format('Y-m-d'));
 
 		$this->db->where("b.aktiv", true);
+
+		$this->db->where_in("get_rolle_prestudent(ps.prestudent_id, null)", $this->config->item('antrag_prestudentstatus_whitelist'));
 
 		if (is_array($status)) {
 			if (in_array(null, $status)) {
