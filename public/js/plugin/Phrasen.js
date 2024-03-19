@@ -23,7 +23,8 @@ function getValueForLoadedPhrase(category, phrase, params) {
 const phrasen = {
 	loadCategory(category) {
 		if (Array.isArray(category))
-			return Promise.all(category.map(cat => this.loadCategory(cat)));
+			return Promise.all(category.map(cat => this.config.globalProperties
+				.$fhcApi.factory.phrasen.loadCategory(cat)));
 		if (!loadingModules[category])
 			loadingModules[category] = this.config.globalProperties
 				.$fhcApi.factory.phrasen.loadCategory(category)
