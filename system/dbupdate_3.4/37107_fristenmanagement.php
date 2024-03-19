@@ -25,6 +25,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
             ereignis_kurzbz character varying(32) NOT NULL,
             bezeichnung varchar(32) NOT NULL,
             manuell boolean DEFAULT FALSE,
+            sort smallint,
             CONSTRAINT tbl_ereignis_pkey PRIMARY KEY (ereignis_kurzbz)
         );
 
@@ -33,6 +34,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
         CREATE TABLE IF NOT EXISTS hr.tbl_frist_status (
             status_kurzbz character varying(32) NOT NULL,
             bezeichnung varchar(32),
+            sort smallint,
             CONSTRAINT tbl_frist_status_pk PRIMARY KEY (status_kurzbz)
         );
 
@@ -54,13 +56,19 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
         GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_frist_status TO vilesci;
         GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_frist_ereignis TO vilesci;
 
-        INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung) VALUES('neu','Neu');
-        INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung) VALUES('in_bearbeitung','In Bearbeitung');
-        INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung) VALUES('erledigt','Erledigt');
+        INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung, sort) VALUES('neu','Neu', 1);
+        INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung, sort) VALUES('in_bearbeitung','In Bearbeitung', 2);
+        INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung, sort) VALUES('erledigt','Erledigt', 3);
 
-        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung) VALUES('dv_beginn','DV Beginn');
-        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung) VALUES('dv_ende','DV Ende');
-
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('dv_beginn','DV Beginn', 1);
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('dv_ende','DV Ende', 2);
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('stunden_beginn','Stunden Beginn', 3);
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('stunden_ende','Stunden Ende', 4);
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('karenz_beginn','Karenz Beginn', 5);
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('karenz_ende','Karenz Ende', 6);
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('zeitaufzeichnung_beginn','Zeitaufzeichnung Beginn', 7);
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('zeitaufzeichnung_ende','Zeitaufzeichnung Ende', 8);
+        INSERT INTO hr.tbl_frist_ereignis (ereignis_kurzbz , bezeichnung, manuell, sort) VALUES('manuell','Manuell', true, 9);
 
 
         ";
