@@ -3,7 +3,7 @@
  * Job zur einmaligen Import der Gehälter
  *
  * Aufruf (Encode / im Filenmae mit %2F):
- * php index.ci.php system/MigrateSalary/import filename 
+ * php index.ci.php system/MigrateSalary/import filename
  *
  */
 /*
@@ -34,7 +34,7 @@ class MigrateSalary extends CLI_Controller
 		$this->load->model('vertragsbestandteil/VertragsbestandteilStunden_model','VertragsbestandteilStundenModel');
 		$this->load->model('vertragsbestandteil/VertragsbestandteilFreitext_model','VertragsbestandteilFreitextModel');
 		$this->load->model('vertragsbestandteil/VertragsbestandteilFunktion_model','VertragsbestandteilFunktionModel');
-		
+
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ class MigrateSalary extends CLI_Controller
 	 */
 	public function import($file)
 	{
-	
+
 		// CSV Laden
 		$file = urldecode($file);
 		if($handle = fopen($file, "r"))
@@ -108,8 +108,8 @@ class MigrateSalary extends CLI_Controller
 					}
 					else
 					{
-						if ($data[$i] != '' 
-							&& isset($gehaltsarr[$gehaltsindex]) && isset($gehaltsarr[$gehaltsindex]['betrag']) 
+						if ($data[$i] != ''
+							&& isset($gehaltsarr[$gehaltsindex]) && isset($gehaltsarr[$gehaltsindex]['betrag'])
 							&& $gehaltsarr[$gehaltsindex]['betrag'] == $data[$i])
 						{
 							// Gehalt bleibt gleich
@@ -138,30 +138,31 @@ class MigrateSalary extends CLI_Controller
 							}
 						}
 					}
-					
+
 					$monat++;
 				}
 
 				// Zeile zu Ende - Ende Datum setzen wenn nicht für alle Monate ein Eintrag vorhanden ist
 				if($monat < count($monate) && isset($gehaltsarr[$gehaltsindex]))
-					$gehaltsarr[$gehaltsindex]['ende'] == $monate[$monat-1];
-				
+					$gehaltsarr[$gehaltsindex]['ende'] = $monate[$monat-1];
+
 			}
 			$this->_saveGehalt($lastuser, $gehaltsarr);
 		}
 	}
 
 	/**
-	 * Ermittelt das passende Dienstverhaeltnis uns speichert den 
+	 * Ermittelt das passende Dienstverhaeltnis uns speichert den
 	 * Gehaltsbestandteil
 	 */
 	private function _saveGehalt($uid, $gehaltsarr)
-	{		
+	{
 		$failed = false;
 		$this->db->trans_begin();
 
 		foreach($gehaltsarr as $row_gehalt)
 		{
+			//var_dump($row_gehalt);
 			$auszahlungen = 14;
 			$dvid = '';
 			$vbsid = '';
@@ -171,16 +172,18 @@ class MigrateSalary extends CLI_Controller
 			//DV und VBS Ermitteln
 			$dv = $this->DienstverhaeltnisModel->getDVByPersonUID($uid, $this->OE_DEFAULT, $row_gehalt['beginn']);
 
-			if (!hasData($dv))
+			// Wenn keiner gefunden wird oder mit Monatsersteln nur ein externer gefunden wird, weitersuchen ob im Monat noch ein
+			// "richtiger" Vertrag startet
+			if (!hasData($dv) || getData($dv)[0]->vertragsart_kurzbz='externerLehrender')
 			{
 				$date = new DateTime($row_gehalt['beginn']);
 				$date->modify('last day of this month');
 				$last_day_this_month = $date->format('Y-m-d');
 
-				// Wenn mit Monatsersten kein DV gefunden wird, wird stattdessen mit Monatsletzten gesucht um DVs zu finden 
+				// Wenn mit Monatsersten kein DV gefunden wird, wird stattdessen mit Monatsletzten gesucht um DVs zu finden
 				// für Personen die erst später im Monat in ihr DV einsteigen
-				$dv = $this->DienstverhaeltnisModel->getDVByPersonUID($uid, $this->OE_DEFAULT, $last_day_this_month);
-				
+				$dv = $this->DienstverhaeltnisModel->getDVByPersonUIDOverlapping($uid, $this->OE_DEFAULT, $row_gehalt['beginn'], $last_day_this_month);
+
 				if (!hasData($dv))
 				{
 					echo "\nKein passendes DV gefunden für User ".$uid." und Datum ".$row_gehalt['beginn']." -> ROLLBACK\n";
@@ -189,34 +192,53 @@ class MigrateSalary extends CLI_Controller
 				}
 				else
 				{
-					// Gehaltsstart wird auf den Start des DV korrigiert wenn nicht der Monatserste
-					$row_gehalt['beginn'] = getData($dv)[0]->von;
+					$resultdata = getData($dv);
+					foreach($resultdata as $dvdata)
+					{
+						// Externer DV wird in Monatsmitte zu echten DV - daher weitersuchen bei externenDVs da
+						// diese sowieso kein Gehalt zugeordnet haben
+						if($dvdata->vertragsart_kurzbz != 'externerLehrender')
+						{
+							$dvid = $dvdata->dienstverhaeltnis_id;
+							// Gehaltsstart wird auf den Start des DV korrigiert wenn nicht der Monatserste
+							// nur wenn das Beginndatum vor dem DV-Start liegt da sonst das Datum korrigiert wird
+							// wenn der Vertragsbestandteil wechselt
+							if($row_gehalt['beginn'] < $dvdata->von)
+								$row_gehalt['beginn'] = $dvdata->von;
+							break;
+						}
+					}
 				}
 			}
-
-			$resultdata = getData($dv);
-			if (count($resultdata) !== 1)
+			else
 			{
-				echo "Kein oder Mehrere DVs gefunden -> ROLLBACK";
+				$resultdata = getData($dv);
+
+				if (count($resultdata) == 1)
+					$dvid = $resultdata[0]->dienstverhaeltnis_id;
+			}
+
+			if ($dvid == '')
+			{
+				echo "Kein oder mehrere DVs gefunden -> ROLLBACK";
 				$failed = true;
 				break;
 			}
 
-			$dvid = $resultdata[0]->dienstverhaeltnis_id;
-			
 			$allin = $this->_isAllIn($dvid, $row_gehalt['beginn']);
 
 			$db = new DB_Model();
 
 			$resultVBS = $this->_getVBS($dvid, $row_gehalt['beginn']);
-			
+
 			if (hasData($resultVBS))
 			{
 				$vbsid = getData($resultVBS)[0]->vertragsbestandteil_id;
+				$vbsbis = getData($resultVBS)[0]->bis;
 			}
 			else
 			{
-				echo "Vertragsbestandteil wurde nicht gefunden -> ROLLBACK";
+				echo "Vertragsbestandteil fuer $uid DV $dvid wurde nicht gefunden mit Beginn ".$row_gehalt['beginn']."-> ROLLBACK";
 				$failed = true;
 				break;
 			}
@@ -246,7 +268,7 @@ class MigrateSalary extends CLI_Controller
 				);
 				if (isset($row_gehalt['ende']) && $row_gehalt['ende']!='')
 					$data['bis'] = $row_gehalt['ende'];
-				
+
 				$resultVBS = $this->VertragsbestandteilModel->Insert($data);
 				if(!isSuccess($resultVBS))
 				{
@@ -286,7 +308,7 @@ class MigrateSalary extends CLI_Controller
 				);
 				if (isset($row_gehalt['ende']) && $row_gehalt['ende']!='')
 					$data['bis'] = $row_gehalt['ende'];
-				
+
 				$resultVBS = $this->VertragsbestandteilModel->Insert($data);
 				if(!isSuccess($resultVBS))
 				{
@@ -356,16 +378,24 @@ class MigrateSalary extends CLI_Controller
 				$date->modify('last day of this month');
 				$last_day_this_month = $date->format('Y-m-d');
 
-				// TODO: wenn das Dienstverhaeltnis in diesem Monat endet und nicht der Monatsletzte ist,
+				// Wenn das Dienstverhaeltnis in diesem Monat endet und nicht der Monatsletzte ist,
 				// dann muss hier das Ende Datum des DV stehen bzw das Ende
 				// oder das Ende des VBS falls die Person in der Monatsmitte Stunden wechselt
 				$data['bis'] = $last_day_this_month;
+
+				// Wenn der Vertragsbestandteil endet bevor das Gehalt endet, dann wir das Gehaltsende auf VBS Ende gesetzt
+				//echo "Ende des VBS: $vbsbis Ende des Gehalt: ".$data['bis'];
+				if ($vbsbis != '' && $vbsbis < $data['bis'])
+				{
+					$data['bis'] = $vbsbis;
+					//echo "Gehalt auf vbs ende gesetzt";
+				}
 			}
 
 			$ret = $this->GehaltsbestandteilModel->insert($data,
 				$this->GehaltsbestandteilModel->getEncryptedColumns()
 			);
-		}	
+		}
 
 		if(!$failed)
 		{
@@ -375,7 +405,7 @@ class MigrateSalary extends CLI_Controller
 		{
 			echo "ROLLBACK";
 			$this->db->trans_rollback();
-		}	
+		}
 	}
 
 	/**
@@ -386,17 +416,17 @@ class MigrateSalary extends CLI_Controller
 		$db = new DB_Model();
 
 		$qry = "
-			SELECT 
-				* 
-			FROM 
-				hr.tbl_vertragsbestandteil 
+			SELECT
+				*
+			FROM
+				hr.tbl_vertragsbestandteil
 				JOIN hr.tbl_vertragsbestandteil_freitext USING(vertragsbestandteil_id)
-			WHERE 
-				dienstverhaeltnis_id=".$db->escape($dvid)." 
-				AND vertragsbestandteiltyp_kurzbz='freitext' 
+			WHERE
+				dienstverhaeltnis_id=".$db->escape($dvid)."
+				AND vertragsbestandteiltyp_kurzbz='freitext'
 				AND ".$db->escape($datum)." BETWEEN von AND COALESCE(bis, '2999-12-31')
 				AND freitexttyp_kurzbz='allin'";
-		
+
 		$resultAllIn = $db->execReadOnlyQuery($qry);
 
 		if (hasData($resultAllIn))
@@ -410,15 +440,15 @@ class MigrateSalary extends CLI_Controller
 		$db = new DB_Model();
 
 		$qry = "
-			SELECT 
-				* 
-			FROM 
-				hr.tbl_vertragsbestandteil 
-			WHERE 
-				dienstverhaeltnis_id=".$db->escape($dvid)." 
-				AND vertragsbestandteiltyp_kurzbz='stunden' 
+			SELECT
+				*
+			FROM
+				hr.tbl_vertragsbestandteil
+			WHERE
+				dienstverhaeltnis_id=".$db->escape($dvid)."
+				AND vertragsbestandteiltyp_kurzbz='stunden'
 				AND ".$db->escape($datum)." BETWEEN von AND COALESCE(bis, '2999-12-31')";
-		
+
 		$resultVBS = $db->execReadOnlyQuery($qry);
 
 		return $resultVBS;
@@ -430,22 +460,22 @@ class MigrateSalary extends CLI_Controller
 	private function _getUser($svnr)
 	{
 		$db = new DB_Model();
-		
+
 		$qry = "
-		SELECT 
-			mitarbeiter_uid 
-		FROM 
-			public.tbl_person 
+		SELECT
+			mitarbeiter_uid
+		FROM
+			public.tbl_person
 			JOIN public.tbl_benutzer using(person_id)
 			JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 		WHERE
 			tbl_person.svnr = ". $db->escape($svnr)."
 			AND EXISTS(
-				SELECT 
-					1 
-				FROM 
-					hr.tbl_dienstverhaeltnis 
-				WHERE 
+				SELECT
+					1
+				FROM
+					hr.tbl_dienstverhaeltnis
+				WHERE
 					mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid
 					AND oe_kurzbz=". $db->escape($this->OE_DEFAULT)."
 			)
