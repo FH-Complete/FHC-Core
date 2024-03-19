@@ -100,7 +100,7 @@ export default {
 			// NOTE(chris): loop through errors
 			if (response.data.errors)
 				response.data.errors = response.data.errors.filter(
-					err => (response.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, response.config.form)
+					err => (response.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, response.config)
 				);
 
 			return _clean_return_value(response);
@@ -121,7 +121,7 @@ export default {
 				
 				// NOTE(chris): loop through errors
 				error.response.data.errors = error.response.data.errors.filter(
-					err => (error.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, error.config.form)
+					err => (error.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, error.config)
 				);
 				if (!error.response.data.errors.length)
 					return Promise.reject({...{handled: true}, ...error});
@@ -152,30 +152,47 @@ export default {
 				return fhcApiAxios.post(uri, data, config);
 			},
 			_defaultErrorHandlers: {
-				validation(error, form) {
+				validation(error, config) {
 					const $fhcAlert = app.config.globalProperties.$fhcAlert;
 
-					if (form) {
-						form.clearValidation();
-						form.setFeedback(false, error.messages);
+					if (config?.form) {
+						config.form.clearValidation();
+						config.form.setFeedback(false, error.messages);
 						return false;
 					}
 					if (Array.isArray(error.messages)) {
 						error.messages.forEach($fhcAlert.alertError);
 						return false;
 					} else if (typeof error.messages == 'object') {
-						Object.entries(error.messages).forEach(
-							([key, value]) => $fhcAlert.alertDefault('error', key, value, true)
-						);
+						if (config?.errorHeader)
+							Object.values(error.messages).forEach(
+								value => $fhcAlert.alertDefault(
+									'error',
+									Array.isArray(config.errorHeader) ? app.config.globalProperties.$p.t.apply(null, config.errorHeader) : config.errorHeader,
+									value,
+									true
+								)
+							);
+						else
+							Object.entries(error.messages).forEach(
+								([key, value]) => $fhcAlert.alertDefault('error', key, value, true)
+							);
 						return false;
 					}
 					return true;
 				},
-				general(error, form) {
+				general(error, config) {
 					const $fhcAlert = app.config.globalProperties.$fhcAlert;
 
-					if (form)
-						form.setFeedback(false, error.message);
+					if (config?.form)
+						config.form.setFeedback(false, error.message);
+					else if (config?.errorHeader)
+						$fhcAlert.alertDefault(
+							'error',
+							Array.isArray(config.errorHeader) ? app.config.globalProperties.$p.t.apply(null, config.errorHeader) : config.errorHeader,
+							error.message,
+							true
+						);
 					else
 						$fhcAlert.alertError(error.message);
 				},
@@ -251,15 +268,22 @@ export default {
 
 					$fhcAlert.alertSystemError(message);
 				},
-				auth(error) {
+				auth(error, config) {
 					const $fhcAlert = app.config.globalProperties.$fhcAlert;
-
 
 					var message = '';
 					message += 'Controller name: ' + error.controller + '\n';
 					message += 'Method name: ' + error.method + '\n';
-					message += 'Required permissions: ' + error.required_permissions
-					$fhcAlert.alertDefault('error', error.message, message);
+					message += 'Required permissions: ' + error.required_permissions;
+					if (config?.errorHeader)
+						$fhcAlert.alertDefault(
+							'error',
+							Array.isArray(config.errorHeader) ? app.config.globalProperties.$p.t.apply(null, config.errorHeader) : config.errorHeader,
+							error.message,
+							true
+						);
+					else
+						$fhcAlert.alertDefault('error', error.message, message);
 				}
 			}
 		};
