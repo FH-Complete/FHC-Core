@@ -20,6 +20,7 @@ var FHC_TableWidget = {
 
 	_datasetRepresentation: null, // contains the current data representation
 
+	_bootstrapVersion:3,
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
@@ -152,6 +153,8 @@ var FHC_TableWidget = {
 
 		FHC_TableWidget._setDatasetRepresentation(data); // set what type of dataset representation was choosen
 
+		FHC_TableWidget._setBootstrapVersion(data); // set the bootstrap version used for the tableWidget
+
 		var tableWidgetDiv = $('div[tableUniqueId="' + data.tableUniqueId + '"]');
 
 		FHC_TableWidget._turnOffEvents(tableWidgetDiv); // turns all the events off
@@ -163,6 +166,7 @@ var FHC_TableWidget = {
 		FHC_TableWidget._turnOnEvents(tableWidgetDiv); // turns all the events off
 
 		FHC_TableWidget._onTableBuilt(tableWidgetDiv, data);
+		
 	},
 
 
@@ -766,6 +770,11 @@ var FHC_TableWidget = {
 		}
 	},
 
+	_setBootstrapVersion: function(data) {
+
+		_bootstrapVersion = data.bootstrapVersion
+	},
+
 	_getTableWidgetUniqueIdArray: function() {
 
 		var tableWidgetUniqueIdArray = [];
@@ -817,17 +826,17 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv){
 	tabulatorHeaderHTML += '<div class="btn-toolbar pull-right" role="toolbar">';
 	tabulatorHeaderHTML += '<div class="btn-group" role="group">';
 	tabulatorHeaderHTML += '' +
-		'<button id="download-csv" class="btn btn-default" type="button" ' +
+		`<button id="download-csv" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'}" type="button" ` +
 		'data-toggle="tooltip" data-placement="left" title="Download CSV">' +
 		'<small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i>' +
 		'</button>';
 	tabulatorHeaderHTML += '' +
-		'<button id="help" class="btn btn-default" type="button" ' +
+		`<button id="help" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'}" type="button" ` +
 		'data-toggle="collapse tooltip" data-target="tabulatorHelp-'+ tableUniqueId + '" data-placement="left" ' +
 		'title="' + FHC_PhrasesLib.t("ui", "hilfe") + '"><i class="fa fa-question"></i>' +
 		'</button>';
 	tabulatorHeaderHTML += '' +
-		'<button id="settings" class="btn btn-default" type="button" ' +
+		`<button id="settings" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'}" type="button" ` +
 		'data-toggle="collapse tooltip" data-target="tabulatorSettings-'+ tableUniqueId + '" data-placement="left" ' +
 		'title="' + FHC_PhrasesLib.t("ui", "tabelleneinstellungen") + '" ' +
 		'aria-expanded="false" aria-controls="tabulatorSettings-'+ tableUniqueId + '">' +
@@ -848,15 +857,15 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns
 	var tabulatorHeaderCollapseHTML = '';
 
 	// CollapseHTML 'Settings'
+	if(_bootstrapVersion==3){
 	tabulatorHeaderCollapseHTML += '<div class="row">';
 	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorSettings-'+ tableUniqueId + '">';
-	tabulatorHeaderCollapseHTML += '<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">';
-
-	tabulatorHeaderCollapseHTML += '<div class="panel panel-default">';
-	tabulatorHeaderCollapseHTML += '<div class="panel-heading" role="tab" id="headingOne">';
+	tabulatorHeaderCollapseHTML += `<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">`;
+	tabulatorHeaderCollapseHTML += `<div class="panel panel-default">`;
+	tabulatorHeaderCollapseHTML += `<div class="panel-heading" role="tab" id="headingOne">`;
 	tabulatorHeaderCollapseHTML += '<h5 class="panel-title">';
 	tabulatorHeaderCollapseHTML += '' +
-		'<a role="button" data-bs-toggle="collapse" data-bs-parent="#accordion" ' +
+		'<a role="button" data-toggle="collapse" data-parent="#accordion" ' +
 		'href="#selectColumns-' + tableUniqueId + '" ' +
 		'aria-expanded="false" aria-controls="selectColumns">' +
 		FHC_PhrasesLib.t("ui", "spaltenEinstellen") +
@@ -867,7 +876,24 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns
 		'role="tabpanel" aria-labelledby="headingOne">';
 	tabulatorHeaderCollapseHTML += '<div class="panel-body">';
 	tabulatorHeaderCollapseHTML += '<div class="btn-group" role="group">';
-
+	}else{
+		tabulatorHeaderCollapseHTML += '<div class="row">';
+		tabulatorHeaderCollapseHTML += '<div class="col-12 collapse" id="tabulatorSettings-'+ tableUniqueId + '">';
+		tabulatorHeaderCollapseHTML += `<div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">`;
+		tabulatorHeaderCollapseHTML += `<div class="accordion-item">`;
+		tabulatorHeaderCollapseHTML += `<h5 class="accordion-header" role="tab" id="headingOne">`;
+		tabulatorHeaderCollapseHTML += '' +
+			'<a role="button" data-bs-toggle="collapse" data-bs-parent="#accordion" ' +
+			'href="#selectColumns-' + tableUniqueId + '" ' +
+			'aria-expanded="false" aria-controls="selectColumns">' +
+			FHC_PhrasesLib.t("ui", "spaltenEinstellen") +
+			'</a>';
+		tabulatorHeaderCollapseHTML += '</h5>';
+		tabulatorHeaderCollapseHTML += '<div id="selectColumns-' + tableUniqueId + '" class="accordion-collapse collapse show" ' +
+			'role="tabpanel" aria-labelledby="headingOne" data-bs-parent="#accordion">';
+		tabulatorHeaderCollapseHTML += '<div class="accordion-body">';
+		tabulatorHeaderCollapseHTML += '<div class="btn-group" role="group">';
+	}
 	// Create column picker (Spalten einstellen)
 	tableWidgetDiv.find('#tableWidgetTabulator').tabulator('getColumns').forEach(function(column)
 	{
@@ -882,25 +908,28 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns
 		{
 			if ($.inArray(field, tableWidgetBlacklistArray_columnUnselectable) < 0)
 			{
-				tabulatorHeaderCollapseHTML += '<button type="button" class="btn btn-default btn-sm btn-select-col ' + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+				tabulatorHeaderCollapseHTML += `<button type="button" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} btn-sm btn-select-col ` + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
 			}
 		}
 		// Else provide all tabulator fields as pickable columns
 		else
 		{
-			tabulatorHeaderCollapseHTML += '<button type="button" class="btn btn-default btn-sm btn-select-col ' + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+			tabulatorHeaderCollapseHTML += `<button type="button" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} btn-sm btn-select-col ` + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
 		}
 	});
 
-	tabulatorHeaderCollapseHTML += '</div>'; // end btn-group
-	tabulatorHeaderCollapseHTML += '</div>'; // end panel-body
-	tabulatorHeaderCollapseHTML += '</div>'; // end panel-collapse
-	tabulatorHeaderCollapseHTML += '</div>'; // end panel
+	
+		tabulatorHeaderCollapseHTML += '</div>'; // end btn-group
+		tabulatorHeaderCollapseHTML += '</div>'; // end panel-body / accordion-body
+		tabulatorHeaderCollapseHTML += '</div>'; // end panel-collapse / accordion-collapse
+		tabulatorHeaderCollapseHTML += '</div>'; // end panel / accordion-item
 
-	tabulatorHeaderCollapseHTML += '</div>'; // end panel-group
-	tabulatorHeaderCollapseHTML += ' </div>'; // end col
-	tabulatorHeaderCollapseHTML += ' </div>'; // end row
+		tabulatorHeaderCollapseHTML += '</div>'; // end panel-group / accordion
+		tabulatorHeaderCollapseHTML += ' </div>'; // end col
+		tabulatorHeaderCollapseHTML += ' </div>'; // end row
 
+	
+	
 	return tabulatorHeaderCollapseHTML;
 }
 
@@ -916,11 +945,13 @@ function _renderTabulatorFooterHTML(tableWidgetFooterOptions){
 		tabulatorFooterHTML += '<div class="btn-toolbar" role="toolbar">';
 		tabulatorFooterHTML += '<div class="btn-group" role="group">';
 		tabulatorFooterHTML += '' +
-			'<button id="select-all" class="btn btn-default pull-left" type="button">'
+		// pull-right is a fontawesome class that adds float right style
+			`<button id="select-all" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} pull-right" type="button">`
 			+ FHC_PhrasesLib.t("ui", "alleAuswaehlen") + '' +
 			'</button>';
 		tabulatorFooterHTML += '' +
-			'<button id="deselect-all" class="btn btn-default pull-left" type="button">'
+		// pull-right is a fontawesome class that adds float right style
+			`<button id="deselect-all" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} pull-right" type="button">`
 			+ FHC_PhrasesLib.t("ui", "alleAbwaehlen") + '' +
 			'</button>';
 		tabulatorFooterHTML += '' +

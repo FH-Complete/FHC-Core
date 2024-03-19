@@ -172,6 +172,7 @@ $query.= '	FROM anrechnungen
 
 $filterWidgetArray = array(
 	'query' => $query,
+	'bootstrapVersion' => 5,
 	'tableUniqueId' => 'approveAnrechnungUebersicht',
 	'requiredPermissions' => 'lehre/anrechnung_genehmigen',
 	'datasetRepresentation' => 'tabulator',
