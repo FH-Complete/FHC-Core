@@ -106,7 +106,7 @@ export default {
 			return _clean_return_value(response);
 		}, error => {
 			if (error.code == 'ERR_CANCELED')
-				return new Promise(() => {});
+				return Promise.reject({...{handled: true}, ...error});
 			
 			if (error.config?.errorHandling == 'off'
 				|| error.config?.errorHandling === false
@@ -116,7 +116,7 @@ export default {
 			if (error.response) {
 				if (error.response.status == 404) {
 					app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL, true);
-					return new Promise(() => {});
+					return Promise.reject({...{handled: true}, ...error});
 				}
 				
 				// NOTE(chris): loop through errors
@@ -124,13 +124,13 @@ export default {
 					err => (error.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, error.config.form)
 				);
 				if (!error.response.data.errors.length)
-					return new Promise(() => {});
+					return Promise.reject({...{handled: true}, ...error});
 			} else if (error.request) {
 				app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL);
-				return new Promise(() => {});
+				return Promise.reject({...{handled: true}, ...error});
 			} else {
 				app.config.globalProperties.$fhcAlert.alertError(error.message);
-				return new Promise(() => {});
+				return Promise.reject({...{handled: true}, ...error});
 			}
 			
 			return Promise.reject(error);
