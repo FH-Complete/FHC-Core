@@ -55,6 +55,22 @@ class Status extends FHC_Controller
 		$this->outputJson($result);
 	}
 
+	public function isLastStatus($prestudent_id)
+	{
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$result = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id);
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}
+		if($result->retval == "1")
+		{
+				return $this->outputJson($result->retval);
+		}
+		$this->outputJson($result);
+	}
+
 	public function addNewStatus($prestudent_id)
 	{
 		//get Studiengang von prestudent_id
@@ -627,7 +643,7 @@ $sqlundo =
 
 		//Delete Prestudent if no data is left
 
-		if($deletePrestudent)
+		if($deletePrestudent && $isBerechtigtAdmin)
 		{
 			//TODO(manu) check all connected tables
 
@@ -652,7 +668,7 @@ $sqlundo =
 					$output .=  ' '. $doc->dokument_kurzbz;
 				}
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return 	$this->outputJson("Achtung, es sind noch zu loeschende Dokumente vorhanden: " . $output);
+				return 	$this->outputJson("Es sind noch zu loeschende Dokumente vorhanden: " . $output);
 			}
 
 			//check if Anrechnungen tbl_anrechnung
@@ -676,7 +692,7 @@ $sqlundo =
 					$output_anrechnungen .=  ' '. $anr->anrechnung_id;
 				}
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return 	$this->outputJson("Achtung, es sind mit dieser Prestudent_id verbundene Anrechnungen vorhanden (id) : " . $output_anrechnungen);
+				return 	$this->outputJson("Mit dieser Prestudent_id sind verbundene Anrechnungen vorhanden (id) : " . $output_anrechnungen);
 			}
 
 			//DELETE Prestudent
@@ -1222,7 +1238,8 @@ $sqlundo =
 		}
 
 		//Data of current Semester
-		$studentlvbData = current(getData($result));
+		$result = getData($result) ? : [];
+		$studentlvbData = current($result);
 
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$result = $this->StudentlehrverbandModel->processStudentlehrverband($student_uid, $studentlvbData->studiengang_kz, $ausbildungssem_next, $studentlvbData->verband, $studentlvbData->gruppe, $studiensem_next);

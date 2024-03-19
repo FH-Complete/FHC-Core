@@ -156,7 +156,8 @@ export default{
 			statusId: {},
 			gruendeLength: {},
 			dataMeldestichtag: null,
-			stichtag: {}
+			stichtag: {},
+			isLastStatus: {}
 		}
 	},
 	computed: {
@@ -204,6 +205,8 @@ export default{
 				'studiensemester_kurzbz': stdsem,
 				'ausbildungssemester': ausbildungssemester
 			};
+
+			this.checkIfLastStatus();
 
 			this.loadStatus(this.statusId).then(() => {
 				if(this.statusData)
@@ -306,8 +309,8 @@ export default{
 							const errorData = result.data.retval;
 							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
 						}
-						/*						return result;*/
-					}).catch(error => {
+					}
+					).catch(error => {
 					if (error.response) {
 						console.log(error.response);
 						this.$fhcAlert.alertError(error.response.data);
@@ -372,6 +375,24 @@ export default{
 					window.scrollTo(0, 0);
 					this.reload();
 				});
+		},
+		checkIfLastStatus(){
+			return CoreRESTClient.get('components/stv/Status/isLastStatus/' + this.prestudent_id)
+				.then(
+					result => {
+						if(result.data){
+							this.isLastStatus = result.data;
+						} else {
+							this.isLastStatus = {};
+						}
+						return result;
+					}).catch(error => {
+						if (error.response) {
+							console.log(error.response);
+							this.$fhcAlert.alertError(error.response.data);
+						}
+					}
+				);
 		},
 		loadStatus(status_id){
 			return CoreRESTClient.post('components/stv/Status/loadStatus/',
@@ -439,6 +460,9 @@ export default{
 		
 		
 		<p>TestData</p>
+		
+		isLastStatus: {{isLastStatus}}
+		<br>
 
 		Bismeldestichtag
 		{{dataMeldestichtag }}
@@ -795,8 +819,14 @@ export default{
 			<BsModal ref="deleteStatusModal">
 				<template #title>Status löschen</template> 
 				<template #default>
+				<div v-if="isLastStatus == 1">
+					<p>Das Loeschen der letzten Rolle loescht auch den gesamten Prestudent-Datensatz! Moechten Sie fortfahren?</p>
+				</div>
+				<div v-else>
 					<p>Prestudentstatus {{statusData.status_kurzbz}} (id: {{statusData.prestudent_id}}  
-					/ {{statusData.studiensemester_kurzbz}}) im {{statusData.ausbildungssemester}}. Ausbildungssemester wirklich löschen?</p>					
+					/ {{statusData.studiensemester_kurzbz}}) im {{statusData.ausbildungssemester}}. Ausbildungssemester wirklich löschen?</p>
+				</div>
+					
 				</template>	
 				<template #footer>
 					<button ref="Close" type="button" class="btn btn-primary" @click="deleteStatus(statusId)">OK</button>
