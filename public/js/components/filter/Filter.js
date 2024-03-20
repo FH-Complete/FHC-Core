@@ -65,6 +65,7 @@ export const CoreFilterCmpt = {
 		newBtnClass: [String, Array, Object],
 		newBtnDisabled: Boolean,
 		newBtnLabel: String,
+		uniqueId: String,
 		// TODO soll im master kommen?
 		idField: String,
 		parentIdField: String
@@ -451,6 +452,9 @@ export const CoreFilterCmpt = {
 			// Always needed parameters
 			apiFunctionParameters.filterUniqueId = FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 			apiFunctionParameters.filterType = this.filterType;
+
+			if (this.uniqueId)
+				apiFunctionParameters.filterUniqueId += '_' + this.uniqueId;
 
 			// Assign parameters to the FetchCmpt binded properties
 			this.fetchCmptApiFunctionParams = apiFunctionParameters;
