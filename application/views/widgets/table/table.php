@@ -12,7 +12,9 @@
 		<div id="tableDatasetActionsTop"></div>
 
 		<!-- TableWidget table -->
-		<?php TableWidget::loadViewDataset(); ?>
+		<div class="border border-2 mb-4">
+			<?php TableWidget::loadViewDataset(); ?>
+		</div>
 
 		<!-- Table info bottom -->
 		<div id="tableDatasetActionsBottom"></div>

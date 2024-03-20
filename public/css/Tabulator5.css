@@ -44,3 +44,14 @@
 	max-height: 22px;
 	min-width: 30px;
 }
+
+.btn-select-col-selected
+{
+	background-color: #e6e6e6;
+}
+
+.accordion-item-dark, .accordion-item-dark:focus{
+	background-color:#CED4DA !important;
+	 border-color:#ADB5BD !important;
+	 box-shadow: none !important;
+}
