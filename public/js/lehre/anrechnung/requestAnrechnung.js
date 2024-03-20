@@ -279,10 +279,10 @@ var requestAnrechnung = {
     alertIfMaxEctsExceeded: function(){
 
         if(
-            true
-            // (parseFloat($('#sumEctsSchulisch').text())) > 60 ||
-            // (parseFloat($('#sumEctsBeruflich').text())) > 60 ||
-            // (parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90 
+        
+             (parseFloat($('#sumEctsSchulisch').text())) > 60 ||
+             (parseFloat($('#sumEctsBeruflich').text())) > 60 ||
+             (parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90 
         )
         {
             $('#requestAnrechnung-maxEctsUeberschrittenMsg')

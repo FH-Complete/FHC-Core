@@ -98,6 +98,7 @@ class TableWidget extends Widget
 		
 		$this->view(self::WIDGET_URL_TABLE, array(
 			'tableUniqueId' => $widgetData[TableWidgetLib::TABLE_UNIQUE_ID],
+			'bootstrapVersion' => $widgetData[TableWidgetLib::TABLE_BOOTSTRAP_VERSION],
 		)); // GUI starts here
 	}
 

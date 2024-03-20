@@ -626,8 +626,6 @@ var FHC_TableWidget = {
 				tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
 
 
-				// Render the collapsable div triggered by button in tableWidgetHeader
-				//! this rendering was moved to the _onTableBuilt function
 				
 			}
 		
@@ -858,7 +856,7 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns
 
 	// CollapseHTML 'Settings'
 	if(_bootstrapVersion==3){
-	tabulatorHeaderCollapseHTML += '<div class="row">';
+	tabulatorHeaderCollapseHTML += '<div class="row ">';
 	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorSettings-'+ tableUniqueId + '">';
 	tabulatorHeaderCollapseHTML += `<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">`;
 	tabulatorHeaderCollapseHTML += `<div class="panel panel-default">`;
@@ -877,22 +875,22 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns
 	tabulatorHeaderCollapseHTML += '<div class="panel-body">';
 	tabulatorHeaderCollapseHTML += '<div class="btn-group" role="group">';
 	}else{
-		tabulatorHeaderCollapseHTML += '<div class="row">';
+		tabulatorHeaderCollapseHTML += '<div class="row my-4">';
 		tabulatorHeaderCollapseHTML += '<div class="col-12 collapse" id="tabulatorSettings-'+ tableUniqueId + '">';
 		tabulatorHeaderCollapseHTML += `<div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">`;
 		tabulatorHeaderCollapseHTML += `<div class="accordion-item">`;
-		tabulatorHeaderCollapseHTML += `<h5 class="accordion-header" role="tab" id="headingOne">`;
+		tabulatorHeaderCollapseHTML += `<h5  class=" accordion-header" role="tab" id="headingOne">`;
 		tabulatorHeaderCollapseHTML += '' +
-			'<a role="button" data-bs-toggle="collapse" data-bs-parent="#accordion" ' +
+			'<a role="button"  class="accordion-item-dark text-dark accordion-button" data-bs-toggle="collapse" data-bs-parent="#accordion" ' +
 			'href="#selectColumns-' + tableUniqueId + '" ' +
 			'aria-expanded="false" aria-controls="selectColumns">' +
 			FHC_PhrasesLib.t("ui", "spaltenEinstellen") +
 			'</a>';
 		tabulatorHeaderCollapseHTML += '</h5>';
-		tabulatorHeaderCollapseHTML += '<div id="selectColumns-' + tableUniqueId + '" class="accordion-collapse collapse show" ' +
+		tabulatorHeaderCollapseHTML += '<div id="selectColumns-' + tableUniqueId + '" class="accordion-collapse collapse " ' +
 			'role="tabpanel" aria-labelledby="headingOne" data-bs-parent="#accordion">';
-		tabulatorHeaderCollapseHTML += '<div class="accordion-body">';
-		tabulatorHeaderCollapseHTML += '<div class="btn-group" role="group">';
+		tabulatorHeaderCollapseHTML += '<div class=" accordion-body ">';
+		tabulatorHeaderCollapseHTML += '<div class="d-flex flex-row flex-wrap btn-group" role="group">';
 	}
 	// Create column picker (Spalten einstellen)
 	tableWidgetDiv.find('#tableWidgetTabulator').tabulator('getColumns').forEach(function(column)
@@ -908,13 +906,13 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns
 		{
 			if ($.inArray(field, tableWidgetBlacklistArray_columnUnselectable) < 0)
 			{
-				tabulatorHeaderCollapseHTML += `<button type="button" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} btn-sm btn-select-col ` + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+				tabulatorHeaderCollapseHTML += `<button type="button" style="flex:0 0 auto " class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary flex-shrink-1'} btn-sm btn-select-col ` + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
 			}
 		}
 		// Else provide all tabulator fields as pickable columns
 		else
 		{
-			tabulatorHeaderCollapseHTML += `<button type="button" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} btn-sm btn-select-col ` + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+			tabulatorHeaderCollapseHTML += `<button type="button" style="flex:0 0 auto " class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary flex-shrink-1'} btn-sm btn-select-col ` + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
 		}
 	});
 
