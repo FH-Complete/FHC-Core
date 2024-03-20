@@ -236,7 +236,7 @@ export default {
 	},
 	template: `
 	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
-		<label v-if="$attrs.label && lcType != 'radio' && lcType != 'checkbox'" :for="idCmp">{{$attrs.label}}</label>
+		<label v-if="$attrs.label && lcType != 'radio' && lcType != 'checkbox'" :class="!noAutoClass && 'form-label'" :for="idCmp">{{$attrs.label}}</label>
 		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
 		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)"></textarea>
 		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
