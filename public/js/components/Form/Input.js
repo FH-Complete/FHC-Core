@@ -160,12 +160,12 @@ export default {
 		},
 		modelValueCmp: {
 			get() {
-				if (this.$attrs.modelValue === undefined)
+				if (!this.$attrs.hasOwnProperty('modelValue'))
 					return this.modelValueDummy;
 				return this.$attrs.modelValue;
 			},
 			set(v) {
-				if (this.$attrs.modelValue === undefined)
+				if (!this.$attrs.hasOwnProperty('modelValue'))
 					this.modelValueDummy = v;
 				this.$emit('update:modelValue', v);
 			}
