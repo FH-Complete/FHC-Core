@@ -242,6 +242,7 @@ export default {
 		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
 			<slot></slot>
 		</select>
+
 		<component
 			v-else-if="tag == 'VueDatePicker'"
 			ref="input"
@@ -272,6 +273,17 @@ export default {
 			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>
+			<template #chip="data"><slot name="chip" v-bind="data"></slot></template>
+			<template #header="data"><slot name="header" v-bind="data"></slot></template>
+			<template #footer="data"><slot name="footer" v-bind="data"></slot></template>
+			<template #option="data"><slot name="option" v-bind="data"></slot></template>
+			<template #optiongroup="data"><slot name="optiongroup" v-bind="data"></slot></template>
+			<template #content="data"><slot name="content" v-bind="data"></slot></template>
+			<template #loader="data"><slot name="loader" v-bind="data"></slot></template>
+			<template #empty="data"><slot name="empty" v-bind="data"></slot></template>
+			<template #dropdownicon="data"><slot name="dropdownicon" v-bind="data"></slot></template>
+			<template #removetokenicon="data"><slot name="removetokenicon" v-bind="data"></slot></template>
+			<template #loadingicon="data"><slot name="loadingicon" v-bind="data"></slot></template>
 		</component>
 		<component
 			v-else-if="tag == 'UploadDms'"
