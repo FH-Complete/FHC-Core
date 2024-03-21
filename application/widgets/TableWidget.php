@@ -140,7 +140,7 @@ class TableWidget extends Widget
 
 		// Initialize class properties
 		$this->_requiredPermissions = null;
-		$this->_bootstrapVersion = null;
+		$this->_bootstrapVersion = 3;
 		$this->_reloadDataset = true; // by default the dataset is NOT cached in session
 		$this->_query = null;
 		$this->_additionalColumns = null;
