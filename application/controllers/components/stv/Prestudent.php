@@ -13,6 +13,7 @@ class Prestudent extends FHC_Controller
 		// Load Libraries
 		$this->load->library('AuthLib');
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+		$this->load->library('PermissionLib');
 
 		// Load language phrases
 		/*		$this->loadPhrases([
@@ -57,15 +58,36 @@ class Prestudent extends FHC_Controller
 
 		var_dump($prestudentData);*/
 
+		//get Studiengang von prestudent_id
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$result = $this->PrestudentModel->load([
+			'prestudent_id'=> $prestudent_id,
+		]);
+		if(isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		$result = current(getData($result));
+
+		$stg = $result->studiengang_kz;
+
+		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg) )
+		{
+			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}
+
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-		$deltaData = $_POST[0];
+
+		$deltaData = $_POST;
 
 		if(!$prestudent_id)
 		{
 			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
 
-		//Todo(manu) updateamum, updatevon ergänzen
 		$uid = getAuthUID();
 
 		$array_allowed_props_prestudent = [
@@ -87,7 +109,7 @@ class Prestudent extends FHC_Controller
 			'bismelden',
 			'anmerkung',
 			'dual',
-			'zgvdoktor_code', //Todo(Manu) tabelle leer? db zum testen
+			'zgvdoktor_code',
 			'zgvdoktorort',
 			'zgvdoktordatum',
 			'zgvdoktornation',
@@ -102,31 +124,30 @@ class Prestudent extends FHC_Controller
 			'standort_code'
 		];
 
-/*		foreach ($array_allowed_props_prestudent as $prop)
-		{
-
-
-		}*/
-
-/*		"insertamum": "2021-05-27 13:03:08",
-		"insertvon": "online",
-		"updateamum": "2022-10-10 15:37:31.903056",
-		"updatevon": "poeckl", "ext_id": null,*/
-
 		$update_prestudent = array();
 		foreach ($array_allowed_props_prestudent as $prop)
 		{
 			$val = isset($deltaData[$prop]) ? $deltaData[$prop] : null;
-			if ($val !== null) {
+			if ($val !== null || $prop == 'foerderrelevant') {
 				$update_prestudent[$prop] = $val;
 			}
 		}
-/*
-		var_dump("update Array");
-		var_dump($update_prestudent);*/
 
+		$update_prestudent['updateamum'] = date('c');
+		$update_prestudent['updatevon'] = $uid;
 
+		function utf8_decode_if_string($value) {
+			if (is_string($value)) {
+				return utf8_decode($value);
+			} else {
+				return $value;
+			}
+		}
+		$update_prestudent_encoded = array_map('utf8_decode_if_string', $update_prestudent);
 
+		//utf8-decode for special chars (eg tag der offenen Tür, FH-Führer)
+		//$update_prestudent_encoded = array_map('utf8_decode', $update_prestudent);
+		var_dump($update_prestudent_encoded);
 		if (count($update_prestudent) && $prestudent_id === null) {
 			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
 			// TODO(manu): phrase
@@ -137,7 +158,7 @@ class Prestudent extends FHC_Controller
 		{
 			$result = $this->PrestudentModel->update(
 				$prestudent_id,
-				$update_prestudent
+				$update_prestudent_encoded
 			);
 			if (isError($result)) {
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);

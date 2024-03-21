@@ -57,8 +57,12 @@ export default {
 			listAusbildung: [],
 			listAufmerksamdurch: [],
 			listBerufe: [],
+			listFoerderrelevant: [
+				{ text: 'wie Studiengang', value: null },
+				{ text: 'Ja', value: true },
+				{ text: 'Nein', value: false }
+			],
 			listStgTyp: [],
-			listFoerderrelevant: [],
 			initialFormData: {},
 			deltaArray: {},
 			actionUpdate: false
@@ -493,7 +497,7 @@ detectChanges() {
 					
 					<div class="row mb-3">
 						<form-input
-							container-class="col-5"
+							container-class="col-4"
 							label="Anmerkung"
 							type="text"
 							v-model="data.anmerkung"
@@ -520,20 +524,16 @@ detectChanges() {
 								>
 							</form-input>
 						</div>
-					<!--	Todo(manu) hier soll ein select ausgewählt werden??-->
-						<div class="col-2 pt-4 d-flex align-items-center">
-							<form-input
-								container-class="form-check"
-								label="Förderrelevant"
-								type="checkbox" 
-								v-model="data.foerderrelevant"
-								name="foerderrelevant"
-								>
-	<!--							<option :value="" selected >wie Studiengang</option>
-								<option :value="true">ja</option>
-								<option :value="false">nein</option>-->
-							</form-input>
-						</div>
+						<form-input
+							container-class="col-3"
+							label="förderrelevant"
+							type="select"
+							v-model="data.foerderrelevant"
+							name="foerderrelevant"
+							>
+							<option v-for="entry in listFoerderrelevant" :value="entry.value">{{entry.text}}</option>
+						</form-input>
+						
 						<form-input
 							container-class="col-1"
 							label="Priorität"
@@ -543,19 +543,9 @@ detectChanges() {
 							:disabled="!hasPrestudentPermission"
 							>
 						</form-input>
+						</div>
 					</div>
-					
-<!--					<div class="row mb-3">
-						<form-input
-							container-class="col-5"
-							label="MentorIn"
-							type="text"
-							v-model="data.mentor"
-							name="mentor"
-							>
-						</form-input>
-					</div>-->
-				
+									
 			</fieldset>
 		
 		</form-form>
@@ -563,16 +553,11 @@ detectChanges() {
 		<br>
 
 					
-		<div class="col-8 d-flex justify-content-center">
+		<div class="col-6 pb-3">
 			<legend>Gesamthistorie</legend>
 			<TblHistory :person_id="modelValue.person_id"></TblHistory>		
 		</div>
-		
-<!--		<div class="col-12 pb-3">
-			<legend>Status</legend>
-			<TblStatus :prestudent_id="modelValue.prestudent_id"></TblStatus>		
-		</div>-->
-				
+					
 		
 	</div>
 	`
