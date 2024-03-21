@@ -88,6 +88,10 @@
 	
 }
 
+/* special bootstrap5 styling for tableWidget and their accordion-item ::after content */
+.accordion-button::after{
+	content:none !important;
+}
 
 
 .tabulator-cell .btn {

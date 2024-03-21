@@ -178,7 +178,7 @@ function func_rowFormatter(row){
             cell.getElement().classList.add('bg-success')                   // akzeptiert
         }
         
-        // Die default Farbe wird bereits in Tabulator5.css file festgesetzt
+        // default color is already set in the Tabulator5.css file that gets loaded the Header flag tabulator5
         // row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
         
     });
