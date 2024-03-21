@@ -931,10 +931,10 @@ function _renderTabulatorFooterHTML(tableWidgetFooterOptions){
 		tabulatorFooterHTML += 
 		`<div class="btn-toolbar" role="toolbar">
 			<div class="btn-group" role="group">
-				<button id="select-all" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} pull-right" type="button">
+				<button id="select-all" class="btn ${_bootstrapVersion==3?'btn-default pull-left':'btn-outline-secondary float-start'} " type="button">
 			 		${FHC_PhrasesLib.t("ui", "alleAuswaehlen")}
 				</button>
-				<button id="deselect-all" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} pull-right" type="button">
+				<button id="deselect-all" class="btn ${_bootstrapVersion==3?'btn-default pull-left':'btn-outline-secondary float-start'} " type="button">
 					${FHC_PhrasesLib.t("ui", "alleAbwaehlen")}
 				</button>
 				<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal">

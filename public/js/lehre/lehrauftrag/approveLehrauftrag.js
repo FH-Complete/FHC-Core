@@ -177,10 +177,10 @@ function func_rowFormatter(row){
         {
             cell.getElement().classList.add('bg-success')                   // akzeptiert
         }
-        else
-        {
-            row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
-        }
+        
+        // Die default Farbe wird bereits in Tabulator5.css file festgesetzt
+        // row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
+        
     });
 }
 
@@ -225,7 +225,7 @@ function func_selectableCheck(row){
 // Adds column status
 function func_tableBuilt(table) {
     // Add status column to table
-    table.tabulator("addColumn",
+    table.addColumn(
         {
             title: "<i class='fa fa-user-o'></i>",
             field: "status",
@@ -469,8 +469,12 @@ status_tooltip = function(cell){
     }
 }
 
-// Generates bestellt tooltip
-bestellt_tooltip = function(cell){
+// Generates bestellt tooltipPhrase
+bestellt_tooltip = function(e, cell, onRendered){
+    //e - mouseover event
+    //cell - cell component
+    //onRendered - onRendered callback registration function
+    
     if (cell.getRow().getData().bestellt_von != null)
     {
         return FHC_PhrasesLib.t("ui", "bestelltVon") + cell.getRow().getData().bestellt_von;
@@ -478,14 +482,22 @@ bestellt_tooltip = function(cell){
 }
 
 // Generates erteilt tooltip
-erteilt_tooltip = function(cell){
+erteilt_tooltip = function(e, cell, onRendered){
+    //e - mouseover event
+    //cell - cell component
+    //onRendered - onRendered callback registration function
+
     if (cell.getRow().getData().erteilt_von != null) {
         return FHC_PhrasesLib.t("ui", "erteiltVon") + cell.getRow().getData().erteilt_von;
     }
 }
 
 // Generates akzeptiert tooltip
-akzeptiert_tooltip = function(cell){
+akzeptiert_tooltip = function(e, cell, onRendered){
+    //e - mouseover event
+    //cell - cell component
+    //onRendered - onRendered callback registration function
+
     if (cell.getRow().getData().akzeptiert_von != null) {
         return FHC_PhrasesLib.t("ui", "angenommenVon") + cell.getRow().getData().akzeptiert_von;
     }
@@ -496,18 +508,6 @@ $(function() {
     window.addEventListener('resize', function(){
         $('#tableWidgetTabulator').tabulator('setHeight', $(window).height() * 0.50);
         $('#tableWidgetTabulator').tabulator('redraw', true);
-    });
-
-    // tableInit is called in the jquery_wrapper when the tableBuilt event was finished
-    $(document).on("tableInit", function(event,tabulatorInstance) {
-     
-        func_tableBuilt($("#tableWidgetTabulator"))
-        
-        // event renderStarted needs to be attached as a callback to the tableBuilt event in tabulator5
-        $("#tableWidgetTabulator").tabulator("on","renderStarted",()=>{func_renderStarted(tabulatorInstance)});
-        // event renderStarted needs to be attached as a callback to the tableBuilt event in tabulator5
-        $("#tableWidgetTabulator").tabulator("on","rowUpdated",(row)=>{func_rowUpdated(row)});
-       
     });
 
     // Show all rows
