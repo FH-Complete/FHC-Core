@@ -54,7 +54,7 @@ export default {
 			hasAssistenzPermissionForStgs: this.permissions['assistenz_stgs'],
 			hasSchreibrechtAss: this.permissions['assistenz_schreibrechte'],
 			hasAdminPermission: this.permissions['admin'],
-			//hasPermissionToSkipStatusCheck: this.permission['student/keine_studdatuspruefung'],
+			hasPermissionToSkipStatusCheck: this.permissions['student/keine_studstatuspruefung'],
 			lists: this.lists,
 			defaultSemester: this.defaultSemester
 		}

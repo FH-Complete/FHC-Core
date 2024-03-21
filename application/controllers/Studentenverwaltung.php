@@ -26,7 +26,7 @@ class Studentenverwaltung extends FHC_Controller
 				'assistenz_stgs' => $this->permissionlib->getSTG_isEntitledFor('assistenz'),
 				'admin' => $this->permissionlib->isBerechtigt('admin'),
 				'assistenz_schreibrechte' => $this->permissionlib->isBerechtigt('assistenz','suid'),
-				'student/keine_studdatuspruefung' => $this->permissionlib->isBerechtigt('student/keine_studdatuspruefung')
+				'student/keine_studstatuspruefung' => $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung')
 
 			],
 			'variables' => [

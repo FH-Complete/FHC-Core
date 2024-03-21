@@ -41,7 +41,8 @@ export default{
 		}
 	},
 	props: {
-		prestudent_id: String
+		prestudent_id: String,
+		studiengang_kz: String
 	},
 	data() {
 		return {
@@ -81,7 +82,7 @@ export default{
 							container.className = "d-flex gap-2";
 
 							let button = document.createElement('button');
-							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
 								button.className = 'btn btn-outline-secondary btn-action disabled';
 							else
 								button.className = 'btn btn-outline-secondary btn-action';
@@ -93,7 +94,7 @@ export default{
 							container.append(button);
 
 							button = document.createElement('button');
-							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
 								button.className = 'btn btn-outline-secondary btn-action disabled';
 							else
 								button.className = 'btn btn-outline-secondary btn-action';
@@ -105,7 +106,7 @@ export default{
 							container.append(button);
 
 							button = document.createElement('button');
-							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
 								button.className = 'btn btn-outline-secondary btn-action disabled';
 							else
 								button.className = 'btn btn-outline-secondary btn-action';
@@ -117,7 +118,7 @@ export default{
 							container.append(button);
 
 							button = document.createElement('button');
-							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum)
+							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
 								button.className = 'btn btn-outline-secondary btn-action disabled';
 							else
 								button.className = 'btn btn-outline-secondary btn-action';
@@ -157,13 +158,23 @@ export default{
 			gruendeLength: {},
 			dataMeldestichtag: null,
 			stichtag: {},
-			isLastStatus: {}
+			isLastStatus: {},
+			hasPermissionThisStg: {}
 		}
 	},
 	computed: {
 		gruende() {
 			return this.listStatusgruende.filter(grund => grund.status_kurzbz == this.statusData.status_kurzbz);
 		},
+		arrayStg(){
+			let stgInteger = this.hasAssistenzPermissionForStgs.map(item => {
+				return parseInt(item); // Wandelt jeden String in eine ganze Zahl um
+			});
+			return stgInteger;
+		},
+		hasPermissionCurrentStg(){
+			return this.arrayStg.includes(this.studiengang_kz);
+		}
 	},
 	watch: {
 		data: {
@@ -459,25 +470,32 @@ export default{
 		<div class="stv-list h-100 pt-3">
 		
 		
-		<p>TestData</p>
+<!--		<p>TestData</p>
 		
-		isLastStatus: {{isLastStatus}}
+		{{hasPermissionCurrentStg}}
+		<hr>
+
+		
+<!--		isLastStatus: {{isLastStatus}}
 		<br>
 
 		Bismeldestichtag
-		{{dataMeldestichtag }}
+		{{dataMeldestichtag }}-->
 		
-		
+<!--		{{arrayStg}}-->
 
 		
 <!--		Berechtigungen:
 			Skip Check: {{hasPermissionToSkipStatusCheck}} |
 			Admin: {{hasAdminPermission}} |
-			Studiengaenge: {{hasAssistenzPermissionForStgs}} |
-			Schreibrecht ASS: {{hasSchreibrechtAss}}-->
+			Studiengaenge:  |
+			Schreibrecht ASS: {{hasSchreibrechtAss}} ||
+			Basis Prestudent: {{hasPrestudentPermission}} ||
+			Recht für Studiengang {{studiengang_kz}} : {{hasPermissionCurrentStg}}-->
 		
 		<hr>
-		<p>{{statusId}}</p>	
+<!--		<p>{{hasAssistenzPermissionForStgs}}</p>	
+		{{this.hasAssistenzPermissionForStgs.includes("476")}}-->
 		
 			<!--Modal: Add New Status-->
 			<BsModal ref="newStatusModal">

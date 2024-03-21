@@ -242,10 +242,7 @@ class Status extends FHC_Controller
 		}
 
 		$isBerechtigtNoStudstatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
-		/*		var_dump(isBerechtigtNoStudstatusCheck);
 
-				$basis =  $this->permissionlib->isBerechtigt('basis/prestudent');
-				var_dump($basis);*/
 		if(!$isBerechtigtNoStudstatusCheck)
 		{
 			//Block STATUSCHECKS
@@ -636,7 +633,7 @@ $sqlundo =
 			if (!hasData($result))
 			{
 				$this->outputJson($result);
-				var_dump("no data Löschen der Lehrverbandszuordnung");
+				//var_dump("no data Löschen der Lehrverbandszuordnung");
 			}
 			$this->outputJsonSuccess(true);
 		}
@@ -996,7 +993,7 @@ $sqlundo =
 		}
 
 
-		if(!isBerechtigtNoStudstatusCheck)
+		if(!$isBerechtigtNoStudstatusCheck)
 		{
 			//Block STATUSCHECKS
 
@@ -1013,7 +1010,7 @@ $sqlundo =
 		$this->db->trans_begin();
 
 		//update status
-		var_dump($ausbildungssemester, $studiensemester_kurzbz);
+		//var_dump($ausbildungssemester, $studiensemester_kurzbz);
 		$result = $this->PrestudentstatusModel->update(
 			[
 				'prestudent_id' => $key_prestudent_id,

@@ -28,6 +28,10 @@ export default {
 			from: 'hasPrestudentPermission',
 			default: false
 		},
+/*		hasPermissionToSkipStatusCheck: {
+			from: 'hasPermissionToSkipStatusCheck',
+			default: false
+		},*/
 		hasAssistenzPermission: {
 			from: 'hasAssistenzPermission',
 			default: false
@@ -201,6 +205,7 @@ detectChanges() {
 	mounted(){},
 	template: `
 	<div class="stv-details-details h-100 pb-3">
+<!--	TEST: {{modelValue}} -->
 		<form-form ref="form" class="stv-details-prestudent" @submit.prevent="updatePrestudent">
 		<div class="position-sticky top-0 z-1">
 			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!deltaLength">Speichern</button>
