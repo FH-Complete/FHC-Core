@@ -589,23 +589,10 @@ var FHC_TableWidget = {
 				
 				options.placeholder = _func_placeholder();	// display text when table is empty
 
-				// OLD tabulator v4
-				// if (typeof options.rowSelectionChanged == 'undefined')
-				// {
-				// 	options.rowSelectionChanged = function(data, rows){
-				// 		_func_rowSelectionChanged(data, rows);
-				// 	};
-				// }
-				
-				// OLD tabulator v4
-				// options.columnVisibilityChanged = function(column, visible) {
-				// 	_func_columnVisibilityChanged(column, visible);
-				// };
-
 				// Renders the tabulator
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator(options);
 
-				//! the following callbacks need to be attached after the table has built in tabulator version 5+
+				//! callbacks that need to be attached after the table has built in tabulator version 5+
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","rowSelectionChanged",_func_rowSelectionChanged);
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("on","columnVisibilityChanged",_func_columnVisibilityChanged);
 				
@@ -821,28 +808,33 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv){
 	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
 
 	var tabulatorHeaderHTML = '';
-	tabulatorHeaderHTML += '<div class="btn-toolbar pull-right" role="toolbar">';
-	tabulatorHeaderHTML += '<div class="btn-group" role="group">';
-	tabulatorHeaderHTML += '' +
-		`<button id="download-csv" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'}" type="button" ` +
-		'data-toggle="tooltip" data-placement="left" title="Download CSV">' +
-		'<small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i>' +
-		'</button>';
-	tabulatorHeaderHTML += '' +
-		`<button id="help" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'}" type="button" ` +
-		'data-toggle="collapse tooltip" data-target="tabulatorHelp-'+ tableUniqueId + '" data-placement="left" ' +
-		'title="' + FHC_PhrasesLib.t("ui", "hilfe") + '"><i class="fa fa-question"></i>' +
-		'</button>';
-	tabulatorHeaderHTML += '' +
-		`<button id="settings" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'}" type="button" ` +
-		'data-toggle="collapse tooltip" data-target="tabulatorSettings-'+ tableUniqueId + '" data-placement="left" ' +
-		'title="' + FHC_PhrasesLib.t("ui", "tabelleneinstellungen") + '" ' +
-		'aria-expanded="false" aria-controls="tabulatorSettings-'+ tableUniqueId + '">' +
-		'<i class="fa fa-cog"></i>' +
-		'</button>';
-	tabulatorHeaderHTML += '</div>';
-	tabulatorHeaderHTML += '</div>';
-	tabulatorHeaderHTML += '<br><br><br>';
+	tabulatorHeaderHTML += 
+	`<div class="btn-toolbar pull-right" role="toolbar">
+		<div class="btn-group" role="group">
+			<!-- CSV Download button -->
+			<button id="download-csv" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'}" type="button" 
+			data-toggle="tooltip" data-placement="left" title="Download CSV">
+				<small>
+					CSV&nbsp;&nbsp;
+				</small>
+				<i class="fa fa-arrow-down"></i>
+			</button>
+			<!-- Hilfe Button -->
+			<button id="help" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'}" type="button"
+			data-toggle="collapse tooltip" data-target="tabulatorHelp-${tableUniqueId}" data-placement="left" 
+			title="${FHC_PhrasesLib.t("ui", "hilfe")}">
+				<i class="fa fa-question"></i>
+			</button>
+			<!-- Settings Button -->
+			<button id="settings" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'}" type="button" 
+			data-toggle="collapse tooltip" data-target="tabulatorSettings-${tableUniqueId}" data-placement="left"
+			title="${FHC_PhrasesLib.t("ui", "tabelleneinstellungen")}" 
+			aria-expanded="false" aria-controls="tabulatorSettings-${tableUniqueId}">
+				<i class="fa fa-cog"></i>
+			</button>
+		</div>
+	</div>
+	<br><br><br>`;
 
 	return tabulatorHeaderHTML;
 }
@@ -856,41 +848,39 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns
 
 	// CollapseHTML 'Settings'
 	if(_bootstrapVersion==3){
-	tabulatorHeaderCollapseHTML += '<div class="row ">';
-	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorSettings-'+ tableUniqueId + '">';
-	tabulatorHeaderCollapseHTML += `<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">`;
-	tabulatorHeaderCollapseHTML += `<div class="panel panel-default">`;
-	tabulatorHeaderCollapseHTML += `<div class="panel-heading" role="tab" id="headingOne">`;
-	tabulatorHeaderCollapseHTML += '<h5 class="panel-title">';
-	tabulatorHeaderCollapseHTML += '' +
-		'<a role="button" data-toggle="collapse" data-parent="#accordion" ' +
-		'href="#selectColumns-' + tableUniqueId + '" ' +
-		'aria-expanded="false" aria-controls="selectColumns">' +
-		FHC_PhrasesLib.t("ui", "spaltenEinstellen") +
-		'</a>';
-	tabulatorHeaderCollapseHTML += '</h5>';
-	tabulatorHeaderCollapseHTML += '</div>'; // end panel-heading
-	tabulatorHeaderCollapseHTML += '<div id="selectColumns-' + tableUniqueId + '" class="panel-collapse collapse" ' +
-		'role="tabpanel" aria-labelledby="headingOne">';
-	tabulatorHeaderCollapseHTML += '<div class="panel-body">';
-	tabulatorHeaderCollapseHTML += '<div class="btn-group" role="group">';
+	tabulatorHeaderCollapseHTML += `
+	<div class="row ">
+		<div class="col-lg-12 collapse" id="tabulatorSettings-${tableUniqueId}">
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingOne">
+						<h5 class="panel-title">
+							<a role="button" data-toggle="collapse" data-parent="#accordion" 
+							href="#selectColumns-${tableUniqueId}" 
+							aria-expanded="false" aria-controls="selectColumns">
+							${FHC_PhrasesLib.t("ui", "spaltenEinstellen")} 
+							</a>
+						</h5>
+					</div>
+					<div id="selectColumns-${tableUniqueId}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+						<div class="panel-body">
+							<div class="btn-group" role="group">`
 	}else{
-		tabulatorHeaderCollapseHTML += '<div class="row my-4">';
-		tabulatorHeaderCollapseHTML += '<div class="col-12 collapse" id="tabulatorSettings-'+ tableUniqueId + '">';
-		tabulatorHeaderCollapseHTML += `<div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">`;
-		tabulatorHeaderCollapseHTML += `<div class="accordion-item">`;
-		tabulatorHeaderCollapseHTML += `<h5  class=" accordion-header" role="tab" id="headingOne">`;
-		tabulatorHeaderCollapseHTML += '' +
-			'<a role="button"  class="accordion-item-dark text-dark accordion-button" data-bs-toggle="collapse" data-bs-parent="#accordion" ' +
-			'href="#selectColumns-' + tableUniqueId + '" ' +
-			'aria-expanded="false" aria-controls="selectColumns">' +
-			FHC_PhrasesLib.t("ui", "spaltenEinstellen") +
-			'</a>';
-		tabulatorHeaderCollapseHTML += '</h5>';
-		tabulatorHeaderCollapseHTML += '<div id="selectColumns-' + tableUniqueId + '" class="accordion-collapse collapse " ' +
-			'role="tabpanel" aria-labelledby="headingOne" data-bs-parent="#accordion">';
-		tabulatorHeaderCollapseHTML += '<div class=" accordion-body ">';
-		tabulatorHeaderCollapseHTML += '<div class="d-flex flex-row flex-wrap btn-group" role="group">';
+		tabulatorHeaderCollapseHTML += 
+		`<div class="row my-4">
+			<div class="col-12 collapse" id="tabulatorSettings-${tableUniqueId}">
+				<div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+					<div class="accordion-item">
+						<h5  class=" accordion-header" role="tab" id="headingOne">		
+							<a role="button"  class="accordion-item-dark text-dark accordion-button" data-bs-toggle="collapse" data-bs-parent="#accordion" 
+							href="#selectColumns-${tableUniqueId}" 
+							aria-expanded="false" aria-controls="selectColumns">
+							${FHC_PhrasesLib.t("ui", "spaltenEinstellen")}
+							</a>
+						</h5>
+						<div id="selectColumns-${tableUniqueId}" class="accordion-collapse collapse" role="tabpanel" aria-labelledby="headingOne" data-bs-parent="#accordion">
+							<div class=" accordion-body ">
+								<div class="d-flex flex-row flex-wrap btn-group" role="group">`;
 	}
 	// Create column picker (Spalten einstellen)
 	tableWidgetDiv.find('#tableWidgetTabulator').tabulator('getColumns').forEach(function(column)
@@ -906,13 +896,13 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns
 		{
 			if ($.inArray(field, tableWidgetBlacklistArray_columnUnselectable) < 0)
 			{
-				tabulatorHeaderCollapseHTML += `<button type="button" style="flex:0 0 auto " class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary flex-shrink-1'} btn-sm btn-select-col ` + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+				tabulatorHeaderCollapseHTML += `<button type="button" style="flex:0 0 auto " class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary flex-shrink-1'} btn-sm btn-select-col ${btn_select_col_selected} " aria-pressed="true" id="btn-${field}" value="${field}">${title}</button>`;
 			}
 		}
 		// Else provide all tabulator fields as pickable columns
 		else
 		{
-			tabulatorHeaderCollapseHTML += `<button type="button" style="flex:0 0 auto " class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary flex-shrink-1'} btn-sm btn-select-col ` + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+			tabulatorHeaderCollapseHTML += `<button type="button" style="flex:0 0 auto " class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary flex-shrink-1'} btn-sm btn-select-col ${btn_select_col_selected} " aria-pressed="true" id="btn-${field}" value="${field}">${title}</button>`;
 		}
 	});
 
@@ -921,7 +911,6 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv,arrayTabulatorColumns
 		tabulatorHeaderCollapseHTML += '</div>'; // end panel-body / accordion-body
 		tabulatorHeaderCollapseHTML += '</div>'; // end panel-collapse / accordion-collapse
 		tabulatorHeaderCollapseHTML += '</div>'; // end panel / accordion-item
-
 		tabulatorHeaderCollapseHTML += '</div>'; // end panel-group / accordion
 		tabulatorHeaderCollapseHTML += ' </div>'; // end col
 		tabulatorHeaderCollapseHTML += ' </div>'; // end row
@@ -939,26 +928,21 @@ function _renderTabulatorFooterHTML(tableWidgetFooterOptions){
 	// If property selectButtons is true, render 'Alle auswaehlen / Alle abwaehlen' buttons
 	if (typeof tableWidgetFooterOptions.selectButtons != 'undefined' && tableWidgetFooterOptions.selectButtons == true)
 	{
-		
-		tabulatorFooterHTML += '<div class="btn-toolbar" role="toolbar">';
-		tabulatorFooterHTML += '<div class="btn-group" role="group">';
-		tabulatorFooterHTML += '' +
-		// pull-right is a fontawesome class that adds float right style
-			`<button id="select-all" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} pull-right" type="button">`
-			+ FHC_PhrasesLib.t("ui", "alleAuswaehlen") + '' +
-			'</button>';
-		tabulatorFooterHTML += '' +
-		// pull-right is a fontawesome class that adds float right style
-			`<button id="deselect-all" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} pull-right" type="button">`
-			+ FHC_PhrasesLib.t("ui", "alleAbwaehlen") + '' +
-			'</button>';
-		tabulatorFooterHTML += '' +
-			'<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal">'
-			+ FHC_PhrasesLib.t("ui", "ausgewaehlteZeilen") + ': <strong>0</strong>' +
-			'</span>';
-		tabulatorFooterHTML += '</div>';
-		tabulatorFooterHTML += '</div>';
-		tabulatorFooterHTML += '</br></br>';
+		tabulatorFooterHTML += 
+		`<div class="btn-toolbar" role="toolbar">
+			<div class="btn-group" role="group">
+				<button id="select-all" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} pull-right" type="button">
+			 		${FHC_PhrasesLib.t("ui", "alleAuswaehlen")}
+				</button>
+				<button id="deselect-all" class="btn ${_bootstrapVersion==3?'btn-default':'btn-outline-secondary'} pull-right" type="button">
+					${FHC_PhrasesLib.t("ui", "alleAbwaehlen")}
+				</button>
+				<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal">
+					${FHC_PhrasesLib.t("ui", "ausgewaehlteZeilen")} : <strong>0</strong>
+				</span>
+			</div>
+		</div>
+		</br></br>`;
 	}
 
 	return tabulatorFooterHTML;
