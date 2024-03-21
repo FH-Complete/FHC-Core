@@ -39,24 +39,12 @@ export default {
 				this.abortController.abort();
 			this.abortController = new AbortController();
 
-			axios.post(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Abmeldung/getStudiengaengeAssistenz/',
-				evt,
-				{
-					signal: this.abortController.signal
-				}
-			).then(
-				result => {
-					if (result.data.error) {
-						BsAlert.popup(result.data.retval, {dialogClass: 'alert alert-danger'});
-					} else {
-						this.data = result.data.retval;
-					}
-					return result;
-				}
-			).catch(() => {});
+			this.$fhcApi.factory
+				.studstatus.leitung.getPrestudents(evt.query, this.abortController.signal)
+				.then(result => {
+					this.data = result.data;
+				})
+				.catch(this.$fhcApi.handleSystemError);
 		}
 	},
 	template: `

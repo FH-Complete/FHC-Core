@@ -2058,7 +2058,7 @@ class AntragLib
 	 */
 	public function isEntitledToUnpauseAntrag($antrag_id)
 	{
-		return $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag');
+		return ($this->hasAccessToAntrag($antrag_id, 'student/antragfreigabe') || $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag'));
 	}
 
 	/**
