@@ -38,27 +38,17 @@
 			this.table = new Tabulator(this.element[0], options);
 			window.table = this.table;
 
-                        console.log(this.table);
-                        props = Object.getOwnPropertyNames(Object.getPrototypeOf(Object.getPrototypeOf(this.table)));
-                        props = props.concat(Object.getOwnPropertyNames(this.table));
-                        console.log(props);
-
-                        const that = this;
-                        this.table.on("tableBuilt", function(){
-                          console.log('bhbuilt begin');
-                          console.log(this);
-                          props = Object.getOwnPropertyNames(Object.getPrototypeOf(Object.getPrototypeOf(this)));
-                          props = props.concat(Object.getOwnPropertyNames(this));
-                          for(let key of props){
-                                  if( key === 'download' ) console.log('download: ' + typeof this[key]);
-                                  if(typeof this[key] === "function" && key.charAt(0) !== "_"){
-                                          that[key] = this[key].bind(this);
-                                  }
-                          }
-                          console.log(props);
-                          console.log('bhbuilt end');
-						  $(document).trigger("tableInit",[this]);
-                        });
+			const that = this;
+   			this.table.on("tableBuilt", function(){
+      			props = Object.getOwnPropertyNames(Object.getPrototypeOf(Object.getPrototypeOf(this)));
+         		props = props.concat(Object.getOwnPropertyNames(this));
+           		for(let key of props){
+					if(typeof this[key] === "function" && key.charAt(0) !== "_"){
+     					that[key] = this[key].bind(this);
+					}
+     			}
+				$(document).trigger("tableInit",[this]);
+    		});
 
 			//retrieve properties on prototype
 			props = Object.getOwnPropertyNames(Object.getPrototypeOf(Object.getPrototypeOf(this.table)));

@@ -167,7 +167,6 @@ function func_rowFormatter(row){
 
 // Formats row selectable/unselectable
 function func_selectableCheck(row){
-    console.log("entered here in selectable check")
     let status_kurzbz = row.getData().status_kurzbz;
 
     return (
