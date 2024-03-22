@@ -88,7 +88,9 @@ export default{
 								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-forward"></i>';
 							button.title = 'Status vorrücken';
-							button.addEventListener('click', () =>
+							button.addEventListener(
+								'click',
+								() =>
 								this.actionAdvanceStatus(cell.getData().status_kurzbz, cell.getData().studiensemester_kurzbz, cell.getData().ausbildungssemester)
 							);
 							container.append(button);
@@ -528,9 +530,9 @@ export default{
 						<div class="row mb-3">
 							<label for="status_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'status_rolle')}}</label>
 							<div class="col-sm-6">
-<!--								<form-input type="text" :readonly="readonly" class="form-control" id="status_kurzbz" v-model="statusData['status_kurzbz']">-->
+							<!--<form-input type="text" :readonly="readonly" class="form-control" id="status_kurzbz" v-model="statusData['status_kurzbz']">-->
 								<form-input
-									required 
+									required
 									v-model="statusData['status_kurzbz']"
 									name="status_kurzbz"
 									type="select"
@@ -547,13 +549,13 @@ export default{
 								</form-input>
 							</div>
 						</div>
-						<div class="row mb-3">									   
+						<div class="row mb-3">		   
 							<label for="studiensemester_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									:readonly="readonly" 
+								<form-input
+									:readonly="readonly"
 									type="select"
-									name="studiensemester_kurzbz" 
+									name="studiensemester_kurzbz"
 									v-model="statusData['studiensemester_kurzbz']"
 								>
 									<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz"  :selected="sem.studiensemester_kurzbz === defaultSemester">{{sem.studiensemester_kurzbz}}</option>
@@ -564,10 +566,10 @@ export default{
 						<div class="row mb-3">
 							<label for="ausbildungssemester" class="form-label col-sm-4">{{$p.t('lehre', 'ausbildungssemester')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									type="select" 
-									:readonly="readonly" 
-									name="ausbildungssemester" 
+								<form-input
+									type="select"
+									:readonly="readonly"
+									name="ausbildungssemester"
 									v-model="statusData.ausbildungssemester"
 								>
 								 <option v-for="number in maxSem" :key="number" :value="number">{{ number }}</option>
@@ -578,10 +580,10 @@ export default{
 						<div class="row mb-3">
 							<label for="datum" class="form-label col-sm-4">{{$p.t('global', 'datum')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									type="DatePicker" 
-									:readonly="readonly" 
-									name="datum" 
+								<form-input
+									type="DatePicker"
+									:readonly="readonly"
+									name="datum"
 									v-model="statusData.datum"
 									auto-apply
 									:enable-time-picker="false"
@@ -591,13 +593,13 @@ export default{
 								></form-input>
 							</div>
 						</div>
-						<div class="row mb-3">									   
+						<div class="row mb-3">
 							<label for="bestaetigtam" class="form-label col-sm-4">{{$p.t('lehre', 'bestaetigt_am')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									type="DatePicker" 
-									:readonly="readonly" 
-									name="datum" 
+								<form-input
+									type="DatePicker"
+									:readonly="readonly"
+									name="datum"
 									v-model="statusData.bestaetigtam"
 									auto-apply
 									:enable-time-picker="false"
@@ -610,10 +612,10 @@ export default{
 						<div class="row mb-3">
 							<label for="bewerbung_abgeschicktamum" class="form-label col-sm-4">{{$p.t('lehre', 'bewerbung_abgeschickt_am')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									type="DatePicker" 
-									:readonly="readonly" 
-									name="datum" 
+								<form-input
+									type="DatePicker"
+									:readonly="readonly"
+									name="datum"
 									v-model="statusData['bewerbung_abgeschicktamum']"
 									auto-apply
 									:enable-time-picker="false"
@@ -626,12 +628,12 @@ export default{
 						<div class="row mb-3">
 							<label for="bezeichnung" class="form-label col-sm-4">{{$p.t('lehre', 'studienplan')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									:readonly="readonly" 
+								<form-input
+									:readonly="readonly"
 									type="select"
-									name="studienplan" 
+									name="studienplan"
 									v-model="statusData['studienplan_id']"
-								>									
+								>		
 									<option v-for="sp in listStudienplaene" :key="sp.studienplan_id" :value="sp.studienplan_id">{{sp.bezeichnung}}</option>
 								</form-input>
 							</div>
@@ -639,22 +641,22 @@ export default{
 						<div class="row mb-3">
 							<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
 							<div class="col-sm-6">
-								<form-input 
+								<form-input
 									type="text"
-									name="anmerkung" 
+									name="anmerkung"
 									v-model="statusData['anmerkung']"
-								>									
+								>						
 								</form-input>
 							</div>
 						</div>
 						
-						<div class="row mb-3">									   
+						<div class="row mb-3">								   
 							<label for="aufnahmestufe" class="form-label col-sm-4">{{$p.t('lehre', 'aufnahmestufe')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-								type="select" 
-								:readonly="readonly" 
-								name="aufnahmestufe" 
+								<form-input
+								type="select"
+								:readonly="readonly"
+								name="aufnahmestufe"
 								v-model="statusData['rt_stufe']"
 								>
 								<option v-for="entry in aufnahmestufen" :key="entry" :value="entry">{{entry}}</option>
@@ -665,10 +667,10 @@ export default{
 						<div v-if="gruende.length > 0" class="row mb-3">
 							<label for="grund" class="form-label col-sm-4">{{$p.t('studierendenantrag', 'antrag_grund')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									type="select" 
-									:readonly="readonly" 
-									name="statusgrund" 
+								<form-input
+									type="select"
+									:readonly="readonly"
+									name="statusgrund"
 									v-model="statusData['statusgrund_id']"
 								>
 								<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.beschreibung[0]}}</option>
@@ -689,7 +691,7 @@ export default{
 				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
 					<form-form class="row g-3" ref="statusData">
 					
-					<div v-if="statusData.datum < dataMeldestichtag ">
+					<div v-if="statusData.datum < dataMeldestichtag">
 						<b>{{$p.t('bismeldestichtag', 'meldestichtag_erreicht')}}</b>
 					</div>
 					
@@ -700,7 +702,7 @@ export default{
 							<div class="col-sm-6">
 <!--								<form-input type="text" :readonly="readonly" class="form-control" id="status_kurzbz" v-model="statusData['status_kurzbz']">-->
 								<form-input
-									required 
+									required
 									v-model="statusData['status_kurzbz']"
 									name="status_kurzbz"
 									type="select"
@@ -718,13 +720,13 @@ export default{
 								</form-input>
 							</div>
 						</div>
-						<div class="row mb-3">									   
+						<div class="row mb-3">							   
 							<label for="studiensemester_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									:readonly="readonly" 
+								<form-input
+									:readonly="readonly"
 									type="select"
-									name="studiensemester_kurzbz" 
+									name="studiensemester_kurzbz"
 									v-model="statusData['studiensemester_kurzbz']"
 								>
 									<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
@@ -735,10 +737,10 @@ export default{
 						<div class="row mb-3">
 							<label for="ausbildungssemester" class="form-label col-sm-4">{{$p.t('lehre', 'ausbildungssemester')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									type="select" 
-									:readonly="readonly" 
-									name="ausbildungssemester" 
+								<form-input
+									type="select"
+									:readonly="readonly"
+									name="ausbildungssemester"
 									v-model="statusData['ausbildungssemester']"
 								>
 								 <option v-for="number in maxSem" :key="number" :value="number">{{ number }}</option>
@@ -749,10 +751,10 @@ export default{
 						<div class="row mb-3">
 							<label for="datum" class="form-label col-sm-4">{{$p.t('global', 'datum')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									type="DatePicker" 
-									:readonly="readonly" 
-									name="datum" 
+								<form-input
+									type="DatePicker"
+									:readonly="readonly"
+									name="datum"
 									v-model="statusData['datum']"
 									auto-apply
 									:enable-time-picker="false"
@@ -762,13 +764,13 @@ export default{
 								></form-input>
 							</div>
 						</div>
-						<div class="row mb-3">									   
+						<div class="row mb-3">					   
 							<label for="bestaetigtam" class="form-label col-sm-4">{{$p.t('lehre', 'bestaetigt_am')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									type="DatePicker" 
-									:readonly="readonly" 
-									name="datum" 
+								<form-input
+									type="DatePicker"
+									:readonly="readonly"
+									name="datum"
 									v-model="statusData['bestaetigtam']"
 									auto-apply
 									:enable-time-picker="false"
@@ -781,10 +783,10 @@ export default{
 						<div class="row mb-3">
 							<label for="bewerbung_abgeschicktamum" class="form-label col-sm-4">{{$p.t('lehre', 'bewerbung_abgeschickt_am')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									type="DatePicker" 
-									:readonly="readonly" 
-									name="datum" 
+								<form-input
+									type="DatePicker"
+									:readonly="readonly"
+									name="datum"
 									v-model="statusData['bewerbung_abgeschicktamum']"
 									auto-apply
 									:enable-time-picker="false"
@@ -797,12 +799,12 @@ export default{
 						<div class="row mb-3">
 							<label for="bezeichnung" class="form-label col-sm-4">{{$p.t('lehre', 'studienplan')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									:readonly="readonly" 
+								<form-input
+									:readonly="readonly"
 									type="select"
-									name="studienplan" 
+									name="studienplan"
 									v-model="statusData['studienplan_id']"
-								>									
+								>
 									<option v-for="sp in listStudienplaene" :key="sp.studienplan_id" :value="sp.studienplan_id">{{sp.bezeichnung}}</option>
 								</form-input>
 							</div>
@@ -810,22 +812,22 @@ export default{
 						<div class="row mb-3">
 							<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
 							<div class="col-sm-6">
-								<form-input 
+								<form-input
 									type="text"
-									name="anmerkung" 
+									name="anmerkung"
 									v-model="statusData['anmerkung']"
-								>									
+								>				
 								</form-input>
 							</div>
 						</div>
 						
-						<div class="row mb-3">									   
+						<div class="row mb-3">				   
 							<label for="aufnahmestufe" class="form-label col-sm-4">{{$p.t('lehre', 'aufnahmestufe')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-								type="select" 
-								:readonly="readonly" 
-								name="aufnahmestufe" 
+								<form-input
+								type="select"
+								:readonly="readonly"
+								name="aufnahmestufe"
 								v-model="statusData['rt_stufe']"
 								>
 								<option v-for="entry in aufnahmestufen" :key="entry" :value="entry">{{entry}}</option>
@@ -836,10 +838,10 @@ export default{
 						<div v-if="gruende.length > 0" class="row mb-3">
 							<label for="grund" class="form-label col-sm-4">{{$p.t('studierendenantrag', 'antrag_grund')}}</label>
 							<div class="col-sm-6">
-								<form-input 
-									type="select" 
-									:readonly="readonly" 
-									name="statusgrund" 
+								<form-input
+									type="select"
+									:readonly="readonly"
+									name="statusgrund"
 									v-model="statusData['statusgrund_id']"
 								>
 								<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.beschreibung[0]}}</option>
@@ -857,7 +859,7 @@ export default{
 		
 			<!--Modal: Delete Status-->
 			<BsModal ref="deleteStatusModal">
-				<template #title>{{$p.t('lehre', 'status_edit')}}</template> 
+				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
 				<template #default>
 				<div v-if="isLastStatus == 1">
 					<p>{{$p.t('lehre', 'last_status_confirm_delete')}}</p>
@@ -866,13 +868,12 @@ export default{
 					<p>{{$p.t('lehre', 'status_confirm_delete')}}</p>
 				</div>
 					
-				</template>	
+				</template>
 				<template #footer>
 					<button ref="Close" type="button" class="btn btn-primary" @click="deleteStatus(statusId)">OK</button>
 				</template>
 			</BsModal>
-			
-			
+				
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"
@@ -887,4 +888,5 @@ export default{
 		</core-filter-cmpt>
 		
 		</div>`
+
 };

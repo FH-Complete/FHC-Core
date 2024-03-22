@@ -16,9 +16,9 @@ class Status extends FHC_Controller
 		$this->load->library('PermissionLib');
 
 		// Load language phrases
-		/*		$this->loadPhrases([
-					'ui'
-				]);*/
+		$this->loadPhrases([
+					'ui', 'bismeldestichtag','lehre'
+				]);
 	}
 
 	public function getHistoryPrestudent($prestudent_id)
@@ -94,7 +94,7 @@ class Status extends FHC_Controller
 
 		$isStudent = false;
 
-		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg) )
+		if(!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
 		{
 			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -132,10 +132,10 @@ class Status extends FHC_Controller
 			$lastStatusData = current(getData($result));
 
 		//Different handling depending on newStatus
-		//Todo(manu) check if these checks makes sense?
+		//Todo(manu) check later with multiactions
 		/*		if($status_kurzbz == 'Absolvent' || $status_kurzbz == 'Diplomand')
 				{
-					//$studiensemester = $semester_aktuell; //TODO(Manu) oder ist hier defaultsemester gemeint?
+					//$studiensemester = $semester_aktuell;
 					$ausbildungssemester = $lastStatusData->ausbildungssemester;
 				}*/
 
@@ -145,7 +145,12 @@ class Status extends FHC_Controller
 				}*/
 
 		//check if Rolle already exists
-		$result = $this->PrestudentstatusModel->checkIfExistingPrestudentRolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester);
+		$result = $this->PrestudentstatusModel->checkIfExistingPrestudentRolle(
+			$prestudent_id,
+			$status_kurzbz,
+			$studiensemester_kurzbz,
+			$ausbildungssemester
+		);
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -221,7 +226,7 @@ class Status extends FHC_Controller
 
 		//check if studentrolle already exists
 		//TODO(manu) eigener Code für Diplomand?
-		if($status_kurzbz == 'Student' || $status_kurzbz == 'Diplomand' )
+		if($status_kurzbz == 'Student' || $status_kurzbz == 'Diplomand')
 		{
 			$this->load->model('crm/Student_model', 'StudentModel');
 			$result = $this->StudentModel->checkIfExistingStudentRolle($prestudent_id);
@@ -254,7 +259,13 @@ class Status extends FHC_Controller
 				return $this->outputJson(getError($result));
 			}
 
-			$result = $this->PrestudentstatusModel->checkIfValidStatusHistory($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $new_status_datum, $ausbildungssemester);
+			$result = $this->PrestudentstatusModel->checkIfValidStatusHistory(
+				$prestudent_id,
+				$status_kurzbz,
+				$studiensemester_kurzbz,
+				$new_status_datum,
+				$ausbildungssemester
+			);
 			if (isError($result))
 			{
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -349,7 +360,14 @@ class Status extends FHC_Controller
 
 			//process studentlehrverband
 			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-			$result = $this->StudentlehrverbandModel->processStudentlehrverband($student_uid, $studiengang_kz, $ausbildungssemester, $verband, $gruppe, $studiensemester_kurzbz);
+			$result = $this->StudentlehrverbandModel->processStudentlehrverband(
+				$student_uid,
+				$studiengang_kz,
+				$ausbildungssemester,
+				$verband,
+				$gruppe,
+				$studiensemester_kurzbz
+			);
 			if ($this->db->trans_status() === false || isError($result))
 			{
 				$this->db->trans_rollback();
@@ -359,7 +377,7 @@ class Status extends FHC_Controller
 
 			//Student updaten (fuer Abbrecher und Unterbrecher)
 			//not active yet: works only for "status ändern" in FAS
-			//Later for multiactions
+			//Todo(Manu) Later for multiactions
 
 			/*
 			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
@@ -491,7 +509,6 @@ class Status extends FHC_Controller
 
 		//Data of current Rolle
 		$statusData = current(getData($result));
-		//var_dump($statusData);
 
 		$datum = $statusData->datum == '' ? 'null' : $statusData->datum;
 		$insertamum = $statusData->insertamum == '' ? 'null' : $statusData->insertamum;
@@ -523,25 +540,27 @@ class Status extends FHC_Controller
 		$quotes_rt_stufe = $rt_stufe == "null" ? " " : "'";
 		$quotes_statusgrund_id = $statusgrund_id == "null" ? " " : "'";
 
-$sqlundo =
-	"
-	INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, anmerkung, bewerbung_abgeschicktamum, studienplan_id,  rt_stufe, statusgrund_id) 
-	VALUES('" . $prestudent_id . "','" . $status_kurzbz . "','" . $studiensemester_kurzbz . "','" . $ausbildungssemester . "',"
-	. $quotes_datum . $datum . $quotes_datum . ","
-	. $quotes_insertamum . $insertamum . $quotes_insertamum . ","
-	. $quotes_insertvon . $insertvon . $quotes_insertvon . ","
-	. $quotes_updateamum . $updateamum . $quotes_updateamum . ","
-	. $quotes_updatevon . $updatevon . $quotes_updatevon . ","
-	. $quotes_ext_id . $ext_id . $quotes_ext_id . ","
-	. $quotes_orgform_kurzbz . $orgform_kurzbz . $quotes_orgform_kurzbz . ","
-	. $quotes_bestaetigtam . $bestaetigtam . $quotes_bestaetigtam . ","
-	. $quotes_bestaetigtvon . $bestaetigtvon . $quotes_bestaetigtvon . ","
-	. $quotes_anmerkung . $anmerkung . $quotes_anmerkung . ","
-	. $quotes_bewerbung_abgeschicktamum . $bewerbung_abgeschicktamum . $quotes_bewerbung_abgeschicktamum . ","
-	. $quotes_studienplan_id . $studienplan_id . $quotes_studienplan_id . ","
-	. $quotes_rt_stufe . $rt_stufe . $quotes_rt_stufe . ","
-	. $quotes_statusgrund_id . $statusgrund_id . $quotes_statusgrund_id . ");
-	";
+		$sqlundo =
+			"
+			INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester, 
+			    datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, 
+			    anmerkung, bewerbung_abgeschicktamum, studienplan_id,  rt_stufe, statusgrund_id) 
+			VALUES('" . $prestudent_id . "','" . $status_kurzbz . "','" . $studiensemester_kurzbz . "','" . $ausbildungssemester . "',"
+			. $quotes_datum . $datum . $quotes_datum . ","
+			. $quotes_insertamum . $insertamum . $quotes_insertamum . ","
+			. $quotes_insertvon . $insertvon . $quotes_insertvon . ","
+			. $quotes_updateamum . $updateamum . $quotes_updateamum . ","
+			. $quotes_updatevon . $updatevon . $quotes_updatevon . ","
+			. $quotes_ext_id . $ext_id . $quotes_ext_id . ","
+			. $quotes_orgform_kurzbz . $orgform_kurzbz . $quotes_orgform_kurzbz . ","
+			. $quotes_bestaetigtam . $bestaetigtam . $quotes_bestaetigtam . ","
+			. $quotes_bestaetigtvon . $bestaetigtvon . $quotes_bestaetigtvon . ","
+			. $quotes_anmerkung . $anmerkung . $quotes_anmerkung . ","
+			. $quotes_bewerbung_abgeschicktamum . $bewerbung_abgeschicktamum . $quotes_bewerbung_abgeschicktamum . ","
+			. $quotes_studienplan_id . $studienplan_id . $quotes_studienplan_id . ","
+			. $quotes_rt_stufe . $rt_stufe . $quotes_rt_stufe . ","
+			. $quotes_statusgrund_id . $statusgrund_id . $quotes_statusgrund_id . ");
+			";
 
 		//Delete Status
 		$result = $this->PrestudentstatusModel->delete(
@@ -553,8 +572,7 @@ $sqlundo =
 			]
 		);
 
-		if ( $this->db->trans_status() === false || isError($result))
-		//if (isError($result))
+		if($this->db->trans_status() === false || isError($result))
 		{
 			$this->db->trans_rollback();
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -698,7 +716,7 @@ $sqlundo =
 			$uid = getAuthUID();
 			$beschreibung = 'Loeschen der Prestudent ID ' . $prestudent_id;
 			$sql = "DELETE FROM public.tbl_prestudent
-                WHERE prestudent_id = " . $prestudent_id ;
+                WHERE prestudent_id = " . $prestudent_id;
 
 			//load prestudent für LOG sqlundo
 			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
@@ -874,7 +892,7 @@ $sqlundo =
 					'prestudent_id' => $prestudent_id
 				)
 			);
-			if ($this->db->trans_status() === FALSE)
+			if ($this->db->trans_status() === false)
 			{
 				$this->db->trans_rollback();
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -886,7 +904,6 @@ $sqlundo =
 			}
 			$this->db->trans_commit();
 			$this->outputJson($result);
-
 		}
 		$this->db->trans_commit();
 		return $this->outputJsonSuccess(true);
@@ -911,7 +928,7 @@ $sqlundo =
 
 		$stg = $result->studiengang_kz;
 
-		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg) )
+		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
 		{
 			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -950,7 +967,11 @@ $sqlundo =
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 				//return $this->outputJson($result->code);
 				//Fehlermeldung überschrieben, passender
-				return $this->outputJson("Meldestichtag erreicht - Bearbeiten nicht mehr möglich");
+				//TODO(Manu) phrase
+				//$this->p->t('bismeldestichtag','meldestichtag_erreicht');
+				//return $this->outputJson($this->p->t('bismeldestichtag','status_confirm_delete'));
+				return $this->outputJson($this->p->t('lehre', 'meldestichtag_erreicht'));
+				//return $this->outputJson("Meldestichtag erreicht - Bearbeiten nicht mehr möglich");
 			}
 		}
 
@@ -958,7 +979,12 @@ $sqlundo =
 		if(($key_studiensemester_kurzbz != $studiensemester_kurzbz)
 			|| ($key_ausbildungssemester != $ausbildungssemester))
 		{
-			$result = $this->PrestudentstatusModel->checkIfExistingPrestudentRolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester);
+			$result = $this->PrestudentstatusModel->checkIfExistingPrestudentRolle(
+				$prestudent_id,
+				$status_kurzbz,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			);
 			if (isError($result))
 			{
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -997,7 +1023,13 @@ $sqlundo =
 		{
 			//Block STATUSCHECKS
 
-			$result = $this->PrestudentstatusModel->checkIfValidStatusHistory($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $datum, $ausbildungssemester);
+			$result = $this->PrestudentstatusModel->checkIfValidStatusHistory(
+				$prestudent_id,
+				$status_kurzbz,
+				$studiensemester_kurzbz,
+				$datum,
+				$ausbildungssemester
+			);
 			if (isError($result))
 			{
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -1073,7 +1105,14 @@ $sqlundo =
 			$studentlvbData = current(getData($result));
 
 			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-			$result = $this->StudentlehrverbandModel->processStudentlehrverband($student_uid,  $studentlvbData->studiengang_kz, $ausbildungssemester, $studentlvbData->verband, $studentlvbData->gruppe, $studiensemester_kurzbz);
+			$result = $this->StudentlehrverbandModel->processStudentlehrverband(
+				$student_uid,
+				$studentlvbData->studiengang_kz,
+				$ausbildungssemester,
+				$studentlvbData->verband,
+				$studentlvbData->gruppe,
+				$studiensemester_kurzbz
+			);
 			if ($this->db->trans_status() === false || isError($result))
 			{
 				$this->db->trans_rollback();
@@ -1104,7 +1143,7 @@ $sqlundo =
 
 		$stg = $result->studiengang_kz;
 
-		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg) )
+		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
 		{
 			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -1151,7 +1190,12 @@ $sqlundo =
 		$ausbildungssem_next = $key_ausbildungssemester+1;
 
 		//check if Rolle already exists
-		$result = $this->PrestudentstatusModel->checkIfExistingPrestudentRolle($key_prestudent_id, $key_status_kurzbz, $studiensem_next, $ausbildungssem_next);
+		$result = $this->PrestudentstatusModel->checkIfExistingPrestudentRolle(
+			$key_prestudent_id,
+			$key_status_kurzbz,
+			$studiensem_next,
+			$ausbildungssem_next
+		);
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -1239,7 +1283,14 @@ $sqlundo =
 		$studentlvbData = current($result);
 
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-		$result = $this->StudentlehrverbandModel->processStudentlehrverband($student_uid, $studentlvbData->studiengang_kz, $ausbildungssem_next, $studentlvbData->verband, $studentlvbData->gruppe, $studiensem_next);
+		$result = $this->StudentlehrverbandModel->processStudentlehrverband(
+			$student_uid,
+			$studentlvbData->studiengang_kz,
+			$ausbildungssem_next,
+			$studentlvbData->verband,
+			$studentlvbData->gruppe,
+			$studiensem_next
+		);
 		if ($this->db->trans_status() === false || isError($result))
 		{
 			$this->db->trans_rollback();
@@ -1270,7 +1321,7 @@ $sqlundo =
 
 		$stg = $result->studiengang_kz;
 
-		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg) )
+		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
 		{
 			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -1301,8 +1352,8 @@ $sqlundo =
 			$statusData = current(getData($result));
 		}
 
-		//check if Status is unconfirmed.. TODO(manu) check further conditions? Status < Student
-		if($statusData->bestaetigtam != NULL)
+		//check if Status is unconfirmed..
+		if($statusData->bestaetigtam != null)
 		{
 			$result = "Der Status ist bereits bestätigt!";
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -1310,7 +1361,7 @@ $sqlundo =
 		}
 
 		//check if Bewerbung abgeschickt
-		if($statusData->bewerbung_abgeschicktamum == NULL)
+		if($statusData->bewerbung_abgeschicktamum == null)
 		{
 			$result = "Die Bewerbung wurde noch nicht abgeschickt und kann deshalb nicht bestaetigt werden!";
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -1344,6 +1395,5 @@ $sqlundo =
 			return error('No Statusdata vorhanden');
 		}
 		return $this->outputJsonSuccess(true);
-
 	}
 }

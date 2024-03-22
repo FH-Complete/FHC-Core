@@ -72,7 +72,7 @@ class Prestudent extends FHC_Controller
 
 		$stg = $result->studiengang_kz;
 
-		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg) )
+		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
 		{
 			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -137,7 +137,8 @@ class Prestudent extends FHC_Controller
 		$update_prestudent['updatevon'] = $uid;
 
 		//utf8-decode for special chars (eg tag der offenen Tür, FH-Führer)
-		function utf8_decode_if_string($value) {
+		function utf8_decode_if_string($value)
+		{
 			if (is_string($value)) {
 				return utf8_decode($value);
 			} else {
@@ -165,7 +166,6 @@ class Prestudent extends FHC_Controller
 			}
 			return $this->outputJsonSuccess(true);
 		}
-
 	}
 
 	public function getHistoryPrestudents($person_id)
@@ -315,6 +315,4 @@ class Prestudent extends FHC_Controller
 		}
 		$this->outputJson($result);
 	}
-
-
 }
