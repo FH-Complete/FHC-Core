@@ -29,6 +29,17 @@ export default{
 			},
 		}
 	},
+	async mounted(){
+		await this.$p.loadCategory(['lehre']);
+
+		cm.getColumnByField('orgform_kurzbz').component.updateDefinition({
+			title: this.$p.t('lehre', 'Organisationsform')
+		});
+
+		cm.getColumnByField('bezeichnung').component.updateDefinition({
+			title: this.$p.t('lehre', 'studienplan')
+		});
+	},
 	template: `
 		<div class="stv-list h-100 pt-3">
 			<core-filter-cmpt

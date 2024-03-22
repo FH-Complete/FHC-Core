@@ -466,45 +466,67 @@ export default{
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
+	async mounted(){
+		await this.$p.loadCategory(['lehre','global','person']);
+
+		let cm = this.$refs.table.tabulator.columnManager;
+
+/*		cm.getColumnByField('lehrverband').component.updateDefinition({
+			title: this.$p.t('lehre', 'lehrverband')
+		});*/
+
+		cm.getColumnByField('format_bestaetigtam').component.updateDefinition({
+			title: this.$p.t('lehre', 'bestaetigt_am')
+		});
+
+		cm.getColumnByField('format_bewerbung_abgeschicktamum').component.updateDefinition({
+			title: this.$p.t('lehre', 'bewerbung_abgeschickt_am')
+		});
+
+		cm.getColumnByField('bezeichnung').component.updateDefinition({
+			title: this.$p.t('lehre', 'studienplan')
+		});
+
+		cm.getColumnByField('actions').component.updateDefinition({
+			title: this.$p.t('global', 'aktionen')
+		});
+
+		cm.getColumnByField('format_datum').component.updateDefinition({
+			title: this.$p.t('global', 'datum')
+		});
+
+		cm.getColumnByField('anmerkung').component.updateDefinition({
+			title: this.$p.t('global', 'anmerkung')
+		});
+
+/*		cm.getColumnByField('format_bestaetigtam').component.updateDefinition({
+			title: this.$p.t('lehre', 'bestaetigt_am')
+		});*/
+
+		cm.getColumnByField('bestaetigtvon').component.updateDefinition({
+			title: this.$p.t('lehre', 'bestaetigt_von')
+		});
+
+		cm.getColumnByField('format_insertamum').component.updateDefinition({
+			title: this.$p.t('lehre', 'insert_am')
+		});
+
+		cm.getColumnByField('insertvon').component.updateDefinition({
+			title: this.$p.t('lehre', 'insert_von')
+		});
+	},
 	template: `
 		<div class="stv-list h-100 pt-3">
 		
-		
-<!--		<p>TestData</p>
-		
-		{{hasPermissionCurrentStg}}
-		<hr>
-
-		
-<!--		isLastStatus: {{isLastStatus}}
-		<br>
-
-		Bismeldestichtag
-		{{dataMeldestichtag }}-->
-		
-<!--		{{arrayStg}}-->
-
-		
-<!--		Berechtigungen:
-			Skip Check: {{hasPermissionToSkipStatusCheck}} |
-			Admin: {{hasAdminPermission}} |
-			Studiengaenge:  |
-			Schreibrecht ASS: {{hasSchreibrechtAss}} ||
-			Basis Prestudent: {{hasPrestudentPermission}} ||
-			Recht für Studiengang {{studiengang_kz}} : {{hasPermissionCurrentStg}}-->
-		
-		<hr>
-<!--		<p>{{hasAssistenzPermissionForStgs}}</p>	
-		{{this.hasAssistenzPermissionForStgs.includes("476")}}-->
-		
+				
 			<!--Modal: Add New Status-->
 			<BsModal ref="newStatusModal">
-				<template #title>Neuen Status hinzufügen</template>
+				<template #title>{{$p.t('lehre', 'status_new')}}</template>
 							
 					<form-form class="row g-3" ref="statusData">
 					
 						<div class="row mb-3">
-							<label for="status_kurzbz" class="form-label col-sm-4">Rolle</label>
+							<label for="status_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'status_rolle')}}</label>
 							<div class="col-sm-6">
 <!--								<form-input type="text" :readonly="readonly" class="form-control" id="status_kurzbz" v-model="statusData['status_kurzbz']">-->
 								<form-input
@@ -526,7 +548,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">									   
-							<label for="studiensemester_kurzbz" class="form-label col-sm-4">Studiensemester</label>
+							<label for="studiensemester_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									:readonly="readonly" 
@@ -540,7 +562,7 @@ export default{
 						</div>
 						<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false) 100 Semester-->
 						<div class="row mb-3">
-							<label for="ausbildungssemester" class="form-label col-sm-4">Ausbildungssemester</label>
+							<label for="ausbildungssemester" class="form-label col-sm-4">{{$p.t('lehre', 'ausbildungssemester')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="select" 
@@ -554,7 +576,7 @@ export default{
 						</div>
 						
 						<div class="row mb-3">
-							<label for="datum" class="form-label col-sm-4">Datum</label>
+							<label for="datum" class="form-label col-sm-4">{{$p.t('global', 'datum')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="DatePicker" 
@@ -570,7 +592,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">									   
-							<label for="bestaetigtam" class="form-label col-sm-4">Bestätigt am</label>
+							<label for="bestaetigtam" class="form-label col-sm-4">{{$p.t('lehre', 'bestaetigt_am')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="DatePicker" 
@@ -586,7 +608,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">
-							<label for="bewerbung_abgeschicktamum" class="form-label col-sm-4">Bewerbung abgeschickt am</label>
+							<label for="bewerbung_abgeschicktamum" class="form-label col-sm-4">{{$p.t('lehre', 'bewerbung_abgeschickt_am')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="DatePicker" 
@@ -602,7 +624,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">
-							<label for="bezeichnung" class="form-label col-sm-4">Studienplan</label>
+							<label for="bezeichnung" class="form-label col-sm-4">{{$p.t('lehre', 'studienplan')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									:readonly="readonly" 
@@ -615,7 +637,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">
-							<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
+							<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="text"
@@ -627,7 +649,7 @@ export default{
 						</div>
 						
 						<div class="row mb-3">									   
-							<label for="aufnahmestufe" class="form-label col-sm-4">Aufnahmestufe</label>
+							<label for="aufnahmestufe" class="form-label col-sm-4">{{$p.t('lehre', 'aufnahmestufe')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 								type="select" 
@@ -641,7 +663,7 @@ export default{
 						</div>
 										
 						<div v-if="gruende.length > 0" class="row mb-3">
-							<label for="grund" class="form-label col-sm-4">Grund</label>
+							<label for="grund" class="form-label col-sm-4">{{$p.t('studierendenantrag', 'antrag_grund')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="select" 
@@ -664,17 +686,17 @@ export default{
 			
 			<!--Modal: Edit Status-->
 			<BsModal ref="editStatusModal">
-				<template #title>Status bearbeiten</template>
+				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
 					<form-form class="row g-3" ref="statusData">
 					
 					<div v-if="statusData.datum < dataMeldestichtag ">
-						<b>Meldestichtag erreicht - Bearbeiten nicht mehr möglich</b>
+						<b>{{$p.t('bismeldestichtag', 'meldestichtag_erreicht')}}</b>
 					</div>
 					
 					 <input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
 					
 						<div class="row mb-3">
-							<label for="status_kurzbz" class="form-label col-sm-4">Rolle</label>
+							<label for="status_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'status_rolle')}}</label>
 							<div class="col-sm-6">
 <!--								<form-input type="text" :readonly="readonly" class="form-control" id="status_kurzbz" v-model="statusData['status_kurzbz']">-->
 								<form-input
@@ -697,7 +719,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">									   
-							<label for="studiensemester_kurzbz" class="form-label col-sm-4">Studiensemester</label>
+							<label for="studiensemester_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									:readonly="readonly" 
@@ -711,7 +733,7 @@ export default{
 						</div>
 						<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false)-->
 						<div class="row mb-3">
-							<label for="ausbildungssemester" class="form-label col-sm-4">Ausbildungssemester</label>
+							<label for="ausbildungssemester" class="form-label col-sm-4">{{$p.t('lehre', 'ausbildungssemester')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="select" 
@@ -725,7 +747,7 @@ export default{
 						</div>
 						
 						<div class="row mb-3">
-							<label for="datum" class="form-label col-sm-4">Datum</label>
+							<label for="datum" class="form-label col-sm-4">{{$p.t('global', 'datum')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="DatePicker" 
@@ -741,7 +763,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">									   
-							<label for="bestaetigtam" class="form-label col-sm-4">Bestätigt am</label>
+							<label for="bestaetigtam" class="form-label col-sm-4">{{$p.t('lehre', 'bestaetigt_am')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="DatePicker" 
@@ -757,7 +779,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">
-							<label for="bewerbung_abgeschicktamum" class="form-label col-sm-4">B. abgeschickt am</label>
+							<label for="bewerbung_abgeschicktamum" class="form-label col-sm-4">{{$p.t('lehre', 'bewerbung_abgeschickt_am')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="DatePicker" 
@@ -773,7 +795,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">
-							<label for="bezeichnung" class="form-label col-sm-4">Studienplan</label>
+							<label for="bezeichnung" class="form-label col-sm-4">{{$p.t('lehre', 'studienplan')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									:readonly="readonly" 
@@ -786,7 +808,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">
-							<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
+							<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="text"
@@ -798,7 +820,7 @@ export default{
 						</div>
 						
 						<div class="row mb-3">									   
-							<label for="aufnahmestufe" class="form-label col-sm-4">Aufnahmestufe</label>
+							<label for="aufnahmestufe" class="form-label col-sm-4">{{$p.t('lehre', 'aufnahmestufe')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 								type="select" 
@@ -812,7 +834,7 @@ export default{
 						</div>
 						
 						<div v-if="gruende.length > 0" class="row mb-3">
-							<label for="grund" class="form-label col-sm-4">Grund</label>
+							<label for="grund" class="form-label col-sm-4">{{$p.t('studierendenantrag', 'antrag_grund')}}</label>
 							<div class="col-sm-6">
 								<form-input 
 									type="select" 
@@ -835,14 +857,13 @@ export default{
 		
 			<!--Modal: Delete Status-->
 			<BsModal ref="deleteStatusModal">
-				<template #title>Status löschen</template> 
+				<template #title>{{$p.t('lehre', 'status_edit')}}</template> 
 				<template #default>
 				<div v-if="isLastStatus == 1">
-					<p>Das Loeschen der letzten Rolle loescht auch den gesamten Prestudent-Datensatz! Moechten Sie fortfahren?</p>
+					<p>{{$p.t('lehre', 'last_status_confirm_delete')}}</p>
 				</div>
 				<div v-else>
-					<p>Prestudentstatus {{statusData.status_kurzbz}} (id: {{statusData.prestudent_id}}  
-					/ {{statusData.studiensemester_kurzbz}}) im {{statusData.ausbildungssemester}}. Ausbildungssemester wirklich löschen?</p>
+					<p>{{$p.t('lehre', 'status_confirm_delete')}}</p>
 				</div>
 					
 				</template>	

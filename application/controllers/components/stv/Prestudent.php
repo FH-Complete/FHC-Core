@@ -136,6 +136,7 @@ class Prestudent extends FHC_Controller
 		$update_prestudent['updateamum'] = date('c');
 		$update_prestudent['updatevon'] = $uid;
 
+		//utf8-decode for special chars (eg tag der offenen Tür, FH-Führer)
 		function utf8_decode_if_string($value) {
 			if (is_string($value)) {
 				return utf8_decode($value);
@@ -145,9 +146,7 @@ class Prestudent extends FHC_Controller
 		}
 		$update_prestudent_encoded = array_map('utf8_decode_if_string', $update_prestudent);
 
-		//utf8-decode for special chars (eg tag der offenen Tür, FH-Führer)
-		//$update_prestudent_encoded = array_map('utf8_decode', $update_prestudent);
-		var_dump($update_prestudent_encoded);
+
 		if (count($update_prestudent) && $prestudent_id === null) {
 			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
 			// TODO(manu): phrase

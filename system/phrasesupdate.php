@@ -23038,7 +23038,7 @@ array(
 				'insertvon' => 'system'
 				)
 		)
-	)
+	),
 	// Personalverwaltung begin
 	array(
 		'app' => 'core',
@@ -24993,25 +24993,6 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'person',
-		'phrase' => 'standort',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Standort',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'location',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'person',
 		'phrase' => 'adresse_new',
 		'phrases' => array(
 			array(
@@ -25164,82 +25145,6 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'person',
-		'phrase' => 'kontonr',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Kontonummer',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Address',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'person',
-		'phrase' => 'anschrift',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Anschrift',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Address',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'person',
-		'phrase' => 'verrechnung',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Verrechnung',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Billing',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'person',
-		'phrase' => 'blz',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'BLZ',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Bank code',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'person',
 		'phrase' => 'privatkonto',
 		'phrases' => array(
 			array(
@@ -25346,6 +25251,636 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Really delete bank details?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//Status
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'status_rolle',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rolle',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'role',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'status_new',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neuen Status hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'add new status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'status_edit',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'edit status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'status_delete',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'bestaetigt_am',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigt am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'confirmed on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'bestaetigt_von',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigt von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'confirmed by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'insert_am',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'InsertAmUm',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'inserted on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'insert_von',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'InsertVon',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'inserted by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'bewerbung_abgeschickt_am',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bewerbung abgeschickt am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'application sent on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'aufnahmestufe',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aufnahmestufe',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'entrance level',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bismeldestichtag',
+		'phrase' => 'meldestichtag_erreicht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldestichtag erreicht - Bearbeiten nicht mehr möglich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'report target date reached - editing no longer possible',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+		),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'status_confirm_delete',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prestudentstatus wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Really delete prestudent status?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+			'app' => 'core',
+			'category' => 'lehre',
+			'phrase' => 'last_status_confirm_delete',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Das Löschen der letzten Rolle löscht auch den gesamten Prestudent-Datensatz! Möchten Sie fortfahren?',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Deleting the last role also deletes the entire Prestudent record! Do you want to continue?',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+	//Prestudent
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'title_zgv',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangsvoraussetzungen für ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Access requirements for ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvMaster',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Master',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV master',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvMasterOrt',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Master Ort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV master place',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvMasterDatum',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Master Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV master date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvMasterNation',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Master Nation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV master nation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvMasterErfuellt',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Master erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV master fulfilled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvDoktor',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Doktor',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV doctor',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvDoktorOrt',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Doktor Ort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV doctor place',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvDoktorDatum',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Doktor Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV doctor date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvDoktorNation',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Doktor Nation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV doctor nation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvDoktorErfuellt',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Doktor erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV doctor fulfilled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'aufmerksamDurch',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aufmerksam durch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'been brought to attention by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'berufstaetigkeit',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Berufstätigkeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'professional activity',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'facheinschlaegigBerufstaetig',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Facheinschlägig berufstätig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'employed in a relevant field',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bisstandort',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bisstandort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'bis location',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'studientyp',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studientyp',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'study type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'dual',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Duales Studium',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'dual study',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'foerderrelevant',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'förderrelevant',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'relevant for funding',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'prioritaet',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Priorität',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'priority',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'title_history',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamthistorie',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Overall history',
 				'description' => '',
 				'insertvon' => 'system'
 			)

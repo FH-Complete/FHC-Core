@@ -28,10 +28,6 @@ export default {
 			from: 'hasPrestudentPermission',
 			default: false
 		},
-/*		hasPermissionToSkipStatusCheck: {
-			from: 'hasPermissionToSkipStatusCheck',
-			default: false
-		},*/
 		hasAssistenzPermission: {
 			from: 'hasAssistenzPermission',
 			default: false
@@ -126,29 +122,9 @@ export default {
 						window.scrollTo(0, 0);
 					});
 		},
-/* //besser im watch teil, dann wird Änderung immer verfolgt
-detectChanges() {
-			const delta = {};
-			for (const key in this.data) {
-				if (this.data[key] !== this.initialFormData[key]) {
-					delta[key] = this.data[key];
-					this.actionUpdate = true;
-				}
-			}
-			this.deltaArray.push(delta);
-		},*/
 	},
 	created() {
 		this.loadPrestudent();
-/*		CoreRESTClient
-			.get('components/stv/Prestudent/getHistoryPrestudents/'+ this.modelValue.person_id)
-			.then(result => CoreRESTClient.getData(result.data) || [])
-			.then(result => {
-				this.historyPrestudents = result;
-			})
-			.catch(this.$fhcAlert.handleSystemError);*/
-		//initiale Daten nach dem Laden
-		//this.initialFormData = {...this.data};
 		CoreRESTClient
 			.get('components/stv/Prestudent/getBezeichnungZGV')
 			.then(result => CoreRESTClient.getData(result.data) || [])
@@ -206,7 +182,6 @@ detectChanges() {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	mounted(){},
 	template: `
 	<div class="stv-details-details h-100 pb-3">
 <!--	TEST: {{modelValue}} -->
@@ -215,7 +190,7 @@ detectChanges() {
 			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!deltaLength">Speichern</button>
 		</div>
 			<fieldset class="overflow-hidden">
-				<legend>Zugangsvoraussetzungen für {{modelValue.nachname}} {{modelValue.vorname}}</legend>
+				<legend>{{$p.t('lehre', 'title_zgv')}} {{modelValue.nachname}} {{modelValue.vorname}}</legend>
 
 						<div class="row mb-3">
 							<form-input
@@ -249,7 +224,7 @@ detectChanges() {
 							</form-input>
 							<form-input
 								container-class="col-3"
-								label="ZGV Ort"
+								:label="$p.t('infocenter', 'zgvOrt')"
 								type="text"
 								v-model="data.zgvort"
 								name="zgvort"
@@ -257,7 +232,7 @@ detectChanges() {
 							</form-input>
 							<form-input
 								container-class="col-3"
-								label="ZGV Datum"
+								:label="$p.t('infocenter', 'zgvDatum')"
 								type="DatePicker"
 								v-model="data.zgvdatum"
 								name="zgvdatum"
@@ -271,7 +246,7 @@ detectChanges() {
 							</form-input>
 							<form-input
 								container-class="col-3"
-								label="ZGV Nation"
+								:label="$p.t('infocenter', 'zgvNation')"
 								type="select"
 								v-model="data.zgvnation"
 								name="zgvnation"
@@ -283,7 +258,7 @@ detectChanges() {
 						<div class="row mb-3">
 							<form-input
 								container-class="col-3"
-								label="ZGV Master"
+								:label="$p.t('lehre', 'zgvMaster')"
 								type="select"
 								v-model="data.zgvmas_code"
 								name="zgvmascode"
@@ -292,7 +267,7 @@ detectChanges() {
 							</form-input>
 							<form-input
 								container-class="col-3"
-								label="ZGV Master Ort"
+								:label="$p.t('lehre', 'zgvMasterOrt')"
 								type="text"
 								v-model="data.zgvmaort"
 								name="zgvmaort"
@@ -300,7 +275,7 @@ detectChanges() {
 							</form-input>
 							<form-input
 								container-class="col-3"
-								label="ZGV Master Datum"
+								:label="$p.t('lehre', 'zgvMasterDatum')"
 								type="DatePicker"
 								v-model="data.zgvmadatum"
 								name="zgvmadatum"
@@ -314,7 +289,7 @@ detectChanges() {
 							</form-input>
 							<form-input
 								container-class="col-3"
-								label="ZGV Master Nation"
+								:label="$p.t('lehre', 'zgvMasterNation')"
 								type="select"
 								v-model="data.zgvmanation"
 								name="zgvmanation"
@@ -327,7 +302,7 @@ detectChanges() {
 						<div v-if="showZgvDoktor" class="row mb-3">
 							<form-input
 								container-class="col-3"
-								label="ZGV Doktor"
+								:label="$p.t('lehre', 'zgvDoktor')"
 								type="select"
 								v-model="data.zgvdoktor_code"
 								name="zgvdoktor_code"
@@ -336,7 +311,7 @@ detectChanges() {
 							</form-input>
 							<form-input
 								container-class="col-3"
-								label="ZGV Doktor Ort"
+								:label="$p.t('lehre', 'zgvDoktorOrt')"
 								type="text"
 								v-model="data.zgvdoktorort"
 								name="zgvdoktorort"
@@ -344,7 +319,7 @@ detectChanges() {
 							</form-input>
 							<form-input
 								container-class="col-3"
-								label="ZGV Doktor Datum"
+								:label="$p.t('lehre', 'zgvDoktorDatum')"
 								type="DatePicker"
 								v-model="data.zgvdoktordatum"
 								name="zgvdoktordatum"
@@ -358,7 +333,7 @@ detectChanges() {
 							</form-input>
 							<form-input
 								container-class="col-3"
-								label="ZGV Doktor Nation"
+								:label="$p.t('lehre', 'zgvDoktorNation')"
 								type="select"
 								v-model="data.zgvdoktornation"
 								name="zgvdoktornation"
@@ -372,7 +347,7 @@ detectChanges() {
 							<div class="col-3 pt-4 d-flex align-items-center">
 								<form-input
 									container-class="form-check"
-									label="ZGV erfüllt"
+									:label="$p.t('infocenter', 'zgvErfuellt')"
 									type="checkbox"
 									v-model="data.zgv_erfuellt"
 									name="zgv_erfuellt"
@@ -382,7 +357,7 @@ detectChanges() {
 							<div class="col-3 pt-4 d-flex align-items-center">
 								<form-input
 									container-class="form-check"
-									label="ZGV Master erfüllt"
+									:label="$p.t('infocenter', 'zgvMasterErfuellt')"
 									type="checkbox"
 									v-model="data.zgvmas_erfuellt"
 									name="zgvmas_erfuellt"
@@ -392,7 +367,7 @@ detectChanges() {
 							<div v-if="showZgvDoktor" class="col-3 pt-4 d-flex align-items-center">
 								<form-input
 									container-class="form-check"
-									label="ZGV Doktor erfüllt"
+									:label="$p.t('infocenter', 'zgvDoktorErfuellt')"
 									type="checkbox"
 									v-model="data.zgvdoktor_erfuellt"
 									name="zgvdoktor_erfuellt"
@@ -411,7 +386,7 @@ detectChanges() {
 					<div class="row mb-3">
 						<form-input
 							container-class="col-4"
-							label="Aufmerksam durch"
+							:label="$p.t('person', 'aufmerksamDurch')"
 							type="select"
 							v-model="data.aufmerksamdurch_kurzbz"
 							name="aufmerksamDurch"
@@ -420,7 +395,7 @@ detectChanges() {
 						</form-input>
 						<form-input
 							container-class="col-4"
-							label="Berufstätigkeit"
+							:label="$p.t('person', 'berufstaetigkeit')"
 							type="select"
 							v-model="data.berufstaetigkeit_code"
 							name="berufstaetigkeit_code"
@@ -429,7 +404,7 @@ detectChanges() {
 						</form-input>
 						<form-input
 							container-class="col-4"
-							label="Ausbildung"
+							:label="$p.t('person', 'ausbildung')"
 							type="select"
 							v-model="data.ausbildungcode"
 							name="ausbildungcode"
@@ -452,7 +427,7 @@ detectChanges() {
 						<div class="col-4 pt-4 d-flex align-items-center">
 							<form-input
 								container-class="form-check"
-								label="Facheinschlägig berufstätig"
+								:label="$p.t('person', 'facheinschlaegigBerufstaetig')"
 								type="checkbox"
 								v-model="data.facheinschlberuf"
 								name="facheinschlberuf"
@@ -463,7 +438,7 @@ detectChanges() {
 						<!--Todo(manu) validierung Integer, liste hier null-->
 						<form-input
 							container-class="col-4"
-							label="Bisstandort"
+							:label="$p.t('person', 'bisstandort')"
 							type="text"
 							v-model="data.standort_code"
 							name="standort_code"
@@ -476,7 +451,7 @@ detectChanges() {
 					<div class="row mb-3">
 						<form-input
 							container-class="col-4"
-							label="Studiengang"
+							:label="$p.t('lehre', 'studiengang')"
 							type="select"
 							v-model="data.studiengang_kz"
 							name="studiengang_kz"
@@ -486,7 +461,7 @@ detectChanges() {
 						</form-input>
 						<form-input
 							container-class="col-4"
-							label="Studientyp"
+							:label="$p.t('lehre', 'studientyp')"
 							type="select"
 							v-model="data.gsstudientyp_kurzbz"
 							name="gsstudientyp_kurzbz"
@@ -498,7 +473,7 @@ detectChanges() {
 					<div class="row mb-3">
 						<form-input
 							container-class="col-4"
-							label="Anmerkung"
+							:label="$p.t('global', 'anmerkung')"
 							type="text"
 							v-model="data.anmerkung"
 							name="anmerkung"
@@ -507,7 +482,7 @@ detectChanges() {
 						<div class="col-2 pt-4 d-flex align-items-center">
 							<form-input
 								container-class="form-check"
-								label="Bismelden"
+								:label="$p.t('person', 'bismelden')"
 								type="checkbox"
 								v-model="data.bismelden"
 								name="bismelden"
@@ -517,7 +492,7 @@ detectChanges() {
 						<div class="col-2 pt-4 d-flex align-items-center">
 							<form-input
 								container-class="form-check"
-								label="Duales Studium"
+								:label="$p.t('lehre', 'dual')"
 								type="checkbox"
 								v-model="data.dual"
 								name="dual"
@@ -526,7 +501,7 @@ detectChanges() {
 						</div>
 						<form-input
 							container-class="col-3"
-							label="förderrelevant"
+							:label="$p.t('lehre', 'foerderrelevant')"
 							type="select"
 							v-model="data.foerderrelevant"
 							name="foerderrelevant"
@@ -536,7 +511,7 @@ detectChanges() {
 						
 						<form-input
 							container-class="col-1"
-							label="Priorität"
+							:label="$p.t('lehre', 'prioritaet')"
 							type="text"
 							v-model="data.priorisierung"
 							name="priorisierung"
@@ -544,16 +519,11 @@ detectChanges() {
 							>
 						</form-input>
 						</div>
-					</div>
-									
-			</fieldset>
-		
+					</fieldset>
+										
 		</form-form>
-		
-		<br>
-
-					
-		<div class="col-6 pb-3">
+		<br>				
+		<div class="col-8">
 			<legend>Gesamthistorie</legend>
 			<TblHistory :person_id="modelValue.person_id"></TblHistory>		
 		</div>
