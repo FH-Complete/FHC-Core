@@ -67,15 +67,20 @@ export default {
 								class="w-100"
 								v-model="student"
 								:suggestions="data"
-								optionLabel = "name"
+								option-label = "name"
 								@complete="loadData"
-								inputId="newAntragModalAutoComplete"
+								input-id="newAntragModalAutoComplete"
 								dropdown
 								dropdown-mode="current"
 								>
 								<template #option="slotProps">
 									<div :title="slotProps.option.prestudent_id">
-									{{slotProps.option.name}}
+										{{slotProps.option.name}}
+									</div>
+								</template>
+								<template #empty>
+									<div class="text-muted px-3 py-2">
+										{{ $p.t('ui/keineEintraegeGefunden') }}
 									</div>
 								</template>
 							</auto-complete>
