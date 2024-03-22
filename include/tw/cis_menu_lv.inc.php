@@ -249,7 +249,7 @@ function checkZeilenUmbruch()
 		$text='';
 
 		$name = 'Anwesenheiten NEU';
-		$link= APP_ROOT."index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&stsem=$angezeigtes_stsem";
+		$link= APP_ROOT."index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&sem_kurzbz=$angezeigtes_stsem";
 
 		$menu[]=array
 		(
