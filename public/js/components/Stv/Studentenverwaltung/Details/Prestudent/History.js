@@ -1,5 +1,4 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
-import {CoreRESTClient} from "../../../../../RESTClient";
 
 export default{
 	components: {
@@ -11,7 +10,9 @@ export default{
 	data() {
 		return {
 			tabulatorOptions: {
-				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Prestudent/getHistoryPrestudents/' + this.person_id),
+				ajaxURL: 'api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.person_id,
+				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
 				columns:[
 					{title:"StSem", field:"studiensemester_kurzbz"},
@@ -22,7 +23,24 @@ export default{
 					{title:"UID", field:"student_uid"},
 					{title:"Status", field:"status"}
 				],
-			//	tabulatorEvents: [],
+				tabulatorEvents: [
+					{
+						event: 'tableBuilt',
+						handler: async () => {
+							await this.$p.loadCategory(['lehre']);
+
+							let cm = this.$refs.table.tabulator.columnManager;
+
+							cm.getColumnByField('orgform_kurzbz').component.updateDefinition({
+								title: this.$p.t('lehre', 'organisationsform')
+							});
+
+							cm.getColumnByField('bezeichnung').component.updateDefinition({
+								title: this.$p.t('lehre', 'studienplan')
+							});
+						}
+					}
+				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
 				height:	'auto',
@@ -30,24 +48,12 @@ export default{
 			},
 		}
 	},
-	async mounted(){
-		await this.$p.loadCategory(['lehre']);
-
-		let cm = this.$refs.table.tabulator.columnManager;
-
-		cm.getColumnByField('orgform_kurzbz').component.updateDefinition({
-			title: this.$p.t('lehre', 'organisationsform')
-		});
-
-		cm.getColumnByField('bezeichnung').component.updateDefinition({
-			title: this.$p.t('lehre', 'studienplan')
-		});
-	},
 	template: `
 		<div class="stv-list h-100 pt-3">
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"
+				:tabulator-events="tabulatorEvents"
 				table-only
 				:side-menu="false"
 			>

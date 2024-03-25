@@ -4,14 +4,26 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use \DateTime as DateTime;
 
-class Prestudent extends FHC_Controller
+class Prestudent extends FHCAPI_Controller
 {
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct([
+			'get' => ['admin:r', 'assistenz:r'],
+			'updatePrestudent' =>  ['admin:w', 'assistenz:w'],
+			'getHistoryPrestudents' => ['admin:r', 'assistenz:r'],
+			'getBezeichnungZGV' => 'admin:r', // TODO(manu): self::PERM_LOGGED
+			'getBezeichnungDZgv' => 'admin:r', // TODO(manu): self::PERM_LOGGED
+			'getBezeichnungMZgv' => 'admin:r', // TODO(manu): self::PERM_LOGGED
+			'getAusbildung' => 'admin:r', // TODO(manu): self::PERM_LOGGED
+			'getAufmerksamdurch' => 'admin:r', // TODO(manu): self::PERM_LOGGED
+			'getBerufstaetigkeit' => 'admin:r', // TODO(manu): self::PERM_LOGGED
+			'getTypenStg' => 'admin:r', // TODO(manu): self::PERM_LOGGED
+			'getStudiensemester' => 'admin:r', // TODO(manu): self::PERM_LOGGED
+			'getStudienplaene' => 'admin:r', // TODO(manu): self::PERM_LOGGED
+		]);
 
 		// Load Libraries
-		$this->load->library('AuthLib');
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 
 
@@ -29,13 +41,11 @@ class Prestudent extends FHC_Controller
 		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
 		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		} elseif (!hasData($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_NOT_FOUND);
-			$this->outputJson('NOT FOUND');
+			return show_404();
 		} else {
-			$this->outputJson(current(getData($result)));
+			$this->terminateWithSuccess(current(getData($result)));
 		}
 	}
 
@@ -51,23 +61,11 @@ class Prestudent extends FHC_Controller
 		]);
 		if(isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 		$result = current(getData($result));
 
 		$stg = $result->studiengang_kz;
-
-		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
-		{
-			$result =  $this->p->t('lehre','error_keineSchreibrechte');
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson($result);
-		}
-
-		//TODO(Manu)  API Controller
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
 
 		//Form validation
 		$this->form_validation->set_rules('priorisierung', 'Priorisierung', 'numeric', [
@@ -76,15 +74,10 @@ class Prestudent extends FHC_Controller
 
 		if ($this->form_validation->run() == false)
 		{
-			return $this->outputJsonError($this->form_validation->error_array());
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
 		$deltaData = $_POST;
-
-		if(!$prestudent_id)
-		{
-			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-		}
 
 		$uid = getAuthUID();
 
@@ -145,13 +138,6 @@ class Prestudent extends FHC_Controller
 		}
 		$update_prestudent_encoded = array_map('utf8_decode_if_string', $update_prestudent);
 
-		if (count($update_prestudent) && $prestudent_id === null) {
-			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
-			// TODO(manu): check phrase
-			//return $this->outputJson("Kein/e PrestudentIn vorhanden!");
-			return $this->outputJson($this->p->t('studierendenantrag','error_no_prestudent', $prestudent_id));
-		}
-
 		if (count($update_prestudent))
 		{
 			$result = $this->PrestudentModel->update(
@@ -159,10 +145,9 @@ class Prestudent extends FHC_Controller
 				$update_prestudent_encoded
 			);
 			if (isError($result)) {
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson(getError($result));
+				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 			}
-			return $this->outputJsonSuccess(true);
+			return $this->terminateWithSuccess(true);
 		}
 	}
 
@@ -173,12 +158,12 @@ class Prestudent extends FHC_Controller
 		$result = $this->PrestudentModel->getHistoryPrestudents($person_id);
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson(getData($result) ?: []);
+		$this->terminateWithSuccess(getData($result) ?: []);
 	}
 
-	public function getBezeichnungZgv()
+	public function getBezeichnungZGV()
 	{
 		$this->load->model('codex/Zgv_model', 'ZgvModel');
 
@@ -187,9 +172,9 @@ class Prestudent extends FHC_Controller
 		$result = $this->ZgvModel->load();
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson($result);
+		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
 	public function getBezeichnungDZgv()
@@ -201,9 +186,9 @@ class Prestudent extends FHC_Controller
 		$result = $this->ZgvdoktorModel->load();
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson($result);
+		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
 	public function getBezeichnungMZgv()
@@ -215,9 +200,9 @@ class Prestudent extends FHC_Controller
 		$result = $this->ZgvmasterModel->load();
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson($result);
+		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
 	public function getAusbildung()
@@ -229,9 +214,9 @@ class Prestudent extends FHC_Controller
 		$result = $this->AusbildungModel->load();
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson($result);
+		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
 	public function getAufmerksamdurch()
@@ -243,9 +228,9 @@ class Prestudent extends FHC_Controller
 		$result = $this->AufmerksamdurchModel->load();
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson($result);
+		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
 	public function getBerufstaetigkeit()
@@ -256,9 +241,9 @@ class Prestudent extends FHC_Controller
 
 		$result = $this->BerufstaetigkeitModel->load();
 		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson($result);
+		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
 	public function getTypenStg()
@@ -269,9 +254,9 @@ class Prestudent extends FHC_Controller
 
 		$result = $this->GsstudientypModel->load();
 		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson($result);
+		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
 	public function getStudiensemester()
@@ -283,9 +268,9 @@ class Prestudent extends FHC_Controller
 
 		$result = $this->StudiensemesterModel->load();
 		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson($result);
+		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
 	public function getStudienplaene($prestudent_id)
@@ -296,7 +281,7 @@ class Prestudent extends FHC_Controller
 			array('prestudent_id' => $prestudent_id)
 		);
 		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 
 		$result = current(getData($result));
@@ -309,8 +294,8 @@ class Prestudent extends FHC_Controller
 		$result = $this->StudienplanModel->getStudienplaene($studiengang_kz);
 
 		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson($result);
+		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 }

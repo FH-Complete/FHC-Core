@@ -90,8 +90,8 @@ export default {
 
 	methods: {
 		loadPrestudent() {
-			CoreRESTClient
-				.get('components/stv/Prestudent/get/' + this.modelValue.prestudent_id)
+			this.$fhcApi
+				.get('api/frontend/v1/stv/prestudent/get/' + this.modelValue.prestudent_id)
 				.then(result => result.data)
 				.then(result => {
 					this.data = result;
@@ -101,85 +101,73 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updatePrestudent(){
-					CoreRESTClient.post('components/stv/Prestudent/updatePrestudent/' + this.modelValue.prestudent_id,
-						this.deltaArray
-					).then(response => {
-						if (!response.data.error) {
-							this.$fhcAlert.alertSuccess('Speichern erfolgreich');
-							this.deltaArray = [];
-							this.actionUpdate = false;
-						} else {
-							const errorData = response.data.retval;
-							Object.entries(errorData).forEach(entry => {
-								const [key, value] = entry;
-								this.$fhcAlert.alertError(value);
-							});
-						}
-					}).catch(error => {
-						if (error.response && error.response.data) {
-							this.$fhcAlert.alertError(error.response.data);
-						} else {
-							this.$fhcAlert.alertError("Fehler bei Speicherroutine aufgetreten");
-						}
-					}).finally(() => {
-						window.scrollTo(0, 0);
-					});
+			this.$refs.form
+				.post('api/frontend/v1/stv/prestudent/updatePrestudent/' + this.modelValue.prestudent_id, this.deltaArray)
+				.then(response => {
+					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
+					this.deltaArray = [];
+					this.actionUpdate = false;
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					window.scrollTo(0, 0);
+				});
 		},
 	},
 	created() {
 		this.loadPrestudent();
-		CoreRESTClient
-			.get('components/stv/Prestudent/getBezeichnungZGV')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/prestudent/getBezeichnungZGV')
+			.then(result => result.data)
 			.then(result => {
 				this.listZgvs = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Prestudent/getBezeichnungMZGV')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/prestudent/getBezeichnungMZgv')
+			.then(result => result.data)
 			.then(result => {
 				this.listZgvsmaster = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Prestudent/getBezeichnungDZGV')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/prestudent/getBezeichnungDZgv')
+			.then(result => result.data)
 			.then(result => {
 				this.listZgvsdoktor = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
+		CoreRESTClient //TODO(manu) FHCAPI
 			.get('components/stv/Lists/getStgs')
 			.then(result => CoreRESTClient.getData(result.data) || [])
 			.then(result => {
 				this.listStgs = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Prestudent/getAusbildung')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/prestudent/getAusbildung')
+			.then(result => result.data)
 			.then(result => {
 				this.listAusbildung = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Prestudent/getAufmerksamdurch')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/prestudent/getAufmerksamdurch')
+			.then(result => result.data)
 			.then(result => {
 				this.listAufmerksamdurch = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Prestudent/getBerufstaetigkeit')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/prestudent/getBerufstaetigkeit')
+			.then(result => result.data)
 			.then(result => {
 				this.listBerufe = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Prestudent/getTypenStg')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/prestudent/getTypenStg')
+			.then(result => result.data)
 			.then(result => {
 				this.listStgTyp = result;
 			})
@@ -192,7 +180,7 @@ export default {
 		<div class="position-sticky top-0 z-1">
 			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!deltaLength">Speichern</button>
 		</div>
-			<fieldset class="overflow-hidden">
+			<fieldset>
 				<legend>{{$p.t('lehre', 'title_zgv')}} {{modelValue.nachname}} {{modelValue.vorname}}</legend>
 
 						<div class="row mb-3">
@@ -383,7 +371,7 @@ export default {
 						
 		<!--			</template>-->
 			</fieldset>
-			<fieldset class="overflow-hidden">
+			<fieldset>
 				<legend>PrestudentIn</legend>
 				
 					<div class="row mb-3">

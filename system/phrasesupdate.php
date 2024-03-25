@@ -25905,6 +25905,25 @@ array(
 			)
 		)
 	),
+	array(
+			'app' => 'core',
+			'category' => 'lehre',
+			'phrase' => 'error_rolleBereitsVorhanden',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Diese Rolle ist bereits vorhanden!',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'This role already exists!',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
 );
 
 

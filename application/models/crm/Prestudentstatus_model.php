@@ -15,6 +15,15 @@ class Prestudentstatus_model extends DB_Model
 		$this->dbTable = 'public.tbl_prestudentstatus';
 		$this->pk = array('ausbildungssemester', 'studiensemester_kurzbz', 'status_kurzbz', 'prestudent_id');
 		$this->hasSequence = false;
+
+/*		$CI =& get_instance();
+
+		$CI->load->library('PhrasesLib');
+
+		// Load language phrases
+		$CI->loadPhrases([
+			'ui', 'lehre'
+		]);*/
 	}
 
 	/**
@@ -375,7 +384,7 @@ class Prestudentstatus_model extends DB_Model
 		}
 		else
 		{
-			return success("1","Diese Rolle ist bereits vorhanden!");
+			return success("1", $this->p->t('studierendenantrag','error_rolleBereitsVorhanden'));
 		}
 	}
 

@@ -149,7 +149,56 @@ export default{
 				height: 'auto',
 				selectable: false,
 			},
-			tabulatorEvents: [],
+			tabulatorEvents: [
+				{
+					event: 'tableBuilt',
+					handler: async () => {
+						await this.$p.loadCategory(['lehre','global','person']);
+
+						let cm = this.$refs.table.tabulator.columnManager;
+
+						/*		cm.getColumnByField('lehrverband').component.updateDefinition({
+									title: this.$p.t('lehre', 'lehrverband')
+								});*/
+
+						cm.getColumnByField('format_bestaetigtam').component.updateDefinition({
+							title: this.$p.t('lehre', 'bestaetigt_am')
+						});
+
+						cm.getColumnByField('format_bewerbung_abgeschicktamum').component.updateDefinition({
+							title: this.$p.t('lehre', 'bewerbung_abgeschickt_am')
+						});
+
+						cm.getColumnByField('bezeichnung').component.updateDefinition({
+							title: this.$p.t('lehre', 'studienplan')
+						});
+
+						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
+						});
+
+						cm.getColumnByField('format_datum').component.updateDefinition({
+							title: this.$p.t('global', 'datum')
+						});
+
+						cm.getColumnByField('anmerkung').component.updateDefinition({
+							title: this.$p.t('global', 'anmerkung')
+						});
+
+						cm.getColumnByField('bestaetigtvon').component.updateDefinition({
+							title: this.$p.t('lehre', 'bestaetigt_von')
+						});
+
+						cm.getColumnByField('format_insertamum').component.updateDefinition({
+							title: this.$p.t('lehre', 'insert_am')
+						});
+
+						cm.getColumnByField('insertvon').component.updateDefinition({
+							title: this.$p.t('lehre', 'insert_von')
+						});
+					}
+				}
+			],
 			statusData: {},
 			listStudiensemester: [],
 			maxSem:  Array.from({ length: 11 }, (_, index) => index),
@@ -472,54 +521,8 @@ export default{
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	async mounted(){
-		await this.$p.loadCategory(['lehre','global','person']);
+	mounted(){
 
-		let cm = this.$refs.table.tabulator.columnManager;
-
-/*		cm.getColumnByField('lehrverband').component.updateDefinition({
-			title: this.$p.t('lehre', 'lehrverband')
-		});*/
-
-		cm.getColumnByField('format_bestaetigtam').component.updateDefinition({
-			title: this.$p.t('lehre', 'bestaetigt_am')
-		});
-
-		cm.getColumnByField('format_bewerbung_abgeschicktamum').component.updateDefinition({
-			title: this.$p.t('lehre', 'bewerbung_abgeschickt_am')
-		});
-
-		cm.getColumnByField('bezeichnung').component.updateDefinition({
-			title: this.$p.t('lehre', 'studienplan')
-		});
-
-		cm.getColumnByField('actions').component.updateDefinition({
-			title: this.$p.t('global', 'aktionen')
-		});
-
-		cm.getColumnByField('format_datum').component.updateDefinition({
-			title: this.$p.t('global', 'datum')
-		});
-
-		cm.getColumnByField('anmerkung').component.updateDefinition({
-			title: this.$p.t('global', 'anmerkung')
-		});
-
-/*		cm.getColumnByField('format_bestaetigtam').component.updateDefinition({
-			title: this.$p.t('lehre', 'bestaetigt_am')
-		});*/
-
-		cm.getColumnByField('bestaetigtvon').component.updateDefinition({
-			title: this.$p.t('lehre', 'bestaetigt_von')
-		});
-
-		cm.getColumnByField('format_insertamum').component.updateDefinition({
-			title: this.$p.t('lehre', 'insert_am')
-		});
-
-		cm.getColumnByField('insertvon').component.updateDefinition({
-			title: this.$p.t('lehre', 'insert_von')
-		});
 	},
 	template: `
 		<div class="stv-list h-100 pt-3">
