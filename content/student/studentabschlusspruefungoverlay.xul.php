@@ -194,17 +194,27 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<label value="Note komm. Pruefung" control="student-abschlusspruefung-menulist-notekommpruef" />
 					<menulist id="student-abschlusspruefung-menulist-notekommpruef"
 						disabled="true"
+						xmlns:NOTE="http://www.technikum-wien.at/note/rdf#"
 						datasources="<?php echo APP_ROOT;?>rdf/note.rdf.php?optional=true" flex="1"
 						ref="http://www.technikum-wien.at/note/liste"
 					>
-					<template>
-						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
-								label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
-								uri="rdf:*"/>
-						</menupopup>
-					</template>
-				</menulist>
+						<template>
+							<rule NOTE:aktiv='false'>
+								<menupopup>
+									<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+												label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+												uri="rdf:*" style="text-decoration:line-through;"/>
+								</menupopup>
+							</rule>
+							<rule>
+								<menupopup>
+									<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+												label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+												uri="rdf:*"/>
+								</menupopup>
+							</rule>
+						</template>
+					</menulist>
 				</row>
 				<row>
 					<label value="Prüfungsantritt" control="student-abschlusspruefung-menulist-pruefungsantritt" />

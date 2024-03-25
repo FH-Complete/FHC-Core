@@ -29,13 +29,11 @@ class MigrateContract extends CLI_Controller
 		$this->load->model('person/benutzerfunktion_model', 'BenutzerfunktionModel');
 
 		$this->matching_ba1_vertragsart = array(
-			//'101'=>'DV zum Bund', // TODO was tun wir damit
-			'101'=>'freierdv', // TODO was tun wir damit
+			'101'=>'externerlehrender',
 			'102'=>'DV anderen Gebietskörperschaft',
 			'103'=>'echterdv',
-			//'104'=>'Lehr- oder Ausbildungsverhältnis', // TODO was tun wir mit dem?
 			'104'=>'studentischehilfskr',
-			'105'=>'freierdv',
+			'105'=>'externerlehrender',
 			'106'=>'Andere Bildungseinrichtung',
 			'107'=>'werkvertrag',
 			'108'=>'studentischehilfskr',

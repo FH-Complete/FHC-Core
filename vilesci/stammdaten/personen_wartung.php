@@ -229,7 +229,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				die('Es sind bereits beide Personen in SAP vorhanden. Bitte zuerst direkt in der tbl_sap_students lösen.');
 			}
 		}
-		
+
 		$personToDelete_obj = new person();
 		if ($personToDelete_obj->load($personToDelete))
 		{
@@ -319,6 +319,199 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					}
 				}
 			}
+
+			if($result = @$db->db_query("SELECT 1 FROM public.tbl_kennzeichen LIMIT 1"))
+			{
+				$kennzeichen_has_personToKeep = array();
+				$kennzeichen_has_personToDelete = array();
+
+				$kennzeichen_query = "
+					SELECT *
+					FROM public.tbl_kennzeichen
+					WHERE (
+						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
+						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
+					)
+					ORDER BY kennzeichentyp_kurzbz, aktiv DESC";
+
+				if ($result = $db->db_query($kennzeichen_query))
+				{
+					while ($row = $db->db_fetch_object($result))
+					{
+						if ($row->person_id === $personToKeep)
+						{
+							$kennzeichen_has_personToKeep[] = $row;
+						}
+						else if ($row->person_id === $personToDelete)
+						{
+							$kennzeichen_has_personToDelete[] = $row;
+						}
+					}
+				}
+
+				if (!empty($kennzeichen_has_personToDelete))
+				{
+					foreach ($kennzeichen_has_personToDelete as $kennzeichen_toDelete)
+					{
+						$kennzeichen_toKeep_Kurzbz = array_column($kennzeichen_has_personToKeep, 'kennzeichentyp_kurzbz');
+
+						if (in_array($kennzeichen_toDelete->kennzeichentyp_kurzbz, $kennzeichen_toKeep_Kurzbz))
+						{
+							$kennzeichen_toKeep_Keys = array_keys($kennzeichen_toKeep_Kurzbz, $kennzeichen_toDelete->kennzeichentyp_kurzbz);
+
+							foreach ($kennzeichen_toKeep_Keys as $key)
+							{
+								if (($kennzeichen_has_personToKeep[$key]->aktiv === 't' && $kennzeichen_toDelete->aktiv === 'f') ||
+									($kennzeichen_has_personToKeep[$key]->aktiv === 'f' && $kennzeichen_toDelete->aktiv === 't') ||
+									($kennzeichen_has_personToKeep[$key]->aktiv === 'f' && $kennzeichen_toDelete->aktiv === 'f'))
+								{
+									if ($kennzeichen_has_personToKeep[$key]->inhalt !== $kennzeichen_toDelete->inhalt)
+									{
+										$sql_query_upd1 .= "UPDATE public.tbl_kennzeichen SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE kennzeichen_id=" . $db->db_add_param($kennzeichen_toDelete->kennzeichen_id, FHC_INTEGER) . ";";
+										$kennzeichen_has_personToKeep[] = $kennzeichen_toDelete;
+										continue 2;
+									}
+									else
+									{
+										if ($kennzeichen_toDelete->aktiv === 'f')
+										{
+											$sql_query_upd1 .= "DELETE FROM public.tbl_kennzeichen WHERE kennzeichen_id=" . $db->db_add_param($kennzeichen_toDelete->kennzeichen_id, FHC_INTEGER) . ";";
+											$msg_warning[] = "Das nicht aktive Kennzeichen mit der ID '" . $kennzeichen_toDelete->kennzeichen_id . "' wurde gelöscht, <br>
+																da es der gleiche Inhalt wie beim Kennzeichen mit der ID '". $kennzeichen_has_personToKeep[$key]->kennzeichen_id ."' ist.";
+											continue 2;
+										}
+										$msg_error[] = 'Beide Personen haben ein Kennzeichen mit dem gleichen Typ ('. $kennzeichen_toDelete->kennzeichentyp_kurzbz.') und den gleichen Inhalt. Können nicht zusammengelegt werden.<br>
+														Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
+										$error = true;
+										break 2;
+									}
+								}
+								else if ($kennzeichen_has_personToKeep[$key]->aktiv === 't' && $kennzeichen_toDelete->aktiv === 't')
+								{
+									$msg_error[] = 'Beide Personen haben ein aktives Kennzeichen mit dem gleichen Typ ('. $kennzeichen_toDelete->kennzeichentyp_kurzbz.'). Können nicht zusammengelegt werden.<br>
+													Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
+										$error = true;
+										break 2;
+								}
+							}
+						}
+						else
+						{
+							$sql_query_upd1 .= "UPDATE public.tbl_kennzeichen SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE kennzeichen_id=" . $db->db_add_param($kennzeichen_toDelete->kennzeichen_id, FHC_INTEGER) . ";";
+						}
+					}
+				}
+			}
+
+			if($result = @$db->db_query("SELECT 1 FROM bis.tbl_uhstat1daten LIMIT 1"))
+			{
+				$uhstat_has_personToKeep = array();
+				$uhstat_has_personToDelete = array();
+
+				$uhstat_query = "
+					SELECT uhstat1daten_id, person_id
+					FROM bis.tbl_uhstat1daten
+					WHERE (
+						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
+						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
+					)
+					ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST";
+
+				// Herausfinden, ob UHSTAT Daten der löschenden oder zu belassenden Person zugeordnet sind
+				if ($result = $db->db_query($uhstat_query))
+				{
+					while ($row = $db->db_fetch_object($result))
+					{
+						if ($row->person_id === $personToKeep)
+						{
+							$uhstat_has_personToKeep[] = $row;
+						}
+						else if ($row->person_id === $personToDelete)
+						{
+							$uhstat_has_personToDelete[] = $row;
+						}
+					}
+				}
+
+				// wenn UHSTAT Daten an Person, die gelöscht werden soll, hängen
+				if (!empty($uhstat_has_personToDelete))
+				{
+					// Wenn es auch UHSTAT Daten für die Person, die bleibt, gibt
+					if (!empty($uhstat_has_personToKeep))
+					{
+						// Unklar: welche Version der Daten soll behalten werden?
+						$msg_error[] = 'Beide Personen haben UHSTAT1 Daten. Können nicht zusammengelegt werden.<br>
+						Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können:<br>
+						<a href="'.APP_ROOT.'index.ci.php/codex/UHSTAT1?person_id='.$personToDelete.'" target="_blank">zum UHSTAT von Person A</a>
+						/
+						<a href="'.APP_ROOT.'index.ci.php/codex/UHSTAT1?person_id='.$personToKeep.'" target="_blank">zum UHSTAT von Person B</a>
+						<br>';
+
+						$error = true;
+					}
+					else
+					{
+						// Es gibt nur UHSTAT Daten für die zu löschende Person: Update
+						foreach ($uhstat_has_personToDelete as $uhstat_toDelete)
+						{
+							$sql_query_upd1 .= "UPDATE bis.tbl_uhstat1daten SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE uhstat1daten_id=" . $db->db_add_param($uhstat_toDelete->uhstat1daten_id, FHC_INTEGER) . ";";
+						}
+					}
+				}
+			}
+
+			if($result = @$db->db_query("SELECT 1 FROM public.tbl_rueckstellung LIMIT 1"))
+			{
+				$rueckstellung_has_personToKeep = array();
+				$rueckstellung_has_personToDelete = array();
+
+				$rueckstellung_query = "
+					SELECT rueckstellung_id, person_id
+					FROM public.tbl_rueckstellung
+					WHERE (
+						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
+						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
+					)
+					ORDER BY insertamum DESC NULLS LAST";
+
+				// Herausfinden, ob Rueckstellung Daten der löschenden oder zu belassenden Person zugeordnet sind
+				if ($result = $db->db_query($rueckstellung_query))
+				{
+					while ($row = $db->db_fetch_object($result))
+					{
+						if ($row->person_id === $personToKeep)
+						{
+							$rueckstellung_has_personToKeep[] = $row;
+						}
+						else if ($row->person_id === $personToDelete)
+						{
+							$rueckstellung_has_personToDelete[] = $row;
+						}
+					}
+				}
+
+				// wenn Rueckstellung Daten an Person, die gelöscht werden soll, hängen
+				if (!empty($rueckstellung_has_personToDelete))
+				{
+					// Wenn es auch Rueckstellung Daten für die Person, die bleibt, gibt
+					if (!empty($rueckstellung_has_personToKeep))
+					{
+						// Unklar: welche Version der Daten soll behalten werden?
+						$msg_error[] = 'Beide Personen haben Rückstellung Daten. Können nicht zusammengelegt werden.<br>
+						Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
+						$error = true;
+					}
+					else
+					{
+						// Es gibt nur Rueckstellung Daten für die zu löschende Person: Update
+						foreach ($rueckstellung_has_personToDelete as $rueckstellung_toDelete)
+						{
+							$sql_query_upd1 .= "UPDATE public.tbl_rueckstellung SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE rueckstellung_id=" . $db->db_add_param($rueckstellung_toDelete->rueckstellung_id, FHC_INTEGER) . ";";
+						}
+					}
+				}
+			}
+
 			if ($error == false)
 			{
 				// Wenn bei einer der Personen das Foto gesperrt ist, dann die Sperre uebernehmen
@@ -437,7 +630,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 Alte Anmerkungen: ".$personToDelete_obj->anmerkungen;
 
 				$anmerkung .= "
-				
+
 Zusammengelegt mit Person-ID ".$personToDelete_obj->person_id." am ".date('d.m.Y H:i:s')." von ".$uid;
 
 				// Letztbenutzten Zugangscode abfragen und übernehmen
@@ -1335,7 +1528,7 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 			$messageOutput .= '<br/>'.$value;
 		}
 	}
-	echo '<br><br><div contenteditable="true" style="width: 100%; height : 150px; border : 1px dotted grey; overflow-y:auto; text-align: left; font-size: 9pt">' . $messageOutput . '</div><br>';
+	echo '<br><br><div contenteditable="false" style="width: 100%; height : 150px; border : 1px dotted grey; overflow-y:auto; text-align: left; font-size: 9pt">' . $messageOutput . '</div><br>';
 
 	// Tabellen anzeigen
 	echo '<form name="form_table" action="personen_wartung.php?filter='.$db->convert_html_chars($filter).'&person_id_1='.$person_id_1.'&person_id_2='.$person_id_2.'" method="POST">';

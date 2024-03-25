@@ -37,9 +37,12 @@ export default {
 			switch (this.data.status)
 			{
 				case 'Erstellt': return 'info';
-				case 'Genehmigt': return 'success';
-				case 'Zurueckgezogen': return 'danger';
-				default: return 'info';
+				case 'Pause':
+				case 'Zurueckgezogen':
+				case 'Abgelehnt': return 'danger';
+				case 'Genehmigt':
+				case 'EmailVersandt': return 'success';
+				default: return 'warning';
 			}
 		},
 		loadUrl() {
@@ -62,6 +65,18 @@ export default {
 				return datumUnformatted;
 			let datum = new Date(datumUnformatted);
 			return datum.toLocaleDateString();
+		},
+		semesterOffsets() {
+			if (!this.data || !this.data.studiensemester)
+				return [];
+			return Object.values(this.data.studiensemester)
+				.filter(el => !el.disabled)
+				.map(el => el.studiensemester_kurzbz);
+		},
+		semester() {
+			if (!this.stsem)
+				return '';
+			return this.data.semester + this.semesterOffsets.indexOf(this.stsem);
 		}
 	},
 	methods: {
@@ -74,8 +89,12 @@ export default {
 				result => {
 					this.data = result.data.retval;
 					if (this.data.status) {
+						const msg = (this.data.status == 'Pause' && this.data.status_insertvon == "Studienabbruch") ? Vue.computed(() => {
+							let status = this.$p.t('studierendenantrag/status_stop');
+							return this.$p.t('studierendenantrag', 'status_x', {status});
+						}) : Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp}));
 						this.$emit("setStatus", {
-							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
+							msg,
 							severity: this.statusSeverity
 						});
 					}
@@ -235,7 +254,7 @@ export default {
 						<tr>
 							<th>{{$p.t('lehre', 'semester')}}</th>
 							<td align="right" v-if="data.studierendenantrag_id">{{data.semester}}</td>
-							<td align="right" v-else>{{stsem === null ? '' : data.studiensemester[stsem].semester}}</td>
+							<td align="right" v-else>{{semester}}</td>
 						</tr>
 					</table>
 				</div>
@@ -256,7 +275,7 @@ export default {
 							:id="'studierendenantrag-form-abmeldung-' + uuid + '-stsem'"
 							@input="currentWiedereinstieg = ''"
 							>
-							<option v-for="(stsem, index) in data.studiensemester" :key="index" :value="index">
+							<option v-for="(stsem, index) in data.studiensemester" :key="index" :value="index" :disabled="stsem.disabled">
 								{{stsem.studiensemester_kurzbz}}
 							</option>
 						</select>
@@ -280,7 +299,7 @@ export default {
 					</div>
 					<div v-else>
 						<select v-model="currentWiedereinstieg" class="form-select">
-							<option v-for="sem in data.studiensemester[stsem].wiedereinstieg" :key="sem.studiensemester_kurzbz" :value="sem.start">
+							<option v-for="sem in data.studiensemester[stsem].wiedereinstieg" :key="sem.studiensemester_kurzbz" :value="sem.start" :disabled="sem.disabled">
 								{{sem.studiensemester_kurzbz}}
 							</option>
 						</select>
