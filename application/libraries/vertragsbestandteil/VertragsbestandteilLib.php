@@ -73,6 +73,11 @@ class VertragsbestandteilLib
 		return $ret;
 	}
 
+	public function fetchDienstverhaeltnisse($unternehmen, $stichtag=null, $mitarbeiteruid=null) {
+		$dvs = $this->DienstverhaeltnisModel->fetchDienstverhaeltnisse($unternehmen, $stichtag, $mitarbeiteruid);
+		return $dvs;
+	}
+
 	public function fetchDienstverhaeltnis($dienstverhaeltnis_id)
 	{
 		$result = $this->DienstverhaeltnisModel->load($dienstverhaeltnis_id);
