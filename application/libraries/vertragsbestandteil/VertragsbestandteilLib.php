@@ -388,26 +388,46 @@ class VertragsbestandteilLib
 		);
 	}
 
+	protected function hasOtherActiveDV(Dienstverhaeltnis $dv, $duedate)
+	{
+	    $hasotheractivedv = false;
+	    $result = $this->DienstverhaeltnisModel->getDVByPersonUID($dv->getMitarbeiter_uid(), null, $duedate);
+	    $dvs = getData($result);
+	    foreach ($dvs as $tmpdv)
+	    {
+		if(intval($tmpdv->dienstverhaeltnis_id) !== intval($dv->getDienstverhaeltnis_id()))
+		{
+		    $hasotheractivedv = true;
+		    break;
+		}
+	    }
+	    return $hasotheractivedv;
+	}
+
 	/**
 	 * like endDienstverhaeltnis, but also sets aktiv flag to false
 	 */
 	public function deactivateDienstverhaeltnis(Dienstverhaeltnis $dv, $enddate, $deactivate)
 	{
-		$result = $this->endDienstverhaeltnis($dv, $enddate);
-		if ( $result === true)
-		{
-			if (!$deactivate) return $result;
-			$result = $this->BenutzerModel->update(
-				array('uid' => $dv->getMitarbeiter_uid()),
-				array(
-					'aktiv' => false,
-					'updateaktivam' => date('Y-m-d'),
-					'updateaktivvon' => $this->loggedInUser
-				)
-			);
-		}
+	    $result = $this->endDienstverhaeltnis($dv, $enddate);
+	    if ( $result === true)
+	    {
+		if (!$deactivate) return $result;
 
-		return $result;
+		if(!$this->hasOtherActiveDV($dv, $enddate))
+		{
+		    $result = $this->BenutzerModel->update(
+			array('uid' => $dv->getMitarbeiter_uid()),
+			array(
+			    'aktiv' => false,
+			    'updateaktivam' => date('Y-m-d'),
+			    'updateaktivvon' => $this->loggedInUser
+			)
+		    );
+		}
+	    }
+
+	    return $result;
 	}
 
 	public function endDienstverhaeltnis(Dienstverhaeltnis $dv, $enddate)
