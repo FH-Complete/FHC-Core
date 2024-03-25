@@ -21991,7 +21991,7 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'studierendenantrag',
+		'category' => 'studierendenantrag',q
 		'phrase' => 'error_no_prestudent',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -25881,6 +25881,25 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Overall history',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_keineSchreibrechte',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie haben keine Schreibrechte fuer diesen Studiengang!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You do not have writing rights for this course!',
 				'description' => '',
 				'insertvon' => 'system'
 			)

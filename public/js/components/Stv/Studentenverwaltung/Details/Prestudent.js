@@ -116,8 +116,11 @@ export default {
 							});
 						}
 					}).catch(error => {
-						this.statusMsg = 'Error in Catch';
-						this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
+						if (error.response && error.response.data) {
+							this.$fhcAlert.alertError(error.response.data);
+						} else {
+							this.$fhcAlert.alertError("Fehler bei Speicherroutine aufgetreten");
+						}
 					}).finally(() => {
 						window.scrollTo(0, 0);
 					});

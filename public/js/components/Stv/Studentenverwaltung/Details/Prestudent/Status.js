@@ -375,7 +375,11 @@ export default{
 						}
 						else
 						{
-							const errorData = result.data.retval;
+/*							const errorData = result.data.retval;
+							Object.entries(errorData).forEach(entry => {
+								const [key, value] = entry;
+								this.$fhcAlert.alertError(value);
+							});*/
 							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
 						}
 						/*						return result;*/

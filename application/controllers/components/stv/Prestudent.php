@@ -16,9 +16,9 @@ class Prestudent extends FHC_Controller
 		$this->load->library('PermissionLib');
 
 		// Load language phrases
-		/*		$this->loadPhrases([
-					'ui'
-				]);*/
+		$this->loadPhrases([
+			'ui', 'studierendenantrag'
+		]);
 	}
 
 	public function get($prestudent_id)
@@ -44,20 +44,6 @@ class Prestudent extends FHC_Controller
 		$this->load->library('form_validation');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
-		//Todo(manu) Validierungen
-
-/*		$result = $this->PrestudentModel->loadWhere(['prestudent_id' =>$prestudent_id]);
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		} elseif (!hasData($result)) {
-			return $this->outputJson(getError($result));
-		} else {
-			$prestudentData = current(getData($result));
-		}
-
-		var_dump($prestudentData);*/
-
 		//get Studiengang von prestudent_id
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$result = $this->PrestudentModel->load([
@@ -74,12 +60,24 @@ class Prestudent extends FHC_Controller
 
 		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
 		{
-			$result = "Sie haben keine Schreibrechte fuer diesen Studiengang!";
+			$result =  $this->p->t('lehre','error_keineSchreibrechte');
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson($result);
 		}
 
+		//TODO(Manu) neuer API Controller
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+
+
+		//Form validation
+		$this->form_validation->set_rules('priorisierung', 'Priorisierung', 'numeric', [
+			'numeric' => $this->p->t('ui','error_fieldNotNumeric',['field' => 'Priorisierung'])
+		]);
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
 
 		$deltaData = $_POST;
 
@@ -147,11 +145,11 @@ class Prestudent extends FHC_Controller
 		}
 		$update_prestudent_encoded = array_map('utf8_decode_if_string', $update_prestudent);
 
-
 		if (count($update_prestudent) && $prestudent_id === null) {
 			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
-			// TODO(manu): phrase
-			return $this->outputJson("Kein/e PrestudentIn vorhanden!");
+			// TODO(manu): check phrase
+			//return $this->outputJson("Kein/e PrestudentIn vorhanden!");
+			return $this->outputJson($this->p->t('studierendenantrag','error_no_prestudent', $prestudent_id));
 		}
 
 		if (count($update_prestudent))

@@ -22,6 +22,7 @@ export default{
 					{title:"UID", field:"student_uid"},
 					{title:"Status", field:"status"}
 				],
+			//	tabulatorEvents: [],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
 				height:	'auto',
@@ -32,8 +33,10 @@ export default{
 	async mounted(){
 		await this.$p.loadCategory(['lehre']);
 
+		let cm = this.$refs.table.tabulator.columnManager;
+
 		cm.getColumnByField('orgform_kurzbz').component.updateDefinition({
-			title: this.$p.t('lehre', 'Organisationsform')
+			title: this.$p.t('lehre', 'organisationsform')
 		});
 
 		cm.getColumnByField('bezeichnung').component.updateDefinition({
