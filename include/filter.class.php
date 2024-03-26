@@ -215,6 +215,9 @@ class filter extends basis_db
 						$html .= '$("#' . $filter->kurzbz . '").datepicker({ dateFormat: \'yy-mm-dd\' });';
 						$html .= '</script>';
 						break;
+					case 'text':
+						$html .= '<input type="text" id="'.$filter->kurzbz.'" class="form-control" name="'.$filter->kurzbz.'" '.$filter->htmlattr.'>';
+						break;
 				}
 				return $html;
 			}
