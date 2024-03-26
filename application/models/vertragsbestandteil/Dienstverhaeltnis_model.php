@@ -143,7 +143,7 @@ EODVIDC;
 			AND
 				dv.oe_kurzbz = ?
 			AND
-				dv.vertragsart_kurzbz != 'werkvertrag'
+				dv.vertragsart_kurzbz NOT IN ('werkvertrag', 'studentischehilfskr')
 			AND
 				?::date <= COALESCE(dv.bis, '2170-12-31'::date)
 			AND
@@ -224,4 +224,22 @@ EOSQL;
 
     }
 
+    public function fetchDienstverhaeltnisse($unternehmen, $stichtag=null, $mitarbeiteruid=null) {
+	$where = "oe_kurzbz = " . $this->escape($unternehmen);
+	if( !is_null($stichtag) )
+	{
+		$where .= " AND " . $this->escape($stichtag) . " BETWEEN COALESCE(von, '1970-01-01') AND COALESCE(bis, '2070-12-31')";
+	}
+	if( !is_null($mitarbeiteruid) )
+	{
+		$where .= " AND mitarbeiter_uid = " . $this->escape($mitarbeiteruid);
+	}
+	$res = $this->loadWhere($where);
+	$dvs = array();
+	if(hasData($res) )
+	{
+		$dvs = getData($res);
+	}
+	return $dvs;
+    }
 }
