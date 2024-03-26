@@ -98,7 +98,7 @@ class vertragsbestandteil extends basis_db
 
 		$timestamp = is_null($datum) ? 'NOW()' :  '(date('. $this->db_add_param($datum).'))';
 
-		$qry = 'SELECT 
+		$qry = 'SELECT
 					vbt.vertragsbestandteil_id, vbt.dienstverhaeltnis_id, vbt.vertragsbestandteiltyp_kurzbz,
 					vbt.von, vbt.bis, vbt.insertamum, vbt.insertvon, vbt.updateamum, vbt.updatevon,
 					vbtza.zeitaufzeichnung, vbtza.azgrelevant, vbtza.homeoffice
@@ -108,8 +108,8 @@ class vertragsbestandteil extends basis_db
 				-- Dienstverhältnis(se) des Mitarbeiters
 				WHERE dv.mitarbeiter_uid = '. $this->db_add_param($mitarbeiter_uid). '
 				-- Zeitaufzeichnungspflichtig...
-				AND zeitaufzeichnung = TRUE 
-				-- ...im aktuellen Monat (default) oder im Monat des übergebenen $datums 
+				AND zeitaufzeichnung = TRUE
+				-- ...im aktuellen Monat (default) oder im Monat des übergebenen $datums
 				AND ((date_trunc(\'month\', '. $timestamp. ')::date < vbt.bis AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von) OR (vbt.bis IS NULL AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von))
 				-- Vorerst nur check, ob zumindest eine aufrechte Zeitaufzeichnungspflicht. Später Unterscheidung nach Dienstverhältnis.
 				ORDER BY vbt.von DESC --aktuellster
@@ -174,7 +174,7 @@ class vertragsbestandteil extends basis_db
 			return false;
 		}
 
-		$qry = 'SELECT 
+		$qry = 'SELECT
 					vbt.vertragsbestandteil_id, vbt.dienstverhaeltnis_id, vbt.vertragsbestandteiltyp_kurzbz,
 					vbt.von, vbt.bis, vbt.insertamum, vbt.insertvon, vbt.updateamum, vbt.updatevon,
 					vbtza.zeitaufzeichnung, vbtza.azgrelevant, vbtza.homeoffice
@@ -184,10 +184,10 @@ class vertragsbestandteil extends basis_db
 				-- Dienstverhältnis(se) des Mitarbeiters
 				WHERE dv.mitarbeiter_uid = '. $this->db_add_param($mitarbeiter_uid). '
 				-- Zeitaufzeichnungspflichtig
-				AND zeitaufzeichnung = TRUE 
-				-- Vertragsbestandteile sind aktuell, liegen nach dem GoLive und starten vor dem aktuellen Monatsletzten 
+				AND zeitaufzeichnung = TRUE
+				-- Vertragsbestandteile sind aktuell, liegen nach dem GoLive und starten vor dem aktuellen Monatsletzten
 				AND(
-					(COALESCE(vbt.bis, NOW()::date) > '. $this->db_add_param(CASETIME_TIMESHEET_GOLIVE). '::date) AND 
+					(COALESCE(vbt.bis, NOW()::date) > '. $this->db_add_param(CASETIME_TIMESHEET_GOLIVE). '::date) AND
 					(vbt.von < (date_trunc(\'month\', NOW()) + interval \'1 month - 1 day\')::date)
 				)
 				ORDER BY vbt.von ' . $order;
@@ -251,7 +251,7 @@ class vertragsbestandteil extends basis_db
 
 		$timestamp = is_null($datum) ? 'NOW()' :  '(date('. $this->db_add_param($datum).'))';
 
-		$qry = 'SELECT 
+		$qry = 'SELECT
 					vbt.vertragsbestandteil_id, vbt.dienstverhaeltnis_id, vbt.vertragsbestandteiltyp_kurzbz,
 					vbt.von, vbt.bis, vbt.insertamum, vbt.insertvon, vbt.updateamum, vbt.updatevon,
 					vbtza.zeitaufzeichnung, vbtza.azgrelevant, vbtza.homeoffice
@@ -261,11 +261,11 @@ class vertragsbestandteil extends basis_db
 				-- Dienstverhältnis(se) des Mitarbeiters
 				WHERE dv.mitarbeiter_uid = '. $this->db_add_param($mitarbeiter_uid). '
 				-- AZG-relevant...
-				AND azgrelevant = TRUE 
-				-- ...am aktuellen Tag (default) oder am Tag des übergebenen $datums 
+				AND azgrelevant = TRUE
+				-- ...am aktuellen Tag (default) oder am Tag des übergebenen $datums
 				AND (
 					(' . $timestamp . '::date BETWEEN vbt.von AND vbt.bis)
-					OR 
+					OR
 					(vbt.bis IS NULL AND ' . $timestamp . '::date > vbt.von)
 				)
 				ORDER BY vbt.von DESC --zur Sicherheit: aktuellster
@@ -324,7 +324,7 @@ class vertragsbestandteil extends basis_db
 
 		$timestamp = is_null($datum) ? 'NOW()' :  '(date('. $this->db_add_param($datum).'))';
 
-		$qry = 'SELECT 
+		$qry = 'SELECT
 					vbt.vertragsbestandteil_id, vbt.dienstverhaeltnis_id, vbt.vertragsbestandteiltyp_kurzbz,
 					vbt.von, vbt.bis, vbt.insertamum, vbt.insertvon, vbt.updateamum, vbt.updatevon,
 					vbtza.zeitaufzeichnung, vbtza.azgrelevant, vbtza.homeoffice
@@ -334,12 +334,12 @@ class vertragsbestandteil extends basis_db
 				-- Dienstverhältnis(se) des Mitarbeiters
 				WHERE dv.mitarbeiter_uid = '. $this->db_add_param($mitarbeiter_uid). '
 				-- Homeoffice...
-				AND homeoffice = TRUE 
-				-- ...am aktuellen Tag (default) oder am Tag des übergebenen $datums 
+				AND homeoffice = TRUE
+				-- ...am aktuellen Tag (default) oder am Tag des übergebenen $datums
 				AND (
 					(' . $timestamp . '::date BETWEEN vbt.von AND vbt.bis)
-					OR 
-					(vbt.bis IS NULL AND ' . $timestamp . '::date > vbt.von)
+					OR
+					(vbt.bis IS NULL AND ' . $timestamp . '::date >= vbt.von)
 				)
 				ORDER BY vbt.von DESC -- Zur Sicherheit: aktuellster
 				LIMIT 1';
@@ -396,7 +396,7 @@ class vertragsbestandteil extends basis_db
 	{
 		$timestamp = is_null($datum) ? 'NOW()' :  '(date('. $this->db_add_param($datum).'))';
 
-		$qry = 'SELECT 				
+		$qry = 'SELECT
        				vbt.vertragsbestandteil_id, vbt.dienstverhaeltnis_id, vbt.vertragsbestandteiltyp_kurzbz,
 					vbt.von, vbt.bis, vbt.insertamum, vbt.insertvon, vbt.updateamum, vbt.updatevon,
        				vbtft.freitexttyp_kurzbz, vbtftt.bezeichnung, vbtft.titel, vbtft.anmerkung
@@ -467,19 +467,19 @@ class vertragsbestandteil extends basis_db
 		$timestamp = is_null($datum) ? 'NOW()' :  '(date('. $this->db_add_param($datum).'))';
 
 		$qry = '
-				SELECT 
+				SELECT
 					1
-				FROM 
-					hr.tbl_vertragsbestandteil vbt 
-				JOIN 
+				FROM
+					hr.tbl_vertragsbestandteil vbt
+				JOIN
 					hr.tbl_dienstverhaeltnis dv USING (dienstverhaeltnis_id)
 				WHERE
 				    dv.mitarbeiter_uid = '. $this->db_add_param($mitarbeiter_uid). '
-				AND 
-					vbt.vertragsbestandteiltyp_kurzbz = \'karenz\' 
-				AND 
+				AND
+					vbt.vertragsbestandteiltyp_kurzbz = \'karenz\'
+				AND
 					vbt.von::date <= '. $timestamp. '::date
-				AND 
+				AND
 					vbt.bis::date >= '. $timestamp. '::date
 		';
 
@@ -515,7 +515,7 @@ class vertragsbestandteil extends basis_db
 	{
 		$timestamp = is_null($datum) ? 'NOW()' :  '(date('. $this->db_add_param($datum).'))';
 
-		$qry = 'SELECT 
+		$qry = 'SELECT
 					vbtstd.vertragsbestandteil_id,
 				   	vbtstd.wochenstunden,
 				   	vbtstd.teilzeittyp_kurzbz
@@ -528,17 +528,17 @@ class vertragsbestandteil extends basis_db
 				AND ((date_trunc(\'month\', '. $timestamp. ')::date < vbt.bis AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von) OR (vbt.bis IS NULL AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von))
 				-- DV mit Vertragsbestandteile Karenz herausnehmen, weil die Wochenstunden dieser DV dann ruhen
 				AND (
-					SELECT 
-						COUNT(*) AS karenzen 
-					FROM 
-						hr.tbl_vertragsbestandteil vbt 
-					WHERE 
+					SELECT
+						COUNT(*) AS karenzen
+					FROM
+						hr.tbl_vertragsbestandteil vbt
+					WHERE
 						vbt.dienstverhaeltnis_id = dv.dienstverhaeltnis_id
-					AND 
-						vbt.vertragsbestandteiltyp_kurzbz = \'karenz\' 
-					AND 
+					AND
+						vbt.vertragsbestandteiltyp_kurzbz = \'karenz\'
+					AND
 						vbt.von::date <= '. $timestamp. '::date
-					AND 
+					AND
 						vbt.bis::date >= '. $timestamp. '::date
 					) = 0
 				ORDER BY vbt.von DESC -- aktuellster

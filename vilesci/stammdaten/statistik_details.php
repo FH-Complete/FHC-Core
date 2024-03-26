@@ -189,7 +189,6 @@ if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 	derivedAttributes: {},
 	hiddenFromDragDrop: [],
 	autoSortUnusedAttrs: false,
-	aggregators: {},
 	unusedAttrsVertical: true,
 	hiddenFromAggregators: [],
 	sorters: {},
