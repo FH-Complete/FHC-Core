@@ -384,7 +384,8 @@ class Prestudentstatus_model extends DB_Model
 		}
 		else
 		{
-			return success("1", $this->p->t('studierendenantrag','error_rolleBereitsVorhanden'));
+			//TODO(manu) nur retval übergeben
+			return success("1", $this->p->t('lehre','error_rolleBereitsVorhanden'));
 		}
 	}
 
@@ -426,14 +427,20 @@ class Prestudentstatus_model extends DB_Model
 	 * @param integer $prestudent_id
 	 * @return success("1") if last prestudentstatusentry, else success("0")
 	 */
-	public function checkIfLastStatusEntry($prestudent_id)
+	public function checkIfLastStatusEntry($prestudent_id, $isStudent=false )
 	{
 		$qry = "SELECT
 					COUNT(*) as anzahl
 				FROM 
 				    public.tbl_prestudentstatus
 				WHERE
-					prestudent_id = ? ";
+					prestudent_id = ?
+				";
+
+		if($isStudent)
+		{
+			$qry .= "AND status_kurzbz = 'Student'";
+		}
 
 		$result = $this->execQuery($qry, array($prestudent_id));
 
@@ -451,11 +458,9 @@ class Prestudentstatus_model extends DB_Model
 				if ($anzahl <= 1 )
 				{
 					return success ("1", "Die letzte Rolle kann nur durch den Administrator geloescht werden");
-					//return error("Die letzte Rolle kann nur durch den Administrator geloescht werden");
 				}
 				else
 					return success("0", $anzahl . " Rollen vorhanden");
-					//return success($anzahl);
 
 			}
 			else
@@ -479,7 +484,6 @@ class Prestudentstatus_model extends DB_Model
 		{
 			return error("Datum eines neuen Statuseintrags darf nicht in der Vergangenheit liegen ");
 		}
-
 		else
 		{
 			return success();

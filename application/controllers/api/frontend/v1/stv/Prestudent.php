@@ -12,24 +12,23 @@ class Prestudent extends FHCAPI_Controller
 			'get' => ['admin:r', 'assistenz:r'],
 			'updatePrestudent' =>  ['admin:w', 'assistenz:w'],
 			'getHistoryPrestudents' => ['admin:r', 'assistenz:r'],
-			'getBezeichnungZGV' => 'admin:r', // TODO(manu): self::PERM_LOGGED
-			'getBezeichnungDZgv' => 'admin:r', // TODO(manu): self::PERM_LOGGED
-			'getBezeichnungMZgv' => 'admin:r', // TODO(manu): self::PERM_LOGGED
-			'getAusbildung' => 'admin:r', // TODO(manu): self::PERM_LOGGED
-			'getAufmerksamdurch' => 'admin:r', // TODO(manu): self::PERM_LOGGED
-			'getBerufstaetigkeit' => 'admin:r', // TODO(manu): self::PERM_LOGGED
-			'getTypenStg' => 'admin:r', // TODO(manu): self::PERM_LOGGED
-			'getStudiensemester' => 'admin:r', // TODO(manu): self::PERM_LOGGED
-			'getStudienplaene' => 'admin:r', // TODO(manu): self::PERM_LOGGED
+			'getBezeichnungZGV' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'getBezeichnungDZgv' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'getBezeichnungMZgv' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'getAusbildung' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'getAufmerksamdurch' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'getBerufstaetigkeit' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'getTypenStg' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'getStudiensemester' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'getStudienplaene' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
 		]);
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 
-
 		// Load language phrases
 		$this->loadPhrases([
-			'ui', 'studierendenantrag'
+			'ui', 'studierendenantrag', 'lehre'
 		]);
 	}
 
@@ -40,13 +39,15 @@ class Prestudent extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('*');
 		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
-		if (isError($result)) {
+		if (isError($result))
+		{
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		} elseif (!hasData($result)) {
-			return show_404();
-		} else {
-			$this->terminateWithSuccess(current(getData($result)));
 		}
+		if(!hasData($result))
+		{
+			return show_404();
+		}
+		$this->terminateWithSuccess(current(getData($result)));
 	}
 
 	public function updatePrestudent($prestudent_id)
@@ -66,6 +67,11 @@ class Prestudent extends FHCAPI_Controller
 		$result = current(getData($result));
 
 		$stg = $result->studiengang_kz;
+
+		if(!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
+		{
+			return $this->terminateWithError($this->p->t('lehre','error_keineSchreibrechte'), self::ERROR_TYPE_GENERAL);
+		}
 
 		//Form validation
 		$this->form_validation->set_rules('priorisierung', 'Priorisierung', 'numeric', [

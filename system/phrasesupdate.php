@@ -21991,7 +21991,7 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'studierendenantrag',q
+		'category' => 'studierendenantrag',
 		'phrase' => 'error_no_prestudent',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -25893,7 +25893,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Sie haben keine Schreibrechte fuer diesen Studiengang!',
+				'text' => 'Sie haben keine Schreibrechte für diesen Studiengang!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -25924,6 +25924,253 @@ array(
 				)
 			)
 		),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_keinReihungstestverfahren',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name}: Um einen Interessenten zum Bewerber zu machen, muss die Person das Reihungstestverfahren abgeschlossen haben!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name}: In order to turn an interested party into an applicant the person must have completed the ranking test process!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_ZGVNichtEingetragen',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name}: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name}: In order to turn an interested party into an applicant, the entry requirements must be entered!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_ZGVMasterNichtEingetragen',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name}: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name}: In order to turn an interested party into an applicant, the entry requirements for master studies must be entered!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_keinBewerber',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name} muss zuerst zum Bewerber gemacht werden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name} must be made an applicant first!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_noStudstatus',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ein Studentenstatus kann hier nur hinzugefuegt werden wenn die Person bereits Student ist. Um einen Bewerber zum Studenten zu machen waehlen Sie bitte unter "Status aendern" den Punkt "Student"',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student status can only be added here if the person is already a student. To turn an applicant into a student, please select "Student" under "Change status".',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_dataVorMeldestichtag',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag kann nicht hinzugefügt werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student status with a date or end of semester before the reporting deadline cannot be added',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_duringInsertUpdateLehrverband',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Ermitteln bzw Aktualisieren des Lehrverbands: es wurden keine Änderungen in der Datenbank gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during insert or update of Lehrverband: no changes were saved in the database',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_duringDeleteLehrverband',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Löschen des Lehrverbands: es wurden keine Änderungen in der Datenbank gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during deletion of Lehrverband: no changes were saved in the database',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_onlyAdminDeleteRolleStudent',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studentenrolle kann nur durch den Administrator geloescht werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during insert or update of Lehrverband: no changes were saved in the database',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_onlyAdminDeleteLastStatus',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die letzte Rolle kann nur durch den Administrator geloescht werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The last role can only be deleted by the administrator',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_noStatusFound',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler: Status nicht gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Status not found',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_statusConfirmedYet',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Status ist bereits bestätigt!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The status is already confirmed!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_bewerbungNochNichtAbgeschickt',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Bewerbung wurde noch nicht abgeschickt und kann deshalb nicht bestaetigt werden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The application has not yet been sent and therefore cannot be confirmed!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

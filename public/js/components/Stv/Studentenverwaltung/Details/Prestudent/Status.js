@@ -1,5 +1,4 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
-import {CoreRESTClient} from "../../../../../RESTClient";
 import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
@@ -47,8 +46,9 @@ export default{
 	data() {
 		return {
 			tabulatorOptions: {
-				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Status/getHistoryPrestudent/' + this.prestudent_id),
-				//autoColumns: true,
+				ajaxURL: 'api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.prestudent_id,
+				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Kurzbz", field: "status_kurzbz", tooltip: true},
 					{title: "StSem", field: "studiensemester_kurzbz"},
@@ -237,7 +237,6 @@ export default{
 	},
 	methods: {
 		actionNewStatus() {
-			console.log("Action: Neuen Status hinzufügen");
 			this.statusData.status_kurzbz = 'Interessent';
 			this.statusData.studiensemester_kurzbz = this.defaultSemester;
 			this.statusData.ausbildungssemester = 1;
@@ -246,7 +245,6 @@ export default{
 			this.$refs.newStatusModal.show();
 		},
 		actionEditStatus(status, stdsem, ausbildungssemester){
-			console.log("Action: Status bearbeiten: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
 			this.statusId = {
 				'prestudent_id': this.prestudent_id,
 				'status_kurzbz': status,
@@ -259,8 +257,6 @@ export default{
 			});
 		},
 		actionDeleteStatus(status, stdsem, ausbildungssemester){
-			console.log("Action: Status löschen: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
-			//this.$refs.deleteStatusModal.show();
 			this.statusId = {
 				'prestudent_id': this.prestudent_id,
 				'status_kurzbz': status,
@@ -276,8 +272,6 @@ export default{
 			});
 		},
 		actionAdvanceStatus(status, stdsem, ausbildungssemester){
-			console.log("Action: Status vorrücken: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
-			//this.$refs.deleteStatusModal.show();
 			this.statusId = {
 				'prestudent_id': this.prestudent_id,
 				'status_kurzbz': status,
@@ -290,8 +284,6 @@ export default{
 			});
 		},
 		actionConfirmStatus(status, stdsem, ausbildungssemester){
-			console.log("Action: Status bestätigen: (" + status + ": " + stdsem + "/" + ausbildungssemester + ")")
-			//this.$refs.deleteStatusModal.show();
 			this.statusId = {
 				'prestudent_id': this.prestudent_id,
 				'status_kurzbz': status,
@@ -304,112 +296,67 @@ export default{
 			});
 		},
 		addNewStatus(){
-			CoreRESTClient.post('components/stv/Status/addNewStatus/' + this.prestudent_id,
+			this.$fhcApi.post('api/frontend/v1/stv/status/addNewStatus/' + this.prestudent_id,
 				this.statusData
 			).then(response => {
-				if (!response.data.error) {
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.hideModal('newStatusModal');
 					this.resetModal();
-				} else {
-					const errorData = response.data.retval;
-					Object.entries(errorData).forEach(entry => {
-						const [key, value] = entry;
-						this.$fhcAlert.alertError(value);
-					});
-				}
-			}).catch(error => {
-				if (error.response) {
-					console.log(error.response);
-					this.$fhcAlert.alertError(error.response.data);
-				}
-			}).finally(() => {
+			}).catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 				window.scrollTo(0, 0);
 				this.reload();
 			});
 		},
 		advanceStatus(statusId){
-			return CoreRESTClient.post('components/stv/Status/advanceStatus/' +
+			return this.$fhcApi.post('api/frontend/v1/stv/status/advanceStatus/' +
 				this.statusId.prestudent_id + '/' +
 				this.statusId.status_kurzbz + '/' +
 				this.statusId.studiensemester_kurzbz + '/' +
 				this.statusId.ausbildungssemester)
 				.then(
 					result => {
-						if(!result.data.error) {
 							this.$fhcAlert.alertSuccess('Vorrückung Status erfolgreich');
-						}
-						else
-						{
-							const errorData = result.data.retval;
-							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
-						}
-						/*						return result;*/
-					}).catch(error => {
-					if (error.response) {
-						console.log(error.response);
-						this.$fhcAlert.alertError(error.response.data);
-					}
-				}).finally(() => {
+					})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
 				});
 		},
 		confirmStatus(statusId){
-			return CoreRESTClient.post('components/stv/Status/confirmStatus/' +
+			return this.$fhcApi.post('api/frontend/v1/stv/status/confirmStatus/' +
 				this.statusId.prestudent_id + '/' +
 				this.statusId.status_kurzbz + '/' +
 				this.statusId.studiensemester_kurzbz + '/' +
 				this.statusId.ausbildungssemester)
 				.then(
 					result => {
-						if(!result.data.error) {
 							this.$fhcAlert.alertSuccess('Bestätigung Status erfolgreich');
-						}
-						else
-						{
-							const errorData = result.data.retval;
-							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
-						}
-					}
-					).catch(error => {
-					if (error.response) {
-						console.log(error.response);
-						this.$fhcAlert.alertError(error.response.data);
-					}
-				}).finally(() => {
-					window.scrollTo(0, 0);
+					})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+/*					window.scrollTo(0, 0);*/
 					this.reload();
 				});
 		},
 		deleteStatus(status_id){
-			return CoreRESTClient.post('components/stv/Status/deleteStatus/',
+			return this.$fhcApi.post('api/frontend/v1/stv/status/deleteStatus/',
 				status_id)
 				.then(
 					result => {
-						if(!result.data.error) {
 							this.$fhcAlert.alertSuccess('Löschen erfolgreich');
 							this.hideModal('deleteStatusModal');
 							this.resetModal();
-						}
-						else
-						{
-							const errorData = result.data.retval;
-							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
-						}
-						/*						return result;*/
-					}).catch(error => {
-					if (error.response) {
-						//console.log(error.response);
-						this.$fhcAlert.alertError(error.response.data);
-					}
-				}).finally(() => {
+					})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
 				});
 		},
 		editStatus(){
-			return CoreRESTClient.post('components/stv/Status/updateStatus/' +
+			return this.$fhcApi.post('api/frontend/v1/stv/status/updateStatus/' +
 				this.statusId.prestudent_id + '/' +
 				this.statusId.status_kurzbz + '/' +
 				this.statusId.studiensemester_kurzbz + '/' +
@@ -417,33 +364,19 @@ export default{
 				this.statusData)
 				.then(
 					result => {
-						if(!result.data.error) {
 							this.$fhcAlert.alertSuccess('Bearbeitung Status erfolgreich');
 							this.hideModal('editStatusModal');
 							this.resetModal();
-						}
-						else
-						{
-/*							const errorData = result.data.retval;
-							Object.entries(errorData).forEach(entry => {
-								const [key, value] = entry;
-								this.$fhcAlert.alertError(value);
-							});*/
-							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
-						}
-						/*						return result;*/
-					}).catch(error => {
-					if (error.response) {
-						console.log(error.response);
-						this.$fhcAlert.alertError(error.response.data);
-					}
-				}).finally(() => {
+					})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
 				});
 		},
 		checkIfLastStatus(){
-			return CoreRESTClient.get('components/stv/Status/isLastStatus/' + this.prestudent_id)
+			return this.$fhcApi
+				.get('api/frontend/v1/stv/status/isLastStatus/' + this.prestudent_id)
 				.then(
 					result => {
 						if(result.data){
@@ -452,29 +385,17 @@ export default{
 							this.isLastStatus = {};
 						}
 						return result;
-					}).catch(error => {
-						if (error.response) {
-							console.log(error.response);
-							this.$fhcAlert.alertError(error.response.data);
-						}
-					}
-				);
+					})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		loadStatus(status_id){
-			return CoreRESTClient.post('components/stv/Status/loadStatus/',
+			return this.$fhcApi.post('api/frontend/v1/stv/status/loadStatus/',
 				status_id)
-				.then(
-					result => {
-						if(result.data.retval)
-							this.statusData = result.data.retval;
-						else
-						{
-							this.statusData = {};
-							this.$fhcAlert.alertError('Kein Status mit Id ' + status_id + ' gefunden');
-						}
+					.then(result => {
+							this.statusData = result.data;
 						return result;
-					}
-				);
+					})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		reload(){
 			this.$refs.table.reloadTable();
@@ -492,32 +413,32 @@ export default{
 		}
 	},
 	created(){
-		CoreRESTClient
-			.get('components/stv/Prestudent/getStudiensemester')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/prestudent/getStudiensemester')
+			.then(result => result.data)
 			.then(result => {
 				this.listStudiensemester = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Prestudent/getStudienplaene/' + this.prestudent_id)
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + this.prestudent_id)
+			.then(result => result.data)
 			.then(result => {
 				this.listStudienplaene = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Status/getStatusgruende/')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/status/getStatusgruende/')
+			.then(result => result.data)
 			.then(result => {
 				this.listStatusgruende = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Status/getLastBismeldestichtag/')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/status/getLastBismeldestichtag/')
+			.then(result => result.data)
 			.then(result => {
-				this.dataMeldestichtag = result[0].meldestichtag;
+				this.dataMeldestichtag = result.retval[0].meldestichtag;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
@@ -526,7 +447,6 @@ export default{
 	},
 	template: `
 		<div class="stv-list h-100 pt-3">
-		
 				
 			<!--Modal: Add New Status-->
 			<BsModal ref="newStatusModal">

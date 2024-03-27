@@ -81,7 +81,6 @@ export default {
 						this.actionUpdate = true;
 					}
 				}
-				//this.deltaArray.push(delta);
 				this.deltaArray = delta;
 			},
 			deep: true
