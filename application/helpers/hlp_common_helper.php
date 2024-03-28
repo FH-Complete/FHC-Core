@@ -422,3 +422,41 @@ function isValidDate($dateString)
 		return false;
 	}
 }
+
+
+// ------------------------------------------------------------------------
+// Collection of utility functions for form validation purposes
+// ------------------------------------------------------------------------
+
+/**
+ * check if string can be converted to a date
+ */
+function is_valid_date($dateString)
+{
+	try
+	{
+		return (new DateTime($dateString)) !== false;
+	}
+	catch(Exception $e)
+	{
+		return false;
+	}
+}
+
+/**
+ * check if given permissions are met
+ */
+function has_write_permissions($value, $permissions = '')
+{
+	if (!$permissions)
+		$permissions = $value; // TODO(chris): ??
+	$permissions = explode(',', $permissions);
+
+	$CI =& get_instance();
+	$CI->load->library('PermissionLib');
+	return $CI->permissionlib->hasAtLeastOne(
+		$permissions,
+		'sometable',
+		'w'
+	);
+}
