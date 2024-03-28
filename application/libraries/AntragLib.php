@@ -62,9 +62,11 @@ class AntragLib
 			'insertvon' => $insertvon
 		]);
 
-		// NOTE(chris): remove "preabbrecher" statusgrund for Stgl-Abmeldungen if set
+		// NOTE(chris): remove "preabbrecher" statusgrund and paused stati for sibling Anträge for Stgl-Abmeldungen if set
 		$res = $this->_ci->StudierendenantragModel->load($antrag_id);
 		if (hasData($res) && current(getData($res))->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL) {
+			$this->unpauseAntrag($antrag_id, Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL);
+
 			$this->_ci->PrestudentstatusModel->addSelect('tbl_status_grund.statusgrund_kurzbz');
 			$res = $this->_ci->PrestudentstatusModel->getLastStatusWithStgEmail(current(getData($res))->prestudent_id, '', 'Student');
 			if (hasData($res) && current(getData($res))->statusgrund_kurzbz == 'preabbrecher') {
@@ -80,6 +82,67 @@ class AntragLib
 			}
 		}
 
+		return $result;
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 * @param string		$insertvon
+	 *
+	 * @return stdClass
+	 */
+	public function pauseAntrag($antrag_id, $insertvon)
+	{
+		switch ($insertvon) {
+			case Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL:
+				$result = $this->_ci->StudierendenantragstatusModel->stopAntraegeForAbmeldungStgl($antrag_id);
+				break;
+			case Studierendenantragstatus_model::INSERTVON_DEREGISTERED:
+				$result = $this->_ci->StudierendenantragstatusModel->stopAntraegeForAbbruchBy($antrag_id);
+				break;
+			default:
+				$result = $this->_ci->StudierendenantragstatusModel->insert([
+					'studierendenantrag_id' => $antrag_id,
+					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_PAUSE,
+					'insertvon' => $insertvon
+				]);
+				break;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 * @param string		$insertvon
+	 *
+	 * @return stdClass
+	 */
+	public function unpauseAntrag($antrag_id, $insertvon)
+	{
+		if ($insertvon == Studierendenantragstatus_model::INSERTVON_DEREGISTERED)
+			return error($this->p->t('studierendenantrag', 'error_no_right'));
+		if ($insertvon == Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL) {
+			return $this->_ci->StudierendenantragstatusModel->resumeAntraegeForAbmeldungStgl($antrag_id);
+		}
+		// NOTE(chris): get last status that is not pause
+		$this->_ci->StudierendenantragstatusModel->addOrder('insertamum');
+		$this->_ci->StudierendenantragstatusModel->addLimit(1);
+		$result = $this->_ci->StudierendenantragstatusModel->loadWhere([
+			'studierendenantrag_id' => $antrag_id,
+			'studierendenantrag_statustyp_kurzbz !=' => Studierendenantragstatus_model::STATUS_PAUSE
+		]);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_antragstatus', ['id' => $antrag_id]));
+		$status = current(getData($result));
+
+		$result = $this->_ci->StudierendenantragstatusModel->insert([
+			'studierendenantrag_id' => $antrag_id,
+			'studierendenantrag_statustyp_kurzbz' => $status->studierendenantrag_statustyp_kurzbz,
+			'insertvon' => $insertvon
+		]);
 		return $result;
 	}
 
@@ -169,7 +232,7 @@ class AntragLib
 			if (isError($result))
 				$errors[] = getError($result);
 			else {
-				$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent ps','studiengang_kz');
+				$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent ps', 'studiengang_kz');
 				$result = $this->_ci->StudiengangModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
 				$stg = '';
 				$orgform = '';
@@ -190,6 +253,10 @@ class AntragLib
 						$vorlage ='Sancho_Mail_Antrag_A_Approve';
 						$subject = $this->_ci->p->t('studierendenantrag', 'mail_subject_A_Approve');
 
+						$result = $this->pauseAntrag($studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_DEREGISTERED);
+						if (isError($result))
+							$errors[] = getError($result);
+
 						$result = $this->_ci->prestudentlib->setAbbrecher(
                             $antrag->prestudent_id,
                             $antrag->studiensemester_kurzbz,
@@ -208,7 +275,13 @@ class AntragLib
 						$data = [
 							'student' => $this->_ci->p->t('person', 'studentIn'),
 							'sem' => $antrag->studiensemester_kurzbz,
-							'linkPdf' => base_url('content/pdfExport.php?xml=Antrag' . $antrag->typ . '.xml.php&xsl=Antrag' . $antrag->typ . '&id=' . $antrag->studierendenantrag_id . '&output=pdf')
+							'linkPdf' => base_url('content/pdfExport.php?xml=Antrag' .
+								$antrag->typ .
+								'.xml.php&xsl=Antrag' .
+								$antrag->typ .
+								'&id=' .
+								$antrag->studierendenantrag_id .
+								'&output=pdf')
 						];
 						if (hasData($result)) {
 							$person = current(getData($result));
@@ -229,6 +302,10 @@ class AntragLib
 						sendSanchoMail($vorlage, $data, $prestudent_status->email, $subject);
 					}
 				} else { // ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL)
+					$result = $this->pauseAntrag($studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL);
+					if (isError($result))
+						$errors[] = getError($result);
+					
 					$result = $this->_ci->PrestudentstatusModel->getLastStatusWithStgEmail($antrag->prestudent_id, '', 'Student');
 					if (isError($result))
 					{
@@ -340,6 +417,10 @@ class AntragLib
 		if (isError($result))
 			return $result;
 		else {
+			$result = $this->pauseAntrag($studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_DEREGISTERED);
+			// NOTE(chris): here we should have error handling but at the
+			// moment there is no way to notify the user for "soft" errors
+
 			$result = $this->_ci->prestudentlib->setAbbrecher(
                 $antrag->prestudent_id,
                 $antrag->studiensemester_kurzbz,
@@ -471,7 +552,6 @@ class AntragLib
 				'<br>Details:<br>' .
 				$error_msg;
 			} else {
-
 				$data = getData($data);
 
 				$result = $this->_ci->StudierendenantragstatusModel->insert([
@@ -582,7 +662,11 @@ class AntragLib
 								'nachname' => $data['person']->nachname,
 								'UID' => $data['UID'],
 								'sem' => $resultAntrag->studiensemester_kurzbz,
-								'linkPdf' => base_url('content/pdfExport.php?xml=AntragUnterbrechung.xml.php&xsl=AntragUnterbrechung&id=' . $studierendenantrag_id . '&output=pdf'),
+								'linkPdf' => base_url(
+									'content/pdfExport.php?xml=AntragUnterbrechung.xml.php&xsl=AntragUnterbrechung&id=' .
+									$studierendenantrag_id .
+									'&output=pdf'
+								),
 								'insertvon' => $approvedBy
 							],
 							$data['prestudent_status']->email,
@@ -699,7 +783,9 @@ class AntragLib
 								'Orgform' => $data['prestudent_status']->orgform_kurzbz,
 								'prestudent_id' => $data['prestudent_status']->prestudent_id,
 								'abmeldungLink' => site_url('lehre/Studierendenantrag/abmeldung/' . $data['prestudent_status']->prestudent_id),
-								'abmeldungLinkCIS' => CIS_ROOT . 'index.ci.php/lehre/Studierendenantrag/abmeldung/' . $data['prestudent_status']->prestudent_id
+								'abmeldungLinkCIS' => CIS_ROOT .
+									'index.ci.php/lehre/Studierendenantrag/abmeldung/' .
+									$data['prestudent_status']->prestudent_id
 							],
 							$data['email'],
 							$this->_ci->p->t('studierendenantrag', 'mail_subject_U_Reject')
@@ -734,7 +820,7 @@ class AntragLib
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $studierendenantrag_id]));
 
 		$result['antrag'] = $antrag = current($res);
-		$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent ps','studiengang_kz');
+		$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent ps', 'studiengang_kz');
 		$res = $this->_ci->StudiengangModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
 		if (hasData($res)) {
 			$result['studiengang'] = current(getData($res));
@@ -862,7 +948,9 @@ class AntragLib
 
 		$result = $this->_ci->StudierendenantragstatusModel->insert([
 			'studierendenantrag_id' => $antrag_id,
-			'studierendenantrag_statustyp_kurzbz' => $repeat ? Studierendenantragstatus_model::STATUS_CREATED : Studierendenantragstatus_model::STATUS_PASS,
+			'studierendenantrag_statustyp_kurzbz' => $repeat
+				? Studierendenantragstatus_model::STATUS_CREATED
+				: Studierendenantragstatus_model::STATUS_PASS,
 			'insertvon' => $insertvon
 		]);
 
@@ -878,8 +966,7 @@ class AntragLib
 			$email = $prestudent_status->email;
 			// NOTE(chris): Sancho mail
 			$lvzuweisungLink = site_url('lehre/Antrag/Wiederholung/assistenz/' . $antrag_id);
-			if( defined('VILESCI_ROOT') )
-			{
+			if (defined('VILESCI_ROOT')) {
 				$lvzuweisungLink = VILESCI_ROOT . 'index.ci.php/lehre/Antrag/Wiederholung/assistenz/' . $antrag_id;
 			}
 			sendSanchoMail(
@@ -888,7 +975,7 @@ class AntragLib
 					'antrag_id' => $antrag_id,
 					'stg' => $prestudent_status->stg_bezeichnung,
 					'Orgform' => $prestudent_status->orgform,
-					'lvzuweisungLink' => $lvzuweisungLink 
+					'lvzuweisungLink' => $lvzuweisungLink
 				],
 				$email,
 				$this->_ci->p->t('studierendenantrag', 'mail_subject_W_New')
@@ -1062,7 +1149,11 @@ class AntragLib
 			if (isError($result))
 				return $result;
 			if (!hasData($result))
-				return error($this->_ci->p->t('studierendenantrag', 'error_no_stdsem', ['studiensemester_kurzbz' => $antrag->studiensemester_kurzbz]));
+				return error($this->_ci->p->t(
+					'studierendenantrag',
+					'error_no_stdsem',
+					['studiensemester_kurzbz' => $antrag->studiensemester_kurzbz]
+				));
 			$asem = current(getData($result));
 
 			foreach ($stdsems as $sem) {
@@ -1117,7 +1208,6 @@ class AntragLib
 						$lv->antrag_anmerkung = $lvszugewiesen[$lv->lehrveranstaltung_id]->anmerkung;
 						$lv->antrag_zugelassen = true;
 					}
-
 				}
 			} else {
 				$lvsA = null;
@@ -1224,10 +1314,10 @@ class AntragLib
 	 * @param integer		$prestudent_id
 	 *
 	 * @return \stdClass	on success retval 0 means not a student;
-     *                      retval 1 means Berechtigt;
-     *                      retval -1 means has already an Antrag pending;
-     *                      retval -2 means other Antrag pending;
-     *                      retval -3 means in blacklist stg
+	 *                      retval 1 means Berechtigt;
+	 *                      retval -1 means has already an Antrag pending;
+	 *                      retval -2 means other Antrag pending;
+	 *                      retval -3 means in blacklist stg
 	 */
 	public function getPrestudentAbmeldeBerechtigt($prestudent_id)
 	{
@@ -1251,12 +1341,24 @@ class AntragLib
 
 		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist_abmeldung'))) {
 			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
-                'prestudent_id' => $prestudent_id,
-                'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED
-            ], [
-                Studierendenantrag_model::TYP_ABMELDUNG,
-                Studierendenantrag_model::TYP_ABMELDUNG_STGL
-            ]);
+				'prestudent_id' => $prestudent_id,
+				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED
+			], [
+				Studierendenantrag_model::TYP_ABMELDUNG,
+				Studierendenantrag_model::TYP_ABMELDUNG_STGL
+			]);
+			if (isError($result))
+				return $result;
+			if (hasData($result))
+				return success(-1);
+
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
+				'prestudent_id' => $prestudent_id,
+				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_PAUSE
+			], [
+				Studierendenantrag_model::TYP_ABMELDUNG,
+				Studierendenantrag_model::TYP_ABMELDUNG_STGL
+			]);
 			if (isError($result))
 				return $result;
 			if (hasData($result))
@@ -1297,12 +1399,12 @@ class AntragLib
 	 * @param string		$studiensemester_kurzbz		(optional)
 	 *
 	 * @return \stdClass	on success retval 0 means not a student;
-     *                      retval 1 means Berechtigt;
+	 *                      retval 1 means Berechtigt;
 	 * 						retval -1 means has already an Antrag pending;
 	 * 						retval -2 means other Antrag pending;
 	 * 						retval -3 means in blacklist stg
 	 */
-	public function getPrestudentUnterbrechungsBerechtigt($prestudent_id, $studiensemester_kurzbz = null)
+	public function getPrestudentUnterbrechungsBerechtigt($prestudent_id, $studiensemester_kurzbz = null, $datum_wiedereinstieg = null)
 	{
 		$result = $this->_ci->PrestudentModel->load($prestudent_id);
 		if (isError($result))
@@ -1320,18 +1422,10 @@ class AntragLib
 		if (!hasData($result))
 			return success(0);
 		$result = current(getData($result));
+		$prestudent_stdsem = $result->studiensemester_kurzbz;
 		$datumStatus = $result->datum;
-		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist'))) {
-			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
-				'prestudent_id' => $prestudent_id,
-				'typ' => Studierendenantrag_model::TYP_UNTERBRECHUNG,
-				'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED
-			]);
-			if (isError($result))
-				return $result;
-			if (hasData($result))
-				return success(-1);
-
+		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist'))
+			&& $result->status_kurzbz != 'Unterbrecher') {
 			return success(0);
 		}
 		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id]);
@@ -1339,7 +1433,8 @@ class AntragLib
 			return $result;
 		if (!hasData($result))
 			return success(1);
-		$result= getData($result);
+
+		$result = getData($result);
 		foreach ($result as $antrag)
 		{
 			if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG || $antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL)
@@ -1349,11 +1444,11 @@ class AntragLib
 				elseif($antrag->status == Studierendenantragstatus_model::STATUS_APPROVED && $antrag->datum > $datumStatus)
 					return success(-2);
 			}
-			if ($studiensemester_kurzbz && $antrag->typ == Studierendenantrag_model::TYP_UNTERBRECHUNG)
+			if ($antrag->typ == Studierendenantrag_model::TYP_UNTERBRECHUNG)
 			{
-				// NOTE(chris): check if this is an old or canceled one
-				if ($antrag->studiensemester_kurzbz == $studiensemester_kurzbz && $antrag->status != Studierendenantragstatus_model::STATUS_CANCELLED)
-					return success(-1);
+				// NOTE(chris): Ignore canceled ones
+				if ($antrag->status == Studierendenantragstatus_model::STATUS_CANCELLED)
+					continue;
 			}
 			if ($antrag->typ == Studierendenantrag_model::TYP_WIEDERHOLUNG)
 			{
@@ -1362,6 +1457,17 @@ class AntragLib
 			}
 		}
 
+		if (!$studiensemester_kurzbz) {
+			$sems = $this->getSemesterForUnterbrechung($prestudent_id, $prestudent_stdsem);
+			if (!count(array_filter($sems, function ($item) {
+				return !$item['disabled'];
+			})))
+				return success(-1);
+		} else {
+			if ($this->_ci->StudierendenantragModel->hasRunningUnterbrechungBetween($prestudent_id, $studiensemester_kurzbz, $datum_wiedereinstieg))
+				return success(-1);
+		}
+		
 		return success(1);
 	}
 
@@ -1406,7 +1512,27 @@ class AntragLib
 			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
 				'prestudent_id' => $prestudent_id,
 				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
-				'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED
+				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED
+			]);
+			if (isError($result))
+				return $result;
+			if (hasData($result))
+				return success(-1);
+
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
+				'prestudent_id' => $prestudent_id,
+				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
+				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_DEREGISTERED
+			]);
+			if (isError($result))
+				return $result;
+			if (hasData($result))
+				return success(-1);
+
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
+				'prestudent_id' => $prestudent_id,
+				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
+				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_PAUSE
 			]);
 			if (isError($result))
 				return $result;
@@ -1457,15 +1583,16 @@ class AntragLib
 		return success($result);
 	}
 
+	/**
+	 * Gets details for the latest Antrag of one or more types
+	 *
+	 * @param integer		$prestudent_id
+	 * @param array|string	$typ
+	 *
+	 * @return \stdClass
+	 */
 	public function getDetailsForLastAntrag($prestudent_id, $typ = null)
 	{
-		$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails($prestudent_id);
-		if (isError($result))
-			return $result;
-		if (!hasData($result))
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', ['prestudent_id' => $prestudent_id]));
-		$resultDetails = current(getData($result));
-
 		$where = [
 			'prestudent_id' => $prestudent_id
 		];
@@ -1494,21 +1621,20 @@ class AntragLib
 				'prestudent_id' => $prestudent_id
 			]));
 
-		$resultDetails->status = $resultAntrag->status;
-		$resultDetails->statustyp = $resultAntrag->statustyp;
-		$resultDetails->grund = $resultAntrag->grund;
-		$resultDetails->studierendenantrag_id = $resultAntrag->studierendenantrag_id;
-		$resultDetails->typ = $resultAntrag->typ;
-		$resultDetails->datum = $resultAntrag->datum;
-		$resultDetails->studiensemester_kurzbz = $resultAntrag->studiensemester_kurzbz;
-
-		return success($resultDetails);
+		return $this->addDetailsToAntrag($resultAntrag);
 	}
 
+	/**
+	 * Gets details for a specific Antrag
+	 *
+	 * @param integer		$studierendenantrag_id
+	 *
+	 * @return \stdClass
+	 */
 	public function getDetailsForAntrag($studierendenantrag_id)
 	{
 		$where = [
-			'studierendenantrag_id' => $studierendenantrag_id
+			's.studierendenantrag_id' => $studierendenantrag_id
 		];
 
 		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere($where);
@@ -1519,76 +1645,99 @@ class AntragLib
 			return error($this->_ci->p->t('studierendenantrag', "error_no_antrag_found", ['id' => $studierendenantrag_id]));
 		$resultAntrag = current(getData($result));
 
-		$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails($resultAntrag->prestudent_id, $resultAntrag->studiensemester_kurzbz);
+		return $this->addDetailsToAntrag($resultAntrag);
+	}
+
+	/**
+	 * Helper function for getDetailsForAntrag and getDetailsForLastAntrag
+	 *
+	 * @param \stdClass		$antrag
+	 *
+	 * @return \stdClass
+	 */
+	protected function addDetailsToAntrag($antrag)
+	{
+		$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails(
+			$antrag->prestudent_id,
+			$antrag->studiensemester_kurzbz,
+			$antrag->insertamum
+		);
 		if (isError($result))
 			return $result;
 		if (!hasData($result)) {
-			$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails($resultAntrag->prestudent_id);
+			$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails(
+				$antrag->prestudent_id,
+				null,
+				$antrag->insertamum
+			);
 			if (isError($result))
 				return $result;
 			if (!hasData($result))
-				return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', $resultAntrag));
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', $antrag));
+			$tmp = current(getData($result));
+			$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+			$res = $this->_ci->StudiensemesterModel->load($antrag->studiensemester_kurzbz);
+			if (hasData($res))
+				$tmp->studienjahr_kurzbz = current(getData($res))->studienjahr_kurzbz;
+			else
+				$tmp->studienjahr_kurzbz = '';
+			// NOTE(chris): the semester might not be correct on this fallback so we disable it
+			$tmp->semester = '';
 		}
-		$resultDetails = current(getData($result));
 
-		$resultDetails->status = $resultAntrag->status;
-		$resultDetails->statustyp = $resultAntrag->statustyp;
-		$resultDetails->grund = $resultAntrag->grund;
-		$resultDetails->studierendenantrag_id = $resultAntrag->studierendenantrag_id;
-		$resultDetails->typ = $resultAntrag->typ;
-		$resultDetails->dms_id = $resultAntrag->dms_id;
-		$resultDetails->datum_wiedereinstieg = $resultAntrag->datum_wiedereinstieg;
+		$result = current(getData($result));
 
-		return success($resultDetails);
+		$result->status = $antrag->status;
+		$result->statustyp = $antrag->statustyp;
+		$result->status_insertvon = $antrag->status_insertvon;
+		$result->grund = $antrag->grund;
+		$result->studierendenantrag_id = $antrag->studierendenantrag_id;
+		$result->typ = $antrag->typ;
+		$result->datum = $antrag->datum;
+		$result->dms_id = $antrag->dms_id;
+		$result->datum_wiedereinstieg = $antrag->datum_wiedereinstieg;
+
+		return success($result);
 	}
 
-	public function getSemesterForUnterbrechung($studiensemester_kurzbz)
+	/**
+	 * Rearrange the free semester slots for a new Unterbrechung
+	 *
+	 * @param integer		$prestudent_id
+	 * @param string		$studiensemester_kurzbz
+	 *
+	 * @return array
+	 */
+	public function getSemesterForUnterbrechung($prestudent_id, $studiensemester_kurzbz)
 	{
-		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-
-		$semester = [];
-
-		$result = $this->_ci->StudiensemesterModel->getNextFrom($studiensemester_kurzbz);
-		if (!hasData($result))
-			return $semester;
-		$nextSem = current(getData($result));
-
-		$semester[0] = [
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'wiedereinstieg' => [$nextSem]
-		];
-
-		$result = $this->_ci->StudiensemesterModel->getNextFrom($nextSem->studiensemester_kurzbz);
-		if (!hasData($result))
-			return $semester;
-
-		$currSemester = current(getData($result));
-		$followingSemester = [$currSemester];
-
-		$max = $this->_ci->config->item('unterbrecher_semester_max_length');
-		if(!$max || $max < 1)
-			$max = 2;
-
-		for ($i = 1; $i < $max; $i++) {
-			$result = $this->_ci->StudiensemesterModel->getNextFrom($currSemester->studiensemester_kurzbz);
-			if (!hasData($result))
-				break;
-			$currSemester = current(getData($result));
-			$followingSemester[] = $currSemester;
-		}
-
-		$semester[1] = [
-			'studiensemester_kurzbz' => $nextSem->studiensemester_kurzbz,
-			'wiedereinstieg' => $followingSemester
-		];
-
-		//remove last Semester of the array
-		array_pop($followingSemester);
-
-		foreach ($followingSemester as $sem)
-			$semester[0]['wiedereinstieg'][] = $sem;
-
-		return $semester;
+		$result = $this->_ci->StudierendenantragModel->getFreeSlotsForUnterbrechung($prestudent_id, $studiensemester_kurzbz);
+		if (isError($result))
+			return [];
+		$result = getData($result);
+		if (!$result)
+			return [];
+		return array_reduce($result, function ($carry, $item) {
+			if (!isset($carry[$item->von]))
+				$carry[$item->von] = [
+					'studienjahr_kurzbz' => $item->studienjahr_kurzbz,
+					'studiensemester_kurzbz' => $item->von,
+					'wiedereinstieg' => [],
+					'disabled' => true
+				];
+			
+			$carry[$item->von]['wiedereinstieg'][] = [
+				'studiensemester_kurzbz' => $item->bis,
+				'start' => $item->ende,
+				'disabled' => (boolean)$item->studierendenantrag_id
+			];
+			
+			if ($carry[$item->von]['disabled'] && !$item->studierendenantrag_id) {
+				$carry[$item->von]['disabled'] = false;
+			}
+			
+			return $carry;
+		}, []);
+		return $result;
 	}
 
 	public function getAktivePrestudentenInStgs($studiengaenge, $query)
@@ -1664,7 +1813,6 @@ class AntragLib
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_antrag', ['id' => $antrag_id]));
 
 		$stg = current($result);
-		$studiengang_kz = $stg->studiengang_kz;
 		$semester = $stg->ausbildungssemester;
 
 		$result = $this->_ci->StudierendenantragModel->load($antrag_id);
@@ -1726,9 +1874,7 @@ class AntragLib
 			$result = $this->getLvsForAntrag($antrag_id);
 			if (hasData($result)) {
 				$lvs = getData($result);
-				$repeat_last = false;
 				if (isset($lvs['repeat_last'])) {
-					$repeat_last = true;
 					unset($lvs['repeat_last']);
 					$vorlage .= '_Lst';
 				}
@@ -1900,6 +2046,26 @@ class AntragLib
 	 *
 	 * @return boolean
 	 */
+	public function isEntitledToPauseAntrag($antrag_id)
+	{
+		return ($this->hasAccessToAntrag($antrag_id, 'student/antragfreigabe') || $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag'));
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
+	public function isEntitledToUnpauseAntrag($antrag_id)
+	{
+		return $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag');
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
 	public function isEntitledToReopenAntrag($antrag_id)
 	{
 		return $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag');
@@ -1933,6 +2099,36 @@ class AntragLib
 	public function isEntitledToRejectAntrag($antrag_id)
 	{
 		return $this->hasAccessToAntrag($antrag_id, 'student/antragfreigabe');
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
+	public function antragCanBeManualPaused($antrag_id)
+	{
+		$this->_ci->StudierendenantragModel->db->where_not_in('campus.get_status_studierendenantrag(studierendenantrag_id)', [
+			Studierendenantragstatus_model::STATUS_DEREGISTERED,
+			Studierendenantragstatus_model::STATUS_APPROVED,
+			Studierendenantragstatus_model::STATUS_PAUSE
+		]);
+		$result = $this->_ci->StudierendenantragModel->loadWhere([
+			'studierendenantrag_id' => $antrag_id,
+			'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG
+		]);
+
+		return hasData($result);
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
+	public function antragCanBeManualUnpaused($antrag_id)
+	{
+		return $this->_ci->StudierendenantragModel->isManuallyPaused($antrag_id);
 	}
 
 	/**

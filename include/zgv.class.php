@@ -187,16 +187,16 @@ class zgv extends basis_db
 	public function getAllDoktor($onlyAktiv = false)
 	{
 		$sprache = new sprache();
-		$qry='SELECT *,'.$sprache->getSprachQuery('bezeichnung').' FROM bis.tbl_zgvdoktor;';
-		
+		$qry='SELECT *,'.$sprache->getSprachQuery('bezeichnung').' FROM bis.tbl_zgvdoktor';
+
 		if ($onlyAktiv === true)
 		{
 			$qry .= " WHERE aktiv";
 		}
-		
+
 		$qry .= " ORDER BY zgvdoktor_bez";
-		
-		
+
+
 		if($result = $this->db_query($qry))
 		{
 			while($row= $this->db_fetch_object($result))
