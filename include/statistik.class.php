@@ -527,6 +527,7 @@ class statistik extends basis_db
 				$uid = get_uid();
 				$sql = str_replace('$user',$this->db_add_param($uid),$sql);
 			}
+
 			foreach($_REQUEST as $name=>$value)
 			{
 				// Inputs, die in eckigen Klammern stehen, werden als Array interpretiert

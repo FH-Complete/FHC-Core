@@ -268,7 +268,12 @@ class filter extends basis_db
 						$html .= '</script>';
 						break;
 					case 'text':
-						$html .= '<input type="text" id="'.$filter->kurzbz.'" class="form-control" name="'.$filter->kurzbz.'" '.$filter->htmlattr.'>';
+						$html .= '<input type="text" id="'.$filter->kurzbz.'" class="form-control" name="'.$filter->kurzbz.'" '.$filter->htmlattr;
+						if (isset($getParams[$filter->kurzbz]))
+						{
+							$html .= ' value="'.$getParams[$filter->kurzbz].'"';
+						}
+						$html .= '>';
 						break;
 				}
 				return $html;
