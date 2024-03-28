@@ -86,7 +86,7 @@ class Unterbrechung extends FHC_Controller
 
 		$data = getData($result);
 
-		$data->studiensemester = $this->antraglib->getSemesterForUnterbrechung($data->studiensemester_kurzbz);
+		$data->studiensemester = $this->antraglib->getSemesterForUnterbrechung($prestudent_id, null);
 
 		$this->outputJsonSuccess($data);
 	}
@@ -136,7 +136,7 @@ class Unterbrechung extends FHC_Controller
 		$datum_wiedereinstieg = $this->input->post('datum_wiedereinstieg');
 		$dms_id = null;
 
-		$result = $this->antraglib->getPrestudentUnterbrechungsBerechtigt($prestudent_id);
+		$result = $this->antraglib->getPrestudentUnterbrechungsBerechtigt($prestudent_id, $studiensemester, $datum_wiedereinstieg);
 		if (isError($result)) {
 			return $this->outputJsonError(['db' => getError($result)]);
 		}
