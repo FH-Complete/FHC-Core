@@ -106,18 +106,16 @@ export default {
 				return;
 
 			this.abortController.suggestions = new AbortController();
-			CoreRESTClient
-				.post('components/stv/student/check', {
+			// TODO(chris): move to fhcapi.factory
+			this.$fhcapi
+				.post('api/frontend/v1/stv/student/check', {
 					vorname: this.formData.vorname,
 					nachname: this.formData.nachname,
 					gebdatum: this.formData.gebdatum
 				}, {
 					signal: this.abortController.suggestions.signal
 				})
-				.then(result => CoreRESTClient.getData(result.data) || [])
-				.then(result => {
-					this.suggestions = result;
-				})
+				.then(result => this.suggestions = result.data)
 				.catch(error => {
 					// NOTE(chris): repeat request
 					if (error.code != "ERR_CANCELED")
@@ -191,13 +189,14 @@ export default {
 			if (data.studiensemester_kurzbz === undefined)
 				data.studiensemester_kurzbz = this.studiensemesterKurzbz;
 
+			// TODO(chris): move to fhcapi.factory
 			this.$refs.form
-				.send(CoreRESTClient.post('components/stv/student/add', data))
+				.send('api/frontend/v1/stv/student/add', data)
 				.then(result => {
 					this.$fhcAlert.alertSuccess('Gespeichert');
 					this.$refs.modal.hide();
 				})
-				.catch(console.error);
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	created() {

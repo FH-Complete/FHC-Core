@@ -1,14 +1,17 @@
 import {CoreRESTClient} from '../../../../RESTClient.js';
-import FormForm from '../../../Form/Form.js';
+import CoreForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
 import FormUploadImage from '../../../Form/Upload/Image.js';
+
+import CoreUdf from '../../../Udf/Udf.js';
 
 
 export default {
 	components: {
-		FormForm,
+		CoreForm,
 		FormInput,
-		FormUploadImage
+		FormUploadImage,
+		CoreUdf
 	},
 	inject: {
 		showBpk: {
@@ -39,6 +42,7 @@ export default {
 	},
 	data() {
 		return {
+			test: {udf_viaf: 'TEST'},
 			familienstaende: {
 				"": "--keine Auswahl--",
 				"g": "geschieden",
@@ -49,6 +53,7 @@ export default {
 			original: null,
 			data: null,
 			changed: {},
+			udfChanges: false,
 			studentIn: null,
 			gebDatumIsValid: false,
 			gebDatumIsInvalid: false
@@ -90,25 +95,33 @@ export default {
 	},
 	methods: {
 		updateStudent(n) {
-			CoreRESTClient
-				.get('components/stv/Student/get/' + n.prestudent_id)
-				.then(result => result.data)
+			// TODO(chris): move to fhcapi.factory
+			this.$fhcApi
+				.get('api/frontend/v1/stv/student/get/' + n.prestudent_id)
 				.then(result => {
-					this.data = result;
+					this.data = result.data;
 					if (!this.data.familienstand)
 						this.data.familienstand = '';
-					this.original = {...this.data};
+					this.original = {...(this.original || {}), ...this.data};
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		save() {
+			if (!this.changedLength)
+				return;
+
+			this.$refs.form.clearValidation();
 			this.$refs.form
-				.send(CoreRESTClient.post('components/stv/Student/save/' + this.modelValue.prestudent_id, this.changed))
+				.post('api/frontend/v1/stv/student/save/' + this.modelValue.prestudent_id, this.changed)
 				.then(result => {
 					this.original = {...this.data};
 					this.changed = {};
+					this.$refs.form.setFeedback(true, result.data);
 				})
-				.catch(this.$fhcAlert.handleSystemError);
+				.catch(this.$fhcAlert.handleSystemError)
+		},
+		udfsLoaded(udfs) {
+			this.original = {...(this.original || {}), ...udfs};
 		}
 	},
 	created() {
@@ -117,7 +130,7 @@ export default {
 	//TODO(chris): Phrasen
 	//TODO(chris): Geburtszeit? Anzahl der Kinder?
 	template: `
-	<form-form ref="form" class="stv-details-details" @submit.prevent="save">
+	<core-form ref="form" class="stv-details-details" @submit.prevent="save">
 		<div class="position-sticky top-0 z-1">
 			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!changedLength">Speichern</button>
 		</div>
@@ -235,6 +248,7 @@ export default {
 						:enable-time-picker="false"
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
+						teleport
  						>
 					</form-input>
 					<form-input
@@ -362,6 +376,7 @@ export default {
 			<div v-else>
 				Loading...
 			</div>
+			<core-udf @load="udfsLoaded" v-model="data" class="row-cols-3 g-3 mb-3" ci-model="person/person" :pk="{person_id:modelValue.person_id}"></core-udf>
 		</fieldset>
 		<fieldset v-if="data?.student_uid" class="overflow-hidden">
 			<legend>StudentIn</legend>
@@ -441,5 +456,5 @@ export default {
 				Loading...
 			</div>
 		</fieldset>
-	</form-form>`
+	</core-form>`
 };
