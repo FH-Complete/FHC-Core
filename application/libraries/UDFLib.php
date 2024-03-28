@@ -65,6 +65,8 @@ class UDFLib
 
 	private $_udfUniqueId; // Property that contains the UDF widget unique id
 
+	private $_definition_cache = [];
+
 	/**
 	 * Gets CI instance
 	 */
@@ -611,6 +613,160 @@ class UDFLib
 			array($session[self::PRIMARY_KEY_NAME] => $session[self::PRIMARY_KEY_VALUE]),
 			get_object_vars($udfs)
 		);
+	}
+
+	/**
+	 * Gets the UDF definitions for a model
+	 *
+	 * @param DB_Model			$targetModel
+	 *
+	 * @return stdClass
+	 */
+	public function getDefinitionForModel($targetModel)
+	{
+		$dbTable = $targetModel->getDbTable();
+		if (!isset($this->_definition_cache[$dbTable])) {
+			$this->_ci->load->model('system/UDF_model', 'UDFModel');
+			list($schema, $table) = explode('.', $dbTable);
+			$result = $this->_ci->UDFModel->loadWhere([
+				'schema' => $schema,
+				'table' => $table
+			]);
+			if (isError($result))
+				return $result;
+
+			$this->_definition_cache[$dbTable] = json_decode(current($result->retval)->jsons, true);
+		}
+		return success($this->_definition_cache[$dbTable]);
+	}
+
+	/**
+	 * Gets the UDFs for db entry with translated params and resolved listValues for dropdowns
+	 *
+	 * @param DB_Model			$targetModel
+	 * @param mixed				$id
+	 *
+	 * @return stdClass
+	 */
+	public function getFieldArray($targetModel, $id)
+	{
+		// Load Libraries
+		$this->_ci->load->library('PhrasesLib');
+		$this->_ci->load->library('PermissionLib');
+
+		$result = $this->getDefinitionForModel($targetModel);
+		if (isError($result))
+			return $result;
+		$definitions = getData($result);
+	
+		usort($definitions, function ($a, $b) {
+			return $a[self::SORT] - $b[self::SORT];
+		});
+
+		$values = $targetModel->getUDFs($id);
+
+		$fields = [];
+		foreach ($definitions as $field) {
+			// check read permissions
+			if (!$this->_ci->permissionlib->hasAtLeastOne(
+				$field[self::REQUIRED_PERMISSIONS_PARAMETER],
+				self::PERMISSION_TABLE_METHOD,
+				self::PERMISSION_TYPE_READ
+			))
+				continue;
+
+			// set value
+			if (isset($values[$field[self::NAME]])) {
+				$field['value'] = $values[$field[self::NAME]];
+			} elseif (isset($field['defaultValue'])) {
+				$field['value'] = $field['defaultValue'];
+			} elseif (isset($field[self::TYPE]) && $field[self::TYPE] == 'checkbox') {
+				$field['value'] = false;
+			} else {
+				$field['value'] = '';
+			}
+
+			// translate params
+			foreach ([self::LABEL, self::TITLE, self::PLACEHOLDER] as $key) {
+				if (isset($field[$key])) {
+					$res = $this->_ci->phraseslib->getPhrases(self::PHRASES_APP_NAME, getUserLanguage(), $field[$key], null, null, 'no');
+					if (hasData($res))
+						$field[$key] = current(getData($res))->text;
+				}
+			}
+
+			// check write permissions
+			$field['disabled'] = !$this->_ci->permissionlib->hasAtLeastOne(
+				$field[self::REQUIRED_PERMISSIONS_PARAMETER],
+				self::PERMISSION_TABLE_METHOD,
+				self::PERMISSION_TYPE_WRITE
+			);
+			
+			// set listValues for dropdowns
+			if (isset($field[self::LIST_VALUES])) {
+				if (isset($field[self::LIST_VALUES]['enum'])) {
+					$field['options'] = $field[self::LIST_VALUES]['enum'];
+				} elseif (isset($field[self::LIST_VALUES]['sql'])) {
+					$res = $this->_ci->UDFModel->execReadOnlyQuery($field[self::LIST_VALUES]['sql']);
+					$field['options'] = hasData($res) ? getData($res) : [];
+				}
+			}
+
+			// add to array
+			$fields[] = $field;
+		}
+		return success($fields);
+	}
+
+	/**
+	 * Gets a validation config array for CI form_validation
+	 *
+	 * @param DB_Model			$targetModel
+	 * @param array				(optional) $filter
+	 *
+	 * @return stdClass
+	 */
+	public function getCiValidations($targetModel, $filter = null)
+	{
+		$result = $this->getDefinitionForModel($targetModel);
+		if (isError($result))
+			return $result;
+		$definitions = getData($result);
+
+		$result = [];
+		foreach ($definitions as $def) {
+			if ($filter && !isset($filter[$def['name']]))
+				continue;
+			$validations = [];
+			if (isset($def['requiredPermissions']))
+				$validations[] = 'has_write_permissions[' . implode(',', $def['requiredPermissions']) . ']';
+			if (isset($def['required']))
+				$validations[] = 'required';
+			if (isset($def['validation'])) {
+				if (isset($def['validation']['max-value']))
+					$validations[] = 'less_than_equal_to[' . $def['validation']['max-value'] . ']';
+				if (isset($def['validation']['min-value']))
+					$validations[] = 'greater_than_equal_to[' . $def['validation']['min-value'] . ']';
+				if (isset($def['validation']['max-length']))
+					$validations[] = 'max_length[' . $def['validation']['max-length'] . ']';
+				if (isset($def['validation']['min-length']))
+					$validations[] = 'min_length[' . $def['validation']['min-length'] . ']';
+				if (isset($def['validation']['regex']) && is_array($def['validation']['regex'])) {
+					foreach ($def['validation']['regex'] as $regex) {
+						if ($regex['language'] == 'php') {
+							$validations[] = 'regex_match[' . $regex['expression'] . ']';
+						}
+					}
+				}
+			}
+			if ($validations)
+				$result[] = [
+					'field' => $def['name'],
+					'label' => $def['title'],
+					'rules' => $validations
+				];
+		}
+		return success($result);
 	}
 
 	// -------------------------------------------------------------------------------------------------
