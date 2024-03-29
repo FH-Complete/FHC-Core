@@ -203,7 +203,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Typ" control="student-pruefung-menulist-typ"/>
 										<menulist id="student-pruefung-menulist-typ" disabled="true"
 										          datasources="<?php echo APP_ROOT; ?>rdf/pruefungstyp.rdf.php?abschluss=false" flex="1"
-										          ref="http://www.technikum-wien.at/pruefungstyp/liste" >
+										          ref="http://www.technikum-wien.at/pruefungstyp/liste"
+										          oncommand="StudentPruefungTypChange()">
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#pruefungstyp_kurzbz"
@@ -249,6 +250,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<hbox>
 					      					<box class="Datum" id="student-pruefung-textbox-datum" disabled="true"/>
 					      					<spacer flex="1" />
+					      				</hbox>
+									</row>
+									<row id="student-pruefung-textbox-datum-hinweis" hidden="true">
+										<label></label>
+										<hbox>
+					      					<image height="17" width="17" class="alert-icon"/>
+					      					<description class="small-margin">
+					      						Bitte das Datum der Benotung eintragen und nicht das Datum der Prüfung.
+					      					</description>
 					      				</hbox>
 									</row>
 					      			<row>
