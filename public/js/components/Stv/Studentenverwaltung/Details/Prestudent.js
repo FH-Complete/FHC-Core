@@ -103,7 +103,7 @@ export default {
 			this.$refs.form
 				.post('api/frontend/v1/stv/prestudent/updatePrestudent/' + this.modelValue.prestudent_id, this.deltaArray)
 				.then(response => {
-					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.deltaArray = [];
 					this.actionUpdate = false;
 				})

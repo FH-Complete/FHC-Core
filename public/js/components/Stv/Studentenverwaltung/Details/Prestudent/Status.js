@@ -299,7 +299,7 @@ export default{
 			this.$fhcApi.post('api/frontend/v1/stv/status/addNewStatus/' + this.prestudent_id,
 				this.statusData
 			).then(response => {
-					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('newStatusModal');
 					this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
@@ -316,7 +316,7 @@ export default{
 				this.statusId.ausbildungssemester)
 				.then(
 					result => {
-							this.$fhcAlert.alertSuccess('Vorrückung Status erfolgreich');
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successAdvance'));
 					})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -332,7 +332,7 @@ export default{
 				this.statusId.ausbildungssemester)
 				.then(
 					result => {
-							this.$fhcAlert.alertSuccess('Bestätigung Status erfolgreich');
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successConfirm'));
 					})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -345,7 +345,7 @@ export default{
 				status_id)
 				.then(
 					result => {
-							this.$fhcAlert.alertSuccess('Löschen erfolgreich');
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 							this.hideModal('deleteStatusModal');
 							this.resetModal();
 					})
@@ -364,9 +364,9 @@ export default{
 				this.statusData)
 				.then(
 					result => {
-							this.$fhcAlert.alertSuccess('Bearbeitung Status erfolgreich');
-							this.hideModal('editStatusModal');
-							this.resetModal();
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+						this.hideModal('editStatusModal');
+						this.resetModal();
 					})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {

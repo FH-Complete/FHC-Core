@@ -26247,7 +26247,44 @@ array(
 			)
 		)
 	),
-
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successAdvance',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vorrückung Status erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Advance status successful',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successConfirm',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigung Status erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Confirmation status successful',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

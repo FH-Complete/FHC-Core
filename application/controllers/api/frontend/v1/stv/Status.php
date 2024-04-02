@@ -26,7 +26,7 @@ class Status extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui', 'bismeldestichtag','lehre'
+			'ui', 'bismeldestichtag','lehre','studierendenantrag'
 		]);
 	}
 
@@ -659,7 +659,7 @@ class Status extends FHCAPI_Controller
 			}
 			if (!hasData($result))
 			{
-				return $this->terminateWithError($this->p->t('studierendenantrag','error_no_student_for_prestudent'), self::ERROR_TYPE_GENERAL);
+				return $this->terminateWithError($this->p->t('studierendenantrag','error_no_student_for_prestudent',['prestudent_id' => $prestudent_id]), self::ERROR_TYPE_GENERAL);
 			}
 			$student_uid = $result->retval;
 
@@ -1070,7 +1070,7 @@ class Status extends FHCAPI_Controller
 			}
 			if (!hasData($result))
 			{
-				$this->terminateWithError($this->p->t('lehre','error_no_student_for_prestudent'), self::ERROR_TYPE_GENERAL);
+				$this->terminateWithError($this->p->t('studierendenantrag','error_no_student_for_prestudent',['prestudent_id' => $prestudent_id]), self::ERROR_TYPE_GENERAL);
 			}
 			$student_uid = $result->retval;
 
@@ -1236,7 +1236,7 @@ class Status extends FHCAPI_Controller
 		}
 		if (!hasData($result))
 		{
-			$this->terminateWithError($this->p->t('lehre','error_no_student_for_prestudent'), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('studierendenantrag','error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]), self::ERROR_TYPE_GENERAL);
 		}
 		$student_uid = $result->retval;
 
