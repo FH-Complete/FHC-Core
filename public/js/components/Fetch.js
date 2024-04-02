@@ -99,7 +99,7 @@ export const CoreFetchCmpt = {
 		 *
 		 */
 		errorHandler: function(error) {
-			if (error.response.data.retval)
+			if (error.response?.data?.retval)
 				this.setError(error.response.data.retval);
 			else
 				this.setError(error.message);

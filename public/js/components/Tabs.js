@@ -71,7 +71,7 @@ export default {
 
 					tabs[key] = {
 						component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
-						title: item.title || key,
+						title: Vue.computed(() => item.title || key),
 						config: item.config,
 						key
 					}
@@ -83,7 +83,7 @@ export default {
 
 					tabs[key] = {
 						component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
-						title: item.title || key,
+						title: Vue.computed(() => item.title || key),
 						config: item.config,
 						key
 					}
