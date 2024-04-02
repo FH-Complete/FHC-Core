@@ -68,7 +68,9 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
         INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('karenz_ende','Karenz Ende', 6);
         INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('zeitaufzeichnung_beginn','Zeitaufzeichnung Beginn', 7);
         INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('zeitaufzeichnung_ende','Zeitaufzeichnung Ende', 8);
-        INSERT INTO hr.tbl_frist_ereignis (ereignis_kurzbz , bezeichnung, manuell, sort) VALUES('manuell','Manuell', true, 9);
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('befristung_beginn','Befristung Beginn', 9);
+        INSERT INTO hr.tbl_frist_ereignis(ereignis_kurzbz, bezeichnung, sort) VALUES('befristung_ende','Befristung Ende', 10);
+        INSERT INTO hr.tbl_frist_ereignis (ereignis_kurzbz , bezeichnung, manuell, sort) VALUES('manuell','Manuell', true, 11);
 
 
         ";
