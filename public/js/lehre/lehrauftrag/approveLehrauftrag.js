@@ -225,7 +225,7 @@ function func_selectableCheck(row){
 // Adds column status
 function func_tableBuilt(table) {
     // Add status column to table
-    table.addColumn(
+    table.tabulator("addColumn",
         {
             title: "<i class='fa fa-user-o'></i>",
             field: "status",
@@ -402,7 +402,11 @@ status_formatter = function(cell, formatterParams, onRendered){
 };
 
 // Generates status tooltip
-status_tooltip = function(cell){
+status_tooltip = function(e, cell, onRendered){
+    //e - mouseover event
+    //cell - cell component
+    //onRendered - onRendered callback registration function
+    
     var is_dummy = (cell.getRow().getData().personalnummer <= 0 && cell.getRow().getData().personalnummer != null);
 
     var bestellt = cell.getRow().getData().bestellt;
@@ -503,6 +507,17 @@ akzeptiert_tooltip = function(e, cell, onRendered){
     }
 }
 $(function() {
+
+    // tableInit is called in the jquery_wrapper when the tableBuilt event was finished
+    $(document).on("tableInit", function(event,tabulatorInstance) {
+     
+        func_tableBuilt($("#tableWidgetTabulator"))
+        
+        // event rowSelectionChanged needs to be attached as a callback to the tableBuilt event in tabulator5
+        $("#tableWidgetTabulator").tabulator("on","renderStarted",()=>func_renderStarted(tabulatorInstance));
+        $("#tableWidgetTabulator").tabulator("on","rowUpdated",(row)=>func_rowUpdated(row));
+       
+    });
 
     // Redraw table on resize to fit tabulators height to windows height
     window.addEventListener('resize', function(){

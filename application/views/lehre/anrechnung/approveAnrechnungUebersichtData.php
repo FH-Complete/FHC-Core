@@ -226,10 +226,13 @@ $filterWidgetArray = array(
             func_rowFormatter(row,this);
         },
 		columnDefaults:{
-			headerFilterPlaceholder: " ",
+			
+			//columnDefaults tooltip did not work
+			
 			tooltip:function(e, cell, onRendered){
 				return func_tooltips(cell);
-			}
+			},
+			headerFilterPlaceholder: " ",
 		}
 		
 	 }', // tabulator properties

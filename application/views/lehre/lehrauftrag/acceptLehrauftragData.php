@@ -330,7 +330,7 @@ $filterWidgetArray = array(
 		height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
+	    
         index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
@@ -338,24 +338,16 @@ $filterWidgetArray = array(
         selectableCheck: function(row){
             return func_selectableCheck(row);
         },
-        rowUpdated:function(row){
-            func_rowUpdated(row);
-        },
         rowFormatter:function(row){
             func_rowFormatter(row);
         },
-        tableBuilt: function(){
-            func_tableBuilt(this);
-        },
-        renderComplete:function(){
-            func_renderComplete(this);
-        },
-         renderStarted:function(){
-            func_renderStarted(this);
-        },
+      
 		tableWidgetFooter: {
 			selectButtons: true
-		}
+		},
+        columnsDefaults:{
+            headerFilterPlaceholder: " ",
+        }
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         row_index: {visible:false},     // necessary for row indexing

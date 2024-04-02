@@ -70,7 +70,7 @@ var form_formatNulltoStringNumber = function(cell, formatterParams, onRendered){
 // -----------------------------------------------------------------------------------------------------------------
 
 // Filters values using comparison operator or just by string comparison
-function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData){
+function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData, filterParams){
 
 	// If string starts with <, <=, >, >=, !=, ==, compare values with that operator
 	var operator = '';

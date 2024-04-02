@@ -203,16 +203,16 @@ function func_rowSelectionChanged(data, rows, tabulatorInstance){
 }
 
 // Returns tooltip
-function func_tooltips(e, cell, onRendered){
+function func_tooltips(){
     //e - mouseover event
     //cell - cell component
     //onRendered - onRendered callback registration function
-    
-    console.log("TOOLTIP DEBUG",cell);
-    // Return tooltip if row is unselectable
-    if (true || !func_selectableCheck(cell.getRow())){
-        return FHC_PhrasesLib.t("ui", "nichtSelektierbarAufgrundVon") + 'Status';
-    }
+    console.log("here");
+    // console.log("TOOLTIP DEBUG",cell);
+    // // Return tooltip if row is unselectable
+    // if (true || !func_selectableCheck(cell.getRow())){
+    //     return FHC_PhrasesLib.t("ui", "nichtSelektierbarAufgrundVon") + 'Status';
+    // }
 }
 
 // Formats empfehlung_anrechnung

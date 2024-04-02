@@ -51,7 +51,7 @@ var mut_formatStringDate = function(value, data, type, params, component) {
 // -----------------------------------------------------------------------------------------------------------------
 
 // Formats null values to a string number '0.00'
-var form_formatNulltoStringNumber = function(cell, formatterParams){
+var form_formatNulltoStringNumber = function(cell, formatterParams, onRendered){
 	if (cell.getValue() == null){
 		if (formatterParams.precision == 1)
 		{
@@ -69,7 +69,7 @@ var form_formatNulltoStringNumber = function(cell, formatterParams){
 // -----------------------------------------------------------------------------------------------------------------
 
 // Filters values using comparison operator or just by string comparison
-function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData){
+function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData, filterParams){
 
 	// If string starts with <, <=, >, >=, !=, ==, compare values with that operator
 	var operator = '';
@@ -346,7 +346,11 @@ status_formatter = function(cell, formatterParams, onRendered){
 };
 
 // Generates status tooltip
-status_tooltip = function(cell){
+status_tooltip = function(e, cell, onRendered){
+	//e - mouseover event
+	//cell - cell component
+	//onRendered - onRendered callback registration function
+
 	var bestellt = cell.getRow().getData().bestellt;
 	var erteilt = cell.getRow().getData().erteilt;
 	var akzeptiert = cell.getRow().getData().akzeptiert;
@@ -403,7 +407,11 @@ status_tooltip = function(cell){
 }
 
 // Generates bestellt tooltip
-bestellt_tooltip = function(cell){
+bestellt_tooltip = function(e, cell, onRendered){
+	//e - mouseover event
+	//cell - cell component
+	//onRendered - onRendered callback registration function
+
 	if (cell.getRow().getData().bestellt_von != null)
 	{
 		return FHC_PhrasesLib.t("ui", "bestelltVon") + cell.getRow().getData().bestellt_von;
@@ -411,21 +419,33 @@ bestellt_tooltip = function(cell){
 }
 
 // Generates erteilt tooltip
-erteilt_tooltip = function(cell){
+erteilt_tooltip = function(e, cell, onRendered){
+	//e - mouseover event
+	//cell - cell component
+	//onRendered - onRendered callback registration function
+
 	if (cell.getRow().getData().erteilt_von != null) {
 		return FHC_PhrasesLib.t("ui", "erteiltVon") + cell.getRow().getData().erteilt_von;
 	}
 }
 
 // Generates akzeptiert tooltip
-akzeptiert_tooltip = function(cell){
+akzeptiert_tooltip = function(e, cell, onRendered){
+	//e - mouseover event
+	//cell - cell component
+	//onRendered - onRendered callback registration function
+
 	if (cell.getRow().getData().akzeptiert_von != null) {
 		return FHC_PhrasesLib.t("ui", "angenommenVon") + cell.getRow().getData().akzeptiert_von;
 	}
 }
 
 // Generates storniert tooltip
-storniert_tooltip = function(cell){
+storniert_tooltip = function(e, cell, onRendered){
+	//e - mouseover event
+	//cell - cell component
+	//onRendered - onRendered callback registration function
+	
 	if (cell.getRow().getData().storniert_von != null) {
 		return FHC_PhrasesLib.t("ui", "storniertVon") + cell.getRow().getData().storniert_von;
 	}
@@ -434,6 +454,21 @@ storniert_tooltip = function(cell){
 $(function() {
 	// Pruefen ob Promise unterstuetzt wird
 	// Tabulator funktioniert nicht mit IE
+
+
+	// tableInit is called in the jquery_wrapper when the tableBuilt event was finished
+    $(document).on("tableInit", function(event,tabulatorInstance) {
+		
+		//passing the tabulator instance because the acceptLehrauftrag site loads two tabulator tables
+        func_tableBuilt(tabulatorInstance)
+        
+        // using the tabulator instance instead of the jquery object because the site loads two different tabulator tables
+		tabulatorInstance.on("renderComplete",()=>{func_renderComplete(tabulatorInstance)});
+		tabulatorInstance.on("renderStarted",()=>{func_renderStarted(tabulatorInstance)});
+		tabulatorInstance.on("rowUpdated",(row)=>{func_rowUpdated(row)});
+       
+    });
+
 	var canPromise = !! window.Promise;
 	if(!canPromise)
 	{

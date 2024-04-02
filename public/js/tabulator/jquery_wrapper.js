@@ -47,6 +47,7 @@
      					that[key] = this[key].bind(this);
 					}
      			}
+				console.log("here the table is building")
 				$(document).trigger("tableInit",[this]);
     		});
 

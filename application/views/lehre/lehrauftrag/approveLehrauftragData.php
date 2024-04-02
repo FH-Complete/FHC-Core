@@ -404,7 +404,7 @@ $filterWidgetArray = array(
         vertrag_id: {visible: false},
         vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
-        mitarbeiter_uid: {visible: false, headerFilter:"input"},func_initialFilter
+        mitarbeiter_uid: {visible: false, headerFilter:"input"},
         bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
         erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
         akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},

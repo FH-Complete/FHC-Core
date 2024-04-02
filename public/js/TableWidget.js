@@ -727,7 +727,6 @@ var FHC_TableWidget = {
 	_getRepresentationFieldsDefinitions: function(data) {
 
 		var fieldsDefinitions = {}; // eventually contains record fields definitions
-
 		// Checks if record fields definitions was given as parameter
 		if (data.hasOwnProperty("datasetRepresentationFieldsDefinitions") && data.datasetRepresentationFieldsDefinitions != "")
 		{
