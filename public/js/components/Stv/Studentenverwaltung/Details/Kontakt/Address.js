@@ -17,7 +17,9 @@ export default{
 	data() {
 		return{
 			tabulatorOptions: {
-				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Kontakt/getAdressen/' + this.uid),
+				ajaxURL: 'api/frontend/v1/stv/Kontakt/getAdressen/' + this.uid,
+				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
 				columns:[
 					{title:"Typ", field:"bezeichnung"},
@@ -80,7 +82,55 @@ export default{
 				selectable:	true,
 				index: 'adresse_id',
 			},
-			tabulatorEvents: [],
+			tabulatorEvents: [
+				{
+					event: 'tableBuilt',
+					handler: async () => {
+						await this.$p.loadCategory(['notiz','global','person']);
+						let cm = this.$refs.table.tabulator.columnManager;
+
+						cm.getColumnByField('bezeichnung').component.updateDefinition({
+							title: this.$p.t('global', 'typ')
+						});
+						cm.getColumnByField('strasse').component.updateDefinition({
+							title: this.$p.t('person', 'strasse')
+						});
+						cm.getColumnByField('plz').component.updateDefinition({
+							title: this.$p.t('person', 'plz')
+						});
+						cm.getColumnByField('ort').component.updateDefinition({
+							title: this.$p.t('person', 'ort')
+						});
+						cm.getColumnByField('gemeinde').component.updateDefinition({
+							title: this.$p.t('person', 'gemeinde')
+						});
+						cm.getColumnByField('nation').component.updateDefinition({
+							title: this.$p.t('person', 'nation')
+						});
+						cm.getColumnByField('heimatadresse').component.updateDefinition({
+							title: this.$p.t('person', 'heimatadresse')
+						});
+						cm.getColumnByField('co_name').component.updateDefinition({
+							title: this.$p.t('person', 'co_name')
+						});
+						cm.getColumnByField('name').component.updateDefinition({
+							title: this.$p.t('person', 'firma_zusatz')
+						});
+						cm.getColumnByField('firmenname').component.updateDefinition({
+							title: this.$p.t('person', 'firma')
+						});
+						cm.getColumnByField('updateamum').component.updateDefinition({
+							title: this.$p.t('notiz', 'letzte_aenderung')
+						});
+						cm.getColumnByField('rechnungsadresse').component.updateDefinition({
+							title: this.$p.t('person', 'rechnungsadresse')
+						});
+						cm.getColumnByField('anmerkung').component.updateDefinition({
+							title: this.$p.t('notiz', 'document')
+						});
+					}
+				}
+			],
 			addressData: {
 				zustelladresse: true,
 				heimatadresse: true,
@@ -132,29 +182,20 @@ export default{
 			this.loadAdress(adress_id).then(() => {
 				if(this.addressData.adresse_id)
 					if(this.addressData.heimatadresse)
-						this.$fhcAlert.alertError("Heimatadressen dürfen nicht gelöscht werden, da diese für die BIS-Meldung relevant sind. Um die Adresse dennoch zu löschen, entfernen sie das Häkchen bei Heimatadresse!");
+						this.$fhcAlert.alertError(this.$p.t('person', 'error_deleteHomeAdress'));
 					else
 						this.$refs.deleteAdressModal.show();
 			});
 		},
 		addNewAddress(addressData) {
-			CoreRESTClient.post('components/stv/Kontakt/addNewAddress/' + this.uid,
+			this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewAddress/' + this.uid,
 				this.addressData
 			).then(response => {
-				if (!response.data.error) {
-					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('newAdressModal');
 					this.resetModal();
-				} else {
-					const errorData = response.data.retval;
-					Object.entries(errorData).forEach(entry => {
-						const [key, value] = entry;
-						this.$fhcAlert.alertError(value);
-					});
-				}
-			}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
-			}).finally(() => {
+			}).catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 				window.scrollTo(0, 0);
 				this.reload();
 			});
@@ -163,60 +204,38 @@ export default{
 			this.$refs.table.reloadTable();
 		},
 		loadAdress(adress_id){
-			return CoreRESTClient.get('components/stv/Kontakt/loadAddress/' + adress_id)
-				.then(
-					result => {
-						if(result.data.retval)
-							this.addressData = result.data.retval;
-						else
-						{
-							this.addressData = {};
-							this.$fhcAlert.alertError('Keine Adresse mit Id ' + adress_id + ' gefunden');
-						}
+			return this.$fhcApi.get('api/frontend/v1/stv/kontakt/loadAddress/' + adress_id)
+				.then(result => {
+						this.addressData = result.data;
 						return result;
-					}
-			);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateAddress(adress_id){
-			CoreRESTClient.post('components/stv/Kontakt/updateAddress/' + adress_id,
+			this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateAddress/' + adress_id,
 				this.addressData
 			).then(response => {
-				if (!response.data.error) {
-					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('editAdressModal');
 					this.resetModal();
-				} else {
-					const errorData = response.data.retval;
-					Object.entries(errorData).forEach(entry => {
-						const [key, value] = entry;
-						this.$fhcAlert.alertError(value);
-					});
-				}
-			}).catch(error => {
-				this.statusMsg = 'Error in Catch';
-				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
-			}).finally(() => {
+			}).catch(this.$fhcAlert.handleSystemError)
+			.finally(() => {
 				window.scrollTo(0, 0);
 				this.reload();
 			});
 		},
 		deleteAddress(adress_id){
-			CoreRESTClient.post('components/stv/Kontakt/deleteAddress/' + adress_id)
+			this.$fhcApi.post('api/frontend/v1/stv/kontakt/deleteAddress/' + adress_id)
 				.then(response => {
-					if (!response.data.error) {
-						this.$fhcAlert.alertSuccess('Löschen erfolgreich');
-					} else {
-						this.$fhcAlert.alertError('Keine Adresse mit Id ' + adress_id + ' gefunden');
-					}
-				}).catch(error => {
-					this.$fhcAlert.alertError('Fehler bei Löschroutine aufgetreten');
-				}).finally(()=> {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+				}).catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
 					window.scrollTo(0, 0);
 					this.hideModal('deleteAdressModal');
 					this.reload();
 				});
 		},
-		loadPlaces() {
+		loadPlaces() { //TODO(manu) Refactor API-controller
 			if (this.abortController.places)
 				this.abortController.places.abort();
 			if (this.addressData.nation != 'A' || !this.addressData.plz)
@@ -241,10 +260,10 @@ export default{
 				});*/
 		},
 		search(event) {
-			return CoreRESTClient
-				.get('components/stv/Kontakt/getFirmen/' + event.query)
+			return this.$fhcApi
+				.get('api/frontend/v1/stv/kontakt/getFirmen/' + event.query)
 				.then(result => {
-					this.filteredFirmen = CoreRESTClient.getData(result.data);
+					this.filteredFirmen = result.data.retval;
 				});
 		},
 		reload(){
@@ -266,59 +285,12 @@ export default{
 				this.nations = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Kontakt/getAdressentypen')
+		this.$fhcApi
+			.get('api/frontend/v1/stv/kontakt/getAdressentypen')
 			.then(result => {
 				this.adressentypen = result.data;
 			})
-			.catch(err => {
-				console.error(err.response.data || err.message);
-			});
-	},
-	async mounted() {
-		await this.$p.loadCategory(['notiz','global','person']);
-
-		let cm = this.$refs.table.tabulator.columnManager;
-
-		cm.getColumnByField('bezeichnung').component.updateDefinition({
-			title: this.$p.t('global', 'typ')
-		});
-		cm.getColumnByField('strasse').component.updateDefinition({
-			title: this.$p.t('person', 'strasse')
-		});
-		cm.getColumnByField('plz').component.updateDefinition({
-			title: this.$p.t('person', 'plz')
-		});
-		cm.getColumnByField('ort').component.updateDefinition({
-			title: this.$p.t('person', 'ort')
-		});
-		cm.getColumnByField('gemeinde').component.updateDefinition({
-			title: this.$p.t('person', 'gemeinde')
-		});
-		cm.getColumnByField('nation').component.updateDefinition({
-			title: this.$p.t('person', 'nation')
-		});
-		cm.getColumnByField('heimatadresse').component.updateDefinition({
-			title: this.$p.t('person', 'heimatadresse')
-		});
-		cm.getColumnByField('co_name').component.updateDefinition({
-			title: this.$p.t('person', 'co_name')
-		});
-		cm.getColumnByField('name').component.updateDefinition({
-			title: this.$p.t('person', 'firma_zusatz')
-		});
-		cm.getColumnByField('firmenname').component.updateDefinition({
-			title: this.$p.t('person', 'firma')
-		});
-		cm.getColumnByField('updateamum').component.updateDefinition({
-			title: this.$p.t('notiz', 'letzte_aenderung')
-		});
-		cm.getColumnByField('rechnungsadresse').component.updateDefinition({
-			title: this.$p.t('person', 'rechnungsadresse')
-		});
-		cm.getColumnByField('anmerkung').component.updateDefinition({
-			title: this.$p.t('notiz', 'document')
-		});
+			.catch(this.$fhcAlert.handleSystemError)
 	},
 	template: `
 		<div class="stv-list h-100 pt-3">
@@ -590,7 +562,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Neu"
+			new-btn-label="Adresse"
 			@click:new="actionNewAdress"
 			>
 				<button v-if="reload" class="btn btn-outline-warning" aria-label="Reload">

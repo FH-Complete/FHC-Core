@@ -16,7 +16,9 @@ export default{
 	data() {
 		return{
 			tabulatorOptions: {
-				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Kontakt/getKontakte/' + this.uid),
+				ajaxURL: 'api/frontend/v1/stv/Kontakt/getKontakte/' + this.uid,
+				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxResponse: (url, params, response) => response.data,
 				columns:[
 					{title:"Typ", field:"kontakttyp"},
 					{title:"Kontakt", field:"kontakt"},
@@ -65,7 +67,35 @@ export default{
 				selectable:	true,
 				index: 'kontakt_id'
 			},
-			tabulatorEvents: [],
+			tabulatorEvents: [
+				{
+					event: 'tableBuilt',
+					handler: async() => {
+						await this.$p.loadCategory(['notiz','global','person']);
+
+						let cm = this.$refs.table.tabulator.columnManager;
+
+						cm.getColumnByField('kontakttyp').component.updateDefinition({
+							title: this.$p.t('global', 'typ')
+						});
+						cm.getColumnByField('kontakt').component.updateDefinition({
+							title: this.$p.t('global', 'kontakt')
+						});
+						cm.getColumnByField('zustellung').component.updateDefinition({
+							title: this.$p.t('person', 'zustellung')
+						});
+						cm.getColumnByField('anmerkung').component.updateDefinition({
+							title: this.$p.t('global', 'anmerkung')
+						});
+						cm.getColumnByField('kurzbz').component.updateDefinition({
+							title: this.$p.t('person', 'firma')
+						});
+						cm.getColumnByField('lastupdate').component.updateDefinition({
+							title: this.$p.t('notiz', 'letzte_aenderung')
+						});
+				}
+			}
+			],
 			lastSelected: null,
 			contactData: {
 				zustellung: true,
@@ -94,79 +124,50 @@ export default{
 			this.$refs.deleteContactModal.show();
 		},
 		addNewContact(formData) {
-			CoreRESTClient.post('components/stv/Kontakt/addNewContact/' + this.uid,
+			this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewContact/' + this.uid,
 				this.contactData)
 				.then(response => {
-					if (!response.data.error) {
-						this.$fhcAlert.alertSuccess('Speichern erfolgreich');
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 						this.hideModal("newContactModal");
 						this.resetModal();
-					} else {
-						const errorData = response.data.retval;
-						Object.entries(errorData).forEach(entry => {
-							const [key, value] = entry;
-							this.$fhcAlert.alertError(value);
-						});
-					}
-			}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
-			}).finally(() => {
+				}).catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 				window.scrollTo(0, 0);
 				this.reload();
 			});
 		},
 		loadContact(contact_id){
-			return CoreRESTClient.get('components/stv/Kontakt/loadContact/' + contact_id)
+			return this.$fhcApi.get('api/frontend/v1/stv/kontakt/loadContact/' + contact_id)
 				.then(
 					result => {
-						if(result.data.retval)
-							this.contactData = result.data.retval;
-						else
-						{
-							this.contactData = {};
-							this.$fhcAlert.alertError('Kein Kontakt mit Id ' + contact_id + ' gefunden');
-						}
+						this.contactData = result.data;
 						return result;
-					}
-			);
+					})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		deleteContact(kontakt_id){
-			CoreRESTClient.post('components/stv/Kontakt/deleteContact/' + kontakt_id)
+			this.$fhcApi.post('api/frontend/v1/stv/kontakt/deleteContact/' + kontakt_id)
 				.then(response => {
-					if (!response.data.error) {
-						this.$fhcAlert.alertSuccess('Löschen erfolgreich');
-					} else {
-						this.$fhcAlert.alertError('Keine Adresse mit Id ' + kontakt_id + ' gefunden');
-					}
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				})
-				.catch(error => {
-					this.$fhcAlert.alertError('Fehler bei Löschroutine aufgetreten');
-			}).finally(()=> {
-				window.scrollTo(0, 0);
-				this.hideModal('deleteContactModal');
-				this.resetModal();
-				this.reload();
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
+					window.scrollTo(0, 0);
+					this.hideModal('deleteContactModal');
+					this.resetModal();
+					this.reload();
 			});
 		},
 		updateContact(kontakt_id){
-			CoreRESTClient.post('components/stv/Kontakt/updateContact/' + kontakt_id,
+			this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateContact/' + kontakt_id,
 				this.contactData).
 			then(response => {
-				if (!response.data.error) {
-					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
-					this.hideModal('editContactModal');
-					this.resetModal();
-					this.reload();
-				} else {
-					const errorData = response.data.retval;
-					Object.entries(errorData).forEach(entry => {
-						const [key, value] = entry;
-						this.$fhcAlert.alertError(value);
-					});
-				}
-			}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
-			}).finally(() => {
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+				this.hideModal('editContactModal');
+				this.resetModal();
+				this.reload();
+			}).catch(this.$fhcAlert.handleSystemError)
+			.finally(()=> {
 				window.scrollTo(0, 0);
 				this.reload();
 			});
@@ -178,10 +179,10 @@ export default{
 			this.$refs.table.reloadTable();
 		},
 		search(event) {
-			return CoreRESTClient
-				.get('components/stv/Kontakt/getStandorte/' + event.query)
+			return this.$fhcApi
+				.get('api/frontend/v1/stv/kontakt/getStandorte/' + event.query)
 					.then(result => {
-						this.filteredStandorte = CoreRESTClient.getData(result.data);
+						this.filteredStandorte = result.data.retval;
 				});
 		},
 		resetModal(){
@@ -190,38 +191,12 @@ export default{
 		},
 	},
 	created(){
-		CoreRESTClient
-			.get('components/stv/Kontakt/getKontakttypen')
+		this.$fhcApi
+			.get('api/frontend/v1/stv/kontakt/getKontakttypen')
 			.then(result => {
 				this.kontakttypen = result.data;
 			})
-			.catch(err => {
-				console.error(err.response.data || err.message);
-			});
-	},
-	async mounted() {
-		await this.$p.loadCategory(['notiz','global','person']);
-
-		let cm = this.$refs.table.tabulator.columnManager;
-
-		cm.getColumnByField('kontakttyp').component.updateDefinition({
-			title: this.$p.t('global', 'typ')
-		});
-		cm.getColumnByField('kontakt').component.updateDefinition({
-			title: this.$p.t('global', 'kontakt')
-		});
-		cm.getColumnByField('zustellung').component.updateDefinition({
-			title: this.$p.t('person', 'zustellung')
-		});
-		cm.getColumnByField('anmerkung').component.updateDefinition({
-			title: this.$p.t('global', 'anmerkung')
-		});
-		cm.getColumnByField('kurzbz').component.updateDefinition({
-			title: this.$p.t('person', 'firma')
-		});
-		cm.getColumnByField('lastupdate').component.updateDefinition({
-			title: this.$p.t('notiz', 'letzte_aenderung')
-		});
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `	
 		<div class="stv-list h-100 pt-3">
@@ -348,7 +323,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Neu"
+			new-btn-label="Kontakt"
 			@click:new="actionNewContact"
 			>
 		</core-filter-cmpt>

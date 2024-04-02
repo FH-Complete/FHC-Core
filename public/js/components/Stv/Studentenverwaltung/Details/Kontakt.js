@@ -2,8 +2,6 @@ import AddressList from "./Kontakt/Address.js";
 import ContactList from "./Kontakt/Contact.js";
 import BankaccountList from "./Kontakt/Bankaccount.js";
 
-import PvToast from "../../../../../../index.ci.php/public/js/components/primevue/toast/toast.esm.min.js";
-import PvAutoComplete from "../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 export default {
 	components: {
 		AddressList,

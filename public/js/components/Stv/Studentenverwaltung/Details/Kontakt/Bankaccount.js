@@ -1,5 +1,4 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
-import {CoreRESTClient} from "../../../../../RESTClient";
 import BsModal from "../../../../Bootstrap/Modal.js";
 
 export default{
@@ -13,7 +12,9 @@ export default{
 	data() {
 		return{
 			tabulatorOptions: {
-				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Kontakt/getBankverbindung/' + this.uid),
+				ajaxURL: 'api/frontend/v1/stv/Kontakt/getBankverbindung/' + this.uid,
+				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxResponse: (url, params, response) => response.data,
 				columns:[
 					{title:"Name", field:"name"},
 					{title:"Anschrift", field:"anschrift", visible:false},
@@ -76,7 +77,32 @@ export default{
 				selectable:	true,
 				index: 'bankverbindung_id',
 			},
-			tabulatorEvents: [],
+			tabulatorEvents: [
+				{
+					event: 'tableBuilt',
+					handler: async() => {
+						await this.$p.loadCategory(['global','person']);
+
+						let cm = this.$refs.table.tabulator.columnManager;
+
+						cm.getColumnByField('anschrift').component.updateDefinition({
+							title: this.$p.t('person', 'anschrift')
+						});
+						cm.getColumnByField('kontonr').component.updateDefinition({
+							title: this.$p.t('person', 'kontonr')
+						});
+						cm.getColumnByField('blz').component.updateDefinition({
+							title: this.$p.t('person', 'blz')
+						});
+						cm.getColumnByField('typ').component.updateDefinition({
+							title: this.$p.t('global', 'typ')
+						});
+						cm.getColumnByField('verrechnung').component.updateDefinition({
+							title: this.$p.t('person', 'verrechnung')
+						});
+					}
+				}
+			],
 			lastSelected: null,
 			bankverbindungData: {
 				verrechnung: true,
@@ -105,80 +131,46 @@ export default{
 			});
 		},
 		addNewBankverbindung(bankverbindungData) {
-			CoreRESTClient.post('components/stv/Kontakt/addNewBankverbindung/' + this.uid,
+			this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewBankverbindung/' + this.uid,
 				this.bankverbindungData
 			).then(response => {
-				if (!response.data.error) {
-					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
-/*					this.$refs.newBankverbindungModal.hide();*/
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('newBankverbindungModal');
 					this.resetModal();
-				} else {
-					const errorData = response.data.retval;
-					Object.entries(errorData).forEach(entry => {
-						const [key, value] = entry;
-						this.$fhcAlert.alertError('Das Feld ' + key + ' ist erforderlich');
-					});
-					this.statusCode = 0;
-					this.statusMsg = response.data;
-				}
-			}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
-			}).finally(() => {
+			}).catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 				window.scrollTo(0, 0);
 				this.reload();
 			});
 		},
 		loadBankverbindung(bankverbindung_id){
-			return CoreRESTClient.get('components/stv/Kontakt/loadBankverbindung/' + bankverbindung_id)
+			return this.$fhcApi.get('api/frontend/v1/stv/kontakt/loadBankverbindung/' + bankverbindung_id)
 				.then(
 				result => {
-					if(!result.data.retval || result.data.retval.length < 1)
-					{
-						this.bankverbindungData = {};
-						this.$fhcAlert.alertError('Keine Bankverbindung mit Id ' + bankverbindung_id + ' gefunden');
-					}
-					else
-					{
-						this.bankverbindungData = result.data.retval;
-					}
+					this.bankverbindungData = result.data;
 					return result;
-				}
-			);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateBankverbindung(bankverbindung_id){
-			CoreRESTClient.post('components/stv/Kontakt/updateBankverbindung/' + bankverbindung_id,
+			this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateBankverbindung/' + bankverbindung_id,
 				this.bankverbindungData)
 				.then(response => {
-					if (!response.data.error) {
-						this.$fhcAlert.alertSuccess('Speichern erfolgreich');
-						this.hideModal('editBankverbindungModal');
-						this.resetModal();
-					} else {
-						const errorData = response.data.retval;
-						Object.entries(errorData).forEach(entry => {
-							const [key, value] = entry;
-							this.$fhcAlert.alertError('Das Feld ' + key + ' ist erforderlich');
-						});
-					}
-			}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
-			}).finally(() => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.hideModal('editBankverbindungModal');
+					this.resetModal();
+			}).catch(this.$fhcAlert.handleSystemError)
+			.finally(() => {
 				window.scrollTo(0, 0);
 				this.reload();
 			});
 		},
 		deleteBankverbindung(bankverbindung_id){
-			CoreRESTClient.post('components/stv/Kontakt/deleteBankverbindung/' + bankverbindung_id)
+			this.$fhcApi.post('api/frontend/v1/stv/kontakt/deleteBankverbindung/' + bankverbindung_id)
 				.then(response => {
-					if (!response.data.error || response.data === []) {
-						this.$fhcAlert.alertSuccess('Löschen erfolgreich');
-					} else {
-						this.$fhcAlert.alertError('Keine Adresse mit Id ' + bankverbindung_id + ' gefunden');
-					}
-				}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Löschroutine aufgetreten');
-			}).finally(()=> {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+				}).catch(this.$fhcAlert.handleSystemError)
+			.finally(()=> {
 				window.scrollTo(0, 0);
 				this.hideModal('deleteBankverbindungModal');
 				this.resetModal();
@@ -195,27 +187,6 @@ export default{
 			this.bankverbindungData = {};
 			this.bankverbindungData = this.initData;
 		},
-	},
-	async mounted() {
-		await this.$p.loadCategory(['global','person']);
-
-		let cm = this.$refs.table.tabulator.columnManager;
-
-		cm.getColumnByField('anschrift').component.updateDefinition({
-			title: this.$p.t('person', 'anschrift')
-		});
-		cm.getColumnByField('kontonr').component.updateDefinition({
-			title: this.$p.t('person', 'kontonr')
-		});
-		cm.getColumnByField('blz').component.updateDefinition({
-			title: this.$p.t('person', 'blz')
-		});
-		cm.getColumnByField('typ').component.updateDefinition({
-			title: this.$p.t('global', 'typ')
-		});
-		cm.getColumnByField('verrechnung').component.updateDefinition({
-			title: this.$p.t('person', 'verrechnung')
-		});
 	},
 	template: `	
 		<div class="stv-list h-100 pt-3">
@@ -370,7 +341,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Neu"
+			new-btn-label="Bankverbindung"
 			@click:new="actionNewBankverbindung"
 		>
 		</core-filter-cmpt>
