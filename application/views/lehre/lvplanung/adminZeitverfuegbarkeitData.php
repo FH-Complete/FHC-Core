@@ -42,16 +42,14 @@ $filterWidgetArray = array(
     'datasetRepOptions' => '{
 		layout: "fitColumns",           // fit columns to width of table
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
         index: "zeitsperre_id",             // assign specific column as unique id (important for row indexing)
         selectable: 1,               // allow row selection
         tableWidgetHeader: false,
-        rowSelected: function(row) {
-            func_rowSelected(row);
+        columnDefaults:{
+            headerFilterPlaceholder: " ",
         },
-        rowDeselected: function(row) {
-            func_rowDeselected(row);
-        }
+       
+      
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         zeitsperre_id: {visible:false},
