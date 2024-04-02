@@ -128,7 +128,6 @@ export default {
         :
         //? fresh insert of new attachment
         await Vue.$fhcapi.ProfilUpdate.insertFile(formData).then(res => {
-          console.log(res.data);
           return res.data?.map((file) => file.dms_id);
         })
         return result;
