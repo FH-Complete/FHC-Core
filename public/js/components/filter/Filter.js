@@ -53,6 +53,7 @@ export const CoreFilterCmpt = {
 			type: String,
 			required: true
 		},
+		filterId: String,
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
 		tableOnly: Boolean,
@@ -415,6 +416,8 @@ export const CoreFilterCmpt = {
 			// Always needed parameters
 			apiFunctionParameters.filterUniqueId = FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 			apiFunctionParameters.filterType = this.filterType;
+			if (this.filterId)
+				apiFunctionParameters.filterUniqueId += '#' + this.filterId;
 
 			// Assign parameters to the FetchCmpt binded properties
 			this.fetchCmptApiFunctionParams = apiFunctionParameters;
