@@ -101,6 +101,8 @@ export default {
               this.fileID? this.fileID[0]: null
             ).then((res) => {
               handleApiResponse(res);
+            }).catch((err) => {
+              console.error(err);
             })
           :  Vue.$fhcapi.ProfilUpdate.insertProfilRequest(
               this.topic,
@@ -109,7 +111,9 @@ export default {
 
             ).then((res) => {
               handleApiResponse(res);
-            });
+            }).catch((err) => {
+              console.error(err);
+            })
       }
     },
 

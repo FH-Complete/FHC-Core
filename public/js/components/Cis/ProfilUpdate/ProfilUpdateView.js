@@ -27,6 +27,7 @@ export default{
   components: {
     CoreFilterCmpt,
     Loading,
+    AcceptDenyUpdate,
   },
   props:{
     id:{
@@ -35,6 +36,8 @@ export default{
   },
   data() {
     return {
+      showModal: false,
+      modalData: null,
       loading:false,
       showAll: false,
       events:[],
@@ -128,7 +131,7 @@ export default{
               {
                 label: "<i class='fa fa-eye'></i> Show Request",
                 action: (e, column) => {
-                  this.showModal(column.getData());
+                  this.showAcceptDenyModal(column.getData());
                     
                 },
               }
@@ -137,7 +140,7 @@ export default{
             menu.push({
               label: "<i class='fa fa-eye'></i> Show Request",
               action: (e, column) => {
-                this.showModal(column.getData());
+                this.showAcceptDenyModal(column.getData());
               },
             });
           }
@@ -213,7 +216,7 @@ export default{
             cellClick: (e, cell) => {
               //! function that is called when clicking on a row in the table
               let cellData = cell.getRow().getData();
-              this.showModal(cellData);
+              this.showAcceptDenyModal(cellData);
             },
             //responsive:0,
           },
@@ -239,8 +242,34 @@ export default{
     setLoading: function(newValue){
       this.loading = newValue;
     },
-   
-    showModal: function (value) {
+    hideAcceptDenyModal: function () {
+      //? checks the AcceptDenyModal component property result, if the user made a successful request or not
+     
+      if (this.$refs.AcceptDenyModal.result) {
+          //? refetches the data, if any request was denied or accepted
+          //* setData will call the ajaxURL again to refresh the data
+          
+          this.$refs.UpdatesTable.tabulator.setData();
+      } else {
+        // when modal was closed without submitting request
+      }
+      this.showModal = false;
+      this.modalData = null;
+    },
+
+    showAcceptDenyModal(value) {
+      this.modalData = value;
+      if(!this.modalData){
+        return;
+      }
+      this.showModal = true;
+      
+      // after a state change, wait for the DOM updates to complete
+      Vue.nextTick(() => {
+        this.$refs.AcceptDenyModal.show();
+      });
+    },
+    /* showModal: function (value) {
       AcceptDenyUpdate.popup({ value: value, setLoading:this.setLoading })
         .then((res) => {
           
@@ -251,7 +280,7 @@ export default{
          
         })
         
-    },
+    }, */
     updateData: function (event) {
       this.$refs.UpdatesTable.tabulator.setData();
       //? store the selected view in the session storage of the browser
@@ -270,7 +299,7 @@ export default{
 
   mounted() {
 
-    //? opens the AcceptDenyUpdate Modal if the a preselected profil_update_id was passed to the component (used for email links)
+    //? opens the AcceptDenyUpdate Modal if a preselected profil_update_id was passed to the component (used for email links)
     if(this.profil_update_id){
         
         this.$refs.UpdatesTable.tabulator.on("dataProcessed", ()=>{
@@ -278,7 +307,7 @@ export default{
             return row.profil_update_id === this.profil_update_id;
         });
         if(arrayRowData.length){
-            this.showModal(arrayRowData[0]);
+            this.showAcceptDenyModal(arrayRowData[0]);
         }
         })
     }
@@ -292,6 +321,8 @@ export default{
   },
   template: `
     <div>
+    
+    <accept-deny-update v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
     
     <div  class="form-underline flex-fill ">
       <div class="form-underline-titel">Show </div>

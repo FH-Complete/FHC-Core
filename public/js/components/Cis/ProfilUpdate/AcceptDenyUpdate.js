@@ -61,8 +61,10 @@ export default {
         this.result = true;
       }).catch((e) => {
         Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
+      }).finally(()=>{
+        this.hide();
       });
-      this.hide();
+      
     },
 
     denyRequest: async function () {
@@ -105,7 +107,7 @@ export default {
   },
   template: `
 
-  <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
+  <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     
     <template v-slot:title>
       {{title}}  
