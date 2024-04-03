@@ -33,7 +33,8 @@ class PlausicheckDefinitionLib
 		'PrestudentMischformOhneOrgform' => 'PrestudentMischformOhneOrgform',
 		'StgPrestudentUngleichStgStudienplan' => 'StgPrestudentUngleichStgStudienplan',
 		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent',
-		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher'
+		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher',
+		'DualesStudiumOhneMarkierung' => 'DualesStudiumOhneMarkierung'
 		//'StudienplanUngueltig' => 'StudienplanUngueltig'
 	);
 
