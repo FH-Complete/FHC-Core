@@ -11,6 +11,9 @@ const APP_ROOT = FHC_JS_DATA_STORAGE_OBJECT.app_root;
 
 const COLOR_LIGHTGREY = "#f5f5f5";
 
+const TABLE_CANCELLED_LEHRAUFTRAG = '[tableuniqueid = cancelledLehrauftrag] #tableWidgetTabulator';
+const TABLE_ACCEPT_LEHRAUFTRAG = '[tableuniqueid = acceptLehrauftrag] #tableWidgetTabulator';
+
 /**
  * PNG icons used in status- and filter buttons
  * Setting png icons is a workaround to use font-awsome 5.9.0 icons until system can be updated to newer font awsome version.
@@ -461,7 +464,7 @@ $(function() {
 		
 		//passing the tabulator instance because the acceptLehrauftrag site loads two tabulator tables
         func_tableBuilt(tabulatorInstance)
-        
+		
         // using the tabulator instance instead of the jquery object because the site loads two different tabulator tables
 		tabulatorInstance.on("renderComplete",()=>{func_renderComplete(tabulatorInstance)});
 		tabulatorInstance.on("renderStarted",()=>{func_renderStarted(tabulatorInstance)});
