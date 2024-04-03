@@ -35,6 +35,10 @@ class Config extends FHC_Controller
 			'title' => 'Status',
 			'component' => './Stv/Studentenverwaltung/Details/Status.js'
 		];
+		$result['betriebsmittel'] = [
+			'title' => 'Betriebsmittel',
+			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
+		];
 		$result['noten'] = [
 			'title' => 'Noten',
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js'
