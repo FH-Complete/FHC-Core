@@ -91,6 +91,6 @@ export default {
 		format: 'es',
 		dir: './',
 		//manualChunks: {}
-		chunkFileNames: 'public/dist/includes/[name]-[hash].js'
+		chunkFileNames: 'public/dist/js/includes/[name]-[hash].js'
 	}
 };
