@@ -27,6 +27,9 @@ export default {
 					{title: "Nummer", field: "nummer"},
 					{title:  "PersonId", field: "person_id"},
 					{title: "Typ", field: "betriebsmitteltyp"},
+					{title: "insertVon", field: "insertvon"}, //Test
+					{title: "insertAmUm", field: "insertamum"}, //TESt
+					{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id"},
 					{title:  "Retourdatum", field: "retouram"},
 					{title:  "Beschreibung", field: "beschreibung"},
 					{title:  "Uid", field: "uid"},
@@ -34,7 +37,7 @@ export default {
 					{title:  "Kaution", field: "kaution", visible: false},
 					{title:  "Ausgabedatum", field: "ausgegebenam", visible: false},
 					{title: "Betriebsmittel_id", field: "betriebsmittel_id", visible: false},
-					{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id", visible: false},
+/*					{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id", visible: false},*/
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -49,7 +52,7 @@ export default {
 							button.addEventListener(
 								'click',
 								(event) =>
-									this.actionPrintConfirmation(cell.getData().betriebsmittel_id)
+									this.actionPrintConfirmation(cell.getData().betriebsmittelperson_id)
 							);
 							container.append(button);
 
@@ -60,7 +63,7 @@ export default {
 							button.addEventListener(
 								'click',
 								(event) =>
-									this.actionEditBetriebsmittel(cell.getData().betriebsmittel_id)
+									this.actionEditBetriebsmittel(cell.getData().betriebsmittelperson_id)
 							);
 							container.append(button);
 
@@ -71,7 +74,7 @@ export default {
 							button.addEventListener(
 								'click',
 								() =>
-									this.actionDeleteBetriebsmittel(cell.getData().betriebsmittel_id)
+									this.actionDeleteBetriebsmittel(cell.getData().betriebsmittelperson_id)
 							);
 							container.append(button);
 
@@ -84,43 +87,165 @@ export default {
 				height: '150',
 				selectableRangeMode: 'click',
 				selectable: true,
-				//index: 'betriebsmittel_id'
+				//index: 'betriebsmittel_id',
 			},
-			tabulatorEvents: [],
+			//tableData: [],
+			tabulatorEvents: [
+				{
+/*					event: 'rowSelectionChanged',
+					handler: this.rowSelectionChanged*/
+/*					handler: (e, row.getData().betriebsmittelperson_id) => {
+						// Handler-Funktion, die aufgerufen wird, wenn das Ereignis ausgelöst wird
+						//this.rowSelectionChanged(row.getData().betriebsmittelperson_id);
+					//	console.log("Selected Row Data:", row.getData());
+						//console.log(cell.getData().betriebsmittelperson_id);
+					}*/
+				},
+
+			],
 			betriebsmittelData: {},
-			betriebsmittel_id: {},
-			listBetriebsmitteltyp: []
+			betriebsmittelperson_id : null,
+			listBetriebsmitteltyp: [],
+			formData: {},
+			statusNew: true
 		};
 	},
 	methods: {
-		actionEditBetriebsmittel(betriebsmittel_id){
-			console.log("id: " + betriebsmittel_id);
-			this.loadBetriebsmittel(betriebsmittel_id).then(() => {
-				if(this.betriebsmittelData)
-					this.$refs.editBetriebsmittelModal.show();
+		rowSelectionChanged(data) {
+			//console.log("Selected Row Data:", data[0].betriebsmittelperson_id);
+			this.param_id = {
+				'betriebsmittelperson_id':  data[0].betriebsmittelperson_id};
+
+			this.loadBetriebsmittel(this.param_id);
+		},
+		actionEditBetriebsmittel(betriebsmittelperson_id){
+			console.log("action EditBM: id: " + betriebsmittelperson_id);
+			this.statusNew = false;
+			this.loadBetriebsmittel(betriebsmittelperson_id);
+/*			this.loadBetriebsmittel(betriebsmittelperson_id).then(() => {
+				/!*				if(this.formData) {
+									this.$refs.deleteBetriebsmittelModal.show();
+								}*!/
+				console.log("nach load" + betriebsmittelperson_id);
+
+			});*/
+		},
+		actionNewBetriebsmittel(){
+			console.log("action newBM: person " + this.person_id);
+			this.resetModal();
+			this.statusNew = true;
+			this.formData.ausgegebenam = this.getDefaultDate();
+			this.reload();
+		},
+		actionDeleteBetriebsmittel(betriebsmittelperson_id){
+			console.log("Löschen von Datensatz mit id: " + betriebsmittelperson_id);
+
+			this.loadBetriebsmittel(betriebsmittelperson_id).then(() => {
+/*				if(this.formData) {
+					this.$refs.deleteBetriebsmittelModal.show();
+				}*/
+				console.log("nach load" + betriebsmittelperson_id);
+				this.$refs.deleteBetriebsmittelModal.show();
 			});
 		},
-		actionPrintConfirmation(betriebsmittel_id){
-			console.log("actionPrintConfirmation of id: " + betriebsmittel_id);
-/*			this.loadBetriebsmittel(betriebsmittel_id).then(() => {
+		actionPrintConfirmation(betriebsmittelperson_id){
+			console.log("actionPrintConfirmation of id: " + betriebsmittelperson_id);
+/*			this.loadBetriebsmittel(betriebsmittelperson_id).then(() => {
 
 				if(this.betriebsmittelData)
 					this.$refs.editBetriebsmittelModal.show();
 			});*/
 		},
-		loadBetriebsmittel(betriebsmittel_id){
-			//console.log("2 " + betriebsmittel_id);
+		addNewBetriebsmittel(){
+			this.param_id = {
+				'uid':  this.uid,
+				'person_id': this.person_id,
+				...this.formData
+			};
+			//this.combinedObj = { ...this.param_id, ...this.formData };
+			this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/addNewBetriebsmittel/',
+				this.param_id
+			).then(response => {
+				console.log(response);
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+			//	this.hideModal('newBetriebsmittelModal');
+				this.resetModal();
+			}).catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
+		},
+		deleteBetriebsmittel(betriebsmittelperson_id){
+			console.log("Delete mit id: " + betriebsmittelperson_id);
+			this.param = {
+				'betriebsmittelperson_id': betriebsmittelperson_id
+			};
+			console.log( "param_id" + this.param + "|" );
+			return this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/deleteBetriebsmittel/',
+				this.param)
+				.then(
+					result => {
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+						this.hideModal('deleteBetriebsmittelModal');
+						this.resetModal();
+					})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
+		},
+		updateBetriebsmittel(){
+			this.param = {
+				'uid':  this.uid,
+				'person_id': this.person_id,
+				...this.formData
+			};
+			this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/updateBetriebsmittel/',
+				this.param
+			).then(response => {
+				//console.log(response);
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'editSave'));
+				//	this.hideModal('newBetriebsmittelModal');
+				this.resetModal();
+			}).catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
+		},
+		loadBetriebsmittel(betriebsmittelperson_id){
+			console.log("loadBetriebsmittel id:" + betriebsmittelperson_id);
+			this.resetModal();
+			this.statusNew = false;
+			this.param_id = {
+				'betriebsmittelperson_id':  betriebsmittelperson_id
+			};
 			return this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/loadBetriebsmittel/',
-				betriebsmittel_id)
+				this.param_id)
+				.then(result => result.data)
 				.then(result => {
-					//console.log("in load"  + result);
-					this.betriebsmittelData = result.data;
-					return result;
+					this.formData = result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		reload(){
+			this.$refs.table.reloadTable();
+		},
+		hideModal(modalRef){
+			this.$refs[modalRef].hide();
+		},
+		resetModal(){
+			this.formData = {};
+			this.betriebsmittelperson_id = {};
+			this.statusNew = true;
+		},
+		getDefaultDate() {
+			const today = new Date();
+			return today;
+		}
 	},
-
 	created(){
 		this.$fhcApi
 			.get('api/frontend/v1/stv/betriebsmittel/getTypenBetriebsmittel')
@@ -129,6 +254,17 @@ export default {
 				this.listBetriebsmitteltyp = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+	},
+	mounted(){
+/*		this.$refs.table.on("rowSelected", (row) => {
+			// Hier können Sie auf das ausgewählte Zeilenobjekt zugreifen und entsprechende Aktionen durchführen
+			console.log("Selected Row:", row.getData());
+		});*/
+
+		//this.$refs.newBetriebsmittelModal.show();
+		//loadFirstEntry for the form
+		console.log("mounted");
+		//console.log(this.$refs.table.tableData);
 	},
 /*	async mounted() {
 		if(this.showTinyMCE){
@@ -170,139 +306,17 @@ export default {
 	template: `
 	<div class="betriebsmittel-betriebsmittel">
 	
-			<!--Modal: editBetriebsmittelModal-->
-		<BsModal ref="editBetriebsmittelModal">
-		
-			<template #title>Details</template>
-			
-		
-			<form-form class="row g-3" ref="betriebsmittelData">
-				
-						<div class="row mb-3">								   
-							<label for="typ" class="form-label col-sm-4">Typ</label>
-							<div class="col-sm-6">
-								<form-input
-								type="select"
-								name="typ"
-								v-model="betriebsmittelData['typ']"
-								>
-								<option v-for="entry in listBetriebsmitteltyp" :key="entry.betriebsmitteltyp" :value="entry.betriebsmitteltyp">{{entry.betriebsmitteltyp}}</option>
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="nummer" class="form-label col-sm-4">Nummer </label>
-							<div class="col-sm-6">
-								<form-input
-									type="text"
-									name="nummer"
-									v-model="betriebsmittelData['nummer2']"
-								>						
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="nummer2" class="form-label col-sm-4">Nummer2</label>
-							<div class="col-sm-6">
-								<form-input
-									type="text"
-									name="nummer"
-									v-model="betriebsmittelData['nummer2']"
-								>						
-								</form-input>
-							</div>
-						</div>
-					
-						<div class="row mb-3">
-							<label for="bechreibung" class="form-label col-sm-4">Beschreibung</label>
-							<div class="col-sm-6">
-								<form-input
-									type="textarea"
-									name="beschreibung"
-									v-model="betriebsmittelData['beschreibung']"
-								>						
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="kaution" class="form-label col-sm-4">Kaution</label>
-							<div class="col-sm-6">
-								<form-input
-									type="text"
-									name="kaution"
-									v-model="betriebsmittelData['kaution']"
-								>						
-								</form-input>
-							</div>
-						</div>
-						
-				<div class="row mb-3">
-							<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
-							<div class="col-sm-6">
-								<form-input
-									type="textarea"
-									name="anmerkung"
-									v-model="betriebsmittelData['anmerkung']"
-								>						
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="ausgegebenam" class="form-label col-sm-4">Ausgegeben am</label>
-							<div class="col-sm-6">
-								<form-input
-									type="DatePicker"
-									:readonly="readonly"
-									name="datum"
-									v-model="betriebsmittelData['ausgegebenam']"
-									auto-apply
-									:enable-time-picker="false"
-									format="dd.MM.yyyy"
-									preview-format="dd.MM.yyyy"
-									:teleport="true"
-								></form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="retouram" class="form-label col-sm-4">Retour am</label>
-							<div class="col-sm-6">
-								<form-input
-									type="DatePicker"
-									:readonly="readonly"
-									name="datum"
-									v-model="betriebsmittelData['retouram']"
-									auto-apply
-									:enable-time-picker="false"
-									format="dd.MM.yyyy"
-									preview-format="dd.MM.yyyy"
-									:teleport="true"
-								></form-input>
-							</div>
-						</div>
-				
-			</form-form>
-			
-			<template #footer>
-				<button ref="Close" type="button" class="btn btn-primary" @click="editBetriebsmittel(betriebsmittelData.betriebsmittel_id)">Speichern</button>
-			</template>
-		</BsModal>
-
 		<!--Modal: deleteBetriebsmittelModal-->
-<!--		<BsModal ref="deleteBetriebsmittelModal">
+		<BsModal ref="deleteBetriebsmittelModal">
 			<template #title>Betriebsmittel löschen</template>
 			<template #default>
-				<p>Betriebsmittel wirklich löschen?</p>
+				<p>Betriebsmittel ({{formData.betriebsmitteltyp}} / {{formData.betriebsmittelperson_id}}) wirklich löschen?</p>
 			</template>
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
-				<button ref="Close" type="button" class="btn btn-primary" @click="deleteBetriebsmittel(notizen.notiz_id)">OK</button>
+<!--				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>-->
+				<button ref="Close" type="button" class="btn btn-primary" @click="deleteBetriebsmittel(formData.betriebsmittelperson_id)">OK</button>
 			</template>
-		</BsModal>-->
+		</BsModal>
 
 		<core-filter-cmpt
 			ref="table"
@@ -317,6 +331,140 @@ export default {
 			>
 		</core-filter-cmpt>
 		<br>
+				{{formData}} || {{statusNew}}
+				<hr>
+			<form-form class="row g-3 col-6" ref="betriebsmittelData">
+				<legend>Details</legend>
+				
+				<div class="row mb-3">
+					<div class="col-sm-7">
+						<p v-if="statusNew" class="fw-bold"> Betriebsmittel anlegen</p>
+						<p v-else class="fw-bold">Betriebsmittel bearbeiten</p>
+					</div>
+				</div>
+				
+				<div class="row mb-3">								   
+					<label for="typ" class="form-label col-sm-4">Typ</label>
+					<div class="col-sm-6">
+						<form-input
+						type="select"
+						name="typ"
+						v-model="formData.betriebsmitteltyp"
+						>
+						<option v-for="entry in listBetriebsmitteltyp" :key="entry.betriebsmitteltyp" :value="entry.betriebsmitteltyp">{{entry.betriebsmitteltyp}}</option>
+						</form-input>
+					</div>
+				</div>
+				
+				<div class="row mb-3">
+					<label for="nummer" class="form-label col-sm-4">Nummer</label>
+					<div class="col-sm-6">
+						<form-input
+							type="text"
+							name="nummer"
+							v-model="formData['nummer']"
+						>						
+						</form-input>
+					</div>
+				</div>
+				
+				<div class="row mb-3">
+					<label for="nummer2" class="form-label col-sm-4">Nummer2</label>
+					<div class="col-sm-6">
+						<form-input
+							type="text"
+							name="nummer2"
+							v-model="formData['nummer2']"
+						>						
+						</form-input>
+					</div>
+				</div>
+			
+				<div class="row mb-3">
+					<label for="beschreibung" class="form-label col-sm-4">Beschreibung</label>
+					<div class="col-sm-6">
+						<form-input
+							type="textarea"
+							name="beschreibung"
+							v-model="formData['beschreibung']"
+						>						
+						</form-input>
+					</div>
+				</div>
+				
+				<div class="row mb-3">
+					<label for="kaution" class="form-label col-sm-4">Kaution</label>
+					<div class="col-sm-6">
+						<form-input
+							type="text"
+							name="kaution"
+							v-model="formData['kaution']"
+						>						
+						</form-input>
+					</div>
+				</div>
+				
+				<div class="row mb-3">
+					<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
+					<div class="col-sm-6">
+						<form-input
+							type="textarea"
+							name="anmerkung"
+							v-model="formData['anmerkung']"
+						>						
+						</form-input>
+					</div>
+				</div>
+				
+				<div class="row mb-3">
+					<label for="ausgegebenam" class="form-label col-sm-4">Ausgegeben am</label>
+					<div class="col-sm-6">
+						<form-input
+							type="DatePicker"
+							:readonly="readonly"
+							name="datum"
+							v-model="formData['ausgegebenam']"
+							auto-apply
+							:enable-time-picker="false"
+							format="dd.MM.yyyy"
+							preview-format="dd.MM.yyyy"
+							:teleport="true"
+						></form-input>
+					</div>
+				</div>
+				
+				<div class="row mb-3">
+					<label for="retouram" class="form-label col-sm-4">Retour am</label>
+					<div class="col-sm-6">
+						<form-input
+							type="DatePicker"
+							:readonly="readonly"
+							name="datum"
+							v-model="formData['retouram']"
+							auto-apply
+							:enable-time-picker="false"
+							format="dd.MM.yyyy"
+							preview-format="dd.MM.yyyy"
+							:teleport="true"
+						></form-input>
+					</div>
+<!--					<div class="position-sticky top-0 z-1">
+						<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!deltaLength">Speichern2</button>
+					</div>-->
+				</div>
+				
+
+				<div class="row mb-3">
+				<label class="form-label col-sm-8"></label>
+					<div v-if="statusNew" class="col-sm-4">
+						<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">Speichern</button>
+					</div>
+					<div v-else class="col-sm-4">
+						<button ref="Close" type="button" class="btn btn-warning" @click="updateBetriebsmittel()">Aktualisieren {{formData.betriebsmittelperson_id}}</button>
+					</div>
+					
+				</div>
+		</form-form>
 		
 	</div>`
 }

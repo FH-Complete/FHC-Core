@@ -16,9 +16,6 @@ export default {
 			:uid="modelValue.uid"
 			>
 		</Betriebsmittel>	
-		{{modelValue}}	
-		<hr>
-		{{modelValue.person_id}}
 	</div>
 	`
 };
