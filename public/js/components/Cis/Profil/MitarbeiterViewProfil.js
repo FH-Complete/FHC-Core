@@ -145,7 +145,7 @@ export default {
    
   },
 
-  template: ` 
+  template: /*html*/` 
 
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
@@ -157,10 +157,6 @@ export default {
 
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->
-
-
-            
-
 
               <!-- MAIN PANNEL -->
               <div class="col-sm-12 col-md-8 col-xxl-9 ">
@@ -174,27 +170,13 @@ export default {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- FIRST KAESTCHEN -->
-                      <div  class="col-lg-12 col-xl-6 ">
+                     <!-- FIRST KAESTCHEN -->
+                     <div  class="col-lg-12 col-xl-6 ">
                      <div class="row mb-4">
                      <div class="col">
                      
                         <!-- Profil Informationen -->
-                        <profil-information title="MitarbeiterIn" :data="profilInformation"></profil-information>
+                        <profil-information title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
                      
 		                </div>
                     </div>
@@ -204,11 +186,6 @@ export default {
                       <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
                      
 
-
-                     
-
-
-              
                     <!-- END OF PROFIL INFORMATION ROW -->
                     <!-- INFORMATION CONTENT END -->
                     </div>
@@ -230,7 +207,7 @@ export default {
                     <div  class=" col-lg-12">
        
                     <!-- roleInformation -->
-                    <role-information :data="roleInformation" title="Mitarbeiter Information"></role-information>
+                    <role-information :data="roleInformation" title="$p.t('profil','mitarbeiterInformation')"></role-information>
 
                     </div>  
                            
@@ -262,7 +239,7 @@ export default {
 
                 <!-- FIRST TABLE -->
                   <div class="col-12 mb-4" >
-                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   </div>
 
                
@@ -270,17 +247,8 @@ export default {
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
                 </div>
 
-
-
-
-
-
-
               <!-- END OF MAIN CONTENT COL -->
               </div>
-
-
-
 
               <!-- START OF SIDE PANEL -->
               <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >

@@ -92,12 +92,12 @@ export default {
       this.dmsData = this.files;
     }
   },
-  template: `
+  template: /*html*/`
   
-    <p style="opacity:0.8" class="ms-2" v-if="withFiles && !updateID">Please update your {{data.titel}} and upload the corresponding Document of proof</p>
+    <p style="opacity:0.8" class="ms-2" v-if="withFiles && !updateID">{{$p.t('profilUpdate','profilUpdateInformationMessage',data.titel)}}</p>
 
     <div class="form-underline">
-    <div class="form-underline-titel">{{data.titel?data.titel:"titel"}}</div>
+    <div class="form-underline-titel">{{data.titel?data.titel:$p.t('global','titel')}}</div>
     
     <input  class="mb-2 form-control" @input="emitChanges"  v-model="data.value" :placeholder="data.value">
   

@@ -7,7 +7,7 @@ export default {
     props:{
         title:{
             type:String,
-            default:"Mails",
+            default:this.$p.t('person','email'),
         },
         data:{
             type:Array,
@@ -21,17 +21,7 @@ export default {
    
     <div class="card-body">
 
-
-
-   
-
-      
-
-      
-
       <!-- HIER SIND DIE EMAILS -->
-  
-
   
       <div  class="gy-3 row justify-content-center ">
       <div v-for="email in data" class="col-12 ">

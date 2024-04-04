@@ -107,7 +107,7 @@ export default {
      <div v-if="showZustellAdressenWarning" class="col-12 ">
      <div class="card bg-danger mx-2">
      <div class="card-body text-white ">
-     <span>!Achtung: Eine deiner Adressen ist bereits als Zustelladresse gespeichert, sind sie sicher, dass sie die aktuelle Adresse stattdessen als Zustelladresse speichern wollen?</span>
+     <span>{{$p.t('profilUpdate','zustelladresseWarning')}}</span>
      </div>
      </div>
      </div>
@@ -120,7 +120,7 @@ export default {
             <div class="form-check mb-2">
                 <input class="form-check-input" type="checkbox" @change="updateValue($event,'zustelladresse')" :checked="data.zustelladresse" id="flexCheckDefault">
                 <label class="form-check-label" for="flexCheckDefault">
-                    Zustelladresse
+                    {{$p.t('person','zustelladresse')}}
                 </label>
             </div>
         
@@ -134,7 +134,7 @@ export default {
         <div  class="col-12 col-sm-9 col-xl-12 col-xxl-9 order-1">
 
         <div class="form-underline ">
-        <div class="form-underline-titel">Strasse*</div>
+        <div class="form-underline-titel">{{$p.t('person','strasse')}}*</div>
         <input  class="form-control" :value="data.strasse" @input="updateValue($event,'strasse')" :placeholder="data.strasse">
         
         </div>
@@ -145,14 +145,14 @@ export default {
         <div class=" order-2 order-sm-4 order-xl-3 order-xxl-4 col-12 col-sm-5  col-xl-8 col-xxl-5  ">
             
             <div  class="form-underline">
-                <div class="form-underline-titel">Kontakttyp*</div>
+                <div class="form-underline-titel">{{$p.t('profilUpdate','kontaktTyp')}}*</div>
         
                 <select  :value="data.typ" @change="updateValue($event,'typ')" class="form-select" aria-label="Select Kontakttyp">
                     <option selected></option>
-                    <option value="Nebenwohnsitz">Nebenwohnsitz</option>
-                    <option value="Hauptwohnsitz">Hauptwohnsitz</option>
-                    <option v-if="isMitarbeiter" value="Homeoffice">Homeoffice</option>
-                    <option v-if="isMitarbeiter" value="Rechnungsadresse">Rechnungsadresse</option>
+                    <option value="Nebenwohnsitz">{{$p.t('profilUpdate','nebenwohnsitz')}}</option>
+                    <option value="Hauptwohnsitz">{{$p.t('profilUpdate','hauptwohnsitz')}}</option>
+                    <option v-if="isMitarbeiter" value="Homeoffice">{{$p.t('profilUpdate','homeoffice')}}</option>
+                    <option v-if="isMitarbeiter" value="Rechnungsadresse">{{$p.t('profilUpdate','rechnungsadresse')}}</option>
                   
                 </select>    
             </div>
@@ -166,14 +166,14 @@ export default {
         <div  class="order-3 order-sm-3 order-xl-2 order-xxl-3 col-12 col-sm-7 col-xl-12 col-xxl-7 " >
             
             <div class="form-underline ">
-            <div class="form-underline-titel">Ort*</div>
+            <div class="form-underline-titel">{{$p.t('person','ort')}}*</div>
             <input  class="form-control" :value="data.ort" @input="updateValue($event,'ort')" :placeholder="data.ort">
         
             </div>
         </div>
         <div  class="order-4 order-sm-2 order-xl-4 order-xxl-2 col-12 col-sm-3 col-xl-4 col-xxl-3 ">
             <div class="form-underline ">
-            <div class="form-underline-titel">PLZ*</div>
+            <div class="form-underline-titel">{{$p.t('person','plz')}}*</div>
     
             <input  class="form-control" :value="data.plz" @input="updateValue($event,'plz')" @input="getGemeinde" :placeholder="data.plz">
         
@@ -182,13 +182,13 @@ export default {
         <div class="col-6 order-5">
        
         <div class="form-underline ">
-        <div class="form-underline-titel">Gemeinde*</div>
+        <div class="form-underline-titel">{{$p.t('person','gemeinde')}}*</div>
         <auto-complete class="w-100" v-model="data.gemeinde" dropdown :forceSelection="data.nation ==='A'?true:false" :suggestions="gemeinden" @complete="autocompleteSearch" ></auto-complete>
         </div>
         </div>
         <div class="col-6 order-5 ">
         <div class="form-underline ">
-        <div class="form-underline-titel">Nation*</div>
+        <div class="form-underline-titel">{{$p.t('person','nation')}}*</div>
             <select  :value="data.nation" @change="updateValue($event,'nation')" @change="getGemeinde" class="form-select" aria-label="Select Kontakttyp">
                 <option selected></option>
                 <option :value="nation.code" v-for="nation in nationenList">{{nation.langtext}}</option>

@@ -234,7 +234,7 @@ export default {
   template: /*html*/ ` 
   <div class="container-fluid text-break fhc-form"  >
   
-    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="Profil bearbeiten"></edit-profil>
+    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="$p.t('profil','profilBearbeiten')"></edit-profil>
           <div class="row">
           
               <div  class="d-md-none col-12 ">
@@ -255,7 +255,7 @@ export default {
                   <div class="col-auto">
                     <i class="fa fa-edit"></i>
                   </div>
-                  <div class="col-auto">Bearbeiten</div>
+                  <div class="col-auto">{{$p.t('ui','bearbeiten')}}</div>
                 </div>
               </button>
               </div>
@@ -289,7 +289,7 @@ export default {
                      <div class="col">
                      
                      <!-- PROFIL INFORMATION -->
-                     <profil-information title="MitarbeiterIn" :data="profilInformation"></profil-information>
+                     <profil-information title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
 
 
 		                 </div>
@@ -300,7 +300,7 @@ export default {
                      <div  class=" col-lg-12">
         
                     <!-- MITARBEITER INFO -->
-                    <role-information title="Mitarbeiter Information" :data="roleInformation"></role-information>
+                    <role-information title="$p.t('profil','mitarbeiterInformation')" :data="roleInformation"></role-information>
 
 
                      </div> 
@@ -328,7 +328,7 @@ export default {
                       
                       <div class="card">
                           <div class="card-header">
-                            Private Kontakte
+                            {{$p.t('profil','privateKontakte')}}
                           </div>
                           <div class="card-body ">
                             
@@ -351,7 +351,7 @@ export default {
                       <!-- PRIVATE ADRESSEN-->
 
                       <div class="card">
-                          <div class="card-header">Private Adressen</div>
+                          <div class="card-header">{{$p.t('profil','privateAdressen')}}</div>
                             <div class="card-body">
                             
                               <div class="gy-3 row ">
@@ -377,14 +377,14 @@ export default {
 
                   <!-- FUNKTIONEN TABELLE -->
                  
-                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   
                     </div>
 
                   <div class="col-12 mb-4" >
 
                   <!-- BETRIEBSMITTEL TABELLE -->
-                    <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
+                    <core-filter-cmpt title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div>
 
                 </div>
@@ -418,7 +418,7 @@ export default {
                     <div class="col-auto">
                       <i class="fa fa-edit"></i>
                     </div>
-                    <div class="col-auto">Bearbeiten</div>
+                    <div class="col-auto">{{$p.t('ui','bearbeiten')}}</div>
                   </div>
                 </button>
                 </div>

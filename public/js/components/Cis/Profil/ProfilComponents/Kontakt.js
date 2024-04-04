@@ -11,7 +11,7 @@ export default{
     created(){
 
     }, 
-    template:`
+    template:/*html*/`
     <div class="gy-2 row align-items-center justify-content-center">
     <div class="col-1 text-center" >
     
@@ -21,20 +21,17 @@ export default{
         
         <!-- rendering KONTAKT emails -->
    
-        
         <div  class="form-underline ">
         <div class="form-underline-titel">{{data.kontakttyp}}</div>
         <a v-if="data.kontakt.includes('@')" role="link" :aria-disabled="view?true:false" :href="!view?('mailto:'+data.kontakt):null" class="form-underline-content">{{data.kontakt}} </a>
         <a v-else role="link" :aria-disabled="view?true:false" :href="!view?('tel:'+data.kontakt):null" class="form-underline-content">{{data.kontakt}} </a>
         </div>
           
-       
-
     </div>
     <div v-if="data?.anmerkung" class="offset-1 offset-md-0 offset-xl-1 offset-xxl-0 order-2 order-sm-1 col-10  col-md-4   col-xl-9 col-xxl-4   ">
         
     <div  class="form-underline ">
-    <div class="form-underline-titel">Anmerkung</div>
+    <div class="form-underline-titel">{{$p.t('global','anmerkung')}}</div>
     <span  class="form-underline-content">{{data.anmerkung}} </span>
     </div>
 
@@ -48,9 +45,6 @@ export default{
     
 </div>
   </div>
-    
-    
-    
     
     `,
 };

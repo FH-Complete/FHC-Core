@@ -1,12 +1,12 @@
 export default {
     props: {
         data: Object,
-        title: { type: String, default: "Mailverteilers" },
+        title: { type: String, default: this.$p.t('profil','mailverteiler') },
     },
     data() {
         return {};
     },
-    template: `
+    template: /*html*/`
     <div class="card">
    
         <div class="card-header">
@@ -14,7 +14,7 @@ export default {
         </div>
         <div class="card-body">
         
-        <h6 class="card-title">Sie sind Mitglied in folgenden Verteilern:</h6>
+        <h6 class="card-title">{{$p.t('profil','mailverteilerMitglied')}}</h6>
         <div  class="card-text row text-break mb-2" v-for="verteiler in data">
             <div class="col-12 ">
             <div class="row">  

@@ -16,7 +16,7 @@ export default {
     return {
       showUpdateModal: false,
       content: null,
-      editProfilTitle: "Profil bearbeiten",
+      editProfilTitle: this.$p.t('profil','profilBearbeiten'),
     };
   },
 
@@ -224,22 +224,22 @@ export default {
 
   computed: {},
   
-  template: `
+  template: /*html*/`
     <div  class="card " >
     
     <edit-profil v-if="showUpdateModal" ref="updateEditModal" @hideBsModal="hideEditProfilModal" :value="content" :title="editProfilTitle"></edit-profil>
                       <div class="card-header">
-                      Profil Updates
+                      {{$p.t('profilUpdate','profilUpdates')}}
                       </div>
                       <div class="card-body" >
     <div class="table-responsive text-nowrap">
         <table class="m-0  table  table-hover">
             <thead >
                 <tr >
-                <th scope="col">Topic</th>
-                <th scope="col">Status</th>
-                <th scope="col">Date</th>
-                <th class="text-center" scope="col">Action</th>
+                <th scope="col">{{$p.t('profilUpdate','topic')}}</th>
+                <th scope="col">{{$p.t('global','status')}}</th>
+                <th scope="col">{{$p.t('global','datum')}}</th>
+                <th class="text-center" scope="col">{{$p.t('ui','aktion')}}</th>
                 </tr>
             </thead>
             <tbody>

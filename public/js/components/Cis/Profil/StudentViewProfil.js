@@ -73,7 +73,7 @@ export default {
    
   },
 
-  template: ` 
+  template: /*html*/` 
 
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
@@ -86,10 +86,6 @@ export default {
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->
 
-
-            
-
-
               <!-- MAIN PANNEL -->
               <div class="col-sm-12 col-md-8 col-xxl-9 ">
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
@@ -100,42 +96,19 @@ export default {
                     <!-- ROW WITH THE PROFIL INFORMATION --> 
                     <div class="row mb-4">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- FIRST KAESTCHEN -->
-                      <div  class="col-lg-12 col-xl-6 ">
+                     <!-- FIRST KAESTCHEN -->
+                    
+                     <div  class="col-lg-12 col-xl-6 ">
                      <div class="row mb-4">
                      <div class="col">
                      
-                        <profil-information :data="profilInformation" title="StudentIn"></profil-information>
+                        <profil-information :data="profilInformation" title="$p.t('profil','studentIn')"></profil-information>
                      
 		                </div>
                     </div>
                   
-
-
                       <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
                      
-
-
-                     
-
-
-              
                     <!-- END OF PROFIL INFORMATION ROW -->
                     <!-- INFORMATION CONTENT END -->
                     </div>
@@ -155,19 +128,14 @@ export default {
 
                     <div  class=" col-lg-12">
        
-                    <role-information title="Student Information" :data="roleInformation"></role-information>
+                    <role-information title="$p.t('profil','studentInformation')" :data="roleInformation"></role-information>
 
                     </div>  
-                           
-
-
+                       
                      </div>
 
                      <!-- END OF SECOND ROW OF SECOND COLUMN IN MAIN CONTENT -->
                   
-
-
-
                     <!-- END OF THE SECOND INFORMATION COLUMN -->
                     </div>
 
@@ -180,9 +148,6 @@ export default {
 
               <!-- END OF MAIN CONTENT COL -->
               </div>
-
-
-
 
               <!-- START OF SIDE PANEL -->
               <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
@@ -218,10 +183,6 @@ export default {
 
                 <!-- END OF SIDE PANEL -->
               </div>
-
-
-            
-
 
 
           <!-- END OF CONTAINER ROW-->

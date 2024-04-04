@@ -157,7 +157,7 @@ export default {
   popup(options) {
     return BsModal.popup.bind(this)(null, options);
   },
-  template: `
+  template: /*html*/`
   <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     
   <template v-if="title" v-slot:title>
@@ -179,8 +179,8 @@ export default {
     <template  v-slot:footer>
     <loader  ref="loaderRef" :timeout="0"></loader>
         
-    <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>    
-      <button :disabled="!profilUpdate"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
+    <button class="btn btn-outline-danger " @click="hide">{{$p.t('ui','cancel')}}</button>    
+      <button :disabled="!profilUpdate"  @click="submitProfilChange" role="button" class="btn btn-primary">{{$p.t('ui','senden')}}</button>
     </template>
     <!-- end of optional footer --> 
   </bs-modal>`,

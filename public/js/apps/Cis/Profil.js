@@ -4,6 +4,7 @@ import ViewStudentProfil from "../../components/Cis/Profil/StudentViewProfil.js"
 import ViewMitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterViewProfil.js";
 import fhcapifactory from "../api/fhcapifactory.js";
 import Loading from "../../components/Loader.js";
+import Phrasen from "../../plugin/Phrasen.js";
 
 Vue.$fhcapi = fhcapifactory;
 Vue.$collapseFormatter = function (data) {
@@ -367,4 +368,5 @@ const profilApp = Vue.createApp({
 });
 
 profilApp.use(primevue.config.default, { zIndex: { overlay: 9999 } });
+profilApp.use(Phrasen);
 profilApp.mount("#content");

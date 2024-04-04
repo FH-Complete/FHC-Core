@@ -193,7 +193,7 @@ export default {
   template:/*html*/ ` 
 
   <div class="container-fluid text-break fhc-form"  >
-  <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="Profil bearbeiten" ></edit-profil>
+  <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="$p.t('profil','profilBearbeiten')" ></edit-profil>
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
@@ -215,7 +215,7 @@ export default {
                   <div class="col-2">
                     <i class="fa fa-edit"></i>
                   </div>
-                  <div class="col-10">Bearbeiten</div>
+                  <div class="col-10">{{$p.t('ui','bearbeiten')}}</div>
                 </div>
               </button>
               </div>
@@ -245,27 +245,12 @@ export default {
                     <!-- ROW WITH THE PROFIL INFORMATION --> 
                     <div class="row mb-4 ">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     <div  class="col-lg-12 col-xl-6 ">
                     <div class="row mb-4">
                     <div class="col">
                     
                     <!-- PROFIL INFORMATION -->
-                    <profil-information title="StudentIn" :data="profilInformation"></profil-information>
+                    <profil-information title="$p.t('profil','studentIn')" :data="profilInformation"></profil-information>
 
 
                     </div>
@@ -276,7 +261,7 @@ export default {
                     <div  class=" col-lg-12">
        
                    <!-- MITARBEITER INFO -->
-                   <role-information title="Student Information" :data="roleInformation"></role-information>
+                   <role-information title="$p.t('profil','studentInformation')" :data="roleInformation"></role-information>
 
 
                     </div> 
@@ -287,11 +272,6 @@ export default {
                     
                    
                    </div>
-
-
-
-
-
 
                     <div  class="col-xl-6 col-lg-12 ">
                     <div class="row mb-4">
@@ -310,7 +290,7 @@ export default {
                       
                       <div class="card">
                           <div class="card-header">
-                            Private Kontakte
+                            {{$p.t('profil','privateKontakte')}}
                           </div>
                           <div class="card-body ">
                             
@@ -332,7 +312,7 @@ export default {
                     <!-- PRIVATE ADRESSEN-->
 
                     <div class="card">
-                        <div class="card-header">Private Adressen</div>
+                        <div class="card-header">{{$p.t('profil','privateAdressen')}}</div>
                           <div class="card-body">
                           
                             <div class="gy-3 row ">
@@ -356,27 +336,18 @@ export default {
                 <div class="row">
 
                   <div class="col-12 mb-4" >
-                    <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
+                    <core-filter-cmpt title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div> 
 
                   <div class="col-12 mb-4" >
-                    <core-filter-cmpt title="Zutrittsgruppen" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options"  tableOnly :sideMenu="false" noColumnFilter />
+                    <core-filter-cmpt title="$p.t('profil','zutrittsGruppen')" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options"  tableOnly :sideMenu="false" noColumnFilter />
             
                   </div>
 
                 </div>
 
-
-
-
-
-
-
               <!-- END OF MAIN CONTENT COL -->
               </div>
-
-
-
 
               <!-- START OF SIDE PANEL -->
               <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
@@ -401,7 +372,7 @@ export default {
                     <div class="col-2">
                       <i class="fa fa-edit"></i>
                     </div>
-                    <div class="col-10">Bearbeiten</div>
+                    <div class="col-10">{{$p.t('ui','bearbeiten')}}</div>
                   </div>
                 </button>
                 </div>
@@ -441,10 +412,6 @@ export default {
                   <!-- HIER SIND DIE MAILVERTEILER -->
                    <mailverteiler :data="data?.mailverteiler"></mailverteiler>
 
-
-
-
-
                   </div>
 
                 <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
@@ -452,11 +419,6 @@ export default {
 
                 <!-- END OF SIDE PANEL -->
               </div>
-
-
-            
-
-
 
           <!-- END OF CONTAINER ROW-->
           

@@ -46,19 +46,19 @@ export default {
       this.files = res.data;
     })
   },
-  template: `
+  template: /*html*/`
     <div class="row">
 
     <div class="col">
     <div  class="form-underline mb-2">
-    <div class="form-underline-titel">Status</div>
+    <div class="form-underline-titel">{{$p.t('global','status')}}</div>
     <span  class="form-underline-content">{{status}} </span>
     </div>
     </div>
 
     <div class="col">
     <div  class="form-underline mb-2">
-    <div class="form-underline-titel">Date</div>
+    <div class="form-underline-titel">{{$p.t('global','datum')}}</div>
     <span  class="form-underline-content">{{status_timestamp}} </span>
     </div>
     </div>
@@ -67,7 +67,7 @@ export default {
     <div class="row">
     <div class="col">
     <div v-if="status_message" class="form-underline mb-2 ">
-    <div class="form-underline-titel">Status message</div>
+    <div class="form-underline-titel">{{$p.t('profilUpdate','statusMessage')}}</div>
     <textarea  class="form-control" rows="4" disabled>{{status_message}} </textarea>
     </div>
     </div>

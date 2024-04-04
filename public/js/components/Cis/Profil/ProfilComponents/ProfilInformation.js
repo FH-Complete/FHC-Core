@@ -57,15 +57,8 @@ export default {
     </div>
     <div class="card-body">
     
-     
-
-
-
 <div  class="gy-3 row justify-content-center align-items-center">
-
-
-
-
+=
 <!-- SQUEEZING THE IMAGE INSIDE THE FIRST INFORMATION COLUMN -->
 <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
 <div class="col-12 col-sm-6 mb-2">
