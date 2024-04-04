@@ -83,16 +83,16 @@ $tableWidgetArray = array(
         vertragstyp_kurzbz: {minWidth: 200},
         bezeichnung: {minWidth: 200},
         vertragsstunden: {
-            align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
+            hozAlign:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
             bottomCalc:"sum", bottomCalcParams:{precision:1},
             minWidth: 200
         },
         betrag: {
-            align:"right", formatter: form_formatNulltoStringNumber,
+            hozAlign:"right", formatter: form_formatNulltoStringNumber,
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"},
             minWidth: 200
         },
-        storniert: {align:"center", mutator: mut_formatStringDate, tooltip: storniert_tooltip, minWidth: 200},
+        storniert: {hozAlign:"center", mutator: mut_formatStringDate, tooltip: storniert_tooltip, minWidth: 200},
         storniert_von: {visible: false},
         letzterStatus_vorStorniert: {visible: false}
     }', // col properties

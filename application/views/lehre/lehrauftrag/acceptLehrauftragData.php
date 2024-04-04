@@ -367,11 +367,11 @@ $filterWidgetArray = array(
         orgform_kurzbz: {visible: false, headerFilter:"input"},
         person_id: {visible: false, headerFilter:"input"},
         lv_oe_kurzbz: {visible: false, headerFilter:"input"},
-        stunden: {align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:2},
+        stunden: {hozAlign:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:2},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}
 		},
-        betrag: {align:"right", formatter: form_formatNulltoStringNumber,
+        betrag: {hozAlign:"right", formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}
 		},
@@ -379,9 +379,9 @@ $filterWidgetArray = array(
         vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
         mitarbeiter_uid: {visible: false, headerFilter:"input"},
-        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
-        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
-        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
+        bestellt: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
+        erteilt: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
+        akzeptiert: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
         bestellt_von: {visible: false, headerFilter:"input"},
         erteilt_von: {visible: false, headerFilter:"input"},
         akzeptiert_von: {visible: false, headerFilter:"input"}
