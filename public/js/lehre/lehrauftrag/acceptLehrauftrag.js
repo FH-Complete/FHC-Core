@@ -466,10 +466,19 @@ $(function() {
         func_tableBuilt(tabulatorInstance)
 		
         // using the tabulator instance instead of the jquery object because the site loads two different tabulator tables
-		tabulatorInstance.on("renderComplete",()=>{func_renderComplete(tabulatorInstance)});
-		tabulatorInstance.on("renderStarted",()=>{func_renderStarted(tabulatorInstance)});
-		tabulatorInstance.on("rowUpdated",(row)=>{func_rowUpdated(row)});
-       
+		let uniqueTableID = tabulatorInstance.parentElement.parentElement.parentElement.attributes.tableUniqueId.value;
+		switch(uniqueTableID){
+			case "cancelledLehrauftrag": 
+				tabulatorInstance.on("renderComplete",()=>{func_renderComplete(tabulatorInstance)});
+				break;
+			case "acceptLehrauftrag": 
+				tabulatorInstance.on("renderComplete",()=>{func_renderComplete(tabulatorInstance)});
+				tabulatorInstance.on("renderStarted",()=>{func_renderStarted(tabulatorInstance)});
+				tabulatorInstance.on("rowUpdated",(row)=>{func_rowUpdated(row)});
+				break;
+			default: break;
+		}
+		
     });
 
 	var canPromise = !! window.Promise;

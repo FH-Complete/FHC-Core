@@ -70,12 +70,7 @@ $tableWidgetArray = array(
         selectableCheck: function(row){
             return func_selectableCheck(row);
         },
-         renderComplete:function(){
-            func_renderComplete(this);
-        },
-        tableBuilt: function(){
-            func_tableBuilt(this);
-        },
+         
     }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
         vertrag_id: {visible: false},

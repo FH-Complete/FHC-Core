@@ -195,14 +195,14 @@ $filterWidgetArray = array(
 		studiengang_kz: {visible: false, headerFilter:"input"},
 		stg_bezeichnung: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
-		ects: {headerFilter:"input", align:"center"},
+		ects: {headerFilter:"input", hozAlign:"center"},
 		student: {headerFilter:"input"},
 		begruendung: {headerFilter:"input"},
 		zgv: {headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams: paramLookup_dokBez},
 		anmerkung_student: {headerFilter:"input"},
-		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
-		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
+		antragsdatum: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate},
+		empfehlung_anrechnung: {headerFilter:"input", hozAlign:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false, headerFilter:"input"},
 		status_bezeichnung: {headerFilter:"input"}
 	 }', // col properties
