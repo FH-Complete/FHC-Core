@@ -10,6 +10,7 @@ import replace from '@rollup/plugin-replace';
 import alias from '@rollup/plugin-alias';
 import { existsSync } from 'node:fs';
 import terser from '@rollup/plugin-terser';
+import json from '@rollup/plugin-json';
 
 function FhcResolver () {
   return {
@@ -59,6 +60,7 @@ export default {
 			}
 		}),
 		nodeResolve({
+			preferBuiltins: true,
 			moduleDirectories: ['node_modules'],
 			modulePaths: globSync('application/extensions/*/node_modules', {follow: true, realpath: true}).map(file => 
 				fileURLToPath(new URL(file, import.meta.url))
@@ -71,6 +73,7 @@ export default {
     		}),
 		commonjs(),
 		vue(),
+		json(),
 		babel({
 			babelHelpers: 'bundled',
       			plugins: ['transform-class-properties']
