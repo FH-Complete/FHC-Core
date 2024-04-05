@@ -24820,6 +24820,206 @@ array(
 				)
 			)
 		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdateRequest',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profil Update Anfrage',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Profil Update Request',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'statusDate',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Status Datum',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Date of Status',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'userID',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'UserID',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'UserID',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'anfrageThema',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Thema der Anfrage',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Topic of Request',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'anfrageDatum',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Datum der Anfrage',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Date of Request',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'update',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Aktualisierung',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'update',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'accept',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Annehmen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'accept',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'deny',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ablehnen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'deny',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'pendingRequests',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ausstehende Anfragen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Pending Requests',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'allRequests',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Alle Anfragen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'All Requests',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
 		
 		
 		

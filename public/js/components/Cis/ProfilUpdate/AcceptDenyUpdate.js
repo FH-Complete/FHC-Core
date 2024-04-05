@@ -14,7 +14,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: "Profil Update Request",
+      default: this.$p.t('profilUpdate','profilUpdateRequest'),
     },
     value: {
       type: Object,
@@ -105,7 +105,7 @@ export default {
   popup(options) {
     return BsModal.popup.bind(this)(null, options);
   },
-  template: `
+  template: /*html*/`
 
   <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     
@@ -126,14 +126,14 @@ export default {
     
    <div class="row">
     <div  class="form-underline mb-2 col-12 col-sm-6">
-      <div class="form-underline-titel">Status: </div>
+      <div class="form-underline-titel">{{$p.t('global','status')}}: </div>
 
       <span  class="form-underline-content" >{{data.status}}</span>
     </div>
 
 
     <div v-if="data.status!=='pending'" class="form-underline mb-2 col-12 col-sm-6">
-      <div class="form-underline-titel">Date of Status: </div>
+      <div class="form-underline-titel">{{$p.t('profilUpdate','statusDate')}}: </div>
       <!-- only status timestamp and status message can be null in the database -->
       <span  class="form-underline-content" >{{data.status_timestamp?data.status_timestamp:'-'}}</span>
     </div>
@@ -141,19 +141,19 @@ export default {
 
     
     <div  class="form-underline mb-2 col-12 col-sm-6">
-      <div class="form-underline-titel">UserID: </div>
+      <div class="form-underline-titel">{{$p.t('profilUpdate','userID')}}: </div>
 
       <span  class="form-underline-content" >{{data.uid}}</span>
     </div>
 
     <div  class="form-underline mb-2 col-12 col-sm-6">
-      <div class="form-underline-titel">Name: </div>
+      <div class="form-underline-titel">{{$p.t('global','name')}}: </div>
 
       <span  class="form-underline-content" >{{data.name}}</span>
     </div>
 
     <div  class="form-underline mb-2 col-12 col-sm-6">
-      <div class="form-underline-titel">Topic of Request: </div>
+      <div class="form-underline-titel">{{$p.t('profilUpdate','anfrageThema')}}: </div>
 
       <span  class="form-underline-content" >{{data.topic}}</span>
     </div>
@@ -162,7 +162,7 @@ export default {
 
 
     <div  class="form-underline mb-2 col-12 col-sm-6">
-      <div class="form-underline-titel">Date of Request:</div>
+      <div class="form-underline-titel">{{$p.t('profilUpdate','anfrageDatum')}}:</div>
 
       <span  class="form-underline-content" >{{data.insertamum}}</span>
     </div>
@@ -173,7 +173,7 @@ export default {
     <div v-if="data.status !=='pending' && data.status_message" class="row">
     <div class="col">
     <div  class="form-underline mb-2 ">
-    <div class="form-underline-titel">Status message</div>
+    <div class="form-underline-titel">{{$p.t('profilUpdate','statusMessage')}}</div>
     <textarea  class="form-control" rows="4" disabled>{{data.status_message}} </textarea>
     </div>
     </div>
@@ -182,7 +182,7 @@ export default {
     <div class="row my-4">
     <div class="col ">
     <div class="card">
-    <div class="card-header">update</div>
+    <div class="card-header">{{$p.t('profilUpdate','update')}}</div>
     <div class="card-body">
     <template v-if="getComponentView==='text_input'">
     <div  class="form-underline mb-2">
@@ -208,12 +208,12 @@ export default {
 
     <template v-if="data.status === 'pending'"  v-slot:footer>
     <div  class="form-underline flex-fill">
-      <div class="form-underline-titel">Message</div>
+      <div class="form-underline-titel">{{$p.t('global','nachricht')}}</div>
 
       <div class="d-flex flex-row gap-2">
         <input  class="form-control " v-model="data.status_message"  >
-        <button  @click="acceptRequest" class="text-nowrap btn btn-success">Accept <i class="fa fa-check"></i></button>
-        <button @click="denyRequest" class="text-nowrap btn btn-danger">Deny <i class="fa fa-xmark"></i></button>
+        <button  @click="acceptRequest" class="text-nowrap btn btn-success">{{$p.t('profilUpdate','accept')}} <i class="fa fa-check"></i></button>
+        <button @click="denyRequest" class="text-nowrap btn btn-danger">{{$p.t('profilUpdate','deny')}} <i class="fa fa-xmark"></i></button>
       </div>
     </div>
      

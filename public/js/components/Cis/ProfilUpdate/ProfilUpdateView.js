@@ -319,17 +319,17 @@ export default{
       
     }
   },
-  template: `
+  template: /*html*/`
     <div>
     
     <accept-deny-update v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
     
     <div  class="form-underline flex-fill ">
-      <div class="form-underline-titel">Show </div>
+      <div class="form-underline-titel">{{$p.t('ui','anzeigen')}} </div>
 
       <select class="mb-4 " v-model="showAll" @change="updateData" class="form-select" aria-label="Profil updates display selection">
-        <option :selected="true" :value="false">Pending Requests</option>
-        <option :value="true">All Requests</option>
+        <option :selected="true" :value="false">{{$p.t('profilUpdate','pendingRequests')}}</option>
+        <option :value="true">{{$p.t('profilUpdate','allRequests')}}</option>
       </select>
   
     </div>
