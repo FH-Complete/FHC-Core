@@ -12,6 +12,11 @@ export default {
 		FormForm,
 		FormInput,
 	},
+	inject: {
+		cisRoot: {
+			from: 'cisRoot'
+		},
+	},
 	props: [
 		'person_id',
 		'uid'
@@ -19,7 +24,6 @@ export default {
 	data(){
 		return {
 			tabulatorOptions: {
-			//	ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Betriebsmittel/getBetriebsmittel/' + this.id + '/' + this.typeId),
 				ajaxURL: 'api/frontend/v1/stv/Betriebsmittel/getAllBetriebsmittel/' + this.uid + '/' + this.person_id,
 				ajaxRequestFunc: this.$fhcApi.get,
 				ajaxResponse: (url, params, response) => response.data,
@@ -27,9 +31,9 @@ export default {
 					{title: "Nummer", field: "nummer"},
 					{title:  "PersonId", field: "person_id"},
 					{title: "Typ", field: "betriebsmitteltyp"},
-					{title: "insertVon", field: "insertvon"}, //Test
-					{title: "insertAmUm", field: "insertamum"}, //TESt
-					{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id"},
+				//	{title: "insertVon", field: "insertvon"}, //Test
+				//	{title: "insertAmUm", field: "insertamum"}, //TESt
+				//	{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id"},
 					{title:  "Retourdatum", field: "retouram"},
 					{title:  "Beschreibung", field: "beschreibung"},
 					{title:  "Uid", field: "uid"},
@@ -37,7 +41,7 @@ export default {
 					{title:  "Kaution", field: "kaution", visible: false},
 					{title:  "Ausgabedatum", field: "ausgegebenam", visible: false},
 					{title: "Betriebsmittel_id", field: "betriebsmittel_id", visible: false},
-/*					{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id", visible: false},*/
+					{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -49,11 +53,16 @@ export default {
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-print"></i>';
 							button.title = 'Übernahmebestätigung drucken';
+							let cellData = cell.getData();
 							button.addEventListener(
 								'click',
 								(event) =>
-									this.actionPrintConfirmation(cell.getData().betriebsmittelperson_id)
-							);
+								{
+									let linkToPdf = this.cisRoot +
+										'/content/pdfExport.php?xml=betriebsmittelperson.rdf.php&xsl=Uebernahme&id=' + cellData.betriebsmittelperson_id + '&output=pdf';
+
+								window.open(linkToPdf, '_blank');
+							});
 							container.append(button);
 
 							button = document.createElement('button');
@@ -86,29 +95,50 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: '150',
 				selectableRangeMode: 'click',
-				selectable: true,
-				//index: 'betriebsmittel_id',
+				selectable: true
 			},
 			//tableData: [],
 			tabulatorEvents: [
 				{
-/*					event: 'rowSelectionChanged',
-					handler: this.rowSelectionChanged*/
-/*					handler: (e, row.getData().betriebsmittelperson_id) => {
-						// Handler-Funktion, die aufgerufen wird, wenn das Ereignis ausgelöst wird
-						//this.rowSelectionChanged(row.getData().betriebsmittelperson_id);
-					//	console.log("Selected Row Data:", row.getData());
-						//console.log(cell.getData().betriebsmittelperson_id);
+/*					//TODO Manu phrases
 					}*/
-				},
 
+					//TODO(manu)für editieren mit click: conflict with action buttons
+
+/*             event: 'rowSelectionChanged',
+			   handler: this.rowSelectionChanged*/
+/*              handler: (e, row.getData().betriebsmittelperson_id) => {
+// HandlerFunktion, die aufgerufen wird, wenn das Ereignis ausgelöst wird
+					   //this.rowSelectionChanged(row.getData().betriebsmittelperson_id);
+			   //      console.log("Selected Row Data:", row.getData());
+					   //console.log(cell.getData().betriebsmittelperson_id);
+*/
+				},
 			],
 			betriebsmittelData: {},
 			betriebsmittelperson_id : null,
 			listBetriebsmitteltyp: [],
-			formData: {},
-			statusNew: true
+			formData: {
+				ausgegebenam : this.getDefaultDate(),
+			},
+			statusNew: true,
+			changesDetected: false
 		};
+	},
+	computed: {
+		deltaLength() {
+			return Object.keys(this.formData).length;
+		}
+	},
+	watch: {
+		formData: {
+			handler: function(newVal) {
+
+				//console.log('Das Objekt wurde geändert:', newVal);
+				this.changesDetected = true;
+			},
+			deep: true  // Hiermit wird auch die Veränderung von Eigenschaften des Objekts überwacht
+		}
 	},
 	methods: {
 		rowSelectionChanged(data) {
@@ -122,19 +152,14 @@ export default {
 			console.log("action EditBM: id: " + betriebsmittelperson_id);
 			this.statusNew = false;
 			this.loadBetriebsmittel(betriebsmittelperson_id);
-/*			this.loadBetriebsmittel(betriebsmittelperson_id).then(() => {
-				/!*				if(this.formData) {
-									this.$refs.deleteBetriebsmittelModal.show();
-								}*!/
-				console.log("nach load" + betriebsmittelperson_id);
-
-			});*/
+			this.changesDetected = false;
 		},
 		actionNewBetriebsmittel(){
 			console.log("action newBM: person " + this.person_id);
 			this.resetModal();
 			this.statusNew = true;
 			this.formData.ausgegebenam = this.getDefaultDate();
+			//this.changesDetected = false;
 			this.reload();
 		},
 		actionDeleteBetriebsmittel(betriebsmittelperson_id){
@@ -148,23 +173,14 @@ export default {
 				this.$refs.deleteBetriebsmittelModal.show();
 			});
 		},
-		actionPrintConfirmation(betriebsmittelperson_id){
-			console.log("actionPrintConfirmation of id: " + betriebsmittelperson_id);
-/*			this.loadBetriebsmittel(betriebsmittelperson_id).then(() => {
-
-				if(this.betriebsmittelData)
-					this.$refs.editBetriebsmittelModal.show();
-			});*/
-		},
 		addNewBetriebsmittel(){
-			this.param_id = {
+			this.param = {
 				'uid':  this.uid,
 				'person_id': this.person_id,
 				...this.formData
 			};
-			//this.combinedObj = { ...this.param_id, ...this.formData };
 			this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/addNewBetriebsmittel/',
-				this.param_id
+				this.param
 			).then(response => {
 				console.log(response);
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -175,13 +191,13 @@ export default {
 					window.scrollTo(0, 0);
 					this.reload();
 				});
+			//this.changesDetected = false; //not working
 		},
 		deleteBetriebsmittel(betriebsmittelperson_id){
 			console.log("Delete mit id: " + betriebsmittelperson_id);
 			this.param = {
 				'betriebsmittelperson_id': betriebsmittelperson_id
 			};
-			console.log( "param_id" + this.param + "|" );
 			return this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/deleteBetriebsmittel/',
 				this.param)
 				.then(
@@ -219,27 +235,32 @@ export default {
 			console.log("loadBetriebsmittel id:" + betriebsmittelperson_id);
 			this.resetModal();
 			this.statusNew = false;
-			this.param_id = {
+			this.param = {
 				'betriebsmittelperson_id':  betriebsmittelperson_id
 			};
 			return this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/loadBetriebsmittel/',
-				this.param_id)
+				this.param)
 				.then(result => result.data)
 				.then(result => {
 					this.formData = result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		//	this.changesDetected = false;
 		},
 		reload(){
 			this.$refs.table.reloadTable();
+			//this.changesDetected = false;
 		},
 		hideModal(modalRef){
 			this.$refs[modalRef].hide();
 		},
 		resetModal(){
 			this.formData = {};
+			this.formData.ausgegebenam = this.getDefaultDate();
+			this.formData.listBetriebsmitteltyp = null;
 			this.betriebsmittelperson_id = {};
 			this.statusNew = true;
+			//this.changesDetected = false;
 		},
 		getDefaultDate() {
 			const today = new Date();
@@ -256,15 +277,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	mounted(){
-/*		this.$refs.table.on("rowSelected", (row) => {
-			// Hier können Sie auf das ausgewählte Zeilenobjekt zugreifen und entsprechende Aktionen durchführen
-			console.log("Selected Row:", row.getData());
-		});*/
 
-		//this.$refs.newBetriebsmittelModal.show();
-		//loadFirstEntry for the form
-		console.log("mounted");
-		//console.log(this.$refs.table.tableData);
 	},
 /*	async mounted() {
 		if(this.showTinyMCE){
@@ -331,7 +344,8 @@ export default {
 			>
 		</core-filter-cmpt>
 		<br>
-				{{formData}} || {{statusNew}}
+		 {{cisRoot}}
+		 {{formData}} {{changesDetected}}
 				<hr>
 			<form-form class="row g-3 col-6" ref="betriebsmittelData">
 				<legend>Details</legend>
@@ -457,10 +471,10 @@ export default {
 				<div class="row mb-3">
 				<label class="form-label col-sm-8"></label>
 					<div v-if="statusNew" class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">Speichern</button>
+						<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()" :disabled="!changesDetected">Speichern</button>
 					</div>
 					<div v-else class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-warning" @click="updateBetriebsmittel()">Aktualisieren {{formData.betriebsmittelperson_id}}</button>
+						<button ref="Close" type="button" class="btn btn-warning" @click="updateBetriebsmittel()" :disabled="!changesDetected">Aktualisieren</button>
 					</div>
 					
 				</div>
