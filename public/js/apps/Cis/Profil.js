@@ -367,6 +367,7 @@ const profilApp = Vue.createApp({
 	</div>`,
 });
 
-profilApp.use(primevue.config.default, { zIndex: { overlay: 9999 } });
-profilApp.use(Phrasen);
-profilApp.mount("#content");
+profilApp
+  .use(primevue.config.default, { zIndex: { overlay: 9999 } })
+  .use(Phrasen)
+  .mount("#content");

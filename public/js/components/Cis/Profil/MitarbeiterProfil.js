@@ -222,6 +222,8 @@ export default {
   },
   
   mounted() {
+    console.log("this mitarbeter",this)
+    console.log("this p",this.$p)
     this.$refs.betriebsmittelTable.tabulator.on("tableBuilt", () => {
       this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
     });
@@ -234,7 +236,7 @@ export default {
   template: /*html*/ ` 
   <div class="container-fluid text-break fhc-form"  >
   
-    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="$p.t('profil','profilBearbeiten')"></edit-profil>
+    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" :title="$p.t('profil','profilBearbeiten')"></edit-profil>
           <div class="row">
           
               <div  class="d-md-none col-12 ">
@@ -242,7 +244,7 @@ export default {
               <div class="row mb-3">
                 <div class="col">
                 <!-- MOBILE QUICK LINKS --> 
-                <quick-links :mobile="true"></quick-links>    
+                <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>    
                 </div>
               </div>
 
@@ -289,7 +291,7 @@ export default {
                      <div class="col">
                      
                      <!-- PROFIL INFORMATION -->
-                     <profil-information title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
+                     <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
 
 
 		                 </div>
@@ -300,7 +302,7 @@ export default {
                      <div  class=" col-lg-12">
         
                     <!-- MITARBEITER INFO -->
-                    <role-information title="$p.t('profil','mitarbeiterInformation')" :data="roleInformation"></role-information>
+                    <role-information :title="$p.t('profil','mitarbeiterInformation')" :data="roleInformation"></role-information>
 
 
                      </div> 
@@ -316,7 +318,7 @@ export default {
                     <div class="row mb-4">
                     <div class="col">
                     <!-- EMAILS -->
-                    <profil-emails :data="data.emails" ></profil-emails>
+                    <profil-emails :title="this.$p.t('person','email')" :data="data.emails" ></profil-emails>
                     </div>
                     </div>
 
@@ -377,14 +379,14 @@ export default {
 
                   <!-- FUNKTIONEN TABELLE -->
                  
-                    <core-filter-cmpt title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   
                     </div>
 
                   <div class="col-12 mb-4" >
 
                   <!-- BETRIEBSMITTEL TABELLE -->
-                    <core-filter-cmpt title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
+                    <core-filter-cmpt :title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div>
 
                 </div>
@@ -402,7 +404,7 @@ export default {
                 <div class="col">
                  
                     <!-- QUICK LINKS --> 
-                    <quick-links></quick-links>
+                    <quick-links :title="$p.t('profil','quickLinks')"></quick-links>
                    
                       
                   
@@ -447,7 +449,7 @@ export default {
                   <div class="col">
                   <!-- MAILVERTEILER -->
                     <mailverteiler  :data="data?.mailverteiler"></mailverteiler>
-                    
+                     
                   </div>
                 </div>
               </div>          

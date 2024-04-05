@@ -7,7 +7,7 @@ export default{
         },
         title:{
             type:String,
-            default: this.$p.t('profil','quickLinks'),
+
         },
         mobile:{
             type:Boolean,

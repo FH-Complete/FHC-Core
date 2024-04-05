@@ -7,7 +7,7 @@ export default {
     props:{
         title:{
             type:String,
-            default:this.$p.t('person','email'),
+            
         },
         data:{
             type:Array,
