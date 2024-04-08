@@ -1,3 +1,5 @@
+import { ref, unref, triggerRef } from 'vue';
+
 const categories = {};
 const loadingModules = {};
 
@@ -12,8 +14,8 @@ function reloadRefs(category) {
 	while (loadingModules[category].length) {
 		var v = loadingModules[category].pop();
 		v[0].value = getValueForLoadedPhrase(category, v[1], v[2]);
-		Vue.triggerRef(v[0]);
-		/*Vue.unref(v);*/
+		triggerRef(v[0]);
+		/*unref(v);*/
 	}
 }
 function loadLazy(category, val, phrase, params) {
@@ -70,16 +72,16 @@ const phrasen = {
 			
 			if (!categories[category] || Object.keys(categories[category]).length === 0) {
 				categories[category] = undefined;
-				let val = Vue.ref(initialval);
+				let val = ref(initialval);
 				loadLazy(category, val, phrase, params);
 				return val;
 			}
 		}
 		var result = getValueForLoadedPhrase(category, phrase, params);
-		return Vue.ref(result);
+		return ref(result);
 	},
 	t(category, phrase, params) {
-		return Vue.unref(this.t_ref(category, phrase, params));
+		return unref(this.t_ref(category, phrase, params));
 	}
 };
 

@@ -92,16 +92,24 @@
  * @param mixed		message
  * @return void
  */
+/*
 import PvConfig from "../../../index.ci.php/public/js/components/primevue/config/config.esm.min.js";
 import PvToast from "../../../index.ci.php/public/js/components/primevue/toast/toast.esm.min.js";
 import PvConfirm from "../../../index.ci.php/public/js/components/primevue/confirmdialog/confirmdialog.esm.min.js";
 import PvConfirmationService from "../../../index.ci.php/public/js/components/primevue/confirmationservice/confirmationservice.esm.min.js";
+*/
+
+import { createApp } from 'vue';
+import PvConfig from 'primevue/config';
+import PvToast from 'primevue/toast';
+import PvConfirm from 'primevue/confirmdialog';
+import PvConfirmationService from 'primevue/confirmationservice';
 
 import {CoreRESTClient} from '../RESTClient.js';
 
 const helperAppContainer = document.createElement('div');
 
-const helperApp = Vue.createApp({
+const helperApp = createApp({
 	components: {
 		PvToast,
 		PvConfirm

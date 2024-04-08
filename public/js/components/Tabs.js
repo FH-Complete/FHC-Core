@@ -1,3 +1,4 @@
+import { markRaw, defineAsyncComponent } from 'vue';
 import {CoreRESTClient} from '../RESTClient.js';
 import accessibility from "../directives/accessibility.js";
 
@@ -70,7 +71,7 @@ export default {
 						return console.error('Component missing for ' + key);
 
 					tabs[key] = {
-						component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
+						component: markRaw(defineAsyncComponent(() => import(item.component))),
 						title: item.title || key,
 						config: item.config,
 						key
@@ -82,7 +83,7 @@ export default {
 						return console.error('Component missing for ' + key);
 
 					tabs[key] = {
-						component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
+						component: markRaw(defineAsyncComponent(() => import(item.component))),
 						title: item.title || key,
 						config: item.config,
 						key
