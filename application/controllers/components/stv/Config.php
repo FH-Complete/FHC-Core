@@ -14,6 +14,7 @@ class Config extends FHC_Controller
 
 	public function student()
 	{
+		// TODO(chris): phrases
 		$result = [];
 		$result['details'] = [
 			'title' => 'Details',
@@ -35,6 +36,11 @@ class Config extends FHC_Controller
 			'title' => 'Status',
 			'component' => './Stv/Studentenverwaltung/Details/Status.js'
 		];
+		$result['konto'] = [
+			'title' => 'Konto',
+			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
+			'config' => ['ZAHLUNGSBESTAETIGUNG_ANZEIGEN' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN)]
+		];
 		$result['betriebsmittel'] = [
 			'title' => 'Betriebsmittel',
 			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
@@ -53,6 +59,18 @@ class Config extends FHC_Controller
 
 	public function students()
 	{
-		$this->outputJsonSuccess([]);
+		// TODO(chris): phrases
+		$result = [];
+		$result['konto'] = [
+			'title' => 'Konto',
+			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
+			'config' => ['ZAHLUNGSBESTAETIGUNG_ANZEIGEN' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN)]
+		];
+
+		Events::trigger('stv_conf_students', function & () use (&$result) {
+			return $result;
+		});
+
+		$this->outputJsonSuccess($result);
 	}
 }
