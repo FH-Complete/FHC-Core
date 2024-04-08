@@ -3559,8 +3559,13 @@ function StudentZeugnisDokumentArchivieren()
 			break;
 	}
 
+	// Speichern zum Anzeigen des Aktivierungsfortschritts
 	var labelalt = document.getElementById('student-zeugnis-button-archive').label;
 	document.getElementById('student-zeugnis-button-archive').label='Loading...';
+	var amountArchived = 0;
+	document.getElementById('student-zeugnis-archive-progress-row').hidden=false;
+	var prestudentIdArray = getMultipleTreeCellText(tree, 'student-treecol-prestudent_id');
+	document.getElementById('student-zeugnis-archive-progress').value="0/"+prestudentIdArray.length;
 
 	//Dokument fuer alle markierten Studenten archivieren
 	for (var t=0; t<numRanges; t++)
@@ -3594,12 +3599,21 @@ function StudentZeugnisDokumentArchivieren()
 			var response = req.execute();
 			if(response!='')
 				errormsg = errormsg + response;
+			else
+			{
+				// Fortschritt der Archivierung anzeigen
+				document.getElementById('student-zeugnis-archive-progress').value
+					=++amountArchived+"/"+prestudentIdArray.length+" (PreStudentInnenID: "+prestudent_id+")";
+			}
 		}
 	}
 
 	if(errormsg!='')
 		alert(errormsg);
+
+	// Fortschrittsfelder zurücksetzen
 	document.getElementById('student-zeugnis-button-archive').label=labelalt;
+	document.getElementById('student-zeugnis-archive-progress-row').hidden=true;
 	StudentAkteTreeDatasource.Refresh(false);
 }
 
@@ -4783,7 +4797,7 @@ function StudentNotenMoveFromAntrag()
 
 	var uid = document.getElementById('student-detail-textbox-uid').value;
 	req.add('student_uid', uid);
-	
+
 	var txt = "?";
 	for(var q in req.parms) {
 		txt = txt+'&'+req.parms[q].name+'='+encodeURIComponent(req.parms[q].value);

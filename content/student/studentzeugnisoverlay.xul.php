@@ -144,6 +144,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</menulist>
 						<button id="student-zeugnis-button-archive" label="Archivieren" disabled="false" oncommand="StudentZeugnisDokumentArchivieren()"/>
 					</row>
+					<row id="student-zeugnis-archive-progress-row" hidden="true">
+						<label value="Archiviert: "/>
+						<label id="student-zeugnis-archive-progress" class="text" value="0/0"/>
+					</row>
 				</rows>
 		</grid>
 	</groupbox>
