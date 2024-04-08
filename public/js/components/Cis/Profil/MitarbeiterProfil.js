@@ -448,7 +448,7 @@ export default {
                 <div  class="row">
                   <div class="col">
                   <!-- MAILVERTEILER -->
-                    <mailverteiler  :data="data?.mailverteiler"></mailverteiler>
+                    <mailverteiler  :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
                      
                   </div>
                 </div>

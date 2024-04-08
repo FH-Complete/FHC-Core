@@ -24366,13 +24366,13 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Der FH Ausweis ist am <b>{0}</b> ausgegeben worden.',
+					'text' => 'Der FH Ausweis ist am {0} ausgegeben worden.',
 					'description' => '',
 					'insertvon' => 'system'
 				),
 				array(
 					'sprache' => 'English',
-					'text' => 'The FH ID card was issued on <b>{0}</b>',
+					'text' => 'The FH ID card was issued on {0}',
 					'description' => '',
 					'insertvon' => 'system'
 				)

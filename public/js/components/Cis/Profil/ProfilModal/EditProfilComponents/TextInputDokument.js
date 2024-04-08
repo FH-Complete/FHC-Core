@@ -94,7 +94,7 @@ export default {
   },
   template: /*html*/`
   
-    <p style="opacity:0.8" class="ms-2" v-if="withFiles && !updateID">{{$p.t('profilUpdate','profilUpdateInformationMessage',data.titel)}}</p>
+    <p style="opacity:0.8" class="ms-2" v-if="withFiles && !updateID">{{$p.t('profilUpdate','profilUpdateInformationMessage',[data.titel])}}</p>
 
     <div class="form-underline">
     <div class="form-underline-titel">{{data.titel?data.titel:$p.t('global','titel')}}</div>

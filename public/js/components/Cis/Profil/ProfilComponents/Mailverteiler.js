@@ -1,13 +1,13 @@
 export default {
     props: {
         data: Object,
-        title: { type: String, default: '' },//this.$p.t('profil','mailverteiler')
+        title: { type: String },
     },
     data() {
         return {};
     },
     created(){
-        console.log("this",this);
+
     },
     template: /*html*/`
     <div class="card">
