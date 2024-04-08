@@ -39,33 +39,40 @@ function FhcResolver () {
 const useplugins = [
     	alias({
 		entries: {
-			vue: 'vue/dist/vue.esm-bundler.js'
+			vue: 'vue/dist/vue.esm-bundler.js',
 		}
 	}),
+	commonjs(),
 	nodeResolve({
+		module: true,
+		jsnext: true,
 		preferBuiltins: true,
+		browser: true,
 		moduleDirectories: ['node_modules'],
 		modulePaths: globSync('application/extensions/*/node_modules', {follow: true, realpath: true}).map(file => 
 			fileURLToPath(new URL(file, import.meta.url))
 		),
+	}),
+	json({
+		compact: true
 	}),
 	FhcResolver(),
 	replace({
 		preventAssignment: true,
 		'process.env.NODE_ENV': JSON.stringify( 'production' ),
 	}),
-	commonjs(),
 	vue(),
-	json(),
 	babel({
 		babelHelpers: 'bundled',
-		plugins: ['transform-class-properties']
+		plugins: ['transform-class-properties'],
 	}),
+/*
 	postcss({
 		extract: false,
 		modules: true,
 		use: ['sass'],
 	}),
+*/
 	terser()
 ];
 
@@ -74,9 +81,18 @@ export default globSync('public/**/js/apps/**/*.js', {follow: true, realpath: tr
 				return null;
 			}
 			let tmp = fileURLToPath(new URL(file, import.meta.url));
+			let cssfile = path.basename(tmp.replace(/\.js/, '.css'));
+			console.log('cssfile: ' + cssfile);
+			let cssplugin = [
+			  postcss({
+				extract: cssfile,
+				minimize: true,
+				sourceMap: true
+			  })
+			];
 			return {
 				input: tmp,
-				plugins: useplugins,
+				plugins: [...useplugins, ...cssplugin],
 				watch: {
 					buildDelay: 500
 				},
@@ -86,6 +102,5 @@ export default globSync('public/**/js/apps/**/*.js', {follow: true, realpath: tr
 					format: 'es',
 					file: tmp.replace(/public\//, 'public/dist/'),
 				}
-
 			}
 		}).filter(Boolean);

@@ -1,4 +1,6 @@
-const categories = Vue.reactive({});
+import { reactive, computed } from 'vue';
+
+const categories = reactive({});
 const loadingModules = {};
 
 function extractCategory(obj, category) {
@@ -35,7 +37,7 @@ const phrasen = {
 	},
 	t_ref(category, phrase, params) {
 		console.warn('depricated');
-		return Vue.computed(() => this.t(category, phrase, params));
+		return computed(() => this.t(category, phrase, params));
 	},
 	t(category, phrase, params) {
 		if (params === undefined && (
@@ -49,7 +51,7 @@ const phrasen = {
 			console.error('invalid input', category, phrase, params);
 			return '';
 		}
-		let val = Vue.computed(() => {
+		let val = computed(() => {
 			if (!categories[category])
 				return '';
 			return getValueForLoadedPhrase(category, phrase, params);

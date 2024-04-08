@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { TabulatorFull as Tabulator } from 'tabulator-tables';
 import {CoreFilterAPIs} from './API.js';
 import {CoreRESTClient} from '../../RESTClient.js';
 import {CoreFetchCmpt} from '../../components/Fetch.js';
