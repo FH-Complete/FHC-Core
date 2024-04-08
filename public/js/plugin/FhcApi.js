@@ -258,6 +258,7 @@ export default {
 			constructor(factorypart, root) {
 				if (root === undefined)
 					this.$fhcApi = app.config.globalProperties.$fhcApi;
+
 				else
 					Object.defineProperty(this, '$fhcApi', {
 						get() {
@@ -277,6 +278,5 @@ export default {
 		}
 
 		app.config.globalProperties.$fhcApi.factory = new FhcApiFactoryWrapper(FhcApiFactory);
-
 	}
 };
