@@ -9,9 +9,12 @@
             CONSTRAINT tbl_profil_update_status_pk PRIMARY KEY(status_kurzbz)
         );
 
-        INSERT INTO public.tbl_profil_update_status VALUES  ('pending','Profil Änderungen die neu erstellt wurden und noch nicht akzeptiert oder abgelehnt wurden'),
-                                                            ('accepted','Profil Änderungen die akzeptiert wurden'),
-                                                            ('rejected','Profil Änderungen die abgelehn wurden');";
+        INSERT INTO public.tbl_profil_update_status VALUES  ('Ausstehend','Profil Änderungen die noch nicht bearbeitet wurden'),
+                                                            ('Pending','Profil updates that were not processed yet'),
+                                                            ('Akzeptiert','Profil Änderungen die akzeptiert wurden'),
+                                                            ('Accepted','Profil updates that were accepted'),
+                                                            ('Abgelehnt','Profil Änderungen die abgelehn wurden'),
+                                                            ('Rejected','Profil updates that were rejected');";
 
         if(!$db->db_query($qry))
         echo '<strong>public.tbl_profil_update_status: '.$db->db_last_error().'</strong><br>';
@@ -28,16 +31,26 @@
             CONSTRAINT tbl_profil_update_topic_pk PRIMARY KEY(topic_kurzbz)
         );
 
-        INSERT INTO public.tbl_profil_update_topic VALUES   ('vorname','Vorname aktualisieren'),
-                                                            ('nachname','Nachname aktualisieren'),
-                                                            ('titel','Titel aktualisieren'),
-                                                            ('postnomen','Postnomen aktualisieren'),
+        INSERT INTO public.tbl_profil_update_topic VALUES   ('Vorname','Vorname aktualisieren'),
+                                                            ('First name','Update first name'),
+                                                            ('Nachname','Nachname aktualisieren'),
+                                                            ('Last name','Update last name'),
+                                                            ('Titel','Titel aktualisieren'),
+                                                            ('Title','Update title'),
+                                                            ('Postnomen','Postnomen aktualisieren'),
+                                                            ('post-nominals','Update post-nominals'),
                                                             ('Private Kontakte','Kontakt aktualisieren'),
-                                                            ('Delete Kontakte','Kontakt löschen'),
-                                                            ('Add Kontakte','Kontakt hinzufügen'),
+                                                            ('Private Contacts','Update contact'),
+                                                            ('Kontakt löschen','Kontakt löschen'),
+                                                            ('Delete contact','Delete contact'),
+                                                            ('Kontakt hinzufügen','Kontakt hinzufügen'),
+                                                            ('Add contact','Add contact'),
                                                             ('Private Adressen','Adresse aktualisieren'),
-                                                            ('Delete Adressen','Adresse löschen'),
-                                                            ('Add Adressen','Adresse hinzufügen');";
+                                                            ('Private Addresses','Update address'),
+                                                            ('Adresse löschen','Adresse löschen'),
+                                                            ('Delete address','Delete address'),
+                                                            ('Adresse hinzufügen','Adresse löschen'),
+                                                            ('Add address','Add address');";
 
         if(!$db->db_query($qry))
         echo '<strong>public.tbl_profil_update_topic: '.$db->db_last_error().'</strong><br>';

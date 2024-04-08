@@ -40,6 +40,17 @@ class ProfilUpdate extends Auth_Controller
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 
 
+		// Load language phrases
+        $this->loadPhrases(
+            array(
+            	'ui',
+                'global',
+                'person',
+                'profil',
+				'profilUpdate'
+            )
+        );
+
 		$this->load->library('DmsLib');
 		$this->load->library('PermissionLib');
 
@@ -63,11 +74,20 @@ class ProfilUpdate extends Auth_Controller
 		$email = $uid . "@" . DOMAIN;
 		
 		//? translation of the english version of the status to german
-		$status_de = $status == 'accepted' ? 'akzeptiert' : 'abgelehnt';
+		$status_de = "";
+		switch($status){
+			case 'Akzeptiert': $status_de = "Akzeptiert"; break;
+			case 'Accepted': $status_de = "Akzeptiert"; break;
+			case 'Abgelehnt': $status_de = "Abgelent"; break;
+			case 'Rejected': $status_de = "Abgelent"; break;
+			case 'Ausstehend': $status_de = "Ausstehend"; break;
+			case 'Pending': $status_de = "Ausstehend"; break;
+			default: $status_de = "default?"; break;
+		}
 
-		$mail_res = sendSanchoMail("profil_update_response",['topic'=>$topic,'status_de'=>$status_de,'status_en'=>$status,'href'=>APP_ROOT.'Cis/Profil'],$email,("Profil Änderung ".$status));
+		$mail_res = sendSanchoMail("profil_update_response",['topic'=>$topic,'status_de'=>$status_de,'status_en'=>$status,'href'=>APP_ROOT.'Cis/Profil'],$email,("Profil Änderung ".$this->p->t('profilUpdate', 'pending')));
 		if(!$mail_res){
-			show_error("failed to send email to " . $email);
+			show_error($this->p->t('profilUpdate','profilUpdate_email_error'));
 		}
 	}
 
@@ -79,7 +99,7 @@ class ProfilUpdate extends Auth_Controller
 
 		$isMitarbeiter_res = $this->MitarbeiterModel->isMitarbeiter($uid);
 		if(isError($isMitarbeiter_res)){
-			show_error("was not able to check whether ".$uid." is a mitarbeiter");
+			show_error($this->p->t('profilUpdate','profilUpdate_mitarbeiterCheck_error'));
 		}
 		$isMitarbeiter_res = getData($isMitarbeiter_res);
 		
@@ -97,13 +117,13 @@ class ProfilUpdate extends Auth_Controller
 			if(hasData($res)){
 				array_push($emails,MAIL_GST);
 			}else{
-				show_error("no Mitarbeiter with uid: ".$uid ." found");
+				show_error($this->p->t('profilUpdate','profilUpdate_mitarbeiterCheck_error'));
 			}
 		}else{
 			//? if it is not a mitarbeiter, check whether it is a student and send email to studiengang
 			$isStudent_res = $this->StudentModel->isStudent($uid);
 			if(isError($isStudent_res)){
-				show_error("was not able to check whether ".$uid." is a student");
+				show_error($this->p->t('profilUpdate','profilUpdate_studentCheck_error'));
 			}
 			$isStudent_res = getData($isStudent_res);
 			if($isStudent_res){
@@ -134,7 +154,7 @@ class ProfilUpdate extends Auth_Controller
 		}
 		foreach($mail_res as $m_res){
 			if(!$m_res){
-				show_error("error occured when sending email.");		
+				show_error($this->p->t('profilUpdate','profilUpdate_email_error'));		
 			}
 		}
 		
@@ -166,12 +186,12 @@ class ProfilUpdate extends Auth_Controller
 				
 
 			}else{
-				show_error("Missing necessary permissions");
+				show_error($this->p->t('profilUpdate','profilUpdate_permission_error'));
 				return;
 			}
 			
 		}else{
-			show_error("The requested document is not an attachment for any profil update");
+			show_error($this->p->t('profilUpdate','profilUpdate_dms_error'));
 			return;
 		}
 		
@@ -189,12 +209,12 @@ class ProfilUpdate extends Auth_Controller
 		//? if replace is set it contains the profil_update_id in which the attachment_id has to be replaced
 		if(isset($replace)){
 			$this->ProfilUpdateModel->addSelect(["attachment_id"]);
-			$attachmentID = $this->ProfilUpdateModel->load([$replace]);
-			if(isError($attachmentID)){
-				return json_encode(error("Error loading ProfilUpdate resource"));
+			$profilUpdate = $this->ProfilUpdateModel->load([$replace]);
+			if(isError($profilUpdate)){
+				return json_encode(error($this->p->t('profilUpdate','profilUpdate_loading_error')));
 			}
 			//? get the attachmentID
-			$dms_id = hasData($attachmentID) ? getData($attachmentID)[0]->attachment_id : null;
+			$dms_id = hasData($profilUpdate) ? getData($profilUpdate)[0]->attachment_id : null;
 			
 			//? delete old dms_file of Profil Update
 			$this->deleteOldVersionFile($dms_id);
@@ -250,7 +270,7 @@ class ProfilUpdate extends Auth_Controller
 				array_push($res, $this->DmsVersionModel->delete([$dms_id,$version]));
 			}
 		}else{
-			echo json_encode(error("No version of the file has been found"));
+			echo json_encode(error($this->p->t('profilUpdate','profilUpdate_dmsVersion_error')));
 		}
 		
 		//? returns a result for each deleted dms_file
@@ -280,7 +300,7 @@ class ProfilUpdate extends Auth_Controller
 		$this->ProfilUpdateModel->addSelect(["attachment_id"]);
 		$attachmentID = $this->ProfilUpdateModel->load([$id]);
 		if(isError($attachmentID)){
-			return json_encode(error("Error loading ProfilUpdate resource"));
+			return json_encode(error($this->p->t('profilUpdate','profilUpdate_loading_error')));
 		}
 		//? get the attachmentID
 		$dms_id = hasData($attachmentID) ? getData($attachmentID)[0]->attachment_id : null;
@@ -289,7 +309,7 @@ class ProfilUpdate extends Auth_Controller
 		$this->DmsVersionModel->addSelect(["name", "dms_id"]);
 		$attachment = $this->DmsVersionModel->load([$dms_id,0]);
 		if(isError($attachment)){
-			return json_encode(error("Error loading DmsVersion resource"));
+			return json_encode(error($this->p->t('profilUpdate','profilUpdate_dmsVersion_error')));
 		}
 		$attachment = hasData($attachment) ? getData($attachment) : null;
 		//? returns {name:..., dms_id:...}
@@ -304,7 +324,7 @@ class ProfilUpdate extends Auth_Controller
 		$payload = $json->payload;
 		$identifier = property_exists($json->payload,"kontakt_id")? "kontakt_id" : (property_exists($json->payload,"adresse_id")? "adresse_id" : null);
 		
-		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid,"status"=>"pending" ];
+		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid,"status"=>$this->p->t('profilUpdate', 'pending') ];
 		
 		//? insert fileID in the dataset if sent with post request
 		if(isset($json->fileID)){
@@ -315,13 +335,13 @@ class ProfilUpdate extends Auth_Controller
 		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilUpdateModel->getProfilUpdatesWhere(["uid"=>$this->uid]);
 		if(isError($res)){
-			show_error("Error occured while querying the profil update requests of UID: ".$uid);
+			show_error($this->p->t('profilUpdate','profilUpdate_loading_error'));
 		}
 		$res = hasData($res)? getData($res):null;
 		
 		//? the user cannot delete a zustelladresse/kontakt
 		if( isset($payload->delete) && $payload->{$identifier=="kontakt_id"? "zustellung":"zustelladresse"}){
-			echo json_encode(error("cannot delete resource marked as zustellung"));
+			echo json_encode(error($this->p->t('profilUpdate','profilUpdate_deleteZustellung_error')));
 			return;
 		 }
 		 
@@ -330,14 +350,14 @@ class ProfilUpdate extends Auth_Controller
 			$adr = $this->AdresseModel->load($payload->$identifier);
 			$adr = getData($adr)[0];
 			if($adr->heimatadresse){
-				echo json_encode(error("cannot delete adresse marked as heimatadresse"));
+				echo json_encode(error($this->p->t('profilUpdate','profilUpdate_deleteZustellung_error')));
 				return;
 			}
 		}
 
 		if($res){
 		$pending_changes = array_filter($res, function($element) {
-			return $element->status == 'pending';
+			return $element->status == 'Pending' || $element->status == 'Ausstehend';
 		});
 
 		foreach($pending_changes as $update_request){
@@ -346,13 +366,13 @@ class ProfilUpdate extends Auth_Controller
 			 //? the user can add as many new kontakte/adressen as he likes
 			 if( !isset($payload->add) && property_exists($existing_change,$identifier) && property_exists($payload,$identifier) && $existing_change->$identifier == $payload->$identifier){
 				//? the kontakt_id / adresse_id of a change has to be unique 
-				echo json_encode(error("cannot change the same resource twice"));
+				echo json_encode(error($this->p->t('profilUpdate','profilUpdate_changeTwice_error')));
 				return;
 			}
 			
 			//? if it is not updating any kontakt/adresse, the topic has to be unique
 			elseif(!$identifier && $update_request->topic == $json->topic ){
-				echo json_encode(error("A request to change " . $json->topic . " is already open"));
+				echo json_encode(error($this->p->t('profilUpdate','profilUpdate_changeTopicTwice_error',['0'=>$update_request->topic])));
 				return;
 			}
 		}}
@@ -417,7 +437,7 @@ class ProfilUpdate extends Auth_Controller
 		
 		$res = $this->StudentModel->execReadOnlyQuery($query,[$student_uid]);
 		if(!isSuccess($res)){
-			show_error("was not able to query the oe_einheit of Student: ".$student_uid);
+			show_error($this->p->t('profilUpdate','profilUpdate_loadingOE_error'));
 		}
 		$res = hasData($res) ? getData($res) : [];
 		$res = array_map(
@@ -447,7 +467,7 @@ class ProfilUpdate extends Auth_Controller
 		
 		//! check for required information
 		if(!isset($id) || !isset($uid) || !isset($personID) || !isset($requested_change) || !isset($topic)){
-			return json_encode(error("missing required information"));
+			return json_encode(error($this->p->t('profilUpdate','profilUpdate_requiredInformation_error')));
 		}
 
 		$is_mitarbeiter_profil_update = getData($this->MitarbeiterModel->isMitarbeiter($uid));
@@ -468,7 +488,7 @@ class ProfilUpdate extends Auth_Controller
 				$requested_change['adresse_id'] = $insertID;
 				$update_res = $this->updateRequestedChange($id,$requested_change);
 				if(isError($update_res)){
-					echo json_encode(error("was not able to add addresse_id " . $insertID . " to profilRequest " . $id ));
+					echo json_encode(error($this->p->t('profilUpdate','profilUpdate_address_error',[$insertID, $id])  ));
 					return;
 				}
 			}
@@ -494,15 +514,15 @@ class ProfilUpdate extends Auth_Controller
 			
 			$result = $this->PersonModel->update($personID,[$topic=>$requested_change["value"]]);
 			if(isError($result)){
-				echo json_encode(error("was not able to update Person Information: " . $topic . " with value : " . $requested_change));
+				echo json_encode(error($this->p->t('profilUpdate','profilUpdate_insert_error')));
 				return;
 			}
 		}
-		$this->sendEmail_onProfilUpdate_response($uid,$topic,"accepted");
+		$this->sendEmail_onProfilUpdate_response($uid,$topic,$this->p->t('profilUpdate','accepted'));
 		
-		echo json_encode($this->setStatusOnUpdateRequest($id, "accepted", $status_message, $requested_change));
+		echo json_encode($this->setStatusOnUpdateRequest($id, $this->p->t('profilUpdate','accepted'), $status_message, $requested_change));
 	}else{
-		show_error("You have not the necessary permissions to accept this profil_update");
+		show_error($this->p->t('profilUpdate','profilUpdate_permission_error'));
 	}
 		
 		
@@ -525,10 +545,10 @@ class ProfilUpdate extends Auth_Controller
 			$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten',"suid") && $is_mitarbeiter_profil_update 
 		)
 		{
-			$this->sendEmail_onProfilUpdate_response($uid,$topic,"rejected");
-			echo json_encode($this->setStatusOnUpdateRequest($id, "rejected", $status_message));
+			$this->sendEmail_onProfilUpdate_response($uid,$topic,$this->p->t('profilUpdate','rejected'));
+			echo json_encode($this->setStatusOnUpdateRequest($id, $this->p->t('profilUpdate','rejected'), $status_message));
 		}else{
-			show_error("You have not the necessary permissions to accept this profil_update");
+			show_error($this->p->t('profilUpdate','profilUpdate_permission_error'));
 		}
 		
 		
@@ -559,7 +579,7 @@ class ProfilUpdate extends Auth_Controller
 			$insertID = $this->KontaktModel->insert($requested_change);
 			$insert_kontakt_id = $insertID;
 			if(isError($insert_kontakt_id)){
-				show_error("was not able to insert new kontakt");
+				show_error($this->p->t('profilUpdate','profilUpdate_insertKontakt_error'));
 			}
 			$insert_kontakt_id = hasData($insert_kontakt_id)? getData($insert_kontakt_id):null;
 			if($insert_kontakt_id){
@@ -580,7 +600,7 @@ class ProfilUpdate extends Auth_Controller
 			$update_kontakt_id = $this->KontaktModel->update($kontakt_id,$requested_change);
 
 			if(isError($update_kontakt_id)){
-				show_error("was not able to update kontakt");
+				show_error($this->p->t('profilUpdate','profilUpdate_updateKontakt_error'));
 			}
 			$update_kontakt_id = hasData($update_kontakt_id) ? getData($update_kontakt_id) : null;
 			if($update_kontakt_id){
@@ -615,7 +635,7 @@ class ProfilUpdate extends Auth_Controller
 			$insertID = $this->AdresseModel->insert($requested_change);
 			$insert_adresse_id = $insertID;
 			if(isError($insert_adresse_id)){
-				show_error("was not able to insert new adresse");
+				show_error($this->p->t('profilUpdate','profilUpdate_insertAdresse_error'));
 			}
 			$insert_adresse_id = hasData($insert_adresse_id) ? getData($insert_adresse_id) : null;
 			if($insert_adresse_id){
@@ -633,7 +653,7 @@ class ProfilUpdate extends Auth_Controller
 			$requested_change['updatevon'] = getAuthUID();
 			$update_adresse_id = $this->AdresseModel->update($adresse_id,$requested_change);
 			if(isError($update_adresse_id)){
-				show_error("was not able to insert new adresse");
+				show_error($this->p->t('profilUpdate','profilUpdate_updateAdresse_error'));
 			}
 			$update_adresse_id = hasData($update_adresse_id) ? getData($update_adresse_id) : null;
 			if($update_adresse_id){

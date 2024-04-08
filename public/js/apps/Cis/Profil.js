@@ -236,11 +236,11 @@ const profilApp = Vue.createApp({
         view: null,
         data: {
           Personen_Informationen: {
-            title: "Personen Informationen",
+            title: this.$p.t('profil','personenInformationen'),
             view: null,
             data: {
               vorname: {
-                title: "vorname",
+                title: this.$p.t('person','vorname'),
                 view: "TextInputDokument",
                 withFiles: true,
                 data: {
@@ -249,7 +249,7 @@ const profilApp = Vue.createApp({
                 },
               },
               nachname: {
-                title: "nachname",
+                title: this.$p.t('person','nachname'),
                 view: "TextInputDokument",
                 withFiles: true,
                 data: {
@@ -258,7 +258,7 @@ const profilApp = Vue.createApp({
                 },
               },
               titel: {
-                title: "titel",
+                title: this.$p.t('global','titel'),
                 view: "TextInputDokument",
                 withFiles: true,
                 data: {
@@ -267,7 +267,7 @@ const profilApp = Vue.createApp({
                 },
               },
               postnomen: {
-                title: "postnomen",
+                title: this.$p.t('profil','postnomen'),
                 view: "TextInputDokument",
                 withFiles: true,
                 data: {
@@ -278,7 +278,7 @@ const profilApp = Vue.createApp({
             },
           },
           Private_Kontakte: {
-            title: "Private Kontakte",
+            title: this.$p.t('profil','privateAdressen'),
             data: this.data.kontakte
               ?.filter((item) => {
                 return !this.data.profilUpdates?.some(
@@ -296,7 +296,7 @@ const profilApp = Vue.createApp({
               }),
           },
           Private_Adressen: {
-            title: "Private Adressen",
+            title: this.$p.t('profil','privateAdressen'),
             data: this.data.adressen
               ?.filter((item) => {
                 return !this.data.profilUpdates?.some((update) => {

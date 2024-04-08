@@ -14,7 +14,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: this.$p.t('profilUpdate','profilUpdateRequest'),
+      
     },
     value: {
       type: Object,
@@ -132,7 +132,7 @@ export default {
     </div>
 
 
-    <div v-if="data.status!=='pending'" class="form-underline mb-2 col-12 col-sm-6">
+    <div v-if="data.status!==$p.t('profilUpdate','pending')" class="form-underline mb-2 col-12 col-sm-6">
       <div class="form-underline-titel">{{$p.t('profilUpdate','statusDate')}}: </div>
       <!-- only status timestamp and status message can be null in the database -->
       <span  class="form-underline-content" >{{data.status_timestamp?data.status_timestamp:'-'}}</span>
@@ -170,7 +170,7 @@ export default {
     </div>
 
     <!-- Row with the status message is only visible if the request is not pending and the message is not empty -->
-    <div v-if="data.status !=='pending' && data.status_message" class="row">
+    <div v-if="data.status !== $p.t('profilUpdate','pending') && data.status_message" class="row">
     <div class="col">
     <div  class="form-underline mb-2 ">
     <div class="form-underline-titel">{{$p.t('profilUpdate','statusMessage')}}</div>
@@ -206,7 +206,7 @@ export default {
     </template>
     
 
-    <template v-if="data.status === 'pending'"  v-slot:footer>
+    <template v-if="data.status === $p.t('profilUpdate','pending')"  v-slot:footer>
     <div  class="form-underline flex-fill">
       <div class="form-underline-titel">{{$p.t('global','nachricht')}}</div>
 

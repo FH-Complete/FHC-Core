@@ -322,7 +322,7 @@ export default{
   template: /*html*/`
     <div>
     
-    <accept-deny-update v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
+    <accept-deny-update :title="$p.t('profilUpdate','profilUpdateRequest')" v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
     
     <div  class="form-underline flex-fill ">
       <div class="form-underline-titel">{{$p.t('ui','anzeigen')}} </div>
