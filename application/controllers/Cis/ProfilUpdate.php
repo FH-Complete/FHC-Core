@@ -670,7 +670,7 @@ class ProfilUpdate extends Auth_Controller
 			$this->PersonModel->addJoin("public.tbl_kontakt","public.tbl_kontakt.person_id = public.tbl_person.person_id");
 			$zustellKontakteArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id"=>$this->pid, "zustellung"=>TRUE]);
 			if(!isSuccess($zustellKontakteArray)){
-				return error("error when querying zustellkontakte");
+				return error($this->p->t('profilUpdate','profilUpdate_loadingZustellkontakte_error'));
 			}
 			$zustellKontakteArray = hasData($zustellKontakteArray) ? getData($zustellKontakteArray) : null;
 
@@ -692,7 +692,7 @@ class ProfilUpdate extends Auth_Controller
 			$this->PersonModel->addJoin("public.tbl_adresse","public.tbl_adresse.person_id = public.tbl_person.person_id");
 			$zustellAdressenArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id"=>$this->pid, "zustelladresse"=>TRUE]);
 			if(!isSuccess($zustellAdressenArray)){
-				return error("error when querying zustelladressen");
+				return error($this->p->t('profilUpdate','profilUpdate_loadingZustellAdressen_error'));
 			}
 			$zustellAdressenArray = hasData($zustellAdressenArray) ? getData($zustellAdressenArray) : null;
 
