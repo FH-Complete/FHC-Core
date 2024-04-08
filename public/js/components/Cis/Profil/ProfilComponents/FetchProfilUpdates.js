@@ -81,7 +81,7 @@ export default {
       }
 
       //? adds the status information if the profil update request was rejected or accepted
-      if (updateRequest.status !== "pending") {
+      if (updateRequest.status !== this.$p.t('profilUpdate','pending')) {
         content["status"] = updateRequest.status;
         content["status_message"] = updateRequest.status_message;
         content["status_timestamp"] = updateRequest.status_timestamp;
@@ -114,7 +114,7 @@ export default {
       );
     },
     getView: function (topic, status) {
-      if (!(status === "pending")) {
+      if (!(status === this.$p.t('profilUpdate','pending'))) {
         return "Status";
       }
 
@@ -194,7 +194,7 @@ export default {
       }
 
       //? adds the status information if the profil update request was rejected or accepted
-      if (updateRequest.status !== "pending") {
+      if (updateRequest.status !== this.$p.t('profilUpdate','pending')) {
         content["status"] = updateRequest.status;
         content["status_message"] = updateRequest.status_message;
         content["status_timestamp"] = updateRequest.status_timestamp;
@@ -243,12 +243,12 @@ export default {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in data" :style="item.status=='accepted'?'background-color:lightgreen':item.status==='rejected'?'background-color:lightcoral':''">
+                <tr v-for="item in data" :style="item.status==$p.t('profilUpdate','accepted')?'background-color:lightgreen':item.status===$p.t('profilUpdate','rejected')?'background-color:lightcoral':''">
                 <td class="align-middle text-wrap ">{{item.topic}}</td>
                 <td class="align-middle " >{{item.status}}</td>
                 <td class="align-middle">{{item.status_timestamp?item.status_timestamp:item.insertamum}}</td>
                 
-                <template v-if="item.status === 'pending'">
+                <template v-if="item.status === $p.t('profilUpdate','pending')">
                 <td>
                 
                 <div class="d-flex flex-row justify-content-evenly">

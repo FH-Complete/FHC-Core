@@ -7,10 +7,10 @@ import Loading from "../../../components/Loader.js";
 
 const sortProfilUpdates = (ele1, ele2) => {
   let result = 0;
-  if (ele1.status === "pending") {
+  if (ele1.status === this.$p.t('profilUpdate','pending')) {
     result = -1;
-  } else if (ele1.status === "accepted") {
-    result = ele2.status === "rejected" ? -1 : 1;
+  } else if (ele1.status === this.$p.t('profilUpdate','accepted')) {
+    result = ele2.status === this.$p.t('profilUpdate','rejected') ? -1 : 1;
   } else {
     result = 1;
   }
@@ -95,10 +95,10 @@ export default{
         },
         rowContextMenu: (e, component) => {
           let menu = [];
-          if (component.getData().status === "pending") {
+          if (component.getData().status === this.$p.t('profilUpdate','pending')) {
             menu.push(
               {
-                label: "<i class='fa fa-check'></i> Accept Request",
+                label: `<i class='fa fa-check'></i> ${this.$p.t('profilUpdate','acceptUpdate')}`,
                 action: (e, column) => {
                   Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column.getData())
                     .then((res) => {
@@ -114,7 +114,7 @@ export default{
               },
               {
                 label:
-                  " <i style='width:16px' class='text-center fa fa-xmark'></i> Deny Request",
+                  ` <i style='width:16px' class='text-center fa fa-xmark'></i> ${this.$p.t('profilUpdate','denyUpdate')}`,
                 action: (e, column) => {
                   Vue.$fhcapi.ProfilUpdate.denyProfilRequest(
                     column.getData()
@@ -129,7 +129,7 @@ export default{
                 separator: true,
               },
               {
-                label: "<i class='fa fa-eye'></i> Show Request",
+                label: `<i class='fa fa-eye'></i> ${this.$p.t('profilUpdate','showRequest')}`,
                 action: (e, column) => {
                   this.showAcceptDenyModal(column.getData());
                     
@@ -138,7 +138,7 @@ export default{
             );
           } else {
             menu.push({
-              label: "<i class='fa fa-eye'></i> Show Request",
+              label: `<i class='fa fa-eye'></i> ${this.$p.t('profilUpdate','showRequest')}`,
               action: (e, column) => {
                 this.showAcceptDenyModal(column.getData());
               },
@@ -188,17 +188,19 @@ export default{
             field: "status",
             hozAlign: "center",
             headerFilter: true,
-            formatter: function (cell, para) {
-              switch (cell.getValue()) {
-                case "pending":
-                  return "<div class='row justify-content-center'><div class='col-2'><i class='fa fa-circle-info text-info fa-lg'></i></div> <div class='col-4'><span>pending</span></div></div>";
-                case "accepted":
-                  return "<div class='row justify-content-center'><div class='col-2'><i class='fa fa-circle-check text-success fa-lg'></i></div> <div class='col-4'><span>accepted</span></div></div>";
-                case "rejected":
-                  return "<div class='row justify-content-center'><div class='col-2'><i class='fa-solid fa-circle-xmark text-danger fa-lg '></i></div> <div class='col-4'><span>rejected</span></div></div>";
-                default:
-                  return "<p>default</p>";
+            formatter: (cell, para) => {
+              let iconClasses ="fa fa-lg"
+              if(cell.getValue() == this.$p.t('profilUpdate','pending')) {
+                iconClasses += " fa-circle-info text-info "
               }
+              else if(cell.getValue() == this.$p.t('profilUpdate','accepted')) {
+                iconClasses += " fa-circle-check text-success "
+              }
+              else if(cell.getValue() == this.$p.t('profilUpdate','rejected')) {
+                iconClasses += " fa-circle-xmark text-danger "
+              }
+
+              return `<div class='row justify-content-center'><div class='col-2'><i class='${iconClasses}'></i></div> <div class='col-4'><span>${cell.getValue()}</span></div></div>`;
             },
 
             resizable: true,
@@ -269,18 +271,7 @@ export default{
         this.$refs.AcceptDenyModal.show();
       });
     },
-    /* showModal: function (value) {
-      AcceptDenyUpdate.popup({ value: value, setLoading:this.setLoading })
-        .then((res) => {
-          
-          //? refetches the data, if any request was denied or accepted
-          //* setData will call the ajaxURL again to refresh the data
-          this.$refs.UpdatesTable.tabulator.setData();
-        }).catch(err=>{
-         
-        })
-        
-    }, */
+    
     updateData: function (event) {
       this.$refs.UpdatesTable.tabulator.setData();
       //? store the selected view in the session storage of the browser
