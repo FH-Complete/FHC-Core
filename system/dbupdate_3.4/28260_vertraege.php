@@ -440,3 +440,67 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			echo 'HR Schema und Vertagstabellen wurden neu erstellt';
 	}
 }
+
+if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table_name='tbl_dvendegrund' AND table_schema='hr'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+		    CREATE TABLE hr.tbl_dvendegrund (
+			dvendegrund_kurzbz character varying(32) NOT NULL ,
+			bezeichnung character varying(255) NOT NULL,
+			bezeichnung_mehrsprachig character varying(255)[] NOT NULL,
+			aktiv boolean DEFAULT true NOT NULL,
+			sort integer DEFAULT 1 NOT NULL,
+			PRIMARY KEY (dvendegrund_kurzbz),
+			CONSTRAINT tbl_dvendegrund_bezeichnung_key UNIQUE (bezeichnung)
+		    );
+		";
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Tabelle tbl_dvendegrund wurde im HR Schema neu erstellt';
+	}
+}
+
+if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE column_name='dvendegrund_kurzbz' AND table_name='tbl_dienstverhaeltnis' AND table_schema='hr'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+		    ALTER TABLE 
+			hr.tbl_dienstverhaeltnis 
+		    ADD COLUMN
+			dvendegrund_kurzbz character varying(255) 
+		    CONSTRAINT 
+			tbl_dvendegrund_fk 
+		    REFERENCES 
+			hr.tbl_dvendegrund(dvendegrund_kurzbz) 
+		    ON UPDATE 
+			cascade 
+		    ON DELETE 
+			restrict
+		";
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte dvendegrund_kurzbz wurde in hr.tbl_dienstverhaeltnis neu erstellt';
+	}
+}
+
+if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE column_name='dvendegrund_anmerkung' AND table_name='tbl_dienstverhaeltnis' AND table_schema='hr'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+		    ALTER TABLE 
+			hr.tbl_dienstverhaeltnis 
+		    ADD COLUMN
+			dvendegrund_anmerkung character varying(255)
+		";
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte dvendegrund_anmerkung wurde in hr.tbl_dienstverhaeltnis neu erstellt';
+	}
+}
