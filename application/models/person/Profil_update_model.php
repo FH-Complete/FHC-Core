@@ -88,7 +88,8 @@ class Profil_update_model extends DB_Model
 		$studentBerechtigung = $this->permissionlib->isBerechtigt('student/stammdaten', 's');
 		$mitarbeiterBerechtigung = $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten', 's');
 		$oe_berechtigung = $this->permissionlib->getOE_isEntitledFor('student/stammdaten');
-
+		
+		$lang = "select index from public.tbl_sprache where sprache =" . $this->escape(getUserLanguage());	
 		$res = [];
 
 		if ($studentBerechtigung) {
@@ -98,8 +99,9 @@ class Profil_update_model extends DB_Model
 			$parameters = [];
 			$query = "
 			SELECT
-			profil_update_id, tbl_profil_update.uid, (tbl_person.vorname || ' ' || tbl_person.nachname) AS name , topic, requested_change, tbl_profil_update.updateamum, tbl_profil_update.updatevon, tbl_profil_update.insertamum, tbl_profil_update.insertvon, status, status_timestamp, status_message, attachment_id 
-			FROM public.tbl_profil_update 
+			profil_update_id, tbl_profil_update.uid, (tbl_person.vorname || ' ' || tbl_person.nachname) AS name , topic, requested_change, tbl_profil_update.updateamum, tbl_profil_update.updatevon, tbl_profil_update.insertamum, tbl_profil_update.insertvon, status, public.tbl_profil_update_status.bezeichnung_mehrsprachig[(".$lang.")] as status_translated, status_timestamp, status_message, attachment_id 
+			FROM public.tbl_profil_update
+			JOIN public.tbl_profil_update_status ON public.tbl_profil_update_status.status_kurzbz = public.tbl_profil_update.status 
 			JOIN public.tbl_student ON public.tbl_student.student_uid=public.tbl_profil_update.uid
 			JOIN public.tbl_benutzer ON public.tbl_benutzer.uid = public.tbl_student.student_uid
 			JOIN public.tbl_person ON public.tbl_benutzer.person_id=public.tbl_person.person_id
@@ -123,7 +125,8 @@ class Profil_update_model extends DB_Model
 			}
 		}
 		if ($mitarbeiterBerechtigung) {
-			$this->addSelect(["profil_update_id", "tbl_profil_update.uid", "(tbl_person.vorname || ' ' || tbl_person.nachname) AS name", "topic", "requested_change", "tbl_profil_update.updateamum", "tbl_profil_update.updatevon", "tbl_profil_update.insertamum", "tbl_profil_update.insertvon", "status", "status_timestamp", "status_message", "attachment_id"]);
+			$this->addSelect(["profil_update_id", "tbl_profil_update.uid", "(tbl_person.vorname || ' ' || tbl_person.nachname) AS name", "topic", "requested_change", "tbl_profil_update.updateamum", "tbl_profil_update.updatevon", "tbl_profil_update.insertamum", "tbl_profil_update.insertvon", "status", "public.tbl_profil_update_status.bezeichnung_mehrsprachig[(".$lang.")] AS status_translated", "status_timestamp", "status_message", "attachment_id"]);
+			$this->addJoin('tbl_profil_update_status', 'tbl_profil_update_status.status_kurzbz=tbl_profil_update.status');
 			$this->addJoin('tbl_mitarbeiter', 'tbl_mitarbeiter.mitarbeiter_uid=tbl_profil_update.uid');
 			$this->addJoin('tbl_benutzer', 'tbl_benutzer.uid=tbl_profil_update.uid');
 			$this->addJoin('tbl_person', 'tbl_benutzer.person_id=tbl_person.person_id');

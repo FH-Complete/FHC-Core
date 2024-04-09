@@ -6,15 +6,16 @@
         $qry = " CREATE TABLE public.tbl_profil_update_status (
             status_kurzbz VARCHAR(32) NOT NULL,
             beschreibung VARCHAR(256) NULL,
+            bezeichnung_mehrsprachig VARCHAR(256)[] NULL,
             CONSTRAINT tbl_profil_update_status_pk PRIMARY KEY(status_kurzbz)
         );
 
-        INSERT INTO public.tbl_profil_update_status VALUES  ('Ausstehend','Profil Änderungen die noch nicht bearbeitet wurden'),
-                                                            ('Pending','Profil updates that were not processed yet'),
-                                                            ('Akzeptiert','Profil Änderungen die akzeptiert wurden'),
-                                                            ('Accepted','Profil updates that were accepted'),
-                                                            ('Abgelehnt','Profil Änderungen die abgelehn wurden'),
-                                                            ('Rejected','Profil updates that were rejected');";
+        GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_profil_update_status TO vilesci;
+        GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_profil_update_status TO web; 
+
+        INSERT INTO public.tbl_profil_update_status VALUES  ('Pending','Profil Änderungen die noch nicht bearbeiten wurden','{Ausstehend,Pending}'),
+                                                            ('Accepted','Profil Änderungen die angenommen wurden','{Angenommen,Accepted}'),
+                                                            ('Rejected','Profil Änderungen die abgelehn wurden','{Abgelehnt,Rejected}');";
 
         if(!$db->db_query($qry))
         echo '<strong>public.tbl_profil_update_status: '.$db->db_last_error().'</strong><br>';
@@ -28,29 +29,24 @@
         $qry="CREATE TABLE public.tbl_profil_update_topic (
             topic_kurzbz VARCHAR(32) NOT NULL,
             beschreibung VARCHAR(256) NULL,
+            bezeichnung_mehrsprachig VARCHAR(256)[] NULL,
             CONSTRAINT tbl_profil_update_topic_pk PRIMARY KEY(topic_kurzbz)
         );
 
-        INSERT INTO public.tbl_profil_update_topic VALUES   ('Vorname','Vorname aktualisieren'),
-                                                            ('First name','Update first name'),
-                                                            ('Nachname','Nachname aktualisieren'),
-                                                            ('Last name','Update last name'),
-                                                            ('Titel','Titel aktualisieren'),
-                                                            ('Title','Update title'),
-                                                            ('Postnomen','Postnomen aktualisieren'),
-                                                            ('post-nominals','Update post-nominals'),
-                                                            ('Private Kontakte','Kontakt aktualisieren'),
-                                                            ('Private Contacts','Update contact'),
-                                                            ('Kontakt löschen','Kontakt löschen'),
-                                                            ('Delete contact','Delete contact'),
-                                                            ('Kontakt hinzufügen','Kontakt hinzufügen'),
-                                                            ('Add contact','Add contact'),
-                                                            ('Private Adressen','Adresse aktualisieren'),
-                                                            ('Private Addresses','Update address'),
-                                                            ('Adresse löschen','Adresse löschen'),
-                                                            ('Delete address','Delete address'),
-                                                            ('Adresse hinzufügen','Adresse löschen'),
-                                                            ('Add address','Add address');";
+        GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_profil_update_topic TO vilesci;
+        GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_profil_update_topic TO web; 
+        
+
+        INSERT INTO public.tbl_profil_update_topic VALUES   ('Vorname','Vorname aktualisieren','{Vorname,\"First name\"}'),
+                                                            ('Nachname','Nachname aktualisieren','{Nachname,\"Last name\"}'),
+                                                            ('Titel','Titel aktualisieren','{Titel,Title}'),
+                                                            ('Postnomen','Postnomen aktualisieren','{Postnomen,Post-nominal}'),
+                                                            ('Private Kontakte','Kontakt aktualisieren','{\"Private Kontakte\",\"Private Contacts\"}'),
+                                                            ('Kontakt löschen','Kontakt löschen','{\"Kontakt löschen\",\"Delete contact\"}'),
+                                                            ('Kontakt hinzufügen','Kontakt hinzufügen','{\"Kontakt hinzufügen\",\"Add contact\"}'),
+                                                            ('Private Adressen','Adresse aktualisieren','{\"Private Adressen\",\"Private Addreses\"}'),
+                                                            ('Adresse löschen','Adresse löschen','{\"Adresse löschen\",\"Delete address\"}'),
+                                                            ('Adresse hinzufügen','Adresse löschen','{\"Adresse hinzufügen\",\"Delete address\"}');";
 
         if(!$db->db_query($qry))
         echo '<strong>public.tbl_profil_update_topic: '.$db->db_last_error().'</strong><br>';

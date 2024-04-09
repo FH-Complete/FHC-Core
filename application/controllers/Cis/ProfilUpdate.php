@@ -9,6 +9,11 @@ if (!defined('BASEPATH'))
 class ProfilUpdate extends Auth_Controller
 {
 
+	public static $STATUS_PENDING =NULL;
+	public static $STATUS_ACCEPTED =NULL;
+	public static $STATUS_REJECTED =NULL;
+	
+
 	public function __construct(){
 		parent::__construct([
 			'index' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
@@ -38,7 +43,8 @@ class ProfilUpdate extends Auth_Controller
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
-
+		$this->load->model('system/Sprache_model', 'SpracheModel');
+		$this->load->model('person/Profil_update_status_model', 'ProfilUpdateStatusModel');
 
 		// Load language phrases
         $this->loadPhrases(
@@ -57,8 +63,21 @@ class ProfilUpdate extends Auth_Controller
 		//? put the uid and pid inside the controller for reusability
 		$this->uid = getAuthUID();
 		$this->pid = getAuthPersonID();
+
+		// static constants
+		$this->ProfilUpdateStatusModel->addSelect(['status_kurzbz']);
+		$status_kurzbz = $this->ProfilUpdateStatusModel->load();
+		if(hasData($status_kurzbz)){
+			list($status_pending, $status_accepted, $status_rejected) = getData($status_kurzbz);
+			
+			self::$STATUS_PENDING = $status_pending->status_kurzbz;
+			self::$STATUS_ACCEPTED = $status_accepted->status_kurzbz;
+			self::$STATUS_REJECTED = $status_rejected->status_kurzbz;
+		}
 	}
 
+
+	
 
 	public function index(){
 		$this->load->view('Cis/ProfilUpdate');
@@ -324,7 +343,7 @@ class ProfilUpdate extends Auth_Controller
 		$payload = $json->payload;
 		$identifier = property_exists($json->payload,"kontakt_id")? "kontakt_id" : (property_exists($json->payload,"adresse_id")? "adresse_id" : null);
 		
-		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid,"status"=>$this->p->t('profilUpdate', 'pending') ];
+		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid, "status"=>self::$STATUS_PENDING?:'Pending'  ];
 		
 		//? insert fileID in the dataset if sent with post request
 		if(isset($json->fileID)){
@@ -357,7 +376,7 @@ class ProfilUpdate extends Auth_Controller
 
 		if($res){
 		$pending_changes = array_filter($res, function($element) {
-			return $element->status == 'Pending' || $element->status == 'Ausstehend';
+			return $element->status == isset(self::$STATUS_PENDING)?:"Pending";
 		});
 
 		foreach($pending_changes as $update_request){
@@ -419,12 +438,29 @@ class ProfilUpdate extends Auth_Controller
 
 
 	public function getProfilUpdateWithPermission($status=null){
+
 		
+
+		// early return if no status has been passed as argument
+		if(!isset($status)){
+			echo json_encode($this->ProfilUpdateModel->getProfilUpdateWithPermission());
+			return;
+		}
+
+		// get the sprache of the user
+		$sprachenIndex = $this->SpracheModel->loadWhere(["sprache"=>getUserLanguage()]);
+		$sprachenIndex = hasData($sprachenIndex)? getData($sprachenIndex)[0]->index : null;
+
+		if(isset($sprachenIndex) && isset($status)){
+			// get the corresponding status kurz_bz primary key out of the translation
+			$status = $this->ProfilUpdateStatusModel->execReadOnlyQuery("select * from public.tbl_profil_update_status where ? = ANY(bezeichnung_mehrsprachig)",[$status]);
+			$status = hasData($status) ? getData($status)[0]->status_kurzbz : null;
+			$res = $this->ProfilUpdateModel->getProfilUpdateWithPermission(isset($status)?['status'=>$status]:null);
 		
-		$res = $this->ProfilUpdateModel->getProfilUpdateWithPermission(isset($status)?['status'=>$status]:null);
-		
-		echo json_encode($res);
+			echo json_encode($res);
+		}
 	}
+
 
 	
 	private function getOE_from_student($student_uid){

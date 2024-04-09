@@ -4,18 +4,25 @@ import AcceptDenyUpdate from "./AcceptDenyUpdate.js";
 import Alert from "../../../components/Bootstrap/Alert.js";
 import Loading from "../../../components/Loader.js";
 
+const STATUS = Object.freeze({
+  PENDING: "Pending",
+  ACCEPTED: "Accepted",
+  REJECTED: "Rejected",
+})
 
-const sortProfilUpdates = (ele1, ele2) => {
+const sortProfilUpdates = (ele1, ele2, thisPointer)=>  {
+  
   let result = 0;
-  if (ele1.status === this.$p.t('profilUpdate','pending')) {
+  if (ele1.status === STATUS.PENDING) {
     result = -1;
-  } else if (ele1.status === this.$p.t('profilUpdate','accepted')) {
-    result = ele2.status === this.$p.t('profilUpdate','rejected') ? -1 : 1;
+  } else if (ele1.status === STATUS.ACCEPTED) {
+    result = ele2.status === STATUS.REJECTED ? -1 : 1;
   } else {
     result = 1;
   }
-  //? if they have the same status the insert date is used for ordering
+  
   if (ele1.status === ele2.status) {
+    //? if they have the same status , insert_date gets compared for order
     result =
       new Date(ele2.insertamum.split(".").reverse().join("-")) -
       new Date(ele1.insertamum.split(".").reverse().join("-"));
@@ -54,15 +61,15 @@ export default{
           if (this.showAll) {
             return url + "getProfilUpdateWithPermission";
           } else {
-            return url + "getProfilUpdateWithPermission/pending";
+            return url + `getProfilUpdateWithPermission/${STATUS.PENDING}`;
           }
         },
-        ajaxResponse: function (url, params, response) {
+        ajaxResponse: (url, params, response)=> {
           //url - the URL of the request
           //params - the parameters passed with the request
           //response - the JSON object returned in the body of the response.
           //? sorts the response data from the backend
-          if (response) response.sort(sortProfilUpdates);
+          if (response) response.sort((ele1,ele2)=>sortProfilUpdates(ele1,ele2,this));
 
           return response;
         },
@@ -185,21 +192,17 @@ export default{
           },
           {
             title: "Status",
-            field: "status",
+            field: "status_translated",
             hozAlign: "center",
             headerFilter: true,
             formatter: (cell, para) => {
-              let iconClasses ="fa fa-lg"
-              if(cell.getValue() == this.$p.t('profilUpdate','pending')) {
-                iconClasses += " fa-circle-info text-info "
+              let iconClasses =""
+              let status = cell.getRow().getData().status;
+              switch (status){
+                case "Pending": iconClasses += "fa fa-lg fa-circle-info text-info "; break;
+                case "Accepted": iconClasses += "fa fa-lg fa-circle-check text-success "; break;
+                case "Rejected": iconClasses += "fa fa-lg fa-circle-xmark text-danger "; break;
               }
-              else if(cell.getValue() == this.$p.t('profilUpdate','accepted')) {
-                iconClasses += " fa-circle-check text-success "
-              }
-              else if(cell.getValue() == this.$p.t('profilUpdate','rejected')) {
-                iconClasses += " fa-circle-xmark text-danger "
-              }
-
               return `<div class='row justify-content-center'><div class='col-2'><i class='${iconClasses}'></i></div> <div class='col-4'><span>${cell.getValue()}</span></div></div>`;
             },
 
@@ -320,6 +323,8 @@ export default{
 
       <select class="mb-4 " v-model="showAll" @change="updateData" class="form-select" aria-label="Profil updates display selection">
         <option :selected="true" :value="false">{{$p.t('profilUpdate','pendingRequests')}}</option>
+        <option :value="false">{{$p.t('profilUpdate','acceptedRequests')}}</option>
+        <option :value="false">{{$p.t('profilUpdate','rejectedRequests')}}</option>
         <option :value="true">{{$p.t('profilUpdate','allRequests')}}</option>
       </select>
   
@@ -327,7 +332,7 @@ export default{
 
     <loading ref="loadingModalRef" :timeout="0"></loading>
     
-    <core-filter-cmpt title="Update Requests"  ref="UpdatesTable" :tabulatorEvents="events" :tabulator-options="profil_updates_table_options" tableOnly :sideMenu="false" />
+    <core-filter-cmpt :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="events" :tabulator-options="profil_updates_table_options" tableOnly :sideMenu="false" />
 
     </div>`,
 };
