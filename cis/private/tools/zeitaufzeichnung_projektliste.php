@@ -60,7 +60,7 @@ if (isset($_GET['uid']))
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($uid);
 
-	if ($rechte->isBerechtigt('admin') || (in_array($_GET['uid'], $untergebenen_arr)))
+	if ($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/zeitsperre') || (in_array($_GET['uid'], $untergebenen_arr)))
 	{
 		$uid = $_GET['uid'];
 	}
