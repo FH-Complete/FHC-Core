@@ -718,10 +718,10 @@ class projektphase extends basis_db
 				(
 					(
 						(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-						AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+						AND (tbl_projekt.ende + interval '7 month 1 day' >=now() OR tbl_projekt.ende is null)
 					) AND (
 						(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-						AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+						AND (tbl_projektphase.ende + interval '7 month 1 day' >=now() OR tbl_projektphase.ende is null)
 					)
 				)
 				AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
@@ -787,10 +787,10 @@ class projektphase extends basis_db
 		(
 			(
 				(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-				AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+				AND (tbl_projekt.ende + interval '7 month 1 day' >=now() OR tbl_projekt.ende is null)
 			) AND (
 				(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-				AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+				AND (tbl_projektphase.ende + interval '7 month 1 day' >=now() OR tbl_projektphase.ende is null)
 			)
 		)
 		AND mitarbeiter_uid = ".$this->db_add_param($mitarbeiter_uid)."

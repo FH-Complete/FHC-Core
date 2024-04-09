@@ -149,11 +149,7 @@ else
 					LEFT JOIN PUBLIC.tbl_benutzer ON (PUBLIC.tbl_benutzer.person_id = PUBLIC.tbl_person.person_id)
 					LEFT JOIN PUBLIC.tbl_mitarbeiter ON (PUBLIC.tbl_benutzer.uid = PUBLIC.tbl_mitarbeiter.mitarbeiter_uid)
 					WHERE projektarbeit_id = ".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)."
-						AND (
-							tbl_projektbetreuer.betreuerart_kurzbz = 'Erstbegutachter'
-							OR tbl_projektbetreuer.betreuerart_kurzbz = 'Betreuer'
-							OR tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter'
-							)
+						AND tbl_projektbetreuer.betreuerart_kurzbz IN ('Erstbegutachter', 'Betreuer', 'Begutachter', 'Senatsvorsitz')
 
 					UNION
 

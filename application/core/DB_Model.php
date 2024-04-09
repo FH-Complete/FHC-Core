@@ -1,5 +1,24 @@
 <?php
 
+/**
+ * Copyright (C) 2023 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+use \stdClass as stdClass;
+
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
@@ -27,6 +46,15 @@ class DB_Model extends CI_Model
 	const PGSQL_INT8_TYPE = 'int8';
 	const PGSQL_FLOAT4_TYPE = 'float4';
 	const PGSQL_FLOAT8_TYPE = 'float8';
+	const PGSQL_BYTEA_TYPE = 'bytea';
+
+	// Name of the config entry containing an array of password that can be used to encrypt/decrypt
+	const CRYPT_CONF_PASSWORDS = 'encryption_passwords';
+	const CRYPT_CAST = 'cast';
+	const CRYPT_PASSWORD_NAME = 'passwordName';
+	const CRYPT_SELECT_TEMPLATE = 'PGP_SYM_DECRYPT(%s, \'%s\')::%s AS %s';
+	const CRYPT_WHERE_TEMPLATE = 'PGP_SYM_DECRYPT(%s, \'%s\')::%s';
+	const CRYPT_WRITE_TEMPLATE = 'PGP_SYM_ENCRYPT(\'%s\', \'%s\')';
 
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  	// Name of the PrimaryKey for DB-Update, Load, ...
@@ -36,7 +64,7 @@ class DB_Model extends CI_Model
 	private $executedQueryMetaData;
 	private $executedQueryListFields;
 
-	private $debugMode;
+	private $debugMode; // Debug mode enable (true) or disabled (false)
 
 	/**
 	 * Constructor
@@ -46,20 +74,23 @@ class DB_Model extends CI_Model
 		// Call parent constructor
 		parent::__construct();
 
-		// Set properties
-		$this->hasSequence = true;
-
-		// Loads DB conns and confs
+		// Loads DB connections and configs
 		$this->load->database($dbtype);
 
+		// Loads the DB config to encrypt/decrypt data
+		$this->config->load('db_crypt');
+
+		// Set properties
+		$this->hasSequence = true;
+		$this->debugMode = isset($this->db->db_debug) && $this->db->db_debug === true;
+
+		// Loads UDF model
 		$this->load->model('system/UDF_model', 'UDFModel');
 
 		// Loads the UDF library
 		$this->load->library('UDFLib');
 		// Loads the logs library
 		$this->load->library('LogLib');
-
-		$this->debugMode = isset($this->db->db_debug) && $this->db->db_debug === true;
 	}
 
 	// ------------------------------------------------------------------------------------------
@@ -85,13 +116,20 @@ class DB_Model extends CI_Model
 	 * @param   array $data  DataArray for Insert
 	 * @return  array
 	 */
-	public function insert($data)
+	public function insert($data, $encryptedColumns = null)
 	{
 		// Check class properties
 		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		// If this table has UDF and the validation of them is ok
-		if (isError($validate = $this->_prepareUDFsWrite($data, $this->dbTable))) return $validate;
+		$validate = $this->_prepareUDFsWrite($data, $this->dbTable);
+		if (isError($validate)) return $validate;
+
+		// Add the pgp_sym_eccrypt postgresql function to the set clause if needed
+		$this->_addEncrypt($encryptedColumns, $data);
+
+		// Add the pgp_sym_eccrypt postgresql function to the set clause if needed
+		if (!empty($encryptedColumns)) $this->_addEncrypt($encryptedColumns, $data);
 
 		// DB-INSERT
 		$insert = $this->db->insert($this->dbTable, $data);
@@ -135,14 +173,15 @@ class DB_Model extends CI_Model
 	 * @param   array $data  DataArray for Insert
 	 * @return  array
 	 */
-	public function update($id, $data)
+	public function update($id, $data, $encryptedColumns = null)
 	{
 		// Check class properties
 		if (is_null($this->pk)) return error('The given primary key is not valid', EXIT_MODEL);
 		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		// If this table has UDF and the validation of them is ok
-		if (isError($validate = $this->_prepareUDFsWrite($data, $this->dbTable, $id))) return $validate;
+		$validate = $this->_prepareUDFsWrite($data, $this->dbTable, $id);
+		if (isError($validate)) return $validate;
 
 		$tmpId = $id;
 
@@ -160,6 +199,9 @@ class DB_Model extends CI_Model
 		}
 
 		$this->db->where($tmpId);
+
+		// Add the pgp_sym_eccrypt postgresql function to the set clause if needed
+		$this->_addEncrypt($encryptedColumns, $data);
 
 		// DB-UPDATE
 		$update = $this->db->update($this->dbTable, $data);
@@ -224,7 +266,7 @@ class DB_Model extends CI_Model
 	 * @param   string $id  ID (Primary Key) for SELECT ... WHERE
 	 * @return  array
 	 */
-	public function load($id = null)
+	public function load($id = null, $encryptedColumns = null)
 	{
 		// Check class properties
 		if (is_null($this->pk)) return error('The given primary key is not valid', EXIT_MODEL);
@@ -245,7 +287,7 @@ class DB_Model extends CI_Model
 			$tmpId = array($this->pk => $id);
 		}
 
-		return $this->loadWhere($tmpId);
+		return $this->loadWhere($tmpId, $encryptedColumns);
 	}
 
 	/**
@@ -253,10 +295,13 @@ class DB_Model extends CI_Model
 	 *
 	 * @return  array
 	 */
-	public function loadWhere($where = null)
+	public function loadWhere($where = null, $encryptedColumns = null)
 	{
 		// Check class properties
 		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
+
+		// Add the pgp_sym_decrypt postgresql function to the select and where clause if needed
+		$this->_addDecryptLoad($encryptedColumns, $where);
 
 		// Execute query
 		$result = $this->db->get_where($this->dbTable, $where);
@@ -265,7 +310,7 @@ class DB_Model extends CI_Model
 
 		if ($result)
 		{
-			return success($this->_toPhp($result));
+			return success($this->_toPhp($result, $encryptedColumns));
 		}
 		else
 		{
@@ -303,7 +348,8 @@ class DB_Model extends CI_Model
 			// NOTE: $this->db->list_fields($tables[$t]) doesn't work if there are two tables with
 			// the same name in two different schemas, use this workaround
 			$fields = array();
-			if (isSuccess($lstColumns = $this->_list_columns($schemaAndTable->schema, $schemaAndTable->table)))
+			$lstColumns = $this->_list_columns($schemaAndTable->schema, $schemaAndTable->table);
+			if (isSuccess($lstColumns))
 			{
 				$fields = $lstColumns->retval;
 			}
@@ -381,7 +427,8 @@ class DB_Model extends CI_Model
 					$tmpFilteredArray = array_filter(get_object_vars($sideTableObj));
 					if (isset($tmpFilteredArray) && count($tmpFilteredArray) > 0)
 					{
-						if (($k = $this->_findMainTable($mainTableObj, $returnArray)) === false)
+						$k = $this->_findMainTable($mainTableObj, $returnArray);
+						if ($k === false)
 						{
 							$mainTableObj->{$sideTableProperty} = array($sideTableObj);
 							$returnArray[$returnArrayCounter++] = $mainTableObj;
@@ -758,14 +805,13 @@ class DB_Model extends CI_Model
 	/**
 	 * Like execQuery, but it allows only to perform queries to read data
 	 */
-	public function execReadOnlyQuery($query, $parametersArray = null)
+	public function execReadOnlyQuery($query, $parametersArray = null, $encryptedColumns = null)
 	{
 		$result = error('You are allowed to run only query for reading data'); //
 		$cleanedQuery = trim(preg_replace('/\t|\n|\r|;/', '', $query)); //
 
 		//
-		if (
-			(stripos($cleanedQuery, 'INSERT') > 0 || stripos($cleanedQuery, 'INSERT') == false)
+		if ((stripos($cleanedQuery, 'INSERT') > 0 || stripos($cleanedQuery, 'INSERT') == false)
 			&& (stripos($cleanedQuery, 'UPDATE') > 0 || stripos($cleanedQuery, 'UPDATE') == false)
 			&& (stripos($cleanedQuery, 'CREATE') > 0 || stripos($cleanedQuery, 'CREATE') == false)
 			&& (stripos($cleanedQuery, 'DELETE') > 0 || stripos($cleanedQuery, 'DELETE') == false)
@@ -775,7 +821,7 @@ class DB_Model extends CI_Model
 		{
 			$queryToExec = str_replace(';', '', $query); //
 
-			$result = $this->execQuery($queryToExec, $parametersArray);
+			$result = $this->execQuery($queryToExec, $parametersArray, $encryptedColumns);
 		}
 
 		return $result;
@@ -790,13 +836,16 @@ class DB_Model extends CI_Model
 	 *			boolean if the query is of the write type (INSERT, UPDATE, DELETE...)
 	 *			array that represents DB data
 	 */
-	protected function execQuery($query, $parametersArray = null)
+	protected function execQuery($query, $parametersArray = null, $encryptedColumns = null)
 	{
 		$result = null;
 
 		// If the query is empty don't lose time
 		if (!isEmptyString($query))
 		{
+			// Add the pgp_sym_decrypt postgresql function to the given query
+			$this->_addDecryptQuery($encryptedColumns, $query);
+
 			// If there are parameters to bind to the query
 			if (is_array($parametersArray) && count($parametersArray) > 0)
 			{
@@ -812,7 +861,7 @@ class DB_Model extends CI_Model
 			// If no errors occurred
 			if ($resultDB)
 			{
-				$result = success($this->_toPhp($resultDB));
+				$result = success($this->_toPhp($resultDB, $encryptedColumns));
 			}
 			else
 			{
@@ -840,7 +889,8 @@ class DB_Model extends CI_Model
 		$result->schema = DB_Model::DEFAULT_SCHEMA;
 
 		// If a schema is specified
-		if (($pos = strpos($schemaAndTable, '.')) !==  false)
+		$pos = strpos($schemaAndTable, '.');
+		if ($pos !==  false)
 		{
 			$result->schema = substr($schemaAndTable, 0, $pos);
 			$result->table = substr($schemaAndTable, $pos + 1);
@@ -851,6 +901,207 @@ class DB_Model extends CI_Model
 
 	// ------------------------------------------------------------------------------------------
 	// Private methods
+	//
+	//
+
+	/**
+	 * To add the pgp_sym_encrypt function to the set clause where needed
+	 */
+	private function _addEncrypt($encryptedColumns, &$data)
+	{
+		// If encryptedColumns is not defined then exit
+		if (isEmptyArray($encryptedColumns)) return;
+
+		$tmpData = array(); // Temporary array used to copy not encrypted columns
+
+		// For each column that is going to be inserted/updated
+		foreach ($data as $column => $value)
+		{
+			// If the current column is in the list of the columns to be encrypted
+			// and contains the password name element
+			if (array_key_exists($column, $encryptedColumns)
+				&& array_key_exists(self::CRYPT_PASSWORD_NAME, $encryptedColumns[$column]))
+			{
+				// Password to encrypt data
+				$cryptConfPasswords = $this->config->item(self::CRYPT_CONF_PASSWORDS);
+				$encryptionPassword = $cryptConfPasswords[$encryptedColumns[$column][self::CRYPT_PASSWORD_NAME]];
+
+				// Add the encrypted column to the set clause without escaping
+				$this->db->set(
+					$column,
+					sprintf(
+						self::CRYPT_WRITE_TEMPLATE,
+						$value,
+						$encryptionPassword
+					),
+					false // no escaping
+				);
+			}
+			else // otherwise copy this element as it is
+			{
+				$tmpData[$column] = $value;
+			}
+		}
+
+		$data = $tmpData; // this array does not contain encrypted columns
+	}
+
+	/**
+	 * To add the pgp_sym_decrypt function to the given query
+	 */
+	private function _addDecryptQuery($encryptedColumns, &$query)
+	{
+		// If it is request to get encrypted columns
+		if (!isEmptyArray($encryptedColumns))
+		{
+			// For each requested encrypted column
+			foreach ($encryptedColumns as $encryptedColumn => $definition)
+			{
+				// If the requested encrypted column is well defined
+				if (!isEmptyArray($definition)
+					&& array_key_exists(self::CRYPT_CAST, $definition)
+					&& array_key_exists(self::CRYPT_PASSWORD_NAME, $definition))
+				{
+					// And if exists the wanted password to decrypt in the configs
+					if (array_key_exists($definition[self::CRYPT_PASSWORD_NAME], $this->config->item(self::CRYPT_CONF_PASSWORDS)))
+					{
+						// Password to decrypt data
+						$cryptConfPasswords = $this->config->item(self::CRYPT_CONF_PASSWORDS);
+						$decryptionPassword = $cryptConfPasswords[$definition[self::CRYPT_PASSWORD_NAME]];
+
+						// Find and replace all the occurrences of the provided encrypted columns
+						// with the postgresql decryption function
+						$query = str_replace(
+							$encryptedColumn,
+							sprintf(
+								self::CRYPT_WHERE_TEMPLATE,
+								$encryptedColumn,
+								$decryptionPassword,
+								$definition[self::CRYPT_CAST]
+							),
+							$query
+						);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * To add the pgp_sym_decrypt function to the select and where clause where needed
+	 */
+	private function _addDecryptLoad($encryptedColumns, &$where)
+	{
+		// If it is request to get encrypted columns
+		if (!isEmptyArray($encryptedColumns))
+		{
+			// For each requested encrypted column
+			foreach ($encryptedColumns as $encryptedColumn => $definition)
+			{
+				// If the requested encrypted column is well defined
+				if (!isEmptyArray($definition)
+					&& array_key_exists(self::CRYPT_CAST, $definition)
+					&& array_key_exists(self::CRYPT_PASSWORD_NAME, $definition))
+				{
+					// And if exists the wanted password to decrypt in the configs
+					if (array_key_exists($definition[self::CRYPT_PASSWORD_NAME], $this->config->item(self::CRYPT_CONF_PASSWORDS)))
+					{
+						// Password to decrypt data
+						$cryptConfPasswords = $this->config->item(self::CRYPT_CONF_PASSWORDS);
+						$decryptionPassword = $cryptConfPasswords[$definition[self::CRYPT_PASSWORD_NAME]];
+
+						// -----------------------------------------
+						// SELECT
+
+						// Add to the select clause the column to be decrypted
+						// NOTE: this is going to override any previously added column with the same name
+						$this->addSelect(
+							sprintf(
+								self::CRYPT_SELECT_TEMPLATE,
+								$encryptedColumn,
+								$decryptionPassword,
+								$definition[self::CRYPT_CAST],
+								$encryptedColumn
+							)
+						);
+
+						// -----------------------------------------
+						// WHERE
+
+						// If the where parameter is a valid array
+						if (!isEmptyArray($where))
+						{
+							$tmpWhere = array();
+
+							// For each condition of the where clause
+							foreach ($where as $column => $condition)
+							{
+								$operator = null; // operator not found in the column name
+
+								// Custom operators with 2 chars
+								if (strpos($column, '>=') != false
+									|| strpos($column, '<=') != false
+									|| strpos($column, '!=') != false
+									|| strpos($column, '<>') != false
+								)
+								{
+									$operator = ' '.substr(trim($column), -2).' ';
+								}
+								// Custom operators with 1 chars
+								elseif (strpos($column, '>') != false
+									|| strpos($column, '<') != false
+									|| strpos($column, '=') != false
+								)
+								{
+									$operator = ' '.substr(trim($column), -1).' ';
+								}
+								else // default operator
+								{
+									$operator = ' = ';
+								}
+
+								// If the column from the where clause is the same from the encrypted columns definition
+								if (trim($column) == $encryptedColumn
+									|| ($operator != null && substr(trim($column), 0, strlen(trim($column)) - 2) == $encryptedColumn)
+								)
+								{
+									// Then rename the column using the postgresql decryption function
+									$tmpWhere[sprintf(
+										self::CRYPT_WHERE_TEMPLATE,
+										$encryptedColumn,
+										$decryptionPassword,
+										$definition[self::CRYPT_CAST]
+									).$operator] = $condition;
+								}
+								else // otherwise copy the column as it is
+								{
+									$tmpWhere[$column] = $condition;
+								}
+							}
+
+							$where = $tmpWhere; // replace with the new where
+						}
+						// Otherwise if the where parameter is a valid string
+						elseif (!isEmptyString($where))
+						{
+							// Find and replace all the occurrences of the provided encrypted columns
+							// with the postgresql decryption function
+							$where = str_replace(
+								$encryptedColumn,
+								sprintf(
+									self::CRYPT_WHERE_TEMPLATE,
+									$encryptedColumn,
+									$decryptionPassword,
+									$definition[self::CRYPT_CAST]
+								),
+								$where
+							);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * Invalid ID
@@ -877,11 +1128,11 @@ class DB_Model extends CI_Model
 		{
 			if ($id != null)
 			{
-				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $this->dbTable, $this->_getUDFsNoPerms($id));
+				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $schemaAndTable, $this->_getUDFsNoPerms($id));
 			}
 			else
 			{
-				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $this->dbTable);
+				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $schemaAndTable);
 			}
 		}
 
@@ -895,7 +1146,7 @@ class DB_Model extends CI_Model
 	 * - A FALSE value on failure
 	 * - Otherwise an object filled with data on success
 	 */
-	private function _toPhp($result)
+	private function _toPhp($result, $encryptedColumns = null)
 	{
 		$udfs = false; // if UDFs are inside the given result set
 		$toPhp = $result; // if there is nothing to convert then return the result from DB
@@ -911,7 +1162,9 @@ class DB_Model extends CI_Model
 			// Looking for booleans, arrays and UDFs
 			foreach ($this->executedQueryMetaData as $eqmd)
 			{
-				// If array type, boolean type OR a UDF
+				// If array type, boolean type, numeric type
+				// Or bytea type
+				// Or UDF type
 				if (strpos($eqmd->type, DB_Model::PGSQL_ARRAY_TYPE) !== false
 					|| $eqmd->type == DB_Model::PGSQL_BOOLEAN_TYPE
 					|| $eqmd->type == DB_Model::PGSQL_INT2_TYPE
@@ -919,6 +1172,7 @@ class DB_Model extends CI_Model
 					|| $eqmd->type == DB_Model::PGSQL_INT8_TYPE
 					|| $eqmd->type == DB_Model::PGSQL_FLOAT4_TYPE
 					|| $eqmd->type == DB_Model::PGSQL_FLOAT8_TYPE
+					|| $eqmd->type == DB_Model::PGSQL_BYTEA_TYPE
 					|| $this->udflib->isUDFColumn($eqmd->name, $eqmd->type))
 				{
 					// If UDFs are inside this result set
@@ -980,6 +1234,21 @@ class DB_Model extends CI_Model
 							|| $toBeConverted->type == DB_Model::PGSQL_FLOAT8_TYPE)
 						{
 							$resultElement->{$toBeConverted->name} = $this->pgFloatPhp($resultElement->{$toBeConverted->name});
+						}
+						// Byte A type
+						elseif ($toBeConverted->type == DB_Model::PGSQL_BYTEA_TYPE)
+						{
+							// If encrypted columns are defined
+							// and if the byte a column is defined as encrypted column
+							if (!isEmptyArray($encryptedColumns)
+								&& array_key_exists($toBeConverted->name, $encryptedColumns))
+							{
+								// keep the column
+							}
+							else // otherwise remove the column from the result
+							{
+								unset($resultElement->{$toBeConverted->name});
+							}
 						}
 					}
 				}

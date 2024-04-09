@@ -144,20 +144,22 @@ if (isset($_GET['projektarbeit_id']))
 	$params .= '&projektarbeit_id='. $_GET['projektarbeit_id'];
 if (isset($_GET['betreuerart_kurzbz']))
 	$params .= '&betreuerart_kurzbz='. $_GET['betreuerart_kurzbz'];
+if (isset($_GET['id']))
+	$params .= '&id='. $_GET['id'];
 
 
 // Logeintrag bei Download von Zahlungsbestaetigungen
 if (isset($_GET['xsl']) && $_GET['xsl'] == 'Zahlung')
 {
 	$requestdata = $_SERVER['QUERY_STRING'];
-	
+
 	$log = new Webservicelog();
 	$log->webservicetyp_kurzbz = 'content';
 	$log->request_id = isset($_GET['buchungsnummern']) && !empty($_GET['buchungsnummern']) ? $_GET['buchungsnummern'] : NULL;
 	$log->beschreibung = 'Zahlungsbestaetigungsdownload';
 	$log->request_data = $requestdata;
 	$log->execute_user = get_uid();
-	
+
 	$log->save(true);
 }
 
@@ -207,6 +209,7 @@ if (isset($_GET['xsl']) && ($_GET['xsl'] === 'Projektbeurteilung'))
 	switch ($_GET['betreuerart_kurzbz'])
 	{
 		case 'Begutachter' :
+		case 'Senatsvorsitz' :
 			$xsl = 'ProjektBeurteilungBA';
 			break;
 		case 'Erstbegutachter' :
@@ -233,7 +236,7 @@ if ((((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('
 	if (isset($_GET['ss']))
 		$stsem_zahlung = $konto->getLastStSemBuchungstypen($user, $buchungstypen, $_GET['ss']);
 
-	if ((($xsl=='Inskription') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
+	if ((($xsl == 'Inskription') || ($xsl == 'InskriptionEng') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
 	{
 		die('Der Studienbeitrag wurde noch nicht bezahlt');
 	}
