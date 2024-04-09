@@ -12,6 +12,73 @@ class Konto_model extends DB_Model
 		$this->pk = 'buchungsnr';
 	}
 
+
+	/**
+	 * Get all accounting entries for a person optionally filtered by Studiengang
+	 *
+	 * @param integer|array		$person_id
+	 * @param string			(optional) $studiengang_kz
+	 *
+	 * @return stdClass
+	 */
+	public function getAlleBuchungen($person_id, $studiengang_kz = '')
+	{
+		$this->addSelect($this->dbTable . '.*');
+		$this->addSelect('UPPER(typ::varchar(1) || kurzbz) AS kuerzel');
+		$this->addSelect('person.anrede');
+		$this->addSelect('person.titelpost');
+		$this->addSelect('person.titelpre');
+		$this->addSelect('person.vorname');
+		$this->addSelect('person.vornamen');
+		$this->addSelect('person.nachname');
+
+		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
+		$this->addJoin('public.tbl_person person', 'person_id', 'LEFT');
+
+		$this->addOrder('buchungsdatum');
+
+		if (is_array($person_id))
+			$this->db->where_in('person_id', $person_id);
+		else
+			$this->db->where('person_id', $person_id);
+
+		if ($studiengang_kz)
+			return $this->loadWhere([
+				'studiengang_kz' => $studiengang_kz
+			]);
+		return $this->load();
+	}
+
+	/**
+	 * Get all open accounting entries for a person optionally filtered by Studiengang
+	 *
+	 * @param integer|array		$person_id
+	 * @param string			(optional) $studiengang_kz
+	 *
+	 * @return stdClass
+	 */
+	public function getOffeneBuchungen($person_id, $studiengang_kz = '')
+	{
+		$this->addSelect('buchungsnr');
+		$this->db->where('(betrag + (
+			SELECT CASE WHEN sum(betrag) is null THEN 0 ELSE sum(betrag) END
+			FROM ' . $this->dbTable . '
+			WHERE buchungsnr_verweis=konto_a.buchungsnr
+		)) !=', 0, false);
+		if (is_array($person_id))
+			$this->db->where_in('person_id', $person_id);
+		else
+			$this->db->where('person_id', $person_id);
+		$sql = $this->db->get_compiled_select($this->dbTable . ' konto_a');
+
+		$this->db->group_start();
+		$this->db->where_in('buchungsnr', $sql, false);
+		$this->db->or_where_in('buchungsnr_verweis', $sql, false);
+		$this->db->group_end();
+
+		return $this->getAlleBuchungen($person_id, $studiengang_kz);
+	}
+
 	/**
 	 * Sets a Payment as paid
 	 */
