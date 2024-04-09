@@ -278,7 +278,7 @@ const profilApp = Vue.createApp({
             },
           },
           Private_Kontakte: {
-            title: this.$p.t('profil','privateAdressen'),
+            title: this.$p.t('profil','privateKontakte'),
             data: this.data.kontakte
               ?.filter((item) => {
                 return !this.data.profilUpdates?.some(

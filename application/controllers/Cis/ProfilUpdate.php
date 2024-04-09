@@ -508,8 +508,10 @@ class ProfilUpdate extends Auth_Controller
 			
 		}else{
 			switch($topic){
-				case "titel": $topic ="titelpre"; break;
-				case "postnomen": $topic = "titelpost"; break;
+				// mapping phrasen to database columns to make the update with the correct column names
+				case $this->p->t('profilUpdate','title'): $topic ="titelpre"; break;
+				case $this->p->t('profilUpdate','postnomen'): $topic = "titelpost"; break;
+				case $this->p->t('profilUpdate','vorname'): $topic = "vorname"; break;
 			}
 			
 			$result = $this->PersonModel->update($personID,[$topic=>$requested_change["value"]]);

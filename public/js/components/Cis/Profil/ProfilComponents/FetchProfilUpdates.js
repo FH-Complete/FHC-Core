@@ -233,7 +233,7 @@ export default {
                       </div>
                       <div class="card-body" >
     <div class="table-responsive text-nowrap">
-        <table class="m-0  table  table-hover">
+        <table class="m-0  table  table-hover align-middle">
             <thead >
                 <tr >
                 <th scope="col">{{$p.t('profilUpdate','topic')}}</th>

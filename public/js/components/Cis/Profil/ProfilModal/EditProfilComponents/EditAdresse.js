@@ -102,7 +102,7 @@ export default {
 
   template: /*html*/ `
      <div class="gy-3 row justify-content-center align-items-center">
-     
+     <pre>{{JSON.stringify(data,null,2)}}</pre>
      <!-- warning message for too many zustellungs Adressen -->
      <div v-if="showZustellAdressenWarning" class="col-12 ">
      <div class="card bg-danger mx-2">
