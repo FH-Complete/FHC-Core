@@ -85,7 +85,6 @@ if(isset($_GET['prestudent']) && $_GET['prestudent']=='false')
 else
 	$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('assistenz'));
 
-//var_dump($berechtigung);
 array_unique($berechtigt_studiengang);
 $stg_kz_query='';
 if (count($berechtigt_studiengang)>0)
@@ -382,13 +381,13 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 			$orgform_sequence[$stg_kz].= "\n\t\t\t</RDF:li>\n";
 			
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
-			$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber\">\n";
+			$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber\">\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestnichtangemeldet\" />\n";
 			
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet\">\n";
-			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet/reihungstestnichtangemeldet/teilgenommen\" />\n";
-			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet/reihungstestnichtangemeldet/nichtteilgenommen\" />\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet/teilgenommen\" />\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet/nichtteilgenommen\" />\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t\t</RDF:Seq>";
 			$orgform_sequence[$stg_kz].= "\n\t\t\t</RDF:li>\n";
 			
@@ -915,7 +914,7 @@ draw_orgformpart($stg_kz);
 					echo "\n\t\t\t</RDF:li>\n";
 					
 					echo "\t\t\t<RDF:li>";
-					echo "\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber\">\n";
+					echo "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber\">\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber/reihungstestnichtangemeldet\" />\n";
 					echo "\t\t\t<RDF:li>";
 					echo "\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet\">\n";

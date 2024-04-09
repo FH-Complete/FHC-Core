@@ -512,7 +512,7 @@ class statistik extends basis_db
 		$this->csv='';
 		$this->json=array();
 		$this->countRows=0;
-		set_time_limit(120);
+		set_time_limit(600);
 
 		// In case a decryption function is used then perform password substitution
 		$this->sql = $this->replaceSQLDecryptionPassword($this->sql);
@@ -527,6 +527,7 @@ class statistik extends basis_db
 				$uid = get_uid();
 				$sql = str_replace('$user',$this->db_add_param($uid),$sql);
 			}
+
 			foreach($_REQUEST as $name=>$value)
 			{
 				// Inputs, die in eckigen Klammern stehen, werden als Array interpretiert

@@ -29,13 +29,11 @@ class MigrateContract extends CLI_Controller
 		$this->load->model('person/benutzerfunktion_model', 'BenutzerfunktionModel');
 
 		$this->matching_ba1_vertragsart = array(
-			//'101'=>'DV zum Bund', // TODO was tun wir damit
-			'101'=>'freierdv', // TODO was tun wir damit
+			'101'=>'externerlehrender',
 			'102'=>'DV anderen Gebietskörperschaft',
 			'103'=>'echterdv',
-			//'104'=>'Lehr- oder Ausbildungsverhältnis', // TODO was tun wir mit dem?
 			'104'=>'studentischehilfskr',
-			'105'=>'freierdv',
+			'105'=>'externerlehrender',
 			'106'=>'Andere Bildungseinrichtung',
 			'107'=>'werkvertrag',
 			'108'=>'studentischehilfskr',
@@ -678,5 +676,36 @@ class MigrateContract extends CLI_Controller
 			return max(array_keys($contracts['dv'])) + 1;
 		else
 			return 0;
+	}
+
+	/**
+	 * Habilitation wird aus der Tabelle bis.tbl_bisverwendung in die Tabelle public.tbl_mitarbeiter uebernommen
+	 * Sofern die Person einmal in den Verwendungen eine habiliation eingetragen hat wird diese in den MA-Datensatz übernommen
+	 * Da es in der regel öfter vorkommt dass das hakerl vergessen wurde beim Vertragswechsel als dass die person die habiliation verliert.
+	 */
+	public function migrateHabilitation()
+	{
+		$this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
+		$db = new DB_Model();
+
+		$qry = "
+		SELECT
+			distinct mitarbeiter_uid
+		FROM
+			bis.tbl_bisverwendung
+		WHERE
+			habilitation=true";
+
+		$resultHabilitation = $db->execReadOnlyQuery($qry);
+
+		if (isSuccess($resultHabilitation) && hasData($resultHabilitation))
+		{
+			$habilitationen = getData($resultHabilitation);
+
+			foreach ($habilitationen as  $row_habilitationen)
+			{
+ 				$this->MitarbeiterModel->update($row_habilitationen->mitarbeiter_uid, array('habilitation'=>true));
+			}
+		}
 	}
 }

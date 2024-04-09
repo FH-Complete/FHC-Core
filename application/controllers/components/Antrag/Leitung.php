@@ -116,6 +116,96 @@ class Leitung extends FHC_Controller
 		$this->outputJsonSuccess($studierendenantrag_id);
 	}
 
+	public function pauseAntrag()
+	{
+		$this->load->library('form_validation');
+
+		$_POST = json_decode($this->input->raw_input_stream, true);
+
+		$this->form_validation->set_rules(
+			'studierendenantrag_id',
+			'Studierenden Antrag',
+			[
+				'required',
+				[
+					'isEntitledToPauseAntrag',
+					[$this->antraglib, 'isEntitledToPauseAntrag']
+				],
+				[
+					'antragCanBeManualPaused',
+					[$this->antraglib, 'antragCanBeManualPaused']
+				]
+			],
+			[
+				'isEntitledToPauseAntrag' => $this->p->t('studierendenantrag', 'error_no_right'),
+				'antragCanBeManualPaused' => $this->p->t(
+					'studierendenantrag',
+					'error_not_pauseable',
+					['id' => $this->input->post('studierendenantrag_id')]
+				)
+			]
+		);
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
+
+		$studierendenantrag_id = $this->input->post('studierendenantrag_id');
+
+		$result = $this->antraglib->pauseAntrag($studierendenantrag_id, getAuthUID());
+
+		if (isError($result))
+			return $this->outputJsonError(['studierendenantrag_id' => getError($result)]);
+
+		$this->outputJsonSuccess($studierendenantrag_id);
+	}
+
+	public function unpauseAntrag()
+	{
+		$this->load->library('form_validation');
+
+		$_POST = json_decode($this->input->raw_input_stream, true);
+
+		$this->form_validation->set_rules(
+			'studierendenantrag_id',
+			'Studierenden Antrag',
+			[
+				'required',
+				[
+					'isEntitledToUnpauseAntrag',
+					[$this->antraglib, 'isEntitledToUnpauseAntrag']
+				],
+				[
+					'antragCanBeManualUnpaused',
+					[$this->antraglib, 'antragCanBeManualUnpaused']
+				]
+			],
+			[
+				'isEntitledToUnpauseAntrag' => $this->p->t('studierendenantrag', 'error_no_right'),
+				'antragCanBeManualUnpaused' => $this->p->t(
+					'studierendenantrag',
+					'error_not_paused',
+					['id' => $this->input->post('studierendenantrag_id')]
+				)
+			]
+		);
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
+
+		$studierendenantrag_id = $this->input->post('studierendenantrag_id');
+
+		$result = $this->antraglib->unpauseAntrag($studierendenantrag_id, getAuthUID());
+
+		if (isError($result))
+			return $this->outputJsonError(['studierendenantrag_id' => getError($result)]);
+
+		$this->outputJsonSuccess($studierendenantrag_id);
+	}
+
 	public function objectAntrag()
 	{
 		$this->load->library('form_validation');

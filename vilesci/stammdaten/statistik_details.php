@@ -173,11 +173,29 @@ if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 			$statistik->preferences = <<<EOT
 // Folgendes Objekt wird als "options"-Parameter an den Pivottable übergeben:
 {
-	rows: [],
 	cols: [],
-	rendererName: "Table",
-	aggregatorName: "Count",
-	vals: []
+	rows: [],
+	vals: [],
+	showUI: true,
+	colOrder: "key_a_to_z",
+	rowOrder: "key_a_to_z",
+	menuLimit: 500,
+	exclusions: {},
+	inclusions: {},
+	rendererName: "Tabelle",
+	aggregatorName: "Anzahl",
+	inclusionsInfo: {},
+	hiddenAttributes: [],
+	derivedAttributes: {},
+	hiddenFromDragDrop: [],
+	autoSortUnusedAttrs: false,
+	unusedAttrsVertical: true,
+	hiddenFromAggregators: [],
+	sorters: {},
+	parseHTML: false,
+	hideTotals: false,
+	showLinecount: true,
+	showEmailButton: false
 }
 EOT;
 		}
