@@ -96,4 +96,33 @@ class Betriebsmittelperson_model extends DB_Model
 
 		return $this->loadWhere($condition);
 	}
+
+	public function getBetriebsmittelData($id, $type_id)
+	{
+		switch ($type_id) {
+			case 'person':
+				$cond = 'bmp.person_id';
+				break;
+			case 'uid':
+				$cond = 'bmp.uid';
+				break;
+			case 'betriebsmittelperson_id':
+				$cond = 'bmp.betriebsmittelperson_id';
+				break;
+			default:
+				return error("ID nicht gültig");
+		}
+
+		$query = "
+			SELECT 
+			    bm.nummer, bmp.person_id, bm.betriebsmitteltyp, bmp.anmerkung as anmerkung, bmp.retouram, bm.beschreibung, bmp.ausgegebenam, bmp.uid, bmp.kaution, bm.betriebsmittel_id, bmp.betriebsmittelperson_id, bm.inventarnummer --bm.*
+			FROM 
+			    wawi.tbl_betriebsmittelperson bmp
+			JOIN 
+			        wawi.tbl_betriebsmittel bm ON (bmp.betriebsmittel_id = bm.betriebsmittel_id)
+			WHERE 
+			    " . $cond . " = ? ";
+
+		return $this->execQuery($query, array($id));
+	}
 }

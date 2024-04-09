@@ -13,17 +13,22 @@ class Betriebsmittel_model extends DB_Model
 	}
 
 	/**
-	 * getBetriebsmittelById
+	 * load Liste Inventarnummern
 	 */
-/*	public function loadBetriebsmittel($betriebsmittelperson_id){
-		$query = "
-			SELECT *
-			FROM wawi.tbl_betriebsmittelperson
-			JOIN wawi.tbl_betriebsmittel ON (wawi.tbl_betriebsmittelperson.betriebsmittel_id = wawi.tbl_betriebsmittel.betriebsmittel_id)
-			WHERE wawi.tbl_betriebsmittelperson.betriebsmittelperson_id  = ? 
-		";
+	public function loadInventarliste($filter)
+	{
+		$filter = strtoLower($filter);
 
-		return $this->execQuery($query, array($betriebsmittelperson_id));
-	}*/
+		$qry = "
+			SELECT 
+			    bm.inventarnummer, bm.betriebsmitteltyp, bm.betriebsmittel_id, CONCAT(bm.inventarnummer, ' ', bm.beschreibung) as dropdowntext
+			FROM 
+			    wawi.tbl_betriebsmittel bm
+			WHERE 
+			    upper(bm.inventarnummer) LIKE '%" .$this->db->escape_like_str($filter)."%'
+			OR    
+			    lower(bm.inventarnummer) LIKE '%" .$this->db->escape_like_str($filter)."%'";
 
+		return $this->execQuery($qry);
+	}
 }

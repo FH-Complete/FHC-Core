@@ -1,5 +1,7 @@
 import VueDatePicker from '../vueDatepicker.js.php';
 import {CoreFilterCmpt} from "../filter/Filter.js";
+import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
+
 import BsModal from "../Bootstrap/Modal";
 import FormForm from '../Form/Form.js';
 import FormInput from '../Form/Input.js';
@@ -11,6 +13,7 @@ export default {
 		BsModal,
 		FormForm,
 		FormInput,
+		PvAutoComplete
 	},
 	inject: {
 		cisRoot: {
@@ -31,13 +34,10 @@ export default {
 					{title: "Nummer", field: "nummer"},
 					{title:  "PersonId", field: "person_id"},
 					{title: "Typ", field: "betriebsmitteltyp"},
-				//	{title: "insertVon", field: "insertvon"}, //Test
-				//	{title: "insertAmUm", field: "insertamum"}, //TESt
-				//	{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id"},
+					{title:  "Anmerkung", field: "anmerkung", visible: false},
 					{title:  "Retourdatum", field: "retouram"},
 					{title:  "Beschreibung", field: "beschreibung"},
 					{title:  "Uid", field: "uid"},
-					{title:  "Anmerkung", field: "anmerkung", visible: false},
 					{title:  "Kaution", field: "kaution", visible: false},
 					{title:  "Ausgabedatum", field: "ausgegebenam", visible: false},
 					{title: "Betriebsmittel_id", field: "betriebsmittel_id", visible: false},
@@ -97,79 +97,31 @@ export default {
 				selectableRangeMode: 'click',
 				selectable: true
 			},
-			//tableData: [],
-			tabulatorEvents: [
-				{
-/*					//TODO Manu phrases
-					}*/
-
-					//TODO(manu)für editieren mit click: conflict with action buttons
-
-/*             event: 'rowSelectionChanged',
-			   handler: this.rowSelectionChanged*/
-/*              handler: (e, row.getData().betriebsmittelperson_id) => {
-// HandlerFunktion, die aufgerufen wird, wenn das Ereignis ausgelöst wird
-					   //this.rowSelectionChanged(row.getData().betriebsmittelperson_id);
-			   //      console.log("Selected Row Data:", row.getData());
-					   //console.log(cell.getData().betriebsmittelperson_id);
-*/
-				},
-			],
+			tabulatorEvents: [],
 			betriebsmittelData: {},
 			betriebsmittelperson_id : null,
 			listBetriebsmitteltyp: [],
 			formData: {
 				ausgegebenam : this.getDefaultDate(),
+				betriebsmitteltyp: 'Zutrittskarte'
 			},
 			statusNew: true,
-			changesDetected: false
-		};
-	},
-	computed: {
-		deltaLength() {
-			return Object.keys(this.formData).length;
-		}
-	},
-	watch: {
-		formData: {
-			handler: function(newVal) {
-
-				//console.log('Das Objekt wurde geändert:', newVal);
-				this.changesDetected = true;
-			},
-			deep: true  // Hiermit wird auch die Veränderung von Eigenschaften des Objekts überwacht
+			filteredInventar: []
 		}
 	},
 	methods: {
-		rowSelectionChanged(data) {
-			//console.log("Selected Row Data:", data[0].betriebsmittelperson_id);
-			this.param_id = {
-				'betriebsmittelperson_id':  data[0].betriebsmittelperson_id};
-
-			this.loadBetriebsmittel(this.param_id);
-		},
 		actionEditBetriebsmittel(betriebsmittelperson_id){
-			console.log("action EditBM: id: " + betriebsmittelperson_id);
 			this.statusNew = false;
 			this.loadBetriebsmittel(betriebsmittelperson_id);
-			this.changesDetected = false;
 		},
 		actionNewBetriebsmittel(){
-			console.log("action newBM: person " + this.person_id);
 			this.resetModal();
 			this.statusNew = true;
 			this.formData.ausgegebenam = this.getDefaultDate();
-			//this.changesDetected = false;
 			this.reload();
 		},
 		actionDeleteBetriebsmittel(betriebsmittelperson_id){
-			console.log("Löschen von Datensatz mit id: " + betriebsmittelperson_id);
-
 			this.loadBetriebsmittel(betriebsmittelperson_id).then(() => {
-/*				if(this.formData) {
-					this.$refs.deleteBetriebsmittelModal.show();
-				}*/
-				console.log("nach load" + betriebsmittelperson_id);
 				this.$refs.deleteBetriebsmittelModal.show();
 			});
 		},
@@ -184,17 +136,14 @@ export default {
 			).then(response => {
 				console.log(response);
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-			//	this.hideModal('newBetriebsmittelModal');
 				this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
 				});
-			//this.changesDetected = false; //not working
 		},
 		deleteBetriebsmittel(betriebsmittelperson_id){
-			console.log("Delete mit id: " + betriebsmittelperson_id);
 			this.param = {
 				'betriebsmittelperson_id': betriebsmittelperson_id
 			};
@@ -221,7 +170,6 @@ export default {
 			this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/updateBetriebsmittel/',
 				this.param
 			).then(response => {
-				//console.log(response);
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'editSave'));
 				//	this.hideModal('newBetriebsmittelModal');
 				this.resetModal();
@@ -232,7 +180,6 @@ export default {
 				});
 		},
 		loadBetriebsmittel(betriebsmittelperson_id){
-			console.log("loadBetriebsmittel id:" + betriebsmittelperson_id);
 			this.resetModal();
 			this.statusNew = false;
 			this.param = {
@@ -245,11 +192,16 @@ export default {
 					this.formData = result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-		//	this.changesDetected = false;
+		},
+		searchInventar(event){
+			return this.$fhcApi
+				.get('api/frontend/v1/stv/betriebsmittel/loadInventarliste/' + event.query)
+				.then(result => {
+					this.filteredInventar = result.data.retval;
+				});
 		},
 		reload(){
 			this.$refs.table.reloadTable();
-			//this.changesDetected = false;
 		},
 		hideModal(modalRef){
 			this.$refs[modalRef].hide();
@@ -257,10 +209,15 @@ export default {
 		resetModal(){
 			this.formData = {};
 			this.formData.ausgegebenam = this.getDefaultDate();
-			this.formData.listBetriebsmitteltyp = null;
+			this.formData.retouram = null;
+			this.formData.betriebsmitteltyp = null;
+			this.formData.nummer = null;
+			this.formData.nummer2 = null;
+			this.formData.kaution = null;
+			this.formData.anmerkung = null;
+			this.formData.beschreibung = null;
 			this.betriebsmittelperson_id = {};
 			this.statusNew = true;
-			//this.changesDetected = false;
 		},
 		getDefaultDate() {
 			const today = new Date();
@@ -323,7 +280,7 @@ export default {
 		<BsModal ref="deleteBetriebsmittelModal">
 			<template #title>Betriebsmittel löschen</template>
 			<template #default>
-				<p>Betriebsmittel ({{formData.betriebsmitteltyp}} / {{formData.betriebsmittelperson_id}}) wirklich löschen?</p>
+				<p>Betriebsmittel {{formData.betriebsmitteltyp}} wirklich löschen?</p>
 			</template>
 			<template #footer>
 <!--				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>-->
@@ -344,9 +301,7 @@ export default {
 			>
 		</core-filter-cmpt>
 		<br>
-		 {{cisRoot}}
-		 {{formData}} {{changesDetected}}
-				<hr>
+
 			<form-form class="row g-3 col-6" ref="betriebsmittelData">
 				<legend>Details</legend>
 				
@@ -364,13 +319,28 @@ export default {
 						type="select"
 						name="typ"
 						v-model="formData.betriebsmitteltyp"
+						:disabled="!statusNew"
 						>
-						<option v-for="entry in listBetriebsmitteltyp" :key="entry.betriebsmitteltyp" :value="entry.betriebsmitteltyp">{{entry.betriebsmitteltyp}}</option>
+						<option v-for="entry in listBetriebsmitteltyp" :key="entry.betriebsmitteltyp" :value="entry.betriebsmitteltyp">{{entry.beschreibung}}</option>
 						</form-input>
 					</div>
 				</div>
 				
-				<div class="row mb-3">
+			
+				<div v-if="formData.betriebsmitteltyp == 'Inventar'" class="row mb-3">
+					<label for="inventarnummer" class="form-label col-sm-4">Inventarnummer</label>
+					<div class="col-sm-6">
+						<PvAutoComplete v-model="formData['inventarData']" optionLabel="dropdowntext" :suggestions="filteredInventar" @complete="searchInventar" minLength="3"/>
+					</div>
+				</div>
+				<div v-else-if="formData.inventarnummer" class="row mb-3">
+				<label for="inventarnummer" class="form-label col-sm-4">Inventarnummer</label>
+					<div class="col-sm-6">
+						<input type="text" :readonly="readonly" class="form-control" id="inventarnummer" v-model="formData.inventarnummer" :disabled="!statusNew">
+					</div>
+				</div>
+				
+				<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
 					<label for="nummer" class="form-label col-sm-4">Nummer</label>
 					<div class="col-sm-6">
 						<form-input
@@ -382,7 +352,7 @@ export default {
 					</div>
 				</div>
 				
-				<div class="row mb-3">
+				<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
 					<label for="nummer2" class="form-label col-sm-4">Nummer2</label>
 					<div class="col-sm-6">
 						<form-input
@@ -394,13 +364,14 @@ export default {
 					</div>
 				</div>
 			
-				<div class="row mb-3">
+				<div v-if="formData.betriebsmitteltyp!='Inventar'" class="row mb-3">
 					<label for="beschreibung" class="form-label col-sm-4">Beschreibung</label>
 					<div class="col-sm-6">
 						<form-input
 							type="textarea"
 							name="beschreibung"
 							v-model="formData['beschreibung']"
+							:disabled="formData.inventarnummer"
 						>						
 						</form-input>
 					</div>
@@ -462,19 +433,16 @@ export default {
 							:teleport="true"
 						></form-input>
 					</div>
-<!--					<div class="position-sticky top-0 z-1">
-						<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!deltaLength">Speichern2</button>
-					</div>-->
 				</div>
 				
 
 				<div class="row mb-3">
 				<label class="form-label col-sm-8"></label>
 					<div v-if="statusNew" class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()" :disabled="!changesDetected">Speichern</button>
+						<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">Speichern</button>
 					</div>
 					<div v-else class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-warning" @click="updateBetriebsmittel()" :disabled="!changesDetected">Aktualisieren</button>
+						<button ref="Close" type="button" class="btn btn-warning" @click="updateBetriebsmittel()">Aktualisieren</button>
 					</div>
 					
 				</div>
