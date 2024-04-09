@@ -455,7 +455,9 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			PRIMARY KEY (dvendegrund_kurzbz),
 			CONSTRAINT tbl_dvendegrund_bezeichnung_key UNIQUE (bezeichnung)
 		    );
-		    
+
+		    GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_dvendegrund TO vilesci;
+
 		    INSERT INTO 
 			hr.tbl_dvendegrund (dvendegrund_kurzbz, bezeichnung, bezeichnung_mehrsprachig) 
 		    VALUES
