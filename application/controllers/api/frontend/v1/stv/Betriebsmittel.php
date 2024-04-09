@@ -112,6 +112,8 @@ class Betriebsmittel extends FHCAPI_Controller
 		// Start DB transaction
 		$this->db->trans_begin();
 
+		$betriebsmitteltyp = utf8_decode($betriebsmitteltyp);
+
 		if(!$inventarData)
 		{
 			$result = $this->BetriebsmittelModel->insert(
