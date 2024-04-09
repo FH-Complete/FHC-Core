@@ -437,7 +437,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		if (! $db->db_query($qry))
 			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
 		else
-			echo 'HR Schema und Vertagstabellen wurden neu erstellt';
+			echo 'HR Schema und Vertagstabellen wurden neu erstellt<br>';
 	}
 }
 
@@ -455,11 +455,20 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			PRIMARY KEY (dvendegrund_kurzbz),
 			CONSTRAINT tbl_dvendegrund_bezeichnung_key UNIQUE (bezeichnung)
 		    );
+		    
+		    INSERT INTO 
+			hr.tbl_dvendegrund (dvendegrund_kurzbz, bezeichnung, bezeichnung_mehrsprachig) 
+		    VALUES
+			('kuendigung_arbeitnehmer', 'Kündigung durch Arbeitnehmer', ARRAY['Kündigung durch Arbeitnehmer', 'Cancellation by Employee']), 
+			('kuendigung_arbeitgeber', 'Kündigung durch Arbeitgeber', ARRAY['Kündigung durch Arbeitgeber', 'Cancellation by Employer']),
+			('entlassung', 'Entlassung', ARRAY['Entlassung', 'Dismissal']),
+			('sonstige', 'Sonstige', ARRAY['Sonstige', 'Miscellaneous']),
+			('einvernehmlich', 'Einvernehmliche Auflösung', ARRAY['Einvernehmliche Auflösung', 'Rescission']);
 		";
 		if (! $db->db_query($qry))
 			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
 		else
-			echo 'Tabelle tbl_dvendegrund wurde im HR Schema neu erstellt';
+			echo 'Tabelle tbl_dvendegrund wurde im HR Schema neu erstellt<br>';
 	}
 }
 
@@ -484,7 +493,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE colu
 		if (! $db->db_query($qry))
 			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
 		else
-			echo 'Spalte dvendegrund_kurzbz wurde in hr.tbl_dienstverhaeltnis neu erstellt';
+			echo 'Spalte dvendegrund_kurzbz wurde in hr.tbl_dienstverhaeltnis neu erstellt<br>';
 	}
 }
 
@@ -501,6 +510,6 @@ if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE colu
 		if (! $db->db_query($qry))
 			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
 		else
-			echo 'Spalte dvendegrund_anmerkung wurde in hr.tbl_dienstverhaeltnis neu erstellt';
+			echo 'Spalte dvendegrund_anmerkung wurde in hr.tbl_dienstverhaeltnis neu erstellt<br>';
 	}
 }
