@@ -34,18 +34,9 @@ require_once('../include/studiensemester.class.php');
 require_once('../include/student.class.php');
 require_once('../include/firma.class.php');
 require_once('../include/note.class.php');
-
-//für Studienordnung
 require_once('../include/studienplan.class.php');
 require_once('../include/lehrveranstaltung.class.php');
 require_once('../include/lehrform.class.php');
-require_once('../include/lvinfo.class.php');
-
-require_once('../include/lehreinheitgruppe.class.php');
-require_once('../include/studienordnung.class.php');
-
-require_once('../include/organisationsform.class.php');
-
 require_once('../include/sprache.class.php');
 
 $datum = new datum();
@@ -285,7 +276,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		if($addonStgAktiv)
 		{
-			echo '<addon_aktiv>1</addon_aktiv>';
 
 			require_once('../addons/studiengangsverwaltung/include/qualifikationsziel.class.php');
 			$qualifikationsziel = new qualifikationsziel();
@@ -298,8 +288,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			}
 
 		}
-		else
-			echo '<addon_aktiv>0</addon_aktiv>';
 
 		if($row->typ=='d')
 		{
@@ -1167,7 +1155,6 @@ function printLehrveranstaltungTree($tree)
 			if(!$alvs = $lv_alvs->getALVS($lv->lehrveranstaltung_id, $lv->semester))
 				$alvs = '';
 			//Semesterwochen zum berechnen der SWS ermitteln
-					// echo '              <lv_sws><![CDATA['.round($sws,2).']]></lv_sws>';
 			$qry = '	SELECT
 							wochen
 						FROM
@@ -1217,44 +1204,6 @@ function printLehrveranstaltungTree($tree)
 			echo '              <lv_gen><![CDATA['.$lv->genehmigung.']]></lv_gen>';
 			echo '              <lv_anmerkung><![CDATA['.clearHtmlTags($lv->anmerkung).']]></lv_anmerkung>';
 			echo '				<lv_sprache><![CDATA['.$sp->getBezeichnung($lv->sprache, constant("DEFAULT_LANGUAGE")).']]></lv_sprache>';
-
-
-			$objLVInfo = new lvinfo();
-			// ***************** LV-Info ***************
-			if ($objLVInfo->exists($lv->lehrveranstaltung_id, 'German'))
-			{
-				if(!$objLVInfo->load($lv->lehrveranstaltung_id, 'German'))
-					die('Fehler beim laden der deutschen LV-Informationen');
-				//var_dump($objLVInfo);
-				echo '              <lvinfo_sprache><![CDATA['.clearHtmlTags($objLVInfo->sprache).']]></lvinfo_sprache>';
-				echo '              <lvinfo_titel><![CDATA['.clearHtmlTags($objLVInfo->titel).']]></lvinfo_titel>';
-				echo '              <lvinfo_lehrziele><![CDATA['.clearHtmlTags($objLVInfo->lehrziele).']]></lvinfo_lehrziele>';
-				echo '              <lvinfo_methodik><![CDATA['.clearHtmlTags($objLVInfo->methodik).']]></lvinfo_methodik>';
-				echo '              <lvinfo_lehrinhalte><![CDATA['.clearHtmlTags($objLVInfo->lehrinhalte).']]></lvinfo_lehrinhalte>';
-				echo '              <lvinfo_voraussetzungen><![CDATA['.clearHtmlTags($objLVInfo->voraussetzungen).']]></lvinfo_voraussetzungen>';
-				echo '              <lvinfo_unterlagen><![CDATA['.clearHtmlTags($objLVInfo->unterlagen).']]></lvinfo_unterlagen>';
-				echo '              <lvinfo_pruefungsordnung><![CDATA['.clearHtmlTags($objLVInfo->pruefungsordnung).']]></lvinfo_pruefungsordnung>';
-				echo '              <lvinfo_kurzbeschreibung><![CDATA['.clearHtmlTags($objLVInfo->kurzbeschreibung).']]></lvinfo_kurzbeschreibung>';
-				echo '              <lvinfo_anmerkungen><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anmerkungen>';
-				echo '              <lvinfo_anwesenheit><![CDATA['.clearHtmlTags($objLVInfo->anwesenheit).']]></lvinfo_anwesenheit>';
-			}
-			if ($objLVInfo->exists($lv->lehrveranstaltung_id, 'English'))
-			{
-				if(!$objLVInfo->load($lv->lehrveranstaltung_id, 'English'))
-					die('Fehler beim laden der englischen LV-Informationen');
-				//var_dump($objLVInfo);
-				echo '              <lvinfo_sprache><![CDATA['.clearHtmlTags($objLVInfo->sprache).']]></lvinfo_sprache>';
-				echo '              <lvinfo_titel_en><![CDATA['.clearHtmlTags($objLVInfo->titel).']]></lvinfo_titel_en>';
-				echo '              <lvinfo_lehrziele_en><![CDATA['.clearHtmlTags($objLVInfo->lehrziele).']]></lvinfo_lehrziele_en>';
-				echo '              <lvinfo_methodik_en><![CDATA['.clearHtmlTags($objLVInfo->methodik).']]></lvinfo_methodik_en>';
-				echo '              <lvinfo_lehrinhalte_en><![CDATA['.clearHtmlTags($objLVInfo->lehrinhalte).']]></lvinfo_lehrinhalte_en>';
-				echo '              <lvinfo_voraussetzungen_en><![CDATA['.clearHtmlTags($objLVInfo->voraussetzungen).']]></lvinfo_voraussetzungen_en>';
-				echo '              <lvinfo_unterlagen_en><![CDATA['.clearHtmlTags($objLVInfo->unterlagen).']]></lvinfo_unterlagen_en>';
-				echo '              <lvinfo_pruefungsordnung_en><![CDATA['.clearHtmlTags($objLVInfo->pruefungsordnung).']]></lvinfo_pruefungsordnung_en>';
-				echo '              <lvinfo_kurzbeschreibung_en><![CDATA['.clearHtmlTags($objLVInfo->kurzbeschreibung).']]></lvinfo_kurzbeschreibung_en>';
-				echo '              <lvinfo_anmerkungen_en><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anmerkungen_en>';
-				echo '              <lvinfo_anwesenheit_en><![CDATA['.clearHtmlTags($objLVInfo->anwesenheit).']]></lvinfo_anwesenheit_en>';
-			}
 
 			//Wenn Modul verpflichtend und alle Childs frei wählbar, soll Modul für ects gezählt werden
 			$allChildsFree = true;
