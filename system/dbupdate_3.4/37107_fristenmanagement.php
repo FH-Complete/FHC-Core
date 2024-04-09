@@ -56,6 +56,8 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
         GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_frist_status TO vilesci;
         GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_frist_ereignis TO vilesci;
 
+	GRANT USAGE ON hr.tbl_frist_frist_id_seq TO vilesci;
+
         INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung, sort) VALUES('neu','Neu', 1);
         INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung, sort) VALUES('in_bearbeitung','In Bearbeitung', 2);
         INSERT INTO hr.tbl_frist_status(status_kurzbz, bezeichnung, sort) VALUES('erledigt','Erledigt', 3);
