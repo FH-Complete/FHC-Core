@@ -26285,6 +26285,196 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'betriebsmittel_delete',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete operating resource',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'betriebsmittel_confirm_delete',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Really delete operating resource?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'add_betriebsmittel',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'create operating resource',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'edit_betriebsmittel',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'edit operating resource',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'inventarnummer',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Inventarnummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'inventory number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'nummer',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'ausgegebenam',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausgegeben am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'issued on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'retouram',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Retour am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'returned on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'retourdatum',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Retourdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'return date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'ausgabedatum',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ausgabedatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'issue date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

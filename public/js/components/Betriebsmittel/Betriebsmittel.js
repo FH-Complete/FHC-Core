@@ -32,14 +32,14 @@ export default {
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Nummer", field: "nummer"},
-					{title:  "PersonId", field: "person_id"},
+					{title: "PersonId", field: "person_id"},
 					{title: "Typ", field: "betriebsmitteltyp"},
-					{title:  "Anmerkung", field: "anmerkung", visible: false},
-					{title:  "Retourdatum", field: "retouram"},
-					{title:  "Beschreibung", field: "beschreibung"},
-					{title:  "Uid", field: "uid"},
-					{title:  "Kaution", field: "kaution", visible: false},
-					{title:  "Ausgabedatum", field: "ausgegebenam", visible: false},
+					{title: "Anmerkung", field: "anmerkung", visible: false},
+					{title: "Retourdatum", field: "retouram"},
+					{title: "Beschreibung", field: "beschreibung"},
+					{title: "Uid", field: "uid"},
+					{title: "Kaution", field: "kaution", visible: false},
+					{title: "Ausgabedatum", field: "ausgegebenam", visible: false},
 					{title: "Betriebsmittel_id", field: "betriebsmittel_id", visible: false},
 					{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id", visible: false},
 					{
@@ -97,7 +97,35 @@ export default {
 				selectableRangeMode: 'click',
 				selectable: true
 			},
-			tabulatorEvents: [],
+			tabulatorEvents: [
+				{
+					event: 'tableBuilt',
+					handler: async () => {
+
+						await this.$p.loadCategory(['wawi', 'global', 'infocenter']);
+
+						let cm = this.$refs.table.tabulator.columnManager;
+
+						cm.getColumnByField('nummer').component.updateDefinition({
+							title: this.$p.t('wawi', 'nummer')
+						});
+						cm.getColumnByField('anmerkung').component.updateDefinition({
+							title: this.$p.t('global', 'anmerkung')
+						});
+						cm.getColumnByField('retouram').component.updateDefinition({
+							title: this.$p.t('wawi', 'retourdatum')
+						});
+						cm.getColumnByField('kaution').component.updateDefinition({
+							title: this.$p.t('infocenter', 'kaution')
+						});
+						cm.getColumnByField('ausgegebenam').component.updateDefinition({
+							title: this.$p.t('wawi', 'ausgabedatum')
+						});
+
+					}
+
+				}
+			],
 			betriebsmittelData: {},
 			betriebsmittelperson_id : null,
 			listBetriebsmitteltyp: [],
@@ -134,7 +162,6 @@ export default {
 			this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/addNewBetriebsmittel/',
 				this.param
 			).then(response => {
-				console.log(response);
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 				this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
@@ -170,8 +197,7 @@ export default {
 			this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/updateBetriebsmittel/',
 				this.param
 			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'editSave'));
-				//	this.hideModal('newBetriebsmittelModal');
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 				this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -233,54 +259,14 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	mounted(){
-
-	},
-/*	async mounted() {
-		if(this.showTinyMCE){
-			this.initTinyMCE();
-		}
-
-		await this.$p.loadCategory(['notiz','global']);
-
-		let cm = this.$refs.table.tabulator.columnManager;
-
-		cm.getColumnByField('verfasser_uid').component.updateDefinition({
-			title: this.$p.t('notiz', 'verfasser')
-		});
-		cm.getColumnByField('titel').component.updateDefinition({
-			title: this.$p.t('global', 'titel')
-		});
-		cm.getColumnByField('text_stripped').component.updateDefinition({
-			title: this.$p.t('global', 'text')
-		});
-		cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
-			title: this.$p.t('notiz', 'bearbeiter')
-		});
-		cm.getColumnByField('start').component.updateDefinition({
-			title: this.$p.t('global', 'gueltigVon')
-		});
-		cm.getColumnByField('ende').component.updateDefinition({
-			title: this.$p.t('global', 'gueltigBis')
-		});
-		cm.getColumnByField('countdoc').component.updateDefinition({
-			title: this.$p.t('notiz', 'document')
-		});
-		cm.getColumnByField('erledigt').component.updateDefinition({
-			title: this.$p.t('notiz', 'erledigt')
-		});
-		cm.getColumnByField('lastupdate').component.updateDefinition({
-			title: this.$p.t('notiz', 'letzte_aenderung')
-		});
-	},*/
 	template: `
 	<div class="betriebsmittel-betriebsmittel">
 	
 		<!--Modal: deleteBetriebsmittelModal-->
 		<BsModal ref="deleteBetriebsmittelModal">
-			<template #title>Betriebsmittel löschen</template>
+			<template #title>{{$p.t('ui', 'betriebsmittel_delete')}}</template>
 			<template #default>
-				<p>Betriebsmittel {{formData.betriebsmitteltyp}} wirklich löschen?</p>
+				<p>{{$p.t('ui', 'betriebsmittel_confirm_delete')}}</p>
 			</template>
 			<template #footer>
 <!--				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>-->
@@ -307,13 +293,13 @@ export default {
 				
 				<div class="row mb-3">
 					<div class="col-sm-7">
-						<p v-if="statusNew" class="fw-bold"> Betriebsmittel anlegen</p>
-						<p v-else class="fw-bold">Betriebsmittel bearbeiten</p>
+						<p v-if="statusNew" class="fw-bold">{{$p.t('ui', 'add_betriebsmittel')}}</p>
+						<p v-else class="fw-bold">{{$p.t('ui', 'edit_betriebsmittel')}}</p>
 					</div>
 				</div>
 				
 				<div class="row mb-3">								   
-					<label for="typ" class="form-label col-sm-4">Typ</label>
+					<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
 					<div class="col-sm-6">
 						<form-input
 						type="select"
@@ -328,20 +314,20 @@ export default {
 				
 			
 				<div v-if="formData.betriebsmitteltyp == 'Inventar'" class="row mb-3">
-					<label for="inventarnummer" class="form-label col-sm-4">Inventarnummer</label>
+					<label for="inventarnummer" class="form-label col-sm-4">{{$p.t('wawi', 'inventarnummer')}}</label>
 					<div class="col-sm-6">
 						<PvAutoComplete v-model="formData['inventarData']" optionLabel="dropdowntext" :suggestions="filteredInventar" @complete="searchInventar" minLength="3"/>
 					</div>
 				</div>
 				<div v-else-if="formData.inventarnummer" class="row mb-3">
-				<label for="inventarnummer" class="form-label col-sm-4">Inventarnummer</label>
+				<label for="inventarnummer" class="form-label col-sm-4">{{$p.t('wawi', 'inventarnummer')}}</label>
 					<div class="col-sm-6">
 						<input type="text" :readonly="readonly" class="form-control" id="inventarnummer" v-model="formData.inventarnummer" :disabled="!statusNew">
 					</div>
 				</div>
 				
 				<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
-					<label for="nummer" class="form-label col-sm-4">Nummer</label>
+					<label for="nummer" class="form-label col-sm-4">{{$p.t('wawi', 'nummer')}}</label>
 					<div class="col-sm-6">
 						<form-input
 							type="text"
@@ -353,7 +339,7 @@ export default {
 				</div>
 				
 				<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
-					<label for="nummer2" class="form-label col-sm-4">Nummer2</label>
+					<label for="nummer2" class="form-label col-sm-4">{{$p.t('wawi', 'nummer')}} 2</label>
 					<div class="col-sm-6">
 						<form-input
 							type="text"
@@ -365,7 +351,7 @@ export default {
 				</div>
 			
 				<div v-if="formData.betriebsmitteltyp!='Inventar'" class="row mb-3">
-					<label for="beschreibung" class="form-label col-sm-4">Beschreibung</label>
+					<label for="beschreibung" class="form-label col-sm-4">{{$p.t('global', 'beschreibung')}}</label>
 					<div class="col-sm-6">
 						<form-input
 							type="textarea"
@@ -378,7 +364,7 @@ export default {
 				</div>
 				
 				<div class="row mb-3">
-					<label for="kaution" class="form-label col-sm-4">Kaution</label>
+					<label for="kaution" class="form-label col-sm-4">{{$p.t('infocenter', 'kaution')}}</label>
 					<div class="col-sm-6">
 						<form-input
 							type="text"
@@ -390,7 +376,7 @@ export default {
 				</div>
 				
 				<div class="row mb-3">
-					<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
+					<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
 					<div class="col-sm-6">
 						<form-input
 							type="textarea"
@@ -402,7 +388,7 @@ export default {
 				</div>
 				
 				<div class="row mb-3">
-					<label for="ausgegebenam" class="form-label col-sm-4">Ausgegeben am</label>
+					<label for="ausgegebenam" class="form-label col-sm-4">{{$p.t('wawi', 'ausgegebenam')}}</label>
 					<div class="col-sm-6">
 						<form-input
 							type="DatePicker"
@@ -419,7 +405,7 @@ export default {
 				</div>
 				
 				<div class="row mb-3">
-					<label for="retouram" class="form-label col-sm-4">Retour am</label>
+					<label for="retouram" class="form-label col-sm-4">{{$p.t('wawi', 'retouram')}}</label>
 					<div class="col-sm-6">
 						<form-input
 							type="DatePicker"
@@ -439,10 +425,10 @@ export default {
 				<div class="row mb-3">
 				<label class="form-label col-sm-8"></label>
 					<div v-if="statusNew" class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">Speichern</button>
+						<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
 					</div>
 					<div v-else class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-warning" @click="updateBetriebsmittel()">Aktualisieren</button>
+						<button ref="Close" type="button" class="btn btn-primary" @click="updateBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
 					</div>
 					
 				</div>
