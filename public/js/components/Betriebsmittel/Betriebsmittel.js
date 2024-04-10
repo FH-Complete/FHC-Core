@@ -32,19 +32,20 @@ export default {
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Nummer", field: "nummer"},
-					{title: "PersonId", field: "person_id"},
+					{title: "PersonId", field: "person_id", visible: false},
 					{title: "Typ", field: "betriebsmitteltyp"},
 					{title: "Anmerkung", field: "anmerkung", visible: false},
-					{title: "Retourdatum", field: "retouram"},
+					{title: "Retourdatum", field: "format_retour", visible: false},
 					{title: "Beschreibung", field: "beschreibung"},
-					{title: "Uid", field: "uid"},
+					{title: "Uid", field: "uid", visible: false},
 					{title: "Kaution", field: "kaution", visible: false},
-					{title: "Ausgabedatum", field: "ausgegebenam", visible: false},
+					{title: "Ausgabedatum", field: "format_ausgabe"},
 					{title: "Betriebsmittel_id", field: "betriebsmittel_id", visible: false},
 					{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
+						maxWidth: 150,
 						formatter: (cell, formatterParams, onRendered) => {
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
@@ -61,7 +62,7 @@ export default {
 									let linkToPdf = this.cisRoot +
 										'/content/pdfExport.php?xml=betriebsmittelperson.rdf.php&xsl=Uebernahme&id=' + cellData.betriebsmittelperson_id + '&output=pdf';
 
-								window.open(linkToPdf, '_blank');
+									window.open(linkToPdf, '_blank');
 							});
 							container.append(button);
 
@@ -93,14 +94,14 @@ export default {
 					}],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
-				height: '150',
+				height: '550',
 				selectableRangeMode: 'click',
 				selectable: true
 			},
 			tabulatorEvents: [
 				{
 					event: 'tableBuilt',
-					handler: async () => {
+					handler: async() => {
 
 						await this.$p.loadCategory(['wawi', 'global', 'infocenter']);
 
@@ -112,18 +113,17 @@ export default {
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
 						});
-						cm.getColumnByField('retouram').component.updateDefinition({
+						cm.getColumnByField('format_retour').component.updateDefinition({
 							title: this.$p.t('wawi', 'retourdatum')
 						});
 						cm.getColumnByField('kaution').component.updateDefinition({
 							title: this.$p.t('infocenter', 'kaution')
 						});
-						cm.getColumnByField('ausgegebenam').component.updateDefinition({
+						cm.getColumnByField('format_ausgabe').component.updateDefinition({
 							title: this.$p.t('wawi', 'ausgabedatum')
 						});
 
 					}
-
 				}
 			],
 			betriebsmittelData: {},
@@ -262,6 +262,7 @@ export default {
 	template: `
 	<div class="betriebsmittel-betriebsmittel">
 	
+	
 		<!--Modal: deleteBetriebsmittelModal-->
 		<BsModal ref="deleteBetriebsmittelModal">
 			<template #title>{{$p.t('ui', 'betriebsmittel_delete')}}</template>
@@ -273,21 +274,28 @@ export default {
 				<button ref="Close" type="button" class="btn btn-primary" @click="deleteBetriebsmittel(formData.betriebsmittelperson_id)">OK</button>
 			</template>
 		</BsModal>
+		
+		
+		<div class="row col-12">
+			<div class="col-6">
+			
+				<core-filter-cmpt
+					ref="table"
+					:tabulator-options="tabulatorOptions"
+					:tabulator-events="tabulatorEvents"
+					table-only
+					:side-menu="false"
+					reload
+					new-btn-show
+					new-btn-label="Betriebsmittel"
+					@click:new="actionNewBetriebsmittel"
+					>
+				</core-filter-cmpt>
+			
+			</div>
+			
 
-		<core-filter-cmpt
-			ref="table"
-			:tabulator-options="tabulatorOptions"
-			:tabulator-events="tabulatorEvents"
-			table-only
-			:side-menu="false"
-			reload
-			new-btn-show
-			new-btn-label="Betriebsmittel"
-			@click:new="actionNewBetriebsmittel"
-			>
-		</core-filter-cmpt>
-		<br>
-
+			
 			<form-form class="row g-3 col-6" ref="betriebsmittelData">
 				<legend>Details</legend>
 				
@@ -298,7 +306,7 @@ export default {
 					</div>
 				</div>
 				
-				<div class="row mb-3">								   
+				<div class="row mb-3">
 					<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
 					<div class="col-sm-6">
 						<form-input
@@ -307,11 +315,16 @@ export default {
 						v-model="formData.betriebsmitteltyp"
 						:disabled="!statusNew"
 						>
-						<option v-for="entry in listBetriebsmitteltyp" :key="entry.betriebsmitteltyp" :value="entry.betriebsmitteltyp">{{entry.beschreibung}}</option>
+						<option
+							v-for="entry in listBetriebsmitteltyp"
+							:key="entry.betriebsmitteltyp"
+							:value="entry.betriebsmitteltyp"
+							>
+							{{entry.beschreibung}}
+						</option>
 						</form-input>
 					</div>
 				</div>
-				
 			
 				<div v-if="formData.betriebsmitteltyp == 'Inventar'" class="row mb-3">
 					<label for="inventarnummer" class="form-label col-sm-4">{{$p.t('wawi', 'inventarnummer')}}</label>
@@ -333,7 +346,7 @@ export default {
 							type="text"
 							name="nummer"
 							v-model="formData['nummer']"
-						>						
+						>
 						</form-input>
 					</div>
 				</div>
@@ -345,7 +358,7 @@ export default {
 							type="text"
 							name="nummer2"
 							v-model="formData['nummer2']"
-						>						
+						>
 						</form-input>
 					</div>
 				</div>
@@ -358,7 +371,7 @@ export default {
 							name="beschreibung"
 							v-model="formData['beschreibung']"
 							:disabled="formData.inventarnummer"
-						>						
+						>
 						</form-input>
 					</div>
 				</div>
@@ -370,7 +383,7 @@ export default {
 							type="text"
 							name="kaution"
 							v-model="formData['kaution']"
-						>						
+						>
 						</form-input>
 					</div>
 				</div>
@@ -382,7 +395,7 @@ export default {
 							type="textarea"
 							name="anmerkung"
 							v-model="formData['anmerkung']"
-						>						
+						>
 						</form-input>
 					</div>
 				</div>
@@ -433,6 +446,13 @@ export default {
 					
 				</div>
 		</form-form>
+		
+		</div>
+
+
+
+
+
 		
 	</div>`
 }

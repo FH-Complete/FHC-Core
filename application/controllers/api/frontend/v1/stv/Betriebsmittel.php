@@ -50,27 +50,18 @@ class Betriebsmittel extends FHCAPI_Controller
 
 	public function addNewBetriebsmittel()
 	{
-		//TODO(Manu) Berechtigungen
-/*		if(!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
-		{
-			$result =  $this->p->t('lehre','error_keineSchreibrechte');
-
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}*/
-
-
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
 		$this->form_validation->set_rules('kaution', 'Kaution', 'numeric', [
-			'numeric' => $this->p->t('ui','error_fieldNotNumeric',['field' => 'Kaution'])
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Kaution'])
 		]);
 
 		$this->form_validation->set_rules('betriebsmitteltyp', 'TYP', 'required', [
-			'required' => $this->p->t('ui','error_fieldRequired',['field' => 'Typ'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
 		]);
 
 		$this->form_validation->set_rules('ausgegebenam', 'Ausgegeben am', 'required', [
-			'required' => $this->p->t('ui','error_fieldRequired',['field' => 'Ausgegeben am'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Ausgegeben am'])
 		]);
 
 
@@ -100,14 +91,19 @@ class Betriebsmittel extends FHCAPI_Controller
 
 		if($betriebsmitteltyp == 'Zutrittskarte' && !$nummer)
 		{
-			return $this->terminateWithError("Eine Zutrittskarte muss eine Nummer haben. Um die Zuordnung zu dieser Karte zu loeschen entfernen Sie bitte den ganzen Datensatz", self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('wawi', 'error_zutrittskarteOhneNummer'), self::ERROR_TYPE_GENERAL);
 		}
 
 		if($retouram && $retouram < $ausgegebenam)
-			return $this->terminateWithError("Retourdatum darf nicht vor Datum der Ausgabe liegen", self::ERROR_TYPE_GENERAL);
+		{
+			return $this->terminateWithError($this->p->t('wawi', 'error_retourdatumVorAusgabe'), self::ERROR_TYPE_GENERAL);
+		}
 
 		if($betriebsmitteltyp == "Inventar" && !($inventarData['inventarnummer']))
-			return $this->terminateWithError("Bitte wählen Sie das entsprechende Inventar aus dem Drop Down Menü aus", self::ERROR_TYPE_GENERAL);
+		{
+			return $this->terminateWithError($this->p->t('wawi', 'error_inventarWaehlen'), self::ERROR_TYPE_GENERAL);
+		}
+
 
 		// Start DB transaction
 		$this->db->trans_begin();
@@ -157,20 +153,10 @@ class Betriebsmittel extends FHCAPI_Controller
 
 		$this->db->trans_commit();
 		return $this->terminateWithSuccess(true);
-
 	}
 
 	public function updateBetriebsmittel()
 	{
-		//TODO(Manu) Berechtigungen
-		/*		if(!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
-				{
-					$result =  $this->p->t('lehre','error_keineSchreibrechte');
-
-					return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-				}*/
-
-
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
 		$uid_user = getAuthUID();
@@ -189,15 +175,15 @@ class Betriebsmittel extends FHCAPI_Controller
 		$uid = $this->input->post('uid');
 
 		$this->form_validation->set_rules('kaution', 'Kaution', 'numeric', [
-			'numeric' => $this->p->t('ui','error_fieldNotNumeric',['field' => 'Kaution'])
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Kaution'])
 		]);
 
 		$this->form_validation->set_rules('betriebsmitteltyp', 'TYP', 'required', [
-			'required' => $this->p->t('ui','error_fieldRequired',['field' => 'Typ'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
 		]);
 
 		$this->form_validation->set_rules('ausgegebenam', 'Ausgegeben am', 'required', [
-			'required' => $this->p->t('ui','error_fieldRequired',['field' => 'Ausgegeben am'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Ausgegeben am'])
 		]);
 
 
@@ -208,11 +194,13 @@ class Betriebsmittel extends FHCAPI_Controller
 
 		if($betriebsmitteltyp == 'Zutrittskarte' && !$nummer)
 		{
-			return $this->terminateWithError("Eine Zutrittskarte muss eine Nummer haben. Um die Zuordnung zu dieser Karte zu loeschen entfernen Sie bitte den ganzen Datensatz", self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('wawi', 'error_zutrittskarteOhneNummer'), self::ERROR_TYPE_GENERAL);
 		}
 
 		if($retouram && $retouram < $ausgegebenam)
-			return $this->terminateWithError("Retourdatum darf nicht vor Datum der Ausgabe liegen", self::ERROR_TYPE_GENERAL);
+		{
+			return $this->terminateWithError($this->p->t('wawi', 'error_retourdatumVorAusgabe'), self::ERROR_TYPE_GENERAL);
+		}
 
 
 		// Start DB transaction
@@ -236,11 +224,10 @@ class Betriebsmittel extends FHCAPI_Controller
 		);
 
 		if($this->db->trans_status() === false || isError($result))
-			{
-				$this->db->trans_rollback();
-				return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-			}
-
+		{
+			$this->db->trans_rollback();
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
 
 		$result = $this->BetriebsmittelModel->update(
 			[
@@ -264,7 +251,6 @@ class Betriebsmittel extends FHCAPI_Controller
 
 		$this->db->trans_commit();
 		return $this->terminateWithSuccess(true);
-
 	}
 
 	public function loadBetriebsmittel()
@@ -286,7 +272,6 @@ class Betriebsmittel extends FHCAPI_Controller
 		}
 
 		$this->terminateWithSuccess(current(getData($result)));
-
 	}
 
 	public function deleteBetriebsmittel()
@@ -307,10 +292,9 @@ class Betriebsmittel extends FHCAPI_Controller
 		}
 		if (!hasData($result))
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId',['id'=> 'Betriebsmittelperson_id']), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Betriebsmittelperson_id']), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->outputJsonSuccess(current(getData($result)));
-
 	}
 
 	public function getTypenBetriebsmittel()
