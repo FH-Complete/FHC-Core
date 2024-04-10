@@ -23,13 +23,13 @@ export default {
              :class="this.topOrBottomClass" @mousedown="this.dragStart">
             <div class="splitactions" :class="this.topOrBottomClass">
                 <span @click="this.collapseTop" class="splitaction">
-                    <i class="fas fa-angle-up"></i>
+                    <i class="fas fa-angle-up text-muted"></i>
                 </span>
                 <span @dblclick="this.showBoth" class="splitaction resize">
-                    <i class="fas fa-grip-horizontal"></i>
+                    <i class="fas fa-grip-lines text-muted"></i>
                 </span>
                 <span @click="this.collapseBottom" class="splitaction">
-                    <i class="fas fa-angle-down"></i>
+                    <i class="fas fa-angle-down text-muted"></i>
                 </span>
             </div>
         </div>

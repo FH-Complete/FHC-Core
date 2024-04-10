@@ -270,7 +270,8 @@ foreach ($uid_arr as $uid)
 					'matrikelnummer' => rtrim($student->matrikelnr),
 					'matr_nr' => $person->matr_nr,
 					'ausstellungsdatum' => date('M.Y'),
-					'gueltigbis' => $datum_obj->formatDatum($gueltigbis, 'd.m.Y')
+					'gueltigbis' => $datum_obj->formatDatum($gueltigbis, 'd.m.Y'),
+                    'gueltigbis_3jahre' => date('d.m.Y', strtotime('+3 years'))
 				);
 			}
 		}

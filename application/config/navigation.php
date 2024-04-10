@@ -31,6 +31,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 20,
 					'requiredPermissions' => 'admin:w'
+				),
+				'bismeldestichtagsverwaltung' => array(
+					'link' => site_url('codex/Bismeldestichtag'),
+					'icon' => '',
+					'description' => 'BIS-Meldestichtagsverwaltung',
+					'expand' => true,
+					'sort' => 30,
+					'requiredPermissions' => 'admin:w'
 				)
 			)
 		),
@@ -283,10 +291,18 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 	'fehlerzustaendigkeiten' => array(
 		'link' => site_url('system/issues/IssuesZustaendigkeiten'),
 		'description' => 'Fehler Zuständigkeiten',
-		'icon' => 'cogs',
+		'icon' => 'users',
 		'sort' => 100,
 		'target' => '_blank',
 		'requiredPermissions' => array('admin:rw')
-	)
+	),
+	'fehlerkonfiguration' => array(
+		'link' => site_url('system/issues/IssuesKonfiguration'),
+		'description' => 'Fehler Konfiguration',
+		'icon' => 'cogs',
+		'sort' => 200,
+		'target' => '_blank',
+		'requiredPermissions' => array('admin:rw')
+	),
 );
 

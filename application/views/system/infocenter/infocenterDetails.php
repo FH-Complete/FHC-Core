@@ -8,7 +8,7 @@
 		'dialoglib' => true,
 		'ajaxlib' => true,
 		'tablesorter2' => true,
-		'tinymce4' => true,
+		'tinymce5' => true,
 		'sbadmintemplate3' => true,
 		'addons' => true,
 		'navigationwidget' => true,
@@ -57,10 +57,11 @@
 							if (isset($lockedby)):
 								echo $this->p->t('global', 'wirdBearbeitetVon').': ';
 								echo $lockedby;
-								if ($origin_page == 'index'):
+								if (in_array($origin_page, array('index', 'abgewiesen'))):
 									$unlockpath = 'unlockPerson/'.$stammdaten->person_id;
 									$unlockpath .= '?fhc_controller_id='.$fhc_controller_id;
 									$unlockpath .= '&filter_id='.$prev_filter_id;
+									$unlockpath .= '&origin_page='.$origin_page;
 							?>
 									&nbsp;&nbsp;
 									<a href="<?php echo $unlockpath; ?>">
