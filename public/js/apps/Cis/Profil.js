@@ -47,6 +47,8 @@ const profilApp = Vue.createApp({
     return {
       //? loading property is used for showing/hiding the loading modal
       loading: false,
+      profilUpdateStates: null,
+      profilUpdateTopic: null,
       view: null,
       data: null,
       // notfound is null by default, but contains an UID if no user exists with that UID
@@ -57,6 +59,8 @@ const profilApp = Vue.createApp({
   //? use function syntax for provide so that we can access `this`
   provide() {
     return {
+      profilUpdateStates: Vue.computed(() => this.profilUpdateStates),
+      profilUpdateTopic: Vue.computed(() => this.profilUpdateTopic),
       setLoading: (newValue) => {
         this.loading = newValue;
       },
@@ -236,11 +240,13 @@ const profilApp = Vue.createApp({
         view: null,
         data: {
           Personen_Informationen: {
-            title: this.$p.t('profil','personenInformationen'),
+            title: this.$p.t("profil", "personenInformationen"),
+            topic: "Personen_informationen",
             view: null,
             data: {
               vorname: {
-                title: this.$p.t('person','vorname'),
+                title: this.$p.t("person", "vorname"),
+                topic: this.profilUpdateTopic?.["Vorname"],
                 view: "TextInputDokument",
                 withFiles: true,
                 data: {
@@ -249,7 +255,8 @@ const profilApp = Vue.createApp({
                 },
               },
               nachname: {
-                title: this.$p.t('person','nachname'),
+                title: this.$p.t("person", "nachname"),
+                topic: this.profilUpdateTopic?.["Nachname"],
                 view: "TextInputDokument",
                 withFiles: true,
                 data: {
@@ -258,7 +265,8 @@ const profilApp = Vue.createApp({
                 },
               },
               titel: {
-                title: this.$p.t('global','titel'),
+                title: this.$p.t("global", "titel"),
+                topic: this.profilUpdateTopic?.["Titel"],
                 view: "TextInputDokument",
                 withFiles: true,
                 data: {
@@ -267,7 +275,8 @@ const profilApp = Vue.createApp({
                 },
               },
               postnomen: {
-                title: this.$p.t('profil','postnomen'),
+                title: this.$p.t("profil", "postnomen"),
+                topic: this.profilUpdateTopic?.["Postnomen"],
                 view: "TextInputDokument",
                 withFiles: true,
                 data: {
@@ -278,12 +287,14 @@ const profilApp = Vue.createApp({
             },
           },
           Private_Kontakte: {
-            title: this.$p.t('profil','privateKontakte'),
+            title: this.$p.t("profil", "privateKontakte"),
+            topic: this.profilUpdateTopic?.["Private Kontakte"],
             data: this.data.kontakte
               ?.filter((item) => {
+                // excludes all contacts that are already used in pending profil update requests
                 return !this.data.profilUpdates?.some(
                   (update) =>
-                    update.status === "pending" &&
+                    update.status === this.profilUpdateStates["Pending"] &&
                     update.requested_change?.kontakt_id === item.kontakt_id
                 );
               })
@@ -296,7 +307,8 @@ const profilApp = Vue.createApp({
               }),
           },
           Private_Adressen: {
-            title: this.$p.t('profil','privateAdressen'),
+            title: this.$p.t("profil", "privateAdressen"),
+            topic: this.profilUpdateTopic?.["Private Adressen"],
             data: this.data.adressen
               ?.filter((item) => {
                 return !this.data.profilUpdates?.some((update) => {
@@ -337,6 +349,24 @@ const profilApp = Vue.createApp({
   },
 
   created() {
+    // fetch profilUpdateStates to provide them to children components
+    Vue.$fhcapi.ProfilUpdate.getStatus()
+      .then((response) => {
+        this.profilUpdateStates = response.data;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    Vue.$fhcapi.ProfilUpdate.getTopic()
+      .then((response) => {
+        console.log("t", response.data);
+        this.profilUpdateTopic = response.data;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
     //? uid contains the last part of the uri
     let uid = location.pathname.split("/").pop();
 
@@ -349,7 +379,7 @@ const profilApp = Vue.createApp({
       }
     });
   },
-  
+
   template: `
 	<div>
 	

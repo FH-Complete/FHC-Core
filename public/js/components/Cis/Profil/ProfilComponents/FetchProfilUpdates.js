@@ -8,7 +8,12 @@ export default {
     },
   },
 
-  inject: ["getZustellkontakteCount", "getZustelladressenCount"],
+  inject: [
+    "getZustellkontakteCount",
+    "getZustelladressenCount",
+    "profilUpdateStates",
+    "profilUpdateTopic",
+  ],
 
   emits: ["fetchUpdates"],
 
@@ -16,7 +21,7 @@ export default {
     return {
       showUpdateModal: false,
       content: null,
-      editProfilTitle: this.$p.t('profil','profilBearbeiten'),
+      editProfilTitle: this.$p.t("profil", "profilBearbeiten"),
     };
   },
 
@@ -81,7 +86,7 @@ export default {
       }
 
       //? adds the status information if the profil update request was rejected or accepted
-      if (updateRequest.status !== this.$p.t('profilUpdate','pending')) {
+      if (updateRequest.status !== this.profilUpdateStates.Pending) {
         content["status"] = updateRequest.status;
         content["status_message"] = updateRequest.status_message;
         content["status_timestamp"] = updateRequest.status_timestamp;
@@ -114,32 +119,25 @@ export default {
       );
     },
     getView: function (topic, status) {
-      if (!(status === this.$p.t('profilUpdate','pending'))) {
+      if (!(status === this.profilUpdateStates.Pending)) {
         return "Status";
       }
 
       switch (topic) {
-        case "Private Kontakte":
+        case this.profilUpdateTopic["Private Kontakte"]:
           return "EditKontakt";
-          break;
-        case "Add Kontakte":
+        case this.profilUpdateTopic["Add Kontakt"]:
           return "EditKontakt";
-          break;
-        case "Delete Kontakte":
+        case this.profilUpdateTopic["Delete Kontakt"]:
           return "Kontakt";
-          break;
-        case "Private Adressen":
+        case this.profilUpdateTopic["Private Adressen"]:
           return "EditAdresse";
-          break;
-        case "Add Adressen":
+        case this.profilUpdateTopic["Add Adresse"]:
           return "EditAdresse";
-          break;
-        case "Delete Adressen":
+        case this.profilUpdateTopic["Delete Adresse"]:
           return "Adresse";
-          break;
         default:
           return "TextInputDokument";
-          break;
       }
     },
 
@@ -194,7 +192,7 @@ export default {
       }
 
       //? adds the status information if the profil update request was rejected or accepted
-      if (updateRequest.status !== this.$p.t('profilUpdate','pending')) {
+      if (updateRequest.status !== this.profilUpdateStates["Pending"]) {
         content["status"] = updateRequest.status;
         content["status_message"] = updateRequest.status_message;
         content["status_timestamp"] = updateRequest.status_timestamp;
@@ -223,8 +221,8 @@ export default {
   created() {},
 
   computed: {},
-  
-  template: /*html*/`
+
+  template: /*html*/ `
     <div  class="card " >
     
     <edit-profil v-if="showUpdateModal" ref="updateEditModal" @hideBsModal="hideEditProfilModal" :value="content" :title="editProfilTitle"></edit-profil>
@@ -243,12 +241,12 @@ export default {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in data" :style="item.status==$p.t('profilUpdate','accepted')?'background-color:lightgreen':item.status===$p.t('profilUpdate','rejected')?'background-color:lightcoral':''">
+                <tr v-for="item in data" :style="item.status==profilUpdateStates['Accepted']?'background-color:lightgreen':item.status===profilUpdateStates['Rejected']?'background-color:lightcoral':''">
                 <td class="align-middle text-wrap ">{{item.topic}}</td>
                 <td class="align-middle " >{{item.status}}</td>
                 <td class="align-middle">{{item.status_timestamp?item.status_timestamp:item.insertamum}}</td>
                 
-                <template v-if="item.status === $p.t('profilUpdate','pending')">
+                <template v-if="item.status === profilUpdateStates['Pending']">
                 <td>
                 
                 <div class="d-flex flex-row justify-content-evenly">

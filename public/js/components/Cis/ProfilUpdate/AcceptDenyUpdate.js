@@ -3,7 +3,6 @@ import Alert from "../../Bootstrap/Alert.js";
 import Kontakt from "../Profil/ProfilComponents/Kontakt.js";
 import Adresse from "../Profil/ProfilComponents/Adresse.js";
 
-
 export default {
   components: {
     BsModal,
@@ -14,12 +13,11 @@ export default {
   props: {
     title: {
       type: String,
-      
     },
     value: {
       type: Object,
     },
-    setLoading:{
+    setLoading: {
       type: Function,
     },
 
@@ -39,48 +37,59 @@ export default {
     return {
       data: this.value,
       loading: false,
-      //? result is returned from the Promise when the modal is closed
+      profilUpdateStates: {},
       result: false,
       info: null,
-      files:null,
+      files: null,
     };
   },
 
   methods: {
-    getDocumentLink: function(dms_id){
-      return FHC_JS_DATA_STORAGE_OBJECT.app_root +
-          FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-          `/Cis/ProfilUpdate/show/${dms_id}`;
+    getProfilStatus: async function () {
+      return (
+        FHC_JS_DATA_STORAGE_OBJECT.app_root +
+        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+        `/Cis/ProfilUpdate/show/${dms_id}`
+      );
+    },
+    getDocumentLink: function (dms_id) {
+      return (
+        FHC_JS_DATA_STORAGE_OBJECT.app_root +
+        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+        `/Cis/ProfilUpdate/show/${dms_id}`
+      );
     },
     acceptRequest: function () {
       this.loading = true;
       this.setLoading(true);
-      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(this.data).then((res) => {
-        this.setLoading(false);
-        this.loading = false;
-        this.result = true;
-      }).catch((e) => {
-        Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
-      }).finally(()=>{
-        this.hide();
-      });
-      
+      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(this.data)
+        .then((res) => {
+          this.setLoading(false);
+          this.loading = false;
+          this.result = true;
+        })
+        .catch((e) => {
+          Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
+        })
+        .finally(() => {
+          this.hide();
+        });
     },
 
     denyRequest: async function () {
       this.loading = true;
       this.setLoading(true);
-      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(this.data).then((res) => {
-        this.setLoading(false);
-        this.loading = false;
-        this.result = true;
-      }).catch((e) => {
-        Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
-      });
+      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(this.data)
+        .then((res) => {
+          this.setLoading(false);
+          this.loading = false;
+          this.result = true;
+        })
+        .catch((e) => {
+          Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
+        });
       this.hide();
     },
-
-   
   },
   computed: {
     getComponentView: function () {
@@ -94,10 +103,20 @@ export default {
     },
   },
   created() {
-   
-     Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(this.data.profil_update_id).then((res) =>{
-      this.files=res.data;
-    }) 
+    // fetching the different ProfilUpdateStates from the db
+    Vue.$fhcapi.ProfilUpdate.getStatus()
+      .then((result) => {
+        this.profilUpdateStates = result.data;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(
+      this.data.profil_update_id
+    ).then((res) => {
+      this.files = res.data;
+    });
   },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
@@ -105,7 +124,7 @@ export default {
   popup(options) {
     return BsModal.popup.bind(this)(null, options);
   },
-  template: /*html*/`
+  template: /*html*/ `
 
   <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     
@@ -206,7 +225,7 @@ export default {
     </template>
     
 
-    <template v-if="data.status === $p.t('profilUpdate','pending')"  v-slot:footer>
+    <template v-if="data.status === profilUpdateStates.Pending"  v-slot:footer>
     <div  class="form-underline flex-fill">
       <div class="form-underline-titel">{{$p.t('global','nachricht')}}</div>
 

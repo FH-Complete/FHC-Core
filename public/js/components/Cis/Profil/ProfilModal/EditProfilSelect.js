@@ -14,6 +14,7 @@ export default {
     Status,
     TextInputDokument,
   },
+  inject: ["profilUpdateTopic"],
   props: {
     list: Object,
 
@@ -52,11 +53,15 @@ export default {
   methods: {
     addItem: function () {
       this.view =
-        this.topic == "Private Kontakte" ? "EditKontakt" : "EditAdresse";
+        this.topic == this.profilUpdateTopic["Private Kontakte"]
+          ? "EditKontakt"
+          : "EditAdresse";
 
       //? updates the topic when a Kontakt or an Address should be added
       this.topic =
-        this.topic == "Private Kontakte" ? "Add Kontakte" : "Add Adressen";
+        this.topic == this.profilUpdateTopic["Private Kontakte"]
+          ? this.profilUpdateTopic["Add Kontakt"]
+          : this.profilUpdateTopic["Add Adresse"];
       this.$emit("update:topic", this.topic);
       this.breadcrumbItems.push(this.topic);
       this.$emit("update:breadcrumb", this.breadcrumbItems);
@@ -89,16 +94,16 @@ export default {
       item.data.delete = true;
       this.$emit("update:profilUpdate", item.data);
       //? updates the topic when a Kontakt or an Address should be deleted
-      this.topic = item.data.kontakt ? "Delete Kontakte" : "Delete Adressen";
+      this.topic = this.profilUpdateTopic["Private Adressen"]
+        ? this.profilUpdateTopic["Delete Adresse"]
+        : this.profilUpdateTopic["Delete Kontakt"];
       this.$emit("update:topic", this.topic);
 
       this.$emit("submit");
     },
 
-    //TODO: REWRITE THIS TO USE PROVIDE AND INJECT
     profilUpdateEmit: function (event) {
       //? passes the updated profil information to the parent component
-
       this.$emit("update:profilUpdate", event);
     },
 
@@ -108,7 +113,7 @@ export default {
       this.view = item.view;
       if (item.title) {
         //? emits the selected topic to the parent component
-        this.topic = item.title;
+        this.topic = item.topic;
         this.$emit("update:topic", this.topic);
 
         //? emits the new item for the breadcrumb in the parent component
