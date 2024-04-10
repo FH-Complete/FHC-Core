@@ -310,8 +310,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo '		<anforderungen_englisch><![CDATA[The program requires the positive completion of all courses (lectures, labs, seminars, project work, and integrated courses) to the extend of 30 ECTS per semester according to the curriculum.  The program integrates technical, economical, management and personal study elements. The degree is awarded upon the successful completion of a Master´s Thesis and the final examination. The program (classification number '.$studiengang_kz.') is accredited by AQ Austria.]]></anforderungen_englisch>';
 			echo '		<zugangsberechtigung_deutsch><![CDATA[Der Abschluss des Masterstudiengangs berechtigt zu einem facheinschlägigen Doktoratsstudium an einer Universität (mit eventuellen Zusatzprüfungen).]]></zugangsberechtigung_deutsch>';
 			echo '		<zugangsberechtigung_englisch><![CDATA[The successful completion of the Master Degree Program qualifies the graduate to apply for admission to a relevant Doctoral Degree Program at a University (additional qualifying exams may be required).    ]]></zugangsberechtigung_englisch>';
-			echo '		<niveau_deutsch>Masterstudium (UNESCO ISCED 7)</niveau_deutsch>';
-			echo '		<niveau_englisch>Master degree program (UNESCO ISCED 7)</niveau_englisch>';
+			echo '		<niveau_deutsch>Masterstudium: UNESCO ISCED 7; Zuordnung nationaler Qualifikationsrahmen 7</niveau_deutsch>';
+			echo '		<niveau_englisch>Master degree program: UNESCO ISCED 7; Classification national qualification framework 7</niveau_englisch>';
 		}
 		elseif($row->typ=='b')
 		{
@@ -322,8 +322,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo '		<anforderungen_englisch><![CDATA[The program requires the positive completion of all courses (lectures, labs, seminars, project work, and integrated courses) to the extend of 30 ECTS per semester according to the curriculum. The program integrates technical, economical, management and personal study elements. '.$anforderungen_praxiseng.' The degree is awarded upon the successful completion of 1 bachelor theses and the final examination. The program (classification number '.$studiengang_kz.') is accredited by AQ Austria.]]></anforderungen_englisch>';
 			echo '		<zugangsberechtigung_deutsch><![CDATA[Der Abschluss des Bachelorstudiengangs berechtigt zu einem facheinschlägigen Magister- bzw. Master-Studium an einer fachhochschulischen Einrichtung oder Universität (mit eventuellen Zusatzprüfungen).]]></zugangsberechtigung_deutsch>';
 			echo '		<zugangsberechtigung_englisch><![CDATA[The successful completion of the Bachelor Degree Program qualifies the graduate to apply for admission to a relevant Master Degree Program at a University of Applied Sciences or a University (additional qualifying exams may be required).]]></zugangsberechtigung_englisch>';
-			echo '		<niveau_deutsch>Bachelorstudium (UNESCO ISCED 6)</niveau_deutsch>';
-			echo '		<niveau_englisch>Bachelor degree program (UNESCO ISCED 6)</niveau_englisch>';
+			echo '		<niveau_deutsch>Bachelorstudium: UNESCO ISCED 6;  Zuordnung nationaler Qualifikationsrahmen 6</niveau_deutsch>';
+			echo '		<niveau_englisch>Bachelor degree program: UNESCO ISCED 6; Classification national qualification framework 6</niveau_englisch>';
 		}
 		elseif($row->typ=='r')
 		{
