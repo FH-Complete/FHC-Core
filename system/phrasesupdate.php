@@ -25367,13 +25367,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'anmerkungIntern',
+				'text' => 'Anmerkung intern',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Note internal',
+				'text' => 'Internal note',
 				'description' => '',
 				'insertvon' => 'system'
 			)
