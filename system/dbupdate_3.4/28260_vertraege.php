@@ -465,7 +465,8 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			('kuendigung_arbeitgeber', 'Kündigung durch Arbeitgeber', ARRAY['Kündigung durch Arbeitgeber', 'Cancellation by Employer']),
 			('entlassung', 'Entlassung', ARRAY['Entlassung', 'Dismissal']),
 			('sonstige', 'Sonstige', ARRAY['Sonstige', 'Miscellaneous']),
-			('einvernehmlich', 'Einvernehmliche Auflösung', ARRAY['Einvernehmliche Auflösung', 'Rescission']);
+			('einvernehmlich', 'Einvernehmliche Auflösung', ARRAY['Einvernehmliche Auflösung', 'Rescission']),
+			('ablaufzeit', 'Ablauf durch Zeit', ARRAY['Ablauf durch Zeit', 'Expired by lapse of time']);
 		";
 		if (! $db->db_query($qry))
 			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
