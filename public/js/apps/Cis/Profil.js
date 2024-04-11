@@ -60,10 +60,10 @@ const profilApp = Vue.createApp({
   provide() {
     return {
       profilUpdateStates: Vue.computed(() =>
-        this.profilUpdateStates ? this.profilUpdateStates : null
+        this.profilUpdateStates ? this.profilUpdateStates : false
       ),
       profilUpdateTopic: Vue.computed(() =>
-        this.profilUpdateTopic ? this.profilUpdateTopic : null
+        this.profilUpdateTopic ? this.profilUpdateTopic : false
       ),
       setLoading: (newValue) => {
         this.loading = newValue;
@@ -364,7 +364,6 @@ const profilApp = Vue.createApp({
 
     Vue.$fhcapi.ProfilUpdate.getTopic()
       .then((response) => {
-        console.log("t", response.data);
         this.profilUpdateTopic = response.data;
       })
       .catch((error) => {

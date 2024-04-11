@@ -220,10 +220,8 @@ export default {
     //? sorts the profil Updates: pending -> accepted -> rejected
     this.data.profilUpdates?.sort(this.sortProfilUpdates);
   },
-  
+
   mounted() {
-    console.log("this mitarbeter",this)
-    console.log("this p",this.$p)
     this.$refs.betriebsmittelTable.tabulator.on("tableBuilt", () => {
       this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
     });
