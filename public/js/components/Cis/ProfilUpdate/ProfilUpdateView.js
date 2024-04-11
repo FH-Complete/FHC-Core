@@ -1,26 +1,19 @@
-
 import { CoreFilterCmpt } from "../../filter/Filter.js";
 import AcceptDenyUpdate from "./AcceptDenyUpdate.js";
 import Alert from "../../../components/Bootstrap/Alert.js";
 import Loading from "../../../components/Loader.js";
 
-const STATUS = Object.freeze({
-  PENDING: "Pending",
-  ACCEPTED: "Accepted",
-  REJECTED: "Rejected",
-})
-
-const sortProfilUpdates = (ele1, ele2, thisPointer)=>  {
-  
+const sortProfilUpdates = (ele1, ele2, thisPointer) => {
   let result = 0;
-  if (ele1.status === STATUS.PENDING) {
+  if (ele1.status === thisPointer.profilUpdateStates["Pending"]) {
     result = -1;
-  } else if (ele1.status === STATUS.ACCEPTED) {
-    result = ele2.status === STATUS.REJECTED ? -1 : 1;
+  } else if (ele1.status === thisPointer.profilUpdateStates["Accepted"]) {
+    result =
+      ele2.status === thisPointer.profilUpdateStates["Rejected"] ? -1 : 1;
   } else {
     result = 1;
   }
-  
+
   if (ele1.status === ele2.status) {
     //? if they have the same status , insert_date gets compared for order
     result =
@@ -30,27 +23,27 @@ const sortProfilUpdates = (ele1, ele2, thisPointer)=>  {
   return result;
 };
 
-export default{
+export default {
   components: {
     CoreFilterCmpt,
     Loading,
     AcceptDenyUpdate,
   },
-  props:{
-    id:{
-        type:Number,
-    }
+  inject: ["profilUpdateTopic", "profilUpdateStates"],
+  props: {
+    id: {
+      type: Number,
+    },
   },
   data() {
     return {
       showModal: false,
       modalData: null,
-      loading:false,
+      loading: false,
       showAll: false,
-      events:[],
-      profil_update_id:Number(this.id),
+      events: [],
+      profil_update_id: Number(this.id),
       profil_updates_table_options: {
-        
         ajaxURL:
           FHC_JS_DATA_STORAGE_OBJECT.app_root +
           FHC_JS_DATA_STORAGE_OBJECT.ci_router +
@@ -61,21 +54,25 @@ export default{
           if (this.showAll) {
             return url + "getProfilUpdateWithPermission";
           } else {
-            return url + `getProfilUpdateWithPermission/${STATUS.PENDING}`;
+            return (
+              url +
+              `getProfilUpdateWithPermission/${this.profilUpdateStates["Pending"]}`
+            );
           }
         },
-        ajaxResponse: (url, params, response)=> {
+        ajaxResponse: (url, params, response) => {
           //url - the URL of the request
           //params - the parameters passed with the request
           //response - the JSON object returned in the body of the response.
           //? sorts the response data from the backend
-          if (response) response.sort((ele1,ele2)=>sortProfilUpdates(ele1,ele2,this));
+          if (response)
+            response.sort((ele1, ele2) => sortProfilUpdates(ele1, ele2, this));
 
           return response;
         },
         //? adds tooltip with the status message of a profil update request if its status is not pending
         columnDefaults: {
-          tooltip: (e, cell, onRendered) =>{
+          tooltip: (e, cell, onRendered) => {
             //e - mouseover event
             //cell - cell component
             //onRendered - onRendered callback registration function
@@ -89,7 +86,7 @@ export default{
             el.classList.add("border", "border-dark");
 
             let statusDateEl = document.createElement("span");
-            statusDateEl.classList.add("d-block","mb-1");
+            statusDateEl.classList.add("d-block", "mb-1");
             statusDateEl.innerHTML =
               "Request was " + status + " on " + statusDate;
             let statusMessageEl = document.createElement("span");
@@ -102,17 +99,22 @@ export default{
         },
         rowContextMenu: (e, component) => {
           let menu = [];
-          if (component.getData().status === this.$p.t('profilUpdate','pending')) {
+          if (
+            component.getData().status === this.profilUpdateStates["Pending"]
+          ) {
             menu.push(
               {
-                label: `<i class='fa fa-check'></i> ${this.$p.t('profilUpdate','acceptUpdate')}`,
+                label: `<i class='fa fa-check'></i> ${this.$p.t(
+                  "profilUpdate",
+                  "acceptUpdate"
+                )}`,
                 action: (e, column) => {
                   Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column.getData())
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
                     .catch((e) => {
-                      Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
+                      Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
                     });
                 },
               },
@@ -120,32 +122,39 @@ export default{
                 separator: true,
               },
               {
-                label:
-                  ` <i style='width:16px' class='text-center fa fa-xmark'></i> ${this.$p.t('profilUpdate','denyUpdate')}`,
+                label: ` <i style='width:16px' class='text-center fa fa-xmark'></i> ${this.$p.t(
+                  "profilUpdate",
+                  "denyUpdate"
+                )}`,
                 action: (e, column) => {
-                  Vue.$fhcapi.ProfilUpdate.denyProfilRequest(
-                    column.getData()
-                  ).then((res) => {
-                    this.$refs.UpdatesTable.tabulator.setData();
-                  }).catch((e) => {
-                    Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
-                  });
+                  Vue.$fhcapi.ProfilUpdate.denyProfilRequest(column.getData())
+                    .then((res) => {
+                      this.$refs.UpdatesTable.tabulator.setData();
+                    })
+                    .catch((e) => {
+                      Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
+                    });
                 },
               },
               {
                 separator: true,
               },
               {
-                label: `<i class='fa fa-eye'></i> ${this.$p.t('profilUpdate','showRequest')}`,
+                label: `<i class='fa fa-eye'></i> ${this.$p.t(
+                  "profilUpdate",
+                  "showRequest"
+                )}`,
                 action: (e, column) => {
                   this.showAcceptDenyModal(column.getData());
-                    
                 },
               }
             );
           } else {
             menu.push({
-              label: `<i class='fa fa-eye'></i> ${this.$p.t('profilUpdate','showRequest')}`,
+              label: `<i class='fa fa-eye'></i> ${this.$p.t(
+                "profilUpdate",
+                "showRequest"
+              )}`,
               action: (e, column) => {
                 this.showAcceptDenyModal(column.getData());
               },
@@ -153,7 +162,7 @@ export default{
           }
           return menu;
         },
-        
+
         height: 600,
         layout: "fitColumns",
 
@@ -196,12 +205,18 @@ export default{
             hozAlign: "center",
             headerFilter: true,
             formatter: (cell, para) => {
-              let iconClasses =""
+              let iconClasses = "";
               let status = cell.getRow().getData().status;
-              switch (status){
-                case "Pending": iconClasses += "fa fa-lg fa-circle-info text-info "; break;
-                case "Accepted": iconClasses += "fa fa-lg fa-circle-check text-success "; break;
-                case "Rejected": iconClasses += "fa fa-lg fa-circle-xmark text-danger "; break;
+              switch (status) {
+                case this.profilUpdateStates["Pending"]:
+                  iconClasses += "fa fa-lg fa-circle-info text-info ";
+                  break;
+                case this.profilUpdateStates["Accepted"]:
+                  iconClasses += "fa fa-lg fa-circle-check text-success ";
+                  break;
+                case this.profilUpdateStates["Rejected"]:
+                  iconClasses += "fa fa-lg fa-circle-xmark text-danger ";
+                  break;
               }
               return `<div class='row justify-content-center'><div class='col-2'><i class='${iconClasses}'></i></div> <div class='col-4'><span>${cell.getValue()}</span></div></div>`;
             },
@@ -244,17 +259,17 @@ export default{
     },
   },
   methods: {
-    setLoading: function(newValue){
+    setLoading: function (newValue) {
       this.loading = newValue;
     },
     hideAcceptDenyModal: function () {
       //? checks the AcceptDenyModal component property result, if the user made a successful request or not
-     
+
       if (this.$refs.AcceptDenyModal.result) {
-          //? refetches the data, if any request was denied or accepted
-          //* setData will call the ajaxURL again to refresh the data
-          
-          this.$refs.UpdatesTable.tabulator.setData();
+        //? refetches the data, if any request was denied or accepted
+        //* setData will call the ajaxURL again to refresh the data
+
+        this.$refs.UpdatesTable.tabulator.setData();
       } else {
         // when modal was closed without submitting request
       }
@@ -264,56 +279,54 @@ export default{
 
     showAcceptDenyModal(value) {
       this.modalData = value;
-      if(!this.modalData){
+      if (!this.modalData) {
         return;
       }
       this.showModal = true;
-      
+
       // after a state change, wait for the DOM updates to complete
       Vue.nextTick(() => {
         this.$refs.AcceptDenyModal.show();
       });
     },
-    
+
     updateData: function (event) {
       this.$refs.UpdatesTable.tabulator.setData();
       //? store the selected view in the session storage of the browser
       sessionStorage.setItem("showAll", event.target.value);
     },
   },
-  watch:{
-    loading: function(newValue, oldValue){
-      if(newValue){
+  watch: {
+    loading: function (newValue, oldValue) {
+      if (newValue) {
         this.$refs.loadingModalRef.show();
-      }else{
+      } else {
         this.$refs.loadingModalRef.hide();
       }
-    }
+    },
   },
 
   mounted() {
-
     //? opens the AcceptDenyUpdate Modal if a preselected profil_update_id was passed to the component (used for email links)
-    if(this.profil_update_id){
-        
-        this.$refs.UpdatesTable.tabulator.on("dataProcessed", ()=>{
-        const arrayRowData = this.$refs.UpdatesTable.tabulator.getData().filter(row => {
+    if (this.profil_update_id) {
+      this.$refs.UpdatesTable.tabulator.on("dataProcessed", () => {
+        const arrayRowData = this.$refs.UpdatesTable.tabulator
+          .getData()
+          .filter((row) => {
             return row.profil_update_id === this.profil_update_id;
-        });
-        if(arrayRowData.length){
-            this.showAcceptDenyModal(arrayRowData[0]);
+          });
+        if (arrayRowData.length) {
+          this.showAcceptDenyModal(arrayRowData[0]);
         }
-        })
+      });
     }
-   
 
     if (!(sessionStorage.getItem("showAll") === null)) {
       //? converting string into a boolean: https://sentry.io/answers/how-can-i-convert-a-string-to-a-boolean-in-javascript/
-      this.showAll = sessionStorage.getItem("showAll")==="true";
-      
+      this.showAll = sessionStorage.getItem("showAll") === "true";
     }
   },
-  template: /*html*/`
+  template: /*html*/ `
     <div>
     
     <accept-deny-update :title="$p.t('profilUpdate','profilUpdateRequest')" v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>

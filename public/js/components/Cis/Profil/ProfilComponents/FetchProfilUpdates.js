@@ -86,7 +86,7 @@ export default {
       }
 
       //? adds the status information if the profil update request was rejected or accepted
-      if (updateRequest.status !== this.profilUpdateStates.Pending) {
+      if (updateRequest.status !== this.profilUpdateStates["Pending"]) {
         content["status"] = updateRequest.status;
         content["status_message"] = updateRequest.status_message;
         content["status_timestamp"] = updateRequest.status_timestamp;
@@ -119,7 +119,7 @@ export default {
       );
     },
     getView: function (topic, status) {
-      if (!(status === this.profilUpdateStates.Pending)) {
+      if (!(status === this.profilUpdateStates["Pending"])) {
         return "Status";
       }
 
