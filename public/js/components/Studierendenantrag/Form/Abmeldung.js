@@ -58,7 +58,8 @@ export default {
 						});
 					}
 					return result;
-				});
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		createAntrag() {
 			bootstrap.Modal.getOrCreateInstance(this.$refs.modal).hide();
