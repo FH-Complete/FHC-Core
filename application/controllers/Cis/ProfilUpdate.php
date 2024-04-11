@@ -480,9 +480,6 @@ class ProfilUpdate extends Auth_Controller
 
 	public function getProfilUpdateWithPermission($status = null)
 	{
-
-
-
 		// early return if no status has been passed as argument
 		if (!isset($status)) {
 			echo json_encode($this->ProfilUpdateModel->getProfilUpdateWithPermission());

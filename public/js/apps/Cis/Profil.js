@@ -59,8 +59,12 @@ const profilApp = Vue.createApp({
   //? use function syntax for provide so that we can access `this`
   provide() {
     return {
-      profilUpdateStates: Vue.computed(() => this.profilUpdateStates),
-      profilUpdateTopic: Vue.computed(() => this.profilUpdateTopic),
+      profilUpdateStates: Vue.computed(() =>
+        this.profilUpdateStates ? this.profilUpdateStates : null
+      ),
+      profilUpdateTopic: Vue.computed(() =>
+        this.profilUpdateTopic ? this.profilUpdateTopic : null
+      ),
       setLoading: (newValue) => {
         this.loading = newValue;
       },

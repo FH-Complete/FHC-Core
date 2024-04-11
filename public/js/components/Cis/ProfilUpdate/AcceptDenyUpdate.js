@@ -135,14 +135,6 @@ export default {
 
 
     <template v-slot:default>
-
-    
-    <!-- debugging prints 
-    <pre>{{JSON.stringify(data.profil_update_id,null,2)}}</pre>
-    <pre>view {{getComponentView}}</pre>
-    <pre>topic {{JSON.stringify(data.topic,null,2)}}</pre>
-    
-    -->
     
    <div class="row">
     <div  class="form-underline mb-2 col-12 col-sm-6">
@@ -226,12 +218,12 @@ export default {
     </template>
     
 
-    <template v-if="data.status === profilUpdateStates['Pending']  v-slot:footer>
+    <template v-if="data.status === profilUpdateStates['Pending']"  v-slot:footer>
     <div  class="form-underline flex-fill">
       <div class="form-underline-titel">{{$p.t('global','nachricht')}}</div>
 
       <div class="d-flex flex-row gap-2">
-        <input  class="form-control " v-model="data.status_message"  >
+        <input  class="form-control " v-model="data.status_message"  />
         <button  @click="acceptRequest" class="text-nowrap btn btn-success">{{$p.t('profilUpdate','accept')}} <i class="fa fa-check"></i></button>
         <button @click="denyRequest" class="text-nowrap btn btn-danger">{{$p.t('profilUpdate','deny')}} <i class="fa fa-xmark"></i></button>
       </div>

@@ -40,7 +40,7 @@ export default {
       showModal: false,
       modalData: null,
       loading: false,
-      showAll: false,
+      filter: "Pending",
       events: [],
       profil_update_id: Number(this.id),
       profil_updates_table_options: {
@@ -51,13 +51,25 @@ export default {
 
         ajaxURLGenerator: (url, config, params) => {
           //? this function needs to be an array function in order to access the this properties of the Vue component
-          if (this.showAll) {
-            return url + "getProfilUpdateWithPermission";
-          } else {
-            return (
-              url +
-              `getProfilUpdateWithPermission/${this.profilUpdateStates["Pending"]}`
-            );
+
+          switch (this.filter) {
+            case this.profilUpdateStates["Pending"]:
+              return (
+                url +
+                `getProfilUpdateWithPermission/${this.profilUpdateStates["Pending"]}`
+              );
+            case this.profilUpdateStates["Accepted"]:
+              return (
+                url +
+                `getProfilUpdateWithPermission/${this.profilUpdateStates["Accepted"]}`
+              );
+            case this.profilUpdateStates["Rejected"]:
+              return (
+                url +
+                `getProfilUpdateWithPermission/${this.profilUpdateStates["Rejected"]}`
+              );
+            default:
+              return url + `getProfilUpdateWithPermission`;
           }
         },
         ajaxResponse: (url, params, response) => {
@@ -244,20 +256,7 @@ export default {
       },
     };
   },
-  computed: {
-    getFetchUrl: function () {
-      let url =
-        FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/`;
-      if (this.showAll) {
-        url + "getAllRequests";
-      } else {
-        url + "getPendingRequests";
-      }
-      return url;
-    },
-  },
+  computed: {},
   methods: {
     setLoading: function (newValue) {
       this.loading = newValue;
@@ -293,7 +292,7 @@ export default {
     updateData: function (event) {
       this.$refs.UpdatesTable.tabulator.setData();
       //? store the selected view in the session storage of the browser
-      sessionStorage.setItem("showAll", event.target.value);
+      sessionStorage.setItem("filter", event.target.value);
     },
   },
   watch: {
@@ -321,31 +320,29 @@ export default {
       });
     }
 
-    if (!(sessionStorage.getItem("showAll") === null)) {
+    if (sessionStorage.getItem("filter")) {
       //? converting string into a boolean: https://sentry.io/answers/how-can-i-convert-a-string-to-a-boolean-in-javascript/
-      this.showAll = sessionStorage.getItem("showAll") === "true";
+      this.filter = sessionStorage.getItem("filter");
     }
   },
   template: /*html*/ `
     <div>
-    
+   
     <accept-deny-update :title="$p.t('profilUpdate','profilUpdateRequest')" v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
-    
     <div  class="form-underline flex-fill ">
       <div class="form-underline-titel">{{$p.t('ui','anzeigen')}} </div>
-
-      <select class="mb-4 " v-model="showAll" @change="updateData" class="form-select" aria-label="Profil updates display selection">
-        <option :selected="true" :value="false">{{$p.t('profilUpdate','pendingRequests')}}</option>
-        <option :value="false">{{$p.t('profilUpdate','acceptedRequests')}}</option>
-        <option :value="false">{{$p.t('profilUpdate','rejectedRequests')}}</option>
-        <option :value="true">{{$p.t('profilUpdate','allRequests')}}</option>
+      
+      <select class="mb-4 " v-model="filter" @change="updateData" class="form-select" aria-label="Profil updates display selection">
+        <option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
+        <option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
+        <option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>
+        <option :value="'Alle'">{{$p.t('profilUpdate','allRequests')}}</option>
       </select>
   
     </div>
-
     <loading ref="loadingModalRef" :timeout="0"></loading>
     
-    <core-filter-cmpt :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="events" :tabulator-options="profil_updates_table_options" tableOnly :sideMenu="false" />
+    <core-filter-cmpt v-if="profilUpdateStates" :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="events" :tabulator-options="profil_updates_table_options" tableOnly :sideMenu="false" />
 
     </div>`,
 };
