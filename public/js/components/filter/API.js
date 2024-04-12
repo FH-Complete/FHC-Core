@@ -124,8 +124,6 @@ export const CoreFilterAPIs = {
 	 *
 	 */
 	getFilter: function(wsParams) {
-		console.log(wsParams)
-		debugger
 		return CoreRESTClient.get(
                         'components/Filter/getFilter',
                         {
