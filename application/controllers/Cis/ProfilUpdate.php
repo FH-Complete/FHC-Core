@@ -415,7 +415,7 @@ class ProfilUpdate extends Auth_Controller
 
 		if ($res) {
 			$pending_changes = array_filter($res, function ($element) {
-				return $element->status == self::$STATUS_PENDING ?: "Pending";
+				return $element->status == (self::$STATUS_PENDING ?: "Pending");
 			});
 
 			foreach ($pending_changes as $update_request) {
@@ -565,7 +565,7 @@ class ProfilUpdate extends Auth_Controller
 					$requested_change['adresse_id'] = $insertID;
 					$update_res = $this->updateRequestedChange($id, $requested_change);
 					if (isError($update_res)) {
-						echo json_encode(error($this->p->t('profilUpdate', 'profilUpdate_address_error', [$insertID, $id])));
+						echo json_encode(error($this->p->t('profilUpdate', 'profilUpdate_address_error', [$insertID])));
 						return;
 					}
 				}
@@ -577,7 +577,7 @@ class ProfilUpdate extends Auth_Controller
 					$requested_change['kontakt_id'] = $insertID;
 					$update_res = $this->updateRequestedChange($id, $requested_change);
 					if (isError($update_res)) {
-						echo json_encode(error("was not able to add kontakt_id " . $insertID . " to profilRequest " . $id));
+						echo json_encode(error($this->p->t('profilUpdate', 'profilUpdate_kontakt_error', [$insertID])));
 						return;
 					}
 				}
@@ -586,15 +586,21 @@ class ProfilUpdate extends Auth_Controller
 			} else {
 				switch ($topic) {
 					// mapping phrasen to database columns to make the update with the correct column names
-					case $this->p->t('profilUpdate', 'title'):
+					case self::$TOPICS['Titel']:
 						$topic = "titelpre";
 						break;
-					case $this->p->t('profilUpdate', 'postnomen'):
+					case self::$TOPICS['Postnomen']:
 						$topic = "titelpost";
 						break;
-					case $this->p->t('profilUpdate', 'vorname'):
+					case self::$TOPICS['Vorname']:
 						$topic = "vorname";
 						break;
+					case self::$TOPICS['Nachname']:
+						$topic = "nachname";
+						break;
+					default:
+						show_error($this->p->t('profilUpdate', 'profilUpdate_topic_error',[$topic]));
+						return;
 				}
 
 				$result = $this->PersonModel->update($personID, [$topic => $requested_change["value"]]);

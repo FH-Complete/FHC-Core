@@ -38,7 +38,6 @@ export default {
     return {
       data: this.value,
       loading: false,
-      profilUpdateStates: {},
       result: false,
       info: null,
       files: null,
@@ -60,10 +59,14 @@ export default {
         `/Cis/ProfilUpdate/show/${dms_id}`
       );
     },
-    acceptRequest: function () {
+    handleRequest: function (type) {
       this.loading = true;
       this.setLoading(true);
-      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(this.data)
+      Vue.$fhcapi.ProfilUpdate[
+        type.toLowerCase() == "accept"
+          ? "acceptProfilRequest"
+          : "denyProfilRequest"
+      ](this.data)
         .then((res) => {
           this.setLoading(false);
           this.loading = false;
@@ -76,22 +79,8 @@ export default {
           this.hide();
         });
     },
-
-    denyRequest: async function () {
-      this.loading = true;
-      this.setLoading(true);
-      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(this.data)
-        .then((res) => {
-          this.setLoading(false);
-          this.loading = false;
-          this.result = true;
-        })
-        .catch((e) => {
-          Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
-        });
-      this.hide();
-    },
   },
+
   computed: {
     getComponentView: function () {
       if (this.data.topic.toLowerCase().includes("kontakt")) {
@@ -104,20 +93,14 @@ export default {
     },
   },
   created() {
-    // fetching the different ProfilUpdateStates from the db
-    Vue.$fhcapi.ProfilUpdate.getStatus()
-      .then((result) => {
-        this.profilUpdateStates = result.data;
-      })
-      .catch((err) => {
-        console.error(err);
+    // only fetching the profilUpdate Attachemnts if the profilUpdate actually has attachments
+    if (this.value.attachment_id) {
+      Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(
+        this.data.profil_update_id
+      ).then((res) => {
+        this.files = res.data;
       });
-
-    Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(
-      this.data.profil_update_id
-    ).then((res) => {
-      this.files = res.data;
-    });
+    }
   },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
@@ -224,8 +207,8 @@ export default {
 
       <div class="d-flex flex-row gap-2">
         <input  class="form-control " v-model="data.status_message"  />
-        <button  @click="acceptRequest" class="text-nowrap btn btn-success">{{$p.t('profilUpdate','accept')}} <i class="fa fa-check"></i></button>
-        <button @click="denyRequest" class="text-nowrap btn btn-danger">{{$p.t('profilUpdate','deny')}} <i class="fa fa-xmark"></i></button>
+        <button  @click="handleRequest('accept')" class="text-nowrap btn btn-success">{{$p.t('profilUpdate','accept')}} <i class="fa fa-check"></i></button>
+        <button @click="handleRequest('deny')" class="text-nowrap btn btn-danger">{{$p.t('profilUpdate','deny')}} <i class="fa fa-xmark"></i></button>
       </div>
     </div>
      

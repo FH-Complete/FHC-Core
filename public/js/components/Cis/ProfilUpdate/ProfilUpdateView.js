@@ -263,7 +263,6 @@ export default {
     },
     hideAcceptDenyModal: function () {
       //? checks the AcceptDenyModal component property result, if the user made a successful request or not
-
       if (this.$refs.AcceptDenyModal.result) {
         //? refetches the data, if any request was denied or accepted
         //* setData will call the ajaxURL again to refresh the data
