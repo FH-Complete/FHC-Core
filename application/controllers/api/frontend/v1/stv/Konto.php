@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+use CI3_Events as Events;
 
 /**
  * This controller operates between (interface) the JS (GUI) and the back-end
@@ -33,7 +35,9 @@ class Konto extends FHCAPI_Controller
 	{
 		// TODO(chris): permissions
 		parent::__construct([
-			'get' => 'student/stammdaten:r'
+			'get' => 'student/stammdaten:r',
+			'getBuchungstypen' => 'student/stammdaten:r', // alle?
+			'update' => ['admin:w', 'assistenz:w']
 		]);
 
 		// Load models
@@ -51,15 +55,20 @@ class Konto extends FHCAPI_Controller
 	/**
 	 * Get details for a prestudent
 	 *
-	 * @param string			$type
-	 * @param string			(optional) $studiengang_kz
 	 * @return void
 	 */
-	public function get($type, $studiengang_kz = '')
+	public function get()
 	{
-		// TODO(chris): validation
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('person_id', 'Person ID', 'required');
+
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		$person_id = $this->input->post('person_id');
+		$studiengang_kz = $this->input->post('studiengang_kz');
 
 		if ($this->input->post('only_open')) {
 			$result = $this->KontoModel->getOffeneBuchungen($person_id, $studiengang_kz);
@@ -94,5 +103,78 @@ class Konto extends FHCAPI_Controller
 		}
 
 		$this->terminateWithSuccess(array_values($data));
+	}
+
+	/**
+	 * Get list of Buchungstypen
+	 *
+	 * @return void
+	 */
+	public function getBuchungstypen()
+	{
+		$this->load->model('crm/Buchungstyp_model', 'BuchungstypModel');
+
+		$result = $this->BuchungstypModel->load();
+
+		#$data = $this->getDataOrTerminateWithError($result);
+		if (isError($result))
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		$data = $result->retval;
+
+		$this->terminateWithSuccess($data);
+	}
+
+	/**
+	 * Save Buchung
+	 *
+	 * @return void
+	 */
+	public function update()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('buchungsnr', 'Buchungsnr', 'required');
+		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'required|has_permissions_for_stg[admin:rw,assistenz:rw]');
+		$this->form_validation->set_rules('buchungsdatum', 'Buchungsdatum', 'is_valid_date');
+		Events::trigger('konto_update_validation', $this->form_validation);
+
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$id = $this->input->post('buchungsnr');
+		$allowed = [
+			'betrag',
+			'buchungsdatum',
+			'buchungstext',
+			'mahnspanne',
+			'buchungstyp_kurzbz',
+			'studiensemester_kurzbz',
+			'studiengang_kz',
+			'credit_points',
+			'anmerkung'
+		];
+		$data = [
+			'updateamum' => date('c'),
+			'updatevon' => getAuthUID()
+		];
+		foreach ($allowed as $field)
+			if ($this->input->post($field) !== null)
+				$data[$field] = $this->input->post($field);
+
+		$result = $this->KontoModel->update($id, $data);
+
+		#$this->getDataOrTerminateWithError($result);
+		if (isError($result))
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+
+		$result = $this->KontoModel->withAdditionalInfo()->load($id);
+		
+		#$result = $this->getDataOrTerminateWithError($result);
+		if (isError($result))
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		$result = $result->retval;
+
+		$this->terminateWithSuccess($result);
 	}
 }

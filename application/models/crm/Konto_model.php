@@ -1,4 +1,7 @@
 <?php
+
+use CI3_Events as Events;
+
 class Konto_model extends DB_Model
 {
 
@@ -14,14 +17,11 @@ class Konto_model extends DB_Model
 
 
 	/**
-	 * Get all accounting entries for a person optionally filtered by Studiengang
+	 * Adds additional fields to the Query
 	 *
-	 * @param integer|array		$person_id
-	 * @param string			(optional) $studiengang_kz
-	 *
-	 * @return stdClass
+	 * @return Konto_model
 	 */
-	public function getAlleBuchungen($person_id, $studiengang_kz = '')
+	public function withAdditionalInfo()
 	{
 		$this->addSelect($this->dbTable . '.*');
 		$this->addSelect('UPPER(typ::varchar(1) || kurzbz) AS kuerzel');
@@ -34,6 +34,23 @@ class Konto_model extends DB_Model
 
 		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
 		$this->addJoin('public.tbl_person person', 'person_id', 'LEFT');
+
+		Events::trigger('konto_query');
+
+		return $this;
+	}
+
+	/**
+	 * Get all accounting entries for a person optionally filtered by Studiengang
+	 *
+	 * @param integer|array		$person_id
+	 * @param string			(optional) $studiengang_kz
+	 *
+	 * @return stdClass
+	 */
+	public function getAlleBuchungen($person_id, $studiengang_kz = '')
+	{
+		$this->withAdditionalInfo();
 
 		$this->addOrder('buchungsdatum');
 

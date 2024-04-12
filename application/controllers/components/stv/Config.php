@@ -6,10 +6,15 @@ use CI3_Events as Events;
 
 class Config extends FHC_Controller
 {
+
+
 	public function __construct()
 	{
 		// TODO(chris): access!
 		parent::__construct();
+
+		$this->load->library('AuthLib');
+		$this->load->library('PermissionLib');
 	}
 
 	public function student()
@@ -39,7 +44,13 @@ class Config extends FHC_Controller
 		$result['konto'] = [
 			'title' => 'Konto',
 			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
-			'config' => ['ZAHLUNGSBESTAETIGUNG_ANZEIGEN' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN)]
+			'config' => [
+				'showZahlungsbestaetigung' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN),
+				'showBuchungsnr' => $this->permissionlib->isBerechtigt('admin'),
+				'showMahnspanne' => (!defined('FAS_KONTO_SHOW_MAHNSPANNE') || FAS_KONTO_SHOW_MAHNSPANNE===true),
+				'showCreditpoints' => (defined('FAS_KONTO_SHOW_CREDIT_POINTS') && FAS_KONTO_SHOW_CREDIT_POINTS == 'true'),
+				'additionalCols' => []
+			]
 		];
 		$result['betriebsmittel'] = [
 			'title' => 'Betriebsmittel',
@@ -64,7 +75,13 @@ class Config extends FHC_Controller
 		$result['konto'] = [
 			'title' => 'Konto',
 			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
-			'config' => ['ZAHLUNGSBESTAETIGUNG_ANZEIGEN' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN)]
+			'config' => [
+				'showZahlungsbestaetigung' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN),
+				'showBuchungsnr' => $this->permissionlib->isBerechtigt('admin'),
+				'showMahnspanne' => (!defined('FAS_KONTO_SHOW_MAHNSPANNE') || FAS_KONTO_SHOW_MAHNSPANNE===true),
+				'showCreditpoints' => (defined('FAS_KONTO_SHOW_CREDIT_POINTS') && FAS_KONTO_SHOW_CREDIT_POINTS == 'true'),
+				'additionalCols' => []
+			]
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {
