@@ -1,6 +1,7 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 /**
  *
@@ -59,7 +60,9 @@ class Cms extends FHC_Controller
 	 */
 	public function news($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
 	{
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar);
+		$page = intval($this->input->get('page', true));
+		$pagination_size = 10;
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $pagination_size);
 
 		if (isError($news))
 			return $this->load->view('CisHtml/Error', ['error' => getError($news)]);
