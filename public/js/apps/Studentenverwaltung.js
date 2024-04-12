@@ -34,7 +34,8 @@ import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_route
 			{ path: `/${ciPath}/studentenverwaltung`, component: FhcStudentenverwaltung },
 			{ path: `/${ciPath}/studentenverwaltung/prestudent/:prestudent_id`, component: FhcStudentenverwaltung },
 			{ path: `/${ciPath}/studentenverwaltung/prestudent/:prestudent_id/:tab`, component: FhcStudentenverwaltung },
-			{ path: `/${ciPath}/studentenverwaltung/student/:id`, component: FhcStudentenverwaltung }
+			{ path: `/${ciPath}/studentenverwaltung/student/:id`, component: FhcStudentenverwaltung },
+			{ path: `/${ciPath}/studentenverwaltung/person/:person_id`, component: FhcStudentenverwaltung }
 		]
 	});
 
