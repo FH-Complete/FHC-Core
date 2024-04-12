@@ -1,7 +1,6 @@
 import VueDatePicker from '../vueDatepicker.js.php';
 import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import FormUploadDms from '../Form/Upload/Dms.js';
-import {CoreRESTClient} from "../../RESTClient";
 import {CoreFilterCmpt} from "../filter/Filter.js";
 import BsModal from "../Bootstrap/Modal";
 
@@ -24,14 +23,17 @@ export default {
 	data(){
 		return {
 			tabulatorOptions: {
-				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.id + '/' + this.typeId),
+				ajaxURL: 'api/frontend/v1/stv/Notiz/getNotizen/' + this.id + '/' + this.typeId,
+				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxResponse: (url, params, response) => response.data,
+				//ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.id + '/' + this.typeId),
 				columns: [
 					{title: "Titel", field: "titel"},
 					{title: "Text", field: "text_stripped", width: 250},
 					{title:  "VerfasserIn", field: "verfasser_uid"},
 					{title: "BearbeiterIn", field: "bearbeiter_uid", visible: false},
-					{title: "Start", field: "start", visible: false},
-					{title: "Ende", field: "ende", visible: false},
+					{title: "Start", field: "start_format", visible: false},
+					{title: "Ende", field: "ende_format", visible: false},
 					{title: "Dokumente", field: "countdoc"},
 					{title: "Erledigt", field: "erledigt", visible: false},
 					{title: "Notiz_id", field: "notiz_id", visible: false},
@@ -74,7 +76,46 @@ export default {
 				selectable: true,
 				index: 'notiz_id'
 			},
-			tabulatorEvents: [],
+			tabulatorEvents: [
+				{
+					event: 'tableBuilt',
+					handler: async() => {
+
+						await this.$p.loadCategory(['notiz','global']);
+
+						let cm = this.$refs.table.tabulator.columnManager;
+
+						cm.getColumnByField('verfasser_uid').component.updateDefinition({
+							title: this.$p.t('notiz', 'verfasser')
+						});
+						cm.getColumnByField('titel').component.updateDefinition({
+							title: this.$p.t('global', 'titel')
+						});
+						cm.getColumnByField('text_stripped').component.updateDefinition({
+							title: this.$p.t('global', 'text')
+						});
+						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
+							title: this.$p.t('notiz', 'bearbeiter')
+						});
+						cm.getColumnByField('start_format').component.updateDefinition({
+							title: this.$p.t('global', 'gueltigVon')
+						});
+						cm.getColumnByField('ende_format').component.updateDefinition({
+							title: this.$p.t('global', 'gueltigBis')
+						});
+						cm.getColumnByField('countdoc').component.updateDefinition({
+							title: this.$p.t('notiz', 'document')
+						});
+						cm.getColumnByField('erledigt').component.updateDefinition({
+							title: this.$p.t('notiz', 'erledigt')
+						});
+						cm.getColumnByField('lastupdate').component.updateDefinition({
+							title: this.$p.t('notiz', 'letzte_aenderung')
+						});
+
+					}
+				}
+			],
 			notizen: [],
 			multiupload: true,
 			mitarbeiter: [],
@@ -101,14 +142,11 @@ export default {
 	methods: {
 		actionDeleteNotiz(notiz_id){
 			this.loadNotiz(notiz_id).then(() => {
-				if(this.notizen.notiz_id) {
 					this.$refs.deleteNotizModal.show();
-				}
 			});
 		},
 		actionEditNotiz(notiz_id){
 			this.loadNotiz(notiz_id).then(() => {
-				console.log(this.notizen);
 				if(this.notizen.notiz_id) {
 					this.notizData.titel = this.notizen.titel;
 					this.notizData.statusNew = false;
@@ -126,10 +164,11 @@ export default {
 				}
 			})
 				.then(() => {
-					if(this.notizen.dms_id){
-						console.log("loadEntries with " + this.notizen.notiz_id);
-						this.loadDocEntries(this.notizen.notiz_id);
+					if(this.notizData.dms_id){
+						this.loadDocEntries(this.notizData.notiz_id);
 					}
+					else
+						this.notizData.anhang = [];
 				});
 		},
 		actionNewNotiz(){
@@ -140,103 +179,80 @@ export default {
 
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
-			CoreRESTClient.post(
-				'components/stv/Notiz/addNewNotiz/' + this.id,
+			this.$fhcApi.post('api/frontend/v1/stv/notiz/addNewNotiz/' + this.id,
 				formData,
 				{ Headers: { "Content-Type": "multipart/form-data" } }
 			).then(response => {
-				if (!response.data.error) {
-					this.$fhcAlert.alertSuccess('Anlegen von neuer Notiz erfolgreich');
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetFormData();
 					this.reload();
-				} else {
-					const errorData = response.data.retval;
-					Object.entries(errorData).forEach(entry => {
-						const [key, value] = entry;
-						this.$fhcAlert.alertError(value);
-					});
-				}
-			}).catch(error => {
-				if (error.response) {
-					console.log(error.response);
-					this.$fhcAlert.alertError(error.response.data);
-				}
-			}).finally(() => {
+			})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 				window.scrollTo(0, 0);
 			});
 		},
 		deleteNotiz(notiz_id){
-			CoreRESTClient.post('components/stv/Notiz/deleteNotiz/' + notiz_id)
-				.then(response => {
-					if (!response.data.error) {
-						this.$fhcAlert.alertSuccess('Löschen erfolgreich');
+			this.param = {
+				'notiz_id':  notiz_id
+			};
+
+			return this.$fhcApi.post('api/frontend/v1/stv/notiz/deleteNotiz/', this.param)
+				.then(result => {
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 						this.$refs.deleteNotizModal.hide();
 						this.reload();
-					} else {
-						this.$fhcAlert.alertError('Keine Notiz mit Id ' + notiz_id + ' gefunden');
-					}
-				}).catch(error => {
-					this.$fhcAlert.alertError('Fehler bei Löschroutine aufgetreten');
-				}).finally(()=> {
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
 					window.scrollTo(0, 0);
 				});
 		},
 		loadNotiz(notiz_id){
-			return CoreRESTClient.get('components/stv/Notiz/loadNotiz/' + notiz_id)
-				.then(
-					result => {
-						if(result.data.retval) {
-							this.notizen = result.data.retval;
-						}
-						else {
-							this.notizen = {};
-							this.$fhcAlert.alertError('Keine Notiz mit Id ' + notiz_id + ' gefunden');
-						}
+			this.param = {
+				'notiz_id':  notiz_id
+			};
+			return this.$fhcApi.post('api/frontend/v1/stv/notiz/loadNotiz/',
+				this.param)
+					.then(result => {
+						this.notizData = result.data;
 						return result;
-					}
-				);
+					})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		loadDocEntries(notiz_id){
-			return CoreRESTClient.get('components/stv/Notiz/loadDokumente/' + notiz_id)
+			this.param = {
+				'notiz_id':  notiz_id
+			};
+			return this.$fhcApi.post('api/frontend/v1/stv/notiz/loadDokumente/',
+				this.param)
 				.then(
 					result => {
-						if(result.data.retval) {
-							this.notizData.anhang = result.data.retval;
-							console.log(this.notizData.anhang);
-						}
-						else
-						{
-							this.notizData.anhang = {};
-							this.$fhcAlert.alertError('Kein Dokumenteneintrag mit NotizId ' + notiz_id + ' gefunden');
-						}
+							this.notizData.anhang = result.data;
 						return result;
-					}
-				);
+					})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateNotiz(notiz_id){
 			const formData = new FormData();
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
 
-			CoreRESTClient.post(
-				'components/stv/Notiz/updateNotiz/' + notiz_id,
+			this.param = {
+				'notiz_id':  notiz_id
+			};
+
+			return this.$fhcApi.post(
+				'api/frontend/v1/stv/notiz/updateNotiz/' ,
 				formData,
 				{ Headers: { "Content-Type": "multipart/form-data" } }
 			).then(response => {
-				if (!response.data.error) {
-					this.$fhcAlert.alertSuccess('Update von Notiz erfolgreich');
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetFormData();
 					this.reload();
-				} else {
-					const errorData = response.data.retval;
-					Object.entries(errorData).forEach(entry => {
-						const [key, value] = entry;
-						this.$fhcAlert.alertError(value);
-					});
-				}
-			}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Updateroutine aufgetreten');
-			}).finally(() => {
+			})
+			.catch(this.$fhcAlert.handleSystemError)
+			.finally(() => {
 				window.scrollTo(0, 0);
 			});
 		},
@@ -261,20 +277,18 @@ export default {
 			};
 		},
 		getUid(){
-			CoreRESTClient
-				.get('components/stv/Notiz/getUid')
+			this.$fhcApi
+				.get('api/frontend/v1/stv/notiz/getUid')
 				.then(result => {
-					if(result.data.retval) {
-						this.notizData.intVerfasser = result.data.retval;
-					}
+						this.notizData.intVerfasser = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		search(event) {
-			return CoreRESTClient
-				.get('components/stv/Notiz/getMitarbeiter/' + event.query)
+			return this.$fhcApi
+				.get('api/frontend/v1/stv/notiz/getMitarbeiter/' + event.query)
 				.then(result => {
-					this.filteredMitarbeiter = CoreRESTClient.getData(result.data);
+					this.filteredMitarbeiter = result.data.retval;
 				});
 		},
 		initTinyMCE() {
@@ -319,38 +333,6 @@ export default {
 		if(this.showTinyMCE){
 			this.initTinyMCE();
 		}
-
-		await this.$p.loadCategory(['notiz','global']);
-
-		let cm = this.$refs.table.tabulator.columnManager;
-
-		cm.getColumnByField('verfasser_uid').component.updateDefinition({
-			title: this.$p.t('notiz', 'verfasser')
-		});
-		cm.getColumnByField('titel').component.updateDefinition({
-			title: this.$p.t('global', 'titel')
-		});
-		cm.getColumnByField('text_stripped').component.updateDefinition({
-			title: this.$p.t('global', 'text')
-		});
-		cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
-			title: this.$p.t('notiz', 'bearbeiter')
-		});
-		cm.getColumnByField('start').component.updateDefinition({
-			title: this.$p.t('global', 'gueltigVon')
-		});
-		cm.getColumnByField('ende').component.updateDefinition({
-			title: this.$p.t('global', 'gueltigBis')
-		});
-		cm.getColumnByField('countdoc').component.updateDefinition({
-			title: this.$p.t('notiz', 'document')
-		});
-		cm.getColumnByField('erledigt').component.updateDefinition({
-			title: this.$p.t('notiz', 'erledigt')
-		});
-		cm.getColumnByField('lastupdate').component.updateDefinition({
-			title: this.$p.t('notiz', 'letzte_aenderung')
-		});
 	},
 	watch: {
 		//watcher für Tinymce-Textfeld
@@ -398,7 +380,7 @@ export default {
 			</template>
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
-				<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizen.notiz_id)">OK</button>
+				<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizData.notiz_id)">OK</button>
 			</template>
 		</BsModal>
 		
@@ -410,7 +392,7 @@ export default {
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Neu"
+			new-btn-label="Notiz"
 			@click:new="actionNewNotiz"
 			>
 		</core-filter-cmpt>
@@ -534,7 +516,7 @@ export default {
 			</div>
 			
 			<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
-			<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizen.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+			<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
 					
 		</form>		
 	</div>`
