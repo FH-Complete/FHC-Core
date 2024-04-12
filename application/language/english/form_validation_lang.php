@@ -36,7 +36,8 @@
  * @since	Version 1.0.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 $lang['form_validation_has_write_permissions']	= 'You have no rights to edit {field} field.';
 $lang['form_validation_is_valid_date']	= 'The date format is invalid or out of range.';
+$lang['form_validation_has_permissions_for_stg']	= 'You have no rights for stg {field}.';
