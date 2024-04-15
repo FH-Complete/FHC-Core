@@ -61,13 +61,18 @@ class Cms extends FHC_Controller
 	 */
 	public function news($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
 	{
+		$this->load->view('CisHtml/Cms/Content', ['infoscreen' => $infoscreen, 'studiengang_kz' => $studiengang_kz, 'semester' => $semester, 'mischen' => $mischen, 'titel' => $titel, 'edit' => $edit, 'sichtbar' => $sichtbar]);
+	}
+
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
+	{
 		$page = intval($this->input->get('page', true));
 		$pagination_size = 10;
 		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $pagination_size);
 
-		if (isError($news))
-			return $this->load->view('CisHtml/Error', ['error' => getError($news)]);
-
-		$this->load->view('CisHtml/Cms/Content', ['content' => getData($news)]);
+		if (isError($news)) {
+			echo json_encode(getError($news));
+		}
+		echo json_encode(getData($news));
 	}
 }

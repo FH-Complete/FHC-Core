@@ -55,15 +55,15 @@ class News_model extends DB_Model
 	 */
 	public function getNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true)
 	{
-		if (isset($page) && is_numeric($page) && isset($page_size) && is_numeric($page_size)) {
-			if ($page > 0 && $page_size > 0) {
-				$maxPageCount = $this->getMaxPageCount($page_size);
-				if ($maxPageCount) {
-					$page = $page % $maxPageCount;
-				}
-				$offset = $page * $page_size;
-				$this->addLimit($page_size, $offset);
+		if (isset($page) && is_numeric($page) && isset($page_size) && is_numeric($page_size) && $page > 0 && $page_size > 0) {
+
+			$maxPageCount = $this->getMaxPageCount($page_size);
+			if ($maxPageCount) {
+				$page = $page % $maxPageCount;
 			}
+			$offset = $page * $page_size;
+			$this->addLimit($page_size, $offset);
+
 		} else {
 			$this->addLimit($page_size);
 		}
