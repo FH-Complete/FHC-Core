@@ -24,15 +24,15 @@ html {
 	border-radius: 0!important;
 }
 
-#main {
+.stv {
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
 }
-#main > header {
+.stv > header {
 	flex: 0 0 auto;
 }
-#main > div {
+.stv > div {
 	flex: 1 1 auto;
 }
 
