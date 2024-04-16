@@ -284,7 +284,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			{
 				$qualifikation_beschreibung = $qualifikationsziel->result[0]->data[1]->elements[0];
 				$qualifikation_beschreibung = json2odt($qualifikation_beschreibung);
-				echo "<lernergebnisse>$qualifikation_beschreibung</lernergebnisse>";
+				echo "<lernergebnisse><![CDATA[$qualifikation_beschreibung]]></lernergebnisse>";
 			}
 
 		}
