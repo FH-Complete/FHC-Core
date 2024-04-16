@@ -600,7 +600,7 @@ export default {
 								name="studiengang_kz"
 								v-model="formDataStg"
 								>
-								<option v-for="stg in lists.stgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">{{stg.kuerzel}}</option>
+								<option v-for="stg in lists.active_stgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">{{stg.kuerzel}}</option>
 							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">

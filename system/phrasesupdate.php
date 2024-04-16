@@ -26532,6 +26532,47 @@ array(
 			)
 		)
 	),
+	// FHC-Core-SAP
+	array(
+		'app' => 'core',
+		'category' => 'sap',
+		'phrase' => 'error_noBuchung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Buchungsnr #{buchungsnr} is ungültig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Buchungnr #{buchungsnr} is not valid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'sap',
+		'phrase' => 'error_buchungLocked',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Buchung wurde bereits übertragen und darf nicht geändert werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Buchung was already submitted and can not be changed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

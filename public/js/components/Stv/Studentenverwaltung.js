@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import FhcSearchbar from "../searchbar/searchbar.js";
+import CoreSearchbar from "../searchbar/searchbar.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import StvVerband from "./Studentenverwaltung/Verband.js";
 import StvList from "./Studentenverwaltung/List.js";
@@ -26,7 +26,7 @@ import {CoreRESTClient} from '../../RESTClient.js';
 
 export default {
 	components: {
-		FhcSearchbar,
+		CoreSearchbar,
 		VerticalSplit,
 		StvVerband,
 		StvList,
@@ -142,11 +142,11 @@ export default {
 				this.lists.ausbildungen = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Lists/getStgs')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/lists/getStgs')
 			.then(result => {
-				this.lists.stgs = result;
+				this.lists.stgs = result.data;
+				this.lists.active_stgs = this.lists.stgs.filter(stg => stg.aktiv);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		CoreRESTClient
@@ -156,40 +156,56 @@ export default {
 				this.lists.orgforms = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+		this.$fhcApi
+			.factory.stv.konto.getBuchungstypen()
+			.then(result => {
+				this.lists.buchungstypen = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		this.$fhcApi
+			.get('api/frontend/v1/stv/lists/getStudiensemester')
+			.then(result => {
+				this.lists.studiensemester = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	mounted() {
 		if (this.$route.params.id) {
 			this.$refs.stvList.updateUrl('components/stv/students/uid/' + this.$route.params.id, true);
 		} else if (this.$route.params.prestudent_id) {
 			this.$refs.stvList.updateUrl('components/stv/students/prestudent/' + this.$route.params.prestudent_id, true);
+		} else if (this.$route.params.person_id) {
+			this.$refs.stvList.updateUrl('components/stv/students/person/' + this.$route.params.person_id, true);
 		}
 
 	},
 	template: `
-	<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
-		<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" :href="stvRoot">FHC 4.0</a>
-		<button class="navbar-toggler d-md-none m-1 collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-		<fhc-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction" class="searchbar w-100"></fhc-searchbar>
-	</header>
-	<div class="container-fluid overflow-hidden">
-		<div class="row h-100">
-			<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
-				<div class="offcanvas-header justify-content-end px-1 d-md-none">
-					<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-				</div>
-				<stv-verband @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
-				<stv-studiensemester :default="defaultSemester" @changed="studiensemesterChanged"></stv-studiensemester>
-			</nav>
-			<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
-				<vertical-split>
-					<template #top>
-						<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></stv-list>
-					</template>
-					<template #bottom>
-						<stv-details ref="details" :students="selected"></stv-details>
-					</template>
-				</vertical-split>
-			</main>
+	<div class="stv">
+		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
+			<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" :href="stvRoot">FHC 4.0</a>
+			<button class="navbar-toggler d-md-none m-1 collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<core-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction" class="searchbar w-100"></core-searchbar>
+		</header>
+		<div class="container-fluid overflow-hidden">
+			<div class="row h-100">
+				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
+					<div class="offcanvas-header justify-content-end px-1 d-md-none">
+						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+					</div>
+					<stv-verband @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
+					<stv-studiensemester :default="defaultSemester" @changed="studiensemesterChanged"></stv-studiensemester>
+				</nav>
+				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
+					<vertical-split>
+						<template #top>
+							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></stv-list>
+						</template>
+						<template #bottom>
+							<stv-details ref="details" :students="selected"></stv-details>
+						</template>
+					</vertical-split>
+				</main>
+			</div>
 		</div>
 	</div>`
 };

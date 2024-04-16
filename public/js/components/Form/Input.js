@@ -25,7 +25,10 @@ export default {
 		type: String,
 		name: String,
 		containerClass: [String, Array, Object],
-		label: String
+		label: String,
+		// NOTE(chris): remove these from $attrs array to prevent doubled event listeners
+		onInput: [Array, Function],
+		'onUpdate:modelValue': [Array, Function]
 	},
 	data() {
 		return {

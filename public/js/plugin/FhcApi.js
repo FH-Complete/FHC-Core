@@ -156,7 +156,6 @@ export default {
 					const $fhcAlert = app.config.globalProperties.$fhcAlert;
 
 					if (form) {
-						form.clearValidation();
 						form.setFeedback(false, error.messages);
 						return false;
 					}
