@@ -157,7 +157,7 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		this.$fhcApi
-			.get('api/frontend/v1/stv/konto/getBuchungstypen')
+			.factory.stv.konto.getBuchungstypen()
 			.then(result => {
 				this.lists.buchungstypen = result.data;
 			})

@@ -1,14 +1,17 @@
 import {CoreFilterCmpt} from "../../../filter/Filter.js";
 import FormInput from "../../../Form/Input.js";
+import KontoNew from "./Konto/New.js";
 import KontoEdit from "./Konto/Edit.js";
 
+// TODO(chris): Phrasen
 // TODO(chris): multi pers
-// TODO(chris): new header(multi pers), edit/row, gegenb.(date) multi, löschen multi, best. multi(recht)
+// TODO(chris): gegenb.(date) multi, löschen multi, best. multi(recht)
 
 export default {
 	components: {
 		CoreFilterCmpt,
 		FormInput,
+		KontoNew,
 		KontoEdit
 	},
 	props: {
@@ -25,6 +28,11 @@ export default {
 		};
 	},
 	computed: {
+		personIds() {
+			if (this.modelValue.person_id)
+				return [this.modelValue.person_id];
+			return this.modelValue.map(e => e.person_id);
+		},
 		stg_kz() {
 			if (this.modelValue.studiengang_kz)
 				return this.modelValue.studiengang_kz;
@@ -153,24 +161,13 @@ export default {
 			return columns;
 		},
 		tabulatorOptions() {
-			return {
-				ajaxURL: 'api/frontend/v1/stv/konto/get',
-				ajaxParams: () => {
-					const params = {
-						person_id: this.modelValue.person_id || this.modelValue.map(e => e.person_id),
-						only_open: this.filter,
-						studiengang_kz: this.studiengang_kz_intern ? this.stg_kz : ''
-					};
-					return params;
-				},
-				ajaxRequestFunc: (url, config, params) => {
-					return this.$fhcApi.post(url, params, config);
-				},
-				ajaxResponse: (url, params, response) => response.data,
+			return this.$fhcApi.factory.stv.konto.tabulatorConfig({
 				dataTree: true,
 				columns: this.tabulatorColumns,
+				selectable: true,
+				selectableRangeMode: 'click',
 				index: 'buchungsnr',
-			};
+			}, this);
 		}
 	},
 	watch: {
@@ -186,6 +183,9 @@ export default {
 			if (!data)
 				return this.reload();
 			this.$refs.table.tabulator.updateData(data);
+		},
+		actionNew() {
+			this.$refs.new.open();
 		}
 	},
 	created() {
@@ -221,8 +221,13 @@ export default {
 			table-only
 			:side-menu="false"
 			:tabulator-options="tabulatorOptions"
+			new-btn-show
+			new-btn-label="Buchung"
+			:new-btn-disabled="stg_kz === ''"
+			@click:new="actionNew"
 			>
 		</core-filter-cmpt>
+		<konto-new ref="new" :config="config" @saved="updateData" :person-ids="personIds" :stg-kz="stg_kz"></konto-new>
 		<konto-edit ref="edit" :config="config" @saved="updateData"></konto-edit>
 	</div>`
 };

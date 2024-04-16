@@ -97,6 +97,34 @@ class Konto_model extends DB_Model
 	}
 
 	/**
+	 * Check double Buchungen
+	 *
+	 * @param array				$person_ids
+	 * @param string			$studiensemester_kurzbz
+	 * @param array				$buchungstyp_kurzbzs
+	 *
+	 * @return stdClass
+	 */
+	public function checkDoubleBuchung($person_ids, $studiensemester_kurzbz, $buchungstyp_kurzbzs)
+	{
+		$this->addSelect('vorname');
+		$this->addSelect('nachname');
+
+		$this->addJoin('public.tbl_person', 'person_id');
+
+		$this->db->where_in('person_id', $person_ids);
+		$this->db->where_in('buchungstyp_kurzbz', $buchungstyp_kurzbzs);
+
+		$this->addGroupBy('vorname, nachname');
+		$this->addOrder('nachname');
+		$this->addOrder('vorname');
+
+		return $this->loadWhere([
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		]);
+	}
+
+	/**
 	 * Sets a Payment as paid
 	 */
 	public function setPaid($buchungsnr)
