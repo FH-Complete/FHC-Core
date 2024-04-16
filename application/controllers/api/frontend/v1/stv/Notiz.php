@@ -127,8 +127,8 @@ class Notiz extends FHCAPI_Controller
 		$verfasser_uid = isset($_POST['verfasser']) ? $_POST['verfasser'] : $uid;
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : null;
 		$type = $this->input->post('typeId');
-		$start = $this->input->post('von');
-		$ende = $this->input->post('bis');
+		$start = $this->input->post('start');
+		$ende = $this->input->post('ende');
 
 		//Speichern der Notiz und Notizzuordnung inkl Prüfung ob valid type
 		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
@@ -222,8 +222,8 @@ class Notiz extends FHCAPI_Controller
 		$verfasser_uid = $this->input->post('verfasser');
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : $uid;
 		$erledigt = $this->input->post('erledigt');
-		$start = $this->input->post('von');
-		$ende = $this->input->post('bis');
+		$start = $this->input->post('start');
+		$ende = $this->input->post('ende');
 
 		$result = $this->NotizModel->update(
 			[
@@ -426,6 +426,7 @@ class Notiz extends FHCAPI_Controller
 
 	public function getMitarbeiter($searchString)
 	{
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 		$result = $this->MitarbeiterModel->searchMitarbeiter($searchString);
 		if (isError($result)) {
 			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);

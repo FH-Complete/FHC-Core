@@ -53,8 +53,14 @@ export default {
 	},
 	watch: {
 		modelValue(n) {
-			if (n instanceof FileList)
+			if (!n)
+				return;
+			if (n instanceof FileList) {
+				if (!this.$refs.upload) {
+					return;
+				}
 				return this.$refs.upload.files = n;
+			}
 
 			const dt = new DataTransfer();
 			const dms = [];
