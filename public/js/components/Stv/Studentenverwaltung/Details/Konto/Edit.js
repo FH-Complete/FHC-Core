@@ -81,6 +81,8 @@ export default {
 					v-model="data.buchungsdatum"
 					name="buchungsdatum"
 					label="Buchungsdatum"
+					:enable-time-picker="false"
+					auto-apply
 					>
 				</form-input>
 				<form-input
