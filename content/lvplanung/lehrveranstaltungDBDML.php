@@ -188,6 +188,29 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz, $oe_ar
 	return $ret;
 }
 
+/**
+ * Liefert zurück, ob Mitarbeiter ein echtes Dienstverhältnis hat.
+ *
+ * @param $mitarbeiter_uid
+ * @param $studiensemester_kurzbz
+ * @return int|null
+ */
+function hasEchtesDienstverhaeltnis($mitarbeiter_uid, $studiensemester_kurzbz)
+{
+	if(defined('DIENSTVERHAELTNIS_SUPPORT') && DIENSTVERHAELTNIS_SUPPORT)
+	{
+		$mitarbeiter = new mitarbeiter();
+
+		// Echte Dienstverhältisse ermitteln
+		$mitarbeiter->getDienstverhaeltnisse($studiensemester_kurzbz, 'echterdv', $mitarbeiter_uid);
+
+		return count($mitarbeiter->result) > 0;
+	}
+
+	// kein DV support
+	return null;
+}
+
 if(!$error)
 {
 	if(!empty($_POST['lehrveranstaltung']))
@@ -302,7 +325,6 @@ if(!$error)
 					//Wenn ja dann ein Warning zurueckliefern
 					$ma = new mitarbeiter();
 					$ma->load($lem->mitarbeiter_uid);
-					$fixangestellt=$ma->fixangestellt;
 
 					$oe_obj = new organisationseinheit();
 					$stunden_oe_kurzbz=null;
@@ -310,15 +332,18 @@ if(!$error)
 					$stg_obj = new studiengang();
 					$stg_obj->load($lva->studiengang_kz);
 
+					//Summe der Stunden ermitteln
+					$le = new lehreinheit();
+					$le->load($lem->lehreinheit_id);
+
+					$hasEchtesDv = hasEchtesDienstverhaeltnis($lem->mitarbeiter_uid, $le->studiensemester_kurzbz);
+					$fixangestellt = is_bool($hasEchtesDv) ? $hasEchtesDv : $ma->fixangestellt;
+
 					//Maximale Stundenanzahl ermitteln
 					if($fixangestellt)
 						list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, true);
 					else
 						list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, false);
-
-					//Summe der Stunden ermitteln
-					$le = new lehreinheit();
-					$le->load($lem->lehreinheit_id);
 
 					if($lem->bismelden==false)
 						$neue_stunden_eingerechnet=false;
@@ -545,7 +570,7 @@ if(!$error)
 
 				$fixangestellt=false;
 				//"lehre" Stundensatz aus hr.tbl_stundensatz holen
-				
+
 				$studiensemester = new studiensemester();
 				if (!$studiensemester->load($_POST['studiensemester_kurzbz']))
 				{
@@ -559,38 +584,12 @@ if(!$error)
 					$mitarbeiter = new mitarbeiter();
 					if ($mitarbeiter->load($_POST['mitarbeiter_uid']))
 					{
-						$fixangestellt = $mitarbeiter->fixangestellt;
-						
+						$hasEchtesDv = hasEchtesDienstverhaeltnis($mitarbeiter->uid, $studiensemester->studiensemester_kurzbz);
+						$fixangestellt = is_bool($hasEchtesDv) ? $hasEchtesDv > 0 : $mitarbeiter->fixangestellt;
+
 						$stundensatz = new stundensatz();
 						$stundensatz->getStundensatzDatum($mitarbeiter->uid, $studiensemester->start, $studiensemester->ende, 'lehre');
-						$lem->stundensatz = $stundensatz->stundensatz;
-						
-						if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
-							&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
-						{
-							$stsem = new studiensemester();
-							$stsem->load($semester_aktuell);
-							$bisverwendung = new bisverwendung();
-							
-							if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
-							{
-								$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
-								$bisverwendung->result[] = $bisverwendung;
-							}
-							
-							foreach($bisverwendung->result as $row_verwendung)
-							{
-								// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
-								// geliefert da dies im Vertrag inkludiert ist.
-								
-								if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
-								{
-									$fixangestellt = true;
-									$lem->stundensatz = '';
-									break;
-								}
-							}
-						}
+						$lem->stundensatz = is_bool($hasEchtesDv) && $hasEchtesDv ? '' : $stundensatz->stundensatz;
 					}
 					else
 					{
@@ -1576,7 +1575,7 @@ if(!$error)
 				$error = true;
 				$errormsg = 'Fehler beim Laden des Studiensemesters';
 			}
-			
+
 			if (!$error)
 			{
 				$mitarbeiter = new mitarbeiter();
@@ -1584,32 +1583,9 @@ if(!$error)
 				{
 					$stundensatz = new stundensatz();
 					$stundensatz->getStundensatzDatum($mitarbeiter->uid, $studiensemester->start, $studiensemester->ende, 'lehre');
-					$data = $stundensatz->stundensatz;
-					
-					if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
-						&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
-					{
-						$stsem = new studiensemester();
-						$stsem->load($semester_aktuell);
-						$bisverwendung = new bisverwendung();
-						if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
-						{
-							$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
-							$bisverwendung->result[] = $bisverwendung;
-						}
-						
-						foreach($bisverwendung->result as $row_verwendung)
-						{
-							
-							// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
-							// geliefert da dies im Vertrag inkludiert ist.
-							if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
-							{
-								$data = '';
-								break;
-							}
-						}
-					}
+					$hasEchtesDv = hasEchtesDienstverhaeltnis($mitarbeiter->uid, $studiensemester->studiensemester_kurzbz);
+					$data = is_bool($hasEchtesDv) && $hasEchtesDv ? '' : $stundensatz->stundensatz;
+
 					$return = true;
 				}
 				else

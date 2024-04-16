@@ -1987,5 +1987,75 @@ class mitarbeiter extends benutzer
 			return true;
 		}
 	}
+
+	/**
+	 * Holt alle Dienstverhaeltnisse des Mitarbeiters, optional für ein Studiensemester und/oder einen Vertragstyp.
+	 */
+	public function getDienstverhaeltnisse($studiensemester_kurzbz = null, $vertragsart_kurzbz = null, $uid = null)
+	{
+		if (is_null($uid))
+			$uid=$this->uid;
+
+		$qry = "";
+
+		if (isset($studiensemester_kurzbz))
+		{
+			$qry .= "
+				WITH semester_datum AS (
+					SELECT
+						start, ende
+					FROM
+						public.tbl_studiensemester
+					WHERE
+						studiensemester_kurzbz = ". $this->db_add_param($studiensemester_kurzbz)."
+				)
+			";
+		}
+
+		$qry .= "
+			SELECT
+				dienstverhaeltnis_id, mitarbeiter_uid, vertragsart_kurzbz, oe_kurzbz, von, bis
+			FROM
+				semester_datum CROSS JOIN
+				hr.tbl_dienstverhaeltnis dv
+			WHERE
+				dv.mitarbeiter_uid = ". $this->db_add_param($uid);
+
+		if (isset($studiensemester_kurzbz))
+		{
+			$qry .= "
+				AND (bis >= semester_datum.start OR bis IS NULL)
+				AND (von <= semester_datum.ende)";
+		}
+
+		if (isset($vertragsart_kurzbz))
+		{
+			if (!is_array($vertragsart_kurzbz)) $vertragsart_kurzbz = array($vertragsart_kurzbz);
+
+			$qry .= "
+				AND vertragsart_kurzbz IN (".$this->db_implode4SQL($vertragsart_kurzbz).")";
+		}
+
+		$qry .= "
+				ORDER BY
+					von, dienstverhaeltnis_id";
+
+		if ($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new StdClass();
+				$obj->dienstverhaeltnis_id = $row->dienstverhaeltnis_id;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->vertragsart_kurzbz = $row->vertragsart_kurzbz;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->von = $row->von;
+				$obj->bis = $row->bis;
+
+				$this->result []= $obj;
+			}
+			return true;
+		}
+	}
 }
 ?>
