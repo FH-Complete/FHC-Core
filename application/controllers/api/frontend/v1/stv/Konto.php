@@ -39,7 +39,8 @@ class Konto extends FHCAPI_Controller
 			'getBuchungstypen' => 'student/stammdaten:r', // alle?
 			'checkDoubles' => ['admin:r', 'assistenz:r'],
 			'insert' => ['admin:w', 'assistenz:w'],
-			'update' => ['admin:w', 'assistenz:w']
+			'update' => ['admin:w', 'assistenz:w'],
+			'delete' => ['admin:w', 'assistenz:w']
 		]);
 
 		// Load models
@@ -64,11 +65,12 @@ class Konto extends FHCAPI_Controller
 		$this->load->library('form_validation');
 
 		$person_id = $this->input->post('person_id');
-		if (!$person_id || !is_array($person_id))
+		if (!$person_id || !is_array($person_id)) {
 			$this->form_validation->set_rules('person_id', 'Person ID', 'required');
 
-		if (!$this->form_validation->run())
-			$this->terminateWithValidationErrors($this->form_validation->error_array());
+			if (!$this->form_validation->run())
+				$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
 
 
 		$studiengang_kz = $this->input->post('studiengang_kz');
@@ -251,14 +253,14 @@ class Konto extends FHCAPI_Controller
 		$result = [];
 		foreach ($person_ids as $person_id) {
 			$id = $this->KontoModel->insert(array_merge($data, ['person_id' => $person_id]));
-			if (isError($id))
+			if (isError($id)) {
 				$this->addError(getError($id), self::ERROR_TYPE_GENERAL);
-			else {
+			} else {
 				$data = $this->KontoModel->withAdditionalInfo()->load(getData($id));
 				if (isError($data))
 					$this->addError(getError($data), self::ERROR_TYPE_GENERAL);
 				else
-					$result[] = getData($data);
+					$result[] = current(getData($data));
 			}
 		}
 
@@ -326,5 +328,51 @@ class Konto extends FHCAPI_Controller
 		$result = $result->retval;
 
 		$this->terminateWithSuccess($result);
+	}
+
+	/**
+	 * Delete Buchung
+	 *
+	 * @return void
+	 */
+	public function delete()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('buchungsnr', 'Buchungsnr', 'required');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+
+		$buchungsnr = $this->input->post('buchungsnr');
+
+		$result = $this->KontoModel->load($buchungsnr);
+		#$result = $this->getDataOrTerminateWithError($result);
+		if (isError($result))
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		$result = $result->retval;
+
+		if (!$result)
+			$this->terminateWithError('buchung not found', self::ERROR_TYPE_GENERAL);
+
+		$_POST['studiengang_kz'] = current($result)->studiengang_kz;
+
+		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'has_permissions_for_stg[admin:rw,assistenz:rw]');
+
+		Events::trigger('konto_delete_validation', $this->form_validation);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+
+		Events::trigger('konto_delete', $buchungsnr);
+		
+		$result = $this->KontoModel->delete($buchungsnr);
+		#$this->getDataOrTerminateWithError($result);
+		if (isError($result))
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+
+		$this->terminateWithSuccess();
 	}
 }

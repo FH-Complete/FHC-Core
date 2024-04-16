@@ -25,6 +25,9 @@ export default {
 	edit(data) {
 		return this.$fhcApi.post('api/frontend/v1/stv/konto/update', data);
 	},
+	delete(buchungsnr) {
+		return this.$fhcApi.post('api/frontend/v1/stv/konto/delete', {buchungsnr});
+	},
 	getBuchungstypen() {
 		return this.$fhcApi.get('api/frontend/v1/stv/konto/getBuchungstypen');
 	}

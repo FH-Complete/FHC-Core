@@ -154,6 +154,19 @@ export default {
 					);
 					container.append(button);
 
+					button = document.createElement('button');
+					button.className = 'btn btn-outline-secondary';
+					button.innerHTML = '<i class="fa fa-trash"></i>';
+					button.addEventListener('click', () =>
+						this.$fhcAlert
+							.confirmDelete()
+							.then(result => result ? cell.getData().buchungsnr : Promise.reject({handled:true}))
+							.then(this.$fhcApi.factory.stv.konto.delete)
+							.then(() => cell.getRow().delete())
+							.catch(this.$fhcAlert.handleSystemError)
+					);
+					container.append(button);
+
 					return container;
 				},
 				frozen: true
@@ -182,7 +195,7 @@ export default {
 		updateData(data) {
 			if (!data)
 				return this.reload();
-			this.$refs.table.tabulator.updateData(data);
+			this.$refs.table.tabulator.updateOrAddData(data);
 		},
 		actionNew() {
 			this.$refs.new.open();
@@ -221,6 +234,7 @@ export default {
 			table-only
 			:side-menu="false"
 			:tabulator-options="tabulatorOptions"
+			reload
 			new-btn-show
 			new-btn-label="Buchung"
 			:new-btn-disabled="stg_kz === ''"
