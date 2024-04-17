@@ -16,9 +16,7 @@ class Notiz extends FHCAPI_Controller
 			'updateNotiz' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
 			'deleteNotiz' => ['admin:r', 'assistenz:r'],
 			'loadDokumente' => ['admin:r', 'assistenz:r'],
-			'getMitarbeiter' => ['admin:r', 'assistenz:r'],
-			'advanceStatus' => ['admin:r', 'assistenz:r'],
-			'confirmStatus' => ['admin:r', 'assistenz:r']
+			'getMitarbeiter' => ['admin:r', 'assistenz:r']
 		]);
 
 		//Load Models

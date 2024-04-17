@@ -14,7 +14,7 @@ export default {
 			ref="formc"
 			typeId="person_id"
 			:id="modelValue.person_id"
-			notizLayout="twoColumnsFormRight"
+			notizLayout="twoColumnsFormLeft"
 			:showErweitert="false"
 			:showDocument="false"
 			:showTinyMCE="false"
