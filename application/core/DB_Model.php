@@ -32,6 +32,9 @@ class DB_Model extends CI_Model
 	protected $pk;  	// Name of the PrimaryKey for DB-Update, Load, ...
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
 				// True if this table has a primary key that uses a sequence
+	//protected $paginationOptions; // $page and $page_size together in an associative array
+	protected $page;
+	protected $page_size;
 
 	private $executedQueryMetaData;
 	private $executedQueryListFields;
@@ -484,7 +487,7 @@ class DB_Model extends CI_Model
 		if (!is_numeric($start) || (is_numeric($start) && $start <= 0))
 			return error('The start parameter is not valid', EXIT_MODEL);
 
-		if (is_numeric($end) && $end > $start)
+		if (is_numeric($end))
 		{
 			$this->db->limit($start, $end);
 		}
@@ -1072,6 +1075,47 @@ class DB_Model extends CI_Model
 		}
 
 		return $udfs;
+	}
+
+	function addPagination( $page, $page_size, $maxPageCount=null)
+	{
+		if (isset($page) && is_numeric($page) && isset($page_size) && is_numeric($page_size) && $page > 0 && $page_size > 0) {
+			
+			if (isset($maxPageCount) && is_numeric($maxPageCount) && $maxPageCount > 0) {
+				$floatMaxPageCount = $maxPageCount / $page_size;
+				$floatMaxPageCount = ceil($floatMaxPageCount);
+				if($page > $floatMaxPageCount){
+					$page = $floatMaxPageCount;
+				}
+			}
+			// else if page is to big
+			$offset = (($page-1) * $page_size); 
+			$this->addLimit($page_size, $offset);
+
+		} else {
+			$this->addLimit($page_size);
+		}
+	}
+
+	function getMaxPageCount( $page_size, $params=null )
+	{
+		// we clone the original query, so we dont have to change the origial query
+		$instance_copy = clone $this;
+		$db_copy = clone $this->db;
+		$countSql = $db_copy->get_compiled_select($instance_copy->dbTable,false);
+		$countSql = "SELECT COUNT(*) FROM (". $countSql .") as count;";
+		
+		// calculating the maxPageCount and adding the pagination to the query
+		$num_rows_query_result = $instance_copy->execReadOnlyQuery($countSql, $params);
+		
+		if(isError($num_rows_query_result)){
+			return error($this->db->error(), EXIT_DATABASE);
+		}
+		$num_rows = getData($num_rows_query_result)[0]->count;
+		
+		
+		// ceil, to include remaining rows into the last page 
+		return $num_rows;
 	}
 }
 

@@ -213,6 +213,7 @@ class CmsLib
 			return $news;
 
 		$news = getData($news);
+		//var_dump($news->maxPageCount);
 		foreach ($news as $newsobj) {
 			if ($studiengang_kz && $edit && !$newsobj->studiengang_kz)
 				continue;

@@ -27,16 +27,7 @@ class News_model extends DB_Model
 		);
 	}
 
-	private function getMaxPageCount($page_size)
-	{
-		$this->addSelect(['Count(*)']);
-		$count = $this->load();
-		$count = hasData($count) ? getData($count)[0]->count : null;
-		$floatMaxPageCount = $count / $page_size;
 
-		// ceil, to include remaining rows into the last page 
-		return ceil($floatMaxPageCount);
-	}
 
 	/**
 	 * @param string            $sprache
@@ -53,20 +44,8 @@ class News_model extends DB_Model
 	 * 
 	 * @return stdObj
 	 */
-	public function getNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true)
+	public function getNewsWithContentQuery($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true)
 	{
-		if (isset($page) && is_numeric($page) && isset($page_size) && is_numeric($page_size) && $page > 0 && $page_size > 0) {
-
-			$maxPageCount = $this->getMaxPageCount($page_size);
-			if ($maxPageCount) {
-				$page = $page % $maxPageCount;
-			}
-			$offset = $page * $page_size;
-			$this->addLimit($page_size, $offset);
-
-		} else {
-			$this->addLimit($page_size);
-		}
 
 		$this->addOrder('datum', 'DESC');
 
@@ -124,9 +103,24 @@ class News_model extends DB_Model
 
 		$this->db->where($where, NULL, FALSE);
 
-		$sql = $this->db->get_compiled_select($this->dbTable);
+		// calculating the maxPageCount and adding pagination to the query
+		$maxPageCount = $this->getMaxPageCount($page_size, $params);
+		$this->addPagination($page, $page_size, $maxPageCount);
 
-		return $this->execQuery($sql, $params);
+		// creating the select query
+		$query = new stdClass();
+		$query->sql = $this->db->get_compiled_select($this->dbTable);
+		$query->params = $params;
+		$query->maxPageCount = $maxPageCount;
+		return $query;
+
+	}
+
+	function getNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true)
+	{
+		$query = $this->getNewsWithContentQuery($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $all, $mischen);
+		return $this->execReadOnlyQuery($query->sql, $query->params);
+
 	}
 
 }
