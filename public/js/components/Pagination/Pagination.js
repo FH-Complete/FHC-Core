@@ -10,7 +10,7 @@ export default {
     },
     page_size: {
       type: Number,
-      default: 10,
+      required: true,
     },
   },
   data() {
