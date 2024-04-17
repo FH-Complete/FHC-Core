@@ -1,5 +1,6 @@
 export default {
-  getNews: function (page = 1, pageSize = 10) {
+  getNews: function (page = 1) {
+    console.log("this is the page that was passed", page);
     const url =
       FHC_JS_DATA_STORAGE_OBJECT.app_root +
       FHC_JS_DATA_STORAGE_OBJECT.ci_router +
@@ -7,8 +8,14 @@ export default {
     return axios.get(url, {
       params: {
         page,
-        pageSize,
       },
     });
+  },
+  getNewsMaxPage: function () {
+    const url =
+      FHC_JS_DATA_STORAGE_OBJECT.app_root +
+      FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+      "/CisHtml/Cms/getNewsMaxPage";
+    return axios.get(url);
   },
 };
