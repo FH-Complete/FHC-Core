@@ -3559,7 +3559,7 @@ function StudentZeugnisDokumentArchivieren()
 			break;
 	}
 
-	// Speichern zum Anzeigen des Aktivierungsfortschritts
+	// Speichern zum Anzeigen des Archivierungsfortschritts
 	var labelalt = document.getElementById('student-zeugnis-button-archive').label;
 	document.getElementById('student-zeugnis-button-archive').label='Loading...';
 	var amountArchived = 0;
