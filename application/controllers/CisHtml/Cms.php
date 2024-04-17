@@ -29,7 +29,7 @@ class Cms extends FHC_Controller
 		$this->load->model('content/News_model', 'NewsModel');
 
 		// setting up the papgination_size
-		$this->pagination_size = 10;
+		$this->page_size = 10;
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -71,10 +71,17 @@ class Cms extends FHC_Controller
 
 	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
 	{
-		$page = intval($this->input->get('page', true));
-
-
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $this->pagination_size);
+		$get_page = intval($this->input->get('page', true));
+		$get_page_size = intval($this->input->get('page_size', true));
+		if ($get_page) {
+			$page = $get_page;
+		}
+		if ($get_page_size) {
+			$page_size = $get_page_size;
+		} else {
+			$page_size = $this->page_size;
+		}
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size);
 
 		if (isError($news)) {
 			echo json_encode(getError($news));
@@ -101,7 +108,7 @@ class Cms extends FHC_Controller
 			}
 		}
 		$all = $edit;
-		$query = $this->NewsModel->getNewsWithContentQuery(getSprache(), $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $this->pagination_size, $all, $mischen);
+		$query = $this->NewsModel->getNewsWithContentQuery(getSprache(), $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $this->page_size, $all, $mischen);
 		echo json_encode($query->maxPageCount);
 	}
 }

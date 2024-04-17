@@ -1,6 +1,5 @@
 export default {
-  getNews: function (page = 1) {
-    console.log("this is the page that was passed", page);
+  getNews: function (page = 1, page_size = 10) {
     const url =
       FHC_JS_DATA_STORAGE_OBJECT.app_root +
       FHC_JS_DATA_STORAGE_OBJECT.ci_router +
@@ -8,6 +7,7 @@ export default {
     return axios.get(url, {
       params: {
         page,
+        page_size,
       },
     });
   },

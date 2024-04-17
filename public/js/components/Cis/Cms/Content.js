@@ -12,14 +12,13 @@ export default {
   },
   methods: {
     loadNewPageContent: function (data) {
-      Vue.$fhcapi.Cms.getNews(data.page).then((result) => {
-        console.log("fetched url :", result.data);
+      Vue.$fhcapi.Cms.getNews(data.page, data.rows).then((result) => {
         this.content = result.data;
       });
     },
   },
   created() {
-    Vue.$fhcapi.Cms.getNews().then((result) => {
+    Vue.$fhcapi.Cms.getNews(1, 10).then((result) => {
       this.content = result.data;
     });
 
