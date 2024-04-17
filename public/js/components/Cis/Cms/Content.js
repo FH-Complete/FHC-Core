@@ -8,6 +8,7 @@ export default {
     return {
       content: null,
       maxPageCount: 0,
+      page_size: 10,
     };
   },
   methods: {
@@ -18,7 +19,7 @@ export default {
     },
   },
   created() {
-    Vue.$fhcapi.Cms.getNews(1, 10).then((result) => {
+    Vue.$fhcapi.Cms.getNews(1, this.page_size).then((result) => {
       this.content = result.data;
     });
 
@@ -27,7 +28,7 @@ export default {
     });
   },
   template: /*html*/ `
-    <pagination @page="loadNewPageContent" :maxPageCount="maxPageCount">
+    <pagination :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
     <div v-html="content"></div>
     </pagination>`,
 };
