@@ -5,7 +5,7 @@ import KontoEdit from "./Konto/Edit.js";
 
 // TODO(chris): Phrasen
 // TODO(chris): multi pers
-// TODO(chris): gegenb.(date) multi, löschen multi, best. multi(recht)
+// TODO(chris): best. multi(recht)
 
 export default {
 	components: {
@@ -24,7 +24,8 @@ export default {
 	data() {
 		return {
 			filter: false,
-			studiengang_kz: false
+			studiengang_kz: false,
+			counterdate: new Date()
 		};
 	},
 	computed: {
@@ -157,14 +158,19 @@ export default {
 					button = document.createElement('button');
 					button.className = 'btn btn-outline-secondary';
 					button.innerHTML = '<i class="fa fa-trash"></i>';
-					button.addEventListener('click', () =>
+					button.addEventListener('click', evt => {
+						evt.stopPropagation();
 						this.$fhcAlert
 							.confirmDelete()
 							.then(result => result ? cell.getData().buchungsnr : Promise.reject({handled:true}))
 							.then(this.$fhcApi.factory.stv.konto.delete)
-							.then(() => cell.getRow().delete())
-							.catch(this.$fhcAlert.handleSystemError)
-					);
+							.then(() => {
+								// TODO(chris): deleting a child also removes the siblings!
+								//cell.getRow().delete();
+								this.reload();
+							})
+							.catch(this.$fhcAlert.handleSystemError);
+					});
 					container.append(button);
 
 					return container;
@@ -195,10 +201,24 @@ export default {
 		updateData(data) {
 			if (!data)
 				return this.reload();
+			// TODO(chris): check children (!delete?, multiple children)
+			//this.$refs.table.tabulator.updateOrAddData(data.map(row => row.buchungsnr_verweis ? {buchungsnr:row.buchungsnr_verweis, _children:row} : row));
 			this.$refs.table.tabulator.updateOrAddData(data);
 		},
 		actionNew() {
 			this.$refs.new.open();
+		},
+		actionCounter(selected) {
+			this.$fhcApi
+				.factory.stv.konto.counter({
+					buchungsnr: selected.map(e => e.buchungsnr),
+					buchungsdatum: this.counterdate
+				})
+				.then(result => result.data)
+				.then(this.updateData)
+				.then(() => 'Daten wurden gespeichert')
+				.then(this.$fhcAlert.alertSuccess)
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	created() {
@@ -240,6 +260,29 @@ export default {
 			:new-btn-disabled="stg_kz === ''"
 			@click:new="actionNew"
 			>
+			<template #actions="{selected}">
+				<div class="input-group w-auto">
+					<form-input
+						type="DatePicker"
+						v-model="counterdate"
+						input-group
+						:enable-time-picker="false"
+						auto-apply
+						@cleared="counterdate = new Date()"
+						>
+					</form-input>
+					<button
+						class="btn btn-outline-secondary"
+						@click="actionCounter(selected)"
+						:disabled="!selected.length"
+						>
+						Gegenbuchen
+					</button>
+				</div>
+				<button v-if="config.showZahlungsbestaetigung" class="btn btn-outline-secondary" @click="actionDownloadPdfs">
+					<i class="fa fa-download"></i> Zahlungsbestaetigung
+				</button>
+			</template>
 		</core-filter-cmpt>
 		<konto-new ref="new" :config="config" @saved="updateData" :person-ids="personIds" :stg-kz="stg_kz"></konto-new>
 		<konto-edit ref="edit" :config="config" @saved="updateData"></konto-edit>
