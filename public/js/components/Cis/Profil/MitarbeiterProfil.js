@@ -30,7 +30,9 @@ export default {
   data() {
     return {
       showModal: false,
+      editDataFilter: null,
 
+      // tabulator options
       funktionen_table_options: {
         height: 300,
         layout: "fitColumns",
@@ -159,14 +161,20 @@ export default {
         // when modal was closed without submitting request
       }
       this.showModal = false;
+      this.editDataFilter = null;
     },
 
-    showEditProfilModal() {
+    showEditProfilModal(view) {
+      if (view) {
+        this.editDataFilter = view;
+      }
+
       this.showModal = true;
-      // after a state change, wait for the DOM updates to complete
       Vue.nextTick(() => {
         this.$refs.editModal.show();
       });
+
+      // after a state change, wait for the DOM updates to complete
     },
 
     fetchProfilUpdates: function () {
@@ -181,6 +189,11 @@ export default {
   },
 
   computed: {
+    filteredEditData() {
+      return this.editDataFilter
+        ? this.editData.data[this.editDataFilter]
+        : this.editData;
+    },
     profilInformation() {
       if (!this.data) {
         return {};
@@ -233,12 +246,11 @@ export default {
 
   template: /*html*/ ` 
   <div class="container-fluid text-break fhc-form"  >
-  
-    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" :title="$p.t('profil','profilBearbeiten')"></edit-profil>
+ 
+    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :title="$p.t('profil','profilBearbeiten')"></edit-profil>
           <div class="row">
-          
               <div  class="d-md-none col-12 ">
-             
+           
               <div class="row mb-3">
                 <div class="col">
                 <!-- MOBILE QUICK LINKS --> 
@@ -250,7 +262,7 @@ export default {
 
               <div class="row mb-3 ">
               <div class="col">
-              <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+              <button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                 <div class="row">
                   <div class="col-auto">
                     <i class="fa fa-edit"></i>
@@ -289,7 +301,7 @@ export default {
                      <div class="col">
                      
                      <!-- PROFIL INFORMATION -->
-                     <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
+                     <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
 
 
 		                 </div>
@@ -328,7 +340,14 @@ export default {
                       
                       <div class="card">
                           <div class="card-header">
-                            {{$p.t('profil','privateKontakte')}}
+                            <div class="row">
+                              <div @click="showEditProfilModal('Private_Kontakte')" class="col-auto" type="button">
+                                <i class="fa fa-edit"></i>
+                              </div>
+                              <div class="col">
+                                <span>{{$p.t('profil','privateKontakte')}}</span>
+                              </div>
+                            </div>
                           </div>
                           <div class="card-body ">
                             
@@ -351,9 +370,18 @@ export default {
                       <!-- PRIVATE ADRESSEN-->
 
                       <div class="card">
-                          <div class="card-header">{{$p.t('profil','privateAdressen')}}</div>
+                        <div class="card-header">
+                          <div class="row">
+                            <div @click="showEditProfilModal('Private_Adressen')" class="col-auto" type="button">
+                              <i class="fa fa-edit"></i>
+                            </div>
+                            <div class="col">
+                              <span>{{$p.t('profil','privateAdressen')}}</span>
+                            </div>
+                          </div>
+                          </div>
                             <div class="card-body">
-                            
+                           
                               <div class="gy-3 row ">
                                 <div v-for="element in data.adressen" class="col-12">
                                 <Adresse :data="element"></Adresse>
@@ -413,7 +441,7 @@ export default {
 
                 <div class="row d-none d-md-block ">
                 <div class="col mb-3">
-                <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                <button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                   <div class="row">
                     <div class="col-auto">
                       <i class="fa fa-edit"></i>

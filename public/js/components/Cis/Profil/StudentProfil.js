@@ -22,14 +22,16 @@ export default {
     RoleInformation,
     ProfilInformation,
     FetchProfilUpdates,
-    EditProfil
-
+    EditProfil,
   },
-  inject:['sortProfilUpdates','collapseFunction'],
+  inject: ["sortProfilUpdates", "collapseFunction"],
   data() {
     return {
       showModal: false,
       collapseIconBetriebsmittel: true,
+      editDataFilter: null,
+
+      // tabulator options
       zutrittsgruppen_table_options: {
         height: 200,
         layout: "fitColumns",
@@ -79,58 +81,62 @@ export default {
   },
 
   props: {
-    data:Object,
-    editData:Object,
+    data: Object,
+    editData: Object,
   },
   methods: {
-
-    fetchProfilUpdates: function(){
-      Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res)=>{
-        
-        if(!res.error){
-          this.data.profilUpdates = res.data?.length ? res.data.sort(this.sortProfilUpdates) : null ; 
+    fetchProfilUpdates: function () {
+      Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res) => {
+        if (!res.error) {
+          this.data.profilUpdates = res.data?.length
+            ? res.data.sort(this.sortProfilUpdates)
+            : null;
         }
       });
     },
-    
-    hideEditProfilModal: function(){
-      
+
+    hideEditProfilModal: function () {
       //? checks the editModal component property result, if the user made a successful request or not
-      if(this.$refs.editModal.result){
+      if (this.$refs.editModal.result) {
         Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
-        .then((request) =>{
-          if(!request.error){
-            this.data.profilUpdates = request.data;
-            this.data.profilUpdates.sort(this.sortProfilUpdates);
-            
-          }else{
-            console.log("Error when fetching profile updates: " +res.data);
-          }
-        })
-        .catch(err=>{
-          console.log(err);
-        });
-      }else{
+          .then((request) => {
+            if (!request.error) {
+              this.data.profilUpdates = request.data;
+              this.data.profilUpdates.sort(this.sortProfilUpdates);
+            } else {
+              console.log("Error when fetching profile updates: " + res.data);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
         // when modal was closed without submitting request
       }
-      this.showModal=false;
-     
+      this.showModal = false;
+      this.editDataFilter = null;
     },
 
-    showEditProfilModal() {
+    showEditProfilModal(view) {
+      if (view) {
+        this.editDataFilter = view;
+      }
       this.showModal = true;
       // after a state change, wait for the DOM updates to complete
-      Vue.nextTick(()=>{
+      Vue.nextTick(() => {
         this.$refs.editModal.show();
       });
-      
     },
-   
   },
 
   computed: {
- 
-   profilInformation() {
+    filteredEditData() {
+      return this.editDataFilter
+        ? this.editData.data[this.editDataFilter]
+        : this.editData;
+    },
+
+    profilInformation() {
       if (!this.data) {
         return {};
       }
@@ -142,13 +148,11 @@ export default {
         Anrede: this.data.anrede,
         Titel: this.data.titel,
         Postnomen: this.data.postnomen,
-        foto_sperre:this.data.foto_sperre,
-        foto:this.data.foto,
-
+        foto_sperre: this.data.foto_sperre,
+        foto: this.data.foto,
       };
     },
 
-   
     roleInformation() {
       if (!this.data) {
         return {};
@@ -164,36 +168,29 @@ export default {
         Gruppe: this.data.gruppe.trim(),
       };
     },
-
-    
   },
 
-  created(){
-
+  created() {
     //? sorts the profil Updates: pending -> accepted -> rejected
     this.data.profilUpdates?.sort(this.sortProfilUpdates);
   },
 
   mounted() {
-    this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
-    
+    this.$refs.betriebsmittelTable.tabulator.on("tableBuilt", () => {
       this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
-      
-  }) 
+    });
 
-  this.$refs.zutrittsgruppenTable.tabulator.on('tableBuilt', () => {
-  
-      this.$refs.zutrittsgruppenTable.tabulator.setData(this.data.zuttritsgruppen);
-      
-  }) 
-
-   
+    this.$refs.zutrittsgruppenTable.tabulator.on("tableBuilt", () => {
+      this.$refs.zutrittsgruppenTable.tabulator.setData(
+        this.data.zuttritsgruppen
+      );
+    });
   },
 
-  template:/*html*/ ` 
+  template: /*html*/ ` 
 
   <div class="container-fluid text-break fhc-form"  >
-  <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="$p.t('profil','profilBearbeiten')" ></edit-profil>
+  <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" title="$p.t('profil','profilBearbeiten')" ></edit-profil>
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
@@ -250,7 +247,7 @@ export default {
                     <div class="col">
                     
                     <!-- PROFIL INFORMATION -->
-                    <profil-information title="$p.t('profil','studentIn')" :data="profilInformation"></profil-information>
+                    <profil-information @showEditProfilModal="showEditProfilModal" title="$p.t('profil','studentIn')" :data="profilInformation"></profil-information>
 
 
                     </div>
@@ -290,7 +287,15 @@ export default {
                       
                       <div class="card">
                           <div class="card-header">
-                            {{$p.t('profil','privateKontakte')}}
+                          <div class="row">
+                              <div @click="showEditProfilModal('Private_Kontakte')" class="col-auto" type="button">
+                                <i class="fa fa-edit"></i>
+                              </div>
+                              <div class="col">
+                                <span>{{$p.t('profil','privateKontakte')}}</span>
+                              </div>
+                            </div>
+                            
                           </div>
                           <div class="card-body ">
                             
@@ -312,7 +317,16 @@ export default {
                     <!-- PRIVATE ADRESSEN-->
 
                     <div class="card">
-                        <div class="card-header">{{$p.t('profil','privateAdressen')}}</div>
+                        <div class="card-header">
+                        <div class="row">
+                              <div @click="showEditProfilModal('Private_Adressen')" class="col-auto" type="button">
+                                <i class="fa fa-edit"></i>
+                              </div>
+                              <div class="col">
+                                <span>{{$p.t('profil','privateAdressen')}}</span>
+                              </div>
+                            </div>
+                        </div>
                           <div class="card-body">
                           
                             <div class="gy-3 row ">
@@ -367,7 +381,7 @@ export default {
   
                 <div class="row d-none d-md-block">
                 <div class="col mb-3">
-                <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                <button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                   <div class="row">
                     <div class="col-2">
                       <i class="fa fa-edit"></i>

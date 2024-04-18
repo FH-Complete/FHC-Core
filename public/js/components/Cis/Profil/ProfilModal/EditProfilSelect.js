@@ -133,8 +133,12 @@ export default {
   created() {
     //? JSON parse and stringify are used to deep clone the objects
     this.properties = { ...this.list };
-    this.data = JSON.parse(JSON.stringify(this.list.data));
-    this.view = JSON.parse(JSON.stringify(this.list.view));
+    this.data = this.list.data
+      ? JSON.parse(JSON.stringify(this.list.data))
+      : null;
+    this.view = this.list.view
+      ? JSON.parse(JSON.stringify(this.list.view))
+      : null;
   },
   mounted() {},
 

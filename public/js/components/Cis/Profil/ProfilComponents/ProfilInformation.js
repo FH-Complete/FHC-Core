@@ -1,59 +1,70 @@
 export default {
+  props: {
+    title: {
+      type: String,
+    },
+    data: {
+      type: Object,
+    },
+  },
+  data() {
+    return {
+      FotoSperre: this.data.foto_sperre,
+    };
+  },
+  emits: ["showEditProfilModal"],
 
-    props:{
-        title:{
-            type:String,
-            
-        },
-        data:{
-            type:Object,
+  methods: {
+    sperre_foto_function() {
+      //TODO: refactor
+      if (!this.data) {
+        return;
+      }
+      Vue.$fhcapi.UserData.sperre_foto_function(!this.FotoSperre).then(
+        (res) => {
+          this.FotoSperre = res.data.foto_sperre;
         }
+      );
     },
-    data(){
-        return {
-            FotoSperre:this.data.foto_sperre,
+  },
+  computed: {
+    get_image_base64_src: function () {
+      if (!this.data.foto) {
+        return "";
+      }
+      return "data:image/jpeg;base64," + this.data.foto;
+    },
+    name: function () {
+      return { vorname: this.data.Vorname, nachname: this.data.Nachname };
+    },
+    profilInfo: function () {
+      let res = {};
+      let notIncludedProperties = [
+        "Vorname",
+        "Nachname",
+        "foto_sperre",
+        "foto",
+      ];
+      Object.keys(this.data).forEach((key) => {
+        if (!notIncludedProperties.includes(key)) {
+          res[key] = this.data[key];
         }
+      });
+      return res;
     },
-    
-    methods:{
-        
-        sperre_foto_function() {
-            //TODO: make this better
-            if (!this.data) {
-              return;
-            }
-            Vue.$fhcapi.UserData.sperre_foto_function(!this.FotoSperre).then((res) => {
-              this.FotoSperre = res.data.foto_sperre;
-            
-            });
-          },
-    },
-    computed:{
-        get_image_base64_src: function() {
-            if (!this.data.foto) {
-              return "";
-            }
-            return "data:image/jpeg;base64," + this.data.foto;
-          },
-        name: function(){
-            return {vorname:this.data.Vorname, nachname: this.data.Nachname};
-        },
-        profilInfo: function(){
-            let res = {};
-            let notIncludedProperties=["Vorname", "Nachname", "foto_sperre","foto"];
-            Object.keys(this.data).forEach((key)=>{
-                if(!notIncludedProperties.includes(key)){
-                    res[key] = this.data[key];
-                }
-            })
-            return res;
-        }
-    },
-    template: `
+  },
+  template: /*html*/ `
     
     <div class="card h-100">
     <div class="card-header">
-    {{title}}
+      <div class="row">
+        <div @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button">
+          <i class="fa fa-edit"></i>
+        </div>
+        <div class="col">
+          <span>{{title}}</span>
+        </div>
+      </div>
     </div>
     <div class="card-body">
     
@@ -134,5 +145,4 @@ export default {
     
     </div>
   </div>`,
-
 };
