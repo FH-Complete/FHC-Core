@@ -23,7 +23,7 @@ export default {
       this.content = result.data;
     });
 
-    Vue.$fhcapi.Cms.getNewsMaxPage().then((result) => {
+    Vue.$fhcapi.Cms.getNewsRowCount().then((result) => {
       this.maxPageCount = result.data;
     });
   },

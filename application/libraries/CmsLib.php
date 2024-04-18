@@ -174,6 +174,30 @@ class CmsLib
 	}
 
 	/**
+	 * @param string			$studiengang_kz
+	 * @param string			$semester
+	 * 
+	 * @return array			queried studiengang_kz and semester
+	 */
+	public function getStgAndSem($studiengang_kz, $semester)
+	{
+		$this->ci->load->model('crm/Student_model', 'StudentModel');
+
+		//Zum anzeigen der Studiengang-Details neben den News
+		$student = $this->ci->StudentModel->loadWhere(['student_uid' => getAuthUID()]);
+		if (isError($student))
+			return $student;
+		if (getData($student)) {
+			$student = current(getData($student));
+			if ($studiengang_kz === null)
+				$studiengang_kz = $student->studiengang_kz;
+			if ($semester === null)
+				$semester = $student->semester;
+		}
+		return [$studiengang_kz, $semester];
+	}
+
+	/**
 	 * @param boolean			$infoscreen
 	 * @param string | null		$studiengang_kz
 	 * @param int | null		$semester
@@ -186,22 +210,7 @@ class CmsLib
 	 */
 	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10)
 	{
-		$this->ci->load->model('crm/Student_model', 'StudentModel');
-		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
-
-		if (!$infoscreen && ($studiengang_kz === null || $semester === null)) {
-			//Zum anzeigen der Studiengang-Details neben den News
-			$student = $this->ci->StudentModel->loadWhere(['student_uid' => get_uid()]);
-			if (isError($student))
-				return $student;
-			if (getData($student)) {
-				$student = current(getData($student));
-				if ($studiengang_kz === null)
-					$studiengang_kz = $student->studiengang_kz;
-				if ($semester === null)
-					$semester = $student->semester;
-			}
-		}
+		list($studiengang_kz, $semester) = $this->getStgAndSem($studiengang_kz, $semester);
 		$all = $edit;
 
 		$xml = '<?xml version="1.0" encoding="UTF-8"?><content>';

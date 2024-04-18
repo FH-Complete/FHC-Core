@@ -11,11 +11,11 @@ export default {
       },
     });
   },
-  getNewsMaxPage: function () {
+  getNewsRowCount: function () {
     const url =
       FHC_JS_DATA_STORAGE_OBJECT.app_root +
       FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-      "/CisHtml/Cms/getNewsMaxPage";
+      "/CisHtml/Cms/getNewsRowCount";
     return axios.get(url);
   },
 };
