@@ -1077,18 +1077,26 @@ class DB_Model extends CI_Model
 		return $udfs;
 	}
 
-	function addPagination( $page, $page_size, $maxPageCount=null)
+	/**
+	 * addPagination
+	 * adds a limit and an optional offset depending on the arguments passed to the function
+	 * @param   int $page	page to be queried
+	 * @param   int $page_size	page_size used to calculate the offset of the pagination
+	 * @param   int | null $num_rows	used to calculate the total amout of pages that are available with the $page and $page_size arguments
+	 * 
+	 * @return	void
+	 */
+	function addPagination( $page, $page_size, $num_rows=null)
 	{
 		if (isset($page) && is_numeric($page) && isset($page_size) && is_numeric($page_size) && $page > 0 && $page_size > 0) {
 			
-			if (isset($maxPageCount) && is_numeric($maxPageCount) && $maxPageCount > 0) {
-				$floatMaxPageCount = $maxPageCount / $page_size;
-				$floatMaxPageCount = ceil($floatMaxPageCount);
-				if($page > $floatMaxPageCount){
-					$page = $floatMaxPageCount;
+			if (isset($num_rows) && is_numeric($num_rows) && $num_rows > 0) {
+				$floatMaxPageCount = $num_rows / $page_size;
+				$maxPageCount = ceil($floatMaxPageCount);
+				if($page > $maxPageCount){
+					$page = $maxPageCount;
 				}
 			}
-			// else if page is to big
 			$offset = (($page-1) * $page_size); 
 			$this->addLimit($page_size, $offset);
 
@@ -1097,25 +1105,22 @@ class DB_Model extends CI_Model
 		}
 	}
 
-	function getMaxPageCount( $page_size, $params=null )
+	/**
+	 * getQueryNumRows
+	 * returns the number of rows of the current build query of the codeigniter query builder instance
+	 * @param   bool $reset	resets the select of the query 
+	 * 
+	 * @return	Result_object $num_rows
+	 */
+	function getNumRows($reset=false)
 	{
-		// we clone the original query, so we dont have to change the origial query
-		$instance_copy = clone $this;
-		$db_copy = clone $this->db;
-		$countSql = $db_copy->get_compiled_select($instance_copy->dbTable,false);
-		$countSql = "SELECT COUNT(*) FROM (". $countSql .") as count;";
-		
-		// calculating the maxPageCount and adding the pagination to the query
-		$num_rows_query_result = $instance_copy->execReadOnlyQuery($countSql, $params);
-		
-		if(isError($num_rows_query_result)){
+		// returns the number of rows when executing the current query without reseting the select statement of the query
+		$num_rows = $this->db->count_all_results($this->dbTable,$reset);
+		if($num_rows){
+			return success($num_rows);
+		}else{
 			return error($this->db->error(), EXIT_DATABASE);
 		}
-		$num_rows = getData($num_rows_query_result)[0]->count;
-		
-		
-		// ceil, to include remaining rows into the last page 
-		return $num_rows;
 	}
 }
 

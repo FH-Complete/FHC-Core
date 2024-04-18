@@ -84,31 +84,30 @@ class Cms extends FHC_Controller
 		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size);
 
 		if (isError($news)) {
-			echo json_encode(getError($news));
+			$this->terminateWithJsonError(getError($news));
 		}
-		echo json_encode(getData($news));
+		$news = hasData($news) ? getData($news) : null;
+		if ($news) {
+			echo json_encode($news);
+		} else {
+			show_error("News: No data found");
+		}
+
 	}
 
-	public function getNewsMaxPage($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $fachbereich_kurzbz = null, $maxalter = 0, $edit = false, $sichtbar = true, $page = 1, $page_size = 10)
+	public function getNewsRowCount($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $fachbereich_kurzbz = null, $maxalter = 0, $edit = false, $sichtbar = true, $page = 1, $page_size = 10)
 	{
-		$this->load->model('crm/Student_model', 'StudentModel');
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-
-		if (!$infoscreen && ($studiengang_kz === null || $semester === null)) {
-			//Zum anzeigen der Studiengang-Details neben den News
-			$student = $this->StudentModel->loadWhere(['student_uid' => get_uid()]);
-			if (isError($student))
-				return $student;
-			if (getData($student)) {
-				$student = current(getData($student));
-				if ($studiengang_kz === null)
-					$studiengang_kz = $student->studiengang_kz;
-				if ($semester === null)
-					$semester = $student->semester;
-			}
-		}
+		list($studiengang_kz, $semester) = $this->cmslib->getStgAndSem($studiengang_kz, $semester);
 		$all = $edit;
-		$query = $this->NewsModel->getNewsWithContentQuery(getSprache(), $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $this->page_size, $all, $mischen);
-		echo json_encode($query->maxPageCount);
+		$num_rows = $this->NewsModel->countNewsWithContent(getSprache(), $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $this->page_size, $all, $mischen);
+		if (isError($num_rows)) {
+			$this->terminateWithJsonError(getError($num_rows));
+		}
+		$num_rows = hasData($num_rows) ? getData($num_rows) : null;
+		if ($num_rows) {
+			echo json_encode($num_rows);
+		} else {
+			show_error("News number rows: No data found");
+		}
 	}
 }
