@@ -111,6 +111,11 @@ export default{
 			filteredStandorte: null
 		}
 	},
+	watch: {
+		uid(){
+			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Kontakt/getKontakte/' + this.uid);
+		}
+	},
 	methods:{
 		actionNewContact(){
 			this.$refs.newContactModal.show();

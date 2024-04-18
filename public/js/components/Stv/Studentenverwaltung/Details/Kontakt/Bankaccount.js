@@ -114,6 +114,11 @@ export default{
 			}
 		}
 	},
+	watch: {
+		uid(){
+			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Kontakt/getBankverbindung/' + this.uid);
+		}
+	},
 	methods:{
 		actionNewBankverbindung(){
 			this.$refs.newBankverbindungModal.show();
