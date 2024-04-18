@@ -84,6 +84,9 @@ export default {
 				this.deltaArray = delta;
 			},
 			deep: true
+		},
+		modelValue(n){
+			this.loadPrestudent(n);
 		}
 	},
 

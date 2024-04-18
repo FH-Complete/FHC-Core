@@ -168,6 +168,11 @@ export default{
 			}, {}));
 		}
 	},
+	watch: {
+		uid(){
+			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Kontakt/getAdressen/' + this.uid);
+		}
+	},
 	methods:{
 		actionNewAdress(){
 			this.$refs.newAdressModal.show();
@@ -265,9 +270,6 @@ export default{
 				.then(result => {
 					this.filteredFirmen = result.data.retval;
 				});
-		},
-		reload(){
-			this.$refs.table.reloadTable();
 		},
 		hideModal(modalRef){
 			this.$refs[modalRef].hide();

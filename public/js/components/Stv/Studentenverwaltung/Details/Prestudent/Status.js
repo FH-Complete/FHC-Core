@@ -233,6 +233,9 @@ export default{
 				const start = this.status_kurzbz;
 			},
 			deep: true
+		},
+		prestudent_id(){
+			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.prestudent_id);
 		}
 	},
 	methods: {

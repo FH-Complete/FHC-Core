@@ -137,6 +137,11 @@ export default {
 			filteredInventar: []
 		}
 	},
+	watch: {
+		uid(){
+			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Betriebsmittel/getAllBetriebsmittel/' + this.uid + '/' + this.person_id);
+		}
+	},
 	methods: {
 		actionEditBetriebsmittel(betriebsmittelperson_id){
 			this.statusNew = false;

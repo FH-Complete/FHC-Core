@@ -2,15 +2,28 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DateTime as DateTime;
 
-class Notiz extends FHC_Controller
+class Notiz extends FHCAPI_Controller
 {
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct([
+			'getUid' => ['admin:r', 'assistenz:r'],
+			'getNotizen' => ['admin:r', 'assistenz:r'],
+			'loadNotiz' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'addNewNotiz' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'updateNotiz' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'deleteNotiz' => ['admin:r', 'assistenz:r'],
+			'loadDokumente' => ['admin:r', 'assistenz:r'],
+			'getMitarbeiter' => ['admin:r', 'assistenz:r']
+		]);
+
+		//Load Models
+		$this->load->model('person/Notiz_model', 'NotizModel');
+		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
 
 		// Load Libraries
-		$this->load->library('AuthLib');
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 
 		// Load language phrases
@@ -21,19 +34,11 @@ class Notiz extends FHC_Controller
 
 	public function getUid()
 	{
-		// Load Libraries
-		$this->load->library('AuthLib');
-		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
-		$result = getAuthUid();
-
-		$this->outputJsonError($result);
+		$this->terminateWithSuccess(getAuthUID());
 	}
 
 	public function getNotizen($id, $type)
 	{
-		$this->load->model('person/Notiz_model', 'NotizModel');
-		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
-
 		//check if valid type
 		$isValidType = $this->NotizzuordnungModel->isValidType($type);
 
@@ -42,23 +47,23 @@ class Notiz extends FHC_Controller
 			$result = $this->NotizModel->getNotizWithDocEntries($id, $type);
 
 			if (isError($result)) {
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				$this->outputJson(getError($result));
-			} else {
-				$this->outputJson(getData($result) ?: []);
+				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 			}
+			return $this->terminateWithSuccess(getData($result) ?: []);
 		}
 		else
 		{
-			//Todo manu (phrases, response?)
-			$result = "datatype not yet implemented for notes";
-			$this->outputJson(getError($result));
+			return $this->terminateWithError("type not valid", self::ERROR_TYPE_GENERAL);
 		}
 	}
 
-	public function loadNotiz($notiz_id)
+	public function loadNotiz()
 	{
-		$this->load->model('person/Notiz_model', 'NotizModel');
+		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+
+		$notiz_id = $this->input->post('notiz_id');
+
+		//$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->NotizModel->addJoin('public.tbl_notiz_dokument', 'notiz_id', 'LEFT');
 		$this->NotizModel->addSelect('*');
 		$this->NotizModel->addSelect("TO_CHAR(CASE WHEN public.tbl_notiz.updateamum >= public.tbl_notiz.insertamum 
@@ -68,23 +73,23 @@ class Notiz extends FHC_Controller
 		$result = $this->NotizModel->loadWhere(
 			array('notiz_id' => $notiz_id)
 		);
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson($result);
+		if (isError($result))
+		{
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-
-		elseif (!hasData($result)) {
-			$this->outputJson($result);
+		elseif (!hasData($result))
+		{
+			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=>'Notiz_id']), self::ERROR_TYPE_GENERAL);
 		}
 		else
 		{
-			$this->outputJsonSuccess(current(getData($result)));
+			$this->terminateWithSuccess(current(getData($result)));
 		}
 	}
 
 	public function addNewNotiz($id, $paramTyp = null)
 	{
-		$this->load->model('person/Notiz_model', 'NotizModel');
+		//$this->load->model('person/Notiz_model', 'NotizModel');
 
 		$this->load->library('DmsLib');
 		$this->load->library('form_validation');
@@ -101,12 +106,17 @@ class Notiz extends FHC_Controller
 		}
 
 		//Form Validation
-		$this->form_validation->set_rules('titel', 'titel', 'callback_titel_required');
-		$this->form_validation->set_rules('text', 'text', 'callback_text_required');
+		$this->form_validation->set_rules('titel', 'Titel', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Titel'])
+		]);
+
+		$this->form_validation->set_rules('text', 'Text', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Text'])
+		]);
 
 		if ($this->form_validation->run() == false)
 		{
-			return $this->outputJsonError($this->form_validation->error_array());
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
 		$titel = $this->input->post('titel');
@@ -115,15 +125,14 @@ class Notiz extends FHC_Controller
 		$verfasser_uid = isset($_POST['verfasser']) ? $_POST['verfasser'] : $uid;
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : null;
 		$type = $this->input->post('typeId');
-		$start = $this->input->post('Von');
-		$ende = $this->input->post('Bis');
+		$start = $this->input->post('start');
+		$ende = $this->input->post('ende');
 
 		//Speichern der Notiz und Notizzuordnung inkl Prüfung ob valid type
 		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 		$notiz_id = $result->retval;
 
@@ -141,12 +150,12 @@ class Notiz extends FHC_Controller
 			);
 
 			//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
+			//Todo(manu)check name files: nicht gleiches file 2mal hochladen
 			$result = $this->dmslib->upload($dms, $k, ['*']);
-/*			$result = $this->dmslib->upload($dms, $k, ['application/pdf','application/x.fhc-dms+json']);*/
+			/*			$result = $this->dmslib->upload($dms, $k, ['application/pdf','application/x.fhc-dms+json']);*/
 			if (isError($result))
 			{
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson(getError($result));
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 			}
 			$dms_id_arr[] = $result->retval['dms_id'];
 		}
@@ -161,20 +170,16 @@ class Notiz extends FHC_Controller
 				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
 				if (isError($result))
 				{
-					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-					return $this->outputJson(getError($result));
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
 			}
 		}
 
-		return $this->outputJsonSuccess(true);
+		return $this->terminateWithSuccess($result);
 	}
 
-	public function updateNotiz($notiz_id)
+	public function updateNotiz()
 	{
-		$this->load->model('person/Notiz_model', 'NotizModel');
-		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
-
 		$this->load->library('form_validation');
 		$this->load->library('DmsLib');
 
@@ -187,18 +192,25 @@ class Notiz extends FHC_Controller
 			}
 		}
 
+		$notiz_id = $this->input->post('notiz_id');
+
 		if(!$notiz_id)
 		{
-			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError($this->p->t('ui','error_missingId',['id'=>'Notiz_id']), self::ERROR_TYPE_GENERAL);
 		}
 
 		//Form Validation
-		$this->form_validation->set_rules('titel', 'titel', 'callback_titel_required');
-		$this->form_validation->set_rules('text', 'text', 'callback_text_required');
+		$this->form_validation->set_rules('titel', 'Titel', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Titel'])
+		]);
+
+		$this->form_validation->set_rules('text', 'Text', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Text'])
+		]);
 
 		if ($this->form_validation->run() == false)
 		{
-			return $this->outputJsonError($this->form_validation->error_array());
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
 		//update Notiz
@@ -208,9 +220,8 @@ class Notiz extends FHC_Controller
 		$verfasser_uid = $this->input->post('verfasser');
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : $uid;
 		$erledigt = $this->input->post('erledigt');
-		//$type = $this->input->post('typeId'); //soll auch dieser geändert werden können?
-		$start = $this->input->post('von');
-		$ende = $this->input->post('bis');
+		$start = $this->input->post('start');
+		$ende = $this->input->post('ende');
 
 		$result = $this->NotizModel->update(
 			[
@@ -230,8 +241,7 @@ class Notiz extends FHC_Controller
 		);
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 
 		//update(1) laden aller bereits mit dieser notiz_id verknüpften DMS-Einträge
@@ -242,8 +252,7 @@ class Notiz extends FHC_Controller
 		$result = $this->NotizdokumentModel->loadWhere(array('notiz_id' => $notiz_id));
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 		elseif (!hasData($result))
 		{
@@ -256,7 +265,7 @@ class Notiz extends FHC_Controller
 				$dms_id_arr[] = array(
 					'name' => $doc->name,
 					'dms_id' => $doc->dms_id
-					);
+				);
 			}
 		}
 
@@ -281,20 +290,19 @@ class Notiz extends FHC_Controller
 				);
 
 				//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
+				//Todo(manu)check name files: nicht gleiches file 2mal hochladen
 				$result = $this->dmslib->upload($dms, $k, array('*'));
 
 				if (isError($result))
 				{
-					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-					return $this->outputJson(getError($result));
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
 				$dms_id = $result->retval['dms_id'];
 
 				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
 				if (isError($result))
 				{
-					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-					return $this->outputJson(getError($result));
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
 			}
 		}
@@ -302,11 +310,18 @@ class Notiz extends FHC_Controller
 		//update(3) check if Dateien gelöscht wurden
 		if(count($dms_uploaded) != count($dms_id_arr))
 		{
-			$upload_new_names = array_column($dms_uploaded, "name");
+			if (count($dms_uploaded) == 0)
+			{
+				$filesDeleted = $dms_id_arr;
+			}
+			else
+			{
+				$upload_new_names = array_column($dms_uploaded, "name");
 
-			$filesDeleted = array_filter($dms_id_arr, function ($file) use ($upload_new_names) {
-				return !in_array($file["name"], $upload_new_names);
-			});
+				$filesDeleted = array_filter($dms_id_arr, function ($file) use ($upload_new_names) {
+					return !in_array($file["name"], $upload_new_names);
+				});
+			}
 
 			foreach ($filesDeleted as $file)
 			{
@@ -314,18 +329,20 @@ class Notiz extends FHC_Controller
 
 				if (isError($result))
 				{
-					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-					return $this->outputJson(getError($result));
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
 				else
 					$this->outputJson($result);
 			}
 		}
-		return $this->outputJsonSuccess(true);
+		return $this->terminateWithSuccess($result);
 	}
 
-	public function deleteNotiz($notiz_id)
+	public function deleteNotiz()
 	{
+		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+		$notiz_id = $this->input->post('notiz_id');
+
 		//dms_id auslesen aus notizdokument wenn vorhanden
 		$dms_id_arr = [];
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
@@ -334,17 +351,13 @@ class Notiz extends FHC_Controller
 
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		elseif (!hasData($result))
-		{
-			$this->outputJson($result);
-		}
-		else
+
+		if(hasData($result))
 		{
 			$result = getData($result);
-			foreach($result as $doc) {
+			foreach ($result as $doc) {
 				$dms_id_arr[] = $doc->dms_id;
 			}
 		}
@@ -358,15 +371,13 @@ class Notiz extends FHC_Controller
 
 				if (isError($result))
 				{
-					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-					return $this->outputJson(getError($result));
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
-				else
-					$this->outputJson($result);
+
+				$this->outputJson($result);
 			}
 		}
 
-		//Todo(manu) rollback?
 		//delete Notiz und Notizzuordnung
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->NotizModel->addJoin('public.tbl_notizzuordnung', 'notiz_id');
@@ -377,20 +388,20 @@ class Notiz extends FHC_Controller
 
 		if (isError($result))
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson($result);
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		elseif (!hasData($result)) {
-			$this->outputJson($result);
+		if(!hasData($result))
+		{
+			return $this->terminateWithError($this->p->t('ui','error_missingId', ['id'=> 'Notiz_id']), self::ERROR_TYPE_GENERAL);
 		}
 
-		return $this->outputJsonSuccess(current(getData($result)));
+		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
-	public function loadDokumente($notiz_id)
+	public function loadDokumente()
 	{
-		$this->load->model('person/Notiz_model', 'NotizModel');
-
+		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+		$notiz_id = $this->input->post('notiz_id');
 
 		$this->NotizModel->addSelect('campus.tbl_dms_version.*');
 
@@ -401,51 +412,24 @@ class Notiz extends FHC_Controller
 			array('public.tbl_notiz.notiz_id' => $notiz_id)
 		);
 		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson($result);
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 
-		elseif (!hasData($result)) {
-			$this->outputJson($result);
-		}
-		else
+		if(!hasData($result))
 		{
-			$this->outputJsonSuccess(getData($result));
+			return $this->terminateWithError($this->p->t('ui','error_missingId', ['id'=> 'Notiz_id']), self::ERROR_TYPE_GENERAL);
 		}
+		return $this->terminateWithSuccess(getData($result));
 	}
 
 	public function getMitarbeiter($searchString)
 	{
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
-
 		$result = $this->MitarbeiterModel->searchMitarbeiter($searchString);
 		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		$this->outputJson($result);
+		return $this->terminateWithSuccess($result);
 	}
 
-	public function titel_required($value)
-	{
-		if (empty($value)) {
-			$this->form_validation->set_message('titel_required', $this->p->t('ui', 'error_fieldRequired', ['field' => 'Titel']));
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
-
-	public function text_required($value)
-	{
-		if (empty($value)) {
-			$this->form_validation->set_message('text_required', $this->p->t('ui', 'error_fieldRequired', ['field' => 'Text']));
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
 }

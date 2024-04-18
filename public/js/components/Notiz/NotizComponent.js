@@ -1,9 +1,10 @@
 import VueDatePicker from '../vueDatepicker.js.php';
 import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import FormUploadDms from '../Form/Upload/Dms.js';
-import {CoreRESTClient} from "../../RESTClient";
 import {CoreFilterCmpt} from "../filter/Filter.js";
 import BsModal from "../Bootstrap/Modal";
+import FormForm from '../Form/Form.js';
+import FormInput from '../Form/Input.js';
 
 
 export default {
@@ -12,109 +13,226 @@ export default {
 		VueDatePicker,
 		PvAutoComplete,
 		FormUploadDms,
+		FormForm,
+		FormInput,
 		BsModal
 	},
 	props: [
 		'typeId',
 		'id',
+		'notizLayout',
 		'showErweitert',
 		'showDocument',
-		'showTinyMCE'
+		'showTinyMCE',
+		'visibleColumns'
 		],
 	data(){
-		return {
-			tabulatorOptions: {
-				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.id + '/' + this.typeId),
-				columns: [
-					{title: "Titel", field: "titel"},
-					{title: "Text", field: "text_stripped", width: 250},
-					{title:  "VerfasserIn", field: "verfasser_uid"},
-					{title: "BearbeiterIn", field: "bearbeiter_uid", visible: false},
-					{title: "Start", field: "start", visible: false},
-					{title: "Ende", field: "ende", visible: false},
-					{title: "Dokumente", field: "countdoc"},
-					{title: "Erledigt", field: "erledigt", visible: false},
-					{title: "Notiz_id", field: "notiz_id", visible: false},
-					{title: "Notizzuordnung_id", field: "notizzuordnung_id", visible: false},
-					{title: "letzte Änderung", field: "lastupdate", visible: false},
-					{title: 'Aktionen', field: 'actions',
-						minWidth: 150, // Ensures Action-buttons will be always fully displayed
-						formatter: (cell, formatterParams, onRendered) => {
-							let container = document.createElement('div');
-							container.className = "d-flex gap-2";
+			return {
+				tabulatorOptions: {
+					ajaxURL: 'api/frontend/v1/stv/Notiz/getNotizen/' + this.id + '/' + this.typeId,
+					ajaxRequestFunc: this.$fhcApi.get,
+					ajaxResponse: (url, params, response) => response.data,
+					//ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.id + '/' + this.typeId),
+					columns: [
+						{
+							title: "Titel",
+							field: "titel",
+							width: 100,
+							visible: true,
+							tooltip:function(e, cell, onRendered){
+								var el = document.createElement("div");
+								el.style.backgroundColor = "white";
+								el.style.fontWeight = "bold";
+								el.style.padding = "5px";
+								el.style.border = "1px solid black";
 
-							let button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.addEventListener(
-								'click',
-								(event) =>
-								this.actionEditNotiz(cell.getData().notiz_id)
-							);
-							container.append(button);
+								el.innerText = cell.getColumn().getField() + " - " + cell.getValue();
 
-							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.addEventListener(
-								'click',
-								() =>
-								this.actionDeleteNotiz(cell.getData().notiz_id)
-							);
-							container.append(button);
-
-							return container;
+								return el;
+							},
 						},
-						frozen: true
-				}],
-				layout: 'fitColumns',
-				layoutColumnsOnNewData: false,
-				height: '150',
-				selectableRangeMode: 'click',
-				selectable: true,
-				index: 'notiz_id'
-			},
-			tabulatorEvents: [],
-			notizen: [],
-			multiupload: true,
-			mitarbeiter: [],
-			filteredMitarbeiter: [],
-			zwischenvar: '',
-			editorInitialized: false,
-			editor: null,
-			notizData: {
-				typeId: this.typeId,
-				titel: null,
-				statusNew: true,
-				text: null,
-				lastChange: null,
-				von: null,
-				bis: null,
-				document: null,
-				erledigt: false,
-				verfasser: null,
-				bearbeiter: null,
-				anhang: []
-			},
-		};
+						{
+							title: "Text",
+							field: "text_stripped",
+							width: 250,
+							visible: true,
+							tooltip:function(e, cell, onRendered){
+								var el = document.createElement("div");
+								el.style.backgroundColor = "white";
+								el.style.fontWeight = "bold";
+								el.style.padding = "5px";
+								el.style.border = "1px solid black";
+								el.style.borderRadius = "5px";
+
+								el.innerText = cell.getValue();
+
+								return el;
+							},
+						},
+						{title: "VerfasserIn", field: "verfasser_uid", width: 124, visible: false},
+						{title: "BearbeiterIn", field: "bearbeiter_uid", width: 126, visible: false},
+						{title: "Start", field: "start_format", width: 86, visible: false},
+						{title: "Ende", field: "ende_format", width: 86, visible: false},
+						{title: "Dokumente", field: "countdoc", width: 100, visible: false},
+						{
+							title: "Erledigt",
+							field: "erledigt",
+							width: 97,
+							visible: false,
+							formatter:"tickCross",
+							hozAlign:"center",
+							formatterParams: {
+								tickElement: '<i class="fa fa-check text-success"></i>',
+								crossElement: '<i class="fa fa-xmark text-danger"></i>'
+							}
+						},
+						{title: "Notiz_id", field: "notiz_id", width: 92, visible: false},
+						{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: false},
+						{title: "letzte Änderung", field: "lastupdate", width: 146, visible: false},
+						{
+							title: 'Aktionen', field: 'actions',
+							width: 100,
+							formatter: (cell, formatterParams, onRendered) => {
+								let container = document.createElement('div');
+								container.className = "d-flex gap-2";
+
+								let button = document.createElement('button');
+								button.className = 'btn btn-outline-secondary btn-action';
+								button.innerHTML = '<i class="fa fa-edit"></i>';
+								button.addEventListener(
+									'click',
+									(event) =>
+										this.actionEditNotiz(cell.getData().notiz_id)
+								);
+								container.append(button);
+
+								button = document.createElement('button');
+								button.className = 'btn btn-outline-secondary btn-action';
+								button.innerHTML = '<i class="fa fa-xmark"></i>';
+								button.addEventListener(
+									'click',
+									() =>
+										this.actionDeleteNotiz(cell.getData().notiz_id)
+								);
+								container.append(button);
+
+								return container;
+							},
+							frozen: true
+						}],
+					layout: 'fitColumns',
+					layoutColumnsOnNewData: false,
+					height: '250',
+					selectableRangeMode: 'click',
+					selectable: true,
+					index: 'notiz_id'
+				},
+				tabulatorEvents: [
+					{
+						event: 'tableBuilt',
+						handler: async () => {
+
+							await this.$p.loadCategory(['notiz', 'global']);
+
+							let cm = this.$refs.table.tabulator.columnManager;
+
+							cm.getColumnByField('verfasser_uid').component.updateDefinition({
+								title: this.$p.t('notiz', 'verfasser'),
+								visible: this.showVariables.showVerfasser
+							});
+							cm.getColumnByField('titel').component.updateDefinition({
+								title: this.$p.t('global', 'titel'),
+								visible: this.showVariables.showTitel
+							});
+							cm.getColumnByField('text_stripped').component.updateDefinition({
+								title: this.$p.t('global', 'text'),
+								visible: this.showVariables.showText
+							});
+							cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
+								title: this.$p.t('notiz', 'bearbeiter'),
+								visible: this.showVariables.showBearbeiter
+							});
+							cm.getColumnByField('start_format').component.updateDefinition({
+								title: this.$p.t('global', 'gueltigVon'),
+								visible: this.showVariables.showVon
+							});
+							cm.getColumnByField('ende_format').component.updateDefinition({
+								title: this.$p.t('global', 'gueltigBis'),
+								visible: this.showVariables.showBis
+							});
+							cm.getColumnByField('countdoc').component.updateDefinition({
+								title: this.$p.t('notiz', 'document'),
+								visible: this.showVariables.showDokumente
+							});
+							cm.getColumnByField('erledigt').component.updateDefinition({
+								title: this.$p.t('notiz', 'erledigt'),
+								visible: this.showVariables.showErledigt
+							});
+							cm.getColumnByField('lastupdate').component.updateDefinition({
+								title: this.$p.t('notiz', 'letzte_aenderung'),
+								visible: this.showVariables.showLastupdate
+							});
+							cm.getColumnByField('notiz_id').component.updateDefinition({
+								visible: this.showVariables.showNotiz_id
+							});
+							cm.getColumnByField('notizzuordnung_id').component.updateDefinition({
+								visible: this.showVariables.showNotizzuordnung_id
+							});
+
+						}
+					}
+				],
+				notizen: [],
+				multiupload: true,
+				mitarbeiter: [],
+				filteredMitarbeiter: [],
+				zwischenvar: '',
+				editorInitialized: false,
+				editor: null,
+				notizData: {
+					typeId: this.typeId,
+					titel: null,
+					statusNew: true,
+					text: null,
+					lastUpdate: null,
+					von: null,
+					bis: null,
+					document: null,
+					erledigt: false,
+					verfasser: null,
+					bearbeiter: null,
+					anhang: []
+				},
+				showVariables: {
+					showTitel: false,
+					showText: false,
+					showVerfasser: false,
+					showBearbeiter: false,
+					showVon: false,
+					showBis: false,
+					showDokumente: false,
+					showErledigt: false,
+					showNotiz_id: false,
+					showNotizzuordnung_id: false,
+					showLastupdate: false
+				},
+		}
 	},
 	methods: {
-		actionDeleteNotiz(notiz_id){
+		actionDeleteNotiz(notiz_id) {
 			this.loadNotiz(notiz_id).then(() => {
-				if(this.notizen.notiz_id) {
-					this.$refs.deleteNotizModal.show();
-				}
+				this.$refs.deleteNotizModal.show();
 			});
 		},
-		actionEditNotiz(notiz_id){
+		actionEditNotiz(notiz_id) {
 			this.loadNotiz(notiz_id).then(() => {
-				console.log(this.notizen);
-				if(this.notizen.notiz_id) {
+				if (this.notizen.notiz_id) {
+					this.notizData.typeId = this.typeId;
 					this.notizData.titel = this.notizen.titel;
 					this.notizData.statusNew = false;
 					this.notizData.text = this.notizen.text;
 					this.notizData.intText = this.notizen.text;
-					this.notizData.lastChange = this.notizen.lastupdate;
+					this.notizData.lastupdate = this.notizen.lastupdate;
 					this.notizData.von = this.notizen.start;
 					this.notizData.bis = this.notizen.ende;
 					this.notizData.document = this.notizen.dms_id;
@@ -126,13 +244,13 @@ export default {
 				}
 			})
 				.then(() => {
-					if(this.notizen.dms_id){
-						console.log("loadEntries with " + this.notizen.notiz_id);
-						this.loadDocEntries(this.notizen.notiz_id);
-					}
+					if (this.notizData.dms_id) {
+						this.loadDocEntries(this.notizData.notiz_id);
+					} else
+						this.notizData.anhang = [];
 				});
 		},
-		actionNewNotiz(){
+		actionNewNotiz() {
 			this.resetFormData();
 		},
 		addNewNotiz() {
@@ -140,107 +258,86 @@ export default {
 
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
-			CoreRESTClient.post(
-				'components/stv/Notiz/addNewNotiz/' + this.id,
+			this.$fhcApi.post('api/frontend/v1/stv/notiz/addNewNotiz/' + this.id,
 				formData,
-				{ Headers: { "Content-Type": "multipart/form-data" } }
+				{Headers: {"Content-Type": "multipart/form-data"}}
 			).then(response => {
-				if (!response.data.error) {
-					this.$fhcAlert.alertSuccess('Anlegen von neuer Notiz erfolgreich');
-					this.resetFormData();
-					this.reload();
-				} else {
-					const errorData = response.data.retval;
-					Object.entries(errorData).forEach(entry => {
-						const [key, value] = entry;
-						this.$fhcAlert.alertError(value);
-					});
-				}
-			}).catch(error => {
-				if (error.response) {
-					console.log(error.response);
-					this.$fhcAlert.alertError(error.response.data);
-				}
-			}).finally(() => {
-				window.scrollTo(0, 0);
-			});
-		},
-		deleteNotiz(notiz_id){
-			CoreRESTClient.post('components/stv/Notiz/deleteNotiz/' + notiz_id)
-				.then(response => {
-					if (!response.data.error) {
-						this.$fhcAlert.alertSuccess('Löschen erfolgreich');
-						this.$refs.deleteNotizModal.hide();
-						this.reload();
-					} else {
-						this.$fhcAlert.alertError('Keine Notiz mit Id ' + notiz_id + ' gefunden');
-					}
-				}).catch(error => {
-					this.$fhcAlert.alertError('Fehler bei Löschroutine aufgetreten');
-				}).finally(()=> {
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+				this.resetFormData();
+				this.reload();
+			})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 					window.scrollTo(0, 0);
 				});
 		},
-		loadNotiz(notiz_id){
-			return CoreRESTClient.get('components/stv/Notiz/loadNotiz/' + notiz_id)
+		deleteNotiz(notiz_id) {
+			this.param = {
+				'notiz_id': notiz_id
+			};
+
+			return this.$fhcApi.post('api/frontend/v1/stv/notiz/deleteNotiz/', this.param)
+				.then(result => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+					this.$refs.deleteNotizModal.hide();
+					this.reload();
+					this.resetFormData();
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					window.scrollTo(0, 0);
+				});
+		},
+		loadNotiz(notiz_id) {
+			this.param = {
+				'notiz_id': notiz_id
+			};
+			return this.$fhcApi.post('api/frontend/v1/stv/notiz/loadNotiz/',
+				this.param)
+				.then(result => {
+					this.notizData = result.data;
+					this.notizData.typeId = this.typeId;
+					return result;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		loadDocEntries(notiz_id) {
+			this.param = {
+				'notiz_id': notiz_id
+			};
+			return this.$fhcApi.post('api/frontend/v1/stv/notiz/loadDokumente/',
+				this.param)
 				.then(
 					result => {
-						if(result.data.retval) {
-							this.notizen = result.data.retval;
-						}
-						else {
-							this.notizen = {};
-							this.$fhcAlert.alertError('Keine Notiz mit Id ' + notiz_id + ' gefunden');
-						}
+						this.notizData.anhang = result.data;
 						return result;
-					}
-				);
+					})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
-		loadDocEntries(notiz_id){
-			return CoreRESTClient.get('components/stv/Notiz/loadDokumente/' + notiz_id)
-				.then(
-					result => {
-						if(result.data.retval) {
-							this.notizData.anhang = result.data.retval;
-							console.log(this.notizData.anhang);
-						}
-						else
-						{
-							this.notizData.anhang = {};
-							this.$fhcAlert.alertError('Kein Dokumenteneintrag mit NotizId ' + notiz_id + ' gefunden');
-						}
-						return result;
-					}
-				);
-		},
-		updateNotiz(notiz_id){
+		updateNotiz(notiz_id) {
 			const formData = new FormData();
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
 
-			CoreRESTClient.post(
-				'components/stv/Notiz/updateNotiz/' + notiz_id,
+			this.param = {
+				'notiz_id': notiz_id
+			};
+
+			return this.$fhcApi.post(
+				'api/frontend/v1/stv/notiz/updateNotiz/',
 				formData,
-				{ Headers: { "Content-Type": "multipart/form-data" } }
+				{Headers: {"Content-Type": "multipart/form-data"}}
 			).then(response => {
-				if (!response.data.error) {
-					this.$fhcAlert.alertSuccess('Update von Notiz erfolgreich');
-					this.resetFormData();
-					this.reload();
-				} else {
-					const errorData = response.data.retval;
-					Object.entries(errorData).forEach(entry => {
-						const [key, value] = entry;
-						this.$fhcAlert.alertError(value);
-					});
-				}
-			}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Updateroutine aufgetreten');
-			}).finally(() => {
-				window.scrollTo(0, 0);
-			});
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+				this.resetFormData();
+				this.reload();
+			})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					window.scrollTo(0, 0);
+				});
 		},
-		reload(){
+		reload() {
 			this.$refs.table.reloadTable();
 		},
 		resetFormData() {
@@ -250,7 +347,7 @@ export default {
 				titel: null,
 				statusNew: true,
 				text: null,
-				lastChange: null,
+				lastUpdate: null,
 				von: null,
 				bis: null,
 				document: null,
@@ -260,21 +357,19 @@ export default {
 				anhang: []
 			};
 		},
-		getUid(){
-			CoreRESTClient
-				.get('components/stv/Notiz/getUid')
+		getUid() {
+			this.$fhcApi
+				.get('api/frontend/v1/stv/notiz/getUid')
 				.then(result => {
-					if(result.data.retval) {
-						this.notizData.intVerfasser = result.data.retval;
-					}
+					this.notizData.intVerfasser = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		search(event) {
-			return CoreRESTClient
-				.get('components/stv/Notiz/getMitarbeiter/' + event.query)
+			return this.$fhcApi
+				.get('api/frontend/v1/stv/notiz/getMitarbeiter/' + event.query)
 				.then(result => {
-					this.filteredMitarbeiter = CoreRESTClient.getData(result.data);
+					this.filteredMitarbeiter = result.data.retval;
 				});
 		},
 		initTinyMCE() {
@@ -287,14 +382,14 @@ export default {
 				//toolbar: " blocks | bold italic underline | alignleft aligncenter alignright alignjustify",
 				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify',
 				style_formats: [
-					{ title: 'Blocks', block: 'div' },
-					{ title: 'Paragraph', block: 'p' },
-					{ title: 'Heading 1', block: 'h1' },
-					{ title: 'Heading 2', block: 'h2' },
-					{ title: 'Heading 3', block: 'h3' },
-					{ title: 'Heading 4', block: 'h4' },
-					{ title: 'Heading 5', block: 'h5' },
-					{ title: 'Heading 6', block: 'h6' },
+					{title: 'Blocks', block: 'div'},
+					{title: 'Paragraph', block: 'p'},
+					{title: 'Heading 1', block: 'h1'},
+					{title: 'Heading 2', block: 'h2'},
+					{title: 'Heading 3', block: 'h3'},
+					{title: 'Heading 4', block: 'h4'},
+					{title: 'Heading 5', block: 'h5'},
+					{title: 'Heading 6', block: 'h6'},
 				],
 				autoresize_bottom_margin: 16,
 
@@ -310,47 +405,22 @@ export default {
 		},
 		updateText(value) {
 			this.notizData.text = value;
-		}
+		},
+		initializeShowVariables() {
+			this.visibleColumns.forEach(column => {
+				const columnToShow = "show" + column.charAt(0).toUpperCase() + column.slice(1);
+				this.showVariables[columnToShow] = true;
+			});
+		},
 	},
 	created(){
+		this.initializeShowVariables();
 		this.getUid();
 	},
 	async mounted() {
 		if(this.showTinyMCE){
 			this.initTinyMCE();
 		}
-
-		await this.$p.loadCategory(['notiz','global']);
-
-		let cm = this.$refs.table.tabulator.columnManager;
-
-		cm.getColumnByField('verfasser_uid').component.updateDefinition({
-			title: this.$p.t('notiz', 'verfasser')
-		});
-		cm.getColumnByField('titel').component.updateDefinition({
-			title: this.$p.t('global', 'titel')
-		});
-		cm.getColumnByField('text_stripped').component.updateDefinition({
-			title: this.$p.t('global', 'text')
-		});
-		cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
-			title: this.$p.t('notiz', 'bearbeiter')
-		});
-		cm.getColumnByField('start').component.updateDefinition({
-			title: this.$p.t('global', 'gueltigVon')
-		});
-		cm.getColumnByField('ende').component.updateDefinition({
-			title: this.$p.t('global', 'gueltigBis')
-		});
-		cm.getColumnByField('countdoc').component.updateDefinition({
-			title: this.$p.t('notiz', 'document')
-		});
-		cm.getColumnByField('erledigt').component.updateDefinition({
-			title: this.$p.t('notiz', 'erledigt')
-		});
-		cm.getColumnByField('lastupdate').component.updateDefinition({
-			title: this.$p.t('notiz', 'letzte_aenderung')
-		});
 	},
 	watch: {
 		//watcher für Tinymce-Textfeld
@@ -388,9 +458,9 @@ export default {
 		}
 	},
 	template: `
-	<div class="notiz-notiz">
 
-		<!--Modal: deleteNotizModal-->
+	<div v-if="notizLayout=='classicFas'"> 
+				<!--Modal: deleteNotizModal-->
 		<BsModal ref="deleteNotizModal">
 			<template #title>Notiz löschen</template>
 			<template #default>
@@ -398,7 +468,7 @@ export default {
 			</template>
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
-				<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizen.notiz_id)">OK</button>
+				<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizData.notiz_id)">OK</button>
 			</template>
 		</BsModal>
 		
@@ -410,11 +480,12 @@ export default {
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Neu"
+			new-btn-label="Notiz"
 			@click:new="actionNewNotiz"
 			>
 		</core-filter-cmpt>
 		<br>
+	
 	
 		<form ref="formc" @submit.prevent class="row pt-3">
 		<br><br>
@@ -433,14 +504,14 @@ export default {
 				</div>
 	
 				<div class="row mb-3">
-					<label for="titel" class="form-label col-sm-2">{{$p.t('global','titel')}}</label>
+					<label for="titel" class="form-label col-sm-2">{{$p.t('global','titel')}} *</label>
 					<div class="col-sm-7">
 						<input type="text" v-model="notizData.titel" class="form-control">
 					</div>
 				</div>
 							
 				<div class="row mb-3">
-					<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}}</label>
+					<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
 						
 					<!-- TinyMce 5 -->
 					<div v-if="showTinyMCE"class="col-sm-7">
@@ -477,7 +548,11 @@ export default {
 			
 				<div class="row mb-3">
 					<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','verfasser')}}</label>
-					<div class="col-sm-3">
+										
+					<div v-if="notizData.verfasser_uid" class="col-sm-3">
+						<input type="text" :readonly="readonly" class="form-control" id="name" v-model="notizData.verfasser_uid">
+					</div>
+					<div v-else class="col-sm-3">
 						<PvAutoComplete v-model="notizData.intVerfasser" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
 					</div>
 					
@@ -485,7 +560,7 @@ export default {
 					<div class="col-sm-3">
 						<vue-date-picker
 							id="von"
-							v-model="notizData.von"
+							v-model="notizData.start"
 							clearable="false"
 							auto-apply
 							:enable-time-picker="false"
@@ -497,7 +572,12 @@ export default {
 				
 				<div class="row mb-3">
 					<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','bearbeiter')}}</label>
-					<div class="col-sm-3">
+					
+					<div v-if="notizData.bearbeiter_uid" class="col-sm-3">
+						<input type="text" :readonly="readonly" class="form-control" id="name" v-model="notizData.bearbeiter_uid">
+					</div>
+					
+					<div v-else class="col-sm-3">
 						<PvAutoComplete v-model="notizData.intBearbeiter" optionLabel="mitarbeiter" :suggestions="filteredMitarbeiter" @complete="search" minlength="3"/>
 					</div>
 					
@@ -506,7 +586,7 @@ export default {
 					<div class="col-sm-3">
 						<vue-date-picker
 							id="bis"
-							v-model="notizData.bis"
+							v-model="notizData.ende"
 							clearable="false"
 							auto-apply
 							:enable-time-picker="false"
@@ -527,16 +607,438 @@ export default {
 			</div>
 			
 			<div class="row mb-3">
-				<label for="lastChange" class="form-label col-sm-2 small">{{$p.t('notiz','letzte_aenderung')}}</label>
+				<label for="lastUpdate" class="form-label col-sm-2 small">{{$p.t('notiz','letzte_aenderung')}}</label>
 				<div class="col-sm-7">
-					<p class="small">{{notizData.lastChange}}</p>
+					<p class="small">{{notizData.lastupdate}}</p>
 				</div>
 			</div>
 			
 			<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
-			<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizen.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+			<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
 					
 		</form>		
-	</div>`
+	</div>
+
+	<div v-else-if="notizLayout=='twoColumnsFormRight'" class="notiz-notiz">
+
+		<!--Modal: deleteNotizModal-->
+		<BsModal ref="deleteNotizModal">
+			<template #title>Notiz löschen</template>
+			<template #default>
+				<p>Notiz wirklich löschen?</p>
+			</template>
+			<template #footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
+				<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizData.notiz_id)">OK</button>
+			</template>
+		</BsModal>
+		
+		<div class="row">
+			<div class="col-sm-6 pt-6">
+			<br>
+					<core-filter-cmpt
+						ref="table"
+						:tabulator-options="tabulatorOptions"
+						:tabulator-events="tabulatorEvents"
+						table-only
+						:side-menu="false"
+						reload
+						new-btn-show
+						new-btn-label="Notiz"
+						@click:new="actionNewNotiz"
+						>
+					</core-filter-cmpt>	
+			</div>
+		
+			<div class="col-sm-6">
+<!--			<p v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}} <span> [{{notizData.typeId}}]</span></p>
+			<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}} <span> [{{notizData.typeId}}]</span></p>-->
+			
+
+
+			  	<form ref="formc" @submit.prevent class="row pt-3">
+			
+	<!--				<div class="row">-->
+						<div class="col pt-3">
+							<p v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}} <span> [{{notizData.typeId}}]</span></p>
+							<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}} <span> [{{notizData.typeId}}]</span></p>
+						</div>
+											
+						<div class="position-sticky top-0 z-1 pt-3">
+							<button v-if="notizData.statusNew" class="btn btn-primary position-absolute top-0 end-0" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
+							<button v-else class="btn btn-primary position-absolute top-0 end-0" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+						</div>
+	
+					<div class="row mb-3">
+						<form-input
+							container-class="col-12"
+							:label="$p.t('global','titel')  + ' *'"
+							type="text"
+							v-model="notizData.titel"
+							name="titel"
+							>
+						</form-input>
+					</div>
+								
+					<div class="row mb-3">
+							
+						<!-- TinyMce 5 -->
+						<div v-if="showTinyMCE" class="col-sm-12">
+							<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
+							<textarea
+							ref="editor"
+							rows="5"
+							cols="75"
+							class="form-control"
+							:value="notizData.text"
+							@input="updateText"></textarea>
+						</div>
+						
+						<div v-else class="col-sm-12">
+							<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
+							<textarea rows="5" cols="75" v-model="notizData.text" class="form-control"></textarea>
+						</div>
+					
+					</div>
+			
+					<!-- show Documentupload-->
+					<div v-if="showDocument">
+						<div class="row mb-3">		
+							
+							<div  class="col-sm-12 py-3">
+							<label for="text" class="form-label col-sm-2">{{$p.t('notiz','document')}}</label>
+								<!--Upload Component-->
+								<FormUploadDms ref="upload" id="file" multiple v-model="notizData.anhang"></FormUploadDms>
+							</div>
+						
+						</div>
+					</div>
+					
+					<!-- show Details-->
+					<div v-if="showErweitert">
+					
+						<div class="row mb-3">
+											
+							<form-input
+								container-class="col-6"
+								:label="$p.t('global', 'gueltigVon')"
+								type="DatePicker"
+								v-model="notizData['start']"
+								name="von"
+								auto-apply
+								:enable-time-picker="false"
+								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
+								:teleport="true"
+								>
+							</form-input>
+							
+							<form-input
+								container-class="col-6"
+								:label="$p.t('global', 'gueltigBis')"
+								type="DatePicker"
+								v-model="notizData.ende"
+								name="bis"
+								auto-apply
+								:enable-time-picker="false"
+								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
+								:teleport="true"
+								>
+							</form-input>
+						</div>
+						
+						<div class="row mb-3">
+							<form-input 
+								v-if="notizData.verfasser_uid"
+								container-class="col-6"
+								:label="$p.t('notiz', 'verfasser')"
+								type="text"
+								v-model="notizData.verfasser_uid"
+								name="titel"
+							>
+							</form-input>
+					
+							<form-input
+								v-else
+								container-class="col-6"
+								:label="$p.t('notiz', 'verfasser')"
+								type="autocomplete"
+								v-model="notizData.intVerfasser"
+								:suggestions="filteredMitarbeiter" 
+								@complete="search" 
+								optionLabel="mitarbeiter"
+								minLength="3"
+								>
+							</form-input>
+							
+							<form-input
+								v-if="notizData.bearbeiter_uid"
+								container-class="col-6"
+								:label="$p.t('notiz', 'bearbeiter')"
+								v-model="notizData.bearbeiter_uid"
+								minlength="3"
+								>
+							</form-input>
+							
+							<form-input
+								v-else
+								container-class="col-6"
+								:label="$p.t('notiz', 'bearbeiter')"
+								type="autocomplete"
+								v-model="notizData.intBearbeiter"
+								:suggestions="filteredMitarbeiter" 
+								@complete="search" 
+								optionLabel="mitarbeiter"
+								minlength="3"
+								>
+							</form-input>	
+						</div>
+														
+						<div class="row mb-3">
+								<div class="col-2 pt-4 d-flex align-items-center">
+									<form-input
+										container-class="form-check"
+										:label="$p.t('notiz', 'erledigt')"
+										type="checkbox"
+										v-model="notizData.erledigt"
+										name="erledigt"
+										>
+									</form-input>
+								</div>
+		<!--					<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','erledigt')}}</label>
+							<div class="col-sm-1">
+								<input type="checkbox" v-model="notizData.erledigt">
+							</div>-->
+						</div>
+						
+					</div>
+					
+					<div class="row mb-3">
+						<label for="lastUpdate" class="form-label col-sm-3 small">{{$p.t('notiz','letzte_aenderung')}}</label>
+						<div class="col-sm-5">
+							<p class="small">{{notizData.lastupdate}}</p>
+						</div>
+					</div>
+					
+				</form>		
+			</div>
+		</div> 
+	</div>
+	
+	<div v-else-if="notizLayout=='twoColumnsFormLeft'" class="notiz-notiz">
+
+		<!--Modal: deleteNotizModal-->
+		<BsModal ref="deleteNotizModal">
+			<template #title>Notiz löschen</template>
+			<template #default>
+				<p>Notiz wirklich löschen?</p>
+			</template>
+			<template #footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
+				<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizData.notiz_id)">OK</button>
+			</template>
+		</BsModal>
+		
+		<div class="row">
+		
+		<div class="col-sm-6">
+	
+		  	<form ref="formc" @submit.prevent class="row pt-3">
+			
+					<div class="col pt-3">
+						<p v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}} <span> [{{notizData.typeId}}]</span></p>
+						<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}} <span> [{{notizData.typeId}}]</span></p>
+					</div>
+											
+	
+					<div class="row mb-3">
+						<form-input
+							container-class="col-12"
+							:label="$p.t('global','titel')  + ' *'"
+							type="text"
+							v-model="notizData.titel"
+							name="titel"
+							>
+						</form-input>
+					</div>
+								
+					<div class="row mb-3">
+							
+						<!-- TinyMce 5 -->
+						<div v-if="showTinyMCE" class="col-sm-12">
+							<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
+							<textarea
+							ref="editor"
+							rows="5"
+							cols="75"
+							class="form-control"
+							:value="notizData.text"
+							@input="updateText"></textarea>
+						</div>
+						
+						<div v-else class="col-sm-12">
+							<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
+							<textarea rows="5" cols="75" v-model="notizData.text" class="form-control"></textarea>
+						</div>
+					
+					</div>
+			
+					<!-- show Documentupload-->
+					<div v-if="showDocument">
+						<div class="row mb-3">		
+							
+							<div  class="col-sm-12 py-3">
+							<label for="text" class="form-label col-sm-2">{{$p.t('notiz','document')}}</label>
+								<!--Upload Component-->
+								<FormUploadDms ref="upload" id="file" multiple v-model="notizData.anhang"></FormUploadDms>
+							</div>
+						
+						</div>
+					</div>
+					
+					<!-- show Details-->
+					<div v-if="showErweitert">
+					
+						<div class="row mb-3">
+											
+							<form-input
+								container-class="col-6"
+								:label="$p.t('global', 'gueltigVon')"
+								type="DatePicker"
+								v-model="notizData['start']"
+								name="von"
+								auto-apply
+								:enable-time-picker="false"
+								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
+								:teleport="true"
+								>
+							</form-input>
+							
+							<form-input
+								container-class="col-6"
+								:label="$p.t('global', 'gueltigBis')"
+								type="DatePicker"
+								v-model="notizData.ende"
+								name="bis"
+								auto-apply
+								:enable-time-picker="false"
+								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
+								:teleport="true"
+								>
+							</form-input>
+						</div>
+						
+				
+						<div class="row mb-3">
+							<form-input 
+								v-if="notizData.verfasser_uid"
+								container-class="col-6"
+								:label="$p.t('notiz', 'verfasser')"
+								type="text"
+								v-model="notizData.verfasser_uid"
+								name="titel"
+							>
+							</form-input>
+					
+							<form-input
+								v-else
+								container-class="col-6"
+								:label="$p.t('notiz', 'verfasser')"
+								type="autocomplete"
+								v-model="notizData.intVerfasser"
+								:suggestions="filteredMitarbeiter" 
+								@complete="search" 
+								optionLabel="mitarbeiter"
+								minLength="3"
+								>
+							</form-input>
+							
+							<form-input
+								v-if="notizData.bearbeiter_uid"
+								container-class="col-6"
+								:label="$p.t('notiz', 'bearbeiter')"
+								v-model="notizData.bearbeiter_uid"
+								minlength="3"
+								>
+							</form-input>
+							
+							<form-input
+								v-else
+								container-class="col-6"
+								:label="$p.t('notiz', 'bearbeiter')"
+								type="autocomplete"
+								v-model="notizData.intBearbeiter"
+								:suggestions="filteredMitarbeiter" 
+								@complete="search" 
+								optionLabel="mitarbeiter"
+								minlength="3"
+								>
+							</form-input>	
+						</div>
+														
+						<div class="row mb-3">
+								<div class="col-2 pt-4 d-flex align-items-center">
+									<form-input
+										container-class="form-check"
+										:label="$p.t('notiz', 'erledigt')"
+										type="checkbox"
+										v-model="notizData.erledigt"
+										name="erledigt"
+										>
+									</form-input>
+								</div>
+		<!--					<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','erledigt')}}</label>
+							<div class="col-sm-1">
+								<input type="checkbox" v-model="notizData.erledigt">
+							</div>-->
+						</div>
+						
+					</div>
+					
+					<div class="row mb-3">
+						<label for="lastUpdate" class="form-label col-sm-3 small">{{$p.t('notiz','letzte_aenderung')}}</label>
+						<div class="col-sm-5">
+							<p class="small">{{notizData.lastupdate}}</p>
+						</div>
+					</div>
+					
+						<div>
+							<button v-if="notizData.statusNew" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
+							<button v-else class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+						</div>
+					
+				</form>		
+			</div>
+			
+			<div class="col-sm-6 pt-6">
+			<br>
+					<core-filter-cmpt
+						ref="table"
+						:tabulator-options="tabulatorOptions"
+						:tabulator-events="tabulatorEvents"
+						table-only
+						:side-menu="false"
+						reload
+						new-btn-show
+						new-btn-label="Notiz"
+						@click:new="actionNewNotiz"
+						>
+					</core-filter-cmpt>	
+			</div>
+		
+			
+		</div> 
+		
+	</div>
+	
+	<div v-else>
+	<p>Kein Layout übergeben</p>
+	</div>
+</div>
+<br>
+`,
 }
 

@@ -271,20 +271,6 @@ class Notiz_model extends DB_Model
 	 */
 	public function getNotizWithDocEntries($id, $type)
 	{
-	// ci query builder returns null
-/*		$this->db->select('n.*, count(dms_id) as countDoc, z.notizzuordnung_id');
-		$this->db->select('(CASE WHEN n.updateamum >= n.insertamum THEN n.updateamum ELSE n.insertamum END) AS lastUpdate');
-		$this->db->from('public.tbl_notiz n');
-		$this->db->join('public.tbl_notizzuordnung z', 'n.notiz_id = z.notiz_id');
-		$this->db->join('public.tbl_notiz_dokument dok', 'n.notiz_id = dok.notiz_id', 'left');
-		$this->db->join('campus.tbl_dms_version', 'dok.notiz_id = campus.tbl_dms_version.dms_id', 'left');
-		$this->db->where("z.$type", $id);
-		$this->db->group_by('n.notiz_id, z.notizzuordnung_id');
-
-		$query = $this->db->get();
-		return $query->result();*/
-
-
 		$qry = "
 			SELECT 
 			    	n.*, count(dms_id) as countDoc, z.notizzuordnung_id,
@@ -292,7 +278,10 @@ class Notiz_model extends DB_Model
 						WHEN n.updateamum >= n.insertamum THEN n.updateamum 
 						ELSE n.insertamum
 					END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate,
-			    	regexp_replace(n.text, '<[^>]*>', '', 'g') as text_stripped
+			    	regexp_replace(n.text, '<[^>]*>', '', 'g') as text_stripped,
+			    	TO_CHAR(n.start::timestamp, 'DD.MM.YYYY') AS start_format,
+			    	TO_CHAR(n.ende::timestamp, 'DD.MM.YYYY') AS ende_format
+			    	
 			FROM
 			    	public.tbl_notiz n
 			JOIN 
