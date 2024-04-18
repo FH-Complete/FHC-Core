@@ -1,19 +1,17 @@
 export default {
-    data(){
-        return {
-
-        }
+  data() {
+    return {};
+  },
+  props: {
+    title: {
+      type: String,
+      required: true,
     },
-    props:{
-        title:{
-            type:String,
-            
-        },
-        data:{
-            type:Array,
-        }
+    data: {
+      type: Array,
     },
-    template: `
+  },
+  template: /*html*/ `
     <div class="card ">
     <div class="card-header">
     {{title}}
@@ -60,5 +58,5 @@ export default {
 
 
     </div>
-    </div>`
-}
+    </div>`,
+};

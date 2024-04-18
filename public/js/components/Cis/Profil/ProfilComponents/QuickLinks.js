@@ -1,34 +1,32 @@
-export default{
-    //TODO: To be implemented
-    props:{
-        data:{
-            type:String,
-            
-        },
-        title:{
-            type:String,
-
-        },
-        mobile:{
-            type:Boolean,
-            default:false,
-        }
+export default {
+  //TODO: To be implemented
+  props: {
+    data: {
+      type: String,
     },
-    methods:{
-        hideCollapse: function(){
-            this.collapseOpen = false;
-        },
-        showCollapse: function(){
-            this.collapseOpen = true;
-        },
+    title: {
+      type: String,
+      required: true,
     },
-    data(){
-        return{
-            collapseOpen: false,
-
-        }
+    mobile: {
+      type: Boolean,
+      default: false,
     },
-    template:/*html*/`
+  },
+  methods: {
+    hideCollapse: function () {
+      this.collapseOpen = false;
+    },
+    showCollapse: function () {
+      this.collapseOpen = true;
+    },
+  },
+  data() {
+    return {
+      collapseOpen: false,
+    };
+  },
+  template: /*html*/ `
     <div class="card">
     <template v-if="mobile">
     
@@ -65,4 +63,4 @@ export default{
   
   </template>
   </div>`,
-}
+};
