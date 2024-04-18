@@ -5,29 +5,22 @@ import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 
 export default {
-  
   data() {
-    return {
-      
-     
-    };
+    return {};
   },
-  components:{
+  components: {
     QuickLinks,
     Mailverteiler,
     ProfilEmails,
     RoleInformation,
-    ProfilInformation
+    ProfilInformation,
   },
 
   props: ["data"],
-  methods: {
-    
-  },
+  methods: {},
 
   computed: {
-   
-     profilInformation() {
+    profilInformation() {
       if (!this.data) {
         return {};
       }
@@ -39,9 +32,8 @@ export default {
         Anrede: this.data.anrede,
         Titel: this.data.titel,
         Postnomen: this.data.postnomen,
-        foto_sperre:this.data.foto_sperre,
-        foto:this.data.foto,
-
+        foto_sperre: this.data.foto_sperre,
+        foto: this.data.foto,
       };
     },
 
@@ -64,16 +56,11 @@ export default {
         Gruppe: this.data.gruppe.trim(),
       };
     },
-  
   },
 
-  mounted() {
-   
+  mounted() {},
 
-   
-  },
-
-  template: /*html*/` 
+  template: /*html*/ ` 
 
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
@@ -81,7 +68,7 @@ export default {
           <!-- HIDDEN QUICK LINKS -->
               <div  class="d-md-none col-12 ">
              
-             <quick-links :mobile="true"></quick-links>
+             <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
 
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->
@@ -102,7 +89,7 @@ export default {
                      <div class="row mb-4">
                      <div class="col">
                      
-                        <profil-information :data="profilInformation" title="$p.t('profil','studentIn')"></profil-information>
+                        <profil-information :data="profilInformation" :title="$p.t('profil','studentIn')"></profil-information>
                      
 		                </div>
                     </div>
@@ -118,7 +105,7 @@ export default {
                     <div class="col">
 
                     <!-- EMAILS -->
-                    <profil-emails :data="personEmails"></profil-emails>
+                    <profil-emails :title="this.$p.t('person','email')" :data="personEmails"></profil-emails>
                   
                     </div></div>
 
@@ -128,7 +115,7 @@ export default {
 
                     <div  class=" col-lg-12">
        
-                    <role-information title="$p.t('profil','studentInformation')" :data="roleInformation"></role-information>
+                    <role-information :title="$p.t('profil','studentInformation')" :data="roleInformation"></role-information>
 
                     </div>  
                        
@@ -161,7 +148,7 @@ export default {
                 <div  class="row d-none d-md-block mb-3">
                   <div class="col">
                  
-                   <quick-links></quick-links>
+                   <quick-links :title="$p.t('profil','quickLinks')"></quick-links>
 
                   </div>
                 </div>
@@ -174,7 +161,7 @@ export default {
 
                   
                   <!-- HIER SIND DIE MAILVERTEILER -->
-                    <mailverteiler :data="data?.mailverteiler"></mailverteiler>
+                    <mailverteiler :title="$p.t('profil','mailverteiler')" :data="data?.mailverteiler"></mailverteiler>
 
                   </div>
 

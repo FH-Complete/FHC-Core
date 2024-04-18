@@ -1,4 +1,3 @@
-
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 import Mailverteiler from "./ProfilComponents/Mailverteiler.js";
 import QuickLinks from "./ProfilComponents/QuickLinks.js";
@@ -15,11 +14,11 @@ export default {
     ProfilEmails,
     ProfilInformation,
   },
-  inject: ['collapseFunction'],
+  inject: ["collapseFunction"],
   data() {
     return {
       collapseIconFunktionen: true,
-     
+
       funktionen_table_options: {
         height: 300,
         layout: "fitColumns",
@@ -82,22 +81,18 @@ export default {
           },
         ],
       },
-     
     };
   },
 
   //? this is the prop passed to the dynamic component with the custom data of the view
   props: ["data"],
-  methods: {
-   
-  },
+  methods: {},
 
   computed: {
-
     personEmails() {
       return this.data?.emails ? this.data.emails : [];
     },
-    
+
     profilInformation() {
       if (!this.data) {
         return {};
@@ -110,13 +105,10 @@ export default {
         Anrede: this.data.anrede,
         Titel: this.data.titel,
         Postnomen: this.data.postnomen,
-        foto_sperre:this.data.foto_sperre,
-        foto:this.data.foto,
-
+        foto_sperre: this.data.foto_sperre,
+        foto: this.data.foto,
       };
     },
-  
-   
 
     roleInformation() {
       if (!this.data) {
@@ -127,25 +119,22 @@ export default {
         Geburtsdatum: this.data.gebdatum,
         Geburtsort: this.data.gebort,
         Kurzzeichen: this.data.kurzbz,
-        Telefon:  (this.data.standort_telefon?this.data.standort_telefon:"") + " " + this.data.telefonklappe,
+        Telefon:
+          (this.data.standort_telefon ? this.data.standort_telefon : "") +
+          " " +
+          this.data.telefonklappe,
         Büro: this.data.ort_kurzbz,
       };
     },
-
-  
   },
 
   mounted() {
-  
-
     this.$refs.funktionenTable.tabulator.on("tableBuilt", () => {
       this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
     });
-
-   
   },
 
-  template: /*html*/` 
+  template: /*html*/ ` 
 
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
@@ -153,7 +142,7 @@ export default {
           <!-- HIDDEN QUICK LINKS -->
               <div  class="d-md-none col-12 ">
              
-              <quick-links :mobile="true" ></quick-links>
+              <quick-links :title="$p.t('profil','quickLinks')" :mobile="true" ></quick-links>
 
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->
@@ -176,7 +165,7 @@ export default {
                      <div class="col">
                      
                         <!-- Profil Informationen -->
-                        <profil-information title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
+                        <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
                      
 		                </div>
                     </div>
@@ -195,7 +184,7 @@ export default {
                     <div class="col">
 
                     <!-- EMAILS -->
-                    <profil-emails :data="personEmails"></profil-emails>
+                    <profil-emails :title="this.$p.t('person','email')" :data="personEmails"></profil-emails>
                    
                     </div></div>
 
@@ -207,7 +196,7 @@ export default {
                     <div  class=" col-lg-12">
        
                     <!-- roleInformation -->
-                    <role-information :data="roleInformation" title="$p.t('profil','mitarbeiterInformation')"></role-information>
+                    <role-information :data="roleInformation" :title="$p.t('profil','mitarbeiterInformation')"></role-information>
 
                     </div>  
                            
@@ -239,7 +228,7 @@ export default {
 
                 <!-- FIRST TABLE -->
                   <div class="col-12 mb-4" >
-                    <core-filter-cmpt title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   </div>
 
                
@@ -258,7 +247,7 @@ export default {
                   <div class="col">
                  
                    <!-- QUICKLINKS -->
-                   <quick-links ></quick-links>
+                   <quick-links :title="$p.t('profil','quickLinks')" ></quick-links>
 
                   </div>
                 </div>
@@ -269,7 +258,7 @@ export default {
 
                   <!-- MAILVERTEILER -->
 
-                  <mailverteiler :data="data?.mailverteiler"></mailverteiler>
+                  <mailverteiler :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
 
                   </div>
 
