@@ -39,7 +39,9 @@ class Konto extends FHCAPI_Controller
 			'getBuchungstypen' => 'student/stammdaten:r', // alle?
 			'checkDoubles' => ['admin:r', 'assistenz:r'],
 			'insert' => ['admin:w', 'assistenz:w'],
-			'update' => ['admin:w', 'assistenz:w']
+			'counter' => ['admin:w', 'assistenz:w'],
+			'update' => ['admin:w', 'assistenz:w'],
+			'delete' => ['admin:w', 'assistenz:w']
 		]);
 
 		// Load models
@@ -64,11 +66,12 @@ class Konto extends FHCAPI_Controller
 		$this->load->library('form_validation');
 
 		$person_id = $this->input->post('person_id');
-		if (!$person_id || !is_array($person_id))
+		if (!$person_id || !is_array($person_id)) {
 			$this->form_validation->set_rules('person_id', 'Person ID', 'required');
 
-		if (!$this->form_validation->run())
-			$this->terminateWithValidationErrors($this->form_validation->error_array());
+			if (!$this->form_validation->run())
+				$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
 
 
 		$studiengang_kz = $this->input->post('studiengang_kz');
@@ -237,8 +240,8 @@ class Konto extends FHCAPI_Controller
 			'anmerkung'
 		];
 		$data = [
-			'updateamum' => date('c'),
-			'updatevon' => getAuthUID()
+			'insertamum' => date('c'),
+			'insertvon' => getAuthUID()
 		];
 		foreach ($allowed as $field)
 			if ($this->input->post($field) !== null)
@@ -251,20 +254,145 @@ class Konto extends FHCAPI_Controller
 		$result = [];
 		foreach ($person_ids as $person_id) {
 			$id = $this->KontoModel->insert(array_merge($data, ['person_id' => $person_id]));
-			if (isError($id))
-				$this->addError(getError($id), self::ERROR_TYPE_GENERAL);
-			else {
+			if (isError($id)) {
+				$this->addError(getError($id), self::ERROR_TYPE_DB);
+			} else {
 				$data = $this->KontoModel->withAdditionalInfo()->load(getData($id));
 				if (isError($data))
-					$this->addError(getError($data), self::ERROR_TYPE_GENERAL);
+					$this->addError(getError($data), self::ERROR_TYPE_DB);
 				else
-					$result[] = getData($data);
+					$result[] = current(getData($data));
 			}
 		}
 
 		if ($result)
 			$this->terminateWithSuccess($result);
-		// NOTE(chris): else there should already be error in the return object
+
+		$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+	}
+
+	/**
+	 * Save Counter Buchung
+	 *
+	 * @return void
+	 */
+	public function counter()
+	{
+		$this->load->library('form_validation');
+
+		$buchungsnrs = $this->input->post('buchungsnr');
+
+		if (!$buchungsnrs || !is_array($buchungsnrs)) {
+			$buchungsnrs = $buchungsnrs ? [$buchungsnrs] : [];
+			$this->form_validation->set_rules('buchungsnr', 'Buchungsnr', 'required');
+		}
+		$this->form_validation->set_rules('buchungsdatum', 'Buchungsdatum', 'is_valid_date');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$data = [];
+		$rules = [];
+		foreach ($buchungsnrs as $k => $buchungsnr) {
+			$result = $this->KontoModel->load($buchungsnr);
+			if (isError($result)) {
+				$rules[] = [
+					'field' => 'buchung[' . $k . ']',
+					'label' => 'Buchung #' . $buchungsnr,
+					'rules' => 'required',
+					'errors' => [
+						'required' => getError($result)
+					]
+				];
+			} elseif (!hasData($result)) {
+				$rules[] = [
+					'field' => 'buchung[' . $k . ']',
+					'label' => 'Buchung #' . $buchungsnr,
+					'rules' => 'required'
+				];
+			} else {
+				$data[$k] = get_object_vars(current(getData($result)));
+				$rules[] = [
+					'field' => 'buchung[' . $k . '][buchungsnr]',
+					'label' => 'Buchung # ' . $buchungsnr,
+					'rules' => 'required|numeric'
+				];
+				$rules[] = [
+					'field' => 'buchung[' . $k . '][studiengang_kz]',
+					'label' => 'Buchung # ' . $buchungsnr,
+					'rules' => 'required|has_permissions_for_stg[admin:rw,assistenz:rw]'
+				];
+				$rules[] = [
+					'field' => 'buchung[' . $k . '][buchungsnr_verweis]',
+					'label' => 'Buchung # ' . $buchungsnr,
+					'rules' => 'regex_match[/^$/]',
+					'errors' => [
+						'regex_match' => 'Gegenbuchungen koennen nur auf die obersten Buchungen getaetigt werden'
+					] // TODO(chris): phrase
+				];
+			}
+		}
+		
+		$this->form_validation->reset_validation();
+		$this->form_validation->set_data(['buchung' => $data]);
+		$this->form_validation->set_rules($rules);
+		
+		Events::trigger('konto_counter_validation', $this->form_validation);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$buchungsdatum = $this->input->post('buchungsdatum');
+
+		$newItems = [];
+		foreach ($data as $buchung) {
+			$result = $this->KontoModel->getDifferenz($buchung['buchungsnr']);
+			if (isError($result)) {
+				$this->addError(getError($result), self::ERROR_TYPE_GENERAL);
+				continue;
+			}
+			$betrag = $result->retval;
+			if ($betrag === null) {
+				$this->addError($this->p->t(
+					'konto',
+					'Buchung #{buchungsnr} does not exist',
+					$buchung
+				), self::ERROR_TYPE_GENERAL); // TODO(chris): phrase
+				continue;
+			}
+
+
+			$result = $this->KontoModel->insert([
+				'person_id' => $buchung['person_id'],
+				'studiengang_kz' => $buchung['studiengang_kz'],
+				'studiensemester_kurzbz' => $buchung['studiensemester_kurzbz'],
+				'buchungstext' => $buchung['buchungstext'],
+				'buchungstyp_kurzbz' => $buchung['buchungstyp_kurzbz'],
+				'credit_points' => $buchung['credit_points'],
+				'zahlungsreferenz' => $buchung['zahlungsreferenz'],
+				'betrag' => $betrag,
+				'buchungsdatum' => $buchungsdatum,
+				'mahnspanne' => '0',
+				'buchungsnr_verweis' => $buchung['buchungsnr'],
+				'insertamum' => date('c'),
+				'insertvon' => getAuthUID(),
+				'anmerkung' => ''
+			]);
+			if (isError($result)) {
+				$this->addError(getError($result), self::ERROR_TYPE_GENERAL);
+				continue;
+			}
+
+			$newItems = null;
+			// TODO(chris): get as tree?
+			/*$result = $this->KontoModel->withAdditionalInfo()->load($result->retval);
+			if (!hasData($result))
+				$newItems = null;
+			elseif ($newItems !== null)
+				$newItems[] = current(getData($result));*/
+		}
+
+		$this->terminateWithSuccess($newItems);
 	}
 
 	/**
@@ -318,13 +446,63 @@ class Konto extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
-		$result = $this->KontoModel->withAdditionalInfo()->load($id);
+		$result = null;
+		// TODO(chris): get as tree?
+		/*$result = $this->KontoModel->withAdditionalInfo()->load($id);
 		
+		#$result = $this->getDataOrTerminateWithError($result);
+		if (isError($result))
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		$result = $result->retval;*/
+
+		$this->terminateWithSuccess($result);
+	}
+
+	/**
+	 * Delete Buchung
+	 *
+	 * @return void
+	 */
+	public function delete()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('buchungsnr', 'Buchungsnr', 'required');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+
+		$buchungsnr = $this->input->post('buchungsnr');
+
+		$result = $this->KontoModel->load($buchungsnr);
 		#$result = $this->getDataOrTerminateWithError($result);
 		if (isError($result))
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		$result = $result->retval;
 
-		$this->terminateWithSuccess($result);
+		if (!$result)
+			$this->terminateWithError('buchung not found', self::ERROR_TYPE_GENERAL); // TODO(chris): phrase
+
+		$_POST['studiengang_kz'] = current($result)->studiengang_kz;
+
+		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'has_permissions_for_stg[admin:rw,assistenz:rw]');
+
+		Events::trigger('konto_delete_validation', $this->form_validation);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+
+		Events::trigger('konto_delete', $buchungsnr);
+		
+		$result = $this->KontoModel->delete($buchungsnr);
+		if (isError($result)) {
+			if (getCode($result) != 42)
+				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL); // TODO(chris): phrase
+		}
+
+		$this->terminateWithSuccess();
 	}
 }

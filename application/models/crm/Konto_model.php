@@ -15,6 +15,78 @@ class Konto_model extends DB_Model
 		$this->pk = 'buchungsnr';
 	}
 
+	/**
+	 * Insert Data into DB-Table
+	 *
+	 * @param array				$data  DataArray for Insert
+	 * @return stdClass
+	 */
+	public function insert($data, $encryptedColumns = null)
+	{
+		if (isset($data['buchungsnr_verweis']) && $data['buchungsnr_verweis'])
+			return parent::insert($data, $encryptedColumns);
+
+		$this->db->trans_begin();
+
+		$result = parent::insert($data, $encryptedColumns);
+		if (isError($result)) {
+			$this->db->trans_rollback();
+			return $result;
+		}
+
+		$buchungsnr = $result->retval;
+		// If studiengang_kz is not present in $data it will fail above since it is a not null field
+		$studiengang_kz = $data['studiengang_kz'];
+
+
+		$zahlungsreferenz = false;
+		Events::trigger('generate_zahlungsreferenz', $buchungsnr, $data, function ($value) use ($zahlungsreferenz) {
+			$zahlungsreferenz = $value;
+		});
+
+		if ($zahlungsreferenz === false) {
+			$result = $this->execQuery('SELECT UPPER(oe_kurzbz) || ? as zahlungsreferenz 
+				FROM public.tbl_studiengang 
+				WHERE studiengang_kz=?', [$buchungsnr, $studiengang_kz]);
+			if (isError($result)) {
+				$this->db->trans_rollback();
+				return $result;
+			}
+			$zahlungsreferenz = current(getData($result))->zahlungsreferenz;
+		} elseif (isError($zahlungsreferenz)) {
+			$this->db->trans_rollback();
+			return $zahlungsreferenz;
+		}
+
+
+		$result = $this->update($buchungsnr, [
+			'zahlungsreferenz' => $zahlungsreferenz
+		]);
+
+		if (isError($result)) {
+			$this->db->trans_rollback();
+			return $result;
+		}
+
+		$this->db->trans_commit();
+
+		return success($buchungsnr);
+	}
+
+	/**
+	 * Delete data from DB-Table
+	 *
+	 * @param string			$id  Primary Key for DELETE
+	 *
+	 * @return stdClass
+	 */
+	public function delete($id)
+	{
+		$this->db->where('buchungsnr_verweis', $id);
+		if ($this->db->count_all_results($this->dbTable))
+			return error('Bitte zuerst die zugeordneten Buchungen loeschen');
+		return parent::delete($id, 42);
+	}
 
 	/**
 	 * Adds additional fields to the Query
@@ -122,6 +194,37 @@ class Konto_model extends DB_Model
 		return $this->loadWhere([
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
 		]);
+	}
+
+	/**
+	 * Berechnet den offenen Betrag einer Buchung
+	 *
+	 * @param integer		$buchungsnr
+	 *
+	 * @return stdClass
+	 */
+	public function getDifferenz($buchungsnr)
+	{
+		$this->addSelect('buchungsnr_verweis');
+		$this->db->where('buchungsnr', $buchungsnr);
+		$sql = $this->db->get_compiled_select($this->dbTable);
+
+		$this->addSelect('buchungsnr_verweis');
+		$this->db->where('buchungsnr', $buchungsnr);
+		$this->db->or_where('buchungsnr_verweis', '(' . $sql . ')', false);
+		$sql = $this->db->get_compiled_select($this->dbTable);
+
+		$this->addSelect('sum(betrag) differenz');
+		$this->db->where('buchungsnr', $buchungsnr);
+		$this->db->or_where('buchungsnr_verweis', $buchungsnr);
+		$this->db->or_where('buchungsnr', '(' . $sql . ')', false);
+
+		$result = $this->load();
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success(null);
+		return success(current(getData($result))->differenz * -1);
 	}
 
 	/**
