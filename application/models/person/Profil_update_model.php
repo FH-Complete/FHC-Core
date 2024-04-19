@@ -25,6 +25,7 @@ class Profil_update_model extends DB_Model
 	 * 
 	 * @param boolean $update: conditional whether to return insertamum or updateamum
 	 */
+	//TODO: function wird nicht verwendet
 	public function getTimestamp($id, $update = false)
 	{
 		$selectStatement = $update ? 'updateamum' : 'insertamum';
@@ -40,8 +41,9 @@ class Profil_update_model extends DB_Model
 	 * {dms_id:123 , name:"test"}
 	 * 
 	 * @param boolean $profil_update_id primary key of the profil update request
-	 * @return Array 
+	 * @return array 
 	 */
+	//TODO: function wird nicht verwendet
 	public function getFilesFromChangeRequest($profil_update_id)
 	{
 		$this->addSelect(["requested_change"]);
@@ -62,25 +64,27 @@ class Profil_update_model extends DB_Model
 		$this->addJoin("public.tbl_benutzer", "public.tbl_benutzer.uid = public.tbl_profil_update.uid");
 		$this->addJoin("public.tbl_person", "public.tbl_person.person_id = public.tbl_benutzer.person_id");
 		$res = $this->loadWhere($whereClause);
-		if(isError($res)){
+		if (isError($res)) {
 			return $res;
 		}
-		if(hasData($res)){
+		if (hasData($res)) {
 			foreach (getData($res) as $request) {
 				$this->formatProfilRequest($request);
 			}
 		}
-		
+
 		return $res;
 
 	}
 
 
 	/**
+	 * getProfilUpdateWithPermission
 	 * 
-	 * getProfilUpdate
-	 * returns a profil update with id 
-	 * returns all profil updates if id is set to null
+	 * queries the profil updates and checks if the user trying to query the data has permissions to get the profil updates
+	 *   
+	 * @param string $whereClause additional where clause that will be appended to the db query
+	 * @return array array with all the profil updates that the user is eligible to see
 	 */
 	public function getProfilUpdateWithPermission($whereClause = null)
 	{
@@ -88,8 +92,8 @@ class Profil_update_model extends DB_Model
 		$studentBerechtigung = $this->permissionlib->isBerechtigt('student/stammdaten', 's');
 		$mitarbeiterBerechtigung = $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten', 's');
 		$oe_berechtigung = $this->permissionlib->getOE_isEntitledFor('student/stammdaten');
-		
-		$lang = "select index from public.tbl_sprache where sprache =" . $this->escape(getUserLanguage());	
+
+		$lang = "select index from public.tbl_sprache where sprache =" . $this->escape(getUserLanguage());
 		$res = [];
 
 		if ($studentBerechtigung) {
@@ -99,7 +103,7 @@ class Profil_update_model extends DB_Model
 			$parameters = [];
 			$query = "
 			SELECT
-			profil_update_id, tbl_profil_update.uid, (tbl_person.vorname || ' ' || tbl_person.nachname) AS name , topic, requested_change, tbl_profil_update.updateamum, tbl_profil_update.updatevon, tbl_profil_update.insertamum, tbl_profil_update.insertvon, status, public.tbl_profil_update_status.bezeichnung_mehrsprachig[(".$lang.")] as status_translated, status_timestamp, status_message, attachment_id 
+			profil_update_id, tbl_profil_update.uid, (tbl_person.vorname || ' ' || tbl_person.nachname) AS name , topic, requested_change, tbl_profil_update.updateamum, tbl_profil_update.updatevon, tbl_profil_update.insertamum, tbl_profil_update.insertvon, status, public.tbl_profil_update_status.bezeichnung_mehrsprachig[(" . $lang . ")] as status_translated, status_timestamp, status_message, attachment_id 
 			FROM public.tbl_profil_update
 			JOIN public.tbl_profil_update_status ON public.tbl_profil_update_status.status_kurzbz = public.tbl_profil_update.status 
 			JOIN public.tbl_student ON public.tbl_student.student_uid=public.tbl_profil_update.uid
@@ -125,7 +129,7 @@ class Profil_update_model extends DB_Model
 			}
 		}
 		if ($mitarbeiterBerechtigung) {
-			$this->addSelect(["profil_update_id", "tbl_profil_update.uid", "(tbl_person.vorname || ' ' || tbl_person.nachname) AS name", "topic", "requested_change", "tbl_profil_update.updateamum", "tbl_profil_update.updatevon", "tbl_profil_update.insertamum", "tbl_profil_update.insertvon", "status", "public.tbl_profil_update_status.bezeichnung_mehrsprachig[(".$lang.")] AS status_translated", "status_timestamp", "status_message", "attachment_id"]);
+			$this->addSelect(["profil_update_id", "tbl_profil_update.uid", "(tbl_person.vorname || ' ' || tbl_person.nachname) AS name", "topic", "requested_change", "tbl_profil_update.updateamum", "tbl_profil_update.updatevon", "tbl_profil_update.insertamum", "tbl_profil_update.insertvon", "status", "public.tbl_profil_update_status.bezeichnung_mehrsprachig[(" . $lang . ")] AS status_translated", "status_timestamp", "status_message", "attachment_id"]);
 			$this->addJoin('tbl_profil_update_status', 'tbl_profil_update_status.status_kurzbz=tbl_profil_update.status');
 			$this->addJoin('tbl_mitarbeiter', 'tbl_mitarbeiter.mitarbeiter_uid=tbl_profil_update.uid');
 			$this->addJoin('tbl_benutzer', 'tbl_benutzer.uid=tbl_profil_update.uid');
@@ -149,6 +153,14 @@ class Profil_update_model extends DB_Model
 
 	}
 
+	/**
+	 * formatProfilRequest
+	 * 
+	 * formats the the properties of a profilUpdate request row result  
+	 *   
+	 * @param stdClass $request unflitered profilUpdate row result from the database
+	 * @return void 
+	 */
 	private function formatProfilRequest($request)
 	{
 		$request->requested_change = json_decode($request->requested_change);

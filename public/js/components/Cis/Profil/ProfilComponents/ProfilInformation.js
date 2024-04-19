@@ -99,7 +99,7 @@ export default {
 
       
 <div class="form-underline ">
-<div class="form-underline-titel">Vorname</div>
+<div class="form-underline-titel">{{$p.t('profilUpdate','vorname')}}</div>
 <span class="form-underline-content">{{name.vorname}} </span>
 </div>
 
@@ -109,7 +109,7 @@ export default {
 <div class="col-12">
 
 <div class="form-underline ">
-<div class="form-underline-titel">Nachname</div>
+<div class="form-underline-titel">{{$p.t('profilUpdate','nachname')}}</div>
 <span class="form-underline-content">{{name.nachname}} </span>
 </div>
 
@@ -130,7 +130,7 @@ export default {
 
 
 <div class="form-underline ">
-<div class="form-underline-titel">{{bez}}</div>
+<div class="form-underline-titel">{{$p.t('profil',bez)}}</div>
 <span class="form-underline-content">{{wert?wert:'-'}} </span>
 </div>
 

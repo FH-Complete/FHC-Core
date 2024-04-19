@@ -43,6 +43,8 @@ export default {
       filter: "Pending",
       events: [],
       profil_update_id: Number(this.id),
+
+      // tabulator options
       profil_updates_table_options: {
         ajaxURL:
           FHC_JS_DATA_STORAGE_OBJECT.app_root +
@@ -180,7 +182,7 @@ export default {
 
         columns: [
           {
-            title: "UID",
+            title: Vue.computed(() => this.$p.t("profilUpdate", "UID")),
             field: "uid",
             minWidth: 200,
             resizable: true,
@@ -188,7 +190,7 @@ export default {
             //responsive:0,
           },
           {
-            title: "Name",
+            title: Vue.computed(() => this.$p.t("profilUpdate", "Name")),
             field: "name",
             minWidth: 200,
             resizable: true,
@@ -196,7 +198,7 @@ export default {
             //responsive:0,
           },
           {
-            title: "Topic",
+            title: Vue.computed(() => this.$p.t("profilUpdate", "Topic")),
             field: "topic",
             resizable: true,
             minWidth: 200,
@@ -204,7 +206,7 @@ export default {
             //responsive:0,
           },
           {
-            title: "Insert Date",
+            title: Vue.computed(() => this.$p.t("profilUpdate", "insertamum")),
             field: "insertamum",
             resizable: true,
             headerFilter: true,
@@ -212,7 +214,9 @@ export default {
             //responsive:0,
           },
           {
-            title: "Status",
+            title: Vue.computed(() => {
+              return this.$p.t("profilUpdate", "Status");
+            }),
             field: "status_translated",
             hozAlign: "center",
             headerFilter: true,
@@ -238,7 +242,9 @@ export default {
             //responsive:0,
           },
           {
-            title: "View",
+            title: Vue.computed(() => {
+              return this.$p.t("profilUpdate", "actions");
+            }),
             formatter: function () {
               return "<i class='fa fa-eye'></i>";
             },

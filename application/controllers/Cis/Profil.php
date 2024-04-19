@@ -46,7 +46,7 @@ class Profil extends Auth_Controller
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Public methods
-	
+
 
 	/**
 	 * index loads the Profil view
@@ -142,12 +142,12 @@ class Profil extends Auth_Controller
 	public function getView($uid)
 	{
 		$res = new stdClass();
-		
+
 		// if parsing the URL did not found a UID then the UID of the logged in user is used
-		if($uid =="Profil" || $uid == $this->uid){
+		if ($uid == "Profil" || $uid == $this->uid) {
 			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($this->uid);
 			if (isError($isMitarbeiter)) {
-				show_error("error while checking if UID: ".$this->uid." is a mitarbeiter");
+				show_error("error while checking if UID: " . $this->uid . " is a mitarbeiter");
 			}
 			$isMitarbeiter = getData($isMitarbeiter);
 			if ($isMitarbeiter) {
@@ -161,19 +161,19 @@ class Profil extends Auth_Controller
 			}
 		}
 		// UID is availabe when accessing Profil/View/:uid
-		else{ 
+		else {
 			$this->PersonModel->addSelect(["person_id"]);
 			$pid = $this->PersonModel->getByUid($uid);
-			if(isError($pid)){
-				show_error("error while trying to update table public.tbl_person while searching for a person with UID: ".$uid);
+			if (isError($pid)) {
+				show_error("error while trying to update table public.tbl_person while searching for a person with UID: " . $uid);
 			}
 			$pid = hasData($pid) ? getData($pid)[0] : null;
-			if(!$pid){
-				show_error("Person with UID: ".$uid." does not exist");
+			if (!$pid) {
+				show_error("Person with UID: " . $uid . " does not exist");
 			}
 			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
 			if (isError($isMitarbeiter)) {
-				show_error("error while checking if UID: ".$uid." is a mitarbeiter");
+				show_error("error while checking if UID: " . $uid . " is a mitarbeiter");
 			}
 			$isMitarbeiter = getData($isMitarbeiter);
 			if ($isMitarbeiter) {
@@ -262,7 +262,7 @@ class Profil extends Auth_Controller
 		} else {
 			echo json_encode(error("Nation was not 'A' (Austria)"));
 		}
-	}	
+	}
 
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -630,7 +630,7 @@ class Profil extends Auth_Controller
 		$profilUpdates = $this->ProfilUpdateModel->getProfilUpdatesWhere(['uid' => $uid]);
 		if (isError($profilUpdates)) {
 			show_error("was not able to query the table public.tbl_profil_update:" . getData($profilUpdates));
-		} 
+		}
 		$profilUpdates = hasData($profilUpdates) ? getData($profilUpdates) : null;
 		return $profilUpdates;
 	}

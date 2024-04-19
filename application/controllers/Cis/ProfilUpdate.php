@@ -34,9 +34,6 @@ class ProfilUpdate extends Auth_Controller
 			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getStatus' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getTopic' => ['student/anrechnung_beantragen:r', 'user:r'],
-
-
-
 		]);
 
 
@@ -599,7 +596,7 @@ class ProfilUpdate extends Auth_Controller
 						$topic = "nachname";
 						break;
 					default:
-						show_error($this->p->t('profilUpdate', 'profilUpdate_topic_error',[$topic]));
+						show_error($this->p->t('profilUpdate', 'profilUpdate_topic_error', [$topic]));
 						return;
 				}
 
