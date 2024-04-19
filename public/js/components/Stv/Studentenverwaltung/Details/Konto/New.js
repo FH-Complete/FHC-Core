@@ -84,10 +84,14 @@ export default {
 		},
 		open() {
 			this.data = {
+				buchungstyp_kurzbz: '',
 				betrag: '-0.00',
-				mahnspanne: 30,
 				buchungsdatum: new Date(),
-				studiensemester_kurzbz: this.defaultSemester
+				buchungstext: '',
+				mahnspanne: 30,
+				studiensemester_kurzbz: this.defaultSemester,
+				credit_points: '',
+				anmerkung: ''
 			};
 			this.$refs.modal.show();
 		},

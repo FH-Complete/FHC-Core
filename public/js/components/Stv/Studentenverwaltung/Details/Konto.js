@@ -4,8 +4,6 @@ import KontoNew from "./Konto/New.js";
 import KontoEdit from "./Konto/Edit.js";
 
 // TODO(chris): Phrasen
-// TODO(chris): multi pers
-// TODO(chris): best. multi(recht)
 
 export default {
 	components: {
@@ -219,10 +217,44 @@ export default {
 				.then(() => 'Daten wurden gespeichert')
 				.then(this.$fhcAlert.alertSuccess)
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		downloadPdf(selected) {
+			if (Array.isArray(this.modelValue)) {
+				let id_uid = this.modelValue.reduce((a,c) => {
+					if (c.uid)
+						a[c.person_id] = c.uid;
+					return a
+				}, {});
+				let persons = selected.reduce((a,c) => {
+					if (!a[c.person_id]) {
+						let uid = id_uid[c.person_id] || '';
+						a[c.person_id] = uid + '&buchungsnummern=' + c.buchungsnr;
+					} else {
+						a[c.person_id] += ';' + c.buchungsnr;
+					}
+					return a;
+				}, {});
+				Object.values(persons).forEach(part => window.open(
+					FHC_JS_DATA_STORAGE_OBJECT.app_root +
+					'content/pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid=' +
+					part,
+					'_blank'
+				));
+			} else {
+				window.open(
+					FHC_JS_DATA_STORAGE_OBJECT.app_root +
+					'content/pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid=' +
+					(this.modelValue.uid || '') +
+					'&buchungsnummern=' +
+					selected.map(row => row.buchungsnr).join(';'),
+					'_blank'
+				);
+			}
 		}
 	},
 	created() {
 		// TODO(chris): persist filter + studiengang_kz
+		// TODO(chris): studiengang_kz in variablelib
 	},
 	template: `
 	<div class="stv-details-konto h-100 d-flex flex-column">
@@ -279,7 +311,12 @@ export default {
 						Gegenbuchen
 					</button>
 				</div>
-				<button v-if="config.showZahlungsbestaetigung" class="btn btn-outline-secondary" @click="actionDownloadPdfs">
+				<button
+					v-if="config.showZahlungsbestaetigung"
+					class="btn btn-outline-secondary"
+					@click="downloadPdf(selected)"
+					:disabled="!selected.length"
+					>
 					<i class="fa fa-download"></i> Zahlungsbestaetigung
 				</button>
 			</template>
