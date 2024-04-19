@@ -18,7 +18,7 @@ export default {
 			:showErweitert="false"
 			:showDocument="false"
 			:showTinyMCE="false"
-			:visibleColumns=['titel','text','verfasser','bearbeiter']
+			:visibleColumns="['titel','text','verfasser','bearbeiter']"
 			>
 		</NotizComponent>
 		
