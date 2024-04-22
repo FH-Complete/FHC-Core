@@ -305,6 +305,7 @@ ORDER BY "typ" DESC, "auftrag", "personalnummer" DESC, "lektor", "bestellt", "er
 
 $filterWidgetArray = array(
     'query' => $query,
+    'bootstrapVersion'=>5,
     'tableUniqueId' => 'approveLehrauftrag',
     'requiredPermissions' => 'lehre/lehrauftrag_erteilen',
     'datasetRepresentation' => 'tabulator',

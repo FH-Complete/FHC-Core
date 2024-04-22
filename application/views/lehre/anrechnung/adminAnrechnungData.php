@@ -8,6 +8,7 @@ $query = '
 
 $filterWidgetArray = array(
 	'query' => $query,
+	'bootstrapVersion'=>5,
 	'tableUniqueId' => 'adminAnrechnung',
 	'requiredPermissions' => 'lehre/anrechnungszeitfenster',
 	'datasetRepresentation' => 'tabulator',

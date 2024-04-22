@@ -37,6 +37,7 @@ $query = '
 
 $filterWidgetArray = array(
 	'query' => $query,
+	'bootstrapVersion'=>5,
 	'tableUniqueId' => 'createAnrechnung',
 	'requiredPermissions' => 'lehre/anrechnung_anlegen',
 	'datasetRepresentation' => 'tabulator',

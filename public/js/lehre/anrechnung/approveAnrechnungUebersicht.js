@@ -158,7 +158,7 @@ function func_rowFormatter(row){
 
         // ...but leave url links selectable
         row.getCell('dokument_bezeichnung').getElement().firstChild.style["pointerEvents"] = "auto";
-        //row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
+        row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
 
         // Color background grey
         row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default

@@ -70,9 +70,8 @@ $query = '
         ORDER BY lehrveranstaltung_id, benutzer.uid, lehrfunktion_kurzbz DESC
     )';
 
-if ($configFachbereichsleitung === TRUE)
-{
-    $query.= '
+if ($configFachbereichsleitung === TRUE) {
+	$query .= '
         SELECT 
         -- immer empfehlungsberechtigt, da hier nur Leitungen der LV-OE eine Empfehlungsanfrage erhalten
         TRUE AS empfehlungsberechtigt, 
@@ -95,10 +94,8 @@ if ($configFachbereichsleitung === TRUE)
         ) 
         order by empfehlung_anrechnung NULLS FIRST, antragsdatum
     ';
-}
-else
-{
-    $query.= '
+} else {
+	$query .= '
         SELECT DISTINCT ON (anrechnungen.*, lema.mitarbeiter_uid) 
         CASE 
             -- erst prüfen, ob es überhaupt eine LV Leitung gibt (wenn nicht, dann immer empfehlungsberechtigt)
@@ -127,11 +124,12 @@ else
 
 $filterWidgetArray = array(
 	'query' => $query,
+	'bootstrapVersion'=>5,
 	'tableUniqueId' => 'approveAnrechnungUebersicht',
 	'requiredPermissions' => 'lehre/anrechnung_empfehlen',
 	'datasetRepresentation' => 'tabulator',
 	'columnsAliases' => array(
-        'Empfehlungsberechtigt',
+		'Empfehlungsberechtigt',
 		'anrechnung_id',
 		'lehrveranstaltung_id',
 		'begruendung_id',
@@ -175,9 +173,7 @@ $filterWidgetArray = array(
 
 			//columnDefaults tooltip did not work
 
-			tooltip:(cell)=>{tooltip:function(e, cell, onRendered){
-				func_tooltips(e,cell,onRendered);
-			},
+			tooltip:true,
 			headerFilterPlaceholder: " ",
 			
 		}
