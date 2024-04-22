@@ -242,16 +242,59 @@ export default {
           },
           {
             title: Vue.computed(() => this.$p.t("profilUpdate", "actions")),
-            formatter: function () {
-              return "<i class='fa fa-eye'></i>";
+            formatter: (cell, para) => {
+              let status = cell.getRow().getData().status;
+              console.log("this is the cell", cell);
+              console.log("this should be the column", cell.getColumn());
+              let result = null;
+              switch (status) {
+                case this.profilUpdateStates["Pending"]:
+                  result =
+                    "<button id='acceptProfilUpdate' type='button' class='btn border-success border-2'><i class='fa fa-lg fa-circle-check text-success'></i></button>" +
+                    "<button id='denyProfilUpdate' type='button' class='btn border-danger border-2'><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>" +
+                    "<button id='viewProfilUpdate' type='button' class='btn border-secondary border-2'><i class=' fa fa-eye'></i></button>";
+                  break;
+                case this.profilUpdateStates["Accepted"]:
+                  result =
+                    "<i id='viewProfilUpdate' type='button' class='d-block fa fa-eye'></i>";
+                  break;
+                case this.profilUpdateStates["Rejected"]:
+                  result =
+                    "<i id='viewProfilUpdate' type='button' class='d-block fa fa-eye'></i>";
+                  break;
+              }
+              return (
+                "<div class='d-flex align-items-center justify-content-evenly'>" +
+                result +
+                "</div>"
+              );
+              /*   switch () {
+                case this.profilUpdateStates["Pending"]:
+                  iconClasses += "fa fa-lg fa-circle-info text-info ";
+                  break;
+                case this.profilUpdateStates["Accepted"]:
+                  iconClasses += "fa fa-lg fa-circle-check text-success ";
+                  break;
+                case this.profilUpdateStates["Rejected"]:
+                  iconClasses += "fa fa-lg fa-circle-xmark text-danger ";
+                  break; */
             },
             resizable: true,
             minWidth: 200,
             hozAlign: "center",
             cellClick: (e, cell) => {
               //! function that is called when clicking on a row in the table
+              console.log("this is the element", e.explicitOriginalTarget);
+              console.log("this is the id", e.explicitOriginalTarget.id);
               let cellData = cell.getRow().getData();
-              this.showAcceptDenyModal(cellData);
+              if (e.explicitOriginalTarget.id === "viewProfilUpdate") {
+                this.showAcceptDenyModal(cellData);
+              } else if (e.explicitOriginalTarget.id === "acceptProfilUpdate") {
+                console.log("this is the celldata", cellData);
+                this.acceptProfilUpdate(cellData);
+              } else if (e.explicitOriginalTarget.id === "denyProfilUpdate") {
+                this.denyProfilUpdate(cellData);
+              }
             },
             //responsive:0,
           },
@@ -260,6 +303,24 @@ export default {
     };
   },
   methods: {
+    denyProfilUpdate: (column) => {
+      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(column)
+        .then((res) => {
+          this.$refs.UpdatesTable.tabulator.setData();
+        })
+        .catch((e) => {
+          Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
+        });
+    },
+    acceptProfilUpdate: (column) => {
+      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column)
+        .then((res) => {
+          this.$refs.UpdatesTable.tabulator.setData();
+        })
+        .catch((e) => {
+          Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
+        });
+    },
     setLoading: function (newValue) {
       this.loading = newValue;
     },
