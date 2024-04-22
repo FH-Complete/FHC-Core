@@ -6225,6 +6225,54 @@ function StudentPrintAntragAbmeldung(event)
 	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragAbmeldung.xml.php&xsl=AntragAbmeldung&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragAbmeldung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
+function StudentPrintAntragAbmeldungStgl(event)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+
+	if (tree.currentIndex==-1)
+		return alert('Bitte eine/n Studierende/n auswaehlen');
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var prestudent_id= '';
+	var student_uid= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudentId=tree.view.getCellText(v,col);
+			prestudent_id += ';'+prestudentId;
+
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			student_uid += ';'+uid;
+
+		}
+	}
+
+	if (event.shiftKey)
+	{
+		var output='odt';
+	}
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragAbmeldungStgl.xml.php&xsl=AntragAbmeldungStgl&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragAbmeldung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
 function StudentPrintAntragUnterbrechung(event)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -6271,6 +6319,54 @@ function StudentPrintAntragUnterbrechung(event)
 	}
 
 	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragUnterbrechung.xml.php&xsl=AntragUnterbrechung&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragUnterbrechung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+function StudentPrintAntragWiederholung(event)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+
+	if (tree.currentIndex==-1)
+		return alert('Bitte eine/n Studierende/n auswaehlen');
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var prestudent_id= '';
+	var student_uid= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudentId=tree.view.getCellText(v,col);
+			prestudent_id += ';'+prestudentId;
+
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			student_uid += ';'+uid;
+
+		}
+	}
+
+	if (event.shiftKey)
+	{
+		var output='odt';
+	}
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragWiederholung.xml.php&xsl=AntragWiederholung&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragUnterbrechung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****

@@ -280,7 +280,7 @@ if(!$error)
 
 		if($_POST['neu']!='true')
 		{
-			if(!$entwt->load($_POST['mitarbeiter_uid'],$_POST['studiengang_kz_old']))
+			if(!$entwt->load($_POST['entwicklungsteam_id']))
 			{
 				$error = true;
 				$return = false;
@@ -291,12 +291,6 @@ if(!$error)
 		else
 		{
 
-			if($entwt->exists($_POST['mitarbeiter_uid'],$_POST['studiengang_kz']))
-			{
-				$error = true;
-				$errormsg = 'Es existiert bereits ein Eintrag fuer diesen Studiengang';
-				$return = false;
-			}
 			$entwt->new = true;
 			$entwt->insertamum = date('Y-m-d H:i:s');
 			$entwt->insertvon = $user;
@@ -304,6 +298,7 @@ if(!$error)
 
 		if(!$error)
 		{
+			$entwt->entwicklungsteam_id= $_POST['entwicklungsteam_id'];
 			$entwt->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 			$entwt->studiengang_kz = $_POST['studiengang_kz'];
 			$entwt->studiengang_kz_old = $_POST['studiengang_kz_old'];
@@ -328,15 +323,17 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='entwicklungsteamdelete')
 	{
 		//Loescht einen Entwicklungsteameintrag
+		$entwicklungsteam_id = $_POST['entwicklungsteam_id'];
+
 		$entwt = new entwicklungsteam();
-		if($entwt->delete($_POST['mitarbeiter_uid'],$_POST['studiengang_kz']))
+		if($entwt->delete($entwicklungsteam_id))
 		{
 			$return = true;
 		}
 		else
 		{
 			$return = false;
-			$errormsg = $entwt->errormsg;
+		 $errormsg = $entwt->errormsg;
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='buchungsave')
@@ -803,6 +800,7 @@ if(!$error)
 			$errormsg = $konto->errormsg;
 		}
 		else
+
 		{
 			$error = false;
 			$return = true;
