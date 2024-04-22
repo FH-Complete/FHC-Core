@@ -53,6 +53,7 @@ require_once('dbupdate_3.4/33714_erhoehter_studienbeitrag_fuer_drittsaatenangeho
 require_once('dbupdate_3.4/36275_zeitaufzeichnung_karenz.php');
 require_once('dbupdate_3.4/21620_neues_feld_zum_erfassen_des_ESI.php');
 require_once('dbupdate_3.4/25999_C4_ma0594.php');
+require_once('dbupdate_3.4/25999_cis4_cms.php');
 
 
 	
