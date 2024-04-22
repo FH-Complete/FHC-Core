@@ -11,6 +11,24 @@ if(!$result = @$db->db_query("SELECT xslt_xhtml_c4 FROM campus.tbl_template LIMI
 	else
 		echo '<br>campus.tbl_template: Spalte xslt_xhtml_c4 hinzugefuegt';
 
+	$xml01 = <<<EOXML01
+<xsl:stylesheet version="1.0"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:template match="content">
+	<h1>
+	    <xsl:value-of select="titel" />
+	</h1>
+	<xsl:value-of select="inhalt" disable-output-escaping="yes" />
+    </xsl:template>
+</xsl:stylesheet>
+EOXML01;
+
+	$qry = <<<EOSQL
+	UPDATE campus.tbl_template SET xslt_xhtml_c4='{$xml01}' WHERE template_kurzbz='contentmittitel';
+
+EOSQL;
+
 	// TODO(chris): add default values
 	$qry = "";
 	$qry .= "UPDATE campus.tbl_template SET xslt_xhtml_c4='" . '<xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"><xsl:template match="content"><h1><xsl:value-of select="titel" /></h1><xsl:value-of select="inhalt" disable-output-escaping="yes" /></xsl:template></xsl:stylesheet>' . "' WHERE template_kurzbz='contentmittitel';";
