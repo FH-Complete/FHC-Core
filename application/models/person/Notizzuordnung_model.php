@@ -32,14 +32,17 @@ class Notizzuordnung_model extends DB_Model
 			$validTypes[] = $t->column_name;
 		}
 
-		if (in_array($type, $validTypes))
+		//TODO(manu) param id
+		if (in_array($type, $validTypes) )
+		//if (in_array($type, $validTypes) ||($type == 'software_id')) //Just for testing
 		{
-			$result = success('Type of Id is valid');
+			return success("Type " . $type . " is valid");
+		//	$result = success('Type of Id is valid');
 		}
 		else
 		{
-			$result = error('Type of Id  is not valid');
+			return error("Type " . $type . " is NOT valid");
 		}
-		return $result;
+		//return $result;
 	}
 }

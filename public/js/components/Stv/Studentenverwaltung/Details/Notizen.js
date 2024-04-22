@@ -11,14 +11,15 @@ export default {
 	<div class="stv-details-details h-100 pb-3">
 		<h3>Notizen</h3>
 		<NotizComponent
+			endpoint="api/frontend/v1/stv/Notiz/"
 			ref="formc"
 			typeId="person_id"
 			:id="modelValue.person_id"
 			notizLayout="twoColumnsFormLeft"
-			:showErweitert="false"
-			:showDocument="false"
+			:showErweitert="true"
+			:showDocument="true"
 			:showTinyMCE="false"
-			:visibleColumns="['titel','text','verfasser','bearbeiter']"
+			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
 		</NotizComponent>
 		
@@ -41,7 +42,7 @@ typeId: id to which table the notizdata should be connected... eg. person_id, pr
 	in progress for extensions
 
 visibleColumns: list, which fields shoult be showed as default in filter component
-		fullVersion: :visibleColumns=['titel','text','bearbeiter','verfasser','von','bis','erledigt']
+		fullVersion: :visibleColumns="['titel','text','bearbeiter','verfasser','von','bis','dokumente','erledigt','notiz_id','notizzuordnung_id','id','lastupdate']"
 
 ---------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------	

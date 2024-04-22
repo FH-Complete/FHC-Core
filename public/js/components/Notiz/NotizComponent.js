@@ -18,6 +18,7 @@ export default {
 		BsModal
 	},
 	props: [
+		'endpoint',
 		'typeId',
 		'id',
 		'notizLayout',
@@ -29,16 +30,14 @@ export default {
 	data(){
 			return {
 				tabulatorOptions: {
-					ajaxURL: 'api/frontend/v1/stv/Notiz/getNotizen/' + this.id + '/' + this.typeId,
+					ajaxURL: this.endpoint + 'getNotizen/' + this.id + '/' + this.typeId,
 					ajaxRequestFunc: this.$fhcApi.get,
 					ajaxResponse: (url, params, response) => response.data,
-					//ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.id + '/' + this.typeId),
 					columns: [
 						{
 							title: "Titel",
 							field: "titel",
 							width: 100,
-							visible: true,
 							tooltip:function(e, cell, onRendered){
 								var el = document.createElement("div");
 								el.style.backgroundColor = "white";
@@ -55,7 +54,6 @@ export default {
 							title: "Text",
 							field: "text_stripped",
 							width: 250,
-							visible: true,
 							tooltip:function(e, cell, onRendered){
 								var el = document.createElement("div");
 								el.style.backgroundColor = "white";
@@ -88,6 +86,8 @@ export default {
 						},
 						{title: "Notiz_id", field: "notiz_id", width: 92, visible: false},
 						{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: false},
+						{title: "type_id", field: "type_id", width: 164, visible: false},
+						{title: "extension_id", field: "id", width: 135, visible: false},
 						{title: "letzte Änderung", field: "lastupdate", width: 146, visible: false},
 						{
 							title: 'Aktionen', field: 'actions',
@@ -142,11 +142,11 @@ export default {
 							});
 							cm.getColumnByField('titel').component.updateDefinition({
 								title: this.$p.t('global', 'titel'),
-								visible: this.showVariables.showTitel
+								//visible: this.showVariables.showTitel
 							});
 							cm.getColumnByField('text_stripped').component.updateDefinition({
 								title: this.$p.t('global', 'text'),
-								visible: this.showVariables.showText
+								//visible: this.showVariables.showText
 							});
 							cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
 								title: this.$p.t('notiz', 'bearbeiter'),
@@ -177,6 +177,12 @@ export default {
 							});
 							cm.getColumnByField('notizzuordnung_id').component.updateDefinition({
 								visible: this.showVariables.showNotizzuordnung_id
+							});
+							cm.getColumnByField('type_id').component.updateDefinition({
+								visible: this.showVariables.showType_id
+							});
+							cm.getColumnByField('id').component.updateDefinition({
+								visible: this.showVariables.showId
 							});
 
 						}
@@ -214,6 +220,8 @@ export default {
 					showErledigt: false,
 					showNotiz_id: false,
 					showNotizzuordnung_id: false,
+					showType_id: false,
+					showId: false,
 					showLastupdate: false
 				},
 		}
@@ -258,7 +266,13 @@ export default {
 
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
-			this.$fhcApi.post('api/frontend/v1/stv/notiz/addNewNotiz/' + this.id,
+/*			this.formData = {
+				'id': this.id,
+				'typeId': this.typeId,
+				...formData
+			};*/
+
+			return this.$fhcApi.post(this.endpoint + 'addNewNotiz/' + this.id,
 				formData,
 				{Headers: {"Content-Type": "multipart/form-data"}}
 			).then(response => {
@@ -273,10 +287,12 @@ export default {
 		},
 		deleteNotiz(notiz_id) {
 			this.param = {
-				'notiz_id': notiz_id
+				'notiz_id': notiz_id,
+				'type_id': this.typeId,
+				'id': this.id
 			};
 
-			return this.$fhcApi.post('api/frontend/v1/stv/notiz/deleteNotiz/', this.param)
+			return this.$fhcApi.post(this.endpoint + 'deleteNotiz/', this.param)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.$refs.deleteNotizModal.hide();
@@ -292,7 +308,7 @@ export default {
 			this.param = {
 				'notiz_id': notiz_id
 			};
-			return this.$fhcApi.post('api/frontend/v1/stv/notiz/loadNotiz/',
+			return this.$fhcApi.post(this.endpoint + 'loadNotiz/',
 				this.param)
 				.then(result => {
 					this.notizData = result.data;
@@ -305,7 +321,7 @@ export default {
 			this.param = {
 				'notiz_id': notiz_id
 			};
-			return this.$fhcApi.post('api/frontend/v1/stv/notiz/loadDokumente/',
+			return this.$fhcApi.post(this.endpoint + 'loadDokumente/',
 				this.param)
 				.then(
 					result => {
@@ -324,7 +340,7 @@ export default {
 			};
 
 			return this.$fhcApi.post(
-				'api/frontend/v1/stv/notiz/updateNotiz/',
+				this.endpoint + 'updateNotiz/',
 				formData,
 				{Headers: {"Content-Type": "multipart/form-data"}}
 			).then(response => {
@@ -359,7 +375,7 @@ export default {
 		},
 		getUid() {
 			this.$fhcApi
-				.get('api/frontend/v1/stv/notiz/getUid')
+				.get(this.endpoint + 'getUid')
 				.then(result => {
 					this.notizData.intVerfasser = result.data;
 				})
@@ -367,7 +383,7 @@ export default {
 		},
 		search(event) {
 			return this.$fhcApi
-				.get('api/frontend/v1/stv/notiz/getMitarbeiter/' + event.query)
+				.get(this.endpoint + 'getMitarbeiter/' + event.query)
 				.then(result => {
 					this.filteredMitarbeiter = result.data.retval;
 				});

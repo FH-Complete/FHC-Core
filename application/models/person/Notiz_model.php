@@ -180,12 +180,28 @@ class Notiz_model extends DB_Model
 		{
 			$notiz_id = $result->retval;
 
-			if (isSuccess($result))
+			//TODO(Manu) neue Function assign Notiz
+			if($type == "software_id")
 			{
-				$notiz_id = $result->retval;
+				// Loads extension Model
+				$this->load->model('extensions/FHC-Core-Softwarebereitstellung/Softwarenotizzuordnung_model', 'ExtensionnotizzuordnungModel');
+				$result = $this->ExtensionnotizzuordnungModel->insert([
+					'notiz_id' => $notiz_id,
+					'id' => $id,
+					'type_id' => $type
+				]);
+			}
+			else
+			{
 				$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, $type => $id));
 			}
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return error('Fehler Insert Zuordnungstabelle');
+			}
 		}
+
 
 		// Transaction complete!
 		$this->db->trans_complete();
@@ -207,8 +223,10 @@ class Notiz_model extends DB_Model
 
 	/**
 	 * Add a Notiz for a given person with DMS_id
+	 *
 	 */
-	public function addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $von, $bis, $dms_id = null)
+	//Todo(manu) deprecated?
+/*	public function addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $von, $bis, $dms_id = null)
 	{
 		// Loads model Notizzuordnung_model
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
@@ -228,7 +246,7 @@ class Notiz_model extends DB_Model
 			{
 				// Loads model Notizdokument_model
 				$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
-				//Todo(manu) change for multiple files
+
 				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
 			}
 		}
@@ -249,7 +267,7 @@ class Notiz_model extends DB_Model
 		}
 
 		return $result;
-	}
+	}*/
 
 	/**
 	 * gets all Notizen for a person
@@ -271,32 +289,33 @@ class Notiz_model extends DB_Model
 	 */
 	public function getNotizWithDocEntries($id, $type)
 	{
-		$qry = "
-			SELECT 
-			    	n.*, count(dms_id) as countDoc, z.notizzuordnung_id,
-			    	TO_CHAR (CASE 
-						WHEN n.updateamum >= n.insertamum THEN n.updateamum 
-						ELSE n.insertamum
-					END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate,
-			    	regexp_replace(n.text, '<[^>]*>', '', 'g') as text_stripped,
-			    	TO_CHAR(n.start::timestamp, 'DD.MM.YYYY') AS start_format,
-			    	TO_CHAR(n.ende::timestamp, 'DD.MM.YYYY') AS ende_format
-			    	
-			FROM
-			    	public.tbl_notiz n
-			JOIN 
-			    	    public.tbl_notizzuordnung z USING (notiz_id)
-			LEFT JOIN 
-			    	    public.tbl_notiz_dokument dok USING (notiz_id)
-			LEFT JOIN 
-			    	    campus.tbl_dms_version USING (dms_id)
-			WHERE 
-			   z.$type  = ?
-			GROUP BY 
-			    notiz_id, z.notizzuordnung_id
-		";
+			$qry = "
+				SELECT 
+						n.*, count(dms_id) as countDoc, z.notizzuordnung_id,
+						TO_CHAR (CASE 
+							WHEN n.updateamum >= n.insertamum THEN n.updateamum 
+							ELSE n.insertamum
+						END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate,
+						regexp_replace(n.text, '<[^>]*>', '', 'g') as text_stripped,
+						TO_CHAR(n.start::timestamp, 'DD.MM.YYYY') AS start_format,
+						TO_CHAR(n.ende::timestamp, 'DD.MM.YYYY') AS ende_format,
+						z.notiz_id, z.person_id as id, ? as type_id
+						
+				FROM
+						public.tbl_notiz n
+				JOIN 
+							public.tbl_notizzuordnung z USING (notiz_id)
+				LEFT JOIN 
+							public.tbl_notiz_dokument dok USING (notiz_id)
+				LEFT JOIN 
+							campus.tbl_dms_version USING (dms_id)
+				WHERE 
+				   z.$type  = ?
+				GROUP BY 
+					notiz_id, z.notizzuordnung_id
+			";
 
-		return $this->execQuery($qry, array($id));
+		return $this->execQuery($qry, array($type, $id));
 
 	}
 

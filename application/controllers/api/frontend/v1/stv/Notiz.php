@@ -4,7 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use \DateTime as DateTime;
 
-class Notiz extends FHCAPI_Controller
+class Notiz extends Notiz_Controller
 {
 	public function __construct()
 	{
@@ -32,32 +32,33 @@ class Notiz extends FHCAPI_Controller
 		]);
 	}
 
-	public function getUid()
+/*	public function getUid()
 	{
 		$this->terminateWithSuccess(getAuthUID());
-	}
+	}*/
+
 
 	public function getNotizen($id, $type)
 	{
+
 		//check if valid type
-		$isValidType = $this->NotizzuordnungModel->isValidType($type);
+		$result = $this->NotizzuordnungModel->isValidType($type);
+		if(isError($result))
+			$this->terminateWithError($result->retval, self::ERROR_TYPE_GENERAL);
 
-		if($isValidType)
-		{
-			$result = $this->NotizModel->getNotizWithDocEntries($id, $type);
+		//$this->terminateWithError(" after check type not valid", self::ERROR_TYPE_GENERAL);
+		$result = $this->NotizModel->getNotizWithDocEntries($id, $type);
 
-			if (isError($result)) {
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-			return $this->terminateWithSuccess(getData($result) ?: []);
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		else
-		{
-			return $this->terminateWithError("type not valid", self::ERROR_TYPE_GENERAL);
-		}
+		return $this->terminateWithSuccess(getData($result) ?: []);
+
+		//	return $this->terminateWithError("type not valid", self::ERROR_TYPE_GENERAL);
+
 	}
 
-	public function loadNotiz()
+/*	public function loadNotiz()
 	{
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
@@ -87,96 +88,6 @@ class Notiz extends FHCAPI_Controller
 		}
 	}
 
-	public function addNewNotiz($id, $paramTyp = null)
-	{
-		//$this->load->model('person/Notiz_model', 'NotizModel');
-
-		$this->load->library('DmsLib');
-		$this->load->library('form_validation');
-
-		$uid = getAuthUID();
-
-		if (isset($_POST['data']))
-		{
-			$data = json_decode($_POST['data']);
-			unset($_POST['data']);
-			foreach ($data as $k => $v) {
-				$_POST[$k] = $v;
-			}
-		}
-
-		//Form Validation
-		$this->form_validation->set_rules('titel', 'Titel', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Titel'])
-		]);
-
-		$this->form_validation->set_rules('text', 'Text', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Text'])
-		]);
-
-		if ($this->form_validation->run() == false)
-		{
-			$this->terminateWithValidationErrors($this->form_validation->error_array());
-		}
-
-		$titel = $this->input->post('titel');
-		$text = $this->input->post('text');
-		$erledigt = $this->input->post('erledigt');
-		$verfasser_uid = isset($_POST['verfasser']) ? $_POST['verfasser'] : $uid;
-		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : null;
-		$type = $this->input->post('typeId');
-		$start = $this->input->post('start');
-		$ende = $this->input->post('ende');
-
-		//Speichern der Notiz und Notizzuordnung inkl Prüfung ob valid type
-		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		$notiz_id = $result->retval;
-
-		//Speichern der Files
-		$dms_id_arr = [];
-		foreach ($_FILES as $k => $file)
-		{
-			$dms = array(
-				'kategorie_kurzbz'  => 'notiz',
-				'version'           => 0,
-				'name'              => $file["name"],
-				'mimetype'          => $file["type"],
-				'insertamum'        => date('c'),
-				'insertvon'         => $uid
-			);
-
-			//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
-			//Todo(manu)check name files: nicht gleiches file 2mal hochladen
-			$result = $this->dmslib->upload($dms, $k, ['*']);
-			/*			$result = $this->dmslib->upload($dms, $k, ['application/pdf','application/x.fhc-dms+json']);*/
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-			$dms_id_arr[] = $result->retval['dms_id'];
-		}
-
-		//Eintrag in Notizdokument speichern
-		if($dms_id_arr)
-		{
-			// Loads model Notizdokument_model
-			$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
-			foreach($dms_id_arr as $dms_id)
-			{
-				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
-			}
-		}
-
-		return $this->terminateWithSuccess($result);
-	}
 
 	public function updateNotiz()
 	{
@@ -336,12 +247,15 @@ class Notiz extends FHCAPI_Controller
 			}
 		}
 		return $this->terminateWithSuccess($result);
-	}
+	}*/
 
-	public function deleteNotiz()
+
+/*	public function deleteNotiz()
 	{
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 		$notiz_id = $this->input->post('notiz_id');
+		$type = $this->input->post('type_id');
+		$id = $this->input->post('id');
 
 		//dms_id auslesen aus notizdokument wenn vorhanden
 		$dms_id_arr = [];
@@ -378,10 +292,33 @@ class Notiz extends FHCAPI_Controller
 			}
 		}
 
-		//delete Notiz und Notizzuordnung
-		$this->load->model('person/Notiz_model', 'NotizModel');
-		$this->NotizModel->addJoin('public.tbl_notizzuordnung', 'notiz_id');
+		//delete Notizzuordnung
+		if($type == "software_id")
+		{
+			// Loads extension Model
+			$this->load->model('extensions/FHC-Core-Softwarebereitstellung/Softwarenotizzuordnung_model', 'ExtensionnotizzuordnungModel');
+			$result = $this->ExtensionnotizzuordnungModel->delete([
+				'notiz_id' => $notiz_id,
+				'id' => strval($id)
+				],
+				[
+				'type_id' => $type
+			]);
 
+		}
+		else
+		{
+			//notizzuordnungsid!
+			$result = $this->NotizzuordnungModel->delete(['notiz_id' => $notiz_id, $type => $id]);
+		}
+
+
+		$this->load->model('person/Notiz_model', 'NotizModel');
+		//$this->NotizModel->addJoin('public.tbl_notizzuordnung', 'notiz_id');
+
+		//TODO (erweitern um Type_id) für Extensions, damit auch Notizzuordnung gelöscht werden kann
+
+		//Löschen von Notiz
 		$result = $this->NotizModel->delete(
 			array('notiz_id' => $notiz_id)
 		);
@@ -396,9 +333,9 @@ class Notiz extends FHCAPI_Controller
 		}
 
 		return $this->terminateWithSuccess(current(getData($result)));
-	}
+	}*/
 
-	public function loadDokumente()
+/*	public function loadDokumente()
 	{
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 		$notiz_id = $this->input->post('notiz_id');
@@ -420,9 +357,9 @@ class Notiz extends FHCAPI_Controller
 			return $this->terminateWithError($this->p->t('ui','error_missingId', ['id'=> 'Notiz_id']), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess(getData($result));
-	}
+	}*/
 
-	public function getMitarbeiter($searchString)
+/*	public function getMitarbeiter($searchString)
 	{
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 		$result = $this->MitarbeiterModel->searchMitarbeiter($searchString);
@@ -430,6 +367,18 @@ class Notiz extends FHCAPI_Controller
 			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess($result);
+	}*/
+
+	public function isBerechtigt($id, $typeId)
+	{
+		if(!$this->permissionlib->isBerechtigt('admin', 'suid') && !$this->permissionlib->isBerechtigt('assistenz', 'suid'))
+		{
+			$result =  $this->p->t('lehre','error_keineSchreibrechte');
+
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		return success("berechtigt in überschreibender Funktion");
+/*		return $this->terminateWithError('keine Berechtigung bro', self::ERROR_TYPE_GENERAL);*/
 	}
 
 }
