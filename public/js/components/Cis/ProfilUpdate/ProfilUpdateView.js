@@ -37,6 +37,7 @@ export default {
   },
   data() {
     return {
+      categoryLoaded: false,
       showModal: false,
       modalData: null,
       loading: false,
@@ -214,9 +215,7 @@ export default {
             //responsive:0,
           },
           {
-            title: Vue.computed(() => {
-              return this.$p.t("profilUpdate", "Status");
-            }),
+            title: Vue.computed(() => this.$p.t("profilUpdate", "Status")),
             field: "status_translated",
             hozAlign: "center",
             headerFilter: true,
@@ -242,9 +241,7 @@ export default {
             //responsive:0,
           },
           {
-            title: Vue.computed(() => {
-              return this.$p.t("profilUpdate", "actions");
-            }),
+            title: Vue.computed(() => this.$p.t("profilUpdate", "actions")),
             formatter: function () {
               return "<i class='fa fa-eye'></i>";
             },
@@ -262,7 +259,6 @@ export default {
       },
     };
   },
-  computed: {},
   methods: {
     setLoading: function (newValue) {
       this.loading = newValue;
@@ -309,7 +305,11 @@ export default {
       }
     },
   },
-
+  created() {
+    this.$p.loadCategory("profilUpdate").then(() => {
+      this.categoryLoaded = true;
+    });
+  },
   mounted() {
     //? opens the AcceptDenyUpdate Modal if a preselected profil_update_id was passed to the component (used for email links)
     if (this.profil_update_id) {
@@ -347,7 +347,7 @@ export default {
     </div>
     <loading ref="loadingModalRef" :timeout="0"></loading>
     
-    <core-filter-cmpt v-if="profilUpdateStates" :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="events" :tabulator-options="profil_updates_table_options" tableOnly :sideMenu="false" />
+    <core-filter-cmpt v-if="profilUpdateStates && categoryLoaded" :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="events" :tabulator-options="profil_updates_table_options" tableOnly :sideMenu="false" />
 
     </div>`,
 };
