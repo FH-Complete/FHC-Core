@@ -831,6 +831,7 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv) {
 			</button>
 		</div>
 	</div>
+	</br>
 	`;
 
   return tabulatorHeaderHTML;
