@@ -92,6 +92,18 @@ echo '<!DOCTYPE HTML>
 	<title>Lehreinheit Vorrueckung</title>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function()
+	{		
+		$("#select_studiensemester_kurzbz_from").change(function()
+		{
+			var index = $(this).prop("selectedIndex");
+			index = index-1;
+			$("#select_studiensemester_kurzbz_to :nth-child("+index+")").prop("selected", true);
+		});
+	});
+	</script>
 </head>
 <body style="background-color:#eeeeee;">
 <h2>Lehreinheiten Vorr&uuml;ckung</h2>
@@ -132,9 +144,9 @@ for ($i = 1;$i <= 10;$i++)
 }
 echo '</SELECT>';
 
-echo ' Von: <SELECT name="stsem_von">';
+echo ' Von: <SELECT id="select_studiensemester_kurzbz_from" name="stsem_von">';
 $stsem_obj = new studiensemester();
-$stsem_obj->getAll();
+$stsem_obj->getAll('desc');
 
 foreach ($stsem_obj->studiensemester as $stsem)
 {
@@ -147,7 +159,7 @@ foreach ($stsem_obj->studiensemester as $stsem)
 }
 echo '</SELECT>';
 
-echo ' Nach: <SELECT name="stsem_nach">';
+echo ' Nach: <SELECT id="select_studiensemester_kurzbz_to" name="stsem_nach">';
 
 foreach ($stsem_obj->studiensemester as $stsem)
 {

@@ -201,7 +201,7 @@ export default {
 			}, {
 				field: 'name',
 				title: this.$p.t('global', 'name'),
-				mutator: (value, data) => (data.vorname + ' ' + data.nachname).replace(/^\s*(.*)\s*$/, '$1'),
+				mutator: (value, data) => (data.nachname + ' ' + data.vorname).replace(/^\s*(.*)\s*$/, '$1'),
 				headerFilter: 'input'
 			}, {
 				field: 'datum',
