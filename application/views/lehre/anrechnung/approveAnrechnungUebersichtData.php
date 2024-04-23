@@ -4,7 +4,7 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 
 $STUDIENSEMESTER = $studiensemester_selected;
 $STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);						// alle STG mit Lese- und Schreibberechtigung
-$ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT = "'". implode('\',\'', $oes_schreibberechtigt). "'";		// alle OE nur mit Schreibberechtigung; singlequote für jeden string notwendig
+$ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT = "'" . implode('\',\'', $oes_schreibberechtigt) . "'";		// alle OE nur mit Schreibberechtigung; singlequote für jeden string notwendig
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
 
 $query = '
@@ -109,9 +109,8 @@ $query = '
                     LIMIT 1)
             END "empfehlungsanfrageAm",';
 
-if ($configFachbereichsleitung === TRUE)
-{
-	$query.= ' CASE
+if ($configFachbereichsleitung === TRUE) {
+	$query .= ' CASE
                 WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
                 ELSE
                 (SELECT COALESCE(
@@ -136,10 +135,8 @@ if ($configFachbereichsleitung === TRUE)
                         ) as tmp_empfehlungsanfrageEmpfaenger
                     )
             END "empfehlungsanfrageAn"';
-}
-else
-{
-	$query.= ' CASE
+} else {
+	$query .= ' CASE
                 WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
                 ELSE
                 (SELECT COALESCE(
@@ -164,7 +161,7 @@ else
             END "empfehlungsanfrageAn"';
 }
 
-$query.= '	FROM anrechnungen
+$query .= '	FROM anrechnungen
 	JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
 	WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
 	AND studiengang_kz IN (' . $STUDIENGAENGE_ENTITLED . ')
@@ -190,8 +187,8 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('lehre', 'lehrveranstaltung')),
 		'ECTS (LV)',
 		'ECTS (LV + Bisher)',
-        'ECTS (Bisher schulisch)',
-        'ECTS (Bisher beruflich',
+		'ECTS (Bisher schulisch)',
+		'ECTS (Bisher beruflich',
 		ucfirst($this->p->t('global', 'begruendung')),
 		ucfirst($this->p->t('person', 'studentIn')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
@@ -201,13 +198,38 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
 		'Status',
-	  	'PrestudentID',
+		'PrestudentID',
 		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')),
 		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAn'))
 	),
 
 	'datasetRepOptions' => '{
-		
+height: func_height(this),
+layout: "fitColumns",               // fit columns to width of table
+layoutColumnsOnNewData:true,
+persistenceID: "approveAnrechnungUebersicht_V1",
+autoResize: false,               // prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
+index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
+selectable: true,               // allow row selection
+selectableRangeMode: "click",   // allow range selection using shift end click on end of range
+selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
+tableWidgetFooter: {
+	selectButtons: true  // tableWidgetFooter properties are checked in _renderTabulatorFooterHTML function
+},
+selectableCheck: function(row){
+	return func_selectableCheck(row);
+},
+rowFormatter:function(row){
+	func_rowFormatter(row,this);
+},
+columnDefaults:{
+	
+	//columnDefaults tooltip did not work
+	
+	tooltip:function(e, cell, onRendered){
+		return func_tooltips(cell);
+	},
+},
 		height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
 		persistenceID: "approveAnrechnungUebersicht_V1",
@@ -232,7 +254,7 @@ $filterWidgetArray = array(
 			tooltip:function(e, cell, onRendered){
 				return func_tooltips(cell);
 			},
-			headerFilterPlaceholder: " ",
+			//headerFilterPlaceholder: " ",
 		}
 		
 	 }', // tabulator properties

@@ -4,15 +4,15 @@
 
 		<!-- Table widget header -->
 		<div id="tableWidgetHeader"></div>
-        
-        <!-- TableWidget help site ( only rendered if widget is Tabulator )-->
+
+		<!-- TableWidget help site ( only rendered if widget is Tabulator )-->
 		<?php $this->load->view('widgets/table/tableHelpsite') ?>
-  
+
 		<!-- Table info top -->
 		<div id="tableDatasetActionsTop"></div>
 
 		<!-- TableWidget table -->
-		<div class="border border-2 mb-4">
+		<div class="border border-1 mb-4">
 			<?php TableWidget::loadViewDataset(); ?>
 		</div>
 
