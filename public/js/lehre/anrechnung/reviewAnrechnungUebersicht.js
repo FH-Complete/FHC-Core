@@ -138,7 +138,7 @@ function func_tooltips(e, cell, onRendered) {
   //e - mouseover event
   //cell - cell component
   //onRendered - onRendered callback registration functionfunction
-
+  console.log("this is a tooltip");
   // Return tooltip if row is unselectable
   if (!func_selectableCheck(cell.getRow())) {
     return FHC_PhrasesLib.t("ui", "nichtSelektierbarAufgrundVon") + "Status";

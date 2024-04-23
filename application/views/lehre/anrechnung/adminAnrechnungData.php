@@ -20,16 +20,17 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('ui', 'bearbeitetVon')),
 	),
 	'datasetRepOptions' => '{
-		
-		layout: "fitColumns",           
+		height: func_height(this),
+		layout: "fitDataFill",           
 		persistentLayout:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
+	    headerFilterPlaceholder: " ",
         index: "anrechnungszeitraum_id",         // assign specific column as unique id (important for row indexing)
         selectable: false,                  // allow row selection
 		tableWidgetHeader: true,
-		columnDefaults:{
-			headerFilterPlaceholder: " ",
-		}
+		tableBuilt: function(){
+            func_tableBuilt(this);
+        },
 	 }',
 	'datasetRepFieldsDefs' => '{
 		anrechnungszeitraum_id: {visible: false, headerFilter:"input"},

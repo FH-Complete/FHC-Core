@@ -214,7 +214,7 @@ var reviewAnrechnung = {
                 $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-info-subtle');
                 break;
             default:
-                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-warning-stubtle');
+                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-warning-subtle');
         }
     },
     setEmpfehlungstext: function () {

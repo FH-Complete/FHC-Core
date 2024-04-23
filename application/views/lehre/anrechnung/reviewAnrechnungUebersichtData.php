@@ -124,7 +124,7 @@ if ($configFachbereichsleitung === TRUE) {
 
 $filterWidgetArray = array(
 	'query' => $query,
-	'bootstrapVersion'=>5,
+	'bootstrapVersion' => 5,
 	'tableUniqueId' => 'approveAnrechnungUebersicht',
 	'requiredPermissions' => 'lehre/anrechnung_empfehlen',
 	'datasetRepresentation' => 'tabulator',
@@ -173,7 +173,7 @@ $filterWidgetArray = array(
 
 			//columnDefaults tooltip did not work
 
-			tooltip:true,
+			tooltip:func_tooltips,
 			headerFilterPlaceholder: " ",
 			
 		}
