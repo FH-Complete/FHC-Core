@@ -35,9 +35,7 @@ $this->load->view(
         ),
         'widgets' => true,
         'dialoglib' => true,
-        'customCSSs' => array(
-            'public/css/lehre/anrechnung.css'
-        ),
+
         'customJSs' => array(
             'public/js/bootstrapper.js',
             'public/js/lehre/lvplanung/zverfueg.js'
@@ -145,15 +143,16 @@ $this->load->view(
                         </div>
 
                         <div class="col-sm-8">
-                            <button type="submit" id="btn-save" class="btn btn-primary btn-w200 pull-right">
+                            <button type="submit" id="btn-save" style="width:200px;" class="btn btn-primary pull-right">
                                 <?php echo ucfirst($this->p->t('ui', 'speichern')); ?>
                             </button>
-                            <button type="button" id="btn-delete" class="btn btn-danger btn-w200 btn-mr5 pull-right"
-                                disabled data-toggle="tooltip" data-placement="right"
+                            <button type="button" id="btn-delete" style="width:200px; margin-right:10px"
+                                class="btn btn-danger  pull-right" disabled data-toggle="tooltip" data-placement="right"
                                 title="Zum Löschen LektorIn aus Tabelle wählen">
                                 <?php echo ucfirst($this->p->t('ui', 'loeschen')); ?>
                             </button>
-                            <button type="reset" id="btn-break" class="btn btn-default btn-w200 btn-mr5 pull-right">
+                            <button type="reset" id="btn-break" style="width:200px; margin-right:10px"
+                                class="btn btn-default pull-right">
                                 <?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                             </button>
                         </div>
