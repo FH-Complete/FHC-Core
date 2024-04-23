@@ -41,9 +41,13 @@ export default {
 							tooltip:function(e, cell, onRendered){
 								var el = document.createElement("div");
 								el.style.backgroundColor = "white";
+								el.style.color = "black";
 								el.style.fontWeight = "bold";
 								el.style.padding = "5px";
 								el.style.border = "1px solid black";
+								el.style.borderRadius = "5px";
+
+								el.innerText = cell.getValue();
 
 								el.innerText = cell.getColumn().getField() + " - " + cell.getValue();
 
@@ -57,6 +61,7 @@ export default {
 							tooltip:function(e, cell, onRendered){
 								var el = document.createElement("div");
 								el.style.backgroundColor = "white";
+								el.style.color = "black";
 								el.style.fontWeight = "bold";
 								el.style.padding = "5px";
 								el.style.border = "1px solid black";
