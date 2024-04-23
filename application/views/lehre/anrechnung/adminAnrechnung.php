@@ -9,7 +9,7 @@ $includesArray = array(
     'dialoglib' => true,
     'tabulator5' => true,
     'tabulator5JQuery' => true,
-    'cis'=>true,
+    'cis' => true,
     'tablewidget' => true,
     'sbadmintemplate3' => true,
     'navigationwidget' => true,
@@ -72,12 +72,12 @@ $this->load->view('templates/FHC-Header', $includesArray);
 
             <!--Untertitel-->
             <h4 class="my-4"><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumFestlegen'); ?></h4>
-            
-            
-            <button class="btn btn-primary azrOpenModal" data-bs-toggle="modal" data-bs-target="#azrModal"  >
+
+
+            <button class="btn btn-primary azrOpenModal" data-bs-toggle="modal" data-bs-target="#azrModal">
                 <i class="fa fa-plus"></i> <?php echo $this->p->t('anrechnung', 'anrechnungszeitraumHinzufuegen'); ?>
             </button>
-              
+
 
             <!-- Tabelle -->
             <div class="row">
@@ -87,53 +87,55 @@ $this->load->view('templates/FHC-Header', $includesArray);
             </div>
 
             <!-- Modal (für insert und update von Anrechnungszeitraum)-->
-            <div class="modal fade" id="azrModal" tabindex="-1" role="dialog" aria-labelledby="azrModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="azrModalLabel"></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button>
-                    </div>
-                    <div class="modal-body my-4">
-                        <div class="row">
-                            <input type="hidden" id="anrechnungszeitraum_id" value="">
-                            <input type="hidden" id="defaultStudiensemester_kurzbz" value="<?php echo $studiensemester_kurzbz ?>">
-                            <div class="col-4">
-                                <label for="studiensemester" class="fw-bold small">Studiensemester</label>
-                                <?php
-                                echo $this->widgetlib->widget(
-                                    'Studiensemester_widget',
-                                    array(
-                                        DropdownWidget::SELECTED_ELEMENT => $studiensemester_kurzbz
-                                    ),
-                                    array(
-                                        'name' => 'studiensemester',
-                                        'id' => 'studiensemester',
-                                        'class'=>'form-select w-auto ',
-                                    )
-                                );
-                                ?>
-                            </div>
-                            <div class="col-4">
-                                <label for="azrStart" class="fw-bold small">Anr.-Zeitraum Start</label>
-                                <input type="date" id="azrStart" value="" class="form-control" required>
-                            </div>
-                            <div class="col-4">
-                                <label for="azrEnde" class="fw-bold small">Anr.-Zeitraum Ende</label>
-                                <input type="date" id="azrEnde" value="" class="form-control" required>
+            <div class="modal fade" id="azrModal" tabindex="-1" role="dialog" aria-labelledby="azrModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="azrModalLabel"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body my-4">
+                            <div class="row">
+                                <input type="hidden" id="anrechnungszeitraum_id" value="">
+                                <input type="hidden" id="defaultStudiensemester_kurzbz"
+                                    value="<?php echo $studiensemester_kurzbz ?>">
+                                <div class="col-4">
+                                    <label for="studiensemester" class="fw-bold small">Studiensemester</label>
+                                    <?php
+                                    echo $this->widgetlib->widget(
+                                        'Studiensemester_widget',
+                                        array(
+                                            DropdownWidget::SELECTED_ELEMENT => $studiensemester_kurzbz
+                                        ),
+                                        array(
+                                            'name' => 'studiensemester',
+                                            'id' => 'studiensemester',
+                                            'class' => 'form-select w-auto ',
+                                        )
+                                    );
+                                    ?>
+                                </div>
+                                <div class="col-4">
+                                    <label for="azrStart" class="fw-bold small">Anr.-Zeitraum Start</label>
+                                    <input type="date" id="azrStart" value="" class="form-control" required>
+                                </div>
+                                <div class="col-4">
+                                    <label for="azrEnde" class="fw-bold small">Anr.-Zeitraum Ende</label>
+                                    <input type="date" id="azrEnde" value="" class="form-control" required>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="azrInsertBtn" class="btn btn-primary" value=""><?php echo $this->p->t('ui', 'speichern'); ?></button>
+                        <div class="modal-footer">
+                            <button type="button" id="azrInsertBtn" class="btn btn-primary"
+                                value=""><?php echo $this->p->t('ui', 'speichern'); ?></button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
         </div>
     </div>
 </div>
 
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
-
