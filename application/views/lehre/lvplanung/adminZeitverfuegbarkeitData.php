@@ -15,7 +15,7 @@ $qry = '
         JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
         JOIN public.tbl_studiensemester ss USING (studiensemester_kurzbz)
         JOIN campus.tbl_zeitsperre zsp ON zsp.mitarbeiter_uid = lema.mitarbeiter_uid
-        WHERE lv.studiengang_kz IN ('. implode (',', $STUDIENGANG_KZ_ARR). ')
+        WHERE lv.studiengang_kz IN (' . implode(',', $STUDIENGANG_KZ_ARR) . ')
         AND b.aktiv
 		AND zsp.vondatum >= ss.start
         AND zeitsperretyp_kurzbz = \'ZVerfueg\'

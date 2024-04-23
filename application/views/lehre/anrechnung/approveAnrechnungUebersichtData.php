@@ -204,32 +204,7 @@ $filterWidgetArray = array(
 	),
 
 	'datasetRepOptions' => '{
-height: func_height(this),
-layout: "fitColumns",               // fit columns to width of table
-layoutColumnsOnNewData:true,
-persistenceID: "approveAnrechnungUebersicht_V1",
-autoResize: false,               // prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
-selectable: true,               // allow row selection
-selectableRangeMode: "click",   // allow range selection using shift end click on end of range
-selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-tableWidgetFooter: {
-	selectButtons: true  // tableWidgetFooter properties are checked in _renderTabulatorFooterHTML function
-},
-selectableCheck: function(row){
-	return func_selectableCheck(row);
-},
-rowFormatter:function(row){
-	func_rowFormatter(row,this);
-},
-columnDefaults:{
-	
-	//columnDefaults tooltip did not work
-	
-	tooltip:function(e, cell, onRendered){
-		return func_tooltips(cell);
-	},
-},
+
 		height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
 		persistenceID: "approveAnrechnungUebersicht_V1",
@@ -254,7 +229,7 @@ columnDefaults:{
 			tooltip:function(e, cell, onRendered){
 				return func_tooltips(cell);
 			},
-			//headerFilterPlaceholder: " ",
+			headerFilterPlaceholder: " ",
 		}
 		
 	 }', // tabulator properties
