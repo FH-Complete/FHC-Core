@@ -8,12 +8,12 @@ $query = '
 
 $filterWidgetArray = array(
 	'query' => $query,
-	'bootstrapVersion'=>5,
+	'bootstrapVersion' => 5,
 	'tableUniqueId' => 'adminAnrechnung',
 	'requiredPermissions' => 'lehre/anrechnungszeitfenster',
 	'datasetRepresentation' => 'tabulator',
 	'columnsAliases' => array(
-        'AzrID',
+		'AzrID',
 		ucfirst($this->p->t('lehre', 'studiensemester')),
 		ucfirst($this->p->t('anrechnung', 'anrechnungszeitraumStart')),
 		ucfirst($this->p->t('anrechnung', 'anrechnungszeitraumEnde')),
@@ -21,8 +21,8 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('ui', 'bearbeitetVon')),
 	),
 	'datasetRepOptions' => '{
-		height: func_height(this),
-		layout: "fitDataFill",           
+		
+		layout: "fitColumns",           
 		persistentLayout:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
         index: "anrechnungszeitraum_id",         // assign specific column as unique id (important for row indexing)
