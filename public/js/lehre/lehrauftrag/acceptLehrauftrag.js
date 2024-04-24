@@ -149,8 +149,6 @@ function func_rowFormatter(row) {
       return; // bestellte + erteilte
     } else if (bestellt != null && erteilt != null && akzeptiert != null) {
       cell.getElement().classList.add("bg-success"); // akzeptierte
-    } else {
-      row.getElement().style["background-color"] = COLOR_LIGHTGREY; // default
     }
   });
 }

@@ -294,7 +294,6 @@ ORDER BY "akzeptiert" NULLS FIRST, "erteilt" NULLS LAST, "bestellt"
 
 $filterWidgetArray = array(
     'query' => $query,
-    'bootstrapVersion'=>5,
     'tableUniqueId' => 'acceptLehrauftrag',
     'requiredPermissions' => 'lehre/lehrauftrag_akzeptieren',
     'datasetRepresentation' => 'tabulator',

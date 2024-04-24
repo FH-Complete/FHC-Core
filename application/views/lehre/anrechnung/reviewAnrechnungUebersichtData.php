@@ -166,9 +166,6 @@ $filterWidgetArray = array(
 		selectableCheck: function(row){
             return func_selectableCheck(row);
         },
-        rowFormatter:function(row){
-            func_rowFormatter(row);
-        },
         columnDefaults:{
 
 			//columnDefaults tooltip did not work

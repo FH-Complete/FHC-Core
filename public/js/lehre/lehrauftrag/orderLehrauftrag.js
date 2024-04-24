@@ -207,9 +207,6 @@ function func_rowFormatter(row) {
     } else if (bestellt != null && erteilt != null && akzeptiert != null) {
       cell.getElement().classList.add("bg-success"); // akzeptiert
     }
-
-    // default color is already set in the Tabulator5.css file that gets loaded the Header flag tabulator5
-    // row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
   });
 }
 

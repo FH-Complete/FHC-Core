@@ -39,6 +39,12 @@
 	z-index: 999999;
 }
 
+/* classes for rows that are not selectable in the tabulator */
+.tabulator-row.tabulator-unselectable{
+	color:var(--bs-gray-500);
+	
+}
+
 /* using bootstrap background classes to style the background color of tabulator rows */
 /* bg-warning */
 /* odd-rows */

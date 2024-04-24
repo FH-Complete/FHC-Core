@@ -184,28 +184,7 @@ var format_ectsSumBisherUndNeu = function (cell, formatterParams, onRendered) {
   );
 };
 
-// Formats the rows
-function func_rowFormatter(row) {
-  let status_kurzbz = row.getData().status_kurzbz;
 
-  // If status is anything else then 'Bearbeitet von STGL-Leitung'
-  if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_STGL) {
-    // Disable new selection of updated rows
-    row.getElement().style["pointerEvents"] = "none";
-
-    // ...but leave url links selectable
-    row.getCell("dokument_bezeichnung").getElement().firstChild.style[
-      "pointerEvents"
-    ] = "auto";
-    if (row.getCell("details")) {
-      row.getCell("details").getElement().firstChild.style["pointerEvents"] =
-        "auto";
-    }
-
-    // Color background grey
-    row.getElement().style["background-color"] = COLOR_LIGHTGREY; // default
-  }
-}
 
 // Formats row selectable/unselectable
 function func_selectableCheck(row) {

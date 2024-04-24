@@ -50,7 +50,6 @@ $query = '
 
 $tableWidgetArray = array(
 	'query' => $query,
-    'bootstrapVersion' => 5,
 	'tableUniqueId' => 'cancelledLehrauftrag',
 	'requiredPermissions' => 'lehre/lehrauftrag_akzeptieren',
 	'datasetRepresentation' => 'tabulator',
