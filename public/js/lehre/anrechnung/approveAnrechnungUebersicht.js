@@ -184,8 +184,6 @@ var format_ectsSumBisherUndNeu = function (cell, formatterParams, onRendered) {
   );
 };
 
-
-
 // Formats row selectable/unselectable
 function func_selectableCheck(row) {
   let status_kurzbz = row.getData().status_kurzbz;
@@ -220,16 +218,14 @@ function func_rowSelectionChanged(data, rows, tabulatorInstance) {
 }
 
 // Returns tooltip
-function func_tooltips() {
+function func_tooltips(e,cell,onRendered) {
   //e - mouseover event
   //cell - cell component
   //onRendered - onRendered callback registration function
-  console.log("here");
-  // console.log("TOOLTIP DEBUG",cell);
-  // // Return tooltip if row is unselectable
-  // if (true || !func_selectableCheck(cell.getRow())){
-  //     return FHC_PhrasesLib.t("ui", "nichtSelektierbarAufgrundVon") + 'Status';
-  // }
+  // Return tooltip if row is unselectable
+  if (!func_selectableCheck(cell.getRow())) {
+    return FHC_PhrasesLib.t("ui", "nichtSelektierbarAufgrundVon") + "Status";
+  }
 }
 
 // Formats empfehlung_anrechnung

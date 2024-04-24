@@ -167,12 +167,8 @@ $filterWidgetArray = array(
             return func_selectableCheck(row);
         },
         columnDefaults:{
-
-			//columnDefaults tooltip did not work
-
 			tooltip:func_tooltips,
 			headerFilterPlaceholder: " ",
-			
 		}
         
 	 }', // tabulator properties

@@ -551,14 +551,15 @@ var FHC_TableWidget = {
       // ...if there are data to be displayed...
       if (data.hasOwnProperty("dataset") && $.isArray(data.dataset)) {
         if (options == null) options = {};
-        options.columnDefaults = {
-          // set header tooltip with column title
-          //! the old keyword is tooltipsHeader, the new keyword for the option is headerTooltip
-          headerTooltip:
-            typeof options.columnDefaults?.tooltipsHeader == "undefined"
-              ? true
-              : options.columnDefaults?.tooltipsHeader,
-        };
+        options.columnDefaults={
+            ...(options.columnDefaults||{}),  
+            headerTooltip:
+              typeof options.columnDefaults?.tooltipsHeader == "undefined"
+                ? true
+                : options.columnDefaults?.tooltipsHeader,
+          };
+        
+        
         options.columns = arrayTabulatorColumns;
         options.data = data.dataset;
         options.persistence =

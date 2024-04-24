@@ -221,12 +221,7 @@ $filterWidgetArray = array(
         },
 		
 		columnDefaults:{
-			
-			//columnDefaults tooltip did not work
-			
-			tooltip:function(e, cell, onRendered){
-				return func_tooltips(cell);
-			},
+			tooltip:func_tooltips,
 			headerFilterPlaceholder: " ",
 		}
 		
