@@ -53,6 +53,7 @@ require_once('dbupdate_3.4/36275_zeitaufzeichnung_karenz.php');
 require_once('dbupdate_3.4/21620_neues_feld_zum_erfassen_des_ESI.php');
 require_once('dbupdate_3.4/36530_bis_internationsalisierung_codextabelle_neuerungen.php');
 require_once('dbupdate_3.4/34543_ux_template.php');
+require_once('dbupdate_3.4/33683_digitale_anwesenheitsliste_und_entschuldigungsmanagement_fuer_studierende_prototyp.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
