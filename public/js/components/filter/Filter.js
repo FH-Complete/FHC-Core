@@ -543,7 +543,7 @@ export const CoreFilterCmpt = {
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
-					<a v-if="!tableOnly" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
+					<a v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
 						<span class="fa-solid fa-xl fa-filter"></span>
 					</a>
 					<a href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
@@ -576,6 +576,14 @@ export const CoreFilterCmpt = {
 				@apply-filter-config="applyFilterConfig"
 				@save-custom-filter="handlerSaveCustomFilter"
 			></filter-config>
+			<div
+				v-else-if="$slots.filter"
+				:id="'collapseFilters' + idExtra"
+				class="card-body collapse"
+				:data-bs-parent="'#filterCollapsables' + idExtra"
+				>
+				<slot name="filter"></slot>
+			</div>
 		</div>
 
 		<!-- Tabulator -->

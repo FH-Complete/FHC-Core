@@ -320,6 +320,8 @@ class Students extends FHC_Controller
 				break;
 		}
 
+		$this->addFilter($studiensemester_kurzbz);
+
 		$this->outputJson([]);
 	}
 
@@ -426,6 +428,8 @@ class Students extends FHC_Controller
 
 		}
 
+		$this->addFilter($studiensemester_kurzbz);
+
 		$result = $this->PrestudentModel->loadWhere($where);
 		
 		if (isError($result)) {
@@ -496,6 +500,8 @@ class Students extends FHC_Controller
 		$this->PrestudentModel->addSelect('tbl_prestudent.priorisierung');
 		$this->PrestudentModel->addSelect('p.zugangscode');
 		$this->PrestudentModel->addSelect('p.bpk');
+
+		$this->addFilter($studiensemester_kurzbz);
 
 		$result = $this->PrestudentModel->loadWhere([
 			'tbl_prestudent.prestudent_id' => $prestudent_id
@@ -570,6 +576,8 @@ class Students extends FHC_Controller
 		$this->PrestudentModel->addSelect('p.zugangscode');
 		$this->PrestudentModel->addSelect('p.bpk');
 
+		$this->addFilter($studiensemester_kurzbz);
+
 		$result = $this->PrestudentModel->loadWhere([
 			's.student_uid' => $student_uid
 		]);
@@ -643,6 +651,8 @@ class Students extends FHC_Controller
 		$this->PrestudentModel->addSelect('p.zugangscode');
 		$this->PrestudentModel->addSelect('p.bpk');
 
+		$this->addFilter($studiensemester_kurzbz);
+
 		$result = $this->PrestudentModel->loadWhere([
 			'p.person_id' => $person_id
 		]);
@@ -652,6 +662,47 @@ class Students extends FHC_Controller
 			$this->outputJson(getError($result));
 		} else {
 			$this->outputJson(getData($result) ?: []);
+		}
+	}
+
+	/**
+	 * Adds additional filters to the query
+	 *
+	 * @param string		$studiensemester_kurzbz
+	 *
+	 * @return void
+	 */
+	protected function addFilter($studiensemester_kurzbz)
+	{
+		$filter = $this->input->get('filter');
+		if (isset($filter['konto_count_0'])) {
+			$bt = $this->PrestudentModel->escape($filter['konto_count_0']);
+			$stdsem = $this->PrestudentModel->escape($studiensemester_kurzbz);
+
+			$this->PrestudentModel->db->where('(
+				SELECT count(*) 
+				FROM public.tbl_konto 
+				WHERE person_id=tbl_prestudent.person_id 
+				AND buchungstyp_kurzbz=' . $bt . ' 
+				AND studiensemester_kurzbz=' . $stdsem . '
+			) =', 0);
+			$this->PrestudentModel->db->where('get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) !=', 'Incoming');
+		}
+		if (isset($filter['konto_missing_counter'])) {
+			$bt = $this->PrestudentModel->escape($filter['konto_missing_counter']);
+			$stg = '';
+			if ($this->variablelib->getVar('kontofilterstg') == 'true')
+				$stg = ' AND studiengang_kz=tbl_prestudent.studiengang_kz';
+
+			$bt = $bt == 'alle' ? '' : ' AND buchungstyp_kurzbz=' . $bt;
+
+			$this->PrestudentModel->db->where('(
+				SELECT sum(betrag) 
+				FROM public.tbl_konto 
+				WHERE person_id=tbl_prestudent.person_id' .
+				$bt .
+				$stg . '
+			) !=', 0);
 		}
 	}
 }
