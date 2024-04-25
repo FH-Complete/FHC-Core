@@ -11124,6 +11124,7 @@ Any unusual occurrences
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
 		'phrase' => 'kommissionellePruefungHinweis',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -22955,6 +22956,7 @@ array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
 		'phrase' => 'dropdown_bitteWaehlen',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -22974,6 +22976,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'notiz_new',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -22993,6 +22996,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'notiz_edit',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -23012,6 +23016,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'verfasser',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -23031,6 +23036,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'bearbeiter',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -23050,6 +23056,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'erledigt',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -23069,6 +23076,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'letzte_aenderung',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -23088,6 +23096,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'error_fieldRequired',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -23107,6 +23116,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'error_fieldNotNumeric',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -23126,6 +23136,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'error_fieldNoValidEmail',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -24868,6 +24879,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'document',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -24887,6 +24899,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'notiz_new',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -24906,6 +24919,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'notiz_edit',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -24925,6 +24939,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'verfasser',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -24944,6 +24959,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'bearbeiter',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -24963,6 +24979,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'erledigt',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -24982,6 +24999,7 @@ array(
 		'app' => 'core',
 		'category' => 'notiz',
 		'phrase' => 'letzte_aenderung',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25001,6 +25019,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'error_fieldRequired',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25020,6 +25039,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'error_fieldNotNumeric',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25039,6 +25059,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'error_fieldNoValidEmail',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25058,6 +25079,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'firma_zusatz',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25077,6 +25099,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'firma',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25096,6 +25119,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'adresse_new',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25115,6 +25139,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'adresse_edit',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25134,6 +25159,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'adresse_delete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25153,6 +25179,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'adresse_confirm_delete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25172,6 +25199,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'kontakt_new',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25191,6 +25219,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'kontakt_edit',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25210,6 +25239,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'kontakt_delete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25229,6 +25259,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'kontakt_confirm_delete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25248,6 +25279,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'privatkonto',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25267,6 +25299,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'firmenkonto',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25286,6 +25319,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'bankvb_new',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25305,6 +25339,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'bankvb_edit',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25324,6 +25359,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'bankvb_delete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25343,6 +25379,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'bankvb_confirm_delete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25363,6 +25400,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'status_rolle',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25382,6 +25420,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'status_new',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25401,6 +25440,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'status_edit',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25420,6 +25460,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'status_delete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25439,6 +25480,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'bestaetigt_am',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25458,6 +25500,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'bestaetigt_von',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25477,6 +25520,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'insert_am',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25496,6 +25540,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'insert_von',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25515,6 +25560,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'bewerbung_abgeschickt_am',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25534,6 +25580,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'aufnahmestufe',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25573,6 +25620,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'status_confirm_delete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25592,6 +25640,7 @@ array(
 			'app' => 'core',
 			'category' => 'lehre',
 			'phrase' => 'last_status_confirm_delete',
+			'insertvon' => 'system',
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
@@ -25612,6 +25661,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'title_zgv',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25631,6 +25681,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'zgvMaster',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25650,6 +25701,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'zgvMasterOrt',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25669,6 +25721,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'zgvMasterDatum',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25688,6 +25741,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'zgvMasterNation',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25707,6 +25761,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'zgvMasterErfuellt',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25726,6 +25781,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'zgvDoktor',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25745,6 +25801,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'zgvDoktorOrt',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25764,6 +25821,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'zgvDoktorDatum',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25783,6 +25841,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'zgvDoktorNation',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25802,6 +25861,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'zgvDoktorErfuellt',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25821,6 +25881,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'aufmerksamDurch',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25840,6 +25901,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'berufstaetigkeit',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25859,6 +25921,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'facheinschlaegigBerufstaetig',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25878,6 +25941,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'bisstandort',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25897,6 +25961,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'studientyp',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25916,6 +25981,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'dual',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25935,6 +26001,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'foerderrelevant',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25954,6 +26021,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'prioritaet',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25973,6 +26041,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'title_history',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -25992,6 +26061,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_keineSchreibrechte',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26011,6 +26081,7 @@ array(
 			'app' => 'core',
 			'category' => 'lehre',
 			'phrase' => 'error_rolleBereitsVorhanden',
+			'insertvon' => 'system',
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
@@ -26030,6 +26101,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_keinReihungstestverfahren',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26049,6 +26121,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_ZGVNichtEingetragen',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26068,6 +26141,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_ZGVMasterNichtEingetragen',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26087,6 +26161,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_keinBewerber',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26106,6 +26181,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_noStudstatus',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26125,6 +26201,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_dataVorMeldestichtag',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26144,6 +26221,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_duringInsertUpdateLehrverband',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26163,6 +26241,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_duringDeleteLehrverband',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26182,6 +26261,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_onlyAdminDeleteRolleStudent',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26201,6 +26281,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_onlyAdminDeleteLastStatus',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26220,6 +26301,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_noStatusFound',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26239,6 +26321,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_statusConfirmedYet',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26258,6 +26341,7 @@ array(
 		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'error_bewerbungNochNichtAbgeschickt',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26277,6 +26361,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'error_missingId',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26296,6 +26381,7 @@ array(
 		'app' => 'core',
 		'category' => 'person',
 		'phrase' => 'error_deleteHomeAdress',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26315,6 +26401,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'successSave',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26334,6 +26421,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'successDelete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26353,6 +26441,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'successAdvance',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26372,6 +26461,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'successConfirm',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26391,6 +26481,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'betriebsmittel_delete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26410,6 +26501,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'betriebsmittel_confirm_delete',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26429,6 +26521,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'add_betriebsmittel',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26448,6 +26541,7 @@ array(
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'edit_betriebsmittel',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26467,6 +26561,7 @@ array(
 		'app' => 'core',
 		'category' => 'wawi',
 		'phrase' => 'inventarnummer',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26486,6 +26581,7 @@ array(
 		'app' => 'core',
 		'category' => 'wawi',
 		'phrase' => 'nummer',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26505,6 +26601,7 @@ array(
 		'app' => 'core',
 		'category' => 'wawi',
 		'phrase' => 'ausgegebenam',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26524,6 +26621,7 @@ array(
 		'app' => 'core',
 		'category' => 'wawi',
 		'phrase' => 'retouram',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26543,6 +26641,7 @@ array(
 		'app' => 'core',
 		'category' => 'wawi',
 		'phrase' => 'retourdatum',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26562,6 +26661,7 @@ array(
 		'app' => 'core',
 		'category' => 'wawi',
 		'phrase' => 'ausgabedatum',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26581,6 +26681,7 @@ array(
 		'app' => 'core',
 		'category' => 'wawi',
 		'phrase' => 'error_zutrittskarteOhneNummer',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26600,6 +26701,7 @@ array(
 		'app' => 'core',
 		'category' => 'wawi',
 		'phrase' => 'error_inventarWaehlen',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26619,6 +26721,7 @@ array(
 		'app' => 'core',
 		'category' => 'wawi',
 		'phrase' => 'error_retourdatumVorAusgabe',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26639,6 +26742,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'buchung',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26658,6 +26762,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'buchungsdatum',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26677,6 +26782,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'buchungstext',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26696,6 +26802,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'betrag',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26715,6 +26822,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'buchungstyp',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26734,6 +26842,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'buchungsnr',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26753,6 +26862,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'confirm_overwrite',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26772,6 +26882,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'confirm_overwrite_1_add_pers',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26791,6 +26902,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'confirm_overwrite_x_add_pers',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26810,6 +26922,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'confirm_overwrite_proceed',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26829,6 +26942,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'error_missing',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26848,6 +26962,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'error_counter_level',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26867,6 +26982,7 @@ array(
 		'app' => 'core',
 		'category' => 'konto',
 		'phrase' => 'error_delete_level',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26887,6 +27003,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'action_new',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26906,6 +27023,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'tab_details',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26925,6 +27043,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'tab_notes',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26944,6 +27063,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'tab_contact',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26963,6 +27083,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'tab_prestudent',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -26982,6 +27103,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'tab_status',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -27001,6 +27123,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'tab_konto',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -27020,6 +27143,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'tab_resources',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -27039,6 +27163,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'tab_grades',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -27059,6 +27184,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'konto_counter',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -27078,6 +27204,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'konto_payment_confirmation',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -27097,6 +27224,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'konto_filter_count_0',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -27116,6 +27244,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'konto_filter_missing_counter',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -27135,6 +27264,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'konto_all_types',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -27154,6 +27284,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'konto_filter_open',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -27173,6 +27304,7 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'konto_filter_current_stg',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
