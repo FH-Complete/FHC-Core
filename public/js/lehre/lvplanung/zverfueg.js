@@ -1,3 +1,9 @@
+
+// Returns relative height (depending on screen size)
+function func_height(table) {
+    return $(window).height() * 0.5;
+}
+
 $(function(){
 
     // tableInit is called in the jquery_wrapper when the tableBuilt event was finished
