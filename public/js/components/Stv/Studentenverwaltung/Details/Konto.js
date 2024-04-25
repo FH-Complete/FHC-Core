@@ -3,6 +3,7 @@ import FormInput from "../../../Form/Input.js";
 import KontoNew from "./Konto/New.js";
 import KontoEdit from "./Konto/Edit.js";
 
+const LOCAL_STORAGE_ID_FILTER = 'stv_details_konto_2024-01-11_filter';
 
 export default {
 	components: {
@@ -165,11 +166,24 @@ export default {
 					'_blank'
 				);
 			}
+		},
+		setFilter(type) {
+			if (type == 'open')
+				window.localStorage.setItem(LOCAL_STORAGE_ID_FILTER, this.filter ? 1 : 0);
+			else if (type == 'current_stg')
+				this.$fhcApi.factory
+					.stv.filter.setStg(this.studiengang_kz)
+					.catch(this.$fhcAlert.handleSystemError);
+
+			this.$nextTick(this.$refs.table.reloadTable);
 		}
 	},
 	created() {
-		// TODO(chris): persist filter + studiengang_kz
-		// TODO(chris): studiengang_kz in variablelib
+		this.filter = window.localStorage.getItem(LOCAL_STORAGE_ID_FILTER) == 1;
+		this.$fhcApi.factory
+			.stv.filter.getStg()
+			.then(result => this.studiengang_kz = result.data)
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-details-konto h-100 d-flex flex-column">
@@ -180,7 +194,7 @@ export default {
 					type="checkbox"
 					:label="$p.t('stv/konto_filter_open')"
 					v-model="filter"
-					@update:model-value="() => $nextTick($refs.table.reloadTable)"
+					@update:model-value="setFilter('open')"
 					>
 				</form-input>
 			</div>
@@ -191,7 +205,7 @@ export default {
 					:label="$p.t('stv/konto_filter_current_stg')"
 					v-model="studiengang_kz_intern"
 					:disabled="!stg_kz"
-					@update:model-value="() => $nextTick($refs.table.reloadTable)"
+					@update:model-value="setFilter('current_stg')"
 					>
 				</form-input>
 			</div>
