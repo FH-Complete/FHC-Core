@@ -97,7 +97,6 @@ $this->load->view(
 );
 ?>
 
-<body>
     <?php echo $this->widgetlib->widget('NavigationWidget'); ?>
     <div id="page-wrapper">
     	<div class="container-fluid">
@@ -209,7 +208,6 @@ $this->load->view(
     	</div><!-- end container -->
     </div><!-- end page-wrapper -->
 	<br>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
 
