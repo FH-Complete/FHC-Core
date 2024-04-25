@@ -2,6 +2,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+// TODO(chris): Prestudent status missing
+
 class Students extends FHC_Controller
 {
 	public function __construct()
