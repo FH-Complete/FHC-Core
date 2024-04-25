@@ -49,7 +49,7 @@ class Konto extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui'
+			'konto'
 		]);
 	}
 
@@ -175,22 +175,21 @@ class Konto extends FHCAPI_Controller
 			return $row->nachname . ' ' . $row->vorname;
 		}, $result);
 		
-		// TODO(chris): Phrases
-		$result = $this->p->t('konto', 'buchung_vorhanden') . "\n";
+		$result = $this->p->t('konto', 'confirm_overwrite') . "\n";
 		if (count($persons) > 10) {
 			$result .= "-" . implode("\n-", array_slice($persons, 0, 10)) . "\n";
 			
 			if (count($persons) == 11) {
-				$result .= "\n" . $this->p->t('konto', 'and_1_additional_person');
+				$result .= "\n" . $this->p->t('konto', 'confirm_overwrite_1_add_pers');
 			} else {
-				$result .= "\n" . $this->p->t('konto', 'and_x_additional_person', [
+				$result .= "\n" . $this->p->t('konto', 'confirm_overwrite_x_add_pers', [
 					'x' => count($persons) - 10
 				]);
 			}
 		} else {
 			$result .= "-" . implode("\n-", $persons) . "\n";
 		}
-		$result .= $this->p->t('konto', 'proceed');
+		$result .= $this->p->t('konto', 'confirm_overwrite_proceed');
 
 		$this->addError($result, 'confirm');
 
@@ -327,8 +326,8 @@ class Konto extends FHCAPI_Controller
 					'label' => 'Buchung # ' . $buchungsnr,
 					'rules' => 'regex_match[/^$/]',
 					'errors' => [
-						'regex_match' => 'Gegenbuchungen koennen nur auf die obersten Buchungen getaetigt werden'
-					] // TODO(chris): phrase
+						'regex_match' => $this->p->t('konto', 'error_counter_level')
+					]
 				];
 			}
 		}
@@ -355,9 +354,9 @@ class Konto extends FHCAPI_Controller
 			if ($betrag === null) {
 				$this->addError($this->p->t(
 					'konto',
-					'Buchung #{buchungsnr} does not exist',
+					'error_missing',
 					$buchung
-				), self::ERROR_TYPE_GENERAL); // TODO(chris): phrase
+				), self::ERROR_TYPE_GENERAL);
 				continue;
 			}
 
@@ -482,7 +481,9 @@ class Konto extends FHCAPI_Controller
 		$result = $result->retval;
 
 		if (!$result)
-			$this->terminateWithError('buchung not found', self::ERROR_TYPE_GENERAL); // TODO(chris): phrase
+			$this->terminateWithError($this->p->t('konto', 'error_missing', [
+				'buchungsnr' => $buchungsnr
+			]), self::ERROR_TYPE_GENERAL);
 
 		$_POST['studiengang_kz'] = current($result)->studiengang_kz;
 
@@ -500,7 +501,7 @@ class Konto extends FHCAPI_Controller
 		if (isError($result)) {
 			if (getCode($result) != 42)
 				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL); // TODO(chris): phrase
+			$this->terminateWithError($this->p->t('konto', 'error_delete_level'), self::ERROR_TYPE_GENERAL);
 		}
 
 		$this->terminateWithSuccess();

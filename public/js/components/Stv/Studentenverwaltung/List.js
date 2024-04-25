@@ -2,6 +2,7 @@ import {CoreFilterCmpt} from "../../filter/Filter.js";
 import {CoreRESTClient} from '../../../RESTClient.js';
 import ListNew from './List/New.js';
 
+
 export default {
 	components: {
 		CoreFilterCmpt,
@@ -205,14 +206,14 @@ export default {
 				:side-menu="false"
 				reload
 				new-btn-show
-				new-btn-label="InteressentIn"
+				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
 			>
 			<template #filter>
 				<div class="card">
 					<div class="card-body">
 						<div class="input-group mb-3">
-							<label class="input-group-text col-4" for="stv-list-filter-konto-count-0">Liste filtern auf nicht belastet:</label>
+							<label class="input-group-text col-4" for="stv-list-filter-konto-count-0">{{ $p.t('stv/konto_filter_count_0') }}</label>
 							<select class="form-select" id="stv-list-filter-konto-count-0" v-model="filterKontoCount0" @input="$nextTick(updateUrl)">
 								<option v-for="typ in lists.buchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz">
 									{{ typ.beschreibung }}
@@ -223,9 +224,9 @@ export default {
 							</button>
 						</div>
 						<div class="input-group">
-							<label class="input-group-text col-4" for="stv-list-filter-konto-missing-counter">Liste filtern auf fehlende Gegenbuchungen:</label>
+							<label class="input-group-text col-4" for="stv-list-filter-konto-missing-counter">{{ $p.t('stv/konto_filter_missing_counter') }}</label>
 							<select class="form-select" id="stv-list-filter-konto-missing-counter" v-model="filterKontoMissingCounter" @input="$nextTick(updateUrl)">
-								<option value="alle">alle Buchungstypen</option>
+								<option value="alle">{{ $p.t('stv/konto_all_types') }}</option>
 								<option v-for="typ in lists.buchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz">
 									{{ typ.beschreibung }}
 								</option>
