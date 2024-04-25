@@ -33,23 +33,23 @@ class Config extends FHC_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Details.js'
 		];
 		$result['notes'] = [
-			'title' => $this->p->t('stv', 'notes'),
+			'title' => $this->p->t('stv', 'tab_notes'),
 			'component' => './Stv/Studentenverwaltung/Details/Notizen.js'
 		];
 		$result['contact'] = [
-			'title' => $this->p->t('stv', 'contact'),
+			'title' => $this->p->t('stv', 'tab_contact'),
 			'component' => './Stv/Studentenverwaltung/Details/Kontakt.js'
 		];
 		$result['prestudent'] = [
-			'title' => $this->p->t('stv', 'prestudent'),
+			'title' => $this->p->t('stv', 'tab_prestudent'),
 			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js'
 		];
 		$result['status'] = [
-			'title' => $this->p->t('stv', 'status'),
+			'title' => $this->p->t('stv', 'tab_status'),
 			'component' => './Stv/Studentenverwaltung/Details/Status.js'
 		];
 		$result['banking'] = [
-			'title' => $this->p->t('stv', 'banking'),
+			'title' => $this->p->t('stv', 'tab_banking'),
 			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
 			'config' => [
 				'showZahlungsbestaetigung' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN),
@@ -61,11 +61,11 @@ class Config extends FHC_Controller
 			]
 		];
 		$result['resources'] = [
-			'title' => $this->p->t('stv', 'resources'),
+			'title' => $this->p->t('stv', 'tab_resources'),
 			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
 		];
 		$result['grades'] = [
-			'title' => $this->p->t('stv', 'grades'),
+			'title' => $this->p->t('stv', 'tab_grades'),
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js'
 		];
 
@@ -80,7 +80,7 @@ class Config extends FHC_Controller
 	{
 		$result = [];
 		$result['banking'] = [
-			'title' => $this->p->t('stv', 'banking'),
+			'title' => $this->p->t('stv', 'tab_banking'),
 			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
 			'config' => [
 				'showZahlungsbestaetigung' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN),
