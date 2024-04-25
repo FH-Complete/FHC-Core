@@ -4,7 +4,6 @@ import CoreForm from "../../../../Form/Form.js";
 import FormValidation from "../../../../Form/Validation.js";
 import FormInput from "../../../../Form/Input.js";
 
-// TODO(chris): Phrasen
 
 export default {
 	components: {
@@ -74,7 +73,7 @@ export default {
 					this.$emit('saved', result.data);
 					this.loading = false;
 					this.$refs.modal.hide();
-					this.$fhcAlert.alertSuccess('Daten wurden gespeichert');
+					this.$fhcAlert.alertSuccess(this.$p.t('ui/gespeichert'));
 				})
 				.catch(error => {
 					if (error)
@@ -125,7 +124,7 @@ export default {
 					type="select"
 					v-model="data.buchungstyp_kurzbz"
 					name="buchungstyp_kurzbz"
-					label="Typ"
+					:label="$p.t('konto/buchungstyp')"
 					@update:model-value="checkDefaultBetrag"
 					>
 					<option v-for="typ in activeBuchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz" :class="typ.aktiv ? '' : 'text-decoration-line-through text-muted'">
@@ -135,14 +134,14 @@ export default {
 				<form-input
 					v-model="data.betrag"
 					name="betrag"
-					label="Betrag"
+					:label="$p.t('konto/betrag')"
 					>
 				</form-input>
 				<form-input
 					type="DatePicker"
 					v-model="data.buchungsdatum"
 					name="buchungsdatum"
-					label="Buchungsdatum"
+					:label="$p.t('konto/buchungsdatum')"
 					:enable-time-picker="false"
 					auto-apply
 					>
@@ -150,21 +149,21 @@ export default {
 				<form-input
 					v-model="data.buchungstext"
 					name="buchungstext"
-					label="Buchungstext"
+					:label="$p.t('konto/buchungstext')"
 					>
 				</form-input>
 				<form-input
 					v-if="config.showMahnspanne"
 					v-model="data.mahnspanne"
 					name="mahnspanne"
-					label="Mahnspanne"
+					:label="$p.t('konto/mahnspanne')"
 					>
 				</form-input>
 				<form-input
 					type="select"
 					v-model="data.studiensemester_kurzbz"
 					name="studiensemester_kurzbz"
-					label="Studiensemester"
+					:label="$p.t('lehre/studiensemester')"
 					>
 					<option v-for="sem in reversedSems" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">
 						{{ sem.studiensemester_kurzbz }}
@@ -174,28 +173,29 @@ export default {
 					v-if="config.showCreditpoints"
 					v-model="data.credit_points"
 					name="credit_points"
-					label="Credit Points"
+					:label="$p.t('konto/credit_points')"
 					>
 				</form-input>
 				<form-input
 					type="textarea"
 					v-model="data.anmerkung"
 					name="anmerkung"
-					label="Anmerkung"
+					:label="$p.t('global/anmerkung')"
 					>
 				</form-input>
 			</fieldset>
 
 			<template #title>
-				New Buchung
-				<template v-if="personIds.length > 1">
-					({{ personIds.length }} Studenten)
-				</template>
+				{{ $p.t(
+					'stv',
+					personIds.length > 1 ? 'konto_title_new_multi' : 'konto_title_new',
+					{ x: personIds.length }
+				) }}
 			</template>
 			<template #footer>
 				<button type="submit" class="btn btn-primary" :disabled="loading">
 					<i v-if="loading" class="fa fa-spinner fa-spin"></i>
-					Speichern
+					{{ $p.t('ui/speichern') }}
 				</button>
 			</template>
 		</bs-modal>
