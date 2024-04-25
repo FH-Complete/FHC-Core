@@ -124,6 +124,10 @@ export default {
                   "acceptUpdate"
                 )}`,
                 action: (e, column) => {
+                  console.log(
+                    "this is the data of the context menu action",
+                    column.getData()
+                  );
                   Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column.getData())
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
@@ -242,83 +246,75 @@ export default {
           },
           {
             title: Vue.computed(() => this.$p.t("profilUpdate", "actions")),
-            formatter: (cell, para) => {
-              let status = cell.getRow().getData().status;
-              console.log("this is the cell", cell);
-              console.log("this should be the column", cell.getColumn());
-              let result = null;
-              switch (status) {
-                case this.profilUpdateStates["Pending"]:
-                  result =
-                    "<button id='acceptProfilUpdate' type='button' class='btn border-success border-2'><i class='fa fa-lg fa-circle-check text-success'></i></button>" +
-                    "<button id='denyProfilUpdate' type='button' class='btn border-danger border-2'><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>" +
-                    "<button id='viewProfilUpdate' type='button' class='btn border-secondary border-2'><i class=' fa fa-eye'></i></button>";
-                  break;
-                case this.profilUpdateStates["Accepted"]:
-                  result =
-                    "<i id='viewProfilUpdate' type='button' class='d-block fa fa-eye'></i>";
-                  break;
-                case this.profilUpdateStates["Rejected"]:
-                  result =
-                    "<i id='viewProfilUpdate' type='button' class='d-block fa fa-eye'></i>";
-                  break;
-              }
-              return (
-                "<div class='d-flex align-items-center justify-content-evenly'>" +
-                result +
-                "</div>"
-              );
-              /*   switch () {
-                case this.profilUpdateStates["Pending"]:
-                  iconClasses += "fa fa-lg fa-circle-info text-info ";
-                  break;
-                case this.profilUpdateStates["Accepted"]:
-                  iconClasses += "fa fa-lg fa-circle-check text-success ";
-                  break;
-                case this.profilUpdateStates["Rejected"]:
-                  iconClasses += "fa fa-lg fa-circle-xmark text-danger ";
-                  break; */
+            headerSort: false,
+            formatter: (cell, params) => {
+              let html = `<div class="d-flex justify-content-evenly align-items-center">
+                <button class="btn border-primary border-2" id="showButton"><i class="fa-solid fa-eye" style="color: #0d6efd;"></i></button>
+                ${
+                  cell.getRow().getData().status ==
+                    this.profilUpdateStates["Pending"] &&
+                  `<button class="btn border-success border-2" id="acceptButton"><i class='fa fa-lg fa-circle-check text-success'></i></button>
+                  <button class="btn border-danger border-2" id="denyButton"><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>`
+                }
+              </div>`;
+
+              // Convert the HTML string to an HTML node
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(html, "text/html");
+              const node = doc.body.firstChild;
+
+              // Add event listeners
+              node
+                .querySelector("#showButton")
+                .addEventListener("click", () => {
+                  this.showAcceptDenyModal(cell.getRow().getData());
+                });
+
+              node
+                .querySelector("#acceptButton")
+                .addEventListener("click", () => {
+                  this.acceptProfilUpdate(cell.getRow().getData());
+                });
+              node
+                .querySelector("#denyButton")
+                .addEventListener("click", () => {
+                  this.denyProfilUpdate(cell.getRow().getData());
+                });
+
+              return node;
             },
-            resizable: true,
             minWidth: 200,
+            resizable: true,
             hozAlign: "center",
-            cellClick: (e, cell) => {
-              //! function that is called when clicking on a row in the table
-              console.log("this is the element", e.explicitOriginalTarget);
-              console.log("this is the id", e.explicitOriginalTarget.id);
-              let cellData = cell.getRow().getData();
-              if (e.explicitOriginalTarget.id === "viewProfilUpdate") {
-                this.showAcceptDenyModal(cellData);
-              } else if (e.explicitOriginalTarget.id === "acceptProfilUpdate") {
-                console.log("this is the celldata", cellData);
-                this.acceptProfilUpdate(cellData);
-              } else if (e.explicitOriginalTarget.id === "denyProfilUpdate") {
-                this.denyProfilUpdate(cellData);
-              }
-            },
-            //responsive:0,
           },
         ],
       },
     };
   },
   methods: {
-    denyProfilUpdate: (column) => {
-      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(column)
+    denyProfilUpdate: function (data) {
+      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(data)
         .then((res) => {
-          this.$refs.UpdatesTable.tabulator.setData();
+          // block when the request was successful
         })
         .catch((e) => {
           Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
+        })
+        .finally(() => {
+          this.$refs.UpdatesTable.tabulator.setData();
         });
     },
-    acceptProfilUpdate: (column) => {
-      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column)
+    acceptProfilUpdate: function (data) {
+      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(data)
         .then((res) => {
-          this.$refs.UpdatesTable.tabulator.setData();
+          // block when the request was successful
         })
         .catch((e) => {
           Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
+        })
+        .finally(() => {
+          // update the data inside the table
+          this.$refs.UpdatesTable.tabulator.setData();
         });
     },
     setLoading: function (newValue) {
@@ -371,6 +367,7 @@ export default {
       this.categoryLoaded = true;
     });
   },
+
   mounted() {
     //? opens the AcceptDenyUpdate Modal if a preselected profil_update_id was passed to the component (used for email links)
     if (this.profil_update_id) {
@@ -387,7 +384,6 @@ export default {
     }
 
     if (sessionStorage.getItem("filter")) {
-      //? converting string into a boolean: https://sentry.io/answers/how-can-i-convert-a-string-to-a-boolean-in-javascript/
       this.filter = sessionStorage.getItem("filter");
     }
   },
