@@ -1,6 +1,9 @@
 // TABULATOR
 // ---------------------------------------------------------------------------------------------------------------------
 
+// global variable used to check whether the modal button should insert or update a
+var isUpdate = false;
+
 // Add Edit and Update Buttons to table rows
 function func_tableBuilt(table) {
   table.tabulator(
@@ -104,12 +107,27 @@ $(function () {
     var anrechnungstart = $(".modal-body #azrStart").val();
     var anrechnungende = $(".modal-body #azrEnde").val();
 
-    // Insert Anrechnungszeitraum
-    adminAnrechnung.insertAzr(
-      studiensemester_kurzbz,
-      anrechnungstart,
-      anrechnungende
-    );
+    if (isUpdate) {
+      // read the id of the anrechungszeitraum
+      var anrechnungszeitraum_id = $(
+        ".modal-body #anrechnungszeitraum_id"
+      ).val();
+
+      // Update Anrechnungszeitraum
+      adminAnrechnung.updateAzr(
+        anrechnungszeitraum_id,
+        studiensemester_kurzbz,
+        anrechnungstart,
+        anrechnungende
+      );
+    } else {
+      // Insert Anrechnungszeitraum
+      adminAnrechnung.insertAzr(
+        studiensemester_kurzbz,
+        anrechnungstart,
+        anrechnungende
+      );
+    }
   });
 });
 
@@ -165,6 +183,9 @@ var adminAnrechnung = {
   editRow: function (cell) {
     // Open Modal
     $("#azrModal").modal("show");
+
+    // set global condition to true, so that the modal knows whether to display an insert or edit button
+    isUpdate = true;
 
     let row = cell.getRow();
     var anrechnungszeitraum_id = row.getData().anrechnungszeitraum_id;
