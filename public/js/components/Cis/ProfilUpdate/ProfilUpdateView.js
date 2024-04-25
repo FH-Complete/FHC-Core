@@ -248,13 +248,16 @@ export default {
             title: Vue.computed(() => this.$p.t("profilUpdate", "actions")),
             headerSort: false,
             formatter: (cell, params) => {
+              let STATUS_PENDING =
+                cell.getRow().getData().status ==
+                this.profilUpdateStates["Pending"];
+
               let html = `<div class="d-flex justify-content-evenly align-items-center">
                 <button class="btn border-primary border-2" id="showButton"><i class="fa-solid fa-eye" style="color: #0d6efd;"></i></button>
                 ${
-                  cell.getRow().getData().status ==
-                    this.profilUpdateStates["Pending"] &&
+                  STATUS_PENDING ?
                   `<button class="btn border-success border-2" id="acceptButton"><i class='fa fa-lg fa-circle-check text-success'></i></button>
-                  <button class="btn border-danger border-2" id="denyButton"><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>`
+                  <button class="btn border-danger border-2" id="denyButton"><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>`:''
                 }
               </div>`;
 
@@ -270,16 +273,18 @@ export default {
                   this.showAcceptDenyModal(cell.getRow().getData());
                 });
 
-              node
-                .querySelector("#acceptButton")
-                .addEventListener("click", () => {
-                  this.acceptProfilUpdate(cell.getRow().getData());
-                });
-              node
-                .querySelector("#denyButton")
-                .addEventListener("click", () => {
-                  this.denyProfilUpdate(cell.getRow().getData());
-                });
+              if (STATUS_PENDING) {
+                node
+                  .querySelector("#acceptButton")
+                  .addEventListener("click", () => {
+                    this.acceptProfilUpdate(cell.getRow().getData());
+                  });
+                node
+                  .querySelector("#denyButton")
+                  .addEventListener("click", () => {
+                    this.denyProfilUpdate(cell.getRow().getData());
+                  });
+              }
 
               return node;
             },
