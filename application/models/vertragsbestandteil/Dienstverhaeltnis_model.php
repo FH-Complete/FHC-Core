@@ -31,6 +31,8 @@ class Dienstverhaeltnis_model extends DB_Model
             org.bezeichnung oe_bezeichnung,
             dv.von,
             dv.bis,
+	    dv.dvendegrund_kurzbz,
+	    dv.dvendegrund_anmerkung,
             dv.vertragsart_kurzbz,
             dv.updateamum,
             dv.updatevon
