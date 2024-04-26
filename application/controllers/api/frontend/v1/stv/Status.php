@@ -365,12 +365,12 @@ class Status extends FHCAPI_Controller
 			//Handle Abbrecher and Unterbrecher
 			//TODO (manu) implement later with multiactions
 			// not active yet: works only for "status ändern" in FAS
-			/*			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
+			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
 						{
 							$ausbildungssemester = 0;
 							$gruppe = '';
 							$verband = $status_kurzbz == 'Abbrecher' ? 'A' : 'B';
-						}*/
+						}
 
 			//process studentlehrverband
 			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
@@ -394,7 +394,7 @@ class Status extends FHCAPI_Controller
 			//not active yet: works only for "status ändern" in FAS
 			//Todo(Manu) Later for multiactions
 
-			/*
+
 			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
 			{
 				$result = $this->StudentModel->update(
@@ -416,12 +416,13 @@ class Status extends FHCAPI_Controller
 								return $this->outputJson($result->code);
 							}
 				}
-			*/
+
 		}
 
 		$this->db->trans_commit();
 
-		return $this->outputJsonSuccess(true);
+		//return $this->outputJsonSuccess($prestudent_id);
+		$this->terminateWithSuccess($prestudent_id);
 	}
 
 	public function loadStatus()

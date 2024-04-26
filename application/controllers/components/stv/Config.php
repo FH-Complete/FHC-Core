@@ -41,6 +41,10 @@ class Config extends FHC_Controller
 			'title' => 'Status',
 			'component' => './Stv/Studentenverwaltung/Details/Status.js'
 		];
+		$result['multistatus'] = [
+			'title' => 'MultiStatus',
+			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js'
+		];
 		$result['konto'] = [
 			'title' => 'Konto',
 			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
@@ -83,6 +87,22 @@ class Config extends FHC_Controller
 				'additionalCols' => []
 			]
 		];
+		$result['multistatus'] = [
+			'title' => 'MultiStatus',
+			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js',
+			'config' => [
+				'abbrecherStgl' => $this->permissionlib->isBerechtigt('admin'),
+				'abbrecherStud' => $this->permissionlib->isBerechtigt('admin')
+			]
+		];
+/*		$result['status'] = [
+			'title' => 'Status',
+			'component' => './Stv/Studentenverwaltung/Details/Status.js',
+			'config' => [
+				'abbrecherStgl' => $this->permissionlib->isBerechtigt('admin'),
+				'abbrecherStud' => $this->permissionlib->isBerechtigt('admin')
+			]
+		];*/
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {
 			return $result;

@@ -83,6 +83,9 @@ export default {
 		}
 	},
 	methods: {
+		reload() {
+			this.$refs.table.reloadTable();
+		},
 		actionNewPrestudent() {
 			this.$refs.new.open();
 		},

@@ -56,7 +56,10 @@ export default {
 			hasAdminPermission: this.permissions['admin'],
 			hasPermissionToSkipStatusCheck: this.permissions['student/keine_studstatuspruefung'],
 			lists: this.lists,
-			defaultSemester: this.defaultSemester
+			defaultSemester: this.defaultSemester,
+			$reloadList: () => {
+				this.$refs.stvList.reload();
+			}
 		}
 	},
 	data() {
@@ -111,6 +114,10 @@ export default {
 			this.studiensemesterKurzbz = v;
 			this.$refs.stvList.updateUrl();
 			this.$refs.details.reload();
+		},
+		reloadList() {
+			console.log('reloadList2');
+			this.$refs.stvList.reload();
 		}
 	},
 	created() {
