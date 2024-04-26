@@ -17,10 +17,11 @@
 
 import {CoreFilterAPIs} from './API.js';
 import {CoreRESTClient} from '../../RESTClient.js';
-import {CoreFetchCmpt} from '../../components/Fetch.js';
+import {CoreFetchCmpt} from '../Fetch.js';
 import FilterConfig from './Filter/Config.js';
 import FilterColumns from './Filter/Columns.js';
 import TableDownload from './Table/Download.js';
+import collapseAutoClose from '../../directives/collapseAutoClose.js';
 
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
@@ -37,6 +38,9 @@ export const CoreFilterCmpt = {
 		FilterConfig,
 		FilterColumns,
 		TableDownload
+	},
+	directives: {
+		collapseAutoClose
 	},
 	emits: [
 		'nwNewEntry',
@@ -562,6 +566,7 @@ export const CoreFilterCmpt = {
 				:names="fieldNames"
 				@hide="tabulator.hideColumn($event)"
 				@show="tabulator.showColumn($event)"
+				v-collapse-auto-close
 			></filter-columns>
 
 			<filter-config
@@ -575,12 +580,14 @@ export const CoreFilterCmpt = {
 				@switch-filter="switchFilter"
 				@apply-filter-config="applyFilterConfig"
 				@save-custom-filter="handlerSaveCustomFilter"
+				v-collapse-auto-close
 			></filter-config>
 			<div
 				v-else-if="$slots.filter"
 				:id="'collapseFilters' + idExtra"
 				class="card-body collapse"
 				:data-bs-parent="'#filterCollapsables' + idExtra"
+				v-collapse-auto-close
 				>
 				<slot name="filter"></slot>
 			</div>
