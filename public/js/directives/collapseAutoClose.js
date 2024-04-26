@@ -9,7 +9,7 @@ export default {
 
 			if (el.contains(evt.target))
 				return;
-			
+
 			const collapse = bootstrap.Collapse.getInstance(el)
 			if (collapse)
 				collapse.hide();
@@ -20,10 +20,10 @@ export default {
 		el.addEventListener('hide.bs.collapse', () => {
 			open = false;
 		});
-		window.addEventListener('click', elementDataMap.get(el));
+		document.addEventListener('click', elementDataMap.get(el), true);
 	},
 	beforeUnmount(el, binding) {
-		window.removeEventListener('click', elementDataMap.get(el));
+		document.removeEventListener('click', elementDataMap.get(el));
 		delete el.collapsibleAutoHideFunc;
 	}
 }
