@@ -800,7 +800,7 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv) {
 
   var tabulatorHeaderHTML = "";
   tabulatorHeaderHTML += `<div class="btn-toolbar ${
-    _bootstrapVersion == 3 ? "pull-right" : "float-end"
+    _bootstrapVersion == 3 ? "pull-right" : "d-flex justify-content-end mb-2"
   }" role="toolbar">
 		<div class="btn-group" role="group">
 			<!-- CSV Download button -->
@@ -832,7 +832,6 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv) {
 			</button>
 		</div>
 	</div>
-	</br>
 	`;
 
   return tabulatorHeaderHTML;
@@ -867,8 +866,8 @@ function _renderTabulatorHeaderCollapseHTML(
 						<div class="panel-body">
 							<div class="btn-group" role="group">`;
   } else {
-    tabulatorHeaderCollapseHTML += `<div class="row my-4">
-			<div class="col-12 collapse" id="tabulatorSettings-${tableUniqueId}">
+    tabulatorHeaderCollapseHTML += `<div class="row ">
+			<div class="col-12 mb-2 collapse" id="tabulatorSettings-${tableUniqueId}">
 				<div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
 					<div class="accordion-item">
 						<h5  class=" accordion-header" role="tab" id="headingOne">		

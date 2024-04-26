@@ -126,7 +126,8 @@ $this->load->view(
 							),
 							array(
 								'name' => 'studiensemester',
-								'id' => 'studiensemester'
+								'id' => 'studiensemester',
+								'class' => 'form-select w-auto ',
 							)
 						);
 						?>
@@ -181,19 +182,19 @@ $this->load->view(
 			</div>
 
 
-			<div class="col-3 col-md-offset-2 col-md-2">
+			<div class="col-3 offset-md-2 col-md-2">
 					<div class="btn-group dropup float-end">
 					<button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<?php echo $this->p->t('global', 'dokumentePDF'); ?>&nbsp;&nbsp;<i class="fa fa-arrow-down"></i>&nbsp;&nbsp;&nbsp;&nbsp;<span class="caret"></span>
 					</button>
 					<ul id="ul-download-pdf" class="dropdown-menu">
-						<li value="etw"><a href="#"><?php echo $this->p->t('global', 'PDFLehrauftraegeFH'); ?></a></li>
-						<li value="lehrgang"><a href="#"><?php echo $this->p->t('global', 'PDFLehrauftraegeLehrgaenge'); ?></a></li>
+						<li value="etw"><a class="dropdown-item" href="#"><?php echo $this->p->t('global', 'PDFLehrauftraegeFH'); ?></a></li>
+						<li value="lehrgang"><a class="dropdown-item" href="#"><?php echo $this->p->t('global', 'PDFLehrauftraegeLehrgaenge'); ?></a></li>
 					</ul>
 				</div>
 			</div>
 
-			<div class="col-4 col-md-offset-0 col-md-4">
+			<div class="col-4 offset-md-0 col-md-4">
 				<div class="input-group">
 					<input id="username" autocomplete="username" style="position: absolute; opacity: 0;"><!-- this is to prevent Chrome autofilling a random input field with the username-->
 					<input id="password" type="password" autocomplete="new-password" class="form-control" placeholder="CIS-<?php echo ucfirst($this->p->t('password', 'password')); ?>">

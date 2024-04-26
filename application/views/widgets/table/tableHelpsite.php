@@ -1,7 +1,7 @@
 <!--CollapseHTML 'Help'-->
 <div class="row">
 	<div class="col-lg-12 collapse" id="tabulatorHelp-<?php echo $tableUniqueId; ?>">
-		<div class="mb-4 " 
+		<div class="mb-2 " 
 			 style="<?php 
 				if(isset($bootstrapVersion) && $bootstrapVersion==5)
 				{ 

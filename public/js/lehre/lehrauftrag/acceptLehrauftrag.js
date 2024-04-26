@@ -195,7 +195,7 @@ function func_tableBuilt(table) {
   );
 
   // fully redrawing the table after adding the Details column
-  table.tabulator("redraw", true);
+  table.redraw(true);
 }
 
 // Sets status values into column status
@@ -474,9 +474,11 @@ $(function () {
     func_tableBuilt(tabulatorInstance);
 
     // using the tabulator instance instead of the jquery object because the site loads two different tabulator tables
+    console.log("instance",tabulatorInstance)
     let uniqueTableID =
-      tabulatorInstance.parentElement.parentElement.parentElement.attributes
+      tabulatorInstance.element.parentElement.parentElement.parentElement.attributes
         .tableUniqueId.value;
+        
     switch (uniqueTableID) {
       case "cancelledLehrauftrag":
         tabulatorInstance.on("renderComplete", () => {
