@@ -11,7 +11,6 @@ $this->load->view(
         'ajaxlib' => true,
         'tabulator5' => true,
         'tabulator5JQuery' => true,
-        'cis' => true,
         'tablewidget' => true,
         'navigationwidget' => true,
         'sbadmintemplate3' => true,

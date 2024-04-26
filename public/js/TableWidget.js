@@ -799,8 +799,8 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv) {
   var tableUniqueId = tableWidgetDiv.attr("tableUniqueId");
 
   var tabulatorHeaderHTML = "";
-  tabulatorHeaderHTML += `<div class="btn-toolbar ${
-    _bootstrapVersion == 3 ? "pull-right" : "d-flex justify-content-end mb-2"
+  tabulatorHeaderHTML += `<div  ${
+    _bootstrapVersion == 3 ? 'class="btn-toolbar pull-right" style="margin-bottom:0.5rem;"' : 'class="btn-toolbar d-flex justify-content-end mb-2"'
   }" role="toolbar">
 		<div class="btn-group" role="group">
 			<!-- CSV Download button -->
@@ -938,7 +938,7 @@ function _renderTabulatorFooterHTML(tableWidgetFooterOptions) {
     typeof tableWidgetFooterOptions.selectButtons != "undefined" &&
     tableWidgetFooterOptions.selectButtons == true
   ) {
-    tabulatorFooterHTML += `<div class="btn-toolbar" role="toolbar">
+    tabulatorFooterHTML += `<div ${_bootstrapVersion==3?'style="margin-top:1.5rem;" class="btn-toolbar"': 'class="btn-toolbar mt-4"'}  role="toolbar">
 			<div class="btn-group" role="group">
 				<button id="select-all" class="btn ${
           _bootstrapVersion == 3
