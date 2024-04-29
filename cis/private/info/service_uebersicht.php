@@ -52,18 +52,15 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>';
 
+const MOODLE_ADDON_KURZBZ = 'moodle';
+
 // Load Addons to get Moodle_Path
 $addon_obj = new addon();
-if ($addon_obj->loadAddons())
+
+// include moodle addon config if active
+if ($addon_obj->checkActiveAddon(MOODLE_ADDON_KURZBZ) && file_exists('../../../addons/'.MOODLE_ADDON_KURZBZ.'/config.inc.php'))
 {
-	if (count($addon_obj->result) > 0)
-	{
-		foreach ($addon_obj->result as $row)
-		{
-			if (file_exists('../../../addons/'.$row->kurzbz.'/config.inc.php'))
-				include_once('../../../addons/'.$row->kurzbz.'/config.inc.php');
-		}
-	}
+	include_once('../../../addons/'.MOODLE_ADDON_KURZBZ.'/config.inc.php');
 }
 
 echo '
