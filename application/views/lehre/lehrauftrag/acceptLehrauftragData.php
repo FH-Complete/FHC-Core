@@ -142,7 +142,7 @@ FROM
                         WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
                         ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
                         END                                             AS "lv_oe_kurzbz",
-                    TRUNC(lema.semesterstunden, 1)                      AS "stunden",
+                    TRUNC(lema.semesterstunden, 2)                      AS "stunden",
                     TRUNC((lema.semesterstunden * lema.stundensatz), 2) AS "betrag",
                     vertrag_id,
                     vertragsstunden                                     AS "vertrag_stunden",
@@ -232,7 +232,7 @@ FROM
                 SELECT
                     pa.lehreinheit_id,
                     lv.lehrveranstaltung_id,
-                    pa.projektarbeit_id                                                                 AS "projektarbeit_id",
+                    pa.projektarbeit_id::text                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     stg.studiengang_kz,
                     upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
@@ -375,9 +375,9 @@ $filterWidgetArray = array(
         orgform_kurzbz: {visible: false, headerFilter:"input"},
         person_id: {visible: false, headerFilter:"input"},
         lv_oe_kurzbz: {visible: false, headerFilter:"input"},
-        stunden: {align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
+        stunden: {align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:2},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
-            bottomCalc:"sum", bottomCalcParams:{precision:1}
+            bottomCalc:"sum", bottomCalcParams:{precision:2}
 		},
         betrag: {align:"right", formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,

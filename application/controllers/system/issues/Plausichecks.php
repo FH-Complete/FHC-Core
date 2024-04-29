@@ -16,7 +16,8 @@ class Plausichecks extends Auth_Controller
 		);
 
 		// Load libraries
-		$this->load->library('issues/PlausicheckProducerLib');
+		$this->load->library('issues/PlausicheckProducerLib', array('app' => 'core'));
+		$this->load->library('issues/PlausicheckDefinitionLib');
 		$this->load->library('WidgetLib');
 
 		// Load models
@@ -44,18 +45,43 @@ class Plausichecks extends Auth_Controller
 		$fehler_kurzbz = $this->input->get('fehler_kurzbz');
 
 		// issues array for passing issue texts
-		$issueTexts = array();
+		$allIssues = array();
 		// all fehler kurzbz which are going to be checked
-		$fehlerKurzbz = !isEmptyString($fehler_kurzbz) ? array($fehler_kurzbz) : $this->plausicheckproducerlib->getFehlerKurzbz();
+		$fehlerKurzbz = !isEmptyString($fehler_kurzbz) ? array($fehler_kurzbz) : $this->plausicheckdefinitionlib->getFehlerKurzbz();
+		$fehlerLibMappings = $this->plausicheckdefinitionlib->getFehlerLibMappings();
 		// set Studiengang to null if not passed
 		if (isEmptyString($studiengang_kz)) $studiengang_kz = null;
 
 		// get the data returned by Plausicheck
 		foreach ($fehlerKurzbz as $fehler_kurzbz)
 		{
+			// get Text and fehlercode of the Fehler
+			$this->FehlerModel->addSelect('fehlercode, fehlertext, fehlertyp_kurzbz');
+			$fehlerRes = $this->FehlerModel->loadWhere(array('fehler_kurzbz' => $fehler_kurzbz));
+
+			if (isError($fehlerRes)) $this->terminateWithJsonError(getError($fehlerRes));
+
+			// do not check error if no data
+			if (!hasData($fehlerRes)) continue;
+
+			// get the error data
+			$fehler = getData($fehlerRes)[0];
+
+			// initialize issue array
+			$allIssues[$fehler_kurzbz] = array('fehlercode' => $fehler->fehlercode, 'data' => array());
+
+			// get library name for producing issue
+			$libName = $fehlerLibMappings[$fehler_kurzbz];
+
 			// execute the check
-			$issueTexts[$fehler_kurzbz] = array();
-			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue($fehler_kurzbz, $studiensemester_kurzbz, $studiengang_kz);
+			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue(
+				$libName,
+				$fehler_kurzbz,
+				array(
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'studiengang_kz' => $studiengang_kz
+				)
+			);
 
 			if (isError($plausicheckRes)) $this->terminateWithJsonError(getError($plausicheckRes));
 
@@ -69,19 +95,13 @@ class Plausichecks extends Auth_Controller
 					$person_id = isset($plausiData['person_id']) ? $plausiData['person_id'] : null;
 					$oe_kurzbz = isset($plausiData['oe_kurzbz']) ? $plausiData['oe_kurzbz'] : null;
 					$fehlertext_params = isset($plausiData['fehlertext_params']) ? $plausiData['fehlertext_params'] : null;
-					$resolution_params = isset($plausiData['resolution_params']) ? $plausiData['resolution_params'] : null;
-
-					// get Text of the Fehler
-					$this->FehlerModel->addSelect('fehlertext');
-					$fehlerRes = $this->FehlerModel->loadWhere(array('fehler_kurzbz' => $fehler_kurzbz));
-
-					if (isError($fehlerRes)) $this->outputJsonError(getError($fehlerRes));
 
 					// optionally replace fehler parameters in text, output the fehlertext
-					if (hasData($fehlerRes))
+					if (!isEmptyString($fehler->fehlertext))
 					{
-						// use issue fehler text from database if present
-						$fehlerText = getData($fehlerRes)[0]->fehlertext;
+						$fehlercode = $fehler->fehlercode;
+						$fehlerText = $fehler->fehlertext;
+						$fehlerTyp = $fehler->fehlertyp_kurzbz;
 
 						if (!isEmptyArray($fehlertext_params))
 						{
@@ -91,6 +111,14 @@ class Plausichecks extends Auth_Controller
 
 							$fehlerText = vsprintf($fehlerText, $fehlertext_params);
 						}
+
+						if (isset($person_id)) $fehlerText .= "; person_id: $person_id";
+						if (isset($oe_kurzbz)) $fehlerText .= "; oe_kurzbz: $oe_kurzbz";
+
+						$issueObj = new StdClass();
+						$issueObj->fehlertext = $fehlerText;
+						$issueObj->type = $fehlerTyp;
+						$allIssues[$fehler_kurzbz]['data'][] = $issueObj;
 					}
 					else // if no issue text found, use generic text
 					{
@@ -100,12 +128,11 @@ class Plausichecks extends Auth_Controller
 					// add generic parameters to issue text
 					if (isset($person_id)) $fehlerText .= "; person_id: $person_id";
 					if (isset($oe_kurzbz)) $fehlerText .= "; oe_kurzbz: $oe_kurzbz";
-					$issueTexts[$fehler_kurzbz][] = $fehlerText;
 				}
 			}
 		}
 
-		$this->outputJsonSuccess($issueTexts);
+		$this->outputJsonSuccess($allIssues);
 	}
 
 	/**
@@ -130,13 +157,38 @@ class Plausichecks extends Auth_Controller
 
 		if (isError($studiengaengeRes)) show_error(getError($studiengaengeRes));
 
-		$fehlerKurzbz = $this->plausicheckproducerlib->getFehlerKurzbz();
+		$fehlerKurzbz = $this->plausicheckdefinitionlib->getFehlerKurzbz();
+
+		$db = new DB_Model();
+
+		// get fehlercodes for fehler_kurzbz
+		$fehlerRes = $db->execReadOnlyQuery(
+			'SELECT
+				fehler_kurzbz, fehlercode
+			FROM
+				system.tbl_fehler
+			WHERE
+				fehler_kurzbz IN ?',
+			array($fehlerKurzbz)
+		);
+
+		if (isError($fehlerRes)) show_error(getError($fehlerRes));
+
+		$fehlerKurzbzCodeMappings = array();
+		if (hasData($fehlerRes))
+		{
+			$fehler = getData($fehlerRes);
+			foreach ($fehler as $fe)
+			{
+				$fehlerKurzbzCodeMappings[$fe->fehler_kurzbz] = $fe->fehlercode;
+			}
+		}
 
 		return array(
 			'semester' => hasData($studiensemesterRes) ? getData($studiensemesterRes) : array(),
 			'currsemester' => hasData($currSemRes) ? getData($currSemRes) : array(),
 			'studiengaenge' => hasData($studiengaengeRes) ? getData($studiengaengeRes) : array(),
-			'fehler' => $fehlerKurzbz
+			'fehlerKurzbzCodeMappings' => $fehlerKurzbzCodeMappings
 		);
 	}
 }

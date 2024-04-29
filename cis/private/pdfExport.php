@@ -65,6 +65,11 @@ $xsl_stg_kz = 0;
 
 $sign = false;
 
+/* Signing on CIS disabled
+if(isset($_GET['sign']))
+	$sign = true;
+*/
+
 // Direkte uebergabe des Studienganges dessen Vorlage verwendet werden soll
 if (isset($_GET['xsl_stg_kz']))
 	$xsl_stg_kz = $_GET['xsl_stg_kz'];
@@ -144,6 +149,8 @@ if (isset($_GET['projektarbeit_id']))
 	$params .= '&projektarbeit_id='. $_GET['projektarbeit_id'];
 if (isset($_GET['betreuerart_kurzbz']))
 	$params .= '&betreuerart_kurzbz='. $_GET['betreuerart_kurzbz'];
+if (isset($_GET['id']))
+	$params .= '&id='. $_GET['id'];
 
 
 // Logeintrag bei Download von Zahlungsbestaetigungen
@@ -234,7 +241,7 @@ if ((((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('
 	if (isset($_GET['ss']))
 		$stsem_zahlung = $konto->getLastStSemBuchungstypen($user, $buchungstypen, $_GET['ss']);
 
-	if ((($xsl=='Inskription') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
+	if ((($xsl == 'Inskription') || ($xsl == 'InskriptionEng') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
 	{
 		die('Der Studienbeitrag wurde noch nicht bezahlt');
 	}
@@ -296,22 +303,18 @@ if ((((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('
 
 	$dokument->setFilename($filename);
 
-	if (!$dokument->create($output))
-		die($dokument->errormsg);
-
 	if ($sign === true)
 	{
-		if ($dokument->sign($user))
-		{
-			$dokument->output();
-		}
-		else
+		if (!$dokument->sign($user))
 		{
 			echo $dokument->errormsg;
 		}
 	}
-	else
-		$dokument->output();
+
+	if (!$dokument->create($output))
+		die($dokument->errormsg);
+
+	$dokument->output();
 	$dokument->close();
 }
 else

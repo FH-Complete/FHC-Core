@@ -29,6 +29,10 @@ class berechtigung extends basis_db
 	public $rolle_kurzbz;
 	public $beschreibung;
 	public $berechtigung_kurzbz;
+	public $art;
+	public $anmerkung;
+	public $insertamum;
+	public $insertvon;
 	
 	/**
 	 * Konstruktor
@@ -79,7 +83,7 @@ class berechtigung extends basis_db
 	{
 		if(is_null($new))
 			$new = $this->new;
-			
+
 		if($new)
 		{
 			$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES(".
@@ -103,14 +107,38 @@ class berechtigung extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Loescht ein Recht
+	 *
+	 * @param $berechtigung_kurzbz
+	 */
+	public function delete($berechtigung_kurzbz)
+	{
+		$qry = "DELETE FROM system.tbl_berechtigung WHERE berechtigung_kurzbz=".$this->db_add_param($berechtigung_kurzbz).";";
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen des Rechts:'.$this->db_last_error();
+			return false;
+		}
+	}
 	
 	/**
 	 * Holt alle BerechtigungsRollen
 	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
-	public function getRollen()
+	public function getRollen($order = null)
 	{
 		$qry = 'SELECT * FROM system.tbl_rolle';
+		if ($order != '')
+		{
+			$qry .= " ORDER BY $order";
+		}
 
 		if($this->db_query($qry))
 		{
@@ -152,6 +180,9 @@ class berechtigung extends basis_db
 				$obj->rolle_kurzbz = $row->rolle_kurzbz;
 				$obj->art = $row->art;
 				$obj->beschreibung = $row->beschreibung;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
 				
 				$this->result[] = $obj;
 			}
@@ -252,15 +283,22 @@ class berechtigung extends basis_db
 			if($this->db_num_rows()>0)
 			{
 				//Update
-				$qry = "UPDATE system.tbl_rolleberechtigung SET art=".$this->db_add_param($this->art)." WHERE rolle_kurzbz=".$this->db_add_param($this->rolle_kurzbz)." AND berechtigung_kurzbz=".$this->db_add_param($this->berechtigung_kurzbz).";";
+				$qry = "UPDATE system.tbl_rolleberechtigung SET art=".$this->db_add_param($this->art).", 
+						anmerkung=".$this->db_add_param($this->anmerkung).", 
+						insertamum=".$this->db_add_param($this->insertamum).", 
+						insertvon=".$this->db_add_param($this->insertvon)." 
+						WHERE rolle_kurzbz=".$this->db_add_param($this->rolle_kurzbz)." AND berechtigung_kurzbz=".$this->db_add_param($this->berechtigung_kurzbz).";";
 			}
 			else 
 			{
 				//Insert
-				$qry = "INSERT INTO system.tbl_rolleberechtigung (rolle_kurzbz, berechtigung_kurzbz, art) VALUES(".
+				$qry = "INSERT INTO system.tbl_rolleberechtigung (rolle_kurzbz, berechtigung_kurzbz, art, anmerkung, insertamum, insertvon) VALUES(".
 						$this->db_add_param($this->rolle_kurzbz).",".
 						$this->db_add_param($this->berechtigung_kurzbz).",".
-						$this->db_add_param($this->art).");";
+						$this->db_add_param($this->art).",".
+						$this->db_add_param($this->anmerkung).",".
+						$this->db_add_param($this->insertamum).",".
+						$this->db_add_param($this->insertvon).");";
 			}
 			
 			if($this->db_query($qry))

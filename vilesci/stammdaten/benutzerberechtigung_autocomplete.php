@@ -36,9 +36,9 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'benutzer')
 	$search = trim((isset($_REQUEST['term']) ? $_REQUEST['term'] : ''));
 	if (is_null($search) || $search == '')
 		exit();
-	
+
 	$benutzer = new benutzer();
-	
+
 	if ($benutzer->search(array(
 		$search
 	)))
@@ -61,9 +61,9 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'berechtigu
 	$search = trim((isset($_REQUEST['term']) ? $_REQUEST['term'] : ''));
 	if (is_null($search) || $search == '')
 		exit();
-	
+
 	$berechtigung = new berechtigung();
-	
+
 	if ($berechtigung->searchBerechtigungen($search))
 	{
 		$result_obj = array();
@@ -98,17 +98,29 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'oe_kurzbz'
 
 	if(is_array($oe->result) && count($oe->result) > 0)
 	{
-		$result_obj = array();
+		$resultArray = array();
 		foreach($oe->result as $row)
 		{
 			if($row->aktiv==true)
 			{
-				$item['oe_kurzbz'] = html_entity_decode($row->oe_kurzbz);
-				$item['organisationseinheittyp_kurzbz'] = html_entity_decode($row->organisationseinheittyp_kurzbz);
-				$item['bezeichnung'] = html_entity_decode($row->bezeichnung);
-				$result_obj[] = $item;
+				$resultArray[html_entity_decode($row->oe_kurzbz)] = array('organisationseinheittyp_kurzbz' => html_entity_decode($row->organisationseinheittyp_kurzbz),'bezeichnung' => html_entity_decode($row->bezeichnung));
 			}
 		}
+
+		uasort($resultArray, function($a, $b)
+		{
+		    return $a['organisationseinheittyp_kurzbz'].$a['bezeichnung'] <=> $b['organisationseinheittyp_kurzbz'].$b['bezeichnung'];
+		});
+
+		$result_obj = array();
+		foreach($resultArray as $key => $value)
+		{
+				$item['oe_kurzbz'] = $key;
+				$item['organisationseinheittyp_kurzbz'] = $value['organisationseinheittyp_kurzbz'];
+				$item['bezeichnung'] = $value['bezeichnung'];
+				$result_obj[] = $item;
+		}
+
 		echo json_encode($result_obj);
 	}
 	exit();

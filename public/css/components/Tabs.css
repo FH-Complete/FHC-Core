@@ -1,0 +1,16 @@
+.nav-item.nav-link:focus {
+	box-shadow: 0 0 0 .24rem rgba(13,110,253,.25);
+	z-index: 1;
+	outline: 0;
+	position: relative;
+}
+.nav-item.nav-link:focus::after {
+	content: "";
+	display: block;
+	position: absolute;
+	left: -.5rem;
+	right: -.5rem;
+	top: calc(100% + 1px);
+	background: white;
+	height: .25rem;
+}
