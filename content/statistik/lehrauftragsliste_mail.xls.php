@@ -182,10 +182,45 @@ if ($result_stg = $db->db_query($qry_stg))
 		$gesamt->write($gesamtsheet_row, $i, "LV-Stunden", $format_bold);
 		$worksheet->write(2, ++$i, "LV-Kosten", $format_bold);
 		$gesamt->write($gesamtsheet_row, $i, "LV-Kosten", $format_bold);
+
+		$worksheet->write(2, ++$i, "LV-Stunden bestellt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "LV-Stunden bestellt", $format_bold);
+		$worksheet->write(2, ++$i, "LV-Kosten bestellt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "LV-Kosten bestellt", $format_bold);
+
+
+		$worksheet->write(2, ++$i, "LV-Stunden erteilt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "LV-Stunden erteilt", $format_bold);
+		$worksheet->write(2, ++$i, "LV-Kosten erteilt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "LV-Kosten erteilt", $format_bold);
+
+		$worksheet->write(2, ++$i, "LV-Stunden angenommen", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "LV-Stunden angenommen", $format_bold);
+		$worksheet->write(2, ++$i, "LV-Kosten angenommen", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "LV-Kosten angenommen", $format_bold);
+
 		$worksheet->write(2, ++$i, "Betreuerstunden", $format_bold);
 		$gesamt->write($gesamtsheet_row, $i, "Betreuerstunden", $format_bold);
 		$worksheet->write(2, ++$i, "Betreuerkosten", $format_bold);
 		$gesamt->write($gesamtsheet_row, $i, "Betreuer-Kosten", $format_bold);
+
+		$worksheet->write(2, ++$i, "Betreuerstunden bestellt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Betreuerstunden bestellt", $format_bold);
+		$worksheet->write(2, ++$i, "Betreuerkosten bestellt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Betreuer-Kosten bestellt", $format_bold);
+
+		$worksheet->write(2, ++$i, "Betreuerstunden erteilt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Betreuerstunden erteilt", $format_bold);
+		$worksheet->write(2, ++$i, "Betreuerkosten erteilt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Betreuer-Kosten erteilt", $format_bold);
+
+		$worksheet->write(2, ++$i, "Betreuerstunden angenomen", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Betreuerstunden angenomen", $format_bold);
+		$worksheet->write(2, ++$i, "Betreuerkosten angenomen", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Betreuer-Kosten angenomen", $format_bold);
+
+
+
 		$worksheet->write(2, ++$i, "Gesamtstunden", $format_bold);
 		$gesamt->write($gesamtsheet_row, $i, "Gesamtstunden", $format_bold);
 		$worksheet->write(2, ++$i, "Gesamtkosten", $format_bold);
@@ -329,18 +364,24 @@ if ($result_stg = $db->db_query($qry_stg))
 					{
 						$liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt'] = 0;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvstunden_bestellt'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvkosten_bestellt'] = 0;
 					}
 
 					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt']))
 					{
 						$liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt'] = 0;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvstunden_erteilt'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvkosten_erteilt'] = 0;
 					}
 
 					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert']))
 					{
 						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] = 0;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvstunden_akzeptiert'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvkosten_akzeptiert'] = 0;
 					}
 
 					if (in_array('bestellt', $row->vertragsstatus))
@@ -349,6 +390,12 @@ if ($result_stg = $db->db_query($qry_stg))
 							$liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt'] + $row->semesterstunden;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt'] =
 							$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt']
+							+ ($row->semesterstunden * $row->stundensatz);
+
+						$liste[$row->mitarbeiter_uid]['lvstunden_bestellt'] =
+							$liste[$row->mitarbeiter_uid]['lvstunden_bestellt'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['lvkosten_bestellt'] =
+							$liste[$row->mitarbeiter_uid]['lvkosten_bestellt']
 							+ ($row->semesterstunden * $row->stundensatz);
 					}
 
@@ -359,6 +406,12 @@ if ($result_stg = $db->db_query($qry_stg))
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt'] =
 							$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt']
 							+ ($row->semesterstunden * $row->stundensatz);
+
+						$liste[$row->mitarbeiter_uid]['lvstunden_erteilt'] =
+							$liste[$row->mitarbeiter_uid]['lvstunden_erteilt'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['lvkosten_erteilt'] =
+							$liste[$row->mitarbeiter_uid]['lvkosten_erteilt']
+							+ ($row->semesterstunden * $row->stundensatz);
 					}
 
 					if (in_array('akzeptiert', $row->vertragsstatus))
@@ -367,6 +420,12 @@ if ($result_stg = $db->db_query($qry_stg))
 							$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] + $row->semesterstunden;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] =
 							$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert']
+							+ ($row->semesterstunden * $row->stundensatz);
+
+						$liste[$row->mitarbeiter_uid]['lvstunden_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['lvstunden_akzeptiert'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['lvkosten_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['lvkosten_akzeptiert']
 							+ ($row->semesterstunden * $row->stundensatz);
 					}
 				}
@@ -381,18 +440,24 @@ if ($result_stg = $db->db_query($qry_stg))
 					{
 						$liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt'] = 0;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvstunden_bestellt'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvkosten_bestellt'] = 0;
 					}
 
 					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt']))
 					{
 						$liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt'] = 0;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvstunden_erteilt'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvkosten_erteilt'] = 0;
 					}
 
 					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert']))
 					{
 						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] = 0;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvstunden_akzeptiert'] = 0;
+						$liste[$row->mitarbeiter_uid]['lvkosten_akzeptiert'] = 0;
 					}
 
 					if (in_array('bestellt', $row->vertragsstatus))
@@ -401,6 +466,12 @@ if ($result_stg = $db->db_query($qry_stg))
 							$liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt'] + $row->semesterstunden;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt'] =
 							$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt']
+							+ ($row->semesterstunden * $row->stundensatz);
+
+						$liste[$row->mitarbeiter_uid]['lvstunden_bestellt'] =
+							$liste[$row->mitarbeiter_uid]['lvstunden_bestellt'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['lvkosten_bestellt'] =
+							$liste[$row->mitarbeiter_uid]['lvkosten_bestellt']
 							+ ($row->semesterstunden * $row->stundensatz);
 					}
 
@@ -411,6 +482,12 @@ if ($result_stg = $db->db_query($qry_stg))
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt'] =
 							$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt']
 							+ ($row->semesterstunden * $row->stundensatz);
+
+						$liste[$row->mitarbeiter_uid]['lvstunden_erteilt'] =
+							$liste[$row->mitarbeiter_uid]['lvstunden_erteilt'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['lvkosten_erteilt'] =
+							$liste[$row->mitarbeiter_uid]['lvkosten_erteilt']
+							+ ($row->semesterstunden * $row->stundensatz);
 					}
 
 					if (in_array('akzeptiert', $row->vertragsstatus))
@@ -419,6 +496,12 @@ if ($result_stg = $db->db_query($qry_stg))
 							$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] + $row->semesterstunden;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] =
 							$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert']
+							+ ($row->semesterstunden * $row->stundensatz);
+
+						$liste[$row->mitarbeiter_uid]['lvstunden_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['lvstunden_akzeptiert'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['lvkosten_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['lvkosten_akzeptiert']
 							+ ($row->semesterstunden * $row->stundensatz);
 					}
 				}
@@ -443,6 +526,15 @@ if ($result_stg = $db->db_query($qry_stg))
 
 				$liste[$row->mitarbeiter_uid]['betreuergesamtstunden'] = 0;
 				$liste[$row->mitarbeiter_uid]['betreuergesamtkosten'] = 0;
+
+				$liste[$row->mitarbeiter_uid]['betreuergesamtstunden_bestellt'] = 0;
+				$liste[$row->mitarbeiter_uid]['betreuergesamtkosten_bestellt'] = 0;
+
+				$liste[$row->mitarbeiter_uid]['betreuergesamtstunden_erteilt'] = 0;
+				$liste[$row->mitarbeiter_uid]['betreuergesamtkosten_erteilt'] = 0;
+
+				$liste[$row->mitarbeiter_uid]['betreuergesamtstunden_akzeptiert'] = 0;
+				$liste[$row->mitarbeiter_uid]['betreuergesamtkosten_akzeptiert'] = 0;
 				if ($row->geaendert == 't')
 					$liste[$row->mitarbeiter_uid]['geaendert'] = true;
 			}
@@ -559,8 +651,20 @@ if ($result_stg = $db->db_query($qry_stg))
 						$liste[$row->uid]['gesamtkosten'] = 0;
 						$liste[$row->uid]['lvstunden'] = 0;
 						$liste[$row->uid]['lvkosten'] = 0;
+						$liste[$row->uid]['lvstunden_bestellt'] = 0;
+						$liste[$row->uid]['lvkosten_bestellt'] = 0;
+						$liste[$row->uid]['lvstunden_erteilt'] = 0;
+						$liste[$row->uid]['lvkosten_erteilt'] = 0;
+						$liste[$row->uid]['lvstunden_akzeptiert'] = 0;
+						$liste[$row->uid]['lvkosten_akzeptiert'] = 0;
 						$liste[$row->uid]['betreuergesamtstunden'] = 0;
 						$liste[$row->uid]['betreuergesamtkosten'] = 0;
+						$liste[$row->uid]['betreuergesamtstunden_bestellt'] = 0;
+						$liste[$row->uid]['betreuergesamtkosten_bestellt'] = 0;
+						$liste[$row->uid]['betreuergesamtstunden_erteilt'] = 0;
+						$liste[$row->uid]['betreuergesamtkosten_erteilt'] = 0;
+						$liste[$row->uid]['betreuergesamtstunden_akzeptiert'] = 0;
+						$liste[$row->uid]['betreuergesamtkosten_akzeptiert'] = 0;
 					}
 				}
 			}
@@ -605,9 +709,35 @@ if ($result_stg = $db->db_query($qry_stg))
 						$liste[$uid]['gesamtstunden'] = $liste[$uid]['gesamtstunden'] + $row->stunden;
 						$liste[$uid]['gesamtkosten'] =
 							$liste[$uid]['gesamtkosten'] + ($row->stunden * $row->stundensatz);
+
 						$liste[$uid]['betreuergesamtstunden'] = $liste[$uid]['betreuergesamtstunden'] + $row->stunden;
 						$liste[$uid]['betreuergesamtkosten'] =
 							$liste[$uid]['betreuergesamtkosten'] + ($row->stunden * $row->stundensatz);
+
+						if (in_array('bestellt', $row->vertragsstatus))
+						{
+							$liste[$uid]['betreuergesamtstunden_bestellt'] =
+								$liste[$uid]['betreuergesamtstunden_bestellt'] + $row->stunden;
+							$liste[$uid]['betreuergesamtkosten_bestellt'] =
+								$liste[$uid]['betreuergesamtkosten_bestellt'] + ($row->stunden * $row->stundensatz);
+						}
+
+						if (in_array('erteilt', $row->vertragsstatus))
+						{
+							$liste[$uid]['betreuergesamtstunden_erteilt'] =
+								$liste[$uid]['betreuergesamtstunden_erteilt'] + $row->stunden;
+							$liste[$uid]['betreuergesamtkosten_erteilt'] =
+								$liste[$uid]['betreuergesamtkosten_erteilt'] + ($row->stunden * $row->stundensatz);
+						}
+
+						if (in_array('akzeptiert', $row->vertragsstatus))
+						{
+							$liste[$uid]['betreuergesamtstunden_akzeptiert'] =
+								$liste[$uid]['betreuergesamtstunden_akzeptiert'] + $row->stunden;
+							$liste[$uid]['betreuergesamtkosten_akzeptiert'] =
+								$liste[$uid]['betreuergesamtkosten_akzeptiert'] + ($row->stunden * $row->stundensatz);
+						}
+
 						if ($row->geaendert == 't')
 						{
 							$liste[$uid]['geaendert'] = true;
@@ -713,6 +843,7 @@ if ($result_stg = $db->db_query($qry_stg))
 				//Department der OE-Zuordnung
 				$worksheet->write($zeile, ++$i, $row['department'], $formatOE);
 				$gesamt->write($gesamtsheet_row, $i, $row['department'], $formatOE);
+
 				//LVStunden
 				$lvstunden = str_replace(', ', '.', $row['lvstunden']);
 				$worksheet->write($zeile, ++$i, $lvstunden, $format);
@@ -721,6 +852,31 @@ if ($result_stg = $db->db_query($qry_stg))
 				$lvkosten = str_replace(', ', '.', $row['lvkosten']);
 				$worksheet->writeNumber($zeile, ++$i, $lvkosten, $formatnb);
 				$gesamt->writeNumber($gesamtsheet_row, $i, $lvkosten, $formatnb);
+				//LVStunden bestellt
+				$lvstunden_bestellt = str_replace(', ', '.', $row['lvstunden_bestellt']);
+				$worksheet->write($zeile, ++$i, $lvstunden_bestellt, $format);
+				$gesamt->write($gesamtsheet_row, $i, $lvstunden_bestellt, $format);
+				//LVKosten bestellt
+				$lvkosten_bestellt = str_replace(', ', '.', $row['lvkosten_bestellt']);
+				$worksheet->writeNumber($zeile, ++$i, $lvkosten_bestellt, $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row, $i, $lvkosten_bestellt, $formatnb);
+				//LVStunden erteilt
+				$lvstunden_erteilt = str_replace(', ', '.', $row['lvstunden_erteilt']);
+				$worksheet->write($zeile, ++$i, $lvstunden_erteilt, $format);
+				$gesamt->write($gesamtsheet_row, $i, $lvstunden_erteilt, $format);
+				//LVKosten erteilt
+				$lvkosten_ereilt = str_replace(', ', '.', $row['lvkosten_erteilt']);
+				$worksheet->writeNumber($zeile, ++$i, $lvkosten_ereilt, $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row, $i, $lvkosten_ereilt, $formatnb);
+				//LVStunden akzeptiert
+				$lvstunden_azeptiert = str_replace(', ', '.', $row['lvstunden_akzeptiert']);
+				$worksheet->write($zeile, ++$i, $lvstunden_azeptiert, $format);
+				$gesamt->write($gesamtsheet_row, $i, $lvstunden_azeptiert, $format);
+				//LVKosten akezptiert
+				$lvkosten_akzeptiert = str_replace(', ', '.', $row['lvkosten_akzeptiert']);
+				$worksheet->writeNumber($zeile, ++$i, $lvkosten_akzeptiert, $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row, $i, $lvkosten_akzeptiert, $formatnb);
+
 				//Betreuerstunden
 				$betreuergesamtstunden = str_replace(', ', '.', $row['betreuergesamtstunden']);
 				$worksheet->write($zeile, ++$i, $betreuergesamtstunden, $formatnb);
@@ -729,6 +885,31 @@ if ($result_stg = $db->db_query($qry_stg))
 				$betreuergesamtkosten = str_replace(', ', '.', $row['betreuergesamtkosten']);
 				$worksheet->write($zeile, ++$i, $betreuergesamtkosten, $formatnb);
 				$gesamt->write($gesamtsheet_row, $i, $betreuergesamtkosten, $formatnb);
+				//Betreuerstunden bestellt
+				$betreuergesamtstunden_bestellt = str_replace(', ', '.', $row['betreuergesamtstunden_bestellt']);
+				$worksheet->write($zeile, ++$i, $betreuergesamtstunden_bestellt, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $betreuergesamtstunden_bestellt, $formatnb);
+				//Betreuerkosten bestellst
+				$betreuergesamtkosten_bestellt = str_replace(', ', '.', $row['betreuergesamtkosten_bestellt']);
+				$worksheet->write($zeile, ++$i, $betreuergesamtkosten_bestellt, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $betreuergesamtkosten_bestellt, $formatnb);
+				//Betreuerstunden erteilt
+				$betreuergesamtstunden_erteilt = str_replace(', ', '.', $row['betreuergesamtstunden_erteilt']);
+				$worksheet->write($zeile, ++$i, $betreuergesamtstunden_erteilt, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $betreuergesamtstunden_erteilt, $formatnb);
+				//Betreuerkosten erteilt
+				$betreuergesamtkosten_erteilt = str_replace(', ', '.', $row['betreuergesamtkosten_erteilt']);
+				$worksheet->write($zeile, ++$i, $betreuergesamtkosten_erteilt, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $betreuergesamtkosten_erteilt, $formatnb);
+				//Betreuerstunden akzeptiert
+				$betreuergesamtstunden_akzeptiert = str_replace(', ', '.', $row['betreuergesamtstunden_akzeptiert']);
+				$worksheet->write($zeile, ++$i, $betreuergesamtstunden_akzeptiert, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $betreuergesamtstunden_akzeptiert, $formatnb);
+				//Betreuerkosten akzeptiert
+				$betreuergesamtkosten_akzeptiert = str_replace(', ', '.', $row['betreuergesamtkosten_akzeptiert']);
+				$worksheet->write($zeile, ++$i, $betreuergesamtkosten_akzeptiert, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $betreuergesamtkosten_akzeptiert, $formatnb);
+
 				//Gesamtstunden
 				$gesamtstunden = str_replace(', ', '.', $row['gesamtstunden']);
 				$worksheet->write($zeile, ++$i, $gesamtstunden, $formatnb);
