@@ -349,7 +349,7 @@ export default{
 			});
 		},
 		actionConfirmDialogue(data, statusgrund, statusText){
-			//this.hideModal('addMultiStatus2');
+			this.hideModal('addMultiStatus2');
 			this.actionButton = statusgrund;
 			this.actionStatusText = statusText;
 
@@ -360,7 +360,7 @@ export default{
 				this.$refs.askForAusbildungssemester.show();
 		},
 		changeStatusToAbbrecherStgl(prestudentIds){
-			this.hideModal('confirmStatusAction2');
+			this.hideModal('confirmStatusAction');
 			let abbruchData =
 				{
 					status_kurzbz: 'Abbrecher',
@@ -445,6 +445,7 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
 
 			console.log("in changeStatusToDiplomand" + prestudentIds);
+			this.hideModal('addMultiStatus2');
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToAbsolvent(prestudentIds){
@@ -459,6 +460,7 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
 
 			console.log("in changeStatusToAbsolvent" + prestudentIds);
+			this.hideModal('addMultiStatus2');
 			this.addNewStatus(prestudentIds);
 		},
 		addNewStatus(prestudentIds){
@@ -602,12 +604,6 @@ export default{
 		reload(){
 			this.$refs.table.reloadTable(); //bei multiactions not working
 		},
-		reloadLast(prestudent_id){
-			console.log("prestudent_id: " + prestudent_id);
-		//	this.$refs.table.tabulator.setData('api/frontend/v1/stv/Status/getHistoryPrestudent/' + prestudent_id);
-
-		//	window.location.href = "https://c3p0.ma0068.technikum-wien.at/fhcomplete/index.ci.php/studentenverwaltung/prestudent/" + prestudent_id + "/multistatus";
-		},
 		hideModal(modalRef){
 			this.$refs[modalRef].hide();
 		},
@@ -656,22 +652,6 @@ export default{
 	mounted(){},
 	template: `
 		<div class="stv-list h-100 pt-3">
-		
-		PersonId(s): {{personIds}}
-		||
-		PrestudentId(s): {{prestudentIds}}
-		
-		<hr>
-		
-<!--		{{statusData}}
-		
-		<hr>
-		
-		{{modelValue}}
-		
-		<hr>
-		
-		{{updateData}}-->
 				
 			<!--Modal: Add New Status-->
 			<BsModal ref="newStatusModal">
@@ -682,7 +662,7 @@ export default{
 						<div class="row mb-3">
 							<label for="status_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'status_rolle')}}</label>
 							<div class="col-sm-6">
-							<!--<form-input type="text" :readonly="readonly" class="form-control" id="status_kurzbz" v-model="statusData['status_kurzbz']">-->
+
 								<form-input
 									required
 									v-model="statusData['status_kurzbz']"
@@ -1051,6 +1031,50 @@ export default{
 				</template>
 			</BsModal>
 			
+			<BsModal ref="addMultiStatus2" id="addMultiStatus2">
+				<template #title>Status ändern zu</template>
+				<template #default>
+					<button type="button" class="btn btn-primary d-block mb-2" data-bs-toggle="collapse" data-bs-target="#submenu1">
+						Abbrecher
+					</button>
+					<div class="collapse" id="submenu1">
+						<button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">durch Stgl</button>
+						<button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">durch Student</button>
+					</div>
+				
+					<button type="button" class="btn btn-primary d-block mb-2" @click="actionConfirmDialogue(updateData, 'unterbrecher','Unterbrecher')">
+						Unterbrecher
+					</button>
+					
+					<button type="button" class="btn btn-primary d-block mb-2" data-bs-toggle="collapse" data-bs-target="#submenu2">
+						Student
+					</button>
+					<div class="collapse" id="submenu2">
+						<button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'student','Student')">Student</button>
+						<button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'student','Wiederholer')">Wiederholer</button>
+					</div>
+				   
+					<button type="button" class="btn btn-primary d-block mb-2" @click="changeStatusToDiplomand(prestudentIds)">
+						Diplomand
+					</button>	
+					<button type="button" class="btn btn-primary d-block mb-2" @click="changeStatusToAbsolvent(prestudentIds)">
+						Absolvent
+					</button>
+					
+				</template>
+				<template #footer>
+					<div v-if="actionButton=='abbrecherStgl'">
+						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToAbbrecherStgl(prestudentIds)">OK</button>
+					</div>
+					<div v-if="actionButton=='abbrecherStud'">
+						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToAbbrecherStud(prestudentIds)">OK</button>
+					</div>
+					<div v-if="actionButton=='unterbrecher'">
+						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToUnterbrecher(prestudentIds)">OK</button>
+					</div>					
+				</template>
+			</BsModal>
+			
 			<!--Modal: askForAusbildungssemester-->
 			<BsModal ref="askForAusbildungssemester">
 				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
@@ -1072,8 +1096,7 @@ export default{
 						>				
 						</form-input>
 					</div>
-				</div>
-					
+				</div>			
 				</template>
 				<template #footer>
 
@@ -1137,287 +1160,19 @@ export default{
 				>
 				
 				<template #actions="{updateData2}">
-
-<!-- Version1 -->
-<!--    <div class="btn-group">
-        &lt;!&ndash; Hauptbutton &ndash;&gt;
-        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            Status Ändern
-        </button>
-        &lt;!&ndash; Dropdown-Menü &ndash;&gt;
-        <ul class="dropdown-menu">
-            &lt;!&ndash; Schleife für fünf Unterbuttons &ndash;&gt;
-            &lt;!&ndash; Jeder Unterbutton hat zwei weitere Unterbuttons &ndash;&gt;
-            <li class="dropdown-submenu">
-                <a class="dropdown-item dropdown-toggle" href="#">Abbrecher</a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Unterbutton 1-1</a></li>
-                    <li><a class="dropdown-item" href="#">Unterbutton 1-2</a></li>
-                </ul>
-            </li>
-            <li class="dropdown-submenu">
-                <a class="dropdown-item dropdown-toggle" href="#">Unterbrecher</a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Unterbutton 2-1</a></li>
-                    <li><a class="dropdown-item" href="#">Unterbutton 2-2</a></li>
-                </ul>
-            </li>
-            <li class="dropdown-submenu">
-                <a class="dropdown-item dropdown-toggle" href="#">Student</a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Unterbutton 3-1</a></li>
-                    <li><a class="dropdown-item" href="#">Unterbutton 3-2</a></li>
-                </ul>
-            </li>
-            <li class="dropdown-submenu">
-                <a class="dropdown-item dropdown-toggle" href="#">Diplomand</a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Unterbutton 4-1</a></li>
-                    <li><a class="dropdown-item" href="#">Unterbutton 4-2</a></li>
-                </ul>
-            </li>
-            <li class="dropdown-submenu">
-                <a class="dropdown-item dropdown-toggle" href="#">Absolvent</a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Unterbutton 5-1</a></li>
-                    <li><a class="dropdown-item" href="#">Unterbutton 5-2</a></li>
-                </ul>
-            </li>
-        </ul>
-    </div>-->
-
-<!-- Version2 -->
-<!--    <div class="btn-group">
-        &lt;!&ndash; Hauptbutton &ndash;&gt;
-        <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
-            Version 2
-        </button>
-    </div>-->
-
-    <!-- Offcanvas-Menü -->
-<!--    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasMenuLabel">Untermenü</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            &lt;!&ndash; Untermenü-Buttons &ndash;&gt;
-            <button type="button" class="btn btn-secondary d-block mb-2">Unterbutton 1-1</button>
-            <button type="button" class="btn btn-secondary d-block mb-2">Unterbutton 1-2</button>
-            <button type="button" class="btn btn-secondary d-block mb-2">Unterbutton 2-1</button>
-            <button type="button" class="btn btn-secondary d-block mb-2">Unterbutton 2-2</button>
-            <button type="button" class="btn btn-secondary d-block mb-2">Unterbutton 3-1</button>
-            <button type="button" class="btn btn-secondary d-block mb-2">Unterbutton 3-2</button>
-            <button type="button" class="btn btn-secondary d-block mb-2">Unterbutton 4-1</button>
-            <button type="button" class="btn btn-secondary d-block mb-2">Unterbutton 4-2</button>
-            <button type="button" class="btn btn-secondary d-block mb-2">Unterbutton 5-1</button>
-            <button type="button" class="btn btn-secondary d-block mb-2">Unterbutton 5-2</button>
-        </div>
-    </div>-->
-
-
-<!-- Hauptbutton zum Öffnen des Modals -->
-<!--TODO(MANU) use bs template addMultiStatus-->
-<!--<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mainModal">
-    Status Ändern(3)
-</button>-->
-
-<!-- Modal für Hauptbuttons und Untermenü-Buttons -->
-<!--<div class="modal fade" id="mainModal" tabindex="-1" aria-labelledby="mainModalLabel" aria-hidden="true" ref="addMultiStatus2">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="mainModalLabel">Status ändern zu</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                &lt;!&ndash; Liste der Hauptbuttons &ndash;&gt;
-                <button type="button" class="btn btn-primary d-block mb-2" data-bs-toggle="collapse" data-bs-target="#submenu1">
-                    Abbrecher
-                </button>
-                <div class="collapse" id="submenu1">
-                    <button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">durch Stgl</button>
-                    <button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">durch Student</button>
-                </div>
-
-                <button type="button" class="btn btn-primary d-block mb-2" @click="actionConfirmDialogue(updateData, 'unterbrecher','Unterbrecher')">
-                    Unterbrecher
-                </button>
-                
-                <button type="button" class="btn btn-primary d-block mb-2" data-bs-toggle="collapse" data-bs-target="#submenu2">
-                    Student
-                </button>
-                <div class="collapse" id="submenu2">
-                    <button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'student','Student')">Student</button>
-                    <button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'student','Wiederholer')">Wiederholer</button>
-                </div>
-               
-                <button type="button" class="btn btn-primary d-block mb-2" @click="changeStatusToDiplomand(prestudentIds)">
-                    Diplomand
-                </button>
-
-                
-                <button type="button" class="btn btn-primary d-block mb-2" @click="changeStatusToAbsolvent(prestudentIds)">
-                    Absolvent
-                </button>
-
-            </div>
-        </div>
-    </div>
-</div>-->
-
-
-
-
-
-					<button
-						class="btn btn-outline-primary"
-						@click="actionChangeStatus(selected)"
-						> Status Ändern
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')"
-						>
-						Abbrecher Stgl
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')"
-						>
-						Abbrecher Stud
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(updateData, 'unterbrecher','Unterbrecher')"
-	
-						>
-						Unterbrecher
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(updateData, 'student','Student')"
-		
-						>
-						Student
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(updateData, 'student','Wiederholer')"
-		
-						>
-						Wiederholer
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="changeStatusToDiplomand(prestudentIds)"
-		
-						>
-						Diplomand
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="changeStatusToAbsolvent(prestudentIds)"
-		
-						>
-						Absolvent
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus2">
+						Status Ändern
 					</button>
 				</template>
 			</core-filter-cmpt>
 			
 			<div 
-			v-if="this.modelValue.length"
-			ref="buttonsStatusMulti"
+				v-if="this.modelValue.length"
+				ref="buttonsStatusMulti"
 			>	
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')"
-						>
-						Abbrecher Stgl
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')"
-						>
-						Abbrecher Stud
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(updateData, 'unterbrecher','Unterbrecher')"
-	
-						>
-						Unterbrecher
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(updateData, 'student','Student')"
-		
-						>
-						Student
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="changeStatusToDiplomand(prestudentIds)"
-		
-						>
-						Diplomand
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="changeStatusToAbsolvent(prestudentIds)"
-		
-						>
-						Absolvent
-					</button>	
-<!--				<template #actions="{updateData}">
-					<button
-						class="btn btn-outline-primary"
-						@click="actionChangeStatus(selected)"
-						> Status Ändern
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(updateData)"
-		
-						>
-						Abbrecher Stgl
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(selected)"
-		
-						>
-						Abbrecher Stud
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(selected)"
-		
-						>
-						Unterbrecher
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(selected)"
-		
-						>
-						Student
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(selected)"
-		
-						>
-						Wiederholer
-					</button>
-					<button
-						class="btn btn-outline-secondary"
-						@click="actionConfirmDialogue(selected)"
-		
-						>
-						Diplomand
-					</button>
-				</template>-->
+			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus2">
+				Status Ändern
+			</button>
 			</div>
 		
 		</div>`

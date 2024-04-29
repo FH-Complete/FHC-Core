@@ -3,7 +3,7 @@ import FormInput from "../../../Form/Input.js";
 import KontoNew from "./Konto/New.js";
 import KontoEdit from "./Konto/Edit.js";
 
-// TODO(chris): Phrasen
+const LOCAL_STORAGE_ID_FILTER = 'stv_details_konto_2024-01-11_filter';
 
 export default {
 	components: {
@@ -52,130 +52,46 @@ export default {
 			}
 		},
 		tabulatorColumns() {
-			let columns = [];
-			
-			if (Array.isArray(this.modelValue)) {
-				columns.push({
-					field: "person_id",
-					title: "Person ID"
-				});
-				columns.push({
-					field: "anrede",
-					title: "Anrede",
-					visible: false
-				});
-				columns.push({
-					field: "titelpost",
-					title: "Titelpost",
-					visible: false
-				});
-				columns.push({
-					field: "titelpre",
-					title: "Titelpre",
-					visible: false
-				});
-				columns.push({
-					field: "vorname",
-					title: "Vorname"
-				});
-				columns.push({
-					field: "vornamen",
-					title: "Vornamen",
-					visible: false
-				});
-				columns.push({
-					field: "nachname",
-					title: "Nachname"
-				});
-			}
+			const columns = { ...this.config.columns };
+			if (!columns.actions)
+				columns.actions = {
+					title: '',
+					frozen: true
+				};
+			columns.actions.formatter = cell => {
+				let container = document.createElement('div');
+				container.className = "d-flex gap-2";
 
-			columns = [...columns, ...[
-				{
-					field: "buchungsdatum",
-					title: "Buchungsdatum"
-				},
-				{
-					field: "buchungstext",
-					title: "Buchungstext"
-				},
-				{
-					field: "betrag",
-					title: "Betrag"
-				},
-				{
-					field: "studiensemester_kurzbz",
-					title: "StSem"
-				},
-				{
-					field: "buchungstyp_kurzbz",
-					title: "Typ",
-					visible: false
-				},
-				{
-					field: "buchungsnr",
-					title: "Buchungs Nr",
-					visible: false
-				},
-				{
-					field: "insertvon",
-					title: "Angelegt von",
-					visible: false
-				},
-				{
-					field: "insertamum",
-					title: "Anlagedatum",
-					visible: false
-				},
-				{
-					field: "kuerzel",
-					title: "Studiengang",
-					visible: false
-				},
-				{
-					field: "anmerkung",
-					title: "Anmerkung"
-				}
-			]];
+				let button = document.createElement('button');
+				button.className = 'btn btn-outline-secondary';
+				button.innerHTML = '<i class="fa fa-edit"></i>';
+				button.addEventListener('click', () =>
+					this.$refs.edit.open(cell.getData())
+				);
+				container.append(button);
 
-			columns = [...columns, ...this.config.additionalCols];
+				button = document.createElement('button');
+				button.className = 'btn btn-outline-secondary';
+				button.innerHTML = '<i class="fa fa-trash"></i>';
+				button.addEventListener('click', evt => {
+					evt.stopPropagation();
+					this.$fhcAlert
+						.confirmDelete()
+						.then(result => result ? cell.getData().buchungsnr : Promise.reject({handled:true}))
+						.then(this.$fhcApi.factory.stv.konto.delete)
+						.then(() => {
+							// TODO(chris): deleting a child also removes the siblings!
+							//cell.getRow().delete();
+							this.reload();
+						})
+						.catch(this.$fhcAlert.handleSystemError);
+				});
+				container.append(button);
 
-			columns.push({
-				title: 'Actions',
-				formatter: cell => {
-					let container = document.createElement('div');
-					container.className = "d-flex gap-2";
+				return container;
+			};
 
-					let button = document.createElement('button');
-					button.className = 'btn btn-outline-secondary';
-					button.innerHTML = '<i class="fa fa-edit"></i>';
-					button.addEventListener('click', () =>
-						this.$refs.edit.open(cell.getData())
-					);
-					container.append(button);
-
-					button = document.createElement('button');
-					button.className = 'btn btn-outline-secondary';
-					button.innerHTML = '<i class="fa fa-trash"></i>';
-					button.addEventListener('click', evt => {
-						evt.stopPropagation();
-						this.$fhcAlert
-							.confirmDelete()
-							.then(result => result ? cell.getData().buchungsnr : Promise.reject({handled:true}))
-							.then(this.$fhcApi.factory.stv.konto.delete)
-							.then(() => {
-								// TODO(chris): deleting a child also removes the siblings!
-								//cell.getRow().delete();
-								this.reload();
-							})
-							.catch(this.$fhcAlert.handleSystemError);
-					});
-					container.append(button);
-
-					return container;
-				},
-				frozen: true
-			});
-			return columns;
+			return Object.values(columns);
 		},
 		tabulatorOptions() {
 			return this.$fhcApi.factory.stv.konto.tabulatorConfig({
@@ -214,7 +130,7 @@ export default {
 				})
 				.then(result => result.data)
 				.then(this.updateData)
-				.then(() => 'Daten wurden gespeichert')
+				.then(() => this.$p.t('ui/gespeichert'))
 				.then(this.$fhcAlert.alertSuccess)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -250,11 +166,24 @@ export default {
 					'_blank'
 				);
 			}
+		},
+		setFilter(type) {
+			if (type == 'open')
+				window.localStorage.setItem(LOCAL_STORAGE_ID_FILTER, this.filter ? 1 : 0);
+			else if (type == 'current_stg')
+				this.$fhcApi.factory
+					.stv.filter.setStg(this.studiengang_kz)
+					.catch(this.$fhcAlert.handleSystemError);
+
+			this.$nextTick(this.$refs.table.reloadTable);
 		}
 	},
 	created() {
-		// TODO(chris): persist filter + studiengang_kz
-		// TODO(chris): studiengang_kz in variablelib
+		this.filter = window.localStorage.getItem(LOCAL_STORAGE_ID_FILTER) == 1;
+		this.$fhcApi.factory
+			.stv.filter.getStg()
+			.then(result => this.studiengang_kz = result.data)
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-details-konto h-100 d-flex flex-column">
@@ -263,9 +192,9 @@ export default {
 				<form-input
 					container-class="form-switch"
 					type="checkbox"
-					label="Nur offene anzeigen"
+					:label="$p.t('stv/konto_filter_open')"
 					v-model="filter"
-					@update:model-value="() => $nextTick($refs.table.reloadTable)"
+					@update:model-value="setFilter('open')"
 					>
 				</form-input>
 			</div>
@@ -273,10 +202,10 @@ export default {
 				<form-input
 					container-class="form-switch"
 					type="checkbox"
-					label="Nur aktuellen Stg anzeigen"
+					:label="$p.t('stv/konto_filter_current_stg')"
 					v-model="studiengang_kz_intern"
 					:disabled="!stg_kz"
-					@update:model-value="() => $nextTick($refs.table.reloadTable)"
+					@update:model-value="setFilter('current_stg')"
 					>
 				</form-input>
 			</div>
@@ -288,7 +217,7 @@ export default {
 			:tabulator-options="tabulatorOptions"
 			reload
 			new-btn-show
-			new-btn-label="Buchung"
+			:new-btn-label="$p.t('konto/buchung')"
 			:new-btn-disabled="stg_kz === ''"
 			@click:new="actionNew"
 			>
@@ -308,7 +237,7 @@ export default {
 						@click="actionCounter(selected)"
 						:disabled="!selected.length"
 						>
-						Gegenbuchen
+						{{ $p.t('stv/konto_counter') }}
 					</button>
 				</div>
 				<button
@@ -317,7 +246,7 @@ export default {
 					@click="downloadPdf(selected)"
 					:disabled="!selected.length"
 					>
-					<i class="fa fa-download"></i> Zahlungsbestaetigung
+					<i class="fa fa-download"></i> {{ $p.t('stv/konto_payment_confirmation') }}
 				</button>
 			</template>
 		</core-filter-cmpt>

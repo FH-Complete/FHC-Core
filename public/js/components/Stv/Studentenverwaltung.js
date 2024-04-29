@@ -190,14 +190,14 @@ export default {
 	<div class="stv">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" :href="stvRoot">FHC 4.0</a>
-			<button class="navbar-toggler d-md-none m-1 collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<button class="navbar-toggler d-md-none m-1 collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" :aria-label="$p.t('ui/toggle_nav')"><span class="navbar-toggler-icon"></span></button>
 			<core-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction" class="searchbar w-100"></core-searchbar>
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">
 				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
-						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
 					<stv-verband @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
 					<stv-studiensemester :default="defaultSemester" @changed="studiensemesterChanged"></stv-studiensemester>

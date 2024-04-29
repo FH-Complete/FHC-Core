@@ -2,15 +2,13 @@ import {CoreRESTClient} from '../../../../RESTClient.js';
 import FormForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
 import TblHistory from "./Prestudent/History.js";
-import TblStatus from "./Prestudent/Status.js";
 
 export default {
 	components: {
 		CoreRESTClient,
 		FormForm,
 		FormInput,
-		TblHistory,
-		TblStatus
+		TblHistory
 	},
 	inject: {
 		lists: {

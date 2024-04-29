@@ -104,3 +104,7 @@ html {
 	background-color: #f8d7da!important;
 	border-color: #f5c2c7!important;
 }
+
+.has-filter .fa-filter {
+	color: var(--bs-success);
+}

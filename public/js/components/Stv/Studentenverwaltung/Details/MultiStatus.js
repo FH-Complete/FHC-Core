@@ -11,7 +11,7 @@ export default {
 
 		<div class="stv-details-details h-100 pb-3">
 			<div class="col-12 pb-3">
-			<legend>MultiStatus</legend>
+			<legend>Status</legend>
 			<TblMultiStatus :modelValue="modelValue"></TblMultiStatus>		
 		</div>
 	</div>

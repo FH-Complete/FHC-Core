@@ -84,8 +84,8 @@ class Konto_model extends DB_Model
 	{
 		$this->db->where('buchungsnr_verweis', $id);
 		if ($this->db->count_all_results($this->dbTable))
-			return error('Bitte zuerst die zugeordneten Buchungen loeschen');
-		return parent::delete($id, 42);
+			return error('Bitte zuerst die zugeordneten Buchungen loeschen', 42);
+		return parent::delete($id);
 	}
 
 	/**
