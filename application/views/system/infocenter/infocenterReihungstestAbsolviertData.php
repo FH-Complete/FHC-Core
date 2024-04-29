@@ -10,6 +10,7 @@
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$ORG_NAME = '\'InfoCenter\'';
 	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
+	$LOGDATA_DELETEDFILE = '\'Document % deleted\'';
 
 $query = '
 		SELECT
@@ -26,6 +27,7 @@ $query = '
 				  FROM system.tbl_log l
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+				   AND l.logdata->>\'name\' NOT LIKE '. $LOGDATA_DELETEDFILE .' 
 				   AND l.person_id = p.person_id
 			  ORDER BY l.log_id DESC
 				 LIMIT 1
@@ -35,6 +37,7 @@ $query = '
 				  FROM system.tbl_log l
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+				   AND l.logdata->>\'name\' NOT LIKE '. $LOGDATA_DELETEDFILE .'   
 				   AND l.person_id = p.person_id
 			  ORDER BY l.log_id DESC
 				 LIMIT 1
@@ -191,6 +194,7 @@ $query = '
 					FROM system.tbl_log l
 					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+					AND l.logdata->>\'name\' NOT LIKE '. $LOGDATA_DELETEDFILE .' 
 					AND l.person_id = p.person_id
 					ORDER BY l.log_id DESC
 					LIMIT 1

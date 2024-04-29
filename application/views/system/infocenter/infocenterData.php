@@ -15,6 +15,7 @@
 	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
 	$ORG_NAME = '\'InfoCenter\'';
 	$ONLINE = '\'online\'';
+	$LOGDATA_DELETEDFILE = '\'Document % deleted\'';
 
 	$query = '
 		SELECT
@@ -31,6 +32,7 @@
 				  FROM system.tbl_log l
 				 WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+				   AND l.logdata->>\'name\' NOT LIKE '. $LOGDATA_DELETEDFILE .' 
 				   AND l.person_id = p.person_id
 			  ORDER BY l.log_id DESC
 				 LIMIT 1
@@ -40,6 +42,7 @@
 				  FROM system.tbl_log l
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+				   AND l.logdata->>\'name\' NOT LIKE '. $LOGDATA_DELETEDFILE .' 
 				   AND l.person_id = p.person_id
 			  ORDER BY l.log_id DESC
 				 LIMIT 1
@@ -62,6 +65,7 @@
 				  LEFT JOIN public.tbl_student student ON tbl_benutzer.uid = student.student_uid
 				 WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+				   AND l.logdata->>\'name\' NOT LIKE '. $LOGDATA_DELETEDFILE .'
 				   AND l.person_id = p.person_id
 			  ORDER BY l.log_id DESC
 				 LIMIT 1
@@ -283,6 +287,7 @@
 					FROM system.tbl_log l
 					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+					AND l.logdata->>\'name\' NOT LIKE '. $LOGDATA_DELETEDFILE .' 
 					AND l.person_id = p.person_id
 					ORDER BY l.log_id DESC
 					LIMIT 1

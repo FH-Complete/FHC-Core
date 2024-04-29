@@ -901,7 +901,7 @@ class ReihungstestJob extends JOB_Controller
 								$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
 									= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
 							}
-							elseif ($rowNiedrPrios->laststatus == 'Bewerber' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum)
+							elseif ($rowNiedrPrios->laststatus == 'Bewerber' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum && $row_ps->studiengang_typ !== 'm')
 							{
 								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
 								$lastStatus = $this->PrestudentstatusModel->getLastStatus($rowNiedrPrios->prestudent_id);
@@ -927,7 +927,7 @@ class ReihungstestJob extends JOB_Controller
 										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
 								}
 							}
-							elseif ($rowNiedrPrios->laststatus == 'Wartender' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum)
+							elseif ($rowNiedrPrios->laststatus == 'Wartender' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum && $row_ps->studiengang_typ !== 'm')
 							{
 								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
 								// Mail zur Info an Assistenz schicken
