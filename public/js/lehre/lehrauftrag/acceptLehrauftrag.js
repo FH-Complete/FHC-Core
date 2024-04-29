@@ -455,9 +455,9 @@ $(function () {
     func_tableBuilt(tabulatorInstance);
 
     // using the tabulator instance instead of the jquery object because the site loads two different tabulator tables
-    console.log("instance",tabulatorInstance)
+   
     let uniqueTableID =
-      tabulatorInstance.element.parentElement.parentElement.parentElement.attributes
+      tabulatorInstance.element.parentElement.parentElement.attributes
         .tableUniqueId.value;
         
     switch (uniqueTableID) {
