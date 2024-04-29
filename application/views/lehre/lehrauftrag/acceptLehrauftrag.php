@@ -7,7 +7,7 @@ $this->load->view(
 		'jqueryui1' => true,
 		'jquerycheckboxes1' => true,
 		'bootstrap5' => true,
-		'fontawesome4' => true,
+		'fontawesome6' => true,
 		'sbadmintemplate' => false,
 		'tabulator5' => true,
         'tabulator5JQuery' => true,
