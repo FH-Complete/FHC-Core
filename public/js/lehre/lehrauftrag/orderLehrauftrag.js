@@ -565,6 +565,23 @@ $(function () {
     $("#tableWidgetTabulator").tabulator("clearFilter");
   });
 
+  // Show all rows
+  $("#show-newAndChanged").click(function () {
+    $("#tableWidgetTabulator").tabulator("setFilter", [
+      [
+        { field: "personalnummer", type: ">", value: 0 }, // not dummy
+        { field: "personalnummer", type: "=", value: null }, // include projektbetreuer
+      ],
+      { field: "mitarbeiter_uid", type: "!=", value: null }, // AND is Mitarbeiter
+      { field: "stunden", type: "!=", value: null }, // AND has Semesterstunden (not null and not 0)
+      { field: "stunden", type: "!=", value: 0 },
+      [
+        { field: "status", type: "=", value: "Neu" }, // AND neu
+        { field: "status", type: "=", value: "Geändert" }, // OR geaendert
+      ],
+    ]);
+  });
+
   // Show only rows with new lehrauftraege (not dummy lectors or external projektbetreuer; stunden not 0 or null)
   $("#show-new").click(function () {
     $("#tableWidgetTabulator").tabulator("setFilter", [

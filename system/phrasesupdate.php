@@ -5903,6 +5903,26 @@ The invoice will be sent to you again. <u><strong>The amount is only to be trans
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'neuUndGeaenderteAnzeigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue und geänderte anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show new and changed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'nurNeueAnzeigen',
 		'insertvon' => 'system',
 		'phrases' => array(
