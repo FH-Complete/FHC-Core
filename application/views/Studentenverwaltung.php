@@ -5,7 +5,7 @@
 		'bootstrap5' => true,
 		'fontawesome6' => true,
 		'vue3' => true,
-		#'primevue3' => true,
+		'primevue3' => true,
 		#'filtercomponent' => true,
 		'tabulator5' => true,
 		'tinymce5' => true,
