@@ -15,9 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CoreFilterAPIs} from './API.js';
-import {CoreRESTClient} from '../../RESTClient.js';
-import {CoreFetchCmpt} from '../Fetch.js';
+import {CoreFetchCmpt} from '../../components/Fetch.js';
 import FilterConfig from './Filter/Config.js';
 import FilterColumns from './Filter/Columns.js';
 import TableDownload from './Table/Download.js';
@@ -255,12 +253,12 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		getFilter: function() {
+		getFilter() {
 			if (this.selectedFilter === null)
-				this.startFetchCmpt(CoreFilterAPIs.getFilter, null, this.render);
+				this.startFetchCmpt(this.$fhcApi.factory.filter.getFilter, null, this.render);
 			else
 				this.startFetchCmpt(
-					CoreFilterAPIs.getFilterById,
+					this.$fhcApi.factory.filter.getFilterById,
 					{
 						filterId: this.selectedFilter
 					},
@@ -270,55 +268,47 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		render: function(response) {
+		render(response) {
+			let data = response;
+			this.filterName = data.filterName;
+			this.dataset = data.dataset;
+			this.datasetMetadata = data.datasetMetadata;
 
-			if (CoreRESTClient.hasData(response))
+			this.fields = data.fields;
+			this.selectedFields = data.selectedFields;
+			this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
+			this.filterFields = [];
+
+			for (let i = 0; i < data.datasetMetadata.length; i++)
 			{
-				let data = CoreRESTClient.getData(response);
-				this.filterName = data.filterName;
-				this.dataset = data.dataset;
-				this.datasetMetadata = data.datasetMetadata;
-
-				this.fields = data.fields;
-				this.selectedFields = data.selectedFields;
-				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
-				this.filterFields = [];
-
-				for (let i = 0; i < data.datasetMetadata.length; i++)
+				for (let j = 0; j < data.filters.length; j++)
 				{
-					for (let j = 0; j < data.filters.length; j++)
+					if (data.datasetMetadata[i].name == data.filters[j].name)
 					{
-						if (data.datasetMetadata[i].name == data.filters[j].name)
-						{
-							let filter = data.filters[j];
-							filter.type = data.datasetMetadata[i].type;
+						let filter = data.filters[j];
+						filter.type = data.datasetMetadata[i].type;
 
-							this.filterFields.push(filter);
-							//break;
-						}
+						this.filterFields.push(filter);
+						//break;
 					}
 				}
+			}
 
-				// If the side menu is active
-				if (this.sideMenu === true)
-				{
-					this.setSideMenu(data);
-				}
-				else // otherwise use the dropdown in the filter options
-				{
-					this.setDropDownMenu(data);
-				}
-				this.updateTabulator();
-			}
-			else
+			// If the side menu is active
+			if (this.sideMenu === true)
 			{
-				console.error(CoreRESTClient.getError(response));
+				this.setSideMenu(data);
 			}
+			else // otherwise use the dropdown in the filter options
+			{
+				this.setDropDownMenu(data);
+			}
+			this.updateTabulator();
 		},
 		/**
 		 * Set the menu
 		 */
-		setSideMenu: function(data) {
+		setSideMenu(data) {
 			let filters = data.sideMenu.filters;
 			let personalFilters = data.sideMenu.personalFilters;
 			let filtersArray = [];
@@ -372,7 +362,7 @@ export const CoreFilterCmpt = {
 		/**
 		 * Set the drop down menu
 		 */
-		setDropDownMenu: function(data) {
+		setDropDownMenu(data) {
 			let filters = data.sideMenu.filters;
 			let personalFilters = data.sideMenu.personalFilters;
 			let filtersArray = [];
@@ -408,7 +398,7 @@ export const CoreFilterCmpt = {
 		/**
 		 * Used to start/refresh the FetchCmpt
 		 */
-		startFetchCmpt: function(apiFunction, apiFunctionParameters, dataFetchedCallback) {
+		startFetchCmpt(apiFunction, apiFunctionParameters, dataFetchedCallback) {
 			// Assign the function api of the FetchCmpt binded property
 			this.fetchCmptApiFunction = apiFunction;
 
@@ -434,11 +424,11 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		handlerSaveCustomFilter: function(customFilterName) {
+		handlerSaveCustomFilter(customFilterName) {
 			this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				CoreFilterAPIs.saveCustomFilter,
+				this.$fhcApi.factory.filter.saveCustomFilter,
 				{
 					customFilterName
 				},
@@ -448,13 +438,13 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		handlerRemoveCustomFilter: function(event) {
+		handlerRemoveCustomFilter(event) {
 			let filterId = event.currentTarget.getAttribute("href").substring(1);
 			if (filterId === this.selectedFilter)
 				this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				CoreFilterAPIs.removeCustomFilter,
+				this.$fhcApi.factory.filter.removeCustomFilter,
 				{
 					filterId: filterId
 				},
@@ -491,7 +481,7 @@ export const CoreFilterCmpt = {
 		applyFilterConfig(filterFields) {
 			this.selectedFilter = null;
 			this.startFetchCmpt(
-				CoreFilterAPIs.applyFilterFields,
+				this.$fhcApi.factory.filter.applyFilterFields,
 				{
 					filterFields
 				},

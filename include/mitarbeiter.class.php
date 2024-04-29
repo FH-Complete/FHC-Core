@@ -1890,6 +1890,46 @@ class mitarbeiter extends benutzer
 
 
 	/**
+	 * Liefert alle Mitarbeiter*innen
+	 *
+	 * @param $filter
+	 * @return boolean
+	 */
+	public function getAll()
+	{
+		$qry = '
+			SELECT
+				ma.mitarbeiter_uid, p.nachname, p.vorname, b.alias
+			FROM
+				public.tbl_mitarbeiter ma
+				JOIN public.tbl_benutzer b ON (mitarbeiter_uid=uid)
+				JOIN public.tbl_person p  USING(person_id)
+			ORDER BY p.nachname
+		';
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$ma_obj = new mitarbeiter();
+
+				$ma_obj->nachname = $row->nachname;
+				$ma_obj->vorname = $row->vorname;
+				$ma_obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$ma_obj->alias = $row->alias;
+
+				$this->maData[] = $ma_obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
 	 * Generiert nächste freie Personalnummer anhand der sequence tbl_mitarbeiter_personalnummer_seq
 	 * @return string $personalnummer
 	 */
@@ -1947,6 +1987,5 @@ class mitarbeiter extends benutzer
 			return true;
 		}
 	}
-
 }
 ?>

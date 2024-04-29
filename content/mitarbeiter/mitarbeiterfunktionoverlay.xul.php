@@ -199,7 +199,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bisfunktion/rdf#sws"  onclick="MitarbeiterTreeFunktionSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="mitarbeiter-funktion-treecol-bisverwendung_id" label="VerwendungID" flex="1" persist="hidden, width" hidden="true"
+					<treecol id="mitarbeiter-funktion-treecol-bisverwendung_id" label="VerwendungID" flex="1" persist="hidden, width" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bisfunktion/rdf#bisverwendung_id"  onclick="MitarbeiterTreeFunktionSort()"/>
 					<splitter class="tree-splitter"/>
@@ -286,15 +286,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#studiengang"  onclick="MitarbeiterTreeEntwicklungsteamSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id" label="entwicklungsteam_id" flex="1" persist="hidden, width" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#entwicklungsteam_id"  onclick="MitarbeiterTreeEntwicklungteamSort()"/>
+				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-entwicklungsteam-treecol-besqual" label="Besondere Qualifikation" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#besqual"  onclick="MitarbeiterTreeEntwicklungteamSort()"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="mitarbeiter-entwicklungsteam-treecol-beginn" label="Beginn" flex="1" persist="hidden, width" hidden="true"
+				<treecol id="mitarbeiter-entwicklungsteam-treecol-beginn" label="Beginn" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#beginn"  onclick="MitarbeiterTreeEntwicklungsteamSort()"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="mitarbeiter-entwicklungsteam-treecol-ende" label="Ende" flex="1" persist="hidden, width" hidden="true"
+				<treecol id="mitarbeiter-entwicklungsteam-treecol-ende" label="Ende" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#ende"  onclick="MitarbeiterTreeEntwicklungsteamSort()"/>
 				<splitter class="tree-splitter"/>
@@ -318,6 +322,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<treeitem uri="rdf:*">
 							<treerow>
 								<treecell label="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#studiengang" />
+								<treecell label="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#entwicklungsteam_id" />
 								<treecell label="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#besqual" />
 								<treecell label="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#beginn" />
 								<treecell label="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#ende" />
@@ -345,6 +350,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<column flex="5"/>
 					</columns>
 					<rows>
+
 						<row>
 							<label value="Studiengang" control="mitarbeiter-entwicklungsteam-detail-menulist-studiengang"/>
 							<menulist id="mitarbeiter-entwicklungsteam-detail-menulist-studiengang" disabled="true"
@@ -359,6 +365,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</template>
 							</menulist>
 						</row>
+
 						<row>
 							<label value="Besondere Qualifikation" control="mitarbeiter-entwicklungsteam-detail-menulist-besqual"/>
 							<menulist id="mitarbeiter-entwicklungsteam-detail-menulist-besqual" disabled="true"
@@ -373,14 +380,17 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</template>
 							</menulist>
 						</row>
+
 						<row>
 							<label value="Beginn" control="mitarbeiter-entwicklungsteam-detail-datum-beginn"/>
 							<box id="mitarbeiter-entwicklungsteam-detail-datum-beginn" class="Datum" disabled="true"/>
 						</row>
+
 						<row>
 							<label value="Ende" control="mitarbeiter-entwicklungsteam-detail-datum-ende"/>
 							<box id="mitarbeiter-entwicklungsteam-detail-datum-ende" class="Datum" disabled="true"/>
 						</row>
+
 						<row>
 							<spacer />
 							<button id="mitarbeiter-entwicklungsteam-detail-button-speichern" label="Speichern" disabled="true" oncommand="MitarbeiterEntwicklungsteamSpeichern()" />

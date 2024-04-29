@@ -56,7 +56,7 @@ $uid_benutzer = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid_benutzer);
-if(!$rechte->isBerechtigt('mitarbeiter', null, 's'))
+if(!$rechte->isBerechtigt('mitarbeiter/zeitwuensche', null, 's'))
 	die($rechte->errormsg);
 
 $datum_obj = new datum();

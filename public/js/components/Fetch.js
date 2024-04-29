@@ -101,6 +101,8 @@ export const CoreFetchCmpt = {
 		errorHandler: function(error) {
 			if (error.response?.data?.retval)
 				this.setError(error.response.data.retval);
+			else if (error.data?.message)
+				this.setError(error.data.message);
 			else
 				this.setError(error.message);
 		},
