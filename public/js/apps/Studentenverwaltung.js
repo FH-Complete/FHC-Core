@@ -18,7 +18,6 @@
 import FhcStudentenverwaltung from "../components/Stv/Studentenverwaltung.js";
 import fhcapifactory from "./api/fhcapifactory.js";
 
-import FhcApi from "../plugin/FhcApi.js";
 import Phrasen from "../plugin/Phrasen.js";
 
 //import PrimeVue form "../../../../index.ci.php/public/js/components/primevue/config/config.esm.min.js");
@@ -48,7 +47,6 @@ import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_route
 				overlay: 1100
 			}
 		})
-		.use(FhcApi)
 		.use(Phrasen)
 		.mount('#main');
 });

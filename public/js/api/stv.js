@@ -3,5 +3,11 @@ import konto from './stv/konto.js';
 
 export default {
 	filter,
-	konto
+	konto,
+	configStudent() {
+		return this.$fhcApi.get('api/frontend/v1/stv/config/student');
+	},
+	configStudents() {
+		return this.$fhcApi.get('api/frontend/v1/stv/config/students');
+	}
 };
