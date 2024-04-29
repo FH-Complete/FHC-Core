@@ -33,10 +33,9 @@ class Konto extends FHCAPI_Controller
 	 */
 	public function __construct()
 	{
-		// TODO(chris): permissions
 		parent::__construct([
 			'get' => 'student/stammdaten:r',
-			'getBuchungstypen' => 'student/stammdaten:r', // alle?
+			'getBuchungstypen' => self::PERM_LOGGED,
 			'checkDoubles' => ['admin:r', 'assistenz:r'],
 			'insert' => ['admin:w', 'assistenz:w'],
 			'counter' => ['admin:w', 'assistenz:w'],
@@ -82,10 +81,7 @@ class Konto extends FHCAPI_Controller
 			$result = $this->KontoModel->getAlleBuchungen($person_id, $studiengang_kz);
 		}
 
-		#$result = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$result = $result->retval;
+		$result = $this->getDataOrTerminateWithError($result);
 
 		// sort into tree
 		$childs = [];
@@ -122,10 +118,7 @@ class Konto extends FHCAPI_Controller
 
 		$result = $this->BuchungstypModel->load();
 
-		#$data = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$data = $result->retval;
+		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
 	}
@@ -163,10 +156,7 @@ class Konto extends FHCAPI_Controller
 
 		$result = $this->KontoModel->checkDoubleBuchung($person_ids, $this->input->post('studiensemester_kurzbz'), $buchungstypen[$buchung]);
 
-		#$result = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$result = $result->retval;
+		$result = $this->getDataOrTerminateWithError($result);
 
 		if (!$result)
 			$this->terminateWithSuccess(false);
@@ -441,9 +431,7 @@ class Konto extends FHCAPI_Controller
 
 		$result = $this->KontoModel->update($id, $data);
 
-		#$this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		$this->getDataOrTerminateWithError($result);
 
 		$result = null;
 		// TODO(chris): get as tree?
@@ -475,15 +463,13 @@ class Konto extends FHCAPI_Controller
 		$buchungsnr = $this->input->post('buchungsnr');
 
 		$result = $this->KontoModel->load($buchungsnr);
-		#$result = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$result = $result->retval;
+
+		$result = $this->getDataOrTerminateWithError($result);
 
 		if (!$result)
 			$this->terminateWithError($this->p->t('konto', 'error_missing', [
 				'buchungsnr' => $buchungsnr
-			]), self::ERROR_TYPE_GENERAL);
+			]));
 
 		$_POST['studiengang_kz'] = current($result)->studiengang_kz;
 
@@ -500,8 +486,8 @@ class Konto extends FHCAPI_Controller
 		$result = $this->KontoModel->delete($buchungsnr);
 		if (isError($result)) {
 			if (getCode($result) != 42)
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			$this->terminateWithError($this->p->t('konto', 'error_delete_level'), self::ERROR_TYPE_GENERAL);
+				$this->terminateWithError(getError($result));
+			$this->terminateWithError($this->p->t('konto', 'error_delete_level'));
 		}
 
 		$this->terminateWithSuccess();

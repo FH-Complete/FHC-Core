@@ -27,10 +27,9 @@ class Lists extends FHCAPI_Controller
 {
 	public function __construct()
 	{
-		// TODO(chris): permissions
 		parent::__construct([
-			'getStudiensemester' => ['admin:r', 'assistenz:r', 'student/stammdaten:r'], // alle?
-			'getStgs' => ['admin:r', 'assistenz:r', 'student/stammdaten:r'] // alle?
+			'getStudiensemester' => self::PERM_LOGGED,
+			'getStgs' => self::PERM_LOGGED
 		]);
 	}
 
@@ -42,10 +41,7 @@ class Lists extends FHCAPI_Controller
 
 		$result = $this->StudiensemesterModel->load();
 
-		#$data = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$data = $result->retval;
+		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
 	}
@@ -62,10 +58,7 @@ class Lists extends FHCAPI_Controller
 
 		$result = $this->StudiengangModel->load();
 
-		#$data = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$data = $result->retval;
+		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
 	}

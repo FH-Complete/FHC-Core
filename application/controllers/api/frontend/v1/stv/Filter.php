@@ -31,10 +31,9 @@ class Filter extends FHCAPI_Controller
 	 */
 	public function __construct()
 	{
-		// TODO(chris): permissions
 		parent::__construct([
-			'getStg' => 'student/stammdaten:r',#self::PERM_LOGGED,
-			'setStg' => 'student/stammdaten:r'#self::PERM_LOGGED
+			'getStg' => self::PERM_LOGGED,
+			'setStg' => self::PERM_LOGGED
 		]);
 
 		// Load models
@@ -53,10 +52,7 @@ class Filter extends FHCAPI_Controller
 	{
 		$result = $this->VariableModel->getVariables(getAuthUID(), ['kontofilterstg']);
 
-		#$data = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$data = $result->retval;
+		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data['kontofilterstg'] == 'true');
 	}
@@ -81,9 +77,7 @@ class Filter extends FHCAPI_Controller
 
 		$result = $this->VariableModel->setVariable(getAuthUID(), 'kontofilterstg', $studiengang_kz ? 'true' : 'false');
 
-		#$this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		$this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess(true);
 	}
