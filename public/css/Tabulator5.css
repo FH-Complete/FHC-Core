@@ -39,10 +39,9 @@
 	z-index: 999999;
 }
 
-/* classes for rows that are not selectable in the tabulator */
-.tabulator-row.tabulator-unselectable{
-	color:var(--bs-gray-500);
-	
+/* classes for rows that are not selectable in the tabulator, except for rows that are used for calculation */
+.tabulator-row.tabulator-unselectable:not(.tabulator-calcs) {
+	color: #adb5bd !important;
 }
 
 /* using bootstrap background classes to style the background color of tabulator rows */

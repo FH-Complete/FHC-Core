@@ -26,8 +26,8 @@
 		<table class="table table-bordered">
 			<tr class="text-center">
 				<td class="col-1"><i class='fa fa-users'></i></td>
-				<td class="col-1"><img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px;"></td>
-				<td class="col-1"><i class='fa fa-handshake-o'></i></td>
+				<td class="col-1"><i class='fa fa-user-check'></i></td>
+				<td class="col-1"><i class='fa-regular fa-handshake'></i></td>
 			</tr>
 			<tr class="text-center">
 				<td><?php echo $this->p->t('lehre', 'filterAlleBeiAnnahme'); ?></td>

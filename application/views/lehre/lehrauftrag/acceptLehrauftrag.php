@@ -167,17 +167,17 @@ $this->load->view(
 								data-bs-toggle="tooltip" data-bs-placement="left" title="<?php echo $this->p->t('ui', 'alleAnzeigen'); ?>"><i class='fa fa-users'></i>
 						</button>
 						<button id="show-approved" class="btn btn-outline-secondary btn-lehrauftrag" type="button"
-								data-bs-toggle="tooltip" data-bs-placement="left" title="<?php echo $this->p->t('ui', 'nurErteilteAnzeigen'); ?>">
-						</button><!-- png img set in javascript -->
+								data-bs-toggle="tooltip" data-bs-placement="left" title="<?php echo $this->p->t('ui', 'nurErteilteAnzeigen'); ?>"><i class='fa fa-user-check'></i>
+						</button>
 						<button id="show-accepted" class="btn btn-outline-secondary btn-lehrauftrag" type="button"
-								data-bs-toggle="tooltip" data-bs-placement="left" title="<?php echo $this->p->t('ui', 'nurAngenommeneAnzeigen'); ?>"><i class='fa fa-handshake-o'></i>
+								data-bs-toggle="tooltip" data-bs-placement="left" title="<?php echo $this->p->t('ui', 'nurAngenommeneAnzeigen'); ?>"><i class='fa-regular fa-handshake'></i>
 						</button>
 					</div>
 
 					<button id="show-cancelled" class="btn btn-outline-secondary btn-lehrauftrag" type="button" style="margin-left: 20px;"
 							data-bs-toggle="collapse" data-placement="left" title="<?php echo $this->p->t('ui', 'nurStornierteAnzeigen'); ?>"
-							data-bs-target ="#collapseCancelledLehrauftraege" aria-expanded="false" aria-controls="collapseExample">
-					</button><!-- png img set in javascript -->
+							data-bs-target ="#collapseCancelledLehrauftraege" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-user-xmark"></i>
+					</button>
 				</div>
 			</div>
 

@@ -9,25 +9,10 @@
 // -----------------------------------------------------------------------------------------------------------------
 const APP_ROOT = FHC_JS_DATA_STORAGE_OBJECT.app_root;
 
-const COLOR_LIGHTGREY = "#f5f5f5";
-
 const TABLE_CANCELLED_LEHRAUFTRAG =
   "[tableuniqueid = cancelledLehrauftrag] #tableWidgetTabulator";
 const TABLE_ACCEPT_LEHRAUFTRAG =
   "[tableuniqueid = acceptLehrauftrag] #tableWidgetTabulator";
-
-/**
- * PNG icons used in status- and filter buttons
- * Setting png icons is a workaround to use font-awsome 5.9.0 icons until system can be updated to newer font awsome version.
- * */
-const ICON_LEHRAUFTRAG_ORDERED =
-  '<img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px; margin: -6px;">';
-const ICON_LEHRAUFTRAG_APPROVED =
-  '<img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px; margin: -6px;">';
-const ICON_LEHRAUFTRAG_CHANGED =
-  '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -6px;">';
-const ICON_LEHRAUFTRAG_CANCELLED =
-  '<img src="../../../public/images/icons/fa-user-times.png" style="height: 30px; width: 30px; margin: -6px;">';
 
 // Fields that should not be provided in the column picker
 var tableWidgetBlacklistArray_columnUnselectable = [
@@ -183,10 +168,10 @@ function func_tableBuilt(table) {
   // Add status column to table
   table.addColumn(
     {
-      title: "<i class='fa fa-user-o'></i>",
+      title: "<i class='fa fa-user'></i>",
       field: "status",
       width: 40,
-      align: "center",
+      hozAlign: "center",
       downloadTitle: "Status",
       formatter: status_formatter,
       tooltip: status_tooltip,
@@ -313,13 +298,12 @@ status_formatter = function (cell, formatterParams, onRendered) {
 
   // commented icons would be so nice to have with fontawsome 5.11...
   if (bestellt != null && isNaN(vertrag_betrag)) {
-    return "<i class='fas fa-user-minus'></i>"; // kein Vertrag
+    return "<i class='fa fa-user-minus'></i>"; // kein Vertrag
   } else if (
     (bestellt != null && betrag != vertrag_betrag) ||
     (bestellt != null && stunden != vertrag_stunden)
   ) {
-    return ICON_LEHRAUFTRAG_CHANGED; // geaendert
-    // return "<i class='fas fa-user-edit'></i>";
+    return "<i class='fa fa-user-pen'></i>";
   } else if (
     bestellt == null &&
     erteilt == null &&
@@ -328,16 +312,13 @@ status_formatter = function (cell, formatterParams, onRendered) {
   ) {
     return "<i class='fa fa-user-plus'></i>"; // neu
   } else if (bestellt != null && erteilt == null && akzeptiert == null) {
-    return ICON_LEHRAUFTRAG_ORDERED; // bestellt
-    // return "<i class='fa fa-user-tag'></i>";
+    return "<i class='fa fa-user-tag'></i>";
   } else if (bestellt != null && erteilt != null && akzeptiert == null) {
-    return ICON_LEHRAUFTRAG_APPROVED; // erteilt
-    // return "<i class='fas fa-user-check'></i>";
+    return "<i class='fa fa-user-check'></i>";
   } else if (bestellt != null && erteilt != null && akzeptiert != null) {
-    return "<i class='fa fa-handshake-o'></i>"; // akzeptiert
-    // return "<i class='fas fa-user-graduate'></i>";
+    return "<i class='fa-regular fa-handshake'></i>"; // akzeptiert  
   } else if (is_storniert) {
-    return ICON_LEHRAUFTRAG_CANCELLED; // storniert
+    return "<i class='fa-solid fa-user-xmark'></i>"; // storniert
   } else {
     return "<i class='fa fa-user'></i>"; // default
   }
@@ -546,21 +527,6 @@ $(function () {
       { field: "erteilt", type: "!=", value: null },
       { field: "akzeptiert", type: "!=", value: null },
     ]);
-  });
-
-  // Set png-icons into filter-buttons
-  $(".btn-lehrauftrag").each(function () {
-    switch (this.id) {
-      case "show-ordered":
-        this.innerHTML = ICON_LEHRAUFTRAG_ORDERED;
-        break;
-      case "show-approved":
-        this.innerHTML = ICON_LEHRAUFTRAG_APPROVED;
-        break;
-      case "show-cancelled":
-        this.innerHTML = ICON_LEHRAUFTRAG_CANCELLED;
-        break;
-    }
   });
 
   // De/activate and un/focus on clicked button

@@ -8,19 +8,6 @@
 // Global vars
 // -----------------------------------------------------------------------------------------------------------------
 
-const COLOR_LIGHTGREY = "#f5f5f5";
-
-/**
- * PNG icons used in status- and filter buttons
- * Setting png icons is a workaround to use font-awsome 5.9.0 icons until system can be updated to newer font awsome version.
- * */
-const ICON_LEHRAUFTRAG_ORDERED =
-  '<img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px; margin: -6px;">';
-const ICON_LEHRAUFTRAG_APPROVED =
-  '<img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px; margin: -6px;">';
-const ICON_LEHRAUFTRAG_CHANGED =
-  '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -6px;">';
-
 // Fields that should not be provided in the column picker
 var tableWidgetBlacklistArray_columnUnselectable = [
   "status",
@@ -192,8 +179,6 @@ function func_rowFormatter(row) {
   row.getCells().forEach(function (cell) {
     if (is_dummy) {
       cell.getElement().classList.add("bg-info"); // dummy lectors
-    } else if ((!is_mitarbeiter || !has_stunden) && akzeptiert == null) {
-      row.getElement().style["background-color"] = COLOR_LIGHTGREY;
     } else if (
       (bestellt != null && betrag != vertrag_betrag) ||
       (bestellt != null &&
@@ -256,10 +241,10 @@ function func_tableBuilt(table) {
   table.tabulator(
     "addColumn",
     {
-      title: "<i class='fa fa-user-o'></i>",
+      title: "<i class='fa fa-user'></i>",
       field: "status",
       width: 40,
-      align: "center",
+      hozAlign: "center",
       downloadTitle: "Status",
       formatter: status_formatter,
       tooltip: status_tooltip,
@@ -406,18 +391,15 @@ status_formatter = function (cell, formatterParams, onRendered) {
     (bestellt != null && stunden != vertrag_stunden)
   ) {
     // geaendert ((if betrag is 0 or null)
-    return ICON_LEHRAUFTRAG_CHANGED; // geaendert
-    // return "<i class='fas fa-user-edit'></i>";
+    return "<i class='fa fa-user-pen'></i>";
   } else if (bestellt == null && erteilt == null && akzeptiert == null) {
     return "<i class='fa fa-user-plus'></i>"; // neu
   } else if (bestellt != null && erteilt == null && akzeptiert == null) {
-    return ICON_LEHRAUFTRAG_ORDERED; // bestellt
-    // return "<i class='fa fa-user-tag'></i>";
+    return "<i class='fa fa-user-tag'></i>";
   } else if (bestellt != null && erteilt != null && akzeptiert == null) {
-    return ICON_LEHRAUFTRAG_APPROVED; // erteilt
-    // return "<i class='fas fa-user-check'></i>";
+    return "<i class='fa fa-user-check'></i>";
   } else if (bestellt != null && erteilt != null && akzeptiert != null) {
-    return "<i class='fa fa-handshake-o'></i>"; // akzeptiert
+    return "<i class='fa-regular fa-handshake'></i>"; // akzeptiert
   } else {
     return "<i class='fa fa-user'></i>"; // default
   }
@@ -652,21 +634,6 @@ $(function () {
       { field: "personalnummer", type: "!=", value: null },
       { field: "personalnummer", type: "<=", value: 0 },
     ]);
-  });
-
-  // Set png-icons into filter-buttons
-  $(".btn-lehrauftrag").each(function () {
-    switch (this.id) {
-      case "show-ordered":
-        this.innerHTML = ICON_LEHRAUFTRAG_ORDERED;
-        break;
-      case "show-approved":
-        this.innerHTML = ICON_LEHRAUFTRAG_APPROVED;
-        break;
-      case "show-changed":
-        this.innerHTML = ICON_LEHRAUFTRAG_CHANGED;
-        break;
-    }
   });
 
   // De/activate and un/focus on clicked button, En-/Disable 'Lehrauftrag bestellen'
