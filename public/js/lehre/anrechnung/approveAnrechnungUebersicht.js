@@ -200,7 +200,6 @@ function func_rowFormatter(row){
 
   // add the tabulator-unselectable class to the row if its data property isSelectable is false
   if(rowData.isSelectable===false && !row.getElement().classList.contains("tabulator-unselectable")){
-    console.log("i entered here")
     row.getElement().classList.add("tabulator-unselectable");
   }
 
@@ -495,7 +494,6 @@ $(function () {
                   "=",
                   key
                 );
-                console.log("here are the rows", rows)
 
                 // Loop through the rows
                 rows.forEach((row) => {
@@ -508,7 +506,6 @@ $(function () {
                         row.getData().anrechnung_id == anrechnung_id
                     ) !== -1
                   ) {
-                    console.log("am i entering in this if ", row);
                     // ...update status
                     updateData.status_kurzbz = data.status_kurzbz;
                     updateData.status_bezeichnung = data.status_bezeichnung;
@@ -525,7 +522,7 @@ $(function () {
                       row.getData().ectsSumBeruflich +
                       sumLvEcts.ectsSumAnzurechnendeLvsBeruflich);
                     
-                  // set the isSelectable property to false, in order to set the tabulator-unselectable class in the rowFormatter function
+                  // set the isSelectable property to false, in order to add the tabulator-unselectable class in the rowFormatter function
                   updateData.isSelectable=false;
                   // Update row
                   row.update(updateData);
@@ -634,6 +631,13 @@ $(function () {
 
             // Update status 'genehmigt'
             $("#tableWidgetTabulator").tabulator("updateData", data);
+
+            // add the isSelectable property to the rejected row, so that the right classes and selectability is applied to the row
+            var selectedRows = $("#tableWidgetTabulator").tabulator("getSelectedRows");
+            selectedRows.forEach((row)=>{
+              row.update({...row.getData(), isSelectable:false});
+              row.reformat();
+            })
 
             // Deselect rows
             var indexesToDeselect = data.map((x) => x.anrechnung_id);
