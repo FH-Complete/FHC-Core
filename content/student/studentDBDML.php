@@ -4711,8 +4711,8 @@ if(!$error)
 						else
 						{
 							// Kein Mitarbeiter gefunden, kein Stundensatz
-							$data = '';
-							$return = false;
+							$data = '0.00';
+							$return = true;
 						}
 					}
 				}

@@ -171,7 +171,11 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 					<rows>
 						<row>
 							<label value="Projektarbeit ID" control="student-projektarbeit-textbox-projektarbeit_id"/>
-							<hbox><textbox id="student-projektarbeit-textbox-projektarbeit_id" readonly="true" maxlength="16" size="16"/></hbox>
+							<hbox>
+								<textbox id="student-projektarbeit-textbox-projektarbeit_id" readonly="true" maxlength="16" size="16"/>
+								<textbox id="student-projektarbeit-textbox-lehreinheit_stsem" hidden="true" readonly="true" maxlength="32" size="32"/>
+							</hbox>
+
 						</row>
 						<row>
 							<label value="Titel" control="student-projektarbeit-textbox-titel"/>
