@@ -250,6 +250,10 @@ export default {
 				// Error is array of strings
 				if (Array.isArray(error) && error.every(err => typeof err === 'string'))
 					return error.every($fhcAlert.alertSystemError);
+
+				// Error has been handled already
+				if (error.hasOwnProperty('handled') && error.handled)
+					return;
 				
 				// Error is object
 				if (typeof error === 'object' && error !== null) {
