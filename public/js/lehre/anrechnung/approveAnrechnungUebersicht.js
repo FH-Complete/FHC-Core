@@ -195,6 +195,21 @@ function func_selectableCheck(row) {
   );
 }
 
+function func_rowFormatter(row){
+  const rowData = row.getData();
+
+  // add the tabulator-unselectable class to the row if its data property isSelectable is false
+  if(rowData.isSelectable===false && !row.getElement().classList.contains("tabulator-unselectable")){
+    console.log("i entered here")
+    row.getElement().classList.add("tabulator-unselectable");
+  }
+
+  // remove the tabulator-selectable class if the data property isSelectable is false and it contains the class
+  if(rowData.isSelectable===false && row.getElement().classList.contains("tabulator-selectable")){
+    row.getElement().classList.remove("tabulator-selectable");
+  }
+}
+
 // Calculate dynamically sum of all LV ECTS by Student and display, when maximum ECTS are exceeded.
 // data = selected data, rows = selected rows
 function func_rowSelectionChanged(data, rows, tabulatorInstance) {
@@ -480,6 +495,7 @@ $(function () {
                   "=",
                   key
                 );
+                console.log("here are the rows", rows)
 
                 // Loop through the rows
                 rows.forEach((row) => {
@@ -492,6 +508,7 @@ $(function () {
                         row.getData().anrechnung_id == anrechnung_id
                     ) !== -1
                   ) {
+                    console.log("am i entering in this if ", row);
                     // ...update status
                     updateData.status_kurzbz = data.status_kurzbz;
                     updateData.status_bezeichnung = data.status_bezeichnung;
@@ -507,19 +524,21 @@ $(function () {
                     (updateData.ectsSumBeruflich =
                       row.getData().ectsSumBeruflich +
                       sumLvEcts.ectsSumAnzurechnendeLvsBeruflich);
-
+                    
+                  // set the isSelectable property to false, in order to set the tabulator-unselectable class in the rowFormatter function
+                  updateData.isSelectable=false;
                   // Update row
                   row.update(updateData);
-
-                  // Reformat row
                   row.reformat();
+                  
                 });
 
                 // Deselect rows
                 $("#tableWidgetTabulator").tabulator(
                   "deselectRow",
                   rowsToDeselect
-                );
+                );  
+
               });
 
               // Print success message
