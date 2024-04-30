@@ -29,7 +29,11 @@ class Lists extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getStudiensemester' => self::PERM_LOGGED,
-			'getStgs' => self::PERM_LOGGED
+			'getStgs' => self::PERM_LOGGED,
+			'getSprachen' => self::PERM_LOGGED,
+			'getGeschlechter' => self::PERM_LOGGED,
+			'getAusbildungen' => self::PERM_LOGGED,
+			'getOrgforms' => self::PERM_LOGGED
 		]);
 	}
 
@@ -60,6 +64,58 @@ class Lists extends FHCAPI_Controller
 
 		$data = $this->getDataOrTerminateWithError($result);
 
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getSprachen()
+	{
+		$this->load->model('system/Sprache_model', 'SpracheModel');
+
+		$this->SpracheModel->addOrder('sprache');
+
+		$result = $this->SpracheModel->load();
+		$data = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getGeschlechter()
+	{
+		$this->load->model('person/Geschlecht_model', 'GeschlechtModel');
+
+		$this->GeschlechtModel->addOrder('sort');
+		$this->GeschlechtModel->addOrder('geschlecht');
+
+		$this->GeschlechtModel->addSelect('*');
+		$this->GeschlechtModel->addSelect("bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $this->GeschlechtModel->escape(DEFAULT_LANGUAGE) . " LIMIT 1)] AS bezeichnung");
+
+		$result = $this->GeschlechtModel->load();
+		$data = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getAusbildungen()
+	{
+		$this->load->model('codex/Ausbildung_model', 'AusbildungModel');
+
+		$this->AusbildungModel->addOrder('ausbildungcode');
+
+		$result = $this->AusbildungModel->load();
+		$data = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getOrgforms()
+	{
+		$this->load->model('codex/Orgform_model', 'OrgformModel');
+
+		$this->OrgformModel->addOrder('bezeichnung');
+
+		$result = $this->OrgformModel->loadWhere(['rolle' => true]);
+		$data = $this->getDataOrTerminateWithError($result);
+		
 		$this->terminateWithSuccess($data);
 	}
 }

@@ -128,25 +128,22 @@ export default {
 				this.lists.nations = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Lists/getSprachen')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/lists/getSprachen')
 			.then(result => {
-				this.lists.sprachen = result;
+				this.lists.sprachen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Lists/getGeschlechter')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/lists/getGeschlechter')
 			.then(result => {
-				this.lists.geschlechter = result;
+				this.lists.geschlechter = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Lists/getAusbildungen')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/lists/getAusbildungen')
 			.then(result => {
-				this.lists.ausbildungen = result;
+				this.lists.ausbildungen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		this.$fhcApi
@@ -156,11 +153,10 @@ export default {
 				this.lists.active_stgs = this.lists.stgs.filter(stg => stg.aktiv);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get('components/stv/Lists/getOrgforms')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/lists/getOrgforms')
 			.then(result => {
-				this.lists.orgforms = result;
+				this.lists.orgforms = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		this.$fhcApi
