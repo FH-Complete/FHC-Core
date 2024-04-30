@@ -21,7 +21,6 @@ import StvVerband from "./Studentenverwaltung/Verband.js";
 import StvList from "./Studentenverwaltung/List.js";
 import StvDetails from "./Studentenverwaltung/Details.js";
 import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
-import {CoreRESTClient} from '../../RESTClient.js';
 
 
 export default {
@@ -107,25 +106,20 @@ export default {
 			this.studiengangKz = studiengang_kz;
 			this.$refs.stvList.updateUrl(link);
 		},
-		searchfunction(searchsettings) {
-			return Vue.$fhcapi.Search.search(searchsettings);  
-		},
 		studiensemesterChanged(v) {
 			this.studiensemesterKurzbz = v;
 			this.$refs.stvList.updateUrl();
 			this.$refs.details.reload();
 		},
 		reloadList() {
-			console.log('reloadList2');
 			this.$refs.stvList.reload();
 		}
 	},
 	created() {
-		CoreRESTClient
-			.get('components/stv/Address/getNations')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$fhcApi
+			.get('api/frontend/v1/stv/address/getNations')
 			.then(result => {
-				this.lists.nations = result;
+				this.lists.nations = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		this.$fhcApi
@@ -187,7 +181,7 @@ export default {
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" :href="stvRoot">FHC 4.0</a>
 			<button class="navbar-toggler d-md-none m-1 collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" :aria-label="$p.t('ui/toggle_nav')"><span class="navbar-toggler-icon"></span></button>
-			<core-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction" class="searchbar w-100"></core-searchbar>
+			<core-searchbar :searchoptions="searchbaroptions" :searchfunction="$fhcApi.factory.search.search" class="searchbar w-100"></core-searchbar>
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">
