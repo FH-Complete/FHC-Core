@@ -259,7 +259,8 @@ if($command=='add')
 				$data = array(
 					'vorname' => $student->vorname,
 					'nachname' => $student->nachname,
-					'studiengang' => $stg_obj->bezeichnung
+					'studiengang' => $stg_obj->bezeichnung,
+					'matrikelnr' => $student->matrikelnr
 				);
 
 				$mailres = sendSanchoMail(
