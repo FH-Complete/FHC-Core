@@ -58,6 +58,7 @@ if($frage_id!='' && is_numeric($frage_id))
 				tbl_frage_sprache.text as frage_text,
 				tbl_frage_sprache.audio as frage_audio,
 				tbl_frage_sprache.bild as frage_bild,
+				tbl_vorschlag.nummer as vorschlag_nummer,
 				tbl_vorschlag_sprache.text as vorschlag_text,
 				tbl_vorschlag_sprache.audio as vorschlag_audio,
 				tbl_vorschlag_sprache.bild as vorschlag_bild,
@@ -108,9 +109,11 @@ if($frage_id!='' && is_numeric($frage_id))
 			}
 			
 			//Vorschlaege
+			echo '<center>Nummer: '.$row->vorschlag_nummer.'</center><br>';
 			echo '<center><div style="width: 90%; padding: 5px; background-color: #eee;border: 1px solid black">';
 			//echo "<b>Vorschlag $i: </b>";
 			$first=false;
+
 			echo $row->vorschlag_text;
 			if($row->vorschlag_audio!='')
 			{

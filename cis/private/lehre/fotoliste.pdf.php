@@ -274,6 +274,8 @@ if ($result = $db->db_query($qry)) {
 
                 //add foto to document
                 $doc->addImage($foto_url, trim($row->person_id) . '.jpg', 'image/jpg');
+
+				$foto_url = 'Pictures/' . trim($row->person_id) . '.jpg';
             }
             elseif ($row->foto_sperre == 't')
             {

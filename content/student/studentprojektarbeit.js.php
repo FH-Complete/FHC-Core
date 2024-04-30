@@ -1374,6 +1374,7 @@ function StudentProjektbetreuerLoadMitarbeiterDaten()
 
 	req.add('type', 'getstundensatz');
 	req.add('person_id', person_id);
+	req.add('studiensemester_kurzbz', getStudiensemester())
 
 	var response = req.executePOST();
 
@@ -1395,7 +1396,7 @@ function StudentProjektbetreuerLoadMitarbeiterDaten()
 	else
 		default_stundensatz = 'Stundensatz';
 
-  document.getElementById('student-projektbetreuer-label-stundensatz').value = default_stundensatz;
+	document.getElementById('student-projektbetreuer-label-stundensatz').value = default_stundensatz;
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value = stundensatz;
 }
 

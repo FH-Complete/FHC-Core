@@ -30,6 +30,7 @@
 require_once('../../../config/vilesci.config.inc.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/variable.class.php');
 require_once('../../../include/functions.inc.php');
 
@@ -39,8 +40,38 @@ $user = get_uid();
 $variable = new variable();
 $variable->loadVariables($user);
 
+//Studiengänge ermitteln, auf die die Person Rechte hat
+$qryOE = "	SELECT
+				studiengang_kz
+			FROM
+				public.tbl_organisationseinheit
+			JOIN 
+			    public.tbl_studiengang USING (oe_kurzbz)
+			WHERE
+				oe_kurzbz IN(
+					SELECT oe_kurzbz 
+					FROM public.tbl_benutzerfunktion 
+					WHERE 
+						funktion_kurzbz='Leitung' 
+						AND uid='$user'
+						AND (datum_von is null OR datum_von <= now())
+						AND (datum_bis is null OR datum_bis >= now())
+					)
+				OR 
+				tbl_organisationseinheit.oe_kurzbz IN(SELECT oe_kurzbz FROM system.vw_berechtigung WHERE uid='$user' AND berechtigung_kurzbz in('admin','assistenz'))";
+
+if($result_rechte = $db->db_query($qryOE))
+{
+	while($row_rechte = $db->db_fetch_object($result_rechte))
+	{
+		$stgBerechtigt[] = $row_rechte->studiengang_kz;
+	}
+}
+
+$stg_get = isset($_GET['stg'])?$_GET['stg'] : '';
+
 $stg = new studiengang();
-$stg->getAll('typ, kurzbz');
+$stg->loadArray($stgBerechtigt, 'typ, kurzbz');
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -65,12 +96,22 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 
 echo '<h2>Übersicht - Verplanung der Lehreinheiten ('.$variable->variable->db_stpl_table.')</h2>';
 
-echo '<form method="GET">Studiensemester <select name="stsem">';
+echo '<form method="GET">';
+echo 'Studiensemester <select name="stsem">';
 foreach ($stsem_obj->studiensemester as $row)
 {
 	echo '<option value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$stsem?'selected':'').'>'.$row->studiensemester_kurzbz.'</option>';
 }
-echo '</select> <input type="submit" value="Anzeigen"></form>';
+echo '</select><br>';
+echo 'Studiengang <select name="stg">';
+echo '<option value="">-- Alle Berechtigten --</option>';
+foreach($stg->result as $row_stg)
+{
+	echo '<option value="'.$row_stg->studiengang_kz.'" '.($row_stg->studiengang_kz==$stg_get?'selected':'').'>'.$row_stg->kuerzel.' - '.$row_stg->bezeichnung.'</option>';
+}
+echo '</select>';
+echo '<input type="submit" value="Anzeigen">';
+echo '</form>';
 
 $gesamt=0;
 $gesamt_verplant=0;
@@ -98,24 +139,29 @@ function drawprogress($prozent, $ueberplanung=0)
 		
 	$content =  '<div style="border: '.$bordercolor.'; width: 300px"><div style="background-color: '.$color.'; width: '.(intval($prozent*3)).'px">&nbsp;'.$prozent.'%</div>';
 	if($ueberplanung>0)
-		$content.= '<div style="background-color: gray; width: '.(intval($ueberplanung*3)).'px">&nbsp;+'.$ueberplanung.'% Überbuchung</div>';
+		$content.= '<div style="background-color: gray; width: '.(intval($ueberplanung*3)).'px">&nbsp;+'.$ueberplanung.'% zusätzliche Planstunden</div>';
 	$content.= '</div>';
 	return $content;
 }
 
 //Alle Studiengaenge durchlaufen
 $content.= "\n<table>";
-$content.= "\n<tr><th>Studiengang/Semester</th><th></th><th colspan='2'>Lehreinheiten</th><th></th><th colspan='2'>Stunden</th></tr>";
+$content.= "\n<tr><th>Studiengang/Semester</th><th></th><th colspan='2'>Lehreinheiten</th><th></th><th colspan='2'>Planstunden</th></tr>";
 foreach($stg->result as $row_stg)
 {
+	if (isset($stg_get) && $stg_get != '' && $stg_get != $row_stg->studiengang_kz)
+		continue;
+
 	$content.= "\n<tr><td colspan='2'><h3>".$row_stg->kuerzel.'</h3></td></tr>';
 	
 	//Anzahl der Lehreinheiten holen
 	$qry = "SELECT count(*) as anzahl, semester 
 			FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
+			JOIN lehre.tbl_lehrform ON (tbl_lehreinheit.lehrform_kurzbz=tbl_lehrform.lehrform_kurzbz)
 			WHERE studiengang_kz='$row_stg->studiengang_kz' AND studiensemester_kurzbz='$stsem' 
-			AND lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
+			AND lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND tbl_lehreinheitmitarbeiter.planstunden > 0)
 			AND tbl_lehreinheit.lehre
+			AND tbl_lehrform.verplanen
 			GROUP BY semester
 			ORDER BY semester ASC";
 
@@ -128,7 +174,9 @@ foreach($stg->result as $row_stg)
 			
 			//Anzahl der verplanten Lehreinheiten holen
 			$qry = "SELECT count(*) as verplant FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-					WHERE studiengang_kz='$row_stg->studiengang_kz' AND studiensemester_kurzbz='$stsem' AND semester='$row_sem->semester' AND tbl_lehreinheit.lehre
+                    JOIN lehre.tbl_lehrform ON (tbl_lehreinheit.lehrform_kurzbz=tbl_lehrform.lehrform_kurzbz)
+					WHERE studiengang_kz='$row_stg->studiengang_kz' AND studiensemester_kurzbz='$stsem' AND semester='$row_sem->semester' 
+					AND tbl_lehreinheit.lehre AND tbl_lehrform.verplanen
 					AND lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_".$variable->variable->db_stpl_table." WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
 					AND lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)";
 
@@ -152,11 +200,13 @@ foreach($stg->result as $row_stg)
 						lehre.tbl_lehreinheit 
 						JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 						JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+						JOIN lehre.tbl_lehrform ON (tbl_lehreinheit.lehrform_kurzbz=tbl_lehrform.lehrform_kurzbz)	
 					WHERE
 						tbl_lehrveranstaltung.studiengang_kz='$row_stg->studiengang_kz' AND
 						tbl_lehrveranstaltung.semester='$row_sem->semester' AND
 						tbl_lehreinheit.studiensemester_kurzbz='$stsem' AND
-						tbl_lehreinheit.lehre";
+						tbl_lehreinheit.lehre AND
+						tbl_lehrform.verplanen";
 			$ps=0;
 			if($result_ps = $db->db_query($qry))
 			{
@@ -174,11 +224,13 @@ foreach($stg->result as $row_stg)
 						JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 						JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 						JOIN lehre.tbl_".$variable->variable->db_stpl_table." USING(lehreinheit_id)
+						JOIN lehre.tbl_lehrform ON (tbl_lehreinheit.lehrform_kurzbz=tbl_lehrform.lehrform_kurzbz)
 					WHERE
 						tbl_lehrveranstaltung.studiengang_kz='$row_stg->studiengang_kz' AND
 						tbl_lehrveranstaltung.semester='$row_sem->semester' AND
 						tbl_lehreinheit.studiensemester_kurzbz='$stsem' AND
-						tbl_lehreinheit.lehre
+						tbl_lehreinheit.lehre AND
+						tbl_lehrform.verplanen
 					) a";
 			$stdverplant=0;
 			
@@ -192,8 +244,16 @@ foreach($stg->result as $row_stg)
 		
 			//offene Stunden ermitteln			
 			$qry = "
-			SELECT distinct lehreinheit_id, planstunden, mitarbeiter_uid FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
-			WHERE studiengang_kz='$row_stg->studiengang_kz' AND semester='$row_sem->semester' AND studiensemester_kurzbz='$stsem' AND tbl_lehreinheit.lehre";
+			SELECT distinct lehreinheit_id, planstunden, mitarbeiter_uid 
+			FROM lehre.tbl_lehreinheit 
+			    JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+			    JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+				JOIN lehre.tbl_lehrform ON (tbl_lehreinheit.lehrform_kurzbz=tbl_lehrform.lehrform_kurzbz) 
+			WHERE studiengang_kz='$row_stg->studiengang_kz' 
+			  AND semester='$row_sem->semester' 
+			  AND studiensemester_kurzbz='$stsem' 
+			  AND tbl_lehreinheit.lehre
+			  AND tbl_lehrform.verplanen";
 			
 			$offen=0;
 			if($result_std = $db->db_query($qry))
@@ -234,7 +294,7 @@ foreach($stg->result as $row_stg)
 
 			$content.= '</td><td nowrap>';
 			$content.=drawprogress($prozent, $prozentueber);
-			$content.= 'offene Stunden: '.$offen;
+			$content.= 'offene Planstunden: '.$offen;
 			$content.='</td></tr>';
 		}
 		$content.='<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
@@ -259,7 +319,7 @@ if($gesamt_ps==0)
 	$prozent=0;
 else
 	$prozent = round($gesamt_ps_verplant*100/$gesamt_ps,2);
-echo "<b>Stunden:</b> (".$gesamt_ps_verplant.'/'.$gesamt_ps.')</td><td width="20px"></td><td>';
+echo "<b>Planstunden:</b> (".$gesamt_ps_verplant.'/'.$gesamt_ps.')</td><td width="20px"></td><td>';
 echo drawprogress($prozent);
 
 echo "</td></tr></table>\n<hr>";
