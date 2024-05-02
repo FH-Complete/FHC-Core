@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2022 fhcomplete.org
+ * Copyright (C) 2024 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * This controller operates between (interface) the JS (GUI) and the NavigationLib (back-end)
  * Provides data to the ajax get calls about the filter
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
- * TODO(chris): deprecated
  */
-class Navigation extends FHC_Controller
+class Navigation extends FHCAPI_Controller
 {
 	const NAVIGATION_PAGE_PARAM = 'navigation_page'; // Navigation page parameter name
 
@@ -33,9 +32,10 @@ class Navigation extends FHC_Controller
 	 */
 	public function __construct()
     {
-        parent::__construct();
-
-		$this->load->library('AuthLib');
+        parent::__construct([
+        	'menu' => self::PERM_LOGGED,
+        	'header' => self::PERM_LOGGED
+        ]);
 
 		$this->_loadNavigationLib(); // Loads the NavigationLib with parameters
 	}
@@ -52,7 +52,7 @@ class Navigation extends FHC_Controller
 	{
 		$menuArray = $this->navigationlib->getMenuArray($this->input->get(self::NAVIGATION_PAGE_PARAM));
 
-		$this->outputJsonSuccess($menuArray);
+		$this->terminateWithSuccess($menuArray);
 	}
 
 	/**
@@ -64,7 +64,7 @@ class Navigation extends FHC_Controller
 	{
 		$headerArray = $this->navigationlib->getHeaderArray($this->input->get(self::NAVIGATION_PAGE_PARAM));
 
-		$this->outputJsonSuccess($headerArray);
+		$this->terminateWithSuccess($headerArray);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -95,9 +95,7 @@ class Navigation extends FHC_Controller
 		}
 		else // Otherwise an error will be written in the output
 		{
-			// NOTE: Used echo to speed up the output before the exit otherwise it's not shown
-			echo 'Parameter "'.self::NAVIGATION_PAGE_PARAM.'" not provided!';
-			exit;
+			show_error('Parameter "' . self::NAVIGATION_PAGE_PARAM . '" not provided!');
 		}
 	}
 }

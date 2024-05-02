@@ -36,21 +36,17 @@ export default {
 	},
 	methods: {
 		setlvs(param) {
-			if(param.error) {
-				this.$refs.fetchCompt.error = true;
-				this.$refs.fetchCompt.errorMessage = param.retval;
-			} else {
-				this.repeat_last = !!param.retval.repeat_last;
-				if (this.repeat_last) {
-					delete param.retval.repeat_last;
-				}
-				this.lvs = param.retval;
+			this.repeat_last = !!param.repeat_last;
+			if (this.repeat_last) {
+				delete param.repeat_last;
 			}
+			this.lvs = param;
 		},
 		loadlvs() {
 			if (!this.antragId)
 				return new Promise(() => {});
-			return axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Antrag/Wiederholung/getLvs/' + this.antragId);
+			return this.$fhcApi.factory
+				.studstatus.wiederholung.getLvs(this.antragId);
 		},
 		submit(result) {
 			this.result = [result, this.check];

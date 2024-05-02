@@ -21,6 +21,8 @@ require_once(FHCPATH.'include/functions.inc.php');
 require_once(FHCPATH.'include/wawi_kostenstelle.class.php');
 require_once(FHCPATH.'include/benutzerberechtigung.class.php');
 
+use \benutzerberechtigung as benutzerberechtigung;
+
 class PermissionLib
 {
 	// Available rights in the DB
@@ -65,8 +67,10 @@ class PermissionLib
 		if (!is_cli())
 		{
 			// API Caller rights initialization
+			$authObj = $this->_ci->authlib->getAuthObj();
 			self::$bb = new benutzerberechtigung();
-			self::$bb->getBerechtigungen(($this->_ci->authlib->getAuthObj())->{AuthLib::AO_USERNAME});
+			if ($authObj)
+				self::$bb->getBerechtigungen($authObj->{AuthLib::AO_USERNAME});
 		}
 	}
 
@@ -165,6 +169,16 @@ class PermissionLib
 									// If the user has one of the permissionsm than exit the loop
 									if ($checkPermissions === true) break;
 								}
+							}
+							elseif ($permissions[$pCounter] == Auth_Controller::PERM_ANONYMOUS)
+							{
+								$checkPermissions = true;
+								break;
+							}
+							elseif ($permissions[$pCounter] == Auth_Controller::PERM_LOGGED)
+							{
+								$checkPermissions = isLogged();
+								break;
 							}
 							else
 							{

@@ -21,7 +21,7 @@ import {CoreRESTClient} from '../../RESTClient.js';
 const CORE_FILTER_CMPT_TIMEOUT = 7000;
 
 /**
- *
+ * TODO(chris): deprecated
  */
 export const CoreFilterAPIs = {
 	/**

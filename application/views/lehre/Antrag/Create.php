@@ -11,6 +11,7 @@ $sitesettings = array(
 	'customJSModules' => array('public/js/apps/lehre/Antrag.js'),
 	'customCSSs' => array(
 		'public/css/Fhc.css',
+		'public/css/components/primevue.css',
 		'vendor/vuejs/vuedatepicker_css/main.css'
 	),
 	'customJSs' => array(

@@ -171,7 +171,11 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 					<rows>
 						<row>
 							<label value="Projektarbeit ID" control="student-projektarbeit-textbox-projektarbeit_id"/>
-							<hbox><textbox id="student-projektarbeit-textbox-projektarbeit_id" readonly="true" maxlength="16" size="16"/></hbox>
+							<hbox>
+								<textbox id="student-projektarbeit-textbox-projektarbeit_id" readonly="true" maxlength="16" size="16"/>
+								<textbox id="student-projektarbeit-textbox-lehreinheit_stsem" hidden="true" readonly="true" maxlength="32" size="32"/>
+							</hbox>
+
 						</row>
 						<row>
 							<label value="Titel" control="student-projektarbeit-textbox-titel"/>
@@ -523,7 +527,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 								<textbox id="student-projektbetreuer-textbox-stunden" disabled="true" maxlength="8"/>
 							</row>
 							<row>
-								<label value="Stundensatz" control="student-projektbetreuer-textbox-stundensatz"/>
+								<label id="student-projektbetreuer-label-stundensatz" value="Stundensatz: " control="student-projektbetreuer-textbox-stundensatz"/>
 								<textbox id="student-projektbetreuer-textbox-stundensatz" disabled="true" maxlength="5"/>
 							</row>
 							<row hidden="true"><!-- Faktor wird nicht mehr benoetigt -->

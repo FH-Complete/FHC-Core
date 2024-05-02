@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 fhcomplete.org
+ * Copyright (C) 2024 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,41 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CoreRESTClient} from '../../RESTClient.js';
-
-// 
-const CORE_NAVIGATION_CMPT_TIMEOUT = 5000;
-
-/**
- * TODO(chris): deprecated
- */
-export const CoreNavigationAPIs = {
-	/**
-	 *
-	 */
-	getHeader: function(navigationPage) {
-		return CoreRESTClient.get(
-			'system/Navigation/header',
-			{
-				navigation_page: navigationPage
-			},
-			{
-				timeout: CORE_NAVIGATION_CMPT_TIMEOUT
-			}
+export default {
+	getHeader(navigation_page) {
+		return this.$fhcApi.get(
+			'/api/frontend/v1/navigation/header',
+			{ navigation_page }
 		);
 	},
-	/**
-	 *
-	 */
-	getMenu: function(navigationPage) {
-		return CoreRESTClient.get(
-			'system/Navigation/menu',
-			{
-				navigation_page: navigationPage
-			},
-			{
-				timeout: CORE_NAVIGATION_CMPT_TIMEOUT
-			}
+	getMenu: function(navigation_page) {
+		return this.$fhcApi.get(
+			'/api/frontend/v1/navigation/menu',
+			{ navigation_page }
 		);
 	}
 };

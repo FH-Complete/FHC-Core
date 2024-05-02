@@ -1023,7 +1023,7 @@ class ReihungstestJob extends JOB_Controller
 			{
 				$studiengang = $this->StudiengangModel->load($stg);
 				$mailcontent = '';
-
+				$content = false;
 				foreach ($orgform AS $art=>$value)
 				{
 					// Orgform nur dazu schreiben, wenn es mehr als Eine gibt
@@ -1044,6 +1044,7 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table><br><br>';
+						$content = true;
 					}
 					if (isset($value['AufnahmeHoeherePrio']) && !isEmptyArray($value['AufnahmeHoeherePrio']))
 					{
@@ -1058,6 +1059,7 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table>';
+						$content = true;
 					}
 					if (isset($value['AbgewiesenHoeherePrio']) && !isEmptyArray($value['AbgewiesenHoeherePrio']))
 					{
@@ -1071,6 +1073,7 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table>';
+						$content = true;
 					}
 					if ($bcc != '' && isset($value['AbgewiesenWeilBewerber']) && !isEmptyArray($value['AbgewiesenWeilBewerber']))
 					{
@@ -1085,13 +1088,14 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table>';
+						$content = true;
 					}
 				}
 
 				$mailcontent_data_arr['table'] = $mailcontent;
 
 				// Send email in Sancho design
-				if (!isEmptyString($mailcontent))
+				if (!isEmptyString($mailcontent) && $content === true)
 				{
 					sendSanchoMail(
 						'Sancho_ReihungstestteilnehmerJob',
