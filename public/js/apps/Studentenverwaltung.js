@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 fhcomplete.org
+ * Copyright (C) 2024 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,33 +20,28 @@ import fhcapifactory from "./api/fhcapifactory.js";
 
 import Phrasen from "../plugin/Phrasen.js";
 
-//import PrimeVue form "../../../../index.ci.php/public/js/components/primevue/config/config.esm.min.js");
-//const PrimeVue = await import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/public/js/components/primevue/config/config.esm.min.js").default;
-import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/public/js/components/primevue/config/config.esm.min.js").then(result => result.default).then(PrimeVue => {
-	Vue.$fhcapi = fhcapifactory;
 
-	const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
-	const router = VueRouter.createRouter({
-		history: VueRouter.createWebHistory(),
-		routes: [
-			{ path: `/${ciPath}/studentenverwaltung`, component: FhcStudentenverwaltung },
-			{ path: `/${ciPath}/studentenverwaltung/prestudent/:prestudent_id`, component: FhcStudentenverwaltung },
-			{ path: `/${ciPath}/studentenverwaltung/prestudent/:prestudent_id/:tab`, component: FhcStudentenverwaltung },
-			{ path: `/${ciPath}/studentenverwaltung/student/:id`, component: FhcStudentenverwaltung },
-			{ path: `/${ciPath}/studentenverwaltung/person/:person_id`, component: FhcStudentenverwaltung }
-		]
-	});
-
-	const app = Vue.createApp();
-
-	app
-		.use(router)
-		.use(PrimeVue, {
-			zIndex: {
-				overlay: 1100
-			}
-		})
-		.use(Phrasen)
-		.mount('#main');
+const router = VueRouter.createRouter({
+	history: VueRouter.createWebHistory(),
+	routes: [
+		{ path: `/${ciPath}/studentenverwaltung`, component: FhcStudentenverwaltung },
+		{ path: `/${ciPath}/studentenverwaltung/prestudent/:prestudent_id`, component: FhcStudentenverwaltung },
+		{ path: `/${ciPath}/studentenverwaltung/prestudent/:prestudent_id/:tab`, component: FhcStudentenverwaltung },
+		{ path: `/${ciPath}/studentenverwaltung/student/:id`, component: FhcStudentenverwaltung },
+		{ path: `/${ciPath}/studentenverwaltung/person/:person_id`, component: FhcStudentenverwaltung }
+	]
 });
+
+const app = Vue.createApp();
+
+app
+	.use(router)
+	.use(primevue.config.default, {
+		zIndex: {
+			overlay: 1100
+		}
+	})
+	.use(Phrasen)
+	.mount('#main');

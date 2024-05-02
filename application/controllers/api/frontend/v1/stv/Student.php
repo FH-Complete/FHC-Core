@@ -100,10 +100,7 @@ class Student extends FHCAPI_Controller
 
 		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 		
-		#$student = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$student = $result->retval;
+		$student = $this->getDataOrTerminateWithError($result);
 		
 		if (!$student)
 			return show_404();
@@ -136,10 +133,7 @@ class Student extends FHCAPI_Controller
 		
 		$result = $this->udflib->getCiValidations($this->PersonModel, $this->input->post());
 
-		#$fieldValidations = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result));
-		$fieldvalidations = $result->retval;
+		$fieldValidations = $this->getDataOrTerminateWithError($result);
 
 		$this->form_validation->set_rules($fieldvalidations);
 
@@ -148,19 +142,13 @@ class Student extends FHCAPI_Controller
 
 		$result = $this->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 		
-		#$student = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$student = $result->retval;
+		$student = $this->getDataOrTerminateWithError($result);
 
 		$uid = $student ? current($student)->student_uid : null;
 
 		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
-		#$person = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result));
-		$person = $result->retval;
+		$person = $this->getDataOrTerminateWithError($result);
 
 		$person_id = $person ? current($person)->person_id : null;
 
@@ -201,10 +189,7 @@ class Student extends FHCAPI_Controller
 		// add UDFs
 		$result = $this->udflib->getDefinitionForModel($this->PersonModel);
 
-		#$definitions = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$definitions = $result->retval;
+		$definitions = $this->getDataOrTerminateWithError($result);
 
 		foreach ($definitions as $def)
 			$array_allowed_props_person[] = $def['name'];
@@ -242,9 +227,7 @@ class Student extends FHCAPI_Controller
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'student_uid' => $uid
 			], $update_lehrverband);
-			#$this->getDataOrTerminateWithError($result);
-			if (isError($result))
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			$this->getDataOrTerminateWithError($result);
 		}
 
 		if (count($update_person)) {
@@ -252,9 +235,7 @@ class Student extends FHCAPI_Controller
 				$person_id,
 				$update_person
 			);
-			#$this->getDataOrTerminateWithError($result);
-			if (isError($result))
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			$this->getDataOrTerminateWithError($result);
 		}
 
 
@@ -263,9 +244,7 @@ class Student extends FHCAPI_Controller
 				[$uid],
 				$update_student
 			);
-			#$this->getDataOrTerminateWithError($result);
-			if (isError($result))
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			$this->getDataOrTerminateWithError($result);
 		}
 
 		$this->terminateWithSuccess(array_fill_keys(array_merge(
@@ -308,10 +287,7 @@ class Student extends FHCAPI_Controller
 
 		$result = $this->PersonModel->load();
 
-		#$data = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$data = $result->retval;
+		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
 	}
@@ -413,9 +389,7 @@ class Student extends FHCAPI_Controller
 				$data['staatsbuergerschaft'] = $this->input->post('staatsbuergerschaft');
 
 			$result = $this->PersonModel->insert($data);
-			if (isError($result))
-				return $result;
-			$person_id = getData($result);
+			$person_id = $this->getDataOrTerminateWithError($result);
 		}
 
 		// Addresse anlegen
@@ -438,17 +412,15 @@ class Student extends FHCAPI_Controller
 				$result = $this->AdresseModel->loadWhere([
 					'person_id' => $person_id
 				]);
-				if (isError($result))
-					return $result;
-				if (hasData($result)) {
-					$address = current(getData($result));
+				$address = $this->getDataOrTerminateWithError($result);
+				if ($address) {
+					$address = current($address);
 
 					$data['updateamum'] = date('c');
 					$data['updatevon'] = getAuthUID();
 
 					$result = $this->AdresseModel->update($address->adresse_id, $data);
-					if (isError($result))
-						return $result;
+					$this->getDataOrTerminateWithError($result);
 				} else {
 					//Wenn keine Adrese vorhanden ist dann eine neue Anlegen
 					$anlegen = 1;
@@ -463,8 +435,7 @@ class Student extends FHCAPI_Controller
 					$data['heimatadresse'] = !$this->input->post('person_id');
 				
 				$result = $this->AdresseModel->insert($data);
-				if (isError($result))
-					return $result;
+				$this->getDataOrTerminateWithError($result);
 			}
 		}
 		
@@ -488,8 +459,7 @@ class Student extends FHCAPI_Controller
 					'insertvon' => getAuthUID()
 				];
 				$result = $this->KontaktModel->insert($data);
-				if (isError($result))
-					return $result;
+				$this->getDataOrTerminateWithError($result);
 			}
 		}
 
@@ -517,10 +487,9 @@ class Student extends FHCAPI_Controller
 		$result = $this->PrestudentModel->loadWhere([
 			'person_id' => $person_id
 		]);
-		if (isError($result))
-			return $result;
-		if (hasData($result)) {
-			$prestudent = current(getData($result));
+		$prestudent = $this->getDataOrTerminateWithError($result);
+		if ($prestudent) {
+			$prestudent = current($prestudent);
 			if ($prestudent->zgv_code) {
 				$data['zgv_code'] = $prestudent->zgv_code;
 				$data['zgvort'] = $prestudent->zgvort;
@@ -533,9 +502,7 @@ class Student extends FHCAPI_Controller
 		}
 		// Prestudent speichern
 		$result = $this->PrestudentModel->insert($data);
-		if (isError($result))
-			return $result;
-		$prestudent_id = getData($result);
+		$prestudent_id = $this->getDataOrTerminateWithError($result);
 
 		// Prestudent Rolle Anlegen
 		$data = [
@@ -550,8 +517,7 @@ class Student extends FHCAPI_Controller
 			'insertvon' => getAuthUID()
 		];
 		$result = $this->PrestudentstatusModel->insert($data);
-		if (isError($result))
-			return $result;
+		$this->getDataOrTerminateWithError($result);
 
 		if ($incoming) {
 			// TODO(chris): IMPLEMENT!
@@ -569,7 +535,7 @@ class Student extends FHCAPI_Controller
 			return $result;
 		}*/
 
-		return success(true);
+		$this->terminateWithSuccess(true);
 	}
 
 	public function requiredIfNotPersonId($value)

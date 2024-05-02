@@ -1,5 +1,4 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
-import {CoreRESTClient} from "../../../../../RESTClient";
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import FhcFormValidation from '../../../../Form/Validation.js';
 import BsModal from "../../../../Bootstrap/Modal.js";
@@ -17,7 +16,7 @@ export default{
 	data() {
 		return{
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Kontakt/getAdressen/' + this.uid,
+				ajaxURL: 'api/frontend/v1/stv/kontakt/getAdressen/' + this.uid,
 				ajaxRequestFunc: this.$fhcApi.get,
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
@@ -169,21 +168,21 @@ export default{
 		}
 	},
 	watch: {
-		uid(){
+		uid() {
 			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Kontakt/getAdressen/' + this.uid);
 		}
 	},
 	methods:{
-		actionNewAdress(){
+		actionNewAdress() {
 			this.$refs.newAdressModal.show();
 		},
-		actionEditAdress(adress_id){
+		actionEditAdress(adress_id) {
 			this.loadAdress(adress_id).then(() => {
 				if(this.addressData.adresse_id)
 					this.$refs.editAdressModal.show();
 			});
 		},
-		actionDeleteAdress(adress_id){
+		actionDeleteAdress(adress_id) {
 			this.loadAdress(adress_id).then(() => {
 				if(this.addressData.adresse_id)
 					if(this.addressData.heimatadresse)
@@ -205,10 +204,10 @@ export default{
 				this.reload();
 			});
 		},
-		reload(){
+		reload() {
 			this.$refs.table.reloadTable();
 		},
-		loadAdress(adress_id){
+		loadAdress(adress_id) {
 			return this.$fhcApi.get('api/frontend/v1/stv/kontakt/loadAddress/' + adress_id)
 				.then(result => {
 						this.addressData = result.data;
@@ -216,7 +215,7 @@ export default{
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		updateAddress(adress_id){
+		updateAddress(adress_id) {
 			this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateAddress/' + adress_id,
 				this.addressData
 			).then(response => {
@@ -229,7 +228,7 @@ export default{
 				this.reload();
 			});
 		},
-		deleteAddress(adress_id){
+		deleteAddress(adress_id) {
 			this.$fhcApi.post('api/frontend/v1/stv/kontakt/deleteAddress/' + adress_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
@@ -247,13 +246,12 @@ export default{
 				return;
 
 			this.abortController.places = new AbortController();
-			CoreRESTClient
-				.get('components/stv/address/getPlaces/' + this.addressData.plz, undefined, {
+			this.$fhcApi
+				.get('api/frontend/v1/stv/address/getPlaces/' + this.addressData.plz, undefined, {
 					signal: this.abortController.places.signal
 				})
-				.then(result => CoreRESTClient.getData(result.data) || [])
 				.then(result => {
-					this.places = result;
+					this.places = result.data;
 				});
 /*				.catch(error => {
 					if (error.code == 'ERR_BAD_REQUEST') {
@@ -271,20 +269,19 @@ export default{
 					this.filteredFirmen = result.data.retval;
 				});
 		},
-		hideModal(modalRef){
+		hideModal(modalRef) {
 			this.$refs[modalRef].hide();
 		},
-		resetModal(){
+		resetModal() {
 			this.addressData = {};
 			this.addressData = this.initData;
 		},
 	},
-	created(){
-		CoreRESTClient
-			.get('components/stv/Address/getNations')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+	created() {
+		this.$fhcApi
+			.get('api/frontend/v1/stv/address/getNations')
 			.then(result => {
-				this.nations = result;
+				this.nations = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		this.$fhcApi

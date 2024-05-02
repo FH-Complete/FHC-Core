@@ -1,17 +1,41 @@
 <?php
+/**
+ * Copyright (C) 2024 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Verband extends FHC_Controller
+/**
+ * This controller operates between (interface) the JS (GUI) and the back-end
+ * Provides data to the ajax get calls about verbände
+ * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
+ */
+class Verband extends FHCAPI_Controller
 {
 	public function __construct()
 	{
-		// TODO(chris): access!
-		parent::__construct();
-		
+		// TODO(chris): permissions
+		$permissions = [];
+		$router = load_class('Router');
+		$permissions[$router->method] = self::PERM_LOGGED;
+		parent::__construct($permissions);
+
+		// Load Models
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 	}
-
 	/**
 	 * Remap calls:
 	 * /
@@ -75,12 +99,9 @@ class Verband extends FHC_Controller
 		$this->StudiengangModel->addOrder('kurzbz');
 
 		$result = $this->StudiengangModel->loadWhere(['v.aktiv' => true]);
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		}
 
-		$list = getData($result) ?: [];
+		$list = $this->getDataOrTerminateWithError($result);
+
 		$list[] = [
 			'name' => 'International',
 			'link' => 'inout',
@@ -102,7 +123,7 @@ class Verband extends FHC_Controller
 				]
 			]
 		];
-		$this->outputJson($list);
+		$this->terminateWithSuccess($list);
 	}
 
 	/**
@@ -139,12 +160,8 @@ class Verband extends FHC_Controller
 			'v.studiengang_kz' => $studiengang_kz,
 			'v.aktiv' => true
 		]);
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		}
+		$list = $this->getDataOrTerminateWithError($result);
 
-		$list = getData($result) ?: [];
 		array_unshift($list, [
 			'name' => 'PreStudent',
 			'link' => $link . 'prestudent',
@@ -154,12 +171,9 @@ class Verband extends FHC_Controller
 		if ($org_form === null) {
 			// NOTE(chris): if mischform show orgforms
 			$result = $this->StudiengangModel->load($studiengang_kz);
-			if (isError($result)) {
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson(getError($result));
-			}
-			if (hasData($result)) {
-				if (current(getData($result))->mischform) {
+			$result = $this->getDataOrTerminateWithError($result);
+			if ($result) {
+				if (current($result)->mischform) {
 					$this->load->model('organisation/Studienordnung_model', 'StudienordnungModel');
 
 					$this->StudienordnungModel->addDistinct();
@@ -175,18 +189,14 @@ class Verband extends FHC_Controller
 						'studiengang_kz' => $studiengang_kz,
 						'p.orgform_kurzbz !=' => 'DDP'
 					]);
-					if (isError($result)) {
-						$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-						return $this->outputJson(getError($result));
-					}
+					$result = $this->getDataOrTerminateWithError($result);
 
-					if (hasData($result))
-						$list = array_merge($list, getData($result));
+					$list = array_merge($list, $result);
 				}
 			}
 
 		}
-		$this->outputJson($list);
+		$this->terminateWithSuccess($list);
 	}
 
 	/**
@@ -231,13 +241,8 @@ class Verband extends FHC_Controller
 			$where['orgform_kurzbz'] = $org_form;
 
 		$result = $this->GruppeModel->loadWhere($where);
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		}
 
-		$list = getData($result) ?: [];
-
+		$list = $this->getDataOrTerminateWithError($result);
 
 		$this->StudiengangModel->addJoin('public.tbl_lehrverband v', 'studiengang_kz');
 		
@@ -263,14 +268,11 @@ class Verband extends FHC_Controller
 			$where['v.orgform_kurzbz'] = $org_form;
 
 		$result = $this->StudiengangModel->loadWhere($where);
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		}
+		$result = $this->getDataOrTerminateWithError($result);
 
-		$list = array_merge($list, getData($result) ?: []);
+		$list = array_merge($list, $result);
 
-		$this->outputJson($list);
+		$this->terminateWithSuccess($list);
 	}
 
 	/**
@@ -313,14 +315,10 @@ class Verband extends FHC_Controller
 			$where['v.orgform_kurzbz'] = $org_form;
 
 		$result = $this->StudiengangModel->loadWhere($where);
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		}
 
-		$list = getData($result) ?: [];
+		$list = $this->getDataOrTerminateWithError($result);
 
-		$this->outputJson($list);
+		$this->terminateWithSuccess($list);
 	}
 
 	/**
@@ -341,13 +339,8 @@ class Verband extends FHC_Controller
 		 * - then: $stsem_obj->getPlusMinus(NULL, $number_displayed_past_studiensemester, 'ende ASC');
 		 */
 		$result = $this->StudiensemesterModel->load();
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
-			exit;
-		}
 
-		$studiensemester = getData($result) ?: [];
+		$studiensemester = $this->getDataOrTerminateWithError($result);
 		$result = [];
 
 		foreach ($studiensemester as $sem) {

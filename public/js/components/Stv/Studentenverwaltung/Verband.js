@@ -53,8 +53,8 @@ export default {
 					});
 					this.loading = true;
 					
-					CoreRESTClient
-						.get("components/stv/verband/" + node.data.link)
+					this.$fhcApi
+						.get('api/frontend/v1/stv/verband/' + node.data.link)
 						.then(result => result.data)
 						.then(result => {
 							const subNodes = result.map(this.mapResultToTreeData);
@@ -128,7 +128,12 @@ export default {
 			
 			let promises = [];
 			for (let parent in sortedInParents)
-				promises.push(CoreRESTClient.get("components/stv/verband/" + (parent == '_' ? '' : parent)).then(res => res.data).then(res => res.filter(node => sortedInParents[parent].includes(node.link + ''))));
+				promises.push(
+					this.$fhcApi
+						.get('api/frontend/v1/stv/verband/' + (parent == '_' ? '' : parent))
+						.then(res => res.data)
+						.then(res => res.filter(node => sortedInParents[parent].includes(node.link + '')))
+				);
 			
 			// NOTE(chris): merge the resulting arrays and transform them to an associative one
 			let result = [].concat.apply([], await Promise.all(promises)).reduce((o, node) => {
@@ -171,8 +176,8 @@ export default {
 		}
 	},
 	mounted() {
-		CoreRESTClient
-			.get("components/stv/verband")
+		this.$fhcApi
+			.get('api/frontend/v1/stv/verband')
 			.then(result => result.data)
 			.then(result => {
 				this.nodes = result.map(this.mapResultToTreeData);

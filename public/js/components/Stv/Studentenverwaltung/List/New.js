@@ -130,21 +130,21 @@ export default {
 
 			this.abortController.places = new AbortController();
 			this.$refs.form
-				.send(CoreRESTClient.get(
-					'components/stv/address/getPlaces/' + this.formData.address.plz,
+				.get(
+					'api/frontend/v1/stv/address/getPlaces/' + this.formData.address.plz,
 					undefined,
 					{
 						signal: this.abortController.places.signal
 					}
-				))
+				)
 				.then(result => {
-					this.places = result
+					this.places = result.data
 				})
 				.catch(error => {
 					if (error.code != "ERR_CANCELED")
 						window.setTimeout(this.loadPlaces, 100);
 					else
-						console.error(error);
+						this.$fhcAlert.handleSystemError(error);
 				});
 		},
 		loadStudienplaene() {
