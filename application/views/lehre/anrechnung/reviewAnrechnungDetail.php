@@ -58,7 +58,7 @@ $this->load->view(
 	<div class="container-fluid">
 		<!-- title -->
 		<div class="row">
-			<div class="col-12 my-4 border-bottom">
+			<div class="col-lg-12 my-4 border-bottom">
 				<h3 class="fw-normal ">
 					<?php echo $this->p->t('anrechnung', 'anrechnungenPruefen'); ?>
 					<small class="text-secondary fs-6">| <?php echo $this->p->t('global', 'detailsicht'); ?></small>
@@ -70,7 +70,7 @@ $this->load->view(
 			<div class="col-8">
 				<!-- Antragsdaten -->
 				<div class="row mb-4">
-					<div class="col-12">
+					<div class="col-lg-12">
 						<div class="card">
 							<div class="card-header">
 								<span
@@ -86,7 +86,7 @@ $this->load->view(
 							</div>
 							<div class="card-body">
 								<div class="row">
-									<div class="col-4">
+									<div class="col-lg-4">
 										<table class="table table-bordered table-condensed table-fixed mb-0">
 											<tbody>
 												<tr>
@@ -138,7 +138,7 @@ $this->load->view(
 											</tbody>
 										</table>
 									</div>
-									<div class="col-8">
+									<div class="col-lg-8">
 										<table class="table table-bordered table-condensed table-fixed mb-0">
 											<tbody>
 
@@ -188,7 +188,7 @@ $this->load->view(
 				</div>
 				<!-- Empfehlungsdaten -->
 				<div class="row">
-					<div class="col-12">
+					<div class="col-lg-12">
 						<div class="card mb-4" id="reviewAnrechnungDetail-empfehlung"
 							data-empfehlung="<?php echo json_encode($empfehlungData->empfehlung) ?>">
 							<div class="card-header">
@@ -207,7 +207,7 @@ $this->load->view(
 							</div>
 							<div class="card-body">
 								<div class="row">
-									<div class="col-6">
+									<div class="col-lg-6">
 										<table class="table table-bordered table-condensed table-fixed mb-0">
 											<tbody>
 												<tr>
@@ -261,7 +261,7 @@ $this->load->view(
 											</tbody>
 										</table>
 									</div>
-									<div class="col-6">
+									<div class="col-lg-6">
 										<div>
 											<label class="text-center mb-2">
 												<b><?php echo ucfirst($this->p->t('global', 'notizDerSTGL')); ?></b>
@@ -348,15 +348,19 @@ $this->load->view(
 							</form>
 						</div>
 						<!-- Button Empfehlen / Nicht Empfehlen -->
-						<div class="float-end mb-5">
+						<div class="row justify-content-center justify-content-sm-end align-items-center mb-5">
+							<div class="col-auto mb-1">
 							<button id="reviewAnrechnungDetail-dont-recommend-anrechnung-ask"
-								class="me-1 btn btn-danger btn-w200" type="button" <?php echo (is_null($empfehlungData->empfehlung) && $isEmpfehlungsberechtigt) ? '' : 'disabled' ?>>
+								class=" btn btn-danger btn-w200" type="button" <?php echo (is_null($empfehlungData->empfehlung) && $isEmpfehlungsberechtigt) ? '' : 'disabled' ?>>
 								<?php echo ucfirst($this->p->t('anrechnung', 'nichtEmpfehlen')); ?>
 							</button>
+							</div>
+							<div class="col-auto mb-1">
 							<button id="reviewAnrechnungDetail-recommend-anrechnung-ask"
 								class="btn btn-primary btn-w200" type="button" <?php echo (is_null($empfehlungData->empfehlung) && $isEmpfehlungsberechtigt) ? '' : 'disabled' ?>>
 								<?php echo ucfirst($this->p->t('anrechnung', 'empfehlen')); ?>
 							</button>
+							</div>
 						</div>
 					</div>
 				</div>
