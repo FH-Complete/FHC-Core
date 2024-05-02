@@ -159,7 +159,7 @@ foreach($service->result as $row)
 		//echo '<td><nobr><a href="../profile/index.php?uid='.$row->betrieb_uid.'">',$betrieb,'</a></nobr></td>';
 		//echo '<td><nobr><a href="../profile/index.php?uid='.$row->operativ_uid.'">',$operativ,'</a></nobr></td>';
 		$title = (isset($servicekategorie_arr[$row->servicekategorie_kurzbz])?$servicekategorie_arr[$row->servicekategorie_kurzbz]:'');
-		echo '<td><span title="'.$service->convert_html_chars($title).'">',$row->servicekategorie_kurzbz,'</span></td>';
+		echo '<td><span title="'.$service->convert_html_chars($title).'">',$title,'</span></td>';
 		echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">Details</a>':'');
 		if (defined("ADDON_MOODLE_PATH"))
 			echo ' '.($row->ext_id!=''?'<a href="'.ADDON_MOODLE_PATH.'course/view.php?id='.$row->ext_id.'" target="_blank">Beschreibung</a>':'');
