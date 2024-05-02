@@ -429,6 +429,17 @@ $(function () {
               // Update status 'genehmigt'
               $("#tableWidgetTabulator").tabulator("updateData", data.retval);
 
+              const selectedRows = $("#tableWidgetTabulator").tabulator("getSelectedRows");
+
+              // makes all denied anrechnungen unselectable by adding the isSelectable property and retriggering the rowFormatter function
+              selectedRows.forEach(row=>{
+                row.update({...row.getData(), isSelectable:false});
+                row.reformat();
+              })
+
+              // deselect all selected rows
+              $("#tableWidgetTabulator").tabulator("deselectRow", selectedRows);
+
               // Print success message
               FHC_DialogLib.alertSuccess(
                 FHC_PhrasesLib.t("ui", "anrechnungenWurdenNichtEmpfohlen")
