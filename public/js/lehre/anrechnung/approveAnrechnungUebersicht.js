@@ -195,16 +195,22 @@ function func_selectableCheck(row) {
   );
 }
 
-function func_rowFormatter(row){
+function func_rowFormatter(row) {
   const rowData = row.getData();
 
   // add the tabulator-unselectable class to the row if its data property isSelectable is false
-  if(rowData.isSelectable===false && !row.getElement().classList.contains("tabulator-unselectable")){
+  if (
+    rowData.isSelectable === false &&
+    !row.getElement().classList.contains("tabulator-unselectable")
+  ) {
     row.getElement().classList.add("tabulator-unselectable");
   }
 
   // remove the tabulator-selectable class if the data property isSelectable is false and it contains the class
-  if(rowData.isSelectable===false && row.getElement().classList.contains("tabulator-selectable")){
+  if (
+    rowData.isSelectable === false &&
+    row.getElement().classList.contains("tabulator-selectable")
+  ) {
     row.getElement().classList.remove("tabulator-selectable");
   }
 }
@@ -232,7 +238,7 @@ function func_rowSelectionChanged(data, rows, tabulatorInstance) {
 }
 
 // Returns tooltip
-function func_tooltips(e,cell,onRendered) {
+function func_tooltips(e, cell, onRendered) {
   //e - mouseover event
   //cell - cell component
   //onRendered - onRendered callback registration function
@@ -330,10 +336,6 @@ $(function () {
   if (!hasCreateAnrechnungAccess) {
     approveAnrechnung.disableCreateAnrechnungButton();
   }
-
-  //! this function should not be needed in the approveAnrechnungUebersicht
-  // Set status alert color
-  approveAnrechnung.setStatusAlertColor();
 
   // Show only rows that are in progress by STGL
   $("#show-inProgressDP").click(function () {
@@ -521,21 +523,19 @@ $(function () {
                     (updateData.ectsSumBeruflich =
                       row.getData().ectsSumBeruflich +
                       sumLvEcts.ectsSumAnzurechnendeLvsBeruflich);
-                    
+
                   // set the isSelectable property to false, in order to add the tabulator-unselectable class in the rowFormatter function
-                  updateData.isSelectable=false;
+                  updateData.isSelectable = false;
                   // Update row
                   row.update(updateData);
                   row.reformat();
-                  
                 });
 
                 // Deselect rows
                 $("#tableWidgetTabulator").tabulator(
                   "deselectRow",
                   rowsToDeselect
-                );  
-
+                );
               });
 
               // Print success message
@@ -633,11 +633,13 @@ $(function () {
             $("#tableWidgetTabulator").tabulator("updateData", data);
 
             // add the isSelectable property to the rejected row, so that the right classes and selectability is applied to the row
-            var selectedRows = $("#tableWidgetTabulator").tabulator("getSelectedRows");
-            selectedRows.forEach((row)=>{
-              row.update({...row.getData(), isSelectable:false});
+            var selectedRows = $("#tableWidgetTabulator").tabulator(
+              "getSelectedRows"
+            );
+            selectedRows.forEach((row) => {
+              row.update({ ...row.getData(), isSelectable: false });
               row.reformat();
-            })
+            });
 
             // Deselect rows
             var indexesToDeselect = data.map((x) => x.anrechnung_id);
@@ -758,33 +760,6 @@ $(function () {
 });
 
 var approveAnrechnung = {
-  setStatusAlertColor: function () {
-    let status_kurzbz = $("#requestAnrechnung-status_kurzbz").data(
-      "status_kurzbz"
-    );
-
-    switch (status_kurzbz) {
-      case ANRECHNUNGSTATUS_APPROVED:
-        $("#requestAnrechnung-status_kurzbz")
-          .closest("div")
-          .addClass("bg-success-subtle");
-        break;
-      case ANRECHNUNGSTATUS_REJECTED:
-        $("#requestAnrechnung-status_kurzbz")
-          .closest("div")
-          .addClass("bg-danger-subtle");
-        break;
-      case "":
-        $("#requestAnrechnung-status_kurzbz")
-          .closest("div")
-          .addClass("bg-info-subtle");
-        break;
-      default:
-        $("#requestAnrechnung-status_kurzbz")
-          .closest("div")
-          .addClass("bg-warning-subtle");
-    }
-  },
   disableEditElements: function () {
     // Disable:
     // ...button Empfehlung anfordern

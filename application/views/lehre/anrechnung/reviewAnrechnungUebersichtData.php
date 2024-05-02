@@ -163,9 +163,13 @@ $filterWidgetArray = array(
         tableWidgetFooter: {
 			selectButtons: true
 		},
+		
 		selectableCheck: function(row){
             return func_selectableCheck(row);
         },
+		rowFormatter:function(row){
+			return func_rowFormatter(row);
+		},
         columnDefaults:{
 			tooltip:func_tooltips,
 			headerFilterPlaceholder: " ",

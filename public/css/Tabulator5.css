@@ -42,6 +42,11 @@
 /* classes for rows that are not selectable in the tabulator, except for rows that are used for calculation */
 .tabulator-row.tabulator-unselectable:not(.tabulator-calcs) {
 	color: #adb5bd !important;
+	pointer-events: none !important;
+}
+
+.tabulator-row.tabulator-unselectable a {
+	pointer-events: auto !important;
 }
 
 /* using bootstrap background classes to style the background color of tabulator rows */

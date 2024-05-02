@@ -95,28 +95,22 @@ function func_selectableCheck(row) {
   let status_kurzbz = row.getData().status_kurzbz;
   let empfehlungsberechtigt = row.getData().empfehlungsberechtigt;
 
-  return (
-    status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR ||
-    empfehlungsberechtigt == "false"
-  );
+  return  status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR || empfehlungsberechtigt == "false";
+  
 }
 
-// Performes after row was updated
-function func_rowUpdated(row) {
-  // Refresh row formatters
-  row.reformat();
 
-  // Deselect and disable new selection of updated rows
-  row.deselect();
-  row.getElement().style["pointerEvents"] = "none";
+function func_rowFormatter(row){
+  const rowData = row.getData();
 
-  // ...but leave url links selectable
-  row.getCell("dokument_bezeichnung").getElement().firstChild.style[
-    "pointerEvents"
-  ] = "auto";
-  if (row.getCell("detils")) {
-    row.getCell("details").getElement().firstChild.style["pointerEvents"] =
-      "auto";
+  // add the tabulator-unselectable class to the row if its data property isSelectable is false
+  if(rowData.isSelectable===false && !row.getElement().classList.contains("tabulator-unselectable")){
+    row.getElement().classList.add("tabulator-unselectable");
+  }
+
+  // remove the tabulator-selectable class if the data property isSelectable is false and it contains the class
+  if(rowData.isSelectable===false && row.getElement().classList.contains("tabulator-selectable")){
+    row.getElement().classList.remove("tabulator-selectable");
   }
 }
 
@@ -189,13 +183,9 @@ $(function () {
 
   $(document).on("tableInit", function (event, tabulatorInstance) {
     func_tableBuilt($("#tableWidgetTabulator"));
-
-    // event rowUpdated needs to be attached as a callback to the tableBuilt event in tabulator5
-    $("#tableWidgetTabulator").tabulator("on", "rowUpdated", (row) => {
-      func_rowUpdated(row);
-    });
   });
 
+  
   // Redraw table on resize to fit tabulators height to windows height
   window.addEventListener("resize", function () {
     $("#tableWidgetTabulator").tabulator("setHeight", $(window).height() * 0.5);
@@ -332,6 +322,19 @@ $(function () {
             if (!data.error && data.retval != null) {
               // Update status 'genehmigt'
               $("#tableWidgetTabulator").tabulator("updateData", data.retval);
+              
+              // make all confirmed anrechnungen unselectable and deselect them
+              let selectedRows = $("#tableWidgetTabulator").tabulator("getSelectedRows");
+              selectedRows.forEach(row => {
+                row.update({...row.getData(), isSelectable:false});
+                row.reformat();
+              });
+
+              // deselect all selected rows
+              $("#tableWidgetTabulator").tabulator(
+                "deselectRow",
+                selectedRows
+              );
 
               // Print success message
               FHC_DialogLib.alertSuccess(
@@ -458,33 +461,6 @@ $(function () {
 });
 
 var reviewAnrechnung = {
-  setStatusAlertColor: function () {
-    let status_kurzbz = $("#reviewAnrechnung-status_kurzbz").data(
-      "status_kurzbz"
-    );
-
-    switch (status_kurzbz) {
-      case ANRECHNUNGSTATUS_APPROVED:
-        $("#reviewAnrechnung-status_kurzbz")
-          .closest("div")
-          .addClass("bg-success-subtle");
-        break;
-      case ANRECHNUNGSTATUS_REJECTED:
-        $("#reviewAnrechnung-status_kurzbz")
-          .closest("div")
-          .addClass("bg-danger-subtle");
-        break;
-      case "":
-        $("#reviewAnrechnung-status_kurzbz")
-          .closest("div")
-          .addClass("bg-info-subtle");
-        break;
-      default:
-        $("#reviewAnrechnung-status_kurzbz")
-          .closest("div")
-          .addClass("bg-warning-subtle");
-    }
-  },
   copyIntoTextarea: function (elem) {
     // Find closest textarea
     let textarea = $(elem).closest("div").find("textarea");
