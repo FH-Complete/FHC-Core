@@ -26,209 +26,213 @@ export default {
 		'showDocument',
 		'showTinyMCE',
 		'visibleColumns'
-		],
+	],
 	data(){
-			return {
-				tabulatorOptions: {
-					ajaxURL: this.endpoint + 'getNotizen/' + this.id + '/' + this.typeId,
-					ajaxRequestFunc: this.$fhcApi.get,
-					ajaxResponse: (url, params, response) => response.data,
-					columns: [
-						{
-							title: "Titel",
-							field: "titel",
-							width: 100,
-							tooltip:function(e, cell, onRendered){
-								var el = document.createElement("div");
-								el.style.backgroundColor = "white";
-								el.style.color = "black";
-								el.style.fontWeight = "bold";
-								el.style.padding = "5px";
-								el.style.border = "1px solid black";
-								el.style.borderRadius = "5px";
-
-								el.innerText = cell.getValue();
-
-								el.innerText = cell.getColumn().getField() + " - " + cell.getValue();
-
-								return el;
-							},
-						},
-						{
-							title: "Text",
-							field: "text_stripped",
-							width: 250,
-							tooltip:function(e, cell, onRendered){
-								var el = document.createElement("div");
-								el.style.backgroundColor = "white";
-								el.style.color = "black";
-								el.style.fontWeight = "bold";
-								el.style.padding = "5px";
-								el.style.border = "1px solid black";
-								el.style.borderRadius = "5px";
-
-								el.innerText = cell.getValue();
-
-								return el;
-							},
-						},
-						{title: "VerfasserIn", field: "verfasser_uid", width: 124, visible: false},
-						{title: "BearbeiterIn", field: "bearbeiter_uid", width: 126, visible: false},
-						{title: "Start", field: "start_format", width: 86, visible: false},
-						{title: "Ende", field: "ende_format", width: 86, visible: false},
-						{title: "Dokumente", field: "countdoc", width: 100, visible: false},
-						{
-							title: "Erledigt",
-							field: "erledigt",
-							width: 97,
-							visible: false,
-							formatter:"tickCross",
-							hozAlign:"center",
-							formatterParams: {
-								tickElement: '<i class="fa fa-check text-success"></i>',
-								crossElement: '<i class="fa fa-xmark text-danger"></i>'
-							}
-						},
-						{title: "Notiz_id", field: "notiz_id", width: 92, visible: false},
-						{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: false},
-						{title: "type_id", field: "type_id", width: 164, visible: false},
-						{title: "extension_id", field: "id", width: 135, visible: false},
-						{title: "letzte Änderung", field: "lastupdate", width: 146, visible: false},
-						{
-							title: 'Aktionen', field: 'actions',
-							width: 100,
-							formatter: (cell, formatterParams, onRendered) => {
-								let container = document.createElement('div');
-								container.className = "d-flex gap-2";
-
-								let button = document.createElement('button');
-								button.className = 'btn btn-outline-secondary btn-action';
-								button.innerHTML = '<i class="fa fa-edit"></i>';
-								button.addEventListener(
-									'click',
-									(event) =>
-										this.actionEditNotiz(cell.getData().notiz_id)
-								);
-								container.append(button);
-
-								button = document.createElement('button');
-								button.className = 'btn btn-outline-secondary btn-action';
-								button.innerHTML = '<i class="fa fa-xmark"></i>';
-								button.addEventListener(
-									'click',
-									() =>
-										this.actionDeleteNotiz(cell.getData().notiz_id)
-								);
-								container.append(button);
-
-								return container;
-							},
-							frozen: true
-						}],
-					layout: 'fitColumns',
-					layoutColumnsOnNewData: false,
-					height: '250',
-					selectableRangeMode: 'click',
-					selectable: true,
-					index: 'notiz_id'
+		return {
+			tabulatorOptions: {
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.endpoint.getNotizen,
+				ajaxParams: {
+					id: this.id,
+					type: this.typeId
 				},
-				tabulatorEvents: [
+				ajaxResponse: (url, params, response) => response.data,
+				columns: [
 					{
-						event: 'tableBuilt',
-						handler: async () => {
+						title: "Titel",
+						field: "titel",
+						width: 100,
+						tooltip:function(e, cell, onRendered){
+							var el = document.createElement("div");
+							el.style.backgroundColor = "white";
+							el.style.color = "black";
+							el.style.fontWeight = "bold";
+							el.style.padding = "5px";
+							el.style.border = "1px solid black";
+							el.style.borderRadius = "5px";
 
-							await this.$p.loadCategory(['notiz', 'global']);
+							el.innerText = cell.getValue();
 
-							let cm = this.$refs.table.tabulator.columnManager;
+							el.innerText = cell.getColumn().getField() + " - " + cell.getValue();
 
-							cm.getColumnByField('verfasser_uid').component.updateDefinition({
-								title: this.$p.t('notiz', 'verfasser'),
-								visible: this.showVariables.showVerfasser
-							});
-							cm.getColumnByField('titel').component.updateDefinition({
-								title: this.$p.t('global', 'titel'),
-								//visible: this.showVariables.showTitel
-							});
-							cm.getColumnByField('text_stripped').component.updateDefinition({
-								title: this.$p.t('global', 'text'),
-								//visible: this.showVariables.showText
-							});
-							cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
-								title: this.$p.t('notiz', 'bearbeiter'),
-								visible: this.showVariables.showBearbeiter
-							});
-							cm.getColumnByField('start_format').component.updateDefinition({
-								title: this.$p.t('global', 'gueltigVon'),
-								visible: this.showVariables.showVon
-							});
-							cm.getColumnByField('ende_format').component.updateDefinition({
-								title: this.$p.t('global', 'gueltigBis'),
-								visible: this.showVariables.showBis
-							});
-							cm.getColumnByField('countdoc').component.updateDefinition({
-								title: this.$p.t('notiz', 'document'),
-								visible: this.showVariables.showDokumente
-							});
-							cm.getColumnByField('erledigt').component.updateDefinition({
-								title: this.$p.t('notiz', 'erledigt'),
-								visible: this.showVariables.showErledigt
-							});
-							cm.getColumnByField('lastupdate').component.updateDefinition({
-								title: this.$p.t('notiz', 'letzte_aenderung'),
-								visible: this.showVariables.showLastupdate
-							});
-							cm.getColumnByField('notiz_id').component.updateDefinition({
-								visible: this.showVariables.showNotiz_id
-							});
-							cm.getColumnByField('notizzuordnung_id').component.updateDefinition({
-								visible: this.showVariables.showNotizzuordnung_id
-							});
-							cm.getColumnByField('type_id').component.updateDefinition({
-								visible: this.showVariables.showType_id
-							});
-							cm.getColumnByField('id').component.updateDefinition({
-								visible: this.showVariables.showId
-							});
+							return el;
+						},
+					},
+					{
+						title: "Text",
+						field: "text_stripped",
+						width: 250,
+						tooltip:function(e, cell, onRendered){
+							var el = document.createElement("div");
+							el.style.backgroundColor = "white";
+							el.style.color = "black";
+							el.style.fontWeight = "bold";
+							el.style.padding = "5px";
+							el.style.border = "1px solid black";
+							el.style.borderRadius = "5px";
 
+							el.innerText = cell.getValue();
+
+							return el;
+						},
+					},
+					{title: "VerfasserIn", field: "verfasser_uid", width: 124, visible: false},
+					{title: "BearbeiterIn", field: "bearbeiter_uid", width: 126, visible: false},
+					{title: "Start", field: "start_format", width: 86, visible: false},
+					{title: "Ende", field: "ende_format", width: 86, visible: false},
+					{title: "Dokumente", field: "countdoc", width: 100, visible: false},
+					{
+						title: "Erledigt",
+						field: "erledigt",
+						width: 97,
+						visible: false,
+						formatter:"tickCross",
+						hozAlign:"center",
+						formatterParams: {
+							tickElement: '<i class="fa fa-check text-success"></i>',
+							crossElement: '<i class="fa fa-xmark text-danger"></i>'
 						}
+					},
+					{title: "Notiz_id", field: "notiz_id", width: 92, visible: false},
+					{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: false},
+					{title: "type_id", field: "type_id", width: 164, visible: false},
+					{title: "extension_id", field: "id", width: 135, visible: false},
+					{title: "letzte Änderung", field: "lastupdate", width: 146, visible: false},
+					{
+						title: 'Aktionen', field: 'actions',
+						width: 100,
+						formatter: (cell, formatterParams, onRendered) => {
+							let container = document.createElement('div');
+							container.className = "d-flex gap-2";
+
+							let button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.addEventListener(
+								'click',
+								(event) =>
+									this.actionEditNotiz(cell.getData().notiz_id)
+							);
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.addEventListener(
+								'click',
+								() =>
+									this.actionDeleteNotiz(cell.getData().notiz_id)
+							);
+							container.append(button);
+
+							return container;
+						},
+						frozen: true
+					}],
+				layout: 'fitColumns',
+				layoutColumnsOnNewData: false,
+				height: '250',
+				selectableRangeMode: 'click',
+				selectable: true,
+				index: 'notiz_id'
+			},
+			tabulatorEvents: [
+				{
+					event: 'tableBuilt',
+					handler: async () => {
+
+						await this.$p.loadCategory(['notiz', 'global']);
+
+						let cm = this.$refs.table.tabulator.columnManager;
+
+						cm.getColumnByField('verfasser_uid').component.updateDefinition({
+							title: this.$p.t('notiz', 'verfasser'),
+							visible: this.showVariables.showVerfasser
+						});
+						cm.getColumnByField('titel').component.updateDefinition({
+							title: this.$p.t('global', 'titel'),
+							//visible: this.showVariables.showTitel
+						});
+						cm.getColumnByField('text_stripped').component.updateDefinition({
+							title: this.$p.t('global', 'text'),
+							//visible: this.showVariables.showText
+						});
+						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
+							title: this.$p.t('notiz', 'bearbeiter'),
+							visible: this.showVariables.showBearbeiter
+						});
+						cm.getColumnByField('start_format').component.updateDefinition({
+							title: this.$p.t('global', 'gueltigVon'),
+							visible: this.showVariables.showVon
+						});
+						cm.getColumnByField('ende_format').component.updateDefinition({
+							title: this.$p.t('global', 'gueltigBis'),
+							visible: this.showVariables.showBis
+						});
+						cm.getColumnByField('countdoc').component.updateDefinition({
+							title: this.$p.t('notiz', 'document'),
+							visible: this.showVariables.showDokumente
+						});
+						cm.getColumnByField('erledigt').component.updateDefinition({
+							title: this.$p.t('notiz', 'erledigt'),
+							visible: this.showVariables.showErledigt
+						});
+						cm.getColumnByField('lastupdate').component.updateDefinition({
+							title: this.$p.t('notiz', 'letzte_aenderung'),
+							visible: this.showVariables.showLastupdate
+						});
+						cm.getColumnByField('notiz_id').component.updateDefinition({
+							visible: this.showVariables.showNotiz_id
+						});
+						cm.getColumnByField('notizzuordnung_id').component.updateDefinition({
+							visible: this.showVariables.showNotizzuordnung_id
+						});
+						cm.getColumnByField('type_id').component.updateDefinition({
+							visible: this.showVariables.showType_id
+						});
+						cm.getColumnByField('id').component.updateDefinition({
+							visible: this.showVariables.showId
+						});
+
 					}
-				],
-				notizen: [],
-				multiupload: true,
-				mitarbeiter: [],
-				filteredMitarbeiter: [],
-				zwischenvar: '',
-				editorInitialized: false,
-				editor: null,
-				notizData: {
-					typeId: this.typeId,
-					titel: null,
-					statusNew: true,
-					text: null,
-					lastUpdate: null,
-					von: null,
-					bis: null,
-					document: null,
-					erledigt: false,
-					verfasser: null,
-					bearbeiter: null,
-					anhang: []
-				},
-				showVariables: {
-					showTitel: false,
-					showText: false,
-					showVerfasser: false,
-					showBearbeiter: false,
-					showVon: false,
-					showBis: false,
-					showDokumente: false,
-					showErledigt: false,
-					showNotiz_id: false,
-					showNotizzuordnung_id: false,
-					showType_id: false,
-					showId: false,
-					showLastupdate: false
-				},
+				}
+			],
+			notizen: [],
+			multiupload: true,
+			mitarbeiter: [],
+			filteredMitarbeiter: [],
+			zwischenvar: '',
+			editorInitialized: false,
+			editor: null,
+			notizData: {
+				typeId: this.typeId,
+				titel: null,
+				statusNew: true,
+				text: null,
+				lastUpdate: null,
+				von: null,
+				bis: null,
+				document: null,
+				erledigt: false,
+				verfasser: null,
+				bearbeiter: null,
+				anhang: []
+			},
+			showVariables: {
+				showTitel: false,
+				showText: false,
+				showVerfasser: false,
+				showBearbeiter: false,
+				showVon: false,
+				showBis: false,
+				showDokumente: false,
+				showErledigt: false,
+				showNotiz_id: false,
+				showNotizzuordnung_id: false,
+				showType_id: false,
+				showId: false,
+				showLastupdate: false
+			},
 		}
 	},
 	methods: {
@@ -271,33 +275,21 @@ export default {
 
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
-/*			this.formData = {
-				'id': this.id,
-				'typeId': this.typeId,
-				...formData
-			};*/
 
-			return this.$fhcApi.post(this.endpoint + 'addNewNotiz/' + this.id,
-				formData,
-				{Headers: {"Content-Type": "multipart/form-data"}}
-			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				this.resetFormData();
-				this.reload();
-			})
+			return this.endpoint.addNewNotiz(this.id, formData)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.resetFormData();
+					this.reload();
+				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
 				});
 		},
 		deleteNotiz(notiz_id) {
-			this.param = {
-				'notiz_id': notiz_id,
-				'type_id': this.typeId,
-				'id': this.id
-			};
-
-			return this.$fhcApi.post(this.endpoint + 'deleteNotiz/', this.param)
+			return this.endpoint.deleteNotiz(notiz_id, this.typeId, this.id)
+				//return this.$fhcApi.post(this.endpoint + 'deleteNotiz/', this.param)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.$refs.deleteNotizModal.hide();
@@ -310,11 +302,7 @@ export default {
 				});
 		},
 		loadNotiz(notiz_id) {
-			this.param = {
-				'notiz_id': notiz_id
-			};
-			return this.$fhcApi.post(this.endpoint + 'loadNotiz/',
-				this.param)
+			return this.endpoint.loadNotiz(notiz_id)
 				.then(result => {
 					this.notizData = result.data;
 					this.notizData.typeId = this.typeId;
@@ -323,11 +311,7 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		loadDocEntries(notiz_id) {
-			this.param = {
-				'notiz_id': notiz_id
-			};
-			return this.$fhcApi.post(this.endpoint + 'loadDokumente/',
-				this.param)
+			return this.endpoint.loadDokumente(notiz_id)
 				.then(
 					result => {
 						this.notizData.anhang = result.data;
@@ -340,19 +324,12 @@ export default {
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
 
-			this.param = {
-				'notiz_id': notiz_id
-			};
-
-			return this.$fhcApi.post(
-				this.endpoint + 'updateNotiz/',
-				formData,
-				{Headers: {"Content-Type": "multipart/form-data"}}
-			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				this.resetFormData();
-				this.reload();
-			})
+			return this.endpoint.updateNotiz(notiz_id, formData)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.resetFormData();
+					this.reload();
+				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
@@ -379,16 +356,14 @@ export default {
 			};
 		},
 		getUid() {
-			this.$fhcApi
-				.get(this.endpoint + 'getUid')
+			return this.endpoint.getUid()
 				.then(result => {
 					this.notizData.intVerfasser = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		search(event) {
-			return this.$fhcApi
-				.get(this.endpoint + 'getMitarbeiter/' + event.query)
+			return this.endpoint.getMitarbeiter(event.query)
 				.then(result => {
 					this.filteredMitarbeiter = result.data.retval;
 				});
@@ -535,7 +510,7 @@ export default {
 					<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
 						
 					<!-- TinyMce 5 -->
-					<div v-if="showTinyMCE"class="col-sm-7">
+					<div v-if="showTinyMCE" class="col-sm-7">
 						<textarea
 						ref="editor"
 						rows="5"
@@ -1062,4 +1037,3 @@ export default {
 <br>
 `,
 }
-

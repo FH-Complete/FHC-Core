@@ -21,6 +21,7 @@ import navigation from "./navigation.js";
 import filter from "./filter.js";
 import studstatus from "./studstatus.js";
 import stv from "./stv.js";
+import notiz from "./notiz.js";
 
 export default {
     search,
@@ -28,5 +29,6 @@ export default {
     navigation,
     filter,
     studstatus,
-    stv
+    stv,
+    notiz
 };

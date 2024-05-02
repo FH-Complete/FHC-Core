@@ -10,7 +10,9 @@ export default {
 	template: `
 	<div class="stv-details-details h-100 pb-3">
 		<h3>Notizen</h3>
-		<NotizComponent
+		
+		<!--oldversion ohne factory-->
+<!--		<NotizComponent
 			endpoint="api/frontend/v1/stv/Notiz/"
 			ref="formc"
 			typeId="person_id"
@@ -19,6 +21,20 @@ export default {
 			:showErweitert="true"
 			:showDocument="true"
 			:showTinyMCE="false"
+			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+			>
+		</NotizComponent>-->
+	
+<!--	mit factory als endpoint	-->
+		<NotizComponent
+			:endpoint="$fhcApi.factory.notiz.person"
+			ref="formc"
+			typeId="person_id"
+			:id="modelValue.person_id"
+			notizLayout="twoColumnsFormLeft"
+			:showErweitert="true"
+			:showDocument="true"
+			:showTinyMCE="true"
 			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
 		</NotizComponent>
