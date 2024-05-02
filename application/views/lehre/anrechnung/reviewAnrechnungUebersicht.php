@@ -100,7 +100,7 @@ $this->load->view(
         <!-- dropdown studiensemester -->
         <div class="row">
             <div class="col-12">
-                <form id="formApproveAnrechnungUebersicht" class="row align-items-center" action="" method="get">
+                <form id="formReviewAnrechnungUebersicht" class="row align-items-center" action="" method="get">
                     <div class="col-auto">
                         <?php
                         echo $this->widgetlib->widget(

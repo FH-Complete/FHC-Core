@@ -192,9 +192,6 @@ $(function () {
     $("#tableWidgetTabulator").tabulator("redraw", true);
   });
 
-  // Set status alert color
-  reviewAnrechnung.setStatusAlertColor();
-
   // Show only rows with anrechnungen ohne Empfehlung
   $("#show-need-recommendation").click(function () {
     $("#tableWidgetTabulator").tabulator("setFilter", [
@@ -314,12 +311,14 @@ $(function () {
         data,
         {
           successCallback: function (data, textStatus, jqXHR) {
+
             if (data.error && data.retval != null) {
               // Print error message
               FHC_DialogLib.alertWarning(data.retval);
             }
 
             if (!data.error && data.retval != null) {
+           
               // Update status 'genehmigt'
               $("#tableWidgetTabulator").tabulator("updateData", data.retval);
               
@@ -334,7 +333,7 @@ $(function () {
               $("#tableWidgetTabulator").tabulator(
                 "deselectRow",
                 selectedRows
-              );
+              ); 
 
               // Print success message
               FHC_DialogLib.alertSuccess(
