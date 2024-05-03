@@ -73,7 +73,7 @@ $this->load->view(
     <div class="container-fluid">
         <!-- header -->
         <div class="row">
-            <div class="col-12 my-4 border-bottom">
+            <div class="col-lg-12 my-4 border-bottom">
                 <h3 class="fw-normal">
 					<?php echo $this->p->t('anrechnung', 'anerkennungNachgewiesenerKenntnisse'); ?>
                     <small class="text-secondary fs-6">| <?php echo $this->p->t('anrechnung', 'antragStellen'); ?></small>
@@ -86,7 +86,7 @@ $this->load->view(
             <div class="col-8">
 				<!-- Antragsdaten, Dokument Upload, Notiz-->
 				<div class="row mb-5">
-					<div class="col-12">
+					<div class="col-lg-12">
 						<form id="requestAnrechnung-form">
 							<input type="hidden" name="anrechnung_id" id="anrechnung_id" value="<?php echo $anrechnungData->anrechnung_id ?>">
 							<input type="hidden" name="lv_id" value="<?php echo $antragData->lv_id ?>">
@@ -96,7 +96,7 @@ $this->load->view(
                             <input type="hidden" name="sumEctsBeruflich" value="<?php echo $antragData->sumEctsBeruflich ?>">
                             <!-- Antragsdaten -->
 							<div class="row mb-3">
-								<div class="col-12">
+								<div class="col-lg-12">
 									<div class="card">
 										<div class="card-header">
 											<span class="text-uppercase fw-bold"><?php echo $this->p->t('anrechnung', 'antrag'); ?></span>&emsp;
@@ -165,7 +165,7 @@ $this->load->view(
 							</div>
 							<!-- Antrag mit Checkboxen -->
 							<div class="row mb-3">
-								<div class="col-12">
+								<div class="col-lg-12">
 									<div class="border border-dark border-3 rounded p-3" >
 										<p ><?php echo $this->p->t('anrechnung', 'antragStellenText'); ?></p>
 										
@@ -211,7 +211,7 @@ $this->load->view(
 							</div>
                             <!-- Begruendung ECTS -->
                             <div class="row mb-3">
-                                <div class="col-12">
+                                <div class="col-lg-12">
                                     <div class="card">
                                         <div class="card-header">
                                             <span class="fw-bold"><?php echo $this->p->t('anrechnung', 'begruendungEcts'); ?></span>&emsp;
@@ -230,7 +230,7 @@ $this->load->view(
                             </div>
                             <!-- Begruendung LV Inhalt -->
                             <div class="row mb-3">
-                                <div class="col-12">
+                                <div class="col-lg-12">
                                     <div class="card">
                                         <div class="card-header">
                                             <span class="fw-bold"><?php echo $this->p->t('anrechnung', 'begruendungLvinhalt'); ?></span>&emsp;
@@ -251,7 +251,7 @@ $this->load->view(
                             </div>
 							<!-- Dokument Upload-->
 							<div class="row mb-3">
-								<div class="col-12">
+								<div class="col-lg-12">
 									<div class="card">
 										<div class="card-header">
 											<span class="fw-bold"><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></span>&emsp;
@@ -283,7 +283,7 @@ $this->load->view(
 							</div>
 							<!-- Herkunft der Kenntnisse -->
 							<div class="row mb-3">
-								<div class="col-12">
+								<div class="col-lg-12">
 									
 											<div class="card">
 												<div class="card-header">
@@ -303,7 +303,7 @@ $this->load->view(
 							</div>
 							<!-- Bestaetigung-->
 							<div class="row mb-3">
-								<div class="col-12">
+								<div class="col-lg-12">
 									<div class="border border-3 rounded border-dark p-3" >
 										
 											<div class="form-check">

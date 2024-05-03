@@ -89,7 +89,7 @@ $this->load->view(
     <div class="container-fluid">
         <!-- title -->
         <div class="row">
-            <div class="col-12 my-4 border-bottom">
+            <div class="col-lg-12 my-4 border-bottom">
                 <h3 class="fw-normal">
                     <?php echo $this->p->t('anrechnung', 'anrechnungenPruefen'); ?>
                     <small class="text-secondary fs-6">|
@@ -99,7 +99,7 @@ $this->load->view(
         </div>
         <!-- dropdown studiensemester -->
         <div class="row">
-            <div class="col-12">
+            <div class="col-lg-12">
                 <form id="formReviewAnrechnungUebersicht" class="row align-items-center" action="" method="get">
                     <div class="col-auto">
                         <?php

@@ -92,7 +92,7 @@ $this->load->view(
 
 		<!-- title & helper link -->
 		<div class="row">
-			<div class="col-12 page-header">
+			<div class="col-lg-12 page-header">
 				<a class="float-end" data-bs-toggle="collapse" href="#collapseHelp" aria-expanded="false" aria-controls="collapseExample">
 					<?php echo $this->p->t('ui', 'hilfeZuDieserSeite'); ?>
 				</a>
@@ -104,7 +104,7 @@ $this->load->view(
 
 		<!-- helper collapse module -->
 		<div class="row">
-			<div class="col-12 collapse my-4" id="collapseHelp">
+			<div class="col-lg-12 collapse my-4" id="collapseHelp">
 				<div class="card p-3">
 					
 					<?php $this->load->view('lehre/lehrauftrag/acceptLehrauftragHelp') ?>
@@ -114,7 +114,7 @@ $this->load->view(
 
 		<!-- dropdown widgets -->
 		<div class="row">
-			<div class="col-12">
+			<div class="col-lg-12">
 				<form id="formLehrauftrag" class="row align-items-center" action="" method="get">
 					<input type="hidden" id="uid" name="uid" value="<?php echo getAuthUID(); ?>">
 					<div class="col-auto">
@@ -139,7 +139,7 @@ $this->load->view(
 
 		<!-- tabulator data table 'Lehrauftraege annehmen'-->
 		<div class="row">
-			<div class="col-12">
+			<div class="col-lg-12">
 				<?php $this->load->view('lehre/lehrauftrag/acceptLehrauftragData.php'); ?>
 			</div>
 		</div>
@@ -209,7 +209,7 @@ $this->load->view(
 
 		<!-- collapse module with data table 'Stornierte Lehrauftraege' (collapsed by default until opened on buttonclick)-->
 		<div class="row">
-			<div class="col-12 collapse" id="collapseCancelledLehrauftraege">
+			<div class="col-lg-12 collapse" id="collapseCancelledLehrauftraege">
 				<h4>
 					<?php echo ucfirst($this->p->t('global', 'stornierteLehrauftraege')); ?>:
 					<small>
@@ -219,7 +219,7 @@ $this->load->view(
 					</small>
 				</h4>
 				<div class="row">
-					<div class="col-12">
+					<div class="col-lg-12">
 						<?php $this->load->view('lehre/lehrauftrag/cancelledLehrauftragData.php'); ?>
 					</div>
 				</div>
