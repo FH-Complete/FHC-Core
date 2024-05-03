@@ -45,7 +45,7 @@ $this->load->view(
 
 		<!-- Title -->
 		<div class="row  my-4">
-			<div class="col-12 border-bottom">
+			<div class="col-lg-12 border-bottom">
 				<h3 class="fw-normal">
 					<?php echo $this->p->t('anrechnung', 'neueAnrechnung'); ?>
 					<small class="text-secondary fs-6">| <?php echo $this->p->t('global', 'antragAnlegen'); ?></small>
@@ -81,7 +81,7 @@ $this->load->view(
 
 		<!-- StudentInnen Table -->
 		<div class="row  my-4">
-			<div class="col-10">
+			<div class="col-lg-10">
 				<?php $this->load->view('lehre/anrechnung/createAnrechnungData.php'); ?>
 			</div>
 		</div>
@@ -91,7 +91,7 @@ $this->load->view(
 			<input name="studiensemester_kurzbz" id="studiensemester_kurzbz" type="hidden"
 				value="<?php echo $studiensemester_selected ?>">
 			<div class="row my-4">
-				<div class="col-10">
+				<div class="col-lg-10">
 					<table class="table table-condensed table-bordered mb-0">
 						<!-- StudentIn -->
 						<tr>
@@ -158,7 +158,7 @@ $this->load->view(
 			</div>
 
 			<div class="row my-4">
-				<div class="col-10">
+				<div class="col-lg-10">
 					<!-- Submit Button -->
 					<button class="btn btn-primary btn-w200 float-end" id="createAnrechnung-submit" type="submit"
 						value="submit">
