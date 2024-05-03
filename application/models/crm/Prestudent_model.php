@@ -739,7 +739,7 @@ class Prestudent_model extends DB_Model
 					ps.status_kurzbz, 
 					ps.studiensemester_kurzbz, 
 					ps.ausbildungssemester,
-					CASE WHEN ps.status_kurzbz IN ('Student', 'Diplomand')
+					CASE WHEN ps.status_kurzbz IN ('Student', 'Diplomand','Abbrecher','Unterbrecher')
 					THEN CONCAT(lv.semester, lv.verband, lv.gruppe)
 					ELSE ''
 					END AS lehrverband, 

@@ -63,7 +63,8 @@ export default{
 				const newObj = {
 					prestudent_id : this.modelValue.prestudent_id,
 					studiensemester_kurzbz : this.defaultSemester,
-					ausbildungssemester : this.modelValue.semester
+					ausbildungssemester : this.modelValue.semester,
+					name: `${this.modelValue.vorname} ${this.modelValue.nachname}`
 				};
 				dataArray.push(newObj);
 				//console.log(dataArray);
@@ -75,14 +76,14 @@ export default{
 					const newObj = {
 						prestudent_id: item.prestudent_id,
 						ausbildungssemester: item.semester,
-						studiensemester_kurzbz: this.defaultSemester
+						studiensemester_kurzbz: this.defaultSemester,
+						name: `${item.vorname} ${item.nachname}`
 					};
 					dataArray.push(newObj);
 				}
 
 				return dataArray;
 			}
-
 		},
 		gruende() {
 			return this.listStatusgruende.filter(grund => grund.status_kurzbz == this.statusData.status_kurzbz);
@@ -295,6 +296,7 @@ export default{
 			this.statusData.ausbildungssemester = 1;
 			this.statusData.datum = this.getDefaultDate();
 			this.statusData.bestaetigtam = this.getDefaultDate();
+			this.statusData.name = this.modelValue.vorname + ' ' + this.modelValue.nachname;
 			this.$refs.newStatusModal.show();
 		},
 		actionEditStatus(status, stdsem, ausbildungssemester){
@@ -482,9 +484,6 @@ export default{
 					changeData = this.newArray.find(item => item.prestudent_id === prestudentId);
 				}
 
-				console.log("---");
-				console.log(changeData);
-
 				return this.$fhcApi.post('api/frontend/v1/stv/status/addNewStatus/' + prestudentId,
 					//this.statusData
 					//this.updateData.find(item => item.prestudent_id == prestudentId)
@@ -504,6 +503,7 @@ export default{
 				.then(values => {
 					if (this.modelValue.prestudent_id) {
 						this.reload();
+						//TODO(manu) reload Detailtab after Abbrecher to see current status activ, verband and gruppe
 					}
 					else {
 						this.$reloadList();
@@ -511,6 +511,7 @@ export default{
 					this.hideModal('newStatusModal');
 					this.resetModal();
 				});
+
 		},
 		advanceStatus(statusId){
 			return this.$fhcApi.post('api/frontend/v1/stv/status/advanceStatus/' +
@@ -673,11 +674,10 @@ export default{
 									<option  value="Bewerber">BewerberIn</option>
 									<option  value="Aufgenommener">Aufgenommene/r</option>
 									<option  value="Student">StudentIn</option>
-									<option  value="Unterbrecher">UnterbrecherIn</option>
+<!--									TODO(Manu) handle Unterbrecher from here
+									<option  value="Unterbrecher">UnterbrecherIn</option>-->
 									<option  value="Diplomand">DiplomandIn</option>
 									<option  value="Incoming">Incoming</option>
-									<option  value="Absolvent">AbsolventIn</option>
-									<option  value="Abbrecher">AbbrecherIn</option>
 								</form-input>
 							</div>
 						</div>
@@ -844,11 +844,10 @@ export default{
 									<option  value="Bewerber">BewerberIn</option>
 									<option  value="Aufgenommener">Aufgenommene/r</option>
 									<option  value="Student">StudentIn</option>
-									<option  value="Unterbrecher">UnterbrecherIn</option>
+<!--									TODO(Manu) handle Unterbrecher from here
+									<option  value="Unterbrecher">UnterbrecherIn</option>-->
 									<option  value="Diplomand">DiplomandIn</option>
 									<option  value="Incoming">Incoming</option>
-									<option  value="Absolvent">AbsolventIn</option>
-									<option  value="Abbrecher">AbbrecherIn</option>
 								</form-input>
 							</div>
 						</div>
@@ -1110,41 +1109,6 @@ export default{
 				</template>
 			</BsModal>
 			
-			<!--Modal: addMultiStatus--> <!--TODO(MANU) use bs template-->
-<!--			<BsModal ref="addMultiStatus">				
-			<template #title>{{$p.t('lehre', 'status_edit')}}</template>
-				<template #default>
-				<div v-if="prestudentIds.length == 1">
-					<p>In welches Semester soll dieser {{actionStatusText}} verschoben werden?</p>
-				</div>
-				<div v-else>
-					<p>In welches Semester sollen diese {{prestudentIds.length}} {{actionStatusText}}en verschoben werden?</p>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="studiensemester" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="studiensemester"
-							v-model="actionSem"
-						>				
-						</form-input>
-					</div>
-				</div>
-					
-				</template>
-				<template #footer>
-
-				<div v-if="actionStatusText=='Student'">
-					<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToStudent(prestudentIds)">OK</button>
-				</div>
-				<div v-if="actionStatusText=='Wiederholer'">
-					<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToWiederholer(prestudentIds)">OK</button>
-				</div>
-					
-				</template>
-			</BsModal>-->
 				
 			<core-filter-cmpt
 				v-if="!this.modelValue.length"

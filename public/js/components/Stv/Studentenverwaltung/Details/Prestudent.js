@@ -137,8 +137,8 @@ export default {
 				this.listZgvsdoktor = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient //TODO(manu) FHCAPI
-			.get('components/stv/Lists/getStgs')
+		this.$fhcApi
+			.get('api/frontend/v1/stv/lists/getStgs')
 			.then(result => CoreRESTClient.getData(result.data) || [])
 			.then(result => {
 				this.listStgs = result;

@@ -11,9 +11,9 @@ class Status extends FHCAPI_Controller
 		parent::__construct([
 			'getHistoryPrestudent' => ['admin:r', 'assistenz:r'],
 			'addNewStatus' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
-			'getStatusgruende' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'getLastBismeldestichtag' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'isLastStatus' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'getStatusgruende' => self::PERM_LOGGED,
+			'getLastBismeldestichtag' => self::PERM_LOGGED,
+			'isLastStatus' => self::PERM_LOGGED,
 			'deleteStatus' => ['admin:r','assistenz:r'],
 			'loadStatus' => ['admin:r', 'assistenz:r'],
 			'updateStatus' => ['admin:r', 'assistenz:r'],
@@ -98,7 +98,7 @@ class Status extends FHCAPI_Controller
 		//Variablen für Statuscheck
 		$stg = $result->studiengang_kz;
 		$reihungstest_angetreten = $result->reihungstestangetreten;
-		$name = trim($result->vorname . " ". $result->nachname);
+		//$name = trim($result->vorname . " ". $result->nachname);
 		$zgv_code = $result->zgv_code;
 
 		$isStudent = false;
@@ -124,6 +124,7 @@ class Status extends FHCAPI_Controller
 		$statusgrund_id = $this->input->post('statusgrund_id');
 		$rt_stufe = $this->input->post('rt_stufe');
 		$bestaetigtvon = $uid;
+		$name = $this->input->post('name');
 
 		//GET lastStatus
 		$result = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
@@ -140,7 +141,6 @@ class Status extends FHCAPI_Controller
 			$lastStatusData = current(getData($result));
 
 		//Different handling depending on newStatus
-		//Todo(manu) check later with multiactions
 		/*		if($status_kurzbz == 'Absolvent' || $status_kurzbz == 'Diplomand')
 				{
 					//$studiensemester = $semester_aktuell;
@@ -163,45 +163,36 @@ class Status extends FHCAPI_Controller
 		if (isError($result))
 		{
 			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-/*			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));*/
 		}
 		if($result->retval == '1')
 		{
-/*			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson($result->code);*/
-			return $this->terminateWithError($this->p->t('lehre','error_rolleBereitsVorhanden'), self::ERROR_TYPE_GENERAL);
-			//return $this->terminateWithError("test error_rolleBereitsVorhanden", self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($name . ": " . $this->p->t('lehre','error_rolleBereitsVorhanden'), self::ERROR_TYPE_GENERAL);
 		}
 
 
 		//Check Reihungstest
-		//TODO(manu) erst später für multiactions releveant
+		//TODO(manu) test
 		if(REIHUNGSTEST_CHECK)
 		{
 			if($status_kurzbz=='Bewerber' && !$reihungstest_angetreten)
 			{
-/*				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson($name . ": Um einen Interessenten zum Bewerber zu machen, muss die Person das Reihungstestverfahren abgeschlossen haben");*/
 				return $this->terminateWithError($this->p->t('lehre','error_keinReihungstestverfahren', $name), self::ERROR_TYPE_GENERAL);
 			}
 		}
 
 		//Check ZGV
-		//TODO(manu) erst später für multiactions releveant
+		//TODO(manu) test
 		if(!defined("ZGV_CHECK") || ZGV_CHECK)
 		{
 			if($status_kurzbz=='Bewerber' && $zgv_code=='')
 			{
-/*				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson($name . ": Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein.");*/
 				return $this->terminateWithError($this->p->t('lehre','error_ZGVNichtEingetragen', $name), self::ERROR_TYPE_GENERAL);
 
 			}
 		}
 
 		//Check ZGV-Master
-		//TODO(manu) erst später für multiactions releveant
+		//TODO(manu) test
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$result = $this->StudiengangModel->load([
 			'studiengang_kz'=> $stg
@@ -218,8 +209,6 @@ class Status extends FHCAPI_Controller
 		{
 			if($status_kurzbz=='Bewerber' && $zgv_code=='' && $typ=='m')
 			{
-/*				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson($name . ": Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein.");*/
 				return $this->terminateWithError($this->p->t('lehre','error_ZGVMasterNichtEingetragen', $name), self::ERROR_TYPE_GENERAL);
 			}
 		}
@@ -246,8 +235,8 @@ class Status extends FHCAPI_Controller
 		}
 
 		//check if studentrolle already exists
-		//TODO(manu) eigener Code für Diplomand?
-		if($status_kurzbz == 'Student' || $status_kurzbz == 'Diplomand')
+		//TODO(manu) refactor and test
+		if($status_kurzbz == 'Student' || $status_kurzbz == 'Diplomand' || $lastStatusData->status_kurzbz == 'Student')
 		{
 			$this->load->model('crm/Student_model', 'StudentModel');
 			$result = $this->StudentModel->checkIfExistingStudentRolle($prestudent_id);
@@ -257,8 +246,6 @@ class Status extends FHCAPI_Controller
 			}
 			if($result->retval == "0")
 			{
-/*				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson($result->code);*/
 				return $this->terminateWithError($this->p->t('lehre','error_noStudstatus'), self::ERROR_TYPE_GENERAL);
 			}
 			if($result->retval != "0")
@@ -281,8 +268,10 @@ class Status extends FHCAPI_Controller
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 			}
 
+			//return $this->terminateWithError($name, self::ERROR_TYPE_GENERAL);
 			$result = $this->PrestudentstatusModel->checkIfValidStatusHistory(
 				$prestudent_id,
+				$name,
 				$status_kurzbz,
 				$studiensemester_kurzbz,
 				$new_status_datum,
@@ -363,8 +352,8 @@ class Status extends FHCAPI_Controller
 			$studiengang_kz = $studentData->studiengang_kz;
 
 			//Handle Abbrecher and Unterbrecher
-			//TODO (manu) implement later with multiactions
-			// not active yet: works only for "status ändern" in FAS
+			//TODO(manu) for addStatus unterbrecher: valdidaton of ausbildungssemester 0 (default = 1)
+			//right now: just commented out
 			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
 						{
 							$ausbildungssemester = 0;
@@ -385,43 +374,59 @@ class Status extends FHCAPI_Controller
 			if ($this->db->trans_status() === false || isError($result))
 			{
 				$this->db->trans_rollback();
-/*				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson($result->code);*/
 				return $this->terminateWithError($this->p->t('lehre','error_duringInsertUpdateLehrverband'), self::ERROR_TYPE_GENERAL);
 			}
 
 			//Student updaten (fuer Abbrecher und Unterbrecher)
-			//not active yet: works only for "status ändern" in FAS
-			//Todo(Manu) Later for multiactions
-
+			//implemented for multiaction "status ändern"
+			//TODO(Manu) implement also for newStatus
 
 			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
 			{
 				$result = $this->StudentModel->update(
-								[
-									'student_uid' => $student_uid
-								],
-								[
-									'studiengang_kz' => $studiengang_kz,
-									'semester' => $ausbildungssemester,
-									'verband' => $verband,
-									'gruppe' => $gruppe,
-									'updateamum' => date('c'),
-									'updatevon' => $uid
-							]);
-							if ($this->db->trans_status() === false || isError($result))
-							{
-								$this->db->trans_rollback();
-								$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-								return $this->outputJson($result->code);
-							}
+					[
+						'student_uid' => $student_uid
+					],
+					[
+						'studiengang_kz' => $studiengang_kz,
+						'semester' => $ausbildungssemester,
+						'verband' => $verband,
+						'gruppe' => $gruppe,
+						'updateamum' => date('c'),
+						'updatevon' => $uid
+				]);
+				if ($this->db->trans_status() === false || isError($result))
+				{
+					$this->db->trans_rollback();
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
 
+				// detailtab: set active to false if abbrecher
+				if($status_kurzbz == 'Abbrecher')
+				{
+
+					$this->load->model('person/Benutzer_model', 'BenutzerModel');
+					$result = $this->BenutzerModel->update(
+						[
+							'uid' => $student_uid
+						],
+						[
+							'aktiv' => false,
+							'updateaktivam' => date('Y-m-d'),
+							'updateaktivvon' => $uid
+						]);
+					if ($this->db->trans_status() === false || isError($result))
+					{
+						$this->db->trans_rollback();
+						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+					}
+				}
+
+			}
 		}
 
 		$this->db->trans_commit();
 
-		//return $this->outputJsonSuccess($prestudent_id);
 		$this->terminateWithSuccess($prestudent_id);
 	}
 
@@ -1013,10 +1018,11 @@ class Status extends FHCAPI_Controller
 
 			$result = $this->PrestudentstatusModel->checkIfValidStatusHistory(
 				$prestudent_id,
+				'',
 				$status_kurzbz,
 				$studiensemester_kurzbz,
 				$datum,
-				$ausbildungssemester
+				$ausbildungssemesteR
 			);
 			if (isError($result))
 			{

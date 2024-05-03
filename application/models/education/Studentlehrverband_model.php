@@ -53,12 +53,14 @@ class Studentlehrverband_model extends DB_Model
 
 		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 		$result = $this->LehrverbandModel->checkIfLehrverbandExists($studiengang_kz, $ausbildungssemester, $verband, $gruppe);
-		if (isError($result)) {
+		if (isError($result))
+		{
 			$this->db->trans_rollback();
 			return error("0", "Error during update Lehrverband");
 		}
 
 		if ($result->retval == "0") {
+
 			// Übergeordneten Lehrverband check and/or insert
 			$result = $this->LehrverbandModel->checkIfLehrverbandExists($studiengang_kz, $ausbildungssemester, '', '');
 			if (isError($result)) {
@@ -68,6 +70,7 @@ class Studentlehrverband_model extends DB_Model
 
 			if ($result->retval == "0")
 			{
+				$this->terminateWithError("in section 0 und weiter.. wo verband auf leer gesetzt wird", self::ERROR_TYPE_GENERAL);
 				$result = $this->LehrverbandModel->insert([
 					'studiengang_kz' => $studiengang_kz,
 					'semester' => $ausbildungssemester,
@@ -104,12 +107,14 @@ class Studentlehrverband_model extends DB_Model
 		// Studentlehrverband insert or update
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$result = $this->StudentlehrverbandModel->checkIfStudentLehrverbandExists($student_uid, $studiensemester_kurzbz);
-		if (isError($result)) {
+		if (isError($result))
+		{
 			$this->db->trans_rollback();
 			return error(getError($result));
 		}
 
-		if ($result->retval == "0") {
+		if ($result->retval == "0")
+		{
 			$result = $this->StudentlehrverbandModel->insert([
 				'student_uid' => $student_uid,
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,

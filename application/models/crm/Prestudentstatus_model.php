@@ -496,8 +496,9 @@ class Prestudentstatus_model extends DB_Model
 	 * @param integer $prestudent_id
 	 * @return error if not valid, array StatusArr if valid
 	 */
-	public function checkIfValidStatusHistory($prestudent_id, $status_kurzbz, $new_status_studiensemester_kurzbz, $new_status_datum, $new_status_ausbildungssemester, $old_status_studiensemester_kurzbz = '', $old_status_ausbildungssemester = '')
+	public function checkIfValidStatusHistory($prestudent_id, $nameStud, $status_kurzbz, $new_status_studiensemester_kurzbz, $new_status_datum, $new_status_ausbildungssemester, $old_status_studiensemester_kurzbz = '', $old_status_ausbildungssemester = '')
 	{
+		$name = ($nameStud != '') ? $nameStud . ": " : '';
 		//$isNewStatus = $this->checkIfNewStatus($prestudent_id,  $status_kurzbz);
 		$isNewStatus =  $old_status_studiensemester_kurzbz == '' && $old_status_ausbildungssemester == '';
 
@@ -581,7 +582,7 @@ class Prestudentstatus_model extends DB_Model
 			// Abbrecher- oder Absolventenstatus muss Endstatus sein
 			if (isset($next_status) && in_array($curr_status_kurzbz, $endstatusArr)) {
 
-				return error("Nach Abbrecher- und Absolventenstatus darf kein anderer Status mehr eingetragen werden");
+				return error($name . "Nach Abbrecher- und Absolventenstatus darf kein anderer Status mehr eingetragen werden");
 			}
 
 			// wenn Unterbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
@@ -590,7 +591,7 @@ class Prestudentstatus_model extends DB_Model
 				&& $curr_status_ausbildungssemester != $next_status->ausbildungssemester
 			)
 			{
-				return error("Aufeinanderfolgende Unterbrecher müssen gleiches Ausbildungssemester haben");
+				return error($name . "Aufeinanderfolgende Unterbrecher müssen gleiches Ausbildungssemester haben");
 			}
 
 			// wenn Abbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
@@ -599,7 +600,7 @@ class Prestudentstatus_model extends DB_Model
 				&& $next_status->status_kurzbz == 'Abbrecher' && $curr_status_ausbildungssemester != $next_status->ausbildungssemester
 			)
 			{
-				return error("Unterbrecher und folgender Abbrecher müssen gleiches Ausbildungssemester haben");
+				return error($name ."Unterbrecher und folgender Abbrecher müssen gleiches Ausbildungssemester haben");
 			}
 
 			// keine Studenten nach Diplomand Status
@@ -607,7 +608,7 @@ class Prestudentstatus_model extends DB_Model
 				isset($next_status) && $curr_status_kurzbz == 'Diplomand' && $next_status->status_kurzbz == 'Student'
 			)
 			{
-				return error("Nach Diplomandenstatus darf kein Studentenstatus mehr eingetragen werden");
+				return error($name . "Nach Diplomandenstatus darf kein Studentenstatus mehr eingetragen werden");
 			}
 
 		}
