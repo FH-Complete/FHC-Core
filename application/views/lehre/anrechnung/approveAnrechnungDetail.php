@@ -66,7 +66,7 @@ $this->load->view(
 	<div class="container-fluid">
 		<!-- header  -->
 		<div class="row">
-			<div class="col-12 my-4 border-bottom">
+			<div class="col-lg-12 my-4 border-bottom">
 				<h3 class="fw-normal ">
 					<?php echo $this->p->t('anrechnung', 'anrechnungenGenehmigen'); ?>
 					<small class="text-secondary fs-6">| <?php echo $this->p->t('global', 'detailsicht'); ?></small>
@@ -80,7 +80,7 @@ $this->load->view(
 			<div class="col-8">
 				<!-- Antragsdaten -->
 				<div class="row mb-4">
-					<div class="col-12">
+					<div class="col-lg-12">
 						<div class="card">
 							<div class="card-header">
 								<span
@@ -95,7 +95,7 @@ $this->load->view(
 							</div>
 							<div class="card-body">
 								<div class="row">
-									<div class="col-4">
+									<div class="col-xxl-4">
 										<table class="table table-bordered table-condensed table-fixed mb-0">
 											<tbody>
 												<tr>
@@ -166,7 +166,7 @@ $this->load->view(
 											</tbody>
 										</table>
 									</div>
-									<div class="col-8">
+									<div class="col-xxl-8">
 										<table class="table table-bordered table-condensed table-fixed mb-0">
 											<tbody>
 
@@ -221,7 +221,7 @@ $this->load->view(
 				</div>
 				<!-- Empfehlungsdaten -->
 				<div class="row">
-					<div class="col-12">
+					<div class="col-lg-12">
 						<div class="card " id="approveAnrechnungDetail-empfehlung"
 							data-empfehlung="<?php echo json_encode($empfehlungData->empfehlung) ?>">
 							<div class="card-header">
@@ -239,7 +239,7 @@ $this->load->view(
 							</div>
 							<div class="card-body">
 								<div class="row">
-									<div class="col-6">
+									<div class="col-lg-6">
 										<form id="form-empfehlung">
 											<input type="hidden" name="anrechnung_id"
 												value="<?php echo $anrechnungData->anrechnung_id ?>">
@@ -297,7 +297,7 @@ $this->load->view(
 											</table>
 										</form>
 									</div>
-									<div class="col-6">
+									<div class="col-lg-6">
 										<form id="form-empfehlungNotiz">
 											<input type="hidden" name="anrechnung_id"
 												value="<?php echo $anrechnungData->anrechnung_id ?>">
@@ -333,7 +333,7 @@ $this->load->view(
 
 				<!-- Genehmigungssdaten -->
 				<div class="row">
-					<div class="col-12">
+					<div class="col-lg-12">
 						<div class="card my-4">
 							<div class="card-header">
 								<span
