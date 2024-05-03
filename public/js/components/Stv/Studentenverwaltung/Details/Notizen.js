@@ -11,20 +11,6 @@ export default {
 	<div class="stv-details-details h-100 pb-3">
 		<h3>Notizen</h3>
 		
-		<!--oldversion ohne factory-->
-<!--		<NotizComponent
-			endpoint="api/frontend/v1/stv/Notiz/"
-			ref="formc"
-			typeId="person_id"
-			:id="modelValue.person_id"
-			notizLayout="twoColumnsFormLeft"
-			:showErweitert="true"
-			:showDocument="true"
-			:showTinyMCE="false"
-			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
-			>
-		</NotizComponent>-->
-	
 <!--	mit factory als endpoint	-->
 		<NotizComponent
 			:endpoint="$fhcApi.factory.notiz.person"
@@ -32,17 +18,28 @@ export default {
 			typeId="person_id"
 			:id="modelValue.person_id"
 			notizLayout="twoColumnsFormLeft"
-			:showErweitert="true"
+			:showErweitert="false"
 			:showDocument="true"
-			:showTinyMCE="true"
+			:showTinyMCE="false"
 			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
 		</NotizComponent>
 		
+	
 <!--		
 ---------------------------------------------------------------------------------------------
 -------------------- DESCRIPTION FOR PARAMETER PROPS ----------------------------------------
 ---------------------------------------------------------------------------------------------
+
+endpoint: for corecontroller: eg: :endpoint="$fhcApi.factory.notiz.person"
+(...prestudent, ...mitarbeiter, ...bestellung, ...lehreinheit, ...projekt, ...projektphase, ...projekttask, ...anrechnung)
+
+for extensions: write own controller extending core NotizController
+
+ref="formc"
+
+typeId: id to which table the notizdata should be connected... eg. person_id, prestudent_id, uid (for mitarbeiter_uid), projekt_kurzbz, projektphase_id, projekttask_id,
+	bestellung_id, lehreinheit_id, anrechnung_id
 
 notizLayout: "classicFas", "twoColumnsFormLeft", twoColumnsFormRight"
 
@@ -53,12 +50,9 @@ showDocument: if true: section with documentHandling will be displayed
 
 showTinyMCE: if true: section with WYSIWYG Editor for Text will be displayed
 
-typeId: id to which table the notizdata should be connected... eg. person_id, prestudent_id, mitarbeiter_uid, projekt_kurzbz, projektphase_id, projekttask_id,
-	bestellung_id, lehreinheit_id, anrechnung_id, uid  
-	in progress for extensions
-
 visibleColumns: list, which fields shoult be showed as default in filter component
 		fullVersion: :visibleColumns="['titel','text','bearbeiter','verfasser','von','bis','dokumente','erledigt','notiz_id','notizzuordnung_id','id','lastupdate']"
+		
 
 ---------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------	
@@ -74,30 +68,42 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 ---------------------------------------------------------------------------------------------
 
 
-<br><br>
-		<h3>Test prestudentId</h3>
 		<NotizComponent
+			:endpoint="$fhcApi.factory.notiz.mitarbeiter"
 			ref="formc"
-			typeId="prestudent_id"
-			:id="modelValue.prestudent_id"
+			typeId="uid"
+			:id= "'ma0068'"
+			notizLayout="twoColumnsFormLeft"
+			:showErweitert="true"
+			:showDocument="true"
+			:showTinyMCE="false"
+			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
 		</NotizComponent>
 		
-		<br><br>
-		<h3>Test mitarbeiter_uid</h3>
 		<NotizComponent
+			:endpoint="$fhcApi.factory.notiz.prestudent"
 			ref="formc"
-			typeId="uid"
-			:id="'ma0068'"
+			typeId="prestudent_id"
+			:id="modelValue.prestudent_id"
+			notizLayout="twoColumnsFormLeft"
+			:showErweitert="true"
+			:showDocument="true"
+			:showTinyMCE="true"
+			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</NotizComponent>-->
-		
-<!--		<br><br>
-		<h3>Test projekt</h3>
+		</NotizComponent>
+				
 		<NotizComponent
+			:endpoint="$fhcApi.factory.notiz.projekt"
 			ref="formc"
 			typeId="projekt_kurzbz"
-			:id="'Studentenausweis'"
+			:id="'EA74'" 
+			notizLayout="twoColumnsFormLeft"
+			:showErweitert="true"
+			:showDocument="true"
+			:showTinyMCE="true"
+			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
 		</NotizComponent>-->
 		
