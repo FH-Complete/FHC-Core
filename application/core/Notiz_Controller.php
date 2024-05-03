@@ -10,19 +10,20 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getUid' => ['admin:r', 'assistenz:r'],
-			'getNotizen' => ['admin:r', 'assistenz:r'],
-			'loadNotiz' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'addNewNotiz' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'updateNotiz' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'deleteNotiz' => ['admin:r', 'assistenz:r'],
-			'loadDokumente' => ['admin:r', 'assistenz:r'],
-			'getMitarbeiter' => ['admin:r', 'assistenz:r'],
-			'isBerechtigt' => ['admin:r', 'assistenz:r']
+			'getUid' => self::PERM_LOGGED,
+			'getNotizen' => self::PERM_LOGGED,
+			'loadNotiz' => self::PERM_LOGGED,
+			'addNewNotiz' => self::PERM_LOGGED,
+			'updateNotiz' => self::PERM_LOGGED,
+			'deleteNotiz' => ['admin:w', 'assistenz:w'],
+			'loadDokumente' => ['admin:w', 'assistenz:w'],
+			'getMitarbeiter' => self::PERM_LOGGED,
+			'isBerechtigt' => self::PERM_LOGGED,
 		]);
 
 		//Load Models
 		$this->load->model('person/Notiz_model', 'NotizModel');
+		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
@@ -39,7 +40,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 	}
 
 
-	//Standardfall: für extensions überschreiben: speichern der Zuordnung in eigene Extensiontabelle angeben
+	//Override function for extensions
 	protected function assignNotiz($notiz_id, $id, $type)
 	{
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
@@ -55,7 +56,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		return success(getData($result));
 	}
 
-	//Standardfall: für extensions überschreiben: speichern der Zuordnung in eigene Extensiontabelle angeben
+	//Override function for extensions
 	protected function deleteNotizzuordnung($notiz_id, $id, $type)
 	{
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
@@ -72,11 +73,23 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 	}
 
 
+	//Override function for extensions
+	public function getNotizen($id, $type)
+	{
+		$result = $this->NotizzuordnungModel->isValidType($type);
+		if(isError($result))
+			$this->terminateWithError($result->retval, self::ERROR_TYPE_GENERAL);
 
-	//TODO(manu) abstract
-	protected function getNotizen($id, $type) {}
+		$result = $this->NotizModel->getNotizWithDocEntries($id, $type);
 
-	//TODO(manu) to abstract
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+		return $this->terminateWithSuccess(getData($result) ?: []);
+	}
+
+
+	//Override function
 	protected function isBerechtigt($id, $typeId){
 		return $this->terminateWithError("in abstract function: define right in extension", self::ERROR_TYPE_GENERAL);
 	}
@@ -144,7 +157,8 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$titel = $this->input->post('titel');
 		$text = $this->input->post('text');
 		$erledigt = $this->input->post('erledigt');
-		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
+		$verfasser_uid = isset($_POST['verfasser']) ? $_POST['verfasser'] : $uid;
+		//$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
 		$bearbeiter_uid = isset($_POST['bearbeiter_uid']) ? $_POST['bearbeiter_uid'] : null;
 		$type = $this->input->post('typeId');
 		$start = $this->input->post('start');
@@ -153,7 +167,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		// Start DB transaction
 		$this->db->trans_start();
 
-		//Speichern der Notiz
+		//Save note
 		$result = $this->NotizModel->insert(array('titel' => $titel, 'text' => $text, 'erledigt' => $erledigt, 'verfasser_uid' => $verfasser_uid,
 			"insertvon" => $verfasser_uid, 'start' => $start, 'ende' => $ende, 'bearbeiter_uid' => $bearbeiter_uid));
 
@@ -165,7 +179,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 		$notiz_id = $result->retval;
 
-		//Speichern der Notizzuordnung
+		//save Notizzuordnung
 		$result = $this->assignNotiz($notiz_id, $id, $type);
 
 		if (isError($result))
@@ -174,7 +188,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 
-		//Speichern der Dokumente
+		//save Documents
 		$dms_id_arr = [];
 		foreach ($_FILES as $k => $file)
 		{
@@ -189,6 +203,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 			//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
 			//Todo(manu)check name files: nicht gleiches file 2mal hochladen
+			//Todo define in dms component: readFile, downloadFile
 			$result = $this->dmslib->upload($dms, $k, ['*']);
 			/*			$result = $this->dmslib->upload($dms, $k, ['application/pdf','application/x.fhc-dms+json']);*/
 			if (isError($result))
@@ -199,10 +214,9 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			$dms_id_arr[] = $result->retval['dms_id'];
 		}
 
-		//Eintrag in Notizdokument speichern
+		//save entry in Notizdokument
 		if($dms_id_arr)
 		{
-			// Loads model Notizdokument_model
 			$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 			foreach($dms_id_arr as $dms_id)
 			{
@@ -257,8 +271,8 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$uid = getAuthUID();
 		$titel = $this->input->post('titel');
 		$text = $this->input->post('text');
-		$verfasser_uid = $this->input->post('verfasser_uid');
-		$bearbeiter_uid = isset($_POST['bearbeiter_uid']) ? $_POST['bearbeiter_uid'] : $uid;
+		$verfasser_uid = isset($_POST['verfasser']) ? $_POST['verfasser'] : $uid;
+		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : $uid;
 		$erledigt = $this->input->post('erledigt');
 		$start = $this->input->post('start');
 		$ende = $this->input->post('ende');
@@ -284,7 +298,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 
-		//update(1) laden aller bereits mit dieser notiz_id verknüpften DMS-Einträge
+		//update(1) loading all dms-entries with this notiz_id
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 		$this->NotizdokumentModel->addJoin('campus.tbl_dms_version', 'dms_id');
 		$dms_uploaded = null;
@@ -311,7 +325,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 		foreach ($_FILES as $k => $file)
 		{
-			//update(2) alle neuen files (alle außer type application/x.fhc-dms+json) anhängen
+			//update(2) attach all new files (except type application/x.fhc-dms+json)
 			if($file["type"] == 'application/x.fhc-dms+json')
 			{
 				$dms_uploaded[] = array(
@@ -331,6 +345,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 				//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
 				//Todo(manu)check name files: nicht gleiches file 2mal hochladen
+				//Todo define in dms component: readFile, downloadFile
 				$result = $this->dmslib->upload($dms, $k, array('*'));
 
 				if (isError($result))
@@ -347,7 +362,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			}
 		}
 
-		//update(3) check if Dateien gelöscht wurden
+		//update(3) check if all files have been deleted
 		if(count($dms_uploaded) != count($dms_id_arr))
 		{
 			if (count($dms_uploaded) == 0)
@@ -387,12 +402,9 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$typeId = $this->input->post('type_id');
 		$id = $this->input->post('id');
 
-		if(!$this->isBerechtigt($id, $typeId))
-		{
-			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), self::ERROR_TYPE_GENERAL);
-		}
+		//TODO(manu): define Permissions for deletion document if filecomponent finished
 
-		//dms_id auslesen aus notizdokument wenn vorhanden
+		//get dms_id from notizdokument
 		$dms_id_arr = [];
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 
@@ -416,7 +428,6 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			// Start DB transaction
 			$this->db->trans_start();
 
-			//return $this->terminateWithError("dms_id kommt: " . $notiz_id, self::ERROR_TYPE_GENERAL);
 			$this->load->library('DmsLib');
 
 
@@ -444,7 +455,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 		$this->load->model('person/Notiz_model', 'NotizModel');
 
-		//Löschen von Notiz
+		//Delete Note
 		$result = $this->NotizModel->delete(
 			array('notiz_id' => $notiz_id)
 		);
@@ -465,10 +476,6 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 	public function loadDokumente()
 	{
-		if(!$this->isBerechtigt('$id', '$typeId'))
-		{
-			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), self::ERROR_TYPE_GENERAL);
-		}
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 		$notiz_id = $this->input->post('notiz_id');
 
