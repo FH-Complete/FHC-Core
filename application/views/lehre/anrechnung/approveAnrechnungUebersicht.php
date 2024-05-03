@@ -96,7 +96,7 @@ $this->load->view(
     <div class="container-fluid">
         <!-- header -->
         <div class="row">
-            <div class="col-12 my-4 border-bottom">
+            <div class="col-lg-12 my-4 border-bottom">
                 <h3 class="fw-normal ">
 					<?php echo $this->p->t('anrechnung', 'anrechnungenGenehmigen'); ?>
                     <small class="text-secondary fs-6">| <?php echo ucfirst($this->p->t('global', 'uebersicht')); ?></small>
@@ -108,7 +108,7 @@ $this->load->view(
 
         <!-- dropdown studiensemester -->
         <div class="row">
-            <div class="col-12">
+            <div class="col-lg-12">
                 <form id="formApproveAnrechnungUebersicht" class="row align-items-center" action="" method="get" data-readonly="<?php echo json_encode($hasReadOnlyAccess)?>" data-createaccess="<?php echo json_encode($hasCreateAnrechnungAccess)?>">
                     <div class="col-auto">
 						<?php
@@ -206,8 +206,8 @@ $this->load->view(
         <!-- Filter buttons / Submit buttons-->
         <div class="row">
             <!-- Filter buttons -->
-            <div class="col-4 col-md-5">
-                <div class="btn-toolbar" role="toolbar">
+            <div class="col-12 col-md-5">
+                <div class="btn-toolbar " role="toolbar">
                     <div class="btn-group" role="group">
                         <button id="show-inProgressDP" class="btn btn-outline-secondary btn-clearfilter" type="button"
                                 data-bs-toggle="tooltip" data-bs-placement="left"
@@ -246,17 +246,18 @@ $this->load->view(
 				</div>
             </div>
             <!-- Action Buttons 'Genehmigen', Ablehnen, 'Empfehlung anfordern'-->
-            <div class="col-8 col-md-7">
-                <div class="d-flex justify-content-end">
+            <div class="col-12 col-md-7">
+                <div class="d-flex ">
                     <button id="approveAnrechnungUebersicht-request-recommendation"
                             class="btn btn-outline-secondary btn-w200 me-5" type="button">
                         <?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?></button>
+                    
                     <button id="approveAnrechnungUebersicht-reject-anrechnungen-ask"
                             class="btn btn-danger btn-w200 me-1" type="button">
                         <?php echo ucfirst($this->p->t('global', 'ablehnen')); ?></button>
                     <button id="approveAnrechnungUebersicht-approve-anrechnungen-ask"
                             class="btn btn-primary btn-w200" type="button">
-                        <?php echo ucfirst($this->p->t('global', 'genehmigen')); ?></button>
+                        <?php echo ucfirst($this->p->t('global', 'genehmigen')); ?></button>       
                 </div>
             </div>
         </div>
