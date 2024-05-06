@@ -51,6 +51,7 @@ export default {
 				.studstatus.leitung.getPrestudents(evt.query, this.abortController.signal)
 				.then(result => {
 					this.data = result.data;
+                                        this.abortController = null;
 				})
 				.catch(error => {
                                     if (this.abortController instanceof AbortController 
@@ -58,7 +59,7 @@ export default {
                                     {
                                         this.abortController.abort();
                                     }
-                                    this.$fhcApi.handleSystemError(error);
+                                    this.$fhcAlert.handleSystemError(error);
                                 });
 		}
 	},
