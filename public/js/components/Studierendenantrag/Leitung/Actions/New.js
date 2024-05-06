@@ -35,8 +35,16 @@ export default {
 			});
 		},
 		loadData(evt) {
-			if (this.abortController)
-				this.abortController.abort();
+                        if( evt.query.length < 2 )
+                        {
+                            return false;
+                        }
+
+			if (this.abortController instanceof AbortController
+                            && this.abortController.signal.aborted === false)
+                        {
+                            this.abortController.abort();
+                        }
 			this.abortController = new AbortController();
 
 			this.$fhcApi.factory
@@ -44,7 +52,14 @@ export default {
 				.then(result => {
 					this.data = result.data;
 				})
-				.catch(this.$fhcApi.handleSystemError);
+				.catch(error => {
+                                    if (this.abortController instanceof AbortController 
+                                        && this.abortController.signal.aborted === false)
+                                    {
+                                        this.abortController.abort();
+                                    }
+                                    this.$fhcApi.handleSystemError(error);
+                                });
 		}
 	},
 	template: `
