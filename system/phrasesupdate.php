@@ -25629,7 +25629,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Anwesenheitskontrolle gefunden für Lehreinheit {le_id} am {day}.{month}.{year}.',
+				'text' => 'Keine Anwesenheitskontrolle gefunden für LV-Teil {le_id} am {day}.{month}.{year}.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -25649,7 +25649,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Fehler beim Löschen der User Anwesenheiten für Lehreinheit {le_id} am {day}.{month}.{year}.',
+				'text' => 'Fehler beim Löschen der User Anwesenheiten für LV-Teil {le_id} am {day}.{month}.{year}.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -25669,7 +25669,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Fehler beim Löschen der Anwesenheitskontrolle für Lehreinheit {le_id} am {day}.{month}.{year}.',
+				'text' => 'Fehler beim Löschen der Anwesenheitskontrolle für LV-Teil {le_id} am {day}.{month}.{year}.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -25689,7 +25689,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Löschen der Anwesenheitskontrolle für Lehreinheit {le_id} am {day}.{month}.{year} erfolgreich.',
+				'text' => 'Löschen der Anwesenheitskontrolle für LV-Teil {le_id} am {day}.{month}.{year} erfolgreich.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -25769,7 +25769,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Zugangscode hat eine fehlerhafte Lehreinheit hinterlegt.',
+				'text' => 'Zugangscode hat einen fehlerhaften LV-Teil hinterlegt.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -25789,7 +25789,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Lehreinheit des Zugangscodes hat keine Teilnehmer hinterlegt.',
+				'text' => 'LV-Teil des Zugangscodes hat keine Teilnehmer hinterlegt.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -25809,7 +25809,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Sie sind nicht als Teilnehmer der Lehreinheit eingetragen.',
+				'text' => 'Sie sind nicht als Teilnehmer der LV-Teil eingetragen.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -25829,7 +25829,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Anwesenheitseinträge gefunden für die Lehreinheit an diesem Datum.',
+				'text' => 'Keine Anwesenheitseinträge gefunden für den LV-Teil an diesem Datum.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -26029,7 +26029,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Lehreinheit auswählen',
+				'text' => 'LV-Teil auswählen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -26049,7 +26049,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Anwesenheitskontrolle möglich weil ihnen im System keine Lehreinheiten für diese Lehrveranstaltung zugewiesen sind.',
+				'text' => 'Keine Anwesenheitskontrolle möglich weil ihnen im System keine LV-Teile für diese Lehrveranstaltung zugewiesen sind.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -26121,6 +26121,47 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'leLaden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Teil laden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Load teaching unit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorCodeSentInTimeOutsideKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Zugangscode wurde außerhalb der Kontrollzeiten gesendet.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The access code has been sent outside the time of the attendance check.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 
 	// FHC-CORE-ANWESENHEITEN END
 );
