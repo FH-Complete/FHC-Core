@@ -13,13 +13,15 @@ $sitesettings = array(
 	'primevue3' => true,
 	'phrases' => array(
 		'global',
+		'ui',
 		'studierendenantrag',
 		'lehre',
 		'person',
 	),
 	'customJSModules' => array('public/js/apps/lehre/Antrag/Leitung.js'),
 	'customCSSs' => array(
-		'public/css/Fhc.css'
+		'public/css/Fhc.css',
+		'public/css/components/primevue.css',
 	),
 	'customJSs' => array(
 	)

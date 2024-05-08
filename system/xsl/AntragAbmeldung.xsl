@@ -327,6 +327,16 @@
 					</table:table-row>
 					<table:table-row table:style-name="Tabelle2.1">
 						<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
+							<text:p text:style-name="P5">Studiensemester</text:p>
+						</table:table-cell>
+						<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
+							<text:p text:style-name="P5">
+								<text:span text:style-name="T4"><xsl:value-of select="studiensemester"/></text:span>
+							</text:p>
+						</table:table-cell>
+					</table:table-row>
+					<table:table-row table:style-name="Tabelle2.1">
+						<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
 							<text:p text:style-name="P5">Semester</text:p>
 						</table:table-cell>
 						<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">

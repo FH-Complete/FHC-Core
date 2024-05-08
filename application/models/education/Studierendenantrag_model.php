@@ -26,25 +26,28 @@ class Studierendenantrag_model extends DB_Model
 		return $this->loadForStudiengaenge($studiengaenge, $typ, $this->StudierendenantragstatusModel::STATUS_CREATED);
 	}
 
-	public function loadForStudiengaenge($studiengaenge, $typ = null, $status = null)
+	public function loadForStudiengaenge($studiengaenge, $typ = null, $status = null, $sql = null)
 	{
-		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
+		if ($sql == null)
+			$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
 
-		$this->addSelect('stg.bezeichnung');
+		$this->addSelect('UPPER(stg.typ) || UPPER(stg.kurzbz) || \' \' || stg.bezeichnung AS bezeichnung');
 		$this->addSelect('bezeichnung_mehrsprachig[(' . $sql . ')] AS orgform', false);
 		$this->addSelect('s.studierendenantrag_id');
 		$this->addSelect('matrikelnr');
 		$this->addSelect('studienjahr_kurzbz');
 		$this->addSelect('vorname');
 		$this->addSelect('nachname');
-		$this->addSelect('prestudent_id');
+		$this->addSelect('p.prestudent_id');
 		$this->addSelect('p.studiengang_kz');
 		$this->addSelect('semester');
 		$this->addSelect($this->dbTable . '.grund');
-		$this->addSelect('datum');
+		$this->addSelect($this->dbTable . '.datum');
 		$this->addSelect('datum_wiedereinstieg');
 		$this->addSelect($this->dbTable . '.typ');
 		$this->addSelect('st.studierendenantrag_statustyp_kurzbz as status');
+		$this->addSelect('s.insertvon as status_insertvon');
+		$this->addSelect('s.insertamum as status_insertamum');
 		$this->addSelect('dms_id');
 		$this->addSelect('st.bezeichnung[(' . $sql . ')] as statustyp');
 
@@ -52,8 +55,16 @@ class Studierendenantrag_model extends DB_Model
 		$this->addJoin('public.tbl_student', 'prestudent_id');
 		$this->addJoin('public.tbl_person', 'person_id');
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
-		$this->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
-		$this->addJoin('bis.tbl_orgform', 'orgform_kurzbz');
+		$this->addJoin('public.tbl_studiensemester ss', 'studiensemester_kurzbz');
+		$this->addJoin(
+			'public.tbl_prestudentstatus ps',
+			'ps.prestudent_id=p.prestudent_id 
+			AND ps.studiensemester_kurzbz=ss.studiensemester_kurzbz 
+			AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, ss.studiensemester_kurzbz)',
+			'LEFT'
+		);
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, stg.orgform_kurzbz)');
 		$this->addJoin(
 			'campus.tbl_studierendenantrag_status as s',
 			'campus.get_status_id_studierendenantrag('. $this->dbTable .'.studierendenantrag_id) = studierendenantrag_status_id'
@@ -69,6 +80,47 @@ class Studierendenantrag_model extends DB_Model
 			$where[$this->dbTable . '.typ'] = $typ;
 
 		return $this->loadWhere($where);
+	}
+
+	public function loadActiveForStudiengaenge($studiengaenge)
+	{
+		// NOTE(chris): get language before changing things in the global
+		// db object because getUserLanguage() might use it and it should
+		// not have been tampered with
+		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
+
+		$this->db->group_start();
+		$this->db->where_not_in('s.studierendenantrag_statustyp_kurzbz', [
+			Studierendenantragstatus_model::STATUS_CANCELLED,
+			Studierendenantragstatus_model::STATUS_APPROVED,
+			Studierendenantragstatus_model::STATUS_REJECTED,
+			Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
+			Studierendenantragstatus_model::STATUS_DEREGISTERED,
+			Studierendenantragstatus_model::STATUS_PAUSE
+		]);
+		$this->db->or_group_start();
+		$this->db->where('s.studierendenantrag_statustyp_kurzbz', Studierendenantragstatus_model::STATUS_APPROVED);
+		$this->db->where('tbl_studierendenantrag.typ', Studierendenantrag_model::TYP_ABMELDUNG_STGL);
+		$this->db->group_end();
+		$this->db->group_end();
+
+		return $this->loadForStudiengaenge($studiengaenge, null, null, $sql);
+	}
+
+	public function loadStgsWithAntraege($studiengaenge)
+	{
+		$this->addDistinct();
+		$this->addSelect('UPPER(stg.typ) || UPPER(stg.kurzbz) || \' \' || stg.bezeichnung AS bezeichnung');
+		$this->addSelect('p.studiengang_kz');
+
+		$this->addJoin('public.tbl_prestudent p', 'prestudent_id');
+		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
+
+		$this->addOrder('UPPER(stg.typ) || UPPER(stg.kurzbz) || \' \' || stg.bezeichnung');
+
+		$this->db->where_in('p.studiengang_kz', $studiengaenge);
+
+		return $this->load();
 	}
 
 	public function isInStudiengang($studierendenantrag_id, $studiengaenge)
@@ -92,12 +144,18 @@ class Studierendenantrag_model extends DB_Model
 		$lang = 'SELECT index FROM public.tbl_sprache WHERE sprache=' . $this->escape(getUserLanguage());
 
 		$this->addSelect('*');
-		$this->addSelect('campus.get_status_studierendenantrag(studierendenantrag_id) status');
+		$this->addSelect($this->dbTable . '.grund AS grund');
+		$this->addSelect('s.studierendenantrag_statustyp_kurzbz status');
+		$this->addSelect('s.insertvon status_insertvon');
 		$this->addSelect('t.bezeichnung[(' . $lang . ')] statustyp');
 
 		$this->addJoin(
+			'campus.tbl_studierendenantrag_status s',
+			'campus.get_status_id_studierendenantrag(' . $this->dbTable . '.studierendenantrag_id)=s.studierendenantrag_status_id'
+		);
+		$this->addJoin(
 			'campus.tbl_studierendenantrag_statustyp t',
-			'campus.get_status_studierendenantrag(studierendenantrag_id)=t.studierendenantrag_statustyp_kurzbz'
+			's.studierendenantrag_statustyp_kurzbz=t.studierendenantrag_statustyp_kurzbz'
 		);
 
 		if ($types && is_array($types)) {
@@ -120,22 +178,28 @@ class Studierendenantrag_model extends DB_Model
 	public function getStgAndSem($antrag_id)
 	{
 		$this->addSelect('p.studiengang_kz');
+		$this->addSelect('stg.bezeichnung');
 		$this->addSelect('s.ausbildungssemester');
-		$this->addSelect('s.orgform_kurzbz');
+		$this->addSelect('plan.sprache');
+		$this->addSelect('COALESCE(plan.orgform_kurzbz, s.orgform_kurzbz, stg.orgform_kurzbz) AS orgform_kurzbz');
 
 		$this->addJoin(
 			'public.tbl_prestudentstatus s',
-			$this->dbTable . '.prestudent_id=s.prestudent_id AND ' . $this->dbTable . '.studiensemester_kurzbz=s.studiensemester_kurzbz'
+			$this->dbTable . '.prestudent_id=s.prestudent_id 
+			AND ' .
+			$this->dbTable . '.studiensemester_kurzbz=s.studiensemester_kurzbz 
+			AND ' .
+			$this->dbTable . '.insertamum > s.insertamum'
 		);
 		$this->addJoin('public.tbl_prestudent p', $this->dbTable . '.prestudent_id=p.prestudent_id');
+		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
 
 		$this->addOrder('s.datum', 'DESC');
 		$this->addOrder('s.insertamum', 'DESC');
 		$this->addOrder('s.ext_id', 'DESC');
 
 		$this->addLimit(1);
-
-		$this->db->where_in('s.status_kurzbz', $this->config->item('antrag_prestudentstatus_whitelist'));
 
 		return $this->loadWhere([
 			$this->pk => $antrag_id
@@ -188,15 +252,46 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect($this->dbTable . '.datum_wiedereinstieg');
 		$this->addSelect($this->dbTable . '.grund');
 		$this->addSelect($this->dbTable . '.dms_id');
+		$this->addSelect('s.insertvon AS status_insertvon');
+		$this->addSelect(
+			"(SELECT count(1) FROM campus.tbl_studierendenantrag_status WHERE studierendenantrag_id = " .
+			$this->dbTable .
+			".studierendenantrag_id AND studierendenantrag_statustyp_kurzbz = 'Genehmigt') AS isapproved",
+			false
+		);
 
 		$this->addJoin('public.tbl_prestudent p', 'prestudent_id', 'RIGHT');
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
-		$this->addJoin('bis.tbl_orgform', 'orgform_kurzbz');
 		$this->addJoin(
-			'campus.tbl_studierendenantrag_statustyp st',
-			'campus.get_status_studierendenantrag(studierendenantrag_id)=st.studierendenantrag_statustyp_kurzbz',
+			'public.tbl_prestudentstatus ps',
+			'ps.prestudent_id=p.prestudent_id AND ps.studiensemester_kurzbz=' .
+			$this->dbTable .
+			'.studiensemester_kurzbz AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, ' .
+			$this->dbTable .
+			'.studiensemester_kurzbz)',
 			'LEFT'
 		);
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, stg.orgform_kurzbz)');
+		$this->addJoin(
+			'campus.tbl_studierendenantrag_status s',
+			'campus.get_status_id_studierendenantrag(' . $this->dbTable . '.studierendenantrag_id)=s.studierendenantrag_status_id',
+			'LEFT'
+		);
+		$this->addJoin(
+			'campus.tbl_studierendenantrag_statustyp st',
+			's.studierendenantrag_statustyp_kurzbz=st.studierendenantrag_statustyp_kurzbz',
+			'LEFT'
+		);
+		
+		$this->db->where("(
+			SELECT status_kurzbz 
+			FROM public.tbl_prestudentstatus 
+			WHERE prestudent_id=p.prestudent_id 
+			AND status_kurzbz='Student' 
+			LIMIT 1
+		) IS NOT NULL", null, false);
+
 
 		return $this->loadWhere([
 			'p.person_id' => $person_id
@@ -235,5 +330,145 @@ class Studierendenantrag_model extends DB_Model
 		);
 
 		return $this->loadWhere($where);
+	}
+
+	/**
+	 * Checks if the Prestudent has an active Unterbrechung between
+	 * the start of the given semester and the given enddate.
+	 * If the enddate is omitted the end of the given semester is used.
+	 *
+	 * @param integer		$prestudent_id
+	 * @param string		$studiensemester_kurzbz
+	 * @param string		$enddate					(optional)
+	 *
+	 * @return boolean
+	 */
+	public function hasRunningUnterbrechungBetween($prestudent_id, $studiensemester, $enddate = null)
+	{
+		$start = '(SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=' . $this->db->escape($studiensemester) . ')';
+		$end = $enddate
+			? $this->db->escape($enddate)
+			: '(SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=' . $this->db->escape($studiensemester) . ')';
+
+		$this->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+		$this->db->where([
+			'prestudent_id' => $prestudent_id,
+			'typ' => Studierendenantrag_model::TYP_UNTERBRECHUNG,
+			'campus.get_status_studierendenantrag(studierendenantrag_id) !=' => Studierendenantragstatus_model::STATUS_CANCELLED,
+			'start < ' . $end => null,
+			'datum_wiedereinstieg > ' . $start => null,
+		]);
+		return (boolean)$this->db->count_all_results($this->dbTable);
+	}
+
+	/**
+	 * Gets free semester slots for a new Unterbrechung.
+	 *
+	 * @param integer		$prestudent_id
+	 * @param string		$studiensemester_kurzbz		(optional)
+	 *
+	 * @return stdClass
+	 */
+	public function getFreeSlotsForUnterbrechung($prestudent_id, $studiensemester = null)
+	{
+		$max_starters = 2;
+		$max_length = max(
+			2,
+			(integer)$this->config->item('unterbrecher_semester_max_length')
+		);
+
+
+		$subquery = '';
+		if ($studiensemester)
+			$subquery = 'SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=?';
+		else
+			$subquery = 'SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=public.get_stdsem_prestudent (?, null)';
+
+		$sql = "WITH numbered_sems AS (
+		    SELECT
+		        a.studienjahr_kurzbz AS studienjahr_kurzbz,
+		        a.studiensemester_kurzbz AS von,
+		        b.studiensemester_kurzbz AS bis,
+		        a.start AS start,
+		        b.start AS ende,
+		        ROW_NUMBER() OVER (
+		            PARTITION BY a.studiensemester_kurzbz
+		            ORDER BY b.start
+		        ) AS row_number
+		    FROM public.tbl_studiensemester a
+		    LEFT JOIN public.tbl_studiensemester b ON (b.start > a.ende)
+		),
+		last_sems AS (
+		    SELECT *
+		    FROM numbered_sems 
+		    WHERE numbered_sems.row_number <= ?
+		)
+		SELECT s.von, s.bis, s.start, s.ende, studierendenantrag_id, studienjahr_kurzbz
+		FROM last_sems s
+		LEFT JOIN (
+			SELECT studierendenantrag_id, start, datum_wiedereinstieg AS ende 
+			FROM campus.tbl_studierendenantrag 
+			LEFT JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+			WHERE typ=? 
+			AND campus.get_status_studierendenantrag(studierendenantrag_id) != ?
+			AND prestudent_id=?
+		) a ON (s.start < a.ende AND s.ende > a.start)
+		WHERE s.start >= (" . $subquery . ")
+		ORDER BY s.start, s.ende
+		LIMIT ?;";
+
+		return $this->execQuery($sql, [
+			$max_length,
+			self::TYP_UNTERBRECHUNG,
+			Studierendenantragstatus_model::STATUS_CANCELLED,
+			$prestudent_id,
+			$studiensemester ?: $prestudent_id,
+			$max_length * $max_starters
+		]);
+	}
+
+	/**
+	 * Returns if an Antrag is manually paused
+	 *
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
+	public function isManuallyPaused($antrag_id)
+	{
+		$this->addJoin(
+			'campus.tbl_studierendenantrag_status s',
+			'campus.get_status_id_studierendenantrag(' . $this->dbTable . '.studierendenantrag_id)=s.studierendenantrag_status_id'
+		);
+
+		$this->db->where([
+			's.studierendenantrag_id' => $antrag_id,
+			's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_PAUSE
+		]);
+
+		$this->db->group_start();
+		$this->db->where_not_in('s.insertvon', [
+			Studierendenantragstatus_model::INSERTVON_DEREGISTERED,
+			Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL
+		]);
+		$this->db->or_group_start();
+		$this->db->where('s.insertvon', Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL);
+		$this->db->where('1 !=', '(
+			SELECT COUNT(*)%2 
+			FROM campus.tbl_studierendenantrag_status i 
+			WHERE i.studierendenantrag_id = s.studierendenantrag_id 
+			AND i.insertamum > (
+				SELECT ii.insertamum 
+				FROM campus.tbl_studierendenantrag_status ii 
+				WHERE ii.studierendenantrag_id = s.studierendenantrag_id 
+				AND ii.insertvon <> ' . $this->escape(Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL) . ' 
+				ORDER BY ii.insertamum DESC 
+				LIMIT 1
+			)
+		)', false);
+		$this->db->group_end();
+		$this->db->group_end();
+		
+		return hasData($this->load());
 	}
 }

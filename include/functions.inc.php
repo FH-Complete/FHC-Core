@@ -1198,6 +1198,26 @@ function anzahlTage($date1, $date2)
 }
 
 /**
+ * Checks if the provided SQL string contains PostgreSQL functions to decrypt data, returns a boolean
+ */
+function hasSQLDecryption($sql)
+{
+	return stripos($sql, 'PGP_SYM_DECRYPT') !== false;
+}
+
+/**
+ * Checks if the provided SQL string contains PostgreSQL functions to decrypt data,
+ * and if it is used a variable instead of a readable password. Returns a boolean
+ */
+function isSQLDecryptionValid($sql)
+{
+	// If the SQL string contains decryption functions and there are _no_ password variables
+	if (hasSQLDecryption($sql) && strpos($sql, '${') === false) return false; // then return false
+
+	return true; // in any other case return true
+}
+
+/**
  * Gibt zurück, ob ein String ausschließlich erlaubte Zeichen enthält
  * erlaubt: Buchstaben a-z, A-Z, 0-9, -, _
  * @param string $stringToCheck Eingabestring
@@ -1205,10 +1225,10 @@ function anzahlTage($date1, $date2)
  */
 function hasOnlyAllowedChars($stringToCheck)
 {
-		if (!preg_match("#^[a-zA-Z0-9_-]+$#", $stringToCheck))
-			return false;
-		else
-			return true;
+	if (!preg_match("#^[a-zA-Z0-9_-]+$#", $stringToCheck))
+		return false;
+	else
+		return true;
 }
 
 ?>

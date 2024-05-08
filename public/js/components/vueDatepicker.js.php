@@ -1,9 +1,10 @@
 <?php
+$path = "../../../vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js";
 
-if(file_exists("../../../vendor/vuepic/vue-datepicker-js/vue-datepicker.iife.js"))
+if(file_exists($path))
 {
 	header('Content-Type: application/javascript');
-	echo file_get_contents("../../../vendor/vuepic/vue-datepicker-js/vue-datepicker.iife.js");
+	echo file_get_contents($path);
 	echo "export default VueDatePicker";
 }
 else

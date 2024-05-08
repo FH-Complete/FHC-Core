@@ -53,20 +53,24 @@ class Studierendenantrag extends FHC_Controller
 					'bezeichnungStg' => $antrag->bezeichnung,
 					'bezeichnungOrgform' => $antrag->orgform
 				);
-				$result = $this->antraglib->getPrestudentAbmeldeBerechtigt($antrag->prestudent_id);
+				
+				$result = $this->antraglib->getPrestudentWiederholungsBerechtigt($antrag->prestudent_id);
 				if (getData($result) == 1)
-					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Abmeldung';
+					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Wiederholung';
 
 				$result = $this->antraglib->getPrestudentUnterbrechungsBerechtigt($antrag->prestudent_id);
 				if (getData($result) == 1)
 					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Unterbrechung';
 
-				$result = $this->antraglib->getPrestudentWiederholungsBerechtigt($antrag->prestudent_id);
+				$result = $this->antraglib->getPrestudentAbmeldeBerechtigt($antrag->prestudent_id);
 				if (getData($result) == 1)
-					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Wiederholung';
+					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Abmeldung';
 			}
 			if ($antrag->studierendenantrag_id == null)
 				continue;
+			if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL && (!$antrag->isapproved))
+				continue;
+
 			$prestudentenArr[$antrag->prestudent_id]['antraege'][] = $antrag;
 		}
 
@@ -77,42 +81,9 @@ class Studierendenantrag extends FHC_Controller
 
 	public function leitung()
 	{
-		$studiengaenge = $this->permissionlib->getSTG_isEntitledFor('student/antragfreigabe');
-		$stgsNeuanlage = $this->permissionlib->getSTG_isEntitledFor('student/studierendenantrag');
+		$stgL = $this->permissionlib->getSTG_isEntitledFor('student/antragfreigabe') ?: [];
 
-		$stgL = [];
-		if ($studiengaenge) {
-			$result = $this->StudiengangModel->loadWithOrgform($studiengaenge);
-			if (isError($result))
-				return show_error(getError($result));
-			$antraege = getData($result) ?: [];
-
-			foreach ($antraege as $antrag) {
-				if (!isset($stgL[$antrag->studiengang_kz])) {
-					$stgL[$antrag->studiengang_kz] = new stdClass();
-					$stgL[$antrag->studiengang_kz]->bezeichnung = $antrag->bezeichnung;
-					$stgL[$antrag->studiengang_kz]->orgform = $antrag->orgform;
-					$stgL[$antrag->studiengang_kz]->studiengang_kz = $antrag->studiengang_kz;
-				}
-			}
-		}
-
-		$stgA = [];
-		if ($stgsNeuanlage) {
-			$result = $this->StudiengangModel->loadWithOrgform($stgsNeuanlage);
-			if (isError($result))
-				return show_error(getError($result));
-			$antraege = getData($result) ?: [];
-
-			foreach ($antraege as $antrag) {
-				if (!isset($stgA[$antrag->studiengang_kz])) {
-					$stgA[$antrag->studiengang_kz] = new stdClass();
-					$stgA[$antrag->studiengang_kz]->bezeichnung = $antrag->bezeichnung;
-					$stgA[$antrag->studiengang_kz]->orgform = $antrag->orgform;
-					$stgA[$antrag->studiengang_kz]->studiengang_kz = $antrag->studiengang_kz;
-				}
-			}
-		}
+		$stgA = $this->permissionlib->getSTG_isEntitledFor('student/studierendenantrag') ?: [];
 
 		$this->load->view('lehre/Antrag/Leitung/List', [
 			'stgA' => $stgA,
@@ -129,7 +100,7 @@ class Studierendenantrag extends FHC_Controller
 		]);
 	}
 
-	public function abmeldungstgl($prestudent_id, $studierendenantrag_id)
+	public function abmeldungstgl($prestudent_id, $studierendenantrag_id = null)
 	{
 		$this->load->view('lehre/Antrag/Create', [
 			'prestudent_id' => $prestudent_id,

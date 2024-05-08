@@ -104,17 +104,16 @@ $config['digitalization_start'] = '2022-07-01';
  * @var string           A string formated as PHP DateTime modifier
  * @see https://www.php.net/manual/de/datetime.modify.php
  */
-$config['abmeldung_job_deadline_date_modifier'] = '+3 weeks';
+$config['abmeldung_job_deadline_date_modifier'] = '+2 weeks';
 
 
 
 /**
  * System User - uid of a user that is allowed to set prestudentstatus
- * TODO(chris): DEBUG! CHANGE THIS!
  *
  * @var string
  */
-$config['antrag_job_systemuser'] = 'ma0168';
+$config['antrag_job_systemuser'] = '';
 
 
 /**
@@ -127,6 +126,7 @@ $config['antrag_job_systemuser'] = 'ma0168';
  * @var array			Array of tbl_status.status_kurzbz's
  */
 $config['antrag_prestudentstatus_whitelist'] = ['Student', 'Diplomand'];
+$config['antrag_prestudentstatus_whitelist_abmeldung'] = ['Student', 'Diplomand', 'Unterbrecher'];
 
 
 /**
@@ -160,3 +160,11 @@ $config['stgkz_blacklist_unterbrechung'] = [];
  * @var array           An array of tbl_studiengang.studiengang_kz's
  */
 $config['stgkz_blacklist_wiederholung'] = [];
+
+/**
+ * Blacklisted noten for negative committee exams
+ * noten with this ids won't be seen as negative
+ *
+ * @var array           An array of noten ids
+ */
+$config['note_blacklist_wiederholung'] = [];

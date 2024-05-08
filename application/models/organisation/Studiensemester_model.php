@@ -223,4 +223,14 @@ class Studiensemester_model extends DB_Model
 		
 		return $this->loadWhere(['uid' => $student_uid, 'v.lehre' => true]);
 	}
+
+	public function getAktAndFutureSemester()
+	{
+		$query = 'SELECT studiensemester_kurzbz
+					FROM public.tbl_studiensemester
+					WHERE start >= NOW() OR (start <= NOW() AND ende >= NOW())
+					ORDER BY start';
+					
+		return $this->execQuery($query);
+	}
 }

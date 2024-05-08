@@ -107,6 +107,21 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 				if($row_filter->anzahl>0 || $prestudent->status_kurzbz=='Incoming')
 					return false;
 	}
+	elseif($filter2 == 'StudiengebuehrErhoeht')
+	{
+		// Alle Personen die eine erhöhte Studiengebuehrbelastung haben
+		$prestudent = new prestudent();
+		$prestudent->getLastStatus($row->prestudent_id);
+
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE
+					studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
+					person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)." AND
+					buchungstyp_kurzbz='StudiengebuehrErhoeht'";
+		if($db->db_query($qry))
+			if($row_filter = $db->db_fetch_object())
+				if($row_filter->anzahl == 0)
+					return false;
+	}
 	elseif(strstr($filter2,'buchungstyp;'))
 	{
 		// Alle Personen die keine Belastung auf den uebergebenen Buchungstyp haben
@@ -736,8 +751,8 @@ if($xmlformat=='rdf')
 		}
 	}
 	elseif(in_array($typ, array('prestudent', 'interessenten', 'bewerber', 'aufgenommen',
-		'warteliste', 'absage', 'zgv', 'reihungstestangemeldet', 'reihungstestnichtangemeldet', 'absolvent',
-		'diplomand', 'bewerbungnichtabgeschickt', 'bewerbungabgeschickt', 'statusbestaetigt', 'statusbestaetigtrtnichtangemeldet', 'statusbestaetigtrtangemeldet')))
+		'warteliste', 'absage', 'zgv', 'reihungstestangemeldet', 'reihungstestnichtangemeldet', 'bewerberrtangemeldetteilgenommen', 'bewerberrtangemeldetnichtteilgenommen','absolvent',
+		'diplomand', 'bewerbungnichtabgeschickt', 'bewerbungabgeschickt', 'statusbestaetigt', 'statusbestaetigtrtnichtangemeldet', 'statusbestaetigtrtangemeldet', 'bewerberrtangemeldet', 'bewerberrtnichtangemeldet')))
 	{
 		$prestd = new prestudent();
 

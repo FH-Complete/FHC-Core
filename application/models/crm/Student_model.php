@@ -84,7 +84,7 @@ class Student_model extends DB_Model
 	}
 
 	/**
-	 * Get the FH-Email for a student (not the private kontakt emailt)
+	 * Get the FH-Email for a student (not the private kontakt email)
 	 * @param $student_uid
 	 * @return string
 	 */

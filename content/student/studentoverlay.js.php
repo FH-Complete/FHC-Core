@@ -1658,7 +1658,7 @@ function StudentAuswahl()
 
 		var antragnotentree = document.getElementById('student-antragnoten-tree');
 
-		url='<?php echo APP_ROOT;?>index.ci.php/components/Antrag/Wiederholung/getLvsAsRdf/'+prestudent_id+"?"+gettimestamp();
+		url='<?php echo APP_ROOT;?>index.ci.php/api/frontend/fas/studstatus/Wiederholung/getLvs/'+prestudent_id+"?"+gettimestamp();
 
 		try
 		{
@@ -1876,7 +1876,6 @@ function StudentPrestudentDisableFields(val)
 
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').disabled=val;
 	document.getElementById('student-prestudent-checkbox-facheinschlberuf').disabled=val;
-	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
 	document.getElementById('student-prestudent-menulist-foerderrelevant').disabled=val;
 	document.getElementById('student-prestudent-checkbox-dual').disabled=val;
 	document.getElementById('student-prestudent-button-save').disabled=val;
@@ -1921,6 +1920,20 @@ function StudentPrestudentDisableFields(val)
 	else
 	{
 		document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=true;
+	}
+
+	// bismelden checkbox deaktivieren wenn Recht nicht vorhanden ist
+	<?php
+		$editBismelden = $rechte->isBerechtigt('student/editBismelden') ? 'true' : 'false';
+		echo ' var editBismelden = '.$editBismelden.';';
+	?>
+	if (editBismelden == true)
+	{
+		document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
+	}
+	else
+	{
+		document.getElementById('student-prestudent-checkbox-bismelden').disabled=true;
 	}
 
 	//Status Tree leeren
@@ -2080,6 +2093,7 @@ function StudentPrestudentRolleDelete()
 	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
 	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);
 	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
+	var datum = getTreeCellText(tree, 'student-prestudent-tree-rolle-datum', tree.currentIndex);
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	if(confirm('Diese Rolle wirklich loeschen?'))
@@ -2108,6 +2122,7 @@ function StudentPrestudentRolleDelete()
 				req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 				req.add('ausbildungssemester', ausbildungssemester);
 				req.add('studiengang_kz', studiengang_kz);
+				req.add('datum', datum);
 
 				var response = req.executePOST();
 
@@ -2139,6 +2154,7 @@ function StudentPrestudentRolleDelete()
 			req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 			req.add('ausbildungssemester', ausbildungssemester);
 			req.add('studiengang_kz', studiengang_kz);
+			req.add('datum', datum);
 
 			var response = req.executePOST();
 
@@ -2231,8 +2247,9 @@ function StudentRolleBearbeiten()
 	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
 	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);
 	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
+	var datum = getTreeCellText(tree, 'student-prestudent-tree-rolle-datum', tree.currentIndex);
 
-	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&status_kurzbz='+status_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester,"Status","status=no, width=500, height=450, centerscreen, resizable");
+	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&status_kurzbz='+status_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester+'&datum='+datum,"Status","status=no, width=500, height=450, centerscreen, resizable");
 }
 
 // ****
@@ -2290,7 +2307,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 					timepart_arr[i] = '00';
 				}
 			}
-			
+
 			arr = datepart.split('.');
 
 			if(arr[0].length==1)
@@ -3532,6 +3549,10 @@ function StudentZeugnisDokumentArchivieren()
 			xml = 'ausbildungsvertrag.xml.php';
 			break;
 
+		case 'AbschlussdokumentLehrgaenge':
+			xml = 'abschlussdokument_lehrgaenge.xml.php';
+			break;
+
 		default:
 			alert('Das Archivieren fuer diesen Dokumenttyp wird derzeit nicht unterstuetzt');
 			return
@@ -4743,7 +4764,7 @@ function StudentNotenMoveFromAntrag()
 	var paramList= '';
 	var i = 0;
 
-	var url = '<?php echo APP_ROOT ?>index.ci.php/components/Antrag/Wiederholung/moveLvsToZeugnis';
+	var url = '<?php echo APP_ROOT ?>index.ci.php/api/frontend/fas/studstatus/Wiederholung/moveLvsToZeugnis';
 	var req = new phpRequest(url,'','');
 
 	for (var t = 0; t < numRanges; t++)
@@ -6204,6 +6225,54 @@ function StudentPrintAntragAbmeldung(event)
 	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragAbmeldung.xml.php&xsl=AntragAbmeldung&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragAbmeldung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
+function StudentPrintAntragAbmeldungStgl(event)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+
+	if (tree.currentIndex==-1)
+		return alert('Bitte eine/n Studierende/n auswaehlen');
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var prestudent_id= '';
+	var student_uid= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudentId=tree.view.getCellText(v,col);
+			prestudent_id += ';'+prestudentId;
+
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			student_uid += ';'+uid;
+
+		}
+	}
+
+	if (event.shiftKey)
+	{
+		var output='odt';
+	}
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragAbmeldungStgl.xml.php&xsl=AntragAbmeldungStgl&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragAbmeldung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
 function StudentPrintAntragUnterbrechung(event)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -6250,6 +6319,54 @@ function StudentPrintAntragUnterbrechung(event)
 	}
 
 	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragUnterbrechung.xml.php&xsl=AntragUnterbrechung&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragUnterbrechung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+function StudentPrintAntragWiederholung(event)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+
+	if (tree.currentIndex==-1)
+		return alert('Bitte eine/n Studierende/n auswaehlen');
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var prestudent_id= '';
+	var student_uid= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudentId=tree.view.getCellText(v,col);
+			prestudent_id += ';'+prestudentId;
+
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			student_uid += ';'+uid;
+
+		}
+	}
+
+	if (event.shiftKey)
+	{
+		var output='odt';
+	}
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragWiederholung.xml.php&xsl=AntragWiederholung&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragUnterbrechung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
