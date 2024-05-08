@@ -46,7 +46,7 @@ if (!isset($menu)) {
 				<img src="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" class="avatar rounded-circle"/>
 			</button>
 			<ul id="nav-user-menu" class="collapse list-unstyled" aria-labelledby="nav-user-btn">
-				<li><a class="btn btn-level-2 rounded-0 d-block" href="#" id="menu-profil">Profil</a></li>
+				<li><a class="btn btn-level-2 rounded-0 d-block" href="<?= site_url('Cis/Profil'); ?>" id="menu-profil">Profil</a></li>
 				<li><a class="btn btn-level-2 rounded-0 d-block" href="#">Ampeln</a></li>
 				<li><hr class="dropdown-divider"></li>
 				<li><a class="btn btn-level-2 rounded-0 d-block" href="<?= site_url('Cis/Auth/logout'); ?>">Logout</a></li>
@@ -62,4 +62,4 @@ if (!isset($menu)) {
 	</nav>
 </header>
 
-<main id="cis-main" class="flex-grow-1 overflow-scroll p-4">
+<main id="cis-main" class="flex-grow-1 overflow-scroll">

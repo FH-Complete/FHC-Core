@@ -38,7 +38,8 @@ export const CoreFilterCmpt = {
 	},
 	emits: [
 		'nwNewEntry',
-		'click:new'
+		'click:new',
+		'tableBuilt'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -54,6 +55,7 @@ export const CoreFilterCmpt = {
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
 		tableOnly: Boolean,
+		noColumnFilter:Boolean,
 		reload: Boolean,
 		download: {
 			type: [Boolean, String, Function, Array, Object],
@@ -150,7 +152,7 @@ export const CoreFilterCmpt = {
 				return [];
 			return this.tabulator.getColumns().filter(col => {
 				let def = col.getDefinition();
-				return !def.frozen && def.title;
+				return !def.frozen && def.title && def.formatter != "responsiveCollapse";
 			}).map(col => col.getField());
 		},
 		fieldNames() {
@@ -222,7 +224,7 @@ export const CoreFilterCmpt = {
 				for (let evt of this.tabulatorEvents)
 					this.tabulator.on(evt.event, evt.handler);
 			}
-			this.tabulator.on('tableBuilt', () => this.tableBuilt = true);
+			this.tabulator.on('tableBuilt', () => {this.tableBuilt = true; this.$emit('tableBuilt');});
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
@@ -231,8 +233,11 @@ export const CoreFilterCmpt = {
 					const cols = this.tabulator.getColumns();
 					this.fields = cols.map(col => col.getField());
 					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+					
 				});
+				
 			}
+			
 		},
 		updateTabulator() {
 			if (this.tabulator) {

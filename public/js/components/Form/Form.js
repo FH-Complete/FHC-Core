@@ -112,6 +112,49 @@ export default {
 		clearValidation() {
 			this.inputs.forEach(input => input.clearValidation());
 		},
+		send(promise) {
+			return new Promise((resolve, reject) => {
+				promise.then(result => {
+					if (result?.status == 200 && result.data) {
+						if (typeof result.data !== 'object' || !result.data.hasOwnProperty('retval'))
+							// TODO(chris): IMPLEMENT! Error in API
+							return reject(result);
+						if (result.data.error)
+							// TODO(chris): IMPLEMENT! Error in API
+							return reject(result);
+						const data = result.data.retval;
+						// TODO(chris): check for something better/add new standardized return value
+						if (result.data.code == 1)
+							this.setFeedback(true, data);
+						return resolve(data);
+					}
+					// TODO(chris): IMPLEMENT! Wrong result object
+					reject(result);
+				}).catch(result => {
+					if (result?.response?.status == 400 && result.response.data) {
+						if (typeof result.response.data !== 'object' || !result.response.data.hasOwnProperty('retval'))
+							// TODO(chris): IMPLEMENT! Error in API
+							return reject(result);
+						this.clearValidation();
+						const remaining = this.setFeedback(
+							false,
+							result.response.data.retval
+						);
+						if (remaining) {
+							result.response.data.retval = remaining;
+							return reject(result);
+						}
+					} else if (result?.response?.status == 500) {
+						if (this.$fhcAlert)
+							this.$fhcAlert.handleSystemError(result);
+						else
+							return reject(result);
+					} else {
+						return reject(result);
+					}
+				});
+			});
+		},
 		clearValidationForName(name) {
 			(this.sortedInputs[name.split('.')[0] + name.split('.').slice(1).map(p => `[${p}]`).join("")] || this.sortedInputs['_default'] || [])
 				.forEach(input => input.clearValidation());
