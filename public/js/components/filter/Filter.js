@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CoreFilterAPIs} from './API.js';
-import {CoreRESTClient} from '../../RESTClient.js';
 import {CoreFetchCmpt} from '../../components/Fetch.js';
 import FilterConfig from './Filter/Config.js';
 import FilterColumns from './Filter/Columns.js';
@@ -40,7 +38,8 @@ export const CoreFilterCmpt = {
 	},
 	emits: [
 		'nwNewEntry',
-		'click:new'
+		'click:new',
+		'tableBuilt'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -137,9 +136,9 @@ export const CoreFilterCmpt = {
 				for (let col of columns)
 				{
 					// If the column has to be displayed or not
-					col.visible = selectedFields.indexOf(col.field) >= 0;
-					if (col.formatter == 'rowSelection')
-						col.visible = true;
+					/* fields.indexOf(col.field) == -1; ensures displaying formatter colums
+					e.g. column with rowSelection checkboxes or with custom formatted action buttons */
+					col.visible = selectedFields.indexOf(col.field) >= 0 || fields.indexOf(col.field) == -1;
 
 					if (col.hasOwnProperty('resizable'))
 						col.resizable = col.visible;
@@ -186,13 +185,23 @@ export const CoreFilterCmpt = {
 			else
 				this.getFilter();
 		},
-		initTabulator() {
+		async initTabulator() {
+			let placeholder = '< Phrasen Plugin not loaded! >';
+			if (this.$p) {
+				await this.$p.loadCategory('ui');
+				placeholder = this.$p.t('ui/keineDatenVorhanden');
+			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
-				height: 500, 
-				layout: "fitColumns",
+				height: 500,
+				layout: "fitDataStretch",
 				movableColumns: true,
-				reactiveData: true
+				columnDefaults:{
+					tooltip: true,
+				},
+				placeholder,
+				reactiveData: true,
+				persistence: true
 			}, ...(this.tabulatorOptions || {})};
 
 			if (!this.tableOnly) {
@@ -215,7 +224,7 @@ export const CoreFilterCmpt = {
 				for (let evt of this.tabulatorEvents)
 					this.tabulator.on(evt.event, evt.handler);
 			}
-			this.tabulator.on('tableBuilt', () => this.tableBuilt = true);
+			this.tabulator.on('tableBuilt', () => {this.tableBuilt = true; this.$emit('tableBuilt');});
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
@@ -246,12 +255,12 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		getFilter: function() {
+		getFilter() {
 			if (this.selectedFilter === null)
-				this.startFetchCmpt(CoreFilterAPIs.getFilter, null, this.render);
+				this.startFetchCmpt(this.$fhcApi.factory.filter.getFilter, null, this.render);
 			else
 				this.startFetchCmpt(
-					CoreFilterAPIs.getFilterById,
+					this.$fhcApi.factory.filter.getFilterById,
 					{
 						filterId: this.selectedFilter
 					},
@@ -261,54 +270,47 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		render: function(response) {
+		render(response) {
+			let data = response;
+			this.filterName = data.filterName;
+			this.dataset = data.dataset;
+			this.datasetMetadata = data.datasetMetadata;
 
-			if (CoreRESTClient.hasData(response))
+			this.fields = data.fields;
+			this.selectedFields = data.selectedFields;
+			this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
+			this.filterFields = [];
+
+			for (let i = 0; i < data.datasetMetadata.length; i++)
 			{
-				let data = CoreRESTClient.getData(response);
-				this.filterName = data.filterName;
-				this.dataset = data.dataset;
-				this.datasetMetadata = data.datasetMetadata;
-				this.fields = data.fields;
-				this.selectedFields = data.selectedFields;
-				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
-				this.filterFields = [];
-
-				for (let i = 0; i < data.datasetMetadata.length; i++)
+				for (let j = 0; j < data.filters.length; j++)
 				{
-					for (let j = 0; j < data.filters.length; j++)
+					if (data.datasetMetadata[i].name == data.filters[j].name)
 					{
-						if (data.datasetMetadata[i].name == data.filters[j].name)
-						{
-							let filter = data.filters[j];
-							filter.type = data.datasetMetadata[i].type;
+						let filter = data.filters[j];
+						filter.type = data.datasetMetadata[i].type;
 
-							this.filterFields.push(filter);
-							//break;
-						}
+						this.filterFields.push(filter);
+						//break;
 					}
 				}
+			}
 
-				// If the side menu is active
-				if (this.sideMenu === true)
-				{
-					this.setSideMenu(data);
-				}
-				else // otherwise use the dropdown in the filter options
-				{
-					this.setDropDownMenu(data);
-				}
-				this.updateTabulator();
-			}
-			else
+			// If the side menu is active
+			if (this.sideMenu === true)
 			{
-				console.error(CoreRESTClient.getError(response));
+				this.setSideMenu(data);
 			}
+			else // otherwise use the dropdown in the filter options
+			{
+				this.setDropDownMenu(data);
+			}
+			this.updateTabulator();
 		},
 		/**
 		 * Set the menu
 		 */
-		setSideMenu: function(data) {
+		setSideMenu(data) {
 			let filters = data.sideMenu.filters;
 			let personalFilters = data.sideMenu.personalFilters;
 			let filtersArray = [];
@@ -362,7 +364,7 @@ export const CoreFilterCmpt = {
 		/**
 		 * Set the drop down menu
 		 */
-		setDropDownMenu: function(data) {
+		setDropDownMenu(data) {
 			let filters = data.sideMenu.filters;
 			let personalFilters = data.sideMenu.personalFilters;
 			let filtersArray = [];
@@ -398,7 +400,7 @@ export const CoreFilterCmpt = {
 		/**
 		 * Used to start/refresh the FetchCmpt
 		 */
-		startFetchCmpt: function(apiFunction, apiFunctionParameters, dataFetchedCallback) {
+		startFetchCmpt(apiFunction, apiFunctionParameters, dataFetchedCallback) {
 			// Assign the function api of the FetchCmpt binded property
 			this.fetchCmptApiFunction = apiFunction;
 
@@ -424,11 +426,11 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		handlerSaveCustomFilter: function(customFilterName) {
+		handlerSaveCustomFilter(customFilterName) {
 			this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				CoreFilterAPIs.saveCustomFilter,
+				this.$fhcApi.factory.filter.saveCustomFilter,
 				{
 					customFilterName
 				},
@@ -438,13 +440,13 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		handlerRemoveCustomFilter: function(event) {
-			filterId = event.currentTarget.getAttribute("href").substring(1);
+		handlerRemoveCustomFilter(event) {
+			let filterId = event.currentTarget.getAttribute("href").substring(1);
 			if (filterId === this.selectedFilter)
 				this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				CoreFilterAPIs.removeCustomFilter,
+				this.$fhcApi.factory.filter.removeCustomFilter,
 				{
 					filterId: filterId
 				},
@@ -481,7 +483,7 @@ export const CoreFilterCmpt = {
 		applyFilterConfig(filterFields) {
 			this.selectedFilter = null;
 			this.startFetchCmpt(
-				CoreFilterAPIs.applyFilterFields,
+				this.$fhcApi.factory.filter.applyFilterFields,
 				{
 					filterFields
 				},

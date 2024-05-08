@@ -6,30 +6,53 @@ export default {
     Adresse,
     Kontakt,
   },
+  inject: ["profilUpdateTopic"],
   data() {
     return {
-      files:null,
+      files: null,
     };
   },
-  methods:{
-    getDocumentLink: function(dms_id){
-      return FHC_JS_DATA_STORAGE_OBJECT.app_root +
-          FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-          `/Cis/ProfilUpdate/show/${dms_id}`;
-    }
+  methods: {
+    getDocumentLink: function (dms_id) {
+      return (
+        FHC_JS_DATA_STORAGE_OBJECT.app_root +
+        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+        `/Cis/ProfilUpdate/show/${dms_id}`
+      );
+    },
   },
   computed: {
     getComponentView: function () {
-      let title = this.topic.toLowerCase();
-      if (title.includes("adressen")) return "Adresse";
-      else if (title.includes("kontakte")) return "Kontakt";
-      else return "text_input";
+      if (
+        this.topic == this.profilUpdateTopic["Private Adressen"] ||
+        this.topic == this.profilUpdateTopic["Add Adresse"] ||
+        this.topic == this.profilUpdateTopic["Delete Adresse"]
+      ) {
+        return "Adresse";
+      } else if (
+        this.topic == this.profilUpdateTopic["Private Kontakte"] ||
+        this.topic == this.profilUpdateTopic["Add Kontakt"] ||
+        this.topic == this.profilUpdateTopic["Delete Kontakt"]
+      ) {
+        return "Kontakt";
+      } else {
+        return "text_input";
+      }
     },
     cardHeader: function () {
-      let title = this.topic.toLowerCase();
-      if (title.includes("delete")) return "Delete";
-      else if (title.includes("add")) return "Add";
-      else return "Update";
+      if (
+        this.topic == this.profilUpdateTopic["Delete Addresse"] ||
+        this.topic == this.profilUpdateTopic["Delete Kontakt"]
+      ) {
+        return "Delete";
+      } else if (
+        this.topic == this.profilUpdateTopic["Add Adresse"] ||
+        this.topic == this.profilUpdateTopic["Add Kontakt"]
+      ) {
+        return "Add";
+      } else {
+        return "Update";
+      }
     },
   },
   props: {
@@ -42,23 +65,25 @@ export default {
     topic: { type: String },
   },
   created() {
-    Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(this.updateID).then((res) =>{
-      this.files = res.data;
-    })
+    Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(this.updateID).then(
+      (res) => {
+        this.files = res.data;
+      }
+    );
   },
-  template: `
+  template: /*html*/ `
     <div class="row">
 
     <div class="col">
     <div  class="form-underline mb-2">
-    <div class="form-underline-titel">Status</div>
+    <div class="form-underline-titel">{{$p.t('global','status')}}</div>
     <span  class="form-underline-content">{{status}} </span>
     </div>
     </div>
 
     <div class="col">
     <div  class="form-underline mb-2">
-    <div class="form-underline-titel">Date</div>
+    <div class="form-underline-titel">{{$p.t('global','datum')}}</div>
     <span  class="form-underline-content">{{status_timestamp}} </span>
     </div>
     </div>
@@ -67,7 +92,7 @@ export default {
     <div class="row">
     <div class="col">
     <div v-if="status_message" class="form-underline mb-2 ">
-    <div class="form-underline-titel">Status message</div>
+    <div class="form-underline-titel">{{$p.t('profilUpdate','statusMessage')}}</div>
     <textarea  class="form-control" rows="4" disabled>{{status_message}} </textarea>
     </div>
     </div>

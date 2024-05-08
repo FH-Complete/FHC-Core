@@ -184,13 +184,30 @@ class filter extends basis_db
 	}
 
 	/**
-	 * Ausgabe des HTML Widgets
-	 * @param kurzbz des Datensatzes, der gefunden werden soll
+	 * Ausgabe des HTML Widgets. Parameter, die als GET übergeben werden, werden ausgelesen und vorselektiert
+	 * @param $kurzbz String Kurzbz des Datensatzes, der gefunden werden soll
 	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
 	public function getHtmlWidget($kurzbz)
 	{
 		$html='';
+		// GET-Parameter parsen und in String rausschreiben 
+		parse_str($this->getVars(), $getParams);
+		
+		foreach ($getParams AS $key=>$value)
+		{
+			// Vordefinierte Parameter entfernen
+			if ($key == 'type' ||
+				$key == 'statistik_kurzbz' ||
+				$key == 'report_id' ||
+				$key == 'putlog' ||
+				$key == 'systemfilter_id' ||
+				$key == 'debug')
+			{
+				unset($getParams[$key]);
+			}
+		}
+
 		foreach ($this->result as $filter)
 		{
 			if ($filter->kurzbz==$kurzbz)
@@ -206,14 +223,57 @@ class filter extends basis_db
 						$sql = str_replace('$user', $this->db_add_param($user), $filter->sql);
 						$this->loadValues($sql, $filter->valuename, $filter->showvalue);
 						foreach ($this->values as $value)
-							$html.="\n\t\t\t\t".'<option value="'.$value->value.'">'.$value->text.'</option>';
+						{
+							// Wenn ein Attribut als GET-Parameter übergeben wurde, dann vorselektieren
+							if (isset($getParams[$filter->kurzbz]))
+							{
+								//GET-Parameter aufsplitten
+								$paramsArr = explode(',',$getParams[$filter->kurzbz]);
+								//echo '<pre>', var_dump($value->value), '</pre>';
+								//$value->value = preg_replace('/(.*?)\s*selected.*/im', '$1', $value->value);
+								$value->value = preg_replace('/"\s*.*/im', '', $value->value);
+								//echo '<pre>', var_dump($value->value), '</pre>';
+
+								if (in_array($value->value, $paramsArr))
+									$html .= "\n\t\t\t\t".'<option value="'.$value->value.'" selected="selected">'.$value->text.'</option>';
+								else
+								{
+									//$value->value = preg_replace('/(.*?)selected=.selected./', '$1', $value->value);
+									//$value->value = preg_replace('/(.*?)\s*[selected=?selected?]/', '$1', $value->value);
+									//$value->value = preg_replace('/(.*?)\s*selected="selected"\s*/', '${1}', $value->value);
+									//$value->value = preg_replace('/^\s*selected=.*?selected.*?\s*/', ' ', $value->value);
+									//$value->value = str_replace('selected=', '', $value->value);
+
+									//echo '<pre>', var_dump($value->value), '</pre>';
+									$html .= "\n\t\t\t\t".'<option value="'.$value->value.'">'.$value->text.'</option>';
+								}
+							}
+							else
+							{
+								//$value->value = str_replace('selected="selected', '', $value->value);
+								$html .= "\n\t\t\t\t".'<option value="'.$value->value.'">'.$value->text.'</option>';
+							}
+						}
 						$html.="\n\t\t\t</select>";
 						break;
 					case 'datepicker':
-						$html .= '<input type="text" id="' . $filter->kurzbz . '" class="form-control" name="' . $filter->kurzbz . '">';
+						$html .= '<input type="text" id="'.$filter->kurzbz.'" class="form-control" name="'.$filter->kurzbz.'"';
+						if (isset($getParams[$filter->kurzbz]))
+						{
+							$html .= ' value="'.$getParams[$filter->kurzbz].'"';
+						}
+						$html .= ' >';
 						$html .= '<script>';
 						$html .= '$("#' . $filter->kurzbz . '").datepicker({ dateFormat: \'yy-mm-dd\' });';
 						$html .= '</script>';
+						break;
+					case 'text':
+						$html .= '<input type="text" id="'.$filter->kurzbz.'" class="form-control" name="'.$filter->kurzbz.'" '.$filter->htmlattr;
+						if (isset($getParams[$filter->kurzbz]))
+						{
+							$html .= ' value="'.$getParams[$filter->kurzbz].'"';
+						}
+						$html .= '>';
 						break;
 				}
 				return $html;

@@ -2,17 +2,19 @@ export default {
     props:{
         data:{
             type:String,
+            
         }
     },
     data(){
         return {
-
+         
         }
+    },mounted(){
     },
-    template: `
+    template: /*html*/`
     <div class="card">
         <div class="card-body">
-        <span>Der FH Ausweis ist am <b>{{data}}</b> ausgegeben worden.</span>
+        <span  >{{$p.t('profil','fhAusweisStatus',[data])}}</span>
         </div>
     </div>`,
 }

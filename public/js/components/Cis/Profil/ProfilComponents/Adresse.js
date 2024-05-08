@@ -13,7 +13,7 @@ export default {
     created(){
         
     },
-    template:`
+    template:/*html*/`
     
     <div class="gy-2 row justify-content-center align-items-center">
     
@@ -27,7 +27,7 @@ export default {
         <div  class="col-11 col-sm-8 col-xl-11 col-xxl-8 order-1">
 
         <div class="form-underline ">
-        <div class="form-underline-titel">Strasse</div>
+        <div class="form-underline-titel">{{$p.t('person','strasse')}}</div>
         <span class="form-underline-content">{{data.strasse}} </span>
         </div>
 
@@ -42,7 +42,7 @@ export default {
             
 
             <div class="form-underline ">
-            <div class="form-underline-titel">Typ</div>
+            <div class="form-underline-titel">{{$p.t('global','typ')}}</div>
             <span class="form-underline-content">{{data.typ}} </span>
             </div>
 
@@ -50,20 +50,20 @@ export default {
         <div  class="offset-1 order-3 order-sm-3 col-11 col-sm-6  col-xl-7 col-xxl-6 ">
             
             <div class="form-underline ">
-            <div class="form-underline-titel">Ort</div>
+            <div class="form-underline-titel">{{$p.t('person','ort')}}</div>
             <span class="form-underline-content">{{data.ort}} </span>
             </div>
         </div>
         <div  class=" offset-1 offset-sm-0 order-4 order-sm-2 order-xl-4 order-xxl-2 col-11 col-sm-3 col-xl-4 col-xxl-3 ">
             <div class="form-underline ">
-            <div class="form-underline-titel">PLZ</div>
+            <div class="form-underline-titel">{{$p.t('person','plz')}}</div>
             <span class="form-underline-content">{{data.plz}} </span>
             </div>
         </div>
 
         <div v-if="withZustelladresse" class="order-5 offset-1 col-11">
         <div class="form-underline ">
-        <div class="form-underline-titel">Zustelladresse</div>
+        <div class="form-underline-titel">{{$p.t('person','zustelladresse')}}</div>
             <div class="ms-2 form-check ">
                 <input class="form-check-input" type="checkbox"  @click.prevent :checked="data.zustelladresse"  >
                

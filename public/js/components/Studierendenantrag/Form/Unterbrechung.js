@@ -1,12 +1,15 @@
 import {CoreFetchCmpt} from '../../Fetch.js';
-import VueDatepicker from '../../vueDatepicker.js.php';
+import CoreForm from '../../Form/Form.js';
+import FormValidation from '../../Form/Validation.js';
+import FormInput from '../../Form/Input.js';
 
-var _uuid = 0;
 
 export default {
 	components: {
 		CoreFetchCmpt,
-		VueDatepicker
+		CoreForm,
+		FormValidation,
+		FormInput
 	},
 	emits: [
 		'setInfos',
@@ -20,12 +23,7 @@ export default {
 		return {
 			data: null,
 			saving: false,
-			errors: {
-				grund: [],
-				studiensemester: [],
-				datum_wiedereinstieg: [],
-				default: []
-			},
+			attachment: [],
 			stsem: null,
 			currentWiedereinstieg: '',
 			siteUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
@@ -37,17 +35,13 @@ export default {
 			switch (this.data.status)
 			{
 				case 'Erstellt': return 'info';
-				case 'Genehmigt': return 'success';
-				case 'Zurueckgezogen': return 'danger';
-				default: return 'info';
+				case 'Pause':
+				case 'Zurueckgezogen':
+				case 'Abgelehnt': return 'danger';
+				case 'Genehmigt':
+				case 'EmailVersandt': return 'success';
+				default: return 'warning';
 			}
-		},
-		loadUrl() {
-			if (this.studierendenantragId)
-				return '/components/Antrag/Unterbrechung/getDetailsForAntrag/'+
-				this.studierendenantragId;
-			return '/components/Antrag/Unterbrechung/getDetailsForNewAntrag/' +
-				this.prestudentId;
 		},
 		datumWsFormatted() {
 			let datumUnformatted = '';
@@ -62,26 +56,40 @@ export default {
 				return datumUnformatted;
 			let datum = new Date(datumUnformatted);
 			return datum.toLocaleDateString();
+		},
+		semesterOffsets() {
+			if (!this.data || !this.data.studiensemester)
+				return [];
+			return Object.values(this.data.studiensemester)
+				.filter(el => !el.disabled)
+				.map(el => el.studiensemester_kurzbz);
+		},
+		semester() {
+			if (!this.stsem)
+				return '';
+			return this.data.semester + this.semesterOffsets.indexOf(this.stsem);
 		}
 	},
 	methods: {
 		load() {
-			return axios.get(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				this.loadUrl
-			).then(
-				result => {
-					this.data = result.data.retval;
-					if (this.data.status) {
-						this.$emit("setStatus", {
-							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
-							severity: this.statusSeverity
-						});
+			return this.$fhcApi.factory
+				.studstatus.unterbrechung.getDetails(this.studierendenantragId, this.prestudentId)
+				.then(
+					result => {
+						this.data = result.data;
+						if (this.data.status) {
+							const msg = (this.data.status == 'Pause' && this.data.status_insertvon == "Studienabbruch") ? Vue.computed(() => {
+								let status = this.$p.t('studierendenantrag/status_stop');
+								return this.$p.t('studierendenantrag', 'status_x', {status});
+							}) : Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp}));
+							this.$emit("setStatus", {
+								msg,
+								severity: this.statusSeverity
+							});
+						}
+						return result;
 					}
-					return result;
-				}
-			);
+				);
 		},
 		createAntrag() {
 			this.$emit('setStatus', {
@@ -89,63 +97,41 @@ export default {
 				severity: 'warning'
 			});
 			this.saving = true;
-			for(var k in this.errors)
-				this.errors[k] = [];
 
-			var formData = new FormData();
-			var attachment = this.$refs.attachment;
-			formData.append("attachment", attachment.files[0]);
-			formData.append("studiensemester", this.stsem !== null && this.data.studiensemester[this.stsem].studiensemester_kurzbz);
-			formData.append("prestudent_id", this.data.prestudent_id);
-			formData.append("grund", this.$refs.grund.value);
-			formData.append("datum_wiedereinstieg", this.stsem !== null && this.currentWiedereinstieg);
+			this.$refs.form.clearValidation();
+			this.$refs.form.factory
+				.studstatus.unterbrechung.create(
+					this.stsem !== null && this.data.studiensemester[this.stsem].studiensemester_kurzbz,
+					this.data.prestudent_id,
+					this.data.grund,
+					this.stsem !== null && this.currentWiedereinstieg,
+					this.attachment
+				)
+				.then(result => {
+					if (Number.isInteger(result.data))
+						document.location += "/" + result.data;
 
-			axios.post(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Unterbrechung/createAntrag/',
-				formData,
-				{
-					headers: {
-						'Content-Type': 'multipart/form-data'
-					}
-				}
-			).then(
-				result => {
-					if (result.data.error)
-					{
-						for (var k in result.data.retval)
-						{
-							if (this.errors[k] !== undefined)
-								this.errors[k].push(result.data.retval[k]);
-							else
-								this.errors.default.push(result.data.retval[k]);
-						}
-						this.$emit('setStatus', {
-							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
-							severity: 'danger'
+					this.data = result.data;
+					if (this.data.status)
+						this.$emit("setStatus", {
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
+							severity: this.statusSeverity
 						});
-					}
 					else
-					{
-						if (Number.isInteger(result.data.retval))
-							document.location += "/" + result.data.retval;
-						this.data = result.data.retval;
-						if (this.data.status) {
-							this.$emit("setStatus", {
-								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
-								severity: this.statusSeverity
-							});
-						}
-						else
-							this.$emit('setStatus', {
-								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_created')})),
-								severity: 'info'
-							});
-					}
+						this.$emit('setStatus', {
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_created')})),
+							severity: 'info'
+						});
 					this.saving = false;
-				}
-			);
+				})
+				.catch(error => {
+					this.$emit('setStatus', {
+						msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
+						severity: 'danger'
+					});
+					this.saving = false;
+					this.$fhcAlert.handleSystemError(error);
+				});
 		},
 		cancelAntrag() {
 			this.$emit('setStatus', {
@@ -153,63 +139,45 @@ export default {
 				severity: 'warning'
 			});
 			this.saving = true;
-			for(var k in this.errors)
-				this.errors[k] = [];
-			axios.post(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Unterbrechung/cancelAntrag/', {
-					antrag_id: this.data.studierendenantrag_id
-				}
-			).then(
-				result => {
-					if (result.data.error)
-					{
-						for (var k in result.data.retval)
-						{
-							if (this.errors[k] !== undefined)
-								this.errors[k].push(result.data.retval[k]);
-							else
-								this.errors.default.push(result.data.retval[k]);
-						}
+
+			this.$refs.form.clearValidation();
+			this.$refs.form.factory
+				.studstatus.unterbrechung.cancel(
+					this.data.studierendenantrag_id
+				)
+				.then(result => {
+					if (Number.isInteger(result.data))
+						document.location = document.location.replace(/unterbrechung\/([0-9]*)\/[0-9]*[\/]?$/, 'unterbrechung/$1') +  "/" + result.data;
+
+					this.data = result.data;
+					if (this.data.status)
+						this.$emit("setStatus", {
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
+							severity: this.statusSeverity
+						});
+					else
 						this.$emit('setStatus', {
-							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_cancelled')})),
 							severity: 'danger'
 						});
-					}
-					else
-					{
-						if (Number.isInteger(result.data.retval)) {
-							document.location = document.location.replace(/unterbrechung\/([0-9]*)\/[0-9]*[\/]?$/, 'unterbrechung/$1') +  "/" + result.data.retval;
-						}
-						this.data = result.data.retval;
-						if (this.data.status) {
-							this.$emit("setStatus", {
-								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
-								severity: this.statusSeverity
-							});
-						}
-						else
-							this.$emit('setStatus', {
-								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_cancelled')})),
-								severity: 'danger'
-							});
-					}
 					this.saving = false;
-				}
-			);
+				})
+				.catch(error => {
+					this.$emit('setStatus', {
+						msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
+						severity: 'danger'
+					});
+					this.saving = false;
+					this.$fhcAlert.handleSystemError(error);
+				});
 		}
-	},
-	created() {
-		this.uuid = _uuid++;
 	},
 	template: `
 	<div class="studierendenantrag-form-unterbrechung">
 		<core-fetch-cmpt :api-function="load">
-			<div class="row">
+			<core-form ref="form" class="row">
 				<div class="col-12">
-					<div v-for="error in errors.default" class="alert alert-danger" role="alert" v-html="error">
-					</div>
+					<form-validation></form-validation>
 					<table class="table">
 						<tr>
 							<th>{{$p.t('lehre', 'studiengang')}}</th>
@@ -235,99 +203,105 @@ export default {
 						<tr>
 							<th>{{$p.t('lehre', 'semester')}}</th>
 							<td align="right" v-if="data.studierendenantrag_id">{{data.semester}}</td>
-							<td align="right" v-else>{{stsem === null ? '' : data.studiensemester[stsem].semester}}</td>
+							<td align="right" v-else>{{semester}}</td>
 						</tr>
 					</table>
 				</div>
 
 				<div class="col-sm-6 mb-3">
-					<label :for="'studierendenantrag-form-abmeldung-' + uuid + '-stsem'" class="form-label">
-						{{$p.t('lehre', 'studiensemester')}}
-					</label>
 					<div v-if="data.studierendenantrag_id">
-						{{data.studiensemester_kurzbz}}
-					</div>
-					<div v-else>
-						<select
-							class="form-select"
-							:class="{'is-invalid': errors.studiensemester.length}"
-							v-model="stsem"
-							required
-							:id="'studierendenantrag-form-abmeldung-' + uuid + '-stsem'"
-							@input="currentWiedereinstieg = ''"
-							>
-							<option v-for="(stsem, index) in data.studiensemester" :key="index" :value="index">
-								{{stsem.studiensemester_kurzbz}}
-							</option>
-						</select>
-						<div v-if="errors.studiensemester.length" class="invalid-feedback">
-							{{errors.studiensemester.join(".")}}
+						<label class="form-label">
+							{{$p.t('lehre', 'studiensemester')}}
+						</label>
+						<div>
+							{{data.studiensemester_kurzbz}}
 						</div>
 					</div>
+					<form-input
+						v-else
+						type="select"
+						v-model="stsem"
+						name="studiensemester"
+						:label="$p.t('lehre', 'studiensemester')"
+						required
+						@input="currentWiedereinstieg = ''"
+						>
+						<option v-for="(stsem, index) in data.studiensemester" :key="index" :value="index" :disabled="stsem.disabled">
+							{{stsem.studiensemester_kurzbz}}
+						</option>
+					</form-input>
 				</div>
 				<div class="col-sm-6 mb-3">
-					<label class="form-label">
-						{{$p.t('studierendenantrag', 'antrag_datum_wiedereinstieg')}}
-					</label>
-
 					<div v-if="data.studierendenantrag_id">
-						{{datumWsFormatted}}
+						<label class="form-label">
+							{{$p.t('studierendenantrag', 'antrag_datum_wiedereinstieg')}}
+						</label>
+						<div>
+							{{datumWsFormatted}}
+						</div>
 					</div>
-					<div v-else-if="stsem === null">
-						<select class="form-select" disabled>
-							<option selected>{{$p.t('ui/select_studiensemester')}}</option>
-						</select>
-					</div>
-					<div v-else>
-						<select v-model="currentWiedereinstieg" class="form-select">
-							<option v-for="sem in data.studiensemester[stsem].wiedereinstieg" :key="sem.studiensemester_kurzbz" :value="sem.start">
-								{{sem.studiensemester_kurzbz}}
-							</option>
-						</select>
-					</div>
-
-					<div v-if="errors.datum_wiedereinstieg.length" class="invalid-feedback d-block">
-						{{errors.datum_wiedereinstieg.join(".")}}
-					</div>
+					<form-input
+						v-else-if="stsem === null"
+						type="select"
+						:label="$p.t('studierendenantrag', 'antrag_datum_wiedereinstieg')"
+						modelValue=""
+						name="datum_wiedereinstieg"
+						disabled
+						>
+						<template #default>
+							<option value="" selected disabled hidden>{{$p.t('ui/select_studiensemester')}}</option>
+						</template>
+					</form-input>
+					<form-input
+						v-else
+						type="select"
+						:label="$p.t('studierendenantrag', 'antrag_datum_wiedereinstieg')"
+						v-model="currentWiedereinstieg"
+						name="datum_wiedereinstieg"
+						>
+						<option v-for="sem in data.studiensemester[stsem].wiedereinstieg" :key="sem.studiensemester_kurzbz" :value="sem.start" :disabled="sem.disabled">
+							{{sem.studiensemester_kurzbz}}
+						</option>
+					</form-input>
 				</div>
-				<div v-if="data.studierendenantrag_id" class="mb-3">
-					<h5>{{$p.t('studierendenantrag', 'antrag_grund')}}:</h5>
-					<textarea class="form-control" rows="5" readonly>{{data.grund}}</textarea>
-				</div>
-				<div v-else class="col-sm-6 mb-3">
-					<label :for="'studierendenantrag-form-abmeldung-' + uuid + '-grund'" class="form-label">Grund:</label>
-					<textarea
-						class="form-control"
-						:class="{'is-invalid': errors.grund.length}"
-						:id="'studierendenantrag-form-abmeldung-' + uuid + '-grund'"
+				<div class="col-sm-6 mb-3">
+					<form-input
+						v-if="data.studierendenantrag_id"
+						type="textarea"
+						:label="$p.t('studierendenantrag', 'antrag_grund') + ':'"
+						v-model="data.grund"
+						name="grund"
 						rows="5"
-						:disabled="saving"
+						readonly
+						>
+					</form-input>
+					<form-input
+						v-else
 						ref="grund"
+						type="textarea"
+						:label="$p.t('studierendenantrag', 'antrag_grund') + ':'"
+						v-model="data.grund"
+						name="grund"
+						:disabled="saving"
+						rows="5"
 						required
-						></textarea>
-					<div v-if="errors.grund.length" class="invalid-feedback">
-						{{errors.grund.join(".")}}
-					</div>
+						>
+					</form-input>
 				</div>
 				<div class="col-12 mb-3">
-
 					<div v-if="data.studierendenantrag_id">
 						<a v-if="data.dms_id" target="_blank" :href="siteUrl + '/lehre/Antrag/Attachment/Show/' + data.dms_id"> {{$p.t('studierendenantrag', 'antrag_dateianhaenge')}} </a>
 						<span v-else>{{$p.t('studierendenantrag', 'no_attachments')}}</span>
 					</div>
-					<div v-else>
-						<label
-							:for="'studierendenantrag-form-abmeldung-' + uuid + '-attachment'"
-							class="form-label">
-							{{$p.t('studierendenantrag', 'antrag_dateianhaenge')}}
-						</label>
-						<input
-							class="form-control"
-							type="file"
-							ref="attachment"
-							:id="'studierendenantrag-form-abmeldung-' + uuid + '-attachment'"
-							name="attachment">
-					</div>
+					<form-input
+						v-else
+						ref="attachment"
+						type="uploadfile"
+						:label="$p.t('studierendenantrag', 'antrag_dateianhaenge')"
+						v-model="attachment"
+						name="attachment"
+						>
+					</form-input>
 				</div>
 				<div class="col-12 text-end">
 					<button
@@ -349,13 +323,12 @@ export default {
 						{{$p.t('studierendenantrag', 'btn_cancel')}}
 					</button>
 				</div>
-			</div>
+			</core-form>
 			<template v-slot:error="{errorMessage}">
 				<div class="alert alert-danger m-0" role="alert">
 					{{ errorMessage }}
 				</div>
 			</template>
 		</core-fetch-cmpt>
-	</div>
-	`
+	</div>`
 }

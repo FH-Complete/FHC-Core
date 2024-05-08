@@ -22,14 +22,16 @@ export default {
     RoleInformation,
     ProfilInformation,
     FetchProfilUpdates,
-    EditProfil
-
+    EditProfil,
   },
-  inject:['sortProfilUpdates','collapseFunction'],
+  inject: ["sortProfilUpdates", "collapseFunction"],
   data() {
     return {
       showModal: false,
       collapseIconBetriebsmittel: true,
+      editDataFilter: null,
+
+      // tabulator options
       zutrittsgruppen_table_options: {
         height: 200,
         layout: "fitColumns",
@@ -79,58 +81,70 @@ export default {
   },
 
   props: {
-    data:Object,
-    editData:Object,
+    data: Object,
+    editData: Object,
   },
   methods: {
-
-    fetchProfilUpdates: function(){
-      Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res)=>{
-        
-        if(!res.error){
-          this.data.profilUpdates = res.data?.length ? res.data.sort(this.sortProfilUpdates) : null ; 
+    betriebsmittelTableBuilt: function () {
+      this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
+    },
+    zutrittsgruppenTableBuilt: function () {
+      this.$refs.zutrittsgruppenTable.tabulator.setData(
+        this.data.zuttritsgruppen
+      );
+    },
+    fetchProfilUpdates: function () {
+      Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res) => {
+        if (!res.error) {
+          this.data.profilUpdates = res.data?.length
+            ? res.data.sort(this.sortProfilUpdates)
+            : null;
         }
       });
     },
-    
-    hideEditProfilModal: function(){
-      
+
+    hideEditProfilModal: function () {
       //? checks the editModal component property result, if the user made a successful request or not
-      if(this.$refs.editModal.result){
+      if (this.$refs.editModal.result) {
         Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
-        .then((request) =>{
-          if(!request.error){
-            this.data.profilUpdates = request.data;
-            this.data.profilUpdates.sort(this.sortProfilUpdates);
-            
-          }else{
-            console.log("Error when fetching profile updates: " +res.data);
-          }
-        })
-        .catch(err=>{
-          console.log(err);
-        });
-      }else{
+          .then((request) => {
+            if (!request.error) {
+              this.data.profilUpdates = request.data;
+              this.data.profilUpdates.sort(this.sortProfilUpdates);
+            } else {
+              console.log("Error when fetching profile updates: " + res.data);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
         // when modal was closed without submitting request
       }
-      this.showModal=false;
-     
+      this.showModal = false;
+      this.editDataFilter = null;
     },
 
-    showEditProfilModal() {
+    showEditProfilModal(view) {
+      if (view) {
+        this.editDataFilter = view;
+      }
       this.showModal = true;
       // after a state change, wait for the DOM updates to complete
-      Vue.nextTick(()=>{
+      Vue.nextTick(() => {
         this.$refs.editModal.show();
       });
-      
     },
-   
   },
 
   computed: {
- 
-   profilInformation() {
+    filteredEditData() {
+      return this.editDataFilter
+        ? this.editData.data[this.editDataFilter]
+        : this.editData;
+    },
+
+    profilInformation() {
       if (!this.data) {
         return {};
       }
@@ -142,13 +156,11 @@ export default {
         Anrede: this.data.anrede,
         Titel: this.data.titel,
         Postnomen: this.data.postnomen,
-        foto_sperre:this.data.foto_sperre,
-        foto:this.data.foto,
-
+        foto_sperre: this.data.foto_sperre,
+        foto: this.data.foto,
       };
     },
 
-   
     roleInformation() {
       if (!this.data) {
         return {};
@@ -164,36 +176,19 @@ export default {
         Gruppe: this.data.gruppe.trim(),
       };
     },
-
-    
   },
 
-  created(){
-
+  created() {
     //? sorts the profil Updates: pending -> accepted -> rejected
     this.data.profilUpdates?.sort(this.sortProfilUpdates);
   },
 
-  mounted() {
-    this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
-    
-      this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
-      
-  }) 
-
-  this.$refs.zutrittsgruppenTable.tabulator.on('tableBuilt', () => {
   
-      this.$refs.zutrittsgruppenTable.tabulator.setData(this.data.zuttritsgruppen);
-      
-  }) 
 
-   
-  },
-
-  template:/*html*/ ` 
+  template: /*html*/ ` 
 
   <div class="container-fluid text-break fhc-form"  >
-  <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="Profil bearbeiten" ></edit-profil>
+  <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" title="$p.t('profil','profilBearbeiten')" ></edit-profil>
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
@@ -202,7 +197,7 @@ export default {
               <div class="row py-2">
                 <div class="col">
                 
-                <quick-links :mobile="true"></quick-links>
+                <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
                 </div>
               </div>
 
@@ -215,7 +210,7 @@ export default {
                   <div class="col-2">
                     <i class="fa fa-edit"></i>
                   </div>
-                  <div class="col-10">Bearbeiten</div>
+                  <div class="col-10">{{$p.t('ui','bearbeiten')}}</div>
                 </div>
               </button>
               </div>
@@ -245,27 +240,12 @@ export default {
                     <!-- ROW WITH THE PROFIL INFORMATION --> 
                     <div class="row mb-4 ">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     <div  class="col-lg-12 col-xl-6 ">
                     <div class="row mb-4">
                     <div class="col">
                     
                     <!-- PROFIL INFORMATION -->
-                    <profil-information title="StudentIn" :data="profilInformation"></profil-information>
+                    <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation"></profil-information>
 
 
                     </div>
@@ -275,8 +255,8 @@ export default {
 
                     <div  class=" col-lg-12">
        
-                   <!-- MITARBEITER INFO -->
-                   <role-information title="Student Information" :data="roleInformation"></role-information>
+                   <!-- STUDENT INFO -->
+                   <role-information :title="$p.t('profil','studentInformation')" :data="roleInformation"></role-information>
 
 
                     </div> 
@@ -288,16 +268,11 @@ export default {
                    
                    </div>
 
-
-
-
-
-
                     <div  class="col-xl-6 col-lg-12 ">
                     <div class="row mb-4">
                     <div class="col">
                     <!-- EMAILS -->
-                    <profil-emails :data="data.emails" ></profil-emails>
+                    <profil-emails :title="this.$p.t('person','email')" :data="data.emails" ></profil-emails>
                     </div>
                     </div>
 
@@ -310,7 +285,15 @@ export default {
                       
                       <div class="card">
                           <div class="card-header">
-                            Private Kontakte
+                          <div class="row">
+                              <div @click="showEditProfilModal('Private_Kontakte')" class="col-auto" type="button">
+                                <i class="fa fa-edit"></i>
+                              </div>
+                              <div class="col">
+                                <span>{{$p.t('profil','privateKontakte')}}</span>
+                              </div>
+                            </div>
+                            
                           </div>
                           <div class="card-body ">
                             
@@ -332,7 +315,16 @@ export default {
                     <!-- PRIVATE ADRESSEN-->
 
                     <div class="card">
-                        <div class="card-header">Private Adressen</div>
+                        <div class="card-header">
+                        <div class="row">
+                              <div @click="showEditProfilModal('Private_Adressen')" class="col-auto" type="button">
+                                <i class="fa fa-edit"></i>
+                              </div>
+                              <div class="col">
+                                <span>{{$p.t('profil','privateAdressen')}}</span>
+                              </div>
+                            </div>
+                        </div>
                           <div class="card-body">
                           
                             <div class="gy-3 row ">
@@ -356,27 +348,18 @@ export default {
                 <div class="row">
 
                   <div class="col-12 mb-4" >
-                    <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
+                    <core-filter-cmpt @tableBuilt="betriebsmittelTableBuilt" :title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div> 
 
                   <div class="col-12 mb-4" >
-                    <core-filter-cmpt title="Zutrittsgruppen" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options"  tableOnly :sideMenu="false" noColumnFilter />
+                    <core-filter-cmpt @tableBuilt="zutrittsgruppenTableBuilt" :title="$p.t('profil','zutrittsGruppen')" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options"  tableOnly :sideMenu="false" noColumnFilter />
             
                   </div>
 
                 </div>
 
-
-
-
-
-
-
               <!-- END OF MAIN CONTENT COL -->
               </div>
-
-
-
 
               <!-- START OF SIDE PANEL -->
               <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
@@ -386,7 +369,7 @@ export default {
                   <div class="col">
                  
                   <!-- QUICK LINKS -->     
-                   <quick-links ></quick-links>
+                   <quick-links :title="$p.t('profil','quickLinks')"></quick-links>
                       
                   
                   </div>
@@ -396,12 +379,12 @@ export default {
   
                 <div class="row d-none d-md-block">
                 <div class="col mb-3">
-                <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                <button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                   <div class="row">
                     <div class="col-2">
                       <i class="fa fa-edit"></i>
                     </div>
-                    <div class="col-10">Bearbeiten</div>
+                    <div class="col-10">{{$p.t('ui','bearbeiten')}}</div>
                   </div>
                 </button>
                 </div>
@@ -439,11 +422,7 @@ export default {
 
                   
                   <!-- HIER SIND DIE MAILVERTEILER -->
-                   <mailverteiler :data="data?.mailverteiler"></mailverteiler>
-
-
-
-
+                   <mailverteiler :title="$p.t('profil','mailverteiler')" :data="data?.mailverteiler"></mailverteiler>
 
                   </div>
 
@@ -452,11 +431,6 @@ export default {
 
                 <!-- END OF SIDE PANEL -->
               </div>
-
-
-            
-
-
 
           <!-- END OF CONTAINER ROW-->
           

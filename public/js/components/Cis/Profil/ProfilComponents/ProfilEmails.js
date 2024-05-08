@@ -1,19 +1,17 @@
 export default {
-    data(){
-        return {
-
-        }
+  data() {
+    return {};
+  },
+  props: {
+    title: {
+      type: String,
+      required: true,
     },
-    props:{
-        title:{
-            type:String,
-            default:"Mails",
-        },
-        data:{
-            type:Array,
-        }
+    data: {
+      type: Array,
     },
-    template: `
+  },
+  template: /*html*/ `
     <div class="card ">
     <div class="card-header">
     {{title}}
@@ -21,17 +19,7 @@ export default {
    
     <div class="card-body">
 
-
-
-   
-
-      
-
-      
-
       <!-- HIER SIND DIE EMAILS -->
-  
-
   
       <div  class="gy-3 row justify-content-center ">
       <div v-for="email in data" class="col-12 ">
@@ -70,5 +58,5 @@ export default {
 
 
     </div>
-    </div>`
-}
+    </div>`,
+};

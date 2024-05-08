@@ -102,6 +102,22 @@ $noten_obj->getAll();
 $sprachen = new sprache();
 $sprachen->getAll(true);
 
+
+$noten_array = array();
+$js_noten='';
+foreach ($noten_obj->result as $row)
+{
+	$js_noten .= "	noten_array['" . $row->note . "']='" . addslashes($row->bezeichnung) . "';\n";
+	$noten_array[$row->note]['bezeichnung'] = $row->bezeichnung;
+	$noten_array[$row->note]['positiv'] = $row->positiv;
+	$noten_array[$row->note]['aktiv'] = $row->aktiv;
+	$noten_array[$row->note]['lehre'] = $row->lehre;
+	$noten_array[$row->note]['lkt_ueberschreibbar'] = $row->lkt_ueberschreibbar;
+	$noten_array[$row->note]['anmerkung'] = $row->anmerkung;
+	foreach ($sprachen->result as $s)
+		$noten_array[$row->note]['bezeichnung_mehrsprachig'][$s->sprache] = $row->bezeichnung_mehrsprachig[$s->sprache];
+}
+
 $errormsg = '';
 
 // eingetragene lv-gesamtnoten freigeben
@@ -326,19 +342,7 @@ echo '<!DOCTYPE HTML>
 	var noten_array = Array();
 ';
 
-$noten_array = array();
-foreach ($noten_obj->result as $row)
-{
-	echo "	noten_array['" . $row->note . "']='" . addslashes($row->bezeichnung) . "';\n";
-	$noten_array[$row->note]['bezeichnung'] = $row->bezeichnung;
-	$noten_array[$row->note]['positiv'] = $row->positiv;
-	$noten_array[$row->note]['aktiv'] = $row->aktiv;
-	$noten_array[$row->note]['lehre'] = $row->lehre;
-	$noten_array[$row->note]['lkt_ueberschreibbar'] = $row->lkt_ueberschreibbar;
-	$noten_array[$row->note]['anmerkung'] = $row->anmerkung;
-	foreach ($sprachen->result as $s)
-		$noten_array[$row->note]['bezeichnung_mehrsprachig'][$s->sprache] = $row->bezeichnung_mehrsprachig[$s->sprache];
-}
+echo $js_noten;
 
 ?>
 
@@ -806,16 +810,16 @@ foreach ($noten_obj->result as $row)
 		for(row in rows)
 		{
 			linenumber++;
-			if( rows[row] == '' ) 
+			if( rows[row] == '' )
 			{
 				//skip empty lines
 				continue;
 			}
 			zeile = rows[row].split("	");
-			
+
 			if( zeile.length < 2 )
 			{
-			  alertMsg = alertMsg + "Zeile " + linenumber + ': ' 
+			  alertMsg = alertMsg + "Zeile " + linenumber + ': '
 			  + 'Zu wenig Paramter - 2 erforderlich.  '
 			  + 'Die Zeile wurde uebersprungen.' + "\n\n";
 			  continue;
@@ -917,36 +921,36 @@ foreach ($noten_obj->result as $row)
 		for(row in rows)
 		{
 			linenumber++;
-			if( rows[row] == '' ) 
+			if( rows[row] == '' )
 			{
 				//skip empty lines
 				continue;
 			}
 			zeile = rows[row].split("	");
-			
+
 			if( zeile.length < 3 )
 			{
-			  alertMsg = alertMsg + "Zeile " + linenumber + ': ' 
+			  alertMsg = alertMsg + "Zeile " + linenumber + ': '
 			  + 'Zu wenig Paramter - 3 erforderlich.  '
 			  + 'Die Zeile wurde uebersprungen.' + "\n\n";
 			  continue;
 			}
-			
+
 			if( zeile[1] == '' && zeile[2] == '' )
 			{
-				// ignore lines just copied from excel 
+				// ignore lines just copied from excel
 				continue;
 			}
-			
-			if( zeile[2] == '' ) 
+
+			if( zeile[2] == '' )
 			{
 				alertMsg = alertMsg + "Zeile " + linenumber + ': '
 					+ "Die Note oder Punkte fehlen. "
 					+ "Die Zeile wurde uebersprungen. \n\n";
-				continue;			
+				continue;
 			}
-			
-			if (CIS_GESAMTNOTE_PUNKTE == false) 
+
+			if (CIS_GESAMTNOTE_PUNKTE == false)
 			{
 				// check for valid grades
 				if (validGrades.indexOf(zeile[2]) === -1)
@@ -958,7 +962,7 @@ foreach ($noten_obj->result as $row)
 				}
 			}
 
-			if( !zeile[1].match(/[0-9]{2}\.[0-9]{2}\.[0-9]{4}/)  ) 
+			if( !zeile[1].match(/[0-9]{2}\.[0-9]{2}\.[0-9]{4}/)  )
 			{
 				alertMsg = alertMsg + "Zeile " + linenumber + ': '
 					+ "Das Datum "+zeile[1]+" fehlt oder ist nicht zulaessig. "

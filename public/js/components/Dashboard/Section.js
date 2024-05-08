@@ -125,6 +125,8 @@ export default {
 			<template v-slot="item">
 				<dashboard-item
 					:id="item.widget"
+					:width="item.w"
+					:height="item.h"
 					:loading="item.loading"
 					:config="item.config"
 					:custom="item.custom"

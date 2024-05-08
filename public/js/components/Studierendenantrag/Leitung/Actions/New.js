@@ -35,28 +35,32 @@ export default {
 			});
 		},
 		loadData(evt) {
-			if (this.abortController)
-				this.abortController.abort();
+                        if( evt.query.length < 2 )
+                        {
+                            return false;
+                        }
+
+			if (this.abortController instanceof AbortController
+                            && this.abortController.signal.aborted === false)
+                        {
+                            this.abortController.abort();
+                        }
 			this.abortController = new AbortController();
 
-			axios.post(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Abmeldung/getStudiengaengeAssistenz/',
-				evt,
-				{
-					signal: this.abortController.signal
-				}
-			).then(
-				result => {
-					if (result.data.error) {
-						BsAlert.popup(result.data.retval, {dialogClass: 'alert alert-danger'});
-					} else {
-						this.data = result.data.retval;
-					}
-					return result;
-				}
-			).catch(() => {});
+			this.$fhcApi.factory
+				.studstatus.leitung.getPrestudents(evt.query, this.abortController.signal)
+				.then(result => {
+					this.data = result.data;
+                                        this.abortController = null;
+				})
+				.catch(error => {
+                                    if (this.abortController instanceof AbortController 
+                                        && this.abortController.signal.aborted === false)
+                                    {
+                                        this.abortController.abort();
+                                    }
+                                    this.$fhcAlert.handleSystemError(error);
+                                });
 		}
 	},
 	template: `
@@ -79,15 +83,20 @@ export default {
 								class="w-100"
 								v-model="student"
 								:suggestions="data"
-								optionLabel = "name"
+								option-label = "name"
 								@complete="loadData"
-								inputId="newAntragModalAutoComplete"
+								input-id="newAntragModalAutoComplete"
 								dropdown
 								dropdown-mode="current"
 								>
 								<template #option="slotProps">
 									<div :title="slotProps.option.prestudent_id">
-									{{slotProps.option.name}}
+										{{slotProps.option.name}}
+									</div>
+								</template>
+								<template #empty>
+									<div class="text-muted px-3 py-2">
+										{{ $p.t('ui/keineEintraegeGefunden') }}
 									</div>
 								</template>
 							</auto-complete>

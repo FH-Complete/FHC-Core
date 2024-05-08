@@ -74,7 +74,10 @@ require_once('../../include/reihungstest.class.php');
 require_once('../../include/studienplan.class.php');
 require_once('../../include/mobilitaet.class.php');
 require_once('../../include/studienordnung.class.php');
+require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/bisverwendung.class.php');
 require_once('../../include/bismeldestichtag.class.php');
+require_once('../../include/stundensatz.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -2584,13 +2587,16 @@ if(!$error)
 		}
 		else
 		{
+			if(defined('FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE') && isset(unserialize(FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE)[$_POST['buchungstyp_kurzbz']]))
+				$kostenstelle = unserialize(FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE)[$_POST['buchungstyp_kurzbz']];
+
 			foreach ($person_ids as $person_id)
 			{
 				if($person_id!='')
 				{
 					$buchung = new konto();
 					$buchung->person_id = $person_id;
-					$buchung->studiengang_kz = $_POST['studiengang_kz'];
+					$buchung->studiengang_kz = isset($kostenstelle) ? $kostenstelle : $_POST['studiengang_kz'];
 					$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 					$buchung->buchungsnr_verweis='';
 					$buchung->betrag = $_POST['betrag'];
@@ -4651,6 +4657,7 @@ if(!$error)
 			$errormsg = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
+
 	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
 	{
 		if(isset($_POST['person_id']) && isset($_POST['studiensemester_kurzbz']))
@@ -4658,33 +4665,87 @@ if(!$error)
 			$studiensemester = new studiensemester();
 			if ($studiensemester->load($_POST['studiensemester_kurzbz']))
 			{
-				$qry = "SELECT ss.stundensatz
-					FROM hr.tbl_stundensatz ss
-						JOIN public.tbl_mitarbeiter ON ss.uid = tbl_mitarbeiter.mitarbeiter_uid
-						JOIN public.tbl_benutzer ON(tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid)
-					WHERE person_id=".$db->db_add_param($_POST['person_id'], FHC_INTEGER) ."
-						AND stundensatztyp = ". $db->db_add_param('lehre') ."
-						AND gueltig_von <= ". $db->db_add_param($studiensemester->ende) ."
-						AND (gueltig_bis >= ". $db->db_add_param($studiensemester->start) ." OR gueltig_bis IS NULL)
-					ORDER BY gueltig_bis DESC NULLS FIRST, gueltig_von DESC NULLS LAST LIMIT 1
-					";
-				if($result = $db->db_query($qry))
+				if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+					&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
 				{
-					if($row = $db->db_fetch_object($result))
+					// Mitarbeiter laden
+					$qry = "
+						SELECT
+							mitarbeiter_uid, fixangestellt
+						FROM
+							public.tbl_mitarbeiter
+							JOIN public.tbl_benutzer ON(tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid)
+						WHERE
+							person_id=".$db->db_add_param($_POST['person_id'], FHC_INTEGER) ."
+						ORDER BY tbl_mitarbeiter.insertamum DESC NULLS LAST LIMIT 1
+						";
+					if($result = $db->db_query($qry))
 					{
-						$data = $row->stundensatz;
-						$return = true;
-					}
-					else
-					{
-						$data = '80.00';
-						$return = true;
+						if($row = $db->db_fetch_object($result))
+						{
+							$uid = $row->mitarbeiter_uid;
+
+							if($db->db_parse_bool($row->fixangestellt)==true)
+							{
+								// Fixangestellte haben keinen Stundensatz
+								$data = '';
+								$return = true;
+							}
+							else
+							{
+								// Stundensatz des Mitarbeiters laden
+								$stundensatz = new stundensatz();
+								if($stundensatz->getStundensatzDatum($uid, $studiensemester->start, $studiensemester->ende, 'lehre'))
+								{
+									$data = $stundensatz->stundensatz;
+									$return = true;
+								}
+								else
+								{
+									// Keine Stundensatz hinterlegt
+									$data = '0.00';
+									$return = true;
+								}
+							}
+						}
+						else
+						{
+							// Kein Mitarbeiter gefunden, kein Stundensatz
+							$data = '0.00';
+							$return = true;
+						}
 					}
 				}
 				else
 				{
-					$return = false;
-					$errormsg = 'Unbekannter Fehler';
+					$qry = "SELECT ss.stundensatz
+						FROM hr.tbl_stundensatz ss
+							JOIN public.tbl_mitarbeiter ON ss.uid = tbl_mitarbeiter.mitarbeiter_uid
+							JOIN public.tbl_benutzer ON(tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid)
+						WHERE person_id=".$db->db_add_param($_POST['person_id'], FHC_INTEGER) ."
+							AND stundensatztyp = ". $db->db_add_param('lehre') ."
+							AND gueltig_von <= ". $db->db_add_param($studiensemester->ende) ."
+							AND (gueltig_bis >= ". $db->db_add_param($studiensemester->start) ." OR gueltig_bis IS NULL)
+						ORDER BY gueltig_bis DESC NULLS FIRST, gueltig_von DESC NULLS LAST LIMIT 1
+						";
+					if($result = $db->db_query($qry))
+					{
+						if($row = $db->db_fetch_object($result))
+						{
+							$data = $row->stundensatz;
+							$return = true;
+						}
+						else
+						{
+							$data = '80.00';
+							$return = true;
+						}
+					}
+					else
+					{
+						$return = false;
+						$errormsg = 'Unbekannter Fehler';
+					}
 				}
 			}
 			else
@@ -4692,8 +4753,15 @@ if(!$error)
 				$return = false;
 				$errormsg = 'Fehler beim Laden des Studiensemesters';
 			}
+
 		}
-	}
+		else
+		{
+			$data = '20.00'.$_POST['studiensemester_kurzbz'];
+			$return = true;
+		}
+ 	}
+
 	elseif(isset($_POST['type']) && $_POST['type']=='saveanrechnung')
 	{
 		$anrechnung = new anrechnung();

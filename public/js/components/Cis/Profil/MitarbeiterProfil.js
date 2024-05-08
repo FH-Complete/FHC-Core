@@ -30,7 +30,9 @@ export default {
   data() {
     return {
       showModal: false,
+      editDataFilter: null,
 
+      // tabulator options
       funktionen_table_options: {
         height: 300,
         layout: "fitColumns",
@@ -140,6 +142,12 @@ export default {
   },
 
   methods: {
+    betriebsmittelTableBuilt: function () {
+      this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
+    },
+    funktionenTableBuilt: function () {
+      this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
+    },
     hideEditProfilModal: function () {
       //? checks the editModal component property result, if the user made a successful request or not
       if (this.$refs.editModal.result) {
@@ -159,14 +167,20 @@ export default {
         // when modal was closed without submitting request
       }
       this.showModal = false;
+      this.editDataFilter = null;
     },
 
-    showEditProfilModal() {
+    showEditProfilModal(view) {
+      if (view) {
+        this.editDataFilter = view;
+      }
+
       this.showModal = true;
-      // after a state change, wait for the DOM updates to complete
       Vue.nextTick(() => {
         this.$refs.editModal.show();
       });
+
+      // after a state change, wait for the DOM updates to complete
     },
 
     fetchProfilUpdates: function () {
@@ -181,6 +195,11 @@ export default {
   },
 
   computed: {
+    filteredEditData() {
+      return this.editDataFilter
+        ? this.editData.data[this.editDataFilter]
+        : this.editData;
+    },
     profilInformation() {
       if (!this.data) {
         return {};
@@ -220,29 +239,18 @@ export default {
     //? sorts the profil Updates: pending -> accepted -> rejected
     this.data.profilUpdates?.sort(this.sortProfilUpdates);
   },
-  
-  mounted() {
-    this.$refs.betriebsmittelTable.tabulator.on("tableBuilt", () => {
-      this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
-    });
-
-    this.$refs.funktionenTable.tabulator.on("tableBuilt", () => {
-      this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
-    });
-  },
 
   template: /*html*/ ` 
   <div class="container-fluid text-break fhc-form"  >
-  
-    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(editData))" title="Profil bearbeiten"></edit-profil>
+ 
+    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :title="$p.t('profil','profilBearbeiten')"></edit-profil>
           <div class="row">
-          
               <div  class="d-md-none col-12 ">
-             
+           
               <div class="row mb-3">
                 <div class="col">
                 <!-- MOBILE QUICK LINKS --> 
-                <quick-links :mobile="true"></quick-links>    
+                <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>    
                 </div>
               </div>
 
@@ -250,12 +258,12 @@ export default {
 
               <div class="row mb-3 ">
               <div class="col">
-              <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+              <button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                 <div class="row">
                   <div class="col-auto">
                     <i class="fa fa-edit"></i>
                   </div>
-                  <div class="col-auto">Bearbeiten</div>
+                  <div class="col-auto">{{$p.t('ui','bearbeiten')}}</div>
                 </div>
               </button>
               </div>
@@ -289,7 +297,7 @@ export default {
                      <div class="col">
                      
                      <!-- PROFIL INFORMATION -->
-                     <profil-information title="MitarbeiterIn" :data="profilInformation"></profil-information>
+                     <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
 
 
 		                 </div>
@@ -300,7 +308,7 @@ export default {
                      <div  class=" col-lg-12">
         
                     <!-- MITARBEITER INFO -->
-                    <role-information title="Mitarbeiter Information" :data="roleInformation"></role-information>
+                    <role-information :title="$p.t('profil','mitarbeiterInformation')" :data="roleInformation"></role-information>
 
 
                      </div> 
@@ -316,7 +324,7 @@ export default {
                     <div class="row mb-4">
                     <div class="col">
                     <!-- EMAILS -->
-                    <profil-emails :data="data.emails" ></profil-emails>
+                    <profil-emails :title="this.$p.t('person','email')" :data="data.emails" ></profil-emails>
                     </div>
                     </div>
 
@@ -328,7 +336,14 @@ export default {
                       
                       <div class="card">
                           <div class="card-header">
-                            Private Kontakte
+                            <div class="row">
+                              <div @click="showEditProfilModal('Private_Kontakte')" class="col-auto" type="button">
+                                <i class="fa fa-edit"></i>
+                              </div>
+                              <div class="col">
+                                <span>{{$p.t('profil','privateKontakte')}}</span>
+                              </div>
+                            </div>
                           </div>
                           <div class="card-body ">
                             
@@ -351,9 +366,18 @@ export default {
                       <!-- PRIVATE ADRESSEN-->
 
                       <div class="card">
-                          <div class="card-header">Private Adressen</div>
+                        <div class="card-header">
+                          <div class="row">
+                            <div @click="showEditProfilModal('Private_Adressen')" class="col-auto" type="button">
+                              <i class="fa fa-edit"></i>
+                            </div>
+                            <div class="col">
+                              <span>{{$p.t('profil','privateAdressen')}}</span>
+                            </div>
+                          </div>
+                          </div>
                             <div class="card-body">
-                            
+                           
                               <div class="gy-3 row ">
                                 <div v-for="element in data.adressen" class="col-12">
                                 <Adresse :data="element"></Adresse>
@@ -377,14 +401,14 @@ export default {
 
                   <!-- FUNKTIONEN TABELLE -->
                  
-                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   
                     </div>
 
                   <div class="col-12 mb-4" >
 
                   <!-- BETRIEBSMITTEL TABELLE -->
-                    <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
+                    <core-filter-cmpt @tableBuilt="betriebsmittelTableBuilt" :title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div>
 
                 </div>
@@ -402,7 +426,7 @@ export default {
                 <div class="col">
                  
                     <!-- QUICK LINKS --> 
-                    <quick-links></quick-links>
+                    <quick-links :title="$p.t('profil','quickLinks')"></quick-links>
                    
                       
                   
@@ -413,12 +437,12 @@ export default {
 
                 <div class="row d-none d-md-block ">
                 <div class="col mb-3">
-                <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                <button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                   <div class="row">
                     <div class="col-auto">
                       <i class="fa fa-edit"></i>
                     </div>
-                    <div class="col-auto">Bearbeiten</div>
+                    <div class="col-auto">{{$p.t('ui','bearbeiten')}}</div>
                   </div>
                 </button>
                 </div>
@@ -446,8 +470,8 @@ export default {
                 <div  class="row">
                   <div class="col">
                   <!-- MAILVERTEILER -->
-                    <mailverteiler  :data="data?.mailverteiler"></mailverteiler>
-                    
+                    <mailverteiler  :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
+                     
                   </div>
                 </div>
               </div>          
