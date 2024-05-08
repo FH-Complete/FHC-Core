@@ -152,8 +152,8 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 			</template>
 		</tree>
 		<vbox>
-			<button id="student-projektarbeit-button-neu" label="Neu" oncommand="StudentProjektarbeitNeu();" disabled="true"/>
-			<button id="student-projektarbeit-button-loeschen" label="Loeschen" oncommand="StudentProjektarbeitLoeschen();" disabled="true"/>
+			<button id="student-projektarbeit-button-neu" label="Neue PA" oncommand="StudentProjektarbeitNeu();" disabled="true"/>
+			<button id="student-projektarbeit-button-loeschen" label="PA Loeschen" oncommand="StudentProjektarbeitLoeschen();" disabled="true"/>
 		</vbox>
 	</hbox>
 	<hbox>
@@ -171,7 +171,11 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 					<rows>
 						<row>
 							<label value="Projektarbeit ID" control="student-projektarbeit-textbox-projektarbeit_id"/>
-							<hbox><textbox id="student-projektarbeit-textbox-projektarbeit_id" readonly="true" maxlength="16" size="16"/></hbox>
+							<hbox>
+								<textbox id="student-projektarbeit-textbox-projektarbeit_id" readonly="true" maxlength="16" size="16"/>
+								<textbox id="student-projektarbeit-textbox-lehreinheit_stsem" hidden="true" readonly="true" maxlength="32" size="32"/>
+							</hbox>
+
 						</row>
 						<row>
 							<label value="Titel" control="student-projektarbeit-textbox-titel"/>
@@ -322,7 +326,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							<spacer />
 							<hbox>
 								<spacer flex="1" />
-								<button id="student-projektarbeit-button-speichern" oncommand="StudentProjektarbeitSpeichern()" label="Speichern" disabled="true"/>
+								<button id="student-projektarbeit-button-speichern" oncommand="StudentProjektarbeitSpeichern()" label="PA Speichern" disabled="true"/>
 							</hbox>
 						</row>
 					</rows>
@@ -428,8 +432,8 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							</template>
 						</tree>
 						<vbox>
-							<button id="student-projektbetreuer-button-neu" label="Neu" oncommand="StudentProjektbetreuerNeu();" disabled="true"/>
-							<button id="student-projektbetreuer-button-loeschen" label="Loeschen" oncommand="StudentProjektbetreuerLoeschen();" disabled="true"/>
+							<button id="student-projektbetreuer-button-neu" label="Neue Betreuung" oncommand="StudentProjektbetreuerNeu();" disabled="true"/>
+							<button id="student-projektbetreuer-button-loeschen" label="Betreuung Loeschen" oncommand="StudentProjektbetreuerLoeschen();" disabled="true"/>
 						</vbox>
 					</hbox>
 					<vbox hidden="true">
@@ -523,7 +527,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 								<textbox id="student-projektbetreuer-textbox-stunden" disabled="true" maxlength="8"/>
 							</row>
 							<row>
-								<label value="Stundensatz" control="student-projektbetreuer-textbox-stundensatz"/>
+								<label id="student-projektbetreuer-label-stundensatz" value="Stundensatz: " control="student-projektbetreuer-textbox-stundensatz"/>
 								<textbox id="student-projektbetreuer-textbox-stundensatz" disabled="true" maxlength="5"/>
 							</row>
 							<row hidden="true"><!-- Faktor wird nicht mehr benoetigt -->
@@ -534,7 +538,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 								<spacer />
 								<hbox>
 									<spacer flex="1" />
-									<button id="student-projektbetreuer-button-speichern" label="Speichern" oncommand="StudentProjektbetreuerSpeichern()" />
+									<button id="student-projektbetreuer-button-speichern" label="Betreuung Speichern" oncommand="StudentProjektbetreuerSpeichern()" />
 								</hbox>
 							</row>
 						</rows>

@@ -1,0 +1,46 @@
+@import '../../../vendor/vuejs/vuedatepicker_css/main.css';
+:root {
+    /*General*/
+    --dp-font-family: var(--bs-body-font-family);
+    --dp-border-radius: .25rem;
+    --dp-cell-border-radius: .25rem; /*Specific border radius for the calendar cell*/
+
+    /*Sizing*/
+    --dp-button-height: 2.1875rem; /*Size for buttons in overlays*/
+    --dp-month-year-row-height: 2.1875rem; /*Height of the month-year select row*/
+    --dp-month-year-row-button-size: 2.1875rem; /*Specific height for the next/previous buttons*/
+    --dp-button-icon-height: 1.25rem; /*Icon sizing in buttons*/
+    --dp-cell-size: 2.1875rem; /*Width and height of calendar cell*/
+    --dp-cell-padding: .3125rem; /*Padding in the cell*/
+    --dp-common-padding: .625rem; /*Common padding used*/
+    --dp-input-icon-padding: 2.1875rem;
+    --dp-input-padding: .375rem .75rem;
+    --dp-action-buttons-padding: .125rem .3125rem; /*Adjust padding for the action buttons in action row*/
+    --dp-row-margin: .3125rem 0; /*Adjust the spacing between rows in the calendar*/
+    --dp-calendar-header-cell-padding: 0.5rem; /*Adjust padding in calendar header cells*/
+    --dp-two-calendars-spacing: .625rem; /*Space between multiple calendars*/
+    --dp-overlay-col-padding: .1875rem; /*Padding in the overlay column*/
+    --dp-time-inc-dec-button-size:  2rem; /*Sizing for arrow buttons in the time picker*/
+    --dp-menu-padding: .375rem .5rem; /*Menu padding*/
+}
+.dp__theme_light {
+    --dp-text-color: var(--text-color);
+    --dp-primary-color: var(--bs-primary);
+    --dp-primary-disabled-color: rgba(var(--bs-primary-rgb), .65);
+    --dp-primary-text-color: var(--primary-color-text);
+    --dp-secondary-color: var(--bs-secondary);
+    --dp-border-color: var(--bs-gray-400);
+    --dp-menu-border-color: var(--bs-gray-400);
+    --dp-border-color-hover: var(--bs-gray-400);
+    --dp-icon-color: rgba(var(--bs-black-rgb), .5);
+    --dp-hover-icon-color: rgba(var(--bs-black-rgb), .75);
+    --dp-range-between-dates-text-color: var(--dp-hover-text-color, var(--text-color));
+}
+.dp__theme_light .form-control.is-invalid {
+    --dp-border-color-hover: var(--bs-danger);
+}
+.dp__theme_light .form-control.is-valid {
+    --dp-border-color-hover: var(--bs-success);
+}
+.form-control.is-invalid ~ .dp__clear_icon,
+.was-validated .form-control:invalid ~ .dp__clear_icon { margin-right: calc(1.5em + .75rem - 12px) }

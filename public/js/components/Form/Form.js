@@ -9,7 +9,8 @@ export default {
 			$registerToForm: component => {
 				if (this.inputs.indexOf(component) < 0)
 					this.inputs.push(component);
-			}
+			},
+			$clearValidationForName: this.clearValidationForName
 		};
 	},
 	props: {
@@ -40,9 +41,34 @@ export default {
 
 				return a;
 			}, {});
+		},
+		factory() {
+			const factory = Object.create(Object.getPrototypeOf(this.$fhcApi.factory), Object.getOwnPropertyDescriptors(this.$fhcApi.factory));
+			factory.$fhcApi = {
+				get: this.get,
+				post: this.post,
+				_defaultErrorHandlers: this.$fhcApi._defaultErrorHandlers
+			};
+			return factory;
 		}
 	},
 	methods: {
+		get(...args) {
+			if (typeof args[0] == 'object' && args[0].clearValidation && args[0].setFeedback)
+				args[0] = this;
+			else
+				args.unshift(this);
+			
+			return this.$fhcApi.get(...args);
+		},
+		post(...args) {
+			if (typeof args[0] == 'object' && args[0].clearValidation && args[0].setFeedback)
+				args[0] = this;
+			else
+				args.unshift(this);
+			
+			return this.$fhcApi.post(...args);
+		},
 		_sendFeedbackToInput(inputs, feedback, valid) {
 			if (inputs.length) {
 				inputs.forEach(input => input.setFeedback(valid, feedback));
@@ -128,6 +154,10 @@ export default {
 					}
 				});
 			});
+		},
+		clearValidationForName(name) {
+			(this.sortedInputs[name.split('.')[0] + name.split('.').slice(1).map(p => `[${p}]`).join("")] || this.sortedInputs['_default'] || [])
+				.forEach(input => input.clearValidation());
 		}
 	},
 	template: `

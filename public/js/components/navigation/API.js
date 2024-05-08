@@ -21,7 +21,7 @@ import {CoreRESTClient} from '../../RESTClient.js';
 const CORE_NAVIGATION_CMPT_TIMEOUT = 5000;
 
 /**
- *
+ * TODO(chris): deprecated
  */
 export const CoreNavigationAPIs = {
 	/**

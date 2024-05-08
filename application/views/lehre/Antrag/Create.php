@@ -11,6 +11,7 @@ $sitesettings = array(
 	'customJSModules' => array('public/js/apps/lehre/Antrag.js'),
 	'customCSSs' => array(
 		'public/css/Fhc.css',
+		'public/css/components/primevue.css',
 		'vendor/vuejs/vuedatepicker_css/main.css'
 	),
 	'customJSs' => array(
@@ -31,9 +32,9 @@ $this->load->view(
 	<div class="fhc-container row">
 		<div class="col-sm-8 mb-3">
 			<studierendenantrag-antrag
-				prestudent-id="<?= $prestudent_id; ?>"
+				:prestudent-id="<?= $prestudent_id; ?>"
 				antrag-type="<?= $antrag_type; ?>"
-				studierendenantrag-id="<?= $studierendenantrag_id; ?>"
+				:studierendenantrag-id="<?= $studierendenantrag_id ?: 'undefined'; ?>"
 				v-model:info-array="infoArray"
 				v-model:status-msg="status.msg"
 				v-model:status-severity="status.severity"
