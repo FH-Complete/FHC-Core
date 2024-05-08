@@ -86,7 +86,11 @@ export default {
 
   //? this is the prop passed to the dynamic component with the custom data of the view
   props: ["data"],
-  methods: {},
+  methods: {
+    funktionenTableBuilt: function () {
+      this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
+    },
+  },
 
   computed: {
     personEmails() {
@@ -126,12 +130,6 @@ export default {
         Büro: this.data.ort_kurzbz,
       };
     },
-  },
-
-  mounted() {
-    this.$refs.funktionenTable.tabulator.on("tableBuilt", () => {
-      this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
-    });
   },
 
   template: /*html*/ ` 
@@ -228,7 +226,7 @@ export default {
 
                 <!-- FIRST TABLE -->
                   <div class="col-12 mb-4" >
-                    <core-filter-cmpt :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   </div>
 
                

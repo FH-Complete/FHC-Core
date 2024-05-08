@@ -38,7 +38,8 @@ export const CoreFilterCmpt = {
 	},
 	emits: [
 		'nwNewEntry',
-		'click:new'
+		'click:new',
+		'tableBuilt'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -223,7 +224,7 @@ export const CoreFilterCmpt = {
 				for (let evt of this.tabulatorEvents)
 					this.tabulator.on(evt.event, evt.handler);
 			}
-			this.tabulator.on('tableBuilt', () => this.tableBuilt = true);
+			this.tabulator.on('tableBuilt', () => {this.tableBuilt = true; this.$emit('tableBuilt');});
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});

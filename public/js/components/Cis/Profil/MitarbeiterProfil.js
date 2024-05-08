@@ -142,6 +142,12 @@ export default {
   },
 
   methods: {
+    betriebsmittelTableBuilt: function () {
+      this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
+    },
+    funktionenTableBuilt: function () {
+      this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
+    },
     hideEditProfilModal: function () {
       //? checks the editModal component property result, if the user made a successful request or not
       if (this.$refs.editModal.result) {
@@ -232,16 +238,6 @@ export default {
   created() {
     //? sorts the profil Updates: pending -> accepted -> rejected
     this.data.profilUpdates?.sort(this.sortProfilUpdates);
-  },
-
-  mounted() {
-    this.$refs.betriebsmittelTable.tabulator.on("tableBuilt", () => {
-      this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
-    });
-
-    this.$refs.funktionenTable.tabulator.on("tableBuilt", () => {
-      this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
-    });
   },
 
   template: /*html*/ ` 
@@ -405,14 +401,14 @@ export default {
 
                   <!-- FUNKTIONEN TABELLE -->
                  
-                    <core-filter-cmpt :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   
                     </div>
 
                   <div class="col-12 mb-4" >
 
                   <!-- BETRIEBSMITTEL TABELLE -->
-                    <core-filter-cmpt :title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
+                    <core-filter-cmpt @tableBuilt="betriebsmittelTableBuilt" :title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div>
 
                 </div>

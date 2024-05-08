@@ -85,6 +85,14 @@ export default {
     editData: Object,
   },
   methods: {
+    betriebsmittelTableBuilt: function () {
+      this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
+    },
+    zutrittsgruppenTableBuilt: function () {
+      this.$refs.zutrittsgruppenTable.tabulator.setData(
+        this.data.zuttritsgruppen
+      );
+    },
     fetchProfilUpdates: function () {
       Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res) => {
         if (!res.error) {
@@ -175,17 +183,7 @@ export default {
     this.data.profilUpdates?.sort(this.sortProfilUpdates);
   },
 
-  mounted() {
-    this.$refs.betriebsmittelTable.tabulator.on("tableBuilt", () => {
-      this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
-    });
-
-    this.$refs.zutrittsgruppenTable.tabulator.on("tableBuilt", () => {
-      this.$refs.zutrittsgruppenTable.tabulator.setData(
-        this.data.zuttritsgruppen
-      );
-    });
-  },
+  
 
   template: /*html*/ ` 
 
@@ -350,11 +348,11 @@ export default {
                 <div class="row">
 
                   <div class="col-12 mb-4" >
-                    <core-filter-cmpt :title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
+                    <core-filter-cmpt @tableBuilt="betriebsmittelTableBuilt" :title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div> 
 
                   <div class="col-12 mb-4" >
-                    <core-filter-cmpt :title="$p.t('profil','zutrittsGruppen')" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options"  tableOnly :sideMenu="false" noColumnFilter />
+                    <core-filter-cmpt @tableBuilt="zutrittsgruppenTableBuilt" :title="$p.t('profil','zutrittsGruppen')" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options"  tableOnly :sideMenu="false" noColumnFilter />
             
                   </div>
 
