@@ -17730,6 +17730,26 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
+		'phrase' => 'alledurchgefuehrten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle durchgeführten anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show all performed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
 		'phrase' => 'bestaetigungHochladen',
 		'insertvon' => 'system',
 		'phrases' => array(
