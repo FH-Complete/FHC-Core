@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 fhcomplete.org
+ * Copyright (C) 2024 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,42 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CoreRESTClient} from '../../RESTClient.js';
+import search from "./search.js";
+import phrasen from "./phrasen.js";
+import navigation from "./navigation.js";
+import filter from "./filter.js";
+import studstatus from "./studstatus.js";
 
-// 
-const CORE_NAVIGATION_CMPT_TIMEOUT = 5000;
-
-/**
- * TODO(chris): deprecated
- */
-export const CoreNavigationAPIs = {
-	/**
-	 *
-	 */
-	getHeader: function(navigationPage) {
-		return CoreRESTClient.get(
-			'system/Navigation/header',
-			{
-				navigation_page: navigationPage
-			},
-			{
-				timeout: CORE_NAVIGATION_CMPT_TIMEOUT
-			}
-		);
-	},
-	/**
-	 *
-	 */
-	getMenu: function(navigationPage) {
-		return CoreRESTClient.get(
-			'system/Navigation/menu',
-			{
-				navigation_page: navigationPage
-			},
-			{
-				timeout: CORE_NAVIGATION_CMPT_TIMEOUT
-			}
-		);
-	}
+export default {
+    search,
+    phrasen,
+    navigation,
+    filter,
+    studstatus
 };
-
