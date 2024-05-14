@@ -406,11 +406,16 @@ EOSC;
 				ort.ort_kurzbz as ort_kurzbz,
 				ort.gebteil as building,
 				ort.stockwerk as floor,
-				ort.dislozierung as room_number
-				
+				ort.dislozierung as room_number,
+				CONCAT(standort.plz,\' \',standort.ort,\', \',standort.strasse,\' \\ \',ort.stockwerk,\' Stockwerk\') as strasse,
+				CONCAT(ort.max_person,\', davon \',ort.arbeitsplaetze,\' PC-Plätze\') as plaetze
 				FROM public.tbl_ort as ort
-				
-			 WHERE ort.ort_kurzbz like \'%'. $searchstr . '%\' GROUP BY ort.ort_kurzbz' 
+				LEFT JOIN (
+					select ort,standort_id,strasse, plz
+					FROM public.tbl_standort
+					LEFT JOIN public.tbl_adresse USING(adresse_id)
+				) standort USING(standort_id)
+			 WHERE LOWER(ort.ort_kurzbz) like LOWER(\'%'. $searchstr . '%\') ' 
 			/* 
 			
 			org joins:

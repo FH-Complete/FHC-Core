@@ -26,13 +26,8 @@ export default {
       employee: employee,
       organisationunit: organisationunit
     },
-<<<<<<< Updated upstream
-    template: `
-          <form ref="searchform" class="d-flex me-3 position-relative" action="javascript:void(0);" 
-=======
     template: /*html*/`
           <form ref="searchform" class="d-flex me-3" action="javascript:void(0);" 
->>>>>>> Stashed changes
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
             <div class="input-group me-2 bg-white">
                 <input ref="searchbox" @keyup="this.search" @focus="this.showsearchresult" 
