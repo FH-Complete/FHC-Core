@@ -99,6 +99,15 @@ class Content_model extends DB_Model
 					{
 						"content_id": 1000002,
 						"template_kurzbz": "redirect",
+						"titel": "Profil",
+						"content": "<content><url><![CDATA[' . site_url('/Cis/Profil') . ']]></url><target><![CDATA[]]></target></content>",
+						"menu_open": false,
+						"aktiv": true,
+						"childs": []
+					},
+					{
+						"content_id": 1000003,
+						"template_kurzbz": "redirect",
 						"titel": "COVID-19",
 						"content": "<content><url><![CDATA[' . site_url('/CisHtml/Cms/content/10012') . ']]></url><target><![CDATA[]]></target></content>",
 						"menu_open": false,
@@ -106,7 +115,7 @@ class Content_model extends DB_Model
 						"childs": []
 					},
 					{
-						"content_id": 1000003,
+						"content_id": 1000004,
 						"template_kurzbz": "redirect",
 						"titel": "Meine LV",
 						"content": "<content><url><![CDATA[' . site_url('/Cis/MyLv') . ']]></url><target><![CDATA[]]></target></content>",
@@ -115,7 +124,7 @@ class Content_model extends DB_Model
 						"childs": []
 					},
 					{
-						"content_id": 1000004,
+						"content_id": 1000005,
 						"template_kurzbz": "redirect",
 						"titel": "Stundenplan",
 						"content": "<content><url><![CDATA[' . site_url('/Cis/Stundenplan') . ']]></url><target><![CDATA[]]></target></content>",
@@ -124,7 +133,7 @@ class Content_model extends DB_Model
 						"childs": []
 					},
 					{
-						"content_id": 1000005,
+						"content_id": 1000006,
 						"template_kurzbz": "redirect",
 						"titel": "Dokumente",
 						"content": "<content><url><![CDATA[' . site_url('/Cis/Documents') . ']]></url><target><![CDATA[]]></target></content>",
@@ -133,10 +142,19 @@ class Content_model extends DB_Model
 						"childs": []
 					},
 					{
-						"content_id": 1000006,
+						"content_id": 1000007,
 						"template_kurzbz": "redirect",
 						"titel": "Studierendenstatus",
 						"content": "<content><url><![CDATA[' . site_url('/lehre/Studierendenantrag') . ']]></url><target><![CDATA[]]></target></content>",
+						"menu_open": false,
+						"aktiv": true,
+						"childs": []
+					},
+					{
+						"content_id": 1000007,
+						"template_kurzbz": "redirect",
+						"titel": "Anrechnung",
+						"content": "<content><url><![CDATA[' . site_url('/lehre/anrechnung/RequestAnrechnung') . ']]></url><target><![CDATA[]]></target></content>",
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []

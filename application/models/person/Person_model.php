@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * Copyright (C) 2023 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 class Person_model extends DB_Model
 {
 	/**
@@ -8,6 +25,7 @@ class Person_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
+
 		$this->dbTable = 'public.tbl_person';
 		$this->pk = 'person_id';
 
@@ -70,7 +88,7 @@ class Person_model extends DB_Model
 		if (isset($person['svnr']) && $person['svnr'] != '')
 		{
 			$this->PersonModel->addOrder('svnr', 'DESC');
-			$result =  $this->PersonModel->loadWhere(array(
+			$result = $this->PersonModel->loadWhere(array(
 				'person_id != ' => $person['person_id'],
 				'SUBSTRING(svnr FROM 1 FOR 10) = ' => $person['svnr'])
 			);
@@ -138,7 +156,8 @@ class Person_model extends DB_Model
 			'lower(nachname) like '.$this->db->escape('%'.$filter.'%')."
 			OR lower(vorname) like ".$this->db->escape('%'.$filter.'%')."
 			OR lower(nachname || ' ' || vorname) like ".$this->db->escape('%'.$filter.'%')."
-			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.$filter.'%'));
+			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.$filter.'%')
+		);
 
 		return $result;
 	}
@@ -152,8 +171,12 @@ class Person_model extends DB_Model
 	 */
 	public function getPersonStammdaten($person_id, $zustellung_only = false)
 	{
-		$this->addSelect('public.tbl_person.*, tbl_person.staatsbuergerschaft AS staatsbuergerschaft_code, tbl_person.geburtsnation AS geburtsnation_code, 
-		s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
+		$this->addSelect('public.tbl_person.*,
+			tbl_person.staatsbuergerschaft AS staatsbuergerschaft_code,
+			tbl_person.geburtsnation AS geburtsnation_code, 
+			s.kurztext as staatsbuergerschaft,
+			g.kurztext as geburtsnation'
+		);
 		$this->addJoin('bis.tbl_nation s', 'public.tbl_person.staatsbuergerschaft = s.nation_code', 'LEFT');
 		$this->addJoin('bis.tbl_nation g', 'public.tbl_person.geburtsnation = g.nation_code', 'LEFT');
 
@@ -258,7 +281,8 @@ class Person_model extends DB_Model
 	 */
 	public function getFullName($uid)
 	{
-		if (!$result = getData($this->getByUid($uid))[0])
+		$result = getData($this->getByUid($uid))[0];
+		if (!$result)
 		{
 			show_error('Failed loading person');
 		}
@@ -326,10 +350,12 @@ class Person_model extends DB_Model
 
 				SELECT p2.person_id
 				FROM tbl_person p1
+				JOIN tbl_prestudent ps ON p1.person_id = ps.person_id
 				INNER JOIN (
-					SELECT vorname, nachname, gebdatum, person_id
-					FROM tbl_person
-					) p2
+					SELECT vorname, nachname, gebdatum, person.person_id
+					FROM tbl_person person
+					JOIN tbl_prestudent sps ON person.person_id = sps.person_id
+				) p2
 					ON (lower(p1.vorname) = lower(p2.vorname) AND lower(p1.nachname) = lower(p2.nachname) AND p1.gebdatum = p2.gebdatum)
 				WHERE p1.person_id != p2.person_id AND (p1.person_id = ?)";
 
@@ -349,3 +375,4 @@ class Person_model extends DB_Model
 		]);
 	}
 }
+

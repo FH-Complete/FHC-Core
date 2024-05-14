@@ -1,6 +1,7 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 use \DateTime as DateTime;
 use \DOMDocument as DOMDocument;
@@ -46,16 +47,16 @@ class CmsLib
 	 */
 	public function getContent($content_id, $version = null, $sprache = null, $sichtbar = true)
 	{
-		if(!is_numeric($content_id))
+		if (!is_numeric($content_id))
 			return error('ContentID ist ungueltig');
 
 		if ($sprache === null)
 			$sprache = getUserLanguage();
-		
+
 		$islocked = $this->ci->ContentgruppeModel->loadWhere(['content_id' => $content_id]);
 		if (isError($islocked))
 			return $islocked;
-		
+
 		if (getData($islocked)) {
 			$uid = getAuthUID();
 			$isberechtigt = $this->ci->ContentgruppeModel->berechtigt($content_id, $uid);
@@ -72,11 +73,9 @@ class CmsLib
 			return $content;
 
 		// Legt einen Logeintrag für die Klickstatistik an
-		if (defined('LOG_CONTENT') && LOG_CONTENT)
-		{
+		if (defined('LOG_CONTENT') && LOG_CONTENT) {
 			// Nur eingeloggte User werden geloggt, das sonst auch alle Infoscreenaufrufe und dgl. mitgeloggt werden
-			if (isLogged())
-			{
+			if (isLogged()) {
 				$request_data = 'content_id=' . $content_id;
 				if ($version !== null)
 					$request_data .= '&version=' . $version;
@@ -175,6 +174,30 @@ class CmsLib
 	}
 
 	/**
+	 * @param string			$studiengang_kz
+	 * @param string			$semester
+	 * 
+	 * @return array			queried studiengang_kz and semester
+	 */
+	public function getStgAndSem($studiengang_kz, $semester)
+	{
+		$this->ci->load->model('crm/Student_model', 'StudentModel');
+
+		//Zum anzeigen der Studiengang-Details neben den News
+		$student = $this->ci->StudentModel->loadWhere(['student_uid' => getAuthUID()]);
+		if (isError($student))
+			return $student;
+		if (getData($student)) {
+			$student = current(getData($student));
+			if ($studiengang_kz === null)
+				$studiengang_kz = $student->studiengang_kz;
+			if ($semester === null)
+				$semester = $student->semester;
+		}
+		return [$studiengang_kz, $semester];
+	}
+
+	/**
 	 * @param boolean			$infoscreen
 	 * @param string | null		$studiengang_kz
 	 * @param int | null		$semester
@@ -185,36 +208,22 @@ class CmsLib
 	 * 
 	 * @return void
 	 */
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10)
 	{
-		$this->ci->load->model('crm/Student_model', 'StudentModel');
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
-
-		if (!$infoscreen && ($studiengang_kz === null || $semester === null))
-		{
-			//Zum anzeigen der Studiengang-Details neben den News
-			$student = $this->ci->StudentModel->loadWhere(['student_uid' => get_uid()]);
-			if (isError($student))
-				return $student;
-			if (getData($student)) {
-				$student = current(getData($student));
-				if ($studiengang_kz === null)
-					$studiengang_kz = $student->studiengang_kz;
-				if ($semester === null)
-					$semester = $student->semester;
-			}
-		}
+		list($studiengang_kz, $semester) = $this->getStgAndSem($studiengang_kz, $semester);
 		$all = $edit;
 
 		$xml = '<?xml version="1.0" encoding="UTF-8"?><content>';
 
 		$this->ci->load->model('content/News_model', 'NewsModel');
-		$news = $this->ci->NewsModel->getNewsWithContent(getSprache(), $studiengang_kz, $semester, null, $sichtbar, 0, 0, $all, $mischen);
+		$news = $this->ci->NewsModel->getNewsWithContent(getSprache(), $studiengang_kz, $semester, null, $sichtbar, 0, $page, $page_size, $all, $mischen);
 
 		if (isError($news))
 			return $news;
 
 		$news = getData($news);
+		//var_dump($news->maxPageCount);
 		foreach ($news as $newsobj) {
 			if ($studiengang_kz && $edit && !$newsobj->studiengang_kz)
 				continue;
@@ -225,17 +234,14 @@ class CmsLib
 			$xml .= "<newswrapper>" . $newsobj->content . $datum . $id . "</newswrapper>";
 		}
 
-		if ($studiengang_kz != 0)
-		{
+		if ($studiengang_kz != 0) {
 			$stg_obj = $this->ci->StudiengangModel->load($studiengang_kz);
 			if (isError($stg_obj))
 				return $stg_obj;
 			$stg_obj = current(getData($stg_obj) ?: []);
 
-			if ($stg_obj)
-			{
-				if (!$edit && !$infoscreen)
-				{
+			if ($stg_obj) {
+				if (!$edit && !$infoscreen) {
 					$extras = $this->getNewsExtras($stg_obj, $semester);
 					if (isError($extras))
 						return $extras;
@@ -245,8 +251,7 @@ class CmsLib
 			}
 		}
 
-		if ($titel != '')
-		{
+		if ($titel != '') {
 			$xml .= '<news_titel>' . $titel . '</news_titel>';
 		}
 
@@ -260,7 +265,7 @@ class CmsLib
 
 		$XML = new DOMDocument();
 		$XML->loadXML($xml);
-		
+
 		$xsltemplate = new DOMDocument();
 		$xsltemplate->loadXML($template->xslt_xhtml_c4);
 

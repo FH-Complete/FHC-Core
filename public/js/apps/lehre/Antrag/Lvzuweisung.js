@@ -1,4 +1,5 @@
 import LvZuweisung from '../../../components/Studierendenantrag/Lvzuweisung.js';
+import Phrasen from '../../../plugin/Phrasen.js';
 
 const app = Vue.createApp({
 	components: {
@@ -10,4 +11,6 @@ const app = Vue.createApp({
 		}
 	}
 });
-app.mount('#wrapper');
+app
+	.use(Phrasen)
+	.mount('#wrapper');

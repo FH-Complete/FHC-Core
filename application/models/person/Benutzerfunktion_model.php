@@ -212,4 +212,60 @@ class Benutzerfunktion_model extends DB_Model
 
         return $this->execQuery($query, $parameters_array);
     }
+
+
+	public function insertBenutzerfunktion($Json)
+	{
+		unset($Json['benutzerfunktion_id']);
+        unset($Json['updateamum']);
+        $Json['insertvon'] = getAuthUID();
+        $Json['insertamum'] = $this->escape('NOW()');
+
+		if ($Json['datum_bis']=='')
+		{
+			unset($Json['datum_bis']);
+		}
+
+        $result = $this->insert($Json);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        $record = $this->load($result->retval);
+
+        return $record;
+	}
+
+	function updateBenutzerfunktion($funktionJson)
+    {
+        $funktionJson['updatevon'] = getAuthUID();
+        $funktionJson['updateamum'] = $this->escape('NOW()');
+
+        $result = $this->update($funktionJson['benutzerfunktion_id'], $funktionJson);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        $result = $this->load($funktionJson['benutzerfunktion_id']);
+
+        return $result;
+    }
+	
+	function deleteBenutzerfunktion($funktionJson)
+    {
+        $result = $this->delete($funktionJson);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        return success($funktionJson);
+    }
+
+
 }

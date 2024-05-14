@@ -21,6 +21,7 @@ class InfoCenter extends Auth_Controller
 	const FREIGEGEBEN_PAGE = 'freigegeben';
 	const REIHUNGSTESTABSOLVIERT_PAGE = 'reihungstestAbsolviert';
 	const ABGEWIESEN_PAGE = 'abgewiesen';
+	const AUFGENOMMEN_PAGE = 'aufgenommen';
 	const SHOW_DETAILS_PAGE = 'showDetails';
 	const SHOW_ZGV_DETAILS_PAGE = 'showZGVDetails';
 	const ZGV_UBERPRUEFUNG_PAGE = 'ZGVUeberpruefung';
@@ -115,6 +116,7 @@ class InfoCenter extends Auth_Controller
 				'index' => 'infocenter:r',
 				'freigegeben' => 'infocenter:r',
 				'abgewiesen' => 'infocenter:r',
+				'aufgenommen' => 'infocenter:r',
 				'reihungstestAbsolviert' => 'infocenter:r',
 				'showDetails' => 'infocenter:r',
 				'showZGVDetails' => 'lehre/zgvpruefung:r',
@@ -228,6 +230,16 @@ class InfoCenter extends Auth_Controller
 
 		$this->load->view('system/infocenter/infocenterAbgewiesen.php');
 	}
+	
+	/**
+	 * Aufgenommene page of the InfoCenter tool
+	 */
+	public function aufgenommen()
+	{
+		$this->_setNavigationMenu(self::AUFGENOMMEN_PAGE); // define the navigation menu for this page
+		
+		$this->load->view('system/infocenter/infocenterAufgenommen.php');
+	}
 
 	/**
 	 *
@@ -314,7 +326,7 @@ class InfoCenter extends Auth_Controller
 			show_error('Person does not exist!');
 
 		$origin_page = $this->input->get(self::ORIGIN_PAGE);
-		if ($origin_page == self::INDEX_PAGE)
+		if (in_array($origin_page, array(self::INDEX_PAGE, self::ABGEWIESEN_PAGE)))
 		{
 			// mark person as locked for editing
 			$result = $this->PersonLockModel->lockPerson($person_id, $this->_uid, self::APP);
@@ -359,7 +371,14 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($result)) show_error(getError($result));
 
-		$redirectLink = '/'.self::INFOCENTER_URI.'?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
+		$origin_page = $this->input->get(self::ORIGIN_PAGE);
+
+		if ($origin_page === self::ABGEWIESEN_PAGE)
+			$redirectLink = self::INFOCENTER_URI. '/' .self::ABGEWIESEN_PAGE;
+		else
+			$redirectLink = '/'.self::INFOCENTER_URI;
+
+		$redirectLink .= '?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
 
 		// Force reload of Dataset after Unlock
 		$redirectLink .= '&'.self::KEEP_TABLESORTER_FILTER.'=true';
@@ -1526,6 +1545,7 @@ class InfoCenter extends Auth_Controller
 		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		$reihungstestAbsolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$abgewiesenLink = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
+		$aufgenommenLink = site_url(self::INFOCENTER_URI.'/'.self::AUFGENOMMEN_PAGE);
 
 		$currentFilterId = $this->input->get(self::FILTER_ID);
 		if (isset($currentFilterId))
@@ -1533,6 +1553,7 @@ class InfoCenter extends Auth_Controller
 			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 			$abgewiesenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+			$aufgenommenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -1583,7 +1604,19 @@ class InfoCenter extends Auth_Controller
 					null, 				// subscriptLinkValue
 					'', 				// target
 					30   				// sort
-				)
+				),
+				'aufgenommen' => $this->navigationlib->oneLevel(
+					'Aufgenommene',		// description
+					$aufgenommenLink,				// link
+					null,				// children
+					'check',					// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					40   				// sort
+				),
 			)
 		);
 	}
@@ -1610,6 +1643,9 @@ class InfoCenter extends Auth_Controller
 			$link = site_url(self::ZGV_UEBERPRUEFUNG_URI);
 		if ($origin_page === self::ABGEWIESEN_PAGE)
 			$link = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
+
+		if ($origin_page === self::AUFGENOMMEN_PAGE)
+			$link = site_url(self::INFOCENTER_URI.'/'.self::AUFGENOMMEN_PAGE);
 
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))

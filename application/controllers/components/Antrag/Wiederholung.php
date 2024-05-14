@@ -41,6 +41,7 @@ class Wiederholung extends FHC_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
+			'global',
 			'studierendenantrag'
 		]);
 	}
@@ -75,10 +76,9 @@ class Wiederholung extends FHC_Controller
 			if (isError($result)) {
 				return $this->outputJsonError(getError($result));
 			}
-
 			$data = getData($result);
 
-			$result = $this->antraglib->getFailedExamForPrestudent($prestudent_id);
+			$result = $this->antraglib->getFailedExamForPrestudent($prestudent_id, $data->datum, $data->studiensemester_kurzbz);
 			// NOTE(chris): error handling for this function should already happenden in antraglib->getPrestudentWiederholungsBerechtigt()
 			$pruefungsdata = current(getData($result));
 

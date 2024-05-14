@@ -5,7 +5,6 @@ import GrundPopup from './Leitung/GrundPopup.js';
 import LvPopup from './Leitung/LvPopup.js';
 import BsAlert from '../Bootstrap/Alert.js';
 import FhcLoader from '../Loader.js';
-import Phrasen from '../../mixins/Phrasen.js';
 
 export default {
 	components: {
@@ -14,7 +13,6 @@ export default {
 		LeitungActions,
 		FhcLoader
 	},
-	mixins: [Phrasen],
 	props: {
 		stgL: Array,
 		stgA: Array
@@ -31,32 +29,28 @@ export default {
 		stgkzL() {
 			if (!this.stgL)
 				return [];
-			return this.stgL.map(stg => stg.studiengang_kz);
+			return this.stgL.map(stg => parseInt(stg));
 		},
 		stgkzA() {
 			if (!this.stgA)
 				return [];
-			return this.stgA.map(stg => stg.studiengang_kz);
+			return this.stgA.map(stg => parseInt(stg));
 		}
 	},
 	methods: {
 		loadFilter() {
-			axios.get(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Leitung/getActiveStgs'
-			).then(result => {
-				this.stgs = Object.values(result.data.retval).sort((a,b) => a.bezeichnung == b.bezeichnung ? (a.orgform == b.orgform ? 0 : (a.orgform > b.orgform ? 1 : -1)) : (a.bezeichnung > b.bezeichnung ? 1 : -1));
-			}).catch(error => {
-				console.error(error);
-			});
+			this.$fhcApi.factory
+				.studstatus.leitung.getStgs()
+				.then(result => this.stgs = result.data)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
-		changeFilter(evt) {
-			this.filter = evt.target.value || undefined;
+		changeFilter(filter) {
+			this.filter = filter || undefined;
 			this.reload();
 		},
 		reload() {
-			this.$refs.table.reload(this.filter);
+			if (this.$refs.table)
+				this.$refs.table.reload(this.filter);
 			this.loadFilter();
 		},
 		download() {
@@ -79,7 +73,7 @@ export default {
 				{
 					let countAntrage = 0;
 					LvPopup
-						.popup(this.p.t('studierendenantrag','title_show_lvs', currentAntrag), {
+						.popup(this.$p.t('studierendenantrag','title_show_lvs', currentAntrag), {
 							antragId: currentAntrag.studierendenantrag_id,
 							footer: true,
 							dialogClass: 'modal-lg',
@@ -104,21 +98,9 @@ export default {
 				}
 			} else {
 				this.$refs.loader.show();
-				axios
-					.all(
-						oks.map(
-							antrag => axios.post(
-								FHC_JS_DATA_STORAGE_OBJECT.app_root +
-								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-								'/components/Antrag/Leitung/approve' + antrag.typ,
-								{
-									studierendenantrag_id: antrag.studierendenantrag_id
-								}
-							)
-						)
-					)
-					.then(this.showValidation)
-					.catch(this.showError);
+				this.$fhcApi.factory
+					.studstatus.leitung.approve(oks)
+					.then(this.showResults);
 			}
 		},
 		actionReject(evt, gruende) {
@@ -128,7 +110,7 @@ export default {
 			var currentAntrag = antraege.pop();
 			if (currentAntrag) {
 				GrundPopup
-					.popup(this.p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
+					.popup(this.$p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
 						countRemaining: antraege.length
 					})
 					.then(result => {
@@ -148,61 +130,38 @@ export default {
 					.catch(() => {});
 			} else {
 				this.$refs.loader.show();
-				axios
-					.all(
-						gruende.map(
-							antrag => axios.post(
-								FHC_JS_DATA_STORAGE_OBJECT.app_root +
-								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-								'/components/Antrag/Leitung/reject' + antrag.typ,
-								{
-									studierendenantrag_id: antrag.studierendenantrag_id,
-									grund: antrag.grund
-								}
-							)
-						)
-					)
-					.then(this.showValidation)
-					.catch(this.showError);
+				this.$fhcApi.factory
+					.studstatus.leitung.reject(gruende)
+					.then(this.showResults);
 			}
 		},
 		actionReopen(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Leitung/reopenAntrag/',
-							{
-								studierendenantrag_id: antrag.studierendenantrag_id
-							}
-						)
-					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
+			this.$fhcApi.factory
+				.studstatus.leitung.reopen(gruende)
+				.then(this.showResults);
+		},
+		actionPause(evt) {
+			var antraege = evt || this.selectedData;
+			this.$refs.loader.show();
+			this.$fhcApi.factory
+				.studstatus.leitung.pause(antraege)
+				.then(this.showResults);
+		},
+		actionUnpause(evt) {
+			var antraege = evt || this.selectedData;
+			this.$refs.loader.show();
+			this.$fhcApi.factory
+				.studstatus.leitung.unpause(antraege)
+				.then(this.showResults);
 		},
 		actionObject(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Leitung/objectAntrag/',
-							{
-								studierendenantrag_id: antrag.studierendenantrag_id
-							}
-						)
-					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
+			this.$fhcApi.factory
+				.studstatus.leitung.object(antraege)
+				.then(this.showResults);
 		},
 		actionoObjectionDeny(evt, gruende) {
 			var antraege = evt || this.selectedData;
@@ -211,7 +170,7 @@ export default {
 			var currentAntrag = antraege.pop();
 			if (currentAntrag) {
 				GrundPopup
-					.popup(this.p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
+					.popup(this.$p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
 						countRemaining : antraege.length,
 						optional: true
 					})
@@ -230,84 +189,31 @@ export default {
 					.catch(() => {});
 			} else {
 				this.$refs.loader.show();
-				axios
-					.all(
-						gruende.map(
-							antrag => axios.post(
-								FHC_JS_DATA_STORAGE_OBJECT.app_root +
-								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-								'/components/Antrag/Leitung/objectionDeny/',
-								{
-									studierendenantrag_id: antrag.studierendenantrag_id,
-									grund: antrag.grund
-								}
-							)
-						)
-					)
-					.then(this.showValidation)
-					.catch(this.showError);
+				this.$fhcApi.factory
+					.studstatus.leitung.denyObjection(gruende)
+					.then(this.showResults);
 			}
 		},
 		actionObjectionApprove(evt, gruende) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Leitung/objectionApprove/',
-							{
-								studierendenantrag_id: antrag.studierendenantrag_id
-							}
-						)
-					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
+			this.$fhcApi.factory
+				.studstatus.leitung.approveObjection(antraege)
+				.then(this.showResults);
 		},
 		actionCancel(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Abmeldung/cancelAntrag/',
-							{
-								antrag_id: antrag.studierendenantrag_id
-							}
-						)
-					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
+			this.$fhcApi.factory
+				.studstatus.abmeldung.cancel(antraege)
+				.then(this.showResults);
 		},
-		showValidation(results) {
-			var errors = results.filter(res => res.data.error);
+		showResults(results) {
+			let fulfilled = results.filter(res => res.status == 'fulfilled');
 			this.$refs.loader.hide();
-			if (errors.length) {
-				let errorMsg = errors.map(
-					error =>
-					'Antrag ' +
-					JSON.parse(error.config.data).studierendenantrag_id +
-					'\n' +
-					Object.values(error.data.retval).join('\n')
-				).join('\n');
-
-				BsAlert.popup(errorMsg, {dialogClass: 'alert alert-danger'});
-			}
-			this.reload();
-		},
-		showError(error) {
-			this.$refs.loader.hide();
-			let msg = error.response.data;
-			if (msg.replace(/^\s+/, '').substr(0, 9) == '<!DOCTYPE' || msg.replace(/^\s+/, '').substr(0, 4).toLowerCase() == '<div')
-				msg = error.message;
-			BsAlert.popup(msg, {dialogClass: 'alert alert-danger'});
+			//fulfilled.forEach(a => this.$fhcAlert.alertDefault('success', '#' + a.value.data, 'Approved, ...'));
+			if (fulfilled.length)
+				this.reload();
 		}
 	},
 	created() {
@@ -338,6 +244,7 @@ export default {
 			ref="table"
 			:stg-a="stgkzA"
 			:stg-l="stgkzL"
+			:filter="filter"
 			v-model:columnData="columns"
 			v-model:selectedData="selectedData"
 			@action:approve="actionApprove"
@@ -347,6 +254,9 @@ export default {
 			@action:objectionDeny="actionoObjectionDeny"
 			@action:objectionApprove="actionObjectionApprove"
 			@action:cancel="actionCancel"
+			@action:pause="actionPause"
+			@action:unpause="actionUnpause"
+			@reload="reload"
 			>
 		</leitung-table>
 

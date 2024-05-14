@@ -32,12 +32,15 @@ class PrestudentLib
 		$this->_ci->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 		$this->_ci->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 	}
 
-	public function setAbbrecher($prestudent_id, $studiensemester_kurzbz, $insertvon = null, $statusgrund_kurzbz = null, $datum = null, $bestaetigtam = null)
+	public function setAbbrecher($prestudent_id, $studiensemester_kurzbz, $insertvon = null, $statusgrund_kurzbz = null, $datum = null, $bestaetigtam = null, $bestaetigtvon = null)
 	{
 		if (!$insertvon)
 			$insertvon = getAuthUID();
+		if (!$bestaetigtvon)
+			$bestaetigtvon = $insertvon;
 
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
 		if (isError($result))
@@ -71,14 +74,14 @@ class PrestudentLib
 		$result = $this->_ci->PrestudentstatusModel->withGrund($statusgrund_kurzbz)->insert([
 			'prestudent_id' => $prestudent_id,
 			'status_kurzbz' => Prestudentstatus_model::STATUS_ABBRECHER,
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'studiensemester_kurzbz' => $prestudent_status->studiensemester_kurzbz,
 			'ausbildungssemester' => $prestudent_status->ausbildungssemester,
 			'datum' => $datum,
 			'insertvon' => $insertvon,
 			'insertamum' => date('c'),
 			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
 			'studienplan_id'=> $prestudent_status->studienplan_id,
-			'bestaetigtvon' => $insertvon,
+			'bestaetigtvon' => $bestaetigtvon,
 			'bestaetigtam' => $bestaetigtam
 		]);
 
@@ -132,7 +135,7 @@ class PrestudentLib
 		}
 
 		//noch nicht eingetragene Zeugnisnoten auf 9 setzen
-		$result = $this->_ci->ZeugnisnoteModel->getZeugnisnoten($student->student_uid, $studiensemester_kurzbz);
+		$result = $this->_ci->ZeugnisnoteModel->getZeugnisnoten($student->student_uid, $prestudent_status->studiensemester_kurzbz);
 		if (isError($result))
 			return $result;
 		$result = getData($result) ?: [];
@@ -178,7 +181,7 @@ class PrestudentLib
 
 		//Studentlehrverband setzen
 		$this->_ci->StudentlehrverbandModel->update([
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'studiensemester_kurzbz' => $prestudent_status->studiensemester_kurzbz,
 			'student_uid' => $student->student_uid
 		], [
 			'studiengang_kz' => $student->studiengang_kz,
@@ -205,6 +208,7 @@ class PrestudentLib
 
 	public function setUnterbrecher($prestudent_id, $studiensemester_kurzbz, $studierendenantrag_id, $insertvon = null)
 	{
+		$ausbildungssemester_plus = 0;
 		if (!$insertvon)
 			$insertvon = getAuthUID();
 
@@ -213,14 +217,38 @@ class PrestudentLib
 			return $result;
 		$result = getData($result);
 		if (!$result) {
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
-				'prestudent_id' => $prestudent_id,
-				'studiensemester_kurzbz' => $studiensemester_kurzbz
-			]));
+			//NOTE(manu): only valid if nextSemester focus max
+
+			$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
+			if (isError($result))
+				return $result;
+			$result = getData($result);
+
+			//check if ausbildungssemester is last
+			$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+			$res = $this->_ci->StudiengangModel->loadWhere(['p.prestudent_id' => $prestudent_id]);
+			if(isError($res))
+				return $res;
+			if(!hasData($res))
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_for_prestudent', [
+					'prestudent_id' => $prestudent_id
+				]));
+
+			$studiengang = current(getData($res));
+			$prestudent_status = current($result);
+			if($prestudent_status->ausbildungssemester + 1 < $studiengang->max_semester)
+				$ausbildungssemester_plus = 1;
+
+			if(!$result)
+			{
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
+					'prestudent_id' => $prestudent_id,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz
+				]));
+			}
 		}
 
 		$prestudent_status = current($result);
-
 		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
 		if (isError($result))
@@ -245,7 +273,7 @@ class PrestudentLib
 			'prestudent_id' => $prestudent_id,
 			'status_kurzbz' => Prestudentstatus_model::STATUS_UNTERBRECHER,
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'ausbildungssemester' => $prestudent_status->ausbildungssemester,
+			'ausbildungssemester' => $prestudent_status->ausbildungssemester + $ausbildungssemester_plus,
 			'datum' => date('c'),
 			'insertvon' => $insertvon,
 			'insertamum' => date('c'),
@@ -256,7 +284,6 @@ class PrestudentLib
 			'anmerkung'=> 'Wiedereinstieg ' . $antrag->datum_wiedereinstieg
 		]);
 
-		//error try manu
 		if (isError($result))
 			return $result;
 
@@ -351,17 +378,34 @@ class PrestudentLib
 		]);
 
 		//Studentlehrverband setzen
-		$this->_ci->StudentlehrverbandModel->update([
+		$result = $this->_ci->StudentlehrverbandModel->loadWhere([
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'student_uid' => $student->student_uid
-		], [
-			'studiengang_kz' => $student->studiengang_kz,
-			'semester' => 0,
-			'verband' => 'B',
-			'gruppe' => '',
-			'updateamum' => date('c'),
-			'updatevon' => $insertvon
 		]);
+		if (hasData($result)) {
+			$this->_ci->StudentlehrverbandModel->update([
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'student_uid' => $student->student_uid
+			], [
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => 0,
+				'verband' => 'B',
+				'gruppe' => '',
+				'updateamum' => date('c'),
+				'updatevon' => $insertvon
+			]);
+		} else {
+			$this->_ci->StudentlehrverbandModel->insert([
+				'student_uid' => $student->student_uid,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => 0,
+				'verband' => 'B',
+				'gruppe' => '',
+				'insertamum' => date('c'),
+				'insertvon' => $insertvon
+			]);
+		}
 
 		return success();
 	}

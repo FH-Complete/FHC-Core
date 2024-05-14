@@ -9,6 +9,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
  * NOTE: extends the FHC_Controller instead of the Auth_Controller because the FilterCmpt has its
  * 	own permissions check
+ * TODO(chris): deprecated
  */
 class Filter extends FHC_Controller
 {
@@ -25,6 +26,9 @@ class Filter extends FHC_Controller
 
 		// Loads authentication library and starts authentication
 		$this->load->library('AuthLib');
+
+		// Loads the FiltersModel
+		$this->load->model('system/Filters_model', 'FiltersModel');
 
 		// Loads the FilterCmptLib with HTTP GET/POST parameters
 		$this->_startFilterCmptLib();

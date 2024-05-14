@@ -85,18 +85,18 @@ class GbDatumWeitZurueck extends PlausiChecker
 			$params[] = $studiengang_kz;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		$qry .= ")";
 
 		if (isset($person_id))
 		{
 			$qry .= " AND pers.person_id = ?";
 			$params[] = $person_id;
-		}
-
-		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
-		{
-			$qry .= " AND stg.studiengang_kz NOT IN ?";
-			$params[] = $exkludierte_studiengang_kz;
 		}
 
 		return $this->_db->execReadOnlyQuery($qry, $params);

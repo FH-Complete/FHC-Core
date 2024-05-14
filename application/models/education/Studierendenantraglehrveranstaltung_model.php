@@ -65,11 +65,32 @@ class Studierendenantraglehrveranstaltung_model extends DB_Model
 			'stat.studierendenantrag_status_id = campus.get_status_id_studierendenantrag(a.studierendenantrag_id)'
 		);
 		$this->addJoin('public.tbl_student s', 'prestudent_id');
-		$this->addJoin(
-			'lehre.tbl_zeugnisnote z',
-			'z.lehrveranstaltung_id=lv.lehrveranstaltung_id AND z.student_uid=s.student_uid AND z.studiensemester_kurzbz=a.studiensemester_kurzbz',
-			'LEFT'
-		);
+
+		// NOTE(chris): last offizell note
+		$this->addJoin('(
+			SELECT z.* 
+			FROM lehre.tbl_zeugnisnote z
+			LEFT JOIN public.tbl_studiensemester zs 
+				USING(studiensemester_kurzbz)
+			JOIN (
+				SELECT zi.lehrveranstaltung_id, zi.student_uid, MAX(zis.start) AS start 
+				FROM lehre.tbl_zeugnisnote zi
+				LEFT JOIN lehre.tbl_note zin
+					USING(note)
+				LEFT JOIN public.tbl_studiensemester zis
+					USING(studiensemester_kurzbz)
+				WHERE zin.aktiv AND zin.offiziell
+				GROUP BY zi.lehrveranstaltung_id, zi.student_uid
+			) zx
+				ON (
+					z.lehrveranstaltung_id=zx.lehrveranstaltung_id
+					AND z.student_uid=zx.student_uid
+					AND zs.start = zx.start
+				)) z', 'z.lehrveranstaltung_id=lv.lehrveranstaltung_id AND z.student_uid=s.student_uid', 'LEFT');
+		$this->addJoin('lehre.tbl_note zn', 'z.note = zn.note', 'LEFT');
+
+		$this->load->config('studierendenantrag');
+		$note_intern_angerechntet = $this->config->item('wiederholung_note_angerechnet');
 
 		return $this->loadWhere([
 			'ps.prestudent_id' => $prestudent_id,
@@ -77,7 +98,7 @@ class Studierendenantraglehrveranstaltung_model extends DB_Model
 			'stat.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
 			'n.note <> ' => 0,
 			$this->dbTable . '.studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'(n.note<>19 OR z.note IS NOT NULL)' => null
+			'(n.note<>' . $this->db->escape($note_intern_angerechntet) . ' OR (z.note IS NOT NULL AND zn.positiv))' => null
 		]);
 	}
 }

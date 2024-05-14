@@ -68,6 +68,7 @@ class Pruefung_model extends DB_Model
 	}
 
     /**
+     * NOTE(chris): not used
      * @return string
      */
     protected function loadWhereThreeExamsFailed()
@@ -115,8 +116,16 @@ class Pruefung_model extends DB_Model
         $this->addJoin('public.tbl_person pers', 'person_id');
         $this->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid');
         $this->addJoin('public.tbl_studiengang g', 'ps.studiengang_kz=g.studiengang_kz');
-        $this->addJoin('bis.tbl_orgform o', 'g.orgform_kurzbz=o.orgform_kurzbz');
-        $this->db->join('campus.tbl_studierendenantrag a', 'ps.prestudent_id=a.prestudent_id and a.typ = ?', 'LEFT', false);
+        $this->addJoin(
+        	'public.tbl_prestudentstatus pss',
+        	'pss.prestudent_id=ps.prestudent_id 
+        	AND pss.studiensemester_kurzbz=le.studiensemester_kurzbz 
+        	AND pss.status_kurzbz=get_rolle_prestudent(ps.prestudent_id, le.studiensemester_kurzbz)',
+        	'LEFT'
+        );
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, pss.orgform_kurzbz, g.orgform_kurzbz)=o.orgform_kurzbz');
+		$this->db->join('campus.tbl_studierendenantrag a', 'ps.prestudent_id=a.prestudent_id and a.typ = ?', 'LEFT', false);
 
         $this->db->where("n.positiv", false);
         /*		$this->db->where_in("p.pruefungstyp_kurzbz1", ['kommPruef','zusKommPruef']);*/
@@ -146,40 +155,134 @@ class Pruefung_model extends DB_Model
         return $this->db->get_compiled_select($this->dbTable);
     }
 
+	/**
+	 * @return stdClass
+	 */
+	public function loadWhereCommitteeExamsFailed()
+	{
+		$this->load->config('studierendenantrag');
+
+		$this->dbTable = 'lehre.tbl_pruefung p';
+
+		$this->addSelect('p.datum');
+
+		$this->addJoin('lehre.tbl_note n', 'note');
+
+		$this->db->where("n.positiv", false);
+		$note_blacklist = $this->config->item('note_blacklist_wiederholung');
+		if ($note_blacklist)
+			$this->db->where_not_in("n.note", $note_blacklist);
+		$this->db->where_in("p.pruefungstyp_kurzbz", ['kommPruef','zusKommPruef']);
+
+		$this->addOrder('p.datum', 'DESC');
+
+		return $this->load();
+	}
 
 
+	/**
+	 * @return void
+	 */
+	protected function withDetailsForStudierendenAntrag()
+	{
+		$this->load->config('studierendenantrag');
+
+		$sprache_index = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
+
+		$this->addSelect('pers.vorname');
+		$this->addSelect('pers.nachname');
+		$this->addSelect('pers.person_id');
+		$this->addSelect('s.matrikelnr');
+		$this->addSelect('g.bezeichnung');
+		$this->addSelect('g.studiengang_kz');
+		$this->addSelect('o.bezeichnung_mehrsprachig[(' . $sprache_index . ')] AS orgform', false);
+		$this->addSelect('ps.prestudent_id');
+		$this->addSelect('lv.bezeichnung as lvbezeichnung');
+		$this->addSelect('le.studiensemester_kurzbz');
+		$this->addSelect('a.studierendenantrag_id');
+		$this->addSelect('a.typ');
+		$this->addSelect('campus.get_status_studierendenantrag(a.studierendenantrag_id) status');
+		$this->addSelect('pss.ausbildungssemester');
+
+		$this->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
+		$this->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
+		$this->addJoin('public.tbl_student s', 'student_uid');
+		$this->addJoin('public.tbl_prestudent ps', 'prestudent_id');
+		$this->addJoin('public.tbl_person pers', 'person_id');
+		$this->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid');
+		$this->addJoin('public.tbl_studiengang g', 'ps.studiengang_kz=g.studiengang_kz');
+		$this->addJoin(
+			'public.tbl_prestudentstatus pss',
+			'pss.prestudent_id=ps.prestudent_id 
+			AND pss.studiensemester_kurzbz=le.studiensemester_kurzbz 
+			AND pss.status_kurzbz=get_rolle_prestudent(ps.prestudent_id, le.studiensemester_kurzbz)',
+			'LEFT'
+		);
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, pss.orgform_kurzbz, g.orgform_kurzbz)=o.orgform_kurzbz');
+		$this->addJoin(
+			'campus.tbl_studierendenantrag a',
+			'ps.prestudent_id=a.prestudent_id and a.typ=' . $this->escape(Studierendenantrag_model::TYP_WIEDERHOLUNG),
+			'LEFT'
+		);
+
+		$this->db->where("g.aktiv", true);
+
+		$statusgruende = $this->config->item('status_gruende_wiederholer');
+		if (is_array($statusgruende) && !isEmptyArray($statusgruende)) {
+			foreach ($statusgruende as $k => $v) {
+				$statusgruende[$k] = $this->db->escape($v);
+			}
+			$this->db->where('lv.studiengang_kz NOT IN(
+				SELECT ps1.studiengang_kz
+				FROM
+				public.tbl_prestudent ps1
+				JOIN public.tbl_prestudentstatus pss USING (prestudent_id)
+				WHERE pss.statusgrund_id in (' . implode(',', $statusgruende) . ')
+				AND ps.prestudent_id = ps1.prestudent_id)', null, false);
+		}
+	}
 
 	/**
 	 * @param integer		$prestudent_id student_uid
 	 *
 	 * @return stdClass
 	 */
-	public function loadWhereCommitteeExamFailedForPrestudent($prestudent_id)
+	public function loadWhereCommitteeExamFailedForPrestudent($prestudent_id, $max_date = null, $studiensemester_kurzbz = null)
 	{
+		$this->withDetailsForStudierendenAntrag();
 
-		$sql = $this->loadWhereThreeExamsFailed();
+		$this->db->where('ps.prestudent_id', $prestudent_id);
 
-        $statusgruende = $this->config->item('status_gruende_wiederholer');
-        if (!is_array($statusgruende))
-            $statusgruende = [];
+		if ($max_date !== null) {
+			$this->db->where('p.datum <=', $max_date);
+		}
+		if ($studiensemester_kurzbz !== null) {
+			$this->db->where('le.studiensemester_kurzbz', $studiensemester_kurzbz);
+		}
 
-        return $this->execQuery('select * from ( ' . $sql . ') temp where count >= 3 AND prestudent_id = ?', [
-			Studierendenantrag_model::TYP_WIEDERHOLUNG,
-			$statusgruende,
-			$prestudent_id
-		]);
+		return $this->loadWhereCommitteeExamsFailed();
 	}
 
+	/**
+	 * @param string		$status
+	 * @param \DateTime		$maxDate
+	 * @param \DateTime		$minDate
+	 *
+	 * @return stdClass
+	 */
 	public function getAllPrestudentsWhereCommitteeExamFailed($status, $maxDate, $minDate)
 	{
-		$this->load->model('education/Studierendenantrag_model', 'StudierendenantragModel');
+		$this->withDetailsForStudierendenAntrag();
 
 		if ($maxDate)
-			$this->db->where("p.datum < ", $maxDate->format('c'));
+			$this->db->where("p.datum <= ", $maxDate->format('Y-m-d'));
 		if ($minDate)
-			$this->db->where("p.datum > ", $minDate->format('c'));
+			$this->db->where("p.datum > ", $minDate->format('Y-m-d'));
 
 		$this->db->where("b.aktiv", true);
+
+		$this->db->where_in("get_rolle_prestudent(ps.prestudent_id, null)", $this->config->item('antrag_prestudentstatus_whitelist'));
 
 		if (is_array($status)) {
 			if (in_array(null, $status)) {
@@ -199,12 +302,6 @@ class Pruefung_model extends DB_Model
 			$this->db->where('campus.get_status_studierendenantrag(a.studierendenantrag_id)', $status);
 		}
 
-		$sql = $this->loadWhereThreeExamsFailed();
-
-		$statusgruende = $this->config->item('status_gruende_wiederholer');
-		if (!is_array($statusgruende))
-			$statusgruende = [];
-
-		return $this->execQuery('select * from ( ' . $sql . ') temp where count >= 3', [Studierendenantrag_model::TYP_WIEDERHOLUNG, $statusgruende]);
+		return $this->loadWhereCommitteeExamsFailed();
 	}
 }

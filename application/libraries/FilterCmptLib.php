@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (C) 2022 fhcomplete.org
  *
@@ -36,6 +37,7 @@ class FilterCmptLib
 	const SESSION_METADATA = 'datasetMetadata';
 	const SESSION_ROW_NUMBER = 'rowNumber';
 	const SESSION_TIMEOUT = 'sessionTimeout';
+	const SESSION_ENCRYPTED_COLUMNS = 'encryptedColumns';
 
 	// Session dataset elements
 	const SESSION_DATASET = 'dataset';
@@ -62,6 +64,7 @@ class FilterCmptLib
 
 	// ...to specify permissions that are needed to use this FilterCmpt
 	const REQUIRED_PERMISSIONS = 'requiredPermissions';
+	const ENCRYPTED_COLUMNS = 'encryptedColumns';
 
 	// ...stament to retrieve the dataset
 	const QUERY = 'query';
@@ -102,6 +105,7 @@ class FilterCmptLib
 	private $_filterKurzbz;
 	private $_query;
 	private $_requiredPermissions;
+	private $_encryptedColumns;
 	private $_reloadDataset;
 	private $_sessionTimeout;
 
@@ -504,10 +508,12 @@ class FilterCmptLib
 			$saveCustomFilter = true;
 		}
 
-		if ($saveCustomFilter === true) 
+		if ($saveCustomFilter === true)
 		{
-			$this->_setSessionElement(FilterCmptLib::SESSION_SIDE_MENU, 
-				$this->_generateFilterMenu($this->_app, $this->_datasetName));	
+			$this->_setSessionElement(
+				FilterCmptLib::SESSION_SIDE_MENU,
+				$this->_generateFilterMenu($this->_app, $this->_datasetName)
+			);
 		}
 		
 		return $saveCustomFilter;
@@ -717,6 +723,7 @@ class FilterCmptLib
 		$this->_filterKurzbz = null;
 		$this->_query = null;
 		$this->_requiredPermissions = null;
+		$this->_encryptedColumns = null;
 
 		$this->_reloadDataset = true; // by default the dataset is NOT cached in session
 		$this->_sessionTimeout = FilterCmptLib::SESSION_DEFAULT_TIMEOUT;
@@ -725,6 +732,12 @@ class FilterCmptLib
 		if (isset($filterCmptArray[FilterCmptLib::REQUIRED_PERMISSIONS]))
 		{
 			$this->_requiredPermissions = $filterCmptArray[FilterCmptLib::REQUIRED_PERMISSIONS];
+		}
+
+		// Retrieved the encrypted columns parameter if present
+		if (isset($filterCmptArray[FilterCmptLib::ENCRYPTED_COLUMNS]))
+		{
+			$this->_encryptedColumns = $filterCmptArray[FilterCmptLib::ENCRYPTED_COLUMNS];
 		}
 
 		// Parameters needed to retrieve univocally a filter from DB
@@ -1129,7 +1142,7 @@ class FilterCmptLib
 			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
 
 			// Execute the given SQL statement suppressing error messages
-			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery);
+			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery, null, $this->_encryptedColumns);
 		}
 
 		return $dataset;

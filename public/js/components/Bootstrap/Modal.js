@@ -1,3 +1,5 @@
+import Phrasen from '../../plugin/Phrasen.js';
+
 export default {
 	data: () => ({
 		modal: null
@@ -66,6 +68,13 @@ export default {
 			slots.title = () => title;
 		if (footer !== undefined)
 			slots.footer = () => footer;
+
+		// little hack to check whether primevue is included in the app or not
+		let includedPrimevue = false;
+		if(typeof primevue !== 'undefined'){
+			includedPrimevue = true;
+		}
+
 		return new Promise((resolve,reject) => {
 			const instance = Vue.createApp({
 				setup() {
@@ -78,6 +87,7 @@ export default {
 				},
 				mounted() {
 					this.$refs.modal.show();
+					
 				},
 				beforeUnmount() {
 					if (this.$refs.modal)
@@ -88,6 +98,13 @@ export default {
 				}
 			});
 			const wrapper = document.createElement("div");
+			
+			// if(primevue) --> won't work because primevue is not defined in this scope and promise would be rejected
+			if (includedPrimevue){
+				instance.use(primevue.config.default, {zIndex: {overlay: 9999}})
+			}
+				 
+			instance.use(Phrasen); // TODO(chris): find a more dynamic way
 			instance.mount(wrapper);
 			document.body.appendChild(wrapper);
 		});
