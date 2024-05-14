@@ -385,7 +385,6 @@ class Prestudentstatus_model extends DB_Model
 		}
 		else
 		{
-			//TODO(manu) nur retval übergeben
 			return success("1", $this->p->t('lehre','error_rolleBereitsVorhanden'));
 		}
 	}
