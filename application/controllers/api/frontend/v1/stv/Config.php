@@ -67,7 +67,7 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_prestudent'),
 			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js'
 		];
-		$result['multistatus'] = [
+		$result['status'] = [
 			'title' => 'Status',
 			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js'
 		];
@@ -114,7 +114,7 @@ class Config extends FHCAPI_Controller
 				'additionalCols' => []
 			]
 		];
-		$result['multistatus'] = [
+		$result['status'] = [
 			'title' => 'Status',
 			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js',
 			'config' => [

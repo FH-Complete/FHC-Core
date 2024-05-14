@@ -139,7 +139,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 		this.$fhcApi
 			.get('api/frontend/v1/stv/lists/getStgs')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => result.data)
 			.then(result => {
 				this.listStgs = result;
 			})
@@ -174,8 +174,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-	<div class="stv-details-details h-100 pb-3">
-<!--	TEST: {{modelValue}} -->
+	<div class="stv-details-details h-100 pb-3">	
 		<form-form ref="form" class="stv-details-prestudent" @submit.prevent="updatePrestudent">
 		<div class="position-sticky top-0 z-1">
 			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!deltaLength">Speichern</button>
@@ -289,7 +288,7 @@ export default {
 								<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 							</form-input>
 						</div>
-						<!--ZGV Doktor Todo(manu) Config -->
+						<!--ZGV Doktor-->
 						<div v-if="showZgvDoktor" class="row mb-3">
 							<form-input
 								container-class="col-3"

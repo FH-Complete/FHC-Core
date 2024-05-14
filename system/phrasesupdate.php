@@ -27761,6 +27761,7 @@ array(
 			)
 		)
 	),
+	//****************************	 FHC-Core-Status
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
@@ -27776,6 +27777,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Teaching Association',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successNewStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{countSuccess} erfolgreiche Statusänderung(en) auf {status}, {countError} Fehler',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{countSuccess} successful status changes to {status}, {countError} errors',
 				'description' => '',
 				'insertvon' => 'system'
 			)

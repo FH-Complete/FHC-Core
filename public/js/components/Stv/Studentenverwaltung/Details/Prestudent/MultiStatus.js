@@ -351,7 +351,7 @@ export default{
 			});
 		},
 		actionConfirmDialogue(data, statusgrund, statusText){
-			this.hideModal('addMultiStatus2');
+			this.hideModal('addMultiStatus');
 			this.actionButton = statusgrund;
 			this.actionStatusText = statusText;
 
@@ -375,6 +375,8 @@ export default{
 			console.log(this.newArray);
 
 			console.log("in changeStatusToAbbrecher" + prestudentIds);
+			console.log("count: " + prestudentIds.length);
+
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToAbbrecherStud(prestudentIds){
@@ -447,7 +449,7 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
 
 			console.log("in changeStatusToDiplomand" + prestudentIds);
-			this.hideModal('addMultiStatus2');
+			this.hideModal('addMultiStatus');
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToAbsolvent(prestudentIds){
@@ -462,45 +464,53 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
 
 			console.log("in changeStatusToAbsolvent" + prestudentIds);
-			this.hideModal('addMultiStatus2');
+			this.hideModal('addMultiStatus');
 			this.addNewStatus(prestudentIds);
 		},
 		addNewStatus(prestudentIds){
 			//Array.isArray(prestudentIds) ? this.modelValue.prestudent_id : [prestudentIds];
 			let changeData = {};
 
+			//for Feedback Sucess, Error
+			let countSuccess = 0;
+			let countError = 0;
+
 			if(!prestudentIds)
 				prestudentIds = [this.modelValue.prestudent_id];
 
 			const promises = prestudentIds.map(prestudentId => {
 				//TODO(manu) besserer check
-				//if(!this.newArray)
-				if(this.statusData.status_kurzbz)
-				{
-					changeData = this.statusData; //this.statusData = this.updateData.find(item => item.prestudent_id === prestudentId);
-				}
-				else
-				{
-					changeData = this.newArray.find(item => item.prestudent_id === prestudentId);
-				}
+				changeData = this.statusData.status_kurzbz ? this.statusData : this.newArray.find(item => item.prestudent_id === prestudentId);
 
 				return this.$fhcApi.post('api/frontend/v1/stv/status/addNewStatus/' + prestudentId,
-					//this.statusData
-					//this.updateData.find(item => item.prestudent_id == prestudentId)
 					changeData
 				).then(response => {
-						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-						console.log(response);
+						countSuccess++;
 						return response;
-						}).catch(this.$fhcAlert.handleSystemError)
-					/*.finally(() => {
-					window.scrollTo(0, 0);
-				})*/;
+						})
+					//.catch(this.$fhcAlert.handleSystemError)
+					.catch(error => {
+						countError++;
+						//For each Prestudent show Error in Alert
+						this.$fhcAlert.handleSystemError(error);
+					});
 			});
 
 			Promise
 				.allSettled(promises)
 				.then(values => {
+					let newStatus = this.newArray[0].status_kurzbz;
+					console.log(`Successful: ${countSuccess}, Errors: ${countError}`);
+
+					//Feedback Success als infoalert
+					 if (countSuccess > 0) {
+						 this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
+							 'countSuccess': countSuccess,
+							 'status': newStatus,
+							 'countError': countError
+						 }));
+					 }
+
 					if (this.modelValue.prestudent_id) {
 						this.reload();
 						//TODO(manu) reload Detailtab after Abbrecher to see current status activ, verband and gruppe
@@ -511,7 +521,6 @@ export default{
 					this.hideModal('newStatusModal');
 					this.resetModal();
 				});
-
 		},
 		advanceStatus(statusId){
 			return this.$fhcApi.post('api/frontend/v1/stv/status/advanceStatus/' +
@@ -653,7 +662,7 @@ export default{
 	mounted(){},
 	template: `
 		<div class="stv-list h-100 pt-3">
-				
+					
 			<!--Modal: Add New Status-->
 			<BsModal ref="newStatusModal">
 				<template #title>{{$p.t('lehre', 'status_new')}}</template>
@@ -844,7 +853,7 @@ export default{
 									<option  value="Bewerber">BewerberIn</option>
 									<option  value="Aufgenommener">Aufgenommene/r</option>
 									<option  value="Student">StudentIn</option>
-<!--									TODO(Manu) handle Unterbrecher from here
+<!--									TODO(Manu) check: is handle Unterbrecher from here necessary?
 									<option  value="Unterbrecher">UnterbrecherIn</option>-->
 									<option  value="Diplomand">DiplomandIn</option>
 									<option  value="Incoming">Incoming</option>
@@ -1030,7 +1039,7 @@ export default{
 				</template>
 			</BsModal>
 			
-			<BsModal ref="addMultiStatus2" id="addMultiStatus2">
+			<BsModal ref="addMultiStatus" id="addMultiStatus">
 				<template #title>Status ändern zu</template>
 				<template #default>
 					<button type="button" class="btn btn-primary d-block mb-2" data-bs-toggle="collapse" data-bs-target="#submenu1">
@@ -1124,7 +1133,7 @@ export default{
 				>
 				
 				<template #actions="{updateData2}">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus2">
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus">
 						Status Ändern
 					</button>
 				</template>
@@ -1134,7 +1143,7 @@ export default{
 				v-if="this.modelValue.length"
 				ref="buttonsStatusMulti"
 			>	
-			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus2">
+			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus">
 				Status Ändern
 			</button>
 			</div>

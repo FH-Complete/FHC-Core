@@ -12,15 +12,15 @@ class Prestudent extends FHCAPI_Controller
 			'get' => ['admin:r', 'assistenz:r'],
 			'updatePrestudent' =>  ['admin:w', 'assistenz:w'],
 			'getHistoryPrestudents' => ['admin:r', 'assistenz:r'],
-			'getBezeichnungZGV' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'getBezeichnungDZgv' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'getBezeichnungMZgv' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'getAusbildung' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'getAufmerksamdurch' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'getBerufstaetigkeit' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'getTypenStg' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'getStudiensemester' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'getStudienplaene' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'getBezeichnungZGV' => self::PERM_LOGGED,
+			'getBezeichnungDZgv' => self::PERM_LOGGED,
+			'getBezeichnungMZgv' => self::PERM_LOGGED,
+			'getAusbildung' => self::PERM_LOGGED,
+			'getAufmerksamdurch' => self::PERM_LOGGED,
+			'getBerufstaetigkeit' => self::PERM_LOGGED,
+			'getTypenStg' => self::PERM_LOGGED,
+			'getStudiensemester' => self::PERM_LOGGED,
+			'getStudienplaene' => self::PERM_LOGGED
 		]);
 
 		// Load Libraries
