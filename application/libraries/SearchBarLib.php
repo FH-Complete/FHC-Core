@@ -390,6 +390,80 @@ EOSC;
 	 */
 	private function _raum($searchstr, $type)
 	{
+		$dbModel = new DB_Model();
+		// select - ARRAY_AGG(ort_reihungstest_studiengang.test) as reihungstest_studiengang
+		/* LEFT JOIN (
+			Select reihungstest_id, bezeichnung as reihungstest_studiengang_bezeichnung, CONCAT(reihungstest_id,\' - \',bezeichnung) as test, public.tbl_rt_ort.ort_kurzbz 
+			FROM public.tbl_reihungstest
+			JOIN public.tbl_studiengang USING(studiengang_kz)
+			JOIN public.tbl_rt_ort ON reihungstest_id = rt_id
+
+		) ort_reihungstest_studiengang ON ort_reihungstest_studiengang.ort_kurzbz = ort.ort_kurzbz
+ 		*/
+		$rooms = $dbModel->execReadOnlyQuery('
+			SELECT
+				\''.$type.'\' AS type,
+				ort.ort_kurzbz as ort_kurzbz,
+				ort.gebteil as building,
+				ort.stockwerk as floor,
+				ort.dislozierung as room_number
+				
+				FROM public.tbl_ort as ort
+				
+			 WHERE ort.ort_kurzbz like \'%'. $searchstr . '%\' GROUP BY ort.ort_kurzbz' 
+			/* 
+			
+			org joins:
+
+			   JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
+		     LEFT JOIN public.tbl_organisationseinheit oParent ON(oParent.oe_kurzbz = o.oe_parent_kurzbz)
+			 LEFT JOIN public.tbl_organisationseinheittyp otParent ON(oParent.organisationseinheittyp_kurzbz = otParent.organisationseinheittyp_kurzbz)
+		     LEFT JOIN (
+				SELECT benutzerfunktion_id, oe_kurzbz
+				  FROM public.tbl_benutzerfunktion
+				 WHERE funktion_kurzbz = \'oezuordnung\'
+				   AND (datum_von IS NULL OR datum_von <= NOW())
+				   AND (datum_bis IS NULL OR datum_bis >= NOW())
+			) bfCount ON(bfCount.oe_kurzbz = o.oe_kurzbz)
+		     LEFT JOIN (
+				SELECT bf.oe_kurzbz, bf.uid, p.vorname, p.nachname
+				  FROM public.tbl_benutzerfunktion bf
+				  JOIN public.tbl_benutzer b USING(uid)
+				  JOIN public.tbl_person p USING(person_id)
+				 WHERE funktion_kurzbz = \'Leitung\'
+				   AND (datum_von IS NULL OR datum_von <= NOW())
+				   AND (datum_bis IS NULL OR datum_bis >= NOW())
+				   AND b.aktiv = TRUE
+			) bfLeader ON(bfLeader.oe_kurzbz = o.oe_kurzbz) 
+			
+			
+			
+			$this->buildSearchClause(
+				$dbModel, 
+				array('o.oe_kurzbz', 'o.bezeichnung', 'ot.bezeichnung'), 
+				$searchstr
+			) . 
+			'GROUP BY type, o.oe_kurzbz, o.bezeichnung, ot.bezeichnung, oParent.oe_kurzbz, oParent.bezeichnung, otParent.bezeichnung'
+		*/
+		);
+
+		// If something has been found
+		if (hasData($rooms))
+		{
+			// Loop through the returned dataset
+			foreach (getData($rooms) as $room)
+			{
+				if($room->building == null){
+					$room->test = "test";
+				
+				}
+			}
+
+			// Returns the dataset
+			return getData($rooms);
+		}
+
+		// Otherwise return an empty array
 		return array();
 	}
 }
