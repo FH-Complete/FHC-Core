@@ -25282,6 +25282,26 @@ array(
 	array(
 		'app' => 'softwarebereitstellung',
 		'category' => 'global',
+		'phrase' => 'softwaretypKurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwaretyp Kurzbz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Softwaretype short',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
 		'phrase' => 'softwareKurzbz',
 		'insertvon' => 'system',
 		'phrases' => array(
