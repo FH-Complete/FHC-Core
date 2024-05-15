@@ -391,24 +391,52 @@ EOSC;
 	private function _raum($searchstr, $type)
 	{
 		$dbModel = new DB_Model();
-		// select - ARRAY_AGG(ort_reihungstest_studiengang.test) as reihungstest_studiengang
-		/* LEFT JOIN (
-			Select reihungstest_id, bezeichnung as reihungstest_studiengang_bezeichnung, CONCAT(reihungstest_id,\' - \',bezeichnung) as test, public.tbl_rt_ort.ort_kurzbz 
-			FROM public.tbl_reihungstest
-			JOIN public.tbl_studiengang USING(studiengang_kz)
-			JOIN public.tbl_rt_ort ON reihungstest_id = rt_id
 
-		) ort_reihungstest_studiengang ON ort_reihungstest_studiengang.ort_kurzbz = ort.ort_kurzbz
- 		*/
 		$rooms = $dbModel->execReadOnlyQuery('
 			SELECT
 				\''.$type.'\' AS type,
-				ort.ort_kurzbz as ort_kurzbz,
-				ort.gebteil as building,
-				ort.stockwerk as floor,
-				ort.dislozierung as room_number,
-				CONCAT(standort.plz,\' \',standort.ort,\', \',standort.strasse,\' \\ \',ort.stockwerk,\' Stockwerk\') as strasse,
-				CONCAT(ort.max_person,\', davon \',ort.arbeitsplaetze,\' PC-Plätze\') as plaetze
+				COALESCE(ort.ort_kurzbz, \'N/A\') as ort_kurzbz,
+				COALESCE(ort.gebteil, \'N/A\') as building,
+				COALESCE(ort.ausstattung, \'N/A\') as austattung,
+				COALESCE(CAST(ort.stockwerk AS VARCHAR), \'N/A\') as floor,
+				COALESCE(CAST(ort.dislozierung AS VARCHAR), \'N/A\') as room_number,
+				COALESCE(CAST(ort.content_id AS VARCHAR), \'N/A\') as content_id,
+				
+				CASE
+					WHEN standort.plz IS NULL OR standort.ort IS NULL THEN 
+						CASE
+							WHEN standort.strasse IS NULL THEN
+								CASE
+									WHEN ort.stockwerk IS NULL THEN \'N/A\'
+									ELSE CONCAT(ort.stockwerk,\' Stockwerk\')
+								END
+							ELSE 
+								CASE
+									WHEN ort.stockwerk IS NULL THEN standort.strasse
+									ELSE CONCAT(standort.strasse,\' / \',ort.stockwerk,\' Stockwerk\')
+								END
+						END
+					ELSE 
+						CASE 
+							WHEN standort.strasse IS NULL THEN
+								CASE
+									WHEN ort.stockwerk IS NULL THEN CONCAT(standort.plz,\' \',standort.ort)
+									ELSE CONCAT(standort.plz,\' \',standort.ort,\' / \',ort.stockwerk,\' Stockwerk\')
+								END
+							ELSE 
+								CASE
+									WHEN ort.stockwerk IS NULL THEN CONCAT(standort.plz,\' \',standort.ort,\' / \',standort.strasse)
+									ELSE CONCAT(standort.plz,\' \',standort.ort,\', \',standort.strasse,\' / \',ort.stockwerk,\' Stockwerk\')
+								END
+						END
+				END as standort,
+				
+				
+				CASE
+					WHEN ort.max_person IS NULL OR ort.arbeitsplaetze IS NULL THEN \'N/A\'
+					ELSE CONCAT(ort.max_person,\', davon \',ort.arbeitsplaetze,\' PC-Plätze\')
+				END as sitzplaetze
+				
 				FROM public.tbl_ort as ort
 				LEFT JOIN (
 					select ort,standort_id,strasse, plz
@@ -416,54 +444,12 @@ EOSC;
 					LEFT JOIN public.tbl_adresse USING(adresse_id)
 				) standort USING(standort_id)
 			 WHERE LOWER(ort.ort_kurzbz) like LOWER(\'%'. $searchstr . '%\') ' 
-			/* 
 			
-			org joins:
-
-			   JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
-		     LEFT JOIN public.tbl_organisationseinheit oParent ON(oParent.oe_kurzbz = o.oe_parent_kurzbz)
-			 LEFT JOIN public.tbl_organisationseinheittyp otParent ON(oParent.organisationseinheittyp_kurzbz = otParent.organisationseinheittyp_kurzbz)
-		     LEFT JOIN (
-				SELECT benutzerfunktion_id, oe_kurzbz
-				  FROM public.tbl_benutzerfunktion
-				 WHERE funktion_kurzbz = \'oezuordnung\'
-				   AND (datum_von IS NULL OR datum_von <= NOW())
-				   AND (datum_bis IS NULL OR datum_bis >= NOW())
-			) bfCount ON(bfCount.oe_kurzbz = o.oe_kurzbz)
-		     LEFT JOIN (
-				SELECT bf.oe_kurzbz, bf.uid, p.vorname, p.nachname
-				  FROM public.tbl_benutzerfunktion bf
-				  JOIN public.tbl_benutzer b USING(uid)
-				  JOIN public.tbl_person p USING(person_id)
-				 WHERE funktion_kurzbz = \'Leitung\'
-				   AND (datum_von IS NULL OR datum_von <= NOW())
-				   AND (datum_bis IS NULL OR datum_bis >= NOW())
-				   AND b.aktiv = TRUE
-			) bfLeader ON(bfLeader.oe_kurzbz = o.oe_kurzbz) 
-			
-			
-			
-			$this->buildSearchClause(
-				$dbModel, 
-				array('o.oe_kurzbz', 'o.bezeichnung', 'ot.bezeichnung'), 
-				$searchstr
-			) . 
-			'GROUP BY type, o.oe_kurzbz, o.bezeichnung, ot.bezeichnung, oParent.oe_kurzbz, oParent.bezeichnung, otParent.bezeichnung'
-		*/
 		);
 
 		// If something has been found
 		if (hasData($rooms))
 		{
-			// Loop through the returned dataset
-			foreach (getData($rooms) as $room)
-			{
-				if($room->building == null){
-					$room->test = "test";
-				
-				}
-			}
-
 			// Returns the dataset
 			return getData($rooms);
 		}
