@@ -86,6 +86,12 @@ if($prestudent_id!='')
 	$disabled = $bismeldestichtag->checkMeldestichtagErreicht($datum) && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid')
 		? ' disabled="true"'
 		: '';
+    $isStatusBeforeStudent = in_array($status_kurzbz, array('Student','Diplomand','Absovlent','Incoming','Abbrecher','Unterbrecher'))
+        ? false
+        : true;
+    $disabledStudent = $isStatusBeforeStudent
+		? ' '
+		: ' disabled="true"';
 }
 ?>
 
@@ -100,8 +106,11 @@ if($prestudent_id!='')
 <vbox>
 <textbox id="student-rolle-textbox-prestudent_id" value="" hidden="true" />
 <groupbox id="student-rolle-groupbox" flex="1">
-	<?php if ($disabled): ?>
+	<?php if ($disabled && !$isStatusBeforeStudent): ?>
 		<label class="warning">Meldestichtag erreicht - ausschließlich Bearbeiten Statusgrund möglich</label>
+	<?php endif; ?>
+	<?php if ($disabled && $isStatusBeforeStudent): ?>
+        <label class="warning">Meldestichtag erreicht - Bearbeiten Ausbildungssemester und Statusgrund möglich</label>
 	<?php endif; ?>
 	<caption label="Details<?php echo ($nachname!=''?" $nachname $vorname":'');?>"/>
 		<grid id="student-rolle-grid-detail" style="margin:4px;" flex="1">
@@ -144,7 +153,7 @@ if($prestudent_id!='')
 	  			</row>
 	  			<row>
 	  				<label value="Ausbildungssemester" control="student-rolle-menulist-ausbildungssemester"/>
-					<menulist id="student-rolle-menulist-ausbildungssemester"<?php echo $disabled ?> >
+					<menulist id="student-rolle-menulist-ausbildungssemester"<?php echo $disabledStudent ?> >
 						<menupopup>
 						<?php
 
@@ -268,15 +277,11 @@ if($prestudent_id!='')
 	</grid>
 	<hbox>
 		<spacer flex="1" />
+		<?php if ($disabled): ?>
+            <button id="student-statusgrund-button-speichern" oncommand="StudentEditSperre()" label="Edit trotz Sperre"/>
+		<?php endif; ?>
 		<button id="student-rolle-button-speichern" oncommand="StudentRolleSpeichern()" label="Speichern"<?php echo $disabled ?> />
 	</hbox>
-
-    <hbox>
-        <spacer flex="1" />
-		<?php if ($disabled): ?>
-            <button id="student-statusgrund-button-speichern" oncommand="StudentUpdateStatusgrund()" label="Statusgrund Bearbeiten"/>
-		<?php endif; ?>
-    </hbox>
 
 </groupbox>
 </vbox>

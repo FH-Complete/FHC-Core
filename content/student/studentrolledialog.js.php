@@ -114,9 +114,9 @@ function StudentRolleSpeichern()
 		window.close();
 }
 
-function StudentUpdateStatusgrund()
+function StudentEditSperre()
 {
-	if(window.opener.StudentUpdateStatusgrund(document, StudentRolleStudiensemester_old, StudentRolleAusbildungssemester_old))
+	if(window.opener.StudentEditSperre(document, StudentRolleStudiensemester_old, StudentRolleAusbildungssemester_old))
 		window.close();
 }
 

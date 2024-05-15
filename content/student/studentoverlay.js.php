@@ -2362,9 +2362,9 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 
 
 	// ****
-	// * Update Statusgrund aus BearbeitenDialog
+	// * Update Statusgrund, Ausbildungssemester trotz Bismeldesperre
 	// ****
-	function StudentUpdateStatusgrund(dialog, studiensemester_old, ausbildungssemester_old)
+	function StudentEditSperre(dialog, studiensemester_old, ausbildungssemester_old)
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		prestudent_id = dialog.getElementById('student-rolle-textbox-prestudent_id').value;
