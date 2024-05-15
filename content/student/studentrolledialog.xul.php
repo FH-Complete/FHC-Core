@@ -101,7 +101,7 @@ if($prestudent_id!='')
 <textbox id="student-rolle-textbox-prestudent_id" value="" hidden="true" />
 <groupbox id="student-rolle-groupbox" flex="1">
 	<?php if ($disabled): ?>
-		<label class="warning">Meldestichtag erreicht - Bearbeiten nicht mehr möglich</label>
+		<label class="warning">Meldestichtag erreicht - ausschließlich Bearbeiten Statusgrund möglich</label>
 	<?php endif; ?>
 	<caption label="Details<?php echo ($nachname!=''?" $nachname $vorname":'');?>"/>
 		<grid id="student-rolle-grid-detail" style="margin:4px;" flex="1">
@@ -254,7 +254,7 @@ if($prestudent_id!='')
 					<label value="Grund"/>
 					<menulist id="student-rolle-menulist-statusgrund"
 					          datasources="rdf:null" flex="1"
-					          ref="http://www.technikum-wien.at/statusgrund"<?php echo $disabled ?> >
+					          ref="http://www.technikum-wien.at/statusgrund">
 						<template>
 							<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/statusgrund/rdf#statusgrund_id"
@@ -270,6 +270,14 @@ if($prestudent_id!='')
 		<spacer flex="1" />
 		<button id="student-rolle-button-speichern" oncommand="StudentRolleSpeichern()" label="Speichern"<?php echo $disabled ?> />
 	</hbox>
+
+    <hbox>
+        <spacer flex="1" />
+		<?php if ($disabled): ?>
+            <button id="student-statusgrund-button-speichern" oncommand="StudentUpdateStatusgrund()" label="Statusgrund Bearbeiten"/>
+		<?php endif; ?>
+    </hbox>
+
 </groupbox>
 </vbox>
 </window>

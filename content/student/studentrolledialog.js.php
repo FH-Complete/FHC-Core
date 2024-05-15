@@ -114,6 +114,12 @@ function StudentRolleSpeichern()
 		window.close();
 }
 
+function StudentUpdateStatusgrund()
+{
+	if(window.opener.StudentUpdateStatusgrund(document, StudentRolleStudiensemester_old, StudentRolleAusbildungssemester_old))
+		window.close();
+}
+
 function StudentRolleLoadStatusgrund(status_kurzbz, statusgrund_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");

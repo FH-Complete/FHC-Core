@@ -1637,6 +1637,77 @@ if(!$error)
 			}
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='updateStatusgrund')
+	{
+		//Statusgrund speichern
+		if(!$error)
+		{
+			if(isset($_POST['prestudent_id']))
+			{
+				$rolle = new prestudent();
+				if(!$rolle->load($_POST['prestudent_id']))
+				{
+					$error = true;
+					$errormsg = 'Prestudent wurde nicht gefunden';
+				}
+				else
+				{
+					//Berechtigung pruefen
+					if(!$rechte->isBerechtigt('assistenz',$rolle->studiengang_kz,'suid') &&
+						!$rechte->isBerechtigt('admin',$rolle->studiengang_kz, 'suid'))
+					{
+						$error = true;
+						$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
+					}
+				}
+
+				if(!$error)
+				{
+					$error = true;
+					$errormsg = " in updateStatusgrund " . $_POST['statusgrund_id'];
+				}
+
+				$rolle = new prestudent();
+				$rolle->prestudent_id = $_POST['prestudent_id'];
+
+				$rolle->status_kurzbz = $_POST['status_kurzbz'];
+				$rolle->ausbildungssemester_old = $_POST['ausbildungssemester_old'];
+				$rolle->studiensemester_old = $_POST['studiensemester_old'];
+				$rolle->statusgrund_id = $_POST['statusgrund_id'];
+
+
+				$rolle->datum = $_POST['datum'];
+				$rolle->bestaetigtam = $_POST['bestaetigtam'];
+				if($_POST['bestaetigtam']=='')
+					$rolle->bestaetigtvon = null;
+				$rolle->updateamum = date('Y-m-d H:i:s');
+				$rolle->updatevon = $user;
+				$rolle->new = false;
+
+				$rolle->ausbildungssemester = $_POST['ausbildungssemester'];
+				$rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+				$rolle->bewerbung_abgeschicktamum = $_POST['bewerbung_abgeschicktamum'];
+				$rolle->anmerkung_status = $_POST['anmerkung'];
+
+				$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
+				$rolle->studienplan_id = $_POST['studienplan_id'];
+				$rolle->rt_stufe = $_POST['rt_stufe'];
+
+				if($rolle->save_rolle())
+					$return = true;
+				else
+				{
+					$return = false;
+					$errormsg = $rolle->errormsg;
+				}
+			}
+			else
+			{
+				$return = false;
+				$errormsg = 'Prestudent_id muss angegeben werden';
+			}
+		}
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='rolleVorruecken')
 	{
 		$errormsg='';
