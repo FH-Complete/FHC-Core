@@ -1227,12 +1227,17 @@ if(!$error)
 			$bismeldestichtag = new bismeldestichtag();
 			$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['datum']);
 
+			//erweitertes Löschrecht für RT-Aufsicht bei Status abgewiesen
+			$rtaufsichtUndStatusAbgewiesen = $rechte->isBerechtigt('lehre/reihungstestAufsicht') && $_POST['status_kurzbz']=='Abgewiesener'
+				? true
+				: false;
+
 			if($_POST['status_kurzbz']=='Student' && !$erweiterteBerechtigungen)
 			{
 				$return = false;
 				$errormsg = 'Studentenrolle kann nur durch den Administrator geloescht werden';
 			}
-			elseif ($meldestichtag_erreicht && !$erweiterteBerechtigungen)
+			elseif ($meldestichtag_erreicht && !$erweiterteBerechtigungen && !$rtaufsichtUndStatusAbgewiesen)
 			{
 				$return = false;
 				$errormsg = 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht gelöscht werden.';
