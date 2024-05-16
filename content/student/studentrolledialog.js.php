@@ -114,12 +114,6 @@ function StudentRolleSpeichern()
 		window.close();
 }
 
-function StudentEditSperre()
-{
-	if(window.opener.StudentEditSperre(document, StudentRolleStudiensemester_old, StudentRolleAusbildungssemester_old))
-		window.close();
-}
-
 function StudentRolleLoadStatusgrund(status_kurzbz, statusgrund_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");

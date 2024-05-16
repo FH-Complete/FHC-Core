@@ -2273,6 +2273,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	rt_stufe = dialog.getElementById('student-rolle-menulist-stufe').value;
 	statusgrund_id = dialog.getElementById('student-rolle-menulist-statusgrund').value;
 	bewerbung_abgeschicktamum = dialog.getElementById('student-rolle-datum-bewerbung_abgeschicktamum').value;
+	exceptionValidationBismeldung = dialog.getElementById('student-rolle-bis-exception').value;
 
 	if(!CheckDatum(datum))
 	{
@@ -2339,6 +2340,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	req.add('rt_stufe', rt_stufe);
 	req.add('statusgrund_id', statusgrund_id);
 	req.add('bewerbung_abgeschicktamum', bewerbung_abgeschicktamum);
+	req.add('exceptionValidationBismeldung', exceptionValidationBismeldung);
 
 	var response = req.executePOST();
 
@@ -2359,70 +2361,6 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 		return true;
 	}
 }
-
-
-	// ****
-	// * Update Statusgrund, Ausbildungssemester trotz Bismeldesperre
-	// ****
-	function StudentEditSperre(dialog, studiensemester_old, ausbildungssemester_old)
-	{
-		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		prestudent_id = dialog.getElementById('student-rolle-textbox-prestudent_id').value;
-		if(studiensemester_old=='')
-		status_kurzbz = dialog.getElementById('student-rolle-menulist-status_kurzbz').value;
-		else
-		status_kurzbz = dialog.getElementById('student-rolle-textbox-status_kurzbz').value;
-		studiensemester_kurzbz = dialog.getElementById('student-rolle-menulist-studiensemester').value;
-		ausbildungssemester = dialog.getElementById('student-rolle-menulist-ausbildungssemester').value;
-		datum = dialog.getElementById('student-rolle-datum-datum').value;
-		bestaetigt_datum = dialog.getElementById('student-rolle-datum-bestaetigt_datum').value;
-		orgform_kurzbz = dialog.getElementById('student-rolle-menulist-orgform_kurzbz').value;
-		studienplan_id = dialog.getElementById('student-rolle-menulist-studienplan').value;
-		anmerkung = dialog.getElementById('student-rolle-textbox-anmerkung').value;
-		rt_stufe = dialog.getElementById('student-rolle-menulist-stufe').value;
-		statusgrund_id = dialog.getElementById('student-rolle-menulist-statusgrund').value;
-		bewerbung_abgeschicktamum = dialog.getElementById('student-rolle-datum-bewerbung_abgeschicktamum').value;
-
-
-		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
-		var req = new phpRequest(url,'','');
-
-		req.add('type', 'updateStatusgrund')
-
-		req.add('status_kurzbz', status_kurzbz);
-		req.add('prestudent_id', prestudent_id);
-		req.add('studiensemester_kurzbz', studiensemester_kurzbz);
-		req.add('studiensemester_old', studiensemester_old);
-		req.add('ausbildungssemester_old', ausbildungssemester_old);
-		req.add('ausbildungssemester', ausbildungssemester);
-		req.add('datum', ConvertDateToISO(datum));
-		req.add('bestaetigtam', ConvertDateToISO(bestaetigt_datum));
-		req.add('orgform_kurzbz', orgform_kurzbz);
-		req.add('studienplan_id', studienplan_id);
-		req.add('anmerkung', anmerkung);
-		req.add('rt_stufe', rt_stufe);
-		req.add('statusgrund_id', statusgrund_id);
-		req.add('bewerbung_abgeschicktamum', bewerbung_abgeschicktamum);
-
-		var response = req.executePOST();
-
-		var val =  new ParseReturnValue(response)
-
-		if (!val.dbdml_return)
-		{
-			if(val.dbdml_errormsg=='')
-			alert(response)
-			else
-			alert(val.dbdml_errormsg)
-			return false;
-		}
-			else
-		{
-			StudentDetailRolleTreeDatasource.Refresh(false);
-			SetStatusBarText('Prestudentstatusgrund wird aktualisiert');
-			return true;
-		}
-	}
 
 // ****
 // * Anmeldungsdatum fuer den RT wird auf das Aktuelle Datum gesetzt

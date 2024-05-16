@@ -273,14 +273,17 @@ if($prestudent_id!='')
 						</template>
 					</menulist>
 				</row>
+				<?php if ($disabled): ?>
+                <row hidden="true">
+                    <label value="exceptionBisValidation" control="student-rolle-bis-exception"/>
+                    <checkbox id="student-rolle-bis-exception" checked="true"/>
+                </row>
+				<?php endif; ?>
 			</rows>
 	</grid>
 	<hbox>
 		<spacer flex="1" />
-		<?php if ($disabled): ?>
-            <button id="student-statusgrund-button-speichern" oncommand="StudentEditSperre()" label="Edit trotz Sperre"/>
-		<?php endif; ?>
-		<button id="student-rolle-button-speichern" oncommand="StudentRolleSpeichern()" label="Speichern"<?php echo $disabled ?> />
+        <button id="student-rolle-button-speichern" oncommand="StudentRolleSpeichern()" label="Speichern"/>
 	</hbox>
 
 </groupbox>
