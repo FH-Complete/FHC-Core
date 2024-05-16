@@ -694,7 +694,6 @@ export default{
 							<label for="studiensemester_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
 							<div class="col-sm-6">
 								<form-input
-									:readonly="readonly"
 									type="select"
 									name="studiensemester_kurzbz"
 									v-model="statusData['studiensemester_kurzbz']"
@@ -709,7 +708,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 									type="select"
-									:readonly="readonly"
 									name="ausbildungssemester"
 									v-model="statusData.ausbildungssemester"
 								>
@@ -723,7 +721,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 									type="DatePicker"
-									:readonly="readonly"
 									name="datum"
 									v-model="statusData.datum"
 									auto-apply
@@ -739,7 +736,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 									type="DatePicker"
-									:readonly="readonly"
 									name="datum"
 									v-model="statusData.bestaetigtam"
 									auto-apply
@@ -755,7 +751,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 									type="DatePicker"
-									:readonly="readonly"
 									name="datum"
 									v-model="statusData['bewerbung_abgeschicktamum']"
 									auto-apply
@@ -770,7 +765,6 @@ export default{
 							<label for="bezeichnung" class="form-label col-sm-4">{{$p.t('lehre', 'studienplan')}}</label>
 							<div class="col-sm-6">
 								<form-input
-									:readonly="readonly"
 									type="select"
 									name="studienplan"
 									v-model="statusData['studienplan_id']"
@@ -796,7 +790,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 								type="select"
-								:readonly="readonly"
 								name="aufnahmestufe"
 								v-model="statusData['rt_stufe']"
 								>
@@ -810,11 +803,10 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 									type="select"
-									:readonly="readonly"
 									name="statusgrund"
 									v-model="statusData['statusgrund_id']"
-								>
-								<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.beschreibung[0]}}</option>
+									>
+									<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.beschreibung[0]}}</option>
 								</form-input>
 							</div>
 						</div>
@@ -841,7 +833,7 @@ export default{
 						<div class="row mb-3">
 							<label for="status_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'status_rolle')}}</label>
 							<div class="col-sm-6">
-<!--								<form-input type="text" :readonly="readonly" class="form-control" id="status_kurzbz" v-model="statusData['status_kurzbz']">-->
+<!--								<form-input type="text" class="form-control" id="status_kurzbz" v-model="statusData['status_kurzbz']">-->
 								<form-input
 									required
 									v-model="statusData['status_kurzbz']"
@@ -864,7 +856,6 @@ export default{
 							<label for="studiensemester_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
 							<div class="col-sm-6">
 								<form-input
-									:readonly="readonly"
 									type="select"
 									name="studiensemester_kurzbz"
 									v-model="statusData['studiensemester_kurzbz']"
@@ -879,7 +870,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 									type="select"
-									:readonly="readonly"
 									name="ausbildungssemester"
 									v-model="statusData['ausbildungssemester']"
 								>
@@ -893,7 +883,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 									type="DatePicker"
-									:readonly="readonly"
 									name="datum"
 									v-model="statusData['datum']"
 									auto-apply
@@ -909,7 +898,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 									type="DatePicker"
-									:readonly="readonly"
 									name="datum"
 									v-model="statusData['bestaetigtam']"
 									auto-apply
@@ -925,7 +913,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 									type="DatePicker"
-									:readonly="readonly"
 									name="datum"
 									v-model="statusData['bewerbung_abgeschicktamum']"
 									auto-apply
@@ -940,7 +927,6 @@ export default{
 							<label for="bezeichnung" class="form-label col-sm-4">{{$p.t('lehre', 'studienplan')}}</label>
 							<div class="col-sm-6">
 								<form-input
-									:readonly="readonly"
 									type="select"
 									name="studienplan"
 									v-model="statusData['studienplan_id']"
@@ -966,7 +952,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 								type="select"
-								:readonly="readonly"
 								name="aufnahmestufe"
 								v-model="statusData['rt_stufe']"
 								>
@@ -980,7 +965,6 @@ export default{
 							<div class="col-sm-6">
 								<form-input
 									type="select"
-									:readonly="readonly"
 									name="statusgrund"
 									v-model="statusData['statusgrund_id']"
 								>

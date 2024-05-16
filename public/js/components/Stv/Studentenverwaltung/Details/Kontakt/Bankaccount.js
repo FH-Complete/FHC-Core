@@ -7,7 +7,7 @@ export default{
 		BsModal
 	},
 	props: {
-		uid: String
+		uid: Number
 	},
 	data() {
 		return{
@@ -203,38 +203,38 @@ export default{
 				<div class="row mb-3">
 						<label for="name" class="form-label col-sm-4">Name</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="bankverbindungData['name']">
+							<input type="text" class="form-control" id="name" v-model="bankverbindungData['name']">
 						</div>
 					</div>
 					<div class="row mb-3">										   
 						<label for="anschrift" class="form-label col-sm-4">{{$p.t('person', 'anschrift')}}</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="anschrift" v-model="bankverbindungData['anschrift']">
+							<input type="text" class="form-control" id="anschrift" v-model="bankverbindungData['anschrift']">
 						</div>
 					</div>
 
 					<div class="row mb-3">									   
 						<label for="iban" class="form-label col-sm-4">IBAN</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" required class="form-control" id="iban" v-model="bankverbindungData['iban']">
+							<input type="text" required class="form-control" id="iban" v-model="bankverbindungData['iban']">
 						</div>
 					</div>
 					<div class="row mb-3">								   
 						<label for="bic" class="form-label col-sm-4">BIC</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="bic" v-model="bankverbindungData['bic']">
+							<input type="text" class="form-control" id="bic" v-model="bankverbindungData['bic']">
 						</div>
 					</div>
 					<div class="row mb-3">							   
 						<label for="kontonr" class="form-label col-sm-4">{{$p.t('person', 'kontonr')}}</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="kontonr" v-model="bankverbindungData['kontonr']">
+							<input type="text" class="form-control" id="kontonr" v-model="bankverbindungData['kontonr']">
 						</div>
 					</div>
 					<div class="row mb-3">										   
 						<label for="blz" class="form-label col-sm-4">{{$p.t('person', 'blz')}}</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="blz" v-model="bankverbindungData['blz']">
+							<input type="text" class="form-control" id="blz" v-model="bankverbindungData['blz']">
 						</div>
 					</div>
 					<div class="row mb-3">
@@ -269,37 +269,37 @@ export default{
 					<div class="row mb-3">
 						<label for="name" class="form-label col-sm-4">Name</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="bankverbindungData['name']">
+							<input type="text" class="form-control" id="name" v-model="bankverbindungData['name']">
 						</div>
 					</div>
 					<div class="row mb-3">									   
 						<label for="anschrift" class="form-label col-sm-4">{{$p.t('person', 'anschrift')}}</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="anschrift" v-model="bankverbindungData['anschrift']">
+							<input type="text" class="form-control" id="anschrift" v-model="bankverbindungData['anschrift']">
 						</div>
 					</div>
 					<div class="row mb-3">
 						<label for="iban" class="form-label col-sm-4">IBAN</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" required class="form-control" id="iban" v-model="bankverbindungData['iban']">
+							<input type="text" required class="form-control" id="iban" v-model="bankverbindungData['iban']">
 						</div>
 					</div>
 					<div class="row mb-3">									   
 						<label for="bic" class="form-label col-sm-4">BIC</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="bic" v-model="bankverbindungData['bic']">
+							<input type="text" class="form-control" id="bic" v-model="bankverbindungData['bic']">
 						</div>
 					</div>
 					<div class="row mb-3">									   
 						<label for="kontonr" class="form-label col-sm-4">{{$p.t('person', 'kontonr')}}</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="kontonr" v-model="bankverbindungData['kontonr']">
+							<input type="text" class="form-control" id="kontonr" v-model="bankverbindungData['kontonr']">
 						</div>
 					</div>
 					<div class="row mb-3">									   
 						<label for="blz" class="form-label col-sm-4">{{$p.t('person', 'blz')}}</label>
 						<div class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="blz" v-model="bankverbindungData['blz']">
+							<input type="text" class="form-control" id="blz" v-model="bankverbindungData['blz']">
 						</div>
 					</div>
 					<div class="row mb-3">

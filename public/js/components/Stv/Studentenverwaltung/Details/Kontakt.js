@@ -19,7 +19,7 @@ export default {
 		}
 	},
 	template: `
-	<div class="stv-details-details h-100 pb-3">
+	<div class="stv-details-kontakt h-100 pb-3">
 		<fieldset class="overflow-hidden">
 			<legend>{{this.$p.t('person', 'adressen')}}</legend>
 			<address-list ref="adressList" :uid="modelValue.person_id"></address-list>

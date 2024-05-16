@@ -5,7 +5,7 @@ export default{
 		CoreFilterCmpt
 	},
 	props: {
-		person_id: String
+		person_id: Number
 	},
 	data() {
 		return {
@@ -23,29 +23,29 @@ export default{
 					{title:"UID", field:"student_uid"},
 					{title:"Status", field:"status"}
 				],
-				tabulatorEvents: [
-					{
-						event: 'tableBuilt',
-						handler: async () => {
-							await this.$p.loadCategory(['lehre']);
-
-							let cm = this.$refs.table.tabulator.columnManager;
-
-							cm.getColumnByField('orgform_kurzbz').component.updateDefinition({
-								title: this.$p.t('lehre', 'organisationsform')
-							});
-
-							cm.getColumnByField('bezeichnung').component.updateDefinition({
-								title: this.$p.t('lehre', 'studienplan')
-							});
-						}
-					}
-				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
 				height:	'auto',
 				selectable:	false,
 			},
+			tabulatorEvents: [
+				{
+					event: 'tableBuilt',
+					handler: async () => {
+						await this.$p.loadCategory(['lehre']);
+
+						let cm = this.$refs.table.tabulator.columnManager;
+
+						cm.getColumnByField('orgform_kurzbz').component.updateDefinition({
+							title: this.$p.t('lehre', 'organisationsform')
+						});
+
+						cm.getColumnByField('bezeichnung').component.updateDefinition({
+							title: this.$p.t('lehre', 'studienplan')
+						});
+					}
+				}
+			]
 		}
 	},
 	template: `

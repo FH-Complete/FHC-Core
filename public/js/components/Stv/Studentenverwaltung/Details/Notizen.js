@@ -1,29 +1,25 @@
-import NotizComponent from "../../../Notiz/NotizComponent.js";
+import CoreNotiz from "../../../Notiz/Notiz.js";
 
 export default {
 	components: {
-		NotizComponent
+		CoreNotiz
 	},
 	props: {
 		modelValue: Object
 	},
 	template: `
-	<div class="stv-details-details h-100 pb-3">
-		<h3>Notizen</h3>
-		
+	<div class="stv-details-notizen h-100 pb-3">
 <!--	mit factory als endpoint	-->
-		<NotizComponent
+		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.person"
 			ref="formc"
-			typeId="person_id"
+			type-id="person_id"
 			:id="modelValue.person_id"
-			notizLayout="twoColumnsFormLeft"
-			:showErweitert="false"
-			:showDocument="true"
-			:showTinyMCE="false"
-			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+			show-document
+			show-tiny-mce
+			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</NotizComponent>
+		</core-notiz>
 		
 	
 <!--		
@@ -68,44 +64,44 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 ---------------------------------------------------------------------------------------------
 
 
-		<NotizComponent
+		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.mitarbeiter"
 			ref="formc"
-			typeId="uid"
+			type-id="uid"
 			:id= "'ma0068'"
-			notizLayout="twoColumnsFormLeft"
-			:showErweitert="true"
-			:showDocument="true"
+			notiz-layout="twoColumnsFormLeft"
+			:show-erweitert="true"
+			:show-document="true"
 			:showTinyMCE="false"
-			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</NotizComponent>
+		</core-notiz>
 		
-		<NotizComponent
+		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.prestudent"
 			ref="formc"
-			typeId="prestudent_id"
+			type-id="prestudent_id"
 			:id="modelValue.prestudent_id"
-			notizLayout="twoColumnsFormLeft"
-			:showErweitert="true"
-			:showDocument="true"
+			notiz-layout="twoColumnsFormLeft"
+			:show-erweitert="true"
+			:show-document="true"
 			:showTinyMCE="true"
-			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</NotizComponent>
+		</core-notiz>
 				
-		<NotizComponent
+		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.projekt"
 			ref="formc"
-			typeId="projekt_kurzbz"
+			type-id="projekt_kurzbz"
 			:id="'EA74'" 
-			notizLayout="twoColumnsFormLeft"
-			:showErweitert="true"
-			:showDocument="true"
+			notiz-layout="twoColumnsFormLeft"
+			:show-erweitert="true"
+			:show-document="true"
 			:showTinyMCE="true"
-			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</NotizComponent>-->
+		</core-notiz>-->
 		
 	</div>
 	`

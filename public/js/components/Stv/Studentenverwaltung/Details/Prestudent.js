@@ -41,7 +41,7 @@ export default {
 	props: {
 		modelValue: Object,
 	},
-	data(){
+	data() {
 		return {
 			data: [],
 			listZgvs: [],
@@ -174,7 +174,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-	<div class="stv-details-details h-100 pb-3">	
+	<div class="stv-details-prestudent h-100 pb-3">	
 		<form-form ref="form" class="stv-details-prestudent" @submit.prevent="updatePrestudent">
 		<div class="position-sticky top-0 z-1">
 			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!deltaLength">Speichern</button>

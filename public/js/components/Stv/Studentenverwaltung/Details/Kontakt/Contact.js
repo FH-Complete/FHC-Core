@@ -11,7 +11,7 @@ export default{
 		BsModal
 	},
 	props: {
-		uid: String
+		uid: Number
 	},
 	data() {
 		return{
@@ -223,13 +223,13 @@ export default{
 						<div class="row mb-3">										   
 							<label for="kontakt" class="form-label col-sm-4">{{$p.t('global', 'kontakt')}}</label>
 							<div class="col-sm-6">
-								<input type="text" :readonly="readonly" class="form-control" id="kontakt" v-model="contactData['kontakt']">
+								<input type="text" class="form-control" id="kontakt" v-model="contactData['kontakt']">
 							</div>
 						</div>
 						<div class="row mb-3">									   
 							<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
 							<div class="col-sm-6">
-								<input type="text" :readonly="readonly" class="form-control" id="anmerkung" v-model="contactData['anmerkung']">
+								<input type="text" class="form-control" id="anmerkung" v-model="contactData['anmerkung']">
 							</div>
 						</div>
 						
@@ -245,7 +245,7 @@ export default{
 						<div class="row mb-3">
 							<label for="firma_name" class="form-label col-sm-4">{{$p.t('person', 'firma')}} / {{$p.t('person', 'standort')}}</label>
 								<div class="col-sm-6">
-									<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" minLength="3"/>
+									<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" :min-length="3"/>
 								</div>
 						</div>
 				</form>
@@ -271,13 +271,13 @@ export default{
 				<div class="row mb-3">									   
 					<label for="kontakt" class="form-label col-sm-4">{{$p.t('global', 'kontakt')}}</label>
 					<div class="col-sm-6">
-						<input type="text" :readonly="readonly" class="form-control" id="kontakt" v-model="contactData['kontakt']">
+						<input type="text" class="form-control" id="kontakt" v-model="contactData['kontakt']">
 					</div>
 				</div>
 				<div class="row mb-3">									   
 					<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
 					<div class="col-sm-6">
-						<input type="text" :readonly="readonly" class="form-control" id="anmerkung" v-model="contactData['anmerkung']">
+						<input type="text" class="form-control" id="anmerkung" v-model="contactData['anmerkung']">
 					</div>
 				</div>
 				<div class="row mb-3">
@@ -289,16 +289,16 @@ export default{
 					</div>
 				</div>
 				<div class="row mb-3">			
-					<input type="hidden" :readonly="readonly" class="form-control" id="standort_id" v-model="contactData.standort_id">
+					<input type="hidden" class="form-control" id="standort_id" v-model="contactData.standort_id">
 				</div>
 				
 				<div class="row mb-3">
 					<label for="standort" class="form-label col-sm-4">{{$p.t('person', 'firma')}} / {{$p.t('person', 'standort')}}</label>
 						<div v-if="contactData.kurzbz" class="col-sm-6">
-							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="contactData.kurzbz">
+							<input type="text" class="form-control" id="name" v-model="contactData.kurzbz">
 						</div>	
 						<div v-else class="col-sm-3">
-							<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" minLength="3"/>
+							<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" :min-length="3"/>
 						</div>
 				</div>
 			</form>

@@ -8,11 +8,10 @@ export default {
 		modelValue: Object,
 	},
 	template: `
-
-		<div class="stv-details-details h-100 pb-3">
-			<div class="col-12 pb-3">
+	<div class="stv-details-multistatus h-100 pb-3">
+		<div class="col-12 pb-3">
 			<legend>Status</legend>
-			<TblMultiStatus :modelValue="modelValue"></TblMultiStatus>		
+			<tbl-multi-status :model-value="modelValue"></tbl-multi-status>		
 		</div>
 	</div>
 	`

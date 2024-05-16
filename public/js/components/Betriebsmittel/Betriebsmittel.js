@@ -23,8 +23,8 @@ export default {
 	props: [
 		'person_id',
 		'uid'
-		],
-	data(){
+	],
+	data() {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'api/frontend/v1/stv/Betriebsmittel/getAllBetriebsmittel/' + this.uid + '/' + this.person_id,
@@ -138,27 +138,27 @@ export default {
 		}
 	},
 	watch: {
-		uid(){
+		uid() {
 			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Betriebsmittel/getAllBetriebsmittel/' + this.uid + '/' + this.person_id);
 		}
 	},
 	methods: {
-		actionEditBetriebsmittel(betriebsmittelperson_id){
+		actionEditBetriebsmittel(betriebsmittelperson_id) {
 			this.statusNew = false;
 			this.loadBetriebsmittel(betriebsmittelperson_id);
 		},
-		actionNewBetriebsmittel(){
+		actionNewBetriebsmittel() {
 			this.resetModal();
 			this.statusNew = true;
 			this.formData.ausgegebenam = this.getDefaultDate();
 			this.reload();
 		},
-		actionDeleteBetriebsmittel(betriebsmittelperson_id){
+		actionDeleteBetriebsmittel(betriebsmittelperson_id) {
 			this.loadBetriebsmittel(betriebsmittelperson_id).then(() => {
 				this.$refs.deleteBetriebsmittelModal.show();
 			});
 		},
-		addNewBetriebsmittel(){
+		addNewBetriebsmittel() {
 			this.param = {
 				'uid':  this.uid,
 				'person_id': this.person_id,
@@ -175,7 +175,7 @@ export default {
 					this.reload();
 				});
 		},
-		deleteBetriebsmittel(betriebsmittelperson_id){
+		deleteBetriebsmittel(betriebsmittelperson_id) {
 			this.param = {
 				'betriebsmittelperson_id': betriebsmittelperson_id
 			};
@@ -193,7 +193,7 @@ export default {
 					this.reload();
 				});
 		},
-		updateBetriebsmittel(){
+		updateBetriebsmittel() {
 			this.param = {
 				'uid':  this.uid,
 				'person_id': this.person_id,
@@ -210,7 +210,7 @@ export default {
 					this.reload();
 				});
 		},
-		loadBetriebsmittel(betriebsmittelperson_id){
+		loadBetriebsmittel(betriebsmittelperson_id) {
 			this.resetModal();
 			this.statusNew = false;
 			this.param = {
@@ -224,20 +224,20 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		searchInventar(event){
+		searchInventar(event) {
 			return this.$fhcApi
 				.get('api/frontend/v1/stv/betriebsmittel/loadInventarliste/' + event.query)
 				.then(result => {
 					this.filteredInventar = result.data.retval;
 				});
 		},
-		reload(){
+		reload() {
 			this.$refs.table.reloadTable();
 		},
-		hideModal(modalRef){
+		hideModal(modalRef) {
 			this.$refs[modalRef].hide();
 		},
-		resetModal(){
+		resetModal() {
 			this.formData = {};
 			this.formData.ausgegebenam = this.getDefaultDate();
 			this.formData.retouram = null;
@@ -340,7 +340,7 @@ export default {
 				<div v-else-if="formData.inventarnummer" class="row mb-3">
 				<label for="inventarnummer" class="form-label col-sm-4">{{$p.t('wawi', 'inventarnummer')}}</label>
 					<div class="col-sm-6">
-						<input type="text" :readonly="readonly" class="form-control" id="inventarnummer" v-model="formData.inventarnummer" :disabled="!statusNew">
+						<input type="text" class="form-control" id="inventarnummer" v-model="formData.inventarnummer" :disabled="!statusNew">
 					</div>
 				</div>
 				
@@ -410,7 +410,6 @@ export default {
 					<div class="col-sm-6">
 						<form-input
 							type="DatePicker"
-							:readonly="readonly"
 							name="datum"
 							v-model="formData['ausgegebenam']"
 							auto-apply
@@ -427,7 +426,6 @@ export default {
 					<div class="col-sm-6">
 						<form-input
 							type="DatePicker"
-							:readonly="readonly"
 							name="datum"
 							v-model="formData['retouram']"
 							auto-apply
