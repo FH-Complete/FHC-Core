@@ -265,7 +265,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-	<div class="betriebsmittel-betriebsmittel">
+	<div class="core-betriebsmittel">
 	
 	
 		<!--Modal: deleteBetriebsmittelModal-->

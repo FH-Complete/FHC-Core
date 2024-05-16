@@ -30,9 +30,13 @@ export default {
 		notizLayout: {
 			type: String,
 			default: 'twoColumnsFormLeft',
-			validator(value, props) {
+			validator(value) {
 				// TODO(chris): modal version
-        		return ['classicFas', 'twoColumnsFormRight', 'twoColumnsFormLeft'].includes(value)
+				return [
+					'classicFas',
+					'twoColumnsFormRight',
+					'twoColumnsFormLeft'
+					].includes(value)
 			}
 		},
 		showErweitert: Boolean,
@@ -470,7 +474,7 @@ export default {
 		}
 	},
 	template: `
-	<div class="notiz-notizcomponent">
+	<div class="core-notiz">
 		<div v-if="notizLayout=='classicFas'">
 			<!--Modal: deleteNotizModal-->
 			<BsModal ref="deleteNotizModal">
@@ -1021,7 +1025,8 @@ export default {
 		</div>
 		
 		<div v-else>
-			<p>Kein Layout übergeben</p>
+			<p v-if="notizLayout">Falsches Layout übergeben: {{notizLayout}}</p>
+			<p v-else>Kein Layout übergeben</p>
 		</div>
 	</div>`,
 }
