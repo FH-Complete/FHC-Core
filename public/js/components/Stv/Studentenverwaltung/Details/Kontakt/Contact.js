@@ -1,5 +1,5 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
-import {CoreRESTClient} from "../../../../../RESTClient";
+/*import {CoreRESTClient} from "../../../../../RESTClient.js";*/
 import BsModal from "../../../../Bootstrap/Modal.js";
 /*import PvToast from "../../../../../../../index.ci.php/public/js/components/primevue/toast/toast.esm.min.js";*/
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";

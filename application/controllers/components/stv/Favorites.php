@@ -27,7 +27,11 @@ class Favorites extends FHC_Controller
 			return $this->outputJson(getError($result));
 		}
 
-		$this->outputJson(getData($result)['stv_favorites']);
+		$result = getData($result);
+		if (!$result)
+			$this->outputJson(null);
+		else
+			$this->outputJson($result['stv_favorites']);
 	}
 
 	public function set()

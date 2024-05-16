@@ -2,7 +2,7 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
-import {CoreRESTClient} from "../../../../../RESTClient";
+import {CoreRESTClient} from "../../../../../RESTClient.js";
 
 export default{
 	components: {

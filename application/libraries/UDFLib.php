@@ -159,7 +159,7 @@ class UDFLib
 					$found = false; // used to check if the field is found or not in the json schema
 
 					$this->_sortJsonSchemas($jsonSchemasArray); // Sort the list of UDF by sort property
-					
+
 					// Loops through json schemas
 					foreach ($jsonSchemasArray as $jsonSchema)
 					{
@@ -294,7 +294,7 @@ class UDFLib
 				// Checks if the requiredPermissions is available and it is a valid array or a valid string
 				if (isset($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})
 					&& (!isEmptyArray($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})
-					|| !isEmptyString($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})))
+						|| !isEmptyString($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})))
 				{
 					// Then check if the user has the permissions to read such UDF
 					if (!$this->_readAllowed($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER}))
@@ -355,7 +355,7 @@ class UDFLib
 				// Checks if the requiredPermissions is available and it is a valid array or a valid string
 				if (isset($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})
 					&& (!isEmptyArray($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})
-					|| !isEmptyString($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})))
+						|| !isEmptyString($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})))
 				{
 					// Then check if the user has the permissions to write such UDF
 					if (!$this->_writeAllowed($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER}))
@@ -634,8 +634,10 @@ class UDFLib
 			]);
 			if (isError($result))
 				return $result;
-
-			$this->_definition_cache[$dbTable] = json_decode(current($result->retval)->jsons, true);
+			if (!hasData($result))
+				$this->_definition_cache[$dbTable] = [];
+			else
+				$this->_definition_cache[$dbTable] = json_decode(current($result->retval)->jsons, true);
 		}
 		return success($this->_definition_cache[$dbTable]);
 	}
@@ -657,8 +659,8 @@ class UDFLib
 		$result = $this->getDefinitionForModel($targetModel);
 		if (isError($result))
 			return $result;
-		$definitions = getData($result);
-	
+		$definitions = $result->retval;
+
 		usort($definitions, function ($a, $b) {
 			return $a[self::SORT] - $b[self::SORT];
 		});
@@ -701,7 +703,7 @@ class UDFLib
 				self::PERMISSION_TABLE_METHOD,
 				self::PERMISSION_TYPE_WRITE
 			);
-			
+
 			// set listValues for dropdowns
 			if (isset($field[self::LIST_VALUES])) {
 				if (isset($field[self::LIST_VALUES]['enum'])) {
@@ -997,7 +999,7 @@ class UDFLib
 		$htmlParameters[HTMLWidget::HTML_ID] = $jsonSchema->{self::NAME};
 		$htmlParameters[HTMLWidget::HTML_NAME] = $jsonSchema->{self::NAME};
 	}
-	
+
 	/**
 	 * Sort the list of UDF by sort property
 	 */
@@ -1020,7 +1022,7 @@ class UDFLib
 			return ($a->{self::SORT} < $b->{self::SORT}) ? -1 : 1;
 		});
 	}
-	
+
 	/**
 	 * Loads the UDF description by the given schema and table
 	 */

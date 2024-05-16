@@ -2,7 +2,7 @@ import VueDatePicker from '../vueDatepicker.js.php';
 import {CoreFilterCmpt} from "../filter/Filter.js";
 import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 
-import BsModal from "../Bootstrap/Modal";
+import BsModal from "../Bootstrap/Modal.js";
 import FormForm from '../Form/Form.js';
 import FormInput from '../Form/Input.js';
 
