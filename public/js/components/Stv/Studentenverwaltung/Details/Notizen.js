@@ -13,6 +13,7 @@ export default {
 		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.person"
 			ref="formc"
+			notiz-layout="twoColumnsFormLeft"
 			type-id="person_id"
 			:id="modelValue.person_id"
 			show-document
@@ -34,10 +35,10 @@ for extensions: write own controller extending core NotizController
 
 ref="formc"
 
-typeId: id to which table the notizdata should be connected... eg. person_id, prestudent_id, uid (for mitarbeiter_uid), projekt_kurzbz, projektphase_id, projekttask_id,
+type-id: id to which table the notizdata should be connected... eg. person_id, prestudent_id, uid (for mitarbeiter_uid), projekt_kurzbz, projektphase_id, projekttask_id,
 	bestellung_id, lehreinheit_id, anrechnung_id
 
-notizLayout: "classicFas", "twoColumnsFormLeft", twoColumnsFormRight"
+notizLayout: "classicFas", "twoColumnsFormLeft", twoColumnsFormRight, popupModal"
 
 showErweitert: if true: section with following fields will be displayed:
 	'verfasser', 'bearbeiter', 'von', 'bis'
@@ -70,9 +71,9 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 			type-id="uid"
 			:id= "'ma0068'"
 			notiz-layout="twoColumnsFormLeft"
-			:show-erweitert="true"
-			:show-document="true"
-			:showTinyMCE="false"
+			show-document
+			show-tiny-mce
+			show-erweitert
 			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
 		</core-notiz>

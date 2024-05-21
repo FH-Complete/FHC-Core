@@ -158,8 +158,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$text = $this->input->post('text');
 		$erledigt = $this->input->post('erledigt');
 		$verfasser_uid = isset($_POST['verfasser']) ? $_POST['verfasser'] : $uid;
-		//$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
-		$bearbeiter_uid = isset($_POST['bearbeiter_uid']) ? $_POST['bearbeiter_uid'] : null;
+		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : null;
 		$type = $this->input->post('typeId');
 		$start = $this->input->post('start');
 		$ende = $this->input->post('ende');

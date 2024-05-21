@@ -29,13 +29,13 @@ export default {
 		},
 		notizLayout: {
 			type: String,
-			default: 'twoColumnsFormLeft',
+			default: 'popupModal',
 			validator(value) {
-				// TODO(chris): modal version
 				return [
 					'classicFas',
 					'twoColumnsFormRight',
-					'twoColumnsFormLeft'
+					'twoColumnsFormLeft',
+					'popupModal'
 					].includes(value)
 			}
 		},
@@ -278,6 +278,9 @@ export default {
 				}
 			})
 				.then(() => {
+					if(this.notizLayout == 'popupModal') {
+						this.$refs.NotizModal.show();
+					}
 					if (this.notizData.dms_id) {
 						this.loadDocEntries(this.notizData.notiz_id);
 					} else
@@ -286,6 +289,9 @@ export default {
 		},
 		actionNewNotiz() {
 			this.resetFormData();
+			if(this.notizLayout == 'popupModal') {
+				this.$refs.NotizModal.show();
+			}
 		},
 		addNewNotiz() {
 			const formData = new FormData();
@@ -297,6 +303,9 @@ export default {
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetFormData();
+					if(this.notizLayout == 'popupModal') {
+						this.$refs.NotizModal.hide();
+					}
 					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -346,6 +355,9 @@ export default {
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetFormData();
+					if(this.notizLayout == 'popupModal') {
+						this.$refs.NotizModal.hide();
+					}
 					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -1021,6 +1033,194 @@ export default {
 						>
 					</core-filter-cmpt>	
 				</div>
+			</div> 
+		</div>
+		
+		<div v-else-if="notizLayout=='popupModal'" class="notiz-notiz">
+			<!--Modal: deleteNotizModal-->
+			<BsModal ref="deleteNotizModal">
+				<template #title>Notiz löschen</template>
+				<template #default>
+					<p>Notiz wirklich löschen?</p>
+				</template>
+				<template #footer>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetFormData">Abbrechen</button>
+					<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizData.notiz_id)">OK</button>
+				</template>
+			</BsModal>
+			
+			<BsModal ref="NotizModal">
+				<template #title>
+					<p v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}} <span> [{{notizData.typeId}}]</span></p>
+					<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}} <span> [{{notizData.typeId}}]</span></p>
+				</template>
+				<template #default>
+					<div>
+				  	<form ref="formc" @submit.prevent class="row">
+						<div class="row mb-3">
+							<form-input
+								container-class="col-12"
+								:label="$p.t('global','titel')  + ' *'"
+								type="text"
+								v-model="notizData.titel"
+								name="titel"
+								>
+							</form-input>
+						</div>
+									
+						<div class="row mb-3">
+							<!-- TinyMce 5 -->
+							<div v-if="showTinyMce" class="col-sm-12">
+								<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
+								<textarea
+								ref="editor"
+								rows="5"
+								cols="75"
+								class="form-control"
+								:value="notizData.text"
+								@input="updateText"></textarea>
+							</div>
+							
+							<div v-else class="col-sm-12">
+								<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
+								<textarea rows="5" cols="75" v-model="notizData.text" class="form-control"></textarea>
+							</div>
+						</div>
+				
+						<!-- show Documentupload-->
+						<div v-if="showDocument">
+							<div class="row mb-3">		
+								<div  class="col-sm-12 py-3">
+									<label for="text" class="form-label col-sm-2">{{$p.t('notiz','document')}}</label>
+									<!--Upload Component-->
+									<FormUploadDms ref="upload" id="file" multiple v-model="notizData.anhang"></FormUploadDms>
+								</div>
+							</div>
+						</div>
+						
+						<!-- show Details-->
+						<div v-if="showErweitert">
+							<div class="row mb-3">
+								<form-input
+									container-class="col-6"
+									:label="$p.t('global', 'gueltigVon')"
+									type="DatePicker"
+									v-model="notizData['start']"
+									name="von"
+									auto-apply
+									:enable-time-picker="false"
+									format="dd.MM.yyyy"
+									preview-format="dd.MM.yyyy"
+									:teleport="true"
+									>
+								</form-input>
+								
+								<form-input
+									container-class="col-6"
+									:label="$p.t('global', 'gueltigBis')"
+									type="DatePicker"
+									v-model="notizData.ende"
+									name="bis"
+									auto-apply
+									:enable-time-picker="false"
+									format="dd.MM.yyyy"
+									preview-format="dd.MM.yyyy"
+									:teleport="true"
+									>
+								</form-input>
+							</div>
+							
+					
+							<div class="row mb-3">
+								<form-input 
+									v-if="notizData.verfasser_uid"
+									container-class="col-6"
+									:label="$p.t('notiz', 'verfasser')"
+									type="text"
+									v-model="notizData.verfasser_uid"
+									name="titel"
+									>
+								</form-input>
+						
+								<form-input
+									v-else
+									container-class="col-6"
+									:label="$p.t('notiz', 'verfasser')"
+									type="autocomplete"
+									v-model="notizData.intVerfasser"
+									:suggestions="filteredMitarbeiter" 
+									@complete="search" 
+									optionLabel="mitarbeiter"
+									minLength="3"
+									>
+								</form-input>
+								
+								<form-input
+									v-if="notizData.bearbeiter_uid"
+									container-class="col-6"
+									:label="$p.t('notiz', 'bearbeiter')"
+									v-model="notizData.bearbeiter_uid"
+									minlength="3"
+									>
+								</form-input>
+								
+								<form-input
+									v-else
+									container-class="col-6"
+									:label="$p.t('notiz', 'bearbeiter')"
+									type="autocomplete"
+									v-model="notizData.intBearbeiter"
+									:suggestions="filteredMitarbeiter" 
+									@complete="search" 
+									optionLabel="mitarbeiter"
+									minlength="3"
+									>
+								</form-input>	
+							</div>
+															
+							<div class="row mb-3">
+								<div class="col-2 pt-4 d-flex align-items-center">
+									<form-input
+										container-class="form-check"
+										:label="$p.t('notiz', 'erledigt')"
+										type="checkbox"
+										v-model="notizData.erledigt"
+										name="erledigt"
+										>
+									</form-input>
+								</div>
+							</div>
+						</div>
+						
+						<div class="row mb-3">
+							<label for="lastUpdate" class="form-label col-sm-3 small">{{$p.t('notiz','letzte_aenderung')}}</label>
+							<div class="col-sm-5">
+								<p class="small">{{notizData.lastupdate}}</p>
+							</div>
+						</div>
+						
+						<div>
+							<button v-if="notizData.statusNew" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
+							<button v-else class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+						</div>
+					</form>		
+				</div>
+				</template>
+			</BsModal>
+			
+			<div class="row">
+				<core-filter-cmpt
+					ref="table"
+					:tabulator-options="tabulatorOptions"
+					:tabulator-events="tabulatorEvents"
+					table-only
+					:side-menu="false"
+					reload
+					new-btn-show
+					new-btn-label="Notiz"
+					@click:new="actionNewNotiz"
+					>
+				</core-filter-cmpt>	
 			</div> 
 		</div>
 		
