@@ -98,7 +98,7 @@ class Status extends FHCAPI_Controller
 		//Variablen für Statuscheck
 		$stg = $result->studiengang_kz;
 		$reihungstest_angetreten = $result->reihungstestangetreten;
-		//$name = trim($result->vorname . " ". $result->nachname);
+		$name = trim($result->vorname . " ". $result->nachname);
 		$zgv_code = $result->zgv_code;
 
 		$isStudent = false;
@@ -141,11 +141,15 @@ class Status extends FHCAPI_Controller
 			$lastStatusData = current(getData($result));
 
 		//Different handling depending on newStatus
-		/*		if($status_kurzbz == 'Absolvent' || $status_kurzbz == 'Diplomand')
-				{
-					//$studiensemester = $semester_aktuell;
-					$ausbildungssemester = $lastStatusData->ausbildungssemester;
-				}*/
+		if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
+		{
+			$ausbildungssemester = $lastStatusData->ausbildungssemester;
+			$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
+		}
+		if($status_kurzbz == 'Absolvent' || $status_kurzbz == 'Diplomand')
+		{
+			$ausbildungssemester = $lastStatusData->ausbildungssemester;
+		}
 
 		/*		if($status_kurzbz != 'Student')
 				{
@@ -176,7 +180,7 @@ class Status extends FHCAPI_Controller
 		{
 			if($status_kurzbz=='Bewerber' && !$reihungstest_angetreten)
 			{
-				return $this->terminateWithError($this->p->t('lehre','error_keinReihungstestverfahren', $name), self::ERROR_TYPE_GENERAL);
+				return $this->terminateWithError($this->p->t('lehre','error_keinReihungstestverfahren', ['name' => $name]), self::ERROR_TYPE_GENERAL);
 			}
 		}
 
@@ -186,7 +190,7 @@ class Status extends FHCAPI_Controller
 		{
 			if($status_kurzbz=='Bewerber' && $zgv_code=='')
 			{
-				return $this->terminateWithError($this->p->t('lehre','error_ZGVNichtEingetragen', $name), self::ERROR_TYPE_GENERAL);
+				return $this->terminateWithError($this->p->t('lehre','error_ZGVNichtEingetragen', ['name' => $name]), self::ERROR_TYPE_GENERAL);
 
 			}
 		}
@@ -209,7 +213,7 @@ class Status extends FHCAPI_Controller
 		{
 			if($status_kurzbz=='Bewerber' && $zgv_code=='' && $typ=='m')
 			{
-				return $this->terminateWithError($this->p->t('lehre','error_ZGVMasterNichtEingetragen', $name), self::ERROR_TYPE_GENERAL);
+				return $this->terminateWithError($this->p->t('lehre','error_ZGVMasterNichtEingetragen', ['name' => $name]), self::ERROR_TYPE_GENERAL);
 			}
 		}
 
@@ -224,7 +228,7 @@ class Status extends FHCAPI_Controller
 			}
 			if($result->retval == "0")
 			{
-				return $this->terminateWithError($this->p->t('lehre','error_keinBewerber', $name), self::ERROR_TYPE_GENERAL);
+				return $this->terminateWithError($this->p->t('lehre','error_keinBewerber', ['name' => $name]), self::ERROR_TYPE_GENERAL);
 			}
 		}
 
@@ -274,6 +278,7 @@ class Status extends FHCAPI_Controller
 			}
 
 			//check if Bismeldestichtag erreicht
+			//TODO(manu) Test...
 			$this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
 			$result = $this->BismeldestichtagModel->checkIfMeldestichtagErreicht($new_status_datum);
 			if (isError($result))
@@ -660,6 +665,7 @@ class Status extends FHCAPI_Controller
 					'studiensemester_kurzbz' => $studiensemester_kurzbz
 				)
 			);
+
 			if ($this->db->trans_status() === false || isError($result) || !hasData($result))
 			{
 				$this->db->trans_rollback();
@@ -667,11 +673,8 @@ class Status extends FHCAPI_Controller
 				return $this->terminateWithError($this->p->t('lehre','error_duringDeleteLehrverband'), self::ERROR_TYPE_GENERAL);
 			}
 
-			$this->terminateWithSuccess(true);
-
 		}
 		//Delete Prestudent if no data is left
-
 		if($deletePrestudent && $isBerechtigtAdmin)
 		{
 			//TODO(manu) check all connected tables, Handling of Deletion
@@ -726,7 +729,7 @@ class Status extends FHCAPI_Controller
 			);
 			if (isError($result) || !hasData($result))
 			{
-				//TODO(Manu) in these case: löschen stautus erlauben aber rückmeldung, dass Prestudent nicht gelöscht wurde
+				//TODO(Manu) in this case: löschen stautus erlauben aber rückmeldung, dass Prestudent nicht gelöscht wurde
 				return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 			}
 
@@ -940,9 +943,7 @@ class Status extends FHCAPI_Controller
 		//check if Bismeldestichtag erreicht
 		if(!$isBerechtigtNoStudstatusCheck)
 		{
-			// only check datum (without semester)
 			$this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
-			/*			$result = $this->BismeldestichtagModel->checkIfMeldestichtagErreicht($datum, $studiensemester_kurzbz);*/
 			$result = $this->BismeldestichtagModel->checkIfMeldestichtagErreicht($datum);
 			if (isError($result))
 			{

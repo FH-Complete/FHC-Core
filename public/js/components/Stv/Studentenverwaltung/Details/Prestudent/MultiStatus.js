@@ -1067,6 +1067,30 @@ export default{
 				</template>
 			</BsModal>
 			
+			<ul class="dropdown-menu" ref="addMultiStatus3" id="addMultiStatus3">
+				<li class="dropdown-submenu">
+					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl</a>
+				</li>
+				<li class="dropdown-submenu">
+					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">Abbrecher durch Student</a>
+				</li>
+				<li class="dropdown-submenu">
+					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'unterbrecher','Unterbrecher')">Unterbrecher</a>
+				</li>
+				<li class="dropdown-submenu">
+					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student','Student')">Student</a>
+				</li>
+				<li class="dropdown-submenu">
+					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student','Wiederholer')">Wiederholer</a>
+				</li>
+				<li class="dropdown-submenu">
+					<a class="dropdown-item" @click="changeStatusToDiplomand(prestudentIds)">Diplomand</a>
+				</li>
+				<li class="dropdown-submenu">
+					<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
+				</li>							
+			</ul>
+			
 			<!--Modal: askForAusbildungssemester-->
 			<BsModal ref="askForAusbildungssemester">
 				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
@@ -1117,19 +1141,80 @@ export default{
 				>
 				
 				<template #actions="{updateData2}">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus">
+<!--					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus">
 						Status Ändern
-					</button>
-				</template>
+					</button>-->
+					
+					<div class="btn-group">						
+						<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+							Status Ändern
+						</button>
+					
+						<ul class="dropdown-menu">
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl</a>
+							</li>
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">Abbrecher durch Student</a>
+							</li>
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'unterbrecher','Unterbrecher')">Unterbrecher</a>
+							</li>
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student','Student')">Student</a>
+							</li>
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student','Wiederholer')">Wiederholer</a>
+							</li>
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="changeStatusToDiplomand(prestudentIds)">Diplomand</a>
+							</li>
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
+							</li>							
+						</ul>
+					</div>
+					
 			</core-filter-cmpt>
 			
 			<div 
 				v-if="this.modelValue.length"
 				ref="buttonsStatusMulti"
 			>	
-			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus">
+<!--			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus">
 				Status Ändern
-			</button>
+			</button>-->
+			
+			<div class="btn-group">						
+				<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+					Status Ändern
+				</button>
+			
+				<ul class="dropdown-menu">
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl</a>
+					</li>
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">Abbrecher durch Student</a>
+					</li>
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'unterbrecher','Unterbrecher')">Unterbrecher</a>
+					</li>
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student','Student')">Student</a>
+					</li>
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student','Wiederholer')">Wiederholer</a>
+					</li>
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="changeStatusToDiplomand(prestudentIds)">Diplomand</a>
+					</li>
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
+					</li>							
+				</ul>
+			</div>
+			
 			</div>
 		
 		</div>`
