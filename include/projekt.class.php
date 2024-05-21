@@ -413,6 +413,8 @@ class projekt extends basis_db
 					AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
 		}
 
+		$qry .= ' ORDER BY titel';
+
 		if ($result = $this->db_query($qry))
 		{
 			while ($row = $this->db_fetch_object($result))

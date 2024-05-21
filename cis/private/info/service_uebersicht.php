@@ -46,24 +46,21 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>';
+	<script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
+	<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>';
+
+const MOODLE_ADDON_KURZBZ = 'moodle';
 
 // Load Addons to get Moodle_Path
 $addon_obj = new addon();
-if ($addon_obj->loadAddons())
+
+// include moodle addon config if active
+if ($addon_obj->checkActiveAddon(MOODLE_ADDON_KURZBZ) && file_exists('../../../addons/'.MOODLE_ADDON_KURZBZ.'/config.inc.php'))
 {
-	if (count($addon_obj->result) > 0)
-	{
-		foreach ($addon_obj->result as $row)
-		{
-			if (file_exists('../../../addons/'.$row->kurzbz.'/config.inc.php'))
-				include_once('../../../addons/'.$row->kurzbz.'/config.inc.php');
-		}
-	}
+	include_once('../../../addons/'.MOODLE_ADDON_KURZBZ.'/config.inc.php');
 }
 
 echo '
@@ -117,6 +114,7 @@ echo '</SELECT>
 <input type="submit" value="'.$p->t("services/filtern").'" />
 </form>';
 
+$servicekategorie_arr = $service->getKategorieArray();
 
 if($oe_kurzbz!='')
 {
@@ -134,6 +132,7 @@ echo '<table class="tablesorter" id="myTable">
 			<th>'.$p->t("global/bezeichnung").'</th>
 			<th>'.$p->t("services/leistung").'</th>
 			<th>'.$p->t("services/design").'</th>
+			<th>'.$p->t("services/kritikalitaet").'</th>
 			<th>'.$p->t("services/details").'</th>
 		</tr>
 	</thead>
@@ -159,6 +158,8 @@ foreach($service->result as $row)
 		echo '<td><nobr><a href="../profile/index.php?uid='.$row->design_uid.'">',$design,'</a></nobr></td>';
 		//echo '<td><nobr><a href="../profile/index.php?uid='.$row->betrieb_uid.'">',$betrieb,'</a></nobr></td>';
 		//echo '<td><nobr><a href="../profile/index.php?uid='.$row->operativ_uid.'">',$operativ,'</a></nobr></td>';
+		$title = (isset($servicekategorie_arr[$row->servicekategorie_kurzbz])?$servicekategorie_arr[$row->servicekategorie_kurzbz]:'');
+		echo '<td><span title="'.$service->convert_html_chars($title).'">',$title,'</span></td>';
 		echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">Details</a>':'');
 		if (defined("ADDON_MOODLE_PATH"))
 			echo ' '.($row->ext_id!=''?'<a href="'.ADDON_MOODLE_PATH.'course/view.php?id='.$row->ext_id.'" target="_blank">Beschreibung</a>':'');

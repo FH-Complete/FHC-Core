@@ -103,7 +103,11 @@ export default {
             this.showsearchresult();            
             this.searchfunction(this.searchsettings)
             .then(function(response) {
-                that.searchresult = response.data.data;
+                if( response.data?.error === 1 ) {
+                    that.error = 'Bei der Suche ist ein Fehler aufgetreten.';
+                } else {
+                    that.searchresult = response.data.data;
+                }
             })
             .catch(function(error) {
                 that.error = 'Bei der Suche ist ein Fehler aufgetreten.' 

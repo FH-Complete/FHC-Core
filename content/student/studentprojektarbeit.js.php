@@ -393,6 +393,7 @@ function StudentProjektarbeitAuswahl()
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	gesamtstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gesamtstunden" ));
 	final = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#final" ));
+	var lehreinheit_stsem = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_stsem" ));
 
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
@@ -440,6 +441,7 @@ function StudentProjektarbeitAuswahl()
 
 	//Werte setzen
 	document.getElementById('student-projektarbeit-textbox-projektarbeit_id').value=projektarbeit_id;
+	document.getElementById('student-projektarbeit-textbox-lehreinheit_stsem').value=lehreinheit_stsem;
 	document.getElementById('student-projektarbeit-menulist-projekttyp').value=projekttyp_kurzbz;
 	document.getElementById('student-projektarbeit-menulist-lehrveranstaltung').value=lehrveranstaltung_id;
 	document.getElementById('student-projektarbeit-menulist-lehreinheit').value=lehreinheit_id;
@@ -649,6 +651,8 @@ function StudentProjektarbeitNeu()
 
 	document.getElementById('student-projektarbeit-checkbox-neu').checked=true;
 	document.getElementById('student-projektarbeit-textbox-projektarbeit_id').value='';
+	document.getElementById('student-projektarbeit-textbox-lehreinheit_stsem').value='';
+
 	StudentProjektarbeitResetFields();
 	StudentProjektarbeitDetailDisableFields(false);
 	StudentProjektbetreuerDisableFields(true);
@@ -872,6 +876,7 @@ function StudentProjektbetreuerAuswahl()
 	name = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#name" ));
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	stunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stunden" ));
+
 	stundensatz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundensatz" ));
 	betreuerart_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betreuerart_kurzbz" ));
 	person_nachname = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_nachname" ));
@@ -891,6 +896,16 @@ function StudentProjektbetreuerAuswahl()
 	document.getElementById('student-projektbetreuer-textbox-betreuerart_kurzbz_old').value=betreuerart_kurzbz;
 	document.getElementById('student-projektbetreuer-textbox-person_id').value=person_id;
 	document.getElementById('student-projektbetreuer-checkbox-neu').checked=false;
+
+	var lehreinheitstsem = document.getElementById('student-projektarbeit-textbox-lehreinheit_stsem').value;
+	var default_stundensatz = StudentProjektbetreuerLoadStundensatz(person_id, lehreinheitstsem);
+
+	if (default_stundensatz != '')
+		default_stundensatz = 'Stundensatz (Default '+default_stundensatz+'):';
+	else
+		default_stundensatz = 'Stundensatz';
+
+	document.getElementById('student-projektbetreuer-label-stundensatz').value= default_stundensatz;
 
     var gesamtkosten = StudentProjektbetreuerGesamtkosten();
 
@@ -1171,7 +1186,9 @@ function StudentProjektbetreuerDetailReset()
 		document.getElementById('student-projektbetreuer-textbox-stunden').value='0.0';
 		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Begutachter';
 	}
+
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value='80.0';
+	document.getElementById('student-projektbetreuer-label-stundensatz').value= 'Stundensatz (Default 80.0):';
 	document.getElementById('student-projektbetreuer-menulist-person').value='';
 }
 
@@ -1358,16 +1375,16 @@ function StudentProjektbetreuerLoeschen()
 	}
 }
 
-function StudentProjektbetreuerLoadMitarbeiterDaten()
+function StudentProjektbetreuerLoadStundensatz(person_id, studiensemester)
 {
-	person_id = MenulistGetSelectedValue('student-projektbetreuer-menulist-person');
+	var stundensatz='';
 
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'getstundensatz');
 	req.add('person_id', person_id);
-	req.add('studiensemester_kurzbz', getStudiensemester())
+	req.add('studiensemester_kurzbz', studiensemester)
 
 	var response = req.executePOST();
 
@@ -1385,7 +1402,23 @@ function StudentProjektbetreuerLoadMitarbeiterDaten()
 		stundensatz = val.dbdml_data
 	}
 
-	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=stundensatz;
+	return stundensatz;
+}
+
+function StudentProjektbetreuerLoadMitarbeiterDaten()
+{
+	var person_id = MenulistGetSelectedValue('student-projektbetreuer-menulist-person');
+	var lehreinheitstsem = document.getElementById('student-projektarbeit-textbox-lehreinheit_stsem').value;
+
+	var stundensatz = StudentProjektbetreuerLoadStundensatz(person_id, lehreinheitstsem);
+
+	if (stundensatz != '')
+		default_stundensatz = 'Stundensatz (Default '+stundensatz+'):';
+	else
+		default_stundensatz = 'Stundensatz';
+
+	document.getElementById('student-projektbetreuer-label-stundensatz').value = default_stundensatz;
+	document.getElementById('student-projektbetreuer-textbox-stundensatz').value = stundensatz;
 }
 
 // ****

@@ -10862,6 +10862,7 @@ Any unusual occurrences
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
 		'phrase' => 'kommissionellePruefungHinweis',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -19948,6 +19949,26 @@ array(
 	),
 	array(
 		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'suche',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Suche',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Search',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'studierendenantrag',
 		'phrase' => 'btn_create',
 		'insertvon' => 'system',
@@ -20523,6 +20544,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Reopen',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_pause',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Pausieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Pause',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_unpause',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fortsetzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Resume',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -21332,6 +21393,46 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
+		'phrase' => 'status_unpaused',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fortgesetzt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Resumed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'status_stop',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gestoppt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Stopped',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
 		'phrase' => 'error_stg_blacklist',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -21524,6 +21625,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'No studienplan found for stg: {studiengang_kz}, studiensemester: {studiensemester_kurzbz}, ausbildungssemester: {semester}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_antragstatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Status für Bekanntgabe #{id} gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No status found announcement #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -21744,6 +21865,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Announcement is not approved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_not_pausable',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bekanntgabe mit Id {id} kann nicht pausiert werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Announcement with Id {id} cannot be not paused',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_not_paused',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bekanntgabe mit Id {id} ist nicht pausiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Announcement with Id {id} is not paused',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -22693,6 +22854,7 @@ array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
 		'phrase' => 'dropdown_bitteWaehlen',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -22703,6 +22865,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'please select if applicable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'grund_Wiederholung_deadline',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'negative kommissionelle Beurteilung und keine fristgerechte Bekanntgabe der Wiederholung des Studienjahres',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'negative assessment by the committee and no timely announcement of the repetition of the academic year',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -22744,6 +22926,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'middle names',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'maennlich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Männlich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Male',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'weiblich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Weiblich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Female',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -23819,6 +24041,26 @@ array(
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'person',
+		'phrase' => 'habilitation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Habilitation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Habilitation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
 		'phrase' => 'funktion',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -24136,6 +24378,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'zeitaufzeichnung',
+		'phrase' => 'id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),	
 	// Personalverwaltung end
 	array(
 		'app' => 'core',

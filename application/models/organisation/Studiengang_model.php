@@ -563,7 +563,7 @@ class Studiengang_model extends DB_Model
 		$this->addJoin('public.tbl_student stud', 'p.prestudent_id=stud.prestudent_id', 'LEFT');
 
 		$this->db->where_in($this->dbTable . '.studiengang_kz', $studiengang_kzs);
-		$this->db->where_in('ps.status_kurzbz', $this->config->item('antrag_prestudentstatus_whitelist'));
+		$this->db->where_in('ps.status_kurzbz', $this->config->item('antrag_prestudentstatus_whitelist_abmeldung'));
 		$this->db->where($this->dbTable . ".aktiv", true);
 
 		if ($not_antrag_typ !== null && is_array($not_antrag_typ)) {

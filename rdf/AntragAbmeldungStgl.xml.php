@@ -14,7 +14,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$id = $_GET['id'];
 
 		$where = " WHERE studierendenantrag_id = " . $db->db_add_param($id) . "
-					AND a.typ = 'AbmeldungStgl' AND campus.get_status_studierendenantrag(a.studierendenantrag_id) IN ('Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt');";
+					AND a.typ = 'AbmeldungStgl' AND campus.get_status_studierendenantrag(a.studierendenantrag_id) IN ('Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt', 'Abgemeldet');";
 		$not_found_error = 'Studierendenantrag not found'. $id;
 	} elseif(isset($_GET['uid']) && isset($_GET['prestudent_id'])) {
 		$uid = $_GET['uid'];
@@ -26,7 +26,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$prestudent_id  = (array_filter($prestudent_id, 'strlen'));
 
 		$where = " WHERE  a.prestudent_id in (" . $db->db_implode4SQL($prestudent_id) . ")
-					AND a.typ = 'AbmeldungStgl' AND campus.get_status_studierendenantrag(a.studierendenantrag_id) IN ('Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt');";
+					AND a.typ = 'AbmeldungStgl' AND campus.get_status_studierendenantrag(a.studierendenantrag_id) IN ('Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt', 'Abgemeldet');";
 		$not_found_error = 'Studierendenantrag not found for: ' . implode(',', $uid);
 	} else
 		die('<error>wrong parameters</error>');
@@ -36,7 +36,7 @@ else
 
 
 $query = "
-	SELECT stg.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, public.get_absem_prestudent(a.prestudent_id, NULL) AS semester, a.grund
+	SELECT stg.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, pss.ausbildungssemester AS semester, a.grund
 	FROM
 	campus.tbl_studierendenantrag a
 	JOIN public.tbl_student USING (prestudent_id)

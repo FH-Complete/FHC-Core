@@ -218,7 +218,7 @@ $datum_obj = new datum();
 	echo '   <td><textarea name="beschreibung" cols="60" rows="5">'.htmlspecialchars($service->beschreibung).'</textarea></td>';
 	echo '</tr>';
 	echo '<tr>';
-	echo '   <td>Kategorie&nbsp;</td>';
+	echo '   <td>Kritikalität&nbsp;</td>';
 	echo '   <td>';
 	echo '<SELECT name="servicekategorie_kurzbz">';
 	echo '<OPTION value="">-- keine Auswahl --</OPTION>';

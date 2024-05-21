@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- *
+ * TODO(chris): deprecated
  */
 class Phrasen extends FHC_Controller
 {

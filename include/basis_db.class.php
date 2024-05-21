@@ -181,7 +181,7 @@ abstract class db extends basis
 		if (!include(dirname(__FILE__).'/../application/config/'.CI_ENVIRONMENT.'/db_crypt.php')) return null;
 
 		// Array that will contains all the DB decryption password
-		$decryptionPasswordsArray = array();
+		$decryptionPasswordArray = array();
 		// Array that will contains all the DB decryption password names
 		$decryptionPasswordNamesArray = array();
 

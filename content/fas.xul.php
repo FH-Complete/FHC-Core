@@ -141,7 +141,9 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt(event);"/>
   <command id="menu-dokumente-zutrittskarte:command" oncommand="PrintZutrittskarte();"/>
   <command id="menu-dokumente-antrag-abmeldung:command" oncommand="StudentPrintAntragAbmeldung(event);"/>
+  <command id="menu-dokumente-antrag-abmeldungstgl:command" oncommand="StudentPrintAntragAbmeldungStgl(event);"/>
   <command id="menu-dokumente-antrag-unterbrechung:command" oncommand="StudentPrintAntragUnterbrechung(event);"/>
+  <command id="menu-dokumente-antrag-wiederholung:command" oncommand="StudentPrintAntragWiederholung(event);"/>
   <command id="menu-dokumente-studienblatt:command" oncommand="PrintStudienblatt(event);"/>
   <command id="menu-dokumente-studienblatt_englisch:command" oncommand="PrintStudienblattEnglisch(event);"/>
   <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'de');"/>
@@ -519,11 +521,25 @@ foreach($addon_obj->result as $addon)
                 accesskey = "&menu-dokumente-antrag-abmeldung.accesskey;"
                 />
               <menuitem
+                id        =  "menu-dokumente-antrag-abmeldungstgl"
+                key       =  "menu-dokumente-antrag-abmeldungstgl:key"
+                label     = "&menu-dokumente-antrag-abmeldungstgl.label;"
+                command   =  "menu-dokumente-antrag-abmeldungstgl:command"
+                accesskey = "&menu-dokumente-antrag-abmeldungstgl.accesskey;"
+                />
+              <menuitem
                 id        =  "menu-dokumente-antrag-unterbrechung"
                 key       =  "menu-dokumente-antrag-unterbrechung:key"
                 label     = "&menu-dokumente-antrag-unterbrechung.label;"
                 command   =  "menu-dokumente-antrag-unterbrechung:command"
                 accesskey = "&menu-dokumente-antrag-unterbrechung.accesskey;"
+                />
+              <menuitem
+                id        =  "menu-dokumente-antrag-wiederholung"
+                key       =  "menu-dokumente-antrag-wiederholung:key"
+                label     = "&menu-dokumente-antrag-wiederholung.label;"
+                command   =  "menu-dokumente-antrag-wiederholung:command"
+                accesskey = "&menu-dokumente-antrag-wiederholung.accesskey;"
                 />
             </menupopup>
           </menu>

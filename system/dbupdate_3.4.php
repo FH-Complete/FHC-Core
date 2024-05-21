@@ -27,8 +27,7 @@ require_once('dbupdate_3.4/example.php');
 require_once('dbupdate_3.4/example2.php');
 ...
 */
-require_once('dbupdate_3.4/25003_notenimport_nachpruefung.php');
-
+//require_once('dbupdate_3.4/25003_notenimport_nachpruefung.php');
 require_once('dbupdate_3.4/26173_index_webservicelog.php');
 require_once('dbupdate_3.4/24682_reihungstest_zugangscode_fuer_login.php');
 require_once('dbupdate_3.4/17512_fehlercode_constraints.php');
@@ -49,10 +48,12 @@ require_once('dbupdate_3.4/30181_tabelle_anrechnung_neue_attribute_fuer_begruend
 require_once('dbupdate_3.4/29529_infocenter_anpassungen.php');
 require_once('dbupdate_3.4/29835_uhstat1_erfassung_der_uhstat1_daten_ueber_das_bewerbungstool.php');
 require_once('dbupdate_3.4/33714_erhoehter_studienbeitrag_fuer_drittsaatenangehoerig.php');
+require_once('dbupdate_3.4/33003_bis_meldung_personal.php');
 require_once('dbupdate_3.4/36275_zeitaufzeichnung_karenz.php');
 require_once('dbupdate_3.4/21620_neues_feld_zum_erfassen_des_ESI.php');
 require_once('dbupdate_3.4/36530_bis_internationsalisierung_codextabelle_neuerungen.php');
 require_once('dbupdate_3.4/34543_ux_template.php');
+require_once('dbupdate_3.4/17513_Entwicklungsteam.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -76,7 +77,7 @@ $tabellen=array(
 	"bis.tbl_bisstandort"  => array("standort_code","bezeichnung","aktiv","insertamum","insertvon","updateamum","updatevon"),
 	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig","azgrelevant", "homeoffice"),
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
-	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","entwicklungsteam_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
 	"bis.tbl_gsstudientyp" => array("gsstudientyp_kurzbz","bezeichnung","studientyp_code"),
 	"bis.tbl_gsprogrammtyp" => array("gsprogrammtyp_kurzbz","bezeichnung","programmtyp_code"),
@@ -166,12 +167,10 @@ $tabellen=array(
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"fue.tbl_scrumteam" => array("scrumteam_kurzbz","bezeichnung","punkteprosprint","tasksprosprint","gruppe_kurzbz"),
 	"fue.tbl_scrumsprint" => array("scrumsprint_id","scrumteam_kurzbz","sprint_kurzbz","sprintstart","sprintende","insertamum","insertvon","updateamum","updatevon"),
-	"hr.tbl_audit_log" => array("audit_log_id","mtime","action","username","table_name","diff_data","row_data"),
 	"hr.tbl_sachaufwand" => array("sachaufwand_id","mitarbeiter_uid","sachaufwandtyp_kurzbz","dienstverhaeltnis_id","beginn","ende","anmerkung","insertamum","insertvon","updateamum","updatevon"),
 	"hr.tbl_sachaufwandtyp" => array("sachaufwandtyp_kurzbz","bezeichnung","sort", "aktiv"),
 	"hr.tbl_stundensatz" => array("stundensatz_id","uid","stundensatztyp","stundensatz","oe_kurzbz","gueltig_von","gueltig_bis","insertamum","insertvon","updateamum","updatevon"),
 	"hr.tbl_stundensatztyp" => array("stundensatztyp","bezeichnung","aktiv","insertamum","insertvon","updateamum","updatevon"),
-	"hr.tbl_tmp_store" => array("tmp_store_id","typ","mitarbeiter_uid","formdata","insertvon","insertamum","updatevon","updateamum"),
 	"hr.tbl_dienstverhaeltnis" => array("dienstverhaeltnis_id","mitarbeiter_uid","vertragsart_kurzbz","oe_kurzbz","von","bis","insertamum","insertvon","updateamum","updatevon"),
 	"hr.tbl_vertragsart" => array("vertragsart_kurzbz","bezeichnung","anmerkung","dienstverhaeltnis","vertragsart_kurzbz_parent","aktiv","sort"),
 	"hr.tbl_vertragsbestandteil" => array("vertragsbestandteil_id","dienstverhaeltnis_id","vertragsbestandteiltyp_kurzbz","von", "bis","insertamum", "insertvon","updateamum","updatevon"),
@@ -282,7 +281,7 @@ $tabellen=array(
 	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id","credit_points", "zahlungsreferenz", "anmerkung"),
 	"public.tbl_lehrverband"  => array("studiengang_kz","semester","verband","gruppe","aktiv","bezeichnung","ext_id","orgform_kurzbz","gid"),
 	"public.tbl_log"  => array("log_id","executetime","mitarbeiter_uid","beschreibung","sql","sqlundo"),
-	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker"),
+	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker","habilitation"),
 	"public.tbl_msg_attachment" => array("attachment_id","message_id","name","filename"),
 	"public.tbl_msg_message" => array("message_id","person_id","subject","body","priority","relationmessage_id","oe_kurzbz","insertamum","insertvon"),
 	"public.tbl_msg_recipient" => array("message_id","person_id","token","sent","sentinfo","insertamum","insertvon","oe_kurzbz"),
