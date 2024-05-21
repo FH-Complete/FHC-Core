@@ -107,7 +107,7 @@ export default {
 
 			this.abortController.suggestions = new AbortController();
 			// TODO(chris): move to fhcapi.factory
-			this.$fhcapi
+			this.$fhcApi
 				.post('api/frontend/v1/stv/student/check', {
 					vorname: this.formData.vorname,
 					nachname: this.formData.nachname,

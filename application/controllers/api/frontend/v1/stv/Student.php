@@ -259,7 +259,7 @@ class Student extends FHCAPI_Controller
 	{
 		$this->load->library('form_validation');
 
-		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'callback_isValidDate', [
+		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'isValidDate', [
 			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
 		]);
 
