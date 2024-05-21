@@ -400,6 +400,11 @@ class MigrateContract extends CLI_Controller
 	 */
 	private function _addVertragsbestandteilZeitaufzeichnung(&$contracts, $dv, $row_verwendung)
 	{
+		if( is_null($row_verwendung->zeitaufzeichnungspflichtig) || is_null($row_verwendung->azgrelevant) )
+		{
+		    return;
+		}
+
 		if (isset($contracts['dv'][$dv]['vbs']))
 		{
 			foreach ($contracts['dv'][$dv]['vbs'] as $index_vbs=>$row_vbs)
