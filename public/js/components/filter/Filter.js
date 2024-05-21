@@ -543,8 +543,8 @@ export const CoreFilterCmpt = {
 					// create children array if not done yet
 					if (!parent._children) parent._children = [];
 
-					// append the child
-					parent._children.push(child);
+					// if child is not included in children array, append the child
+					if (!parent._children.includes(child)) parent._children.push(child);
 
 					// parent found
 					return true;
