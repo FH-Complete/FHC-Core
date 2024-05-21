@@ -13,6 +13,18 @@ class Stundenplan_model extends DB_Model
 	}
 
 	/**
+	 * @param string $ort_kurzbz
+	 * @param string $date
+	 * 
+	 * @return stdClass
+	 */
+	public function getRoomDataOnDay($ort_kurzbz,$date){
+		$res = $this->loadWhere(['ort_kurzbz'=>$ort_kurzbz,'datum'=>$date]);
+		$res = hasData($res) ? getData($res): null;
+		return $res;
+	}
+
+	/**
 	 * @param string $uid
 	 * 
 	 * @return stdClass

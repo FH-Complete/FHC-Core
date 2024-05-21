@@ -16,7 +16,8 @@ class Stundenplan extends Auth_Controller
 		parent::__construct([
 			'index' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
 			'Reservierungen' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'Stunden' => ['student/anrechnung_beantragen:r','user:r'] // TODO(chris): permissions?
+			'Stunden' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
+			'RoomInformation'=> ['student/anrechnung_beantragen:r','user:r'],
 		]);
 	}
 
@@ -63,6 +64,16 @@ class Stundenplan extends Auth_Controller
 			return $this->outputJsonError(getError($result));
 
 		$this->outputJsonSuccess(getData($result));
+	}
+
+	public function RoomInformation()
+	{
+		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+
+		$result = $this->StundenplanModel->getRoomDataOnDay('EDV_A2.06','2024-05-21');
+		//echo($this->db->last_query());
+		echo json_encode($result);
+		
 	}
 
 }

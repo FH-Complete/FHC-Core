@@ -115,4 +115,8 @@ class Cms extends FHC_Controller
 			show_error("News number rows: No data found");
 		}
 	}
+
+	public function getRoomInformation(){
+		$this->load->view('CisVue/Cms/RoomInformation');
+	}
 }
