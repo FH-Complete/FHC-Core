@@ -105,7 +105,8 @@ export default {
 				this.favnodes = await this.loadNodes(this.favorites.list);
 			}
 			this.favorites.on = !this.favorites.on;
-			CoreRESTClient.post("components/stv/favorites/set", {favorites: JSON.stringify(this.favorites)});
+			this.$fhcApi
+				.factory.stv.verband.favorites.set(JSON.stringify(this.favorites));
 			this.loading = false;
 		},
 		async loadNodes(links) {
@@ -156,7 +157,8 @@ export default {
 				this.favorites.list.push(key.data.link + '');
 			}
 			
-			CoreRESTClient.post("components/stv/favorites/set", {favorites: JSON.stringify(this.favorites)});
+			this.$fhcApi
+				.factory.stv.verband.favorites.set(JSON.stringify(this.favorites));
 		},
 		unsetFavFocus(e) {
 			if (e.target.dataset?.linkFavAdd !== undefined) {
@@ -177,19 +179,18 @@ export default {
 	},
 	mounted() {
 		this.$fhcApi
-			.get('api/frontend/v1/stv/verband')
-			.then(result => result.data)
+			.factory.stv.verband.get()
 			.then(result => {
-				this.nodes = result.map(this.mapResultToTreeData);
+				this.nodes = result.data.map(this.mapResultToTreeData);
 				this.loading = false;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get("components/stv/favorites")
-			.then(result => result.data)
+
+		this.$fhcApi
+			.factory.stv.verband.favorites.get()
 			.then(result => {
-				if (result) {
-					let f = JSON.parse(result);
+				if (result.data) {
+					let f = JSON.parse(result.data);
 					if (f.on) {
 						this.loading = true;
 						this.favorites = f;
