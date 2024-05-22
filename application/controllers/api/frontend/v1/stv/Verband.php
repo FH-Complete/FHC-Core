@@ -343,6 +343,8 @@ class Verband extends FHCAPI_Controller
 		$studiensemester = $this->getDataOrTerminateWithError($result);
 		$result = [];
 
+		$studiengang_kz = (int)$studiengang_kz;
+
 		foreach ($studiensemester as $sem) {
 			$semlink = $link . $sem->studiensemester_kurzbz;
 			$intlink = $semlink . '/interessenten';
