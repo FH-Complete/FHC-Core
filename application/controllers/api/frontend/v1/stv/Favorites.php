@@ -28,7 +28,6 @@ class Favorites extends FHCAPI_Controller
 {
 	public function __construct()
 	{
-		// TODO(chris): access!
 		parent::__construct([
 			'index' => self::PERM_LOGGED,
 			'set' => self::PERM_LOGGED
@@ -58,10 +57,8 @@ class Favorites extends FHCAPI_Controller
 
 		$this->form_validation->set_rules('favorites', 'Favorites', 'required');
 
-		if ($this->form_validation->run() == false) {
-			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
-			return $this->outputJson($this->form_validation->error_array());
-		}
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		$favorites = $this->input->post('favorites');
 
