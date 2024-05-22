@@ -271,7 +271,6 @@ export const CoreFilterCmpt = {
 
 			if (CoreRESTClient.hasData(response))
 			{
-
 				let data = CoreRESTClient.getData(response);
 				this.filterName = data.filterName;
 				this.dataset = data.dataset;
@@ -279,7 +278,7 @@ export const CoreFilterCmpt = {
 
 				this.fields = data.fields;
 				this.selectedFields = data.selectedFields;
-				// this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
+				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
 				this.filterFields = [];
 
 				for (let i = 0; i < data.datasetMetadata.length; i++)
@@ -292,7 +291,7 @@ export const CoreFilterCmpt = {
 							filter.type = data.datasetMetadata[i].type;
 
 							this.filterFields.push(filter);
-						//break;
+							//break;
 						}
 					}
 				}
@@ -407,7 +406,6 @@ export const CoreFilterCmpt = {
 		 * Used to start/refresh the FetchCmpt
 		 */
 		startFetchCmpt: function(apiFunction, apiFunctionParameters, dataFetchedCallback) {
-
 			// Assign the function api of the FetchCmpt binded property
 			this.fetchCmptApiFunction = apiFunction;
 

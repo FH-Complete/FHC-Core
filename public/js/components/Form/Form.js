@@ -46,7 +46,8 @@ export default {
 			const factory = Object.create(Object.getPrototypeOf(this.$fhcApi.factory), Object.getOwnPropertyDescriptors(this.$fhcApi.factory));
 			factory.$fhcApi = {
 				get: this.get,
-				post: this.post
+				post: this.post,
+				_defaultErrorHandlers: this.$fhcApi._defaultErrorHandlers
 			};
 			return factory;
 		}

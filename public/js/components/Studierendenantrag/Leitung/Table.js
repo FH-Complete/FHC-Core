@@ -31,9 +31,6 @@ export default {
 	],
 	data() {
 		return {
-			ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Leitung/getAntraege/',
 			table: null,
 			lastHistoryClickedId: null,
 			historyData: [],
@@ -42,7 +39,7 @@ export default {
 	},
 	methods: {
 		reload(stg) {
-			this.table.setData(this.ajaxUrl + (stg || ''));
+			this.table.setData('/' + (stg || ''));
 		},
 		download() {
 			this.table.download("csv", "data.csv", {
@@ -53,14 +50,12 @@ export default {
 		getHistory() {
 			if (this.lastHistoryClickedId === null)
 				return null;
-			return axios.get(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Leitung/getHistory/' +
-				this.lastHistoryClickedId
-			).then(res => {
-				this.historyData = res.data.retval.sort((a, b) => a.insertamum > b.insertamum);
-			});
+			return this.$fhcApi.factory
+				.studstatus.leitung.getHistory(this.lastHistoryClickedId)
+				.then(res => {
+					this.historyData = res.data.sort((a, b) => a.insertamum > b.insertamum);
+				})
+				.catch(this.$fhcApi.handleSystemError);
 		},
 		getHistoryStatus(data, index) {
 			if (data.insertvon == 'Studienabbruch')
@@ -116,7 +111,8 @@ export default {
 			movableColumns: true,
 			height: '65vh',
 			layout: "fitDataFill",
-			ajaxURL: this.ajaxUrl + (this.filter || ''),
+			ajaxURL: '/' + (this.filter || ''),
+			ajaxRequestFunc: this.$fhcApi.factory.studstatus.leitung.getAntraege,
 			persistence: { // NOTE(chris): do not store column titles
 				sort: true, //persist column sorting
 				filter: true, //persist filters
@@ -205,7 +201,7 @@ export default {
 			}, {
 				field: 'name',
 				title: this.$p.t('global', 'name'),
-				mutator: (value, data) => (data.vorname + ' ' + data.nachname).replace(/^\s*(.*)\s*$/, '$1'),
+				mutator: (value, data) => (data.nachname + ' ' + data.vorname).replace(/^\s*(.*)\s*$/, '$1'),
 				headerFilter: 'input'
 			}, {
 				field: 'datum',

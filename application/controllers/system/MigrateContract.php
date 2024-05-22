@@ -400,6 +400,11 @@ class MigrateContract extends CLI_Controller
 	 */
 	private function _addVertragsbestandteilZeitaufzeichnung(&$contracts, $dv, $row_verwendung)
 	{
+		if( is_null($row_verwendung->zeitaufzeichnungspflichtig) || is_null($row_verwendung->azgrelevant) )
+		{
+		    return;
+		}
+
 		if (isset($contracts['dv'][$dv]['vbs']))
 		{
 			foreach ($contracts['dv'][$dv]['vbs'] as $index_vbs=>$row_vbs)
@@ -676,5 +681,36 @@ class MigrateContract extends CLI_Controller
 			return max(array_keys($contracts['dv'])) + 1;
 		else
 			return 0;
+	}
+
+	/**
+	 * Habilitation wird aus der Tabelle bis.tbl_bisverwendung in die Tabelle public.tbl_mitarbeiter uebernommen
+	 * Sofern die Person einmal in den Verwendungen eine habiliation eingetragen hat wird diese in den MA-Datensatz übernommen
+	 * Da es in der regel öfter vorkommt dass das hakerl vergessen wurde beim Vertragswechsel als dass die person die habiliation verliert.
+	 */
+	public function migrateHabilitation()
+	{
+		$this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
+		$db = new DB_Model();
+
+		$qry = "
+		SELECT
+			distinct mitarbeiter_uid
+		FROM
+			bis.tbl_bisverwendung
+		WHERE
+			habilitation=true";
+
+		$resultHabilitation = $db->execReadOnlyQuery($qry);
+
+		if (isSuccess($resultHabilitation) && hasData($resultHabilitation))
+		{
+			$habilitationen = getData($resultHabilitation);
+
+			foreach ($habilitationen as  $row_habilitationen)
+			{
+ 				$this->MitarbeiterModel->update($row_habilitationen->mitarbeiter_uid, array('habilitation'=>true));
+			}
+		}
 	}
 }
