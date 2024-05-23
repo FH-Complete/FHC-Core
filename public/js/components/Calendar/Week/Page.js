@@ -28,7 +28,8 @@ export default {
 	},
 	computed: {
 		days() {
-			let tmpDate = new CalendarDate(this.year, 1, 1); // NOTE(chris): somewhere in the middle of the year
+			
+			let tmpDate = new CalendarDate(this.year,1,1); // NOTE(chris): somewhere in the middle of the year
 			tmpDate.w = this.week;
 			let startDay = tmpDate.firstDayOfWeek;
 			let result = [];
@@ -36,9 +37,11 @@ export default {
 				result.push(new Date(startDay.getFullYear(), startDay.getMonth(), startDay.getDate() + i));
 			}
 			return result;
+
 		},
 		eventsPerDayAndHour() {
 			const res = {};
+			console.log("this are the days",this.days)
 			this.days.forEach(day => {
 				let key = day.toDateString();
 				
@@ -46,6 +49,7 @@ export default {
 				nextDay.setDate(nextDay.getDate()+1);
 				nextDay.setMilliseconds(nextDay.getMilliseconds()-1);
 				let d = {events:[],lanes:1};
+				console.log("this are the events",this.events, "and this is the key",key)
 				if (this.events[key]) {
 					this.events[key].forEach(evt => {
 						let event = {orig:evt,lane:1,maxLane:1,start: evt.start < day ? day : evt.start, end: evt.end > nextDay ? nextDay : evt.end,shared:[],setSharedMaxRecursive(doneItems) {
@@ -75,6 +79,9 @@ export default {
 		}
 	},
 	methods: {
+		printTest:function(param){
+			console.log("HERE",param)
+		},
 		changeToMonth(day) {
 			if (!this.noMonthView) {
 				this.date.set(day);
@@ -91,6 +98,7 @@ export default {
 	},
 	template: `
 	<div class="fhc-calendar-week-page">
+	
 		<div class="d-flex flex-column border-top">
 			<div class="fhc-calendar-week-page-header border-2 border-bottom text-center d-flex">
 				<div v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})">
@@ -104,8 +112,10 @@ export default {
 						<div v-for="hour in hours" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class="day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (1440 / smallestTimeFrame) + ', 1fr)'}">
-						<a href="#" v-for="event in day.events" :key="event" class="small rounded overflow-hidden text-decoration-none text-dark" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end), '--test': dateToMinutesOfDay(event.end), background: event.orig.color}" @click.prevent="$emit('input', event.orig)">
-							{{event.orig.title}}
+						<span>test</span>
+					<a href="#" @click="printTest(event)" v-for="event in day.events" :key="event" class="small rounded overflow-hidden text-decoration-none text-dark" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end), '--test': dateToMinutesOfDay(event.end), background: event.orig.color}" @click.prevent="$emit('input', event.orig)">
+							
+							{{event.orig.title}}-->
 						</a>
 					</div>
 				</div>
