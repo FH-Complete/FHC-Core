@@ -142,7 +142,7 @@ export default{
 
 							let button = document.createElement('button');
 							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
-								button.className = 'btn btn-outline-secondary btn-action disabled';
+								button.className = 'btn btn-outline-secondary btn-action';
 							else
 								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-forward"></i>';
@@ -156,7 +156,7 @@ export default{
 
 							button = document.createElement('button');
 							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
-								button.className = 'btn btn-outline-secondary btn-action disabled';
+								button.className = 'btn btn-outline-secondary btn-action';
 							else
 								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-check"></i>';
@@ -168,7 +168,7 @@ export default{
 
 							button = document.createElement('button');
 							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
-								button.className = 'btn btn-outline-secondary btn-action disabled';
+								button.className = 'btn btn-outline-secondary btn-action';
 							else
 								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
@@ -180,7 +180,7 @@ export default{
 
 							button = document.createElement('button');
 							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
-								button.className = 'btn btn-outline-secondary btn-action disabled';
+								button.className = 'btn btn-outline-secondary btn-action';
 							else
 								button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
@@ -499,8 +499,15 @@ export default{
 			Promise
 				.allSettled(promises)
 				.then(values => {
-					let newStatus = this.newArray[0].status_kurzbz;
-					console.log(`Successful: ${countSuccess}, Errors: ${countError}`);
+					if (this.abbruchData.length < 1) {
+						console.log("singleNew");
+					}
+					else{
+						let newStatus = this.newArray[0].status_kurzbz;
+						console.log(`Successful: ${countSuccess}, Errors: ${countError}`);
+					}
+
+
 
 					//Feedback Success als infoalert
 					 if (countSuccess > 0) {
