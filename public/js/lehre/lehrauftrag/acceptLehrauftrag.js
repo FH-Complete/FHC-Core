@@ -445,19 +445,6 @@ storniert_tooltip = function (e, cell, onRendered) {
   }
 };
 
-//recursive function that returns the tableuniqueid using the tableInstance
-const findTableUniqueID = function (tableElement,count =0){
-  if(count >=10){
-      // after 10 iterations end the recursion
-      return null;
-  }
-  if(tableElement.attributes.tableuniqueid){
-     return tableElement.attributes.tableuniqueid.value;
-  }else{
-      findTableUniqueID(tableElement.parentElement, ++count);
-  }
-}
-
 $(function () {
   // Pruefen ob Promise unterstuetzt wird
   // Tabulator funktioniert nicht mit IE
@@ -466,9 +453,9 @@ $(function () {
   $(document).on("tableInit", function (event, tabulatorInstance) {
     //passing the tabulator instance because the acceptLehrauftrag site loads two tabulator tables
     func_tableBuilt(tabulatorInstance);
-
-    let uniqueTableID = findTableUniqueID(tabulatorInstance.element);
-        
+    
+    let uniqueTableID = tabulatorInstance.element.closest('[tableuniqueid]').attributes.tableuniqueid.value;
+    
     switch (uniqueTableID) {
       case "cancelledLehrauftrag":
         tabulatorInstance.on("renderComplete", () => {
