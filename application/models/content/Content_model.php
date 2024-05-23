@@ -78,6 +78,31 @@ class Content_model extends DB_Model
 	 */
 	public function getMenu($root_content_id, $uid, $sprache = DEFAULT_LANGUAGE)
 	{
+
+		/*,
+		{
+			"content_id": 1000007,
+			"template_kurzbz": "redirect",
+			"titel": "Anrechnung",
+			"content": "<content><url><![CDATA[' . site_url('/lehre/anrechnung/RequestAnrechnung') . ']]></url><target><![CDATA[]]></target></content>",
+			"menu_open": false,
+			"aktiv": true,
+			"childs": []
+		} 
+		*/
+
+		/* 
+		{
+			"content_id": 1000003,
+			"template_kurzbz": "redirect",
+			"titel": "COVID-19",
+			"content": "<content><url><![CDATA[' . site_url('/CisHtml/Cms/content/10012') . ']]></url><target><![CDATA[]]></target></content>",
+			"menu_open": false,
+			"aktiv": true,
+			"childs": []
+		},
+		*/
+
 		if ($root_content_id === null) {
 			$res = json_decode('{
 				"content_id": 1000000,
@@ -101,15 +126,6 @@ class Content_model extends DB_Model
 						"template_kurzbz": "redirect",
 						"titel": "Profil",
 						"content": "<content><url><![CDATA[' . site_url('/Cis/Profil') . ']]></url><target><![CDATA[]]></target></content>",
-						"menu_open": false,
-						"aktiv": true,
-						"childs": []
-					},
-					{
-						"content_id": 1000003,
-						"template_kurzbz": "redirect",
-						"titel": "COVID-19",
-						"content": "<content><url><![CDATA[' . site_url('/CisHtml/Cms/content/10012') . ']]></url><target><![CDATA[]]></target></content>",
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []
@@ -149,16 +165,8 @@ class Content_model extends DB_Model
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []
-					},
-					{
-						"content_id": 1000007,
-						"template_kurzbz": "redirect",
-						"titel": "Anrechnung",
-						"content": "<content><url><![CDATA[' . site_url('/lehre/anrechnung/RequestAnrechnung') . ']]></url><target><![CDATA[]]></target></content>",
-						"menu_open": false,
-						"aktiv": true,
-						"childs": []
 					}
+					
 				]
 			}');
 			return success($res);
