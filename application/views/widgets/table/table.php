@@ -23,4 +23,3 @@
 		<div id="tableWidgetFooter"></div>
 		</div>
 	</div>
-</div>
