@@ -1280,7 +1280,7 @@ if(!$error)
 					$rolle = new prestudent();
 					if($rolle->load_rolle($_POST['prestudent_id'],$_POST['status_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
 					{
-						if($rechte->isBerechtigt('admin', $_POST['studiengang_kz'], 'suid') || $rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid'))
+						if($rechte->isBerechtigt('admin', $_POST['studiengang_kz'], 'suid') || $rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid') || $rtaufsichtUndStatusAbgewiesen)
 						{
 							if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['status_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
 							{
