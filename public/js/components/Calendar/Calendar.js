@@ -5,6 +5,7 @@ import CalendarWeek from './Week.js';
 import CalendarWeeks from './Weeks.js';
 import CalendarMinimized from './Minimized.js';
 import CalendarDate from '../../composables/CalendarDate.js';
+import CalendarModal from './CalendarModal.js';
 
 // TODO(chris): week/month toggle
 
@@ -15,7 +16,8 @@ export default {
 		CalendarYears,
 		CalendarWeek,
 		CalendarWeeks,
-		CalendarMinimized
+		CalendarMinimized,
+		CalendarModal
 	},
 	provide() {
 		return {
@@ -61,6 +63,7 @@ export default {
 	],
 	data() {
 		return {
+			currentlySelectedEvent:null,
 			header: '',
 			prevMode: null,
 			currMode: null,
@@ -102,6 +105,15 @@ export default {
 	},
 	methods: {
 		handleInput(day) {
+			// set the event when clicking on the lernveranstaltung in the data 
+			this.currentlySelectedEvent = day[1];
+			console.log(this.currentlySelectedEvent)
+			// showing the modal
+			Vue.nextTick(()=>{
+				this.$refs.calendarModal.show();
+			})
+			
+			console.log(day,"this is the day")
 			this.$emit(day[0], day[1]);
 		}
 	},
@@ -135,6 +147,7 @@ export default {
 	},
 	template: `
 	<div ref="container" class="fhc-calendar card" :class="sizeClass">
+		<calendar-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="calendarModal"  />
 		<component :is="'calendar-' + mode" @update:mode="mode=$event" @change:range="$emit('change:range',$event)" @input="handleInput" />
 	</div>`
 }
