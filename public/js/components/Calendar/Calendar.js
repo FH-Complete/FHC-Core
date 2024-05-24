@@ -106,7 +106,7 @@ export default {
 	methods: {
 		handleInput(day) {
 			// set the event when clicking on the lernveranstaltung in the data 
-			this.currentlySelectedEvent = day;
+			this.currentlySelectedEvent = day[1];
 			console.log(this.currentlySelectedEvent)
 			// showing the modal
 			Vue.nextTick(()=>{

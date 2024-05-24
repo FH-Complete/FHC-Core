@@ -1,4 +1,5 @@
 import FhcCalendar from "../../components/Calendar/Calendar.js";
+import Phrasen from "../../plugin/Phrasen.js";
 
 const app = Vue.createApp({
 	components: {
@@ -50,4 +51,5 @@ const app = Vue.createApp({
 	}
 });
 app.config.unwrapInjectedRef = true;
+app.use(Phrasen);
 app.mount('#content');

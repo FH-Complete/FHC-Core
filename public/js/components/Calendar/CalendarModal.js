@@ -133,7 +133,16 @@ export default {
       }
     },
   },
-  computed: {},
+  computed: {
+    start_time: function(){
+      if(!this.data.start) return 'N/A';
+      return this.data.start.getHours() + ":" + this.data.start.getMinutes();
+    },
+    end_time: function(){
+      if(!this.data.end) return 'N/A';
+      return this.data.end.getHours() + ":" + this.data.end.getMinutes();
+    }
+  },
   created() {
     console.log("this is an test")
   },
@@ -145,11 +154,37 @@ export default {
   },
   template: /*html*/ `
   <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
-
+    <template v-slot:title>
+      {{data.title + ' - ' + data.lehrfach_bez + ' [' + data.ort_kurzbz+']' }}  
+    </template>
     <template v-slot:default>
-        <p>{{JSON.stringify(data,null,2)}}</p>
+        <div class="row">
+        <div class="offset-3 col-4"><span>Datum:</span></div>
+        <div class=" col"><span>{{data.datum}}</span></div>
+        </div>
+        <div class="row">
+        <div class="offset-3 col-4"><span>Raum:</span></div>
+        <div class=" col"><span>{{data.ort_kurzbz}}</span></div>
+        </div>
+        <div class="row">
+        <div class="offset-3 col-4"><span>LV:</span></div>
+        <div class=" col"><span>{{'('+data.lehrform+') ' + data.lehrfach_bez}}</span></div>
+        </div>
+        <div class="row">
+        <div class="offset-3 col-4"><span>Lektor:</span></div>
+        <div class=" col"><span>{{data.lektor}}</span></div>
+        </div>
+        <div class="row">
+        <div class="offset-3 col-4"><span>Zeitraum:</span></div>
+        <div class=" col"><span>{{start_time + ' - ' + end_time}}</span></div>
+        </div>
     </template>
  
-    <!-- end of optional footer --> 
+     <!-- optional footer -->
+     <template  v-slot:footer >
+        
+     <button class="btn btn-outline-secondary " @click="hide">{{$p.t('ui','cancel')}}</button>    
+       </template>
+     <!-- end of optional footer --> 
   </bs-modal>`,
 };
