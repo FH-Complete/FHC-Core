@@ -1,13 +1,12 @@
 <?php
 	$includesArray = array(
 		'title' => 'Test Search',
-		'jquery3' => true,
 		'bootstrap5' => true,
 		'fontawesome6' => true,
-		'tablesorter2' => true,
+		'tabulator5' => true,
+		'primevue3' => true,
+		'axios027' => true,
 		'vue3' => true,
-		'ajaxlib' => true,
-		'jqueryui1' => true,
 		'filtercomponent' => true,
 		'navigationcomponent' => true,
 		'phrases' => array(
@@ -17,8 +16,8 @@
 		'customCSSs' => array(
 			'public/css/components/verticalsplit.css',
 			'public/css/components/searchbar.css',
+			'public/css/components/primevue.css',
 		),
-		'customJSs' => array('vendor/axios/axios/axios.min.js'),
 		'customJSModules' => array('public/js/apps/TestSearch.js')
 	);
 
@@ -40,17 +39,17 @@
 			</div>
 			<div>
 
-				<searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></searchbar>
+				<core-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></core-searchbar>
 				
-				<verticalsplit>
+				<core-verticalsplit>
 					<template #top>
-						<searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunctiondummy"></searchbar>
+						<core-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunctiondummy"></core-searchbar>
 					</template>
 					<template #bottom>
 						<!-- Filter component -->
 						<core-filter-cmpt filter-type="LogsViewer" @nw-new-entry="newSideMenuEntryHandler"></core-filter-cmpt>
 					</template>
-				</verticalsplit>				
+				</core-verticalsplit>				
 
 			</div>
 		</div>

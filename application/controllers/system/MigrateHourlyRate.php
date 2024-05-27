@@ -25,6 +25,7 @@ class MigrateHourlyRate extends CLI_Controller
 
 	public function index($user = null)
 	{
+		echo "Lehre Stundensaetze werden migriert.\n";
 		$mitarbeiterResult = $this->_getMitarbeiterStunden($user);
 		if (isError($mitarbeiterResult)) return $mitarbeiterResult;
 		if (!hasData($mitarbeiterResult)) return error('Keine Mitarbeiterstunden gefunden');
@@ -38,19 +39,58 @@ class MigrateHourlyRate extends CLI_Controller
 			if (isError($insertResult)) return $insertResult;
 		}
 		
-		$sapResult = $this->_getSapStunden($user);
-		if (isError($sapResult)) return $sapResult;
-		if (!hasData($sapResult)) return error('Keinen kalkulatorischen Stundensaetze gefunden');
-
-		$mitarbeiterArray = getData($sapResult);
-
-		foreach ($mitarbeiterArray as $mitarbeiter)
+		if( $this->checkIfSAPSyncTableExists() )
 		{
-			$this->_getUnternehmen($mitarbeiter);
-			$insertResult = $this->_addStundensatz($mitarbeiter, self::STUNDENSTAZTYP_KALKULATORISCH, date_format(date_create($mitarbeiter->beginn), 'Y-m-d'));
-			if (isError($insertResult)) return $insertResult;
+			echo "SAP Sync Tabelle gefunden. SAP Stundensaetze werden migriert.\n";
+			$sapResult = $this->_getSapStunden($user);
+			if (isError($sapResult)) return $sapResult;
+			if (!hasData($sapResult)) return error('Keinen kalkulatorischen Stundensaetze gefunden');
+
+			$mitarbeiterArray = getData($sapResult);
+
+			foreach ($mitarbeiterArray as $mitarbeiter)
+			{
+				$this->_getUnternehmen($mitarbeiter);
+				$insertResult = $this->_addStundensatz($mitarbeiter, self::STUNDENSTAZTYP_KALKULATORISCH, date_format(date_create($mitarbeiter->beginn), 'Y-m-d'));
+				if (isError($insertResult)) return $insertResult;
+			}
+		}
+		else
+		{
+		    echo "SAP Sync Tabelle nicht gefunden. Ignoriere SAP Stundensaetze.\n";
 		}
 	}
+
+	protected function checkIfSAPSyncTableExists()
+	{
+	    $dbModel = new DB_Model();
+	    $params = array(
+		DB_NAME,
+		'sync',
+		'tbl_sap_stundensatz'
+	    );
+
+	    $sql = "SELECT
+			    1 AS exists
+		    FROM
+			    information_schema.tables
+		    WHERE
+			    table_catalog = ? AND
+			    table_schema = ? AND
+			    table_name = ?";
+
+	    $res = $dbModel->execReadOnlyQuery($sql, $params);
+
+	    if( hasData($res) )
+	    {
+		return true;
+	    }
+	    else
+	    {
+		return false;
+	    }
+	}
+
 
 	private function _getSapStunden($user = null)
 	{
