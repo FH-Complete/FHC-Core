@@ -37,7 +37,7 @@ export default {
 			let res = arr.filter(n => n.key == key);
 			if (res.length)
 				return res.pop();
-			res = arr.map(n => n.children ? this.findNodeByKey(key, n.children) : null).filter();
+			res = arr.map(n => n.children ? this.findNodeByKey(key, n.children) : null).filter(a => a);
 			if (res.length)
 				return res.pop();
 			return null;
