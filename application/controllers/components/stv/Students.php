@@ -3,6 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 // TODO(chris): Prestudent status missing
+// TODO(chris): Prestudent studiengang missing
 
 class Students extends FHC_Controller
 {
