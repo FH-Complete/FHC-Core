@@ -42,7 +42,9 @@ export default {
 	<div class="fhc-calendar-week">
 		<calendar-header :title="title" @prev="prev" @next="next" @click="$emit('update:mode', 'weeks')" />
 		<calendar-pane ref="pane" v-slot="slot" @slid="paneChanged">
-			<calendar-week-page :year="focusDate.y" :week="focusDate.w+slot.offset" @update:mode="$emit('update:mode', $event)" @page:back="prev" @page:forward="next" @input="selectEvent" />
+			<calendar-week-page v-slot="{event}" :year="focusDate.y" :week="focusDate.w+slot.offset" @update:mode="$emit('update:mode', $event)" @page:back="prev" @page:forward="next" @input="selectEvent" >
+				<slot :event="event" ></slot>
+			</calendar-week-page>
 		</calendar-pane>
 	</div>`
 }
