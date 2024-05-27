@@ -148,6 +148,15 @@ export default {
 	template: `
 	<div ref="container" class="fhc-calendar card" :class="sizeClass">
 		<calendar-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="calendarModal"  />
-		<component :is="'calendar-' + mode" @update:mode="mode=$event" @change:range="$emit('change:range',$event)" @input="handleInput" />
+		<component v-slot="{event}" :is="'calendar-' + mode" @update:mode="mode=$event" @change:range="$emit('change:range',$event)" @input="handleInput" >
+			<!--Week Page layout-->
+			<slot :event="event">
+				<div class="d-flex flex-column align-items-center justify-content-evenly h-100">
+					<span>{{event.orig.title}}</span>	
+					<span>{{event.orig.ort_kurzbz}}</span>
+					<span>{{event.orig.mitarbeiter_kurzbz}}</span>
+				</div>
+			</slot>
+		</component>
 	</div>`
 }
