@@ -27,10 +27,24 @@ export default{
 					{title:"Ort", field:"ort"},
 					{title:"Gemeinde", field:"gemeinde"},
 					{title:"Nation", field:"nation"},
-					{title:"Heimatadresse", field:"heimatadresse",
-						formatter: (cell, formatterParams, onRendered) => {
-							let output = cell.getValue() ? "ja" : "nein";
-							return output;
+					{
+						title:"Heimatadresse",
+						field:"heimatadresse",
+						formatter:"tickCross",
+						hozAlign:"center",
+						formatterParams: {
+							tickElement: '<i class="fa fa-check text-success"></i>',
+							crossElement: '<i class="fa fa-xmark text-danger"></i>'
+						}
+					},
+					{
+						title:"Zustelladresse",
+						field:"zustelladresse",
+						formatter:"tickCross",
+						hozAlign:"center",
+						formatterParams: {
+							tickElement: '<i class="fa fa-check text-success"></i>',
+							crossElement: '<i class="fa fa-xmark text-danger"></i>'
 						}
 					},
 					{title:"Abweich.Empf", field:"co_name"},
@@ -125,7 +139,7 @@ export default{
 							title: this.$p.t('person', 'rechnungsadresse')
 						});
 						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('notiz', 'document')
+							title: this.$p.t('global', 'anmerkung')
 						});
 					}
 				}
@@ -239,7 +253,7 @@ export default{
 					this.reload();
 				});
 		},
-		loadPlaces() { //TODO(manu) Refactor API-controller
+		loadPlaces() {
 			if (this.abortController.places)
 				this.abortController.places.abort();
 			if (this.addressData.nation != 'A' || !this.addressData.plz)
@@ -254,13 +268,11 @@ export default{
 					this.places = result.data;
 				});
 /*				.catch(error => {
-					if (error.code == 'ERR_BAD_REQUEST') {
-						return this.$fhcAlert.handleFormValidation(error, this.$refs.form);
-					}
-					// NOTE(chris): repeat request
-					if (error.code != "ERR_CANCELED")
-						window.setTimeout(this.loadPlaces, 100);
-				});*/
+						if (error.code != "ERR_CANCELED")
+							window.setTimeout(this.loadPlaces, 100);
+						else
+							this.$fhcAlert.handleSystemError(error);
+					});*/
 		},
 		search(event) {
 			return this.$fhcApi
@@ -324,7 +336,7 @@ export default{
 				</div>
 									
 				<div class="row mb-3">
-					<label for="plz" class="required form-label col-sm-4" >{{$p.t('person', 'plz')}}</label>
+					<label for="plz" class="required form-label col-sm-4" >{{$p.t('person', 'plz')}}<sup>*</sup></label>
 					 <div class="col-sm-6">
 						<input type="text" class="form-control" required v-model="addressData['plz']" @input="loadPlaces" >
 					</div>
@@ -336,7 +348,7 @@ export default{
 						<select v-if="addressData['nation'] == 'A'" name="addressData[gemeinde]" class="form-select" v-model="addressData['gemeinde']">
 							<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
 							<option v-for="gemeinde in gemeinden" :key="gemeinde.name" :value="gemeinde.name">{{gemeinde.name}}</option>
-						</select>
+						</select><!---->
 						<input v-else type="text" class="form-control" v-model="addressData['gemeinde']">
 					</div>
 				</div>
@@ -442,7 +454,7 @@ export default{
 				</div>
 				
 				<div class="row mb-3">
-					<label for="plz" class="required form-label col-sm-4" >{{$p.t('person', 'plz')}}</label>
+					<label for="plz" class="required form-label col-sm-4" >{{$p.t('person', 'plz')}}<sup>*</sup></label>
 					 <div class="col-sm-6">
 						<input type="text" class="form-control" required v-model="addressData['plz']" @input="loadPlaces">
 					</div>
@@ -472,7 +484,7 @@ export default{
 						</select>
 					</div>
 				</div>
-								
+					
 				<div class="row mb-3">
 					<label for="heimatadresse" class="form-label col-sm-4">{{$p.t('person', 'heimatadresse')}}</label>
 					<div class="col-sm-3">

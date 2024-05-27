@@ -22,10 +22,15 @@ export default{
 				columns:[
 					{title:"Typ", field:"kontakttyp"},
 					{title:"Kontakt", field:"kontakt"},
-					{title:"Zustellung", field:"zustellung",
-						formatter: (cell, formatterParams, onRendered) => {
-							let output = cell.getValue() ? "ja" : "nein";
-							return output;}
+					{
+						title:"Zustellung",
+						field:"zustellung",
+						formatter:"tickCross",
+						hozAlign:"center",
+						formatterParams: {
+							tickElement: '<i class="fa fa-check text-success"></i>',
+							crossElement: '<i class="fa fa-xmark text-danger"></i>'
+						}
 					},
 					{title:"Anmerkung", field:"anmerkung"},
 					{title:"Firma", field:"kurzbz", visible:false},
@@ -221,7 +226,7 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">										   
-							<label for="kontakt" class="form-label col-sm-4">{{$p.t('global', 'kontakt')}}</label>
+							<label for="kontakt" class="form-label col-sm-4">{{$p.t('global', 'kontakt')}}<sup>*</sup></label>
 							<div class="col-sm-6">
 								<input type="text" class="form-control" id="kontakt" v-model="contactData['kontakt']">
 							</div>
@@ -269,7 +274,7 @@ export default{
 					</div>
 				</div>
 				<div class="row mb-3">									   
-					<label for="kontakt" class="form-label col-sm-4">{{$p.t('global', 'kontakt')}}</label>
+					<label for="kontakt" class="form-label col-sm-4">{{$p.t('global', 'kontakt')}}<sup>*</sup></label>
 					<div class="col-sm-6">
 						<input type="text" class="form-control" id="kontakt" v-model="contactData['kontakt']">
 					</div>

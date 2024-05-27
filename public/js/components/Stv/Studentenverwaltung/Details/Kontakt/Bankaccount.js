@@ -37,10 +37,16 @@ export default{
 							}
 							return output;}
 					},
-					{title:"Verrechnung", field:"verrechnung", visible:false,
-						formatter: (cell, formatterParams, onRendered) => {
-							let output = cell.getValue() ? "ja" : "nein";
-							return output;}
+					{
+						title:"Verrechnung",
+						field:"verrechnung",
+						visible:false,
+						formatter:"tickCross",
+						hozAlign:"center",
+						formatterParams: {
+							tickElement: '<i class="fa fa-check text-success"></i>',
+							crossElement: '<i class="fa fa-xmark text-danger"></i>'
+						}
 					},
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Bankverbindung_id", field:"bankverbindung_id", visible:false},
@@ -214,7 +220,7 @@ export default{
 					</div>
 
 					<div class="row mb-3">									   
-						<label for="iban" class="form-label col-sm-4">IBAN</label>
+						<label for="iban" class="form-label col-sm-4">IBAN<sup>*</sup></label>
 						<div class="col-sm-6">
 							<input type="text" required class="form-control" id="iban" v-model="bankverbindungData['iban']">
 						</div>
@@ -238,7 +244,7 @@ export default{
 						</div>
 					</div>
 					<div class="row mb-3">
-						<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
+						<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}<sup>*</sup></label>
 						<div class="col-sm-6">
 							<select  id="typ" class="form-select" required v-model="bankverbindungData['typ']">
 								<option  value="p">{{$p.t('person', 'privatkonto')}}</option>
@@ -279,7 +285,7 @@ export default{
 						</div>
 					</div>
 					<div class="row mb-3">
-						<label for="iban" class="form-label col-sm-4">IBAN</label>
+						<label for="iban" class="form-label col-sm-4">IBAN<sup>*</sup></label>
 						<div class="col-sm-6">
 							<input type="text" required class="form-control" id="iban" v-model="bankverbindungData['iban']">
 						</div>
@@ -303,7 +309,7 @@ export default{
 						</div>
 					</div>
 					<div class="row mb-3">
-						<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
+						<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}<sup>*</sup></label>
 						<div class="col-sm-6">
 							<select  id="typ" class="form-select" required v-model="bankverbindungData['typ']">
 								<option  value="p">{{$p.t('person', 'privatkonto')}}</option>

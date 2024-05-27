@@ -37,7 +37,8 @@ class Kontakt extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui'
+			'ui',
+			'person'
 		]);
 	}
 
@@ -221,6 +222,18 @@ class Kontakt extends FHCAPI_Controller
 	public function deleteAddress($adresse_id)
 	{
 		$this->load->model('person/Adresse_model', 'AdresseModel');
+		$result = $this->AdresseModel->load([
+			'adresse_id'=> $adresse_id,
+		]);
+		if(isError($result))
+		{
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+		$result = current(getData($result));
+
+		if($result->heimatadresse)
+
+			$this->terminateWithError($this->p->t('person', 'error_deleteHomeAdress'), self::ERROR_TYPE_GENERAL);
 
 		$result = $this->AdresseModel->delete(
 			array('adresse_id' => $adresse_id)
@@ -234,7 +247,7 @@ class Kontakt extends FHCAPI_Controller
 		{
 			return $this->terminateWithError($this->p->t('ui','error_missingId',['id'=> 'Adresse_id']), self::ERROR_TYPE_GENERAL);
 		}
-		//return $this->outputJsonSuccess(current(getData($result)));
+
 		return $this->terminateWithSuccess(current(getData($result)) ? : null);
 	}
 
