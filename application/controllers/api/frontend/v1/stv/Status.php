@@ -484,8 +484,9 @@ class Status extends FHCAPI_Controller
 
 		$isBerechtigtAdmin = $this->permissionlib->isBerechtigt('admin', null, 'suid');
 		$isBerechtigtNoStudstatusCheck = $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung', null, 'suid');
+		$isBerechtigtToDeleteAbgewiesen = $this->permissionlib->isBerechtigt('lehre/reihungstestAufsicht') && $status_kurzbz == "Abgewiesener";
 
-		if(!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
+		if(!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg) && !$isBerechtigtToDeleteAbgewiesen)
 		{
 			return $this->terminateWithError($this->p->t('lehre','error_keineSchreibrechte'), self::ERROR_TYPE_GENERAL);
 		}

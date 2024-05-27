@@ -39,6 +39,10 @@ export default{
 			from: 'hasSchreibrechtAss',
 			default: false
 		},
+		hasPermissionRtAufsicht: {
+			from: 'hasPermissionRtAufsicht',
+			default: false
+		},
 		$reloadList: {
 			from: '$reloadList',
 			required: true
@@ -96,6 +100,10 @@ export default{
 		},
 		hasPermissionCurrentStg(){
 			return this.arrayStg.includes(this.studiengang_kz);
+		},
+		isStatusBeforeStudent(){
+			let isStatusStudent = ['Student', 'Absolvent', 'Diplomand'];
+			return !isStatusStudent.includes(this.statusData.status_kurzbz);
 		}
 	},
 	props: {
@@ -669,6 +677,7 @@ export default{
 	mounted(){},
 	template: `
 		<div class="stv-list h-100 pt-3">
+		
 					
 			<!--Modal: Add New Status-->
 			<BsModal ref="newStatusModal">
@@ -828,11 +837,15 @@ export default{
 			
 			<!--Modal: Edit Status-->
 			<BsModal ref="editStatusModal">
+			
 				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
 					<form-form class="row g-3" ref="statusData">
 					
-					<div v-if="statusData.datum < dataMeldestichtag">
-						<b>{{$p.t('bismeldestichtag', 'meldestichtag_erreicht')}}</b>
+					<div v-if="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent">
+						<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrund')}}</b>
+					</div>
+					<div v-if="statusData.datum < dataMeldestichtag && isStatusBeforeStudent">
+						<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrundSemester')}}</b>
 					</div>
 					
 					 <input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
@@ -866,7 +879,9 @@ export default{
 									type="select"
 									name="studiensemester_kurzbz"
 									v-model="statusData['studiensemester_kurzbz']"
+									:disabled="statusData.datum < dataMeldestichtag"
 								>
+									<option value="null"></option>
 									<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
 								</form-input>
 							</div>
@@ -879,6 +894,7 @@ export default{
 									type="select"
 									name="ausbildungssemester"
 									v-model="statusData['ausbildungssemester']"
+									:disabled="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent"
 								>
 								 <option v-for="number in maxSem" :key="number" :value="number">{{ number }}</option>
 								</form-input>
@@ -897,6 +913,7 @@ export default{
 									format="dd.MM.yyyy"
 									preview-format="dd.MM.yyyy"
 									:teleport="true"
+									:disabled="statusData.datum < dataMeldestichtag"
 								></form-input>
 							</div>
 						</div>
@@ -912,6 +929,7 @@ export default{
 									format="dd.MM.yyyy"
 									preview-format="dd.MM.yyyy"
 									:teleport="true"
+									:disabled="statusData.datum < dataMeldestichtag"
 								></form-input>
 							</div>
 						</div>
@@ -927,6 +945,7 @@ export default{
 									format="dd.MM.yyyy"
 									preview-format="dd.MM.yyyy"
 									:teleport="true"
+									:disabled="statusData.datum < dataMeldestichtag"
 								></form-input>
 							</div>
 						</div>
@@ -937,6 +956,7 @@ export default{
 									type="select"
 									name="studienplan"
 									v-model="statusData['studienplan_id']"
+									:disabled="statusData.datum < dataMeldestichtag"
 								>
 									<option v-for="sp in listStudienplaene" :key="sp.studienplan_id" :value="sp.studienplan_id">{{sp.bezeichnung}}</option>
 								</form-input>
@@ -949,6 +969,7 @@ export default{
 									type="text"
 									name="anmerkung"
 									v-model="statusData['anmerkung']"
+									:disabled="statusData.datum < dataMeldestichtag"
 								>				
 								</form-input>
 							</div>
@@ -961,6 +982,7 @@ export default{
 								type="select"
 								name="aufnahmestufe"
 								v-model="statusData['rt_stufe']"
+								:disabled="statusData.datum < dataMeldestichtag"
 								>
 								<option v-for="entry in aufnahmestufen" :key="entry" :value="entry">{{entry}}</option>
 								</form-input>
@@ -975,6 +997,7 @@ export default{
 									name="statusgrund"
 									v-model="statusData['statusgrund_id']"
 								>
+								<option :value="NULL"></option>
 								<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.beschreibung[0]}}</option>
 								</form-input>
 							</div>

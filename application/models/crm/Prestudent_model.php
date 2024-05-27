@@ -764,9 +764,9 @@ class Prestudent_model extends DB_Model
 					ps.updatevon 
 				FROM 
 					public.tbl_prestudentstatus ps
-				JOIN 
+				LEFT JOIN 
 					public.tbl_student st USING (prestudent_id)
-				JOIN 
+				LEFT JOIN 
 					public.tbl_studiengang sg ON (st.studiengang_kz = sg.studiengang_kz)
 				LEFT JOIN 
 					lehre.tbl_studienplan sp USING (studienplan_id) 

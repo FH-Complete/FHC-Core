@@ -54,6 +54,7 @@ export default {
 			hasSchreibrechtAss: this.permissions['assistenz_schreibrechte'],
 			hasAdminPermission: this.permissions['admin'],
 			hasPermissionToSkipStatusCheck: this.permissions['student/keine_studstatuspruefung'],
+			hasPermissionRtAufsicht: this.permissions['lehre/reihungstestAufsicht'],
 			lists: this.lists,
 			defaultSemester: this.defaultSemester,
 			$reloadList: () => {
