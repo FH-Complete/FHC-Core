@@ -2,13 +2,17 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import FhcFormValidation from '../../../../Form/Validation.js';
 import BsModal from "../../../../Bootstrap/Modal.js";
+import FormForm from '../../../../Form/Form.js';
+import FormInput from '../../../../Form/Input.js';
 
 export default{
 	components: {
 		CoreFilterCmpt,
 		PvAutoComplete,
 		FhcFormValidation,
-		BsModal
+		BsModal,
+		FormForm,
+		FormInput
 	},
 	props: {
 		uid: Number
@@ -50,7 +54,6 @@ export default{
 					{title:"Abweich.Empf", field:"co_name"},
 					{title:"Firma", field:"firmenname"},
 					{title:"Firma_id", field:"firma_id", visible:false},
-					{title:"Name", field:"name"},
 					{title:"Adresse_id", field:"adresse_id", visible:false},
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Name", field:"name", visible:false},
@@ -184,16 +187,21 @@ export default{
 	watch: {
 		uid() {
 			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Kontakt/getAdressen/' + this.uid);
-		}
+		},
 	},
 	methods:{
 		actionNewAdress() {
+			this.resetModal();
 			this.$refs.newAdressModal.show();
 		},
 		actionEditAdress(adress_id) {
 			this.loadAdress(adress_id).then(() => {
 				if(this.addressData.adresse_id)
+				{
+					this.loadPlaces(this.addressData.plz);
 					this.$refs.editAdressModal.show();
+
+				}
 			});
 		},
 		actionDeleteAdress(adress_id) {
@@ -303,121 +311,218 @@ export default{
 			})
 			.catch(this.$fhcAlert.handleSystemError)
 	},
-	// TODO(chris): use Form Component
 	template: `
 	<div class="stv-details-kontakt-address h-100 pt-3">
 		
 		<!--Modal: Add Address-->
 		<bs-modal ref="newAdressModal">
 			<template #title>{{$p.t('person', 'adresse_new')}}</template>
-			<form class="row g-3" ref="addressData">
+			<form-form class="row g-3" ref="addressData">
+
 				<div class="row mb-3">
 					<label for="adressentyp" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
 					<div class="col-sm-6">
-						<select id="adressentyp" class="form-select" v-model="addressData.typ">
-							<option v-for="typ in adressentypen" :key="typ.adressentyp_kurzbz" :value="typ.adressentyp_kurzbz" >{{typ.bezeichnung}}</option>
-						</select>
+						<form-input
+							type="select"
+							name="adressentyp"
+							v-model="addressData.typ"
+							>
+							<option
+								v-for="typ in adressentypen"
+								:key="typ.adressentyp_kurzbz"
+								:value="typ.adressentyp_kurzbz"
+								>
+								{{typ.bezeichnung}}
+							</option>
+							</form-input>
+						</div>
 					</div>
-				</div>
-				<div class="row mb-3">
+					
+					<div class="row mb-3">
 					<label for="strasse" class="form-label col-sm-4">{{$p.t('person', 'strasse')}}</label>
 					<div class="col-sm-6">
-						<input type="text" class="form-control" id="strasse" v-model="addressData['strasse']">
-					</div>
-				</div>
-					
-				<div class="row mb-3">
-					<label for="nation" class="form-label col-sm-4">{{$p.t('person', 'nation')}}</label>
-					<div class="col-sm-6">
-						<select id="nation" class="form-select" v-model="addressData.nation">
-							<option v-for="nation in nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
-						</select>
-					</div>
-				</div>
-									
-				<div class="row mb-3">
-					<label for="plz" class="required form-label col-sm-4" >{{$p.t('person', 'plz')}}<sup>*</sup></label>
-					 <div class="col-sm-6">
-						<input type="text" class="form-control" required v-model="addressData['plz']" @input="loadPlaces" >
+						<form-input
+							type="text"
+							name="strasse"
+							v-model="addressData.strasse"
+						>
+						</form-input>					
 					</div>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="gemeinde" class="form-label col-sm-4">{{$p.t('person', 'gemeinde')}}</label>
+					<label for="nation" class="form-label col-sm-4">{{$p.t('person', 'nation')}}</label>
 					<div class="col-sm-6">
-						<select v-if="addressData['nation'] == 'A'" name="addressData[gemeinde]" class="form-select" v-model="addressData['gemeinde']">
-							<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
-							<option v-for="gemeinde in gemeinden" :key="gemeinde.name" :value="gemeinde.name">{{gemeinde.name}}</option>
-						</select><!---->
-						<input v-else type="text" class="form-control" v-model="addressData['gemeinde']">
+						<form-input
+							type="select"
+							name="nation"
+							v-model="addressData.nation"
+							>
+							<option 
+								v-for="nation in nations" 
+								:key="nation.nation_code" 
+								:value="nation.nation_code" 
+								:disabled="nation.sperre"
+								>
+								{{nation.kurztext}}
+							</option>
+							</form-input>
+						</div>
+					</div>
+													
+				<div class="row mb-3">
+					<label for="plz" class="required form-label col-sm-4" >{{$p.t('person', 'plz')}}<sup>*</sup></label>
+					<div class="col-sm-6">
+						<form-input
+							type="text"
+							name="plz"
+							v-model="addressData.plz"
+							required
+							@input="loadPlaces"
+						>
+						</form-input>					
 					</div>
 				</div>
+											
+				<div class="row mb-3">
+					<label for="gemeinde" class="form-label col-sm-4">{{$p.t('person', 'gemeinde')}}</label>
+					<div class="col-sm-6">
+						<form-input
+							v-if="addressData.nation == 'A'"
+							type="select"
+							name="gemeinde"
+							v-model="addressData.gemeinde"
+							>
+							<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
+							<option 
+								v-for="gemeinde in gemeinden" 
+								:key="gemeinde.name" 
+								:value="gemeinde.name"
+								>
+								{{gemeinde.name}}
+							</option>
+							</form-input>
+							<form-input
+								v-else
+								type="text"
+								name="addressData.gemeinde"
+								v-model="addressData.gemeinde"
+							>	
+							</form-input>
+						</div>
+					</div>
 				
 				<div class="row mb-3">
 					<label for="Ort" class="form-label col-sm-4">{{$p.t('person', 'ort')}}</label>
 					<div class="col-sm-6">
-						<select v-if="addressData['nation'] == 'A'" name="address[ort]" class="form-select" v-model="addressData['ort']">
+						<form-input
+							v-if="addressData.nation == 'A'" 
+							type="select"
+							name="ort"
+							v-model="addressData.ort"
+							>
 							<option v-if="!orte.length" disabled>Bitte gültige Gemeinde wählen</option>
-							<option v-for="ort in orte" :key="ort.ortschaftsname" :value="ort.ortschaftsname">{{ort.ortschaftsname}}</option>
-						</select>
-						<input v-else type="text" name="ort" class="form-control" v-model="addressData['ort']">
+							<option 
+								v-for="ort in orte" 
+								:key="ort.ortschaftsname" 
+								:value="ort.ortschaftsname"
+								>
+								{{ort.ortschaftsname}}
+							</option>
+						</form-input>
+						<form-input
+								v-else
+								type="text"
+								name="ort"
+								v-model="addressData.ort"
+							>	
+						</form-input>
 					</div>
 				</div>
-									
+				
 				<div class="row mb-3">
 					<label for="heimatadresse" class="form-label col-sm-4">{{$p.t('person', 'heimatadresse')}}</label>
-					<div class="col-sm-3">
-						<div class="form-check">
-							<input id="heimatadresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['heimatadresse']">
-						</div>
+					<div class="col-sm-4">
+						<form-input
+							container-class="form-check"
+							type="checkbox"
+							name="heimatadresse"
+							v-model="addressData.heimatadresse"
+						>
+						</form-input>
 					</div>
 				</div>
-					
+				
 				<div class="row mb-3">
 					<label for="zustelladresse" class="form-label col-sm-4">{{$p.t('person', 'zustelladresse')}}</label>
-					<div class="col-sm-3">
-						<div class="form-check">
-							<input id="zustelladresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['zustelladresse']">
-						</div>
+					<div class="col-sm-4">
+						<form-input
+							container-class="form-check"
+							type="checkbox"
+							name="zustelladresse"
+							v-model="addressData.zustelladresse"
+						>
+						</form-input>
 					</div>
 				</div>
 				
 				<div class="row mb-3">
 					<label for="co_name" class="form-label col-sm-4">{{$p.t('person', 'co_name')}}</label>
 					<div class="col-sm-6">
-						<input type="text" id="co_name" class="form-control" v-model="addressData['co_name']">
+						<form-input
+							type="text"
+							name="co_name"
+							v-model="addressData.co_name"
+						>
+						</form-input>
 					</div>
 				</div>
 				
 				<div class="row mb-3">
 					<label for="rechnungsadresse" class="form-label col-sm-4">{{$p.t('person', 'rechnungsadresse')}}</label>
-					<div class="col-sm-3">
-						<div class="form-check">
-							<input id="rechnungsadresse" type="checkbox" class="form-check-input" v-model="addressData['rechnungsadresse']">
-						</div>
+					<div class="col-sm-4">
+						<form-input
+							container-class="form-check"
+							type="checkbox"
+							name="rechnungsadresse"
+							v-model="addressData.rechnungsadresse"
+						>
+						</form-input>
 					</div>
 				</div>
 				
 				<div class="row mb-3">
 					<label for="firma_name" class="form-label col-sm-4">{{$p.t('person', 'firma')}}</label>
 					<div class="col-sm-3">
-						<PvAutoComplete v-model="addressData['firma']"  optionLabel="name" :suggestions="filteredFirmen" @complete="search" :min-length="3"/>
+						<PvAutoComplete v-model="addressData.firma"  optionLabel="name" :suggestions="filteredFirmen" @complete="search" :min-length="3"/>
 					</div>
 				</div>
 				
 				<div class="row mb-3">
 					<label for="name" class="form-label col-sm-4">{{$p.t('person', 'firma_zusatz')}}</label>
 					<div class="col-sm-6">
-						<input type="text" class="form-control" id="name" v-model="addressData['name']">
+						<form-input
+							type="text"
+							name="firma_zusatz"
+							v-model="addressData.name"
+						>
+						</form-input>
 					</div>
 				</div>
+				
 				<div class="row mb-3">
 					<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
 					<div class="col-sm-6">
-						<input type="text" class="form-control" id="anmerkung" v-model="addressData['anmerkung']">
+					<form-input
+							type="text"
+							name="anmerkung"
+							v-model="addressData.anmerkung"
+						>
+						</form-input>
 					</div>
 				</div>
-			</form>
+				
+			</form-form>
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
 				<button type="button" class="btn btn-primary" @click="addNewAddress()">OK</button>
@@ -427,95 +532,163 @@ export default{
 		<!--Modal: Edit Address-->
 		<bs-modal ref="editAdressModal">
 			<template #title>{{$p.t('person', 'adresse_edit')}}</template>
-			<form class="row g-3" ref="addressData">
+			<form-form class="row g-3" ref="addressData">
+			
 				<div class="row mb-3">
 					<label for="adressentyp" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
 					<div class="col-sm-6">
-						<select id="adressentyp" class="form-control" v-model="addressData.typ">
-							<option v-for="typ in adressentypen" :key="typ.adressentyp_kurzbz" :value="typ.adressentyp_kurzbz" >{{typ.bezeichnung}}</option>
-						</select>
+						<form-input
+							type="select"
+							name="adressentyp"
+							v-model="addressData.typ"
+							>
+							<option
+								v-for="typ in adressentypen"
+								:key="typ.adressentyp_kurzbz"
+								:value="typ.adressentyp_kurzbz"
+								>
+								{{typ.bezeichnung}}
+							</option>
+						</form-input>
 					</div>
 				</div>
-				
+					
 				<div class="row mb-3">
 					<label for="strasse" class="form-label col-sm-4">{{$p.t('person', 'strasse')}}</label>
 					<div class="col-sm-6">
-						<input type="text" class="form-control" id="strasse" v-model="addressData.strasse">
-					</div>
-				</div>
-					
-				<div class="row mb-3">
-					<label for="nation" class="form-label col-sm-4">{{$p.t('person', 'nation')}}</label>
-					<div class="col-sm-6">
-						<select id="nation" class="form-select" v-model="addressData.nation">
-							<option v-for="nation in nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
-						</select>
+						<form-input
+							type="text"
+							name="strasse"
+							v-model="addressData.strasse"
+						>
+						</form-input>					
 					</div>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="plz" class="required form-label col-sm-4" >{{$p.t('person', 'plz')}}<sup>*</sup></label>
-					 <div class="col-sm-6">
-						<input type="text" class="form-control" required v-model="addressData['plz']" @input="loadPlaces">
+					<label for="nation" class="form-label col-sm-4">{{$p.t('person', 'nation')}}</label>
+					<div class="col-sm-6">
+						<form-input
+							type="select"
+							name="nation"
+							v-model="addressData.nation"
+							>
+							<option 
+								v-for="nation in nations" 
+								:key="nation.nation_code" 
+								:value="nation.nation_code" 
+								:disabled="nation.sperre"
+								>
+								{{nation.kurztext}}
+							</option>
+						</form-input>
 					</div>
 				</div>
+							
+				<div class="row mb-3">
+					<label for="plz" class="required form-label col-sm-4" >{{$p.t('person', 'plz')}}<sup>*</sup></label>
+					<div class="col-sm-6">
+						<form-input
+							type="text"
+							name="plz"
+							v-model="addressData.plz"
+							required
+							@input="loadPlaces"
+						>
+						</form-input>					
+					</div>
+				</div>
+							
 				<div class="row mb-3">
 					<label for="gemeinde" class="form-label col-sm-4">{{$p.t('person', 'gemeinde')}}</label>
-					<div v-if="addressData['gemeinde']" class="col-sm-6">
-						<input type="text" class="form-control" v-model="addressData['gemeinde']">
-					</div>
-					<div v-else class="col-sm-6">
-						<select v-if="addressData['nation'] == 'A'" name="addressData[gemeinde]" class="form-select" v-model="addressData['gemeinde']">
-							<option v-if="!gemeinden.length" disabled>{{$p.t('person', 'plz_waehlen')}}</option>
-							<option v-for="gemeinde in gemeinden" :key="gemeinde.name" :value="gemeinde.name">{{gemeinde.name}}</option>
-						</select>
+					<div class="col-sm-6">
+						<form-input
+							v-if="addressData.gemeinde"
+							type="select"
+							name="addressData.gemeinde"
+							v-model="addressData.gemeinde"
+							>
+							<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
+							<option 
+								v-for="gemeinde in gemeinden" 
+								:key="gemeinde.name" 
+								:value="gemeinde.name"
+								>
+								{{gemeinde.name}}
+							</option>						
+						</form-input>
 					</div>
 				</div>
-		
+			
 				<div class="row mb-3">
 					<label for="Ort" class="form-label col-sm-4">{{$p.t('person', 'ort')}}</label>
-					<div v-if="addressData['ort']" class="col-sm-6">
-						<input type="text" name="ort" class="form-control" v-model="addressData['ort']">
-					</div>
-					<div v-else class="col-sm-6">
-						<select v-if="addressData['nation'] == 'A'" name="address[ort]" class="form-select" v-model="addressData['ort']">
-							<option v-if="!orte.length" disabled>{{$p.t('person', 'gemeinde_waehlen')}}</option>
-							<option v-for="ort in orte" :key="ort.ortschaftsname" :value="ort.ortschaftsname">{{ort.ortschaftsname}}</option>
-						</select>
+					<div class="col-sm-6">
+						<form-input
+							v-if="addressData.ort" 
+							type="select"
+							name="ort"
+							v-model="addressData.ort"
+							>
+							<option v-if="!orte.length" disabled>Bitte gültige Gemeinde wählen</option>
+							<option 
+								v-for="ort in orte" 
+								:key="ort.ortschaftsname" 
+								:value="ort.ortschaftsname"
+								>
+								{{ort.ortschaftsname}}
+							</option>
+						</form-input>
 					</div>
 				</div>
-					
+				
 				<div class="row mb-3">
 					<label for="heimatadresse" class="form-label col-sm-4">{{$p.t('person', 'heimatadresse')}}</label>
-					<div class="col-sm-3">
-						<div class="form-check">
-							<input id="heimatadresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['heimatadresse']">
-						</div>
+					<div class="col-sm-4">
+						<form-input
+							container-class="form-check"
+							type="checkbox"
+							name="heimatadresse"
+							v-model="addressData.heimatadresse"
+						>
+						</form-input>
 					</div>
 				</div>
-					
+				
 				<div class="row mb-3">
 					<label for="zustelladresse" class="form-label col-sm-4">{{$p.t('person', 'zustelladresse')}}</label>
-					<div class="col-sm-3">
-						<div class="form-check">
-							<input id="zustelladresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['zustelladresse']">
-						</div>
+					<div class="col-sm-4">
+						<form-input
+							container-class="form-check"
+							type="checkbox"
+							name="zustelladresse"
+							v-model="addressData.zustelladresse"
+						>
+						</form-input>
 					</div>
 				</div>
 				
 				<div class="row mb-3">
 					<label for="co_name" class="form-label col-sm-4">{{$p.t('person', 'co_name')}}</label>
 					<div class="col-sm-6">
-						<input type="text" id="co_name" class="form-control" v-model="addressData['co_name']">
+						<form-input
+							type="text"
+							name="co_name"
+							v-model="addressData.co_name"
+						>
+						</form-input>
 					</div>
 				</div>
 				
 				<div class="row mb-3">
 					<label for="rechnungsadresse" class="form-label col-sm-4">{{$p.t('person', 'rechnungsadresse')}}</label>
-					<div class="col-sm-3">
-						<div class="form-check">
-							<input id="rechnungsadresse" type="checkbox" class="form-check-input" v-model="addressData['rechnungsadresse']">
-						</div>
+					<div class="col-sm-4">
+						<form-input
+							container-class="form-check"
+							type="checkbox"
+							name="rechnungsadresse"
+							v-model="addressData.rechnungsadresse"
+						>
+						</form-input>
 					</div>
 				</div>
 				
@@ -525,29 +698,39 @@ export default{
 						<input type="text" class="form-control" id="name" v-model="addressData.firmenname">
 					</div>
 					<div v-else class="col-sm-6">
-						<PvAutoComplete v-model="addressData['firma']" optionLabel="name" :suggestions="filteredFirmen" @complete="search" :min-length="3"/>
+						<PvAutoComplete v-model="addressData.firma" optionLabel="name" :suggestions="filteredFirmen" @complete="search" :min-length="3"/>
 					</div>
 				</div>
 				
 				<div class="row mb-3">
 					<input type="hidden" class="form-control" id="firma_id" v-model="addressData.firma_id">
 				</div>
-	
+				
 				<div class="row mb-3">
 					<label for="name" class="form-label col-sm-4">{{$p.t('person', 'firma_zusatz')}}</label>
 					<div class="col-sm-6">
-						<input type="text" class="form-control" id="name" v-model="addressData['name']">
+						<form-input
+							type="text"
+							name="firma_zusatz"
+							v-model="addressData.name"
+						>
+						</form-input>
 					</div>
 				</div>
 				
 				<div class="row mb-3">
 					<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
 					<div class="col-sm-6">
-						<input type="text" class="form-control" id="anmerkung" v-model="addressData['anmerkung']">
+					<form-input
+							type="text"
+							name="anmerkung"
+							v-model="addressData.anmerkung"
+						>
+						</form-input>
 					</div>
 				</div>
 			
-			</form>
+			</form-form>
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
 				<button ref="Close" type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>

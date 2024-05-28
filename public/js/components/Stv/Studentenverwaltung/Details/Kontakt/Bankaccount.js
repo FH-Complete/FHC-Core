@@ -1,10 +1,14 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import BsModal from "../../../../Bootstrap/Modal.js";
+import FormForm from '../../../../Form/Form.js';
+import FormInput from '../../../../Form/Input.js';
 
 export default{
 	components: {
 		CoreFilterCmpt,
-		BsModal
+		BsModal,
+		FormForm,
+		FormInput
 	},
 	props: {
 		uid: Number
@@ -114,10 +118,6 @@ export default{
 				verrechnung: true,
 				typ: 'p'
 			},
-			initData: {
-				verrechnung: true,
-				typ: 'p'
-			}
 		}
 	},
 	watch: {
@@ -127,6 +127,7 @@ export default{
 	},
 	methods:{
 		actionNewBankverbindung(){
+			this.resetModal();
 			this.$refs.newBankverbindungModal.show();
 		},
 		actionEditBankverbindung(bankverbindung_id){
@@ -196,7 +197,15 @@ export default{
 		},
 		resetModal(){
 			this.bankverbindungData = {};
-			this.bankverbindungData = this.initData;
+			this.bankverbindungData.name = "";
+			this.bankverbindungData.anschrift = "";
+			this.bankverbindungData.iban = "";
+			this.bankverbindungData.bic = "";
+			this.bankverbindungData.kontonr = "";
+			this.bankverbindungData.blz = "";
+			this.bankverbindungData.bic = "";
+			this.bankverbindungData.verrechnung = true;
+			this.bankverbindungData.typ = 'p';
 		},
 	},
 	template: `	
@@ -204,63 +213,103 @@ export default{
 		
 		<!--Modal: Add Bankverbindung-->
 		<BsModal title="Bankverbindung anlegen" ref="newBankverbindungModal">
+
 			<template #title>{{$p.t('person', 'bankvb_new')}}</template>
-			<form class="row g-3" ref="bankverbindungData">
+						<form-form class="row g-3" ref="bankverbindungData">
 				<div class="row mb-3">
-						<label for="name" class="form-label col-sm-4">Name</label>
-						<div class="col-sm-6">
-							<input type="text" class="form-control" id="name" v-model="bankverbindungData['name']">
-						</div>
+					<label for="name" class="form-label col-sm-4">Name</label>
+					<div class="col-sm-6">
+						<form-input 
+							type="text" 
+							name="name" 
+							v-model="bankverbindungData.name"
+						>
 					</div>
-					<div class="row mb-3">										   
-						<label for="anschrift" class="form-label col-sm-4">{{$p.t('person', 'anschrift')}}</label>
-						<div class="col-sm-6">
-							<input type="text" class="form-control" id="anschrift" v-model="bankverbindungData['anschrift']">
-						</div>
+				</div>
+				<div class="row mb-3">										   
+					<label for="anschrift" class="form-label col-sm-4">{{$p.t('person', 'anschrift')}}</label>
+					<div class="col-sm-6">
+						<form-input 
+							type="text" 
+							name="anschrift" 
+								v-model="bankverbindungData.anschrift"
+						>
+						</form-input>
 					</div>
+				</div>
 
 					<div class="row mb-3">									   
 						<label for="iban" class="form-label col-sm-4">IBAN<sup>*</sup></label>
 						<div class="col-sm-6">
-							<input type="text" required class="form-control" id="iban" v-model="bankverbindungData['iban']">
+							<form-input 
+								type="text" 
+								name="iban" 
+								v-model="bankverbindungData.iban"
+								required
+							>
+						</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">								   
 						<label for="bic" class="form-label col-sm-4">BIC</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" id="bic" v-model="bankverbindungData['bic']">
+							<form-input 
+								type="text" 
+								name="bic" 
+								v-model="bankverbindungData.bic"
+								>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">							   
 						<label for="kontonr" class="form-label col-sm-4">{{$p.t('person', 'kontonr')}}</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" id="kontonr" v-model="bankverbindungData['kontonr']">
+							<form-input 
+								type="text" 
+								name="kontonr" 
+								v-model="bankverbindungData.kontonr"
+								>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">										   
 						<label for="blz" class="form-label col-sm-4">{{$p.t('person', 'blz')}}</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" id="blz" v-model="bankverbindungData['blz']">
+							<form-input 
+								type="text" 
+								name="blz" 
+								v-model="bankverbindungData.blz"
+								>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">
 						<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}<sup>*</sup></label>
 						<div class="col-sm-6">
-							<select  id="typ" class="form-select" required v-model="bankverbindungData['typ']">
+							<form-input 
+								type="select" 
+								name="typ" 
+								v-model="bankverbindungData.typ"
+								required
+								>
 								<option  value="p">{{$p.t('person', 'privatkonto')}}</option>
 								<option  value="f">{{$p.t('person', 'firmenkonto')}}</option>
-							</select>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">
-						<label for="verrechnung" class="form-label col-sm-4">{{$p.t('person', 'verrechnung')}}</label>
-						<div class="col-sm-3">
-							<div class="form-check">
-								<input id="verrechnung" type="checkbox" class="form-check-input" value="1" v-model="bankverbindungData['verrechnung']">
-							</div>
-						</div>
+					<label for="verrechnung" class="form-label col-sm-4">{{$p.t('person', 'verrechnung')}}</label>
+					<div class="col-sm-4">
+						<form-input
+							container-class="form-check"
+							type="checkbox"
+							name="verrechnung"
+							v-model="bankverbindungData.verrechnung"
+						>
+						</form-input>
 					</div>
-			</form>
+				</div>
+			</form-form>
             <template #footer>
             		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
 					<button type="button" class="btn btn-primary" @click="addNewBankverbindung()">OK</button>
@@ -270,62 +319,101 @@ export default{
 		<!--Modal: Edit Bankverbindung-->
 		<BsModal ref="editBankverbindungModal">
 			<template #title>{{$p.t('person', 'bankvb_edit')}}</template>
-				<form class="row g-3" ref="bankverbindungData">
+				<form-form class="row g-3" ref="bankverbindungData">
 				
 					<div class="row mb-3">
 						<label for="name" class="form-label col-sm-4">Name</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" id="name" v-model="bankverbindungData['name']">
+								<form-input 
+								type="text" 
+								name="name" 
+								v-model="bankverbindungData.name"
+							>
 						</div>
 					</div>
 					<div class="row mb-3">									   
 						<label for="anschrift" class="form-label col-sm-4">{{$p.t('person', 'anschrift')}}</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" id="anschrift" v-model="bankverbindungData['anschrift']">
+							<form-input 
+								type="text" 
+								name="anschrift" 
+								v-model="bankverbindungData.anschrift"
+							>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">
 						<label for="iban" class="form-label col-sm-4">IBAN<sup>*</sup></label>
 						<div class="col-sm-6">
-							<input type="text" required class="form-control" id="iban" v-model="bankverbindungData['iban']">
+							<form-input 
+								type="text" 
+								name="iban" 
+								v-model="bankverbindungData.iban"
+								required
+							>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">									   
 						<label for="bic" class="form-label col-sm-4">BIC</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" id="bic" v-model="bankverbindungData['bic']">
+							<form-input 
+								type="text" 
+								name="bic" 
+								v-model="bankverbindungData.bic"
+								>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">									   
 						<label for="kontonr" class="form-label col-sm-4">{{$p.t('person', 'kontonr')}}</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" id="kontonr" v-model="bankverbindungData['kontonr']">
+							<form-input 
+								type="text" 
+								name="kontonr" 
+								v-model="bankverbindungData.kontonr"
+								>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">									   
 						<label for="blz" class="form-label col-sm-4">{{$p.t('person', 'blz')}}</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" id="blz" v-model="bankverbindungData['blz']">
+							<form-input 
+								type="text" 
+								name="blz" 
+								v-model="bankverbindungData.blz"
+								>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">
 						<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}<sup>*</sup></label>
 						<div class="col-sm-6">
-							<select  id="typ" class="form-select" required v-model="bankverbindungData['typ']">
+							<form-input 
+								type="select" 
+								name="typ" 
+								v-model="bankverbindungData.typ"
+								required
+								>
 								<option  value="p">{{$p.t('person', 'privatkonto')}}</option>
 								<option  value="f">{{$p.t('person', 'firmenkonto')}}</option>
-							</select>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">
 						<label for="verrechnung" class="form-label col-sm-4">{{$p.t('person', 'verrechnung')}}</label>
-						<div class="col-sm-3">
-							<div class="form-check">
-								<input id="verrechnung" type="checkbox" class="form-check-input" value="1" v-model="bankverbindungData['verrechnung']">
-							</div>
+						<div class="col-sm-4">
+							<form-input
+								container-class="form-check"
+								type="checkbox"
+								name="verrechnung"
+								v-model="bankverbindungData.verrechnung"
+							>
+							</form-input>
 						</div>
 					</div>															   
-				</form>
+				</form-form>
 				<template #footer>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
 					<button ref="Close" type="button" class="btn btn-primary" @click="updateBankverbindung(bankverbindungData.bankverbindung_id)">OK</button>

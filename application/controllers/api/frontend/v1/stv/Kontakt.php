@@ -524,7 +524,7 @@ class Kontakt extends FHCAPI_Controller
 		$name = $this->input->post('name');
 		$anschrift = $this->input->post('anschrift');
 		$bic = $this->input->post('bic');
-		$blz  = $this->input->post('blz ');
+		$blz  = $this->input->post('blz');
 		$kontonr = $this->input->post('kontonr');
 
 		$result = $this->BankverbindungModel->insert(

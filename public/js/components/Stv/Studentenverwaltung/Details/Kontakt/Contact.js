@@ -1,14 +1,16 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
-/*import {CoreRESTClient} from "../../../../../RESTClient.js";*/
 import BsModal from "../../../../Bootstrap/Modal.js";
-/*import PvToast from "../../../../../../../index.ci.php/public/js/components/primevue/toast/toast.esm.min.js";*/
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
+import FormForm from '../../../../Form/Form.js';
+import FormInput from '../../../../Form/Input.js';
 
 export default{
 	components: {
 		CoreFilterCmpt,
 		PvAutoComplete,
-		BsModal
+		BsModal,
+		FormForm,
+		FormInput
 	},
 	props: {
 		uid: Number
@@ -123,6 +125,7 @@ export default{
 	},
 	methods:{
 		actionNewContact(){
+			this.resetModal();
 			this.$refs.newContactModal.show();
 		},
 		actionEditContact(contact_id){
@@ -214,46 +217,69 @@ export default{
 		<!--Modal: new Contact-->
 		<BsModal ref="newContactModal">
 			<template #title>{{$p.t('person', 'kontakt_new')}}</template>
-				<form class="row g-3" ref="contactData">
 				
-						<div class="row mb-3">
-							<label for="kontakttyp" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
-							<div class="col-sm-6">
-								<select id="kontakttyp" class="form-control" v-model="contactData.kontakttyp">
-									<option value="">keine Auswahl</option>
-									<option v-for="typ in kontakttypen" :key="typ.kontakttyp_kurzbz" :value="typ.kontakttyp" >{{typ.kontakttyp}}</option>
-								</select>
-							</div>
+				<form-form class="row g-3" ref="contactData">
+				
+					<div class="row mb-3">
+						<label for="kontakttyp" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
+						<div class="col-sm-6">
+							<form-input 
+								type="select" 
+								name="typ" 
+								v-model="contactData.kontakttyp">
+							>
+								<option value="">keine Auswahl</option>
+								<option v-for="typ in kontakttypen" :key="typ.kontakttyp_kurzbz" :value="typ.kontakttyp" >{{typ.kontakttyp}}</option>
+						</form-input>
 						</div>
-						<div class="row mb-3">										   
-							<label for="kontakt" class="form-label col-sm-4">{{$p.t('global', 'kontakt')}}<sup>*</sup></label>
-							<div class="col-sm-6">
-								<input type="text" class="form-control" id="kontakt" v-model="contactData['kontakt']">
-							</div>
+					</div>
+					
+					<div class="row mb-3">										   
+						<label for="kontakt" class="form-label col-sm-4">{{$p.t('global', 'kontakt')}}<sup>*</sup></label>
+						<div class="col-sm-6">
+							<form-input 
+								type="text" 
+								name="kontakt" 
+								v-model="contactData.kontakt">
+								required
+								>
+							</form-input>
 						</div>
-						<div class="row mb-3">									   
-							<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
-							<div class="col-sm-6">
-								<input type="text" class="form-control" id="anmerkung" v-model="contactData['anmerkung']">
-							</div>
+					</div>
+					
+					<div class="row mb-3">									   
+						<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
+						<div class="col-sm-6">
+							<form-input 
+								type="text" 
+								name="anmerkung" 
+								v-model="contactData.anmerkung">
+								>
+							</form-input>
 						</div>
+					</div>
+					
+					<div class="row mb-3">
+						<label for="zustellung" class="form-label col-sm-4">{{$p.t('person', 'zustellung')}}</label>
+						<div class="col-sm-4">
+							<form-input
+								container-class="form-check"
+								type="checkbox"
+								name="zustellung"
+								v-model="contactData.zustellung"
+							>
+							</form-input>
+						</div>
+					</div>
 						
-						<div class="row mb-3">
-							<label for="zustellung" class="form-label col-sm-4">{{$p.t('person', 'zustellung')}}</label>
+					<div class="row mb-3">
+						<label for="firma_name" class="form-label col-sm-4">{{$p.t('person', 'firma')}} / {{$p.t('person', 'standort')}}</label>
 							<div class="col-sm-6">
-								<div class="form-check">
-									<input id="zustellung" type="checkbox" class="form-check-input" value="1" v-model="contactData['zustellung']">
-								</div>
+								<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" :min-length="3"/>
 							</div>
-						</div>
-							
-						<div class="row mb-3">
-							<label for="firma_name" class="form-label col-sm-4">{{$p.t('person', 'firma')}} / {{$p.t('person', 'standort')}}</label>
-								<div class="col-sm-6">
-									<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" :min-length="3"/>
-								</div>
-						</div>
-				</form>
+					</div>
+				</form-form>
+				
 			    <template #footer>
             		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
 					<button type="button" class="btn btn-primary" @click="addNewContact()">OK</button>
@@ -262,8 +288,10 @@ export default{
 						
 		<!--Modal: Edit Contact-->
 		<BsModal ref="editContactModal">
+		
 			<template #title>{{$p.t('person', 'kontakt_edit')}}</template>
-			<form class="row g-3" ref="contactData">
+			
+			<form-form class="row g-3" ref="contactData">
 				<div class="row mb-3">
 					<label for="kontakttyp" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
 					<div class="col-sm-6">
@@ -273,26 +301,45 @@ export default{
 						</select>
 					</div>
 				</div>
+				
 				<div class="row mb-3">									   
 					<label for="kontakt" class="form-label col-sm-4">{{$p.t('global', 'kontakt')}}<sup>*</sup></label>
 					<div class="col-sm-6">
-						<input type="text" class="form-control" id="kontakt" v-model="contactData['kontakt']">
+						<form-input 
+							type="text" 
+							name="kontakt" 
+							v-model="contactData.kontakt">
+							required
+							>
+						</form-input>
 					</div>
 				</div>
+				
 				<div class="row mb-3">									   
 					<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
 					<div class="col-sm-6">
-						<input type="text" class="form-control" id="anmerkung" v-model="contactData['anmerkung']">
+						<form-input 
+							type="text" 
+							name="anmerkung" 
+							v-model="contactData.anmerkung">
+							>
+						</form-input>
 					</div>
 				</div>
+				
 				<div class="row mb-3">
 					<label for="zustellung" class="form-label col-sm-4">{{$p.t('person', 'zustellung')}}</label>
-					<div class="col-sm-6">
-						<div class="form-check">
-							<input id="zustellung" type="checkbox" class="form-check-input" value="1" v-model="contactData['zustellung']">
-						</div>
+					<div class="col-sm-4">
+						<form-input
+							container-class="form-check"
+							type="checkbox"
+							name="zustellung"
+							v-model="contactData.zustellung"
+						>
+						</form-input>
 					</div>
 				</div>
+				
 				<div class="row mb-3">			
 					<input type="hidden" class="form-control" id="standort_id" v-model="contactData.standort_id">
 				</div>
@@ -300,13 +347,19 @@ export default{
 				<div class="row mb-3">
 					<label for="standort" class="form-label col-sm-4">{{$p.t('person', 'firma')}} / {{$p.t('person', 'standort')}}</label>
 						<div v-if="contactData.kurzbz" class="col-sm-6">
-							<input type="text" class="form-control" id="name" v-model="contactData.kurzbz">
+							<form-input
+								type="text"
+								name="name"
+								v-model="contactData.kurzbz"
+							>
+							</form-input>
 						</div>	
 						<div v-else class="col-sm-3">
 							<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" :min-length="3"/>
 						</div>
 				</div>
-			</form>
+			</form-form>
+			
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
 				<button type="button" class="btn btn-primary" @click="updateContact(contactData.kontakt_id)">OK</button>
