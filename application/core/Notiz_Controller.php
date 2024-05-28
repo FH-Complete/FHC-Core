@@ -475,7 +475,6 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 	public function loadDokumente()
 	{
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 		$notiz_id = $this->input->post('notiz_id');
 
 		$this->NotizModel->addSelect('campus.tbl_dms_version.*');
