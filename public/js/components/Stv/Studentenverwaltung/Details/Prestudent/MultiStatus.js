@@ -283,7 +283,9 @@ export default{
 			actionButton: {},
 			actionStatusText: {},
 			actionSem: null,
-			newArray: {}
+			newArray: {},
+			abbruchData: {},
+			newStatus: ''
 		}
 	},
 	watch: {
@@ -511,8 +513,13 @@ export default{
 						console.log("singleNew");
 					}
 					else{
-						let newStatus = this.newArray[0].status_kurzbz;
-						console.log(`Successful: ${countSuccess}, Errors: ${countError}`);
+						if(this.newArray.length > 0) {
+							this.newStatus = this.newArray[0].status_kurzbz;
+							console.log(`Successful: ${countSuccess}, Errors: ${countError}`);
+						}
+						else {
+							this.newStatus = this.statusData.status_kurzbz;
+						}
 					}
 
 
@@ -521,7 +528,7 @@ export default{
 					 if (countSuccess > 0) {
 						 this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
 							 'countSuccess': countSuccess,
-							 'status': newStatus,
+							 'status': this.newStatus,
 							 'countError': countError
 						 }));
 					 }
@@ -684,8 +691,8 @@ export default{
 				<template #title>{{$p.t('lehre', 'status_new')}}</template>
 							
 					<form-form class="row g-3" ref="statusData">
-					
-						<div class="row mb-3">
+						<div class="row mb-3">	
+							<p class="py-2 fw-bold">Details {{modelValue.nachname}} {{modelValue.vorname}}</p>
 							<label for="status_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'status_rolle')}}</label>
 							<div class="col-sm-6">
 
@@ -840,17 +847,18 @@ export default{
 			
 				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
 					<form-form class="row g-3" ref="statusData">
-					
-					<div v-if="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent">
-						<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrund')}}</b>
-					</div>
-					<div v-if="statusData.datum < dataMeldestichtag && isStatusBeforeStudent">
-						<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrundSemester')}}</b>
-					</div>
-					
-					 <input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
-					
 						<div class="row mb-3">
+							<p class="py-2 fw-bold">Details {{modelValue.nachname}} {{modelValue.vorname}}</p>
+							
+							<div v-if="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent" class="mb-1">
+								<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrund')}}</b>
+							</div>
+							<div v-if="statusData.datum < dataMeldestichtag && isStatusBeforeStudent">
+								<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrundSemester')}}</b>
+							</div>
+						
+							<input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
+					
 							<label for="status_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'status_rolle')}}</label>
 							<div class="col-sm-6">
 <!--								<form-input type="text" class="form-control" id="status_kurzbz" v-model="statusData['status_kurzbz']">-->
