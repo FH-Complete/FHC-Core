@@ -64,12 +64,13 @@ class Kontakt extends FHCAPI_Controller
 
 	public function addNewAddress($person_id)
 	{
-		$_POST = json_decode($this->input->raw_input_stream, true);
-
 		$this->form_validation->set_rules('plz', 'PLZ', 'required|numeric', [
-			'required' => $this->p->t('ui','error_fieldRequired',['field' => 'PLZ']),
-			'numeric' => $this->p->t('ui','error_fieldNotNumeric',['field' => 'PLZ'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'PLZ']),
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
 		]);
+
+		if(isset($_POST['gemeinde']) && isset($_POST['ort']))
+		$this->form_validation->set_rules('plz', 'Postleitzahl', 'callback_validate_location_combination');
 
 		if ($this->form_validation->run() == false)
 		{
@@ -126,12 +127,13 @@ class Kontakt extends FHCAPI_Controller
 	public function updateAddress($address_id)
 	{
 		$uid = getAuthUID();
-		$_POST = json_decode($this->input->raw_input_stream, true);
-
 		$this->form_validation->set_rules('plz', 'PLZ', 'required|numeric', [
-			'required' => $this->p->t('ui','error_fieldRequired',['field' => 'PLZ']),
-			'numeric' => $this->p->t('ui','error_fieldNotNumeric',['field' => 'PLZ'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'PLZ']),
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
 		]);
+
+		if(isset($_POST['gemeinde']) && isset($_POST['ort']))
+			$this->form_validation->set_rules('plz', 'Postleitzahl', 'callback_validateLocationCombination');
 
 		if ($this->form_validation->run() == false)
 		{
@@ -142,7 +144,7 @@ class Kontakt extends FHCAPI_Controller
 
 		if(!$address_id)
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId',['id'=> 'Adresse_id']), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Adresse_id']), self::ERROR_TYPE_GENERAL);
 		}
 
 		if(isset($_POST['firma']))
@@ -214,7 +216,7 @@ class Kontakt extends FHCAPI_Controller
 
 		if (!hasData($result))
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId',['id'=> 'Adresse_id']), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Adresse_id']), self::ERROR_TYPE_GENERAL);
 		}
 		$this->terminateWithSuccess(current(getData($result)) ? : null);
 	}
@@ -245,7 +247,7 @@ class Kontakt extends FHCAPI_Controller
 		}
 		if (!hasData($result))
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId',['id'=> 'Adresse_id']), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Adresse_id']), self::ERROR_TYPE_GENERAL);
 		}
 
 		return $this->terminateWithSuccess(current(getData($result)) ? : null);
@@ -338,7 +340,7 @@ class Kontakt extends FHCAPI_Controller
 		}
 		if (!hasData($result))
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId',['id'=> 'Kontakt_id']), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Kontakt_id']), self::ERROR_TYPE_GENERAL);
 		}
 		//	$this->outputJsonSuccess(current(getData($result)));
 		$this->terminateWithSuccess(current(getData($result)));
@@ -346,15 +348,13 @@ class Kontakt extends FHCAPI_Controller
 
 	public function addNewContact($person_id)
 	{
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
 		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
-			$this->form_validation->set_rules('kontakt', 'Kontakt', 'valid_email', [
-				'valid_email' => $this->p->t('ui','error_fieldNoValidEmail',['field' => 'Kontakt'])
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'validEmail', [
+				'validEmail' => $this->p->t('ui', 'error_fieldNoValidEmail', ['field' => 'Kontakt'])
 			]);
 		else
 			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required', [
-				'required' => $this->p->t('ui','error_fieldRequired',['field' => 'Kontakt'])
+				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Kontakt'])
 			]);
 
 		if ($this->form_validation->run() == false)
@@ -401,22 +401,20 @@ class Kontakt extends FHCAPI_Controller
 
 	public function updateContact($kontakt_id)
 	{
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
 		if(!$kontakt_id)
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId',['id'=> 'Kontakt_id']), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Kontakt_id']), self::ERROR_TYPE_GENERAL);
 		}
 
 		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
-			$this->form_validation->set_rules('kontakt', 'Kontakt', 'valid_email', [
-				'valid_email' => $this->p->t('ui','error_fieldNoValidEmail',['field' => 'Kontakt'])
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'validEmail', [
+				'validEmail' => $this->p->t('ui', 'error_fieldNoValidEmail', ['field' => 'Kontakt'])
 			]);
 		else
 			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required', [
-				'required' => $this->p->t('ui','error_fieldRequired',['field' => 'Kontakt'])
+				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Kontakt'])
 			]);
 
 		if ($this->form_validation->run() == false)
@@ -476,11 +474,10 @@ class Kontakt extends FHCAPI_Controller
 		}
 		elseif (!hasData($result))
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId',['id'=> 'Kontakt_id']), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Kontakt_id']), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess(current(getData($result)) ? : null);
 	}
-
 
 	public function getBankverbindung($person_id)
 	{
@@ -500,15 +497,12 @@ class Kontakt extends FHCAPI_Controller
 
 	public function addNewBankverbindung($person_id)
 	{
-		$this->load->library('form_validation');
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
 		$this->form_validation->set_rules('iban', 'IBAN', 'required', [
-			'required' => $this->p->t('ui','error_fieldRequired',['field' => 'IBAN'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'IBAN'])
 		]);
 
 		$this->form_validation->set_rules('typ', 'TYP', 'required', [
-			'required' => $this->p->t('ui','error_fieldRequired',['field' => 'TYP'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'TYP'])
 		]);
 
 		if ($this->form_validation->run() == false)
@@ -570,21 +564,19 @@ class Kontakt extends FHCAPI_Controller
 
 		if (!hasData($result))
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId',['id'=> 'Bankverbindung_id']), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Bankverbindung_id']), self::ERROR_TYPE_GENERAL);
 		}
 		$this->terminateWithSuccess(current(getData($result)));
 	}
 
 	public function updateBankverbindung($bankverbindung_id)
 	{
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
 		$this->form_validation->set_rules('iban', 'IBAN', 'required', [
-			'required' => $this->p->t('ui','error_fieldRequired',['field' => 'IBAN'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'IBAN'])
 		]);
 
 		$this->form_validation->set_rules('typ', 'TYP', 'required', [
-			'required' => $this->p->t('ui','error_fieldRequired',['field' => 'TYP'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'TYP'])
 		]);
 
 		if ($this->form_validation->run() == false)
@@ -596,7 +588,7 @@ class Kontakt extends FHCAPI_Controller
 
 		if(!$bankverbindung_id)
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId',['id'=> 'Bankverbindung_id']), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Bankverbindung_id']), self::ERROR_TYPE_GENERAL);
 		}
 
 		$uid = getAuthUID();
@@ -649,75 +641,30 @@ class Kontakt extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($result)) ? : null);
 	}
 
-/*	public function plz_required($value)
-	{
-		if (empty($value)) {
-			$this->form_validation->set_message('plz_required',  $this->p->t('ui','error_fieldRequired',['field' => 'PLZ']));
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}*/
-
-/*	public function kontakt_required($value)
-	{
-		if (empty($value)) {
-			$this->form_validation->set_message('kontakt_required',  $this->p->t('ui','error_fieldRequired',['field' => 'Kontakt']));
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
-
-	public function iban_required($value)
-	{
-		if (empty($value)) {
-			$this->form_validation->set_message('iban_required',  $this->p->t('ui','error_fieldRequired',['field' => 'IBANoff']));
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
-
-	public function typ_required($value)
-	{
-		if (empty($value)) {
-			$this->form_validation->set_message('typ_required',  $this->p->t('ui','error_fieldRequired',['field' => 'Typ']));
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}*/
-
-/*	public function plz_numeric($value)
-	{
-		if (!is_numeric($value)) {
-			$this->form_validation->set_message('plz_numeric',  $this->p->t('ui','error_fieldNotNumeric',['field' => 'PLZ']));
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}*/
-
-	public function kontakt_valid_email($email)
+	public function kontaktValidEmail($email)
 	{
 		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-			$this->form_validation->set_message('kontakt_valid_email',  $this->p->t('ui','error_fieldNoValidEmail',['field' => 'Kontakt']));
+			$this->form_validation->set_message('kontaktValidEmail', $this->p->t('ui', 'error_fieldNoValidEmail', ['field' => 'Kontakt']));
 			return false;
 		}
 		else
 		{
 			return true;
+		}
+	}
+
+	public function validateLocationCombination()
+	{
+		$this->load->model('codex/Gemeinde_model', 'GemeindeModel');
+
+		if($this->GemeindeModel->checkLocation($_POST['plz'], $_POST['gemeinde'], $_POST['ort']))
+		{
+			return true;
+		}
+		else
+		{
+			$this->form_validation->set_message('validateLocationCombination', $this->p->t('ui', 'error_location_combination'));
+			return false;
 		}
 	}
 }

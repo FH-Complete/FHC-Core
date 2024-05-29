@@ -102,7 +102,7 @@ export default{
 				{
 					event: 'tableBuilt',
 					handler: async () => {
-						await this.$p.loadCategory(['notiz','global','person']);
+						await this.$p.loadCategory(['notiz','global','person', 'ui']);
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
@@ -393,7 +393,7 @@ export default{
 							name="gemeinde"
 							v-model="addressData.gemeinde"
 							>
-							<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
+							<option v-if="!gemeinden.length" disabled>{{$p.t('ui', 'bittePlzWaehlen')}}</option>
 							<option 
 								v-for="gemeinde in gemeinden" 
 								:key="gemeinde.name" 
@@ -421,7 +421,7 @@ export default{
 							name="ort"
 							v-model="addressData.ort"
 							>
-							<option v-if="!orte.length" disabled>Bitte gültige Gemeinde wählen</option>
+							<option v-if="!orte.length" disabled>{{$p.t('ui', 'bitteGemeindeWaehlen')}}</option>
 							<option 
 								v-for="ort in orte" 
 								:key="ort.ortschaftsname" 
@@ -608,7 +608,7 @@ export default{
 							name="addressData.gemeinde"
 							v-model="addressData.gemeinde"
 							>
-							<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
+							<option v-if="!gemeinden.length" disabled>{{$p.t('ui', 'bittePlzWaehlen')}}</option>
 							<option 
 								v-for="gemeinde in gemeinden" 
 								:key="gemeinde.name" 
@@ -629,7 +629,7 @@ export default{
 							name="ort"
 							v-model="addressData.ort"
 							>
-							<option v-if="!orte.length" disabled>Bitte gültige Gemeinde wählen</option>
+							<option v-if="!orte.length" disabled>{{$p.t('ui', 'bitteGemeindeWaehlen')}}</option>
 							<option 
 								v-for="ort in orte" 
 								:key="ort.ortschaftsname" 
