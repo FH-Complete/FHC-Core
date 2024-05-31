@@ -100,7 +100,7 @@ export default {
 	<div class="fhc-calendar-week-page">
 	
 		<div class="d-flex flex-column border-top">
-			<div style="position:sticky; top:10px; z-index:1020;" class="fhc-calendar-week-page-header border-2 border-bottom text-center d-flex">
+			<div class="fhc-calendar-week-page-header border-2 border-bottom text-center d-flex" style="position:sticky; top:0; z-index:1020;" >
 				<div v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})">
 					<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
 					<a href="#" class="small text-secondary text-decoration-none" @click.prevent="changeToMonth(day)">{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
@@ -109,15 +109,11 @@ export default {
 			<div ref="eventcontainer" class="flex-grow-1">
 				<div class="events">
 					<div class="hours">
-						<div v-for="hour in hours" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
+						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class="day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (1440 / smallestTimeFrame) + ', 1fr)'}">
-						<a  href="#" @click="printTest(event)" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'" v-for="event in day.events" :key="event" class="mx-2 border border-dark border-2 small rounded overflow-hidden text-decoration-none text-dark" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end), 'background': event.orig.farbe?event.orig.farbe:'white' ,'--test': dateToMinutesOfDay(event.end)}" @click.prevent="$emit('input', event.orig)">
-							<div class="d-flex flex-column align-items-center justify-content-evenly h-100">
-								<span>{{event.orig.title}}</span>	
-								<span>{{event.orig.ort_kurzbz}}</span>
-								<span>{{event.orig.mitarbeiter_kurzbz}}</span>
-							</div>
+						<a  href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'" v-for="event in day.events" :key="event" class="mx-2 border border-dark border-2 small rounded overflow-hidden text-decoration-none text-dark" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end), 'background': event.orig.farbe?event.orig.farbe:'white' ,'--test': dateToMinutesOfDay(event.end)}" @click.prevent="$emit('input', event.orig)">
+							<slot :event="event" />
 						</a>
 					</div>
 				</div>
