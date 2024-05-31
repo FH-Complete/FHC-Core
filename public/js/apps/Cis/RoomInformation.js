@@ -37,12 +37,12 @@ const app = Vue.createApp({
                     });
                     events = res.data;
                     //console.log("this are the room events",events)
-                    //this.events = events;
+                    this.events = events;
                 }
             }).catch((e)=>{console.log(e,"this is the exception")})
 		});
 
-        axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Stundenplan').then(res => {
+        /* axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Stundenplan').then(res => {
             
             let events;
             console.log(" this is the res of the api call stundenplan",res);
@@ -65,7 +65,7 @@ const app = Vue.createApp({
         }).catch((e)=>{console.log(e,"this is the exception")}) 
 
 
-        
+         */
 
        
 
@@ -73,7 +73,13 @@ const app = Vue.createApp({
     template: /*html*/`
     <div>
     <!--initialDate="2023-5-12"-->
-        <fhc-calendar :initialDate="testDate" :events="events" initial-mode="week" show-weeks></fhc-calendar>
+        <fhc-calendar v-slot="{event}" :initialDate="testDate" :events="events" initial-mode="week" show-weeks>
+            <div class="d-flex flex-column align-items-center justify-content-evenly h-100">
+                <span>{{event.orig.lv_info}}</span>	
+                <span>{{event.orig.stg}}</span>
+                <span>{{event.orig.lektor}}</span>
+			</div>
+        </fhc-calendar>
     </div>
     `,
 });

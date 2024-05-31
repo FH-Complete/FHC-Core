@@ -21,7 +21,7 @@ class Stundenplan_model extends DB_Model
 	public function getRoomDataOnDay($ort_kurzbz,$date){
 
 
-		$this->addSelect(['*',"CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) as eintrag","lektor","CONCAT(lehrfach,'-',lehrform)"]);
+		$this->addSelect(['*',"CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) as stg","lektor","CONCAT(lehrfach,'-',lehrform) as lv_info" ]);
 		/* $this->addSelect(["lehre.tbl_stundenplan.*","CONCAT(UPPER(sg.typ),UPPER(sg.kurzbz),'-',lehre.tbl_stundenplan.semester,lehre.tbl_stundenplan.verband) as simml"]);
 		$this->addJoin("public.tbl_lehrverband as lv","lv.studiengang_kz=lehre.tbl_stundenplan.studiengang_kz AND lv.gruppe=lehre.tbl_stundenplan.gruppe AND lv.verband=lehre.tbl_stundenplan.verband AND lv.semester=lehre.tbl_stundenplan.semester","LEFT"); 
 		$this->addJoin("public.tbl_studiengang as sg","sg.studiengang_kz=lehre.tbl_stundenplan.studiengang_kz","LEFT"); 
@@ -29,7 +29,7 @@ class Stundenplan_model extends DB_Model
 		$res = hasData($res) ? getData($res): null;
 		return $res; */
 		$this->db->where('ort_kurzbz','EDV_A2.06',true);
-		$this->db->where('datum','2024-05-21',true);
+		$this->db->where('datum >=','2024-05-21',true);
 
 		$query = $this->db->get_compiled_select('lehre.vw_stundenplan sp');
 		

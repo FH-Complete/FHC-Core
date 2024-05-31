@@ -112,7 +112,7 @@ export default {
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class="day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (1440 / smallestTimeFrame) + ', 1fr)'}">
-						<a  href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'" v-for="event in day.events" :key="event" class="mx-2 border border-dark border-2 small rounded overflow-hidden text-decoration-none text-dark" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end), 'background': event.orig.farbe?event.orig.farbe:'white' ,'--test': dateToMinutesOfDay(event.end)}" @click.prevent="$emit('input', event.orig)">
+						<a  href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'" v-for="event in day.events" :key="event" class="mx-2 border border-dark border-2 small rounded overflow-hidden text-decoration-none text-dark" :style="{'background-color': event.orig.farbe?'#'.concat(event.orig.farbe):'white','grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" @click.prevent="$emit('input', event.orig)">
 							<slot :event="event" />
 						</a>
 					</div>
