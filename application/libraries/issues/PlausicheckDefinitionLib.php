@@ -15,13 +15,16 @@ class PlausicheckDefinitionLib
 		'AktSemesterNull' => 'AktSemesterNull',
 		'AktiverStudentOhneStatus' => 'AktiverStudentOhneStatus',
 		'AusbildungssemPrestudentUngleichAusbildungssemStatus' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
+		'BeginndatumVorBismeldung' => 'BeginndatumVorBismeldung',
 		'BewerberNichtZumRtAngetreten' => 'BewerberNichtZumRtAngetreten',
 		'DatumAbschlusspruefungFehlt' => 'DatumAbschlusspruefungFehlt',
 		'DatumSponsionFehlt' => 'DatumSponsionFehlt',
 		'DatumStudiensemesterFalscheReihenfolge' => 'DatumStudiensemesterFalscheReihenfolge',
+		'DualesStudiumOhneMarkierung' => 'DualesStudiumOhneMarkierung',
 		'FalscheAnzahlAbschlusspruefungen' => 'FalscheAnzahlAbschlusspruefungen',
 		'FalscheAnzahlHeimatadressen' => 'FalscheAnzahlHeimatadressen',
 		'FalscheAnzahlZustelladressen' => 'FalscheAnzahlZustelladressen',
+		'FalscheStatusabfolgeVorStudentstatus' => 'FalscheStatusabfolgeVorStudentstatus',
 		'GbDatumWeitZurueck' => 'GbDatumWeitZurueck',
 		'InaktiverStudentAktiverStatus' => 'InaktiverStudentAktiverStatus',
 		'IncomingHeimatNationOesterreich' => 'IncomingHeimatNationOesterreich',
@@ -33,8 +36,7 @@ class PlausicheckDefinitionLib
 		'PrestudentMischformOhneOrgform' => 'PrestudentMischformOhneOrgform',
 		'StgPrestudentUngleichStgStudienplan' => 'StgPrestudentUngleichStgStudienplan',
 		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent',
-		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher',
-		'DualesStudiumOhneMarkierung' => 'DualesStudiumOhneMarkierung'
+		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher'
 		//'StudienplanUngueltig' => 'StudienplanUngueltig'
 	);
 

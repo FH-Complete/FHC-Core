@@ -294,6 +294,22 @@ $fehlerArr = array(
 		'app' => 'core'
 	),
 	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0017',
+		'fehler_kurzbz' => 'BeginndatumVorBismeldung',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Statusdatum vor Bismeldedatum eingetragen, nachdem das Bismeldedatum erreicht wurde  (prestudent_id %s, Studiensemester %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0018',
+		'fehler_kurzbz' => 'FalscheStatusabfolgeVorStudentstatus',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Falsche Statusabfolge vor Studentstatus (prestudent_id %s, Studiensemester %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
 		'fehlercode' => 'CORE_PERSON_0001',
 		'fehler_kurzbz' => 'GbDatumWeitZurueck',
 		'fehlercode_extern' => null,
