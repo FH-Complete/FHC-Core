@@ -9,7 +9,8 @@ export default {
 		BankaccountList,
 	},
 	props: {
-		modelValue: Object
+		modelValue: Object,
+		config: Object
 	},
 	data() {
 		return {
@@ -30,7 +31,7 @@ export default {
 			<contact-list ref="contactList" :uid="modelValue.person_id"></contact-list>
 		</fieldset>
 		<br>
-		<fieldset class="overflow-hidden">
+		<fieldset v-if="config.showBankaccount" class="overflow-hidden">
 			<legend>{{this.$p.t('person', 'bankverbindungen')}}</legend>
 			<bankaccount-list ref="bankaccountList" :uid="modelValue.person_id"></bankaccount-list>
 		</fieldset>

@@ -61,7 +61,11 @@ class Config extends FHCAPI_Controller
 		];
 		$result['contact'] = [
 			'title' => $this->p->t('stv', 'tab_contact'),
-			'component' => './Stv/Studentenverwaltung/Details/Kontakt.js'
+			'component' => './Stv/Studentenverwaltung/Details/Kontakt.js',
+			'config' => [
+				'showBankaccount' => $this->permissionlib->isBerechtigt('mitarbeiter/bankdaten')
+					|| $this->permissionlib->isBerechtigt('student/bankdaten')
+			]
 		];
 		$result['prestudent'] = [
 			'title' => $this->p->t('stv', 'tab_prestudent'),
