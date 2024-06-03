@@ -43,11 +43,12 @@ export default {
 				else if (dragAction == 'resize')
 					return this.$emit('startResize', evt, item);
 			}
-			evt.preventDefault();
+			//evt.preventDefault();
 		},
 		touchDragEnd(evt) {
 			if (!this.dragging)
-				return evt.preventDefault();
+				//return evt.preventDefault();
+                                return;
 			this.dragging = false;
 			this.$emit('dropDrag', evt);
 		},
