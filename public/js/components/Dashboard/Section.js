@@ -32,7 +32,7 @@ export default {
 	computed: {
 		items() {
 			return this.widgets.map(item => {
-				return {...item, ...(item.place[this.gridWidth] || {})};
+				return {...item, ...(item.place[this.gridWidth] || {h: 1, w:1, x:0, y:0})};
 			});
 		}
 	},

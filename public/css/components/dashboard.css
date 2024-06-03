@@ -19,7 +19,7 @@
 }
 @media(max-width: 577px) {
 	:root {
-		--fhc-dashboard-grid-size: 2;
+		--fhc-dashboard-grid-size: 1;
 	}
 }
 
