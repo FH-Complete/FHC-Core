@@ -215,7 +215,7 @@ export default{
 		<BsModal title="Bankverbindung anlegen" ref="newBankverbindungModal">
 
 			<template #title>{{$p.t('person', 'bankvb_new')}}</template>
-						<form-form class="row g-3" ref="bankverbindungData">
+			<form-form class="row g-3" ref="bankverbindungData">
 				<div class="row mb-3">
 					<label for="name" class="form-label col-sm-4">Name</label>
 					<div class="col-sm-6">
@@ -224,6 +224,7 @@ export default{
 							name="name" 
 							v-model="bankverbindungData.name"
 						>
+						</form-input>
 					</div>
 				</div>
 				<div class="row mb-3">										   
@@ -247,7 +248,7 @@ export default{
 								v-model="bankverbindungData.iban"
 								required
 							>
-						</form-input>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">								   
@@ -324,11 +325,12 @@ export default{
 					<div class="row mb-3">
 						<label for="name" class="form-label col-sm-4">Name</label>
 						<div class="col-sm-6">
-								<form-input 
+							<form-input 
 								type="text" 
 								name="name" 
 								v-model="bankverbindungData.name"
 							>
+							</form-input>
 						</div>
 					</div>
 					<div class="row mb-3">									   
