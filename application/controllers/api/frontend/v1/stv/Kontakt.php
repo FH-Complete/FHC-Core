@@ -70,7 +70,9 @@ class Kontakt extends FHCAPI_Controller
 		]);
 
 		if(isset($_POST['gemeinde']) && isset($_POST['ort']))
-		$this->form_validation->set_rules('plz', 'Postleitzahl', 'callback_validate_location_combination');
+		$this->form_validation->set_rules('plz', 'Postleitzahl', 'callback_validateLocationCombination', [
+			'validateLocationCombination' => $this->p->t('ui', 'error_location_combination')
+		]);
 
 		if ($this->form_validation->run() == false)
 		{
@@ -133,7 +135,9 @@ class Kontakt extends FHCAPI_Controller
 		]);
 
 		if(isset($_POST['gemeinde']) && isset($_POST['ort']))
-			$this->form_validation->set_rules('plz', 'Postleitzahl', 'callback_validateLocationCombination');
+			$this->form_validation->set_rules('plz', 'Postleitzahl', 'callback_validateLocationCombination', [
+				'validateLocationCombination' => $this->p->t('ui', 'error_location_combination')
+			]);
 
 		if ($this->form_validation->run() == false)
 		{
@@ -349,8 +353,8 @@ class Kontakt extends FHCAPI_Controller
 	public function addNewContact($person_id)
 	{
 		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
-			$this->form_validation->set_rules('kontakt', 'Kontakt', 'validEmail', [
-				'validEmail' => $this->p->t('ui', 'error_fieldNoValidEmail', ['field' => 'Kontakt'])
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'valid_email', [
+				'valid_email' => $this->p->t('ui', 'error_fieldNoValidEmail', ['field' => 'Kontakt'])
 			]);
 		else
 			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required', [
@@ -409,8 +413,8 @@ class Kontakt extends FHCAPI_Controller
 		}
 
 		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
-			$this->form_validation->set_rules('kontakt', 'Kontakt', 'validEmail', [
-				'validEmail' => $this->p->t('ui', 'error_fieldNoValidEmail', ['field' => 'Kontakt'])
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'valid_email', [
+				'valid_email' => $this->p->t('ui', 'error_fieldNoValidEmail', ['field' => 'Kontakt'])
 			]);
 		else
 			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required', [
@@ -641,30 +645,10 @@ class Kontakt extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($result)) ? : null);
 	}
 
-	public function kontaktValidEmail($email)
-	{
-		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-			$this->form_validation->set_message('kontaktValidEmail', $this->p->t('ui', 'error_fieldNoValidEmail', ['field' => 'Kontakt']));
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
-
 	public function validateLocationCombination()
 	{
 		$this->load->model('codex/Gemeinde_model', 'GemeindeModel');
 
-		if($this->GemeindeModel->checkLocation($_POST['plz'], $_POST['gemeinde'], $_POST['ort']))
-		{
-			return true;
-		}
-		else
-		{
-			$this->form_validation->set_message('validateLocationCombination', $this->p->t('ui', 'error_location_combination'));
-			return false;
-		}
+		return $this->GemeindeModel->checkLocation($_POST['plz'], $_POST['gemeinde'], $_POST['ort']);
 	}
 }
