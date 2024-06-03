@@ -101,23 +101,26 @@ class AbschlussstatusFehlt extends PlausiChecker
 
 		if (isset($studiensemester_kurzbz))
 		{
+			$this->_ci->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
 			$prevStudiensemesterRes = $this->_ci->StudiensemesterModel->getPreviousFrom($studiensemester_kurzbz);
 
 			if (isError($prevStudiensemesterRes)) return $prevStudiensemesterRes;
 
+			$semesterArr = array($studiensemester_kurzbz);
+
 			if (hasData($prevStudiensemesterRes))
 			{
 				// if Studiensemester given, check only if has status in current or previous semester
-				$prevStudiensemester = getData($prevStudiensemesterRes)[0]->studiensemester_kurzbz;
-				$qry .= " AND EXISTS (
-							SELECT 1
-							FROM public.tbl_prestudentstatus ps
-							WHERE studiensemester_kurzbz IN (?, ?)
-							AND ps.prestudent_id = pre.prestudent_id
-						)";
-				$params[] = $prevStudiensemester;
-				$params[] = $studiensemester_kurzbz;
+				$semesterArr[] = getData($prevStudiensemesterRes)[0]->studiensemester_kurzbz;
 			}
+
+			$qry .= " AND EXISTS (
+						SELECT 1
+						FROM public.tbl_prestudentstatus ps
+						WHERE studiensemester_kurzbz IN ?
+						AND ps.prestudent_id = pre.prestudent_id
+					)";
+			$params[] = $semesterArr;
 		}
 
 		if (isset($studiengang_kz))
