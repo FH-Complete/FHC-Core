@@ -16,7 +16,9 @@ class MigrateContract extends CLI_Controller
 {
 
 	private $matching_ba1_vertragsart;
-	private $OE_DEFAULT = 'gst';
+	private $OE_DEFAULT;
+
+	protected $configerrors;
 
 	/**
 	 * Constructor
@@ -28,29 +30,70 @@ class MigrateContract extends CLI_Controller
 		$this->load->model('codex/bisverwendung_model', 'BisVerwendungModel');
 		$this->load->model('person/benutzerfunktion_model', 'BenutzerfunktionModel');
 
-		$this->matching_ba1_vertragsart = array(
-			'101'=>'externerlehrender',
-			'102'=>'DV anderen Gebietskörperschaft',
-			'103'=>'echterdv',
-			'104'=>'studentischehilfskr',
-			'105'=>'externerlehrender',
-			'106'=>'Andere Bildungseinrichtung',
-			'107'=>'werkvertrag',
-			'108'=>'studentischehilfskr',
-			'109'=>'ueberlassungsvertrag',
-			'110'=>'echterfreier',
-			'111'=>'echterdv', //All-In
-		);
+		$this->load->config('migratecontract');
+
+		$this->OE_DEFAULT = $this->config->item('migratecontract_oe_default');
+		$this->matching_ba1_vertragsart = $this->config->item('migratecontract_matching_ba1_vertragsart');
+		$this->configerrors = array();
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Public methods
+	public function checkConfig()
+	{
+	    echo "OE_DEFAULT: " . $this->OE_DEFAULT . "\n";
+	    echo "matching_ba1_vertragsart: " . print_r($this->matching_ba1_vertragsart, true);
+
+	    $this->checkOE_DEFAULT();
+	    $this->checkMatching_ba1_vertragsart();
+
+	    if( count($this->configerrors) > 0 )
+	    {
+		foreach($this->configerrors AS $configerror)
+		{
+		    echo $configerror . "\n";
+		}
+		die("Fehler in der Konfiguration. Abbruch!\n");
+	    }
+	    else
+	    {
+		echo "Konfiguration OK.\n";
+	    }
+	}
+
+	protected function checkOE_DEFAULT()
+	{
+	    $db = new DB_Model();
+	    $oesql = 'SELECT * FROM public.tbl_organisationseinheit WHERE oe_kurzbz = ?';
+	    $oeres = $db->execReadOnlyQuery($oesql, array($this->OE_DEFAULT));
+	    if( !hasData($oeres) )
+	    {
+		$this->configerrors[] = 'Default Organisationseinheit: "'
+		    . $this->OE_DEFAULT . '" nicht gefunden.';
+	    }
+	}
+
+	protected function checkMatching_ba1_vertragsart() {
+	    $db = new DB_Model();
+	    foreach( $this->matching_ba1_vertragsart AS $vertragsart_kurzbz )
+	    {
+		$vasql = 'SELECT * FROM hr.tbl_vertragsart WHERE vertragsart_kurzbz = ?';
+		$vares = $db->execReadOnlyQuery($vasql, array($vertragsart_kurzbz));
+		if( !hasData($vares) )
+		{
+		    $this->configerrors[] = 'Vertragsart "' . $vertragsart_kurzbz
+			. '" nicht gefunden.';
+		}
+	    }
+	}
 
 	/**
 	 * Everything has a beginning
 	 */
 	public function index($user = null)
 	{
+		$this->checkConfig();
+
 		if (!is_null($user))
 		{
 			$contracts = $this->_transformUser($user);
