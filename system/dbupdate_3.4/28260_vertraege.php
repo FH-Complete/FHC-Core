@@ -437,6 +437,60 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		if (! $db->db_query($qry))
 			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
 		else
-			echo 'HR Schema und Vertagstabellen wurden neu erstellt';
+			echo 'HR Schema und Vertagstabellen wurden neu erstellt<br />';
+	}
+}
+
+if ($result = $db->db_query("SELECT * FROM hr.tbl_vertragsart WHERE vertragsart_kurzbz='dvbund'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+		INSERT INTO hr.tbl_vertragsart
+		    (vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort)
+		VALUES
+		    ('dvbund','DV zum Bund','Dienstverhältnis zum Bund', true, null, true, 400);
+		";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Vertragsart "Dienstverhältnis zum Bund" erstellt.<br />';
+	}
+}
+
+if ($result = $db->db_query("SELECT * FROM hr.tbl_vertragsart WHERE vertragsart_kurzbz='dvanderengk'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+		INSERT INTO hr.tbl_vertragsart
+		    (vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort)
+		VALUES
+		    ('dvanderengk','DV anderen Gebietskörperschaft','Dienstverhältnis zu einer anderen Gebietskörperschaft', true, null, true, 500);
+		";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Vertragsart "Dienstverhältnis zu einer anderen Gebietskörperschaft" erstellt.<br />';
+	}
+}
+
+if ($result = $db->db_query("SELECT * FROM hr.tbl_vertragsart WHERE vertragsart_kurzbz='dvanderenbet'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+		INSERT INTO hr.tbl_vertragsart
+		    (vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort)
+		VALUES
+		    ('dvanderenbet','DV anderen Bildungseinrichtung','Dienstverhältnis zu einer anderen Bildungseinrichtung oder einem anderen Träger', true, null, true, 600);
+		";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Vertragsart "Dienstverhältnis zu einer anderen Bildungseinrichtung oder einem anderen Träger" erstellt.<br />';
 	}
 }
