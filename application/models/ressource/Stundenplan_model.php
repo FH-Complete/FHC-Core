@@ -18,7 +18,7 @@ class Stundenplan_model extends DB_Model
 	 * 
 	 * @return stdClass
 	 */
-	public function getRoomDataOnDay($ort_kurzbz='EDV_A2.06',$start_date='2024-05-21',$end_date='2024-05-21'){
+	public function getRoomDataOnDay($ort_kurzbz='EDV_A2.06',$start_date,$end_date){
 
 
 		$this->addSelect(['*',"CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) as stg","lektor","CONCAT(lehrfach,'-',lehrform) as lv_info" ]);

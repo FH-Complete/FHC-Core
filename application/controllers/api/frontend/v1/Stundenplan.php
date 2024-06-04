@@ -49,11 +49,15 @@ class Stundenplan extends FHCAPI_Controller
 	 */
 	public function roomInformation()
 	{
+
+        
         // storing the get parameter in local variables
         $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
         
+        $this->addMeta("test_start_date",$start_date);
+
         $this->addMeta("ort",$ort_kurzbz);
         $this->addMeta("start date",$start_date);
         $this->addMeta("end date",$end_date);
@@ -67,10 +71,49 @@ class Stundenplan extends FHCAPI_Controller
         }
 
         $result = hasData($result) ? getData($result) : [];
+        
+        // set up the log library and configure the library to log to the db
+        $this->load->library('LogLib');
+        $this->loglib->setConfigs(array(
+			'classIndex' => 5,
+			'functionIndex' => 5,
+			'lineIndex' => 4,
+			'dbLogType' => 'API', // required
+			'dbExecuteUser' => 'RESTful API'
+		));
+
+        /* foreach($result as $event){
+            $this->loglib->logInfoDB($event->datum,"NEW DATE");
+        } */
+
+        $testStartDate = new DateTime($start_date);
+        $this->loglib->logInfoDB($testStartDate->format('Y-m-d'),"php start date");
+        $testStartDate->modify('+1 day');
+        $this->loglib->logInfoDB($testStartDate->format('Y-m-d'),"php start date plus one day");
+        $testStartDate->modify('+1 day');
+        $this->loglib->logInfoDB($testStartDate->format('Y-m-d'),"php start date plus one day");
+        $testStartDate->modify('+1 day');
+        $this->loglib->logInfoDB($testStartDate->format('Y-m-d'),"php start date plus one day");
+        $testStartDate->modify('+1 day');
+        $this->loglib->logInfoDB($testStartDate->format('Y-m-d'),"php start date plus one day");
+        
+        $this->groupTheCalendar($result);
+        //php start date
+        $phpStartDate = new DateTime($start_date);
+
+        //$phpStartDate->modify('+1 day');
+        $this->addMeta('result',$phpStartDate);
+       
+            error_log("test".print_r($result,true));
+        
 		//echo($this->db->last_query());
 		$this->terminateWithSuccess($result);
 		
 	}
+
+    private function groupTheCalendar($data){
+
+    }
 
     public function Stunden()
 	{

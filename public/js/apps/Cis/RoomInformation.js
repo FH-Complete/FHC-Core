@@ -18,6 +18,11 @@ const app = Vue.createApp({
             return new Date(this.calendarWeek.y, this.calendarWeek.m, this.calendarWeek.d);
         },
     },
+    methods:{
+        calendarDate_to_UTC_date: function(calendarDate){
+            return [calendarDate.y, calendarDate.m, calendarDate.d].join('-');    
+        }
+    },
 	created() {
 
         this.$fhcApi.factory.stundenplan.getStunden().then(res =>{
@@ -25,6 +30,18 @@ const app = Vue.createApp({
 				this.stunden[std.stunde] = std; // TODO(chris): geht besser
 			});
 
+
+            console.log(this.calendarDate_to_UTC_date(this.calendarWeek.firstDayOfWeek),"this is the converted calendar date")
+
+            /* console.log(this.convertDateToUtcDate(this.calendarWeek.firstDayOfWeek), "iso string here")
+
+            console.log(this.calendarWeek.cdFirstDayOfWeek.y,"this is the year of the first day of the week");
+            console.log(this.calendarWeek.cdFirstDayOfWeek.m,"this is the month of the first day of the week");
+            console.log(this.calendarWeek.cdFirstDayOfWeek.d,"this is the day of the first day of the week");
+
+            console.log(this.calendarWeek.firstDayOfWeek,"this is the first day of the week");
+            console.log(this.convertDateToUtcDate(this.calendarWeek.firstDayOfWeek), "this is the UTC date")
+ */
             this.$fhcApi.factory.stundenplan.getRoomInfo('EDV_A6.09', this.calendarWeek.firstDayOfWeek, this.calendarWeek.lastDayOfWeek).then(res =>{
                 let events;
                 if (res.data && res.data.forEach) {
