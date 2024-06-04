@@ -41,7 +41,6 @@ export default {
 		},
 		eventsPerDayAndHour() {
 			const res = {};
-			console.log("this are the days",this.days)
 			this.days.forEach(day => {
 				let key = day.toDateString();
 				

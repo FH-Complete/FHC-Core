@@ -18,7 +18,7 @@ class Stundenplan_model extends DB_Model
 	 * 
 	 * @return stdClass
 	 */
-	public function getRoomDataOnDay($ort_kurzbz,$date){
+	public function getRoomDataOnDay($ort_kurzbz='EDV_A2.06',$start_date='2024-05-21',$end_date='2024-05-21'){
 
 
 		$this->addSelect(['*',"CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) as stg","lektor","CONCAT(lehrfach,'-',lehrform) as lv_info" ]);
@@ -28,12 +28,13 @@ class Stundenplan_model extends DB_Model
 		$res = $this->loadWhere(['ort_kurzbz'=>$ort_kurzbz,'datum'=>$date]);
 		$res = hasData($res) ? getData($res): null;
 		return $res; */
-		$this->db->where('ort_kurzbz','EDV_A2.06',true);
-		$this->db->where('datum >=','2024-05-21',true);
+		$this->db->where('ort_kurzbz',$ort_kurzbz,true);
+		$this->db->where('datum >=',$start_date,true);
+		$this->db->where('datum <=',$end_date,true);
 
 		$query = $this->db->get_compiled_select('lehre.vw_stundenplan sp');
 		
-		return $this->execQuery($query, [$ort_kurzbz, $date]);
+		return $this->execQuery($query, [$ort_kurzbz, $start_date, $end_date]);
 	}
 
 	/**
