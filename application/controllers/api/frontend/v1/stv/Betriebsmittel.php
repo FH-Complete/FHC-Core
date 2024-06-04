@@ -28,7 +28,8 @@ class Betriebsmittel extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui'
+			'ui',
+			'wawi'
 		]);
 	}
 
