@@ -225,8 +225,9 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		searchInventar(event) {
+			const encodedQuery = encodeURIComponent(event.query);
 			return this.$fhcApi
-				.get('api/frontend/v1/stv/betriebsmittel/loadInventarliste/' + event.query)
+				.get('api/frontend/v1/stv/betriebsmittel/loadInventarliste/' + encodedQuery)
 				.then(result => {
 					this.filteredInventar = result.data.retval;
 				});
