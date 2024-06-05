@@ -100,7 +100,7 @@ class Betriebsmittelperson_model extends DB_Model
 	public function getBetriebsmittelData($id, $type_id)
 	{
 		switch ($type_id) {
-			case 'person':
+			case 'person_id':
 				$cond = 'bmp.person_id';
 				break;
 			case 'uid':

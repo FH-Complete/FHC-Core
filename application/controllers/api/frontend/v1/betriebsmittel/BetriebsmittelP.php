@@ -1,10 +1,10 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 use \DateTime as DateTime;
 
-class Betriebsmittel extends FHCAPI_Controller
+class BetriebsmittelP extends FHCAPI_Controller
 {
 	public function __construct()
 	{
@@ -35,21 +35,17 @@ class Betriebsmittel extends FHCAPI_Controller
 
 	public function getAllBetriebsmittel($type_id, $id)
 	{
-
 		$result = $this->BetriebsmittelpersonModel->getBetriebsmittelData($id, $type_id);
 
-		if (isError($result))
-		{
+		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 
 		$this->terminateWithSuccess((getData($result) ?: []));
 	}
 
-	public function addNewBetriebsmittel()
+	public function addNewBetriebsmittel($person_id)
 	{
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
 		$this->form_validation->set_rules('kaution', 'Kaution', 'numeric', [
 			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Kaution'])
 		]);
@@ -62,9 +58,7 @@ class Betriebsmittel extends FHCAPI_Controller
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Ausgegeben am'])
 		]);
 
-
-		if ($this->form_validation->run() == false)
-		{
+		if ($this->form_validation->run() == false) {
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
@@ -78,38 +72,31 @@ class Betriebsmittel extends FHCAPI_Controller
 		$anmerkung = $this->input->post('anmerkung');
 		$ausgegebenam = $this->input->post('ausgegebenam');
 		$retouram = $this->input->post('retouram');
-		$person_id = $this->input->post('person_id');
 		$uid = $this->input->post('uid');
 
-		if($inventarData)
-		{
+		if ($inventarData) {
 			$betriebsmitteltyp = $inventarData['betriebsmitteltyp'];
 			$betriebsmittel_id = $inventarData['betriebsmittel_id'];
 		}
 
-		if($betriebsmitteltyp == 'Zutrittskarte' && !$nummer)
-		{
+		if ($betriebsmitteltyp == 'Zutrittskarte' && !$nummer) {
 			return $this->terminateWithError($this->p->t('wawi', 'error_zutrittskarteOhneNummer'), self::ERROR_TYPE_GENERAL);
 		}
 
-		if($retouram && $retouram < $ausgegebenam)
-		{
+		if ($retouram && $retouram < $ausgegebenam) {
 			return $this->terminateWithError($this->p->t('wawi', 'error_retourdatumVorAusgabe'), self::ERROR_TYPE_GENERAL);
 		}
 
-		if($betriebsmitteltyp == "Inventar" && !($inventarData['inventarnummer']))
-		{
+		if ($betriebsmitteltyp == "Inventar" && !($inventarData['inventarnummer'])) {
 			return $this->terminateWithError($this->p->t('wawi', 'error_inventarWaehlen'), self::ERROR_TYPE_GENERAL);
 		}
-
 
 		// Start DB transaction
 		$this->db->trans_begin();
 
 		$betriebsmitteltyp = utf8_decode($betriebsmitteltyp);
 
-		if(!$inventarData)
-		{
+		if (!$inventarData) {
 			$result = $this->BetriebsmittelModel->insert(
 				[
 					'betriebsmitteltyp' => $betriebsmitteltyp,
@@ -121,8 +108,7 @@ class Betriebsmittel extends FHCAPI_Controller
 					'insertamum' => date('c')
 				]
 			);
-			if($this->db->trans_status() === false || isError($result))
-			{
+			if ($this->db->trans_status() === false || isError($result)) {
 				$this->db->trans_rollback();
 				return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 			}
@@ -143,8 +129,7 @@ class Betriebsmittel extends FHCAPI_Controller
 			]
 		);
 
-		if($this->db->trans_status() === false || isError($result))
-		{
+		if ($this->db->trans_status() === false || isError($result)) {
 			$this->db->trans_rollback();
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
@@ -153,14 +138,10 @@ class Betriebsmittel extends FHCAPI_Controller
 		return $this->terminateWithSuccess(true);
 	}
 
-	public function updateBetriebsmittel()
+	public function updateBetriebsmittel($betriebsmittelperson_id)
 	{
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
 		$uid_user = getAuthUID();
-
 		$betriebsmittel_id = $this->input->post('betriebsmittel_id');
-		$betriebsmittelperson_id = $this->input->post('betriebsmittelperson_id');
 		$betriebsmitteltyp = $this->input->post('betriebsmitteltyp');
 		$nummer = $this->input->post('nummer');
 		$nummer2 = $this->input->post('nummer2');
@@ -185,18 +166,15 @@ class Betriebsmittel extends FHCAPI_Controller
 		]);
 
 
-		if ($this->form_validation->run() == false)
-		{
+		if ($this->form_validation->run() == false) {
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
-		if($betriebsmitteltyp == 'Zutrittskarte' && !$nummer)
-		{
+		if ($betriebsmitteltyp == 'Zutrittskarte' && !$nummer) {
 			return $this->terminateWithError($this->p->t('wawi', 'error_zutrittskarteOhneNummer'), self::ERROR_TYPE_GENERAL);
 		}
 
-		if($retouram && $retouram < $ausgegebenam)
-		{
+		if ($retouram && $retouram < $ausgegebenam) {
 			return $this->terminateWithError($this->p->t('wawi', 'error_retourdatumVorAusgabe'), self::ERROR_TYPE_GENERAL);
 		}
 
@@ -221,8 +199,7 @@ class Betriebsmittel extends FHCAPI_Controller
 			]
 		);
 
-		if($this->db->trans_status() === false || isError($result))
-		{
+		if ($this->db->trans_status() === false || isError($result)) {
 			$this->db->trans_rollback();
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
@@ -241,8 +218,7 @@ class Betriebsmittel extends FHCAPI_Controller
 				'updateamum' => date('c')
 			]
 		);
-		if($this->db->trans_status() === false || isError($result))
-		{
+		if ($this->db->trans_status() === false || isError($result)) {
 			$this->db->trans_rollback();
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
@@ -251,46 +227,33 @@ class Betriebsmittel extends FHCAPI_Controller
 		return $this->terminateWithSuccess(true);
 	}
 
-	public function loadBetriebsmittel()
+	public function loadBetriebsmittel($betriebsmittelperson_id)
 	{
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
-		$betriebsmittelperson_id = $this->input->post('betriebsmittelperson_id');
-
 		$result = $this->BetriebsmittelpersonModel->getBetriebsmittelData($betriebsmittelperson_id, 'betriebsmittelperson_id');
 
-		if (isError($result))
-		{
+		if (isError($result)) {
 			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 
-		if (!hasData($result))
-		{
-			$this->terminateWithError("no Betriebsmittelperson with ID found: " . $betriebsmittelperson_id, self::ERROR_TYPE_GENERAL);
+		if (!hasData($result)) {
+			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Betriebsmittelperson_id']), self::ERROR_TYPE_GENERAL);
 		}
 
 		$this->terminateWithSuccess(current(getData($result)));
 	}
 
-	public function deleteBetriebsmittel()
+	public function deleteBetriebsmittel($betriebsmittelperson_id)
 	{
-
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
-		$betriebsmittelperson_id = $this->input->post('betriebsmittelperson_id');
-
 		$result = $this->BetriebsmittelpersonModel->delete(
 			array('betriebsmittelperson_id' => $betriebsmittelperson_id,
-				)
+			)
 		);
 
-		if (isError($result))
-		{
+		if (isError($result)) {
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		if (!hasData($result))
-		{
-			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Betriebsmittelperson_id']), self::ERROR_TYPE_GENERAL);
+		if (!hasData($result)) {
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Betriebsmittelperson_id']), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->outputJsonSuccess(current(getData($result)));
 	}
@@ -302,8 +265,7 @@ class Betriebsmittel extends FHCAPI_Controller
 		$this->BetriebsmitteltypModel->addOrder('beschreibung', 'ASC');
 		$result = $this->BetriebsmitteltypModel->load(); // load All
 
-		if (isError($result))
-		{
+		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess(getData($result) ?: []);

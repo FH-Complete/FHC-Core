@@ -20,15 +20,30 @@ export default {
 			from: 'cisRoot'
 		},
 	},
-	props: [
-		'person_id',
-		'uid'
-	],
+	props: {
+		endpoint: {
+			type: Object,
+			required: true
+		},
+		typeId: String,
+		id: {
+			type: [Number, String],
+			required: true
+		},
+		uid: {
+			type: [Number, String],
+			required: true
+		}
+	},
 	data() {
 		return {
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Betriebsmittel/getAllBetriebsmittel/' + this.uid + '/' + this.person_id,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.endpoint.getAllBetriebsmittel,
+				ajaxParams: {
+					type: this.typeId,
+					id: this.id
+				},
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Nummer", field: "nummer"},
@@ -139,7 +154,7 @@ export default {
 	},
 	watch: {
 		uid() {
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Betriebsmittel/getAllBetriebsmittel/' + this.uid + '/' + this.person_id);
+			this.$refs.table.tabulator.setData(this.endpoint.getAllBetriebsmittel + '/' + this.typeId + '/' + this.id);
 		}
 	},
 	methods: {
@@ -159,28 +174,20 @@ export default {
 			});
 		},
 		addNewBetriebsmittel() {
-			this.param = {
-				'uid':  this.uid,
-				'person_id': this.person_id,
-				...this.formData
-			};
-			this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/addNewBetriebsmittel/',
-				this.param
-			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
+			//just append uid to formdata
+			this.formData.uid = this.uid;
+			return this.endpoint.addNewBetriebsmittel(this.id, this.formData)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.resetModal();
+				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
 				});
 		},
 		deleteBetriebsmittel(betriebsmittelperson_id) {
-			this.param = {
-				'betriebsmittelperson_id': betriebsmittelperson_id
-			};
-			return this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/deleteBetriebsmittel/',
-				this.param)
+			return this.endpoint.deleteBetriebsmittel(betriebsmittelperson_id)
 				.then(
 					result => {
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
@@ -193,15 +200,10 @@ export default {
 					this.reload();
 				});
 		},
-		updateBetriebsmittel() {
-			this.param = {
-				'uid':  this.uid,
-				'person_id': this.person_id,
-				...this.formData
-			};
-			this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/updateBetriebsmittel/',
-				this.param
-			).then(response => {
+		updateBetriebsmittel(betriebsmittelperson_id) {
+			this.formData.uid = this.uid;
+			return this.endpoint.updateBetriebsmittel(betriebsmittelperson_id, this.formData)
+			.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 				this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
@@ -213,11 +215,7 @@ export default {
 		loadBetriebsmittel(betriebsmittelperson_id) {
 			this.resetModal();
 			this.statusNew = false;
-			this.param = {
-				'betriebsmittelperson_id':  betriebsmittelperson_id
-			};
-			return this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/loadBetriebsmittel/',
-				this.param)
+			return this.endpoint.loadBetriebsmittel(betriebsmittelperson_id)
 				.then(result => result.data)
 				.then(result => {
 					this.formData = result;
@@ -226,8 +224,7 @@ export default {
 		},
 		searchInventar(event) {
 			const encodedQuery = encodeURIComponent(event.query);
-			return this.$fhcApi
-				.get('api/frontend/v1/stv/betriebsmittel/loadInventarliste/' + encodedQuery)
+			return this.endpoint.loadInventarliste(encodedQuery)
 				.then(result => {
 					this.filteredInventar = result.data.retval;
 				});
@@ -257,8 +254,7 @@ export default {
 		}
 	},
 	created(){
-		this.$fhcApi
-			.get('api/frontend/v1/stv/betriebsmittel/getTypenBetriebsmittel')
+		return this.endpoint.getTypenBetriebsmittel()
 			.then(result => result.data)
 			.then(result => {
 				this.listBetriebsmitteltyp = result;
@@ -299,8 +295,6 @@ export default {
 				</core-filter-cmpt>
 			
 			</div>
-			
-
 			
 			<form-form class="row g-3 col-6" ref="betriebsmittelData">
 				<legend>Details</legend>
@@ -445,7 +439,7 @@ export default {
 						<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
 					</div>
 					<div v-else class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-primary" @click="updateBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
+						<button ref="Close" type="button" class="btn btn-primary" @click="updateBetriebsmittel(formData.betriebsmittelperson_id)">{{$p.t('ui', 'speichern')}}</button>
 					</div>
 					
 				</div>

@@ -10,8 +10,10 @@ export default {
 	template: `
 	<div class="stv-details-betriebsmittel h-100 pb-3">
 		<core-betriebsmittel
+			:endpoint="$fhcApi.factory.betriebsmittel.person"
 			ref="formc"
-			:person_id="modelValue.person_id"
+			type-id="person_id"
+			:id="modelValue.person_id"
 			:uid="modelValue.uid"
 			>
 		</core-betriebsmittel>	

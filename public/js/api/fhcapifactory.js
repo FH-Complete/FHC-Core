@@ -22,6 +22,7 @@ import filter from "./filter.js";
 import studstatus from "./studstatus.js";
 import stv from "./stv.js";
 import notiz from "./notiz.js";
+import betriebsmittel from "./betriebsmittel.js";
 
 export default {
     search,
@@ -30,5 +31,6 @@ export default {
     filter,
     studstatus,
     stv,
-    notiz
+    notiz,
+    betriebsmittel
 };
