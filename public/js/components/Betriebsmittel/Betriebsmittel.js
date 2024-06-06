@@ -266,7 +266,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-	<div class="core-betriebsmittel">
+	<div class="core-betriebsmittel h-100 d-flex flex-column">
 		
 		<!--Modal: deleteBetriebsmittelModal-->
 		<BsModal ref="deleteBetriebsmittelModal">
@@ -277,169 +277,159 @@ export default {
 			</template>
 		</BsModal>
 		
-		<div class="row col-12">	
-			<core-filter-cmpt
-				ref="table"
-				:tabulator-options="tabulatorOptions"
-				:tabulator-events="tabulatorEvents"
-				table-only
-				:side-menu="false"
-				reload
-				new-btn-show
-				new-btn-label="Betriebsmittel"
-				@click:new="actionNewBetriebsmittel"
-				>
-			</core-filter-cmpt>		
-			
-			<!--Modal: betriebsmittelModal-->
-			<bs-modal ref="betriebsmittelModal">
-				<template #title>
-					<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('ui', 'add_betriebsmittel')}}</p>
-					<p v-else class="fw-bold mt-3">{{$p.t('ui', 'edit_betriebsmittel')}}</p>
-				</template>
-			
-				<form-form class="row g-3" ref="betriebsmittelData">		
-					<legend>Details</legend>
-						
-						<div class="row mb-3">
-							<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
-							<div class="col-sm-6">
-								<form-input
-								type="select"
-								name="typ"
-								v-model="formData.betriebsmitteltyp"
-								:disabled="!statusNew"
-								>
-								<option
-									v-for="entry in listBetriebsmitteltyp"
-									:key="entry.betriebsmitteltyp"
-									:value="entry.betriebsmitteltyp"
-									>
-									{{entry.beschreibung}}
-								</option>
-								</form-input>
-							</div>
-						</div>
+		<core-filter-cmpt
+			ref="table"
+			:tabulator-options="tabulatorOptions"
+			:tabulator-events="tabulatorEvents"
+			table-only
+			:side-menu="false"
+			reload
+			new-btn-show
+			new-btn-label="Betriebsmittel"
+			@click:new="actionNewBetriebsmittel"
+			>
+		</core-filter-cmpt>		
+		
+		<!--Modal: betriebsmittelModal-->
+		<bs-modal ref="betriebsmittelModal">
+			<template #title>
+				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('ui', 'add_betriebsmittel')}}</p>
+				<p v-else class="fw-bold mt-3">{{$p.t('ui', 'edit_betriebsmittel')}}</p>
+			</template>
+		
+			<form-form class="row g-3" ref="betriebsmittelData">		
+				<legend>Details</legend>
 					
-						<div v-if="formData.betriebsmitteltyp == 'Inventar'" class="row mb-3">
-							<label for="inventarnummer" class="form-label col-sm-4">{{$p.t('wawi', 'inventarnummer')}}</label>
-							<div class="col-sm-6">
-								<PvAutoComplete v-model="formData['inventarData']" optionLabel="dropdowntext" :suggestions="filteredInventar" @complete="searchInventar" minLength="3"/>
-							</div>
-						</div>
-						<div v-else-if="formData.inventarnummer" class="row mb-3">
-						<label for="inventarnummer" class="form-label col-sm-4">{{$p.t('wawi', 'inventarnummer')}}</label>
-							<div class="col-sm-6">
-								<input type="text" class="form-control" id="inventarnummer" v-model="formData.inventarnummer" :disabled="!statusNew">
-							</div>
-						</div>
-						
-						<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
-							<label for="nummer" class="form-label col-sm-4">{{$p.t('wawi', 'nummer')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="text"
-									name="nummer"
-									v-model="formData['nummer']"
-								>
-								</form-input>
-							</div>
-						</div>
-						
-						<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
-							<label for="nummer2" class="form-label col-sm-4">{{$p.t('wawi', 'nummer')}} 2</label>
-							<div class="col-sm-6">
-								<form-input
-									type="text"
-									name="nummer2"
-									v-model="formData['nummer2']"
-								>
-								</form-input>
-							</div>
-						</div>
-					
-						<div v-if="formData.betriebsmitteltyp!='Inventar'" class="row mb-3">
-							<label for="beschreibung" class="form-label col-sm-4">{{$p.t('global', 'beschreibung')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="textarea"
-									name="beschreibung"
-									v-model="formData['beschreibung']"
-									:disabled="formData.inventarnummer"
-								>
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="kaution" class="form-label col-sm-4">{{$p.t('infocenter', 'kaution')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="text"
-									name="kaution"
-									v-model="formData['kaution']"
-								>
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="textarea"
-									name="anmerkung"
-									v-model="formData['anmerkung']"
-								>
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="ausgegebenam" class="form-label col-sm-4">{{$p.t('wawi', 'ausgegebenam')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="DatePicker"
-									name="datum"
-									v-model="formData['ausgegebenam']"
-									auto-apply
-									:enable-time-picker="false"
-									format="dd.MM.yyyy"
-									preview-format="dd.MM.yyyy"
-									:teleport="true"
-								></form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="retouram" class="form-label col-sm-4">{{$p.t('wawi', 'retouram')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="DatePicker"
-									name="datum"
-									v-model="formData['retouram']"
-									auto-apply
-									:enable-time-picker="false"
-									format="dd.MM.yyyy"
-									preview-format="dd.MM.yyyy"
-									:teleport="true"
-								></form-input>
-							</div>
-						</div>
-					</form-form>
-					
-					<template #footer>
-						<div v-if="statusNew" class="col-sm-4">
-							<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
-						</div>
-						<div v-else class="col-sm-4">
-							<button ref="Close" type="button" class="btn btn-primary" @click="updateBetriebsmittel(formData.betriebsmittelperson_id)">{{$p.t('ui', 'speichern')}}</button>
-						</div>
-					</template>
-						
-			</bs-modal>
+					<div class="row mb-3">
+						<form-input
+						type="select"
+						:label="$p.t('global/typ')"
+						name="typ"
+						v-model="formData.betriebsmitteltyp"
+						:disabled="!statusNew"
+						>
+						<option
+							v-for="entry in listBetriebsmitteltyp"
+							:key="entry.betriebsmitteltyp"
+							:value="entry.betriebsmitteltyp"
+							>
+							{{entry.beschreibung}}
+						</option>
+						</form-input>
+					</div>
 				
-		</div>	
+					<div v-if="formData.betriebsmitteltyp == 'Inventar'" class="row mb-3">
+						<form-input
+							type="autocomplete"
+							:label="$p.t('wawi/inventarnummer')"
+							name="inventarnummer"
+							v-model="formData.inventarData"
+							optionLabel="dropdowntext" 
+							:suggestions="filteredInventar" 
+							@complete="searchInventar" 
+							minLength="3"
+						>
+						</form-input>
+					</div>
+					<div v-else-if="formData.inventarnummer" class="row mb-3">
+						<form-input
+							type="text"
+							:label="$p.t('wawi/inventarnummer')"
+							name="inventarnummer"
+							v-model="formData.inventarnummer"
+							:disabled="!statusNew"
+						>
+						</form-input>
+					</div>
+					
+					<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
+						<form-input
+							type="text"
+							:label="$p.t('wawi/nummer')"
+							name="nummer"
+							v-model="formData['nummer']"
+						>
+						</form-input>
+					</div>
+					
+					<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
+						<form-input
+							type="text"
+							:label="$p.t('wawi/nummer') + ' 2'"
+							name="nummer2"
+							v-model="formData['nummer2']"
+						>
+						</form-input>
+					</div>
+				
+					<div v-if="formData.betriebsmitteltyp!='Inventar'" class="row mb-3">
+						<form-input
+							type="textarea"
+							:label="$p.t('global/beschreibung')"
+							name="beschreibung"
+							v-model="formData['beschreibung']"
+							:disabled="formData.inventarnummer"
+						>
+						</form-input>
+					</div>
+					
+					<div class="row mb-3">
+						<form-input
+							type="text"
+							:label="$p.t('infocenter/kaution')"
+							name="kaution"
+							v-model="formData['kaution']"
+						>
+						</form-input>
+					</div>
+					
+					<div class="row mb-3">
+						<form-input
+							type="textarea"
+							:label="$p.t('global/anmerkung')"
+							name="anmerkung"
+							v-model="formData['anmerkung']"
+						>
+						</form-input>
+					</div>
+					
+					<div class="row mb-3">
+						<form-input
+							type="DatePicker"
+							:label="$p.t('wawi/ausgegebenam')"
+							name="datum"
+							v-model="formData['ausgegebenam']"
+							auto-apply
+							:enable-time-picker="false"
+							format="dd.MM.yyyy"
+							preview-format="dd.MM.yyyy"
+							:teleport="true"
+						></form-input>
+					</div>
+					
+					<div class="row mb-3">
+						<form-input
+							type="DatePicker"
+							:label="$p.t('wawi/retouram')"
+							name="datum"
+							v-model="formData['retouram']"
+							auto-apply
+							:enable-time-picker="false"
+							format="dd.MM.yyyy"
+							preview-format="dd.MM.yyyy"
+							:teleport="true"
+						></form-input>
+					</div>
+				</form-form>
+				
+				<template #footer>
+					<button v-if="statusNew"  ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
+
+					<button v-else  ref="Close" type="button" class="btn btn-primary" @click="updateBetriebsmittel(formData.betriebsmittelperson_id)">{{$p.t('ui', 'speichern')}}</button>
+				</template>
+					
+		</bs-modal>
+				
 	</div>`
 }
 
