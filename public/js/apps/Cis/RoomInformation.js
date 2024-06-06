@@ -19,8 +19,13 @@ const app = Vue.createApp({
         },
     },
     methods:{
-        calendarDate_to_UTC_date: function(calendarDate){
-            return [calendarDate.y, calendarDate.m, calendarDate.d].join('-');    
+        // returns the string YYYY-MM-DD if param is instance of CalendarDate and null otherwise
+        calendarDateToString: function(calendarDate){
+            
+            return calendarDate instanceof CalendarDate? 
+            [calendarDate.y, calendarDate.m+1, calendarDate.d].join('-'):
+            null; 
+            
         }
     },
 	created() {
@@ -31,18 +36,10 @@ const app = Vue.createApp({
 			});
 
 
-            console.log(this.calendarDate_to_UTC_date(this.calendarWeek.firstDayOfWeek),"this is the converted calendar date")
+            console.log(this.calendarDateToString(this.calendarWeek.cdFirstDayOfWeek),"this is the converted calendar date")
 
-            /* console.log(this.convertDateToUtcDate(this.calendarWeek.firstDayOfWeek), "iso string here")
-
-            console.log(this.calendarWeek.cdFirstDayOfWeek.y,"this is the year of the first day of the week");
-            console.log(this.calendarWeek.cdFirstDayOfWeek.m,"this is the month of the first day of the week");
-            console.log(this.calendarWeek.cdFirstDayOfWeek.d,"this is the day of the first day of the week");
-
-            console.log(this.calendarWeek.firstDayOfWeek,"this is the first day of the week");
-            console.log(this.convertDateToUtcDate(this.calendarWeek.firstDayOfWeek), "this is the UTC date")
- */
-            this.$fhcApi.factory.stundenplan.getRoomInfo('EDV_A6.09', this.calendarWeek.firstDayOfWeek, this.calendarWeek.lastDayOfWeek).then(res =>{
+           
+            this.$fhcApi.factory.stundenplan.getRoomInfo('EDV_A6.09', this.calendarDateToString(this.calendarWeek.cdFirstDayOfWeek), this.calendarDateToString(this.calendarWeek.cdLastDayOfWeek)).then(res =>{
                 let events;
                 if (res.data && res.data.forEach) {
                     res.data.forEach((el, i) => {

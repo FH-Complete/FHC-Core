@@ -66,15 +66,5 @@ class Stundenplan extends Auth_Controller
 		$this->outputJsonSuccess(getData($result));
 	}
 
-	public function RoomInformation()
-	{
-		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
-		
-		$result = $this->StundenplanModel->getRoomDataOnDay('EDV_A2.06','2024-05-21');
-		$result = hasData($result) ? getData($result) : [];
-		//echo($this->db->last_query());
-		echo json_encode($result);
-		
-	}
 
 }
