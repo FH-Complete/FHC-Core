@@ -7,7 +7,7 @@ require_once('PlausiChecker.php');
 /**
  *
  */
-class BeginndatumVorBismeldung extends PlausiChecker
+class OrgformBewerberUngleichorgformStudent extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
@@ -21,7 +21,7 @@ class BeginndatumVorBismeldung extends PlausiChecker
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->getBeginndatumVorBismeldung(
+		$prestudentRes = $this->getOrgformBewerberUngleichorgformStudent(
 			$studiensemester_kurzbz,
 			$studiengang_kz,
 			null,
@@ -43,6 +43,7 @@ class BeginndatumVorBismeldung extends PlausiChecker
 					'fehlertext_params' => array(
 						'prestudent_id' => $prestudent->prestudent_id,
 						'studiensemester_kurzbz' => $prestudent->studiensemester_kurzbz,
+						'bewerber_studiensemester_kurzbz' => $prestudent->bewerber_studiensemester_kurzbz
 					),
 					'resolution_params' => array(
 						'prestudent_id' => $prestudent->prestudent_id,
@@ -57,50 +58,78 @@ class BeginndatumVorBismeldung extends PlausiChecker
 	}
 
 	/**
-	 * Beginndatum shouldn't be before Bismeldedatum if the Bismeldedatum has already  been reached.
+	 * Orgform of Bewerber should be same as of student (Orgform of Status AND Studienplan)
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getBeginndatumVorBismeldung(
+	public function getOrgformBewerberUngleichorgformStudent(
 		$studiensemester_kurzbz,
 		$studiengang_kz = null,
 		$prestudent_id = null,
 		$exkludierte_studiengang_kz = null
 	) {
-		$this->_ci->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
-
-		$bismeldestichtagRes = $this->_ci->BismeldestichtagModel->getByStudiensemester($studiensemester_kurzbz);
-
-		if (isError($bismeldestichtagRes)) return $bismeldestichtagRes;
-
-		if (!hasData($bismeldestichtagRes)) return success(array());
-
-		$bismeldestichtag = getData($bismeldestichtagRes)[0]->meldestichtag;
-
-		$params = array($bismeldestichtag, $studiensemester_kurzbz, $bismeldestichtag);
+		$params = array();
 
 		$qry = "
 			SELECT
-				prestudent.person_id, prestudent.prestudent_id, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz, status.studiensemester_kurzbz
+				DISTINCT ON (prestudent.prestudent_id) prestudent.person_id, prestudent.prestudent_id, students.studiensemester_kurzbz,
+				bewerber_status.studiensemester_kurzbz AS bewerber_studiensemester_kurzbz, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_prestudent prestudent
-				JOIN public.tbl_prestudentstatus status ON(prestudent.prestudent_id=status.prestudent_id)
-				JOIN public.tbl_person USING(person_id)
-				LEFT JOIN bis.tbl_orgform USING(orgform_kurzbz)
-				JOIN public.tbl_studiengang stg USING(studiengang_kz)
+				JOIN public.tbl_prestudentstatus bewerber_status ON prestudent.prestudent_id = bewerber_status.prestudent_id AND bewerber_status.status_kurzbz = 'Bewerber'
+				JOIN lehre.tbl_studienplan bewerber_studienplan ON bewerber_status.studienplan_id = bewerber_studienplan.studienplan_id
+				JOIN (
+					SELECT
+						DISTINCT ON (prestudent_id) prestudent_id, st.studiensemester_kurzbz,
+						st.orgform_kurzbz, pl.orgform_kurzbz AS studienplan_orgform_kurzbz
+					FROM
+						public.tbl_prestudentstatus st
+						JOIN lehre.tbl_studienplan pl USING (studienplan_id)
+					WHERE
+						status_kurzbz = 'Student'
+					ORDER BY
+						st.prestudent_id, st.datum, st.insertamum, st.ext_id
+				) students ON prestudent.prestudent_id = students.prestudent_id
+				JOIN public.tbl_studiengang stg ON prestudent.studiengang_kz = stg.studiengang_kz
 			WHERE
-				status.datum < ?::date
-				AND status.studiensemester_kurzbz = ?
-				AND status.insertamum > ?::date + interval '1' day
+				prestudent.bismelden
 				AND stg.melderelevant
-				AND prestudent.bismelden";
+				AND (
+					bewerber_status.orgform_kurzbz <> students.orgform_kurzbz
+					OR bewerber_studienplan.orgform_kurzbz <> students.studienplan_orgform_kurzbz
+				)";
+
+		if (isset($studiensemester_kurzbz))
+		{
+			$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+			$prevStudiensemesterRes = $this->_ci->StudiensemesterModel->getPreviousFrom($studiensemester_kurzbz);
+
+			if (isError($prevStudiensemesterRes)) return $prevStudiensemesterRes;
+
+			$semesterArr = array($studiensemester_kurzbz);
+
+			if (hasData($prevStudiensemesterRes))
+			{
+				// if Studiensemester given, check only if has status in current or previous semester
+				$semesterArr[] = getData($prevStudiensemesterRes)[0]->studiensemester_kurzbz;
+			}
+
+			$qry .= " AND EXISTS (
+						SELECT 1
+						FROM public.tbl_prestudentstatus ps
+						WHERE studiensemester_kurzbz IN ?
+						AND ps.prestudent_id = prestudent.prestudent_id
+					)";
+
+			$params[] = $semesterArr;
+		}
 
 		if (isset($studiengang_kz))
 		{
-			$qry .= " AND stg.studiengang_kz = ?";
+			$qry .= " AND studiengang.studiengang_kz = ?";
 			$params[] = $studiengang_kz;
 		}
 

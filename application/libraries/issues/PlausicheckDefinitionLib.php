@@ -12,6 +12,7 @@ class PlausicheckDefinitionLib
 	private $_fehlerLibMappings = array(
 		'AbbrecherAktiv' => 'AbbrecherAktiv',
 		'AbschlussstatusFehlt' => 'AbschlussstatusFehlt',
+		'AbschlusspruefungOderAbsolventFehlt' => 'AbschlusspruefungOderAbsolventFehlt',
 		'AktSemesterNull' => 'AktSemesterNull',
 		'AktiverStudentOhneStatus' => 'AktiverStudentOhneStatus',
 		'AusbildungssemPrestudentUngleichAusbildungssemStatus' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
@@ -32,10 +33,13 @@ class PlausicheckDefinitionLib
 		'IncomingOrGsFoerderrelevant' => 'IncomingOrGsFoerderrelevant',
 		'InskriptionVorLetzerBismeldung' => 'InskriptionVorLetzerBismeldung',
 		'NationNichtOesterreichAberGemeinde' => 'NationNichtOesterreichAberGemeinde',
+		'OrgformBewerberUngleichOrgformStudent' => 'OrgformBewerberUngleichOrgformStudent',
 		'OrgformStgUngleichOrgformPrestudent' => 'OrgformStgUngleichOrgformPrestudent',
 		'PrestudentMischformOhneOrgform' => 'PrestudentMischformOhneOrgform',
+		'StartsemesterUngleichPersonenkennzeichen' => 'StartsemesterUngleichPersonenkennzeichen',
 		'StgPrestudentUngleichStgStudienplan' => 'StgPrestudentUngleichStgStudienplan',
 		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent',
+		'StudentstatusNachDiplomand' => 'StudentstatusNachDiplomand',
 		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher'
 		//'StudienplanUngueltig' => 'StudienplanUngueltig'
 	);

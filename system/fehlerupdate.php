@@ -303,9 +303,41 @@ $fehlerArr = array(
 	),
 	array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0018',
+		'fehler_kurzbz' => 'StudentstatusNachDiplomand',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Studentstatus nach Diplomandenstatus (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0019',
+		'fehler_kurzbz' => 'OrgformBewerberUngleichOrgformStudent',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Orgform des Bewerbers stimmt nicht mit Orgform des Studenten überein (Status oder Studienplan) (prestudent_id %s, Student Studiensemester %s, Bewerber Studiensemester %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0020',
+		'fehler_kurzbz' => 'StartsemesterUngleichPersonenkennzeichen',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Semester des ersten Studentstatus stimmt nicht mit Personenkennzeichen überein (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0021',
+		'fehler_kurzbz' => 'AbschlusspruefungOderAbsolventFehlt',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Keine Abschlussprüfung vor der Bismeldung oder kein Absolventenstatus vor der Bismeldung (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0022',
 		'fehler_kurzbz' => 'FalscheStatusabfolgeVorStudentstatus',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Falsche Statusabfolge vor Studentstatus (prestudent_id %s, Studiensemester %s)',
+		'fehlertext' => 'Falsche Statusabfolge vor Studentstatus (prestudent_id %s, Studiensemester%s, richtige Abfolge: %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),

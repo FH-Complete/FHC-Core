@@ -9,6 +9,8 @@ require_once('PlausiChecker.php');
  */
 class FalscheStatusabfolgeVorStudentstatus extends PlausiChecker
 {
+	private $_statusAbfolge = array('Interessent', 'Bewerber', 'Aufgenommener', 'Student');
+
 	public function executePlausiCheck($params)
 	{
 		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
@@ -44,11 +46,11 @@ class FalscheStatusabfolgeVorStudentstatus extends PlausiChecker
 					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
 					'fehlertext_params' => array(
 						'prestudent_id' => $prestudent->prestudent_id,
-						'studiensemester_kurzbz' => $prestudent->studiensemester_kurzbz
+						'studiensemester_kurzbz' => $prestudent->studiensemester_kurzbz,
+						'status_abfolge' => implode(', ', $this->_statusAbfolge)
 					),
 					'resolution_params' => array(
-						'prestudent_id' => $prestudent->prestudent_id,
-						'studiensemester_kurzbz' => $prestudent->studiensemester_kurzbz
+						'prestudent_id' => $prestudent->prestudent_id
 					)
 				);
 			}
@@ -59,7 +61,7 @@ class FalscheStatusabfolgeVorStudentstatus extends PlausiChecker
 	}
 
 	/**
-	 * Bewerber should have participated in Reihungstest.
+	 * There should be certain order of status before the student status.
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
@@ -72,7 +74,7 @@ class FalscheStatusabfolgeVorStudentstatus extends PlausiChecker
 		$prestudent_id = null,
 		$exkludierte_studiengang_kz = null
 	) {
-		$params = array();
+		$params = array($this->_statusAbfolge);
 
 		$qry = "
 			SELECT
@@ -95,7 +97,7 @@ class FalscheStatusabfolgeVorStudentstatus extends PlausiChecker
 					LEFT JOIN bis.tbl_orgform USING(orgform_kurzbz)
 					JOIN public.tbl_studiengang stg USING(studiengang_kz)
 				WHERE
-					status.status_kurzbz IN ('Interessent', 'Bewerber', 'Aufgenommener', 'Student')
+					status.status_kurzbz IN ?
 					AND stg.melderelevant
 					AND prestudent.bismelden
 					-- there should be a student already
@@ -110,15 +112,27 @@ class FalscheStatusabfolgeVorStudentstatus extends PlausiChecker
 					)
 			) prestudents
 			WHERE
-			(
-				-- incorrect order
-				(status_kurzbz = 'Interessent' AND prev_status_kurzbz NOT IN ('Interessent') AND prev_status_kurzbz IS NOT NULL)
-				OR (
-					(status_kurzbz <> 'Interessent' AND prev_status_kurzbz IS NULL)
-					OR (status_kurzbz = 'Bewerber' AND prev_status_kurzbz NOT IN ('Bewerber', 'Interessent'))
-					OR (status_kurzbz = 'Aufgenommener' AND prev_status_kurzbz NOT IN ('Aufgenommener', 'Bewerber'))
-					OR (status_kurzbz = 'Student' AND prev_status_kurzbz NOT IN ('Student', 'Aufgenommener'))
-				)
+			(";
+
+		foreach ($this->_statusAbfolge as $idx => $status_kurzbz)
+		{
+			// previous status should be either same status, or previous status, or null in case of first status
+			if ($idx != 0)$qry .= " OR ";
+			$qry .= " (status_kurzbz = ? AND prev_status_kurzbz NOT IN ?";
+			$prev_status_kurzbz = array($status_kurzbz);
+
+			if ($idx == 0)
+				$qry .= " AND prev_status_kurzbz IS NOT NULL";
+			else
+				$prev_status_kurzbz[] = $this->_statusAbfolge[$idx - 1];
+
+			$qry .= ')';
+
+			$params[] = $status_kurzbz;
+			$params[] = $prev_status_kurzbz;
+		}
+
+		$qry .= "
 			)";
 
 		if (isset($studiensemester_kurzbz))
