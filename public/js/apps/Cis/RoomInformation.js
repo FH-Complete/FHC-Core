@@ -10,7 +10,7 @@ const app = Vue.createApp({
 		return {
 			stunden: [],
 			events: null,
-            calendarWeek: new CalendarDate(new Date()),
+            calendarWeek: new CalendarDate(new Date("2024-03-06")),
         }
 	},
     computed:{

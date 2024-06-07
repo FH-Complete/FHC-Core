@@ -84,16 +84,20 @@ class Stundenplan extends FHCAPI_Controller
         $this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 		$this->load->model('ressource/Stunde_model', 'StundeModel');
 
+        
 		$stunden = $this->StundeModel->load();
         if(isError($stunden)){
             $this->terminateWithError(getError($stunden), self::ERROR_TYPE_GENERAL);
         }
         $stunden = getData($stunden);
 
-        $this->loglib->logInfoDB(print_r($stunden,true),"stunden");
-
-
+     
 		$result = $this->StundenplanModel->getRoomDataOnDay($ort_kurzbz,$start_date,$end_date);
+        
+            $this->loglib->logErrorDB(print_r($result,true),"this is an entry of a reservierung");
+        
+        return;
+
 		if(isError($result)){
             $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
         }
@@ -111,6 +115,7 @@ class Stundenplan extends FHCAPI_Controller
         $testEndDate = new DateTime($end_date);
         $count =0;
         $final_events = array();
+        $grouped = array();
         while($testStartDate <= $testEndDate && $count <7){
             $date = $testStartDate->format('Y-m-d');
             //TODO: array filtering for every day and hour could be too time consuming causing slow response
@@ -123,24 +128,16 @@ class Stundenplan extends FHCAPI_Controller
                     return $entry->stunde == $stunde->stunde;
                 });
 
-                // aenderung aller events die am gleichen tag und zur gleichen Stunde gehalten werden
-                foreach($stunden_events as $event_key => $stunden_event){
-                    $this->loglib->logInfoDB(print_r($stunden_event,true),"this is the stunden evnet");
-                    
-                    // lektor bestimmen
-                    if($stunden_event->mitarbeiter_kurzbz == null){
-                        $simml_lektor = $stunden_event->lektor;
-                    }else{
-                        $simml_lektor = $stunden_event->mitarbeiter_kurzbz;
-                    }
+                $lehrverband_array = array();
 
-                    
-
+                
+                // for loop that is just used to fill the lehrverband_array
+                foreach($stunden_events as $key=>$stunden_event){
                     // lehrverband bestimmen
                     if(strlen($stunden_event->gruppe_kurzbz)>0){
                         $lehrverband = $stunden_event->gruppe_kurzbz;
                     }else{
-                        $lehrverband=$stunden_event->stg.'-'.$stunden_event->sem;
+                        $lehrverband=$stunden_event->stg_typ . $stunden_event->stg_kurzbz .'-'.$stunden_event->semester;
                         // checks whether the verband is not null, '' or '0'
                         if($stunden_event->verband !=null && $stunden_event->verband != '0' && $stunden_event->verband != ''){ 
                             $lehrverband.=$stunden_event->verband;
@@ -148,7 +145,24 @@ class Stundenplan extends FHCAPI_Controller
                             $lehrverband.=$stunden_event->gruppe;
                         }
                     }
+                    $lehrverband_array[$key] = $lehrverband;
+                }
+                
+                
+                // aenderung aller events die am gleichen tag und zur gleichen Stunde gehalten werden
+                foreach($stunden_events as $event_key => $stunden_event){
+                    if(isset($grouped[$event_key])){
+                        continue;
+                    }
+                     
+                    // lektor bestimmen
+                    if($stunden_event->mitarbeiter_kurzbz == null){
+                        $simml_lektor = $stunden_event->lektor;
+                    }else{
+                        $simml_lektor = $stunden_event->mitarbeiter_kurzbz;
+                    }
 
+                
                     // lehrfach bestimmen
                     $lehrfach = $stunden_event->lehrfach;
                     if(isset($stunden_event->lehrform)){
@@ -158,26 +172,64 @@ class Stundenplan extends FHCAPI_Controller
                     // GRUPIEREN DER GLEICHEN EVENTS
                     // vergleiche das aktuelle Event mit allen anderen Events die am gleichen Tag und zur gleichen Stunde gehalten werden
                     foreach($stunden_events as $compare_key => $stunden_event_compare){
+                        
                         if($compare_key != $event_key){
-
+                            
+                            // will be used to skip the loop iteration with this index because it was already grouped
+                            $grouped[$compare_key] = 1;
+                            // this if checks if the events can be grouped
                            if ( 
                                 // the unr's have to be equal to be grouped
                                 $stunden_event->unr==$stunden_event_compare->unr && 
                                 // and either the lektor or the ort_kurzbz have to be equal
                                 ($stunden_event->ort_kurzbz==$stunden_event_compare->ort_kurzbz 
                                 || $stunden_event->lektor==$stunden_event_compare->lektor)
+                                // reservierungen muessen auch beachtet werden, wenn der eintrag eine reservierung ist dann koennen die eintraege nicht gruppiert werden
+                                //&& !$stunden_event->reservierung && !$stunden_event_compare->reservierung
+
                            )
                                 {
+
+                                    
+
+                                    // Bezeichnung des Events zusammenfuehren
+                                    // change the event with the $event_key if the compared_event has different properties but is still groupable
+
+                                    //Lektoren
+                                    if(!mb_strstr($stunden_event->lektor,$stunden_event_compare->lektor)){
+                                        $this->loglib->logErrorDB($stunden_event->datum ."-". $stunden_event->stunde,"entered lektor - first if");
+                                        $stunden_events[$event_key]->lektor = $stunden_event->lektor . ' \ ' . $stunden_event_compare->lektor;
+                                        $stunden_events[$event_key]->mitarbeiter_kurzbz = $stunden_event->mitarbeiter_kurzbz . ' \ ' . $stunden_event_compare->mitarbeiter_kurzbz;
+                                    }
+
+                                    //Ort
+                                    if(!mb_strstr($stunden_event->ort_kurzbz,$stunden_event_compare->ort_kurzbz)){
+                                        $this->loglib->logErrorDB($stunden_event->datum ."-". $stunden_event->stunde,"entered ort - second if");
+                                        $stunden_events[$event_key]->ort_kurzbz = $stunden_event->ort_kurzbz . ' \ ' . $stunden_event_compare->ort_kurzbz;
+                                    }
+
+                                    //unset the compared and grouped event
+                                    unset($stunden_events[$compare_key]);
+                                    
+
+                                    //Lehrverband
+                                    if(!mb_strstr($lehrverband_array[$event_key],$lehrverband_array[$compare_key])){
+                                        $this->loglib->logErrorDB($stunden_event->datum ."-". $stunden_event->stunde,"entered gruppe - third if");
+                                        $lehrverband_array[$event_key] .= ' \ ' . $lehrverband_array[$compare_key];
+                                    }
 
                                 }
                         }
                     }
-                    
+
+                    // add the grouped lehrverband entry to the event
+                    $stunden_events[$event_key]->stg = $lehrverband_array[$event_key];
+                    $final_events[] = $stunden_events[$event_key];
 
 
 
                 }
-                if (count($stunden_events) == 1){
+                /* if (count($stunden_events) == 1){
                     $final_events[] = current($stunden_events);
                 }else if(count($stunden_events) > 1){
                     $gruppe = '';
@@ -186,7 +238,7 @@ class Stundenplan extends FHCAPI_Controller
                     }
                     current($stunden_events)->gruppe = $gruppe;
                     $final_events[] = current($stunden_events);
-                }
+                } */
                 //$this->loglib->logInfoDB(print_r($stunden_events,true),"date: " . $date . " - stunde:" .$stunde->stunde);
             }
             /* $this->loglib->logInfoDB(print_r($testStartDate,true),"startdate");
@@ -197,8 +249,7 @@ class Stundenplan extends FHCAPI_Controller
             $count++;
         }     
         
-        $this->loglib->logInfoDB(print_r($final_events,true),"final_events");
-      
+       
         $this->groupTheCalendar($result);
         //php start date
         $phpStartDate = new DateTime($start_date);
