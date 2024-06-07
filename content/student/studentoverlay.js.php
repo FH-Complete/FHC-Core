@@ -2273,7 +2273,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	rt_stufe = dialog.getElementById('student-rolle-menulist-stufe').value;
 	statusgrund_id = dialog.getElementById('student-rolle-menulist-statusgrund').value;
 	bewerbung_abgeschicktamum = dialog.getElementById('student-rolle-datum-bewerbung_abgeschicktamum').value;
-	exceptionValidationBismeldung = dialog.getElementById('student-rolle-bis-exception').value;
+	exceptionValidationBismeldung = dialog.getElementById('student-rolle-bis-exception').checked;
 
 	if(!CheckDatum(datum))
 	{
@@ -4785,7 +4785,7 @@ function StudentNotenMoveFromAntrag()
 
 	var uid = document.getElementById('student-detail-textbox-uid').value;
 	req.add('student_uid', uid);
-	
+
 	var txt = "?";
 	for(var q in req.parms) {
 		txt = txt+'&'+req.parms[q].name+'='+encodeURIComponent(req.parms[q].value);

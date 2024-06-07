@@ -86,19 +86,19 @@ if($prestudent_id!='')
 	$disabled = $bismeldestichtag->checkMeldestichtagErreicht($datum) && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid')
 		? ' disabled="true"'
 		: '';
-    $isStatusBeforeStudent = in_array($status_kurzbz, array('Student','Diplomand','Absovlent','Incoming','Abbrecher','Unterbrecher'))
-        ? false
-        : true;
-    $disabledStudent = $isStatusBeforeStudent
+	$isStatusBeforeStudent = in_array($status_kurzbz, array('Student','Diplomand','Absovlent','Incoming','Abbrecher','Unterbrecher'))
+		? false
+		: true;
+	$disabledStudent = $isStatusBeforeStudent
 		? ' '
 		: ' disabled="true"';
 }
 ?>
 
 <window id="student-rolle-dialog" title="Status"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="StudentRolleInit(<?php echo "'$prestudent_id','$status_kurzbz','$studiensemester_kurzbz','$ausbildungssemester'";?>)"
-        >
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+		onload="StudentRolleInit(<?php echo "'$prestudent_id','$status_kurzbz','$studiensemester_kurzbz','$ausbildungssemester'";?>)"
+		>
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/student/studentrolledialog.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
@@ -110,7 +110,7 @@ if($prestudent_id!='')
 		<label class="warning">Meldestichtag erreicht - ausschließlich Bearbeiten Statusgrund möglich</label>
 	<?php endif; ?>
 	<?php if ($disabled && $isStatusBeforeStudent): ?>
-        <label class="warning">Meldestichtag erreicht - Bearbeiten Ausbildungssemester und Statusgrund möglich</label>
+		<label class="warning">Meldestichtag erreicht - Bearbeiten Ausbildungssemester und Statusgrund möglich</label>
 	<?php endif; ?>
 	<caption label="Details<?php echo ($nachname!=''?" $nachname $vorname":'');?>"/>
 		<grid id="student-rolle-grid-detail" style="margin:4px;" flex="1">
@@ -140,13 +140,13 @@ if($prestudent_id!='')
 				<row>
 					<label value="Studiensemester" control="student-rolle-menulist-studiensemester"/>
 					<menulist id="student-rolle-menulist-studiensemester"
-					          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php?order=desc" flex="1"
-					          ref="http://www.technikum-wien.at/studiensemester/liste"<?php echo $disabled ?> >
+							  datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php?order=desc" flex="1"
+							  ref="http://www.technikum-wien.at/studiensemester/liste"<?php echo $disabled ?> >
 						<template>
 							<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
-								          label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
-								          uri="rdf:*"/>
+										  label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+										  uri="rdf:*"/>
 								</menupopup>
 						</template>
 					</menulist>
@@ -262,28 +262,26 @@ if($prestudent_id!='')
 				<row>
 					<label value="Grund"/>
 					<menulist id="student-rolle-menulist-statusgrund"
-					          datasources="rdf:null" flex="1"
-					          ref="http://www.technikum-wien.at/statusgrund">
+							  datasources="rdf:null" flex="1"
+							  ref="http://www.technikum-wien.at/statusgrund">
 						<template>
 							<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/statusgrund/rdf#statusgrund_id"
-								          label="rdf:http://www.technikum-wien.at/statusgrund/rdf#bezeichnung_mehrsprachig"
-								          uri="rdf:*"/>
+										  label="rdf:http://www.technikum-wien.at/statusgrund/rdf#bezeichnung_mehrsprachig"
+										  uri="rdf:*"/>
 								</menupopup>
 						</template>
 					</menulist>
 				</row>
-				<?php if ($disabled): ?>
-                <row hidden="true">
-                    <label value="exceptionBisValidation" control="student-rolle-bis-exception"/>
-                    <checkbox id="student-rolle-bis-exception" checked="true"/>
-                </row>
-				<?php endif; ?>
+				<row hidden="true">
+					<label value="exceptionBisValidation" control="student-rolle-bis-exception"/>
+					<checkbox id="student-rolle-bis-exception" checked="<?php echo ($disabled) ? 'true' : 'false' ?>"/>
+				</row>
 			</rows>
 	</grid>
 	<hbox>
 		<spacer flex="1" />
-        <button id="student-rolle-button-speichern" oncommand="StudentRolleSpeichern()" label="Speichern"/>
+		<button id="student-rolle-button-speichern" oncommand="StudentRolleSpeichern()" label="Speichern"/>
 	</hbox>
 
 </groupbox>

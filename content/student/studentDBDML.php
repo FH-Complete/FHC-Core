@@ -390,15 +390,23 @@ function isBuchungAllowedToChange($buchung_obj)
  * @return array mit error = true und Fehlerbeschreibung wenn ungültig, andernfalls error = false
  */
 function checkStatusaenderung(
-	$prestudent_id, $status_kurzbz, $new_status_studiensemester, $new_status_datum, $new_status_ausbildungssemester,
+	$prestudent_id, $status_kurzbz,
+	$new_status_studiensemester, $new_status_datum, $new_status_ausbildungssemester, $new_status_orgform_kurzbz, $new_studienplan_id,
 	$old_status_studiensemester = '', $old_status_ausbildungssemester = ''
 )
 {
 	global $db;
+
+	// load stuidenplan orgform
+	$new_studienplan_orgform_kurzbz = '';
+	$studienplan = new studienplan();
+	if ($studienplan->loadStudienplan($new_studienplan_id))
+	{
+		$new_studienplan_orgform_kurzbz = $studienplan->orgform_kurzbz;
+	}
+
 	// Es ist ein neuer Status wenn es kein altes Semester gibt
 	$isNewStatus = $old_status_studiensemester == '' && $old_status_ausbildungssemester == '';
-	// status_kurzbz für Endstatus
-	$endstatusArr = array('Absolvent', 'Abbrecher');
 	// Datum des neuen Status setzen
 	$new_status_datum = new DateTime($new_status_datum);
 
@@ -422,10 +430,16 @@ function checkStatusaenderung(
 	$new_status_semesterstart = new DateTime($studiensemester->start);
 
 	// Alle prestudentstatus nach Datum sortiert
-	$qry = "SELECT status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, sem.start AS studiensemester_start
-			FROM public.tbl_prestudentstatus pss
-			JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
-			WHERE prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER);
+	$qry = "SELECT
+				status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, sem.start AS studiensemester_start,
+				pss.orgform_kurzbz, pl.orgform_kurzbz AS studienplan_orgform_kurzbz, stud.matrikelnr
+			FROM
+				public.tbl_prestudentstatus pss
+				JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
+				JOIN public.tbl_student stud USING (prestudent_id)
+				JOIN lehre.tbl_studienplan pl USING (studienplan_id)
+			WHERE
+				prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER);
 
 	// zu ändernden Status rausfiltern wenn Status bearbeitet wird
 	if (!$isNewStatus)
@@ -461,6 +475,9 @@ function checkStatusaenderung(
 					$new_status->studiensemester_kurzbz = $new_status_studiensemester;
 					$new_status->datum = $new_status_datum;
 					$new_status->ausbildungssemester = $new_status_ausbildungssemester;
+					$new_status->orgform_kurzbz = $new_status_orgform_kurzbz;
+					$new_status->studienplan_orgform_kurzbz = $new_studienplan_orgform_kurzbz;
+					$new_status->matrikelnr = $row->matrikelnr;
 					$statusArr[] = $new_status;
 					$newStatusInserted = true;
 				}
@@ -484,15 +501,27 @@ function checkStatusaenderung(
 			}
 		}
 
+		// status_kurzbz für Endstatus
+		$endstatusArr = array('Absolvent', 'Abbrecher');
+
+		// status_kurzbz Abfolge vor dem Studentstatus
+		$statusAbfolge = array('Interessent', 'Bewerber', 'Aufgenommener');
+
+		// erster Studentstatus
+		$ersterStudent = null;
+
 		// Prüfungen den Prestudentstatus betreffend
 		// Über alle gespeicherten Status gehen und Statusabfolge prüfen
 		for ($i = 0; $i < count($statusArr); $i++)
 		{
+			$next_idx = $i - 1; //absteigend sortiert, nächster Status ist vorheriger Eintrag
+
 			$curr_status = $statusArr[$i];
 			$curr_status_kurzbz = $curr_status->status_kurzbz;
 			$curr_status_ausbildungssemester = $curr_status->ausbildungssemester;
-			$next_idx = $i - 1; //absteigend sortiert, nächster Status ist vorheriger Eintrag
 			$next_status = isset($statusArr[$next_idx]) ? $statusArr[$next_idx] : null;
+
+			if ($curr_status_kurzbz == 'Student') $ersterStudent = $curr_status;
 
 			// Abbrecher- oder Absolventenstatus muss Endstatus sein
 			if (isset($next_status) && in_array($curr_status_kurzbz, $endstatusArr))
@@ -511,7 +540,7 @@ function checkStatusaenderung(
 			{
 				return array(
 					'error' => true,
-					'errormsg' => 'Aufeinanderfolgende Unterbrecher müssen gleiches Ausbildungssemester haben'
+					'errormsg' => 'Aufeinanderfolgende Unterbrecherstatus müssen gleiches Ausbildungssemester haben'
 				);
 			}
 
@@ -523,18 +552,69 @@ function checkStatusaenderung(
 			{
 				return array(
 					'error' => true,
-					'errormsg' => 'Unterbrecher und folgender Abbrecher müssen gleiches Ausbildungssemester haben'
+					'errormsg' => 'Unterbrecherstatus und folgender Abbrecherstatus müssen gleiches Ausbildungssemester haben'
 				);
 			}
 
-			// keine Studenten nach Diplomand Status
-			if (
-				isset($next_status) && $curr_status_kurzbz == 'Diplomand' && $next_status->status_kurzbz == 'Student'
-			)
+			// Vor Studentstatus müssen bestimmte Status vorhanden sein
+			if (isset($next_status) && $next_status->status_kurzbz == 'Student')
+			{
+				$restliche_status_obj = array_slice($statusArr, $i);
+				$restliche_status = array_unique(array_column($restliche_status_obj, 'status_kurzbz'));
+				$status_intersected = array_intersect($restliche_status, $statusAbfolge);
+
+				if ($curr_status_kurzbz == 'Diplomand')
+				{
+					return array(
+						'error' => true,
+						'errormsg' => 'Nach Diplomantenstatus darf kein Studentenstatus mehr eingetragen werden'
+					);
+				}
+
+				if (array_values($status_intersected) != array_values(array_reverse($statusAbfolge)))
+				{
+					return array(
+						'error' => true,
+						'errormsg' => 'Vor dem Studentenstatus müssen folgende Status eingetragen werden: '.implode(', ', $statusAbfolge)
+					);
+				}
+
+			}
+		}
+
+
+		// wenn erster Studentstatus, checken ob Personenkennzeichen passt
+		if (isset($ersterStudent))
+		{
+			$studiensemester = new studiensemester();
+			$studienjahrNumber = $studiensemester->getStudienjahrNumberFromStudiensemester($ersterStudent->studiensemester_kurzbz);
+
+			if ($studienjahrNumber != mb_substr($ersterStudent->matrikelnr, 0, 2))
 			{
 				return array(
 					'error' => true,
-					'errormsg' => 'Nach Diplomantenstatus darf kein Studentenstatus mehr eingetragen werden'
+					'errormsg' => 'Personenkennzeichen passt nicht zu Studiensemester des ersten Studentstatus'
+				);
+			}
+
+			if (!empty(
+					array_filter(
+						$restliche_status_obj,
+						function($s) use($ersterStudent)
+						{
+							return
+								$s->status_kurzbz == 'Bewerber'
+								&& (
+									$s->orgform_kurzbz != $ersterStudent->orgform_kurzbz
+									|| $s->studienplan_orgform_kurzbz != $ersterStudent->studienplan_orgform_kurzbz
+								);
+						}
+					)
+				)
+			) {
+				return array(
+					'error' => true,
+					'errormsg' => 'Erster Studentstatus muss gleiche Organisationsform haben wie Bewerberstatus (Status oder Studienplan Orgform)'
 				);
 			}
 		}
@@ -1005,7 +1085,7 @@ if(!$error)
 									{
 										$return = false;
 										$error = true;
-										$errormsg .= 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht hinzugefügt werden.';
+										$errormsg .= 'Studentstatus mit Datum vor erreichtem Meldestichtag können nicht hinzugefügt werden.';
 										$anzahl_fehler++;
 									}
 
@@ -1014,7 +1094,9 @@ if(!$error)
 										$_POST['status_kurzbz'],
 										$studiensemester,
 										$new_status_datum,
-										$sem
+										$sem,
+										$_POST['orgform_kurzbz'],
+										$_POST['studienplan_id']
 									);
 
 									if (isset($check_statusaenderung_result['error']) && $check_statusaenderung_result['error'] === true)
@@ -1240,7 +1322,7 @@ if(!$error)
 			elseif ($meldestichtag_erreicht && !$erweiterteBerechtigungen && !$rtaufsichtUndStatusAbgewiesen)
 			{
 				$return = false;
-				$errormsg = 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht gelöscht werden.';
+				$errormsg = 'Studentstatus mit Datum vor erreichtem Meldestichtag können nicht gelöscht werden.';
 			}
 			else
 			{
@@ -1551,6 +1633,8 @@ if(!$error)
 							$_POST['studiensemester_kurzbz'],
 							$_POST['datum'],
 							$_POST['ausbildungssemester'],
+							$_POST['orgform_kurzbz'],
+							$_POST['studienplan_id'],
 							$_POST['studiensemester_old'],
 							$_POST['ausbildungssemester_old']
 						);
@@ -1566,11 +1650,11 @@ if(!$error)
 						$bismeldestichtag = new bismeldestichtag();
 						$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['datum']);
 
-						if ($meldestichtag_erreicht === true && !($_POST['exceptionValidationBismeldung']))
+						if ($meldestichtag_erreicht === true && !($_POST['exceptionValidationBismeldung'] == 'true'))
 						{
 							$return = false;
 							$error = true;
-							$errormsg = 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht hinzugefügt werden.';
+							$errormsg = 'Studentstatus mit Datum vor erreichtem Meldestichtag können nicht bearbeitet werden.';
 						}
 					}
 

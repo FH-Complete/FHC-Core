@@ -1157,5 +1157,17 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Holt Studienjahr von Studiensemester (letzte zwei Ziffern), z.B. 24 für WS2024 und SS2025
+	 * @param studiensemester_kurzbz
+	 * @return string Studienjahr Nummer
+	 */
+	public function getStudienjahrNumberFromStudiensemester($studiensemester_kurzbz)
+	{
+		$studienjahrNumber = mb_substr($studiensemester_kurzbz,4,2);
+		if (is_numeric($studienjahrNumber) && mb_substr($studiensemester_kurzbz,0,2)=='SS') $studienjahrNumber -= 1;
+		return $studienjahrNumber;
+	}
 }
 ?>
