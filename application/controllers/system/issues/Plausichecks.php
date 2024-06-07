@@ -184,6 +184,8 @@ class Plausichecks extends Auth_Controller
 			}
 		}
 
+		ksort($fehlerKurzbzCodeMappings);
+
 		return array(
 			'semester' => hasData($studiensemesterRes) ? getData($studiensemesterRes) : array(),
 			'currsemester' => hasData($currSemRes) ? getData($currSemRes) : array(),
