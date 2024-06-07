@@ -81,7 +81,7 @@ class Bismeldestichtag extends Auth_Controller
 			tbl_bismeldestichtag.insertamum, tbl_bismeldestichtag.insertvon, tbl_bismeldestichtag.updateamum, tbl_bismeldestichtag.updatevon'
 		);
 		$this->BismeldestichtagModel->addJoin('public.tbl_studiensemester sem', 'studiensemester_kurzbz', 'LEFT');
-		$this->BismeldestichtagModel->addOrder('semester_start');
+		$this->BismeldestichtagModel->addOrder('semester_start', 'DESC');
 		$this->BismeldestichtagModel->addOrder('meldestichtag', 'DESC');
 		$this->BismeldestichtagModel->addOrder('meldestichtag_id', 'DESC');
 		$this->outputJson($this->BismeldestichtagModel->load());
