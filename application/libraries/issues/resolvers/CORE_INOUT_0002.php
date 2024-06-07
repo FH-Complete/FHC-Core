@@ -1,5 +1,7 @@
 <?php
 
+if (! defined('BASEPATH')) exit('No direct script access allowed');
+
 /**
  * More than one Zweck for incoming
  */
