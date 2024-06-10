@@ -57,7 +57,7 @@ if(!$benutzer->load($uid))
 
 $p = new phrasen(getSprache());
 $db = new basis_db();
-$student = new Profil;
+$student = new student;
 $stundenplan = new stundenplan('stundenplan');
 $anwesenheit = new anwesenheit;
 
