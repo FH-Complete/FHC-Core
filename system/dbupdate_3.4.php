@@ -437,37 +437,37 @@ echo '<H2>Gegenpruefung!</H2>';
 $error=false;
 $sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon' AND schemaname != 'reports' AND schemaname != 'extension';";
 if (!$result=@$db->db_query($sql_query))
-		echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
-	else
-		while ($row=$db->db_fetch_object($result))
+	echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
+else
+	while ($row=$db->db_fetch_object($result))
+	{
+		$fulltablename=$row->schemaname.'.'.$row->tablename;
+		if (!isset($tabellen[$fulltablename]))
 		{
-			$fulltablename=$row->schemaname.'.'.$row->tablename;
-			if (!isset($tabellen[$fulltablename]))
-			{
-				echo 'Tabelle '.$fulltablename.' existiert in der DB, aber nicht in diesem Skript!<BR>';
-				$error=true;
-			}
-			else
-				if (!$result_fields=@$db->db_query("SELECT * FROM $fulltablename LIMIT 1;"))
-					echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
-				else
-					for ($i=0; $i<$db->db_num_fields($result_fields); $i++)
-					{
-						$found=false;
-						$fieldnameDB=$db->db_field_name($result_fields,$i);
-						foreach ($tabellen[$fulltablename] AS $fieldnameARRAY)
-							if ($fieldnameDB==$fieldnameARRAY)
-							{
-								$found=true;
-								break;
-							}
-						if (!$found)
-						{
-							echo 'Attribut '.$fulltablename.'.<strong>'.$fieldnameDB.'</strong> existiert in der DB, aber nicht in diesem Skript!<BR>';
-							$error=true;
-						}
-					}
+			echo 'Tabelle '.$fulltablename.' existiert in der DB, aber nicht in diesem Skript!<BR>';
+			$error=true;
 		}
+		else
+			if (!$result_fields=@$db->db_query("SELECT * FROM $fulltablename LIMIT 1;"))
+				echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
+			else
+				for ($i=0; $i<$db->db_num_fields($result_fields); $i++)
+				{
+					$found=false;
+					$fieldnameDB=$db->db_field_name($result_fields,$i);
+					foreach ($tabellen[$fulltablename] AS $fieldnameARRAY)
+						if ($fieldnameDB==$fieldnameARRAY)
+						{
+							$found=true;
+							break;
+						}
+					if (!$found)
+					{
+						echo 'Attribut '.$fulltablename.'.<strong>'.$fieldnameDB.'</strong> existiert in der DB, aber nicht in diesem Skript!<BR>';
+						$error=true;
+					}
+				}
+	}
 if($error==false)
 	echo '<br>Gegenpruefung fehlerfrei';
 ?>
