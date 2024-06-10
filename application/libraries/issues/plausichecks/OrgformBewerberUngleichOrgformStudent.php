@@ -7,7 +7,7 @@ require_once('PlausiChecker.php');
 /**
  *
  */
-class OrgformBewerberUngleichorgformStudent extends PlausiChecker
+class OrgformBewerberUngleichOrgformStudent extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
@@ -21,7 +21,7 @@ class OrgformBewerberUngleichorgformStudent extends PlausiChecker
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->getOrgformBewerberUngleichorgformStudent(
+		$prestudentRes = $this->getOrgformBewerberUngleichOrgformStudent(
 			$studiensemester_kurzbz,
 			$studiengang_kz,
 			null,
@@ -65,7 +65,7 @@ class OrgformBewerberUngleichorgformStudent extends PlausiChecker
 	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getOrgformBewerberUngleichorgformStudent(
+	public function getOrgformBewerberUngleichOrgformStudent(
 		$studiensemester_kurzbz,
 		$studiengang_kz = null,
 		$prestudent_id = null,
