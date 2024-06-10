@@ -79,12 +79,13 @@ class OrgformBewerberUngleichorgformStudent extends PlausiChecker
 				bewerber_status.studiensemester_kurzbz AS bewerber_studiensemester_kurzbz, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_prestudent prestudent
-				JOIN public.tbl_prestudentstatus bewerber_status ON prestudent.prestudent_id = bewerber_status.prestudent_id AND bewerber_status.status_kurzbz = 'Bewerber'
+				JOIN public.tbl_prestudentstatus bewerber_status
+					ON prestudent.prestudent_id = bewerber_status.prestudent_id AND bewerber_status.status_kurzbz = 'Bewerber'
 				JOIN lehre.tbl_studienplan bewerber_studienplan ON bewerber_status.studienplan_id = bewerber_studienplan.studienplan_id
 				JOIN (
 					SELECT
 						DISTINCT ON (prestudent_id) prestudent_id, st.studiensemester_kurzbz,
-						st.orgform_kurzbz, pl.orgform_kurzbz AS studienplan_orgform_kurzbz
+						pl.orgform_kurzbz AS studienplan_orgform_kurzbz
 					FROM
 						public.tbl_prestudentstatus st
 						JOIN lehre.tbl_studienplan pl USING (studienplan_id)
@@ -97,10 +98,7 @@ class OrgformBewerberUngleichorgformStudent extends PlausiChecker
 			WHERE
 				prestudent.bismelden
 				AND stg.melderelevant
-				AND (
-					bewerber_status.orgform_kurzbz <> students.orgform_kurzbz
-					OR bewerber_studienplan.orgform_kurzbz <> students.studienplan_orgform_kurzbz
-				)";
+				AND bewerber_studienplan.orgform_kurzbz <> students.studienplan_orgform_kurzbz";
 
 		if (isset($studiensemester_kurzbz))
 		{

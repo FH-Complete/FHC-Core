@@ -313,7 +313,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0019',
 		'fehler_kurzbz' => 'OrgformBewerberUngleichOrgformStudent',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Orgform des Bewerbers stimmt nicht mit Orgform des Studenten überein (Status oder Studienplan) (prestudent_id %s, Student Studiensemester %s, Bewerber Studiensemester %s)',
+		'fehlertext' => 'Orgform des Bewerbers (Studienplan) stimmt nicht mit Orgform des ersten Studenten überein (prestudent_id %s, Student Studiensemester %s, Bewerber Studiensemester %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),

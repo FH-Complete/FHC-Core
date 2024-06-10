@@ -391,7 +391,7 @@ function isBuchungAllowedToChange($buchung_obj)
  */
 function checkStatusaenderung(
 	$prestudent_id, $status_kurzbz,
-	$new_status_studiensemester, $new_status_datum, $new_status_ausbildungssemester, $new_status_orgform_kurzbz, $new_studienplan_id,
+	$new_status_studiensemester, $new_status_datum, $new_status_ausbildungssemester, $new_studienplan_id,
 	$old_status_studiensemester = '', $old_status_ausbildungssemester = ''
 )
 {
@@ -432,7 +432,7 @@ function checkStatusaenderung(
 	// Alle prestudentstatus nach Datum sortiert
 	$qry = "SELECT
 				status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, sem.start AS studiensemester_start,
-				pss.orgform_kurzbz, pl.orgform_kurzbz AS studienplan_orgform_kurzbz, stud.matrikelnr
+				pl.orgform_kurzbz AS studienplan_orgform_kurzbz, stud.matrikelnr
 			FROM
 				public.tbl_prestudentstatus pss
 				JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
@@ -475,7 +475,6 @@ function checkStatusaenderung(
 					$new_status->studiensemester_kurzbz = $new_status_studiensemester;
 					$new_status->datum = $new_status_datum;
 					$new_status->ausbildungssemester = $new_status_ausbildungssemester;
-					$new_status->orgform_kurzbz = $new_status_orgform_kurzbz;
 					$new_status->studienplan_orgform_kurzbz = $new_studienplan_orgform_kurzbz;
 					$new_status->matrikelnr = $row->matrikelnr;
 					$statusArr[] = $new_status;
@@ -556,14 +555,14 @@ function checkStatusaenderung(
 				);
 			}
 
-			// Vor Studentstatus müssen bestimmte Status vorhanden sein
 			if (isset($next_status) && $next_status->status_kurzbz == 'Student')
 			{
 				$restliche_status_obj = array_slice($statusArr, $i);
 				$restliche_status = array_unique(array_column($restliche_status_obj, 'status_kurzbz'));
 				$status_intersected = array_intersect($restliche_status, $statusAbfolge);
 
-				if ($curr_status_kurzbz == 'Diplomand')
+				// Vor Studentstatus darf kein Diplomand Status vorhanden sein
+				if (in_array('Diplomand', $restliche_status))
 				{
 					return array(
 						'error' => true,
@@ -571,6 +570,7 @@ function checkStatusaenderung(
 					);
 				}
 
+				// Vor Studentstatus müssen bestimmte Status vorhanden sein
 				if (array_values($status_intersected) != array_values(array_reverse($statusAbfolge)))
 				{
 					return array(
@@ -578,7 +578,6 @@ function checkStatusaenderung(
 						'errormsg' => 'Vor dem Studentenstatus müssen folgende Status eingetragen werden: '.implode(', ', $statusAbfolge)
 					);
 				}
-
 			}
 		}
 
@@ -605,8 +604,7 @@ function checkStatusaenderung(
 							return
 								$s->status_kurzbz == 'Bewerber'
 								&& (
-									$s->orgform_kurzbz != $ersterStudent->orgform_kurzbz
-									|| $s->studienplan_orgform_kurzbz != $ersterStudent->studienplan_orgform_kurzbz
+									$s->studienplan_orgform_kurzbz != $ersterStudent->studienplan_orgform_kurzbz
 								);
 						}
 					)
@@ -614,7 +612,7 @@ function checkStatusaenderung(
 			) {
 				return array(
 					'error' => true,
-					'errormsg' => 'Erster Studentstatus muss gleiche Organisationsform haben wie Bewerberstatus (Status oder Studienplan Orgform)'
+					'errormsg' => 'Erster Studentstatus muss gleiche Organisationsform haben wie Bewerberstatus (Studienplan Orgform)'
 				);
 			}
 		}
@@ -1095,8 +1093,7 @@ if(!$error)
 										$studiensemester,
 										$new_status_datum,
 										$sem,
-										$_POST['orgform_kurzbz'],
-										$_POST['studienplan_id']
+										$_POST['studienplan_id'] ?? ''
 									);
 
 									if (isset($check_statusaenderung_result['error']) && $check_statusaenderung_result['error'] === true)
@@ -1633,7 +1630,6 @@ if(!$error)
 							$_POST['studiensemester_kurzbz'],
 							$_POST['datum'],
 							$_POST['ausbildungssemester'],
-							$_POST['orgform_kurzbz'],
 							$_POST['studienplan_id'],
 							$_POST['studiensemester_old'],
 							$_POST['ausbildungssemester_old']
