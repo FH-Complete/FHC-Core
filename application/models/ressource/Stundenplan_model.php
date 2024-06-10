@@ -32,7 +32,7 @@ class Stundenplan_model extends DB_Model
 		"*/
 
 		$raum_stundenplan= $this->execReadOnlyQuery("
-		SELECT 'stundenplan_eintrag' as eintrags_type, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, semester, verband, gruppe, gruppe_kurzbz, stg_kurzbz, CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) AS stg, CONCAT(lehrfach,'-',lehrform) AS lv_info, * FROM lehre.vw_stundenplan sp
+		SELECT CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) AS stg, CONCAT(lehrfach,'-',lehrform) AS lv_info, * FROM lehre.vw_stundenplan sp
 		WHERE ort_kurzbz = ? AND datum >= ? AND datum <= ? 
 		", [$ort_kurzbz, $start_date, $end_date]);
 

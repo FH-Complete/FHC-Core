@@ -34,7 +34,8 @@ class Stundenplan extends FHCAPI_Controller
 	
 		parent::__construct([
 			'roomInformation' => self::PERM_LOGGED,
-            'Stunden' => self::PERM_LOGGED
+            'Stunden' => self::PERM_LOGGED,
+            'Reservierungen' => self::PERM_LOGGED
 		]);
 
         $this->load->library('LogLib');
@@ -68,12 +69,16 @@ class Stundenplan extends FHCAPI_Controller
 	public function roomInformation()
 	{
 
-        
+        //TODO please split this algorithm into multiple smaller function it is not really mantainable like this
         // storing the get parameter in local variables
         $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
         
+        if(!$ort_kurzbz || !$start_date || !$end_date){
+            $this->terminateWithError("Missing parameters", self::ERROR_TYPE_GENERAL);
+        }
+
         $this->addMeta("test_start_date",$start_date);
 
         $this->addMeta("ort",$ort_kurzbz);
@@ -295,7 +300,6 @@ class Stundenplan extends FHCAPI_Controller
         }     
         
        
-        $this->groupTheCalendar($result);
         //php start date
         $phpStartDate = new DateTime($start_date);
 
@@ -309,9 +313,26 @@ class Stundenplan extends FHCAPI_Controller
 		
 	}
 
-    private function groupTheCalendar($data){
+    public function Reservierungen()
+	{
 
-    }
+        $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
+        $start_date = $this->input->get('start_date', TRUE);
+        $end_date = $this->input->get('end_date', TRUE);
+
+        if(!$ort_kurzbz || !$start_date || !$end_date){
+            $this->terminateWithError("Missing parameters", self::ERROR_TYPE_GENERAL);
+        }
+
+		$this->load->model('ressource/Reservierung_model', 'ReservierungModel');
+
+		$result = $this->ReservierungModel->getRoomReservierungen($ort_kurzbz, $start_date, $end_date);
+
+		if (isError($result))
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+
+		$this->terminateWithSuccess(getData($result));
+	}
 
 }
 

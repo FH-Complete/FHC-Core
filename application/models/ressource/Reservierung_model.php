@@ -12,6 +12,23 @@ class Reservierung_model extends DB_Model
 		$this->pk = 'reservierung_id';
 	}
 
+
+	/**
+	 * @param $uid
+	 * 
+	 * @return stdClass
+	 */
+	public function getRoomReservierungen($ort_kurzbz, $start_date, $end_date)
+	{
+
+		$raum_reservierungen= $this->execReadOnlyQuery("
+		SELECT * FROM lehre.vw_reservierung res
+		WHERE ort_kurzbz = ? AND datum >= ? AND datum <= ? 
+		", [$ort_kurzbz, $start_date, $end_date]);
+
+		return $raum_reservierungen;
+	}
+
 	/**
 	 * @param $uid
 	 * 
