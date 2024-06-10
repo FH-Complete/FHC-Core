@@ -78,7 +78,7 @@ const app = Vue.createApp({
 
                 let reservierungs_events = res.data;
                 console.log(reservierungs_events, " this are the reserverungs event")
-                this.events = [...this.events,...reservierungs_events];
+                this.events = [...(this.events?this.events:[]),...reservierungs_events];
                 
             });
         });
@@ -91,9 +91,9 @@ const app = Vue.createApp({
                 
 
                 <span>{{event.orig.reservierung? event.orig.title :event.orig.lv_info}}</span>	
-                <span v-if="event.orig.reservierung">{{'this is a reservierung'}}</span>
+                <span v-if="event.orig.reservierung">{{event.orig.stg}}</span>
                 <span v-else v-for="(item, index) in event.orig.stg.split('/')" :key="index">{{item}}</span>
-                <span>{{event.orig.reservierung? event.orig.uid : event.orig.lektor}}</span>
+                <span>{{event.orig.reservierung? event.orig.person_kurzbz : event.orig.lektor}}</span>
              
 			</div>
         </fhc-calendar>

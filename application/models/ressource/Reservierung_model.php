@@ -22,8 +22,11 @@ class Reservierung_model extends DB_Model
 	{
 
 		$raum_reservierungen= $this->execReadOnlyQuery("
-		SELECT * FROM lehre.vw_reservierung res
-		WHERE ort_kurzbz = ? AND datum >= ? AND datum <= ? 
+		SELECT res.*, mit.kurzbz as person_kurzbz , CONCAT(studg.typ,studg.kurzbz,'-') as stg
+		FROM lehre.vw_reservierung res
+		JOIN public.tbl_mitarbeiter mit ON mit.mitarbeiter_uid=res.uid
+		JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
+		WHERE res.ort_kurzbz = ? AND datum >= ? AND datum <= ? 
 		", [$ort_kurzbz, $start_date, $end_date]);
 
 		return $raum_reservierungen;

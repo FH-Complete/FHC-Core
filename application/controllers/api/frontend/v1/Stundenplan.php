@@ -316,6 +316,8 @@ class Stundenplan extends FHCAPI_Controller
     public function Reservierungen()
 	{
 
+        //TODO the reservierungen have to be grouped like the stundenplan
+
         $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
