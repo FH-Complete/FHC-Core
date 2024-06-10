@@ -94,9 +94,7 @@ class Stundenplan extends FHCAPI_Controller
      
 		$result = $this->StundenplanModel->getRoomDataOnDay($ort_kurzbz,$start_date,$end_date);
         
-            $this->loglib->logErrorDB(print_r($result,true),"this is an entry of a reservierung");
-        
-        return;
+            
 
 		if(isError($result)){
             $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
@@ -110,6 +108,53 @@ class Stundenplan extends FHCAPI_Controller
         /* foreach($result as $event){
             $this->loglib->logInfoDB($event->datum,"NEW DATE");
         } */
+
+        //TODO: also implement the following algorithm to block the lectures that are together over different stunden
+        /* $blockcontinue=false;
+						if (isset($blocked[$this->std_plan[$i][$j][$idx]->unr]) && $blocked[$this->std_plan[$i][$j][$idx]->unr]>0)
+						{
+							$blocked[$this->std_plan[$i][$j][$idx]->unr]--;
+							$blockcontinue=true;
+						}
+
+						if (!$blockcontinue)
+						{
+							// Blockungen ueber mehrere Stunden erkennen
+
+							$blockflag=false;
+							for ($blockstunden=1;$blockstunden<=$num_rows_stunde;$blockstunden++)
+							{
+								if (isset($this->std_plan[$i][$j+$blockstunden][$idx]) && isset($this->std_plan[$i][$j+$blockstunden][$idx]->stundenplan_id)
+									&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+$blockstunden][$idx]->unr)
+									&& $this->std_plan[$i][$j][$idx]!='0' && $k<($num_rows_stunde-$blockstunden)
+									&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+$blockstunden][$idx]->lektor))
+								{
+
+									if (isset($blocked[$this->std_plan[$i][$j][$idx]->unr]))
+										$blocked[$this->std_plan[$i][$j][$idx]->unr]++;
+									else
+										$blocked[$this->std_plan[$i][$j][$idx]->unr]=1;
+									$row = $this->db_fetch_object($this->stunde, ($k+$blockstunden));
+									$stunden_arr[]=$row->stunde;
+									$end_time=$row->ende;
+									$blockflag=true;
+								}
+								else
+								{
+									if (!$blockflag)
+									{
+										$row = $this->db_fetch_object($this->stunde, $k);
+										$stunden_arr[]=$row->stunde;
+										$end_time=$row->ende;
+										break;
+									}
+									else
+									{
+										break;
+									}
+								}
+							}
+						} */
 
         $testStartDate = new DateTime($start_date);
         $testEndDate = new DateTime($end_date);
@@ -215,7 +260,7 @@ class Stundenplan extends FHCAPI_Controller
                                     //Lehrverband
                                     if(!mb_strstr($lehrverband_array[$event_key],$lehrverband_array[$compare_key])){
                                         $this->loglib->logErrorDB($stunden_event->datum ."-". $stunden_event->stunde,"entered gruppe - third if");
-                                        $lehrverband_array[$event_key] .= ' \ ' . $lehrverband_array[$compare_key];
+                                        $lehrverband_array[$event_key] .= ' / ' . $lehrverband_array[$compare_key];
                                     }
 
                                 }

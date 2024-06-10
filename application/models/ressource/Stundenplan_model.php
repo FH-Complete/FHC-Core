@@ -21,49 +21,22 @@ class Stundenplan_model extends DB_Model
 	public function getRoomDataOnDay($ort_kurzbz='EDV_A2.06',$start_date,$end_date){
 
 
-		//$this->addSelect(['*',"CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) as stg","lektor","CONCAT(lehrfach,'-',lehrform) as lv_info" ]);
-		$result = $this->execReadOnlyQuery("
-		
-		SELECT 'stundenplan_eintrag' as eintrags_type, CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) AS stg, lektor, CONCAT(lehrfach,'-',lehrform) AS lv_info, ort_kurzbz , * FROM lehre.vw_stundenplan sp
+		//TODO alternative query version that unions the reservierungen into the stundenplan with different 'eintrags_type' column
+		/*"
+		-- merging all reservierungs information with the stundenplan information but with different types
+		SELECT 'stundenplan_eintrag' as eintrags_type, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, semester, verband, gruppe, gruppe_kurzbz, stg_kurzbz, CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) AS stg, CONCAT(lehrfach,'-',lehrform) AS lv_info, * FROM lehre.vw_stundenplan sp
 		WHERE ort_kurzbz = ? AND datum >= ? AND datum <= ? 
 		UNION ALL
-		SELECT 'reservierungs_eintrag' as eintrags_type, titel, uid, NULL, ort_kurzbz FROM lehre.vw_reservierung res
+		SELECT 'reservierungs_eintrag' as eintrags_type, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, semester, verband, gruppe, gruppe_kurzbz, stg_kurzbz, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM lehre.vw_reservierung res
 		WHERE ort_kurzbz = ? AND datum >= ? AND datum <= ?
-		
-		", [$ort_kurzbz, $start_date, $end_date,$ort_kurzbz, $start_date, $end_date]);
-		return $result;
+		"*/
 
+		$raum_stundenplan= $this->execReadOnlyQuery("
+		SELECT 'stundenplan_eintrag' as eintrags_type, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, semester, verband, gruppe, gruppe_kurzbz, stg_kurzbz, CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) AS stg, CONCAT(lehrfach,'-',lehrform) AS lv_info, * FROM lehre.vw_stundenplan sp
+		WHERE ort_kurzbz = ? AND datum >= ? AND datum <= ? 
+		", [$ort_kurzbz, $start_date, $end_date]);
 
-		/*
-		"SELECT 'stundenplan_eintrag' as eintrags_type ort_kurzbz studiengang_kz uid stunde datum titel NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL NULL"
-		"SELECT 'reservierungs_eintrag' as eintrags_type, ort_kurzbz studiengang_kz uid stunde datum titel NULL NULL NULL NULL NULL"
-		 
-		 */
-		//to add reservierungen to the query, we have to join the table vw_reservierung to the vw_stundenplan and use the datum/stunde/ort_kurzbz keys
-		
-		
-		/* $this->addSelect(["lehre.tbl_stundenplan.*","CONCAT(UPPER(sg.typ),UPPER(sg.kurzbz),'-',lehre.tbl_stundenplan.semester,lehre.tbl_stundenplan.verband) as simml"]);
-		$this->addJoin("public.tbl_lehrverband as lv","lv.studiengang_kz=lehre.tbl_stundenplan.studiengang_kz AND lv.gruppe=lehre.tbl_stundenplan.gruppe AND lv.verband=lehre.tbl_stundenplan.verband AND lv.semester=lehre.tbl_stundenplan.semester","LEFT"); 
-		$this->addJoin("public.tbl_studiengang as sg","sg.studiengang_kz=lehre.tbl_stundenplan.studiengang_kz","LEFT"); 
-		$res = $this->loadWhere(['ort_kurzbz'=>$ort_kurzbz,'datum'=>$date]);
-		$res = hasData($res) ? getData($res): null;
-		return $res; */
-		$this->db->where('ort_kurzbz',$ort_kurzbz,true);
-		$this->db->where('datum >=',$start_date,true);
-		$this->db->where('datum <=',$end_date,true);
-
-		$query = $this->db->get_compiled_select('lehre.vw_stundenplan sp');
-		
-		$raum_stundenplan= $this->execQuery($query, [$ort_kurzbz, $start_date, $end_date]);
-
-		// reseting the query and query reservierungen information
-		$this->resetQuery();
-		$this->db->where('ort_kurzbz',$ort_kurzbz,true);
-		$this->db->where('datum >=',$start_date,true);
-		$this->db->where('datum <=',$end_date,true);
-		$query = $this->db->get_compiled_select('lehre.vw_reservierung res');
-		return $this->execQuery($query, [$ort_kurzbz, $start_date, $end_date]);
-		
+		return $raum_stundenplan;
 	}
 
 	/**
