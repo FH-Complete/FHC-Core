@@ -98,7 +98,8 @@ class Stundenplan extends FHCAPI_Controller
 
      
 		$result = $this->StundenplanModel->getRoomDataOnDay($ort_kurzbz,$start_date,$end_date);
-        
+        // logging the result of the query
+        //$this->loglib->logErrorDB(print_r($result,true),"this is the result of the query");
             
 
 		if(isError($result)){

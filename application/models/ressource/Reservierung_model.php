@@ -22,7 +22,13 @@ class Reservierung_model extends DB_Model
 	{
 
 		$raum_reservierungen= $this->execReadOnlyQuery("
-		SELECT res.*, mit.kurzbz as person_kurzbz , CONCAT(studg.typ,studg.kurzbz,'-') as stg
+		SELECT res.*, mit.kurzbz as person_kurzbz , 
+		CASE
+			WHEN res.verband IS NOT NULL OR res.semester IS NOT NULL THEN
+				CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',res.verband,res.semester) 
+			ELSE
+				CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz)) 
+		END AS stg
 		FROM lehre.vw_reservierung res
 		JOIN public.tbl_mitarbeiter mit ON mit.mitarbeiter_uid=res.uid
 		JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz

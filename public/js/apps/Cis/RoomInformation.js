@@ -1,7 +1,7 @@
 import FhcCalendar from "../../components/Calendar/Calendar.js";
 import CalendarDate from "../../composables/CalendarDate.js";
 import FhcApi from "../../plugin/FhcApi.js";
-
+import Phrasen from "../../plugin/Phrasen.js";
 const app = Vue.createApp({
 	components: {
 		FhcCalendar
@@ -10,7 +10,9 @@ const app = Vue.createApp({
 		return {
 			stunden: [],
 			events: null,
-            calendarWeek: new CalendarDate(new Date("2024-06-06")),
+            calendarWeek: new CalendarDate(new Date("2024-05-07")),
+            reservierungenLoaded:false,
+            stundenplanLoaded:false,
         }
 	},
     computed:{
@@ -59,14 +61,16 @@ const app = Vue.createApp({
                     });
                     
                     this.events = res.data;
+                    this.stundenplanLoaded = true;
+                    console.log(this.events,"this are the events")
                 }
             });
 
-            this.$fhcApi.factory.stundenplan.getReservierungen('SEM_E0.04', this.weekFirstDay, this.weekLastDay).then(res => {
+           /*  this.$fhcApi.factory.stundenplan.getReservierungen('EDV_F4.26', this.weekFirstDay, this.weekLastDay).then(res => {
                 if (res.data && res.data.forEach) {
                     res.data.forEach((el, i) => {
                         el.reservierung = true;
-                        el.color = '#CCCCCC';
+                        el.color = '#' + (el.farbe || 'ffffff');
                         el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
                         el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
                         el.title = el.titel;
@@ -77,29 +81,40 @@ const app = Vue.createApp({
                 }
 
                 let reservierungs_events = res.data;
+
+                // adding the last reservierung twice for testing purposes
+                let last_reservierung=Object.assign({}, reservierungs_events[reservierungs_events.length-1]);
+                last_reservierung.person_kurzbz="drSimml";
+                reservierungs_events.push(last_reservierung);
+
                 console.log(reservierungs_events, " this are the reserverungs event")
                 this.events = [...(this.events?this.events:[]),...reservierungs_events];
-                
-            });
+                this.reservierungenLoaded=true;
+                console.log(reservierungs_events,"this are the reservierungs events")
+            }); */
         });
 
 	},
     template: /*html*/`
     <div>
-        <fhc-calendar v-slot="{event}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
-            <div class="d-flex flex-column align-items-center justify-content-evenly h-100">
-                
-
-                <span>{{event.orig.reservierung? event.orig.title :event.orig.lv_info}}</span>	
-                <span v-if="event.orig.reservierung">{{event.orig.stg}}</span>
-                <span v-else v-for="(item, index) in event.orig.stg.split('/')" :key="index">{{item}}</span>
-                <span>{{event.orig.reservierung? event.orig.person_kurzbz : event.orig.lektor}}</span>
-             
-			</div>
+        <fhc-calendar v-if="stundenplanLoaded || reservierungenLoaded" v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
+           
+           <template v-if="event.orig.eintrags_type != 'reservierungs_eintrag'">
+            <a class="text-decoration-none text-dark" href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'"   >    
+                <div class="d-flex flex-column align-items-center justify-content-evenly h-100" :style="{'background-color':event.orig.color}">
+                    <span>{{event.orig.reservierung? event.orig.title :event.orig.lv_info}}</span>	
+                    <span v-if="event.orig.reservierung">{{event.orig.stg}}</span>
+                    <span v-else v-for="(item, index) in event.orig.stg.split('/')" :key="index">{{item}}</span>
+                    <span>{{event.orig.reservierung? event.orig.person_kurzbz : event.orig.lektor}}</span>
+                </div>
+            </a>
+            </template>
+            <p v-else>this is a reservierung</p>
         </fhc-calendar>
     </div>
     `,
 });
 app.config.unwrapInjectedRef = true;
 app.use(FhcApi);
+app.use(Phrasen);
 app.mount('#content');

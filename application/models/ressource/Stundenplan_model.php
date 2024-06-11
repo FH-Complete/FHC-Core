@@ -18,23 +18,25 @@ class Stundenplan_model extends DB_Model
 	 * 
 	 * @return stdClass
 	 */
-	public function getRoomDataOnDay($ort_kurzbz='EDV_A2.06',$start_date,$end_date){
+	public function getRoomDataOnDay($ort_kurzbz,$start_date,$end_date){
 
 
-		//TODO alternative query version that unions the reservierungen into the stundenplan with different 'eintrags_type' column
-		/*"
+	
+		/*$raum_stundenplan= $this->execReadOnlyQuery("
 		-- merging all reservierungs information with the stundenplan information but with different types
-		SELECT 'stundenplan_eintrag' as eintrags_type, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, semester, verband, gruppe, gruppe_kurzbz, stg_kurzbz, CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) AS stg, CONCAT(lehrfach,'-',lehrform) AS lv_info, * FROM lehre.vw_stundenplan sp
+		SELECT 'stundenplan_eintrag' as eintrags_type, CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) AS stg, CONCAT(lehrfach,'-',lehrform) AS lv_info, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, semester, verband, gruppe, gruppe_kurzbz, stg_kurzbz, * FROM lehre.vw_stundenplan sp
 		WHERE ort_kurzbz = ? AND datum >= ? AND datum <= ? 
 		UNION ALL
-		SELECT 'reservierungs_eintrag' as eintrags_type, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, semester, verband, gruppe, gruppe_kurzbz, stg_kurzbz, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM lehre.vw_reservierung res
+		SELECT 'reservierungs_eintrag' as eintrags_type, NULL, NULL, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, semester, verband, gruppe, gruppe_kurzbz, stg_kurzbz, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM lehre.vw_reservierung res
 		WHERE ort_kurzbz = ? AND datum >= ? AND datum <= ?
-		"*/
+		", [$ort_kurzbz, $start_date, $end_date,$ort_kurzbz, $start_date, $end_date]);
+		*/
+
 
 		$raum_stundenplan= $this->execReadOnlyQuery("
 		SELECT CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) AS stg, CONCAT(lehrfach,'-',lehrform) AS lv_info, * FROM lehre.vw_stundenplan sp
 		WHERE ort_kurzbz = ? AND datum >= ? AND datum <= ? 
-		", [$ort_kurzbz, $start_date, $end_date]);
+		", [$ort_kurzbz, $start_date, $end_date]); 
 
 		return $raum_stundenplan;
 	}
