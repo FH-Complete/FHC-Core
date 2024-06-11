@@ -372,13 +372,18 @@ class Kontakt extends FHCAPI_Controller
 	public function addNewContact($person_id)
 	{
 		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
-			$this->form_validation->set_rules('kontakt', 'Kontakt', 'valid_email', [
+		{
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required|valid_email', [
+				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Kontakt']),
 				'valid_email' => $this->p->t('ui', 'error_fieldNoValidEmail', ['field' => 'Kontakt'])
 			]);
+		}
 		else
+		{
 			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required', [
 				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Kontakt'])
 			]);
+		}
 
 		if ($this->form_validation->run() == false)
 		{
@@ -426,13 +431,18 @@ class Kontakt extends FHCAPI_Controller
 		}
 
 		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
-			$this->form_validation->set_rules('kontakt', 'Kontakt', 'valid_email', [
+		{
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required|valid_email', [
+				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Kontakt']),
 				'valid_email' => $this->p->t('ui', 'error_fieldNoValidEmail', ['field' => 'Kontakt'])
 			]);
+		}
 		else
+		{
 			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required', [
 				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Kontakt'])
 			]);
+		}
 
 		if ($this->form_validation->run() == false)
 		{
