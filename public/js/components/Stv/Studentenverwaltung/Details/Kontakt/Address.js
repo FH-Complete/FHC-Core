@@ -154,13 +154,7 @@ export default{
 				typ: 'h',
 				nation: 'A'
 			},
-			initData: {
-				zustelladresse: true,
-				heimatadresse: true,
-				rechnungsadresse: false,
-				typ: 'h',
-				nation: 'A'
-			},
+			statusNew: true,
 			places: [],
 			suggestions: {},
 			nations: [],
@@ -192,14 +186,15 @@ export default{
 	methods:{
 		actionNewAdress() {
 			this.resetModal();
-			this.$refs.newAdressModal.show();
+			this.$refs.adressModal.show();
 		},
 		actionEditAdress(adress_id) {
+			this.statusNew = false;
 			this.loadAdress(adress_id).then(() => {
 				if(this.addressData.adresse_id)
 				{
 					this.loadPlaces(this.addressData.plz);
-					this.$refs.editAdressModal.show();
+					this.$refs.adressModal.show();
 
 				}
 			});
@@ -218,7 +213,7 @@ export default{
 				this.addressData
 			).then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-					this.hideModal('newAdressModal');
+					this.hideModal('adressModal');
 					this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -230,6 +225,7 @@ export default{
 			this.$refs.table.reloadTable();
 		},
 		loadAdress(adress_id) {
+			this.statusNew = false;
 			return this.$fhcApi.get('api/frontend/v1/stv/kontakt/loadAddress/' + adress_id)
 				.then(result => {
 						this.addressData = result.data;
@@ -242,7 +238,7 @@ export default{
 				this.addressData
 			).then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-					this.hideModal('editAdressModal');
+					this.hideModal('adressModal');
 					this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 			.finally(() => {
@@ -294,7 +290,20 @@ export default{
 		},
 		resetModal() {
 			this.addressData = {};
-			this.addressData = this.initData;
+
+			this.addressData.strasse = null;
+			this.addressData.zustelladresse = true;
+			this.addressData.heimatadresse = true;
+			this.addressData.rechnungsadresse = false;
+			this.addressData.co_name = null;
+			this.addressData.firma_id = null;
+			this.addressData.name = null;
+			this.addressData.anmerkung = null;
+			this.addressData.typ = 'h';
+			this.addressData.nation = 'A';
+			this.addressData.plz = null;
+
+			this.statusNew = true;
 		},
 	},
 	created() {
@@ -314,139 +323,130 @@ export default{
 	template: `
 	<div class="stv-details-kontakt-address h-100 pt-3">
 		
-		<!--Modal: Add Address-->
-		<bs-modal ref="newAdressModal">
-			<template #title>{{$p.t('person', 'adresse_new')}}</template>
-			<form-form class="row g-3" ref="addressData">
+		<!--Modal: AddressModal-->
+		<bs-modal ref="adressModal">
+			<template #title>
+				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('person', 'adresse_new')}}</p>
+				<p v-else class="fw-bold mt-3">{{$p.t('person', 'adresse_edit')}}</p>
+			</template>
+			<form-form class="row g-3 mt-2" ref="addressData">
 
 				<div class="row mb-3">
-					<label for="adressentyp" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="select"
-							name="adressentyp"
-							v-model="addressData.typ"
+					<form-input
+						type="select"
+						name="adressentyp"
+						:label="$p.t('global/typ')"
+						v-model="addressData.typ"
+						>
+						<option
+							v-for="typ in adressentypen"
+							:key="typ.adressentyp_kurzbz"
+							:value="typ.adressentyp_kurzbz"
 							>
-							<option
-								v-for="typ in adressentypen"
-								:key="typ.adressentyp_kurzbz"
-								:value="typ.adressentyp_kurzbz"
-								>
-								{{typ.bezeichnung}}
-							</option>
-							</form-input>
-						</div>
+							{{typ.bezeichnung}}
+						</option>
+						</form-input>
 					</div>
 					
 					<div class="row mb-3">
-					<label for="strasse" class="form-label col-sm-4">{{$p.t('person', 'strasse')}}</label>
-					<div class="col-sm-6">
 						<form-input
 							type="text"
 							name="strasse"
+							:label="$p.t('person/strasse')"
 							v-model="addressData.strasse"
 						>
 						</form-input>					
-					</div>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="nation" class="form-label col-sm-4">{{$p.t('person', 'nation')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="select"
-							name="nation"
-							v-model="addressData.nation"
+					<form-input
+						type="select"
+						name="nation"
+						:label="$p.t('person/nation')"
+						v-model="addressData.nation"
+						>
+						<option 
+							v-for="nation in nations" 
+							:key="nation.nation_code" 
+							:value="nation.nation_code" 
+							:disabled="nation.sperre"
 							>
-							<option 
-								v-for="nation in nations" 
-								:key="nation.nation_code" 
-								:value="nation.nation_code" 
-								:disabled="nation.sperre"
-								>
-								{{nation.kurztext}}
-							</option>
-							</form-input>
-						</div>
-					</div>
+							{{nation.kurztext}}
+						</option>
+						</form-input>
+				</div>
 													
 				<div class="row mb-3">
-					<label for="plz" class="required form-label col-sm-4" >{{$p.t('person', 'plz')}}<sup>*</sup></label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="plz"
-							v-model="addressData.plz"
-							required
-							@input="loadPlaces"
-						>
-						</form-input>					
-					</div>
+					<form-input
+						type="text"
+						name="plz"
+						:label="$p.t('person/plz') + ' *'"
+						v-model="addressData.plz"
+						required
+						@input="loadPlaces"
+					>
+					</form-input>					
 				</div>
 											
 				<div class="row mb-3">
-					<label for="gemeinde" class="form-label col-sm-4">{{$p.t('person', 'gemeinde')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							v-if="addressData.nation == 'A'"
-							type="select"
-							name="gemeinde"
-							v-model="addressData.gemeinde"
+					<form-input
+						v-if="addressData.nation == 'A'"
+						type="select"
+						name="gemeinde"
+						:label="$p.t('person/gemeinde')"
+						v-model="addressData.gemeinde"
+						>
+						<option v-if="!gemeinden.length" disabled>{{$p.t('ui', 'bittePlzWaehlen')}}</option>
+						<option 
+							v-for="gemeinde in gemeinden" 
+							:key="gemeinde.name" 
+							:value="gemeinde.name"
 							>
-							<option v-if="!gemeinden.length" disabled>{{$p.t('ui', 'bittePlzWaehlen')}}</option>
-							<option 
-								v-for="gemeinde in gemeinden" 
-								:key="gemeinde.name" 
-								:value="gemeinde.name"
-								>
-								{{gemeinde.name}}
-							</option>
-							</form-input>
-							<form-input
-								v-else
-								type="text"
-								name="addressData.gemeinde"
-								v-model="addressData.gemeinde"
-							>	
-							</form-input>
-						</div>
+							{{gemeinde.name}}
+						</option>
+						</form-input>
+						<form-input
+							v-else
+							type="text"
+							name="addressData.gemeinde"
+							v-model="addressData.gemeinde"
+						>	
+						</form-input>
 					</div>
 				
 				<div class="row mb-3">
-					<label for="Ort" class="form-label col-sm-4">{{$p.t('person', 'ort')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							v-if="addressData.nation == 'A'" 
-							type="select"
+					<form-input
+						v-if="addressData.nation == 'A'" 
+						type="select"
+						name="ort"
+						:label="$p.t('person/ort')"
+						v-model="addressData.ort"
+						>
+						<option v-if="!orte.length" disabled>{{$p.t('ui', 'bitteGemeindeWaehlen')}}</option>
+						<option 
+							v-for="ort in orte" 
+							:key="ort.ortschaftsname" 
+							:value="ort.ortschaftsname"
+							>
+							{{ort.ortschaftsname}}
+						</option>
+					</form-input>
+					<form-input
+							v-else
+							type="text"
 							name="ort"
 							v-model="addressData.ort"
-							>
-							<option v-if="!orte.length" disabled>{{$p.t('ui', 'bitteGemeindeWaehlen')}}</option>
-							<option 
-								v-for="ort in orte" 
-								:key="ort.ortschaftsname" 
-								:value="ort.ortschaftsname"
-								>
-								{{ort.ortschaftsname}}
-							</option>
-						</form-input>
-						<form-input
-								v-else
-								type="text"
-								name="ort"
-								v-model="addressData.ort"
-							>	
-						</form-input>
-					</div>
+						>	
+					</form-input>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="heimatadresse" class="form-label col-sm-4">{{$p.t('person', 'heimatadresse')}}</label>
 					<div class="col-sm-4">
 						<form-input
 							container-class="form-check"
 							type="checkbox"
 							name="heimatadresse"
+							:label="$p.t('person/heimatadresse')"
 							v-model="addressData.heimatadresse"
 						>
 						</form-input>
@@ -454,12 +454,12 @@ export default{
 				</div>
 				
 				<div class="row mb-3">
-					<label for="zustelladresse" class="form-label col-sm-4">{{$p.t('person', 'zustelladresse')}}</label>
 					<div class="col-sm-4">
 						<form-input
 							container-class="form-check"
 							type="checkbox"
 							name="zustelladresse"
+							:label="$p.t('person/zustelladresse')"
 							v-model="addressData.zustelladresse"
 						>
 						</form-input>
@@ -467,239 +467,63 @@ export default{
 				</div>
 				
 				<div class="row mb-3">
-					<label for="co_name" class="form-label col-sm-4">{{$p.t('person', 'co_name')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="co_name"
-							v-model="addressData.co_name"
-						>
-						</form-input>
-					</div>
+					<form-input
+						type="text"
+						name="co_name"
+						:label="$p.t('person/co_name')"
+						v-model="addressData.co_name"
+					>
+					</form-input>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="rechnungsadresse" class="form-label col-sm-4">{{$p.t('person', 'rechnungsadresse')}}</label>
 					<div class="col-sm-4">
 						<form-input
 							container-class="form-check"
 							type="checkbox"
 							name="rechnungsadresse"
+							:label="$p.t('person/rechnungsadresse')"
 							v-model="addressData.rechnungsadresse"
 						>
-						</form-input>
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="firma_name" class="form-label col-sm-4">{{$p.t('person', 'firma')}}</label>
-					<div class="col-sm-3">
-						<PvAutoComplete v-model="addressData.firma"  optionLabel="name" :suggestions="filteredFirmen" @complete="search" :min-length="3"/>
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="name" class="form-label col-sm-4">{{$p.t('person', 'firma_zusatz')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="firma_zusatz"
-							v-model="addressData.name"
-						>
-						</form-input>
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
-					<div class="col-sm-6">
-					<form-input
-							type="text"
-							name="anmerkung"
-							v-model="addressData.anmerkung"
-						>
-						</form-input>
-					</div>
-				</div>
-				
-			</form-form>
-			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
-				<button type="button" class="btn btn-primary" @click="addNewAddress()">OK</button>
-            </template>
-		</bs-modal>
-		
-		<!--Modal: Edit Address-->
-		<bs-modal ref="editAdressModal">
-			<template #title>{{$p.t('person', 'adresse_edit')}}</template>
-			<form-form class="row g-3" ref="addressData">
-			
-				<div class="row mb-3">
-					<label for="adressentyp" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="select"
-							name="adressentyp"
-							v-model="addressData.typ"
-							>
-							<option
-								v-for="typ in adressentypen"
-								:key="typ.adressentyp_kurzbz"
-								:value="typ.adressentyp_kurzbz"
-								>
-								{{typ.bezeichnung}}
-							</option>
 						</form-input>
 					</div>
 				</div>
 					
-				<div class="row mb-3">
-					<label for="strasse" class="form-label col-sm-4">{{$p.t('person', 'strasse')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="strasse"
-							v-model="addressData.strasse"
-						>
-						</form-input>					
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="nation" class="form-label col-sm-4">{{$p.t('person', 'nation')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="select"
-							name="nation"
-							v-model="addressData.nation"
-							>
-							<option 
-								v-for="nation in nations" 
-								:key="nation.nation_code" 
-								:value="nation.nation_code" 
-								:disabled="nation.sperre"
-								>
-								{{nation.kurztext}}
-							</option>
-						</form-input>
-					</div>
-				</div>
-							
-				<div class="row mb-3">
-					<label for="plz" class="required form-label col-sm-4" >{{$p.t('person', 'plz')}}<sup>*</sup></label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="plz"
-							v-model="addressData.plz"
-							required
-							@input="loadPlaces"
-						>
-						</form-input>					
-					</div>
-				</div>
-							
-				<div class="row mb-3">
-					<label for="gemeinde" class="form-label col-sm-4">{{$p.t('person', 'gemeinde')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							v-if="addressData.gemeinde"
-							type="select"
-							name="addressData.gemeinde"
-							v-model="addressData.gemeinde"
-							>
-							<option v-if="!gemeinden.length" disabled>{{$p.t('ui', 'bittePlzWaehlen')}}</option>
-							<option 
-								v-for="gemeinde in gemeinden" 
-								:key="gemeinde.name" 
-								:value="gemeinde.name"
-								>
-								{{gemeinde.name}}
-							</option>						
-						</form-input>
-					</div>
-				</div>
-			
-				<div class="row mb-3">
-					<label for="Ort" class="form-label col-sm-4">{{$p.t('person', 'ort')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							v-if="addressData.ort" 
-							type="select"
-							name="ort"
-							v-model="addressData.ort"
-							>
-							<option v-if="!orte.length" disabled>{{$p.t('ui', 'bitteGemeindeWaehlen')}}</option>
-							<option 
-								v-for="ort in orte" 
-								:key="ort.ortschaftsname" 
-								:value="ort.ortschaftsname"
-								>
-								{{ort.ortschaftsname}}
-							</option>
-						</form-input>
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="heimatadresse" class="form-label col-sm-4">{{$p.t('person', 'heimatadresse')}}</label>
-					<div class="col-sm-4">
-						<form-input
-							container-class="form-check"
-							type="checkbox"
-							name="heimatadresse"
-							v-model="addressData.heimatadresse"
-						>
-						</form-input>
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="zustelladresse" class="form-label col-sm-4">{{$p.t('person', 'zustelladresse')}}</label>
-					<div class="col-sm-4">
-						<form-input
-							container-class="form-check"
-							type="checkbox"
-							name="zustelladresse"
-							v-model="addressData.zustelladresse"
-						>
-						</form-input>
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="co_name" class="form-label col-sm-4">{{$p.t('person', 'co_name')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="co_name"
-							v-model="addressData.co_name"
-						>
-						</form-input>
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="rechnungsadresse" class="form-label col-sm-4">{{$p.t('person', 'rechnungsadresse')}}</label>
-					<div class="col-sm-4">
-						<form-input
-							container-class="form-check"
-							type="checkbox"
-							name="rechnungsadresse"
-							v-model="addressData.rechnungsadresse"
-						>
-						</form-input>
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="firma_name" class="form-label col-sm-4">{{$p.t('person', 'firma')}}</label>
-					<div v-if="addressData.firmenname" class="col-sm-6">
-						<input type="text" class="form-control" id="name" v-model="addressData.firmenname">
-					</div>
-					<div v-else class="col-sm-6">
-						<PvAutoComplete v-model="addressData.firma" optionLabel="name" :suggestions="filteredFirmen" @complete="search" :min-length="3"/>
-					</div>
+				<div v-if="statusNew" class="row mb-3">
+					<form-input
+						type="autocomplete"
+						:label="$p.t('person/firma')"
+						name="firma_name"
+						v-model="addressData.firma"  
+						optionLabel="name" 
+						:suggestions="filteredFirmen" 
+						@complete="search" 
+						:min-length="3"
+					>
+					</form-input>
+				</div>				
+					
+				<div v-else class="row mb-3">
+					<form-input
+						v-if="addressData.firmenname" 
+						type="text"
+						name="name"
+						:label="$p.t('person/firma')"
+						v-model="addressData.firmenname"
+					>
+					</form-input>
+					<form-input
+						v-else 
+						type="autocomplete"
+						:label="$p.t('person/firma')"
+						name="firma_name"
+						v-model="addressData.firma"  
+						optionLabel="name" 
+						:suggestions="filteredFirmen" 
+						@complete="search" 
+						:min-length="3"
+					>
+					</form-input>
 				</div>
 				
 				<div class="row mb-3">
@@ -707,33 +531,31 @@ export default{
 				</div>
 				
 				<div class="row mb-3">
-					<label for="name" class="form-label col-sm-4">{{$p.t('person', 'firma_zusatz')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="firma_zusatz"
-							v-model="addressData.name"
-						>
-						</form-input>
-					</div>
+					<form-input
+						type="text"
+						name="firma_zusatz"
+						:label="$p.t('person/firma_zusatz')"
+						v-model="addressData.name"
+					>
+					</form-input>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
-					<div class="col-sm-6">
 					<form-input
 							type="text"
 							name="anmerkung"
+							:label="$p.t('global/anmerkung')"
 							v-model="addressData.anmerkung"
 						>
-						</form-input>
-					</div>
+					</form-input>
 				</div>
 			
 			</form-form>
+			
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
-				<button ref="Close" type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
+				<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewAddress()">OK</button>
+				<button v-else type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>
             </template>
 		</bs-modal>
 		
@@ -745,7 +567,7 @@ export default{
 			</template>
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
-				<button ref="Close" type="button" class="btn btn-primary" @click="deleteAddress(addressData.adresse_id)">OK</button>
+				<button type="button" class="btn btn-primary" @click="deleteAddress(addressData.adresse_id)">OK</button>
 			</template>
 		</bs-modal>
 			

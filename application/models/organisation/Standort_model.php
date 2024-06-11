@@ -28,5 +28,29 @@ class Standort_model extends DB_Model
 
 		return $this->execQuery($qry);
 	}
+
+/*	public function searchStandorteByFirma($filter)
+	{
+		$filter = strtoLower($filter);
+		$qry = "
+			SELECT 
+				s.kurzbz, s.standort_id
+			FROM 
+			    public.tbl_firma f
+			LEFT JOIN 
+			        public.tbl_standort s ON(f.firma_id = s.firma_id)
+			WHERE 
+			    f.firma_id = '". $this->db->escape_like_str($filter)."'";
+
+
+		return $this->execQuery($qry);
+	}*/
+
+	public function getStandorteByFirma($firma_id)
+	{
+		$this->addSelect("DISTINCT ON (standort_id) bezeichnung, standort_id");
+
+		return $this->loadWhere(array("firma_id" => $firma_id));
+	}
 }
 

@@ -26,9 +26,9 @@ class Kontakt extends FHCAPI_Controller
 			'getKontakttypen' => ['admin:r', 'assistenz:r'],
 			'getFirmen' => ['admin:r', 'assistenz:r'],
 			'getStandorte' => ['admin:r', 'assistenz:r'],
+			'getStandorteByFirma' => ['admin:r', 'assistenz:r'],
 			'getKontakte' => ['admin:r', 'assistenz:r'],
-			'getBankverbindung' => ['mitarbeiter/bankdaten:r', 'student/bankdaten:r'],
-
+			'getBankverbindung' => ['mitarbeiter/bankdaten:r', 'student/bankdaten:r']
 		]);
 
 		// Load Libraries
@@ -40,12 +40,17 @@ class Kontakt extends FHCAPI_Controller
 			'ui',
 			'person'
 		]);
+
+		// Load models
+		$this->load->model('person/Adresse_model', 'AdresseModel');
+		$this->load->model('organisation/standort_model', 'StandortModel');
+		$this->load->model('ressource/firma_model', 'FirmaModel');
+		$this->load->model('person/Kontakt_model', 'KontaktModel');
+
 	}
 
 	public function getAdressen($person_id)
 	{
-		$this->load->model('person/Adresse_model', 'AdresseModel');
-
 		$this->AdresseModel->addSelect('public.tbl_adresse.*');
 		$this->AdresseModel->addSelect('t.*');
 		$this->AdresseModel->addSelect('f.firma_id');
@@ -78,8 +83,6 @@ class Kontakt extends FHCAPI_Controller
 		{
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
-
-		$this->load->model('person/Adresse_model', 'AdresseModel');
 
 		$uid = getAuthUID();
 		$co_name = isset($_POST['co_name']) ? $_POST['co_name'] : null;
@@ -154,6 +157,10 @@ class Kontakt extends FHCAPI_Controller
 		if(isset($_POST['firma']))
 		{
 			$firma_id = $_POST['firma']['firma_id'];
+		}
+		elseif(isset($_POST['firma_id']))
+		{
+			$firma_id = $_POST['firma_id'];
 		}
 		else
 			$firma_id = null;
@@ -291,18 +298,27 @@ class Kontakt extends FHCAPI_Controller
 		$this->terminateWithSuccess($result ?: []);
 	}
 
+	public function getStandorteByFirma($firma_id)
+	{
+		$this->load->model('organisation/standort_model', 'StandortModel');
+
+		$result = $this->StandortModel->getStandorteByFirma($firma_id);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
 	public function getKontakte($person_id)
 	{
-		$this->load->model('person/Kontakt_model', 'KontaktModel');
-		$this->load->model('organisation/standort_model', 'StandortModel');
-		$this->KontaktModel->addSelect("*,
+		$this->KontaktModel->addSelect("public.tbl_kontakt.*,
 			TO_CHAR (CASE 
 					WHEN public.tbl_kontakt.updateamum >= public.tbl_kontakt.insertamum 
 					THEN public.tbl_kontakt.updateamum 
 					ELSE public.tbl_kontakt.insertamum 
-				END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate");
+				END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate, st.bezeichnung, f.name");
 		$this->StandortModel->addJoin('public.tbl_standort st', 'ON (public.tbl_kontakt.standort_id = st.standort_id)', 'LEFT');
-
+		$this->FirmaModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = st.firma_id)', 'LEFT');
 		$result = $this->KontaktModel->loadWhere(
 			array('person_id' => $person_id)
 		);
@@ -321,7 +337,9 @@ class Kontakt extends FHCAPI_Controller
 		$result = $this->KontakttypModel->load();
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		} else {
+		}
+		else
+		{
 			$this->terminateWithSuccess(getData($result) ?: []);
 		}
 	}
@@ -330,9 +348,10 @@ class Kontakt extends FHCAPI_Controller
 	{
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
-		$this->KontaktModel->addSelect('public.tbl_kontakt.*');
+		$this->KontaktModel->addSelect('*, public.tbl_kontakt.*');
 		$this->KontaktModel->addSelect('st.kurzbz');
 		$this->KontaktModel->addJoin('public.tbl_standort st', 'ON (public.tbl_kontakt.standort_id = st.standort_id)', 'LEFT');
+		$this->FirmaModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = st.firma_id)', 'LEFT');
 
 		$this->KontaktModel->addLimit(1);
 
@@ -368,19 +387,13 @@ class Kontakt extends FHCAPI_Controller
 
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
-		if(isset($_POST['standort']))
-		{
-			$standort_id = $_POST['standort']['standort_id'];
-		}
-		else
-			$standort_id = null;
-
 		$uid = getAuthUID();
 
 		$kontakttyp = $this->input->post('kontakttyp');
 		$anmerkung = $this->input->post('anmerkung');
 		$kontakt = $this->input->post('kontakt');
 		$ext_id = $this->input->post('ext_id');
+		$standort_id = $this->input->post('standort_id');
 
 		$result = $this->KontaktModel->insert(
 			[
@@ -426,12 +439,12 @@ class Kontakt extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
-		if(isset($_POST['standort']))
+/*		if(isset($_POST['standort']))
 		{
 			$standort_id = $_POST['standort']['standort_id'];
 		}
 		else
-			$standort_id = null;
+			$standort_id = null;*/
 
 		$uid = getAuthUID();
 		$kontakttyp = $this->input->post('kontakttyp');
@@ -439,6 +452,9 @@ class Kontakt extends FHCAPI_Controller
 		$kontakt = $this->input->post('kontakt');
 		$ext_id = $this->input->post('ext_id');
 		$person_id = $this->input->post('person_id');
+		$standort_id = $this->input->post('standort_id');
+
+		//return $this->terminateWithError("in update " . $standort_id, self::ERROR_TYPE_GENERAL);
 
 		$result = $this->KontaktModel->update(
 			[
