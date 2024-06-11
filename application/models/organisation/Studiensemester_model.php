@@ -214,4 +214,31 @@ class Studiensemester_model extends DB_Model
 					
 		return $this->execQuery($query);
 	}
+
+	/**
+	 * Liefert ausgehend von heutigen Datum $plus studiensemester in die Zukunft und $minus Studiensemester in die Vergangenheit
+	 *
+	 * @param integer $plus Optional. Wieviele Studiensemester in die Zukunft sollen ausgegeben werden. Wenn NULL werden alle zukuenftigen geliefert.
+	 * @param integer $minus Optional. Wieviele Studiensemester in die Vergangenheit sollen ausgegeben werden. Wenn NULL werden alle vergangenen geliefert.
+	 *
+	 * @return stdClass
+	 */
+	public function addPlusMinus($plus = null, $minus = null)
+	{
+		$this->addSelect($this->pk);
+		$this->addOrder('ende');
+		if ($plus)
+			$this->addLimit($plus);
+		$this->db->where('start >= NOW()', null, false);
+		$plus = $this->db->get_compiled_select($this->dbTable);
+
+		$this->addSelect($this->pk);
+		$this->addOrder('start', 'DESC');
+		if ($minus)
+			$this->addLimit($minus);
+		$this->db->where('start <= NOW()', null, false);
+		$minus = $this->db->get_compiled_select($this->dbTable);
+		
+		$this->db->where_in($this->pk, '(' . $plus . ') UNION (' . $minus . ')', false);
+	}
 }

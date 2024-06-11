@@ -36,6 +36,7 @@ class Verband extends FHCAPI_Controller
 		// Load Models
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 	}
+	
 	/**
 	 * Remap calls:
 	 * /
@@ -87,7 +88,10 @@ class Verband extends FHCAPI_Controller
 		
 		$this->StudiengangModel->addDistinct();
 		$this->StudiengangModel->addSelect("v.studiengang_kz AS link");
-		$this->StudiengangModel->addSelect("CONCAT(kurzbzlang, ' (', UPPER(CONCAT(typ, kurzbz)), ') - ', tbl_studiengang.bezeichnung) AS name", false);
+		$this->StudiengangModel->addSelect(
+			"CONCAT(kurzbzlang, ' (', UPPER(CONCAT(typ, kurzbz)), ') - ', tbl_studiengang.bezeichnung) AS name",
+			false
+		);
 		$this->StudiengangModel->addSelect('erhalter_kz');
 		$this->StudiengangModel->addSelect('typ');
 		$this->StudiengangModel->addSelect('kurzbz');
@@ -98,31 +102,37 @@ class Verband extends FHCAPI_Controller
 		$this->StudiengangModel->addOrder('typ');
 		$this->StudiengangModel->addOrder('kurzbz');
 
+		$stgs = $this->permissionlib->getSTG_isEntitledFor('admin') ?: [];
+		$stgs = array_merge($stgs, $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: []);
+		if ($stgs)
+			$this->StudiengangModel->db->where_in('studiengang_kz', $stgs);
+
 		$result = $this->StudiengangModel->loadWhere(['v.aktiv' => true]);
 
 		$list = $this->getDataOrTerminateWithError($result);
 
-		$list[] = [
-			'name' => 'International',
-			'link' => 'inout',
-			'children' => [
-				[
-					'name' => 'Incoming',
-					'link' => 'inout/incoming',
-					'leaf' => true
-				],
-				[
-					'name' => 'Outgoing',
-					'link' => 'inout/outgoing',
-					'leaf' => true
-				],
-				[
-					'name' => 'Gemeinsame Studien',
-					'link' => 'inout/gemeinsamestudien',
-					'leaf' => true
+		if ($this->permissionlib->isBerechtigt('inout/uebersicht'))
+			$list[] = [
+				'name' => 'International',
+				'link' => 'inout',
+				'children' => [
+					[
+						'name' => 'Incoming',
+						'link' => 'inout/incoming',
+						'leaf' => true
+					],
+					[
+						'name' => 'Outgoing',
+						'link' => 'inout/outgoing',
+						'leaf' => true
+					],
+					[
+						'name' => 'Gemeinsame Studien',
+						'link' => 'inout/gemeinsamestudien',
+						'leaf' => true
+					]
 				]
-			]
-		];
+			];
 		$this->terminateWithSuccess($list);
 	}
 
@@ -331,13 +341,13 @@ class Verband extends FHCAPI_Controller
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
-		$this->StudiensemesterModel->addOrder('start');
+		$this->load->model('system/Variable_model', 'VariableModel');
+		$result = $this->VariableModel->getVariables(getAuthUID(), ['number_displayed_past_studiensemester']);
+		$data = $this->getDataOrTerminateWithError($result);
+		$number_displayed_past_studiensemester = $data['number_displayed_past_studiensemester'] ?? null;
 
-		/**
-		 * TODO(chris): filter with variable:
-		 * - $number_displayed_past_studiensemester from Variable
-		 * - then: $stsem_obj->getPlusMinus(NULL, $number_displayed_past_studiensemester, 'ende ASC');
-		 */
+		$this->StudiensemesterModel->addPlusMinus(null, $number_displayed_past_studiensemester);
+		$this->StudiensemesterModel->addOrder('ende');
 		$result = $this->StudiensemesterModel->load();
 
 		$studiensemester = $this->getDataOrTerminateWithError($result);
