@@ -486,7 +486,7 @@ class AntragJob extends JOB_Controller
 						$person = current(getData($result));
 						$email = $studiengang->email;
 						$dataMail = array(
-							'prestudent' => 'UID: '$antrag->student_uid . ', PreStudentId' . $antrag->prestudent_id,
+							'prestudent' => 'UID: ' . $antrag->student_uid . ', PreStudentId: ' . $antrag->prestudent_id,
 							'studiensemester' => $antrag->studiensemester_kurzbz,
 							'name' => trim($person->vorname . ' '. $person->nachname),
 						);
