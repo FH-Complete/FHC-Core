@@ -64,10 +64,7 @@ export default {
 					{title:"GeburtsdatumISO", field:"geburtsdatum_iso", visible:false},
 				],
 
-				ajaxResponse: (url, params, response) => {
-					console.log(url, params, response);
-					return response.data;
-				},
+				ajaxResponse: (url, params, response) => response.data,
 
 				layout: 'fitDataStretch',
 				layoutColumnsOnNewData: false,
