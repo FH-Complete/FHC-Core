@@ -10,9 +10,8 @@ const app = Vue.createApp({
 		return {
 			stunden: [],
 			events: null,
-            calendarWeek: new CalendarDate(new Date("2024-05-07")),
-            reservierungenLoaded:false,
-            stundenplanLoaded:false,
+            calendarWeek: new CalendarDate(new Date()),
+            events_loaded:false,
         }
 	},
     computed:{
@@ -46,7 +45,7 @@ const app = Vue.createApp({
 
 
            // old testing room EDV_A6.09
-            this.$fhcApi.factory.stundenplan.getRoomInfo('SEM_E0.04', this.weekFirstDay, this.weekLastDay).then(res =>{
+            this.$fhcApi.factory.stundenplan.getRoomInfo('EDV_F4.26', this.weekFirstDay, this.weekLastDay).then(res =>{
                 let events;
                 if (res.data && res.data.forEach) {
                     res.data.forEach((el, i) => {
@@ -61,55 +60,54 @@ const app = Vue.createApp({
                     });
                     
                     this.events = res.data;
-                    this.stundenplanLoaded = true;
-                    console.log(this.events,"this are the events")
                 }
+
+                this.$fhcApi.factory.stundenplan.getReservierungen('EDV_F4.26', this.weekFirstDay, this.weekLastDay).then(res => {
+                    if (res.data && res.data.forEach) {
+                        res.data.forEach((el, i) => {
+                            el.reservierung = true;
+                            el.color = '#' + (el.farbe || 'ffffff');
+                            el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
+                            el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
+                            el.title = el.titel;
+                            if (el.lehrform)
+                                el.title += '-' + el.lehrform;
+                        });
+                        
+                    }
+    
+                    let reservierungs_events = res.data;
+                    console.log(reservierungs_events,"this are the reservierungs events that are getting from the db query")
+                    this.events = [...(this.events?this.events:[]),...reservierungs_events];
+                    this.events_loaded = true;
+                    
+                }); 
             });
 
-           /*  this.$fhcApi.factory.stundenplan.getReservierungen('EDV_F4.26', this.weekFirstDay, this.weekLastDay).then(res => {
-                if (res.data && res.data.forEach) {
-                    res.data.forEach((el, i) => {
-                        el.reservierung = true;
-                        el.color = '#' + (el.farbe || 'ffffff');
-                        el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-                        el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
-                        el.title = el.titel;
-                        if (el.lehrform)
-                            el.title += '-' + el.lehrform;
-                    });
-                    
-                }
-
-                let reservierungs_events = res.data;
-
-                // adding the last reservierung twice for testing purposes
-                let last_reservierung=Object.assign({}, reservierungs_events[reservierungs_events.length-1]);
-                last_reservierung.person_kurzbz="drSimml";
-                reservierungs_events.push(last_reservierung);
-
-                console.log(reservierungs_events, " this are the reserverungs event")
-                this.events = [...(this.events?this.events:[]),...reservierungs_events];
-                this.reservierungenLoaded=true;
-                console.log(reservierungs_events,"this are the reservierungs events")
-            }); */
+           
         });
 
 	},
     template: /*html*/`
     <div>
-        <fhc-calendar v-if="stundenplanLoaded || reservierungenLoaded" v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
+        <fhc-calendar v-if="events_loaded" v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
            
-           <template v-if="event.orig.eintrags_type != 'reservierungs_eintrag'">
             <a class="text-decoration-none text-dark" href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'"   >    
                 <div class="d-flex flex-column align-items-center justify-content-evenly h-100" :style="{'background-color':event.orig.color}">
-                    <span>{{event.orig.reservierung? event.orig.title :event.orig.lv_info}}</span>	
-                    <span v-if="event.orig.reservierung">{{event.orig.stg}}</span>
-                    <span v-else v-for="(item, index) in event.orig.stg.split('/')" :key="index">{{item}}</span>
-                    <span>{{event.orig.reservierung? event.orig.person_kurzbz : event.orig.lektor}}</span>
+                    <template v-if="event.orig.reservierung">    
+                        <!-- render content for reservierungen -->
+                        <span>{{event.orig.title}}</span>
+                        <span>{{event.orig.stg}}</span>
+                        <span v-for="(item, index) in event.orig.person_kurzbz.split('/')" :key="index">{{item}}</span>
+                    </template>
+                    <template v-else>
+                        <!-- render content for stundenplan -->
+                        <span>{{event.orig.lv_info}}</span>	
+                        <span v-for="(item, index) in event.orig.stg.split('/')" :key="index">{{item}}</span>
+                        <span >{{event.orig.lektor}}</span>
+                    </template>
                 </div>
             </a>
-            </template>
-            <p v-else>this is a reservierung</p>
         </fhc-calendar>
     </div>
     `,

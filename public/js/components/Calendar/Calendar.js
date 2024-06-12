@@ -150,13 +150,7 @@ export default {
 		<calendar-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="calendarModal"  />
 		<component v-slot="{event,day}" :is="'calendar-' + mode" @update:mode="mode=$event" @change:range="$emit('change:range',$event)" @input="handleInput" >
 			<!--Week Page layout-->
-			<slot :event="event" :day="day">
-				<div class="d-flex flex-column align-items-center justify-content-evenly h-100">
-					<span>{{event.orig.title}}</span>	
-					<span>{{event.orig.ort_kurzbz}}</span>
-					<span>{{event.orig.mitarbeiter_kurzbz}}</span>
-				</div>
-			</slot>
+			<slot :event="event" :day="day"></slot>
 		</component>
 	</div>`
 }

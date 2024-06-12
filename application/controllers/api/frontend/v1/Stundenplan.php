@@ -75,16 +75,10 @@ class Stundenplan extends FHCAPI_Controller
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
         
+        //return early if the get parameter are not present
         if(!$ort_kurzbz || !$start_date || !$end_date){
             $this->terminateWithError("Missing parameters", self::ERROR_TYPE_GENERAL);
         }
-
-        $this->addMeta("test_start_date",$start_date);
-
-        $this->addMeta("ort",$ort_kurzbz);
-        $this->addMeta("start date",$start_date);
-        $this->addMeta("end date",$end_date);
-        $this->addMeta("testKey","testValue");
         
         $this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 		$this->load->model('ressource/Stunde_model', 'StundeModel');
@@ -99,7 +93,7 @@ class Stundenplan extends FHCAPI_Controller
      
 		$result = $this->StundenplanModel->getRoomDataOnDay($ort_kurzbz,$start_date,$end_date);
         // logging the result of the query
-        //$this->loglib->logErrorDB(print_r($result,true),"this is the result of the query");
+        $this->loglib->logErrorDB(print_r($result,true),"this is the result of the original stundenplan query");
             
 
 		if(isError($result)){
@@ -107,13 +101,8 @@ class Stundenplan extends FHCAPI_Controller
         }
 
         $result = hasData($result) ? getData($result) : [];
-        $this->loglib->logInfoDB(print_r($result,true),"result");
-        // set up the log library and configure the library to log to the db
+        $this->loglib->logInfoDB(print_r(count($result),true),"this is the count of the result");
         
-
-        /* foreach($result as $event){
-            $this->loglib->logInfoDB($event->datum,"NEW DATE");
-        } */
 
         //TODO: also implement the following algorithm to block the lectures that are together over different stunden
         /* $blockcontinue=false;
@@ -248,14 +237,12 @@ class Stundenplan extends FHCAPI_Controller
 
                                     //Lektoren
                                     if(!mb_strstr($stunden_event->lektor,$stunden_event_compare->lektor)){
-                                        $this->loglib->logErrorDB($stunden_event->datum ."-". $stunden_event->stunde,"entered lektor - first if");
                                         $stunden_events[$event_key]->lektor = $stunden_event->lektor . ' \ ' . $stunden_event_compare->lektor;
                                         $stunden_events[$event_key]->mitarbeiter_kurzbz = $stunden_event->mitarbeiter_kurzbz . ' \ ' . $stunden_event_compare->mitarbeiter_kurzbz;
                                     }
 
                                     //Ort
                                     if(!mb_strstr($stunden_event->ort_kurzbz,$stunden_event_compare->ort_kurzbz)){
-                                        $this->loglib->logErrorDB($stunden_event->datum ."-". $stunden_event->stunde,"entered ort - second if");
                                         $stunden_events[$event_key]->ort_kurzbz = $stunden_event->ort_kurzbz . ' \ ' . $stunden_event_compare->ort_kurzbz;
                                     }
 
@@ -265,8 +252,7 @@ class Stundenplan extends FHCAPI_Controller
 
                                     //Lehrverband
                                     if(!mb_strstr($lehrverband_array[$event_key],$lehrverband_array[$compare_key])){
-                                        $this->loglib->logErrorDB($stunden_event->datum ."-". $stunden_event->stunde,"entered gruppe - third if");
-                                        $lehrverband_array[$event_key] .= ' / ' . $lehrverband_array[$compare_key];
+                                         $lehrverband_array[$event_key] .= ' / ' . $lehrverband_array[$compare_key];
                                     }
 
                                 }
@@ -280,22 +266,9 @@ class Stundenplan extends FHCAPI_Controller
 
 
                 }
-                /* if (count($stunden_events) == 1){
-                    $final_events[] = current($stunden_events);
-                }else if(count($stunden_events) > 1){
-                    $gruppe = '';
-                    foreach($stunden_events as $stunden_event){
-                        $gruppe .= $stunden_event->gruppe . ',';
-                    }
-                    current($stunden_events)->gruppe = $gruppe;
-                    $final_events[] = current($stunden_events);
-                } */
-                //$this->loglib->logInfoDB(print_r($stunden_events,true),"date: " . $date . " - stunde:" .$stunde->stunde);
+               
             }
-            /* $this->loglib->logInfoDB(print_r($testStartDate,true),"startdate");
-            $this->loglib->logInfoDB($count,"count");
-            $this->loglib->logInfoDB(print_r($testEndDate,true),"enddate");
-            */
+           
             $testStartDate->modify('+1 day');
             $count++;
         }     
@@ -305,9 +278,7 @@ class Stundenplan extends FHCAPI_Controller
         $phpStartDate = new DateTime($start_date);
 
         //$phpStartDate->modify('+1 day');
-        $this->addMeta('result',$phpStartDate);
-       
-            error_log("test".print_r($result,true));
+        $this->loglib->logErrorDB(print_r($final_events,true),"this is the result of the stundenplan query");
         
 		//echo($this->db->last_query());
 		$this->terminateWithSuccess($final_events);
@@ -328,13 +299,84 @@ class Stundenplan extends FHCAPI_Controller
         }
 
 		$this->load->model('ressource/Reservierung_model', 'ReservierungModel');
-
+        $this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
 		$result = $this->ReservierungModel->getRoomReservierungen($ort_kurzbz, $start_date, $end_date);
 
 		if (isError($result))
 			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+        $this->load->library('LogLib');
+        $this->loglib->logErrorDB(print_r(getData($result),true),"this is the result of the reservierungen query");
+		
+        $result = hasData($result) ? getData($result) : [];
 
-		$this->terminateWithSuccess(getData($result));
+        // fetching the stunden to do a loop over the days and the stunden
+        $this->load->model('ressource/Stunde_model', 'StundeModel');
+        $stunden = $this->StundeModel->load();
+        if(isError($stunden)){
+            $this->terminateWithError(getError($stunden), self::ERROR_TYPE_GENERAL);
+        }
+        $stunden = getData($stunden);
+
+        $testStartDate = new DateTime($start_date);
+        $testEndDate = new DateTime($end_date);
+        $count =0;
+        $final_events = array();
+        $grouped = array();
+
+        $final_reservierungen = array();
+
+        // loop over the days
+        while($testStartDate <= $testEndDate && $count <7){
+            
+            $date = $testStartDate->format('Y-m-d');
+
+            // filtering all the reservierungen with the date
+            $day_reservierungen = array_filter($result, function($result_entry) use ($date){
+                return $result_entry->datum == $date;
+            });
+
+            // loop over the stunden
+            foreach( $stunden as $stunde){
+                // filtering all the day reservierungen to the reservierungen that happen at the same hour of the day
+                $hour_reservierungen = array_filter($day_reservierungen, function($day_entry) use ($stunde){
+                    return $day_entry->stunde == $stunde->stunde;
+                });
+
+                // if there are no reservierungen within that hour than we skip that iteration of the loop
+                if(!count($hour_reservierungen)){
+                    continue;
+                }
+
+                // looping over the reservierungen that happen at the same day and at the same hour
+                
+                $grouped_uid = array();
+                foreach($hour_reservierungen as $grouping_reservierung){
+                    $grouped_uid[]= $grouping_reservierung->uid;
+                }
+
+                $final_reservierung = $hour_reservierungen[0];
+                
+                
+                $grouped_uid = array_map(function($uid){
+                    $res =$this->MitarbeiterModel->generateKurzbz($uid);
+                    $res = hasData($res)? getData($res): $uid;
+                    return $res;
+               },$grouped_uid);
+                $this->loglib->logErrorDB(print_r($grouped_uid,true),"this are the grouped uids");
+
+                $final_reservierung->person_kurzbz = implode(" / ",$grouped_uid);
+
+                $final_reservierungen[] = $final_reservierung;
+            }
+            
+            
+            $testStartDate->modify('+1 day');
+            ++$count;
+
+        }
+        $this->loglib->logErrorDB(print_r($final_reservierungen,true),"lalala");
+        
+        $this->terminateWithSuccess($final_reservierungen);
 	}
 
 }
