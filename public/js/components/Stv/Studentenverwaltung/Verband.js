@@ -19,6 +19,7 @@ export default {
 		return {
 			loading: true,
 			nodes: [],
+			selectedKey: [],
 			filters: {}, // TODO(chris): filter only 1st level?
 			favnodes: [],
 			favorites: {on: false, list: []}
@@ -212,6 +213,7 @@ export default {
 			:value="filteredNodes"
 			@node-expand="onExpandTreeNode"
 			selection-mode="single"
+			v-model:selection-keys="selectedKey"
 			@node-select="onSelectTreeNode"
 			scrollable
 			scroll-height="flex"
