@@ -83,7 +83,7 @@ export default {
 		},
 		onSelectTreeNode(node) {
 			if (node.data.link)
-				this.$emit('selectVerband', {link: 'components/stv/students/' + node.data.link, studiengang_kz: node.data.stg_kz});
+				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz});
 		},
 		mapResultToTreeData(el) {
 			const cp = {

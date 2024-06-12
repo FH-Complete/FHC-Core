@@ -64,6 +64,11 @@ export default {
 					{title:"GeburtsdatumISO", field:"geburtsdatum_iso", visible:false},
 				],
 
+				ajaxResponse: (url, params, response) => {
+					console.log(url, params, response);
+					return response.data;
+				},
+
 				layout: 'fitDataStretch',
 				layoutColumnsOnNewData: false,
 				height: '100%',
@@ -119,9 +124,6 @@ export default {
 		},
 		updateUrl(url, first) {
 			this.lastSelected = first ? undefined : this.selected;
-
-			if (url)
-				url = CoreRESTClient._generateRouterURI(url);
 
 			const params = {}, filter = {};
 			if (this.filterKontoCount0)
