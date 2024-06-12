@@ -204,22 +204,22 @@ class Students extends FHCAPI_Controller
 				break;
 			case "bewerbungabgeschickt":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bewerbung_abgeschicktamum IS NOT'] = null;
+				$where['bewerbung_abgeschicktamum IS NOT NULL'] = null;
 				$where['bestaetigtam'] = null;
 				break;
 			case "statusbestaetigt":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bestaetigtam IS NOT'] = null;
+				$where['bestaetigtam IS NOT NULL'] = null;
 				break;
 			case "statusbestaetigtrtnichtangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bestaetigtam IS NOT'] = null;
-				$this->PrestudentModel->db->where('NOT EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemesterkurzbz=' . $stdsemEsc . ')', null, false);
+				$where['bestaetigtam IS NOT NULL'] = null;
+				$this->PrestudentModel->db->where('NOT EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemester_kurzbz=' . $stdsemEsc . ')', null, false);
 				break;
 			case "statusbestaetigtrtangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bestaetigtam IS NOT'] = null;
-				$this->PrestudentModel->db->where('EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemesterkurzbz=' . $stdsemEsc . ')', null, false);
+				$where['bestaetigtam IS NOT NULL'] = null;
+				$this->PrestudentModel->db->where('EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemester_kurzbz=' . $stdsemEsc . ')', null, false);
 				break;
 			case "zgv":
 				$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
@@ -234,26 +234,26 @@ class Students extends FHCAPI_Controller
 				$where['ps.status_kurzbz'] = 'Interessent';
 				
 				if ($stg->typ == 'm') {
-					$where['zgvmas_code IS NOT'] = null;
+					$where['zgvmas_code IS NOT NULL'] = null;
 					if (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN)
 						$where['zgvmas_erfuellt'] = true;
 				} elseif ($stg->typ == 'p') {
-					$where['zgvdoktor_code IS NOT'] = null;
+					$where['zgvdoktor_code IS NOT NULL'] = null;
 					if (defined('ZGV_DOKTOR_ANZEIGEN') && ZGV_DOKTOR_ANZEIGEN)
 						$where['zgvdoktor_erfuellt'] = true;
 				} else {
-					$where['zgv_code IS NOT'] = null;
+					$where['zgv_code IS NOT NULL'] = null;
 					if (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN)
 						$where['zgv_erfuellt'] = true;
 				}
 				break;
 			case "reihungstestangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$this->PrestudentModel->db->where('EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemesterkurzbz=' . $stdsemEsc . ')', null, false);
+				$this->PrestudentModel->db->where('EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemester_kurzbz=' . $stdsemEsc . ')', null, false);
 				break;
 			case "reihungstestnichtangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$this->PrestudentModel->db->where('NOT EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemesterkurzbz=' . $stdsemEsc . ')', null, false);
+				$this->PrestudentModel->db->where('NOT EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemester_kurzbz=' . $stdsemEsc . ')', null, false);
 				break;
 			case "bewerber":
 				$where['ps.status_kurzbz'] = 'Bewerber';
