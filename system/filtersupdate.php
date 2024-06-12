@@ -1317,13 +1317,18 @@ $filters = array(
 				{
 					"name": "MA Handyverwaltung",
 					"columns": [
+						{"name": "UID"},
 						{"name": "PersonId"},
 						{"name": "Vorname"},
 						{"name": "Nachname"},
-						{"name": "Alias"},
-						{"name": "Aktiv"},
-						{"name": "Raum"},
-						{"name": "Geschlecht"},
+						{"name": "EMail"}, 
+						{"name": "Unternehmen"}, 
+						{"name": "Vertragsart"}, 
+						{"name": "DV_von"}, 
+						{"name": "DV_bis"}, 
+						{"name": "Wochenstunden"}, 
+						{"name": "WS_von"}, 
+						{"name": "WS_bis"}, 
 						{"name": "Standardkostenstelle"}
 					],
 					"filters": [
