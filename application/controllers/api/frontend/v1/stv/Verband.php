@@ -261,7 +261,7 @@ class Verband extends FHCAPI_Controller
 		$this->StudiengangModel->addSelect("CASE WHEN MAX(gruppe)='' OR MAX(gruppe)=' ' THEN TRUE ELSE FALSE END AS leaf");
 
 		$this->StudiengangModel->addSelect('verband');
-		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . ' AS stg_kz', false);
+		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . '::integer AS stg_kz', false);
 		
 		$this->StudiengangModel->addOrder('verband');
 
