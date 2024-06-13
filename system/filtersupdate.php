@@ -1296,6 +1296,8 @@ $filters = array(
 					{"name": "beschreibung"},
 					{"name": "hersteller"},
 					{"name": "os"},
+					{"name": "lizenzserver_kurzbz"},
+					{"name": "lizenzserver_port"},
 					{"name": "softwarestatus_kurzbz"}
 				],
 				"filters": []
