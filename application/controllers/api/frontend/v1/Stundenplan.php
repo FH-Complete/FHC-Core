@@ -68,8 +68,10 @@ class Stundenplan extends FHCAPI_Controller
 	 */
 	public function roomInformation()
 	{
+       
+        $this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		$this->load->model('ressource/Stunde_model', 'StundeModel');
 
-        //TODO please split this algorithm into multiple smaller function it is not really mantainable like this
         // storing the get parameter in local variables
         $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
         $start_date = $this->input->get('start_date', TRUE);
@@ -80,21 +82,15 @@ class Stundenplan extends FHCAPI_Controller
             $this->terminateWithError("Missing parameters", self::ERROR_TYPE_GENERAL);
         }
         
-        $this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
-		$this->load->model('ressource/Stunde_model', 'StundeModel');
+		// querying the stunden
+        $stunden = $this->StundeModel->load();
 
-        
-		$stunden = $this->StundeModel->load();
-        if(isError($stunden)){
+        if(isError($stunden))
             $this->terminateWithError(getError($stunden), self::ERROR_TYPE_GENERAL);
-        }
+        
         $stunden = getData($stunden);
 
-     
-		$result = $this->StundenplanModel->getRoomDataOnDay($ort_kurzbz,$start_date,$end_date);
-        // logging the result of the query
-        $this->loglib->logErrorDB(print_r($result,true),"this is the result of the original stundenplan query");
-            
+		$result = $this->StundenplanModel->getRoomDataOnDay($ort_kurzbz,$start_date,$end_date);  
 
 		if(isError($result)){
             $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
@@ -103,76 +99,24 @@ class Stundenplan extends FHCAPI_Controller
         $result = hasData($result) ? getData($result) : [];
         $this->loglib->logInfoDB(print_r(count($result),true),"this is the count of the result");
         
-
-        //TODO: also implement the following algorithm to block the lectures that are together over different stunden
-        /* $blockcontinue=false;
-						if (isset($blocked[$this->std_plan[$i][$j][$idx]->unr]) && $blocked[$this->std_plan[$i][$j][$idx]->unr]>0)
-						{
-							$blocked[$this->std_plan[$i][$j][$idx]->unr]--;
-							$blockcontinue=true;
-						}
-
-						if (!$blockcontinue)
-						{
-							// Blockungen ueber mehrere Stunden erkennen
-
-							$blockflag=false;
-							for ($blockstunden=1;$blockstunden<=$num_rows_stunde;$blockstunden++)
-							{
-								if (isset($this->std_plan[$i][$j+$blockstunden][$idx]) && isset($this->std_plan[$i][$j+$blockstunden][$idx]->stundenplan_id)
-									&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+$blockstunden][$idx]->unr)
-									&& $this->std_plan[$i][$j][$idx]!='0' && $k<($num_rows_stunde-$blockstunden)
-									&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+$blockstunden][$idx]->lektor))
-								{
-
-									if (isset($blocked[$this->std_plan[$i][$j][$idx]->unr]))
-										$blocked[$this->std_plan[$i][$j][$idx]->unr]++;
-									else
-										$blocked[$this->std_plan[$i][$j][$idx]->unr]=1;
-									$row = $this->db_fetch_object($this->stunde, ($k+$blockstunden));
-									$stunden_arr[]=$row->stunde;
-									$end_time=$row->ende;
-									$blockflag=true;
-								}
-								else
-								{
-									if (!$blockflag)
-									{
-										$row = $this->db_fetch_object($this->stunde, $k);
-										$stunden_arr[]=$row->stunde;
-										$end_time=$row->ende;
-										break;
-									}
-									else
-									{
-										break;
-									}
-								}
-							}
-						} */
-
-        $testStartDate = new DateTime($start_date);
-        $testEndDate = new DateTime($end_date);
-        $count =0;
+        
         $final_events = array();
         $grouped = array();
-        while($testStartDate <= $testEndDate && $count <7){
-            $date = $testStartDate->format('Y-m-d');
-            //TODO: array filtering for every day and hour could be too time consuming causing slow response
-            $day_events = array_filter($result,function($entry) use ($date){
-                return $entry->datum == $date;
-            });
-            //$this->loglib->logInfoDB(print_r($day_events,true),"day_events");
+        $associative_day_events = $this->filterEventsIntoAssociativeDateArray($result, $start_date, $end_date);
+        foreach($associative_day_events as $date => $day_events ){
+            
             foreach($stunden as $stunde){
+
+                // filtering all the events at the same hour of the day
                 $stunden_events = array_filter($day_events, function($entry) use ($stunde){
                     return $entry->stunde == $stunde->stunde;
                 });
 
                 $lehrverband_array = array();
 
-                
                 // for loop that is just used to fill the lehrverband_array
                 foreach($stunden_events as $key=>$stunden_event){
+
                     // lehrverband bestimmen
                     if(strlen($stunden_event->gruppe_kurzbz)>0){
                         $lehrverband = $stunden_event->gruppe_kurzbz;
@@ -188,25 +132,22 @@ class Stundenplan extends FHCAPI_Controller
                     $lehrverband_array[$key] = $lehrverband;
                 }
                 
-                
-                // aenderung aller events die am gleichen tag und zur gleichen Stunde gehalten werden
+                // compare nested loop start
                 foreach($stunden_events as $event_key => $stunden_event){
+                    
+                    // skip the loop iteration if the event was already grouped
                     if(isset($grouped[$event_key])){
                         continue;
                     }
                      
                     // lektor bestimmen
-                    if($stunden_event->mitarbeiter_kurzbz == null){
-                        $simml_lektor = $stunden_event->lektor;
-                    }else{
-                        $simml_lektor = $stunden_event->mitarbeiter_kurzbz;
+                    if($stunden_event->mitarbeiter_kurzbz != null){
+                        $stunden_events[$event_key]->lektor = $stunden_event->mitarbeiter_kurzbz;
                     }
 
-                
                     // lehrfach bestimmen
-                    $lehrfach = $stunden_event->lehrfach;
                     if(isset($stunden_event->lehrform)){
-                        $lehrfach .= '-'.$stunden_event->lehrform;
+                        $stunden_events[$event_key]->lehrfach .= '-'.$stunden_event->lehrform;
                     }
                     
                     // GRUPIEREN DER GLEICHEN EVENTS
@@ -216,24 +157,19 @@ class Stundenplan extends FHCAPI_Controller
                         if($compare_key != $event_key){
                             
                             // will be used to skip the loop iteration with this index because it was already grouped
-                            $grouped[$compare_key] = 1;
-                            // this if checks if the events can be grouped
+                            $grouped[$compare_key] = TRUE;
+
+                            // can the events be grouped?
                            if ( 
                                 // the unr's have to be equal to be grouped
                                 $stunden_event->unr==$stunden_event_compare->unr && 
                                 // and either the lektor or the ort_kurzbz have to be equal
                                 ($stunden_event->ort_kurzbz==$stunden_event_compare->ort_kurzbz 
                                 || $stunden_event->lektor==$stunden_event_compare->lektor)
-                                // reservierungen muessen auch beachtet werden, wenn der eintrag eine reservierung ist dann koennen die eintraege nicht gruppiert werden
-                                //&& !$stunden_event->reservierung && !$stunden_event_compare->reservierung
-
                            )
                                 {
-
-                                    
-
                                     // Bezeichnung des Events zusammenfuehren
-                                    // change the event with the $event_key if the compared_event has different properties but is still groupable
+                                    // group the events properties if they are groupable
 
                                     //Lektoren
                                     if(!mb_strstr($stunden_event->lektor,$stunden_event_compare->lektor)){
@@ -245,10 +181,6 @@ class Stundenplan extends FHCAPI_Controller
                                     if(!mb_strstr($stunden_event->ort_kurzbz,$stunden_event_compare->ort_kurzbz)){
                                         $stunden_events[$event_key]->ort_kurzbz = $stunden_event->ort_kurzbz . ' \ ' . $stunden_event_compare->ort_kurzbz;
                                     }
-
-                                    //unset the compared and grouped event
-                                    unset($stunden_events[$compare_key]);
-                                    
 
                                     //Lehrverband
                                     if(!mb_strstr($lehrverband_array[$event_key],$lehrverband_array[$compare_key])){
@@ -262,83 +194,54 @@ class Stundenplan extends FHCAPI_Controller
                     // add the grouped lehrverband entry to the event
                     $stunden_events[$event_key]->stg = $lehrverband_array[$event_key];
                     $final_events[] = $stunden_events[$event_key];
-
-
-
                 }
-               
             }
-           
-            $testStartDate->modify('+1 day');
-            $count++;
         }     
         
-       
-        //php start date
-        $phpStartDate = new DateTime($start_date);
-
-        //$phpStartDate->modify('+1 day');
-        $this->loglib->logErrorDB(print_r($final_events,true),"this is the result of the stundenplan query");
-        
-		//echo($this->db->last_query());
 		$this->terminateWithSuccess($final_events);
 		
 	}
 
     public function Reservierungen()
 	{
+        $this->load->model('ressource/Reservierung_model', 'ReservierungModel');
+        $this->load->model('ressource/Stunde_model', 'StundeModel');
+        $this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
 
-        //TODO the reservierungen have to be grouped like the stundenplan
-
+        // storing the get parameter in local variables
         $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
 
+        // return early if the get parameter are not present
         if(!$ort_kurzbz || !$start_date || !$end_date){
             $this->terminateWithError("Missing parameters", self::ERROR_TYPE_GENERAL);
         }
 
-		$this->load->model('ressource/Reservierung_model', 'ReservierungModel');
-        $this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
+        // querying the stunden
+        $stunden = $this->StundeModel->load();
+
+        if(isError($stunden))
+            $this->terminateWithError(getError($stunden), self::ERROR_TYPE_GENERAL);
+        
+        $stunden = getData($stunden);
+
+		// querying the reservierungen
 		$result = $this->ReservierungModel->getRoomReservierungen($ort_kurzbz, $start_date, $end_date);
 
 		if (isError($result))
 			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-        $this->load->library('LogLib');
-        $this->loglib->logErrorDB(print_r(getData($result),true),"this is the result of the reservierungen query");
-		
+        
         $result = hasData($result) ? getData($result) : [];
-
-        // fetching the stunden to do a loop over the days and the stunden
-        $this->load->model('ressource/Stunde_model', 'StundeModel');
-        $stunden = $this->StundeModel->load();
-        if(isError($stunden)){
-            $this->terminateWithError(getError($stunden), self::ERROR_TYPE_GENERAL);
-        }
-        $stunden = getData($stunden);
-
-        $testStartDate = new DateTime($start_date);
-        $testEndDate = new DateTime($end_date);
-        $count =0;
-        $final_events = array();
-        $grouped = array();
-
-        $final_reservierungen = array();
-
+        
         // loop over the days
-        while($testStartDate <= $testEndDate && $count <7){
-            
-            $date = $testStartDate->format('Y-m-d');
-
-            // filtering all the reservierungen with the date
-            $day_reservierungen = array_filter($result, function($result_entry) use ($date){
-                return $result_entry->datum == $date;
-            });
+        $day_events = $this->filterEventsIntoAssociativeDateArray($result, $start_date, $end_date);
+        foreach($day_events as $date => $day_eventArray){
 
             // loop over the stunden
             foreach( $stunden as $stunde){
                 // filtering all the day reservierungen to the reservierungen that happen at the same hour of the day
-                $hour_reservierungen = array_filter($day_reservierungen, function($day_entry) use ($stunde){
+                $hour_reservierungen = array_filter($day_eventArray, function($day_entry) use ($stunde){
                     return $day_entry->stunde == $stunde->stunde;
                 });
 
@@ -347,37 +250,72 @@ class Stundenplan extends FHCAPI_Controller
                     continue;
                 }
 
-                // looping over the reservierungen that happen at the same day and at the same hour
-                
-                $grouped_uid = array();
-                foreach($hour_reservierungen as $grouping_reservierung){
-                    $grouped_uid[]= $grouping_reservierung->uid;
+                $grouped_uids = array();
+                foreach($hour_reservierungen as $entry){
+
+                    $mitarbeiter_check = $this->MitarbeiterModel->isMitarbeiter($entry->uid);
+                    
+                    if(isError($mitarbeiter_check)){
+                        $this->terminateWithError(getError($mitarbeiter_check), self::ERROR_TYPE_GENERAL);
+                    }
+
+                    $mitarbeiter_check = getData($mitarbeiter_check);
+
+                    // if the uid belongs to a mitarbeiter store the mitarbeiter_kurzbz otherwise store the student uid
+                    if($mitarbeiter_check){
+                        $mitarbeiterKurzbz = $this->MitarbeiterModel->generateKurzbz($entry->uid);
+                        
+                        if(isError($mitarbeiterKurzbz)){
+                            $this->terminateWithError(getError($mitarbeiterKurzbz), self::ERROR_TYPE_GENERAL);
+                        }
+
+                        $grouped_uids[] = getData($mitarbeiterKurzbz);
+
+                    }else{
+                        $grouped_uids[]= $entry->uid;
+                    }
+                    
                 }
 
+                // merging all the information into the first entry
                 $final_reservierung = $hour_reservierungen[0];
                 
-                
-                $grouped_uid = array_map(function($uid){
-                    $res =$this->MitarbeiterModel->generateKurzbz($uid);
-                    $res = hasData($res)? getData($res): $uid;
-                    return $res;
-               },$grouped_uid);
-                $this->loglib->logErrorDB(print_r($grouped_uid,true),"this are the grouped uids");
-
-                $final_reservierung->person_kurzbz = implode(" / ",$grouped_uid);
+                $final_reservierung->person_kurzbz = implode(" / ",$grouped_uids);
 
                 $final_reservierungen[] = $final_reservierung;
             }
-            
-            
-            $testStartDate->modify('+1 day');
-            ++$count;
 
         }
-        $this->loglib->logErrorDB(print_r($final_reservierungen,true),"lalala");
-        
         $this->terminateWithSuccess($final_reservierungen);
 	}
+
+    private function filterEventsIntoAssociativeDateArray($events, $start_date, $end_date){
+        $php_start_date = new DateTime($start_date);
+        $php_end_date = new DateTime($end_date);
+        // count is used to ensure that the loop does not iterate more than 7 times (7 days per week)
+        $count =0;
+
+       $result = array();
+
+        // loop over the days
+        while($php_start_date <= $php_end_date && $count <7){
+            
+            $date = $php_start_date->format('Y-m-d');
+
+            // filtering all the reservierungen with the date
+            $day_events = array_filter($events, function($event) use ($date){
+                // no filtering is done if the event entries do not have a datum property
+                return isset($event->datum) ? $event->datum == $date : true; 
+                
+            });
+
+            $result[$date] = $day_events;
+            ++$count;
+            $php_start_date->modify('+1 day');
+        }
+
+        return $result;
+    }
 
 }
 
