@@ -251,7 +251,7 @@ else
 		// deshalb wird hier versucht eine passende Lehreinheit zu ermitteln.
 		$lehreinheit_id = getLehreinheit($db, $lvid, $student_uid, $stsem);
 
-		$response = savePruefung($lvid, $student_uid, $stsem, $lehreinheit_id, $datum, $typ, $note);
+		$response = savePruefung($lvid, $student_uid, $stsem, $lehreinheit_id, $datum, $typ, $note, $punkte);
 		echo $response;
 	}
 	else

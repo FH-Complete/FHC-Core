@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CoreFilterAPIs} from './API.js';
-import {CoreRESTClient} from '../../RESTClient.js';
 import {CoreFetchCmpt} from '../../components/Fetch.js';
 import FilterConfig from './Filter/Config.js';
 import FilterColumns from './Filter/Columns.js';
@@ -64,7 +62,11 @@ export const CoreFilterCmpt = {
 		newBtnShow: Boolean,
 		newBtnClass: [String, Array, Object],
 		newBtnDisabled: Boolean,
-		newBtnLabel: String
+		newBtnLabel: String,
+		uniqueId: String,
+		// TODO soll im master kommen?
+		idField: String,
+		parentIdField: String
 	},
 	data: function() {
 		return {
@@ -211,6 +213,13 @@ export const CoreFilterCmpt = {
 
 			if (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length)
 				this.tabulatorHasSelector = true;
+			// TODO check ob im core bleiben soll
+			if (this.idField) {
+				// enable nested tabulator if parent Id given
+				if (this.parentIdField) tabulatorOptions.dataTree = true;
+				// set tabulator index
+				tabulatorOptions.index = this.idField;
+			}
 
 			// Start the tabulator with the build options
 			this.tabulator = new Tabulator(
@@ -228,6 +237,33 @@ export const CoreFilterCmpt = {
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
+			// TODO check ob im core so bleiben soll
+			// if nested tabulator, restructure data
+			if (this.parentIdField && this.idField) {
+				this.tabulator.on("dataLoading", data => {
+					let toDelete = [];
+
+					// loop through all data
+					for (let childIdx = 0; childIdx < data.length; childIdx++)
+					{
+						let child = data[childIdx];
+
+						// if it has parent id, it is a child
+						if (child[this.parentIdField])
+						{
+							// append the child on the right place. If parent found, mark original sw child on 0 level for deleting
+							if (this.appendChild(data, child)) toDelete.push(childIdx);
+						}
+					}
+
+					// delete the marked children from 0 level
+					for (let counter = 0; counter < toDelete.length; counter++)
+					{
+						// decrease index by counter as index of data array changes after every deletion
+						data.splice(toDelete[counter] - counter, 1);
+					}
+				});
+			}
 			if (this.tableOnly) {
 				this.tabulator.on('tableBuilt', () => {
 					const cols = this.tabulator.getColumns();
@@ -252,12 +288,12 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		getFilter: function() {
+		getFilter() {
 			if (this.selectedFilter === null)
-				this.startFetchCmpt(CoreFilterAPIs.getFilter, null, this.render);
+				this.startFetchCmpt(this.$fhcApi.factory.filter.getFilter, null, this.render);
 			else
 				this.startFetchCmpt(
-					CoreFilterAPIs.getFilterById,
+					this.$fhcApi.factory.filter.getFilterById,
 					{
 						filterId: this.selectedFilter
 					},
@@ -267,55 +303,47 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		render: function(response) {
+		render(response) {
+			let data = response;
+			this.filterName = data.filterName;
+			this.dataset = data.dataset;
+			this.datasetMetadata = data.datasetMetadata;
 
-			if (CoreRESTClient.hasData(response))
+			this.fields = data.fields;
+			this.selectedFields = data.selectedFields;
+			this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
+			this.filterFields = [];
+
+			for (let i = 0; i < data.datasetMetadata.length; i++)
 			{
-				let data = CoreRESTClient.getData(response);
-				this.filterName = data.filterName;
-				this.dataset = data.dataset;
-				this.datasetMetadata = data.datasetMetadata;
-
-				this.fields = data.fields;
-				this.selectedFields = data.selectedFields;
-				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
-				this.filterFields = [];
-
-				for (let i = 0; i < data.datasetMetadata.length; i++)
+				for (let j = 0; j < data.filters.length; j++)
 				{
-					for (let j = 0; j < data.filters.length; j++)
+					if (data.datasetMetadata[i].name == data.filters[j].name)
 					{
-						if (data.datasetMetadata[i].name == data.filters[j].name)
-						{
-							let filter = data.filters[j];
-							filter.type = data.datasetMetadata[i].type;
+						let filter = data.filters[j];
+						filter.type = data.datasetMetadata[i].type;
 
-							this.filterFields.push(filter);
-							//break;
-						}
+						this.filterFields.push(filter);
+						//break;
 					}
 				}
+			}
 
-				// If the side menu is active
-				if (this.sideMenu === true)
-				{
-					this.setSideMenu(data);
-				}
-				else // otherwise use the dropdown in the filter options
-				{
-					this.setDropDownMenu(data);
-				}
-				this.updateTabulator();
-			}
-			else
+			// If the side menu is active
+			if (this.sideMenu === true)
 			{
-				console.error(CoreRESTClient.getError(response));
+				this.setSideMenu(data);
 			}
+			else // otherwise use the dropdown in the filter options
+			{
+				this.setDropDownMenu(data);
+			}
+			this.updateTabulator();
 		},
 		/**
 		 * Set the menu
 		 */
-		setSideMenu: function(data) {
+		setSideMenu(data) {
 			let filters = data.sideMenu.filters;
 			let personalFilters = data.sideMenu.personalFilters;
 			let filtersArray = [];
@@ -369,7 +397,7 @@ export const CoreFilterCmpt = {
 		/**
 		 * Set the drop down menu
 		 */
-		setDropDownMenu: function(data) {
+		setDropDownMenu(data) {
 			let filters = data.sideMenu.filters;
 			let personalFilters = data.sideMenu.personalFilters;
 			let filtersArray = [];
@@ -405,7 +433,7 @@ export const CoreFilterCmpt = {
 		/**
 		 * Used to start/refresh the FetchCmpt
 		 */
-		startFetchCmpt: function(apiFunction, apiFunctionParameters, dataFetchedCallback) {
+		startFetchCmpt(apiFunction, apiFunctionParameters, dataFetchedCallback) {
 			// Assign the function api of the FetchCmpt binded property
 			this.fetchCmptApiFunction = apiFunction;
 
@@ -415,6 +443,9 @@ export const CoreFilterCmpt = {
 			// Always needed parameters
 			apiFunctionParameters.filterUniqueId = FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 			apiFunctionParameters.filterType = this.filterType;
+
+			if (this.uniqueId)
+				apiFunctionParameters.filterUniqueId += '_' + this.uniqueId;
 
 			// Assign parameters to the FetchCmpt binded properties
 			this.fetchCmptApiFunctionParams = apiFunctionParameters;
@@ -431,11 +462,11 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		handlerSaveCustomFilter: function(customFilterName) {
+		handlerSaveCustomFilter(customFilterName) {
 			this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				CoreFilterAPIs.saveCustomFilter,
+				this.$fhcApi.factory.filter.saveCustomFilter,
 				{
 					customFilterName
 				},
@@ -445,13 +476,13 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		handlerRemoveCustomFilter: function(event) {
+		handlerRemoveCustomFilter(event) {
 			let filterId = event.currentTarget.getAttribute("href").substring(1);
 			if (filterId === this.selectedFilter)
 				this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				CoreFilterAPIs.removeCustomFilter,
+				this.$fhcApi.factory.filter.removeCustomFilter,
 				{
 					filterId: filterId
 				},
@@ -488,12 +519,42 @@ export const CoreFilterCmpt = {
 		applyFilterConfig(filterFields) {
 			this.selectedFilter = null;
 			this.startFetchCmpt(
-				CoreFilterAPIs.applyFilterFields,
+				this.$fhcApi.factory.filter.applyFilterFields,
 				{
 					filterFields
 				},
 				this.getFilter
 			);
+		},
+		// TODO check ob im core so bleiben soll
+		// append child to it's parent
+		appendChild(data, child) {
+			// get parent id
+			let parentId = child[this.parentIdField];
+
+			// loop thorugh all data
+			for (let parentIdx = 0; parentIdx < data.length; parentIdx++)
+			{
+				let parent = data[parentIdx];
+
+				// if it's the parent
+				if (parent[this.idField] == parentId)
+				{
+					// create children array if not done yet
+					if (!parent._children) parent._children = [];
+
+					// if child is not included in children array, append the child
+					if (!parent._children.includes(child)) parent._children.push(child);
+
+					// parent found
+					return true;
+				}
+				// search children for parents
+				else if (parent._children) this.appendChild(parent._children, child);
+			}
+
+			// parent not found
+			return false;
 		}
 	},
 	beforeCreate() {
@@ -522,7 +583,7 @@ export const CoreFilterCmpt = {
 
 		<div class="row" v-if="title != null && title != ''">
 			<div class="col-lg-12">
-				<h3 class="page-header">
+				<h3 class="page-header mt-1 mb-4">
 					{{ title }}
 				</h3>
 			</div>
@@ -531,7 +592,7 @@ export const CoreFilterCmpt = {
 		<div :id="'filterCollapsables' + idExtra">
 
 			<div class="d-flex flex-row justify-content-between flex-wrap">
-				<div v-if="newBtnShow || reload || $slots.actions" class="d-flex gap-2 align-items-baseline flex-wrap">
+				<div v-if="newBtnShow || reload || $slots.search || $slots.actions" class="d-flex gap-2 align-items-baseline flex-wrap">
 					<button v-if="newBtnShow" class="btn btn-primary" :class="newBtnClass" :title="newBtnLabel ? undefined : 'New'" :aria-label="newBtnLabel ? undefined : 'New'" @click="$emit('click:new', $event)" :disabled="newBtnDisabled">
 						<span class="fa-solid fa-plus" aria-hidden="true"></span>
 						{{ newBtnLabel }}
@@ -539,8 +600,9 @@ export const CoreFilterCmpt = {
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
 						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
 					</button>
-					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten: </span>
+					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten:</span>
 					<slot name="actions" v-bind="tabulatorHasSelector ? selectedData : []"></slot>
+					<slot name="search"></slot>
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>

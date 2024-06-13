@@ -1,4 +1,3 @@
-import {CoreRESTClient} from '../RESTClient.js';
 import accessibility from "../directives/accessibility.js";
 
 export default {
@@ -12,7 +11,7 @@ export default {
 	],
 	props: {
 		config: {
-			type: [String, Object],
+			type: [String, Array, Object, Promise],
 			required: true
 		},
 		default: String,
@@ -56,39 +55,36 @@ export default {
 		initConfig(config) {
 			if (!config)
 				return;
+			if (config instanceof Promise)
+				return config
+					.then(result => result.data)
+					.then(this.initConfig)
+					.catch(this.$fhcAlert.handleSystemError);
 			if (typeof config === 'string' || config instanceof String)
-				return CoreRESTClient.get(config)
-					.then(result => CoreRESTClient.getData(result.data))
+				return this.$fhcApi
+					.get(config)
+					.then(result => result.data)
 					.then(this.initConfig)
 					.catch(this.$fhcAlert.handleSystemError);
 
 			const tabs = {};
 
-			if (Array.isArray(config)) {
-				config.forEach((item, key) => {
-					if (!item.component)
-						return console.error('Component missing for ' + key);
+			function _addToTabs(key, item) {
+				if (!item.component)
+					return console.error('Component missing for ' + key);
 
-					tabs[key] = {
-						component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
-						title: item.title || key,
-						config: item.config,
-						key
-					}
-				});
-			} else {
-				Object.entries(config).forEach(([key, item]) => {
-					if (!item.component)
-						return console.error('Component missing for ' + key);
-
-					tabs[key] = {
-						component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
-						title: item.title || key,
-						config: item.config,
-						key
-					}
-				});
+				tabs[key] = {
+					component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
+					title: Vue.computed(() => item.title || key),
+					config: item.config,
+					key
+				}
 			}
+
+			if (Array.isArray(config))
+				config.forEach((item, key) => _addToTabs(key, item));
+			else
+				Object.entries(config).forEach(([key, item]) => _addToTabs(key, item));
 
 			if (this.current === null || !tabs[this.current]) {
 				if (tabs[this.default])

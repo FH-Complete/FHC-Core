@@ -20,7 +20,8 @@ $sitesettings = array(
 	),
 	'customJSModules' => array('public/js/apps/lehre/Antrag/Leitung.js'),
 	'customCSSs' => array(
-		'public/css/Fhc.css'
+		'public/css/Fhc.css',
+		'public/css/components/primevue.css',
 	),
 	'customJSs' => array(
 	)
