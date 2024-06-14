@@ -97,7 +97,7 @@ const app = Vue.createApp({
                     <template v-if="event.orig.reservierung">    
                         <!-- render content for reservierungen -->
                         <span>{{event.orig.title}}</span>
-                        <span>{{event.orig.stg}}</span>
+                        <span>{{event.orig.gruppe_kurzbz?event.orig.gruppe_kurzbz:event.orig.stg}}</span>
                         <span v-for="(item, index) in event.orig.person_kurzbz.split('/')" :key="index">{{item}}</span>
                     </template>
                     <template v-else>

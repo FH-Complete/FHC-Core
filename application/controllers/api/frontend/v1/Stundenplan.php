@@ -236,6 +236,7 @@ class Stundenplan extends FHCAPI_Controller
         
         // loop over the days
         $day_events = $this->filterEventsIntoAssociativeDateArray($result, $start_date, $end_date);
+        $final_reservierungen = array();
         foreach($day_events as $date => $day_eventArray){
 
             // loop over the stunden
@@ -246,12 +247,17 @@ class Stundenplan extends FHCAPI_Controller
                 });
 
                 // if there are no reservierungen within that hour than we skip that iteration of the loop
-                if(!count($hour_reservierungen)){
+                if(count($hour_reservierungen) <1){
                     continue;
                 }
 
+                $this->loglib->logInfoDB(print_r($hour_reservierungen,true),"this is the hour reservierungen");
+                
+                // grouping the reservierung information of reservervations of the same hour on the same day
                 $grouped_uids = array();
                 foreach($hour_reservierungen as $entry){
+
+                    // grouping the reservierungs participants
 
                     $mitarbeiter_check = $this->MitarbeiterModel->isMitarbeiter($entry->uid);
                     
@@ -274,11 +280,14 @@ class Stundenplan extends FHCAPI_Controller
                     }else{
                         $grouped_uids[]= $entry->uid;
                     }
+
+                    // grouping the 
                     
                 }
 
+                
                 // merging all the information into the first entry
-                $final_reservierung = $hour_reservierungen[0];
+                $final_reservierung = current($hour_reservierungen);
                 
                 $final_reservierung->person_kurzbz = implode(" / ",$grouped_uids);
 
@@ -295,7 +304,7 @@ class Stundenplan extends FHCAPI_Controller
         // count is used to ensure that the loop does not iterate more than 7 times (7 days per week)
         $count =0;
 
-       $result = array();
+        $result = array();
 
         // loop over the days
         while($php_start_date <= $php_end_date && $count <7){
