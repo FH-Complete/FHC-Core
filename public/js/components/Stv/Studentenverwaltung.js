@@ -105,7 +105,7 @@ export default {
 	methods: {
 		onSelectVerband({link, studiengang_kz}) {
 			this.studiengangKz = studiengang_kz;
-			this.$refs.stvList.updateUrl(link);
+			this.$refs.stvList.updateUrl(this.$fhcApi.factory.stv.students.verband(link));
 		},
 		studiensemesterChanged(v) {
 			this.studiensemesterKurzbz = v;
@@ -169,11 +169,11 @@ export default {
 	},
 	mounted() {
 		if (this.$route.params.id) {
-			this.$refs.stvList.updateUrl('components/stv/students/uid/' + this.$route.params.id, true);
+			this.$refs.stvList.updateUrl(this.$fhcApi.factory.stv.students.uid(this.$route.params.id), true);
 		} else if (this.$route.params.prestudent_id) {
-			this.$refs.stvList.updateUrl('components/stv/students/prestudent/' + this.$route.params.prestudent_id, true);
+			this.$refs.stvList.updateUrl(this.$fhcApi.factory.stv.students.prestudent(this.$route.params.prestudent_id), true);
 		} else if (this.$route.params.person_id) {
-			this.$refs.stvList.updateUrl('components/stv/students/person/' + this.$route.params.person_id, true);
+			this.$refs.stvList.updateUrl(this.$fhcApi.factory.stv.students.person(this.$route.params.person_id), true);
 		}
 
 	},

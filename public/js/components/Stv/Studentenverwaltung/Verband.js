@@ -19,6 +19,7 @@ export default {
 		return {
 			loading: true,
 			nodes: [],
+			selectedKey: [],
 			filters: {}, // TODO(chris): filter only 1st level?
 			favnodes: [],
 			favorites: {on: false, list: []}
@@ -83,7 +84,7 @@ export default {
 		},
 		onSelectTreeNode(node) {
 			if (node.data.link)
-				this.$emit('selectVerband', {link: 'components/stv/students/' + node.data.link, studiengang_kz: node.data.stg_kz});
+				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz});
 		},
 		mapResultToTreeData(el) {
 			const cp = {
@@ -212,6 +213,7 @@ export default {
 			:value="filteredNodes"
 			@node-expand="onExpandTreeNode"
 			selection-mode="single"
+			v-model:selection-keys="selectedKey"
 			@node-select="onSelectTreeNode"
 			scrollable
 			scroll-height="flex"
