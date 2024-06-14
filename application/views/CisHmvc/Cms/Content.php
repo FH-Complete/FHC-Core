@@ -12,7 +12,8 @@ $this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
 <div id="cms">
-	<?= $content; ?>
+<?php echo (isset($content) ? $content : '<content/>'); ?>
+	
 </div>
 
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>

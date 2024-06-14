@@ -12,7 +12,7 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 ?>
 
 <div id="cms">
-	<content />
+<?php echo (isset($content) ? $content : '<content/>'); ?>
 
 </div>
 
