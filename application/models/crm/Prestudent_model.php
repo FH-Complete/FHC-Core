@@ -718,6 +718,7 @@ class Prestudent_model extends DB_Model
 					ORDER BY prestudent_id, datum desc, insertamum desc
 				) ps USING(prestudent_id)
 			JOIN public.tbl_status USING(status_kurzbz)
+			LEFT JOIN public.tbl_status_grund g USING (statusgrund_id)
 			JOIN public.tbl_studiengang sg USING(studiengang_kz)
 			LEFT JOIN lehre.tbl_studienplan sp USING (studienplan_id)
 			LEFT JOIN public.tbl_student s USING (prestudent_id)
@@ -732,7 +733,7 @@ class Prestudent_model extends DB_Model
 	 * @param int $prestudent_id
 	 * @return object
 	 */
-	public function getHistoryPrestudent($prestudent_id)
+	public function getHistoryPrestudent($prestudent_id, $index_lang)
 	{
 		$query = "
 					SELECT 
@@ -761,7 +762,8 @@ class Prestudent_model extends DB_Model
 					ps.insertvon,
 					ps.updateamum,
 					TO_CHAR(ps.updateamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_updateamum,
-					ps.updatevon 
+					ps.updatevon,
+					stg.beschreibung[?] as statusgrund_beschreibung
 				FROM 
 					public.tbl_prestudentstatus ps
 				LEFT JOIN 
@@ -781,6 +783,6 @@ class Prestudent_model extends DB_Model
 				ORDER BY datum DESC
 		";
 
-		return $this->execQuery($query, array($prestudent_id));
+		return $this->execQuery($query, array($index_lang, $prestudent_id));
 	}
 }
