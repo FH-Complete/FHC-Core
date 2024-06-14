@@ -19,6 +19,7 @@ export default {
 		}
 	},
 	computed: {
+		
 		currentEvents() {
 			return (this.events || []).filter(evt => evt.end < this.dayAfterCurrentDay && evt.start >= this.currentDay);
 		},
@@ -29,12 +30,28 @@ export default {
 		}
 	},
 	methods: {
+		printEntry: function(item){
+			console.log(item);
+		},
 		selectDay(day) {
 			this.currentDay = day;
 			this.minimized = true;
+		},
+		showRoomInfo: function($ort_kurzbz){
+			
+			this.$fhcApi.factory.ort.getContentID($ort_kurzbz).then(res =>{
+
+				window.location.href = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+				"/CisHtml/Cms/content/" + res.data;
+			
+			})
 		}
+
 	},
 	created() {
+		
+		
 		this.$emit('setConfig', false);
 		axios
 			.get(this.apiurl + '/components/Cis/Stundenplan/Stunden').then(res => {
@@ -67,11 +84,11 @@ export default {
 				<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 			</div>
 			<div v-else-if="currentEvents.length" class="list-group list-group-flush">
-				<div class="" v-for="evt in currentEvents" :key="evt.id" class="list-group-item small" :style="{'background-color':evt.color}">
+				<div @click="printEntry(evt)" class="" v-for="evt in currentEvents" :key="evt.id" class="list-group-item small" :style="{'background-color':evt.color}">
 					<b>{{evt.title}}</b>
 					<br>
 					<small class="d-flex w-100 justify-content-between">
-						<span>{{evt.ort_kurzbz}}</span>
+						<span @click="showRoomInfo(evt.ort_kurzbz)" style="text-decoration:underline" type="button">{{evt.ort_kurzbz}}</span>
 						<span>{{evt.start.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}-{{evt.end.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}</span>
 					</small>
 				</div>

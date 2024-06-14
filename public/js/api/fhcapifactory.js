@@ -20,11 +20,13 @@ import phrasen from "./phrasen.js";
 import navigation from "./navigation.js";
 import filter from "./filter.js";
 import studstatus from "./studstatus.js";
+import ort from "./ort.js";
 
 export default {
     search,
     phrasen,
     navigation,
     filter,
-    studstatus
+    studstatus,
+    ort,
 };
