@@ -28045,6 +28045,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
+		'phrase' => 'btn_statusAendern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status ändern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Change status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
 		'phrase' => 'error_lastRole',
 		'insertvon' => 'system',
 		'phrases' => array(

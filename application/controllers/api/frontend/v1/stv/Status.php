@@ -141,11 +141,6 @@ class Status extends FHCAPI_Controller
 			$lastStatusData = current(getData($result));
 
 		//Different handling depending on newStatus
-		if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
-		{
-			$ausbildungssemester = $lastStatusData->ausbildungssemester;
-			$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
-		}
 		if($status_kurzbz == 'Absolvent' || $status_kurzbz == 'Diplomand')
 		{
 			$ausbildungssemester = $lastStatusData->ausbildungssemester;
@@ -175,7 +170,6 @@ class Status extends FHCAPI_Controller
 
 
 		//Check Reihungstest
-		//TODO(manu) test
 		if(REIHUNGSTEST_CHECK)
 		{
 			if($status_kurzbz=='Bewerber' && !$reihungstest_angetreten)
@@ -185,18 +179,15 @@ class Status extends FHCAPI_Controller
 		}
 
 		//Check ZGV
-		//TODO(manu) test
 		if(!defined("ZGV_CHECK") || ZGV_CHECK)
 		{
 			if($status_kurzbz=='Bewerber' && $zgv_code=='')
 			{
 				return $this->terminateWithError($this->p->t('lehre','error_ZGVNichtEingetragen', ['name' => $name]), self::ERROR_TYPE_GENERAL);
-
 			}
 		}
 
 		//Check ZGV-Master
-		//TODO(manu) test
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$result = $this->StudiengangModel->load([
 			'studiengang_kz'=> $stg
@@ -291,6 +282,45 @@ class Status extends FHCAPI_Controller
 			}
 		}
 
+		//different handling of StudStati
+		if($status_kurzbz == 'Abbrecher')
+		{
+			$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
+
+			$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+			$result = $this->StatusgrundModel->load($statusgrund_id);
+			if (isError($result))
+			{
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+			$result = current(getData($result));
+			$statusgrund_kurzbz = $result->statusgrund_kurzbz;
+
+			$this->load->library('PrestudentLib');
+			$result = $this->prestudentlib->setAbbrecher($prestudent_id, $studiensemester_kurzbz, null, $statusgrund_kurzbz, $datum, $bestaetigtam, $bestaetigtvon);
+			if (isError($result))
+			{
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+			else
+				$this->terminateWithSuccess($prestudent_id);
+		}
+
+		//TODO(Manu) setUnterbrecher FasLogic!
+		if($status_kurzbz == 'Unterbrecher')
+		{
+			$ausbildungssemester = $lastStatusData->ausbildungssemester;
+			$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
+
+			$this->load->library('PrestudentLib');
+			$result = $this->prestudentlib->setUnterbrecherFas($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $datum, $bestaetigtam, $bestaetigtvon);
+			if (isError($result))
+			{
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+			else
+				$this->terminateWithSuccess($prestudent_id);
+		}
 
 		// Start DB transaction
 		$this->db->trans_begin(); // Beginnen der Transaktion
@@ -345,13 +375,14 @@ class Status extends FHCAPI_Controller
 			$gruppe = $studentData->gruppe == '' ? '' : $studentData->gruppe;
 			$studiengang_kz = $studentData->studiengang_kz;
 
+			//TODO(Manu) DEPRECATED
 			//Handle Abbrecher and Unterbrecher
-			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
+/*			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
 						{
 							$ausbildungssemester = 0;
 							$gruppe = '';
 							$verband = $status_kurzbz == 'Abbrecher' ? 'A' : 'B';
-						}
+						}*/
 
 			//process studentlehrverband
 			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
@@ -371,9 +402,9 @@ class Status extends FHCAPI_Controller
 
 			//update(fuer Abbrecher und Unterbrecher)
 			//implemented for multiaction "status ändern"
-			//TODO(Manu) implement also for newStatus?
 
-			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
+			//TODO(Manu) DEPRECATED
+/*			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
 			{
 				$result = $this->StudentModel->update(
 					[
@@ -414,7 +445,7 @@ class Status extends FHCAPI_Controller
 					}
 				}
 
-			}
+			}*/
 		}
 
 		$this->db->trans_commit();

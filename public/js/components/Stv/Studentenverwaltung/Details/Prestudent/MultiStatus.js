@@ -126,6 +126,7 @@ export default{
 					{title: "BestätigtAm", field: "format_bestaetigtam"},
 					{title: "AbgeschicktAm", field: "format_bewerbung_abgeschicktamum", visible:false},
 					{title: "Statusgrund", field: "statusgrund_kurzbz"},
+					{title: "Bezeichnung", field: "bezeichnung_mehrsprachig[0]"},
 					{title: "Organisationsform", field: "orgform_kurzbz", visible: false},
 					{title: "PrestudentInId", field: "prestudent_id", visible: false},
 					{title: "StudienplanId", field: "studienplan_id", visible: false},
@@ -1185,7 +1186,7 @@ export default{
 					
 					<div class="btn-group">						
 						<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-							Status Ändern
+							{{$p.t('lehre', 'btn_statusAendern')}}
 						</button>
 					
 						<ul class="dropdown-menu">
