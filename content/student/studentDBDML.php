@@ -431,13 +431,13 @@ function checkStatusaenderung(
 
 	// Alle prestudentstatus nach Datum sortiert
 	$qry = "SELECT
-				status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, sem.start AS studiensemester_start,
+				pss.status_kurzbz, sem.studiensemester_kurzbz, pss.ausbildungssemester, pss.datum, sem.start AS studiensemester_start,
 				pl.orgform_kurzbz AS studienplan_orgform_kurzbz, stud.matrikelnr
 			FROM
 				public.tbl_prestudentstatus pss
 				JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
-				JOIN public.tbl_student stud USING (prestudent_id)
-				JOIN lehre.tbl_studienplan pl USING (studienplan_id)
+				LEFT JOIN public.tbl_student stud USING (prestudent_id)
+				LEFT JOIN lehre.tbl_studienplan pl USING (studienplan_id)
 			WHERE
 				prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER);
 
