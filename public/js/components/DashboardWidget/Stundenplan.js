@@ -1,6 +1,8 @@
 import Phrasen from '../../mixins/Phrasen.js';
 import AbstractWidget from './Abstract.js';
 import FhcCalendar from '../Calendar/Calendar.js';
+import LvUebersicht from '../Cis/Mylv/LvUebersicht.js';
+
 
 export default {
 	mixins: [
@@ -8,14 +10,17 @@ export default {
 		AbstractWidget
 	],
 	components: {
-		FhcCalendar
+		FhcCalendar,
+		LvUebersicht,
 	},
+	
 	data() {
 		return {
 			stunden: [],
 			minimized: true,
 			events: null,
-			currentDay: new Date()
+			currentDay: new Date(),
+			
 		}
 	},
 	computed: {
@@ -30,9 +35,14 @@ export default {
 		}
 	},
 	methods: {
-		printEntry: function(item){
-			console.log(item);
+		showLvUebersicht: function (event){
+			
+			this.$refs.lvUebersicht.lehreinheit = event.lehreinheit_id;
+			this.$refs.lvUebersicht.lv = event.title;
+			this.$refs.lvUebersicht.stg = event.stg_typ + event.stg_kurzbz + (event.verband?'-' + event.verband:'' );
+			this.$refs.lvUebersicht.show();
 		},
+		
 		selectDay(day) {
 			this.currentDay = day;
 			this.minimized = true;
@@ -76,15 +86,16 @@ export default {
 			})
 			.catch(err => { console.error('ERROR: ', err.response.data) });
 	},
-	template: `
+	template: /*html*/`
 	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">
+		<lv-uebersicht ref="lvUebersicht"  />
 		<fhc-calendar :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" />
 		<div v-show="minimized" class="flex-grow-1 overflow-scroll">
 			<div v-if="events === null" class="d-flex h-100 justify-content-center align-items-center">
 				<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 			</div>
 			<div v-else-if="currentEvents.length" class="list-group list-group-flush">
-				<div @click="printEntry(evt)" class="" v-for="evt in currentEvents" :key="evt.id" class="list-group-item small" :style="{'background-color':evt.color}">
+				<div @click="showLvUebersicht(evt)" class="" v-for="evt in currentEvents" :key="evt.id" class="list-group-item small" :style="{'background-color':evt.color}">
 					<b>{{evt.title}}</b>
 					<br>
 					<small class="d-flex w-100 justify-content-between">
