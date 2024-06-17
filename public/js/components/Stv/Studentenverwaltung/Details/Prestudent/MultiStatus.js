@@ -706,8 +706,7 @@ export default{
 									<option  value="Bewerber">BewerberIn</option>
 									<option  value="Aufgenommener">Aufgenommene/r</option>
 									<option  value="Student">StudentIn</option>
-<!--									TODO(Manu) handle Unterbrecher from here
-									<option  value="Unterbrecher">UnterbrecherIn</option>-->
+									<option  value="Unterbrecher">UnterbrecherIn</option>
 									<option  value="Diplomand">DiplomandIn</option>
 									<option  value="Incoming">Incoming</option>
 								</form-input>
@@ -873,8 +872,7 @@ export default{
 									<option  value="Bewerber">BewerberIn</option>
 									<option  value="Aufgenommener">Aufgenommene/r</option>
 									<option  value="Student">StudentIn</option>
-<!--									TODO(Manu) check: is handle Unterbrecher from here necessary?
-									<option  value="Unterbrecher">UnterbrecherIn</option>-->
+									<option  value="Unterbrecher">UnterbrecherIn</option>
 									<option  value="Diplomand">DiplomandIn</option>
 									<option  value="Incoming">Incoming</option>
 								</form-input>

@@ -73,17 +73,17 @@ class Status extends FHCAPI_Controller
 
 	public function isLastStatus($prestudent_id)
 	{
-		//TODO(Manu) translate here
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 		$result = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id);
+
+
 		if (isError($result))
 		{
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 		if($result->retval == "1")
 		{
-			//return $this->outputJson($result->retval);
-			return $this->terminateWithError("Die letzte Rolle kann nur durch den Administrator geloescht werden", self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('lehre','error_lastRole'), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess($result);
 	}
@@ -313,7 +313,7 @@ class Status extends FHCAPI_Controller
 				$this->terminateWithSuccess($prestudent_id);
 		}
 
-		//TODO(Manu) setUnterbrecher FasLogic!
+		//TODO(Manu) documentation: here setUnterbrecher FasLogic!
 		if($status_kurzbz == 'Unterbrecher')
 		{
 			$ausbildungssemester = $lastStatusData->ausbildungssemester;
@@ -328,6 +328,57 @@ class Status extends FHCAPI_Controller
 			else
 				$this->terminateWithSuccess($prestudent_id);
 		}
+
+		//TODO(Manu) documentation: here setStudent Logic!
+		if($status_kurzbz == 'Student')
+		{
+			//return $this->terminateWithError($studiensemester_kurzbz . " - " . $ausbildungssemester, self::ERROR_TYPE_GENERAL);
+
+			$this->load->library('PrestudentLib');
+			$result = $this->prestudentlib->setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtam, $bestaetigtvon);
+
+			if (isError($result))
+			{
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+			else
+				$this->terminateWithSuccess($prestudent_id);
+			
+		}
+
+		if($status_kurzbz == 'Diplomand')
+		{
+			//return $this->terminateWithError("in setDiplomand", self::ERROR_TYPE_GENERAL);
+
+			$this->load->library('PrestudentLib');
+			$result = $this->prestudentlib->setDiplomand($prestudent_id, $studiensemester_kurzbz,$ausbildungssemester, $bestaetigtam, $bestaetigtvon);
+
+			if (isError($result))
+			{
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+			else
+				$this->terminateWithSuccess($prestudent_id);
+			
+		}
+
+		if($status_kurzbz == 'Absolvent')
+		{
+			//return $this->terminateWithError("in setAbsolvent", self::ERROR_TYPE_GENERAL);
+
+			$this->load->library('PrestudentLib');
+			$result = $this->prestudentlib->setAbsolvent($prestudent_id, $studiensemester_kurzbz,$ausbildungssemester, $bestaetigtam, $bestaetigtvon);
+
+			if (isError($result))
+			{
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+			else
+				$this->terminateWithSuccess($prestudent_id);
+			
+		}
+
+		return $this->terminateWithError("Warning! not in setStatus Mode", self::ERROR_TYPE_GENERAL);
 
 		// Start DB transaction
 		$this->db->trans_begin(); // Beginnen der Transaktion

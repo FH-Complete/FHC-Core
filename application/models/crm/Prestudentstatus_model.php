@@ -5,6 +5,9 @@ class Prestudentstatus_model extends DB_Model
 
 	const STATUS_ABBRECHER = 'Abbrecher';
 	const STATUS_UNTERBRECHER = 'Unterbrecher';
+	const STATUS_STUDENT = 'Student';
+	const STATUS_DIPLOMAND = 'Diplomand';
+	const STATUS_ABSOLVENT = 'Absolvent';
 
 	/**
 	 * Constructor

@@ -612,5 +612,331 @@ class PrestudentLib
 		return success();
 	}
 
+	public function setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtAm, $bestaetigtVon)
+	{
+		$insertvon = getAuthUID();
+		 
+		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
+		if (isError($result))
+			return $result;
+		$result = getData($result);
+		if (!$result)
+		{
+
+			$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
+			if (isError($result))
+				return $result;
+			$result = getData($result);
+
+			if($statusgrund_id != 16)
+			{
+			//check if ausbildungssemester is last
+				$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+				$res = $this->_ci->StudiengangModel->loadWhere(['p.prestudent_id' => $prestudent_id]);
+				if(isError($res))
+					return $res;
+				if(!hasData($res))
+					return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_for_prestudent', [
+						'prestudent_id' => $prestudent_id
+					]));
+
+				$studiengang = current(getData($res));
+				$prestudent_status = current($result);
+				if($prestudent_status->ausbildungssemester + 1 < $studiengang->max_semester)
+					$ausbildungssemester_plus = 1;
+
+				if(!$result)
+				{
+					return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
+						'prestudent_id' => $prestudent_id,
+						'studiensemester_kurzbz' => $studiensemester_kurzbz
+					]));
+				}
+			}
+		}
+
+		$prestudent_status = current($result);
+		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+
+		if (isError($result))
+			return $result;
+		$result = getData($result);
+		if (!$result)
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+
+		$student = current($result);
+
+		//Status updaten
+		$result = $this->_ci->PrestudentstatusModel->insert([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_STUDENT,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'statusgrund_id' => $statusgrund_id,
+			'ausbildungssemester' => $ausbildungssemester,
+			'datum' => date('c'),
+			'insertvon' => $insertvon,
+			'insertamum' => date('c'),
+			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
+			'studienplan_id'=> $prestudent_status->studienplan_id,
+			'bestaetigtvon' => $insertvon,
+			'bestaetigtam' => date('c'),
+		]);
+
+		if (isError($result))
+			return $result;
+
+		$result = $this->_ci->StudentModel->checkIfUid($prestudent_id);
+		if (isError($result)) {
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+		$student_uid = $result->retval;
+
+		//load student
+		$result = $this->_ci->StudentModel->loadWhere(
+			array(
+				'student_uid' => $student_uid
+			)
+		);
+		if (isError($result))
+		{
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+
+		$studentData = current(getData($result) ? : []);
+		$verband = $studentData->verband == '' ? '' : $studentData->verband;
+		$gruppe = $studentData->gruppe == '' ? '' : $studentData->gruppe;
+		$studiengang_kz = $studentData->studiengang_kz;
+
+		//process studentlehrverband
+		$this->_ci->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+		$result = $this->_ci->StudentlehrverbandModel->processStudentlehrverband(
+			$student_uid,
+			$studiengang_kz,
+			$ausbildungssemester,
+			$verband,
+			$gruppe,
+			$studiensemester_kurzbz
+		);
+
+		return success();
+	}
+
+	public function setDiplomand($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester,$bestaetigtAm, $bestaetigtVon)
+	{
+		$insertvon = getAuthUID();
+		 
+		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
+		if (isError($result))
+			return $result;
+		$result = getData($result);
+		if (!$result)
+		{
+
+			$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
+			if (isError($result))
+				return $result;
+			$result = getData($result);
+
+			if($statusgrund_id != 16)
+			{
+			//check if ausbildungssemester is last
+				$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+				$res = $this->_ci->StudiengangModel->loadWhere(['p.prestudent_id' => $prestudent_id]);
+				if(isError($res))
+					return $res;
+				if(!hasData($res))
+					return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_for_prestudent', [
+						'prestudent_id' => $prestudent_id
+					]));
+
+				$studiengang = current(getData($res));
+				$prestudent_status = current($result);
+				if($prestudent_status->ausbildungssemester + 1 < $studiengang->max_semester)
+					$ausbildungssemester_plus = 1;
+
+				if(!$result)
+				{
+					return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
+						'prestudent_id' => $prestudent_id,
+						'studiensemester_kurzbz' => $studiensemester_kurzbz
+					]));
+				}
+			}
+		}
+
+		$prestudent_status = current($result);
+		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+
+		if (isError($result))
+			return $result;
+		$result = getData($result);
+		if (!$result)
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+
+		$student = current($result);
+
+		//Status updaten
+		$result = $this->_ci->PrestudentstatusModel->insert([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_DIPLOMAND,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			// 'statusgrund_id' => $statusgrund_id,
+			// 'ausbildungssemester' => $ausbildungssemester,
+			'datum' => date('c'),
+			'insertvon' => $insertvon,
+			'insertamum' => date('c'),
+			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
+			'studienplan_id'=> $prestudent_status->studienplan_id,
+			'bestaetigtvon' => $insertvon,
+			'bestaetigtam' => date('c'),
+		]);
+
+		if (isError($result))
+			return $result;
+
+		$result = $this->_ci->StudentModel->checkIfUid($prestudent_id);
+		if (isError($result)) {
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+		$student_uid = $result->retval;
+
+		//load student
+		$result = $this->_ci->StudentModel->loadWhere(
+			array(
+				'student_uid' => $student_uid
+			)
+		);
+		if (isError($result))
+		{
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+
+		$studentData = current(getData($result) ? : []);
+		$verband = $studentData->verband == '' ? '' : $studentData->verband;
+		$gruppe = $studentData->gruppe == '' ? '' : $studentData->gruppe;
+		$studiengang_kz = $studentData->studiengang_kz;
+
+		//process studentlehrverband
+		$this->_ci->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+		$result = $this->_ci->StudentlehrverbandModel->processStudentlehrverband(
+			$student_uid,
+			$studiengang_kz,
+			$ausbildungssemester,
+			$verband,
+			$gruppe,
+			$studiensemester_kurzbz
+		);
+
+		return success();
+	}
+
+	public function setAbsolvent($prestudent_id,$studiensemester_kurzbz, $ausbildungssemester, $bestaetigtAm, $bestaetigtVon)
+	{
+		$insertvon = getAuthUID();
+		 
+		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
+		if (isError($result))
+			return $result;
+		$result = getData($result);
+		if (!$result)
+		{
+
+			$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
+			if (isError($result))
+				return $result;
+			$result = getData($result);
+
+			if($statusgrund_id != 16)
+			{
+			//check if ausbildungssemester is last
+				$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+				$res = $this->_ci->StudiengangModel->loadWhere(['p.prestudent_id' => $prestudent_id]);
+				if(isError($res))
+					return $res;
+				if(!hasData($res))
+					return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_for_prestudent', [
+						'prestudent_id' => $prestudent_id
+					]));
+
+				$studiengang = current(getData($res));
+				$prestudent_status = current($result);
+				if($prestudent_status->ausbildungssemester + 1 < $studiengang->max_semester)
+					$ausbildungssemester_plus = 1;
+
+				if(!$result)
+				{
+					return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
+						'prestudent_id' => $prestudent_id,
+						'studiensemester_kurzbz' => $studiensemester_kurzbz
+					]));
+				}
+			}
+		}
+
+		$prestudent_status = current($result);
+		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+
+		if (isError($result))
+			return $result;
+		$result = getData($result);
+		if (!$result)
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+
+		$student = current($result);
+
+		//Status updaten
+		$result = $this->_ci->PrestudentstatusModel->insert([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_ABSOLVENT,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			// 'statusgrund_id' => $statusgrund_id,
+			// 'ausbildungssemester' => $ausbildungssemester,
+			'datum' => date('c'),
+			'insertvon' => $insertvon,
+			'insertamum' => date('c'),
+			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
+			'studienplan_id'=> $prestudent_status->studienplan_id,
+			'bestaetigtvon' => $insertvon,
+			'bestaetigtam' => date('c'),
+		]);
+
+		if (isError($result))
+			return $result;
+
+		$result = $this->_ci->StudentModel->checkIfUid($prestudent_id);
+		if (isError($result)) {
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+		$student_uid = $result->retval;
+
+		//load student
+		$result = $this->_ci->StudentModel->loadWhere(
+			array(
+				'student_uid' => $student_uid
+			)
+		);
+		if (isError($result))
+		{
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+
+		$studentData = current(getData($result) ? : []);
+		$verband = $studentData->verband == '' ? '' : $studentData->verband;
+		$gruppe = $studentData->gruppe == '' ? '' : $studentData->gruppe;
+		$studiengang_kz = $studentData->studiengang_kz;
+
+		//process studentlehrverband
+		$this->_ci->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+		$result = $this->_ci->StudentlehrverbandModel->processStudentlehrverband(
+			$student_uid,
+			$studiengang_kz,
+			$ausbildungssemester,
+			$verband,
+			$gruppe,
+			$studiensemester_kurzbz
+		);
+
+		return success();
+	}
 
 }
