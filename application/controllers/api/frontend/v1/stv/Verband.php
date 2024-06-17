@@ -393,12 +393,12 @@ class Verband extends FHCAPI_Controller
 								'children' => [
 									[
 										'name' => 'Nicht zum Reihungstest angemeldet',
-										'link' => $intlink . '/statusbestaetigt/reihungstestnichtangemeldet',
+										'link' => $intlink . '/statusbestaetigtrtnichtangemeldet',
 										'leaf' => true
 									],
 									[
 										'name' => 'Reihungstest angemeldet',
-										'link' => $intlink . '/statusbestaetigt/reihungstestangemeldet',
+										'link' => $intlink . '/statusbestaetigtrtangemeldet',
 										'leaf' => true
 									]
 								]
@@ -421,7 +421,33 @@ class Verband extends FHCAPI_Controller
 						'name' => 'Bewerber',
 						'link' => $semlink . '/bewerber',
 						'stg_kz' => $studiengang_kz,
-						'leaf' => true
+						'children' => [
+							[
+								'name' => 'Nicht zum Reihungstest angemeldet',
+								'link' => $intlink . '/bewerberrtnichtangemeldet',
+								'stg_kz' => $studiengang_kz,
+								'leaf' => true
+							],
+							[
+								'name' => 'Reihungstest angemeldet',
+								'link' => $intlink . '/bewerberrtangemeldet',
+								'stg_kz' => $studiengang_kz,
+								'children' => [
+									[
+										'name' => 'Teilgenommen',
+										'link' => $intlink . '/bewerberrtangemeldetteilgenommen',
+										'stg_kz' => $studiengang_kz,
+										'leaf' => true
+									],
+									[
+										'name' => 'Nicht teilgenommen',
+										'link' => $intlink . '/bewerberrtangemeldetnichtteilgenommen',
+										'stg_kz' => $studiengang_kz,
+										'leaf' => true
+									]
+								]
+							]
+						]
 					],
 					[
 						'name' => 'Aufgenommen',

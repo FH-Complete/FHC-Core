@@ -183,13 +183,15 @@ class Students extends FHCAPI_Controller
 	 */
 	protected function getPrestudents($studiengang_kz, $studiensemester_kurzbz = null, $filter = null, $orgform_kurzbz = null)
 	{
-		// TODO(chris): @see: prestudent.class::loadInteressentenUndBewerber
-		// TODO(chris): IMPLEMENT!
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
-		$stdsemEsc = $this->PrestudentModel->escape($studiensemester_kurzbz);
+		$stdsemEsc = $studiensemester_kurzbz ? $this->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
+
+		$selectRT = 'SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemester_kurzbz=' . $stdsemEsc;
+
 		
-		$where = [];
+		$where = ['studiengang_kz' => $studiengang_kz];
+
 		if ($orgform_kurzbz) {
 			$where['ps.orgform_kurzbz'] = $orgform_kurzbz;
 		}
@@ -214,12 +216,12 @@ class Students extends FHCAPI_Controller
 			case "statusbestaetigtrtnichtangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
 				$where['bestaetigtam IS NOT NULL'] = null;
-				$this->PrestudentModel->db->where('NOT EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemester_kurzbz=' . $stdsemEsc . ')', null, false);
+				$this->PrestudentModel->db->where('NOT EXISTS(' . $selectRT . ')', null, false);
 				break;
 			case "statusbestaetigtrtangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
 				$where['bestaetigtam IS NOT NULL'] = null;
-				$this->PrestudentModel->db->where('EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemester_kurzbz=' . $stdsemEsc . ')', null, false);
+				$this->PrestudentModel->db->where('EXISTS(' . $selectRT . ')', null, false);
 				break;
 			case "zgv":
 				$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
@@ -249,14 +251,32 @@ class Students extends FHCAPI_Controller
 				break;
 			case "reihungstestangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$this->PrestudentModel->db->where('EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemester_kurzbz=' . $stdsemEsc . ')', null, false);
+				$this->PrestudentModel->db->where('EXISTS(' . $selectRT . ')', null, false);
 				break;
 			case "reihungstestnichtangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$this->PrestudentModel->db->where('NOT EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemester_kurzbz=' . $stdsemEsc . ')', null, false);
+				$this->PrestudentModel->db->where('NOT EXISTS(' . $selectRT . ')', null, false);
 				break;
 			case "bewerber":
 				$where['ps.status_kurzbz'] = 'Bewerber';
+				break;
+			case "bewerberrtnichtangemeldet":
+				$where['ps.status_kurzbz'] = 'Bewerber';
+				$this->PrestudentModel->db->where('NOT EXISTS(' . $selectRT . ')', null, false);
+				break;
+			case "bewerberrtangemeldet":
+				$where['ps.status_kurzbz'] = 'Bewerber';
+				$this->PrestudentModel->db->where('EXISTS(' . $selectRT . ')', null, false);
+				break;
+			case "bewerberrtangemeldetteilgenommen":
+				$where['ps.status_kurzbz'] = 'Bewerber';
+				$this->PrestudentModel->db->where('EXISTS(' . $selectRT . ')', null, false);
+				$where['reihungstestangetreten'] = true;
+				break;
+			case "bewerberrtangemeldetnichtteilgenommen":
+				$where['ps.status_kurzbz'] = 'Bewerber';
+				$this->PrestudentModel->db->where('EXISTS(' . $selectRT . ')', null, false);
+				$where['reihungstestangetreten'] = false;
 				break;
 			case "aufgenommen":
 				$where['ps.status_kurzbz'] = 'Aufgenommener';
@@ -267,6 +287,10 @@ class Students extends FHCAPI_Controller
 			case "absage":
 				$where['ps.status_kurzbz'] = 'Abgewiesener';
 				break;
+			case "incoming":
+				// NOTE(chris): in FAS it was not filtered for studiengang_kz
+				$where['ps.status_kurzbz'] = 'Incoming';
+				break;
 			case "absolvent":
 				$where['ps.status_kurzbz'] = 'Absolvent';
 				break;
@@ -275,8 +299,6 @@ class Students extends FHCAPI_Controller
 				break;
 			default:
 				if (!$studiensemester_kurzbz) {
-					// TODO(chris): should work ... needs testing
-					// we want all prestudents without status?
 					$where['ps.status_kurzbz'] = null;
 				} else {
 					$this->PrestudentModel->db->where_in('ps.status_kurzbz', [
@@ -315,7 +337,7 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('tbl_prestudent.studiengang_kz');
 		$this->PrestudentModel->addSelect('aufmerksamdurch_kurzbz');
 		$this->PrestudentModel->addSelect('mentor');
-		$this->PrestudentModel->addSelect('FALSE AS bnaktiv', false);
+		$this->PrestudentModel->addSelect('NULL AS bnaktiv', false);
 		$this->PrestudentModel->addSelect(
 			"(SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung LIMIT 1) AS email_privat",
 			false
@@ -333,12 +355,12 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('tbl_prestudent.priorisierung');
 		$this->PrestudentModel->addSelect('p.zugangscode');
 		$this->PrestudentModel->addSelect('p.bpk');
-
+		
 		$this->PrestudentModel->addOrder('nachname');
 		$this->PrestudentModel->addOrder('vorname');
 
 		$this->addFilter($studiensemester_kurzbz);
-
+		
 		$result = $this->PrestudentModel->loadWhere($where);
 
 		$data = $this->getDataOrTerminateWithError($result);

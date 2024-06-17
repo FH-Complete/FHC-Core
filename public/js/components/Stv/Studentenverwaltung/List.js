@@ -32,7 +32,7 @@ export default {
 					{title:"TitelPost", field:"titelpost"},
 					{title:"SVNR", field:"svnr"},
 					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen"},
-					{title:"Geburtsdatum", field:"geburtsdatum_iso"},
+					{title:"Geburtsdatum", field:"gebdatum"},
 					{title:"Geschlecht", field:"geschlecht"},
 					{title:"Sem.", field:"semester"},
 					{title:"Verb.", field:"verband"},
@@ -60,9 +60,14 @@ export default {
 					{title:"PreStudentInnenID", field:"prestudent_id"},
 					{title:"Priorität", field:"priorisierung_realtiv"},
 					{title:"Mentor", field:"mentor", visible:false},
-					{title:"Aktiv", field:"aktiv", visible:false},
+					{title:"Aktiv", field:"bnaktiv", visible:false},
 					{title:"GeburtsdatumISO", field:"geburtsdatum_iso", visible:false},
 				],
+				rowFormatter(row) {
+					if (row.getData().bnaktiv === false) {
+						row.getElement().classList.add('text-muted');
+					}
+				},
 
 				ajaxResponse: (url, params, response) => response.data,
 
