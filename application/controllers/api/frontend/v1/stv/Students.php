@@ -331,7 +331,7 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('svnr');
 		$this->PrestudentModel->addSelect("'' AS matrikelnr");
 		$this->PrestudentModel->addSelect('p.anmerkung AS anmerkungen');
-		$this->PrestudentModel->addSelect("'' AS semester");
+		$this->PrestudentModel->addSelect("CASE WHEN ps.status_kurzbz IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') THEN ps.ausbildungssemester::text ELSE ''::text END AS semester", false);
 		$this->PrestudentModel->addSelect("'' AS verband");
 		$this->PrestudentModel->addSelect("'' AS gruppe");
 		$this->PrestudentModel->addSelect('tbl_prestudent.studiengang_kz');
@@ -516,7 +516,7 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('svnr');
 		$this->PrestudentModel->addSelect('s.matrikelnr');
 		$this->PrestudentModel->addSelect('p.anmerkung AS anmerkungen');
-		$this->PrestudentModel->addSelect('v.semester');
+		$this->PrestudentModel->addSelect("COALESCE(v.semester::text, CASE WHEN public.get_rolle_prestudent(prestudent_id, NULL) IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') THEN public.get_absem_prestudent(prestudent_id, NULL)::text ELSE ''::text END) AS semester", false);
 		$this->PrestudentModel->addSelect('v.verband');
 		$this->PrestudentModel->addSelect('v.gruppe');
 		$this->PrestudentModel->addSelect('tbl_prestudent.studiengang_kz');
