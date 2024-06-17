@@ -26361,6 +26361,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'termine',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Termine',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 	// FHC-CORE-ANWESENHEITEN END
 );
 
