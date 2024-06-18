@@ -153,11 +153,6 @@ class Status extends FHCAPI_Controller
 			$ausbildungssemester = $lastStatusData->ausbildungssemester;
 		}
 
-		/*		if($status_kurzbz != 'Student')
-				{
-					$ausbildungssemester = $lastStatusData->ausbildungssemester;
-				}*/
-
 		//check if Rolle already exists
 		$result = $this->PrestudentstatusModel->checkIfExistingPrestudentRolle(
 			$prestudent_id,
@@ -231,7 +226,6 @@ class Status extends FHCAPI_Controller
 		}
 
 		//check if studentrolle already exists
-		//TODO(manu) refactor and test
 		if($status_kurzbz == 'Student' || $status_kurzbz == 'Diplomand' || $lastStatusData->status_kurzbz == 'Student')
 		{
 			$this->load->model('crm/Student_model', 'StudentModel');
@@ -276,7 +270,6 @@ class Status extends FHCAPI_Controller
 			}
 
 			//check if Bismeldestichtag erreicht
-			//TODO(manu) Test...
 			$this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
 			$result = $this->BismeldestichtagModel->checkIfMeldestichtagErreicht($new_status_datum);
 			if (isError($result))
@@ -320,7 +313,7 @@ class Status extends FHCAPI_Controller
 			$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
 
 			$this->load->library('PrestudentLib');
-			$result = $this->prestudentlib->setUnterbrecherFas($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $datum, $bestaetigtam, $bestaetigtvon);
+			$result = $this->prestudentlib->setUnterbrecher($prestudent_id, $studiensemester_kurzbz, null, null, $ausbildungssemester);
 			if (isError($result))
 			{
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
@@ -329,11 +322,8 @@ class Status extends FHCAPI_Controller
 				$this->terminateWithSuccess($prestudent_id);
 		}
 
-		//TODO(Manu) documentation: here setStudent Logic!
 		if($status_kurzbz == 'Student')
 		{
-			//return $this->terminateWithError($studiensemester_kurzbz . " - " . $ausbildungssemester, self::ERROR_TYPE_GENERAL);
-
 			$this->load->library('PrestudentLib');
 			$result = $this->prestudentlib->setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtam, $bestaetigtvon);
 
@@ -348,10 +338,8 @@ class Status extends FHCAPI_Controller
 
 		if($status_kurzbz == 'Diplomand')
 		{
-			//return $this->terminateWithError("in setDiplomand", self::ERROR_TYPE_GENERAL);
-
 			$this->load->library('PrestudentLib');
-			$result = $this->prestudentlib->setDiplomand($prestudent_id, $studiensemester_kurzbz,$ausbildungssemester, $bestaetigtam, $bestaetigtvon);
+			$result = $this->prestudentlib->setDiplomand($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 
 			if (isError($result))
 			{
@@ -364,10 +352,8 @@ class Status extends FHCAPI_Controller
 
 		if($status_kurzbz == 'Absolvent')
 		{
-			//return $this->terminateWithError("in setAbsolvent", self::ERROR_TYPE_GENERAL);
-
 			$this->load->library('PrestudentLib');
-			$result = $this->prestudentlib->setAbsolvent($prestudent_id, $studiensemester_kurzbz,$ausbildungssemester, $bestaetigtam, $bestaetigtvon);
+			$result = $this->prestudentlib->setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 
 			if (isError($result))
 			{
@@ -377,8 +363,6 @@ class Status extends FHCAPI_Controller
 				$this->terminateWithSuccess($prestudent_id);
 			
 		}
-
-		return $this->terminateWithError("Warning! not in setStatus Mode", self::ERROR_TYPE_GENERAL);
 
 		// Start DB transaction
 		$this->db->trans_begin(); // Beginnen der Transaktion
@@ -405,7 +389,6 @@ class Status extends FHCAPI_Controller
 		if ($this->db->trans_status() === false || isError($result))
 		{
 			$this->db->trans_rollback();
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 
 		if($isStudent)
@@ -455,7 +438,8 @@ class Status extends FHCAPI_Controller
 			if ($this->db->trans_status() === false || isError($result))
 			{
 				$this->db->trans_rollback();
-				return $this->terminateWithError($this->p->t('lehre','error_duringInsertUpdateLehrverband'), self::ERROR_TYPE_GENERAL);
+			//	return $this->terminateWithError($result->code);
+			return $this->terminateWithError($this->p->t('lehre','error_duringInsertUpdateLehrverband'), self::ERROR_TYPE_GENERAL);
 			}
 
 			//update(fuer Abbrecher und Unterbrecher)

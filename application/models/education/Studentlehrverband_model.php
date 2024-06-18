@@ -70,7 +70,6 @@ class Studentlehrverband_model extends DB_Model
 
 			if ($result->retval == "0")
 			{
-				//$this->terminateWithError("in section 0 und weiter.. wo verband auf leer gesetzt wird", self::ERROR_TYPE_GENERAL);
 				$result = $this->LehrverbandModel->insert([
 					'studiengang_kz' => $studiengang_kz,
 					'semester' => $ausbildungssemester,
@@ -86,6 +85,8 @@ class Studentlehrverband_model extends DB_Model
 					return error("0", $this->p->t('lehre','error_updateLehrverband'));
 				}
 			}
+
+
 
 			// Lehrverband insert
 			$bezeichnung = $verband == 'A' ? ' Abbrecher' : 'Unterbrecher';
@@ -103,6 +104,7 @@ class Studentlehrverband_model extends DB_Model
 				return error("0", $this->p->t('lehre','error_updateLehrverband'));
 			}
 		}
+
 
 		// Studentlehrverband insert or update
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');

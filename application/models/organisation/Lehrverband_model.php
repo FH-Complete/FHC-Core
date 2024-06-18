@@ -39,6 +39,7 @@ class Lehrverband_model extends DB_Model
 
 		$result = $this->execQuery($qry, array($studiengang_kz, $semester, $verband, $gruppe));
 
+
 		if(isError($result))
 		{
 			return error($result);

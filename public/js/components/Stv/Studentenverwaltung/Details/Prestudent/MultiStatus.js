@@ -2,7 +2,6 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
-import {CoreRESTClient} from "../../../../../RESTClient.js";
 
 export default{
 	components: {
@@ -49,11 +48,6 @@ export default{
 		}
 	},
 	computed: {
-/*		personIds(){
-			if (this.modelValue.person_id)
-				return [this.modelValue.person_id];
-			return this.modelValue.map(e => e.person_id);
-		},*/
 		prestudentIds(){
 			if (this.modelValue.prestudent_id)
 			{
@@ -71,7 +65,6 @@ export default{
 					name: `${this.modelValue.vorname} ${this.modelValue.nachname}`
 				};
 				dataArray.push(newObj);
-				//console.log(dataArray);
 				return dataArray;
 			}
 			else
@@ -94,7 +87,7 @@ export default{
 		},
 		arrayStg(){
 			let stgInteger = this.hasAssistenzPermissionForStgs.map(item => {
-				return parseInt(item); // Wandelt jeden String in eine ganze Zahl um
+				return parseInt(item);
 			});
 			return stgInteger;
 		},
@@ -139,11 +132,6 @@ export default{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
-
-
-							//let disableButton = false;
-							//const rowData = this.row.getData();
-
 
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
@@ -266,8 +254,6 @@ export default{
 					}
 				}
 			],
-//		}
-
 			statusData: {},
 			listStudiensemester: [],
 			maxSem:  Array.from({ length: 11 }, (_, index) => index),
@@ -365,7 +351,6 @@ export default{
 			this.actionButton = statusgrund;
 			this.actionStatusText = statusText;
 
-			console.log("statusgrund: " + this.actionButton + ' , statusText:  ' + this.actionStatusText + ' sem: ' + this.actionSem);
 			if(this.actionStatusText != "Student" && this.actionStatusText != "Wiederholer")
 				this.$refs.confirmStatusAction.show();
 			else
@@ -382,10 +367,10 @@ export default{
 				};
 			console.log(this.updateData);
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...abbruchData }));
-			console.log(this.newArray);
+/*			console.log(this.newArray);
 
 			console.log("in changeStatusToAbbrecher" + prestudentIds);
-			console.log("count: " + prestudentIds.length);
+			console.log("count: " + prestudentIds.length);*/
 
 			this.addNewStatus(prestudentIds);
 		},
@@ -400,8 +385,6 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData }));
-
-			console.log("in changeStatusToAbbrecher" + prestudentIds);
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToUnterbrecher(prestudentIds){
@@ -414,8 +397,6 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData }));
-
-			console.log("in changeStatusToUnterbrecher" + prestudentIds);
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToStudent(prestudentIds){
@@ -428,8 +409,6 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData, ausbildungssemester: this.actionSem}));
-
-			console.log("in changeStatusToStudent" + prestudentIds);
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToWiederholer(prestudentIds){
@@ -522,8 +501,6 @@ export default{
 						}
 					}
 
-
-
 					//Feedback Success als infoalert
 					 if (countSuccess > 0) {
 						 this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
@@ -572,7 +549,6 @@ export default{
 					})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-/*					window.scrollTo(0, 0);*/
 					this.reload();
 				});
 		},
@@ -659,13 +635,13 @@ export default{
 				this.listStudiensemester = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-/*		this.$fhcApi
+		this.$fhcApi
 			.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + this.modelValue.prestudent_id)
 			.then(result => result.data)
 			.then(result => {
 				this.listStudienplaene = result;
 			})
-			.catch(this.$fhcAlert.handleSystemError);*/
+			.catch(this.$fhcAlert.handleSystemError);
 		this.$fhcApi
 			.get('api/frontend/v1/stv/status/getStatusgruende/')
 			.then(result => result.data)
