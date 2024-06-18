@@ -40,8 +40,7 @@ export default  {
             </div>
         </template>
         <template #footer>
-            <button type="button" class="btn btn-primary" @click="result=true;this.hide()">OK</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </template>
     </bs-modal>
     `,

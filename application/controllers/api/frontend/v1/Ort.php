@@ -33,7 +33,8 @@ class Ort extends FHCAPI_Controller
 	{
 		// NOTE(chris): additional permission checks will be done in SearchBarLib
 		parent::__construct([
-			'ContentID' => self::PERM_LOGGED
+			'ContentID' => self::PERM_LOGGED,
+			'getOrtKurzbzContent' => self::PERM_LOGGED,
 		]);
 
 		$this->load->model('ressource/Ort_model', 'OrtModel');
@@ -66,6 +67,29 @@ class Ort extends FHCAPI_Controller
 		$result = hasData($result) ? current(getData($result)) : null;
 		
 		$this->terminateWithSuccess($result->content_id ?? NULL);
+	}
+
+	/**
+	 * @param int		$version
+	 * @param string	$sprache
+	 * @param boolean	$sichtbar
+	 *
+	 * @return $content
+	 */
+	public function getOrtKurzbzContent($version = null, $sprache = null, $sichtbar = true)
+	{
+		$content_id = $this->input->get("content_id",TRUE);
+
+		$this->load->library('CmsLib');
+
+		$content = $this->cmslib->getContent($content_id, $version, $sprache, $sichtbar);
+
+		if (isError($content))
+			$this->terminateWithError(getError($content), self::ERROR_TYPE_GENERAL);
+
+		$content = hasData($content) ? getData($content) : null;
+
+		$this->terminateWithSuccess($content);
 	}
 }
 
