@@ -271,7 +271,8 @@ export default{
 			actionSem: null,
 			newArray: {},
 			abbruchData: {},
-			newStatus: ''
+			newStatus: '',
+			statusNew: true
 		}
 	},
 	watch: {
@@ -287,15 +288,17 @@ export default{
 	},
 	methods: {
 		actionNewStatus() {
+			this.resetModal();
 			this.statusData.status_kurzbz = 'Interessent';
 			this.statusData.studiensemester_kurzbz = this.defaultSemester;
 			this.statusData.ausbildungssemester = 1;
 			this.statusData.datum = this.getDefaultDate();
 			this.statusData.bestaetigtam = this.getDefaultDate();
 			this.statusData.name = this.modelValue.vorname + ' ' + this.modelValue.nachname;
-			this.$refs.newStatusModal.show();
+			this.$refs.statusModal.show();
 		},
 		actionEditStatus(status, stdsem, ausbildungssemester){
+			this.statusNew = false;
 			this.statusId = {
 				'prestudent_id': this.modelValue.prestudent_id,
 				'status_kurzbz': status,
@@ -304,7 +307,7 @@ export default{
 			};
 			this.loadStatus(this.statusId).then(() => {
 				if(this.statusData)
-					this.$refs.editStatusModal.show();
+					this.$refs.statusModal.show();
 			});
 		},
 		actionDeleteStatus(status, stdsem, ausbildungssemester){
@@ -367,11 +370,6 @@ export default{
 				};
 			console.log(this.updateData);
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...abbruchData }));
-/*			console.log(this.newArray);
-
-			console.log("in changeStatusToAbbrecher" + prestudentIds);
-			console.log("count: " + prestudentIds.length);*/
-
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToAbbrecherStud(prestudentIds){
@@ -397,6 +395,7 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData }));
+			console.log("in changeStatus to Unterbrecher: " + this.deltaData);
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToStudent(prestudentIds){
@@ -517,7 +516,7 @@ export default{
 					else {
 						this.$reloadList();
 					}
-					this.hideModal('newStatusModal');
+					this.hideModal('statusModal');
 					this.resetModal();
 				});
 		},
@@ -577,7 +576,7 @@ export default{
 				.then(
 					result => {
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-						this.hideModal('editStatusModal');
+						this.hideModal('statusModal');
 						this.resetModal();
 					})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -601,6 +600,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		loadStatus(status_id){
+			this.statusNew = false;
 			return this.$fhcApi.post('api/frontend/v1/stv/status/loadStatus/',
 				status_id)
 					.then(result => {
@@ -614,6 +614,7 @@ export default{
 		},
 		hideModal(modalRef){
 			this.$refs[modalRef].hide();
+			this.statusNew = true;
 		},
 		resetModal(){
 			this.statusData = {};
@@ -635,13 +636,13 @@ export default{
 				this.listStudiensemester = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
+/*		this.$fhcApi
 			.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + this.modelValue.prestudent_id)
 			.then(result => result.data)
 			.then(result => {
 				this.listStudienplaene = result;
 			})
-			.catch(this.$fhcAlert.handleSystemError);
+			.catch(this.$fhcAlert.handleSystemError);*/
 		this.$fhcApi
 			.get('api/frontend/v1/stv/status/getStatusgruende/')
 			.then(result => result.data)
@@ -661,334 +662,158 @@ export default{
 	template: `
 		<div class="stv-list h-100 pt-3">
 		
-					
-			<!--Modal: Add New Status-->
-			<BsModal ref="newStatusModal">
-				<template #title>{{$p.t('lehre', 'status_new')}}</template>
-							
-					<form-form class="row g-3" ref="statusData">
-						<div class="row mb-3">	
-							<p class="py-2 fw-bold">Details {{modelValue.nachname}} {{modelValue.vorname}}</p>
-							<label for="status_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'status_rolle')}}</label>
-							<div class="col-sm-6">
-
-								<form-input
-									required
-									v-model="statusData['status_kurzbz']"
-									name="status_kurzbz"
-									type="select"
-									>
-									<option  value="Interessent">InteressentIn</option>
-									<option  value="Bewerber">BewerberIn</option>
-									<option  value="Aufgenommener">Aufgenommene/r</option>
-									<option  value="Student">StudentIn</option>
-									<option  value="Unterbrecher">UnterbrecherIn</option>
-									<option  value="Diplomand">DiplomandIn</option>
-									<option  value="Incoming">Incoming</option>
-								</form-input>
-							</div>
-						</div>
-						<div class="row mb-3">		   
-							<label for="studiensemester_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="select"
-									name="studiensemester_kurzbz"
-									v-model="statusData['studiensemester_kurzbz']"
-								>
-									<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz"  :selected="sem.studiensemester_kurzbz === defaultSemester">{{sem.studiensemester_kurzbz}}</option>
-								</form-input>
-							</div>
-						</div>
-						<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false) 100 Semester-->
-						<div class="row mb-3">
-							<label for="ausbildungssemester" class="form-label col-sm-4">{{$p.t('lehre', 'ausbildungssemester')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="select"
-									name="ausbildungssemester"
-									v-model="statusData.ausbildungssemester"
-								>
-								 <option v-for="number in maxSem" :key="number" :value="number">{{ number }}</option>
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="datum" class="form-label col-sm-4">{{$p.t('global', 'datum')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="DatePicker"
-									name="datum"
-									v-model="statusData.datum"
-									auto-apply
-									:enable-time-picker="false"
-									format="dd.MM.yyyy"
-									preview-format="dd.MM.yyyy"
-									:teleport="true"
-								></form-input>
-							</div>
-						</div>
-						<div class="row mb-3">
-							<label for="bestaetigtam" class="form-label col-sm-4">{{$p.t('lehre', 'bestaetigt_am')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="DatePicker"
-									name="datum"
-									v-model="statusData.bestaetigtam"
-									auto-apply
-									:enable-time-picker="false"
-									format="dd.MM.yyyy"
-									preview-format="dd.MM.yyyy"
-									:teleport="true"
-								></form-input>
-							</div>
-						</div>
-						<div class="row mb-3">
-							<label for="bewerbung_abgeschicktamum" class="form-label col-sm-4">{{$p.t('lehre', 'bewerbung_abgeschickt_am')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="DatePicker"
-									name="datum"
-									v-model="statusData['bewerbung_abgeschicktamum']"
-									auto-apply
-									:enable-time-picker="false"
-									format="dd.MM.yyyy"
-									preview-format="dd.MM.yyyy"
-									:teleport="true"
-								></form-input>
-							</div>
-						</div>
-						<div class="row mb-3">
-							<label for="bezeichnung" class="form-label col-sm-4">{{$p.t('lehre', 'studienplan')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="select"
-									name="studienplan"
-									v-model="statusData['studienplan_id']"
-								>		
-									<option v-for="sp in listStudienplaene" :key="sp.studienplan_id" :value="sp.studienplan_id">{{sp.bezeichnung}}</option>
-								</form-input>
-							</div>
-						</div>
-						<div class="row mb-3">
-							<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="text"
-									name="anmerkung"
-									v-model="statusData['anmerkung']"
-								>						
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">								   
-							<label for="aufnahmestufe" class="form-label col-sm-4">{{$p.t('lehre', 'aufnahmestufe')}}</label>
-							<div class="col-sm-6">
-								<form-input
-								type="select"
-								name="aufnahmestufe"
-								v-model="statusData['rt_stufe']"
-								>
-								<option v-for="entry in aufnahmestufen" :key="entry" :value="entry">{{entry}}</option>
-								</form-input>
-							</div>
-						</div>
-										
-						<div v-if="gruende.length > 0" class="row mb-3">
-							<label for="grund" class="form-label col-sm-4">{{$p.t('studierendenantrag', 'antrag_grund')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="select"
-									name="statusgrund"
-									v-model="statusData['statusgrund_id']"
-									>
-									<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.beschreibung[0]}}</option>
-								</form-input>
-							</div>
-						</div>
-					
-					</form-form>
-					
-				<template #footer>
-						<button type="button" class="btn btn-primary" @click="addNewStatus()">OK</button>
+			<!--Modal: statusModal-->
+			<BsModal ref="statusModal">
+				<template #title>
+					<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('lehre', 'status_new')}}</p>
+					<p v-else class="fw-bold mt-3">{{$p.t('lehre', 'status_edit')}}</p>
 				</template>
-								
-			</BsModal>
-			
-			<!--Modal: Edit Status-->
-			<BsModal ref="editStatusModal">
-			
-				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
-					<form-form class="row g-3" ref="statusData">
-						<div class="row mb-3">
-							<p class="py-2 fw-bold">Details {{modelValue.nachname}} {{modelValue.vorname}}</p>
-							
-							<div v-if="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent" class="mb-1">
-								<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrund')}}</b>
-							</div>
-							<div v-if="statusData.datum < dataMeldestichtag && isStatusBeforeStudent">
-								<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrundSemester')}}</b>
-							</div>
-						
-							<input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
+
+				<form-form class="row g-3" ref="statusData">
+					<p class="pt-2 fw-bold">Details {{modelValue.nachname}} {{modelValue.vorname}} </p>
+					<p v-if="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent">
+						<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrund')}}</b>
+					</p>
+					<p v-if="statusData.datum < dataMeldestichtag && isStatusBeforeStudent">
+						<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrundSemester')}}</b>
+					</p>
+					<input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
+					<div class="row mb-3">	
+						<form-input
+							required
+							v-model="statusData['status_kurzbz']"
+							name="status_kurzbz"
+							:label="$p.t('lehre/status_rolle')"
+							type="select"
+							:disabled="!statusNew"
+							>
+							<option  value="Interessent">InteressentIn</option>
+							<option  value="Bewerber">BewerberIn</option>
+							<option  value="Aufgenommener">Aufgenommene/r</option>
+							<option  value="Student">StudentIn</option>
+							<option  value="Unterbrecher">UnterbrecherIn</option>
+							<option  value="Diplomand">DiplomandIn</option>
+							<option  value="Incoming">Incoming</option>
+						</form-input>
+					</div>
+					<div class="row mb-3">		   
+						<form-input
+							type="select"
+							name="studiensemester_kurzbz"
+							:label="$p.t('lehre/studiensemester')"
+							v-model="statusData['studiensemester_kurzbz']"
+							:disabled="statusData.datum < dataMeldestichtag"
+						>
+							<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz"  :selected="sem.studiensemester_kurzbz === defaultSemester">{{sem.studiensemester_kurzbz}}</option>
+						</form-input>
+					</div>
+					<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false) 100 Semester-->
+					<div class="row mb-3">
+						<form-input
+							type="select"
+							name="ausbildungssemester"
+							:label="$p.t('lehre/ausbildungssemester')"
+							v-model="statusData.ausbildungssemester"
+							:disabled="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent"
+						>
+						 <option v-for="number in maxSem" :key="number" :value="number">{{ number }}</option>
+						</form-input>
+					</div>
 					
-							<label for="status_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'status_rolle')}}</label>
-							<div class="col-sm-6">
-<!--								<form-input type="text" class="form-control" id="status_kurzbz" v-model="statusData['status_kurzbz']">-->
-								<form-input
-									required
-									v-model="statusData['status_kurzbz']"
-									name="status_kurzbz"
-									type="select"
-									disabled
-									>
-									<option  value="Interessent">InteressentIn</option>
-									<option  value="Bewerber">BewerberIn</option>
-									<option  value="Aufgenommener">Aufgenommene/r</option>
-									<option  value="Student">StudentIn</option>
-									<option  value="Unterbrecher">UnterbrecherIn</option>
-									<option  value="Diplomand">DiplomandIn</option>
-									<option  value="Incoming">Incoming</option>
-								</form-input>
-							</div>
-						</div>
-						<div class="row mb-3">							   
-							<label for="studiensemester_kurzbz" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="select"
-									name="studiensemester_kurzbz"
-									v-model="statusData['studiensemester_kurzbz']"
-									:disabled="statusData.datum < dataMeldestichtag"
-								>
-									<option value="null"></option>
-									<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
-								</form-input>
-							</div>
-						</div>
-						<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false)-->
-						<div class="row mb-3">
-							<label for="ausbildungssemester" class="form-label col-sm-4">{{$p.t('lehre', 'ausbildungssemester')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="select"
-									name="ausbildungssemester"
-									v-model="statusData['ausbildungssemester']"
-									:disabled="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent"
-								>
-								 <option v-for="number in maxSem" :key="number" :value="number">{{ number }}</option>
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">
-							<label for="datum" class="form-label col-sm-4">{{$p.t('global', 'datum')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="DatePicker"
-									name="datum"
-									v-model="statusData['datum']"
-									auto-apply
-									:enable-time-picker="false"
-									format="dd.MM.yyyy"
-									preview-format="dd.MM.yyyy"
-									:teleport="true"
-									:disabled="statusData.datum < dataMeldestichtag"
-								></form-input>
-							</div>
-						</div>
-						<div class="row mb-3">					   
-							<label for="bestaetigtam" class="form-label col-sm-4">{{$p.t('lehre', 'bestaetigt_am')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="DatePicker"
-									name="datum"
-									v-model="statusData['bestaetigtam']"
-									auto-apply
-									:enable-time-picker="false"
-									format="dd.MM.yyyy"
-									preview-format="dd.MM.yyyy"
-									:teleport="true"
-									:disabled="statusData.datum < dataMeldestichtag"
-								></form-input>
-							</div>
-						</div>
-						<div class="row mb-3">
-							<label for="bewerbung_abgeschicktamum" class="form-label col-sm-4">{{$p.t('lehre', 'bewerbung_abgeschickt_am')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="DatePicker"
-									name="datum"
-									v-model="statusData['bewerbung_abgeschicktamum']"
-									auto-apply
-									:enable-time-picker="false"
-									format="dd.MM.yyyy"
-									preview-format="dd.MM.yyyy"
-									:teleport="true"
-									:disabled="statusData.datum < dataMeldestichtag"
-								></form-input>
-							</div>
-						</div>
-						<div class="row mb-3">
-							<label for="bezeichnung" class="form-label col-sm-4">{{$p.t('lehre', 'studienplan')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="select"
-									name="studienplan"
-									v-model="statusData['studienplan_id']"
-									:disabled="statusData.datum < dataMeldestichtag"
-								>
-									<option v-for="sp in listStudienplaene" :key="sp.studienplan_id" :value="sp.studienplan_id">{{sp.bezeichnung}}</option>
-								</form-input>
-							</div>
-						</div>
-						<div class="row mb-3">
-							<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="text"
-									name="anmerkung"
-									v-model="statusData['anmerkung']"
-									:disabled="statusData.datum < dataMeldestichtag"
-								>				
-								</form-input>
-							</div>
-						</div>
-						
-						<div class="row mb-3">				   
-							<label for="aufnahmestufe" class="form-label col-sm-4">{{$p.t('lehre', 'aufnahmestufe')}}</label>
-							<div class="col-sm-6">
-								<form-input
-								type="select"
-								name="aufnahmestufe"
-								v-model="statusData['rt_stufe']"
-								:disabled="statusData.datum < dataMeldestichtag"
-								>
-								<option v-for="entry in aufnahmestufen" :key="entry" :value="entry">{{entry}}</option>
-								</form-input>
-							</div>
-						</div>
-						
-						<div v-if="gruende.length > 0" class="row mb-3">
-							<label for="grund" class="form-label col-sm-4">{{$p.t('studierendenantrag', 'antrag_grund')}}</label>
-							<div class="col-sm-6">
-								<form-input
-									type="select"
-									name="statusgrund"
-									v-model="statusData['statusgrund_id']"
-								>
-								<option :value="NULL"></option>
-								<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.beschreibung[0]}}</option>
-								</form-input>
-							</div>
-						</div>
+					<div class="row mb-3">
+						<form-input
+							type="DatePicker"
+							name="datum"
+							:label="$p.t('global/datum')"
+							v-model="statusData.datum"
+							auto-apply
+							:enable-time-picker="false"
+							format="dd.MM.yyyy"
+							preview-format="dd.MM.yyyy"
+							:teleport="true"
+							:disabled="statusData.datum < dataMeldestichtag"
+						></form-input>
+					</div>
+					<div class="row mb-3">
+						<form-input
+							type="DatePicker"
+							name="datum"
+							:label="$p.t('lehre/bestaetigt_am')"
+							v-model="statusData.bestaetigtam"
+							auto-apply
+							:enable-time-picker="false"
+							format="dd.MM.yyyy"
+							preview-format="dd.MM.yyyy"
+							:teleport="true"
+							:disabled="statusData.datum < dataMeldestichtag"
+						></form-input>
+					</div>
+					<div class="row mb-3">
+						<form-input
+							type="DatePicker"
+							name="datum"
+							:label="$p.t('lehre/bewerbung_abgeschickt_am')"
+							v-model="statusData['bewerbung_abgeschicktamum']"
+							auto-apply
+							:enable-time-picker="false"
+							format="dd.MM.yyyy"
+							preview-format="dd.MM.yyyy"
+							:teleport="true"
+							:disabled="statusData.datum < dataMeldestichtag"
+						></form-input>
+					</div>
+					<div class="row mb-3">
+						<form-input
+							type="select"
+							name="studienplan"
+							:label="$p.t('lehre/studienplan')"
+							v-model="statusData['studienplan_id']"
+							:disabled="statusData.datum < dataMeldestichtag"
+						>		
+							<option v-for="sp in listStudienplaene" :key="sp.studienplan_id" :value="sp.studienplan_id">{{sp.bezeichnung}}</option>
+						</form-input>
+					</div>
+					<div class="row mb-3">
+						<form-input
+							type="text"
+							name="anmerkung"
+							:label="$p.t('global/anmerkung')"
+							v-model="statusData['anmerkung']"
+							:disabled="statusData.datum < dataMeldestichtag"
+						>						
+						</form-input>
+					</div>
 					
-					</form-form>
-					
+					<div class="row mb-3">								   
+						<form-input
+						type="select"
+						name="aufnahmestufe"
+						:label="$p.t('lehre/aufnahmestufe')"
+						v-model="statusData['rt_stufe']"
+						:disabled="statusData.datum < dataMeldestichtag"
+						>
+						<option v-for="entry in aufnahmestufen" :key="entry" :value="entry">{{entry}}</option>
+						</form-input>
+					</div>
+									
+					<div v-if="gruende.length > 0" class="row mb-3">
+						<form-input
+							type="select"
+							name="statusgrund"
+							:label="$p.t('studierendenantrag/antrag_grund')"
+							v-model="statusData['statusgrund_id']"
+							>
+							<option :value="NULL"></option>
+							<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.beschreibung[0]}}</option>
+						</form-input>
+					</div>
+				
+				</form-form>
+				
 				<template #footer>
-						<button type="button" class="btn btn-primary" @click="editStatus()">OK</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
+					<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewStatus()">OK</button>
+					<button v-else type="button" class="btn btn-primary" @click="editStatus()">OK</button>
 				</template>
 								
 			</BsModal>
@@ -1153,10 +978,7 @@ export default{
 				>
 				
 				<template #actions="{updateData2}">
-<!--					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus">
-						Status Ändern
-					</button>-->
-					
+					<!-- SingleSelectButton-->
 					<div class="btn-group">						
 						<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 							{{$p.t('lehre', 'btn_statusAendern')}}
@@ -1193,18 +1015,15 @@ export default{
 				v-if="this.modelValue.length"
 				ref="buttonsStatusMulti"
 			>	
-<!--			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMultiStatus">
-				Status Ändern
-			</button>-->
-			
+			<!--MultiSelectButton-->
 			<div class="btn-group">						
 				<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-					Status Ändern
+					Status Ändern 2
 				</button>
 			
 				<ul class="dropdown-menu">
 					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl</a>
+						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl 2</a>
 					</li>
 					<li class="dropdown-submenu">
 						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">Abbrecher durch Student</a>
