@@ -353,7 +353,7 @@ export default{
 			});
 		},
 		actionConfirmDialogue(data, statusgrund, statusText){
-			this.hideModal('addMultiStatus');
+		//	this.hideModal('addMultiStatus');
 			this.actionButton = statusgrund;
 			this.actionStatusText = statusText;
 
@@ -398,7 +398,6 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData }));
-			console.log("in changeStatus to Unterbrecher: " + this.deltaData);
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToStudent(prestudentIds){
@@ -439,8 +438,8 @@ export default{
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
 
-			console.log("in changeStatusToDiplomand" + prestudentIds);
-			this.hideModal('addMultiStatus');
+/*			console.log("in changeStatusToDiplomand" + prestudentIds);
+			this.hideModal('addMultiStatus');*/
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToAbsolvent(prestudentIds){
@@ -454,8 +453,8 @@ export default{
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
 
-			console.log("in changeStatusToAbsolvent" + prestudentIds);
-			this.hideModal('addMultiStatus');
+/*			console.log("in changeStatusToAbsolvent" + prestudentIds);
+			this.hideModal('addMultiStatus');*/
 			this.addNewStatus(prestudentIds);
 		},
 		addNewStatus(prestudentIds){
@@ -491,12 +490,10 @@ export default{
 				.allSettled(promises)
 				.then(values => {
 					if (this.abbruchData.length < 1) {
-						console.log("singleNew");
 					}
 					else{
 						if(this.newArray.length > 0) {
 							this.newStatus = this.newArray[0].status_kurzbz;
-							console.log(`Successful: ${countSuccess}, Errors: ${countError}`);
 						}
 						else {
 							this.newStatus = this.statusData.status_kurzbz;
@@ -863,7 +860,7 @@ export default{
 				</template>
 			</BsModal>
 			
-			<BsModal ref="addMultiStatus" id="addMultiStatus">
+<!--			<BsModal ref="addMultiStatus" id="addMultiStatus">
 				<template #title>Status ändern zu</template>
 				<template #default>
 					<button type="button" class="btn btn-primary d-block mb-2" data-bs-toggle="collapse" data-bs-target="#submenu1">
@@ -905,11 +902,11 @@ export default{
 						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToUnterbrecher(prestudentIds)">OK</button>
 					</div>					
 				</template>
-			</BsModal>
+			</BsModal>-->
 			
-			<ul class="dropdown-menu" ref="addMultiStatus3" id="addMultiStatus3">
+<!--			<ul class="dropdown-menu" ref="addMultiStatus3" id="addMultiStatus3">
 				<li class="dropdown-submenu">
-					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl</a>
+					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl 5</a>
 				</li>
 				<li class="dropdown-submenu">
 					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">Abbrecher durch Student</a>
@@ -929,7 +926,7 @@ export default{
 				<li class="dropdown-submenu">
 					<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
 				</li>							
-			</ul>
+			</ul>-->
 			
 			<!--Modal: askForAusbildungssemester-->
 			<BsModal ref="askForAusbildungssemester">

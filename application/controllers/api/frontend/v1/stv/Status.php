@@ -306,193 +306,92 @@ class Status extends FHCAPI_Controller
 				$this->terminateWithSuccess($prestudent_id);
 		}
 
-		//TODO(Manu) documentation: here setUnterbrecher FasLogic!
-		if($status_kurzbz == 'Unterbrecher')
-		{
-			$ausbildungssemester = $lastStatusData->ausbildungssemester;
-			$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
-
-			$this->load->library('PrestudentLib');
-			$result = $this->prestudentlib->setUnterbrecher($prestudent_id, $studiensemester_kurzbz, null, null, $ausbildungssemester);
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-			else
-				$this->terminateWithSuccess($prestudent_id);
-		}
-
-		if($status_kurzbz == 'Student')
-		{
-			$this->load->library('PrestudentLib');
-			$result = $this->prestudentlib->setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtam, $bestaetigtvon);
-
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-			else
-				$this->terminateWithSuccess($prestudent_id);
-			
-		}
-
-		if($status_kurzbz == 'Diplomand')
-		{
-			$this->load->library('PrestudentLib');
-			$result = $this->prestudentlib->setDiplomand($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
-
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-			else
-				$this->terminateWithSuccess($prestudent_id);
-			
-		}
-
-		if($status_kurzbz == 'Absolvent')
-		{
-			$this->load->library('PrestudentLib');
-			$result = $this->prestudentlib->setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
-
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-			else
-				$this->terminateWithSuccess($prestudent_id);
-			
-		}
-
-		// Start DB transaction
-		$this->db->trans_begin(); // Beginnen der Transaktion
-
-		$result = $this->PrestudentstatusModel->insert(
-			[
-				'prestudent_id' => $prestudent_id,
-				'status_kurzbz' => $status_kurzbz,
-				'bewerbung_abgeschicktamum' => $bewerbung_abgeschicktamum,
-				'studiensemester_kurzbz' => $studiensemester_kurzbz,
-				'studienplan_id' => $lastStatusData->studienplan_id,
-				'ausbildungssemester' => $ausbildungssemester,
-				'anmerkung' => $anmerkung,
-				'statusgrund_id' => $statusgrund_id,
-				'insertvon' => $uid,
-				'insertamum' => date('c'),
-				'bestaetigtam' => $bestaetigtam,
-				'bestaetigtvon' => $bestaetigtvon,
-				'datum' => $datum,
-				'rt_stufe' => $rt_stufe
-			]
-		);
-
-		if ($this->db->trans_status() === false || isError($result))
-		{
-			$this->db->trans_rollback();
-		}
-
-		if($isStudent)
-		{
-			$this->load->model('crm/Student_model', 'StudentModel');
-			$result = $this->StudentModel->checkIfUid($prestudent_id);
-			if (isError($result)) {
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-			$student_uid = $result->retval;
-
-			//load student
-			$result = $this->StudentModel->loadWhere(
-				array(
-					'student_uid' => $student_uid
-				)
-			);
-			if (isError($result))
-			{
-				$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-			}
-
-			$studentData = current(getData($result) ? : []);
-			$verband = $studentData->verband == '' ? '' : $studentData->verband;
-			$gruppe = $studentData->gruppe == '' ? '' : $studentData->gruppe;
-			$studiengang_kz = $studentData->studiengang_kz;
-
-			//TODO(Manu) DEPRECATED
-			//Handle Abbrecher and Unterbrecher
-/*			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
-						{
-							$ausbildungssemester = 0;
-							$gruppe = '';
-							$verband = $status_kurzbz == 'Abbrecher' ? 'A' : 'B';
-						}*/
-
-			//process studentlehrverband
-			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-			$result = $this->StudentlehrverbandModel->processStudentlehrverband(
-				$student_uid,
-				$studiengang_kz,
-				$ausbildungssemester,
-				$verband,
-				$gruppe,
-				$studiensemester_kurzbz
-			);
-			if ($this->db->trans_status() === false || isError($result))
-			{
-				$this->db->trans_rollback();
-			//	return $this->terminateWithError($result->code);
-			return $this->terminateWithError($this->p->t('lehre','error_duringInsertUpdateLehrverband'), self::ERROR_TYPE_GENERAL);
-			}
-
-			//update(fuer Abbrecher und Unterbrecher)
-			//implemented for multiaction "status ändern"
-
-			//TODO(Manu) DEPRECATED
-/*			if($status_kurzbz == 'Abbrecher' || $status_kurzbz == 'Unterbrecher')
-			{
-				$result = $this->StudentModel->update(
-					[
-						'student_uid' => $student_uid
-					],
-					[
-						'studiengang_kz' => $studiengang_kz,
-						'semester' => $ausbildungssemester,
-						'verband' => $verband,
-						'gruppe' => $gruppe,
-						'updateamum' => date('c'),
-						'updatevon' => $uid
-				]);
-				if ($this->db->trans_status() === false || isError($result))
+		switch($status_kurzbz){
+			case 'Unterbrecher':
 				{
-					$this->db->trans_rollback();
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
+					$ausbildungssemester = $lastStatusData->ausbildungssemester;
+					$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
 
-				// detailtab: set active to false if abbrecher
-				if($status_kurzbz == 'Abbrecher')
-				{
-
-					$this->load->model('person/Benutzer_model', 'BenutzerModel');
-					$result = $this->BenutzerModel->update(
-						[
-							'uid' => $student_uid
-						],
-						[
-							'aktiv' => false,
-							'updateaktivam' => date('Y-m-d'),
-							'updateaktivvon' => $uid
-						]);
-					if ($this->db->trans_status() === false || isError($result))
+					$this->load->library('PrestudentLib');
+					$result = $this->prestudentlib->setUnterbrecher($prestudent_id, $studiensemester_kurzbz, null, null, $ausbildungssemester);
+					if (isError($result))
 					{
-						$this->db->trans_rollback();
 						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 					}
+					else
+						$this->terminateWithSuccess($prestudent_id);
 				}
+				break;
+			case 'Student':
+			{
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtam, $bestaetigtvon);
 
-			}*/
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
+
+			}
+			break;
+			case 'Diplomand':
+			{
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setDiplomand($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
+			}
+			break;
+			case 'Absolvent':
+			{
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
+
+			}
+			default:
+			{
+/*				if ($isStudent) {
+					return $this->terminateWithError("LehrverbandData needs no handling", self::ERROR_TYPE_GENERAL);
+				}*/
+				$result = $this->PrestudentstatusModel->insert(
+					[
+						'prestudent_id' => $prestudent_id,
+						'status_kurzbz' => $status_kurzbz,
+						'bewerbung_abgeschicktamum' => $bewerbung_abgeschicktamum,
+						'studiensemester_kurzbz' => $studiensemester_kurzbz,
+						'studienplan_id' => $lastStatusData->studienplan_id,
+						'ausbildungssemester' => $ausbildungssemester,
+						'anmerkung' => $anmerkung,
+						'statusgrund_id' => $statusgrund_id,
+						'insertvon' => $uid,
+						'insertamum' => date('c'),
+						'bestaetigtam' => $bestaetigtam,
+						'bestaetigtvon' => $bestaetigtvon,
+						'datum' => $datum,
+						'rt_stufe' => $rt_stufe
+					]
+				);
+
+				if (isError($result)) {
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				} else
+					$this->terminateWithSuccess($prestudent_id);
+			}
 		}
-
-		$this->db->trans_commit();
-
-		$this->terminateWithSuccess($prestudent_id);
 	}
 
 	public function loadStatus()
