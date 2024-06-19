@@ -21,6 +21,7 @@ import navigation from "./navigation.js";
 import filter from "./filter.js";
 import studstatus from "./studstatus.js";
 import ort from "./ort.js";
+import cms from "./cms.js";
 
 export default {
     search,
@@ -29,4 +30,5 @@ export default {
     filter,
     studstatus,
     ort,
+    cms,
 };

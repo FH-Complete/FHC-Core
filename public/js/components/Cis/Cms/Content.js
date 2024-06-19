@@ -1,34 +1,40 @@
-import Pagination from "../../Pagination/Pagination.js";
 
 export default {
-  components: {
-    Pagination,
+  props:{
+    content_id:{
+        type:Number,
+        required:true,
+    },
+    version:{
+        type:[String, Number],
+        default: null,
+    },
+    sprache:{
+        type:[String, Number],
+        default: null,
+    },
+    sichtbar:{
+        type:[String, Number],
+        default: null,
+    }
+
+
   },
   data() {
     return {
       content: null,
-      maxPageCount: 0,
-      page_size: 10,
+      
     };
   },
-  methods: {
-    loadNewPageContent: function (data) {
-      Vue.$fhcapi.Cms.getNews(data.page, data.rows).then((result) => {
-        this.content = result.data;
-      });
-    },
-  },
   created() {
-    Vue.$fhcapi.Cms.getNews(1, this.page_size).then((result) => {
-      this.content = result.data;
-    });
-
-    Vue.$fhcapi.Cms.getNewsRowCount().then((result) => {
-      this.maxPageCount = result.data;
+    console.log("this is the api", this.$fhcApi);
+    this.$fhcApi.factory.cms.content(this.content_id,this.version, this.sprache, this.sichtbar).then(res =>{
+        this.content = res.data;
     });
   },
   template: /*html*/ `
-    <pagination :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
-    <div v-html="content"></div>
-    </pagination>`,
+    <!-- div that contains the content -->
+    <div v-if="content" v-html="content"></div>
+    <p v-else>No content is available to display</p>
+    `,
 };

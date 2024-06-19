@@ -45,12 +45,11 @@ class Cms extends FHC_Controller
 	 */
 	public function content($content_id, $version = null, $sprache = null, $sichtbar = true)
 	{
-		$content = $this->cmslib->getContent($content_id, $version, $sprache, $sichtbar);
-
-		if (isError($content))
-			return $this->load->view('CisHtml/Error', ['error' => getError($content)]);
-
-		$this->load->view('CisHtml/Cms/Content', ['content' => getData($content)]);
+		// return early if the content_id for the content is missing
+		if(!isset($content_id))
+			$this->terminateWithError("content_id is missing");
+		
+		$this->load->view('CisHtml/Cms/Content', ['content_id' => $content_id, 'version' => $version, 'sprache' => $sprache, 'sichtbar' => $sichtbar]);
 	}
 
 	/**

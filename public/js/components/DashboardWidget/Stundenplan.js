@@ -2,7 +2,7 @@ import Phrasen from '../../mixins/Phrasen.js';
 import AbstractWidget from './Abstract.js';
 import FhcCalendar from '../Calendar/Calendar.js';
 import LvUebersicht from '../Cis/Mylv/LvUebersicht.js';
-import ContentModal from '../Cis/Cms/ContentModal.js'
+import ContentModal from '../Cis/Cms/ContentModal.js';
 
 export default {
 	mixins: [
@@ -21,7 +21,8 @@ export default {
 			minimized: true,
 			events: null,
 			currentDay: new Date(),
-			
+			roomInfoContentID: null,
+			ort_kurzbz: null,
 		}
 	},
 	computed: {
@@ -41,26 +42,18 @@ export default {
 
 			// getting the content_id of the ort_kurzbz
 			this.$fhcApi.factory.ort.getContentID(ort_kurzbz).then(res =>{
+				this.roomInfoContentID = res.data;
+				this.ort_kurzbz = ort_kurzbz;
 
-				let ort_kurzbz_content_id = res.data;
-
-				this.$refs.contentModal.content_id = ort_kurzbz_content_id;
-
-				this.$fhcApi.factory.ort.getOrtKuzbzContent(ort_kurzbz_content_id).then(res =>{
-					let result = res.data;
-					console.log("this is the result of the query", result);
-					this.$refs.contentModal.content = result;
-					this.$refs.contentModal.ort_kurzbz = ort_kurzbz;
-					if(this.$refs.contentModal.content){
-						this.$refs.contentModal.show();
-					}
-					
-
-				})
-
+				// only showing the modal after vue was able to set the reactive data
+				Vue.nextTick(()=>{this.$refs.contentModal.show();});
 				
 				
-			})
+			}).catch(err =>{
+				console.err(err);
+				this.ort_kurzbz = null;
+				this.roomInfoContentID = null;
+			});
 			
 		},
 		showLvUebersicht: function (event){
@@ -75,6 +68,7 @@ export default {
 			this.currentDay = day;
 			this.minimized = true;
 		},
+		// this function was the alternative of showing the room information in the content component instead of showing the room information inside a modal
 		showRoomInfo: function($ort_kurzbz){
 			
 			this.$fhcApi.factory.ort.getContentID($ort_kurzbz).then(res =>{
@@ -118,7 +112,7 @@ export default {
 	template: /*html*/`
 	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">
 		<lv-uebersicht ref="lvUebersicht"  />
-		<content-modal ref="contentModal"  />
+		<content-modal :contentID="roomInfoContentID" :ort_kurzbz="" dialogClass="modal-lg" ref="contentModal"/>
 		<fhc-calendar :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" />
 		<div v-show="minimized" class="flex-grow-1 overflow-scroll">
 			<div v-if="events === null" class="d-flex h-100 justify-content-center align-items-center">
