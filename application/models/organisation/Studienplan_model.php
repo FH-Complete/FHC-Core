@@ -119,4 +119,20 @@ class Studienplan_model extends DB_Model
 			'lv.lehrveranstaltung_id' => $lehrveranstaltung_id
 		]);
 	}
+
+	public function getStudienplaeneByPrestudents($prestudentIds)
+	{
+		$prestudentIds = intVal($prestudentIds);
+
+		$query = "
+			SELECT so.studienordnung_id, sp.bezeichnung 
+			FROM public.tbl_prestudent ps
+			JOIN lehre.tbl_studienordnung so ON (ps.studiengang_kz = so.studiengang_kz)
+			JOIN lehre.tbl_studienplan sp ON (sp.studienordnung_id = so.studienordnung_id)
+			WHERE ps.prestudent_id IN (?)
+			ORDER BY so.studienordnung_id DESC
+		";
+
+		return $this->execQuery($query, array($prestudentIds));
+	}
 }

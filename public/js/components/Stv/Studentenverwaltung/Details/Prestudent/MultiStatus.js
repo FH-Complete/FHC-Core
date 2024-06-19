@@ -55,6 +55,9 @@ export default{
 			}
 			return this.modelValue.map(e => e.prestudent_id);
 		},
+		paramIds(){
+			return  Array.isArray(this.prestudentIds) ? this.prestudentIds.join(',') : this.prestudentIds;
+		},
 		updateData(){
 			const dataArray = [];
 			if (this.modelValue.prestudent_id) {
@@ -636,13 +639,13 @@ export default{
 				this.listStudiensemester = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-/*		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + this.modelValue.prestudent_id)
+		this.$fhcApi
+			.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + encodeURIComponent(this.paramIds))
 			.then(result => result.data)
 			.then(result => {
 				this.listStudienplaene = result;
 			})
-			.catch(this.$fhcAlert.handleSystemError);*/
+			.catch(this.$fhcAlert.handleSystemError);
 		this.$fhcApi
 			.get('api/frontend/v1/stv/status/getStatusgruende/')
 			.then(result => result.data)
@@ -661,7 +664,7 @@ export default{
 	mounted(){},
 	template: `
 		<div class="stv-list h-100 pt-3">
-		
+			
 			<!--Modal: statusModal-->
 			<BsModal ref="statusModal">
 				<template #title>
@@ -1018,12 +1021,12 @@ export default{
 			<!--MultiSelectButton-->
 			<div class="btn-group">						
 				<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-					Status Ändern 2
+					Status Ändern
 				</button>
 			
 				<ul class="dropdown-menu">
 					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl 2</a>
+						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl</a>
 					</li>
 					<li class="dropdown-submenu">
 						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">Abbrecher durch Student</a>

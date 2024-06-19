@@ -279,28 +279,16 @@ class Prestudent extends FHCAPI_Controller
 		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
-	//TODO(manu) multi
-	public function getStudienplaene($prestudent_id)
+	public function getStudienplaene($prestudent_ids)
 	{
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-
-		$result = $this->PrestudentModel->loadWhere(
-			array('prestudent_id' => $prestudent_id)
-		);
-		if (isError($result)) {
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-
-		$result = current(getData($result));
-		$studiengang_kz = $result->studiengang_kz;
+		$prestudent_ids = urldecode($prestudent_ids);
 
 		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+		$result = $this->StudienplanModel->getStudienplaeneByPrestudents($prestudent_ids);
 
-		$this->StudienplanModel->addOrder('studienplan_id', 'DESC');
 
-		$result = $this->StudienplanModel->getStudienplaene($studiengang_kz);
-
-		if (isError($result)) {
+		if (isError($result))
+		{
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess(getData($result) ?: []);
