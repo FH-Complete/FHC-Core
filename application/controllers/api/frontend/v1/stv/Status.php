@@ -23,6 +23,7 @@ class Status extends FHCAPI_Controller
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+		$this->load->library('PrestudentstatusCheckLib');
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -126,6 +127,7 @@ class Status extends FHCAPI_Controller
 		$datum = $this->input->post('datum');
 		$bestaetigtam = $this->input->post('bestaetigtam');
 		$bewerbung_abgeschicktamum = $this->input->post('bewerbung_abgeschicktamum');
+		$studienplan_id = $this->input->post('studienplan_id');
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
 		$anmerkung = $this->input->post('anmerkung');
 		$statusgrund_id = $this->input->post('statusgrund_id');
@@ -165,7 +167,8 @@ class Status extends FHCAPI_Controller
 		{
 			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		if($result->retval == '1')
+
+		if(getData($result) == '1')
 		{
 			return $this->terminateWithError($name . ": " . $this->p->t('lehre','error_rolleBereitsVorhanden'), self::ERROR_TYPE_GENERAL);
 		}
@@ -249,21 +252,17 @@ class Status extends FHCAPI_Controller
 		if(!$isBerechtigtNoStudstatusCheck)
 		{
 			//Block STATUSCHECKS
-			$new_status_datum = isset($datum) ? $datum  : date('Y-m-d');
-			$result = $this->PrestudentstatusModel->checkDatumNewStatus($new_status_datum);
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
+			$new_status_datum = isset($datum) ? $datum : date('Y-m-d');
 
-			$result = $this->PrestudentstatusModel->checkIfValidStatusHistory(
+			$result = $this->prestudentstatuschecklib->checkStatusAdd(
 				$prestudent_id,
-				$name,
 				$status_kurzbz,
 				$studiensemester_kurzbz,
 				$new_status_datum,
-				$ausbildungssemester
+				$ausbildungssemester,
+				$studienplan_id
 			);
+
 			if (isError($result))
 			{
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
@@ -545,9 +544,9 @@ class Status extends FHCAPI_Controller
 
 		$sqlundo =
 			"
-			INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester, 
-			    datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, 
-			    anmerkung, bewerbung_abgeschicktamum, studienplan_id,  rt_stufe, statusgrund_id) 
+			INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester,
+				datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon,
+				anmerkung, bewerbung_abgeschicktamum, studienplan_id,  rt_stufe, statusgrund_id)
 			VALUES('" . $prestudent_id . "','" . $status_kurzbz . "','" . $studiensemester_kurzbz . "','" . $ausbildungssemester . "',"
 			. $quotes_datum . $datum . $quotes_datum . ","
 			. $quotes_insertamum . $insertamum . $quotes_insertamum . ","
@@ -795,7 +794,7 @@ class Status extends FHCAPI_Controller
 				aufnahmeschluessel, facheinschlberuf, anmeldungreihungstest, reihungstestangetreten, reihungstest_id,
 				rt_gesamtpunkte, rt_punkte1, rt_punkte2, rt_punkte3, bismelden, person_id, anmerkung, mentor, ext_id,
 				dual, ausstellungsstaat, zgvdoktor_code, zgvdoktorort, zgvdoktordatum, zgvdoktornation,
-				gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung, zgvdoktor_erfuellt) 
+				gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung, zgvdoktor_erfuellt)
 	VALUES('" . $prestudent_id . "',"
 				. $quotes_aufmerksamdurch_kurzbz . $aufmerksamdurch_kurzbz . $quotes_aufmerksamdurch_kurzbz . ","
 				. $quotes_studiengang_kz . $studiengang_kz . $quotes_studiengang_kz . ","
@@ -974,14 +973,17 @@ class Status extends FHCAPI_Controller
 		{
 			//Block STATUSCHECKS
 
-			$result = $this->PrestudentstatusModel->checkIfValidStatusHistory(
+			$result = $this->prestudentstatuschecklib->checkStatusUpdate(
 				$prestudent_id,
-				'',
 				$status_kurzbz,
 				$studiensemester_kurzbz,
 				$datum,
-				$ausbildungssemester
+				$ausbildungssemester,
+				$studienplan_id,
+				$key_studiensemester_kurzbz,
+				$key_ausbildungssemester
 			);
+
 			if (isError($result))
 			{
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);

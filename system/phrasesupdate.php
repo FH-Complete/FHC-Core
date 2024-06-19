@@ -24832,7 +24832,7 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	),	
+	),
 	// Personalverwaltung end
 	array(
 		'app' => 'core',
@@ -27885,18 +27885,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
-		'phrase' => 'error_statuseintrag',
+		'phrase' => 'error_statuseintrag_zeitabfolge',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Datum des Statuseintrags muss nach dem Statusdatum, das Semesterstartdatum nach Semesterstartdatum des vorherigen Statuseintrags sein',
+				'text' => 'Ungültige Zeitabfolge der Statuseinträge (Statusdatum oder Semester)',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Error: Date of the status entry must be after the start date, the semester start date after the semester start date of the previous status entry',
+				'text' => 'Error: Invalid date order of statuses (date or semester)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -28202,6 +28202,66 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_wrongStatusOrderBeforeStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vor dem Studentenstatus müssen folgende Status eingetragen werden: {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Following status should be present before student status: {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_personenkennzeichenPasstNichtZuStudiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Personenkennzeichen passt nicht zu Studiensemester des ersten Studentstatus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Personenkennzeichen does not fit with semester of first student status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_bewerberOrgformUngleichStudentOrgform',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erster Studentstatus muss gleiche Organisationsform haben wie Bewerberstatus (Studienplan Orgform)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: first student status should have same organisational form as bewerber status (Studienplan)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 

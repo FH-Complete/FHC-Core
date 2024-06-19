@@ -365,11 +365,11 @@ class Prestudentstatus_model extends DB_Model
 	{
 		$qry = "SELECT
 					*
-				FROM 
+				FROM
 				    public.tbl_prestudentstatus
 				WHERE
-					prestudent_id = ? 
-				AND 
+					prestudent_id = ?
+				AND
 				    status_kurzbz = ?
 				AND
 				    studiensemester_kurzbz = ?
@@ -401,11 +401,11 @@ class Prestudentstatus_model extends DB_Model
 	{
 		$qry = "SELECT
 					*
-				FROM 
+				FROM
 				    public.tbl_prestudentstatus
 				WHERE
-					prestudent_id = ? 
-				AND 
+					prestudent_id = ?
+				AND
 				    status_kurzbz = 'Bewerber'";
 
 		$result = $this->execQuery($qry, array($prestudent_id));
@@ -434,7 +434,7 @@ class Prestudentstatus_model extends DB_Model
 	{
 		$qry = "SELECT
 					COUNT(*) as anzahl
-				FROM 
+				FROM
 				    public.tbl_prestudentstatus
 				WHERE
 					prestudent_id = ?
@@ -471,186 +471,34 @@ class Prestudentstatus_model extends DB_Model
 		}
 	}
 
-	/**
-	 * Check if Datum New Status is in the Past
-	 * @param integer $prestudent_id
-	 * @return error if in past
-	 */
-	public function checkDatumNewStatus($new_status_datum)
+	public function getAllPrestudentstatiWithStudiensemester($prestudent_id)
 	{
-		$today = new DateTime('today');
-		$new_status_datum = new DateTime($new_status_datum);
-
-		if($new_status_datum < $today)
-		{
-			return error($this->p->t('lehre','error_entryInPast'));
-		}
-		else
-		{
-			return success();
-		}
-	}
-
-	/**
-	 * Check if History of StatusData is valid
-	 * @param integer $prestudent_id
-	 * @return error if not valid, array StatusArr if valid
-	 */
-	public function checkIfValidStatusHistory($prestudent_id, $nameStud, $status_kurzbz, $new_status_studiensemester_kurzbz, $new_status_datum, $new_status_ausbildungssemester, $old_status_studiensemester_kurzbz = '', $old_status_ausbildungssemester = '')
-	{
-		$name = ($nameStud != '') ? $nameStud . ": " : '';
-		//$isNewStatus = $this->checkIfNewStatus($prestudent_id,  $status_kurzbz);
-		$isNewStatus =  $old_status_studiensemester_kurzbz == '' && $old_status_ausbildungssemester == '';
-
-		//get start studiensemester
-		$result = $this->StudiensemesterModel->load([
-			'studiensemester_kurzbz' => $new_status_studiensemester_kurzbz
-		]);
-		if(isError($result))
-		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		}
-		elseif(!hasData($result)) {
-			return error($this->p->t('lehre','error_noStudiensemester') . $new_status_studiensemester_kurzbz);
-		}
-
-		$studiensemester = current($result->retval);
-		$new_status_semesterstart = $studiensemester->start;
-
-		//get all prestudentstati
-		//TODO(manu) check errorlogic
-		$resultPs = $this->getAllPrestudentstatiWithStudiensemester($prestudent_id);
-		if (isError($resultPs))
-		{
-			$resultArr = [];
-		}
-		if(!hasData($resultPs))
-		{
-			$resultArr = [];
-		}
-		else
-			$resultArr = $resultPs->retval;
-
-		$statusArr = array();
-
-		$newStatusInserted = false;
-		$new_status_datum_form = new DateTime($new_status_datum);
-		$new_status_semesterstart_form = new DateTime($new_status_semesterstart);
-
-
-		foreach ($resultArr as $row)
-		{
-			$studiensemester_start = new DateTime($row->studiensemester_start);
-			$status_datum = new DateTime ($row->datum);
-
-
-			if ($new_status_datum_form >= $status_datum && $new_status_semesterstart_form >= $studiensemester_start)
-			{
-				if (!$newStatusInserted)
-				{
-					// neuer Status erstmals größer als Datum eines bestehenden Status -> neuen Status EINMALIG einfügen für spätere Statusprüfung
-					$neuer_status = new stdClass();
-					$neuer_status->status_kurzbz = $status_kurzbz;
-					$neuer_status->studiensemester_kurzbz = $new_status_studiensemester_kurzbz;
-					$neuer_status->datum = $new_status_datum;
-					$neuer_status->ausbildungssemester = $new_status_ausbildungssemester;
-					$statusArr[] = $neuer_status;
-					$newStatusInserted = true;
-				}
-				$statusArr[] = $row;
-			}
-			elseif($new_status_datum_form <= $status_datum && $new_status_semesterstart_form <= $studiensemester_start)
-			{
-				$statusArr[] = $row;
-
-			}
-			else
-			{
-				return error($this->p->t('lehre','error_statuseintrag'));
-			}
-
-		}
-
-		$endstatusArr = array('Absolvent', 'Abbrecher');
-		// Über alle gespeicherten Status gehen und Statusabfolge prüfen
-		for ($i = 0; $i < count($statusArr); $i++) {
-			$curr_status = $statusArr[$i];
-			$curr_status_kurzbz = $curr_status->status_kurzbz;
-			$curr_status_ausbildungssemester = $curr_status->ausbildungssemester;
-			$next_idx = $i - 1; //absteigend sortiert, nächster Status ist vorheriger Eintrag
-			$next_status = isset($statusArr[$next_idx]) ? $statusArr[$next_idx] : null;
-
-			// Abbrecher- oder Absolventenstatus muss Endstatus sein
-			if (isset($next_status) && in_array($curr_status_kurzbz, $endstatusArr))
-			{
-				return error($name . $this->p->t('lehre','error_endstatus'));
-			}
-
-			// wenn Unterbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
-			if (
-				$curr_status_kurzbz == 'Unterbrecher' && isset($next_status) && $next_status->status_kurzbz == 'Unterbrecher'
-				&& $curr_status_ausbildungssemester != $next_status->ausbildungssemester
-			)
-			{
-				return error($name . $this->p->t('lehre','error_consecutiveUnterbrecher'));
-			}
-
-			// wenn Abbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
-			if (
-				isset($next_status) && $curr_status_kurzbz == 'Unterbrecher'
-				&& $next_status->status_kurzbz == 'Abbrecher' && $curr_status_ausbildungssemester != $next_status->ausbildungssemester
-			)
-			{
-				return error($name . $this->p->t('lehre','error_consecutiveUnterbrecherAbbrecher'));
-			}
-
-			// keine Studenten nach Diplomand Status
-			if (
-				isset($next_status) && $curr_status_kurzbz == 'Diplomand' && $next_status->status_kurzbz == 'Student'
-			)
-			{
-				return error($name . $this->p->t('lehre','error_consecutiveDiplomandStudent'));
-			}
-
-		}
-
-		return $resultPs;
-	}
-
-	public function getAllPrestudentstatiWithStudiensemester($prestudent_id, $old_status_studiensemester_kurzbz = '', $old_status_ausbildungssemester = '')
-	{
-
-		//Todo(manu) check isNewStatus
-		$isNewStatus =  $old_status_studiensemester_kurzbz == '' && $old_status_ausbildungssemester == '';
-
 		$qry = "
-				SELECT public.tbl_prestudentstatus.status_kurzbz, 
-				public.tbl_prestudentstatus.studiensemester_kurzbz, 
-				public.tbl_prestudentstatus.ausbildungssemester, 
-				public.tbl_prestudentstatus.datum, 
-				s.start AS studiensemester_start 
-				FROM public.tbl_prestudentstatus 
-				JOIN public.tbl_studiensemester s USING (studiensemester_kurzbz) 
-				WHERE prestudent_id = ? 
-				ORDER BY public.tbl_prestudentstatus.datum DESC, 
-				public.tbl_prestudentstatus.insertamum DESC, 
-				public.tbl_prestudentstatus.ext_id DESC
+				SELECT
+					tbl_prestudentstatus.status_kurzbz,
+					tbl_prestudentstatus.studiensemester_kurzbz,
+					tbl_prestudentstatus.ausbildungssemester,
+					tbl_prestudentstatus.datum,
+					s.start AS studiensemester_start,
+					pl.orgform_kurzbz AS studienplan_orgform_kurzbz,
+					stud.matrikelnr,
+					pers.vorname,
+					pers.nachname
+				FROM
+					public.tbl_prestudentstatus
+					JOIN public.tbl_studiensemester s USING (studiensemester_kurzbz)
+					JOIN public.tbl_prestudent USING (prestudent_id)
+					JOIN public.tbl_person pers USING (person_id)
+					LEFT JOIN public.tbl_student stud USING (prestudent_id)
+					LEFT JOIN lehre.tbl_studienplan pl USING (studienplan_id)
+				WHERE
+					prestudent_id = ?
+				ORDER BY
+					public.tbl_prestudentstatus.datum DESC,
+					public.tbl_prestudentstatus.insertamum DESC,
+					public.tbl_prestudentstatus.ext_id DESC
 		";
 
-		$result = $this->execQuery($qry, array($prestudent_id));
-
-		if (isError($result))
-		{
-			return error($result);
-		}
-		if (!hasData($result)) {
-			return success("0", $this->p->t('lehre','error_noStatusFound'));
-		}
-
-		return $result;
-
+		return $this->execQuery($qry, array($prestudent_id));
 	}
-
-
 }
