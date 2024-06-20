@@ -46,7 +46,7 @@ class Cms extends FHCAPI_Controller
 	// Public methods
 
     /**
-	 * Gets a JSON body via HTTP POST and provides the parameters
+	 * fetches the content with the content_id and additional parameters
 	 */
     public function content()
 	{
