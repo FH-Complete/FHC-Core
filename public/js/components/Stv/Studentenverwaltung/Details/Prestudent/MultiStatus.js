@@ -694,6 +694,8 @@ export default{
 							<option  value="Unterbrecher">UnterbrecherIn</option>
 							<option  value="Diplomand">DiplomandIn</option>
 							<option  value="Incoming">Incoming</option>
+							<option v-if="!statusNew" value="Absolvent">Absolvent</option>
+							<option v-if="!statusNew" value="Abbrecher">Abbrecher</option>
 						</form-input>
 					</div>
 					<div class="row mb-3">		   
