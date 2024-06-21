@@ -467,7 +467,7 @@ class ReihungstestJob extends JOB_Controller
 		$this->PrestudentstatusModel->addJoin('public.tbl_person', 'person_id');
 
 		$yesterdays_applicants_arr = $this->PrestudentstatusModel->loadWhere('
-			status_kurzbz = \'Interessent\' AND
+			status_kurzbz IN (\'Interessent\', \'Bewerber\') AND
 			typ = \'b\' AND
 			bestaetigtam = current_date - 1
 		');
@@ -730,33 +730,27 @@ class ReihungstestJob extends JOB_Controller
 			tbl_reihungstest.reihungstest_id,
 			tbl_studienplan.studienplan_id,
 			tbl_reihungstest.studiensemester_kurzbz,
-			tbl_studienordnung.studiengang_kz
+			tbl_studienordnung.studiengang_kz,
+			tbl_studienplan.orgform_kurzbz
 		FROM
 			public.tbl_reihungstest
-			JOIN public.tbl_rt_studienplan ON(tbl_rt_studienplan.reihungstest_id=tbl_reihungstest.reihungstest_id)
-			JOIN lehre.tbl_studienplan USING(studienplan_id)
-			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+				JOIN public.tbl_rt_studienplan ON(tbl_rt_studienplan.reihungstest_id=tbl_reihungstest.reihungstest_id)
+				JOIN lehre.tbl_studienplan USING(studienplan_id)
+				JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 		WHERE
-			NOT EXISTS(
-				SELECT 1 FROM lehre.tbl_studienplan_semester
-				WHERE studienplan_id=tbl_rt_studienplan.studienplan_id
-					AND tbl_studienplan_semester.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz
+			EXISTS (
+				SELECT studienplan_id
+				FROM lehre.tbl_studienordnung sordnung
+					JOIN lehre.tbl_studienplan USING (studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
+				WHERE sordnung.studiengang_kz = tbl_studienordnung.studiengang_kz
+					AND tbl_studienplan_semester.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
+					AND tbl_studienplan.studienplan_id NOT IN
+					(
+						SELECT studienplan_id FROM tbl_rt_studienplan WHERE reihungstest_id = tbl_reihungstest.reihungstest_id
+					)
 			)
-			AND tbl_reihungstest.datum >= now()
-			AND NOT EXISTS(
-				SELECT
-					1
-				FROM
-					public.tbl_rt_studienplan rtstp
-					JOIN lehre.tbl_studienplan stp USING(studienplan_id)
-					JOIN lehre.tbl_studienordnung sto USING(studienordnung_id)
-					JOIN lehre.tbl_studienplan_semester stpsem USING(studienplan_id)
-				WHERE
-					sto.studiengang_kz=tbl_studienordnung.studiengang_kz
-					AND rtstp.reihungstest_id=tbl_reihungstest.reihungstest_id
-					AND stpsem.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz
-			)
-		";
+			AND tbl_reihungstest.datum >= now()";
 
 		$db = new DB_Model();
 		$result_rt = $db->execReadOnlyQuery($qry);
@@ -766,7 +760,9 @@ class ReihungstestJob extends JOB_Controller
 				// find an active studyplan for the same degree program with is valid in this semester
 				$result_stpl = $this->StudienplanModel->getStudienplaeneBySemester(
 					$row_rt->studiengang_kz,
-					$row_rt->studiensemester_kurzbz
+					$row_rt->studiensemester_kurzbz,
+					null,
+					$row_rt->orgform_kurzbz
 				);
 
 				if (hasData($result_stpl)) {
@@ -1027,7 +1023,7 @@ class ReihungstestJob extends JOB_Controller
 			{
 				$studiengang = $this->StudiengangModel->load($stg);
 				$mailcontent = '';
-
+				$content = false;
 				foreach ($orgform AS $art=>$value)
 				{
 					// Orgform nur dazu schreiben, wenn es mehr als Eine gibt
@@ -1048,6 +1044,7 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table><br><br>';
+						$content = true;
 					}
 					if (isset($value['AufnahmeHoeherePrio']) && !isEmptyArray($value['AufnahmeHoeherePrio']))
 					{
@@ -1062,6 +1059,7 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table>';
+						$content = true;
 					}
 					if (isset($value['AbgewiesenHoeherePrio']) && !isEmptyArray($value['AbgewiesenHoeherePrio']))
 					{
@@ -1075,6 +1073,7 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table>';
+						$content = true;
 					}
 					if ($bcc != '' && isset($value['AbgewiesenWeilBewerber']) && !isEmptyArray($value['AbgewiesenWeilBewerber']))
 					{
@@ -1089,13 +1088,14 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table>';
+						$content = true;
 					}
 				}
 
 				$mailcontent_data_arr['table'] = $mailcontent;
 
 				// Send email in Sancho design
-				if (!isEmptyString($mailcontent))
+				if (!isEmptyString($mailcontent) && $content === true)
 				{
 					sendSanchoMail(
 						'Sancho_ReihungstestteilnehmerJob',

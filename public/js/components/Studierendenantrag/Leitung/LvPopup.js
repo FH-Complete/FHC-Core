@@ -16,6 +16,7 @@ export default {
 	data(){
 		return {
 			lvs: null,
+			repeat_last: false,
 			refresh: true,
 			result: false,
 			check: false
@@ -35,18 +36,17 @@ export default {
 	},
 	methods: {
 		setlvs(param) {
-			if(param.error)
-			{
-				this.$refs.fetchCompt.error = true;
-				this.$refs.fetchCompt.errorMessage = param.retval;
+			this.repeat_last = !!param.repeat_last;
+			if (this.repeat_last) {
+				delete param.repeat_last;
 			}
-			else
-				this.lvs = param.retval;
+			this.lvs = param;
 		},
 		loadlvs() {
 			if (!this.antragId)
 				return new Promise(() => {});
-			return axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Antrag/Wiederholung/getLvs/' + this.antragId);
+			return this.$fhcApi.factory
+				.studstatus.wiederholung.getLvs(this.antragId);
 		},
 		submit(result) {
 			this.result = [result, this.check];
@@ -82,7 +82,7 @@ export default {
 					<table v-else class="table caption-top" v-for="(lv_arr, sem) in lvzugelassen" :key="sem">
 						<caption>
 							<span class="d-flex justify-content-between">
-								<span>{{ $p.t('studierendenantrag',['title_lv_nicht_zugelassen', 'title_lv_wiederholen'][sem.substr(0,1)-1]) }}</span>
+								<span>{{ $p.t('studierendenantrag',['title_lv_nicht_zugelassen', 'title_lv_wiederholen'][repeat_last ? 1 : sem.substr(0,1)-1]) }}</span>
 								<span>{{sem.substr(1)}}</span>
 							</span>
 						</caption>

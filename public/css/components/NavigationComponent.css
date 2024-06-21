@@ -82,6 +82,7 @@
 /*
  * To be moved outside
  */
+.navbar.navbar-left-side ~ *,
 #content {
 	position: inherit;
 	margin: 0 0 0 250px;

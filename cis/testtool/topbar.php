@@ -71,6 +71,18 @@ function changeSprache(sprache)
     parent.menu.location.href = parent.menu.location.pathname + '?sprache_user=' + sprache; // refreshes menu.php
     parent.content.location.href = parent.content.location.pathname + '?' + content_params; // refreshes login.php or frage.php
 }
+
+	$(document).on("keydown", function (e) {
+		if (((e.ctrlKey || e.metaKey) && e.keyCode === 85) || e.keyCode === 123)
+		{
+			e.preventDefault();
+		}
+	});
+	
+	$(document).on("contextmenu", function (e)
+	{
+		e.preventDefault();
+	});
 </script>
 <body>
 <?php

@@ -8,7 +8,7 @@
 			'bootstrap3' => true,
 			'ajaxlib' => true,
 			'fontawesome4' => true,
-			'tinymce4' => true,
+			'tinymce5' => true,
 			'sbadmintemplate3' => true,
 			'dialoglib' => true,
 			'widgets' => true,

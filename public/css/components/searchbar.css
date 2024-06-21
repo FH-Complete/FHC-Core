@@ -15,13 +15,17 @@
     position: absolute; 
     z-index: 9998; 
     background-color: #fff; 
-    border: 2px solid #666;
+    border: 1px solid lightgrey;
     padding: 1rem;
     overflow-y: auto;
+    top: 100%;
+    width: 100%;
+    left: 0;
+    right: 0;
 }
 
 .searchbar_result {
-    border-bottom: 1px solid #666;
+    border-bottom: 1px solid lightgrey;
     margin-bottom: 1rem;
 }
 
@@ -33,6 +37,7 @@
 .searchbar_icon {
     grid-column-start: icon;
     grid-column-end: span 1;
+    margin-right: .75em;
 }
 
 .searchbar_data {

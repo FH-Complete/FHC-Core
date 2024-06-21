@@ -208,7 +208,8 @@ else
 								<menupopup id="student-filter-menu-popup" >
 									<menuitem id="student-toolbar-filter-dokumente" label="fehlende Dokumente" oncommand="InteressentDokumenteFilter()" disabled="false" tooltiptext="Liste aller Studenten mit Fehlenden Dokumenten"/>
 									<menuitem id="student-toolbar-filter-offenebuchungen" label="offene Buchungen" oncommand="StudentKontoFilterStudenten('konto')" disabled="false" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
-									<menuitem id="student-toolbar-filter-studiengebuehr" label="nicht gebuchte Studiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" disabled="false" tooltiptext="Liste aller Studenten die noch nicht mit Studienbebuehr belastet wurden" />
+									<menuitem id="student-toolbar-filter-studiengebuehr" label="nicht gebuchte Studiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" disabled="false" tooltiptext="Liste aller Studenten die noch nicht mit der Studiengebühr belastet wurden" />
+									<menuitem id="student-toolbar-filter-erhoehte-studiengebuehr" label="erhöhten Studienbeitrag" oncommand="StudentKontoFilterStudenten('StudiengebuehrErhoeht')" disabled="false" tooltiptext="Liste aller Studenten denen der erhöhte Studienbeitrag eingebucht wurde" />
 									<menuitem id="student-toolbar-filter-zgvohnedatum" label="ZGV eingetragen ohne Datum" oncommand="StudentKontoFilterStudenten('zgvohnedatum')" disabled="false" tooltiptext="Liste aller Studenten die ZGV eingetragen haben bei denen aber kein ZGV Datum gesetzt ist" />
 									<menu label="nach Statusgrund">
 									    <menupopup id="student-filter-statusgrund-menu-popup">

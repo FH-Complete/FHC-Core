@@ -31,6 +31,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 20,
 					'requiredPermissions' => 'admin:w'
+				),
+				'bismeldestichtagsverwaltung' => array(
+					'link' => site_url('codex/Bismeldestichtag'),
+					'icon' => '',
+					'description' => 'BIS-Meldestichtagsverwaltung',
+					'expand' => true,
+					'sort' => 30,
+					'requiredPermissions' => 'admin:w'
 				)
 			)
 		),

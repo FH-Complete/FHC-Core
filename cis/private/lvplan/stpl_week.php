@@ -270,7 +270,7 @@ if (isset($_POST['titel']))
 	foreach($addon_obj->result as $addon)
 	{
 		if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
-			echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+			echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php"></script>';
 	}
 
 	// Wenn Seite fertig geladen ist Addons aufrufen

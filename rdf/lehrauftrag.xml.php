@@ -242,9 +242,31 @@ function drawLehrauftrag($uid)
 				$name_gesamt = trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
 				$zuhanden='';
 			}
-			// Lädt die letzte (aktuellste) Verwendungen eines Mitarbeiters um die inkludierte Lehre auslesen zu können
-			$bis = new bisverwendung();
-			$bis->getLastAktVerwendung($uid);
+
+			$show_betrag = true;
+
+			if (defined('DIENSTVERHAELTNIS_SUPPORT') && DIENSTVERHAELTNIS_SUPPORT)
+			{
+				$qry = "
+				SELECT
+					1
+				FROM
+					hr.tbl_dienstverhaeltnis
+				WHERE
+					mitarbeiter_uid=".$db->db_add_param($uid)."
+					AND vertragsart_kurzbz = 'echterdv'
+					AND von <= (SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=".$db->db_add_param($ss).")
+					AND COALESCE(bis,'2999-12-31') >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=".$db->db_add_param($ss).")
+				";
+
+				if($result = $db->db_query($qry))
+				{
+					if($db->db_num_rows($result)>0)
+					{
+						$show_betrag = false;
+					}
+				}
+			}
 
 			$xml .= '
 		<mitarbeiter>
@@ -259,7 +281,7 @@ function drawLehrauftrag($uid)
 			<ort><![CDATA['.$ort.']]></ort>
 			<svnr><![CDATA['.$row->svnr.']]></svnr>
 			<personalnummer><![CDATA['.$row->personalnummer.']]></personalnummer>
-			<inkludierte_lehre><![CDATA['.$bis->inkludierte_lehre.']]></inkludierte_lehre>
+			<show_betrag><![CDATA['.($show_betrag?'true':'false').']]></show_betrag>
 		</mitarbeiter>';
 		}
 	}

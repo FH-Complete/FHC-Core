@@ -48,7 +48,7 @@ foreach ($cj->result as $cronjob)
 			if($cronjob->execute())
 			{
 				echo "\n".date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') executed<br>'."\n";
-				echo implode($cronjob->output,"\n");
+				echo implode("\n",$cronjob->output);
 			}
 			else
 			{

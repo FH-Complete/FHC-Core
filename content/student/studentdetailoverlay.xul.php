@@ -806,24 +806,24 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<treechildren flex="1" >
 										<treeitem uri="rdf:*">
 											<treerow>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#status_kurzbz"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studiensemester_kurzbz"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#lehrverband"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#orgform_kurzbz"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_id"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_bezeichnung"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#anmerkung"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_von"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_am"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bewerbung_abgeschicktamum"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#statusgrund"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#insertamum"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#insertvon"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updateamum"/>
-												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updatevon"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#status_kurzbz"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studiensemester_kurzbz"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#lehrverband"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#orgform_kurzbz"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_id"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_bezeichnung"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#anmerkung"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_von"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_am"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bewerbung_abgeschicktamum"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#statusgrund"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#insertamum"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#insertvon"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updateamum"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updatevon"/>
 											</treerow>
 										</treeitem>
 									</treechildren>

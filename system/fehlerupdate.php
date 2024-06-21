@@ -286,6 +286,14 @@ $fehlerArr = array(
 		'app' => 'core'
 	),
 	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0016',
+		'fehler_kurzbz' => 'DualesStudiumOhneMarkierung',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'StudentIn in dualem Studiengang nicht als dual markiert (prestudent_id %s, Studienplan %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
 		'fehlercode' => 'CORE_PERSON_0001',
 		'fehler_kurzbz' => 'GbDatumWeitZurueck',
 		'fehlercode_extern' => null,

@@ -1,4 +1,4 @@
-@import '../../vendor/olifolkerd/tabulator5/dist/css/tabulator_bootstrap5.min.css';
+@import '../../vendor/olifolkerd/tabulator5/dist/css/tabulator_simple.min.css';
 
 /* Apply borders and background to Cell instead of the Row
  * otherwise frozen columns won't look good (columns behind
@@ -37,4 +37,10 @@
 }
 .tabulator .tabulator-col-resize-handle:last-of-type {
 	z-index: 999999;
+}
+
+.tabulator-cell .btn {
+	padding: 0 .7rem;
+	min-height: 25px;
+	min-width: 25px;
 }

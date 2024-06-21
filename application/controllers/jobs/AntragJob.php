@@ -19,6 +19,8 @@ class AntragJob extends JOB_Controller
 		// Loads SanchoHelper
 		$this->load->helper('hlp_sancho_helper');
 
+		$this->load->library('AntragLib');
+
 		// Load Model
 		$this->load->model('education/Studierendenantrag_model', 'StudierendenantragModel');
 		$this->load->model('education/Studierendenantragstatus_model', 'StudierendenantragstatusModel');
@@ -172,7 +174,16 @@ class AntragJob extends JOB_Controller
 			$cc = $leitung['Details']->email;
 
 			// NOTE(chris): Sancho mail
-			if (sendSanchoMail("Sancho_Mail_Antrag_Stgl", $data, $to, 'Anträge - Aktion(en) erforderlich', DEFAULT_SANCHO_HEADER_IMG, DEFAULT_SANCHO_FOOTER_IMG, '', $cc))
+			if (sendSanchoMail(
+				"Sancho_Mail_Antrag_Stgl",
+				$data,
+				$to,
+				'Anträge - Aktion(en) erforderlich',
+				DEFAULT_SANCHO_HEADER_IMG,
+				DEFAULT_SANCHO_FOOTER_IMG,
+				'',
+				$cc
+			))
 				$count++;
 		}
 
@@ -286,7 +297,6 @@ class AntragJob extends JOB_Controller
 
 		$result = $this->PruefungModel->getAllPrestudentsWhereCommitteeExamFailed(
 			[
-				null,
 				Studierendenantragstatus_model::STATUS_REQUESTSENT_1,
 				Studierendenantragstatus_model::STATUS_REQUESTSENT_2
 			],
@@ -307,11 +317,64 @@ class AntragJob extends JOB_Controller
 
 			foreach ($prestudents as $prestudent)
 			{
-				$result = $this->prestudentlib->setAbbrecher($prestudent->prestudent_id, $prestudent->studiensemester_kurzbz, $insertvon);
-				if (isError($result))
+				$result = $this->StudierendenantragstatusModel->insert([
+					'studierendenantrag_id' => $prestudent->studierendenantrag_id,
+					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_DEREGISTERED,
+					'insertvon' => 'AntragJob'
+				]);
+				if (isError($result)) {
 					$this->logError(getError($result));
-				else
-					$count++;
+				} else {
+					$deregisterStatus = getData($result);
+
+					$result = $this->antraglib->pauseAntrag(
+						$prestudent->studierendenantrag_id,
+						Studierendenantragstatus_model::INSERTVON_DEREGISTERED
+					);
+					if (isError($result))
+						$this->logError(getError($result));
+
+					$result = $this->prestudentlib->setAbbrecher($prestudent->prestudent_id, '', $insertvon);
+					if (isError($result)) {
+						$this->StudierendenantragstatusModel->delete($deregisterStatus);
+						$this->logError(getError($result));
+					} else {
+						$count++;
+						
+						$datum_kp = new DateTime($prestudent->datum);
+						$dataMail = array(
+							'name'=> trim($prestudent->vorname . ' '. $prestudent->nachname),
+							'vorname' => $prestudent->vorname,
+							'nachname' => $prestudent->nachname,
+							'pers_kz'=> $prestudent->matrikelnr,
+							'stg' => $prestudent->bezeichnung,
+							'lvbezeichnung' => $prestudent->lvbezeichnung,
+							'datum_kp' => $datum_kp->format('d.m.Y'),
+							'studiensemester'=> $prestudent->studiensemester_kurzbz,
+							'Orgform'=> $prestudent->orgform,
+							'prestudent_id' => $prestudent->prestudent_id,
+							'fristablauf' => $dateDeadline->format('d.m.Y')
+						);
+
+						$email = $this->StudentModel->getEmailFH($this->StudentModel->getUID($prestudent->prestudent_id));
+						// Mail to Student
+						if (!sendSanchoMail('Sancho_Mail_Antrag_W_DL_Stud', $dataMail, $email, 'Wiederholung: Frist abgelaufen')) {
+							$this->logWarning("Failed to send Notification to " . $email);
+						}
+
+						$result = $this->StudiengangModel->load($prestudent->studiengang_kz);
+						if (!hasData($result)) {
+							$this->logWarning('No Studiengang found');
+							continue;
+						}
+						$studiengang = current(getData($result));
+						$email = $studiengang->email;
+						// Mail to Assistenz
+						if (!sendSanchoMail('Sancho_Mail_Antrag_W_DL_Assist', $dataMail, $email, 'Wiederholung: Frist abgelaufen')) {
+							$this->logWarning("Failed to send Notification to " . $email);
+						}
+					}
+				}
 			}
 			$this->logInfo($count . " Students set to Abbrecher");
 		}
@@ -326,8 +389,6 @@ class AntragJob extends JOB_Controller
 	public function handleAbmeldungenStglDeadline()
 	{
 		$this->logInfo('Start Job handleAbmeldungenStglDeadline');
-
-		$this->load->library('AntragLib');
 
 		$insertvon = $this->config->item('antrag_job_systemuser');
 		if (!$insertvon) {
@@ -346,12 +407,18 @@ class AntragJob extends JOB_Controller
 		$dateDeadline = new DateTime();
 		$dateDeadline->sub(DateInterval::createFromDateString($modifier_deadline));
 
+		$this->StudierendenantragModel->addSelect('tbl_studierendenantrag.studierendenantrag_id');
 		$this->StudierendenantragModel->addSelect('prestudent_id');
 		$this->StudierendenantragModel->addSelect('studiensemester_kurzbz');
 		$this->StudierendenantragModel->addSelect('s.insertamum');
 		$this->StudierendenantragModel->addSelect('s.insertvon');
+		$this->StudierendenantragModel->addJoin('public.tbl_student pts', 'prestudent_id');
+		$this->StudierendenantragModel->addSelect('pts.student_uid');
 
-		$this->StudierendenantragModel->db->where_in('public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)', $this->config->item('antrag_prestudentstatus_whitelist'));
+		$this->StudierendenantragModel->db->where_in(
+			'public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)',
+			$this->config->item('antrag_prestudentstatus_whitelist')
+		);
 
 		$result = $this->StudierendenantragModel->getWithLastStatusWhere([
             'typ' => Studierendenantrag_model::TYP_ABMELDUNG_STGL,
@@ -370,49 +437,64 @@ class AntragJob extends JOB_Controller
 
 			foreach ($antraege as $antrag)
 			{
-				$result = $this->prestudentlib->setAbbrecher(
-                    $antrag->prestudent_id,
-                    $antrag->studiensemester_kurzbz,
-                    'AntragJob',
-                    'abbrecherStgl',
-                    $antrag->insertamum,
-                    null,
-                    $antrag->insertvon ?: $insertvon
-                );
+				$result = $this->StudierendenantragstatusModel->insert([
+					'studierendenantrag_id' => $antrag->studierendenantrag_id,
+					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_DEREGISTERED,
+					'insertvon' => 'AntragJob'
+				]);
 				if (isError($result))
 					$this->logError(getError($result));
-				else
-				{
-					$count++;
-					$result = $this->PrestudentModel->load($antrag->prestudent_id);
-					if(!hasData($result)) {
-						$this->logWarning('No Prestudent found');
-						continue;
-					}
-					$prestudent = current(getData($result));
-					$result = $this->StudiengangModel->load($prestudent->studiengang_kz);
-					if(!hasData($result)) {
-						$this->logWarning('No Studiengang found');
-						continue;
-					}
-					$studiengang = current(getData($result));
-					$result = $this->PersonModel->loadPrestudent($antrag->prestudent_id);
-					if(!hasData($result))
-					{
-						$this->logWarning('No Person found');
-						continue;
-					}
-					$person = current(getData($result));
-					$email = $studiengang->email;
-					$dataMail = array(
-						'prestudent' => $antrag->prestudent_id,
-						'studiensemester' => $antrag->studiensemester_kurzbz,
-						'name' => trim($person->vorname . ' '. $person->nachname),
-					);
+				else {
+					$deregisterStatus = getData($result);
 
-					if(!sendSanchoMail('Sancho_Mail_Antrag_A_Assist', $dataMail, $email, 'Einspruchsfrist abgelaufen'))
-					{
-						$this->logWarning("Failed to send Notification to " . $email);
+					$result = $this->antraglib->pauseAntrag($antrag->studierendenantrag_id, Studierendenantragstatus_model::INSERTVON_DEREGISTERED);
+					if (isError($result))
+						$this->logError(getError($result));
+
+					$result = $this->prestudentlib->setAbbrecher(
+	                    $antrag->prestudent_id,
+	                    $antrag->studiensemester_kurzbz,
+	                    'AntragJob',
+	                    'abbrecherStgl',
+	                    $antrag->insertamum,
+	                    null,
+	                    $antrag->insertvon ?: $insertvon
+	                );
+					if (isError($result)) {
+						$this->StudierendenantragstatusModel->delete($deregisterStatus);
+						$this->logError(getError($result));
+					} else {
+						$count++;
+						$result = $this->PrestudentModel->load($antrag->prestudent_id);
+						if(!hasData($result)) {
+							$this->logWarning('No Prestudent found');
+							continue;
+						}
+						$prestudent = current(getData($result));
+						$result = $this->StudiengangModel->load($prestudent->studiengang_kz);
+						if(!hasData($result)) {
+							$this->logWarning('No Studiengang found');
+							continue;
+						}
+						$studiengang = current(getData($result));
+						$result = $this->PersonModel->loadPrestudent($antrag->prestudent_id);
+						if(!hasData($result))
+						{
+							$this->logWarning('No Person found');
+							continue;
+						}
+						$person = current(getData($result));
+						$email = $studiengang->email;
+						$dataMail = array(
+							'prestudent' => 'UID: ' . $antrag->student_uid . ', PreStudentId: ' . $antrag->prestudent_id,
+							'studiensemester' => $antrag->studiensemester_kurzbz,
+							'name' => trim($person->vorname . ' '. $person->nachname),
+						);
+
+						if(!sendSanchoMail('Sancho_Mail_Antrag_A_Assist', $dataMail, $email, 'Einspruchsfrist abgelaufen'))
+						{
+							$this->logWarning("Failed to send Notification to " . $email);
+						}
 					}
 				}
 			}
@@ -544,12 +626,6 @@ class AntragJob extends JOB_Controller
 					}
 				}
 
-				$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
-				$result = $this->PrestudentstatusModel->loadLastWithStgDetails($prestudent->prestudent_id, $prestudent->studiensemester_kurzbz);
-				if (hasData($result)) {
-					$ausbildungssemester = current(getData($result))->semester;
-				}
-
 				$dataMail = array(
 					'name'=> trim($prestudent->vorname . ' '. $prestudent->nachname),
 					'vorname' => $prestudent->vorname,
@@ -566,7 +642,7 @@ class AntragJob extends JOB_Controller
 					'fristablauf' => $fristende->format('d.m.Y'),
 					'pre_wiederholer_sem' => $next_sem,
 					'wiederholer_sem' => $sem_after_next_sem,
-					'sem' => $ausbildungssemester
+					'sem' => $prestudent->ausbildungssemester
 				);
 
 				// NOTE(chris): Sancho mail

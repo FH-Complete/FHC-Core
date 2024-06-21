@@ -108,7 +108,7 @@ echo '<form action="studienplan_vorrueckung.php" method="POST">';
 echo ' Quelle: <select id="select_studiensemester_kurzbz_from" name="studiensemester_kurzbz_from" />';
 
 $stsem = new studiensemester();
-$stsem->getPlusMinus(null,10,'ende ASC');
+$stsem->getPlusMinus(null,10,'ende DESC');
 
 foreach($stsem->studiensemester as $row)
 {

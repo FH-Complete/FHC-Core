@@ -395,15 +395,15 @@ if($command=="update" && $error!=true)
 							    }
 							    $htmlstr .= "</td></tr>\n";
 								$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/deutscheSchlagwoerter').':*</b></td>
-											<td><input  type="text" name="schlagwoerter" value="'.$db->convert_html_chars($schlagwoerter).'" size="60" maxlength="150"></td></tr>'."\n";
+											<td><input  type="text" name="schlagwoerter" value="'.$db->convert_html_chars($schlagwoerter).'" size="60" maxlength="150" required></td></tr>'."\n";
 								$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/englischeSchlagwoerter').':*</b></td>
-											<td><input type="text" name="schlagwoerter_en" value="'.$db->convert_html_chars($schlagwoerter_en).'" size="60" maxlength="150"></td></tr>'."\n";
+											<td><input type="text" name="schlagwoerter_en" value="'.$db->convert_html_chars($schlagwoerter_en).'" size="60" maxlength="150" required></td></tr>'."\n";
 								$htmlstr .= '<tr><td valign="top"><b>'.$p->t('abgabetool/abstract').' </b>'.$p->t('abgabetool/maxZeichen').':*</td>
-											<td><textarea name="abstract" cols="46"  rows="7">'.$db->convert_html_chars($abstract).'</textarea></td></tr>'."\n";
+											<td><textarea name="abstract" cols="46"  rows="7" required>'.$db->convert_html_chars($abstract).'</textarea></td></tr>'."\n";
 								$htmlstr .= '<tr><td valign="top"><b>'.$p->t('abgabetool/abstractEng').'</b>'.$p->t('abgabetool/maxZeichen').':*</td>
-											<td><textarea name="abstract_en" cols="46"  rows="7">'.$db->convert_html_chars($abstract_en).'</textarea></td></tr>'."\n";
+											<td><textarea name="abstract_en" cols="46"  rows="7" required>'.$db->convert_html_chars($abstract_en).'</textarea></td></tr>'."\n";
 								$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/seitenanzahl').':*</b></td>
-											<td><input  type="text" name="seitenanzahl" value="'.$db->convert_html_chars($seitenanzahl).'" size="5" maxlength="4"></td></tr>'."\n";
+											<td><input  type="text" name="seitenanzahl" value="'.$db->convert_html_chars($seitenanzahl).'" size="5" maxlength="4" required></td></tr>'."\n";
 								$htmlstr .="<tr><td>&nbsp;</td></tr>\n";
 
 								// If there are info about the signed document

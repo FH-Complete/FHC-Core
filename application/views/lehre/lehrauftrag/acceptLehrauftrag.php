@@ -142,14 +142,17 @@ $this->load->view(
 		<br>
 
 		<!-- link for external lectors 'Informationsblatt fuer externe Lehrende'. Show only for external lecturers -->
-		<?php if ($is_external_lector): ?>
+
 		<div class="row">
 			<div class="col-xs-12">
-				<span class="pull-right"><?php echo $this->p->t('dms' , 'informationsblattExterneLehrende'); ?></span>
+				<span class="pull-left"><?php echo $this->p->t('ui' , 'hinweistextLehrauftrag'); ?></span>
+				<?php if ($is_external_lector): ?>
+					<span class="pull-right"><?php echo $this->p->t('dms' , 'informationsblattExterneLehrende'); ?></span>
+				<?php endif; ?>
 			</div>
 		</div>
 		<br>
-		<?php endif; ?>
+
 
 		<!-- filter buttons & PDF downloads & password field & akzeptieren-button -->
 		<div class="row">

@@ -267,7 +267,7 @@ class Prestudentstatus_model extends DB_Model
 		return $this->loadWhere($where);
 	}
 
-	public function loadLastWithStgDetails($prestudent_id, $studiensemester_kurzbz = null)
+	public function loadLastWithStgDetails($prestudent_id, $studiensemester_kurzbz = null, $max_date = null)
 	{
 		$this->load->config('studierendenantrag');
 
@@ -304,7 +304,8 @@ class Prestudentstatus_model extends DB_Model
 
 		$this->addLimit(1);
 
-		$this->db->where_in($this->dbTable . '.status_kurzbz', $this->config->item('antrag_prestudentstatus_whitelist'));
+		if ($max_date)
+			$this->db->where($this->dbTable . '.insertamum <', $max_date);
 
 		$whereArr = [
 			$this->dbTable . '.prestudent_id' => $prestudent_id,

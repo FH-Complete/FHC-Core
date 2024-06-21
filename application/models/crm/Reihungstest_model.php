@@ -322,7 +322,7 @@ class Reihungstest_model extends DB_Model
 			JOIN lehre.tbl_studienplan ON (tbl_prestudentstatus.studienplan_id = tbl_studienplan.studienplan_id)
 			LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
 			WHERE rt_id = ?
-				AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) = \'Interessent\'
+				AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) IN (\'Interessent\', \'Bewerber\')
 				AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
 				AND bewerbung_abgeschicktamum IS NOT NULL
 				AND bestaetigtam IS NOT NULL
@@ -411,7 +411,7 @@ class Reihungstest_model extends DB_Model
 			JOIN lehre.tbl_studienplan ON (tbl_prestudentstatus.studienplan_id = tbl_studienplan.studienplan_id)
 			LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
 			WHERE rt.studiengang_kz = ?
-				AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) = \'Interessent\'
+				AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) IN (\'Interessent\', \'Bewerber\')
 				AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
 				AND bewerbung_abgeschicktamum IS NOT NULL
 				AND bestaetigtam IS NOT NULL
@@ -462,7 +462,7 @@ class Reihungstest_model extends DB_Model
 			LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
 			LEFT JOIN PUBLIC.tbl_ort ON (tbl_rt_person.ort_kurzbz = tbl_ort.ort_kurzbz)
 			WHERE rt_id = ?
-				AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) = \'Interessent\'
+				AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) IN (\'Interessent\', \'Bewerber\')
 				AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
 				AND bewerbung_abgeschicktamum IS NOT NULL
 				AND bestaetigtam IS NOT NULL

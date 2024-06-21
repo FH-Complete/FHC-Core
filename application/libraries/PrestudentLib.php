@@ -74,7 +74,7 @@ class PrestudentLib
 		$result = $this->_ci->PrestudentstatusModel->withGrund($statusgrund_kurzbz)->insert([
 			'prestudent_id' => $prestudent_id,
 			'status_kurzbz' => Prestudentstatus_model::STATUS_ABBRECHER,
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'studiensemester_kurzbz' => $prestudent_status->studiensemester_kurzbz,
 			'ausbildungssemester' => $prestudent_status->ausbildungssemester,
 			'datum' => $datum,
 			'insertvon' => $insertvon,
@@ -135,7 +135,7 @@ class PrestudentLib
 		}
 
 		//noch nicht eingetragene Zeugnisnoten auf 9 setzen
-		$result = $this->_ci->ZeugnisnoteModel->getZeugnisnoten($student->student_uid, $studiensemester_kurzbz);
+		$result = $this->_ci->ZeugnisnoteModel->getZeugnisnoten($student->student_uid, $prestudent_status->studiensemester_kurzbz);
 		if (isError($result))
 			return $result;
 		$result = getData($result) ?: [];
@@ -181,7 +181,7 @@ class PrestudentLib
 
 		//Studentlehrverband setzen
 		$this->_ci->StudentlehrverbandModel->update([
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'studiensemester_kurzbz' => $prestudent_status->studiensemester_kurzbz,
 			'student_uid' => $student->student_uid
 		], [
 			'studiengang_kz' => $student->studiengang_kz,
