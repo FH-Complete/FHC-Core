@@ -24,6 +24,9 @@ class PlausicheckProducerLib
 
 		$this->_ci =& get_instance(); // get ci instance
 
+		// load libraries
+		$this->_ci->load->library('IssuesLib');
+
 		// load models
 		$this->_ci->load->model('system/Fehlerkonfiguration_model', 'FehlerkonfigurationModel');
 
@@ -39,6 +42,53 @@ class PlausicheckProducerLib
 				$this->_konfiguration[$fk->fehler_kurzbz][$fk->konfigurationstyp_kurzbz] = $fk->konfiguration;
 			}
 		}
+	}
+
+	/**
+	 * Produces multiple plausicheck issues at once.
+	 * @param array $fehlerLibMappings contains fehler type to check and library responsible for check (fehler_kurzbz => libName)
+	 * @param array $params passed to each plausicheck
+	 * @return result object with occured error and info
+	 */
+	public function producePlausicheckIssues($fehlerLibMappings, $params)
+	{
+		$result = new StdClass();
+		$result->errors = [];
+		$result->infos = [];
+
+		foreach ($fehlerLibMappings as $fehler_kurzbz => $libName)
+		{
+			$plausicheckRes = $this->producePlausicheckIssue(
+				$libName,
+				$fehler_kurzbz,
+				$params
+			);
+
+			if (hasData($plausicheckRes))
+			{
+				$plausicheckData = getData($plausicheckRes);
+
+				foreach ($plausicheckData as $plausiData)
+				{
+					// get the data needed for issue production
+					$person_id = isset($plausiData['person_id']) ? $plausiData['person_id'] : null;
+					$oe_kurzbz = isset($plausiData['oe_kurzbz']) ? $plausiData['oe_kurzbz'] : null;
+					$fehlertext_params = isset($plausiData['fehlertext_params']) ? $plausiData['fehlertext_params'] : null;
+					$resolution_params = isset($plausiData['resolution_params']) ? $plausiData['resolution_params'] : null;
+
+					// write the issue
+					$addIssueRes = $this->_ci->issueslib->addFhcIssue($fehler_kurzbz, $person_id, $oe_kurzbz, $fehlertext_params, $resolution_params);
+
+					// log if error, or log info if inserted new issue
+					if (isError($addIssueRes))
+						$result->errors[] = getError($addIssueRes);
+					elseif (hasData($addIssueRes) && is_integer(getData($addIssueRes)))
+						$result->infos[] = "Plausicheck issue " . $fehler_kurzbz . " successfully produced, person_id: " . $person_id;
+				}
+			}
+		}
+
+		return $result;
 	}
 
 	/**
