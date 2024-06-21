@@ -1,3 +1,5 @@
+import raum_contentmittitel from './Content_types/Raum_contentmittitel.js'
+
 
 export default {
   props:{
@@ -20,6 +22,9 @@ export default {
 
 
   },
+  components:{
+    raum_contentmittitel,
+  },
   data() {
     return {
       content: null,
@@ -29,12 +34,14 @@ export default {
   created() {
     console.log("this is the api", this.$fhcApi);
     this.$fhcApi.factory.cms.content(this.content_id,this.version, this.sprache, this.sichtbar).then(res =>{
-        this.content = res.data;
+        this.content = res.data.content;
+        this.content_type = res.data.type;
     });
   },
   template: /*html*/ `
     <!-- div that contains the content -->
-    <div v-if="content" v-html="content"></div>
+    <component :is="content_type" v-if="content" :content="content" />
     <p v-else>No content is available to display</p>
+
     `,
 };

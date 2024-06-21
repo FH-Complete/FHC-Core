@@ -110,10 +110,14 @@ class CmsLib
 		$processor = new XSLTProcessor();
 		$processor->importStylesheet($xsltemplate);
 
-		$content = $processor->transformToXML($XML);
-		$content = str_replace('dms.php', APP_ROOT . 'cms/dms.php', $content);
+		
+		$transformed_content = $processor->transformToXML($XML);
+		$transformed_content = str_replace('dms.php', APP_ROOT . 'cms/dms.php', $transformed_content);
 
-		return success($content);
+		return success([
+			"type"=>$content->template_kurzbz,
+			"content"=>$transformed_content
+		]);
 	}
 
 	/**

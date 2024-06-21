@@ -72,8 +72,18 @@ class Cms extends Auth_Controller
 		// return early if the content_id for the content is missing
 		if(!isset($content_id))
 			$this->terminateWithError("content_id is missing");
-		
-		$this->load->view('CisHtml/Cms/Content', ['content_id' => $content_id, 'version' => $version, 'sprache' => $sprache, 'sichtbar' => $sichtbar]);
+
+		$content = $this->ContentModel->load($content_id);		
+		if (isError($content))
+			$this->terminateWithError(getError($content));	
+
+		$content = getData($content);
+		if(NULL === $content)
+			$this->terminateWithError("Content not found");
+
+		$content = current($content);
+
+		$this->load->view('CisVue/Cms/Content', ['content_id' => $content_id, 'template_kurzbz'=>$content->template_kurzbz , 'version' => $version, 'sprache' => $sprache, 'sichtbar' => $sichtbar]);
 	}
 
 	/**

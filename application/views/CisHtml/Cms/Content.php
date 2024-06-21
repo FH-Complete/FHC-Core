@@ -1,15 +1,23 @@
 <?php
 $includesArray = array(
-	'primevue3' => true,
 	'customJSModules' => ['public/js/apps/Cis/Cms.js'],
+	'primevue3'=>true,
 	'customCSSs' => [
 		'public/css/Cis4/Cms.css',
 		#'skin/style.css.php'
 	]
 );
 
-$this->load->view('templates/CISHTML-Header', $includesArray);
+switch($template_kurzbz){
+	case 'raum_contentmittitel': 
+		$includesArray['tabulator5'] = true; 
+		break;
+}
+
+$this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
+
+
 
 <div id="cms">
 
@@ -17,4 +25,5 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 	
 </div>
 
-<?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>
+<?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>
+
