@@ -35,9 +35,6 @@ class PlausicheckResolverLib
 		$result->errors = [];
 		$result->infos = [];
 
-		//var_dump($openIssues);
-		//var_dump($codeLibMappings);
-
 		foreach ($openIssues as $issue)
 		{
 			// ignore if Fehlercode is not in libmappings (shouldn't be checked)
@@ -86,9 +83,6 @@ class PlausicheckResolverLib
 			// call the function for checking for issue resolution
 			$issueResolvedRes = $this->_ci->{$lowercaseLibName}->{self::CHECK_ISSUE_RESOLVED_METHOD_NAME}($params);
 
-			var_dump($params);
-			var_dump($issueResolvedRes);
-
 			if (isError($issueResolvedRes))
 			{
 				$result->errors[] = getError($issueResolvedRes);
@@ -101,8 +95,6 @@ class PlausicheckResolverLib
 				{
 					// set issue to resolved if needed
 					$behobenRes = $this->_ci->issueslib->setBehoben($issue->issue_id, null);
-
-					var_dump($behobenRes);
 
 					if (isError($behobenRes))
 						$result->errors[] = getError($behobenRes);
