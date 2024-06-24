@@ -135,6 +135,18 @@ class Status extends FHCAPI_Controller
 		$bestaetigtvon = $uid;
 		$name = $this->input->post('name');
 
+
+
+		//Form Validation
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('ausbildungssemester', 'Ausbildungssemester', 'integer', [
+			'integer' => $this->p->t('ui', 'error_fieldNotInteger', ['field' => 'Ausbildungssemester'])
+		]);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
 		//GET lastStatus
 		$result = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 

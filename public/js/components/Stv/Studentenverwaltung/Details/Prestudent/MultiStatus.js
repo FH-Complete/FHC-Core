@@ -937,10 +937,12 @@ export default{
 				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
 				<template #default>
 				<div v-if="prestudentIds.length == 1">
-					<p>In welches Semester soll dieser {{actionStatusText}} verschoben werden?</p>
+					<p>
+					{{$p.t('lehre', 'modal_askAusbildungssem', { status: actionStatusText })}}</p>
 				</div>
 				<div v-else>
-					<p>In welches Semester sollen diese {{prestudentIds.length}} {{actionStatusText}}en verschoben werden?</p>
+					<p>
+					{{$p.t('lehre', 'modal_askAusbildungssemPlural', { count: prestudentIds.length })}}</p>
 				</div>
 				
 				<div class="row mb-3">
@@ -950,6 +952,7 @@ export default{
 							type="text"
 							name="studiensemester"
 							v-model="actionSem"
+							maxlength="2"
 						>				
 						</form-input>
 					</div>
