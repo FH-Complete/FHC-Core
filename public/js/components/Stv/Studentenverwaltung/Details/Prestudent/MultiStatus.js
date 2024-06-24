@@ -261,7 +261,7 @@ export default{
 			listStudiensemester: [],
 			maxSem:  Array.from({ length: 11 }, (_, index) => index),
 			listStudienplaene: [],
-			aufnahmestufen: {'': '-- keine Auswahl --', 1: 1, 2: 2, 3: 3},
+			aufnahmestufen: {1: 1, 2: 2, 3: 3},
 			listStatusgruende: [],
 			statusId: {},
 			gruendeLength: {},
@@ -291,6 +291,7 @@ export default{
 	},
 	methods: {
 		actionNewStatus() {
+			this.statusNew = true;
 			this.resetModal();
 			this.statusData.status_kurzbz = 'Interessent';
 			this.statusData.studiensemester_kurzbz = this.defaultSemester;
@@ -794,6 +795,7 @@ export default{
 						v-model="statusData['rt_stufe']"
 						:disabled="statusData.datum < dataMeldestichtag"
 						>
+						<option :value="NULL">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
 						<option v-for="entry in aufnahmestufen" :key="entry" :value="entry">{{entry}}</option>
 						</form-input>
 					</div>
