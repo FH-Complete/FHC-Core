@@ -25909,7 +25909,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Sie sind nicht als Teilnehmer der LV-Teil eingetragen.',
+				'text' => 'Sie sind nicht als Teilnehmer des LV-Teil eingetragen.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -26364,18 +26364,18 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'termine',
+		'phrase' => 'termineLautStundenplan',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Termine',
+				'text' => 'Termine laut Stundenplan',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Dates',
+				'text' => 'Lessons as per Timetable',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -26476,6 +26476,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Attendance Check Date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'showAllDates',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Termine anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show All Dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'deletableKontrollen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Löschbare Anwesenheitskontrollen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deletable Attendance Checks',
 				'description' => '',
 				'insertvon' => 'system'
 			)
