@@ -25297,18 +25297,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'ui',
-		'phrase' => 'error_fieldNotNumeric',
+		'phrase' => 'error_fieldNotInteger',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Das Eingabefeld {field} darf nur Zahlen enthalten.',
+				'text' => 'Das Eingabefeld {field} muss eine Ganzzahl enthalten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The Field {Field} must contain only numbers.',
+				'text' => 'The Field {field} must contain an integer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -25915,6 +25915,46 @@ array(
 				)
 			)
 		),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'modal_askAusbildungssem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In welches Ausbildungssemester soll dieser {status} verschoben werden?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'To which education semester should this {status} be moved?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'modal_askAusbildungssemPlural',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In welches Semester sollen diese {count} PrestudentInnen verschoben werden?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'To which education semester should these {count} prestudents be moved?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//Prestudent
 	array(
 		'app' => 'core',
