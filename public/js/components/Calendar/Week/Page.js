@@ -48,7 +48,6 @@ export default {
 				nextDay.setDate(nextDay.getDate()+1);
 				nextDay.setMilliseconds(nextDay.getMilliseconds()-1);
 				let d = {events:[],lanes:1};
-				console.log("this are the events",this.events, "and this is the key",key)
 				if (this.events[key]) {
 					this.events[key].forEach(evt => {
 						let event = {orig:evt,lane:1,maxLane:1,start: evt.start < day ? day : evt.start, end: evt.end > nextDay ? nextDay : evt.end,shared:[],setSharedMaxRecursive(doneItems) {
@@ -78,9 +77,7 @@ export default {
 		}
 	},
 	methods: {
-		printTest:function(param){
-			console.log("HERE",param)
-		},
+		
 		changeToMonth(day) {
 			if (!this.noMonthView) {
 				this.date.set(day);

@@ -90,16 +90,22 @@ class Stundenplan extends FHCAPI_Controller
         
         $stunden = getData($stunden);
 
-		$result = $this->StundenplanModel->getRoomDataOnDay($ort_kurzbz,$start_date,$end_date);  
-
-		if(isError($result)){
+		$result = $this->StundenplanModel->groupedRoomPlanning($ort_kurzbz,$start_date,$end_date);  
+        //$this->loglib->logErrorDB(print_r($result,TRUE),"this is the result of the grouped query");
+		
+        if(isError($result)){
             $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
         }
 
         $result = hasData($result) ? getData($result) : [];
-        $this->loglib->logInfoDB(print_r(count($result),true),"this is the count of the result");
         
-        
+
+        foreach($result as $entry){
+            if(COUNT($entry->lektor)>1){
+                // gruppierung hat stattgefunden und das array muss in einem String konvertiert werden
+            }
+        }
+        /* 
         $final_events = array();
         $grouped = array();
         $associative_day_events = $this->filterEventsIntoAssociativeDateArray($result, $start_date, $end_date);
@@ -196,9 +202,9 @@ class Stundenplan extends FHCAPI_Controller
                     $final_events[] = $stunden_events[$event_key];
                 }
             }
-        }     
+        } */     
         
-		$this->terminateWithSuccess($final_events);
+		$this->terminateWithSuccess($result);
 		
 	}
 

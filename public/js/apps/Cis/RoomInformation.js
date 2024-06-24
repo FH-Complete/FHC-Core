@@ -51,7 +51,13 @@ const app = Vue.createApp({
                     res.data.forEach((el, i) => {
 
                         el.id = i;
-                        el.color = '#' + (el.farbe || 'CCCCCC');
+                        if(el.type === 'reservierung')
+                        {
+                            el.color = '#' + (el.farbe || 'FFFFFF');
+                        }else{
+                            el.color = '#' + (el.farbe || 'CCCCCC');
+                        }
+                        
                         el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
                         el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
                         el.title = el.lehrfach;
@@ -62,7 +68,8 @@ const app = Vue.createApp({
                     this.events = res.data;
                 }
 
-                this.$fhcApi.factory.stundenplan.getReservierungen('EDV_F4.26', this.weekFirstDay, this.weekLastDay).then(res => {
+                // reservierungen are loaded with the stundenplan
+                /* this.$fhcApi.factory.stundenplan.getReservierungen('EDV_F4.26', this.weekFirstDay, this.weekLastDay).then(res => {
                     if (res.data && res.data.forEach) {
                         res.data.forEach((el, i) => {
                             el.reservierung = true;
@@ -77,11 +84,10 @@ const app = Vue.createApp({
                     }
     
                     let reservierungs_events = res.data;
-                    console.log(reservierungs_events,"this are the reservierungs events that are getting from the db query")
                     this.events = [...(this.events?this.events:[]),...reservierungs_events];
-                    this.events_loaded = true;
                     
-                }); 
+                    
+                }); */
             });
 
            
@@ -90,22 +96,19 @@ const app = Vue.createApp({
 	},
     template: /*html*/`
     <div>
-        <fhc-calendar v-if="events_loaded" v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
+        <fhc-calendar  v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
            
             <a class="text-decoration-none text-dark" href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'"   >    
                 <div class="d-flex flex-column align-items-center justify-content-evenly h-100" :style="{'background-color':event.orig.color}">
-                    <template v-if="event.orig.reservierung">    
-                        <!-- render content for reservierungen -->
-                        <span>{{event.orig.title}}</span>
-                        <span>{{event.orig.gruppe_kurzbz?event.orig.gruppe_kurzbz:event.orig.stg}}</span>
-                        <span v-for="(item, index) in event.orig.person_kurzbz.split('/')" :key="index">{{item}}</span>
-                    </template>
-                    <template v-else>
+                    
                         <!-- render content for stundenplan -->
-                        <span>{{event.orig.lv_info}}</span>	
-                        <span v-for="(item, index) in event.orig.stg.split('/')" :key="index">{{item}}</span>
-                        <span >{{event.orig.lektor}}</span>
-                    </template>
+                        <span >{{event.orig.topic}}</span>
+                        <span v-for="gruppe in event.orig.gruppe.split('/')" :key="gruppe">{{gruppe}}</span>	
+                        <span v-for="lektor in event.orig.lektor.split('/')" :key="lektor">{{lektor}}</span>
+                        <!-- add the beschreibung if the event is a reservierung -->
+                        <span v-if="event.orig.type === 'reservierung'">{{event.orig.beschreibung}}</span>
+                        
+                    
                 </div>
             </a>
         </fhc-calendar>

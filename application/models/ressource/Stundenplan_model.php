@@ -18,7 +18,7 @@ class Stundenplan_model extends DB_Model
 	 * 
 	 * @return stdClass
 	 */
-	public function getRoomDataOnDay($ort_kurzbz,$start_date,$end_date){
+	public function getRoomDataOnInterval($ort_kurzbz,$start_date,$end_date){
 
 
 	
@@ -39,6 +39,98 @@ class Stundenplan_model extends DB_Model
 		", [$ort_kurzbz, $start_date, $end_date]); 
 
 		return $raum_stundenplan;
+	}
+
+	/**
+	 * @param string $ort_kurzbz The room to query the planning for
+	 * @param string $start_date The start date of the query interval
+	 * @param string $end_date The end date of the query interval
+	 * 
+	 * @return stdClass
+	 */
+	public function groupedRoomPlanning($ort_kurzbz,$start_date,$end_date){
+
+
+		$gruppierteRaumVerplannung= $this->execReadOnlyQuery("
+		SELECT 
+		
+			'reservierung' as type,
+			NULL as unr,datum, stunde,
+			titel AS topic, 
+			beschreibung as beschreibung,
+			string_agg(DISTINCT gruppe, '/') as gruppe,
+			string_agg(DISTINCT lektor, '/') as lektor,
+			res.ort_kurzbz,res.studiengang_kz,  res.titel, res.beschreibung,NULL as lehreinheit_id,NULL as lehrfach_id,NULL as anmerkung, NULL as fix,NULL as lehrveranstaltung_id,NULL as stg_kurzbzlang,NULL as stg_bezeichnung,NULL as stg_typ, NULL as fachbereich_kurzbz,NULL as lehrfach,NULL as lehrfach_bez,NULL as farbe,NULL as lehrform, NULL as anmerkung_lehreinheit
+		
+		FROM 
+		
+		(
+			SELECT 
+			NULL as unr,datum, stunde, 
+			CASE 
+				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz 
+				ELSE CONCAT(UPPER(studg.typ),UPPER(res.stg_kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/'))  
+			END as gruppe,
+			CASE
+				WHEN mit.kurzbz IS NOT NULL THEN mit.kurzbz
+				ELSE uid
+			END as lektor, 
+			res.ort_kurzbz,res.studiengang_kz,  res.titel, res.beschreibung,NULL as lehreinheit_id,NULL as lehrfach_id,NULL as anmerkung, NULL as fix,NULL as lehrveranstaltung_id,NULL as stg_kurzbzlang,NULL as stg_bezeichnung,NULL as stg_typ, NULL as fachbereich_kurzbz,NULL as lehrfach,NULL as lehrfach_bez,NULL as farbe,NULL as lehrform, NULL as anmerkung_lehreinheit 
+			FROM lehre.vw_reservierung res
+
+			LEFT JOIN public.tbl_mitarbeiter mit ON mit.mitarbeiter_uid=uid
+			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
+
+			WHERE 
+				res.ort_kurzbz = ? 
+				AND res.datum >= ? 
+				AND res.datum <= ?
+		) as res
+	
+		GROUP BY res.ort_kurzbz,res.studiengang_kz, res.datum, res.stunde, res.titel, res.beschreibung
+
+		UNION ALL
+		
+		SELECT 
+			
+		'stundenplan' as type,
+		unr,datum, stunde,
+		CONCAT(lehrfach,'-',lehrform) as topic,
+		'' as beschreibung,
+		string_agg(DISTINCT gruppe, '/') as gruppe,
+		string_agg(DISTINCT lektor, '/') as lektor,  
+		ort_kurzbz, studiengang_kz, titel,'' as beschreibung,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit 
+
+		FROM
+		(
+			SELECT
+ 			unr,datum, stunde,
+			CASE
+				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz 
+				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) 
+			END as gruppe,
+			CASE
+				WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
+				ELSE lektor
+			END as lektor,
+			ort_kurzbz, studiengang_kz, titel,'' as beschreibung,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit 
+
+			FROM lehre.vw_stundenplan sp
+
+			WHERE ort_kurzbz = ? 
+			AND datum >= ? 
+			AND datum <= ?
+
+		) as sp
+
+		GROUP BY 
+
+			ort_kurzbz,unr, datum, stunde, lehreinheit_id, lehrfach_id,studiengang_kz,titel,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit
+
+		ORDER BY datum, stunde
+		", [$ort_kurzbz, $start_date, $end_date, $ort_kurzbz, $start_date, $end_date]); 
+
+		return $gruppierteRaumVerplannung;
 	}
 
 	/**
