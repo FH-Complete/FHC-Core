@@ -26461,6 +26461,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolldatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrolldatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance Check Date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// FHC-CORE-ANWESENHEITEN END
 );
 
