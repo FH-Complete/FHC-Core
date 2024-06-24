@@ -28,11 +28,12 @@ export default {
                 }
 	},
 	created(){
-		axios
-			.get(this.apiurl + '/dashboard/Api/getNews', {params: {limit: MAX_LOADED_NEWS}})
-			.then(res => { this.allNewsList = res.data })
-			.catch(err => { console.error('ERROR: ', err.response.data) });
-
+		
+    
+    this.$fhcApi.factory.cms.news(MAX_LOADED_NEWS)
+    .then(res => { this.allNewsList = res.data })
+    .catch(err => { console.error('ERROR: ', err.response.data) }); 
+    
 		this.$emit('setConfig', false);
 	},
 	methods: {
@@ -41,7 +42,7 @@ export default {
 			this.$refs.newsModal.show();
 		}
 	},
-	template: `<div class="widgets-news w-100 h-100">
+	template: /*html*/`<div class="widgets-news w-100 h-100">
       <div class="d-flex flex-column h-100">
       <div class="d-flex">
         <header><b>Top News</b></header>

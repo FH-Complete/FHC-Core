@@ -36,10 +36,27 @@ class Cms extends FHCAPI_Controller
 			'ContentID' => self::PERM_LOGGED,
 			'getOrtKurzbzContent' => self::PERM_LOGGED,
             'content' => self::PERM_LOGGED,
+			'news' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('CmsLib');
 
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	private function fetchContent($content_id){
+		$content = $this->cmslib->getContent($content_id);
+
+		if (isError($content))
+            $this->terminateWithError(getError($content), self::ERROR_TYPE_GENERAL);
+
+		if(getData($content)){
+			return getData($content);
+		}else{
+			$this->terminateWithError("No content was found", self::ERROR_TYPE_GENERAL);
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -60,11 +77,8 @@ class Cms extends FHCAPI_Controller
 		if(!isset($content_id))
 			$this->terminateWithError("content_id is missing", self::ERROR_TYPE_GENERAL);
 
-		$content = $this->cmslib->getContent($content_id, $version, $sprache, $sichtbar);
+		$content = $this->fetchContent($content_id); 
 
-		if (isError($content))
-            $this->terminateWithError(getError($content), self::ERROR_TYPE_GENERAL);
-        
 		$this->terminateWithSuccess(getData($content));
 	}
 
@@ -91,6 +105,30 @@ class Cms extends FHCAPI_Controller
 		$result = hasData($result) ? current(getData($result)) : null;
 		
 		$this->terminateWithSuccess($result->content_id ?? NULL);
+	}
+
+	public function news()
+	{
+		$limit =  $this->input->get('limit',TRUE);
+
+        // return early if the limit parameter is missing or is not greater than 0
+        if(!isset($limit) and $limit > 0)
+            $this->terminateWithError("limit parameter is missing", self::ERROR_TYPE_GENERAL);
+
+        $this->load->model('content/news_model', 'NewsModel');
+        
+		$news_content_ids = $this->NewsModel->getNewsContentIDs($limit);
+        $news_content = array();
+
+		if(isError($news_content_ids))
+			$this->terminateWithError(getError($news_content_ids), self::ERROR_TYPE_GENERAL);
+		
+		foreach(getData($news_content_ids) as $content_id){
+			$news_content[] = $this->fetchContent($content_id->content_id);
+		}
+		
+		$this->terminateWithSuccess($news_content);
+		
 	}
 
 	

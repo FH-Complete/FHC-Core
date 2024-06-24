@@ -19,12 +19,21 @@ class News_model extends DB_Model
 	 */
 	public function getAll($limit = null)
 	{
+		$this->addJoin("campus.tbl_content","content_id");
 		return $this->loadWhere('
-			text IS NOT NULL
-			AND datum <= NOW() AND (datum_bis IS NULL OR datum_bis >= now()::date)
+			text IS NOT NULL	
+			datum <= NOW() AND (datum_bis IS NULL OR datum_bis >= now()::date)
 			ORDER BY datum DESC
 			LIMIT ' . $this->escape($limit)
 		);
+	}
+
+	public function getNewsContentIDs($limit=10){
+		$this->addSelect(['content_id']);
+		return $this->loadWhere("datum <= NOW() AND (datum_bis IS NULL OR datum_bis >= now()::date)
+		ORDER BY datum DESC
+		LIMIT " . $this->escape($limit));
+
 	}
 
 
