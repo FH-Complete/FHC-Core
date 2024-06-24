@@ -108,7 +108,7 @@ export default {
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class="day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (1440 / smallestTimeFrame) + ', 1fr)'}">
-						<div class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="$emit('input', event.orig)" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">	
+						<div :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="$emit('input', event.orig)" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">	
 							<slot :event="event" :day="day">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 							</slot>

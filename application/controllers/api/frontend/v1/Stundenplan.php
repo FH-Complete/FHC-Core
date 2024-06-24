@@ -90,7 +90,7 @@ class Stundenplan extends FHCAPI_Controller
         
         $stunden = getData($stunden);
 
-		$result = $this->StundenplanModel->groupedRoomPlanning($ort_kurzbz,$start_date,$end_date);  
+		$result = $this->StundenplanModel->groupedCalendarEvents($ort_kurzbz,$start_date,$end_date);  
         //$this->loglib->logErrorDB(print_r($result,TRUE),"this is the result of the grouped query");
 		
         if(isError($result)){
@@ -105,6 +105,8 @@ class Stundenplan extends FHCAPI_Controller
                 // gruppierung hat stattgefunden und das array muss in einem String konvertiert werden
             }
         }
+
+        // this is the old way the events were grouped, kept in case that the query doesnt work out as expected
         /* 
         $final_events = array();
         $grouped = array();

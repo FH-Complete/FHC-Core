@@ -48,7 +48,18 @@ const app = Vue.createApp({
 				});
 			});
 		});
-	}
+	},
+	template:/*html*/`
+	<h2>Stundenplan</h2>
+	<hr>
+	<fhc-calendar v-slot="{event, day}" :events="events" initial-mode="week" show-weeks>
+		<div class="d-flex flex-column align-items-center justify-content-evenly h-100">
+			<span>{{event.orig.title}}</span>
+			<span>{{event.orig.ort_kurzbz}}</span>
+			<span>{{event.orig.mitarbeiter_kurzbz}}</span>
+		</div>
+	</fhc-calendar>
+	`
 });
 app.config.unwrapInjectedRef = true;
 app.use(Phrasen);

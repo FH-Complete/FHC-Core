@@ -48,10 +48,10 @@ class Stundenplan_model extends DB_Model
 	 * 
 	 * @return stdClass
 	 */
-	public function groupedRoomPlanning($ort_kurzbz,$start_date,$end_date){
+	public function groupedCalendarEvents($ort_kurzbz,$start_date,$end_date){
 
 
-		$gruppierteRaumVerplannung= $this->execReadOnlyQuery("
+		$gruppierteEvents= $this->execReadOnlyQuery("
 		SELECT 
 		
 			'reservierung' as type,
@@ -130,7 +130,7 @@ class Stundenplan_model extends DB_Model
 		ORDER BY datum, stunde
 		", [$ort_kurzbz, $start_date, $end_date, $ort_kurzbz, $start_date, $end_date]); 
 
-		return $gruppierteRaumVerplannung;
+		return $gruppierteEvents;
 	}
 
 	/**
