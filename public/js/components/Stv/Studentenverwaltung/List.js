@@ -20,6 +20,15 @@ export default {
 		'update:selected'
 	],
 	data() {
+		function dateFormatter(cell)
+		{
+			let val = cell.getValue();
+			if (!val)
+				return '&nbsp;';
+			let date = new Date(val);
+			return date.toLocaleDateString();
+		}
+
 		return {
 			tabulatorOptions: {
 				columns:[
@@ -32,36 +41,40 @@ export default {
 					{title:"TitelPost", field:"titelpost"},
 					{title:"SVNR", field:"svnr"},
 					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen"},
-					{title:"Geburtsdatum", field:"gebdatum"},
+					{title:"Geburtsdatum", field:"gebdatum", formatter:dateFormatter},
 					{title:"Geschlecht", field:"geschlecht"},
 					{title:"Sem.", field:"semester"},
 					{title:"Verb.", field:"verband"},
 					{title:"Grp.", field:"gruppe"},
 					{title:"Studiengang", field:"studiengang"},
 					{title:"Studiengang_kz", field:"studiengang_kz", visible:false},
-					{title:"Personenkennzeichen", field:"matrikelnummer"},
+					{title:"Personenkennzeichen", field:"matrikelnr"},
 					{title:"PersonID", field:"person_id"},
 					{title:"Status", field:"status"},
-					{title:"Status Datum", field:"status_datum", visible:false},
-					{title:"Status Bestaetigung", field:"status_bestaetigung", visible:false},
-					{title:"Status Datum ISO", field:"status_datum_iso", visible:false},
-					{title:"Status Bestaetigung ISO", field:"status_bestaetigung_iso", visible:false},
+					{title:"Status Datum", field:"status_datum", visible:false, formatter:dateFormatter},
+					{title:"Status Bestaetigung", field:"status_bestaetigung", visible:false, formatter:dateFormatter},
 					{title:"EMail (Privat)", field:"mail_privat", visible:false},
 					{title:"EMail (Intern)", field:"mail_intern", visible:false},
 					{title:"Anmerkungen", field:"anmerkungen", visible:false},
-					{title:"AnmerkungPre", field:"anmerkungpre", visible:false},
-					{title:"OrgForm", field:"orgform"},
-					{title:"Aufmerksamdurch", field:"orgform", visible:false},
+					{title:"AnmerkungPre", field:"anmerkung", visible:false},
+					{title:"OrgForm", field:"orgform_kurzbz"},
+					{title:"Aufmerksamdurch", field:"aufmerksamdurch_kurzbz", visible:false},
 					{title:"Gesamtpunkte", field:"punkte", visible:false},
 					{title:"Aufnahmegruppe", field:"aufnahmegruppe_kurzbz", visible:false},
-					{title:"Dual", field:"dual_bezeichnung", visible:false},
+					{title:"Dual", field:"dual", visible:false, formatter:'tickCross', formatterParams: {
+						tickElement: '<i class="fas fa-check text-success"></i>',
+						crossElement: '<i class="fas fa-times text-danger"></i>'
+					}},
 					{title:"Matrikelnummer", field:"matr_nr", visible:false},
 					{title:"Studienplan", field:"studienplan_bezeichnung"},
 					{title:"PreStudentInnenID", field:"prestudent_id"},
-					{title:"Priorität", field:"priorisierung_realtiv"},
+					{title:"Priorität", field:"priorisierung_relativ"},
 					{title:"Mentor", field:"mentor", visible:false},
-					{title:"Aktiv", field:"bnaktiv", visible:false},
-					{title:"GeburtsdatumISO", field:"geburtsdatum_iso", visible:false},
+					{title:"Aktiv", field:"bnaktiv", visible:false, formatter:'tickCross', formatterParams: {
+						allowEmpty:true,
+						tickElement: '<i class="fas fa-check text-success"></i>',
+						crossElement: '<i class="fas fa-times text-danger"></i>'
+					}},
 				],
 				rowFormatter(row) {
 					if (row.getData().bnaktiv === false) {
