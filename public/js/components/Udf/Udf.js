@@ -131,7 +131,7 @@ export default {
 			@data-fetched="init"
 			>
 			<template #default>
-				<div v-for="field in filteredFields" :key="field.name" class="col">
+				<div v-for="field in filteredFields" :key="field.name" class="col" :class="field.type == 'checkbox' ? 'pt-4 d-flex align-items-center' : ''">
 					<form-input
 						v-model="internModelValue[field.name]"
 						:name="field.name"
