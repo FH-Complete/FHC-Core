@@ -112,23 +112,31 @@ class Cms extends FHCAPI_Controller
 		$limit =  $this->input->get('limit',TRUE);
 
         // return early if the limit parameter is missing or is not greater than 0
-        if(!isset($limit) and $limit > 0)
-            $this->terminateWithError("limit parameter is missing", self::ERROR_TYPE_GENERAL);
+        if(!isset($limit) || $limit > 0)
+            $this->terminateWithError("API parameters are missing", self::ERROR_TYPE_GENERAL);
 
         $this->load->model('content/news_model', 'NewsModel');
         
 		$news_content_ids = $this->NewsModel->getNewsContentIDs($limit);
+		$news_metadata = $this->NewsModel->getAll($limit);
+
 		$this->addMeta("content_ids",$news_content_ids);
-        $news_content = array();
+		
+		$news_content = array();
 
 		if(isError($news_content_ids))
 			$this->terminateWithError(getError($news_content_ids), self::ERROR_TYPE_GENERAL);
+		
+		if(isError($news_metadata))
+			$this->terminateWithError(getError($news_metadata), self::ERROR_TYPE_GENERAL);
 		
 		foreach(getData($news_content_ids) as $content_id){
 			$news_content[] = $this->fetchContent($content_id->content_id);
 		}
 		
-		$this->terminateWithSuccess($news_content);
+		$this->terminateWithSuccess(["news_content" =>$news_content, "news_metadata"=>getData($news_metadata)]);
+	
+		
 		
 	}
 

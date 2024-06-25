@@ -1,8 +1,8 @@
-/* .widgets-news .card-header {
+.widgets-news .card-header {
     flex-direction: column;
     align-items: flex-start !important;
     
-} */
+}
 
 :root{
     --news-widget-height: 1;

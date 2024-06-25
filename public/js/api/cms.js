@@ -11,12 +11,15 @@ export default {
               }
           );
       },
-      news(limit) {
+      news(limit, metadata=false) {
         return this.$fhcApi.get(
             FHC_JS_DATA_STORAGE_OBJECT.app_root +
             FHC_JS_DATA_STORAGE_OBJECT.ci_router +
             "/api/frontend/v1/Cms/news",
-            { limit: limit}
+            {
+              limit: limit,
+              metadata: metadata,
+            }
         );
     },
    
