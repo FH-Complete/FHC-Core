@@ -1,4 +1,6 @@
 @import './calendar.css';
+@import './dashboard/news.css';
+
 .empty-tile-hover {
 	height: 100%;
 	width: 100%;

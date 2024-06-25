@@ -36,6 +36,23 @@ export default {
     
 		this.$emit('setConfig', false);
 	},
+  mounted(){
+    
+    this.$nextTick(() =>{
+
+      console.log(this.$refs.htmlContent,"this is the html content");
+      /* //console.log(this.$refs.htmlContent,"this is the refs content");
+      let newsItems = document.getElementsByClassName("news-list");
+      console.log(newsItems,"i am printing something");
+      for(let item of newsItems){
+        //console.log(item,"this is the item");
+        item.style.maxHeight = "100px";
+        item.style.overflow = "scroll";
+      } */
+    });
+    
+     
+  },
 	methods: {
 		setSingleNews(singleNews){
 			this.singleNews = singleNews;
@@ -43,6 +60,7 @@ export default {
 		}
 	},
 	template: /*html*/`<div class="widgets-news w-100 h-100">
+  
       <div class="d-flex flex-column h-100">
       <div class="d-flex">
         <header><b>Top News</b></header>
@@ -60,30 +78,36 @@ export default {
         </div>
       </div>
       <div v-else-if="width > 1 && height === 1" class="h-100" :class="'row row-cols-' + width">
-        <div v-for="news in newsList" :key="news.id">
+        <div class="h-100" v-for="news in newsList" :key="news.id">
             <div class="card h-100">
-				<div class="card-body">
+            <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" ><div v-html="news.content"></div></div>
+            <!--<div class="card-body">
 				  <a href="#newsModal" class="card-title h5 stretched-link" @click="setSingleNews(news)">{{ news.betreff }}</a><br>
 				  <span class="small text-muted">{{ formatDateTime(news.insertamum) }} </span>
 				  <p class="card-text pt-3" style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical;">{{ news.text }}</p>
-				</div>       
+				</div>-->       
             </div>
           </div>
  		</div>
        <div v-else class="h-100" :class="'row row-cols-' + width">
-        <div v-for="news in newsList" :key="news.id">
+        <div class="h-100" v-for="news in newsList" :key="news.id">
             <div class="card h-100">
-                <img :src="placeHolderImgURL" class="card-img-top">
+            <!-- alte variante um die News anzuzeigen
+            <img :src="placeHolderImgURL" class="card-img-top">
                 <div class="card-footer"><span class="card-subtitle small text-muted">{{ formatDateTime(news.insertamum) }}</span></div>
                 <div class="card-body">
-                  <a href="#newsModal" class="card-title h5 stretched-link" @click="setSingleNews(news)">{{ news.betreff }}</a><br>
+                <p>this is a test</p>  
+                <a href="#newsModal" class="card-title h5 stretched-link" @click="setSingleNews(news)">{{ news.betreff }}</a><br>
                   <p class="card-text pt-3">{{ news.text }}</p>
                 </div>
+            -->
+                <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" v-html="news.content"></div>
             </div>
           </div>
       </div>
 </div>
 </div>
+
 
   <!-- News Modal -->
   <BsModal ref="newsModal" id="newsModal" dialog-class="modal-lg">

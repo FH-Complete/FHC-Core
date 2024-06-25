@@ -118,6 +118,7 @@ class Cms extends FHCAPI_Controller
         $this->load->model('content/news_model', 'NewsModel');
         
 		$news_content_ids = $this->NewsModel->getNewsContentIDs($limit);
+		$this->addMeta("content_ids",$news_content_ids);
         $news_content = array();
 
 		if(isError($news_content_ids))
