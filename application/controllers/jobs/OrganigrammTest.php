@@ -109,7 +109,7 @@ HEADER;
 
 STARTDIAGRAMM;
 
-			renderOE($root, 0, 0);
+			renderOE($root, 0, 0, 100);
   
 			echo <<<ENDDIAGRAMM
         </root>
@@ -141,27 +141,29 @@ FOOTER;
 	}
 }
 
-function renderOE($oe, $level, $parentchildcount) 
+function renderOE($oe, $level, $parentchildcount, $minxoffset) 
 {
     $nextlevel = $level + 1;
     $ownchildcount = 0;
+    $childsmaxxoffset = $minxoffset;
     foreach($oe->childs AS $child) 
     {	
-	renderOE($child, $nextlevel, $ownchildcount);
+	$childsmaxxoffset = renderOE($child, $nextlevel, $ownchildcount, $childsmaxxoffset);
 	$ownchildcount++;
     }
     
-    $width = 200;
-    $height = 100;
-    $x = 100 + ($parentchildcount * 280);
-    $y = 180 + ($level * 180);
+    $width	= 200;
+    $height	= 100;
+    $spacing	= 80;
+    $x		= $minxoffset;
+    $y		= 180 + ($level * ($height + $spacing));
     $bezeichnung = htmlspecialchars($oe->bezeichnung);
     $leitung = ($oe->leitung_uid !== null) ? htmlspecialchars($oe->leitung_uid) : 'N.N.';
     $fillcolors = array(
-	'Team' => '#ffe6cc',
-	'Abteilung' => '#e6ffcc',
-	'Studiengang'=> '#cce6ff',
-	'Lehrgang'=> '#e6ccff'
+	'Team'		=> '#ffe6cc',
+	'Abteilung'	=> '#e6ffcc',
+	'Studiengang'	=> '#cce6ff',
+	'Lehrgang'	=> '#e6ccff'
     );
     $fillcolor = (isset($fillcolors[$oe->organisationseinheittyp_kurzbz])) ? $fillcolors[$oe->organisationseinheittyp_kurzbz] : '#ffffff';
     echo <<<OE
@@ -180,4 +182,6 @@ OE;
 	
 EDGE;
     }
+    
+    return ($x + $width + $spacing);
 }
