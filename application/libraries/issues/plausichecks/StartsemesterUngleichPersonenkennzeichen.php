@@ -19,12 +19,13 @@ class StartsemesterUngleichPersonenkennzeichen extends PlausiChecker
 		// pass parameters needed for plausicheck
 		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
+		$prestudent_id = isset($params['prestudent_id']) ? $params['prestudent_id'] : null;
 
 		// get all students failing the plausicheck
 		$prestudentRes = $this->getStartsemesterUngleichPersonenkennzeichen(
 			$studiensemester_kurzbz,
 			$studiengang_kz,
-			null,
+			$prestudent_id,
 			$exkludierte_studiengang_kz
 		);
 

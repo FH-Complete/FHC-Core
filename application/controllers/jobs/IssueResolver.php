@@ -55,6 +55,12 @@ class IssueResolver extends IssueResolver_Controller
 		// structure: fehlercode => class (library) name for resolving
 		$this->_codeProducerLibMappings = array(
 			'CORE_STUDENTSTATUS_0001' => 'AbbrecherAktiv',
+			'CORE_STUDENTSTATUS_0017' => 'BeginndatumVorBismeldung',
+			'CORE_STUDENTSTATUS_0018' => 'StudentstatusNachDiplomand',
+			'CORE_STUDENTSTATUS_0019' => 'OrgformBewerberUngleichOrgformStudent',
+			'CORE_STUDENTSTATUS_0020' => 'StartsemesterUngleichPersonenkennzeichen',
+			'CORE_STUDENTSTATUS_0021' => 'AbschlusspruefungOderAbsolventFehlt',
+			'CORE_STUDENTSTATUS_0022' => 'FalscheStatusabfolgeVorStudentstatus'
 		);
 	}
 }

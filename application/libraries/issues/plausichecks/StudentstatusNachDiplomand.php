@@ -18,9 +18,10 @@ class StudentstatusNachDiplomand extends PlausiChecker
 
 		// pass parameters needed for plausicheck
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
+		$prestudent_id = isset($params['prestudent_id']) ? $params['prestudent_id'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->getStudentstatusNachDiplomand($studiengang_kz, null, $exkludierte_studiengang_kz);
+		$prestudentRes = $this->getStudentstatusNachDiplomand($studiengang_kz, $prestudent_id, $exkludierte_studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 
