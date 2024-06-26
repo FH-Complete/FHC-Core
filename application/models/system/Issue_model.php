@@ -22,13 +22,23 @@ class Issue_model extends DB_Model
 	 */
 	public function getOpenIssues($fehlercodes, $person_id = null, $oe_kurzbz = null, $fehlercode_extern = null)
 	{
-		$params = array($fehlercodes);
+		$params = array();
 		// issue exists for a fehlercode (or fehlercode_extern), person_id, oe_kurzbz, if not verarbeitet yet
-		$qry = 'SELECT issue_id, fehlercode, inhalt, fehlercode_extern, inhalt_extern, person_id, oe_kurzbz,
-       					behebung_parameter, datum, verarbeitetvon, verarbeitetamum
-				FROM system.tbl_issue
-				WHERE fehlercode IN ?
-				AND verarbeitetamum IS NULL';
+		$qry = 'SELECT
+					iss.issue_id, iss.fehlercode, fe.fehler_kurzbz, iss.inhalt, iss.fehlercode_extern,
+					iss.inhalt_extern, iss.person_id, iss.oe_kurzbz, iss.behebung_parameter,
+					iss.datum, iss.verarbeitetvon, iss.verarbeitetamum
+				FROM
+					system.tbl_issue iss
+					JOIN system.tbl_fehler fe USING (fehlercode)
+				WHERE
+					verarbeitetamum IS NULL';
+
+		if (!isEmptyArray($fehlercodes))
+		{
+			$qry .= ' AND fehlercode IN ?';
+			$params[] = $fehlercodes;
+		}
 
 		if (!isEmptyString($fehlercode_extern))
 		{

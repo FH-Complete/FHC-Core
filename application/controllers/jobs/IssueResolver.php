@@ -9,7 +9,7 @@ class IssueResolver extends IssueResolver_Controller
 	{
 		parent::__construct();
 
-		// set fehler codes which can be resolved by the job
+		// set fehler codes which can be resolved by the job, with own resolver defined
 		// structure: fehlercode => class (library) name for resolving
 		$this->_codeLibMappings = array(
 			'CORE_ZGV_0001' => 'CORE_ZGV_0001',
@@ -30,7 +30,6 @@ class IssueResolver extends IssueResolver_Controller
 			'CORE_STG_0002' => 'CORE_STG_0002',
 			'CORE_STG_0003' => 'CORE_STG_0003',
 			'CORE_STG_0004' => 'CORE_STG_0004',
-			'CORE_STUDENTSTATUS_0001' => 'CORE_STUDENTSTATUS_0001',
 			'CORE_STUDENTSTATUS_0002' => 'CORE_STUDENTSTATUS_0002',
 			'CORE_STUDENTSTATUS_0003' => 'CORE_STUDENTSTATUS_0003',
 			'CORE_STUDENTSTATUS_0004' => 'CORE_STUDENTSTATUS_0004',
@@ -50,6 +49,12 @@ class IssueResolver extends IssueResolver_Controller
 			'CORE_PERSON_0002' => 'CORE_PERSON_0002',
 			'CORE_PERSON_0003' => 'CORE_PERSON_0003',
 			'CORE_PERSON_0004' => 'CORE_PERSON_0004'
+		);
+
+		// fehler which are resolved the same way as they are produced
+		// structure: fehlercode => class (library) name for resolving
+		$this->_codeProducerLibMappings = array(
+			'CORE_STUDENTSTATUS_0001' => 'AbbrecherAktiv',
 		);
 	}
 }

@@ -12,12 +12,16 @@ class PlausicheckProducerLib
 
 	private $_ci; // ci instance
 	private $_extensionName; // name of extension
-	private $_konfiguration = array(); // configuration parameters
+	private $_konfiguration = []; // configuration parameters
+	private $_fehlerLibMappings = []; // mappings of fehler and libraries for producing them
+	private $_isForResolutionCheck = false; // mappings of fehler and libraries for producing them
 
 	public function __construct($params = null)
 	{
 		// set extension name if called from extension
 		if (isset($params['extensionName'])) $this->_extensionName = $params['extensionName'];
+		if (isset($params['fehlerLibMappings'])) $this->_fehlerLibMappings = $params['fehlerLibMappings'];
+		if (isset($params['isForResolutionCheck'])) $this->_isForResolutionCheck = $params['isForResolutionCheck'];
 
 		// set application
 		$app = isset($params['app']) ? $params['app'] : null;
@@ -45,18 +49,17 @@ class PlausicheckProducerLib
 	}
 
 	/**
-	 * Produces multiple plausicheck issues at once.
-	 * @param array $fehlerLibMappings contains fehler type to check and library responsible for check (fehler_kurzbz => libName)
+	 * Produces multiple plausicheck issues at once and saved them to db.
 	 * @param array $params passed to each plausicheck
 	 * @return result object with occured error and info
 	 */
-	public function producePlausicheckIssues($fehlerLibMappings, $params)
+	public function producePlausicheckIssues($params)
 	{
 		$result = new StdClass();
 		$result->errors = [];
 		$result->infos = [];
 
-		foreach ($fehlerLibMappings as $fehler_kurzbz => $libName)
+		foreach ($this->_fehlerLibMappings as $fehler_kurzbz => $libName)
 		{
 			$plausicheckRes = $this->producePlausicheckIssue(
 				$libName,
@@ -116,7 +119,10 @@ class PlausicheckProducerLib
 		$config = isset($this->_konfiguration[$fehler_kurzbz]) ? $this->_konfiguration[$fehler_kurzbz] : null;
 
 		// load library connected to fehlercode
-		$this->_ci->load->library($issuesLibPath . $libName, $config);
+		$this->_ci->load->library(
+			$issuesLibPath . $libName,
+			['configurationParams' => $config, 'isForResolutionCheck' => $this->_isForResolutionCheck]
+		);
 
 		$lowercaseLibName = mb_strtolower($libName);
 
