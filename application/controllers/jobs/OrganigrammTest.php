@@ -8,12 +8,17 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
  */
 class OrganigrammTest extends JOB_Controller
 {
+    const DEFAULT_XOFFSET = 100;
+    
+    protected $xoffsetperlevel;
 
-	public function __construct()
+    public function __construct()
 	{
 	    parent::__construct();
 	    
 	    $this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+	    
+	    $this->xoffsetperlevel = array();
 	}
 	
 	public function getAllActiveOes()
@@ -109,7 +114,7 @@ HEADER;
 
 STARTDIAGRAMM;
 
-			renderOE($root, 0, 0, 100);
+			$this->renderOE($root, 0);
   
 			echo <<<ENDDIAGRAMM
         </root>
@@ -139,49 +144,82 @@ FOOTER;
 		echo "Keine Oes gefunden.\n";
 	    }
 	}
-}
 
-function renderOE($oe, $level, $parentchildcount, $minxoffset) 
-{
-    $nextlevel = $level + 1;
-    $ownchildcount = 0;
-    $childsmaxxoffset = $minxoffset;
-    foreach($oe->childs AS $child) 
+    protected function renderOE($oe, $level) 
     {	
-	$childsmaxxoffset = renderOE($child, $nextlevel, $ownchildcount, $childsmaxxoffset);
-	$ownchildcount++;
-    }
-    
-    $width	= 200;
-    $height	= 100;
-    $spacing	= 80;
-    $x		= $minxoffset;
-    $y		= 180 + ($level * ($height + $spacing));
-    $bezeichnung = htmlspecialchars($oe->bezeichnung);
-    $leitung = ($oe->leitung_uid !== null) ? htmlspecialchars($oe->leitung_uid) : 'N.N.';
-    $fillcolors = array(
-	'Team'		=> '#ffe6cc',
-	'Abteilung'	=> '#e6ffcc',
-	'Studiengang'	=> '#cce6ff',
-	'Lehrgang'	=> '#e6ccff'
-    );
-    $fillcolor = (isset($fillcolors[$oe->organisationseinheittyp_kurzbz])) ? $fillcolors[$oe->organisationseinheittyp_kurzbz] : '#ffffff';
-    echo <<<OE
-        <mxCell id="{$oe->oe_kurzbz}" value="&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;[{$oe->organisationseinheittyp_kurzbz}]&lt;/font&gt;&lt;/div&gt;&lt;b style=&quot;&quot;&gt;{$bezeichnung}&lt;/b&gt;&lt;div&gt;({$leitung})&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=center;verticalAlign=middle;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fillColor={$fillcolor};" parent="1" vertex="1">
-          <mxGeometry x="{$x}" y="{$y}" width="{$width}" height="{$height}" as="geometry" />
-        </mxCell>
+	$width	    = 200;
+	$height	    = 100;
+	$spacing    = 80;
+	$nextlevel = $level + 1;
+	$ownchildcount = 0;
+	$firstelementinlevel = false;
+	
+	if( !isset($this->xoffsetperlevel[$level]) )
+	{
+	    $this->xoffsetperlevel[$level] = (object) array(
+		'min' => self::DEFAULT_XOFFSET, 
+		'max' => self::DEFAULT_XOFFSET
+	    );
+	    $firstelementinlevel = true;
+	}
+	
+	fwrite(STDERR, print_r($this->xoffsetperlevel, true) . PHP_EOL);
+	
+	foreach($oe->childs AS $child) 
+	{	
+	    $this->renderOE($child, $nextlevel);
+	    $ownchildcount++;
+	}
+
+	if( count($oe->childs) === 0 )
+	{
+	    if( !isset($this->xoffsetperlevel[$nextlevel]) )
+	    {
+		$this->xoffsetperlevel[$nextlevel] = (object) array(
+		    'min' => $this->xoffsetperlevel[$level]->max + $width + $spacing, 
+		    'max' => $this->xoffsetperlevel[$level]->max + $width + $spacing
+		);
+	    }
+	}
+
+	if( count($oe->childs) > 0 && count($oe->childs) === $ownchildcount )
+	{
+	    $this->xoffsetperlevel[$level]->max = 
+		floor((($this->xoffsetperlevel[$nextlevel]->max - $this->xoffsetperlevel[$nextlevel]->min) / 2)) - floor(($width / 2)); 
+	    if( $firstelementinlevel )
+	    {
+		$this->xoffsetperlevel[$level]->min = $this->xoffsetperlevel[$level]->max;
+	    }
+	}		
+
+	$x		= $this->xoffsetperlevel[$level]->max;
+	$y		= 180 + ($level * ($height + $spacing));
+	$bezeichnung = htmlspecialchars($oe->bezeichnung);
+	$leitung = ($oe->leitung_uid !== null) ? htmlspecialchars($oe->leitung_uid) : 'N.N.';
+	$fillcolors = array(
+	    'Team'		=> '#ffe6cc',
+	    'Abteilung'	=> '#e6ffcc',
+	    'Studiengang'	=> '#cce6ff',
+	    'Lehrgang'	=> '#e6ccff'
+	);
+	$fillcolor = (isset($fillcolors[$oe->organisationseinheittyp_kurzbz])) ? $fillcolors[$oe->organisationseinheittyp_kurzbz] : '#ffffff';
+	echo <<<OE
+	    <mxCell id="{$oe->oe_kurzbz}" value="&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;[{$oe->organisationseinheittyp_kurzbz}]&lt;/font&gt;&lt;/div&gt;&lt;b style=&quot;&quot;&gt;{$bezeichnung}&lt;/b&gt;&lt;div&gt;({$leitung})&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=center;verticalAlign=middle;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fillColor={$fillcolor};" parent="1" vertex="1">
+	      <mxGeometry x="{$x}" y="{$y}" width="{$width}" height="{$height}" as="geometry" />
+	    </mxCell>
 
 OE;
-	  
-    if( $oe->oe_parent_kurzbz !== NULL ) 
-    {
-	echo <<<EDGE
-        <mxCell id="edge_{$oe->oe_parent_kurzbz}_{$oe->oe_kurzbz}" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=12 12;" parent="1" source="{$oe->oe_parent_kurzbz}" target="{$oe->oe_kurzbz}" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-	
+
+	if( $oe->oe_parent_kurzbz !== NULL ) 
+	{
+	    echo <<<EDGE
+	    <mxCell id="edge_{$oe->oe_parent_kurzbz}_{$oe->oe_kurzbz}" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=12 12;" parent="1" source="{$oe->oe_parent_kurzbz}" target="{$oe->oe_kurzbz}" edge="1">
+	      <mxGeometry relative="1" as="geometry" />
+	    </mxCell>
+
 EDGE;
-    }
-    
-    return ($x + $width + $spacing);
+	}
+
+	$this->xoffsetperlevel[$level]->max = ($x + $width + $spacing);
+    }	
 }
