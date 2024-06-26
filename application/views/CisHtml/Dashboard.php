@@ -13,7 +13,7 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 <div id="content">
 	<h2>Dashboard</h2>
 	<hr>
-	<fhc-dashboard dashboard="CIS"/>
+	<fhc-dashboard active_addons="<?php echo ACTIVE_ADDONS ?>" dashboard="CIS"/>
 </div>
 
 <?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>

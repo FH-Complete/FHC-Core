@@ -8,8 +8,14 @@ export default {
 		DashboardWidgetPicker
 	},
 	props: [
-		"dashboard"
+		"dashboard",
+		"active_addons",
 	],
+	provide(){
+		return{
+			active_addons: this.active_addons,
+		}
+	},
 	data: () => ({
 		sections: [],
 		widgets: null

@@ -14,13 +14,16 @@ export default  {
             result: false,
         }
     },
+    inject:["active_addons"],
     mixins:[BsModal],
     components:{
         BsModal,
     },
     mounted(){
         this.modal = this.$refs.modalContainer;
+        
     },
+    
     template:/*html*/`
     <bs-modal ref="modalContainer" dialogClass="modal-lg">
         <template #title>
