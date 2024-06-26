@@ -103,6 +103,12 @@ class CmsLib
 		$XML = new DOMDocument();
 		$XML->loadXML($content->content);
 
+		if($content->titel){
+			$betreff = $content->titel;
+		}else{
+			$betreff = $XML->getElementsByTagName('betreff');
+		}
+
 		$xsltemplate = new DOMDocument();
 		$xsltemplate->loadXML($template->xslt_xhtml_c4);
 
@@ -115,6 +121,7 @@ class CmsLib
 		$transformed_content = str_replace('dms.php', APP_ROOT . 'cms/dms.php', $transformed_content);
 
 		return success([
+			"betreff"=>$betreff,
 			"type"=>$content->template_kurzbz,
 			"content"=>$transformed_content
 		]);

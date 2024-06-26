@@ -28,30 +28,13 @@ export default {
                 }
 	},
 	created(){
-		
-      this.$fhcApi.factory.cms.news(MAX_LOADED_NEWS,this.width === 1?true:false)
+		console.log(MAX_LOADED_NEWS,"this are the max news");
+       this.$fhcApi.factory.cms.news(MAX_LOADED_NEWS)
       .then(res => { this.allNewsList = res.data })
       .catch(err => { console.error('ERROR: ', err.response.data) });
-    
+     
 		this.$emit('setConfig', false);
 	},
-  mounted(){
-    
-    this.$nextTick(() =>{
-
-      console.log(this.$refs.htmlContent,"this is the html content");
-      /* //console.log(this.$refs.htmlContent,"this is the refs content");
-      let newsItems = document.getElementsByClassName("news-list");
-      console.log(newsItems,"i am printing something");
-      for(let item of newsItems){
-        //console.log(item,"this is the item");
-        item.style.maxHeight = "100px";
-        item.style.overflow = "scroll";
-      } */
-    });
-    
-     
-  },
 	methods: {
 		setSingleNews(singleNews){
 			this.singleNews = singleNews;
@@ -70,7 +53,7 @@ export default {
         <div  v-for="news in newsList" :key="news.id" class="mt-2">
           <div  class="card">
             <div class=" card-body">
-              <a href="#newsModal" class="stretched-link" @click="setSingleNews(news)">{{ news.betreff }}</a><br>
+              <a href="#newsModal" class="stretched-link" @click="setSingleNews(news)">{{ news.content_obj.betreff?news.content_obj.betreff:'Kein Betreff vorhanden' }}</a><br>
               <span class="small text-muted">{{ formatDateTime(news.insertamum) }}</span>
             </div>
           </div>
@@ -79,7 +62,7 @@ export default {
       <div v-else-if="width > 1 && height === 1" class="h-100" :class="'row row-cols-' + width">
         <div class="h-100" v-for="news in newsList" :key="news.id">
             
-              <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" ><div v-html="news.content"></div></div>
+              <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" v-html="news.content_obj.content"></div>
                    
             
           </div>
@@ -87,7 +70,7 @@ export default {
        <div v-else class="h-100" :class="'row row-cols-' + width">
         <div class="h-100" v-for="news in newsList" :key="news.id">
             
-              <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" v-html="news.content"></div>
+              <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" v-html="news.content_obj.content"></div>
             
           </div>
       </div>
@@ -101,9 +84,8 @@ export default {
       <div class="row">
         <div class="col-5"><img :src="placeHolderImgURL" class="img-fluid rounded-start"></div>
         <div class="col-7 d-flex align-items-end">
-          <p>{{ singleNews.betreff }}<br><small class="text-muted">{{ formatDateTime(singleNews.insertamum) }}</small></p>
+        <p>{{ singleNews?.content_obj?.betreff?singleNews?.content_obj?.betreff:'Kein Betreff vorhanden' }}<br><small class="text-muted">{{ formatDateTime(singleNews.insertamum) }}</small></p>
         </div>
-      </div>
     </template>
     <template #default>{{ singleNews.text }}</template>
   </BsModal>
