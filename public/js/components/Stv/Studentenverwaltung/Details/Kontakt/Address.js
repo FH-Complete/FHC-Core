@@ -97,6 +97,7 @@ export default{
 				height:	'auto',
 				selectable:	true,
 				index: 'adresse_id',
+				persistenceID: 'stv-details-kontakt-address'
 			},
 			tabulatorEvents: [
 				{

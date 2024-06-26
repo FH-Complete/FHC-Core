@@ -85,7 +85,8 @@ export default{
 				layoutColumnsOnNewData:	false,
 				height:	'auto',
 				selectable:	true,
-				index: 'bankverbindung_id'
+				index: 'bankverbindung_id',
+				persistenceID: 'stv-details-kontakt-bankaccount'
 			},
 			tabulatorEvents: [
 				{
@@ -214,7 +215,7 @@ export default{
 		},
 	},
 	template: `	
-		<div class="stv-list h-100 pt-3">
+		<div class="stv-details-kontakt-bankaccount h-100 pt-3">
 		
 		<!--Modal: Bankverbindung-->
 		<BsModal title="Bankverbindung anlegen" ref="bankverbindungModal">

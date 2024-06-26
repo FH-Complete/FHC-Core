@@ -73,7 +73,8 @@ export default{
 				layoutColumnsOnNewData:	false,
 				height:	'auto',
 				selectable:	true,
-				index: 'kontakt_id'
+				index: 'kontakt_id',
+				persistenceID: 'stv-details-kontakt-contact'
 			},
 			tabulatorEvents: [
 				{
@@ -243,7 +244,7 @@ export default{
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `	
-		<div class="stv-list h-100 pt-3">
+		<div class="stv-details-kontakt-contact h-100 pt-3">
 
 		<!--Modal: contactModal-->
 		<BsModal ref="contactModal">

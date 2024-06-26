@@ -58,7 +58,7 @@ export default {
 				height: '100%',
 				selectable: true,
 				selectableRangeMode: 'click',
-				persistence: true
+				persistenceID: 'stv-details-noten-zeugnis'
 			};
 		}
 	},
