@@ -177,7 +177,7 @@ export default {
 			<div class="position-sticky top-0 z-1">
 				<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!deltaLength">Speichern</button>
 			</div>
-			<fieldset>
+			<fieldset class="overflow-hidden">
 				<legend>{{$p.t('lehre', 'title_zgv')}} {{modelValue.nachname}} {{modelValue.vorname}}</legend>
 				<div class="row mb-3">
 					<form-input
@@ -363,7 +363,7 @@ export default {
 					</div>
 				</div>
 			</fieldset>
-			<fieldset>
+			<fieldset class="overflow-hidden">
 				<legend>PrestudentIn</legend>
 				<div class="row mb-3">
 					<form-input
@@ -503,7 +503,7 @@ export default {
 				</div>
 			</fieldset>
 		</form-form>
-		<div class="col-8">
+		<div>
 			<legend>Gesamthistorie</legend>
 			<tbl-history :person_id="modelValue.person_id"></tbl-history>		
 		</div>
