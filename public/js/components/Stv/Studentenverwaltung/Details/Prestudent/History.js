@@ -21,7 +21,8 @@ export default{
 					{title:"Orgform", field:"orgform_kurzbz"},
 					{title:"Studienplan", field:"bezeichnung"},
 					{title:"UID", field:"student_uid"},
-					{title:"Status", field:"status"}
+					{title:"Status", field:"status"},
+					{title:"PrestudentId", field:"prestudent_id", visible:false}
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
