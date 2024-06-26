@@ -66,7 +66,6 @@ class CmsLib
 			if (!getData($isberechtigt))
 				return error('global/keineBerechtigungFuerDieseSeite');
 		}
-		#$this->load->model('content/Content_model', 'ContentModel');
 		$content = $this->ci->ContentModel->getContent($content_id, $sprache, $version, $sichtbar, true);
 
 		if (isError($content))
