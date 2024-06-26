@@ -240,7 +240,7 @@ function checkZeilenUmbruch()
 		);
 	}
 
-	// Anwesenheiten neu
+	// Digitale Anwesenheiten
 	if(CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet)
 	{
 
@@ -248,7 +248,7 @@ function checkZeilenUmbruch()
 		$name='';
 		$text='';
 
-		$name = 'Anwesenheiten NEU';
+		$name = 'Digitale Anwesenheiten';
 		$link= APP_ROOT."index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&sem_kurzbz=$angezeigtes_stsem";
 
 		$menu[]=array
