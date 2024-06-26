@@ -51,6 +51,7 @@ class Cms extends FHC_Controller
 			$this->terminateWithError(getError($content));	
 
 		$content = getData($content);
+		
 		if(NULL === $content)
 			$this->terminateWithError("Content not found");
 

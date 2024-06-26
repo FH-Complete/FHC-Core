@@ -48,9 +48,10 @@ class Cms extends FHCAPI_Controller
 
 	private function fetchContent($content_id){
 		$content = $this->cmslib->getContent($content_id);
-
-		if (isError($content))
-            $this->terminateWithError(getError($content), self::ERROR_TYPE_GENERAL);
+		
+		if (isError($content)){
+			$this->terminateWithError(getError($content), self::ERROR_TYPE_GENERAL);
+		}
 
 		if(getData($content)){
 			return getData($content);
@@ -79,7 +80,7 @@ class Cms extends FHCAPI_Controller
 
 		$content = $this->fetchContent($content_id); 
 
-		$this->terminateWithSuccess(getData($content));
+		$this->terminateWithSuccess($content);
 	}
 
 	/**
@@ -130,7 +131,7 @@ class Cms extends FHCAPI_Controller
 
 		// collect the content of the news
 		foreach($news as $news_element){
-			$this->addMeta("asdfs",$news_element->content_id);
+			$this->addMeta("content_id",$news_element->content_id);
 			$news_element->content_obj = $this->fetchContent($news_element->content_id);
 		}
 

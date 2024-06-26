@@ -13,6 +13,9 @@ export default {
 		AbstractWidget
 	],
 	computed: {
+
+    
+
 		newsList(){
 			//Return news amount depending on widget width and size
 			let quantity = this.width;
@@ -28,14 +31,18 @@ export default {
                 }
 	},
 	created(){
-		console.log(MAX_LOADED_NEWS,"this are the max news");
-       this.$fhcApi.factory.cms.news(MAX_LOADED_NEWS)
-      .then(res => { this.allNewsList = res.data })
-      .catch(err => { console.error('ERROR: ', err.response.data) });
-     
+		this.$fhcApi.factory.cms.news(MAX_LOADED_NEWS)
+    .then(res => { this.allNewsList = res.data })
+    .catch(err => { console.error('ERROR: ', err.response.data) });
+
+      
 		this.$emit('setConfig', false);
 	},
 	methods: {
+
+    contentURI: function(content_id){
+      return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/CisVue/Cms/content/' + content_id;
+    },
 		setSingleNews(singleNews){
 			this.singleNews = singleNews;
 			this.$refs.newsModal.show();
@@ -53,7 +60,7 @@ export default {
         <div  v-for="news in newsList" :key="news.id" class="mt-2">
           <div  class="card">
             <div class=" card-body">
-              <a href="#newsModal" class="stretched-link" @click="setSingleNews(news)">{{ news.content_obj.betreff?news.content_obj.betreff:'Kein Betreff vorhanden' }}</a><br>
+              <a :href="contentURI(news.content_id)" class="stretched-link" >{{ news.content_obj.betreff?news.content_obj.betreff:'Kein Betreff vorhanden' }}</a><br>
               <span class="small text-muted">{{ formatDateTime(news.insertamum) }}</span>
             </div>
           </div>
@@ -78,8 +85,8 @@ export default {
 </div>
 
 
-  <!-- News Modal -->
-  <BsModal ref="newsModal" id="newsModal" dialog-class="modal-lg">
+  <!-- News Modal old way of showing the news content if clicking on the little content format-->
+  <!--<BsModal ref="newsModal" id="newsModal" dialog-class="modal-lg">
     <template #title>
       <div class="row">
         <div class="col-5"><img :src="placeHolderImgURL" class="img-fluid rounded-start"></div>
@@ -89,6 +96,7 @@ export default {
     </template>
     <template #default>{{ singleNews.text }}</template>
   </BsModal>
+  -->
 
   <!-- All News Modal -->
   <BsModal ref="allNewsModal" id="allNewsModal" dialog-class="modal-fullscreen">
