@@ -1,5 +1,5 @@
 import raum_contentmittitel from './Content_types/Raum_contentmittitel.js'
-import news from './Content_types/News.js'
+import general from './Content_types/General.js'
 
 
 export default {
@@ -25,6 +25,7 @@ export default {
   },
   components:{
     raum_contentmittitel,
+    general,
   },
   data() {
     return {
@@ -32,10 +33,21 @@ export default {
       
     };
   },
+  computed:{
+    computeContentType: function(){
+      switch(this.content_type){
+        
+        case "raum_contentmittitel":
+          return "raum_contentmittitel";
+        default:
+          return "general";
+      };
+    },
+  },
   created() {
     this.$fhcApi.factory.cms.content(this.content_id,this.version, this.sprache, this.sichtbar).then(res =>{
         this.content = res.data.content;
-        this.content_type=res.data.content;
+        this.content_type=res.data.type;
     });
   },
   mounted(){
@@ -43,7 +55,7 @@ export default {
   },
   template: /*html*/ `
     <!-- div that contains the content -->
-    <component :is="'raum_contentmittitel'" v-if="content" :content="content" />
+    <component :is="computeContentType" v-if="content" :content="content" />
     <p v-else>No content is available to display</p>
 
     `,
