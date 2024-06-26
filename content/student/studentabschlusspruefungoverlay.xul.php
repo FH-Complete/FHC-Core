@@ -137,7 +137,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer1_nachname" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer2_nachname" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer3_nachname" />
-									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlussbeurteilung_kurzbz" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlussbeurteilung_bezeichnung" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#datum" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#uhrzeit" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#freigabedatum" />

@@ -31,9 +31,13 @@ class Dienstverhaeltnis_model extends DB_Model
             org.bezeichnung oe_bezeichnung,
             dv.von,
             dv.bis,
+	    dv.dvendegrund_kurzbz,
+	    dv.dvendegrund_anmerkung,
             dv.vertragsart_kurzbz,
             dv.updateamum,
-            dv.updatevon
+            dv.updatevon,
+            dv.dvendegrund_kurzbz,
+            dv.dvendegrund_anmerkung
         FROM tbl_mitarbeiter
             JOIN tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
             JOIN tbl_person USING (person_id)
