@@ -49,14 +49,14 @@ export default{
 		}
 	},
 	template: `
-		<div class="stv-list h-100 pt-3">
-			<core-filter-cmpt
-				ref="table"
-				:tabulator-options="tabulatorOptions"
-				:tabulator-events="tabulatorEvents"
-				table-only
-				:side-menu="false"
+	<div class="stv-list h-100 pt-3">
+		<core-filter-cmpt
+			ref="table"
+			:tabulator-options="tabulatorOptions"
+			:tabulator-events="tabulatorEvents"
+			table-only
+			:side-menu="false"
 			>
 		</core-filter-cmpt>
-		</div>`
+	</div>`
 }
