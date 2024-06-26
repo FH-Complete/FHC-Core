@@ -505,7 +505,7 @@ export default {
 		</form-form>
 		<div>
 			<legend>Gesamthistorie</legend>
-			<tbl-history :person_id="modelValue.person_id"></tbl-history>		
+			<tbl-history :person-id="modelValue.person_id" :prestudent-id="modelValue.prestudent_id"></tbl-history>
 		</div>
 	</div>
 	`

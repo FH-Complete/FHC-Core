@@ -5,12 +5,14 @@ export default{
 		CoreFilterCmpt
 	},
 	props: {
-		person_id: Number
+		personId: Number,
+		prestudentId: Number
 	},
 	data() {
+		let prestudent_id = this.prestudentId;
 		return {
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.person_id,
+				ajaxURL: 'api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.personId,
 				ajaxRequestFunc: this.$fhcApi.get,
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
@@ -24,6 +26,14 @@ export default{
 					{title:"Status", field:"status"},
 					{title:"PrestudentId", field:"prestudent_id", visible:false}
 				],
+				rowFormatter(row) {
+					if (["Abgewiesener","Abbrecher","Absolvent"].includes(row.getData().status_kurzbz)) {
+						row.getElement().classList.add('text-muted');
+					}
+					if (row.getData().prestudent_id == prestudent_id) {
+						row.getElement().classList.add('fw-bold');
+					}
+				},
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
 				height:	'auto',
