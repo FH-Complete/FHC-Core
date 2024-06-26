@@ -1319,7 +1319,7 @@ if(!$error)
 			elseif ($meldestichtag_erreicht && !$erweiterteBerechtigungen && !$rtaufsichtUndStatusAbgewiesen)
 			{
 				$return = false;
-				$errormsg = 'Studentstatus mit Datum vor erreichtem Meldestichtag können nicht gelöscht werden.';
+				$errormsg = 'Rollen mit Datum vor erreichtem Meldestichtag können nicht gelöscht werden.';
 			}
 			else
 			{
