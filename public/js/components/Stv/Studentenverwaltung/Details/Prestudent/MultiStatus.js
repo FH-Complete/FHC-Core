@@ -942,7 +942,9 @@ export default{
 				</div>
 				<div v-else>
 					<p>
-					{{$p.t('lehre', 'modal_askAusbildungssemPlural', { count: prestudentIds.length })}}</p>
+					{{$p.t('lehre', 'modal_askAusbildungssemPlural', { count: prestudentIds.length,
+					status: actionStatusText
+						})}}</p>
 				</div>
 				
 				<div class="row mb-3">

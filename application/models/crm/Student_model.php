@@ -156,7 +156,7 @@ class Student_model extends DB_Model
 				}
 				else
 				{
-					return success("0", "Ein Studentenstatus kann hier nur hinzugefuegt werden wenn die Person bereits Student ist. Um einen Bewerber zum Studenten zu machen waehlen Sie bitte unter 'Status aendern' den Punkt 'Student'");
+					return success("0");
 				}
 			} else {
 				return error("StudentModel: Error During Check if Existing Student Rolle.");

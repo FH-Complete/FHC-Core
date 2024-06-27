@@ -8,6 +8,10 @@ class Prestudentstatus_model extends DB_Model
 	const STATUS_STUDENT = 'Student';
 	const STATUS_DIPLOMAND = 'Diplomand';
 	const STATUS_ABSOLVENT = 'Absolvent';
+	const STATUS_BEWERBER = 'Bewerber';
+	const STATUS_AUFGENOMMENER = 'Aufgenommener';
+	const STATUS_WARTENDER = 'Wartender';
+	const STATUS_ABGEWIESENER = 'Abgewiesener';
 
 	/**
 	 * Constructor
@@ -397,8 +401,18 @@ class Prestudentstatus_model extends DB_Model
 	 * @param integer $prestudent_id
 	 * @return error if no bewerberstatus, success if existing
 	 */
-	public function checkIfExistingBewerberstatus($prestudent_id, $name = null)
+	public function checkIfExistingBewerberstatus($prestudent_id)
 	{
+		$studentName = '';
+
+		$nameRes = $this->PersonModel->loadPrestudent($prestudent_id);
+
+		if (hasData($nameRes))
+		{
+			$nameData = getData($nameRes)[0];
+			$studentName = $nameData->vorname.' '.$nameData->nachname;
+		}
+
 		$qry = "SELECT
 					*
 				FROM
@@ -416,8 +430,7 @@ class Prestudentstatus_model extends DB_Model
 		}
 		elseif (!hasData($result))
 		{
-			$person = $name ? $name : "Person";
-			return success("0", $this->p->t('lehre','error_keinBewerber', ['name' => $person]));
+			return success("0", $this->p->t('lehre','error_keinBewerber', ['name' => $studentName]));
 		}
 		else
 		{

@@ -27,7 +27,10 @@ class PrestudentstatusCheckLib
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$this->_ci->load->model('person/Person_model', 'PersonModel');
 		$this->_ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->_ci->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->_ci->load->model('crm/Student_model', 'StudentModel');
 		$this->_ci->load->model('organisation/Studienplan_model', 'StudienplanModel');
+		$this->_ci->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
 	}
 
 	/**
@@ -91,6 +94,174 @@ class PrestudentstatusCheckLib
 			$old_status_studiensemester,
 			$old_status_ausbildungssemester
 		);
+	}
+
+		/**
+	 * Checks if a prestudent role already exists.
+	 * @return error if invalid
+	 * @return 1 if role already exists, 0 if it does not
+	 */
+	public function checkIfExistingPrestudentRolle(
+		$prestudent_id,
+		$status_kurzbz,
+		$tudiensemester_kurzbz,
+		$ausbildungssemester
+	) 
+	{
+		$resultApp =  $this->_getApplicationData($prestudent_id);
+		if(isError($resultApp))
+		{
+			return getData($resultApp);
+		}
+		$resultApp =  current(getData($resultApp));
+		$studentName = trim ($resultApp->vorname.' '.$resultApp->nachname);
+
+		$result =  $this->_ci->PrestudentstatusModel->checkIfExistingPrestudentRolle(
+			$prestudent_id,
+			$status_kurzbz,
+			$tudiensemester_kurzbz,
+			$ausbildungssemester
+		);
+		if(isError($result))
+		{
+			return getData($result);
+		}
+		$result = getData($result);
+
+		if($result == '1')
+		{
+			return error($studentName . ": " . $this->_ci->p->t('lehre', 'error_rolleBereitsVorhanden'));
+		}
+		return success($result);
+	}
+
+	/**
+	 * Checks if a student role already exists.
+	 * @return error if invalid
+	 * @return error, if role does not exist, else count(roles) if it does
+	 */
+	public function checkIfExistingStudentRolle($prestudent_id) 
+	{
+		$resultApp =  $this->_getApplicationData($prestudent_id);
+		if(isError($resultApp))
+		{
+			return getData($resultApp);
+		}
+		$resultApp =  current(getData($resultApp));
+		$studentName = trim ($resultApp->vorname.' '.$resultApp->nachname);
+
+		$result = $this->_ci->StudentModel->checkIfExistingStudentRolle($prestudent_id);
+		if(isError($result))
+		{
+			return getData($result);
+		}
+		$result = getData($result);
+
+		if($result == '0')
+		{
+			return error($this->_ci->p->t('lehre', 'error_noStudstatus', ['name' => $studentName]));
+		}
+		return success($result);
+	}
+
+	/**
+	 * Check if Reihungstest was admitted
+	 * @param integer $prestudent_id
+	 * @return booleans $reihungstest_angetreten, error if not angetreten
+	 */
+	public function checkIfAngetreten($prestudent_id) 
+	{
+		$result =  $this->_getApplicationData($prestudent_id);
+		if(isError($result))
+		{
+			return getData($result);
+		}
+		$result =  current(getData($result));
+		$studentName = trim ($result->vorname.' '.$result->nachname);
+
+		if (!$result->reihungstestangetreten)
+		return error($this->_ci->p->t('lehre', 'error_keinReihungstestverfahren', ['name' => $studentName]));
+
+		return success($result->reihungstestangetreten);
+	}
+
+		/**
+	 * Check if ZGV-Code is registered
+	 * @param integer $prestudent_id
+	 * @return booleans $zgv_code, error if not registered
+	 */
+	public function checkIfZGVEingetragen($prestudent_id, $typ=null) 
+	{
+		$result =  $this->_getApplicationData($prestudent_id);
+		if(isError($result))
+		{
+			return getData($result);
+		}
+		$result =  current(getData($result));
+		$studentName = trim ($result->vorname.' '.$result->nachname);
+
+		if ($typ && $typ=='m' && !$result->zgvmas_code)
+		{			
+			return error($this->_ci->p->t('lehre', 'error_ZGVMasterNichtEingetragen', ['name' => $studentName]));
+		}
+		else
+			return success($result->zgvmas_code);
+		
+
+		if(!$result->zgv_code)
+		{		
+			return error($this->_ci->p->t('lehre', 'error_ZGVNichtEingetragen', ['name' => $studentName]));
+		}
+	
+		return success($result->zgv_code);
+	}
+
+	/**
+	 * Checks if a bewerber status already exists.
+	 * @return error if invalid
+	 * @return error if no bewerberstatus, success otherwise
+	 */
+	public function checkIfExistingBewerberstatus($prestudent_id) 
+	{
+		$result =  $this->_getApplicationData($prestudent_id);
+		if(isError($result))
+		{
+			return getData($result);
+		}
+		$result =  current(getData($result));
+		$studentName = trim ($result->vorname.' '.$result->nachname);
+
+		$result =  $this->_ci->PrestudentstatusModel->checkIfExistingBewerberstatus(
+			$prestudent_id
+		);
+		if(isError($result))
+		{
+			return getData($result);
+		}
+		if(getData($result) == "0")
+		{		
+			return error($this->_ci->p->t('lehre','error_keinBewerber', ['name' => $studentName]));
+		}
+		return success(getData($result));
+	}
+
+	/**
+	 * Check if Bismeldestichtag erreicht
+	 * @param Date $statusDatum
+	 * @return error if Bismeldestichtag erreicht
+	 */
+	public function checkIfMeldestichtagErreicht($statusDatum, $studiensemester_kurzbz=null)
+	{
+		$result = $this->_ci->BismeldestichtagModel->checkIfMeldestichtagErreicht($statusDatum, $studiensemester_kurzbz);
+		if(isError($result))
+		{
+			return getData($result);
+		}
+		if(getData($result) == "1")
+		{		
+			return error($this->_ci->p->t('lehre','error_dataVorMeldestichtag'));
+		}
+		return success(getData($result));
 	}
 
 	/**
@@ -298,4 +469,28 @@ class PrestudentstatusCheckLib
 
 		return $resultPs;
 	}
+
+
+
+
+	/**
+	 * Provides Application Data
+	 * @param integer $prestudent_id
+	 * @return error if not valid, array with ApplicationData if valid
+	 */
+	private function _getApplicationData($prestudent_id) 
+	{
+		$this->_ci->PrestudentModel->addJoin('public.tbl_person p', 'ON (p.person_id = public.tbl_prestudent.person_id)');
+		
+		$result = $this->_ci->PrestudentModel->load([
+			'prestudent_id'=> $prestudent_id,
+		]);
+		if(isError($result))
+		{
+			return getData($result);
+		}
+
+		return $result;
+	}
+
 }

@@ -425,29 +425,30 @@ class PrestudentLib
 	public function setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtAm, $bestaetigtVon)
 	{
 		$insertvon = getAuthUID();
-		 
-		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
+		
+		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($result))
 			return $result;
-		$result = getData($result);
+		$resultStatus = getData($result);
 
 		//if not Wiederholer
 		if($statusgrund_id != 16)
 		{
 			//check if ausbildungssemester is last
 			$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent p', 'studiengang_kz');
-			$res = $this->_ci->StudiengangModel->loadWhere(['p.prestudent_id' => $prestudent_id]);
-			if(isError($res))
-				return $res;
-			if(!hasData($res))
+			$resultStg = $this->_ci->StudiengangModel->loadWhere(['p.prestudent_id' => $prestudent_id]);
+			if(isError($resultStg))
+				return $resultStg;
+			if(!hasData($resultStg))
 				return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_for_prestudent', [
 					'prestudent_id' => $prestudent_id
 				]));
 
-			$studiengang = current(getData($res));
-			$prestudent_status = current($result);
 
-			if(!$result)
+			$studiengang = current(getData($resultStg));
+
+			$prestudent_status = ($resultStatus[0]);
+			if(!$prestudent_status)
 			{
 				return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
 					'prestudent_id' => $prestudent_id,
@@ -456,7 +457,6 @@ class PrestudentLib
 			}
 		}
 
-		$prestudent_status = current($result);
 		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
 		if (isError($result))
@@ -526,10 +526,13 @@ class PrestudentLib
 	{
 		$insertvon = getAuthUID();
 
-		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
+		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($result))
 			return $result;
-		$result = getData($result);
+		if (!hasData($result))
+		return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+
+		$result = getData($result) ?: [];
 
 		$prestudent_status = current($result);
 		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
@@ -602,7 +605,7 @@ class PrestudentLib
 
 	public function setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		//TODO(Manu) makes no difference
+		//TODO(Manu) why no lvb?
 /*		if (gettype($ausbildungssemester) != "integer") {
 			$ausbildungssemester = (int)$ausbildungssemester;
 		}*/
@@ -613,7 +616,7 @@ class PrestudentLib
 
 		$insertvon = getAuthUID();
 		 
-		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
+		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($result))
 			return $result;
 		$result = getData($result);
@@ -627,7 +630,7 @@ class PrestudentLib
 		if (!$result)
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
 
-	//	$student = current($result);
+		$student = current($result);
 
 		//Status updaten
 		$result = $this->_ci->PrestudentstatusModel->insert([

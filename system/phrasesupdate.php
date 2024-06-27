@@ -25943,13 +25943,33 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'In welches Semester sollen diese {count} PrestudentInnen verschoben werden?',
+				'text' => 'In welches Semester sollen diese {count} PrestudentInnen ({status})verschoben werden?',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'To which education semester should these {count} prestudents be moved?',
+				'text' => 'To which education semester should these {count} prestudents ({status}) be moved?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'modal_askAusbildungssemPlural2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In welches Semester sollen diese {count} PrestudentInnen ({status}) verschoben werden?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'To which education semester should these {count} prestudents ({status}) be moved?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
