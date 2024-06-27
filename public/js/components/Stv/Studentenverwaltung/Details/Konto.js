@@ -100,6 +100,7 @@ export default {
 				selectable: true,
 				selectableRangeMode: 'click',
 				index: 'buchungsnr',
+				persistenceID: 'stv-details-konto'
 			}, this);
 		}
 	},

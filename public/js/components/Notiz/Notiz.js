@@ -151,7 +151,8 @@ export default {
 				height: '250',
 				selectableRangeMode: 'click',
 				selectable: true,
-				index: 'notiz_id'
+				index: 'notiz_id',
+				persistenceID: 'core-notiz'
 			},
 			tabulatorEvents: [
 				{

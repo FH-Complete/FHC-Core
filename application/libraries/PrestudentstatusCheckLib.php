@@ -334,7 +334,7 @@ class PrestudentstatusCheckLib
 
 		foreach ($resultArr as $row)
 		{
-			// gerade bearbeiteten Status überspringen
+			// Status, der gerade in Bearbeitung ist, überspringen
 			if (isset($old_status_studiensemester)
 				&& isset($old_status_ausbildungssemester)
 				&& $row->status_kurzbz == $status_kurzbz

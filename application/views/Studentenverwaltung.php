@@ -34,8 +34,8 @@
 <?php
 $configArray = [
 	'generateAlias' => !defined('GENERATE_ALIAS_STUDENT') ? true : GENERATE_ALIAS_STUDENT,
-	'showZgvDoktor' => !defined('ZGV_DOKTOR_ANZEIGEN') ? true : ZGV_DOKTOR_ANZEIGEN,
-	'showZgvErfuellt' => !defined('ZGV_ERFUELLT_ANZEIGEN') ? true : ZGV_ERFUELLT_ANZEIGEN
+	'showZgvDoktor' => !defined('ZGV_DOKTOR_ANZEIGEN') ? false : ZGV_DOKTOR_ANZEIGEN,
+	'showZgvErfuellt' => !defined('ZGV_ERFUELLT_ANZEIGEN') ? false : ZGV_ERFUELLT_ANZEIGEN
 ];
 ?>
 

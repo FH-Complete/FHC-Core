@@ -8,7 +8,7 @@ export default {
 		modelValue: Object
 	},
 	template: `
-	<div class="stv-details-notizen h-100 pb-3">
+	<div class="stv-details-notizen h-100 pb-3 overflow-hidden">
 <!--	mit factory als endpoint	-->
 		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.person"

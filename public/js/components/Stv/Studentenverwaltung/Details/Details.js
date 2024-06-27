@@ -1,4 +1,3 @@
-import {CoreRESTClient} from '../../../../RESTClient.js';
 import CoreForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
 import FormUploadImage from '../../../Form/Upload/Image.js';

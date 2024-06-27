@@ -90,7 +90,7 @@ export default {
 				selectable: true,
 				selectableRangeMode: 'click',
 				index: 'prestudent_id',
-				persistence: true
+				persistenceID: 'stv-list'
 			},
 			tabulatorEvents: [
 				{
