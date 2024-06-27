@@ -300,26 +300,15 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		//update(1) loading all dms-entries with this notiz_id
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 		$this->NotizdokumentModel->addJoin('campus.tbl_dms_version', 'dms_id');
-		$dms_uploaded = null;
+		#$dms_uploaded = null;//
 
 		$result = $this->NotizdokumentModel->loadWhere(array('notiz_id' => $notiz_id));
-		if (isError($result))
-		{
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		elseif (!hasData($result))
-		{
-			$dms_id_arr = null;
-		}
-		else
-		{
-			$result = getData($result);
-			foreach($result as $doc) {
-				$dms_id_arr[] = array(
-					'name' => $doc->name,
-					'dms_id' => $doc->dms_id
-				);
-			}
+		$result = $this->getDataOrTerminateWithError($result);
+		foreach ($result as $doc) {
+			$dms_id_arr[$doc->dms_id] = array(
+				'name' => $doc->name,
+				'dms_id' => $doc->dms_id
+			);
 		}
 
 		foreach ($_FILES as $k => $file)
@@ -327,9 +316,9 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			//update(2) attach all new files (except type application/x.fhc-dms+json)
 			if($file["type"] == 'application/x.fhc-dms+json')
 			{
-				$dms_uploaded[] = array(
-					'name' => $file["name"]
-				);
+				$jsonFile = json_decode(file_get_contents($file['tmp_name']));
+				unset($dms_id_arr[$jsonFile->dms_id]);
+				#$dms_uploaded[] = $jsonFile->dms_id;
 			}
 			else
 			{
@@ -347,48 +336,23 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 				//Todo define in dms component: readFile, downloadFile
 				$result = $this->dmslib->upload($dms, $k, array('*'));
 
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
-				$dms_id = $result->retval['dms_id'];
+				$result = $this->getDataOrTerminateWithError($result);
+				$dms_id = $result['dms_id'];
 
 				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
+
+				$this->getDataOrTerminateWithError($result);
 			}
 		}
 
 		//update(3) check if all files have been deleted
-		if(count($dms_uploaded) != count($dms_id_arr))
+		foreach ($dms_id_arr as $file)
 		{
-			if (count($dms_uploaded) == 0)
-			{
-				$filesDeleted = $dms_id_arr;
-			}
-			else
-			{
-				$upload_new_names = array_column($dms_uploaded, "name");
+			$result = $this->dmslib->removeAll($file['dms_id']);
 
-				$filesDeleted = array_filter($dms_id_arr, function ($file) use ($upload_new_names) {
-					return !in_array($file["name"], $upload_new_names);
-				});
-			}
-
-			foreach ($filesDeleted as $file)
-			{
-				$result = $this->dmslib->removeAll($file['dms_id']);
-
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
-				else
-					$this->outputJson($result);
-			}
+			$this->getDataOrTerminateWithError($result);
 		}
+
 		return $this->terminateWithSuccess($result);
 	}
 
