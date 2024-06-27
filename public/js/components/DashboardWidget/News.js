@@ -43,6 +43,9 @@ export default {
     contentURI: function(content_id){
       return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/CisVue/Cms/content/' + content_id;
     },
+    allNewsURI: function(){
+      return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/CisVue/Cms/news';
+    },
 		setSingleNews(singleNews){
 			this.singleNews = singleNews;
 			this.$refs.newsModal.show();
@@ -53,7 +56,7 @@ export default {
       <div class="d-flex flex-column h-100 ">
       <div class="d-flex">
         <header><b>Top News</b></header>
-        <a href="#allNewsModal" data-bs-toggle="modal" class="ms-auto mb-2">
+        <a :href="allNewsURI()" class="ms-auto mb-2">
           <i class="fa fa-arrow-up-right-from-square me-1"></i>Alle News</a>
       </div>
       <div class="h-100 overflow-scroll" v-if="width == 1">
@@ -98,8 +101,8 @@ export default {
   </BsModal>
   -->
 
-  <!-- All News Modal -->
-  <BsModal ref="allNewsModal" id="allNewsModal" dialog-class="modal-fullscreen">
+  <!-- All News Modal old way of showing all the different news -->
+  <!--<BsModal ref="allNewsModal" id="allNewsModal" dialog-class="modal-fullscreen">
     <template #title>Alle News</template>
     <template #default>
     <div class="row row-cols-md-2 row-cols-lg-3 row-cols-xl-5 g-4 h-100 px-5">
@@ -115,5 +118,5 @@ export default {
           </div>
           </div>
 	</template>
-  </BsModal>`
+  </BsModal>-->`
 }
