@@ -36,7 +36,7 @@ class NotizPerson extends Notiz_Controller
 		$notiz_id = $this->input->post('notiz_id');
 
 		// TODO(chris): make CI variant of endpoint
-		$this->NotizModel->addSelect($this->NotizModel->escape(base_url('content/notizdokdownload.php?id=' . $notiz_id)) . ' AS preview');
+		$this->NotizModel->addSelect($this->NotizModel->escape(base_url('content/notizdokdownload.php?id=')) . ' || campus.tbl_dms_version.dms_id AS preview');
 		
 		return parent::loadDokumente();
 	}
