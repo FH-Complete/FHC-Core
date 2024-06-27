@@ -180,6 +180,10 @@ FOOTER;
 		    'max' => $this->xoffsetperlevel[$level]->max + $width + $spacing
 		);
 	    }
+	    else
+	    {
+		$this->xoffsetperlevel[$nextlevel]->max = ($this->xoffsetperlevel[$level]->max + $width + $spacing);
+	    }
 	}
 
 	if( count($oe->childs) > 0 && count($oe->childs) === $ownchildcount )
