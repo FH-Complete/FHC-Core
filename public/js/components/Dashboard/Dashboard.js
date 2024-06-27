@@ -10,10 +10,12 @@ export default {
 	props: [
 		"dashboard",
 		"active_addons",
+		"mail_studierende",
 	],
 	provide(){
 		return{
 			active_addons: this.active_addons,
+			mail_studierende: this.mail_studierende,
 		}
 	},
 	data: () => ({

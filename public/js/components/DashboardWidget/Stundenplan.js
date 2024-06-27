@@ -21,8 +21,11 @@ export default {
 			minimized: true,
 			events: null,
 			currentDay: new Date(),
+			// used for contentModal
 			roomInfoContentID: null,
 			ort_kurzbz: null,
+			// used for LvUbersichtModal
+			selectedEvent: null,
 		}
 	},
 	computed: {
@@ -57,11 +60,9 @@ export default {
 			
 		},
 		showLvUebersicht: function (event){
+			this.selectedEvent= event;
+			Vue.nextTick(()=>{this.$refs.lvUebersicht.show();});
 			
-			this.$refs.lvUebersicht.lehreinheit = event.lehreinheit_id;
-			this.$refs.lvUebersicht.lv = event.title;
-			this.$refs.lvUebersicht.stg = event.stg_typ + event.stg_kurzbz + (event.verband?'-' + event.verband:'' );
-			this.$refs.lvUebersicht.show();
 		},
 		
 		selectDay(day) {
@@ -111,7 +112,7 @@ export default {
 	},
 	template: /*html*/`
 	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">
-		<lv-uebersicht ref="lvUebersicht"  />
+		<lv-uebersicht ref="lvUebersicht" :event="selectedEvent"  />
 		<content-modal :contentID="roomInfoContentID" :ort_kurzbz="" dialogClass="modal-lg" ref="contentModal"/>
 		<fhc-calendar :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" />
 		<div v-show="minimized" class="flex-grow-1 overflow-scroll">

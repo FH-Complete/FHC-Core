@@ -22,6 +22,7 @@ import filter from "./filter.js";
 import studstatus from "./studstatus.js";
 import ort from "./ort.js";
 import cms from "./cms.js";
+import lehre from "./lehre.js";
 
 export default {
     search,
@@ -31,4 +32,5 @@ export default {
     studstatus,
     ort,
     cms,
+    lehre,
 };

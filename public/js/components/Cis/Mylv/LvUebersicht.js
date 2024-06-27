@@ -2,7 +2,12 @@ import BsModal from "../../Bootstrap/Modal";
 
 export default  {
   
-    
+    props:{
+        event:{
+            type:Object,
+            required:true,
+        }
+    },
     data(){
         return {
             // reactive data
@@ -14,25 +19,34 @@ export default  {
             result: false,
         }
     },
-    inject:["active_addons"],
+    inject:["active_addons","mail_studierende"],
     mixins:[BsModal],
     components:{
         BsModal,
+    },
+    methods:{
+        showModal: function(){
+            
+            this.$fhcApi.factory.lehre.getStudentenMail(this.event.lehreinheit_id).then(res =>
+                {
+                    console.log(res.data,"API response");
+                });
+        },
     },
     mounted(){
         this.modal = this.$refs.modalContainer;
         
     },
-    
     template:/*html*/`
-    <bs-modal ref="modalContainer" dialogClass="modal-lg">
+    <bs-modal @showBsModal="showModal" ref="modalContainer" dialogClass="modal-lg">
         <template #title>
-            <span v-if="lv ">
+            <p>{{JSON.stringify(event,null,2)}}</p>
+            <!--<span v-if="lv ">
             {{lv + (stg?' / ' + stg:'')}}
             </span>
             <span v-else>
             Lehrveranstaltungs Übersicht
-            </span>
+            </span>-->
         </template>
         <template #default>
             <div :style="{'display':'grid', 'row-gap':'10px', 'column-gap':'10px', 'grid-template-columns':'repeat(3,minmax(100px,1fr))', 'grid-template-rows':'repeat('+Math.ceil(items.length / 3)+',minmax(100px,1fr))'} ">
