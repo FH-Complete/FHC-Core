@@ -396,7 +396,6 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 	{
 		$this->load->library('DmsLib');
 
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 		$notiz_id = $this->input->post('notiz_id');
 		$typeId = $this->input->post('type_id');
 		$id = $this->input->post('id');
@@ -404,43 +403,24 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		//TODO(manu): define Permissions for deletion document if filecomponent finished
 
 		//get dms_id from notizdokument
-		$dms_id_arr = [];
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 
 		$result = $this->NotizdokumentModel->loadWhere(array('notiz_id' => $notiz_id));
 
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
+		$result = $this->getDataOrTerminateWithError($result);
 
-		if(hasData($result))
-		{
-			$result = getData($result);
-			foreach ($result as $doc) {
-				$dms_id_arr[] = $doc->dms_id;
-			}
-		}
+		// Start DB transaction
+		$this->db->trans_start();
 
-		if($dms_id_arr)
-		{
-			// Start DB transaction
-			$this->db->trans_start();
-
+		if ($result)
 			$this->load->library('DmsLib');
 
-
-			foreach($dms_id_arr as $dms_id)
+		foreach ($result as $doc) {
+			$res = $this->dmslib->removeAll($doc->dms_id);
+			if (isError($result))
 			{
-				$result = $this->dmslib->removeAll($dms_id);
-
-				if (isError($result))
-				{
-					$this->db->trans_rollback();
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
-
-				$this->outputJson($result);
+				$this->db->trans_rollback();
+				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 			}
 		}
 
@@ -455,9 +435,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$this->load->model('person/Notiz_model', 'NotizModel');
 
 		//Delete Note
-		$result = $this->NotizModel->delete(
-			array('notiz_id' => $notiz_id)
-		);
+		$result = $this->NotizModel->delete($notiz_id);
 
 		if (isError($result))
 		{
@@ -469,8 +447,8 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			return $this->terminateWithError($this->p->t('ui','error_missingId', ['id'=> 'Notiz_id']), self::ERROR_TYPE_GENERAL);
 		}
 
-		$this->db->trans_rollback();
-		return $this->terminateWithSuccess(current(getData($result)));
+		$this->db->trans_complete();
+		return $this->terminateWithSuccess(getData($result));
 	}
 
 	public function loadDokumente()
