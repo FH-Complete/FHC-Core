@@ -57,6 +57,11 @@ class Lehre extends FHCAPI_Controller
 
         $studentenMails = $this->getDataOrTerminateWithError($studentenMails);
 
+		//convert array of objects into array of strings
+		$studentenMails = array_map(function($element){
+			return $element->mail;
+		}, $studentenMails);
+
         $this->terminateWithSuccess($studentenMails);
 	}
 
