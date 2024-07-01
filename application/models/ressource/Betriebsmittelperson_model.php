@@ -100,7 +100,7 @@ class Betriebsmittelperson_model extends DB_Model
 	public function getBetriebsmittelData($id, $type_id)
 	{
 		switch ($type_id) {
-			case 'person':
+			case 'person_id':
 				$cond = 'bmp.person_id';
 				break;
 			case 'uid':
@@ -115,7 +115,7 @@ class Betriebsmittelperson_model extends DB_Model
 
 		$query = "
 			SELECT 
-			    bm.nummer, bmp.person_id, bm.betriebsmitteltyp, bmp.anmerkung as anmerkung, bmp.retouram, TO_CHAR(bmp.retouram::timestamp, 'DD.MM.YYYY') AS format_retour, bmp.ausgegebenam, TO_CHAR(bmp.ausgegebenam::timestamp, 'DD.MM.YYYY') AS format_ausgabe, bm.beschreibung, bmp.uid, bmp.kaution, bm.betriebsmittel_id, bmp.betriebsmittelperson_id, bm.inventarnummer
+			    bm.nummer, bmp.person_id, bm.betriebsmitteltyp, bmp.anmerkung as anmerkung, bmp.retouram, TO_CHAR(bmp.retouram::timestamp, 'DD.MM.YYYY') AS format_retour, bmp.ausgegebenam, TO_CHAR(bmp.ausgegebenam::timestamp, 'DD.MM.YYYY') AS format_ausgabe, bm.beschreibung, bmp.uid, bmp.kaution, bm.betriebsmittel_id, bmp.betriebsmittelperson_id, bm.inventarnummer, bm.nummer2
 			FROM 
 			    wawi.tbl_betriebsmittelperson bmp
 			JOIN 

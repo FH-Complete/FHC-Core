@@ -20,26 +20,41 @@ export default {
 			from: 'cisRoot'
 		},
 	},
-	props: [
-		'person_id',
-		'uid'
-	],
+	props: {
+		endpoint: {
+			type: Object,
+			required: true
+		},
+		typeId: String,
+		id: {
+			type: [Number, String],
+			required: true
+		},
+		uid: {
+			type: [Number, String],
+			required: true
+		}
+	},
 	data() {
 		return {
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/betriebsmittel/Betriebsmittel/getAllBetriebsmittel/' + this.uid + '/' + this.person_id,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.endpoint.getAllBetriebsmittel,
+				ajaxParams: {
+					type: this.typeId,
+					id: this.id
+				},
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title: "Nummer", field: "nummer"},
+					{title: "Nummer", field: "nummer", width: 150},
 					{title: "PersonId", field: "person_id", visible: false},
-					{title: "Typ", field: "betriebsmitteltyp"},
+					{title: "Typ", field: "betriebsmitteltyp", width: 125},
 					{title: "Anmerkung", field: "anmerkung", visible: false},
-					{title: "Retourdatum", field: "format_retour", visible: false},
+					{title: "Retourdatum", field: "format_retour", width: 128},
 					{title: "Beschreibung", field: "beschreibung"},
-					{title: "Uid", field: "uid", visible: false},
+					{title: "Uid", field: "uid", width: 87},
 					{title: "Kaution", field: "kaution", visible: false},
-					{title: "Ausgabedatum", field: "format_ausgabe"},
+					{title: "Ausgabedatum", field: "format_ausgabe", width: 144},
 					{title: "Betriebsmittel_id", field: "betriebsmittel_id", visible: false},
 					{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id", visible: false},
 					{
@@ -96,7 +111,8 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: '550',
 				selectableRangeMode: 'click',
-				selectable: true
+				selectable: true,
+				persistenceID: 'core-betriebsmittel'
 			},
 			tabulatorEvents: [
 				{
@@ -139,16 +155,18 @@ export default {
 	},
 	watch: {
 		uid() {
-			this.$refs.table.tabulator.setData('api/frontend/v1/betriebsmittel/Betriebsmittel/getAllBetriebsmittel/' + this.uid + '/' + this.person_id);
+			this.$refs.table.tabulator.setData(this.endpoint.getAllBetriebsmittel + '/' + this.typeId + '/' + this.id);
 		}
 	},
 	methods: {
 		actionEditBetriebsmittel(betriebsmittelperson_id) {
 			this.statusNew = false;
 			this.loadBetriebsmittel(betriebsmittelperson_id);
+			this.$refs.betriebsmittelModal.show();
 		},
 		actionNewBetriebsmittel() {
 			this.resetModal();
+			this.$refs.betriebsmittelModal.show();
 			this.statusNew = true;
 			this.formData.ausgegebenam = this.getDefaultDate();
 			this.reload();
@@ -159,28 +177,21 @@ export default {
 			});
 		},
 		addNewBetriebsmittel() {
-			this.param = {
-				'uid':  this.uid,
-				'person_id': this.person_id,
-				...this.formData
-			};
-			this.$fhcApi.post('api/frontend/v1/betriebsmittel/Betriebsmittel/addNewBetriebsmittel/',
-				this.param
-			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
+			//just append uid to formdata
+			this.formData.uid = this.uid;
+			return this.endpoint.addNewBetriebsmittel(this.id, this.formData)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.hideModal('betriebsmittelModal');
+					this.resetModal();
+				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
 				});
 		},
 		deleteBetriebsmittel(betriebsmittelperson_id) {
-			this.param = {
-				'betriebsmittelperson_id': betriebsmittelperson_id
-			};
-			return this.$fhcApi.post('api/frontend/v1/betriebsmittel/betriebsmittel/deleteBetriebsmittel/',
-				this.param)
+			return this.endpoint.deleteBetriebsmittel(betriebsmittelperson_id)
 				.then(
 					result => {
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
@@ -193,16 +204,12 @@ export default {
 					this.reload();
 				});
 		},
-		updateBetriebsmittel() {
-			this.param = {
-				'uid':  this.uid,
-				'person_id': this.person_id,
-				...this.formData
-			};
-			this.$fhcApi.post('api/frontend/v1/betriebsmittel/Betriebsmittel/updateBetriebsmittel/',
-				this.param
-			).then(response => {
+		updateBetriebsmittel(betriebsmittelperson_id) {
+			this.formData.uid = this.uid;
+			return this.endpoint.updateBetriebsmittel(betriebsmittelperson_id, this.formData)
+			.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+				this.hideModal('betriebsmittelModal');
 				this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -213,11 +220,7 @@ export default {
 		loadBetriebsmittel(betriebsmittelperson_id) {
 			this.resetModal();
 			this.statusNew = false;
-			this.param = {
-				'betriebsmittelperson_id':  betriebsmittelperson_id
-			};
-			return this.$fhcApi.post('api/frontend/v1/betriebsmittel/Betriebsmittel/loadBetriebsmittel/',
-				this.param)
+			return this.endpoint.loadBetriebsmittel(betriebsmittelperson_id)
 				.then(result => result.data)
 				.then(result => {
 					this.formData = result;
@@ -225,8 +228,8 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		searchInventar(event) {
-			return this.$fhcApi
-				.get('api/frontend/v1/betriebsmittel/Betriebsmittel/loadInventarliste/' + event.query)
+			const encodedQuery = encodeURIComponent(event.query);
+			return this.endpoint.loadInventarliste(encodedQuery)
 				.then(result => {
 					this.filteredInventar = result.data.retval;
 				});
@@ -256,8 +259,7 @@ export default {
 		}
 	},
 	created(){
-		this.$fhcApi
-			.get('api/frontend/v1/betriebsmittel/Betriebsmittel/getTypenBetriebsmittel')
+		return this.endpoint.getTypenBetriebsmittel()
 			.then(result => result.data)
 			.then(result => {
 				this.listBetriebsmitteltyp = result;
@@ -265,57 +267,44 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-	<div class="core-betriebsmittel">
-	
-	
+	<div class="core-betriebsmittel h-100 d-flex flex-column">
+		
 		<!--Modal: deleteBetriebsmittelModal-->
 		<BsModal ref="deleteBetriebsmittelModal">
 			<template #title>{{$p.t('ui', 'betriebsmittel_delete')}}</template>
-			<template #default>
-				<p>{{$p.t('ui', 'betriebsmittel_confirm_delete')}}</p>
-			</template>
+			<template #default><p>{{$p.t('ui', 'betriebsmittel_confirm_delete')}}</p></template>
 			<template #footer>
-<!--				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>-->
 				<button ref="Close" type="button" class="btn btn-primary" @click="deleteBetriebsmittel(formData.betriebsmittelperson_id)">OK</button>
 			</template>
 		</BsModal>
 		
+		<core-filter-cmpt
+			ref="table"
+			:tabulator-options="tabulatorOptions"
+			:tabulator-events="tabulatorEvents"
+			table-only
+			:side-menu="false"
+			reload
+			new-btn-show
+			new-btn-label="Betriebsmittel"
+			@click:new="actionNewBetriebsmittel"
+			>
+		</core-filter-cmpt>		
 		
-		<div class="row col-12">
-			<div class="col-6">
-			
-				<core-filter-cmpt
-					ref="table"
-					:tabulator-options="tabulatorOptions"
-					:tabulator-events="tabulatorEvents"
-					table-only
-					:side-menu="false"
-					reload
-					new-btn-show
-					new-btn-label="Betriebsmittel"
-					@click:new="actionNewBetriebsmittel"
-					>
-				</core-filter-cmpt>
-			
-			</div>
-			
-
-			
-			<form-form class="row g-3 col-6" ref="betriebsmittelData">
+		<!--Modal: betriebsmittelModal-->
+		<bs-modal ref="betriebsmittelModal">
+			<template #title>
+				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('ui', 'add_betriebsmittel')}}</p>
+				<p v-else class="fw-bold mt-3">{{$p.t('ui', 'edit_betriebsmittel')}}</p>
+			</template>
+		
+			<form-form class="row g-3" ref="betriebsmittelData">		
 				<legend>Details</legend>
-				
-				<div class="row mb-3">
-					<div class="col-sm-7">
-						<p v-if="statusNew" class="fw-bold">{{$p.t('ui', 'add_betriebsmittel')}}</p>
-						<p v-else class="fw-bold">{{$p.t('ui', 'edit_betriebsmittel')}}</p>
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
-					<div class="col-sm-6">
+					
+					<div class="row mb-3">
 						<form-input
 						type="select"
+						:label="$p.t('global/typ')"
 						name="typ"
 						v-model="formData.betriebsmitteltyp"
 						:disabled="!statusNew"
@@ -329,87 +318,86 @@ export default {
 						</option>
 						</form-input>
 					</div>
-				</div>
-			
-				<div v-if="formData.betriebsmitteltyp == 'Inventar'" class="row mb-3">
-					<label for="inventarnummer" class="form-label col-sm-4">{{$p.t('wawi', 'inventarnummer')}}</label>
-					<div class="col-sm-6">
-						<PvAutoComplete v-model="formData['inventarData']" optionLabel="dropdowntext" :suggestions="filteredInventar" @complete="searchInventar" minLength="3"/>
-					</div>
-				</div>
-				<div v-else-if="formData.inventarnummer" class="row mb-3">
-				<label for="inventarnummer" class="form-label col-sm-4">{{$p.t('wawi', 'inventarnummer')}}</label>
-					<div class="col-sm-6">
-						<input type="text" class="form-control" id="inventarnummer" v-model="formData.inventarnummer" :disabled="!statusNew">
-					</div>
-				</div>
 				
-				<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
-					<label for="nummer" class="form-label col-sm-4">{{$p.t('wawi', 'nummer')}}</label>
-					<div class="col-sm-6">
+					<div v-if="formData.betriebsmitteltyp == 'Inventar'" class="row mb-3">
+						<form-input
+							type="autocomplete"
+							:label="$p.t('wawi/inventarnummer')"
+							name="inventarnummer"
+							v-model="formData.inventarData"
+							optionLabel="dropdowntext" 
+							:suggestions="filteredInventar" 
+							@complete="searchInventar" 
+							minLength="3"
+						>
+						</form-input>
+					</div>
+					<div v-else-if="formData.inventarnummer" class="row mb-3">
 						<form-input
 							type="text"
+							:label="$p.t('wawi/inventarnummer')"
+							name="inventarnummer"
+							v-model="formData.inventarnummer"
+							:disabled="!statusNew"
+						>
+						</form-input>
+					</div>
+					
+					<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
+						<form-input
+							type="text"
+							:label="$p.t('wawi/nummer')"
 							name="nummer"
 							v-model="formData['nummer']"
 						>
 						</form-input>
 					</div>
-				</div>
-				
-				<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
-					<label for="nummer2" class="form-label col-sm-4">{{$p.t('wawi', 'nummer')}} 2</label>
-					<div class="col-sm-6">
+					
+					<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
 						<form-input
 							type="text"
+							:label="$p.t('wawi/nummer') + ' 2'"
 							name="nummer2"
 							v-model="formData['nummer2']"
 						>
 						</form-input>
 					</div>
-				</div>
-			
-				<div v-if="formData.betriebsmitteltyp!='Inventar'" class="row mb-3">
-					<label for="beschreibung" class="form-label col-sm-4">{{$p.t('global', 'beschreibung')}}</label>
-					<div class="col-sm-6">
+				
+					<div v-if="formData.betriebsmitteltyp!='Inventar'" class="row mb-3">
 						<form-input
 							type="textarea"
+							:label="$p.t('global/beschreibung')"
 							name="beschreibung"
 							v-model="formData['beschreibung']"
 							:disabled="formData.inventarnummer"
 						>
 						</form-input>
 					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="kaution" class="form-label col-sm-4">{{$p.t('infocenter', 'kaution')}}</label>
-					<div class="col-sm-6">
+					
+					<div class="row mb-3">
 						<form-input
 							type="text"
+							:label="$p.t('infocenter/kaution')"
 							name="kaution"
 							v-model="formData['kaution']"
 						>
 						</form-input>
 					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
-					<div class="col-sm-6">
+					
+					<div class="row mb-3">
 						<form-input
 							type="textarea"
+							:label="$p.t('global/anmerkung')"
 							name="anmerkung"
 							v-model="formData['anmerkung']"
 						>
 						</form-input>
 					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="ausgegebenam" class="form-label col-sm-4">{{$p.t('wawi', 'ausgegebenam')}}</label>
-					<div class="col-sm-6">
+					
+					<div class="row mb-3">
 						<form-input
 							type="DatePicker"
+							:label="$p.t('wawi/ausgegebenam')"
 							name="datum"
 							v-model="formData['ausgegebenam']"
 							auto-apply
@@ -419,13 +407,11 @@ export default {
 							:teleport="true"
 						></form-input>
 					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="retouram" class="form-label col-sm-4">{{$p.t('wawi', 'retouram')}}</label>
-					<div class="col-sm-6">
+					
+					<div class="row mb-3">
 						<form-input
 							type="DatePicker"
+							:label="$p.t('wawi/retouram')"
 							name="datum"
 							v-model="formData['retouram']"
 							auto-apply
@@ -435,28 +421,16 @@ export default {
 							:teleport="true"
 						></form-input>
 					</div>
-				</div>
+				</form-form>
 				
+				<template #footer>
+					<button v-if="statusNew"  ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
 
-				<div class="row mb-3">
-				<label class="form-label col-sm-8"></label>
-					<div v-if="statusNew" class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
-					</div>
-					<div v-else class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-primary" @click="updateBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
-					</div>
+					<button v-else  ref="Close" type="button" class="btn btn-primary" @click="updateBetriebsmittel(formData.betriebsmittelperson_id)">{{$p.t('ui', 'speichern')}}</button>
+				</template>
 					
-				</div>
-		</form-form>
-		
-		</div>
-
-
-
-
-
-		
+		</bs-modal>
+				
 	</div>`
 }
 
