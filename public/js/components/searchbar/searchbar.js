@@ -54,8 +54,8 @@ export default {
               </template>
             </div>
 
-            <div @[\`show.bs.collapse\`]="calcSearchSettingsExtent" class="collapse" id="searchSettings"  ref="settings" 
-                 class="searchbar_settings text-white" tabindex="-1">
+            <div id="searchSettings"  ref="settings" 
+                 class="top-100 end-0 searchbar_settings text-white collapse" tabindex="-1">
               <div class="d-flex flex-column m-3" v-if="this.searchoptions.types.length > 0">
               <span class="fw-light mb-2">Suche filtern nach:</span>  
               <template v-for="(type, index) in this.searchoptions.types" :key="type">
@@ -79,13 +79,18 @@ export default {
     },
     beforeMount: function() {
         this.updateSearchOptions();
+        
+    },
+    mounted(){
+        window.addEventListener('resize', (event) =>{
+            console.log(this.$refs.settings,"this is the refs of the settings")
+            this.$refs.settings.hide();
+            console.log("resizing")
+        }); 
+        //console.log(this.$refs.settings.show,"this are the refs")
     },
     methods: {
         
-        calcSearchSettingsExtent: function(){
-            this.$refs.settings.style.top = Math.floor(this.$refs.settingsbutton.offsetHeight  ) + 'px';
-            this.$refs.settings.style.right = 0;
-        },
 
         updateSearchOptions: function() {
             this.searchsettings.types = [];
