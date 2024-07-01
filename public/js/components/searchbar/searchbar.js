@@ -2,22 +2,21 @@ import person from "./person.js";
 import raum from "./raum.js";
 import employee from "./employee.js";
 import organisationunit from "./organisationunit.js";
+import {searchSettings, searchresult} from "./sharedSettings.js";
 
 export default {
-    props: [ "searchoptions", "searchfunction" ],
+    props: [ "searchoptions", "searchfunction","selectedtypes" ],
+    
     data: function() {
       return {
         searchtimer: null,
         hidetimer: null,
         showsettings: false,
-        searchsettings: {
-            searchstr: '',
-            types: []
-        },
-        showresult: false,        
-        searchresult: [],
+        searchsettings: searchSettings,
+        searchresult: searchresult,
+        showresult: false,  
         searching: false,
-        error: null
+        error: null,
       };
     },
     components: {
@@ -26,10 +25,13 @@ export default {
       employee: employee,
       organisationunit: organisationunit
     },
+   
     template: /*html*/`
           <form ref="searchform" class="d-flex me-3" action="javascript:void(0);" 
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
+           
             <div class="h-100 input-group me-2 bg-white">
+           
                 <input ref="searchbox" @keyup="this.search" @focus="this.showsearchresult" 
                     v-model="this.searchsettings.searchstr" class="form-control" 
                     type="search" :placeholder="'Search: '+ searchsettings.types.join(' / ')" aria-label="Search">
@@ -42,8 +44,8 @@ export default {
                 <i class="fas fa-spinner fa-spin fa-2x"></i>
               </div>
               <div v-else-if="this.error !== null">{{ this.error }}</div>
-              <div v-else-if="this.searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
-              <template v-else="" v-for="res in this.searchresult">
+              <div v-else-if="searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
+              <template v-else="" v-for="res in searchresult">
                 <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
                 <employee v-else-if="res.type === 'mitarbeiter'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                 <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
@@ -58,7 +60,7 @@ export default {
               <span class="fw-light mb-2">Suche filtern nach:</span>  
               <template v-for="(type, index) in this.searchoptions.types" :key="type">
                     <div class="form-check form-switch">
-                        <input class="fhc-switches form-check-input" type="checkbox" role="switch" :id="this.$.uid + 'search_type_' + index" :value="type" v-model="this.searchsettings.types" />
+                        <input class="fhc-switches form-check-input" type="checkbox" role="switch" :id="this.$.uid + 'search_type_' + index" :value="type" v-model="searchsettings.types"  />
                         <label class="ps-2 form-check-label non-selectable" :for="this.$.uid + 'search_type_' + index">{{ type }}</label>
                     </div>
                 </template>
@@ -69,14 +71,17 @@ export default {
     `,
     watch:{
         'searchsettings.types'(newValue){
-            // execute search with new searchsettings filters
             this.search();
+            
+            
         },
+        
     },
     beforeMount: function() {
         this.updateSearchOptions();
     },
     methods: {
+        
         calcSearchSettingsExtent: function(){
             this.$refs.settings.style.top = Math.floor(this.$refs.settingsbutton.offsetHeight  ) + 'px';
             this.$refs.settings.style.right = 0;
@@ -84,8 +89,8 @@ export default {
 
         updateSearchOptions: function() {
             this.searchsettings.types = [];
-            for( const idx in this.searchoptions.types ) {
-                this.searchsettings.types.push(this.searchoptions.types[idx]);
+            for( const idx in this.selectedtypes ) {
+                this.searchsettings.types.push(this.selectedtypes[idx]);
             }
         },
         calcSearchResultExtent: function() {
@@ -111,25 +116,26 @@ export default {
             }
         },
         callsearchapi: function() {            
-            var that = this;
             this.error = null;
-            this.searchresult = [];
+            this.searchresult.splice(0,this.searchresult.length);
             this.searching = true;
             this.showsearchresult();            
             this.searchfunction(this.searchsettings)
-            .then(function(response) {
+            .then(response=>{
                 if( response.data?.error === 1 ) {
-                    that.error = 'Bei der Suche ist ein Fehler aufgetreten.';
+                    this.error = 'Bei der Suche ist ein Fehler aufgetreten.';
                 } else {
-                    that.searchresult = response.data.data;
+                    for(let element of response.data.data){
+                        this.searchresult.push(element);
+                    }
                 }
             })
-            .catch(function(error) {
-                that.error = 'Bei der Suche ist ein Fehler aufgetreten.' 
+            .catch(error=> {
+                this.error = 'Bei der Suche ist ein Fehler aufgetreten.' 
                     + ' ' + error.message;
             })
-            .finally(function() {
-                that.searching = false;
+            .finally(()=> {
+                this.searching = false;
             });
         },
         refreshsearch: function() {

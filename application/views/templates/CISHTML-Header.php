@@ -31,7 +31,7 @@ if (!isset($menu)) {
 	<button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
-	<fhc-searchbar id="nav-search" class="px-2 d-lg-none fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>	
+	<fhc-searchbar id="nav-search" class="px-2 d-lg-none fhc-searchbar w-100" @updatesearchtypes="updatesearchtypes" :selectedtypes="selectedtypes" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>	
 	<a id="nav-logo" href="<?= site_url(''); ?>">
 		<img src="<?= base_url('/public/images/logo-300x160.png'); ?>" alt="Logo">
 	</a>
@@ -42,7 +42,7 @@ if (!isset($menu)) {
 			</button>
 		</div>
 		<div class="offcanvas-body p-0">
-			<fhc-searchbar id="nav-search" class="d-none d-lg-block fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
+			<fhc-searchbar id="nav-search" class="d-none d-lg-block fhc-searchbar w-100" @updatesearchtypes="updatesearchtypes" :selectedtypes="selectedtypes" :searchoptions="searchbaroptions"  :searchfunction="searchfunction"></fhc-searchbar>
 			<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
 				<img src="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" class="avatar rounded-circle"/>
 			</button>
