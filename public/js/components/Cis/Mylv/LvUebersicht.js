@@ -32,9 +32,20 @@ export default  {
                 // prepare the mailto link with all the emails from the students of the lv
                 this.emailAnStudierende = "mailto:"+res.data.join(",");
             });
+
+            this.$fhcApi.factory.addons.getAddonLink("lvinfo",this.event.lehrveranstaltung_id, this.event.studiensemester_kurzbz).then(res =>{
+                console.log(res,"this is the result from the api call");
+            });
         },
     },
     mounted(){
+        
+        
+        // make axios call to the active addons
+        /* $addon_obj->loadAddons();
+        foreach($addon_obj->result as $addon)
+        {
+        if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php')) */
         this.modal = this.$refs.modalContainer;
         
     },
