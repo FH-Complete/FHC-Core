@@ -245,18 +245,16 @@ function checkZeilenUmbruch()
 	{
 
 		$link='';
-		$name='';
 		$text='';
 
-		$name = 'Digitale Anwesenheiten';
-		$link= APP_ROOT."index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&sem_kurzbz=$angezeigtes_stsem";
+		$link= APP_ROOT."index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&sem_kurzbz=$angezeigtes_stsem&nav=false";
 
 		$menu[]=array
 		(
-			'id'=>'core_menu_anwesenheitslisten',
-			'position'=>'40',
-			'name'=> $name,
-			'icon'=>'../../../skin/images/button_listen.png',
+			'id'=>'core_menu_digitale_anwesenheitslisten',
+			'position'=>'50',
+			'name'=> $p->t('lehre/digiAnw'),
+			'icon'=>'../../../skin/images/button_kreuzerltool.png',
 			'link'=>$link,
 			'text'=>$text
 		);
@@ -268,7 +266,7 @@ function checkZeilenUmbruch()
 		$menu[]=array
 		(
 			'id'=>'core_menu_feedback',
-			'position'=>'50',
+			'position'=>'60',
 			'name'=>$p->t('lehre/feedback'),
 			'icon'=>'../../../skin/images/button_feedback.png',
 			'link'=>'feedback.php?lvid='.$lvid,
