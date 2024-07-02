@@ -2,7 +2,6 @@ import person from "./person.js";
 import raum from "./raum.js";
 import employee from "./employee.js";
 import organisationunit from "./organisationunit.js";
-import {searchSettings, searchresult} from "./sharedSettings.js";
 
 export default {
     props: [ "searchoptions", "searchfunction","selectedtypes" ],
@@ -12,8 +11,11 @@ export default {
         searchtimer: null,
         hidetimer: null,
         showsettings: false,
-        searchsettings: searchSettings,
-        searchresult: searchresult,
+        searchsettings: {
+            searchstr: '',
+            types: [],
+        },
+        searchresult: [],
         showresult: false,  
         searching: false,
         error: null,
