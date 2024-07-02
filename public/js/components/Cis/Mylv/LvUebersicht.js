@@ -58,7 +58,7 @@ export default  {
                         <span>{{item}}</span>
                         <i class="fa fa-file"></i>
                     </a>
-                    <a v-else :href="#">
+                    <a v-else href="#">
                         <span>{{item}}</span>
                         <i class="fa fa-file"></i>
                     </a>
