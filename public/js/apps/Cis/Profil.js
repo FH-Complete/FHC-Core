@@ -5,6 +5,7 @@ import ViewMitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterViewPr
 import fhcapifactory from "../api/fhcapifactory.js";
 import Loading from "../../components/Loader.js";
 import Phrasen from "../../plugin/Phrasen.js";
+import fhcapi from "../../plugin/FhcApi.js";
 
 Vue.$fhcapi = fhcapifactory;
 Vue.$collapseFormatter = function (data) {
@@ -373,7 +374,7 @@ const profilApp = Vue.createApp({
     //? uid contains the last part of the uri
     let uid = location.pathname.split("/").pop();
 
-    Vue.$fhcapi.UserData.getView(uid).then((res) => {
+    this.$fhcApi.factory.profil.getView(uid).then((res) => {
       if (!res.data) {
         this.notFoundUID = uid;
       } else {
@@ -403,4 +404,5 @@ const profilApp = Vue.createApp({
 profilApp
   .use(primevue.config.default, { zIndex: { overlay: 9999 } })
   .use(Phrasen)
+  .use(fhcapi)
   .mount("#content");

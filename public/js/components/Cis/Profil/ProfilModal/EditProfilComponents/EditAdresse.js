@@ -43,6 +43,7 @@ export default {
         this.data.plz > 999 &&
         this.data.plz < 32000
       ) {
+        
         Vue.$fhcapi.UserData.getGemeinden(this.data.nation, this.data.plz).then(
           (res) => {
             if (res.data.length) {
@@ -91,6 +92,8 @@ export default {
   },
 
   created() {
+
+
     Vue.$fhcapi.UserData.getAllNationen().then((res) => {
       this.nationenList = res.data;
       this.getGemeinde();
