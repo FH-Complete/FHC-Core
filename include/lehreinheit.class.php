@@ -1158,6 +1158,63 @@ public function lehreinheitInfo($lvid,$angezeigtes_stsem,$lehrfach_id)
 
 	return $ret;
 }
+
+public function lehrfach_id_mitarbeiter($angezeigtes_stsem,$user,$lvid)
+{
+	$qry = "SELECT
+            distinct lehrfach_id
+            FROM
+                lehre.tbl_lehreinheit
+                JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+            WHERE
+                studiensemester_kurzbz=".$this->db_add_param($angezeigtes_stsem)."
+                AND mitarbeiter_uid=".$this->db_add_param($user)."
+                AND lehrveranstaltung_id=".$this->db_add_param($lvid, FHC_INTEGER);
+
+	
+	$result = $this->db_query($qry);
+	if (!$result)
+	{
+		$this->errormsg=$this->db_last_error().$qry;
+		return false;
+	}
+	$ret = array();
+
+	while($row = $this->db_fetch_object($result))
+	{
+		$ret[] = $row;
+	}
+
+	return $ret;
+}
+
+public function lehrfach_id_studierender($lvid,$angezeigtes_stsem,$user)
+{
+	$qry = "SELECT distinct lehrfach_id
+            FROM
+                campus.vw_student_lehrveranstaltung
+            WHERE
+                lehrveranstaltung_id=".$this->db_add_param($lvid, FHC_INTEGER)."
+                AND studiensemester_kurzbz=".$this->db_add_param($angezeigtes_stsem)."
+                AND uid=".$this->db_add_param($user);
+	
+	$result = $this->db_query($qry);
+	if (!$result)
+	{
+		$this->errormsg=$this->db_last_error().$qry;
+		return false;
+	}
+	$ret = array();
+
+	while($row = $this->db_fetch_object($result))
+	{
+		$ret[] = $row;
+	}
+
+	return $ret;
+}
+
+
 }
 
 
