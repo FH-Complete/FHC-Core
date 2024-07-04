@@ -9,8 +9,11 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
 class OrganigrammTest extends JOB_Controller
 {
     const DEFAULT_XOFFSET = 100;
+    const DEFAULT_YOFFSET = 180;
+    const RENDER_CHILDS_HORIZONTAL  = 1;
+    const RENDER_CHILDS_VERTICAL    = 2;
     
-    protected $xoffsetperlevel;
+    protected $maxxoffset;
 
     public function __construct()
 	{
@@ -18,7 +21,7 @@ class OrganigrammTest extends JOB_Controller
 	    
 	    $this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 	    
-	    $this->xoffsetperlevel = array();
+	    $this->maxxoffset = self::DEFAULT_XOFFSET;
 	}
 	
 	public function getAllActiveOes()
@@ -70,12 +73,13 @@ EOSQL;
 		{
 		    $oe->parent = NULL;
 		    $oe->childs = array();
+		    $oe->renderchilds = self::RENDER_CHILDS_HORIZONTAL;
 		    $assocoes[$oe->oe_kurzbz] = $oe;
 		}
 		
 		foreach($assocoes as &$assocoe)
 		{
-		    if( $assocoe->oe_parent_kurzbz === NULL )
+		    if( $assocoe->oe_parent_kurzbz === NULL || $assocoe->organisationseinheittyp_kurzbz === 'Fakultaet' )
 		    {
 			$roots[$assocoe->oe_kurzbz] = $assocoe;
 		    }
@@ -114,7 +118,7 @@ HEADER;
 
 STARTDIAGRAMM;
 
-			$this->renderOE($root, 0);
+			$this->renderOE($root, 0, 0);
   
 			echo <<<ENDDIAGRAMM
         </root>
@@ -145,66 +149,83 @@ FOOTER;
 	    }
 	}
 
-    protected function renderOE($oe, $level) 
+    protected function renderOE($oe, $level, $parentrenderedchildcount) 
     {	
-	$width	    = 200;
-	$height	    = 100;
-	$spacing    = 80;
+	$width	   = 200;
+	$height	   = 100;
+	$spacing   = 80;
 	$nextlevel = $level + 1;
-	$ownchildcount = 0;
-	$firstelementinlevel = false;
+	$renderedchildcount = 0;
 	
-	if( !isset($this->xoffsetperlevel[$level]) )
+	$curxoffset = $this->maxxoffset;
+	
+	if( count($oe->childs) > 0 )
 	{
-	    $this->xoffsetperlevel[$level] = (object) array(
-		'min' => self::DEFAULT_XOFFSET, 
-		'max' => self::DEFAULT_XOFFSET
-	    );
-	    $firstelementinlevel = true;
-	}
-	
-	fwrite(STDERR, print_r($this->xoffsetperlevel, true) . PHP_EOL);
-	
-	foreach($oe->childs AS $child) 
-	{	
-	    $this->renderOE($child, $nextlevel);
-	    $ownchildcount++;
-	}
-
-	if( count($oe->childs) === 0 )
-	{
-	    if( !isset($this->xoffsetperlevel[$nextlevel]) )
+	    if( !isset($oe->childsxoffset) )
 	    {
-		$this->xoffsetperlevel[$nextlevel] = (object) array(
-		    'min' => $this->xoffsetperlevel[$level]->max + $width + $spacing, 
-		    'max' => $this->xoffsetperlevel[$level]->max + $width + $spacing
+		$oe->childsxoffset = (object) array(
+		    'min' => $curxoffset,
+		    'max' => $curxoffset
 		);
 	    }
-	    else
+
+	    $nurLehrgaengeOderStudiengaengeOhneKinder = true;
+	    foreach($oe->childs AS $oechild )
 	    {
-		$this->xoffsetperlevel[$nextlevel]->max = ($this->xoffsetperlevel[$level]->max + $width + $spacing);
+		if( !(($oechild->organisationseinheittyp_kurzbz == 'Studiengang' 
+		    || $oechild->organisationseinheittyp_kurzbz == 'Lehrgang')
+		    && count($oechild->childs) === 0) )
+		{
+		    $nurLehrgaengeOderStudiengaengeOhneKinder = false;
+		    break;
+		}
+	    }
+	    if( $nurLehrgaengeOderStudiengaengeOhneKinder ) 
+	    {
+		$oe->renderchilds = self::RENDER_CHILDS_VERTICAL;
+	    }
+	    
+	    foreach($oe->childs AS $child) 
+	    {	
+		$oe->childsxoffset->max = $this->renderOE($child, $nextlevel, $renderedchildcount);
+		$renderedchildcount++;
+	    }
+
+	    if(  count($oe->childs) === $renderedchildcount )
+	    {
+		$curxoffset = $oe->childsxoffset->min + 
+		    floor((($oe->childsxoffset->max - $oe->childsxoffset->min) / 2)) - 
+		    floor((($width + $spacing) / 2));
 	    }
 	}
 
-	if( count($oe->childs) > 0 && count($oe->childs) === $ownchildcount )
-	{
-	    $this->xoffsetperlevel[$level]->max = 
-		floor((($this->xoffsetperlevel[$nextlevel]->max - $this->xoffsetperlevel[$nextlevel]->min) / 2)) - floor(($width / 2)); 
-	    if( $firstelementinlevel )
-	    {
-		$this->xoffsetperlevel[$level]->min = $this->xoffsetperlevel[$level]->max;
-	    }
-	}		
 
-	$x		= $this->xoffsetperlevel[$level]->max;
-	$y		= 180 + ($level * ($height + $spacing));
+	if( $oe->parent !== null && $oe->parent->renderchilds === self::RENDER_CHILDS_VERTICAL ) 
+	{
+/*	    
+	    if($parentrenderedchildcount === 0)
+	    {
+		$curxoffset += ($width + $spacing);
+		$this->maxxoffset = $curxoffset;
+	    }
+ */
+	    $x = $curxoffset;
+	    $y = self::DEFAULT_YOFFSET
+		+ (($level - 1) * ($height + $spacing))
+		+ (($parentrenderedchildcount + 1) * ($height + floor($spacing / 2)));
+	}
+	else
+	{
+	    $x = $curxoffset;
+	    $y = self::DEFAULT_YOFFSET + ($level * ($height + $spacing));
+	}
 	$bezeichnung = htmlspecialchars($oe->bezeichnung);
 	$leitung = ($oe->leitung_uid !== null) ? htmlspecialchars($oe->leitung_uid) : 'N.N.';
 	$fillcolors = array(
-	    'Team'		=> '#ffe6cc',
-	    'Abteilung'	=> '#e6ffcc',
-	    'Studiengang'	=> '#cce6ff',
-	    'Lehrgang'	=> '#e6ccff'
+	    'Team'	    => '#ffe6cc',
+	    'Abteilung'	    => '#e6ffcc',
+	    'Studiengang'   => '#cce6ff',
+	    'Lehrgang'	    => '#e6ccff'
 	);
 	$fillcolor = (isset($fillcolors[$oe->organisationseinheittyp_kurzbz])) ? $fillcolors[$oe->organisationseinheittyp_kurzbz] : '#ffffff';
 	echo <<<OE
@@ -216,14 +237,53 @@ OE;
 
 	if( $oe->oe_parent_kurzbz !== NULL ) 
 	{
+	    $exitX = '0.5';
+	    $exitY = '1';
+	    $entryX = '0.5';
+	    $entryY = '0';
+	    $edgegeom = '<mxGeometry relative="1" as="geometry" />';
+	    if( $oe->parent !== null && $oe->parent->renderchilds === self::RENDER_CHILDS_VERTICAL) 
+	    {
+		$exitX = '0';
+		$exitY = '0.5';
+		$entryX = '0';
+		$entryY = '0.5';
+		$pointx = $x - floor($spacing / 2);
+		$pointy = $y + floor($height / 2);
+		$edgegeom = <<<EDGEPOINTS
+	      <mxGeometry relative="1" as="geometry">
+		<Array as="points">
+		  <mxPoint x="{$pointx}" y="{$pointy}" />
+		</Array>
+	      </mxGeometry>
+EDGEPOINTS;
+	    }
 	    echo <<<EDGE
-	    <mxCell id="edge_{$oe->oe_parent_kurzbz}_{$oe->oe_kurzbz}" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=12 12;" parent="1" source="{$oe->oe_parent_kurzbz}" target="{$oe->oe_kurzbz}" edge="1">
-	      <mxGeometry relative="1" as="geometry" />
+	    <mxCell id="edge_{$oe->oe_parent_kurzbz}_{$oe->oe_kurzbz}" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;exitX={$exitX};exitY={$exitY};exitDx=0;exitDy=0;entryX={$entryX};entryY={$entryY};entryDx=0;entryDy=0;dashed=1;dashPattern=12 12;" parent="1" source="{$oe->oe_parent_kurzbz}" target="{$oe->oe_kurzbz}" edge="1">
+	      {$edgegeom}
 	    </mxCell>
 
 EDGE;
 	}
 
-	$this->xoffsetperlevel[$level]->max = ($x + $width + $spacing);
-    }	
+	if( $oe->parent !== null && $oe->parent->renderchilds === self::RENDER_CHILDS_VERTICAL ) 
+	{
+	    if( count($oe->parent->childs) === ($parentrenderedchildcount + 1) ) 
+	    {
+		if( $this->maxxoffset <  ($x + $width + $spacing) )
+		{
+		    $this->maxxoffset = ($x + $width + $spacing);
+		}
+		return ($x + $width + $spacing);
+	    }
+	    return $x;
+	}
+	
+	if( $this->maxxoffset <  ($x + $width + $spacing) )
+	{
+	    $this->maxxoffset = ($x + $width + $spacing);
+	}
+	
+	return ($x + $width + $spacing);
+    }
 }
