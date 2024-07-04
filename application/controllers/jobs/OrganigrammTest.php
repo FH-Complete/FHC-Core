@@ -79,16 +79,21 @@ EOSQL;
 		
 		foreach($assocoes as &$assocoe)
 		{
-		    if( $assocoe->oe_parent_kurzbz === NULL || $assocoe->organisationseinheittyp_kurzbz === 'Fakultaet' )
+		    if( $assocoe->oe_parent_kurzbz === NULL )
 		    {
 			$roots[$assocoe->oe_kurzbz] = $assocoe;
 		    }
 		    else
-		    {
+		    {						
 			if( isset($assocoes[$assocoe->oe_parent_kurzbz]) ) 
 			{
 			    $assocoe->parent = $assocoes[$assocoe->oe_parent_kurzbz];
 			    $assocoes[$assocoe->oe_parent_kurzbz]->childs[] = $assocoe;
+			    
+			    if( $assocoe->organisationseinheittyp_kurzbz === 'Fakultaet' )
+			    {
+				$roots[$assocoe->oe_kurzbz] = $assocoe;
+			    }
 			}
 			else
 			{
@@ -108,6 +113,7 @@ HEADER;
 
 		    foreach($roots AS &$root)
 		    {
+			$this->resetChildsOffset($root);
 
 			echo <<<STARTDIAGRAMM
   <diagram id="diagram_{$root->oe_kurzbz}" name="{$root->bezeichnung}">
@@ -149,6 +155,19 @@ FOOTER;
 	    }
 	}
 
+    protected function resetChildsOffset($oe) 
+    {
+	if( isset($oe->childsxoffset) )
+	{
+	    unset($oe->childsxoffset);
+	}
+	
+	foreach($oe->childs AS $oechild )
+	{
+	    $this->resetChildsOffset($oechild);
+	}
+    }
+
     protected function renderOE($oe, $level, $parentrenderedchildcount) 
     {	
 	$width	   = 200;
@@ -172,9 +191,12 @@ FOOTER;
 	    $nurLehrgaengeOderStudiengaengeOhneKinder = true;
 	    foreach($oe->childs AS $oechild )
 	    {
+/*		
 		if( !(($oechild->organisationseinheittyp_kurzbz == 'Studiengang' 
 		    || $oechild->organisationseinheittyp_kurzbz == 'Lehrgang')
 		    && count($oechild->childs) === 0) )
+ */
+		if( !(count($oechild->childs) === 0) )
 		{
 		    $nurLehrgaengeOderStudiengaengeOhneKinder = false;
 		    break;
