@@ -282,7 +282,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$qualifikationsziel->getAll($studienordnung_id);
 			if (isset($qualifikationsziel->result[0]))
 			{
-				$qualifikation_beschreibung = $qualifikationsziel->result[0]->data[1]->elements[0];
+				//vom Feld Lernergebnisse (vorher Qualifikationsziele)
+				$qualifikation_beschreibung = $qualifikationsziel->result[0]->data[2]->fixed[0];
 				$qualifikation_beschreibung = json2odt($qualifikation_beschreibung);
 				echo "<lernergebnisse><![CDATA[$qualifikation_beschreibung]]></lernergebnisse>";
 			}
