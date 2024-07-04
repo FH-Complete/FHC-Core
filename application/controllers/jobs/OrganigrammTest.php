@@ -8,8 +8,12 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
  */
 class OrganigrammTest extends JOB_Controller
 {
-    const DEFAULT_XOFFSET = 100;
-    const DEFAULT_YOFFSET = 180;
+    const DEFAULT_XOFFSET = 50;
+    const DEFAULT_YOFFSET = 25;
+    const DEFAULT_WIDTH	  = 165;
+    const DEFAULT_HEIGHT  = 50;
+    const DEFAULT_SPACING = 50;
+    const DEFAULT_FONTSIZE = 8;
     const RENDER_CHILDS_HORIZONTAL  = 1;
     const RENDER_CHILDS_VERTICAL    = 2;
     
@@ -113,6 +117,7 @@ HEADER;
 
 		    foreach($roots AS &$root)
 		    {
+			$this->maxxoffset = self::DEFAULT_XOFFSET;
 			$this->resetChildsOffset($root);
 
 			echo <<<STARTDIAGRAMM
@@ -170,9 +175,10 @@ FOOTER;
 
     protected function renderOE($oe, $level, $parentrenderedchildcount) 
     {	
-	$width	   = 200;
-	$height	   = 100;
-	$spacing   = 80;
+	$width	   = self::DEFAULT_WIDTH;
+	$height	   = self::DEFAULT_HEIGHT;
+	$spacing   = self::DEFAULT_SPACING;
+	$fontsize  = self::DEFAULT_FONTSIZE;
 	$nextlevel = $level + 1;
 	$renderedchildcount = 0;
 	
@@ -251,7 +257,7 @@ FOOTER;
 	);
 	$fillcolor = (isset($fillcolors[$oe->organisationseinheittyp_kurzbz])) ? $fillcolors[$oe->organisationseinheittyp_kurzbz] : '#ffffff';
 	echo <<<OE
-	    <mxCell id="{$oe->oe_kurzbz}" value="&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;[{$oe->organisationseinheittyp_kurzbz}]&lt;/font&gt;&lt;/div&gt;&lt;b style=&quot;&quot;&gt;{$bezeichnung}&lt;/b&gt;&lt;div&gt;({$leitung})&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=center;verticalAlign=middle;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fillColor={$fillcolor};" parent="1" vertex="1">
+	    <mxCell id="{$oe->oe_kurzbz}" value="&lt;font style=&quot;font-size: {$fontsize}px;&quot;&gt;&lt;div style=&quot;&quot;&gt;[{$oe->organisationseinheittyp_kurzbz}]&lt;/div&gt;&lt;b style=&quot;&quot;&gt;{$bezeichnung}&lt;/b&gt;&lt;div&gt;({$leitung})&lt;/div&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;verticalAlign=middle;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fillColor={$fillcolor};" parent="1" vertex="1">
 	      <mxGeometry x="{$x}" y="{$y}" width="{$width}" height="{$height}" as="geometry" />
 	    </mxCell>
 
