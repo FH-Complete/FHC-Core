@@ -27,6 +27,9 @@ export default  {
     },
     methods:{
         showModal: function(){
+            this.$fhcApi.factory.addons.getLvMenu(this.event.lehrveranstaltung_id, this.event.studiensemester_kurzbz).then(res =>{
+                console.log("this is the addon endpoint res",res);
+            });
             this.$fhcApi.factory.lehre.getStudentenMail(this.event.lehreinheit_id).then(res =>
             {
                 // prepare the mailto link with all the emails from the students of the lv
@@ -39,6 +42,7 @@ export default  {
         },
     },
     mounted(){
+        
         
         
         // make axios call to the active addons
