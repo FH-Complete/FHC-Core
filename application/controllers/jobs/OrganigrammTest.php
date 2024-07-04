@@ -8,11 +8,11 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
  */
 class OrganigrammTest extends JOB_Controller
 {
-    const DEFAULT_XOFFSET = 50;
-    const DEFAULT_YOFFSET = 25;
-    const DEFAULT_WIDTH	  = 165;
+    const DEFAULT_XOFFSET = 40;
+    const DEFAULT_YOFFSET = 30;
+    const DEFAULT_WIDTH	  = 160;
     const DEFAULT_HEIGHT  = 50;
-    const DEFAULT_SPACING = 50;
+    const DEFAULT_SPACING = 40;
     const DEFAULT_FONTSIZE = 8;
     const RENDER_CHILDS_HORIZONTAL  = 1;
     const RENDER_CHILDS_VERTICAL    = 2;
@@ -35,7 +35,11 @@ class OrganigrammTest extends JOB_Controller
 	    $sql = <<<EOSQL
 		SELECT 
 		  oe.oe_kurzbz, 
-		  oe.oe_parent_kurzbz, 
+		  CASE 
+		      WHEN oe.oe_parent_kurzbz = 'atw' THEN 'gst'
+		      WHEN oe.oe_parent_kurzbz = 'etw' THEN 'gst'
+		      ELSE oe.oe_parent_kurzbz
+		  END AS oe_parent_kurzbz, 
 		  oe.bezeichnung, 
 		  oe.organisationseinheittyp_kurzbz, 
 		  STRING_AGG(
@@ -56,7 +60,8 @@ class OrganigrammTest extends JOB_Controller
 		  LEFT JOIN public.tbl_benutzer b USING(uid) 
 		  LEFT JOIN public.tbl_person p USING(person_id) 
 		WHERE 
-		  oe.aktiv = true 
+		  oe.aktiv = true
+		  AND oe.oe_kurzbz NOT IN ('betriebsrat', 'oeh', 'FUEWahl', 'atw', 'etw', 'gf20')
 		GROUP BY 
 		  oe.oe_kurzbz, 
 		  oe.oe_parent_kurzbz, 
@@ -87,10 +92,6 @@ EOSQL;
 		
 		foreach($assocoes as &$assocoe)
 		{
-		    if( in_array($assocoe->oe_kurzbz, array('depAngewandteMath', 'depEntrepreneurshipComm')) )
-		    {
-			file_put_contents( "php://stderr", print_r($assocoe, true), FILE_APPEND);
-		    }
 		    if( $assocoe->oe_parent_kurzbz === NULL )
 		    {
 			$roots[$assocoe->oe_kurzbz] = $assocoe;
@@ -99,7 +100,8 @@ EOSQL;
 			    'Lehrgang',
 			    'Studiengang',
 			    'Kompetenzfeld',
-			    'Forschungsfeld'
+			    'Forschungsfeld',
+			    'Container'
 			);
 		    }
 		    else
@@ -129,13 +131,13 @@ EOSQL;
 <mxfile modified="{$modified}" host="Electron" agent="{$agent}" type="device" pages="{$pages}">
 
 HEADER;
-		    file_put_contents( "php://stderr", count($roots), FILE_APPEND);
+
 		    foreach($roots AS &$root)
 		    {
 			$this->maxxoffset = self::DEFAULT_XOFFSET;
 			$this->donotrenderchildsoftype = $root->donotrenderchildsoftype;
-			$this->resetChildsOffset($root);
-
+			$this->prepareChildsToRender($root);
+			
 			$bezeichnung = htmlspecialchars($root->bezeichnung);
 			
 			echo <<<STARTDIAGRAMM
@@ -178,20 +180,44 @@ FOOTER;
 	    }
 	}
 
-    protected function resetChildsOffset($oe) 
+    protected function prepareChildsToRender(&$oe)
     {
 	$oe->childstorender = array();
+	$oe->renderchilds = self::RENDER_CHILDS_HORIZONTAL;
 	if( isset($oe->childsxoffset) )
 	{
 	    unset($oe->childsxoffset);
 	}
 	
-	foreach($oe->childs AS $oechild )
+	foreach($oe->childs AS &$oechild )
 	{
-	    $this->resetChildsOffset($oechild);
-	}	
+	    $this->prepareChildsToRender($oechild);
+	    if( !in_array($oechild->organisationseinheittyp_kurzbz, $this->donotrenderchildsoftype) )
+	    {
+		$oe->childstorender[] = $oechild;
+	    }
+	}
+	
+	$nurLehrgaengeOderStudiengaengeOhneKinder = true;
+	foreach($oe->childstorender AS &$oechildtorender )
+	{
+/*		
+	    if( !(($oechild->organisationseinheittyp_kurzbz == 'Studiengang' 
+		|| $oechild->organisationseinheittyp_kurzbz == 'Lehrgang')
+		&& count($oechild->childs) === 0) )
+*/
+	    if( !(count($oechildtorender->childstorender) === 0) )
+	    {
+		$nurLehrgaengeOderStudiengaengeOhneKinder = false;
+	    }
+	}
+	
+	if( $nurLehrgaengeOderStudiengaengeOhneKinder && $oe->parent !== NULL ) 
+	{
+	    $oe->renderchilds = self::RENDER_CHILDS_VERTICAL;
+	}
     }
-
+    
     protected function renderOE($oe, $level, $parentrenderedchildcount) 
     {	
 	$width	   = self::DEFAULT_WIDTH;
@@ -203,7 +229,7 @@ FOOTER;
 	
 	$curxoffset = $this->maxxoffset;
 	
-	if( count($oe->childs) > 0 )
+	if( count($oe->childstorender) > 0 )
 	{
 	    if( !isset($oe->childsxoffset) )
 	    {
@@ -212,36 +238,19 @@ FOOTER;
 		    'max' => $curxoffset
 		);
 	    }
-
-	    $nurLehrgaengeOderStudiengaengeOhneKinder = true;
-	    foreach($oe->childs AS &$oechild )
-	    {
-/*		
-		if( !(($oechild->organisationseinheittyp_kurzbz == 'Studiengang' 
-		    || $oechild->organisationseinheittyp_kurzbz == 'Lehrgang')
-		    && count($oechild->childs) === 0) )
- */
-		if( !(count($oechild->childs) === 0) )
-		{
-		    $nurLehrgaengeOderStudiengaengeOhneKinder = false;
-		}
-		if( !in_array($oechild->organisationseinheittyp_kurzbz, $this->donotrenderchildsoftype) )
-		{
-		    $oe->childstorender[] = $oechild;
-		}
-	    }
-	    if( $nurLehrgaengeOderStudiengaengeOhneKinder ) 
-	    {
-		$oe->renderchilds = self::RENDER_CHILDS_VERTICAL;
-	    }
 	    
 	    foreach($oe->childstorender AS $child) 
 	    {	
-		$oe->childsxoffset->max = $this->renderOE($child, $nextlevel, $renderedchildcount);
+		$ret = $this->renderOE($child, $nextlevel, $renderedchildcount);
 		$renderedchildcount++;
+		if( $renderedchildcount === 1 ) 
+		{
+		    $oe->childsxoffset->min = $ret->minx;
+		}
+		$oe->childsxoffset->max = $ret->maxx;
 	    }
 
-	    if( count($oe->childstorender) > 0 && count($oe->childstorender) === $renderedchildcount )
+	    if( count($oe->childstorender) === $renderedchildcount )
 	    {
 		$curxoffset = $oe->childsxoffset->min + 
 		    floor((($oe->childsxoffset->max - $oe->childsxoffset->min) / 2)) - 
@@ -252,13 +261,6 @@ FOOTER;
 
 	if( $oe->parent !== null && $oe->parent->renderchilds === self::RENDER_CHILDS_VERTICAL ) 
 	{
-/*	    
-	    if($parentrenderedchildcount === 0)
-	    {
-		$curxoffset += ($width + $spacing);
-		$this->maxxoffset = $curxoffset;
-	    }
- */
 	    $x = $curxoffset;
 	    $y = self::DEFAULT_YOFFSET
 		+ (($level - 1) * ($height + $spacing))
@@ -272,10 +274,14 @@ FOOTER;
 	$bezeichnung = htmlspecialchars($oe->bezeichnung);
 	$leitung = ($oe->leitung_uid !== null) ? htmlspecialchars($oe->leitung_uid) : 'N.N.';
 	$fillcolors = array(
-	    'Team'	    => '#ffe6cc',
-	    'Abteilung'	    => '#e6ffcc',
-	    'Studiengang'   => '#cce6ff',
-	    'Lehrgang'	    => '#e6ccff'
+	    'Team'	     => '#ffe6cc',
+	    'Abteilung'	     => '#e6ffcc',
+	    'Studiengang'    => '#cce6ff',
+	    'Lehrgang'	     => '#e6ccff',
+	    'Fakultaet'	     => '#f8cecc',
+	    'Department'     => '#fff2cc',
+	    'Forschungsfeld' => '#e1d5e7',
+	    'Kompetenzfeld'  => '#f5f5f5'
 	);
 	$fillcolor = (isset($fillcolors[$oe->organisationseinheittyp_kurzbz])) ? $fillcolors[$oe->organisationseinheittyp_kurzbz] : '#ffffff';
 	echo <<<OE
@@ -309,7 +315,7 @@ OE;
 EDGEPOINTS;
 	    }
 	    echo <<<EDGE
-	    <mxCell id="edge_{$oe->oe_parent_kurzbz}_{$oe->oe_kurzbz}" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;exitX={$exitX};exitY={$exitY};exitDx=0;exitDy=0;entryX={$entryX};entryY={$entryY};entryDx=0;entryDy=0;dashed=1;dashPattern=12 12;" parent="1" source="{$oe->oe_parent_kurzbz}" target="{$oe->oe_kurzbz}" edge="1">
+	    <mxCell id="edge_{$oe->oe_parent_kurzbz}_{$oe->oe_kurzbz}" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;exitX={$exitX};exitY={$exitY};exitDx=0;exitDy=0;entryX={$entryX};entryY={$entryY};entryDx=0;entryDy=0;" parent="1" source="{$oe->oe_parent_kurzbz}" target="{$oe->oe_kurzbz}" edge="1">
 	      {$edgegeom}
 	    </mxCell>
 
@@ -324,9 +330,15 @@ EDGE;
 		{
 		    $this->maxxoffset = ($x + $width + $spacing);
 		}
-		return ($x + $width + $spacing);
+		return (object) array(
+		    'minx' => $curxoffset,
+		    'maxx' => ($x + $width + $spacing)
+		);
 	    }
-	    return $x;
+	    return (object) array( 
+		'minx' => $curxoffset,
+		'maxx' => $x
+	    );
 	}
 	
 	if( $this->maxxoffset <  ($x + $width + $spacing) )
@@ -334,6 +346,9 @@ EDGE;
 	    $this->maxxoffset = ($x + $width + $spacing);
 	}
 	
-	return ($x + $width + $spacing);
+	return (object) array(
+	    'minx' => $curxoffset,
+	    'maxx' => ($x + $width + $spacing)
+	);
     }
 }
