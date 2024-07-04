@@ -18,6 +18,7 @@ class OrganigrammTest extends JOB_Controller
     const RENDER_CHILDS_VERTICAL    = 2;
     
     protected $maxxoffset;
+    protected $donotrenderchildsoftype;
 
     public function __construct()
 	{
@@ -26,6 +27,7 @@ class OrganigrammTest extends JOB_Controller
 	    $this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 	    
 	    $this->maxxoffset = self::DEFAULT_XOFFSET;
+	    $this->donotrenderchildsoftype = array();
 	}
 	
 	public function getAllActiveOes()
@@ -78,14 +80,27 @@ EOSQL;
 		    $oe->parent = NULL;
 		    $oe->childs = array();
 		    $oe->renderchilds = self::RENDER_CHILDS_HORIZONTAL;
+		    $oe->childstorender = array();
+		    $oe->donotrenderchildsoftype = array();
 		    $assocoes[$oe->oe_kurzbz] = $oe;
 		}
 		
 		foreach($assocoes as &$assocoe)
 		{
+		    if( in_array($assocoe->oe_kurzbz, array('depAngewandteMath', 'depEntrepreneurshipComm')) )
+		    {
+			file_put_contents( "php://stderr", print_r($assocoe, true), FILE_APPEND);
+		    }
 		    if( $assocoe->oe_parent_kurzbz === NULL )
 		    {
 			$roots[$assocoe->oe_kurzbz] = $assocoe;
+			$assocoe->donotrenderchildsoftype = array(
+			    'Team',
+			    'Lehrgang',
+			    'Studiengang',
+			    'Kompetenzfeld',
+			    'Forschungsfeld'
+			);
 		    }
 		    else
 		    {						
@@ -114,14 +129,17 @@ EOSQL;
 <mxfile modified="{$modified}" host="Electron" agent="{$agent}" type="device" pages="{$pages}">
 
 HEADER;
-
+		    file_put_contents( "php://stderr", count($roots), FILE_APPEND);
 		    foreach($roots AS &$root)
 		    {
 			$this->maxxoffset = self::DEFAULT_XOFFSET;
+			$this->donotrenderchildsoftype = $root->donotrenderchildsoftype;
 			$this->resetChildsOffset($root);
 
+			$bezeichnung = htmlspecialchars($root->bezeichnung);
+			
 			echo <<<STARTDIAGRAMM
-  <diagram id="diagram_{$root->oe_kurzbz}" name="{$root->bezeichnung}">
+  <diagram id="diagram_{$root->oe_kurzbz}" name="{$bezeichnung}">
     <mxGraphModel dx="1177" dy="687" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
@@ -162,6 +180,7 @@ FOOTER;
 
     protected function resetChildsOffset($oe) 
     {
+	$oe->childstorender = array();
 	if( isset($oe->childsxoffset) )
 	{
 	    unset($oe->childsxoffset);
@@ -170,7 +189,7 @@ FOOTER;
 	foreach($oe->childs AS $oechild )
 	{
 	    $this->resetChildsOffset($oechild);
-	}
+	}	
     }
 
     protected function renderOE($oe, $level, $parentrenderedchildcount) 
@@ -195,7 +214,7 @@ FOOTER;
 	    }
 
 	    $nurLehrgaengeOderStudiengaengeOhneKinder = true;
-	    foreach($oe->childs AS $oechild )
+	    foreach($oe->childs AS &$oechild )
 	    {
 /*		
 		if( !(($oechild->organisationseinheittyp_kurzbz == 'Studiengang' 
@@ -205,7 +224,10 @@ FOOTER;
 		if( !(count($oechild->childs) === 0) )
 		{
 		    $nurLehrgaengeOderStudiengaengeOhneKinder = false;
-		    break;
+		}
+		if( !in_array($oechild->organisationseinheittyp_kurzbz, $this->donotrenderchildsoftype) )
+		{
+		    $oe->childstorender[] = $oechild;
 		}
 	    }
 	    if( $nurLehrgaengeOderStudiengaengeOhneKinder ) 
@@ -213,13 +235,13 @@ FOOTER;
 		$oe->renderchilds = self::RENDER_CHILDS_VERTICAL;
 	    }
 	    
-	    foreach($oe->childs AS $child) 
+	    foreach($oe->childstorender AS $child) 
 	    {	
 		$oe->childsxoffset->max = $this->renderOE($child, $nextlevel, $renderedchildcount);
 		$renderedchildcount++;
 	    }
 
-	    if(  count($oe->childs) === $renderedchildcount )
+	    if( count($oe->childstorender) > 0 && count($oe->childstorender) === $renderedchildcount )
 	    {
 		$curxoffset = $oe->childsxoffset->min + 
 		    floor((($oe->childsxoffset->max - $oe->childsxoffset->min) / 2)) - 
@@ -296,7 +318,7 @@ EDGE;
 
 	if( $oe->parent !== null && $oe->parent->renderchilds === self::RENDER_CHILDS_VERTICAL ) 
 	{
-	    if( count($oe->parent->childs) === ($parentrenderedchildcount + 1) ) 
+	    if( count($oe->parent->childstorender) === ($parentrenderedchildcount + 1) ) 
 	    {
 		if( $this->maxxoffset <  ($x + $width + $spacing) )
 		{
