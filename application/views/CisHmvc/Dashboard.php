@@ -1,6 +1,7 @@
 <?php
 	$includesArray = array(
 		'title' => 'FH-Complete',
+		'tabulator5'=>true,
 		'customJSModules' => ['public/js/apps/Dashboard/Fhc.js'],
 		'customCSSs' => [
 			'public/css/components/dashboard.css'
