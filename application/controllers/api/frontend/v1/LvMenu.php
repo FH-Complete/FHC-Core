@@ -66,6 +66,7 @@ class LvMenu extends FHCAPI_Controller
 		require_once(FHCPATH.'include/studiengang.class.php');
 		require_once(FHCPATH.'include/phrasen.class.php');
 		require_once(FHCPATH.'include/lvangebot.class.php');
+		require_once(FHCPATH.'include/lehre_tools.class.php');
 
 		// get the sprache
 		$sprache = getSprache();
@@ -247,39 +248,49 @@ class LvMenu extends FHCAPI_Controller
 
 		// Addons Menu Logic
 		// ##########################################################################################		
-        Events::trigger('lvMenuBuild', 
+        $params = [
+			'lvid'=>$lvid,
+			'studiensemester_kurzbz'=>$studiensemester_kurzbz,
+			'studiengang_kz'=>$studiengang_kz,
+			'p'=>$p,
+			'rechte'=>$rechte,
+			'lv'=>$lv,
+			'angezeigtes_stsem'=>$angezeigtes_stsem,
+			'lektor_der_lv'=>$lektor_der_lv,
+			'lehrfach_oe_kurzbz_arr'=>$lehrfach_oe_kurzbz_arr,
+			'is_lector'=>$is_lector,
+			'angemeldet'=>$angemeldet
+		];
+		
+		Events::trigger('lvMenuBuild', 
 						// callback function for the onEvents to add newValues to the $menu
 						function ($addonMenu) use (&$menu) {
 							foreach($addonMenu as $m){
 								$menu[]= $m;
 							}
 						},
-						$lvid,
-						$studiensemester_kurzbz,
-						$studiengang_kz,
-						$p,
-						$rechte,
-						$lv,
-						$angezeigtes_stsem,
-						$lektor_der_lv,
-						$lehrfach_oe_kurzbz_arr,
-						$is_lector,
-						$angemeldet
+						$params
 		);
 
 
 		// Menu sortieren
 		// ##########################################################################################
 		foreach ($menu as $key => $row){
-			$pos[$key] = $row['position'];
+			if(isset($row['position'])){
+				$pos[$key] = $row['position'];
+			}
 		}
 
-		array_multisort($pos, SORT_ASC, SORT_NUMERIC, $menu);
+		$sortable_menu = array_filter($menu, function($element){
+			return isset($element['position']);
+		});
+
+		array_multisort($pos, SORT_ASC, SORT_NUMERIC, $sortable_menu);
 
 		// HTTP response
 		// ##########################################################################################
 
-		$this->terminateWithSuccess($menu);
+		$this->terminateWithSuccess($sortable_menu);
 
 	}
 
