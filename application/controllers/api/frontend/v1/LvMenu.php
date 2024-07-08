@@ -54,7 +54,7 @@ class LvMenu extends FHCAPI_Controller
 			$this->terminateWithError('Missing parameters', self::ERROR_TYPE_GENERAL);
 
 		// FH-Core Variables 
-		// #############################################
+		// ##########################################################################################
 
 		require_once(FHCPATH.'config/cis.config.inc.php');
 		require_once(FHCPATH.'include/lehrveranstaltung.class.php');
@@ -65,6 +65,7 @@ class LvMenu extends FHCAPI_Controller
 		require_once(FHCPATH.'include/benutzerberechtigung.class.php');
 		require_once(FHCPATH.'include/studiengang.class.php');
 		require_once(FHCPATH.'include/phrasen.class.php');
+		require_once(FHCPATH.'include/lvangebot.class.php');
 
 		// get the sprache
 		$sprache = getSprache();
@@ -113,6 +114,14 @@ class LvMenu extends FHCAPI_Controller
 
 		$short_name = $lv->bezeichnung;
 		$short_short_name = $lv->lehreverzeichnis;
+
+		// create documents directory
+		$dir_name=DOC_ROOT.'/documents';
+		if(!is_dir($dir_name))
+		{
+			exec('mkdir -m 755 '.escapeshellarg($dir_name));
+			exec('sudo chown www-data:teacher '.escapeshellarg($dir_name));
+		}
 
 		// angemeldet
 		$angemeldet = true;
@@ -206,17 +215,38 @@ class LvMenu extends FHCAPI_Controller
 		}
 
 		// FH-Core Menu Logic 
-		// #############################################
+		// ##########################################################################################
 
 		$menu = array();
 
 		$this->fhc_menu_lvinfo($menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $rechte, $lehrfach_oe_kurzbz_arr, $p);
 
 		$this->fhc_menu_semesterplan($menu, $angemeldet, $user_is_allowed_to_upload, $rechte, $lvid, $studiengang_kz, $kurzbz, $semester, $short_short_name, $p);
+		
+		$this->fhc_menu_download($menu, $angemeldet, $user_is_allowed_to_upload, $rechte, $semester, $kurzbz, $studiengang_kz, $short_short_name, $short, $p);
+		
+		$this->fhc_menu_notenliste($menu, $angemeldet, $is_lector, $lvid, $studiengang_kz, $angezeigtes_stsem, $kurzbz, $semester, $short_short_name, $p);
+
+		$this->fhc_menu_feedback($menu, $angemeldet, $lvid, $p);
+
+		$this->fhc_menu_gesamtnote($menu, $angemeldet, $lvid, $lv_obj, $is_lector, $angezeigtes_stsem, $p);
+
+		$this->fhc_menu_stundenupload($menu, $angemeldet, $lvid, $is_lector, $studiengang_kz, $kurzbz, $semester, $short, $short_short_name, $p);
+
+		$this->fhc_menu_emailStudierende($menu, $angemeldet, $lehreinheit->lehreinheit_id, $p);
+
+		$this->fhc_menu_pinboard($menu, $angemeldet, $is_lector, $studiengang_kz, $semester, $p);
+
+		$this->fhc_menu_abmeldung($menu, $user, $is_lector, $lvid, $angezeigtes_stsem, $p);
+
+		$this->fhc_menu_lehretools($menu, $lvid, $angezeigtes_stsem, $sprache);
+
+		$this->fhc_menu_anrechnungStudent($menu, $rechte, $lvid, $angezeigtes_stsem, $p);
+
+		$this->fhc_menu_anrechnungLector($menu, $rechte, $angezeigtes_stsem, $p);
 
 		// Addons Menu Logic
-		// #############################################
-		
+		// ##########################################################################################		
         Events::trigger('lvMenuBuild', 
 						// callback function for the onEvents to add newValues to the $menu
 						function ($addonMenu) use (&$menu) {
@@ -233,8 +263,21 @@ class LvMenu extends FHCAPI_Controller
 						$angezeigtes_stsem,
 						$lektor_der_lv,
 						$lehrfach_oe_kurzbz_arr,
-						$is_lector
+						$is_lector,
+						$angemeldet
 		);
+
+
+		// Menu sortieren
+		// ##########################################################################################
+		foreach ($menu as $key => $row){
+			$pos[$key] = $row['position'];
+		}
+
+		array_multisort($pos, SORT_ASC, SORT_NUMERIC, $menu);
+
+		// HTTP response
+		// ##########################################################################################
 
 		$this->terminateWithSuccess($menu);
 
@@ -285,7 +328,7 @@ class LvMenu extends FHCAPI_Controller
 		{
 			$dir_name = $this->ensureDirectoryExists($kurzbz, $semester, $short_short_name, 'semesterplan','teacher');
 			
-			$dir_empty = count(scandir($dir_name)) == 2 ? true : false;
+			$dir_empty = $this->isDirectoryEmpty($dir_name);
 
 			if($dir_empty == false)
 			{
@@ -325,6 +368,331 @@ class LvMenu extends FHCAPI_Controller
 		}
 	}
 
+	private function fhc_menu_download(&$menu, $angemeldet, $user_is_allowed_to_upload, $rechte, $semester, $kurzbz, $studiengang_kz, $short_short_name, $short, $p){
+		
+		if((!defined('CIS_LEHRVERANSTALTUNG_DOWNLOAD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_DOWNLOAD_ANZEIGEN) && $angemeldet)
+		{
+			$dir_name = $this->ensureDirectoryExists($kurzbz, $semester, $short_short_name, 'download','teacher');
+			$dir_empty = $this->isDirectoryEmpty($dir_name);
+
+			$text = '';
+			if($dir_empty == false)
+			{
+				$link = $dir_name.'/';
+			}
+			else
+				$link = '';
+
+			//Wenn user eine Lehrfachzuteilung fuer dieses Lehrfach hat wird
+			//Ein Link zum Upload angezeigt und ein Link um das Download-Verzeichnis
+			//als Zip Archiv herunterzuladen
+			if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$studiengang_kz) || $rechte->isBerechtigt('lehre',$studiengang_kz))// || $rechte->isBerechtigt('lehre',null,null,$fachbereich_id))
+			{
+				$text.= mb_strtolower("$kurzbz/$semester/$short/download");
+				$text.=  '<br>';
+				$text.=  "<a class='Item' target='_blank' href='upload.php?course_id=$studiengang_kz&term_id=$semester&short=$short'>".$p->t('lehre/upload')."</a>";
+				$text.=  '&nbsp;&nbsp;&nbsp;';
+			}
+
+			$menu[]=array
+			(
+				'id'=>'core_menu_download',
+				'position'=>'30',
+				'name'=>$p->t('lehre/download'),
+				'icon'=>'../../../skin/images/button_download.png',
+				'link'=>$link,
+				'text'=>$text
+			);
+		}
+	}
+
+	private function fhc_menu_notenliste(&$menu, $angemeldet, $is_lector, $lvid, $studiengang_kz, $angezeigtes_stsem, $kurzbz, $semester, $short_short_name, $p){
+		// Anwesenheits und Notenlisten
+		if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN || $is_lector)
+		{
+			$link='';
+			$name='';
+			if($is_lector)
+			{
+				$name = $p->t('lehre/anwesenheitsUndNotenlisten');
+				$link= "anwesenheitsliste.php?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&stsem=$angezeigtes_stsem";
+			}
+
+			$text='';
+			if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && ($angemeldet || $is_lector))
+			{
+				$dir_name = $this->ensureDirectoryExists($kurzbz, $semester, $short_short_name, 'leistung','teacher');
+				$dir_empty = $this->isDirectoryEmpty($dir_name);
+
+				if($dir_empty == false)
+				{
+					
+					if($is_lector)
+					{
+						$text.= '<a href="'.$dir_name.'" target="_blank">';
+						$text.= '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
+						$text.= '</a>';
+					}
+					else
+					{
+						$name = $p->t('lehre/leistungsuebersicht');
+						$link = $dir_name;
+					}
+				}
+				else
+				{
+					if($is_lector)
+					{
+						$text.= '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
+					}
+					else
+					{
+						$name = $p->t('lehre/leistungsuebersicht');
+						$link = '';
+					}
+				}
+			}
+
+			$menu[]=array
+			(
+				'id'=>'core_menu_anwesenheitslisten',
+				'position'=>'40',
+				'name'=>$name,
+				'icon'=>'../../../skin/images/button_listen.png',
+				'link'=>$link,
+				'text'=>$text
+			);
+		}
+	}
+
+	private function fhc_menu_feedback(&$menu, $angemeldet, $lvid, $p){
+		//FEEDBACK
+		if((!defined('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN) && $angemeldet)
+		{
+			$menu[]=array
+			(
+				'id'=>'core_menu_feedback',
+				'position'=>'50',
+				'name'=>$p->t('lehre/feedback'),
+				'icon'=>'../../../skin/images/button_feedback.png',
+				'link'=>'feedback.php?lvid='.$lvid,
+				'text'=>''
+			);
+		}
+	}
+
+	private function fhc_menu_gesamtnote(&$menu, $angemeldet, $lvid, $lv_obj, $is_lector, $angezeigtes_stsem, $p){
+		//Gesamtnote
+		if($is_lector && ((!defined('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN) && $angemeldet))
+		{
+			if($lv_obj->benotung)
+			{
+				$menu[]=array
+				(
+					'id'=>'core_menu_gesamtnote',
+					'position'=>'80',
+					'name'=>$p->t('lehre/gesamtnote'),
+					'icon'=>'../../../skin/images/button_endnote.png',
+					'link'=>'benotungstool/lvgesamtnoteverwalten.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem)
+				);
+			}
+			else
+			{
+				$menu[]=array
+				(
+					'id'=>'core_menu_gesamtnote',
+					'position'=>'80',
+					'name'=>$p->t('lehre/gesamtnote'),
+					'icon'=>'../../../skin/images/button_endnote.png',
+					'text'=>$p->t('lehre/noteneingabedeaktiviert')
+				);
+			}
+		}
+	}
+
+	private function fhc_menu_stundenupload(&$menu, $angemeldet, $lvid, $is_lector, $studiengang_kz, $kurzbz, $semester, $short, $short_short_name, $p){
+		// Studentenupload
+		if((!defined('CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN) && $angemeldet)
+		{
+			$link='';
+			$link_target='';
+
+			$dir_name = $this->ensureDirectoryExists($kurzbz, $semester, $short_short_name, 'upload','student');
+			$dir_empty = $this->isDirectoryEmpty($dir_name);
+
+			if(isset($dir_empty) && $dir_empty == false)
+			{
+				if($is_lector == true)
+				{
+					$link='lector_choice.php?lvid='.urlencode($lvid);
+					$link_target='_blank';
+				}
+				else
+				{
+					$link='upload.php?course_id='.urlencode($studiengang_kz).'&term_id='.urlencode($semester).'&short='.urlencode($short);
+					$link_target='_blank';
+				}
+			}
+			else
+			{
+				if($is_lector == true)
+				{
+					$link='';
+				}
+				else
+				{
+					$link='upload.php?course_id='.urlencode($studiengang_kz).'&term_id='.urlencode($semester).'&short='.urlencode($short);
+					$link_target='_blank';
+				}
+			}
+			$menu[]=array
+			(
+				'id'=>'core_menu_studentenupload',
+				'position'=>'90',
+				'name'=>$p->t('lehre/studentenAbgabe'),
+				'icon'=>'../../../skin/images/button_studiupload.png',
+				'link'=>$link,
+				'link_target'=>$link_target
+			);
+		}
+	}
+
+	private function fhc_menu_emailStudierende(&$menu, $angemeldet, $lehreinheit_id,$p){
+		// Email an Studierende
+		if((!defined('CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN) && $angemeldet)
+		{
+			$nomail='';
+			$mailto='mailto:';
+			
+			// load the Lehreinheit model and get the student mails
+			$this->load->model('education/Lehreinheit_model','LehreinheitModel');
+			$studentMails = $this->LehreinheitModel->getStudentenMail($lehreinheit_id);
+			
+			// get the data of the database result and map the array of objects to their object property
+			$studentMails = $this->getDataOrTerminateWithError($studentMails, 'No student mails found');
+			$studentMails = array_map(
+			function($mail_obj){
+				return $mail_obj->mail;
+			},$studentMails);
+
+			$mailto = implode(',',$studentMails);
+			
+			//todo logic for nomail is missing
+			if($nomail!='')
+				$link_onclick='alert(\''.$p->t('lehre/keinMailverteiler',array($nomail)).'\');';
+			else
+				$link_onclick='';
+
+			$menu[]=array
+			(
+				'id'=>'core_menu_mailanstudierende',
+				'position'=>'100',
+				'name'=>$p->t('lehre/mail'),
+				'icon'=>'../../../skin/images/button_feedback.png',
+				'link'=>$mailto,
+				'link_onclick'=>$link_onclick
+			);
+		} 
+	}
+
+	private function  fhc_menu_pinboard(&$menu, $angemeldet, $is_lector, $studiengang_kz, $semester, $p){
+		// Pinboard
+		if((!defined('CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN) && $angemeldet)
+		{
+			$text='';
+			if($is_lector)
+				$text.= "<a href='../../../cms/newsverwaltung.php?studiengang_kz=$studiengang_kz&semester=$semester' class='Item'>".$p->t('profil/adminstration')."</a>";
+
+			$menu[]=array
+			(
+				'id'=>'core_menu_pinboard',
+				'position'=>'110',
+				'name'=>$p->t('lehre/pinboard'),
+				'icon'=>'../../../skin/images/button_pinboard.png',
+				'link'=>'../../../cms/news.php?studiengang_kz='.urlencode($studiengang_kz).'&semester='.urlencode($semester),
+				'text'=>$text
+			);
+		}
+	}
+
+	private function fhc_menu_abmeldung(&$menu, $user, $is_lector, $lvid, $angezeigtes_stsem, $p){
+		if(!defined('CIS_LEHRVERANSTALTUNG_ABMELDUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ABMELDUNG_ANZEIGEN)
+		{
+			if(!$is_lector)
+			{
+				$lvangebot = new lvangebot();
+				$gruppen = $lvangebot->AbmeldungMoeglich($lvid, $angezeigtes_stsem, $user);
+				if(count($gruppen)>0)
+				{
+					$menu[]=array
+					(
+						'id'=>'core_menu_abmeldung',
+						'position'=>'120',
+						'name'=>$p->t('lehre/abmelden'),
+						'icon'=>'../../../skin/images/button_studiupload.png',
+						'link'=>'abmeldung.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem),
+					);
+
+				}
+			}
+		}
+	}
+
+	private function fhc_menu_lehretools(&$menu, $lvid, $angezeigtes_stsem, $sprache){
+		//Anzeigen von zusaetzlichen Lehre-Tools
+		$lehretools = new lehre_tools();
+		if($lehretools->getTools($lvid, $angezeigtes_stsem))
+		{
+			if(count($lehretools->result)>0)
+			{
+				foreach($lehretools->result as $row)
+				{
+					$menu[]=array
+					(
+						'id'=>'core_menu_lehretools_'.$row->lehre_tools_id,
+						'position'=>'1000',
+						'name'=>$row->bezeichnung[$sprache],
+						'icon'=>'../../../cms/dms.php?id='.$row->logo_dms_id,
+						'link'=>$row->basis_url,
+						'link_target'=>'_blank'
+					);
+				}
+			}
+		}
+	}
+
+	private function fhc_menu_anrechnungStudent(&$menu, $rechte, $lvid, $angezeigtes_stsem, $p){
+		// Anerkennung nachgewiesener Kenntnisse (Anrechnung) - Anzeige fuer Studenten
+		if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN)
+        && $rechte->isBerechtigt('student/anrechnung_beantragen'))
+		{
+			$menu[]=array
+			(
+				'id'=>'core_menu_anerkennungNachgewiesenerKenntnisse',
+				'position'=>'128',
+				'name'=>$p->t('lehre/anrechnung'),
+				'icon'=>'../../../skin/images/button_listen.png',
+				'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid)
+			);
+		}
+	}
+
+	private function fhc_menu_anrechnungLector(&$menu, $rechte, $angezeigtes_stsem, $p){
+		// Anerkennung nachgewiesener Kenntnisse (Anrechnung) - Anzeige fuer LektorInnen
+		if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN)
+		&& $rechte->isBerechtigt('lehre/anrechnung_empfehlen'))
+		{
+		$menu[]=array
+		(
+			'id'=>'core_menu_anerkennungNachgewiesenerKenntnisse_empfehlen',
+			'position'=>'128',
+			'name'=>$p->t('lehre/anrechnungen'),
+			'icon'=>'../../../skin/images/button_listen.png',
+			'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/ReviewAnrechnungUebersicht?studiensemester='.urlencode($angezeigtes_stsem)
+		);
+		}
+	}
+
 	private function ensureDirectoryExists($kurzbz, $semester, $short_short_name, $type, $role){
 		$dir_name = DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/'.$type;
 
@@ -337,6 +705,10 @@ class LvMenu extends FHCAPI_Controller
 		}
 
 		return $dir_name;
+	}
+
+	private function isDirectoryEmpty($dir){
+		return count(scandir($dir)) == 2 ? true : false;
 	}
 }
 
