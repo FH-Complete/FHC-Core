@@ -48,13 +48,14 @@ require_once('dbupdate_3.4/30181_tabelle_anrechnung_neue_attribute_fuer_begruend
 require_once('dbupdate_3.4/29529_infocenter_anpassungen.php');
 require_once('dbupdate_3.4/29835_uhstat1_erfassung_der_uhstat1_daten_ueber_das_bewerbungstool.php');
 require_once('dbupdate_3.4/33714_erhoehter_studienbeitrag_fuer_drittsaatenangehoerig.php');
+require_once('dbupdate_3.4/37107_fristenmanagement.php');
 require_once('dbupdate_3.4/33003_bis_meldung_personal.php');
 require_once('dbupdate_3.4/36275_zeitaufzeichnung_karenz.php');
 require_once('dbupdate_3.4/21620_neues_feld_zum_erfassen_des_ESI.php');
 require_once('dbupdate_3.4/36530_bis_internationsalisierung_codextabelle_neuerungen.php');
 require_once('dbupdate_3.4/34543_ux_template.php');
 require_once('dbupdate_3.4/17513_Entwicklungsteam.php');
-require_once('dbupdate_3.4/33683_digitale_anwesenheitsliste_und_entschuldigungsmanagement_fuer_studierende_prototyp.php');
+require_once('dbupdate_3.4/28575_softwarebereitstellung.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -172,7 +173,8 @@ $tabellen=array(
 	"hr.tbl_sachaufwandtyp" => array("sachaufwandtyp_kurzbz","bezeichnung","sort", "aktiv"),
 	"hr.tbl_stundensatz" => array("stundensatz_id","uid","stundensatztyp","stundensatz","oe_kurzbz","gueltig_von","gueltig_bis","insertamum","insertvon","updateamum","updatevon"),
 	"hr.tbl_stundensatztyp" => array("stundensatztyp","bezeichnung","aktiv","insertamum","insertvon","updateamum","updatevon"),
-	"hr.tbl_dienstverhaeltnis" => array("dienstverhaeltnis_id","mitarbeiter_uid","vertragsart_kurzbz","oe_kurzbz","von","bis","insertamum","insertvon","updateamum","updatevon"),
+	"hr.tbl_dienstverhaeltnis" => array("dienstverhaeltnis_id","mitarbeiter_uid","vertragsart_kurzbz","oe_kurzbz","von","bis","insertamum","insertvon","updateamum","updatevon","dvendegrund_kurzbz","dvendegrund_anmerkung"),
+	"hr.tbl_dvendegrund" => array("dvendegrund_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig", "aktiv", "sort"),
 	"hr.tbl_vertragsart" => array("vertragsart_kurzbz","bezeichnung","anmerkung","dienstverhaeltnis","vertragsart_kurzbz_parent","aktiv","sort"),
 	"hr.tbl_vertragsbestandteil" => array("vertragsbestandteil_id","dienstverhaeltnis_id","vertragsbestandteiltyp_kurzbz","von", "bis","insertamum", "insertvon","updateamum","updatevon"),
 	"hr.tbl_vertragsbestandteiltyp" => array("vertragsbestandteiltyp_kurzbz","bezeichnung","ueberlappend"),
@@ -189,6 +191,9 @@ $tabellen=array(
 	"hr.tbl_gehaltsbestandteil" => array("gehaltsbestandteil_id","dienstverhaeltnis_id","vertragsbestandteil_id","gehaltstyp_kurzbz","von","bis","anmerkung","grundbetrag","betrag_valorisiert","valorisierungssperre","insertamum", "insertvon","updateamum","updatevon","valorisierung","auszahlungen"),
 	"hr.tbl_gehaltshistorie" => array("gehaltshistorie_id", "datum","betrag","gehaltsbestandteil_id","mitarbeiter_uid"),
 	"hr.tbl_gehaltstyp" => array("gehaltstyp_kurzbz","bezeichnung","valorisierung","sort","aktiv"),
+	"hr.tbl_frist" => array("frist_id","mitarbeiter_uid","ereignis_kurzbz","bezeichnung","datum","status_kurzbz","parameter","insertvon","insertamum","updatevon","updateamum"),
+	"hr.tbl_frist_ereignis" => array("ereignis_kurzbz","bezeichnung","manuell"),
+	"hr.tbl_frist_status" => array("status_kurzbz", "bezeichnung"),
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
@@ -437,37 +442,37 @@ echo '<H2>Gegenpruefung!</H2>';
 $error=false;
 $sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon' AND schemaname != 'reports' AND schemaname != 'extension';";
 if (!$result=@$db->db_query($sql_query))
-	echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
-else
-	while ($row=$db->db_fetch_object($result))
-	{
-		$fulltablename=$row->schemaname.'.'.$row->tablename;
-		if (!isset($tabellen[$fulltablename]))
+		echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
+	else
+		while ($row=$db->db_fetch_object($result))
 		{
-			echo 'Tabelle '.$fulltablename.' existiert in der DB, aber nicht in diesem Skript!<BR>';
-			$error=true;
-		}
-		else
-			if (!$result_fields=@$db->db_query("SELECT * FROM $fulltablename LIMIT 1;"))
-				echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
+			$fulltablename=$row->schemaname.'.'.$row->tablename;
+			if (!isset($tabellen[$fulltablename]))
+			{
+				echo 'Tabelle '.$fulltablename.' existiert in der DB, aber nicht in diesem Skript!<BR>';
+				$error=true;
+			}
 			else
-				for ($i=0; $i<$db->db_num_fields($result_fields); $i++)
-				{
-					$found=false;
-					$fieldnameDB=$db->db_field_name($result_fields,$i);
-					foreach ($tabellen[$fulltablename] AS $fieldnameARRAY)
-						if ($fieldnameDB==$fieldnameARRAY)
-						{
-							$found=true;
-							break;
-						}
-					if (!$found)
+				if (!$result_fields=@$db->db_query("SELECT * FROM $fulltablename LIMIT 1;"))
+					echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
+				else
+					for ($i=0; $i<$db->db_num_fields($result_fields); $i++)
 					{
-						echo 'Attribut '.$fulltablename.'.<strong>'.$fieldnameDB.'</strong> existiert in der DB, aber nicht in diesem Skript!<BR>';
-						$error=true;
+						$found=false;
+						$fieldnameDB=$db->db_field_name($result_fields,$i);
+						foreach ($tabellen[$fulltablename] AS $fieldnameARRAY)
+							if ($fieldnameDB==$fieldnameARRAY)
+							{
+								$found=true;
+								break;
+							}
+						if (!$found)
+						{
+							echo 'Attribut '.$fulltablename.'.<strong>'.$fieldnameDB.'</strong> existiert in der DB, aber nicht in diesem Skript!<BR>';
+							$error=true;
+						}
 					}
-				}
-	}
+		}
 if($error==false)
 	echo '<br>Gegenpruefung fehlerfrei';
 ?>
