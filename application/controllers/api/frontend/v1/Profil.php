@@ -34,6 +34,8 @@ class Profil extends FHCAPI_Controller
 		parent::__construct([
 			'getView' => self::PERM_LOGGED,
             'fotoSperre' => self::PERM_LOGGED,
+			'getGemeinden' => self::PERM_LOGGED,
+			
 		]);
 
 
@@ -141,6 +143,31 @@ class Profil extends FHCAPI_Controller
         $res = $this->getDataOrTerminateWithError($res);
 		
         $this->terminateWithSuccess(current($res));
+	}
+
+	public function getGemeinden($nation, $zip)
+	{
+		if(!isset($nation) || !isset($zip)){
+			echo json_encode(error("Missing parameters"));
+			return;
+		}
+		
+		$this->load->model('codex/Gemeinde_model', "GemeindeModel");
+		
+
+		$gemeinde_res = $this->GemeindeModel->getGemeindeByPlz($zip);
+		
+		if (isError($gemeinde_res)) {
+			$this->terminateWithError(getError($gemeinde_res),self::ERROR_TYPE_GENERAL);
+		}
+		$gemeinde_res = $this->getDataOrTerminateWithError($gemeinde_res);
+		
+		/* $gemeinde_res = array_map(function ($obj) {
+			return $obj->ortschaftsname;
+		}, $gemeinde_res); */
+
+		$this->terminateWithSuccess($gemeinde_res);	
+		
 	}
 
 

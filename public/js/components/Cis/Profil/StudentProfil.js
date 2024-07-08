@@ -85,6 +85,7 @@ export default {
     editData: Object,
   },
   methods: {
+    
     betriebsmittelTableBuilt: function () {
       this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
     },
@@ -181,6 +182,7 @@ export default {
   created() {
     //? sorts the profil Updates: pending -> accepted -> rejected
     this.data.profilUpdates?.sort(this.sortProfilUpdates);
+    
   },
 
   
@@ -205,6 +207,7 @@ export default {
   
               <div class="row ">
               <div class="col mb-3">
+              
               <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                 <div class="row">
                   <div class="col-2">

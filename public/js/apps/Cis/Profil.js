@@ -318,16 +318,16 @@ const profilApp = Vue.createApp({
               ?.filter((item) => {
                 return !this.data.profilUpdates?.some((update) => {
                   return (
-                    update.status === "pending" &&
+                    update.status === this.profilUpdateStates["Pending"] &&
                     update.requested_change?.adresse_id == item.adresse_id
                   );
                 });
               })
-              .map((kontakt) => {
+              .map((adresse) => {
                 return {
                   listview: "Adresse",
                   view: "EditAdresse",
-                  data: kontakt,
+                  data: adresse,
                 };
               }),
           },

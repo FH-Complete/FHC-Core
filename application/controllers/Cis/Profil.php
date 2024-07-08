@@ -244,23 +244,23 @@ class Profil extends Auth_Controller
 		$this->GemeindeModel->addDistinct();
 		$this->GemeindeModel->addSelect(["name"]);
 		if ($nation == "A") {
-			if (isset($zip) && $zip > 999 && $zip < 32000) {
+				if (isset($zip) && $zip > 999 && $zip < 32000) {
 
-				$gemeinde_res = $this->GemeindeModel->loadWhere(['plz' => $zip]);
-				if (isError($gemeinde_res)) {
-					show_error("error while trying to query bis.tbl_gemeinde");
+						$gemeinde_res = $this->GemeindeModel->loadWhere(['plz' => $zip]);
+						if (isError($gemeinde_res)) {
+								show_error("error while trying to query bis.tbl_gemeinde");
+						}
+						$gemeinde_res = hasData($gemeinde_res) ? getData($gemeinde_res) : null;
+						$gemeinde_res = array_map(function ($obj) {
+								return $obj->name;
+						}, $gemeinde_res);
+						echo json_encode($gemeinde_res);
+
+				} else {
+						echo json_encode(error("ortschaftskennziffer code was not valid"));
 				}
-				$gemeinde_res = hasData($gemeinde_res) ? getData($gemeinde_res) : null;
-				$gemeinde_res = array_map(function ($obj) {
-					return $obj->name;
-				}, $gemeinde_res);
-				echo json_encode($gemeinde_res);
-
-			} else {
-				echo json_encode(error("ortschaftskennziffer code was not valid"));
-			}
 		} else {
-			echo json_encode(error("Nation was not 'A' (Austria)"));
+				echo json_encode(error("Nation was not 'A' (Austria)"));
 		}
 	}
 

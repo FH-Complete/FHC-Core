@@ -56,13 +56,12 @@ export default {
     );
   },
 
-  getGemeinden: function(nation,zip=null){
+  getGemeinden: function(nation,zip){
     return this.$fhcApi.get(
       FHC_JS_DATA_STORAGE_OBJECT.app_root + 
       FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-      "/api/frontend/v1/Profil/getGemeinden",
-      { nation: nation,
-      ...(zip? {zip:zip}:{}) }
+      `/api/frontend/v1/Profil/getGemeinden/${nation}/${zip}`,
+      {}
     );
     
   },
