@@ -736,18 +736,18 @@ class Prestudent_model extends DB_Model
 	public function getHistoryPrestudent($prestudent_id, $index_lang)
 	{
 		$query = "
-					SELECT 
-					ps.status_kurzbz, 
-					ps.studiensemester_kurzbz, 
+					SELECT
+					ps.status_kurzbz,
+					ps.studiensemester_kurzbz,
 					ps.ausbildungssemester,
 					CASE WHEN ps.status_kurzbz IN ('Student', 'Diplomand','Abbrecher','Unterbrecher')
 					THEN CONCAT(lv.semester, lv.verband, lv.gruppe)
 					ELSE ''
-					END AS lehrverband, 
-					ps.datum, 
+					END AS lehrverband,
+					ps.datum,
 					TO_CHAR(ps.datum::timestamp, 'DD.MM.YYYY') AS format_datum,
-					sp.bezeichnung, 
-					ps.bestaetigtam, 
+					sp.bezeichnung,
+					ps.bestaetigtam,
 					TO_CHAR(ps.bestaetigtam::timestamp, 'DD.MM.YYYY') AS format_bestaetigtam,
 					ps.bewerbung_abgeschicktamum,
 					TO_CHAR(ps.bewerbung_abgeschicktamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_bewerbung_abgeschicktamum,
@@ -764,23 +764,23 @@ class Prestudent_model extends DB_Model
 					TO_CHAR(ps.updateamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_updateamum,
 					ps.updatevon,
 					stg.beschreibung[?] as statusgrund_beschreibung
-				FROM 
+				FROM
 					public.tbl_prestudentstatus ps
-				LEFT JOIN 
+				LEFT JOIN
 					public.tbl_student st USING (prestudent_id)
-				LEFT JOIN 
+				LEFT JOIN
 					public.tbl_studiengang sg ON (st.studiengang_kz = sg.studiengang_kz)
-				LEFT JOIN 
-					lehre.tbl_studienplan sp USING (studienplan_id) 
-				LEFT JOIN 
-					public.tbl_status_grund stg USING (statusgrund_id) 
-				LEFT JOIN 
-					public.tbl_studentlehrverband lv ON 
-						(st.student_uid = lv.student_uid 
-							 AND st.student_uid IS NOT NULL 
+				LEFT JOIN
+					lehre.tbl_studienplan sp USING (studienplan_id)
+				LEFT JOIN
+					public.tbl_status_grund stg USING (statusgrund_id)
+				LEFT JOIN
+					public.tbl_studentlehrverband lv ON
+						(st.student_uid = lv.student_uid
+							 AND st.student_uid IS NOT NULL
 							 AND lv.studiensemester_kurzbz = ps.studiensemester_kurzbz)
 				WHERE prestudent_id = ?
-				ORDER BY datum DESC
+				ORDER BY ps.datum DESC, ps.insertamum DESC, ps.ext_id DESC
 		";
 
 		return $this->execQuery($query, array($index_lang, $prestudent_id));
