@@ -81,6 +81,65 @@ class Lehrveranstaltung_model extends DB_Model
 	}
 
 	/**
+	 * Get Lehrveranstaltungen with its Stg, OE and OE-type.
+	 * Filter by Studiensemester and Organisationseinheiten if necessary.
+	 * @param $eventQuery String
+	 * @param string $studiensemester_kurzbz Filter by Studiensemester
+	 * @param array $oes Filter by Organisationseinheiten
+	 * @return array
+	 */
+	public function getLvsByStudiensemesterAndOes($studiensemester_kurzbz = null, $oes = null)
+	{
+		$params = [];
+		$qry = '
+			SELECT DISTINCT ON (lv_oe_kurzbz, stg_bezeichnung, lehrveranstaltung_id)
+			    le.studiensemester_kurzbz,
+                lv.oe_kurzbz AS "lv_oe_kurzbz",
+                CASE
+                    WHEN oe.organisationseinheittyp_kurzbz = \'Kompetenzfeld\' THEN (\'KF \' || oe.bezeichnung)
+                    WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
+                    ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
+                END AS "lv_oe_bezeichnung",
+                stg.studiengang_kz,
+                upper(stg.typ || stg.kurzbz) AS "stg_typ_kurzbz",    
+                stg.bezeichnung AS "stg_bezeichnung",
+                lv.semester,   
+                lv.lehrveranstaltung_id,
+                lv.bezeichnung AS "lv_bezeichnung"           
+            FROM
+				lehre.tbl_lehrveranstaltung     		lv 
+				JOIN lehre.tbl_lehreinheit           	le USING (lehrveranstaltung_id)
+				JOIN public.tbl_organisationseinheit 	oe USING (oe_kurzbz)
+				JOIN public.tbl_studiengang          	stg ON stg.studiengang_kz = lv.studiengang_kz
+            WHERE
+				/* filter negative studiengaenge */
+                stg.studiengang_kz > 0 ';
+
+		if (isset($studiensemester_kurzbz) && is_string($studiensemester_kurzbz))
+		{
+			/* filter studiensemester */
+			$qry.= ' AND le.studiensemester_kurzbz =  ? ';
+			$params[]= $studiensemester_kurzbz;
+		}
+
+		if (isset($oes) && is_array($oes))
+		{
+			/* filter organisationseinheit */
+			$qry.= ' AND lv.oe_kurzbz IN ? ';
+			$params[]= $oes;
+		}
+
+		$qry.= '
+                /* filter active lehrveranstaltungen */
+                AND lv.aktiv = TRUE
+                /* filter active organisationseinheiten */
+                AND oe.aktiv = TRUE
+		';
+
+		return $this->execQuery($qry, $params);
+	}
+
+	/**
 	 * Gets unique Groupstrings for Lehrveranstaltungen, e.g. WS2018_BIF_1_PRJM_VZ_LV12345
 	 * @param string $studiensemester_kurzbz
 	 * @param string $ausbildungssemester
