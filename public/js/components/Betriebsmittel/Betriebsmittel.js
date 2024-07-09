@@ -277,7 +277,7 @@ export default {
 					<form-input
 						type="select"
 						:label="$p.t('global/typ')"
-						name="typ"
+						name="betriebsmitteltyp"
 						v-model="formData.betriebsmitteltyp"
 						:disabled="!statusNew"
 						>
@@ -320,7 +320,7 @@ export default {
 						type="text"
 						:label="$p.t('wawi/nummer')"
 						name="nummer"
-						v-model="formData['nummer']"
+						v-model="formData.nummer"
 						>
 					</form-input>
 				</div>
@@ -330,7 +330,7 @@ export default {
 						type="text"
 						:label="$p.t('wawi/nummer') + ' 2'"
 						name="nummer2"
-						v-model="formData['nummer2']"
+						v-model="formData.nummer2"
 						>
 					</form-input>
 				</div>
@@ -340,7 +340,7 @@ export default {
 						type="textarea"
 						:label="$p.t('global/beschreibung')"
 						name="beschreibung"
-						v-model="formData['beschreibung']"
+						v-model="formData.beschreibung"
 						:disabled="formData.inventarnummer"
 						>
 					</form-input>
@@ -351,7 +351,7 @@ export default {
 						type="text"
 						:label="$p.t('infocenter/kaution')"
 						name="kaution"
-						v-model="formData['kaution']"
+						v-model="formData.kaution"
 						>
 					</form-input>
 				</div>
@@ -361,7 +361,7 @@ export default {
 						type="textarea"
 						:label="$p.t('global/anmerkung')"
 						name="anmerkung"
-						v-model="formData['anmerkung']"
+						v-model="formData.anmerkung"
 						>
 					</form-input>
 				</div>
@@ -370,8 +370,8 @@ export default {
 					<form-input
 						type="DatePicker"
 						:label="$p.t('wawi/ausgegebenam')"
-						name="datum"
-						v-model="formData['ausgegebenam']"
+						name="ausgegebenam"
+						v-model="formData.ausgegebenam"
 						auto-apply
 						:enable-time-picker="false"
 						format="dd.MM.yyyy"
@@ -385,8 +385,8 @@ export default {
 					<form-input
 						type="DatePicker"
 						:label="$p.t('wawi/retouram')"
-						name="datum"
-						v-model="formData['retouram']"
+						name="retouram"
+						v-model="formData.retouram"
 						auto-apply
 						:enable-time-picker="false"
 						format="dd.MM.yyyy"
