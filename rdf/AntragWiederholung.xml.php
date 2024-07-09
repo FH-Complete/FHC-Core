@@ -78,15 +78,14 @@ if ($config['note_blacklist_wiederholung']) {
 
 $query = "
 	SELECT stg.bezeichnung, tbl_orgform.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, pss.ausbildungssemester AS semester, (
-			SELECT pr.datum
-			FROM lehre.tbl_pruefung pr
-			JOIN lehre.tbl_note n USING (note)
-			WHERE pr.student_uid = tbl_student.student_uid 
-			AND pr.datum <= a.datum
-			AND pr.pruefungstyp_kurzbz IN ('kommPruef', 'zusKommPruef')
-			AND n.positiv=FALSE
-			" . $blacklist . "
-			ORDER BY datum DESC
+			SELECT
+				insertamum::date
+			FROM
+				campus.tbl_studierendenantrag_status
+			WHERE
+				studierendenantrag_id = a.studierendenantrag_id AND studierendenantrag_statustyp_kurzbz = 'Abgemeldet'
+			ORDER BY
+				insertamum DESC
 			LIMIT 1
 		) AS abmeldedatum, (SELECT pt.text FROM system.tbl_phrase p JOIN system.tbl_phrasentext pt USING(phrase_id) WHERE p.category=" . $db->db_add_param('studierendenantrag', FHC_STRING) . " AND p.phrase=" . $db->db_add_param('grund_Wiederholung_deadline', FHC_STRING) . " AND pt.sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . " LIMIT 1) AS grund
 	FROM
@@ -110,7 +109,6 @@ if (!$db->db_query($query) || !$db->db_num_rows())
 	<?php while($row = $db->db_fetch_object()) { ?>
 		<?php
 			$abmeldedatum = new DateTime($row->abmeldedatum);
-			$abmeldedatum->modify($config['wiederholung_job_deadline_date_modifier']);
 		?>
 		<antrag>
 			<name><![CDATA[<?= trim($row->vorname . ' ' . $row->nachname); ?>]]></name>
