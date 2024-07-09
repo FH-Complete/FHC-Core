@@ -1658,7 +1658,7 @@ function StudentAuswahl()
 
 		var antragnotentree = document.getElementById('student-antragnoten-tree');
 
-		url='<?php echo APP_ROOT;?>index.ci.php/components/Antrag/Wiederholung/getLvsAsRdf/'+prestudent_id+"?"+gettimestamp();
+		url='<?php echo APP_ROOT;?>index.ci.php/api/frontend/fas/studstatus/Wiederholung/getLvs/'+prestudent_id+"?"+gettimestamp();
 
 		try
 		{
@@ -4764,7 +4764,7 @@ function StudentNotenMoveFromAntrag()
 	var paramList= '';
 	var i = 0;
 
-	var url = '<?php echo APP_ROOT ?>index.ci.php/components/Antrag/Wiederholung/moveLvsToZeugnis';
+	var url = '<?php echo APP_ROOT ?>index.ci.php/api/frontend/fas/studstatus/Wiederholung/moveLvsToZeugnis';
 	var req = new phpRequest(url,'','');
 
 	for (var t = 0; t < numRanges; t++)

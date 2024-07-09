@@ -34,19 +34,22 @@ require_once('../include/studiensemester.class.php');
 require_once('../include/student.class.php');
 require_once('../include/firma.class.php');
 require_once('../include/note.class.php');
+require_once('../include/studienplan.class.php');
+require_once('../include/lehrveranstaltung.class.php');
+require_once('../include/lehrform.class.php');
+require_once('../include/sprache.class.php');
 
 $datum = new datum();
 $db = new basis_db();
 
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
-
 	if(isset($_GET['uid']))
 		$uid = $_GET['uid'];
 	else
 		$uid = null;
 
-	$uid_arr = explode(";",$uid);
+	$uid_arr = explode(";", $uid);
 
 	echo "<?xml version='1.0' encoding='UTF-8' standalone='yes'?> ";
 	echo "<supplements>";
@@ -60,9 +63,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						vw_student.matrikelnr, vw_student.prestudent_id,
 						tbl_studiengang.bezeichnung, tbl_studiengang.english, tbl_studiengang.studiengang_kz,
 						tbl_studiengang.typ, tbl_studiengang.mischform, tbl_studiengang.max_semester,
-						tbl_studiengang.orgform_kurzbz
+						tbl_studiengang.orgform_kurzbz, tbl_person.matr_nr
 				  FROM
 						campus.vw_student JOIN public.tbl_studiengang USING(studiengang_kz)
+				  JOIN
+				   		public.tbl_person USING (person_id)
 				  WHERE
 						uid = ".$db->db_add_param($uid_arr[$i]);
 
@@ -96,7 +101,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<vornamen><![CDATA['.$row->vornamen.']]></vornamen>';
 		echo '		<name><![CDATA['.$row->vorname.' '.$row->nachname.']]></name>';
 		echo '		<geburtsdatum><![CDATA['.$datum->convertISODate($row->gebdatum).']]></geburtsdatum>';
+
+		//Print in Transcript of Record
 		echo '		<matrikelnummer>'.TRIM($row->matrikelnr).'</matrikelnummer>';
+
+		//Angaben zur Person /Information identifying the holder of the qualification
+		echo '		<matr_nr><![CDATA['.$row->matr_nr.']]></matr_nr>';
 		echo '		<studiengang_kz>'.$studiengang_kz.'</studiengang_kz>';
 
 		$prestudent = new prestudent($row->prestudent_id);
@@ -108,6 +118,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			{
 				$studiengangbezeichnung = $studienordnung->__get('studiengangbezeichnung');
 				$studiengangbezeichnung_englisch = $studienordnung->__get('studiengangbezeichnung_englisch');
+				$studienordnung_id =$studienordnung->__get('studienordnung_id');
 			}
 		}
 		$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $row->bezeichnung : $studiengangbezeichnung;
@@ -115,6 +126,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		echo '		<studiengang_bezeichnung_deutsch><![CDATA['.$studiengang_bezeichnung.']]></studiengang_bezeichnung_deutsch>';
 		echo '		<studiengang_bezeichnung_englisch><![CDATA['.$studiengang_bezeichnung_englisch.']]></studiengang_bezeichnung_englisch>';
+		echo '<studienordnung_id>'.$studienordnung_id.'</studienordnung_id>';
 
 		$prestudent = new prestudent();
 		$prestudent->getFirstStatus($row->prestudent_id, 'Student');
@@ -126,8 +138,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			$angerechneteECTS=($semesterNumberStart-1)*30; // 30 ECTS pro Semester
 			echo '		<angerechnete_ects_quereinstieg>'.$angerechneteECTS.'</angerechnete_ects_quereinstieg>';
+
+            $end_semester_anrechnung = $semesterNumberStart - 1;
+            echo '      <start_semester_anrechnung_number>1</start_semester_anrechnung_number>';
+            echo '      <end_semester_anrechnung_number>'. $end_semester_anrechnung .'</end_semester_anrechnung_number>';
 		}
-		echo '      <start_semester>'.substr($prestudent->studiensemester_kurzbz,2,6).'</start_semester>';
+		echo '      <start_semester>'.substr($prestudent->studiensemester_kurzbz, 2, 6).'</start_semester>';
 		echo '      <start_semester_number>'.$prestudent->ausbildungssemester.'</start_semester_number>';
 		$prestudent->getLastStatus($row->prestudent_id, null);
 		$semesterNumberEnd = $prestudent->ausbildungssemester;
@@ -254,6 +270,25 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				break;
 		}
 
+		//Anforderungen durch Lernergebnisse des Studiums ersetzen
+		$addon_obj = new addon();
+		$addonStgAktiv = $addon_obj->checkActiveAddon("studiengangsverwaltung");
+
+		if($addonStgAktiv)
+		{
+
+			require_once('../addons/studiengangsverwaltung/include/qualifikationsziel.class.php');
+			$qualifikationsziel = new qualifikationsziel();
+			$qualifikationsziel->getAll($studienordnung_id);
+			if (isset($qualifikationsziel->result[0]))
+			{
+				$qualifikation_beschreibung = $qualifikationsziel->result[0]->data[1]->elements[0];
+				$qualifikation_beschreibung = json2odt($qualifikation_beschreibung);
+				echo "<lernergebnisse><![CDATA[$qualifikation_beschreibung]]></lernergebnisse>";
+			}
+
+		}
+
 		if($row->typ=='d')
 		{
 			echo '		<niveau_code>UNESCO ISCED 7</niveau_code>';
@@ -275,8 +310,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo '		<anforderungen_englisch><![CDATA[The program requires the positive completion of all courses (lectures, labs, seminars, project work, and integrated courses) to the extend of 30 ECTS per semester according to the curriculum.  The program integrates technical, economical, management and personal study elements. The degree is awarded upon the successful completion of a Master´s Thesis and the final examination. The program (classification number '.$studiengang_kz.') is accredited by AQ Austria.]]></anforderungen_englisch>';
 			echo '		<zugangsberechtigung_deutsch><![CDATA[Der Abschluss des Masterstudiengangs berechtigt zu einem facheinschlägigen Doktoratsstudium an einer Universität (mit eventuellen Zusatzprüfungen).]]></zugangsberechtigung_deutsch>';
 			echo '		<zugangsberechtigung_englisch><![CDATA[The successful completion of the Master Degree Program qualifies the graduate to apply for admission to a relevant Doctoral Degree Program at a University (additional qualifying exams may be required).    ]]></zugangsberechtigung_englisch>';
-			echo '		<niveau_deutsch>Masterstudium (UNESCO ISCED 7)</niveau_deutsch>';
-			echo '		<niveau_englisch>Master degree program (UNESCO ISCED 7)</niveau_englisch>';
+			echo '		<niveau_deutsch>Masterstudium: UNESCO ISCED 7; Zuordnung nationaler Qualifikationsrahmen 7</niveau_deutsch>';
+			echo '		<niveau_englisch>Master degree program: UNESCO ISCED 7; Classification national qualification framework 7</niveau_englisch>';
 		}
 		elseif($row->typ=='b')
 		{
@@ -287,8 +322,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo '		<anforderungen_englisch><![CDATA[The program requires the positive completion of all courses (lectures, labs, seminars, project work, and integrated courses) to the extend of 30 ECTS per semester according to the curriculum. The program integrates technical, economical, management and personal study elements. '.$anforderungen_praxiseng.' The degree is awarded upon the successful completion of 1 bachelor theses and the final examination. The program (classification number '.$studiengang_kz.') is accredited by AQ Austria.]]></anforderungen_englisch>';
 			echo '		<zugangsberechtigung_deutsch><![CDATA[Der Abschluss des Bachelorstudiengangs berechtigt zu einem facheinschlägigen Magister- bzw. Master-Studium an einer fachhochschulischen Einrichtung oder Universität (mit eventuellen Zusatzprüfungen).]]></zugangsberechtigung_deutsch>';
 			echo '		<zugangsberechtigung_englisch><![CDATA[The successful completion of the Bachelor Degree Program qualifies the graduate to apply for admission to a relevant Master Degree Program at a University of Applied Sciences or a University (additional qualifying exams may be required).]]></zugangsberechtigung_englisch>';
-			echo '		<niveau_deutsch>Bachelorstudium (UNESCO ISCED 6)</niveau_deutsch>';
-			echo '		<niveau_englisch>Bachelor degree program (UNESCO ISCED 6)</niveau_englisch>';
+			echo '		<niveau_deutsch>Bachelorstudium: UNESCO ISCED 6;  Zuordnung nationaler Qualifikationsrahmen 6</niveau_deutsch>';
+			echo '		<niveau_englisch>Bachelor degree program: UNESCO ISCED 6; Classification national qualification framework 6</niveau_englisch>';
 		}
 		elseif($row->typ=='r')
 		{
@@ -328,6 +363,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo "		<beurteilung>In diesem Curriculum nicht zutreffend.</beurteilung>";
 			echo "		<beurteilung_english>Not applicable within this curriculum.</beurteilung_english>";
 		}
+
+		echo "		<zugangsber_reglementierte_berufe>Zugang zu reglementierten Berufen nach Maßgabe der berufsrechtlichen Vorschriften;	Diplom im Sinne des Art.11 lit.c/d/e der Richtlinie 2005/36/EG über die Anerkennung von Berufsqualifikationen</zugangsber_reglementierte_berufe>";
+		echo "		<zugangsber_reglementierte_berufe_englisch>Access to regulated professions according to professional regulations; diploma in the sense of Art.11 lit.(c)/(d)/(e) of directive 2005/36/EG</zugangsber_reglementierte_berufe_englisch>";
 
 		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE akadgrad_id=".$db->db_add_param($akadgrad_id);
 		$titel_de = '';
@@ -411,7 +449,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$abschlussbeurteilung='';
 		// Hole Datum der Sponsion -> wenn keine vorhanden nimm aktuelles datum
 		$qry = "SELECT
-					sponsion, tbl_abschlussbeurteilung.bezeichnung_english, datum, pruefungstyp_kurzbz
+					sponsion, tbl_abschlussbeurteilung.bezeichnung_english, datum, pruefungstyp_kurzbz, bezeichnung
 				FROM
 					lehre.tbl_abschlusspruefung
 					JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz)
@@ -431,11 +469,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$sponsion_datum = $datum->formatDatum($row1->sponsion, 'd.m.Y');
 				$abschlusspruefungsdatum = $datum->formatDatum($row1->datum, 'd.m.Y');
 				$abschlussbeurteilung = $row1->bezeichnung_english;
+				$abschlussbeurteilung_deutsch = $row1->bezeichnung;
 				$pruefungstyp_kurzbz = $row1->pruefungstyp_kurzbz;
 			}
 		}
 		echo "		<pruefungstyp_kurzbz>$pruefungstyp_kurzbz</pruefungstyp_kurzbz>";
 		echo "		<abschlussbeurteilung>$abschlussbeurteilung</abschlussbeurteilung>";
+		echo "		<abschlussbeurteilung_deutsch>$abschlussbeurteilung_deutsch</abschlussbeurteilung_deutsch>";
 		echo "		<abschlusspruefungsdatum>$abschlusspruefungsdatum</abschlusspruefungsdatum>";
 		echo "      <sponsion_datum>$sponsion_datum</sponsion_datum>";
 
@@ -578,6 +618,41 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$ects_total = 0;
 		$ects_total_positiv = 0;
 
+		//Anrechnung Quereinsteiger
+		echo ' <anrechnungen>';
+
+    	//Version Studienordnung
+		if($semesterNumberStart>1)
+		{
+			$maxSemester = $semesterNumberStart;
+			$summe_ects_orgform = 0;
+			$summe_sws_orgform = 0;
+			for($j = 1; $j <$maxSemester; $j++)
+			{
+				$summe_ects_semester = 0;
+				$summe_sws_semester = 0;
+				echo '	<stosemester>';
+				echo '	<stosemester_nr><![CDATA['.$j.']]></stosemester_nr>';
+
+				$lv = new lehrveranstaltung();
+				$lv->loadLehrveranstaltungStudienplan($studienplan_id, $j);
+				$tree = $lv->getLehrveranstaltungTree();
+
+				printLehrveranstaltungTree($tree);
+
+				//if ($lv->lehrtyp_kurzbz!='modul')
+				//	$summe += $lv->ects;
+
+				echo '	<lv_summe_ects_semester><![CDATA['.$summe_ects_semester.']]></lv_summe_ects_semester>';
+				echo '	<lv_summe_sws_semester><![CDATA['.round($summe_sws_semester, 2).']]></lv_summe_sws_semester>';
+
+				$summe_ects_orgform += $summe_ects_semester;
+				$summe_sws_orgform += $summe_sws_semester;
+				echo '</stosemester>';
+			}
+		}
+		echo ' </anrechnungen>';
+
 		echo "<studiensemester>";
 		for($start = $semesterNumberStart; $start <= $semesterNumberEnd; $start++)
 		{
@@ -615,16 +690,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			// Array der Semester
 			$aktuellesSemester = $semester_kurzbz;
 
-			$semester = mb_substr($semester_kurzbz[0],0,2);
-			$year = mb_substr($semester_kurzbz[0], 2,4);
+			$semester = mb_substr($semester_kurzbz[0], 0, 2);
+			$year = mb_substr($semester_kurzbz[0], 2, 4);
 
 			if($semester == 'SS')
 				$semester_kurzbz = 'Summer Semester '.$year;
-			else if($semester == 'WS')
+			elseif($semester == 'WS')
 			{
-				$helpyear = mb_substr($year, 2,2);
+				$helpyear = mb_substr($year, 2, 2);
 				$helpyear +=1;
-				$helpyear = sprintf("%02d",$helpyear);
+				$helpyear = sprintf("%02d", $helpyear);
 				$semester_kurzbz = 'Winter Semester '.$year.'/'.$helpyear;
 			}
 
@@ -763,11 +838,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					if($result_lehrform = $db->db_query($qry_lehrform))
 					{
 						while($row_lehrform = $db->db_fetch_object($result_lehrform))
-						{	if($y != 0)
-							$lehrform_kurzbz = $lehrform_kurzbz.', '.$row_lehrform->lehrform_kurzbz;
-						else
-							$lehrform_kurzbz = $row_lehrform->lehrform_kurzbz;
-							$y++;
+						{
+							if($y != 0)
+								$lehrform_kurzbz = $lehrform_kurzbz.', '.$row_lehrform->lehrform_kurzbz;
+							else
+								$lehrform_kurzbz = $row_lehrform->lehrform_kurzbz;
+								$y++;
 						}
 					}
 					$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['lehrform_kurzbz']= $lehrform_kurzbz;
@@ -791,7 +867,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					}
 
 					$datum = new datum();
-					$benotungsdatum = $datum->formatDatum($benotungsdatum,'d/m/Y');
+					$benotungsdatum = $datum->formatDatum($benotungsdatum, 'd/m/Y');
 					$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['benotungsdatum']= $benotungsdatum;
 
 					$bezeichnung_englisch = $row_stud->bezeichnung_english;
@@ -1052,4 +1128,108 @@ function checkNote($note_alt, $note_neu)
 		return false;
 }
 
+//Funktionen für Andruck Studienordnung
+function cmp($a, $b)
+{
+	return strcmp($a->bezeichnung, $b->bezeichnung);
+}
+
+//newline \n durch string '\n' ersetzen (für Qualifikationsziele)
+function json2odt($str)
+{
+	$str = str_replace(array("\r\n", "\r", "\n"), '\n', $str);
+
+	return $str;
+}
+
+function printLehrveranstaltungTree($tree)
+{
+	global $summe_ects_semester, $summe_sws_semester;
+	usort($tree, "cmp");
+	foreach($tree as $lv)
+	{
+		if ($lv->export)
+		{
+			$db = new basis_db();
+			$lv_alvs = new lehrveranstaltung();
+			if(!$alvs = $lv_alvs->getALVS($lv->lehrveranstaltung_id, $lv->semester))
+				$alvs = '';
+			//Semesterwochen zum berechnen der SWS ermitteln
+			$qry = '	SELECT
+							wochen
+						FROM
+							public.tbl_semesterwochen
+						WHERE
+							studiengang_kz='.$lv->studiengang_kz.'
+						AND
+							semester='.$lv->semester;
+			if($wochen_stg = $db->db_query($qry))
+			{
+				if($db->db_num_rows($wochen_stg)==1)
+				{
+					$row_wochen = $db->db_fetch_object($wochen_stg);
+					$wochen = $row_wochen->wochen;
+				}
+				else
+					$wochen = '15';
+			}
+			if ($lv->semesterstunden!='')
+				$sws = ($lv->semesterstunden / $wochen);
+			else
+				$sws = 0;
+
+			//Bezeichnung der Lehrform
+			$lehrform_kurzbz = new lehrform();
+			$lehrform_kurzbz->load($lv->lehrform_kurzbz);
+
+			//Klasse "sprache" instanzieren, um anschließend die Sprache(e.g. "German") in der richtigen Sprache zu bekommen("Deutsch")
+			$sp = new sprache();
+
+
+			echo '  		<lehrveranstaltung>';
+			echo '              <lv_semester><![CDATA['.$lv->semester.']]></lv_semester>';
+			echo '              <lv_lehrtyp_kurzbz><![CDATA['.$lv->lehrtyp_kurzbz.']]></lv_lehrtyp_kurzbz>';
+			echo '              <lv_bezeichnung><![CDATA['.$lv->bezeichnung.']]></lv_bezeichnung>';
+			echo '              <lv_bezeichnung_en><![CDATA['.$lv->bezeichnung_english.']]></lv_bezeichnung_en>';
+			echo '              <lv_kurzbz><![CDATA['.$lv->kurzbz.']]></lv_kurzbz>';
+			echo '              <lv_lehrform_kurzbz><![CDATA['.$lv->lehrform_kurzbz.']]></lv_lehrform_kurzbz>';
+			echo '              <lv_lehrform_langbz><![CDATA['.$lehrform_kurzbz->bezeichnung.']]></lv_lehrform_langbz>';
+			echo '              <lv_gruppen><![CDATA[]]></lv_gruppen>';
+			echo '              <lv_ects><![CDATA['.$lv->ects.']]></lv_ects>';
+			echo '              <lv_semesterstunden><![CDATA['.$lv->semesterstunden.']]></lv_semesterstunden>';
+			echo '              <lv_sws><![CDATA['.$lv->sws.']]></lv_sws>';
+			echo '              <lv_lvs><![CDATA['.$lv->lvs.']]></lv_lvs>';
+			echo '              <lv_pflicht><![CDATA['.$lv->stpllv_pflicht.']]></lv_pflicht>';
+			echo '              <lv_studplan><![CDATA['.$lv->export.']]></lv_studplan>';
+			echo '              <lv_gen><![CDATA['.$lv->genehmigung.']]></lv_gen>';
+			echo '              <lv_anmerkung><![CDATA['.clearHtmlTags($lv->anmerkung).']]></lv_anmerkung>';
+			echo '				<lv_sprache><![CDATA['.$sp->getBezeichnung($lv->sprache, constant("DEFAULT_LANGUAGE")).']]></lv_sprache>';
+
+			//Wenn Modul verpflichtend und alle Childs frei wählbar, soll Modul für ects gezählt werden
+			$allChildsFree = true;
+			foreach ($lv->childs as $child)
+			{
+				if($child->stpllv_pflicht)
+				{
+					$allChildsFree = false;
+				}
+			}
+
+			if(($lv->lehrtyp_kurzbz!='modul' && $lv->stpllv_pflicht) || ($allChildsFree && $lv->lehrtyp_kurzbz=='modul' && $lv->stpllv_pflicht))
+			{
+				$summe_ects_semester += $lv->ects;
+				$summe_sws_semester += $sws;
+			}
+
+			// Darunterliegende LVs/Module
+			if(isset($lv->childs) && count($lv->childs)>0)
+			{
+				echo '<singlelehrveranstaltungen>';
+				printLehrveranstaltungTree($lv->childs, count($lv->childs));
+				echo '</singlelehrveranstaltungen>';
+			}
+			echo '</lehrveranstaltung>';
+		}
+	}
+}
 ?>
