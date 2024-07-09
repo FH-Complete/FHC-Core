@@ -100,6 +100,10 @@ export default {
 				{
 					event: 'dataProcessed',
 					handler: this.autoSelectRows
+				},
+				{
+					event: 'rowClick',
+					handler: this.handleRowClick // TODO(chris): this should be in the filter component
 				}
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
@@ -178,38 +182,47 @@ export default {
 					e.preventDefault();
 					var next = this.focusObj.previousElementSibling;
 					if (next)
-						this.focusObj = this.changeFocus(this.focusObj, next);
+						this.changeFocus(this.focusObj, next);
 					break;
 				case 'ArrowDown':
 					e.preventDefault();
 					var next = this.focusObj.nextElementSibling;
 					if (next)
-						this.focusObj = this.changeFocus(this.focusObj, next);
+						this.changeFocus(this.focusObj, next);
 					break;
 			}
 		},
 		changeFocus(a, b) { // TODO(chris): this should be in the filter component
-			a.tabIndex = -1;
 			if (b) {
 				b.tabIndex = 0;
+				this.focusObj = b;
 				b.focus();
-			}
-			return b;
-		},
-		onBlur(e) { // TODO(chris): this should be in the filter component
-			const tableholder = e.target.closest('.tabulator-tableholder');
-			if (tableholder && tableholder != e.target && !e.relatedTarget?.classList.contains('tabulator-row')) {
-				e.target.tabIndex = -1;
-				tableholder.tabIndex = 0;
+			} else {
 				this.focusObj = null;
 			}
+			a.tabIndex = -1;
+			return this.focusObj;
 		},
 		onFocus(e) { // TODO(chris): this should be in the filter component
-			if (e.target.classList.contains('tablulator-container')) {
-				this.focusObj = this.changeFocus(e.target, e.target.querySelector('.tabulator-row'));
+			if (!this.focusObj) {
+				var container, target;
+				if (e.target.classList.contains('tabulator-container')) {
+					container = e.target;
+					target = container.querySelector('.tabulator-row');
+				} else if (e.target.classList.contains('tabulator-row')) {
+					container = e.target.closest('.tabulator-container');
+					target = e.target;
+				}
+				if (container && target) {
+					this.changeFocus(container, target);
+				}
 			}
-			if (e.target.classList.contains('tabulator-tableholder')) {
-				this.focusObj = this.changeFocus(e.target, e.target.querySelector('.tabulator-row'));
+		},
+		handleRowClick(e, row) { // TODO(chris): this should be in the filter component
+			if (this.focusObj) {
+				let el = row.getElement();
+				if (el != this.focusObj)
+					this.changeFocus(this.focusObj, el);
 			}
 		}
 	},
@@ -217,7 +230,7 @@ export default {
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
-		<div class="tablulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @focusout="onBlur" @keydown="onKeydown">
+		<div class="tabulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @keydown="onKeydown">
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"
