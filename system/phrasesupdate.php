@@ -2522,6 +2522,26 @@ $phrases = array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'error_uidNotInPerson',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die angegebene UID passt nicht zu der angegebenen Person',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Given UID is not assigned to the given Person',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 	//****************	CORE/lehre
 	array(
@@ -27011,6 +27031,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'An access card must have a number. To delete the assignment to this card, please remove the entire data record!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'error_bmZutrittskarteOccupied',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diese Zutrittskarte ist bereits ausgegeben an: {vorname} {nachname} ({uid})',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This access card has already been issued to: {vorname} {nachname} ({uid})',
 				'description' => '',
 				'insertvon' => 'system'
 			)
