@@ -271,11 +271,12 @@ class LvMenu extends FHCAPI_Controller
 						$params
 		);
 
-
+		
 		// Menu sortieren
 		// ##########################################################################################
 		foreach ($menu as $key => $row){
 			$pos[$key] = $row['position'];
+			$menu[$key]['icon'] = base_url(str_replace("../../..","",$row['icon']));
 		}
 
 		array_multisort($pos, SORT_ASC, SORT_NUMERIC, $menu);
@@ -574,19 +575,32 @@ class LvMenu extends FHCAPI_Controller
 			
 			// get the data of the database result and map the array of objects to their object property
 			$studentMails = $this->getDataOrTerminateWithError($studentMails, 'No student mails found');
-			$studentMails = array_map(
-			function($mail_obj){
-				return $mail_obj->mail;
-			},$studentMails);
-
-			$mailto = implode(',',$studentMails);
 			
-			//todo logic for nomail is missing
-			if($nomail!='')
-				$link_onclick='alert(\''.$p->t('lehre/keinMailverteiler',array($nomail)).'\');';
-			else
-				$link_onclick='';
+			// emails used to create the mailto link
+			$mailtoMails = array();
+			$noMails = array();
+			$noMailLink = FALSE;
 
+			
+
+			foreach($studentMails as $mail){
+				
+				if($mail->mail == 'nomail'){
+					$noMails[]=$mail->gruppe_kurzbz;
+					$noMailLink= TRUE;
+				}else{
+					$mailtoMails[]=$mail->mail;
+				}
+			}
+
+			if($noMailLink){
+				$link_onclick='alert(\''.$p->t('lehre/keinMailverteiler',array(implode(" ",$noMails))).'\');';
+			}else{
+				$link_onclick='';
+			}
+			
+			$mailto .= implode(',',$mailtoMails);
+			
 			$menu[]=array
 			(
 				'id'=>'core_menu_mailanstudierende',

@@ -125,15 +125,22 @@ class Lehreinheit_model extends DB_Model
 		// logic used from cis_menu_lv.inc.php line 335
 		return $this->execReadOnlyQuery("
 		SELECT
-				CASE 
-					WHEN gruppe_kurzbz !='' THEN LOWER(gruppe_kurzbz || '@' || ?)
-					ELSE LOWER(stg_typ || stg_kurzbz || semester || TRIM(verband) || TRIM(gruppe) || '@' || ?) 
-				END AS mail
+			gruppe_kurzbz,
+			CASE 
+				WHEN nomail = TRUE THEN 'nomail'
+				WHEN gruppe_kurzbz !='' THEN LOWER(gruppe_kurzbz || '@' || ?)
+				ELSE LOWER(stg_typ || stg_kurzbz || semester || TRIM(verband) || TRIM(gruppe) || '@' || ?) 
+			END AS mail
+			
 		FROM 
 		(
 			SELECT 
 				distinct vw_lehreinheit.studiensemester_kurzbz, vw_lehreinheit.stg_kurzbz, vw_lehreinheit.stg_typ, vw_lehreinheit.semester,
-				COALESCE(vw_lehreinheit.verband,'') as verband, COALESCE(vw_lehreinheit.gruppe,'') as gruppe, vw_lehreinheit.gruppe_kurzbz, tbl_gruppe.mailgrp
+				COALESCE(vw_lehreinheit.verband,'') as verband, COALESCE(vw_lehreinheit.gruppe,'') as gruppe, vw_lehreinheit.gruppe_kurzbz, tbl_gruppe.mailgrp,
+				CASE
+					WHEN mailgrp = TRUE OR mailgrp IS NULL THEN FALSE
+					ELSE TRUE
+				END as nomail
 			FROM campus.vw_lehreinheit
 			LEFT JOIN public.tbl_gruppe USING(gruppe_kurzbz)
 			WHERE 
@@ -143,7 +150,7 @@ class Lehreinheit_model extends DB_Model
 				vw_lehreinheit.studiensemester_kurzbz =
 				(select distinct studiensemester_kurzbz from campus.vw_lehreinheit where lehreinheit_id=?)
 				AND (vw_lehreinheit.gruppe_kurzbz IS NULL OR
-					(vw_lehreinheit.gruppe_kurzbz IS NOT NULL AND tbl_gruppe.mailgrp = TRUE AND (SELECT COUNT(*) FROM public.tbl_benutzergruppe where gruppe_kurzbz = vw_lehreinheit.gruppe_kurzbz AND studiensemester_kurzbz = vw_lehreinheit.studiensemester_kurzbz) > 0))
+					(vw_lehreinheit.gruppe_kurzbz IS NOT NULL AND (SELECT COUNT(*) FROM public.tbl_benutzergruppe where gruppe_kurzbz = vw_lehreinheit.gruppe_kurzbz AND studiensemester_kurzbz = vw_lehreinheit.studiensemester_kurzbz) > 0))
 				
 		
 		) AS subquery

@@ -14,8 +14,7 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 <div id="content">
 	<h2>Dashboard</h2>
 	<hr>
-	<fhc-dashboard active_addons="<?php echo ACTIVE_ADDONS ?>" 
-	mail_studierende="<?php echo !defined('CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN ?>" dashboard="CIS"/>
+	<fhc-dashboard dashboard="CIS"/>
 </div>
 
 <?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>
