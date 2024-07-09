@@ -249,6 +249,7 @@ class LvMenu extends FHCAPI_Controller
 		// Addons Menu Logic
 		// ##########################################################################################		
         $params = [
+			'user'=>$user,
 			'lvid'=>$lvid,
 			'studiensemester_kurzbz'=>$studiensemester_kurzbz,
 			'studiengang_kz'=>$studiengang_kz,
@@ -264,10 +265,8 @@ class LvMenu extends FHCAPI_Controller
 		
 		Events::trigger('lvMenuBuild', 
 						// callback function for the onEvents to add newValues to the $menu
-						function ($addonMenu) use (&$menu) {
-							foreach($addonMenu as $m){
-								$menu[]= $m;
-							}
+						function & () use (&$menu) {
+							return $menu;
 						},
 						$params
 		);
@@ -276,21 +275,15 @@ class LvMenu extends FHCAPI_Controller
 		// Menu sortieren
 		// ##########################################################################################
 		foreach ($menu as $key => $row){
-			if(isset($row['position'])){
-				$pos[$key] = $row['position'];
-			}
+			$pos[$key] = $row['position'];
 		}
 
-		$sortable_menu = array_filter($menu, function($element){
-			return isset($element['position']);
-		});
-
-		array_multisort($pos, SORT_ASC, SORT_NUMERIC, $sortable_menu);
+		array_multisort($pos, SORT_ASC, SORT_NUMERIC, $menu);
 
 		// HTTP response
 		// ##########################################################################################
 
-		$this->terminateWithSuccess($sortable_menu);
+		$this->terminateWithSuccess($menu);
 
 	}
 
