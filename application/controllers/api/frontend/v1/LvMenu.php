@@ -248,7 +248,8 @@ class LvMenu extends FHCAPI_Controller
 
 		// Addons Menu Logic
 		// ##########################################################################################		
-        $params = [
+        
+		$params = [
 			'user'=>$user,
 			'lvid'=>$lvid,
 			'studiensemester_kurzbz'=>$studiensemester_kurzbz,
@@ -271,12 +272,17 @@ class LvMenu extends FHCAPI_Controller
 						$params
 		);
 
-		
 		// Menu sortieren
 		// ##########################################################################################
+		
 		foreach ($menu as $key => $row){
 			$pos[$key] = $row['position'];
+			// replace the path to the icon
 			$menu[$key]['icon'] = base_url(str_replace("../../..","",$row['icon']));
+			// replace the quatations in the link_onclick
+			if(array_key_exists("link_onclick",$menu[$key])){
+				$menu[$key]['link_onclick'] = str_replace("\"","'",$menu[$key]['link_onclick']);
+			}
 		}
 
 		array_multisort($pos, SORT_ASC, SORT_NUMERIC, $menu);
