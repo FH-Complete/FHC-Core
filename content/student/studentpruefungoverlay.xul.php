@@ -34,6 +34,11 @@ if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 else
 	$punktehidden = 'true';
 
+if(defined('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT') && FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT)
+    $show_komm_prfg_hint = true;
+else
+    $show_komm_prfg_hint = false;
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 ?>
@@ -252,15 +257,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
+<?php if($show_komm_prfg_hint) { ?>
 									<row id="student-pruefung-textbox-datum-hinweis" hidden="true">
 										<label></label>
-										<hbox>
-					      					<image height="17" width="17" class="alert-icon"/>
-					      					<description class="small-margin">
-					      						Bitte das Datum der Benotung eintragen und nicht das Datum der Prüfung.
-					      					</description>
-					      				</hbox>
+										<hbox style="font-size: 75%;">
+										    <image style="width: 20px; margin: 15px 5px 15px 10px;" class="message-icon"/>
+										    <vbox>
+											<description class="small-margin">Bitte bei der Neuanlage das Datum der Noteneintragung (i. d. R. heute) eintragen, </description>
+											<description class="small-margin">um einen korrekten Fristenablauf der Wiederholung zu ermöglichen. </description>
+											<description class="small-margin">Das Datum der Prüfung bitte im Anmerkungsfeld vermerken.</description>
+										    </vbox>
+										</hbox>
 									</row>
+<?php } ?>
 					      			<row>
 					      				<label value="Anmerkung" control="student-pruefung-textbox-anmerkung"/>
 							      		<textbox id="student-pruefung-textbox-anmerkung" disabled="true" maxlength="256"/>
