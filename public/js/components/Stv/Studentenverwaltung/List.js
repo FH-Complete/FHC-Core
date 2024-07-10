@@ -1,5 +1,4 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
-import {CoreRESTClient} from '../../../RESTClient.js';
 import ListNew from './List/New.js';
 
 
