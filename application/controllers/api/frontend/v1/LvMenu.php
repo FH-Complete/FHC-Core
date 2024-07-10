@@ -277,11 +277,23 @@ class LvMenu extends FHCAPI_Controller
 		
 		foreach ($menu as $key => $row){
 			$pos[$key] = $row['position'];
-			// replace the path to the icon
-			$menu[$key]['icon'] = base_url(str_replace("../../..","",$row['icon']));
-			// replace the quatations in the link_onclick
+
+			// adds new key with modified icon path to the menu
+			$menu[$key]['cis4_icon'] = base_url(str_replace("../../..","",$row['icon']));
+			
+			// adds new key with modified link_onclick link to the menu 
 			if(array_key_exists("link_onclick",$menu[$key])){
-				$menu[$key]['link_onclick'] = str_replace("\"","'",$menu[$key]['link_onclick']);
+				$menu[$key]['cis4_link_onclick'] = str_replace("\"","'",$menu[$key]['link_onclick']);
+			}
+
+			// adds new key with modified link to the menu 
+			if(array_key_exists("link",$menu[$key])){
+				// only replace the link key if the link has an old path
+				if(strpos($menu[$key]['link'],"../../..") != false){
+					$menu[$key]['cis4_link'] = base_url(str_replace("../../..","",$row['link']));
+				}else{
+					$menu[$key]['cis4_link'] = $menu[$key]['link'];
+				}
 			}
 		}
 
