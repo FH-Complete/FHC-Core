@@ -56,6 +56,7 @@ require_once('dbupdate_3.4/36530_bis_internationsalisierung_codextabelle_neuerun
 require_once('dbupdate_3.4/34543_ux_template.php');
 require_once('dbupdate_3.4/17513_Entwicklungsteam.php');
 require_once('dbupdate_3.4/28575_softwarebereitstellung.php');
+require_once('dbupdate_3.4/40717_lv_faktor.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -246,6 +247,7 @@ $tabellen=array(
 	"lehre.tbl_zeitfenster"  => array("wochentag","stunde","ort_kurzbz","studiengang_kz","gewicht"),
 	"lehre.tbl_zeugnis"  => array("zeugnis_id","student_uid","zeugnis","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
+	"lehre.tbl_lehrveranstaltung_faktor"  => array("lehrveranstaltung_faktor_id", "lehrveranstaltung_id","faktor","studiensemester_kurzbz_von","studiensemester_kurzbz_bis","insertamum","insertvon","updateamum","updatevon"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung", "co_name"),
 	"public.tbl_adressentyp"  => array("adressentyp_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig", "sort"),
