@@ -27,11 +27,13 @@ export default{
 					{title:"PrestudentId", field:"prestudent_id", visible:false}
 				],
 				rowFormatter(row) {
-					if (["Abgewiesener","Abbrecher","Absolvent"].includes(row.getData().status_kurzbz)) {
-						row.getElement().classList.add('text-muted');
+					const rowData = row.getData();
+					const element = row.getElement();
+					if (["Abgewiesener","Abbrecher","Absolvent"].includes(rowData.status_kurzbz)) {
+						element.classList.add('disabled');
 					}
-					if (row.getData().prestudent_id == prestudent_id) {
-						row.getElement().classList.add('fw-bold');
+					if (rowData.prestudent_id == prestudent_id) {
+						element.classList.add('fw-bold');
 					}
 				},
 				layout: 'fitDataFill',
