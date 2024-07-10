@@ -8,11 +8,14 @@ $includesArray = array(
 	]
 );
 
-switch($template_kurzbz){
-	case 'raum_contentmittitel': 
-		$includesArray['tabulator5'] = true; 
-		break;
+if(isset($template_kurzbz)){
+	switch($template_kurzbz){
+		case 'raum_contentmittitel': 
+			$includesArray['tabulator5'] = true; 
+			break;
+	}
 }
+
 
 $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>

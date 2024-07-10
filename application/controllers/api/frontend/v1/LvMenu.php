@@ -289,8 +289,8 @@ class LvMenu extends FHCAPI_Controller
 			// adds new key with modified link to the menu 
 			if(array_key_exists("link",$menu[$key])){
 				// only replace the link key if the link has an old path
-				if(strpos($menu[$key]['link'],"../../..") != false){
-					$menu[$key]['cis4_link'] = base_url(str_replace("../../..","",$row['link']));
+				if(strpos($menu[$key]['link'],"../../..") !== false){
+					$menu[$key]['cis4_link'] = base_url(str_replace("../../..","",$menu[$key]['link']));
 				}else{
 					$menu[$key]['cis4_link'] = $menu[$key]['link'];
 				}
@@ -638,8 +638,20 @@ class LvMenu extends FHCAPI_Controller
 			$text='';
 			if($is_lector)
 				$text.= "<a href='../../../cms/newsverwaltung.php?studiengang_kz=$studiengang_kz&semester=$semester' class='Item'>".$p->t('profil/adminstration')."</a>";
-
+			
+			// this is the new cis4 version
 			$menu[]=array
+			(
+				'id'=>'core_menu_pinboard',
+				'position'=>'110',
+				'name'=>$p->t('lehre/pinboard'),
+				'icon'=>'../../../skin/images/button_pinboard.png',
+				'link'=>base_url("CisHtml/Cms/news"),
+				'text'=>$text
+			);
+
+			// this is the old cis version
+			/* $menu[]=array
 			(
 				'id'=>'core_menu_pinboard',
 				'position'=>'110',
@@ -647,7 +659,7 @@ class LvMenu extends FHCAPI_Controller
 				'icon'=>'../../../skin/images/button_pinboard.png',
 				'link'=>'../../../cms/news.php?studiengang_kz='.urlencode($studiengang_kz).'&semester='.urlencode($semester),
 				'text'=>$text
-			);
+			); */
 		}
 	}
 
