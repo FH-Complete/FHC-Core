@@ -36,10 +36,12 @@ export default {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: this.endpoint.getAllBetriebsmittel,
-				ajaxParams: {
-					type: this.typeId,
-					id: this.id
-				},
+				ajaxParams: () => {
+                                    return {
+                                        type: this.typeId,
+                                        id: this.id
+                                    }
+                                },
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Nummer", field: "nummer", width: 150},
@@ -149,7 +151,7 @@ export default {
 	},
 	watch: {
 		id() {
-			this.$refs.table.tabulator.setData('dummy', {type: this.typeId, id: this.id});
+			this.$refs.table.tabulator.setData('dummy');
 		}
 	},
 	methods: {
