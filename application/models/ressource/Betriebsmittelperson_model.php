@@ -109,7 +109,7 @@ class Betriebsmittelperson_model extends DB_Model
 			case 'betriebsmittelperson_id':
 				$cond = 'bmp.betriebsmittelperson_id';
 				break;
-			default:
+			default: 
 				return error("ID nicht gültig");
 		}
 
@@ -124,5 +124,21 @@ class Betriebsmittelperson_model extends DB_Model
 			    " . $cond . " = ? ";
 
 		return $this->execQuery($query, array($id));
+	}
+
+	/**
+	 * Perform a loadWhere on the vw_betriebsmittelperson DB View
+	 *
+	 * @param array $where
+	 *
+	 * @return stdClass
+	 */
+	public function loadViewWhere($where)
+	{
+		$table = $this->dbTable;
+		$this->dbTable = 'public.vw_betriebsmittelperson';
+		$result = $this->loadWhere($where);
+		$this->dbTable = $table;
+		return $result;
 	}
 }
