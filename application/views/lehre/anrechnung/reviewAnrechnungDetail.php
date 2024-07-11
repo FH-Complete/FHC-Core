@@ -1,4 +1,5 @@
 <?php
+$this->load->config('anrechnung');
 $this->load->view(
 	'templates/FHC-Header',
 	array(
@@ -143,14 +144,16 @@ $this->load->view(
 													   target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
 												</td>
 											</tr>
-                                            <tr>
-                                                <th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'begruendungEctsLabel'); ?></th>
-                                                <td><span><?php echo $anrechnungData->begruendung_ects ?></span></td>
-                                            </tr>
-                                            <tr>
-                                                <th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'begruendungLvinhaltLabel'); ?></th>
-                                                <td><span><?php echo $anrechnungData->begruendung_lvinhalt ?></span></td>
-                                            </tr>
+											<?php if ($this->config->item('explain_equivalence')): ?>
+                                                <tr>
+                                                    <th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'begruendungEctsLabel'); ?></th>
+                                                    <td><span><?php echo $anrechnungData->begruendung_ects ?></span></td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'begruendungLvinhaltLabel'); ?></th>
+                                                    <td><span><?php echo $anrechnungData->begruendung_lvinhalt ?></span></td>
+                                                </tr>
+											<?php endif; ?>
 											</tbody>
 										</table>
 
