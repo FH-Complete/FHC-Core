@@ -42,7 +42,8 @@ class Lehrveranstaltung_model extends DB_Model
                 stg.bezeichnung AS "stg_bezeichnung",
                 lv.semester,   
                 lv.lehrveranstaltung_id,
-                lv.bezeichnung AS "lv_bezeichnung"           
+                lv.bezeichnung AS "lv_bezeichnung",
+				lv.orgform_kurzbz
             FROM
                     lehre.tbl_lehrveranstaltung     lv 
                     JOIN lehre.tbl_lehreinheit           le USING (lehrveranstaltung_id)
@@ -105,7 +106,8 @@ class Lehrveranstaltung_model extends DB_Model
                 stg.bezeichnung AS "stg_bezeichnung",
                 lv.semester,   
                 lv.lehrveranstaltung_id,
-                lv.bezeichnung AS "lv_bezeichnung"           
+                lv.bezeichnung AS "lv_bezeichnung",
+				lv.orgform_kurzbz
             FROM
 				lehre.tbl_lehrveranstaltung     		lv 
 				JOIN lehre.tbl_lehreinheit           	le USING (lehrveranstaltung_id)
