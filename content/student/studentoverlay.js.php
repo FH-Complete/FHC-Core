@@ -5198,7 +5198,7 @@ function StudentPruefungTypChange()
 {
 	var typ = document.getElementById('student-pruefung-menulist-typ').value;
 	var hinweisid = document.getElementById('student-pruefung-textbox-datum-hinweis');
-	//if(hinweisid === NULL) return;
+	if(hinweisid === null) return;
 	hinweisid.hidden = (typ != 'kommPruef' && typ != 'zusKommPruef');
 }
 
