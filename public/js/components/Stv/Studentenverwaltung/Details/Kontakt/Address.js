@@ -205,8 +205,15 @@ export default{
 				if(this.addressData.adresse_id)
 					if(this.addressData.heimatadresse)
 						this.$fhcAlert.alertError(this.$p.t('person', 'error_deleteHomeAdress'));
-					else
-						this.$refs.deleteAdressModal.show();
+					else {
+						this.$fhcAlert
+							.confirmDelete()
+							.then(result => result
+								? adress_id
+								: Promise.reject({handled: true}))
+							.then(this.deleteAddress)
+							.catch(this.$fhcAlert.handleSystemError);
+					}
 			});
 		},
 		addNewAddress(addressData) {
@@ -254,7 +261,6 @@ export default{
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(()=> {
 					window.scrollTo(0, 0);
-					this.hideModal('deleteAdressModal');
 					this.reload();
 				});
 		},
@@ -558,18 +564,6 @@ export default{
 				<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewAddress()">OK</button>
 				<button v-else type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>
             </template>
-		</bs-modal>
-		
-		<!--Modal: deleteAdressModal-->
-		<bs-modal ref="deleteAdressModal">
-			<template #title>{{$p.t('person', 'adresse_delete')}}</template>
-			<template #default>
-				<p>{{$p.t('person', 'adresse_confirm_delete')}}</p>
-			</template>
-			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
-				<button type="button" class="btn btn-primary" @click="deleteAddress(addressData.adresse_id)">OK</button>
-			</template>
 		</bs-modal>
 			
 		<core-filter-cmpt

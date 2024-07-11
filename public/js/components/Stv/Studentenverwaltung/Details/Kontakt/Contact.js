@@ -146,7 +146,14 @@ export default{
 		},
 		actionDeleteContact(contact_id){
 			this.loadContact(contact_id);
-			this.$refs.deleteContactModal.show();
+
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? contact_id
+					: Promise.reject({handled: true}))
+				.then(this.deleteContact)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewContact(formData) {
 			this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewContact/' + this.uid,
@@ -181,7 +188,6 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(()=> {
 					window.scrollTo(0, 0);
-					this.hideModal('deleteContactModal');
 					this.resetModal();
 					this.reload();
 			});
@@ -378,19 +384,7 @@ export default{
 				<button v-else type="button" class="btn btn-primary" @click="updateContact(contactData.kontakt_id)">OK</button>
 			</template>
 		</BsModal>
-										
-		<!--Modal: Delete Contact-->
-		<BsModal ref="deleteContactModal">
-			<template #title>{{$p.t('person', 'kontakt_delete')}}</template>  
-			<template #default>
-				<p>{{$p.t('person', 'kontakt_confirm_delete')}}</p>
-			</template>												
-			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
-				<button ref="Close" type="button" class="btn btn-primary" @click="deleteContact(contactData.kontakt_id)">OK</button>
-			</template>
-		</BsModal>
-					
+														
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"

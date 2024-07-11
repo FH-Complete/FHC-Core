@@ -327,8 +327,17 @@ export default{
 
 			this.loadStatus(this.statusId).then(() => {
 				if(this.statusData)
-					this.$refs.deleteStatusModal.show();
+				{
+					this.$fhcAlert
+						.confirmDelete()
+						.then(result => result
+							? this.statusId
+							: Promise.reject({handled: true}))
+						.then(this.deleteStatus)
+						.catch(this.$fhcAlert.handleSystemError);
+				}
 			});
+
 		},
 		actionAdvanceStatus(status, stdsem, ausbildungssemester){
 			this.statusId = {
@@ -355,7 +364,6 @@ export default{
 			});
 		},
 		actionConfirmDialogue(data, statusgrund, statusText){
-		//	this.hideModal('addMultiStatus');
 			this.actionButton = statusgrund;
 			this.actionStatusText = statusText;
 
@@ -426,8 +434,6 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData, ausbildungssemester: this.actionSem}));
-
-			console.log("in changeStatusToWiederholer" + prestudentIds);
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToDiplomand(prestudentIds){
@@ -440,9 +446,6 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
-
-/*			console.log("in changeStatusToDiplomand" + prestudentIds);
-			this.hideModal('addMultiStatus');*/
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToAbsolvent(prestudentIds){
@@ -455,9 +458,6 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
-
-/*			console.log("in changeStatusToAbsolvent" + prestudentIds);
-			this.hideModal('addMultiStatus');*/
 			this.addNewStatus(prestudentIds);
 		},
 		turnIntoStudent(prestudentIds){
@@ -502,7 +502,6 @@ export default{
 					else
 					{
 						console.log(prestudentId + ": isersterStudent: " + this.isErsterStudent + " Add New Status");
-
 						changeData = this.newArray.find(item => item.prestudent_id === prestudentId);
 
 						return this.$fhcApi.post('api/frontend/v1/stv/status/addNewStatus/' + prestudentId,
@@ -537,7 +536,6 @@ export default{
 /*					if (this.modelValue.prestudent_id) {
 						this.reload();
 						//TODO(manu) reload Detailtab after Abbrecher to see current status activ, verband and gruppe
-						//TODO(manu) reload Tab STatus after turned Into Student to see new status
 					}*/
 					if(this.isErsterStudent) {
 						this.reload();
@@ -652,7 +650,6 @@ export default{
 				.then(
 					result => {
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-							this.hideModal('deleteStatusModal');
 							this.resetModal();
 					})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -924,24 +921,7 @@ export default{
 				</template>
 								
 			</BsModal>
-		
-			<!--Modal: Delete Status-->
-			<BsModal ref="deleteStatusModal">
-				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
-				<template #default>
-				<div v-if="isLastStatus == 1">
-					<p>{{$p.t('lehre', 'last_status_confirm_delete')}}</p>
-				</div>
-				<div v-else>
-					<p>{{$p.t('lehre', 'status_confirm_delete')}}</p>
-				</div>
-					
-				</template>
-				<template #footer>
-					<button ref="Close" type="button" class="btn btn-primary" @click="deleteStatus(statusId)">OK</button>
-				</template>
-			</BsModal>
-			
+				
 			<!--Modal: Confirm Abbruch-->
 			<BsModal ref="confirmStatusAction">
 				<template #title>{{$p.t('lehre', 'status_edit')}}</template>

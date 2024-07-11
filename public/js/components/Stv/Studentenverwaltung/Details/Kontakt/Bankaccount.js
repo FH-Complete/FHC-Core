@@ -141,8 +141,13 @@ export default{
 		},
 		actionDeleteBankverbindung(bankverbindung_id){
 			this.loadBankverbindung(bankverbindung_id).then(() => {
-				if(this.bankverbindungData.bankverbindung_id)
-					this.$refs.deleteBankverbindungModal.show();
+				this.$fhcAlert
+					.confirmDelete()
+					.then(result => result
+						? bankverbindung_id
+						: Promise.reject({handled: true}))
+					.then(this.deleteBankverbindung)
+					.catch(this.$fhcAlert.handleSystemError);
 			});
 		},
 		addNewBankverbindung(bankverbindungData) {
@@ -188,7 +193,6 @@ export default{
 				}).catch(this.$fhcAlert.handleSystemError)
 			.finally(()=> {
 				window.scrollTo(0, 0);
-				this.hideModal('deleteBankverbindungModal');
 				this.resetModal();
 				this.reload();
 			});
@@ -315,230 +319,7 @@ export default{
 			</template>
 			
 		</BsModal>
-		
-		<!--Modal: Add Bankverbindung-->
-<!--		<BsModal title="Bankverbindung anlegen" ref="newBankverbindungModal">
-
-			<template #title>{{$p.t('person', 'bankvb_new')}}</template>
-			<form-form class="row g-3" ref="bankverbindungData">
-				<div class="row mb-3">
-					<label for="name" class="form-label col-sm-4">Name</label>
-					<div class="col-sm-6">
-						<form-input 
-							type="text" 
-							name="name" 
-							v-model="bankverbindungData.name"
-						>
-						</form-input>
-					</div>
-				</div>
-				<div class="row mb-3">										   
-					<label for="anschrift" class="form-label col-sm-4">{{$p.t('person', 'anschrift')}}</label>
-					<div class="col-sm-6">
-						<form-input 
-							type="text" 
-							name="anschrift" 
-								v-model="bankverbindungData.anschrift"
-						>
-						</form-input>
-					</div>
-				</div>
-
-					<div class="row mb-3">									   
-						<label for="iban" class="form-label col-sm-4">IBAN<sup>*</sup></label>
-						<div class="col-sm-6">
-							<form-input 
-								type="text" 
-								name="iban" 
-								v-model="bankverbindungData.iban"
-								required
-							>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">								   
-						<label for="bic" class="form-label col-sm-4">BIC</label>
-						<div class="col-sm-6">
-							<form-input 
-								type="text" 
-								name="bic" 
-								v-model="bankverbindungData.bic"
-								>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">							   
-						<label for="kontonr" class="form-label col-sm-4">{{$p.t('person', 'kontonr')}}</label>
-						<div class="col-sm-6">
-							<form-input 
-								type="text" 
-								name="kontonr" 
-								v-model="bankverbindungData.kontonr"
-								>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">										   
-						<label for="blz" class="form-label col-sm-4">{{$p.t('person', 'blz')}}</label>
-						<div class="col-sm-6">
-							<form-input 
-								type="text" 
-								name="blz" 
-								v-model="bankverbindungData.blz"
-								>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">
-						<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}<sup>*</sup></label>
-						<div class="col-sm-6">
-							<form-input 
-								type="select" 
-								name="typ" 
-								v-model="bankverbindungData.typ"
-								required
-								>
-								<option  value="p">{{$p.t('person', 'privatkonto')}}</option>
-								<option  value="f">{{$p.t('person', 'firmenkonto')}}</option>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">
-					<label for="verrechnung" class="form-label col-sm-4">{{$p.t('person', 'verrechnung')}}</label>
-					<div class="col-sm-4">
-						<form-input
-							container-class="form-check"
-							type="checkbox"
-							name="verrechnung"
-							v-model="bankverbindungData.verrechnung"
-						>
-						</form-input>
-					</div>
-				</div>
-			</form-form>
-            <template #footer>
-            		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
-					<button type="button" class="btn btn-primary" @click="addNewBankverbindung()">OK</button>
-            </template>
-		</BsModal>-->
 				
-		<!--Modal: Edit Bankverbindung-->
-<!--		<BsModal ref="editBankverbindungModal">
-			<template #title>{{$p.t('person', 'bankvb_edit')}}</template>
-				<form-form class="row g-3" ref="bankverbindungData">
-				
-					<div class="row mb-3">
-						<label for="name" class="form-label col-sm-4">Name</label>
-						<div class="col-sm-6">
-							<form-input 
-								type="text" 
-								name="name" 
-								v-model="bankverbindungData.name"
-							>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">									   
-						<label for="anschrift" class="form-label col-sm-4">{{$p.t('person', 'anschrift')}}</label>
-						<div class="col-sm-6">
-							<form-input 
-								type="text" 
-								name="anschrift" 
-								v-model="bankverbindungData.anschrift"
-							>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">
-						<label for="iban" class="form-label col-sm-4">IBAN<sup>*</sup></label>
-						<div class="col-sm-6">
-							<form-input 
-								type="text" 
-								name="iban" 
-								v-model="bankverbindungData.iban"
-								required
-							>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">									   
-						<label for="bic" class="form-label col-sm-4">BIC</label>
-						<div class="col-sm-6">
-							<form-input 
-								type="text" 
-								name="bic" 
-								v-model="bankverbindungData.bic"
-								>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">									   
-						<label for="kontonr" class="form-label col-sm-4">{{$p.t('person', 'kontonr')}}</label>
-						<div class="col-sm-6">
-							<form-input 
-								type="text" 
-								name="kontonr" 
-								v-model="bankverbindungData.kontonr"
-								>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">									   
-						<label for="blz" class="form-label col-sm-4">{{$p.t('person', 'blz')}}</label>
-						<div class="col-sm-6">
-							<form-input 
-								type="text" 
-								name="blz" 
-								v-model="bankverbindungData.blz"
-								>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">
-						<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}<sup>*</sup></label>
-						<div class="col-sm-6">
-							<form-input 
-								type="select" 
-								name="typ" 
-								v-model="bankverbindungData.typ"
-								required
-								>
-								<option  value="p">{{$p.t('person', 'privatkonto')}}</option>
-								<option  value="f">{{$p.t('person', 'firmenkonto')}}</option>
-							</form-input>
-						</div>
-					</div>
-					<div class="row mb-3">
-						<label for="verrechnung" class="form-label col-sm-4">{{$p.t('person', 'verrechnung')}}</label>
-						<div class="col-sm-4">
-							<form-input
-								container-class="form-check"
-								type="checkbox"
-								name="verrechnung"
-								v-model="bankverbindungData.verrechnung"
-							>
-							</form-input>
-						</div>
-					</div>															   
-				</form-form>
-				<template #footer>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
-					<button ref="Close" type="button" class="btn btn-primary" @click="updateBankverbindung(bankverbindungData.bankverbindung_id)">OK</button>
-            	</template>
-		</BsModal>-->
-		
-		<!--Modal: Delete Bankverbindung-->
-		<BsModal ref="deleteBankverbindungModal">
-			<template #title>{{$p.t('person', 'bankvb_delete')}}</template>
-			<template #default>
-				<p>{{$p.t('person', 'bankvb_confirm_delete')}}</p>
-			</template>									
-			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
-				<button ref="Close" type="button" class="btn btn-primary" @click="deleteBankverbindung(bankverbindungData.bankverbindung_id)">OK</button>
-			</template>
-		</BsModal>
-			
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
