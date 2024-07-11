@@ -4,13 +4,14 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class MigrateHourlyRate extends CLI_Controller
 {
-	
-	CONST DEFAULT_OE = 'gst';
 	CONST DEFAULT_DATE = '1970-01-01';
 	CONST STUNDENSTAZTYP_LEHRE = 'lehre';
 	CONST STUNDENSTAZTYP_KALKULATORISCH = 'kalkulatorisch';
 	
+	private $OE_DEFAULT;
 	private $_ci;
+
+	protected $configerrors;
 
 	public function __construct()
 	{
@@ -21,10 +22,37 @@ class MigrateHourlyRate extends CLI_Controller
 		$this->load->model('codex/Bisverwendung_model', 'BisVerwendungModel');
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
+
+		$this->load->config('migratecontract');
+
+		$this->OE_DEFAULT = $this->config->item('migratecontract_oe_default');
+		$this->configerrors = array();
+	}
+
+	public function checkConfig()
+	{
+	    echo "OE_DEFAULT: " . $this->OE_DEFAULT . "\n";
+
+	    $this->checkOE_DEFAULT();
+
+	    if( count($this->configerrors) > 0 )
+	    {
+		foreach($this->configerrors AS $configerror)
+		{
+		    echo $configerror . "\n";
+		}
+		die("Fehler in der Konfiguration. Abbruch!\n");
+	    }
+	    else
+	    {
+		echo "Konfiguration OK.\n";
+	    }
 	}
 
 	public function index($user = null)
 	{
+		$this->checkConfig();
+
 		echo "Lehre Stundensaetze werden migriert.\n";
 		$mitarbeiterResult = $this->_getMitarbeiterStunden($user);
 		if (isError($mitarbeiterResult)) return $mitarbeiterResult;
@@ -59,6 +87,18 @@ class MigrateHourlyRate extends CLI_Controller
 		{
 		    echo "SAP Sync Tabelle nicht gefunden. Ignoriere SAP Stundensaetze.\n";
 		}
+	}
+
+	protected function checkOE_DEFAULT()
+	{
+	    $db = new DB_Model();
+	    $oesql = 'SELECT * FROM public.tbl_organisationseinheit WHERE oe_kurzbz = ?';
+	    $oeres = $db->execReadOnlyQuery($oesql, array($this->OE_DEFAULT));
+	    if( !hasData($oeres) )
+	    {
+		$this->configerrors[] = 'Default Organisationseinheit: "'
+		    . $this->OE_DEFAULT . '" nicht gefunden.';
+	    }
 	}
 
 	protected function checkIfSAPSyncTableExists()
@@ -167,7 +207,7 @@ class MigrateHourlyRate extends CLI_Controller
 			$unternehmenResult = $this->_findUnternehmen($mitarbeiter->uid, "'kstzuordnung', 'oezuordnung'");
 		}
 
-		$unternehmen = self::DEFAULT_OE;
+		$unternehmen = $this->OE_DEFAULT;
 
 		if (hasData($unternehmenResult))
 			$unternehmen = getData($unternehmenResult)[0]->oe_kurzbz;

@@ -40,7 +40,7 @@
 }
 
 .tabulator-cell .btn {
-	padding: 0 .5rem;
-	max-height: 22px;
-	min-width: 30px;
+	padding: 0 .7rem;
+	min-height: 25px;
+	min-width: 25px;
 }
