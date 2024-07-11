@@ -1,5 +1,7 @@
+<?php
+
 /**
- * Copyright (C) 2024 fhcomplete.org
+ * Copyright (C) 2023 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +17,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import search from "./search.js";
-import phrasen from "./phrasen.js";
-import navigation from "./navigation.js";
-import filter from "./filter.js";
-import studstatus from "./studstatus.js";
-import betriebsmittel from "./betriebsmittel.js";
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-export default {
-    search,
-    phrasen,
-    navigation,
-    filter,
-    studstatus,
-    betriebsmittel
-};
+$config['migratecontract_oe_default'] = 'TODO_OE_DEFAULT';
+
+$config['migratecontract_matching_ba1_vertragsart'] = array(
+    '101'=>'dvbund',
+    '102'=>'dvanderengk',
+    '103'=>'echterdv',
+    '104'=>'studentischehilfskr',
+    '105'=>'externerlehrender',
+    '106'=>'dvanderenbet',
+    '107'=>'werkvertrag',
+    '108'=>'studentischehilfskr',
+    '109'=>'ueberlassungsvertrag',
+    '110'=>'echterfreier',
+    '111'=>'echterdv' //All-In
+);

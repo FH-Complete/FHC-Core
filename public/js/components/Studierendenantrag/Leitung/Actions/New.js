@@ -35,16 +35,32 @@ export default {
 			});
 		},
 		loadData(evt) {
-			if (this.abortController)
-				this.abortController.abort();
+                        if( evt.query.length < 2 )
+                        {
+                            return false;
+                        }
+
+			if (this.abortController instanceof AbortController
+                            && this.abortController.signal.aborted === false)
+                        {
+                            this.abortController.abort();
+                        }
 			this.abortController = new AbortController();
 
 			this.$fhcApi.factory
 				.studstatus.leitung.getPrestudents(evt.query, this.abortController.signal)
 				.then(result => {
 					this.data = result.data;
+                                        this.abortController = null;
 				})
-				.catch(this.$fhcApi.handleSystemError);
+				.catch(error => {
+                                    if (this.abortController instanceof AbortController 
+                                        && this.abortController.signal.aborted === false)
+                                    {
+                                        this.abortController.abort();
+                                    }
+                                    this.$fhcAlert.handleSystemError(error);
+                                });
 		}
 	},
 	template: `

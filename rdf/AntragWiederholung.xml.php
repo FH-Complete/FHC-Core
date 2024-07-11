@@ -5,6 +5,42 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/basis_db.class.php');
 
+// Get CodeIgniter Config
+// Get Environment Var
+if (defined('CI_ENVIRONMENT')) $_SERVER['CI_ENV'] = CI_ENVIRONMENT;
+define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+
+// Get BASEPATH Var
+$system_path = dirname(__FILE__).'/../vendor/codeigniter/framework/system';
+if (($_temp = realpath($system_path)) !== FALSE)
+	$system_path = $_temp.'/';
+else
+	$system_path = rtrim($system_path, '/').'/';
+define('BASEPATH', str_replace('\\', '/', $system_path));
+
+// Get APPPATH Var
+$application_folder = dirname(__FILE__).'/../application';
+if (is_dir($application_folder)) {
+	if (($_temp = realpath($application_folder)) !== FALSE)
+		$application_folder = $_temp;
+	define('APPPATH', $application_folder.DIRECTORY_SEPARATOR);
+} else {
+	if (!is_dir(BASEPATH.$application_folder.DIRECTORY_SEPARATOR)) {
+		header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+		echo 'Your application folder path does not appear to be set correctly. Please open the following file and correct this: '.SELF;
+		exit(3); // EXIT_CONFIG
+	}
+	define('APPPATH', BASEPATH.$application_folder.DIRECTORY_SEPARATOR);
+}
+
+// Load studierendenantrag Config
+foreach (['studierendenantrag', ENVIRONMENT.DIRECTORY_SEPARATOR.'studierendenantrag'] as $location) {
+	$file_path = APPPATH . 'config/' . $location . '.php';
+	if (file_exists($file_path))
+		include($file_path);
+}
+// Get CodeIgniter Config end
+
 $db = new basis_db();
 
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
@@ -34,9 +70,24 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 else
 	die('<error>Format not supported</error>');
 
+$blacklist = '';
+if ($config['note_blacklist_wiederholung']) {
+	$blacklist = " AND n.note NOT IN (" . $db->db_implode4SQL($config['note_blacklist_wiederholung']) . ")";
+}
+
 
 $query = "
-	SELECT stg.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, pss.ausbildungssemester AS semester, (SELECT pt.text FROM system.tbl_phrase p JOIN system.tbl_phrasentext pt USING(phrase_id) WHERE p.category=" . $db->db_add_param('studierendenantrag', FHC_STRING) . " AND p.phrase=" . $db->db_add_param('grund_Wiederholung_deadline', FHC_STRING) . " AND pt.sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . " LIMIT 1) AS grund
+	SELECT stg.bezeichnung, tbl_orgform.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, pss.ausbildungssemester AS semester, (
+			SELECT
+				insertamum::date
+			FROM
+				campus.tbl_studierendenantrag_status
+			WHERE
+				studierendenantrag_id = a.studierendenantrag_id AND studierendenantrag_statustyp_kurzbz = 'Abgemeldet'
+			ORDER BY
+				insertamum DESC
+			LIMIT 1
+		) AS abmeldedatum, (SELECT pt.text FROM system.tbl_phrase p JOIN system.tbl_phrasentext pt USING(phrase_id) WHERE p.category=" . $db->db_add_param('studierendenantrag', FHC_STRING) . " AND p.phrase=" . $db->db_add_param('grund_Wiederholung_deadline', FHC_STRING) . " AND pt.sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . " LIMIT 1) AS grund
 	FROM
 	campus.tbl_studierendenantrag a
 	JOIN public.tbl_student USING (prestudent_id)
@@ -56,15 +107,19 @@ if (!$db->db_query($query) || !$db->db_num_rows())
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <antraege>
 	<?php while($row = $db->db_fetch_object()) { ?>
-        <antrag>
-            <name><![CDATA[<?= trim($row->vorname . ' ' . $row->nachname); ?>]]></name>
-            <studiengang><![CDATA[<?= $row->bezeichnung; ?>]]></studiengang>
-            <organisationsform><![CDATA[<?= $row->bezeichnung_mehrsprachig; ?>]]></organisationsform>
-            <personenkz><![CDATA[<?= $row->matrikelnr; ?>]]></personenkz>
-            <studienjahr><![CDATA[<?= $row->studienjahr_kurzbz; ?>]]></studienjahr>
-            <studiensemester><![CDATA[<?= $row->studiensemester_kurzbz; ?>]]></studiensemester>
-            <semester><![CDATA[<?= $row->semester; ?>]]></semester>
-            <grund><![CDATA[<?= $row->grund; ?>]]></grund>
+		<?php
+			$abmeldedatum = new DateTime($row->abmeldedatum);
+		?>
+		<antrag>
+			<name><![CDATA[<?= trim($row->vorname . ' ' . $row->nachname); ?>]]></name>
+			<studiengang><![CDATA[<?= $row->bezeichnung; ?>]]></studiengang>
+			<organisationsform><![CDATA[<?= $row->bezeichnung_mehrsprachig; ?>]]></organisationsform>
+			<personenkz><![CDATA[<?= $row->matrikelnr; ?>]]></personenkz>
+			<studienjahr><![CDATA[<?= $row->studienjahr_kurzbz; ?>]]></studienjahr>
+			<studiensemester><![CDATA[<?= $row->studiensemester_kurzbz; ?>]]></studiensemester>
+			<semester><![CDATA[<?= $row->semester; ?>]]></semester>
+			<abmeldedatum><![CDATA[<?= $abmeldedatum->format('d.m.Y'); ?>]]></abmeldedatum>
+			<grund><![CDATA[<?= $row->grund; ?>]]></grund>
 	</antrag>
 	<?php } ?>
 </antraege>

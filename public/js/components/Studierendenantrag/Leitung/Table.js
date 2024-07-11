@@ -265,7 +265,7 @@ export default {
 							allowed_status_for_download = ['Genehmigt'];
 							break;
 						case 'AbmeldungStgl':
-							allowed_status_for_download = ['Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt', 'Abgemeldet'];
+							allowed_status_for_download = ['EinspruchAbgelehnt', 'Abgemeldet'];
 							break;
 						case 'Unterbrechung':
 							allowed_status_for_download = ['Genehmigt', 'EmailVersandt'];

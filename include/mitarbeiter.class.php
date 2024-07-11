@@ -317,7 +317,7 @@ class mitarbeiter extends benutzer
 	 * gibt array mit allen Mitarbeitern zurueck
 	 * @return array mit Mitarbeitern
 	 */
-	public function getMitarbeiter($lektor=true,$fixangestellt=null,$stg_kz=null)
+	public function getMitarbeiter($lektor=true,$fixangestellt=null,$stg_kz=null, $aktiv=null)
 	{
 		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.uid, titelpre, titelpost, vorname, vornamen, wahlname, nachname, gebdatum, gebort, gebzeit, anmerkung, aktiv,
 					homepage, campus.vw_mitarbeiter.updateamum, campus.vw_mitarbeiter.updatevon, personalnummer, kurzbz, lektor, fixangestellt, standort_id, telefonklappe FROM campus.vw_mitarbeiter
@@ -344,6 +344,14 @@ class mitarbeiter extends benutzer
 		{
 			$stg = new studiengang($stg_kz);
 			$sql_query.=" AND oe_kurzbz=".$this->db_add_param($stg->oe_kurzbz);
+		}
+
+		if(!is_null($aktiv))
+		{
+			$sql_query.=' AND';
+			if (!$aktiv)
+				$sql_query.=' NOT';
+			$sql_query.=' aktiv';
 		}
 
 		$sql_query.=' ORDER BY nachname, vornamen, kurzbz;';

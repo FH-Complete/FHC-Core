@@ -68,6 +68,68 @@ abstract class Auth_Controller extends FHC_Controller
 	}
 
 	/**
+	 * Checks for Permissions depending if the given person is a
+	 * Mitarbeiter and/or Student
+	 * and exits/outputs an error if they are not met.
+	 *
+	 * @param integer 				$person_id
+	 * @param array 				$permMa		Perms if the person is a Mitarbeiter
+	 * @param array 				$permStud	Perms if the person is a Student
+	 *
+	 * @return void
+	 */
+	protected function checkPermissionsForPerson($person_id, $permMa, $permStud)
+	{
+		$res = $this->hasPermissionsForPerson($person_id, $permMa, $permStud);
+		
+		if ($res) {
+			$perm = array_keys(array_flip(array_merge($res|1 ? $permMa : [], $res|2 ? $permStud : [])));
+			$this->_outputAuthError([$this->router->method => $perm]);
+		}
+	}
+
+	/**
+	 * Checks for Permissions depending if the given person is a
+	 * Mitarbeiter and/or Student
+	 * and returns the result.
+	 *
+	 * @param integer 				$person_id
+	 * @param array 				$permMa		Perms if the person is a Mitarbeiter
+	 * @param array 				$permStud	Perms if the person is a Student
+	 *
+	 * @return boolean
+	 */
+	protected function hasPermissionsForPerson($person_id, $permMa, $permStud)
+	{
+		$res = 0;
+		$this->load->model('person/Person_model', 'PersonModel');
+		$this->PersonModel->addJoin('public.tbl_benutzer', 'person_id');
+		$this->PersonModel->addJoin('public.tbl_mitarbeiter', 'uid = mitarbeiter_uid');
+		$result = $this->PersonModel->load($person_id);
+		if (hasData($result)) {
+			if ($this->permissionlib->isEntitled(['a' => $permMa], 'a'))
+				return 0;
+			$res = 1;
+		}
+		$this->PersonModel->addJoin('public.tbl_prestudent', 'person_id');
+		$result = $this->PersonModel->load($person_id);
+		if (hasData($result)) {
+			$permStudConverted = [];
+			foreach (getData($result) as $row) {
+				foreach ($permStud as $k => $v) {
+					if (!isset($permStudConverted[$k])) {
+						$permStudConverted[$k] = $this->permissionlib->convertAccessType($v);
+					}
+					if ($this->permissionlib->isBerechtigt($permStudConverted[$k][0], $permStudConverted[$k][1], $row->studiengang_kz))
+						return 0;
+				}
+			}
+			$res += 2;
+		}
+		return $res;
+	}
+
+	/**
 	 * Outputs an error message and sets the HTTP Header.
 	 * This function is protected so that it can be overwritten.
 	 *

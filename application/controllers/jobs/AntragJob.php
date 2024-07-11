@@ -412,6 +412,8 @@ class AntragJob extends JOB_Controller
 		$this->StudierendenantragModel->addSelect('studiensemester_kurzbz');
 		$this->StudierendenantragModel->addSelect('s.insertamum');
 		$this->StudierendenantragModel->addSelect('s.insertvon');
+		$this->StudierendenantragModel->addJoin('public.tbl_student pts', 'prestudent_id');
+		$this->StudierendenantragModel->addSelect('pts.student_uid');
 
 		$this->StudierendenantragModel->db->where_in(
 			'public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)',
@@ -484,7 +486,7 @@ class AntragJob extends JOB_Controller
 						$person = current(getData($result));
 						$email = $studiengang->email;
 						$dataMail = array(
-							'prestudent' => $antrag->prestudent_id,
+							'prestudent' => 'UID: ' . $antrag->student_uid . ', PreStudentId: ' . $antrag->prestudent_id,
 							'studiensemester' => $antrag->studiensemester_kurzbz,
 							'name' => trim($person->vorname . ' '. $person->nachname),
 						);

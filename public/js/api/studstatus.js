@@ -117,7 +117,10 @@ export default {
 			return this.$fhcApi.post(
 				'/api/frontend/v1/studstatus/leitung/getPrestudents',
 				{ query },
-				{ signal }
+				{
+                                    signal: signal,
+                                    timeout: 30000
+                                }
 			);
 		},
 		approve(antrag) {

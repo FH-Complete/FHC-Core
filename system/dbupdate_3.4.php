@@ -55,6 +55,7 @@ require_once('dbupdate_3.4/21620_neues_feld_zum_erfassen_des_ESI.php');
 require_once('dbupdate_3.4/36530_bis_internationsalisierung_codextabelle_neuerungen.php');
 require_once('dbupdate_3.4/34543_ux_template.php');
 require_once('dbupdate_3.4/17513_Entwicklungsteam.php');
+require_once('dbupdate_3.4/28575_softwarebereitstellung.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -172,7 +173,8 @@ $tabellen=array(
 	"hr.tbl_sachaufwandtyp" => array("sachaufwandtyp_kurzbz","bezeichnung","sort", "aktiv"),
 	"hr.tbl_stundensatz" => array("stundensatz_id","uid","stundensatztyp","stundensatz","oe_kurzbz","gueltig_von","gueltig_bis","insertamum","insertvon","updateamum","updatevon"),
 	"hr.tbl_stundensatztyp" => array("stundensatztyp","bezeichnung","aktiv","insertamum","insertvon","updateamum","updatevon"),
-	"hr.tbl_dienstverhaeltnis" => array("dienstverhaeltnis_id","mitarbeiter_uid","vertragsart_kurzbz","oe_kurzbz","von","bis","insertamum","insertvon","updateamum","updatevon"),
+	"hr.tbl_dienstverhaeltnis" => array("dienstverhaeltnis_id","mitarbeiter_uid","vertragsart_kurzbz","oe_kurzbz","von","bis","insertamum","insertvon","updateamum","updatevon","dvendegrund_kurzbz","dvendegrund_anmerkung"),
+	"hr.tbl_dvendegrund" => array("dvendegrund_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig", "aktiv", "sort"),
 	"hr.tbl_vertragsart" => array("vertragsart_kurzbz","bezeichnung","anmerkung","dienstverhaeltnis","vertragsart_kurzbz_parent","aktiv","sort"),
 	"hr.tbl_vertragsbestandteil" => array("vertragsbestandteil_id","dienstverhaeltnis_id","vertragsbestandteiltyp_kurzbz","von", "bis","insertamum", "insertvon","updateamum","updatevon"),
 	"hr.tbl_vertragsbestandteiltyp" => array("vertragsbestandteiltyp_kurzbz","bezeichnung","ueberlappend"),
