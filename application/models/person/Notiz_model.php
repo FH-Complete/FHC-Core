@@ -180,7 +180,6 @@ class Notiz_model extends DB_Model
 		{
 			$notiz_id = $result->retval;
 
-			//TODO(Manu) neue Function assign Notiz
 			if($type == "software_id")
 			{
 				// Loads extension Model

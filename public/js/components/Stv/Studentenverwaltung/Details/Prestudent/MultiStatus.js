@@ -275,7 +275,8 @@ export default{
 			newArray: {},
 			abbruchData: {},
 			newStatus: '',
-			statusNew: true
+			statusNew: true,
+			isErsterStudent: false
 		}
 	},
 	watch: {
@@ -411,7 +412,8 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData, ausbildungssemester: this.actionSem}));
-			this.addNewStatus(prestudentIds);
+			//BewerberZuStudent
+			this.turnIntoStudent(prestudentIds);
 		},
 		changeStatusToWiederholer(prestudentIds){
 			this.hideModal('askForAusbildungssemester');
@@ -457,6 +459,98 @@ export default{
 /*			console.log("in changeStatusToAbsolvent" + prestudentIds);
 			this.hideModal('addMultiStatus');*/
 			this.addNewStatus(prestudentIds);
+		},
+		turnIntoStudent(prestudentIds){
+
+			//erste Voraussetzung: kein check auf checkIfExistingStudent
+			// macht aus einem Bewerber einen Studenten
+			// Voraussetzungen:
+			// - ZGV muss ausgefuellt sein (bei Master beide)
+			// - Kaution muss bezahlt sein
+			// - Rolle Bewerber muss existieren
+			// Wenn die Voraussetzungen erfuellt sind, dann wird die Matrikelnr
+			// und UID generiert und der Studentendatensatz angelegt.
+			let changeData = {};
+
+			//for Feedback Sucess, Error
+			let countSuccess = 0;
+			let countError = 0;
+
+			const promises = prestudentIds.map(prestudentId => {
+
+				this.checkIfErsterStudent(prestudentId).then(() => {
+
+					if(this.isErsterStudent)
+					{
+						console.log(prestudentId + ": isersterStudent: " + this.isErsterStudent + " Logik turnIntoStudent");
+
+						changeData = this.newArray.find(item => item.prestudent_id === prestudentId);
+
+						return this.$fhcApi.post('api/frontend/v1/stv/status/turnIntoStudent/' + prestudentId,
+							changeData
+						).then(response => {
+							countSuccess++;
+							return response;
+						})
+							//.catch(this.$fhcAlert.handleSystemError)
+							.catch(error => {
+								countError++;
+								//For each Prestudent show Error in Alert
+								this.$fhcAlert.handleSystemError(error);
+							});
+					}
+					else
+					{
+						console.log(prestudentId + ": isersterStudent: " + this.isErsterStudent + " Add New Status");
+
+						changeData = this.newArray.find(item => item.prestudent_id === prestudentId);
+
+						return this.$fhcApi.post('api/frontend/v1/stv/status/addNewStatus/' + prestudentId,
+							changeData
+						).then(response => {
+							countSuccess++;
+							return response;
+						})
+							//.catch(this.$fhcAlert.handleSystemError)
+							.catch(error => {
+								countError++;
+								//For each Prestudent show Error in Alert
+								this.$fhcAlert.handleSystemError(error);
+							});
+					}
+				});
+			});
+
+			Promise
+				.allSettled(promises)
+				.then(values => {
+
+					//Feedback Success als infoalert
+					if (countSuccess > 0) {
+						this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
+							'countSuccess': countSuccess,
+							'status': this.newStatus,
+							'countError': countError
+						}));
+					}
+
+/*					if (this.modelValue.prestudent_id) {
+						this.reload();
+						//TODO(manu) reload Detailtab after Abbrecher to see current status activ, verband and gruppe
+						//TODO(manu) reload Tab STatus after turned Into Student to see new status
+					}*/
+					if(this.isErsterStudent) {
+						this.reload();
+						this.isErsterStudent = false;
+					}
+					else {
+						this.$reloadList();
+					}
+					this.hideModal('statusModal');
+					this.resetModal();
+				});
+
+
 		},
 		addNewStatus(prestudentIds){
 			//Array.isArray(prestudentIds) ? this.modelValue.prestudent_id : [prestudentIds];
@@ -600,6 +694,16 @@ export default{
 					})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		checkIfErsterStudent(prestudent_id){
+			return this.$fhcApi
+				.get('api/frontend/v1/stv/status/isErsterStudent/' + prestudent_id)
+				.then(
+					result => {
+						this.isErsterStudent = result.data.retval == 0 ? 1 : 0;
+						return result;
+					})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 		loadStatus(status_id){
 			this.statusNew = false;
 			return this.$fhcApi.post('api/frontend/v1/stv/status/loadStatus/',
@@ -659,7 +763,6 @@ export default{
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	mounted(){},
 	template: `
 		<div class="stv-list h-100 pt-3">
 			
@@ -863,75 +966,7 @@ export default{
 					</div>					
 				</template>
 			</BsModal>
-			
-<!--			<BsModal ref="addMultiStatus" id="addMultiStatus">
-				<template #title>Status ändern zu</template>
-				<template #default>
-					<button type="button" class="btn btn-primary d-block mb-2" data-bs-toggle="collapse" data-bs-target="#submenu1">
-						Abbrecher
-					</button>
-					<div class="collapse" id="submenu1">
-						<button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">durch Stgl</button>
-						<button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">durch Student</button>
-					</div>
-				
-					<button type="button" class="btn btn-primary d-block mb-2" @click="actionConfirmDialogue(updateData, 'unterbrecher','Unterbrecher')">
-						Unterbrecher
-					</button>
-					
-					<button type="button" class="btn btn-primary d-block mb-2" data-bs-toggle="collapse" data-bs-target="#submenu2">
-						Student
-					</button>
-					<div class="collapse" id="submenu2">
-						<button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'student','Student')">Student</button>
-						<button type="button" class="btn btn-light d-block mb-2" @click="actionConfirmDialogue(updateData, 'student','Wiederholer')">Wiederholer</button>
-					</div>
-				   
-					<button type="button" class="btn btn-primary d-block mb-2" @click="changeStatusToDiplomand(prestudentIds)">
-						Diplomand
-					</button>	
-					<button type="button" class="btn btn-primary d-block mb-2" @click="changeStatusToAbsolvent(prestudentIds)">
-						Absolvent
-					</button>
-					
-				</template>
-				<template #footer>
-					<div v-if="actionButton=='abbrecherStgl'">
-						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToAbbrecherStgl(prestudentIds)">OK</button>
-					</div>
-					<div v-if="actionButton=='abbrecherStud'">
-						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToAbbrecherStud(prestudentIds)">OK</button>
-					</div>
-					<div v-if="actionButton=='unterbrecher'">
-						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToUnterbrecher(prestudentIds)">OK</button>
-					</div>					
-				</template>
-			</BsModal>-->
-			
-<!--			<ul class="dropdown-menu" ref="addMultiStatus3" id="addMultiStatus3">
-				<li class="dropdown-submenu">
-					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl 5</a>
-				</li>
-				<li class="dropdown-submenu">
-					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">Abbrecher durch Student</a>
-				</li>
-				<li class="dropdown-submenu">
-					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'unterbrecher','Unterbrecher')">Unterbrecher</a>
-				</li>
-				<li class="dropdown-submenu">
-					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student','Student')">Student</a>
-				</li>
-				<li class="dropdown-submenu">
-					<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student','Wiederholer')">Wiederholer</a>
-				</li>
-				<li class="dropdown-submenu">
-					<a class="dropdown-item" @click="changeStatusToDiplomand(prestudentIds)">Diplomand</a>
-				</li>
-				<li class="dropdown-submenu">
-					<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
-				</li>							
-			</ul>-->
-			
+								
 			<!--Modal: askForAusbildungssemester-->
 			<BsModal ref="askForAusbildungssemester">
 				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
@@ -1029,7 +1064,7 @@ export default{
 				<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 					Status Ändern
 				</button>
-			
+							
 				<ul class="dropdown-menu">
 					<li class="dropdown-submenu">
 						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl</a>

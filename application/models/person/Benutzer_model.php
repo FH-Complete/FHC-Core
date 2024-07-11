@@ -89,7 +89,29 @@ class Benutzer_model extends DB_Model
 			if (hasData($aliasexists) && !getData($aliasexists)[0])
 				$aliasres = $alias;
 		}
+
 		return success($aliasres);
+	}
+
+	/**
+	 * Generates alias for a uid.
+	 * @param $uid
+	 * @return array the alias if newly generated
+	 */
+	public function generateAliasByPersonId($person_id)
+	{
+		$sql = 'SELECT p.vorname, p.nachname
+				FROM public.tbl_person p
+				where person_id = ?';
+
+		$nameresult = $this->execQuery($sql, array($person_id));
+
+		$nameresult = getData($nameresult) ?: null;
+
+	//	if($aliasdata)
+	//		$alias = $this->_sanitizeAliasName($aliasdata->vorname).'.'.$this->_sanitizeAliasName($aliasdata->nachname);
+
+		return success($nameresult->vorname . " " . $nameresult->nachname);
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -104,5 +126,59 @@ class Benutzer_model extends DB_Model
 	{
 		$str = sanitizeProblemChars($str);
 		return mb_strtolower(str_replace(' ','_', $str));
+	}
+
+	/**
+	 * Generiert einen Aktivierungscode
+	 */
+	function generateActivationKey()
+	{
+		$keyvalues=array('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
+		$key='';
+		for($i=0;$i<32;$i++)
+			$key.=$keyvalues[mt_rand(0,15)];
+
+		return success(md5(encryptData(uniqid(mt_rand(), true),$key)));
+	}
+
+	/**
+	 * Check if Benutzer already exists
+	 * @param integer $person_id
+	 * @return 0 if not exists, 1 if it does
+	 */
+	public function checkIfExistingBenutzer($person_id)
+	{
+		$qry = "SELECT 
+    				count(*) as anzahl 
+				FROM 
+				    public.tbl_benutzer 
+				WHERE 
+				    person_id = ? ";
+
+		$result = $this->execQuery($qry, array($person_id));
+
+		if (isError($result))
+		{
+			return error($result);
+		}
+		else
+		{
+			$resultObject = current(getData($result));
+
+			if (property_exists($resultObject, 'anzahl')) {
+				$resultValue = (int) $resultObject->anzahl;
+
+				if ($resultValue > 0)
+				{
+					return success("1");
+				}
+				else
+				{
+					return success("0");
+				}
+			} else {
+				return error("BenutzerModel: Error During Check if Existing Benutzer.");
+			}
+		}
 	}
 }

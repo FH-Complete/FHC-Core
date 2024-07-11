@@ -374,5 +374,54 @@ class Person_model extends DB_Model
 			'prestudent_id' => $prestudent_id
 		]);
 	}
+
+	public function generateAliasByPersonId($person_id)
+	{
+
+		$this->addSelect('vorname, nachname');
+
+		return success ($this->loadWhere(array('person_id' => $person_id)));
+	}
+
+/*	public function generateAliasByPersonId($person_id)
+	{
+
+		$this->addSelect('vorname, nachname');
+
+		$result = $this->loadWhere(array('person_id' => $person_id));
+
+		// Überprüfe, ob ein Ergebnis zurückgegeben wurde
+		if ($result) {
+			$result = getData($result);
+			$result = $result->retval[0];
+			$vorname = $result->vorname;
+			$nachname = $result->nachname;
+
+			// Sanitize the extracted names
+			$sanitizedVorname = $this->sanitizeAliasName($vorname);
+			$sanitizedNachname = $this->sanitizeAliasName($nachname);
+
+			// Erstelle den Alias
+			$alias = $sanitizedVorname . '.' . $sanitizedNachname;
+
+			// Gib den Erfolg zurück mit dem generierten Alias
+			return success($alias);
+		} else {
+				// Falls kein Ergebnis gefunden wurde, gib einen Fehler zurück
+				return error('Person not found');
+			}
+
+	}*/
+
+	/**
+	 * Sanitizes a string used for alias. Replaces special characters, spaces, sets lower case.
+	 * @param string $str
+	 * @return string
+	 */
+	public function sanitizeAliasName($str)
+	{
+		$str = sanitizeProblemChars($str);
+		return success (mb_strtolower(str_replace(' ','_', $str)));
+	}
 }
 
