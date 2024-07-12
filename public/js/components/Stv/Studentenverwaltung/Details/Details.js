@@ -121,6 +121,9 @@ export default {
 		},
 		udfsLoaded(udfs) {
 			this.original = {...(this.original || {}), ...udfs};
+		},
+		reload(){
+			this.updateStudent(this.modelValue);
 		}
 	},
 	created() {

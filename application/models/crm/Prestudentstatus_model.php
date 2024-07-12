@@ -526,6 +526,7 @@ class Prestudentstatus_model extends DB_Model
 	 */
 	public function getHistoryPrestudent($prestudent_id)
 	{
+		$lang= getUserLanguage();
 		$this->addSelect('tbl_prestudentstatus.prestudent_id');
 		$this->addSelect('tbl_prestudentstatus.status_kurzbz');
 		$this->addSelect('tbl_prestudentstatus.studiensemester_kurzbz');
@@ -545,7 +546,7 @@ class Prestudentstatus_model extends DB_Model
 		$this->addSelect('grund.beschreibung[(
 			SELECT index 
 			FROM public.tbl_sprache 
-			WHERE sprache=' . $this->escape(getUserLanguage()) . '
+			WHERE sprache=' . $this->escape($lang) . '
 		)] AS statusgrund_bezeichnung', false);
 		$this->addSelect("CASE 
 			WHEN s.student_uid IS NOT NULL 

@@ -410,6 +410,8 @@ export default{
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToStudent(prestudentIds){
+
+			//TODO Manu validation if Bewerber already before asking for ausbildungssemester
 			this.hideModal('askForAusbildungssemester');
 			let deltaData =
 				{
