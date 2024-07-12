@@ -13,6 +13,7 @@ export default  {
         return {
             result: false,
             menu: [],
+            selectedMenu:null,
             
         }
     },
@@ -21,6 +22,18 @@ export default  {
         BsModal,
     },
     methods:{
+        selectMenu: function(menuItem){
+            console.log(menuItem,"menuItem")
+            switch(menuItem.id){
+                case "core_menu_mailanstudierende": window.location.href=menuItem.c4_link; break;
+                default:
+                    this.selectedMenu=menuItem;
+            }
+            
+        },
+        hiddenModal: function(){
+            this.selectedMenu = null;
+        },
         showModal: function(){
 
             this.$fhcApi.factory.addons.getLvMenu(this.event.lehrveranstaltung_id, this.event.studiensemester_kurzbz).then(res =>{
@@ -33,25 +46,31 @@ export default  {
         this.modal = this.$refs.modalContainer;
     },
     template:/*html*/`
-    <bs-modal @showBsModal="showModal" ref="modalContainer" dialogClass="modal-lg">
+    <bs-modal :bodyClass="selectedMenu ? '' : 'px-4 py-5'" @showBsModal="showModal" @hiddenBsModal="hiddenModal" ref="modalContainer" :dialogClass="{'modal-lg': !selectedMenu, 'modal-fullscreen':selectedMenu}">
         <template #title>
             <span v-if="event?.lehrfach_bez ">{{event?.lehrfach_bez + (event?.stg_kurzbzlang?' / ' + event?.stg_kurzbzlang:'')}}</span>
             <span v-else>Lehrveranstaltungs Übersicht</span>
             
         </template>
         <template #default>
-            <div :style="{'display':'grid', 'row-gap':'10px', 'column-gap':'10px', 'grid-template-columns':'repeat(3,minmax(100px,1fr))', 'grid-template-rows':'repeat('+Math.ceil(menu.length / 3)+',minmax(100px,1fr))'} ">
-                <div  v-for="(menuItem, index) in menu" :key="index">
-                    <a :onclick="menuItem.cis4_link_onclick?menuItem.cis4_link_onclick:null" class="d-flex flex-column align-items-center justify-content-center" target="_blank" :href="menuItem.cis4_link_onclick?'#':menuItem.cis4_link" :title="menuItem.name">
-                        <span>{{menuItem.name}}</span>
-                        <img :src="menuItem.cis4_icon" :alt="menuItem.name" ></img>
-                    </a>
+
+          <div v-if="selectedMenu" class="d-flex flex-column h-100">
+                <div class="d-flex mb-2">
+                <button v-if="selectedMenu" @click="selectedMenu=null" class="btn btn-secondary me-2"><i class="fa fa-chevron-left"></i> Back</button>
+                <h2>{{selectedMenu.name}}</h2>
+                </div>
+                <iframe class="h-100 w-100" :src="selectedMenu.c4_link" :title="selectedMenu.name"></iframe>
+            </div>
+            <div v-else :style="{'display':'grid', 'row-gap':'10px', 'column-gap':'10px', 'grid-template-columns':'repeat(3,minmax(100px,1fr))', 'grid-template-rows':'repeat('+Math.ceil(menu.length / 3)+',minmax(100px,1fr))'} ">
+                <div role="button" @click="selectMenu(menuItem)" :title="menuItem.name" class="lvUebersichtMenuPunkt border border-1 d-flex flex-column align-items-center justify-content-center" v-for="(menuItem, index) in menu" :key="index">
+                        <img :src="menuItem.c4_icon" :alt="menuItem.name" ></img>    
+                        <span class="mt-2">{{menuItem.name}}</span>
                 </div>
             </div>
         </template>
-        <template #footer>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </template>
+        
     </bs-modal>
+
+    
     `,
 };

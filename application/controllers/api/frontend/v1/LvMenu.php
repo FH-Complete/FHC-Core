@@ -250,22 +250,34 @@ class LvMenu extends FHCAPI_Controller
 		// ##########################################################################################		
         
 		$params = [
-			'user'=>$user,
-			'lvid'=>$lvid,
-			'studiensemester_kurzbz'=>$studiensemester_kurzbz,
-			'studiengang_kz'=>$studiengang_kz,
+			'sprache'=>$sprache,
 			'p'=>$p,
+			'db'=>$db,
+			'user'=>$user,
+			'is_lector'=>$is_lector,
+			'user_is_allowed_to_upload'=>$user_is_allowed_to_upload,
 			'rechte'=>$rechte,
-			'lv'=>$lv,
 			'angezeigtes_stsem'=>$angezeigtes_stsem,
+			'lehreinheit'=>$lehreinheit,
+			'lv_obj'=>$lv_obj,
+			'lv'=>$lv,
+			'lvid'=>$lvid,
+			'studiengang_kz'=>$studiengang_kz,
+			'semester'=>$semester,
+			'short'=>$short,
+			'stg_obj'=>$stg_obj,
+			'kurzbz'=>$kurzbz,
+			'short_name'=>$short_name,
+			'short_short_name'=>$short_short_name,
+			'dir_name'=>$dir_name,
+			'angemeldet'=>$angemeldet,
+			'lehrfach_id'=>$lehrfach_id,
 			'lektor_der_lv'=>$lektor_der_lv,
 			'lehrfach_oe_kurzbz_arr'=>$lehrfach_oe_kurzbz_arr,
-			'is_lector'=>$is_lector,
-			'angemeldet'=>$angemeldet
 		];
 		
 		Events::trigger('lvMenuBuild', 
-						// callback function for the onEvents to add newValues to the $menu
+						// passing $menu per reference
 						function & () use (&$menu) {
 							return $menu;
 						},
@@ -276,8 +288,20 @@ class LvMenu extends FHCAPI_Controller
 		// ##########################################################################################
 		
 		foreach ($menu as $key => $row){
+			
+			// fills pos array to sort the menu 
 			$pos[$key] = $row['position'];
 
+			//adds base_url to both the c4_icon and c4_link
+			/* if(array_key_exists('c4_icon',$menu[$key]) ){
+				$menu[$key]['c4_icon']=base_url($menu[$key]['c4_icon']);
+			}
+			if(array_key_exists('c4_link',$menu[$key]) ){
+				$menu[$key]['c4_link']=base_url($menu[$key]['c4_link']);
+			} */
+			
+
+			/* 
 			// adds new key with modified icon path to the menu
 			$menu[$key]['cis4_icon'] = base_url(str_replace("../../..","",$row['icon']));
 			
@@ -294,7 +318,7 @@ class LvMenu extends FHCAPI_Controller
 				}else{
 					$menu[$key]['cis4_link'] = $menu[$key]['link'];
 				}
-			}
+			} */
 		}
 
 		array_multisort($pos, SORT_ASC, SORT_NUMERIC, $menu);
@@ -339,6 +363,8 @@ class LvMenu extends FHCAPI_Controller
 				'name'=>$p->t('lehre/lehrveranstaltungsinformation'),
 				'icon'=>'../../../skin/images/button_lvinfo.png',
 				'link'=>'',
+				'c4_icon'=> base_url('skin/images/button_lvinfo.png'),
+				'c4_link'=>'',
 				'text'=>$text
 			);
 		}
@@ -385,6 +411,8 @@ class LvMenu extends FHCAPI_Controller
 				'name'=>$p->t('lehre/semesterplan'),
 				'icon'=>'../../../skin/images/button_semplan.png',
 				'link'=>$link,
+				'c4_icon'=> base_url('skin/images/button_semplan.png'),
+				'c4_link'=> $link,
 				'link_target'=>'_blank',
 				'text'=>$text
 			);
@@ -424,6 +452,8 @@ class LvMenu extends FHCAPI_Controller
 				'name'=>$p->t('lehre/download'),
 				'icon'=>'../../../skin/images/button_download.png',
 				'link'=>$link,
+				'c4_icon'=> base_url('skin/images/button_download.png'),
+				'c4_link'=>$link,
 				'text'=>$text
 			);
 		}
@@ -483,6 +513,8 @@ class LvMenu extends FHCAPI_Controller
 				'name'=>$name,
 				'icon'=>'../../../skin/images/button_listen.png',
 				'link'=>$link,
+				'c4_icon'=> base_url('skin/images/button_listen.png'),
+				'c4_link'=>$link,
 				'text'=>$text
 			);
 		}
@@ -499,6 +531,8 @@ class LvMenu extends FHCAPI_Controller
 				'name'=>$p->t('lehre/feedback'),
 				'icon'=>'../../../skin/images/button_feedback.png',
 				'link'=>'feedback.php?lvid='.$lvid,
+				'c4_icon'=> base_url('skin/images/button_feedback.png'),
+				'c4_link'=> base_url('feedback.php?lvid='.$lvid),
 				'text'=>''
 			);
 		}
@@ -515,8 +549,8 @@ class LvMenu extends FHCAPI_Controller
 					'id'=>'core_menu_gesamtnote',
 					'position'=>'80',
 					'name'=>$p->t('lehre/gesamtnote'),
-					'icon'=>'../../../skin/images/button_endnote.png',
-					'link'=>'benotungstool/lvgesamtnoteverwalten.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem)
+					'c4_icon'=> base_url('skin/images/button_endnote.png'),
+					'c4_link'=> base_url('benotungstool/lvgesamtnoteverwalten.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem))
 				);
 			}
 			else
@@ -526,7 +560,7 @@ class LvMenu extends FHCAPI_Controller
 					'id'=>'core_menu_gesamtnote',
 					'position'=>'80',
 					'name'=>$p->t('lehre/gesamtnote'),
-					'icon'=>'../../../skin/images/button_endnote.png',
+					'c4_icon'=>'skin/images/button_endnote.png',
 					'text'=>$p->t('lehre/noteneingabedeaktiviert')
 				);
 			}
@@ -573,8 +607,8 @@ class LvMenu extends FHCAPI_Controller
 				'id'=>'core_menu_studentenupload',
 				'position'=>'90',
 				'name'=>$p->t('lehre/studentenAbgabe'),
-				'icon'=>'../../../skin/images/button_studiupload.png',
-				'link'=>$link,
+				'c4_icon'=>'skin/images/button_studiupload.png',
+				'c4_link'=>$link,
 				'link_target'=>$link_target
 			);
 		}
@@ -599,8 +633,6 @@ class LvMenu extends FHCAPI_Controller
 			$noMails = array();
 			$noMailLink = FALSE;
 
-			
-
 			foreach($studentMails as $mail){
 				
 				if($mail->mail == 'nomail'){
@@ -624,8 +656,8 @@ class LvMenu extends FHCAPI_Controller
 				'id'=>'core_menu_mailanstudierende',
 				'position'=>'100',
 				'name'=>$p->t('lehre/mail'),
-				'icon'=>'../../../skin/images/button_feedback.png',
-				'link'=>$mailto,
+				'c4_icon'=>base_url('skin/images/button_feedback.png'),
+				'c4_link'=>$mailto,
 				'link_onclick'=>$link_onclick
 			);
 		} 
@@ -645,21 +677,12 @@ class LvMenu extends FHCAPI_Controller
 				'id'=>'core_menu_pinboard',
 				'position'=>'110',
 				'name'=>$p->t('lehre/pinboard'),
-				'icon'=>'../../../skin/images/button_pinboard.png',
-				'link'=>base_url("CisHtml/Cms/news"),
+				'c4_icon'=>base_url('skin/images/button_pinboard.png'),
+				'c4_link'=>base_url('CisHtml/Cms/news'),
 				'text'=>$text
 			);
 
-			// this is the old cis version
-			/* $menu[]=array
-			(
-				'id'=>'core_menu_pinboard',
-				'position'=>'110',
-				'name'=>$p->t('lehre/pinboard'),
-				'icon'=>'../../../skin/images/button_pinboard.png',
-				'link'=>'../../../cms/news.php?studiengang_kz='.urlencode($studiengang_kz).'&semester='.urlencode($semester),
-				'text'=>$text
-			); */
+			
 		}
 	}
 
@@ -679,6 +702,8 @@ class LvMenu extends FHCAPI_Controller
 						'name'=>$p->t('lehre/abmelden'),
 						'icon'=>'../../../skin/images/button_studiupload.png',
 						'link'=>'abmeldung.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem),
+						'c4_icon'=>base_url('skin/images/button_studiupload.png'),
+						'c4_link'=>base_url('abmeldung.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem)),
 					);
 
 				}
@@ -702,6 +727,8 @@ class LvMenu extends FHCAPI_Controller
 						'name'=>$row->bezeichnung[$sprache],
 						'icon'=>'../../../cms/dms.php?id='.$row->logo_dms_id,
 						'link'=>$row->basis_url,
+						'c4_icon'=>base_url('cms/dms.php?id='.$row->logo_dms_id),
+						'c4_link'=>$row->basis_url,
 						'link_target'=>'_blank'
 					);
 				}
@@ -720,7 +747,9 @@ class LvMenu extends FHCAPI_Controller
 				'position'=>'128',
 				'name'=>$p->t('lehre/anrechnung'),
 				'icon'=>'../../../skin/images/button_listen.png',
-				'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid)
+				'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid),
+				'c4_icon'=>base_url('skin/images/button_listen.png'),
+				'c4_link' => base_url('index.ci.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid))
 			);
 		}
 	}
@@ -736,7 +765,9 @@ class LvMenu extends FHCAPI_Controller
 			'position'=>'128',
 			'name'=>$p->t('lehre/anrechnungen'),
 			'icon'=>'../../../skin/images/button_listen.png',
-			'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/ReviewAnrechnungUebersicht?studiensemester='.urlencode($angezeigtes_stsem)
+			'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/ReviewAnrechnungUebersicht?studiensemester='.urlencode($angezeigtes_stsem),
+			'c4_icon'=> base_url('skin/images/button_listen.png'),
+			'c4_link' => base_url('index.ci.php/lehre/anrechnung/ReviewAnrechnungUebersicht?studiensemester='.urlencode($angezeigtes_stsem))
 		);
 		}
 	}
