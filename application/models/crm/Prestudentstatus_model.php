@@ -514,4 +514,70 @@ class Prestudentstatus_model extends DB_Model
 
 		return $this->execQuery($qry, array($prestudent_id));
 	}
+
+	/**
+	 * Gets status history of a prestudent
+	 * This function uses the language of the logged in user to
+	 * translate the given statusgrund
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return stdClass
+	 */
+	public function getHistoryPrestudent($prestudent_id)
+	{
+		$this->addSelect('tbl_prestudentstatus.prestudent_id');
+		$this->addSelect('tbl_prestudentstatus.status_kurzbz');
+		$this->addSelect('tbl_prestudentstatus.studiensemester_kurzbz');
+		$this->addSelect('tbl_prestudentstatus.ausbildungssemester');
+		$this->addSelect('tbl_prestudentstatus.datum');
+		$this->addSelect('tbl_prestudentstatus.insertamum');
+		$this->addSelect('tbl_prestudentstatus.insertvon');
+		$this->addSelect('tbl_prestudentstatus.updateamum');
+		$this->addSelect('tbl_prestudentstatus.updatevon');
+		$this->addSelect('tbl_prestudentstatus.orgform_kurzbz');
+		$this->addSelect('tbl_prestudentstatus.bestaetigtam');
+		$this->addSelect('tbl_prestudentstatus.bestaetigtvon');
+		$this->addSelect('tbl_prestudentstatus.bewerbung_abgeschicktamum');
+		$this->addSelect('tbl_prestudentstatus.anmerkung');
+		$this->addSelect('plan.studienplan_id');
+		$this->addSelect('plan.bezeichnung');
+		$this->addSelect('grund.beschreibung[(
+			SELECT index 
+			FROM public.tbl_sprache 
+			WHERE sprache=' . $this->escape(getUserLanguage()) . '
+		)] AS statusgrund_bezeichnung', false);
+		$this->addSelect("CASE 
+			WHEN s.student_uid IS NOT NULL 
+			AND tbl_prestudentstatus.status_kurzbz IN (" . implode(",", $this->escape([
+				'Student',
+				'Diplomand',
+				'Abbrecher',
+				'Absolvent',
+				'Ausserodentlicher',
+				'Incoming',
+				'Outgoing',
+				'Unterbrecher'
+			])) . ") 
+			THEN lv.semester || lv.verband || lv.gruppe 
+			ELSE '-'
+			END AS lehrverband", false);
+
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+		$this->addJoin('public.tbl_status_grund grund', 'statusgrund_id', 'LEFT');
+		$this->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
+		$this->addJoin(
+			'public.tbl_studentlehrverband lv',
+			's.student_uid IS NOT NULL AND s.student_uid=lv.student_uid AND tbl_prestudentstatus.studiensemester_kurzbz=lv.studiensemester_kurzbz',
+			'LEFT'
+		);
+
+		$this->addOrder('tbl_prestudentstatus.datum', 'DESC');
+		$this->addOrder('tbl_prestudentstatus.insertamum', 'DESC');
+		$this->addOrder('tbl_prestudentstatus.ext_id', 'DESC');
+
+		return $this->loadWhere([
+			'tbl_prestudentstatus.prestudent_id' => $prestudent_id
+		]);
+	}
 }

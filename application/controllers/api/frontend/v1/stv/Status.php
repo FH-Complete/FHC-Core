@@ -39,21 +39,11 @@ class Status extends FHCAPI_Controller
 
 	public function getHistoryPrestudent($prestudent_id)
 	{
-		$this->load->model('system/Sprache_model', 'SpracheModel');
-		$this->SpracheModel->addSelect('index');
-		$result = $this->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+		$result = $this->PrestudentstatusModel->getHistoryPrestudent($prestudent_id);
 
-		// Return language index
-		$lang =  hasData($result) ? getData($result)[0]->index : 1;
+		$data = $this->getDataOrTerminateWithError($result);
 
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-
-		$result = $this->PrestudentModel->getHistoryPrestudent($prestudent_id, $lang);
-		if (isError($result))
-		{
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		$this->terminateWithSuccess((getData($result) ?: []));
+		$this->terminateWithSuccess($data);
 	}
 
 	public function getStatusgruende()
