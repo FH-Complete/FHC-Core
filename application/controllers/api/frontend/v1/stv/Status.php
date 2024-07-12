@@ -293,7 +293,9 @@ class Status extends FHCAPI_Controller
 			//TODO(manu) check Berechtigung
 			//check if Bismeldestichtag erreicht ADDNEW status
 			$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($new_status_datum, $studiensemester_kurzbz);
-			return $this->terminateWithError("here", self::ERROR_TYPE_GENERAL);
+
+			//just testing
+			//return $this->terminateWithError("here", self::ERROR_TYPE_GENERAL);
 			if (isError($result))
 			{
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
@@ -509,11 +511,6 @@ class Status extends FHCAPI_Controller
 			$isStudent = true;
 
 		if (!$isStudent) {
-			//check if bewerberstatus exists
-			$result = $result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
-			if (isError($result)) {
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
 
 			//Check ZGV
 			if ($status_kurzbz == Prestudentstatus_model::STATUS_BEWERBER) {
@@ -544,11 +541,16 @@ class Status extends FHCAPI_Controller
 				}
 			}
 
+			//check if bewerberstatus exists
+			$result = $result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
+			if (isError($result)) {
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+
 			//checkIf Kaution bezahlt
 			//TODO(Manu)
 
 			//generate Personenkennzeichen(matrikelnr)
-			//TODO(manu) check if generateMatrikelnummer verwenden or use new version2 (with Type Param)
 			$resultMat = $this->StudentModel->generateMatrikelnummer2($stg, $studiensemester_kurzbz, $typ);
 			if (isError($resultMat)) {
 				return $this->terminateWithError($resultMat, self::ERROR_TYPE_GENERAL);
@@ -557,7 +559,6 @@ class Status extends FHCAPI_Controller
 			$jahr = mb_substr($matrikelnr, 0, 2);
 
 			//generate UID
-			//TODO(Manu) check ausbildungssemester: testfall prestudent_id 26381
 			$resultUid = $this->StudentModel->generateUID($stgkzl, $jahr, $typ, $matrikelnr);
 			if (isError($resultMat)) {
 				return $this->terminateWithError("in generateUid" . $resultUid, self::ERROR_TYPE_GENERAL);
@@ -590,8 +591,8 @@ class Status extends FHCAPI_Controller
 				}
 			}
 
-			//TODO(Manu) check if benutzer already exists ok?
-			//person kann mehrere Benutzer haben...
+			//TODO(Manu) check if benutzer already exists to avoid conflicts..
+			//person kann mehrere Benutzer haben... student_uid?
 			//add benutzerdatensatz mit Aktierungscode
 			$this->load->model('person/Benutzer_model', 'BenutzerModel');
 			$result = $this->BenutzerModel->checkIfExistingBenutzer($person_id);
@@ -1192,8 +1193,7 @@ class Status extends FHCAPI_Controller
 		//check if Bismeldestichtag erreicht
 		if(!$isBerechtigtNoStudstatusCheck)
 		{
-			$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($new_status_datum);
-			return $this->terminateWithError("here2", self::ERROR_TYPE_GENERAL);
+			$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($datum);
 			if (isError($result))
 			{
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
