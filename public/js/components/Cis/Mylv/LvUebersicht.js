@@ -22,12 +22,17 @@ export default  {
         BsModal,
     },
     methods:{
-        selectMenu: function(menuItem){
+        selectMenu: function(menuItem, key=null){
             console.log(menuItem,"menuItem")
             switch(menuItem.id){
                 case "core_menu_mailanstudierende": window.location.href=menuItem.c4_link; break;
                 default:
-                    this.selectedMenu=menuItem;
+                    this.selectedMenu= {...menuItem};
+            }
+
+            if( this.selectedMenu && key != null && menuItem.c4_linkList[key] !='#'){
+                this.selectedMenu.c4_link = menuItem.c4_linkList[key];
+                this.selectedMenu.name += ' - ' + key;
             }
             
         },
@@ -62,11 +67,14 @@ export default  {
                 <iframe class="h-100 w-100" :src="selectedMenu.c4_link" :title="selectedMenu.name"></iframe>
             </div>
             <div v-else :style="{'display':'grid', 'row-gap':'10px', 'column-gap':'10px', 'grid-template-columns':'repeat(3,minmax(100px,1fr))', 'grid-template-rows':'repeat('+Math.ceil(menu.length / 3)+',minmax(100px,1fr))'} ">
-                <div role="button" @click="selectMenu(menuItem)" :title="menuItem.name" class="lvUebersichtMenuPunkt border border-1 d-flex flex-column align-items-center justify-content-center" v-for="(menuItem, index) in menu" :key="index">
-                        <img :src="menuItem.c4_icon" :alt="menuItem.name" ></img>    
-                        <span class="mt-2">{{menuItem.name}}</span>
+                <div :title="menuItem.name" role="button" @click="selectMenu(menuItem)" class="lvUebersichtMenuPunkt border border-1 d-flex flex-column align-items-center justify-content-center p-1" v-for="(menuItem, index) in menu" :key="index">
+                    <img :src="menuItem.c4_icon" :alt="menuItem.name" ></img>    
+                    <span @click="selectMenu(menuItem)" class="underline_hover mt-2">{{menuItem.name}}</span> 
+                    <span v-for="(value,key,index) in menuItem.c4_linkList" @click.stop="selectMenu(menuItem,key)" class="underline_hover mt-1" :index="index">{{key}}</span>
+                        
                 </div>
             </div>
+            <div>{{JSON.stringify(event,null,2)}}</div>
         </template>
         
     </bs-modal>
