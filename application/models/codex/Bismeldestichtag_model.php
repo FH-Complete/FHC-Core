@@ -13,38 +13,24 @@ class Bismeldestichtag_model extends DB_Model
 
 	public function getLastReachedMeldestichtag($studiensemester_kurzbz = null)
 	{
-		$qry = "
-				SELECT
-					meldestichtag_id, meldestichtag, studiensemester_kurzbz, insertamum, insertvon, updateamum, updatevon
-				FROM
-					bis.tbl_bismeldestichtag
-				WHERE
-					meldestichtag < NOW()
-		";
+		$this->addSelect('meldestichtag_id');
+		$this->addSelect('meldestichtag');
+		$this->addSelect('studiensemester_kurzbz');
+		$this->addSelect('insertamum');
+		$this->addSelect('insertvon');
+		$this->addSelect('updateamum');
+		$this->addSelect('updatevon');
 
-		if (isset($studiensemester_kurzbz))
-		{
-			$qry .=	"
-				AND
-					studiensemester_kurzbz= ?";
+		if ($studiensemester_kurzbz) {
+			$this->db->where('studiensemester_kurzbz', $studiensemester_kurzbz);
 		}
 
-		$qry .= "
-				ORDER BY
-					meldestichtag DESC
-				LIMIT 1;";
+		$this->addOrder('meldestichtag', 'DESC');
+		$this->addLimit(1);
 
-		$result = $this->execQuery($qry, array($studiensemester_kurzbz));
-
-		if (isError($result))
-		{
-			return error($result);
-		}
-		if (!hasData($result)) {
-			return success("0",'Kein Meldestichtag vorhanden');
-		}
-		return $result;
-
+		return $this->loadWhere([
+			'meldestichtag < NOW()' => null
+		]);
 	}
 
 	/**

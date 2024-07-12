@@ -199,7 +199,6 @@ export default{
 					if (this.dataMeldestichtag && this.dataMeldestichtag > rowData.datum)
 					{
 						row.getElement().classList.add('disabled');
-
 					}
 				},
 				layout: 'fitDataFill',
@@ -754,9 +753,10 @@ export default{
 			.catch(this.$fhcAlert.handleSystemError);
 		this.$fhcApi
 			.get('api/frontend/v1/stv/status/getLastBismeldestichtag/')
-			.then(result => result.data)
 			.then(result => {
-				this.dataMeldestichtag = result.retval[0].meldestichtag;
+				this.dataMeldestichtag = result.data[0].meldestichtag;
+				if (this.$refs.table.tableBuilt)
+					this.$refs.table.tabulator.redraw(true);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},

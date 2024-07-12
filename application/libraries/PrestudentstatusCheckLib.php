@@ -106,7 +106,7 @@ class PrestudentstatusCheckLib
 		$status_kurzbz,
 		$tudiensemester_kurzbz,
 		$ausbildungssemester
-	) 
+	)
 	{
 		$resultApp =  $this->_getApplicationData($prestudent_id);
 		if(isError($resultApp))
@@ -140,7 +140,7 @@ class PrestudentstatusCheckLib
 	 * @return error if invalid
 	 * @return error, if role does not exist, else count(roles) if it does
 	 */
-	public function checkIfExistingStudentRolle($prestudent_id) 
+	public function checkIfExistingStudentRolle($prestudent_id)
 	{
 		$resultApp =  $this->_getApplicationData($prestudent_id);
 		if(isError($resultApp))
@@ -169,7 +169,7 @@ class PrestudentstatusCheckLib
 	 * @param integer $prestudent_id
 	 * @return booleans $reihungstest_angetreten, error if not angetreten
 	 */
-	public function checkIfAngetreten($prestudent_id) 
+	public function checkIfAngetreten($prestudent_id)
 	{
 		$result =  $this->_getApplicationData($prestudent_id);
 		if(isError($result))
@@ -190,7 +190,7 @@ class PrestudentstatusCheckLib
 	 * @param integer $prestudent_id
 	 * @return booleans $zgv_code, error if not registered
 	 */
-	public function checkIfZGVEingetragen($prestudent_id, $typ=null) 
+	public function checkIfZGVEingetragen($prestudent_id, $typ=null)
 	{
 		$result =  $this->_getApplicationData($prestudent_id);
 		if(isError($result))
@@ -201,18 +201,18 @@ class PrestudentstatusCheckLib
 		$studentName = trim ($result->vorname.' '.$result->nachname);
 
 		if ($typ && $typ=='m' && !$result->zgvmas_code)
-		{			
+		{
 			return error($this->_ci->p->t('lehre', 'error_ZGVMasterNichtEingetragen', ['name' => $studentName]));
 		}
 		else
 			return success($result->zgvmas_code);
-		
+
 
 		if(!$result->zgv_code)
-		{		
+		{
 			return error($this->_ci->p->t('lehre', 'error_ZGVNichtEingetragen', ['name' => $studentName]));
 		}
-	
+
 		return success($result->zgv_code);
 	}
 
@@ -221,7 +221,7 @@ class PrestudentstatusCheckLib
 	 * @return error if invalid
 	 * @return error if no bewerberstatus, success otherwise
 	 */
-	public function checkIfExistingBewerberstatus($prestudent_id) 
+	public function checkIfExistingBewerberstatus($prestudent_id)
 	{
 		$result =  $this->_getApplicationData($prestudent_id);
 		if(isError($result))
@@ -239,7 +239,7 @@ class PrestudentstatusCheckLib
 			return getData($result);
 		}
 		if(getData($result) == "0")
-		{		
+		{
 			return error($this->_ci->p->t('lehre','error_keinBewerber', ['name' => $studentName]));
 		}
 		return success(getData($result));
@@ -258,7 +258,7 @@ class PrestudentstatusCheckLib
 			return getData($result);
 		}
 		if(getData($result) == "1")
-		{		
+		{
 			return error($this->_ci->p->t('lehre','error_dataVorMeldestichtag'));
 		}
 		return success(getData($result));
@@ -325,23 +325,53 @@ class PrestudentstatusCheckLib
 		$new_status_datum_form = new DateTime($new_status_datum);
 		$new_status_semesterstart_form = new DateTime($new_status_semesterstart);
 
-		$neuer_status = new stdClass();
-		$neuer_status->status_kurzbz = $status_kurzbz;
-		$neuer_status->studiensemester_kurzbz = $new_status_studiensemester_kurzbz;
-		$neuer_status->datum = $new_status_datum;
-		$neuer_status->ausbildungssemester = $new_status_ausbildungssemester;
-		$neuer_status->studienplan_orgform_kurzbz = $new_studienplan_orgform_kurzbz;
+		if (!isEmptyArray($resultArr))
+		{
+			// neuen Status zum Hinzufügen
+			$first_status = $resultArr[0];
+			$neuer_status = new stdClass();
+			$neuer_status->status_kurzbz = $status_kurzbz;
+			$neuer_status->studiensemester_kurzbz = $new_status_studiensemester_kurzbz;
+			$neuer_status->datum = $new_status_datum;
+			$neuer_status->ausbildungssemester = $new_status_ausbildungssemester;
+			$neuer_status->studienplan_orgform_kurzbz = $new_studienplan_orgform_kurzbz;
+			$neuer_status->matrikelnr = $first_status->matrikelnr;
+			$neuer_status->vorname = $first_status->vorname;
+			$neuer_status->nachname = $first_status->nachname;
+
+			// Status, welcher gerade geändert wird, holen
+			$status_to_change = array_filter(
+				$resultArr,
+				function ($status) use ($status_kurzbz, $old_status_studiensemester, $old_status_ausbildungssemester) {
+					return
+						$status->status_kurzbz == $status_kurzbz
+						&& $status->studiensemester_kurzbz == $old_status_studiensemester
+						&& $status->ausbildungssemester == $old_status_ausbildungssemester;
+				}
+			);
+
+			if (!isEmptyArray($status_to_change))
+			{
+				$status_to_change_index = key($status_to_change);
+
+				// wenn sich Studiensemester und Ausbildungssemester nicht geändert haben...
+				if ($new_status_studiensemester_kurzbz == $old_status_studiensemester
+					&& $new_status_ausbildungssemester == $old_status_ausbildungssemester)
+				{
+					// ...neuen status an selber stelle einfügen wie zu ändernder Status
+					$resultArr[$status_to_change_index] = (object) array_merge((array) $resultArr[$status_to_change_index], (array) $neuer_status);
+					$newStatusInserted = true;
+				}
+				else
+				{
+					// bei Status mit neuem Semester: alten Status entfernen
+					unset($resultArr[$status_to_change_index]);
+				}
+			}
+		}
 
 		foreach ($resultArr as $row)
 		{
-			// Status, der gerade in Bearbeitung ist, überspringen
-			if (isset($old_status_studiensemester)
-				&& isset($old_status_ausbildungssemester)
-				&& $row->status_kurzbz == $status_kurzbz
-				&& $row->studiensemester_kurzbz == $old_status_studiensemester
-				&& $row->ausbildungssemester == $old_status_ausbildungssemester)
-				continue;
-
 			$studiensemester_start = new DateTime($row->studiensemester_start);
 			$status_datum = new DateTime($row->datum);
 
@@ -350,15 +380,6 @@ class PrestudentstatusCheckLib
 				if (!$newStatusInserted)
 				{
 					// neuer Status erstmals größer als Datum eines bestehenden Status -> neuen Status EINMALIG einfügen für spätere Statusprüfung
-					$neuer_status = new stdClass();
-					$neuer_status->status_kurzbz = $status_kurzbz;
-					$neuer_status->studiensemester_kurzbz = $new_status_studiensemester_kurzbz;
-					$neuer_status->datum = $new_status_datum;
-					$neuer_status->ausbildungssemester = $new_status_ausbildungssemester;
-					$neuer_status->studienplan_orgform_kurzbz = $new_studienplan_orgform_kurzbz;
-					$neuer_status->matrikelnr = $row->matrikelnr;
-					$neuer_status->vorname = $row->vorname;
-					$neuer_status->nachname = $row->nachname;
 					$statusArr[] = $neuer_status;
 					$newStatusInserted = true;
 				}
@@ -478,10 +499,10 @@ class PrestudentstatusCheckLib
 	 * @param integer $prestudent_id
 	 * @return error if not valid, array with ApplicationData if valid
 	 */
-	private function _getApplicationData($prestudent_id) 
+	private function _getApplicationData($prestudent_id)
 	{
 		$this->_ci->PrestudentModel->addJoin('public.tbl_person p', 'ON (p.person_id = public.tbl_prestudent.person_id)');
-		
+
 		$result = $this->_ci->PrestudentModel->load([
 			'prestudent_id'=> $prestudent_id,
 		]);
