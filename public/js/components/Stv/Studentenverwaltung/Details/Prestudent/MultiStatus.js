@@ -1008,7 +1008,7 @@ export default{
 						v-model="statusData['rt_stufe']"
 						:disabled="statusData.datum < dataMeldestichtag"
 						>
-						<option :value="NULL">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
+						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
 						<option v-for="entry in aufnahmestufen" :key="entry" :value="entry">{{entry}}</option>
 						</form-input>
 					</div>
@@ -1020,7 +1020,7 @@ export default{
 							:label="$p.t('studierendenantrag/antrag_grund')"
 							v-model="statusData['statusgrund_id']"
 							>
-							<option :value="NULL"></option>
+							<option value=""></option>
 							<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.beschreibung[0]}}</option>
 						</form-input>
 					</div>
@@ -1145,7 +1145,7 @@ export default{
 							</li>							
 						</ul>
 					</div>
-					
+				</template>
 			</core-filter-cmpt>
 			
 			<div 
