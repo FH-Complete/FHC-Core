@@ -164,6 +164,7 @@ export default {
 			.get('api/frontend/v1/stv/lists/getStudiensemester')
 			.then(result => {
 				this.lists.studiensemester = result.data;
+				this.lists.studiensemester_desc = result.data.toReversed();
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},

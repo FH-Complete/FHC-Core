@@ -42,6 +42,9 @@ export default{
 			from: 'hasPermissionRtAufsicht',
 			default: false
 		},
+		lists: {
+			from: 'lists'
+		},
 		$reloadList: {
 			from: '$reloadList',
 			required: true
@@ -259,7 +262,6 @@ export default{
 				}
 			],
 			statusData: {},
-			listStudiensemester: [],
 			maxSem:  Array.from({ length: 11 }, (_, index) => index),
 			listStudienplaene: [],
 			aufnahmestufen: {1: 1, 2: 2, 3: 3},
@@ -848,13 +850,6 @@ export default{
 	},
 	created(){
 		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getStudiensemester')
-			.then(result => result.data)
-			.then(result => {
-				this.listStudiensemester = result;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
 			.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + encodeURIComponent(this.paramIds))
 			.then(result => result.data)
 			.then(result => {
@@ -925,7 +920,7 @@ export default{
 							v-model="statusData['studiensemester_kurzbz']"
 							:disabled="statusData.datum < dataMeldestichtag"
 						>
-							<option v-for="sem in listStudiensemester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz"  :selected="sem.studiensemester_kurzbz === defaultSemester">{{sem.studiensemester_kurzbz}}</option>
+							<option v-for="sem in lists.studiensemester_desc" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz"  :selected="sem.studiensemester_kurzbz === defaultSemester">{{sem.studiensemester_kurzbz}}</option>
 						</form-input>
 					</div>
 					<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false) 100 Semester-->

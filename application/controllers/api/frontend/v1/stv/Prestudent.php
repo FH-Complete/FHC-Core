@@ -19,7 +19,6 @@ class Prestudent extends FHCAPI_Controller
 			'getAufmerksamdurch' => self::PERM_LOGGED,
 			'getBerufstaetigkeit' => self::PERM_LOGGED,
 			'getTypenStg' => self::PERM_LOGGED,
-			'getStudiensemester' => self::PERM_LOGGED,
 			'getStudienplaene' => self::PERM_LOGGED
 		]);
 
@@ -259,20 +258,6 @@ class Prestudent extends FHCAPI_Controller
 		$this->GsstudientypModel->addOrder('gsstudientyp_kurzbz');
 
 		$result = $this->GsstudientypModel->load();
-		if (isError($result)) {
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		return $this->terminateWithSuccess(getData($result) ?: []);
-	}
-
-	public function getStudiensemester()
-	{
-		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-
-		$this->StudiensemesterModel->addOrder('start', 'DESC');
-		$this->StudiensemesterModel->addLimit(20);
-
-		$result = $this->StudiensemesterModel->load();
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
