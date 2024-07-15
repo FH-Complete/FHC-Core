@@ -12,6 +12,7 @@ class Prestudentstatus_model extends DB_Model
 	const STATUS_AUFGENOMMENER = 'Aufgenommener';
 	const STATUS_WARTENDER = 'Wartender';
 	const STATUS_ABGEWIESENER = 'Abgewiesener';
+	const STATUS_INTERESSENT = 'Interessent';
 
 	/**
 	 * Constructor
@@ -431,6 +432,48 @@ class Prestudentstatus_model extends DB_Model
 		elseif (!hasData($result))
 		{
 			return success("0", $this->p->t('lehre','error_keinBewerber', ['name' => $studentName]));
+		}
+		else
+		{
+			return success($result);
+		}
+	}
+
+		/**
+	 * Check if Rolle there is an existing Aufgenommenerstatus
+	 * @param integer $prestudent_id
+	 * @return error if no status Aufgenommener, success if existing
+	 */
+	public function checkIfExistingAufgenommenerstatus($prestudent_id)
+	{
+		$studentName = '';
+
+		$nameRes = $this->PersonModel->loadPrestudent($prestudent_id);
+
+		if (hasData($nameRes))
+		{
+			$nameData = getData($nameRes)[0];
+			$studentName = $nameData->vorname.' '.$nameData->nachname;
+		}
+
+		$qry = "SELECT
+					*
+				FROM
+				    public.tbl_prestudentstatus
+				WHERE
+					prestudent_id = ?
+				AND
+				    status_kurzbz = 'Aufgenommener'";
+
+		$result = $this->execQuery($qry, array($prestudent_id));
+
+		if (isError($result))
+		{
+			return error($result);
+		}
+		elseif (!hasData($result))
+		{
+			return success("0", $this->p->t('lehre','error_keinAufgenommener', ['name' => $studentName]));
 		}
 		else
 		{

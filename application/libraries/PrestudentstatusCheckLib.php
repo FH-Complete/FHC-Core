@@ -246,6 +246,35 @@ class PrestudentstatusCheckLib
 	}
 
 	/**
+	 * Checks if status aufgenommen already exists.
+	 * @return error if invalid
+	 * @return error if no status Aufgenommen, success otherwise
+	 */
+	public function checkIfExistingAufgenommenerstatus($prestudent_id)
+	{
+		$result =  $this->_getApplicationData($prestudent_id);
+		if(isError($result))
+		{
+			return getData($result);
+		}
+		$result =  current(getData($result));
+		$studentName = trim ($result->vorname.' '.$result->nachname);
+
+		$result =  $this->_ci->PrestudentstatusModel->checkIfExistingAufgenommenerstatus(
+			$prestudent_id
+		);
+		if(isError($result))
+		{
+			return getData($result);
+		}
+		if(getData($result) == "0")
+		{
+			return error($this->_ci->p->t('lehre','error_keinAufgenommener', ['name' => $studentName]));
+		}
+		return success(getData($result));
+	}
+
+	/**
 	 * Check if Bismeldestichtag erreicht
 	 * @param Date $statusDatum
 	 * @return error if Bismeldestichtag erreicht

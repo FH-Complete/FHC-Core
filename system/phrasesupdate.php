@@ -27535,7 +27535,7 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
 	//Prestudent
 	array(
 		'app' => 'core',
@@ -28052,6 +28052,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => '{name} must be made an applicant first!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_keinAufgenommener',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name} muss zuerst Aufgenommener sein, um zum Studenten gemacht werden zu können!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name} must first be admitted in order to be made a student!',
 				'description' => '',
 				'insertvon' => 'system'
 			)

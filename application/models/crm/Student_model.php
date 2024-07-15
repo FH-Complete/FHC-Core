@@ -108,9 +108,9 @@ class Student_model extends DB_Model
 		$max = 0;
 		if ($matrikelnrres && hasData($matrikelnrres)) {
 			$max = mb_substr($matrikelnrres->retval[0]->matrikelnr, 7);
-/*			if (!is_numeric($max)) {
-				$max = 0;
-			}*/
+			if (!is_numeric($max)) {
+				$max = (int) $max;
+			}
 		}
 
 		$max += 1;

@@ -472,98 +472,8 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
 			this.addNewStatus(prestudentIds);
 		},
-		turnIntoStudent(prestudentIds){
-
-			//erste Voraussetzung: kein check auf checkIfExistingStudent
-			// macht aus einem Bewerber einen Studenten
-			// Voraussetzungen:
-			// - ZGV muss ausgefuellt sein (bei Master beide)
-			// - Kaution muss bezahlt sein
-			// - Rolle Bewerber muss existieren
-			// Wenn die Voraussetzungen erfuellt sind, dann wird die Matrikelnr
-			// und UID generiert und der Studentendatensatz angelegt.
-			let changeData = {};
-
-			//for Feedback Sucess, Error
-			let countSuccess = 0;
-			let countError = 0;
-
-			const promises = prestudentIds.map(prestudentId => {
-
-				this.checkIfErsterStudent(prestudentId).then(() => {
-
-					if(this.isErsterStudent)
-					{
-						console.log(prestudentId + ": isersterStudent: " + this.isErsterStudent + " Logik turnIntoStudent");
-
-						changeData = this.newArray.find(item => item.prestudent_id === prestudentId);
-
-						return this.$fhcApi.post('api/frontend/v1/stv/status/turnIntoStudent/' + prestudentId,
-							changeData
-						).then(response => {
-							countSuccess++;
-							return response;
-						})
-							//.catch(this.$fhcAlert.handleSystemError)
-							.catch(error => {
-								countError++;
-								//For each Prestudent show Error in Alert
-								this.$fhcAlert.handleSystemError(error);
-							});
-					}
-					else
-					{
-						console.log(prestudentId + ": isersterStudent: " + this.isErsterStudent + " Add New Status");
-						changeData = this.newArray.find(item => item.prestudent_id === prestudentId);
-
-						return this.$fhcApi.post('api/frontend/v1/stv/status/addNewStatus/' + prestudentId,
-							changeData
-						).then(response => {
-							countSuccess++;
-							return response;
-						})
-							//.catch(this.$fhcAlert.handleSystemError)
-							.catch(error => {
-								countError++;
-								//For each Prestudent show Error in Alert
-								this.$fhcAlert.handleSystemError(error);
-							});
-					}
-				});
-			});
-
-			Promise
-				.allSettled(promises)
-				.then(values => {
-
-					//Feedback Success als infoalert
-					if (countSuccess > 0) {
-						this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
-							'countSuccess': countSuccess,
-							'status': this.newStatus,
-							'countError': countError
-						}));
-					}
-
-/*					if (this.modelValue.prestudent_id) {
-						this.reload();
-						//TODO(manu) reload Detailtab after Abbrecher to see current status activ, verband and gruppe
-					}*/
-					if(this.isErsterStudent) {
-						this.reload();
-						this.isErsterStudent = false;
-					}
-					else {
-						this.$reloadList();
-					}
-					this.hideModal('statusModal');
-					this.resetModal();
-				});
-
-
-		},
 		addStudent(prestudentIds){
-			//Array.isArray(prestudentIds) ? this.modelValue.prestudent_id : [prestudentIds];
+
 			let changeData = {};
 
 			//for Feedback Sucess, Error
@@ -668,12 +578,16 @@ export default{
 						 }));
 					 }
 
-					if (this.modelValue.prestudent_id) {
-						this.reload();
-					}
-					else {
-						this.$reloadList();
-					}
+					 //TODO(Manu) bei status Interessent, Bewerber, aufgenommener, reload nicht working
+					 this.reload();
+					 this.reloadList();
+
+					// if (this.modelValue.prestudent_id) {
+					// 	this.reload();
+					// }
+					// else {
+					// 	this.$reloadList();
+					// }
 					this.hideModal('statusModal');
 					this.resetModal();
 				});
@@ -868,8 +782,8 @@ export default{
 			.then(result => {
 				this.dataMeldestichtag = result.data[0].meldestichtag;
 				//TODO(Manu) wirft plötzlich fehler bei multiselect status
-/*				if (this.$refs.table.tableBuilt)
-					this.$refs.table.tabulator.redraw(true);*/
+		//	if (this.$refs.table.tableBuilt)
+		//		this.$refs.table.tabulator.redraw(true);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
