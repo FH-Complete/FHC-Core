@@ -49,9 +49,11 @@ export default {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: this.endpoint.getNotizen,
-				ajaxParams: {
-					id: this.id,
-					type: this.typeId
+				ajaxParams: () => {
+					return {
+						id: this.id,
+						type: this.typeId
+					};
 				},
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
@@ -479,6 +481,9 @@ export default {
 				}
 			},
 			deep: true
+		},
+		id() {
+			this.reload();
 		}
 	},
 	beforeDestroy() {

@@ -9,7 +9,6 @@ export default{
 		prestudentId: Number
 	},
 	data() {
-		let prestudent_id = this.prestudentId;
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.personId,
@@ -26,13 +25,13 @@ export default{
 					{title:"Status", field:"status"},
 					{title:"PrestudentId", field:"prestudent_id", visible:false}
 				],
-				rowFormatter(row) {
+				rowFormatter: row => {
 					const rowData = row.getData();
 					const element = row.getElement();
 					if (["Abgewiesener","Abbrecher","Absolvent"].includes(rowData.status_kurzbz)) {
 						element.classList.add('disabled');
 					}
-					if (rowData.prestudent_id == prestudent_id) {
+					if (rowData.prestudent_id == this.prestudentId) {
 						element.classList.add('fw-bold');
 					}
 				},
@@ -60,6 +59,11 @@ export default{
 					}
 				}
 			]
+		}
+	},
+	watch: {
+		personId() {
+			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.personId);
 		}
 	},
 	template: `
