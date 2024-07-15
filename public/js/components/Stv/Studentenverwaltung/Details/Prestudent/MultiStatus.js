@@ -65,6 +65,7 @@ export default{
 					prestudent_id : this.modelValue.prestudent_id,
 					studiensemester_kurzbz : this.defaultSemester,
 					ausbildungssemester : this.modelValue.semester,
+					orgform_kurzbz: this.modelValue.orgform_kurzbz,
 					name: `${this.modelValue.vorname} ${this.modelValue.nachname}`
 				};
 				dataArray.push(newObj);
@@ -77,6 +78,7 @@ export default{
 						prestudent_id: item.prestudent_id,
 						ausbildungssemester: item.semester,
 						studiensemester_kurzbz: this.defaultSemester,
+						orgform_kurzbz: item.modelValue.orgform_kurzbz,
 						name: `${item.vorname} ${item.nachname}`
 					};
 					dataArray.push(newObj);
@@ -275,7 +277,8 @@ export default{
 			abbruchData: {},
 			newStatus: '',
 			statusNew: true,
-			isErsterStudent: false
+			isErsterStudent: false,
+			isBewerber: true
 		}
 	},
 	watch: {
@@ -368,8 +371,14 @@ export default{
 
 			if(this.actionStatusText != "Student" && this.actionStatusText != "Wiederholer")
 				this.$refs.confirmStatusAction.show();
-			else
+			else {
+				//haut einzeln hin
+/*				console.log("check if Bewerberstatus");
+				this.checkIfBewerber(this.prestudentIds);
+				console.log(this.isBewerber);*/
+
 				this.$refs.askForAusbildungssemester.show();
+			}
 		},
 		changeStatusToAbbrecherStgl(prestudentIds){
 			this.hideModal('confirmStatusAction');
@@ -410,8 +419,8 @@ export default{
 			this.addNewStatus(prestudentIds);
 		},
 		changeStatusToStudent(prestudentIds){
-
 			//TODO Manu validation if Bewerber already before asking for ausbildungssemester
+			//this.checkIfBewerber();
 			this.hideModal('askForAusbildungssemester');
 			let deltaData =
 				{
@@ -422,7 +431,7 @@ export default{
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData, ausbildungssemester: this.actionSem}));
 			//BewerberZuStudent
-			this.turnIntoStudent(prestudentIds);
+			this.addStudent(prestudentIds);
 		},
 		changeStatusToWiederholer(prestudentIds){
 			this.hideModal('askForAusbildungssemester');
@@ -551,6 +560,60 @@ export default{
 
 
 		},
+		addStudent(prestudentIds){
+			//Array.isArray(prestudentIds) ? this.modelValue.prestudent_id : [prestudentIds];
+			let changeData = {};
+
+			//for Feedback Sucess, Error
+			let countSuccess = 0;
+			let countError = 0;
+
+			if(!prestudentIds)
+				prestudentIds = [this.modelValue.prestudent_id];
+
+			const promises = prestudentIds.map(prestudentId => {
+				//TODO(manu) besserer check
+				changeData = this.statusData.status_kurzbz ? this.statusData : this.newArray.find(item => item.prestudent_id === prestudentId);
+
+				return this.$fhcApi.post('api/frontend/v1/stv/status/addStudent/' + prestudentId,
+					changeData
+				).then(response => {
+					countSuccess++;
+					return response;
+				})
+					//.catch(this.$fhcAlert.handleSystemError)
+					.catch(error => {
+						countError++;
+						//For each Prestudent show Error in Alert
+						this.$fhcAlert.handleSystemError(error);
+					});
+			});
+
+			Promise
+				.allSettled(promises)
+				.then(values => {
+
+					this.newStatus = 'Student';
+
+					//Feedback Success als infoalert
+					if (countSuccess > 0) {
+						this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
+							'countSuccess': countSuccess,
+							'status': this.newStatus,
+							'countError': countError
+						}));
+					}
+
+					if (this.modelValue.prestudent_id) {
+						this.reload();
+					}
+					else {
+						this.$reloadList();
+					}
+					this.hideModal('statusModal');
+					this.resetModal();
+				});
+		},
 		addNewStatus(prestudentIds){
 			//Array.isArray(prestudentIds) ? this.modelValue.prestudent_id : [prestudentIds];
 			let changeData = {};
@@ -605,7 +668,6 @@ export default{
 
 					if (this.modelValue.prestudent_id) {
 						this.reload();
-						//TODO(manu) reload Detailtab after Abbrecher to see current status activ, verband and gruppe
 					}
 					else {
 						this.$reloadList();
@@ -657,6 +719,7 @@ export default{
 				.finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
+					this.$reloadList();
 				});
 		},
 		editStatus(){
@@ -702,6 +765,58 @@ export default{
 					})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+/*		checkIfBewerber(prestudentIds){
+
+			if(!prestudentIds)
+				prestudentIds = [this.modelValue.prestudent_id];
+
+			const promises = prestudentIds.map(prestudentId => {
+
+				return this.$fhcApi.post('api/frontend/v1/stv/status/hasStatusBewerber/' + prestudentId,
+				).then(response => {
+					countSuccess++;
+					return response;
+				})
+					//.catch(this.$fhcAlert.handleSystemError)
+					.catch(error => {
+						countError++;
+						//For each Prestudent show Error in Alert
+						this.$fhcAlert.handleSystemError(error);
+					});
+			});
+
+			Promise
+				.allSettled(promises)
+				.then(values => {
+
+						//Feedback Success als infoalert
+						if (countSuccess > 0) {
+							this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
+								'countSuccess': countSuccess,
+								'status': this.newStatus,
+								'countError': countError
+							}));
+						}
+
+						if (this.modelValue.prestudent_id) {
+							this.reload();
+							//TODO(manu) reload Detailtab after Abbrecher to see current status activ, verband and gruppe
+						}
+						else {
+							this.$reloadList();
+						}
+
+/!*			return this.$fhcApi
+				.get('api/frontend/v1/stv/status/hasStatusBewerber/' + prestudent_id)
+				.then(
+					result => {
+						this.isBewerber = result.data;
+						console.log(result);
+						return result;
+					})
+				.catch(this.$fhcAlert.handleSystemError);*!/
+			//}
+		},*/
 		loadStatus(status_id){
 			this.statusNew = false;
 			return this.$fhcApi.post('api/frontend/v1/stv/status/loadStatus/',
@@ -757,8 +872,9 @@ export default{
 			.get('api/frontend/v1/stv/status/getLastBismeldestichtag/')
 			.then(result => {
 				this.dataMeldestichtag = result.data[0].meldestichtag;
-				if (this.$refs.table.tableBuilt)
-					this.$refs.table.tabulator.redraw(true);
+				//TODO(Manu) wirft plötzlich fehler bei multiselect status
+/*				if (this.$refs.table.tableBuilt)
+					this.$refs.table.tabulator.redraw(true);*/
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},

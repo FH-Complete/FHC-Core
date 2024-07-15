@@ -12,10 +12,12 @@ class Status extends FHCAPI_Controller
 			'getHistoryPrestudent' => ['admin:r', 'assistenz:r'],
 			'addNewStatus' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			'turnIntoStudent' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
+			'addStudent' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			'getStatusgruende' => self::PERM_LOGGED,
 			'getLastBismeldestichtag' => self::PERM_LOGGED,
 			'isLastStatus' => self::PERM_LOGGED,
 			'isErsterStudent' => self::PERM_LOGGED,
+			'hasStatusBewerber' => self::PERM_LOGGED,
 			'deleteStatus' => ['admin:r','assistenz:r'],
 			'loadStatus' => ['admin:r', 'assistenz:r'],
 			'updateStatus' => ['admin:r', 'assistenz:r'],
@@ -100,6 +102,16 @@ class Status extends FHCAPI_Controller
 
 	}
 
+	public function hasStatusBewerber($prestudent_id)
+	{
+		$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
+		if (isError($result))
+		{
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+		return $this->terminateWithSuccess($result);
+	}
+
 	public function addNewStatus($prestudent_id)
 	{
 		//get Studiengang von prestudent_id
@@ -138,7 +150,6 @@ class Status extends FHCAPI_Controller
 		$statusgrund_id = $this->input->post('statusgrund_id');
 		$rt_stufe = $this->input->post('rt_stufe');
 		$bestaetigtvon = $uid;
-		//$name = $this->input->post('name');
 
 		//Form Validation
 		$this->load->library('form_validation');
@@ -245,6 +256,7 @@ class Status extends FHCAPI_Controller
 			{
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 			}
+
 		}
 
 		//check if studentrolle already exists
@@ -435,8 +447,10 @@ class Status extends FHCAPI_Controller
 		}
 	}
 
+	//TODO(Manu) DEPRECATED
 	public function turnIntoStudent($prestudent_id)
 	{
+
 		//get Studiengang von prestudent_id
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->PrestudentModel->addJoin('public.tbl_person p', 'ON (p.person_id = public.tbl_prestudent.person_id)');
@@ -663,6 +677,323 @@ class Status extends FHCAPI_Controller
 			} else
 				$this->terminateWithSuccess($prestudent_id);
 
+		}
+		else
+			return $this->terminateWithError("addNewStatus(student)", self::ERROR_TYPE_GENERAL);
+	}
+
+	public function addStudent($prestudent_id)
+	{
+		//get Studiengang von prestudent_id
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->PrestudentModel->addJoin('public.tbl_person p', 'ON (p.person_id = public.tbl_prestudent.person_id)');
+		$this->PrestudentModel->addJoin('public.tbl_studiengang sg', 'ON (sg.studiengang_kz = public.tbl_prestudent.studiengang_kz)');
+		$result = $this->PrestudentModel->load([
+			'prestudent_id' => $prestudent_id,
+		]);
+		if (isError($result)) {
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		$result = current(getData($result));
+
+		$stg = $result->studiengang_kz;
+		$stgkzl = $result->kurzbz;
+		$person_id = $result->person_id;
+
+		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg)) {
+			$result = $this->p->t('lehre', 'error_keineSchreibrechte');
+
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+
+		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+
+		$uid = getAuthUID();
+		$status_kurzbz = $this->input->post('status_kurzbz');
+		$ausbildungssemester = $this->input->post('ausbildungssemester');
+		$bestaetigtam = $this->input->post('bestaetigtam');
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		$bestaetigtvon = $uid;
+		$studienplan_id = $this->input->post('studienplan_id');
+		$statusgrund_id = $this->input->post('statusgrund_id');
+
+		//Form Validation
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('ausbildungssemester', 'Ausbildungssemester', 'integer', [
+			'integer' => $this->p->t('ui', 'error_fieldNotInteger', ['field' => 'Ausbildungssemester'])
+		]);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		//GET lastStatus
+		$result = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
+
+		if (isError($result)) {
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		} elseif (!hasData($result)) {
+			$lastStatusData = [];
+		} else
+			$lastStatusData = current(getData($result));
+
+		//check if studentrolle already exists
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$result = $this->StudentModel->checkIfExistingStudentRolle($prestudent_id);
+		if (isError($result)) {
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+		if ($result->retval == "0") {
+			$isStudent = false;
+		} else
+			$isStudent = true;
+
+
+		//TODO(manu) check if for ersterStudent and Student
+		if(REIHUNGSTEST_CHECK)
+		{
+			if($status_kurzbz==Prestudentstatus_model::STATUS_BEWERBER)
+			{
+				$result = $this->prestudentstatuschecklib->checkIfAngetreten($prestudent_id);
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				}
+			}
+		}
+
+		//Check ZGV
+		if(!defined("ZGV_CHECK") || ZGV_CHECK)
+		{
+			if($status_kurzbz==Prestudentstatus_model::STATUS_BEWERBER)
+			{
+				$result = $this->prestudentstatuschecklib->checkIfZGVEingetragen($prestudent_id);
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				}
+			}
+		}
+
+
+		//Check ZGV-Master
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$result = $this->StudiengangModel->load([
+			'studiengang_kz'=> $stg
+		]);
+		if(isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		$result = current(getData($result));
+		$typ = $result->typ;
+		//$stgkzl = $result->kurzbz;
+
+		if(!defined("ZGV_CHECK") || ZGV_CHECK)
+		{
+			if($status_kurzbz==Prestudentstatus_model::STATUS_BEWERBER && $typ=='m')
+			{
+				$result = $this->prestudentstatuschecklib->checkIfZGVEingetragen($prestudent_id, $typ);
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				}
+			}
+		}
+
+		//check if bewerberstatus exists
+		if($status_kurzbz == Prestudentstatus_model::STATUS_AUFGENOMMENER || $status_kurzbz == Prestudentstatus_model::STATUS_WARTENDER)
+		{
+
+			$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
+			if (isError($result))
+			{
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+		}
+
+		$isBerechtigtNoStudstatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
+
+		if(!$isBerechtigtNoStudstatusCheck) {
+			//Block STATUSCHECKS
+			$new_status_datum = isset($datum) ? $datum : date('Y-m-d');
+
+			$result = $this->prestudentstatuschecklib->checkStatusAdd(
+				$prestudent_id,
+				$status_kurzbz,
+				$studiensemester_kurzbz,
+				$new_status_datum,
+				$ausbildungssemester,
+				$studienplan_id
+			);
+
+			if (isError($result)) {
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+
+			//TODO(manu) check Berechtigung
+			//check if Bismeldestichtag erreicht ADDNEW status
+			$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($new_status_datum, $studiensemester_kurzbz);
+
+			if (isError($result)) {
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+		}
+
+		// return ($this->terminateWithError("Is Student " . $isStudent, self::ERROR_TYPE_GENERAL));
+
+		if(!$isStudent)
+		{
+			//checkIf Kaution bezahlt
+			//TODO(Manu)
+
+			//generate Personenkennzeichen(matrikelnr)
+			$resultMat = $this->StudentModel->generateMatrikelnummer2($stg, $studiensemester_kurzbz, $typ);
+			if (isError($resultMat)) {
+				return $this->terminateWithError($resultMat, self::ERROR_TYPE_GENERAL);
+			}
+			$matrikelnr = getData($resultMat);
+			$jahr = mb_substr($matrikelnr, 0, 2);
+
+			//generate UID
+			$resultUid = $this->StudentModel->generateUID($stgkzl, $jahr, $typ, $matrikelnr);
+			if (isError($resultMat)) {
+				return $this->terminateWithError("in generateUid" . $resultUid, self::ERROR_TYPE_GENERAL);
+			}
+			$uidStudent = getData($resultUid);
+
+			//Check for additional logic (config entries, addons)
+			//TODO(Manu) check include/tw/generatematrikelnr.inc.php
+			//(1) addons durchsuchen, ob eigene Logik für Matrikelnr-erstellung existiert
+			//Default: keine Matrikelnummer wird generiert
+
+			//(2) personenkz = uid
+			if (defined('SET_UID_AS_PERSONENKENNZEICHEN') && SET_UID_AS_PERSONENKENNZEICHEN) {
+				$matrikelnr = $uidStudent;
+			}
+
+			//(3) Matrikelnummer = uid
+			if (defined('SET_UID_AS_MATRIKELNUMMER') && SET_UID_AS_MATRIKELNUMMER) {
+				//update person
+				$result = $this->PersonModel->update(
+					[
+						'person_id' => $person_id,
+					],
+					[
+						'matr_nr' => $uidStudent,
+					]
+				);
+				if (isError($result)) {
+					return $this->terminateWithError("uidAsMatrikelnummer" . getError($result), self::ERROR_TYPE_GENERAL);
+				}
+			}
+
+			//add benutzerdatensatz mit Aktierungscode
+			$this->load->model('person/Benutzer_model', 'BenutzerModel');
+			$result = $this->BenutzerModel->checkIfExistingBenutzer($uidStudent);
+			if (isError($result)) {
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+			if ($result->retval != "0")
+			{
+			//	return ($this->terminateWithError($result->retval . " uid: " . $uid, self::ERROR_TYPE_GENERAL));
+				return $this->terminateWithError($this->p->t('lehre','error_benutzerBereitsVorhanden', self::ERROR_TYPE_GENERAL));
+			}
+			//activation key
+			$aktivierungscode = null;
+			$result = $this->BenutzerModel->generateActivationKey();
+			if (isError($result)) {
+				return $this->terminateWithError("in Error " . $result, self::ERROR_TYPE_GENERAL);
+			}
+			$aktivierungscode = getData($result);
+
+			//Alias generieren
+			$result = $this->PersonModel->generateAliasByPersonId($person_id);
+			if (isError($result))
+			{
+				return $this->terminateWithError("in generate alias " . $result, self::ERROR_TYPE_GENERAL);
+			}
+			$alias = getData($result) ?: null;
+			$alias = $alias->retval[0];
+
+			$sanitizedVorname = $this->_sanitizeAliasName($alias->vorname);
+			$sanitizedNachname = $this->_sanitizeAliasName($alias->nachname);
+
+			// Erstelle den Alias
+			$alias = $sanitizedVorname . '.' . $sanitizedNachname;
+
+			if (isError($result))
+			{
+				return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+			}
+			$result = $this->BenutzerModel->insert(
+				[
+					'person_id' => $person_id,
+					'uid' => $uidStudent,
+					'aktiv' => true,
+					'aktivierungscode' => $aktivierungscode,
+					'alias' => $alias,
+					'insertvon' => $uid,
+					'insertamum' => date('c'),
+				]
+			);
+
+			if (isError($result)) {
+				return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+			}
+
+
+			//Student anlegen
+			$result = $this->StudentModel->insert(
+				[
+					'student_uid' => $uidStudent,
+					'prestudent_id' => $prestudent_id,
+					'matrikelnr' => $matrikelnr,
+					'studiengang_kz' => $stg,
+					'semester' => $ausbildungssemester,
+					'verband' => '',
+					'gruppe' => '',
+					'insertvon' => $uid,
+					'insertamum' => date('c')
+				]
+			);
+			if (isError($result))
+			{
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+
+			$this->load->library('PrestudentLib');
+			$result = $this->prestudentlib->setFirstStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, null, $bestaetigtam, $bestaetigtvon, $stg, $uidStudent);
+
+			if (isError($result)) {
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			} else
+				$this->terminateWithSuccess($prestudent_id);
+
+		}
+		//if not ersterStudent
+		else
+		{
+			//check if studentrolle already exists
+			if($status_kurzbz == Prestudentstatus_model::STATUS_STUDENT || $status_kurzbz == Prestudentstatus_model::STATUS_DIPLOMAND || $lastStatusData->status_kurzbz == Prestudentstatus_model::STATUS_STUDENT)
+			{
+				$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($prestudent_id);
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				}
+			}
+
+			$this->load->library('PrestudentLib');
+			$result = $this->prestudentlib->setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtam, $bestaetigtvon);
+
+			if (isError($result))
+			{
+				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+			else
+				$this->terminateWithSuccess($prestudent_id);
 		}
 	}
 

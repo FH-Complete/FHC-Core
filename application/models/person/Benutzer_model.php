@@ -143,42 +143,39 @@ class Benutzer_model extends DB_Model
 
 	/**
 	 * Check if Benutzer already exists
-	 * @param integer $person_id
+	 * @param String $uid
 	 * @return 0 if not exists, 1 if it does
 	 */
-	public function checkIfExistingBenutzer($person_id)
+	public function checkIfExistingBenutzer($uid)
 	{
 		$qry = "SELECT 
     				count(*) as anzahl 
 				FROM 
 				    public.tbl_benutzer 
 				WHERE 
-				    person_id = ? ";
+				    uid = ? ";
 
-		$result = $this->execQuery($qry, array($person_id));
+		$result = $this->execQuery($qry, array($uid));
 
 		if (isError($result))
 		{
 			return error($result);
 		}
-		else
+
+		$resultObject = current(getData($result));
+
+		if (property_exists($resultObject, 'anzahl'))
 		{
-			$resultObject = current(getData($result));
+			$resultValue = (int) $resultObject->anzahl;
 
-			if (property_exists($resultObject, 'anzahl')) {
-				$resultValue = (int) $resultObject->anzahl;
-
-				if ($resultValue > 0)
-				{
-					return success("1");
-				}
-				else
-				{
-					return success("0");
-				}
-			} else {
-				return error("BenutzerModel: Error During Check if Existing Benutzer.");
+			if ($resultValue > 0)
+			{
+				return success("1");
 			}
-		}
+			else
+			{
+				return success("0");
+			}
+		}	
 	}
 }
