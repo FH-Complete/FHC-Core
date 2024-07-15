@@ -258,12 +258,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					      				</hbox>
 									</row>
 <?php if($show_komm_prfg_hint) { ?>
-									<row id="student-pruefung-textbox-datum-hinweis" hidden="true" style="border: 1px solid #f00;">
-										<label></label>
-										<!--hbox align="center" style="border: 1px solid #0f0;"-->
-										    <!--image width="20" class="message-icon"/-->
-										    <description width="400" style="font-size: 70%; border: solid 1px #00f;">Bitte bei der Neuanlage das Datum der Noteneintragung (i. d. R. heute) eintragen, um den korrekten Fristenablauf der Wiederholung zu ermöglichen. Das Datum der Prüfung bitte im Anmerkungsfeld vermerken.</description>
-										<!--/hbox-->
+									<row id="student-pruefung-textbox-datum-hinweis" hidden="true">
+										<label><image width="20" class="message-icon"/></label>
+										<textbox readonly="true" multiline="true" rows="3" value="Bitte bei der Neuanlage das Datum der Noteneintragung (i. d. R. heute) eintragen, um den korrekten Fristenablauf der Wiederholung zu ermöglichen. Das Datum der Prüfung bitte im Anmerkungsfeld vermerken."></textbox>
 									</row>
 <?php } ?>
 					      			<row>
