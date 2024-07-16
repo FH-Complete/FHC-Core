@@ -260,7 +260,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <?php if($show_komm_prfg_hint) { ?>
 									<row id="student-pruefung-textbox-datum-hinweis" hidden="true">
 										<label><image width="20" class="message-icon"/></label>
-										<textbox readonly="true" multiline="true" rows="3" value="Bitte bei der Neuanlage das Datum der Noteneintragung (i. d. R. heute) eintragen, um den korrekten Fristenablauf der Wiederholung zu ermöglichen. Das Datum der Prüfung bitte im Anmerkungsfeld vermerken."></textbox>
+										<textbox readonly="true" multiline="true" rows="3" value="Bitte bei Neuanlage einer kommissionellen Prüfung das Datum der Noteneintragung (i. d. R. heute) eintragen, um den korrekten Fristenablauf der Wiederholung zu ermöglichen. Das Datum der Prüfung bitte im Anmerkungsfeld vermerken."></textbox>
 									</row>
 <?php } ?>
 					      			<row>
