@@ -378,7 +378,7 @@ class LvMenu extends FHCAPI_Controller
 					'position'=>'80',
 					'name'=>$p->t('lehre/gesamtnote'),
 					'c4_icon'=> base_url('skin/images/button_endnote.png'),
-					'c4_link'=> base_url('benotungstool/lvgesamtnoteverwalten.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem))
+					'c4_link'=> base_url('cis/private/lehre/benotungstool/lvgesamtnoteverwalten.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem))
 				);
 			}
 			else
