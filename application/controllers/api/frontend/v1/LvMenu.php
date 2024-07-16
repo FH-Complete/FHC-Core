@@ -67,6 +67,9 @@ class LvMenu extends FHCAPI_Controller
 		require_once(FHCPATH.'include/phrasen.class.php');
 		require_once(FHCPATH.'include/lvangebot.class.php');
 		require_once(FHCPATH.'include/lehre_tools.class.php');
+		// data gets not returned
+		//require_once(FHCPATH.'addons/moodle/lib/LogicCourses.php');
+		//require_once(FHCPATH.'addons/moodle/lib/Database.php');
 
 		// get the sprache
 		$sprache = getSprache();
@@ -327,14 +330,11 @@ class LvMenu extends FHCAPI_Controller
 			|| $rechte->isBerechtigtMultipleOe('lehre/lvinfo', $lehrfach_oe_kurzbz_arr)
 			)
 			{
-				$c4_linkList[$p->t('lehre/lvInfoBearbeiten')]= 'ects/index.php?lvid='.$lvid;
-				$c4_linkList['test']= 'ects/index.php?lvid='.$lvid;
-				$c4_linkList['asdf']= 'ects/index.php?lvid='.$lvid;
-				$c4_linkList['qewr']= 'ects/index.php?lvid='.$lvid;
+				$c4_linkList[]= [$p->t('lehre/lvInfoBearbeiten'), 'ects/index.php?lvid='.$lvid];
 			}
 			elseif ($is_lector)
 			{
-				$c4_linkList["Bearbeiten der LV-Infos derzeit gesperrt"]= '#';
+				$c4_linkList[]= ["Bearbeiten der LV-Infos derzeit gesperrt",'#'];
 			}
 
 			$menu[]=array
@@ -390,7 +390,7 @@ class LvMenu extends FHCAPI_Controller
 					'name'=>$p->t('lehre/gesamtnote'),
 					'c4_icon'=>'skin/images/button_endnote.png',
 					'c4_link'=>'',
-					'c4_linkList'=>[$p->t('lehre/noteneingabedeaktiviert')=>'#'],
+					'c4_linkList'=>[[$p->t('lehre/noteneingabedeaktiviert'),'#']],
 				);
 			}
 		}
@@ -428,7 +428,7 @@ class LvMenu extends FHCAPI_Controller
 			}
 
 			if($noMailLink){
-				$c4_linkList[$p->t('lehre/keinMailverteiler',array(implode(" ",$noMails)))]='#';
+				$c4_linkList[]=[$p->t('lehre/keinMailverteiler',array(implode(" ",$noMails))), '#'];
 				$link_onclick='alert(\''.$p->t('lehre/keinMailverteiler',array(implode(" ",$noMails))).'\');';
 			}else{
 				$link_onclick='';
