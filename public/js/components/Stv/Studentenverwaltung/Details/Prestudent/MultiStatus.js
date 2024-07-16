@@ -867,7 +867,7 @@ export default{
 					<div class="row mb-3">
 						<form-input
 							type="DatePicker"
-							name="datum"
+							name="bestaetigtam"
 							:label="$p.t('lehre/bestaetigt_am')"
 							v-model="statusData.bestaetigtam"
 							auto-apply
@@ -881,7 +881,7 @@ export default{
 					<div class="row mb-3">
 						<form-input
 							type="DatePicker"
-							name="datum"
+							name="bewerbung_abgeschickt_am"
 							:label="$p.t('lehre/bewerbung_abgeschickt_am')"
 							v-model="statusData['bewerbung_abgeschicktamum']"
 							auto-apply
