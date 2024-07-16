@@ -81,7 +81,7 @@ export default{
 						prestudent_id: item.prestudent_id,
 						ausbildungssemester: item.semester,
 						studiensemester_kurzbz: this.defaultSemester,
-						orgform_kurzbz: item.modelValue.orgform_kurzbz,
+						orgform_kurzbz: item.orgform_kurzbz,
 						name: `${item.vorname} ${item.nachname}`
 					};
 					dataArray.push(newObj);
@@ -484,7 +484,7 @@ export default{
 				prestudentIds = [this.modelValue.prestudent_id];
 
 			const promises = prestudentIds.map(prestudentId => {
-				//TODO(manu) besserer check
+
 				changeData = this.statusData.status_kurzbz ? this.statusData : this.newArray.find(item => item.prestudent_id === prestudentId);
 
 				return this.$fhcApi.post('api/frontend/v1/stv/status/addStudent/' + prestudentId,
