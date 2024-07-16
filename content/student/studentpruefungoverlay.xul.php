@@ -61,7 +61,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<column flex="1"/>
 			</columns>
 			<rows>
-				<row style="min-height: 325px;">
+				<row>
 					<vbox>
 						<hbox>
 							<spacer flex="1"/>
