@@ -933,8 +933,8 @@ export default{
 							:label="$p.t('studierendenantrag/antrag_grund')"
 							v-model="statusData['statusgrund_id']"
 							>
-							<option value=""></option>
-							<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.beschreibung[0]}}</option>
+							<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
+							<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.bezeichnung}}</option>
 						</form-input>
 					</div>
 				

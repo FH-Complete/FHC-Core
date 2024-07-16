@@ -54,11 +54,11 @@ class Status extends FHCAPI_Controller
 	{
 		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
 
-		$result = $this->StatusgrundModel->load();
-		if (isError($result)) {
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		return $this->terminateWithSuccess(getData($result) ?: []);
+		$result = $this->StatusgrundModel->getAktiveGruende();
+
+		$data = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($data);
 	}
 
 	public function getLastBismeldestichtag()
