@@ -2,6 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use CI3_Events as Events;
 use \DateTime as DateTime;
 
 class Status extends FHCAPI_Controller
@@ -879,12 +880,18 @@ class Status extends FHCAPI_Controller
 			$semesterAufgenommen = current(getData($result));
 
 			//generate Personenkennzeichen(matrikelnr)
-			$resultMat = $this->StudentModel->generateMatrikelnummer2($stg, $semesterAufgenommen->studiensemester_kurzbz, $typ);
-			if (isError($resultMat)) {
-				return $this->terminateWithError($resultMat, self::ERROR_TYPE_GENERAL);
+			$matrikelnr = false;
+			Events::trigger('generate_personenkennzeichen', $stg, $semesterAufgenommen, $typ, function ($value) use ($matrikelnr) {
+				$matrikelnr = $value;
+			});
+			if ($matrikelnr === false) {
+				$resultMat = $this->StudentModel->generateMatrikelnummer2($stg, $semesterAufgenommen->studiensemester_kurzbz, $typ);
+				if (isError($resultMat)) {
+					return $this->terminateWithError($resultMat, self::ERROR_TYPE_GENERAL);
+				}
+				$matrikelnr = getData($resultMat);
 			}
-			$matrikelnr = getData($resultMat);
-			$jahr = mb_substr($matrikelnr, 0, 2);
+			$jahr = mb_substr($semesterAufgenommen, 4, 2);
 
 			//generate UID
 			$resultUid = $this->StudentModel->generateUID($stgkzl, $jahr, $typ, $matrikelnr);

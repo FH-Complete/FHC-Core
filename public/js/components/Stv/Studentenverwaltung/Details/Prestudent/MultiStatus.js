@@ -781,9 +781,8 @@ export default{
 			.get('api/frontend/v1/stv/status/getLastBismeldestichtag/')
 			.then(result => {
 				this.dataMeldestichtag = result.data[0].meldestichtag;
-				//TODO(Manu) wirft plötzlich fehler bei multiselect status
-		//	if (this.$refs.table.tableBuilt)
-		//		this.$refs.table.tabulator.redraw(true);
+				if (this.$refs.table && this.$refs.table.tableBuilt)
+					this.$refs.table.tabulator.redraw(true);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
