@@ -575,17 +575,21 @@ class Prestudentstatus_model extends DB_Model
 		$this->addSelect('tbl_prestudentstatus.studiensemester_kurzbz');
 		$this->addSelect('tbl_prestudentstatus.ausbildungssemester');
 		$this->addSelect('tbl_prestudentstatus.datum');
+		$this->addSelect("TO_CHAR(tbl_prestudentstatus.datum::timestamp, 'DD.MM.YYYY') AS format_datum");
 		$this->addSelect('tbl_prestudentstatus.insertamum');
 		$this->addSelect('tbl_prestudentstatus.insertvon');
 		$this->addSelect('tbl_prestudentstatus.updateamum');
 		$this->addSelect('tbl_prestudentstatus.updatevon');
 		$this->addSelect('tbl_prestudentstatus.orgform_kurzbz');
 		$this->addSelect('tbl_prestudentstatus.bestaetigtam');
+		$this->addSelect("TO_CHAR(tbl_prestudentstatus.bestaetigtam::timestamp, 'DD.MM.YYYY') AS format_bestaetigtam");
 		$this->addSelect('tbl_prestudentstatus.bestaetigtvon');
 		$this->addSelect('tbl_prestudentstatus.bewerbung_abgeschicktamum');
+		$this->addSelect("TO_CHAR(tbl_prestudentstatus.bewerbung_abgeschicktamum::timestamp, 'DD.MM.YYYY') AS format_bewerbung_abgeschicktamum");
 		$this->addSelect('tbl_prestudentstatus.anmerkung');
 		$this->addSelect('plan.studienplan_id');
 		$this->addSelect('plan.bezeichnung');
+
 		$this->addSelect('grund.beschreibung[(
 			SELECT index 
 			FROM public.tbl_sprache 
@@ -606,6 +610,7 @@ class Prestudentstatus_model extends DB_Model
 			THEN lv.semester || lv.verband || lv.gruppe 
 			ELSE '-'
 			END AS lehrverband", false);
+
 
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
 		$this->addJoin('public.tbl_status_grund grund', 'statusgrund_id', 'LEFT');
