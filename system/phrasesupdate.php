@@ -23468,7 +23468,7 @@ array(
 				'text' => 'The field {field} must contain a valid email address.',
 				'description' => '',
 				'insertvon' => 'system'
-			)
+				)
 		)
 	),
 	// Personalverwaltung begin
@@ -28297,6 +28297,7 @@ array(
 			)
 		)
 	),
+	// Betriebsmittel begin
 	array(
 		'app' => 'core',
 		'category' => 'ui',
@@ -28372,6 +28373,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Confirmation status successful',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'betriebsmittel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Resources',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -28657,6 +28678,7 @@ array(
 			)
 		)
 	),
+	// Betriebsmittel end
 	//****************************	 CORE/konto
 	array(
 		'app' => 'core',
