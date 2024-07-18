@@ -813,8 +813,7 @@ export default{
 			<!--Modal: statusModal-->
 			<bs-modal ref="statusModal">
 				<template #title>
-					<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('lehre', 'status_new')}} ({{modelValue.nachname}} {{modelValue.vorname}})</p>
-					<p v-else class="fw-bold mt-3">{{$p.t('lehre', 'status_edit')}} ({{modelValue.nachname}} {{modelValue.vorname}})</p>
+					$p.t('lehre', statusNew ? 'status_new' : 'status_edit', modelValue)
 				</template>
 
 				<form-form ref="statusData">
@@ -962,7 +961,7 @@ export default{
 				
 			<!--Modal: Confirm Abbruch-->
 			<BsModal ref="confirmStatusAction">
-				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
+				<template #title>{{$p.t('lehre', 'status_edit', modelValue)}}</template>
 				<template #default>
 					<div v-if="prestudentIds.length == 1">
 						<p>Diese Person wirklich zum {{actionStatusText}} machen?</p>

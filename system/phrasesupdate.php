@@ -27264,13 +27264,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Neuen Status hinzufügen',
+				'text' => 'Neuen Status hinzufügen ({vorname} {nachname})',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'add new status',
+				'text' => 'add new status ({vorname} {nachname})',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -27284,13 +27284,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Status bearbeiten',
+				'text' => 'Status bearbeiten ({vorname} {nachname})',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'edit status',
+				'text' => 'edit status ({vorname} {nachname})',
 				'description' => '',
 				'insertvon' => 'system'
 			)
