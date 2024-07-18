@@ -2,6 +2,7 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
+import FormValidation from '../../../../Form/Validation.js';
 
 export default{
 	components: {
@@ -9,6 +10,7 @@ export default{
 		BsModal,
 		FormForm,
 		FormInput,
+		FormValidation,
 	},
 	inject: {
 		defaultSemester: {
@@ -526,6 +528,20 @@ export default{
 					this.resetModal();
 				});
 		},
+		// Manually inserts a new Status with use of the statusModal
+		insertStatus() {
+			this.$refs.statusData
+				.post(
+					'api/frontend/v1/stv/status/insert/' + this.modelValue.prestudent_id,
+					this.statusData
+				)
+				.then(result => {
+					this.reload();
+					this.$reloadList();
+					this.$refs.statusModal.hide();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 		addNewStatus(prestudentIds){
 			//Array.isArray(prestudentIds) ? this.modelValue.prestudent_id : [prestudentIds];
 			let changeData = {};
@@ -790,14 +806,14 @@ export default{
 		<div class="stv-list h-100 pt-3">
 			
 			<!--Modal: statusModal-->
-			<BsModal ref="statusModal">
+			<bs-modal ref="statusModal">
 				<template #title>
-					<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('lehre', 'status_new')}}</p>
-					<p v-else class="fw-bold mt-3">{{$p.t('lehre', 'status_edit')}}</p>
+					<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('lehre', 'status_new')}} ({{modelValue.nachname}} {{modelValue.vorname}})</p>
+					<p v-else class="fw-bold mt-3">{{$p.t('lehre', 'status_edit')}} ({{modelValue.nachname}} {{modelValue.vorname}})</p>
 				</template>
 
-				<form-form class="row g-3" ref="statusData">
-					<p class="pt-2 fw-bold">Details {{modelValue.nachname}} {{modelValue.vorname}} </p>
+				<form-form ref="statusData">
+					<form-validation></form-validation>
 					<p v-if="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent">
 						<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrund')}}</b>
 					</p>
@@ -805,116 +821,109 @@ export default{
 						<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrundSemester')}}</b>
 					</p>
 					<input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
-					<div class="row mb-3">	
-						<form-input
-							required
-							v-model="statusData['status_kurzbz']"
-							name="status_kurzbz"
-							:label="$p.t('lehre/status_rolle')"
-							type="select"
-							:disabled="!statusNew"
-							>
-							<option  value="Interessent">InteressentIn</option>
-							<option  value="Bewerber">BewerberIn</option>
-							<option  value="Aufgenommener">Aufgenommene/r</option>
-							<option  value="Student">StudentIn</option>
-							<option  value="Unterbrecher">UnterbrecherIn</option>
-							<option  value="Diplomand">DiplomandIn</option>
-							<option  value="Incoming">Incoming</option>
-							<option v-if="!statusNew" value="Absolvent">Absolvent</option>
-							<option v-if="!statusNew" value="Abbrecher">Abbrecher</option>
-						</form-input>
-					</div>
-					<div class="row mb-3">		   
-						<form-input
-							type="select"
-							name="studiensemester_kurzbz"
-							:label="$p.t('lehre/studiensemester')"
-							v-model="statusData['studiensemester_kurzbz']"
-							:disabled="statusData.datum < dataMeldestichtag"
+					<form-input
+						container-class="mb-3"
+						required
+						v-model="statusData['status_kurzbz']"
+						name="status_kurzbz"
+						:label="$p.t('lehre/status_rolle')"
+						type="select"
+						:disabled="!statusNew"
 						>
-							<option v-for="sem in lists.studiensemester_desc" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz"  :selected="sem.studiensemester_kurzbz === defaultSemester">{{sem.studiensemester_kurzbz}}</option>
-						</form-input>
-					</div>
+						<option  value="Interessent">InteressentIn</option>
+						<option  value="Bewerber">BewerberIn</option>
+						<option  value="Aufgenommener">Aufgenommene/r</option>
+						<option  value="Student">StudentIn</option>
+						<option  value="Unterbrecher">UnterbrecherIn</option>
+						<option  value="Diplomand">DiplomandIn</option>
+						<option  value="Incoming">Incoming</option>
+						<option v-if="!statusNew" value="Absolvent">Absolvent</option>
+						<option v-if="!statusNew" value="Abbrecher">Abbrecher</option>
+					</form-input>
+					<form-input
+						container-class="mb-3"
+						type="select"
+						name="studiensemester_kurzbz"
+						:label="$p.t('lehre/studiensemester')"
+						v-model="statusData['studiensemester_kurzbz']"
+						:disabled="statusData.datum < dataMeldestichtag"
+						>
+						<option v-for="sem in lists.studiensemester_desc" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz"  :selected="sem.studiensemester_kurzbz === defaultSemester">{{sem.studiensemester_kurzbz}}</option>
+					</form-input>
 					<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false) 100 Semester-->
-					<div class="row mb-3">
-						<form-input
-							type="select"
-							name="ausbildungssemester"
-							:label="$p.t('lehre/ausbildungssemester')"
-							v-model="statusData.ausbildungssemester"
-							:disabled="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent"
+					<form-input
+						container-class="mb-3"
+						type="select"
+						name="ausbildungssemester"
+						:label="$p.t('lehre/ausbildungssemester')"
+						v-model="statusData.ausbildungssemester"
+						:disabled="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent"
 						>
-						 <option v-for="number in maxSem" :key="number" :value="number">{{ number }}</option>
-						</form-input>
-					</div>
-					
-					<div class="row mb-3">
-						<form-input
-							type="DatePicker"
-							name="datum"
-							:label="$p.t('global/datum')"
-							v-model="statusData.datum"
-							auto-apply
-							:enable-time-picker="false"
-							format="dd.MM.yyyy"
-							preview-format="dd.MM.yyyy"
-							:teleport="true"
-							:disabled="statusData.datum < dataMeldestichtag"
-						></form-input>
-					</div>
-					<div class="row mb-3">
-						<form-input
-							type="DatePicker"
-							name="bestaetigtam"
-							:label="$p.t('lehre/bestaetigt_am')"
-							v-model="statusData.bestaetigtam"
-							auto-apply
-							:enable-time-picker="false"
-							format="dd.MM.yyyy"
-							preview-format="dd.MM.yyyy"
-							:teleport="true"
-							:disabled="statusData.datum < dataMeldestichtag"
-						></form-input>
-					</div>
-					<div class="row mb-3">
-						<form-input
-							type="DatePicker"
-							name="bewerbung_abgeschickt_am"
-							:label="$p.t('lehre/bewerbung_abgeschickt_am')"
-							v-model="statusData['bewerbung_abgeschicktamum']"
-							auto-apply
-							:enable-time-picker="false"
-							format="dd.MM.yyyy"
-							preview-format="dd.MM.yyyy"
-							:teleport="true"
-							:disabled="statusData.datum < dataMeldestichtag"
-						></form-input>
-					</div>
-					<div class="row mb-3">
-						<form-input
-							type="select"
-							name="studienplan"
-							:label="$p.t('lehre/studienplan')"
-							v-model="statusData['studienplan_id']"
-							:disabled="statusData.datum < dataMeldestichtag"
+					 <option v-for="number in maxSem" :key="number" :value="number">{{ number }}</option>
+					</form-input>
+					<form-input
+						container-class="mb-3"
+						type="DatePicker"
+						name="datum"
+						:label="$p.t('global/datum')"
+						v-model="statusData.datum"
+						auto-apply
+						:enable-time-picker="false"
+						format="dd.MM.yyyy"
+						preview-format="dd.MM.yyyy"
+						:teleport="true"
+						:disabled="statusData.datum < dataMeldestichtag"
+						>
+					</form-input>
+					<form-input
+						container-class="mb-3"
+						type="DatePicker"
+						name="bestaetigtam"
+						:label="$p.t('lehre/bestaetigt_am')"
+						v-model="statusData.bestaetigtam"
+						auto-apply
+						:enable-time-picker="false"
+						format="dd.MM.yyyy"
+						preview-format="dd.MM.yyyy"
+						:teleport="true"
+						:disabled="statusData.datum < dataMeldestichtag"
+						>
+					</form-input>
+					<form-input
+						container-class="mb-3"
+						type="DatePicker"
+						name="bewerbung_abgeschickt_am"
+						:label="$p.t('lehre/bewerbung_abgeschickt_am')"
+						v-model="statusData['bewerbung_abgeschicktamum']"
+						auto-apply
+						:enable-time-picker="false"
+						format="dd.MM.yyyy"
+						preview-format="dd.MM.yyyy"
+						:teleport="true"
+						:disabled="statusData.datum < dataMeldestichtag"
+						>
+					</form-input>
+					<form-input
+						container-class="mb-3"
+						type="select"
+						name="studienplan"
+						:label="$p.t('lehre/studienplan')"
+						v-model="statusData['studienplan_id']"
+						:disabled="statusData.datum < dataMeldestichtag"
 						>		
-							<option v-for="sp in listStudienplaene" :key="sp.studienplan_id" :value="sp.studienplan_id">{{sp.bezeichnung}}</option>
-						</form-input>
-					</div>
-					<div class="row mb-3">
-						<form-input
-							type="text"
-							name="anmerkung"
-							:label="$p.t('global/anmerkung')"
-							v-model="statusData['anmerkung']"
-							:disabled="statusData.datum < dataMeldestichtag"
+						<option v-for="sp in listStudienplaene" :key="sp.studienplan_id" :value="sp.studienplan_id">{{sp.bezeichnung}}</option>
+					</form-input>
+					<form-input
+						container-class="mb-3"
+						type="text"
+						name="anmerkung"
+						:label="$p.t('global/anmerkung')"
+						v-model="statusData['anmerkung']"
+						:disabled="statusData.datum < dataMeldestichtag"
 						>						
-						</form-input>
-					</div>
-					
-					<div class="row mb-3">								   
-						<form-input
+					</form-input>
+					<form-input
+						container-class="mb-3"
 						type="select"
 						name="aufnahmestufe"
 						:label="$p.t('lehre/aufnahmestufe')"
@@ -923,30 +932,28 @@ export default{
 						>
 						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
 						<option v-for="entry in aufnahmestufen" :key="entry" :value="entry">{{entry}}</option>
-						</form-input>
-					</div>
+					</form-input>
 									
-					<div v-if="gruende.length > 0" class="row mb-3">
-						<form-input
-							type="select"
-							name="statusgrund"
-							:label="$p.t('studierendenantrag/antrag_grund')"
-							v-model="statusData['statusgrund_id']"
-							>
-							<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
-							<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.bezeichnung}}</option>
-						</form-input>
-					</div>
+					<form-input
+					 	v-if="gruende.length > 0"
+					 	container-class="mb-3"
+						type="select"
+						name="statusgrund"
+						:label="$p.t('studierendenantrag/antrag_grund')"
+						v-model="statusData['statusgrund_id']"
+						>
+						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
+						<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.bezeichnung}}</option>
+					</form-input>
 				
 				</form-form>
 				
 				<template #footer>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
-					<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewStatus()">OK</button>
+					<button v-if="statusNew" type="button" class="btn btn-primary" @click="insertStatus">OK</button>
 					<button v-else type="button" class="btn btn-primary" @click="editStatus()">OK</button>
 				</template>
 								
-			</BsModal>
+			</bs-modal>
 				
 			<!--Modal: Confirm Abbruch-->
 			<BsModal ref="confirmStatusAction">
