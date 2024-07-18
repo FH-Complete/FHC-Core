@@ -54,19 +54,18 @@ class Bismeldestichtag_model extends DB_Model
 			);
 			if(isError($result))
 			{
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson(getError($result));
+				return $result;
 			}
 			$result = current(getData($result));
 
-			$studiensemester_ende = $result->ende;
+			$studiensemester_ende = new DateTime($result->ende);
 		}
 
 		// letztes erreichtes Bismeldedatum holen
 		$result = $this->getLastReachedMeldestichtag();
 		if (isError($result))
 		{
-			return error($result);
+			return $result;
 		}
 		if (!hasData($result)) {
 			return success("0",'No Statusdata vorhanden');
@@ -88,7 +87,7 @@ class Bismeldestichtag_model extends DB_Model
 			$erreicht = $erreicht || $studiensemester_ende < $stichtag;
 		}
 
-		if($erreicht)
+		if ($erreicht)
 			return success("1", "Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht hinzugefügt werden");
 
 		return success("0", "Meldestatus nicht erreicht");
