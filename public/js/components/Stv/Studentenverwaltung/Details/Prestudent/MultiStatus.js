@@ -311,6 +311,7 @@ export default{
 			this.statusData.datum = this.getDefaultDate();
 			this.statusData.bestaetigtam = this.getDefaultDate();
 			this.statusData.name = this.modelValue.vorname + ' ' + this.modelValue.nachname;
+			this.$refs.statusData.clearValidation();
 			this.$refs.statusModal.show();
 		},
 		actionEditStatus(status, stdsem, ausbildungssemester){
@@ -322,8 +323,10 @@ export default{
 				'ausbildungssemester': ausbildungssemester
 			};
 			this.loadStatus(this.statusId).then(() => {
-				if(this.statusData)
+				if(this.statusData) {
+					this.$refs.statusData.clearValidation();
 					this.$refs.statusModal.show();
+				}
 			});
 		},
 		actionDeleteStatus(status, stdsem, ausbildungssemester){
