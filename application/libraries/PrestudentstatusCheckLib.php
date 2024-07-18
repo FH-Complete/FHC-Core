@@ -276,7 +276,7 @@ class PrestudentstatusCheckLib
 		if (isError($result))
 			return $result;
 		
-		return success(getData($result) != "1");
+		return success(getData($result) == "1");
 	}
 
 	/**
