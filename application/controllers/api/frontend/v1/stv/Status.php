@@ -44,7 +44,7 @@ class Status extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui', 'bismeldestichtag','lehre','studierendenantrag'
+			'global', 'ui', 'bismeldestichtag','lehre','studierendenantrag'
 		]);
 	}
 
@@ -76,9 +76,12 @@ class Status extends FHCAPI_Controller
 			[
 				'required', // In FAS empty datum results in todays
 				'is_valid_date',
+				// TODO(chris): before today
 				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck) {
 					if ($isBerechtigtNoStudstatusCheck)
 						return true; // Skip if access right says so
+					if (!$value)
+						return true; // Error will be handled by the required statement above
 					
 					$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($value);
 					
@@ -122,7 +125,7 @@ class Status extends FHCAPI_Controller
 
 				$result = $this->PrestudentstatusModel->load([$ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id]);
 
-				return $this->getDataOrTerminateWithError($result);
+				return !$this->getDataOrTerminateWithError($result);
 			}]
 		], [
 			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhanden')
