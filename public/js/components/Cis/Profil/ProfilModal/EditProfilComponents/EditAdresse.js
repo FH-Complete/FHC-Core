@@ -60,7 +60,6 @@ export default {
           .getGemeinden(this.data.nation, this.data.plz)
           .then((res) => {
             if (res.data.length) {
-              console.log(res.data, "this is the data from the gemeinden");
               this.gemeinden = [
                 ...new Set(
                   res.data.map((element) => {
@@ -119,11 +118,12 @@ export default {
   },
 
   created() {
-    Vue.$fhcapi.UserData.getAllNationen().then((res) => {
+    // get all available nationen
+    this.$fhcApi.factory.profil.getAllNationen().then((res)=>{
       this.nationenList = res.data;
       this.getGemeinde();
-    });
-
+    })
+   
     this.originalValue = JSON.stringify(this.data);
     this.zustellAdressenCount = this.getZustelladressenCount();
   },

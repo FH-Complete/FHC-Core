@@ -35,6 +35,7 @@ class Profil extends FHCAPI_Controller
 			'getView' => self::PERM_LOGGED,
             'fotoSperre' => self::PERM_LOGGED,
 			'getGemeinden' => self::PERM_LOGGED,
+			'getAllNationen' => self::PERM_LOGGED,
 			
 		]);
 
@@ -143,6 +144,28 @@ class Profil extends FHCAPI_Controller
         $res = $this->getDataOrTerminateWithError($res);
 		
         $this->terminateWithSuccess(current($res));
+	}
+
+	/**
+	 * gets all nations in the table bis.tbl_nation
+	 *
+	 * @access public
+	 * @return array all the nations in table bis.tbl_nation
+	 */
+	public function getAllNationen()
+	{
+		// load the nationen from the database
+		$this->load->model('codex/Nation_model', "NationModel");
+		$this->NationModel->addSelect(["nation_code as code", "langtext"]);
+		$nation_res = $this->NationModel->load();
+
+		if (isError($nation_res)) {
+			show_error("error while trying to query table codex.tbl_nation");
+		}
+		
+		$nation_res = $this->getDataOrTerminateWithError($nation_res);
+
+		$this->terminateWithSuccess($nation_res);
 	}
 
 	public function getGemeinden($nation, $zip)
