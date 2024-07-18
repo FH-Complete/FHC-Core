@@ -293,7 +293,12 @@ export default{
 			deep: true
 		},
 		modelValue(){
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id);
+			if (this.$refs.table) {
+				if (this.$refs.table.tableBuilt)
+					this.$refs.table.tabulator.setData('api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id);
+				else
+					this.data.tabulatorOptions.ajaxURL = 'api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id;
+			}
 		}
 	},
 	methods: {
