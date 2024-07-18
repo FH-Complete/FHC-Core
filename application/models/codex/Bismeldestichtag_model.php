@@ -72,7 +72,9 @@ class Bismeldestichtag_model extends DB_Model
 			return success("0",'No Statusdata vorhanden');
 		}
 		$stichtag = current(getData($result));
-		$stichtag = $stichtag->meldestichtag;
+		$stichtag = new DateTime($stichtag->meldestichtag);
+
+		$statusDatum = new DateTime($status_datum);
 
 		// Prüfen, ob Studentstatusdatum oder Studiensemester vor dem Stichtagsdatum liegen
 		if (isset($statusDatum))
