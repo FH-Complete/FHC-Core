@@ -1,0 +1,99 @@
+<?php
+/**
+ * Copyright (C) 2024 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+/**
+ * This controller operates between (interface) the JS (GUI) and the SearchBarLib (back-end)
+ * Provides data to the ajax get calls about the searchbar component
+ * This controller works with JSON calls on the HTTP GET and the output is always JSON
+ */
+class ProfilUpdate extends FHCAPI_Controller
+{
+
+    public static $STATUS_PENDING = NULL;
+	public static $STATUS_ACCEPTED = NULL;
+	public static $STATUS_REJECTED = NULL;
+
+	public static $TOPICS = [];
+
+	/**
+	 * Object initialization
+	 */
+	public function __construct()
+	{
+		parent::__construct([
+            'getStatus' => self::PERM_LOGGED,
+            'fotoSperre' => self::PERM_LOGGED,
+			
+		]);
+
+
+        $this->load->model('person/Profil_update_model', 'ProfilUpdateModel');
+		$this->load->model('person/Kontakt_model', 'KontaktModel');
+		$this->load->model('person/Adresse_model', 'AdresseModel');
+		$this->load->model('person/Adressentyp_model', 'AdressenTypModel');
+		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->load->model('system/Sprache_model', 'SpracheModel');
+		$this->load->model('person/Profil_update_status_model', 'ProfilUpdateStatusModel');
+		$this->load->model('person/Profil_update_topic_model', 'ProfilUpdateTopicModel');
+
+		$this->load->library('DmsLib');
+		$this->load->library('PermissionLib');
+
+		//? put the uid and pid inside the controller for reusability
+		$this->uid = getAuthUID();
+		$this->pid = getAuthPersonID();
+
+		// setup the ProfilUpdate states
+		$this->ProfilUpdateStatusModel->addSelect(['status_kurzbz']);
+		$status_kurzbz = $this->ProfilUpdateStatusModel->load();
+		if (hasData($status_kurzbz)) {
+			list($status_pending, $status_accepted, $status_rejected) = getData($status_kurzbz);
+
+			self::$STATUS_PENDING = $status_pending->status_kurzbz;
+			self::$STATUS_ACCEPTED = $status_accepted->status_kurzbz;
+			self::$STATUS_REJECTED = $status_rejected->status_kurzbz;
+		}
+		// setup the ProfilUpdate topics
+		$this->ProfilUpdateTopicModel->addSelect(['topic_kurzbz']);
+		$topic_kurzbz = $this->ProfilUpdateTopicModel->load();
+
+		if (hasData($topic_kurzbz)) {
+			foreach (getData($topic_kurzbz) as $topic) {
+				self::$TOPICS[$topic->topic_kurzbz] = $topic->topic_kurzbz;
+			}
+		}
+
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Public methods
+
+    public function getStatus()
+	{
+		$this->terminateWithSuccess([self::$STATUS_PENDING => self::$STATUS_PENDING, self::$STATUS_ACCEPTED => self::$STATUS_ACCEPTED, self::$STATUS_REJECTED => self::$STATUS_REJECTED]);
+	}
+
+
+}
+	
+   

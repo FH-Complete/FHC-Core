@@ -353,10 +353,12 @@ const profilApp = Vue.createApp({
     },
   },
 
-  created() {
+  async created() {
     // fetch profilUpdateStates to provide them to children components
-    Vue.$fhcapi.ProfilUpdate.getStatus()
+
+    await this.$fhcApi.factory.profilUpdate.getStatus()
       .then((response) => {
+        console.log(response.data,"this is the response when we set the status")
         this.profilUpdateStates = response.data;
       })
       .catch((error) => {
