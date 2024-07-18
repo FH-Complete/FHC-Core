@@ -813,7 +813,7 @@ export default{
 			<!--Modal: statusModal-->
 			<bs-modal ref="statusModal">
 				<template #title>
-					$p.t('lehre', statusNew ? 'status_new' : 'status_edit', modelValue)
+					{{ $p.t('lehre', statusNew ? 'status_new' : 'status_edit', modelValue) }}
 				</template>
 
 				<form-form ref="statusData">
