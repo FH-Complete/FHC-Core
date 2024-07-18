@@ -137,31 +137,19 @@ class PrestudentstatusCheckLib
 
 	/**
 	 * Checks if a student role already exists.
-	 * @return error if invalid
-	 * @return error, if role does not exist, else count(roles) if it does
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return boolean
 	 */
 	public function checkIfExistingStudentRolle($prestudent_id)
 	{
-		$resultApp =  $this->_getApplicationData($prestudent_id);
-		if(isError($resultApp))
-		{
-			return getData($resultApp);
-		}
-		$resultApp =  current(getData($resultApp));
-		$studentName = trim ($resultApp->vorname.' '.$resultApp->nachname);
-
 		$result = $this->_ci->StudentModel->checkIfExistingStudentRolle($prestudent_id);
-		if(isError($result))
-		{
-			return getData($result);
-		}
-		$result = getData($result);
 
-		if($result == '0')
-		{
-			return error($this->_ci->p->t('lehre', 'error_noStudstatus', ['name' => $studentName]));
-		}
-		return success($result);
+		if (isError($result))
+			return $result;
+
+		return success(getData($result) != '0');
 	}
 
 	/**
@@ -276,21 +264,19 @@ class PrestudentstatusCheckLib
 
 	/**
 	 * Check if Bismeldestichtag erreicht
-	 * @param Date $statusDatum
-	 * @return error if Bismeldestichtag erreicht
+	 *
+	 * @param DateTime				$datum
+	 *
+	 * @return boolean
 	 */
-	public function checkIfMeldestichtagErreicht($statusDatum, $studiensemester_kurzbz=null)
+	public function checkIfMeldestichtagErreicht($statusDatum, $studiensemester_kurzbz = null)
 	{
 		$result = $this->_ci->BismeldestichtagModel->checkIfMeldestichtagErreicht($statusDatum, $studiensemester_kurzbz);
-		if(isError($result))
-		{
-			return getData($result);
-		}
-		if(getData($result) == "1")
-		{
-			return error($this->_ci->p->t('lehre','error_dataVorMeldestichtag'));
-		}
-		return success(getData($result));
+		
+		if (isError($result))
+			return $result;
+		
+		return success(getData($result) != "1");
 	}
 
 	/**
