@@ -74,11 +74,9 @@ export default {
         files: files,
       };
 
-      //?TODO: check if updateRequest.uid is a mitarbeiter, if so add the flag isMitarbeiter:true
       if (view === "EditAdresse") {
-        const isMitarbeiter = await Vue.$fhcapi.UserData.isMitarbeiter(
-          updateRequest.uid
-        ).then((res) => res.data);
+        
+        const isMitarbeiter = await this.$fhcApi.factory.profil.isMitarbeiter(updateRequest.uid).then((res)=>res.data);
 
         if (isMitarbeiter) {
           content["isMitarbeiter"] = isMitarbeiter;
@@ -141,83 +139,7 @@ export default {
       }
     },
 
-    // OLD way to open the editProfil modal, which was dynamically added to the html and then removed
-    async openModal(updateRequest) {
-      let view = this.getView(updateRequest.topic, updateRequest.status);
-
-      let data = null;
-      let content = null;
-      let files = null;
-      let withFiles = false;
-
-      if (view === "TextInputDokument") {
-        data = {
-          titel: updateRequest.topic,
-          value: updateRequest.requested_change.value,
-        };
-
-        const filesFromDatabase =
-          await Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(
-            updateRequest.profil_update_id
-          ).then((res) => {
-            return res.data;
-          });
-
-        files = filesFromDatabase;
-        if (files) {
-          withFiles = true;
-        }
-      } else {
-        data = updateRequest.requested_change;
-      }
-
-      content = {
-        updateID: updateRequest.profil_update_id,
-        view: view,
-        data: data,
-        withFiles: withFiles,
-        topic: updateRequest.topic,
-        files: files,
-      };
-
-      //?TODO: check if updateRequest.uid is a mitarbeiter, if so add the flag isMitarbeiter:true
-      if (view === "EditAdresse") {
-        const isMitarbeiter = await Vue.$fhcapi.UserData.isMitarbeiter(
-          updateRequest.uid
-        ).then((res) => res.data);
-
-        if (isMitarbeiter) {
-          content["isMitarbeiter"] = isMitarbeiter;
-        }
-      }
-
-      //? adds the status information if the profil update request was rejected or accepted
-      if (updateRequest.status !== this.profilUpdateStates["Pending"]) {
-        content["status"] = updateRequest.status;
-        content["status_message"] = updateRequest.status_message;
-        content["status_timestamp"] = updateRequest.status_timestamp;
-      }
-
-      //? only show the popup if also the right content is available
-      if (content) {
-        EditProfil.popup({
-          value: content,
-          title: updateRequest.topic,
-          zustellkontakteCount: this.getZustellkontakteCount,
-          zustelladressenCount: this.getZustelladressenCount,
-        })
-          .then((res) => {
-            if (res === true) {
-              this.$emit("fetchUpdates");
-            }
-          })
-          .catch((e) => {
-            // Wenn der User das Modal abbricht ohne Änderungen
-          });
-      }
-    },
   },
-
   created() {},
 
   computed: {},

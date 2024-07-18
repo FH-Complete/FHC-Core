@@ -36,6 +36,7 @@ class Profil extends FHCAPI_Controller
             'fotoSperre' => self::PERM_LOGGED,
 			'getGemeinden' => self::PERM_LOGGED,
 			'getAllNationen' => self::PERM_LOGGED,
+			'isMitarbeiter' => self::PERM_LOGGED,
 			
 		]);
 
@@ -160,7 +161,7 @@ class Profil extends FHCAPI_Controller
 		$nation_res = $this->NationModel->load();
 
 		if (isError($nation_res)) {
-			show_error("error while trying to query table codex.tbl_nation");
+			$this->terminateWithError("error while trying to query table codex.tbl_nation", self::ERROR_TYPE_GENERAL);
 		}
 		
 		$nation_res = $this->getDataOrTerminateWithError($nation_res);
@@ -276,6 +277,29 @@ class Profil extends FHCAPI_Controller
 		$res->mailverteiler = $mailverteiler_res;
 
 		return $res;
+	}
+
+	/**
+	 * checks whether a specific userID is a mitarbeiter or not (foreword declaration of the function isMitarbeiter in Mitarbeiter_model.php)
+	 * @access public
+	 * @param  $uid the userID used to check if it is a mitarbeiter
+	 * @return boolean 
+	 */
+	public function isMitarbeiter($uid)
+	{
+
+		if(!$uid) $this->terminateWithError("No uid provided", self::ERROR_TYPE_GENERAL);
+		
+		
+		$result = $this->MitarbeiterModel->isMitarbeiter($uid);
+		
+		if (isError($result)) {
+			$this->terminateWithError("error when calling Mitarbeiter_model function isMitarbeiter with uid " . $uid, self::ERROR_TYPE_GENERAL);
+		}
+
+		$result = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($result);
 	}
 
 	/**
