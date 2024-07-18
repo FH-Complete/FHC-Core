@@ -12,7 +12,7 @@ export default {
         return this.$fhcApi.get(
         FHC_JS_DATA_STORAGE_OBJECT.app_root +
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/getTopic`,{});
+        `/api/frontend/v1/ProfilUpdate/getTopic`,{});
     },
   
     getProfilUpdateRequest: function () {

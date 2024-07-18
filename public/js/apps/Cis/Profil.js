@@ -358,14 +358,13 @@ const profilApp = Vue.createApp({
 
     await this.$fhcApi.factory.profilUpdate.getStatus()
       .then((response) => {
-        console.log(response.data,"this is the response when we set the status")
         this.profilUpdateStates = response.data;
       })
       .catch((error) => {
         console.error(error);
       });
 
-    Vue.$fhcapi.ProfilUpdate.getTopic()
+    this.$fhcApi.factory.profilUpdate.getTopic()
       .then((response) => {
         this.profilUpdateTopic = response.data;
       })

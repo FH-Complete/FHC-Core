@@ -39,7 +39,7 @@ class ProfilUpdate extends FHCAPI_Controller
 	{
 		parent::__construct([
             'getStatus' => self::PERM_LOGGED,
-            'fotoSperre' => self::PERM_LOGGED,
+            'getTopic' => self::PERM_LOGGED,
 			
 		]);
 
@@ -93,6 +93,14 @@ class ProfilUpdate extends FHCAPI_Controller
 		$this->terminateWithSuccess([self::$STATUS_PENDING => self::$STATUS_PENDING, self::$STATUS_ACCEPTED => self::$STATUS_ACCEPTED, self::$STATUS_REJECTED => self::$STATUS_REJECTED]);
 	}
 
+
+    public function getTopic()
+	{
+        if(!count(self::$TOPICS)){
+            $this->terminateWithError('No topics found');
+        }
+		$this->terminateWithSuccess(self::$TOPICS);
+	}
 
 }
 	
