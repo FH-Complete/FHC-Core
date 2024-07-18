@@ -11,6 +11,7 @@ class Status extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getHistoryPrestudent' => ['admin:r', 'assistenz:r'],
+			'insert' => ['admin:rw', 'assistenz:rw'],
 			'addNewStatus' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			//'turnIntoStudent' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			'addStudent' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
@@ -21,7 +22,7 @@ class Status extends FHCAPI_Controller
 			'hasStatusBewerber' => self::PERM_LOGGED,
 			'deleteStatus' => ['admin:r','assistenz:r'],
 			'loadStatus' => ['admin:r', 'assistenz:r'],
-			'updateStatus' => ['admin:r', 'assistenz:r'],
+			'updateStatus' => ['admin:rw', 'assistenz:rw'],
 			'advanceStatus' => ['admin:r', 'assistenz:r'],
 			'confirmStatus' => ['admin:r', 'assistenz:r'],
 
@@ -34,6 +35,12 @@ class Status extends FHCAPI_Controller
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 		$this->load->library('PrestudentstatusCheckLib');
+
+		// Additional Permission Checks
+		if ($this->router->method == 'insert' || $this->router->method == 'updateStatus') {
+			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
+			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:rw', 'assistenz:rw']);
+		}
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -48,6 +55,83 @@ class Status extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
+	}
+
+	public function insert($prestudent_id)
+	{
+		$isBerechtigtNoStudstatusCheck = $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
+		$isBerechtigtNoStudstatusCheck = false; // TODO(chris): DEBUG
+
+		$status_kurzbz = $this->input->post('status_kurzbz');
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		$ausbildungssemester = $this->input->post('ausbildungssemester');
+		$datum = $this->input->post('datum');
+
+
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(
+			'datum',
+			$this->p->t('global', 'datum'),
+			[
+				'required', // In FAS empty datum results in todays
+				'is_valid_date',
+				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck) {
+					if ($isBerechtigtNoStudstatusCheck)
+						return true; // Skip if access right says so
+					
+					$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($value);
+					
+					return !$this->getDataOrTerminateWithError($result);
+				}]
+			],
+			[
+				'meldestichtag_not_exceeded' => $this->p->t('lehre', 'error_dataVorMeldestichtag')
+			]
+		);
+
+		$this->form_validation->set_rules(
+			'status_kurzbz',
+			$this->p->t('lehre', 'status_rolle'),
+			[
+				'required',
+				['status_stud_exists', function ($value) use ($prestudent_id) {
+					if ($value != 'Student')
+						return true; // Only test if new status is Student
+					
+					$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($prestudent_id);
+
+					return $this->getDataOrTerminateWithError($result);
+				}]
+			],
+			[
+				'status_stud_exists' => $this->p->t('lehre', 'error_noStudstatus')
+			]
+		);
+		
+		$this->form_validation->set_rules('studiensemester_kurzbz', $this->p->t('lehre', 'studiensemester'), 'required');
+		
+		$this->form_validation->set_rules('ausbildungssemester', $this->p->t('lehre', 'ausbildungssemester'), 'required');
+
+		$this->form_validation->set_rules('bestaetigtam', $this->p->t('lehre', 'bestaetigt_am'), 'is_valid_date');
+
+		$this->form_validation->set_rules('_default', '', [
+			['rolle_doesnt_exist', function () use ($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester) {
+				if (!$status_kurzbz || !$studiensemester_kurzbz || !$ausbildungssemester)
+					return true; // Error will be handled by the required statements above
+
+				$result = $this->PrestudentstatusModel->load([$ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id]);
+
+				return $this->getDataOrTerminateWithError($result);
+			}]
+		], [
+			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhanden')
+		]);
+		
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		// TODO(chris): IMPLEMENT!
+		$this->terminateWithSuccess($prestudent_id);
 	}
 
 	public function getStatusgruende()
@@ -1510,24 +1594,6 @@ class Status extends FHCAPI_Controller
 	{
 		$isStudent = false;
 		$isBerechtigtNoStudstatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
-
-		//get Studiengang von prestudent_id
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$result = $this->PrestudentModel->load([
-			'prestudent_id'=> $key_prestudent_id,
-		]);
-		if(isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		$result = current(getData($result));
-
-		$stg = $result->studiengang_kz;
-
-		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
-		{
-			return $this->terminateWithError($this->p->t('lehre','error_keineSchreibrechte'), self::ERROR_TYPE_GENERAL);
-		}
 
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
