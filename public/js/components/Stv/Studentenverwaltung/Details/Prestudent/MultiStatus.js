@@ -107,6 +107,25 @@ export default{
 		isStatusBeforeStudent(){
 			let isStatusStudent = ['Student', 'Absolvent', 'Diplomand'];
 			return !isStatusStudent.includes(this.statusData.status_kurzbz);
+		},
+		showToolbarStudent() {
+			if (Array.isArray(this.modelValue)) {
+				if (!this.modelValue.length)
+					return false;
+				return this.modelValue.every(item => item.uid);
+			}
+			return !!this.modelValue.uid;
+		},
+		showToolbar() {
+			return this.showToolbarStudent || this.showToolbarInteressent;
+		},
+		showToolbarInteressent() {
+			if (Array.isArray(this.modelValue)) {
+				if (!this.modelValue.length)
+					return false;
+				return !this.modelValue.some(item => item.uid);
+			}
+			return !this.modelValue.uid;
 		}
 	},
 	props: {
@@ -482,6 +501,68 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
 			this.addNewStatus(prestudentIds);
 		},
+		changeStatusToBewerber(prestudentIds){
+			let def_date = this.getDefaultDate();
+			let deltaData =
+				{
+					status_kurzbz: 'Bewerber',
+					datum: def_date,
+					bestaetigtam: def_date,
+					ausbildungssemester: 1
+				};
+
+			this.newArray = this.updateData.map(objekt => ({
+				...objekt,
+				...deltaData}));
+			this.addNewStatus(prestudentIds);
+		},
+		changeStatusToAufgenommener(prestudentIds){
+			this.hideModal('confirmStatusAction');
+			let def_date = this.getDefaultDate();
+			let deltaData =
+				{
+					status_kurzbz: 'Aufgenommener',
+					datum: def_date,
+					bestaetigtam: def_date
+				};
+
+			this.newArray = this.updateData.map(objekt => ({
+				...objekt,
+				...deltaData,
+					}));
+
+			//TODO(Manu) change studiensemester_kurzbz in backend
+			//studiensemester_kurzbz: this.getStudiensemesterOfBewerber(objekt.prestudent_id)
+			this.addNewStatus(prestudentIds);
+
+		},
+		changeInteressentToStudent(prestudentIds){
+
+			console.log("in function changeInteressentToStudent")
+			let def_date = this.getDefaultDate();
+			let deltaData =
+				{
+					status_kurzbz: 'Student',
+					datum: def_date,
+					bestaetigtam: def_date
+				};
+
+			this.newArray = this.updateData.map(objekt => ({
+				...objekt,
+				...deltaData,
+					}));
+
+			//TODO(Manu) change studiensemester_kurzbz in backend
+			//studiensemester_kurzbz: this.getStudiensemesterOfBewerber(objekt.prestudent_id)
+			//this.addStudent(prestudentIds);
+
+		},
+		changeStatusToAbgewiesen(prestudentIds){
+			console.log("in function changeStatusToAbgewiesen");
+		},
+		changeStatusToWartend(prestudentIds){	
+			console.log("in function changeStatusToWartend");
+		},
 		addStudent(prestudentIds){
 
 			let changeData = {};
@@ -603,15 +684,15 @@ export default{
 					 }
 
 					 //TODO(Manu) bei status Interessent, Bewerber, aufgenommener, reload nicht working
-					 this.reload();
-					 this.reloadList();
+					//  this.reload();
+					//  this.reloadList();
 
-					// if (this.modelValue.prestudent_id) {
-					// 	this.reload();
-					// }
-					// else {
-					// 	this.$reloadList();
-					// }
+					if (this.modelValue.prestudent_id) {
+						this.reload();
+					}
+					else {
+						this.$reloadList();
+					}
 					this.hideModal('statusModal');
 					this.resetModal();
 				});
@@ -983,6 +1064,18 @@ export default{
 					</div>
 					<div v-if="actionButton=='unterbrecher'">
 						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToUnterbrecher(prestudentIds)">OK</button>
+					</div>
+					<div v-if="actionButton=='aufgenommener'">
+						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToAufgenommener(prestudentIds)">OK</button>
+					</div>
+					<div v-if="actionButton=='student'">
+						<button  ref="Close" type="button" class="btn btn-primary" @click="changeInteressentToStudent(prestudentIds)">OK</button>
+					</div>
+					<div v-if="actionButton=='wartender'">
+						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToWartend(prestudentIds)">OK</button>
+					</div>
+					<div v-if="actionButton=='abgewiesener'">
+						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToAbgewiesen(prestudentIds)">OK</button>
 					</div>					
 				</template>
 			</BsModal>
@@ -1047,8 +1140,59 @@ export default{
 						<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 							{{$p.t('lehre', 'btn_statusAendern')}}
 						</button>
+												
+						<!--toolbar Interessent-->		
+						<ul v-if="showToolbarInteressent" class="dropdown-menu">
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="changeStatusToBewerber(prestudentIds)">Bewerber</a>
+							</li>
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'aufgenommener','Aufgenommenen')">Aufgenommener</a>
+							</li>				
+							<li class="dropdown-submenu">
+								<a class="dropdown-item dropdown-toggle" href="#">Student</a>
+								<ul class="dropdown-menu dropdown-menu-right">
+									<li>
+										<a class="dropdown-item" @click="changeInteressentToStudent(prestudentIds)">Student</a>
+									</li>
+									<li>
+										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'PreAbbrecher')">Pre-Abbrecher</a>
+									</li>
+									<li>
+										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'PreWiederholer')">Pre-Wiederholer</a>
+									</li>
+									<li>
+										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'Wiederholer')">Wiederholer</a>
+									</li>
+								</ul>
+							</li>
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'wartender', 'Wartenden')">Wartender</a>
+							</li>
+							<li class="dropdown-submenu">
+								<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
+							</li>
+							<li class="dropdown-submenu">
+								<a class="dropdown-item dropdown-toggle" href="#">Absage</a>
+								<ul class="dropdown-menu dropdown-menu-right">
+									<li>
+										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Aufnahme in anderen Studiengang</a>
+									</li>
+									<li>
+										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Keine Antwort</a>
+									</li>
+									<li>
+										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Sonstiges</a>
+									</li>
+									<li>
+										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">...</a>
+									</li>
+								</ul>
+							</li>					
+						</ul>
 					
-						<ul class="dropdown-menu">
+						<!--toolbar Student-->
+						<ul v-if="showToolbarStudent" class="dropdown-menu">
 							<li class="dropdown-submenu">
 								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl</a>
 							</li>
@@ -1073,6 +1217,7 @@ export default{
 						</ul>
 					</div>
 				</template>
+
 			</core-filter-cmpt>
 			
 			<div 
@@ -1080,12 +1225,63 @@ export default{
 				ref="buttonsStatusMulti"
 			>	
 			<!--MultiSelectButton-->
-			<div class="btn-group">						
+			<div v-if="showToolbar" class="btn-group">						
 				<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 					Status Ändern
 				</button>
 							
-				<ul class="dropdown-menu">
+				<!--toolbar Interessent-->		
+				<ul v-if="showToolbarInteressent" class="dropdown-menu">
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="changeStatusToBewerber(prestudentIds)">Bewerber</a>
+					</li>
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'aufgenommener','Aufgenommenen')">Aufgenommener</a>
+					</li>				
+					<li class="dropdown-submenu">
+						<a class="dropdown-item dropdown-toggle" href="#">Student</a>
+						<ul class="dropdown-menu dropdown-menu-right">
+							<li>
+								<a class="dropdown-item" @click="changeStatusToStudent(prestudentIds)">Student</a>
+							</li>
+							<li>
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'PreAbbrecher')">Pre-Abbrecher</a>
+							</li>
+							<li>
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'PreWiederholer')">Pre-Wiederholer</a>
+							</li>
+							<li>
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'Wiederholer')">Wiederholer</a>
+							</li>
+						</ul>
+					</li>
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'wartender', 'Wartenden')">Wartender</a>
+					</li>
+					<li class="dropdown-submenu">
+						<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
+					</li>
+					<li class="dropdown-submenu">
+						<a class="dropdown-item dropdown-toggle" href="#">Absage</a>
+						<ul class="dropdown-menu dropdown-menu-right">
+							<li>
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Aufnahme in anderen Studiengang</a>
+							</li>
+							<li>
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Keine Antwort</a>
+							</li>
+							<li>
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Sonstiges</a>
+							</li>
+							<li>
+								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">...</a>
+							</li>
+						</ul>
+					</li>					
+				</ul>
+			
+				<!--toolbar Student-->
+				<ul v-if="showToolbarStudent" class="dropdown-menu">
 					<li class="dropdown-submenu">
 						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl</a>
 					</li>
@@ -1108,8 +1304,6 @@ export default{
 						<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
 					</li>							
 				</ul>
-			</div>
-			
 			</div>
 		
 		</div>`

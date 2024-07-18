@@ -47,6 +47,23 @@ html {
 	color: var(--gray-500);
 }
 
+/* Dropdown Toolbar Interessent, submenu */
+.dropdown-menu-right {
+	left: 100%;
+	top: 5;
+	margin-left: 0.1rem;
+	margin-top: -1rem;
+}
+
+.dropdown-submenu:hover>.dropdown-menu-right {
+	display: block;
+}
+
+.dropdown-submenu>.dropdown-menu-right {
+	display: none;
+	position: absolute;
+}
+
 @media (min-width: 768px) {
 	#sidebarMenu {
 		visibility: visible!important;
