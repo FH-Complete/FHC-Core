@@ -75,16 +75,16 @@ export default {
   
     //TODO post request
     insertProfilRequest: function (topic, payload, fileID = null) {
-      const url =
+
+      return this.$fhcApi.post(
         FHC_JS_DATA_STORAGE_OBJECT.app_root +
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/insertProfilRequest`;
-  
-      return axios.post(url, {
-        topic,
-        payload,
-        ...(fileID ? { fileID: fileID } : {}),
-      });
+        "/api/frontend/v1/ProfilUpdate/insertProfilRequest",
+        {
+          topic,
+          payload,
+          ...(fileID ? { fileID } : {}),
+        });
     },
   
     //TODO post request

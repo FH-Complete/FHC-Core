@@ -44,7 +44,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			'denyProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
 			'acceptProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
 			'selectProfilRequest' => self::PERM_LOGGED,
-			
+			'insertProfilRequest' => self::PERM_LOGGED,
 		]);
 
 		// Load language phrases
@@ -132,6 +132,81 @@ class ProfilUpdate extends FHCAPI_Controller
 		$res = $this->getDataOrTerminateWithError($res);
 		$this->terminateWithSuccess($res);
 
+	}
+
+	public function insertProfilRequest()
+	{
+
+		$payload = $this->input->post('payload',true);
+		$topic = $this->input->post('topic',true);
+		$fileID = $this->input->post('fileID',true);
+
+		if(!isset($payload) || !isset($topic)){
+			$this->terminateWithError("required parameters are missing");
+		}
+
+		$identifier = array_key_exists("kontakt_id", $payload) ? "kontakt_id" : (array_key_exists("adresse_id", $payload) ? "adresse_id" : null);
+		
+		$data = ["topic" => $topic, "uid" => $this->uid, "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon" => $this->uid, "status" => self::$STATUS_PENDING ?: 'Pending'];
+
+		//? insert fileID in the dataset if sent with post request
+		if (isset($fileID)) {
+			$data['attachment_id'] = $fileID;
+		}
+
+		//? loops over all updateRequests from a user to validate if the new request is valid
+		$res = $this->ProfilUpdateModel->getProfilUpdatesWhere(["uid" => $this->uid]);
+		if (isError($res)) {
+			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_loading_error'));
+		}
+		$res = $this->getDataOrTerminateWithError($res);
+
+		//? the user cannot delete a zustelladresse/kontakt
+		if (isset($payload->delete) && $payload->{$identifier == "kontakt_id" ? "zustellung" : "zustelladresse"}) {
+			$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_deleteZustellung_error')));
+		}
+
+		//? if the user tries to delete a adresse, checks whether the adresse is a heimatadresse, if so an error is raised
+		if (isset($payload->delete) && $identifier == "adresse_id") {
+			$adr = $this->AdresseModel->load($payload->$identifier);
+			$adr = $this->getDataOrTerminateWithError($adr)[0];
+			if ($adr->heimatadresse) {
+				$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_deleteZustellung_error')));
+			}
+		}
+
+		if ($res) {
+			$pending_changes = array_filter($res, function ($element) {
+				return $element->status == (self::$STATUS_PENDING ?: "Pending");
+			});
+
+			foreach ($pending_changes as $update_request) {
+				$existing_change = $update_request->requested_change;
+				
+				//? the user can add as many new kontakte/adressen as he likes
+				if (!isset($payload->add) && property_exists($existing_change, $identifier) && property_exists($payload, $identifier) && $existing_change->$identifier == $payload->$identifier) {
+					//? the kontakt_id / adresse_id of a change has to be unique 
+					$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_changeTwice_error')));
+				}
+
+				//? if it is not updating any kontakt/adresse, the topic has to be unique
+				elseif (!$identifier && $update_request->topic == $topic) {
+					$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_changeTopicTwice_error', ['0' => $update_request->topic])));
+				}
+			}
+		}
+
+		$insertID = $this->ProfilUpdateModel->insert($data);
+
+		if (isError($insertID)) {
+			$this->terminateWithError(error($insertID));
+		} else {
+			
+			$insertID = hasData($insertID) ? getData($insertID) : null;
+			//? sends emails to the correspondents of the $uid
+			$this->sendEmail_onProfilUpdate_insertion($this->uid, $insertID, $topic);
+			$this->terminateWithSuccess(success($insertID));
+		}
 	}
 
 	public function getProfilRequestFiles($id)
@@ -277,6 +352,75 @@ class ProfilUpdate extends FHCAPI_Controller
 	// Private methods
 
 
+	private function sendEmail_onProfilUpdate_insertion($uid, $profil_update_id, $topic)
+	{
+
+		$this->load->helper('hlp_sancho_helper');
+		$emails = [];
+
+		$is_mitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
+		if (isError($is_mitarbeiter)) {
+			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_mitarbeiterCheck_error'));
+		}
+		$is_mitarbeiter = $this->getDataOrTerminateWithError($is_mitarbeiter);
+
+		//! if the $uid is a mitarbeiter and student, only the hr is notified by email
+		if ($is_mitarbeiter) {
+			//? user is not a student therefore he is a mitarbeiter, send email to Personalverwaltung
+			//? use constant variable MAIL_GST to mail to the personalverwaltung
+			$this->MitarbeiterModel->addSelect([TRUE]);
+			$this->MitarbeiterModel->addJoin("public.tbl_benutzer", "public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid");
+			//? check if the the userID is a mitarbeiter and if the benutzer is active
+			$res = $this->MitarbeiterModel->loadWhere(["public.tbl_mitarbeiter.mitarbeiter_uid" => $uid, "public.tbl_benutzer.aktiv" => TRUE]);
+			if (isError($res)) {
+				$this->terminateWithError("was not able to query the mitarbeiter and benutzer by the uid: " . $uid);
+			}
+			if (hasData($res)) {
+				array_push($emails, MAIL_GST);
+			} else {
+				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_mitarbeiterCheck_error'));
+			}
+		} else {
+			//? if it is not a mitarbeiter, check whether it is a student and send email to studiengang
+			$is_student = $this->StudentModel->isStudent($uid);
+			if (isError($is_student)) {
+				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_studentCheck_error'));
+			}
+			$is_student = $this->getDataOrTerminateWithError($is_student);
+			if ($is_student) {
+				//? Send email to the Studiengangsassistentinnen
+				$this->StudentModel->addSelect(["public.tbl_studiengang.email"]);
+				$this->StudentModel->addJoin("public.tbl_benutzer", "public.tbl_benutzer.uid = public.tbl_student.student_uid");
+				$this->StudentModel->addJoin("public.tbl_prestudent", "public.tbl_benutzer.person_id = public.tbl_prestudent.person_id");
+				$this->StudentModel->addJoin("public.tbl_prestudentstatus", "public.tbl_prestudentstatus.prestudent_id = public.tbl_prestudent.prestudent_id");
+				$this->StudentModel->addJoin("public.tbl_studiengang", "public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
+				//* check if the benutzer itself is active
+				//* check if the student status is Student or Diplomand (active students)
+				$this->StudentModel->db->where_in("public.tbl_prestudentstatus.status_kurzbz", ['Student', 'Diplomand']);
+				$res = $this->StudentModel->loadWhere(["public.tbl_benutzer.aktiv" => TRUE, "public.tbl_student.student_uid" => $uid]);
+				if (isError($res)) {
+					$this->terminateWithError(getData($res));
+				} else {
+					$res = $this->getDataOrTerminateWithError($res);
+					foreach ($res as $emailObj) {
+						array_push($emails, $emailObj->email);
+					}
+				}
+			}
+		}
+		$mail_res = [];
+		//? sending email
+		foreach ($emails as $email) {
+			array_push($mail_res, sendSanchoMail("profil_update", ['uid' => $uid, 'topic' => $topic, 'href' => APP_ROOT . 'Cis/ProfilUpdate/id/' . $profil_update_id], $email, ("Profil Änderung von " . $uid)));
+		}
+		foreach ($mail_res as $m_res) {
+			if (!$m_res) {
+				$this->addError($this->p->t('profilUpdate', 'profilUpdate_email_error'));
+			}
+		}
+
+	}
+	
 	private function sendEmail_onProfilUpdate_response($uid, $topic, $status)
 	{
 		$this->load->helper('hlp_sancho_helper');

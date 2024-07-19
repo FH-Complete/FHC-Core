@@ -95,7 +95,7 @@ export default {
               .catch((err) => {
                 console.error(err);
               })
-          : Vue.$fhcapi.ProfilUpdate.insertProfilRequest(
+          : this.$fhcApi.factory.profilUpdate.insertProfilRequest(
               this.topic,
               this.profilUpdate,
               this.fileID ? this.fileID[0] : null
