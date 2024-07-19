@@ -40,9 +40,9 @@ class ProfilUpdate extends FHCAPI_Controller
 		parent::__construct([
             'getStatus' => self::PERM_LOGGED,
             'getTopic' => self::PERM_LOGGED,
+			'getProfilRequestFiles' => self::PERM_LOGGED,
 			
 		]);
-
 
         $this->load->model('person/Profil_update_model', 'ProfilUpdateModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
@@ -102,6 +102,113 @@ class ProfilUpdate extends FHCAPI_Controller
 		$this->terminateWithSuccess(self::$TOPICS);
 	}
 
+	public function getProfilRequestFiles($id)
+	{
+		 if(!$id){
+			$this->terminateWithError("parameter id is missing");
+		 }
+
+		$this->ProfilUpdateModel->addSelect(["attachment_id"]);
+		$attachmentID = $this->ProfilUpdateModel->load([$id]);
+		if (isError($attachmentID)) {
+			$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_loading_error')),self::ERROR_TYPE_GENERAL);
+		}
+		//? get the attachmentID
+		$dms_id = $this->getDataOrTerminateWithError($attachmentID)[0]->attachment_id;
+
+		//? get the name to the file
+		$this->DmsVersionModel->addSelect(["name", "dms_id"]);
+		$attachment = $this->DmsVersionModel->load([$dms_id, 0]);
+		if (isError($attachment)) {
+			$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_dmsVersion_error')),self::ERROR_TYPE_GENERAL);
+		}
+		$attachment = $this->getDataOrTerminateWithError($attachment);
+		//? returns {name:..., dms_id:...}
+		$this->terminateWithSuccess($attachment);
+	}
+
+	/* public function insertFile($replace)
+	{
+		$replace = json_decode($replace);
+
+		if (!count($_FILES)) {
+			$this->terminateWithSuccess([]);
+			return;
+		}
+
+		//? if replace is set it contains the profil_update_id in which the attachment_id has to be replaced
+		if (isset($replace)) {
+			$this->ProfilUpdateModel->addSelect(["attachment_id"]);
+			$profilUpdate = $this->ProfilUpdateModel->load([$replace]);
+			if (isError($profilUpdate)) {
+				$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_loading_error')),self::ERROR_TYPE_GENERAL);
+			}
+			//? get the attachmentID
+			$dms_id = $this->getDataOrTerminateWithError($profilUpdate)[0];
+
+			//? delete old dms_file of Profil Update
+			$this->deleteOldVersionFile($dms_id);
+		}
+
+
+		$files = $_FILES['files'];
+		$file_count = count($files['name']);
+
+		$res = [];
+
+		for ($i = 0; $i < $file_count; $i++) {
+			$_FILES['files']['name'] = $files['name'][$i];
+			$_FILES['files']['type'] = $files['type'][$i];
+			$_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
+			$_FILES['files']['error'] = $files['error'][$i];
+			$_FILES['files']['size'] = $files['size'][$i];
+
+			$dms = [
+				"kategorie_kurzbz" => "profil_aenderung",
+				"version" => 0,
+				"name" => $_FILES['files']['name'],
+				"mimetype" => $_FILES['files']['type'],
+				"beschreibung" => $this->uid . " Profil Änderung",
+				"insertvon" => $this->uid,
+				"insertamum" => "NOW()",
+			];
+
+			$tmp_res = $this->dmslib->upload($dms, 'files', array("jpg", "png", "pdf"));
+
+			$tmp_res = $this->getDataOrTerminateWithError($tmp_res);
+			array_push($res, $tmp_res);
+		}
+
+		$this->terminateWithSuccess($res);
+	}
+
+	private function deleteOldVersionFile($dms_id)
+	{
+		if (!isset($dms_id)) {
+			return;
+		}
+
+		//? collect all the results of the deleted versions in an array 
+		$res = array();
+
+		//? delete all the different versions of the dms_file
+		$dmsVersions = $this->DmsVersionModel->loadWhere(["dms_id" => $dms_id]);
+		$dmsVersions = $this->getDataOrTerminateWithError($dmsVersions);
+		if (isset($dmsVersions)) {
+			$zwischen_res = array_map(function ($item) {
+				return $item->version;
+			}, $dmsVersions);
+			foreach ($zwischen_res as $version) {
+				array_push($res, $this->DmsVersionModel->delete([$dms_id, $version]));
+			}
+		} else {
+			$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_dmsVersion_error')), self::ERROR_TYPE_GENERAL);
+		}
+
+		//? returns a result for each deleted dms_file
+		return $res;
+	}
+ */
 }
 	
    

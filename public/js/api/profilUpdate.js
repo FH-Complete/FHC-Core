@@ -15,15 +15,6 @@ export default {
         `/api/frontend/v1/ProfilUpdate/getTopic`,{});
     },
   
-    getProfilUpdateRequest: function () {
-
-        return this.$fhcApi.get(
-        FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/getAllRequests`,{});
-      
-    },
-  
 
     //TODO post request
     acceptProfilRequest: function (payload) {
@@ -68,16 +59,19 @@ export default {
         headers: { "Content-Type": "multipart/form-data" },
       });
     },
-  
-    //TODO post request
+    
     getProfilRequestFiles: function (requestID) {
-      const url =
+      return this.$fhcApi.get(
         FHC_JS_DATA_STORAGE_OBJECT.app_root +
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/getProfilRequestFiles`;
-  
-      return axios.post(url, requestID);
+        `/api/frontend/v1/ProfilUpdate/getProfilRequestFiles/${requestID}`,{});
     },
+
+    search(searchsettings) {
+      const url = '/api/frontend/v1/searchbar/search';
+      return this.$fhcApi.post(url, searchsettings);
+    },
+
   
     selectProfilRequest: function (uid = null, id = null) {
 

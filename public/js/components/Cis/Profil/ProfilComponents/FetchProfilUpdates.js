@@ -37,21 +37,23 @@ export default {
     },
 
     async showEditProfilModal(updateRequest) {
-      let view = this.getView(updateRequest.topic, updateRequest.status);
 
+      let view = this.getView(updateRequest.topic, updateRequest.status);
+  
       let data = null;
       let content = null;
       let files = null;
       let withFiles = false;
 
       if (view === "TextInputDokument") {
+        console.log("text input")
         data = {
           titel: updateRequest.topic,
           value: updateRequest.requested_change.value,
         };
-
+        
         const filesFromDatabase =
-          await Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(
+          await this.$fhcApi.factory.profilUpdate.getProfilRequestFiles(
             updateRequest.profil_update_id
           ).then((res) => {
             return res.data;
@@ -140,7 +142,8 @@ export default {
     },
 
   },
-  created() {},
+  created() {
+  },
 
   computed: {},
 

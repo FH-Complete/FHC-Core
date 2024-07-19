@@ -22,8 +22,7 @@ const app = Vue.createApp({
   },
   methods: {},
   created() {
-    console.log("this is the place i am searching for")
-    Vue.$fhcapi.ProfilUpdate.getStatus()
+    this.$fhcApi.factory.profilUpdate.getStatus()
       .then((response) => {
         this.profilUpdateStates = response.data;
       })
