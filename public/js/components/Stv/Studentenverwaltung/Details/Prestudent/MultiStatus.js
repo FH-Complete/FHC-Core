@@ -413,51 +413,55 @@ export default{
 		},
 		changeStatusToAbbrecherStgl(prestudentIds){
 			this.hideModal('confirmStatusAction');
+			let def_date = this.getDefaultDate();
 			let abbruchData =
 				{
 					status_kurzbz: 'Abbrecher',
-					datum: this.getDefaultDate(),
-					bestaetigtam: this.getDefaultDate(),
+					datum: def_date,
+					bestaetigtam: def_date,
 					statusgrund_id: 17
 				};
 			console.log(this.updateData);
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...abbruchData }));
-			this.addNewStatus(prestudentIds);
+			this.changeStatus(prestudentIds);
 		},
 		changeStatusToAbbrecherStud(prestudentIds){
 			this.hideModal('confirmStatusAction');
+			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
 					status_kurzbz: 'Abbrecher',
-					datum: this.getDefaultDate(),
-					bestaetigtam: this.getDefaultDate(),
+					datum: def_date,
+					bestaetigtam: def_date,
 					statusgrund_id: 18
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData }));
-			this.addNewStatus(prestudentIds);
+			this.changeStatus(prestudentIds);
 		},
 		changeStatusToUnterbrecher(prestudentIds){
 			this.hideModal('confirmStatusAction');
+			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
 					status_kurzbz: 'Unterbrecher',
-					datum: this.getDefaultDate(),
-					bestaetigtam: this.getDefaultDate()
+					datum: def_date,
+					bestaetigtam: def_date
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData }));
-			this.addNewStatus(prestudentIds);
+			this.changeStatus(prestudentIds);
 		},
 		changeStatusToStudent(prestudentIds){
+			let def_date = this.getDefaultDate();
 			//TODO Manu validation if Bewerber already before asking for ausbildungssemester
 			//this.checkIfBewerber();
 			this.hideModal('askForAusbildungssemester');
 			let deltaData =
 				{
 					status_kurzbz: 'Student',
-					datum: this.getDefaultDate(),
-					bestaetigtam: this.getDefaultDate()
+					datum: def_date,
+					bestaetigtam: def_date
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData, ausbildungssemester: this.actionSem}));
@@ -466,40 +470,41 @@ export default{
 		},
 		changeStatusToWiederholer(prestudentIds){
 			this.hideModal('askForAusbildungssemester');
+			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
 					status_kurzbz: 'Student',
-					datum: this.getDefaultDate(),
-					bestaetigtam: this.getDefaultDate(),
+					datum: def_date,
+					bestaetigtam: def_date,
 					statusgrund_id: 16
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData, ausbildungssemester: this.actionSem}));
-			this.addNewStatus(prestudentIds);
+			this.changeStatus(prestudentIds);
 		},
 		changeStatusToDiplomand(prestudentIds){
-
+			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
 					status_kurzbz: 'Diplomand',
-					datum: this.getDefaultDate(),
-					bestaetigtam: this.getDefaultDate(),
+					datum: def_date,
+					bestaetigtam: def_date,
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
-			this.addNewStatus(prestudentIds);
+			this.changeStatus(prestudentIds);
 		},
 		changeStatusToAbsolvent(prestudentIds){
-
+			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
 					status_kurzbz: 'Absolvent',
-					datum: this.getDefaultDate(),
-					bestaetigtam: this.getDefaultDate(),
+					datum: def_date,
+					bestaetigtam: def_date,
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
-			this.addNewStatus(prestudentIds);
+			this.changeStatus(prestudentIds);
 		},
 		changeStatusToBewerber(prestudentIds){
 			let def_date = this.getDefaultDate();
@@ -514,7 +519,7 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({
 				...objekt,
 				...deltaData}));
-			this.addNewStatus(prestudentIds);
+			this.changeStatus(prestudentIds);
 		},
 		changeStatusToAufgenommener(prestudentIds){
 			this.hideModal('confirmStatusAction');
@@ -533,7 +538,7 @@ export default{
 
 			//TODO(Manu) change studiensemester_kurzbz in backend
 			//studiensemester_kurzbz: this.getStudiensemesterOfBewerber(objekt.prestudent_id)
-			this.addNewStatus(prestudentIds);
+			this.changeStatus(prestudentIds);
 
 		},
 		changeInteressentToStudent(prestudentIds){
@@ -631,7 +636,7 @@ export default{
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		addNewStatus(prestudentIds){
+		changeStatus(prestudentIds){
 			//Array.isArray(prestudentIds) ? this.modelValue.prestudent_id : [prestudentIds];
 			let changeData = {};
 
@@ -646,7 +651,7 @@ export default{
 				//TODO(manu) besserer check
 				changeData = this.statusData.status_kurzbz ? this.statusData : this.newArray.find(item => item.prestudent_id === prestudentId);
 
-				return this.$fhcApi.post('api/frontend/v1/stv/status/addNewStatus/' + prestudentId,
+				return this.$fhcApi.post('api/frontend/v1/stv/status/changeStatus/' + prestudentId,
 					changeData
 				).then(response => {
 						countSuccess++;

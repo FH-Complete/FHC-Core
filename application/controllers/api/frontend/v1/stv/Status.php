@@ -12,7 +12,7 @@ class Status extends FHCAPI_Controller
 		parent::__construct([
 			'getHistoryPrestudent' => ['admin:r', 'assistenz:r'],
 			'insert' => ['admin:rw', 'assistenz:rw'],
-			'addNewStatus' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
+			'changeStatus' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			//'turnIntoStudent' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			'addStudent' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			'getStatusgruende' => self::PERM_LOGGED,
@@ -201,7 +201,7 @@ class Status extends FHCAPI_Controller
 		return $this->terminateWithSuccess($result);
 	}
 
-	public function addNewStatus($prestudent_id)
+	public function changeStatus($prestudent_id)
 	{
 		//get Studiengang von prestudent_id
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
@@ -780,7 +780,7 @@ class Status extends FHCAPI_Controller
 
 	// 	}
 	// 	else
-	// 		return $this->terminateWithError("addNewStatus(student)", self::ERROR_TYPE_GENERAL);
+	// 		return $this->terminateWithError("changeStatus(student)", self::ERROR_TYPE_GENERAL);
 	// }
 
 	public function addStudent($prestudent_id)
