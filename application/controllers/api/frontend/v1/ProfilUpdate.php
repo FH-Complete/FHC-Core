@@ -43,6 +43,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			'getProfilRequestFiles' => self::PERM_LOGGED,
 			'denyProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
 			'acceptProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
+			'selectProfilRequest' => self::PERM_LOGGED,
 			
 		]);
 
@@ -113,6 +114,24 @@ class ProfilUpdate extends FHCAPI_Controller
             $this->terminateWithError('No topics found');
         }
 		$this->terminateWithSuccess(self::$TOPICS);
+	}
+
+	public function selectProfilRequest()
+	{
+
+		$uid = $this->input->get('uid',true);
+		$id = $this->input->get('id',true);
+		$whereClause = ['uid' => $this->uid];
+		
+		if (isset($uid))
+			$whereClause['uid'] = $uid;
+		if (isset($id))
+			$whereClause['id'] = $id;
+
+		$res = $this->ProfilUpdateModel->getProfilUpdatesWhere($whereClause);
+		$res = $this->getDataOrTerminateWithError($res);
+		$this->terminateWithSuccess($res);
+
 	}
 
 	public function getProfilRequestFiles($id)

@@ -95,8 +95,8 @@ export default {
       );
     },
     fetchProfilUpdates: function () {
-      Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res) => {
-        if (!res.error) {
+      this.$fhcApi.factory.profilUpdate.selectProfilRequest().then((res) => {
+        if (!res.error && res) {
           this.data.profilUpdates = res.data?.length
             ? res.data.sort(this.sortProfilUpdates)
             : null;
@@ -107,17 +107,17 @@ export default {
     hideEditProfilModal: function () {
       //? checks the editModal component property result, if the user made a successful request or not
       if (this.$refs.editModal.result) {
-        Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
+        this.$fhcApi.factory.profilUpdate.selectProfilRequest()
           .then((request) => {
-            if (!request.error) {
+            if (!request.error && res) {
               this.data.profilUpdates = request.data;
               this.data.profilUpdates.sort(this.sortProfilUpdates);
             } else {
-              console.log("Error when fetching profile updates: " + res.data);
+              console.error("Error when fetching profile updates: " + res.data);
             }
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
           });
       } else {
         // when modal was closed without submitting request

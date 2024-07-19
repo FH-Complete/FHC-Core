@@ -151,17 +151,17 @@ export default {
     hideEditProfilModal: function () {
       //? checks the editModal component property result, if the user made a successful request or not
       if (this.$refs.editModal.result) {
-        Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
+        this.$fhcApi.factory.profilUpdate.selectProfilRequest()
           .then((request) => {
-            if (!request.error) {
+            if (!request.error && request) {
               this.data.profilUpdates = request.data;
               this.data.profilUpdates.sort(this.sortProfilUpdates);
             } else {
-              console.log("Error when fetching profile updates: " + res.data);
+              console.error("Error when fetching profile updates: " + res.data);
             }
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
           });
       } else {
         // when modal was closed without submitting request
@@ -184,8 +184,8 @@ export default {
     },
 
     fetchProfilUpdates: function () {
-      Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res) => {
-        if (!res.error) {
+      this.$fhcApi.factory.profilUpdate.selectProfilRequest().then((res) => {
+        if (!res.error && res) {
           this.data.profilUpdates = res.data?.length
             ? res.data.sort(this.sortProfilUpdates)
             : null;
@@ -451,8 +451,6 @@ export default {
 
                 <div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
                 <div class="col mb-3">
-  
-  
                     <!-- PROFIL UPDATES -->
                     <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
                 

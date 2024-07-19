@@ -43,7 +43,7 @@ export default {
     },
   
     //TODO post request
-    //? new reuquests
+    //? new requests
     insertFile: function (dms, replace = null) {
       const url =
         FHC_JS_DATA_STORAGE_OBJECT.app_root +
@@ -61,19 +61,16 @@ export default {
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
         `/api/frontend/v1/ProfilUpdate/getProfilRequestFiles/${requestID}`,{});
     },
-
-    search(searchsettings) {
-      const url = '/api/frontend/v1/searchbar/search';
-      return this.$fhcApi.post(url, searchsettings);
-    },
-
   
     selectProfilRequest: function (uid = null, id = null) {
 
         return this.$fhcApi.get(
         FHC_JS_DATA_STORAGE_OBJECT.app_root +
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/selectProfilRequest`,{ uid: uid, id: id });
+        `/api/frontend/v1/ProfilUpdate/selectProfilRequest`,
+        {...(uid?{uid}:{}),
+          ...(id?{id}:{})
+        });
     },
   
     //TODO post request
