@@ -76,7 +76,12 @@ class Status extends FHCAPI_Controller
 			[
 				'required', // In FAS empty datum results in todays
 				'is_valid_date',
-				// TODO(chris): before today
+				['is_date_not_before_today', function ($value) {
+					if (!is_valid_date($value))
+						return true; // Error will be handled by the is_valid_date statement above
+					$today = new DateTime('today');
+					return (new DateTime($value) >= $today);
+				}],
 				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck) {
 					if ($isBerechtigtNoStudstatusCheck)
 						return true; // Skip if access right says so
@@ -89,7 +94,8 @@ class Status extends FHCAPI_Controller
 				}]
 			],
 			[
-				'meldestichtag_not_exceeded' => $this->p->t('lehre', 'error_dataVorMeldestichtag')
+				'meldestichtag_not_exceeded' => $this->p->t('lehre', 'error_dataVorMeldestichtag'),
+				'is_date_not_before_today' => $this->p->t('lehre', 'error_entryInPast')
 			]
 		);
 
@@ -118,6 +124,10 @@ class Status extends FHCAPI_Controller
 
 		$this->form_validation->set_rules('bestaetigtam', $this->p->t('lehre', 'bestaetigt_am'), 'is_valid_date');
 
+		// Set Datum to null to prevent multiple is_valid_date checks in the following validation rules
+		if (!is_valid_date($datum))
+			$datum = null;
+
 		$this->form_validation->set_rules('_default', '', [
 			['rolle_doesnt_exist', function () use ($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester) {
 				if (!$status_kurzbz || !$studiensemester_kurzbz || !$ausbildungssemester)
@@ -126,9 +136,142 @@ class Status extends FHCAPI_Controller
 				$result = $this->PrestudentstatusModel->load([$ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id]);
 
 				return !$this->getDataOrTerminateWithError($result);
+			}],
+			['history_timesequence', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
+					return true; // Error will be handled by the required statements above
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryTimesequence(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					'',
+					''
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			['history_laststatus', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
+					return true; // Error will be handled by the required statements above
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryLaststatus(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					'',
+					''
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			['history_unterbrecher', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
+					return true; // Error will be handled by the required statements above
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryUnterbrechersemester(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					'',
+					''
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			['history_abbrecher', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
+					return true; // Error will be handled by the required statements above
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryAbbrechersemester(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					'',
+					''
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			['history_diplomant', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
+					return true; // Error will be handled by the required statements above
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryDiplomant(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					'',
+					''
+				);
+
+				return $this->getDataOrTerminateWithError($result);
 			}]
+			// TODO(chris): check status history error_wrongStatusOrderBeforeStudent
+			// TODO(chris): check status history error_personenkennzeichenPasstNichtZuStudiensemester
+			// TODO(chris): check status history error_bewerberOrgformUngleichStudentOrgform
 		], [
-			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhanden')
+			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhanden'),
+			'history_timesequence' => $this->p->t('lehre', 'error_statuseintrag_zeitabfolge'),
+			'history_laststatus' => $this->p->t('lehre', 'error_endstatus'),
+			'history_unterbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecher'),
+			'history_abbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecherAbbrecher'),
+			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent')
 		]);
 		
 		if (!$this->form_validation->run())
