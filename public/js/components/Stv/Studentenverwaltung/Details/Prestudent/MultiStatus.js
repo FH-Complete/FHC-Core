@@ -689,8 +689,6 @@ export default{
 					 }
 
 					 //TODO(Manu) bei status Interessent, Bewerber, aufgenommener, reload nicht working
-					//  this.reload();
-					//  this.reloadList();
 
 					if (this.modelValue.prestudent_id) {
 						this.reload();
