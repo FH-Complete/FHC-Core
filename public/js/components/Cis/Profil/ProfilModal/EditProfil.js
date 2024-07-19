@@ -96,7 +96,7 @@ export default {
         this.setLoading(true);
 
         this.editData.updateID
-          ? Vue.$fhcapi.ProfilUpdate.updateProfilRequest(
+          ? this.$fhcApi.factory.profilUpdate.updateProfilRequest(
               this.topic,
               this.profilUpdate,
               this.editData.updateID,

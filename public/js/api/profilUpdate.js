@@ -73,7 +73,6 @@ export default {
         });
     },
   
-    //TODO post request
     insertProfilRequest: function (topic, payload, fileID = null) {
 
       return this.$fhcApi.post(
@@ -87,19 +86,18 @@ export default {
         });
     },
   
-    //TODO post request
     updateProfilRequest: function (topic, payload, ID, fileID = null) {
-      const url =
+
+      return this.$fhcApi.post(
         FHC_JS_DATA_STORAGE_OBJECT.app_root +
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/updateProfilRequest`;
-  
-      return axios.post(url, {
-        topic,
-        payload,
-        ID,
-        ...(fileID ? { fileID: fileID } : {}),
-      });
+        `/api/frontend/v1/ProfilUpdate/updateProfilRequest`,
+        {
+          topic,
+          payload,
+          ID,
+          ...(fileID ? { fileID: fileID } : {}),
+        });
     },
   
     //TODO post request

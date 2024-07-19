@@ -45,6 +45,8 @@ class ProfilUpdate extends FHCAPI_Controller
 			'acceptProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
 			'selectProfilRequest' => self::PERM_LOGGED,
 			'insertProfilRequest' => self::PERM_LOGGED,
+			'updateProfilRequest' => self::PERM_LOGGED,
+			
 		]);
 
 		// Load language phrases
@@ -163,7 +165,7 @@ class ProfilUpdate extends FHCAPI_Controller
 
 		//? the user cannot delete a zustelladresse/kontakt
 		if (isset($payload->delete) && $payload->{$identifier == "kontakt_id" ? "zustellung" : "zustelladresse"}) {
-			$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_deleteZustellung_error')));
+			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_deleteZustellung_error'));
 		}
 
 		//? if the user tries to delete a adresse, checks whether the adresse is a heimatadresse, if so an error is raised
@@ -171,7 +173,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$adr = $this->AdresseModel->load($payload->$identifier);
 			$adr = $this->getDataOrTerminateWithError($adr)[0];
 			if ($adr->heimatadresse) {
-				$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_deleteZustellung_error')));
+				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_deleteZustellung_error'));
 			}
 		}
 
@@ -186,12 +188,12 @@ class ProfilUpdate extends FHCAPI_Controller
 				//? the user can add as many new kontakte/adressen as he likes
 				if (!isset($payload->add) && property_exists($existing_change, $identifier) && property_exists($payload, $identifier) && $existing_change->$identifier == $payload->$identifier) {
 					//? the kontakt_id / adresse_id of a change has to be unique 
-					$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_changeTwice_error')));
+					$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_changeTwice_error'));
 				}
 
 				//? if it is not updating any kontakt/adresse, the topic has to be unique
 				elseif (!$identifier && $update_request->topic == $topic) {
-					$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_changeTopicTwice_error', ['0' => $update_request->topic])));
+					$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_changeTopicTwice_error', ['0' => $update_request->topic]));
 				}
 			}
 		}
@@ -199,7 +201,7 @@ class ProfilUpdate extends FHCAPI_Controller
 		$insertID = $this->ProfilUpdateModel->insert($data);
 
 		if (isError($insertID)) {
-			$this->terminateWithError(error($insertID));
+			$this->terminateWithError(getError($insertID));
 		} else {
 			
 			$insertID = hasData($insertID) ? getData($insertID) : null;
@@ -207,6 +209,33 @@ class ProfilUpdate extends FHCAPI_Controller
 			$this->sendEmail_onProfilUpdate_insertion($this->uid, $insertID, $topic);
 			$this->terminateWithSuccess(success($insertID));
 		}
+	}
+
+	public function updateProfilRequest()
+	{
+		$topic = $this->input->post('topic', true);
+		$payload = $this->input->post('payload', true);
+		$ID = $this->input->post('ID', true);
+		$fileID = $this->input->post('fileID', true);//optional
+
+		if(!isset($topic) || !isset($payload) || !isset($ID)){
+			$this->terminateWithError("required parameters are missing");
+		}
+
+		$updateData = ["requested_change" => json_encode($payload), "updateamum" => "NOW()", "updatevon" => $this->uid];
+		if (isset($fileID)) {
+			$updateData['attachment_id'] = json_decode($fileID);
+		}
+		$updateID = $this->ProfilUpdateModel->update([$ID], $updateData);
+		//? insert fileID in the dataset if sent with post request
+
+		if (isError($updateID)) {
+			$this->terminateWithError(getError($updateID));
+		}
+		
+		$updateID = $this->getDataOrTerminateWithError($updateID)[0];
+		
+		$this->terminateWithSuccess(success($updateID));
 	}
 
 	public function getProfilRequestFiles($id)
@@ -218,7 +247,7 @@ class ProfilUpdate extends FHCAPI_Controller
 		$this->ProfilUpdateModel->addSelect(["attachment_id"]);
 		$attachmentID = $this->ProfilUpdateModel->load([$id]);
 		if (isError($attachmentID)) {
-			$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_loading_error')),self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_loading_error'),self::ERROR_TYPE_GENERAL);
 		}
 		//? get the attachmentID
 		$dms_id = $this->getDataOrTerminateWithError($attachmentID)[0]->attachment_id;
@@ -227,7 +256,7 @@ class ProfilUpdate extends FHCAPI_Controller
 		$this->DmsVersionModel->addSelect(["name", "dms_id"]);
 		$attachment = $this->DmsVersionModel->load([$dms_id, 0]);
 		if (isError($attachment)) {
-			$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_dmsVersion_error')),self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_dmsVersion_error'),self::ERROR_TYPE_GENERAL);
 		}
 		$attachment = $this->getDataOrTerminateWithError($attachment);
 		//? returns {name:..., dms_id:...}
@@ -276,7 +305,7 @@ class ProfilUpdate extends FHCAPI_Controller
 
 		//! check for required information
 		if (!isset($id) || !isset($uid) || !isset($personID) || !isset($requested_change) || !isset($topic)) {
-			$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_requiredInformation_error')));
+			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_requiredInformation_error'));
 		}
 
 		$is_mitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
@@ -299,7 +328,7 @@ class ProfilUpdate extends FHCAPI_Controller
 					$requested_change['adresse_id'] = $insertID;
 					$update_res = $this->updateRequestedChange($id, $requested_change);
 					if (isError($update_res)) {
-						$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_address_error', [$insertID])));
+						$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_address_error', [$insertID]));
 					}
 				}
 
@@ -310,7 +339,7 @@ class ProfilUpdate extends FHCAPI_Controller
 					$requested_change['kontakt_id'] = $insertID;
 					$update_res = $this->updateRequestedChange($id, $requested_change);
 					if (isError($update_res)) {
-						$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_kontakt_error', [$insertID])));
+						$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_kontakt_error', [$insertID]));
 					}
 				}
 
@@ -335,7 +364,7 @@ class ProfilUpdate extends FHCAPI_Controller
 				}
 
 				$result = $this->PersonModel->update($personID, [$topic => $requested_change["value"]]);
-				if (isError($result)) $this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_insert_error')));
+				if (isError($result)) $this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_insert_error'));
 			
 			}
 			$this->sendEmail_onProfilUpdate_response($uid, $topic, self::$STATUS_ACCEPTED);
@@ -399,7 +428,7 @@ class ProfilUpdate extends FHCAPI_Controller
 				$this->StudentModel->db->where_in("public.tbl_prestudentstatus.status_kurzbz", ['Student', 'Diplomand']);
 				$res = $this->StudentModel->loadWhere(["public.tbl_benutzer.aktiv" => TRUE, "public.tbl_student.student_uid" => $uid]);
 				if (isError($res)) {
-					$this->terminateWithError(getData($res));
+					$this->terminateWithError(getError($res));
 				} else {
 					$res = $this->getDataOrTerminateWithError($res);
 					foreach ($res as $emailObj) {
@@ -498,7 +527,7 @@ class ProfilUpdate extends FHCAPI_Controller
 		elseif (array_key_exists('delete', $requested_change) && $requested_change['delete']) {
 			$result = $this->AdresseModel->delete($adresse_id);
 			if(isError($result)){
-				$this->terminateWithError(error($result));
+				$this->terminateWithError(getError($result));
 			}
 		}
 		//! UPDATE
