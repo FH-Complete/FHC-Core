@@ -17,6 +17,8 @@ class PrestudentstatusCheckLib
 	private $_statusAbfolgeVorStudent = [self::INTERESSENT_STATUS, self::BEWERBER_STATUS, self::AUFGENOMMENER_STATUS];
 	private $_endStatusArr = [self::ABSOLVENT_STATUS, self::ABBRECHER_STATUS];
 
+	private $_cache_history = [];
+
 	/**
 	 * Object initialization
 	 */
@@ -140,7 +142,7 @@ class PrestudentstatusCheckLib
 	 *
 	 * @param integer				$prestudent_id
 	 *
-	 * @return boolean
+	 * @return stdClass
 	 */
 	public function checkIfExistingStudentRolle($prestudent_id)
 	{
@@ -265,9 +267,10 @@ class PrestudentstatusCheckLib
 	/**
 	 * Check if Bismeldestichtag erreicht
 	 *
-	 * @param DateTime				$datum
+	 * @param DateTime				$statusDatum
+	 * @param string				$studiensemester_kurzbz
 	 *
-	 * @return boolean
+	 * @return stdClass
 	 */
 	public function checkIfMeldestichtagErreicht($statusDatum, $studiensemester_kurzbz = null)
 	{
@@ -277,6 +280,319 @@ class PrestudentstatusCheckLib
 			return $result;
 		
 		return success(getData($result) == "1");
+	}
+
+	/**
+	 * Runs all checks on Status History and saves it in cache.
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param DateTime				$new_date
+	 * @param string				$new_studiensemester_kurzbz
+	 * @param integer				$new_ausbildungssemester
+	 * @param string				$old_studiensemester_kurzbz
+	 * @param integer				$old_ausbildungssemester
+	 *
+	 * @return stdClass
+	 */
+	protected function prepareStatusHistory(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester
+	) {
+		// Generate key for caching
+		$primary = implode('|', [
+			$prestudent_id,
+			$status_kurzbz,
+			$new_date->format('Y-m-d'),
+			$new_studiensemester_kurzbz,
+			$new_ausbildungssemester,
+			$old_studiensemester_kurzbz,
+			$old_ausbildungssemester
+		]);
+
+		if (isset($this->_cache_history[$primary]))
+			return $this->_cache_history[$primary];
+
+		$this->_ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+
+		// Get the history
+		$result = $this->_ci->PrestudentstatusModel->getHistoryWithNewOrEditedState(
+			$prestudent_id,
+			$status_kurzbz,
+			$new_date,
+			$new_studiensemester_kurzbz,
+			$new_ausbildungssemester,
+			$old_studiensemester_kurzbz,
+			$old_ausbildungssemester
+		);
+
+		if (isError($result))
+			return $result;
+
+		if (!hasData($result))
+			return error('This is impossible');
+
+		$history = getData($result);
+		$historyCount = count($history);
+
+		// Run checks
+		$checks = [
+			'timesequence' => true,
+			'laststatus' => true,
+			'unterbrechersemester' => true,
+			'abbrechersemester' => true,
+			'diplomant' => true
+		];
+
+		for ($n = 0, $c = 1; $c < $historyCount; $n++, $c++) {
+			if (!$checks['timesequence']
+				&& !$checks['laststatus']
+				&& !$checks['unterbrechersemester']
+				&& !$checks['abbrechersemester']
+				&& !$checks['diplomant']
+			)
+				break; // early out
+
+			$next = $history[$n];
+			$current = $history[$c];
+
+			// Zeitabfolge ungültig?
+			if ($checks['timesequence']
+				&& $next->start < $current->start
+			)
+				$checks['timesequence'] = false;
+
+			// Abbrecher- oder Absolventenstatus muss Endstatus sein
+			if ($checks['laststatus']
+				&& in_array($current->status_kurzbz, ['Absolvent', 'Abbrecher'])
+			)
+				$checks['laststatus'] = false;
+
+			// wenn Unterbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
+			if ($checks['unterbrechersemester']
+				&& $current->status_kurzbz == 'Unterbrecher'
+				&& $next->status_kurzbz == 'Unterbrecher'
+				&& $current->ausbildungssemester != $next->ausbildungssemester
+			)
+				$checks['unterbrechersemester'] = false;
+
+			// wenn Abbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
+			if ($checks['abbrechersemester']
+				&& $current->status_kurzbz == 'Unterbrecher'
+				&& $next->status_kurzbz == 'Abbrecher'
+				&& $current->ausbildungssemester != $next->ausbildungssemester
+			)
+				$checks['abbrechersemester'] = false;
+
+			// keine Studenten nach Diplomand Status
+			if ($checks['diplomant']
+				&& $current->status_kurzbz == 'Diplomand'
+				&& $next->status_kurzbz == 'Student'
+			)
+				$checks['diplomant'] = false;
+		}
+
+		$this->_cache_history[$primary] = success($checks);
+
+		return success($checks);
+	}
+
+	/**
+	 * Checks if the time sequence of the status history is valid.
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param DateTime				$new_date
+	 * @param string				$new_studiensemester_kurzbz
+	 * @param integer				$new_ausbildungssemester
+	 * @param string				$old_studiensemester_kurzbz
+	 * @param integer				$old_ausbildungssemester
+	 *
+	 * @return stdClass
+	 */
+	public function checkStatusHistoryTimesequence(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester
+	) {
+		$result = $this->prepareStatusHistory(
+			$prestudent_id,
+			$status_kurzbz,
+			$new_date,
+			$new_studiensemester_kurzbz,
+			$new_ausbildungssemester,
+			$old_studiensemester_kurzbz,
+			$old_ausbildungssemester
+		);
+
+		if (isError($result))
+			return $result;
+
+		return success(getData($result)['timesequence']);
+	}
+
+	/**
+	 * Checks if the last status of the status history is not Abbrecher or
+	 * Absolvent.
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param DateTime				$new_date
+	 * @param string				$new_studiensemester_kurzbz
+	 * @param integer				$new_ausbildungssemester
+	 * @param string				$old_studiensemester_kurzbz
+	 * @param integer				$old_ausbildungssemester
+	 *
+	 * @return stdClass
+	 */
+	public function checkStatusHistoryLaststatus(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester
+	) {
+		$result = $this->prepareStatusHistory(
+			$prestudent_id,
+			$status_kurzbz,
+			$new_date,
+			$new_studiensemester_kurzbz,
+			$new_ausbildungssemester,
+			$old_studiensemester_kurzbz,
+			$old_ausbildungssemester
+		);
+
+		if (isError($result))
+			return $result;
+
+		return success(getData($result)['laststatus']);
+	}
+
+	/**
+	 * Checks if two consecutively Unterbrecher have the same
+	 * ausbildungssemester in the status history.
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param DateTime				$new_date
+	 * @param string				$new_studiensemester_kurzbz
+	 * @param integer				$new_ausbildungssemester
+	 * @param string				$old_studiensemester_kurzbz
+	 * @param integer				$old_ausbildungssemester
+	 *
+	 * @return stdClass
+	 */
+	public function checkStatusHistoryUnterbrechersemester(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester
+	) {
+		$result = $this->prepareStatusHistory(
+			$prestudent_id,
+			$status_kurzbz,
+			$new_date,
+			$new_studiensemester_kurzbz,
+			$new_ausbildungssemester,
+			$old_studiensemester_kurzbz,
+			$old_ausbildungssemester
+		);
+
+		if (isError($result))
+			return $result;
+
+		return success(getData($result)['unterbrechersemester']);
+	}
+
+	/**
+	 * Checks if an Unterbrecher followed by an Abbrecher have the same
+	 * ausbildungssemester in the status history.
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param DateTime				$new_date
+	 * @param string				$new_studiensemester_kurzbz
+	 * @param integer				$new_ausbildungssemester
+	 * @param string				$old_studiensemester_kurzbz
+	 * @param integer				$old_ausbildungssemester
+	 *
+	 * @return stdClass
+	 */
+	public function checkStatusHistoryAbbrechersemester(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester
+	) {
+		$result = $this->prepareStatusHistory(
+			$prestudent_id,
+			$status_kurzbz,
+			$new_date,
+			$new_studiensemester_kurzbz,
+			$new_ausbildungssemester,
+			$old_studiensemester_kurzbz,
+			$old_ausbildungssemester
+		);
+
+		if (isError($result))
+			return $result;
+
+		return success(getData($result)['abbrechersemester']);
+	}
+
+	/**
+	 * Checks if no Diplomant is followed by a Student in the status history.
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param DateTime				$new_date
+	 * @param string				$new_studiensemester_kurzbz
+	 * @param integer				$new_ausbildungssemester
+	 * @param string				$old_studiensemester_kurzbz
+	 * @param integer				$old_ausbildungssemester
+	 *
+	 * @return stdClass
+	 */
+	public function checkStatusHistoryDiplomant(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester
+	) {
+		$result = $this->prepareStatusHistory(
+			$prestudent_id,
+			$status_kurzbz,
+			$new_date,
+			$new_studiensemester_kurzbz,
+			$new_ausbildungssemester,
+			$old_studiensemester_kurzbz,
+			$old_ausbildungssemester
+		);
+
+		if (isError($result))
+			return $result;
+
+		return success(getData($result)['diplomant']);
 	}
 
 	/**

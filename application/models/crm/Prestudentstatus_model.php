@@ -629,4 +629,73 @@ class Prestudentstatus_model extends DB_Model
 			'tbl_prestudentstatus.prestudent_id' => $prestudent_id
 		]);
 	}
+
+	/**
+	 * Gets status history of a prestudent for checking purposes.
+	 * This function adds the new state or replaces the edited.
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param DateTime				$new_date
+	 * @param string				$new_studiensemester_kurzbz
+	 * @param integer				$new_ausbildungssemester
+	 * @param string				$old_studiensemester_kurzbz
+	 * @param integer				$old_ausbildungssemester
+	 *
+	 * @return stdClass
+	 */
+	public function getHistoryWithNewOrEditedState(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester
+	) {
+		$new_date = $new_date->format('Y-m-d');
+
+		$this->addSelect('status_kurzbz');
+		$this->addSelect('studiensemester_kurzbz');
+		$this->addSelect('ausbildungssemester');
+		$this->addSelect('datum');
+		$this->addSelect('insertamum');
+		$this->addSelect('ext_id');
+
+		if ($old_studiensemester_kurzbz || $old_ausbildungssemester) {
+			$this->db->not_group_start();
+			$this->db->where('status_kurzbz', $status_kurzbz);
+			$this->db->where('studiensemester_kurzbz', $old_studiensemester_kurzbz);
+			$this->db->where('ausbildungssemester', $old_ausbildungssemester);
+			$this->db->group_end();
+		}
+
+		$this->db->where('prestudent_id', $prestudent_id);
+
+		$tmpTable = $this->db->get_compiled_select($this->dbTable);
+
+		$tmpTable .= "UNION
+			SELECT " .
+				$this->escape($status_kurzbz) . " AS status_kurzbz, " .
+				$this->escape($new_studiensemester_kurzbz) . " AS studiensemester_kurzbz, " .
+				$this->escape($new_ausbildungssemester) . " AS ausbildungssemester, " .
+				$this->escape($new_date) . "::date AS datum," .
+				$this->escape(date('c')) . "::date AS insertamum," .
+				"NULL AS ext_id";
+
+		$this->addJoin('public.tbl_studiensemester sem', 'studiensemester_kurzbz');
+
+		$this->addOrder('s.datum', 'DESC');
+		$this->addOrder('s.insertamum', 'DESC');
+		$this->addOrder('s.ext_id', 'DESC');
+
+		$dbTable = $this->dbTable;
+		$this->dbTable = "(" . $tmpTable . ") s";
+
+		$result = $this->load();
+
+		$this->dbTable = $dbTable;
+
+		return $result;
+	}
 }
