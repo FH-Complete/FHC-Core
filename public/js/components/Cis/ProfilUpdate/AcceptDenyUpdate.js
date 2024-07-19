@@ -62,7 +62,7 @@ export default {
     handleRequest: function (type) {
       this.loading = true;
       this.setLoading(true);
-      Vue.$fhcapi.ProfilUpdate[
+      this.$fhcApi.factory.profilUpdate[
         type.toLowerCase() == "accept"
           ? "acceptProfilRequest"
           : "denyProfilRequest"

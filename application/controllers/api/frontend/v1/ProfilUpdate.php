@@ -41,8 +41,21 @@ class ProfilUpdate extends FHCAPI_Controller
             'getStatus' => self::PERM_LOGGED,
             'getTopic' => self::PERM_LOGGED,
 			'getProfilRequestFiles' => self::PERM_LOGGED,
+			'denyProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
+			'acceptProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
 			
 		]);
+
+		// Load language phrases
+		$this->loadPhrases(
+			array(
+				'ui',
+				'global',
+				'person',
+				'profil',
+				'profilUpdate'
+			)
+		);
 
         $this->load->model('person/Profil_update_model', 'ProfilUpdateModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
@@ -127,88 +140,247 @@ class ProfilUpdate extends FHCAPI_Controller
 		$this->terminateWithSuccess($attachment);
 	}
 
-	/* public function insertFile($replace)
+	public function denyProfilRequest()
 	{
-		$replace = json_decode($replace);
+		$id = $this->input->post('profil_update_id', true);
+		$uid = $this->input->post('uid', true);
+		$topic = $this->input->post('topic', true);
+		$status_message = $this->input->post('status_message', true); //optional
 
-		if (!count($_FILES)) {
-			$this->terminateWithSuccess([]);
-			return;
+		if(!isset($id) || !isset($uid) || !isset($topic)){
+			$this->terminateWithError("parameter id, uid, topic or status_message is missing");
 		}
 
-		//? if replace is set it contains the profil_update_id in which the attachment_id has to be replaced
-		if (isset($replace)) {
-			$this->ProfilUpdateModel->addSelect(["attachment_id"]);
-			$profilUpdate = $this->ProfilUpdateModel->load([$replace]);
-			if (isError($profilUpdate)) {
-				$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_loading_error')),self::ERROR_TYPE_GENERAL);
-			}
-			//? get the attachmentID
-			$dms_id = $this->getDataOrTerminateWithError($profilUpdate)[0];
+		$is_mitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
+		$is_mitarbeiter = $this->getDataOrTerminateWithError($is_mitarbeiter);
+		
+		$is_student = $this->StudentModel->isStudent($uid);
+		$is_student = $this->getDataOrTerminateWithError($is_student);
 
-			//? delete old dms_file of Profil Update
-			$this->deleteOldVersionFile($dms_id);
-		}
-
-
-		$files = $_FILES['files'];
-		$file_count = count($files['name']);
-
-		$res = [];
-
-		for ($i = 0; $i < $file_count; $i++) {
-			$_FILES['files']['name'] = $files['name'][$i];
-			$_FILES['files']['type'] = $files['type'][$i];
-			$_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
-			$_FILES['files']['error'] = $files['error'][$i];
-			$_FILES['files']['size'] = $files['size'][$i];
-
-			$dms = [
-				"kategorie_kurzbz" => "profil_aenderung",
-				"version" => 0,
-				"name" => $_FILES['files']['name'],
-				"mimetype" => $_FILES['files']['type'],
-				"beschreibung" => $this->uid . " Profil Änderung",
-				"insertvon" => $this->uid,
-				"insertamum" => "NOW()",
-			];
-
-			$tmp_res = $this->dmslib->upload($dms, 'files', array("jpg", "png", "pdf"));
-
-			$tmp_res = $this->getDataOrTerminateWithError($tmp_res);
-			array_push($res, $tmp_res);
-		}
-
-		$this->terminateWithSuccess($res);
-	}
-
-	private function deleteOldVersionFile($dms_id)
-	{
-		if (!isset($dms_id)) {
-			return;
-		}
-
-		//? collect all the results of the deleted versions in an array 
-		$res = array();
-
-		//? delete all the different versions of the dms_file
-		$dmsVersions = $this->DmsVersionModel->loadWhere(["dms_id" => $dms_id]);
-		$dmsVersions = $this->getDataOrTerminateWithError($dmsVersions);
-		if (isset($dmsVersions)) {
-			$zwischen_res = array_map(function ($item) {
-				return $item->version;
-			}, $dmsVersions);
-			foreach ($zwischen_res as $version) {
-				array_push($res, $this->DmsVersionModel->delete([$dms_id, $version]));
-			}
+		if (
+			$is_student && $this->permissionlib->isBerechtigt('student/stammdaten', "suid", $this->getOE_from_student($uid)) ||
+			$is_mitarbeiter && $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten', "suid") 
+		) {
+			$this->sendEmail_onProfilUpdate_response($uid, $topic, self::$STATUS_REJECTED);
+			$this->terminateWithSuccess($this->setStatusOnUpdateRequest($id, self::$STATUS_REJECTED, $status_message));
 		} else {
-			$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_dmsVersion_error')), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_permission_error'),self::ERROR_TYPE_GENERAL);
+		}
+	}
+
+	public function acceptProfilRequest()
+	{
+		$id = $this->input->post('profil_update_id', true);
+		$uid = $this->input->post('uid', true);
+		$topic = $this->input->post('topic', true);
+		$requested_change = $this->input->post('requested_change');
+		$status_message = $this->input->post('status_message', true); //optional
+
+		//? fetching person_id using UID
+		$personID = $this->PersonModel->getByUid($uid);
+		$personID = $this->getDataOrTerminateWithError($personID)[0]->person_id;
+
+		//! check for required information
+		if (!isset($id) || !isset($uid) || !isset($personID) || !isset($requested_change) || !isset($topic)) {
+			$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_requiredInformation_error')));
 		}
 
-		//? returns a result for each deleted dms_file
-		return $res;
+		$is_mitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
+		$is_mitarbeiter = $this->getDataOrTerminateWithError($is_mitarbeiter);
+
+		$is_student = $this->StudentModel->isStudent($uid);
+		$is_student = $this->getDataOrTerminateWithError($is_student);
+
+
+		//? check if the permissions are set correctly
+		if (
+			$is_student && $this->permissionlib->isBerechtigt('student/stammdaten', "suid", $this->getOE_from_student($uid)) ||
+			$is_mitarbeiter && $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten', "suid") 
+		) {
+
+			if (is_array($requested_change) && array_key_exists("adresse_id", $requested_change)) {
+				$insertID = $this->handleAdresse($requested_change, $personID);
+				$insertID = getData($insertID);
+				if (isset($insertID)) {
+					$requested_change['adresse_id'] = $insertID;
+					$update_res = $this->updateRequestedChange($id, $requested_change);
+					if (isError($update_res)) {
+						$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_address_error', [$insertID])));
+					}
+				}
+
+			} else if (is_array($requested_change) && array_key_exists("kontakt_id", $requested_change)) {
+				$insertID = $this->handleKontakt($requested_change, $personID);
+				$insertID = getData($insertID);
+				if (isset($insertID)) {
+					$requested_change['kontakt_id'] = $insertID;
+					$update_res = $this->updateRequestedChange($id, $requested_change);
+					if (isError($update_res)) {
+						$this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_kontakt_error', [$insertID])));
+					}
+				}
+
+
+			} else {
+				switch ($topic) {
+					// mapping phrasen to database columns to make the update with the correct column names
+					case self::$TOPICS['Titel']:
+						$topic = "titelpre";
+						break;
+					case self::$TOPICS['Postnomen']:
+						$topic = "titelpost";
+						break;
+					case self::$TOPICS['Vorname']:
+						$topic = "vorname";
+						break;
+					case self::$TOPICS['Nachname']:
+						$topic = "nachname";
+						break;
+					default:
+						$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_topic_error', [$topic]));
+				}
+
+				$result = $this->PersonModel->update($personID, [$topic => $requested_change["value"]]);
+				if (isError($result)) $this->terminateWithError(error($this->p->t('profilUpdate', 'profilUpdate_insert_error')));
+			
+			}
+			$this->sendEmail_onProfilUpdate_response($uid, $topic, self::$STATUS_ACCEPTED);
+
+			$this->terminateWithSuccess($this->setStatusOnUpdateRequest($id, self::$STATUS_ACCEPTED, $status_message, $requested_change));
+		} else {
+			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_permission_error'));
+		}
+
+
 	}
- */
-}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+
+	private function sendEmail_onProfilUpdate_response($uid, $topic, $status)
+	{
+		$this->load->helper('hlp_sancho_helper');
+		$email = $uid . "@" . DOMAIN;
+
+
+		function languageQuery($language)
+		{
+			return "select index from public.tbl_sprache where sprache = '" + $language + "'";
+		}
+
+		$this->ProfilUpdateStatusModel->addSelect(["bezeichnung_mehrsprachig[(" . languageQuery('German') . ")] as status_de", "bezeichnung_mehrsprachig[(" . languageQuery('English') . ")] as status_en"]);
+		
+		$status_translation = $this->ProfilUpdateStatusModel->loadWhere(["status_kurzbz" => $status]);
+		
+		if (isError($status_translation)) {
+			$this->terminateWithError($this->p->t('profilUpdate', 'ProfilUpdateStatusTranslationError'));
+		}
+
+		$status_translation = hasData($status_translation) ? getData($status_translation)[0] : null;
+
+		if (isset($status_translation)) {
+			$mail_res = sendSanchoMail("profil_update_response", ['topic' => $topic, 'status_de' => $status_translation->status_de, 'status_en' => $status_translation->status_en, 'href' => APP_ROOT . 'Cis/Profil'], $email, ("Profil Änderung " . $this->p->t('profilUpdate', 'pending')));
+			if (!$mail_res) {
+				$this->addError($this->p->t('profilUpdate', 'profilUpdate_email_error'));
+			}
+		}
+	}
+
+	private function setStatusOnUpdateRequest($id, $status, $status_message)
+	{
+		return $this->ProfilUpdateModel->update([$id], ["status" => $status, "status_timestamp" => "NOW()", "status_message" => $status_message]);
+	}
 	
-   
+	private function updateRequestedChange($id, $requested_change)
+	{
+		return $this->ProfilUpdateModel->update([$id], ['requested_change' => json_encode($requested_change)]);
+	}
+
+	private function handleAdresse($requested_change, $personID)
+	{
+		$this->AdressenTypModel->addSelect(["adressentyp_kurzbz"]);
+		$adr_kurzbz = $this->AdressenTypModel->loadWhere(["bezeichnung" => $requested_change['typ']]);
+		$adr_kurzbz = $this->getDataOrTerminateWithError($adr_kurzbz)[0]->adressentyp_kurzbz;
+		
+		//? replace the address_typ with its correct kurzbz foreign key
+		$requested_change['typ'] = $adr_kurzbz;
+
+		$adresse_id = $requested_change["adresse_id"];
+
+		//? removes the adresse_id because we don't want to update the kontakt_id in the database
+		unset($requested_change["adresse_id"]);
+
+		//! ADD
+		if (array_key_exists('add', $requested_change) && $requested_change['add']) {
+
+			//? removes add flag
+			unset($requested_change['add']);
+			$requested_change['insertamum'] = "NOW()";
+			$requested_change['insertvon'] = getAuthUID();
+			$requested_change['person_id'] = $personID;
+			//TODO: zustelladresse, heimatadresse, rechnungsadresse und nation werden nicht beachtet
+			$insertID = $this->AdresseModel->insert($requested_change);
+			$insert_adresse_id = $insertID;
+			if (isError($insert_adresse_id)) {
+				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_insertAdresse_error'));
+			}
+			$insert_adresse_id = $this->getDataOrTerminateWithError($insert_adresse_id);
+			if ($insert_adresse_id) {
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $insert_adresse_id);
+			}
+
+		}
+		//! DELETE
+		elseif (array_key_exists('delete', $requested_change) && $requested_change['delete']) {
+			$result = $this->AdresseModel->delete($adresse_id);
+			if(isError($result)){
+				$this->terminateWithError(error($result));
+			}
+		}
+		//! UPDATE
+		else {
+			$requested_change['updateamum'] = "NOW()";
+			$requested_change['updatevon'] = getAuthUID();
+			$update_adresse_id = $this->AdresseModel->update($adresse_id, $requested_change);
+			if (isError($update_adresse_id)) {
+				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_updateAdresse_error'));
+			}
+			$update_adresse_id = $this->getDataOrTerminateWithError($update_adresse_id);
+			$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $update_adresse_id);
+			
+		}
+		return $insertID ?? null;
+	}
+
+
+	private function handleDupplicateZustellAdressen($zustellung, $adresse_id)
+	{
+		if ($zustellung) {
+			$this->PersonModel->addSelect("public.tbl_adresse.adresse_id");
+			$this->PersonModel->addJoin("public.tbl_adresse", "public.tbl_adresse.person_id = public.tbl_person.person_id");
+			$zustellAdressenArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id" => $this->pid, "zustelladresse" => TRUE]);
+			if (isError($zustellAdressenArray)) {
+				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_loadingZustellAdressen_error'));
+			}
+			$zustellAdressenArray = $this->getDataOrTerminateWithError($zustellAdressenArray);
+
+			if (count($zustellAdressenArray) > 0) {
+
+				$zustellAdressenArray = array_filter($zustellAdressenArray, function ($adresse) use ($adresse_id) {
+
+					return $adresse->adresse_id != $adresse_id;
+				});
+
+				// remove the zustelladresse from all other zustelladressen
+				foreach ($zustellAdressenArray as $adresse) {
+					$this->AdresseModel->update($adresse->adresse_id, ["zustelladresse" => FALSE]);
+				}
+
+			}
+		}
+	}
+
+}
+
+

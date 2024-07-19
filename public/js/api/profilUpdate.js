@@ -15,24 +15,19 @@ export default {
         `/api/frontend/v1/ProfilUpdate/getTopic`,{});
     },
   
+    acceptProfilRequest: function ({profil_update_id, uid, status_message, topic, requested_change}) {
 
-    //TODO post request
-    acceptProfilRequest: function (payload) {
-
-        const url =
+      return this.$fhcApi.post(
         FHC_JS_DATA_STORAGE_OBJECT.app_root +
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        "/Cis/ProfilUpdate/acceptProfilRequest";
-      return axios.post(url, payload); 
+        "/api/frontend/v1/ProfilUpdate/acceptProfilRequest",{profil_update_id, uid, status_message, topic, requested_change});
     },
   
-    //TODO post request
-    denyProfilRequest: function (payload) {
-      const url =
+    denyProfilRequest: function ({profil_update_id, uid, topic, status_message}) {
+      return this.$fhcApi.post(
         FHC_JS_DATA_STORAGE_OBJECT.app_root +
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        "/Cis/ProfilUpdate/denyProfilRequest";
-      return axios.post(url, payload);
+        "/api/frontend/v1/ProfilUpdate/denyProfilRequest",{profil_update_id,uid,topic,status_message});
     },
   
     //TODO post request

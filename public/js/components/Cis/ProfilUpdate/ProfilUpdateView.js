@@ -131,7 +131,7 @@ export default {
                     "this is the data of the context menu action",
                     column.getData()
                   );
-                  Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column.getData())
+                  this.$fhcApi.factory.profilUpdate.acceptProfilRequest(column.getData())
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
@@ -149,7 +149,7 @@ export default {
                   "denyUpdate"
                 )}`,
                 action: (e, column) => {
-                  Vue.$fhcapi.ProfilUpdate.denyProfilRequest(column.getData())
+                  this.$fhcApi.factory.profilUpdate.denyProfilRequest(column.getData())
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
@@ -260,7 +260,9 @@ export default {
                 ${
                   STATUS_PENDING ?
                   `<button class="btn border-success border-2" id="acceptButton"><i class='fa fa-lg fa-circle-check text-success'></i></button>
-                  <button class="btn border-danger border-2" id="denyButton"><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>`:''
+                  <button class="btn border-danger border-2" id="denyButton"><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>`
+                  :
+                  ``
                 }
               </div>`;
 
@@ -302,7 +304,7 @@ export default {
   },
   methods: {
     denyProfilUpdate: function (data) {
-      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(data)
+      this.$fhcApi.factory.profilUpdate.denyProfilRequest(data)
         .then((res) => {
           // block when the request was successful
         })
@@ -314,7 +316,7 @@ export default {
         });
     },
     acceptProfilUpdate: function (data) {
-      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(data)
+      this.$fhcApi.factory.profilUpdate.acceptProfilRequest(data)
         .then((res) => {
           // block when the request was successful
         })
