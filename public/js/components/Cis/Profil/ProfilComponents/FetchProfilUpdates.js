@@ -107,17 +107,18 @@ export default {
     },
 
     deleteRequest: function (item) {
-      Vue.$fhcapi.ProfilUpdate.deleteProfilRequest(item.profil_update_id).then(
+      this.$fhcApi.factory.profilUpdate.deleteProfilRequest(item.profil_update_id).then(
         (res) => {
           if (res.data.error) {
             //? open alert
-            console.log(res.data);
+            console.error("error happened",res.data);
           } else {
             this.$emit("fetchUpdates");
           }
         }
       );
     },
+    
     getView: function (topic, status) {
       if (!(status === this.profilUpdateStates["Pending"])) {
         return "Status";

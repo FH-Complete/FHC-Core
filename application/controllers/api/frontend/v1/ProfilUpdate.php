@@ -46,8 +46,8 @@ class ProfilUpdate extends FHCAPI_Controller
 			'selectProfilRequest' => self::PERM_LOGGED,
 			'insertProfilRequest' => self::PERM_LOGGED,
 			'updateProfilRequest' => self::PERM_LOGGED,
-			
-		]);
+			'deleteProfilRequest' => self::PERM_LOGGED,
+			]);
 
 		// Load language phrases
 		$this->loadPhrases(
@@ -236,6 +236,17 @@ class ProfilUpdate extends FHCAPI_Controller
 		$updateID = $this->getDataOrTerminateWithError($updateID)[0];
 		
 		$this->terminateWithSuccess(success($updateID));
+	}
+
+	public function deleteProfilRequest()
+	{
+
+		$requestID = $this->input->post('requestID', true);
+		$result = $this->ProfilUpdateModel->delete([$requestID]);
+		if (isError($result)) {
+			$this->terminateWithError(getError($result));
+		}
+		$this->terminateWithSuccess($result);
 	}
 
 	public function getProfilRequestFiles($id)

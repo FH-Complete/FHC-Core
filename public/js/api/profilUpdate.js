@@ -100,14 +100,15 @@ export default {
         });
     },
   
-    //TODO post request
     deleteProfilRequest: function (requestID) {
-      const url =
+
+      return this.$fhcApi.post(
         FHC_JS_DATA_STORAGE_OBJECT.app_root +
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/deleteProfilRequest`;
-  
-      return axios.post(url, requestID);
+        `/api/frontend/v1/ProfilUpdate/deleteProfilRequest`,
+        {
+          requestID,
+        });
     },
   };
   
