@@ -30,20 +30,6 @@ export default {
         "/api/frontend/v1/ProfilUpdate/denyProfilRequest",{profil_update_id,uid,topic,status_message});
     },
   
-    //TODO post request
-    replaceProfilUpdateAttachment: function (dms) {
-      const url =
-        FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/replaceProfilUpdateAttachment`;
-  
-      return axios.post(url, dms, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-    },
-  
-    //TODO post request
-    //? new requests
     insertFile: function (dms, replace = null) {
 
       return this.$fhcApi.post(

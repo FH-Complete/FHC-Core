@@ -2,12 +2,10 @@ import StudentProfil from "../../components/Cis/Profil/StudentProfil.js";
 import MitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterProfil.js";
 import ViewStudentProfil from "../../components/Cis/Profil/StudentViewProfil.js";
 import ViewMitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterViewProfil.js";
-import fhcapifactory from "../api/fhcapifactory.js";
 import Loading from "../../components/Loader.js";
 import Phrasen from "../../plugin/Phrasen.js";
-import fhcapi from "../../plugin/FhcApi.js";
 
-Vue.$fhcapi = fhcapifactory;
+
 Vue.$collapseFormatter = function (data) {
   //data - an array of objects containing the column title and value for each cell
   var container = document.createElement("div");
@@ -405,5 +403,4 @@ const profilApp = Vue.createApp({
 profilApp
   .use(primevue.config.default, { zIndex: { overlay: 9999 } })
   .use(Phrasen)
-  .use(fhcapi)
   .mount("#content");
