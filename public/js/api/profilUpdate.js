@@ -45,14 +45,13 @@ export default {
     //TODO post request
     //? new requests
     insertFile: function (dms, replace = null) {
-      const url =
+
+      return this.$fhcApi.post(
         FHC_JS_DATA_STORAGE_OBJECT.app_root +
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/insertFile/${replace}`;
-  
-      return axios.post(url, dms, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+        `/api/frontend/v1/ProfilUpdate/insertFile/${replace}`,
+        dms);
+
     },
     
     getProfilRequestFiles: function (requestID) {

@@ -116,14 +116,14 @@ export default {
         const result = this.editData.updateID
           ? //? updating old attachment by replacing
             //* second parameter of api request insertFile checks if the file has to be replaced or not
-            await Vue.$fhcapi.ProfilUpdate.insertFile(
+            await this.$fhcApi.factory.profilUpdate.insertFile(
               formData,
               this.editData.updateID
             ).then((res) => {
               return res.data?.map((file) => file.dms_id);
             })
           : //? fresh insert of new attachment
-            await Vue.$fhcapi.ProfilUpdate.insertFile(formData).then((res) => {
+            await this.$fhcApi.factory.profilUpdate.insertFile(formData).then((res) => {
               return res.data?.map((file) => file.dms_id);
             });
         return result;

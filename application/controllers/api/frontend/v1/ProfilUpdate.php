@@ -47,6 +47,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			'insertProfilRequest' => self::PERM_LOGGED,
 			'updateProfilRequest' => self::PERM_LOGGED,
 			'deleteProfilRequest' => self::PERM_LOGGED,
+			'insertFile' => self::PERM_LOGGED,
 			]);
 
 		// Load language phrases
@@ -388,6 +389,68 @@ class ProfilUpdate extends FHCAPI_Controller
 
 	}
 
+	public function insertFile($replace)
+	{
+		$replace = json_decode($replace);
+		
+		if (!count($_FILES)) {
+			$this->terminateWithError("No file available for upload");
+		}
+
+		//? if replace is set it contains the profil_update_id in which the attachment_id has to be replaced
+		if (isset($replace)) {
+			
+			$this->ProfilUpdateModel->addSelect(["attachment_id"]);
+			$profilUpdate = $this->ProfilUpdateModel->load([$replace]);
+			if (isError($profilUpdate)) {
+				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_loading_error'));
+			}
+			//? get the attachmentID
+			$dms_id = $this->getDataOrTerminateWithError($profilUpdate)[0]->attachment_id;
+
+			//? delete old dms_file of Profil Update
+			$deleteOldFile_result = $this->deleteOldVersionFile($dms_id);
+			if(!$deleteOldFile_result){
+				$this->terminateWithError("error while deleting the old file");
+			}
+		}
+
+
+		$files = $_FILES['files'];
+		$file_count = count($files['name']);
+
+		$res = [];
+
+		for ($i = 0; $i < $file_count; $i++) {
+			$_FILES['files']['name'] = $files['name'][$i];
+			$_FILES['files']['type'] = $files['type'][$i];
+			$_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
+			$_FILES['files']['error'] = $files['error'][$i];
+			$_FILES['files']['size'] = $files['size'][$i];
+
+			$dms = [
+				"kategorie_kurzbz" => "profil_aenderung",
+				"version" => 0,
+				"name" => $_FILES['files']['name'],
+				"mimetype" => $_FILES['files']['type'],
+				"beschreibung" => $this->uid . " Profil Änderung",
+				"insertvon" => $this->uid,
+				"insertamum" => "NOW()",
+			];
+
+			$tmp_res = $this->dmslib->upload($dms, 'files', array("jpg", "png", "pdf"));
+			
+			if(isError($tmp_res)){
+				$this->addError(getError($tmp_res));
+			}
+
+			$tmp_res = $this->getDataOrTerminateWithError($tmp_res);
+			array_push($res, $tmp_res);
+		}
+
+		$this->terminateWithSuccess($res);
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 
@@ -582,6 +645,58 @@ class ProfilUpdate extends FHCAPI_Controller
 
 			}
 		}
+	}
+
+	private function deleteOldVersionFile($dms_id)
+	{
+		// starting the transaction
+		$this->db->trans_start();
+
+
+		if (!isset($dms_id)) {
+			return;
+		}
+
+		//? delete the file from the profilUpdate first
+		$profilUpdateFileDelete = $this->ProfilUpdateModel->removeFileFromProfilUpdate($dms_id);
+		if(isError($profilUpdateFileDelete)){
+			$this->terminateWithError(getError($profilUpdateFileDelete));
+		}
+		
+		//? delete all the different versions of the dms_file
+		$dmsVersions = $this->DmsVersionModel->loadWhere(["dms_id" => $dms_id]);
+		$dmsVersions = $this->getDataOrTerminateWithError($dmsVersions);
+		
+		
+
+		$dms_versions = array_map(function ($item) {
+			return $item->version;
+		}, $dmsVersions);
+
+
+		$test_array = array();
+		foreach ($dms_versions as $version) {
+			
+			$delete_result = $this->dmslib->removeVersion($dms_id, $version);
+			array_push($test_array, $delete_result);
+			
+			if(isError($delete_result)){
+				$this->addError(getError($delete_result));
+			}
+		}
+
+		// transaction complete
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === FALSE)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+		
 	}
 
 }
