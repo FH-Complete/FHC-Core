@@ -26,7 +26,7 @@ export default {
       employee: employee,
       organisationunit: organisationunit
     },
-    template: `
+    template: /*html*/`
           <form ref="searchform" class="d-flex me-3" action="javascript:void(0);" 
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
             <div class="input-group me-2 bg-white">

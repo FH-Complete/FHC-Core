@@ -58,6 +58,7 @@ require_once('dbupdate_3.4/25999_cis4_cms.php');
 require_once('dbupdate_3.4/36530_bis_internationsalisierung_codextabelle_neuerungen.php');
 require_once('dbupdate_3.4/34543_ux_template.php');
 require_once('dbupdate_3.4/17513_Entwicklungsteam.php');
+require_once('dbupdate_3.4/39911_tabulator_in_contentmittitel.php');
 
 
 	
