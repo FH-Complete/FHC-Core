@@ -68,6 +68,8 @@ class Lehrveranstaltung_model extends DB_Model
 			}
 
 		$qry.= '
+				/* filter lv type only */
+                AND lv.lehrtyp_kurzbz = \'lv\'
                 /* filter active lehrveranstaltungen */
                 AND lv.aktiv = TRUE
                 /* filter active organisationseinheiten */
@@ -132,6 +134,8 @@ class Lehrveranstaltung_model extends DB_Model
 		}
 
 		$qry.= '
+				/* filter lv type only */
+                AND lv.lehrtyp_kurzbz = \'lv\'
                 /* filter active lehrveranstaltungen */
                 AND lv.aktiv = TRUE
                 /* filter active organisationseinheiten */
