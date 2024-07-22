@@ -47,7 +47,7 @@ export default {
                 <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
                 <employee v-else-if="res.type === 'mitarbeiter'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                 <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
-                <raum v-else-if="res.type === 'raum'" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
+                <raum v-else-if="res.type === 'raum'" :res="res" :actions="getActionsForRoom(res)" @actionexecuted="this.hideresult"></raum>
                 <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
               </template>
             </div>
@@ -69,6 +69,33 @@ export default {
         this.updateSearchOptions();
     },
     methods: {
+        getActionsForRoom: function(res){
+            res.roomoverview= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+            FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+            `/CisVue/Cms/getRoomInformation/${res.ort_kurzbz}`; 
+
+            if(res.content_id !=="N/A"){
+                res.infolink= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+                FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+                `/CisVue/Cms/content/${res.content_id}`;
+            }
+
+            let child = this.searchoptions.actions.raum.childactions.filter((child)=>{
+                if(child.label =="Rauminformation" && res.content_id =="N/A"){
+                    return false;
+                }
+                return true;
+            });
+
+            let computedActions = {
+                childactions:child,
+                defaultaction:this.searchoptions.actions.raum.defaultaction
+            }
+            
+            return computedActions;
+            
+            
+        },
         updateSearchOptions: function() {
             this.searchsettings.types = [];
             for( const idx in this.searchoptions.types ) {

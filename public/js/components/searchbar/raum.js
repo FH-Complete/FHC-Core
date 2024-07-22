@@ -14,20 +14,7 @@ export default {
         action: function(data) { 
             return FHC_JS_DATA_STORAGE_OBJECT.app_root+'cms/content.php?content_id='+data.content_id;
         }
-      }; */ 
-
-      this.res.roomoverview= FHC_JS_DATA_STORAGE_OBJECT.app_root +
-      FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-      `/CisVue/Cms/getRoomInformation/${this.res.ort_kurzbz}`; 
-
-      if(this.res.content_id !=="N/A"){
-        this.res.infolink= FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/CisVue/Cms/content/${this.res.content_id}`;
-      }else{
-        this.res.infolink= '#';
-      }
-      
+      }; */
     },
     emits: [ 'actionexecuted' ],
     template: /*html*/`
