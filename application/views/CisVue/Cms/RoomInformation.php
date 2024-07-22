@@ -9,9 +9,12 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 ?>
 
 <div >
-	<h2>Room Information</h2>
+	<h2>Room Information: <?php echo $ort_kurzbz ?></h2>
 	<hr>
-    <div id="content"></div>
+	<div id="content">
+	<room-information ort_kurzbz="<?php echo $ort_kurzbz ?>"></room-information>
+	</div>
+    
 </div>
 
 <?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>

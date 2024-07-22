@@ -52,6 +52,14 @@ Vue.createApp({
                                 action: function(data) {
                                     return data.booklink;
                                 }
+                            },
+                            {
+                                label: "Raumübersicht",
+                                icon: "fas fa-bookmark",
+                                type: "link",
+                                action: function(data) {
+                                    return data.roomoverview;
+                                }
                             }
                         ]
                     },

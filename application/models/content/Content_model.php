@@ -170,7 +170,7 @@ class Content_model extends DB_Model
 						"content_id": 1000008,
 						"template_kurzbz": "redirect",
 						"titel": "room information (to delete)",
-						"content": "<content><url><![CDATA[' . site_url('/CisVue/Cms/getRoomInformation') . ']]></url><target><![CDATA[]]></target></content>",
+						"content": "<content><url><![CDATA[' . site_url('/CisVue/Cms/getRoomInformation/EDV_F4.26') . ']]></url><target><![CDATA[]]></target></content>",
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []

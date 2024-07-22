@@ -15,6 +15,19 @@ export default {
             return FHC_JS_DATA_STORAGE_OBJECT.app_root+'cms/content.php?content_id='+data.content_id;
         }
       }; */ 
+
+      this.res.roomoverview= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+      FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+      `/CisVue/Cms/getRoomInformation/${this.res.ort_kurzbz}`; 
+
+      if(this.res.content_id !=="N/A"){
+        this.res.infolink= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+        `/CisVue/Cms/content/${this.res.content_id}`;
+      }else{
+        this.res.infolink= '#';
+      }
+      
     },
     emits: [ 'actionexecuted' ],
     template: /*html*/`
@@ -36,6 +49,10 @@ export default {
                 <div class="searchbar_tablerow">
                   <div class="searchbar_tablecell">Standort</div>
                   <div class="searchbar_tablecell">{{ res.standort }}</div>
+                </div>
+                <div class="searchbar_tablerow">
+                  <div class="searchbar_tablecell">data</div>
+                  <div class="searchbar_tablecell">{{ JSON.stringify(res,null,2) }}</div>
                 </div>
                 <div class="searchbar_tablerow">
                   <div class="searchbar_tablecell">Sitzplätze</div>

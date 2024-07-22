@@ -116,7 +116,7 @@ class Cms extends FHC_Controller
 		}
 	}
 
-	public function getRoomInformation(){
-		$this->load->view('CisVue/Cms/RoomInformation');
+	public function getRoomInformation($ort_kurzbz){
+		$this->load->view('CisVue/Cms/RoomInformation',['ort_kurzbz'=>$ort_kurzbz]);
 	}
 }
