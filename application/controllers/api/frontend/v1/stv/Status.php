@@ -406,6 +406,26 @@ class Status extends FHCAPI_Controller
 			'integer' => $this->p->t('ui', 'error_fieldNotInteger', ['field' => 'Ausbildungssemester'])
 		]);
 
+		$this->form_validation->set_rules('_global', '', [
+			//check if Rolle already exists
+			['checkIfExistingPrestudentRolle', function () use (
+				$prestudent_id,
+				$status_kurzbz,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				$result = $this->prestudentstatuschecklib->checkIfExistingPrestudentRolle(
+					$prestudent_id,
+					$status_kurzbz,
+					$studiensemester_kurzbz,
+					$ausbildungssemester
+				);
+				return $this->getDataOrTerminateWithError($result);
+			}]
+		], [
+			'checkIfExistingPrestudentRolle' => $this->p->t('lehre', 'error_rolleBereitsVorhanden')
+		]);
+
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
@@ -432,19 +452,6 @@ class Status extends FHCAPI_Controller
 		{
 			$studiensemester_kurzbz = 	$this->getStudiensemesterOfStatus($prestudent_id, Prestudentstatus_model::STATUS_BEWERBER);
 
-		}
-
-		//check if Rolle already exists
-		$result = $this->prestudentstatuschecklib->checkIfExistingPrestudentRolle(
-			$prestudent_id,
-			$status_kurzbz,
-			$studiensemester_kurzbz,
-			$ausbildungssemester
-		);
-
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 
 		//Check Reihungstest
@@ -520,7 +527,7 @@ class Status extends FHCAPI_Controller
 			{
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 			}
-			$isStudent = true;
+			$isStudent = getData($result);
 		}
 
 		$isBerechtigtNoStudstatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
@@ -770,7 +777,7 @@ class Status extends FHCAPI_Controller
 		}
 	}
 
-		public function addStudent($prestudent_id)
+	public function addStudent($prestudent_id)
 	{
 		//get Studiengang von prestudent_id
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
@@ -1611,21 +1618,37 @@ class Status extends FHCAPI_Controller
 			}
 		}
 
-		//check if Rolle already exists
-		if(($key_studiensemester_kurzbz != $studiensemester_kurzbz)
-			|| ($key_ausbildungssemester != $ausbildungssemester))
-		{
-			$result = $this->prestudentstatuschecklib->checkIfExistingPrestudentRolle(
+		//Form Validation
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('_global', '', [
+			//check if Rolle already exists
+			['checkIfExistingPrestudentRolle', function () use (
 				$prestudent_id,
 				$status_kurzbz,
 				$studiensemester_kurzbz,
-				$ausbildungssemester
-			);
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-		}
+				$ausbildungssemester,
+				$key_studiensemester_kurzbz,
+				$key_ausbildungssemester
+			) {
+				if ($key_studiensemester_kurzbz == $studiensemester_kurzbz
+					&&  $key_ausbildungssemester == $ausbildungssemester
+				)
+					return true;
+				$result = $this->prestudentstatuschecklib->checkIfExistingPrestudentRolle(
+					$prestudent_id,
+					$status_kurzbz,
+					$studiensemester_kurzbz,
+					$ausbildungssemester
+				);
+				return $this->getDataOrTerminateWithError($result);
+			}]
+		], [
+			'checkIfExistingPrestudentRolle' => $this->p->t('lehre', 'error_rolleBereitsVorhanden')
+		]);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		//check if studentrolle already exists
 		if($status_kurzbz == Prestudentstatus_model::STATUS_STUDENT || $status_kurzbz == Prestudentstatus_model::STATUS_DIPLOMAND )
@@ -1638,7 +1661,7 @@ class Status extends FHCAPI_Controller
 			{
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 			}
-			$isStudent = true;
+			$isStudent = getData($result);
 		}
 
 
@@ -1806,17 +1829,45 @@ class Status extends FHCAPI_Controller
 
 		$ausbildungssem_next = $key_ausbildungssemester+1;
 
-		//check if Rolle already exists
-		$result = $this->prestudentstatuschecklib->checkIfExistingPrestudentRolle(
-			$key_prestudent_id,
-			$key_status_kurzbz,
-			$studiensem_next,
-			$ausbildungssem_next
-		);
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
+		//Form Validation
+		$this->load->library('form_validation');
+
+		$last_status_kurzbz = $lastStatusData->status_kurzbz; // TODO(chris): copy pasta!
+
+		$this->form_validation->set_rules('_global', '', [
+			//check if Rolle already exists
+			['checkIfExistingPrestudentRolle', function () use (
+				$key_prestudent_id,
+				$key_status_kurzbz,
+				$studiensem_next,
+				$ausbildungssem_next
+			) {
+				$result = $this->prestudentstatuschecklib->checkIfExistingPrestudentRolle(
+					$key_prestudent_id,
+					$key_status_kurzbz,
+					$studiensem_next,
+					$ausbildungssem_next
+				);
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			['status_stud_exists', function () use ($key_prestudent_id, $key_status_kurzbz, $last_status_kurzbz) {
+				if ($key_status_kurzbz != Prestudentstatus_model::STATUS_STUDENT
+					&& $key_status_kurzbz != Prestudentstatus_model::STATUS_DIPLOMAND
+					&& $last_status_kurzbz != Prestudentstatus_model::STATUS_STUDENT
+				)
+					return true;
+				
+				$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($key_prestudent_id);
+
+				return $this->getDataOrTerminateWithError($result);
+			}]
+		], [
+			'checkIfExistingPrestudentRolle' => $this->p->t('lehre', 'error_rolleBereitsVorhanden'),
+			'status_stud_exists' => $this->p->t('lehre', 'error_noStudstatus')
+		]);
+		
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		//check if studentrolle already exists
 		// if($key_status_kurzbz == Prestudentstatus_model::STATUS_STUDENT)
@@ -1832,14 +1883,6 @@ class Status extends FHCAPI_Controller
 		// 		return $this->terminateWithError($this->p->t('lehre','error_noStudstatus'), self::ERROR_TYPE_GENERAL);
 		// 	}
 		// }
-		if($key_status_kurzbz == Prestudentstatus_model::STATUS_STUDENT || $key_status_kurzbz == Prestudentstatus_model::STATUS_DIPLOMAND || $lastStatusData->status_kurzbz == Prestudentstatus_model::STATUS_STUDENT)
-		{
-			$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($key_prestudent_id);
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-		}
 
 		// Start DB transaction
 		$this->db->trans_begin();
