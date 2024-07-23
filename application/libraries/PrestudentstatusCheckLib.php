@@ -335,7 +335,8 @@ class PrestudentstatusCheckLib
 			'laststatus' => true,
 			'unterbrechersemester' => true,
 			'abbrechersemester' => true,
-			'diplomant' => true
+			'diplomant' => true,
+			'student' => true
 		];
 
 		for ($n = 0, $c = 1; $c < $historyCount; $n++, $c++) {
@@ -344,6 +345,7 @@ class PrestudentstatusCheckLib
 				&& !$checks['unterbrechersemester']
 				&& !$checks['abbrechersemester']
 				&& !$checks['diplomant']
+				&& !$checks['student']
 			)
 				break; // early out
 
@@ -358,32 +360,44 @@ class PrestudentstatusCheckLib
 
 			// Abbrecher- oder Absolventenstatus muss Endstatus sein
 			if ($checks['laststatus']
-				&& in_array($current->status_kurzbz, ['Absolvent', 'Abbrecher'])
+				&& in_array($current->status_kurzbz, [self::ABSOLVENT_STATUS, self::ABBRECHER_STATUS])
 			)
 				$checks['laststatus'] = false;
 
 			// wenn Unterbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
 			if ($checks['unterbrechersemester']
-				&& $current->status_kurzbz == 'Unterbrecher'
-				&& $next->status_kurzbz == 'Unterbrecher'
+				&& $current->status_kurzbz == self::UNTERBRECHER_STATUS
+				&& $next->status_kurzbz == self::UNTERBRECHER_STATUS
 				&& $current->ausbildungssemester != $next->ausbildungssemester
 			)
 				$checks['unterbrechersemester'] = false;
 
 			// wenn Abbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
 			if ($checks['abbrechersemester']
-				&& $current->status_kurzbz == 'Unterbrecher'
-				&& $next->status_kurzbz == 'Abbrecher'
+				&& $current->status_kurzbz == self::UNTERBRECHER_STATUS
+				&& $next->status_kurzbz == self::ABBRECHER_STATUS
 				&& $current->ausbildungssemester != $next->ausbildungssemester
 			)
 				$checks['abbrechersemester'] = false;
 
-			// keine Studenten nach Diplomand Status
-			if ($checks['diplomant']
-				&& $current->status_kurzbz == 'Diplomand'
-				&& $next->status_kurzbz == 'Student'
-			)
-				$checks['diplomant'] = false;
+			if (($checks['diplomant']
+				|| $checks['student'])
+				&& $next->status_kurzbz == self::STUDENT_STATUS
+			) {
+				$restl_stati = array_unique(array_column(array_slice($history, $c), 'status_kurzbz'));
+
+				// keine Studenten nach Diplomand Status
+				if ($checks['diplomant']
+					&& in_array(self::DIPLOMAND_STATUS, $restl_stati)
+				)
+					$checks['diplomant'] = false;
+
+				// vor Studentenstatus müssen bestimmte Status vorhanden sein
+				if ($checks['student']
+					&& array_values(array_intersect($restl_stati, $this->_statusAbfolgeVorStudent)) != array_values($this->_statusAbfolgeVorStudent)
+				)
+					$checks['student'] = false;
+			}
 		}
 
 		$this->_cache_history[$primary] = success($checks);
@@ -585,6 +599,44 @@ class PrestudentstatusCheckLib
 	}
 
 	/**
+	 * Checks if a Student precedes given stati in the status history.
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param DateTime				$new_date
+	 * @param string				$new_studiensemester_kurzbz
+	 * @param integer				$new_ausbildungssemester
+	 * @param string				$old_studiensemester_kurzbz
+	 * @param integer				$old_ausbildungssemester
+	 *
+	 * @return stdClass
+	 */
+	public function checkStatusHistoryStudent(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester
+	) {
+		$result = $this->prepareStatusHistory(
+			$prestudent_id,
+			$status_kurzbz,
+			$new_date,
+			$new_studiensemester_kurzbz,
+			$new_ausbildungssemester,
+			$old_studiensemester_kurzbz,
+			$old_ausbildungssemester
+		);
+
+		if (isError($result))
+			return $result;
+
+		return success(getData($result)['student']);
+	}
+
+	/**
 	 * Checks if Personenkennzeichen is set correctly.
 	 *
 	 * @param integer				$prestudent_id
@@ -605,6 +657,7 @@ class PrestudentstatusCheckLib
 		$this->_ci->PrestudentstatusModel->addLimit(1);
 		
 		$result = $this->_ci->PrestudentstatusModel->loadWhere([
+			'tbl_prestudentstatus.prestudent_id' => $prestudent_id,
 			'tbl_prestudentstatus.status_kurzbz' => self::STATUS_STUDENT
 		]);
 

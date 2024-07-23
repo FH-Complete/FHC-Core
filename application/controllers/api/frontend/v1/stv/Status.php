@@ -262,9 +262,6 @@ class Status extends FHCAPI_Controller
 
 				return $this->getDataOrTerminateWithError($result);
 			}]
-			// TODO(chris): check status history error_wrongStatusOrderBeforeStudent
-			// TODO(chris): check status history error_personenkennzeichenPasstNichtZuStudiensemester
-			// TODO(chris): check status history error_bewerberOrgformUngleichStudentOrgform
 		], [
 			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhanden'),
 			'history_timesequence' => $this->p->t('lehre', 'error_statuseintrag_zeitabfolge'),
