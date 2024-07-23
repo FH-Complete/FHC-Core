@@ -585,6 +585,46 @@ class PrestudentstatusCheckLib
 	}
 
 	/**
+	 * Checks if Personenkennzeichen is set correctly.
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return stdClass
+	 */
+	public function checkPersonenkennzeichen($prestudent_id)
+	{
+		$this->_ci->PrestudentstatusModel->addSelect('tbl_prestudentstatus.prestudent_id');
+		$this->_ci->PrestudentstatusModel->addSelect('tbl_student.matrikelnr');
+
+		$this->_ci->PrestudentstatusModel->addJoin('public.tbl_student', 'prestudent_id');
+
+		$this->_ci->PrestudentstatusModel->addOrder('tbl_prestudentstatus.datum', 'DESC');
+		$this->_ci->PrestudentstatusModel->addOrder('tbl_prestudentstatus.insertamum', 'DESC');
+		$this->_ci->PrestudentstatusModel->addOrder('tbl_prestudentstatus.ext_id', 'DESC');
+		
+		$this->_ci->PrestudentstatusModel->addLimit(1);
+		
+		$result = $this->_ci->PrestudentstatusModel->loadWhere([
+			'tbl_prestudentstatus.status_kurzbz' => self::STATUS_STUDENT
+		]);
+
+		if (isError($result))
+			return $result;
+
+		if (!hasData($result))
+			return success(true); // Not a student yet so no wrong personenkennzeichen
+
+		$data = current(getData($result));
+
+		$jahr = $this->_ci->StudiensemesterModel->getStudienjahrNumberFromStudiensemester($data->studiensemester_kurzbz);
+
+
+		return success($jahr == mb_substr($data->matrikelnr, 0, 2));
+	}
+
+	// TODO(chris): check status history error_bewerberOrgformUngleichStudentOrgform
+
+	/**
 	 * Check if History of StatusData is valid
 	 * @param integer $prestudent_id
 	 * @return error if not valid, array StatusArr if valid
