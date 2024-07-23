@@ -1099,7 +1099,7 @@ class Status extends FHCAPI_Controller
 				{
 					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
-			}
+			} // NOTE(chris): this does not do anything since $isStudent did the same thing and returned positive success
 
 			$this->load->library('PrestudentLib');
 			$result = $this->prestudentlib->setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtam, $bestaetigtvon);
