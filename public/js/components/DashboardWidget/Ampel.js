@@ -7,7 +7,7 @@ export default {
     data: () => ({
         filter: '',
         source: '',
-        ampeln: []
+        ampeln: [],
     }),
     mixins: [
         AbstractWidget
@@ -76,13 +76,33 @@ export default {
             return buttontext == null ? 'Bestätigen' : buttontext;
         }
     },
-    created() {
+    async created() {
+        
+        let temporary_ampeln=null;
+        let temporary_confirmedAmpeln=null;
+
+        await this.$fhcApi.factory.ampeln.getAllActiveAmpeln().then(res=>{
+            temporary_ampeln = res.data;
+        }); 
+
+        await this.$fhcApi.factory.ampeln.getConfirmedActiveAmpeln().then(res=>{
+            temporary_confirmedAmpeln = res.data;
+        });
+
+
+        /* this.ampeln = temporary_ampeln.filter((ampel)=>{
+                if(temporary_confirmedAmpeln.some((confirmedAmpel)=> confirmedAmpel.ampel_id === ampel.ampel_id)){
+                    return false;
+                }
+                return true;
+            });
+ */
         this.$emit('setConfig', false);
-        this.ampeln = TEST_OFFENE_AMPELN;
+        
     },
-    template: `
+    template: /*html*/`
     <div class="widgets-ampel w-100 h-100">
-        <div class="d-flex flex-column justify-content-between">
+        <div v-if="ampeln" class="d-flex flex-column justify-content-between">
             <div class="d-flex">
                 <header class="me-auto"><b>Neueste Ampeln</b></header>
                 <div class="mb-2 text-danger"><a href="#allAmpelOffcanvas" data-bs-toggle="offcanvas">Alle Ampeln</a></div>
@@ -105,12 +125,28 @@ export default {
                     </div>
                 </div>
             </div>
+            
             <div v-if="ampeln.length == 0" class="card card-body mt-4 p-4 text-center">
                 <span class="text-success h2"><i class="fa fa-solid fa-circle-check"></i></span>
                 <span class="text-success h5">Super!</span><br>
                 <span class="small">Keine offenen Ampeln.</span>
             </div>
         </div>
+        <div v-else>
+        <header class="me-auto"><b>Neueste Ampeln</b></header>
+            <template v-for="n in 4">
+                <div class="mt-2 card" aria-hidden="true">
+                <div class="card-body">
+                    <p class="card-text placeholder-glow">
+                    <span class="placeholder col-7"></span>
+                    <span class="placeholder col-12"></span>
+                    </p>
+                </div>
+                </div>
+            </template>
+
+        </div>
+        
     </div>
 
     <!-- All Ampeln Offcanvas -->

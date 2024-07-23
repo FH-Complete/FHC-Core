@@ -27,7 +27,9 @@ class Ampeln extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getAmpeln' => self::PERM_LOGGED,
+			'getNonConfirmedActiveAmpeln' => self::PERM_LOGGED,
+            'getAllActiveAmpeln' => self::PERM_LOGGED,
+            'getConfirmedActiveAmpeln' => self::PERM_LOGGED,
             
 		]);
 
@@ -50,7 +52,7 @@ class Ampeln extends FHCAPI_Controller
      * @access public
 	 * 
 	 */
-	public function getAmpeln()
+	public function getNonConfirmedActiveAmpeln()
 	{
         $userAmpeln = array();
         $ampel_result = $this->AmpelModel->active();
@@ -62,6 +64,59 @@ class Ampeln extends FHCAPI_Controller
             
             $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
             if(!$confirmedByUser){
+                $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
+                $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
+                foreach($userUID_array as $user_obj){
+                    
+                    $user_uid = property_exists($user_obj,"uid") ? $user_obj->uid : $user_obj->mitarbeiter_uid;
+                    if($user_uid === $this->uid){
+                        $userAmpeln[] = $ampel;
+                    }
+                }
+                    
+            }
+            
+        }
+
+        $this->terminateWithSuccess($userAmpeln);
+	}
+
+    public function getAllActiveAmpeln()
+	{
+        $userAmpeln = array();
+        $ampel_result = $this->AmpelModel->active();
+
+        $ampel_result = $this->getDataOrTerminateWithError($ampel_result);
+
+        foreach($ampel_result as $ampel){
+            
+            $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
+            $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
+            foreach($userUID_array as $user_obj){
+                
+                $user_uid = property_exists($user_obj,"uid") ? $user_obj->uid : $user_obj->mitarbeiter_uid;
+                if($user_uid === $this->uid){
+                    $userAmpeln[] = $ampel;
+                }
+            }
+            
+        }
+
+        $this->terminateWithSuccess($userAmpeln);
+	}
+
+    public function getConfirmedActiveAmpeln()
+	{
+        $userAmpeln = array();
+        $ampel_result = $this->AmpelModel->active();
+
+        $ampel_result = $this->getDataOrTerminateWithError($ampel_result);
+
+        $is_confirmed_array = array();
+        foreach($ampel_result as $ampel){
+            
+            $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
+            if($confirmedByUser){
                 $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
                 $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
                 foreach($userUID_array as $user_obj){
