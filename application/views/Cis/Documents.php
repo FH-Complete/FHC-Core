@@ -14,8 +14,8 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 	</div>
 	
 	<div class="row">
-		<!--<div class="col<?= $selfservice ? '-8' : ''; ?>">-->
-		<div class="col-lg-8">
+	
+		<div class="order-2 col-lg-8">
 			<div class="fhc-table mb-3">
 				<div class="fhc-table-header d-flex align-items-center mb-2 gap-2">
 					<h3 class="h5 col m-0"><?= $this->p->t('tools', 'inskriptionsbestaetigung'); ?><?= $studienbuchblatt ? ' & ' . $this->p->t('tools', 'studienbuchblatt') : ''; ?></h3>
@@ -200,12 +200,13 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 			<?php } ?>
 		</div>
 		<?php if ($selfservice) { ?>
-			<div class="col-lg-4">
+			<div class="order-1 order-lg-3 col-lg-4">
 				<div class="alert alert-warning" role="alert">
 					<?= $this->p->t('tools', 'warnungDruckDigitaleSignatur'); ?>
 				</div>
 			</div>
 		<?php } ?>
+		
 	</div>
 </div>
 
