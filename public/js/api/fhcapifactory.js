@@ -22,6 +22,7 @@ import filter from "./filter.js";
 import studstatus from "./studstatus.js";
 import profil from "./profil.js";
 import profilUpdate from "./profilUpdate.js";
+import ampeln from "./ampeln.js";
 
 export default {
     search,
@@ -31,4 +32,5 @@ export default {
     studstatus,
     profil,
     profilUpdate,
+    ampeln,
 };
