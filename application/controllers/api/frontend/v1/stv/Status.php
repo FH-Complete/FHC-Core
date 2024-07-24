@@ -851,7 +851,7 @@ class Status extends FHCAPI_Controller
 			}
 
 			$this->load->library('PrestudentLib');
-			$result = $this->prestudentlib->setFirstStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, null, $bestaetigtam, $bestaetigtvon, $stg, $uidStudent);
+			$result = $this->prestudentlib->setFirstStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtam, $bestaetigtvon, $stg, $uidStudent);
 
 			if (isError($result)) {
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);

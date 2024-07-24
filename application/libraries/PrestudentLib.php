@@ -568,6 +568,7 @@ class PrestudentLib
 			'status_kurzbz' => Prestudentstatus_model::STATUS_STUDENT,
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'ausbildungssemester' => $ausbildungssemester,
+			'statusgrund_id' => $statusgrund_id,
 			'datum' => date('c'),
 			'insertvon' => $insertvon,
 			'insertamum' => date('c'),

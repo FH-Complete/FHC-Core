@@ -133,6 +133,14 @@ export default{
 		toolbarStudent() {
 			return this.listDataToolbar.filter(item => this.statiStudent.includes(item.status_kurzbz));
 		},
+		sortedGruende() {
+			return this.listDataToolbar.reduce((result,current) => {
+				if (!result[current.status_kurzbz])
+					result[current.status_kurzbz] = [];
+				result[current.status_kurzbz].push(current);
+				return result;
+			}, {});
+		},
 		resultInteressentArray() {
 			const result = [];
 			this.statiInteressent.forEach(status => {
@@ -140,18 +148,16 @@ export default{
 					status_kurzbz: status,
 					statusgrund_id: null,
 					link: `changeStatusTo${status}`,
-					dropEntry: null
+					dropEntry: null,
+					children: []
 				};
 
 				if (status === "Student") {
 					defaultObject.link = 'changeInteressentToStudent';
 				}
-
 				result.push(defaultObject);
-
-				this.toolbarInteressent.forEach(item => {
-					if (item.status_kurzbz === status) {
-
+				if(this.sortedGruende[status]) {
+					this.sortedGruende[status].forEach(item => {
 						const itemObject = {
 							status_kurzbz: item.status_kurzbz,
 							statusgrund_id: item.statusgrund_id,
@@ -164,10 +170,9 @@ export default{
 							itemObject.link = `changeInteressentTo${item.status_kurzbz}(${item.statusgrund_id})`;
 						}
 
-						result.push(itemObject);
-
-					}
-				});
+						defaultObject.children.push(itemObject);
+					});
+				}
 			});
 			return result;
 		},
@@ -667,7 +672,7 @@ export default{
 			this.actionConfirmDialogue(this.updateData, 'wartender','Wartenden');
 		},
 		addStudent(prestudentIds){
-
+			//this.hideModal('confirmStatusAction');
 			let changeData = {};
 
 			//for Feedback Sucess, Error
@@ -968,17 +973,18 @@ export default{
 			const today = new Date();
 			return today;
 		},
-		handleSelectionChange(event) {
-			const selectedValue = event.target.value;
-			const selectedItem = this.resultInteressentArray.find(item =>
-				item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '') === selectedValue
-			);
-			if (selectedItem && typeof this[selectedItem.link] === 'function') {
-				this[selectedItem.link]();
+		executeLink(link) {
+			// Split the link string to extract the function name and arguments
+			const match = link.match(/(\w+)\(([^)]*)\)/);
+			const functionName = match ? match[1] : link;
+			const args = match ? match[2].split(',').map(arg => arg.trim()) : [];
+			
+			if (typeof this[functionName] === 'function') {
+				this[functionName](...args);
 			} else {
-				console.warn(`No method found for ${selectedItem.link}`);
+				console.error(`Method ${functionName} not found`);
 			}
-		}
+		},
 	},
 	created(){
 		this.$fhcApi
@@ -1014,27 +1020,7 @@ export default{
 	template: `
 		<div class="stv-list h-100 pt-3">
 		
-	<!--<div>
-				<table class="table">
-				<thead>
-					<tr>
-					<th>Status Kurzbez</th>
-					<th>Bezeichnung</th>
-					<th>Status Grund ID</th>
-					<th>Link</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for="item in resultInteressentArray" :key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')">
-					<td>{{ item.status_kurzbz }}</td>
-					<td>{{ item.beschreibung }}</td>
-					<td>{{ item.statusgrund_id }}</td>
-					<td><a :href="item.link">{{ item.link }}</a></td>
-					</tr>
-				</tbody>
-				</table>
-			</div> -->
-			
+		
 			<!--Modal: statusModal-->
 			<bs-modal ref="statusModal">
 				<template #title>
@@ -1279,76 +1265,39 @@ export default{
 				<template #actions="{updateData2}">
 					<!-- SingleSelectButton-->
 					<div class="btn-group">						
-						<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+						<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
 							{{$p.t('lehre', 'btn_statusAendern')}}
 						</button>
-												
-						<!--toolbar Interessent-->		
-						<ul v-if="showToolbarInteressent" class="dropdown-menu">
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToBewerber(prestudentIds)">Bewerber</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToAufgenommener">Aufgenommener</a>
-							</li>				
-							<li class="dropdown-submenu">
-								<a class="dropdown-item dropdown-toggle" href="#">Student</a>
-								<ul class="dropdown-menu dropdown-menu-right">
-									<li>
-										<a class="dropdown-item" @click="changeInteressentToStudent(prestudentIds)">Student</a>
+															
+						    <ul v-if="showToolbarInteressent" class="dropdown-menu">
+							  <li v-for="item in resultInteressentArray" :key="item.status_kurzbz" class="w-100">
+
+								<div v-if="item.children.length > 0" class="btn-group dropend w-100">
+								  <a
+									class="dropdown-item dropdown-toggle"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									href="#"
+								  >
+									{{ item.status_kurzbz }}
+								  </a>
+								  <ul class="dropdown-menu dropdown-menu-right">
+									<li v-for="child in item.children" :key="child.statusgrund_id">
+									  <a class="dropdown-item" @click="executeLink(child.link)">{{ child.beschreibung }}</a>
 									</li>
-									<li>
-										<a class="dropdown-item" @click="changeInteressentToStudent(19)">Pre-Abbrecher</a>
-									</li>
-									<li>
-										<a class="dropdown-item" @click="changeInteressentToStudent(15)">Pre-Wiederholer</a>
-									</li>
-									<li>
-										<a class="dropdown-item" @click="changeInteressentToStudent(16)">Wiederholer</a>
-									</li>
-								</ul>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToWartender">Wartender</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item dropdown-toggle" href="#">Absage</a>
-								<ul class="dropdown-menu dropdown-menu-right">
-									<li>
-										<a class="dropdown-item" @click="changeStatusToAbgewiesener(2)">Keine Antwort</a>
-									</li>
-									<li>
-										<a class="dropdown-item" @click="changeStatusToAbgewiesener(3)">ZGV nicht erfüllt</a>
-									</li>									
-									<li>
-										<a class="dropdown-item" @click="changeStatusToAbgewiesener(4)">Von BewerberIn storniert</a>
-									</li>									
-									<li>
-										<a class="dropdown-item" @click="changeStatusToAbgewiesener(5)">Aufnahme in anderen Studiengang</a>
-									</li>									
-									<li>
-										<a class="dropdown-item" @click="changeStatusToAbgewiesener(6)">Reihungstestergebnis unzureichend</a>
-									</li>									
-									<li>
-										<a class="dropdown-item" @click="changeStatusToAbgewiesener(7)">Sonstiges</a>
-									</li>
-								</ul>
-							</li>					
-						</ul>
-												
-						<!-- SingleSelectButton Dynamisch Interessent-->
-						<div v-if="showToolbarInteressent" class="btn-group">
-							<select v-model="selectedStatus" class="form-select button-dropdown" @change="handleSelectionChange">
-							<option value="default">---SELECT STATUS INTERESSENT---</option>
-							<option 
-								v-for="item in resultInteressentArray" 
-								:key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
-								:value="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
-							>
-								{{ item.status_kurzbz }} {{ item.bezeichnung }} {{ item.dropEntry }}
-							</option>
-							</select>
-						</div>
+								  </ul>
+								</div>
+						
+								<div v-else>
+								  <a
+									class="dropdown-item"
+									@click="executeLink(item.link)"
+								  >
+									{{ item.status_kurzbz }}
+								  </a>
+								</div>
+							  </li>
+							</ul>	
 					
 						<!--toolbar Student-->
 						<ul v-if="showToolbarStudent" class="dropdown-menu">
@@ -1399,78 +1348,41 @@ export default{
 				ref="buttonsStatusMulti"
 			>	
 			<!--MultiSelectButton-->
-			<div v-if="showToolbar" class="btn-group">						
-				<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-					Status Ändern
+			<div v-if="showToolbar"  class="btn-group">						
+				<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+					{{$p.t('lehre', 'btn_statusAendern')}}
 				</button>
-							
-				<!--toolbar Interessent-->		
-				<ul v-if="showToolbarInteressent" class="dropdown-menu">
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="changeStatusToBewerber(prestudentIds)">Bewerber</a>
-					</li>
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="changeStatusToAufgenommener">Aufgenommener</a>
-					</li>				
-					<li class="dropdown-submenu">
-						<a class="dropdown-item dropdown-toggle" href="#">Student</a>
-						<ul class="dropdown-menu dropdown-menu-right">
-							<li>
-								<a class="dropdown-item" @click="changeInteressentToStudent(prestudentIds)">Student</a>
+													
+					<ul v-if="showToolbarInteressent" class="dropdown-menu">
+					  <li v-for="item in resultInteressentArray" :key="item.status_kurzbz" class="w-100">
+
+						<div v-if="item.children.length > 0" class="btn-group dropend w-100">
+						  <a
+							class="dropdown-item dropdown-toggle"
+							data-bs-toggle="dropdown"
+							aria-expanded="false"
+							href="#"
+						  >
+							{{ item.status_kurzbz }}
+						  </a>
+						  <ul class="dropdown-menu dropdown-menu-right">
+							<li v-for="child in item.children" :key="child.statusgrund_id">
+							  <a class="dropdown-item" @click="executeLink(child.link)">{{ child.beschreibung }}</a>
 							</li>
-							<li>
-								<a class="dropdown-item" @click="changeInteressentToStudent(19)">Pre-Abbrecher</a>
-							</li>
-							<li>
-								<a class="dropdown-item" @click="changeInteressentToStudent(15)">Pre-Wiederholer</a>
-							</li>
-							<li>
-								<a class="dropdown-item" @click="changeInteressentToStudent(16)">Wiederholer</a>
-							</li>
-						</ul>
-					</li>
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="changeStatusToWartender">Wartender</a>
-					</li>
-					<li class="dropdown-submenu">
-						<a class="dropdown-item dropdown-toggle" href="#">Absage</a>
-						<ul class="dropdown-menu dropdown-menu-right">
-							<li>
-								<a class="dropdown-item" @click="changeStatusToAbgewiesener(2)">Keine Antwort</a>
-							</li>
-							<li>
-								<a class="dropdown-item" @click="changeStatusToAbgewiesener(3)">ZGV nicht erfüllt</a>
-							</li>									
-							<li>
-								<a class="dropdown-item" @click="changeStatusToAbgewiesener(4)">Von BewerberIn storniert</a>
-							</li>									
-							<li>
-								<a class="dropdown-item" @click="changeStatusToAbgewiesener(5)">Aufnahme in anderen Studiengang</a>
-							</li>									
-							<li>
-								<a class="dropdown-item" @click="changeStatusToAbgewiesener(6)">Reihungstestergebnis unzureichend</a>
-							</li>									
-							<li>
-								<a class="dropdown-item" @click="changeStatusToAbgewiesener(7)">Sonstiges</a>
-							</li>
-						</ul>
-					</li>					
-				</ul>
+						  </ul>
+						</div>
 				
-				<!-- Dynamisch Interessent-->
-				<div v-if="showToolbarInteressent" class="btn-group">
-					<select v-model="selectedStatus" class="form-select button-dropdown" @change="handleSelectionChange">
-					<option value="default">---SELECT STATUS INTERESSENT---</option>
-					<option 
-						v-for="item in resultInteressentArray" 
-						:key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
-						:value="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
-					>
-						{{ item.status_kurzbz }} {{ item.bezeichnung }} {{ item.dropEntry }}
-					</option>
-					</select>
-				</div>
-			
+						<div v-else>
+						  <a
+							class="dropdown-item"
+							@click="executeLink(item.link)"
+						  >
+							{{ item.status_kurzbz }}
+						  </a>
+						</div>
+					  </li>
+					</ul>	
+							
 				<!--toolbar Student-->
 				<ul v-if="showToolbarStudent" class="dropdown-menu">
 					<li class="dropdown-submenu">
