@@ -18,6 +18,7 @@ $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 
 <h2><?php echo isset($content_id)? "Content" : "News" ?></h2>
+<hr/>
 <div id="cms">
 <?php echo (isset($content_id) ? '<cms-content :content_id="'.$content_id.'" :version="'.$version.'" :sprache="'.$sprache.'" :sichtbar="'.$sichtbar.'" />' : '<cms-news/>'); ?>
 	
