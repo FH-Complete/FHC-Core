@@ -1281,6 +1281,79 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
+		'app' => 'core',
+		'dataset_name' => 'softwareManagement',
+		'filter_kurzbz' => 'SoftwareManagement',
+		'description' => '{Software Verwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "SoftwareManagement",
+				"columns": [
+					{"name": "software_kurzbz"},
+					{"name": "version"},
+					{"name": "beschreibung"},
+					{"name": "hersteller"},
+					{"name": "os"},
+					{"name": "lizenzserver_kurzbz"},
+					{"name": "lizenzserver_port"},
+					{"name": "softwarestatus_kurzbz"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'imageVerwaltung',
+		'filter_kurzbz' => 'ImageVerwaltung',
+		'description' => '{Image Verwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "ImageVerwaltung",
+				"columns": [
+					{"name": "bezeichnung"},
+					{"name": "betriebssystem"},
+					{"name": "verfuegbarkeit_start"},
+					{"name": "verfuegbarkeit_ende"},
+					{"name": "anmerkung"},
+					{"name": "ort_count"},
+					{"name": "software_count"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'lizenzserverVerwaltung',
+		'filter_kurzbz' => 'LizenzserverVerwaltung',
+		'description' => '{Lizenzserver Verwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "LizenzserverVerwaltung",
+				"columns": [
+					{"name": "lizenzserver_kurzbz"},
+					{"name": "bezeichnung"},
+					{"name": "macadresse"},
+					{"name": "ipadresse"},
+					{"name": "ansprechpartner"},
+					{"name": "anmerkung"},
+					{"name": "location"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
 		'app' => 'fhctemplate',
 		'dataset_name' => 'exampledata',
 		'filter_kurzbz' => 'exampledata',
@@ -1305,7 +1378,44 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null
-	)
+		),
+		array(
+			'app' => 'personalverwaltung',
+			'dataset_name' => 'handyverwaltung',
+			'filter_kurzbz' => 'ma4handyverwaltung',
+			'description' => '{MA Handyverwaltung}',
+			'sort' => 1,
+			'default_filter' => true,
+			'filter' => '
+				{
+					"name": "MA Handyverwaltung",
+					"columns": [
+						{"name": "UID"},
+						{"name": "PersonId"},
+						{"name": "Vorname"},
+						{"name": "Nachname"},
+						{"name": "EMail"}, 
+						{"name": "Unternehmen"}, 
+						{"name": "Vertragsart"}, 
+						{"name": "DV_von"}, 
+						{"name": "DV_bis"}, 
+						{"name": "Wochenstunden"}, 
+						{"name": "WS_von"}, 
+						{"name": "WS_bis"}, 
+						{"name": "Standardkostenstelle"}
+					],
+					"filters": [
+						{
+							"name": "Nachname",
+							"option": "",
+							"operation": "",
+							"condition": ""
+						}
+					]
+				}
+			',
+			'oe_kurzbz' => null,
+		),
 );
 
 // Loop through the filters array
