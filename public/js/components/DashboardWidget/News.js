@@ -101,7 +101,7 @@ export default {
   <BsModal ref="allNewsModal" id="allNewsModal" dialog-class="modal-fullscreen">
     <template #title>Alle News</template>
     <template #default>
-    <div class="row row-cols-5 g-4 h-100 px-5">
+    <div class="row row-cols-md-2 row-cols-lg-3 row-cols-xl-5 g-4 h-100 px-5">
      <div v-for="news in allNewsList" :key="news.id">
             <div class="card h-100">
                 <img :src="placeHolderImgURL" class="card-img-top">

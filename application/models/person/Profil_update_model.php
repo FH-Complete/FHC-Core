@@ -77,6 +77,21 @@ class Profil_update_model extends DB_Model
 
 	}
 
+	//? remove File from the Profil Update
+	public function removeFileFromProfilUpdate($dms_id)
+	{
+
+		if(!is_int($dms_id) || $dms_id < 0){
+			return error("not valid dms_id");
+		}
+		
+		return $this->execReadOnlyQuery("
+		UPDATE public.tbl_profil_update
+		SET attachment_id = NULL
+		WHERE attachment_id = ?", [$dms_id]);
+
+	}
+
 
 	/**
 	 * getProfilUpdateWithPermission

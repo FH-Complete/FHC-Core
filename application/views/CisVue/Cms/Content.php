@@ -11,7 +11,7 @@ $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 
 <div id="cms">
-	<?= $content; ?>
+<?php echo (isset($content) ? $content : '<content/>'); ?>
 </div>
 
 <?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>

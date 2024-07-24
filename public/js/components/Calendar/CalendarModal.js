@@ -36,6 +36,16 @@ export default {
   },
   
 
+  computed: {
+    start_time: function(){
+      if(!this.data.start) return 'N/A';
+      return this.data.start.getHours() + ":" + this.data.start.getMinutes();
+    },
+    end_time: function(){
+      if(!this.data.end) return 'N/A';
+      return this.data.end.getHours() + ":" + this.data.end.getMinutes();
+    }
+  },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
   },

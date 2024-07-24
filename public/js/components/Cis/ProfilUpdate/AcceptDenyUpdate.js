@@ -62,7 +62,7 @@ export default {
     handleRequest: function (type) {
       this.loading = true;
       this.setLoading(true);
-      Vue.$fhcapi.ProfilUpdate[
+      this.$fhcApi.factory.profilUpdate[
         type.toLowerCase() == "accept"
           ? "acceptProfilRequest"
           : "denyProfilRequest"
@@ -95,7 +95,7 @@ export default {
   created() {
     // only fetching the profilUpdate Attachemnts if the profilUpdate actually has attachments
     if (this.value.attachment_id) {
-      Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(
+      this.$fhcApi.factory.profilUpdate.getProfilRequestFiles(
         this.data.profil_update_id
       ).then((res) => {
         this.files = res.data;

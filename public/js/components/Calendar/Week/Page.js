@@ -96,7 +96,7 @@ export default {
 	<div class="fhc-calendar-week-page">
 	
 		<div class="d-flex flex-column border-top">
-			<div class="fhc-calendar-week-page-header border-2 border-bottom text-center d-flex" style="position:sticky; top:0; z-index:1020;" >
+			<div class="fhc-calendar-week-page-header border-2 border-bottom text-center d-flex" style="position:sticky; top:0; " >
 				<div v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})">
 					<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
 					<a href="#" class="small text-secondary text-decoration-none" @click.prevent="changeToMonth(day)">{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
