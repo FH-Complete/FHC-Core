@@ -24,6 +24,10 @@ export default{
 			from: 'hasPrestudentPermission',
 			default: false
 		},
+		hasPrestudentstatusPermission: {
+			from: 'hasPrestudentstatusPermission',
+			default: false
+		},
 		hasAssistenzPermission: {
 			from: 'hasAssistenzPermission',
 			default: false
@@ -1108,7 +1112,7 @@ export default{
 					<form-input
 						container-class="mb-3"
 						type="DatePicker"
-						name="bewerbung_abgeschickt_am"
+						name="bewerbung_abgeschicktamum"
 						:label="$p.t('lehre/bewerbung_abgeschickt_am')"
 						v-model="statusData['bewerbung_abgeschicktamum']"
 						auto-apply
@@ -1116,7 +1120,7 @@ export default{
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
-						:disabled="statusData.datum < dataMeldestichtag"
+						:disabled="statusData.datum < dataMeldestichtag || !hasPrestudentstatusPermission"
 						>
 					</form-input>
 					<form-input

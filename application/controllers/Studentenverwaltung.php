@@ -23,6 +23,7 @@ class Studentenverwaltung extends FHC_Controller
 				'student/bpk' => $this->permissionlib->isBerechtigt('student/bpk'),
 				'student/alias' => $this->permissionlib->isBerechtigt('student/alias'),
 				'basis/prestudent' => $this->permissionlib->isBerechtigt('basis/prestudent'),
+				'basis/prestudentstatus' => $this->permissionlib->isBerechtigt('basis/prestudentstatus'),
 				'assistenz_stgs' => $this->permissionlib->getSTG_isEntitledFor('assistenz'),
 				'admin' => $this->permissionlib->isBerechtigt('admin'),
 				'assistenz_schreibrechte' => $this->permissionlib->isBerechtigt('assistenz','suid'),

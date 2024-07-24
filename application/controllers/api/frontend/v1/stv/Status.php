@@ -1369,6 +1369,7 @@ class Status extends FHCAPI_Controller
 	public function insertStatus($prestudent_id)
 	{
 		$isBerechtigtNoStudstatusCheck = $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
+		$isBerechtigtBasisPrestudentstatus = $this->permissionlib->isBerechtigt('basis/prestudentstatus');
 
 
 		$authUID = getAuthUID();
@@ -1386,6 +1387,16 @@ class Status extends FHCAPI_Controller
 
 
 		$this->load->library('form_validation');
+
+		if (!$isBerechtigtBasisPrestudentstatus)
+			$this->form_validation->set_rules(
+				'bewerbung_abgeschicktamum',
+				$this->p->t('lehre', 'bewerbung_abgeschickt_am'),
+				'is_null',
+				[
+					'is_null' => $this->p->t('ui', 'error_fieldWriteAccess')
+				]
+			);
 
 		$this->form_validation->set_rules(
 			'datum',
@@ -1649,7 +1660,8 @@ class Status extends FHCAPI_Controller
 
 		
 		$isBerechtigtNoStudstatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
-
+		$isBerechtigtBasisPrestudentstatus = $this->permissionlib->isBerechtigt('basis/prestudentstatus');
+		
 
 		$authUID = getAuthUID();
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz') ?: $oldstatus->studiensemester_kurzbz;
@@ -1659,6 +1671,16 @@ class Status extends FHCAPI_Controller
 
 		//Form Validation
 		$this->load->library('form_validation');
+
+		if (!$isBerechtigtBasisPrestudentstatus)
+			$this->form_validation->set_rules(
+				'bewerbung_abgeschicktamum',
+				$this->p->t('lehre', 'bewerbung_abgeschickt_am'),
+				'is_null',
+				[
+					'is_null' => $this->p->t('ui', 'error_fieldWriteAccess')
+				]
+			);
 
 		$this->form_validation->set_rules(
 			'datum',

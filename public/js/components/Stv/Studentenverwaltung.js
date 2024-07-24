@@ -50,6 +50,7 @@ export default {
 			hasBpkPermission: this.permissions['student/bpk'],
 			hasAliasPermission: this.permissions['student/alias'],
 			hasPrestudentPermission: this.permissions['basis/prestudent'],
+			hasPrestudentstatusPermission: this.permissions['basis/prestudentstatus'],
 			hasAssistenzPermissionForStgs: this.permissions['assistenz_stgs'],
 			hasSchreibrechtAss: this.permissions['assistenz_schreibrechte'],
 			hasAdminPermission: this.permissions['admin'],
