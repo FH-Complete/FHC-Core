@@ -55,6 +55,10 @@ export default {
     },
 
     async submitProfilChange() {
+
+      //todo delete this debugging line
+      console.log("this is a test")
+
       //? check if data is valid before making a request
       if (this.topic && this.profilUpdate) {
         //? if profil update contains any attachment
@@ -71,17 +75,17 @@ export default {
           this.loading = false;
           this.setLoading(false);
 
-          if (res.data.error == 0) {
-            this.result = true;
-            this.hide();
-            Alert.popup(
-              "Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert."
-            );
-          } else {
+          if (res.data.error) {
             this.result = false;
             this.hide();
             Alert.popup(
               "Ein Fehler ist aufgetreten: " + JSON.stringify(res.data.retval)
+            );
+          } else {
+            this.result = true;
+            this.hide();
+            Alert.popup(
+              "Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert."
             );
           }
         };
@@ -92,7 +96,7 @@ export default {
         this.setLoading(true);
 
         this.editData.updateID
-          ? Vue.$fhcapi.ProfilUpdate.updateProfilRequest(
+          ? this.$fhcApi.factory.profilUpdate.updateProfilRequest(
               this.topic,
               this.profilUpdate,
               this.editData.updateID,
@@ -104,7 +108,7 @@ export default {
               .catch((err) => {
                 console.error(err);
               })
-          : Vue.$fhcapi.ProfilUpdate.insertProfilRequest(
+          : this.$fhcApi.factory.profilUpdate.insertProfilRequest(
               this.topic,
               this.profilUpdate,
               this.fileID ? this.fileID[0] : null
@@ -125,14 +129,14 @@ export default {
         const result = this.editData.updateID
           ? //? updating old attachment by replacing
             //* second parameter of api request insertFile checks if the file has to be replaced or not
-            await Vue.$fhcapi.ProfilUpdate.insertFile(
+            await this.$fhcApi.factory.profilUpdate.insertFile(
               formData,
               this.editData.updateID
             ).then((res) => {
               return res.data?.map((file) => file.dms_id);
             })
           : //? fresh insert of new attachment
-            await Vue.$fhcapi.ProfilUpdate.insertFile(formData).then((res) => {
+            await this.$fhcApi.factory.profilUpdate.insertFile(formData).then((res) => {
               return res.data?.map((file) => file.dms_id);
             });
         return result;

@@ -25873,7 +25873,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => '!Achtung: Eine deiner Adressen ist bereits als Zustelladresse gespeichert, sind sie sicher, dass sie die aktuelle Adresse stattdessen als Zustelladresse speichern wollen?',
+					'text' => '!Achtung: Eine Ihrer Adressen ist bereits als Zustelladresse gespeichert, sind sie sicher, dass sie die aktuelle Adresse stattdessen als Zustelladresse speichern wollen?',
 					'description' => '',
 					'insertvon' => 'system'
 				),

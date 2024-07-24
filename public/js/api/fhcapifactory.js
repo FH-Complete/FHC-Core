@@ -20,6 +20,8 @@ import phrasen from "./phrasen.js";
 import navigation from "./navigation.js";
 import filter from "./filter.js";
 import studstatus from "./studstatus.js";
+import profil from "./profil.js";
+import profilUpdate from "./profilUpdate.js";
 import ort from "./ort.js";
 import cms from "./cms.js";
 
@@ -29,6 +31,8 @@ export default {
     navigation,
     filter,
     studstatus,
+    profil,
+    profilUpdate,
     ort,
     cms,
 };

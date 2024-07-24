@@ -525,8 +525,6 @@ class ProfilUpdate extends Auth_Controller
 
 	public function acceptProfilRequest()
 	{
-
-
 		$_POST = json_decode($this->input->raw_input_stream, true);
 		$id = $this->input->post('profil_update_id', true);
 		$uid = $this->input->post('uid', true);

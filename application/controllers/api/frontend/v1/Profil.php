@@ -1,30 +1,45 @@
 <?php
+/**
+ * Copyright (C) 2024 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-if (!defined('BASEPATH'))
-	exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Profil extends Auth_Controller
+/**
+ * This controller operates between (interface) the JS (GUI) and the SearchBarLib (back-end)
+ * Provides data to the ajax get calls about the searchbar component
+ * This controller works with JSON calls on the HTTP GET and the output is always JSON
+ */
+class Profil extends FHCAPI_Controller
 {
 
 	/**
-	 * Constructor
+	 * Object initialization
 	 */
-
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'foto_sperre_function' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getView' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'View' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'isMitarbeiter' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'isStudent' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getZustellAdresse' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getZustellKontakt' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getAllNationen' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getGemeinden' => ['student/anrechnung_beantragen:r', 'user:r'],
-
+			'getView' => self::PERM_LOGGED,
+            'fotoSperre' => self::PERM_LOGGED,
+			'getGemeinden' => self::PERM_LOGGED,
+			'getAllNationen' => self::PERM_LOGGED,
+			'isMitarbeiter' => self::PERM_LOGGED,
+			
 		]);
+
 
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -42,97 +57,14 @@ class Profil extends Auth_Controller
 		//? put the uid and pid inside the controller for reusability
 		$this->uid = getAuthUID();
 		$this->pid = getAuthPersonID();
+
 	}
 
-	// -----------------------------------------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
-
-	/**
-	 * index loads the Profil view
-	 * @access public
-	 * @return void 
-	 */
-	public function index()
-	{
-		$this->load->view('Cis/Profil');
-	}
-
-	/**
-	 * redirects to the index function (needed to allow calling this URI)
-	 * @access public
-	 * @return void 
-	 */
-	public function View($uid)
-	{
-		$this->load->view('Cis/Profil');
-	}
-
-	/**
-	 * checks whether a specific userID is a mitarbeiter or not (foreword declaration of the function isMitarbeiter in Mitarbeiter_model.php)
-	 * @access public
-	 * @param  $uid the userID used to check if it is a mitarbeiter
-	 * @return boolean 
-	 */
-	public function isStudent($uid)
-	{
-		$result = $this->StudentModel->isStudent($uid);
-		if (isError($result)) {
-			show_error("error when calling Student_model function isStudent with uid " . $uid);
-		}
-		$result = getData($result);
-		echo json_encode($result);
-	}
-
-	/**
-	 * checks whether a specific userID is a mitarbeiter or not (foreword declaration of the function isMitarbeiter in Mitarbeiter_model.php)
-	 * @access public
-	 * @param  $uid the userID used to check if it is a mitarbeiter
-	 * @return boolean 
-	 */
-	public function isMitarbeiter($uid)
-	{
-		$result = $this->MitarbeiterModel->isMitarbeiter($uid);
-		if (isError($result)) {
-			show_error("error when calling Mitarbeiter_model function isMitarbeiter with uid " . $uid);
-		}
-		$result = getData($result);
-		echo json_encode($result);
-	}
-
-	/**
-	 * gets the adressen that are marked as zustell from the currenlty logged in user
-	 * @access public
-	 * @return array a list of adresse_id's 
-	 */
-	public function getZustellAdresse()
-	{
-		$this->AdresseModel->addSelect(["adresse_id"]);
-		$adressen_res = $this->AdresseModel->loadWhere(['person_id' => $this->pid, 'zustelladresse' => true]);
-		$adressen_res = hasData($adressen_res) ? getData($adressen_res) : null;
-		$adressen_res = array_map(function ($item) {
-			return $item->adresse_id;
-		}, $adressen_res);
-		echo json_encode($adressen_res);
-	}
-
-	/**
-	 * gets the kontakte that are marked as zustell from the currenlty logged in user
-	 * @access public
-	 * @return array a list of kontakt_id's 
-	 */
-	public function getZustellKontakt()
-	{
-		$this->KontaktModel->addSelect(["kontakt_id"]);
-		$kontakt_res = $this->KontaktModel->loadWhere(['person_id' => $this->pid, 'zustellung' => true]);
-		$kontakt_res = hasData($kontakt_res) ? getData($kontakt_res) : null;
-		$kontakt_res = array_map(function ($item) {
-			return $item->kontakt_id;
-		}, $kontakt_res);
-		echo json_encode($kontakt_res);
-	}
-
-	/**
+	
+    /**
 	 * function that returns the data used for the corresponding view
 	 * the client side parses the @param $uid and calls this function to get the data to the correct view 
 	 * @access public
@@ -185,17 +117,21 @@ class Profil extends Auth_Controller
 				$res->data = $this->viewStudentProfil($uid);
 			}
 		}
-		echo json_encode($res);
+		$this->terminateWithSuccess($res);
 	}
 
-	/**
+    /**
 	 * update column foto_sperre in public.tbl_person
 	 * @access public
 	 * @param  boolean $value  new value for the column
 	 * @return boolean the new value added to the column in public.tbl_person
 	 */
-	public function foto_sperre_function($value)
+	public function fotoSperre($value)
 	{
+        if(!isset($value)){
+            $this->terminateWithError("Missing parameter", self::ERROR_TYPE_GENERAL);
+        }
+
 		$res = $this->PersonModel->update($this->pid, ["foto_sperre" => $value]);
 		if (isError($res)) {
 			show_error("error while trying to update table public.tbl_person");
@@ -205,8 +141,10 @@ class Profil extends Auth_Controller
 		if (isError($res)) {
 			show_error("error while trying to query table public.tbl_person");
 		}
-		$res = hasData($res) ? getData($res)[0] : null;
-		echo json_encode($res);
+
+        $res = $this->getDataOrTerminateWithError($res);
+		
+        $this->terminateWithSuccess(current($res));
 	}
 
 	/**
@@ -217,55 +155,47 @@ class Profil extends Auth_Controller
 	 */
 	public function getAllNationen()
 	{
+		// load the nationen from the database
 		$this->load->model('codex/Nation_model', "NationModel");
 		$this->NationModel->addSelect(["nation_code as code", "langtext"]);
 		$nation_res = $this->NationModel->load();
+
 		if (isError($nation_res)) {
-			show_error("error while trying to query table codex.tbl_nation");
+			$this->terminateWithError("error while trying to query table codex.tbl_nation", self::ERROR_TYPE_GENERAL);
 		}
-		$nation_res = hasData($nation_res) ? getData($nation_res) : null;
-		echo json_encode($nation_res);
+		
+		$nation_res = $this->getDataOrTerminateWithError($nation_res);
+
+		$this->terminateWithSuccess($nation_res);
 	}
 
-	/**
-	 * gets specific gemeinden which are related to the ZIP and the Nation passed in the body of the get request
-	 * @access public
-	 * @var    $_GET function uses GET request payload
-	 * @return boolean the new value added to the column in public.tbl_person
-	 */
-	public function getGemeinden()
+	public function getGemeinden($nation, $zip)
 	{
-		/** @var $nation value parsed out of the body of the get request */
-		$nation = $this->input->get('nation', true);
-		/** @var $zip value parsed out of the body of the get request and converted to a php integer with json_decode */
-		$zip = json_decode($this->input->get('zip', true));
-
-		$this->load->model('codex/Gemeinde_model', "GemeindeModel");
-		$this->GemeindeModel->addDistinct();
-		$this->GemeindeModel->addSelect(["name"]);
-		if ($nation == "A") {
-				if (isset($zip) && $zip > 999 && $zip < 32000) {
-
-						$gemeinde_res = $this->GemeindeModel->loadWhere(['plz' => $zip]);
-						if (isError($gemeinde_res)) {
-								show_error("error while trying to query bis.tbl_gemeinde");
-						}
-						$gemeinde_res = hasData($gemeinde_res) ? getData($gemeinde_res) : null;
-						$gemeinde_res = array_map(function ($obj) {
-								return $obj->name;
-						}, $gemeinde_res);
-						echo json_encode($gemeinde_res);
-
-				} else {
-						echo json_encode(error("ortschaftskennziffer code was not valid"));
-				}
-		} else {
-				echo json_encode(error("Nation was not 'A' (Austria)"));
+		if(!isset($nation) || !isset($zip)){
+			echo json_encode(error("Missing parameters"));
+			return;
 		}
+		
+		$this->load->model('codex/Gemeinde_model', "GemeindeModel");
+		
+
+		$gemeinde_res = $this->GemeindeModel->getGemeindeByPlz($zip);
+		
+		if (isError($gemeinde_res)) {
+			$this->terminateWithError(getError($gemeinde_res),self::ERROR_TYPE_GENERAL);
+		}
+		$gemeinde_res = $this->getDataOrTerminateWithError($gemeinde_res);
+		
+		/* $gemeinde_res = array_map(function ($obj) {
+			return $obj->ortschaftsname;
+		}, $gemeinde_res); */
+
+		$this->terminateWithSuccess($gemeinde_res);	
+		
 	}
 
 
-	// -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 
 	/**
@@ -347,6 +277,29 @@ class Profil extends Auth_Controller
 		$res->mailverteiler = $mailverteiler_res;
 
 		return $res;
+	}
+
+	/**
+	 * checks whether a specific userID is a mitarbeiter or not (foreword declaration of the function isMitarbeiter in Mitarbeiter_model.php)
+	 * @access public
+	 * @param  $uid the userID used to check if it is a mitarbeiter
+	 * @return boolean 
+	 */
+	public function isMitarbeiter($uid)
+	{
+
+		if(!$uid) $this->terminateWithError("No uid provided", self::ERROR_TYPE_GENERAL);
+		
+		
+		$result = $this->MitarbeiterModel->isMitarbeiter($uid);
+		
+		if (isError($result)) {
+			$this->terminateWithError("error when calling Mitarbeiter_model function isMitarbeiter with uid " . $uid, self::ERROR_TYPE_GENERAL);
+		}
+
+		$result = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($result);
 	}
 
 	/**
@@ -450,7 +403,8 @@ class Profil extends Auth_Controller
 		return $res;
 	}
 
-	/**
+
+    /**
 	 * gets all the mailverteiler using the tables: tbl_benutzer, tbl_benutzergruppe, tbl_gruppe
 	 * @access private
 	 * @param  integer $uid  the userID used to retrieve the mailverteiler 
@@ -732,6 +686,5 @@ class Profil extends Auth_Controller
 		$zutrittskarte_ausgegebenam = str_replace("-", ".", $zutrittskarte_ausgegebenam);
 		return $zutrittskarte_ausgegebenam;
 	}
-
-
 }
+
