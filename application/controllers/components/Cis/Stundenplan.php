@@ -16,7 +16,8 @@ class Stundenplan extends Auth_Controller
 		parent::__construct([
 			'index' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
 			'Reservierungen' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'Stunden' => ['student/anrechnung_beantragen:r','user:r'] // TODO(chris): permissions?
+			'Stunden' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
+			'RoomInformation'=> ['student/anrechnung_beantragen:r','user:r'],
 		]);
 	}
 
@@ -64,5 +65,6 @@ class Stundenplan extends Auth_Controller
 
 		$this->outputJsonSuccess(getData($result));
 	}
+
 
 }

@@ -12,6 +12,32 @@ class Reservierung_model extends DB_Model
 		$this->pk = 'reservierung_id';
 	}
 
+
+	/**
+	 * @param $uid
+	 * 
+	 * @return stdClass
+	 */
+	public function getRoomReservierungen($ort_kurzbz, $start_date, $end_date)
+	{
+
+		$raum_reservierungen= $this->execReadOnlyQuery("
+		SELECT res.*, mit.kurzbz as person_kurzbz , 
+		CASE
+			WHEN res.verband IS NOT NULL OR res.semester IS NOT NULL THEN
+				CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',res.verband,res.semester) 
+			ELSE
+				CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz)) 
+		END AS stg
+		FROM lehre.vw_reservierung res
+		JOIN public.tbl_mitarbeiter mit ON mit.mitarbeiter_uid=res.uid
+		JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
+		WHERE res.ort_kurzbz = ? AND datum >= ? AND datum <= ? 
+		", [$ort_kurzbz, $start_date, $end_date]);
+
+		return $raum_reservierungen;
+	}
+
 	/**
 	 * @param $uid
 	 * 

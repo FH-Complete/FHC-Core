@@ -22,6 +22,7 @@ import filter from "./filter.js";
 import studstatus from "./studstatus.js";
 import profil from "./profil.js";
 import profilUpdate from "./profilUpdate.js";
+import stundenplan from "./studenplan.js";
 
 export default {
     search,
@@ -30,5 +31,6 @@ export default {
     filter,
     studstatus,
     profil,
-    profilUpdate,
+    profilUpdate,,
+    stundenplan,
 };

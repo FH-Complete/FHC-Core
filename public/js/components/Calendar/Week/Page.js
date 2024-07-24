@@ -28,7 +28,8 @@ export default {
 	},
 	computed: {
 		days() {
-			let tmpDate = new CalendarDate(this.year, 1, 1); // NOTE(chris): somewhere in the middle of the year
+			
+			let tmpDate = new CalendarDate(this.year,1,1); // NOTE(chris): somewhere in the middle of the year
 			tmpDate.w = this.week;
 			let startDay = tmpDate.firstDayOfWeek;
 			let result = [];
@@ -36,6 +37,7 @@ export default {
 				result.push(new Date(startDay.getFullYear(), startDay.getMonth(), startDay.getDate() + i));
 			}
 			return result;
+
 		},
 		eventsPerDayAndHour() {
 			const res = {};
@@ -75,6 +77,7 @@ export default {
 		}
 	},
 	methods: {
+		
 		changeToMonth(day) {
 			if (!this.noMonthView) {
 				this.date.set(day);
@@ -91,6 +94,7 @@ export default {
 	},
 	template: `
 	<div class="fhc-calendar-week-page">
+	
 		<div class="d-flex flex-column border-top">
 			<div class="fhc-calendar-week-page-header border-2 border-bottom text-center d-flex" style="position:sticky; top:0; " >
 				<div v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})">
@@ -104,9 +108,12 @@ export default {
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class="day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (1440 / smallestTimeFrame) + ', 1fr)'}">
-						<a  href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'" v-for="event in day.events" :key="event" class="mx-2 border border-dark border-2 small rounded overflow-hidden text-decoration-none text-dark" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end), 'background': event.orig.farbe?event.orig.farbe:'white' ,'--test': dateToMinutesOfDay(event.end)}" @click.prevent="$emit('input', event.orig)">
-							<slot :event="event" />
-						</a>
+						<div :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="$emit('input', event.orig)" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">	
+							<slot :event="event" :day="day">
+								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+							</slot>
+						</div>
+						
 					</div>
 				</div>
 			</div>
