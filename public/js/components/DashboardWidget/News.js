@@ -85,38 +85,5 @@ export default {
           </div>
       </div>
 </div>
-</div>
-
-
-  <!-- News Modal old way of showing the news content if clicking on the little content format-->
-  <!--<BsModal ref="newsModal" id="newsModal" dialog-class="modal-lg">
-    <template #title>
-      <div class="row">
-        <div class="col-5"><img :src="placeHolderImgURL" class="img-fluid rounded-start"></div>
-        <div class="col-7 d-flex align-items-end">
-        <p>{{ singleNews?.content_obj?.betreff?singleNews?.content_obj?.betreff:'Kein Betreff vorhanden' }}<br><small class="text-muted">{{ formatDateTime(singleNews.insertamum) }}</small></p>
-        </div>
-    </template>
-    <template #default>{{ singleNews.text }}</template>
-  </BsModal>
-  -->
-
-  <!-- All News Modal old way of showing all the different news -->
-  <!--<BsModal ref="allNewsModal" id="allNewsModal" dialog-class="modal-fullscreen">
-    <template #title>Alle News</template>
-    <template #default>
-    <div class="row row-cols-md-2 row-cols-lg-3 row-cols-xl-5 g-4 h-100 px-5">
-     <div v-for="news in allNewsList" :key="news.id">
-            <div class="card h-100">
-                <img :src="placeHolderImgURL" class="card-img-top">
-                <div class="card-footer"><span class="card-subtitle small">{{ formatDateTime(news.insertamum) }}</span></div>
-                <div class="card-body">
-                  <a href="" class="card-title h5 stretched-link" @click="setSingleNews1(news)">{{ news.betreff }}</a><br>
-                  <p class="card-text">{{ news.text }}</p>
-                </div>
-            </div>
-          </div>
-          </div>
-	</template>
-  </BsModal>-->`
+</div>`
 }
