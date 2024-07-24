@@ -724,7 +724,7 @@ export default{
 		insertStatus() {
 			this.$refs.statusData
 				.post(
-					'api/frontend/v1/stv/status/insert/' + this.modelValue.prestudent_id,
+					'api/frontend/v1/stv/status/insertStatus/' + this.modelValue.prestudent_id,
 					this.statusData
 				)
 				.then(result => {
