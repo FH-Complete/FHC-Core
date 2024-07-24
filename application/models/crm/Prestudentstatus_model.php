@@ -698,4 +698,39 @@ class Prestudentstatus_model extends DB_Model
 
 		return $result;
 	}
+
+	/**
+	 * For checks if Orgform of Student status and Bewerber status match.
+	 * Returns any Bewerber status that does not match the first Student
+	 * status' Orgform.
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return stdClass
+	 */
+	public function getBewerberWhereOrgformNotStudent($prestudent_id)
+	{
+		$this->addSelect('plan.orgform_kurzbz');
+
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+
+		$this->addOrder('tbl_prestudentstatus.datum', 'DESC');
+		$this->addOrder('tbl_prestudentstatus.insertamum', 'DESC');
+		$this->addOrder('tbl_prestudentstatus.ext_id', 'DESC');
+		
+		$this->addLimit(1);
+
+		$this->db->where('prestudent_id', $prestudent_id);
+		$this->db->where('status_kurzbz', self::STATUS_STUDENT);
+		
+		$sql = $this->db->get_compiled_select($this->dbTable);
+
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+
+		$this->db->where('plan.orgform_kurzbz !=', '(' . $sql . ')', false);
+		return $this->loadWhere([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => self::STATUS_BEWERBER
+		]);
+	}
 }

@@ -620,6 +620,7 @@ class PrestudentstatusCheckLib
 		$old_studiensemester_kurzbz,
 		$old_ausbildungssemester
 	) {
+		// TODO(chris): TEST
 		$result = $this->prepareStatusHistory(
 			$prestudent_id,
 			$status_kurzbz,
@@ -645,6 +646,7 @@ class PrestudentstatusCheckLib
 	 */
 	public function checkPersonenkennzeichen($prestudent_id)
 	{
+		// TODO(chris): TEST
 		$this->_ci->PrestudentstatusModel->addSelect('tbl_prestudentstatus.prestudent_id');
 		$this->_ci->PrestudentstatusModel->addSelect('tbl_student.matrikelnr');
 
@@ -675,7 +677,23 @@ class PrestudentstatusCheckLib
 		return success($jahr == mb_substr($data->matrikelnr, 0, 2));
 	}
 
-	// TODO(chris): check status history error_bewerberOrgformUngleichStudentOrgform
+	/**
+	 * Checks if Orgform of Student status and Bewerber status match.
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return stdClass
+	 */
+	public function checkStudentOrgform($prestudent_id)
+	{
+		// TODO(chris): TEST
+		$result = $this->_ci->PrestudentstatusModel->getBewerberWhereOrgformNotStudent($prestudent_id);
+
+		if (isError($result))
+			return $result;
+
+		return success(!hasData($result));
+	}
 
 	/**
 	 * Check if History of StatusData is valid
