@@ -13,13 +13,13 @@ class Status extends FHCAPI_Controller
 			'getHistoryPrestudent' => ['admin:r', 'assistenz:r'],
 			'insert' => ['admin:rw', 'assistenz:rw'],
 			'changeStatus' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
-			//'turnIntoStudent' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			'addStudent' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			'getStatusgruende' => self::PERM_LOGGED,
 			'getLastBismeldestichtag' => self::PERM_LOGGED,
 			'isLastStatus' => self::PERM_LOGGED,
 			'isErsterStudent' => self::PERM_LOGGED,
 			'hasStatusBewerber' => self::PERM_LOGGED,
+			'getStatusarray' => self::PERM_LOGGED,
 			'deleteStatus' => ['admin:r','assistenz:r'],
 			'loadStatus' => ['admin:r', 'assistenz:r'],
 			'updateStatus' => ['admin:rw', 'assistenz:rw'],
@@ -357,6 +357,22 @@ class Status extends FHCAPI_Controller
 		return $studiensem->studiensemester_kurzbz;
 	}
 
+	public function getStatusarray()
+	{
+		$this->load->model('crm/Status_model', 'StatusModel');
+		$result = $this->StatusModel->getAllStatiWithStatusgruende();
+
+		if(isError($result))
+		{
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+
+	}
+
 	public function changeStatus($prestudent_id)
 	{
 		//get Studiengang von prestudent_id
@@ -445,7 +461,11 @@ class Status extends FHCAPI_Controller
 		{
 			$ausbildungssemester = $lastStatusData->ausbildungssemester;
 		}
-		if($status_kurzbz == Prestudentstatus_model::STATUS_AUFGENOMMENER)
+		if(
+			$status_kurzbz == Prestudentstatus_model::STATUS_AUFGENOMMENER ||
+			$status_kurzbz == Prestudentstatus_model::STATUS_WARTENDER ||
+			$status_kurzbz == Prestudentstatus_model::STATUS_ABGEWIESENER
+		)
 		{
 			$studiensemester_kurzbz = 	$this->getStudiensemesterOfStatus($prestudent_id, Prestudentstatus_model::STATUS_BEWERBER);
 
@@ -560,36 +580,6 @@ class Status extends FHCAPI_Controller
 			}
 		}
 
-		//TODO(Manu) DELETE
-		// $new_status_datum = isset($datum) ? $datum : date('Y-m-d');
-
-		// $result = $this->prestudentstatuschecklib->checkStatusAdd(
-		// 	$prestudent_id,
-		// 	$status_kurzbz,
-		// 	$studiensemester_kurzbz,
-		// 	$new_status_datum,
-		// 	$ausbildungssemester,
-		// 	$studienplan_id
-		// );
-
-		// if (isError($result))
-		// {
-		// 	return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		// }
-
-		// $this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
-		// $result = $this->BismeldestichtagModel->checkIfMeldestichtagErreicht($datum, $studiensemester_kurzbz);
-		// return $this->terminateWithError("retval: " . $result->retval, self::ERROR_TYPE_GENERAL);
-
-		// if (isError($result))
-		// {
-		// 	return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		// }
-		// if ($result->retval == "1")
-		// {
-		// 	return $this->terminateWithError($this->p->t('lehre','error_dataVorMeldestichtag'), self::ERROR_TYPE_GENERAL);
-		// }
-
 		switch($status_kurzbz){
 			case Prestudentstatus_model::STATUS_ABBRECHER:
 				{
@@ -670,7 +660,7 @@ class Status extends FHCAPI_Controller
 
 				}
 				break;
-			case Prestudentstatus_model::STATUS_BEWERBER:
+/*			case Prestudentstatus_model::STATUS_BEWERBER:
 				{
 					$this->load->library('PrestudentLib');
 					$result = $this->prestudentlib->setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
@@ -683,7 +673,7 @@ class Status extends FHCAPI_Controller
 						$this->terminateWithSuccess($prestudent_id);
 
 				}
-				break;
+				break;*/
 			// case Prestudentstatus_model::STATUS_BEWERBER:
 			// 	{
 			// 		$this->load->library('PrestudentLib');
@@ -956,6 +946,8 @@ class Status extends FHCAPI_Controller
 				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 			}
 			$semesterAufgenommen = current(getData($result));
+			$semesterAufgenommen = $semesterAufgenommen->studiensemester_kurzbz;
+
 
 			//generate Personenkennzeichen(matrikelnr)
 			$matrikelnr = false;
@@ -963,7 +955,7 @@ class Status extends FHCAPI_Controller
 				$matrikelnr = $value;
 			});
 			if ($matrikelnr === false) {
-				$resultMat = $this->StudentModel->generateMatrikelnummer2($stg, $semesterAufgenommen->studiensemester_kurzbz, $typ);
+				$resultMat = $this->StudentModel->generateMatrikelnummer2($stg, $semesterAufgenommen, $typ);
 				if (isError($resultMat)) {
 					return $this->terminateWithError($resultMat, self::ERROR_TYPE_GENERAL);
 				}
@@ -1023,6 +1015,8 @@ class Status extends FHCAPI_Controller
 			$aktivierungscode = getData($result);
 
 			//generate Alias
+			//TODO(Manu) check if alias already exists
+
 			$result = $this->PersonModel->generateAliasByPersonId($person_id);
 
 			if (isError($result))

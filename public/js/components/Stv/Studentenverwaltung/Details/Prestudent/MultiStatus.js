@@ -126,6 +126,74 @@ export default{
 				return !this.modelValue.some(item => item.uid);
 			}
 			return !this.modelValue.uid;
+		},
+		toolbarInteressent() {
+			return this.listDataToolbar.filter(item => this.statiInteressent.includes(item.status_kurzbz));
+		},
+		toolbarStudent() {
+			return this.listDataToolbar.filter(item => this.statiStudent.includes(item.status_kurzbz));
+		},
+		resultInteressentArray() {
+			const result = [];
+			this.statiInteressent.forEach(status => {
+				const defaultObject = {
+					status_kurzbz: status,
+					statusgrund_id: null,
+					link: `changeStatusTo${status}`,
+					dropEntry: null
+				};
+
+				if (status === "Student") {
+					defaultObject.link = 'changeInteressentToStudent';
+				}
+
+				result.push(defaultObject);
+
+				this.toolbarInteressent.forEach(item => {
+					if (item.status_kurzbz === status) {
+
+						const itemObject = {
+							status_kurzbz: item.status_kurzbz,
+							statusgrund_id: item.statusgrund_id,
+							beschreibung: item.beschreibung,
+							link: `changeStatusTo${item.status_kurzbz}(${item.statusgrund_id})`,
+							dropEntry: `[${item.beschreibung}]`
+						};
+
+						if (item.status_kurzbz === "Student") {
+							itemObject.link = `changeInteressentTo${item.status_kurzbz}(${item.statusgrund_id})`;
+						}
+
+						result.push(itemObject);
+
+					}
+				});
+			});
+			return result;
+		},
+		resultStudentArray() {
+			const result = [];
+			this.statiStudent.forEach(status => {
+				result.push({
+					status_kurzbz: status,
+					statusgrund_id: null,
+					link: `changeStatusTo${status}`,
+					dropEntry: null
+				});
+
+				this.toolbarStudent.forEach(item => {
+					if (item.status_kurzbz === status) {
+						result.push({
+							status_kurzbz: item.status_kurzbz,
+							statusgrund_id: item.statusgrund_id,
+							beschreibung: item.beschreibung,
+							link: `changeStatusTo${item.status_kurzbz}(${item.statusgrund_id})`,
+							dropEntry: `[${item.beschreibung}]`,
+						});
+					}
+				});
+			});
+			return result;
 		}
 	},
 	props: {
@@ -301,7 +369,12 @@ export default{
 			newStatus: '',
 			statusNew: true,
 			isErsterStudent: false,
-			isBewerber: true
+			isBewerber: true,
+			listDataToolbar: [],
+			//TODO(Manu) get from config
+			statiInteressent: ["Bewerber", "Aufgenommener", "Student" , "Wartender", "Abgewiesener"],
+			statiStudent: ["Abbrecher", "Unterbrecher", "Student" , "Diplomand", "Absolvent"],
+			selectedStatus: 'default'
 		}
 	},
 	watch: {
@@ -452,7 +525,8 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData }));
 			this.changeStatus(prestudentIds);
 		},
-		changeStatusToStudent(prestudentIds){
+		changeStatusToStudent(statusgrund_id){
+			console.log("in function changeStatusToStudent: ", statusgrund_id);
 			let def_date = this.getDefaultDate();
 			//TODO Manu validation if Bewerber already before asking for ausbildungssemester
 			//this.checkIfBewerber();
@@ -461,12 +535,14 @@ export default{
 				{
 					status_kurzbz: 'Student',
 					datum: def_date,
-					bestaetigtam: def_date
+					bestaetigtam: def_date,
+					statusgrund_id: statusgrund_id
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData, ausbildungssemester: this.actionSem}));
-			//BewerberZuStudent
-			this.addStudent(prestudentIds);
+
+			//TODO(Manu) get bezeichnung von statusgrund_kurzbz
+			this.actionConfirmDialogue(this.updateData, 'student','Studenten');
 		},
 		changeStatusToWiederholer(prestudentIds){
 			this.hideModal('askForAusbildungssemester');
@@ -506,7 +582,7 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
 			this.changeStatus(prestudentIds);
 		},
-		changeStatusToBewerber(prestudentIds){
+		changeStatusToBewerber(){
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
@@ -519,10 +595,9 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({
 				...objekt,
 				...deltaData}));
-			this.changeStatus(prestudentIds);
+			this.changeStatus(this.prestudentIds);
 		},
-		changeStatusToAufgenommener(prestudentIds){
-			this.hideModal('confirmStatusAction');
+		changeStatusToAufgenommener(){
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
@@ -534,39 +609,62 @@ export default{
 			this.newArray = this.updateData.map(objekt => ({
 				...objekt,
 				...deltaData,
-					}));
+			}));
 
-			//TODO(Manu) change studiensemester_kurzbz in backend
-			//studiensemester_kurzbz: this.getStudiensemesterOfBewerber(objekt.prestudent_id)
-			this.changeStatus(prestudentIds);
+			this.actionConfirmDialogue(this.updateData, 'aufgenommener','Aufgenommenen');
 
 		},
-		changeInteressentToStudent(prestudentIds){
-
-			console.log("in function changeInteressentToStudent")
+		changeInteressentToStudent(statusgrund_id){
+			//TODO(Manu) test statusgrund_id
+			console.log("in function changeInteressentToStudent mit statusgrund_id", statusgrund_id);
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
 					status_kurzbz: 'Student',
 					datum: def_date,
-					bestaetigtam: def_date
+					bestaetigtam: def_date,
+					statusgrund_id: statusgrund_id
 				};
 
 			this.newArray = this.updateData.map(objekt => ({
 				...objekt,
 				...deltaData,
-					}));
+			}));
 
-			//TODO(Manu) change studiensemester_kurzbz in backend
-			//studiensemester_kurzbz: this.getStudiensemesterOfBewerber(objekt.prestudent_id)
-			//this.addStudent(prestudentIds);
+			this.addStudent(this.prestudentIds);
 
 		},
-		changeStatusToAbgewiesen(prestudentIds){
-			console.log("in function changeStatusToAbgewiesen");
+		changeStatusToAbgewiesener(statusgrund_id){
+			let def_date = this.getDefaultDate();
+			let deltaData =
+				{
+					status_kurzbz: 'Abgewiesener',
+					datum: def_date,
+					bestaetigtam: def_date,
+					statusgrund_id: statusgrund_id
+				};
+
+			this.newArray = this.updateData.map(objekt => ({
+				...objekt,
+				...deltaData,
+			}));
+
+			this.actionConfirmDialogue(this.updateData, 'abgewiesener','Abgewiesenen');
 		},
-		changeStatusToWartend(prestudentIds){	
-			console.log("in function changeStatusToWartend");
+		changeStatusToWartender(){
+			let def_date = this.getDefaultDate();
+			let deltaData =
+				{
+					status_kurzbz: 'Wartender',
+					datum: def_date,
+					bestaetigtam: def_date
+				};
+			this.newArray = this.updateData.map(objekt => ({
+				...objekt,
+				...deltaData,
+			}));
+
+			this.actionConfirmDialogue(this.updateData, 'wartender','Wartenden');
 		},
 		addStudent(prestudentIds){
 
@@ -637,6 +735,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		changeStatus(prestudentIds){
+			this.hideModal('confirmStatusAction');
 			//Array.isArray(prestudentIds) ? this.modelValue.prestudent_id : [prestudentIds];
 			let changeData = {};
 
@@ -868,6 +967,17 @@ export default{
 		getDefaultDate() {
 			const today = new Date();
 			return today;
+		},
+		handleSelectionChange(event) {
+			const selectedValue = event.target.value;
+			const selectedItem = this.resultInteressentArray.find(item =>
+				item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '') === selectedValue
+			);
+			if (selectedItem && typeof this[selectedItem.link] === 'function') {
+				this[selectedItem.link]();
+			} else {
+				console.warn(`No method found for ${selectedItem.link}`);
+			}
 		}
 	},
 	created(){
@@ -893,9 +1003,37 @@ export default{
 					this.$refs.table.tabulator.redraw(true);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+		this.$fhcApi
+			.get('api/frontend/v1/stv/status/getStatusarray/')
+			.then(result => result.data)
+			.then(result => {
+				this.listDataToolbar = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 		<div class="stv-list h-100 pt-3">
+		
+	<!--<div>
+				<table class="table">
+				<thead>
+					<tr>
+					<th>Status Kurzbez</th>
+					<th>Bezeichnung</th>
+					<th>Status Grund ID</th>
+					<th>Link</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="item in resultInteressentArray" :key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')">
+					<td>{{ item.status_kurzbz }}</td>
+					<td>{{ item.beschreibung }}</td>
+					<td>{{ item.statusgrund_id }}</td>
+					<td><a :href="item.link">{{ item.link }}</a></td>
+					</tr>
+				</tbody>
+				</table>
+			</div> -->
 			
 			<!--Modal: statusModal-->
 			<bs-modal ref="statusModal">
@@ -930,6 +1068,7 @@ export default{
 						<option  value="Incoming">Incoming</option>
 						<option v-if="!statusNew" value="Absolvent">Absolvent</option>
 						<option v-if="!statusNew" value="Abbrecher">Abbrecher</option>
+						<option v-if="!statusNew" value="Abgewiesener">Abgewiesener</option>
 					</form-input>
 					<form-input
 						container-class="mb-3"
@@ -1069,16 +1208,16 @@ export default{
 						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToUnterbrecher(prestudentIds)">OK</button>
 					</div>
 					<div v-if="actionButton=='aufgenommener'">
-						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToAufgenommener(prestudentIds)">OK</button>
+						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatus(prestudentIds)">OK</button>
 					</div>
 					<div v-if="actionButton=='student'">
 						<button  ref="Close" type="button" class="btn btn-primary" @click="changeInteressentToStudent(prestudentIds)">OK</button>
 					</div>
 					<div v-if="actionButton=='wartender'">
-						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToWartend(prestudentIds)">OK</button>
+						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatus(prestudentIds)">OK</button>
 					</div>
 					<div v-if="actionButton=='abgewiesener'">
-						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToAbgewiesen(prestudentIds)">OK</button>
+						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatus(prestudentIds)">OK</button>
 					</div>					
 				</template>
 			</BsModal>
@@ -1150,7 +1289,7 @@ export default{
 								<a class="dropdown-item" @click="changeStatusToBewerber(prestudentIds)">Bewerber</a>
 							</li>
 							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'aufgenommener','Aufgenommenen')">Aufgenommener</a>
+								<a class="dropdown-item" @click="changeStatusToAufgenommener">Aufgenommener</a>
 							</li>				
 							<li class="dropdown-submenu">
 								<a class="dropdown-item dropdown-toggle" href="#">Student</a>
@@ -1159,40 +1298,57 @@ export default{
 										<a class="dropdown-item" @click="changeInteressentToStudent(prestudentIds)">Student</a>
 									</li>
 									<li>
-										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'PreAbbrecher')">Pre-Abbrecher</a>
+										<a class="dropdown-item" @click="changeInteressentToStudent(19)">Pre-Abbrecher</a>
 									</li>
 									<li>
-										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'PreWiederholer')">Pre-Wiederholer</a>
+										<a class="dropdown-item" @click="changeInteressentToStudent(15)">Pre-Wiederholer</a>
 									</li>
 									<li>
-										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'Wiederholer')">Wiederholer</a>
+										<a class="dropdown-item" @click="changeInteressentToStudent(16)">Wiederholer</a>
 									</li>
 								</ul>
 							</li>
 							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'wartender', 'Wartenden')">Wartender</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
+								<a class="dropdown-item" @click="changeStatusToWartender">Wartender</a>
 							</li>
 							<li class="dropdown-submenu">
 								<a class="dropdown-item dropdown-toggle" href="#">Absage</a>
 								<ul class="dropdown-menu dropdown-menu-right">
 									<li>
-										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Aufnahme in anderen Studiengang</a>
+										<a class="dropdown-item" @click="changeStatusToAbgewiesener(2)">Keine Antwort</a>
 									</li>
 									<li>
-										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Keine Antwort</a>
-									</li>
+										<a class="dropdown-item" @click="changeStatusToAbgewiesener(3)">ZGV nicht erfüllt</a>
+									</li>									
 									<li>
-										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Sonstiges</a>
-									</li>
+										<a class="dropdown-item" @click="changeStatusToAbgewiesener(4)">Von BewerberIn storniert</a>
+									</li>									
 									<li>
-										<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">...</a>
+										<a class="dropdown-item" @click="changeStatusToAbgewiesener(5)">Aufnahme in anderen Studiengang</a>
+									</li>									
+									<li>
+										<a class="dropdown-item" @click="changeStatusToAbgewiesener(6)">Reihungstestergebnis unzureichend</a>
+									</li>									
+									<li>
+										<a class="dropdown-item" @click="changeStatusToAbgewiesener(7)">Sonstiges</a>
 									</li>
 								</ul>
 							</li>					
 						</ul>
+												
+						<!-- SingleSelectButton Dynamisch Interessent-->
+						<div v-if="showToolbarInteressent" class="btn-group">
+							<select v-model="selectedStatus" class="form-select button-dropdown" @change="handleSelectionChange">
+							<option value="default">---SELECT STATUS INTERESSENT---</option>
+							<option 
+								v-for="item in resultInteressentArray" 
+								:key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
+								:value="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
+							>
+								{{ item.status_kurzbz }} {{ item.bezeichnung }} {{ item.dropEntry }}
+							</option>
+							</select>
+						</div>
 					
 						<!--toolbar Student-->
 						<ul v-if="showToolbarStudent" class="dropdown-menu">
@@ -1219,6 +1375,21 @@ export default{
 							</li>							
 						</ul>
 					</div>
+					
+					<!-- Dynamisch Student-->
+					<div v-if="showToolbarStudent" class="btn-group">
+						<select v-model="selectedStatus" class="form-select button-dropdown" @change="handleSelectionChange">
+						<option value="default">---SELECT STATUS STUDENT---</option>
+						<option 
+							v-for="item in resultStudentArray" 
+							:key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
+							 :value="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
+						>
+							{{ item.status_kurzbz }} {{ item.bezeichnung }} {{ item.dropEntry }}
+						</option>
+						</select>
+					</div>
+				</template>
 				</template>
 
 			</core-filter-cmpt>
@@ -1239,49 +1410,66 @@ export default{
 						<a class="dropdown-item" @click="changeStatusToBewerber(prestudentIds)">Bewerber</a>
 					</li>
 					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'aufgenommener','Aufgenommenen')">Aufgenommener</a>
+						<a class="dropdown-item" @click="changeStatusToAufgenommener">Aufgenommener</a>
 					</li>				
 					<li class="dropdown-submenu">
 						<a class="dropdown-item dropdown-toggle" href="#">Student</a>
 						<ul class="dropdown-menu dropdown-menu-right">
 							<li>
-								<a class="dropdown-item" @click="changeStatusToStudent(prestudentIds)">Student</a>
+								<a class="dropdown-item" @click="changeInteressentToStudent(prestudentIds)">Student</a>
 							</li>
 							<li>
-								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'PreAbbrecher')">Pre-Abbrecher</a>
+								<a class="dropdown-item" @click="changeInteressentToStudent(19)">Pre-Abbrecher</a>
 							</li>
 							<li>
-								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'PreWiederholer')">Pre-Wiederholer</a>
+								<a class="dropdown-item" @click="changeInteressentToStudent(15)">Pre-Wiederholer</a>
 							</li>
 							<li>
-								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student', 'Wiederholer')">Wiederholer</a>
+								<a class="dropdown-item" @click="changeInteressentToStudent(16)">Wiederholer</a>
 							</li>
 						</ul>
 					</li>
 					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'wartender', 'Wartenden')">Wartender</a>
-					</li>
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
+						<a class="dropdown-item" @click="changeStatusToWartender">Wartender</a>
 					</li>
 					<li class="dropdown-submenu">
 						<a class="dropdown-item dropdown-toggle" href="#">Absage</a>
 						<ul class="dropdown-menu dropdown-menu-right">
 							<li>
-								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Aufnahme in anderen Studiengang</a>
+								<a class="dropdown-item" @click="changeStatusToAbgewiesener(2)">Keine Antwort</a>
 							</li>
 							<li>
-								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Keine Antwort</a>
-							</li>
+								<a class="dropdown-item" @click="changeStatusToAbgewiesener(3)">ZGV nicht erfüllt</a>
+							</li>									
 							<li>
-								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">Sonstiges</a>
-							</li>
+								<a class="dropdown-item" @click="changeStatusToAbgewiesener(4)">Von BewerberIn storniert</a>
+							</li>									
 							<li>
-								<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abgewiesener', 'Abgewiesenen')">...</a>
+								<a class="dropdown-item" @click="changeStatusToAbgewiesener(5)">Aufnahme in anderen Studiengang</a>
+							</li>									
+							<li>
+								<a class="dropdown-item" @click="changeStatusToAbgewiesener(6)">Reihungstestergebnis unzureichend</a>
+							</li>									
+							<li>
+								<a class="dropdown-item" @click="changeStatusToAbgewiesener(7)">Sonstiges</a>
 							</li>
 						</ul>
 					</li>					
 				</ul>
+				
+				<!-- Dynamisch Interessent-->
+				<div v-if="showToolbarInteressent" class="btn-group">
+					<select v-model="selectedStatus" class="form-select button-dropdown" @change="handleSelectionChange">
+					<option value="default">---SELECT STATUS INTERESSENT---</option>
+					<option 
+						v-for="item in resultInteressentArray" 
+						:key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
+						:value="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
+					>
+						{{ item.status_kurzbz }} {{ item.bezeichnung }} {{ item.dropEntry }}
+					</option>
+					</select>
+				</div>
 			
 				<!--toolbar Student-->
 				<ul v-if="showToolbarStudent" class="dropdown-menu">
@@ -1307,6 +1495,20 @@ export default{
 						<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
 					</li>							
 				</ul>
+			</div>
+			
+			<!-- Dynamisch Student-->
+			<div v-if="showToolbarStudent" class="btn-group">
+				<select v-model="selectedStatus" class="form-select button-dropdown" @change="handleSelectionChange">
+				<option value="default">---SELECT STATUS STUDENT---</option>
+				<option 
+					v-for="item in resultStudentArray" 
+					:key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
+						:value="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
+				>
+					{{ item.status_kurzbz }} {{ item.bezeichnung }} {{ item.dropEntry }}
+				</option>
+				</select>
 			</div>
 		
 		</div>`
