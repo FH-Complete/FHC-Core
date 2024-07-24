@@ -70,6 +70,7 @@ class Status extends FHCAPI_Controller
 		$isBerechtigtNoStudstatusCheck = $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
 
 
+		$authUID = getAuthUID();
 		$status_kurzbz = $this->input->post('status_kurzbz');
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
 		$ausbildungssemester = $this->input->post('ausbildungssemester');
@@ -288,8 +289,9 @@ class Status extends FHCAPI_Controller
 		
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
-		
 
+
+		// Start DB transaction
 		$this->db->trans_start();
 
 		if (in_array($status_kurzbz, [
@@ -339,12 +341,13 @@ class Status extends FHCAPI_Controller
 						'verband' => $student->verband,
 						'gruppe' => $student->gruppe,
 						'insertamum' => date('c'),
-						'insertvon' => getAuthUID()
+						'insertvon' => $authUID
 					]);
 				}
 			}
 		}
 
+		//insert status
 		$result = $this->PrestudentstatusModel->insert([
 			'prestudent_id' => $prestudent_id,
 			'status_kurzbz' => $status_kurzbz,
@@ -352,10 +355,10 @@ class Status extends FHCAPI_Controller
 			'ausbildungssemester' => $ausbildungssemester,
 			'datum' => $datum,
 			'insertamum' => date('c'),
-			'insertvon' => getAuthUID(),
+			'insertvon' => $authUID,
 			'orgform_kurzbz' => $orgform_kurzbz,
 			'bestaetigtam' => $bestaetigtam,
-			'bestaetigtvon' => $bestaetigtam ? getAuthUID() : null,
+			'bestaetigtvon' => $bestaetigtam ? $authUID : null,
 			'anmerkung' => $anmerkung,
 			'bewerbung_abgeschicktamum' => $bewerbung_abgeschicktamum,
 			'studienplan_id' => $studienplan_id,
@@ -367,7 +370,7 @@ class Status extends FHCAPI_Controller
 
 		$this->db->trans_complete();
 
-		$this->terminateWithSuccess($prestudent_id);
+		$this->terminateWithSuccess(true);
 	}
 
 	public function getStatusgruende()
@@ -1671,43 +1674,63 @@ class Status extends FHCAPI_Controller
 		return $this->terminateWithSuccess(true);
 	}
 
-	public function updateStatus($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
+	public function updateStatus($prestudent_id, $status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
 	{
-		$isStudent = false;
+		$result = $this->PrestudentstatusModel->load([
+			$key_ausbildungssemester,
+			$key_studiensemester_kurzbz,
+			$status_kurzbz,
+			$prestudent_id
+		]);
+		$oldstatus = $this->getDataOrTerminateWithError($result);
+		if (!$oldstatus)
+			show_404(); // Status that should be updated does not exist
+
+		$oldstatus = current($oldstatus);
+
+		
 		$isBerechtigtNoStudstatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
 
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
-		$uid = getAuthUID();
-		$prestudent_id = $this->input->post('prestudent_id');
-		$status_kurzbz = $this->input->post('status_kurzbz');
-		$ausbildungssemester = $this->input->post('ausbildungssemester');
-		$datum = $this->input->post('datum');
-		$bestaetigtam = $this->input->post('bestaetigtam');
-		$bewerbung_abgeschicktamum = $this->input->post('bewerbung_abgeschicktamum');
-		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
-		$studienplan_id = $this->input->post('studienplan_id');
-		$anmerkung  = $this->input->post('anmerkung');
-		$statusgrund_id = $this->input->post('statusgrund_id');
-		$rt_stufe = $this->input->post('rt_stufe');
-		$bestaetigtvon = $uid;
+		$authUID = getAuthUID();
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz') ?: $oldstatus->studiensemester_kurzbz;
+		$ausbildungssemester = $this->input->post('ausbildungssemester') ?: $oldstatus->ausbildungssemester;
+		$datum = $this->input->post('datum') ?: $oldstatus->datum;
 
-		//check if Bismeldestichtag erreicht
-		if(!$isBerechtigtNoStudstatusCheck)
-		{
-			$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($datum);
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-		}
 
 		//Form Validation
 		$this->load->library('form_validation');
 
-		$this->form_validation->set_rules('_global', '', [
+		$this->form_validation->set_rules(
+			'datum',
+			$this->p->t('global', 'datum'),
+			[
+				'is_valid_date',
+				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck) {
+					if ($isBerechtigtNoStudstatusCheck)
+						return true; // Skip if access right says so
+					if (!$value)
+						return true; // Error will be handled by the required statement above
+					
+					$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($value);
+					
+					return !$this->getDataOrTerminateWithError($result);
+				}]
+			],
+			[
+				'meldestichtag_not_exceeded' => $this->p->t('lehre', 'error_dataVorMeldestichtag')
+			]
+		);
+
+		$this->form_validation->set_rules('bestaetigtam', $this->p->t('lehre', 'bestaetigt_am'), 'is_valid_date');
+
+		if (!is_valid_date($datum))
+			$datum = null;
+
+		// Set Datum to null to prevent multiple is_valid_date checks in the following validation rules
+		$this->form_validation->set_rules('_default', '', [
 			//check if Rolle already exists
-			['checkIfExistingPrestudentRolle', function () use (
+			['new_rolle_doesnt_exist', function () use (
 				$prestudent_id,
 				$status_kurzbz,
 				$studiensemester_kurzbz,
@@ -1716,143 +1739,257 @@ class Status extends FHCAPI_Controller
 				$key_ausbildungssemester
 			) {
 				if ($key_studiensemester_kurzbz == $studiensemester_kurzbz
-					&&  $key_ausbildungssemester == $ausbildungssemester
+					&& $key_ausbildungssemester == $ausbildungssemester
 				)
-					return true;
-				$result = $this->prestudentstatuschecklib->checkIfExistingPrestudentRolle(
+					return true; // Primary key has not change we update in place
+
+				$result = $this->PrestudentstatusModel->load([
+					$ausbildungssemester,
+					$studiensemester_kurzbz,
+					$status_kurzbz,
+					$prestudent_id
+				]);
+				return !$this->getDataOrTerminateWithError($result);
+			}],
+			['history_timesequence', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester,
+				$key_studiensemester_kurzbz,
+				$key_ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+				if (!$datum)
+					return true; // Error will be handled by the is_valid_date statement above
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryTimesequence(
 					$prestudent_id,
 					$status_kurzbz,
+					new DateTime($datum),
 					$studiensemester_kurzbz,
-					$ausbildungssemester
+					$ausbildungssemester,
+					$key_studiensemester_kurzbz,
+					$key_ausbildungssemester
 				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			['history_laststatus', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester,
+				$key_studiensemester_kurzbz,
+				$key_ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+				if (!$datum)
+					return true; // Error will be handled by the is_valid_date statement above
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryLaststatus(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					$key_studiensemester_kurzbz,
+					$key_ausbildungssemester
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			['history_unterbrecher', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester,
+				$key_studiensemester_kurzbz,
+				$key_ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+				if (!$datum)
+					return true; // Error will be handled by the is_valid_date statement above
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryUnterbrechersemester(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					$key_studiensemester_kurzbz,
+					$key_ausbildungssemester
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			['history_abbrecher', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester,
+				$key_studiensemester_kurzbz,
+				$key_ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+				if (!$datum)
+					return true; // Error will be handled by the is_valid_date statement above
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryAbbrechersemester(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					$key_studiensemester_kurzbz,
+					$key_ausbildungssemester
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			['history_diplomant', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester,
+				$key_studiensemester_kurzbz,
+				$key_ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+				if (!$datum)
+					return true; // Error will be handled by the is_valid_date statement above
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryDiplomant(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					$key_studiensemester_kurzbz,
+					$key_ausbildungssemester
+				);
+
 				return $this->getDataOrTerminateWithError($result);
 			}]
 		], [
-			'checkIfExistingPrestudentRolle' => $this->p->t('lehre', 'error_rolleBereitsVorhanden')
+			'new_rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhanden'),
+			'history_timesequence' => $this->p->t('lehre', 'error_statuseintrag_zeitabfolge'),
+			'history_laststatus' => $this->p->t('lehre', 'error_endstatus'),
+			'history_unterbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecher'),
+			'history_abbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecherAbbrecher'),
+			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent')
 		]);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		//check if studentrolle already exists
-		if($status_kurzbz == Prestudentstatus_model::STATUS_STUDENT || $status_kurzbz == Prestudentstatus_model::STATUS_DIPLOMAND )
-		
-		//TODO(manu): check why $lastStatusDAta
-		// if($status_kurzbz == Prestudentstatus_model::STATUS_STUDENT || $status_kurzbz == Prestudentstatus_model::STATUS_DIPLOMAND || $lastStatusData->status_kurzbz == Prestudentstatus_model::STATUS_STUDENT)
-		{
-			$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($prestudent_id);
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-			$isStudent = getData($result);
-		}
-
-
-		if(!$isBerechtigtNoStudstatusCheck)
-		{
-			//Block STATUSCHECKS
-
-			$result = $this->prestudentstatuschecklib->checkStatusUpdate(
-				$prestudent_id,
-				$status_kurzbz,
-				$studiensemester_kurzbz,
-				$datum,
-				$ausbildungssemester,
-				$studienplan_id,
-				$key_studiensemester_kurzbz,
-				$key_ausbildungssemester
-			);
-
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-		}
-
 
 		// Start DB transaction
-		$this->db->trans_begin();
+		$this->db->trans_start();
 
-		//update status
-		$result = $this->PrestudentstatusModel->update(
-			[
-				'prestudent_id' => $key_prestudent_id,
-				'status_kurzbz' => $key_status_kurzbz,
-				'studiensemester_kurzbz' => $key_studiensemester_kurzbz,
-				'ausbildungssemester' => $key_ausbildungssemester,
-			],
-			[
-				'status_kurzbz' => $status_kurzbz,
-				'studiensemester_kurzbz' => $studiensemester_kurzbz,
-				'ausbildungssemester' => $ausbildungssemester,
-				'bewerbung_abgeschicktamum' => $bewerbung_abgeschicktamum,
-				'studienplan_id' => $studienplan_id,
-				'anmerkung' => $anmerkung,
-				'statusgrund_id' => $statusgrund_id,
-				'updatevon' => $uid,
-				'updateamum' => date('c'),
-				'bestaetigtam' => $bestaetigtam,
-				'bestaetigtvon' => $bestaetigtvon,
-				'datum' => $datum,
-				'rt_stufe' => $rt_stufe
-			]
-		);
-		if (isError($result))
-		{
-			$this->db->trans_rollback();
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		}
+		if (in_array($status_kurzbz, [
+			Prestudentstatus_model::STATUS_STUDENT,
+			Prestudentstatus_model::STATUS_DIPLOMAND,
+			Prestudentstatus_model::STATUS_ABSOLVENT,
+			Prestudentstatus_model::STATUS_INCOMING,
+			Prestudentstatus_model::STATUS_ABBRECHER,
+			Prestudentstatus_model::STATUS_UNTERBRECHER
+		])) {
+			$result = $this->StudentModel->loadWhere([
+				'prestudent_id' => $prestudent_id
+			]);
 
+			$student = $this->getDataOrTerminateWithError($result);
 
-		if($isStudent)
-		{
-			//check Studentlehrverband
-			$this->load->model('crm/Student_model', 'StudentModel');
-			$result = $this->StudentModel->checkIfUid($prestudent_id);
-			if (isError($result))
-			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-			if (!hasData($result))
-			{
-				$this->terminateWithError($this->p->t('studierendenantrag','error_no_student_for_prestudent',['prestudent_id' => $prestudent_id]), self::ERROR_TYPE_GENERAL);
-			}
-			$student_uid = $result->retval;
-
-			//process studentlehrverband
-			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-			$result = $this->StudentlehrverbandModel->loadWhere(
-				array(
-					'student_uid' => $student_uid,
+			if ($student) {
+				$student = current($student);
+				
+				$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+				$result = $this->StudentlehrverbandModel->loadWhere([
+					'student_uid' => $student->student_uid,
 					'studiensemester_kurzbz' => $studiensemester_kurzbz
-				)
-			);
-			if (isError($result))
-			{
-				$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-			}
+				]);
 
-			//Data of current Semester
-			$studentlvbData = current(getData($result) ? : []);
+				$studentlvb = $this->getDataOrTerminateWithError($result);
 
-			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-			$result = $this->StudentlehrverbandModel->processStudentlehrverband(
-				$student_uid,
-				$studentlvbData->studiengang_kz,
-				$ausbildungssemester,
-				$studentlvbData->verband,
-				$studentlvbData->gruppe,
-				$studiensemester_kurzbz
-			);
-			if ($this->db->trans_status() === false || isError($result))
-			{
-				$this->db->trans_rollback();
-				return $this->terminateWithError($this->p->t('lehre','error_duringInsertUpdateLehrverband'), self::ERROR_TYPE_GENERAL);
+				// NOTE(chris): if $studentlvb then update to the same values as before (except updatevon). So do nothing.
+				// TODO(chris): check if that is correct (in FAS)?
+				if (!$studentlvb) {
+					$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+					
+					$this->LehrverbandModel->addLimit(1);
+					$result = $this->LehrverbandModel->loadWhere([
+						'studiengang_kz' => $student->studiengang_kz,
+						'semester' => $ausbildungssemester,
+						'verband' => $student->verband,
+						'gruppe' => $student->gruppe
+					]);
+					$lv = $this->getDataOrTerminateWithError($result);
+
+					$this->StudentlehrverbandModel->insert([
+						'student_uid' => $student->student_uid,
+						'studiensemester_kurzbz' => $studiensemester_kurzbz,
+						'studiengang_kz' => $student->studiengang_kz,
+						'semester' => $lv ? $ausbildungssemester : $student->semester,
+						'verband' => $student->verband,
+						'gruppe' => $student->gruppe,
+						'insertamum' => date('c'),
+						'insertvon' => $authUID
+					]);
+				}
 			}
 		}
+		
+		//update status
+		$updateData = [
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'ausbildungssemester' => $ausbildungssemester,
+			'datum' => $datum,
+			'updateamum' => date('c'),
+			'updatevon' => $authUID
+		];
+		foreach ([
+			'orgform_kurzbz',
+			'anmerkung',
+			'bewerbung_abgeschicktamum',
+			'studienplan_id',
+			'rt_stufe',
+			'statusgrund_id'
+		] as $key)
+			if ($this->input->post($key))
+				$updateData[$key] = $this->input->post($key);
+		
+		if ($this->input->post('bestaetigtam')) {
+			$updateData['bestaetigtam'] = $this->input->post('bestaetigtam');
+			$updateData['bestaetigtvon'] = $authUID;
+		}
+		
+		$result = $this->PrestudentstatusModel->update([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => $status_kurzbz,
+			'studiensemester_kurzbz' => $key_studiensemester_kurzbz,
+			'ausbildungssemester' => $key_ausbildungssemester,
+		], $updateData);
+
+		$this->getDataOrTerminateWithError($result);
+
 		$this->db->trans_commit();
+
 		return $this->outputJsonSuccess(true);
 	}
 
