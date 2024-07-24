@@ -57,15 +57,30 @@ class Status extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
+	/**
+	 * Inserts a status with less validations and extra logic for manual
+	 * manipulation
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return void
+	 */
 	public function insert($prestudent_id)
 	{
 		$isBerechtigtNoStudstatusCheck = $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
-		$isBerechtigtNoStudstatusCheck = false; // TODO(chris): DEBUG
+
 
 		$status_kurzbz = $this->input->post('status_kurzbz');
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
 		$ausbildungssemester = $this->input->post('ausbildungssemester');
 		$datum = $this->input->post('datum');
+		$bestaetigtam = $this->input->post('bestaetigtam');
+		$orgform_kurzbz = $this->input->post('orgform_kurzbz');
+		$anmerkung = $this->input->post('anmerkung');
+		$bewerbung_abgeschicktamum = $this->input->post('bewerbung_abgeschicktamum');
+		$studienplan_id = $this->input->post('studienplan_id');
+		$rt_stufe = $this->input->post('rt_stufe');
+		$statusgrund_id = $this->input->post('statusgrund_id');
 
 
 		$this->load->library('form_validation');
@@ -125,7 +140,7 @@ class Status extends FHCAPI_Controller
 		$this->form_validation->set_rules('bestaetigtam', $this->p->t('lehre', 'bestaetigt_am'), 'is_valid_date');
 
 		// Set Datum to null to prevent multiple is_valid_date checks in the following validation rules
-		if (!is_valid_date($datum))
+		if (!$datum || !is_valid_date($datum))
 			$datum = null;
 
 		$this->form_validation->set_rules('_default', '', [
@@ -273,7 +288,85 @@ class Status extends FHCAPI_Controller
 		
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
-		// TODO(chris): IMPLEMENT!
+		
+
+		$this->db->trans_start();
+
+		if (in_array($status_kurzbz, [
+			Prestudentstatus_model::STATUS_STUDENT,
+			Prestudentstatus_model::STATUS_DIPLOMAND,
+			Prestudentstatus_model::STATUS_ABSOLVENT,
+			Prestudentstatus_model::STATUS_INCOMING,
+			Prestudentstatus_model::STATUS_ABBRECHER,
+			Prestudentstatus_model::STATUS_UNTERBRECHER
+		])) {
+			$result = $this->StudentModel->loadWhere([
+				'prestudent_id' => $prestudent_id
+			]);
+
+			$student = $this->getDataOrTerminateWithError($result);
+
+			if ($student) {
+				$student = current($student);
+				
+				$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+				$result = $this->StudentlehrverbandModel->loadWhere([
+					'student_uid' => $student->student_uid,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz
+				]);
+
+				$studentlvb = $this->getDataOrTerminateWithError($result);
+
+				// NOTE(chris): if $studentlvb then update to the same values as before (except updatevon). So do nothing.
+				// TODO(chris): check if that is correct (in FAS)?
+				if (!$studentlvb) {
+					$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+					
+					$this->LehrverbandModel->addLimit(1);
+					$result = $this->LehrverbandModel->loadWhere([
+						'studiengang_kz' => $student->studiengang_kz,
+						'semester' => $ausbildungssemester,
+						'verband' => $student->verband,
+						'gruppe' => $student->gruppe
+					]);
+					$lv = $this->getDataOrTerminateWithError($result);
+
+					$this->StudentlehrverbandModel->insert([
+						'student_uid' => $student->student_uid,
+						'studiensemester_kurzbz' => $studiensemester_kurzbz,
+						'studiengang_kz' => $student->studiengang_kz,
+						'semester' => $lv ? $ausbildungssemester : $student->semester,
+						'verband' => $student->verband,
+						'gruppe' => $student->gruppe,
+						'insertamum' => date('c'),
+						'insertvon' => getAuthUID()
+					]);
+				}
+			}
+		}
+
+		$result = $this->PrestudentstatusModel->insert([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => $status_kurzbz,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'ausbildungssemester' => $ausbildungssemester,
+			'datum' => $datum,
+			'insertamum' => date('c'),
+			'insertvon' => getAuthUID(),
+			'orgform_kurzbz' => $orgform_kurzbz,
+			'bestaetigtam' => $bestaetigtam,
+			'bestaetigtvon' => $bestaetigtam ? getAuthUID() : null,
+			'anmerkung' => $anmerkung,
+			'bewerbung_abgeschicktamum' => $bewerbung_abgeschicktamum,
+			'studienplan_id' => $studienplan_id,
+			'rt_stufe' => $rt_stufe,
+			'statusgrund_id' => $statusgrund_id
+		]);
+
+		$this->getDataOrTerminateWithError($result);
+
+		$this->db->trans_complete();
+
 		$this->terminateWithSuccess($prestudent_id);
 	}
 

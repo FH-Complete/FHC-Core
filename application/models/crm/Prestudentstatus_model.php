@@ -13,6 +13,7 @@ class Prestudentstatus_model extends DB_Model
 	const STATUS_WARTENDER = 'Wartender';
 	const STATUS_ABGEWIESENER = 'Abgewiesener';
 	const STATUS_INTERESSENT = 'Interessent';
+	const STATUS_INCOMING = 'Incoming';
 
 	/**
 	 * Constructor
