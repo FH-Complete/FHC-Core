@@ -30,6 +30,7 @@ class Ampeln extends FHCAPI_Controller
 			'getNonConfirmedActiveAmpeln' => self::PERM_LOGGED,
             'getAllActiveAmpeln' => self::PERM_LOGGED,
             'getConfirmedActiveAmpeln' => self::PERM_LOGGED,
+            'confirmAmpel' => self::PERM_LOGGED,
             
 		]);
 
@@ -46,6 +47,27 @@ class Ampeln extends FHCAPI_Controller
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
+    /**
+	 * function that queries all the ampeln that are addressed to the user uid
+     * @access public
+	 * 
+	 */
+	public function confirmAmpel($ampel_id)
+	{
+        if(!isset($ampel_id)){
+            $this->terminateWithError("missing parameter");
+        }
+
+        $insert_into_result = $this->AmpelModel->confirmAmpel($ampel_id,$this->uid);
+
+        if(isError($insert_into_result)){
+            $this->terminateWithError(getError($insert_into_result));
+        }
+
+        $insert_into_result = $this->getDataOrTerminateWithError($insert_into_result);
+
+        $this->terminateWithSuccess($insert_into_result);
+    }
 	
     /**
 	 * function that queries all the ampeln that are addressed to the user uid
@@ -59,10 +81,10 @@ class Ampeln extends FHCAPI_Controller
 
         $ampel_result = $this->getDataOrTerminateWithError($ampel_result);
 
-        $is_confirmed_array = array();
         foreach($ampel_result as $ampel){
             
             $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
+            $ampel->bestaetigt = $confirmedByUser;
             if(!$confirmedByUser){
                 $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
                 $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
@@ -90,6 +112,8 @@ class Ampeln extends FHCAPI_Controller
 
         foreach($ampel_result as $ampel){
             
+            $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
+            $ampel->bestaetigt = $confirmedByUser;
             $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
             $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
             foreach($userUID_array as $user_obj){
@@ -104,35 +128,7 @@ class Ampeln extends FHCAPI_Controller
 
         $this->terminateWithSuccess($userAmpeln);
 	}
-
-    public function getConfirmedActiveAmpeln()
-	{
-        $userAmpeln = array();
-        $ampel_result = $this->AmpelModel->active();
-
-        $ampel_result = $this->getDataOrTerminateWithError($ampel_result);
-
-        $is_confirmed_array = array();
-        foreach($ampel_result as $ampel){
-            
-            $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
-            if($confirmedByUser){
-                $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
-                $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
-                foreach($userUID_array as $user_obj){
-                    
-                    $user_uid = property_exists($user_obj,"uid") ? $user_obj->uid : $user_obj->mitarbeiter_uid;
-                    if($user_uid === $this->uid){
-                        $userAmpeln[] = $ampel;
-                    }
-                }
-                    
-            }
-            
-        }
-
-        $this->terminateWithSuccess($userAmpeln);
-	}
+    
 
     
 }

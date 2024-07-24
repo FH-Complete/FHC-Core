@@ -90,4 +90,18 @@ class Ampel_model extends DB_Model
 		else
 			return $result; //will contain the error-msg from execQuery
 	}
+
+
+	public function confirmAmpel($ampel_id, $uid)
+	{
+		if(isset($ampel_id) && isset($uid)){
+			return $this->execQuery('
+			INSERT INTO public.tbl_ampel_benutzer_bestaetigt (ampel_id, uid)
+			VALUES (?,?);', array($ampel_id, $uid));
+		}else{
+
+			return error("parameter were missing to execute the insert into");
+		}
+		
+	}
 }

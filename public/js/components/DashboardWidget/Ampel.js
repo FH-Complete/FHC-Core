@@ -7,33 +7,76 @@ export default {
     data: () => ({
         filter: '',
         source: '',
-        ampeln: [],
+        ampeln: null,
+        allAmpeln:null,
+        activeAmpeln:null,
     }),
     mixins: [
         AbstractWidget
     ],
     computed: {
+        filteredAmpeln(){
+            
+            if (this.source == 'offen')
+            {
+                switch(this.filter)
+                {
+                    case 'verpflichtend': return this.activeAmpeln?.filter(item => item.verpflichtend);
+                    case 'ueberfaellig': return this.activeAmpeln?.filter(item => (new Date() > new Date(item.deadline)) && !item.bestaetigt);
+                    default: return this.activeAmpeln;
+                }
+            }
+            if (this.source == 'alle')
+            {
+                switch(this.filter)
+                {
+                    case 'verpflichtend': return this.allActiveAmpeln?.filter(item => item.verpflichtend);
+                    case 'ueberfaellig': return this.allActiveAmpeln?.filter(item => (new Date() > new Date(item.deadline)) && !item.bestaetigt);
+                    default: return this.allActiveAmpeln;
+                }
+                
+            }
+            return this.activeAmpeln;
+        },
+        openAmpeln () {
+            return this.ampeln.filter(ampel=>{
+                if(!ampel.bestaetigt){
+                    return true;
+                }
+                return false;
+            })  
+        },
         widgetAmpeln () {
-            return this.ampeln.slice(0, 4);  // show only newest 4 ampeln
+            return this.activeAmpeln?.slice(0, 4);  // show only newest 4 ampeln
         },
         offcanvasAmpeln ()
         {
             switch(this.filter)
             {
-                case 'verpflichtend': return this.ampeln.filter(item => item.verpflichtend);
-                case 'ueberfaellig': return this.ampeln.filter(item => (new Date() > new Date(item.deadline)) && !item.bestaetigt);
-                default: return this.ampeln;
+                case 'verpflichtend': return this.activeAmpeln?.filter(item => item.verpflichtend);
+                case 'ueberfaellig': return this.activeAmpeln?.filter(item => (new Date() > new Date(item.deadline)) && !item.bestaetigt);
+                default: return this.activeAmpeln;
             }
         },
         count () {
+            let datasource = this.activeAmpeln;
+            if (this.source == 'offen') datasource = this.activeAmpeln;
+            if (this.source == 'alle') datasource = this.allActiveAmpeln;
+
             return {
-                verpflichtend: this.ampeln.filter(item => item.verpflichtend).length,
-                ueberfaellig: this.ampeln.filter(item => (new Date() > new Date(item.deadline)) && !item.bestaetigt).length,
-                alle: this.ampeln.length
+                verpflichtend: datasource?.filter(item => item.verpflichtend).length,
+                ueberfaellig: datasource?.filter(item => (new Date() > new Date(item.deadline)) && !item.bestaetigt).length,
+                alle: datasource?.length
             }
+            
         }
     },
     methods: {
+
+        toggleFilter(value){
+            this.filter === value ? this.filter = '' : this.filter = value;
+        },
+        
         closeOffcanvasAmpeln()
         {
             for (let i = 0; i < this.offcanvasAmpeln.length; i++)
@@ -52,20 +95,38 @@ export default {
         closeOffcanvas(){
             this.filter = '';
         },
-        confirm(ampelId){
-            let indexToRemove = this.ampeln.findIndex((obj => obj.ampel_id === ampelId));
-            this.ampeln.splice(indexToRemove, 1);
+        async fetchActiveAmpeln(){
+
+            await this.$fhcApi.factory.ampeln.getNonConfirmedActiveAmpeln().then(res=>{
+                this.activeAmpeln = res.data;
+            }); 
+        },
+        async fetchAllAmpeln(){
+
+            await this.$fhcApi.factory.ampeln.getAllActiveAmpeln().then(res=>{
+                this.allActiveAmpeln = res.data;
+            }); 
+        },
+        async confirm(ampelId){
+            this.$fhcApi.factory.ampeln.confirmAmpel(ampelId).then(res =>{
+                console.log(res,"result of the insert into")
+            });
+
+            // fetch all the ampeln after an ampel has been confirmed
+            await this.fetchActiveAmpeln();
+            await this.fetchAllAmpeln();
+
         },
         changeDisplay(){
             this.filter = '';
             if (this.source == 'offen')
             {
-                this.ampeln = TEST_OFFENE_AMPELN;
+                //this.ampeln = openAmpeln;
             }
 
             if (this.source == 'alle')
             {
-                this.ampeln = TEST_ALLE_AMPELN;
+                //this.ampeln = TEST_ALLE_AMPELN;
                 // axios
                 //     .get(this.apiurl + '/dashboard/Api/getAmpeln')
                 //     .then(res => { this.ampeln = res.data })
@@ -78,31 +139,22 @@ export default {
     },
     async created() {
         
-        let temporary_ampeln=null;
-        let temporary_confirmedAmpeln=null;
+        await this.fetchActiveAmpeln();
+        await this.fetchAllAmpeln();
 
-        await this.$fhcApi.factory.ampeln.getAllActiveAmpeln().then(res=>{
-            temporary_ampeln = res.data;
-        }); 
-
-        await this.$fhcApi.factory.ampeln.getConfirmedActiveAmpeln().then(res=>{
-            temporary_confirmedAmpeln = res.data;
-        });
-
-
-        /* this.ampeln = temporary_ampeln.filter((ampel)=>{
-                if(temporary_confirmedAmpeln.some((confirmedAmpel)=> confirmedAmpel.ampel_id === ampel.ampel_id)){
-                    return false;
-                }
-                return true;
-            });
- */
+        // add the first element of the active ampeln again just for testing purposes
+        /* let duplicate = {...this.allActiveAmpeln[0]};
+        duplicate.verpflichtend= false;
+        this.allActiveAmpeln.push(duplicate);
+        console.log(this.activeAmpeln,"this are the active ampeln")
+        console.log(this.allActiveAmpeln,"this are all the ampeln")
+  */
         this.$emit('setConfig', false);
         
     },
     template: /*html*/`
     <div class="widgets-ampel w-100 h-100">
-        <div v-if="ampeln" class="d-flex flex-column justify-content-between">
+        <div v-if="activeAmpeln" class="d-flex flex-column justify-content-between">
             <div class="d-flex">
                 <header class="me-auto"><b>Neueste Ampeln</b></header>
                 <div class="mb-2 text-danger"><a href="#allAmpelOffcanvas" data-bs-toggle="offcanvas">Alle Ampeln</a></div>
@@ -126,7 +178,7 @@ export default {
                 </div>
             </div>
             
-            <div v-if="ampeln.length == 0" class="card card-body mt-4 p-4 text-center">
+            <div v-if="activeAmpeln && activeAmpeln.length == 0" class="card card-body mt-4 p-4 text-center">
                 <span class="text-success h2"><i class="fa fa-solid fa-circle-check"></i></span>
                 <span class="text-success h5">Super!</span><br>
                 <span class="small">Keine offenen Ampeln.</span>
@@ -165,10 +217,10 @@ export default {
             </div>
             <div class="col"><button class="btn btn-light w-100" @click="filter = ''"><small>Alle: <b>{{ count.alle }}</b></small></button></div>
             <div class="row row-cols-2 g-2 mt-1">
-                <div class="col"><button class="btn btn-danger w-100"  @click="filter = 'ueberfaellig'"><i class="fa fa-solid fa-bolt me-2"></i><small>Überfällig: <b>{{ count.ueberfaellig }}</b></small></button></div>
-                <div class="col"><button class="btn btn-warning w-100" @click="filter = 'verpflichtend'"><i class="fa fa-solid fa-triangle-exclamation me-2"></i><small>Pflicht: <b>{{ count.verpflichtend }}</b></small></button></div>
+                <div class="col"><button class="btn btn-danger w-100"  @click="toggleFilter('ueberfaellig')"><i class="fa fa-solid fa-bolt me-2"></i><small :style="{...(filter==='ueberfaellig'?{'text-decoration':'underline','font-weight':'bold'}:{})}">Überfällig: <b>{{ count.ueberfaellig }}</b></small></button></div>
+                <div class="col"><button class="btn btn-warning w-100" @click="toggleFilter('verpflichtend')"><i class="fa fa-solid fa-triangle-exclamation me-2"></i><small :style="{...(filter==='verpflichtend'?{'text-decoration':'underline','font-weight':'bold'}:{})}">Pflicht: <b>{{ count.verpflichtend }}</b></small></button></div>
             </div>
-            <div v-for="ampel in offcanvasAmpeln" :key="ampel.ampel_id" class="mt-2">
+            <div v-for="ampel in filteredAmpeln" :key="ampel.ampel_id" class="mt-2">
                 <ul class="list-group">
                 <li class="list-group-item small">
                 <div class="position-relative"><!-- prevents streched-link from stretching outside this parent element -->
