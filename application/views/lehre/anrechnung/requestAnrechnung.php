@@ -4,6 +4,7 @@ const CHAR_LENGTH150 = 150;
 const CHAR_LENGTH500 = 500;
 const CHAR_LENGTH1000 = 1000;
 
+$this->load->config('anrechnung');
 $this->load->view(
 	'templates/FHC-Header',
 	array(
@@ -200,27 +201,29 @@ $this->load->view(
 									</div>
 								</div>
 							</div>
-                            <!-- Begruendung ECTS -->
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <b><?php echo $this->p->t('anrechnung', 'begruendungEcts'); ?></b>&emsp;
-                                            <span class="requestAnrechnung-anrechnungInfoTooltip" data-toggle="tooltip" data-placement="right"
-                                                  title="<?php echo $this->p->t('anrechnung', 'anrechnungBegruendungEctsTooltipText'); ?>">
-                                                <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
-                                            </span>
-                                        </div>
-                                        <div class="panel-body">
-                                            <textarea class="form-control" name="begruendung_ects" rows="1" id="requestAnrechnung-begruendungEcts"
-                                                      maxlength="<?php echo CHAR_LENGTH150 ?>" required><?php echo $anrechnungData->begruendung_ects; ?></textarea>
-                                            <small><span class="text-muted pull-right"><?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-begruendungEcts-charCounter"><?php echo CHAR_LENGTH150 ?></span></span></small>
+
+							<?php if ($this->config->item('explain_equivalence')): ?>
+                                <!-- Begruendung ECTS -->
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <b><?php echo $this->p->t('anrechnung', 'begruendungEcts'); ?></b>&emsp;
+                                                <span class="requestAnrechnung-anrechnungInfoTooltip" data-toggle="tooltip" data-placement="right"
+                                                      title="<?php echo $this->p->t('anrechnung', 'anrechnungBegruendungEctsTooltipText'); ?>">
+                                                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                                </span>
+                                            </div>
+                                            <div class="panel-body">
+                                                <textarea class="form-control" name="begruendung_ects" rows="1" id="requestAnrechnung-begruendungEcts"
+                                                          maxlength="<?php echo CHAR_LENGTH150 ?>" required><?php echo $anrechnungData->begruendung_ects; ?></textarea>
+                                                <small><span class="text-muted pull-right"><?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-begruendungEcts-charCounter"><?php echo CHAR_LENGTH150 ?></span></span></small>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Begruendung LV Inhalt -->
-                            <div class="row">
+                                <!-- Begruendung LV Inhalt -->
+                                <div class="row">
                                 <div class="col-lg-12">
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
@@ -240,6 +243,8 @@ $this->load->view(
                                     </div>
                                 </div>
                             </div>
+							<?php endif; ?>
+
 							<!-- Dokument Upload-->
 							<div class="row">
 								<div class="col-lg-12">
