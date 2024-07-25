@@ -1,34 +1,62 @@
-import Pagination from "../../Pagination/Pagination.js";
+import raum_contentmittitel from './Content_types/Raum_contentmittitel.js'
+import general from './Content_types/General.js'
+
 
 export default {
-  components: {
-    Pagination,
+  props:{
+    content_id:{
+        type:Number,
+        required:true,
+    },
+    version:{
+        type:[String, Number],
+        default: null,
+    },
+    sprache:{
+        type:[String, Number],
+        default: null,
+    },
+    sichtbar:{
+        type:[String, Number],
+        default: null,
+    }
+
+
+  },
+  components:{
+    raum_contentmittitel,
+    general,
   },
   data() {
     return {
       content: null,
-      maxPageCount: 0,
-      page_size: 10,
+      
     };
   },
-  methods: {
-    loadNewPageContent: function (data) {
-      Vue.$fhcapi.Cms.getNews(data.page, data.rows).then((result) => {
-        this.content = result.data;
-      });
+  computed:{
+    computeContentType: function(){
+      switch(this.content_type){
+        
+        case "raum_contentmittitel":
+          return "raum_contentmittitel";
+        default:
+          return "general";
+      };
     },
   },
   created() {
-    Vue.$fhcapi.Cms.getNews(1, this.page_size).then((result) => {
-      this.content = result.data;
-    });
-
-    Vue.$fhcapi.Cms.getNewsRowCount().then((result) => {
-      this.maxPageCount = result.data;
+    this.$fhcApi.factory.cms.content(this.content_id,this.version, this.sprache, this.sichtbar).then(res =>{
+        this.content = res.data.content;
+        this.content_type=res.data.type;
     });
   },
+  mounted(){
+    
+  },
   template: /*html*/ `
-    <pagination :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
-    <div v-html="content"></div>
-    </pagination>`,
+    <!-- div that contains the content -->
+    <component :is="computeContentType" v-if="content" :content="content" />
+    <p v-else>No content is available to display</p>
+
+    `,
 };

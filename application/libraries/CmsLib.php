@@ -66,7 +66,6 @@ class CmsLib
 			if (!getData($isberechtigt))
 				return error('global/keineBerechtigungFuerDieseSeite');
 		}
-		#$this->load->model('content/Content_model', 'ContentModel');
 		$content = $this->ci->ContentModel->getContent($content_id, $sprache, $version, $sichtbar, true);
 
 		if (isError($content))
@@ -103,6 +102,12 @@ class CmsLib
 		$XML = new DOMDocument();
 		$XML->loadXML($content->content);
 
+		if($content->titel){
+			$betreff = $content->titel;
+		}else{
+			$betreff = $XML->getElementsByTagName('betreff');
+		}
+
 		$xsltemplate = new DOMDocument();
 		$xsltemplate->loadXML($template->xslt_xhtml_c4);
 
@@ -110,10 +115,15 @@ class CmsLib
 		$processor = new XSLTProcessor();
 		$processor->importStylesheet($xsltemplate);
 
-		$content = $processor->transformToXML($XML);
-		$content = str_replace('dms.php', APP_ROOT . 'cms/dms.php', $content);
+		
+		$transformed_content = $processor->transformToXML($XML);
+		$transformed_content = str_replace('dms.php', APP_ROOT . 'cms/dms.php', $transformed_content);
 
-		return success($content);
+		return success([
+			"betreff"=>$betreff,
+			"type"=>$content->template_kurzbz,
+			"content"=>$transformed_content
+		]);
 	}
 
 	/**

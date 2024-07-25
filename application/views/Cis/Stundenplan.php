@@ -8,10 +8,10 @@ $includesArray = array(
 $this->load->view('templates/CISHTML-Header', $includesArray);
 ?>
 
-<div id="content">
+<div >
 	<h2>Stundenplan</h2>
 	<hr>
-	<fhc-calendar :events="events" initial-mode="week" show-weeks></fhc-calendar>
+	<div id="content"></div>
 </div>
 
 <?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>

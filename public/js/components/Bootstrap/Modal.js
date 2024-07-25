@@ -109,7 +109,7 @@ export default {
 			document.body.appendChild(wrapper);
 		});
 	},
-	template: `<div ref="modal" class="bootstrap-modal modal" tabindex="-1" @[\`hide.bs.modal\`]="$emit('hideBsModal')" @[\`hidden.bs.modal\`]="$emit('hiddenBsModal')" @[\`hidePrevented.bs.modal\`]="$emit('hidePreventedBsModal')" @[\`show.bs.modal\`]="$emit('showBsModal')" @[\`shown.bs.modal\`]="$emit('shownBsModal')">
+	template: `<div ref="modal" class="bootstrap-modal modal" tabindex="-1" @[\`hide.bs.modal\`]="$emit('hideBsModal')" @[\`hidden.bs.modal\`]="$emit('hiddenBsModal')" @[\`hidePrevented.bs.modal\`]="$emit('hidePreventedBsModal')" @[\`show.bs.modal\`]="$emit('showBsModal')" >
 		<div class="modal-dialog" :class="dialogClass">
 			<div class="modal-content">
 				<div v-if="$slots.title" class="modal-header">

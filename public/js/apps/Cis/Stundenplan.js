@@ -1,15 +1,27 @@
 import FhcCalendar from "../../components/Calendar/Calendar.js";
+import CalendarModal from '../../components/Calendar/CalendarModal.js';
 import Phrasen from "../../plugin/Phrasen.js";
 
 const app = Vue.createApp({
 	components: {
-		FhcCalendar
+		FhcCalendar,
+		CalendarModal
 	},
 	data() {
 		return {
 			stunden: [],
-			events: null
+			events: null,
+			currentlySelectedEvent:null,
 		}
+	},
+	methods:{
+		selectEvent: function(event){
+			this.currentlySelectedEvent = event;
+			Vue.nextTick(()=>{
+				this.$refs.calendarModal.show();
+			})
+			
+		},
 	},
 	created() {
 		axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Stundenplan/Stunden').then(res => {
@@ -48,7 +60,10 @@ const app = Vue.createApp({
 				});
 			});
 		});
-	}
+	},
+	template:`
+	<calendar-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="calendarModal"  ></calendar-modal>
+	<fhc-calendar @select:event="selectEvent" :events="events" initial-mode="week" show-weeks></fhc-calendar>`
 });
 app.config.unwrapInjectedRef = true;
 app.use(Phrasen);
