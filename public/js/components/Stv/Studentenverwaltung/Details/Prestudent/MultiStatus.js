@@ -3,6 +3,7 @@ import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 import FormValidation from '../../../../Form/Validation.js';
+import StatusModal from '../Status/Modal.js';
 
 export default{
 	components: {
@@ -11,6 +12,7 @@ export default{
 		FormForm,
 		FormInput,
 		FormValidation,
+		StatusModal
 	},
 	inject: {
 		defaultSemester: {
@@ -426,7 +428,8 @@ export default{
 	},
 	methods: {
 		actionNewStatus() {
-			this.statusNew = true;
+			this.$refs.test.open(this.modelValue);
+			/*this.statusNew = true;
 			this.resetModal();
 			this.statusData.status_kurzbz = 'Interessent';
 			this.statusData.studiensemester_kurzbz = this.defaultSemester;
@@ -435,10 +438,11 @@ export default{
 			this.statusData.bestaetigtam = this.getDefaultDate();
 			this.statusData.name = this.modelValue.vorname + ' ' + this.modelValue.nachname;
 			this.$refs.statusData.clearValidation();
-			this.$refs.statusModal.show();
+			this.$refs.statusModal.show();*/
 		},
-		actionEditStatus(status, stdsem, ausbildungssemester){
-			this.statusNew = false;
+		actionEditStatus(status, stdsem, ausbildungssemester) {
+			this.$refs.test.open(this.modelValue, status, stdsem, ausbildungssemester);
+			/*this.statusNew = false;
 			this.statusId = {
 				'prestudent_id': this.modelValue.prestudent_id,
 				'status_kurzbz': status,
@@ -450,7 +454,7 @@ export default{
 					this.$refs.statusData.clearValidation();
 					this.$refs.statusModal.show();
 				}
-			});
+			});*/
 		},
 		actionDeleteStatus(status, stdsem, ausbildungssemester){
 			this.statusId = {
@@ -1051,6 +1055,7 @@ export default{
 	template: `
 		<div class="stv-list h-100 pt-3">
 			
+			<status-modal ref="test" :meldestichtag="new Date(dataMeldestichtag)" @saved="reload"></status-modal>
 			<!--Modal: statusModal-->
 			<bs-modal ref="statusModal">
 				<template #title>
