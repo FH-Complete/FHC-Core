@@ -14,6 +14,10 @@ export default{
 		defaultSemester: {
 			from: 'defaultSemester',
 		},
+		hasPermissionToSkipStatusCheck: {
+			from: 'hasPermissionToSkipStatusCheck',
+			default: false
+		},
 		hasPrestudentstatusPermission: {
 			from: 'hasPrestudentstatusPermission',
 			default: false
@@ -50,8 +54,7 @@ export default{
 	},
 	computed: {
 		bisLocked() {
-			// TODO(chris): special right
-			if (this.statusNew)
+			if (this.statusNew || this.hasPermissionToSkipStatusCheck)
 				return false;
 
 			if (!this.orig_datum || !this.meldestichtag)
@@ -70,7 +73,7 @@ export default{
 	methods: {
 		open(prestudent, status_kurzbz, studiensemester_kurzbz, ausbildungssemester) {
 			this.$refs.modal.hide();
-			this.prestudent = prestudent;
+			
 			if (!status_kurzbz && !studiensemester_kurzbz && !ausbildungssemester) {
 				this.statusNew = true;
 				this.statusId = prestudent.prestudent_id;
@@ -87,8 +90,11 @@ export default{
 					statusgrund_id: null
 				};
 				this.orig_datum = null;
-				this.$refs.form.clearValidation();
-				this.$refs.modal.show();
+				
+				this.loadStudienplaeneAndSetPrestudent(prestudent)
+					.then(this.$refs.form.clearValidation)
+					.then(this.$refs.modal.show)
+					.catch(this.$fhcAlert.handleSystemError);
 			} else {
 				this.statusId = {
 					prestudent_id: prestudent.prestudent_id,
@@ -96,15 +102,18 @@ export default{
 					studiensemester_kurzbz,
 					ausbildungssemester
 				};
+				
 				this.$fhcApi
 					.post('api/frontend/v1/stv/status/loadStatus/', this.statusId)
 					.then(result => {
 						this.statusNew = false;
 						this.formData = result.data;
 						this.orig_datum = new Date(result.data.datum);
-						this.$refs.form.clearValidation();
-						this.$refs.modal.show();
+						return prestudent;
 					})
+					.then(this.loadStudienplaeneAndSetPrestudent)
+					.then(this.$refs.form.clearValidation)
+					.then(this.$refs.modal.show)
 					.catch(this.$fhcAlert.handleSystemError);
 			}
 		},
@@ -134,29 +143,28 @@ export default{
 					this.$refs.modal.hide();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		loadStudienplaeneAndSetPrestudent(prestudent) {
+			const old_id = this.prestudent.prestudent_id;
+			this.prestudent = prestudent;
+			if (old_id == prestudent.prestudent_id)
+				return Promise.resolve();
+			
+			return this.$fhcApi
+				.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + prestudent.prestudent_id)
+				.then(result => this.listStudienplaene = result.data);
 		}
 	},
 	created() {
-		// TODO(chris): reload studienpläne on prestudent change
-		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + this.prestudent.prestudent_id)
-			.then(result => result.data)
-			.then(result => {
-				this.listStudienplaene = result;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
 		this.$fhcApi
 			.get('api/frontend/v1/stv/status/getStatusgruende/')
-			.then(result => result.data)
-			.then(result => {
-				this.listStatusgruende = result;
-			})
+			.then(result => this.listStatusgruende = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<bs-modal class="stv-status-modal" ref="modal">
 		<template #title>
-			TODO: {{ $p.t('lehre', statusNew ? 'status_new' : 'status_edit', prestudent) }}
+			{{ $p.t('lehre', statusNew ? 'status_new' : 'status_edit', prestudent) }}
 		</template>
 
 		<core-form ref="form">
@@ -189,6 +197,7 @@ export default{
 				<option v-if="!statusNew" value="Absolvent">Absolvent</option>
 				<option v-if="!statusNew" value="Abbrecher">Abbrecher</option>
 				<option v-if="!statusNew" value="Abgewiesener">Abgewiesener</option>
+				<option v-if="!statusNew" value="Wartender">Wartender</option>
 			</form-input>
 			<form-input
 				container-class="mb-3"
