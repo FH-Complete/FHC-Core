@@ -33,7 +33,8 @@ class Lists extends FHCAPI_Controller
 			'getSprachen' => self::PERM_LOGGED,
 			'getGeschlechter' => self::PERM_LOGGED,
 			'getAusbildungen' => self::PERM_LOGGED,
-			'getOrgforms' => self::PERM_LOGGED
+			'getOrgforms' => self::PERM_LOGGED,
+			'getStati' => self::PERM_LOGGED
 		]);
 	}
 
@@ -114,6 +115,29 @@ class Lists extends FHCAPI_Controller
 		$this->OrgformModel->addOrder('bezeichnung');
 
 		$result = $this->OrgformModel->loadWhere(['rolle' => true]);
+		$data = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getStati()
+	{
+		$lang = getUserLanguage();
+		$this->load->model('crm/Status_model', 'StatusModel');
+
+		$this->StatusModel->addSelect('*');
+		$this->StatusModel->addSelect(
+			'bezeichnung_mehrsprachig[(
+				SELECT index
+				FROM public.tbl_sprache
+				WHERE sprache=' . $this->StatusModel->escape($lang) . '
+				LIMIT 1
+			)] AS bezeichnung',
+			false
+		);
+		#$this->StatusModel->addOrder('ext_id');
+
+		$result = $this->StatusModel->load();
 		$data = $this->getDataOrTerminateWithError($result);
 		
 		$this->terminateWithSuccess($data);

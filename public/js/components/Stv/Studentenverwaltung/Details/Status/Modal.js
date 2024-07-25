@@ -42,12 +42,22 @@ export default{
 	data() {
 		return {
 			prestudent: {},
-			orig_datum: null,
+			originalDatum: null,
 			statusNew: true,
 			statusId: {},
 			formData: {},
-			listStudienplaene: [],
-			listStatusgruende: [],
+			studienplaene: [],
+			statusgruende: [],
+			stati: [],
+			allowedNewStatus: [
+				'Interessent',
+				'Bewerber',
+				'Aufgenommener',
+				'Student',
+				'Unterbrecher',
+				'Diplomand',
+				'Incoming'
+			],
 			// TODO(chris): IMPLEMENT!
 			maxSem:  Array.from({ length: 11 }, (_, index) => index),
 		};
@@ -57,17 +67,26 @@ export default{
 			if (this.statusNew || this.hasPermissionToSkipStatusCheck)
 				return false;
 
-			if (!this.orig_datum || !this.meldestichtag)
+			if (!this.originalDatum || !this.meldestichtag)
 				return true;
 			
-			return this.orig_datum < this.meldestichtag;
+			return this.originalDatum < this.meldestichtag;
 		},
 		isStatusBeforeStudent() {
 			let isStatusStudent = ['Student', 'Absolvent', 'Diplomand'];
 			return !isStatusStudent.includes(this.formData.status_kurzbz);
 		},
+		allowedStati() {
+			if (!this.stati)
+				return [];
+			
+			if (this.statusNew)
+				return this.stati.filter(status => this.allowedNewStatus.includes(status.status_kurzbz));
+
+			return this.stati;
+		},
 		gruende() {
-			return this.listStatusgruende.filter(grund => grund.status_kurzbz == this.formData.status_kurzbz);
+			return this.statusgruende.filter(grund => grund.status_kurzbz == this.formData.status_kurzbz);
 		}
 	},
 	methods: {
@@ -89,7 +108,7 @@ export default{
 					rt_stufe: null,
 					statusgrund_id: null
 				};
-				this.orig_datum = null;
+				this.originalDatum = null;
 				
 				this.loadStudienplaeneAndSetPrestudent(prestudent)
 					.then(this.$refs.form.clearValidation)
@@ -108,7 +127,7 @@ export default{
 					.then(result => {
 						this.statusNew = false;
 						this.formData = result.data;
-						this.orig_datum = new Date(result.data.datum);
+						this.originalDatum = new Date(result.data.datum);
 						return prestudent;
 					})
 					.then(this.loadStudienplaeneAndSetPrestudent)
@@ -152,14 +171,31 @@ export default{
 			
 			return this.$fhcApi
 				.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + prestudent.prestudent_id)
-				.then(result => this.listStudienplaene = result.data);
+				.then(result => this.studienplaene = result.data);
 		}
 	},
 	created() {
 		this.$fhcApi
-			.get('api/frontend/v1/stv/status/getStatusgruende/')
-			.then(result => this.listStatusgruende = result.data)
+			.get('api/frontend/v1/stv/status/getStatusgruende')
+			.then(result => this.statusgruende = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
+		/*this.$fhcApi
+			.get('api/frontend/v1/stv/lists/getStati')
+			.then(result => this.stati = result.data)
+			.catch(this.$fhcAlert.handleSystemError);*/
+		this.stati = [
+			{ status_kurzbz: 'Interessent', bezeichnung: 'Interessent'},
+			{ status_kurzbz: 'Bewerber', bezeichnung: 'Bewerber'},
+			{ status_kurzbz: 'Aufgenommener', bezeichnung: 'Aufgenommener'},
+			{ status_kurzbz: 'Student', bezeichnung: 'Student'},
+			{ status_kurzbz: 'Unterbrecher', bezeichnung: 'Unterbrecher'},
+			{ status_kurzbz: 'Diplomand', bezeichnung: 'Diplomand'},
+			{ status_kurzbz: 'Incoming', bezeichnung: 'Incoming'},
+			{ status_kurzbz: 'Absolvent', bezeichnung: 'Absolvent'},
+			{ status_kurzbz: 'Abbrecher', bezeichnung: 'Abbrecher'},
+			{ status_kurzbz: 'Abgewiesener', bezeichnung: 'Abgewiesener'},
+			{ status_kurzbz: 'Wartender', bezeichnung: 'Wartender'}
+		];
 	},
 	template: `
 	<bs-modal class="stv-status-modal" ref="modal">
@@ -187,17 +223,12 @@ export default{
 				required
 				:disabled="!statusNew"
 				>
-				<option value="Interessent">InteressentIn</option>
-				<option value="Bewerber">BewerberIn</option>
-				<option value="Aufgenommener">Aufgenommene/r</option>
-				<option value="Student">StudentIn</option>
-				<option value="Unterbrecher">UnterbrecherIn</option>
-				<option value="Diplomand">DiplomandIn</option>
-				<option value="Incoming">Incoming</option>
-				<option v-if="!statusNew" value="Absolvent">Absolvent</option>
-				<option v-if="!statusNew" value="Abbrecher">Abbrecher</option>
-				<option v-if="!statusNew" value="Abgewiesener">Abgewiesener</option>
-				<option v-if="!statusNew" value="Wartender">Wartender</option>
+				<option
+					v-for="status in allowedStati"
+					:value="status.status_kurzbz"
+					>
+					{{ status.bezeichnung }}
+				</option>
 			</form-input>
 			<form-input
 				container-class="mb-3"
@@ -283,11 +314,11 @@ export default{
 				:disabled="bisLocked"
 				>
 				<option
-					v-for="sp in listStudienplaene"
-					:key="sp.studienplan_id"
-					:value="sp.studienplan_id"
+					v-for="plan in studienplaene"
+					:key="plan.studienplan_id"
+					:value="plan.studienplan_id"
 					>
-					{{ sp.bezeichnung }}
+					{{ plan.bezeichnung }}
 				</option>
 			</form-input>
 			<form-input
