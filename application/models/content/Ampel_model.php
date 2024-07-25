@@ -104,4 +104,65 @@ class Ampel_model extends DB_Model
 		}
 		
 	}
+
+
+	function alleAmpeln($uid){
+
+		$datum = new datum();
+		$now = $datum->mktime_fromdate(date('Y-m-d'));
+
+		// start date of user
+		$benutzerStartDate = $this->execReadOnlyQuery("
+			SELECT insertamum FROM public.tbl_benutzer WHERE uid = ?", [$uid]);
+		$benutzerStartDate = $datum->mktime_fromdate(date(current(getData($benutzerStartDate))->insertamum));
+
+		// user language 
+		$userLanguage = getUserLanguage();
+		$this->load->model('system/Sprache_model','SpracheModel');
+		$this->SpracheModel->addSelect(["index"]);
+		$userLanguage = $this->SpracheModel->loadWhere(["sprache" => $userLanguage]);
+		//checking for error
+		if(isError($userLanguage)) return error(getError($userLanguage));
+		$userLanguage = getData($userLanguage)[0]->index - 1; // why does the index start at 1?
+
+		$zugeteile_ampeln = [];
+		
+		$allAmpeln = $this->execReadOnlyQuery("
+			SELECT * FROM 
+			public.tbl_ampel");
+		
+		if(isError($allAmpeln)) return error(getError($allAmpeln));
+
+		$allAmpeln = getData($allAmpeln);
+
+		foreach($allAmpeln as $ampel){
+			$zugeteilt = $this->execReadOnlyQuery("
+			SELECT 
+				CASE WHEN ? IN (?) 
+					THEN true 
+					ELSE false
+				END as zugeteilt	
+			", [$uid, $ampel->benutzer_select]);
+
+			if(isError($zugeteilt)) return error(getError($zugeteilt));
+			
+			if($zugeteilt 
+				// datum der Ampel liegt nicht vor der Vorlaufzeit
+				&& (isset($ampel->vorlaufzeit) && !($now < strtotime('-' .  $ampel->vorlaufzeit . ' day', $datum->mktime_fromdate($ampel->deadline)) ))
+				// verfallszeit nicht vor dem start Datum des Benutzers abgelaufen
+				&& isset($ampel->verfallszeit) && $benutzerStartDate < strtotime('+' . $ampel->verfallszeit . ' day', $datum->mktime_fromdate($ampel->deadline))
+
+				// verfallszeit ist abgelaufen
+				//&& $now > strtotime('+' . $ampel->verfallszeit . ' day', $ampel->deadline)
+				
+			){
+				$ampel->beschreibung = $ampel->beschreibung[$userLanguage];
+				$ampel->buttontext = $ampel->buttontext[$userLanguage];
+				$zugeteile_ampeln[] = $ampel;
+			}
+		}
+
+		return success($zugeteile_ampeln);
+	}
+
 }

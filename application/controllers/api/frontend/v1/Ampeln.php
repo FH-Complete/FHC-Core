@@ -31,6 +31,7 @@ class Ampeln extends FHCAPI_Controller
             'getAllActiveAmpeln' => self::PERM_LOGGED,
             'getConfirmedActiveAmpeln' => self::PERM_LOGGED,
             'confirmAmpel' => self::PERM_LOGGED,
+            'alleAmpeln' => self::PERM_LOGGED,
             
 		]);
 
@@ -128,6 +129,18 @@ class Ampeln extends FHCAPI_Controller
 
         $this->terminateWithSuccess($userAmpeln);
 	}
+
+    public function alleAmpeln(){
+
+        $alle_ampeln = $this->AmpelModel->alleAmpeln($this->uid);
+
+        if(isError($alle_ampeln)) $this->terminateWithError(getError($alle_ampeln));
+
+        $alle_ampeln = $this->getDataOrTerminateWithError($alle_ampeln);
+
+        $this->terminateWithSuccess($alle_ampeln);
+
+    }
     
 
     
