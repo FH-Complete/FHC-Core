@@ -83,7 +83,7 @@ export default{
 			if (this.statusNew)
 				return this.stati.filter(status => this.allowedNewStatus.includes(status.status_kurzbz));
 
-			return this.stati;
+			return this.stati.filter(status => this.statusId.status_kurzbz == status.status_kurzbz);
 		},
 		gruende() {
 			return this.statusgruende.filter(grund => grund.status_kurzbz == this.formData.status_kurzbz);
