@@ -120,19 +120,18 @@ class Studienplan_model extends DB_Model
 		]);
 	}
 
-	public function getStudienplaeneByPrestudents($prestudentIds)
+	public function getStudienplaeneByPrestudents($prestudent_id)
 	{
-		$prestudentIds = intVal($prestudentIds);
+		$this->addDistinct();
+		$this->addSelect($this->dbTable . '.*');
+		$this->addSelect('sem.start AS start_stsem');
+		$this->addJoin('lehre.tbl_studienordnung o', 'studienordnung_id');
+		$this->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+		$this->addJoin('public.tbl_studiensemester sem', 'sem.studiensemester_kurzbz = o.gueltigvon', 'LEFT');
+		$this->addOrder('sem.start');
 
-		$query = "
-			SELECT so.studienordnung_id, sp.bezeichnung 
-			FROM public.tbl_prestudent ps
-			JOIN lehre.tbl_studienordnung so ON (ps.studiengang_kz = so.studiengang_kz)
-			JOIN lehre.tbl_studienplan sp ON (sp.studienordnung_id = so.studienordnung_id)
-			WHERE ps.prestudent_id IN (?)
-			ORDER BY so.studienordnung_id DESC
-		";
-
-		return $this->execQuery($query, array($prestudentIds));
+		return $this->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
 	}
 }
