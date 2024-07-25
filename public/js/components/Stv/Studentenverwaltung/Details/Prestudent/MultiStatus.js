@@ -152,7 +152,6 @@ export default{
 					status_kurzbz: status,
 					statusgrund_id: null,
 					link: `changeStatusTo${status}`,
-				//	dropEntry: null,
 					children: []
 				};
 
@@ -168,7 +167,6 @@ export default{
 							statusgrund_id: item.statusgrund_id,
 							beschreibung: item.beschreibung,
 							link: `changeStatusTo${item.status_kurzbz}(${item.statusgrund_id})`,
-						//dropEntry: `[${item.beschreibung}]`
 						};
 
 						if (item.status_kurzbz === "Student") {
@@ -505,22 +503,10 @@ export default{
 		actionConfirmDialogue(data, statusgrund, statusText){
 			this.actionButton = statusgrund;
 			this.actionStatusText = statusText;
-
-			if(this.actionStatusText != "Student" && this.actionStatusText != "Wiederholer")
-				this.$refs.confirmStatusAction.show();
-			else {
-				//haut einzeln hin
-/*				console.log("check if Bewerberstatus");
-				this.checkIfBewerber(this.prestudentIds);
-				console.log(this.isBewerber);*/
-
-				this.$refs.askForAusbildungssemester.show();
-			}
+			this.$refs.confirmStatusAction.show();
 		},
 		changeStatusToAbbrecher(statusgrund_id){
-			this.hideModal('confirmStatusAction');
-			this.hideModal('askForAusbildungssemester');
-			console.log("in function changeStatusToAbbrecher: ", statusgrund_id);
+			this.resetChangeModals();
 			let def_date = this.getDefaultDate();
 			let abbruchData =
 				{
@@ -535,8 +521,7 @@ export default{
 			//this.changeStatus(prestudentIds);
 		},
 		changeStatusToUnterbrecher(){
-			this.hideModal('confirmStatusAction');
-			this.hideModal('askForAusbildungssemester');
+			this.resetChangeModals();
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
@@ -549,8 +534,7 @@ export default{
 			this.actionConfirmDialogue(this.updateData, 'studenten','Unterbrecher');
 		},
 		changeStatusToStudent(statusgrund_id){
-			this.hideModal('confirmStatusAction');
-			this.hideModal('askForAusbildungssemester');
+			this.resetChangeModals();
 			console.log("in function changeStatusToStudent: ", statusgrund_id);
 			let def_date = this.getDefaultDate();
 			//TODO Manu validation if Bewerber already before asking for ausbildungssemester
@@ -561,7 +545,7 @@ export default{
 			if(statusgrund_id == 19){
 				this.actionStatusText = 'Pre-Abbrecher';
 			}
-			if(statusgrund_id == 11){
+			if(statusgrund_id == 15){
 				this.actionStatusText = 'Pre-Wiederholer';
 			}
 			if(statusgrund_id == 16){
@@ -570,8 +554,6 @@ export default{
 			if(!statusgrund_id){
 				this.actionStatusText = 'Student';
 			}
-
-
 			let deltaData =
 				{
 					status_kurzbz: 'Student',
@@ -579,15 +561,17 @@ export default{
 					bestaetigtam: def_date,
 					statusgrund_id: statusgrund_id
 				};
-
-		//	this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData, ausbildungssemester: this.actionSem}));
-
-			//now actionSem is asked later
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
 
-			this.actionConfirmDialogue(this.updateData, this.actionButton, this.actionStatusText);
+			if(statusgrund_id == 16 || !statusgrund_id){
+				this.$refs.askForAusbildungssemester.show();
+			}
+			else
+			{
+				this.actionConfirmDialogue(this.updateData, this.actionButton, this.actionStatusText);
+			}
 		},
-		changeStatusToDiplomand(prestudentIds){
+		changeStatusToDiplomand(){
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
@@ -597,9 +581,9 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
-			this.changeStatus(prestudentIds);
+			this.changeStatus(this.prestudentIds);
 		},
-		changeStatusToAbsolvent(prestudentIds){
+		changeStatusToAbsolvent(){
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
@@ -609,11 +593,14 @@ export default{
 				};
 
 			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
-			this.changeStatus(prestudentIds);
+			this.changeStatus(this.prestudentIds);
+		},
+		saveNewAusbildungssemester(){
+			this.newArray = this.newArray.map(objekt => ({ ...objekt, ausbildungssemester: this.actionSem}));
+			this.changeStatus(this.prestudentIds);
 		},
 		changeStatusToBewerber(){
-			this.hideModal('confirmStatusAction');
-			this.hideModal('askForAusbildungssemester');
+			this.resetChangeModals();
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
@@ -629,8 +616,7 @@ export default{
 			this.changeStatus(this.prestudentIds);
 		},
 		changeStatusToAufgenommener(){
-			this.hideModal('confirmStatusAction');
-			this.hideModal('askForAusbildungssemester');
+			this.resetChangeModals();
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
@@ -648,8 +634,7 @@ export default{
 
 		},
 		changeInteressentToStudent(statusgrund_id){
-			this.hideModal('confirmStatusAction');
-			this.hideModal('askForAusbildungssemester');
+			this.resetChangeModals();
 			//TODO(Manu) test statusgrund_id
 			console.log("in function changeInteressentToStudent mit statusgrund_id", statusgrund_id);
 			let def_date = this.getDefaultDate();
@@ -670,8 +655,7 @@ export default{
 
 		},
 		changeStatusToAbgewiesener(statusgrund_id){
-			this.hideModal('confirmStatusAction');
-			this.hideModal('askForAusbildungssemester');
+			this.resetChangeModals();
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
@@ -689,8 +673,7 @@ export default{
 			this.actionConfirmDialogue(this.updateData, 'abgewiesener','Abgewiesenen');
 		},
 		changeStatusToWartender(){
-			this.hideModal('confirmStatusAction');
-			this.hideModal('askForAusbildungssemester');
+			this.resetChangeModals();
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
@@ -774,8 +757,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		changeStatus(prestudentIds){
-			this.hideModal('confirmStatusAction');
-			this.hideModal('askForAusbildungssemester');
+			this.resetChangeModals();
 			//Array.isArray(prestudentIds) ? this.modelValue.prestudent_id : [prestudentIds];
 			let changeData = {};
 
@@ -795,8 +777,6 @@ export default{
 			if (!existingEntry) {
 				this.newArray.push({ ausbildungssemester: this.actionSem });
 			}
-
-			console.log(this.actionSem + ' ' + this.newArray['ausbildungssemester']);
 
 			const promises = prestudentIds.map(prestudentId => {
 				//TODO(manu) besserer check
@@ -1016,6 +996,10 @@ export default{
 			this.actionStatusText = {};
 			this.actionSem = null;
 		},
+		resetChangeModals(){
+			this.hideModal('confirmStatusAction');
+			this.hideModal('askForAusbildungssemester');
+		},
 		getDefaultDate() {
 			const today = new Date();
 			return today;
@@ -1066,72 +1050,7 @@ export default{
 	},
 	template: `
 		<div class="stv-list h-100 pt-3">
-		
-		
-			<table class="table">
-				<thead>
-					<tr>
-					<th>Status Kurzbez</th>
-					<th>Bezeichnung</th>
-					<th>Status Grund ID</th>
-					<th>Link</th>
-					<th>Link statusgrund_id</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for="item in resultStudentArray" :key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')">
-					
-						<td>{{item.status_kurzbz}}</td>
-						
-						<td v-if="item.children[0]">
-							<div v-for="child in item.children">
-								{{child.beschreibung}}
-							</div>
-						</td>
-						<td v-else>{{ item.beschreibung }}</td>
-						<td>{{ item.children[0] }}</td>
-						<td><a :href="item.link">{{ item.link }}</a></td>
-						<td v-if="item.children[0]">
-							<div v-for="child in item.children">
-								{{child.link}}
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
 			
-<!--			<table class="table">
-				<thead>
-					<tr>
-					<th>Status Kurzbez</th>
-					<th>Bezeichnung</th>
-					<th>Status Grund ID</th>
-					<th>Link</th>
-					<th>Link statusgrund_id</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for="item in resultInteressentArray" :key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')">
-					
-						<td>{{item.status_kurzbz}}</td>
-						
-						<td v-if="item.children[0]">
-							<div v-for="child in item.children">
-								{{child.beschreibung}}
-							</div>
-						</td>
-						<td v-else>{{ item.beschreibung }}</td>
-						<td>{{ item.children[0] }}</td>
-						<td><a :href="item.link">{{ item.link }}</a></td>
-						<td v-if="item.children[0]">
-							<div v-for="child in item.children">
-								{{child.link}}
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>-->
-		
 			<!--Modal: statusModal-->
 			<bs-modal ref="statusModal">
 				<template #title>
@@ -1354,18 +1273,9 @@ export default{
 				</div>			
 				</template>
 				<template #footer>
-
-<!--				<div v-if="actionStatusText=='Student'">
-					<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusToStudent(prestudentIds)">OK</button>
-				</div>
-				<div v-if="actionStatusText=='Wiederholer'">
-					<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatusTo(prestudentIds)">OK</button>
-				</div>-->
-				
-				<div>
-					<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatus(prestudentIds)">OK</button>
-				</div>
-					
+					<div>
+						<button  ref="Close" type="button" class="btn btn-primary" @click="saveNewAusbildungssemester()">OK</button>
+					</div>					
 				</template>
 			</BsModal>
 			
@@ -1420,50 +1330,36 @@ export default{
 							  </li>
 							</ul>	
 					
-						<!--toolbar Student-->
-						<ul v-if="showToolbarStudent" class="dropdown-menu">
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToAbbrecher(17)">Abbrecher durch Stgl</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToAbbrecher(18)">Abbrecher durch Student</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToUnterbrecher()">Unterbrecher</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToStudent()">Student</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToStudent(16)">Wiederholer</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToStudent(15)">Pre-Wiederholer</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToStudent(19)">Pre-Abbrecher</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToDiplomand()">Diplomand</a>
-							</li>
-							<li class="dropdown-submenu">
-								<a class="dropdown-item" @click="changeStatusToAbsolvent()">Absolvent</a>
-							</li>							
-						</ul>
-					</div>
-					
-					<!-- Dynamisch Student-->
-					<div v-if="showToolbarStudent" class="btn-group">
-						<select v-model="selectedStatus" class="form-select button-dropdown" @change="handleSelectionChange">
-						<option value="default">---SELECT STATUS STUDENT---</option>
-						<option 
-							v-for="item in resultStudentArray" 
-							:key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
-							 :value="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
-						>
-							{{ item.status_kurzbz }} {{ item.bezeichnung }} {{ item.dropEntry }}
-						</option>
-						</select>
+							<!--toolbar Student-->
+							<ul v-if="showToolbarStudent" class="dropdown-menu">
+							  <li v-for="item in resultStudentArray" :key="item.status_kurzbz" class="w-100">
+
+								<div v-if="item.children.length > 0" class="btn-group dropend w-100">
+								  <a
+									class="dropdown-item dropdown-toggle"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									href="#"
+								  >
+									{{ item.status_kurzbz }}
+								  </a>
+								  <ul class="dropdown-menu dropdown-menu-right">
+									<li v-for="child in item.children" :key="child.statusgrund_id">
+									  <a class="dropdown-item" @click="executeLink(child.link)">{{ child.beschreibung }}</a>
+									</li>
+								  </ul>
+								</div>
+						
+								<div v-else>
+								  <a
+									class="dropdown-item"
+									@click="executeLink(item.link)"
+								  >
+									{{ item.status_kurzbz }}
+								  </a>
+								</div>
+							  </li>
+							</ul>	
 					</div>
 				</template>
 
@@ -1510,44 +1406,36 @@ export default{
 					</ul>	
 							
 				<!--toolbar Student-->
-				<ul v-if="showToolbarStudent" class="dropdown-menu">
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStgl', 'Abbrecher')">Abbrecher durch Stgl</a>
-					</li>
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'abbrecherStud','Abbrecher')">Abbrecher durch Student</a>
-					</li>
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'unterbrecher','Unterbrecher')">Unterbrecher</a>
-					</li>
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student','Student')">Student</a>
-					</li>
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="actionConfirmDialogue(updateData, 'student','Wiederholer')">Wiederholer</a>
-					</li>
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="changeStatusToDiplomand(prestudentIds)">Diplomand</a>
-					</li>
-					<li class="dropdown-submenu">
-						<a class="dropdown-item" @click="changeStatusToAbsolvent(prestudentIds)">Absolvent</a>
-					</li>							
-				</ul>
-			</div>
-			
-			<!-- Dynamisch Student-->
-			<div v-if="showToolbarStudent" class="btn-group">
-				<select v-model="selectedStatus" class="form-select button-dropdown" @change="handleSelectionChange">
-				<option value="default">---SELECT STATUS STUDENT---</option>
-				<option 
-					v-for="item in resultStudentArray" 
-					:key="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
-						:value="item.status_kurzbz + (item.statusgrund_id !== null ? '-' + item.statusgrund_id : '')"
-				>
-					{{ item.status_kurzbz }} {{ item.bezeichnung }} {{ item.dropEntry }}
-				</option>
-				</select>
-			</div>
+					<ul v-if="showToolbarStudent" class="dropdown-menu">
+					  <li v-for="item in resultStudentArray" :key="item.status_kurzbz" class="w-100">
+
+						<div v-if="item.children.length > 0" class="btn-group dropend w-100">
+						  <a
+							class="dropdown-item dropdown-toggle"
+							data-bs-toggle="dropdown"
+							aria-expanded="false"
+							href="#"
+						  >
+							{{ item.status_kurzbz }}
+						  </a>
+						  <ul class="dropdown-menu dropdown-menu-right">
+							<li v-for="child in item.children" :key="child.statusgrund_id">
+							  <a class="dropdown-item" @click="executeLink(child.link)">{{ child.beschreibung }}</a>
+							</li>
+						  </ul>
+						</div>
+				
+						<div v-else>
+						  <a
+							class="dropdown-item"
+							@click="executeLink(item.link)"
+						  >
+							{{ item.status_kurzbz }}
+						  </a>
+						</div>
+					  </li>
+					</ul>
+			</div>			
 	 	</div>	
 	</div>`
 };
