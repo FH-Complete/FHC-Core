@@ -1,17 +1,13 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import BsModal from "../../../../Bootstrap/Modal.js";
-import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
-import FormValidation from '../../../../Form/Validation.js';
 import StatusModal from '../Status/Modal.js';
 
 export default{
 	components: {
 		CoreFilterCmpt,
 		BsModal,
-		FormForm,
 		FormInput,
-		FormValidation,
 		StatusModal
 	},
 	inject: {
@@ -22,54 +18,20 @@ export default{
 			from: 'hasPermissionToSkipStatusCheck',
 			default: false
 		},
-		hasPrestudentPermission: {
-			from: 'hasPrestudentPermission',
-			default: false
-		},
-		hasPrestudentstatusPermission: {
-			from: 'hasPrestudentstatusPermission',
-			default: false
-		},
-		hasAssistenzPermission: {
-			from: 'hasAssistenzPermission',
-			default: false
-		},
-		hasAdminPermission: {
-			from: 'hasAdminPermission',
-			default: false
-		},
-		hasAssistenzPermissionForStgs: {
-			from: 'hasAssistenzPermissionForStgs',
-			default: false
-		},
-		hasSchreibrechtAss: {
-			from: 'hasSchreibrechtAss',
-			default: false
-		},
-		hasPermissionRtAufsicht: {
-			from: 'hasPermissionRtAufsicht',
-			default: false
-		},
-		lists: {
-			from: 'lists'
-		},
 		$reloadList: {
 			from: '$reloadList',
 			required: true
 		}
 	},
 	computed: {
-		prestudentIds(){
+		prestudentIds() {
 			if (this.modelValue.prestudent_id)
 			{
 				return [this.modelValue.prestudent_id];
 			}
 			return this.modelValue.map(e => e.prestudent_id);
 		},
-		paramIds(){
-			return  Array.isArray(this.prestudentIds) ? this.prestudentIds.join(',') : this.prestudentIds;
-		},
-		updateData(){
+		updateData() {
 			const dataArray = [];
 			if (this.modelValue.prestudent_id) {
 				const newObj = {
@@ -97,22 +59,6 @@ export default{
 
 				return dataArray;
 			}
-		},
-		gruende() {
-			return this.listStatusgruende.filter(grund => grund.status_kurzbz == this.statusData.status_kurzbz);
-		},
-		arrayStg(){
-			let stgInteger = this.hasAssistenzPermissionForStgs.map(item => {
-				return parseInt(item);
-			});
-			return stgInteger;
-		},
-		hasPermissionCurrentStg(){
-			return this.arrayStg.includes(this.studiengang_kz);
-		},
-		isStatusBeforeStudent(){
-			let isStatusStudent = ['Student', 'Absolvent', 'Diplomand'];
-			return !isStatusStudent.includes(this.statusData.status_kurzbz);
 		},
 		showToolbarStudent() {
 			if (Array.isArray(this.modelValue)) {
@@ -233,7 +179,6 @@ export default{
 		modelValue: Object,
 	},
 	data() {
-
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id,
@@ -384,16 +329,9 @@ export default{
 				}
 			],
 			statusData: {},
-			maxSem:  Array.from({ length: 11 }, (_, index) => index),
-			listStudienplaene: [],
-			aufnahmestufen: {1: 1, 2: 2, 3: 3},
-			listStatusgruende: [],
 			statusId: {},
-			gruendeLength: {},
 			dataMeldestichtag: null,
-			stichtag: {},
 			isLastStatus: {},
-			hasPermissionThisStg: {},
 			actionButton: {},
 			actionStatusText: {},
 			actionSem: null,
@@ -417,7 +355,7 @@ export default{
 			},
 			deep: true
 		},
-		modelValue(){
+		modelValue() {
 			if (this.$refs.table) {
 				if (this.$refs.table.tableBuilt)
 					this.$refs.table.tabulator.setData('api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id);
@@ -429,32 +367,9 @@ export default{
 	methods: {
 		actionNewStatus() {
 			this.$refs.test.open(this.modelValue);
-			/*this.statusNew = true;
-			this.resetModal();
-			this.statusData.status_kurzbz = 'Interessent';
-			this.statusData.studiensemester_kurzbz = this.defaultSemester;
-			this.statusData.ausbildungssemester = 1;
-			this.statusData.datum = this.getDefaultDate();
-			this.statusData.bestaetigtam = this.getDefaultDate();
-			this.statusData.name = this.modelValue.vorname + ' ' + this.modelValue.nachname;
-			this.$refs.statusData.clearValidation();
-			this.$refs.statusModal.show();*/
 		},
 		actionEditStatus(status, stdsem, ausbildungssemester) {
 			this.$refs.test.open(this.modelValue, status, stdsem, ausbildungssemester);
-			/*this.statusNew = false;
-			this.statusId = {
-				'prestudent_id': this.modelValue.prestudent_id,
-				'status_kurzbz': status,
-				'studiensemester_kurzbz': stdsem,
-				'ausbildungssemester': ausbildungssemester
-			};
-			this.loadStatus(this.statusId).then(() => {
-				if(this.statusData) {
-					this.$refs.statusData.clearValidation();
-					this.$refs.statusModal.show();
-				}
-			});*/
 		},
 		actionDeleteStatus(status, stdsem, ausbildungssemester){
 			this.statusId = {
@@ -742,23 +657,8 @@ export default{
 					else {
 						this.$reloadList();
 					}
-					this.hideModal('statusModal');
 					this.resetModal();
 				});
-		},
-		// Manually inserts a new Status with use of the statusModal
-		insertStatus() {
-			this.$refs.statusData
-				.post(
-					'api/frontend/v1/stv/status/insertStatus/' + this.modelValue.prestudent_id,
-					this.statusData
-				)
-				.then(result => {
-					this.reload();
-					this.$reloadList();
-					this.$refs.statusModal.hide();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
 		},
 		changeStatus(prestudentIds){
 			this.resetChangeModals();
@@ -831,7 +731,6 @@ export default{
 					else {
 						this.$reloadList();
 					}
-					this.hideModal('statusModal');
 					this.resetModal();
 				});
 		},
@@ -881,25 +780,6 @@ export default{
 					this.$reloadList();
 				});
 		},
-		editStatus(){
-			return this.$fhcApi.post('api/frontend/v1/stv/status/updateStatus/' +
-				this.statusId.prestudent_id + '/' +
-				this.statusId.status_kurzbz + '/' +
-				this.statusId.studiensemester_kurzbz + '/' +
-				this.statusId.ausbildungssemester,
-				this.statusData)
-				.then(
-					result => {
-						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-						this.hideModal('statusModal');
-						this.resetModal();
-					})
-				.catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
-					window.scrollTo(0, 0);
-					this.reload();
-				});
-		},
 		checkIfLastStatus(){
 			return this.$fhcApi
 				.get('api/frontend/v1/stv/status/isLastStatus/' + this.modelValue.prestudent_id)
@@ -924,7 +804,7 @@ export default{
 					})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-/*		checkIfBewerber(prestudentIds){
+		/*checkIfBewerber(prestudentIds){
 
 			if(!prestudentIds)
 				prestudentIds = [this.modelValue.prestudent_id];
@@ -965,7 +845,7 @@ export default{
 							this.$reloadList();
 						}
 
-/!*			return this.$fhcApi
+			/!*return this.$fhcApi
 				.get('api/frontend/v1/stv/status/hasStatusBewerber/' + prestudent_id)
 				.then(
 					result => {
@@ -986,14 +866,15 @@ export default{
 					})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		reload(){
-			this.$refs.table.reloadTable(); //bei multiactions not working
+		reload() {
+			if (this.$refs.table)
+				this.$refs.table.reloadTable();
 		},
 		hideModal(modalRef){
 			this.$refs[modalRef].hide();
 			this.statusNew = true;
 		},
-		resetModal(){
+		resetModal() {
 			this.statusData = {};
 			this.statusId = {};
 			this.actionButton = {};
@@ -1023,20 +904,6 @@ export default{
 	},
 	created(){
 		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + encodeURIComponent(this.paramIds))
-			.then(result => result.data)
-			.then(result => {
-				this.listStudienplaene = result;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.get('api/frontend/v1/stv/status/getStatusgruende/')
-			.then(result => result.data)
-			.then(result => {
-				this.listStatusgruende = result;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
 			.get('api/frontend/v1/stv/status/getLastBismeldestichtag/')
 			.then(result => {
 				this.dataMeldestichtag = result.data[0].meldestichtag;
@@ -1056,155 +923,6 @@ export default{
 		<div class="stv-list h-100 pt-3">
 			
 			<status-modal ref="test" :meldestichtag="new Date(dataMeldestichtag)" @saved="reload"></status-modal>
-			<!--Modal: statusModal-->
-			<bs-modal ref="statusModal">
-				<template #title>
-					{{ $p.t('lehre', statusNew ? 'status_new' : 'status_edit', modelValue) }}
-				</template>
-
-				<form-form ref="statusData">
-					<form-validation></form-validation>
-					<p v-if="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent">
-						<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrund')}}</b>
-					</p>
-					<p v-if="statusData.datum < dataMeldestichtag && isStatusBeforeStudent">
-						<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrundSemester')}}</b>
-					</p>
-					<input type="hidden" id="statusId" name="statusId" value="statusData.statusId">
-					<form-input
-						container-class="mb-3"
-						required
-						v-model="statusData['status_kurzbz']"
-						name="status_kurzbz"
-						:label="$p.t('lehre/status_rolle')"
-						type="select"
-						:disabled="!statusNew"
-						>
-						<option  value="Interessent">InteressentIn</option>
-						<option  value="Bewerber">BewerberIn</option>
-						<option  value="Aufgenommener">Aufgenommene/r</option>
-						<option  value="Student">StudentIn</option>
-						<option  value="Unterbrecher">UnterbrecherIn</option>
-						<option  value="Diplomand">DiplomandIn</option>
-						<option  value="Incoming">Incoming</option>
-						<option v-if="!statusNew" value="Absolvent">Absolvent</option>
-						<option v-if="!statusNew" value="Abbrecher">Abbrecher</option>
-						<option v-if="!statusNew" value="Abgewiesener">Abgewiesener</option>
-					</form-input>
-					<form-input
-						container-class="mb-3"
-						type="select"
-						name="studiensemester_kurzbz"
-						:label="$p.t('lehre/studiensemester')"
-						v-model="statusData['studiensemester_kurzbz']"
-						:disabled="statusData.datum < dataMeldestichtag"
-						>
-						<option v-for="sem in lists.studiensemester_desc" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz"  :selected="sem.studiensemester_kurzbz === defaultSemester">{{sem.studiensemester_kurzbz}}</option>
-					</form-input>
-					<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false) 100 Semester-->
-					<form-input
-						container-class="mb-3"
-						type="select"
-						name="ausbildungssemester"
-						:label="$p.t('lehre/ausbildungssemester')"
-						v-model="statusData.ausbildungssemester"
-						:disabled="statusData.datum < dataMeldestichtag && !isStatusBeforeStudent"
-						>
-					 <option v-for="number in maxSem" :key="number" :value="number">{{ number }}</option>
-					</form-input>
-					<form-input
-						container-class="mb-3"
-						type="DatePicker"
-						name="datum"
-						:label="$p.t('global/datum')"
-						v-model="statusData.datum"
-						auto-apply
-						:enable-time-picker="false"
-						format="dd.MM.yyyy"
-						preview-format="dd.MM.yyyy"
-						:teleport="true"
-						:disabled="statusData.datum < dataMeldestichtag"
-						>
-					</form-input>
-					<form-input
-						container-class="mb-3"
-						type="DatePicker"
-						name="bestaetigtam"
-						:label="$p.t('lehre/bestaetigt_am')"
-						v-model="statusData.bestaetigtam"
-						auto-apply
-						:enable-time-picker="false"
-						format="dd.MM.yyyy"
-						preview-format="dd.MM.yyyy"
-						:teleport="true"
-						:disabled="statusData.datum < dataMeldestichtag"
-						>
-					</form-input>
-					<form-input
-						container-class="mb-3"
-						type="DatePicker"
-						name="bewerbung_abgeschicktamum"
-						:label="$p.t('lehre/bewerbung_abgeschickt_am')"
-						v-model="statusData['bewerbung_abgeschicktamum']"
-						auto-apply
-						:enable-time-picker="false"
-						format="dd.MM.yyyy"
-						preview-format="dd.MM.yyyy"
-						:teleport="true"
-						:disabled="statusData.datum < dataMeldestichtag || !hasPrestudentstatusPermission"
-						>
-					</form-input>
-					<form-input
-						container-class="mb-3"
-						type="select"
-						name="studienplan"
-						:label="$p.t('lehre/studienplan')"
-						v-model="statusData['studienplan_id']"
-						:disabled="statusData.datum < dataMeldestichtag"
-						>		
-						<option v-for="sp in listStudienplaene" :key="sp.studienplan_id" :value="sp.studienplan_id">{{sp.bezeichnung}}</option>
-					</form-input>
-					<form-input
-						container-class="mb-3"
-						type="text"
-						name="anmerkung"
-						:label="$p.t('global/anmerkung')"
-						v-model="statusData['anmerkung']"
-						:disabled="statusData.datum < dataMeldestichtag"
-						>						
-					</form-input>
-					<form-input
-						container-class="mb-3"
-						type="select"
-						name="aufnahmestufe"
-						:label="$p.t('lehre/aufnahmestufe')"
-						v-model="statusData['rt_stufe']"
-						:disabled="statusData.datum < dataMeldestichtag"
-						>
-						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
-						<option v-for="entry in aufnahmestufen" :key="entry" :value="entry">{{entry}}</option>
-					</form-input>
-									
-					<form-input
-					 	v-if="gruende.length > 0"
-					 	container-class="mb-3"
-						type="select"
-						name="statusgrund"
-						:label="$p.t('studierendenantrag/antrag_grund')"
-						v-model="statusData['statusgrund_id']"
-						>
-						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
-						<option v-for="grund in gruende" :key="grund.statusgrund_id" :value="grund.statusgrund_id">{{grund.bezeichnung}}</option>
-					</form-input>
-				
-				</form-form>
-				
-				<template #footer>
-					<button v-if="statusNew" type="button" class="btn btn-primary" @click="insertStatus">OK</button>
-					<button v-else type="button" class="btn btn-primary" @click="editStatus()">OK</button>
-				</template>
-								
-			</bs-modal>
 				
 			<!--Modal: Confirm Abbruch-->
 			<BsModal ref="confirmStatusAction">
