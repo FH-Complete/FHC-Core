@@ -523,27 +523,10 @@ class PrestudentLib
 
 	public function setFirstStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtAm, $bestaetigtVon, $stg_kz, $uidStudent)
 	{
-		$insertvon = getAuthUID();
-
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($result))
 			return $result;
-		$resultStatus = getData($result);
-
-		//check if ausbildungssemester is last
-		$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent p', 'studiengang_kz');
-		$resultStg = $this->_ci->StudiengangModel->loadWhere(['p.prestudent_id' => $prestudent_id]);
-		if(isError($resultStg))
-			return $resultStg;
-/*		if(!hasData($resultStg))
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_for_prestudent', [
-				'prestudent_id' => $prestudent_id
-			]));*/
-
-
-		$studiengang = current(getData($resultStg)) ?: null;
-
-		$prestudent_status = ($resultStatus[0]);
+		$prestudent_status = current(getData($result));
 		if(!$prestudent_status)
 		{
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
@@ -552,15 +535,13 @@ class PrestudentLib
 			]));
 		}
 
-/*		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+		//check studiensemester_kurzbz is last
+		$studiensemester_kurzbz = $prestudent_status->studiensemester_kurzbz != $studiensemester_kurzbz ?
+			$prestudent_status->studiensemester_kurzbz : $studiensemester_kurzbz;
 
-		if (isError($result))
-			return $result;
-		$result = getData($result);
-		if (!$result)
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
-
-		$student = current($result);*/
+		//check if ausbildungssemester is last
+		$ausbildungssemester = $prestudent_status->ausbildungssemester != $ausbildungssemester ?
+			$prestudent_status->ausbildungssemester : $ausbildungssemester;
 
 		//Status updaten
 		$result = $this->_ci->PrestudentstatusModel->insert([
@@ -570,7 +551,7 @@ class PrestudentLib
 			'ausbildungssemester' => $ausbildungssemester,
 			'statusgrund_id' => $statusgrund_id,
 			'datum' => date('c'),
-			'insertvon' => $insertvon,
+			'insertvon' => getAuthUID(),
 			'insertamum' => date('c'),
 			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
 			'studienplan_id'=> $prestudent_status->studienplan_id,
@@ -581,24 +562,6 @@ class PrestudentLib
 		if (isError($result))
 			return $result;
 
-/*		$result = $this->_ci->StudentModel->checkIfUid($prestudent_id);
-		if (isError($result)) {
-			return $result;
-		}
-		$student_uid = $result->retval;*/
-
-		//load student
-/*		$result = $this->_ci->StudentModel->loadWhere(
-			array(
-				'student_uid' => $uidStudent
-			)
-		);
-		if (isError($result))
-		{
-			return $result;
-		}
-
-		$studentData = current(getData($result) ? : []);*/
 		$verband = '';
 		$gruppe = '';
 		$studiengang_kz = $stg_kz;
@@ -785,4 +748,104 @@ class PrestudentLib
 		return success();
 	}
 
+	public function setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
+	{
+		$resultLastStatus = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
+		if (isError($resultLastStatus))
+			return $resultLastStatus;
+		$resultLastStatus = getData($resultLastStatus);
+
+		$prestudent_status = current($resultLastStatus);
+
+		//check studiensemester_kurzbz:
+		$studiensemester_kurzbz = $prestudent_status->studiensemester_kurzbz != $studiensemester_kurzbz ?
+			$prestudent_status->studiensemester_kurzbz : $studiensemester_kurzbz;
+
+		//Status updaten
+		$result = $this->_ci->PrestudentstatusModel->insert([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_BEWERBER,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'ausbildungssemester' => $ausbildungssemester,
+			'datum' => date('c'),
+			'insertvon' => getAuthUID(),
+			'insertamum' => date('c'),
+			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
+			'studienplan_id'=> $prestudent_status->studienplan_id,
+			'bestaetigtvon' => getAuthUID(),
+			'bestaetigtam' => date('c')
+		]);
+
+		if (isError($result))
+		{
+			return $result;
+		}
+		else
+			return success();
+	}
+
+	public function setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester){
+
+		$resultLastStatus = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
+		if (isError($resultLastStatus))
+			return $resultLastStatus;
+		$resultLastStatus = getData($resultLastStatus);
+
+		$prestudent_status = current($resultLastStatus);
+
+
+		//Status updaten
+		$result = $this->_ci->PrestudentstatusModel->insert([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_AUFGENOMMENER,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'ausbildungssemester' => $ausbildungssemester,
+			'datum' => date('c'),
+			'insertvon' => getAuthUID(),
+			'insertamum' => date('c'),
+			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
+			'studienplan_id'=> $prestudent_status->studienplan_id,
+			'bestaetigtvon' => getAuthUID(),
+			'bestaetigtam' => date('c')
+		]);
+
+		if (isError($result))
+		{
+			return $result;
+		}
+		else
+			return success();
+	}
+
+	public function setAbgewiesener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester){
+
+		$resultLastStatus = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
+		if (isError($resultLastStatus))
+			return $resultLastStatus;
+		$resultLastStatus = getData($resultLastStatus);
+
+		$prestudent_status = current($resultLastStatus);
+
+		//Status updaten
+		$result = $this->_ci->PrestudentstatusModel->insert([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_ABGEWIESENER,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'ausbildungssemester' => $ausbildungssemester,
+			'datum' => date('c'),
+			'insertvon' => getAuthUID(),
+			'insertamum' => date('c'),
+			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
+			'studienplan_id'=> $prestudent_status->studienplan_id,
+			'bestaetigtvon' => getAuthUID(),
+			'bestaetigtam' => date('c')
+		]);
+
+		if (isError($result))
+		{
+			return $result;
+		}
+		else
+			return success();
+	}
 }

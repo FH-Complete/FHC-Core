@@ -436,7 +436,7 @@ class Status extends FHCAPI_Controller
 
 				}
 				break;
-/*			case Prestudentstatus_model::STATUS_BEWERBER:
+			case Prestudentstatus_model::STATUS_BEWERBER:
 				{
 					$this->load->library('PrestudentLib');
 					$result = $this->prestudentlib->setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
@@ -449,68 +449,38 @@ class Status extends FHCAPI_Controller
 						$this->terminateWithSuccess($prestudent_id);
 
 				}
-				break;*/
-			// case Prestudentstatus_model::STATUS_BEWERBER:
-			// 	{
-			// 		$this->load->library('PrestudentLib');
-			// 		$result = $this->prestudentlib->setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+				break;
+			case Prestudentstatus_model::STATUS_AUFGENOMMENER:
+				{
+					$this->load->library('PrestudentLib');
+					$result = $this->prestudentlib->setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 
-			// 		if (isError($result))
-			// 		{
-			// 			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			// 		}
-			// 		else
-			// 			$this->terminateWithSuccess($prestudent_id);
+					if (isError($result))
+					{
+						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+					}
+					else
+						$this->terminateWithSuccess($prestudent_id);
 
-			// 	}
-			// 	break;
-			// case Prestudentstatus_model::STATUS_AUFGENOMMENER: //auch Student...
-			// 	{
-			// 		$this->load->library('PrestudentLib');
-			// 		$result = $this->prestudentlib->setStudentFromInteressent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+				}
+				break;
+			case Prestudentstatus_model::STATUS_ABGEWIESENER:
+				{
+					$this->load->library('PrestudentLib');
+					$result = $this->prestudentlib->setAbgewiesener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 
-			// 		if (isError($result))
-			// 		{
-			// 			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			// 		}
-			// 		else
-			// 			$this->terminateWithSuccess($prestudent_id);
+					if (isError($result))
+					{
+						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+					}
+					else
+						$this->terminateWithSuccess($prestudent_id);
 
-			// 	}
-			// 	break;
-			// case Prestudentstatus_model::STATUS_AUFGENOMMENER:
-			// 	{
-			// 		$this->load->library('PrestudentLib');
-			// 		$result = $this->prestudentlib->setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
-
-			// 		if (isError($result))
-			// 		{
-			// 			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			// 		}
-			// 		else
-			// 			$this->terminateWithSuccess($prestudent_id);
-
-			// 	}
-			// 	break;
-			// case Prestudentstatus_model::STATUS_ABGEWIESENER:
-			// 	{
-			// 		$this->load->library('PrestudentLib');
-			// 		$result = $this->prestudentlib->setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
-
-			// 		if (isError($result))
-			// 		{
-			// 			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			// 		}
-			// 		else
-			// 			$this->terminateWithSuccess($prestudent_id);
-
-			// 	}
-			// 	break;
+				}
+				break;
 			default:
 			{
-/*				if ($isStudent) {
-					return $this->terminateWithError("LehrverbandData needs no handling", self::ERROR_TYPE_GENERAL);
-				}*/
+				$this->terminateWithError("Action not yet defined in Prestudentlib", self::ERROR_TYPE_GENERAL);
 				$result = $this->PrestudentstatusModel->insert(
 					[
 						'prestudent_id' => $prestudent_id,
