@@ -144,7 +144,7 @@ export default{
 				)
 				.then(result => {
 					this.$reloadList();
-					this.emit('saved');
+					this.$emit('saved');
 					this.$refs.modal.hide();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -152,13 +152,13 @@ export default{
 		editStatus() {
 			this.$refs.form
 				.post(
-					'api/frontend/v1/stv/status/updateStatus/' + this.statusId.join('/'),
+					'api/frontend/v1/stv/status/updateStatus/' + Object.values(this.statusId).join('/'),
 					this.formData
 				)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$reloadList();
-					this.emit('saved');
+					this.$emit('saved');
 					this.$refs.modal.hide();
 				})
 				.catch(this.$fhcAlert.handleSystemError);

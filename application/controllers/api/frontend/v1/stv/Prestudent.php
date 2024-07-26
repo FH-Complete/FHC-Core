@@ -266,7 +266,7 @@ class Prestudent extends FHCAPI_Controller
 
 	public function getStudienplaene($prestudent_id)
 	{
-		if (!is_int($prestudent_id))
+		if (!is_int((int)$prestudent_id) || (int)$prestudent_id . '' != $prestudent_id)
 			show_404();
 		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 		$result = $this->StudienplanModel->getStudienplaeneByPrestudents($prestudent_id);
