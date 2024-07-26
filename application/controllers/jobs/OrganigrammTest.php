@@ -26,6 +26,8 @@ class OrganigrammTest extends JOB_Controller
 	    
 	    $this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 	    
+	    $this->load->library('DrawIoLib', null, 'DrawIoLib');
+	    
 	    $this->maxxoffset = self::DEFAULT_XOFFSET;
 	    $this->donotrenderchildsoftype = array();
 	}
@@ -125,46 +127,18 @@ EOSQL;
 		
 		if(count($errors) === 0) {
 		    $pages = count($roots);
-		    $modified = (new DateTime('now', new DateTimeZone('UTC')))->format(DateTime::ATOM);
-		    $agent = 'FH-Complete';
-		    echo <<<HEADER
-<mxfile modified="{$modified}" host="Electron" agent="{$agent}" type="device" pages="{$pages}">
-
-HEADER;
+		    $this->DrawIoLib->renderFileStart($pages);
 
 		    foreach($roots AS &$root)
 		    {
 			$this->maxxoffset = self::DEFAULT_XOFFSET;
 			$this->donotrenderchildsoftype = $root->donotrenderchildsoftype;
 			$this->prepareChildsToRender($root);
-			
-			$bezeichnung = htmlspecialchars($root->bezeichnung);
-			
-			echo <<<STARTDIAGRAMM
-  <diagram id="diagram_{$root->oe_kurzbz}" name="{$bezeichnung}">
-    <mxGraphModel dx="1177" dy="687" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-
-STARTDIAGRAMM;
-
+			$this->DrawIoLib->renderDiagramStart($root->oe_kurzbz, $root->bezeichnung);
 			$this->renderOE($root, 0, 0);
-  
-			echo <<<ENDDIAGRAMM
-        </root>
-    </mxGraphModel>
-  </diagram>
-
-ENDDIAGRAMM;
-  
+			$this->DrawIoLib->renderDiagramEnd();
 		    }
-		
-		    echo <<<FOOTER
-</mxfile>
-
-FOOTER;
-	
+		    $this->DrawIoLib->renderFileEnd();
 		}
 		else 
 		{
@@ -284,12 +258,11 @@ FOOTER;
 	    'Kompetenzfeld'  => '#f5f5f5'
 	);
 	$fillcolor = (isset($fillcolors[$oe->organisationseinheittyp_kurzbz])) ? $fillcolors[$oe->organisationseinheittyp_kurzbz] : '#ffffff';
-	echo <<<OE
-	    <mxCell id="{$oe->oe_kurzbz}" value="&lt;font style=&quot;font-size: {$fontsize}px;&quot;&gt;&lt;div style=&quot;&quot;&gt;[{$oe->organisationseinheittyp_kurzbz}]&lt;/div&gt;&lt;b style=&quot;&quot;&gt;{$bezeichnung}&lt;/b&gt;&lt;div&gt;({$leitung})&lt;/div&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;verticalAlign=middle;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fillColor={$fillcolor};" parent="1" vertex="1">
-	      <mxGeometry x="{$x}" y="{$y}" width="{$width}" height="{$height}" as="geometry" />
-	    </mxCell>
+	$value = <<<EOVAL
+&lt;font style=&quot;font-size: {$fontsize}px;&quot;&gt;&lt;div style=&quot;&quot;&gt;[{$oe->organisationseinheittyp_kurzbz}]&lt;/div&gt;&lt;b style=&quot;&quot;&gt;{$bezeichnung}&lt;/b&gt;&lt;div&gt;({$leitung})&lt;/div&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;verticalAlign=middle;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fillColor={$fillcolor};
+EOVAL;
 
-OE;
+	$this->DrawIoLib->renderCell($oe->oe_kurzbz, $value, $x, $y, $width, $height);
 
 	if( $oe->oe_parent_kurzbz !== NULL ) 
 	{
@@ -297,29 +270,21 @@ OE;
 	    $exitY = '1';
 	    $entryX = '0.5';
 	    $entryY = '0';
-	    $edgegeom = '<mxGeometry relative="1" as="geometry" />';
+	    $points = array();
 	    if( $oe->parent !== null && $oe->parent->renderchilds === self::RENDER_CHILDS_VERTICAL) 
 	    {
 		$exitX = '0';
 		$exitY = '0.5';
 		$entryX = '0';
 		$entryY = '0.5';
-		$pointx = $x - floor($spacing / 2);
-		$pointy = $y + floor($height / 2);
-		$edgegeom = <<<EDGEPOINTS
-	      <mxGeometry relative="1" as="geometry">
-		<Array as="points">
-		  <mxPoint x="{$pointx}" y="{$pointy}" />
-		</Array>
-	      </mxGeometry>
-EDGEPOINTS;
+		$points = array(
+		    (object) array(
+			'x' => ($x - floor($spacing / 2)),
+			'y' => ($y + floor($height  / 2))
+		    )
+		);
 	    }
-	    echo <<<EDGE
-	    <mxCell id="edge_{$oe->oe_parent_kurzbz}_{$oe->oe_kurzbz}" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;exitX={$exitX};exitY={$exitY};exitDx=0;exitDy=0;entryX={$entryX};entryY={$entryY};entryDx=0;entryDy=0;" parent="1" source="{$oe->oe_parent_kurzbz}" target="{$oe->oe_kurzbz}" edge="1">
-	      {$edgegeom}
-	    </mxCell>
-
-EDGE;
+	    $this->DrawIoLib->renderEdge($oe->oe_parent_kurzbz, $oe->oe_kurzbz, $exitX, $exitY, $entryX, $entryY, $points);
 	}
 
 	if( $oe->parent !== null && $oe->parent->renderchilds === self::RENDER_CHILDS_VERTICAL ) 
