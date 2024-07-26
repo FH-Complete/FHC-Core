@@ -484,48 +484,44 @@ class Prestudentstatus_model extends DB_Model
 
 	/**
 	 * Check if there is only one prestudentstatus left
-	 * @param integer $prestudent_id
-	 * @return success("1") if last prestudentstatusentry, else success("0")
+	 *
+	 * @param integer					$prestudent_id
+	 *
+	 * @return stdClass
 	 */
-	public function checkIfLastStatusEntry($prestudent_id, $isStudent=false )
+	public function checkIfLastStatusEntry($prestudent_id)
 	{
-		$qry = "SELECT
-					COUNT(*) as anzahl
-				FROM
-				    public.tbl_prestudentstatus
-				WHERE
-					prestudent_id = ?
-				";
+		$this->addSelect('COUNT(*) AS anzahl', false);
 
-		if($isStudent)
-		{
-			$qry .= "AND status_kurzbz = 'Student'";
-		}
-
-		$result = $this->execQuery($qry, array($prestudent_id));
+		$result = $this->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
 
 		if (isError($result))
-		{
-			return error($result);
-		}
+			return $result;
 
-		$resultObject = current(getData($result));
+		$resultObject = current($result->retval);
 
-		if (property_exists($resultObject, 'anzahl'))
-		{
-			$anzahl = (int) $resultObject->anzahl;
-			if ($anzahl <= 1 )
-			{
-				return success("1", $this->p->t('lehre','error_lastRole'));
-			}
-			else
-				return success("0",  $this->p->t('lehre','anzahl_existingRoles', ['anzahl' => $anzahl]));
+		$anzahl = (int)$resultObject->anzahl;
 
-		}
-		else
-		{
-			return error($result);
-		}
+		if ($anzahl <= 1)
+			return success(true, $this->p->t('lehre', 'error_lastRole'));
+
+		return success(false, $this->p->t('lehre', 'anzahl_existingRoles', ['anzahl' => $anzahl]));
+	}
+
+	/**
+	 * Check if there is only one "Student" prestudentstatus left
+	 *
+	 * @param integer					$prestudent_id
+	 *
+	 * @return stdClass
+	 */
+	public function checkIfLastStudentStatusEntry($prestudent_id)
+	{
+		$this->db->where('status_kurzbz', self::STATUS_STUDENT);
+		
+		return $this->checkIfLastStatusEntry($prestudent_id);
 	}
 
 	public function getAllPrestudentstatiWithStudiensemester($prestudent_id)

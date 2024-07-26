@@ -85,15 +85,8 @@ class Status extends FHCAPI_Controller
 	{
 		$result = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id);
 
+		$result = $this->getDataOrTerminateWithError($result);
 
-		if (isError($result))
-		{
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		if($result->retval == "1")
-		{
-			$this->terminateWithError($this->p->t('lehre','error_lastRole'), self::ERROR_TYPE_GENERAL);
-		}
 		return $this->terminateWithSuccess($result);
 	}
 
@@ -963,7 +956,7 @@ class Status extends FHCAPI_Controller
 		{
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		if($result->retval == "1")
+		if($result->retval)
 		{
 			//Berechtigungen nach Check prüfen!
 			if(!$isBerechtigtAdmin && !$isBerechtigtNoStudstatusCheck)
@@ -1098,13 +1091,13 @@ class Status extends FHCAPI_Controller
 		$logId = $result->retval;
 
 		//Delete Studentlehrverband if no Status left
-		$result = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id, true);
+		$result = $this->PrestudentstatusModel->checkIfLastStudentStatusEntry($prestudent_id);
 
 		if (isError($result))
 		{
 			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		if ($result->retval == "1")
+		if ($result->retval)
 		{
 			//get student_uid
 			$this->load->model('crm/Student_model', 'StudentModel');
