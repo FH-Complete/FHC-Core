@@ -402,7 +402,7 @@ class Status extends FHCAPI_Controller
 						$this->terminateWithSuccess($prestudent_id);
 				}
 				break;
-/*			case Prestudentstatus_model::STATUS_STUDENT:
+			case Prestudentstatus_model::STATUS_STUDENT:
 				{
 					$this->load->library('PrestudentLib');
 					$result = $this->prestudentlib->setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtam, $bestaetigtvon);
@@ -415,7 +415,7 @@ class Status extends FHCAPI_Controller
 						$this->terminateWithSuccess($prestudent_id);
 
 				}
-				break;*/
+				break;
 			case Prestudentstatus_model::STATUS_DIPLOMAND:
 				{
 					$this->load->library('PrestudentLib');
