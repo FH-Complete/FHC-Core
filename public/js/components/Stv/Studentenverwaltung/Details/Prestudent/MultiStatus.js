@@ -1,5 +1,6 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import BsModal from "../../../../Bootstrap/Modal.js";
+import BsConfirm from "../../../../Bootstrap/Confirm.js";
 import FormInput from '../../../../Form/Input.js';
 import StatusModal from '../Status/Modal.js';
 
@@ -407,17 +408,19 @@ export default{
 					this.advanceStatus(this.statusId);
 			});
 		},
-		actionConfirmStatus(status, stdsem, ausbildungssemester){
-			this.statusId = {
-				'prestudent_id': this.modelValue.prestudent_id,
-				'status_kurzbz': status,
-				'studiensemester_kurzbz': stdsem,
-				'ausbildungssemester': ausbildungssemester
-			};
-			this.loadStatus(this.statusId).then(() => {
-				if(this.statusData)
-					this.confirmStatus(this.statusId);
-			});
+		actionConfirmStatus(status, stdsem, ausbildungssemester) {
+			BsConfirm
+				.popup(this.$p.t('stv', 'status_confirm_popup'))
+				.then(() => this.$fhcApi.post(
+					'api/frontend/v1/stv/status/confirmStatus/' +
+					this.modelValue.prestudent_id + '/' +
+					status + '/' +
+					stdsem + '/' +
+					ausbildungssemester
+				))
+				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successConfirm')))
+				.then(this.reload)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		actionConfirmDialogue(data, statusgrund, statusText){
 			this.actionButton = statusgrund;
@@ -747,21 +750,6 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
-					this.reload();
-				});
-		},
-		confirmStatus(statusId){
-			return this.$fhcApi.post('api/frontend/v1/stv/status/confirmStatus/' +
-				this.statusId.prestudent_id + '/' +
-				this.statusId.status_kurzbz + '/' +
-				this.statusId.studiensemester_kurzbz + '/' +
-				this.statusId.ausbildungssemester)
-				.then(
-					result => {
-						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successConfirm'));
-					})
-				.catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
 					this.reload();
 				});
 		},

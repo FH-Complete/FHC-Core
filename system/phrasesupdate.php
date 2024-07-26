@@ -29402,6 +29402,27 @@ array(
 			)
 		)
 	),
+	// status
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'status_confirm_popup',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diesen Status bestaetigen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Confirm this status?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 	//****************************	 FHC-Core-SAP
 	array(
