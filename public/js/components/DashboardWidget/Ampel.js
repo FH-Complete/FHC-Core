@@ -1,6 +1,8 @@
 import AbstractWidget from './Abstract';
 import BaseOffcanvas from '../Base/Offcanvas';
 
+const widgetAmpelMAX = 4;
+
 export default {
     name: 'WidgetsAmpel',
     components: { BaseOffcanvas },
@@ -15,53 +17,23 @@ export default {
         AbstractWidget
     ],
     computed: {
-        filteredAmpeln(){
+        ampelnComputed(){
             
-            if (this.source == 'offen')
+            switch(this.source)
             {
-                switch(this.filter)
-                {
-                    case 'verpflichtend': return this.activeAmpeln?.filter(item => item.verpflichtend);
-                    case 'ueberfaellig': return this.activeAmpeln?.filter(item => (new Date() > new Date(item.deadline)) && !item.bestaetigt);
-                    default: return this.activeAmpeln;
-                }
+                case 'offen': return this.applyFilter(this.activeAmpeln);
+                case 'alle': return this.applyFilter(this.allAmpeln);
+                default: return this.activeAmpeln; 
             }
-            if (this.source == 'alle')
-            {
-                switch(this.filter)
-                {
-                    case 'verpflichtend': return this.allActiveAmpeln?.filter(item => item.verpflichtend);
-                    case 'ueberfaellig': return this.allActiveAmpeln?.filter(item => (new Date() > new Date(item.deadline)) && !item.bestaetigt);
-                    default: return this.allActiveAmpeln;
-                }
-                
-            }
-            return this.activeAmpeln;
+            
         },
-        openAmpeln () {
-            return this.ampeln.filter(ampel=>{
-                if(!ampel.bestaetigt){
-                    return true;
-                }
-                return false;
-            })  
-        },
-        widgetAmpeln () {
-            return this.activeAmpeln?.slice(0, 4);  // show only newest 4 ampeln
-        },
-        offcanvasAmpeln ()
-        {
-            switch(this.filter)
-            {
-                case 'verpflichtend': return this.activeAmpeln?.filter(item => item.verpflichtend);
-                case 'ueberfaellig': return this.activeAmpeln?.filter(item => (new Date() > new Date(item.deadline)) && !item.bestaetigt);
-                default: return this.activeAmpeln;
-            }
+        ampelnOverview () {
+            return this.activeAmpeln?.slice(0, widgetAmpelMAX);  // show only newest 4 active ampeln
         },
         count () {
             let datasource = this.activeAmpeln;
             if (this.source == 'offen') datasource = this.activeAmpeln;
-            if (this.source == 'alle') datasource = this.allActiveAmpeln;
+            if (this.source == 'alle') datasource = this.allAmpeln;
 
             return {
                 verpflichtend: datasource?.filter(item => item.verpflichtend).length,
@@ -72,6 +44,26 @@ export default {
         }
     },
     methods: {
+        applyFilter(data){
+            switch(this.filter)
+                {
+                    case 'verpflichtend': return data?.filter(item => item.verpflichtend);
+                    case 'ueberfaellig': return data?.filter(item => (new Date() > new Date(item.deadline)) && !item.bestaetigt);
+                    default: return data;
+                }
+        },
+        isExpiredAmpel(ampel){
+        
+            let deadline = new Date(ampel.deadline);
+            if(ampel.verfallszeit instanceof Number) deadline.setDate(deadline.getDate() + ampel.verfallszeit);
+            deadline.setHours(0, 0, 0, 0); 
+
+            let today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            return deadline < today ? true : false;
+            
+        },
 
         toggleFilter(value){
             this.filter === value ? this.filter = '' : this.filter = value;
@@ -79,9 +71,9 @@ export default {
         
         closeOffcanvasAmpeln()
         {
-            for (let i = 0; i < this.offcanvasAmpeln.length; i++)
+            for (let i = 0; i < this.ampelnComputed.length; i++)
             {
-                let ampelId = this.offcanvasAmpeln[i].ampel_id;
+                let ampelId = this.ampelnComputed[i].ampel_id;
                 this.$refs['ampelCollapse_' + ampelId][0].classList.remove('show');
             }
         },
@@ -98,18 +90,18 @@ export default {
         async fetchActiveAmpeln(){
 
             await this.$fhcApi.factory.ampeln.getNonConfirmedActiveAmpeln().then(res=>{
-                this.activeAmpeln = res.data;
+                this.activeAmpeln = res.data.sort((a,b) => new Date(b.deadline) - new Date(a.deadline));
             }); 
         },
         async fetchAllAmpeln(){
 
-            await this.$fhcApi.factory.ampeln.getAllActiveAmpeln().then(res=>{
-                this.allActiveAmpeln = res.data;
+            await this.$fhcApi.factory.ampeln.alleAmpeln().then(res=>{
+                this.allAmpeln = res.data.sort((a,b) => new Date(b.deadline) - new Date(a.deadline));
             }); 
         },
         async confirm(ampelId){
-            this.$fhcApi.factory.ampeln.confirmAmpel(ampelId).then(res =>{
-                console.log(res,"result of the insert into")
+            await this.$fhcApi.factory.ampeln.confirmAmpel(ampelId).then(res =>{
+                res.data ? this.$toast.success('Ampel bestätigt') : this.$toast.error('Fehler beim Bestätigen der Ampel');
             });
 
             // fetch all the ampeln after an ampel has been confirmed
@@ -117,40 +109,23 @@ export default {
             await this.fetchAllAmpeln();
 
         },
-        changeDisplay(){
-            this.filter = '';
-            if (this.source == 'offen')
-            {
-                //this.ampeln = openAmpeln;
-            }
-
-            if (this.source == 'alle')
-            {
-                //this.ampeln = TEST_ALLE_AMPELN;
-                // axios
-                //     .get(this.apiurl + '/dashboard/Api/getAmpeln')
-                //     .then(res => { this.ampeln = res.data })
-                //     .catch(err => { console.error('ERROR: ', err.response.data) });
-            }
-        },
         validateBtnTxt(buttontext){
-            return buttontext == null ? 'Bestätigen' : buttontext;
+
+            if(buttontext instanceof Array && !buttontext.length) return 'Bestätigen';
+
+            if(!buttontext) return 'Bestätigen';
+
+            return buttontext;
         }
     },
-    async created() {
+    created() {
+
+        this.$emit('setConfig', false);    
+    },
+    async mounted() {
         
         await this.fetchActiveAmpeln();
         await this.fetchAllAmpeln();
-
-        // add the first element of the active ampeln again just for testing purposes
-        /* let duplicate = {...this.allActiveAmpeln[0]};
-        duplicate.verpflichtend= false;
-        this.allActiveAmpeln.push(duplicate);
-        console.log(this.activeAmpeln,"this are the active ampeln")
-        console.log(this.allActiveAmpeln,"this are all the ampeln")
-  */
-        this.$emit('setConfig', false);
-        
     },
     template: /*html*/`
     <div class="widgets-ampel w-100 h-100">
@@ -162,7 +137,7 @@ export default {
             <div class="d-flex justify-content-end">
                 <a v-if="count.ueberfaellig > 0" href="#allAmpelOffcanvas" data-bs-toggle="offcanvas" @click="filter = 'ueberfaellig'" class="text-decoration-none"><span class="badge bg-danger me-1"><i class="fa fa-solid fa-bolt"></i> Überfällig: <b>{{ count.ueberfaellig }}</b></span></a>
             </div>
-            <div v-for="ampel in widgetAmpeln" :key="ampel.ampel_id" class="mt-2">
+            <div v-for="ampel in ampelnOverview" :key="ampel.ampel_id" class="mt-2">
                 <div class="card">
                     <div class="card-body">
                         <div class="position-relative">
@@ -186,7 +161,7 @@ export default {
         </div>
         <div v-else>
         <header class="me-auto"><b>Neueste Ampeln</b></header>
-            <template v-for="n in 4">
+            <template v-for="n in widgetAmpelMAX">
                 <div class="mt-2 card" aria-hidden="true">
                 <div class="card-body">
                     <p class="card-text placeholder-glow">
@@ -207,11 +182,11 @@ export default {
         <template #body>
             <div class="d-flex justify-content-evenly">
                 <div class="form-check form-check-inline form-control-sm">
-                <input class="form-check-input" type="radio" v-model="source" id="offen" value="offen" @change="changeDisplay" checked>
+                <input class="form-check-input" type="radio" v-model="source" id="offen" value="offen"  checked>
                 <label class="form-check-label" for="offen">Offene Ampeln</label>
             </div>
             <div class="form-check form-check-inline form-control-sm">
-                <input class="form-check-input" type="radio" v-model="source" id="alle" value="alle" @change="changeDisplay">
+                <input class="form-check-input" type="radio" v-model="source" id="alle" value="alle" >
                 <label class="form-check-label" for="alle">Alle Ampeln</label>
             </div>
             </div>
@@ -220,9 +195,9 @@ export default {
                 <div class="col"><button class="btn btn-danger w-100"  @click="toggleFilter('ueberfaellig')"><i class="fa fa-solid fa-bolt me-2"></i><small :style="{...(filter==='ueberfaellig'?{'text-decoration':'underline','font-weight':'bold'}:{})}">Überfällig: <b>{{ count.ueberfaellig }}</b></small></button></div>
                 <div class="col"><button class="btn btn-warning w-100" @click="toggleFilter('verpflichtend')"><i class="fa fa-solid fa-triangle-exclamation me-2"></i><small :style="{...(filter==='verpflichtend'?{'text-decoration':'underline','font-weight':'bold'}:{})}">Pflicht: <b>{{ count.verpflichtend }}</b></small></button></div>
             </div>
-            <div v-for="ampel in filteredAmpeln" :key="ampel.ampel_id" class="mt-2">
+            <div v-for="ampel in ampelnComputed" :key="ampel.ampel_id" class="mt-2">
                 <ul class="list-group">
-                <li class="list-group-item small">
+                <li :style="{...(isExpiredAmpel(ampel)? {'background':'#E2E3E5'} : {})}" class="list-group-item small">
                 <div class="position-relative"><!-- prevents streched-link from stretching outside this parent element -->
                     <div class="d-flex">
                         <span class="small text-muted me-auto"><small>Deadline: {{ getDate(ampel.deadline) }}</small></span>
@@ -230,12 +205,12 @@ export default {
                         <div v-if="ampel.verpflichtend"><span class="badge bg-warning ms-1"><i class="fa fa-solid fa-triangle-exclamation"></span></div>
                         <div v-if="ampel.bestaetigt"><span class="badge bg-success ms-1"><i class="fa fa-solid fa-circle-check"></i></span></div>
                     </div>
-                    <a :href="'#ampelCollapse_' + ampel.ampel_id" data-bs-toggle="collapse" class="stretched-link">{{ ampel.kurzbz }}</a><br>
+                    <a :class="{...(isExpiredAmpel(ampel)? {'text-reset':true, 'text-decoration-none':true} : {})}" :href="'#ampelCollapse_' + ampel.ampel_id" data-bs-toggle="collapse" class="stretched-link">{{ ampel.kurzbz }}</a><br>
                 </div>
                 <div class="collapse my-3" :id="'ampelCollapse_' + ampel.ampel_id" :ref="'ampelCollapse_' + ampel.ampel_id">
-                    {{ ampel.beschreibung[0] }}
-                    <div class="d-flex justify-content-end mt-3">
-                        <button class="btn btn-sm btn-primary" :class="{disabled: ampel.bestaetigt}" @click="confirm(ampel.ampel_id)">{{ validateBtnTxt(ampel.buttontext[0]) }}</button>
+                    <div v-html="ampel.beschreibung"></div>
+                    <div v-if="!isExpiredAmpel(ampel)" class="d-flex justify-content-end mt-3">
+                        <button  class="btn btn-sm btn-primary" :class="{disabled: ampel.bestaetigt}" @click="confirm(ampel.ampel_id)">{{ validateBtnTxt(ampel.buttontext) }}</button>
                     </div>
                 </div>
                 </li>
@@ -245,189 +220,3 @@ export default {
     </BaseOffcanvas>`
 }
 
-const TEST_ALLE_AMPELN = [
-    {
-        ampel_id: 0,
-        kurzbz: 'Ampeltitel 1',
-        deadline: '2022-12-31',
-        verfallszeit: 10,
-        verpflichtend: false,
-        bestaetigt: false,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            '1-Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            '1-Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },
-    {
-        ampel_id: 1,
-        kurzbz: 'Ampeltitel 2 kann auch etwas länger sein',
-        deadline: '2023-10-03',
-        verfallszeit: 20,
-        verpflichtend: true,
-        bestaetigt: false,
-        buttontext: ['Gelesen', 'Read'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            '2-Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            '2-Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },
-    {
-        ampel_id: 2,
-        kurzbz: 'Ampeltitel 3',
-        deadline: '2022-10-31',
-        verfallszeit: null,		// Dauerampel, Bis zur Bestätigung
-        verpflichtend: false,
-        bestaetigt: true,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            '3-Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            '3-Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },
-    {
-        ampel_id: 3,
-        kurzbz: 'Ampeltitel 4',
-        deadline: '2022-10-31',
-        verfallszeit: 40,
-        verpflichtend: false,
-        bestaetigt: true,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            'Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            'Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },
-    {
-        ampel_id: 4,
-        kurzbz: 'Ampeltitel 5',
-        deadline: '2022-10-31',
-        verfallszeit: 10,
-        verpflichtend: false,
-        bestaetigt: true,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            'Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            'Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },
-    {
-        ampel_id: 5,
-        kurzbz: 'Ampeltitel 6',
-        deadline: '2022-10-31',
-        verfallszeit: 40,
-        verpflichtend: false,
-        bestaetigt: true,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            'Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            'Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },
-    {
-        ampel_id: 6,
-        kurzbz: 'Ampeltitel 7',
-        deadline: '2020-12-31',
-        verfallszeit: 10,
-        verpflichtend: false,
-        bestaetigt: true,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            'Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            'Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },{
-        ampel_id: 7,
-        kurzbz: 'Ampeltitel 8',
-        deadline: '2022-09-25',
-        verfallszeit: 40,
-        verpflichtend: false,
-        bestaetigt: false,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            'Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            'Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },
-    {
-        ampel_id: 8,
-        kurzbz: 'Ampeltitel 9',
-        deadline: '2022-10-01',
-        verfallszeit: 10,
-        verpflichtend: false,
-        bestaetigt: false,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            'Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            'Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    }
-]
-
-const TEST_OFFENE_AMPELN = [
-    {
-        ampel_id: 0,
-        kurzbz: 'Ampeltitel 1',
-        deadline: '2022-12-31',
-        verfallszeit: 10,
-        verpflichtend: false,
-        bestaetigt: false,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            '1-Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            '1-Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },
-    {
-        ampel_id: 1,
-        kurzbz: 'Ampeltitel 2 kann auch etwas länger sein',
-        deadline: '2023-10-03',
-        verfallszeit: 20,
-        verpflichtend: true,
-        bestaetigt: false,
-        buttontext: ['Gelesen', 'Read'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            '2-Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            '2-Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },
-    {
-        ampel_id: 7,
-        kurzbz: 'Ampeltitel 8',
-        deadline: '2022-09-25',
-        verfallszeit: 40,
-        verpflichtend: false,
-        bestaetigt: false,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            'Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            'Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    },
-    {
-        ampel_id: 8,
-        kurzbz: 'Ampeltitel 9',
-        deadline: '2022-10-01',
-        verfallszeit: 10,
-        verpflichtend: false,
-        bestaetigt: false,
-        buttontext: ['Bestätigen', 'Confirm'],
-        insertamum: '2022-09-21 15:25:00',
-        beschreibung: [
-            'Deutscher Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.',
-            'Englischer Text Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'
-        ]
-    }
-];
