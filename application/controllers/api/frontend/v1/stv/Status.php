@@ -24,7 +24,7 @@ class Status extends FHCAPI_Controller
 			'insertStatus' => ['admin:rw', 'assistenz:rw'],
 			'updateStatus' => ['admin:rw', 'assistenz:rw'],
 			'advanceStatus' => ['admin:r', 'assistenz:r'],
-			'confirmStatus' => ['admin:r', 'assistenz:r'],
+			'confirmStatus' => ['admin:rw', 'assistenz:rw'],
 
 		]);
 
@@ -37,7 +37,10 @@ class Status extends FHCAPI_Controller
 		$this->load->library('PrestudentstatusCheckLib');
 
 		// Additional Permission Checks
-		if ($this->router->method == 'insertStatus' || $this->router->method == 'updateStatus') {
+		if ($this->router->method == 'insertStatus'
+			|| $this->router->method == 'updateStatus'
+			|| $this->router->method == 'confirmStatus'
+		) {
 			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
 			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:rw', 'assistenz:rw']);
 		}
@@ -2111,85 +2114,69 @@ class Status extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function confirmStatus($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
+	/**
+	 * Confirms a status entry
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param string				$key_studiensemester_kurzbz
+	 * @param integer				$key_ausbildungssemester
+	 *
+	 * @return void
+	 */
+	public function confirmStatus($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		$uid = getAuthUID();
-
-		//get Studiengang von prestudent_id
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$result = $this->PrestudentModel->load([
-			'prestudent_id'=> $key_prestudent_id,
+		$result = $this->PrestudentstatusModel->load([
+			$ausbildungssemester,
+			$studiensemester_kurzbz,
+			$status_kurzbz,
+			$prestudent_id
 		]);
-		if(isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		$result = current(getData($result));
+		$oldstatus = $this->getDataOrTerminateWithError($result);
+		if (!$oldstatus)
+			show_404(); // Status that should be updated does not exist
 
-		$stg = $result->studiengang_kz;
+		$oldstatus = current($oldstatus);
 
-		if (!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
-		{
-			return $this->terminateWithError($this->p->t('lehre','error_keineSchreibrechte'), self::ERROR_TYPE_GENERAL);
-		}
 
-		$result = $this->PrestudentstatusModel->loadWhere(
-			array(
-				'prestudent_id' => $key_prestudent_id,
-				'status_kurzbz' => $key_status_kurzbz,
-				'ausbildungssemester' => $key_ausbildungssemester,
-				'studiensemester_kurzbz' => $key_studiensemester_kurzbz
-			)
-		);
+		$authUID = getAuthUID();
+		$now = date('c');
 
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
+		//Form Validation
+		$this->load->library('form_validation');
 
-		elseif (!hasData($result))
-		{
-			return $this->terminateWithError($this->p->t('lehre','error_noStatusFound'), self::ERROR_TYPE_GENERAL);
-		}
+		$this->form_validation->set_rules('Status', '', [
+			['status_not_yet_confirmed', function () use ($oldstatus) {
+				return !$oldstatus->bestaetigtam;
+			}],
+			['bewerbung_abgeschickt', function () use ($oldstatus) {
+				return !!$oldstatus->bewerbung_abgeschicktamum;
+			}]
+		], [
+			'status_not_yet_confirmed' => $this->p->t('lehre', 'error_statusConfirmedYet'),
+			'bewerbung_abgeschickt' => $this->p->t('lehre', 'error_bewerbungNochNichtAbgeschickt')
+		]);
 
-		$statusData = current(getData($result));
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		//check if Status is unconfirmed..
-		if($statusData->bestaetigtam != null)
-		{
-			//return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			return $this->terminateWithError($this->p->t('lehre','error_statusConfirmedYet'), self::ERROR_TYPE_GENERAL);
-		}
 
-		//check if Bewerbung abgeschickt
-		if($statusData->bewerbung_abgeschicktamum == null)
-		{
-			return $this->terminateWithError($this->p->t('lehre','error_bewerbungNochNichtAbgeschickt'), self::ERROR_TYPE_GENERAL);
-		}
+		//update status
+		$result = $this->PrestudentstatusModel->update([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => $status_kurzbz,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'ausbildungssemester' => $ausbildungssemester,
+		], [
+			'bestaetigtam' => $now,
+			'bestaetigtvon' => $authUID,
+			'updateamum' => $now,
+			'updatevon' => $authUID
+		]);
 
-		$result = $this->PrestudentstatusModel->update(
-			[
-				'prestudent_id' => $key_prestudent_id,
-				'status_kurzbz' => $key_status_kurzbz,
-				'studiensemester_kurzbz' => $key_studiensemester_kurzbz,
-				'ausbildungssemester' => $key_ausbildungssemester,
-			],
-			[
-				'prestudent_id' => $key_prestudent_id,
-				'status_kurzbz' => $key_status_kurzbz,
-				'studiensemester_kurzbz' => $key_studiensemester_kurzbz,
-				'ausbildungssemester' => $key_ausbildungssemester,
-				'bestaetigtam' => date('c'),
-				'bestaetigtvon' => $uid,
-				'updateamum' => date('c'),
-				'updatevon' => $uid
-			]
-		);
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		return $this->outputJsonSuccess(true);
+		$this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess(true);
 	}
 
 	/**
