@@ -236,6 +236,8 @@ export default{
 							button.addEventListener('click', () =>
 								this.actionConfirmStatus(cell.getData().status_kurzbz, cell.getData().studiensemester_kurzbz, cell.getData().ausbildungssemester)
 							);
+							if (cell.getData().bestaetigtam || !cell.getData().bewerbung_abgeschicktamum)
+								button.disabled = true;
 							container.append(button);
 
 							button = document.createElement('button');
