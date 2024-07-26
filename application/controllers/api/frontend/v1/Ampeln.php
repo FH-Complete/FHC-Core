@@ -37,6 +37,7 @@ class Ampeln extends FHCAPI_Controller
 
 
 		$this->load->model('content/Ampel_model', 'AmpelModel');
+        $this->load->model('system/Sprache_model','SpracheModel');
 
 
 		//? put the uid and pid inside the controller for reusability
@@ -49,7 +50,7 @@ class Ampeln extends FHCAPI_Controller
 	// Public methods
 
     /**
-	 * function that queries all the ampeln that are addressed to the user uid
+	 * confirms ampel and inserts ampelID in public.tbl_ampel_benutzer_bestaetigt
      * @access public
 	 * 
 	 */
@@ -71,32 +72,40 @@ class Ampeln extends FHCAPI_Controller
     }
 	
     /**
-	 * function that queries all the ampeln that are addressed to the user uid
+	 * queries active and not confirmed ampeln by the user 
      * @access public
 	 * 
 	 */
 	public function getNonConfirmedActiveAmpeln()
 	{
+
         $userAmpeln = array();
-        $ampel_result = $this->AmpelModel->active();
 
-        $ampel_result = $this->getDataOrTerminateWithError($ampel_result);
+        // fetch active ampeln
+        $activeAmpeln = $this->AmpelModel->active();
 
-        foreach($ampel_result as $ampel){
+        $activeAmpeln = $this->getDataOrTerminateWithError($activeAmpeln);
+
+        foreach($activeAmpeln as $ampel){
             
+            // check if ampel is confirmed by user
             $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
             $ampel->bestaetigt = $confirmedByUser;
+
+            // only include non confirmed active ampeln in the result
             if(!$confirmedByUser){
                 $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
                 $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
+
+                // check if user is assigned to the ampel
                 foreach($userUID_array as $user_obj){
-                    
+                    // property is called uid for students and mitarbeiter_uid for employees
                     $user_uid = property_exists($user_obj,"uid") ? $user_obj->uid : $user_obj->mitarbeiter_uid;
-                    if($user_uid === $this->uid){
-                        $userAmpeln[] = $ampel;
-                    }
-                }
                     
+                    if($user_uid === $this->uid){
+                        $userAmpeln[] = $this->translateAmpel($ampel);
+                    }
+                } 
             }
             
         }
@@ -104,6 +113,11 @@ class Ampeln extends FHCAPI_Controller
         $this->terminateWithSuccess($userAmpeln);
 	}
 
+    /**
+	 * queries active ampeln by the user 
+     * @access public
+	 * 
+	 */
     public function getAllActiveAmpeln()
 	{
         $userAmpeln = array();
@@ -121,27 +135,60 @@ class Ampeln extends FHCAPI_Controller
                 
                 $user_uid = property_exists($user_obj,"uid") ? $user_obj->uid : $user_obj->mitarbeiter_uid;
                 if($user_uid === $this->uid){
-                    $userAmpeln[] = $ampel;
+                    $userAmpeln[] = $this->translateAmpel($ampel);
                 }
             }
-            
         }
 
         $this->terminateWithSuccess($userAmpeln);
 	}
 
+    /**
+	 * queries all ampeln that were assigned to the user until start of first work day
+     * @access public
+	 * 
+	 */
     public function alleAmpeln(){
 
+        //fetch all ampeln
         $alle_ampeln = $this->AmpelModel->alleAmpeln($this->uid);
 
         if(isError($alle_ampeln)) $this->terminateWithError(getError($alle_ampeln));
 
         $alle_ampeln = $this->getDataOrTerminateWithError($alle_ampeln);
 
+        // translate ampeln
+        array_map(function($ampel){ return $this->translateAmpel($ampel);}, $alle_ampeln);
+
         $this->terminateWithSuccess($alle_ampeln);
 
     }
+
+    //------------------------------------------------------------------------------------------------------------------
+	// Private methods
     
+    /**
+	 * translate ampel description and button text
+     * @access private
+	 * 
+	 */
+    public function translateAmpel($ampel){
+
+        // fetch user language 
+        $userLanguage = getUserLanguage();
+        
+        $userLanguage = $this->SpracheModel->loadWhere(["sprache" => $userLanguage]);
+        
+        if(isError($userLanguage)) $this->terminateWithError(getError($userLanguage));
+        $userLanguage = $this->getDataOrTerminateWithError($userLanguage)[0]->index - 1; // why does the index start at 1?
+
+        // translate the ampel description and button text
+        $ampel->beschreibung = $ampel->beschreibung[$userLanguage];
+        $ampel->buttontext = $ampel->buttontext[$userLanguage];
+
+        return $ampel;
+
+    }
 
     
 }

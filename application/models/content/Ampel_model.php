@@ -108,6 +108,8 @@ class Ampel_model extends DB_Model
 
 	function alleAmpeln($uid){
 
+		$zugeteile_ampeln = [];
+		
 		$datum = new datum();
 		$now = $datum->mktime_fromdate(date('Y-m-d'));
 
@@ -116,17 +118,6 @@ class Ampel_model extends DB_Model
 			SELECT insertamum FROM public.tbl_benutzer WHERE uid = ?", [$uid]);
 		$benutzerStartDate = $datum->mktime_fromdate(date(current(getData($benutzerStartDate))->insertamum));
 
-		// user language 
-		$userLanguage = getUserLanguage();
-		$this->load->model('system/Sprache_model','SpracheModel');
-		$this->SpracheModel->addSelect(["index"]);
-		$userLanguage = $this->SpracheModel->loadWhere(["sprache" => $userLanguage]);
-		//checking for error
-		if(isError($userLanguage)) return error(getError($userLanguage));
-		$userLanguage = getData($userLanguage)[0]->index - 1; // why does the index start at 1?
-
-		$zugeteile_ampeln = [];
-		
 		$allAmpeln = $this->execReadOnlyQuery("
 			SELECT * FROM 
 			public.tbl_ampel");
@@ -156,8 +147,6 @@ class Ampel_model extends DB_Model
 				//&& $now > strtotime('+' . $ampel->verfallszeit . ' day', $ampel->deadline)
 				
 			){
-				$ampel->beschreibung = $ampel->beschreibung[$userLanguage];
-				$ampel->buttontext = $ampel->buttontext[$userLanguage];
 				$zugeteile_ampeln[] = $ampel;
 			}
 		}
