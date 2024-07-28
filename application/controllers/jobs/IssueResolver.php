@@ -10,7 +10,7 @@ class IssueResolver extends IssueResolver_Controller
 		parent::__construct();
 
 		// set fehler codes which can be resolved by the job, with own resolver defined
-		// structure: fehlercode => class (library) name for resolving
+		// structure: fehlercode => class (library) name for resolving in "resolvers" folder
 		$this->_codeLibMappings = array(
 			'CORE_ZGV_0001' => 'CORE_ZGV_0001',
 			'CORE_ZGV_0002' => 'CORE_ZGV_0002',
@@ -52,7 +52,7 @@ class IssueResolver extends IssueResolver_Controller
 		);
 
 		// fehler which are resolved by the job the same way as they are produced
-		// structure: fehlercode => class (library) name for resolving
+		// structure: fehlercode => class (library) name for resolving in "plausichecks" folder
 		$this->_codeProducerLibMappings = array(
 			'CORE_STUDENTSTATUS_0001' => 'AbbrecherAktiv',
 		);
