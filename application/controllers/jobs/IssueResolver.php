@@ -51,7 +51,7 @@ class IssueResolver extends IssueResolver_Controller
 			'CORE_PERSON_0004' => 'CORE_PERSON_0004'
 		);
 
-		// fehler which are resolved the same way as they are produced
+		// fehler which are resolved by the job the same way as they are produced
 		// structure: fehlercode => class (library) name for resolving
 		$this->_codeProducerLibMappings = array(
 			'CORE_STUDENTSTATUS_0001' => 'AbbrecherAktiv',
