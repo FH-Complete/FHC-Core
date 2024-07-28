@@ -25,7 +25,7 @@ class PlausicheckResolverLib
 		$this->_ci =& get_instance(); // get ci instance
 
 		$this->_ci->load->library('IssuesLib');
-		$this->_ci->load->library('issues/PlausicheckProducerLib', ['isForResolutionCheck' => true]);
+		$this->_ci->load->library('issues/PlausicheckProducerLib', ['extensionName' => $this->_extensionName, 'isForResolutionCheck' => true]);
 	}
 
 	/**
