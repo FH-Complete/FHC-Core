@@ -101,7 +101,7 @@ export default{
 					{title: "Studienplan", field: "bezeichnung"},
 					{title: "BestätigtAm", field: "format_bestaetigtam"},
 					{title: "AbgeschicktAm", field: "format_bewerbung_abgeschicktamum", visible:false},
-					{title: "Statusgrund", field: "statusgrund_beschreibung"},
+					{title: "Statusgrund", field: "statusgrund_bezeichnung"},
 					{title: "Organisationsform", field: "orgform_kurzbz", visible: false},
 					{title: "PrestudentInId", field: "prestudent_id", visible: false},
 					{title: "StudienplanId", field: "studienplan_id", visible: false},
