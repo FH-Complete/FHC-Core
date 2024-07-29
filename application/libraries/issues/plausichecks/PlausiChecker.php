@@ -9,7 +9,7 @@ abstract class PlausiChecker
 	protected $_config; // all applicable configuration parameters for this plausicheck
 	protected $_db; // database for queries
 
-	protected $_isForResolutionCheck;
+	protected $_isForResolutionCheck; // if true, additional parameters only needed for resolution are checked
 
 	protected $_base_sql = ''; // base sql string
 
