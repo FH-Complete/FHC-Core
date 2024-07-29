@@ -52,18 +52,7 @@ export default {
                     default: return data;
                 }
         },
-        isExpiredAmpel(ampel){
         
-            let deadline = new Date(ampel.deadline);
-            if(ampel.verfallszeit instanceof Number) deadline.setDate(deadline.getDate() + ampel.verfallszeit);
-            deadline.setHours(0, 0, 0, 0); 
-
-            let today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            return deadline < today ? true : false;
-            
-        },
 
         toggleFilter(value){
             this.filter === value ? this.filter = '' : this.filter = value;
@@ -87,27 +76,31 @@ export default {
         closeOffcanvas(){
             this.filter = '';
         },
-        async fetchActiveAmpeln(){
+        async fetchNonConfirmedActiveAmpeln(){
 
             await this.$fhcApi.factory.ampeln.getNonConfirmedActiveAmpeln().then(res=>{
                 this.activeAmpeln = res.data.sort((a,b) => new Date(b.deadline) - new Date(a.deadline));
             }); 
         },
-        async fetchAllAmpeln(){
+        async fetchAllActiveAmpeln(){
 
-            await this.$fhcApi.factory.ampeln.alleAmpeln().then(res=>{
+            await this.$fhcApi.factory.ampeln.getAllActiveAmpeln().then(res=>{
                 this.allAmpeln = res.data.sort((a,b) => new Date(b.deadline) - new Date(a.deadline));
             }); 
         },
         async confirm(ampelId){
-            await this.$fhcApi.factory.ampeln.confirmAmpel(ampelId).then(res =>{
-                res.data ? this.$toast.success('Ampel bestätigt') : this.$toast.error('Fehler beim Bestätigen der Ampel');
+            this.$fhcApi.factory.ampeln.confirmAmpel(ampelId).then(res =>{
+                // response of the enpoint when confirming an ampel (true if confirmed and false if not confirmed)
+                if(res.data){
+                    console.log("ampel was successfully confirmed");
+                }else{
+                    console.error("ampel was not successfully confirmed");
+                } 
             });
 
-            // fetch all the ampeln after an ampel has been confirmed
-            await this.fetchActiveAmpeln();
-            await this.fetchAllAmpeln();
-
+            // update the ampeln by refetching them
+            this.fetchNonConfirmedActiveAmpeln();
+            this.fetchAllActiveAmpeln();
         },
         validateBtnTxt(buttontext){
 
@@ -124,8 +117,8 @@ export default {
     },
     async mounted() {
         
-        await this.fetchActiveAmpeln();
-        await this.fetchAllAmpeln();
+        await this.fetchNonConfirmedActiveAmpeln();
+        await this.fetchAllActiveAmpeln();
     },
     template: /*html*/`
     <div class="widgets-ampel w-100 h-100">
@@ -197,7 +190,7 @@ export default {
             </div>
             <div v-for="ampel in ampelnComputed" :key="ampel.ampel_id" class="mt-2">
                 <ul class="list-group">
-                <li :style="{...(isExpiredAmpel(ampel)? {'background':'#E2E3E5'} : {})}" class="list-group-item small">
+                <li class="list-group-item small">
                 <div class="position-relative"><!-- prevents streched-link from stretching outside this parent element -->
                     <div class="d-flex">
                         <span class="small text-muted me-auto"><small>Deadline: {{ getDate(ampel.deadline) }}</small></span>
@@ -205,11 +198,11 @@ export default {
                         <div v-if="ampel.verpflichtend"><span class="badge bg-warning ms-1"><i class="fa fa-solid fa-triangle-exclamation"></span></div>
                         <div v-if="ampel.bestaetigt"><span class="badge bg-success ms-1"><i class="fa fa-solid fa-circle-check"></i></span></div>
                     </div>
-                    <a :class="{...(isExpiredAmpel(ampel)? {'text-reset':true, 'text-decoration-none':true} : {})}" :href="'#ampelCollapse_' + ampel.ampel_id" data-bs-toggle="collapse" class="stretched-link">{{ ampel.kurzbz }}</a><br>
+                    <a :href="'#ampelCollapse_' + ampel.ampel_id" data-bs-toggle="collapse" class="stretched-link">{{ ampel.kurzbz }}</a><br>
                 </div>
                 <div class="collapse my-3" :id="'ampelCollapse_' + ampel.ampel_id" :ref="'ampelCollapse_' + ampel.ampel_id">
                     <div v-html="ampel.beschreibung"></div>
-                    <div v-if="!isExpiredAmpel(ampel)" class="d-flex justify-content-end mt-3">
+                    <div v-if="!ampel.bestaetigt " class="d-flex justify-content-end mt-3">
                         <button  class="btn btn-sm btn-primary" :class="{disabled: ampel.bestaetigt}" @click="confirm(ampel.ampel_id)">{{ validateBtnTxt(ampel.buttontext) }}</button>
                     </div>
                 </div>

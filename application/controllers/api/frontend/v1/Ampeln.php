@@ -78,14 +78,14 @@ class Ampeln extends FHCAPI_Controller
 	 */
 	public function getNonConfirmedActiveAmpeln()
 	{
-
+        
         $userAmpeln = array();
 
         // fetch active ampeln
         $activeAmpeln = $this->AmpelModel->active();
 
         $activeAmpeln = $this->getDataOrTerminateWithError($activeAmpeln);
-
+        
         foreach($activeAmpeln as $ampel){
             
             // check if ampel is confirmed by user
@@ -94,22 +94,40 @@ class Ampeln extends FHCAPI_Controller
 
             // only include non confirmed active ampeln in the result
             if(!$confirmedByUser){
-                $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
-                $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
+                
+                // check if the user was assigned to the ampel
+                $zugeteilt = $this->AmpelModel->isZugeteilt($this->uid, $ampel->benutzer_select);
 
+                if(isError($zugeteilt)){
+                    $this->addError(getError($zugeteilt));
+                    $zugeteilt = false;
+                }else{
+                    $zugeteilt = $this->getDataOrTerminateWithError($zugeteilt);
+                }
+
+                if($zugeteilt) $userAmpeln[] = $this->translateAmpel($ampel);
+                
+                // old way to check if an ampel was assigned to the user
+                /* $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
+                if(isError($userUID_array)){
+                    $this->addError(getError($userUID_array));
+                }
+                $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
+                
+                
                 // check if user is assigned to the ampel
                 foreach($userUID_array as $user_obj){
                     // property is called uid for students and mitarbeiter_uid for employees
                     $user_uid = property_exists($user_obj,"uid") ? $user_obj->uid : $user_obj->mitarbeiter_uid;
-                    
                     if($user_uid === $this->uid){
                         $userAmpeln[] = $this->translateAmpel($ampel);
                     }
-                } 
-            }
-            
-        }
+                } */ 
+                
 
+            }
+        }
+        
         $this->terminateWithSuccess($userAmpeln);
 	}
 
@@ -121,23 +139,27 @@ class Ampeln extends FHCAPI_Controller
     public function getAllActiveAmpeln()
 	{
         $userAmpeln = array();
+        
         $ampel_result = $this->AmpelModel->active();
 
         $ampel_result = $this->getDataOrTerminateWithError($ampel_result);
-
+        
         foreach($ampel_result as $ampel){
-            
             $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
             $ampel->bestaetigt = $confirmedByUser;
-            $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
-            $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
-            foreach($userUID_array as $user_obj){
-                
-                $user_uid = property_exists($user_obj,"uid") ? $user_obj->uid : $user_obj->mitarbeiter_uid;
-                if($user_uid === $this->uid){
-                    $userAmpeln[] = $this->translateAmpel($ampel);
-                }
+            
+            // check if the ampel was assigned to the user
+            $zugeteilt = $this->AmpelModel->isZugeteilt($this->uid, $ampel->benutzer_select);
+
+            if(isError($zugeteilt)){
+                $this->addError(getError($zugeteilt));
+                $zugeteilt = false;
+            }else{
+                $zugeteilt = $this->getDataOrTerminateWithError($zugeteilt);
             }
+
+            if($zugeteilt) $userAmpeln[] = $this->translateAmpel($ampel);
+                        
         }
 
         $this->terminateWithSuccess($userAmpeln);
@@ -157,8 +179,13 @@ class Ampeln extends FHCAPI_Controller
 
         $alle_ampeln = $this->getDataOrTerminateWithError($alle_ampeln);
 
-        // translate ampeln
-        array_map(function($ampel){ return $this->translateAmpel($ampel);}, $alle_ampeln);
+        $alle_ampeln = array_map(function($ampel){ 
+            // check if ampel is confirmed by user
+            $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
+            $ampel->bestaetigt = $confirmedByUser;
+            // translate ampeln
+            return $this->translateAmpel($ampel);
+        }, $alle_ampeln);
 
         $this->terminateWithSuccess($alle_ampeln);
 
@@ -183,8 +210,8 @@ class Ampeln extends FHCAPI_Controller
         $userLanguage = $this->getDataOrTerminateWithError($userLanguage)[0]->index - 1; // why does the index start at 1?
 
         // translate the ampel description and button text
-        $ampel->beschreibung = $ampel->beschreibung[$userLanguage];
-        $ampel->buttontext = $ampel->buttontext[$userLanguage];
+        if(isset($ampel->beschreibung) && count($ampel->beschreibung)>=($userLanguage+1)) $ampel->beschreibung = $ampel->beschreibung[$userLanguage];
+        if(isset($ampel->buttontext) && count($ampel->buttontext)>=($userLanguage+1)) $ampel->buttontext = $ampel->buttontext[$userLanguage];
 
         return $ampel;
 

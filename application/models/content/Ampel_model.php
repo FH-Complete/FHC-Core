@@ -33,10 +33,16 @@ class Ampel_model extends DB_Model
 		}
 
 		$query .= '(
-			(NOW()<(deadline+(COALESCE(verfallszeit,0) || \' days\')::interval)::date)
-			    OR (verfallszeit IS NULL)
-			   AND (NOW()>(deadline-(COALESCE(vorlaufzeit,0) || \' days\')::interval)::date)
-			    OR (vorlaufzeit IS NULL AND NOW() < deadline))';
+			(
+				(NOW()<(deadline+(COALESCE(verfallszeit,0) || \' days\')::interval)::date)
+				OR (verfallszeit IS NULL)
+			)
+			AND 
+			(
+				(NOW()>(deadline-(COALESCE(vorlaufzeit,0) || \' days\')::interval)::date)
+			    OR (vorlaufzeit IS NULL AND NOW() < deadline)
+			)
+			)';
 
 		$query .= ' ORDER BY deadline DESC';
 
@@ -92,6 +98,12 @@ class Ampel_model extends DB_Model
 	}
 
 
+	/**
+	 * confirms Ampel by the user.
+	 * @param int $ampel_id Ampel-ID
+	 * @param string $uid UID
+	 * @return bool insert into result
+	 */
 	public function confirmAmpel($ampel_id, $uid)
 	{
 		if(isset($ampel_id) && isset($uid)){
@@ -104,6 +116,33 @@ class Ampel_model extends DB_Model
 		}
 		
 	}
+
+	/**
+	 * checks if a user is assigned to an ampel
+	 * @param string $uid userID
+	 * @param string $benutzer_select the select query which gets all the user that are assigned to an ampel
+	 * @return stdClass 
+	 */
+	public function isZugeteilt($uid, $benutzer_select){
+		$zugeteilt = $this->execReadOnlyQuery("
+			SELECT 
+				CASE WHEN ? IN (".$benutzer_select.") 
+					THEN true 
+					ELSE false
+				END as zugeteilt	
+			", [$uid]);
+
+		if(isError($zugeteilt)){
+			return $zugeteilt;
+		}
+
+		$zugeteilt = getData($zugeteilt);
+
+		return success(current($zugeteilt)->zugeteilt);
+
+	}
+
+	
 
 
 	function alleAmpeln($uid){
@@ -125,30 +164,43 @@ class Ampel_model extends DB_Model
 		if(isError($allAmpeln)) return error(getError($allAmpeln));
 
 		$allAmpeln = getData($allAmpeln);
-
 		foreach($allAmpeln as $ampel){
+
+			// check if the ampel is assigned to the user
 			$zugeteilt = $this->execReadOnlyQuery("
 			SELECT 
-				CASE WHEN ? IN (?) 
+				CASE WHEN ? IN (".$ampel->benutzer_select.") 
 					THEN true 
 					ELSE false
 				END as zugeteilt	
-			", [$uid, $ampel->benutzer_select]);
-
-			if(isError($zugeteilt)) return error(getError($zugeteilt));
+			", [$uid]);
 			
-			if($zugeteilt 
-				// datum der Ampel liegt nicht vor der Vorlaufzeit
-				&& (isset($ampel->vorlaufzeit) && !($now < strtotime('-' .  $ampel->vorlaufzeit . ' day', $datum->mktime_fromdate($ampel->deadline)) ))
-				// verfallszeit nicht vor dem start Datum des Benutzers abgelaufen
-				&& isset($ampel->verfallszeit) && $benutzerStartDate < strtotime('+' . $ampel->verfallszeit . ' day', $datum->mktime_fromdate($ampel->deadline))
+			if(isError($zugeteilt)) return error(getError($zugeteilt));
 
-				// verfallszeit ist abgelaufen
-				//&& $now > strtotime('+' . $ampel->verfallszeit . ' day', $ampel->deadline)
-				
+			$zugeteilt = current(getData($zugeteilt))->zugeteilt;
+			
+			
+			// abgelaufen check
+			// $now > strtotime('+' . $ampel->verfallszeit . ' day', $ampel->deadline)
+
+			if(
+				// aktuelles datum liegt vor der Vorlaufzeit der Ampel
+				(isset($ampel->vorlaufzeit) && $now < strtotime('-' .  $ampel->vorlaufzeit . ' day', $datum->mktime_fromdate($ampel->deadline)))
+				||
+				// ampel ist vor Arbeitsstart abgelaufen
+				(isset($ampel->verfallszeit) && $benutzerStartDate > strtotime('+' . $ampel->verfallszeit . ' day', $datum->mktime_fromdate($ampel->deadline)))
+				||
+				// ampel ist vor Arbeitsstart abgelaufen (verfallszeit nicht vorhanden)
+				($benutzerStartDate > strtotime('+' . $ampel->verfallszeit . ' day', $datum->mktime_fromdate($ampel->deadline)))
 			){
-				$zugeteile_ampeln[] = $ampel;
+				// continue iteration if ampel is expired before work start or shouldn't be visible yet
+				continue;
 			}
+
+			$ampel->zugeteilt = $zugeteilt;
+
+			if($zugeteilt) $zugeteile_ampeln[] = $ampel; 
+			   
 		}
 
 		return success($zugeteile_ampeln);
