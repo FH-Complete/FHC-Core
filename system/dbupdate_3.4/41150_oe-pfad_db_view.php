@@ -27,6 +27,8 @@ if ($result = $db->db_query("SELECT * FROM information_schema.views WHERE table_
 		    oe.oe_parent_kurzbz = oet.oe_kurzbz
 		)
 		SELECT * FROM vw_oe_path ORDER BY path, depth;
+
+		GRANT SELECT ON public.vw_oe_path TO vilesci;
 		";
 	
 	if (!$db->db_query($qry))
