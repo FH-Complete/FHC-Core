@@ -604,10 +604,12 @@ export default {
 				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
 				<template #default>
 					<div v-if="prestudentIds.length == 1">
-						<p>Diese Person wirklich zum {{actionStatusText}} machen?</p>
+						<p>{{$p.t('lehre', 'modal_StatusactionSingle', { status: actionStatusText })}}</p>
 					</div>
 					<div v-else>
-						<p>Diese {{prestudentIds.length}} Personen wirklich zum {{actionStatusText}} machen?</p>
+						<p>{{$p.t('lehre', 'modal_StatusactionPlural', { count: prestudentIds.length,
+					status: actionStatusText
+						})}}</p>
 					</div>
 					
 				</template>
