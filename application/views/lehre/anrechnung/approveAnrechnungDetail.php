@@ -1,4 +1,5 @@
 <?php
+$this->load->config('anrechnung');
 $this->load->view(
 	'templates/FHC-Header',
 	array(
@@ -172,14 +173,16 @@ $this->load->view(
                                                 <th class="col-xs-4"><?php echo $this->p->t('global', 'begruendung'); ?></th>
                                                 <td><span id="begruendung_id" data-begruendung_id="<?php echo $anrechnungData->begruendung_id ?>" ><?php echo $anrechnungData->begruendung ?></span></td>
                                             </tr>
-                                            <tr>
-                                                <th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'begruendungEctsLabel'); ?></th>
-                                                <td><span><?php echo $anrechnungData->begruendung_ects ?></span></td>
-                                            </tr>
-                                            <tr>
-                                                <th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'begruendungLvinhaltLabel'); ?></th>
-                                                <td><span><?php echo $anrechnungData->begruendung_lvinhalt ?></span></td>
-                                            </tr>
+											<?php if ($this->config->item('explain_equivalence')): ?>
+                                                <tr>
+                                                    <th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'begruendungEctsLabel'); ?></th>
+                                                    <td><span><?php echo $anrechnungData->begruendung_ects ?></span></td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'begruendungLvinhaltLabel'); ?></th>
+                                                    <td><span><?php echo $anrechnungData->begruendung_lvinhalt ?></span></td>
+                                                </tr>
+											<?php endif; ?>
 											</tbody>
 										</table>
 									</div>
