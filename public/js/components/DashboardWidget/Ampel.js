@@ -17,13 +17,16 @@ export default {
         AbstractWidget
     ],
     computed: {
+        widgetAmpelMAX(){
+            return widgetAmpelMAX;
+        },
         ampelnComputed(){
             
             switch(this.source)
             {
                 case 'offen': return this.applyFilter(this.activeAmpeln);
                 case 'alle': return this.applyFilter(this.allAmpeln);
-                default: return this.activeAmpeln; 
+                default: return this.applyFilter(this.activeAmpeln); 
             }
             
         },
@@ -63,7 +66,9 @@ export default {
             for (let i = 0; i < this.ampelnComputed.length; i++)
             {
                 let ampelId = this.ampelnComputed[i].ampel_id;
-                this.$refs['ampelCollapse_' + ampelId][0].classList.remove('show');
+                if(this.$refs['ampelCollapse_' + ampelId]){
+                    this.$refs['ampelCollapse_' + ampelId][0].classList.remove('show');
+                } 
             }
         },
         openOffcanvasAmpel(ampelId){
@@ -74,7 +79,9 @@ export default {
             this.$refs['ampelCollapse_' + ampelId][0].classList.add('show');
         },
         closeOffcanvas(){
+            this.closeOffcanvasAmpeln();
             this.filter = '';
+            // maybe we also want to reset the source (open/alle) of the displayed ampeln
         },
         async fetchNonConfirmedActiveAmpeln(){
 
@@ -153,8 +160,9 @@ export default {
             </div>
         </div>
         <div v-else>
-        <header class="me-auto"><b>Neueste Ampeln</b></header>
+        <header class="me-auto"><b>Neueste Ampeln </b></header>
             <template v-for="n in widgetAmpelMAX">
+            
                 <div class="mt-2 card" aria-hidden="true">
                 <div class="card-body">
                     <p class="card-text placeholder-glow">
