@@ -84,7 +84,7 @@ export default{
 		}
 	},
 	props: {
-		modelValue: Object,
+		modelValue: Object
 	},
 	data() {
 		return {
@@ -241,22 +241,10 @@ export default{
 			statusData: {},
 			statusId: {},
 			dataMeldestichtag: null,
-			isLastStatus: {},
-			//newArray: {},
-			abbruchData: {},
-			newStatus: '',
-			statusNew: true,
-			isErsterStudent: false,
-			isBewerber: true,
-		}
+			statusNew: true
+		};
 	},
 	watch: {
-		data: {
-			handler(n) {
-				const start = this.status_kurzbz;
-			},
-			deep: true
-		},
 		modelValue() {
 			if (this.$refs.table) {
 				if (this.$refs.table.tableBuilt)
@@ -302,7 +290,7 @@ export default{
 				.then(this.$reloadList)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		actionAdvanceStatus(status, stdsem, ausbildungssemester){
+		actionAdvanceStatus(status, stdsem, ausbildungssemester) {
 			this.statusId = {
 				'prestudent_id': this.modelValue.prestudent_id,
 				'status_kurzbz': status,
@@ -328,7 +316,7 @@ export default{
 				.then(this.reload)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		advanceStatus(statusId){
+		advanceStatus(statusId) {
 			return this.$fhcApi.post('api/frontend/v1/stv/status/advanceStatus/' +
 				this.statusId.prestudent_id + '/' +
 				this.statusId.status_kurzbz + '/' +
@@ -344,98 +332,7 @@ export default{
 					this.reload();
 				});
 		},
-		deleteStatus(status_id){
-			return this.$fhcApi.post('api/frontend/v1/stv/status/deleteStatus/',
-				status_id)
-				.then(
-					result => {
-						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-							this.resetModal();
-					})
-				.catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
-					window.scrollTo(0, 0);
-					this.reload();
-					this.$reloadList();
-				});
-		},
-		checkIfLastStatus(){
-			return this.$fhcApi
-				.get('api/frontend/v1/stv/status/isLastStatus/' + this.modelValue.prestudent_id)
-				.then(
-					result => {
-						if(result.data){
-							this.isLastStatus = result.data;
-						} else {
-							this.isLastStatus = {};
-						}
-						return result;
-					})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
-		// checkIfErsterStudent(prestudent_id){
-		// 	return this.$fhcApi
-		// 		.get('api/frontend/v1/stv/status/isErsterStudent/' + prestudent_id)
-		// 		.then(
-		// 			result => {
-		// 				this.isErsterStudent = result.data.retval == 0 ? 1 : 0;
-		// 				return result;
-		// 			})
-		// 		.catch(this.$fhcAlert.handleSystemError);
-		// },
-		/*checkIfBewerber(prestudentIds){
-
-			if(!prestudentIds)
-				prestudentIds = [this.modelValue.prestudent_id];
-
-			const promises = prestudentIds.map(prestudentId => {
-
-				return this.$fhcApi.post('api/frontend/v1/stv/status/hasStatusBewerber/' + prestudentId,
-				).then(response => {
-					countSuccess++;
-					return response;
-				})
-					//.catch(this.$fhcAlert.handleSystemError)
-					.catch(error => {
-						countError++;
-						//For each Prestudent show Error in Alert
-						this.$fhcAlert.handleSystemError(error);
-					});
-			});
-
-			Promise
-				.allSettled(promises)
-				.then(values => {
-
-						//Feedback Success als infoalert
-						if (countSuccess > 0) {
-							this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
-								'countSuccess': countSuccess,
-								'status': this.newStatus,
-								'countError': countError
-							}));
-						}
-
-						if (this.modelValue.prestudent_id) {
-							this.reload();
-							//TODO(manu) reload Detailtab after Abbrecher to see current status activ, verband and gruppe
-						}
-						else {
-							this.$reloadList();
-						}
-
-			/!*return this.$fhcApi
-				.get('api/frontend/v1/stv/status/hasStatusBewerber/' + prestudent_id)
-				.then(
-					result => {
-						this.isBewerber = result.data;
-						console.log(result);
-						return result;
-					})
-				.catch(this.$fhcAlert.handleSystemError);*!/
-			//}
-		},*/
-		loadStatus(status_id){
+		loadStatus(status_id) {
 			this.statusNew = false;
 			return this.$fhcApi.post('api/frontend/v1/stv/status/loadStatus/',
 				status_id)
@@ -448,20 +345,9 @@ export default{
 		reload() {
 			if (this.$refs.table)
 				this.$refs.table.reloadTable();
-		},
-		hideModal(modalRef){
-			this.$refs[modalRef].hide();
-			this.statusNew = true;
-		},
-		resetModal() {
-			this.statusData = {};
-			this.statusId = {};
-			this.actionButton = {};
-			this.actionStatusText = {};
-			this.actionSem = null;
 		}
 	},
-	created(){
+	created() {
 		this.$fhcApi
 			.get('api/frontend/v1/stv/status/getLastBismeldestichtag/')
 			.then(result => {
