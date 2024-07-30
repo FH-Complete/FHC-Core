@@ -48,20 +48,8 @@ html {
 }
 
 /* Dropdown Toolbar Interessent, submenu */
-.dropdown-menu-right {
-	left: 100%;
-	top: 5;
-	margin-left: 0.1rem;
-	margin-top: -1rem;
-}
-
-.dropdown-submenu:hover>.dropdown-menu-right {
-	display: block;
-}
-
-.dropdown-submenu>.dropdown-menu-right {
-	display: none;
-	position: absolute;
+.dropend .dropdown-toggle.d-flex::after {
+	height: 0;
 }
 
 @media (min-width: 768px) {

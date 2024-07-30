@@ -154,6 +154,7 @@ export default {
 	},
 	methods: {
 		executeLink(link) {
+			bootstrap.Dropdown.getInstance(this.$refs.toolbarButton).hide();
 			// Split the link string to extract the function name and arguments
 			const match = link.match(/(\w+)\(([^)]*)\)/);
 			const functionName = match ? match[1] : link;
@@ -597,131 +598,138 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-		<div class="stv-status-dropdown">
-			
-			<!--Modal: ConfirmStatusAction-->
-			<BsModal ref="confirmStatusAction">
-				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
-				<template #default>
-					<div v-if="prestudentIds.length == 1">
-						<p>{{$p.t('lehre', 'modal_StatusactionSingle', { status: actionStatusText })}}</p>
-					</div>
-					<div v-else>
-						<p>{{$p.t('lehre', 'modal_StatusactionPlural', { count: prestudentIds.length,
-					status: actionStatusText
-						})}}</p>
-					</div>
-					
-				</template>
-				<template #footer>	
-					<!--Action changeStatus-->
-					<div>
-						<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatus(prestudentIds)">OK</button>
-					</div>				
-				</template>
-			</BsModal>
-								
-			<!--Modal: askForAusbildungssemester-->
-			<BsModal ref="askForAusbildungssemester">
-				<template #title>{{$p.t('lehre', 'status_edit')}}</template>
-				<template #default>
+	<div class="stv-status-dropdown">
+		
+		<!--Modal: ConfirmStatusAction-->
+		<BsModal ref="confirmStatusAction">
+			<template #title>{{$p.t('lehre', 'status_edit')}}</template>
+			<template #default>
 				<div v-if="prestudentIds.length == 1">
-					<p>
-					{{$p.t('lehre', 'modal_askAusbildungssem', { status: actionStatusText })}}</p>
+					<p>{{$p.t('lehre', 'modal_StatusactionSingle', { status: actionStatusText })}}</p>
 				</div>
 				<div v-else>
-					<p>
-					{{$p.t('lehre', 'modal_askAusbildungssemPlural', { count: prestudentIds.length,
-					status: actionStatusText
-						})}}</p>
+					<p>{{$p.t('lehre', 'modal_StatusactionPlural', { count: prestudentIds.length,
+				status: actionStatusText
+					})}}</p>
 				</div>
 				
-				<div class="row mb-3">
-					<label for="studiensemester" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="studiensemester"
-							v-model="actionSem"
-							maxlength="2"
-						>				
-						</form-input>
-					</div>
-				</div>			
-				</template>
-				<template #footer>
-					<div>
-						<button  ref="Close" type="button" class="btn btn-primary" @click="saveNewAusbildungssemester()">OK</button>
-					</div>					
-				</template>
-			</BsModal>
-		
-			<!-- Dropdown -->
-			<div v-if="showToolbar"  class="btn-group">						
-				<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-					{{$p.t('lehre', 'btn_statusAendern')}}
-				</button>
-						
-				<ul  v-if="showToolbarInteressent" class="dropdown-menu">
-				  <li v-for="item in resultInteressentArray" :key="item.status_kurzbz" class="w-100">
-
-					<div v-if="item.children.length > 0" class="btn-group dropend w-100">
-					  <a
-						class="dropdown-item dropdown-toggle"
-						data-bs-toggle="dropdown"
-						aria-expanded="false"
-						href="#"
-					  >
-						{{ item.status_kurzbz }}
-					  </a>
-					  <ul class="dropdown-menu dropdown-menu-right">
-						<li v-for="child in item.children" :key="child.statusgrund_id">
-						  <a class="dropdown-item" @click="executeLink(child.link)">{{ child.beschreibung }}</a>
-						</li>
-					  </ul>
-					</div>
-			
-					<div v-else>
-					  <a
-						class="dropdown-item"
-						@click="executeLink(item.link)"
-					  >
-						{{ item.status_kurzbz }}
-					  </a>
-					</div>
-				  </li>
-				</ul>	
-						
-			<!--toolbar Student-->
-				<ul v-if="showToolbarStudent" class="dropdown-menu">
-				  <li v-for="item in resultStudentArray" :key="item.status_kurzbz" class="w-100">
-
-					<div v-if="item.children.length > 0" class="btn-group dropend w-100">
-					  <a
-						class="dropdown-item dropdown-toggle"
-						data-bs-toggle="dropdown"
-						aria-expanded="false"
-						href="#"
-					  >
-						{{ item.status_kurzbz }}
-					  </a>
-					  <ul class="dropdown-menu dropdown-menu-right">
-						<li v-for="child in item.children" :key="child.statusgrund_id">
-						  <a class="dropdown-item" @click="executeLink(child.link)">{{ child.beschreibung }}</a>
-						</li>
-					  </ul>
-					</div>
-			
-					<div v-else>
-					  <a
-						class="dropdown-item"
-						@click="executeLink(item.link)"
-					  >
-						{{ item.status_kurzbz }}
-					  </a>
-					</div>
-				  </li>
-				</ul>
+			</template>
+			<template #footer>	
+				<!--Action changeStatus-->
+				<div>
+					<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatus(prestudentIds)">OK</button>
+				</div>				
+			</template>
+		</BsModal>
+							
+		<!--Modal: askForAusbildungssemester-->
+		<BsModal ref="askForAusbildungssemester">
+			<template #title>{{$p.t('lehre', 'status_edit')}}</template>
+			<template #default>
+			<div v-if="prestudentIds.length == 1">
+				<p>
+				{{$p.t('lehre', 'modal_askAusbildungssem', { status: actionStatusText })}}</p>
 			</div>
-		</div> `
+			<div v-else>
+				<p>
+				{{$p.t('lehre', 'modal_askAusbildungssemPlural', { count: prestudentIds.length,
+				status: actionStatusText
+					})}}</p>
+			</div>
+			
+			<div class="row mb-3">
+				<label for="studiensemester" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
+				<div class="col-sm-6">
+					<form-input
+						type="text"
+						name="studiensemester"
+						v-model="actionSem"
+						maxlength="2"
+					>				
+					</form-input>
+				</div>
+			</div>			
+			</template>
+			<template #footer>
+				<div>
+					<button  ref="Close" type="button" class="btn btn-primary" @click="saveNewAusbildungssemester()">OK</button>
+				</div>					
+			</template>
+		</BsModal>
+	
+		<!-- Dropdown -->
+		<div v-if="showToolbar"  class="btn-group">						
+			<button ref="toolbarButton" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+				{{$p.t('lehre', 'btn_statusAendern')}}
+			</button>
+
+			<ul class="dropdown-menu">
+				
+				<!--toolbar Interessent-->
+				<template v-if="showToolbarInteressent">
+					<li v-for="item in resultInteressentArray" :key="item.status_kurzbz" class="w-100">
+
+						<div v-if="item.children.length > 0" class="btn-group dropend w-100">
+							<a
+								class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center"
+								data-bs-toggle="dropdown"
+								aria-expanded="false"
+								href="#"
+								>
+								{{ item.status_kurzbz }}
+							</a>
+							<ul class="dropdown-menu dropdown-menu-right">
+								<li v-for="child in item.children" :key="child.statusgrund_id">
+									<a class="dropdown-item" @click.prevent="executeLink(child.link)" href="#">{{ child.beschreibung }}</a>
+								</li>
+							</ul>
+						</div>
+						<div v-else>
+							<a
+								class="dropdown-item"
+								@click.prevent="executeLink(item.link)"
+								href="#"
+								>
+								{{ item.status_kurzbz }}
+							</a>
+						</div>
+
+					</li>
+				</template>
+
+				<!--toolbar Student-->
+				<template v-if="showToolbarStudent">
+					<li v-for="item in resultStudentArray" :key="item.status_kurzbz" class="w-100">
+
+						<div v-if="item.children.length > 0" class="btn-group dropend w-100">
+							<a
+								class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center"
+								data-bs-toggle="dropdown"
+								aria-expanded="false"
+								href="#"
+								>
+								{{ item.status_kurzbz }}
+							</a>
+							<ul class="dropdown-menu dropdown-menu-right">
+								<li v-for="child in item.children" :key="child.statusgrund_id">
+									<a class="dropdown-item" @click.prevent="executeLink(child.link)" href="#">{{ child.beschreibung }}</a>
+								</li>
+							</ul>
+						</div>
+						<div v-else>
+							<a
+								class="dropdown-item"
+								@click.prevent="executeLink(item.link)"
+								href="#"
+								>
+								{{ item.status_kurzbz }}
+							</a>
+						</div>
+
+					</li>
+				</template>
+
+			</ul>
+		</div>
+	</div> `
 };
