@@ -1,24 +1,24 @@
 import AbstractWidget from './Abstract';
 import BaseOffcanvas from '../Base/Offcanvas';
 
-const widgetAmpelMAX = 4;
-
 export default {
     name: 'WidgetsAmpel',
     components: { BaseOffcanvas },
     data: () => ({
+        WIDGET_AMPEL_MAX: 4,
         filter: '',
         source: '',
-        ampeln: null,
         allAmpeln:null,
         activeAmpeln:null,
+        phrasen: {ampeln:false, ui:false},
     }),
     mixins: [
         AbstractWidget
     ],
     computed: {
-        widgetAmpelMAX(){
-            return widgetAmpelMAX;
+        arePhrasenLoaded(){
+            // checks if both the phrasen categories 'ampeln' and 'ui' are loaded
+            return this.phrasen.ampeln && this.phrasen.ui;            
         },
         ampelnComputed(){
             
@@ -31,7 +31,7 @@ export default {
             
         },
         ampelnOverview () {
-            return this.activeAmpeln?.slice(0, widgetAmpelMAX);  // show only newest 4 active ampeln
+            return this.activeAmpeln?.slice(0, this.WIDGET_AMPEL_MAX);  // show only newest 4 active ampeln
         },
         count () {
             let datasource = this.activeAmpeln;
@@ -111,15 +111,20 @@ export default {
         },
         validateBtnTxt(buttontext){
 
-            if(buttontext instanceof Array && !buttontext.length) return 'Bestätigen';
+            if(buttontext instanceof Array && !buttontext.length) return this.$p.t('ui','bestaetigen');
 
-            if(!buttontext) return 'Bestätigen';
+            if(!buttontext) return this.$p.t('ui','bestaetigen');
 
             return buttontext;
         }
     },
     created() {
-
+        this.$p.loadCategory('ampel').then(() => {
+            this.isPhrasenLoaded = true;
+        });
+        this.$p.loadCategory('ui').then(() => {
+            this.isPhrasenLoaded = true;
+        });
         this.$emit('setConfig', false);    
     },
     async mounted() {
@@ -131,18 +136,18 @@ export default {
     <div class="widgets-ampel w-100 h-100">
         <div v-if="activeAmpeln" class="d-flex flex-column justify-content-between">
             <div class="d-flex">
-                <header class="me-auto"><b>Neueste Ampeln</b></header>
-                <div class="mb-2 text-danger"><a href="#allAmpelOffcanvas" data-bs-toggle="offcanvas">Alle Ampeln</a></div>
+                <header class="me-auto"><b>{{$p.t('ampeln','newestAmpeln')}}</b></header>
+                <div class="mb-2 text-danger"><a href="#allAmpelOffcanvas" data-bs-toggle="offcanvas">{{$p.t('ampeln','allAmpeln')}}</a></div>
             </div>
             <div class="d-flex justify-content-end">
-                <a v-if="count.ueberfaellig > 0" href="#allAmpelOffcanvas" data-bs-toggle="offcanvas" @click="filter = 'ueberfaellig'" class="text-decoration-none"><span class="badge bg-danger me-1"><i class="fa fa-solid fa-bolt"></i> Überfällig: <b>{{ count.ueberfaellig }}</b></span></a>
+                <a v-if="count.ueberfaellig > 0" href="#allAmpelOffcanvas" data-bs-toggle="offcanvas" @click="filter = 'ueberfaellig'" class="text-decoration-none"><span class="badge bg-danger me-1"><i class="fa fa-solid fa-bolt"></i> {{$p.t('ampeln','overdue')}}: <b>{{ count.ueberfaellig }}</b></span></a>
             </div>
             <div v-for="ampel in ampelnOverview" :key="ampel.ampel_id" class="mt-2">
                 <div class="card">
                     <div class="card-body">
                         <div class="position-relative">
                             <div class="d-flex">
-                                <div class="text-muted small me-auto"><small>Deadline: {{ getDate(ampel.deadline) }}</small></div>
+                                <div class="text-muted small me-auto"><small>{{$p.t('ampeln','deadline')}}: {{ getDate(ampel.deadline) }}</small></div>
                                 <div v-if="(new Date() > new Date(ampel.deadline)) && !ampel.bestaetigt "><span class="badge bg-danger"><i class="fa fa-solid fa-bolt"></i></span></div>
                                 <div v-if="ampel.verpflichtend"><span class="badge bg-warning ms-1"><i class="fa fa-solid fa-triangle-exclamation"></i></span></div>
                                 <div v-if="ampel.bestaetigt"><span class="badge bg-success ms-1"><i class="fa fa-solid fa-circle-check"></i></span></div>
@@ -156,12 +161,12 @@ export default {
             <div v-if="activeAmpeln && activeAmpeln.length == 0" class="card card-body mt-4 p-4 text-center">
                 <span class="text-success h2"><i class="fa fa-solid fa-circle-check"></i></span>
                 <span class="text-success h5">Super!</span><br>
-                <span class="small">Keine offenen Ampeln.</span>
+                <span class="small">{{$p.t('ampeln','noOpenAmpeln')}}</span>
             </div>
         </div>
         <div v-else>
-        <header class="me-auto"><b>Neueste Ampeln </b></header>
-            <template v-for="n in widgetAmpelMAX">
+        <header class="me-auto"><b>{{$p.t('ampeln','newestAmpeln')}} </b></header>
+            <template v-for="n in WIDGET_AMPEL_MAX">
             
                 <div class="mt-2 card" aria-hidden="true">
                 <div class="card-body">
@@ -179,29 +184,29 @@ export default {
 
     <!-- All Ampeln Offcanvas -->
     <BaseOffcanvas id="allAmpelOffcanvas" :closeFunc="closeOffcanvas">
-        <template #title><header><b>Alle meine Ampeln</b></header></template>
+        <template #title><header><b>{{$p.t('ampeln','allMyAmpeln')}}</b></header></template>
         <template #body>
             <div class="d-flex justify-content-evenly">
                 <div class="form-check form-check-inline form-control-sm">
                 <input class="form-check-input" type="radio" v-model="source" id="offen" value="offen"  checked>
-                <label class="form-check-label" for="offen">Offene Ampeln</label>
+                <label class="form-check-label" for="offen">{{$p.t('ampeln','openAmpeln')}}</label>
             </div>
             <div class="form-check form-check-inline form-control-sm">
                 <input class="form-check-input" type="radio" v-model="source" id="alle" value="alle" >
-                <label class="form-check-label" for="alle">Alle Ampeln</label>
+                <label class="form-check-label" for="alle">{{$p.t('ampeln','allAmpeln')}}</label>
             </div>
             </div>
-            <div class="col"><button class="btn btn-light w-100" @click="filter = ''"><small>Alle: <b>{{ count.alle }}</b></small></button></div>
+            <div class="col"><button class="btn btn-light w-100" @click="filter = ''"><small>{{$p.t('ui','alle')}}: <b>{{ count.alle }}</b></small></button></div>
             <div class="row row-cols-2 g-2 mt-1">
-                <div class="col"><button class="btn btn-danger w-100"  @click="toggleFilter('ueberfaellig')"><i class="fa fa-solid fa-bolt me-2"></i><small :style="{...(filter==='ueberfaellig'?{'text-decoration':'underline','font-weight':'bold'}:{})}">Überfällig: <b>{{ count.ueberfaellig }}</b></small></button></div>
-                <div class="col"><button class="btn btn-warning w-100" @click="toggleFilter('verpflichtend')"><i class="fa fa-solid fa-triangle-exclamation me-2"></i><small :style="{...(filter==='verpflichtend'?{'text-decoration':'underline','font-weight':'bold'}:{})}">Pflicht: <b>{{ count.verpflichtend }}</b></small></button></div>
+                <div class="col"><button class="btn btn-danger w-100"  @click="toggleFilter('ueberfaellig')"><i class="fa fa-solid fa-bolt me-2"></i><small :class="{'text-decoration-underline':filter==='ueberfaellig', 'fw-bold':filter==='ueberfaellig'}">{{$p.t('ampeln','overdue')}}: <b>{{ count.ueberfaellig }}</b></small></button></div>
+                <div class="col"><button class="btn btn-warning w-100" @click="toggleFilter('verpflichtend')"><i class="fa fa-solid fa-triangle-exclamation me-2"></i><small :class="{'text-decoration-underline':filter==='ueberfaellig', 'fw-bold':filter==='ueberfaellig'}" >{{$p.t('ampeln','mandatory')}}: <b>{{ count.verpflichtend }}</b></small></button></div>
             </div>
             <div v-for="ampel in ampelnComputed" :key="ampel.ampel_id" class="mt-2">
                 <ul class="list-group">
                 <li class="list-group-item small">
                 <div class="position-relative"><!-- prevents streched-link from stretching outside this parent element -->
                     <div class="d-flex">
-                        <span class="small text-muted me-auto"><small>Deadline: {{ getDate(ampel.deadline) }}</small></span>
+                        <span class="small text-muted me-auto"><small>{{$p.t('ampeln','deadline')}}: {{ getDate(ampel.deadline) }}</small></span>
                         <div v-if="(new Date() > new Date(ampel.deadline)) && !ampel.bestaetigt"><span class="badge bg-danger"><i class="fa fa-solid fa-bolt"></span></div>
                         <div v-if="ampel.verpflichtend"><span class="badge bg-warning ms-1"><i class="fa fa-solid fa-triangle-exclamation"></span></div>
                         <div v-if="ampel.bestaetigt"><span class="badge bg-success ms-1"><i class="fa fa-solid fa-circle-check"></i></span></div>
