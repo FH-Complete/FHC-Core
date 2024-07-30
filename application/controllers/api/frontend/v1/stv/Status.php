@@ -883,6 +883,16 @@ class Status extends FHCAPI_Controller
 		}
 	}
 
+	/**
+	 * Delete a status entry
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param string				$studiensemester_kurzbz
+	 * @param integer				$ausbildungssemester
+	 *
+	 * @return void
+	 */
 	public function deleteStatus($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
 	{
 		$result = $this->PrestudentstatusModel->load([
@@ -898,7 +908,9 @@ class Status extends FHCAPI_Controller
 		$oldstatus = current($oldstatus);
 
 
-		$erweiterteBerechtigung = $this->permissionlib->isBerechtigt('admin', null, 'suid') || $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung', null, 'suid');
+		$erweiterteBerechtigung =
+			$this->permissionlib->isBerechtigt('admin', null, 'suid')
+			|| $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung', null, 'suid');
 
 
 		//check if last status
@@ -965,7 +977,6 @@ class Status extends FHCAPI_Controller
 			$student = $this->getDataOrTerminateWithError($result);
 			if ($student)
 			{
-				// TODO(chris): what if no student?
 				$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 				$result = $this->StudentlehrverbandModel->delete(
 					array(
@@ -977,54 +988,17 @@ class Status extends FHCAPI_Controller
 				$this->getDataOrTerminateWithError($result);
 			}
 		}
+
 		//Delete Prestudent if no data is left
 		if ($deletePrestudent)
 		{
-			/*
-				//TODO(manu) check all connected tables, Handling of Deletion
-				//check if existing dokumentprestudent
-				$this->load->model('crm/Dokumentprestudent_model', 'DokumentprestudentModel');
-				$result = $this->DokumentprestudentModel->loadWhere(
-					array(
-						'prestudent_id' => $prestudent_id
-					)
-				);
-				if (isError($result))
-				{
-					$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-
-				}
-				if (hasData($result))
-				{
-					return $this->terminateWithError("Es sind noch zu loeschende Dokumente vorhanden: ", self::ERROR_TYPE_GENERAL);
-				}
-
-				//check if Anrechnungen tbl_anrechnung
-				$output_anrechnungen = '';
-				$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
-				$result = $this->AnrechnungModel->loadWhere(
-					array(
-						'prestudent_id' => $prestudent_id
-					)
-				);
-				if (isError($result))
-				{
-					$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-				}
-				if (hasData($result))
-				{
-					return $this->terminateWithError("Mit dieser Prestudent_id sind verbundene Anrechnungen vorhanden!", self::ERROR_TYPE_GENERAL);
-				}
-			*/
-			//DELETE Prestudent
 			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 			$result = $this->PrestudentModel->delete($prestudent_id);
 
 			$this->getDataOrTerminateWithError($result);
 		}
 
-		$this->db->trans_rollback(); // TODO(chris): DEBUG!
-		#$this->db->trans_commit();
+		$this->db->trans_commit();
 
 		return $this->terminateWithSuccess(true);
 	}
@@ -1881,6 +1855,7 @@ class Status extends FHCAPI_Controller
 
 		$student = current($student);
 		
+
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$result = $this->StudentlehrverbandModel->loadWhere([
 			'student_uid' => $student->student_uid,
@@ -1889,10 +1864,6 @@ class Status extends FHCAPI_Controller
 
 		$studentlvb = $this->getDataOrTerminateWithError($result);
 
-		// NOTE(chris): if $studentlvb then update to the same values as before (except updatevon). So do nothing?
-		// TODO(chris): check if that is correct (in FAS)?
-		if ($studentlvb)
-			return; // No Update necessary
 
 		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 		
@@ -1905,16 +1876,33 @@ class Status extends FHCAPI_Controller
 		]);
 		$lv = $this->getDataOrTerminateWithError($result);
 
-		$this->StudentlehrverbandModel->insert([
-			'student_uid' => $student->student_uid,
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'studiengang_kz' => $student->studiengang_kz,
-			'semester' => $lv ? $ausbildungssemester : $student->semester,
-			'verband' => $student->verband,
-			'gruppe' => $student->gruppe,
-			'insertamum' => date('c'),
-			'insertvon' => $authUID
-		]);
+
+		if ($studentlvb && !$lv)
+			return; // No Update necessary
+
+		if ($studentlvb) // Update current Student-Lehrverband entry
+			$this->StudentlehrverbandModel->update([
+				'student_uid' => $student->student_uid,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz
+			], [
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => $ausbildungssemester,
+				'verband' => $student->verband,
+				'gruppe' => $student->gruppe,
+				'updateamum' => date('c'),
+				'updatevon' => $authUID
+			]);
+		else // Add new Student-Lehrverband entry
+			$this->StudentlehrverbandModel->insert([
+				'student_uid' => $student->student_uid,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => $lv ? $ausbildungssemester : $student->semester,
+				'verband' => $student->verband,
+				'gruppe' => $student->gruppe,
+				'insertamum' => date('c'),
+				'insertvon' => $authUID
+			]);
 	}
 
 	private function _sanitizeAliasName($str)
