@@ -289,9 +289,9 @@ export default{
 				)
 				.then(this.$fhcApi.get)
 				.then(result => result.data
-					? new Promise((resolve, reject) => { BsConfirm.popup('TEST').then(resolve).catch(() => reject({handled:true})) })
+					? new Promise((resolve, reject) => { BsConfirm.popup(this.$p.t('lehre', 'last_status_confirm_delete')).then(resolve).catch(() => reject({handled:true})) })
 					: true
-				) // TODO(chris): correct confirm
+				)
 				.then(result => result
 					? 'api/frontend/v1/stv/status/deleteStatus/' + Object.values(statusId).join('/')
 					: Promise.reject({handled: true})
