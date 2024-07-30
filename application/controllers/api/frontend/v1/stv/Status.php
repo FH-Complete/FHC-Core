@@ -1569,6 +1569,17 @@ class Status extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
+	/**
+	 * Advances a status entry
+	 * must be of type Student, Diplomand or Unterbrecher
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param string				$key_studiensemester_kurzbz
+	 * @param integer				$key_ausbildungssemester
+	 *
+	 * @return void
+	 */
 	public function advanceStatus($prestudent_id, $status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
 	{
 		$result = $this->PrestudentstatusModel->load([
