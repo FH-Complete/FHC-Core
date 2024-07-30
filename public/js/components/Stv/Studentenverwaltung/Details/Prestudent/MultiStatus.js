@@ -116,59 +116,53 @@ export default{
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
 
-							let container = document.createElement('div');
+							const container = document.createElement('div');
 							container.className = "d-flex gap-2";
 
+							const data = cell.getData();
+
 							let button = document.createElement('button');
-							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
-								button.className = 'btn btn-outline-secondary btn-action';
-							else
-								button.className = 'btn btn-outline-secondary btn-action';
+							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-forward"></i>';
 							button.title = 'Status vorrücken';
-							button.addEventListener(
-								'click',
-								() =>
-								this.actionAdvanceStatus(cell.getData().status_kurzbz, cell.getData().studiensemester_kurzbz, cell.getData().ausbildungssemester)
-							);
-							container.append(button);
-
-							button = document.createElement('button');
-							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
-								button.className = 'btn btn-outline-secondary btn-action';
-							else
-								button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-check"></i>';
-							button.title = 'Status bestätigen';
 							button.addEventListener('click', () =>
-								this.actionConfirmStatus(cell.getData().status_kurzbz, cell.getData().studiensemester_kurzbz, cell.getData().ausbildungssemester)
+								this.actionAdvanceStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
-							if (cell.getData().bestaetigtam || !cell.getData().bewerbung_abgeschicktamum)
+							if (!['Student', 'Diplomand', 'Unterbrecher'].includes(data.status_kurzbz))
 								button.disabled = true;
 							container.append(button);
 
 							button = document.createElement('button');
-							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
-								button.className = 'btn btn-outline-secondary btn-action';
-							else
-								button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.title = 'Status bearbeiten';
-							button.addEventListener('click', (event) =>
-								this.actionEditStatus(cell.getData().status_kurzbz, cell.getData().studiensemester_kurzbz, cell.getData().ausbildungssemester)
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-check"></i>';
+							button.title = 'Status bestätigen';
+							button.addEventListener('click', () =>
+								this.actionConfirmStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
+							if (data.bestaetigtam || !data.bewerbung_abgeschicktamum)
+								button.disabled = true;
 							container.append(button);
 
 							button = document.createElement('button');
-							if (this.dataMeldestichtag && this.dataMeldestichtag > cell.getData().datum && !this.hasPermissionToSkipStatusCheck)
-								button.className = 'btn btn-outline-secondary btn-action';
-							else
-								button.className = 'btn btn-outline-secondary btn-action';
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = 'Status bearbeiten';
+							button.addEventListener('click', () =>
+								this.actionEditStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
+							);
+							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
+								button.disabled = true;
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = 'Status löschen';
 							button.addEventListener('click', () =>
-								this.actionDeleteStatus(cell.getData().status_kurzbz, cell.getData().studiensemester_kurzbz, cell.getData().ausbildungssemester)
+								this.actionDeleteStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
+							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
+								button.disabled = true;
 							container.append(button);
 
 							return container;
@@ -291,16 +285,17 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		actionAdvanceStatus(status, stdsem, ausbildungssemester) {
-			this.statusId = {
-				'prestudent_id': this.modelValue.prestudent_id,
-				'status_kurzbz': status,
-				'studiensemester_kurzbz': stdsem,
-				'ausbildungssemester': ausbildungssemester
+			const statusId = {
+				prestudent_id: this.modelValue.prestudent_id,
+				status_kurzbz: status,
+				studiensemester_kurzbz: stdsem,
+				ausbildungssemester: ausbildungssemester
 			};
-			this.loadStatus(this.statusId).then(() => {
-				if(this.statusData)
-					this.advanceStatus(this.statusId);
-			});
+			this.$fhcApi
+				.post('api/frontend/v1/stv/status/advanceStatus/' + Object.values(statusId).join('/'))
+				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successAdvance')))
+				.then(this.reload)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		actionConfirmStatus(status, stdsem, ausbildungssemester) {
 			BsConfirm
@@ -314,32 +309,6 @@ export default{
 				))
 				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successConfirm')))
 				.then(this.reload)
-				.catch(this.$fhcAlert.handleSystemError);
-		},
-		advanceStatus(statusId) {
-			return this.$fhcApi.post('api/frontend/v1/stv/status/advanceStatus/' +
-				this.statusId.prestudent_id + '/' +
-				this.statusId.status_kurzbz + '/' +
-				this.statusId.studiensemester_kurzbz + '/' +
-				this.statusId.ausbildungssemester)
-				.then(
-					result => {
-						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successAdvance'));
-					})
-				.catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
-					window.scrollTo(0, 0);
-					this.reload();
-				});
-		},
-		loadStatus(status_id) {
-			this.statusNew = false;
-			return this.$fhcApi.post('api/frontend/v1/stv/status/loadStatus/',
-				status_id)
-					.then(result => {
-							this.statusData = result.data;
-						return result;
-					})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		reload() {

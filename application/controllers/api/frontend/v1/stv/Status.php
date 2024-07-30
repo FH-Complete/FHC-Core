@@ -23,14 +23,14 @@ class Status extends FHCAPI_Controller
 			'loadStatus' => ['admin:r', 'assistenz:r'],
 			'insertStatus' => ['admin:rw', 'assistenz:rw'],
 			'updateStatus' => ['admin:rw', 'assistenz:rw'],
-			'advanceStatus' => ['admin:r', 'assistenz:r'],
+			'advanceStatus' => ['admin:rw', 'assistenz:rw'],
 			'confirmStatus' => ['admin:rw', 'assistenz:rw'],
 
 		]);
 
 		//Load Models
-		$this->load->model('crm/Prestudentstatus_model','PrestudentstatusModel');
-		$this->load->model('person/Person_model','PersonModel');
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->load->model('person/Person_model', 'PersonModel');
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
@@ -41,6 +41,7 @@ class Status extends FHCAPI_Controller
 			|| $this->router->method == 'updateStatus'
 			|| $this->router->method == 'confirmStatus'
 			|| $this->router->method == 'deleteStatus'
+			|| $this->router->method == 'advanceStatus'
 		) {
 			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
 			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:rw', 'assistenz:rw']);
@@ -1078,7 +1079,7 @@ class Status extends FHCAPI_Controller
 			[
 				'required',
 				['status_stud_exists', function ($value) use ($prestudent_id) {
-					if ($value != 'Student')
+					if ($value != Prestudentstatus_model::STATUS_STUDENT)
 						return true; // Only test if new status is Student
 					
 					$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($prestudent_id);
@@ -1568,189 +1569,163 @@ class Status extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function advanceStatus($key_prestudent_id, $key_status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
+	public function advanceStatus($prestudent_id, $status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
 	{
-		//get Studiengang von prestudent_id
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$result = $this->PrestudentModel->load([
-			'prestudent_id'=> $key_prestudent_id,
+		$result = $this->PrestudentstatusModel->load([
+			$key_ausbildungssemester,
+			$key_studiensemester_kurzbz,
+			$status_kurzbz,
+			$prestudent_id
 		]);
-		if(isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		$result = current(getData($result));
+		$oldstatus = $this->getDataOrTerminateWithError($result);
+		if (!$oldstatus)
+			show_404(); // Status that should be updated does not exist
 
-		$stg = $result->studiengang_kz;
+		$oldstatus = current($oldstatus);
 
-		if(!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
-		{
-			return $this->terminateWithError($this->p->t('lehre','error_keineSchreibrechte'), self::ERROR_TYPE_GENERAL);
-		}
 
-		//Data Vorrücken
-		$result = $this->PrestudentstatusModel->loadWhere(
-			array(
-				'prestudent_id' => $key_prestudent_id,
-				'status_kurzbz' => $key_status_kurzbz,
-				'ausbildungssemester' => $key_ausbildungssemester,
-				'studiensemester_kurzbz' => $key_studiensemester_kurzbz
-			)
-		);
-
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-
-		elseif (!hasData($result))
-		{
-			return $this->terminateWithError($this->p->t('lehre','error_noStatusFound'), self::ERROR_TYPE_GENERAL);
-		}
-		else
-		{
-			$statusData = current(getData($result));
-		}
-
+		//Target studiensemester_kurzbz
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$result = $this->StudiensemesterModel->getNextFrom($key_studiensemester_kurzbz);
 
-		if (isError($result))
-		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		}
-		$studiensem_next = current(getData($result));
-		$studiensem_next = $studiensem_next->studiensemester_kurzbz;
+		$studiensemester_kurzbz = $this->getDataOrTerminateWithError($result);
+		$studiensemester_kurzbz = current($studiensemester_kurzbz)->studiensemester_kurzbz;
 
-		$ausbildungssem_next = $key_ausbildungssemester+1;
+
+		//Target ausbildungssemester
+		$ausbildungssemester = $key_ausbildungssemester + 1;
+
 
 		//Form Validation
 		$this->load->library('form_validation');
+		
+		$this->form_validation->set_data([
+			'status_kurzbz' => $status_kurzbz
+		]);
 
-		$last_status_kurzbz = $lastStatusData->status_kurzbz; // TODO(chris): copy pasta!
-
-		$this->form_validation->set_rules('_global', '', [
-			//check if Rolle already exists
-			['checkIfExistingPrestudentRolle', function () use (
-				$key_prestudent_id,
-				$key_status_kurzbz,
-				$studiensem_next,
-				$ausbildungssem_next
-			) {
-				$result = $this->prestudentstatuschecklib->checkIfExistingPrestudentRolle(
-					$key_prestudent_id,
-					$key_status_kurzbz,
-					$studiensem_next,
-					$ausbildungssem_next
-				);
-				return $this->getDataOrTerminateWithError($result);
-			}],
-			['status_stud_exists', function () use ($key_prestudent_id, $key_status_kurzbz, $last_status_kurzbz) {
-				if ($key_status_kurzbz != Prestudentstatus_model::STATUS_STUDENT
-					&& $key_status_kurzbz != Prestudentstatus_model::STATUS_DIPLOMAND
-					&& $last_status_kurzbz != Prestudentstatus_model::STATUS_STUDENT
-				)
+		$this->form_validation->set_rules('status_kurzbz', $this->p->t('lehre', 'status_rolle'), [
+			'in_list[' .
+				Prestudentstatus_model::STATUS_STUDENT . ',' .
+				Prestudentstatus_model::STATUS_DIPLOMAND . ',' .
+				Prestudentstatus_model::STATUS_UNTERBRECHER . ']',
+			['status_stud_exists', function ($value) use ($prestudent_id) {
+				if ($value != Prestudentstatus_model::STATUS_STUDENT)
 					return true;
 				
-				$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($key_prestudent_id);
+				$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($prestudent_id);
 
 				return $this->getDataOrTerminateWithError($result);
 			}]
 		], [
-			'checkIfExistingPrestudentRolle' => $this->p->t('lehre', 'error_rolleBereitsVorhanden'),
 			'status_stud_exists' => $this->p->t('lehre', 'error_noStudstatus')
+		]);
+		
+		$this->form_validation->set_rules('_default', '', [
+			//check if Rolle already exists
+			['rolle_doesnt_exist', function () use (
+				$prestudent_id,
+				$status_kurzbz,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				$result = $this->PrestudentstatusModel->load([$ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id]);
+
+				return !$this->getDataOrTerminateWithError($result);
+			}]
+		], [
+			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhanden')
 		]);
 		
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		//check if studentrolle already exists
-		// if($key_status_kurzbz == Prestudentstatus_model::STATUS_STUDENT)
-		// {
-		// 	$this->load->model('crm/Student_model', 'StudentModel');
-		// 	$result = $this->StudentModel->checkIfExistingStudentRolle($key_prestudent_id);
-		// 	if (isError($result))
-		// 	{
-		// 		return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		// 	}
-		// 	if ($result->retval == "0")
-		// 	{
-		// 		return $this->terminateWithError($this->p->t('lehre','error_noStudstatus'), self::ERROR_TYPE_GENERAL);
-		// 	}
-		// }
 
 		// Start DB transaction
 		$this->db->trans_begin();
 
+		$authUID = getAuthUID();
+		$now = date('c');
+
 		//insert prestudentstatus
-		$uid = getAuthUID();
-		$result = $this->PrestudentstatusModel->insert(
-			[
-				'prestudent_id' => $key_prestudent_id,
-				'status_kurzbz' => $key_status_kurzbz,
-				'studiensemester_kurzbz' => $studiensem_next,
-				'ausbildungssemester' => $ausbildungssem_next,
-				'insertamum' => date('c'),
-				'insertvon' => $uid,
-				'bestaetigtam' => date('c'),
-				'bestaetigtvon' => $uid,
-				'studienplan_id' => $statusData->studienplan_id,
-				'datum' => date('c'),
-				'anmerkung' => $statusData->anmerkung
-			]
-		);
+		$result = $this->PrestudentstatusModel->insert([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => $status_kurzbz,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'ausbildungssemester' => $ausbildungssemester,
+			'datum' => $now,
+			'insertamum' => $now,
+			'insertvon' => $authUID,
+			'orgform_kurzbz' => $oldstatus->orgform_kurzbz,
+			'studienplan_id' => $oldstatus->studienplan_id,
+			'bestaetigtam' => $now,
+			'bestaetigtvon' => $authUID,
+			'anmerkung' => $oldstatus->anmerkung
+		]);
 
-		if (isError($result))
-		{
-			$this->db->trans_rollback();
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
+		$this->getDataOrTerminateWithError($result);
 
+
+		//get student_uid
 		$this->load->model('crm/Student_model', 'StudentModel');
-		$result = $this->StudentModel->checkIfUid($key_prestudent_id);
-		if(isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		if (!hasData($result))
-		{
-			$this->terminateWithError($this->p->t('studierendenantrag','error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]), self::ERROR_TYPE_GENERAL);
-		}
-		$student_uid = $result->retval;
+		$result = $this->StudentModel->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
 
+		$student = $this->getDataOrTerminateWithError($result);
+
+		if (!$student)
+			$this->terminateWithError($this->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+
+		
 		//process studentlehrverband
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-		$result = $this->StudentlehrverbandModel->loadWhere(
-			array(
-				'student_uid' => $student_uid,
-				'studiensemester_kurzbz' => $key_studiensemester_kurzbz
-			)
-		);
-		if (isError($result))
-		{
-			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
+		$result = $this->StudentlehrverbandModel->load([
+			$key_studiensemester_kurzbz,
+			$student->student_uid
+		]);
+
+		$studentlvb = $this->getDataOrTerminateWithError($result);
+		if (!$studentlvb)
+			$this->terminateWithError($this->p->t('lehre', 'error_noStudentlehrverband'));
 
 		//Data of current Semester
-		$result = getData($result) ? : [];
-		$studentlvbData = current($result);
+		$studentlvb = current($studentlvb);
 
-		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-		$result = $this->StudentlehrverbandModel->processStudentlehrverband(
-			$student_uid,
-			$studentlvbData->studiengang_kz,
-			$ausbildungssem_next,
-			$studentlvbData->verband,
-			$studentlvbData->gruppe,
-			$studiensem_next
-		);
-		if ($this->db->trans_status() === false || isError($result))
-		{
-			$this->db->trans_rollback();
-			return $this->terminateWithError($this->p->t('lehre','error_duringInsertUpdateLehrverband'), self::ERROR_TYPE_GENERAL);
-		}
 
+		$newStudentlvb = [
+			'student_uid' => $studentlvb->student_uid,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'studiengang_kz' => $studentlvb->studiengang_kz,
+			'semester' => $studentlvb->semester,
+			'verband' => $studentlvb->verband,
+			'gruppe' => $studentlvb->gruppe,
+			'insertamum' => $now,
+			'insertvon' => $authUID,
+			'ext_id' => $studentlvb->ext_id
+
+		];
+
+
+		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+
+		$result = $this->LehrverbandModel->load([
+			$student->gruppe,
+			$student->verband,
+			$ausbildungssemester,
+			$student->studiengang_kz
+		]);
+
+		$lv = $this->getDataOrTerminateWithError($result);
+		if ($lv) {
+			$newStudentlvb['semester'] = $ausbildungssemester;
+		} // If there is no lehrverband just use the same as in the previous studiensemester
+
+
+		//add studentlehrverband
+		$result = $this->StudentlehrverbandModel->insert($newStudentlvb);
+
+		$this->getDataOrTerminateWithError($result);
+		
 		$this->db->trans_commit();
 
 		return $this->outputJsonSuccess(true);
@@ -1868,11 +1843,11 @@ class Status extends FHCAPI_Controller
 		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 		
 		$this->LehrverbandModel->addLimit(1);
-		$result = $this->LehrverbandModel->loadWhere([
-			'studiengang_kz' => $student->studiengang_kz,
-			'semester' => $ausbildungssemester,
-			'verband' => $student->verband,
-			'gruppe' => $student->gruppe
+		$result = $this->LehrverbandModel->load([
+			$student->gruppe,
+			$student->verband,
+			$ausbildungssemester,
+			$student->studiengang_kz
 		]);
 		$lv = $this->getDataOrTerminateWithError($result);
 
