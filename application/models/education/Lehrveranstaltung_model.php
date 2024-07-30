@@ -24,61 +24,16 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function getAutocompleteSuggestions($eventQuery, $studiensemester_kurzbz = null, $oes = null)
 	{
+		$subQry = $this->_getQryLvsByStudienplan($studiensemester_kurzbz, $oes);
 		$params = [];
 
-		$eventQuery = '%' . $eventQuery . '%';
+		/* filter by input string */
+		if (is_string($eventQuery)) {
+			$subQry.= ' AND lv.bezeichnung ILIKE ?';
+			$params[] = '%' . $eventQuery . '%';
+		}
 
-		$qry = '
-			SELECT DISTINCT ON (lv_oe_kurzbz, stg_bezeichnung, lehrveranstaltung_id)
-			    le.studiensemester_kurzbz,
-                lv.oe_kurzbz AS "lv_oe_kurzbz",
-                CASE
-                    WHEN oe.organisationseinheittyp_kurzbz = \'Kompetenzfeld\' THEN (\'KF \' || oe.bezeichnung)
-                    WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
-                    ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
-                END AS "lv_oe_bezeichnung",
-                stg.studiengang_kz,
-                upper(stg.typ || stg.kurzbz) AS "stg_typ_kurzbz",    
-                stg.bezeichnung AS "stg_bezeichnung",
-                lv.semester,   
-                lv.lehrveranstaltung_id,
-                lv.bezeichnung AS "lv_bezeichnung",
-				lv.orgform_kurzbz
-            FROM
-                    lehre.tbl_lehrveranstaltung     lv 
-                    JOIN lehre.tbl_lehreinheit           le USING (lehrveranstaltung_id)
-                    JOIN PUBLIC.tbl_organisationseinheit oe USING (oe_kurzbz)
-                    JOIN PUBLIC.tbl_studiengang          stg ON stg.studiengang_kz = lv.studiengang_kz
-            WHERE
-				/* filter negative studiengaenge */
-                stg.studiengang_kz > 0 ';
-
-			if (isset($studiensemester_kurzbz) && is_string($studiensemester_kurzbz))
-			{
-				/* filter studiensemester */
-				$qry.= ' AND le.studiensemester_kurzbz =  ? ';
-				$params[]= $studiensemester_kurzbz;
-			}
-
-			if (isset($oes) && is_array($oes))
-			{
-				/* filter organisationseinheit */
-				$qry.= ' AND lv.oe_kurzbz IN ? ';
-				$params[]= $oes;
-			}
-
-		$qry.= '
-				/* filter lv type only */
-                AND lv.lehrtyp_kurzbz = \'lv\'
-                /* filter active lehrveranstaltungen */
-                AND lv.aktiv = TRUE
-                /* filter active organisationseinheiten */
-                AND oe.aktiv = TRUE
-				/* filter by search entry */
-				AND lv.bezeichnung ILIKE ?
-		';
-
-		$params[]= $eventQuery;
+		$qry = 'SELECT DISTINCT ON (lehrveranstaltung_id) * FROM ('. $subQry. ') AS tmp';
 
 		return $this->execQuery($qry, $params);
 	}
@@ -91,58 +46,69 @@ class Lehrveranstaltung_model extends DB_Model
 	 * @param array $oes Filter by Organisationseinheiten
 	 * @return array
 	 */
-	public function getLvsByStudiensemesterAndOes($studiensemester_kurzbz = null, $oes = null)
+	public function getLvsByStudienplan($studiensemester_kurzbz = null, $oes = null)
 	{
-		$params = [];
+		$subQry = $this->_getQryLvsByStudienplan($studiensemester_kurzbz, $oes);
+		$qry = 'SELECT DISTINCT ON (lehrveranstaltung_id) * FROM ('. $subQry. ') AS tmp ORDER BY lehrveranstaltung_id, orgform_kurzbz DESC'; // TODO: hier VZ zuerst. aber eig nicht relevant...check
+
+		return $this->execQuery($qry);
+	}
+
+	/**
+	 * Get basic query to retrieve Lehrveranstaltungen according to the Orgforms and Ausbildungssemesters actual Studienplan.
+	 *
+	 * @return string
+	 */
+	private function _getQryLvsByStudienplan($studiensemester_kurzbz = null, $oes = null,  $lehrtyp_kurzbz = 'lv')
+	{
 		$qry = '
-			SELECT DISTINCT ON (lv_oe_kurzbz, stg_bezeichnung, lehrveranstaltung_id)
-			    le.studiensemester_kurzbz,
-                lv.oe_kurzbz AS "lv_oe_kurzbz",
-                CASE
+			SELECT
+				lv.oe_kurzbz AS "lv_oe_kurzbz",
+				CASE
                     WHEN oe.organisationseinheittyp_kurzbz = \'Kompetenzfeld\' THEN (\'KF \' || oe.bezeichnung)
                     WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
                     ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
                 END AS "lv_oe_bezeichnung",
-                stg.studiengang_kz,
-                upper(stg.typ || stg.kurzbz) AS "stg_typ_kurzbz",    
-                stg.bezeichnung AS "stg_bezeichnung",
-                lv.semester,   
-                lv.lehrveranstaltung_id,
-                lv.bezeichnung AS "lv_bezeichnung",
-				lv.orgform_kurzbz
+				stplsem.studiensemester_kurzbz,
+				studienordnung_id,
+				sto.studiengang_kz,
+				stpl.studienplan_id,
+				stplsem.semester,
+				stpl.orgform_kurzbz,
+				upper(stg.typ || stg.kurzbz) AS "stg_typ_kurzbz",    
+				stg.bezeichnung AS "stg_bezeichnung",
+				stgtyp.bezeichnung AS "stg_typ_bezeichnung",
+			    lv.lehrveranstaltung_id,
+				lv.semester,   		
+				lv.bezeichnung AS "lv_bezeichnung"
             FROM
-				lehre.tbl_lehrveranstaltung     		lv 
-				JOIN lehre.tbl_lehreinheit           	le USING (lehrveranstaltung_id)
-				JOIN public.tbl_organisationseinheit 	oe USING (oe_kurzbz)
-				JOIN public.tbl_studiengang          	stg ON stg.studiengang_kz = lv.studiengang_kz
-            WHERE
-				/* filter negative studiengaenge */
-                stg.studiengang_kz > 0 ';
+				lehre.tbl_studienplan 							stpl
+				JOIN lehre.tbl_studienordnung 					sto USING (studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester 			stplsem USING (studienplan_id)
+				JOIN lehre.tbl_studienplan_lehrveranstaltung 	stpllv ON (stpllv.studienplan_id = stpl.studienplan_id AND stpllv.semester = stplsem.semester)
+				JOIN lehre.tbl_lehrveranstaltung 				lv USING (lehrveranstaltung_id)
+				JOIN public.tbl_organisationseinheit 			oe USING (oe_kurzbz)
+				JOIN public.tbl_studiengang          			stg ON stg.studiengang_kz = sto.studiengang_kz
+				JOIN public.tbl_studiengangstyp 				stgtyp ON stgtyp.typ = stg.typ
+			/* filter by lehrtyp_kurzbz, default is lvs only */
+			WHERE 
+			      lehrtyp_kurzbz = '. $this->db->escape($lehrtyp_kurzbz);
 
 		if (isset($studiensemester_kurzbz) && is_string($studiensemester_kurzbz))
 		{
-			/* filter studiensemester */
-			$qry.= ' AND le.studiensemester_kurzbz =  ? ';
-			$params[]= $studiensemester_kurzbz;
+			/* filter by studiensemester */
+			$qry.= ' AND stplsem.studiensemester_kurzbz = '. $this->db->escape($studiensemester_kurzbz);
+
 		}
 
 		if (isset($oes) && is_array($oes))
 		{
-			/* filter organisationseinheit */
-			$qry.= ' AND lv.oe_kurzbz IN ? ';
-			$params[]= $oes;
+			/* filter by organisationseinheit */
+			$implodedOes = "'". implode("', '", $oes). "'";
+			$qry.= ' AND lv.oe_kurzbz IN ('. $implodedOes. ')';
 		}
 
-		$qry.= '
-				/* filter lv type only */
-                AND lv.lehrtyp_kurzbz = \'lv\'
-                /* filter active lehrveranstaltungen */
-                AND lv.aktiv = TRUE
-                /* filter active organisationseinheiten */
-                AND oe.aktiv = TRUE
-		';
-
-		return $this->execQuery($qry, $params);
+		return $qry;
 	}
 
 	/**
