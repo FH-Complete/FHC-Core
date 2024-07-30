@@ -96,14 +96,12 @@ export default {
             }); 
         },
         async confirm(ampelId){
-            this.$fhcApi.factory.ampeln.confirmAmpel(ampelId).then(res =>{
-                // response of the enpoint when confirming an ampel (true if confirmed and false if not confirmed)
-                if(res.data){
-                    console.log("ampel was successfully confirmed");
-                }else{
-                    console.error("ampel was not successfully confirmed");
-                } 
-            });
+            this.$fhcApi.factory.ampeln.confirmAmpel(ampelId)
+            .then(res => res.data)
+            .then(result => {
+                this.$fhcAlert.alertSuccess(this.$p.t('ampeln','ampelBestaetigt'));
+            })
+            .catch(this.$fhcAlert.handleSystemError);
 
             // update the ampeln by refetching them
             this.fetchNonConfirmedActiveAmpeln();

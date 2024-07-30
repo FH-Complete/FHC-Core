@@ -27651,6 +27651,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'ampelBestaetigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ampel bestätigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Ampel confirmed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 );
 
