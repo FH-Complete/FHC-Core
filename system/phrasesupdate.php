@@ -27489,7 +27489,70 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	// BOOKMARK PHRASEN ----------------------------------------------------------------------
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'newLink',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neuer Link',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Link',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'saveLink',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Save link',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'bookmarkDeleted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Link deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	
+
 );
 
 
