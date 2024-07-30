@@ -119,6 +119,7 @@ export default {
 			this.$refs.new.open();
 		},
 		rowSelectionChanged(data) {
+			this.lastSelected = this.selected;
 			this.$emit('update:selected', data);
 		},
 		autoSelectRows(data) {
@@ -128,8 +129,6 @@ export default {
 				// TODO(chris): unselect current item if it's no longer in the table?
 				// or maybe reselect only the last one?
 				selected = selected.filter(el => el);
-
-				this.lastSelected = null;
 
 				if (selected.length)
 					this.$refs.table.tabulator.selectRow(selected);
