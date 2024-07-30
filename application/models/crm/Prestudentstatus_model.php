@@ -486,12 +486,16 @@ class Prestudentstatus_model extends DB_Model
 	 * Check if there is only one prestudentstatus left
 	 *
 	 * @param integer					$prestudent_id
+	 * @param string					$studiensemester_kurzbz
 	 *
 	 * @return stdClass
 	 */
-	public function checkIfLastStatusEntry($prestudent_id)
+	public function checkIfLastStatusEntry($prestudent_id, $studiensemester_kurzbz = null)
 	{
 		$this->addSelect('COUNT(*) AS anzahl', false);
+
+		if ($studiensemester_kurzbz)
+			$this->db->where('studiensemester_kurzbz', $studiensemester_kurzbz);
 
 		$result = $this->loadWhere([
 			'prestudent_id' => $prestudent_id

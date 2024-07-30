@@ -273,29 +273,34 @@ export default{
 		actionEditStatus(status, stdsem, ausbildungssemester) {
 			this.$refs.test.open(this.modelValue, status, stdsem, ausbildungssemester);
 		},
-		actionDeleteStatus(status, stdsem, ausbildungssemester){
-			this.statusId = {
-				'prestudent_id': this.modelValue.prestudent_id,
-				'status_kurzbz': status,
-				'studiensemester_kurzbz': stdsem,
-				'ausbildungssemester': ausbildungssemester
+		actionDeleteStatus(status, stdsem, ausbildungssemester) {
+			const statusId = {
+				prestudent_id: this.modelValue.prestudent_id,
+				status_kurzbz: status,
+				studiensemester_kurzbz: stdsem,
+				ausbildungssemester: ausbildungssemester
 			};
 
-			this.checkIfLastStatus();
-
-			this.loadStatus(this.statusId).then(() => {
-				if(this.statusData)
-				{
-					this.$fhcAlert
-						.confirmDelete()
-						.then(result => result
-							? this.statusId
-							: Promise.reject({handled: true}))
-						.then(this.deleteStatus)
-						.catch(this.$fhcAlert.handleSystemError);
-				}
-			});
-
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? 'api/frontend/v1/stv/status/isLastStatus/' + statusId.prestudent_id
+					: Promise.reject({handled: true})
+				)
+				.then(this.$fhcApi.get)
+				.then(result => result.data
+					? new Promise((resolve, reject) => { BsConfirm.popup('TEST').then(resolve).catch(() => reject({handled:true})) })
+					: true
+				) // TODO(chris): correct confirm
+				.then(result => result
+					? 'api/frontend/v1/stv/status/deleteStatus/' + Object.values(statusId).join('/')
+					: Promise.reject({handled: true})
+				)
+				.then(this.$fhcApi.post)
+				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete')))
+				.then(this.reload)
+				.then(this.$reloadList)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		actionAdvanceStatus(status, stdsem, ausbildungssemester){
 			this.statusId = {

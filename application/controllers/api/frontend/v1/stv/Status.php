@@ -19,7 +19,7 @@ class Status extends FHCAPI_Controller
 			'isErsterStudent' => self::PERM_LOGGED,
 			'hasStatusBewerber' => self::PERM_LOGGED,
 			'getStatusarray' => self::PERM_LOGGED,
-			'deleteStatus' => ['admin:r','assistenz:r'],
+			'deleteStatus' => ['admin:rw','assistenz:rw'],
 			'loadStatus' => ['admin:r', 'assistenz:r'],
 			'insertStatus' => ['admin:rw', 'assistenz:rw'],
 			'updateStatus' => ['admin:rw', 'assistenz:rw'],
@@ -40,6 +40,7 @@ class Status extends FHCAPI_Controller
 		if ($this->router->method == 'insertStatus'
 			|| $this->router->method == 'updateStatus'
 			|| $this->router->method == 'confirmStatus'
+			|| $this->router->method == 'deleteStatus'
 		) {
 			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
 			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:rw', 'assistenz:rw']);
@@ -882,139 +883,60 @@ class Status extends FHCAPI_Controller
 		}
 	}
 
-	public function deleteStatus()
+	public function deleteStatus($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
-		$prestudent_id = $this->input->post('prestudent_id');
-		$status_kurzbz = $this->input->post('status_kurzbz');
-		$ausbildungssemester = $this->input->post('ausbildungssemester');
-		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
-		$deletePrestudent = false;
-
-		//get Studiengang von prestudent_id
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$result = $this->PrestudentModel->load([
-			'prestudent_id'=> $prestudent_id,
+		$result = $this->PrestudentstatusModel->load([
+			$ausbildungssemester,
+			$studiensemester_kurzbz,
+			$status_kurzbz,
+			$prestudent_id
 		]);
-		if(isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		$result = current(getData($result));
+		$oldstatus = $this->getDataOrTerminateWithError($result);
+		if (!$oldstatus)
+			show_404(); // Status that should be updated does not exist
 
-		$stg = $result->studiengang_kz;
+		$oldstatus = current($oldstatus);
 
-		$isBerechtigtAdmin = $this->permissionlib->isBerechtigt('admin', null, 'suid');
-		$isBerechtigtNoStudstatusCheck = $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung', null, 'suid');
-		$isBerechtigtToDeleteAbgewiesen = $this->permissionlib->isBerechtigt('lehre/reihungstestAufsicht') && $status_kurzbz == Prestudentstatus_model::STATUS_ABGEWIESENER;
 
-		if(!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg) && !$isBerechtigtToDeleteAbgewiesen)
-		{
-			return $this->terminateWithError($this->p->t('lehre','error_keineSchreibrechte'), self::ERROR_TYPE_GENERAL);
-		}
+		$erweiterteBerechtigung = $this->permissionlib->isBerechtigt('admin', null, 'suid') || $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung', null, 'suid');
 
-		if($status_kurzbz==Prestudentstatus_model::STATUS_STUDENT && !$isBerechtigtAdmin && !$isBerechtigtNoStudstatusCheck)
-		{
-			return $this->terminateWithError($this->p->t('lehre','error_onlyAdminDeleteRolleStudent'), self::ERROR_TYPE_GENERAL);
-		}
 
 		//check if last status
 		$result = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id);
 
-		if (isError($result))
-		{
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		if($result->retval)
-		{
-			//Berechtigungen nach Check prüfen!
-			if(!$isBerechtigtAdmin && !$isBerechtigtNoStudstatusCheck)
-			{
-				return $this->terminateWithError($this->p->t('lehre','error_onlyAdminDeleteLastStatus'), self::ERROR_TYPE_GENERAL);
-			}
-			else
-			{
-				$deletePrestudent = true;
-			}
+		$result = $this->getDataOrTerminateWithError($result);
+
+		$deletePrestudent = $result;
+
+
+		//Berechtigungen nach Check prüfen!
+		if (!$erweiterteBerechtigung) {
+			if ($status_kurzbz == Prestudentstatus_model::STATUS_STUDENT)
+				$this->terminateWithError(
+					$this->p->t('lehre', 'error_onlyAdminDeleteRolleStudent'),
+					self::ERROR_TYPE_GENERAL,
+					REST_Controller::HTTP_FORBIDDEN
+				);
+
+			if ($deletePrestudent)
+				$this->terminateWithError(
+					$this->p->t('lehre', 'error_onlyAdminDeleteLastStatus'),
+					self::ERROR_TYPE_GENERAL,
+					REST_Controller::HTTP_FORBIDDEN
+				);
+
+			$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($oldstatus->datum);
+
+			if (!$this->getDataOrTerminateWithError($result))
+				$this->terminateWithError(
+					$this->p->t('lehre', 'error_dataVorMeldestichtag'),
+					self::ERROR_TYPE_GENERAL,
+					REST_Controller::HTTP_FORBIDDEN
+				);
 		}
 
 		// Start DB transaction
 		$this->db->trans_begin();
-
-		//load rolle für LOG sqlundo
-		$result = $this->PrestudentstatusModel->loadWhere(
-			array(
-				'prestudent_id' => $prestudent_id,
-				'status_kurzbz' => $status_kurzbz,
-				'ausbildungssemester' => $ausbildungssemester,
-				'studiensemester_kurzbz' => $studiensemester_kurzbz
-			)
-		);
-
-		if (isError($result))
-		{
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		if (!hasData($result)) {
-			return $this->terminateWithError($this->p->t('lehre','error_noStatusFound'), self::ERROR_TYPE_GENERAL);
-
-		}
-
-		//Data of current Rolle
-		$statusData = current(getData($result));
-
-		$datum = $statusData->datum == '' ? 'null' : $statusData->datum;
-		$insertamum = $statusData->insertamum == '' ? 'null' : $statusData->insertamum;
-		$insertvon = $statusData->insertvon == '' ? 'null' : $statusData->insertvon;
-		$updateamum = $statusData->updateamum == '' ? 'null' : $statusData->updateamum;
-		$updatevon = $statusData->updatevon == '' ? 'null' : $statusData->updatevon;
-		$ext_id = $statusData->ext_id == '' ? 'null' : $statusData->ext_id;
-		$orgform_kurzbz = $statusData->orgform_kurzbz == '' ? 'null' : $statusData->orgform_kurzbz;
-		$bestaetigtam = $statusData->bestaetigtam == '' ? 'null' : $statusData->bestaetigtam;
-		$bestaetigtvon = $statusData->bestaetigtvon == '' ? 'null' : $statusData->bestaetigtvon;
-		$anmerkung = $statusData->anmerkung == '' ? 'null' : $statusData->anmerkung;
-		$bewerbung_abgeschicktamum = $statusData->bewerbung_abgeschicktamum == '' ? 'null' : $statusData->bewerbung_abgeschicktamum;
-		$studienplan_id = $statusData->studienplan_id == '' ? 'null' : $statusData->studienplan_id;
-		$rt_stufe = $statusData->rt_stufe == '' ? 'null' : $statusData->rt_stufe;
-		$statusgrund_id = $statusData->statusgrund_id == '' ? 'null' : $statusData->statusgrund_id;
-
-		$quotes_datum = $datum == "null" ? " " : "'";
-		$quotes_insertamum = $insertamum == "null" ? " " : "'";
-		$quotes_insertvon = $insertvon == "null" ? " " : "'";
-		$quotes_updateamum = $updateamum == "null" ? " " : "'";
-		$quotes_updatevon = $updatevon == "null" ? " " : "'";
-		$quotes_ext_id = $ext_id == "null" ? " " : "'";
-		$quotes_orgform_kurzbz = $orgform_kurzbz == "null" ? " " : "'";
-		$quotes_bestaetigtam = $bestaetigtam == "null" ? " " : "'";
-		$quotes_bestaetigtvon = $bestaetigtvon == "null" ? " " : "'";
-		$quotes_anmerkung = $anmerkung == "null" ? " " : "'";
-		$quotes_bewerbung_abgeschicktamum = $bewerbung_abgeschicktamum == "null" ? " " : "'";
-		$quotes_studienplan_id = $studienplan_id == "null" ? " " : "'";
-		$quotes_rt_stufe = $rt_stufe == "null" ? " " : "'";
-		$quotes_statusgrund_id = $statusgrund_id == "null" ? " " : "'";
-
-		$sqlundo =
-			"
-			INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester,
-				datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon,
-				anmerkung, bewerbung_abgeschicktamum, studienplan_id,  rt_stufe, statusgrund_id)
-			VALUES('" . $prestudent_id . "','" . $status_kurzbz . "','" . $studiensemester_kurzbz . "','" . $ausbildungssemester . "',"
-			. $quotes_datum . $datum . $quotes_datum . ","
-			. $quotes_insertamum . $insertamum . $quotes_insertamum . ","
-			. $quotes_insertvon . $insertvon . $quotes_insertvon . ","
-			. $quotes_updateamum . $updateamum . $quotes_updateamum . ","
-			. $quotes_updatevon . $updatevon . $quotes_updatevon . ","
-			. $quotes_ext_id . $ext_id . $quotes_ext_id . ","
-			. $quotes_orgform_kurzbz . $orgform_kurzbz . $quotes_orgform_kurzbz . ","
-			. $quotes_bestaetigtam . $bestaetigtam . $quotes_bestaetigtam . ","
-			. $quotes_bestaetigtvon . $bestaetigtvon . $quotes_bestaetigtvon . ","
-			. $quotes_anmerkung . $anmerkung . $quotes_anmerkung . ","
-			. $quotes_bewerbung_abgeschicktamum . $bewerbung_abgeschicktamum . $quotes_bewerbung_abgeschicktamum . ","
-			. $quotes_studienplan_id . $studienplan_id . $quotes_studienplan_id . ","
-			. $quotes_rt_stufe . $rt_stufe . $quotes_rt_stufe . ","
-			. $quotes_statusgrund_id . $statusgrund_id . $quotes_statusgrund_id . ");
-			";
 
 		//Delete Status
 		$result = $this->PrestudentstatusModel->delete(
@@ -1026,300 +948,83 @@ class Status extends FHCAPI_Controller
 			]
 		);
 
-		if($this->db->trans_status() === false || isError($result))
-		{
-			$this->db->trans_rollback();
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		if(!hasData($result))
-		{
-			return $this->terminateWithError($this->p->t('lehre','error_noStatusFound'), self::ERROR_TYPE_GENERAL);
+		$this->getDataOrTerminateWithError($result);
 
-		}
+		//Delete Studentlehrverband if no Status left in this semester
+		$result = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id, $studiensemester_kurzbz);
 
-		//save log delete prestudentstatus
-		$uid = getAuthUID();
-		$beschreibung = 'Loeschen der Rolle ' . $status_kurzbz . " bei " . $prestudent_id;
-		$sql = "DELETE FROM public.tbl_prestudentstatus
-                WHERE prestudent_id = " . $prestudent_id . "
-			  AND status_kurzbz = '" . $status_kurzbz . "'
-			  AND ausbildungssemester ='" . $ausbildungssemester . "'
-			  AND studiensemester_kurzbz = '" . $studiensemester_kurzbz . "'";
-
-		$this->load->model('system/Log_model', 'LogModel');
-		$result = $this->LogModel->insert([
-			'mitarbeiter_uid' => $uid,
-			'beschreibung' => $beschreibung,
-			'sql' => $sql,
-			'sqlundo' => $sqlundo
-		]);
-		if (isError($result) || !hasData($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-
-		$logId = $result->retval;
-
-		//Delete Studentlehrverband if no Status left
-		$result = $this->PrestudentstatusModel->checkIfLastStudentStatusEntry($prestudent_id);
-
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		if ($result->retval)
+		$result = $this->getDataOrTerminateWithError($result);
+		if ($result)
 		{
 			//get student_uid
 			$this->load->model('crm/Student_model', 'StudentModel');
-			$result = $this->StudentModel->checkIfUid($prestudent_id);
-			if (isError($result))
+			$result = $this->StudentModel->loadWhere([
+				'prestudent_id' => $prestudent_id
+			]);
+
+			$student = $this->getDataOrTerminateWithError($result);
+			if ($student)
 			{
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				// TODO(chris): what if no student?
+				$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+				$result = $this->StudentlehrverbandModel->delete(
+					array(
+						'student_uid' => $student->student_uid,
+						'studiensemester_kurzbz' => $studiensemester_kurzbz
+					)
+				);
+
+				$this->getDataOrTerminateWithError($result);
 			}
-			if (!hasData($result))
-			{
-				return $this->terminateWithError($this->p->t('studierendenantrag','error_no_student_for_prestudent',['prestudent_id' => $prestudent_id]), self::ERROR_TYPE_GENERAL);
-			}
-			$student_uid = $result->retval;
-
-			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-			$result = $this->StudentlehrverbandModel->delete(
-				array(
-					'student_uid' => $student_uid,
-					'studiensemester_kurzbz' => $studiensemester_kurzbz
-				)
-			);
-
-			if ($this->db->trans_status() === false || isError($result) || !hasData($result))
-			{
-				$this->db->trans_rollback();
-
-				return $this->terminateWithError($this->p->t('lehre','error_duringDeleteLehrverband'), self::ERROR_TYPE_GENERAL);
-			}
-
 		}
 		//Delete Prestudent if no data is left
-		if($deletePrestudent && $isBerechtigtAdmin)
+		if ($deletePrestudent)
 		{
-			//TODO(manu) check all connected tables, Handling of Deletion
-			//check if existing dokumentprestudent
-			$this->load->model('crm/Dokumentprestudent_model', 'DokumentprestudentModel');
-			$result = $this->DokumentprestudentModel->loadWhere(
-				array(
-					'prestudent_id' => $prestudent_id
-				)
-			);
-			if (isError($result))
-			{
-				$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+			/*
+				//TODO(manu) check all connected tables, Handling of Deletion
+				//check if existing dokumentprestudent
+				$this->load->model('crm/Dokumentprestudent_model', 'DokumentprestudentModel');
+				$result = $this->DokumentprestudentModel->loadWhere(
+					array(
+						'prestudent_id' => $prestudent_id
+					)
+				);
+				if (isError($result))
+				{
+					$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 
-			}
-			if (hasData($result))
-			{
-				return $this->terminateWithError("Es sind noch zu loeschende Dokumente vorhanden: ", self::ERROR_TYPE_GENERAL);
-			}
+				}
+				if (hasData($result))
+				{
+					return $this->terminateWithError("Es sind noch zu loeschende Dokumente vorhanden: ", self::ERROR_TYPE_GENERAL);
+				}
 
-			//check if Anrechnungen tbl_anrechnung
-			$output_anrechnungen = '';
-			$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
-			$result = $this->AnrechnungModel->loadWhere(
-				array(
-					'prestudent_id' => $prestudent_id
-				)
-			);
-			if (isError($result))
-			{
-				$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-			}
-			if (hasData($result))
-			{
-				return $this->terminateWithError("Mit dieser Prestudent_id sind verbundene Anrechnungen vorhanden!", self::ERROR_TYPE_GENERAL);
-			}
-
+				//check if Anrechnungen tbl_anrechnung
+				$output_anrechnungen = '';
+				$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
+				$result = $this->AnrechnungModel->loadWhere(
+					array(
+						'prestudent_id' => $prestudent_id
+					)
+				);
+				if (isError($result))
+				{
+					$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+				}
+				if (hasData($result))
+				{
+					return $this->terminateWithError("Mit dieser Prestudent_id sind verbundene Anrechnungen vorhanden!", self::ERROR_TYPE_GENERAL);
+				}
+			*/
 			//DELETE Prestudent
-
-			//save log delete prestudent
-			$uid = getAuthUID();
-			$beschreibung = 'Loeschen der Prestudent ID ' . $prestudent_id;
-			$sql = "DELETE FROM public.tbl_prestudent
-                WHERE prestudent_id = " . $prestudent_id;
-
-			//load prestudent für LOG sqlundo
 			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-			$result = $this->PrestudentModel->loadWhere(
-				array(
-					'prestudent_id' => $prestudent_id
-				)
-			);
-			if (isError($result) || !hasData($result))
-			{
-				//TODO(Manu) in this case: löschen status erlauben aber rückmeldung, dass Prestudent nicht gelöscht wurde
-				return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-			}
+			$result = $this->PrestudentModel->delete($prestudent_id);
 
-			//Data of current Prestudent
-			$prestudentData = current(getData($result));
-
-			$aufmerksamdurch_kurzbz = $prestudentData->aufmerksamdurch_kurzbz == '' ? 'null' : $prestudentData->aufmerksamdurch_kurzbz;
-			$studiengang_kz = $prestudentData->studiengang_kz == '' ? 'null' : $prestudentData->studiengang_kz;
-			$berufstaetigkeit_code = $prestudentData->berufstaetigkeit_code == '' ? 'null' : $prestudentData->berufstaetigkeit_code;
-			$ausbildungcode = $prestudentData->ausbildungcode == '' ? 'null' : $prestudentData->ausbildungcode;
-			$zgv_code = $prestudentData->zgv_code == '' ? 'null' : $prestudentData->zgv_code;
-			$zgvort = $prestudentData->zgvort == '' ? 'null' : $prestudentData->zgvort;
-			$zgvdatum = $prestudentData->zgvdatum == '' ? 'null' : $prestudentData->zgvdatum;
-			$zgvnation = $prestudentData->zgvnation == '' ? 'null' : $prestudentData->zgvnation;
-			$zgv_erfuellt = $prestudentData->zgv_erfuellt == '' ? 'null' : $prestudentData->zgv_erfuellt;
-			$zgvmas_code = $prestudentData->zgvmas_code == '' ? 'null' : $prestudentData->zgvmas_code;
-			$zgvmaort = $prestudentData->zgvmaort == '' ? 'null' : $prestudentData->zgvmaort;
-			$zgvmadatum = $prestudentData->zgvmadatum == '' ? 'null' : $prestudentData->zgvmadatum;
-			$zgvmanation = $prestudentData->zgvmanation == '' ? 'null' : $prestudentData->zgvmanation;
-			$zgvmas_erfuellt = $prestudentData->zgvmas_erfuellt == '' ? 'null' : $prestudentData->zgvmas_erfuellt;
-			$aufnahmeschluessel = $prestudentData->aufnahmeschluessel == '' ? 'null' : $prestudentData->aufnahmeschluessel;
-			$facheinschlberuf = $prestudentData->facheinschlberuf == '' ? 'null' : $prestudentData->facheinschlberuf;
-			$anmeldungreihungstest = $prestudentData->anmeldungreihungstest == '' ? 'null' : $prestudentData->anmeldungreihungstest;
-			$reihungstestangetreten = $prestudentData->reihungstestangetreten == 1 ? 'true' : 'false';
-			$reihungstest_id = $prestudentData->reihungstest_id == '' ? 'null' : $prestudentData->reihungstest_id;
-			$rt_gesamtpunkte = $prestudentData->rt_gesamtpunkte == '' ? 'null' : $prestudentData->rt_gesamtpunkte;
-			$rt_punkte1 = $prestudentData->rt_punkte1 == '' ? 'null' : $prestudentData->rt_punkte1;
-			$rt_punkte2 = $prestudentData->rt_punkte2 == '' ? 'null' : $prestudentData->rt_punkte2;
-			$rt_punkte3 = $prestudentData->rt_punkte3 == '' ? 'null' : $prestudentData->rt_punkte3;
-			$bismelden = $prestudentData->bismelden == 1 ? 'true' : 'false';
-			$person_id = $prestudentData->person_id == '' ? 'null' : $prestudentData->person_id;
-			$anmerkung = $prestudentData->anmerkung == '' ? 'null' : $prestudentData->anmerkung;
-			$mentor = $prestudentData->mentor == '' ? 'null' : $prestudentData->mentor;
-			$ext_id = $prestudentData->ext_id == '' ? 'null' : $prestudentData->ext_id;
-			$dual = $prestudentData->dual == 1 ? 'true' : 'false';
-			$ausstellungsstaat = $prestudentData->ausstellungsstaat == '' ? 'null' : $prestudentData->ausstellungsstaat;
-			$zgvdoktor_code = $prestudentData->zgvdoktor_code == '' ? 'null' : $prestudentData->zgvdoktor_code;
-			$zgvdoktorort = $prestudentData->zgvdoktorort == '' ? 'null' : $prestudentData->zgvdoktorort;
-			$zgvdoktordatum = $prestudentData->zgvdoktordatum == '' ? 'null' : $prestudentData->zgvdoktordatum;
-			$zgvdoktornation = $prestudentData->zgvdoktornation == '' ? 'null' : $prestudentData->zgvdoktornation;
-			$gsstudientyp_kurzbz = $prestudentData->gsstudientyp_kurzbz == '' ? 'null' : $prestudentData->gsstudientyp_kurzbz;
-			$aufnahmegruppe_kurzbz = $prestudentData->aufnahmegruppe_kurzbz == '' ? 'null' : $prestudentData->aufnahmegruppe_kurzbz;
-			$priorisierung = $prestudentData->priorisierung == '' ? 'null' : $prestudentData->priorisierung;
-			$zgvdoktor_erfuellt= $prestudentData->zgvdoktor_erfuellt == '' ? 'null' : $prestudentData->zgvdoktor_erfuellt;
-
-			$quotes_aufmerksamdurch_kurzbz = $aufmerksamdurch_kurzbz == "null" ? " " : "'";
-			$quotes_studiengang_kz = $studiengang_kz == "null" ? " " : "'";
-			$quotes_berufstaetigkeit_code = $berufstaetigkeit_code == "null" ? " " : "'";
-			$quotes_ausbildungcode = $ausbildungcode == "null" ? " " : "'";
-			$quotes_zgv_code = $zgv_code == "null" ? " " : "'";
-			$quotes_zgvort = $zgvort == "null" ? " " : "'";
-			$quotes_zgvdatum = $zgvdatum == "null" ? " " : "'";
-			$quotes_zgvnation = $zgvnation == "null" ? " " : "'";
-			$quotes_zgv_erfuellt = $zgv_erfuellt == "null" ? " " : "'";
-			$quotes_zgvmas_code = $zgvmas_code == "null" ? " " : "'";
-			$quotes_zgvmaort = $zgvmaort == "null" ? " " : "'";
-			$quotes_zgvmadatum = $zgvmadatum == "null" ? " " : "'";
-			$quotes_zgvmanation = $zgvmanation == "null" ? " " : "'";
-			$quotes_zgvmas_erfuellt = $zgvmas_erfuellt == "null" ? " " : "'";
-			$quotes_aufnahmeschluessel = $aufnahmeschluessel == "null" ? " " : "'";
-			$quotes_facheinschlberuf = $facheinschlberuf == "null" ? " " : "'";
-			$quotes_anmeldungreihungstest = $anmeldungreihungstest == "null" ? " " : "'";
-			$quotes_reihungstestangetreten = $reihungstestangetreten == "null" ? " " : "'";
-			$quotes_reihungstest_id = $reihungstest_id == "null" ? " " : "'";
-			$quotes_rt_gesamtpunkte = $rt_gesamtpunkte == "null" ? " " : "'";
-			$quotes_rt_punkte1 = $rt_punkte1 == "null" ? " " : "'";
-			$quotes_rt_punkte2 = $rt_punkte2 == "null" ? " " : "'";
-			$quotes_rt_punkte3 = $rt_punkte3 == "null" ? " " : "'";
-			$quotes_bismelden = $bismelden == "null" ? " " : "'";
-			$quotes_person_id = $person_id == "null" ? " " : "'";
-			$quotes_anmerkung = $anmerkung == "null" ? " " : "'";
-			$quotes_mentor = $mentor == "null" ? " " : "'";
-			$quotes_ext_id = $ext_id == "null" ? " " : "'";
-			$quotes_dual = $dual == "null" ? " " : "'";
-			$quotes_ausstellungsstaat = $ausstellungsstaat == "null" ? " " : "'";
-			$quotes_zgvdoktor_code = $zgvdoktor_code == "null" ? " " : "'";
-			$quotes_zgvdoktorort = $zgvdoktorort == "null" ? " " : "'";
-			$quotes_zgvdoktordatum = $zgvdoktordatum == "null" ? " " : "'";
-			$quotes_zgvdoktornation = $zgvdoktornation == "null" ? " " : "'";
-			$quotes_gsstudientyp_kurzbz = $gsstudientyp_kurzbz == "null" ? " " : "'";
-			$quotes_aufnahmegruppe_kurzbz = $aufnahmegruppe_kurzbz == "null" ? " " : "'";
-			$quotes_priorisierung = $priorisierung == "null" ? " " : "'";
-			$quotes_zgvdoktor_erfuellt = $zgvdoktor_erfuellt == "null" ? " " : "'";
-
-
-			$sqlundo =
-				"
-				INSERT INTO public.tbl_prestudent(prestudent_id, aufmerksamdurch_kurzbz, studiengang_kz, berufstaetigkeit_code, ausbildungcode,
-				zgv_code, zgvort, zgvdatum, zgvnation,zgv_erfuellt, zgvmas_code, zgvmaort, zgvmadatum, zgvmanation,zgvmas_erfuellt,
-				aufnahmeschluessel, facheinschlberuf, anmeldungreihungstest, reihungstestangetreten, reihungstest_id,
-				rt_gesamtpunkte, rt_punkte1, rt_punkte2, rt_punkte3, bismelden, person_id, anmerkung, mentor, ext_id,
-				dual, ausstellungsstaat, zgvdoktor_code, zgvdoktorort, zgvdoktordatum, zgvdoktornation,
-				gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung, zgvdoktor_erfuellt)
-				VALUES('" . $prestudent_id . "',"
-				. $quotes_aufmerksamdurch_kurzbz . $aufmerksamdurch_kurzbz . $quotes_aufmerksamdurch_kurzbz . ","
-				. $quotes_studiengang_kz . $studiengang_kz . $quotes_studiengang_kz . ","
-				. $quotes_berufstaetigkeit_code . $berufstaetigkeit_code . $quotes_berufstaetigkeit_code . ","
-				. $quotes_ausbildungcode . $ausbildungcode . $quotes_ausbildungcode . ","
-				. $quotes_zgv_code . $zgv_code . $quotes_zgv_code . ","
-				. $quotes_zgvort . $zgvort . $quotes_zgvort . ","
-				. $quotes_zgvdatum . $zgvdatum . $quotes_zgvdatum . ","
-				. $quotes_zgvnation . $zgvnation . $quotes_zgvnation . ","
-				. $quotes_zgv_erfuellt . $zgv_erfuellt . $quotes_zgv_erfuellt . ","
-				. $quotes_zgvmas_code . $zgvmas_code . $quotes_zgvmas_code . ","
-				. $quotes_zgvmaort . $zgvmaort . $quotes_zgvmaort . ","
-				. $quotes_zgvmadatum . $zgvmadatum . $quotes_zgvmadatum . ","
-				. $quotes_zgvmanation . $zgvmanation . $quotes_zgvmanation . ","
-				. $quotes_zgvmas_erfuellt . $zgvmas_erfuellt . $quotes_zgvmas_erfuellt . ","
-				. $quotes_aufnahmeschluessel . $aufnahmeschluessel . $quotes_aufnahmeschluessel . ","
-				. $quotes_facheinschlberuf . $facheinschlberuf . $quotes_facheinschlberuf . ","
-				. $quotes_anmeldungreihungstest . $anmeldungreihungstest . $quotes_anmeldungreihungstest . ","
-				. $quotes_reihungstestangetreten . $reihungstestangetreten . $quotes_reihungstestangetreten . ","
-				. $quotes_reihungstest_id . $reihungstest_id . $quotes_reihungstest_id . ","
-				. $quotes_rt_gesamtpunkte . $rt_gesamtpunkte . $quotes_rt_gesamtpunkte . ","
-				. $quotes_rt_punkte1 . $rt_punkte1 . $quotes_rt_punkte1 . ","
-				. $quotes_rt_punkte2 . $rt_punkte2 . $quotes_rt_punkte2 . ","
-				. $quotes_rt_punkte3 . $rt_punkte3 . $quotes_rt_punkte3 . ","
-				. $quotes_bismelden . $bismelden . $quotes_bismelden . ","
-				. $quotes_person_id . $person_id . $quotes_person_id . ","
-				. $quotes_anmerkung . $anmerkung . $quotes_anmerkung . ","
-				. $quotes_mentor . $mentor . $quotes_mentor . ","
-				. $quotes_ext_id . $ext_id . $quotes_ext_id . ","
-				. $quotes_dual . $dual . $quotes_dual . ","
-				. $quotes_ausstellungsstaat . $ausstellungsstaat . $quotes_ausstellungsstaat . ","
-				. $quotes_zgvdoktor_code . $zgvdoktor_code . $quotes_zgvdoktor_code . ","
-				. $quotes_zgvdoktorort . $zgvdoktorort . $quotes_zgvdoktorort . ","
-				. $quotes_zgvdoktordatum . $zgvdoktordatum . $quotes_zgvdoktordatum . ","
-				. $quotes_zgvdoktornation . $zgvdoktornation . $quotes_zgvdoktornation . ","
-				. $quotes_gsstudientyp_kurzbz . $gsstudientyp_kurzbz . $quotes_gsstudientyp_kurzbz . ","
-				. $quotes_aufnahmegruppe_kurzbz . $aufnahmegruppe_kurzbz . $quotes_aufnahmegruppe_kurzbz . ","
-				. $quotes_priorisierung . $priorisierung . $quotes_priorisierung . ","
-				. $quotes_zgvdoktor_erfuellt . $zgvdoktor_erfuellt . $quotes_zgvdoktor_erfuellt . ");
-			";
-
-			$this->load->model('system/Log_model', 'LogModel');
-			$result = $this->LogModel->insert([
-				'mitarbeiter_uid' => $uid,
-				'beschreibung' => $beschreibung,
-				'sql' => $sql,
-				'sqlundo' => $sqlundo
-			]);
-			if (isError($result) || !hasData($result))
-			{
-				return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-			}
-
-			//$logId = $result->retval;
-
-			//independent transaction
-			$this->db->trans_start();
-
-			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-			$result = $this->PrestudentModel->delete(
-				array(
-					'prestudent_id' => $prestudent_id
-				)
-			);
-			if ($this->db->trans_status() === false)
-			{
-				$this->db->trans_rollback();
-				$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-			}
-			$this->db->trans_commit();
-			$this->terminateWithSuccess($result);
+			$this->getDataOrTerminateWithError($result);
 		}
-		$this->db->trans_commit();
+
+		$this->db->trans_rollback(); // TODO(chris): DEBUG!
+		#$this->db->trans_commit();
 
 		return $this->terminateWithSuccess(true);
 	}
