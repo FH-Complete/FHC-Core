@@ -111,13 +111,13 @@ class PrestudentstatusCheckLib
 	public function checkIfExistingPrestudentRolle(
 		$prestudent_id,
 		$status_kurzbz,
-		$tudiensemester_kurzbz,
+		$studiensemester_kurzbz,
 		$ausbildungssemester
 	) {
 		$result =  $this->_ci->PrestudentstatusModel->checkIfExistingPrestudentRolle(
 			$prestudent_id,
 			$status_kurzbz,
-			$tudiensemester_kurzbz,
+			$studiensemester_kurzbz,
 			$ausbildungssemester
 		);
 		if (isError($result))

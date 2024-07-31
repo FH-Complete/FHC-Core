@@ -369,6 +369,16 @@ class Prestudentstatus_model extends DB_Model
 	 */
 	public function checkIfExistingPrestudentRolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
 	{
+		$studentName = '';
+
+		$nameRes = $this->PersonModel->loadPrestudent($prestudent_id);
+
+		if (hasData($nameRes))
+		{
+			$nameData = getData($nameRes)[0];
+			$studentName = $nameData->vorname.' '.$nameData->nachname;
+		}
+
 		$qry = "SELECT
 					*
 				FROM
@@ -394,7 +404,7 @@ class Prestudentstatus_model extends DB_Model
 		}
 		else
 		{
-			return success("1", $this->p->t('lehre','error_rolleBereitsVorhanden'));
+			return success("1", $this->p->t('lehre','error_rolleBereitsVorhandenMitNamen', ['name' => $studentName]));
 		}
 	}
 

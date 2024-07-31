@@ -172,22 +172,16 @@ export default {
 			this.$refs.confirmStatusAction.show();
 		},
 		addStudent(prestudentIds){
-			console.log("function addStudent ");
-			//this.hideModal('confirmStatusAction');
+			this.resetChangeModals();
 			let changeData = {};
 
 			//for Feedback Sucess, Error
 			let countSuccess = 0;
 			let countError = 0;
 
-			//if(!prestudentIds)
-			//	prestudentIds = [this.modelValue.prestudent_id];
-
 			const promises = prestudentIds.map(prestudentId => {
 
 				changeData = this.newArray.find(item => item.prestudent_id === prestudentId);
-
-				//changeData = this.statusData.status_kurzbz ? this.statusData : this.newArray.find(item => item.prestudent_id === prestudentId);
 
 				return this.$fhcApi.post('api/frontend/v1/stv/status/addStudent/' + prestudentId,
 					changeData
@@ -195,12 +189,11 @@ export default {
 					countSuccess++;
 					return response;
 				})
-					//.catch(this.$fhcAlert.handleSystemError)
-					.catch(error => {
-						countError++;
-						//For each Prestudent show Error in Alert
-						this.$fhcAlert.handleSystemError(error);
-					});
+				.catch(error => {
+					countError++;
+					//For each Prestudent show Error in Alert
+					this.$fhcAlert.handleSystemError(error);
+				});
 			});
 
 			Promise
@@ -257,7 +250,6 @@ export default {
 			this.actionConfirmDialogue(this.updateData, 'studenten','Unterbrecher');
 		},
 		changeStatusToStudent(statusgrund_id){
-			this.resetChangeModals();
 			let def_date = this.getDefaultDate();
 			//TODO Manu validation if Bewerber already before asking for ausbildungssemester
 			//this.checkIfBewerber();
@@ -348,13 +340,11 @@ export default {
 				...deltaData,
 			}));
 
-			this.actionConfirmDialogue(this.updateData, 'aufgenommener','Aufgenommenen');
+			this.actionConfirmDialogue(this.updateData, 'aufgenommener','Aufgenommener');
 
 		},
 		changeInteressentToStudent(statusgrund_id){
 			this.resetChangeModals();
-			//TODO(Manu) test statusgrund_id
-			console.log("in function changeInteressentToStudent mit statusgrund_id", statusgrund_id);
 			let def_date = this.getDefaultDate();
 			let deltaData =
 				{
@@ -388,7 +378,7 @@ export default {
 				...deltaData,
 			}));
 
-			this.actionConfirmDialogue(this.updateData, 'abgewiesener','Abgewiesenen');
+			this.actionConfirmDialogue(this.updateData, 'abgewiesener','Abgewiesener');
 		},
 		changeStatusToWartender(){
 			this.resetChangeModals();
@@ -404,12 +394,10 @@ export default {
 				...deltaData,
 			}));
 
-			this.actionConfirmDialogue(this.updateData, 'wartender','Wartenden');
+			this.actionConfirmDialogue(this.updateData, 'wartender','Wartender');
 		},
 		changeStatus(prestudentIds){
-			console.log("function changeStatus ");
 			this.resetChangeModals();
-			//Array.isArray(prestudentIds) ? this.modelValue.prestudent_id : [prestudentIds];
 			let changeData = {};
 
 			//for Feedback Sucess, Error
@@ -425,8 +413,6 @@ export default {
 			if (!existingEntry) {
 				this.newArray.push({ ausbildungssemester: this.actionSem });
 			}
-
-			console.log("ausbildungssem: " + this.actionSem);
 
 			const promises = prestudentIds.map(prestudentId => {
 
@@ -461,7 +447,7 @@ export default {
 					//	}
 
 					//Feedback Success als infoalert
-					if (countSuccess > 0) {
+					if (countSuccess > 0 || countError > 0 ) {
 						this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
 							'countSuccess': countSuccess,
 							'status': this.newStatus,
@@ -469,9 +455,7 @@ export default {
 						}));
 					}
 
-					//TODO(Manu) bei status Interessent, Bewerber, aufgenommener, reload nicht working
-
-					if(this.prestudentIds.length == 1){
+					if(this.prestudentIds.length == 1 && countSuccess > 0){
 						this.reload();
 
 						//necessary to see new status in List
@@ -496,58 +480,6 @@ export default {
 					})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		/*checkIfBewerber(prestudentIds){
-
-			if(!prestudentIds)
-				prestudentIds = [this.modelValue.prestudent_id];
-
-			const promises = prestudentIds.map(prestudentId => {
-
-				return this.$fhcApi.post('api/frontend/v1/stv/status/hasStatusBewerber/' + prestudentId,
-				).then(response => {
-					countSuccess++;
-					return response;
-				})
-					//.catch(this.$fhcAlert.handleSystemError)
-					.catch(error => {
-						countError++;
-						//For each Prestudent show Error in Alert
-						this.$fhcAlert.handleSystemError(error);
-					});
-			});
-
-			Promise
-				.allSettled(promises)
-				.then(values => {
-
-						//Feedback Success als infoalert
-						if (countSuccess > 0) {
-							this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
-								'countSuccess': countSuccess,
-								'status': this.newStatus,
-								'countError': countError
-							}));
-						}
-
-						if (this.modelValue.prestudent_id) {
-							this.reload();
-							//TODO(manu) reload Detailtab after Abbrecher to see current status activ, verband and gruppe
-						}
-						else {
-							this.$reloadList();
-						}
-
-			/!*return this.$fhcApi
-				.get('api/frontend/v1/stv/status/hasStatusBewerber/' + prestudent_id)
-				.then(
-					result => {
-						this.isBewerber = result.data;
-						console.log(result);
-						return result;
-					})
-				.catch(this.$fhcAlert.handleSystemError);*!/
-			//}
-		},*/
 		getDefaultDate() {
 			const today = new Date();
 			return today;
