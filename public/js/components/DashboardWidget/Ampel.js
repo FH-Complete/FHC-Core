@@ -10,16 +10,13 @@ export default {
         source: '',
         allAmpeln:null,
         activeAmpeln:null,
-        phrasen: {ampeln:false, ui:false},
+        isPhrasenLoaded: false,
     }),
     mixins: [
         AbstractWidget
     ],
     computed: {
-        arePhrasenLoaded(){
-            // checks if both the phrasen categories 'ampeln' and 'ui' are loaded
-            return this.phrasen.ampeln && this.phrasen.ui;            
-        },
+        
         ampelnComputed(){
             
             switch(this.source)
@@ -117,10 +114,7 @@ export default {
         }
     },
     created() {
-        this.$p.loadCategory('ampel').then(() => {
-            this.isPhrasenLoaded = true;
-        });
-        this.$p.loadCategory('ui').then(() => {
+        this.$p.loadCategory(['ampel','ui']).then(() => {
             this.isPhrasenLoaded = true;
         });
         this.$emit('setConfig', false);    
