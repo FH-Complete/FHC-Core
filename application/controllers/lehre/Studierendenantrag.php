@@ -21,6 +21,7 @@ class Studierendenantrag extends FHC_Controller
 
 		// Load Models
 		$this->load->model('education/Studierendenantrag_model', 'StudierendenantragModel');
+		$this->load->model('person/Person_model', 'PersonModel');
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -102,10 +103,13 @@ class Studierendenantrag extends FHC_Controller
 
 	public function abmeldungstgl($prestudent_id, $studierendenantrag_id = null)
 	{
+		$unruly = getData($this->PersonModel->loadPrestudent($prestudent_id))[0]->unruly;
+
 		$this->load->view('lehre/Antrag/Create', [
 			'prestudent_id' => $prestudent_id,
 			'studierendenantrag_id' => $studierendenantrag_id,
-			'antrag_type' => 'AbmeldungStgl'
+			'antrag_type' => 'AbmeldungStgl',
+			'unruly' => $unruly
 		]);
 	}
 

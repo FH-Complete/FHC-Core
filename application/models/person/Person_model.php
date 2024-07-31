@@ -374,5 +374,29 @@ class Person_model extends DB_Model
 			'prestudent_id' => $prestudent_id
 		]);
 	}
-}
 
+	public function checkUnruly($vorname, $nachname, $gebdatum)
+	{
+		$qry = "SELECT *
+				FROM tbl_person
+				WHERE tbl_person.vorname = ? 
+					AND tbl_person.nachname = ? 
+					AND tbl_person.gebdatum = ? 
+					AND tbl_person.unruly = TRUE;";
+
+		return $this->execQuery($qry, [$vorname, $nachname, $gebdatum]);
+	}
+
+	public function updateUnruly($person_id, $unruly)
+	{
+		$result = $this->update($person_id, array(
+			'unruly' => $unruly
+		));
+
+		if (isError($result)) {
+			return error($result->msg, EXIT_ERROR);
+		} else if (isSuccess($result) && hasData($result)) {
+			return success($result);
+		}
+	}
+}

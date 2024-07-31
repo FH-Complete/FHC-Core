@@ -38,6 +38,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect('studienjahr_kurzbz');
 		$this->addSelect('vorname');
 		$this->addSelect('nachname');
+		$this->addSelect('unruly');
 		$this->addSelect('p.prestudent_id');
 		$this->addSelect('p.studiengang_kz');
 		$this->addSelect('semester');
@@ -148,6 +149,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect('s.studierendenantrag_statustyp_kurzbz status');
 		$this->addSelect('s.insertvon status_insertvon');
 		$this->addSelect('t.bezeichnung[(' . $lang . ')] statustyp');
+		$this->addSelect('p.unruly AS unruly');
 
 		$this->addJoin(
 			'campus.tbl_studierendenantrag_status s',
@@ -156,6 +158,18 @@ class Studierendenantrag_model extends DB_Model
 		$this->addJoin(
 			'campus.tbl_studierendenantrag_statustyp t',
 			's.studierendenantrag_statustyp_kurzbz=t.studierendenantrag_statustyp_kurzbz'
+		);
+		$this->addJoin(
+			'public.tbl_student st',
+			'st.prestudent_id=tbl_studierendenantrag.prestudent_id'
+		);
+		$this->addJoin(
+			'public.tbl_benutzer b',
+			'st.student_uid=b.uid'
+		);
+		$this->addJoin(
+			'public.tbl_person p',
+			'b.person_id=p.person_id'
 		);
 
 		if ($types && is_array($types)) {

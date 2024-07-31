@@ -337,10 +337,13 @@ class InfoCenter extends Auth_Controller
 		$persondata = $this->_loadPersonData($person_id);
 
 		$checkPerson = $this->PersonModel->checkDuplicate($person_id);
-
 		if (isError($checkPerson)) show_error(getError($checkPerson));
 
+		$checkUnruly = $this->PersonModel->checkUnruly($persondata['stammdaten']->vorname, $persondata['stammdaten']->nachname, $persondata['stammdaten']->gebdatum);
+		if (isError($checkUnruly)) show_error(getError($checkUnruly));
+
 		$duplicate = array('duplicated' => getData($checkPerson));
+		$unruly = array('unruly' => getData($checkUnruly));
 
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
@@ -351,7 +354,8 @@ class InfoCenter extends Auth_Controller
 			$persondata,
 			$prestudentdata,
 			$dokumentdata,
-			$duplicate
+			$duplicate,
+			$unruly
 		);
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();

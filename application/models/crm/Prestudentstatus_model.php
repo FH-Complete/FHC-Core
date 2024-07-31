@@ -280,6 +280,7 @@ class Prestudentstatus_model extends DB_Model
 		$this->addSelect('ss.studienjahr_kurzbz');
 		$this->addSelect('pers.vorname');
 		$this->addSelect('pers.nachname');
+		$this->addSelect('pers.unruly');
 		$this->addSelect('TRIM(CONCAT(pers.vorname, \' \', pers.nachname)) AS name');
 		$this->addSelect('pers.person_id');
 		$this->addSelect('g.studiengang_kz');

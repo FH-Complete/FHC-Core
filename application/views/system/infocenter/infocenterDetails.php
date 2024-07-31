@@ -74,6 +74,22 @@
 						</div>
 					</div>
 				</div>
+				<?php if (!is_null($unruly)): ?>
+					<div class="row alert-info">
+						<h3 class="header col-lg-12">
+							<?php echo $this->p->t('infocenter', 'unrulyPersonFound') . ':'; ?>
+						</h3>
+						<div class="text-left col-lg-12">
+							<?php
+							foreach ($unruly as $unruled)
+							{
+								echo  'Person ID: ' . $unruled->person_id . '<br />';
+							}
+							?>
+						</div>
+
+					</div>
+				<?php endif; ?>
 				<?php if (!is_null($duplicated)): ?>
 					<div class="row alert-warning">
 						<h3 class="header col-lg-12">
@@ -202,4 +218,3 @@
 	<button id="scrollToTop" title="Go to top"><i class="fa fa-chevron-up"></i></button>
 
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
-
