@@ -44,6 +44,7 @@ export default{
 			prestudent: {},
 			originalDatum: null,
 			statusNew: true,
+			mischform: false,
 			statusId: {},
 			formData: {},
 			studienplaene: [],
@@ -171,7 +172,9 @@ export default{
 			
 			return this.$fhcApi
 				.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + prestudent.prestudent_id)
-				.then(result => this.studienplaene = result.data);
+				.then(result => this.studienplaene = result.data)
+				.then(() => this.$fhcApi.get('api/frontend/v1/stv/prestudent/getStudiengang/' + prestudent.prestudent_id))
+				.then(result => this.mischform = result.data.mischform);
 		}
 	},
 	created() {
@@ -261,6 +264,23 @@ export default{
 					:value="number"
 					>
 					{{ number }}
+				</option>
+			</form-input>
+			<form-input
+				v-if="mischform"
+				container-class="mb-3"
+				type="select"
+				v-model="formData.orgform_kurzbz"
+				name="orgform_kurzbz"
+				:label="$p.t('lehre/organisationsform')"
+				:disabled="bisLocked && !isStatusBeforeStudent"
+				>
+				<option
+					v-for="orgform in lists.orgforms"
+					:key="orgform.orgform_kurzbz"
+					:value="orgform.orgform_kurzbz"
+					>
+					{{ orgform.bezeichnung }}
 				</option>
 			</form-input>
 			<form-input

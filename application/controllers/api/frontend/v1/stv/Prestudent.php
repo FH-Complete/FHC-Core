@@ -19,7 +19,8 @@ class Prestudent extends FHCAPI_Controller
 			'getAufmerksamdurch' => self::PERM_LOGGED,
 			'getBerufstaetigkeit' => self::PERM_LOGGED,
 			'getTypenStg' => self::PERM_LOGGED,
-			'getStudienplaene' => self::PERM_LOGGED
+			'getStudienplaene' => self::PERM_LOGGED,
+			'getStudiengang' => self::PERM_LOGGED
 		]);
 
 		// Load Libraries
@@ -266,13 +267,33 @@ class Prestudent extends FHCAPI_Controller
 
 	public function getStudienplaene($prestudent_id)
 	{
-		if (!is_int((int)$prestudent_id) || (int)$prestudent_id . '' != $prestudent_id)
-			show_404();
 		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 		$result = $this->StudienplanModel->getStudienplaeneByPrestudents($prestudent_id);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
 		return $this->terminateWithSuccess($data);
+	}
+
+	/**
+	 * Gets details for the Studiengang of the Prestudent
+	 *
+	 * @param integer					$prestudent_id
+	 *
+	 * @return stdClass
+	 */
+	public function getStudiengang($prestudent_id)
+	{
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$this->PrestudentModel->addSelect('stg.*');
+
+		$this->PrestudentModel->addJoin('public.tbl_studiengang stg', 'studiengang_kz');
+
+		$result = $this->PrestudentModel->load($prestudent_id);
+
+		$stg = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess(current($stg));
 	}
 }
