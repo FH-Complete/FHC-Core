@@ -49,7 +49,7 @@ class Lehrveranstaltung_model extends DB_Model
 	public function getLvsByStudienplan($studiensemester_kurzbz = null, $oes = null)
 	{
 		$subQry = $this->_getQryLvsByStudienplan($studiensemester_kurzbz, $oes);
-		$qry = 'SELECT DISTINCT ON (lehrveranstaltung_id) * FROM ('. $subQry. ') AS tmp ORDER BY lehrveranstaltung_id, orgform_kurzbz DESC'; // TODO: hier VZ zuerst. aber eig nicht relevant...check
+		$qry = 'SELECT * FROM ('. $subQry. ') AS tmp ORDER BY stg_typ_kurzbz, orgform_kurzbz DESC';
 
 		return $this->execQuery($qry);
 	}
