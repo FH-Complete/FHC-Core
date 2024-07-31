@@ -1,4 +1,20 @@
 <?php
+/**
+ * Copyright (C) 2024 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -8,6 +24,8 @@ class PhrasesLib
 {
 	// Directory name where all the category files are
 	const CORE_PHRASES_DIRECTORY = 'phrases/';
+	// Old config file used for the phrases
+	const CORE_PHRASES_LEGACY_CFG_FILE = 'system/phrasesupdate.php';
 
 	// Who adds phrases into the database
 	const INSERT_BY = 'PhrasesManager';
@@ -172,8 +190,152 @@ class PhrasesLib
 		$this->_installPhrases($phrasesDirectory);
 	}
 
+	/**
+	 * Creates/updates the phrases files under the directory application/phrases/
+	 */
+	public function syncFiles()
+	{
+		// Legacy phrases file absolute path
+		$legacyPhrasesFile = FHCPATH.self::CORE_PHRASES_LEGACY_CFG_FILE;
+
+		// Try to include the legacy file used to store the phrases
+		// It is using the @ to suppress errors in case the file is not readable or does not exist
+		// In case is not readable or does not exists it stops the execution and prompts a message
+		if ((@include_once $legacyPhrasesFile) === false)
+		{
+			$this->_ci->eprintflib->printError($legacyPhrasesFile.' not found or not readable!'."\n");
+			exit;
+		}
+
+		// If the phrases array exists and it is not empty, otherwise it stops the executions and prompts a message
+		if (!isset($phrases) || isEmptyArray($phrases))
+		{
+			$this->_ci->eprintflib->printError($legacyPhrasesFile.' does not contain a populated array called "$phrases"');
+			exit;
+		}
+
+		// For each phrases contained in the array
+		foreach ($phrases as $phrase)
+		{
+			// If it contains the element category
+			if (isset($phrase[self::CATEGORY]) && isset($phrase[self::PHRASE]))
+			{
+				// 
+				$toAppend = false;
+				
+				// Path and name of the phrases category file
+				$phrasesCategoryFile = APPPATH.self::CORE_PHRASES_DIRECTORY.$phrase[self::CATEGORY].'.php';
+
+				// Checks if a phrases file already exists for this category
+				if (file_exists($phrasesCategoryFile))
+				{
+					// Get the phrases file category content
+					$phrasesCategoryFileContent = file_get_contents($phrasesCategoryFile);
+
+					// If an error occurred
+					if ($phrasesCategoryFileContent === false)
+					{
+						$this->_ci->eprintflib->printError('Was not possible to get the content of: '.$phrasesCategoryFile);
+						exit;
+					}
+
+					// Check if the phrase already exists inside this file
+					if (stristr($phrasesCategoryFileContent, $phrase[self::PHRASE]) === false) $toAppend = true;
+				}
+				else // if not then
+				{
+					// Create the new phrases category file
+					if (!$this->_createPhraseToCategoryFile($phrasesCategoryFile))
+					{
+						$this->_ci->eprintflib->printError('Was not possible to create the phrases category file: '.$phrasesCategoryFile);
+						exit;
+					}
+
+					$this->_ci->eprintflib->printMessage('Created new phrases category file: '.$phrasesCategoryFile);
+					$toAppend = true;
+				}
+
+				// If the phrase is to be appended to the phrases category file
+				if ($toAppend)
+				{
+					// And then append the phrase to it
+					if (!$this->_appendPhraseToCategoryFile($phrase, $phrasesCategoryFile))
+					{
+						$this->_ci->eprintflib->printError('Was not possible to append to the phrases category file: '.$phrasesCategoryFile);
+						exit;
+					}
+				}
+			}
+			else // otherwise prompt an error message and continue
+			{
+				$this->_ci->eprintflib->printInfo('Missing "'.self::CATEGORY.'" or "'.self::PHRASE.'" for the following element:');
+				var_dump($phrase);
+				$this->_ci->eprintflib->printInfo('-------------------------------------------');
+			}
+		}
+	}
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
+
+	/**
+	 * Append a new phrases to the related phrases category file
+	 */
+	private function _appendPhraseToCategoryFile($phrase, $phrasesCategoryFile)
+	{
+		// Open the category phrases file and a temporary one
+		$srcFileHandle = @fopen($phrasesCategoryFile, 'r');
+		// In case exists then it is truncated
+		$dstFileHandle = @fopen($phrasesCategoryFile.'.tmp', 'w');
+
+		// If an error occurred then return false
+		if (!$srcFileHandle || !$dstFileHandle) return false;
+
+		$line = '';
+		// Read the file line by line
+		while (!feof($srcFileHandle))
+		{
+			// Read a single line from the source file
+			$line = fgets($srcFileHandle, 4096);
+			// If an error occurred then exit
+			if ($line === false && !feof($srcFileHandle)) return false;
+
+			// Search for the end of the array
+			if (stristr($line, ');'))
+			{
+				// If found then append the new phrase to the current line
+				// and replace the end of the array
+				$line = str_replace(');', "\n".var_export($phrase, true).','."\n".');', $line);
+			}
+
+			// In any case copy the line to the temp file
+			if (@fwrite($dstFileHandle, $line) === false) return false;
+		}
+
+		// Close the file handles
+		fclose($srcFileHandle);
+		fclose($dstFileHandle);
+
+		// Delete the old file
+		if (@unlink($phrasesCategoryFile) === false) return false;
+
+		// Rename the temp file as the old one
+		if (@rename($phrasesCategoryFile.'.tmp', $phrasesCategoryFile) === false) return false;
+
+		return true; // if everything was fine
+	}
+
+	/**
+	 * Creates a new phrases category file with the given name
+	 * and having an empy array called $phrases as content
+	 */
+	private function _createPhraseToCategoryFile($phrasesCategoryFile)
+	{
+		return !(file_put_contents(
+			$phrasesCategoryFile,
+			'<?php'."\n\n".'$phrases = array('."\n".');'
+		) === false);
+	}
 
 	/**
 	 * Extends the functionalities of the constructor of this class
