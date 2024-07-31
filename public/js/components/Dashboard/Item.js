@@ -38,9 +38,13 @@ export default {
 		},
 		ready() {
 			return this.component && this.arguments !== null
-		}
+		},
+		widgetHasFooter(){
+			return this.widget?.setup?.name == "Bookmark" ? false : true;
+		},
 	},
 	methods: {
+		
 		mouseDown(e) {
 			this.target = e.target;
 		},
@@ -97,7 +101,7 @@ export default {
 		this.arguments = {...this.widget.arguments, ...this.config};
 		this.tmpConfig = {...this.arguments};
 	},
-	template: `
+	template: /*html*/`
 	<div v-if="loading">
 		<div class="d-flex justify-content-center align-items-center h-100">
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
@@ -127,7 +131,7 @@ export default {
 				<component v-if="ready && !isLoading" :is="component" :config="tmpConfig" @change="changeConfig" :configMode="true"></component>
 				<div v-else class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
 			</template>
-			<template v-slot:footer>
+			<template v-if="widgetHasFooter" v-slot:footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 				<button type="button" class="btn btn-primary" @click="changeConfig">Save changes</button>
 			</template>

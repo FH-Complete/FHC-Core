@@ -3,7 +3,10 @@ import AbstractWidget from './Abstract';
 export default {
     name: 'WidgetsUrl',
     data: () => ({
-        links: null
+        links: null,
+        title_input: '',
+        url_input: '',
+        isPhrasenLoaded: false,
     }),
     mixins: [
         AbstractWidget
@@ -22,27 +25,50 @@ export default {
             })
             .catch();
         },
-        addLink(){
-            let linkId = this.links.length;
-
-            this.links.push({
-                id: linkId,
-                tag: this.config.tag,
-                title: this.title,
-                url: this.url
-                })
+        async confirmDelete() {
+            if (await this.$fhcAlert.confirmDelete() === false)
+                return;
         },
-        removeLink(bookmark_id){
+        addLink(){
+            //let linkId = this.links.length;
+
+            this.$fhcApi.factory.bookmark.insertBookmark({
+                tag: this.config.tag,
+                title: this.title_input,
+                url: this.url_input
+                })
+                .then(res => res.data)
+                .then(result => {
+                    this.$fhcAlert.alertInfo("bookmark added");
+                })
+                .catch();
+
+            // reset the values for the title and url inputs
+            this.title_input = '';
+            this.url_input = '';
+
+            // refetch the bookmarks to see the updates
+            this.fetchBookmarks();
+
+        },
+        async removeLink(bookmark_id){
+            await this.confirmDelete();
             this.$fhcApi.factory.bookmark.deleteBookmark(bookmark_id)
             .then(res => res.data)
             .then(result => {
                 this.$fhcAlert.alertInfo(this.$p.t('bookmark','bookmarkDeleted'));
             })
             .catch();
+
+            // refetch the bookmarks to see the updates
+            this.fetchBookmarks();
         }
     },
     
     created() {
+        this.$p.loadCategory('bookmark').then(()=>{
+            this.isPhrasenLoaded = true;
+        })
         //this.links = TEST_LINKS;
         // this.links = TEST_KEINE_LINKS;
     },
@@ -56,9 +82,9 @@ export default {
 
                 <header><b>{{$p.t('bookmark','newLink')}}</b></header><br>
                 <div>
-                    <input class="form-control form-control-sm" placeholder="Titel" type="text" v-model="title" name="title" maxlength="50" required>
-                    <input class="form-control form-control-sm mt-2" type="url" placeholder="URL" v-model="url" name="url" required>
-                    <button class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="addLink()" type="button">{{$p.t('bookmark','saveLink')}}</button>
+                    <input class="form-control form-control-sm" placeholder="Titel" type="text" v-model="title_input" name="title" maxlength="50" required>
+                    <input class="form-control form-control-sm mt-2" type="url" placeholder="URL" v-model="url_input" name="url" required>
+                    <button class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="addLink" type="button">{{$p.t('bookmark','saveLink')}}</button>
                 </div>
             </div>
         </div>

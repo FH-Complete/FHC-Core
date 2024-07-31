@@ -29,6 +29,7 @@ class Bookmark extends FHCAPI_Controller
 		parent::__construct([
 			'getBookmarks' => self::PERM_LOGGED,
             'delete' => self::PERM_LOGGED,
+            'insert' => self::PERM_LOGGED,
         ]);
 
 		$this->load->model('dashboard/Bookmark_model', 'BookmarkModel');
@@ -49,7 +50,7 @@ class Bookmark extends FHCAPI_Controller
 	 */
 	public function getBookmarks()
 	{
-        $bookmarks = $this->BookmarkModel->getAll($this->uid);
+        $bookmarks = $this->BookmarkModel->loadWhere(["uid"=>$this->uid]);
 
         if(isError($bookmarks)){
             $this->terminateWithError(getError($bookmarks));
@@ -69,7 +70,7 @@ class Bookmark extends FHCAPI_Controller
 	{
         if(!isset($bookmark_id)) $this->terminateWithError("missing required parameters");
         
-        $bookmark = $this->BookmarkModel->get($bookmark_id);
+        $bookmark = $this->BookmarkModel->load($bookmark_id);
 
         if(isError($bookmark)){
             $this->terminateWithError(getError($bookmark));
@@ -94,6 +95,36 @@ class Bookmark extends FHCAPI_Controller
         }else{
             $this->terminateWithError("You are not authorized to delete this bookmark");
         }
+    }
+
+    /**
+	 * inserts new bookmark into the bookmark table 
+	 * @access public
+	 * @return void
+	 */
+    public function insert()
+	{
+        $url = $this->input->post('url',true);
+        $title = $this->input->post('title',true);
+        $tag = $this->input->post('tag',true);
+
+        // set the parameters to null if they are not present in the request payload
+        if($title == FALSE) $title = NULL;
+        if($tag == FALSE) $tag = NULL;
+
+        if(!isset($url))$this->terminateWithError("missing required parameters");
+
+        $insert_into_result = $this->BookmarkModel->execReadOnlyQuery("
+        INSERT INTO dashboard.tbl_bookmark (uid, url, title,tag, insertvon, updateamum, updatevon) VALUES (?,?,?,?,?,NULL,NULL);",[$this->uid,$url,$title,$tag,$this->uid]);
+
+        if(isError($insert_into_result)){
+            $this->terminateWithError(getError($insert_into_result));
+        }
+
+        $insert_into_result = $this->getDataOrTerminateWithError($insert_into_result);
+
+        $this->terminateWithSuccess($insert_into_result);
+
     }
 }
 

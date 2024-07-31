@@ -18,4 +18,16 @@ export default {
         ,{}
       ); 
     },
+
+    insertBookmark: function ({url, title, tag}) {
+      
+      return this.$fhcApi.post(
+        FHC_JS_DATA_STORAGE_OBJECT.app_root + 
+        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+        `/api/frontend/v1/Bookmark/insert`
+        ,{url: url,
+          title: title,
+          tag: tag}
+      ); 
+    },
 }
