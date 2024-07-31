@@ -1,81 +1,84 @@
 import AbstractWidget from './Abstract';
 
 export default {
-    name: 'WidgetsUrl',
-    data: () => ({
-        links: null,
-        title_input: '',
-        url_input: '',
-        isPhrasenLoaded: false,
-    }),
-    mixins: [
-        AbstractWidget
-    ],
-    computed: {
-        tagName() {
-            return this.config.tag !== undefined && this.config.tag.length > 0 ? this.config.tag : 'Meine Urls';
-        }
+  name: "WidgetsUrl",
+  data: () => ({
+    title_input: "",
+    url_input: "",
+    isPhrasenLoaded: false,
+  }),
+  mixins: [AbstractWidget],
+  computed: {
+    tagName() {
+      return this.config.tag !== undefined && this.config.tag.length > 0
+        ? this.config.tag
+        : this.$p.t("bookmark", "myBookmarks");
     },
-    methods: {
-        async fetchBookmarks(){
-            await this.$fhcApi.factory.bookmark.getBookmarks()
-            .then(res => res.data)
-            .then(result => {
-                this.links = result;
-            })
-            .catch();
-        },
-        async confirmDelete() {
-            if (await this.$fhcAlert.confirmDelete() === false)
-                return;
-        },
-        addLink(){
-            //let linkId = this.links.length;
+    emptyBookmarks() {
+      if (this.shared instanceof Array && this.shared.length == 0) return true;
 
-            this.$fhcApi.factory.bookmark.insertBookmark({
-                tag: this.config.tag,
-                title: this.title_input,
-                url: this.url_input
-                })
-                .then(res => res.data)
-                .then(result => {
-                    this.$fhcAlert.alertInfo("bookmark added");
-                })
-                .catch();
+      if (!this.shared) return true;
 
-            // reset the values for the title and url inputs
-            this.title_input = '';
-            this.url_input = '';
-
-            // refetch the bookmarks to see the updates
-            this.fetchBookmarks();
-
-        },
-        async removeLink(bookmark_id){
-            await this.confirmDelete();
-            this.$fhcApi.factory.bookmark.deleteBookmark(bookmark_id)
-            .then(res => res.data)
-            .then(result => {
-                this.$fhcAlert.alertInfo(this.$p.t('bookmark','bookmarkDeleted'));
-            })
-            .catch();
-
-            // refetch the bookmarks to see the updates
-            this.fetchBookmarks();
-        }
+      return false;
     },
-    
-    created() {
-        this.$p.loadCategory('bookmark').then(()=>{
-            this.isPhrasenLoaded = true;
+  },
+  methods: {
+    async fetchBookmarks() {
+      await this.$fhcApi.factory.bookmark
+        .getBookmarks()
+        .then((res) => res.data)
+        .then((result) => {
+          this.shared = result;
         })
-        //this.links = TEST_LINKS;
-        // this.links = TEST_KEINE_LINKS;
+        .catch();
     },
-    async mounted(){
-        await this.fetchBookmarks();
+    async confirmDelete() {
+      if ((await this.$fhcAlert.confirmDelete()) === false) return;
     },
-    template: /*html*/`
+    addLink() {
+      this.$fhcApi.factory.bookmark
+        .insertBookmark({
+          tag: this.config.tag,
+          title: this.title_input,
+          url: this.url_input,
+        })
+        .then((res) => res.data)
+        .then((result) => {
+          this.$fhcAlert.alertInfo("bookmark added");
+        })
+        .catch();
+
+      // reset the values for the title and url inputs
+      this.title_input = "";
+      this.url_input = "";
+
+      // refetch the bookmarks to see the updates
+      this.fetchBookmarks();
+    },
+    async removeLink(bookmark_id) {
+      await this.confirmDelete();
+      this.$fhcApi.factory.bookmark
+        .deleteBookmark(bookmark_id)
+        .then((res) => res.data)
+        .then((result) => {
+          this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkDeleted"));
+        })
+        .catch();
+
+      // refetch the bookmarks to see the updates
+      this.fetchBookmarks();
+    },
+  },
+
+  created() {
+    this.$p.loadCategory("bookmark").then(() => {
+      this.isPhrasenLoaded = true;
+    });
+  },
+  async mounted() {
+    await this.fetchBookmarks();
+  },
+  template: /*html*/ `
     <div class="widgets-url w-100 h-100">
         <div v-if="configMode">
             <div class="mb-3">
@@ -90,11 +93,14 @@ export default {
         </div>
         <div class="d-flex flex-column justify-content-between">
         <!-- todo: widgetTag ?? -->
-            <template v-if="links">
-                <header><b>{{ widgetTag }}</b></header>
-                <div v-for="link in links" :key="link.id" class="d-flex mt-2">
+            <template v-if="shared">
+                <header><b>{{ tagName }}</b></header>
+                <div v-if="!emptyBookmarks" v-for="link in shared" :key="link.id" class="d-flex mt-2">
                     <a target="_blank" :href="link.url"><i class="fa fa-solid fa-arrow-up-right-from-square"></i> {{ link.title }}</a>
                     <a class="ms-auto" href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode"><i class="fa fa-regular fa-trash-can"></i></a>
+                </div>
+                <div v-else class="d-flex mt-2">
+                    <span>{{$p.t('bookmark','emptyBookmarks')}}</span>
                 </div>
             </template>
             <template v-else>
@@ -103,8 +109,8 @@ export default {
                 </p>
             </template>
         </div>
-    </div>`
-}
+    </div>`,
+};
 
 /*
 Link JSON structure:
@@ -120,32 +126,3 @@ Link JSON structure:
     "updatevon": null
 }
 */
-
-
-const TEST_KEINE_LINKS = [];
-const TEST_LINKS = [
-    {
-        id: 0,
-        tag: 'Zeitverwaltung',
-        title: 'Zeitverwaltung' + 'link 0',
-        url: 'https://www.technikum-wien.at'
-    },
-    {
-        id: 1,
-        tag: 'Zeitverwaltung',
-        title: 'Zeitverwaltung' + 'link 1',
-        url: 'https://www.technikum-wien.at'
-    },
-    {
-        id: 2,
-        tag: 'Zeitverwaltung',
-        title: 'Zeitverwaltung' + 'link 2',
-        url: 'https://www.technikum-wien.at'
-    },
-    {
-        id: 3,
-        tag: 'Zeitverwaltung',
-        title: 'Zeitverwaltung' + 'link 3',
-        url: 'https://www.technikum-wien.at'
-    }
-];
