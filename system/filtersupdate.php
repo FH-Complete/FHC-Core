@@ -1379,7 +1379,44 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null
-	)
+		),
+		array(
+			'app' => 'personalverwaltung',
+			'dataset_name' => 'handyverwaltung',
+			'filter_kurzbz' => 'ma4handyverwaltung',
+			'description' => '{MA Handyverwaltung}',
+			'sort' => 1,
+			'default_filter' => true,
+			'filter' => '
+				{
+					"name": "MA Handyverwaltung",
+					"columns": [
+						{"name": "UID"},
+						{"name": "PersonId"},
+						{"name": "Vorname"},
+						{"name": "Nachname"},
+						{"name": "EMail"}, 
+						{"name": "Unternehmen"}, 
+						{"name": "Vertragsart"}, 
+						{"name": "DV_von"}, 
+						{"name": "DV_bis"}, 
+						{"name": "Wochenstunden"}, 
+						{"name": "WS_von"}, 
+						{"name": "WS_bis"}, 
+						{"name": "Standardkostenstelle"}
+					],
+					"filters": [
+						{
+							"name": "Nachname",
+							"option": "",
+							"operation": "",
+							"condition": ""
+						}
+					]
+				}
+			',
+			'oe_kurzbz' => null,
+		),
 );
 
 // Loop through the filters array
