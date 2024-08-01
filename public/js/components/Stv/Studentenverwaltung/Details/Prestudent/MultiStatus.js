@@ -235,7 +235,8 @@ export default{
 			statusData: {},
 			statusId: {},
 			dataMeldestichtag: null,
-			statusNew: true
+			statusNew: true,
+			maxSem: 0
 		};
 	},
 	watch: {
@@ -246,9 +247,20 @@ export default{
 				else
 					this.data.tabulatorOptions.ajaxURL = 'api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id;
 			}
+			this.getMaxSem();
 		}
 	},
 	methods: {
+		getMaxSem() {
+			const studiengang_kzs = this.modelValue.studiengang_kz
+				? [this.modelValue.studiengang_kz]
+				: this.modelValue.map(prestudent => prestudent.studiengang_kz);
+			this.maxSem = 0;
+			this.$fhcApi
+				.post('api/frontend/v1/stv/status/getMaxSemester/', {studiengang_kzs})
+				.then(result => this.maxSem = result.data)
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 		actionNewStatus() {
 			this.$refs.test.open(this.modelValue);
 		},
@@ -317,6 +329,8 @@ export default{
 		}
 	},
 	created() {
+		this.getMaxSem();
+
 		this.$fhcApi
 			.get('api/frontend/v1/stv/status/getLastBismeldestichtag/')
 			.then(result => {
@@ -327,9 +341,9 @@ export default{
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-		<div class="stv-list h-100 pt-3">
+		<div class="stv-multistatus h-100 pt-3">
 			
-			<status-modal ref="test" :meldestichtag="new Date(dataMeldestichtag)" @saved="reload"></status-modal>
+			<status-modal ref="test" :meldestichtag="new Date(dataMeldestichtag)" :max-sem="maxSem" @saved="reload"></status-modal>
 				
 			<core-filter-cmpt
 				v-if="!this.modelValue.length"

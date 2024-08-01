@@ -1756,6 +1756,26 @@ $phrases = array(
 		)
 	),
 	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldMustBeArray',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das {field} Feld muss ein Array sein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The {field} field must be an array',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 	'app' => 'core',
 	'category' => 'anrechnung',
 	'phrase' => 'benotungDerLV',

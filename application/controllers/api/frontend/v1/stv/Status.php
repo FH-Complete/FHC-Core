@@ -11,6 +11,7 @@ class Status extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getHistoryPrestudent' => ['admin:r', 'assistenz:r'],
+			'getMaxSemester' => ['admin:r', 'assistenz:r'],
 			'changeStatus' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			'addStudent' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
 			'getStatusgruende' => self::PERM_LOGGED,
@@ -61,6 +62,41 @@ class Status extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
+	}
+
+	/**
+	 * Gets the maximum possible semester for one or more Studiengaenge.
+	 * If there are more than one Studiengang each maximum is calculated and
+	 * the smallest result is returned.
+	 *
+	 * @return void
+	 */
+	public function getMaxSemester()
+	{
+		$studiengang_kzs = $this->input->post('studiengang_kzs');
+
+		if (!$studiengang_kzs || !is_array($studiengang_kzs)) {
+			$this->load->library('form_validation');
+
+			$this->form_validation->set_rules('studiengang_kzs', '', 'required|is_null', [
+				'is_null' => $this->p->t('ui', 'error_fieldMustBeArray')
+			]);
+
+			if (!$this->form_validation->run())
+				$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
+		
+
+		if (defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER == false)
+			$this->terminateWithSuccess(100);
+
+		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+		
+		$result = $this->LehrverbandModel->getMaxSemester($studiengang_kzs);
+		
+		$maxsem = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($maxsem ? current($maxsem)->maxsem : 10);
 	}
 
 	public function getStatusgruende()

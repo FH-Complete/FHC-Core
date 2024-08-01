@@ -37,6 +37,10 @@ export default{
 		meldestichtag: {
 			type: Date,
 			required: true
+		},
+		maxSem: {
+			type: Number,
+			required: true
 		}
 	},
 	data() {
@@ -58,12 +62,13 @@ export default{
 				'Unterbrecher',
 				'Diplomand',
 				'Incoming'
-			],
-			// TODO(chris): IMPLEMENT!
-			maxSem:  Array.from({ length: 11 }, (_, index) => index),
+			]
 		};
 	},
 	computed: {
+		semester() {
+			return Array.from({length: this.maxSem}, (_, index) => index);
+		},
 		bisLocked() {
 			if (this.statusNew || this.hasPermissionToSkipStatusCheck)
 				return false;
@@ -207,7 +212,7 @@ export default{
 		</template>
 
 		<core-form ref="form">
-			
+
 			<form-validation></form-validation>
 			
 			<p v-if="bisLocked && !isStatusBeforeStudent">
@@ -249,7 +254,6 @@ export default{
 					{{ sem.studiensemester_kurzbz }}
 				</option>
 			</form-input>
-			<!-- TODO(manu) if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false) 100 Semester-->
 			<form-input
 				container-class="mb-3"
 				type="select"
@@ -259,7 +263,7 @@ export default{
 				:disabled="bisLocked && !isStatusBeforeStudent"
 				>
 				<option
-					v-for="number in maxSem"
+					v-for="number in semester"
 					:key="number"
 					:value="number"
 					>
