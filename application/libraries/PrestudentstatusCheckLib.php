@@ -145,84 +145,72 @@ class PrestudentstatusCheckLib
 
 	/**
 	 * Check if Reihungstest was admitted
-	 * @param integer $prestudent_id
-	 * @return booleans $reihungstest_angetreten, error if not angetreten
+	 *
+	 * @param stdClass $prestudent
+	 *
+	 * @return stdClass
 	 */
-	public function checkIfAngetreten($prestudent_id)
+	public function checkIfAngetreten($prestudent)
 	{
-		$result =  $this->_getApplicationData($prestudent_id);
-		if(isError($result))
-		{
-			return getData($result);
-		}
-		$result =  current(getData($result));
-		$studentName = trim ($result->vorname.' '.$result->nachname);
-
-		if (!$result->reihungstestangetreten)
-		return error($this->_ci->p->t('lehre', 'error_keinReihungstestverfahren', ['name' => $studentName]));
-
-		return success($result->reihungstestangetreten);
+		return success($prestudent->reihungstestangetreten);
 	}
 
-		/**
+	/**
 	 * Check if ZGV-Code is registered
-	 * @param integer $prestudent_id
+	 *
+	 * @param stdClass $prestudent
+	 *
+	 * @return stdClass
+	 */
+	public function checkIfZGVEingetragen($prestudent_person)
+	{
+		return success((boolean)$prestudent_person->zgv_code);
+		return !!$prestudent_person->zgv_code;
+		//return success(false);
+		//return error(false);
+	}
+
+	/**
+	 * Check if Master ZGV-Code is registered
+	 *
+	 * @param stdClass $prestudent
+	 *
 	 * @return booleans $zgv_code, error if not registered
 	 */
-	public function checkIfZGVEingetragen($prestudent_id, $typ=null)
+	//TODO(Manu) TEST
+	public function checkIfZGVEingetragenMaster($prestudent, $typ=null)
 	{
-		$result =  $this->_getApplicationData($prestudent_id);
-		if(isError($result))
-		{
-			return getData($result);
-		}
-		$result =  current(getData($result));
-		$studentName = trim ($result->vorname.' '.$result->nachname);
+		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$result = $this->_ci->StudiengangModel->load($prestudent->studiengang_kz);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return error($this->_ci->p->t('studierendenantrag','error_no_stg', ['studiengang_kz' => $prestudent->studiengang_kz])); // TODO(chris): phrase
 
-		if ($typ && $typ=='m' && !$result->zgvmas_code)
-		{
-			return error($this->_ci->p->t('lehre', 'error_ZGVMasterNichtEingetragen', ['name' => $studentName]));
-		}
-		else
-			return success($result->zgvmas_code);
+		if (current($result->retval)->typ != 'm')
+			return success(true); // TODO(chris): correct?
 
-
-		if(!$result->zgv_code)
-		{
-			return error($this->_ci->p->t('lehre', 'error_ZGVNichtEingetragen', ['name' => $studentName]));
-		}
-
-		return success($result->zgv_code);
+		return success((boolean)$prestudent->zgv_code);
 	}
 
 	/**
 	 * Checks if a bewerber status already exists.
-	 * @return error if invalid
-	 * @return error if no bewerberstatus, success otherwise
+	 *
+	 * @param integer $prestudent_id
+	 * *
+	 * @return stdClass
 	 */
 	public function checkIfExistingBewerberstatus($prestudent_id)
 	{
-		$result =  $this->_getApplicationData($prestudent_id);
-		if(isError($result))
-		{
-			return getData($result);
-		}
-		$result =  current(getData($result));
-		$studentName = trim ($result->vorname.' '.$result->nachname);
-
 		$result =  $this->_ci->PrestudentstatusModel->checkIfExistingBewerberstatus(
 			$prestudent_id
 		);
-		if(isError($result))
-		{
-			return getData($result);
-		}
-		if(getData($result) == "0")
-		{
-			return error($this->_ci->p->t('lehre','error_keinBewerber', ['name' => $studentName]));
-		}
-		return success(getData($result));
+		if (isError($result))
+			return $result;
+
+		return success(getData($result) != '0');
 	}
+
 
 	/**
 	 * Checks if status aufgenommen already exists.

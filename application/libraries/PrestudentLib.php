@@ -421,7 +421,7 @@ class PrestudentLib
 		return success();
 	}
 
-	public function setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, $bestaetigtAm, $bestaetigtVon)
+	public function setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
 	{
 
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
@@ -477,8 +477,8 @@ class PrestudentLib
 			'insertamum' => date('c'),
 			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
 			'studienplan_id'=> $prestudent_status->studienplan_id,
-			'bestaetigtvon' => $bestaetigtVon,
-			'bestaetigtam' => $bestaetigtAm
+			'bestaetigtvon' => getAuthUID(),
+			'bestaetigtam' => date('c')
 		]);
 
 		if (isError($result))
