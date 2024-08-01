@@ -422,3 +422,79 @@ function isValidDate($dateString)
 		return false;
 	}
 }
+
+
+// ------------------------------------------------------------------------
+// Collection of utility functions for form validation purposes
+// ------------------------------------------------------------------------
+
+/**
+ * check if string can be converted to a date
+ */
+function is_valid_date($dateString)
+{
+	try
+	{
+		return (new DateTime($dateString)) !== false;
+	}
+	catch(Exception $e)
+	{
+		return false;
+	}
+}
+
+/**
+ * check if given permissions are met
+ */
+function has_write_permissions($value, $permissions = '')
+{
+	if (!$permissions)
+		$permissions = $value;
+	$permissions = explode(',', $permissions);
+
+	$CI =& get_instance();
+	$CI->load->library('AuthLib');
+	$CI->load->library('PermissionLib');
+
+	return $CI->permissionlib->hasAtLeastOne(
+		$permissions,
+		'sometable',
+		PermissionLib::WRITE_RIGHT
+	);
+}
+
+/**
+ * check if has permissions for a studiengang_kz
+ */
+function has_permissions_for_stg($studiengang_kz, $permissions = '')
+{
+	if (!$permissions)
+		return false;
+	$permissions = explode(',', $permissions);
+
+	$CI =& get_instance();
+	$CI->load->library('AuthLib');
+	$CI->load->library('PermissionLib');
+
+	foreach ($permissions as $perm) {
+		if (strpos($perm, PermissionLib::PERMISSION_SEPARATOR) === false) {
+			$CI->addError(
+				'The given permission does not use the correct format',
+				FHCAPI_Controller::ERROR_TYPE_GENERAL
+			);
+			return false;
+		}
+
+		list($perm, $accesstype) = explode(PermissionLib::PERMISSION_SEPARATOR, $perm);
+		$at = '';
+		if (strpos($accesstype, PermissionLib::READ_RIGHT) !== false)
+			$at = PermissionLib::SELECT_RIGHT; // S
+		if (strpos($accesstype, PermissionLib::WRITE_RIGHT) !== false)
+			$at .= PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT; // UID
+
+		if ($CI->permissionlib->isBerechtigt($perm, $at, $studiengang_kz))
+			return true;
+	}
+
+	return false;
+}
