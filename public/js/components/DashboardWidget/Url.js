@@ -5,7 +5,6 @@ export default {
   data: () => ({
     title_input: "",
     url_input: "",
-    isPhrasenLoaded: false,
   }),
   mixins: [AbstractWidget],
   computed: {
@@ -37,16 +36,16 @@ export default {
     },
     addLink() {
       this.$fhcApi.factory.bookmark
-        .insertBookmark({
+        .insert({
           tag: this.config.tag,
           title: this.title_input,
           url: this.url_input,
         })
         .then((res) => res.data)
         .then((result) => {
-          this.$fhcAlert.alertInfo("bookmark added");
+          this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkAdded"));
         })
-        .catch();
+        .catch(this.$fhcAlert.handleSystemError);
 
       // reset the values for the title and url inputs
       this.title_input = "";
@@ -58,7 +57,7 @@ export default {
     async removeLink(bookmark_id) {
       await this.confirmDelete();
       this.$fhcApi.factory.bookmark
-        .deleteBookmark(bookmark_id)
+        .delete(bookmark_id)
         .then((res) => res.data)
         .then((result) => {
           this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkDeleted"));
@@ -68,12 +67,6 @@ export default {
       // refetch the bookmarks to see the updates
       this.fetchBookmarks();
     },
-  },
-
-  created() {
-    this.$p.loadCategory("bookmark").then(() => {
-      this.isPhrasenLoaded = true;
-    });
   },
   async mounted() {
     await this.fetchBookmarks();
@@ -95,10 +88,12 @@ export default {
         <!-- todo: widgetTag ?? -->
             <template v-if="shared">
                 <header><b>{{ tagName }}</b></header>
-                <div v-if="!emptyBookmarks" v-for="link in shared" :key="link.id" class="d-flex mt-2">
-                    <a target="_blank" :href="link.url"><i class="fa fa-solid fa-arrow-up-right-from-square"></i> {{ link.title }}</a>
-                    <a class="ms-auto" href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode"><i class="fa fa-regular fa-trash-can"></i></a>
-                </div>
+                <template v-if="!emptyBookmarks">
+                  <div v-for="link in shared" :key="link.id" class="d-flex mt-2">
+                      <a target="_blank" :href="link.url"><i class="fa fa-solid fa-arrow-up-right-from-square"></i> {{ link.title }}</a>
+                      <a class="ms-auto" href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode"><i class="fa fa-regular fa-trash-can"></i></a>
+                  </div>
+                </template>
                 <div v-else class="d-flex mt-2">
                     <span>{{$p.t('bookmark','emptyBookmarks')}}</span>
                 </div>

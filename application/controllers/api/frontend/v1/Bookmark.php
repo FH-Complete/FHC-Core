@@ -52,10 +52,6 @@ class Bookmark extends FHCAPI_Controller
 	{
         $bookmarks = $this->BookmarkModel->loadWhere(["uid"=>$this->uid]);
 
-        if(isError($bookmarks)){
-            $this->terminateWithError(getError($bookmarks));
-        }
-
         $bookmarks = $this->getDataOrTerminateWithError($bookmarks);
 
         $this->terminateWithSuccess($bookmarks);
@@ -68,32 +64,20 @@ class Bookmark extends FHCAPI_Controller
 	 */
     public function delete($bookmark_id)
 	{
-        if(!isset($bookmark_id)) $this->terminateWithError("missing required parameters");
-        
         $bookmark = $this->BookmarkModel->load($bookmark_id);
-
-        if(isError($bookmark)){
-            $this->terminateWithError(getError($bookmark));
-        }
 
         $bookmark = current($this->getDataOrTerminateWithError($bookmark));
 
         // only delete bookmark if the user is the owner of the bookmark
-        $this->load->library('PermissionLib');
-
         if($bookmark->uid == $this->uid || $this->permissionlib->isBerechtigt('admin')){
 
             $delete_result = $this->BookmarkModel->delete($bookmark_id);
-
-            if(isError($delete_result)){
-                $this->terminateWithError(getError($delete_result));
-            }
 
             $delete_result = $this->getDataOrTerminateWithError($delete_result);
 
             $this->terminateWithSuccess($delete_result);
         }else{
-            $this->terminateWithError("You are not authorized to delete this bookmark");
+            $this->_outputAuthError(['delete' => ['admin:rw']]);
         }
     }
 
@@ -104,22 +88,17 @@ class Bookmark extends FHCAPI_Controller
 	 */
     public function insert()
 	{
+        // form validation
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('url', 'URL', 'required|valid_url|max_length[511]');
+        $this->form_validation->set_rules('title', 'Title', 'required|max_length[255]');
+        if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
+
         $url = $this->input->post('url',true);
         $title = $this->input->post('title',true);
-        $tag = $this->input->post('tag',true);
+        $tag = $this->input->post('tag', true);
 
-        // set the parameters to null if they are not present in the request payload
-        if($title == FALSE) $title = NULL;
-        if($tag == FALSE) $tag = NULL;
-
-        if(!isset($url))$this->terminateWithError("missing required parameters");
-
-        $insert_into_result = $this->BookmarkModel->execReadOnlyQuery("
-        INSERT INTO dashboard.tbl_bookmark (uid, url, title,tag, insertvon, updateamum, updatevon) VALUES (?,?,?,?,?,NULL,NULL);",[$this->uid,$url,$title,$tag,$this->uid]);
-
-        if(isError($insert_into_result)){
-            $this->terminateWithError(getError($insert_into_result));
-        }
+        $insert_into_result = $this->BookmarkModel->insert(['uid'=>$this->uid, 'url'=>$url, 'title'=>$title,'tag'=>$tag, 'insertvon'=>$this->uid, 'updateamum'=>NULL, 'updatevon'=>NULL]);
 
         $insert_into_result = $this->getDataOrTerminateWithError($insert_into_result);
 

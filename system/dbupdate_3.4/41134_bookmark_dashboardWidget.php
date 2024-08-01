@@ -8,7 +8,7 @@ if (!$result = @$db->db_query("SELECT to_regclass('dashboard.tbl_bookmark')"))
                 bookmark_id BIGINT PRIMARY KEY,
                 uid VARCHAR(255) NOT NULL,
                 url VARCHAR(511) NOT NULL,
-                title VARCHAR(255) NULL,
+                title VARCHAR(255) NOT NULL,
                 tag VARCHAR(255) NULL,
                 insertamum TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
                 insertvon VARCHAR(255) NULL REFERENCES public.tbl_benutzer(uid),
