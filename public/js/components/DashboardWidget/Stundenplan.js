@@ -36,7 +36,7 @@ export default {
 	},
 	created() {
 		this.$emit('setConfig', false);
-		/* axios
+		axios
 			.get(this.apiurl + '/components/Cis/Stundenplan/Stunden').then(res => {
 				res.data.retval.forEach(std => {
 					this.stunden[std.stunde] = std; // TODO(chris): geht besser
@@ -57,7 +57,7 @@ export default {
 					})
 					.catch(err => { console.log(err);console.error('ERROR: ', err.response.data) });
 			})
-			.catch(err => { console.error('ERROR: ', err.response.data) }); */
+			.catch(err => { console.error('ERROR: ', err.response.data) });
 	},
 	template: `
 	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">

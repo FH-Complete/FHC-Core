@@ -27,20 +27,15 @@ class Ampeln extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getNonConfirmedActiveAmpeln' => self::PERM_LOGGED,
-            'getAllActiveAmpeln' => self::PERM_LOGGED,
-            'getConfirmedActiveAmpeln' => self::PERM_LOGGED,
-            'confirmAmpel' => self::PERM_LOGGED,
+			'open' => self::PERM_LOGGED,
+            'all' => self::PERM_LOGGED,
+            'confirm' => self::PERM_LOGGED,
             'alleAmpeln' => self::PERM_LOGGED,
-            
 		]);
-
 
 		$this->load->model('content/Ampel_model', 'AmpelModel');
         $this->load->model('system/Sprache_model','SpracheModel');
 
-
-		//? put the uid and pid inside the controller for reusability
 		$this->uid = getAuthUID();
 		$this->pid = getAuthPersonID();
 
@@ -50,21 +45,18 @@ class Ampeln extends FHCAPI_Controller
 	// Public methods
 
     /**
-	 * confirms ampel and inserts ampelID in public.tbl_ampel_benutzer_bestaetigt
+	 * confirms ampel and inserts ampel_id in public.tbl_ampel_benutzer_bestaetigt
      * @access public
 	 * 
 	 */
-	public function confirmAmpel($ampel_id)
+	public function confirm($ampel_id)
 	{
-        if(!isset($ampel_id)){
-            $this->terminateWithError("missing parameter");
-        }
+        $this->load->library('form_validation');
+        $this->form_validation->set_data(['ampel_id'=> $ampel_id]);
+        $this->form_validation->set_rules('ampel_id', 'Ampel ID', 'required|integer');
+        if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
 
         $insert_into_result = $this->AmpelModel->confirmAmpel($ampel_id,$this->uid);
-
-        if(isError($insert_into_result)){
-            $this->terminateWithError(getError($insert_into_result));
-        }
 
         $insert_into_result = $this->getDataOrTerminateWithError($insert_into_result);
 
@@ -76,9 +68,8 @@ class Ampeln extends FHCAPI_Controller
      * @access public
 	 * 
 	 */
-	public function getNonConfirmedActiveAmpeln()
+	public function open()
 	{
-        
         $userAmpeln = array();
 
         // fetch active ampeln
@@ -98,33 +89,9 @@ class Ampeln extends FHCAPI_Controller
                 // check if the user was assigned to the ampel
                 $zugeteilt = $this->AmpelModel->isZugeteilt($this->uid, $ampel->benutzer_select);
 
-                if(isError($zugeteilt)){
-                    $this->addError(getError($zugeteilt));
-                    $zugeteilt = false;
-                }else{
-                    $zugeteilt = $this->getDataOrTerminateWithError($zugeteilt);
-                }
+                $zugeteilt = $this->getDataOrTerminateWithError($zugeteilt);
 
                 if($zugeteilt) $userAmpeln[] = $this->translateAmpel($ampel);
-                
-                // old way to check if an ampel was assigned to the user
-                /* $userUID_array = $this->AmpelModel->execBenutzerSelect($ampel->benutzer_select);
-                if(isError($userUID_array)){
-                    $this->addError(getError($userUID_array));
-                }
-                $userUID_array = $this->getDataOrTerminateWithError($userUID_array);
-                
-                
-                // check if user is assigned to the ampel
-                foreach($userUID_array as $user_obj){
-                    // property is called uid for students and mitarbeiter_uid for employees
-                    $user_uid = property_exists($user_obj,"uid") ? $user_obj->uid : $user_obj->mitarbeiter_uid;
-                    if($user_uid === $this->uid){
-                        $userAmpeln[] = $this->translateAmpel($ampel);
-                    }
-                } */ 
-                
-
             }
         }
         
@@ -132,11 +99,11 @@ class Ampeln extends FHCAPI_Controller
 	}
 
     /**
-	 * queries active ampeln by the user 
+	 * queries all ampeln of the user 
      * @access public
 	 * 
 	 */
-    public function getAllActiveAmpeln()
+    public function all()
 	{
         $userAmpeln = array();
         
@@ -151,15 +118,9 @@ class Ampeln extends FHCAPI_Controller
             // check if the ampel was assigned to the user
             $zugeteilt = $this->AmpelModel->isZugeteilt($this->uid, $ampel->benutzer_select);
 
-            if(isError($zugeteilt)){
-                $this->addError(getError($zugeteilt));
-                $zugeteilt = false;
-            }else{
-                $zugeteilt = $this->getDataOrTerminateWithError($zugeteilt);
-            }
+            $zugeteilt = $this->getDataOrTerminateWithError($zugeteilt);
 
-            if($zugeteilt) $userAmpeln[] = $this->translateAmpel($ampel);
-                        
+            if($zugeteilt) $userAmpeln[] = $this->translateAmpel($ampel);    
         }
 
         $this->terminateWithSuccess($userAmpeln);
@@ -174,8 +135,6 @@ class Ampeln extends FHCAPI_Controller
 
         //fetch all ampeln
         $alle_ampeln = $this->AmpelModel->alleAmpeln($this->uid);
-
-        if(isError($alle_ampeln)) $this->terminateWithError(getError($alle_ampeln));
 
         $alle_ampeln = $this->getDataOrTerminateWithError($alle_ampeln);
 
@@ -206,12 +165,14 @@ class Ampeln extends FHCAPI_Controller
         
         $userLanguage = $this->SpracheModel->loadWhere(["sprache" => $userLanguage]);
         
-        if(isError($userLanguage)) $this->terminateWithError(getError($userLanguage));
         $userLanguage = $this->getDataOrTerminateWithError($userLanguage)[0]->index - 1; // why does the index start at 1?
 
         // translate the ampel description and button text
-        if(isset($ampel->beschreibung) && count($ampel->beschreibung)>=($userLanguage+1)) $ampel->beschreibung = $ampel->beschreibung[$userLanguage];
-        if(isset($ampel->buttontext) && count($ampel->buttontext)>=($userLanguage+1)) $ampel->buttontext = $ampel->buttontext[$userLanguage];
+        if(isset($ampel->beschreibung) && count($ampel->beschreibung)>=($userLanguage+1)) 
+        $ampel->beschreibung = $ampel->beschreibung[$userLanguage];
+        
+        if(isset($ampel->buttontext) && count($ampel->buttontext)>=($userLanguage+1)) 
+        $ampel->buttontext = $ampel->buttontext[$userLanguage];
 
         return $ampel;
 

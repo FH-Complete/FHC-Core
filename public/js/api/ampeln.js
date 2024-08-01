@@ -1,33 +1,18 @@
 export default {
     
-    getNonConfirmedActiveAmpeln: function () {
+    open: function () {
         return this.$fhcApi.get(
-        FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/api/frontend/v1/Ampeln/getNonConfirmedActiveAmpeln`,{});
+        `/api/frontend/v1/Ampeln/open`,{});
     },
 
-    getAllActiveAmpeln: function () {
+    all: function () {
         return this.$fhcApi.get(
-        FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/api/frontend/v1/Ampeln/getAllActiveAmpeln`,{});
+        `/api/frontend/v1/Ampeln/all`,{});
     },
 
-    
-
-    confirmAmpel: function (ampel_id) {
+    confirm: function (ampel_id) {
         return this.$fhcApi.get(
-        FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/api/frontend/v1/Ampeln/confirmAmpel/${ampel_id}`,{});
-    },
-
-    alleAmpeln: function () {
-        return this.$fhcApi.get(
-        FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/api/frontend/v1/Ampeln/alleAmpeln`,{});
+        `/api/frontend/v1/Ampeln/confirm/${ampel_id}`,{});
     },
 
 }

@@ -25,6 +25,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * Used to create a return object, should not be used directly
+ * @return  stdClass
  */
 function _createReturnObject($code, $error, $retval)
 {

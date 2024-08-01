@@ -10,7 +10,6 @@ export default {
         source: '',
         allAmpeln:null,
         activeAmpeln:null,
-        isPhrasenLoaded: false,
     }),
     mixins: [
         AbstractWidget
@@ -52,12 +51,9 @@ export default {
                     default: return data;
                 }
         },
-        
-
         toggleFilter(value){
             this.filter === value ? this.filter = '' : this.filter = value;
         },
-        
         closeOffcanvasAmpeln()
         {
             for (let i = 0; i < this.ampelnComputed.length; i++)
@@ -81,19 +77,17 @@ export default {
             // maybe we also want to reset the source (open/alle) of the displayed ampeln
         },
         async fetchNonConfirmedActiveAmpeln(){
-
-            await this.$fhcApi.factory.ampeln.getNonConfirmedActiveAmpeln().then(res=>{
+            await this.$fhcApi.factory.ampeln.open().then(res=>{
                 this.activeAmpeln = res.data.sort((a,b) => new Date(b.deadline) - new Date(a.deadline));
             }); 
         },
         async fetchAllActiveAmpeln(){
-
-            await this.$fhcApi.factory.ampeln.getAllActiveAmpeln().then(res=>{
+            await this.$fhcApi.factory.ampeln.all().then(res=>{
                 this.allAmpeln = res.data.sort((a,b) => new Date(b.deadline) - new Date(a.deadline));
             }); 
         },
         async confirm(ampelId){
-            this.$fhcApi.factory.ampeln.confirmAmpel(ampelId)
+            this.$fhcApi.factory.ampeln.confirm(ampelId)
             .then(res => res.data)
             .then(result => {
                 this.$fhcAlert.alertSuccess(this.$p.t('ampeln','ampelBestaetigt'));
@@ -114,13 +108,9 @@ export default {
         }
     },
     created() {
-        this.$p.loadCategory(['ampel','ui']).then(() => {
-            this.isPhrasenLoaded = true;
-        });
         this.$emit('setConfig', false);    
     },
     async mounted() {
-        
         await this.fetchNonConfirmedActiveAmpeln();
         await this.fetchAllActiveAmpeln();
     },

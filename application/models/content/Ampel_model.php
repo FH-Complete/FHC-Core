@@ -16,7 +16,7 @@ class Ampel_model extends DB_Model
 	 * 1. not after the deadline date
 	 * 2. not before the vorlaufszeit
 	 * @param bool $email If true, then only ampeln are retrieved that are marked to be sent by mail.
-	 * @return array Returns array of objects.
+	 * @return stdClass Returns array of objects.
 	 */
 	public function active($email = false)
 	{
@@ -52,7 +52,7 @@ class Ampel_model extends DB_Model
 	/**
 	 * Returns all Ampel-receiver of a specific Ampel.
 	 * @param string $benutzer_select SQL Statement which defines the Ampel-receiver.
-	 * @return array Returns array of objects with property 'uid'.
+	 * @return stdClass Returns array of objects with property 'uid'.
 	 */
 	public function execBenutzerSelect($benutzer_select)
 	{
@@ -102,19 +102,16 @@ class Ampel_model extends DB_Model
 	 * confirms Ampel by the user.
 	 * @param int $ampel_id Ampel-ID
 	 * @param string $uid UID
-	 * @return bool insert into result
+	 * @return stdClass insert into result
 	 */
 	public function confirmAmpel($ampel_id, $uid)
 	{
-		if(isset($ampel_id) && isset($uid)){
-			return $this->execQuery('
-			INSERT INTO public.tbl_ampel_benutzer_bestaetigt (ampel_id, uid)
-			VALUES (?,?);', array($ampel_id, $uid));
-		}else{
-
-			return error("parameter were missing to execute the insert into");
-		}
-		
+		if(isset($ampel_id) && isset($uid))
+            return error("parameter were missing to execute the insert into");
+        
+        return $this->execQuery('
+        INSERT INTO public.tbl_ampel_benutzer_bestaetigt (ampel_id, uid)
+        VALUES (?,?);', array($ampel_id, $uid));
 	}
 
 	/**
@@ -139,7 +136,6 @@ class Ampel_model extends DB_Model
 		$zugeteilt = getData($zugeteilt);
 
 		return success(current($zugeteilt)->zugeteilt);
-
 	}
 
 	
