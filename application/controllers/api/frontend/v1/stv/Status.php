@@ -205,9 +205,68 @@ class Status extends FHCAPI_Controller
 		//Form Validation
 		$this->load->library('form_validation');
 
+		// $this->form_validation->set_rules('status_kurzbz', $this->p->t('lehre', 'status_kurzbz'), 
+		// [
+		// 	'required',
+		// 	//Check Reihungstest
+		// 	['reihungstest_check', function ($value) use ($prestudent_person) {
+		// 		if (!REIHUNGSTEST_CHECK)
+		// 			return true;
+		// 		if ($value != Prestudentstatus_model::STATUS_BEWERBER)
+		// 			return true;
+		// 		$result = $this->prestudentstatuschecklib->checkIfAngetreten($prestudent_person);
+		// 		return $this->getDataOrTerminateWithError($result);
+		// 	}],
+		// 	//Check ZGV
+		// 	['checkIfZGV', function ($value) use ($prestudent_person) {
+		// 		if (!ZGV_CHECK)
+		// 			return true;
+		// 		if ($value != Prestudentstatus_model::STATUS_BEWERBER)
+		// 			return true;
+		// 		$result = $this->prestudentstatuschecklib->checkIfZGVEingetragen($prestudent_person);
+		// 		return $this->getDataOrTerminateWithError($result);
+		// 	}],
+		// ], 
+
+		// [
+		// 	'reihungstest_check' => $this->p->t('lehre', 'error_keinReihungstestverfahren', ['name' => $studentName]),
+		// 	'checkIfZGV' => $this->p->t('lehre', 'error_ZGVNichtEingetragen', ['name' => $studentName]),
+		// ]);
+
+
+		// $this->form_validation->set_rules(
+		// 	'status_kurzbz', 
+		// 	$this->p->t('lehre', 'status_kurzbz'), 
+		// 	[
+		// 		'required',
+		// 		//Check Reihungstest
+		// 		['reihungstest_check', function ($value) use ($prestudent_person) {
+		// 			if (!REIHUNGSTEST_CHECK)
+		// 				return true;
+		// 			if ($value != Prestudentstatus_model::STATUS_BEWERBER)
+		// 				return true;
+		// 			$result = $this->prestudentstatuschecklib->checkIfAngetreten($prestudent_person);
+		// 			return $this->getDataOrTerminateWithError($result);
+		// 		}]
+		// 	],
+		// 	//Check Bewerberstatus
+		// 	[
+		// 		'checkIfExistingBewerberstatus', function () use ($prestudent_id, $status_kurzbz) {
+		// 		if ($status_kurzbz != Prestudentstatus_model::STATUS_AUFGENOMMENER &&
+		// 			$status_kurzbz != Prestudentstatus_model::STATUS_WARTENDER &&
+		// 			$status_kurzbz != Prestudentstatus_model::STATUS_ABGEWIESENER)
+		// 			return true;
+		// 		$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
+		// 		return $this->getDataOrTerminateWithError($result);
+		// 		}]
+		// 	, [
+		// 		'reihungstest_check' => $this->p->t('lehre', 'error_keinReihungstestverfahren', ['name' => $studentName]),
+		// 		'checkIfExistingBewerberstatus' => $this->p->t('lehre', 'error_keinBewerber', ['name' => $studentName]),
+		// 	]);
+
 		$this->form_validation->set_rules(
 			'status_kurzbz',
-			$this->p->t('lehre', 'status_rolle'),
+			'Status',
 			[
 				'required',
 				//Check Reihungstest
@@ -218,38 +277,36 @@ class Status extends FHCAPI_Controller
 						return true;
 					$result = $this->prestudentstatuschecklib->checkIfAngetreten($prestudent_person);
 					return $this->getDataOrTerminateWithError($result);
-				}]
-			],
-			//Check ZGV
-			['checkIfZGV', function ($value) use ($prestudent_person) {
-				if (!ZGV_CHECK)
-					return true;
-				if ($value != Prestudentstatus_model::STATUS_BEWERBER)
-					return true;
-				$result = $this->prestudentstatuschecklib->checkIfZGVEingetragen($prestudent_person);
-				return $this->getDataOrTerminateWithError($result);
-			}],
-			//Check ZGV Master
-			['checkIfZGVMaster', function ($value) use ($prestudent_person) {
-				if (!ZGV_CHECK)
-					return true;
-				if ($value != Prestudentstatus_model::STATUS_BEWERBER)
-					return true;
-				$result = $this->prestudentstatuschecklib->checkIfZGVEingetragenMaster($prestudent_person);
-				return $this->getDataOrTerminateWithError($result);
-			}],
-			//Check Bewerberstatus
-			['checkIfExistingBewerberstatus', function () use ($prestudent_id, $status_kurzbz) {
-				if ($status_kurzbz != Prestudentstatus_model::STATUS_AUFGENOMMENER &&
-					$status_kurzbz != Prestudentstatus_model::STATUS_WARTENDER &&
-					$status_kurzbz != Prestudentstatus_model::STATUS_ABGEWIESENER)
-					return true;
-				$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
-				return $this->getDataOrTerminateWithError($result);
-			}],
-			//Check If Student
-			[
-				'required',
+				}],		
+				//Check ZGV
+				['checkIfZGV', function ($value) use ($prestudent_person) {
+					if (!ZGV_CHECK)
+						return true;
+					if ($value != Prestudentstatus_model::STATUS_BEWERBER)
+						return true;
+					$result = $this->prestudentstatuschecklib->checkIfZGVEingetragen($prestudent_person);
+					return $this->getDataOrTerminateWithError($result);
+				}],
+				//Check ZGV Master
+				['checkIfZGVMaster', function ($value) use ($prestudent_person) {
+					if (!ZGV_CHECK)
+						return true;
+					if ($value != Prestudentstatus_model::STATUS_BEWERBER)
+						return true;
+					$result = $this->prestudentstatuschecklib->checkIfZGVEingetragenMaster($prestudent_person);
+					return $this->getDataOrTerminateWithError($result);
+				}],
+				//Check Bewerberstatus
+				[
+				'checkIfExistingBewerberstatus', function () use ($prestudent_id, $status_kurzbz) {
+					if ($status_kurzbz != Prestudentstatus_model::STATUS_AUFGENOMMENER &&
+						$status_kurzbz != Prestudentstatus_model::STATUS_WARTENDER &&
+						$status_kurzbz != Prestudentstatus_model::STATUS_ABGEWIESENER)
+						return true;
+					$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
+					return $this->getDataOrTerminateWithError($result);
+				}],
+				//Check If Student
 				['status_stud_exists', function ($value) use ($prestudent_id) {
 					if ($value != Prestudentstatus_model::STATUS_STUDENT)
 						return true; // Only test if new status is Student
@@ -258,17 +315,15 @@ class Status extends FHCAPI_Controller
 
 					return $this->getDataOrTerminateWithError($result);
 				}],
-
-		],
-		[
-			'reihungstest_check' => $this->p->t('lehre', 'error_keinReihungstestverfahren', ['name' => $studentName]),
-			'checkIfExistingBewerberstatus' => $this->p->t('lehre', 'error_keinBewerber', ['name' => $studentName]),
-			'checkIfZGV' => $this->p->t('lehre', 'error_ZGVNichtEingetragen', ['name' => $studentName]),
-			'checkIfZGVMaster' => $this->p->t('lehre', 'error_ZGVMasterNichtEingetragen', ['name' => $studentName]),
-			'status_stud_exists' => $this->p->t('lehre', 'error_noStudstatus')
-		]
+			],	[
+				'reihungstest_check' => $this->p->t('lehre', 'error_keinReihungstestverfahren', ['name' => $studentName]),
+				'checkIfExistingBewerberstatus' => $this->p->t('lehre', 'error_keinBewerber', ['name' => $studentName]),
+				'checkIfZGV' => $this->p->t('lehre', 'error_ZGVNichtEingetragen', ['name' => $studentName]),
+				'checkIfZGVMaster' => $this->p->t('lehre', 'error_ZGVMasterNichtEingetragen', ['name' => $studentName]),
+				'status_stud_exists' => $this->p->t('lehre', 'error_noStudstatus')
+				]
 		);
-
+ 
 		if ($status_kurzbz == Prestudentstatus_model::STATUS_STUDENT)
 			$this->form_validation->set_rules('ausbildungssemester', $this->p->t('lehre', 'ausbildungssemester'), 'required|integer', [
 				'integer' => $this->p->t('ui', 'error_fieldNotInteger')
@@ -278,6 +333,7 @@ class Status extends FHCAPI_Controller
 				'integer' => $this->p->t('ui', 'error_fieldNotInteger')
 			]);
 
+		//TODO(Manu) check if really necessary, sth similiar above: rolle_doesnt_exist
 		$this->form_validation->set_rules('_default', '', [
 			//check if Rolle already exists
 			['checkIfExistingPrestudentRolle', function () use (
@@ -457,7 +513,7 @@ class Status extends FHCAPI_Controller
 				return $this->getDataOrTerminateWithError($result);
 			}]
 		], [
-			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhanden'),
+			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhandenMitNamen', ['name' => $studentName]),
 			'history_timesequence' => $this->p->t('lehre', 'error_statuseintrag_zeitabfolge'),
 			'history_laststatus' => $this->p->t('lehre', 'error_endstatus'),
 			'history_unterbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecher'),
