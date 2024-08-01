@@ -42,6 +42,7 @@ class Status extends FHCAPI_Controller
 			|| $this->router->method == 'confirmStatus'
 			|| $this->router->method == 'deleteStatus'
 			|| $this->router->method == 'advanceStatus'
+			|| $this->router->method == 'changeStatus'
 		) {
 			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
 			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:rw', 'assistenz:rw']);
