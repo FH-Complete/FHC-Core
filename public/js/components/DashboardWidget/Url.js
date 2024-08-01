@@ -29,7 +29,7 @@ export default {
         .then((result) => {
           this.shared = result;
         })
-        .catch();
+        .catch(this.$fhcAlert.handleSystemError);
     },
     async confirmDelete() {
       if ((await this.$fhcAlert.confirmDelete()) === false) return;
@@ -62,7 +62,7 @@ export default {
         .then((result) => {
           this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkDeleted"));
         })
-        .catch();
+        .catch(this.$fhcAlert.handleSystemError);
 
       // refetch the bookmarks to see the updates
       this.fetchBookmarks();
