@@ -44,12 +44,22 @@ class Lehrveranstaltung_model extends DB_Model
 	 * @param $eventQuery String
 	 * @param string $studiensemester_kurzbz Filter by Studiensemester
 	 * @param array $oes Filter by Organisationseinheiten
+	 * @param array $lv_ids Filter by Lehrveranstaltung-Ids
 	 * @return array
 	 */
-	public function getLvsByStudienplan($studiensemester_kurzbz = null, $oes = null)
+	public function getLvsByStudienplan($studiensemester_kurzbz = null, $oes = null, $lv_ids = null)
 	{
 		$subQry = $this->_getQryLvsByStudienplan($studiensemester_kurzbz, $oes);
-		$qry = 'SELECT * FROM ('. $subQry. ') AS tmp ORDER BY stg_typ_kurzbz, orgform_kurzbz DESC';
+		$qry = 'SELECT * FROM ('. $subQry. ') AS tmp';
+
+		if (isset($lv_ids) && is_array($lv_ids))
+		{
+			/* filter by lv_ids */
+			$implodedLvIds = "'". implode("', '", $lv_ids). "'";
+			$qry.= ' WHERE lehrveranstaltung_id IN ('. $implodedLvIds. ')';
+		}
+
+		$qry.= ' ORDER BY stg_typ_kurzbz, orgform_kurzbz DESC';
 
 		return $this->execQuery($qry);
 	}
