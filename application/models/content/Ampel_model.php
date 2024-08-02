@@ -16,7 +16,7 @@ class Ampel_model extends DB_Model
 	 * 1. not after the deadline date
 	 * 2. not before the vorlaufszeit
 	 * @param bool $email If true, then only ampeln are retrieved that are marked to be sent by mail.
-	 * @return array Returns array of objects.
+	 * @return stdClass Returns array of objects.
 	 */
 	public function active($email = false)
 	{
@@ -33,10 +33,16 @@ class Ampel_model extends DB_Model
 		}
 
 		$query .= '(
-			(NOW()<(deadline+(COALESCE(verfallszeit,0) || \' days\')::interval)::date)
-			    OR (verfallszeit IS NULL)
-			   AND (NOW()>(deadline-(COALESCE(vorlaufzeit,0) || \' days\')::interval)::date)
-			    OR (vorlaufzeit IS NULL AND NOW() < deadline))';
+			(
+				(NOW()<(deadline+(COALESCE(verfallszeit,0) || \' days\')::interval)::date)
+				OR (verfallszeit IS NULL)
+			)
+			AND 
+			(
+				(NOW()>(deadline-(COALESCE(vorlaufzeit,0) || \' days\')::interval)::date)
+			    OR (vorlaufzeit IS NULL AND NOW() < deadline)
+			)
+			)';
 
 		$query .= ' ORDER BY deadline DESC';
 
@@ -46,7 +52,7 @@ class Ampel_model extends DB_Model
 	/**
 	 * Returns all Ampel-receiver of a specific Ampel.
 	 * @param string $benutzer_select SQL Statement which defines the Ampel-receiver.
-	 * @return array Returns array of objects with property 'uid'.
+	 * @return stdClass Returns array of objects with property 'uid'.
 	 */
 	public function execBenutzerSelect($benutzer_select)
 	{
@@ -90,4 +96,110 @@ class Ampel_model extends DB_Model
 		else
 			return $result; //will contain the error-msg from execQuery
 	}
+
+
+	/**
+	 * confirms Ampel by the user.
+	 * @param int $ampel_id Ampel-ID
+	 * @param string $uid UID
+	 * @return stdClass insert into result
+	 */
+	public function confirmAmpel($ampel_id, $uid)
+	{
+		if(isset($ampel_id) && isset($uid))
+            return error("parameter were missing to execute the insert into");
+        
+        return $this->execQuery('
+        INSERT INTO public.tbl_ampel_benutzer_bestaetigt (ampel_id, uid)
+        VALUES (?,?);', array($ampel_id, $uid));
+	}
+
+	/**
+	 * checks if a user is assigned to an ampel
+	 * @param string $uid userID
+	 * @param string $benutzer_select the select query which gets all the user that are assigned to an ampel
+	 * @return stdClass 
+	 */
+	public function isZugeteilt($uid, $benutzer_select){
+		$zugeteilt = $this->execReadOnlyQuery("
+			SELECT 
+				CASE WHEN ? IN (".$benutzer_select.") 
+					THEN true 
+					ELSE false
+				END as zugeteilt	
+			", [$uid]);
+
+		if(isError($zugeteilt)){
+			return $zugeteilt;
+		}
+
+		$zugeteilt = getData($zugeteilt);
+
+		return success(current($zugeteilt)->zugeteilt);
+	}
+
+	
+
+
+	function alleAmpeln($uid){
+
+		$zugeteile_ampeln = [];
+		
+		$datum = new datum();
+		$now = $datum->mktime_fromdate(date('Y-m-d'));
+
+		// start date of user
+		$benutzerStartDate = $this->execReadOnlyQuery("
+			SELECT insertamum FROM public.tbl_benutzer WHERE uid = ?", [$uid]);
+		$benutzerStartDate = $datum->mktime_fromdate(date(current(getData($benutzerStartDate))->insertamum));
+
+		$allAmpeln = $this->execReadOnlyQuery("
+			SELECT * FROM 
+			public.tbl_ampel");
+		
+		if(isError($allAmpeln)) return error(getError($allAmpeln));
+
+		$allAmpeln = getData($allAmpeln);
+		foreach($allAmpeln as $ampel){
+
+			// check if the ampel is assigned to the user
+			$zugeteilt = $this->execReadOnlyQuery("
+			SELECT 
+				CASE WHEN ? IN (".$ampel->benutzer_select.") 
+					THEN true 
+					ELSE false
+				END as zugeteilt	
+			", [$uid]);
+			
+			if(isError($zugeteilt)) return error(getError($zugeteilt));
+
+			$zugeteilt = current(getData($zugeteilt))->zugeteilt;
+			
+			
+			// abgelaufen check
+			// $now > strtotime('+' . $ampel->verfallszeit . ' day', $ampel->deadline)
+
+			if(
+				// aktuelles datum liegt vor der Vorlaufzeit der Ampel
+				(isset($ampel->vorlaufzeit) && $now < strtotime('-' .  $ampel->vorlaufzeit . ' day', $datum->mktime_fromdate($ampel->deadline)))
+				||
+				// ampel ist vor Arbeitsstart abgelaufen
+				(isset($ampel->verfallszeit) && $benutzerStartDate > strtotime('+' . $ampel->verfallszeit . ' day', $datum->mktime_fromdate($ampel->deadline)))
+				||
+				// ampel ist vor Arbeitsstart abgelaufen (verfallszeit nicht vorhanden)
+				($benutzerStartDate > strtotime('+' . $ampel->verfallszeit . ' day', $datum->mktime_fromdate($ampel->deadline)))
+			){
+				// continue iteration if ampel is expired before work start or shouldn't be visible yet
+				continue;
+			}
+
+			$ampel->zugeteilt = $zugeteilt;
+
+			if($zugeteilt) $zugeteile_ampeln[] = $ampel; 
+			   
+		}
+
+		return success($zugeteile_ampeln);
+	}
+
 }

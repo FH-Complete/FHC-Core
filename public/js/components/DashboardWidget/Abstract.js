@@ -19,12 +19,12 @@ export default {
 	methods: {
 		formatDateTime: function(dateTime) {
 			const dt = new Date(dateTime);
-			return dt.getDate() + '.' + dt.getMonth() + '.' + dt.getFullYear() + ' | '
+			return dt.getDate() + '.' + (dt.getMonth()+1) + '.' + dt.getFullYear() + ' | '
 				+ dt.getHours() + ':' + dt.getMinutes();
 		},
 		getDate: function(dateTime){
 			const dt = new Date(dateTime);
-			return dt.getDate() + '.' + dt.getMonth() + '.' + dt.getFullYear();
+			return dt.getDate() + '.' + (dt.getMonth()+1) + '.' + dt.getFullYear();
 		}
 	}
 }
