@@ -94,6 +94,8 @@ class DB_Model extends CI_Model
 		$this->load->library('UDFLib');
 		// Loads the logs library
 		$this->load->library('LogLib');
+
+		
 	}
 
 	// ------------------------------------------------------------------------------------------

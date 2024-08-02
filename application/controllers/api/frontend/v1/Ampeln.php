@@ -91,7 +91,7 @@ class Ampeln extends FHCAPI_Controller
 
                 $zugeteilt = $this->getDataOrTerminateWithError($zugeteilt);
 
-                if($zugeteilt) $userAmpeln[] = $this->translateAmpel($ampel);
+                if($zugeteilt) $userAmpeln[] = $ampel;
             }
         }
         
@@ -150,33 +150,7 @@ class Ampeln extends FHCAPI_Controller
 
     }
 
-    //------------------------------------------------------------------------------------------------------------------
-	// Private methods
-    
-    /**
-	 * translate ampel description and button text
-     * @access private
-	 * 
-	 */
-    public function translateAmpel($ampel){
 
-        // fetch user language 
-        $userLanguage = getUserLanguage();
-        
-        $userLanguage = $this->SpracheModel->loadWhere(["sprache" => $userLanguage]);
-        
-        $userLanguage = $this->getDataOrTerminateWithError($userLanguage)[0]->index - 1; // why does the index start at 1?
-
-        // translate the ampel description and button text
-        if(isset($ampel->beschreibung) && count($ampel->beschreibung)>=($userLanguage+1)) 
-        $ampel->beschreibung = $ampel->beschreibung[$userLanguage];
-        
-        if(isset($ampel->buttontext) && count($ampel->buttontext)>=($userLanguage+1)) 
-        $ampel->buttontext = $ampel->buttontext[$userLanguage];
-
-        return $ampel;
-
-    }
 
     
 }

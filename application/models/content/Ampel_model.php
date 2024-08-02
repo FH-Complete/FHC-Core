@@ -20,9 +20,12 @@ class Ampel_model extends DB_Model
 	 */
 	public function active($email = false)
 	{
+		
+		$userLanguage = getUserLanguage();
+
 		$parametersArray = null;
 		$query = '
-			SELECT *
+			SELECT *, beschreibung[('.$this->getLanguageIndex($this->escape($userLanguage)).')], buttontext[('. $this->getLanguageIndex($this->escape($userLanguage)).')]
 			  FROM public.tbl_ampel
 			 WHERE';
 
@@ -142,6 +145,7 @@ class Ampel_model extends DB_Model
 
 
 	function alleAmpeln($uid){
+		$userLanguage = getUserLanguage();
 
 		$zugeteile_ampeln = [];
 		
@@ -154,7 +158,7 @@ class Ampel_model extends DB_Model
 		$benutzerStartDate = $datum->mktime_fromdate(date(current(getData($benutzerStartDate))->insertamum));
 
 		$allAmpeln = $this->execReadOnlyQuery("
-			SELECT * FROM 
+			SELECT *, beschreibung[('.$this->getLanguageIndex($userLanguage).')], buttontext[('.$this->getLanguageIndex($userLanguage).')] FROM 
 			public.tbl_ampel");
 		
 		if(isError($allAmpeln)) return error(getError($allAmpeln));
@@ -200,6 +204,14 @@ class Ampel_model extends DB_Model
 		}
 
 		return success($zugeteile_ampeln);
+	}
+
+	private function getLanguageIndex($userLanguage)
+	{
+		return "
+			SELECT index 
+			FROM public.tbl_sprache 
+			WHERE sprache = " . $userLanguage;
 	}
 
 }
