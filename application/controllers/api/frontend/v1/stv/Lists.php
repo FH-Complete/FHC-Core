@@ -88,6 +88,7 @@ class Lists extends FHCAPI_Controller
 		$this->GeschlechtModel->addOrder('geschlecht');
 
 		$this->GeschlechtModel->addSelect('*');
+		#$this->GeschlechtModel->addTranslatedSelect("bezeichnung_mehrsprachig", "bezeichnung");
 		$this->GeschlechtModel->addSelect("bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $this->GeschlechtModel->escape(DEFAULT_LANGUAGE) . " LIMIT 1)] AS bezeichnung");
 
 		$result = $this->GeschlechtModel->load();
@@ -126,6 +127,7 @@ class Lists extends FHCAPI_Controller
 		$this->load->model('crm/Status_model', 'StatusModel');
 
 		$this->StatusModel->addSelect('*');
+		#$this->StatusModel->addTranslatedSelect('bezeichnung_mehrsprachig', 'bezeichnung');
 		$this->StatusModel->addSelect(
 			'bezeichnung_mehrsprachig[(
 				SELECT index
