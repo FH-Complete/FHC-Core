@@ -20,7 +20,6 @@ class Ampel_model extends DB_Model
 	 */
 	public function active($email = false)
 	{
-		
 		$userLanguage = getUserLanguage();
 
 		$parametersArray = null;
@@ -158,7 +157,7 @@ class Ampel_model extends DB_Model
 		$benutzerStartDate = $datum->mktime_fromdate(date(current(getData($benutzerStartDate))->insertamum));
 
 		$allAmpeln = $this->execReadOnlyQuery("
-			SELECT *, beschreibung[('.$this->getLanguageIndex($userLanguage).')], buttontext[('.$this->getLanguageIndex($userLanguage).')] FROM 
+			SELECT *, beschreibung[(".$this->getLanguageIndex($this->escape($userLanguage)).")], buttontext[(".$this->getLanguageIndex($this->escape($userLanguage)).")] FROM 
 			public.tbl_ampel");
 		
 		if(isError($allAmpeln)) return error(getError($allAmpeln));
