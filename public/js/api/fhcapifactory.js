@@ -31,6 +31,6 @@ export default {
     filter,
     studstatus,
     profil,
-    profilUpdate,,
+    profilUpdate,
     stundenplan,
 };

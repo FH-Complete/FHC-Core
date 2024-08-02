@@ -18,11 +18,6 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- * This controller operates between (interface) the JS (GUI) and the SearchBarLib (back-end)
- * Provides data to the ajax get calls about the searchbar component
- * This controller works with JSON calls on the HTTP GET and the output is always JSON
- */
 class Stundenplan extends FHCAPI_Controller
 {
 
@@ -46,32 +41,48 @@ class Stundenplan extends FHCAPI_Controller
 			'dbLogType' => 'API', // required
 			'dbExecuteUser' => 'RESTful API'
 		));
+
+        $this->load->library('form_validation');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
+    /**
+     * fetches Stunden layout from database
+     * @access public
+     * 
+     */
     public function Stunden()
 	{
 		$this->load->model('ressource/Stunde_model', 'StundeModel');
 
-		$result = $this->StundeModel->load();
+		$stunden = $this->StundeModel->load();
 
-		if (isError($result))
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+        $stunden = $this->getDataOrTerminateWithError($stunden);
 
-		$this->terminateWithSuccess(getData($result));
+		$this->terminateWithSuccess($stunden);
 	}
-    
-	/**
-	 * Gets a JSON body via HTTP POST and provides the parameters
-	 */
+
+    /**
+     * fetches room events from a certain date
+     * @access public
+     * 
+     */
 	public function roomInformation()
 	{
        
         $this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 		$this->load->model('ressource/Stunde_model', 'StundeModel');
-
+		
+        // form validation
+        $this->load->library('form_validation');
+        $this->form_validation->set_data($_GET);
+        $this->form_validation->set_rules('ort_kurzbz',"Ort","required");
+        $this->form_validation->set_rules('start_date',"start_date","required");
+        $this->form_validation->set_rules('end_date',"end_date","required");
+        if($this->form_validation->run() === FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array()); 
+        
         // storing the get parameter in local variables
         $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
         $start_date = $this->input->get('start_date', TRUE);
@@ -106,106 +117,6 @@ class Stundenplan extends FHCAPI_Controller
             }
         }
 
-        // this is the old way the events were grouped, kept in case that the query doesnt work out as expected
-        /* 
-        $final_events = array();
-        $grouped = array();
-        $associative_day_events = $this->filterEventsIntoAssociativeDateArray($result, $start_date, $end_date);
-        foreach($associative_day_events as $date => $day_events ){
-            
-            foreach($stunden as $stunde){
-
-                // filtering all the events at the same hour of the day
-                $stunden_events = array_filter($day_events, function($entry) use ($stunde){
-                    return $entry->stunde == $stunde->stunde;
-                });
-
-                $lehrverband_array = array();
-
-                // for loop that is just used to fill the lehrverband_array
-                foreach($stunden_events as $key=>$stunden_event){
-
-                    // lehrverband bestimmen
-                    if(strlen($stunden_event->gruppe_kurzbz)>0){
-                        $lehrverband = $stunden_event->gruppe_kurzbz;
-                    }else{
-                        $lehrverband=$stunden_event->stg_typ . $stunden_event->stg_kurzbz .'-'.$stunden_event->semester;
-                        // checks whether the verband is not null, '' or '0'
-                        if($stunden_event->verband !=null && $stunden_event->verband != '0' && $stunden_event->verband != ''){ 
-                            $lehrverband.=$stunden_event->verband;
-                            // if gruppe is not set it will concatenate nothing but it is only appended if the verband is set
-                            $lehrverband.=$stunden_event->gruppe;
-                        }
-                    }
-                    $lehrverband_array[$key] = $lehrverband;
-                }
-                
-                // compare nested loop start
-                foreach($stunden_events as $event_key => $stunden_event){
-                    
-                    // skip the loop iteration if the event was already grouped
-                    if(isset($grouped[$event_key])){
-                        continue;
-                    }
-                     
-                    // lektor bestimmen
-                    if($stunden_event->mitarbeiter_kurzbz != null){
-                        $stunden_events[$event_key]->lektor = $stunden_event->mitarbeiter_kurzbz;
-                    }
-
-                    // lehrfach bestimmen
-                    if(isset($stunden_event->lehrform)){
-                        $stunden_events[$event_key]->lehrfach .= '-'.$stunden_event->lehrform;
-                    }
-                    
-                    // GRUPIEREN DER GLEICHEN EVENTS
-                    // vergleiche das aktuelle Event mit allen anderen Events die am gleichen Tag und zur gleichen Stunde gehalten werden
-                    foreach($stunden_events as $compare_key => $stunden_event_compare){
-                        
-                        if($compare_key != $event_key){
-                            
-                            // will be used to skip the loop iteration with this index because it was already grouped
-                            $grouped[$compare_key] = TRUE;
-
-                            // can the events be grouped?
-                           if ( 
-                                // the unr's have to be equal to be grouped
-                                $stunden_event->unr==$stunden_event_compare->unr && 
-                                // and either the lektor or the ort_kurzbz have to be equal
-                                ($stunden_event->ort_kurzbz==$stunden_event_compare->ort_kurzbz 
-                                || $stunden_event->lektor==$stunden_event_compare->lektor)
-                           )
-                                {
-                                    // Bezeichnung des Events zusammenfuehren
-                                    // group the events properties if they are groupable
-
-                                    //Lektoren
-                                    if(!mb_strstr($stunden_event->lektor,$stunden_event_compare->lektor)){
-                                        $stunden_events[$event_key]->lektor = $stunden_event->lektor . ' \ ' . $stunden_event_compare->lektor;
-                                        $stunden_events[$event_key]->mitarbeiter_kurzbz = $stunden_event->mitarbeiter_kurzbz . ' \ ' . $stunden_event_compare->mitarbeiter_kurzbz;
-                                    }
-
-                                    //Ort
-                                    if(!mb_strstr($stunden_event->ort_kurzbz,$stunden_event_compare->ort_kurzbz)){
-                                        $stunden_events[$event_key]->ort_kurzbz = $stunden_event->ort_kurzbz . ' \ ' . $stunden_event_compare->ort_kurzbz;
-                                    }
-
-                                    //Lehrverband
-                                    if(!mb_strstr($lehrverband_array[$event_key],$lehrverband_array[$compare_key])){
-                                         $lehrverband_array[$event_key] .= ' / ' . $lehrverband_array[$compare_key];
-                                    }
-
-                                }
-                        }
-                    }
-
-                    // add the grouped lehrverband entry to the event
-                    $stunden_events[$event_key]->stg = $lehrverband_array[$event_key];
-                    $final_events[] = $stunden_events[$event_key];
-                }
-            }
-        } */     
-        
 		$this->terminateWithSuccess($result);
 		
 	}
