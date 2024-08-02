@@ -22,12 +22,12 @@ class Ampel_model extends DB_Model
 	{
 		$userLanguage = getUserLanguage();
 
-		$parametersArray = null;
+		$parametersArray = [];
 		$query = '
-			SELECT *, beschreibung[('.$this->getLanguageIndex($this->escape($userLanguage)).')], buttontext[('. $this->getLanguageIndex($this->escape($userLanguage)).')]
+			SELECT *, beschreibung[('.$this->getLanguageIndex($this->escape($userLanguage)).')] as beschreibung_trans, buttontext[('.$this->getLanguageIndex($this->escape($userLanguage)).')] as buttontext_trans
 			  FROM public.tbl_ampel
 			 WHERE';
-
+		
 		if ($email === true)
 		{
 			$parametersArray['email'] = $email;
@@ -108,10 +108,15 @@ class Ampel_model extends DB_Model
 	 */
 	public function confirmAmpel($ampel_id, $uid)
 	{
-		if(isset($ampel_id) && isset($uid))
-            return error("parameter were missing to execute the insert into");
-        
-        return $this->execQuery('
+		$this->load->library('form_validation');
+		$this->form_validation->set_data(['ampel_id' => $ampel_id, 'uid' => $uid]);
+		$this->form_validation->set_rules('ampel_id', 'Ampel ID', 'required|integer');
+		$this->form_validation->set_rules('uid', 'UID', 'required');
+
+		if ($this->form_validation->run() == FALSE)
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		return $this->execQuery('
         INSERT INTO public.tbl_ampel_benutzer_bestaetigt (ampel_id, uid)
         VALUES (?,?);', array($ampel_id, $uid));
 	}
@@ -140,9 +145,8 @@ class Ampel_model extends DB_Model
 		return success(current($zugeteilt)->zugeteilt);
 	}
 
-	
-
-
+	// THIS FUNCTION IS NOT IN USE
+	// fetches all ampeln that were assigned to the user after the working start_date
 	function alleAmpeln($uid){
 		$userLanguage = getUserLanguage();
 
@@ -157,7 +161,7 @@ class Ampel_model extends DB_Model
 		$benutzerStartDate = $datum->mktime_fromdate(date(current(getData($benutzerStartDate))->insertamum));
 
 		$allAmpeln = $this->execReadOnlyQuery("
-			SELECT *, beschreibung[(".$this->getLanguageIndex($this->escape($userLanguage)).")], buttontext[(".$this->getLanguageIndex($this->escape($userLanguage)).")] FROM 
+			SELECT *, beschreibung[(".$this->getLanguageIndex($this->escape($userLanguage)).")] as beschreibung_trans, buttontext[(".$this->getLanguageIndex($this->escape($userLanguage)).")] as buttontext_trans FROM 
 			public.tbl_ampel");
 		
 		if(isError($allAmpeln)) return error(getError($allAmpeln));

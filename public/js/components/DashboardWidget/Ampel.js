@@ -139,7 +139,7 @@ export default {
                     </div>
                 </div>
             </div>
-            
+
             <div v-if="activeAmpeln && activeAmpeln.length == 0" class="card card-body mt-4 p-4 text-center">
                 <span class="text-success h2"><i class="fa fa-solid fa-circle-check"></i></span>
                 <span class="text-success h5">{{$p.t('ampeln','super')}}</span><br>
@@ -149,7 +149,7 @@ export default {
         <div v-else>
         <header class="me-auto"><b>{{$p.t('ampeln','newestAmpeln')}} </b></header>
             <template v-for="n in WIDGET_AMPEL_MAX">
-            
+
                 <div class="mt-2 card" aria-hidden="true">
                 <div class="card-body">
                     <p class="card-text placeholder-glow">
@@ -161,7 +161,7 @@ export default {
             </template>
 
         </div>
-        
+
     </div>
 
     <!-- All Ampeln Offcanvas -->
@@ -196,9 +196,9 @@ export default {
                     <a :href="'#ampelCollapse_' + ampel.ampel_id" data-bs-toggle="collapse" class="stretched-link">{{ ampel.kurzbz }}</a><br>
                 </div>
                 <div class="collapse my-3" :id="'ampelCollapse_' + ampel.ampel_id" :ref="'ampelCollapse_' + ampel.ampel_id">
-                    <div v-html="ampel.beschreibung"></div>
+                    <div v-html="ampel.beschreibung_trans"></div>
                     <div v-if="!ampel.bestaetigt " class="d-flex justify-content-end mt-3">
-                        <button  class="btn btn-sm btn-primary" :class="{disabled: ampel.bestaetigt}" @click="confirm(ampel.ampel_id)">{{ validateBtnTxt(ampel.buttontext) }}</button>
+                        <button  class="btn btn-sm btn-primary" :class="{disabled: ampel.bestaetigt}" @click="confirm(ampel.ampel_id)">{{ validateBtnTxt(ampel.buttontext_trans) }}</button>
                     </div>
                 </div>
                 </li>

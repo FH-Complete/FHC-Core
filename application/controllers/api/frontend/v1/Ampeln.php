@@ -74,10 +74,10 @@ class Ampeln extends FHCAPI_Controller
 
         // fetch active ampeln
         $activeAmpeln = $this->AmpelModel->active();
-
+		
         $activeAmpeln = $this->getDataOrTerminateWithError($activeAmpeln);
-        
-        foreach($activeAmpeln as $ampel){
+
+		foreach($activeAmpeln as $ampel){
             
             // check if ampel is confirmed by user
             $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
@@ -108,8 +108,8 @@ class Ampeln extends FHCAPI_Controller
         $userAmpeln = array();
         
         $ampel_result = $this->AmpelModel->active();
-
-        $ampel_result = $this->getDataOrTerminateWithError($ampel_result);
+		
+		$ampel_result = $this->getDataOrTerminateWithError($ampel_result);
         
         foreach($ampel_result as $ampel){
             $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
@@ -120,7 +120,7 @@ class Ampeln extends FHCAPI_Controller
 
             $zugeteilt = $this->getDataOrTerminateWithError($zugeteilt);
 
-            if($zugeteilt) $userAmpeln[] = $this->translateAmpel($ampel);    
+            if($zugeteilt) $userAmpeln[] = $ampel;    
         }
 
         $this->terminateWithSuccess($userAmpeln);
@@ -142,8 +142,7 @@ class Ampeln extends FHCAPI_Controller
             // check if ampel is confirmed by user
             $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
             $ampel->bestaetigt = $confirmedByUser;
-            // translate ampeln
-            return $this->translateAmpel($ampel);
+            return $ampel;
         }, $alle_ampeln);
 
         $this->terminateWithSuccess($alle_ampeln);
