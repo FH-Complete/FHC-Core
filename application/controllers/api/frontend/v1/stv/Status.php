@@ -781,6 +781,9 @@ class Status extends FHCAPI_Controller
 		//Vor dem Studentenstatus müssen folgende Status eingetragen werden: {0}'
 		//private $_statusAbfolgeVorStudent = [self::INTERESSENT_STATUS, self::BEWERBER_STATUS, self::AUFGENOMMENER_STATUS
 
+		// Start DB transaction
+		$this->db->trans_start();
+
 		//getSemester of Status Aufgenommen
 		$result = $this->PrestudentstatusModel->loadWhere([
 			"prestudent_id" => $prestudent_id,
@@ -878,26 +881,10 @@ class Status extends FHCAPI_Controller
 		$aktivierungscode = getData($result);
 
 		//generate Alias
-		//TODO(Manu) check if alias already exists
+		$result = $this->BenutzerModel->generateAliasByPersonId($person_id);
+		$this->getDataOrTerminateWithError($result);
+		$alias = getData($result);
 
-		$result = $this->PersonModel->generateAliasByPersonId($person_id);
-
-		if (isError($result))
-		{
-			return $this->terminateWithError(getData($result), self::ERROR_TYPE_GENERAL);
-		}
-
-		$alias = getData($result) ?: null;
-		$alias = $alias->retval[0];
-
-		$sanitizedVorname = $this->_sanitizeAliasName($alias->vorname);
-		$sanitizedNachname = $this->_sanitizeAliasName($alias->nachname);
-		$alias = $sanitizedVorname . '.' . $sanitizedNachname;
-
-		if (isError($result))
-		{
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
 		$result = $this->BenutzerModel->insert(
 			[
 				'person_id' => $person_id,
@@ -936,11 +923,11 @@ class Status extends FHCAPI_Controller
 		$this->load->library('PrestudentLib');
 		$result = $this->prestudentlib->setFirstStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, date('c'), getAuthUID(), $stg, $uidStudent);
 
-		if (isError($result)) {
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		} else
-			$this->terminateWithSuccess($prestudent_id);
+		$this->getDataOrTerminateWithError($result);
 
+		$this->db->trans_commit();
+
+		return $this->outputJsonSuccess(true);
 	}
 
 	public function loadStatus()
@@ -2011,6 +1998,14 @@ class Status extends FHCAPI_Controller
 		]);
 	}
 
+	/**
+	 * Helper function for sanitizing Alias Name
+	 * replaces empty spaces with underlines
+	 *
+	 * @param string					$str
+	 *
+	 * @return string
+	 */
 	private function _sanitizeAliasName($str)
 	{
 		$str = sanitizeProblemChars($str);

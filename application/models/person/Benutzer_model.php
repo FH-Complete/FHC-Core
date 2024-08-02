@@ -94,9 +94,9 @@ class Benutzer_model extends DB_Model
 	}
 
 	/**
-	 * Generates alias for a uid.
-	 * @param $uid
-	 * @return array the alias if newly generated
+	 * Generates alias for a person_id
+	 * @param $person_id
+	 * @return string
 	 */
 	public function generateAliasByPersonId($person_id)
 	{
@@ -106,12 +106,19 @@ class Benutzer_model extends DB_Model
 
 		$nameresult = $this->execQuery($sql, array($person_id));
 
-		$nameresult = getData($nameresult) ?: null;
+		$nameresult = current(getData($nameresult)) ?: null;
 
-	//	if($aliasdata)
-	//		$alias = $this->_sanitizeAliasName($aliasdata->vorname).'.'.$this->_sanitizeAliasName($aliasdata->nachname);
+		if($nameresult)
+		{
+			$alias = $this->_sanitizeAliasName($nameresult->vorname).'.'.$this->_sanitizeAliasName($nameresult->nachname);
 
-		return success($nameresult->vorname . " " . $nameresult->nachname);
+			$aliasexists = $this->aliasExists($alias);
+
+			if (hasData($aliasexists) && current(getData($aliasexists)))
+				$alias = "";
+		}
+
+		return success($alias);
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -122,6 +129,7 @@ class Benutzer_model extends DB_Model
 	 * @param string $str
 	 * @return string
 	 */
+
 	private function _sanitizeAliasName($str)
 	{
 		$str = sanitizeProblemChars($str);
