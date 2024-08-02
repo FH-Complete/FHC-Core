@@ -14,7 +14,7 @@ switch($template_kurzbz){
 		break;
 }
 
-$this->load->view('templates/CISVUE-Header', $includesArray);
+$this->load->view('templates/CISHTML-Header', $includesArray);
 ?>
 
 <h2><?php echo isset($content_id)? "Content" : "News" ?></h2>
@@ -24,5 +24,5 @@ $this->load->view('templates/CISVUE-Header', $includesArray);
 	
 </div>
 
-<?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>
+<?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>
 

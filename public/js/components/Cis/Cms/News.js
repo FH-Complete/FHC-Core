@@ -13,18 +13,25 @@ export default {
   },
   methods: {
     loadNewPageContent: function (data) {
-      Vue.$fhcapi.Cms.getNews(data.page, data.rows).then((result) => {
-        this.content = result.data;
-      });
+		this.$fhcApi.factory.cms.getNews(data.page, data.rows)
+		.then(res => res.data)
+		.then(result => {
+			this.content = result;
+		});
+		
     },
   },
   created() {
-    Vue.$fhcapi.Cms.getNews(1, this.page_size).then((result) => {
-      this.content = result.data;
-    });
+    this.$fhcApi.factory.cms.getNews(1, this.page_size)
+	.then(res => res.data)
+	.then(result => {
+		this.content = result;
+	});
 
-    Vue.$fhcapi.Cms.getNewsRowCount().then((result) => {
-      this.maxPageCount = result.data;
+    this.$fhcApi.factory.cms.getNewsRowCount()
+	.then(res => res.data)
+	.then(result => {
+    	this.maxPageCount = result;
     });
   },
   template: /*html*/ `

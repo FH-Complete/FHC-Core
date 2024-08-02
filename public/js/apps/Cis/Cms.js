@@ -2,7 +2,7 @@ import BsConfirm from "../../components/Bootstrap/Confirm.js";
 //import Pagination from "../../components/Pagination/Pagination.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
 import CmsContent from "../../components/Cis/Cms/Content.js";
-import Fhcapi from "../../plugin/FhcApi.js";
+import Phrasen from "../../plugin/Phrasen.js";
 
 
 const app = Vue.createApp({
@@ -35,6 +35,6 @@ const app = Vue.createApp({
   },
 });
 app.use(primevue.config.default, { zIndex: { overlay: 9999 } });
-app.use(Fhcapi);
+app.use(Phrasen);
 app.mount("#cms");
 //#cms [data-confirm], #cms [data-href]
