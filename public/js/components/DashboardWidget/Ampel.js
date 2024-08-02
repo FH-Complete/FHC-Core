@@ -142,7 +142,7 @@ export default {
             
             <div v-if="activeAmpeln && activeAmpeln.length == 0" class="card card-body mt-4 p-4 text-center">
                 <span class="text-success h2"><i class="fa fa-solid fa-circle-check"></i></span>
-                <span class="text-success h5">Super!</span><br>
+                <span class="text-success h5">{{$p.t('ampeln','super')}}</span><br>
                 <span class="small">{{$p.t('ampeln','noOpenAmpeln')}}</span>
             </div>
         </div>

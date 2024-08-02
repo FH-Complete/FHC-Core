@@ -27671,6 +27671,26 @@ array(
 			)
 		)
 	),
+    array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'super',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Super!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Super!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 );
 
