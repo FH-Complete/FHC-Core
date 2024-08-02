@@ -165,9 +165,6 @@ class PrestudentstatusCheckLib
 	public function checkIfZGVEingetragen($prestudent_person)
 	{
 		return success((boolean)$prestudent_person->zgv_code);
-		return !!$prestudent_person->zgv_code;
-		//return success(false);
-		//return error(false);
 	}
 
 	/**
@@ -197,7 +194,7 @@ class PrestudentstatusCheckLib
 	 * Checks if a bewerber status already exists.
 	 *
 	 * @param integer $prestudent_id
-	 * *
+	 * 
 	 * @return stdClass
 	 */
 	public function checkIfExistingBewerberstatus($prestudent_id)
@@ -214,19 +211,13 @@ class PrestudentstatusCheckLib
 
 	/**
 	 * Checks if status aufgenommen already exists.
-	 * @return error if invalid
-	 * @return error if no status Aufgenommen, success otherwise
+	 *
+	 * @param integer $prestudent_id
+	 * 
+	 *  @return stdClass
 	 */
 	public function checkIfExistingAufgenommenerstatus($prestudent_id)
 	{
-		$result =  $this->_getApplicationData($prestudent_id);
-		if(isError($result))
-		{
-			return getData($result);
-		}
-		$result =  current(getData($result));
-		$studentName = trim ($result->vorname.' '.$result->nachname);
-
 		$result =  $this->_ci->PrestudentstatusModel->checkIfExistingAufgenommenerstatus(
 			$prestudent_id
 		);
@@ -234,11 +225,24 @@ class PrestudentstatusCheckLib
 		{
 			return getData($result);
 		}
-		if(getData($result) == "0")
-		{
-			return error($this->_ci->p->t('lehre','error_keinAufgenommener', ['name' => $studentName]));
-		}
-		return success(getData($result));
+		return success(getData($result) != '0');
+	}
+
+	/**
+	 * Checks if is the first student Status
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return stdClass
+	 */
+	public function checkIfIsErsterStudent($prestudent_id)
+	{
+		$result = $this->_ci->StudentModel->checkIfExistingStudentRolle($prestudent_id);
+
+		if (isError($result))
+			return $result;
+
+		return success(getData($result) == '0');
 	}
 
 	/**
@@ -908,29 +912,6 @@ class PrestudentstatusCheckLib
 		}
 
 		return $resultPs;
-	}
-
-
-
-
-	/**
-	 * Provides Application Data
-	 * @param integer $prestudent_id
-	 * @return error if not valid, array with ApplicationData if valid
-	 */
-	private function _getApplicationData($prestudent_id)
-	{
-		$this->_ci->PrestudentModel->addJoin('public.tbl_person p', 'ON (p.person_id = public.tbl_prestudent.person_id)');
-
-		$result = $this->_ci->PrestudentModel->load([
-			'prestudent_id'=> $prestudent_id,
-		]);
-		if(isError($result))
-		{
-			return getData($result);
-		}
-
-		return $result;
 	}
 
 }

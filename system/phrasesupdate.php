@@ -28040,6 +28040,25 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
+		'phrase' => 'error_personBereitsStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name}: Diese Person ist bereits Student!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name}: This person already is student!',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
 		'phrase' => 'error_keinReihungstestverfahren',
 		'insertvon' => 'system',
 		'phrases' => array(
