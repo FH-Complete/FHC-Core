@@ -64,6 +64,9 @@ class DB_Model extends CI_Model
 	private $executedQueryMetaData;
 	private $executedQueryListFields;
 
+	// caching
+	private $lang = null;
+
 	private $debugMode; // Debug mode enable (true) or disabled (false)
 
 	/**
@@ -511,6 +514,34 @@ class DB_Model extends CI_Model
 	}
 
 	/**
+	 * Add translated select clause
+	 *
+	 * @param string					$select
+	 * @param string					$alias (optional)
+	 * @param string					$lang (optional)
+	 *
+	 * @return  stdClass
+	 */
+	public function addTranslatedSelect($select, $alias = null, $lang = null)
+	{
+		return $this->addSelect($this->getTranslatedSelectQuery($select, $alias, $lang), false);
+	}
+
+	/**
+	 * gets translated select query
+	 *
+	 * @param string					$select
+	 * @param string					$alias (optional)
+	 * @param string					$lang (optional)
+	 *
+	 * @return  string
+	 */
+	public function getTranslatedSelectQuery($select, $alias = null, $lang = null)
+	{
+		return $select . '[(SELECT index FROM public.tbl_sprache WHERE sprache=' . $lang ? $lang : $this->loadLang() . ')] AS ' . $alias ? $alias : end(explode('.', $select));
+	}
+
+	/**
 	 * Add distinct clause
 	 *
 	 * @return  void
@@ -903,6 +934,26 @@ class DB_Model extends CI_Model
 	// Private methods
 	//
 	//
+	
+	/**
+	 * Loads the user language and caches it
+	 *
+	 * @return string
+	 */
+	private function loadLang()
+	{
+		if ($this->lang)
+			return $this->lang;
+		
+		$tmp = clone $this->db;
+		$this->db->reset_query();
+
+		$this->lang = $this->escape(getUserLanguage());
+
+		$this->db = $tmp;
+
+		return $this->lang;
+	}
 
 	/**
 	 * To add the pgp_sym_encrypt function to the set clause where needed
