@@ -58,6 +58,7 @@ require_once('dbupdate_3.4/25999_cis4_cms.php');
 require_once('dbupdate_3.4/36530_bis_internationsalisierung_codextabelle_neuerungen.php');
 require_once('dbupdate_3.4/34543_ux_template.php');
 require_once('dbupdate_3.4/17513_Entwicklungsteam.php');
+require_once('dbupdate_3.4/41134_bookmark_dashboardWidget.php');
 
 
 	
@@ -410,6 +411,8 @@ $tabellen=array(
 	"wawi.tbl_rechnungsbetrag"  => array("rechnungsbetrag_id","rechnung_id","mwst","betrag","bezeichnung","ext_id"),
 	"wawi.tbl_aufteilung"  => array("aufteilung_id","bestellung_id","oe_kurzbz","anteil","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_aufteilung_default"  => array("aufteilung_id","kostenstelle_id","oe_kurzbz","anteil","insertamum","insertvon","updateamum","updatevon"),
+	"dashboard.tbl_bookmark"  => array("bookmark_id","uid","url","title","tag","insertamum","insertvon","updateamum","updatevon"),
+
 );
 
 $tabs=array_keys($tabellen);
