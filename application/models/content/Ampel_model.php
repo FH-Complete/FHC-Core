@@ -18,15 +18,27 @@ class Ampel_model extends DB_Model
 	 * @param bool $email If true, then only ampeln are retrieved that are marked to be sent by mail.
 	 * @return stdClass Returns array of objects.
 	 */
-	public function active($email = false)
+	public function active($email = false, $uid = null)
 	{
 		$userLanguage = getUserLanguage();
+
+		$bestaetigt = '';
+		if($uid != null){
+			$bestaetigt = ',
+				COALESCE((
+				SELECT true
+			  	FROM public.tbl_ampel_benutzer_bestaetigt a
+			 	WHERE a.ampel_id = ampel_id
+			   	AND uid = ' . $this->escape($uid) . ' LIMIT 1), false) as bestaetigt';
+		}
 
 		$parametersArray = [];
 		$query = '
 			SELECT *, beschreibung[('.$this->getLanguageIndex($this->escape($userLanguage)).')] as beschreibung_trans, buttontext[('.$this->getLanguageIndex($this->escape($userLanguage)).')] as buttontext_trans
-			  FROM public.tbl_ampel
-			 WHERE';
+			'.$bestaetigt
+			.'
+			FROM public.tbl_ampel
+			WHERE';
 		
 		if ($email === true)
 		{

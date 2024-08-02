@@ -73,18 +73,14 @@ class Ampeln extends FHCAPI_Controller
         $userAmpeln = array();
 
         // fetch active ampeln
-        $activeAmpeln = $this->AmpelModel->active();
+        $activeAmpeln = $this->AmpelModel->active(false, $this->uid);
 		
         $activeAmpeln = $this->getDataOrTerminateWithError($activeAmpeln);
 
 		foreach($activeAmpeln as $ampel){
             
-            // check if ampel is confirmed by user
-            $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
-            $ampel->bestaetigt = $confirmedByUser;
-
             // only include non confirmed active ampeln in the result
-            if(!$confirmedByUser){
+            if(!$ampel->bestaetigt){
                 
                 // check if the user was assigned to the ampel
                 $zugeteilt = $this->AmpelModel->isZugeteilt($this->uid, $ampel->benutzer_select);
@@ -107,13 +103,11 @@ class Ampeln extends FHCAPI_Controller
 	{
         $userAmpeln = array();
         
-        $ampel_result = $this->AmpelModel->active();
+        $ampel_result = $this->AmpelModel->active(false, $this->uid);
 		
 		$ampel_result = $this->getDataOrTerminateWithError($ampel_result);
         
         foreach($ampel_result as $ampel){
-            $confirmedByUser = $this->AmpelModel->isConfirmed($ampel->ampel_id,$this->uid);
-            $ampel->bestaetigt = $confirmedByUser;
             
             // check if the ampel was assigned to the user
             $zugeteilt = $this->AmpelModel->isZugeteilt($this->uid, $ampel->benutzer_select);
