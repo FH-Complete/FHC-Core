@@ -120,18 +120,20 @@ EOXML04;
 		<xsl:param name="news_id" select="news_id"/>
 		<article class="news-list-item card mb-3">
 			<header class="card-header d-flex justify-content-between align-items-center">
-				<h5 class="mb-0">
-					<xsl:value-of select="betreff"/>
-				</h5>
-				<div class="d-flex flex-wrap justify-content-end">
-					<address class="fw-bold small mb-0">
-						<xsl:value-of select="verfasser"/>
-					</address>
-					<xsl:if test="\$datum">
-						<time class="small text-end w-100" datetime="{\$datumdetail}">
-							<xsl:value-of select="\$datum"/>
-						</time>
-					</xsl:if>
+				<div class="row ">
+                    <h2 class="h5 col-auto me-auto">
+                        <xsl:value-of select="betreff"/>
+                    </h2>
+                    <div class="col-auto">	
+						<address class="fw-bold small mb-0">
+							<xsl:value-of select="verfasser"/>
+						</address>
+						<xsl:if test="\$datum">
+							<time class="small text-end w-100" datetime="{\$datumdetail}">
+								<xsl:value-of select="\$datum"/>
+							</time>
+						</xsl:if>
+					</div>
 				</div>
 			</header>
 			<xsl:if test="text">
