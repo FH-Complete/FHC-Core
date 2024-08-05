@@ -28,6 +28,7 @@ export default {
     <button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
+    
     <a id="nav-logo" :href="rootUrl">
         <img :src="logoUrl" alt="Logo">
     </a>

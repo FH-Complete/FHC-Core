@@ -1,5 +1,5 @@
 /* basic */
-@import '../components/searchbar.css';
+@import '../components/searchbar/searchbar.css';
 html {
   font-size: 0.875em;
 }
