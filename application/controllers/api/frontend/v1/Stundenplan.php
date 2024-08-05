@@ -88,28 +88,14 @@ class Stundenplan extends FHCAPI_Controller
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
         
-        //return early if the get parameter are not present
-        if(!$ort_kurzbz || !$start_date || !$end_date){
-            $this->terminateWithError("Missing parameters", self::ERROR_TYPE_GENERAL);
-        }
-        
 		// querying the stunden
         $stunden = $this->StundeModel->load();
 
-        if(isError($stunden))
-            $this->terminateWithError(getError($stunden), self::ERROR_TYPE_GENERAL);
-        
-        $stunden = getData($stunden);
+        $stunden = $this->getDataOrTerminateWithError($stunden);
 
 		$result = $this->StundenplanModel->groupedCalendarEvents($ort_kurzbz,$start_date,$end_date);  
-        //$this->loglib->logErrorDB(print_r($result,TRUE),"this is the result of the grouped query");
 		
-        if(isError($result)){
-            $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-        }
-
-        $result = hasData($result) ? getData($result) : [];
-        
+        $result = $this->getDataOrTerminateWithError($result);
 
         foreach($result as $entry){
             if(COUNT($entry->lektor)>1){
@@ -121,37 +107,35 @@ class Stundenplan extends FHCAPI_Controller
 		
 	}
 
+	// reservierungen is not used in the prototype for the students
     public function Reservierungen()
 	{
         $this->load->model('ressource/Reservierung_model', 'ReservierungModel');
         $this->load->model('ressource/Stunde_model', 'StundeModel');
         $this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
 
+		//form validation
+		$this->load->library('form_validation');
+		$this->form_validation->set_data($_GET);
+		$this->form_validation->set_rules('ort_kurzbz',"Ort","required");
+		$this->form_validation->set_rules('start_date', "StartDate", "required");
+		$this->form_validation->set_rules('end_date', "EndDate", "required");
+		if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
+
         // storing the get parameter in local variables
         $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
 
-        // return early if the get parameter are not present
-        if(!$ort_kurzbz || !$start_date || !$end_date){
-            $this->terminateWithError("Missing parameters", self::ERROR_TYPE_GENERAL);
-        }
-
         // querying the stunden
         $stunden = $this->StundeModel->load();
 
-        if(isError($stunden))
-            $this->terminateWithError(getError($stunden), self::ERROR_TYPE_GENERAL);
-        
-        $stunden = getData($stunden);
+        $stunden = $this->getDataOrTerminateWithError($stunden);
 
 		// querying the reservierungen
 		$result = $this->ReservierungModel->getRoomReservierungen($ort_kurzbz, $start_date, $end_date);
 
-		if (isError($result))
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-        
-        $result = hasData($result) ? getData($result) : [];
+        $result = $this->getDataOrTerminateWithError($result);
         
         // loop over the days
         $day_events = $this->filterEventsIntoAssociativeDateArray($result, $start_date, $end_date);
