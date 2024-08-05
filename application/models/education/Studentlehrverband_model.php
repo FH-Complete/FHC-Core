@@ -11,13 +11,18 @@ class Studentlehrverband_model extends DB_Model
 		$this->dbTable = 'public.tbl_studentlehrverband';
 		$this->pk = array('studiensemester_kurzbz', 'student_uid');
 		$this->hasSequence = false;
+
+		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 	}
 
 	/**
 	 * Check if Studentlehrverband already exists
+	 *
 	 * @param string $student_id
+	 *
 	 * @param string $studiensemester_kurzbz
-	 * @return 1: if Rolle exists, 0: if it doesn't
+	 *
+	 * @return 1: if Studentlehrverband exists, 0: if it doesn't
 	 */
 	public function checkIfStudentlehrverbandExists($student_uid, $studiensemester_kurzbz)
 	{
@@ -46,50 +51,65 @@ class Studentlehrverband_model extends DB_Model
 		}
 	}
 
-	public function processStudentlehrverband($student_uid, $studiengang_kz, $ausbildungssemester, $verband, $gruppe, $studiensemester_kurzbz)
+	/**
+	 * update Lehrverband and Studenlehrverband
+	 *
+	 * @param char 					$student_id
+	 * @param integer 				$studiengang_kz
+	 * @param integer 				$ausbildungssemester
+	 * @param char 					$verband
+	 * @param char 					$gruppe
+	 * @param string 				$studiensemester_kurzbz
+	 *
+	 * @return success if handling lehrverband, studentlehrverband successfull
+	 * 			error if not
+	 *
+	 */
+	public function processStudentlehrverband($student_uid, $studiengang_kz, $ausbildungssemester, $verband, $gruppe, $studiensemester_kurzbz, $status_kurzbz=null)
 	{
 		$uid = getAuthUID();
-		$this->db->trans_begin(); // Start Transaktion
 
 		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 		$result = $this->LehrverbandModel->checkIfLehrverbandExists($studiengang_kz, $ausbildungssemester, $verband, $gruppe);
 		if (isError($result))
 		{
-			$this->db->trans_rollback();
 			return error("0", $this->p->t('lehre','error_updateLehrverband'));
 		}
 
-		if ($result->retval == "0") {
-
+		if ($result->retval == "0")
+		{
 			// Übergeordneten Lehrverband check and/or insert
 			$result = $this->LehrverbandModel->checkIfLehrverbandExists($studiengang_kz, $ausbildungssemester, '', '');
 			if (isError($result)) {
-				$this->db->trans_rollback();
 				return error("0", $this->p->t('lehre','error_updateLehrverband'));
 			}
 
 			if ($result->retval == "0")
 			{
+				$bezeichnung = ($status_kurzbz == PrestudentstatusModel::STATUS_ABBRECHER || $status_kurzbz == Prestudentstatus_model::STATUS_UNTERBRECHER)  ? 'Ab-Unterbrecher' : '';
 				$result = $this->LehrverbandModel->insert([
 					'studiengang_kz' => $studiengang_kz,
 					'semester' => $ausbildungssemester,
 					'verband' => '',
 					'gruppe' => '',
 					'aktiv' => true,
-					'bezeichnung' => 'Ab-Unterbrecher'
+					'bezeichnung' => $bezeichnung
 				]);
 
-				if ($this->db->trans_status() === false || isError($result))
+				if (isError($result))
 				{
-					$this->db->trans_rollback();
 					return error("0", $this->p->t('lehre','error_updateLehrverband'));
 				}
 			}
 
-
-
 			// Lehrverband insert
-			$bezeichnung = $verband == 'A' ? ' Abbrecher' : 'Unterbrecher';
+			if ($verband == 'A')
+				$bezeichnung = Prestudentstatus_model::STATUS_ABBRECHER;
+			else if ($verband == 'B')
+				$bezeichnung = Prestudentstatus_model::STATUS_BEWERBER;
+			else
+				$bezeichnung = '';
+
 			$result = $this->LehrverbandModel->insert([
 				'studiengang_kz' => $studiengang_kz,
 				'semester' => $ausbildungssemester,
@@ -99,20 +119,17 @@ class Studentlehrverband_model extends DB_Model
 				'aktiv' => true
 			]);
 
-			if ($this->db->trans_status() === false || isError($result)) {
-				$this->db->trans_rollback();
+			if (isError($result)) {
 				return error("0", $this->p->t('lehre','error_updateLehrverband'));
 			}
 		}
-
 
 		// Studentlehrverband insert or update
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$result = $this->StudentlehrverbandModel->checkIfStudentLehrverbandExists($student_uid, $studiensemester_kurzbz);
 		if (isError($result))
 		{
-			$this->db->trans_rollback();
-			return error(getError($result));
+			return error($result);
 		}
 
 		if ($result->retval == "0")
@@ -127,8 +144,7 @@ class Studentlehrverband_model extends DB_Model
 				'insertvon' => $uid,
 				'studiengang_kz' => $studiengang_kz
 			]);
-			if ($this->db->trans_status() === false || isError($result)) {
-				$this->db->trans_rollback();
+			if (isError($result)) {
 				return error("0", $this->p->t('lehre','error_updateStudentlehrverband'));
 			}
 		}
@@ -148,18 +164,16 @@ class Studentlehrverband_model extends DB_Model
 					'studiengang_kz' => $studiengang_kz
 				]
 			);
-			if ($this->db->trans_status() === false || isError($result)) {
-				$this->db->trans_rollback();
+			if (isError($result)) {
 				return error("0", $this->p->t('lehre','error_updateStudentlehrverband'));
 			}
 		}
 
-		// finish transaktion
-		if ($this->db->trans_status() === false || isError($result)) {
-			$this->db->trans_rollback();
+		if (isError($result)) {
 			return error("0", $this->p->t('lehre','error_updateStudentlehrverband'));
-		} else {
-			$this->db->trans_commit();
+		}
+		else
+		{
 			return success();
 		}
 	}

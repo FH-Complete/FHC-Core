@@ -88,51 +88,20 @@ class PrestudentLib
 		if (isError($result))
 			return $result;
 
-
-		//Verband anlegen
-		$result = $this->_ci->LehrverbandModel->load([
-			'studiengang_kz' => $student->studiengang_kz,
-			'semester' => 0,
-			'verband' => 'A',
-			'gruppe' => ''
-		]);
+		//refactored with processStudentlehrverband
+		$result = $this->_ci->StudentlehrverbandModel->processStudentlehrverband(
+			$student->student_uid,
+			$student->studiengang_kz,
+			0,
+			'A',
+			'',
+			$studiensemester_kurzbz,
+			Prestudentstatus_model::STATUS_ABBRECHER
+		);
 
 		if (isError($result))
 			return $result;
-		$result = getData($result);
-		if (!$result)
-		{
-			$result = $this->_ci->LehrverbandModel->load([
-				'studiengang_kz' => $student->studiengang_kz,
-				'semester' => 0,
-				'verband' => '',
-				'gruppe' => ''
-			]);
-			if (isError($result))
-				return $result;
-			$result = getData($result);
 
-			if(!$result)
-			{
-				$this->_ci->LehrverbandModel->insert([
-					'studiengang_kz' => $student->studiengang_kz,
-					'semester' => 0,
-					'verband' => '',
-					'gruppe' => '',
-					'bezeichnung' => 'Ab-Unterbrecher',
-					'aktiv' => true,
-				]);
-			}
-
-			$this->_ci->LehrverbandModel->insert([
-				'studiengang_kz' => $student->studiengang_kz,
-				'semester' => 0,
-				'verband' => 'A',
-				'gruppe' => '',
-				'bezeichnung' => 'Abbrecher',
-				'aktiv' => true
-			]);
-		}
 
 		//noch nicht eingetragene Zeugnisnoten auf 9 setzen
 		$result = $this->_ci->ZeugnisnoteModel->getZeugnisnoten($student->student_uid, $prestudent_status->studiensemester_kurzbz);
@@ -164,33 +133,6 @@ class PrestudentLib
 				}
 			}
 		}
-
-
-		//Update Aktionen
-
-		//StudentModel updaten
-		$this->_ci->StudentModel->update([
-			'student_uid' => $student->student_uid
-		], [
-			'verband' => 'A',
-			'gruppe' => '',
-			'semester' => 0,
-			'updatevon' => $insertvon,
-			'updateamum' => date('c')
-		]);
-
-		//Studentlehrverband setzen
-		$this->_ci->StudentlehrverbandModel->update([
-			'studiensemester_kurzbz' => $prestudent_status->studiensemester_kurzbz,
-			'student_uid' => $student->student_uid
-		], [
-			'studiengang_kz' => $student->studiengang_kz,
-			'semester' => 0,
-			'verband' => 'A',
-			'gruppe' => '',
-			'updateamum' => date('c'),
-			'updatevon' => $insertvon
-		]);
 
 		//Benutzer inaktiv setzen
 		$this->_ci->BenutzerModel->update([
@@ -298,50 +240,19 @@ class PrestudentLib
 		if (isError($result))
 			return $result;
 
-		//Verband anlegen
-		$result = $this->_ci->LehrverbandModel->load([
-			'studiengang_kz' => $student->studiengang_kz,
-			'semester' => 0,
-			'verband' => 'B',
-			'gruppe' => ''
-		]);
+		//refactored with processStudentlehrverband
+		$result = $this->_ci->StudentlehrverbandModel->processStudentlehrverband(
+			$student->student_uid,
+			$student->studiengang_kz,
+			0,
+			'B',
+			'',
+			$studiensemester_kurzbz,
+			Prestudentstatus_model::STATUS_UNTERBRECHER
+		);
 
 		if (isError($result))
 			return $result;
-		$result = getData($result);
-		if (!$result)
-		{
-			$result = $this->_ci->LehrverbandModel->load([
-				'studiengang_kz' => $student->studiengang_kz,
-				'semester' => 0,
-				'verband' => '',
-				'gruppe' => ''
-			]);
-			if (isError($result))
-				return $result;
-			$result = getData($result);
-
-			if(!$result)
-			{
-				$this->_ci->LehrverbandModel->insert([
-					'studiengang_kz' => $student->studiengang_kz,
-					'semester' => 0,
-					'verband' => '',
-					'gruppe' => '',
-					'bezeichnung' => 'Ab-Unterbrecher',
-					'aktiv' => true,
-				]);
-			}
-
-			$this->_ci->LehrverbandModel->insert([
-				'studiengang_kz' => $student->studiengang_kz,
-				'semester' => 0,
-				'verband' => 'B',
-				'gruppe' => '',
-				'bezeichnung' => 'Unterbrecher',
-				'aktiv' => true
-			]);
-		}
 
 		//noch nicht eingetragene Zeugnisnoten auf 9 setzen
 		$result = $this->_ci->ZeugnisnoteModel->getZeugnisnoten($student->student_uid, $studiensemester_kurzbz);
@@ -374,56 +285,11 @@ class PrestudentLib
 			}
 		}
 
-
-		//Update Aktionen
-
-		//StudentModel updaten
-		$this->_ci->StudentModel->update([
-			'student_uid' => $student->student_uid
-		], [
-			'verband' => 'B',
-			'gruppe' => '',
-			'semester' => 0,
-			'updatevon' => $insertvon,
-			'updateamum' => date('c')
-		]);
-
-		//Studentlehrverband setzen
-		$result = $this->_ci->StudentlehrverbandModel->loadWhere([
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'student_uid' => $student->student_uid
-		]);
-		if (hasData($result)) {
-			$this->_ci->StudentlehrverbandModel->update([
-				'studiensemester_kurzbz' => $studiensemester_kurzbz,
-				'student_uid' => $student->student_uid
-			], [
-				'studiengang_kz' => $student->studiengang_kz,
-				'semester' => 0,
-				'verband' => 'B',
-				'gruppe' => '',
-				'updateamum' => date('c'),
-				'updatevon' => $insertvon
-			]);
-		} else {
-			$this->_ci->StudentlehrverbandModel->insert([
-				'student_uid' => $student->student_uid,
-				'studiensemester_kurzbz' => $studiensemester_kurzbz,
-				'studiengang_kz' => $student->studiengang_kz,
-				'semester' => 0,
-				'verband' => 'B',
-				'gruppe' => '',
-				'insertamum' => date('c'),
-				'insertvon' => $insertvon
-			]);
-		}
-
 		return success();
 	}
 
 	public function setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
 	{
-
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($result))
 			return $result;
@@ -445,7 +311,7 @@ class PrestudentLib
 
 			$studiengang = current(getData($resultStg));
 
-			$prestudent_status = ($resultStatus[0]);
+			$prestudent_status = ($resultStatus[0] ?: null );
 			if(!$prestudent_status)
 			{
 				return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
@@ -463,7 +329,7 @@ class PrestudentLib
 		if (!$result)
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
 
-		$student = current($result);
+		//	$student = current($result);
 
 		//Status updaten
 		$result = $this->_ci->PrestudentstatusModel->insert([
@@ -488,7 +354,8 @@ class PrestudentLib
 		if (isError($result)) {
 			return $result;
 		}
-		$student_uid = $result->retval;
+		//$student_uid = $result->retval;
+		$student_uid = getData($result);
 
 		//load student
 		$result = $this->_ci->StudentModel->loadWhere(
@@ -502,8 +369,9 @@ class PrestudentLib
 		}
 
 		$studentData = current(getData($result) ? : []);
-		$verband = $studentData->verband == '' ? '' : $studentData->verband;
-		$gruppe = $studentData->gruppe == '' ? '' : $studentData->gruppe;
+		//TODO(Manu) check why in FAS == 0; correct there??
+		//$verband = $studentData->verband == '' ? '' : $studentData->verband;
+		//$gruppe = $studentData->gruppe == '' ? '' : $studentData->gruppe;
 		$studiengang_kz = $studentData->studiengang_kz;
 
 		//process studentlehrverband
@@ -512,10 +380,15 @@ class PrestudentLib
 			$student_uid,
 			$studiengang_kz,
 			$ausbildungssemester,
-			$verband,
-			$gruppe,
+			"", //TODO(Manu) checkFAS: 0
+			"",//TODO(Manu) checkFAS: 0
 			$studiensemester_kurzbz
 		);
+
+		if (isError($result))
+		{
+			return $result;
+		}
 
 		return success();
 	}
@@ -576,18 +449,21 @@ class PrestudentLib
 			$studiensemester_kurzbz
 		);
 
+		if (isError($result))
+		{
+			return $result;
+		}
+
 		return success();
 	}
 
 	public function setDiplomand($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		$insertvon = getAuthUID();
-
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-		return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
 
 		$result = getData($result) ?: [];
 
@@ -600,8 +476,6 @@ class PrestudentLib
 		if (!$result)
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
 
-		$student = current($result);
-
 		//Status updaten
 		$result = $this->_ci->PrestudentstatusModel->insert([
 			'prestudent_id' => $prestudent_id,
@@ -609,11 +483,11 @@ class PrestudentLib
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'ausbildungssemester' => $ausbildungssemester,
 			'datum' => date('c'),
-			'insertvon' => $insertvon,
+			'insertvon' => getAuthUID(),
 			'insertamum' => date('c'),
 			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
 			'studienplan_id'=> $prestudent_status->studienplan_id,
-			'bestaetigtvon' => $insertvon,
+			'bestaetigtvon' => getAuthUID(),
 			'bestaetigtam' => date('c'),
 		]);
 
@@ -662,17 +536,6 @@ class PrestudentLib
 
 	public function setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		//TODO(Manu) why no lvb?
-/*		if (gettype($ausbildungssemester) != "integer") {
-			$ausbildungssemester = (int)$ausbildungssemester;
-		}*/
-
-/*		if (!is_string($ausbildungssemester)) {
-			$ausbildungssemester = (string)$ausbildungssemester; // Oder verwende strval($ausbildungssemester)
-		}*/
-
-		$insertvon = getAuthUID();
-		 
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($result))
 			return $result;
@@ -687,8 +550,6 @@ class PrestudentLib
 		if (!$result)
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
 
-		$student = current($result);
-
 		//Status updaten
 		$result = $this->_ci->PrestudentstatusModel->insert([
 			'prestudent_id' => $prestudent_id,
@@ -696,11 +557,11 @@ class PrestudentLib
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'ausbildungssemester' => $ausbildungssemester,
 			'datum' => date('c'),
-			'insertvon' => $insertvon,
+			'insertvon' => getAuthUID(),
 			'insertamum' => date('c'),
 			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
 			'studienplan_id'=> $prestudent_status->studienplan_id,
-			'bestaetigtvon' => $insertvon,
+			'bestaetigtvon' => getAuthUID(),
 			'bestaetigtam' => date('c'),
 		]);
 
@@ -757,8 +618,8 @@ class PrestudentLib
 		$prestudent_status = current($resultLastStatus);
 
 		//check studiensemester_kurzbz TODO(Manu) check if Necessary: already checked in staus.php changeStatus()
-/*		$studiensemester_kurzbz = $prestudent_status->studiensemester_kurzbz != $studiensemester_kurzbz ?
-			$prestudent_status->studiensemester_kurzbz : $studiensemester_kurzbz;*/
+		/*		$studiensemester_kurzbz = $prestudent_status->studiensemester_kurzbz != $studiensemester_kurzbz ?
+					$prestudent_status->studiensemester_kurzbz : $studiensemester_kurzbz;*/
 
 		//Status updaten
 		$result = $this->_ci->PrestudentstatusModel->insert([

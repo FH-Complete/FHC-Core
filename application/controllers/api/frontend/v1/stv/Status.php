@@ -86,15 +86,15 @@ class Status extends FHCAPI_Controller
 			if (!$this->form_validation->run())
 				$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
-		
+
 
 		if (defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER == false)
 			$this->terminateWithSuccess(100);
 
 		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
-		
+
 		$result = $this->LehrverbandModel->getMaxSemester($studiengang_kzs);
-		
+
 		$maxsem = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($maxsem ? current($maxsem)->maxsem : 10);
@@ -133,7 +133,7 @@ class Status extends FHCAPI_Controller
 	public function isErsterStudent($prestudent_id)
 	{
 		//check if studentrolle already exists
-		$this->load->model('crm/Student_model','StudentModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
 		$result = $this->StudentModel->checkIfExistingStudentRolle($prestudent_id);
 		if (isError($result))
 		{
@@ -144,7 +144,6 @@ class Status extends FHCAPI_Controller
 			return $this->terminateWithSuccess($result);
 		}
 		return $this->terminateWithSuccess($result);
-
 	}
 
 	public function hasStatusBewerber($prestudent_id)
@@ -200,11 +199,10 @@ class Status extends FHCAPI_Controller
 		$lastStatusData = $this->getDataOrTerminateWithError($result);
 		$lastStatusData = current($lastStatusData);
 
-		//TODO(Manu) check phrase: why bewerbung?
 		if (!$isBerechtigtBasisPrestudentstatus)
 			$this->form_validation->set_rules(
-				'bewerbung_abgeschicktamum',
-				$this->p->t('lehre', 'bewerbung_abgeschickt_am'),
+				'berechtigt',
+				$this->p->t('ui', 'nurLeseberechtigung'),
 				'is_null',
 				[
 					'is_null' => $this->p->t('ui', 'error_fieldWriteAccess')
@@ -253,7 +251,7 @@ class Status extends FHCAPI_Controller
 						return true;
 					$result = $this->prestudentstatuschecklib->checkIfAngetreten($prestudent_person);
 					return $this->getDataOrTerminateWithError($result);
-				}],		
+				}],
 				//Check ZGV
 				['checkIfZGV', function ($value) use ($prestudent_person) {
 					if (!ZGV_CHECK)
@@ -274,7 +272,7 @@ class Status extends FHCAPI_Controller
 				}],
 				//Check Bewerberstatus
 				[
-				'checkIfExistingBewerberstatus', function () use ($prestudent_id, $status_kurzbz) {
+					'checkIfExistingBewerberstatus', function () use ($prestudent_id, $status_kurzbz) {
 					if ($status_kurzbz != Prestudentstatus_model::STATUS_AUFGENOMMENER &&
 						$status_kurzbz != Prestudentstatus_model::STATUS_WARTENDER &&
 						$status_kurzbz != Prestudentstatus_model::STATUS_ABGEWIESENER)
@@ -297,9 +295,9 @@ class Status extends FHCAPI_Controller
 				'checkIfZGV' => $this->p->t('lehre', 'error_ZGVNichtEingetragen', ['name' => $studentName]),
 				'checkIfZGVMaster' => $this->p->t('lehre', 'error_ZGVMasterNichtEingetragen', ['name' => $studentName]),
 				'status_stud_exists' => $this->p->t('lehre', 'error_noStudstatus')
-				]
+			]
 		);
- 
+
 		if ($status_kurzbz == Prestudentstatus_model::STATUS_STUDENT)
 			$this->form_validation->set_rules('ausbildungssemester', $this->p->t('lehre', 'ausbildungssemester'), 'required|integer', [
 				'integer' => $this->p->t('ui', 'error_fieldNotInteger')
@@ -647,11 +645,10 @@ class Status extends FHCAPI_Controller
 
 		$isBerechtigtBasisPrestudentstatus = $this->permissionlib->isBerechtigt('basis/prestudentstatus');
 
-		//TODO(Manu) check phrase: why bewerbung?
 		if (!$isBerechtigtBasisPrestudentstatus)
 			$this->form_validation->set_rules(
-				'bewerbung_abgeschicktamum',
-				$this->p->t('lehre', 'bewerbung_abgeschickt_am'),
+				'berechtigt',
+				$this->p->t('ui', 'nurLeseberechtigung'),
 				'is_null',
 				[
 					'is_null' => $this->p->t('ui', 'error_fieldWriteAccess')
@@ -842,25 +839,25 @@ class Status extends FHCAPI_Controller
 		//Default: keine Matrikelnummer wird generiert
 
 		//(2) personenkz = uid
-/*		if (defined('SET_UID_AS_PERSONENKENNZEICHEN') && SET_UID_AS_PERSONENKENNZEICHEN) {
-			$matrikelnr = $uidStudent;
-		}*/
+		/*		if (defined('SET_UID_AS_PERSONENKENNZEICHEN') && SET_UID_AS_PERSONENKENNZEICHEN) {
+					$matrikelnr = $uidStudent;
+				}*/
 
 		//(3) Matrikelnummer = uid
-/*		if (defined('SET_UID_AS_MATRIKELNUMMER') && SET_UID_AS_MATRIKELNUMMER) {
-			//update person
-			$result = $this->PersonModel->update(
-				[
-					'person_id' => $person_id,
-				],
-				[
-					'matr_nr' => $uidStudent,
-				]
-			);
-			if (isError($result)) {
-				return $this->terminateWithError("uidAsMatrikelnummer" . getError($result), self::ERROR_TYPE_GENERAL);
-			}
-		}*/
+		/*		if (defined('SET_UID_AS_MATRIKELNUMMER') && SET_UID_AS_MATRIKELNUMMER) {
+					//update person
+					$result = $this->PersonModel->update(
+						[
+							'person_id' => $person_id,
+						],
+						[
+							'matr_nr' => $uidStudent,
+						]
+					);
+					if (isError($result)) {
+						return $this->terminateWithError("uidAsMatrikelnummer" . getError($result), self::ERROR_TYPE_GENERAL);
+					}
+				}*/
 
 		//add benutzerdatensatz mit Aktierungscode
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
@@ -1695,9 +1692,9 @@ class Status extends FHCAPI_Controller
 
 		$this->form_validation->set_rules('status_kurzbz', $this->p->t('lehre', 'status_rolle'), [
 			'in_list[' .
-				Prestudentstatus_model::STATUS_STUDENT . ',' .
-				Prestudentstatus_model::STATUS_DIPLOMAND . ',' .
-				Prestudentstatus_model::STATUS_UNTERBRECHER . ']',
+			Prestudentstatus_model::STATUS_STUDENT . ',' .
+			Prestudentstatus_model::STATUS_DIPLOMAND . ',' .
+			Prestudentstatus_model::STATUS_UNTERBRECHER . ']',
 			['status_stud_exists', function ($value) use ($prestudent_id) {
 				if ($value != Prestudentstatus_model::STATUS_STUDENT)
 					return true;
@@ -1886,7 +1883,7 @@ class Status extends FHCAPI_Controller
 
 		//Send Message
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		
+
 		$this->PrestudentModel->addSelect('p.*');
 		$this->PrestudentModel->addSelect('stg.oe_kurzbz');
 		$this->PrestudentModel->addSelect('stg.bezeichnung AS stg_bezeichnung');
@@ -1898,7 +1895,7 @@ class Status extends FHCAPI_Controller
 		$this->PrestudentModel->addJoin('public.tbl_studiengang stg', 'studiengang_kz');
 		$this->PrestudentModel->addJoin('public.tbl_studiengangstyp typ', 'typ');
 		$this->PrestudentModel->addJoin('public.tbl_studienplan plan', 'studienplan_id', 'LEFT');
-		
+
 		$result = $this->PrestudentModel->load($prestudent_id);
 
 		$studentdata = $this->getDataOrTerminateWithError($result);
