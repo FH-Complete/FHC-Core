@@ -523,18 +523,56 @@ class PrestudentLib
 
 	public function setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		return $this->setBasic(Prestudentstatus_model::STATUS_ABSOLVENT, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+		$authUID = getAuthUID();
+		$now = date('c');
+
+
+		$result = $this->setBasic(Prestudentstatus_model::STATUS_ABSOLVENT, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+
+		if (isError($result))
+			return $result;
+
+		
+		// Load Student
+		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+
+		$student = current(getData($result));
+
+
+		// Benutzer inaktiv setzen
+		$this->_ci->BenutzerModel->update([
+			'uid' =>  $student->student_uid
+		], [
+			'aktiv' => false,
+			'updateaktivvon' => $authUID,
+			'updateaktivam' => $now,
+			'updatevon' => $authUID,
+			'updateamum' => $now
+		]);
+
+		if (isError($result))
+			return $result;
+
+		return success();
 	}
 
 	public function setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
 		$result = $this->setBasic(Prestudentstatus_model::STATUS_BEWERBER, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 
+		if (isError($result))
+			return $result;
+
 		if (SEND_BEWERBER_INFOMAIL) {
 			// TODO(chris): IMPLEMENT!
 		}
 
-		return $result;
+		return success();
 	}
 
 	public function setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
