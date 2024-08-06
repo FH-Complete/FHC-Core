@@ -516,18 +516,34 @@ class PrestudentLib
 		return success();
 	}
 
-	public function setDiplomand($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
+	public function setDiplomand($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
 	{
-		return $this->setBasic(getAuthUID(), date('c'), Prestudentstatus_model::STATUS_DIPLOMAND, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+		return $this->setBasic(
+			getAuthUID(),
+			date('c'),
+			Prestudentstatus_model::STATUS_DIPLOMAND,
+			$prestudent_id,
+			$studiensemester_kurzbz,
+			$ausbildungssemester,
+			$statusgrund_id
+		);
 	}
 
-	public function setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
+	public function setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
 	{
 		$authUID = getAuthUID();
 		$now = date('c');
 
 
-		$result = $this->setBasic($authUID, $now, Prestudentstatus_model::STATUS_ABSOLVENT, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+		$result = $this->setBasic(
+			$authUID,
+			$now,
+			Prestudentstatus_model::STATUS_ABSOLVENT,
+			$prestudent_id,
+			$studiensemester_kurzbz,
+			$ausbildungssemester,
+			$statusgrund_id
+		);
 
 		if (isError($result))
 			return $result;
@@ -561,9 +577,17 @@ class PrestudentLib
 		return success();
 	}
 
-	public function setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
+	public function setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
 	{
-		$result = $this->setBasic(getAuthUID(), date('c'), Prestudentstatus_model::STATUS_BEWERBER, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+		$result = $this->setBasic(
+			getAuthUID(),
+			date('c'),
+			Prestudentstatus_model::STATUS_BEWERBER,
+			$prestudent_id,
+			$studiensemester_kurzbz,
+			$ausbildungssemester,
+			$statusgrund_id
+		);
 
 		if (isError($result))
 			return $result;
@@ -575,19 +599,43 @@ class PrestudentLib
 		return success();
 	}
 
-	public function setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
+	public function setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
 	{
-		return $this->setBasic(getAuthUID(), $now, Prestudentstatus_model::STATUS_AUFGENOMMENER, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+		return $this->setBasic(
+			getAuthUID(),
+			date('c'),
+			Prestudentstatus_model::STATUS_AUFGENOMMENER,
+			$prestudent_id,
+			$studiensemester_kurzbz,
+			$ausbildungssemester,
+			$statusgrund_id
+		);
 	}
 
 	public function setAbgewiesener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
 	{
-		return $this->setBasic(getAuthUID(), $now, Prestudentstatus_model::STATUS_ABGEWIESENER, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id);
+		return $this->setBasic(
+			getAuthUID(),
+			date('c'),
+			Prestudentstatus_model::STATUS_ABGEWIESENER,
+			$prestudent_id,
+			$studiensemester_kurzbz,
+			$ausbildungssemester,
+			$statusgrund_id
+		);
 	}
 
 	public function setWartender($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
 	{
-		return $this->setBasic(getAuthUID(), $now, Prestudentstatus_model::STATUS_WARTENDER, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id);
+		return $this->setBasic(
+			getAuthUID(),
+			date('c'),
+			Prestudentstatus_model::STATUS_WARTENDER,
+			$prestudent_id,
+			$studiensemester_kurzbz,
+			$ausbildungssemester,
+			$statusgrund_id
+		);
 	}
 
 	protected function setBasic($authUID, $now, $status_kurzbz, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id = null)

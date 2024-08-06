@@ -480,28 +480,32 @@ class Status extends FHCAPI_Controller
 				$result = $this->prestudentlib->setDiplomand(
 					$prestudent_id,
 					$studiensemester_kurzbz,
-					$ausbildungssemester // TODO(chris): statusgrund_id
+					$ausbildungssemester,
+					$statusgrund_id
 				);
 				break;
 			case Prestudentstatus_model::STATUS_ABSOLVENT:
 				$result = $this->prestudentlib->setAbsolvent(
 					$prestudent_id,
 					$studiensemester_kurzbz,
-					$ausbildungssemester // TODO(chris): statusgrund_id
+					$ausbildungssemester,
+					$statusgrund_id
 				);
 				break;
 			case Prestudentstatus_model::STATUS_BEWERBER:
 				$result = $this->prestudentlib->setBewerber(
 					$prestudent_id,
 					$studiensemester_kurzbz,
-					$ausbildungssemester // TODO(chris): statusgrund_id
+					$ausbildungssemester,
+					$statusgrund_id
 				);
 				break;
 			case Prestudentstatus_model::STATUS_AUFGENOMMENER:
 				$result = $this->prestudentlib->setAufgenommener(
 					$prestudent_id,
 					$studiensemester_kurzbz,
-					$ausbildungssemester // TODO(chris): statusgrund_id
+					$ausbildungssemester,
+					$statusgrund_id
 				);
 				break;
 			case Prestudentstatus_model::STATUS_ABGEWIESENER:
