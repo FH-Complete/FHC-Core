@@ -480,40 +480,37 @@ class Status extends FHCAPI_Controller
 				$result = $this->prestudentlib->setDiplomand(
 					$prestudent_id,
 					$studiensemester_kurzbz,
-					$ausbildungssemester
+					$ausbildungssemester // TODO(chris): statusgrund_id
 				);
 				break;
 			case Prestudentstatus_model::STATUS_ABSOLVENT:
 				$result = $this->prestudentlib->setAbsolvent(
 					$prestudent_id,
 					$studiensemester_kurzbz,
-					$ausbildungssemester
+					$ausbildungssemester // TODO(chris): statusgrund_id
 				);
 				break;
 			case Prestudentstatus_model::STATUS_BEWERBER:
 				$result = $this->prestudentlib->setBewerber(
 					$prestudent_id,
 					$studiensemester_kurzbz,
-					$ausbildungssemester
+					$ausbildungssemester // TODO(chris): statusgrund_id
 				);
 				break;
 			case Prestudentstatus_model::STATUS_AUFGENOMMENER:
 				$result = $this->prestudentlib->setAufgenommener(
 					$prestudent_id,
 					$studiensemester_kurzbz,
-					$ausbildungssemester
+					$ausbildungssemester // TODO(chris): statusgrund_id
 				);
 				break;
 			case Prestudentstatus_model::STATUS_ABGEWIESENER:
-				$this->load->library('PrestudentLib');
-				$result = $this->prestudentlib->setAbgewiesener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id);
-
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
-				else
-					$this->terminateWithSuccess($prestudent_id);
+				$result = $this->prestudentlib->setAbgewiesener(
+					$prestudent_id,
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					$statusgrund_id
+				);
 				break;
 			case Prestudentstatus_model::STATUS_WARTENDER:
 				$this->load->library('PrestudentLib');
