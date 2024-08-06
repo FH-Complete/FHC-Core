@@ -567,7 +567,9 @@ class PrestudentLib
 		$prestudent_status = current(getData($result));
 
 
-		//Status updaten
+		// Update Aktionen
+
+		// Status updaten
 		$result = $this->_ci->PrestudentstatusModel->insert([
 			'prestudent_id' => $prestudent_id,
 			'status_kurzbz' => Prestudentstatus_model::STATUS_ABSOLVENT,
@@ -590,18 +592,21 @@ class PrestudentLib
 
 	public function setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		$resultLastStatus = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
-		if (isError($resultLastStatus))
-			return $resultLastStatus;
-		$resultLastStatus = getData($resultLastStatus);
+		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 
-		$prestudent_status = current($resultLastStatus);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', [
+				'prestudent_id' => $prestudent_id
+			]));
 
-		//check studiensemester_kurzbz TODO(Manu) check if Necessary: already checked in staus.php changeStatus()
-		/*		$studiensemester_kurzbz = $prestudent_status->studiensemester_kurzbz != $studiensemester_kurzbz ?
-					$prestudent_status->studiensemester_kurzbz : $studiensemester_kurzbz;*/
+		$prestudent_status = current(getData($result));
 
-		//Status updaten
+
+		// Update Aktionen
+
+		// Status updaten
 		$result = $this->_ci->PrestudentstatusModel->insert([
 			'prestudent_id' => $prestudent_id,
 			'status_kurzbz' => Prestudentstatus_model::STATUS_BEWERBER,
@@ -616,12 +621,14 @@ class PrestudentLib
 			'bestaetigtam' => date('c')
 		]);
 
-		if (isError($result))
-		{
-			return $result;
+		if (SEND_BEWERBER_INFOMAIL) {
+			// TODO(chris): IMPLEMENT!
 		}
-		else
-			return success();
+
+		if (isError($result))
+			return $result;
+
+		return success();
 	}
 
 	public function setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
