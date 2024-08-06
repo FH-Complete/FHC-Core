@@ -35,6 +35,141 @@ class PrestudentLib
 		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 	}
 
+	public function setAbbrecherNeu(
+		$prestudent_id,
+		$studiensemester_kurzbz,
+		$insertvon = null,
+		$statusgrund_id = null,
+		$datum = null,
+		$bestaetigtam = null,
+		$bestaetigtvon = null
+	) {
+		if (!$insertvon)
+			$insertvon = getAuthUID();
+		if (!$bestaetigtvon)
+			$bestaetigtvon = $insertvon;
+
+		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
+		if (isError($result))
+			return $result;
+		$result = getData($result);
+		if (!$result)
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
+				'prestudent_id' => $prestudent_id,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz
+			]));
+
+		$prestudent_status = current($result);
+
+		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+
+		if (isError($result))
+			return $result;
+		$result = getData($result);
+		if (!$result)
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+
+		$student = current($result);
+
+		if(!$datum)
+			$datum = date('c');
+
+		if(!$bestaetigtam)
+			$bestaetigtam = date('c');
+
+		//Status und Statusgrund updaten
+		$result = $this->_ci->PrestudentstatusModel->insert([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_ABBRECHER,
+			'studiensemester_kurzbz' => $prestudent_status->studiensemester_kurzbz,
+			'ausbildungssemester' => $prestudent_status->ausbildungssemester,
+			'datum' => $datum,
+			'insertvon' => $insertvon,
+			'insertamum' => date('c'),
+			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
+			'studienplan_id'=> $prestudent_status->studienplan_id,
+			'bestaetigtvon' => $bestaetigtvon,
+			'bestaetigtam' => $bestaetigtam,
+			'statusgrund_id' => $statusgrund_id
+		]);
+
+		if (isError($result))
+			return $result;
+
+		//refactored with processStudentlehrverband
+		$result = $this->_ci->StudentlehrverbandModel->processStudentlehrverband(
+			$student->student_uid,
+			$student->studiengang_kz,
+			0,
+			'A',
+			'',
+			$studiensemester_kurzbz,
+			Prestudentstatus_model::STATUS_ABBRECHER
+		);
+
+		if (isError($result))
+			return $result;
+
+
+		//noch nicht eingetragene Zeugnisnoten auf 9 setzen
+		$result = $this->_ci->ZeugnisnoteModel->getZeugnisnoten($student->student_uid, $prestudent_status->studiensemester_kurzbz);
+		if (isError($result))
+			return $result;
+		$result = getData($result) ?: [];
+
+		foreach ($result as $lv)
+		{
+			if (!$lv->note)
+			{
+				$result = $this->_ci->ZeugnisnoteModel->insert([
+					'note' => 9,
+					'studiensemester_kurzbz' => $lv->studiensemester_kurzbz,
+					'student_uid' => $lv->uid,
+					'lehrveranstaltung_id' => $lv->lehrveranstaltung_id
+				]);
+				if (isError($result)) {
+					$result = $this->_ci->ZeugnisnoteModel->update([
+						'studiensemester_kurzbz' => $lv->studiensemester_kurzbz,
+						'student_uid' => $lv->uid,
+						'lehrveranstaltung_id' => $lv->lehrveranstaltung_id
+					], [
+						'note' => 9
+					]);
+
+					if (isError($result))
+						return $result;
+				}
+			}
+		}
+
+
+		//Update Aktionen
+
+		//StudentModel updaten
+		$this->_ci->StudentModel->update([
+			'student_uid' => $student->student_uid
+		], [
+			'verband' => 'A',
+			'gruppe' => '',
+			'semester' => 0,
+			'updatevon' => $insertvon,
+			'updateamum' => date('c')
+		]);
+
+		//Benutzer inaktiv setzen
+		$this->_ci->BenutzerModel->update([
+			'uid' =>  $student->student_uid
+		], [
+			'aktiv' => false,
+			'updateaktivvon' => $insertvon,
+			'updateaktivam' => date('c'),
+			'updatevon' => $insertvon,
+			'updateamum' => date('c')
+		]);
+
+		return success();
+	}
+
 	public function setAbbrecher($prestudent_id, $studiensemester_kurzbz, $insertvon = null, $statusgrund_kurzbz = null, $datum = null, $bestaetigtam = null, $bestaetigtvon = null)
 	{
 		if (!$insertvon)
@@ -133,6 +268,9 @@ class PrestudentLib
 				}
 			}
 		}
+
+		// TODO(chris): student updaten (hier oder in studentlehrverband)
+		// TODO(chris): db transaction
 
 		//Benutzer inaktiv setzen
 		$this->_ci->BenutzerModel->update([
@@ -284,6 +422,20 @@ class PrestudentLib
 				}
 			}
 		}
+
+
+		//Update Aktionen
+
+		//StudentModel updaten
+		$this->_ci->StudentModel->update([
+			'student_uid' => $student->student_uid
+		], [
+			'verband' => 'B',
+			'gruppe' => '',
+			'semester' => 0,
+			'updatevon' => $insertvon,
+			'updateamum' => date('c')
+		]);
 
 		return success();
 	}

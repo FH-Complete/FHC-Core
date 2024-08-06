@@ -437,33 +437,22 @@ class Status extends FHCAPI_Controller
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
+		
+		$this->load->library('PrestudentLib');
+
+		$this->db->trans_start();
+		
 		switch($status_kurzbz){
 			case Prestudentstatus_model::STATUS_ABBRECHER:
-				$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
-				$result = $this->StatusgrundModel->load($statusgrund_id);
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
-				$result = current(getData($result));
-				$statusgrund_kurzbz = $result->statusgrund_kurzbz;
-
-				$this->load->library('PrestudentLib');
-				$result = $this->prestudentlib->setAbbrecher(
+				$result = $this->prestudentlib->setAbbrecherNeu(
 					$prestudent_id,
 					$studiensemester_kurzbz,
 					null,
-					$statusgrund_kurzbz,
+					$statusgrund_id,
 					$datum_string,
 					null,
 					null
 				);
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result));
-				}
-				else
-					$this->terminateWithSuccess($prestudent_id);
 				break;
 			case Prestudentstatus_model::STATUS_UNTERBRECHER:
 				$ausbildungssemester = $lastStatusData->ausbildungssemester;
@@ -558,6 +547,12 @@ class Status extends FHCAPI_Controller
 			default:
 				$this->terminateWithError("Action not yet defined in Prestudentlib", self::ERROR_TYPE_GENERAL);
 		}
+
+		$this->getDataOrTerminateWithError($result);
+
+		$this->trans_complete();
+
+		$this->terminateWithSuccess($prestudent_id);
 	}
 
 	public function addStudent($prestudent_id)
