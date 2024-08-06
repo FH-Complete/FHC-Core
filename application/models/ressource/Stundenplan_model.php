@@ -133,6 +133,71 @@ class Stundenplan_model extends DB_Model
 		return $gruppierteEvents;
 	}
 
+	public function stundenPlanGruppierung($stundenplanViewQuery)
+	{
+		
+
+		$gruppierteEvents = $this->execReadOnlyQuery("
+		SELECT 
+			
+		'stundenplan' as type,
+		unr,datum, stunde,
+		CONCAT(lehrfach,'-',lehrform) as topic,
+		'' as beschreibung,
+		string_agg(DISTINCT gruppe, '/') as gruppe,
+		string_agg(DISTINCT lektor, '/') as lektor,  
+		ort_kurzbz, studiengang_kz, titel,'' as beschreibung,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit 
+
+		FROM
+		(
+			SELECT
+ 			unr,datum, stunde,
+			CASE
+				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz 
+				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) 
+			END as gruppe,
+			CASE
+				WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
+				ELSE lektor
+			END as lektor,
+			ort_kurzbz, studiengang_kz, titel,'' as beschreibung,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit 
+
+			FROM (".$stundenplanViewQuery.") sp
+
+		) as sp
+
+		GROUP BY 
+
+			ort_kurzbz,unr, datum, stunde, lehreinheit_id, lehrfach_id,studiengang_kz,titel,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit
+
+		ORDER BY datum, stunde
+		");
+
+		return $gruppierteEvents;
+	}
+
+	public function getStudenPlanQuery($uid){
+			return 
+			"select sp.*
+			from lehre.vw_stundenplan sp
+			left join public.tbl_benutzergruppe bg ON sp.gruppe_kurzbz=bg.gruppe_kurzbz AND bg.uid =".$this->escape($uid)." 
+			left join public.tbl_studiensemester ss1 ON bg.studiensemester_kurzbz=ss1.studiensemester_kurzbz AND ss1.start <=sp.datum AND ss1.ende>= sp.datum
+			left join public.tbl_studentlehrverband slv ON sp.studiengang_kz=slv.studiengang_kz and slv.student_uid=".$this->escape($uid)." and (slv.semester=sp.semester OR sp.semester IS NULL) AND (slv.verband=sp.verband OR sp.verband IS NULL OR sp.verband='' OR sp.verband='0') AND
+			(slv.gruppe=sp.gruppe OR sp.gruppe IS NULL OR sp.gruppe='' OR sp.gruppe='0') AND sp.gruppe_kurzbz IS NULL
+			left join public.tbl_studiensemester ss2 ON slv.studiensemester_kurzbz=ss2.studiensemester_kurzbz AND ss2.start<=sp.datum and ss2.ende >= sp.datum
+			WHERE ss1.studiensemester_kurzbz IS NOT NULL or ss2.studiensemester_kurzbz IS NOT NULL";
+	}
+
+	public function getRoomQuery($ort_kurzbz, $start_date, $end_date)
+	{
+		return
+			"select sp.*
+			FROM lehre.vw_stundenplan sp
+			WHERE ort_kurzbz = ".$this->escape($ort_kurzbz)." 
+			AND datum >= ".$this->escape($start_date)." 
+			AND datum <= ".$this->escape($end_date);
+	}
+
 	/**
 	 * @param string $uid
 	 * 
@@ -149,7 +214,7 @@ class Stundenplan_model extends DB_Model
 		$this->db->or_where('ss2.studiensemester_kurzbz IS NOT NULL', null, false);
 		
 		$query = $this->db->get_compiled_select('lehre.vw_stundenplan sp');
-		
+
 		return $this->execQuery($query, [$uid, $uid]);
 	}
 

@@ -30,12 +30,14 @@ class Stundenplan extends Auth_Controller
 	{
 		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 
-		$result = $this->StundenplanModel->loadForUid(get_uid());
+		/* $result = $this->StundenplanModel->loadForUid(get_uid());
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
-
-		$this->outputJsonSuccess(getData($result));
+ */
+		$res = $this->StundenplanModel->stundenPlanGruppierung($this->StundenplanModel->getStudenPlanQuery(get_uid())); 
+		$res = getData($res);	
+		$this->outputJsonSuccess($res);
 	}
 
 	/**

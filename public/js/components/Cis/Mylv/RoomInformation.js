@@ -32,6 +32,13 @@ export default{
         },
     },
     methods:{
+		updateRange: function(data){
+			this.calendarWeek = new CalendarDate(data.start);
+			Vue.nextTick(() => {
+				this.loadRoomEvents();
+			});
+		},
+
         // returns the string YYYY-MM-DD if param is instance of CalendarDate and null otherwise
         calendarDateToString: function(calendarDate){
             
@@ -40,69 +47,50 @@ export default{
             null; 
             
         },
+
+		loadStunden: async function(){
+			await this.$fhcApi.factory.stundenplan.getStunden().then(res => {
+				res.data.forEach(std => {
+					this.stunden[std.stunde] = std; // TODO(chris): geht besser
+				});
+			});
+		},
+
+		loadRoomEvents: function(){
+			this.$fhcApi.factory.stundenplan.getRoomInfo(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay).then(res => {
+				let events;
+				if (res.data && res.data.forEach) {
+					res.data.forEach((el, i) => {
+
+						el.id = i;
+						if (el.type === 'reservierung') {
+							el.color = '#' + (el.farbe || 'FFFFFF');
+						} else {
+							el.color = '#' + (el.farbe || 'CCCCCC');
+						}
+
+						el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
+						el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
+						el.title = el.lehrfach;
+						if (el.lehrform)
+							el.title += '-' + el.lehrform;
+					});
+
+					this.events = res.data;
+				}
+			});
+		}
         
     },
-	created() {
+	async mounted() {
 
-        this.$fhcApi.factory.stundenplan.getStunden().then(res =>{
-            res.data.forEach(std => {
-				this.stunden[std.stunde] = std; // TODO(chris): geht besser
-			});
-
-
-           // old testing room EDV_A6.09
-            this.$fhcApi.factory.stundenplan.getRoomInfo(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay).then(res =>{
-                let events;
-                if (res.data && res.data.forEach) {
-                    res.data.forEach((el, i) => {
-
-                        el.id = i;
-                        if(el.type === 'reservierung')
-                        {
-                            el.color = '#' + (el.farbe || 'FFFFFF');
-                        }else{
-                            el.color = '#' + (el.farbe || 'CCCCCC');
-                        }
-                        
-                        el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-                        el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
-                        el.title = el.lehrfach;
-                        if (el.lehrform)
-                            el.title += '-' + el.lehrform;
-                    });
-                    
-                    this.events = res.data;
-                }
-
-                // reservierungen are loaded with the stundenplan
-                /* this.$fhcApi.factory.stundenplan.getReservierungen('EDV_F4.26', this.weekFirstDay, this.weekLastDay).then(res => {
-                    if (res.data && res.data.forEach) {
-                        res.data.forEach((el, i) => {
-                            el.reservierung = true;
-                            el.color = '#' + (el.farbe || 'ffffff');
-                            el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-                            el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
-                            el.title = el.titel;
-                            if (el.lehrform)
-                                el.title += '-' + el.lehrform;
-                        });
-                        
-                    }
-    
-                    let reservierungs_events = res.data;
-                    this.events = [...(this.events?this.events:[]),...reservierungs_events];
-                    
-                    
-                }); */
-            });
-
-           
-        });
+        this.loadStunden();
+		this.loadRoomEvents();
 
 	},
     template: /*html*/`
     <div>
-        <fhc-calendar  v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
+		<fhc-calendar @change:range="updateRange" v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
            
             <a class="text-decoration-none text-dark" href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'"   >    
                 <div class="d-flex flex-column align-items-center justify-content-evenly h-100" >

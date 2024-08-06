@@ -87,21 +87,10 @@ class Stundenplan extends FHCAPI_Controller
         $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
-        
-		// querying the stunden
-        $stunden = $this->StundeModel->load();
 
-        $stunden = $this->getDataOrTerminateWithError($stunden);
-
-		$result = $this->StundenplanModel->groupedCalendarEvents($ort_kurzbz,$start_date,$end_date);  
+		$result = $this->StundenplanModel->stundenPlanGruppierung($this->StundenplanModel->getRoomQuery($ort_kurzbz, $start_date, $end_date));  
 		
         $result = $this->getDataOrTerminateWithError($result);
-
-        foreach($result as $entry){
-            if(COUNT($entry->lektor)>1){
-                // gruppierung hat stattgefunden und das array muss in einem String konvertiert werden
-            }
-        }
 
 		$this->terminateWithSuccess($result);
 		
