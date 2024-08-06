@@ -73,24 +73,49 @@ class Lehrveranstaltung_model extends DB_Model
 	{
 		$qry = '
 			SELECT
-				lv.oe_kurzbz AS "lv_oe_kurzbz",
+				lv.oe_kurzbz AS lv_oe_kurzbz,
 				CASE
                     WHEN oe.organisationseinheittyp_kurzbz = \'Kompetenzfeld\' THEN (\'KF \' || oe.bezeichnung)
                     WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
                     ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
-                END AS "lv_oe_bezeichnung",
+                END AS lv_oe_bezeichnung,
 				stplsem.studiensemester_kurzbz,
 				studienordnung_id,
 				sto.studiengang_kz,
 				stpl.studienplan_id,
 				stplsem.semester,
 				stpl.orgform_kurzbz,
-				upper(stg.typ || stg.kurzbz) AS "stg_typ_kurzbz",    
-				stg.bezeichnung AS "stg_bezeichnung",
-				stgtyp.bezeichnung AS "stg_typ_bezeichnung",
+				upper(stg.typ || stg.kurzbz) AS stg_typ_kurzbz,    
+				stg.bezeichnung AS stg_bezeichnung,
+				stgtyp.bezeichnung AS stg_typ_bezeichnung,
 			    lv.lehrveranstaltung_id,
 				lv.semester,   		
-				lv.bezeichnung AS "lv_bezeichnung"
+				lv.bezeichnung AS lv_bezeichnung,
+				(
+				    -- comma seperated string of all lehreinheitgruppen
+					SELECT string_agg(bezeichnung, \', \') AS lehreinheitgruppe_bezeichnung
+					FROM(
+					    -- distinct bezeichnung, as may come multiple times from different lehreinheiten
+						SELECT DISTINCT ON (studiengang_kz, bezeichnung) studiengang_kz, bezeichnung FROM
+						(
+							-- distinct lehreinheitgruppe, as may come multiple times from different lehrform
+							SELECT DISTINCT ON (legr.lehreinheitgruppe_id) legr.studiengang_kz,
+								-- get Spezialgruppe or Lehrverbandgruppe 
+								COALESCE(
+									legr.gruppe_kurzbz,
+									CONCAT( UPPER(stg1.typ), UPPER(stg1.kurzbz), \'-\', legr.semester, legr.verband, legr.gruppe )
+								) as bezeichnung
+							FROM lehre.tbl_lehreinheitgruppe 	legr
+							JOIN lehre.tbl_lehreinheit 			le USING (lehreinheit_id)
+							JOIN lehre.tbl_lehrveranstaltung 	lv1 USING (lehrveranstaltung_id)
+							JOIN public.tbl_studiengang 		stg1 ON stg1.studiengang_kz = legr.studiengang_kz
+							WHERE lv1.lehrveranstaltung_id 		= lv.lehrveranstaltung_id
+							AND le.studiensemester_kurzbz 		= stplsem.studiensemester_kurzbz
+						) AS lehreinheitgruppen
+					    GROUP BY studiengang_kz, bezeichnung
+						ORDER BY studiengang_kz DESC
+					) AS uniqueLehreinheitgruppen_bezeichnung
+				) AS lehreinheitgruppen_bezeichnung
             FROM
 				lehre.tbl_studienplan 							stpl
 				JOIN lehre.tbl_studienordnung 					sto USING (studienordnung_id)
