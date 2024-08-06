@@ -498,15 +498,11 @@ class Status extends FHCAPI_Controller
 				);
 				break;
 			case Prestudentstatus_model::STATUS_AUFGENOMMENER:
-				$this->load->library('PrestudentLib');
-				$result = $this->prestudentlib->setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
-
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
-				else
-					$this->terminateWithSuccess($prestudent_id);
+				$result = $this->prestudentlib->setAufgenommener(
+					$prestudent_id,
+					$studiensemester_kurzbz,
+					$ausbildungssemester
+				);
 				break;
 			case Prestudentstatus_model::STATUS_ABGEWIESENER:
 				$this->load->library('PrestudentLib');

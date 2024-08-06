@@ -518,150 +518,28 @@ class PrestudentLib
 
 	public function setDiplomand($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
-
-		if (isError($result))
-			return $result;
-		if (!hasData($result))
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', [
-				'prestudent_id' => $prestudent_id
-			]));
-
-		$prestudent_status = current(getData($result));
-
-
-		// Update Aktionen
-
-		// Status updaten
-		$result = $this->_ci->PrestudentstatusModel->insert([
-			'prestudent_id' => $prestudent_id,
-			'status_kurzbz' => Prestudentstatus_model::STATUS_DIPLOMAND,
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'ausbildungssemester' => $ausbildungssemester,
-			'datum' => date('c'),
-			'insertvon' => getAuthUID(),
-			'insertamum' => date('c'),
-			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
-			'studienplan_id'=> $prestudent_status->studienplan_id,
-			'bestaetigtvon' => getAuthUID(),
-			'bestaetigtam' => date('c'),
-		]);
-
-		if (isError($result))
-			return $result;
-
-		return success();
+		return $this->setBasic(Prestudentstatus_model::STATUS_DIPLOMAND, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 	}
 
 	public function setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
-
-		if (isError($result))
-			return $result;
-		if (!hasData($result))
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', [
-				'prestudent_id' => $prestudent_id
-			]));
-
-		$prestudent_status = current(getData($result));
-
-
-		// Update Aktionen
-
-		// Status updaten
-		$result = $this->_ci->PrestudentstatusModel->insert([
-			'prestudent_id' => $prestudent_id,
-			'status_kurzbz' => Prestudentstatus_model::STATUS_ABSOLVENT,
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'ausbildungssemester' => $ausbildungssemester,
-			'datum' => date('c'),
-			'insertvon' => getAuthUID(),
-			'insertamum' => date('c'),
-			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
-			'studienplan_id'=> $prestudent_status->studienplan_id,
-			'bestaetigtvon' => getAuthUID(),
-			'bestaetigtam' => date('c'),
-		]);
-
-		if (isError($result))
-			return $result;
-
-		return success();
+		return $this->setBasic(Prestudentstatus_model::STATUS_ABSOLVENT, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 	}
 
 	public function setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
-
-		if (isError($result))
-			return $result;
-		if (!hasData($result))
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', [
-				'prestudent_id' => $prestudent_id
-			]));
-
-		$prestudent_status = current(getData($result));
-
-
-		// Update Aktionen
-
-		// Status updaten
-		$result = $this->_ci->PrestudentstatusModel->insert([
-			'prestudent_id' => $prestudent_id,
-			'status_kurzbz' => Prestudentstatus_model::STATUS_BEWERBER,
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'ausbildungssemester' => $ausbildungssemester,
-			'datum' => date('c'),
-			'insertvon' => getAuthUID(),
-			'insertamum' => date('c'),
-			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
-			'studienplan_id'=> $prestudent_status->studienplan_id,
-			'bestaetigtvon' => getAuthUID(),
-			'bestaetigtam' => date('c')
-		]);
+		$result = $this->setBasic(Prestudentstatus_model::STATUS_BEWERBER, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 
 		if (SEND_BEWERBER_INFOMAIL) {
 			// TODO(chris): IMPLEMENT!
 		}
 
-		if (isError($result))
-			return $result;
-
-		return success();
+		return $result;
 	}
 
 	public function setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		$resultLastStatus = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
-		if (isError($resultLastStatus))
-			return $resultLastStatus;
-		$resultLastStatus = getData($resultLastStatus);
-
-		$prestudent_status = current($resultLastStatus);
-
-
-		//Status updaten
-		$result = $this->_ci->PrestudentstatusModel->insert([
-			'prestudent_id' => $prestudent_id,
-			'status_kurzbz' => Prestudentstatus_model::STATUS_AUFGENOMMENER,
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'ausbildungssemester' => $ausbildungssemester,
-			'datum' => date('c'),
-			'insertvon' => getAuthUID(),
-			'insertamum' => date('c'),
-			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
-			'studienplan_id'=> $prestudent_status->studienplan_id,
-			'bestaetigtvon' => getAuthUID(),
-			'bestaetigtam' => date('c')
-		]);
-
-		if (isError($result))
-		{
-			return $result;
-		}
-		else
-			return success();
+		return $this->setBasic(Prestudentstatus_model::STATUS_AUFGENOMMENER, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 	}
 
 	public function setAbgewiesener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
@@ -727,5 +605,42 @@ class PrestudentLib
 		}
 		else
 			return success();
+	}
+
+	protected function setBasic($status_kurzbz, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
+	{
+		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
+
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', [
+				'prestudent_id' => $prestudent_id
+			]));
+
+		$prestudent_status = current(getData($result));
+
+
+		// Update Aktionen
+
+		// Status updaten
+		$result = $this->_ci->PrestudentstatusModel->insert([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => $status_kurzbz,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'ausbildungssemester' => $ausbildungssemester,
+			'datum' => date('c'),
+			'insertvon' => getAuthUID(),
+			'insertamum' => date('c'),
+			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
+			'studienplan_id'=> $prestudent_status->studienplan_id,
+			'bestaetigtvon' => getAuthUID(),
+			'bestaetigtam' => date('c')
+		]);
+
+		if (isError($result))
+			return $result;
+
+		return success();
 	}
 }
