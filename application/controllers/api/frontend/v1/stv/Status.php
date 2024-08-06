@@ -185,7 +185,6 @@ class Status extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
-
 	}
 
 	public function changeStatus($prestudent_id)
@@ -273,13 +272,14 @@ class Status extends FHCAPI_Controller
 				//Check Bewerberstatus
 				[
 					'checkIfExistingBewerberstatus', function () use ($prestudent_id, $status_kurzbz) {
-					if ($status_kurzbz != Prestudentstatus_model::STATUS_AUFGENOMMENER &&
-						$status_kurzbz != Prestudentstatus_model::STATUS_WARTENDER &&
-						$status_kurzbz != Prestudentstatus_model::STATUS_ABGEWIESENER)
+						if ($status_kurzbz != Prestudentstatus_model::STATUS_AUFGENOMMENER &&
+							$status_kurzbz != Prestudentstatus_model::STATUS_WARTENDER &&
+							$status_kurzbz != Prestudentstatus_model::STATUS_ABGEWIESENER
+							)
 						return true;
-					$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
-					return $this->getDataOrTerminateWithError($result);
-				}],
+						$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
+						return $this->getDataOrTerminateWithError($result);
+					}],
 				//Check If Student
 				['status_stud_exists', function ($value) use ($prestudent_id) {
 					if ($value != Prestudentstatus_model::STATUS_STUDENT)
@@ -289,7 +289,8 @@ class Status extends FHCAPI_Controller
 
 					return $this->getDataOrTerminateWithError($result);
 				}],
-			],	[
+			],
+			[
 				'reihungstest_check' => $this->p->t('lehre', 'error_keinReihungstestverfahren', ['name' => $studentName]),
 				'checkIfExistingBewerberstatus' => $this->p->t('lehre', 'error_keinBewerber', ['name' => $studentName]),
 				'checkIfZGV' => $this->p->t('lehre', 'error_ZGVNichtEingetragen', ['name' => $studentName]),
@@ -500,143 +501,126 @@ class Status extends FHCAPI_Controller
 
 		switch($status_kurzbz){
 			case Prestudentstatus_model::STATUS_ABBRECHER:
+				$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
+
+				$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+				$result = $this->StatusgrundModel->load($statusgrund_id);
+				if (isError($result))
 				{
-					$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
-
-					$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
-					$result = $this->StatusgrundModel->load($statusgrund_id);
-					if (isError($result))
-					{
-						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-					}
-					$result = current(getData($result));
-					$statusgrund_kurzbz = $result->statusgrund_kurzbz;
-
-					$this->load->library('PrestudentLib');
-					$result = $this->prestudentlib->setAbbrecher($prestudent_id, $studiensemester_kurzbz, null, $statusgrund_kurzbz, $datum, null, null);
-					if (isError($result))
-					{
-						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-					}
-					else
-						$this->terminateWithSuccess($prestudent_id);
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
+				$result = current(getData($result));
+				$statusgrund_kurzbz = $result->statusgrund_kurzbz;
+
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setAbbrecher(
+					$prestudent_id,
+					$studiensemester_kurzbz,
+					null,
+					$statusgrund_kurzbz,
+					$datum,
+					null,
+					null
+				);
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
 				break;
 			case Prestudentstatus_model::STATUS_UNTERBRECHER:
-				{
-					$ausbildungssemester = $lastStatusData->ausbildungssemester;
-					$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
+				$ausbildungssemester = $lastStatusData->ausbildungssemester;
+				$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
 
-					$this->load->library('PrestudentLib');
-					$result = $this->prestudentlib->setUnterbrecher($prestudent_id, $studiensemester_kurzbz, null, null, $ausbildungssemester);
-					if (isError($result))
-					{
-						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-					}
-					else
-						$this->terminateWithSuccess($prestudent_id);
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setUnterbrecher($prestudent_id, $studiensemester_kurzbz, null, null, $ausbildungssemester);
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
 				break;
 			case Prestudentstatus_model::STATUS_STUDENT:
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id);
+
+				if (isError($result))
 				{
-					$this->load->library('PrestudentLib');
-					$result = $this->prestudentlib->setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id);
-
-					if (isError($result))
-					{
-						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-					}
-					else
-						$this->terminateWithSuccess($prestudent_id);
-
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
 				break;
 			case Prestudentstatus_model::STATUS_DIPLOMAND:
-				{
-					$this->load->library('PrestudentLib');
-					$result = $this->prestudentlib->setDiplomand($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setDiplomand($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 
-					if (isError($result))
-					{
-						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-					}
-					else
-						$this->terminateWithSuccess($prestudent_id);
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
 				break;
 			case Prestudentstatus_model::STATUS_ABSOLVENT:
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+
+				if (isError($result))
 				{
-					$this->load->library('PrestudentLib');
-					$result = $this->prestudentlib->setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
-
-					if (isError($result))
-					{
-						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-					}
-					else
-						$this->terminateWithSuccess($prestudent_id);
-
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
 				break;
 			case Prestudentstatus_model::STATUS_BEWERBER:
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+
+				if (isError($result))
 				{
-					$this->load->library('PrestudentLib');
-					$result = $this->prestudentlib->setBewerber($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
-
-					if (isError($result))
-					{
-						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-					}
-					else
-						$this->terminateWithSuccess($prestudent_id);
-
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
 				break;
 			case Prestudentstatus_model::STATUS_AUFGENOMMENER:
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+
+				if (isError($result))
 				{
-					$this->load->library('PrestudentLib');
-					$result = $this->prestudentlib->setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
-
-					if (isError($result))
-					{
-						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-					}
-					else
-						$this->terminateWithSuccess($prestudent_id);
-
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
 				break;
 			case Prestudentstatus_model::STATUS_ABGEWIESENER:
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setAbgewiesener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id);
+
+				if (isError($result))
 				{
-					$this->load->library('PrestudentLib');
-					$result = $this->prestudentlib->setAbgewiesener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id);
-
-					if (isError($result))
-					{
-						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-					}
-					else
-						$this->terminateWithSuccess($prestudent_id);
-
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
 				break;
 			case Prestudentstatus_model::STATUS_WARTENDER:
-				{
-					$this->load->library('PrestudentLib');
-					$result = $this->prestudentlib->setWartender($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
+				$this->load->library('PrestudentLib');
+				$result = $this->prestudentlib->setWartender($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
 
-					if (isError($result))
-					{
-						return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-					}
-					else
-						$this->terminateWithSuccess($prestudent_id);
+				if (isError($result))
+				{
+					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
+				else
+					$this->terminateWithSuccess($prestudent_id);
 				break;
 			default:
-			{
 				$this->terminateWithError("Action not yet defined in Prestudentlib", self::ERROR_TYPE_GENERAL);
-			}
 		}
 	}
 
@@ -700,7 +684,7 @@ class Status extends FHCAPI_Controller
 					$result = $this->prestudentstatuschecklib->checkIfZGVEingetragen($prestudent_person);
 					return $this->getDataOrTerminateWithError($result);
 				}],
-				//Check ZGV Master //TODO(Manu) test
+				//Check ZGV Master
 				['checkIfZGVMaster', function ($value) use ($prestudent_person) {
 					if (!ZGV_CHECK)
 						return true;
@@ -749,7 +733,8 @@ class Status extends FHCAPI_Controller
 					);
 					return $this->getDataOrTerminateWithError($result);
 				}]
-			],	[
+			],
+			[
 				'reihungstest_check' => $this->p->t('lehre', 'error_keinReihungstestverfahren', ['name' => $studentName]),
 				'checkIfExistingBewerberstatus' => $this->p->t('lehre', 'error_keinBewerber', ['name' => $studentName]),
 				'checkIfExistingAufgenommenerstatus' => $this->p->t('lehre', 'error_keinAufgenommener', ['name' => $studentName]),
@@ -867,7 +852,7 @@ class Status extends FHCAPI_Controller
 		}
 		if ($result->retval != "0")
 		{
-			return $this->terminateWithError($this->p->t('lehre','error_benutzerBereitsVorhanden', ['uid' => $uidStudent]), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError($this->p->t('lehre', 'error_benutzerBereitsVorhanden', ['uid' => $uidStudent]), self::ERROR_TYPE_GENERAL);
 		}
 
 		$aktivierungscode = null;
@@ -918,7 +903,16 @@ class Status extends FHCAPI_Controller
 		}
 
 		$this->load->library('PrestudentLib');
-		$result = $this->prestudentlib->setFirstStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id, date('c'), getAuthUID(), $stg, $uidStudent);
+		$result = $this->prestudentlib->setFirstStudent(
+			$prestudent_id,
+			$studiensemester_kurzbz,
+			$ausbildungssemester,
+			$statusgrund_id,
+			date('c'),
+			getAuthUID(),
+			$stg,
+			$uidStudent
+		);
 
 		$this->getDataOrTerminateWithError($result);
 
@@ -951,7 +945,7 @@ class Status extends FHCAPI_Controller
 
 		elseif (!hasData($result))
 		{
-			$this->terminateWithError($this->p->t('lehre','error_noStatusFound'), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('lehre', 'error_noStatusFound'), self::ERROR_TYPE_GENERAL);
 		}
 		else
 		{
@@ -2006,6 +2000,6 @@ class Status extends FHCAPI_Controller
 	private function _sanitizeAliasName($str)
 	{
 		$str = sanitizeProblemChars($str);
-		return mb_strtolower(str_replace(' ','_', $str));
+		return mb_strtolower(str_replace(' ', '_', $str));
 	}
 }
