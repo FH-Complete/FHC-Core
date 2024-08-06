@@ -513,15 +513,12 @@ class Status extends FHCAPI_Controller
 				);
 				break;
 			case Prestudentstatus_model::STATUS_WARTENDER:
-				$this->load->library('PrestudentLib');
-				$result = $this->prestudentlib->setWartender($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester);
-
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
-				else
-					$this->terminateWithSuccess($prestudent_id);
+				$result = $this->prestudentlib->setWartender(
+					$prestudent_id,
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					$statusgrund_id
+				);
 				break;
 			default:
 				$this->terminateWithError("Action not yet defined in Prestudentlib", self::ERROR_TYPE_GENERAL);

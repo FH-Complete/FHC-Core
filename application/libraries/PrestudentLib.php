@@ -585,36 +585,9 @@ class PrestudentLib
 		return $this->setBasic(getAuthUID(), $now, Prestudentstatus_model::STATUS_ABGEWIESENER, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id);
 	}
 
-	public function setWartender($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
+	public function setWartender($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
 	{
-		$resultLastStatus = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
-		if (isError($resultLastStatus))
-			return $resultLastStatus;
-		$resultLastStatus = getData($resultLastStatus);
-
-		$prestudent_status = current($resultLastStatus);
-
-		//Status updaten
-		$result = $this->_ci->PrestudentstatusModel->insert([
-			'prestudent_id' => $prestudent_id,
-			'status_kurzbz' => Prestudentstatus_model::STATUS_WARTENDER,
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'ausbildungssemester' => $ausbildungssemester,
-			'datum' => date('c'),
-			'insertvon' => getAuthUID(),
-			'insertamum' => date('c'),
-			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
-			'studienplan_id'=> $prestudent_status->studienplan_id,
-			'bestaetigtvon' => getAuthUID(),
-			'bestaetigtam' => date('c')
-		]);
-
-		if (isError($result))
-		{
-			return $result;
-		}
-		else
-			return success();
+		return $this->setBasic(getAuthUID(), $now, Prestudentstatus_model::STATUS_WARTENDER, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id);
 	}
 
 	protected function setBasic($authUID, $now, $status_kurzbz, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id = null)
