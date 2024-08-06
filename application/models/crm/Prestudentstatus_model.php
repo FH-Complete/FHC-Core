@@ -348,10 +348,10 @@ class Prestudentstatus_model extends DB_Model
 	 */
 	public function withGrund($statusgrund_kurzbz)
 	{
-		if($statusgrund_kurzbz)
+		if ($statusgrund_kurzbz)
 			$this->db->set(
 				'statusgrund_id',
-				'(SELECT statusgrund_id FROM public.tbl_status_grund WHERE statusgrund_kurzbz =' . $this->db->escape($statusgrund_kurzbz) .')',
+				'(SELECT statusgrund_id FROM public.tbl_status_grund WHERE statusgrund_kurzbz=' . $this->db->escape($statusgrund_kurzbz) . ')',
 				false
 			);
 
