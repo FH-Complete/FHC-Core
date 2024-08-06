@@ -175,14 +175,14 @@ class PrestudentstatusCheckLib
 	 * @return booleans $zgv_code, error if not registered
 	 */
 	//TODO(Manu) TEST
-	public function checkIfZGVEingetragenMaster($prestudent, $typ=null)
+	public function checkIfZGVEingetragenMaster($prestudent, $typ = null)
 	{
 		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$result = $this->_ci->StudiengangModel->load($prestudent->studiengang_kz);
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error($this->_ci->p->t('studierendenantrag','error_no_stg', ['studiengang_kz' => $prestudent->studiengang_kz])); // TODO(chris): phrase
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_stg', ['studiengang_kz' => $prestudent->studiengang_kz])); // TODO(chris): phrase
 
 		if (current($result->retval)->typ != 'm')
 			return success(true); // TODO(chris): correct?
@@ -194,7 +194,7 @@ class PrestudentstatusCheckLib
 	 * Checks if a bewerber status already exists.
 	 *
 	 * @param integer $prestudent_id
-	 * 
+	 *
 	 * @return stdClass
 	 */
 	public function checkIfExistingBewerberstatus($prestudent_id)
@@ -213,8 +213,8 @@ class PrestudentstatusCheckLib
 	 * Checks if status aufgenommen already exists.
 	 *
 	 * @param integer $prestudent_id
-	 * 
-	 *  @return stdClass
+	 *
+	 * @return stdClass
 	 */
 	public function checkIfExistingAufgenommenerstatus($prestudent_id)
 	{
@@ -782,7 +782,7 @@ class PrestudentstatusCheckLib
 					&& $new_status_ausbildungssemester == $old_status_ausbildungssemester)
 				{
 					// ...neuen status an selber stelle einfügen wie zu ändernder Status
-					$resultArr[$status_to_change_index] = (object) array_merge((array) $resultArr[$status_to_change_index], (array) $neuer_status);
+					$resultArr[$status_to_change_index] = (object)array_merge((array)$resultArr[$status_to_change_index], (array)$neuer_status);
 					$newStatusInserted = true;
 				}
 				else
@@ -894,17 +894,17 @@ class PrestudentstatusCheckLib
 
 			// wenn erster Studentstatus, checken ob Orgform des Bewerbers mit Studenten übereinstimmt
 			if (!isEmptyArray(
-					array_filter(
-						$restliche_status_obj,
-						function ($s) use ($ersterStudent) {
-							return
-								$s->status_kurzbz == self::BEWERBER_STATUS
-								&& (
-									$s->studienplan_orgform_kurzbz != $ersterStudent->studienplan_orgform_kurzbz
-								);
-						}
-					)
+				array_filter(
+					$restliche_status_obj,
+					function ($s) use ($ersterStudent) {
+						return
+							$s->status_kurzbz == self::BEWERBER_STATUS
+							&& (
+								$s->studienplan_orgform_kurzbz != $ersterStudent->studienplan_orgform_kurzbz
+							);
+					}
 				)
+			)
 			)
 			{
 				return error($studentName . ' ' . $this->_ci->p->t('lehre', 'error_bewerberOrgformUngleichStudentOrgform'));
@@ -913,5 +913,4 @@ class PrestudentstatusCheckLib
 
 		return $resultPs;
 	}
-
 }

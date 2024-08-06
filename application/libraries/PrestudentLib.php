@@ -644,8 +644,8 @@ class PrestudentLib
 			return success();
 	}
 
-	public function setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester){
-
+	public function setAufgenommener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
+	{
 		$resultLastStatus = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($resultLastStatus))
 			return $resultLastStatus;
@@ -677,8 +677,8 @@ class PrestudentLib
 			return success();
 	}
 
-	public function setAbgewiesener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id){
-
+	public function setAbgewiesener($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id)
+	{
 		$resultLastStatus = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($resultLastStatus))
 			return $resultLastStatus;
@@ -710,8 +710,8 @@ class PrestudentLib
 			return success();
 	}
 
-	public function setWartender($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester){
-
+	public function setWartender($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
+	{
 		$resultLastStatus = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($resultLastStatus))
 			return $resultLastStatus;
