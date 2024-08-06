@@ -12,12 +12,11 @@ class Status extends FHCAPI_Controller
 		parent::__construct([
 			'getHistoryPrestudent' => ['admin:r', 'assistenz:r'],
 			'getMaxSemester' => ['admin:r', 'assistenz:r'],
-			'changeStatus' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
-			'addStudent' => ['admin:r', 'assistenz:r', 'student/keine_studstatuspruefung'],
+			'changeStatus' => ['admin:rw', 'assistenz:rw'],
+			'addStudent' => ['admin:rw', 'assistenz:rw'],
 			'getStatusgruende' => self::PERM_LOGGED,
 			'getLastBismeldestichtag' => self::PERM_LOGGED,
 			'isLastStatus' => self::PERM_LOGGED,
-			'isErsterStudent' => self::PERM_LOGGED,
 			'hasStatusBewerber' => self::PERM_LOGGED,
 			'getStatusarray' => self::PERM_LOGGED,
 			'deleteStatus' => ['admin:rw','assistenz:rw'],
@@ -130,22 +129,6 @@ class Status extends FHCAPI_Controller
 		return $this->terminateWithSuccess($result);
 	}
 
-	public function isErsterStudent($prestudent_id)
-	{
-		//check if studentrolle already exists
-		$this->load->model('crm/Student_model', 'StudentModel');
-		$result = $this->StudentModel->checkIfExistingStudentRolle($prestudent_id);
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		if($result->retval == "0")
-		{
-			return $this->terminateWithSuccess($result);
-		}
-		return $this->terminateWithSuccess($result);
-	}
-
 	public function hasStatusBewerber($prestudent_id)
 	{
 		$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
@@ -190,23 +173,12 @@ class Status extends FHCAPI_Controller
 	public function changeStatus($prestudent_id)
 	{
 		$isBerechtigtNoStudstatusCheck = $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
-		$isBerechtigtBasisPrestudentstatus = $this->permissionlib->isBerechtigt('basis/prestudentstatus');
 
 		//GET lastStatus
 		$result = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
 		$lastStatusData = $this->getDataOrTerminateWithError($result);
 		$lastStatusData = current($lastStatusData);
-
-		if (!$isBerechtigtBasisPrestudentstatus)
-			$this->form_validation->set_rules(
-				'berechtigt',
-				$this->p->t('ui', 'nurLeseberechtigung'),
-				'is_null',
-				[
-					'is_null' => $this->p->t('ui', 'error_fieldWriteAccess')
-				]
-			);
 
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->PersonModel->addJoin('public.tbl_prestudent', 'person_id');
@@ -232,14 +204,15 @@ class Status extends FHCAPI_Controller
 		}
 
 		$statusgrund_id = $this->input->post('statusgrund_id');
-		$datum = $this->input->post('datum');
+		$datum_string = date('c');
+		$datum = new DateTime($datum_string);
 
 		//Form Validation
 		$this->load->library('form_validation');
 
 		$this->form_validation->set_rules(
 			'status_kurzbz',
-			'Status',
+			$this->p->t('global', 'status'),
 			[
 				'required',
 				//Check Reihungstest
@@ -253,7 +226,7 @@ class Status extends FHCAPI_Controller
 				}],
 				//Check ZGV
 				['checkIfZGV', function ($value) use ($prestudent_person) {
-					if (!ZGV_CHECK)
+					if (defined("ZGV_CHECK") && !ZGV_CHECK)
 						return true;
 					if ($value != Prestudentstatus_model::STATUS_BEWERBER)
 						return true;
@@ -262,7 +235,7 @@ class Status extends FHCAPI_Controller
 				}],
 				//Check ZGV Master
 				['checkIfZGVMaster', function ($value) use ($prestudent_person) {
-					if (!ZGV_CHECK)
+					if (defined("ZGV_CHECK") && !ZGV_CHECK)
 						return true;
 					if ($value != Prestudentstatus_model::STATUS_BEWERBER)
 						return true;
@@ -270,19 +243,19 @@ class Status extends FHCAPI_Controller
 					return $this->getDataOrTerminateWithError($result);
 				}],
 				//Check Bewerberstatus
-				[
-					'checkIfExistingBewerberstatus', function () use ($prestudent_id, $status_kurzbz) {
-						if ($status_kurzbz != Prestudentstatus_model::STATUS_AUFGENOMMENER &&
-							$status_kurzbz != Prestudentstatus_model::STATUS_WARTENDER &&
-							$status_kurzbz != Prestudentstatus_model::STATUS_ABGEWIESENER
-							)
+				['checkIfExistingBewerberstatus', function ($value) use ($prestudent_id) {
+					if ($value != Prestudentstatus_model::STATUS_AUFGENOMMENER
+						&& $value != Prestudentstatus_model::STATUS_WARTENDER
+					)
 						return true;
-						$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
-						return $this->getDataOrTerminateWithError($result);
-					}],
+					$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
+					return $this->getDataOrTerminateWithError($result);
+				}],
 				//Check If Student
 				['status_stud_exists', function ($value) use ($prestudent_id) {
-					if ($value != Prestudentstatus_model::STATUS_STUDENT)
+					if ($value != Prestudentstatus_model::STATUS_STUDENT
+						&& $value != Prestudentstatus_model::STATUS_ABBRECHER
+					)
 						return true; // Only test if new status is Student
 
 					$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($prestudent_id);
@@ -308,52 +281,16 @@ class Status extends FHCAPI_Controller
 				'integer' => $this->p->t('ui', 'error_fieldNotInteger')
 			]);
 
-		//TODO(Manu) check if really necessary, sth similiar with check rolle_doesnt_exist
 		$this->form_validation->set_rules('_default', '', [
+			['meldestichtag_not_exceeded', function () use ($datum, $isBerechtigtNoStudstatusCheck) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+
+				$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($datum);
+
+				return !$this->getDataOrTerminateWithError($result);
+			}],
 			//check if Rolle already exists
-			['checkIfExistingPrestudentRolle', function () use (
-				$prestudent_id,
-				$status_kurzbz,
-				$studiensemester_kurzbz,
-				$ausbildungssemester
-			) {
-				if (!$ausbildungssemester)
-					return true; // Error will be handled by the required statement above
-				$result = $this->prestudentstatuschecklib->checkIfExistingPrestudentRolle(
-					$prestudent_id,
-					$status_kurzbz,
-					$studiensemester_kurzbz,
-					$ausbildungssemester
-				);
-				return $this->getDataOrTerminateWithError($result);
-			}]
-		], [
-			'checkIfExistingPrestudentRolle' => $this->p->t('lehre', 'error_rolleBereitsVorhandenMitNamen', ['name' => $studentName])
-		]);
-
-		//TODO(Manu) check if really necessary, in FAS code
-		$this->form_validation->set_rules(
-			'datum',
-			$this->p->t('global', 'datum'),
-			[
-				'is_valid_date',
-				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck) {
-					if ($isBerechtigtNoStudstatusCheck)
-						return true; // Skip if access right says so
-					if (!$value)
-						return true; // Error will be handled by the required statement above
-
-					$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($value);
-
-					return !$this->getDataOrTerminateWithError($result);
-				}]
-			],
-			[
-				'meldestichtag_not_exceeded' => $this->p->t('lehre', 'error_dataVorMeldestichtag')
-			]
-		);
-
-		$this->form_validation->set_rules('_default', '', [
 			['rolle_doesnt_exist', function () use ($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester) {
 				if (!$status_kurzbz || !$studiensemester_kurzbz || !$ausbildungssemester)
 					return true; // Error will be handled by the required statements above
@@ -372,13 +309,13 @@ class Status extends FHCAPI_Controller
 			) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
-				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
-					return true; // Error will be handled by the required statements above
+				if (!$status_kurzbz)
+					return true; // Error will be handled by the required statement above
 
 				$result = $this->prestudentstatuschecklib->checkStatusHistoryTimesequence(
 					$prestudent_id,
 					$status_kurzbz,
-					new DateTime($datum),
+					$datum,
 					$studiensemester_kurzbz,
 					$ausbildungssemester,
 					'',
@@ -397,13 +334,13 @@ class Status extends FHCAPI_Controller
 			) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
-				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
-					return true; // Error will be handled by the required statements above
+				if (!$status_kurzbz)
+					return true; // Error will be handled by the required statement above
 
 				$result = $this->prestudentstatuschecklib->checkStatusHistoryLaststatus(
 					$prestudent_id,
 					$status_kurzbz,
-					new DateTime($datum),
+					$datum,
 					$studiensemester_kurzbz,
 					$ausbildungssemester,
 					'',
@@ -422,13 +359,13 @@ class Status extends FHCAPI_Controller
 			) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
-				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
-					return true; // Error will be handled by the required statements above
+				if (!$status_kurzbz)
+					return true; // Error will be handled by the required statement above
 
 				$result = $this->prestudentstatuschecklib->checkStatusHistoryUnterbrechersemester(
 					$prestudent_id,
 					$status_kurzbz,
-					new DateTime($datum),
+					$datum,
 					$studiensemester_kurzbz,
 					$ausbildungssemester,
 					'',
@@ -447,13 +384,13 @@ class Status extends FHCAPI_Controller
 			) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
-				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
-					return true; // Error will be handled by the required statements above
+				if (!$status_kurzbz)
+					return true; // Error will be handled by the required statement above
 
 				$result = $this->prestudentstatuschecklib->checkStatusHistoryAbbrechersemester(
 					$prestudent_id,
 					$status_kurzbz,
-					new DateTime($datum),
+					$datum,
 					$studiensemester_kurzbz,
 					$ausbildungssemester,
 					'',
@@ -472,13 +409,13 @@ class Status extends FHCAPI_Controller
 			) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
-				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
-					return true; // Error will be handled by the required statements above
+				if (!$status_kurzbz)
+					return true; // Error will be handled by the required statement above
 
 				$result = $this->prestudentstatuschecklib->checkStatusHistoryDiplomant(
 					$prestudent_id,
 					$status_kurzbz,
-					new DateTime($datum),
+					$datum,
 					$studiensemester_kurzbz,
 					$ausbildungssemester,
 					'',
@@ -486,8 +423,9 @@ class Status extends FHCAPI_Controller
 				);
 
 				return $this->getDataOrTerminateWithError($result);
-			}]
+			}] // TODO(chris): history_student?
 		], [
+			'meldestichtag_not_exceeded' => $this->p->t('lehre', 'error_dataVorMeldestichtag'),
 			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhandenMitNamen', ['name' => $studentName]),
 			'history_timesequence' => $this->p->t('lehre', 'error_statuseintrag_zeitabfolge'),
 			'history_laststatus' => $this->p->t('lehre', 'error_endstatus'),
@@ -501,8 +439,6 @@ class Status extends FHCAPI_Controller
 
 		switch($status_kurzbz){
 			case Prestudentstatus_model::STATUS_ABBRECHER:
-				$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
-
 				$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
 				$result = $this->StatusgrundModel->load($statusgrund_id);
 				if (isError($result))
@@ -518,13 +454,13 @@ class Status extends FHCAPI_Controller
 					$studiensemester_kurzbz,
 					null,
 					$statusgrund_kurzbz,
-					$datum,
+					$datum_string,
 					null,
 					null
 				);
 				if (isError($result))
 				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+					return $this->terminateWithError(getError($result));
 				}
 				else
 					$this->terminateWithSuccess($prestudent_id);
