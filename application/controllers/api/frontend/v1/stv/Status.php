@@ -280,6 +280,10 @@ class Status extends FHCAPI_Controller
 			$this->form_validation->set_rules('ausbildungssemester', $this->p->t('lehre', 'ausbildungssemester'), 'integer', [
 				'integer' => $this->p->t('ui', 'error_fieldNotInteger')
 			]);
+			
+		$this->form_validation->set_rules('statusgrund_id', $this->p->t('international', 'grund'), 'integer', [
+			'integer' => $this->p->t('ui', 'error_fieldNotInteger')
+		]);
 
 		$this->form_validation->set_rules('_default', '', [
 			['meldestichtag_not_exceeded', function () use ($datum, $isBerechtigtNoStudstatusCheck) {
@@ -455,28 +459,22 @@ class Status extends FHCAPI_Controller
 				);
 				break;
 			case Prestudentstatus_model::STATUS_UNTERBRECHER:
-				$ausbildungssemester = $lastStatusData->ausbildungssemester;
-				$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
-
-				$this->load->library('PrestudentLib');
-				$result = $this->prestudentlib->setUnterbrecher($prestudent_id, $studiensemester_kurzbz, null, null, $ausbildungssemester);
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
-				else
-					$this->terminateWithSuccess($prestudent_id);
+				$result = $this->prestudentlib->setUnterbrecher(
+					$prestudent_id,
+					$studiensemester_kurzbz,
+					null,
+					null,
+					$ausbildungssemester,
+					$statusgrund_id
+				);
 				break;
 			case Prestudentstatus_model::STATUS_STUDENT:
-				$this->load->library('PrestudentLib');
-				$result = $this->prestudentlib->setStudent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id);
-
-				if (isError($result))
-				{
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-				}
-				else
-					$this->terminateWithSuccess($prestudent_id);
+				$result = $this->prestudentlib->setStudent(
+					$prestudent_id,
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					$statusgrund_id
+				);
 				break;
 			case Prestudentstatus_model::STATUS_DIPLOMAND:
 				$this->load->library('PrestudentLib');

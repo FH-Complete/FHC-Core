@@ -371,7 +371,7 @@ export default{
 				type="select"
 				v-model="formData.statusgrund_id"
 				name="statusgrund_id"
-				:label="$p.t('studierendenantrag/antrag_grund')"
+				:label="$p.t('international/grund')"
 				>
 				<option :value="null">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
 				<option
