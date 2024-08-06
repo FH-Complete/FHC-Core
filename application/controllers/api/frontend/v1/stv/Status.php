@@ -444,7 +444,7 @@ class Status extends FHCAPI_Controller
 		
 		switch($status_kurzbz){
 			case Prestudentstatus_model::STATUS_ABBRECHER:
-				$result = $this->prestudentlib->setAbbrecherNeu(
+				$result = $this->prestudentlib->setAbbrecher(
 					$prestudent_id,
 					$studiensemester_kurzbz,
 					null,

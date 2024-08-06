@@ -30068,6 +30068,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
+		'phrase' => 'error_noStatusgrund',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Statusgrund {statusgrundkurzbz} nicht gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Statusgrund {statusgrundkurzbz} not found',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
 		'phrase' => 'modal_StatusactionSingle',
 		'insertvon' => 'system',
 		'phrases' => array(

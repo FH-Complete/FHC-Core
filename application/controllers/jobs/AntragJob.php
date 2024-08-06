@@ -29,6 +29,10 @@ class AntragJob extends JOB_Controller
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$this->loadPhrases([
+			'lehre'
+		]);
 	}
 
 	/**
@@ -451,11 +455,23 @@ class AntragJob extends JOB_Controller
 					if (isError($result))
 						$this->logError(getError($result));
 
+					$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+					$result = $this->StatusgrundModel->loadWhere(['statusgrund_kurzbz' => 'abbrecherStgl']);
+					if (isError($result)) {
+						$this->logError(getError($result));
+						continue;
+					} elseif (!hasData($result)) {
+						$this->logError($this->p->t('lehre', 'error_noStatusgrund', ['statusgrund_kurzbz' => 'abbrecherStgl'])); // TODO(chris): phrase
+						continue;
+					}
+					
+					$statusgrund = current(getData($result));
+
 					$result = $this->prestudentlib->setAbbrecher(
 	                    $antrag->prestudent_id,
 	                    $antrag->studiensemester_kurzbz,
 	                    'AntragJob',
-	                    'abbrecherStgl',
+	                    $statusgrund->statusgrund_id,
 	                    $antrag->insertamum,
 	                    null,
 	                    $antrag->insertvon ?: $insertvon
