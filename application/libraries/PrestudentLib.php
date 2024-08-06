@@ -523,7 +523,9 @@ class PrestudentLib
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', [
+				'prestudent_id' => $prestudent_id
+			]));
 
 		$prestudent_status = current(getData($result));
 
@@ -554,18 +556,16 @@ class PrestudentLib
 	public function setAbsolvent($prestudent_id, $studiensemester_kurzbz, $ausbildungssemester)
 	{
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
-		if (isError($result))
-			return $result;
-		$result = getData($result);
-
-		$prestudent_status = current($result);
-		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
 		if (isError($result))
 			return $result;
-		$result = getData($result);
-		if (!$result)
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+		if (!hasData($result))
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', [
+				'prestudent_id' => $prestudent_id
+			]));
+
+		$prestudent_status = current(getData($result));
+
 
 		//Status updaten
 		$result = $this->_ci->PrestudentstatusModel->insert([
@@ -584,43 +584,6 @@ class PrestudentLib
 
 		if (isError($result))
 			return $result;
-
-		$result = $this->_ci->StudentModel->checkIfUid($prestudent_id);
-		if (isError($result)) {
-			return $result;
-		}
-		$student_uid = $result->retval;
-
-		//load student
-		$result = $this->_ci->StudentModel->loadWhere(
-			array(
-				'student_uid' => $student_uid
-			)
-		);
-		if (isError($result))
-		{
-			return $result;
-		}
-
-		$studentData = current(getData($result) ? : []);
-		$verband = $studentData->verband == '' ? '' : $studentData->verband;
-		$gruppe = $studentData->gruppe == '' ? '' : $studentData->gruppe;
-		$studiengang_kz = $studentData->studiengang_kz;
-
-		//process studentlehrverband
-		$this->_ci->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-		$result = $this->_ci->StudentlehrverbandModel->processStudentlehrverband(
-			$student_uid,
-			$studiengang_kz,
-			$ausbildungssemester,
-			$verband,
-			$gruppe,
-			$studiensemester_kurzbz
-		);
-		if (isError($result))
-		{
-			return $result;
-		}
 
 		return success();
 	}
