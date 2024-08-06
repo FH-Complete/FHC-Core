@@ -43,11 +43,11 @@ class Studentlehrverband_model extends DB_Model
 		}
 		elseif (!hasData($result))
 		{
-			return success("0", $this->p->t('lehre','error_noStudentlehrverband'));
+			return success("0", $this->p->t('lehre', 'error_noStudentlehrverband'));
 		}
 		else
 		{
-			return success("1", $this->p->t('lehre','error_updateStudentlehrverband'));
+			return success("1", $this->p->t('lehre', 'error_updateStudentlehrverband'));
 		}
 	}
 
@@ -65,15 +65,22 @@ class Studentlehrverband_model extends DB_Model
 	 * 			error if not
 	 *
 	 */
-	public function processStudentlehrverband($student_uid, $studiengang_kz, $ausbildungssemester, $verband, $gruppe, $studiensemester_kurzbz, $status_kurzbz=null)
-	{
+	public function processStudentlehrverband(
+		$student_uid,
+		$studiengang_kz,
+		$ausbildungssemester,
+		$verband,
+		$gruppe,
+		$studiensemester_kurzbz,
+		$status_kurzbz = null
+	) {
 		$uid = getAuthUID();
 
 		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 		$result = $this->LehrverbandModel->checkIfLehrverbandExists($studiengang_kz, $ausbildungssemester, $verband, $gruppe);
 		if (isError($result))
 		{
-			return error("0", $this->p->t('lehre','error_updateLehrverband'));
+			return error("0", $this->p->t('lehre', 'error_updateLehrverband'));
 		}
 
 		if ($result->retval == "0")
@@ -81,12 +88,15 @@ class Studentlehrverband_model extends DB_Model
 			// Übergeordneten Lehrverband check and/or insert
 			$result = $this->LehrverbandModel->checkIfLehrverbandExists($studiengang_kz, $ausbildungssemester, '', '');
 			if (isError($result)) {
-				return error("0", $this->p->t('lehre','error_updateLehrverband'));
+				return error("0", $this->p->t('lehre', 'error_updateLehrverband'));
 			}
 
 			if ($result->retval == "0")
 			{
-				$bezeichnung = ($status_kurzbz == PrestudentstatusModel::STATUS_ABBRECHER || $status_kurzbz == Prestudentstatus_model::STATUS_UNTERBRECHER)  ? 'Ab-Unterbrecher' : '';
+				$bezeichnung = (
+					$status_kurzbz == PrestudentstatusModel::STATUS_ABBRECHER
+					|| $status_kurzbz == Prestudentstatus_model::STATUS_UNTERBRECHER)
+					? 'Ab-Unterbrecher' : '';
 				$result = $this->LehrverbandModel->insert([
 					'studiengang_kz' => $studiengang_kz,
 					'semester' => $ausbildungssemester,
@@ -98,14 +108,14 @@ class Studentlehrverband_model extends DB_Model
 
 				if (isError($result))
 				{
-					return error("0", $this->p->t('lehre','error_updateLehrverband'));
+					return error("0", $this->p->t('lehre', 'error_updateLehrverband'));
 				}
 			}
 
 			// Lehrverband insert
 			if ($verband == 'A')
 				$bezeichnung = Prestudentstatus_model::STATUS_ABBRECHER;
-			else if ($verband == 'B')
+			elseif ($verband == 'B')
 				$bezeichnung = Prestudentstatus_model::STATUS_BEWERBER;
 			else
 				$bezeichnung = '';
@@ -120,7 +130,7 @@ class Studentlehrverband_model extends DB_Model
 			]);
 
 			if (isError($result)) {
-				return error("0", $this->p->t('lehre','error_updateLehrverband'));
+				return error("0", $this->p->t('lehre', 'error_updateLehrverband'));
 			}
 		}
 
@@ -145,7 +155,7 @@ class Studentlehrverband_model extends DB_Model
 				'studiengang_kz' => $studiengang_kz
 			]);
 			if (isError($result)) {
-				return error("0", $this->p->t('lehre','error_updateStudentlehrverband'));
+				return error("0", $this->p->t('lehre', 'error_updateStudentlehrverband'));
 			}
 		}
 		else
@@ -165,12 +175,12 @@ class Studentlehrverband_model extends DB_Model
 				]
 			);
 			if (isError($result)) {
-				return error("0", $this->p->t('lehre','error_updateStudentlehrverband'));
+				return error("0", $this->p->t('lehre', 'error_updateStudentlehrverband'));
 			}
 		}
 
 		if (isError($result)) {
-			return error("0", $this->p->t('lehre','error_updateStudentlehrverband'));
+			return error("0", $this->p->t('lehre', 'error_updateStudentlehrverband'));
 		}
 		else
 		{
