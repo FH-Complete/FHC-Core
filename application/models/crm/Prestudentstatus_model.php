@@ -404,7 +404,7 @@ class Prestudentstatus_model extends DB_Model
 		}
 		else
 		{
-			return success("1", $this->p->t('lehre','error_rolleBereitsVorhandenMitNamen', ['name' => $studentName]));
+			return success("1", $this->p->t('lehre', 'error_rolleBereitsVorhandenMitNamen', ['name' => $studentName]));
 		}
 	}
 
@@ -442,7 +442,7 @@ class Prestudentstatus_model extends DB_Model
 		}
 		elseif (!hasData($result))
 		{
-			return success("0", $this->p->t('lehre','error_keinBewerber', ['name' => $studentName]));
+			return success("0", $this->p->t('lehre', 'error_keinBewerber', ['name' => $studentName]));
 		}
 		else
 		{
@@ -450,7 +450,7 @@ class Prestudentstatus_model extends DB_Model
 		}
 	}
 
-		/**
+	/**
 	 * Check if Rolle there is an existing Aufgenommenerstatus
 	 * @param integer $prestudent_id
 	 * @return error if no status Aufgenommener, success if existing
@@ -484,7 +484,7 @@ class Prestudentstatus_model extends DB_Model
 		}
 		elseif (!hasData($result))
 		{
-			return success("0", $this->p->t('lehre','error_keinAufgenommener', ['name' => $studentName]));
+			return success("0", $this->p->t('lehre', 'error_keinAufgenommener', ['name' => $studentName]));
 		}
 		else
 		{

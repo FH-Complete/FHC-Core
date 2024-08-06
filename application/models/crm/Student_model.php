@@ -73,9 +73,15 @@ class Student_model extends DB_Model
 			//Lehrgang
 			switch($art)
 			{
-				case 'WS': $art = '3'; break;
-				case 'SS': $art = '4'; break;
-				default: $art = '0'; break;
+				case 'WS':
+					$art = '3';
+					break;
+				case 'SS':
+					$art = '4';
+					break;
+				default:
+					$art = '0';
+					break;
 			}
 		}
 		else
@@ -83,9 +89,15 @@ class Student_model extends DB_Model
 			//Studiengang
 			switch($art)
 			{
-				case 'WS': $art = '1'; break;
-				case 'SS': $art = '2'; break;
-				default: $art = '0'; break;
+				case 'WS':
+					$art = '1';
+					break;
+				case 'SS':
+					$art = '2';
+					break;
+				default:
+					$art = '0';
+					break;
 			}
 		}
 		if($art=='2' || $art=='4')
@@ -95,11 +107,11 @@ class Student_model extends DB_Model
 		//(AO sind normal 9+erhalter Nummer, matrikelnr/personenkz wird auch im DVUH Extension berücksichtigt)
 		if ($studiengang_kz >= 90010 && $studiengang_kz <= 90019)
 		{
-			$matrikelnummer = sprintf("%02d",$jahr).$art.substr($studiengang_kz, 0, 4);
+			$matrikelnummer = sprintf("%02d", $jahr).$art.substr($studiengang_kz, 0, 4);
 		}
 		else
 		{
-			$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
+			$matrikelnummer = sprintf("%02d", $jahr).$art.sprintf("%04d", $studiengang_kz);
 		}
 
 		$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE ? ORDER BY matrikelnr DESC LIMIT 1";
@@ -109,12 +121,12 @@ class Student_model extends DB_Model
 		if ($matrikelnrres && hasData($matrikelnrres)) {
 			$max = mb_substr($matrikelnrres->retval[0]->matrikelnr, 7);
 			if (!is_numeric($max)) {
-				$max = (int) $max;
+				$max = (int)$max;
 			}
 		}
 
 		$max += 1;
-		return success ($matrikelnummer.sprintf("%03d", $max));
+		return success($matrikelnummer.sprintf("%03d", $max));
 	}
 
 	// ****
@@ -127,7 +139,7 @@ class Student_model extends DB_Model
 	// * 001 = Laufende Nummer  Wenn StSem==SS dann wird zur Nummer 500 dazugezaehlt
 	// * Bei Incoming im Masterstudiengang wird auch 500 dazugezaehlt
 	// ****
-	function generateUID($stgkzl, $jahr, $stgtyp, $matrikelnummer)
+	public function generateUID($stgkzl, $jahr, $stgtyp, $matrikelnummer)
 	{
 		$art = mb_substr($matrikelnummer, 2, 1);
 		$nr = mb_substr($matrikelnummer, mb_strlen(trim($matrikelnummer))-3);
@@ -139,7 +151,7 @@ class Student_model extends DB_Model
 			$nr = $nr+500;
 
 
-		return success (mb_strtolower($stgkzl.$jahr.($art!='0'?$stgtyp:'x').$nr));
+		return success(mb_strtolower($stgkzl.$jahr.($art!='0'?$stgtyp:'x').$nr));
 	}
 
 
@@ -179,18 +191,17 @@ class Student_model extends DB_Model
 
 		if(isError($result))
 		{
-			return error( "Error while checking student_uid");
+			return error("Error while checking student_uid");
 		}
 
 		if (!hasData($result))
 		{
-			return success("0","Keine Student_uid vorhanden");
+			return success("0", "Keine Student_uid vorhanden");
 		}
 
 		$student_uid = $result->retval[0]->student_uid;
 
-		return success ($student_uid);
-
+		return success($student_uid);
 	}
 
 	public function searchStudent($filter)
@@ -204,7 +215,8 @@ class Student_model extends DB_Model
 			OR lower(person.nachname) like ".$this->db->escape('%'.$filter.'%')."
 			OR lower(person.vorname) like ".$this->db->escape('%'.$filter.'%')."
 			OR lower(person.nachname || ' ' || person.vorname) like ".$this->db->escape('%'.$filter.'%')."
-			OR lower(person.vorname || ' ' || person.nachname) like ".$this->db->escape('%'.$filter.'%'));
+			OR lower(person.vorname || ' ' || person.nachname) like ".$this->db->escape('%'.$filter.'%')
+		);
 
 		return $result;
 	}
@@ -245,7 +257,7 @@ class Student_model extends DB_Model
 			$resultObject = current(getData($result));
 
 			if (property_exists($resultObject, 'anzahl')) {
-				$resultValue = (int) $resultObject->anzahl;
+				$resultValue = (int)$resultObject->anzahl;
 
 				if ($resultValue > 0)
 				{

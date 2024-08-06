@@ -133,20 +133,20 @@ class Benutzer_model extends DB_Model
 	private function _sanitizeAliasName($str)
 	{
 		$str = sanitizeProblemChars($str);
-		return mb_strtolower(str_replace(' ','_', $str));
+		return mb_strtolower(str_replace(' ', '_', $str));
 	}
 
 	/**
 	 * Generiert einen Aktivierungscode
 	 */
-	function generateActivationKey()
+	public function generateActivationKey()
 	{
 		$keyvalues=array('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
 		$key='';
-		for($i=0;$i<32;$i++)
-			$key.=$keyvalues[mt_rand(0,15)];
+		for($i=0; $i<32; $i++)
+			$key.=$keyvalues[mt_rand(0, 15)];
 
-		return success(md5(encryptData(uniqid(mt_rand(), true),$key)));
+		return success(md5(encryptData(uniqid(mt_rand(), true), $key)));
 	}
 
 	/**
@@ -174,7 +174,7 @@ class Benutzer_model extends DB_Model
 
 		if (property_exists($resultObject, 'anzahl'))
 		{
-			$resultValue = (int) $resultObject->anzahl;
+			$resultValue = (int)$resultObject->anzahl;
 
 			if ($resultValue > 0)
 			{
@@ -184,6 +184,6 @@ class Benutzer_model extends DB_Model
 			{
 				return success("0");
 			}
-		}	
+		}
 	}
 }

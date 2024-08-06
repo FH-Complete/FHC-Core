@@ -27,6 +27,5 @@ class Status_model extends DB_Model
 		return $this->loadWhere([
 			'aktiv'=> true,
 		]);
-
 	}
 }
