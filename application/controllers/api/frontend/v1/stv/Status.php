@@ -627,11 +627,6 @@ class Status extends FHCAPI_Controller
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		//TODO(Manu) check if necessary
-		//Das Studiensemester oder Ausbildungsemester des Bewerberstatus und des Aufgenommenenstatus passen nicht überein"
-
-		//Vor dem Studentenstatus müssen folgende Status eingetragen werden: {0}'
-		//private $_statusAbfolgeVorStudent = [self::INTERESSENT_STATUS, self::BEWERBER_STATUS, self::AUFGENOMMENER_STATUS
 
 		// Start DB transaction
 		$this->db->trans_start();
