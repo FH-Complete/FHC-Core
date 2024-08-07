@@ -173,7 +173,7 @@ class PrestudentstatusCheckLib
 	 */
 	public function checkIfExistingBewerberstatus($prestudent_id)
 	{
-		$result =  $this->_ci->PrestudentstatusModel->loadWhere([
+		$result = $this->_ci->PrestudentstatusModel->loadWhere([
 			'prestudent_id' => $prestudent_id,
 			'status_kurzbz' => Prestudentstatus_model::STATUS_BEWERBER
 		]);
@@ -193,7 +193,7 @@ class PrestudentstatusCheckLib
 	 */
 	public function checkIfExistingAufgenommenerstatus($prestudent_id)
 	{
-		$result =  $this->_ci->PrestudentstatusModel->loadWhere([
+		$result = $this->_ci->PrestudentstatusModel->loadWhere([
 			'prestudent_id' => $prestudent_id,
 			'status_kurzbz' => Prestudentstatus_model::STATUS_AUFGENOMMENER
 		]);
@@ -201,6 +201,55 @@ class PrestudentstatusCheckLib
 			return $result;
 
 		return success(hasData($result));
+	}
+
+	/**
+	 * Checks if the last Bewerber status and the last Aufgenommener status
+	 * have the same studiensemester and ausbildungssemester.
+	 *
+	 * Attention:
+	 * If one of those two status is missing the function returns true!
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return stdClass
+	 */
+	public function checkIfLastBewerberAndAufgenommenerShareSemesters($prestudent_id)
+	{
+		$this->_ci->PrestudentstatusModel->addOrder('datum', 'DESC');
+		$this->_ci->PrestudentstatusModel->addOrder('insertamum', 'DESC');
+		$this->_ci->PrestudentstatusModel->addLimit(1);
+		$result = $this->_ci->PrestudentstatusModel->loadWhere([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_BEWERBER
+		]);
+
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success(true);
+
+		$bewerber = current(getData($result));
+
+		$this->_ci->PrestudentstatusModel->addOrder('datum', 'DESC');
+		$this->_ci->PrestudentstatusModel->addOrder('insertamum', 'DESC');
+		$this->_ci->PrestudentstatusModel->addLimit(1);
+		$result = $this->_ci->PrestudentstatusModel->loadWhere([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_AUFGENOMMENER
+		]);
+
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success(true);
+
+		$aufgenommener = current(getData($result));
+
+		return success(
+			$bewerber->studiensemester_kurzbz == $aufgenommener->studiensemester_kurzbz
+			&& $bewerber->ausbildungssemester == $aufgenommener->ausbildungssemester
+		);
 	}
 
 	/**
