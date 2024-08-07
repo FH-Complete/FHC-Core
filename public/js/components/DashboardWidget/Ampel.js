@@ -191,7 +191,7 @@ export default {
 				<div class="col">
 					<button class="btn btn-warning w-100" @click="toggleFilter('verpflichtend')">
 						<i class="fa fa-solid fa-triangle-exclamation me-2"></i>
-						<small :class="{'text-decoration-underline':filter==='ueberfaellig', 'fw-bold':filter==='ueberfaellig'}" >
+						<small :class="{'text-decoration-underline':filter==='verpflichtend', 'fw-bold':filter==='verpflichtend'}" >
 							{{$p.t('ampeln','mandatory')}}: <b>{{ count.verpflichtend }}</b>
 						</small>
 					</button>
