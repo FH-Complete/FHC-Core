@@ -590,11 +590,26 @@ class Status extends FHCAPI_Controller
 				return !$this->getDataOrTerminateWithError($result);
 			}],
 			//Check if Rolle already exists
-			['rolle_doesnt_exist', function () use ($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester) {
-				if (!$status_kurzbz || !$studiensemester_kurzbz || !$ausbildungssemester)
-					return true; // Error will be handled by the required statements above
+			['rolle_doesnt_exist', function () use ($prestudent_id) {
+				$this->PrestudentstatusModel->addOrder('datum', 'DESC');
+				$this->PrestudentstatusModel->addOrder('insertamum', 'DESC');
+				$this->PrestudentstatusModel->addLimit(1);
+				$result = $this->PrestudentstatusModel->loadWhere([
+					'prestudent_id' => $prestudent_id,
+					'status_kurzbz' => Prestudentstatus_model::STATUS_AUFGENOMMENER
+				]);
+				$lastAufgenommener = $this->getDataOrTerminateWithError($result);
+				if (!$lastAufgenommener)
+					return true; // Error will be handled by the checkIfExistingAufgenommenerstatus statement above
 
-				$result = $this->PrestudentstatusModel->load([$ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id]);
+				$lastAufgenommener = current($lastAufgenommener);
+
+
+				$result = $this->PrestudentstatusModel->loadWhere([
+					'studiensemester_kurzbz' => $lastAufgenommener->studiensemester_kurzbz,
+					'status_kurzbz' => Prestudentstatus_model::STATUS_STUDENT,
+					'prestudent_id' => $prestudent_id
+				]);
 
 				return !$this->getDataOrTerminateWithError($result);
 			}]
