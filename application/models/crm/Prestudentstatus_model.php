@@ -359,56 +359,6 @@ class Prestudentstatus_model extends DB_Model
 	}
 
 	/**
-	 * Check if Rolle already exists
-	 * @param integer $prestudent_id
-	 * @param string $status_kurzbz
-	 * @param string $studiensemester_kurzbz
-	 * @param integer $ausbildungssemester
-	 * @return 1: if Rolle exists, 0: if it doesn't
-	 * Copy from studentDBDML.php
-	 */
-	public function checkIfExistingPrestudentRolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
-	{
-		$studentName = '';
-
-		$nameRes = $this->PersonModel->loadPrestudent($prestudent_id);
-
-		if (hasData($nameRes))
-		{
-			$nameData = getData($nameRes)[0];
-			$studentName = $nameData->vorname.' '.$nameData->nachname;
-		}
-
-		$qry = "SELECT
-					*
-				FROM
-				    public.tbl_prestudentstatus
-				WHERE
-					prestudent_id = ?
-				AND
-				    status_kurzbz = ?
-				AND
-				    studiensemester_kurzbz = ?
-				AND
-				    ausbildungssemester = ?";
-
-		$result = $this->execQuery($qry, array($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester));
-
-		if (isError($result))
-		{
-			return error($result);
-		}
-		elseif (!hasData($result))
-		{
-			return success(0);
-		}
-		else
-		{
-			return success("1", $this->p->t('lehre', 'error_rolleBereitsVorhandenMitNamen', ['name' => $studentName]));
-		}
-	}
-
-	/**
 	 * Check if there is only one prestudentstatus left
 	 *
 	 * @param integer					$prestudent_id

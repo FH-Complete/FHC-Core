@@ -99,34 +99,6 @@ class PrestudentstatusCheckLib
 	}
 
 	/**
-	 * Checks if a prestudent role already exists.
-	 *
-	 * @param integer				$prestudent_id
-	 * @param string				$status_kurzbz
-	 * @param string				$studiensemester_kurzbz
-	 * @param integer				$ausbildungssemester
-	 *
-	 * @return stdClass
-	 */
-	public function checkIfExistingPrestudentRolle(
-		$prestudent_id,
-		$status_kurzbz,
-		$studiensemester_kurzbz,
-		$ausbildungssemester
-	) {
-		$result =  $this->_ci->PrestudentstatusModel->checkIfExistingPrestudentRolle(
-			$prestudent_id,
-			$status_kurzbz,
-			$studiensemester_kurzbz,
-			$ausbildungssemester
-		);
-		if (isError($result))
-			return $result;
-
-		return success(getData($result) != '1');
-	}
-
-	/**
 	 * Checks if a student already exists.
 	 *
 	 * @param integer				$prestudent_id

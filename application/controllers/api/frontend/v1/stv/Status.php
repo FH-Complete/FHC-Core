@@ -290,7 +290,7 @@ class Status extends FHCAPI_Controller
 
 				return !$this->getDataOrTerminateWithError($result);
 			}],
-			//check if Rolle already exists
+			//Check if Rolle already exists
 			['rolle_doesnt_exist', function () use ($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester) {
 				if (!$status_kurzbz || !$studiensemester_kurzbz || !$ausbildungssemester)
 					return true; // Error will be handled by the required statements above
@@ -1333,7 +1333,7 @@ class Status extends FHCAPI_Controller
 
 		// Set Datum to null to prevent multiple is_valid_date checks in the following validation rules
 		$this->form_validation->set_rules('_default', '', [
-			//check if Rolle already exists
+			//Check if Rolle already exists
 			['new_rolle_doesnt_exist', function () use (
 				$prestudent_id,
 				$status_kurzbz,
@@ -1609,7 +1609,7 @@ class Status extends FHCAPI_Controller
 		]);
 
 		$this->form_validation->set_rules('_default', '', [
-			//check if Rolle already exists
+			//Check if Rolle already exists
 			['rolle_doesnt_exist', function () use (
 				$prestudent_id,
 				$status_kurzbz,
