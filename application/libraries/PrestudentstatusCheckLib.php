@@ -219,14 +219,14 @@ class PrestudentstatusCheckLib
 	 */
 	public function checkIfExistingAufgenommenerstatus($prestudent_id)
 	{
-		$result =  $this->_ci->PrestudentstatusModel->checkIfExistingAufgenommenerstatus(
-			$prestudent_id
-		);
-		if(isError($result))
-		{
-			return getData($result);
-		}
-		return success(getData($result) != '0');
+		$result =  $this->_ci->PrestudentstatusModel->loadWhere([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_AUFGENOMMENER
+		]);
+		if (isError($result))
+			return $result;
+
+		return success(hasData($result));
 	}
 
 	/**
