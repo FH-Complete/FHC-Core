@@ -58,12 +58,12 @@ export default {
 				const defaultObject = {
 					status_kurzbz: status,
 					statusgrund_id: null,
-					link: this['changeStatusTo' + status],
+					link: () => this['changeStatusTo' + status](),
 					children: []
 				};
 
 				if (status === "Student") {
-					defaultObject.link = 'changeInteressentToStudent';
+					defaultObject.link = () => this.changeInteressentToStudent();
 
 				}
 				result.push(defaultObject);
@@ -89,7 +89,7 @@ export default {
 							status_kurzbz: 'Student',
 							statusgrund_id: null,
 							beschreibung: 'Student',
-							link: this.changeInteressentToStudent
+							link: () => this.changeInteressentToStudent()
 						});
 					}
 				}
@@ -102,7 +102,7 @@ export default {
 				const defaultObject = {
 					status_kurzbz: status,
 					statusgrund_id: null,
-					link: this['changeStatusTo' + status],
+					link: () => this['changeStatusTo' + status](),
 					children: []
 				};
 				result.push(defaultObject);
@@ -125,7 +125,7 @@ export default {
 						status_kurzbz: 'Student',
 						statusgrund_id: null,
 						beschreibung: 'Student',
-						link: this.changeStatusToStudent
+						link: () => this.changeStatusToStudent()
 					});
 				}
 			});
@@ -136,7 +136,7 @@ export default {
 		changeInteressentToStudent(statusgrund_id) {
 			this.addStudent({status_kurzbz: 'student', statusgrund_id});
 		},
-		addStudent() {
+		addStudent(data) {
 			Promise
 				.allSettled(
 					this.prestudentIds.map(prestudent_id => this.$fhcApi.post(
@@ -160,7 +160,7 @@ export default {
 		},
 		changeStatusToStudent(statusgrund_id) {
 			this
-				.promtAusbildungssemester('Student')
+				.promtAusbildungssemester('Student', statusgrund_id)
 				.then(this.changeStatus)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
