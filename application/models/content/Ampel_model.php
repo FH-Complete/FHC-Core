@@ -21,10 +21,10 @@ class Ampel_model extends DB_Model
 	public function active($email = false, $uid = null)
 	{
 		$userLanguage = getUserLanguage();
-
-		$bestaetigt = '';
+		$selectStatement='*,beschreibung[('.$this->getLanguageIndex($this->escape($userLanguage)).')] as beschreibung_trans, buttontext[('.$this->getLanguageIndex($this->escape($userLanguage)).')] as buttontext_trans';
+		
 		if($uid != null ){
-			$bestaetigt = ',
+			$selectStatement .= ',
 				COALESCE((
 				SELECT true
 			  	FROM public.tbl_ampel_benutzer_bestaetigt a
@@ -32,21 +32,59 @@ class Ampel_model extends DB_Model
 			   	AND uid = ' . $this->escape($uid) . ' LIMIT 1), false) as bestaetigt';
 		}
 
-		$parametersArray = [];
-		$query = '
-			SELECT *, beschreibung[('.$this->getLanguageIndex($this->escape($userLanguage)).')] as beschreibung_trans, buttontext[('.$this->getLanguageIndex($this->escape($userLanguage)).')] as buttontext_trans
-			'.$bestaetigt
-			.'
-			FROM public.tbl_ampel
-			WHERE';
-		
-		if ($email === true)
-		{
-			$parametersArray['email'] = $email;
-			$query .= ' email = ? AND';
+		$this->addSelect($selectStatement);
+		$whereStatement='';
+
+		if ($email === true) {
+			$whereStatement .= ' email = '.$this->escape($email).' AND';
 		}
 
-		$query .= '(
+		$whereStatement .=
+		'(
+			(
+				(NOW()<(deadline+(COALESCE(verfallszeit,0) || \' days\')::interval)::date)
+				OR (verfallszeit IS NULL)
+			)
+			AND 
+			(
+				(NOW()>(deadline-(COALESCE(vorlaufzeit,0) || \' days\')::interval)::date)
+			    OR (vorlaufzeit IS NULL AND NOW() < deadline)
+			)
+			)';
+		
+		$this->addOrder('deadline', 'DESC');
+		return $this->loadWhere($whereStatement);
+
+	}
+
+	public function openActive($uid, $email = false)
+	{
+		$userLanguage = getUserLanguage();
+		$selectStatement = '*,beschreibung[(' . $this->getLanguageIndex($this->escape($userLanguage)) . ')] as beschreibung_trans, buttontext[(' . $this->getLanguageIndex($this->escape($userLanguage)) . ')] as buttontext_trans';
+
+		
+		$selectStatement .= ',
+			COALESCE((
+			SELECT true
+			FROM public.tbl_ampel_benutzer_bestaetigt a
+			WHERE a.ampel_id = ' . $this->dbTable . '.ampel_id
+			AND uid = ' . $this->escape($uid) . ' LIMIT 1), false) as bestaetigt';
+
+		$this->addSelect($selectStatement);
+		$whereStatement = '';
+
+		if ($email === true) {
+			$whereStatement .= ' email = ' . $this->escape($email) . ' AND';
+		}
+
+		$whereStatement .=
+			'
+			(COALESCE((
+			SELECT true
+			FROM public.tbl_ampel_benutzer_bestaetigt a
+			WHERE a.ampel_id = ' . $this->dbTable . '.ampel_id
+			AND uid = ' . $this->escape($uid) . ' LIMIT 1), false) = FALSE) AND 
+			(
 			(
 				(NOW()<(deadline+(COALESCE(verfallszeit,0) || \' days\')::interval)::date)
 				OR (verfallszeit IS NULL)
@@ -58,9 +96,9 @@ class Ampel_model extends DB_Model
 			)
 			)';
 
-		$query .= ' ORDER BY deadline DESC';
+		$this->addOrder('deadline', 'DESC');
+		return $this->loadWhere($whereStatement);
 
-		return $this->execQuery($query, $parametersArray);
 	}
 
 	/**

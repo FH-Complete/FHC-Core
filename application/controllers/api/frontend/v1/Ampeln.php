@@ -75,7 +75,7 @@ class Ampeln extends FHCAPI_Controller
 		$userAmpeln = array();
 
 		// fetch active ampeln
-		$activeAmpeln = $this->AmpelModel->active(false, $this->uid);
+		$activeAmpeln = $this->AmpelModel->openActive($this->uid, false);
 		
 		$activeAmpeln = $this->getDataOrTerminateWithError($activeAmpeln);
 
