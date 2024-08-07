@@ -230,46 +230,4 @@ class Student_model extends DB_Model
 	{
 		return $student_uid . '@' . DOMAIN;
 	}
-
-	/**
-	 * Check if StudentenRolle already exists
-	 * @param integer $prestudent_id
-	 * @return 0 if not exists, count(rollen) if it does
-	 * Copy from studentDBDML.php
-	 */
-	public function checkIfExistingStudentRolle($prestudent_id)
-	{
-		$qry = "SELECT 
-    				count(*) as anzahl 
-				FROM 
-				    public.tbl_student 
-				WHERE 
-				    prestudent_id = ? ";
-
-		$result = $this->execQuery($qry, array($prestudent_id));
-
-		if (isError($result))
-		{
-			return error($result);
-		}
-		else
-		{
-			$resultObject = current(getData($result));
-
-			if (property_exists($resultObject, 'anzahl')) {
-				$resultValue = (int)$resultObject->anzahl;
-
-				if ($resultValue > 0)
-				{
-					return success($resultValue, $resultValue . " vorhandene Rollen");
-				}
-				else
-				{
-					return success("0");
-				}
-			} else {
-				return error("StudentModel: Error During Check if Existing Student Rolle.");
-			}
-		}
-	}
 }

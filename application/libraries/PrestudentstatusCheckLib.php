@@ -127,20 +127,22 @@ class PrestudentstatusCheckLib
 	}
 
 	/**
-	 * Checks if a student role already exists.
+	 * Checks if a student already exists.
 	 *
 	 * @param integer				$prestudent_id
 	 *
 	 * @return stdClass
 	 */
-	public function checkIfExistingStudentRolle($prestudent_id)
+	public function checkIfExistingStudent($prestudent_id)
 	{
-		$result = $this->_ci->StudentModel->checkIfExistingStudentRolle($prestudent_id);
+		$result = $this->_ci->StudentModel->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
 
 		if (isError($result))
 			return $result;
 
-		return success(getData($result) != '0');
+		return success(hasData($result));
 	}
 
 	/**
@@ -227,23 +229,6 @@ class PrestudentstatusCheckLib
 			return $result;
 
 		return success(hasData($result));
-	}
-
-	/**
-	 * Checks if is the first student Status
-	 *
-	 * @param integer				$prestudent_id
-	 *
-	 * @return stdClass
-	 */
-	public function checkIfIsErsterStudent($prestudent_id)
-	{
-		$result = $this->_ci->StudentModel->checkIfExistingStudentRolle($prestudent_id);
-
-		if (isError($result))
-			return $result;
-
-		return success(getData($result) == '0');
 	}
 
 	/**

@@ -254,7 +254,7 @@ class Status extends FHCAPI_Controller
 					)
 						return true; // Only test if new status is Student
 
-					$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($prestudent_id);
+					$result = $this->prestudentstatuschecklib->checkIfExistingStudent($prestudent_id);
 
 					return $this->getDataOrTerminateWithError($result);
 				}],
@@ -1059,7 +1059,7 @@ class Status extends FHCAPI_Controller
 					if ($value != Prestudentstatus_model::STATUS_STUDENT)
 						return true; // Only test if new status is Student
 
-					$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($prestudent_id);
+					$result = $this->prestudentstatuschecklib->checkIfExistingStudent($prestudent_id);
 
 					return $this->getDataOrTerminateWithError($result);
 				}]
@@ -1600,7 +1600,7 @@ class Status extends FHCAPI_Controller
 				if ($value != Prestudentstatus_model::STATUS_STUDENT)
 					return true;
 
-				$result = $this->prestudentstatuschecklib->checkIfExistingStudentRolle($prestudent_id);
+				$result = $this->prestudentstatuschecklib->checkIfExistingStudent($prestudent_id);
 
 				return $this->getDataOrTerminateWithError($result);
 			}]
