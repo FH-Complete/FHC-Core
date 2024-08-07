@@ -56,9 +56,6 @@ export default {
 
     async submitProfilChange() {
 
-      //todo delete this debugging line
-      console.log("this is a test")
-
       //? check if data is valid before making a request
       if (this.topic && this.profilUpdate) {
         //? if profil update contains any attachment

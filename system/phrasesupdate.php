@@ -25868,18 +25868,18 @@ array(
 		array(
 			'app' => 'core',
 			'category' => 'profilUpdate',
-			'phrase' => 'zustelladresseWarning',
+			'phrase' => 'zustell_adressen_warning',
 			'insertvon' => 'system',
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => '!Achtung: Eine Ihrer Adressen ist bereits als Zustelladresse gespeichert, sind sie sicher, dass sie die aktuelle Adresse stattdessen als Zustelladresse speichern wollen?',
+					'text' => 'Einer ihrer Adressen wird bereits zur Zustellung verwendet, möchten sie diese Adressen als Zustellungsadresse übernehmen?',
 					'description' => '',
 					'insertvon' => 'system'
 				),
 				array(
 					'sprache' => 'English',
-					'text' => '!Attention: One of your addresses is already saved as a delivery address, are you sure you want to save the current address as a delivery address instead?',
+					'text' => 'One of your addresses is already used as a contact address, would you like to use this address as your new contact address?',
 					'description' => '',
 					'insertvon' => 'system'
 				)
@@ -25888,23 +25888,24 @@ array(
 		array(
 			'app' => 'core',
 			'category' => 'profilUpdate',
-			'phrase' => 'zustellkontakteWarning',
+			'phrase' => 'zustell_kontakte_warning',
 			'insertvon' => 'system',
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => '!Achtung: Eine deiner Kontakte ist bereits als Zustellungskontakt gespeichert, sind sie sicher, dass sie den aktuellen Kontakt stattdessen als Zustellkontakt speichern wollen?',
+					'text' => 'Einer ihrer Kontakte wird bereits zur Zustellung verwendet, möchten sie diesen Kontakt als Zustellungskontakt übernehmen?',
 					'description' => '',
 					'insertvon' => 'system'
 				),
 				array(
 					'sprache' => 'English',
-					'text' => '!Attention: One of your contacts is already saved as a delivery contact, are you sure you want to save the current contact as a delivery contact instead?',
+					'text' => 'One of your contacts is already used as a communication mean, would you like to use this contact as your new communication mean?',
 					'description' => '',
 					'insertvon' => 'system'
 				)
 			)
 		),
+		
 		array(
 			'app' => 'core',
 			'category' => 'profilUpdate',

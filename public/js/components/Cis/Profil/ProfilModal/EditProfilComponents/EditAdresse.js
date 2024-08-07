@@ -34,10 +34,6 @@ export default {
   },
 
   methods: {
-    test: function () {
-      console.log(this.gemeinden, "this are the gemeinden");
-      console.log(this.ortschaftnamen, "this are the ortschaftsnamen");
-    },
 
     autocompleteSearchGemeinden: function (event) {
       this.gemeinden = this.gemeinden.map((gemeinde) => gemeinde);
@@ -97,6 +93,11 @@ export default {
 
   computed: {
     showZustellAdressenWarning: function () {
+
+	  // if the address was already a zustellungsadresse when editing the address, then the warning will not be shown and the zustellungsadresse will just be overwritten
+	  if (JSON.parse(this.originalValue).zustelladresse){
+		return false;
+	  }
       // if zustellAdressenCount is not 0 and the own kontakt has the flag zustellung set to true
       if (!this.zustellAdressenCount.includes(this.data.adresse_id)) {
         return this.data.zustelladresse && this.zustellAdressenCount.length;
@@ -135,7 +136,7 @@ export default {
   <div v-if="showZustellAdressenWarning" class="col-12 ">
     <div class="card bg-danger mx-2">
       <div class="card-body text-white ">
-        <span>{{$p.t('profilUpdate','zustelladresseWarning')}}</span>
+	  <span>{{$p.t('profilUpdate','zustell_adressen_warning')}}</span>
       </div>
     </div>
   </div>
