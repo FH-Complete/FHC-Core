@@ -170,6 +170,13 @@ class Status extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
+	/**
+	 * Changes the status of a prestudent with full additional logic.
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return stdClass
+	 */
 	public function changeStatus($prestudent_id)
 	{
 		$isBerechtigtNoStudstatusCheck = $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
@@ -427,7 +434,7 @@ class Status extends FHCAPI_Controller
 				);
 
 				return $this->getDataOrTerminateWithError($result);
-			}] // TODO(chris): history_student?
+			}]
 		], [
 			'meldestichtag_not_exceeded' => $this->p->t('lehre', 'error_dataVorMeldestichtag'),
 			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhandenMitNamen', ['name' => $studentName]),
