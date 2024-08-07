@@ -14,11 +14,10 @@ export default {
 			required: true
 		}
 	},
+	emits: [
+		'reloadTable'
+	],
 	props: {
-		showToolbar: {
-			type: Boolean,
-			required: true
-		},
 		showToolbarStudent: {
 			type: Boolean,
 			required: true
@@ -31,11 +30,6 @@ export default {
 			type: Array,
 			required: true,
 			default: () => []
-		},
-		updateData: {
-			type: Array,
-			required: true,
-			default: () => []
 		}
 	},
 	data() {
@@ -43,18 +37,12 @@ export default {
 			listDataToolbar: [],
 			//TODO(Manu) get from config
 			statiInteressent: ["Bewerber", "Aufgenommener", "Student" , "Wartender", "Abgewiesener"],
-			statiStudent: ["Abbrecher", "Unterbrecher", "Student" , "Diplomand", "Absolvent"],
-			actionButton: {},
-			actionStatusText: {},
-			actionSem: null
+			statiStudent: ["Abbrecher", "Unterbrecher", "Student" , "Diplomand", "Absolvent"]
 		};
 	},
 	computed: {
-		toolbarInteressent() {
-			return this.listDataToolbar.filter(item => this.statiInteressent.includes(item.status_kurzbz));
-		},
-		toolbarStudent() {
-			return this.listDataToolbar.filter(item => this.statiStudent.includes(item.status_kurzbz));
+		showToolbar() {
+			return this.showToolbarStudent || this.showToolbarInteressent;
 		},
 		sortedGruende() {
 			return this.listDataToolbar.reduce((result,current) => {
@@ -142,321 +130,119 @@ export default {
 				}
 			});
 			return result;
-		},
-		gruende() {
-			return this.listStatusgruende.filter(grund => grund.status_kurzbz == this.formData.status_kurzbz);
 		}
 	},
 	methods: {
-		actionConfirmDialogue(data, statusgrund, statusText) {
-			this.actionButton = statusgrund;
-			this.actionStatusText = statusText;
-			this.$refs.confirmStatusAction.show();
+		changeInteressentToStudent(statusgrund_id) {
+			this.addStudent({status_kurzbz: 'student', statusgrund_id});
 		},
 		addStudent() {
-			this.resetChangeModals();
-			let changeData = {};
-
-			//for Feedback Sucess, Error
-			let countSuccess = 0;
-			let countError = 0;
-
-			const promises = this.newArray.map(changeData => {
-
-				return this.$fhcApi.post('api/frontend/v1/stv/status/addStudent/' + changeData.prestudent_id,
-					changeData
-				).then(response => {
-					countSuccess++;
-					return response;
-				})
-				.catch(error => {
-					countError++;
-					//For each Prestudent show Error in Alert
-					this.$fhcAlert.handleSystemError(error);
-				});
-			});
-
 			Promise
-				.allSettled(promises)
-				.then(values => {
-
-					this.newStatus = 'Student';
-
-					//Feedback Success als infoalert
-					this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
-						'countSuccess': countSuccess,
-						'status': this.newStatus,
-						'countError': countError
-					}));
-
-					if (this.prestudentIds.length == 1) {
-						this.reload();
-					}
-					this.$reloadList();
-					this.resetModal();
-				});
+				.allSettled(
+					this.prestudentIds.map(prestudent_id => this.$fhcApi.post(
+						'api/frontend/v1/stv/status/addStudent/' + prestudent_id,
+						data
+					))
+				)
+				.then(this.showFeedback);
 		},
 		changeStatusToAbbrecher(statusgrund_id) {
-			const data = this.prestudentIds.map(prestudent_id => ({
-				prestudent_id,
-				status_kurzbz: 'Abbrecher',
-				statusgrund_id
-			}));
-			BsConfirm
-				.popup(this.$p.t('lehre', data.length > 1 ? 'modal_StatusactionPlural' : 'modal_StatusactionSingle', {
-					count: data.length,
-					status: 'Abbrecher'
-				}))
-				.then(() => this.changeStatusNeu('Abbrecher', data))
+			this
+				.confirmStatusChange('Abbrecher', statusgrund_id)
+				.then(this.changeStatus)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		changeStatusToUnterbrecher() {
-			this.resetChangeModals();
-			let def_date = this.getDefaultDate();
-			let deltaData =
-				{
-					status_kurzbz: 'Unterbrecher',
-					datum: def_date,
-					bestaetigtam: def_date
-				};
-
-			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData }));
-			this.actionConfirmDialogue(this.updateData, 'studenten', 'Unterbrecher');
+		changeStatusToUnterbrecher(statusgrund_id) {
+			this
+				.confirmStatusChange('Unterbrecher', statusgrund_id)
+				.then(this.changeStatus)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		changeStatusToStudent(statusgrund_id) {
-			const data = this.prestudentIds.map(prestudent_id => ({
-				prestudent_id,
-				status_kurzbz: 'Student',
-				statusgrund_id
-			}));
-			BsPrompt
-				.popup(this.$p.t('lehre', data.length > 1 ? 'modal_askAusbildungssemPlural' : 'modal_askAusbildungssem', {
-					count: data.length,
-					status: 'Student'
-				}))
-				.then(ausbildungssemester => this.changeStatusNeu('Student', data.map(item => {
-					item.ausbildungssemester = ausbildungssemester;
-					return item;
-				})))
+			this
+				.promtAusbildungssemester('Student')
+				.then(this.changeStatus)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		changeStatusToDiplomand() {
-			let def_date = this.getDefaultDate();
-			let deltaData =
-				{
-					status_kurzbz: 'Diplomand',
-					datum: def_date,
-					bestaetigtam: def_date,
-				};
-
-			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
-			this.changeStatus(this.prestudentIds);
+		changeStatusToDiplomand(statusgrund_id) {
+			this.changeStatus({status_kurzbz: 'Diplomand', statusgrund_id});
 		},
-		changeStatusToAbsolvent() {
-			let def_date = this.getDefaultDate();
-			let deltaData =
-				{
-					status_kurzbz: 'Absolvent',
-					datum: def_date,
-					bestaetigtam: def_date,
-				};
-
-			this.newArray = this.updateData.map(objekt => ({ ...objekt, ...deltaData}));
-			this.changeStatus(this.prestudentIds);
+		changeStatusToAbsolvent(statusgrund_id) {
+			this.changeStatus({status_kurzbz'Absolvent', statusgrund_id});
 		},
-		changeStatusToBewerber() {
-			this.resetChangeModals();
-			let def_date = this.getDefaultDate();
-			let deltaData =
-				{
-					status_kurzbz: 'Bewerber',
-					datum: def_date,
-					bestaetigtam: def_date,
-					ausbildungssemester: 1
-				};
-
-			this.newArray = this.updateData.map(objekt => ({
-				...objekt,
-				...deltaData}));
-			this.changeStatus(this.prestudentIds);
+		changeStatusToBewerber(statusgrund_id) {
+			this.changeStatus({status_kurzbz: 'Bewerber', statusgrund_id});
 		},
-		changeStatusToAufgenommener() {
-			this.resetChangeModals();
-			let def_date = this.getDefaultDate();
-			let deltaData =
-				{
-					status_kurzbz: 'Aufgenommener',
-					datum: def_date,
-					bestaetigtam: def_date
-				};
-
-			this.newArray = this.updateData.map(objekt => ({
-				...objekt,
-				...deltaData,
-			}));
-
-			this.actionConfirmDialogue(this.updateData, 'aufgenommener', 'Aufgenommener');
-		},
-		changeInteressentToStudent(statusgrund_id) {
-			this.resetChangeModals();
-			let def_date = this.getDefaultDate();
-			let deltaData =
-				{
-					status_kurzbz: 'Student',
-					datum: def_date,
-					bestaetigtam: def_date,
-					statusgrund_id: statusgrund_id
-				};
-
-			this.newArray = this.updateData.map(objekt => ({
-				...objekt,
-				...deltaData,
-			}));
-
-			this.addStudent(this.prestudentIds);
+		changeStatusToAufgenommener(statusgrund_id) {
+			this
+				.confirmStatusChange('Aufgenommener', statusgrund_id)
+				.then(this.changeStatus)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		changeStatusToAbgewiesener(statusgrund_id) {
-			this.resetChangeModals();
-			let def_date = this.getDefaultDate();
-			let deltaData =
-				{
-					status_kurzbz: 'Abgewiesener',
-					datum: def_date,
-					bestaetigtam: def_date,
-					statusgrund_id: statusgrund_id
-				};
-
-			this.newArray = this.updateData.map(objekt => ({
-				...objekt,
-				...deltaData,
-			}));
-
-			this.actionConfirmDialogue(this.updateData, 'abgewiesener', 'Abgewiesener');
+			this
+				.confirmStatusChange('Abgewiesener', statusgrund_id)
+				.then(this.changeStatus)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
-		changeStatusToWartender() {
-			this.resetChangeModals();
-			let def_date = this.getDefaultDate();
-			let deltaData =
-				{
-					status_kurzbz: 'Wartender',
-					datum: def_date,
-					bestaetigtam: def_date
-				};
-			this.newArray = this.updateData.map(objekt => ({
-				...objekt,
-				...deltaData,
-			}));
-
-			this.actionConfirmDialogue(this.updateData, 'wartender', 'Wartender');
+		changeStatusToWartender(statusgrund_id) {
+			this
+				.confirmStatusChange('Wartender', statusgrund_id)
+				.then(this.changeStatus)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
-		changeStatusNeu(status_kurzbz, data) {
+		confirmStatusChange(status, statusgrund_id) {
+			const count = this.prestudentIds.length;
+			return BsConfirm
+				.popup(this.$p.t(
+					'lehre',
+					count > 1 ? 'modal_StatusactionPlural' : 'modal_StatusactionSingle',
+					{ count, status }
+				))
+				.then(() => ({
+					status_kurzbz: status,
+					statusgrund_id
+				}));
+		},
+		promtAusbildungssemester(status, statusgrund_id) {
+			const count = this.prestudentIds.length;
+			return BsPrompt
+				.popup(this.$p.t(
+					'lehre',
+					count > 1 ? 'modal_askAusbildungssemPlural' : 'modal_askAusbildungssem',
+					{ count, status }
+				))
+				.then(ausbildungssemester => ({
+					status_kurzbz: status,
+					ausbildungssemester,
+					statusgrund_id
+				}));
+		},
+		changeStatus(data) {
 			Promise
-				.allSettled(data.map(item => this.$fhcApi.post('api/frontend/v1/stv/status/changeStatus/' + item.prestudent_id, item)))
-				.then(results => {
-					let successes = results.filter(result => result.status == "fulfilled").length,
-						errors = results.length - successes;
-					
-					//Feedback Success als infoalert
-					this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
-						'countSuccess': successes,
-						'status': status_kurzbz,
-						'countError': errors
-					}));
-
-					if(results.length == 1 && successes > 0){
-						this.reload();
-					}
-					this.$reloadList();
-				});
+				.allSettled(
+					this.prestudentIds.map(prestudent_id => this.$fhcApi.post(
+						'api/frontend/v1/stv/status/changeStatus/' + prestudent_id,
+						data
+					))
+				)
+				.then(this.showFeedback);
 		},
-		changeStatus() {
-			this.resetChangeModals();
-			let changeData = {};
+		showFeedback(results) {
+			const countSuccess = results.filter(result => result.status == "fulfilled").length;
+			const countError = results.length - successes;
+			
+			//Feedback Success als infoalert
+			this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
+				countSuccess,
+				status: data.status_kurzbz,
+				countError
+			}));
 
-			//for Feedback Sucess, Error
-			let countSuccess = 0;
-			let countError = 0;
-
-			// Check if ausbildungssemester is already in this.newArray
-			const existingEntry = this.newArray.find(
-				(entry) => entry.ausbildungssemester
-			);
-
-			// If the entry doesn't exist, add a new object with ausbildungssemester
-			if (!existingEntry) {
-				this.newArray.push({ ausbildungssemester: this.actionSem });
+			if(results.length == 1 && countSuccess > 0){
+				this.$emit('reloadTable');
 			}
-
-			const promises = this.newArray.map(changeData => {
-
-				return this.$fhcApi.post('api/frontend/v1/stv/status/changeStatus/' + changeData.prestudent_id,
-					changeData
-				).then(response => {
-					countSuccess++;
-					return response;
-				})
-					//.catch(this.$fhcAlert.handleSystemError)
-					.catch(error => {
-						countError++;
-						//For each Prestudent show Error in Alert
-						this.$fhcAlert.handleSystemError(error);
-					});
-			});
-
-			Promise
-				.allSettled(promises)
-				.then(values => {
-					if(this.newArray.length > 0) {
-						this.newStatus = this.newArray[0].status_kurzbz;
-					}
-					else {
-						this.newStatus = this.statusData.status_kurzbz;
-					}
-
-					//Feedback Success als infoalert
-					this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
-						'countSuccess': countSuccess,
-						'status': this.newStatus,
-						'countError': countError
-					}));
-
-					if(this.prestudentIds.length == 1 && countSuccess > 0){
-						this.reload();
-						//necessary to see new status in List
-					}
-					this.$reloadList();
-					//to change ToolbarInteressent to ToolbarStudent
-					this.resetModal();
-				});
-		},
-		getDefaultDate() {
-			const today = new Date();
-			return today;
-		},
-		hideModal(modalRef) {
-			this.$refs[modalRef].hide();
-			this.statusNew = true;
-		},
-		reload() {
-			this.$emit('reload-table');
-		},
-		reloadList() {
-			this.$emit('reload-list');
-		},
-		resetChangeModals() {
-			this.hideModal('confirmStatusAction');
-			this.hideModal('askForAusbildungssemester');
-		},
-		resetModal() {
-			this.statusData = {};
-			this.statusId = {};
-			this.actionButton = {};
-			this.actionStatusText = {};
-			this.actionSem = null;
-		},
-		saveNewAusbildungssemester() {
-			this.newArray = this.newArray.map(objekt => ({ ...objekt, ausbildungssemester: this.actionSem}));
-			this.changeStatus(this.prestudentIds);
+			this.$reloadList();
 		}
 	},
 	created() {
@@ -467,76 +253,10 @@ export default {
 				this.listDataToolbar = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		//TODO(manu) check if necessary
-		this.$fhcApi
-			.get('api/frontend/v1/stv/status/getStatusgruende/')
-			.then(result => result.data)
-			.then(result => {
-				this.listStatusgruende = result;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-status-dropdown">
 		
-		<!--Modal: ConfirmStatusAction-->
-		<BsModal ref="confirmStatusAction">
-			<template #title>{{$p.t('lehre', 'status_edit')}}</template>
-			<template #default>
-				<div v-if="prestudentIds.length == 1">
-					<p>{{$p.t('lehre', 'modal_StatusactionSingle', { status: actionStatusText })}}</p>
-				</div>
-				<div v-else>
-					<p>{{$p.t('lehre', 'modal_StatusactionPlural', { count: prestudentIds.length,
-				status: actionStatusText
-					})}}</p>
-				</div>
-				
-			</template>
-			<template #footer>	
-				<!--Action changeStatus-->
-				<div>
-					<button  ref="Close" type="button" class="btn btn-primary" @click="changeStatus(prestudentIds)">OK</button>
-				</div>				
-			</template>
-		</BsModal>
-							
-		<!--Modal: askForAusbildungssemester-->
-		<BsModal ref="askForAusbildungssemester">
-			<template #title>{{$p.t('lehre', 'status_edit')}}</template>
-			<template #default>
-			<div v-if="prestudentIds.length == 1">
-				<p>
-				{{$p.t('lehre', 'modal_askAusbildungssem', { status: actionStatusText })}}</p>
-			</div>
-			<div v-else>
-				<p>
-				{{$p.t('lehre', 'modal_askAusbildungssemPlural', { count: prestudentIds.length,
-				status: actionStatusText
-					})}}</p>
-			</div>
-			
-			<div class="row mb-3">
-				<label for="studiensemester" class="form-label col-sm-4">{{$p.t('lehre', 'studiensemester')}}</label>
-				<div class="col-sm-6">
-					<form-input
-						type="text"
-						name="studiensemester"
-						v-model="actionSem"
-						maxlength="2"
-					>				
-					</form-input>
-				</div>
-			</div>			
-			</template>
-			<template #footer>
-				<div>
-					<button  ref="Close" type="button" class="btn btn-primary" @click="saveNewAusbildungssemester()">OK</button>
-				</div>					
-			</template>
-		</BsModal>
-	
-		<!-- Dropdown -->
 		<div v-if="showToolbar"  class="btn-group">						
 			<button ref="toolbarButton" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
 				{{$p.t('lehre', 'btn_statusAendern')}}
@@ -610,5 +330,5 @@ export default {
 
 			</ul>
 		</div>
-	</div> `
+	</div>`
 };

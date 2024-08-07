@@ -34,35 +34,6 @@ export default{
 			}
 			return this.modelValue.map(e => e.prestudent_id);
 		},
-		updateData() {
-			const dataArray = [];
-			if (this.modelValue.prestudent_id) {
-				const newObj = {
-					prestudent_id : this.modelValue.prestudent_id,
-					studiensemester_kurzbz : this.defaultSemester,
-					ausbildungssemester : this.modelValue.semester,
-					orgform_kurzbz: this.modelValue.orgform_kurzbz,
-					name: `${this.modelValue.vorname} ${this.modelValue.nachname}`
-				};
-				dataArray.push(newObj);
-				return dataArray;
-			}
-			else
-			{
-				for (const item of this.modelValue) {
-					const newObj = {
-						prestudent_id: item.prestudent_id,
-						ausbildungssemester: item.semester,
-						studiensemester_kurzbz: this.defaultSemester,
-						orgform_kurzbz: item.orgform_kurzbz,
-						name: `${item.vorname} ${item.nachname}`
-					};
-					dataArray.push(newObj);
-				}
-
-				return dataArray;
-			}
-		},
 		showToolbarStudent() {
 			if (Array.isArray(this.modelValue)) {
 				if (!this.modelValue.length)
@@ -70,9 +41,6 @@ export default{
 				return this.modelValue.every(item => item.uid);
 			}
 			return !!this.modelValue.uid;
-		},
-		showToolbar() {
-			return this.showToolbarStudent || this.showToolbarInteressent;
 		},
 		showToolbarInteressent() {
 			if (Array.isArray(this.modelValue)) {
@@ -341,55 +309,54 @@ export default{
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-		<div class="stv-multistatus h-100 pt-3">
+	<div class="stv-multistatus h-100 pt-3">
+		
+		<status-modal
+			ref="test"
+			:meldestichtag="new Date(dataMeldestichtag)"
+			:max-sem="maxSem"
+			@saved="reload"
+			>
+		</status-modal>
 			
-			<status-modal ref="test" :meldestichtag="new Date(dataMeldestichtag)" :max-sem="maxSem" @saved="reload"></status-modal>
-				
-			<core-filter-cmpt
-				v-if="!this.modelValue.length"
-				ref="table"
-				:tabulator-options="tabulatorOptions"
-				:tabulator-events="tabulatorEvents"
-				table-only
-				:side-menu="false"
-				reload
-				new-btn-show
-				new-btn-label="Status"
-				@click:new="actionNewStatus"
-				>
-				
-				<template #actions="{updateData2}">
-					<!-- SingleSelectButton-->
-					<status-dropdown 
-						ref="statusDropdown"
-						:showToolbar="showToolbar"
-						:showToolbarStudent="showToolbarStudent"
-						:showToolbarInteressent="showToolbarInteressent"
-						:prestudentIds="prestudentIds"
-						:updateData="updateData"
-						@reload-table="reload"
-					>		
-					</status-dropdown>		
-				</template>	
+		<core-filter-cmpt
+			v-if="!this.modelValue.length"
+			ref="table"
+			:tabulator-options="tabulatorOptions"
+			:tabulator-events="tabulatorEvents"
+			table-only
+			:side-menu="false"
+			reload
+			new-btn-show
+			new-btn-label="Status"
+			@click:new="actionNewStatus"
+			>
+			
+			<template #actions="{updateData2}">
+				<!-- SingleSelectButton-->
+				<status-dropdown 
+					ref="statusDropdown"
+					:show-toolbar-student="showToolbarStudent"
+					:show-toolbar-interessent="showToolbarInteressent"
+					:prestudent-ids="prestudentIds"
+					@reload-table="reload"
+				>		
+				</status-dropdown>
+			</template>	
 
-			</core-filter-cmpt>
+		</core-filter-cmpt>
 
-			<div 
-				v-if="this.modelValue.length"
-				ref="buttonsStatusMulti"
-			>	
-					<!--MultiSelectButton-->
-					<status-dropdown 
-						ref="statusDropdown"
-						:showToolbar="showToolbar"
-						:showToolbarStudent="showToolbarStudent"
-						:showToolbarInteressent="showToolbarInteressent"
-						:prestudentIds="prestudentIds"
-						:updateData="updateData"
-						@reload-table="reload"
-					>		
-					</status-dropdown>	
-				
-	 	</div>	
+		<div v-else>
+			<!--MultiSelectButton-->
+			<status-dropdown 
+				ref="statusDropdown"
+				:show-toolbar-student="showToolbarStudent"
+				:show-toolbar-interessent="showToolbarInteressent"
+				:prestudent-ids="prestudentIds"
+				@reload-table="reload"
+				>		
+			</status-dropdown>
+	 	</div>
+
 	</div>`
 };
