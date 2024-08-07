@@ -409,48 +409,6 @@ class Prestudentstatus_model extends DB_Model
 	}
 
 	/**
-	 * Check if Rolle there is an existing Bewerberstatus
-	 * @param integer $prestudent_id
-	 * @return error if no bewerberstatus, success if existing
-	 */
-	public function checkIfExistingBewerberstatus($prestudent_id)
-	{
-		$studentName = '';
-
-		$nameRes = $this->PersonModel->loadPrestudent($prestudent_id);
-
-		if (hasData($nameRes))
-		{
-			$nameData = getData($nameRes)[0];
-			$studentName = $nameData->vorname.' '.$nameData->nachname;
-		}
-
-		$qry = "SELECT
-					*
-				FROM
-				    public.tbl_prestudentstatus
-				WHERE
-					prestudent_id = ?
-				AND
-				    status_kurzbz = 'Bewerber'";
-
-		$result = $this->execQuery($qry, array($prestudent_id));
-
-		if (isError($result))
-		{
-			return error($result);
-		}
-		elseif (!hasData($result))
-		{
-			return success("0", $this->p->t('lehre', 'error_keinBewerber', ['name' => $studentName]));
-		}
-		else
-		{
-			return success($result);
-		}
-	}
-
-	/**
 	 * Check if Rolle there is an existing Aufgenommenerstatus
 	 * @param integer $prestudent_id
 	 * @return error if no status Aufgenommener, success if existing

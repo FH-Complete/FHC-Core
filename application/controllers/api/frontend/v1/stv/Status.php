@@ -17,7 +17,6 @@ class Status extends FHCAPI_Controller
 			'getStatusgruende' => self::PERM_LOGGED,
 			'getLastBismeldestichtag' => self::PERM_LOGGED,
 			'isLastStatus' => self::PERM_LOGGED,
-			'hasStatusBewerber' => self::PERM_LOGGED,
 			'getStatusarray' => self::PERM_LOGGED,
 			'deleteStatus' => ['admin:rw','assistenz:rw'],
 			'loadStatus' => ['admin:r', 'assistenz:r'],
@@ -126,16 +125,6 @@ class Status extends FHCAPI_Controller
 
 		$result = $this->getDataOrTerminateWithError($result);
 
-		return $this->terminateWithSuccess($result);
-	}
-
-	public function hasStatusBewerber($prestudent_id)
-	{
-		$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
 		return $this->terminateWithSuccess($result);
 	}
 

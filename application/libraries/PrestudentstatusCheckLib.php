@@ -199,13 +199,14 @@ class PrestudentstatusCheckLib
 	 */
 	public function checkIfExistingBewerberstatus($prestudent_id)
 	{
-		$result =  $this->_ci->PrestudentstatusModel->checkIfExistingBewerberstatus(
-			$prestudent_id
-		);
+		$result =  $this->_ci->PrestudentstatusModel->loadWhere([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_BEWERBER
+		]);
 		if (isError($result))
 			return $result;
 
-		return success(getData($result) != '0');
+		return success(hasData($result));
 	}
 
 
