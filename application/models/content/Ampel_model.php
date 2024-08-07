@@ -23,12 +23,12 @@ class Ampel_model extends DB_Model
 		$userLanguage = getUserLanguage();
 
 		$bestaetigt = '';
-		if($uid != null){
+		if($uid != null ){
 			$bestaetigt = ',
 				COALESCE((
 				SELECT true
 			  	FROM public.tbl_ampel_benutzer_bestaetigt a
-			 	WHERE a.ampel_id = ampel_id
+			 	WHERE a.ampel_id = ' . $this->dbTable . '.ampel_id
 			   	AND uid = ' . $this->escape($uid) . ' LIMIT 1), false) as bestaetigt';
 		}
 
@@ -109,28 +109,6 @@ class Ampel_model extends DB_Model
 		}
 		else
 			return $result; //will contain the error-msg from execQuery
-	}
-
-
-	/**
-	 * confirms Ampel by the user.
-	 * @param int $ampel_id Ampel-ID
-	 * @param string $uid UID
-	 * @return stdClass insert into result
-	 */
-	public function confirmAmpel($ampel_id, $uid)
-	{
-		$this->load->library('form_validation');
-		$this->form_validation->set_data(['ampel_id' => $ampel_id, 'uid' => $uid]);
-		$this->form_validation->set_rules('ampel_id', 'Ampel ID', 'required|integer');
-		$this->form_validation->set_rules('uid', 'UID', 'required');
-
-		if ($this->form_validation->run() == FALSE)
-			$this->terminateWithValidationErrors($this->form_validation->error_array());
-
-		return $this->execQuery('
-        INSERT INTO public.tbl_ampel_benutzer_bestaetigt (ampel_id, uid)
-        VALUES (?,?);', array($ampel_id, $uid));
 	}
 
 	/**

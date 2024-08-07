@@ -56,7 +56,9 @@ class Ampeln extends FHCAPI_Controller
         $this->form_validation->set_rules('ampel_id', 'Ampel ID', 'required|integer');
         if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
 
-        $insert_into_result = $this->AmpelModel->confirmAmpel($ampel_id,$this->uid);
+		// load Ampel_benutzer_bestaetigt_model to confirm the ampel
+		$this->load->model('content/Ampel_Benutzer_Bestaetigt_model', 'AmpelBenutzerBestaetigtModel');
+        $insert_into_result = $this->AmpelBenutzerBestaetigtModel->insert(["ampel_id"=> $ampel_id, "uid"=> $this->uid]);
 
         $insert_into_result = $this->getDataOrTerminateWithError($insert_into_result);
 
@@ -78,8 +80,8 @@ class Ampeln extends FHCAPI_Controller
         $activeAmpeln = $this->getDataOrTerminateWithError($activeAmpeln);
 
 		foreach($activeAmpeln as $ampel){
-            
-            // only include non confirmed active ampeln in the result
+			
+			// only include non confirmed active ampeln in the result
             if(!$ampel->bestaetigt){
                 
                 // check if the user was assigned to the ampel
