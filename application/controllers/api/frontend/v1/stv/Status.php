@@ -533,19 +533,6 @@ class Status extends FHCAPI_Controller
 
 	public function addStudent($prestudent_id)
 	{
-
-		$isBerechtigtBasisPrestudentstatus = $this->permissionlib->isBerechtigt('basis/prestudentstatus');
-
-		if (!$isBerechtigtBasisPrestudentstatus)
-			$this->form_validation->set_rules(
-				'berechtigt',
-				$this->p->t('ui', 'nurLeseberechtigung'),
-				'is_null',
-				[
-					'is_null' => $this->p->t('ui', 'error_fieldWriteAccess')
-				]
-			);
-
 		//get studentname for validations
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->PersonModel->addJoin('public.tbl_prestudent', 'person_id');
@@ -555,110 +542,71 @@ class Status extends FHCAPI_Controller
 
 		$studentName = trim($prestudent_person->vorname . ' ' . $prestudent_person->nachname);
 
-		$status_kurzbz = $this->input->post('status_kurzbz');
+		/*$status_kurzbz = $this->input->post('status_kurzbz');
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
 		$ausbildungssemester = $this->input->post('ausbildungssemester');
-
-		//Form Validation
-		$this->load->library('form_validation');
-
 		$statusgrund_id = $this->input->post('statusgrund_id');
-		$datum = $this->input->post('datum');
+		$datum = $this->input->post('datum');*/
+
 
 		//Form Validation
 		$this->load->library('form_validation');
 
-		$this->form_validation->set_rules(
-			'status_kurzbz',
-			'Status',
-			[
-				'required',
-				//Check Reihungstest
-				['reihungstest_check', function ($value) use ($prestudent_person) {
-					if (!REIHUNGSTEST_CHECK)
-						return true;
-					if ($value != Prestudentstatus_model::STATUS_BEWERBER)
-						return true;
-					$result = $this->prestudentstatuschecklib->checkIfAngetreten($prestudent_person);
-					return $this->getDataOrTerminateWithError($result);
-				}],
-				//Check ZGV
-				['checkIfZGV', function ($value) use ($prestudent_person) {
-					if (!ZGV_CHECK)
-						return true;
-					if ($value != Prestudentstatus_model::STATUS_BEWERBER)
-						return true;
-					$result = $this->prestudentstatuschecklib->checkIfZGVEingetragen($prestudent_person);
-					return $this->getDataOrTerminateWithError($result);
-				}],
-				//Check ZGV Master
-				['checkIfZGVMaster', function ($value) use ($prestudent_person) {
-					if (!ZGV_CHECK)
-						return true;
-					if ($value != Prestudentstatus_model::STATUS_BEWERBER)
-						return true;
-					$result = $this->prestudentstatuschecklib->checkIfZGVEingetragenMaster($prestudent_person);
-					return $this->getDataOrTerminateWithError($result);
-				}],
-				//Check Bewerberstatus
-				['checkIfExistingBewerberstatus', function () use ($prestudent_id, $status_kurzbz) {
-					if ($status_kurzbz != Prestudentstatus_model::STATUS_AUFGENOMMENER &&
-						$status_kurzbz != Prestudentstatus_model::STATUS_WARTENDER &&
-						$status_kurzbz != Prestudentstatus_model::STATUS_ABGEWIESENER)
-						return true;
-					$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
-					return $this->getDataOrTerminateWithError($result);
-				}],
-				//Check Aufgenommenerstatus
-				['checkIfExistingAufgenommenerstatus', function () use ($prestudent_id, $status_kurzbz) {
-					if ($status_kurzbz != Prestudentstatus_model::STATUS_STUDENT)
-						return true;
-					$result = $this->prestudentstatuschecklib->checkIfExistingAufgenommenerstatus($prestudent_id);
-					return $this->getDataOrTerminateWithError($result);
-				}],
-				//Check If FirstStudent
-				['check_isFirstStudStatus', function ($value) use ($prestudent_id) {
-					if ($value != Prestudentstatus_model::STATUS_STUDENT)
-						return true;
+		$this->form_validation->set_rules('_default', '', [
+			'required',
+			//Check ZGV
+			['checkIfZGV', function () use ($prestudent_person) {
+				if (defined("ZGV_CHECK") && !ZGV_CHECK)
+					return true;
+				$result = $this->prestudentstatuschecklib->checkIfZGVEingetragen($prestudent_person);
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			//Check ZGV Master
+			['checkIfZGVMaster', function () use ($prestudent_person) {
+				if (defined("ZGV_CHECK") && !ZGV_CHECK)
+					return true;
+				$result = $this->prestudentstatuschecklib->checkIfZGVEingetragenMaster($prestudent_person);
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			//Check Bewerberstatus
+			['checkIfExistingBewerberstatus', function () use ($prestudent_id) {
+				$result = $this->prestudentstatuschecklib->checkIfExistingBewerberstatus($prestudent_id);
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			//Check Aufgenommenerstatus
+			['checkIfExistingAufgenommenerstatus', function () use ($prestudent_id) {
+				$result = $this->prestudentstatuschecklib->checkIfExistingAufgenommenerstatus($prestudent_id);
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			//Check Bewerberstatus & Aufgenommenerstatus semester
+			['checkIfLastBewerberAndAufgenommenerShareSemesters', function () use ($prestudent_id) {
+				$result = $this->prestudentstatuschecklib->checkIfLastBewerberAndAufgenommenerShareSemesters($prestudent_id);
+				return $this->getDataOrTerminateWithError($result);
+			}],
+			//Check If FirstStudent
+			['check_isFirstStudStatus', function () use ($prestudent_id) {
+				$result = $this->prestudentstatuschecklib->checkIfExistingStudent($prestudent_id);
 
-					$result = $this->prestudentstatuschecklib->checkIfIsErsterStudent($prestudent_id);
+				return !$this->getDataOrTerminateWithError($result);
+			}],
+			//Check if Rolle already exists
+			['rolle_doesnt_exist', function () use ($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester) {
+				if (!$status_kurzbz || !$studiensemester_kurzbz || !$ausbildungssemester)
+					return true; // Error will be handled by the required statements above
 
-					return $this->getDataOrTerminateWithError($result);
-				}],
-				//Check If Existing PrestudentRolle
-				['checkIfExistingPrestudentRolle', function () use (
-					$prestudent_id,
-					$status_kurzbz,
-					$studiensemester_kurzbz,
-					$ausbildungssemester
-				) {
-					$result = $this->prestudentstatuschecklib->checkIfExistingPrestudentRolle(
-						$prestudent_id,
-						$status_kurzbz,
-						$studiensemester_kurzbz,
-						$ausbildungssemester
-					);
-					return $this->getDataOrTerminateWithError($result);
-				}]
-			],
-			[
-				'reihungstest_check' => $this->p->t('lehre', 'error_keinReihungstestverfahren', ['name' => $studentName]),
-				'checkIfExistingBewerberstatus' => $this->p->t('lehre', 'error_keinBewerber', ['name' => $studentName]),
-				'checkIfExistingAufgenommenerstatus' => $this->p->t('lehre', 'error_keinAufgenommener', ['name' => $studentName]),
-				'checkIfZGV' => $this->p->t('lehre', 'error_ZGVNichtEingetragen', ['name' => $studentName]),
-				'checkIfZGVMaster' => $this->p->t('lehre', 'error_ZGVMasterNichtEingetragen', ['name' => $studentName]),
-				'check_isFirstStudStatus' => $this->p->t('lehre', 'error_personBereitsStudent', ['name' => $studentName]),
-				'checkIfExistingPrestudentRolle' => $this->p->t('lehre', 'error_rolleBereitsVorhandenMitNamen', ['name' => $studentName])
-			]
-		);
+				$result = $this->PrestudentstatusModel->load([$ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id]);
 
-		$this->form_validation->set_rules('ausbildungssemester', $this->p->t('lehre', 'ausbildungssemester'), 'required|integer', [
-			'integer' => $this->p->t('ui', 'error_fieldNotInteger')
-		]);
-
-
-		$this->form_validation->set_rules('ausbildungssemester', 'Ausbildungssemester', 'integer', [
-			'integer' => $this->p->t('ui', 'error_fieldNotInteger', ['field' => 'Ausbildungssemester'])
+				return !$this->getDataOrTerminateWithError($result);
+			}]
+		], [
+			'reihungstest_check' => $this->p->t('lehre', 'error_keinReihungstestverfahren', ['name' => $studentName]),
+			'checkIfExistingBewerberstatus' => $this->p->t('lehre', 'error_keinBewerber', ['name' => $studentName]),
+			'checkIfExistingAufgenommenerstatus' => $this->p->t('lehre', 'error_keinAufgenommener', ['name' => $studentName]),
+			'checkIfLastBewerberAndAufgenommenerShareSemesters' => $this->p->t('lehre', 'error_lastBewerberAndAufgenommenerSemesters'),
+			'checkIfZGV' => $this->p->t('lehre', 'error_ZGVNichtEingetragen', ['name' => $studentName]),
+			'checkIfZGVMaster' => $this->p->t('lehre', 'error_ZGVMasterNichtEingetragen', ['name' => $studentName]),
+			'check_isFirstStudStatus' => $this->p->t('lehre', 'error_personBereitsStudent', ['name' => $studentName]),
+			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhandenMitNamen', ['name' => $studentName])
 		]);
 
 		if (!$this->form_validation->run())
