@@ -168,7 +168,7 @@ export default {
 			this.changeStatus({status_kurzbz: 'Diplomand', statusgrund_id});
 		},
 		changeStatusToAbsolvent(statusgrund_id) {
-			this.changeStatus({status_kurzbz'Absolvent', statusgrund_id});
+			this.changeStatus({status_kurzbz: 'Absolvent', statusgrund_id});
 		},
 		changeStatusToBewerber(statusgrund_id) {
 			this.changeStatus({status_kurzbz: 'Bewerber', statusgrund_id});
