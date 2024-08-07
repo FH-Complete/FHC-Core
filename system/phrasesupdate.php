@@ -27539,13 +27539,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Überfällig',
+				'text' => 'Überfällig: {count}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Overdue',
+				'text' => 'Overdue: {count}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -27554,18 +27554,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'ampeln',
-		'phrase' => 'deadline',
+		'phrase' => 'ampelnDeadline',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Stichtag',
+				'text' => 'Stichtag: {value}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Deadline',
+				'text' => 'Deadline: {value}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
