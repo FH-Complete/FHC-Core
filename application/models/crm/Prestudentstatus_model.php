@@ -24,15 +24,6 @@ class Prestudentstatus_model extends DB_Model
 		$this->dbTable = 'public.tbl_prestudentstatus';
 		$this->pk = array('ausbildungssemester', 'studiensemester_kurzbz', 'status_kurzbz', 'prestudent_id');
 		$this->hasSequence = false;
-
-/*		$CI =& get_instance();
-
-		$CI->load->library('PhrasesLib');
-
-		// Load language phrases
-		$CI->loadPhrases([
-			'ui', 'lehre'
-		]);*/
 	}
 
 	/**
@@ -388,20 +379,6 @@ class Prestudentstatus_model extends DB_Model
 			return success(true, $this->p->t('lehre', 'error_lastRole'));
 
 		return success(false, $this->p->t('lehre', 'anzahl_existingRoles', ['anzahl' => $anzahl]));
-	}
-
-	/**
-	 * Check if there is only one "Student" prestudentstatus left
-	 *
-	 * @param integer					$prestudent_id
-	 *
-	 * @return stdClass
-	 */
-	public function checkIfLastStudentStatusEntry($prestudent_id)
-	{
-		$this->db->where('status_kurzbz', self::STATUS_STUDENT);
-		
-		return $this->checkIfLastStatusEntry($prestudent_id);
 	}
 
 	public function getAllPrestudentstatiWithStudiensemester($prestudent_id)

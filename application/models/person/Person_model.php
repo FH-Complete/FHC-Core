@@ -374,6 +374,5 @@ class Person_model extends DB_Model
 			'prestudent_id' => $prestudent_id
 		]);
 	}
-
 }
 
