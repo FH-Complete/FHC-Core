@@ -165,6 +165,15 @@ class Content_model extends DB_Model
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []
+					},
+					{
+						"content_id": 1000008,
+						"template_kurzbz": "redirect",
+						"titel": "Digitale Anwesenheiten",
+						"content": "<content><url><![CDATA[' . site_url('/extensions/FHC-Core-Anwesenheiten/Anw') . ']]></url><target><![CDATA[]]></target></content>",
+						"menu_open": false,
+						"aktiv": true,
+						"childs": []
 					}
 					
 				]
