@@ -1694,10 +1694,6 @@ class Status extends FHCAPI_Controller
 
 		$studentlvb = $this->getDataOrTerminateWithError($result);
 
-		// NOTE(chris): if $studentlvb then update to the same values as before (except updatevon). So do nothing?
-		// TODO(chris): check if that is correct (in FAS)?
-		if ($studentlvb)
-			return; // No Update necessary
 
 		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 
@@ -1710,16 +1706,33 @@ class Status extends FHCAPI_Controller
 		]);
 		$lv = $this->getDataOrTerminateWithError($result);
 
-		$this->StudentlehrverbandModel->insert([
-			'student_uid' => $student->student_uid,
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'studiengang_kz' => $student->studiengang_kz,
-			'semester' => $lv ? $ausbildungssemester : $student->semester,
-			'verband' => $student->verband,
-			'gruppe' => $student->gruppe,
-			'insertamum' => date('c'),
-			'insertvon' => $authUID
-		]);
+
+		if ($studentlvb && !$lv)
+			return; // No Update necessary
+
+		if ($studentlvb) // Update current Student-Lehrverband entry
+			$this->StudentlehrverbandModel->update([
+				'student_uid' => $student->student_uid,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz
+			], [
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => $ausbildungssemester,
+				'verband' => $student->verband,
+				'gruppe' => $student->gruppe,
+				'updateamum' => date('c'),
+				'updatevon' => $authUID
+			]);
+		else // Add new Student-Lehrverband entry
+			$this->StudentlehrverbandModel->insert([
+				'student_uid' => $student->student_uid,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => $lv ? $ausbildungssemester : $student->semester,
+				'verband' => $student->verband,
+				'gruppe' => $student->gruppe,
+				'insertamum' => date('c'),
+				'insertvon' => $authUID
+			]);
 	}
 
 	/**
