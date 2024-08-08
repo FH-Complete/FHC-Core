@@ -1,4 +1,7 @@
 <?php
+
+use \CI3_Events as Events;
+
 class Benutzer_model extends DB_Model
 {
 
@@ -74,51 +77,88 @@ class Benutzer_model extends DB_Model
 	 */
 	public function generateAlias($uid)
 	{
-		$aliasres = '';
 		$this->addLimit(1);
 		$this->addSelect('vorname, nachname');
 		$this->addJoin('public.tbl_person', 'person_id');
 		$nameresult = $this->loadWhere(array('uid' => $uid));
 
-		if (hasData($nameresult))
-		{
-			$aliasdata = getData($nameresult);
-			$alias = $this->_sanitizeAliasName($aliasdata[0]->vorname).'.'.$this->_sanitizeAliasName($aliasdata[0]->nachname);
-			$aliasexists = $this->aliasExists($alias);
+		if (isError($nameresult))
+			return $nameresult;
 
-			if (hasData($aliasexists) && !getData($aliasexists)[0])
-				$aliasres = $alias;
-		}
+		if (!hasData($nameresult))
+			return success('');
+		
+		$aliasdata = current(getData($nameresult));
 
-		return success($aliasres);
+		return $this->generateAliasFromName($aliasdata->vorname, $aliasdata->nachname);
 	}
 
 	/**
-	 * Generates alias for a person_id
-	 * @param $person_id
-	 * @return string
+	 * Generates alias for a vor- and nachname.
+	 *
+	 * @param string						$vorname
+	 * @param string						$nachname
+	 *
+	 * @return stdClass
 	 */
-	public function generateAliasByPersonId($person_id)
+	public function generateAliasFromName($vorname, $nachname)
 	{
-		$sql = 'SELECT p.vorname, p.nachname
-				FROM public.tbl_person p
-				where person_id = ?';
+		$alias = $this->_sanitizeAliasName($vorname . '.' . $nachname);
+		
+		$result = $this->aliasExists($alias);
 
-		$nameresult = $this->execQuery($sql, array($person_id));
+		if (isError($result))
+			return $result;
 
-		$nameresult = current(getData($nameresult)) ?: null;
-
-		if($nameresult)
-		{
-			$alias = $this->_sanitizeAliasName($nameresult->vorname).'.'.$this->_sanitizeAliasName($nameresult->nachname);
-
-			$aliasexists = $this->aliasExists($alias);
-
-			if (hasData($aliasexists) && current(getData($aliasexists)))
-				$alias = "";
-		}
+		if (current(getData($result)))
+			return success('');
 
 		return success($alias);
+	}
+
+	/**
+	 * Generates a matrikelnummer
+	 *
+	 * @param string						$oe_kurzbz
+	 *
+	 * @return stdClass
+	 */
+	public function generateMatrikelnummer($oe_kurzbz)
+	{
+		$matrikelnummer = false;
+
+		Events::trigger(
+			'generate_matrikelnummer',
+			function ($value) use ($matrikelnummer) {
+				$matrikelnummer = $value;
+			},
+			$oe_kurzbz
+		);
+
+		if ($matrikelnummer !== false)
+			return success($matrikelnummer);
+
+		return success(null);
+	}
+
+	/**
+	 * Generates an activation key
+	 *
+	 * @return string
+	 */
+	public function generateActivationkey()
+	{
+		$this->load->library('CryptLib');
+
+		$key = '';
+		for ($i=0; $i<32; $i++)
+			$key .= ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'][mt_rand(0, 15)];
+
+		$value = uniqid(mt_rand(), true);
+		$length = strlen($value);
+		$value = str_pad($value, $length + 32 - ($length % 32), chr(0));
+
+		return md5($this->cryptlib->RIJNDAEL_256_ECB($value, $key, true));
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -134,56 +174,5 @@ class Benutzer_model extends DB_Model
 	{
 		$str = sanitizeProblemChars($str);
 		return mb_strtolower(str_replace(' ', '_', $str));
-	}
-
-	/**
-	 * Generiert einen Aktivierungscode
-	 */
-	public function generateActivationKey()
-	{
-		$keyvalues=array('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
-		$key='';
-		for($i=0; $i<32; $i++)
-			$key.=$keyvalues[mt_rand(0, 15)];
-
-		return success(md5(encryptData(uniqid(mt_rand(), true), $key)));
-	}
-
-	/**
-	 * Check if Benutzer already exists
-	 * @param String $uid
-	 * @return 0 if not exists, 1 if it does
-	 */
-	public function checkIfExistingBenutzer($uid)
-	{
-		$qry = "SELECT 
-    				count(*) as anzahl 
-				FROM 
-				    public.tbl_benutzer 
-				WHERE 
-				    uid = ? ";
-
-		$result = $this->execQuery($qry, array($uid));
-
-		if (isError($result))
-		{
-			return error($result);
-		}
-
-		$resultObject = current(getData($result));
-
-		if (property_exists($resultObject, 'anzahl'))
-		{
-			$resultValue = (int)$resultObject->anzahl;
-
-			if ($resultValue > 0)
-			{
-				return success("1");
-			}
-			else
-			{
-				return success("0");
-			}
-		}
 	}
 }

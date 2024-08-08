@@ -533,6 +533,19 @@ class Status extends FHCAPI_Controller
 
 	public function addStudent($prestudent_id)
 	{
+		// Prepare lastAufgenommener Status
+		$this->PrestudentstatusModel->addOrder('datum', 'DESC');
+		$this->PrestudentstatusModel->addOrder('insertamum', 'DESC');
+		$this->PrestudentstatusModel->addLimit(1);
+		$result = $this->PrestudentstatusModel->loadWhere([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => Prestudentstatus_model::STATUS_AUFGENOMMENER
+		]);
+		$lastAufgenommener = $this->getDataOrTerminateWithError($result);
+
+		if ($lastAufgenommener)
+			$lastAufgenommener = current($lastAufgenommener);
+
 		//get studentname for validations
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->PersonModel->addJoin('public.tbl_prestudent', 'person_id');
@@ -542,15 +555,13 @@ class Status extends FHCAPI_Controller
 
 		$studentName = trim($prestudent_person->vorname . ' ' . $prestudent_person->nachname);
 
-		/*$status_kurzbz = $this->input->post('status_kurzbz');
-		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
-		$ausbildungssemester = $this->input->post('ausbildungssemester');
-		$statusgrund_id = $this->input->post('statusgrund_id');
-		$datum = $this->input->post('datum');*/
-
-
+		
 		//Form Validation
 		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('statusgrund_id', $this->p->t('international', 'grund'), 'integer', [
+			'integer' => $this->p->t('ui', 'error_fieldNotInteger')
+		]);
 
 		$this->form_validation->set_rules('_default', '', [
 			'required',
@@ -574,9 +585,8 @@ class Status extends FHCAPI_Controller
 				return $this->getDataOrTerminateWithError($result);
 			}],
 			//Check Aufgenommenerstatus
-			['checkIfExistingAufgenommenerstatus', function () use ($prestudent_id) {
-				$result = $this->prestudentstatuschecklib->checkIfExistingAufgenommenerstatus($prestudent_id);
-				return $this->getDataOrTerminateWithError($result);
+			['checkIfExistingAufgenommenerstatus', function () use ($lastAufgenommener) {
+				return !!$lastAufgenommener;
 			}],
 			//Check Bewerberstatus & Aufgenommenerstatus semester
 			['checkIfLastBewerberAndAufgenommenerShareSemesters', function () use ($prestudent_id) {
@@ -590,20 +600,9 @@ class Status extends FHCAPI_Controller
 				return !$this->getDataOrTerminateWithError($result);
 			}],
 			//Check if Rolle already exists
-			['rolle_doesnt_exist', function () use ($prestudent_id) {
-				$this->PrestudentstatusModel->addOrder('datum', 'DESC');
-				$this->PrestudentstatusModel->addOrder('insertamum', 'DESC');
-				$this->PrestudentstatusModel->addLimit(1);
-				$result = $this->PrestudentstatusModel->loadWhere([
-					'prestudent_id' => $prestudent_id,
-					'status_kurzbz' => Prestudentstatus_model::STATUS_AUFGENOMMENER
-				]);
-				$lastAufgenommener = $this->getDataOrTerminateWithError($result);
+			['rolle_doesnt_exist', function () use ($prestudent_id, $lastAufgenommener) {
 				if (!$lastAufgenommener)
 					return true; // Error will be handled by the checkIfExistingAufgenommenerstatus statement above
-
-				$lastAufgenommener = current($lastAufgenommener);
-
 
 				$result = $this->PrestudentstatusModel->loadWhere([
 					'studiensemester_kurzbz' => $lastAufgenommener->studiensemester_kurzbz,
@@ -631,152 +630,13 @@ class Status extends FHCAPI_Controller
 		// Start DB transaction
 		$this->db->trans_start();
 
-		//getSemester of Status Aufgenommen
-		$result = $this->PrestudentstatusModel->loadWhere([
-			"prestudent_id" => $prestudent_id,
-			"status_kurzbz" => Prestudentstatus_model::STATUS_AUFGENOMMENER
-		]);
-
-		$this->PrestudentstatusModel->addLimit(1);
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		$semesterAufgenommen = current(getData($result));
-		$semesterAufgenommen = $semesterAufgenommen->studiensemester_kurzbz;
-
-
-		//generate Personenkennzeichen(matrikelnr)
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$this->PrestudentModel->addJoin('public.tbl_person p', 'ON (p.person_id = public.tbl_prestudent.person_id)');
-		$this->PrestudentModel->addJoin('public.tbl_studiengang sg', 'ON (sg.studiengang_kz = public.tbl_prestudent.studiengang_kz)');
-		$result = $this->PrestudentModel->load([
-			'prestudent_id' => $prestudent_id,
-		]);
-		if (isError($result)) {
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		$result = current(getData($result));
-
-		$stg = $result->studiengang_kz;
-		$typ = $result->typ;
-		$stgkzl = $result->kurzbz;
-		$person_id = $result->person_id;
-		$matrikelnr = false;
-
-		Events::trigger('generate_personenkennzeichen', $stg, $semesterAufgenommen, $typ, function ($value) use ($matrikelnr) {
-			$matrikelnr = $value;
-		});
-		if ($matrikelnr === false) {
-			$resultMat = $this->StudentModel->generateMatrikelnummer2($stg, $semesterAufgenommen, $typ);
-			if (isError($resultMat)) {
-				return $this->terminateWithError($resultMat, self::ERROR_TYPE_GENERAL);
-			}
-			$matrikelnr = getData($resultMat);
-		}
-		$jahr = mb_substr($semesterAufgenommen, 4, 2);
-
-		//generate UID
-		$resultUid = $this->StudentModel->generateUID($stgkzl, $jahr, $typ, $matrikelnr);
-		if (isError($resultUid)) {
-			return $this->terminateWithError(getData($resultUid), self::ERROR_TYPE_GENERAL);
-		}
-		$uidStudent = getData($resultUid);
-
-		//TODO(Manu)  Check for additional logic (config entries, addons)
-		//check include/tw/generatematrikelnr.inc.php
-		//(1) addons durchsuchen, ob eigene Logik für Matrikelnr-erstellung existiert
-		//Default: keine Matrikelnummer wird generiert
-
-		//(2) personenkz = uid
-		/*		if (defined('SET_UID_AS_PERSONENKENNZEICHEN') && SET_UID_AS_PERSONENKENNZEICHEN) {
-					$matrikelnr = $uidStudent;
-				}*/
-
-		//(3) Matrikelnummer = uid
-		/*		if (defined('SET_UID_AS_MATRIKELNUMMER') && SET_UID_AS_MATRIKELNUMMER) {
-					//update person
-					$result = $this->PersonModel->update(
-						[
-							'person_id' => $person_id,
-						],
-						[
-							'matr_nr' => $uidStudent,
-						]
-					);
-					if (isError($result)) {
-						return $this->terminateWithError("uidAsMatrikelnummer" . getError($result), self::ERROR_TYPE_GENERAL);
-					}
-				}*/
-
-		//add benutzerdatensatz mit Aktierungscode
-		$this->load->model('person/Benutzer_model', 'BenutzerModel');
-		$result = $this->BenutzerModel->checkIfExistingBenutzer($uidStudent);
-		if (isError($result)) {
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		if ($result->retval != "0")
-		{
-			return $this->terminateWithError($this->p->t('lehre', 'error_benutzerBereitsVorhanden', ['uid' => $uidStudent]), self::ERROR_TYPE_GENERAL);
-		}
-
-		$aktivierungscode = null;
-		$result = $this->BenutzerModel->generateActivationKey();
-		if (isError($result)) {
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		$aktivierungscode = getData($result);
-
-		//generate Alias
-		$result = $this->BenutzerModel->generateAliasByPersonId($person_id);
-		$this->getDataOrTerminateWithError($result);
-		$alias = getData($result);
-
-		$result = $this->BenutzerModel->insert(
-			[
-				'person_id' => $person_id,
-				'uid' => $uidStudent,
-				'aktiv' => true,
-				'aktivierungscode' => $aktivierungscode,
-				'alias' => $alias,
-				'insertvon' => getAuthUID(),
-				'insertamum' => date('c'),
-			]
-		);
-
-		if (isError($result)) {
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-
-		//Student anlegen
-		$result = $this->StudentModel->insert(
-			[
-				'student_uid' => $uidStudent,
-				'prestudent_id' => $prestudent_id,
-				'matrikelnr' => $matrikelnr,
-				'studiengang_kz' => $stg,
-				'semester' => $ausbildungssemester,
-				'verband' => '',
-				'gruppe' => '',
-				'insertvon' => getAuthUID(),
-				'insertamum' => date('c')
-			]
-		);
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-
-		$this->load->library('PrestudentLib');
-		$result = $this->prestudentlib->setFirstStudent(
+		$this->prestudentlib->setFirstStudent(
 			$prestudent_id,
-			$studiensemester_kurzbz,
-			$ausbildungssemester,
-			$statusgrund_id,
-			date('c'),
-			getAuthUID(),
-			$stg,
-			$uidStudent
+			$lastAufgenommener->studiensemester_kurzbz,
+			$lastAufgenommener->ausbildungssemester,
+			$lastAufgenommener->orgform_kurzbz,
+			$lastAufgenommener->studienplan_id,
+			$this->input->post('statusgrund_id')
 		);
 
 		$this->getDataOrTerminateWithError($result);
@@ -968,6 +828,10 @@ class Status extends FHCAPI_Controller
 
 
 		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('statusgrund_id', $this->p->t('international', 'grund'), 'integer', [
+			'integer' => $this->p->t('ui', 'error_fieldNotInteger')
+		]);
 
 		if (!$isBerechtigtBasisPrestudentstatus)
 			$this->form_validation->set_rules(
@@ -1252,6 +1116,10 @@ class Status extends FHCAPI_Controller
 
 		//Form Validation
 		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('statusgrund_id', $this->p->t('international', 'grund'), 'integer', [
+			'integer' => $this->p->t('ui', 'error_fieldNotInteger')
+		]);
 
 		if (!$isBerechtigtBasisPrestudentstatus)
 			$this->form_validation->set_rules(

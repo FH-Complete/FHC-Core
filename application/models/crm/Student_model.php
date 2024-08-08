@@ -1,4 +1,8 @@
 <?php
+
+use \InvalidArgumentException as InvalidArgumentException;
+use \CI3_Events as Events;
+
 class Student_model extends DB_Model
 {
 
@@ -47,18 +51,42 @@ class Student_model extends DB_Model
 		return $matrikelnummer.sprintf("%03d", $max);
 	}
 
-	// ****
-	// * Generiert die Matrikelnummer
-	// * FORMAT: 0710254001
-	// * 07 = Jahr
-	// * 1/2/0  = WS/SS/incoming
-	// * 0254 = Studiengangskennzahl vierstellig
-	// * 001 = Laufende Nummer
-	// * copy of generateMatrikelnummer plus
-	// * logic FH Burgenland
-	// ****
+	/**
+	 * Generiert die Matrikelnummer
+	 * FORMAT: 0710254001
+	 * 07 = Jahr
+	 * 1/2/0  = WS/SS/incoming
+	 * 0254 = Studiengangskennzahl vierstellig
+	 * 001 = Laufende Nummer
+	 * copy of generateMatrikelnummer plus
+	 * logic FH Burgenland
+	 *
+	 * TODO(chris): replace function above with this?
+	 * TODO(chris): rename to generatePersonenkennzeichen?
+	 *
+	 * @param integer					$studiengang_kz
+	 * @param string					$studiensemester_kurzbz
+	 * @param string					$typ
+	 *
+	 * @return stdClass
+	 */
 	public function generateMatrikelnummer2($studiengang_kz, $studiensemester_kurzbz, $typ = null)
 	{
+		$personenkennzeichen = false;
+
+		Events::trigger(
+			'generate_personenkennzeichen',
+			function ($value) use ($personenkennzeichen) {
+				$personenkennzeichen = $value;
+			},
+			$studiengang_kz,
+			$studiensemester_kurzbz,
+			$typ
+		);
+
+		if ($personenkennzeichen !== false)
+			return success($personenkennzeichen);
+
 		// Validierung der Eingabewerte
 		if (strlen($studiensemester_kurzbz) < 6) {
 			throw new InvalidArgumentException("Ungültiges studiensemester_kurzbz Format.");
@@ -129,18 +157,45 @@ class Student_model extends DB_Model
 		return success($matrikelnummer.sprintf("%03d", $max));
 	}
 
-	// ****
-	// * Generiert die UID
-	// * FORMAT: el07b001
-	// * $stgkzl: el = studiengangskuerzel
-	// * $jahr: 07 = Jahr
-	// * $stgtyp: b/m/d/x = Bachelor/Master/Diplom/Incoming
-	// * $matrikelnummer
-	// * 001 = Laufende Nummer  Wenn StSem==SS dann wird zur Nummer 500 dazugezaehlt
-	// * Bei Incoming im Masterstudiengang wird auch 500 dazugezaehlt
-	// ****
-	public function generateUID($stgkzl, $jahr, $stgtyp, $matrikelnummer)
+	/**
+	 * Generiert die UID
+	 * FORMAT: el07b001
+	 * $stgkzl: el = studiengangskuerzel
+	 * $jahr: 07 = Jahr
+	 * $stgtyp: b/m/d/x = Bachelor/Master/Diplom/Incoming
+	 * $matrikelnummer
+	 * 001 = Laufende Nummer  Wenn StSem==SS dann wird zur Nummer 500 dazugezaehlt
+	 * Bei Incoming im Masterstudiengang wird auch 500 dazugezaehlt
+	 *
+	 * @param string					$stgkzl
+	 * @param string					$jahr
+	 * @param string					$stgtyp
+	 * @param string					$matrikelnummer
+	 * @param string					$vorname
+	 * @param string					$nachname
+	 *
+	 * @return stdClass
+	 */
+	public function generateUID($stgkzl, $jahr, $stgtyp, $matrikelnummer, $vorname, $nachname)
 	{
+		$uid = false;
+
+		Events::trigger(
+			'generate_student_uid',
+			function ($value) use ($uid) {
+				$uid = $value;
+			},
+			$stgkzl,
+			$jahr,
+			$stgtyp,
+			$matrikelnummer,
+			$vorname,
+			$nachname
+		);
+
+		if ($uid !== false)
+			return success($uid);
+
 		$art = mb_substr($matrikelnummer, 2, 1);
 		$nr = mb_substr($matrikelnummer, mb_strlen(trim($matrikelnummer))-3);
 		if($art=='2') //Sommersemester
