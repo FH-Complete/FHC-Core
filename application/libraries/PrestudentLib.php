@@ -96,20 +96,50 @@ class PrestudentLib
 		if (isError($result))
 			return $result;
 
-		// refactored with processStudentlehrverband
-		$result = $this->_ci->StudentlehrverbandModel->processStudentlehrverband(
-			$student->student_uid,
-			$student->studiengang_kz,
-			0,
-			'A',
-			'',
-			$studiensemester_kurzbz,
-			Prestudentstatus_model::STATUS_ABBRECHER
-		);
+		//Verband anlegen
+		$result = $this->_ci->LehrverbandModel->load([
+			'studiengang_kz' => $student->studiengang_kz,
+			'semester' => 0,
+			'verband' => 'A',
+			'gruppe' => ''
+		]);
 
 		if (isError($result))
 			return $result;
+		$result = getData($result);
+		if (!$result)
+		{
+			$result = $this->_ci->LehrverbandModel->load([
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => 0,
+				'verband' => '',
+				'gruppe' => ''
+			]);
+			if (isError($result))
+				return $result;
+			$result = getData($result);
 
+			if(!$result)
+			{
+				$this->_ci->LehrverbandModel->insert([
+					'studiengang_kz' => $student->studiengang_kz,
+					'semester' => 0,
+					'verband' => '',
+					'gruppe' => '',
+					'bezeichnung' => 'Ab-Unterbrecher',
+					'aktiv' => true,
+				]);
+			}
+
+			$this->_ci->LehrverbandModel->insert([
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => 0,
+				'verband' => 'A',
+				'gruppe' => '',
+				'bezeichnung' => 'Abbrecher',
+				'aktiv' => true
+			]);
+		}
 
 		// noch nicht eingetragene Zeugnisnoten auf 9 setzen
 		$result = $this->_ci->ZeugnisnoteModel->getZeugnisnoten($student->student_uid, $prestudent_status->studiensemester_kurzbz);
@@ -154,6 +184,19 @@ class PrestudentLib
 			'semester' => 0,
 			'updatevon' => $insertvon,
 			'updateamum' => date('c')
+		]);
+
+		//Studentlehrverband setzen
+		$this->_ci->StudentlehrverbandModel->update([
+			'studiensemester_kurzbz' => $prestudent_status->studiensemester_kurzbz,
+			'student_uid' => $student->student_uid
+		], [
+			'studiengang_kz' => $student->studiengang_kz,
+			'semester' => 0,
+			'verband' => 'A',
+			'gruppe' => '',
+			'updateamum' => date('c'),
+			'updatevon' => $insertvon
 		]);
 
 		// Benutzer inaktiv setzen
@@ -279,19 +322,50 @@ class PrestudentLib
 		if (isError($result))
 			return $result;
 
-		// refactored with processStudentlehrverband
-		$result = $this->_ci->StudentlehrverbandModel->processStudentlehrverband(
-			$student->student_uid,
-			$student->studiengang_kz,
-			0,
-			'B',
-			'',
-			$studiensemester_kurzbz,
-			Prestudentstatus_model::STATUS_UNTERBRECHER
-		);
+		//Verband anlegen
+		$result = $this->_ci->LehrverbandModel->load([
+			'studiengang_kz' => $student->studiengang_kz,
+			'semester' => 0,
+			'verband' => 'B',
+			'gruppe' => ''
+		]);
 
 		if (isError($result))
 			return $result;
+		$result = getData($result);
+		if (!$result)
+		{
+			$result = $this->_ci->LehrverbandModel->load([
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => 0,
+				'verband' => '',
+				'gruppe' => ''
+			]);
+			if (isError($result))
+				return $result;
+			$result = getData($result);
+
+			if(!$result)
+			{
+				$this->_ci->LehrverbandModel->insert([
+					'studiengang_kz' => $student->studiengang_kz,
+					'semester' => 0,
+					'verband' => '',
+					'gruppe' => '',
+					'bezeichnung' => 'Ab-Unterbrecher',
+					'aktiv' => true,
+				]);
+			}
+
+			$this->_ci->LehrverbandModel->insert([
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => 0,
+				'verband' => 'B',
+				'gruppe' => '',
+				'bezeichnung' => 'Unterbrecher',
+				'aktiv' => true
+			]);
+		}
 
 		// noch nicht eingetragene Zeugnisnoten auf 9 setzen
 		$result = $this->_ci->ZeugnisnoteModel->getZeugnisnoten($student->student_uid, $studiensemester_kurzbz);
@@ -324,7 +398,6 @@ class PrestudentLib
 			}
 		}
 
-
 		// Update Aktionen
 
 		// StudentModel updaten
@@ -337,6 +410,36 @@ class PrestudentLib
 			'updatevon' => $insertvon,
 			'updateamum' => date('c')
 		]);
+
+		//Studentlehrverband setzen
+		$result = $this->_ci->StudentlehrverbandModel->loadWhere([
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'student_uid' => $student->student_uid
+		]);
+		if (hasData($result)) {
+			$this->_ci->StudentlehrverbandModel->update([
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'student_uid' => $student->student_uid
+			], [
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => 0,
+				'verband' => 'B',
+				'gruppe' => '',
+				'updateamum' => date('c'),
+				'updatevon' => $insertvon
+			]);
+		} else {
+			$this->_ci->StudentlehrverbandModel->insert([
+				'student_uid' => $student->student_uid,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => 0,
+				'verband' => 'B',
+				'gruppe' => '',
+				'insertamum' => date('c'),
+				'insertvon' => $insertvon
+			]);
+		}
 
 		return success();
 	}
