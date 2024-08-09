@@ -223,6 +223,9 @@ class LvMenu extends FHCAPI_Controller
 
 		$menu = array();
 
+		//todo: digitale anwesenheiten sollte ein Events.php im config/ folder beinhalten
+		//$this->fhc_menu_digitale_anwesenheiten($menu, $angemeldet, $studiengang_kz, $semester, $lvid, $angezeigtes_stsem, $p);
+
 		$this->fhc_menu_lvinfo($menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $rechte, $lehrfach_oe_kurzbz_arr, $p);
 		
 		$this->fhc_menu_feedback($menu, $angemeldet, $lvid, $p);
@@ -315,6 +318,23 @@ class LvMenu extends FHCAPI_Controller
 	}
 
 
+	private function fhc_menu_digitale_anwesenheiten(&$menu, $angemeldet, $studiengang_kz, $semester, $lvid, $angezeigtes_stsem, $p){
+		
+		// DIGITALE ANWESENHEITEN
+		if (CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet) {
+
+			$menu[] = array
+			(
+				'id' => 'core_menu_digitale_anwesenheitslisten',
+				'position' => '50',
+				'name' => $p->t('lehre/digiAnw'),
+				'c4_icon' => base_url('skin/images/button_kreuzerltool.png'),
+				'c4_link' => base_url("index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&sem_kurzbz=$angezeigtes_stsem&nav=false"),
+				'c4_linkList' => []
+			);
+		}
+	}
+
 	private function fhc_menu_lvinfo(&$menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $rechte, $lehrfach_oe_kurzbz_arr, $p){
 		
 		// LVINFO
@@ -358,7 +378,7 @@ class LvMenu extends FHCAPI_Controller
 			$menu[]=array
 			(
 				'id'=>'core_menu_feedback',
-				'position'=>'50',
+				'position'=>'60',
 				'name'=>$p->t('lehre/feedback'),
 				'c4_icon'=> base_url('skin/images/button_feedback.png'),
 				'c4_link'=> base_url('feedback.php?lvid='.$lvid),
