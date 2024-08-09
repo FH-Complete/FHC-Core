@@ -190,8 +190,6 @@ class Verband extends FHCAPI_Controller
 					$this->StudienordnungModel->addSelect("CONCAT(studiengang_kz, '/', p.orgform_kurzbz) AS link");
 					$this->StudienordnungModel->addSelect("p.orgform_kurzbz AS name");
 
-					// TODO(chris): semester for gruppe_kurzbz <- what did i mean by that?
-
 					$this->StudienordnungModel->addJoin('lehre.tbl_studienplan p', 'studienordnung_id');
 
 					$result = $this->StudienordnungModel->loadWhere([

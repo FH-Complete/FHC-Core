@@ -461,7 +461,7 @@ class AntragJob extends JOB_Controller
 						$this->logError(getError($result));
 						continue;
 					} elseif (!hasData($result)) {
-						$this->logError($this->p->t('lehre', 'error_noStatusgrund', ['statusgrund_kurzbz' => 'abbrecherStgl'])); // TODO(chris): phrase
+						$this->logError($this->p->t('lehre', 'error_noStatusgrund', ['statusgrund_kurzbz' => 'abbrecherStgl']));
 						continue;
 					}
 					
