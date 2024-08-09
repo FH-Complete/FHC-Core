@@ -148,20 +148,19 @@ class PrestudentstatusCheckLib
 	 *
 	 * @return booleans $zgv_code, error if not registered
 	 */
-	//TODO(Manu) TEST
-	public function checkIfZGVEingetragenMaster($prestudent, $typ = null)
+	public function checkIfZGVEingetragenMaster($prestudent)
 	{
 		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$result = $this->_ci->StudiengangModel->load($prestudent->studiengang_kz);
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_stg', ['studiengang_kz' => $prestudent->studiengang_kz])); // TODO(chris): phrase
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_stg', ['studiengang_kz' => $prestudent->studiengang_kz]));
 
 		if (current($result->retval)->typ != 'm')
-			return success(true); // TODO(chris): correct?
+			return success(true); // NOTE(chris): we only test master stgs, all other stgs should default to true
 
-		return success((boolean)$prestudent->zgv_code);
+		return success((boolean)$prestudent->zgvmas_code);
 	}
 
 	/**
