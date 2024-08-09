@@ -2411,12 +2411,13 @@ else
 			});
 		}
 	}
-	function prueflingEntSperren(person_id, name, art)
+	function prueflingEntSperren(element)
 	{
-		if (art === true)
-			var text = "sperren";
-		else if (art === false)
-			var text = "entsperren";
+	 	var person_id = element.getAttribute("data-person-id");
+		var name = element.getAttribute("data-person-name");
+		var art = element.getAttribute("data-art") === "true";
+
+		let text = art ? "sperren" : "entsperren";
 
 		if (confirm("Wollen Sie den Studenten "+ name + " wirklich " + text + "?"))
 		{
@@ -3279,10 +3280,18 @@ else
 
 
 				echo "<td class='textcentered ".$inaktiv ."'>
-						<a href='#' class='prueflingsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt === true) ? " hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->person_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", true)'>
+						<a href='#' class='prueflingsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt === true) ? " hidden" : "") ."' 
+							data-person-id='".$erg->person_id."' 
+							data-person-name='".htmlspecialchars($erg->vorname . " " . $erg->nachname, ENT_QUOTES, 'UTF-8')."' 
+							data-art='true' 
+							onclick='prueflingEntSperren(this)'>
 							<span class='glyphicon glyphicon-remove'></span>
 						</a>
-						<a href='#' class='prueflingentsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt !== true ? " hidden" : "")) . "' onclick='prueflingEntSperren(" . $erg->person_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", false);'>
+						<a href='#' class='prueflingentsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt !== true ? " hidden" : "")) . "' 
+							data-person-id='".$erg->person_id."' 
+							data-person-name='".htmlspecialchars($erg->vorname . " " . $erg->nachname, ENT_QUOTES, 'UTF-8')."' 
+							data-art='false' 
+							onclick='prueflingEntSperren(this)'>
 							<span class='glyphicon glyphicon-ok'></span>
 						</a>
 					</td>";
