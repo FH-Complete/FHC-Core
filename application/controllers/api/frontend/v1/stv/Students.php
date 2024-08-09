@@ -124,10 +124,10 @@ class Students extends FHCAPI_Controller
 			$org = $params[0];
 			if ($count > 1 && $params[1] == 'prestudent') {
 				if ($count == 2)
-					return $this->getPrestudents(null, null, $org);
+					return $this->getPrestudents($method, null, null, $org);
 				if ($count == 3)
-					return $this->getPrestudents($params[2], null, $org);
-				return $this->getPrestudents($params[2], $params[$count-1], $org);
+					return $this->getPrestudents($method, $params[2], null, $org);
+				return $this->getPrestudents($method, $params[2], $params[$count-1], $org);
 			}
 			$sem = $count > 1 ? $params[1] : null;
 			if ($count == 4 && $params[2] == 'grp') {
@@ -310,6 +310,7 @@ class Students extends FHCAPI_Controller
 				break;
 			default:
 				if (!$studiensemester_kurzbz) {
+					// TODO(chris): this does not work with $orgform_kurzbz != null
 					$where['ps.status_kurzbz'] = null;
 				} else {
 					$this->PrestudentModel->db->where_in('ps.status_kurzbz', [
@@ -348,7 +349,7 @@ class Students extends FHCAPI_Controller
 		$this->addSelectPrioRel();
 
 		$this->addFilter($studiensemester_kurzbz);
-		
+
 		$result = $this->PrestudentModel->loadWhere($where);
 
 		$data = $this->getDataOrTerminateWithError($result);
@@ -422,7 +423,7 @@ class Students extends FHCAPI_Controller
 						WHERE prestudent_id=tbl_prestudent.prestudent_id 
 						AND studiensemester_kurzbz=" . $this->PrestudentModel->escape($studiensemester_kurzbz) . " 
 						ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1
-					)",
+					) =",
 					$this->PrestudentModel->escape($orgform_kurzbz),
 					false
 				);
