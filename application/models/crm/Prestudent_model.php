@@ -707,8 +707,9 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getHistoryPrestudents($person_id)
 	{
+
 		$query = "
-			SELECT ps.studiensemester_kurzbz, p.priorisierung, p.studiengang_kz, sg.kurzbzlang, sg.orgform_kurzbz, 
+			SELECT ps.studiensemester_kurzbz, p.priorisierung, p.studiengang_kz, sg.kurzbzlang, ps.orgform_kurzbz, 
 					ps.status_kurzbz, s.student_uid, sp.bezeichnung, ps.ausbildungssemester,
 			       CONCAT(ps.status_kurzbz, ' (', ps.ausbildungssemester, '. Semester)') as status, p.prestudent_id
 			FROM public.tbl_prestudent p
