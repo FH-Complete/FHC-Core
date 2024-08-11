@@ -24698,7 +24698,7 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	),	
+	),
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'gehaltsband',
@@ -26942,6 +26942,26 @@ array(
 		)
 	),
 	// Betriebsmittel end
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'unbekannt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'unbekannt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'unknown',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 
