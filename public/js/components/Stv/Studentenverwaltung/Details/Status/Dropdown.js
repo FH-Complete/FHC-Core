@@ -141,7 +141,8 @@ export default {
 				.allSettled(
 					this.prestudentIds.map(prestudent_id => this.$fhcApi.post(
 						'api/frontend/v1/stv/status/addStudent/' + prestudent_id,
-						data
+						data,
+						{ errorHeader: prestudent_id }
 					))
 				)
 				.then(this.showFeedback);
@@ -223,7 +224,8 @@ export default {
 				.allSettled(
 					this.prestudentIds.map(prestudent_id => this.$fhcApi.post(
 						'api/frontend/v1/stv/status/changeStatus/' + prestudent_id,
-						data
+						data,
+						{ errorHeader: prestudent_id }
 					))
 				)
 				.then(this.showFeedback);
