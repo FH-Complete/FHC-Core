@@ -145,7 +145,7 @@ export default {
 						{ errorHeader: prestudent_id }
 					))
 				)
-				.then(this.showFeedback);
+				.then(res => this.showFeedback(res, data.status_kurzbz));
 		},
 		changeStatusToAbbrecher(statusgrund_id) {
 			this
@@ -228,16 +228,16 @@ export default {
 						{ errorHeader: prestudent_id }
 					))
 				)
-				.then(this.showFeedback);
+				.then(res => this.showFeedback(res, data.status_kurzbz));
 		},
-		showFeedback(results) {
+		showFeedback(results, status_kurzbz) {
 			const countSuccess = results.filter(result => result.status == "fulfilled").length;
 			const countError = results.length - countSuccess;
 			
 			//Feedback Success als infoalert
 			this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
 				countSuccess,
-				status: data.status_kurzbz,
+				status: status_kurzbz,
 				countError
 			}));
 
