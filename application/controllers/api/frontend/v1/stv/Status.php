@@ -526,7 +526,7 @@ class Status extends FHCAPI_Controller
 
 		$this->getDataOrTerminateWithError($result);
 
-		$this->trans_complete();
+		$this->db->trans_complete();
 
 		$this->terminateWithSuccess($prestudent_id);
 	}
