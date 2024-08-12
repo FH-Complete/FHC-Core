@@ -1,7 +1,6 @@
 <?php
 $includesArray = array(
 	'title' => 'Dashboard',
-	'phrases'=> array('global'),
 	'tabulator5'=>true,
 	'customJSModules' => ['public/js/apps/Dashboard/Fhc.js'],
 	'customCSSs' => [
@@ -13,7 +12,7 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 ?>
 
 <div id="content">
-	<h2>Dashboard </h2>
+	<h2>Dashboard</h2>
 	<hr>
 	<fhc-dashboard dashboard="CIS"/>
 </div>

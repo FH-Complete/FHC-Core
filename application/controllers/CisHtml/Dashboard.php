@@ -18,9 +18,6 @@ class Dashboard extends Auth_Controller
 			)
 		);
 
-		$this->load->library("PhrasesLib");
-		$this->loadPhrases(array('global'));
-
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -31,6 +28,6 @@ class Dashboard extends Auth_Controller
 	 */
 	public function index()
 	{	
-		$this->load->view('CisHtml/Dashboard.php',["test"=>$this->p->t('global/digitalesAnwManagement')]);
+		$this->load->view('CisHtml/Dashboard.php');
 	}
 }

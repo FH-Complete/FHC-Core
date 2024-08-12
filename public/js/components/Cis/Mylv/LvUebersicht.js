@@ -63,8 +63,6 @@ export default  {
             
         </template>
         <template #default>
-		<h1>{{$p.t('global','digitalesAnwManagement')}}</h1>
-
           <div v-if="selectedMenu" class="d-flex flex-column h-100">
                 <div class="d-flex mb-2">
                 <button v-if="selectedMenu" @click="selectedMenu=null" class="btn btn-secondary me-2"><i class="fa fa-chevron-left"></i> Back</button>
