@@ -232,7 +232,7 @@ export default {
 		},
 		showFeedback(results) {
 			const countSuccess = results.filter(result => result.status == "fulfilled").length;
-			const countError = results.length - successes;
+			const countError = results.length - countSuccess;
 			
 			//Feedback Success als infoalert
 			this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
