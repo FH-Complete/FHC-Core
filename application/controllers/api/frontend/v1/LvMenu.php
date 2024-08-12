@@ -260,6 +260,7 @@ class LvMenu extends FHCAPI_Controller
 		$params = [
 			'sprache'=>$sprache,
 			'p'=>$p,
+			'ci_p'=> $this->p,
 			'db'=>$db,
 			'user'=>$user,
 			'is_lector'=>$is_lector,
@@ -800,4 +801,3 @@ private function  fhc_menu_pinboard(&$menu, $angemeldet, $is_lector, $studiengan
 
 
 }
-
