@@ -358,6 +358,35 @@ EOSC;
 	 */
 	private function _student($searchstr, $type)
 	{
+		$dbModel = new DB_Model();
+
+		$students = $dbModel->execReadOnlyQuery('
+		SELECT
+			\''.$type.'\' AS type,
+			s.student_uid AS uid,
+			s.matrikelnr,
+			p.person_id AS person_id,
+			p.vorname || \' \' || p.nachname AS name,
+			k.kontakt as email ,
+			p.foto
+			FROM public.tbl_student s
+			JOIN public.tbl_benutzer b ON(b.uid = s.student_uid)
+			JOIN public.tbl_person p USING(person_id)
+			LEFT JOIN (
+				SELECT kontakt, person_id
+				FROM public.tbl_kontakt
+					WHERE kontakttyp = \'email\'
+			) as k USING(person_id)
+				WHERE b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+					GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto
+	');
+
+		// If something has been found then return it
+		if (hasData($students)) return getData($students);
+
+		// Otherwise return an empty array
 		return array();
 	}
 
@@ -366,6 +395,41 @@ EOSC;
 	 */
 	private function _prestudent($searchstr, $type)
 	{
+		$dbModel = new DB_Model();
+
+		$prestudent = $dbModel->execReadOnlyQuery('
+		SELECT
+			\''.$type.'\' AS type,
+			ps.prestudent_id,
+			ps.studiengang_kz,
+			p.person_id AS person_id,
+			b.uid,
+			p.vorname || \' \' || p.nachname AS name,
+			(
+				SELECT kontakt
+				FROM public.tbl_kontakt
+				WHERE kontakttyp = \'email\'
+				AND person_id = p.person_id
+				LIMIT 1
+			) as email,
+			p.foto,
+			sg.bezeichnung
+			FROM public.tbl_prestudent ps
+			LEFT JOIN public.tbl_student s USING (prestudent_id)
+			LEFT JOIN public.tbl_benutzer b ON (b.uid = s.student_uid)
+			JOIN public.tbl_person p ON (p.person_id = ps.person_id)
+			LEFT JOIN public.tbl_studiengang sg ON (sg.studiengang_kz = ps.studiengang_kz)
+			WHERE b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+				OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+				OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+				or cast(ps.prestudent_id as text) ILIKE \'%'.$dbModel->escapeLIKE($searchstr).'%\'
+			GROUP BY type, b.uid, ps.prestudent_id, ps.studiengang_kz, sg.bezeichnung, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto
+			');
+
+		// If something has been found then return it
+		if (hasData($prestudent)) return getData($prestudent);
+
+		// Otherwise return an empty array
 		return array();
 	}
 

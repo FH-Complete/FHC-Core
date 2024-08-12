@@ -13,35 +13,35 @@ class Studiensemester_model extends DB_Model
 		$this->hasSequence = false;
 	}
 
-    /**
-     * Get actual Studiensemester.
-     *
-     * @return array
-     */
-    public function getAkt()
-    {
-        return $this->loadWhere(array(
-                'start <= ' => 'NOW()',
-                'ende >= '  => 'NOW()'
-            )
-        );
-    }
+	/**
+	 * Get actual Studiensemester.
+	 *
+	 * @return array
+	 */
+	public function getAkt()
+	{
+		return $this->loadWhere(array(
+				'start <= ' => 'NOW()',
+				'ende >= '  => 'NOW()'
+			)
+		);
+	}
 
 	// Get next study semester
 	public function getNext()
-    {
-        $query = '
-            SELECT *
-            FROM
-                public.tbl_studiensemester
-            WHERE
-                start > now()
-            ORDER BY start
-            LIMIT 1;
-        ';
+	{
+		$query = '
+			SELECT *
+			FROM
+				public.tbl_studiensemester
+			WHERE
+				start > now()
+			ORDER BY start
+			LIMIT 1;
+		';
 
-        return $this->execQuery($query);
-    }
+		return $this->execQuery($query);
+	}
 
 	/**
 	 * getLastOrAktSemester
@@ -182,10 +182,10 @@ class Studiensemester_model extends DB_Model
 			return success(array());
 
 		$query = "
-            SELECT  *
-            FROM    public.tbl_studiensemester
-            WHERE   ( ?::date < ende AND ?::date > start )
-            ORDER BY start DESC";
+			SELECT  *
+			FROM	public.tbl_studiensemester
+			WHERE   ( ?::date < ende AND ?::date > start )
+			ORDER BY start DESC";
 
 		return $this->execQuery($query, array($from, $to));
 	}
@@ -200,7 +200,7 @@ class Studiensemester_model extends DB_Model
 	{
 		$query = "SELECT studiensemester_kurzbz, start, ende FROM public.vw_studiensemester
 				WHERE studiensemester_kurzbz <> ?
-		        ORDER BY delta, start LIMIT 1";
+				ORDER BY delta, start LIMIT 1";
 
 		return $this->execQuery($query, array($studiensemester_kurzbz));
 	}
@@ -211,7 +211,46 @@ class Studiensemester_model extends DB_Model
 					FROM public.tbl_studiensemester
 					WHERE start >= NOW() OR (start <= NOW() AND ende >= NOW())
 					ORDER BY start';
-					
+
 		return $this->execQuery($query);
+	}
+
+	/**
+	 * Liefert ausgehend von heutigen Datum $plus studiensemester in die Zukunft und $minus Studiensemester in die Vergangenheit
+	 *
+	 * @param integer $plus Optional. Wieviele Studiensemester in die Zukunft sollen ausgegeben werden. Wenn NULL werden alle zukuenftigen geliefert.
+	 * @param integer $minus Optional. Wieviele Studiensemester in die Vergangenheit sollen ausgegeben werden. Wenn NULL werden alle vergangenen geliefert.
+	 *
+	 * @return stdClass
+	 */
+	public function addPlusMinus($plus = null, $minus = null)
+	{
+		$this->addSelect($this->pk);
+		$this->addOrder('ende');
+		if ($plus)
+			$this->addLimit($plus);
+		$this->db->where('start >= NOW()', null, false);
+		$plus = $this->db->get_compiled_select($this->dbTable);
+
+		$this->addSelect($this->pk);
+		$this->addOrder('start', 'DESC');
+		if ($minus)
+			$this->addLimit($minus);
+		$this->db->where('start <= NOW()', null, false);
+		$minus = $this->db->get_compiled_select($this->dbTable);
+		
+		$this->db->where_in($this->pk, '(' . $plus . ') UNION (' . $minus . ')', false);
+	}
+
+	/**
+	 * Holt letzen zwei Ziffern des Studienjahres von Studiensemester, z.B. 24 für WS2024 und SS2025
+	 * @param studiensemester_kurzbz
+	 * @return string Studienjahr Nummer
+	 */
+	public function getStudienjahrNumberFromStudiensemester($studiensemester_kurzbz)
+	{
+		$studienjahrNumber = mb_substr($studiensemester_kurzbz, 4, 2);
+		if (is_numeric($studienjahrNumber) && mb_substr($studiensemester_kurzbz, 0, 2) == 'SS') (int)$studienjahrNumber -= 1;
+		return $studienjahrNumber;
 	}
 }

@@ -94,7 +94,7 @@ class FHCAPI_Controller extends Auth_Controller
 	// ---------------------------------------------------------------
 
 	/**
-	 * @param array					$data
+	 * @param string|array|object	$data
 	 * @param string				$type (optional)
 	 * @return void
 	 */
@@ -110,12 +110,17 @@ class FHCAPI_Controller extends Auth_Controller
 				$error['messages'] = $data;
 			else
 				$error = $data;
+		} elseif (is_object($data)) {
+			$error = (array)$data;
 		} else {
 			$error['message'] = $data;
 		}
 		
 		if ($type)
 			$error['type'] = $type;
+
+		if (!isset($error['type']))
+			$error['type'] = self::ERROR_TYPE_GENERAL;
 
 		$this->returnObj['errors'][] = $error;
 	}

@@ -827,6 +827,23 @@ class DB_Model extends CI_Model
 		return $result;
 	}
 
+	public function getDbTable()
+	{
+		return $this->dbTable;
+	}
+
+	public function getPk()
+	{
+		return $this->pk;
+	}
+
+	public function getPks()
+	{
+		if (is_array($this->pk))
+			return $this->pk;
+		return [$this->pk];
+	}
+
 	// ------------------------------------------------------------------------------------------
 	// Protected methods
 

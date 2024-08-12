@@ -2,6 +2,8 @@ import person from "./person.js";
 import raum from "./raum.js";
 import employee from "./employee.js";
 import organisationunit from "./organisationunit.js";
+import student from "./student.js";
+import prestudent from "./prestudent.js";
 
 export default {
     props: [ "searchoptions", "searchfunction" ],
@@ -24,7 +26,9 @@ export default {
       person: person,
       raum: raum,
       employee: employee,
-      organisationunit: organisationunit
+      organisationunit: organisationunit,
+      student: student,
+      prestudent: prestudent
     },
     template: `
           <form ref="searchform" class="d-flex me-3 position-relative" action="javascript:void(0);" 
@@ -45,6 +49,8 @@ export default {
               <div v-else-if="this.searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
               <template v-else="" v-for="res in this.searchresult">
                 <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
+                <student v-else-if="res.type === 'student'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
+                <prestudent v-else-if="res.type === 'prestudent'" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
                 <employee v-else-if="res.type === 'mitarbeiter'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                 <employee v-else-if="res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                 <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
