@@ -33,16 +33,25 @@ class Student extends FHCAPI_Controller
 	 */
 	public function __construct()
 	{
-		// TODO(chris): permissions
 		parent::__construct([
 			'get' => ['admin:r', 'assistenz:r'],
-			'save' => ['admin:w', 'assistenz:w'],
-			'check' => ['admin:w', 'assistenz:w'],
-			'add' => ['admin:w', 'assistenz:w']
+			'save' => ['admin:rw', 'assistenz:rw'],
+			'check' => ['admin:rw', 'assistenz:rw'],
+			'add' => ['admin:rw', 'assistenz:rw'] // TODO(chris): extra permissions
 		]);
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+
+		if ($this->router->method == 'get'
+			|| $this->router->method == 'save'
+		) {
+			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
+			if ($this->router->method == 'get')
+				$this->checkPermissionsForPrestudent($prestudent_id, ['admin:r', 'assistenz:r']);
+			else
+				$this->checkPermissionsForPrestudent($prestudent_id, ['admin:rw', 'assistenz:rw']);
+		}
 
 		// Load language phrases
 		$this->loadPhrases([
