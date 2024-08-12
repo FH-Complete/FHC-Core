@@ -564,7 +564,6 @@ class Status extends FHCAPI_Controller
 		]);
 
 		$this->form_validation->set_rules('_default', '', [
-			'required',
 			//Check ZGV
 			['checkIfZGV', function () use ($prestudent_person) {
 				if (defined("ZGV_CHECK") && !ZGV_CHECK)
