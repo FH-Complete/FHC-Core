@@ -10,18 +10,18 @@ class Kontakt extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getAdressen' => ['admin:r', 'assistenz:r'],
-			'addNewAddress' => ['admin:r', 'assistenz:r'],
-			'addNewContact' => ['admin:r', 'assistenz:r'],
-			'addNewBankverbindung' => ['mitarbeiter/bankdaten:w', 'student/bankdaten:w'],
-			'updateAddress' => ['admin:r', 'assistenz:r'],
-			'updateContact' => ['admin:r', 'assistenz:r'],
-			'updateBankverbindung' => ['mitarbeiter/bankdaten:w', 'student/bankdaten:w'],
+			'addNewAddress' => ['admin:rw', 'assistenz:rw'],
+			'addNewContact' => ['admin:rw', 'assistenz:rw'],
+			'addNewBankverbindung' => ['mitarbeiter/bankdaten:rw', 'student/bankdaten:rw'],
+			'updateAddress' => ['admin:rw', 'assistenz:rw'],
+			'updateContact' => ['admin:rw', 'assistenz:rw'],
+			'updateBankverbindung' => ['mitarbeiter/bankdaten:rw', 'student/bankdaten:rw'],
 			'loadAddress' => ['admin:r', 'assistenz:r'],
 			'loadContact' => ['admin:r', 'assistenz:r'],
 			'loadBankverbindung' => ['mitarbeiter/bankdaten:r', 'student/bankdaten:r'],
-			'deleteAddress' => ['admin:r', 'assistenz:r'],
-			'deleteContact' => ['admin:r','assistenz:r'],
-			'deleteBankverbindung' => ['mitarbeiter/bankdaten:w','astudent/bankdaten:w'],
+			'deleteAddress' => ['admin:rw', 'assistenz:rw'],
+			'deleteContact' => ['admin:rw','assistenz:rw'],
+			'deleteBankverbindung' => ['mitarbeiter/bankdaten:rw','astudent/bankdaten:rw'],
 			'getAdressentypen' => ['admin:r', 'assistenz:r'],
 			'getKontakttypen' => ['admin:r', 'assistenz:r'],
 			'getFirmen' => ['admin:r', 'assistenz:r'],
@@ -47,8 +47,82 @@ class Kontakt extends FHCAPI_Controller
 		$this->load->model('ressource/firma_model', 'FirmaModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
-	}
+		// Extra Permissionchecks
+		$permsMa = [];
+		$permsStud = [];
+		switch ($this->router->method) {
+			case 'getBankverbindung':
+			case 'loadBankverbindung':
+				$permsMa = ['mitarbeiter/bankdaten:r'];
+				$permsStud = ['student/bankdaten:r'];
+				break;
+			case 'addNewBankverbindung':
+			case 'updateBankverbindung':
+			case 'deleteBankverbindung':
+				$permsMa = ['mitarbeiter/bankdaten:rw'];
+				$permsStud = ['student/bankdaten:rw'];
+				break;
+			case 'getAdressen':
+			case 'getKontakte':
+			case 'loadAddress':
+			case 'loadContact':
+				$permsMa = $permsStud = ['admin:r', 'assistenz:r'];
+				break;
+			case 'addNewAddress':
+			case 'addNewContact':
+			case 'updateAddress':
+			case 'updateContact':
+			case 'deleteAddress':
+			case 'deleteContact':
+				$permsMa = $permsStud = ['admin:rw', 'assistenz:rw'];
+				break;
+		}
+		if ($this->router->method == 'getAdressen'
+			|| $this->router->method == 'getKontakte'
+			|| $this->router->method == 'getBankverbindung'
+			|| $this->router->method == 'addNewAddress'
+			|| $this->router->method == 'addNewContact'
+			|| $this->router->method == 'addNewBankverbindung'
+		) {
+			$person_id = current(array_slice($this->uri->rsegments, 2));
+			
+			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud);
+		} elseif ($this->router->method == 'loadAddress'
+			|| $this->router->method == 'loadContact'
+			|| $this->router->method == 'loadBankverbindung'
+			|| $this->router->method == 'updateAddress'
+			|| $this->router->method == 'updateContact'
+			|| $this->router->method == 'updateBankverbindung'
+			|| $this->router->method == 'deleteAddress'
+			|| $this->router->method == 'deleteContact'
+			|| $this->router->method == 'deleteBankverbindung'
+		) {
+			$id = current(array_slice($this->uri->rsegments, 2));
 
+			$model = 'person/Adresse_model';
+			if ($this->router->method == 'loadContact'
+				|| $this->router->method == 'updateContact'
+				|| $this->router->method == 'deleteContact'
+			) {
+				$model = 'person/Kontakt_model';
+			} elseif ($this->router->method == 'loadBankverbindung'
+				|| $this->router->method == 'updateBankverbindung'
+				|| $this->router->method == 'deleteBankverbindung'
+			) {
+				$model = 'person/Bankverbindung_model';
+			}
+
+			$this->load->model($model, 'TempModel');
+			$result = $this->TempModel->load($id);
+			$data = $this->getDataOrTerminateWithError($result);
+			if (!$result)
+				show_404();
+
+			$person_id = current($data)->person_id;
+			
+			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud);
+		}
+	}
 	public function getAdressen($person_id)
 	{
 		$this->AdresseModel->addSelect('public.tbl_adresse.*');
