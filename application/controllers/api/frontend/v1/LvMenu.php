@@ -38,6 +38,9 @@ class LvMenu extends FHCAPI_Controller
 		parent::__construct([
 			'getLvMenu' => self::PERM_LOGGED
 		]);
+
+		$this->load->library("PhrasesLib");
+		$this->loadPhrases(array('global'));
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -74,6 +77,7 @@ class LvMenu extends FHCAPI_Controller
 		// get the sprache
 		$sprache = getSprache();
 		$p = new phrasen($sprache);
+		//$p = $this->$p;
 
 		// get the db
 		if (!$db = new basis_db())
