@@ -25,13 +25,23 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class Students extends FHCAPI_Controller
 {
+	private $allowedStgs = [];
+
+
 	public function __construct()
 	{
-		// TODO(chris): permissions
 		$permissions = [];
 		$router = load_class('Router');
 		$permissions[$router->method] = self::PERM_LOGGED;
 		parent::__construct($permissions);
+
+		$this->allowedStgs = $this->permissionlib->getSTG_isEntitledFor('admin') ?: [];
+		$this->allowedStgs = array_merge($this->allowedStgs, $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: []);
+		
+		if (!$this->allowedStgs) {
+			$this->_outputAuthError([$router->method => ['admin:r', 'assistenz:r']]);
+			exit;
+		}
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
@@ -657,6 +667,8 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('tbl_prestudent.priorisierung');
 		$this->PrestudentModel->addSelect('p.zugangscode');
 		$this->PrestudentModel->addSelect('p.bpk');*/
+
+		$this->PrestudentModel->db->where_in('tbl_prestudent.studiengang_kz', $this->allowedStgs);
 
 		$this->PrestudentModel->addOrder('nachname');
 		$this->PrestudentModel->addOrder('vorname');
