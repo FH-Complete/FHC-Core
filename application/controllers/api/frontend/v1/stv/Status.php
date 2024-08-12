@@ -629,6 +629,8 @@ class Status extends FHCAPI_Controller
 		// Start DB transaction
 		$this->db->trans_start();
 
+		$this->load->library('PrestudentLib');
+
 		$this->prestudentlib->setFirstStudent(
 			$prestudent_id,
 			$lastAufgenommener->studiensemester_kurzbz,
