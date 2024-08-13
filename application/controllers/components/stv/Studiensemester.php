@@ -2,12 +2,16 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studiensemester extends FHC_Controller
+class Studiensemester extends Auth_Controller
 {
 	public function __construct()
 	{
 		// TODO(chris): access!
-		parent::__construct();
+		parent::__construct([
+			'index' => self::PERM_LOGGED,
+			'now' => self::PERM_LOGGED,
+			'set' => self::PERM_LOGGED
+		]);
 	}
 
 	public function index()
