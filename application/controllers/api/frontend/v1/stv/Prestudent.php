@@ -34,7 +34,7 @@ class Prestudent extends FHCAPI_Controller
 			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:r', 'assistenz:r']);
 		} elseif ($this->router->method == 'getHistoryPrestudents') {
 			$person_id = current(array_slice($this->uri->rsegments, 2));
-			$this->checkPermissionsForPrestudent($person_id, ['admin:r', 'assistenz:r'], ['admin:r', 'assistenz:r']);
+			$this->checkPermissionsForPerson($person_id, ['admin:r', 'assistenz:r'], ['admin:r', 'assistenz:r']);
 		}
 
 		// Load Libraries
