@@ -89,7 +89,7 @@ export default {
 				buchungstext: '',
 				mahnspanne: 30,
 				studiensemester_kurzbz: this.defaultSemester,
-				credit_points: '',
+				credit_points: null,
 				anmerkung: ''
 			};
 			this.$refs.modal.show();
@@ -110,7 +110,7 @@ export default {
 			if (!this.data.buchungstext)
 				this.data.buchungstext = text;
 
-			if (this.config.showCreditpoints && this.data.credit_points == '0.00')
+			if (this.config.showCreditpoints && (this.data.credit_points == '0.00' || this.data.credit_points === null))
 				this.data.credit_points = creditpoints;
 		}
 	},
