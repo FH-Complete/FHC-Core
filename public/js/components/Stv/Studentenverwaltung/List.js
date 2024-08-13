@@ -236,7 +236,9 @@ export default {
 				table-only
 				:side-menu="false"
 				reload
+				` + /* TODO(chris): Ausgeblendet für Testing
 				new-btn-show
+				*/`
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
 			>
