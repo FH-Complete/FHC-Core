@@ -1,4 +1,7 @@
 <?php
+
+use CI3_Events as Events;
+
 class Konto_model extends DB_Model
 {
 
@@ -10,6 +13,218 @@ class Konto_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_konto';
 		$this->pk = 'buchungsnr';
+	}
+
+	/**
+	 * Insert Data into DB-Table
+	 *
+	 * @param array				$data  DataArray for Insert
+	 * @return stdClass
+	 */
+	public function insert($data, $encryptedColumns = null)
+	{
+		if (isset($data['buchungsnr_verweis']) && $data['buchungsnr_verweis'])
+			return parent::insert($data, $encryptedColumns);
+
+		$this->db->trans_begin();
+
+		$result = parent::insert($data, $encryptedColumns);
+		if (isError($result)) {
+			$this->db->trans_rollback();
+			return $result;
+		}
+
+		$buchungsnr = $result->retval;
+		// If studiengang_kz is not present in $data it will fail above since it is a not null field
+		$studiengang_kz = $data['studiengang_kz'];
+
+
+		$zahlungsreferenz = false;
+		Events::trigger('generate_zahlungsreferenz', $buchungsnr, $data, function ($value) use ($zahlungsreferenz) {
+			$zahlungsreferenz = $value;
+		});
+
+		if ($zahlungsreferenz === false) {
+			$result = $this->execQuery('SELECT UPPER(oe_kurzbz) || ? as zahlungsreferenz 
+				FROM public.tbl_studiengang 
+				WHERE studiengang_kz=?', [$buchungsnr, $studiengang_kz]);
+			if (isError($result)) {
+				$this->db->trans_rollback();
+				return $result;
+			}
+			$zahlungsreferenz = current(getData($result))->zahlungsreferenz;
+		} elseif (isError($zahlungsreferenz)) {
+			$this->db->trans_rollback();
+			return $zahlungsreferenz;
+		}
+
+
+		$result = $this->update($buchungsnr, [
+			'zahlungsreferenz' => $zahlungsreferenz
+		]);
+
+		if (isError($result)) {
+			$this->db->trans_rollback();
+			return $result;
+		}
+
+		$this->db->trans_commit();
+
+		return success($buchungsnr);
+	}
+
+	/**
+	 * Delete data from DB-Table
+	 *
+	 * @param string			$id  Primary Key for DELETE
+	 *
+	 * @return stdClass
+	 */
+	public function delete($id)
+	{
+		$this->db->where('buchungsnr_verweis', $id);
+		if ($this->db->count_all_results($this->dbTable))
+			return error('Bitte zuerst die zugeordneten Buchungen loeschen', 42);
+		return parent::delete($id);
+	}
+
+	/**
+	 * Adds additional fields to the Query
+	 *
+	 * @return Konto_model
+	 */
+	public function withAdditionalInfo()
+	{
+		$this->addSelect($this->dbTable . '.*');
+		$this->addSelect('UPPER(typ::varchar(1) || kurzbz) AS kuerzel');
+		$this->addSelect('person.anrede');
+		$this->addSelect('person.titelpost');
+		$this->addSelect('person.titelpre');
+		$this->addSelect('person.vorname');
+		$this->addSelect('person.vornamen');
+		$this->addSelect('person.nachname');
+
+		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
+		$this->addJoin('public.tbl_person person', 'person_id', 'LEFT');
+
+		Events::trigger('konto_query');
+
+		return $this;
+	}
+
+	/**
+	 * Get all accounting entries for a person optionally filtered by Studiengang
+	 *
+	 * @param integer|array		$person_id
+	 * @param string			(optional) $studiengang_kz
+	 *
+	 * @return stdClass
+	 */
+	public function getAlleBuchungen($person_id, $studiengang_kz = '')
+	{
+		$this->withAdditionalInfo();
+
+		$this->addOrder('buchungsdatum');
+
+		if (is_array($person_id))
+			$this->db->where_in('person_id', $person_id);
+		else
+			$this->db->where('person_id', $person_id);
+
+		if ($studiengang_kz)
+			return $this->loadWhere([
+				'studiengang_kz' => $studiengang_kz
+			]);
+		return $this->load();
+	}
+
+	/**
+	 * Get all open accounting entries for a person optionally filtered by Studiengang
+	 *
+	 * @param integer|array		$person_id
+	 * @param string			(optional) $studiengang_kz
+	 *
+	 * @return stdClass
+	 */
+	public function getOffeneBuchungen($person_id, $studiengang_kz = '')
+	{
+		$this->addSelect('buchungsnr');
+		$this->db->where('(betrag + (
+			SELECT CASE WHEN sum(betrag) is null THEN 0 ELSE sum(betrag) END
+			FROM ' . $this->dbTable . '
+			WHERE buchungsnr_verweis=konto_a.buchungsnr
+		)) !=', 0, false);
+		if (is_array($person_id))
+			$this->db->where_in('person_id', $person_id);
+		else
+			$this->db->where('person_id', $person_id);
+		$sql = $this->db->get_compiled_select($this->dbTable . ' konto_a');
+
+		$this->db->group_start();
+		$this->db->where_in('buchungsnr', $sql, false);
+		$this->db->or_where_in('buchungsnr_verweis', $sql, false);
+		$this->db->group_end();
+
+		return $this->getAlleBuchungen($person_id, $studiengang_kz);
+	}
+
+	/**
+	 * Check double Buchungen
+	 *
+	 * @param array				$person_ids
+	 * @param string			$studiensemester_kurzbz
+	 * @param array				$buchungstyp_kurzbzs
+	 *
+	 * @return stdClass
+	 */
+	public function checkDoubleBuchung($person_ids, $studiensemester_kurzbz, $buchungstyp_kurzbzs)
+	{
+		$this->addSelect('vorname');
+		$this->addSelect('nachname');
+
+		$this->addJoin('public.tbl_person', 'person_id');
+
+		$this->db->where_in('person_id', $person_ids);
+		$this->db->where_in('buchungstyp_kurzbz', $buchungstyp_kurzbzs);
+
+		$this->addGroupBy('vorname, nachname');
+		$this->addOrder('nachname');
+		$this->addOrder('vorname');
+
+		return $this->loadWhere([
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		]);
+	}
+
+	/**
+	 * Berechnet den offenen Betrag einer Buchung
+	 *
+	 * @param integer		$buchungsnr
+	 *
+	 * @return stdClass
+	 */
+	public function getDifferenz($buchungsnr)
+	{
+		$this->addSelect('buchungsnr_verweis');
+		$this->db->where('buchungsnr', $buchungsnr);
+		$sql = $this->db->get_compiled_select($this->dbTable);
+
+		$this->addSelect('buchungsnr_verweis');
+		$this->db->where('buchungsnr', $buchungsnr);
+		$this->db->or_where('buchungsnr_verweis', '(' . $sql . ')', false);
+		$sql = $this->db->get_compiled_select($this->dbTable);
+
+		$this->addSelect('sum(betrag) differenz');
+		$this->db->where('buchungsnr', $buchungsnr);
+		$this->db->or_where('buchungsnr_verweis', $buchungsnr);
+		$this->db->or_where('buchungsnr', '(' . $sql . ')', false);
+
+		$result = $this->load();
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success(null);
+		return success(current(getData($result))->differenz * -1);
 	}
 
 	/**
