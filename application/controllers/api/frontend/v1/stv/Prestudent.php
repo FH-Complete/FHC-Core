@@ -12,20 +12,29 @@ class Prestudent extends FHCAPI_Controller
 			'get' => ['admin:r', 'assistenz:r'],
 			'updatePrestudent' =>  ['admin:rw', 'assistenz:rw'],
 			'getHistoryPrestudents' => ['admin:r', 'assistenz:r'],
-			'getBezeichnungZGV' => self::PERM_LOGGED,
-			'getBezeichnungDZgv' => self::PERM_LOGGED,
-			'getBezeichnungMZgv' => self::PERM_LOGGED,
-			'getAusbildung' => self::PERM_LOGGED,
-			'getAufmerksamdurch' => self::PERM_LOGGED,
-			'getBerufstaetigkeit' => self::PERM_LOGGED,
-			'getTypenStg' => self::PERM_LOGGED,
-			'getStudienplaene' => self::PERM_LOGGED,
-			'getStudiengang' => self::PERM_LOGGED
+			'getBezeichnungZGV' => ['admin:r', 'assistenz:r'],
+			'getBezeichnungDZgv' => ['admin:r', 'assistenz:r'],
+			'getBezeichnungMZgv' => ['admin:r', 'assistenz:r'],
+			'getAusbildung' => ['admin:r', 'assistenz:r'],
+			'getAufmerksamdurch' => ['admin:r', 'assistenz:r'],
+			'getBerufstaetigkeit' => ['admin:r', 'assistenz:r'],
+			'getTypenStg' => ['admin:r', 'assistenz:r'],
+			'getStudienplaene' => ['admin:r', 'assistenz:r'],
+			'getStudiengang' => ['admin:r', 'assistenz:r']
 		]);
 
 		if ($this->router->method == 'updatePrestudent') {
 			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
 			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:rw', 'assistenz:rw']);
+		} elseif ($this->router->method == 'get'
+			|| $this->router->method == 'getStudienplaene'
+			|| $this->router->method == 'getStudiengang'
+		) {
+			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
+			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:r', 'assistenz:r']);
+		} elseif ($this->router->method == 'getHistoryPrestudents') {
+			$person_id = current(array_slice($this->uri->rsegments, 2));
+			$this->checkPermissionsForPrestudent($person_id, ['admin:r', 'assistenz:r'], ['admin:r', 'assistenz:r']);
 		}
 
 		// Load Libraries
