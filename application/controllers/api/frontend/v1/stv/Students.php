@@ -32,7 +32,7 @@ class Students extends FHCAPI_Controller
 	{
 		$permissions = [];
 		$router = load_class('Router');
-		$permissions[$router->method] = self::PERM_LOGGED;
+		$permissions[$router->method] = ['admin:r', 'assistenz:r'];
 		parent::__construct($permissions);
 
 		$this->allowedStgs = $this->permissionlib->getSTG_isEntitledFor('admin') ?: [];
