@@ -395,6 +395,7 @@ export default {
 					</form-input>
 				</div>
 				
+				` + /* TODO(chris): Ausgeblendet für Testing
 				<div class="row mb-3">
 					<form-input
 						container-class="col-4"
@@ -429,6 +430,7 @@ export default {
 					</form-input>
 				 
 				</div>
+				*/`
 				
 				<div class="row mb-3">
 					<form-input
@@ -481,6 +483,7 @@ export default {
 							>
 						</form-input>
 					</div>
+					` + /* TODO(chris): Ausgeblendet für Testing
 					<form-input
 						container-class="col-3"
 						:label="$p.t('lehre', 'foerderrelevant')"
@@ -490,6 +493,7 @@ export default {
 						>
 						<option v-for="entry in listFoerderrelevant" :value="entry.value">{{entry.text}}</option>
 					</form-input>
+					*/`
 					
 					<form-input
 						container-class="col-1"
