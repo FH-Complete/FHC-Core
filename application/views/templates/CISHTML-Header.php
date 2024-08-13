@@ -35,12 +35,12 @@ if (!isset($menu)) {
 		<img src="<?= base_url('/public/images/logo-300x160.png'); ?>" alt="Logo">
 	</a>
 	<nav id="nav-main" class="offcanvas offcanvas-start bg-dark" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
-		<div id="nav-main-toggle" class="position-static d-none d-lg-block bg-dark">
+		<div id="nav-main-toggle" class="d-none d-lg-flex bg-dark">
 			<button type="button" class="btn bg-dark text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#nav-main-menu" aria-expanded="true" aria-controls="nav-main-menu">
 				<i class="fa fa-arrow-circle-left"></i>
 			</button>
 		</div>
-		<div class="offcanvas-body p-0">
+		<div class="offcanvas-body flex-grow-0 p-0">
 			<fhc-searchbar id="nav-search" class="fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
 			<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
 				<img src="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" class="avatar rounded-circle"/>
