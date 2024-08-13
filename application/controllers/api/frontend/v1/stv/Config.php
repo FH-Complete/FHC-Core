@@ -33,8 +33,8 @@ class Config extends FHCAPI_Controller
 	{
 		// TODO(chris): permissions
 		parent::__construct([
-			'student' => self::PERM_LOGGED,
-			'students' => self::PERM_LOGGED
+			'student' => ['admin:r', 'assistenz:r'],
+			'students' => ['admin:r', 'assistenz:r']
 		]);
 
 
