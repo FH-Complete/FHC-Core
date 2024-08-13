@@ -143,9 +143,9 @@ class Student extends FHCAPI_Controller
 		$result = $this->udflib->getCiValidations($this->PersonModel, $this->input->post());
 
 		//TODO(Manu) check with Chris: input number not allowed
-		$field_validations = $this->getDataOrTerminateWithError($result);
+		$udf_field_validations = $this->getDataOrTerminateWithError($result);
 
-		$this->form_validation->set_rules($field_validations);
+		$this->form_validation->set_rules($udf_field_validations);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());

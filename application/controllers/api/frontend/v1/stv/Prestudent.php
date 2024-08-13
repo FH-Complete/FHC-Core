@@ -57,8 +57,18 @@ class Prestudent extends FHCAPI_Controller
 
 	public function updatePrestudent($prestudent_id)
 	{
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		// UDF
+		$this->load->library('UDFLib');
+		
+		$result = $this->udflib->getCiValidations($this->PrestudentModel, $this->input->post());
+		$udf_field_validations = $this->getDataOrTerminateWithError($result);
+
 		//Form validation
 		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules($udf_field_validations);
 
 		$this->form_validation->set_rules('priorisierung', 'Priorisierung', 'numeric', [
 			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Priorisierung'])
@@ -104,6 +114,14 @@ class Prestudent extends FHCAPI_Controller
 			'aufnahmeschluessel',
 			'standort_code'
 		];
+
+		// add UDFs
+		$result = $this->udflib->getDefinitionForModel($this->PrestudentModel);
+
+		$definitions = $this->getDataOrTerminateWithError($result);
+
+		foreach ($definitions as $def)
+			$array_allowed_props_prestudent[] = $def['name'];
 
 		$update_prestudent = array();
 		foreach ($array_allowed_props_prestudent as $prop)
