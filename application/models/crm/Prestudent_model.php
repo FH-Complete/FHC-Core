@@ -15,6 +15,39 @@ class Prestudent_model extends DB_Model
 	}
 
 	/**
+	 * Update Data in DB-Table
+	 *
+	 * @param   string $id  PK for DB-Table
+	 * @param   array $data  DataArray for Insert
+	 * @return  array
+	 */
+	public function update($id, $data, $encryptedColumns = null)
+	{
+		if (isset($data['zgvmas_code'])
+			|| isset($data['zgvmanation'])
+			|| isset($data['zgv_code'])
+			|| isset($data['zgvnation'])
+		) {
+			/**
+			 * Falls ZGV vorhanden, setze Ausstellungsstaat (für BIS-Meldung)
+			 * auf Nation der höchsten angegebenen ZGV
+			 */
+			$case = '(CASE 
+				WHEN zgvmas_code IS NOT NULL AND zgvmanation IS NOT NULL THEN zgvmanation 
+				WHEN zgv_code IS NOT NULL AND zgvnation IS NOT NULL THEN zgvnation 
+				ELSE NULL END)';
+			
+			foreach (['zgvmas_code', 'zgvmanation', 'zgv_code', 'zgvnation'] as $key)
+				if (isset($data[$key]))
+					$case = str_replace($key, $this->escape($data[$key]), $case);
+			
+			$this->db->set('ausstellungsstaat', $case, false);
+		}
+
+		return parent::update($id, $data, $encryptedColumns);
+	}
+
+	/**
 	 * getLastStatuses
 	 */
 	public function getLastStatuses($person_id, $studiensemester_kurzbz = null, $studiengang_kz = null, $status_kurzbz = null)
