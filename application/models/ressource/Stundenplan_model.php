@@ -133,7 +133,14 @@ class Stundenplan_model extends DB_Model
 		return $gruppierteEvents;
 	}
 
-	public function stundenPlanGruppierung($stundenplanViewQuery)
+
+	/**
+	 * function that takes a query that fetches lehre.vw_stundenplan rows and groups them so that they can be displayed in a calendar
+	 * @param string $stundenplanViewQuery the subquery used to group the result
+	 * 
+	 * @return stdClass
+	 */
+	public function stundenplanGruppierung($stundenplanViewQuery)
 	{
 		
 
@@ -176,6 +183,12 @@ class Stundenplan_model extends DB_Model
 		return $gruppierteEvents;
 	}
 
+	/**
+	 * NO STANDALONE FUNCTION - Generates a SQL query string to fetch 'stundenplan' events for a specific student within the current semester.
+	 * @param string $uid the user id that is used to fetch the stundenplan rows from the lehre.vw_studenplan table
+	 * 
+	 * @return string
+	 */
 	public function getStudenPlanQuery($uid){
 			return 
 			"select sp.*
@@ -188,6 +201,14 @@ class Stundenplan_model extends DB_Model
 			WHERE ss1.studiensemester_kurzbz IS NOT NULL or ss2.studiensemester_kurzbz IS NOT NULL";
 	}
 
+	/**
+	 * NO STANDALONE FUNCTION - Generates a SQL query string to fetch 'stundenplan' events for a specific room within a date range.
+	 * @param string $ort_kurzbz the ort from which we want to query the stundenplan events 
+	 * @param string $start_date (inclusive) the minimum date that an event should have to be fetched
+	 * @param string $end_date (inclusive) the maximum date that an event should not extend to be fetched
+	 * 
+	 * @return string
+	 */
 	public function getRoomQuery($ort_kurzbz, $start_date, $end_date)
 	{
 		return
