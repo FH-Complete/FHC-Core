@@ -1,5 +1,5 @@
 
-import BsAlert from './Alert';
+import BsAlert from './Alert.js';
 
 export default {
 	mixins: [

@@ -1490,6 +1490,7 @@ class Status extends FHCAPI_Controller
 
 		if (!$student)
 			$this->terminateWithError($this->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
+		$student = current($student);
 
 
 		//process studentlehrverband
