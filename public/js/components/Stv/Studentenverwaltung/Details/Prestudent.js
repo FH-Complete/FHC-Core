@@ -2,11 +2,14 @@ import FormForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
 import TblHistory from "./Prestudent/History.js";
 
+import CoreUdf from '../../../Udf/Udf.js';
+
 export default {
 	components: {
 		FormForm,
 		FormInput,
-		TblHistory
+		TblHistory,
+		CoreUdf
 	},
 	inject: {
 		lists: {
@@ -97,6 +100,9 @@ export default {
 					this.initialFormData = {...this.data};
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		udfsLoaded(udfs) {
+			this.initialFormData = {...(this.initialFormData || {}), ...udfs};
 		},
 		updatePrestudent(){
 			this.$refs.form
@@ -395,6 +401,7 @@ export default {
 					</form-input>
 				</div>
 				
+				` + /* TODO(chris): Ausgeblendet für Testing
 				<div class="row mb-3">
 					<form-input
 						container-class="col-4"
@@ -429,6 +436,7 @@ export default {
 					</form-input>
 				 
 				</div>
+				*/`
 				
 				<div class="row mb-3">
 					<form-input
@@ -481,6 +489,7 @@ export default {
 							>
 						</form-input>
 					</div>
+					` + /* TODO(chris): Ausgeblendet für Testing
 					<form-input
 						container-class="col-3"
 						:label="$p.t('lehre', 'foerderrelevant')"
@@ -490,6 +499,7 @@ export default {
 						>
 						<option v-for="entry in listFoerderrelevant" :value="entry.value">{{entry.text}}</option>
 					</form-input>
+					*/`
 					
 					<form-input
 						container-class="col-1"
@@ -501,6 +511,7 @@ export default {
 						>
 					</form-input>
 				</div>
+				<core-udf @load="udfsLoaded" v-model="data" class="row-cols-3 g-3 mb-3" ci-model="crm/prestudent" :pk="{prestudent_id:modelValue.prestudent_id}"></core-udf>
 			</fieldset>
 		</form-form>
 		<div>

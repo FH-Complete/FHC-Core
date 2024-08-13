@@ -27,10 +27,9 @@ class Verband extends FHCAPI_Controller
 {
 	public function __construct()
 	{
-		// TODO(chris): permissions
 		$permissions = [];
 		$router = load_class('Router');
-		$permissions[$router->method] = self::PERM_LOGGED;
+		$permissions[$router->method] = ['admin:r', 'assistenz:r'];
 		parent::__construct($permissions);
 
 		// Load Models
@@ -56,6 +55,13 @@ class Verband extends FHCAPI_Controller
 	{
 		if ($method == '' || $method == 'index')
 			return $this->getBase();
+
+		// NOTE(chris): Test if access is allowed ($method is the Studiengang)
+		if (!$this->permissionlib->isBerechtigt('assistenz', 's', $method)
+			&& !$this->permissionlib->isBerechtigt('admin', 's', $method)
+		) {
+			return $this->_outputAuthError([$method => ['admin:r', 'assistenz:r']]);
+		}
 
 		$count = count($params);
 		if (!$count)
@@ -104,8 +110,11 @@ class Verband extends FHCAPI_Controller
 
 		$stgs = $this->permissionlib->getSTG_isEntitledFor('admin') ?: [];
 		$stgs = array_merge($stgs, $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: []);
-		if ($stgs)
-			$this->StudiengangModel->db->where_in('studiengang_kz', $stgs);
+
+		if (!$stgs)
+			$this->terminateWithSuccess([]);
+
+		$this->StudiengangModel->db->where_in('studiengang_kz', $stgs);
 
 		$result = $this->StudiengangModel->loadWhere(['v.aktiv' => true]);
 

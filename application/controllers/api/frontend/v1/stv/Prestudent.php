@@ -10,18 +10,32 @@ class Prestudent extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'get' => ['admin:r', 'assistenz:r'],
-			'updatePrestudent' =>  ['admin:w', 'assistenz:w'],
+			'updatePrestudent' =>  ['admin:rw', 'assistenz:rw'],
 			'getHistoryPrestudents' => ['admin:r', 'assistenz:r'],
-			'getBezeichnungZGV' => self::PERM_LOGGED,
-			'getBezeichnungDZgv' => self::PERM_LOGGED,
-			'getBezeichnungMZgv' => self::PERM_LOGGED,
-			'getAusbildung' => self::PERM_LOGGED,
-			'getAufmerksamdurch' => self::PERM_LOGGED,
-			'getBerufstaetigkeit' => self::PERM_LOGGED,
-			'getTypenStg' => self::PERM_LOGGED,
-			'getStudienplaene' => self::PERM_LOGGED,
-			'getStudiengang' => self::PERM_LOGGED
+			'getBezeichnungZGV' => ['admin:r', 'assistenz:r'],
+			'getBezeichnungDZgv' => ['admin:r', 'assistenz:r'],
+			'getBezeichnungMZgv' => ['admin:r', 'assistenz:r'],
+			'getAusbildung' => ['admin:r', 'assistenz:r'],
+			'getAufmerksamdurch' => ['admin:r', 'assistenz:r'],
+			'getBerufstaetigkeit' => ['admin:r', 'assistenz:r'],
+			'getTypenStg' => ['admin:r', 'assistenz:r'],
+			'getStudienplaene' => ['admin:r', 'assistenz:r'],
+			'getStudiengang' => ['admin:r', 'assistenz:r']
 		]);
+
+		if ($this->router->method == 'updatePrestudent') {
+			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
+			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:rw', 'assistenz:rw']);
+		} elseif ($this->router->method == 'get'
+			|| $this->router->method == 'getStudienplaene'
+			|| $this->router->method == 'getStudiengang'
+		) {
+			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
+			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:r', 'assistenz:r']);
+		} elseif ($this->router->method == 'getHistoryPrestudents') {
+			$person_id = current(array_slice($this->uri->rsegments, 2));
+			$this->checkPermissionsForPrestudent($person_id, ['admin:r', 'assistenz:r'], ['admin:r', 'assistenz:r']);
+		}
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
@@ -52,38 +66,27 @@ class Prestudent extends FHCAPI_Controller
 
 	public function updatePrestudent($prestudent_id)
 	{
-		$this->load->library('form_validation');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
-		//get Studiengang von prestudent_id
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$result = $this->PrestudentModel->load([
-			'prestudent_id'=> $prestudent_id,
-		]);
-		if(isError($result))
-		{
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		$result = current(getData($result));
-
-		$stg = $result->studiengang_kz;
-
-		if(!$this->permissionlib->isBerechtigt('admin', 'suid', $stg) && !$this->permissionlib->isBerechtigt('assistenz', 'suid', $stg))
-		{
-			return $this->terminateWithError($this->p->t('lehre','error_keineSchreibrechte'), self::ERROR_TYPE_GENERAL);
-		}
+		// UDF
+		$this->load->library('UDFLib');
+		
+		$result = $this->udflib->getCiValidations($this->PrestudentModel, $this->input->post());
+		$udf_field_validations = $this->getDataOrTerminateWithError($result);
 
 		//Form validation
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules($udf_field_validations);
+
 		$this->form_validation->set_rules('priorisierung', 'Priorisierung', 'numeric', [
-			'numeric' => $this->p->t('ui','error_fieldNotNumeric',['field' => 'Priorisierung'])
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Priorisierung'])
 		]);
 
 		if ($this->form_validation->run() == false)
 		{
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
-
-		$deltaData = $_POST;
 
 		$uid = getAuthUID();
 
@@ -121,10 +124,18 @@ class Prestudent extends FHCAPI_Controller
 			'standort_code'
 		];
 
+		// add UDFs
+		$result = $this->udflib->getDefinitionForModel($this->PrestudentModel);
+
+		$definitions = $this->getDataOrTerminateWithError($result);
+
+		foreach ($definitions as $def)
+			$array_allowed_props_prestudent[] = $def['name'];
+
 		$update_prestudent = array();
 		foreach ($array_allowed_props_prestudent as $prop)
 		{
-			$val = isset($deltaData[$prop]) ? $deltaData[$prop] : null;
+			$val = $this->input->post($prop);
 			if ($val !== null || $prop == 'foerderrelevant') {
 				$update_prestudent[$prop] = $val;
 			}
@@ -133,28 +144,17 @@ class Prestudent extends FHCAPI_Controller
 		$update_prestudent['updateamum'] = date('c');
 		$update_prestudent['updatevon'] = $uid;
 
-		//utf8-decode for special chars (eg tag der offenen Tür, FH-Führer)
-		function utf8_decode_if_string($value)
-		{
-			if (is_string($value)) {
-				return utf8_decode($value);
-			} else {
-				return $value;
-			}
-		}
-		$update_prestudent_encoded = array_map('utf8_decode_if_string', $update_prestudent);
-
 		if (count($update_prestudent))
 		{
 			$result = $this->PrestudentModel->update(
 				$prestudent_id,
-				$update_prestudent_encoded
+				$update_prestudent
 			);
-			if (isError($result)) {
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
+			$this->getDataOrTerminateWithError($result);
+
 			return $this->terminateWithSuccess(true);
 		}
+		return $this->terminateWithSuccess(false);
 	}
 
 	public function getHistoryPrestudents($person_id)

@@ -6,20 +6,31 @@ use \DateTime as DateTime;
 
 abstract class Notiz_Controller extends FHCAPI_Controller
 {
+	const DEFAULT_PERMISSION_R  = 'admin:r';
+	const DEFAULT_PERMISSION_RW = 'admin:rw';
 	//public function __construct($zuordnung = 'person/Notizzuordnung_model')
-	public function __construct()
+	public function __construct($permissions)
 	{
-		parent::__construct([
-			'getUid' => self::PERM_LOGGED,
-			'getNotizen' => self::PERM_LOGGED,
-			'loadNotiz' => self::PERM_LOGGED,
-			'addNewNotiz' => self::PERM_LOGGED,
-			'updateNotiz' => self::PERM_LOGGED,
-			'deleteNotiz' => ['admin:w', 'assistenz:w'],
-			'loadDokumente' => ['admin:w', 'assistenz:w'],
-			'getMitarbeiter' => self::PERM_LOGGED,
-			'isBerechtigt' => self::PERM_LOGGED,
-		]);
+		$default_permissions = [
+			'getUid' => self::DEFAULT_PERMISSION_R,
+			'getNotizen' => self::DEFAULT_PERMISSION_R,
+			'loadNotiz' => self::DEFAULT_PERMISSION_R,
+			'addNewNotiz' => self::DEFAULT_PERMISSION_RW,
+			'updateNotiz' => self::DEFAULT_PERMISSION_RW,
+			'deleteNotiz' => self::DEFAULT_PERMISSION_RW,
+			'loadDokumente' => self::DEFAULT_PERMISSION_R,
+			'getMitarbeiter' => self::DEFAULT_PERMISSION_R,
+			'isBerechtigt' => self::DEFAULT_PERMISSION_R,
+		];
+		
+		if(!is_array($permissions))
+		{
+		    $this->terminateWithError("Notiz_controller construct: permissions must be an array");
+		}
+		
+		$merged_permissions = array_merge($default_permissions, $permissions);
+		
+		parent::__construct($merged_permissions);
 
 		//Load Models
 		$this->load->model('person/Notiz_model', 'NotizModel');

@@ -2,12 +2,14 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studienplan extends FHC_Controller
+class Studienplan extends Auth_Controller
 {
 	public function __construct()
 	{
 		// TODO(chris): access!
-		parent::__construct();
+		parent::__construct([
+			'get' => self::PERM_LOGGED
+		]);
 	}
 
 	public function get()

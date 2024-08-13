@@ -33,8 +33,8 @@ class Config extends FHCAPI_Controller
 	{
 		// TODO(chris): permissions
 		parent::__construct([
-			'student' => self::PERM_LOGGED,
-			'students' => self::PERM_LOGGED
+			'student' => ['admin:r', 'assistenz:r'],
+			'students' => ['admin:r', 'assistenz:r']
 		]);
 
 
@@ -91,10 +91,12 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_resources'),
 			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
 		];
+		/* TODO(chris): Ausgeblendet für Testing
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js'
 		];
+		*/
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
 			return $result;
