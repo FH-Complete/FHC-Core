@@ -32,7 +32,7 @@ class Studiensemester extends Auth_Controller
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
-		$result = $this->StudiensemesterModel->getAkt();
+		$result = $this->StudiensemesterModel->getNearest();
 
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
