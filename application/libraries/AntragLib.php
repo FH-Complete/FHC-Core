@@ -126,7 +126,7 @@ class AntragLib
 			return $this->_ci->StudierendenantragstatusModel->resumeAntraegeForAbmeldungStgl($antrag_id);
 		}
 		// NOTE(chris): get last status that is not pause
-		$this->_ci->StudierendenantragstatusModel->addOrder('insertamum');
+		$this->_ci->StudierendenantragstatusModel->addOrder('insertamum', 'DESC');
 		$this->_ci->StudierendenantragstatusModel->addLimit(1);
 		$result = $this->_ci->StudierendenantragstatusModel->loadWhere([
 			'studierendenantrag_id' => $antrag_id,
