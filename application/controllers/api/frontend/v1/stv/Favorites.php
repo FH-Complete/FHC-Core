@@ -46,9 +46,9 @@ class Favorites extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		if (!$data)
-			$this->outputJson(null);
+			$this->terminateWithSuccess(null);
 		else
-			$this->outputJson($data['stv_favorites']);
+			$this->terminateWithSuccess($data['stv_favorites']);
 	}
 
 	public function set()
@@ -66,6 +66,6 @@ class Favorites extends FHCAPI_Controller
 
 		$this->getDataOrTerminateWithError($result);
 		
-		$this->outputJsonSuccess(true);
+		$this->terminateWithSuccess(true);
 	}
 }
