@@ -139,9 +139,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$angerechneteECTS=($semesterNumberStart-1)*30; // 30 ECTS pro Semester
 			echo '		<angerechnete_ects_quereinstieg>'.$angerechneteECTS.'</angerechnete_ects_quereinstieg>';
 
-            $end_semester_anrechnung = $semesterNumberStart - 1;
-            echo '      <start_semester_anrechnung_number>1</start_semester_anrechnung_number>';
-            echo '      <end_semester_anrechnung_number>'. $end_semester_anrechnung .'</end_semester_anrechnung_number>';
+			$end_semester_anrechnung = $semesterNumberStart - 1;
+			echo '      <start_semester_anrechnung_number>1</start_semester_anrechnung_number>';
+			echo '      <end_semester_anrechnung_number>'. $end_semester_anrechnung .'</end_semester_anrechnung_number>';
 		}
 		echo '      <start_semester>'.substr($prestudent->studiensemester_kurzbz, 2, 6).'</start_semester>';
 		echo '      <start_semester_number>'.$prestudent->ausbildungssemester.'</start_semester_number>';
@@ -621,7 +621,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		//Anrechnung Quereinsteiger
 		echo ' <anrechnungen>';
 
-    	//Version Studienordnung
+		//Version Studienordnung
 		if($semesterNumberStart>1)
 		{
 			$maxSemester = $semesterNumberStart;
@@ -653,115 +653,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 		echo ' </anrechnungen>';
 
-		//Berufliche Kompetenzen
-		$studienplan = new studienplan();
-		$studienplan->loadStudienplan($studienplan_id);
-		$regelstudiendauer = $studienplan->regelstudiendauer;
-		$ects_berufliche_kompetenzen = 0;
-
-		//bei masterlehrgängen 120ECTS bzw regelstudienzeit >= 4 sem: Andruck der beruflichen Kompetenzen
-
-		//Version notenunabhängig
-/*		if ($row->typ == 'l' && $regelstudiendauer >= 4)
-		{
-			echo '<berufliche_kompetenzen>';
-			//echo '<test>'.$row->typ . ' '. $regelstudiendauer. '</test>';
-			echo '<header_berufliche_kompetenz>Validierung beruflicher Kompetenzen</header_berufliche_kompetenz>';
-			$qry_sem_0="
-				SELECT
-				    lehrveranstaltung_id,
-				    lehrform_kurzbz,
-				    sws,
-				    bezeichnung,
-				    bezeichnung_english,
-				    ects
-				FROM
-				    lehre.tbl_studienplan_lehrveranstaltung sp
-					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
-				WHERE
-					studienplan_id = ".$db->db_add_param($studienplan_id)."
-				AND
-					sp.semester = '0'
-			";
-
-			if($result_sem_0 = $db->db_query($qry_sem_0))
-			{
-				while ($row_sem_0 = $db->db_fetch_object($result_sem_0))
-				{
-					echo '<lv_sem0>
-						<lv_id>' . $row_sem_0->lehrveranstaltung_id . '</lv_id>
-						<lehrform_kurzbz>' . $row_sem_0->lehrform_kurzbz .'</lehrform_kurzbz>
-						<bezeichnung><![CDATA[' . $row_sem_0->bezeichnung .']]></bezeichnung>
-						<bezeichnung_englisch><![CDATA[' . $row_sem_0->bezeichnung_english . ']]></bezeichnung_englisch>
-						<sws_lv>'.$row_sem_0->sws.'</sws_lv>
-						<ects>'.$row_sem_0->ects.'</ects>
-						<note_positiv> 1 </note_positiv>
-						<note> - </note>
-						<benotungsdatum> - </benotungsdatum>
-						</lv_sem0>';
-				}
-			}
-			echo '</berufliche_kompetenzen>';
-		}*/
-
-		//Version mit Noten
-		if ($row->typ == 'l' && $regelstudiendauer >= 4)
-		{
-			$ects_berufliche_kompetenzen = 30;
-			echo '<berufliche_kompetenzen>';
-			//echo '<test>'.$row->typ . ' '. $regelstudiendauer. '</test>';
-			echo '<header_berufliche_kompetenz>Validierung beruflicher Kompetenzen</header_berufliche_kompetenz>';
-			//TODO(Manu) check if information somewhere in DB
-			echo '<ects_berufliche_kompetenz>'.$ects_berufliche_kompetenzen.'</ects_berufliche_kompetenz>';
-			$qry_sem_0="
-				SELECT
-					lehrveranstaltung_id,
-					lehrform_kurzbz,
-					sws,
-					lehre.tbl_lehrveranstaltung.bezeichnung,
-					bezeichnung_english,
-					ects,
-					benotungsdatum,
-					note,
-					positiv,
-					offiziell,
-					note.anmerkung
-				FROM
-					lehre.tbl_zeugnisnote zeugnis
-					JOIN lehre.tbl_note note USING(note)
-					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-					JOIN public.tbl_student student USING(student_uid)
-				WHERE
-				    student_uid =".$db->db_add_param($uid_arr[$i])."
-				AND
-					lehre.tbl_lehrveranstaltung.semester = '0'
-					";
-
-			if($result_sem_0 = $db->db_query($qry_sem_0))
-			{
-				while ($row_sem_0 = $db->db_fetch_object($result_sem_0))
-				{
-					$benotungsdatum = $datum->formatDatum($row_sem_0->benotungsdatum, 'd/m/Y');
-					$note = $db->db_parse_bool($row_sem_0->offiziell) ?  $row_sem_0->anmerkung : $row_sem_0->note;
-
-					echo '<lv_sem0>
-						<lv_id>' . $row_sem_0->lehrveranstaltung_id . '</lv_id>
-						<lehrform_kurzbz>' . $row_sem_0->lehrform_kurzbz . '</lehrform_kurzbz>
-						<bezeichnung><![CDATA[' . $row_sem_0->bezeichnung . ']]></bezeichnung>
-						<bezeichnung_englisch><![CDATA[' . $row_sem_0->bezeichnung_english . ']]></bezeichnung_englisch>
-						<sws_lv>'.$row_sem_0->sws.'</sws_lv>
-						<ects>'.$row_sem_0->ects.'</ects>
-						<note_positiv>'.$db->db_parse_bool($row_sem_0->positiv).'</note_positiv>
-						<note>'.$note.'</note>
-						<benotungsdatum>'.$benotungsdatum.'</benotungsdatum>
-						</lv_sem0>';
-				}
-			}
-			echo '</berufliche_kompetenzen>';
-		}
-
 		echo "<studiensemester>";
-
 		for($start = $semesterNumberStart; $start <= $semesterNumberEnd; $start++)
 		{
 			$semester_ects = 0;
@@ -784,7 +676,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				AND zeugnis = true
 				AND status.ausbildungssemester = ".$db->db_add_param($start)."
 				AND status.status_kurzbz NOT IN('Unterbrecher', 'Interessent','Bewerber','Aufgenommener','Abgewiesener','Wartender')
-				--AND	lehre.tbl_lehrveranstaltung.semester != '0'
 			ORDER BY datum ASC";
 
 			$semester_kurzbz = array();
@@ -833,7 +724,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			WHERE
 				student_uid = ".$db->db_add_param($uid_arr[$i])."
 				AND zeugnis = true
-				AND	lehre.tbl_lehrveranstaltung.semester != '0'
 				AND studiensemester_kurzbz in (".$sqlStudent->implode4SQL($aktuellesSemester).")";
 
 			if (defined('ZEUGNISNOTE_NICHT_ANZEIGEN'))
@@ -953,7 +843,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 								$lehrform_kurzbz = $lehrform_kurzbz.', '.$row_lehrform->lehrform_kurzbz;
 							else
 								$lehrform_kurzbz = $row_lehrform->lehrform_kurzbz;
-								$y++;
+							$y++;
 						}
 					}
 					$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['lehrform_kurzbz']= $lehrform_kurzbz;
@@ -1192,19 +1082,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					}
 				}
 			}
-
 			echo '<ects_gesamt>'.$semester_ects.'</ects_gesamt>';
 			echo '<ects_gesamt_positiv>'.$semester_ects_positiv.'</ects_gesamt_positiv>';
 			echo "</semesters>";
 		}
-
-		//Korrektur ects_total um berufliche Kompetenzen
-		if ($row->typ == 'l' && $regelstudiendauer >= 4)
-		{
-			$ects_total += $ects_berufliche_kompetenzen;
-			$ects_total_positiv += $ects_berufliche_kompetenzen;
-		}
-
 		echo "</studiensemester>";
 		echo " <ects_total>$ects_total</ects_total>";
 		echo " <ects_total_positiv>$ects_total_positiv</ects_total_positiv>";
