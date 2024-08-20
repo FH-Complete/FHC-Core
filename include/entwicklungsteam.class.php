@@ -21,6 +21,7 @@
  *          Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/mitarbeiter.class.php');
 
 class entwicklungsteam extends basis_db
 {
@@ -74,7 +75,7 @@ class entwicklungsteam extends basis_db
 		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode)
 				WHERE entwicklungsteam_id=".$this->db_add_param($entwicklungsteam_id);
 
-				$qry.=";";
+		$qry.=";";
 
 		if($this->db_query($qry))
 		{
@@ -147,6 +148,11 @@ class entwicklungsteam extends basis_db
 			$this->errormsg = 'Es muss ein Mitarbeiter angegeben werden';
 			return false;
 		}
+		if(!$this->checkIfExistingUid($this->mitarbeiter_uid))
+		{
+			$this->errormsg = 'Bitte einen Eintrag aus dem Dropdown Personensuche auswählen!';
+			return false;
+		}
 		if($this->studiengang_kz=='')
 		{
 			$this->errormsg = 'Es muss ein Studiengang angegeben werden';
@@ -183,15 +189,15 @@ class entwicklungsteam extends basis_db
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO bis.tbl_entwicklungsteam (mitarbeiter_uid, studiengang_kz, besqualcode, beginn, ende,
 					updateamum, updatevon, insertamum, insertvon) VALUES (".
-			       $this->db_add_param($this->mitarbeiter_uid).', '.
-			       $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
-			       $this->db_add_param($this->besqualcode, FHC_INTEGER).', '.
-			       $this->db_add_param($this->beginn).', '.
-			       $this->db_add_param($this->ende).', '.
-			       $this->db_add_param($this->updateamum).', '.
-			       $this->db_add_param($this->updatevon).', '.
-			       $this->db_add_param($this->insertamum).', '.
-			       $this->db_add_param($this->insertvon).');';
+				$this->db_add_param($this->mitarbeiter_uid).', '.
+				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+				$this->db_add_param($this->besqualcode, FHC_INTEGER).', '.
+				$this->db_add_param($this->beginn).', '.
+				$this->db_add_param($this->ende).', '.
+				$this->db_add_param($this->updateamum).', '.
+				$this->db_add_param($this->updatevon).', '.
+				$this->db_add_param($this->insertamum).', '.
+				$this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
@@ -200,13 +206,13 @@ class entwicklungsteam extends basis_db
 
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE bis.tbl_entwicklungsteam SET".
-				  " besqualcode=".$this->db_add_param($this->besqualcode, FHC_INTEGER).",".
-				  " beginn=".$this->db_add_param($this->beginn).",".
-				  " studiengang_kz=".$this->db_add_param($this->studiengang_kz, FHC_INTEGER).",".
-				  " ende=".$this->db_add_param($this->ende).",".
-				  " updateamum=".$this->db_add_param($this->updateamum).",".
-				  " updatevon=".$this->db_add_param($this->updatevon).
-				  " WHERE entwicklungsteam_id=".$this->db_add_param($this->entwicklungsteam_id).";";
+				" besqualcode=".$this->db_add_param($this->besqualcode, FHC_INTEGER).",".
+				" beginn=".$this->db_add_param($this->beginn).",".
+				" studiengang_kz=".$this->db_add_param($this->studiengang_kz, FHC_INTEGER).",".
+				" ende=".$this->db_add_param($this->ende).",".
+				" updateamum=".$this->db_add_param($this->updateamum).",".
+				" updatevon=".$this->db_add_param($this->updatevon).
+				" WHERE entwicklungsteam_id=".$this->db_add_param($this->entwicklungsteam_id).";";
 		}
 
 		if($this->db_query($qry))
@@ -234,7 +240,7 @@ class entwicklungsteam extends basis_db
 		if($studiengang_kz!=null)
 			$qry.=" AND studiengang_kz=".$this->db_add_param($studiengang_kz);
 
-        $qry.=";";
+		$qry.=";";
 
 		if($this->db_query($qry))
 		{
@@ -316,7 +322,7 @@ class entwicklungsteam extends basis_db
 
 		if ($sort != null)
 		{
-				$qry .= " ORDER BY ".$sort;
+			$qry .= " ORDER BY ".$sort;
 		}
 
 		$qry .= ";";
@@ -364,7 +370,7 @@ class entwicklungsteam extends basis_db
 		$bismeldung_jahr = $datetime->format('Y');
 
 		//laden des Datensatzes
-			$qry = "SELECT *
+		$qry = "SELECT *
 					FROM bis.tbl_entwicklungsteam
 					JOIN bis.tbl_besqual USING(besqualcode)
 					WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)."
@@ -374,7 +380,7 @@ class entwicklungsteam extends basis_db
 		if($studiengang_kz!=null)
 			$qry.=" AND studiengang_kz=".$this->db_add_param($studiengang_kz);
 
-        $qry.=";";
+		$qry.=";";
 
 		if($this->db_query($qry))
 		{
@@ -404,6 +410,21 @@ class entwicklungsteam extends basis_db
 			$this->errormsg = 'Fehler bei der Datenbankabfrage';
 			return false;
 		}
+	}
+
+	/*
+	 * Überprüft, ob die übergebene Uid in der Tabelle tbl_mitarbeiter vorhanden ist
+	 * @param char $uid UID des Mitarbeiters
+	 * @return true wenn vorhanden, false wenn nicht
+	 */
+	private function checkIfExistingUid($uid)
+	{
+		$mitarbeiter = new mitarbeiter();
+
+		if(!$mitarbeiter->load($uid))
+			return false;
+
+		return true;
 	}
 }
 ?>
