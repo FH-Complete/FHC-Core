@@ -118,8 +118,8 @@ export default {
 			await this.loadAndSetStudiensemester();
 
 			// Set table data
-			// TODO change with brandnew FHCAPI getUrl after merge master
-			this.table.setData(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+			this.table.setData(
+				this.$fhcApi.getUri() +
 				'/api/frontend/v1/education/Lehrveranstaltung/getTemplateLvTree' +
 				'?studiensemester_kurzbz=' + this.selectedStudiensemester
 			);
@@ -133,16 +133,16 @@ export default {
 		},
 		onChangeStudiensemester(){
 			// Reset table data
-			// TODO change with brandnew FHCAPI getUrl after merge master
-			// ...danach im SWB auch die core rest clients raus bzw. ggf änderung requests auf api/frontend/... wie hier und core rest client ggf raus.
-			this.table.setData(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+			this.table.setData(
+				this.$fhcApi.getUri() +
 				'/api/frontend/v1/education/Lehrveranstaltung/getTemplateLvTree' +
 				'?studiensemester_kurzbz=' + this.selectedStudiensemester
 			);
 		},
 		openAdminLvTemplate(event, row){
 			const url = FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				'vilesci/lehre/lehrveranstaltung.php?stg_kz=&semester=-1&orgform=-1&lehrveranstaltung_id=' + row.getData().lehrveranstaltung_id;
+				'vilesci/lehre/lehrveranstaltung.php?stg_kz=&semester=-1&orgform=-1&lehrveranstaltung_id=' +
+				row.getData().lehrveranstaltung_id;
 
 			window.open(url, '_blank').focus();
 		},
