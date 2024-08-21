@@ -139,7 +139,7 @@ switch($method)
 				$selected=' selected';
 			else
 				$selected='';
-			echo '<option value="'.$row->akadgrad_id.'"'.$selected.'>'.$row->akadgrad_kurzbz.' - '.$row->titel.'</option>';
+			echo '<option value="'.$row->akadgrad_id.'"'.$selected.'>'.$row->studiengang_kz.' - '.$row->akadgrad_kurzbz.' - '.$row->titel.'</option>';
 		}
 		echo '
 					</select>
@@ -312,7 +312,7 @@ switch($method)
 		</table>
 		';
 		break;
-        
+
     case 'semesterSTPLZuordnung':
 		$studienplan_id = $_GET["studienplan_id"];
 
@@ -362,7 +362,7 @@ switch($method)
 		{
 			if (array_key_exists($row->studiensemester, $studiensemester_array))
 				$studiensemester_array[$row->studiensemester] = true;
-				
+
 			echo '<tr id="row_'.$row->studiensemester.'" style="font-size: 1em !important;"><td style="font-size: 1em; padding: 0.5em 0.5em 0.5em 0.5em;" align="center">'.$row->studiensemester.'</td>';
 			for($i = 1; $i<=$ausbildungssemester; $i++)
 			{
@@ -385,7 +385,7 @@ switch($method)
 				foreach($studiensemester_array AS $key => $value)
 				{
 					if ($value == true)
-					{							
+					{
 						echo '<option value='.$key.' disabled="disabled">'.$key.'</option>';
 						$lastStudiensemesterActive = false;
 					}
