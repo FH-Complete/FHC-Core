@@ -70,12 +70,16 @@ class Verband extends FHCAPI_Controller
 		if ($count == 1) {
 			if (is_numeric($params[0]))
 				return $this->getSemester($method, $params[0]);
+			elseif ($params[0] == 'prestudent')
+				return $this->terminateWithSuccess($this->getStdSem($method . '/prestudent/', $method));
 			else
 				return $this->getStudiengang($method, $params[0]);
 		}
 		if ($count == 2) {
 			if (is_numeric($params[0]))
 				return $this->getVerband($method, $params[0], $params[1]);
+			elseif ($params[1] == 'prestudent')
+				return $this->terminateWithSuccess($this->getStdSem($method . '/' . $params[0] . '/prestudent/', $method));
 			else
 				return $this->getSemester($method, $params[1], $params[0]);
 		}
