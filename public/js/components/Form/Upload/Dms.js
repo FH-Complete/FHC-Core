@@ -1,4 +1,9 @@
+import DmsItem from './Dms/Item.js';
+
 export default {
+	components: {
+		DmsItem
+	},
 	emits: [
 		'update:modelValue'
 	],
@@ -53,8 +58,14 @@ export default {
 	},
 	watch: {
 		modelValue(n) {
-			if (n instanceof FileList)
+			if (!n)
+				return;
+			if (n instanceof FileList) {
+				if (!this.$refs.upload) {
+					return;
+				}
 				return this.$refs.upload.files = n;
+			}
 
 			const dt = new DataTransfer();
 			const dms = [];
@@ -75,13 +86,14 @@ export default {
 	<div class="form-upload-dms">
 		<input ref="upload" class="form-control" :class="inputClass" :id="id" :name="name" :multiple="multiple" type="file" @change="addFiles">
 		<ul v-if="modelValue.length && multiple && !noList" class="list-unstyled m-0">
-			<li v-for="(file, index) in modelValue" :key="index" class="d-flex mx-1 mt-1 align-items-start">
-				<span class="col-auto"><i class="fa fa-file me-1"></i></span>
-				<span class="col">{{ file.name }}</span>
-				<button class="col-auto btn btn-outline-secondary btn-p-0" @click="removeFile(index)">
-					<i class="fa fa-close"></i>
-				</button>
-			</li>
+			<dms-item
+				v-for="(file, index) in modelValue"
+				:key="index"
+				v-model="file"
+				class="d-flex mx-1 mt-1 align-items-start"
+				@delete="removeFile(index)"
+				>
+			</dms-item>
 		</ul>
 	</div>`
 }
