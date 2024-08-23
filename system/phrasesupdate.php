@@ -29300,6 +29300,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_exam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// konto
 	array(
 		'app' => 'core',
