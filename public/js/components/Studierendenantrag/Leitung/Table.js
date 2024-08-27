@@ -231,9 +231,6 @@ export default {
 					return val ? link : '&nbsp;';
 				}
 			}, {
-				field: 'unruly',
-				title: this.$p.t('studierendenantrag', 'antrag_unruly')
-			}, {
 				field: 'dms_id',
 				title: this.$p.t('studierendenantrag', 'antrag_dateianhaenge'),
 				formatter: (cell, formatterParams, onRendered) => {

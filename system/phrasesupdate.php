@@ -2281,6 +2281,26 @@ $phrases = array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'unruly',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unerwünscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unruly',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 	//****************	CORE/lehre
 	array(
