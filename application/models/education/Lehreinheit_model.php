@@ -113,4 +113,57 @@ class Lehreinheit_model extends DB_Model
 
 		return $this->execQuery($query, array($lehreinheit_id));
 	}
+
+	/**
+	 * Gets Lehreinheiten for Lehrveranstaltungen in a Studiensemester.
+	 * Without using tbl_lehrfach: bezeichnung and kurzbz ALWAYS from lehrveranstaltung
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester
+	 * @return array with Lehreinheiten and their Lehreinheitgruppen
+	 */
+	public function getLesFromLvIds($lehrveranstaltung_id, $studiensemester_kurzbz = null)
+	{
+		$params = array($lehrveranstaltung_id);
+
+		$query = "
+			SELECT
+			    lv.lehrveranstaltung_id,
+			    le.lehreinheit_id,
+				le.lehrform_kurzbz, 
+				lv.kurzbz, 
+				lv.bezeichnung, 
+				lv.semester, 
+				ma.mitarbeiter_uid, 
+				(
+					SELECT 
+						STRING_AGG(CONCAT(leg.semester, leg.verband, leg.gruppe), ' ') 
+					FROM lehre.tbl_lehreinheitgruppe leg 
+					WHERE leg.lehreinheit_id = le.lehreinheit_id
+				) AS gruppe
+			FROM 
+				lehre.tbl_lehreinheit le
+			JOIN 
+				lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id
+			JOIN 
+				lehre.tbl_lehreinheitmitarbeiter ma USING (lehreinheit_id)
+			WHERE 
+				lv.lehrveranstaltung_id = ?
+				--AND le.studiensemester_kurzbz = 'WS2021'
+				";
+
+		if (isset($studiensemester_kurzbz))
+		{
+			$query .= " AND le.studiensemester_kurzbz = ?";
+			$params[] = $studiensemester_kurzbz;
+		}
+
+		$query .="	
+			ORDER BY 
+				le.lehreinheit_id;
+		";
+
+		return $this->execQuery($query, $params);
+
+	}
+
 }

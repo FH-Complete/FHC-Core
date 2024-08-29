@@ -13,7 +13,7 @@ class LePruefung_model extends DB_Model
 	}
 
 	/**
-	 * CI_STYLE
+	 * gets all Pruefungen for a student_uid
 	 * @param string		$student_uid
 	 * @param string		$studiensemester_kurzbz
 	 *

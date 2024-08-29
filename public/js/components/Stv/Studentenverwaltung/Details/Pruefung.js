@@ -16,7 +16,7 @@ export default {
 	template: `
 	<div class="stv-details-pruefung h-100 pb-3">
 	
-	{{modelValue}}
+<!--	{{modelValue}}-->
 		<fieldset class="overflow-hidden">
 <!--			<legend>{{this.$p.t('lehre', 'pruefung')}}</legend>-->
 			<pruefung-list ref="pruefungList" :uid="modelValue.uid"></pruefung-list>
