@@ -657,61 +657,17 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$studienplan = new studienplan();
 		$studienplan->loadStudienplan($studienplan_id);
 		$regelstudiendauer = $studienplan->regelstudiendauer;
+		$studienplan_ects = $studienplan->ects_stpl;
 		$ects_berufliche_kompetenzen = 0;
 
-		//bei masterlehrgängen 120ECTS bzw regelstudienzeit >= 4 sem: Andruck der beruflichen Kompetenzen
-
-		//Version notenunabhängig
-/*		if ($row->typ == 'l' && $regelstudiendauer >= 4)
-		{
-			echo '<berufliche_kompetenzen>';
-			//echo '<test>'.$row->typ . ' '. $regelstudiendauer. '</test>';
-			echo '<header_berufliche_kompetenz>Validierung beruflicher Kompetenzen</header_berufliche_kompetenz>';
-			$qry_sem_0="
-				SELECT
-				    lehrveranstaltung_id,
-				    lehrform_kurzbz,
-				    sws,
-				    bezeichnung,
-				    bezeichnung_english,
-				    ects
-				FROM
-				    lehre.tbl_studienplan_lehrveranstaltung sp
-					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
-				WHERE
-					studienplan_id = ".$db->db_add_param($studienplan_id)."
-				AND
-					sp.semester = '0'
-			";
-
-			if($result_sem_0 = $db->db_query($qry_sem_0))
-			{
-				while ($row_sem_0 = $db->db_fetch_object($result_sem_0))
-				{
-					echo '<lv_sem0>
-						<lv_id>' . $row_sem_0->lehrveranstaltung_id . '</lv_id>
-						<lehrform_kurzbz>' . $row_sem_0->lehrform_kurzbz .'</lehrform_kurzbz>
-						<bezeichnung><![CDATA[' . $row_sem_0->bezeichnung .']]></bezeichnung>
-						<bezeichnung_englisch><![CDATA[' . $row_sem_0->bezeichnung_english . ']]></bezeichnung_englisch>
-						<sws_lv>'.$row_sem_0->sws.'</sws_lv>
-						<ects>'.$row_sem_0->ects.'</ects>
-						<note_positiv> 1 </note_positiv>
-						<note> - </note>
-						<benotungsdatum> - </benotungsdatum>
-						</lv_sem0>';
-				}
-			}
-			echo '</berufliche_kompetenzen>';
-		}*/
-
-		//Version mit Noten
+		//bei masterlehrgängen und $studienplan_ects >= 120 ECTS: Andruck der beruflichen Kompetenzen, wenn die Lv angerechnet wurde
 		if ($row->typ == 'l' && $regelstudiendauer >= 4)
 		{
 			$ects_berufliche_kompetenzen = 30;
 			echo '<berufliche_kompetenzen>';
-			//echo '<test>'.$row->typ . ' '. $regelstudiendauer. '</test>';
+			echo '<test>'.$row->typ . ' '. $studienplan_ects . '</test>';
 			echo '<header_berufliche_kompetenz>Validierung beruflicher Kompetenzen</header_berufliche_kompetenz>';
-			//TODO(Manu) check if information somewhere in DB
+
 			echo '<ects_berufliche_kompetenz>'.$ects_berufliche_kompetenzen.'</ects_berufliche_kompetenz>';
 			$qry_sem_0="
 				SELECT
