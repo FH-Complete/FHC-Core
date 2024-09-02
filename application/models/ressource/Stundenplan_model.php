@@ -142,8 +142,11 @@ class Stundenplan_model extends DB_Model
 	 */
 	public function stundenplanGruppierung($stundenplanViewQuery)
 	{
-		
 
+		/* CASE
+				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz 
+				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) 
+			END as gruppe, */
 		$gruppierteEvents = $this->execReadOnlyQuery("
 		SELECT 
 			
@@ -151,23 +154,26 @@ class Stundenplan_model extends DB_Model
 		unr,datum, stunde,
 		CONCAT(lehrfach,'-',lehrform) as topic,
 		'' as beschreibung,
-		string_agg(DISTINCT gruppe, '/') as gruppe,
-		string_agg(DISTINCT lektor, '/') as lektor,  
-		ort_kurzbz, studiengang_kz, titel,'' as beschreibung,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit 
+		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz)) as gruppe,
+		array_agg(DISTINCT gruppe_bezeichnung) as gruppe_bezeichnung,
+		array_agg(DISTINCT lektor) as lektor,  
+		
+		ort_kurzbz, studiengang_kz, titel, lehrform, lehrfach, semester, verband
 
 		FROM
 		(
 			SELECT
  			unr,datum, stunde,
-			CASE
-				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz 
-				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) 
-			END as gruppe,
+			
 			CASE
 				WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
 				ELSE lektor
 			END as lektor,
-			ort_kurzbz, studiengang_kz, titel,'' as beschreibung,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit 
+			CASE
+				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz 
+				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) 
+			END as gruppe_bezeichnung,
+			ort_kurzbz, studiengang_kz, titel,'' as beschreibung,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit,gruppe, verband, semester
 
 			FROM (".$stundenplanViewQuery.") sp
 
@@ -175,7 +181,7 @@ class Stundenplan_model extends DB_Model
 
 		GROUP BY 
 
-			ort_kurzbz,unr, datum, stunde, lehreinheit_id, lehrfach_id,studiengang_kz,titel,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit
+			unr, datum, stunde, lehrfach, lehrform, ort_kurzbz, titel, studiengang_kz, lehrform, lehrfach, semester, verband
 
 		ORDER BY datum, stunde
 		");

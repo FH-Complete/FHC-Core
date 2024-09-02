@@ -113,7 +113,6 @@ export default {
 				this.$refs.calendarModal.show();
 			})
 			
-			console.log(day,"this is the day")
 			this.$emit(day[0], day[1]);
 		}
 	},
