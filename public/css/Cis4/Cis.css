@@ -192,6 +192,10 @@ html {
   padding: var(--fhc-cis-main-py) var(--fhc-cis-main-px);
 }
 
+#nav-main-sticky {
+	max-height: calc(100vh - var(--fhc-cis-header-height));
+}
+
 /* desktop */
 @media (min-width: 992px) {
   body {
@@ -235,6 +239,11 @@ html {
   #nav-main-sticky {
   	position: sticky;
   	top: var(--fhc-cis-header-height);
+	display: flex;
+	flex-direction: column;
+  }
+  #nav-main-sticky > :not(#nav-main-toggle) {
+	overflow: auto;
   }
   #nav-main-toggle {
     width: 0;
@@ -313,6 +322,9 @@ html {
   #nav-logo img {
     height: var(--fhc-cis-header-height);
     width: auto;
+  }
+  #nav-main-sticky {
+  	overflow: auto;
   }
   #nav-search {
     position: relative;
