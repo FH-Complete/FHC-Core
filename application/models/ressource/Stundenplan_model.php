@@ -142,23 +142,16 @@ class Stundenplan_model extends DB_Model
 	 */
 	public function stundenplanGruppierung($stundenplanViewQuery)
 	{
-
-		/* CASE
-				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz 
-				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) 
-			END as gruppe, */
 		$gruppierteEvents = $this->execReadOnlyQuery("
 		SELECT 
 			
-		'stundenplan' as type,
 		unr,datum, stunde,
 		CONCAT(lehrfach,'-',lehrform) as topic,
-		'' as beschreibung,
+		array_agg(DISTINCT gruppen_kurzbz) as gruppen_kurzbz,
 		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz)) as gruppe,
-		array_agg(DISTINCT gruppe_bezeichnung) as gruppe_bezeichnung,
-		array_agg(DISTINCT lektor) as lektor,  
+		array_agg(DISTINCT lektor) as lektor,
 		
-		ort_kurzbz, studiengang_kz, titel, lehrform, lehrfach, semester, verband
+		ort_kurzbz, studiengang_kz, titel, lehrfach, lehrform, lehrfach_bez
 
 		FROM
 		(
@@ -172,8 +165,8 @@ class Stundenplan_model extends DB_Model
 			CASE
 				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz 
 				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) 
-			END as gruppe_bezeichnung,
-			ort_kurzbz, studiengang_kz, titel,'' as beschreibung,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit,gruppe, verband, semester
+			END as gruppen_kurzbz,
+			ort_kurzbz, studiengang_kz, titel,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit,gruppe, verband, semester,stg_kurzbz
 
 			FROM (".$stundenplanViewQuery.") sp
 
@@ -181,7 +174,7 @@ class Stundenplan_model extends DB_Model
 
 		GROUP BY 
 
-			unr, datum, stunde, lehrfach, lehrform, ort_kurzbz, titel, studiengang_kz, lehrform, lehrfach, semester, verband
+			unr, datum, stunde, ort_kurzbz, titel, studiengang_kz, lehrform, lehrfach, lehrfach_bez
 
 		ORDER BY datum, stunde
 		");

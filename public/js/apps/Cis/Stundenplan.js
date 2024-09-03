@@ -54,10 +54,9 @@ const app = Vue.createApp({
 	<hr>
 	<fhc-calendar v-slot="{event, day}" :events="events" initial-mode="week" show-weeks>
 		<div class="d-flex flex-column align-items-center justify-content-evenly h-100">
-			<!--<span>{{JSON.stringify(event.orig,null,2)}}</span>-->
 			<span>{{event.orig.title}}</span>
+			<span v-for="lektor in event.orig.lektor">{{lektor.kurzbz}}</span>
 			<span>{{event.orig.ort_kurzbz}}</span>
-			<span>{{event.orig.lektor}}</span>
 		</div>
 	</fhc-calendar>
 	`

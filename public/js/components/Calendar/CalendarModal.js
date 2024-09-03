@@ -55,7 +55,8 @@ export default {
   template: /*html*/ `
   <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     <template v-slot:title>
-      {{data.title + ' - ' + data.lehrfach_bez + ' [' + data.ort_kurzbz+']' }}  
+    	<template v-if="data.titel">{{ data.titel + ' - ' + data.lehrfach_bez + ' [' + data.ort_kurzbz+']'}}</template>
+		<template v-else>{{ data.lehrfach_bez + ' [' + data.ort_kurzbz+']'}}</template>
     </template>
     <template v-slot:default>
         <div class="row">
@@ -72,7 +73,7 @@ export default {
         </div>
         <div class="row">
         <div class="offset-3 col-4"><span>Lektor:</span></div>
-        <div class=" col"><span>{{data.lektor}}</span></div>
+        <div class=" col"><span>{{data.lektor.map(lektor=>lektor.kurzbz).join("/")}}</span></div>
         </div>
         <div class="row">
         <div class="offset-3 col-4"><span>Zeitraum:</span></div>
