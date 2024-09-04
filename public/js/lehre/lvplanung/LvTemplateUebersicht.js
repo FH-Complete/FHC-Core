@@ -16,14 +16,7 @@ export default {
 			table: null,
 			studiensemester: [],
 			selectedStudiensemester: '',
-			cbDataTreeStartExpanded: false,	// checkbox expand dataTree or not
-			cbGroupStartOpen: true,	// checkbox group organisationseinheit start open
-		}
-	},
-	watch: {
-		cbGroupStartOpen(newVal){
-			this.table.setGroupStartOpen(newVal);
-			this.table.setData();
+			cbDataTreeStartExpanded: false	// checkbox expand dataTree or not
 		}
 	},
 	computed: {
@@ -43,9 +36,6 @@ export default {
 				dataTree: true,
 				dataTreeStartExpanded: self.cbDataTreeStartExpanded,
 				dataTreeChildIndent: 15, //indent child rows by 15 px
-				groupBy: ["lv_oe_bezeichnung"],
-				groupToggleElement:"header", //toggle group on click anywhere in the group header
-				groupStartOpen: self.cbGroupStartOpen,
 				persistence:{
 					filter: false, //persist filter sorting
 				},
@@ -53,8 +43,9 @@ export default {
 					{title: 'LV-ID', field: 'lehrveranstaltung_id', headerFilter: true, visible: false},
 					{title: 'LV Kurzbz', field: 'kurzbz', headerFilter: true, visible:false, width: 70},
 					{title: 'STG Kurzbz', field: 'stg_typ_kurzbz', headerFilter: true, visible:true, width: 80},
+					{title: 'OrgEinheit', field: 'lv_oe_bezeichnung', headerFilter: true, visible: false, width: 250},
 					{title: 'Lehrtyp Kurzbz', field: 'lehrtyp_kurzbz', headerFilter: true, visible:false, width: 70},
-					{title: 'Studiengangtyp', field: 'stg_typ_bezeichnung', headerFilter: true, width: 250},
+					{title: 'Studiengangtyp', field: 'stg_typ_bezeichnung', headerFilter: true, width: 150},
 					{title: 'OrgForm', field: 'orgform_kurzbz', headerFilter: true, width: 70},
 					{title: 'Semester', field: 'semester', headerFilter: true, width: 50},
 					{title: 'Lehrveranstaltung', field: 'lv_bezeichnung', headerFilter: true, minWidth: 250},
@@ -241,13 +232,6 @@ export default {
 				:tabulator-events="[{event: 'tableBuilt', handler: onTableBuilt}]">
 				<template v-slot:actions>
 					<a type="button" class="btn btn-primary" :href="urlToAdminAllTemplates" target="_blank"><i class="fa fa-external-link me-2"></i>{{ $p.t('lehre/lvTemplatesVerwalten') }}</a>
-					<div class="form-check form-check-inline ms-3">
-						<input
-							class="form-check-input"
-							type="checkbox"
-							v-model="cbGroupStartOpen">
-						<label class="form-check-label">KF {{ $p.t('global/aufgeklappt') }}</label>
-					</div>
 					<div class="form-check form-check-inline">
 						<input
 							class="form-check-input"
