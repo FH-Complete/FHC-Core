@@ -28,9 +28,10 @@ class Stundenplan extends FHCAPI_Controller
 	{
 	
 		parent::__construct([
-			'roomInformation' => self::PERM_LOGGED,
+			'getRoomplan' => self::PERM_LOGGED,
             'Stunden' => self::PERM_LOGGED,
-            'Reservierungen' => self::PERM_LOGGED
+            'Reservierungen' => self::PERM_LOGGED,
+			'getStundenplan' => self::PERM_LOGGED,
 		]);
 
         $this->load->library('LogLib');
@@ -69,7 +70,7 @@ class Stundenplan extends FHCAPI_Controller
      * @access public
      * 
      */
-	public function roomInformation()
+	public function getRoomplan()
 	{
        
         $this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
@@ -88,12 +89,28 @@ class Stundenplan extends FHCAPI_Controller
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
 
-		$result = $this->StundenplanModel->stundenPlanGruppierung($this->StundenplanModel->getRoomQuery($ort_kurzbz, $start_date, $end_date));  
+		$result = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getRoomQuery($ort_kurzbz, $start_date, $end_date));  
 		
         $result = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($result);
 		
+	}
+
+	public function getStundenplan(){
+		
+		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+
+		/* $result = $this->StundenplanModel->loadForUid(get_uid());
+
+		if (isError($result))
+			return $this->outputJsonError(getError($result));
+ 		*/
+		$res = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(get_uid())); 
+		
+		$res = getData($res);
+		
+		$this->outputJsonSuccess($res);
 	}
 
 	// reservierungen is not used in the prototype for the students
@@ -125,7 +142,7 @@ class Stundenplan extends FHCAPI_Controller
 		$result = $this->ReservierungModel->getRoomReservierungen($ort_kurzbz, $start_date, $end_date);
 
         $result = $this->getDataOrTerminateWithError($result);
-        
+        $this->terminateWithSuccess($result);
         // loop over the days
         $day_events = $this->filterEventsIntoAssociativeDateArray($result, $start_date, $end_date);
         $final_reservierungen = array();
@@ -173,7 +190,6 @@ class Stundenplan extends FHCAPI_Controller
                         $grouped_uids[]= $entry->uid;
                     }
 
-                    // grouping the 
                     
                 }
 

@@ -145,18 +145,17 @@ class Stundenplan_model extends DB_Model
 		$gruppierteEvents = $this->execReadOnlyQuery("
 		SELECT 
 			
-		unr,datum, stunde,
+		unr,datum, sp.stunde,
 		CONCAT(lehrfach,'-',lehrform) as topic,
-		array_agg(DISTINCT gruppen_kurzbz) as gruppen_kurzbz,
-		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz)) as gruppe,
+		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
 		array_agg(DISTINCT lektor) as lektor,
 		
-		ort_kurzbz, studiengang_kz, titel, lehrfach, lehrform, lehrfach_bez
+		ort_kurzbz, titel, lehrfach, lehrform, lehrfach_bez, beginn, ende
 
 		FROM
 		(
 			SELECT
- 			unr,datum, stunde,
+ 			unr,datum, sp.stunde,beginn, ende,
 			
 			CASE
 				WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
@@ -165,30 +164,84 @@ class Stundenplan_model extends DB_Model
 			CASE
 				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz 
 				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) 
-			END as gruppen_kurzbz,
+			END as gruppen_kuerzel,
 			ort_kurzbz, studiengang_kz, titel,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit,gruppe, verband, semester,stg_kurzbz
 
 			FROM (".$stundenplanViewQuery.") sp
+			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = sp.stunde
 
 		) as sp
 
 		GROUP BY 
 
-			unr, datum, stunde, ort_kurzbz, titel, studiengang_kz, lehrform, lehrfach, lehrfach_bez
+			unr, datum, sp.stunde, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, beginn, ende
 
-		ORDER BY datum, stunde
+		ORDER BY datum, sp.stunde
 		");
 
-		return $gruppierteEvents;
+		if(isError($gruppierteEvents)){
+			$this->output(getError($gruppierteEvents));
+		}
+		
+		$gruppierteEvents = getData($gruppierteEvents) ?? [];
+
+		// get the benutzer object for the lektor of the lv	
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		
+		foreach ($gruppierteEvents as $item) {
+			$lektor_obj_array = array();
+			$gruppe_obj_array = array();
+			
+			// load lektor object
+			foreach ($item->lektor as $lv_lektor) {
+				$this->MitarbeiterModel->addLimit(1);
+				$lektor_object = $this->execReadOnlyQuery("
+				SELECT mitarbeiter_uid, vorname, nachname, kurzbz 
+				FROM public.tbl_mitarbeiter 
+				JOIN public.tbl_benutzer benutzer ON benutzer.uid = mitarbeiter_uid
+				JOIN public.tbl_person person ON person.person_id = benutzer.person_id 
+				WHERE kurzbz = ?",[$lv_lektor]);
+				if (isError($lektor_object)) {
+					$this->show_error(getError($lektor_object));
+				}
+				$lektor_object = current(getData($lektor_object));
+				// only provide needed information of the mitarbeiter object 
+				$lektor_obj_array[] = $lektor_object;
+			}
+
+			// load gruppe object
+			foreach ($item->gruppe as $lv_gruppe) {
+				$lv_gruppe = strtr($lv_gruppe, ['(' => '', ')' => '', '"' => '']);
+				$lv_gruppe_array = explode(",", $lv_gruppe);
+				list($gruppe, $verband, $semester, $studiengang_kz, $gruppen_kuerzel) = $lv_gruppe_array;
+				
+				$lv_gruppe_object = new stdClass();
+				$lv_gruppe_object->gruppe = $gruppe;
+				$lv_gruppe_object->verband = $verband;
+				$lv_gruppe_object->semester = $semester;
+				$lv_gruppe_object->studiengang_kz = $studiengang_kz;
+				$lv_gruppe_object->kuerzel = $gruppen_kuerzel;
+				
+				$gruppe_obj_array[] = $lv_gruppe_object;
+			}
+
+			$item->lektor = $lektor_obj_array;
+			$item->gruppe = $gruppe_obj_array;
+		}
+
+		return success($gruppierteEvents);
 	}
 
 	/**
 	 * NO STANDALONE FUNCTION - Generates a SQL query string to fetch 'stundenplan' events for a specific student within the current semester.
-	 * @param string $uid the user id that is used to fetch the stundenplan rows from the lehre.vw_studenplan table
+	 * @param string $uid the user id that is used to fetch the stundenplan rows from the lehre.vw_stundenplan table
 	 * 
 	 * @return string
 	 */
-	public function getStudenPlanQuery($uid){
+	public function getStundenPlanQuery($uid){
 			return 
 			"select sp.*
 			from lehre.vw_stundenplan sp

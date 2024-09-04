@@ -22,20 +22,46 @@ class Reservierung_model extends DB_Model
 	{
 
 		$raum_reservierungen= $this->execReadOnlyQuery("
-		SELECT res.*, mit.kurzbz as person_kurzbz , 
-		CASE
-			WHEN res.verband IS NOT NULL OR res.semester IS NOT NULL THEN
-				CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',res.verband,res.semester) 
-			ELSE
-				CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz)) 
-		END AS stg
-		FROM lehre.vw_reservierung res
-		JOIN public.tbl_mitarbeiter mit ON mit.mitarbeiter_uid=res.uid
-		JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
-		WHERE res.ort_kurzbz = ? AND datum >= ? AND datum <= ? 
+		SELECT ort_kurzbz, studiengang_kz, array_agg(uid) as lektor, stunde, datum, titel, beschreibung, gruppe, gruppe_kurzbz, stg_kurzbz, stg 
+		FROM 
+		(
+			SELECT res.* , 
+			CASE
+				WHEN res.verband IS NOT NULL OR res.semester IS NOT NULL THEN
+					CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',res.verband,res.semester) 
+				ELSE
+					CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz)) 
+			END AS stg
+			FROM lehre.vw_reservierung res
+			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
+			WHERE res.ort_kurzbz = ? AND datum >= ? AND datum <= ?
+		) AS reservierungen
+		GROUP BY ort_kurzbz, studiengang_kz, stunde, datum, titel, beschreibung, gruppe, stg, gruppe_kurzbz, stg_kurzbz
 		", [$ort_kurzbz, $start_date, $end_date]);
 
-		return $raum_reservierungen;
+		if(isError($raum_reservierungen)){
+			show_error(getError($raum_reservierungen));
+		}
+
+		$raum_reservierungen = getData($raum_reservierungen) ?? [];
+		
+		$this->load->model("ressrouce/Mitarbeiter_model","MitarbeiterModel");
+		foreach($raum_reservierungen as $reservierung){
+			$lektoren_array = array();
+			foreach($reservierung->lektor as $lektor){
+				$this->MitarbeiterModel->addLimit(1);
+				$lektor_obj= $this->MitarbeiterModel->load($lektor);
+				if(isError($lektor_obj)){
+					show_error(getError($lektor_obj));
+				}
+				$lektor_obj = current(getData($lektor_obj));
+				$lektoren_array[] = $lektor_obj;
+			}
+
+			$reservierung->lektor = $lektoren_array;
+			
+		}
+		return success($raum_reservierungen);
 	}
 
 	/**

@@ -17,7 +17,7 @@ export default{
 			stunden: [],
 			events: null,
             calendarWeek: new CalendarDate(new Date()),
-            events_loaded:false,
+            
         }
 	},
     computed:{
@@ -36,6 +36,7 @@ export default{
 			this.calendarWeek = new CalendarDate(data.start);
 			Vue.nextTick(() => {
 				this.loadRoomEvents();
+				//this.loadReservierungen();
 			});
 		},
 
@@ -56,9 +57,37 @@ export default{
 			});
 		},
 
-		loadRoomEvents: function(){
-			this.$fhcApi.factory.stundenplan.getRoomInfo(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay).then(res => {
-				let events;
+		loadRoomEvents: async function () {
+			await this.$fhcApi.factory.stundenplan.getRoomInfo(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay).then(res => {
+				
+				if (res.data && res.data.forEach) {
+					res.data.forEach((el, i) => {
+
+						el.id = i;
+						if (el.type === 'reservierung') {
+							el.color = '#' + (el.farbe || 'FFFFFF');
+						} else {
+							el.color = '#' + (el.farbe || 'CCCCCC');
+						}
+
+						el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
+						el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
+						el.title = el.lehrfach;
+						if (el.lehrform)
+							el.title += '-' + el.lehrform;
+					});
+					if (this.events){
+						this.events = [...this.events, ...res.data];
+					}else{
+						this.events = res.data;
+					}
+				}
+			});
+		},
+
+		
+		loadReservierungen: async function () {
+			await this.$fhcApi.factory.stundenplan.getReservierungen(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay).then(res => {
 				if (res.data && res.data.forEach) {
 					res.data.forEach((el, i) => {
 
@@ -76,33 +105,36 @@ export default{
 							el.title += '-' + el.lehrform;
 					});
 
-					this.events = res.data;
+					if (this.events) {
+						this.events = [...this.events, ...res.data];
+					} else {
+						this.events = res.data;
+					}
 				}
 			});
 		}
-        
+
     },
 	async mounted() {
 
         this.loadStunden();
 		this.loadRoomEvents();
+		this.loadReservierungen();
 
 	},
     template: /*html*/`
     <div>
 		<fhc-calendar @change:range="updateRange" v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
-           
-            <a class="text-decoration-none text-dark" href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'"   >    
+            <a class="text-decoration-none text-dark" href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'"   >
                 <div class="d-flex flex-column align-items-center justify-content-evenly h-100" >
-                    
+
                         <!-- render content for stundenplan -->
                         <span >{{event.orig.topic}}</span>
-                        <span v-for="gruppe in event.orig.gruppe.split('/')" :key="gruppe">{{gruppe}}</span>	
-                        <span v-for="lektor in event.orig.lektor.split('/')" :key="lektor">{{lektor}}</span>
-                        <!-- add the beschreibung if the event is a reservierung -->
-                        <span v-if="event.orig.type === 'reservierung'">{{event.orig.beschreibung}}</span>
+                        <span v-for="gruppe_kurzbz in event.orig.gruppen_kurzbz" >{{gruppe_kurzbz}}</span>
+                        <span v-for="lektor in event.orig.lektor" >{{lektor.kurzbz}}</span>
+                        <!-- add the beschreibung if the event is a reservierung
+                        <span v-if="event.orig.type === 'reservierung'">{{event.orig.beschreibung}}</span>-->
                         
-                    
                 </div>
             </a>
         </fhc-calendar>
