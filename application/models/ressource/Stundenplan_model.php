@@ -145,12 +145,11 @@ class Stundenplan_model extends DB_Model
 		$gruppierteEvents = $this->execReadOnlyQuery("
 		SELECT 
 			
-		unr,datum, sp.stunde,
 		CONCAT(lehrfach,'-',lehrform) as topic,
 		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
 		array_agg(DISTINCT lektor) as lektor,
 		
-		ort_kurzbz, titel, lehrfach, lehrform, lehrfach_bez, beginn, ende
+		unr,datum, sp.stunde, ort_kurzbz, titel, lehrfach, lehrform, lehrfach_bez, beginn, ende
 
 		FROM
 		(

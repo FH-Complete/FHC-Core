@@ -143,8 +143,8 @@ class Stundenplan extends FHCAPI_Controller
 
         $result = $this->getDataOrTerminateWithError($result);
         $this->terminateWithSuccess($result);
-        // loop over the days
-        $day_events = $this->filterEventsIntoAssociativeDateArray($result, $start_date, $end_date);
+        // imperative approach
+        /* $day_events = $this->filterEventsIntoAssociativeDateArray($result, $start_date, $end_date);
         $final_reservierungen = array();
         foreach($day_events as $date => $day_eventArray){
 
@@ -203,7 +203,7 @@ class Stundenplan extends FHCAPI_Controller
             }
 
         }
-        $this->terminateWithSuccess($final_reservierungen);
+        $this->terminateWithSuccess($final_reservierungen); */
 	}
 
     private function filterEventsIntoAssociativeDateArray($events, $start_date, $end_date){

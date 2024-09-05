@@ -22,21 +22,26 @@ class Reservierung_model extends DB_Model
 	{
 
 		$raum_reservierungen= $this->execReadOnlyQuery("
-		SELECT ort_kurzbz, studiengang_kz, array_agg(uid) as lektor, stunde, datum, titel, beschreibung, gruppe, gruppe_kurzbz, stg_kurzbz, stg 
+		SELECT 
+		
+		array_agg(DISTINCT uid) as lektor,
+		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
+		COALESCE(titel, beschreibung) as topic,
+		ort_kurzbz, studiengang_kz, reservierungen.stunde, datum, beginn, ende
+		
 		FROM 
 		(
-			SELECT res.* , 
+			SELECT res.*, beginn, ende,
 			CASE
-				WHEN res.verband IS NOT NULL OR res.semester IS NOT NULL THEN
-					CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',res.verband,res.semester) 
-				ELSE
-					CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz)) 
-			END AS stg
+				WHEN res.gruppe_kurzbz IS NOT NULL THEN res.gruppe_kurzbz 
+				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/')) 
+			END as gruppen_kuerzel
 			FROM lehre.vw_reservierung res
 			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
+			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = res.stunde
 			WHERE res.ort_kurzbz = ? AND datum >= ? AND datum <= ?
 		) AS reservierungen
-		GROUP BY ort_kurzbz, studiengang_kz, stunde, datum, titel, beschreibung, gruppe, stg, gruppe_kurzbz, stg_kurzbz
+		GROUP BY ort_kurzbz, studiengang_kz, reservierungen.stunde, datum, titel, beschreibung, beginn, ende
 		", [$ort_kurzbz, $start_date, $end_date]);
 
 		if(isError($raum_reservierungen)){
@@ -46,19 +51,48 @@ class Reservierung_model extends DB_Model
 		$raum_reservierungen = getData($raum_reservierungen) ?? [];
 		
 		$this->load->model("ressrouce/Mitarbeiter_model","MitarbeiterModel");
+
 		foreach($raum_reservierungen as $reservierung){
-			$lektoren_array = array();
-			foreach($reservierung->lektor as $lektor){
+
+			$lektor_obj_array = array();
+			$gruppe_obj_array = array();
+
+			// load lektor object
+			foreach ($reservierung->lektor as $lektor) {
 				$this->MitarbeiterModel->addLimit(1);
-				$lektor_obj= $this->MitarbeiterModel->load($lektor);
-				if(isError($lektor_obj)){
-					show_error(getError($lektor_obj));
+				$lektor_object = $this->execReadOnlyQuery("
+				SELECT mitarbeiter_uid, vorname, nachname, kurzbz 
+				FROM public.tbl_mitarbeiter 
+				JOIN public.tbl_benutzer benutzer ON benutzer.uid = mitarbeiter_uid
+				JOIN public.tbl_person person ON person.person_id = benutzer.person_id 
+				WHERE mitarbeiter_uid = ?", [$lektor]);
+				if (isError($lektor_object)) {
+					$this->show_error(getError($lektor_object));
 				}
-				$lektor_obj = current(getData($lektor_obj));
-				$lektoren_array[] = $lektor_obj;
+				$lektor_object = current(getData($lektor_object));
+				// only provide needed information of the mitarbeiter object 
+				$lektor_obj_array[] = $lektor_object;
 			}
 
-			$reservierung->lektor = $lektoren_array;
+			// load gruppe object
+			foreach ($reservierung->gruppe as $lv_gruppe) {
+				$lv_gruppe = strtr($lv_gruppe, ['(' => '', ')' => '', '"' => '']);
+				$lv_gruppe_array = explode(",", $lv_gruppe);
+				list($gruppe, $verband, $semester, $studiengang_kz, $gruppen_kuerzel) = $lv_gruppe_array;
+
+				$lv_gruppe_object = new stdClass();
+				$lv_gruppe_object->gruppe = $gruppe;
+				$lv_gruppe_object->verband = $verband;
+				$lv_gruppe_object->semester = $semester;
+				$lv_gruppe_object->studiengang_kz = $studiengang_kz;
+				$lv_gruppe_object->kuerzel = $gruppen_kuerzel;
+
+				$gruppe_obj_array[] = $lv_gruppe_object;
+			}
+
+
+			$reservierung->gruppe = $gruppe_obj_array;
+			$reservierung->lektor = $lektor_obj_array;
 			
 		}
 		return success($raum_reservierungen);

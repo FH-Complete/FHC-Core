@@ -100,6 +100,9 @@ export default{
 
 						el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
 						el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
+						if(el.titel){
+							
+						}
 						el.title = el.lehrfach;
 						if (el.lehrform)
 							el.title += '-' + el.lehrform;
@@ -130,7 +133,7 @@ export default{
 
                         <!-- render content for stundenplan -->
                         <span >{{event.orig.topic}}</span>
-                        <span v-for="gruppe_kurzbz in event.orig.gruppen_kurzbz" >{{gruppe_kurzbz}}</span>
+                        <span v-for="gruppe in event.orig.gruppe" >{{gruppe.kuerzel}} </span>
                         <span v-for="lektor in event.orig.lektor" >{{lektor.kurzbz}}</span>
                         <!-- add the beschreibung if the event is a reservierung
                         <span v-if="event.orig.type === 'reservierung'">{{event.orig.beschreibung}}</span>-->
