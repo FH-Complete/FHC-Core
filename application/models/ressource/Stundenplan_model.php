@@ -144,18 +144,16 @@ class Stundenplan_model extends DB_Model
 	{
 		$gruppierteEvents = $this->execReadOnlyQuery("
 		SELECT 
-			
+		unr, beginn, ende, subquery.stunde, datum,	
 		CONCAT(lehrfach,'-',lehrform) as topic,
-		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
 		array_agg(DISTINCT lektor) as lektor,
+		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
 		
-		unr,datum, sp.stunde, ort_kurzbz, titel, lehrfach, lehrform, lehrfach_bez, beginn, ende
+		ort_kurzbz, titel, lehrfach, lehrform, lehrfach_bez
 
 		FROM
 		(
-			SELECT
- 			unr,datum, sp.stunde,beginn, ende,
-			
+			SELECT unr,datum, sp.stunde,beginn, ende,
 			CASE
 				WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
 				ELSE lektor
@@ -169,13 +167,11 @@ class Stundenplan_model extends DB_Model
 			FROM (".$stundenplanViewQuery.") sp
 			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = sp.stunde
 
-		) as sp
+		) as subquery
 
-		GROUP BY 
+		GROUP BY unr, datum, subquery.stunde, beginn, ende, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez
 
-			unr, datum, sp.stunde, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, beginn, ende
-
-		ORDER BY datum, sp.stunde
+		ORDER BY datum, subquery.stunde
 		");
 
 		if(isError($gruppierteEvents)){

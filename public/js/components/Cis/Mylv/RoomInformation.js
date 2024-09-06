@@ -35,8 +35,7 @@ export default{
 		updateRange: function(data){
 			this.calendarWeek = new CalendarDate(data.start);
 			Vue.nextTick(() => {
-				this.loadRoomEvents();
-				//this.loadReservierungen();
+				this.loadEvents();
 			});
 		},
 
@@ -50,80 +49,52 @@ export default{
         },
 
 		loadStunden: async function(){
-			await this.$fhcApi.factory.stundenplan.getStunden().then(res => {
+			this.$fhcApi.factory.stundenplan.getStunden().then(res => {
 				res.data.forEach(std => {
 					this.stunden[std.stunde] = std; // TODO(chris): geht besser
 				});
 			});
 		},
 
-		loadRoomEvents: async function () {
-			await this.$fhcApi.factory.stundenplan.getRoomInfo(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay).then(res => {
-				
-				if (res.data && res.data.forEach) {
-					res.data.forEach((el, i) => {
+		loadEvents: function(){
 
-						el.id = i;
-						if (el.type === 'reservierung') {
-							el.color = '#' + (el.farbe || 'FFFFFF');
-						} else {
-							el.color = '#' + (el.farbe || 'CCCCCC');
+			// bundles the room_events and the reservierungen together into the this.events array
+			Promise.allSettled([
+				this.$fhcApi.factory.stundenplan.getRoomInfo(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay),
+				this.$fhcApi.factory.stundenplan.getReservierungen(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay)
+			]).then((result) => {
+				let events = [];
+				result.forEach((promise_result) => {
+					if(promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success"){
+						
+						let data = promise_result.value.data;
+						// adding additional information to the events 
+						if (data && data.forEach) {
+							data.forEach((el, i) => {
+
+								el.id = i;
+								if (el.type === 'reservierung') {
+									el.color = '#' + (el.farbe || 'FFFFFF');
+								} else {
+									el.color = '#' + (el.farbe || 'CCCCCC');
+								}
+
+								el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
+								el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
+								
+							});
 						}
-
-						el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-						el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
-						el.title = el.lehrfach;
-						if (el.lehrform)
-							el.title += '-' + el.lehrform;
-					});
-					if (this.events){
-						this.events = [...this.events, ...res.data];
-					}else{
-						this.events = res.data;
+						events = events.concat(data);
 					}
-				}
-			});
+				})
+				this.events = events;
+			})
 		},
-
 		
-		loadReservierungen: async function () {
-			await this.$fhcApi.factory.stundenplan.getReservierungen(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay).then(res => {
-				if (res.data && res.data.forEach) {
-					res.data.forEach((el, i) => {
-
-						el.id = i;
-						if (el.type === 'reservierung') {
-							el.color = '#' + (el.farbe || 'FFFFFF');
-						} else {
-							el.color = '#' + (el.farbe || 'CCCCCC');
-						}
-
-						el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-						el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
-						if(el.titel){
-							
-						}
-						el.title = el.lehrfach;
-						if (el.lehrform)
-							el.title += '-' + el.lehrform;
-					});
-
-					if (this.events) {
-						this.events = [...this.events, ...res.data];
-					} else {
-						this.events = res.data;
-					}
-				}
-			});
-		}
-
     },
 	async mounted() {
-
-        this.loadStunden();
-		this.loadRoomEvents();
-		this.loadReservierungen();
-
+		// the stunden data are required to display the events accordingly on the calendar
+		await this.loadStunden();
 	},
     template: /*html*/`
     <div>
