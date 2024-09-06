@@ -149,7 +149,7 @@ class Stundenplan_model extends DB_Model
 		array_agg(DISTINCT lektor) as lektor,
 		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
 		
-		ort_kurzbz, titel, lehrfach, lehrform, lehrfach_bez, farbe
+		ort_kurzbz, titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe
 
 		FROM
 		(
@@ -162,14 +162,21 @@ class Stundenplan_model extends DB_Model
 				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz 
 				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) 
 			END as gruppen_kuerzel,
+			(SELECT bezeichnung 
+			FROM public.tbl_organisationseinheit
+			WHERE oe_kurzbz IN(
+				SELECT oe_kurzbz
+				FROM lehre.tbl_lehrveranstaltung
+				WHERE lehrveranstaltung_id = sp.lehrveranstaltung_id
+			)) as organisationseinheit,
 			ort_kurzbz, studiengang_kz, titel,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit,gruppe, verband, semester,stg_kurzbz
 
 			FROM (".$stundenplanViewQuery.") sp
 			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = sp.stunde
-
+			
 		) as subquery
 
-		GROUP BY unr, datum, beginn, ende, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, farbe
+		GROUP BY unr, datum, beginn, ende, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe
 
 		ORDER BY datum, beginn
 		");
@@ -189,7 +196,7 @@ class Stundenplan_model extends DB_Model
 		foreach ($gruppierteEvents as $item) {
 			$lektor_obj_array = array();
 			$gruppe_obj_array = array();
-			
+
 			// load lektor object
 			foreach ($item->lektor as $lv_lektor) {
 				$this->MitarbeiterModel->addLimit(1);
