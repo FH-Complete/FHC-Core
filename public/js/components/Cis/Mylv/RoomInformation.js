@@ -48,14 +48,6 @@ export default{
             
         },
 
-		loadStunden: async function(){
-			this.$fhcApi.factory.stundenplan.getStunden().then(res => {
-				res.data.forEach(std => {
-					this.stunden[std.stunde] = std; // TODO(chris): geht besser
-				});
-			});
-		},
-
 		loadEvents: function(){
 
 			// bundles the room_events and the reservierungen together into the this.events array
@@ -71,7 +63,6 @@ export default{
 						// adding additional information to the events 
 						if (data && data.forEach) {
 							data.forEach((el, i) => {
-
 								el.id = i;
 								if (el.type === 'reservierung') {
 									el.color = '#' + (el.farbe || 'FFFFFF');
@@ -79,8 +70,8 @@ export default{
 									el.color = '#' + (el.farbe || 'CCCCCC');
 								}
 
-								el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-								el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
+								el.start = new Date(el.datum + ' ' + el.beginn);
+								el.end = new Date(el.datum + ' ' + el.ende);
 								
 							});
 						}
@@ -92,10 +83,6 @@ export default{
 		},
 		
     },
-	async mounted() {
-		// the stunden data are required to display the events accordingly on the calendar
-		await this.loadStunden();
-	},
     template: /*html*/`
     <div>
 		<fhc-calendar @change:range="updateRange" v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>

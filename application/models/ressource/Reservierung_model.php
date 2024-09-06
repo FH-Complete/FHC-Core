@@ -23,12 +23,12 @@ class Reservierung_model extends DB_Model
 
 		$raum_reservierungen= $this->execReadOnlyQuery("
 		SELECT 
-		'reservierung' as type, beginn, ende, subquery.stunde, datum,
+		'reservierung' as type, beginn, ende, datum,
 		COALESCE(titel, beschreibung) as topic,
 		array_agg(DISTINCT uid) as lektor,
-		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
+		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe, 
 		
-		ort_kurzbz 
+		ort_kurzbz, 'FFFFFF' as farbe
 		
 		FROM 
 		(
@@ -45,9 +45,9 @@ class Reservierung_model extends DB_Model
 
 		) AS subquery
 
-		GROUP BY datum, subquery.stunde, beginn, ende, ort_kurzbz, titel, beschreibung
+		GROUP BY datum, beginn, ende, ort_kurzbz, titel, beschreibung
 		
-		ORDER BY datum, subquery.stunde 
+		ORDER BY datum, beginn
 		", [$ort_kurzbz, $start_date, $end_date]);
 
 		if(isError($raum_reservierungen)){
