@@ -15,7 +15,7 @@
 		),
 		'customCSSs' => array(
 			'public/css/components/verticalsplit.css',
-			'public/css/components/searchbar.css',
+			'public/css/components/searchbar/searchbar.css',
 			'public/css/components/primevue.css',
 		),
 		'customJSModules' => array('public/js/apps/TestSearch.js')
