@@ -454,6 +454,71 @@ EOSC;
 	 */
 	private function _raum($searchstr, $type)
 	{
+		$dbModel = new DB_Model();
+
+		$rooms = $dbModel->execReadOnlyQuery('
+			SELECT
+				\''.$type.'\' AS type,
+				COALESCE(ort.ort_kurzbz, \'N/A\') as ort_kurzbz,
+				COALESCE(ort.gebteil, \'N/A\') as building,
+				COALESCE(ort.ausstattung, \'N/A\') as austattung,
+				COALESCE(CAST(ort.stockwerk AS VARCHAR), \'N/A\') as floor,
+				COALESCE(CAST(ort.dislozierung AS VARCHAR), \'N/A\') as room_number,
+				COALESCE(CAST(ort.content_id AS VARCHAR), \'N/A\') as content_id,
+				
+				CASE
+					WHEN standort.plz IS NULL OR standort.ort IS NULL THEN 
+						CASE
+							WHEN standort.strasse IS NULL THEN
+								CASE
+									WHEN ort.stockwerk IS NULL THEN \'N/A\'
+									ELSE CONCAT(ort.stockwerk,\' Stockwerk\')
+								END
+							ELSE 
+								CASE
+									WHEN ort.stockwerk IS NULL THEN standort.strasse
+									ELSE CONCAT(standort.strasse,\' / \',ort.stockwerk,\' Stockwerk\')
+								END
+						END
+					ELSE 
+						CASE 
+							WHEN standort.strasse IS NULL THEN
+								CASE
+									WHEN ort.stockwerk IS NULL THEN CONCAT(standort.plz,\' \',standort.ort)
+									ELSE CONCAT(standort.plz,\' \',standort.ort,\' / \',ort.stockwerk,\' Stockwerk\')
+								END
+							ELSE 
+								CASE
+									WHEN ort.stockwerk IS NULL THEN CONCAT(standort.plz,\' \',standort.ort,\' / \',standort.strasse)
+									ELSE CONCAT(standort.plz,\' \',standort.ort,\', \',standort.strasse,\' / \',ort.stockwerk,\' Stockwerk\')
+								END
+						END
+				END as standort,
+				
+				
+				CASE
+					WHEN ort.max_person IS NULL OR ort.arbeitsplaetze IS NULL THEN \'N/A\'
+					ELSE CONCAT(ort.max_person,\', davon \',ort.arbeitsplaetze,\' PC-Plätze\')
+				END as sitzplaetze
+				
+				FROM public.tbl_ort as ort
+				LEFT JOIN (
+					select ort,standort_id,strasse, plz
+					FROM public.tbl_standort
+					LEFT JOIN public.tbl_adresse USING(adresse_id)
+				) standort USING(standort_id)
+			 WHERE LOWER(ort.ort_kurzbz) like LOWER(\'%'. $searchstr . '%\') ' 
+			
+		);
+
+		// If something has been found
+		if (hasData($rooms))
+		{
+			// Returns the dataset
+			return getData($rooms);
+		}
+
+		// Otherwise return an empty array
 		return array();
 	}
 }
