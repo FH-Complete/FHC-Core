@@ -154,7 +154,8 @@ export default {
     this.modal = this.$refs.modalContainer.modal;
   },
   popup(options) {
-    return BsModal.popup.bind(this)(null, options);
+    BsModal.popup.bind(this);
+    return BsModal.popup(null, options);
   },
   template: /*html*/ `
   <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >

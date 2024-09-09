@@ -27,6 +27,8 @@ import stv from "./stv.js";
 import notiz from "./notiz.js";
 import betriebsmittel from "./betriebsmittel.js";
 import ampeln from "./ampeln.js";
+import ort from "./ort.js";
+import cms from "./cms.js";
 
 export default {
     search,
@@ -41,4 +43,6 @@ export default {
     notiz,
     betriebsmittel
     ampeln,
+    ort,
+    cms,
 };

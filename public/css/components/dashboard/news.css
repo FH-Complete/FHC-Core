@@ -1,0 +1,24 @@
+.widgets-news .card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    
+}
+
+:root{
+    --news-widget-height: 1;
+}
+
+.widgets-news .news-content > div,
+.widgets-news .news-content .row:nth-child(1),
+.widgets-news .news-content .news-list,
+.widgets-news .news-content .news-list-item,
+.widgets-news .news-content .card-body
+{
+    height: 100%;
+}
+
+.widgets-news .card-body{
+
+    /*max-height: calc(var(--news-widget-height)*var(--fhc-dg-row-height));  */
+    overflow:scroll;
+} 
