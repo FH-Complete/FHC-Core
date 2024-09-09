@@ -41,7 +41,7 @@ export default {
     bookmark,
     stv,
     notiz,
-    betriebsmittel
+    betriebsmittel,
     ampeln,
     ort,
     cms,
