@@ -27061,6 +27061,26 @@ array(
 		)
 	),
 	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwCountTermin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesend am gewählten Termin',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attending at date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'core',
 		'category' => 'global',
 		'phrase' => 'gespeichert',
