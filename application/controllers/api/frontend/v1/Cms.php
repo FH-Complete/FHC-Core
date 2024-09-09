@@ -49,6 +49,11 @@ class Cms extends FHCAPI_Controller
 
 		$this->load->library('CmsLib');
 
+		// Loads phrases system
+		$this->loadPhrases([
+			'global'
+		]);
+
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -105,6 +110,7 @@ class Cms extends FHCAPI_Controller
 	//todo: there is the method news and getNews but only one should exist
 	public function news()
 	{
+
 		// form validation
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_GET);
