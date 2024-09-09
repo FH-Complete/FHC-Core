@@ -108,14 +108,6 @@ export default {
 			this.formData.grund = event.target.value
 				? this.$p.t('studierendenantrag', event.target.value)
 				: '';
-		},
-		saveUnrulyPerson(event) {
-			this.$fhcApi.factory.unrulyperson.updatePersonUnrulyStatus(this.data.person_id, this.unrulyInternal).then(
-				(res)=> {
-					if(res?.meta?.status === "success") {
-						this.$fhcAlert.alertSuccess(this.$p.t('studierendenantrag', 'antrag_unruly_updated'))
-					}
-				})
 		}
 	},
 	created() {
@@ -182,6 +174,8 @@ export default {
 							<option value="textLong_plageat">{{$p.t('studierendenantrag', 'dropdown_plageat')}}
 							</option>					
 							<option value="textLong_MissingZgv">{{$p.t('studierendenantrag', 'dropdown_MissingZgv')}}
+							</option>	
+							<option value="textLong_unruly">{{$p.t('studierendenantrag', 'mark_person_as_unruly')}}
 							</option>						
 						</select>	
 					</div>
@@ -195,11 +189,6 @@ export default {
 						required
 						>
 					</form-input>
-				</div>
-				
-				<div class="col-6 d-flex " style="height: 40px; align-items: center;">
-					<input type="checkbox" v-model="unrulyInternal" @change=saveUnrulyPerson id="unruly" :disabled="saving" ref="unrulyCheckbox">
-					<label for="unruly" style="margin-left: 12px;" >{{ $p.t('studierendenantrag', 'mark_person_as_unruly') }}</label>
 				</div>
 				
 				<div class="col-12 text-end">

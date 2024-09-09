@@ -77,6 +77,17 @@ export default {
 					this.formData.grund
 				)
 				.then(result => {
+					console.log(this.formData.grund)
+					// TODO: replace this with actual identifier after demo porpuses
+					if(this.formData.grund === '<< PHRASE textLong_unruly>>') {
+						this.$fhcApi.factory.unrulyperson.updatePersonUnrulyStatus(this.data.person_id, true).then(
+							(res)=> {
+								if(res?.meta?.status === "success") {
+									this.$fhcAlert.alertSuccess(this.$p.t('studierendenantrag', 'antrag_unruly_updated'))
+								}
+							})
+					}
+
 					if (result.data === true)
 						document.location += "";
 
@@ -143,6 +154,9 @@ export default {
 	},
 	created() {
 		this.uuid = _uuid++;
+	},
+	mounted() {
+		console.log(this)
 	},
 	template: `
 	<div class="studierendenantrag-form-abmeldung">
