@@ -18,11 +18,6 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- * This controller operates between (interface) the JS (GUI) and the SearchBarLib (back-end)
- * Provides data to the ajax get calls about the searchbar component
- * This controller works with JSON calls on the HTTP GET and the output is always JSON
- */
 class Profil extends FHCAPI_Controller
 {
 

@@ -26,6 +26,7 @@ import bookmark from "./bookmark.js";
 import stv from "./stv.js";
 import notiz from "./notiz.js";
 import betriebsmittel from "./betriebsmittel.js";
+import ampeln from "./ampeln.js";
 
 export default {
     search,
@@ -39,4 +40,5 @@ export default {
     stv,
     notiz,
     betriebsmittel
+    ampeln,
 };
