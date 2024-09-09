@@ -113,4 +113,47 @@ class Lehreinheit_model extends DB_Model
 
 		return $this->execQuery($query, array($lehreinheit_id));
 	}
+
+	/**
+	 * Gets emails of all Studierende in a lehrveranstaltung
+	 * @param int $lehreinheit_id
+	 * @return array
+	 */
+	public function getStudentenMail($lehreinheit_id)
+	{
+		  
+		// logic used from cis_menu_lv.inc.php line 335
+		return $this->execReadOnlyQuery("
+		SELECT
+			gruppe_kurzbz,
+			CASE 
+				WHEN nomail = TRUE THEN 'nomail'
+				WHEN gruppe_kurzbz !='' THEN LOWER(gruppe_kurzbz || '@' || ?)
+				ELSE LOWER(stg_typ || stg_kurzbz || semester || TRIM(verband) || TRIM(gruppe) || '@' || ?) 
+			END AS mail
+			
+		FROM 
+		(
+			SELECT 
+				distinct vw_lehreinheit.studiensemester_kurzbz, vw_lehreinheit.stg_kurzbz, vw_lehreinheit.stg_typ, vw_lehreinheit.semester,
+				COALESCE(vw_lehreinheit.verband,'') as verband, COALESCE(vw_lehreinheit.gruppe,'') as gruppe, vw_lehreinheit.gruppe_kurzbz, tbl_gruppe.mailgrp,
+				CASE
+					WHEN mailgrp = TRUE OR mailgrp IS NULL THEN FALSE
+					ELSE TRUE
+				END as nomail
+			FROM campus.vw_lehreinheit
+			LEFT JOIN public.tbl_gruppe USING(gruppe_kurzbz)
+			WHERE 
+				vw_lehreinheit.lehrveranstaltung_id=
+				(select distinct lehrveranstaltung_id from campus.vw_lehreinheit where lehreinheit_id=?)
+				AND
+				vw_lehreinheit.studiensemester_kurzbz =
+				(select distinct studiensemester_kurzbz from campus.vw_lehreinheit where lehreinheit_id=?)
+				AND (vw_lehreinheit.gruppe_kurzbz IS NULL OR
+					(vw_lehreinheit.gruppe_kurzbz IS NOT NULL AND (SELECT COUNT(*) FROM public.tbl_benutzergruppe where gruppe_kurzbz = vw_lehreinheit.gruppe_kurzbz AND studiensemester_kurzbz = vw_lehreinheit.studiensemester_kurzbz) > 0))
+				
+		
+		) AS subquery
+		",[DOMAIN,DOMAIN,$lehreinheit_id,$lehreinheit_id ]);
+	}
 }

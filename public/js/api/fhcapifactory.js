@@ -29,6 +29,8 @@ import betriebsmittel from "./betriebsmittel.js";
 import ampeln from "./ampeln.js";
 import ort from "./ort.js";
 import cms from "./cms.js";
+import lehre from "./lehre.js";
+import addons from "./addons.js";
 
 export default {
     search,
@@ -45,4 +47,6 @@ export default {
     ampeln,
     ort,
     cms,
+    lehre,
+    addons,
 };

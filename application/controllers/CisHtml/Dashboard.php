@@ -17,6 +17,7 @@ class Dashboard extends Auth_Controller
 				'index' => 'user:r'
 			)
 		);
+
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -26,7 +27,7 @@ class Dashboard extends Auth_Controller
 	 * @return void
 	 */
 	public function index()
-	{
+	{	
 		$this->load->view('CisHtml/Dashboard.php');
 	}
 }

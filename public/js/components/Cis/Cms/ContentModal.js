@@ -1,4 +1,5 @@
 import BsModal from "../../Bootstrap/Modal";
+import RaumContent from "./Content_types/Raum_contentmittitel";
 
 
 export default {
@@ -8,6 +9,7 @@ export default {
     
     components:{
         BsModal,
+        RaumContent,
     },
     props:{
         contentID:{
@@ -36,7 +38,8 @@ export default {
             
             if(this.contentID){
                 this.$fhcApi.factory.cms.content(this.contentID).then(res =>{
-                this.content = res.data;
+                this.content = res.data.content;
+                this.type = res.data.type;
                 
                 })
             } 
@@ -44,17 +47,17 @@ export default {
     },
     mounted(){
         this.modal = this.$refs.modalContainer;
-          
+        
     },
     
     template:/*html*/`
-    <bs-modal @hideBsModal="modalHidden" @showBsModal="modalShown" ref="modalContainer" dialogClass="modal-lg">
+    <bs-modal @hideBsModal="modalHidden" dialogClass="modal-xl" @showBsModal="modalShown" ref="modalContainer" dialogClass="modal-lg">
         <template #title>
             <span v-if="ort_kurzbz">{{ort_kurzbz}}</span>
             <span v-else>Raum Informationen</span>
         </template>
         <template #default>
-            <div v-if="content" v-html="content"></div>
+            <RaumContent v-if="content" :content="content"></RaumContent>
             <div v-else>Der Content für diesen Raum konnte nicht geladen werden</div>
         </template>
         <template #footer>
