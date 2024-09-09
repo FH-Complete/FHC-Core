@@ -8,7 +8,7 @@ export default {
 		DashboardWidgetPicker
 	},
 	props: [
-		"dashboard"
+		"dashboard",
 	],
 	data: () => ({
 		sections: [],

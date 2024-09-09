@@ -1122,4 +1122,100 @@ class lehreinheit extends basis_db
 
 		return $ret;
 	}
+
+
+public function lehreinheitInfo($lvid,$angezeigtes_stsem,$lehrfach_id)
+{
+	$qry = "SELECT * FROM (SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid,
+	CASE WHEN lehrfunktion_kurzbz='LV-Leitung' THEN true ELSE false END as lvleiter
+	FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person
+	WHERE
+	tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+	tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
+	tbl_person.person_id=tbl_benutzer.person_id AND
+	lehrveranstaltung_id=".$this->db_add_param($lvid, FHC_INTEGER)." AND
+	tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND
+	tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND
+	studiensemester_kurzbz=".$this->db_add_param($angezeigtes_stsem);
+
+	if($lehrfach_id!='')
+	$qry.=" AND tbl_lehreinheit.lehrfach_id=".$this->db_add_param($lehrfach_id);
+
+	$qry.=" ORDER BY uid, lvleiter desc) as a ORDER BY lvleiter desc, nachname, vorname";
+
+	$result = $this->db_query($qry);
+	if (!$result)
+	{
+		$this->errormsg=$this->db_last_error().$qry;
+		return false;
+	}
+	$ret = array();
+
+	while($row = $this->db_fetch_object($result))
+	{
+		$ret[] = $row;
+	}
+
+	return $ret;
 }
+
+public function lehrfach_id_mitarbeiter($angezeigtes_stsem,$user,$lvid)
+{
+	$qry = "SELECT
+            distinct lehrfach_id
+            FROM
+                lehre.tbl_lehreinheit
+                JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+            WHERE
+                studiensemester_kurzbz=".$this->db_add_param($angezeigtes_stsem)."
+                AND mitarbeiter_uid=".$this->db_add_param($user)."
+                AND lehrveranstaltung_id=".$this->db_add_param($lvid, FHC_INTEGER);
+
+	
+	$result = $this->db_query($qry);
+	if (!$result)
+	{
+		$this->errormsg=$this->db_last_error().$qry;
+		return false;
+	}
+	$ret = array();
+
+	while($row = $this->db_fetch_object($result))
+	{
+		$ret[] = $row;
+	}
+
+	return $ret;
+}
+
+public function lehrfach_id_studierender($lvid,$angezeigtes_stsem,$user)
+{
+	$qry = "SELECT distinct lehrfach_id
+            FROM
+                campus.vw_student_lehrveranstaltung
+            WHERE
+                lehrveranstaltung_id=".$this->db_add_param($lvid, FHC_INTEGER)."
+                AND studiensemester_kurzbz=".$this->db_add_param($angezeigtes_stsem)."
+                AND uid=".$this->db_add_param($user);
+	
+	$result = $this->db_query($qry);
+	if (!$result)
+	{
+		$this->errormsg=$this->db_last_error().$qry;
+		return false;
+	}
+	$ret = array();
+
+	while($row = $this->db_fetch_object($result))
+	{
+		$ret[] = $row;
+	}
+
+	return $ret;
+}
+
+
+}
+
+
+

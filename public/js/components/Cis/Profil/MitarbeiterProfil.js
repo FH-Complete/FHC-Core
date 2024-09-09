@@ -240,6 +240,12 @@ export default {
     this.data.profilUpdates?.sort(this.sortProfilUpdates);
     
   },
+  mounted(){
+    // this is a test api call to test whether the addon lvevaluierung the menu point adds if the logged in user is the lector of the lehrveranstaltung
+    this.$fhcApi.factory.addons.getLvMenu(750, "WS2005").then(res =>{
+      console.log("this is the addon endpoint res",res);
+    });
+  },
 
   template: /*html*/ ` 
   <div class="container-fluid text-break fhc-form"  >

@@ -35,3 +35,14 @@
 .cursor-move {
 	cursor: move;
 }
+
+.lvUebersichtMenuPunkt:hover{
+	background-color:rgba(0, 100, 156, 0.25);
+}
+
+.underline_hover:hover{
+	color:var(--bs-primary);
+	text-decoration: underline;
+}
+
+
