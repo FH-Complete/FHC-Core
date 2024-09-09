@@ -24,7 +24,11 @@ export default {
 		inputGroup: Boolean,
 		type: String,
 		name: String,
-		containerClass: [String, Array, Object]
+		containerClass: [String, Array, Object],
+		label: String,
+		// NOTE(chris): remove these from $attrs array to prevent doubled event listeners
+		onInput: [Array, Function],
+		'onUpdate:modelValue': [Array, Function]
 	},
 	data() {
 		return {
@@ -160,12 +164,12 @@ export default {
 		},
 		modelValueCmp: {
 			get() {
-				if (this.$attrs.modelValue === undefined)
+				if (!this.$attrs.hasOwnProperty('modelValue'))
 					return this.modelValueDummy;
 				return this.$attrs.modelValue;
 			},
 			set(v) {
-				if (this.$attrs.modelValue === undefined)
+				if (!this.$attrs.hasOwnProperty('modelValue'))
 					this.modelValueDummy = v;
 				this.$emit('update:modelValue', v);
 			}
@@ -174,7 +178,7 @@ export default {
 			let uuid = this.$attrs.id;
 			if (this.lcType == 'datepicker')
 				uuid = this.$attrs.uid;
-			if (!uuid && this.$attrs.label)
+			if (!uuid && this.label)
 				uuid = 'fhc-form-input';
 			if (!uuid)
 				return undefined;
@@ -236,7 +240,7 @@ export default {
 	},
 	template: `
 	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
-		<label v-if="$attrs.label && lcType != 'radio' && lcType != 'checkbox'" :for="idCmp">{{$attrs.label}}</label>
+		<label v-if="label && lcType != 'radio' && lcType != 'checkbox'" :class="!noAutoClass && 'form-label'" :for="idCmp">{{label}}</label>
 		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
 		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)"></textarea>
 		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
@@ -269,6 +273,17 @@ export default {
 			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>
+			<template #chip="data"><slot name="chip" v-bind="data"></slot></template>
+			<template #header="data"><slot name="header" v-bind="data"></slot></template>
+			<template #footer="data"><slot name="footer" v-bind="data"></slot></template>
+			<template #option="data"><slot name="option" v-bind="data"></slot></template>
+			<template #optiongroup="data"><slot name="optiongroup" v-bind="data"></slot></template>
+			<template #content="data"><slot name="content" v-bind="data"></slot></template>
+			<template #loader="data"><slot name="loader" v-bind="data"></slot></template>
+			<template #empty="data"><slot name="empty" v-bind="data"></slot></template>
+			<template #dropdownicon="data"><slot name="dropdownicon" v-bind="data"></slot></template>
+			<template #removetokenicon="data"><slot name="removetokenicon" v-bind="data"></slot></template>
+			<template #loadingicon="data"><slot name="loadingicon" v-bind="data"></slot></template>
 		</component>
 		<component
 			v-else-if="tag == 'UploadDms'"
@@ -300,7 +315,7 @@ export default {
 			>
 			<slot></slot>
 		</component>
-		<label v-if="$attrs.label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'">{{$attrs.label}}</label>
+		<label v-if="label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'">{{label}}</label>
 		<div v-if="valid !== undefined && feedback.length && !noFeedback" :class="feedbackClass">
 			<template v-for="(msg, i) in feedback" :key="i">
 				<hr v-if="i" class="m-0">

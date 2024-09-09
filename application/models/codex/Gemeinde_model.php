@@ -20,16 +20,17 @@ class Gemeinde_model extends DB_Model
 		return $this->loadWhere(array("plz" => $plz));
 	}
 
-	public function getGemeindeByNation($nation, $zip){
-		
-		
+	public function getGemeindeByNation($nation, $zip)
+	{
 		$this->addSelect(["name"]);
 
-		if ($nation == "A") {
-			if (isset($zip) && $zip > 999 && $zip < 32000) {
-
+		if ($nation == "A") 
+		{
+			if (isset($zip) && $zip > 999 && $zip < 32000) 
+			{
 				$gemeinde_res = $this->GemeindeModel->loadWhere(['plz' => $zip]);
-				if (isError($gemeinde_res)) {
+				if (isError($gemeinde_res))
+				{
 					show_error("error while trying to query bis.tbl_gemeinde");
 				}
 				$gemeinde_res = hasData($gemeinde_res) ? getData($gemeinde_res) : null;
@@ -41,6 +42,15 @@ class Gemeinde_model extends DB_Model
 			} else {
 				echo json_encode(error("ortschaftskennziffer code was not valid"));
 			}
-		} else {}
+		}
+	}
+
+	public function checkLocation($plz, $gemeinde, $ort)
+	{
+		$this->db->where('ortschaftsname', $ort);
+		$this->db->where('name', $gemeinde);
+		$this->db->where('plz', $plz);
+
+		return (boolean)$this->db->count_all_results($this->dbTable);
 	}
 }
