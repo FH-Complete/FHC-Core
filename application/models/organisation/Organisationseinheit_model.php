@@ -202,4 +202,19 @@ class Organisationseinheit_model extends DB_Model
     	return $this->load($oe_kurzbz);
     }
 
+	/**
+	 * Get OEs by eventQuery string. Use with autocomplete event queries.
+	 * @param $eventQuery String
+	 * @return array
+	 */
+	public function getAutocompleteSuggestions($eventQuery)
+	{
+		$this->addSelect('oe_kurzbz');
+		$this->addSelect('organisationseinheittyp_kurzbz, oe_kurzbz, bezeichnung, aktiv, lehre');
+		$this->addOrder('organisationseinheittyp_kurzbz, bezeichnung');
+
+		return $this->loadWhere("
+			oe_kurzbz ILIKE '%". $this->escapeLike($eventQuery). "%'
+		");
+	}
 }

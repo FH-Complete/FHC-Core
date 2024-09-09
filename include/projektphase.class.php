@@ -190,7 +190,7 @@ class projektphase extends basis_db
 		if(!is_null($foreignkey))
 			$qry .= " and projektphase_fk is NULL";
 
-		$qry .= " ORDER BY start, projektphase_fk DESC;";
+		$qry .= " ORDER BY tbl_projektphase.start, tbl_projektphase.bezeichnung, projektphase_fk DESC;";
 
 		if($this->db_query($qry))
 		{
@@ -794,7 +794,8 @@ class projektphase extends basis_db
 			)
 		)
 		AND mitarbeiter_uid = ".$this->db_add_param($mitarbeiter_uid)."
-		AND tbl_projekt.projekt_kurzbz = ".$this->db_add_param($projekt_kurzbz);
+		AND tbl_projekt.projekt_kurzbz = ".$this->db_add_param($projekt_kurzbz). "
+		ORDER BY tbl_projektphase.start, tbl_projektphase.bezeichnung";
 
 		if($result = $this->db_query($qry))
 		{

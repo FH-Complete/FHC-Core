@@ -41,6 +41,7 @@
 			{
 				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/fontawesome.min.css');
 				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/solid.min.css');
+				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/regular.min.css'); // NOTE(chris): for favorites in stv
 				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/brands.min.css');
 			}
 

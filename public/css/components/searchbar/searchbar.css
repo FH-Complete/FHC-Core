@@ -3,12 +3,17 @@
     Author     : bambi
 */
 
+@import url(./switches.css);
+
+#search-filter{
+    border: 1px solid #ced4da;
+}
+
+
 .searchbar_settings {
     position: absolute; 
     z-index: 9999; 
-    background-color: #fff; 
-    border: 2px solid #666; 
-    padding: 1rem;
+    background-color: #343a40;
 }
 
 .searchbar_results {
@@ -93,3 +98,10 @@
 .searchbar_inline_ul li {
     list-style: none;
 }
+
+.non-selectable {
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE/Edge */
+  }

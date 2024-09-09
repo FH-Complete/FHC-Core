@@ -2,11 +2,10 @@ import StudentProfil from "../../components/Cis/Profil/StudentProfil.js";
 import MitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterProfil.js";
 import ViewStudentProfil from "../../components/Cis/Profil/StudentViewProfil.js";
 import ViewMitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterViewProfil.js";
-import fhcapifactory from "../api/fhcapifactory.js";
 import Loading from "../../components/Loader.js";
 import Phrasen from "../../plugin/Phrasen.js";
 
-Vue.$fhcapi = fhcapifactory;
+
 Vue.$collapseFormatter = function (data) {
   //data - an array of objects containing the column title and value for each cell
   var container = document.createElement("div");
@@ -317,16 +316,16 @@ const profilApp = Vue.createApp({
               ?.filter((item) => {
                 return !this.data.profilUpdates?.some((update) => {
                   return (
-                    update.status === "pending" &&
+                    update.status === this.profilUpdateStates["Pending"] &&
                     update.requested_change?.adresse_id == item.adresse_id
                   );
                 });
               })
-              .map((kontakt) => {
+              .map((adresse) => {
                 return {
                   listview: "Adresse",
                   view: "EditAdresse",
-                  data: kontakt,
+                  data: adresse,
                 };
               }),
           },
@@ -352,9 +351,10 @@ const profilApp = Vue.createApp({
     },
   },
 
-  created() {
+  async created() {
     // fetch profilUpdateStates to provide them to children components
-    Vue.$fhcapi.ProfilUpdate.getStatus()
+
+    await this.$fhcApi.factory.profilUpdate.getStatus()
       .then((response) => {
         this.profilUpdateStates = response.data;
       })
@@ -362,7 +362,7 @@ const profilApp = Vue.createApp({
         console.error(error);
       });
 
-    Vue.$fhcapi.ProfilUpdate.getTopic()
+    this.$fhcApi.factory.profilUpdate.getTopic()
       .then((response) => {
         this.profilUpdateTopic = response.data;
       })
@@ -373,7 +373,7 @@ const profilApp = Vue.createApp({
     //? uid contains the last part of the uri
     let uid = location.pathname.split("/").pop();
 
-    Vue.$fhcapi.UserData.getView(uid).then((res) => {
+    this.$fhcApi.factory.profil.getView(uid).then((res) => {
       if (!res.data) {
         this.notFoundUID = uid;
       } else {

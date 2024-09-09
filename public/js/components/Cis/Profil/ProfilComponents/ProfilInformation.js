@@ -20,11 +20,9 @@ export default {
       if (!this.data) {
         return;
       }
-      Vue.$fhcapi.UserData.sperre_foto_function(!this.FotoSperre).then(
-        (res) => {
-          this.FotoSperre = res.data.foto_sperre;
-        }
-      );
+      this.$fhcApi.factory.profil.fotoSperre(!this.FotoSperre).then(res =>{
+        this.FotoSperre = res.data.foto_sperre;
+      })
     },
   },
   computed: {

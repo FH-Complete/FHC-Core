@@ -1222,7 +1222,6 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				<td colspan="4"><SELECT name="projekt" id="projekt">
 					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
 
-			sort($projekt->result);
 			$projektfound = false;
 			foreach ($projekt->result as $row_projekt)
 			{
@@ -1976,7 +1975,6 @@ function getDataForProjectOverviewCSV($user)
 		}
 	}
 
-	sort($csvData);
 	//headers schreiben
 	$header = array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'PROJEKTPHASEN ID', 'START', 'PROJEKT ENDE');
 

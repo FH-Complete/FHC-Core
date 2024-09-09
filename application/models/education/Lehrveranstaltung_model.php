@@ -667,4 +667,10 @@ class Lehrveranstaltung_model extends DB_Model
 		return $this->execQuery($qry, $binds);
 	}
 
+    public function getStg($lehrveranstaltung_id)
+    {
+    	$this->addSelect('stg.*');
+    	$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz');
+    	return $this->load($lehrveranstaltung_id);
+    }
 }

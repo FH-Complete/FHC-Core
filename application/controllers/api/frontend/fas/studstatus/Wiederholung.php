@@ -63,7 +63,9 @@ class Wiederholung extends Auth_Controller
 
 
 		$result = $this->antraglib->getLvsForPrestudent($prestudent_id, $sem_akt);
-		$lvs = $this->getDataOrTerminateWithError($result) ?: [];
+		if (isError($result))
+			return $result;
+		$lvs = $result->retval;
 
 		$rdf_url = 'http://www.technikum-wien.at/antragnote';
 

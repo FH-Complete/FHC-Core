@@ -5139,6 +5139,7 @@ function StudentPruefungNeu()
 	document.getElementById('student-pruefung-menulist-note').value='9';
 	document.getElementById('student-pruefung-textbox-datum').value='<?php echo date('d.m.Y');?>';
 	document.getElementById('student-pruefung-textbox-anmerkung').value='';
+	StudentPruefungTypChange();
 }
 
 // ****
@@ -5188,6 +5189,17 @@ function StudentPruefungLVAChange()
 	//Lehreinheiten und Mitarbeiter DropDown Auswahl leeren
 	MADropDown.selectedIndex=-1;
 	LEDropDown.selectedIndex=-1;
+}
+
+// ****
+// * Wenn der Typ der Pruefung geaendert wird, dann wird ein Hinweistext angezeigt.
+// ****
+function StudentPruefungTypChange()
+{
+	var typ = document.getElementById('student-pruefung-menulist-typ').value;
+	var hinweisid = document.getElementById('student-pruefung-textbox-datum-hinweis');
+	if(hinweisid === null) return;
+	hinweisid.hidden = (typ != 'kommPruef' && typ != 'zusKommPruef');
 }
 
 // ****
@@ -5424,6 +5436,7 @@ function StudentPruefungAuswahl()
 	document.getElementById('student-pruefung-checkbox-neu').checked=false;
 	document.getElementById('student-pruefung-textbox-pruefung_id').value=pruefung_id;
 	document.getElementById('student-pruefung-textbox-punkte').value=punkte;
+	StudentPruefungTypChange();
 }
 
 function StudentPruefungFilterStsem()

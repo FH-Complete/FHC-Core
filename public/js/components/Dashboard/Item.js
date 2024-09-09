@@ -3,22 +3,23 @@ import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.j
 
 export default {
 	components: {
-		BsModal
+		BsModal,
 	},
 	data: () => ({
-		component: '',
+		component: "",
 		arguments: null,
 		target: false,
 		widget: null,
 		tmpConfig: {},
 		isLoading: false,
-		hasConfig: true
+		hasConfig: true,
+		sharedData: null,
 	}),
 	emits: [
 		"change",
 		"remove",
 		"dragstart",
-		"resizestart",
+		"resizestart"
 	],
 	props: [
 		"id",
@@ -28,17 +29,16 @@ export default {
 		"custom",
 		"hidden",
 		"editMode",
-		"loading"
+		"loading",
 	],
 	computed: {
 		isResizeable() {
-			if (!this.widget)
-				return false;
+			if (!this.widget) return false;
 			return this.widget.setup.width.max || this.widget.setup.height.max;
 		},
 		ready() {
-			return this.component && this.arguments !== null
-		}
+			return this.component && this.arguments !== null;
+		},
 	},
 	methods: {
 		mouseDown(e) {
@@ -46,18 +46,19 @@ export default {
 		},
 		startDrag(e) {
 			if (this.$refs.dragHandle.contains(this.target)) {
-				this.$emit('dragstart', e);
-			} else if (this.isResizeable && this.$refs.resizeHandle.contains(this.target)) {
-				if (this.isResizeable)
-					this.$emit('resizestart', e);
-				else
-					e.preventDefault();
+				this.$emit("dragstart", e);
+			} else if (
+				this.isResizeable &&
+				this.$refs.resizeHandle.contains(this.target)
+			) {
+				if (this.isResizeable) this.$emit("resizestart", e);
+				else e.preventDefault();
 			} else {
 				e.preventDefault();
 			}
 		},
 		openConfig() {
-			this.tmpConfig = {...this.arguments};
+			this.tmpConfig = { ...this.arguments };
 			this.$refs.config.show();
 		},
 		setConfig(hasConfig) {
@@ -65,39 +66,39 @@ export default {
 		},
 		changeConfig() {
 			this.isLoading = true;
-			let config = {...this.tmpConfig};
+			let config = { ...this.tmpConfig };
 			this.sendChangeConfig(config);
 		},
 		changeConfigManually() {
-			let config = {...this.arguments};
+			let config = { ...this.arguments };
 			this.sendChangeConfig(config);
 		},
 		sendChangeConfig(config) {
 			for (var k in config) {
 				if (this.widget.arguments[k] == config[k]) {
-					delete config[k];
+				delete config[k];
 				}
 			}
-			this.$emit('change', config);
-		}
+			this.$emit("change", config);
+		},
 	},
 	watch: {
 		config() {
-			this.arguments = {...this.widget.arguments, ...this.config};
-			this.tmpConfig = {...this.arguments};
+			this.arguments = { ...this.widget.arguments, ...this.config };
+			this.tmpConfig = { ...this.arguments };
 			this.$refs.config.hide();
 			this.isLoading = false;
-		}
+		},
 	},
 	async created() {
 		this.widget = await CachedWidgetLoader.loadWidget(this.id);
-		let component = (await import('../' + this.widget.setup.file)).default;
-		this.$options.components['widget' + this.widget.widget_id] = component;
-		this.component = 'widget' + this.widget.widget_id;
-		this.arguments = {...this.widget.arguments, ...this.config};
-		this.tmpConfig = {...this.arguments};
+		let component = (await import("../" + this.widget.setup.file)).default;
+		this.$options.components["widget" + this.widget.widget_id] = component;
+		this.component = "widget" + this.widget.widget_id;
+		this.arguments = { ...this.widget.arguments, ...this.config };
+		this.tmpConfig = { ...this.arguments };
 	},
-	template: `
+	template: /*html*/ `
 	<div v-if="loading">
 		<div class="d-flex justify-content-center align-items-center h-100">
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
@@ -116,7 +117,7 @@ export default {
 			</div>
 		</div>
 		<div v-if="ready" class="card-body overflow-hidden">
-			<component :is="component" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
+			<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
 		</div>
 		<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
 		<bs-modal ref="config">
@@ -124,10 +125,10 @@ export default {
 				{{ widget ? 'Config for ' + widget.setup.name : '' }}
 			</template>
 			<template v-slot:default>
-				<component v-if="ready && !isLoading" :is="component" :config="tmpConfig" @change="changeConfig" :configMode="true"></component>
+				<component v-if="ready && !isLoading" :is="component" v-model:shared-data="sharedData" :config="tmpConfig" @change="changeConfig" :configMode="true"></component>
 				<div v-else class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
 			</template>
-			<template v-slot:footer>
+			<template v-if="!widget?.setup?.hideFooter" v-slot:footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 				<button type="button" class="btn btn-primary" @click="changeConfig">Save changes</button>
 			</template>
@@ -135,5 +136,5 @@ export default {
 		<div v-if="editMode && isResizeable" class="card-footer d-flex justify-content-end p-0">
 			<span drag-action="resize" class="col-auto px-1 cursor-nw-resize"><i class="fa-solid fa-up-right-and-down-left-from-center mirror-x"></i></span>
 		</div>
-	</div>`
-}
+	</div>`,
+};

@@ -20,11 +20,29 @@ import phrasen from "./phrasen.js";
 import navigation from "./navigation.js";
 import filter from "./filter.js";
 import studstatus from "./studstatus.js";
+import profil from "./profil.js";
+import profilUpdate from "./profilUpdate.js";
+import bookmark from "./bookmark.js";
+import stv from "./stv.js";
+import notiz from "./notiz.js";
+import betriebsmittel from "./betriebsmittel.js";
+import ampeln from "./ampeln.js";
+import ort from "./ort.js";
+import cms from "./cms.js";
 
 export default {
     search,
     phrasen,
     navigation,
     filter,
-    studstatus
+    studstatus,
+    profil,
+    profilUpdate,
+    bookmark,
+    stv,
+    notiz,
+    betriebsmittel
+    ampeln,
+    ort,
+    cms,
 };

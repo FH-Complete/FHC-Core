@@ -65,7 +65,7 @@ export default {
     topic: { type: String },
   },
   created() {
-    Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(this.updateID).then(
+    this.$fhcApi.factory.profilUpdate.getProfilRequestFiles(this.updateID).then(
       (res) => {
         this.files = res.data;
       }

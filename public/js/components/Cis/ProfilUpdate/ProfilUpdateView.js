@@ -45,8 +45,11 @@ export default {
       events: [],
       profil_update_id: Number(this.id),
 
-      // tabulator options
-      profil_updates_table_options: {
+  };
+  },
+  computed:{
+    profilUpdateOptions: function(){
+      return {
         ajaxURL:
           FHC_JS_DATA_STORAGE_OBJECT.app_root +
           FHC_JS_DATA_STORAGE_OBJECT.ci_router +
@@ -128,7 +131,7 @@ export default {
                     "this is the data of the context menu action",
                     column.getData()
                   );
-                  Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column.getData())
+                  this.$fhcApi.factory.profilUpdate.acceptProfilRequest(column.getData())
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
@@ -146,7 +149,7 @@ export default {
                   "denyUpdate"
                 )}`,
                 action: (e, column) => {
-                  Vue.$fhcapi.ProfilUpdate.denyProfilRequest(column.getData())
+                  this.$fhcApi.factory.profilUpdate.denyProfilRequest(column.getData())
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
@@ -187,7 +190,7 @@ export default {
 
         columns: [
           {
-            title: Vue.computed(() => this.$p.t("profilUpdate", "UID")),
+            title: this.$p.t("profilUpdate", "UID"),
             field: "uid",
             minWidth: 200,
             resizable: true,
@@ -195,7 +198,7 @@ export default {
             //responsive:0,
           },
           {
-            title: Vue.computed(() => this.$p.t("profilUpdate", "Name")),
+            title: this.$p.t("profilUpdate", "Name"),
             field: "name",
             minWidth: 200,
             resizable: true,
@@ -203,7 +206,7 @@ export default {
             //responsive:0,
           },
           {
-            title: Vue.computed(() => this.$p.t("profilUpdate", "Topic")),
+            title: this.$p.t("profilUpdate", "Topic"),
             field: "topic",
             resizable: true,
             minWidth: 200,
@@ -211,7 +214,7 @@ export default {
             //responsive:0,
           },
           {
-            title: Vue.computed(() => this.$p.t("profilUpdate", "insertamum")),
+            title: this.$p.t("profilUpdate", "insertamum"),
             field: "insertamum",
             resizable: true,
             headerFilter: true,
@@ -219,7 +222,7 @@ export default {
             //responsive:0,
           },
           {
-            title: Vue.computed(() => this.$p.t("profilUpdate", "Status")),
+            title: this.$p.t("profilUpdate", "Status"),
             field: "status_translated",
             hozAlign: "center",
             headerFilter: true,
@@ -245,7 +248,7 @@ export default {
             //responsive:0,
           },
           {
-            title: Vue.computed(() => this.$p.t("profilUpdate", "actions")),
+            title: this.$p.t("profilUpdate", "actions"),
             headerSort: false,
             formatter: (cell, params) => {
               let STATUS_PENDING =
@@ -257,7 +260,9 @@ export default {
                 ${
                   STATUS_PENDING ?
                   `<button class="btn border-success border-2" id="acceptButton"><i class='fa fa-lg fa-circle-check text-success'></i></button>
-                  <button class="btn border-danger border-2" id="denyButton"><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>`:''
+                  <button class="btn border-danger border-2" id="denyButton"><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>`
+                  :
+                  ``
                 }
               </div>`;
 
@@ -293,12 +298,13 @@ export default {
             hozAlign: "center",
           },
         ],
-      },
-    };
+      };
+    }
+    
   },
   methods: {
     denyProfilUpdate: function (data) {
-      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(data)
+      this.$fhcApi.factory.profilUpdate.denyProfilRequest(data)
         .then((res) => {
           // block when the request was successful
         })
@@ -310,7 +316,7 @@ export default {
         });
     },
     acceptProfilUpdate: function (data) {
-      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(data)
+      this.$fhcApi.factory.profilUpdate.acceptProfilRequest(data)
         .then((res) => {
           // block when the request was successful
         })
@@ -409,7 +415,7 @@ export default {
     </div>
     <loading ref="loadingModalRef" :timeout="0"></loading>
     
-    <core-filter-cmpt v-if="profilUpdateStates && categoryLoaded" :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="events" :tabulator-options="profil_updates_table_options" tableOnly :sideMenu="false" />
+    <core-filter-cmpt v-if="profilUpdateStates && categoryLoaded" :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="events" :tabulator-options="profilUpdateOptions" tableOnly :sideMenu="false" />
 
     </div>`,
 };

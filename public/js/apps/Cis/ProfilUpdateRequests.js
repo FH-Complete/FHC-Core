@@ -1,7 +1,5 @@
-import fhcapifactory from "../api/fhcapifactory.js";
 import ProfilUpdateView from "../../components/Cis/ProfilUpdate/ProfilUpdateView.js";
 import Phrasen from "../../plugin/Phrasen.js";
-Vue.$fhcapi = fhcapifactory;
 
 const app = Vue.createApp({
   components: {
@@ -22,7 +20,7 @@ const app = Vue.createApp({
   },
   methods: {},
   created() {
-    Vue.$fhcapi.ProfilUpdate.getStatus()
+    this.$fhcApi.factory.profilUpdate.getStatus()
       .then((response) => {
         this.profilUpdateStates = response.data;
       })

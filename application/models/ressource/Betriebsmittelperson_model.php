@@ -96,4 +96,49 @@ class Betriebsmittelperson_model extends DB_Model
 
 		return $this->loadWhere($condition);
 	}
+
+	public function getBetriebsmittelData($id, $type_id)
+	{
+		switch ($type_id) {
+			case 'person_id':
+				$cond = 'bmp.person_id';
+				break;
+			case 'uid':
+				$cond = 'bmp.uid';
+				break;
+			case 'betriebsmittelperson_id':
+				$cond = 'bmp.betriebsmittelperson_id';
+				break;
+			default: 
+				return error("ID nicht gültig");
+		}
+
+		$query = "
+			SELECT 
+			    bm.nummer, bmp.person_id, bm.betriebsmitteltyp, bmp.anmerkung as anmerkung, bmp.retouram, TO_CHAR(bmp.retouram::timestamp, 'DD.MM.YYYY') AS format_retour, bmp.ausgegebenam, TO_CHAR(bmp.ausgegebenam::timestamp, 'DD.MM.YYYY') AS format_ausgabe, bm.beschreibung, bmp.uid, bmp.kaution, bm.betriebsmittel_id, bmp.betriebsmittelperson_id, bm.inventarnummer, bm.nummer2
+			FROM 
+			    wawi.tbl_betriebsmittelperson bmp
+			JOIN 
+			        wawi.tbl_betriebsmittel bm ON (bmp.betriebsmittel_id = bm.betriebsmittel_id)
+			WHERE 
+			    " . $cond . " = ? ";
+
+		return $this->execQuery($query, array($id));
+	}
+
+	/**
+	 * Perform a loadWhere on the vw_betriebsmittelperson DB View
+	 *
+	 * @param array $where
+	 *
+	 * @return stdClass
+	 */
+	public function loadViewWhere($where)
+	{
+		$table = $this->dbTable;
+		$this->dbTable = 'public.vw_betriebsmittelperson';
+		$result = $this->loadWhere($where);
+		$this->dbTable = $table;
+		return $result;
+	}
 }

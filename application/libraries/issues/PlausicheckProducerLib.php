@@ -12,8 +12,7 @@ class PlausicheckProducerLib
 
 	private $_ci; // ci instance
 	private $_extensionName; // name of extension
-	private $_app; // name of application
-	private $_konfiguration = array(); // konfigratio parameters
+	private $_konfiguration = array(); // configuration parameters
 
 	public function __construct($params = null)
 	{

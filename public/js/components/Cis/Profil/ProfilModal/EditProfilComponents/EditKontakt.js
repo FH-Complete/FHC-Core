@@ -27,6 +27,10 @@ export default {
 
   computed: {
     showZustellKontakteWarning: function () {
+	  // if the kontakt is already a zustellungskontakt when the user is editing the kontakt, then no warning is shown and the zustellung will be overwritten
+	  if (JSON.parse(this.originalValue).zustellung) {
+	    return false;
+	  } 
       // if zustellKontakteCount is not 0 and the own kontakt has the flag zustellung set to true
       if (!this.zustellKontakteCount.includes(this.data.kontakt_id)) {
         return this.data.zustellung && this.zustellKontakteCount.length;
@@ -50,14 +54,14 @@ export default {
   template:
     /*html*/
     `
-    
-    <div class="gy-3 row align-items-center justify-content-center">    
+
+    <div class="gy-3 row align-items-center justify-content-center">
 
     <!-- warning message for too many zustellungs Kontakte -->
     <div v-if="showZustellKontakteWarning" class="col-12 ">
     <div class="card bg-danger mx-2">
     <div class="card-body text-white ">
-    <span>{{$p.t('profilUpdate','zustellkontakteWarning')}}</span>
+    <span>{{$p.t('profilUpdate','zustell_kontakte_warning')}}</span>
     </div>
     </div>
     </div>

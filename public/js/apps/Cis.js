@@ -11,6 +11,11 @@ Vue.createApp({
     },
     data: function() {
         return {
+            selectedtypes:[
+                "mitarbeiter",
+                "raum",
+                "organisationunit"
+            ],
             searchbaroptions: {
                 types: [
                     "mitarbeiter",
@@ -71,6 +76,11 @@ Vue.createApp({
     methods: {
         searchfunction: function(searchsettings) {
             return Vue.$fhcapi.Search.search(searchsettings);
-        }
+        },
+        updatesearchtypes: function(newValues){
+            console.log(newValues,"this are the new values")
+           this.selectedtypes= newValues;
+            
+        },
     }
 }).mount('#cis-header');

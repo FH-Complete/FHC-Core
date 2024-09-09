@@ -7,10 +7,18 @@ export default {
         action: action, 
         actions: actions
     },
+    created(){
+      //! this should be the default action for a raum
+      /*this.actions.defaultaction = {
+        type: "link",
+        action: function(data) { 
+            return FHC_JS_DATA_STORAGE_OBJECT.app_root+'cms/content.php?content_id='+data.content_id;
+        }
+      }; */ 
+    },
     emits: [ 'actionexecuted' ],
-    template: `
+    template: /*html*/`
         <div class="searchbar_result searchbar_raum">
-        
           <div class="searchbar_grid">
             <div class="searchbar_icon">
               <action :res="this.res" :action="this.actions.defaultaction" @actionexecuted="$emit('actionexecuted')">
@@ -19,23 +27,27 @@ export default {
             </div>
             <div class="searchbar_data">
               <action :res="this.res" :action="this.actions.defaultaction" @actionexecuted="$emit('actionexecuted')">
-                <span class="fw-bold">{{ res.r }}</span>
+                <span class="fw-bold">{{ res.ort_kurzbz }}</span>
               </action>
         
               <div class="mb-3"></div>
         
               <div class="searchbar_table">
                 <div class="searchbar_tablerow">
+                  <div class="searchbar_tablecell">Standort</div>
+                  <div class="searchbar_tablecell">{{ res.standort }}</div>
+                </div>
+                <div class="searchbar_tablerow">
+                  <div class="searchbar_tablecell">Sitzplätze</div>
+                  <div class="searchbar_tablecell">{{ res.sitzplaetze }}</div>
+                </div>
+                <div class="searchbar_tablerow">
                   <div class="searchbar_tablecell">Gebäude</div>
-                  <div class="searchbar_tablecell">{{ res.g }}</div>
+                  <div class="searchbar_tablecell">{{ res.building }}</div>
                 </div>
                 <div class="searchbar_tablerow">
-                  <div class="searchbar_tablecell">Stockwerk</div>
-                  <div class="searchbar_tablecell">{{ res.s }}</div>
-                </div>
-                <div class="searchbar_tablerow">
-                  <div class="searchbar_tablecell">Raumnummer</div>
-                  <div class="searchbar_tablecell">{{ res.rn }}</div>
+                  <div class="searchbar_tablecell">Zusatz Informationen</div>
+                  <div class="searchbar_tablecell"><div v-html="res.austattung.replace('<br />','')"></div></div>
                 </div>
               </div>
         

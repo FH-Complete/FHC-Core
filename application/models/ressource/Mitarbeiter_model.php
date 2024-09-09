@@ -216,4 +216,26 @@ class Mitarbeiter_model extends DB_Model
 	
 		return success($kurzbz);
 	}
+
+	public function searchMitarbeiter($filter)
+	{
+		$filter = strtoLower($filter);
+		$qry = "
+			SELECT 
+					ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter
+			FROM 
+			    public.tbl_mitarbeiter ma 
+			JOIN 
+			    public.tbl_benutzer b on (ma.mitarbeiter_uid = b.uid)
+			JOIN 
+			    public.tbl_person p on (p.person_id = b.person_id)
+			WHERE 
+			    lower (p.nachname) LIKE '%". $this->db->escape_like_str($filter)."%'
+			OR
+				lower (p.vorname) LIKE '%". $this->db->escape_like_str($filter)."%'
+			OR
+				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'";
+
+		return $this->execQuery($qry);
+	}
 }

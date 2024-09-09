@@ -435,7 +435,7 @@ class VertragsbestandteilLib
 	    return $result;
 	}
 
-	public function endDienstverhaeltnis(Dienstverhaeltnis $dv, $enddate)
+	public function endDienstverhaeltnis(Dienstverhaeltnis $dv, $enddate, $dvendegrund_kurzbz=null, $dvendegrund_anmerkung=null)
 	{
 		if( $dv->getBis() !== null && $dv->getBis() < $enddate )
 		{
@@ -460,6 +460,14 @@ class VertragsbestandteilLib
 					$this->endVertragsbestandteil($vb, $enddate);
 				}
 
+				if( $dvendegrund_kurzbz !== null )
+				{
+				    $dv->setDvendegrund_kurzbz($dvendegrund_kurzbz);
+				}
+				if( $dvendegrund_anmerkung !== null )
+				{
+				    $dv->setDvendegrund_anmerkung($dvendegrund_anmerkung);
+				}
 				$dv->setBis($enddate);
 				$this->updateDienstverhaeltnis($dv);
 

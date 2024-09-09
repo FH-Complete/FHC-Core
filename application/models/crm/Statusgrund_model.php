@@ -27,4 +27,19 @@ class Statusgrund_model extends DB_Model
 
 		return success($status->retval);
 	}
+
+	public function getAktiveGruende()
+	{
+		$lang = '[(SELECT index FROM public.tbl_sprache WHERE sprache=' . $this->escape(getUserLanguage()) . ' LIMIT 1)]';
+
+		$this->addSelect('tbl_status_grund.*');
+		$this->addSelect('bezeichnung_mehrsprachig' . $lang . ' AS bezeichnung');
+		$this->addSelect('beschreibung' . $lang . ' AS beschreibung');
+
+		$this->addOrder('bezeichnung_mehrsprachig' . $lang);
+
+		return $this->loadWhere([
+			'aktiv' => true
+		]);
+	}
 }

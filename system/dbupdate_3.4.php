@@ -50,6 +50,7 @@ require_once('dbupdate_3.4/30181_tabelle_anrechnung_neue_attribute_fuer_begruend
 require_once('dbupdate_3.4/29529_infocenter_anpassungen.php');
 require_once('dbupdate_3.4/29835_uhstat1_erfassung_der_uhstat1_daten_ueber_das_bewerbungstool.php');
 require_once('dbupdate_3.4/33714_erhoehter_studienbeitrag_fuer_drittsaatenangehoerig.php');
+require_once('dbupdate_3.4/37107_fristenmanagement.php');
 require_once('dbupdate_3.4/33003_bis_meldung_personal.php');
 require_once('dbupdate_3.4/36275_zeitaufzeichnung_karenz.php');
 require_once('dbupdate_3.4/21620_neues_feld_zum_erfassen_des_ESI.php');
@@ -58,9 +59,12 @@ require_once('dbupdate_3.4/25999_cis4_cms.php');
 require_once('dbupdate_3.4/36530_bis_internationsalisierung_codextabelle_neuerungen.php');
 require_once('dbupdate_3.4/34543_ux_template.php');
 require_once('dbupdate_3.4/17513_Entwicklungsteam.php');
+require_once('dbupdate_3.4/41134_bookmark_dashboardWidget.php');
+require_once('dbupdate_3.4/28575_softwarebereitstellung.php');
+require_once('dbupdate_3.4/41150_oe-pfad_db_view.php');
+require_once('dbupdate_3.4/44031_stv_favorites.php');
+require_once('dbupdate_3.4/39911_tabulator_in_contentmittitel.php');
 
-
-	
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -177,7 +181,8 @@ $tabellen=array(
 	"hr.tbl_sachaufwandtyp" => array("sachaufwandtyp_kurzbz","bezeichnung","sort", "aktiv"),
 	"hr.tbl_stundensatz" => array("stundensatz_id","uid","stundensatztyp","stundensatz","oe_kurzbz","gueltig_von","gueltig_bis","insertamum","insertvon","updateamum","updatevon"),
 	"hr.tbl_stundensatztyp" => array("stundensatztyp","bezeichnung","aktiv","insertamum","insertvon","updateamum","updatevon"),
-	"hr.tbl_dienstverhaeltnis" => array("dienstverhaeltnis_id","mitarbeiter_uid","vertragsart_kurzbz","oe_kurzbz","von","bis","insertamum","insertvon","updateamum","updatevon"),
+	"hr.tbl_dienstverhaeltnis" => array("dienstverhaeltnis_id","mitarbeiter_uid","vertragsart_kurzbz","oe_kurzbz","von","bis","insertamum","insertvon","updateamum","updatevon","dvendegrund_kurzbz","dvendegrund_anmerkung"),
+	"hr.tbl_dvendegrund" => array("dvendegrund_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig", "aktiv", "sort"),
 	"hr.tbl_vertragsart" => array("vertragsart_kurzbz","bezeichnung","anmerkung","dienstverhaeltnis","vertragsart_kurzbz_parent","aktiv","sort"),
 	"hr.tbl_vertragsbestandteil" => array("vertragsbestandteil_id","dienstverhaeltnis_id","vertragsbestandteiltyp_kurzbz","von", "bis","insertamum", "insertvon","updateamum","updatevon"),
 	"hr.tbl_vertragsbestandteiltyp" => array("vertragsbestandteiltyp_kurzbz","bezeichnung","ueberlappend"),
@@ -194,6 +199,9 @@ $tabellen=array(
 	"hr.tbl_gehaltsbestandteil" => array("gehaltsbestandteil_id","dienstverhaeltnis_id","vertragsbestandteil_id","gehaltstyp_kurzbz","von","bis","anmerkung","grundbetrag","betrag_valorisiert","valorisierungssperre","insertamum", "insertvon","updateamum","updatevon","valorisierung","auszahlungen"),
 	"hr.tbl_gehaltshistorie" => array("gehaltshistorie_id", "datum","betrag","gehaltsbestandteil_id","mitarbeiter_uid"),
 	"hr.tbl_gehaltstyp" => array("gehaltstyp_kurzbz","bezeichnung","valorisierung","sort","aktiv"),
+	"hr.tbl_frist" => array("frist_id","mitarbeiter_uid","ereignis_kurzbz","bezeichnung","datum","status_kurzbz","parameter","insertvon","insertamum","updatevon","updateamum"),
+	"hr.tbl_frist_ereignis" => array("ereignis_kurzbz","bezeichnung","manuell"),
+	"hr.tbl_frist_status" => array("status_kurzbz", "bezeichnung"),
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
@@ -410,6 +418,8 @@ $tabellen=array(
 	"wawi.tbl_rechnungsbetrag"  => array("rechnungsbetrag_id","rechnung_id","mwst","betrag","bezeichnung","ext_id"),
 	"wawi.tbl_aufteilung"  => array("aufteilung_id","bestellung_id","oe_kurzbz","anteil","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_aufteilung_default"  => array("aufteilung_id","kostenstelle_id","oe_kurzbz","anteil","insertamum","insertvon","updateamum","updatevon"),
+	"dashboard.tbl_bookmark"  => array("bookmark_id","uid","url","title","tag","insertamum","insertvon","updateamum","updatevon"),
+
 );
 
 $tabs=array_keys($tabellen);
