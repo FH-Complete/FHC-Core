@@ -138,6 +138,9 @@ export default {
 		});
 
 		app.config.globalProperties.$fhcApi = {
+			getUri(url) {
+				return fhcApiAxios.getUri({url});
+			},
 			get(form, uri, params, config) {
 				[uri, params, config] = _get_config(form, uri, params, config);
 				if (params) {

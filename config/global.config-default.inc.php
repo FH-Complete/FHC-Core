@@ -333,4 +333,6 @@ define('DOCSBOX_ENABLED', false);
 // (true | false)
 define('DIENSTVERHAELTNIS_SUPPORT', false);
 
+// Falls Studstatus (Abmeldung, AbmeldungStg, Unterbrechung, Wiederholung) verwendet wird zeige Hinweistext bei Eingabe einer kommissionellen oder zusaetzlichen kommissionellen Pruefung
+define('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT', false);
 ?>
