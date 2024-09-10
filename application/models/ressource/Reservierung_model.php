@@ -18,8 +18,31 @@ class Reservierung_model extends DB_Model
 	 * 
 	 * @return stdClass
 	 */
-	public function getRoomReservierungen($ort_kurzbz, $start_date, $end_date)
+	public function getReservierungen($start_date, $end_date, $ort_kurzbz = null)
 	{
+		
+		$stundenplan_reservierungen="SELECT r.* , beginn, ende
+			FROM campus.vw_reservierung r
+			LEFT JOIN public.tbl_benutzergruppe bg ON r.gruppe_kurzbz=bg.gruppe_kurzbz AND bg.uid=?
+			LEFT JOIN public.tbl_studiensemester ss1 ON bg.studiensemester_kurzbz=ss1.studiensemester_kurzbz AND ss1.start <= r.datum AND ss1.ende >= r.datum
+			LEFT JOIN public.tbl_studentlehrverband slv ON r.studiengang_kz=slv.studiengang_kz AND slv.student_uid=? AND (slv.semester=r.semester OR r.semester IS NULL) AND (slv.verband=r.verband OR r.verband IS NULL OR r.verband='' OR r.verband='0') AND (slv.gruppe=r.gruppe OR r.gruppe IS NULL OR r.gruppe ='' OR r.gruppe ='0') AND r.gruppe_kurzbz IS NULL 
+			LEFT JOIN public.tbl_studiensemester ss2 ON slv.studiensemester_kurzbz = ss2.studiensemester_kurzbz AND ss2.start <=r.datum AND ss2.ende >= r.datum 
+			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = r.stunde
+			WHERE datum >= ? AND datum <= ? AND (ss1.studiensemester_kurzbz IS NOT NULL
+			OR ss2.studiensemester_kurzbz IS NOT NULL)";
+		
+		$raum_reservierungen = "SELECT res.*, beginn, ende,
+			CASE
+				WHEN res.gruppe_kurzbz IS NOT NULL THEN res.gruppe_kurzbz 
+				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/')) 
+			END as gruppen_kuerzel
+
+			FROM lehre.vw_reservierung res
+			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
+			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = res.stunde
+			WHERE res.ort_kurzbz = ? AND datum >= ? AND datum <= ?";
+
+			
 
 		$raum_reservierungen= $this->execReadOnlyQuery("
 		SELECT 
@@ -32,23 +55,13 @@ class Reservierung_model extends DB_Model
 		
 		FROM 
 		(
-			SELECT res.*, beginn, ende,
-			CASE
-				WHEN res.gruppe_kurzbz IS NOT NULL THEN res.gruppe_kurzbz 
-				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/')) 
-			END as gruppen_kuerzel
-
-			FROM lehre.vw_reservierung res
-			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
-			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = res.stunde
-			WHERE res.ort_kurzbz = ? AND datum >= ? AND datum <= ?
-
+			". is_null($ort_kurzbz)? $stundenplan_reservierungen:$raum_reservierungen ."
 		) AS subquery
 
 		GROUP BY datum, beginn, ende, ort_kurzbz, titel, beschreibung
 		
 		ORDER BY datum, beginn
-		", [$ort_kurzbz, $start_date, $end_date]);
+		", is_null($ort_kurzbz) ?[getAuthUID(), getAuthUID(),$start_date,$end_date]: [$ort_kurzbz, $start_date, $end_date]);
 
 		if(isError($raum_reservierungen)){
 			show_error(getError($raum_reservierungen));

@@ -53,7 +53,7 @@ export default{
 			// bundles the room_events and the reservierungen together into the this.events array
 			Promise.allSettled([
 				this.$fhcApi.factory.stundenplan.getRoomInfo(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay),
-				this.$fhcApi.factory.stundenplan.getReservierungen(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay)
+				this.$fhcApi.factory.stundenplan.getOrtReservierungen(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay)
 			]).then((result) => {
 				let events = [];
 				result.forEach((promise_result) => {

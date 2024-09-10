@@ -148,8 +148,9 @@ class Stundenplan_model extends DB_Model
 		CONCAT(lehrfach,'-',lehrform) as topic,
 		array_agg(DISTINCT lektor) as lektor,
 		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
+		string_agg(DISTINCT ort_kurzbz, '/') as ort_kurzbz,
 		
-		ort_kurzbz, titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe
+		titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe
 
 		FROM
 		(
@@ -243,7 +244,7 @@ class Stundenplan_model extends DB_Model
 	 * 
 	 * @return string
 	 */
-	public function getStundenPlanQuery($uid){
+	public function getStundenplanQuery($uid, $start_date, $end_date){
 			return 
 			"select sp.*
 			from lehre.vw_stundenplan sp
@@ -252,7 +253,9 @@ class Stundenplan_model extends DB_Model
 			left join public.tbl_studentlehrverband slv ON sp.studiengang_kz=slv.studiengang_kz and slv.student_uid=".$this->escape($uid)." and (slv.semester=sp.semester OR sp.semester IS NULL) AND (slv.verband=sp.verband OR sp.verband IS NULL OR sp.verband='' OR sp.verband='0') AND
 			(slv.gruppe=sp.gruppe OR sp.gruppe IS NULL OR sp.gruppe='' OR sp.gruppe='0') AND sp.gruppe_kurzbz IS NULL
 			left join public.tbl_studiensemester ss2 ON slv.studiensemester_kurzbz=ss2.studiensemester_kurzbz AND ss2.start<=sp.datum and ss2.ende >= sp.datum
-			WHERE ss1.studiensemester_kurzbz IS NOT NULL or ss2.studiensemester_kurzbz IS NOT NULL";
+			WHERE ss1.studiensemester_kurzbz IS NOT NULL or ss2.studiensemester_kurzbz IS NOT NULL
+			AND sp.datum >= ".$this->escape($start_date)." 
+			AND sp.datum <= ".$this->escape($end_date);
 	}
 
 	/**

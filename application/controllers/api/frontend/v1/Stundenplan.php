@@ -97,24 +97,36 @@ class Stundenplan extends FHCAPI_Controller
 		
 	}
 
+	/**
+	 * fetches stundenplan events from a UID and start/end date
+	 * @access public
+	 * 
+	 */
 	public function getStundenplan(){
+
+		// form validation
+		$this->load->library('form_validation');
+		$this->form_validation->set_data($_GET);
+		$this->form_validation->set_rules('start_date', "start_date", "required");
+		$this->form_validation->set_rules('end_date', "end_date", "required");
+		if ($this->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		// storing the get parameter in local variables
+		$start_date = $this->input->get('start_date', TRUE);
+		$end_date = $this->input->get('end_date', TRUE);
 		
 		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 
-		/* $result = $this->StundenplanModel->loadForUid(get_uid());
-
-		if (isError($result))
-			return $this->outputJsonError(getError($result));
- 		*/
-		$res = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(get_uid())); 
+		// the stundenplan query needs the uid and a start and end date
+		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(get_uid(),$start_date,$end_date)); 
+		$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data);
 		
-		$res = getData($res);
-		
-		$this->outputJsonSuccess($res);
+		$this->terminateWithSuccess($stundenplan_data);
 	}
 
-	// reservierungen is not used in the prototype for the students
-    public function Reservierungen()
+	// gets the reservierungen of a room if the ort_kurzbz parameter is supplied otherwise gets the reservierungen of the stundenplan of a student
+    public function Reservierungen($ort_kurzbz = null)
 	{
         $this->load->model('ressource/Reservierung_model', 'ReservierungModel');
         $this->load->model('ressource/Stunde_model', 'StundeModel');
@@ -123,13 +135,11 @@ class Stundenplan extends FHCAPI_Controller
 		//form validation
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_GET);
-		$this->form_validation->set_rules('ort_kurzbz',"Ort","required");
 		$this->form_validation->set_rules('start_date', "StartDate", "required");
 		$this->form_validation->set_rules('end_date', "EndDate", "required");
 		if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
 
         // storing the get parameter in local variables
-        $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
 
@@ -139,100 +149,18 @@ class Stundenplan extends FHCAPI_Controller
         $stunden = $this->getDataOrTerminateWithError($stunden);
 
 		// querying the reservierungen
-		$result = $this->ReservierungModel->getRoomReservierungen($ort_kurzbz, $start_date, $end_date);
+		if(isset($ort_kurzbz)){
+			$result = $this->ReservierungModel->getReservierungen($start_date, $end_date, $ort_kurzbz);
+		}else{
+			$result = $this->ReservierungModel->getReservierungen($start_date, $end_date);
+		}
 
         $result = $this->getDataOrTerminateWithError($result);
-        $this->terminateWithSuccess($result);
-        // imperative approach
-        /* $day_events = $this->filterEventsIntoAssociativeDateArray($result, $start_date, $end_date);
-        $final_reservierungen = array();
-        foreach($day_events as $date => $day_eventArray){
-
-            // loop over the stunden
-            foreach( $stunden as $stunde){
-                // filtering all the day reservierungen to the reservierungen that happen at the same hour of the day
-                $hour_reservierungen = array_filter($day_eventArray, function($day_entry) use ($stunde){
-                    return $day_entry->stunde == $stunde->stunde;
-                });
-
-                // if there are no reservierungen within that hour than we skip that iteration of the loop
-                if(count($hour_reservierungen) <1){
-                    continue;
-                }
-
-                $this->loglib->logInfoDB(print_r($hour_reservierungen,true),"this is the hour reservierungen");
-                
-                // grouping the reservierung information of reservervations of the same hour on the same day
-                $grouped_uids = array();
-                foreach($hour_reservierungen as $entry){
-
-                    // grouping the reservierungs participants
-
-                    $mitarbeiter_check = $this->MitarbeiterModel->isMitarbeiter($entry->uid);
-                    
-                    if(isError($mitarbeiter_check)){
-                        $this->terminateWithError(getError($mitarbeiter_check), self::ERROR_TYPE_GENERAL);
-                    }
-
-                    $mitarbeiter_check = getData($mitarbeiter_check);
-
-                    // if the uid belongs to a mitarbeiter store the mitarbeiter_kurzbz otherwise store the student uid
-                    if($mitarbeiter_check){
-                        $mitarbeiterKurzbz = $this->MitarbeiterModel->generateKurzbz($entry->uid);
-                        
-                        if(isError($mitarbeiterKurzbz)){
-                            $this->terminateWithError(getError($mitarbeiterKurzbz), self::ERROR_TYPE_GENERAL);
-                        }
-
-                        $grouped_uids[] = getData($mitarbeiterKurzbz);
-
-                    }else{
-                        $grouped_uids[]= $entry->uid;
-                    }
-
-                    
-                }
-
-                
-                // merging all the information into the first entry
-                $final_reservierung = current($hour_reservierungen);
-                
-                $final_reservierung->person_kurzbz = implode(" / ",$grouped_uids);
-
-                $final_reservierungen[] = $final_reservierung;
-            }
-
-        }
-        $this->terminateWithSuccess($final_reservierungen); */
+		$this->terminateWithSuccess($result);
+        
 	}
 
-    private function filterEventsIntoAssociativeDateArray($events, $start_date, $end_date){
-        $php_start_date = new DateTime($start_date);
-        $php_end_date = new DateTime($end_date);
-        // count is used to ensure that the loop does not iterate more than 7 times (7 days per week)
-        $count =0;
-
-        $result = array();
-
-        // loop over the days
-        while($php_start_date <= $php_end_date && $count <7){
-            
-            $date = $php_start_date->format('Y-m-d');
-
-            // filtering all the reservierungen with the date
-            $day_events = array_filter($events, function($event) use ($date){
-                // no filtering is done if the event entries do not have a datum property
-                return isset($event->datum) ? $event->datum == $date : true; 
-                
-            });
-
-            $result[$date] = $day_events;
-            ++$count;
-            $php_start_date->modify('+1 day');
-        }
-
-        return $result;
-    }
+    
 
 }
 

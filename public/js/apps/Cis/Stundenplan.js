@@ -1,53 +1,77 @@
 import FhcCalendar from "../../components/Calendar/Calendar.js";
 import Phrasen from "../../plugin/Phrasen.js";
+import CalendarDate from "../../composables/CalendarDate.js";
+
 
 const app = Vue.createApp({
-	components: {
-		FhcCalendar
-	},
 	data() {
 		return {
 			stunden: [],
-			events: null
+			events: null,
+			calendarWeek: new CalendarDate(new Date()),
+
 		}
 	},
-	created() {
-		axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Stundenplan/Stunden').then(res => {
-			res.data.retval.forEach(std => {
-				this.stunden[std.stunde] = std; // TODO(chris): geht besser
-			});
-			axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Stundenplan').then(res => {
-				let events;
-				if (res.data.retval && res.data.retval.forEach) {
-					res.data.retval.forEach((el, i) => {
-						el.id = i;
-						el.color = '#' + (el.farbe || 'CCCCCC');
-						el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-						el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
-						el.title = el.lehrfach;
-						if (el.lehrform)
-							el.title += '-' + el.lehrform;
-					});
-					events = res.data.retval;
-				}
-				// TODO(chris): do we need that
-				axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Stundenplan/Reservierungen').then(res => {
-					if (res.data.retval && res.data.retval.forEach) {
-						res.data.retval.forEach((el, i) => {
-							el.id = i + events.length;
-							el.color = '#CCCCCC';
-							el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-							el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
-							el.title = el.lehrfach;
-							if (el.lehrform)
-								el.title += '-' + el.lehrform;
-						});
-						events = [...events, ...res.data.retval];
+	components: {
+		FhcCalendar
+	},
+	computed:{
+		weekFirstDay: function () {
+			return this.calendarDateToString(this.calendarWeek.cdFirstDayOfWeek);
+		},
+		weekLastDay: function () {
+			return this.calendarDateToString(this.calendarWeek.cdLastDayOfWeek);
+		},
+	},
+	methods:{
+
+		calendarDateToString: function (calendarDate) {
+
+			return calendarDate instanceof CalendarDate ?
+				[calendarDate.y, calendarDate.m + 1, calendarDate.d].join('-') :
+				null;
+
+		},
+
+		loadEvents: function(){
+			console.log("this are the days with which i am testing", this.weekFirstDay, this.weekLastDay)
+			Promise.allSettled([
+				this.$fhcApi.factory.stundenplan.getStundenplan(this.weekFirstDay, this.weekLastDay),
+				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.weekFirstDay, this.weekLastDay)
+			]).then((result) => {
+				let promise_events = [];
+				result.forEach((promise_result) => {
+					if (promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success") {
+
+						let data = promise_result.value.data;
+						// adding additional information to the events 
+						if (data && data.forEach) {
+
+							data.forEach((el, i) => {
+								el.id = i;
+								if (el.type === 'reservierung') {
+									el.color = '#' + (el.farbe || 'FFFFFF');
+								} else {
+									el.color = '#' + (el.farbe || 'CCCCCC');
+								}
+
+								el.start = new Date(el.datum + ' ' + el.beginn);
+								el.end = new Date(el.datum + ' ' + el.ende);
+
+							});
+						}
+						promise_events = promise_events.concat(data);
 					}
-					this.events = events;
-				});
+				})
+				this.events = promise_events;
 			});
-		});
+		},
+	},
+	created() {
+		this.loadEvents();
+			
+			
+		
 	},
 	template:/*html*/`
 	<h2>Stundenplan</h2>
