@@ -37,9 +37,6 @@ export default {
 			return this.$p.t('studierendenantrag/info_' + this.antragType + '_' + this.status);
 		}
 	},
-	mounted() {
-		console.log(this)
-	},
 	template: `
 	<div class="studierendenantrag-antrag card">
 		<div class="card-header">

@@ -79,6 +79,16 @@ export default {
 					this.formData.grund
 				)
 				.then(result => {
+
+					if(this.unrulyInternal) {
+						this.$fhcApi.factory.unrulyperson.updatePersonUnrulyStatus(this.data.person_id, true).then(
+							(res)=> {
+								if(res?.meta?.status === "success") {
+									this.$fhcAlert.alertSuccess(this.$p.t('studierendenantrag', 'antrag_unruly_updated'))
+								}
+							})
+					}
+
 					if (result.data === true)
 						document.location += "";
 					
@@ -112,6 +122,11 @@ export default {
 	},
 	created() {
 		this.uuid = _uuid++;
+	},
+	watch: {
+		'formData.grund'(newVal) {
+			this.unrulyInternal = (newVal === this.$p.t('studierendenantrag', 'mark_person_as_unruly'))
+		}
 	},
 	template: `
 	<div class="studierendenantrag-form-abmeldung">

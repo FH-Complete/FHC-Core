@@ -25,7 +25,7 @@ class UnrulyPerson extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'updatePersonUnrulyStatus' => 'basis/mitarbeiter:rw'
+			'updatePersonUnrulyStatus' => array('basis/mitarbeiter:rw', 'student/antragfreigabe:rw', 'student/anrechnung:rw' , 'student/studierendenantrag:rw')
 		]);
 
 		$this->_ci =& get_instance();
