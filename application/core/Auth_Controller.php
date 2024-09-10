@@ -89,6 +89,22 @@ abstract class Auth_Controller extends FHC_Controller
 	}
 
 	/**
+	 * Checks for Permissions depending on the Studiengang of a Prestudent
+	 * and exits/outputs an error if they are not met.
+	 *
+	 * @param integer 				$prestudent_id
+	 * @param array 				$permStud	Perms if the person is a Student
+	 *
+	 * @return void
+	 */
+	protected function checkPermissionsForPrestudent($prestudent_id, $permStud)
+	{
+		if (!$this->hasPermissionsForPrestudent($prestudent_id, $permStud)) {
+			$this->_outputAuthError([$this->router->method => $permStud]);
+		}
+	}
+
+	/**
 	 * Checks for Permissions depending if the given person is a
 	 * Mitarbeiter and/or Student
 	 * and returns the result.
@@ -97,11 +113,11 @@ abstract class Auth_Controller extends FHC_Controller
 	 * @param array 				$permMa		Perms if the person is a Mitarbeiter
 	 * @param array 				$permStud	Perms if the person is a Student
 	 *
-	 * @return boolean
+	 * @return integer				0 if permission is granted
 	 */
 	protected function hasPermissionsForPerson($person_id, $permMa, $permStud)
 	{
-		$res = 0;
+		$res = 3;
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->PersonModel->addJoin('public.tbl_benutzer', 'person_id');
 		$this->PersonModel->addJoin('public.tbl_mitarbeiter', 'uid = mitarbeiter_uid');
@@ -127,6 +143,30 @@ abstract class Auth_Controller extends FHC_Controller
 			$res += 2;
 		}
 		return $res;
+	}
+
+	/**
+	 * Checks for Permissions depending on the Studiengang of a Prestudent
+	 * and returns the result.
+	 *
+	 * @param integer 				$prestudent_id
+	 * @param array 				$permStud	Perms if the person is a Student
+	 *
+	 * @return boolean
+	 */
+	protected function hasPermissionsForPrestudent($prestudent_id, $permStud)
+	{
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$result = $this->PrestudentModel->load($prestudent_id);
+		if (!hasData($result))
+			show_404();
+		$stg = current(getData($result))->studiengang_kz;
+		foreach ($permStud as $k => $v) {
+			$perm = $this->permissionlib->convertAccessType($v);
+			if ($this->permissionlib->isBerechtigt($perm[0], $perm[1], $stg))
+				return true;
+		}
+		return false;
 	}
 
 	/**
