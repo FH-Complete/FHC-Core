@@ -149,11 +149,9 @@ class Stundenplan extends FHCAPI_Controller
         $stunden = $this->getDataOrTerminateWithError($stunden);
 
 		// querying the reservierungen
-		if(isset($ort_kurzbz)){
-			$result = $this->ReservierungModel->getReservierungen($start_date, $end_date, $ort_kurzbz);
-		}else{
-			$result = $this->ReservierungModel->getReservierungen($start_date, $end_date);
-		}
+		
+		$result = $this->ReservierungModel->getReservierungen($start_date, $end_date, $ort_kurzbz);
+		
 
         $result = $this->getDataOrTerminateWithError($result);
 		$this->terminateWithSuccess($result);

@@ -34,7 +34,6 @@ const app = Vue.createApp({
 		},
 
 		loadEvents: function(){
-			console.log("this are the days with which i am testing", this.weekFirstDay, this.weekLastDay)
 			Promise.allSettled([
 				this.$fhcApi.factory.stundenplan.getStundenplan(this.weekFirstDay, this.weekLastDay),
 				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.weekFirstDay, this.weekLastDay)
