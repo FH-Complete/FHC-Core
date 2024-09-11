@@ -16,7 +16,7 @@ class Stundenplan extends Auth_Controller
 		parent::__construct([
 			'index' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
 			'Reservierungen' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'Stunden' => ['student/anrechnung_beantragen:r','user:r'] // TODO(chris): permissions?
+			'Stunden' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
 		]);
 	}
 
@@ -29,12 +29,16 @@ class Stundenplan extends Auth_Controller
 	{
 		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 
-		$result = $this->StundenplanModel->loadForUid(get_uid());
+		/* $result = $this->StundenplanModel->loadForUid(get_uid());
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
-
-		$this->outputJsonSuccess(getData($result));
+ 		*/
+		$res = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(get_uid())); 
+		
+		$res = getData($res);
+		
+		$this->outputJsonSuccess($res);
 	}
 
 	/**
@@ -64,5 +68,6 @@ class Stundenplan extends Auth_Controller
 
 		$this->outputJsonSuccess(getData($result));
 	}
+
 
 }

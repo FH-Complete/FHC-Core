@@ -8,10 +8,8 @@ $includesArray = array(
 $this->load->view('templates/CISHTML-Header', $includesArray);
 ?>
 
-<div >
-	<h2>Stundenplan</h2>
-	<hr>
-	<div id="content"></div>
+<div id="content">
+	
 </div>
 
 <?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>
