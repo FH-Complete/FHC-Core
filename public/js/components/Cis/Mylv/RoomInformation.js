@@ -87,7 +87,7 @@ export default{
     <div>
 		<fhc-calendar @change:range="updateRange" v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
             <a class="text-decoration-none text-dark" href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'"   >
-                <div class="d-flex flex-column align-items-center justify-content-evenly h-100" >
+                <div type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100" >
 
                         <!-- render content for stundenplan -->
                         <span >{{event.orig.topic}}</span>

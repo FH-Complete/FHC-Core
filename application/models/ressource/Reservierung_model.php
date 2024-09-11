@@ -41,7 +41,7 @@ class Reservierung_model extends DB_Model
 				WHEN res.gruppe_kurzbz IS NOT NULL THEN res.gruppe_kurzbz 
 				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/')) 
 			END as gruppen_kuerzel
-			FROM lehre.vw_reservierung res
+			FROM campus.vw_reservierung res
 			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
 			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = res.stunde
 			WHERE res.ort_kurzbz = ? AND datum >= ? AND datum <= ?";
@@ -52,7 +52,7 @@ class Reservierung_model extends DB_Model
 		SELECT 
 		'reservierung' as type, beginn, ende, datum,
 		COALESCE(titel, beschreibung) as topic,
-		array_agg(DISTINCT uid) as lektor,
+		array_agg(DISTINCT mitarbeiter_kurzbz) as lektor,
 		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe, 
 		
 		ort_kurzbz, 'FFFFFF' as farbe

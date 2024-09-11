@@ -76,8 +76,8 @@ const app = Vue.createApp({
 	<h2>Stundenplan</h2>
 	<hr>
 	<fhc-calendar v-slot="{event, day}" :events="events" initial-mode="week" show-weeks>
-		<div class="d-flex flex-column align-items-center justify-content-evenly h-100">
-			<span>{{event.orig.title}}</span>
+		<div type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100">
+			<span>{{event.orig.topic}}</span>
 			<span v-for="lektor in event.orig.lektor">{{lektor.kurzbz}}</span>
 			<span>{{event.orig.ort_kurzbz}}</span>
 		</div>
