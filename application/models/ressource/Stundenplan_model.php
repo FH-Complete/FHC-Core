@@ -142,7 +142,7 @@ class Stundenplan_model extends DB_Model
 	 */
 	public function stundenplanGruppierung($stundenplanViewQuery)
 	{
-		$gruppierteEvents = $this->execReadOnlyQuery("
+		$query_result = $this->execReadOnlyQuery("
 		SELECT 
 		'lehreinheit' as type, beginn, ende, datum,	
 		CONCAT(lehrfach,'-',lehrform) as topic,
@@ -182,60 +182,7 @@ class Stundenplan_model extends DB_Model
 		ORDER BY datum, beginn
 		");
 
-		if(isError($gruppierteEvents)){
-			$this->output(getError($gruppierteEvents));
-		}
-		
-		$gruppierteEvents = getData($gruppierteEvents) ?? [];
-
-		// get the benutzer object for the lektor of the lv	
-		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
-		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-		$this->load->model('person/Benutzer_model', 'BenutzerModel');
-		
-		foreach ($gruppierteEvents as $item) {
-			$lektor_obj_array = array();
-			$gruppe_obj_array = array();
-
-			// load lektor object
-			foreach ($item->lektor as $lv_lektor) {
-				$this->MitarbeiterModel->addLimit(1);
-				$lektor_object = $this->execReadOnlyQuery("
-				SELECT mitarbeiter_uid, vorname, nachname, kurzbz 
-				FROM public.tbl_mitarbeiter 
-				JOIN public.tbl_benutzer benutzer ON benutzer.uid = mitarbeiter_uid
-				JOIN public.tbl_person person ON person.person_id = benutzer.person_id 
-				WHERE kurzbz = ?",[$lv_lektor]);
-				if (isError($lektor_object)) {
-					$this->show_error(getError($lektor_object));
-				}
-				$lektor_object = current(getData($lektor_object));
-				// only provide needed information of the mitarbeiter object 
-				$lektor_obj_array[] = $lektor_object;
-			}
-
-			// load gruppe object
-			foreach ($item->gruppe as $lv_gruppe) {
-				$lv_gruppe = strtr($lv_gruppe, ['(' => '', ')' => '', '"' => '']);
-				$lv_gruppe_array = explode(",", $lv_gruppe);
-				list($gruppe, $verband, $semester, $studiengang_kz, $gruppen_kuerzel) = $lv_gruppe_array;
-				
-				$lv_gruppe_object = new stdClass();
-				$lv_gruppe_object->gruppe = $gruppe;
-				$lv_gruppe_object->verband = $verband;
-				$lv_gruppe_object->semester = $semester;
-				$lv_gruppe_object->studiengang_kz = $studiengang_kz;
-				$lv_gruppe_object->kuerzel = $gruppen_kuerzel;
-				
-				$gruppe_obj_array[] = $lv_gruppe_object;
-			}
-
-			$item->lektor = $lektor_obj_array;
-			$item->gruppe = $gruppe_obj_array;
-		}
-
-		return success($gruppierteEvents);
+		return $query_result;
 	}
 
 	/**

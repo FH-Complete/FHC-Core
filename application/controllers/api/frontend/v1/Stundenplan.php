@@ -104,6 +104,12 @@ class Stundenplan extends FHCAPI_Controller
 	 */
 	public function getStundenplan(){
 
+		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+
 		// form validation
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_GET);
@@ -116,11 +122,51 @@ class Stundenplan extends FHCAPI_Controller
 		$start_date = $this->input->get('start_date', TRUE);
 		$end_date = $this->input->get('end_date', TRUE);
 		
-		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
-
 		// the stundenplan query needs the uid and a start and end date
 		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(get_uid(),$start_date,$end_date)); 
-		$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data);
+		$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data) ?? [];
+
+		// get the benutzer object for the lektor of the lv	
+		foreach ($stundenplan_data as $item) {
+			$lektor_obj_array = array();
+			$gruppe_obj_array = array();
+
+			// load lektor object
+			foreach ($item->lektor as $lv_lektor) {
+				$this->StundenplanModel->addLimit(1);
+				$lektor_object = $this->StundenplanModel->execReadOnlyQuery("
+				SELECT mitarbeiter_uid, vorname, nachname, kurzbz 
+				FROM public.tbl_mitarbeiter 
+				JOIN public.tbl_benutzer benutzer ON benutzer.uid = mitarbeiter_uid
+				JOIN public.tbl_person person ON person.person_id = benutzer.person_id 
+				WHERE kurzbz = ?", [$lv_lektor]);
+				if (isError($lektor_object)) {
+					$this->show_error(getError($lektor_object));
+				}
+				$lektor_object = current(getData($lektor_object));
+				// only provide needed information of the mitarbeiter object 
+				$lektor_obj_array[] = $lektor_object;
+			}
+
+			// load gruppe object
+			foreach ($item->gruppe as $lv_gruppe) {
+				$lv_gruppe = strtr($lv_gruppe, ['(' => '', ')' => '', '"' => '']);
+				$lv_gruppe_array = explode(",", $lv_gruppe);
+				list($gruppe, $verband, $semester, $studiengang_kz, $gruppen_kuerzel) = $lv_gruppe_array;
+
+				$lv_gruppe_object = new stdClass();
+				$lv_gruppe_object->gruppe = $gruppe;
+				$lv_gruppe_object->verband = $verband;
+				$lv_gruppe_object->semester = $semester;
+				$lv_gruppe_object->studiengang_kz = $studiengang_kz;
+				$lv_gruppe_object->kuerzel = $gruppen_kuerzel;
+
+				$gruppe_obj_array[] = $lv_gruppe_object;
+			}
+
+			$item->lektor = $lektor_obj_array;
+			$item->gruppe = $gruppe_obj_array;
+		}
 		
 		$this->terminateWithSuccess($stundenplan_data);
 	}
@@ -129,8 +175,7 @@ class Stundenplan extends FHCAPI_Controller
     public function Reservierungen($ort_kurzbz = null)
 	{
         $this->load->model('ressource/Reservierung_model', 'ReservierungModel');
-        $this->load->model('ressource/Stunde_model', 'StundeModel');
-        $this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
 		//form validation
 		$this->load->library('form_validation');
@@ -143,18 +188,56 @@ class Stundenplan extends FHCAPI_Controller
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
 
-        // querying the stunden
-        $stunden = $this->StundeModel->load();
-
-        $stunden = $this->getDataOrTerminateWithError($stunden);
-
 		// querying the reservierungen
-		
-		$result = $this->ReservierungModel->getReservierungen($start_date, $end_date, $ort_kurzbz);
-		
+		$reservierungen = $this->ReservierungModel->getReservierungen($start_date, $end_date, $ort_kurzbz);
 
-        $result = $this->getDataOrTerminateWithError($result);
-		$this->terminateWithSuccess($result);
+        $reservierungen = $this->getDataOrTerminateWithError($reservierungen) ?? [];
+
+		foreach ($reservierungen as $reservierung) {
+
+			$lektor_obj_array = array();
+			$gruppe_obj_array = array();
+
+			// load lektor object
+			foreach ($reservierung->lektor as $lektor) {
+				$this->MitarbeiterModel->addLimit(1);
+				$lektor_object = $this->MitarbeiterModel->execReadOnlyQuery("
+				SELECT mitarbeiter_uid, vorname, nachname, kurzbz 
+				FROM public.tbl_mitarbeiter 
+				JOIN public.tbl_benutzer benutzer ON benutzer.uid = mitarbeiter_uid
+				JOIN public.tbl_person person ON person.person_id = benutzer.person_id 
+				WHERE mitarbeiter_uid = ?", [$lektor]);
+				if (isError($lektor_object)) {
+					$this->show_error(getError($lektor_object));
+				}
+				$lektor_object = current(getData($lektor_object));
+				// only provide needed information of the mitarbeiter object 
+				$lektor_obj_array[] = $lektor_object;
+			}
+
+			// load gruppe object
+			foreach ($reservierung->gruppe as $lv_gruppe) {
+				$lv_gruppe = strtr($lv_gruppe, ['(' => '', ')' => '', '"' => '']);
+				$lv_gruppe_array = explode(",", $lv_gruppe);
+				list($gruppe, $verband, $semester, $studiengang_kz, $gruppen_kuerzel) = $lv_gruppe_array;
+
+				$lv_gruppe_object = new stdClass();
+				$lv_gruppe_object->gruppe = $gruppe;
+				$lv_gruppe_object->verband = $verband;
+				$lv_gruppe_object->semester = $semester;
+				$lv_gruppe_object->studiengang_kz = $studiengang_kz;
+				$lv_gruppe_object->kuerzel = $gruppen_kuerzel;
+
+				$gruppe_obj_array[] = $lv_gruppe_object;
+			}
+
+
+			$reservierung->gruppe = $gruppe_obj_array;
+			$reservierung->lektor = $lektor_obj_array;
+
+		}
+
+		$this->terminateWithSuccess($reservierungen);
         
 	}
 

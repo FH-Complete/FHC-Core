@@ -67,58 +67,8 @@ class Reservierung_model extends DB_Model
 		ORDER BY datum, beginn
 		", is_null($ort_kurzbz) ?[getAuthUID(), getAuthUID(),$start_date,$end_date]: [$ort_kurzbz, $start_date, $end_date]);
 
-		if(isError($query_result)){
-			show_error(getError($query_result));
-		}
-
-		$query_result = getData($query_result) ?? [];
 		
-		$this->load->model("ressrouce/Mitarbeiter_model","MitarbeiterModel");
-
-		foreach($query_result as $reservierung){
-
-			$lektor_obj_array = array();
-			$gruppe_obj_array = array();
-
-			// load lektor object
-			foreach ($reservierung->lektor as $lektor) {
-				$this->MitarbeiterModel->addLimit(1);
-				$lektor_object = $this->execReadOnlyQuery("
-				SELECT mitarbeiter_uid, vorname, nachname, kurzbz 
-				FROM public.tbl_mitarbeiter 
-				JOIN public.tbl_benutzer benutzer ON benutzer.uid = mitarbeiter_uid
-				JOIN public.tbl_person person ON person.person_id = benutzer.person_id 
-				WHERE mitarbeiter_uid = ?", [$lektor]);
-				if (isError($lektor_object)) {
-					$this->show_error(getError($lektor_object));
-				}
-				$lektor_object = current(getData($lektor_object));
-				// only provide needed information of the mitarbeiter object 
-				$lektor_obj_array[] = $lektor_object;
-			}
-
-			// load gruppe object
-			foreach ($reservierung->gruppe as $lv_gruppe) {
-				$lv_gruppe = strtr($lv_gruppe, ['(' => '', ')' => '', '"' => '']);
-				$lv_gruppe_array = explode(",", $lv_gruppe);
-				list($gruppe, $verband, $semester, $studiengang_kz, $gruppen_kuerzel) = $lv_gruppe_array;
-
-				$lv_gruppe_object = new stdClass();
-				$lv_gruppe_object->gruppe = $gruppe;
-				$lv_gruppe_object->verband = $verband;
-				$lv_gruppe_object->semester = $semester;
-				$lv_gruppe_object->studiengang_kz = $studiengang_kz;
-				$lv_gruppe_object->kuerzel = $gruppen_kuerzel;
-
-				$gruppe_obj_array[] = $lv_gruppe_object;
-			}
-
-
-			$reservierung->gruppe = $gruppe_obj_array;
-			$reservierung->lektor = $lektor_obj_array;
-			
-		}
-		return success($query_result);
+		return $query_result;
 	}
 
 	/**
