@@ -98,7 +98,7 @@ export default {
     },
     methods: {
         getActionsForRoom: function(res){
-            res.roomoverview= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+            res.booklink= FHC_JS_DATA_STORAGE_OBJECT.app_root +
             FHC_JS_DATA_STORAGE_OBJECT.ci_router +
             `/CisVue/Cms/getRoomInformation/${res.ort_kurzbz}`; 
 
