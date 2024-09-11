@@ -20,12 +20,10 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class UnrulyPerson extends FHCAPI_Controller
 {
-
-	// TODO: BERECHTIGUNGEN
 	public function __construct()
 	{
 		parent::__construct([
-			'updatePersonUnrulyStatus' => array('basis/mitarbeiter:rw', 'student/antragfreigabe:rw', 'student/anrechnung:rw' , 'student/studierendenantrag:rw')
+			'updatePersonUnrulyStatus' => array('basis/mitarbeiter:rw', 'student/antragfreigabe:rw', 'student/studierendenantrag:rw')
 		]);
 
 		$this->_ci =& get_instance();
