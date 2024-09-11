@@ -130,7 +130,9 @@ class Cms extends FHCAPI_Controller
 		// collect the content of the news
 		foreach($news as $news_element){
 			$this->addMeta("content_id",$news_element->content_id);
-
+			
+			//todo: quick fix, for query builder error when fetching content
+			$this->NewsModel->resetQuery();
 			$content = $this->cmslib->getContent($news_element->content_id);
 
 			$content = $this->getDataOrTerminateWithError($content);
