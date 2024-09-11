@@ -5,7 +5,7 @@ import CalendarWeek from './Week.js';
 import CalendarWeeks from './Weeks.js';
 import CalendarMinimized from './Minimized.js';
 import CalendarDate from '../../composables/CalendarDate.js';
-
+import CalendarModal from './CalendarModal.js';
 
 // TODO(chris): week/month toggle
 
@@ -17,14 +17,15 @@ export default {
 		CalendarWeek,
 		CalendarWeeks,
 		CalendarMinimized,
+		CalendarModal
 	},
 	provide() {
 		return {
 			date: this.date,
 			focusDate: this.focusDate,
-			size: Vue.computed({ get: () => this.size, set: v => this.size = v}),
+			size: Vue.computed({ get: () => this.size, set: v => this.size = v }),
 			events: Vue.computed(() => this.eventsPerDay),
-			minimized: Vue.computed({ get: () => this.minimized, set: v => this.$emit('update:minimized',v) }),
+			minimized: Vue.computed({ get: () => this.minimized, set: v => this.$emit('update:minimized', v) }),
 			showWeeks: this.showWeeks,
 			noMonthView: this.noMonthView,
 			noWeekView: this.noWeekView,
@@ -47,7 +48,7 @@ export default {
 			default: 'month'
 		},
 		classHeader: {
-			type: [String,Object,Array],
+			type: [String, Object, Array],
 			default: ''
 		},
 		minimized: Boolean,
@@ -62,7 +63,7 @@ export default {
 	],
 	data() {
 		return {
-			currentlySelectedEvent:null,
+			currentlySelectedEvent: null,
 			header: '',
 			prevMode: null,
 			currMode: null,
@@ -73,7 +74,7 @@ export default {
 	},
 	computed: {
 		sizeClass() {
-			return 'fhc-calendar-' + ['xs','sm','md','lg'][this.size];
+			return 'fhc-calendar-' + ['xs', 'sm', 'md', 'lg'][this.size];
 		},
 		mode: {
 			get() { return this.minimized ? 'minimized' : this.currMode; },
@@ -104,13 +105,13 @@ export default {
 	},
 	methods: {
 		handleInput(day) {
-			// set the event when clicking on the lehrveranstaltung in the data 
+			// set the event when clicking on the lehrveranstaltungen in the data 
 			this.currentlySelectedEvent = day[1];
 			// showing the modal
-			Vue.nextTick(()=>{
+			Vue.nextTick(() => {
 				this.$refs.calendarModal.show();
 			})
-			
+
 			this.$emit(day[0], day[1]);
 		}
 	},
