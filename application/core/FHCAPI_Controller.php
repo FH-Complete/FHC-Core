@@ -147,6 +147,19 @@ class FHCAPI_Controller extends Auth_Controller
 	}
 
 	/**
+	 * @param string				$key
+	 * @return mixed
+	 */
+	public function getMeta($key)
+	{
+		if (!isset($this->returnObj['meta']))
+			return null;
+		if (!isset($this->returnObj['meta'][$key]))
+			return null;
+		return $this->returnObj['meta'][$key];
+	}
+
+	/**
 	 * @param string				$status
 	 * @return void
 	 */

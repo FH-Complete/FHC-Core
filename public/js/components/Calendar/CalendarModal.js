@@ -29,110 +29,13 @@ export default {
   data() {
     return {
       data:this.event,
-      topic: null,
-      profilUpdate: null,
-      editData: this.value,
-      fileID: null,
-      breadcrumb: null,
-      loading: false,
-
+    
       result: false,
       info: null,
     };
   },
-  methods: {
-    updateFileIDFunction: function (newFileID) {
-      this.fileID = newFileID;
-    },
+  
 
-    async submitProfilChange() {
-      //? check if data is valid before making a request
-      if (this.topic && this.profilUpdate) {
-        //? if profil update contains any attachment
-        if (this.fileID) {
-          const fileData = await this.uploadFiles(this.fileID);
-
-          this.fileID = fileData ? fileData : null;
-        }
-
-        //? inserts new row in public.tbl_cis_profil_update
-        //* calls the update api call if an update field is present in the data that was passed to the modal
-        const handleApiResponse = (res) => {
-          //? toggles the loading to false and closes the loading modal
-          this.loading = false;
-          this.setLoading(false);
-
-          if (res.data.error == 0) {
-            this.result = true;
-            this.hide();
-            Alert.popup(
-              "Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert."
-            );
-          } else {
-            this.result = false;
-            this.hide();
-            Alert.popup(
-              "Ein Fehler ist aufgetreten: " + JSON.stringify(res.data.retval)
-            );
-          }
-        };
-
-        //* v-show on EditProfil modal binded to this.loading
-        //? hides the EditProfil modal and shows the loading modal by calling a callback that was passed as prop from the parent component
-        this.loading = true;
-        this.setLoading(true);
-
-        this.editData.updateID
-          ? this.$fhcApi.factory.profilUpdate.updateProfilRequest(
-              this.topic,
-              this.profilUpdate,
-              this.editData.updateID,
-              this.fileID ? this.fileID[0] : null
-            )
-              .then((res) => {
-                handleApiResponse(res);
-              })
-              .catch((err) => {
-                console.error(err);
-              })
-          : this.$fhcApi.factory.profilUpdate.insertProfilRequest(
-              this.topic,
-              this.profilUpdate,
-              this.fileID ? this.fileID[0] : null
-            )
-              .then((res) => {
-                handleApiResponse(res);
-              })
-              .catch((err) => {
-                console.error(err);
-              });
-      }
-    },
-
-    uploadFiles: async function (files) {
-      if (files[0].type !== "application/x.fhc-dms+json") {
-        let formData = new FormData();
-        formData.append("files[]", files[0]);
-        const result = this.editData.updateID
-          ? //? updating old attachment by replacing
-            //* second parameter of api request insertFile checks if the file has to be replaced or not
-            await this.$fhcApi.factory.profilUpdate.insertFile(
-              formData,
-              this.editData.updateID
-            ).then((res) => {
-              return res.data?.map((file) => file.dms_id);
-            })
-          : //? fresh insert of new attachment
-            await this.$fhcApi.factory.profilUpdate.insertFile(formData).then((res) => {
-              return res.data?.map((file) => file.dms_id);
-            });
-        return result;
-      } else {
-        //? attachment hasn't been replaced
-        return false;
-      }
-    },
-  },
   computed: {
     start_time: function(){
       if(!this.data.start) return 'N/A';
@@ -143,9 +46,6 @@ export default {
       return this.data.end.getHours() + ":" + this.data.end.getMinutes();
     }
   },
-  created() {
-    console.log("this is an test")
-  },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
   },
@@ -155,7 +55,8 @@ export default {
   template: /*html*/ `
   <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     <template v-slot:title>
-      {{data.title + ' - ' + data.lehrfach_bez + ' [' + data.ort_kurzbz+']' }}  
+    	<template v-if="data.titel">{{ data.titel + ' - ' + data.lehrfach_bez + ' [' + data.ort_kurzbz+']'}}</template>
+		<template v-else>{{ data.lehrfach_bez + ' [' + data.ort_kurzbz+']'}}</template>
     </template>
     <template v-slot:default>
         <div class="row">
@@ -172,7 +73,7 @@ export default {
         </div>
         <div class="row">
         <div class="offset-3 col-4"><span>Lektor:</span></div>
-        <div class=" col"><span>{{data.lektor}}</span></div>
+        <div class=" col"><span>{{data.lektor.map(lektor=>lektor.kurzbz).join("/")}}</span></div>
         </div>
         <div class="row">
         <div class="offset-3 col-4"><span>Zeitraum:</span></div>

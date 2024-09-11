@@ -104,6 +104,13 @@ export default {
 	},
 	methods: {
 		handleInput(day) {
+			// set the event when clicking on the lehrveranstaltung in the data 
+			this.currentlySelectedEvent = day[1];
+			// showing the modal
+			Vue.nextTick(()=>{
+				this.$refs.calendarModal.show();
+			})
+			
 			this.$emit(day[0], day[1]);
 		}
 	},
@@ -137,15 +144,10 @@ export default {
 	},
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card" :class="sizeClass">
-		<component v-slot="{event}" :is="'calendar-' + mode" @update:mode="mode=$event" @change:range="$emit('change:range',$event)" @input="handleInput" >
+		<calendar-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="calendarModal"  />
+		<component v-slot="{event,day}" :is="'calendar-' + mode" @update:mode="mode=$event" @change:range="$emit('change:range',$event)" @input="handleInput" >
 			<!--Week Page layout-->
-			<slot :event="event">
-				<div class="d-flex flex-column align-items-center justify-content-evenly h-100">
-					<span>{{event.orig.title}}</span>	
-					<span>{{event.orig.ort_kurzbz}}</span>
-					<span>{{event.orig.mitarbeiter_kurzbz}}</span>
-				</div>
-			</slot>
+			<slot :event="event" :day="day"></slot>
 		</component>
 	</div>`
 }

@@ -31,7 +31,6 @@ export default {
       student: student,
       prestudent: prestudent
     },
-   
     template: /*html*/`
           <form ref="searchform" class="d-flex me-3" action="javascript:void(0);" 
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
@@ -57,7 +56,7 @@ export default {
                 <prestudent v-else-if="res.type === 'prestudent'" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
                 <employee v-else-if="res.type === 'mitarbeiter'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                 <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
-                <raum v-else-if="res.type === 'raum'" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
+                <raum v-else-if="res.type === 'raum'" :res="res" :actions="getActionsForRoom(res)" @actionexecuted="this.hideresult"></raum>
                 <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
               </template>
             </div>
@@ -98,8 +97,33 @@ export default {
         //console.log(this.$refs.settings.show,"this are the refs")
     },
     methods: {
-        
+        getActionsForRoom: function(res){
+            res.roomoverview= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+            FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+            `/CisVue/Cms/getRoomInformation/${res.ort_kurzbz}`; 
 
+            if(res.content_id !=="N/A"){
+                res.infolink= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+                FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+                `/CisVue/Cms/content/${res.content_id}`;
+            }
+
+            let child = this.searchoptions.actions.raum.childactions.filter((child)=>{
+                if(child.label =="Rauminformation" && res.content_id =="N/A"){
+                    return false;
+                }
+                return true;
+            });
+
+            let computedActions = {
+                childactions:child,
+                defaultaction:this.searchoptions.actions.raum.defaultaction
+            }
+            
+            return computedActions;
+            
+            
+        },
         updateSearchOptions: function() {
             this.searchsettings.types = [];
             for( const idx in this.selectedtypes ) {
