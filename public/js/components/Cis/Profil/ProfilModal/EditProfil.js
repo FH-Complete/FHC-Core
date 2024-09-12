@@ -57,7 +57,7 @@ export default {
     async submitProfilChange() {
 
       //? check if data is valid before making a request
-      if (this.topic && this.profilUpdate) {
+	  if (this.topic && this.profilUpdate) {
         //? if profil update contains any attachment
         if (this.fileID) {
           const fileData = await this.uploadFiles(this.fileID);

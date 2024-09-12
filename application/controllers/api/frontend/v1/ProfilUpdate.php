@@ -160,13 +160,13 @@ class ProfilUpdate extends FHCAPI_Controller
 		$res = $this->getDataOrTerminateWithError($res);
 
 		//? the user cannot delete a zustelladresse/kontakt
-		if (isset($payload->delete) && $payload->{$identifier == "kontakt_id" ? "zustellung" : "zustelladresse"}) {
+		if (isset($payload["delete"]) && $payload-[$identifier == "kontakt_id" ? "zustellung" : "zustelladresse"]) {
 			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_deleteZustellung_error'));
 		}
 
 		//? if the user tries to delete a adresse, checks whether the adresse is a heimatadresse, if so an error is raised
-		if (isset($payload->delete) && $identifier == "adresse_id") {
-			$adr = $this->AdresseModel->load($payload->$identifier);
+		if (isset($payload["delete"]) && $identifier == "adresse_id") {
+			$adr = $this->AdresseModel->load($payload[$identifier]);
 			$adr = $this->getDataOrTerminateWithError($adr)[0];
 			if ($adr->heimatadresse) {
 				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_deleteZustellung_error'));
@@ -177,12 +177,15 @@ class ProfilUpdate extends FHCAPI_Controller
 			$pending_changes = array_filter($res, function ($element) {
 				return $element->status == (self::$STATUS_PENDING ?: "Pending");
 			});
-
+			$test = array();
 			foreach ($pending_changes as $update_request) {
 				$existing_change = $update_request->requested_change;
-				
+				$this->addMeta("paylaod",$payload);
+				$this->addMeta("object style", $payload[$identifier]);
+				$this->addMeta("array style", $payload[$identifier]);
+
 				//? the user can add as many new kontakte/adressen as he likes
-				if (!isset($payload->add) && property_exists($existing_change, $identifier) && property_exists($payload, $identifier) && $existing_change->$identifier == $payload->$identifier) {
+				if (!isset($payload["add"]) && property_exists($existing_change, $identifier) && array_key_exists($identifier,$payload) && $existing_change->$identifier == $payload[$identifier]) {
 					//? the kontakt_id / adresse_id of a change has to be unique 
 					$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_changeTwice_error'));
 				}

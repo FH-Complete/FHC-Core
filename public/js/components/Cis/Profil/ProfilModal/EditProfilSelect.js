@@ -45,7 +45,7 @@ export default {
       view: null,
       data: null,
       breadcrumbItems: [],
-      topic: this.topic,
+      modal_topic: this.topic,
       properties: null,
     };
   },
@@ -53,17 +53,17 @@ export default {
   methods: {
     addItem: function () {
       this.view =
-        this.topic == this.profilUpdateTopic["Private Kontakte"]
+        this.modal_topic == this.profilUpdateTopic["Private Kontakte"]
           ? "EditKontakt"
           : "EditAdresse";
 		  
       //? updates the topic when a Kontakt or an Address should be added
-      this.topic =
-        this.topic == this.profilUpdateTopic["Private Kontakte"]
+		this.modal_topic =
+			this.modal_topic == this.profilUpdateTopic["Private Kontakte"]
           ? this.profilUpdateTopic["Add Kontakt"]
           : this.profilUpdateTopic["Add Adresse"];
-      this.$emit("update:topic", this.topic);
-      this.breadcrumbItems.push(this.topic);
+	  this.$emit("update:topic", this.modal_topic);
+	  this.breadcrumbItems.push(this.modal_topic);
       this.$emit("update:breadcrumb", this.breadcrumbItems);
 
       this.data =
@@ -108,13 +108,13 @@ export default {
     },
 
     updateOptions: function (event, item) {
-      this.properties = item;
+	  this.properties = item;
       this.data = item.data;
       this.view = item.view;
       if (item.title) {
         //? emits the selected topic to the parent component
-        this.topic = item.topic;
-        this.$emit("update:topic", this.topic);
+        this.modal_topic = item.topic;
+		this.$emit("update:topic", this.modal_topic);
 
         //? emits the new item for the breadcrumb in the parent component
         this.breadcrumbItems.push(item.title);
