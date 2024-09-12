@@ -387,6 +387,15 @@ class Person_model extends DB_Model
 		return $this->execQuery($qry, [$vorname, $nachname, $gebdatum]);
 	}
 
+	public function checkUnrulyWhere($where, $paramsArray)
+	{
+		$qry =  'SELECT *
+				FROM tbl_person p
+				WHERE '.$where.';';
+
+		return $this->execQuery($qry, $paramsArray);
+	}
+
 	public function updateUnruly($person_id, $unruly)
 	{
 		$result = $this->update($person_id, array(
