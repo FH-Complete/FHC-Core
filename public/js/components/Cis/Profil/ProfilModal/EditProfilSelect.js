@@ -94,11 +94,11 @@ export default {
       item.data.delete = true;
       this.$emit("update:profilUpdate", item.data);
       //? updates the topic when a Kontakt or an Address should be deleted
-	  this.modal_topic = this.profilUpdateTopic["Private Adressen"]
+	  
+	  this.modal_topic = this.modal_topic == this.profilUpdateTopic["Private Adressen"]
         ? this.profilUpdateTopic["Delete Adresse"]
         : this.profilUpdateTopic["Delete Kontakt"];
 	  this.$emit("update:topic", this.modal_topic);
-
       this.$emit("submit");
     },
 
