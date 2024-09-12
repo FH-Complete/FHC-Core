@@ -45,7 +45,7 @@ export default {
       view: null,
       data: null,
       breadcrumbItems: [],
-      topic: null,
+      topic: this.topic,
       properties: null,
     };
   },
@@ -56,7 +56,7 @@ export default {
         this.topic == this.profilUpdateTopic["Private Kontakte"]
           ? "EditKontakt"
           : "EditAdresse";
-
+		  
       //? updates the topic when a Kontakt or an Address should be added
       this.topic =
         this.topic == this.profilUpdateTopic["Private Kontakte"]

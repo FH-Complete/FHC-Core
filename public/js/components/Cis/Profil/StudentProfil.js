@@ -187,10 +187,10 @@ export default {
 
   
 
-  template: /*html*/ ` 
+  template: /*html*/ `
 
   <div class="container-fluid text-break fhc-form"  >
-  <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" title="$p.t('profil','profilBearbeiten')" ></edit-profil>
+  <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :title="p.t('profil','profilBearbeiten')" ></edit-profil>
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
