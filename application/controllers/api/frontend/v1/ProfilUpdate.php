@@ -160,7 +160,7 @@ class ProfilUpdate extends FHCAPI_Controller
 		$res = $this->getDataOrTerminateWithError($res);
 
 		//? the user cannot delete a zustelladresse/kontakt
-		if (isset($payload["delete"]) && $payload-[$identifier == "kontakt_id" ? "zustellung" : "zustelladresse"]) {
+		if (isset($payload["delete"]) && $payload[$identifier == "kontakt_id" ? "zustellung" : "zustelladresse"]) {
 			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_deleteZustellung_error'));
 		}
 

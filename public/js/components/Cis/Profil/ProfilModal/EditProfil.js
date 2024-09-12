@@ -104,6 +104,10 @@ export default {
               })
               .catch((err) => {
                 console.error(err);
+				this.loading = false;
+				this.setLoading(false);
+				this.result = false;
+				this.hide();
               })
           : this.$fhcApi.factory.profilUpdate.insertProfilRequest(
               this.topic,
@@ -115,6 +119,10 @@ export default {
               })
               .catch((err) => {
                 console.error(err);
+				this.loading = false;
+				this.setLoading(false);
+				this.result = false;
+				this.hide();
               });
       }
     },
