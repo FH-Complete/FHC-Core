@@ -131,7 +131,6 @@ export default {
 
   template: /*html*/ `
 <div class="gy-3 row justify-content-center align-items-center">
-
   <!-- warning message for too many zustellungs Adressen -->
   <div v-if="showZustellAdressenWarning" class="col-12 ">
     <div class="card bg-danger mx-2">

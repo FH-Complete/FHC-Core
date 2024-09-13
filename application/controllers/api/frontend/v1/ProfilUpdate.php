@@ -135,7 +135,7 @@ class ProfilUpdate extends FHCAPI_Controller
 	public function insertProfilRequest()
 	{
 
-		$payload = $this->input->post('payload',true);
+		$payload = $this->input->post('payload');
 		$topic = $this->input->post('topic',true);
 		$fileID = $this->input->post('fileID',true);
 
@@ -154,9 +154,6 @@ class ProfilUpdate extends FHCAPI_Controller
 
 		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilUpdateModel->getProfilUpdatesWhere(["uid" => $this->uid]);
-		if (isError($res)) {
-			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_loading_error'));
-		}
 		$res = $this->getDataOrTerminateWithError($res);
 
 		//? the user cannot delete a zustelladresse/kontakt
@@ -177,13 +174,8 @@ class ProfilUpdate extends FHCAPI_Controller
 			$pending_changes = array_filter($res, function ($element) {
 				return $element->status == (self::$STATUS_PENDING ?: "Pending");
 			});
-			$test = array();
 			foreach ($pending_changes as $update_request) {
 				$existing_change = $update_request->requested_change;
-				$this->addMeta("paylaod",$payload);
-				$this->addMeta("object style", $payload[$identifier]);
-				$this->addMeta("array style", $payload[$identifier]);
-
 				//? the user can add as many new kontakte/adressen as he likes
 				if (!isset($payload["add"]) && property_exists($existing_change, $identifier) && array_key_exists($identifier,$payload) && $existing_change->$identifier == $payload[$identifier]) {
 					//? the kontakt_id / adresse_id of a change has to be unique 
@@ -695,6 +687,30 @@ class ProfilUpdate extends FHCAPI_Controller
 			return true;
 		}
 		
+	}
+
+
+	private function getOE_from_student($student_uid)
+	{
+
+		//? returns the oe_einheit eines Studenten 
+		$query = "SELECT public.tbl_studiengang.oe_kurzbz
+		FROM public.tbl_student
+		JOIN public.tbl_studiengang ON tbl_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
+		WHERE public.tbl_student.student_uid = ?;";
+
+		$res = $this->StudentModel->execReadOnlyQuery($query, [$student_uid]);
+		if (!isSuccess($res)) {
+			show_error($this->p->t('profilUpdate', 'profilUpdate_loadingOE_error'));
+		}
+		$res = hasData($res) ? getData($res) : [];
+		$res = array_map(
+			function ($item) {
+				return $item->oe_kurzbz;
+			},
+			$res
+		);
+		return $res;
 	}
 
 }
