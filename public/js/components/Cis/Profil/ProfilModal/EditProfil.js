@@ -77,18 +77,13 @@ export default {
         //* calls the update api call if an update field is present in the data that was passed to the modal
         const handleApiResponse = (res) => {
           //? toggles the loading to false and closes the loading modal
-          this.loading = false;
-          this.setLoading(false);
-
           if (res.data.error) {
             this.result = false;
-            this.hide();
             Alert.popup(
               "Ein Fehler ist aufgetreten: " + JSON.stringify(res.data.retval)
             );
           } else {
             this.result = true;
-            this.hide();
             Alert.popup(
               "Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert."
             );
@@ -100,8 +95,9 @@ export default {
         this.loading = true;
         this.setLoading(true);
 
-        this.editData.updateID
-          ? this.$fhcApi.factory.profilUpdate.updateProfilRequest(
+		//? if an updateID is present, updateProfilRequest is called, else insertProfilRequest is called
+        this.editData.updateID? 
+			this.$fhcApi.factory.profilUpdate.updateProfilRequest(
               this.topic,
               this.profilUpdate,
               this.editData.updateID,
@@ -110,8 +106,14 @@ export default {
 			.then((res) => {
 			handleApiResponse(res);
 			})
-			.catch((err) => this.handleFailedError)
-			: this.$fhcApi.factory.profilUpdate.insertProfilRequest(
+			.catch((err) => this.$fhcAlert.handleSystemError)
+			.finally(()=>{
+				this.loading = false;
+				this.setLoading(false);
+				this.hide();
+			})
+			: 
+			this.$fhcApi.factory.profilUpdate.insertProfilRequest(
               this.topic,
               this.profilUpdate,
               this.fileID ? this.fileID[0] : null
@@ -119,7 +121,12 @@ export default {
 			.then((res) => {
 			handleApiResponse(res);
 			})
-			.catch((err) => this.handleFailedError);
+			.catch((err) => this.$fhcAlert.handleSystemError)
+			.finally(() => {
+				this.loading = false;
+				this.setLoading(false);
+				this.hide();
+			});
       }
     },
 
