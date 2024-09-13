@@ -68,14 +68,12 @@ export default {
           : "denyProfilRequest"
       ](this.data)
         .then((res) => {
-          this.setLoading(false);
-          this.loading = false;
           this.result = true;
         })
-        .catch((e) => {
-          Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
-        })
+		.catch((e) => this.$fhcAlert.handleSystemError)
         .finally(() => {
+		  this.setLoading(false);
+		  this.loading = false;
           this.hide();
         });
     },

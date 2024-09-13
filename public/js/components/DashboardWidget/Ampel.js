@@ -81,12 +81,7 @@ export default {
 				.then(res => {
 					this.activeAmpeln = res.data;
 				})
-				.catch(error => {
-					if (error.code === 'ECONNABORTED')
-						this.fetchNonConfirmedActiveAmpeln();
-					else
-						this.$fhcAlert.handleSystemError(error);
-				});
+				.catch(error => this.$fhcAlert.handleSystemError);
 		},
 		fetchAllActiveAmpeln() {
 			this.$fhcApi.factory
@@ -94,12 +89,7 @@ export default {
 				.then(res => {
 					this.allAmpeln = res.data;
 				})
-				.catch(error => {
-					if (error.code === 'ECONNABORTED')
-						this.fetchAllActiveAmpeln();
-					else
-						this.$fhcAlert.handleSystemError(error);
-				});
+				.catch(error => this.$fhcAlert.handleSystemError);
 
 		},
 		async confirm(ampelId) {

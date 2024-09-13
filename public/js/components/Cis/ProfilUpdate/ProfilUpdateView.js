@@ -135,9 +135,7 @@ export default {
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
-                    .catch((e) => {
-                      Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
-                    });
+					.catch((e) => this.$fhcAlert.handleSystemError);
                 },
               },
               {
@@ -153,9 +151,7 @@ export default {
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
-                    .catch((e) => {
-                      Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
-                    });
+					.catch((e) => this.$fhcAlert.handleSystemError);
                 },
               },
               {
@@ -308,9 +304,7 @@ export default {
         .then((res) => {
           // block when the request was successful
         })
-        .catch((e) => {
-          Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
-        })
+		.catch((e) => this.$fhcAlert.handleSystemError)
         .finally(() => {
           this.$refs.UpdatesTable.tabulator.setData();
         });
@@ -320,9 +314,7 @@ export default {
         .then((res) => {
           // block when the request was successful
         })
-        .catch((e) => {
-          Alert.popup(Vue.h("div", { innerHTML: e.response.data }));
-        })
+		.catch((e) => this.$fhcAlert.handleSystemError)
         .finally(() => {
           // update the data inside the table
           this.$refs.UpdatesTable.tabulator.setData();
