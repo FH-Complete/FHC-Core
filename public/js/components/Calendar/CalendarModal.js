@@ -29,13 +29,11 @@ export default {
   data() {
     return {
       data:this.event,
-    
+	  menu: [],
       result: false,
       info: null,
     };
   },
-  
-
   computed: {
     start_time: function(){
       if(!this.data.start) return 'N/A';
@@ -46,6 +44,27 @@ export default {
       return this.data.end.getHours() + ":" + this.data.end.getMinutes();
     }
   },
+  methods:{
+	onModalShow: function(){
+		console.log(this.event)
+		if (this.event.type == 'lehreinheit') {
+			this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(this.event.lehreinheit_id[0]).then(
+				res=>res.data
+			).then(
+				studiensemester_kurzbz =>{
+					this.$fhcApi.factory.addons.getLvMenu(this.data.lehrveranstaltung_id, studiensemester_kurzbz).then(res => {
+						//this.$fhcApi.factory.addons.getLvMenu(750, "WS2005").then(res =>{
+						if (res.data) {
+							this.menu = res.data;
+						}
+
+					});
+				}
+			)
+		}
+			
+	}
+  },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
   },
@@ -53,31 +72,39 @@ export default {
     return BsModal.popup.bind(this)(null, options);
   },
   template: /*html*/ `
-  <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
+  <bs-modal ref="modalContainer" @showBsModal="onModalShow" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     <template v-slot:title>
-    	<template v-if="data.titel">{{ data.titel + ' - ' + data.lehrfach_bez + ' [' + data.ort_kurzbz+']'}}</template>
+  		<template v-if="data.titel">{{ data.titel + ' - ' + data.lehrfach_bez + ' [' + data.ort_kurzbz+']'}}</template>
 		<template v-else>{{ data.lehrfach_bez + ' [' + data.ort_kurzbz+']'}}</template>
     </template>
     <template v-slot:default>
         <div class="row">
-        <div class="offset-3 col-4"><span>Datum:</span></div>
-        <div class=" col"><span>{{data.datum}}</span></div>
+			<div class="offset-3 col-4"><span>Datum:</span></div>
+			<div class=" col"><span>{{data.datum}}</span></div>
         </div>
         <div class="row">
-        <div class="offset-3 col-4"><span>Raum:</span></div>
-        <div class=" col"><span>{{data.ort_kurzbz}}</span></div>
+			<div class="offset-3 col-4"><span>Raum:</span></div>
+			<div class=" col"><span>{{data.ort_kurzbz}}</span></div>
         </div>
         <div class="row">
-        <div class="offset-3 col-4"><span>LV:</span></div>
-        <div class=" col"><span>{{'('+data.lehrform+') ' + data.lehrfach_bez}}</span></div>
+			<div class="offset-3 col-4"><span>LV:</span></div>
+			<div class=" col"><span>{{'('+data.lehrform+') ' + data.lehrfach_bez}}</span></div>
         </div>
         <div class="row">
-        <div class="offset-3 col-4"><span>Lektor:</span></div>
-        <div class=" col"><span>{{data.lektor.map(lektor=>lektor.kurzbz).join("/")}}</span></div>
+			<div class="offset-3 col-4"><span>Lektor:</span></div>
+			<div class=" col"><span>{{data.lektor.map(lektor=>lektor.kurzbz).join("/")}}</span></div>
         </div>
         <div class="row">
-        <div class="offset-3 col-4"><span>Zeitraum:</span></div>
-        <div class=" col"><span>{{start_time + ' - ' + end_time}}</span></div>
+			<div class="offset-3 col-4"><span>Zeitraum:</span></div>
+			<div class=" col"><span>{{start_time + ' - ' + end_time}}</span></div>
+        </div>
+		<div class="row">
+			<div class=" col"><h2>LvMenu:</h2></div>
+        </div>
+		<div v-for="menuPunkt in menu" class="row">
+			<div class="col">
+  				<a target="_blank" :href="menuPunkt.c4_link">{{menuPunkt.name}}</a>
+			</div>
         </div>
     </template>
  

@@ -30,4 +30,10 @@ export default {
 			{ start_date, end_date }
 		);
 	},
+	getLehreinheitStudiensemester(lehreinheit_id) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Stundenplan/getLehreinheitStudiensemester/${lehreinheit_id}`,
+			{}
+		);
+	},
 };

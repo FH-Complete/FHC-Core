@@ -149,8 +149,9 @@ class Stundenplan_model extends DB_Model
 		array_agg(DISTINCT lektor) as lektor,
 		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
 		string_agg(DISTINCT ort_kurzbz, '/') as ort_kurzbz,
+		array_agg(DISTINCT lehreinheit_id) as lehreinheit_id,
 		
-		titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe
+		titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
 
 		FROM
 		(
@@ -177,7 +178,7 @@ class Stundenplan_model extends DB_Model
 			
 		) as subquery
 
-		GROUP BY unr, datum, beginn, ende, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe
+		GROUP BY unr, datum, beginn, ende, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
 
 		ORDER BY datum, beginn
 		");

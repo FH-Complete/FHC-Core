@@ -32,6 +32,7 @@ class Stundenplan extends FHCAPI_Controller
             'Stunden' => self::PERM_LOGGED,
             'Reservierungen' => self::PERM_LOGGED,
 			'getStundenplan' => self::PERM_LOGGED,
+			'getLehreinheitStudiensemester' => self::PERM_LOGGED,
 		]);
 
         $this->load->library('LogLib');
@@ -152,6 +153,14 @@ class Stundenplan extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($reservierungen);
         
+	}
+
+	public function getLehreinheitStudiensemester($lehreinheit_id){
+		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+		$this->LehreinheitModel->addSelect(["studiensemester_kurzbz"]);
+		$result = $this->LehreinheitModel->load($lehreinheit_id);
+		$result = current($this->getDataOrTerminateWithError($result))->studiensemester_kurzbz;
+		$this->terminateWithSuccess($result);	
 	}
 
 	private function expand_object_information($data){
