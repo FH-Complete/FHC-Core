@@ -301,34 +301,6 @@ class ProfilUpdate extends Auth_Controller
 	}
 
 
-	private function deleteOldVersionFile($dms_id)
-	{
-		if (!isset($dms_id)) {
-			return;
-		}
-
-		//? collect all the results of the deleted versions in an array 
-		$res = array();
-
-		//? delete all the different versions of the dms_file
-		$dmsVersions = $this->DmsVersionModel->loadWhere(["dms_id" => $dms_id]);
-		$dmsVersions = hasData($dmsVersions) ? getData($dmsVersions) : null;
-		if (isset($dmsVersions)) {
-			$zwischen_res = array_map(function ($item) {
-				return $item->version;
-			}, $dmsVersions);
-			foreach ($zwischen_res as $version) {
-				array_push($res, $this->DmsVersionModel->delete([$dms_id, $version]));
-			}
-		} else {
-			echo json_encode(error($this->p->t('profilUpdate', 'profilUpdate_dmsVersion_error')));
-		}
-
-		//? returns a result for each deleted dms_file
-		return $res;
-	}
-
-
 	public function selectProfilRequest()
 	{
 		$_GET = json_decode($this->input->raw_input_stream, true);
@@ -648,6 +620,33 @@ class ProfilUpdate extends Auth_Controller
 	private function setStatusOnUpdateRequest($id, $status, $status_message)
 	{
 		return $this->ProfilUpdateModel->update([$id], ["status" => $status, "status_timestamp" => "NOW()", "status_message" => $status_message]);
+	}
+
+	private function deleteOldVersionFile($dms_id)
+	{
+		if (!isset($dms_id)) {
+			return;
+		}
+
+		//? collect all the results of the deleted versions in an array 
+		$res = array();
+
+		//? delete all the different versions of the dms_file
+		$dmsVersions = $this->DmsVersionModel->loadWhere(["dms_id" => $dms_id]);
+		$dmsVersions = hasData($dmsVersions) ? getData($dmsVersions) : null;
+		if (isset($dmsVersions)) {
+			$zwischen_res = array_map(function ($item) {
+				return $item->version;
+			}, $dmsVersions);
+			foreach ($zwischen_res as $version) {
+				array_push($res, $this->DmsVersionModel->delete([$dms_id, $version]));
+			}
+		} else {
+			echo json_encode(error($this->p->t('profilUpdate', 'profilUpdate_dmsVersion_error')));
+		}
+
+		//? returns a result for each deleted dms_file
+		return $res;
 	}
 
 

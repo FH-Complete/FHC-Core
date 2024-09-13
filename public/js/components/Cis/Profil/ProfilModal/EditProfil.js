@@ -54,6 +54,14 @@ export default {
       this.fileID = newFileID;
     },
 
+	handleFailedError: function (err) {
+		console.error(err);
+		this.loading = false;
+		this.setLoading(false);
+		this.result = false;
+		this.hide();
+	},
+
     async submitProfilChange() {
 
       //? check if data is valid before making a request
@@ -99,31 +107,19 @@ export default {
               this.editData.updateID,
               this.fileID ? this.fileID[0] : null
             )
-              .then((res) => {
-                handleApiResponse(res);
-              })
-              .catch((err) => {
-                console.error(err);
-				this.loading = false;
-				this.setLoading(false);
-				this.result = false;
-				this.hide();
-              })
-          : this.$fhcApi.factory.profilUpdate.insertProfilRequest(
+			.then((res) => {
+			handleApiResponse(res);
+			})
+			.catch((err) => this.handleFailedError)
+			: this.$fhcApi.factory.profilUpdate.insertProfilRequest(
               this.topic,
               this.profilUpdate,
               this.fileID ? this.fileID[0] : null
             )
-              .then((res) => {
-                handleApiResponse(res);
-              })
-              .catch((err) => {
-                console.error(err);
-				this.loading = false;
-				this.setLoading(false);
-				this.result = false;
-				this.hide();
-              });
+			.then((res) => {
+			handleApiResponse(res);
+			})
+			.catch((err) => this.handleFailedError);
       }
     },
 

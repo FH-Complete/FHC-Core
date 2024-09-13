@@ -36,6 +36,7 @@ class ProfilUpdate extends FHCAPI_Controller
             'getStatus' => self::PERM_LOGGED,
             'getTopic' => self::PERM_LOGGED,
 			'getProfilRequestFiles' => self::PERM_LOGGED,
+			'getProfilUpdateWithPermission' => ['student/stammdaten:r', 'mitarbeiter/stammdaten:r'],
 			'denyProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
 			'acceptProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
 			'selectProfilRequest' => self::PERM_LOGGED,
@@ -43,6 +44,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			'updateProfilRequest' => self::PERM_LOGGED,
 			'deleteProfilRequest' => self::PERM_LOGGED,
 			'insertFile' => self::PERM_LOGGED,
+			'show' => self::PERM_LOGGED,
 			]);
 
 		// Load language phrases
@@ -112,6 +114,39 @@ class ProfilUpdate extends FHCAPI_Controller
             $this->terminateWithError('No topics found');
         }
 		$this->terminateWithSuccess(self::$TOPICS);
+	}
+
+	public function show($dms_id)
+	{
+
+		$profil_update = $this->ProfilUpdateModel->loadWhere(['attachment_id' => $dms_id]);
+		$profil_update = hasData($profil_update) ? getData($profil_update)[0] : null;
+
+		//? checks if an profil update exists with the dms_id requested from the user
+		if ($profil_update) {
+			$is_mitarbeiter_profil_update = getData($this->MitarbeiterModel->isMitarbeiter($profil_update->uid));
+			$is_student_profil_update = getData($this->StudentModel->isStudent($profil_update->uid));
+
+			if (
+				$this->permissionlib->isBerechtigt('student/stammdaten:r') && $is_student_profil_update ||
+				$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten:r') && $is_mitarbeiter_profil_update ||
+				$this->uid == $profil_update->uid
+			) {
+				// Get file to be downloaded from DMS
+				$download = $this->dmslib->download($dms_id);
+				$download = $this->getDataOrTerminateWithError($download);
+				// Download file
+				$this->outputFile($download);
+
+
+			} else {
+				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_permission_error'));
+			}
+
+		} else {
+			$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_dms_error'));
+		}
+
 	}
 
 	public function selectProfilRequest()
@@ -441,6 +476,28 @@ class ProfilUpdate extends FHCAPI_Controller
 		$this->terminateWithSuccess($res);
 	}
 
+	public function getProfilUpdateWithPermission($status = null)
+	{
+		// early return if no status has been passed as argument
+		if (!isset($status)) {
+			echo json_encode($this->ProfilUpdateModel->getProfilUpdateWithPermission());
+			return;
+		}
+
+		// get the sprache of the user
+		$sprachenIndex = $this->SpracheModel->loadWhere(["sprache" => getUserLanguage()]);
+		$sprachenIndex = hasData($sprachenIndex) ? getData($sprachenIndex)[0]->index : null;
+
+		if (isset($sprachenIndex) && isset($status)) {
+			// get the corresponding status kurz_bz primary key out of the translation
+			$status = $this->ProfilUpdateStatusModel->execReadOnlyQuery("select * from public.tbl_profil_update_status where ? = ANY(bezeichnung_mehrsprachig)", [$status]);
+			$status = hasData($status) ? getData($status)[0]->status_kurzbz : null;
+			$res = $this->ProfilUpdateModel->getProfilUpdateWithPermission(isset($status) ? ['status' => $status] : null);
+
+			echo json_encode($res);
+		}
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 
@@ -552,13 +609,85 @@ class ProfilUpdate extends FHCAPI_Controller
 	{
 		return $this->ProfilUpdateModel->update([$id], ['requested_change' => json_encode($requested_change)]);
 	}
+	
+	private function deleteOldVersionFile($dms_id)
+	{
+		// starting the transaction
+		$this->db->trans_start();
+		
+		
+		if (!isset($dms_id)) {
+			return;
+		}
+
+		//? delete the file from the profilUpdate first
+		$profilUpdateFileDelete = $this->ProfilUpdateModel->removeFileFromProfilUpdate($dms_id);
+		if(isError($profilUpdateFileDelete)){
+			$this->terminateWithError(getError($profilUpdateFileDelete));
+		}
+		
+		//? delete all the different versions of the dms_file
+		$dmsVersions = $this->DmsVersionModel->loadWhere(["dms_id" => $dms_id]);
+		$dmsVersions = $this->getDataOrTerminateWithError($dmsVersions);
+		
+		
+		
+		$dms_versions = array_map(function ($item) {
+			return $item->version;
+		}, $dmsVersions);
+
+
+		$test_array = array();
+		foreach ($dms_versions as $version) {
+			
+			$delete_result = $this->dmslib->removeVersion($dms_id, $version);
+			array_push($test_array, $delete_result);
+			
+			if(isError($delete_result)){
+				$this->addError(getError($delete_result));
+			}
+		}
+
+		// transaction complete
+		$this->db->trans_complete();
+		
+		if ($this->db->trans_status() === FALSE)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+		
+	}
+	
+	
+	private function getOE_from_student($student_uid)
+	{
+		//? returns the oe_einheit eines Studenten 
+		$query = "SELECT public.tbl_studiengang.oe_kurzbz
+		FROM public.tbl_student
+		JOIN public.tbl_studiengang ON tbl_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
+		WHERE public.tbl_student.student_uid = ?;";
+
+		$res = $this->StudentModel->execReadOnlyQuery($query, [$student_uid]);
+		$res = $this->getDataOrTerminateWithError($res, $this->p->t('profilUpdate', 'profilUpdate_loadingOE_error'));	
+		$res = array_map(
+			function ($item) {
+				return $item->oe_kurzbz;
+			},
+			$res
+		);
+		return $res;
+	}
 
 	private function handleAdresse($requested_change, $personID)
 	{
 		$this->AdressenTypModel->addSelect(["adressentyp_kurzbz"]);
 		$adr_kurzbz = $this->AdressenTypModel->loadWhere(["bezeichnung" => $requested_change['typ']]);
 		$adr_kurzbz = $this->getDataOrTerminateWithError($adr_kurzbz)[0]->adressentyp_kurzbz;
-		
+
 		//? replace the address_typ with its correct kurzbz foreign key
 		$requested_change['typ'] = $adr_kurzbz;
 
@@ -578,19 +707,15 @@ class ProfilUpdate extends FHCAPI_Controller
 			//TODO: zustelladresse, heimatadresse, rechnungsadresse und nation werden nicht beachtet
 			$insertID = $this->AdresseModel->insert($requested_change);
 			$insert_adresse_id = $insertID;
-			if (isError($insert_adresse_id)) {
-				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_insertAdresse_error'));
-			}
-			$insert_adresse_id = $this->getDataOrTerminateWithError($insert_adresse_id);
+			$insert_adresse_id = $this->getDataOrTerminateWithError($insert_adresse_id, $this->p->t('profilUpdate', 'profilUpdate_insertAdresse_error'));
 			if ($insert_adresse_id) {
 				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $insert_adresse_id);
 			}
-
 		}
 		//! DELETE
 		elseif (array_key_exists('delete', $requested_change) && $requested_change['delete']) {
 			$result = $this->AdresseModel->delete($adresse_id);
-			if(isError($result)){
+			if (isError($result)) {
 				$this->terminateWithError(getError($result));
 			}
 		}
@@ -599,16 +724,52 @@ class ProfilUpdate extends FHCAPI_Controller
 			$requested_change['updateamum'] = "NOW()";
 			$requested_change['updatevon'] = getAuthUID();
 			$update_adresse_id = $this->AdresseModel->update($adresse_id, $requested_change);
-			if (isError($update_adresse_id)) {
-				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_updateAdresse_error'));
-			}
-			$update_adresse_id = $this->getDataOrTerminateWithError($update_adresse_id);
+			$update_adresse_id = $this->getDataOrTerminateWithError($update_adresse_id, $this->p->t('profilUpdate', 'profilUpdate_updateAdresse_error'));
 			$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $update_adresse_id);
-			
+
 		}
 		return $insertID ?? null;
 	}
 
+	private function handleKontakt($requested_change, $personID)
+	{
+		$kontakt_id = $requested_change["kontakt_id"];
+		//? removes the kontakt_id because we don't want to update the kontakt_id in the database
+		unset($requested_change["kontakt_id"]);
+
+		//! ADD
+		if (array_key_exists('add', $requested_change) && $requested_change['add']) {
+			//? removes add flag
+			unset($requested_change['add']);
+			$requested_change['person_id'] = $personID;
+			$requested_change['insertamum'] = "NOW()";
+			$requested_change['insertvon'] = getAuthUID();
+			$insertID = $this->KontaktModel->insert($requested_change);
+			$insert_kontakt_id = $insertID;
+			$insert_kontakt_id = $this->getDataOrTerminateWithError($insert_kontakt_id, $this->p->t('profilUpdate', 'profilUpdate_insertKontakt_error'));
+			if ($insert_kontakt_id) {
+				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $insert_kontakt_id);
+			}
+		}
+		//! DELETE
+		elseif (array_key_exists('delete', $requested_change) && $requested_change['delete']) {
+			$result = $this->KontaktModel->delete($kontakt_id);
+			if (isError($result)) {
+				$this->terminateWithError(getError($result));
+			}
+		}
+		//! UPDATE
+		else {
+			$requested_change['updateamum'] = "NOW()";
+			$requested_change['updatevon'] = getAuthUID();
+			$update_kontakt_id = $this->KontaktModel->update($kontakt_id, $requested_change);
+			$update_kontakt_id = $this->getDataOrTerminateWithError($update_kontakt_id, $this->p->t('profilUpdate', 'profilUpdate_updateKontakt_error'));
+			if ($update_kontakt_id) {
+				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $update_kontakt_id);
+			}
+		}
+		return isset($insertID) ? $insertID : null;
+	}
 
 	private function handleDupplicateZustellAdressen($zustellung, $adresse_id)
 	{
@@ -620,99 +781,46 @@ class ProfilUpdate extends FHCAPI_Controller
 				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_loadingZustellAdressen_error'));
 			}
 			$zustellAdressenArray = $this->getDataOrTerminateWithError($zustellAdressenArray);
-
+	
 			if (count($zustellAdressenArray) > 0) {
-
+	
 				$zustellAdressenArray = array_filter($zustellAdressenArray, function ($adresse) use ($adresse_id) {
-
+	
 					return $adresse->adresse_id != $adresse_id;
 				});
-
+	
 				// remove the zustelladresse from all other zustelladressen
 				foreach ($zustellAdressenArray as $adresse) {
 					$this->AdresseModel->update($adresse->adresse_id, ["zustelladresse" => FALSE]);
+				}
+	
+			}
+		}
+	}
+
+	private function handleDupplicateZustellKontakte($zustellung, $kontakt_id)
+	{
+		if ($zustellung) {
+			$this->PersonModel->addSelect("public.tbl_kontakt.kontakt_id");
+			$this->PersonModel->addJoin("public.tbl_kontakt", "public.tbl_kontakt.person_id = public.tbl_person.person_id");
+			$zustellKontakteArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id" => $this->pid, "zustellung" => TRUE]);
+			if (!isSuccess($zustellKontakteArray)) {
+				return error($this->p->t('profilUpdate', 'profilUpdate_loadingZustellkontakte_error'));
+			}
+			$zustellKontakteArray = hasData($zustellKontakteArray) ? getData($zustellKontakteArray) : null;
+
+			if ($zustellung && count($zustellKontakteArray) > 0) {
+				$zustellKontakteArray = array_filter($zustellKontakteArray, function ($kontakt) use ($kontakt_id) {
+					return $kontakt->kontakt_id != $kontakt_id;
+				});
+				foreach ($zustellKontakteArray as $kontakt) {
+					$this->KontaktModel->update($kontakt->kontakt_id, ["zustellung" => FALSE]);
 				}
 
 			}
 		}
 	}
-
-	private function deleteOldVersionFile($dms_id)
-	{
-		// starting the transaction
-		$this->db->trans_start();
-
-
-		if (!isset($dms_id)) {
-			return;
-		}
-
-		//? delete the file from the profilUpdate first
-		$profilUpdateFileDelete = $this->ProfilUpdateModel->removeFileFromProfilUpdate($dms_id);
-		if(isError($profilUpdateFileDelete)){
-			$this->terminateWithError(getError($profilUpdateFileDelete));
-		}
-		
-		//? delete all the different versions of the dms_file
-		$dmsVersions = $this->DmsVersionModel->loadWhere(["dms_id" => $dms_id]);
-		$dmsVersions = $this->getDataOrTerminateWithError($dmsVersions);
-		
-		
-
-		$dms_versions = array_map(function ($item) {
-			return $item->version;
-		}, $dmsVersions);
-
-
-		$test_array = array();
-		foreach ($dms_versions as $version) {
-			
-			$delete_result = $this->dmslib->removeVersion($dms_id, $version);
-			array_push($test_array, $delete_result);
-			
-			if(isError($delete_result)){
-				$this->addError(getError($delete_result));
-			}
-		}
-
-		// transaction complete
-		$this->db->trans_complete();
-
-		if ($this->db->trans_status() === FALSE)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-		
-	}
-
-
-	private function getOE_from_student($student_uid)
-	{
-
-		//? returns the oe_einheit eines Studenten 
-		$query = "SELECT public.tbl_studiengang.oe_kurzbz
-		FROM public.tbl_student
-		JOIN public.tbl_studiengang ON tbl_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
-		WHERE public.tbl_student.student_uid = ?;";
-
-		$res = $this->StudentModel->execReadOnlyQuery($query, [$student_uid]);
-		if (!isSuccess($res)) {
-			show_error($this->p->t('profilUpdate', 'profilUpdate_loadingOE_error'));
-		}
-		$res = hasData($res) ? getData($res) : [];
-		$res = array_map(
-			function ($item) {
-				return $item->oe_kurzbz;
-			},
-			$res
-		);
-		return $res;
-	}
-
+	
 }
 
 
