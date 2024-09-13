@@ -37,11 +37,11 @@ export default {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: this.endpoint.getAllBetriebsmittel,
 				ajaxParams: () => {
-                                    return {
-                                        type: this.typeId,
-                                        id: this.id
-                                    }
-                                },
+					return {
+						type: this.typeId,
+						id: this.id
+					};
+				},
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Nummer", field: "nummer", width: 150},
@@ -151,7 +151,7 @@ export default {
 	},
 	watch: {
 		id() {
-			this.$refs.table.tabulator.setData('dummy');
+			this.$refs.table.reloadTable();
 		}
 	},
 	methods: {
