@@ -1,7 +1,8 @@
 import MylvStudent from "../../../components/Cis/Mylv/Student.js";
+import Phrasen from "../../../plugin/Phrasen.js";
 
 Vue.createApp({
 	components: {
 		MylvStudent
 	}
-}).mount('#content');
+}).use(Phrasen).mount('#content');

@@ -25,7 +25,6 @@ export default {
 				axios.get(this.apiurl + '/Widget/getWidgetsForDashboard', {params:{
 					db: this.dashboard
 				}}).then(res => {
-					//console.log(res.data.retval);
 					res.data.retval.forEach(widget => {
 						widget.arguments = JSON.parse(widget.arguments);
 						widget.setup = JSON.parse(widget.setup);
@@ -123,7 +122,6 @@ export default {
 		axios.get(this.apiurl + '/Config', {params:{
 			db: this.dashboard
 		}}).then(res => {
-			//console.log(res.data.retval);
 			for (var name in res.data.retval.widgets) {
 				let widgets = [];
 				let remove = [];

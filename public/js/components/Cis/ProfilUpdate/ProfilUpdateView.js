@@ -127,10 +127,6 @@ export default {
                   "acceptUpdate"
                 )}`,
                 action: (e, column) => {
-                  console.log(
-                    "this is the data of the context menu action",
-                    column.getData()
-                  );
                   this.$fhcApi.factory.profilUpdate.acceptProfilRequest(column.getData())
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();

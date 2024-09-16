@@ -307,7 +307,6 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    console.log(data);
                     if (data.error && data.retval != null)
                     {
                         // Print error message

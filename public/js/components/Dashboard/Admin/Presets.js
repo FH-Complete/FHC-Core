@@ -144,7 +144,6 @@ export default {
 	},
 	created() {
 		axios.get(this.apiurl + '/Config/funktionen').then(res => {
-			//console.log(res.data.retval);
 			this.funktionen = {general: 'GENERAL'};
 			res.data.retval.forEach(funktion => {
 				this.funktionen[funktion.funktion_kurzbz] = funktion.beschreibung;

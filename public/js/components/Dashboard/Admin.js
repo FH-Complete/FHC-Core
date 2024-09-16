@@ -73,7 +73,6 @@ export default {
 	},
 	created() {
 		axios.get(this.apiurl + '/Dashboard').then(res => {
-			//console.log(res.data.retval);
 			this.dashboards = res.data.retval;
 		}).catch(err => console.error('ERROR:', err));
 	},

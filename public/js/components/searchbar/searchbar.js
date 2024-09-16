@@ -79,22 +79,11 @@ export default {
     watch:{
         'searchsettings.types'(newValue){
             this.search();
-            
-            
         },
-        
     },
     beforeMount: function() {
         this.updateSearchOptions();
         
-    },
-    mounted(){
-        window.addEventListener('resize', (event) =>{
-            console.log(this.$refs.settings,"this is the refs of the settings")
-            this.$refs.settings.hide();
-            console.log("resizing")
-        }); 
-        //console.log(this.$refs.settings.show,"this are the refs")
     },
     methods: {
         getActionsForRoom: function(res){
@@ -132,7 +121,6 @@ export default {
         },
         calcSearchResultExtent: function() {
             var rect = this.$refs.searchbox.getBoundingClientRect();
-            //console.log(window.innerWidth + ' ' + window.innerHeight + ' ' + JSON.stringify(rect));
             this.$refs.result.style.top = Math.floor(rect.bottom + 3) + 'px';
             this.$refs.result.style.right = Math.floor(window.innerWidth - rect.right) + 'px';
             this.$refs.result.style.width = Math.floor(window.innerWidth * 0.75) + 'px';

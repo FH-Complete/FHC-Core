@@ -86,7 +86,6 @@ Vue.createApp({
             return Vue.$fhcapi.Search.search(searchsettings);
         },
         updatesearchtypes: function(newValues){
-            console.log(newValues,"this are the new values")
            this.selectedtypes= newValues;
             
         },

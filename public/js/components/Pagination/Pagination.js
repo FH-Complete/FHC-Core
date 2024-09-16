@@ -18,7 +18,7 @@ export default {
   },
   methods: {
     newPageEvent: function (data) {
-      //console.log("hier", data.page);
+      
     },
   },
   mounted() {},

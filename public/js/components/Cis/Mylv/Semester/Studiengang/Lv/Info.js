@@ -1,11 +1,13 @@
 import BsModal from '../../../../../Bootstrap/Modal.js';
 import Phrasen from '../../../../../../mixins/Phrasen.js';
+import LvMenu from '../../../LvMenu.js';
 
 const infos = {};
 
 export default {
 	components: {
-		BsModal
+		BsModal,
+		LvMenu
 	},
 	mixins: [
 		BsModal,
@@ -35,7 +37,9 @@ export default {
 	},
 	data: () => ({
 		result: true,
-		info: null
+		info: null,
+		isMenuSelected: false,
+		menu: [],
 	}),
 	computed: {
 		lektorNames() {
@@ -76,112 +80,130 @@ export default {
 			}).catch(() => this.info = {});
 		}
 	},
+	methods:{
+		onModelHide() {
+			this.isMenuSelected = false;
+		},
+		onModalShow() {
+			this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, this.studien_semester)
+			.then(res => {
+				this.menu = res.data;
+			})
+			.catch((error) => this.$fhcAlert.handleSystemError);
+		}
+	},
 	mounted() {
 		this.modal = this.$refs.modalContainer.modal;
 	},
 	popup(options) {
 		return BsModal.popup.bind(this)(null, options);
 	},
-	template: `<bs-modal ref="modalContainer" class="bootstrap-alert" v-bind="$props" body-class="" dialog-class="modal-lg">
+	template: /*html*/`
+	<bs-modal ref="modalContainer" @hideBsModal="onModelHide" @showBsModal="onModalShow" class="bootstrap-alert" v-bind="$props" body-class="" :dialogClass="{'modal-lg': !isMenuSelected, 'modal-fullscreen':isMenuSelected}">
 		<template v-slot:title>
 			{{p.t('lvinfo/lehrveranstaltungsinformationen')}}
 		</template>
 		<template v-slot:default>
-			<div v-if="!info" class="text-center">
-				<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
-			</div>
-			<table v-else class="table table-hover">
-				<tbody>
-					<tr>
-						<th>{{p.t('lehre/lehrveranstaltung')}}</th>
-						<td>{{bezeichnung}}</td>
-					</tr>
-					<tr>
-						<th>{{p.t('lehre/studiengang')}}</th>
-						<td>{{studiengang_kuerzel}}</td>
-					</tr>
-					<tr>
-						<th>{{p.t('lehre/semester')}}</th>
-						<td>{{semester}}</td>
-					</tr>
-					<tr>
-						<th>{{p.t('lehre/studiensemester')}}</th>
-						<td>{{studien_semester}}</td>
-					</tr>
-					<tr>
-						<th>{{p.t('lehre/organisationsform')}}</th>
-						<td>{{orgform_kurzbz}}</td>
-					</tr>
-					<tr>
-						<th>{{p.t('lehre/lehrbeauftragter')}}</th>
-						<td>
-							<ul v-if="lektorNames.length" class="list-unstyled mb-0">
-								<li v-for="name in lektorNames" :key="name">
-									<!-- TODO(chris): link? -->
-									{{name}}
-								</li>
-							</ul>
-							<template v-else>
-								{{p.t('lehre/keinLektorZugeordnet')}}
-							</template>
-						</td>
-					</tr>
-					<tr v-if="lvLeitung">
-						<th>{{p.t('lehre/lvleitung')}}</th>
-						<td>
-							<ul class="list-unstyled mb-0">
-								<li v-for="name in lvLeitung" :key="name">
-									<!-- TODO(chris): link? -->
-									{{name}}
-								</li>
-							</ul>
-						</td>
-					</tr>
-					<tr>
-						<th>{{p.t('global/sprache')}}</th>
-						<td>{{sprache}}</td>
-					</tr>
-					<tr>
-						<th>{{p.t('lehre/ects')}}</th>
-						<td>{{ects}}</td>
-					</tr>
-					<tr>
-						<th>{{p.t('lehre/incomingplaetze')}}</th>
-						<td>{{incoming}}</td>
-					</tr>
-					<tr>
-						<th>{{p.t('lehre/organisationseinheit')}}</th>
-						<td>
-							{{oe}} <br>
-							(
-							<i>{{p.t('global/leitung')}}: </i>{{oeLeitung.join(', ')}}
-							<template v-if="koordinator">
-								<i>{{p.t('global/koordination')}}: </i>{{koordinator.join(', ')}}
-							</template>
-							)
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<div v-if="info && info.lvinfo">
-				<div v-if="Object.keys(info.lvinfo).length > 1" class="text-end">
-					<div class="btn-group" role="group" :title="p.t('global/verfuegbareSprachen')" :aria-label="p.t('global/verfuegbareSprachen')">
-						<template v-for="lang in info.sprachen" :key="lang.index">
-							<button v-if="info.lvinfo[lang.sprache]" type="button" class="btn btn-outline-primary" :class="lang.sprache == currentLang ? 'active' : ''" @click.prevent="info.lastLang = lang.sprache">{{lang.bezeichnung[lang.index-1]}}</button>
-						</template>
-					</div>
+			<template v-if="!isMenuSelected">
+				<div v-if="!info" class="text-center">
+					<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 				</div>
-				<template v-for="i in info.lvinfo[currentLang]" :key="info">
-					<h4>{{i.header}}</h4>
-					<h6 v-if="i.subheader">{{i.subheader}}</h6>
-					<ul v-if="Array.isArray(i.body)">
-						<li v-for="e in i.body" :key="e">{{e}}</li>
-					</ul>
-					<p v-else>
-						{{i.body}}
-					</p>
-				</template>
-			</div>
+				<table v-else class="table table-hover">
+					<tbody>
+						<tr>
+							<th>{{p.t('lehre/lehrveranstaltung')}}</th>
+							<td>{{bezeichnung}}</td>
+						</tr>
+						<tr>
+							<th>{{p.t('lehre/studiengang')}}</th>
+							<td>{{studiengang_kuerzel}}</td>
+						</tr>
+						<tr>
+							<th>{{p.t('lehre/semester')}}</th>
+							<td>{{semester}}</td>
+						</tr>
+						<tr>
+							<th>{{p.t('lehre/studiensemester')}}</th>
+							<td>{{studien_semester}}</td>
+						</tr>
+						<tr>
+							<th>{{p.t('lehre/organisationsform')}}</th>
+							<td>{{orgform_kurzbz}}</td>
+						</tr>
+						<tr>
+							<th>{{p.t('lehre/lehrbeauftragter')}}</th>
+							<td>
+								<ul v-if="lektorNames.length" class="list-unstyled mb-0">
+									<li v-for="name in lektorNames" :key="name">
+										<!-- TODO(chris): link? -->
+										{{name}}
+									</li>
+								</ul>
+								<template v-else>
+									{{p.t('lehre/keinLektorZugeordnet')}}
+								</template>
+							</td>
+						</tr>
+						<tr v-if="lvLeitung">
+							<th>{{p.t('lehre/lvleitung')}}</th>
+							<td>
+								<ul class="list-unstyled mb-0">
+									<li v-for="name in lvLeitung" :key="name">
+										<!-- TODO(chris): link? -->
+										{{name}}
+									</li>
+								</ul>
+							</td>
+						</tr>
+						<tr>
+							<th>{{p.t('global/sprache')}}</th>
+							<td>{{sprache}}</td>
+						</tr>
+						<tr>
+							<th>{{p.t('lehre/ects')}}</th>
+							<td>{{ects}}</td>
+						</tr>
+						<tr>
+							<th>{{p.t('lehre/incomingplaetze')}}</th>
+							<td>{{incoming}}</td>
+						</tr>
+						<tr>
+							<th>{{p.t('lehre/organisationseinheit')}}</th>
+							<td>
+								{{oe}} <br>
+								(
+								<i>{{p.t('global/leitung')}}: </i>{{oeLeitung.join(', ')}}
+								<template v-if="koordinator">
+									<i>{{p.t('global/koordination')}}: </i>{{koordinator.join(', ')}}
+								</template>
+								)
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</template>
+			<lv-menu v-model:isMenuSelected="isMenuSelected" :menu="menu"></lv-menu>
+			<template v-if="!isMenuSelected">
+				<div v-if="info && info.lvinfo">
+					<div v-if="Object.keys(info.lvinfo).length > 1" class="text-end">
+						<div class="btn-group" role="group" :title="p.t('global/verfuegbareSprachen')" :aria-label="p.t('global/verfuegbareSprachen')">
+							<template v-for="lang in info.sprachen" :key="lang.index">
+								<button v-if="info.lvinfo[lang.sprache]" type="button" class="btn btn-outline-primary" :class="lang.sprache == currentLang ? 'active' : ''" @click.prevent="info.lastLang = lang.sprache">{{lang.bezeichnung[lang.index-1]}}</button>
+							</template>
+						</div>
+					</div>
+					<template v-for="i in info.lvinfo[currentLang]" :key="info">
+						<h4>{{i.header}}</h4>
+						<h6 v-if="i.subheader">{{i.subheader}}</h6>
+						<ul v-if="Array.isArray(i.body)">
+							<li v-for="e in i.body" :key="e">{{e}}</li>
+						</ul>
+						<p v-else>
+							{{i.body}}
+						</p>
+					</template>
+				</div>
+			</template>
 		</template>
 	</bs-modal>`
 }

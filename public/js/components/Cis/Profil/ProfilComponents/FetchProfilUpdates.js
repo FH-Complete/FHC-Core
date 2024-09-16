@@ -46,7 +46,6 @@ export default {
       let withFiles = false;
 
       if (view === "TextInputDokument") {
-        console.log("text input")
         data = {
           titel: updateRequest.topic,
           value: updateRequest.requested_change.value,
