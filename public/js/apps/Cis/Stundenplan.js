@@ -8,7 +8,7 @@ const app = Vue.createApp({
 		return {
 			stunden: [],
 			events: null,
-			calendarWeek: new CalendarDate(new Date()),
+			calendarDate: new CalendarDate(new Date()),
 
 		}
 	},
@@ -17,19 +17,29 @@ const app = Vue.createApp({
 	},
 	computed:{
 		weekFirstDay: function () {
-			return this.calendarDateToString(this.calendarWeek.cdFirstDayOfWeek);
+			return this.calendarDateToString(this.calendarDate.cdFirstDayOfWeek);
 		},
 		weekLastDay: function () {
-			return this.calendarDateToString(this.calendarWeek.cdLastDayOfWeek);
+			return this.calendarDateToString(this.calendarDate.cdLastDayOfWeek);
+		},
+		monthFirstDay: function () {
+			return this.calendarDateToString(this.calendarDate.cdFirstDayOfCalendarMonth);
+		},
+		monthLastDay: function () {
+			return this.calendarDateToString(this.calendarDate.cdLastDayOfCalendarMonth);
 		},
 	},
 	methods:{
 
 		updateRange: function (data) {
-			this.calendarWeek = new CalendarDate(data.start);
-			Vue.nextTick(() => {
-				this.loadEvents();
-			});
+			let tmp_date = new CalendarDate(data.start);
+			// only load month data if the month or year has changed
+			if(tmp_date.m != this.calendarDate.m || tmp_date.y != this.calendarDate.y){
+				this.calendarDate = tmp_date;
+				Vue.nextTick(() => {
+					this.loadEvents();
+				});
+			}
 		},
 
 		calendarDateToString: function (calendarDate) {
@@ -42,8 +52,8 @@ const app = Vue.createApp({
 
 		loadEvents: function(){
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getStundenplan(this.weekFirstDay, this.weekLastDay),
-				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.weekFirstDay, this.weekLastDay)
+				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay),
+				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay)
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {

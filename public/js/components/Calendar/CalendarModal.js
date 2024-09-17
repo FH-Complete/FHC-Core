@@ -79,38 +79,60 @@ export default {
 		</template>
 		<template v-slot:default>
 			<template v-if="!isMenuSelected">
-				<div class="row">
-					<div class="col">
-						<h3>{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="offset-3 col-4"><span>Datum:</span></div>
-					<div class=" col"><span>{{event.datum}}</span></div>
-				</div>
-				<div class="row">
-					<div class="offset-3 col-4"><span>Raum:</span></div>
-					<div class=" col"><span>{{event.ort_kurzbz}}</span></div>
-				</div>
-				<div class="row">
-					<div class="offset-3 col-4"><span>LV:</span></div>
-					<div class=" col"><span>{{'('+event.lehrform+') ' + event.lehrfach_bez}}</span></div>
-				</div>
-				<div class="row">
-					<div class="offset-3 col-4"><span>Lektor:</span></div>
-					<div class=" col"><span>{{event.lektor.map(lektor=>lektor.kurzbz).join("/")}}</span></div>
-				</div>
-				<div class="row">
-					<div class="offset-3 col-4"><span>Zeitraum:</span></div>
-					<div class=" col"><span>{{start_time + ' - ' + end_time}}</span></div>
-				</div>
-				<hr class="my-5">
-				<div v-if="menu" class="row">
-					<div class="col">
-						<h3>Lehrveranstaltungs Menu</h3>
-					</div>
-				</div>
+				<h3>{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
+				<table class="table table-hover mb-4">
+					<tbody>
+						<tr>
+							<th>{{
+								$p.t('global','datum')?
+								$p.t('global','datum')+':'
+								:''
+							}}</th>
+							<td>{{event.datum}}</td>
+						</tr>
+						<tr>
+							<th>{{
+								$p.t('global','raum')?
+								$p.t('global','raum')+':'
+								:''
+							}}</th>
+							<td>{{event.ort_kurzbz}}</td>
+						</tr>
+						<tr>
+							<th>{{
+								$p.t('lehre','lehrveranstaltung')?
+								$p.t('lehre','lehrveranstaltung')+':'
+								:''
+							}}</th>
+							<td>{{'('+event.lehrform+') ' + event.lehrfach_bez}}</td>
+						</tr>
+						<tr>
+							<th>{{
+								$p.t('lehre','lektor')?
+								$p.t('lehre','lektor')+':'
+								:''
+							}}</th>
+							<td>{{event.lektor.map(lektor=>lektor.kurzbz).join("/")}}</td>
+						</tr>
+						<tr>
+							<th>{{
+								$p.t('ui','zeitraum')?
+								$p.t('ui','zeitraum')+':'
+								:''
+							}}</th>
+							<td>{{start_time + ' - ' + end_time}}</td>
+						</tr>
+						<tr>
+							<th>{{
+								$p.t('lehre','organisationseinheit')?
+								$p.t('lehre','organisationseinheit')+':'
+								:''
+							}}</th>
+							<td>{{event.organisationseinheit}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Lehrveranstaltungs Menu</h3>
 			</template>
 			<lv-menu v-model:isMenuSelected="isMenuSelected" :menu="menu"></lv-menu>
 		</template>

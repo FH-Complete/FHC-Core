@@ -108,7 +108,7 @@ export default {
 				<div v-if="!info" class="text-center">
 					<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 				</div>
-				<table v-else class="table table-hover">
+				<table v-else class="table table-hover mb-4">
 					<tbody>
 						<tr>
 							<th>{{p.t('lehre/lehrveranstaltung')}}</th>

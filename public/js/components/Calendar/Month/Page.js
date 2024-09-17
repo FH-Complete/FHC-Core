@@ -66,7 +66,7 @@ export default {
 				<span class="no">{{day.getDate()}}</span>
 				<span v-if="events[day.toDateString()] && events[day.toDateString()].length" class="events">
 					<span v-for="event in events[day.toDateString()]" :key="event.id" style="color:white" :style="{'background-color': event.color}">
-						{{event.title}}
+						{{event.topic}}
 					</span>
 				</span>
 			</a>
