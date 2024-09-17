@@ -123,10 +123,8 @@ export default {
         Geburtsdatum: this.data.gebdatum,
         Geburtsort: this.data.gebort,
         Kurzzeichen: this.data.kurzbz,
-        Telefon:
-          (this.data.standort_telefon ? this.data.standort_telefon : "") +
-          " " +
-          this.data.telefonklappe,
+		  Telefon:
+			  (this.data.standort_telefon ? this.data.standort_telefon + " " + this.data.telefonklappe : this.data.telefonklappe),
         Büro: this.data.ort_kurzbz,
       };
     },
