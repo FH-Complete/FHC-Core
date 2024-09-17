@@ -49,6 +49,7 @@ class projektphase extends basis_db
 	public $updateamum;	    // timestamp
 	public $updatevon;	    // bigint
 	public $zeitaufzeichnung; // bool
+	public $arbeitsbeschreibung; // bool
 	public $project_task_id;
 
 
@@ -103,6 +104,7 @@ class projektphase extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
+				$this->arbeitsbeschreibung = $this->db_parse_bool($row->arbeitsbeschreibung);
 				return true;
 			}
 			else
@@ -161,6 +163,7 @@ class projektphase extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
+				$obj->arbeitsbeschreibung = $this->db_parse_bool($row->arbeitsbeschreibung);
 
 				$this->result[] = $obj;
 			}
@@ -216,6 +219,7 @@ class projektphase extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
+				$obj->arbeitsbeschreibung = $this->db_parse_bool($row->arbeitsbeschreibung);
 
 				$this->result[] = $obj;
 			}
@@ -263,6 +267,7 @@ class projektphase extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
+				$obj->arbeitsbeschreibung = $this->db_parse_bool($row->arbeitsbeschreibung);
 
 				$this->result[] = $obj;
 			}
@@ -323,7 +328,7 @@ class projektphase extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, typ,
-				beschreibung, start, ende, budget, ressource_id, insertvon, insertamum, updatevon, updateamum, farbe, personentage, zeitaufzeichnung) VALUES ('.
+				beschreibung, start, ende, budget, ressource_id, insertvon, insertamum, updatevon, updateamum, farbe, personentage, zeitaufzeichnung, arbeitsbeschreibung) VALUES ('.
 				$this->db_add_param($this->projekt_kurzbz).', '.
 				$this->db_add_param($this->projektphase_fk).', '.
 				$this->db_add_param($this->bezeichnung).', '.
@@ -337,7 +342,8 @@ class projektphase extends basis_db
 				$this->db_add_param($this->updatevon).', now(), '.
 				$this->db_add_param($this->farbe).', '.
 				$this->db_add_param($this->personentage).', '.
-				$this->db_add_param($this->zeitaufzeichnung,FHC_BOOLEAN).');';
+				$this->db_add_param($this->zeitaufzeichnung, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->arbeitsbeschreibung, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -357,7 +363,8 @@ class projektphase extends basis_db
 				'personentage='.$this->db_add_param($this->personentage).', '.
 				'updateamum= now(), '.
 				'updatevon='.$this->db_add_param($this->updatevon).', '.
-				'zeitaufzeichnung='.$this->db_add_param($this->zeitaufzeichnung,FHC_BOOLEAN).' '.
+				'zeitaufzeichnung='.$this->db_add_param($this->zeitaufzeichnung, FHC_BOOLEAN).', '.
+				'arbeitsbeschreibung='.$this->db_add_param($this->arbeitsbeschreibung,FHC_BOOLEAN).' '.
 				'WHERE projektphase_id='.$this->db_add_param($this->projektphase_id, FHC_INTEGER).';';
 		}
 
@@ -819,6 +826,7 @@ class projektphase extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->arbeitsbeschreibung = $row->arbeitsbeschreibung;
 
 				$this->result[] = $obj;
 			}

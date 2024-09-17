@@ -64,6 +64,7 @@ if($projektphase_id != '')
     $oRdf->obj[$i]->setAttribut('typ',$phase->typ);
     $oRdf->obj[$i]->setAttribut('ressource_id',$phase->ressource_id);
 	$oRdf->obj[$i]->setAttribut('zeitaufzeichnung',$phase->zeitaufzeichnung);
+	$oRdf->obj[$i]->setAttribut('arbeitsbeschreibung',$phase->arbeitsbeschreibung);
 
 	if($phase->projektphase_fk!='')
 		$oRdf->addSequence($phase->projektphase_id, $phase->projektphase_fk);
@@ -97,6 +98,7 @@ else if($projekt_kurzbz != '')
         $oRdf->obj[$idx]->setAttribut('farbe', '');
         $oRdf->obj[$idx]->setAttribut('typ', '');
 		$oRdf->obj[$idx]->setAttribut('zeitaufzeichnung','');
+		$oRdf->obj[$idx]->setAttribut('arbeitsbeschreibung','');
 
 		$oRdf->addSequence('opt');
 	}
@@ -117,6 +119,7 @@ else if($projekt_kurzbz != '')
         $oRdf->obj[$idx]->setAttribut('farbe', $phase->farbe);
         $oRdf->obj[$idx]->setAttribut('typ', $phase->typ);
 		$oRdf->obj[$idx]->setAttribut('zeitaufzeichnung',$phase->zeitaufzeichnung);
+		$oRdf->obj[$idx]->setAttribut('arbeitsbeschreibung',$phase->arbeitsbeschreibung);
 
 		$oRdf->addSequence($phase->projektphase_id);
 	}
@@ -179,6 +182,7 @@ else
 			$oRdf->obj[$idx]->setAttribut('ende','');
 			$oRdf->obj[$idx]->setAttribut('typ','organisationseinheit');
 			$oRdf->obj[$idx]->setAttribut('zeitaufzeichnung','');
+			$oRdf->obj[$idx]->setAttribut('arbeitsbeschreibung','');
 
 			$oRdf->addSequence($projekt->oe_kurzbz);
 
@@ -201,6 +205,7 @@ else
 		$oRdf->obj[$idx]->setAttribut('ende',$datum_obj->formatDatum($projekt->ende,'d.m.Y'));
 		$oRdf->obj[$idx]->setAttribut('typ','projekt');
 		$oRdf->obj[$idx]->setAttribut('zeitaufzeichnung',$projekt->zeitaufzeichnung);
+		$oRdf->obj[$idx]->setAttribut('arbeitsbeschreibung',$projekt->arbeitsbeschreibung);
 
 
 		$oRdf->addSequence($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz, $projekt->oe_kurzbz);
@@ -242,6 +247,7 @@ else
 			$oRdf->obj[$idx]->setAttribut('ressource_bezeichnung',$projektphase->ressource_bezeichnung);
 			$oRdf->obj[$idx]->setAttribut('ressource_id',$projektphase->ressource_id);
 			$oRdf->obj[$idx]->setAttribut('zeitaufzeichnung',$projektphase->zeitaufzeichnung);
+			$oRdf->obj[$idx]->setAttribut('arbeitsbeschreibung',$projektphase->arbeitsbeschreibung);
 			if (!is_null($projektphase->projektphase_fk))
 				$oRdf->addSequence($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_id, $projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_fk);
 			else

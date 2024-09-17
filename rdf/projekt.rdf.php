@@ -73,6 +73,7 @@ for ($i=0;$i<count($projekt_obj->result);$i++)
       <PROJEKT:aufwand_pt>'.$projekt->aufwand_pt.'</PROJEKT:aufwand_pt>
       <PROJEKT:aufwandstyp_kurzbz>'.$projekt->aufwandstyp_kurzbz.'</PROJEKT:aufwandstyp_kurzbz>
       <PROJEKT:zeitaufzeichnung>'.$projekt->zeitaufzeichnung.'</PROJEKT:zeitaufzeichnung>
+      <PROJEKT:arbeitsbeschreibung>'.$projekt->arbeitsbeschreibung.'</PROJEKT:arbeitsbeschreibung>
 	</RDF:Description>'."\n";
 
 	$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekt->projekt_kurzbz.'" />'."\n";

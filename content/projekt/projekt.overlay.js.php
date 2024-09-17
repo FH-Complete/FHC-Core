@@ -154,6 +154,7 @@ function onselectProjekt()
     var anzahl_ma=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahl_ma" ));
     var aufwandstyp_kurzbz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufwandstyp_kurzbz" ));
 	var zeitaufzeichnung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zeitaufzeichnung" ));
+	var arbeitsbeschreibung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#arbeitsbeschreibung" ));
 
 	if (!zeitaufzeichnung)
 	{
@@ -162,6 +163,15 @@ function onselectProjekt()
 	else
 	{
 		zeitaufzeichnung='Ja';
+	}
+
+	if (!arbeitsbeschreibung)
+	{
+		arbeitsbeschreibung='Nein';
+	}
+	else
+	{
+		arbeitsbeschreibung='Ja';
 	}
 
 	//Daten den Feldern zuweisen
@@ -183,6 +193,11 @@ function onselectProjekt()
         document.getElementById('checkbox-projekt-detail-zeitaufzeichnung').checked=false;
     else
     	document.getElementById('checkbox-projekt-detail-zeitaufzeichnung').checked=true;
+
+	if(arbeitsbeschreibung=='Nein')
+        document.getElementById('checkbox-projekt-detail-arbeitsbeschreibung').checked=false;
+    else
+    	document.getElementById('checkbox-projekt-detail-arbeitsbeschreibung').checked=true;
 
     MenulistSelectItemOnValue('menulist-projekt-detail-aufwandstyp', aufwandstyp_kurzbz);
     
@@ -218,11 +233,10 @@ function saveProjektDetail()
 	anzahl_ma = document.getElementById('textbox-projekt-anzahl_ma').value;
 	aufwand_pt = document.getElementById('textbox-projekt-aufwand_pt').value;
 	zeitaufzeichnung = document.getElementById('checkbox-projekt-detail-zeitaufzeichnung').checked;
+	arbeitsbeschreibung = document.getElementById('checkbox-projekt-detail-arbeitsbeschreibung').checked;
 
 	var soapBody = new SOAPObject("saveProjekt");
-	//soapBody.appendChild(new SOAPObject("username")).val('joe');
-	//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
-				
+
 	var projekt = new SOAPObject("projekt");
     projekt.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
     projekt.appendChild(new SOAPObject("oe_kurzbz")).val(oe_kurzbz);
@@ -244,6 +258,15 @@ function saveProjektDetail()
 	else
 	{
 		projekt.appendChild(new SOAPObject("zeitaufzeichnung")).val('false');
+	}
+
+	if(arbeitsbeschreibung)
+	{
+		projekt.appendChild(new SOAPObject("arbeitsbeschreibung")).val('true');
+	}
+	else
+	{
+		projekt.appendChild(new SOAPObject("arbeitsbeschreibung")).val('false');
 	}
 
 	if(neu)

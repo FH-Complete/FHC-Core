@@ -162,6 +162,7 @@ function onselectTreeProjektphase()
     var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
     var farbe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#farbe" ));
 	var zeitaufzeichnung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zeitaufzeichnung" ));
+	var arbeitsbeschreibung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#arbeitsbeschreibung" ));
 
 	if (!zeitaufzeichnung)
 	{
@@ -170,6 +171,15 @@ function onselectTreeProjektphase()
 	else
 	{
 		zeitaufzeichnung='Ja';
+	}
+
+	if (!arbeitsbeschreibung)
+	{
+		arbeitsbeschreibung='Nein';
+	}
+	else
+	{
+		arbeitsbeschreibung='Ja';
 	}
     //alert(typ);
     
@@ -193,6 +203,11 @@ function onselectTreeProjektphase()
 		document.getElementById('checkbox-projektphase-detail-zeitaufzeichnung').checked=false;
 	else
 		document.getElementById('checkbox-projektphase-detail-zeitaufzeichnung').checked=true;
+
+	if(arbeitsbeschreibung=='Nein')
+		document.getElementById('checkbox-projektphase-detail-arbeitsbeschreibung').checked=false;
+	else
+		document.getElementById('checkbox-projektphase-detail-arbeitsbeschreibung').checked=true;
 
     MenulistSelectItemOnValue('menulist-projektphase-detail-projektphase_fk', projektphase_fk);
 	MenulistSelectItemOnValue('menulist-projektphase-detail-ressource', ressource_id);
@@ -248,6 +263,7 @@ function saveProjektphaseDetail()
     var farbe = document.getElementById('textbox-projektphase-detail-farbe').value;
 	var neu = document.getElementById('checkbox-projektphase-detail-neu').checked;
 	var zeitaufzeichnung = document.getElementById('checkbox-projektphase-detail-zeitaufzeichnung').checked;
+	var arbeitsbeschreibung = document.getElementById('checkbox-projektphase-detail-arbeitsbeschreibung').checked;
 
 	var soapBody = new SOAPObject("saveProjektphase");
 	//soapBody.appendChild(new SOAPObject("username")).val('joe');
@@ -273,6 +289,15 @@ function saveProjektphaseDetail()
 	else
 	{
 		phase.appendChild(new SOAPObject("zeitaufzeichnung")).val('false');
+	}
+
+	if(arbeitsbeschreibung)
+	{
+		phase.appendChild(new SOAPObject("arbeitsbeschreibung")).val('true');
+	}
+	else
+	{
+		phase.appendChild(new SOAPObject("arbeitsbeschreibung")).val('false');
 	}
 	if(neu)
 	{

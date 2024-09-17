@@ -297,11 +297,47 @@ echo '
 			}
 			});
 
+			function updateArbeitsbeschreibung() {
+				let selectedProjekt = $("#projekt").find("option:selected");
+				let selectedPhase = $("#projektphase").find("option:selected");
+				
+				let arbeitsbeschreibungProjekt = selectedProjekt.data("arbeitsbeschreibung");
+				let arbeitsbeschreibungPhase = selectedPhase.data("arbeitsbeschreibung");
+
+				 if (arbeitsbeschreibungPhase !== undefined && selectedPhase !== "") 
+				 {
+					if (arbeitsbeschreibungPhase) 
+					{
+						$("#beschreibung-textarea").attr("required", true);
+					} 
+					else 
+					{
+						$("#beschreibung-textarea").removeAttr("required");
+					}
+				}
+				else if (arbeitsbeschreibungProjekt) 
+				{
+					$("#beschreibung-textarea").attr("required", true);
+				}
+				else 
+				{
+					$("#beschreibung-textarea").removeAttr("required");
+				}
+			}
+
 			$("#projekt").change(
 				function()
 				{
 					var uid = $("#uidpass").val();
 					getProjektphasen($(this).val(),uid);
+					updateArbeitsbeschreibung();
+				}
+			)
+			
+			$("#projektphase").change(
+				function()
+				{
+					updateArbeitsbeschreibung();
 				}
 			)
 
@@ -334,6 +370,7 @@ echo '
 				$(this).trigger("isVisible");
 			});
 
+			updateArbeitsbeschreibung();
 		});
 
 		function setbisdatum()
@@ -617,7 +654,7 @@ echo '
 							var projphasenhtml = "";
 							for (var i = 0; i < json.length; i++)
 							{
-								projphasenhtml += "<option value = \'" + json[i].projektphase_id + "\'>";
+								projphasenhtml += "<option data-arbeitsbeschreibung=\'" + json[i].arbeitsbeschreibung + "\' value = \'" + json[i].projektphase_id + "\'>";
 								projphasenhtml += json[i].bezeichnung;
 
 								if(json[i].start != \'\' && json[i].ende !=\'\')
@@ -1233,7 +1270,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				else
 					$selected = '';
 
-				echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
+				echo '<option data-arbeitsbeschreibung="'. $db->db_parse_bool($row_projekt->arbeitsbeschreibung) .'" value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
 		}
 		echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">-->';
 
@@ -1266,7 +1303,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				else
 					$selected = '';
 
-				echo '<option value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung).
+				echo '<option data-arbeitsbeschreibung="'. $db->db_parse_bool($projektphase->arbeitsbeschreibung) .'" value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung).
 				$phasentext. '</option>';
 			}
 
@@ -1390,7 +1427,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			if (!$adminView)
 				{
 					//Beschreibung
-					echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea style="font-size: 13px" name="beschreibung" cols="60" maxlength="256">'.$db->convert_html_chars($beschreibung).'</textarea></td></tr>';
+					echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea id="beschreibung-textarea" style="font-size: 13px" name="beschreibung" cols="60" maxlength="256">'.$db->convert_html_chars($beschreibung).'</textarea></td></tr>';
 					echo '<tr><td></td><td></td><td></td><td align="right">';
 					//SpeichernButton
 					if($zeitaufzeichnung_id == '')

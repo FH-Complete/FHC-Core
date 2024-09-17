@@ -173,6 +173,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
                             </hbox>
 
                     </row>
+					<row>
+
+						<label value="Arbeitsbeschreibung" control="checkbox-projekt-detail-arbeitsbeschreibung"/>
+						<hbox>
+							<checkbox id="checkbox-projekt-detail-arbeitsbeschreibung"/>
+							<spacer />
+						</hbox>
+
+					</row>
 				</rows>
 			</grid>
 			<hbox>

@@ -91,6 +91,15 @@ function saveProjektphase($username, $passwort, $phase)
 		$projektphase->zeitaufzeichnung = false;
 	}
 
+	if($phase->arbeitsbeschreibung=='true')
+	{
+		$projektphase->arbeitsbeschreibung = true;
+	}
+	else
+	{
+		$projektphase->arbeitsbeschreibung = false;
+	}
+
 	if($phase->neu=='true')
 	{
 		$projektphase->new = true;

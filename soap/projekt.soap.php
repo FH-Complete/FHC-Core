@@ -81,6 +81,15 @@ function saveProjekt($username, $passwort, $projekt)
 		$projektNew->zeitaufzeichnung = false;
 	}
 
+	if($projekt->arbeitsbeschreibung=='true')
+	{
+		$projektNew->arbeitsbeschreibung = true;
+	}
+	else
+	{
+		$projektNew->arbeitsbeschreibung = false;
+	}
+
 	if($projekt->neu=='true')
 	{
 		$projektNew->new = true;

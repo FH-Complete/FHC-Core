@@ -174,6 +174,10 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 			if(empty($data[self::PHASE]))
 				$this->checkProjectInterval($data[self::PROJEKT], $data[self::STARTDT], $data[self::ENDEDT]);
 			$this->checkPhaseInterval($data[self::PHASE], $data[self::STARTDT], $data[self::ENDEDT]);
+			if ($data[self::PHASE] !== "")
+				$this->checkIfArbeitsbeschreibungRequiredPhase($data[self::PHASE], $data[self::BESCHREIBUNG]);
+			else
+				$this->checkIfArbeitsbeschreibungRequired($data[self::PROJEKT], $data[self::BESCHREIBUNG]);
 			$this->checkVals($data[self::OE],$data[self::PROJEKT],$data[self::PHASE],$data[self::SERVICE]);
 			$this->mapLehreIntern($data);
 			$this->prepareZeitaufzeichnung($data);

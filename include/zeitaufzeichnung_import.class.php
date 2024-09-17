@@ -222,36 +222,63 @@ class zeitaufzeichnung_import {
 		}
 	}
 
-	/**
- * @param string $phase The Projektphase ID
- * @return void
- *
- * @throws Exception
- */
-protected function checkPhaseBebuchbar($phase)
-{
-	if ($this->phase->getPhasenZA($phase) == 'f')
+		/**
+	 * @param string $phase The Projektphase ID
+	 * @return void
+	 *
+	 * @throws Exception
+	 */
+	protected function checkPhaseBebuchbar($phase)
 	{
-		throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Dieses Arbeitspaket darf nicht bebucht werden!');
-	}
-}
-
-/**
-* @param string $phase The Projektphase ID
-* @return void
-*
-* @throws Exception
-*/
-protected function checkIfArbeitspaketZuWaehlen($projekt_kurzbz, $phase)
-{
-	if ($projekt_kurzbz != '')
-	{
-		$this->project->load($projekt_kurzbz);
-		if (!$this->project->zeitaufzeichnung && !$phase)
+		if ($this->phase->getPhasenZA($phase) == 'f')
 		{
-			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Bitte ein Arbeitspaket wählen!');
+			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Dieses Arbeitspaket darf nicht bebucht werden!');
 		}
 	}
-}
+
+	/**
+	* @param string $phase The Projektphase ID
+	* @return void
+	*
+	* @throws Exception
+	*/
+	protected function checkIfArbeitspaketZuWaehlen($projekt_kurzbz, $phase)
+	{
+		if ($projekt_kurzbz != '')
+		{
+			$this->project->load($projekt_kurzbz);
+
+			if (!$this->project->zeitaufzeichnung && !$phase)
+			{
+				throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Bitte ein Arbeitspaket wählen!');
+			}
+		}
+	}
+
+	protected function checkIfArbeitsbeschreibungRequired($projekt_kurzbz, $beschreibung)
+	{
+		if ($projekt_kurzbz != '')
+		{
+			$this->project->load($projekt_kurzbz);
+
+			if ($this->project->arbeitsbeschreibung && empty(trim($beschreibung)))
+			{
+				throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Bitte eine Beschreibung angeben!');
+			}
+		}
+	}
+
+	protected function checkIfArbeitsbeschreibungRequiredPhase($phase, $beschreibung)
+	{
+		if ($phase != '')
+		{
+			$this->phase->load($phase);
+
+			if ($this->phase->arbeitsbeschreibung && empty(trim($beschreibung)))
+			{
+				throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Bitte eine Beschreibung angeben!');
+			}
+		}
+	}
 
 }

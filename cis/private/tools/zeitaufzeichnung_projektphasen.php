@@ -87,6 +87,7 @@ if (isset($_GET['projekt_kurzbz']))
 				$item['start'] = $datum_obj->formatDatum($row->start, 'd.m.Y');
 				$item['ende'] = $datum_obj->formatDatum($row->ende, 'd.m.Y');
 				$item['zeitaufzeichnung_erlaubt'] = $row->zeitaufzeichnung;
+				$item['arbeitsbeschreibung'] = $db->db_parse_bool($row->arbeitsbeschreibung);
 				$result_obj[] = $item;
 			}
 		}
