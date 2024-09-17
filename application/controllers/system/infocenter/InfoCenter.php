@@ -342,7 +342,7 @@ class InfoCenter extends Auth_Controller
 		$checkUnruly = $this->PersonModel->checkUnruly($persondata['stammdaten']->vorname, $persondata['stammdaten']->nachname, $persondata['stammdaten']->gebdatum);
 		if (isError($checkUnruly)) show_error(getError($checkUnruly));
 
-		$duplicate = array('duplicated' => getData($checkPerson));
+		$duplicate = array('duplicate' => getData($checkPerson));
 		$unruly = array('unruly' => getData($checkUnruly));
 
 		$prestudentdata = $this->_loadPrestudentData($person_id);
@@ -1289,67 +1289,28 @@ class InfoCenter extends Auth_Controller
 			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 
 		$kontakte = $this->input->post('kontakt');
-		foreach ($kontakte as $kontakt)
-		{
-			$kontaktExists = $this->KontaktModel->loadWhere(array(
-				'kontakt_id' => $kontakt['id'],
-				'person_id' => $person_id,
-			));
+		if($kontakte) {
 
-			if (hasData($kontaktExists))
-			{
-				$kontaktExists = getData($kontaktExists)[0];
+			foreach ($kontakte as $kontakt) {
+				$kontaktExists = $this->KontaktModel->loadWhere(array(
+					'kontakt_id' => $kontakt['id'],
+					'person_id' => $person_id,
+				));
 
-				if ($kontaktExists->kontakt === $kontakt['value'])
-					continue;
+				if (hasData($kontaktExists)) {
+					$kontaktExists = getData($kontaktExists)[0];
 
-				$update = $this->KontaktModel->update(
-					array
-					(
-						'kontakt_id' => $kontakt['id']
-					),
-					array
-					(
-						'kontakt' => isEmptyString($kontakt['value']) ? null : $kontakt['value'],
-						'updateamum' => date('Y-m-d H:i:s'),
-						'updatevon' => $this->_uid
-					)
-				);
+					if ($kontaktExists->kontakt === $kontakt['value'])
+						continue;
 
-				if (isError($update))
-					$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
-			}
-		}
-
-		$adressen = $this->input->post('adresse');
-
-		foreach ($adressen as $adresse)
-		{
-			$adresseExists = $this->AdresseModel->loadWhere(array(
-				'adresse_id' => $adresse['id'],
-				'person_id' => $person_id,
-			));
-
-			if (hasData($adresseExists))
-			{
-				$adresse = $adresse['value'];
-				$adresseExists = getData($adresseExists)[0];
-				if ($adresseExists->strasse !== $adresse['strasse'] ||
-					$adresseExists->plz !== $adresse['plz'] ||
-					$adresseExists->ort !== $adresse['ort'] ||
-					$adresseExists->nation !== $adresse['nation'])
-				{
-					$update = $this->AdresseModel->update(
+					$update = $this->KontaktModel->update(
 						array
 						(
-							'adresse_id' => $adresseExists->adresse_id
+							'kontakt_id' => $kontakt['id']
 						),
 						array
 						(
-							'strasse' => isEmptyString($adresse['strasse']) ? null : $adresse['strasse'],
-							'plz' => isEmptyString($adresse['plz']) ? null : $adresse['plz'],
-							'ort' => isEmptyString($adresse['ort']) ? null : $adresse['ort'],
-							'nation' => isEmptyString($adresse['nation']) ? null : $adresse['nation'],
+							'kontakt' => isEmptyString($kontakt['value']) ? null : $kontakt['value'],
 							'updateamum' => date('Y-m-d H:i:s'),
 							'updatevon' => $this->_uid
 						)
@@ -1358,7 +1319,48 @@ class InfoCenter extends Auth_Controller
 					if (isError($update))
 						$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 				}
+			}
 
+		}
+
+		$adressen = $this->input->post('adresse');
+
+		if($adressen) {
+
+			foreach ($adressen as $adresse) {
+				$adresseExists = $this->AdresseModel->loadWhere(array(
+					'adresse_id' => $adresse['id'],
+					'person_id' => $person_id,
+				));
+
+				if (hasData($adresseExists)) {
+					$adresse = $adresse['value'];
+					$adresseExists = getData($adresseExists)[0];
+					if ($adresseExists->strasse !== $adresse['strasse'] ||
+						$adresseExists->plz !== $adresse['plz'] ||
+						$adresseExists->ort !== $adresse['ort'] ||
+						$adresseExists->nation !== $adresse['nation']) {
+						$update = $this->AdresseModel->update(
+							array
+							(
+								'adresse_id' => $adresseExists->adresse_id
+							),
+							array
+							(
+								'strasse' => isEmptyString($adresse['strasse']) ? null : $adresse['strasse'],
+								'plz' => isEmptyString($adresse['plz']) ? null : $adresse['plz'],
+								'ort' => isEmptyString($adresse['ort']) ? null : $adresse['ort'],
+								'nation' => isEmptyString($adresse['nation']) ? null : $adresse['nation'],
+								'updateamum' => date('Y-m-d H:i:s'),
+								'updatevon' => $this->_uid
+							)
+						);
+
+						if (isError($update))
+							$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+					}
+
+				}
 			}
 		}
 

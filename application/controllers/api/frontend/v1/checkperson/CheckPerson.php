@@ -18,13 +18,15 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class UnrulyPerson extends FHCAPI_Controller
+class CheckPerson extends FHCAPI_Controller
 {
 	public function __construct()
 	{
 		parent::__construct([
 			'updatePersonUnrulyStatus' => array('basis/mitarbeiter:rw', 'student/antragfreigabe:rw', 'student/studierendenantrag:rw'),
-			'filterPerson' => array('basis/mitarbeiter:rw', 'student/antragfreigabe:rw', 'student/studierendenantrag:rw')
+			'filterPerson' => array('basis/mitarbeiter:rw', 'student/antragfreigabe:rw', 'student/studierendenantrag:rw'),
+			'checkUnruly' => array('basis/mitarbeiter:r', 'student/antragfreigabe:r', 'student/studierendenantrag:r', 'infocenter:r'),
+			'checkDuplicate' => array('infocenter:r'),
 		]);
 
 		$this->_ci =& get_instance();
@@ -48,13 +50,42 @@ class UnrulyPerson extends FHCAPI_Controller
 
 	}
 
+	public function checkDuplicate() {
+
+		$person_id = $this->input->post('person_id');
+
+		$result = $this->_ci->PersonModel->checkDuplicate($person_id);
+
+		if (isSuccess($result))
+			$this->terminateWithSuccess($result);
+		else
+			$this->terminateWithError('Error when searching for person');
+
+	}
+
+	// performs strict check over vorname, nachname, gebdatum
+	public function checkUnruly() {
+
+		$vorname = $this->input->post('vorname');
+		$nachname = $this->input->post('nachname');
+		$gebdatum = $this->input->post('gebdatum');
+
+		$result = $this->_ci->PersonModel->checkUnruly($vorname, $nachname, $gebdatum);
+
+		if (isSuccess($result))
+			$this->terminateWithSuccess($result);
+		else
+			$this->terminateWithError('Error when searching for person');
+	}
+
+	// filters nachname on similarity and vorname/gebdatum are optional
 	public function filterPerson() {
 		$payload = json_decode($this->input->raw_input_stream, TRUE);
 
 		$nachnameString = '';
 		$vornameString = '';
 		$filterUnruly = true;
-		$birthdateString = null;
+		$birthdateString = '';
 
 		if(array_key_exists( 'nachname', $payload) ) {
 			$nachnameString = $payload['nachname'];
@@ -80,16 +111,16 @@ class UnrulyPerson extends FHCAPI_Controller
 			$where = "p.nachname=? ";
 		}
 
-		if(isset($vorname) && $vorname != '')
+		if(isset($vornameString) && $vornameString != '')
 		{
 			$where.= " AND p.vorname~*?";
-			$parametersArray[] = $vorname;
+			$parametersArray[] = $vornameString;
 		}
 
-		if(isset($birthdate) && $birthdate != '')
+		if(isset($birthdateString) && $birthdateString != '')
 		{
 			$where.=" AND p.gebdatum=?";
-			$parametersArray[] = $birthdate;
+			$parametersArray[] = $birthdateString;
 		}
 
 		if(isset($filterUnruly))

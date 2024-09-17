@@ -3,7 +3,7 @@ export default {
 
 		try {
 			const payload = {person_id, unruly: unrulyParam}
-			const url = '/api/frontend/v1/unrulyperson/UnrulyPerson/updatePersonUnrulyStatus';
+			const url = '/api/frontend/v1/checkperson/CheckPerson/updatePersonUnrulyStatus';
 			return this.$fhcApi.post(url, payload, null);
 		} catch (error) {
 			throw error;
@@ -13,7 +13,7 @@ export default {
 	filterPerson(payload, base = ''){
 
 		try {
-			const url = base + '/api/frontend/v1/unrulyperson/UnrulyPerson/filterPerson';
+			const url = base + '/api/frontend/v1/checkperson/CheckPerson/filterPerson';
 			return axios.post(url, payload)
 			// return this.$fhcApi.post(url, payload, null);
 		} catch (error) {

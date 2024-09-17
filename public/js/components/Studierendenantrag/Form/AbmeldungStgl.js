@@ -81,7 +81,7 @@ export default {
 				.then(result => {
 
 					if(this.unrulyInternal) {
-						this.$fhcApi.factory.unrulyperson.updatePersonUnrulyStatus(this.data.person_id, true).then(
+						this.$fhcApi.factory.checkperson.updatePersonUnrulyStatus(this.data.person_id, true).then(
 							(res)=> {
 								if(res?.meta?.status === "success") {
 									this.$fhcAlert.alertSuccess(this.$p.t('studierendenantrag', 'antrag_unruly_updated'))

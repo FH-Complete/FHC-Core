@@ -27,7 +27,8 @@
 			'public/js/infocenter/rueckstellung.js',
 			'public/js/infocenter/zgvUeberpruefung.js',
 			'public/js/infocenter/docUeberpruefung.js',
-			'public/js/infocenter/stammdaten.js'
+			'public/js/infocenter/stammdaten.js',
+			'public/js/infocenter/personcheck.js'
 		),
 		'phrases' => array(
 			'infocenter',
@@ -38,6 +39,14 @@
 
 	$this->load->view('templates/FHC-Header', $includesArray);
 ?>
+
+	<script>
+		// Embed PHP data into JS as JSON to access from script files
+		const viewData = {
+			checkPerson: <?php echo json_encode(array('unruly' => $unruly, 'duplicate' => $duplicate)); ?>,
+		};
+	</script>
+
 	<div id="wrapper">
 	
 		<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
@@ -74,38 +83,8 @@
 						</div>
 					</div>
 				</div>
-				<?php if (!is_null($unruly)): ?>
-					<div class="row alert-info">
-						<h3 class="header col-lg-12">
-							<?php echo $this->p->t('infocenter', 'unrulyPersonFound') . ':'; ?>
-						</h3>
-						<div class="text-left col-lg-12">
-							<?php
-							foreach ($unruly as $unruled)
-							{
-								echo  'Person ID: ' . $unruled->person_id . '<br />';
-							}
-							?>
-						</div>
-
-					</div>
-				<?php endif; ?>
-				<?php if (!is_null($duplicated)): ?>
-					<div class="row alert-warning">
-						<h3 class="header col-lg-12">
-							<?php echo $this->p->t('global', 'bewerberVorhanden') . ':'; ?>
-						</h3>
-						<div class="text-left col-lg-12">
-							<?php
-							foreach ($duplicated as $duplicate)
-							{
-								echo  'Person ID: ' . $duplicate->person_id . '<br />';
-							}
-							?>
-						</div>
-	
-					</div>
-				<?php endif; ?>
+				<br/>
+					<?php $this->load->view('system/infocenter/personCheck.php', array('unruly' => $unruly, 'duplicate' => $duplicate)); ?>
 				<br/>
 				<section>
 					<div class="row">

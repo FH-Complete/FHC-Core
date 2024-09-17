@@ -294,15 +294,15 @@ class Person_model extends DB_Model
 	{
 		$qry = "SELECT person_id
 				FROM public.tbl_prestudent p
-				JOIN 
+				JOIN
 				(
 					SELECT DISTINCT ON(prestudent_id) *
 					FROM public.tbl_prestudentstatus
-					WHERE prestudent_id IN 
+					WHERE prestudent_id IN
 						(
-							SELECT prestudent_id 
-							FROM public.tbl_prestudent 
-							WHERE person_id IN 
+							SELECT prestudent_id
+							FROM public.tbl_prestudent
+							WHERE person_id IN
 							(
 								SELECT p2.person_id
 								FROM public.tbl_person p
@@ -316,8 +316,8 @@ class Person_model extends DB_Model
 					ORDER BY prestudent_id, datum DESC, insertamum DESC
 				) ps USING(prestudent_id)
 				JOIN public.tbl_status USING(status_kurzbz)
-				WHERE status_kurzbz = 'Interessent' 
-				AND studiengang_kz IN 
+				WHERE status_kurzbz = 'Interessent'
+				AND studiengang_kz IN
 				(
 					SELECT studiengang_kz
 					FROM public.tbl_prestudent p

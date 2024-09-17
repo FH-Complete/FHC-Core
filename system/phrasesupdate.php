@@ -2670,7 +2670,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unerwünscht',
+				'text' => 'Unruly',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5349,7 +5349,7 @@ The invoice will be sent to you again. <u><strong>The amount is only to be trans
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unerwünschte Person wurde gefunden',
+				'text' => 'Unruly Person wurde gefunden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -20838,7 +20838,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unerwünscht',
+				'text' => 'Unruly',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -20858,7 +20858,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unerwünschte Person Status wurde aktualisiert.',
+				'text' => 'Unruly Person Status wurde aktualisiert.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -23219,7 +23219,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Person ist unerwünscht',
+				'text' => 'Person ist unruly',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -23419,7 +23419,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Person ist unerwünscht',
+				'text' => 'Person ist unruly.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
