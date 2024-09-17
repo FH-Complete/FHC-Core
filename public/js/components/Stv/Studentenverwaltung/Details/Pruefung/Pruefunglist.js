@@ -12,6 +12,10 @@ export default{
 		defaultSemester: {
 			from: 'defaultSemester',
 		},
+/*		$reloadList: {
+			from: '$reloadList',
+			required: true
+		}*/
 	},
 	props: {
 		uid: Number
@@ -26,6 +30,7 @@ export default{
 					{title: "Datum", field: "format_datum"},
 					{title: "Lehrveranstaltung", field: "lehrveranstaltung_bezeichnung"},
 					{title: "Note", field: "note_bezeichnung"},
+					{title: "StudSem", field: "studiensemester_kurzbz"}, //just testing
 					{title: "Anmerkung", field: "anmerkung"},
 					{title: "Typ", field: "pruefungstyp_kurzbz"},
 					{title: "PruefungId", field: "pruefung_id", visible: false},
@@ -110,7 +115,10 @@ export default{
 			listMarks: [],
 			filter: false,
 			statusNew: true,
-			isStartDropDown: false
+			isStartDropDown: false,
+			currentSemester: false,
+	//		componentKey: 0,
+			isFilterSet: false,
 		}
 	},
 	computed:{
@@ -124,13 +132,31 @@ export default{
 		},
 		lv_teile_ma(){
 			return this.listLvsAndMas.filter(lv => lv.lehrveranstaltung_id == this.pruefungData.lehrveranstaltung_id);
-		}
+		},
+		semester_intern: {
+			get() {
+				if (this.currentSemester)
+					return this.currentSemester;
+				else
+					return false;
+			},
+			set(value) {
+				this.currentSemester = value;
+			}
+		},
 	},
-/*	watch: {
+	watch: {
+/*		defaultSemester(newVal, oldVal) {
+			if (newVal !== oldVal) {
+				console.log("variable did change");
+				//this.reload(); // Methode aufrufen, um die Komponente neu zu laden
+				this.componentKey += 1;
+			}
+		},
 		modelValue() {
 			this.$refs.table.reloadTable();
-		}
-	},*/
+		}*/
+	},
 	methods:{
 		loadPruefung(pruefung_id) {
 			return this.$fhcApi.get('api/frontend/v1/stv/pruefung/loadPruefung/' + pruefung_id)
@@ -143,6 +169,7 @@ export default{
 		actionNewPruefung(){
 			this.statusNew = true;
 			this.isStartDropDown = true;
+			this.resetModal();
 
 /*			this.getLvsByStudent(this.uid).then(() => {
 					this.$refs.pruefungModal.show();
@@ -157,8 +184,9 @@ export default{
 			this.statusNew = true;
 			this.isStartDropDown = false;
 			this.loadPruefung(pruefung_id).then(() => {
-				this.pruefungData.note_bezeichnung = 'Noch nicht eingetragen';
+				this.pruefungData.note = 9;
 				this.pruefungData.datum = new Date();
+				this.pruefungData.pruefungstyp_kurzbz = null;
 				this.prepareDropdowns();
 
 				this.$refs.pruefungModal.show();
@@ -249,6 +277,16 @@ export default{
 		reload() {
 			this.$refs.table.reloadTable();
 		},
+/*		setFilter(semester) {
+			if (semester == 'open')
+				window.localStorage.setItem(LOCAL_STORAGE_ID_FILTER, this.filter ? 1 : 0);
+			else if( semester == 'default_semester')
+				this.$fhcApi.factory
+					.stv.filter.setSemester(this.defaultSemester)
+					.catch(this.$fhcAlert.handleSystemError);
+
+			this.$nextTick(this.$refs.table.reloadTable);
+		},*/
 		getLvsByStudent(student_uid){
 			return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getLvsByStudent/' + student_uid)
 				.then(result => {
@@ -256,6 +294,18 @@ export default{
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+/*		//version post request
+getLvsByStudent(student_uid, studiensemester_kurzbz){
+			const data = {
+				student_uid: student_uid,
+				studiensemester_kurzbz: studiensemester_kurzbz
+			};
+			return this.$fhcApi.post('api/frontend/v1/stv/pruefung/getLvsByStudent/', data)
+				.then(result => {
+					this.listLvs = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},*/
 		getMaFromLv(lv_id){
 			return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getMitarbeiterLv/' + lv_id)
 				.then(result => {
@@ -301,7 +351,17 @@ export default{
 
 
 			this.$refs.pruefungModal.show();
-		}
+		},
+		onSwitchChange() {
+			if (this.isFilterSet) {
+				console.log('filter gesetzt: ' + this.defaultSemester + ' uid ' + this.uid);
+				this.$refs.table.setFilter("studiensemester_kurzbz", "=", this.defaultSemester);
+				//TODO(Manu) TypeError: this.$refs.table.setFilter is not a function
+
+			} else {
+				console.log('Alle anzeigen');
+			}
+		},
 	},
 	created(){
 		this.$fhcApi.get('api/frontend/v1/stv/pruefung/getLvsByStudent/' + this.uid)
@@ -337,19 +397,41 @@ export default{
 	template: `
 	<div class="stv-details-pruefung-pruefung-list 100 pt-3">
 	
-	aktuelles Sem: {{defaultSemester}}
+<!--	{{pruefungData}}-->
+	
+	aktuelles Sem: {{defaultSemester}} <br>
+	current Sem: {{currentSemester}}
 	<hr>
 	
+	  <div>
+	  
+		<form-input
+			container-class="form-switch"
+			type="checkbox"
+			label="Nur aktuelles Studiensemester anzeigen"
+			v-model="isFilterSet"
+			@change="onSwitchChange"
+			>
+		</form-input>
+	
 		<div class="justify-content-end pb-3">
-				<form-inputlistTypesExam
+				<form-input
 					container-class="form-switch"
 					type="checkbox"
 					label="Aktuelles Studiensemester Anzeigen"
-					v-model="filter"
-					@update:model-value="setFilter('open')"
+					v-model="defaultSemester"
+					 @change="setSemester('defaultSemester')"
 					>
-				</form-inputlistTypesExam>
-<!--			<div class="col-lg-3">
+				</form-input>
+<!--				<form-input
+					container-class="form-switch"
+					type="checkbox"
+					label="Aktuelles Studiensemester Anzeigen"
+					v-model="semester_intern"
+					@update:model-value="setFilter('current_sem')"
+					>
+				</form-input>
+			<div class="col-lg-3">
 				<form-input
 					container-class="form-switch"
 					type="checkbox"
@@ -373,9 +455,7 @@ export default{
 			@click:new="actionNewPruefung"
 			>
 		</core-filter-cmpt>
-	
-		<p>Form </p>
-		
+			
 		<!--Modal: pruefungModal-->
 		<bs-modal ref="pruefungModal">
 			<template #title>
@@ -421,7 +501,9 @@ export default{
 					</option>
 				</form-input>
 			
-				<!--DropDown MitarbeiterIn-->
+				<!--DropDown MitarbeiterIn
+				//TODO(Manu) phrase
+				-->
 				<form-input
 					container-class="mb-3"
 					type="select"
@@ -429,7 +511,8 @@ export default{
 					:label="$p.t('fristenmanagement/mitarbeiterin')"
 					v-model="pruefungData.mitarbeiter_uid"
 					>
-					<option value="null"> -- keine Auswahl -- </option>
+					
+					<option :value="null"> -- keine Auswahl -- </option>
 					<option
 						v-for="ma in isStartDropDown ? lv_teile_ma : listMas"
 						:key="ma.mitarbeiter_uid"
@@ -439,14 +522,19 @@ export default{
 					</option>				
 				</form-input>
 			
-				<!--DropDown Typ Prüfungstermin-->
+				<!--DropDown Typ Prüfungstermin
+				//TODO (Manu) phrase
+				-->
 				<form-input
 					container-class="mb-3"
 					type="select"
 					name="typ"
 					:label="$p.t('global/typ')"
 					v-model="pruefungData.pruefungstyp_kurzbz"
-					>
+					>			
+					<option :value="null">
+						-- keine Auswahl --
+					</option>
 					<option
 						v-for="typ in listTypesExam"
 						:key="typ.pruefungstyp_kurzbz"

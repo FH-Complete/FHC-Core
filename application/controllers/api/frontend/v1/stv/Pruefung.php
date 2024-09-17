@@ -101,7 +101,7 @@ class Pruefung extends FHCAPI_Controller
 	}
 
 	public function insertPruefung(){
-		//TODO(Manu) validations
+		//TODO(Manu) Berechtigungen
 
 		$authUID = getAuthUID();
 		$lehreinheit_id = $this->input->post('lehreinheit_id');
@@ -112,6 +112,11 @@ class Pruefung extends FHCAPI_Controller
 		$pruefungstyp_kurzbz = $this->input->post('pruefungstyp_kurzbz');
 		$anmerkung = $this->input->post('anmerkung');
 
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(
+			'datum', $this->p->t('global', 'datum'), ['is_valid_date']
+		);
 
 		$result = $this->PruefungModel->insert([
 			'lehreinheit_id' => $lehreinheit_id,
@@ -132,7 +137,7 @@ class Pruefung extends FHCAPI_Controller
 	}
 
 	public function updatePruefung($pruefung_id){
-		//TODO(Manu) validations
+		//TODO(Manu) validations and Berechtigungen
 		$result = $this->PruefungModel->load($pruefung_id);
 
 		$oldpruefung = $this->getDataOrTerminateWithError($result);
@@ -280,11 +285,15 @@ class Pruefung extends FHCAPI_Controller
 		return $this->terminateWithSuccess($allDataMa);
 	}
 
-	public function getLvsByStudent($student_uid)
+	public function getLvsByStudent($student_uid, $studiensemester_kurzbz=null )
 	{
+		//bei post request
+/*		$student_uid = $this->input->post('student_uid');
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');*/
+
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 
-		$result = $this->LehrveranstaltungModel->getLvsByStudent($student_uid);
+		$result = $this->LehrveranstaltungModel->getLvsByStudent($student_uid, $studiensemester_kurzbz);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
