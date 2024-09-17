@@ -1,5 +1,4 @@
 import FhcCalendar from "../../components/Calendar/Calendar.js";
-import CalendarModal from '../../components/Calendar/CalendarModal.js';
 import Phrasen from "../../plugin/Phrasen.js";
 import CalendarDate from "../../composables/CalendarDate.js";
 
