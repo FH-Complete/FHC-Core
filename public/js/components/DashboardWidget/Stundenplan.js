@@ -61,8 +61,9 @@ export default {
 		},
 		showLvUebersicht: function (event){
 			this.selectedEvent= event;
-			Vue.nextTick(()=>{this.$refs.lvUebersicht.show();});
-			
+			Vue.nextTick(()=>{
+				this.$refs.lvUebersicht.show();
+			});
 		},
 		
 		selectDay(day) {

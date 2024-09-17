@@ -7,7 +7,13 @@ export default  {
             type:Object,
             required:true,
             default:null,
-        }
+        },
+		// prop used to preselect a menu item and skip the grid overview
+		preselectedMenu: {
+			type: Object,
+			required: false,
+			default: null,
+		}
     },
     data(){
         return {
@@ -28,12 +34,15 @@ export default  {
 			this.isMenuSelected = false;
         },
         showModal: function(){
-
-            this.$fhcApi.factory.addons.getLvMenu(this.event.lehrveranstaltung_id, this.event.studiensemester_kurzbz).then(res =>{
-                if(res.data){
-                    this.menu = res.data;
-                }
-            });
+			if(!this.preselectedMenu){
+				this.$fhcApi.factory.addons.getLvMenu(this.event.lehrveranstaltung_id, this.event.studiensemester_kurzbz).then(res =>{
+					if(res.data){
+						this.menu = res.data;
+					}
+				});
+			}else{
+				this.isMenuSelected = true;
+			}
         },
     },
     mounted(){
@@ -47,7 +56,7 @@ export default  {
 
         </template>
         <template #default>
-			<lv-menu v-model:isMenuSelected="isMenuSelected" :menu="menu"></lv-menu>
+			<lv-menu v-model:isMenuSelected="isMenuSelected" :preselectedMenu="preselectedMenu" :menu="menu" @hideModal="hide"></lv-menu>
         </template>
         
     </bs-modal>

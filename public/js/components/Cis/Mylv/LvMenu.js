@@ -9,6 +9,10 @@ export default {
 			type:Array,
 			default:null,
 		},
+		preselectedMenu: {
+			type: Object,
+			default: null,
+		},
 	},
 	data(){
 		return{
@@ -44,11 +48,26 @@ export default {
 
 			
 		},
+		back: function(){
+			if(this.preselectedMenu){
+				this.$emit('hideModal');
+			}else{
+				this.$emit('update:isMenuSelected', false);
+			}
+		},
+	},
+	watch:{
+		'preselectedMenu': function (newValue) {
+			if (newValue) {
+				this.selectedMenu = newValue;
+				this.$emit("update:isMenuSelected", true);
+			}
+		}
 	},
 	template:/*html*/`
 	<div v-if="selectedMenu" class="d-flex flex-column h-100">
 		<div class="d-flex mb-2">
-			<button v-if="selectedMenu" @click="$emit('update:isMenuSelected', false)" class="btn btn-secondary me-2"><i class="fa fa-chevron-left"></i> Back</button>
+			<button v-if="selectedMenu" @click="back" class="btn btn-secondary me-2"><i class="fa fa-chevron-left"></i> Back</button>
 			<h2>{{selectedMenu.name}}</h2>
 		</div>
 		<iframe class="h-100 w-100" :src="selectedMenu.c4_link" :title="selectedMenu.name"></iframe>
