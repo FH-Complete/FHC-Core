@@ -363,7 +363,11 @@ class UHSTAT1 extends FHC_Controller
 
 		// get realistic birth years, dated back from current year
 		$currYear = date("Y");
-		$formMetaData['jahre'] = range($currYear - self::UPPER_BOUNDARY_YEARS, $currYear - self::LOWER_BOUNDARY_YEARS);
+		$yearRange = range($currYear - self::UPPER_BOUNDARY_YEARS, $currYear - self::LOWER_BOUNDARY_YEARS);
+		$formMetaData['jahre'] = array_combine($yearRange, $yearRange);
+
+		// add "unknown" option
+		$formMetaData['jahre'][9999] = 'unbekannt';
 
 		return success($formMetaData);
 	}
