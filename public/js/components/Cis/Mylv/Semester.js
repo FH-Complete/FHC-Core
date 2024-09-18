@@ -6,7 +6,7 @@ export default {
 	},
 	provide() {
 		return {
-			studien_semester: this.semester
+			studien_semester: Vue.computed(() => this.semester) 
 		}
 	},
 	props: {

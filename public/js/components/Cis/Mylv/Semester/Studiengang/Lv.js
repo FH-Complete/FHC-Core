@@ -87,7 +87,16 @@ export default {
 			}
 		}
 	},
-	mounted(){
+	watch:{
+		studien_semester(newValue){
+			this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, newValue)
+				.then(res => {
+					this.menu = res.data;
+				})
+				.catch((error) => this.$fhcAlert.handleSystemError);	
+		}
+	},
+	mounted() {
 		this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, this.studien_semester)
 			.then(res => {
 				this.menu = res.data;
@@ -95,7 +104,6 @@ export default {
 			.catch((error) => this.$fhcAlert.handleSystemError);
 	},
 	template: /*html*/`<div class="mylv-semester-studiengang-lv card">
-
 		<lv-uebersicht ref="lvUebersicht" :preselectedMenu="preselectedMenuItem" :event="{
 			lehrveranstaltung_id: lehrveranstaltung_id,
 			studiensemester_kurzbz:studien_semester,
