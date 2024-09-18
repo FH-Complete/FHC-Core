@@ -83,6 +83,9 @@ const app = Vue.createApp({
 			});
 		},
 	},
+	created(){
+		this.loadEvents();
+	},
 	template:/*html*/`
 	<h2>Stundenplan</h2>
 	<hr>
