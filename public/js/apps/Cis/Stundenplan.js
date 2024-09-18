@@ -1,7 +1,7 @@
 import FhcCalendar from "../../components/Calendar/Calendar.js";
 import Phrasen from "../../plugin/Phrasen.js";
 import CalendarDate from "../../composables/CalendarDate.js";
-
+import CalendarModal from "../../components/Calendar/CalendarModal.js";
 
 const app = Vue.createApp({
 	data() {
@@ -9,11 +9,12 @@ const app = Vue.createApp({
 			stunden: [],
 			events: null,
 			calendarDate: new CalendarDate(new Date()),
-
+			currentlySelectedEvent: null,
 		}
 	},
 	components: {
-		FhcCalendar
+		FhcCalendar,
+		CalendarModal
 	},
 	computed:{
 		weekFirstDay: function () {
@@ -31,6 +32,12 @@ const app = Vue.createApp({
 	},
 	methods:{
 
+		showModal: function(event){
+			this.currentlySelectedEvent = event;
+			Vue.nextTick(() => {
+				this.$refs.calendarModal.show();
+			});
+		},
 		updateRange: function (data) {
 			let tmp_date = new CalendarDate(data.start);
 			// only load month data if the month or year has changed
@@ -89,8 +96,9 @@ const app = Vue.createApp({
 	template:/*html*/`
 	<h2>Stundenplan</h2>
 	<hr>
+	<calendar-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="calendarModal"  />
 	<fhc-calendar @change:range="updateRange" v-slot="{event, day}" :events="events" initial-mode="week" show-weeks>
-		<div type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100">
+		<div @click="showModal(event)" type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100">
 			<span>{{event.orig.topic}}</span>
 			<span v-for="lektor in event.orig.lektor">{{lektor.kurzbz}}</span>
 			<span>{{event.orig.ort_kurzbz}}</span>

@@ -38,10 +38,16 @@ export default {
 	computed: {
 		start_time: function(){
 			if(!this.event.start) return 'N/A';
+			if (!this.event.start instanceof Date){
+				return this.event.start;
+			}
 			return this.event.start.getHours() + ":" + this.event.start.getMinutes();
 		},
 		end_time: function(){
 			if (!this.event.end) return 'N/A';
+			if (!this.event.end instanceof Date) {
+				return this.event.end;
+			}
 			return this.event.end.getHours() + ":" + this.event.end.getMinutes();
 		}
 	},
