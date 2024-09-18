@@ -60,18 +60,6 @@ export default {
 				});
 			}
 		},
-		onShowDropdown(){
-			//load menu
-			this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, this.studien_semester)
-				.then(res => {
-					this.menu = res.data;
-				})
-				.catch((error) => this.$fhcAlert.handleSystemError);
-		},
-		onHideDropdown(){
-			//reset menu
-			this.menu = null;
-		},
 		openPruefungen() {
 			if (!this.pruefungen) {
 				this.pruefungen = true;
@@ -99,6 +87,13 @@ export default {
 			}
 		}
 	},
+	mounted(){
+		this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, this.studien_semester)
+			.then(res => {
+				this.menu = res.data;
+			})
+			.catch((error) => this.$fhcAlert.handleSystemError);
+	},
 	template: /*html*/`<div class="mylv-semester-studiengang-lv card">
 
 		<lv-uebersicht ref="lvUebersicht" :preselectedMenu="preselectedMenuItem" :event="{
@@ -107,35 +102,29 @@ export default {
 			lehrfach_bez:studien_semester,
 			stg_kurzbzlang:studien_semester,
 		}"/>
-		
+
 		<div v-if="module" class="card-header">
 			{{module}}
 		</div>
 		<div class="card-body d-flex justify-content-center align-items-center" :style="bodyStyle">
 			<h6 class="card-title">{{bezeichnung}}</h6>
+
 		</div>
+		<ul class="list-group border-top-0 border-bottom-0 rounded-0">
+			<template v-if="menu">
+				<li type="button" v-for="menuItem in menu" @click="openLvOption(menuItem)" class="list-group-item border-start-0 border-end-0">{{menuItem.name}}</li>
+			</template>
+			<template v-else>
+				<li class="text-center" class="list-group-item"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
+			</template>	
+		</ul>
 		<div class="card-footer">
 			<div class="row">
-				<a href="#" class="col text-start text-decoration-none" @click.prevent="openPruefungen">
+				<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
 					<i class="fa fa-check text-success" v-if="positiv"></i>
 					{{ grade || p.t('lehre/noGrades') }}
 				</a>
-				<div class="col-auto text-end">
-					<div class="dropdown">
-						<span @[\`show.bs.dropdown\`]="onShowDropdown" @[\`hide.bs.dropdown\`]="onHideDropdown" class="dropdown-toggle" type="button" id="LvOptions" data-bs-toggle="dropdown" aria-expanded="false">
-							{{$p.t('lehre','lvOptions')}}
-						</span>
-						<ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="LvOptions">
-							<template v-if="menu">
-								<li v-for="menuItem in menu" @click="openLvOption(menuItem)"><span type="button" class="dropdown-item" >{{menuItem.name}}</span></li>
-							</template>
-							<template v-else>
-								<li class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
-							</template>
-						</ul>
-					</div>
-				</div>
-				<div v-if="lvinfo" class="col-auto text-end">
+				<div v-if="lvinfo" class="col text-end">
 					<a class="card-link" href="#" @click.prevent="openInfos">
 						<i class="fa fa-info-circle" aria-hidden="true"></i>
 					</a>
