@@ -12,6 +12,14 @@ export default{
 		defaultSemester: {
 			from: 'defaultSemester',
 		},
+		showHintKommPrfg: {
+			from: 'configShowHintKommPrfg',
+			default: false
+		},
+		showZgvErfuellt: {
+			from: 'configShowZgvErfuellt',
+			default: false
+		},
 /*		$reloadList: {
 			from: '$reloadList',
 			required: true
@@ -166,19 +174,18 @@ export default{
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		actionNewPruefung(){
+		actionNewPruefung(lv_id){
 			this.statusNew = true;
 			this.isStartDropDown = true;
 			this.resetModal();
 
-/*			this.getLvsByStudent(this.uid).then(() => {
-					this.$refs.pruefungModal.show();
-				});*/
-
+			this.pruefungData.note = 9;
+			this.pruefungData.datum = new Date();
+			this.pruefungData.pruefungstyp_kurzbz = null;
+			if(lv_id){
+				this.pruefungData.lehrveranstaltung_id = lv_id;
+			}
 			this.$refs.pruefungModal.show();
-			//	this.prepareDropdowns();
-			//	this.$refs.pruefungModal.show();
-
 		},
 		actionNewFromOldPruefung(pruefung_id) {
 			this.statusNew = true;
@@ -187,6 +194,7 @@ export default{
 				this.pruefungData.note = 9;
 				this.pruefungData.datum = new Date();
 				this.pruefungData.pruefungstyp_kurzbz = null;
+				this.pruefungData.anmerkung = null;
 				this.prepareDropdowns();
 
 				this.$refs.pruefungModal.show();
@@ -203,7 +211,6 @@ export default{
 			});
 		},
 		actionDeletePruefung(pruefung_id) {
-			console.log("action delete Prüfung" + pruefung_id);
 			this.loadPruefung(pruefung_id).then(() => {
 				if(this.pruefungData.pruefung_id)
 
@@ -218,7 +225,7 @@ export default{
 			});
 		},
 		addPruefung(){
-			this.$fhcApi.post('api/frontend/v1/stv/pruefung/insertPruefung/',
+			this.$fhcApi.post('api/frontend/v1/stv/Pruefung/insertPruefung/',
 				this.pruefungData
 			).then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -325,6 +332,17 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		handleTypeChange(){
+			if( this.showHintKommPrfg
+				&& (this.pruefungData.pruefungstyp_kurzbz === 'kommPruef'
+				|| this.pruefungData.pruefungstyp_kurzbz === 'zusKommPruef')){
+
+				//TODO(Manu) phrase
+				this.pruefungData.anmerkung = 'Bitte bei Neuanlage einer kommissionellen Prüfung das Datum der Noteneintragung ' +
+					'(i. d. R. heute) eintragen, um den korrekten Fristenablauf der Wiederholung zu ermöglichen.';
+			}
+
+		},
 		prepareDropdowns(){
 
 			// Get Lvs from Student
@@ -397,8 +415,13 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 	template: `
 	<div class="stv-details-pruefung-pruefung-list 100 pt-3">
 	
-<!--	{{pruefungData}}-->
+	{{showHintKommPrfg}}
+	{{showZgvErfuellt}}
 	
+	{{lv_teile}}
+	
+	<hr>
+	{{listLes}}
 	aktuelles Sem: {{defaultSemester}} <br>
 	current Sem: {{currentSemester}}
 	<hr>
@@ -473,6 +496,7 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 					name="lehrveranstaltung"
 					:label="$p.t('lehre/lehrveranstaltung')"
 					v-model="pruefungData.lehrveranstaltung_id"
+					@change="actionNewPruefung(pruefungData.lehrveranstaltung_id)"
 					>
 					<option
 						v-for="lv in listLvs"
@@ -531,6 +555,7 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 					name="typ"
 					:label="$p.t('global/typ')"
 					v-model="pruefungData.pruefungstyp_kurzbz"
+					@change="handleTypeChange()"
 					>			
 					<option :value="null">
 						-- keine Auswahl --
@@ -556,6 +581,7 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 						v-for="note in listMarks"
 						:key="note.note"
 						:value="note.note"
+						:disabled="!note.aktiv"
 						>
 						{{note.bezeichnung}}
 					</option>
@@ -578,10 +604,11 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 				
 				<form-input
 					container-class="mb-3"
-					type="text"
+					type="textarea"
 					name="name"
 					:label="$p.t('global/anmerkung')"
 					v-model="pruefungData.anmerkung"
+					rows="4"
 				>
 				</form-input>
 			</form>

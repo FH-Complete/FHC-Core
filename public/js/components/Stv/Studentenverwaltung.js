@@ -47,6 +47,7 @@ export default {
 			configGenerateAlias: this.config.generateAlias,
 			configShowZgvDoktor: this.config.showZgvDoktor,
 			configShowZgvErfuellt: this.config.showZgvErfuellt,
+			configShowHintKommPrfg: this.config.showHintKommPrfg,
 			hasBpkPermission: this.permissions['student/bpk'],
 			hasAliasPermission: this.permissions['student/alias'],
 			hasPrestudentPermission: this.permissions['basis/prestudent'],
