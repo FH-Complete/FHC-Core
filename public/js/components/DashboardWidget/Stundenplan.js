@@ -1,7 +1,7 @@
 import Phrasen from '../../mixins/Phrasen.js';
 import AbstractWidget from './Abstract.js';
 import FhcCalendar from '../Calendar/Calendar.js';
-import LvUebersicht from '../Cis/Mylv/LvUebersicht.js';
+import LvModal from '../Cis/Mylv/LvModal.js';
 import ContentModal from '../Cis/Cms/ContentModal.js'
 import CalendarDate from '../../composables/CalendarDate.js';
 
@@ -12,7 +12,7 @@ export default {
 	],
 	components: {
 		FhcCalendar,
-		LvUebersicht,
+		LvModal,
 		ContentModal,
 	},
 	
@@ -73,7 +73,7 @@ export default {
 		showLvUebersicht: function (event){
 			this.selectedEvent= event;
 			Vue.nextTick(()=>{
-				this.$refs.lvUebersicht.show();
+				this.$refs.lvmodal.show();
 			});
 		},
 		
@@ -167,7 +167,7 @@ export default {
 	},
 	template: /*html*/`
 	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">
-		<lv-uebersicht ref="lvUebersicht" :event="selectedEvent"  />
+		<lv-modal v-if="selectedEvent" ref="lvmodal" :event="selectedEvent"  />
 		<content-modal :contentID="roomInfoContentID" :ort_kurzbz="" dialogClass="modal-lg" ref="contentModal"/>
 		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" />
 		<div v-show="minimized" class="flex-grow-1 overflow-scroll">

@@ -1,6 +1,6 @@
-import BsModal from "../Bootstrap/Modal.js";
-import Alert from "../Bootstrap/Alert.js";
-import LvMenu from "../Cis/Mylv/LvMenu.js"
+import BsModal from "../../Bootstrap/Modal.js";
+import Alert from "../../Bootstrap/Alert.js";
+import LvMenu from "./LvMenu.js"
 
 export default {
 	components: {
