@@ -1,0 +1,59 @@
+/* 
+    Created on : May 19, 2022, 10:16:21 AM
+    Author     : bambi
+*/
+:root {
+    --fhc-verticalsplit-vsplitter-bg-color: #eee;
+    --fhc-verticalsplit-vsplitter-border-color: #eee;
+    --fhc-verticalsplit-vsplitter-splitactions-color: #000;
+}
+
+.verticalsplitted {
+    overflow-y: auto;
+}
+
+.verticalsplitter {
+    text-align: center;
+}
+
+.verticalsplitter.top {
+    border-top: solid 3px var(--fhc-verticalsplit-vsplitter-border-color);
+}
+
+.verticalsplitter.bottom {
+    border-bottom: solid 3px var(--fhc-verticalsplit-vsplitter-border-color);
+}
+
+.splitactions {
+    background-color: var(--fhc-verticalsplit-vsplitter-bg-color);
+    color: var(--fhc-verticalsplit-vsplitter-splitactions-color);
+    display: inline-block; 
+    padding: 0 5px 0 5px;
+}
+
+.splitactions.top {
+    border-radius: 0 0 40% 40%;
+}
+
+.splitactions.bottom {
+    border-radius: 40% 40% 0 0;
+}
+
+.splitaction {
+    display: inline-block;
+    width: 25px;
+    cursor: pointer;
+}
+
+.splitaction.resize {
+    cursor: row-resize;
+}
+
+#content {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+#content > div:first-child {
+  margin-top: 30px;
+}

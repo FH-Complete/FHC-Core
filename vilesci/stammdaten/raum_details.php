@@ -70,7 +70,7 @@
 
 	$neu = "true";
 
-	if(isset($_POST["schick"]))
+	if(isset($_POST["schick"]) || isset($_POST["kopieren"]))
 	{
 		if(!$rechte->isBerechtigt('basis/ort', null, 'suid'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
@@ -118,7 +118,7 @@
 		$sg_update->updateamum = date('Y-m-d H:i:s');
 		$sg_update->updatevon = $user;
 
-		if ($_POST["neu"] == "true")
+		if ($_POST["neu"] == "true" || isset($_POST["kopieren"]))
 		{
 			$sg_update->insertamum = date('Y-m-d H:i:s');
 			$sg_update->insertvon = $user;
@@ -366,18 +366,30 @@
 						<td>Organisationseinheit</td>
 						<td colspan="3">';
 		$oe=new organisationseinheit();
-		$oe->getAll();
+		$oe->getAll(null, null, 'organisationseinheittyp_kurzbz, bezeichnung');
+		$inaktivWarning = false;
 		$htmlstr.='<select name="oe_kurzbz">';
 		$htmlstr.='<option value="">-- keine Auswahl --</option>';
 		foreach($oe->result as $row_oe)
 		{
 			if($row_oe->oe_kurzbz==$oe_kurzbz)
-				$selected='selected';
+			{
+				$selected = 'selected';
+				if ($row_oe->aktiv == false)
+				{
+					$inaktivWarning = '&nbsp;<span style="color: red; font-weight: bold">Inaktive OE !</span>';
+				}
+			}
 			else
 				$selected='';
+
+			//Inaktive OEs übersrpingen, außer es ist die gespeicherte
+			if ($row_oe->aktiv == false && $row_oe->oe_kurzbz != $oe_kurzbz)
+				continue;
+
 			$htmlstr.='<option value="'.$row_oe->oe_kurzbz.'" '.$selected.'>'.$row_oe->organisationseinheittyp_kurzbz.' '.$row_oe->bezeichnung.'</option>';
 		}
-		$htmlstr.='</select>';
+		$htmlstr.='</select>'.$inaktivWarning;
 		$htmlstr.='
 						</td>
 					</tr>
@@ -401,8 +413,9 @@
 				<div align="right" id="sub">
 					<span id="submsg" style="color:red; visibility:hidden;">Datensatz ge&auml;ndert!&nbsp;&nbsp;</span>
 					<input type="hidden" name="neu" value="'.$neu.'">
-					<input type="submit" value="Speichern" name="schick">
+					<input type="submit" value="Kopieren" name="kopieren" onclick="return confirm(\'Eintrag kopieren?\')">
 					<input type="button" value="Reset" onclick="unchanged()">
+					&nbsp;&nbsp;&nbsp;<input type="submit" value="Speichern" name="schick">
 				</div>
 			</form>
 			<div class="inserterror">'.$errorstr.'</div>';
@@ -416,7 +429,7 @@
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
-	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>

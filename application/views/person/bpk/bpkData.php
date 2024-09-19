@@ -76,4 +76,4 @@
 	$filterWidgetArray['filter_id'] = $this->input->get('filter_id');
 
 	echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
-?>
+

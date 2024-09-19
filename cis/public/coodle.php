@@ -254,11 +254,11 @@ if (isset($_GET['resend']))
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/style.css.php" type="text/css">
-	<link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css">
+	<link rel="stylesheet" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css" type="text/css">
 	<?php
 	include('../../include/meta/jquery.php');
 	?>
-	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 	<title><?php echo $p->t('coodle/terminauswahl'); ?></title>
 	<script type="text/javascript">
 		$(document).ready(function () {

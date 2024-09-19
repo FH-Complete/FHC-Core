@@ -184,12 +184,13 @@ function StudentMobilitaetDisableFields(val)
 	document.getElementById('student-mobilitaet-menulist-status').disabled=val;
 	document.getElementById('student-mobilitaet-textbox-ausbildungssemester').disabled=val;
 	document.getElementById('student-mobilitaet-button-speichern').disabled=val;
+	document.getElementById('student-mobilitaet-button-kopie-speichern').disabled=val;
 }
 
 // ****
 // * Speichert den Mobilitaet Datensatz
 // ****
-function StudentMobilitaetSpeichern()
+function StudentMobilitaetSpeichern(newval)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
@@ -200,7 +201,14 @@ function StudentMobilitaetSpeichern()
 	var gsprogramm = document.getElementById('student-mobilitaet-menulist-gsprogramm').value;
 	var mobilitaetsprogramm = document.getElementById('student-mobilitaet-menulist-mobilitaetsprogramm').value;
 	var studiensemester = document.getElementById('student-mobilitaet-menulist-studiensemester').value;
-	var neu = document.getElementById('student-mobilitaet-detail-checkbox-neu').checked;
+	if (newval == true)
+	{
+		var neu = true;
+	}
+	else
+	{
+		var neu = document.getElementById('student-mobilitaet-detail-checkbox-neu').checked;
+	}
 	var prestudent_id = document.getElementById('student-mobilitaet-detail-textbox-prestudent_id').value;
 	var mobilitaet_id = document.getElementById('student-mobilitaet-detail-textbox-mobilitaet_id').value;
 

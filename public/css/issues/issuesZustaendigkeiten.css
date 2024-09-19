@@ -1,0 +1,13 @@
+td.tableCellNoRightBorder {
+    border-right: 0 !important;
+}
+
+td.tableCellNoLeftBorder {
+    border-left: 0 !important;
+}
+
+#fehlercodeInfoCell {
+    vertical-align: middle;
+    font-size: 1.2em;
+    cursor: pointer;
+}

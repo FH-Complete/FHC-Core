@@ -74,6 +74,7 @@ if(!$error)
 			$mitarbeiter->titelpre = $_POST['titelpre'];
 			$mitarbeiter->titelpost = $_POST['titelpost'];
 			$mitarbeiter->vorname = $_POST['vorname'];
+			$mitarbeiter->wahlname = $_POST['wahlname'];
 			$mitarbeiter->vornamen = $_POST['vornamen'];
 			$mitarbeiter->nachname = $_POST['nachname'];
 			$mitarbeiter->gebdatum = $_POST['geburtsdatum'];
@@ -181,7 +182,7 @@ if(!$error)
 				$verwendung->azgrelevant = false;
 			else
 				$verwendung->azgrelevant = '';
-			
+
 			if($_POST['homeoffice']=='true')
 				$verwendung->homeoffice = true;
 			elseif($_POST['homeoffice']=='false')

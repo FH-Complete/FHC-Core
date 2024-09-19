@@ -3,14 +3,14 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'bPK Details',
-			'jquery' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'jqueryui' => true,
+			'jquery3' => true,
+			'bootstrap3' => true,
+			'fontawesome4' => true,
+			'jqueryui1' => true,
 			'ajaxlib' => true,
-			'tablesorter' => true,
-			'tinymce' => true,
-			'sbadmintemplate' => true,
+			'tablesorter2' => true,
+			'tinymce4' => true,
+			'sbadmintemplate3' => true,
 			'addons' => true,
 			'navigationwidget' => true,
 			'customCSSs' => array(
@@ -64,62 +64,62 @@
 										<table class="table">
 											<?php if (!empty($stammdaten->titelpre)): ?>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','titelpre')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'titelpre')) ?></strong></td>
 												<td><?php echo $stammdaten->titelpre ?></td>
 											</tr>
 											<?php endif; ?>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','vorname')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'vorname')) ?></strong></td>
 												<td><?php echo $stammdaten->vorname ?></td>
 											</tr>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','nachname')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'nachname')) ?></strong></td>
 												<td>
 													<?php echo $stammdaten->nachname ?></td>
 											</tr>
 											<?php if (!empty($stammdaten->titelpost)): ?>
 												<tr>
-													<td><strong><?php echo  ucfirst($this->p->t('person','titelpost')) ?></strong></td>
+													<td><strong><?php echo  ucfirst($this->p->t('person', 'titelpost')) ?></strong></td>
 													<td><?php echo $stammdaten->titelpost ?></td>
 												</tr>
 											<?php endif; ?>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','geburtsdatum')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'geburtsdatum')) ?></strong></td>
 												<td>
 													<?php echo date_format(date_create($stammdaten->gebdatum), 'd.m.Y') ?></td>
 											</tr>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','svnr')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'svnr')) ?></strong></td>
 												<td>
 													<?php echo $stammdaten->svnr ?></td>
 											</tr>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','ersatzkennzeichen')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'ersatzkennzeichen')) ?></strong></td>
 												<td>
 													<?php echo $stammdaten->ersatzkennzeichen ?></td>
 											</tr>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','staatsbuergerschaft')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'staatsbuergerschaft')) ?></strong></td>
 												<td>
 													<?php echo $stammdaten->staatsbuergerschaft ?></td>
 											</tr>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','geschlecht')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'geschlecht')) ?></strong></td>
 												<td>
 													<?php echo $stammdaten->geschlecht ?></td>
 											</tr>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','bpk')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'bpk')) ?></strong></td>
 												<td>
 													<?php echo $stammdaten->bpk ?></td>
 											</tr>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','postleitzahl')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'postleitzahl')) ?></strong></td>
 												<td>
 													<?php echo $adresse->plz ?></td>
 											</tr>
 											<tr>
-												<td><strong><?php echo  ucfirst($this->p->t('person','strasse')) ?></strong></td>
+												<td><strong><?php echo  ucfirst($this->p->t('person', 'strasse')) ?></strong></td>
 												<td>
 													<?php echo $adresse->strasse ?></td>
 											</tr>
@@ -129,7 +129,7 @@
 										<form action="<?php echo base_url('soap/datenverbund_client.php?action=pruefeBPK');?>" method="POST" target="_blank">
 											<input type="hidden" name="vorname" value="<?php echo $stammdaten->vorname; ?>"/>
 											<input type="hidden" name="nachname" value="<?php echo $stammdaten->nachname; ?>"/>
-											<input type="hidden" name="geburtsdatum" value="<?php echo mb_str_replace('-','',$stammdaten->gebdatum); ?>"/>
+											<input type="hidden" name="geburtsdatum" value="<?php echo mb_str_replace('-', '',$stammdaten->gebdatum); ?>"/>
 											<input type="hidden" name="geschlecht" value="<?php echo mb_strtoupper($stammdaten->geschlecht); ?>"/>
 											<input type="submit" value="Namenssuche starten" class="btn btn-default"/>
 										</form>

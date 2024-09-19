@@ -395,8 +395,12 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Set filename to be used on downlaod
 		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
 
+		// Get file to be downloaded from DMS
+		$download = $this->dmslib->download($dms_id, $filename);
+		if (isError($download)) return $download;
+
 		// Download file
-		$this->dmslib->download($dms_id, $filename);
+		$this->outputFile(getData($download));
 	}
 
 	/**

@@ -47,7 +47,7 @@ $query = '
 		JOIN lehre.tbl_anrechnung_anrechnungstatus USING (anrechnung_id)
 		JOIN lehre.tbl_anrechnung_begruendung AS begruendung USING (begruendung_id)
 	)
-	
+
 	SELECT DISTINCT ON (anrechnungen.*, lema.mitarbeiter_uid) anrechnungen.*,
 	array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung"
 	FROM anrechnungen
@@ -134,11 +134,7 @@ $filterWidgetArray = array(
 		student: {headerFilter:"input"},
 		begruendung: {headerFilter:"input"},
 		zgv: {visible: false, headerFilter:"input"},
-		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams:{
-		    labelField:"dokument_bezeichnung",
-			url:function(cell){return "'. current_url() .'/download?dms_id=" + cell.getData().dms_id},
-		    target:"_blank"
-		}},
+		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams: paramLookup_dokBez},
 		anmerkung_student: {headerFilter:"input"},
 		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},

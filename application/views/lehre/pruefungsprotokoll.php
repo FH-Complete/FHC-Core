@@ -1,46 +1,47 @@
 <?php
-$this->load->view(
-	'templates/FHC-Header',
-	array(
-		'title' => 'Pruefungsprotokoll',
-		'jquery' => true,
-		'jqueryui' => true,
-		'bootstrap' => true,
-		'fontawesome' => true,
-		'dialoglib' => true,
-		'ajaxlib' => true,
-		'sbadmintemplate' => true,
-		'phrases' => array(
-			'abschlusspruefung' => array(
-				'freigegebenAm',
-				'pruefungGespeichert',
-				'pruefungSpeichernFehler',
-                'abschlussbeurteilungLeer',
-                'beginnzeitLeer',
-                'beginnzeitFormatError',
-                'endezeitLeer',
-                'endezeitFormatError',
-                'endezeitBeforeError',
-                'verfNotice'
-			),
-			'ui' => array(
-				'stunde',
-                'minute'
-			)
+$sitesettings = array(
+	'title' => 'Pruefungsprotokoll',
+	'jquery3' => true,
+	'jqueryui1' => true,
+	'bootstrap3' => true,
+	'fontawesome4' => true,
+	'dialoglib' => true,
+	'ajaxlib' => true,
+	'sbadmintemplate3' => true,
+	'phrases' => array(
+		'abschlusspruefung' => array(
+			'freigegebenAm',
+			'pruefungGespeichert',
+			'pruefungSpeichernFehler',
+			'abschlussbeurteilungLeer',
+			'beginnzeitLeer',
+			'beginnzeitFormatError',
+			'endezeitLeer',
+			'endezeitFormatError',
+			'endezeitBeforeError',
+			'verfNotice'
 		),
-		'customCSSs' => array(
-			'public/css/sbadmin2/admintemplate_contentonly.css',
-			'vendor/fgelinas/timepicker/jquery.ui.timepicker.css',
-			'public/css/lehre/pruefungsprotokoll.css'
-		),
-		'customJSs' => array(
-			'vendor/fgelinas/timepicker/jquery.ui.timepicker.js',
-			'public/js/lehre/pruefungsprotokoll.js'
+		'ui' => array(
+			'stunde',
+			'minute'
 		)
+	),
+	'customCSSs' => array(
+		'public/css/sbadmin2/admintemplate_contentonly.css',
+		'vendor/fgelinas/timepicker/jquery.ui.timepicker.css',
+		'public/css/lehre/pruefungsprotokoll.css'
+	),
+	'customJSs' => array(
+		'vendor/fgelinas/timepicker/jquery.ui.timepicker.js',
+		'public/js/lehre/pruefungsprotokoll.js'
 	)
 );
+
+$this->load->view(
+	'templates/FHC-Header',
+	$sitesettings
+);
 ?>
-<body>
 <div id="wrapper">
 	<div id="page-wrapper">
 		<div class="container-fluid">
@@ -230,3 +231,8 @@ $this->load->view(
 		</div>
 	</div>
 </div>
+<?php
+$this->load->view(
+	'templates/FHC-Footer',
+	$sitesettings
+);

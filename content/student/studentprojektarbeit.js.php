@@ -585,7 +585,7 @@ function StudentProjektarbeitSpeichern()
 
 	if(lehreinheit_id=='')
 	{
-		alert('Bitte eine Lehreinheit Auswaehlen');
+		alert('Bitte einen LV-Teil auswaehlen');
 		return false;
 	}
 

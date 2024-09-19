@@ -12,7 +12,14 @@ class Variablenname_model extends DB_Model
                                    		) sem
 										WHERE start > now()
 										LIMIT 1;',
-        'infocenter_studiensgangtyp' => 'SELECT infocenter_studiensgangtyp FROM public.tbl_variablenname LIMIT 1'
+		'infocenter_studiensgangtyp' => 'SELECT infocenter_studiensgangtyp FROM public.tbl_variablenname LIMIT 1;',
+		'projektuebersicht_studiensemester' => 'SELECT studiensemester_kurzbz FROM (
+													SELECT DISTINCT ON (studienjahr_kurzbz) start, studiensemester_kurzbz
+													FROM public.tbl_studiensemester
+													ORDER BY studienjahr_kurzbz, start
+												) sem
+												WHERE start > now()
+												LIMIT 1;'
 	);
 
 	/**

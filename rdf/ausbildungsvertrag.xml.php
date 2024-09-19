@@ -287,7 +287,7 @@ if($prestudent_help->load($prest_id))
 			$titel_kurzbz = '';
 	}
 
-	if ($prestudent_help->getLastStatus($prest_id, null, 'Student'))
+	if ($prestudent_help->getLastStatus($prest_id, null))
 	{
 		$studienplan_id = $prestudent_help->studienplan_id;
 		$studienordnung = new studienordnung();
@@ -327,7 +327,7 @@ foreach($prestudent_arr as $prest_id)
 				$lehrgangstyp = new studiengang();
 				$lehrgangstyp->loadLehrgangstyp($studiengang->lgartcode);
 
-				if ($prestudent->getLastStatus($prestudent->prestudent_id, null, 'Student'))
+				if ($prestudent->getLastStatus($prestudent->prestudent_id, null))
 				{
 					$studienplan_id = $prestudent->studienplan_id;
 					$studienordnung = new studienordnung();

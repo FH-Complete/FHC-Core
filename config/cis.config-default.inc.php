@@ -44,14 +44,17 @@ define('PAABGABE_PATH','/var/fhcomplete/documents/paabgabe/');
 // Pfad zu den Rauminfos
 define('RAUMINFO_PATH','/var/www/html/build/rauminfos/');
 
+// Pfad zu Applikation
+define('BASE_LOCATION','/');
+
 // URL zu RDF Verzeichnis
-define('XML_ROOT','http://www.fhcomplete.org/build/rdf/');
+define('XML_ROOT','http://www.fhcomplete.org'.BASE_LOCATION.'rdf/');
 // URL zu Application Root
-define('APP_ROOT','http://www.fhcomplete.org/build/');
+define('APP_ROOT','http://www.fhcomplete.org/'.BASE_LOCATION);
 // Pfad zu Document Root
 define('DOC_ROOT','/var/www/html/build/');
 // URL zu Vilesci Root
-define('VILESCI_ROOT','http://www.fhcomplete.org/build/');
+define('VILESCI_ROOT','http://www.fhcomplete.org/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH','tw');
@@ -256,4 +259,18 @@ define('CIS_ZEITWUNSCH_GD', false);
 
 // Covid-Status anzeigen
 define('CIS_SHOW_COVID_STATUS', false);
+
+// Docsbox configs
+define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
+define('DOCSBOX_PATH_API', 'api/v1/');
+define('DOCSBOX_CONVERSION_TIMEOUT', 30); // seconds
+define('DOCSBOX_WAITING_SLEEP_TIME', 1);
+
+//Vertrag Allin
+define ('DEFAULT_ALLIN_DIENSTVERTRAG',[111]);
+
+//Echter Dienstvertrag
+define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,111]);
+
+
 ?>

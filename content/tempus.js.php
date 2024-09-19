@@ -376,6 +376,69 @@ function getStudiensemesterVariable()
 }
 
 // ****
+// * Setzt das aktuelle Studiensemester
+// ****
+function setStudiensemesterAktuell()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	// Request absetzen
+
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'variablechange');
+	req.add('stsem_aktuell', 'stsem_aktuell');
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		//Statusbar setzen
+		document.getElementById("statusbarpanel-text").label = "Studiensemester erfolgreich geaendert";
+		document.getElementById("statusbarpanel-semester").label = val.dbdml_data;
+		//Menue setzen
+		var items = document.getElementsByTagName('menuitem');
+
+		for(i in items)
+		{
+			if(items[i].label==val.dbdml_data && items[i].id=='menu-properies-studiensemester-name')
+			{
+				items[i].setAttribute('checked',true);
+				break;
+			}
+		}
+		//MitarbeiterDetailStudiensemester_id = dbdml_errormsg;
+		//Ansichten Refreshen
+		try
+		{
+			StudentTreeRefresh();
+		}
+		catch(e)
+		{}
+
+		try
+		{
+			LvTreeRefresh();
+		}
+		catch(e)
+		{}
+	}
+
+	return true;
+}
+
+// ****
 // * Laedt das Undo Menue Neu
 // ****
 function loadUndoList()

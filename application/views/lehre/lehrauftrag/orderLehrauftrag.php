@@ -3,14 +3,14 @@ $this->load->view(
     'templates/FHC-Header',
     array(
         'title' => 'Lehrauftrag bestellen',
-        'jquery' => true,
-        'jqueryui' => true,
-        'jquerycheckboxes' => true,
-        'bootstrap' => true,
-        'fontawesome' => true,
-        'sbadmintemplate' => true,
-        'tabulator' => true,
-        'momentjs' => true,
+        'jquery3' => true,
+        'jqueryui1' => true,
+        'jquerycheckboxes1' => true,
+        'bootstrap3' => true,
+        'fontawesome4' => true,
+        'sbadmintemplate3' => true,
+        'tabulator4' => true,
+        'momentjs2' => true,
         'ajaxlib' => true,
         'dialoglib' => true,
         'tablewidget' => true,
@@ -169,7 +169,9 @@ $this->load->view(
                         );
                         ?>
                     </div>
-                    <button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
+			<button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group">
+				<?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?>
+			</button>
                 </form>
             </div>
         </div>
@@ -205,3 +207,4 @@ $this->load->view(
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
+

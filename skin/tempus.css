@@ -20,6 +20,12 @@ label.tempus_vertrag_info
 	font-size: x-small
 }
 
+label.tempus_lektor_verfuegbarezeit
+{
+	font-weight: bold;
+	color: green;
+}
+
 label.kalenderwoche
 {
 	font-size: medium;

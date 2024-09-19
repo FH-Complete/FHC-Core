@@ -422,7 +422,8 @@ $oRdf->sendHeader();
 				$planstunden.=$row_lkt->planstunden.' ';
 			}
 			$qry = "SELECT
-					tbl_organisationseinheit.bezeichnung
+					tbl_organisationseinheit.bezeichnung,
+       				tbl_organisationseinheit.organisationseinheittyp_kurzbz
 				FROM
 					public.tbl_organisationseinheit,
 					lehre.tbl_lehrveranstaltung as lehrfach,
@@ -435,7 +436,7 @@ $oRdf->sendHeader();
 			$fachbereich='';
 			if($result_fb = $db->db_query($qry))
 				if($row_fb = $db->db_fetch_object($result_fb))
-					$fachbereich = $row_fb->bezeichnung;
+					$fachbereich = $row_fb->bezeichnung.' ('.$row_fb->organisationseinheittyp_kurzbz.')';
 
 
 			$i=$oRdf->newObjekt($row_lva->lehrveranstaltung_id.'/'.$row_le->lehreinheit_id);

@@ -29,6 +29,7 @@
 	require_once('../../include/lehrtyp.class.php');
 	require_once('../../include/lehrmodus.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/studienplan.class.php');
 
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -121,6 +122,7 @@
 		$lv->benotung = isset($_POST['benotung']);
 		$lv->lvinfo = isset($_POST['lvinfo']);
 		$lv->lehrauftrag = isset($_POST['lehrauftrag']);
+		$lv->lehrveranstaltung_template_id = $lv->lehrtyp_kurzbz == 'tpl' ? '' : $_POST['lehrveranstaltung_template_id'];
 
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
@@ -291,8 +293,9 @@
 			<td></td>
 			<td></td>
 			<td></td>
-			<td>Lehrmodus*</td>
-			<td><select name="lehrmodus_kurzbz"><option value="">-- keine Auswahl --</option>';
+			<td>Lehrmodus*</td>';
+
+		$htmlstr .= '<td><select name="lehrmodus_kurzbz"><option value="">-- keine Auswahl --</option>';
 
 		$lehrmodus_arr = new lehrmodus();
 		$lehrmodus_arr->getAll();
@@ -300,6 +303,8 @@
 		foreach ($lehrmodus_arr->result as $lehrmodus)
 		{
 			if ($lehrmodus->lehrmodus_kurzbz == $lv->lehrmodus_kurzbz)
+				$sel = ' selected';
+			else if (isset($_GET['neu']) && defined('DEFAULT_LEHRMODUS') && ($lehrmodus->lehrmodus_kurzbz == DEFAULT_LEHRMODUS) && ($lv->lehrmodus_kurzbz == ''))
 				$sel = ' selected';
 			else
 				$sel = '';
@@ -436,6 +441,13 @@
 			<td>Lehrauftrag</td>
 			<td><input type="checkbox" name="lehrauftrag" '.($lv->lehrauftrag?'checked':'').'></td>
 		</tr>
+		<tr id="lehrveranstaltung_template_id">
+			<td>Template</td>
+			<td colspan="2"><input type="text" name="lehrveranstaltung_template_id" value="'.$lv->lehrveranstaltung_template_id.'" size="6"> <span class="text-template_name"></span></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
 		<tr>
 			<td></td>
 			<td></td>
@@ -500,19 +512,10 @@
 			}
 
 			$htmlstr.='<br><b>Verwendung in folgenden Studienplänen</b>: ';
-			$qry ="SELECT distinct tbl_studienplan.bezeichnung
-					FROM
-						lehre.tbl_studienplan_lehrveranstaltung
-						JOIN lehre.tbl_studienplan USING(studienplan_id)
-					WHERE lehrveranstaltung_id=".$db->db_add_param($lv->lehrveranstaltung_id).'
-					ORDER BY tbl_studienplan.bezeichnung desc';
-			if($result = $db->db_query($qry))
-			{
-				while($row = $db->db_fetch_object($result))
-				{
-					$htmlstr.= $row->bezeichnung.'; ';
-				}
-			}
+			$stdplan = new studienplan();
+			if ($stdplan->getStudienplanLehrveranstaltung($lv->lehrveranstaltung_id))
+			foreach($stdplan->result as $result)
+				$htmlstr .= $result->bezeichnung . "; ";
 
 			$htmlstr.='</span>';
 			// Details Ende
@@ -527,10 +530,11 @@
 	<title>Lehrveranstaltung - Details</title>
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/colorpicker.css" type="text/css"/>
+	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 	<script type="text/javascript" src="../../include/js/mailcheck.js"></script>
 	<script type="text/javascript" src="../../include/js/datecheck.js"></script>
 
-	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
@@ -665,6 +669,91 @@
 			{
 				$(this).ColorPickerSetColor(this.value);
 			});
+
+			$('input[name="lehrveranstaltung_template_id"]').autocomplete({
+				minLength: 2,
+				source: function(request, response) {
+					$.ajax({
+						dataType: "json",
+						url: "../../soap/fhcomplete.php",
+						data: {
+							typ: "json",
+							class: "lehrveranstaltung",
+							method: "loadTemplates",
+							parameter_0: request.term
+						}
+					}).then(data => {
+						for (var k in data.return) {
+							data.return[k].value = data.return[k].lehrveranstaltung_id;
+							data.return[k].name = data.return[k].bezeichnung + " [" + data.return[k].kurzbz + "]";
+							data.return[k].label = data.return[k].name + " (" + data.return[k].lehrveranstaltung_id + ")";
+						}
+						response(data.return);
+					});
+				},
+				close: function(e, ui) {
+					$(this).trigger('check.ac-template');
+				},
+				focus: function(e, ui) {
+					$(this).removeClass('input_ok input_error').val(ui.item.value).parent().parent().find('.text-template_name').text(ui.item.name);
+					return false;
+				},
+				select: function(e, ui) {
+					$(this).addClass('input_ok').val(ui.item.value).parent().parent().find('.text-template_name').text(ui.item.name);
+					return false;
+				}
+			}).focus(function(e) {
+				$(this).removeClass('input_ok input_error');
+			}).blur(function(e) {
+				$(this).trigger('check.ac-template');
+			}).on('check.ac-template', function(e) {
+				var self = $(this),
+					val = self.val();
+				if (!val) {
+					self.removeClass('input_ok input_error').parent().parent().find('.text-template_name').text('');
+				} else {
+					$.ajax({
+						dataType: "json",
+						url: "../../soap/fhcomplete.php",
+						data: {
+							typ: "json",
+							class: "lehrveranstaltung",
+							method: "loadTemplates",
+							parameter_0: val
+						},
+						success: function(data) {
+							if (self.val() == val) {
+								var label = '',
+									state = '',
+									item = null;
+
+								for (var k in data.return) {
+									if (data.return[k].lehrveranstaltung_id == val) {
+										item = data.return[k];
+										break;
+									}
+								}
+
+								if (item) {
+									state = 'input_ok';
+									label = item.bezeichnung + " [" + item.kurzbz + "]";
+								} else if (val) {
+									state = 'input_error';
+								}
+								self.removeClass('input_ok input_error').addClass(state).parent().parent().find('.text-template_name').text(label);
+							}
+						}
+					});
+				}
+			}).trigger('check.ac-template');
+
+			$('select[name="lehrtyp_kurzbz"]').change(function(e) {
+				if ($(this).val() == 'tpl') {
+					$('#lehrveranstaltung_template_id').hide();
+				} else {
+					$('#lehrveranstaltung_template_id').show();
+				}
+			}).change();
 	    });
 	</script>
 	<style type="text/css">

@@ -172,7 +172,7 @@ var LeLvbgrpDDObserver=
 
 	    if(lehreinheit_id=='')
 	    {
-	    	alert('Eine Gruppe kann nur zu einer Lehreinheit hinzugefügt werden. Nicht aber zu einer Lehrveranstaltung');
+	    	alert('Eine Gruppe kann nur zu einem LV-Teil hinzugefügt werden, nicht aber zu einer Lehrveranstaltung');
 	    	return false;
 	    }
 

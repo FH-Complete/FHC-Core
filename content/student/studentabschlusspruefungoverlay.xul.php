@@ -226,17 +226,28 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<row>
 					<label value="Vorsitz" control="student-abschlusspruefung-menulist-vorsitz" />
 					<menulist id="student-abschlusspruefung-menulist-vorsitz"
+						  xmlns:MITARBEITER_AKTIV="http://www.technikum-wien.at/mitarbeiter/rdf#"
 						  editable="true" disabled="true"
 				          datasources="rdf:null" flex="1"
 				          ref="http://www.technikum-wien.at/mitarbeiter/liste"
 				          oninput="StudentAbschlusspruefungMenulistMitarbeiterLoad(this)">
 					<template>
-						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
-				        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost"
-				        		      myvalue="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
-							  		  uri="rdf:*"/>
-						</menupopup>
+						<rule MITARBEITER_AKTIV:aktiv='inaktiv'>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+										  label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname	rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost ( rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid )"
+										  myvalue="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+										  uri="rdf:*" style="color: grey;"/>
+							</menupopup>
+						</rule>
+						<rule>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+									  label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname	rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost ( rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid )"
+									  myvalue="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+									  uri="rdf:*"/>
+							</menupopup>
+						</rule>
 					</template>
 				</menulist>
 				<label value="PrueferIn 1" id="student-abschlusspruefung-label-pruefer1" control="student-abschlusspruefung-menulist-pruefer1" />

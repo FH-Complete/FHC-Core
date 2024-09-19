@@ -1080,7 +1080,7 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null
-	)
+	),
 );
 
 // Loop through the filters array

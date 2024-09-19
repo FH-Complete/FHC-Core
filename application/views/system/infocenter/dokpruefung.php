@@ -1,10 +1,11 @@
-<div class="table-responsive">
-	<table id="doctable" class="table table-bordered">
+<div class="table-responsive" id="uebersichtDoks">
+	<table id="doctable" class="table table-bordered table-condensed tablesorter tablesorter-default">
 		<thead>
 		<tr>
 			<th><?php echo  ucfirst($this->p->t('global','name')) ?></th>
 			<th><?php echo  ucfirst($this->p->t('global','typ')) ?></th>
 			<th><?php echo  ucfirst($this->p->t('global','uploaddatum')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('ui','loeschen')) ?></th>
 			<th><?php echo  ucfirst($this->p->t('infocenter','ausstellungsnation')) ?></th>
 			<?php
 				if (!isset($formalReadonly))
@@ -22,7 +23,7 @@
 					<a href="outputAkteContent/<?php echo $dokument->akte_id ?>"><?php echo isEmptyString($dokument->titel) ? $dokument->bezeichnung : $dokument->titel ?></a>
 				</td>
 				<td>
-					<select class="aktenid" id="aktenid_<?php echo $dokument->akte_id?>" <?php echo (isset($formalReadonly) ? 'disabled' : '') ?> autocomplete="off">
+					<select class="form-control aktenid" id="aktenid_<?php echo $dokument->akte_id?>" <?php echo (isset($formalReadonly) ? 'disabled' : '') ?> autocomplete="off">
 						<?php
 						foreach($dokumententypen as $dokumenttyp)
 							echo "<option " . ($dokumenttyp->bezeichnung === $dokument->dokument_bezeichnung ? 'selected' : '') . " value = " . $dokumenttyp->dokument_kurzbz . ">" . $dokumenttyp->bezeichnung . "</option>"
@@ -30,7 +31,7 @@
 					</select>
 
 					<div class="row">
-						<button class="nachreichungInfos hidden" id="nachreichungInfos_<?php echo $dokument->akte_id?>"><?php echo  ucfirst($this->p->t('infocenter','dokumentWirdNachgereicht')) ?></button>
+						<button class="nachreichungInfos hidden btn btn-default" id="nachreichungInfos_<?php echo $dokument->akte_id?>"><?php echo  ucfirst($this->p->t('infocenter','dokumentWirdNachgereicht')) ?></button>
 					</div>
 
 					<div class="nachreichungInputs hidden" id="nachreichungInputs_<?php echo $dokument->akte_id?>">
@@ -49,7 +50,7 @@
 						<div class="row">
 							<div class="col-sm-12">
 								<div class="btn-group pull-right">
-									<input type="button" value="OK" class="btn btn-primary nachreichungSpeichern" id="nachreichungSpeichern_<?php echo $dokument->akte_id?>">
+									<input type="button" value="OK" class="btn btn-primary nachreichungSpeichern btn-default" id="nachreichungSpeichern_<?php echo $dokument->akte_id?>">
 									<input type="button" value="Abbrechen" class="btn btn-default nachreichungAbbrechen" id="nachreichungAbbrechen_<?php echo $dokument->akte_id?>">
 								</div>
 							</div>
@@ -60,6 +61,7 @@
 
 				</td>
 				<td><?php echo date_format(date_create($dokument->erstelltam), 'd.m.Y') ?></td>
+				<td><input type="button" value="<?php echo ucfirst($this->p->t('ui','loeschen')); ?>" class="btn btn-default dokLoeschen" id="dokLoeschen_<?php echo $dokument->akte_id?>"  <?php echo (isset($formalReadonly) ? 'disabled' : '') ?>></td>
 				<td><?php echo $dokument->langtext ?></td>
 				<?php
 				if (!isset($formalReadonly)) :

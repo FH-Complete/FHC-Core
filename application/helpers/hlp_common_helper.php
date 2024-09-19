@@ -1,20 +1,19 @@
 <?php
-
 /**
- * FH-Complete
+ * Copyright (C) 2022 fhcomplete.org
  *
- * @package		FHC-Helper
- * @author		FHC-Team
- * @copyright	Copyright (c) 2016 fhcomplete.org
- * @license		GPLv3
- * @since		Version 1.0.0
- */
-
-/**
- * FHC Helper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * @subpackage	Helpers
- * @category	Helpers
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
@@ -42,15 +41,19 @@ function generateToken($length = 64)
 		{
 			$firstGeneratedToken = random_bytes($length); // try to generates cryptographically secure pseudo-random bytes...
 		}
-		catch (Exception $e) { $firstGeneratedToken = null; } // if fails $firstGeneratedToken is set to null
+		catch (Exception $e)
+		{
+			// If fails $firstGeneratedToken is set to null
+			$firstGeneratedToken = null;
+		}
 	}
 	// For PHP >= 5.3 and < 7 and openssl is available
 	elseif (function_exists('openssl_random_pseudo_bytes'))
 	{
 		$firstGeneratedToken = openssl_random_pseudo_bytes($length, $strong);
 		// If the token generation ended with errors OR the generated token is NOT strong enough
-        if ($firstGeneratedToken == false || $strong == false) $firstGeneratedToken = null; // $firstGeneratedToken is set to null
-    }
+		if ($firstGeneratedToken == false || $strong == false) $firstGeneratedToken = null; // $firstGeneratedToken is set to null
+	}
 
 	if ($firstGeneratedToken != null) // If everything was fine
 	{
@@ -107,10 +110,7 @@ function var_dump_to_error_log($parameter)
 function loadResource($path, $resources = null, $subdir = false)
 {
 	// Place a / character at the and of the string if not present
-	if (strrpos($path, '/') < strlen($path) - 1)
-	{
-		$path .= '/';
-	}
+	if (strrpos($path, '/') < strlen($path) - 1) $path .= '/';
 
 	// Loads in $tmpResources all the given resources
 	$tmpResources = $resources;
@@ -125,28 +125,36 @@ function loadResource($path, $resources = null, $subdir = false)
 
 	// Loads in $tmpPaths path and eventually the subdirectories
 	$tmpPaths = array($path);
-	// NOTE: Used @ to prevent ugly error messages
-	if (is_dir($path) && ($dirHandler = @opendir($path)) !== false)
+
+	// If path is a directory
+	if (is_dir($path))
 	{
-		// Reads all file system entries present in path
-		while (($entry = readdir($dirHandler)) !== false)
+		// NOTE: Used @ to prevent ugly error messages
+		$dirHandler = @opendir($path);
+
+		// Successfully opened
+		if ($dirHandler !== false)
 		{
-			// If entry is a directory but not the current and subdirectories should be loaded
-			if ($subdir === true && $entry != '.' && $entry != '..' && is_dir($entry))
+			// Reads all file system entries present in path
+			while (($entry = readdir($dirHandler)) !== false)
 			{
-				$tmpPaths[] = $entry;
-			}
-			// If no resources are specified and the current file system entry is a file
-			if ($resources == null && is_file($path.$entry))
-			{
-				// If the current entry is a php file store the name without extension
-				if ($entry != ($tmpName = str_replace('.php', '', $entry)))
+				// If entry is a directory but not the current and subdirectories should be loaded
+				if ($subdir === true && $entry != '.' && $entry != '..' && is_dir($path.$entry))
 				{
-					$tmpResources[] = $tmpName;
+					$tmpPaths[] = $path.$entry.'/';
+				}
+				// If no resources are specified and the current file system entry is a file
+				if ($resources == null && is_file($path.$entry))
+				{
+					// Name without php extension
+					$tmpName = str_replace('.php', '', $entry);
+
+					// If the current entry is a php file store the name without extension
+					if ($entry != $tmpName) $tmpResources[] = $tmpName;
 				}
 			}
+			closedir($dirHandler);
 		}
-		closedir($dirHandler);
 	}
 
 	// Loops through the resources
@@ -156,10 +164,7 @@ function loadResource($path, $resources = null, $subdir = false)
 		foreach ($tmpPaths as $tmpPath)
 		{
 			$fileName = $tmpPath.$tmpResource.'.php'; // Php extension
-			if (file_exists($fileName))
-			{
-				include_once($fileName);
-			}
+			if (file_exists($fileName)) include_once($fileName);
 		}
 	}
 }
@@ -351,3 +356,52 @@ function sanitizeProblemChars($str)
 
 	return preg_replace($acentos, array_keys($acentos), htmlentities($str, ENT_NOQUOTES | ENT_HTML5, $enc));
 }
+
+/**
+ *
+ */
+function findResource($path, $resource, $subdir = false, $extraDir = null)
+{
+	// Place a / character at the and of the string if not present
+	if (strrpos($path, '/') < strlen($path) - 1) $path .= '/';
+
+	// Loads in $tmpPaths path and eventually the subdirectories
+	$tmpPaths = array($path);
+	if (is_dir($path))
+	{
+		// NOTE: Used @ to prevent ugly error messages
+		$dirHandler = @opendir($path);
+
+		// Successfully opened
+		if ($dirHandler !== false)
+		{
+			// Reads all file system entries present in path
+			while (($entry = readdir($dirHandler)) !== false)
+			{
+				// If entry is a directory but not the current and subdirectories should be loaded
+				if ($subdir === true && $entry != '.' && $entry != '..' && is_dir($path.$entry))
+				{
+					if ($extraDir == null)
+					{
+						$tmpPaths[] = $path.$entry.'/';
+					}
+					else
+					{
+						$tmpPaths[] = $path.$entry.'/'.$extraDir.'/';
+					}
+				}
+			}
+			closedir($dirHandler);
+		}
+	}
+
+	// Loops through the paths
+	foreach ($tmpPaths as $tmpPath)
+	{
+		$fileName = $tmpPath.$resource.'.php'; // Php extension
+		if (file_exists($fileName)) return $fileName;
+	}
+
+	return null;
+}
+

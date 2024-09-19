@@ -175,7 +175,7 @@ SELECT
 				SELECT
 						'Verlinkung von '||content_id AS art
 				FROM campus.tbl_contentsprache
-				WHERE content::text LIKE '%content.php?content_id='||content.content_id||'%'
+				WHERE content::text LIKE '%content.php?content_id='||content.content_id
 				/*WHERE content::text ~* '[\w\d\s]*content\.php\?content_id=1245[\w\d\s]*'*/
 			) verwendung
 	) AS verwendung_in,

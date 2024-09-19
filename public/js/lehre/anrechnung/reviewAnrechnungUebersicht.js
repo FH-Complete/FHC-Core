@@ -1,4 +1,6 @@
 const BASE_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
+const CONTROLLER_URL = BASE_URL + '/' + CALLED_PATH;
 const APPROVE_ANRECHNUNG_DETAIL_URI = "lehre/anrechnung/ReviewAnrechnungDetail";
 
 const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
@@ -65,7 +67,7 @@ function func_tableBuilt(table) {
                 },
                 target:"_blank"
             }
-        }, false, "status"  // place column after status
+        }, true  // place column on the very left
     );
 }
 
@@ -121,17 +123,30 @@ var format_empfehlung_anrechnung = function(cell, formatterParams){
             : FHC_PhrasesLib.t("ui", "nein");
 }
 
+/**
+ * Returns formatter params for field dokument_bezeichnung (= Spalte Nachweisdokumente)
+ * NOTE: Returning a formatter param object fixes the problem, that tabulator did not know the url after refreshing the page.
+ */
+function paramLookup_dokBez(cell){
+    return {
+        labelField: 'dokument_bezeichnung',
+        url: CONTROLLER_URL + '/download?dms_id=' + cell.getData().dms_id,
+        target: '_blank'
+    }
+}
+
 /*
  * Hook to overwrite TableWigdgets select-all-button behaviour
  * Select all (filtered) rows that are progressed by stg leiter.
  * (Ignore rows that are approved, rejected or in request for recommendation)
  */
 function tableWidgetHook_selectAllButton(tableWidgetDiv){
-    tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+    var resultRows = tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
         .filter(row =>
             row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
-        )
-        .forEach((row => row.select()));
+        );
+
+    tableWidgetDiv.find("#tableWidgetTabulator").tabulator('selectRow', resultRows);
 }
 
 

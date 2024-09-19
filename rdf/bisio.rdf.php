@@ -111,6 +111,7 @@ function draw_content($row)
 	            <IO:mobilitaetsprogramm_code><![CDATA['.$row->mobilitaetsprogramm_code.']]></IO:mobilitaetsprogramm_code>
 	            <IO:mobilitaetsprogramm_kurzbz><![CDATA['.$row->mobilitaetsprogramm_kurzbz.']]></IO:mobilitaetsprogramm_kurzbz>
 	            <IO:nation_code><![CDATA['.$row->nation_code.']]></IO:nation_code>
+	            <IO:herkunftsland_code><![CDATA['.$row->herkunftsland_code.']]></IO:herkunftsland_code>
 	            <IO:von_iso><![CDATA['.$row->von.']]></IO:von_iso>
 	            <IO:von><![CDATA['.$datum->convertISODate($row->von).']]></IO:von>
 	            <IO:bis_iso><![CDATA['.$row->bis.']]></IO:bis_iso>

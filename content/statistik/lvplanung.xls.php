@@ -181,7 +181,9 @@ SELECT tbl_lehrveranstaltung.bezeichnung AS lf_bezeichnung,
 			AND tbl_lehrveranstaltung.lehrform_kurzbz = slv.lehrform_kurzbz
 			AND sle.studiensemester_kurzbz = " . $db->db_add_param($previousStsem) . "
 		) AS vorjahr_lektor,
-	tbl_lehrveranstaltung.lehrform_kurzbz
+	tbl_lehrveranstaltung.lehrform_kurzbz,
+	tbl_lehrveranstaltung.las,
+	tbl_lehrveranstaltung.alvs
 FROM lehre.tbl_lehrveranstaltung
 JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
 JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
@@ -274,7 +276,7 @@ $maxlength[$spalte]=9;
 $worksheet->write($zeile,++$spalte,"LV-Nummer", $format_bold);
 $maxlength[$spalte]=9;
 
-$worksheet->write($zeile,++$spalte,"Semesterstunden", $format_bold);
+$worksheet->write($zeile,++$spalte,"Lehrauftragsstunden", $format_bold);
 $maxlength[$spalte]=15;
 
 $worksheet->write($zeile,++$spalte,"ECTS", $format_bold);
@@ -295,6 +297,14 @@ $maxlength[$spalte]=10;
 $worksheet->write($zeile,++$spalte,"Start in KW", $format_bold);
 $maxlength[$spalte]=10;
 
+$worksheet->write($zeile,++$spalte,"LAS der LV", $format_bold);
+$maxlength[$spalte]=10;
+
+$worksheet->write($zeile,++$spalte,"ALVS der LV", $format_bold);
+$maxlength[$spalte]=10;
+
+$worksheet->write($zeile,++$spalte,"Anzahl Studierende", $format_bold);
+$maxlength[$spalte]=16;
 
 if($result = $db->db_query($qry))
 {
@@ -445,6 +455,26 @@ if($result = $db->db_query($qry))
 
 		//Start in KW
 		$worksheet->write($zeile,++$spalte,$row->start_kw);
+
+		//LAS der LV
+		$worksheet->write($zeile,++$spalte,$row->las);
+
+		//ALVS der LV
+		$worksheet->write($zeile,++$spalte,$row->alvs);
+
+		// Anzahl Studierende in Lehreinheit
+		$anzahlStudierende = 0;
+		$qry_anz_std = "SELECT count(DISTINCT uid) as anzahl FROM campus.vw_student_lehrveranstaltung WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
+
+		if($result_anz_std = $db->db_query($qry_anz_std))
+		{
+			if ($row_anz_std = $db->db_fetch_object($result_anz_std))
+			{
+				$anzahlStudierende = $row_anz_std->anzahl;
+			}
+		}
+
+		$worksheet->write($zeile,++$spalte,$anzahlStudierende);
 	}
 
 	//Betreuungen

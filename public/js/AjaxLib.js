@@ -101,7 +101,8 @@ var FHC_AjaxClient = {
 			if ((jQuery.type(response.retval) == "object" && !jQuery.isEmptyObject(response.retval))
 				|| (jQuery.isArray(response.retval) && response.retval.length > 0)
 				|| (jQuery.type(response.retval) == "string" && response.retval.trim() != "")
-				|| jQuery.type(response.retval) == "number")
+				|| jQuery.type(response.retval) == "number"
+				|| jQuery.type(response.retval) == "boolean")
 			{
 				hasData = true;
 			}

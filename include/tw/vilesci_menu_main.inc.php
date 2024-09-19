@@ -72,7 +72,7 @@ $menu=array
 		'Lehrveranstaltung'=>array('name'=>'Lehrveranstaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
 		'Studienordnung'=>array('name'=>'Studienordnung', 'link'=>'lehre/studienordnung.php', 'target'=>'_blank','permissions'=>array('lehre/studienordnung')),
 		'StudienplanGueltigkeit'=>array('name'=>'Studienplan Gültigkeit', 'link'=>'lehre/studienplan_gueltigkeit.php', 'target'=>'main','permissions'=>array('lehre/studienordnung')),
-		'StudienplanVorruecken'=>array('name'=>'Studienplan vorrücken', 'link'=>'lehre/studienplan_vorrueckung.php', 'target'=>'main','permissions'=>array('lehre/studienordnung')),
+		'StudienplanVorruecken'=>array('name'=>'Studienplan vorrücken', 'link'=>'lehre/studienplan_vorrueckung.php', 'target'=>'main','permissions'=>array('lehre/studienplan')),
 
 		'Freifach'=>array
 		(

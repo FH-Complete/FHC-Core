@@ -54,6 +54,13 @@ foreach ($stg_obj->result as $stg)
 	$stg_arr[$stg->studiengang_kz] = $stg->kuerzel;
 }
 
+//Default BA1Codes für echte Dienstverträge aus Config Laden
+$arrEchterDV = [103, 110];
+if (defined('DEFAULT_ECHTER_DIENSTVERTRAG') && DEFAULT_ECHTER_DIENSTVERTRAG != '')
+{
+	$arrEchterDV = DEFAULT_ECHTER_DIENSTVERTRAG;
+}
+
 $studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'');
 $semester = (isset($_GET['semester'])?$_GET['semester']:'');
 $stsem_von = (isset($_GET['stsem_von'])?$_GET['stsem_von']:'');
@@ -92,14 +99,23 @@ echo '<!DOCTYPE HTML>
 echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 echo 'Studiengang: <SELECT name="studiengang_kz">';
 echo '<OPTION value="">---Stg ausw&auml;hlen---</OPTION>';
-foreach($stg_obj->result as $stg)
+$types = new studiengang();
+$types->getAllTypes();
+$typ = '';
+foreach($stg_obj->result as $row)
 {
-	if ($studiengang_kz == $stg->studiengang_kz)
+	if ($typ != $row->typ || $typ == '')
+	{
+		if ($typ != '')
+			echo '</optgroup>';
+		echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ] != ''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
+	}
+	if($row->studiengang_kz == $studiengang_kz)
 		$selected = 'selected';
 	else
 		$selected = '';
-
-	echo '<OPTION value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.' ('.$stg->kurzbzlang.')</OPTION>';
+	echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.$db->convert_html_chars($row->kuerzel.' - '.$row->bezeichnung).'</option>';
+	$typ = $row->typ;
 }
 echo '</SELECT>';
 
@@ -350,7 +366,7 @@ if ($studiengang_kz != '' && $stsem_von != '' && $stsem_nach != '')
 										{
 											// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
 											// geliefert da dies im Vertrag inkludiert ist.
-											if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+											if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
 											{
 												$lem_obj->stundensatz = '';
 												break;

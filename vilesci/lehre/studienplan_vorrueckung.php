@@ -31,10 +31,12 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('lehre/studienordnung', null, 's'))
+if(!$rechte->isBerechtigt('lehre/studienplan', null, 's'))
 {
 	die($rechte->errormsg);
 }
+
+$berechtigteStgKz = $rechte->getStgKz('lehre/studienplan');
 
 echo '<!DOCTYPE HTML>
 <html>
@@ -44,7 +46,7 @@ echo '<!DOCTYPE HTML>
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
 
-	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script  type="text/javascript" src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js"></script>
 	<script type="text/javascript">
@@ -138,7 +140,7 @@ echo '</form>';
 
 if(isset($_POST['vorruecken']) && !empty($studienplaene) && $studiensemester_kurzbz_to != '')
 {
-	if(!$rechte->isBerechtigt('lehre/studienordnung', null, 'suid'))
+	if(!$rechte->isBerechtigt('lehre/studienplan', null, 'sui'))
 	{
 		die($rechte->errormsg);
 	}
@@ -193,6 +195,7 @@ if(isset($_POST['show']) && $studiensemester_kurzbz_from != '' && $studiensemest
 							AND studiengang_kz = sto.studiengang_kz
 						)
 					AND tbl_studiengang.typ IN ('b', 'm', 'l')
+					AND tbl_studiengang.studiengang_kz IN (".implode(',',$berechtigteStgKz).")
 					AND studienplan.onlinebewerbung_studienplan = true";
 	if (substr($studiensemester_kurzbz_from,0,2) == 'SS')
 	{
@@ -244,7 +247,7 @@ if(isset($_POST['show']) && $studiensemester_kurzbz_from != '' && $studiensemest
 							</tr>';
 			}
 			echo "</tbody></table>";
-			if ($rechte->isBerechtigt('lehre/studienordnung', null, 'suid'))
+			if ($rechte->isBerechtigt('lehre/studienplan', null, 'sui'))
 			{
 				echo '<button type="submit" name="vorruecken">Ausgewählte Studienpläne vorrücken</button>';
 			}

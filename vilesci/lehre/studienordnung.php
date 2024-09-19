@@ -49,7 +49,7 @@ echo '<!DOCTYPE html>
 	<link rel="stylesheet" href="../../skin/vilesci.css" />
 	<link rel="stylesheet" href="../../include/js/treeGrid/css/jquery.treegrid.css">
 
-	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script>var jqUi = jQuery.noConflict(true);</script>
@@ -59,7 +59,7 @@ echo '<!DOCTYPE html>
 
 	<script type="text/javascript" src="../../include/js/treeGrid/jstreegrid.js"></script>
 
-	<script type="text/javascript" src="../../vendor/alvaro-prieto/colResizable/colResizable-1.6.min.js"></script>
+	<script type="text/javascript" src="../../vendor/alvaro-prieto/colresizable/colResizable-1.6.min.js"></script>
 
 	<script src="studienordnung_lvregel.js" type="text/javascript"></script>
 	<script src="studienordnung.js" type="text/javascript"></script>

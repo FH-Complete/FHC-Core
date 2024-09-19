@@ -169,6 +169,9 @@ class IssuesLib
 		return $this->_changeIssueStatus($issue_id, $data, $user);
 	}
 
+	// --------------------------------------------------------------------------------------------------------------
+	// Private methods
+
 	/**
 	 * Changes status of an issue.
 	 * @param int $issue_id
@@ -215,8 +218,15 @@ class IssuesLib
 	 * @param string $inhalt_extern
 	 * @return object success or error
 	 */
-	private function _addIssue($fehlercode, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null, $resolution_params = null, $fehlercode_extern = null, $inhalt_extern = null)
-	{
+	private function _addIssue(
+		$fehlercode,
+		$person_id = null,
+		$oe_kurzbz = null,
+		$fehlertext_params = null,
+		$resolution_params = null,
+		$fehlercode_extern = null,
+		$inhalt_extern = null
+	) {
 		if (isEmptyString($person_id) && isEmptyString($oe_kurzbz))
 			return error("Person_id or oe_kurzbz must be set.");
 
@@ -226,7 +236,15 @@ class IssuesLib
 		if (hasData($fehlerRes))
 		{
 			$fehlertextVorlage = getData($fehlerRes)[0]->fehlertext;
-			$fehlertext = isEmptyArray($fehlertext_params) ? $fehlertextVorlage : vsprintf($fehlertextVorlage, $fehlertext_params);
+
+			$fehlertext = $fehlertextVorlage;
+			if (!isEmptyArray($fehlertext_params))
+			{
+				if (count($fehlertext_params) != substr_count($fehlertextVorlage, '%s'))
+					return error('Wrong number of parameters for Fehlertext, fehler_kurzbz ' . $fehlercode);
+
+				$fehlertext = vsprintf($fehlertextVorlage, $fehlertext_params);
+			}
 
 			$openIssuesCountRes = $this->_ci->IssueModel->getOpenIssueCount($fehlercode, $person_id, $oe_kurzbz, $fehlercode_extern);
 
@@ -252,6 +270,7 @@ class IssuesLib
 							return error("Invalid parameters for resolution");
 					}
 
+					// insert new issue
 					return $this->_ci->IssueModel->insert(
 						array(
 							'fehlercode' => $fehlercode,
@@ -267,8 +286,8 @@ class IssuesLib
 						)
 					);
 				}
-				else
-					return success($openIssueCount);
+				else // return success if issue already exists
+					return success("Issue already exists");
 			}
 			else
 				return error("Number of open issues could not be determined");

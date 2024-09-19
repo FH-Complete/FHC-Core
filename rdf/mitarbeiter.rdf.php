@@ -112,6 +112,7 @@ function draw_row($mitarbeiter)
     	<MITARBEITER:uid><![CDATA['.$mitarbeiter->uid.']]></MITARBEITER:uid>
 		<MITARBEITER:titelpre><![CDATA['.$mitarbeiter->titelpre.']]></MITARBEITER:titelpre>
 		<MITARBEITER:titelpost><![CDATA['.$mitarbeiter->titelpost.']]></MITARBEITER:titelpost>
+		<MITARBEITER:wahlname><![CDATA['.$mitarbeiter->wahlname.']]></MITARBEITER:wahlname>
 		<MITARBEITER:vornamen><![CDATA['.$mitarbeiter->vornamen.']]></MITARBEITER:vornamen>
 		<MITARBEITER:vorname><![CDATA['.$mitarbeiter->vorname.']]></MITARBEITER:vorname>
 		<MITARBEITER:nachname><![CDATA['.$mitarbeiter->nachname.']]></MITARBEITER:nachname>
@@ -143,6 +144,7 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 				<MITARBEITER:uid></MITARBEITER:uid>
 				<MITARBEITER:titelpre></MITARBEITER:titelpre>
 				<MITARBEITER:titelpost></MITARBEITER:titelpost>
+				<MITARBEITER:wahlname></MITARBEITER:wahlname>
 				<MITARBEITER:vornamen></MITARBEITER:vornamen>
 				<MITARBEITER:vorname></MITARBEITER:vorname>
 				<MITARBEITER:nachname></MITARBEITER:nachname>
@@ -182,6 +184,7 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 								"\n\t\t\t<MITARBEITER:uid></MITARBEITER:uid>".
 								"\n\t\t\t<MITARBEITER:titelpre></MITARBEITER:titelpre>".
 								"\n\t\t\t<MITARBEITER:titelpost></MITARBEITER:titelpost>".
+								"\n\t\t\t<MITARBEITER:wahlname></MITARBEITER:wahlname>".
 								"\n\t\t\t<MITARBEITER:vornamen></MITARBEITER:vornamen>".
 								"\n\t\t\t<MITARBEITER:vorname></MITARBEITER:vorname>".
 								"\n\t\t\t<MITARBEITER:nachname></MITARBEITER:nachname>".
@@ -214,6 +217,7 @@ else
 	    	<MITARBEITER:uid><![CDATA[]]></MITARBEITER:uid>
 			<MITARBEITER:titelpre><![CDATA[]]></MITARBEITER:titelpre>
 			<MITARBEITER:titelpost><![CDATA[]]></MITARBEITER:titelpost>
+			<MITARBEITER:wahlname><![CDATA[]]></MITARBEITER:wahlname>
 			<MITARBEITER:vornamen><![CDATA[]]></MITARBEITER:vornamen>
 			<MITARBEITER:vorname><![CDATA[]]></MITARBEITER:vorname>
 			<MITARBEITER:nachname><![CDATA[-- Keine Auswahl --]]></MITARBEITER:nachname>

@@ -22,11 +22,16 @@ class DB_Model extends CI_Model
 	const PGSQL_BOOLEAN_FALSE = 'f';
 	const PGSQL_BOOLEAN_TYPE = 'bool';
 	const PGSQL_BOOLEAN_ARRAY_TYPE = '_bool';
+	const PGSQL_INT2_TYPE = 'int2';
+	const PGSQL_INT4_TYPE = 'int4';
+	const PGSQL_INT8_TYPE = 'int8';
+	const PGSQL_FLOAT4_TYPE = 'float4';
+	const PGSQL_FLOAT8_TYPE = 'float8';
 
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
-	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
+	protected $pk;  	// Name of the PrimaryKey for DB-Update, Load, ...
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
-							// True if this table has a primary key that uses a sequence
+				// True if this table has a primary key that uses a sequence
 
 	private $executedQueryMetaData;
 	private $executedQueryListFields;
@@ -271,11 +276,6 @@ class DB_Model extends CI_Model
 	/**
 	 * Load data and convert a record into a list of data from the main table,
 	 * and linked to every element, the data from the side tables
-	 *
-	 * TODO:
-	 * - Adding support for composed primary key
-	 * - Adding support for cascading side tables (useful?)
-	 *
 	 * NOTE: sub queries are not supported in the from clause
 	 *
 	 * @return  array
@@ -599,6 +599,28 @@ class DB_Model extends CI_Model
 	}
 
 	/**
+	 * Convert PG-Int* to PHP-Integer
+	 */
+	public function pgIntPhp($val)
+	{
+		// If it is null, let it be null
+		if ($val == null) return $val;
+
+		return intval($val);
+	}
+
+	/**
+	 * Convert PG-Float* to PHP-Float
+	 */
+	public function pgFloatPhp($val)
+	{
+		// If it is null, let it be null
+		if ($val == null) return $val;
+
+		return floatval($val);
+	}
+
+	/**
 	 * Converts from PostgreSQL array to php array
 	 * It also takes care about array of booleans
 	 */
@@ -892,6 +914,11 @@ class DB_Model extends CI_Model
 				// If array type, boolean type OR a UDF
 				if (strpos($eqmd->type, DB_Model::PGSQL_ARRAY_TYPE) !== false
 					|| $eqmd->type == DB_Model::PGSQL_BOOLEAN_TYPE
+					|| $eqmd->type == DB_Model::PGSQL_INT2_TYPE
+					|| $eqmd->type == DB_Model::PGSQL_INT4_TYPE
+					|| $eqmd->type == DB_Model::PGSQL_INT8_TYPE
+					|| $eqmd->type == DB_Model::PGSQL_FLOAT4_TYPE
+					|| $eqmd->type == DB_Model::PGSQL_FLOAT8_TYPE
 					|| $this->udflib->isUDFColumn($eqmd->name, $eqmd->type))
 				{
 					// If UDFs are inside this result set
@@ -940,6 +967,19 @@ class DB_Model extends CI_Model
 						elseif ($toBeConverted->type == DB_Model::PGSQL_BOOLEAN_TYPE)
 						{
 							$resultElement->{$toBeConverted->name} = $this->pgBoolPhp($resultElement->{$toBeConverted->name});
+						}
+						// Integer type
+						elseif ($toBeConverted->type == DB_Model::PGSQL_INT2_TYPE
+							|| $toBeConverted->type == DB_Model::PGSQL_INT4_TYPE
+							|| $toBeConverted->type == DB_Model::PGSQL_INT8_TYPE)
+						{
+							$resultElement->{$toBeConverted->name} = $this->pgIntPhp($resultElement->{$toBeConverted->name});
+						}
+						// Float type
+						elseif ($toBeConverted->type == DB_Model::PGSQL_FLOAT4_TYPE
+							|| $toBeConverted->type == DB_Model::PGSQL_FLOAT8_TYPE)
+						{
+							$resultElement->{$toBeConverted->name} = $this->pgFloatPhp($resultElement->{$toBeConverted->name});
 						}
 					}
 				}

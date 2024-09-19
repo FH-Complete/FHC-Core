@@ -1,0 +1,66 @@
+.filter-header-title {
+	text-align: right;
+}
+
+.filter-header-title-span-filter {
+	margin-right: 7px;
+}
+
+.filter-header-title-span-icon {
+	margin-right: 3px;
+	cursor: pointer;
+}
+
+.filter-options-div {
+	padding: 10px;
+}
+
+.filter-fields-area {
+	height: 50px;
+	padding: 3px;
+	margin-bottom: 10px;
+}
+
+.filter-fields-field {
+	height: 100%;
+	margin-left: 7px;
+	padding: 11px;
+	display: inline-block;
+	background-color: white;
+	border-style: solid;
+	border-color: black;
+	border-width: 1px;
+	border-radius: 7px;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	cursor: pointer;
+}
+
+.filter-filter-fields {
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
+
+.selection-before::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 100%;
+        height: 100%;
+        margin-right: 3px;
+        border-left: 2px solid #428bca;
+}
+
+.selection-after::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 100%;
+        height: 100%;
+        margin-left: 3px;
+        border-right: 2px solid #428bca;
+}
+
+.filter-table-dataset {
+	margin-top: 20px;
+}
+

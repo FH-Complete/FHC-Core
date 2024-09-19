@@ -343,7 +343,7 @@ function func_rowUpdated(row){
  * Select all (filtered) rows and ignore rows which have status bestellt
  */
 function tableWidgetHook_selectAllButton(tableWidgetDiv){
-	tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+	var resultRows = tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
 		.filter(row => (
 			row.getData().personalnummer > 0 ||					// not dummies
 			row.getData().personalnummer == null) &&			// include Projektbetreuer
@@ -355,8 +355,9 @@ function tableWidgetHook_selectAllButton(tableWidgetDiv){
 				(row.getData().bestellt != null &&				// OR (bestellt
 				row.getData().status == 'Geändert')				// AND geaendert)
 			)
-		)
-		.forEach((row => row.select()));
+		);
+
+	tableWidgetDiv.find("#tableWidgetTabulator").tabulator('selectRow', resultRows);
 }
 
 // -----------------------------------------------------------------------------------------------------------------

@@ -52,9 +52,9 @@ $p = new phrasen($sprache_user);
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css" type="text/css"/>
     <script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
-    <script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 </head>
 
 <body scroll="no">
@@ -277,6 +277,7 @@ if (isset($_SESSION['pruefling_id']))
 	$anzahlGebiete = $db->db_num_rows($result);
 	$lastsemester = '';
 	$quereinsteiger_stg = '';
+	$_SESSION['alleGebiete']= [];
 	while($row = $db->db_fetch_object($result))
 	{
 		//Jedes Semester in einer eigenen Tabelle anzeigen
@@ -385,6 +386,7 @@ if (isset($_SESSION['pruefling_id']))
 						</td>
 					<!--<td width="10" class="ItemTesttoolRight" nowrap>&nbsp;</td>-->
 					</tr>';
+			$_SESSION['alleGebiete'][] = $row->gebiet_id;
 		}
 		else
 		{

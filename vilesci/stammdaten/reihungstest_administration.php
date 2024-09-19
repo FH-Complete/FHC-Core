@@ -110,17 +110,17 @@ echo '	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker
 				$("#t2").tablesorter(
 					{
 						sortList: [[6,0],[5,0]],
-						widgets: ["zebra"]
+						widgets: ["zebra","filter"]
 					});
 				$("#t3").tablesorter(
 					{
 						sortList: [[0,0],[1,0],[3,0]],
-						widgets: ["zebra"]
+						widgets: ["zebra","filter"]
 					});
 				$("#t4").tablesorter(
 					{
 						sortList: [[2,0],[3,0]],
-						widgets: ["zebra"],
+						widgets: ["zebra","filter"],
 						headers: {5:{sorter:false}}
 					});
 
@@ -583,7 +583,7 @@ if(isset($_POST['delete_all']))
 }
 
 // Testergebnisse anzeigen
-echo '<hr><br><form action="'.$_SERVER['PHP_SELF'].'" method="POST">Testergebnisse der Person mit der Prestudent_id <input type="text" name="prestudent_id"><input type="submit" value="anzeigen" name="testergebnisanzeigen"></form>';
+echo '<hr><br><form action="'.$_SERVER['PHP_SELF'].'" method="POST">Testergebnisse der Person mit der Prestudent_id <input type="text" name="prestudent_id" value="'.(isset($_POST['prestudent_id'])?$_POST['prestudent_id']:'').'"><input type="submit" value="anzeigen" name="testergebnisanzeigen"></form>';
 if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 {
 	if(is_numeric($_POST['prestudent_id']) && $_POST['prestudent_id']!='')

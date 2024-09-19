@@ -52,6 +52,24 @@ class Prestudentstatus_model extends DB_Model
 		return $this->execQuery($query, $parametersArray);
 	}
 
+    /**
+     * Liefert den Ersten Status eines Prestudenten mit der übergebenen Statuskurzbezeichnung.
+     *
+     * @param $prestudent_id
+     * @param $status_kurzbz
+     * @return array
+     */
+    public function getFirstStatus($prestudent_id, $status_kurzbz)
+    {
+        $this->addOrder('datum, insertamum, ext_id');
+        $this->addLimit(1);
+
+        return $this->loadWhere(array(
+            'prestudent_id' => $prestudent_id,
+            'status_kurzbz' => $status_kurzbz
+        ));
+    }
+
 	/**
 	 * updateStufe
 	 */

@@ -54,9 +54,9 @@ $p = new phrasen($sprache_user);
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css" type="text/css"/>
     <script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
-    <script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 </head>
 <script type="text/javascript">
 function changeSprache(sprache)

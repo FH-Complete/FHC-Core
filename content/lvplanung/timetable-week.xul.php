@@ -681,12 +681,12 @@ while ($begin<=$ende)
 	{
 		$wunsch=new zeitwunsch();
 		if ($type=='lektor')
-			if ($wunsch->loadPerson($pers_uid,$datum))
+			if ($wunsch->loadPerson($pers_uid,montag($datum)))
 				$zeitwunsch=$wunsch->zeitwunsch;
 			else
 				$error_msg.=$wunsch->errormsg;
 		if ($aktion=='lva_single_search' || $aktion=='lva_multi_search')
-			if ($wunsch->loadZwLE($lva_id,$datum))
+			if ($wunsch->loadZwLE($lva_id,montag($datum)))
 				$zeitwunsch=$wunsch->zeitwunsch;
 			else
 				$error_msg.=$wunsch->errormsg;

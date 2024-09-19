@@ -17,19 +17,12 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-//require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
-
-$dr = DOC_ROOT;
-$dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
-if($dr=='')
-	$dr='/';
-
 //Originaldateien des Herstellers
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'FHC-vendor/angular-tablesort/tablesort.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.BASE_LOCATION.'FHC-vendor/angular-tablesort/tablesort.css">';
 
-echo '<script src="'.$dr.'FHC-vendor/angular-tablesort/js/angular-tablesort.js"></script>';
+echo '<script src="'.BASE_LOCATION.'FHC-vendor/angular-tablesort/js/angular-tablesort.js"></script>';
 
 //Anpassungen
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/angular-tablesorter/tablesort.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.BASE_LOCATION.'include/vendor_custom/angular-tablesorter/tablesort.css">';
 
 ?>

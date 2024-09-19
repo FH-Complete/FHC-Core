@@ -274,12 +274,13 @@ function func_renderComplete(table){
  * Select all (filtered) rows and ignore rows that are bestellt and erteilt
  */
 function tableWidgetHook_selectAllButton(tableWidgetDiv){
-	tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+	var resultRows = tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
 		.filter(row =>  row.getData().bestellt != null &&	// bestellt
 			row.getData().erteilt != null &&				// AND erteilt
 			row.getData().akzeptiert == null &&				// AND NOT akzeptiert
-			row.getData().status != 'Geändert')				// AND NOT geändert
-		.forEach((row => row.select()));
+			row.getData().status != 'Geändert');				// AND NOT geändert
+
+	tableWidgetDiv.find("#tableWidgetTabulator").tabulator('selectRow', resultRows);
 }
 
 // -----------------------------------------------------------------------------------------------------------------

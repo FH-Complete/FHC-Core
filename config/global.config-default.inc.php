@@ -258,6 +258,9 @@ define('STIP_USER_PASSWORD','password');
 // Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
 
+// UID des Dummy Lektors
+define('DUMMY_LEKTOR_UID','_DummyLektor');
+
 // Soll der Lageplan am Infoterminal angezeigt werden (true|false)
 //define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN', true);
 
@@ -313,4 +316,7 @@ define ('ZAHLUNGSBESTAETIGUNG_ANZEIGEN_FUER_LEHRGAENGE', true);
 
 // Gibt an, ob im CIS die Zahlungsreferenz angezeigt wird
 define ('ZAHLUNGSBESTAETIGUNG_ZAHLUNGSREFERENZ_ANZEIGEN', false);
+
+define('DOCSBOX_ENABLED', false);
+
 ?>

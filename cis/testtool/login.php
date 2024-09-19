@@ -82,7 +82,8 @@ if (isset($_REQUEST['prestudent']))
 	$ps = new prestudent($_REQUEST['prestudent']);
 
 	$login_ok = false;
-	if (defined('TESTTOOL_LOGIN_BEWERBUNGSTOOL') && TESTTOOL_LOGIN_BEWERBUNGSTOOL && isset($_GET['confirmation']))
+	if (defined('TESTTOOL_LOGIN_BEWERBUNGSTOOL') && TESTTOOL_LOGIN_BEWERBUNGSTOOL &&
+		(isset($_GET['confirmation']) || isset($_GET['confirmed_code'])))
 	{
 		if (isset($_SESSION['bewerbung/personId']) && $ps->person_id == $_SESSION['bewerbung/personId'])
 		{
@@ -153,6 +154,33 @@ if (isset($_REQUEST['prestudent']))
 			{
 				// regenerate Session ID after Login
 				session_regenerate_id();
+				if (defined('TESTTOOL_LOGIN_BEWERBUNGSTOOL') && TESTTOOL_LOGIN_BEWERBUNGSTOOL)
+				{
+					if ($rt->zugangs_ueberpruefung && !is_null($rt->zugangscode))
+					{
+						$_SESSION['confirmed_code'] = false;
+						if (isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true)
+						{
+							if (isset($_GET['confirmed_code']))
+							{
+								if ($_GET['confirmed_code'] === $_SESSION['reihungstest_code'])
+								{
+									$_SESSION['confirmed_code'] = true;
+								}
+								else
+									$alertmsg .= '<div class="alert alert-danger">Code ist nicht korrekt.</div>';
+							}
+						}
+
+						if ($_SESSION['confirmed_code'] === false)
+						{
+							$_SESSION['reihungstest_code'] = $rt->zugangscode;
+							$_SESSION['confirmation_needed'] = true;
+						}
+						else
+							$reload_menu = true;
+					}
+				}
 
 				$pruefling = new pruefling();
 				if ($pruefling->getPruefling($ps->prestudent_id))
@@ -314,8 +342,11 @@ else
 	}
 }
 
-
-if (isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
+if ((isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
+	!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code'])) ||
+	(isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
+	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
+	isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])))
 {
 	$pruefling = new pruefling();
 
@@ -365,13 +396,13 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+	<link rel="stylesheet" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css" type="text/css"/>
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css" type="text/css"/>
 	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/ui/i18n/datepicker-de.js"></script>
-	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 
 	$(document).ready(function()
@@ -421,8 +452,32 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 
 <?php
 
+if (isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
+	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === false)
+{
+	echo '
+		<div class="col-xs-11">
+			<div id="alertmsgdiv"></div>
+			<div id="alert">'.$alertmsg.'</div>
+			<div class="row text-center">
+			'.$p->t('testtool/freischalttext').'
+					<br />
+					<br />
+					<b>'.$p->t('testtool/freischaltcode').':</b>
+				<form action="login.php">
+					<input type="hidden" name="prestudent" value="'.$_REQUEST['prestudent'].'" />
+					<input id="confirmed_code" type="number" name="confirmed_code"/>
+					<br />
+					<br />
+					<button id="confirmation_access_submit" type="submit" class="btn btn-primary"/>
+						'.$p->t('testtool/start').'
+					</button>
+				</form>
+			</div>
+		</div>';
+}
 //REIHUNGSTEST STARTSEITE (nach Login)
-if (isset($prestudent_id))
+elseif (isset($prestudent_id))
 {
 	$prestudent = new prestudent($prestudent_id);
 	$stg_obj = new studiengang($prestudent->studiengang_kz);

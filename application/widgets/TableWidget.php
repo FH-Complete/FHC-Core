@@ -213,51 +213,49 @@ class TableWidget extends Widget
 	 */
 	private function _checkParameters($args)
 	{
-		// If no options are given to this widget...
+		// If no options are given to this widget then ends the execution
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
 			show_error('Second parameter of the widget call must be a NOT empty associative array');
 		}
-		else // ...otherwise
+
+		// The unique id parameter is mandatory
+		if (!isset($args[TableWidgetLib::TABLE_UNIQUE_ID]))
 		{
-			// The unique id parameter is mandatory
-			if (!isset($args[TableWidgetLib::TABLE_UNIQUE_ID]))
-			{
-				show_error('The parameter "'.TableWidgetLib::TABLE_UNIQUE_ID.'" must be specified');
-			}
+			show_error('The parameter "'.TableWidgetLib::TABLE_UNIQUE_ID.'" must be specified');
+		}
 
-			// The query parameter is mandatory
-			if (!isset($args[TableWidgetLib::QUERY]))
-			{
-				show_error('The parameter "'.TableWidgetLib::QUERY.'" must be specified');
-			}
+		// The query parameter is mandatory
+		if (!isset($args[TableWidgetLib::QUERY]))
+		{
+			show_error('The parameter "'.TableWidgetLib::QUERY.'" must be specified');
+		}
 
-			// The dataset representation parameter is mandatory
-			if (!isset($args[TableWidgetLib::DATASET_REPRESENTATION]))
-			{
-				show_error('The parameter "'.TableWidgetLib::DATASET_REPRESENTATION.'" must be specified');
-			}
+		// The dataset representation parameter is mandatory
+		if (!isset($args[TableWidgetLib::DATASET_REPRESENTATION]))
+		{
+			show_error('The parameter "'.TableWidgetLib::DATASET_REPRESENTATION.'" must be specified');
+		}
 
-			// Checks if the dataset representation parameter is valid
-			if (isset($args[TableWidgetLib::DATASET_REPRESENTATION])
-				&& $args[TableWidgetLib::DATASET_REPRESENTATION] != TableWidgetLib::DATASET_REP_TABLESORTER
-				&& $args[TableWidgetLib::DATASET_REPRESENTATION] != TableWidgetLib::DATASET_REP_PIVOTUI
-				&& $args[TableWidgetLib::DATASET_REPRESENTATION] != TableWidgetLib::DATASET_REP_TABULATOR)
-			{
-				show_error(
-					'The parameter "'.TableWidgetLib::DATASET_REPRESENTATION.
-					'" must be IN ("'
-						.TableWidgetLib::DATASET_REP_TABLESORTER.'", "'
-						.TableWidgetLib::DATASET_REP_PIVOTUI.'", "'
-						.TableWidgetLib::DATASET_REP_TABULATOR.'")'
-				);
-			}
+		// Checks if the dataset representation parameter is valid
+		if (isset($args[TableWidgetLib::DATASET_REPRESENTATION])
+			&& $args[TableWidgetLib::DATASET_REPRESENTATION] != TableWidgetLib::DATASET_REP_TABLESORTER
+			&& $args[TableWidgetLib::DATASET_REPRESENTATION] != TableWidgetLib::DATASET_REP_PIVOTUI
+			&& $args[TableWidgetLib::DATASET_REPRESENTATION] != TableWidgetLib::DATASET_REP_TABULATOR)
+		{
+			show_error(
+				'The parameter "'.TableWidgetLib::DATASET_REPRESENTATION.
+				'" must be IN ("'
+					.TableWidgetLib::DATASET_REP_TABLESORTER.'", "'
+					.TableWidgetLib::DATASET_REP_PIVOTUI.'", "'
+					.TableWidgetLib::DATASET_REP_TABULATOR.'")'
+			);
+		}
 
-			// If given the session timeout parameter must be a number
-			if (isset($args[TableWidgetLib::SESSION_TIMEOUT]) && !is_numeric($args[TableWidgetLib::SESSION_TIMEOUT]))
-			{
-				show_error('The parameter "'.TableWidgetLib::SESSION_TIMEOUT.'" must be a number');
-			}
+		// If given the session timeout parameter must be a number
+		if (isset($args[TableWidgetLib::SESSION_TIMEOUT]) && !is_numeric($args[TableWidgetLib::SESSION_TIMEOUT]))
+		{
+			show_error('The parameter "'.TableWidgetLib::SESSION_TIMEOUT.'" must be a number');
 		}
 	}
 
@@ -330,8 +328,10 @@ class TableWidget extends Widget
 						TableWidgetLib::SESSION_DATASET => $dataset->retval, // the entire dataset
 						TableWidgetLib::SESSION_DATASET_RELOAD => false, // if the dataset must be reloaded, not needed the first time
 						TableWidgetLib::SESSION_DATASET_REPRESENTATION => $this->_datasetRepresentation, // the choosen dataset representation
-						TableWidgetLib::SESSION_DATASET_REP_OPTIONS => $this->_datasetRepresentationOptions, // the choosen dataset representation options
-						TableWidgetLib::SESSION_DATASET_REP_FIELDS_DEFS => $this->_datasetRepFieldsDefs // the choosen dataset representation record fields definition
+						// The choosen dataset representation options
+						TableWidgetLib::SESSION_DATASET_REP_OPTIONS => $this->_datasetRepresentationOptions,
+						// The choosen dataset representation record fields definition
+						TableWidgetLib::SESSION_DATASET_REP_FIELDS_DEFS => $this->_datasetRepFieldsDefs
 					)
 				);
 			}
@@ -381,6 +381,19 @@ class TableWidget extends Widget
 			{
 				$rawDatasetRow->{$columnName} = ($columnValue === true ? 'true' : 'false');
 			}
+			// if it is an array
+			elseif (is_array($columnValue))
+			{
+				// Default is an empty string
+				$rawDatasetRow->{$columnName} = '';
+
+				// For each element of the array
+				foreach ($columnValue as $value)
+				{
+					$rawDatasetRow->{$columnName} .= $value."\n"; // concatenate each element of the array
+				}
+			}
+			// if it is a date/timestamp
 			elseif (DateTime::createFromFormat('Y-m-d H:i:s', $columnValue) !== false)
 			{
 				$rawDatasetRow->{$columnName} = date(self::DEFAULT_DATE_FORMAT, strtotime($columnValue));
@@ -412,24 +425,6 @@ class TableWidget extends Widget
 	}
 
 	/**
-	 * Utility method that retrieves the name of the columns present in a table JSON definition
-	 */
-	private function _getColumnsNames($columns)
-	{
-		$columnsNames = array();
-
-		foreach ($columns as $key => $obj)
-		{
-			if (isset($obj->name))
-			{
-				$columnsNames[] = $obj->name;
-			}
-		}
-
-		return $columnsNames;
-	}
-
-	/**
 	 * Loads a view using the given viewName and eventually other parameters
 	 */
 	private static function _loadView($viewName, $parameters = null)
@@ -438,3 +433,4 @@ class TableWidget extends Widget
 		$ci->load->view($viewName, $parameters);
 	}
 }
+

@@ -160,8 +160,6 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 		<vbox hidden="true">
 			<label value="Neu"/>
 			<checkbox id="student-projektarbeit-checkbox-neu" checked="true" />
-	  		<label value="Projektarbeit ID"/>
-	  		<textbox id="student-projektarbeit-textbox-projektarbeit_id" disabled="true"/>
 		</vbox>
 		<groupbox flex="1">
 		<caption label="Details"/>
@@ -171,6 +169,10 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 						<column flex="5"/>
 					</columns>
 					<rows>
+						<row>
+							<label value="Projektarbeit ID" control="student-projektarbeit-textbox-projektarbeit_id"/>
+							<hbox><textbox id="student-projektarbeit-textbox-projektarbeit_id" readonly="true" maxlength="16" size="16"/></hbox>
+						</row>
 						<row>
 							<label value="Titel" control="student-projektarbeit-textbox-titel"/>
 							<textbox id="student-projektarbeit-textbox-titel" disabled="true" maxlength="1024" />
@@ -244,7 +246,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							</menulist>
 						</row>
 						<row>
-							<label value="Lehreinheit" control="student-projektarbeit-menulist-lehreinheit"/>
+							<label value="LV-Teil" control="student-projektarbeit-menulist-lehreinheit"/>
 							<menulist id="student-projektarbeit-menulist-lehreinheit" disabled="true"
 							          datasources="rdf:null" flex="1"
 									  style="max-width: 600px"
@@ -492,7 +494,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 									</template>
 								</menulist>
 							</row>
-							<row>
+							<row id="student-projektbetreuer-textbox-punkte-row">
 								<label value="Punkte" control="student-projektbetreuer-textbox-punkte"/>
 								<textbox id="student-projektbetreuer-textbox-punkte" disabled="true" maxlength="6"/>
 							</row>

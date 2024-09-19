@@ -8,7 +8,7 @@ require_once('../include/phrasen.class.php');
 $sprache = getSprache();
 $p = new phrasen($sprache);
 ?>
-<script src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script src="../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script>
 	$(document).ready(function () {
 		$('#ampel_div').html('');

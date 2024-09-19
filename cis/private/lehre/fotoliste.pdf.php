@@ -37,7 +37,6 @@ require_once('../../../include/erhalter.class.php');
 require_once('../../../include/datum.class.php');
 
 
-$doc = new dokument_export('fotoliste');
 $output = 'pdf';
 $show_all_fotos = false;
 
@@ -61,6 +60,8 @@ $lv->load($lvid);
 
 $stg = new studiengang();
 $stg->load($lv->studiengang_kz);
+
+$doc = new dokument_export('fotoliste', $stg->oe_kurzbz);
 
 $berechtigung = new benutzerberechtigung();
 $berechtigung->getBerechtigungen($user);
@@ -102,6 +103,7 @@ $gruppen_string = '';
 $gruppen_string_arr = array();
 $stg_typ = $stg->typ;
 $stg_bezeichnung = $stg->bezeichnung;
+$lv_bezeichnung = '';
 
 //structure overall lehrveranstaltungs data
 if ($result = $db->db_query($qry)) {
@@ -153,6 +155,7 @@ $qry = 'SELECT DISTINCT ON
 			(nachname, vorname, person_id)
             vorname,
             nachname,
+            wahlname,
             matrikelnr,
 			tbl_studentlehrverband.semester,
             tbl_studentlehrverband.verband,
@@ -177,7 +180,8 @@ $qry = 'SELECT DISTINCT ON
             tbl_person.matr_nr,
             tbl_person.geschlecht,
             tbl_person.foto,
-            tbl_person.foto_sperre
+            tbl_person.foto_sperre,
+			(tbl_bisio.bis::timestamp - tbl_bisio.von::timestamp) as daysout
 		FROM
 			campus.vw_student_lehrveranstaltung
             JOIN public.tbl_benutzer USING(uid)
@@ -197,7 +201,7 @@ $qry = 'SELECT DISTINCT ON
 if ($lehreinheit != '')
     $qry .= ' AND vw_student_lehrveranstaltung.lehreinheit_id=' . $db->db_add_param($lehreinheit, FHC_INTEGER);
 
-$qry .= ' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
+$qry .= ' ORDER BY nachname, vorname, person_id, daysout DESC';
 
 $stsem_obj = new studiensemester();
 $stsem_obj->load($studiensemester);
@@ -237,6 +241,16 @@ if ($result = $db->db_query($qry)) {
             if ($row->stg_kz_student == $a_o_kz) //Außerordentliche Studierende
                 $zusatz .= '(a.o.)';
 
+            //wenn Wahlname vorhanden, wird dieser anstelle des Vornamens angezeigt
+            if ($row->wahlname != '')
+            {
+              $vorname = $row->wahlname;
+            }
+            else
+            {
+              $vorname = $row->vorname;
+            }
+
             //allow admin and assistenz to see ALL fotos (even if locked by user)
             if ($show_all_fotos)
                 $row->foto_sperre = 'f';
@@ -271,12 +285,12 @@ if ($result = $db->db_query($qry)) {
 
             //add studierenden data for XML
             $data[] = array('studierende' => array(
-                    'vorname' => $row->vorname,
+                    'vorname' => $vorname,
                     'nachname' => mb_strtoupper($row->nachname, 'UTF-8'),
                     'personenkennzeichen' => trim($row->matrikelnr),
                     'geschlecht' => $row->geschlecht,
                     'foto_gesperrt' => $row->foto_sperre, // f/t
-                    'foto_url' => $foto_url,
+                    'foto_url' => 'Pictures/' . trim($row->person_id) . '.jpg',
                     'studiengruppe' => $student_studiengruppe,
                     'verband' => trim($row->verband),
                     'gruppe' => trim($row->gruppe),

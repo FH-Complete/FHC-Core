@@ -55,4 +55,45 @@ class Betriebsmittelperson_model extends DB_Model
 		
 		return $this->loadWhere($condition);
 	}
+
+	public function getBetriebsmittelZuordnung($cardIdentifier, $typ = 'Zutrittskarte', $ausgegeben = true)
+	{
+		$this->addJoin('wawi.tbl_betriebsmittel', 'betriebsmittel_id');
+
+		$where = 'wawi.tbl_betriebsmittel.nummer2 = \'' . $cardIdentifier . '\'
+					AND wawi.tbl_betriebsmittel.betriebsmitteltyp = \''. $typ .'\'
+					AND (retouram >= now() OR retouram IS NULL)
+					';
+
+		if ($ausgegeben)
+			$where .= 'AND ausgegebenam <= now()';
+		else
+			$where .= 'AND (ausgegebenam <= now() OR ausgegebenam IS NULL)';
+
+		return $this->loadWhere($where);
+	}
+
+	public function getBetriebsmittelByUid($uid, $betriebsmitteltyp = null, $isRetourniert = false)
+	{
+		$this->addJoin('wawi.tbl_betriebsmittel', 'betriebsmittel_id');
+
+		$condition = ' wawi.tbl_betriebsmittelperson.uid = '. $this->escape($uid);
+
+		if (is_string($betriebsmitteltyp))
+		{
+			$condition .= ' AND betriebsmitteltyp = ' . $this->escape($betriebsmitteltyp);
+		}
+
+		if ($isRetourniert === true) {
+			$condition .= ' AND retouram IS NOT NULL';
+		}
+		elseif ($isRetourniert === false)
+		{
+			$condition .= ' AND retouram IS NULL';
+		}
+
+		$this->addOrder('ausgegebenam', 'DESC');
+
+		return $this->loadWhere($condition);
+	}
 }

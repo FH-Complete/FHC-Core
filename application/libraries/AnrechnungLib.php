@@ -80,14 +80,24 @@ class AnrechnungLib
 		// Get latest ZGV
 		$result = $this->ci->PrestudentModel->getLatestZGVBezeichnung($prestudent_id);
 		$latest_zgv_bezeichnung = hasData($result) ? getData($result)[0]->bezeichnung : '';
-		
+
+        // Get Sum of berufliche and schulische ECTS
+        $result = $this->ci->LehrveranstaltungModel->getEctsSumSchulisch($uid, $prestudent_id, $lv->studiengang_kz);
+        $sumEctsSchulisch = getData($result)[0]->ectssumschulisch;
+
+        $result = $this->ci->LehrveranstaltungModel->getEctsSumBeruflich($uid);
+        $sumEctsBeruflich = getData($result)[0]->ectssumberuflich;
+
 		// Set the given studiensemester
 		$antrag_data->lv_id = $lv_id;
 		$antrag_data->lv_bezeichnung = $lv->bezeichnung;
 		$antrag_data->ects = $lv->ects;
+        $antrag_data->sumEctsSchulisch = $sumEctsSchulisch;
+        $antrag_data->sumEctsBeruflich = $sumEctsBeruflich;
 		$antrag_data->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$antrag_data->vorname = $person->vorname;
 		$antrag_data->nachname = $person->nachname;
+		$antrag_data->student_uid = $uid;
 		$antrag_data->matrikelnr = $student->matrikelnr;
         $antrag_data->studiengang_kz = $studiengang->studiengang_kz;
 		$antrag_data->stg_bezeichnung = $studiengang->bezeichnung;
@@ -112,6 +122,7 @@ class AnrechnungLib
 
 		$anrechnung_data = new StdClass();
 
+        $this->ci->AnrechnungModel->addJoin('lehre.tbl_anrechnung_begruendung', 'begruendung_id');
 		$result = $this->ci->AnrechnungModel->load($anrechnung_id);
 
 		if (isError($result))
@@ -145,6 +156,7 @@ class AnrechnungLib
 		$anrechnung_data->prestudent_id = '';
 		$anrechnung_data->lehrveranstaltung = '';
 		$anrechnung_data->begruendung_id = '';
+		$anrechnung_data->begruendung = '';
 		$anrechnung_data->anmerkung = '';
 		$anrechnung_data->dms_id = '';
 		$anrechnung_data->insertamum = '';
@@ -155,6 +167,7 @@ class AnrechnungLib
 		$anrechnung_data->status = getUserLanguage() == 'German' ? 'neu' : 'new';
 		$anrechnung_data->dokumentname = '';
 
+        $this->ci->AnrechnungModel->addJoin('lehre.tbl_anrechnung_begruendung', 'begruendung_id');
 		$result = $this->ci->AnrechnungModel->loadWhere(
 			array(
 				'lehrveranstaltung_id' => $lehrveranstaltung_id,
@@ -800,6 +813,7 @@ class AnrechnungLib
 		$anrechnung_data->prestudent_id = $anrechnung->prestudent_id;
 		$anrechnung_data->lehrveranstaltung_id = $anrechnung->lehrveranstaltung_id;
 		$anrechnung_data->begruendung_id =  $anrechnung->begruendung_id;
+		$anrechnung_data->begruendung =  $anrechnung->bezeichnung;
 		$anrechnung_data->anmerkung = $anrechnung->anmerkung_student;
 		$anrechnung_data->dms_id = $anrechnung->dms_id;
 		$anrechnung_data->insertamum = (new DateTime($anrechnung->insertamum))->format('d.m.Y');
@@ -823,4 +837,110 @@ class AnrechnungLib
 
 		return $anrechnung_data;
 	}
+
+    /**
+     * If Student is a Quereinsteiger, get ECTS Summe of all angerechnete Studiensemester.
+     *
+     * @param $prestudent_id
+     * @param $studiengang_kz Studiengang_kz der LV
+     * @return int|mixed
+     */
+    public function getQuereinsteigerEctsSumme($prestudent_id, $studiengang_kz)
+    {
+        $sumEctsQuereinsteiger = 0;
+
+        // Check, if student is Quereinsteiger
+        $this->ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+        $result = $this->ci->PrestudentstatusModel->getFirstStatus($prestudent_id, 'Student');
+
+        $prestudentFirstStudentStatus = getData($result)[0];
+
+        // If Prestudent is not a Quereinsteiger
+        if ($prestudentFirstStudentStatus->ausbildungssemester == 1)
+        {
+            return $sumEctsQuereinsteiger; // return 0
+        }
+
+        $anzahlAngerechneteStudiensemester = $prestudentFirstStudentStatus->ausbildungssemester - 1;
+
+        // If Prestudent is a Quereinsteiger
+        if ($prestudentFirstStudentStatus->ausbildungssemester > 1)
+        {
+            // Get the 'angerechnete Studiensemester'
+            $this->ci->load->model('organisations/Studiensemester_model', 'StudiensemesterModel');
+            $result = $this->ci->StudiensemesterModel->getPreviousFrom(
+                $prestudentFirstStudentStatus->studiensemester_kurzbz,
+                $anzahlAngerechneteStudiensemester
+            );
+
+            // Get ECTS Summe of each 'angerechnetes Studiensemester'
+            foreach (getData($result) as $studiensemester)
+            {
+                $result = $this->ci->LehrveranstaltungModel->getSumQuereinstiegsECTSProSemester(
+                    $studiengang_kz,
+                    $studiensemester->studiensemester_kurzbz,
+                    $anzahlAngerechneteStudiensemester--,
+                    $prestudentFirstStudentStatus->orgform_kurzbz
+                );
+
+                if (hasData($result))
+                {
+                    $sumEctsQuereinsteiger = $sumEctsQuereinsteiger + getData($result)[0]->sum_ects;
+                }
+            }
+        }
+        return $sumEctsQuereinsteiger;  // return sum of ects of all 'angerechnete Studiensemester'
+    }
+
+    /**
+     * Get ECTS Summe of all Anrechnungen based on schulische Kenntnisse.
+     *
+     * @param $student_uid
+     * @return int|mixed
+     */
+    public function getSchulischeAnrechnungenEctsSumme($student_uid)
+    {
+        $sumEctsSchule = 0;
+
+        $result = $this->ci->LehrveranstaltungModel->getSumAngerechneteECTSByBegruendung($student_uid);
+
+        if (hasData($result))
+        {
+            foreach (getData($result) as $ects)
+            {
+                if ($ects->begruendung_id != 4)
+                {
+                    $sumEctsSchule = $sumEctsSchule + $ects->sum;
+                }
+            }
+        }
+
+        return $sumEctsSchule;
+    }
+
+    /**
+     * Get ECTS Summe of all Anrechnungen based on berufliche Kenntnisse.
+     *
+     * @param $student_uid
+     * @return int
+     */
+    public function getBeruflicheAnrechnungenEctsSumme($student_uid)
+    {
+        $sumEctsBeruflich = 0;
+
+        $result = $this->ci->LehrveranstaltungModel->getSumAngerechneteECTSByBegruendung($student_uid);
+
+        if (hasData($result))
+        {
+            foreach (getData($result) as $ects)
+            {
+                if ($ects->begruendung_id == 4)
+                {
+                    $sumEctsBeruflich = $ects->sum;
+                }
+            }
+        }
+
+        return $sumEctsBeruflich;
+    }
 }

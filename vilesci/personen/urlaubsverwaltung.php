@@ -32,6 +32,7 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/addon.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -59,6 +60,15 @@ $alle = (isset($_GET['alle'])?true:false);
 $errormsg='';
 $message='';
 $error=false;
+$mlAbgeschickt = '';
+
+//prüfen, ob addon casetime aktiviert ist
+$addon_obj = new addon();
+$addoncasetime = $addon_obj->checkActiveAddon("casetime");
+if ($addoncasetime)
+{
+	require_once('../../addons/casetime/include/functions.inc.php');
+}
 
 //Kopfzeile
 echo '<html>
@@ -77,6 +87,10 @@ echo '	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker
 		function confdel(val)
 		{
 			return confirm("Wollen Sie diesen Eintrag wirklich loeschen: "+val);
+		}
+		function rejdel(val)
+		{
+			return confirm("ACHTUNG! Die Zeitsperre ("+val + ") wurde bereits in einer abgeschickten Monatsliste verarbeitet und kann nicht gelöscht werden.");
 		}
 		$(document).ready(function()
 		{
@@ -249,8 +263,15 @@ if($uid!='')
 			<th>Bezeichnung</th>
 			<th>Von</th>
 			<th>Bis</th>
-			<th>Vertretung</th>
-			<th>Freigegeben von, am</th>
+			<th>Vertretung</th>';
+
+if($addoncasetime)
+{
+	echo '<th>Status Monatsliste</th>';
+}
+
+echo'
+<th>Freigegeben von, am</th>
 			<th>Aktualisiert am</th>
 			<th>Aktualisiert von</th>
 			<th>Edit</th>
@@ -268,12 +289,38 @@ if($uid!='')
 		echo "<td data-sorter='shortDate' data-date-format='dd.mm.yyyy'>".$datum->formatDatum($row->vondatum,'d.m.Y')." ".($row->vonstunde!=''?'(Stunde '.$row->vonstunde.')':'')."</td>";
 		echo "<td data-sorter='shortDate' data-date-format='dd.mm.yyyy'>".$datum->formatDatum($row->bisdatum,'d.m.Y')." ".($row->bisstunde!=''?'(Stunde '.$row->bisstunde.')':'')."</td>";
 		echo "<td>$row->vertretung_uid</td>";
+
+		if($addoncasetime)
+		{
+			echo "<td align='center'>";
+			checkStatusMonatsliste($uid,$row->vondatum, $row->bisdatum) == '' ? $mlAbgeschickt = false : $mlAbgeschickt = true;
+
+			if($mlAbgeschickt)
+				echo "abgeschickt";
+			else
+				echo "nicht abgeschickt";
+
+			echo '</td>';
+		}
 		echo "<td>$row->freigabevon ".$datum->formatDatum($row->freigabeamum,'d.m.Y')."</td>";
 		echo "<td>".$datum->formatDatum($row->updateamum,'d.m.Y H:i:s')."</td>";
 		echo "<td>$row->updatevon</td>";
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=edit&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'><img src='../../skin/images/application_form_edit.png' alt='bearbeiten' title='bearbeiten' /></a></td>";
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=copy&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'><img src='../../skin/images/copy.png' alt='bearbeiten' title='bearbeiten' /></a></td>";
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=delete&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'' onclick='return confdel(\"$row->zeitsperretyp_kurzbz von ".$datum->formatDatum($row->vondatum,'d.m.Y')." bis ".$datum->formatDatum($row->bisdatum,'d.m.Y')."\")'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
+
+		//nur Zeitsperren von noch nicht abgeschickten Monatlisten dürfen gelöscht werden
+		if ( ($addoncasetime) && ($mlAbgeschickt && in_array($row->zeitsperretyp_kurzbz, zeitsperre::getBlockierendeZeitsperren())) )
+		{
+			echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=edit&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'><img src='../../skin/images/application_form_edit.png' alt='bearbeiten' title='bearbeiten' /></a></td>";
+			echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=copy&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'><img src='../../skin/images/copy.png' alt='bearbeiten' title='kopieren' /></a></td>";
+			echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'' onclick='return rejdel(\"$row->zeitsperretyp_kurzbz von ".$datum->formatDatum($row->vondatum,'d.m.Y')." bis ".$datum->formatDatum($row->bisdatum,'d.m.Y'). "" . "\") '><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
+		}
+		else
+		{
+			echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=edit&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'><img src='../../skin/images/application_form_edit.png' alt='bearbeiten' title='bearbeiten' /></a></td>";
+			echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=copy&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'><img src='../../skin/images/copy.png' alt='bearbeiten' title='kopieren' /></a></td>";
+			echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=delete&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'' onclick='return confdel(\"$row->zeitsperretyp_kurzbz von ".$datum->formatDatum($row->vondatum,'d.m.Y')." bis ".$datum->formatDatum($row->bisdatum,'d.m.Y')."\")'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
+		}
+
+
 		echo '</tr>';
 	}
 	echo '</tbody></table>';

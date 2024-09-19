@@ -16,9 +16,11 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 class AnrechnungJob extends JOB_Controller
 {
 	const APPROVE_ANRECHNUNG_URI = '/lehre/anrechnung/ApproveAnrechnungUebersicht';
+    const REVIEW_ANRECHNUNG_URI = '/lehre/anrechnung/ReviewAnrechnungUebersicht';
 
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
+    const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL = 'AnrechnungNotizSTGL';
 
 	/**
@@ -33,6 +35,8 @@ class AnrechnungJob extends JOB_Controller
 
 		$this->load->helper('url');
 		$this->load->helper('hlp_sancho_helper');
+
+        $this->load->library('AnrechnungLib');
 	}
 
 	/**
@@ -341,6 +345,79 @@ html;
 		}
 
 	}
+
+    /**
+     * Send Sancho mail to remind lecturers to provide their recommendation if not done until one week after request.
+     */
+    public function sendMailRemindRecommendation(){
+
+        $this->logInfo('Start AnrechnungJob sendMailRemindRecommendation to remind lecturers to provide their recommendation.');
+
+        // Get Anrechnungen with pending recommendations, that were requested 1 week before today.
+        // Restrict query for Anrechnungen of actual semester.
+        $this->AnrechnungModel->addSelect('astat.anrechnung_id, astat.datum, astat.insertamum');
+        $this->AnrechnungModel->addDistinct('astat.anrechnung_id');
+        $this->AnrechnungModel->addJoin('lehre.tbl_anrechnung_anrechnungstatus astat', 'anrechnung_id');
+
+        $result = $this->AnrechnungModel->loadWhere('
+            studiensemester_kurzbz = (
+                SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE now()::date BETWEEN start AND ende)
+            )
+            AND genehmigt_von IS NULL                             
+            AND empfehlung_anrechnung IS NULL
+            AND status_kurzbz = '. $this->db->escape(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR) .' -- in Bearbeitung durch Lektor
+            AND NOW()::date = (astat.datum + interval \'1 week\')                   -- eine Woche nach Empfehlungsanfrage
+            ORDER BY astat.anrechnung_id, astat.datum DESC, astat.insertamum DESC   -- nur letzten status dabei prüfen
+        ');
+
+        // Exit if there are no pending recommendations
+        if (!hasData($result))
+        {
+            $this->logInfo('End AnrechnungJob sendMailRemindRecommendation, because no recommendations to be done.');
+            exit;
+        }
+        
+        $anrechnung_id_arr = array_column(getData($result), 'anrechnung_id');
+
+        $arr_lvLector_arr = array();
+        foreach ($anrechnung_id_arr as $anrechnung_id)
+        {
+            $arr_lvLector_arr[]= $this->anrechnunglib->getLectors($anrechnung_id); // Returns LV Leitung. If not present, then all lectors of LV.
+        }
+
+        // Unique lector array to send only one mail per lector
+        $arr_lvLector_arr = array_unique($arr_lvLector_arr, SORT_REGULAR);
+
+        // Link to 'Anrechnungen prüfen' dashboard
+        $url =
+            CIS_ROOT. 'cis/index.php?menu='.
+            CIS_ROOT. 'cis/menu.php?content_id=&content='.
+            CIS_ROOT. index_page(). self::REVIEW_ANRECHNUNG_URI;
+
+        foreach ($arr_lvLector_arr as $lvLector_arr)
+        {
+            foreach ($lvLector_arr as $lector)
+            {
+                // Prepare mail content
+                $fields = array(
+                    'vorname'       => $lector->vorname,
+                    'stgl_name'     => 'Die Studiengangsleitung',
+                    'link'          => anchor($url, 'Anrechnungsanträge Übersicht')
+                );
+
+                // Send mail
+                sendSanchoMail(
+                    'AnrechnungEmpfehlungAnfordern',
+                    $fields,
+                    $lector->uid. '@'. DOMAIN,
+                    'Erinnerung: Deine Empfehlung wird benötigt zur Anerkennung nachgewiesener Kenntnisse'
+                );
+            }
+        }
+
+        $this->logInfo('SUCCEDED AnrechnungJob sendMailRemindRecommendation');
+
+    }
 
 	// Get STGL mail address
 	private function _getSTGLMailAddress($studiengang_kz)

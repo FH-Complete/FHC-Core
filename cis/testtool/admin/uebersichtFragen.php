@@ -24,6 +24,8 @@ require_once("../../../include/frage.class.php");
 require_once("../../../include/vorschlag.class.php");
 require_once('../../../include/functions.inc.php');
 require_once("../../../include/benutzerberechtigung.class.php");
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/ablauf.class.php');
 
 if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -50,11 +52,84 @@ $sprache = (isset($_REQUEST['Sprache'])?$_REQUEST['Sprache']:'German');
 $Auswahlgebiet = (isset($_REQUEST['AuswahlGebiet'])?$_REQUEST['AuswahlGebiet']:'');
 $loesungen = (isset($_REQUEST['loesungen']) && $_REQUEST['loesungen'] != '' ? true:false);
 
-echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post" name="TesttoolUebersicht">
+$studiengang = new studiengang();
+$studiengang->getAll('typ, kurzbz', false);
+$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
+$gebiet_id = (isset($_GET['gebiet_id'])?$_GET['gebiet_id']:'');
+
+echo '<form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'" method="post" name="TesttoolUebersicht">
 <table>
 <tr>
-<td>Gebiet:</td>
-<td><select name="AuswahlGebiet"><option value="auswahl"> - Bitte Auswählen - </option>';
+<td>Studiengang:</td><td>';
+//Liste der Studiengänge
+echo '<select onchange="window.location.href=this.value">';
+		echo '<option value="'.$_SERVER['PHP_SELF'].'?" >Alle Studiengänge</option>';
+foreach ($studiengang->result as $row)
+{
+	$stg_arr[$row->studiengang_kz] = $row->kuerzel;
+	if ($stg_kz == '')
+	$stg_kz = $row->studiengang_kz;
+	if ($row->studiengang_kz == $stg_kz)
+	$selected = 'selected="selected"';
+	else
+	$selected = '';
+
+	echo '<option value="'.$_SERVER['PHP_SELF'].'?stg_kz='.$row->studiengang_kz.'" '.$selected.'>'.$db->convert_html_chars($row->kuerzel).' - '.$db->convert_html_chars($row->bezeichnung).'</option>'."\n";
+}
+		echo '</select>';
+echo '</td>
+</tr>
+<tr>
+<td>Gebiet:</td><td>';
+//Liste der Gebiete
+$qry = "SELECT * FROM testtool.tbl_ablauf WHERE studiengang_kz=".$db->db_add_param($stg_kz);
+$anzahl = $db->db_num_rows($db->db_query($qry));
+
+if ($stg_kz !== "-1" && $anzahl !== 0)
+{
+	$qry = "SELECT * FROM testtool.tbl_gebiet LEFT JOIN testtool.tbl_ablauf USING (gebiet_id)
+		WHERE studiengang_kz=".$db->db_add_param($stg_kz)." ORDER BY semester,reihung";
+}
+else
+	$qry = "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
+
+if (($anzahl !== 0) || ($stg_kz == '-1') && ($stg_kz !== ''))
+{
+	if ($result = $db->db_query($qry))
+	{
+		echo ' <select name="AuswahlGebiet">';
+		echo '<option value="auswahl"> - Bitte Auswählen - </option>';
+
+		while ($row = $db->db_fetch_object($result))
+		{
+			if ($Auswahlgebiet == $row->gebiet_id)
+			{
+				$selected = 'selected="selected"';
+			}
+			else
+			{
+				$selected = '';
+			}
+
+			if ($stg_kz == "-1")
+			{
+				echo '<option value="'.$row->gebiet_id.'" '.$selected.'>'.$row->bezeichnung.' - '.$row->kurzbz.' - ID:'.$row->gebiet_id.'</option>'."\n";
+			}
+			else
+			{
+				echo '<option value="'.$row->gebiet_id.'" '.$selected.'>('.$row->semester.') - '.$row->bezeichnung.' - '.$row->kurzbz.' - ID:'.$row->gebiet_id.'</option>'."\n";
+			}
+
+		}
+		echo '</select>';
+	}
+}
+elseif (($anzahl == 0))
+{
+	echo 'Keine Gebiete für diesen Studiengang';
+}
+echo '</td>';
+/*echo '<td><select name="AuswahlGebiet"><option value="auswahl"> - Bitte Auswählen - </option>';
 foreach ($gebiet->result as $gebietResult)
 {
 	$selected ='';
@@ -62,7 +137,8 @@ foreach ($gebiet->result as $gebietResult)
 		$selected = 'selected';	
 	echo '<option value="'.$gebietResult->gebiet_id.'" '.$selected.'>'.$gebietResult->gebiet_id.' - '.$gebietResult->bezeichnung.' - '.$gebietResult->kurzbz.'</option>';
 }
-echo '</select></td></tr>
+echo '</select></td>';*/
+echo '</tr>
 <tr>
 <td>Sprache: </td>
 <td><select name="Sprache">';
@@ -171,6 +247,10 @@ if(isset($_REQUEST['AuswahlGebiet']))
 			<td align="right">Maximalpunkte:</td>
 			<td>'.$gebietdetails->maxpunkte.'</td>
 		</tr>
+		<tr>
+				<td align="right">Offsetpunkte:</td>
+				<td>'.$gebietdetails->offsetpunkte.'</td>
+			</tr>
 		<tr>
 			<td align="right">Antworten pro Zeile:</td>
 			<td>'.$gebietdetails->antwortenprozeile.'</td>

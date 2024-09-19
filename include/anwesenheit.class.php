@@ -479,9 +479,9 @@ class anwesenheit extends basis_db
 	 */
 	public function loadAnwesenheitStudiensemester($studiensemester_kurzbz, $student_uid=null, $lehrveranstaltung_id=null)
 	{
-		$qry = "SELECT lehrveranstaltung_id, bezeichnung, vorname, nachname, uid, sum(anwesend) as anwesend, sum(nichtanwesend) as nichtanwesend, sum(gesamtstunden) as gesamtstunden FROM (
+		$qry = "SELECT lehrveranstaltung_id, bezeichnung, vorname,  wahlname, nachname,uid, sum(anwesend) as anwesend, sum(nichtanwesend) as nichtanwesend, sum(gesamtstunden) as gesamtstunden FROM (
 				SELECT
-					lehrveranstaltung_id, bezeichnung, vorname, nachname, uid,
+					lehrveranstaltung_id, bezeichnung, vorname, wahlname, nachname, uid,
 					(
 					SELECT
 						sum(einheiten)
@@ -520,7 +520,7 @@ class anwesenheit extends basis_db
 			if(!is_null($student_uid))
 				$qry.=" AND uid=".$this->db_add_param($student_uid);
 
-			$qry.=") as b GROUP BY lehrveranstaltung_id, bezeichnung, vorname, nachname, uid";
+			$qry.=") as b GROUP BY lehrveranstaltung_id, bezeichnung, vorname, wahlname, nachname, uid";
 
 			if($lehrveranstaltung_id!='')
 				$qry.=" order by nachname, vorname ";
@@ -543,6 +543,7 @@ class anwesenheit extends basis_db
 				else
 					$obj->prozent = number_format(100-(100/$obj->gesamtstunden*$row->nichtanwesend),2);
 				$obj->vorname = $row->vorname;
+				$obj->wahlname = $row->wahlname;
 				$obj->nachname = $row->nachname;
 				$obj->uid = $row->uid;
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;

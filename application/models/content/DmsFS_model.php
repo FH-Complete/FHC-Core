@@ -7,7 +7,7 @@ class DmsFS_model extends FS_Model
 	 */
 	public function __construct()
 	{
-		parent::__construct();
-		$this->filepath = DMS_PATH;
+		parent::__construct(DMS_PATH);
 	}
 }
+

@@ -1,4 +1,20 @@
 <?php
+/**
+ * Copyright (C) 2022 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -20,20 +36,24 @@ class ExtensionsLib
 
         const PHRASES_DIRECTORY = 'phrases/'; // directory name where phrases files are
 
-	private $_ci;
+	const UPLOAD_PATH = 'tmp/';
 
-	private $ARCHIVE_EXTENSIONS = array('.tgz', '.tbz2'); // accepted file extensions for an uploaded extension
-	private $UPLOAD_PATH; // temporary directory to store the upload file and checks the archive
-	private $EXTENSIONS_PATH; // directory where all the extensions are
-
-	// Directories that are part of the extension archive
-	private $SOFTLINK_TARGET_DIRECTORIES = array(
-		APPPATH => array('config', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets'),
-		DOC_ROOT => array('public')
-	);
+	private $_ci; // Code igniter instance
 
 	private $_errorOccurred; // boolean, true if an error occurred while installing an extension
 	private $_currentInstalledExtensionVersion; // contains the version of the current installation of an extension
+
+	// NOTE: the following have been declared as properties to maintain compatibility with previous PHP versions
+	// where arrays cannot be declared as constants
+
+	// Accepted file extensions for an uploaded extension
+	private $ARCHIVE_EXTENSIONS = array('.tgz', '.tbz2');
+
+	// Directories that are part of the extension archive
+	private $SOFTLINK_TARGET_DIRECTORIES = array(
+		APPPATH => array('config', 'components', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets'),
+		DOC_ROOT => array('public')
+	);
 
 	/**
 	 * Class constructor
@@ -60,6 +80,13 @@ class ExtensionsLib
 		// Set default values fot class properties
 		$this->_errorOccurred = false;
 		$this->_currentInstalledExtensionVersion = 0;
+
+		// If SERVER_NAME is _not_ declared or it is an empty string
+		if (!defined('SERVER_NAME') || (defined('SERVER_NAME') && isEmptyString(SERVER_NAME)))
+		{
+			$this->_printError('Global constant SERVER_NAME is not declared or it is not valid');
+			exit();
+		}
 	}
 
 	// -------------------------------------------------------------------------------------------------
@@ -72,32 +99,40 @@ class ExtensionsLib
 	 * @param $extensionName string Name of Extension (optional)
 	 * @param $filename Path to tgz Extension File (optional)
 	 */
-	public function installExtension($extensionName = null, $filename = null)
+	public function installExtension($extensionName, $filename, $perform_sql)
 	{
 		$extensionDB = null; // contains data from DB about an extension
 		$extensionJson = null; // contains the extension.json data
 
 		$this->_printInfo('WARNING!!! Please do not change page or stop this procedure before it is finished');
 
-		if (!is_null($extensionName) && !is_null($filename))
-		{
-			$uploadData = new stdClass();
-			$uploadData->fullPath = $filename;
-			$uploadData->extensionName = $extensionName;
-		}
-		else
+		// Create an object with the given paramenters
+		$uploadData = new stdClass();
+		$uploadData->fullPath = $filename;
+		$uploadData->extensionName = $extensionName;
+
+		// If no extension name or file name are provided
+		if (is_null($extensionName) || is_null($filename))
 		{
 			$this->_loadUploadLibrary(); // loads CI upload library
 			$uploadData = $this->_uploadExtension(); // perform the upload of the file and returns info about it
 		}
 
-		if ($uploadData != null) // if no error occurred
+		// If the given filename is the upper directory or the current one
+		if (trim($uploadData->fullPath) == '..' || trim($uploadData->fullPath) == '.')
+		{
+			$this->_printFailure('wrong file name: / has to be escaped with %2F');
+			$uploadData = null; // then it is a wrong one!
+		}
+
+		// If the no error occurred
+		if ($uploadData != null)
 		{
 			$this->_extractExtension($uploadData->fullPath); // extract the archive of the uploaded extension
 
 			if (!$this->_errorOccurred) // if no error occurred
 			{
-				// Retives data about any previous installation of this extension
+				// Retrieves data about any previous installation of this extension on this server
 				$extensionDB = $this->_loadPreviousInstallation($uploadData->extensionName);
 			}
 
@@ -118,15 +153,17 @@ class ExtensionsLib
 				$this->_printStart('Proceding with the installation of the extension: '.$extensionJson->name);
 				$this->_printEnd();
 
-				$this->_cleanPreviousInstallation($extensionJson); // cleans any previous installation
+				// Remove any previous installation from file system and database
+				$this->_cleanPreviousInstallation($extensionJson);
 
-				$this->_installExtension($extensionJson); // records extension data in DB
+				// Records extension data in DB
+				$this->_installExtension($extensionJson);
 
-				if (!$this->_errorOccurred) // if no error occurred
+				if (!$this->_errorOccurred && $perform_sql === true) // if no error occurred
 				{
 					// Loads and executes the needed SQL scripts
 					$this->_loadSQLs(
-						$this->UPLOAD_PATH.$extensionJson->name.'/'.ExtensionsLib::SQL_DIRECTORY,
+						$this->_getUploadPath().$extensionJson->name.DIRECTORY_SEPARATOR.ExtensionsLib::SQL_DIRECTORY,
 						$extensionJson
 					);
 				}
@@ -149,14 +186,6 @@ class ExtensionsLib
 					$this->_installPhrases($extensionJson->name);
 				}
 			}
-			else
-			{
-				$this->_errorOccurred = true;
-			}
-		}
-		else
-		{
-			$this->_errorOccurred = true;
 		}
 
 		if ($this->_errorOccurred === false) // if no errors occurred
@@ -187,24 +216,30 @@ class ExtensionsLib
 		$result = $this->_ci->ExtensionsModel->load($extensionId);
 		if (hasData($result)) // if something was found
 		{
-			$extensionName = $result->retval[0]->name; // extension name
-			$this->_delSoftLinks($extensionName); // not to be checked, could fail if the extension is disabled
-			// remove the extension from the extensions installation directory
-			$delExtension = $this->_rrm($this->EXTENSIONS_PATH.$extensionName);
+			// If this server is _not_ the same where the extension was installed then exit with a failure
+			if (getData($result)[0]->server_kurzbz != SERVER_NAME) return false;
+
+			$extensionName = getData($result)[0]->name; // extension name
+
+			// Not to be checked, could fail if the extension is disabled
+			$this->_delSoftLinks($extensionName);
+
+			// Remove the extension from the extensions installation directory
+			$delExtension = $this->_rrm($this->_getExtensionsPath().$extensionName);
 
 			// Select all the version of this extension
 			$this->_ci->ExtensionsModel->addSelect('extension_id');
-			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName));
-			if (hasData($result)) // if something was found
+
+			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName, 'server_kurzbz' => SERVER_NAME));
+
+			// If something was found
+			if (hasData($result))
 			{
-				foreach ($result->retval as $extension) // loops on them
+				foreach (getData($result) as $extension) // loops on them
 				{
 					// Remove them all
 					$result = $this->_ci->ExtensionsModel->delete($extension->extension_id);
-					if (isSuccess($result))
-					{
-						$delExtension = true;
-					}
+					if (isSuccess($result)) $delExtension = true;
 				}
 			}
 		}
@@ -217,23 +252,57 @@ class ExtensionsLib
 	 */
 	public function getInstalledExtensions()
 	{
-		return $this->_ci->ExtensionsModel->getInstalledExtensions();
+		$this->_ci->ExtensionsModel->addOrder('name', 'ASC');
+		$this->_ci->ExtensionsModel->addOrder('server_kurzbz', 'ASC');
+		$this->_ci->ExtensionsModel->addOrder('version', 'ASC');
+
+		return $this->_ci->ExtensionsModel->load();
 	}
 
 	/**
-	 * To enable an extension
+	 * To enable/disable an extension
 	 */
-	public function enableExtension($extensionId)
+	public function toggleExtension($extensionId, $enabled)
 	{
-		return $this->_toggleExtension($extensionId, true);
-	}
+		$_toggleExtension = false;
 
-	/**
-	 * To disable an extension
-	 */
-	public function disableExtension($extensionId)
-	{
-		return $this->_toggleExtension($extensionId, false);
+		// Loads data from DB about the given extension
+		$result = $this->_ci->ExtensionsModel->load($extensionId);
+		if (hasData($result))
+		{
+			// If this server is _not_ the same where the extension was installed then exit with a failure
+			if (getData($result)[0]->server_kurzbz != SERVER_NAME) return false;
+
+			$extensionName = getData($result)[0]->name; // extension name
+
+			// If to be enabled
+			if ($enabled === true)
+			{
+				// Add the symlinks
+				$_toggleExtension = $this->_addSoftLinks($extensionName);
+			}
+			else // If to be disabled
+			{
+				// Remove all the symlinks
+				$_toggleExtension = $this->_delSoftLinks($extensionName);
+			}
+
+			if ($_toggleExtension) // if is a success
+			{
+				// Updates DB
+				$result = $this->_ci->ExtensionsModel->update($extensionId, array('enabled' => $enabled));
+				if (isSuccess($result))
+				{
+					$_toggleExtension = true;
+				}
+				else // if DB update fails remove symlinks from file system
+				{
+					$this->_delSoftLinks($extensionName);
+				}
+			}
+		}
+
+		return $_toggleExtension;
 	}
 
 	// -------------------------------------------------------------------------------------------------
@@ -247,7 +316,7 @@ class ExtensionsLib
 		$this->_ci->load->library(
 			'upload',
 			array(
-				'upload_path' => $this->UPLOAD_PATH,
+				'upload_path' => $this->_getUploadPath(),
 				'allowed_types' => '*',
 				'overwrite' => true
 			)
@@ -311,7 +380,7 @@ class ExtensionsLib
 			// Extracts the uploaded file
 			$pd = new PharData($uploadPath);
 
-			$pd->extractTo($this->UPLOAD_PATH, null, true);
+			$pd->extractTo($this->_getUploadPath(), null, true);
 		}
 		catch (UnexpectedValueException $uva)
 		{
@@ -319,6 +388,16 @@ class ExtensionsLib
 			$this->_printFailure('provided an invalid archive');
 		}
 		catch (PharException $pe)
+		{
+			$this->_errorOccurred = true;
+			$this->_printFailure('phar error occurred');
+		}
+		catch (InvalidArgumentException $iae)
+		{
+			$this->_errorOccurred = true;
+			$this->_printFailure('wrong file name');
+		}
+		catch (Exception $e)
 		{
 			$this->_errorOccurred = true;
 			$this->_printFailure('generic error occurred, check logs');
@@ -341,23 +420,28 @@ class ExtensionsLib
 		// Loads the last version of the previous installation of this extension
 		$this->_ci->ExtensionsModel->addOrder('version', 'DESC');
 		$this->_ci->ExtensionsModel->addLimit(1);
-		$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName));
+
+		// Loads extensions installed on this server
+		$result = $this->_ci->ExtensionsModel->loadWhere(
+			array(
+				'name' => $extensionName,
+				'server_kurzbz' => SERVER_NAME
+			)
+		);
+
+		// In an error occurred
 		if (isError($result))
 		{
 			$this->_errorOccurred = true;
-			$this->_printFailure('data base error: '.$result->retval);
+			$this->_printFailure('data base error: '.getData($result));
 		}
-		else
+		elseif (hasData($result))
 		{
-			if (hasData($result)) // if found
-			{
-				$extensionDB = $result->retval[0]; // return it!
-			}
-			else
-			{
-				$this->_printMessage('not found');
-			}
+			$extensionDB = getData($result)[0];
 		}
+
+		// If no data have been found
+		if ($extensionDB == null) $this->_printMessage('not found');
 
 		$this->_printSuccess(!$this->_errorOccurred);
 
@@ -374,10 +458,10 @@ class ExtensionsLib
 		$this->_printStart('Checking extension file system structure');
 
 		// Checks if the root directory of this archive has the same name of the extension
-		if (is_dir($this->UPLOAD_PATH.$extensionName))
+		if (is_dir($this->_getUploadPath().$extensionName))
 		{
 			// Checks if file extension.json exists inside the uploaded archive
-			if (!file_exists($this->UPLOAD_PATH.$extensionName.'/'.ExtensionsLib::EXTENSION_JSON_NAME))
+			if (!file_exists($this->_getUploadPath().$extensionName.DIRECTORY_SEPARATOR.ExtensionsLib::EXTENSION_JSON_NAME))
 			{
 				$this->_errorOccurred = true;
 				$this->_printFailure('missing extension.json');
@@ -399,12 +483,14 @@ class ExtensionsLib
 	 */
 	private function _chkExtensionJson($extensionName, $extensionDB)
 	{
+		// Set a default FHComplete version
 		$fhcomplete_version = 0;
+
 		$this->_printStart('Parsing and checking extension.json');
 
 		// Decodes extension.json
 		$extensionJson = json_decode(
-			file_get_contents($this->UPLOAD_PATH.$extensionName.'/'.ExtensionsLib::EXTENSION_JSON_NAME)
+			file_get_contents($this->_getUploadPath().$extensionName.DIRECTORY_SEPARATOR.ExtensionsLib::EXTENSION_JSON_NAME)
 		);
 
 		// Checks if the parameter name of the extension.json has the same value of the extension name
@@ -414,41 +500,50 @@ class ExtensionsLib
 			if (isset($extensionJson->version))
 			{
 				$extensionJson->currentInstalledVersion = 0; // default current installed version of this extension
-
-				if ($extensionDB != null) // if no previous installation was found in DB
+				
+				// If a previous installation was found in DB
+				if ($extensionDB != null)
 				{
+					// Then get the data from database
 					$extensionJson->extension_id = $extensionDB->extension_id; // get the extension_id from DB
 					$extensionJson->currentInstalledVersion = $extensionDB->version; // get the current installed version from DB
 
+					// Prompt a summary
 					$this->_printMessage('Extension already installed!');
 					$this->_printMessage('Current version: '.$extensionDB->version);
 					$this->_printMessage('Version of the uploaded extension: '.$extensionJson->version);
 
+					// Check if the version of the uploaded extension is the same
+					// as the one from the dataabase
 					if ($extensionJson->version == $extensionDB->version)
 					{
 						$this->_printMessage('Updating the same version!');
 					}
-					elseif ($extensionJson->version > $extensionDB->version)
+					elseif ($extensionJson->version > $extensionDB->version) // or it is higher
 					{
 						$this->_printMessage('Updating to a new version!');
 					}
-					else // downgrade is not possible
+					else // otherwise is lower, then the downgrade is not possible
 					{
 						$extensionJson = null;
 						$this->_printFailure('downgrade must be performed manually');
 					}
 				}
-				else
+				else // otherwise if it is not installed on this server
 				{
 					$this->_printMessage('Version of the uploaded extension: '.$extensionJson->version);
 				}
 
-				// If no errors occurred
+				// If no errors occurred then check the JSON file content within the uploaded extension
 				if ($extensionJson != null)
 				{
+					// Default value
+					$fhcomplete_version = 0;
+
 					require_once('version.php'); // get the core version
+
 					// Checks if the required core version of the extension is the same of this system
-					if (isset($extensionJson->core_version) && $extensionJson->core_version == $fhcomplete_version)
+					if (isset($extensionJson->core_version) && version_compare($extensionJson->core_version, $fhcomplete_version, '<='))
 					{
 						$this->_printMessage('Required core version: '.$extensionJson->core_version);
 						$this->_printMessage('Current core version: '.$fhcomplete_version);
@@ -461,7 +556,7 @@ class ExtensionsLib
 							// Gets the required dependencies
 							$result = $this->_ci->ExtensionsModel->getDependencies($extensionJson->dependencies);
 							// If they are matcheds
-							if (hasData($result) && count($result->retval) == count($extensionJson->dependencies))
+							if (hasData($result) && count(getData($result)) == count($extensionJson->dependencies))
 							{
 								if (isset($extensionJson->dependencies))
 								{
@@ -556,6 +651,7 @@ class ExtensionsLib
 	{
 		$this->_printStart('Adding new entry in the DB');
 
+		// Insert into database the extension information
 		$result = $this->_ci->ExtensionsModel->insert(
 			array(
 				'name' => $extensionJson->name,
@@ -564,7 +660,8 @@ class ExtensionsLib
 				'license' => isset($extensionJson->license) ? $extensionJson->license : null,
 				'url' => isset($extensionJson->url) ? $extensionJson->url : null,
 				'core_version' => $extensionJson->core_version,
-				'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null
+				'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null,
+				'server_kurzbz' => SERVER_NAME
 			)
 		);
 		if (isSuccess($result))
@@ -600,23 +697,25 @@ class ExtensionsLib
 		// Loops through the versions
 		for ($sqlDir = $startVersion; $sqlDir <= $extensionJson->version; $sqlDir++)
 		{
-			// Search for a directory with the same value of the version in the sql scripts directory
-			$files = glob($pkgSQLsPath.'/'.$sqlDir.'/*'.ExtensionsLib::SQL_FILE_EXTENSION);
+			// Gets all the SQL files in the directory having the same name of the version
+			$files = glob($pkgSQLsPath.DIRECTORY_SEPARATOR.$sqlDir.'/*'.ExtensionsLib::SQL_FILE_EXTENSION);
 
-			// If found
+			// If a directory with the same value of the version is present in the sql scripts directory
 			if ($files != false)
-			{
+	        	{
 				// Loads every sql files
 				foreach ($files as $file)
 				{
-					$sql = file_get_contents($file); // gets the entire content of the file
+	        		        $sql = file_get_contents($file); // gets the entire content of the file
 
 					$this->_printMessage('Executing query:');
 					$this->_printMessage($sql);
 
 					// Try to execute that
-					$result = @$this->_ci->ExtensionsModel->executeQuery($sql);
-					if (!isSuccess($result))
+					$resultQuery = @$this->_ci->ExtensionsModel->executeQuery($sql);
+
+					// If _not_ a success
+					if (!isSuccess($resultQuery))
 					{
 						$this->_errorOccurred = true;
 						$this->_printFailure(' error occurred while executing the query');
@@ -626,7 +725,7 @@ class ExtensionsLib
 					else
 					{
 						$this->_printMessage('Query result:');
-						var_dump($result->retval); // KEEP IT!!!
+						var_dump(getData($resultQuery)); // KEEP IT!!!
 						$this->_ci->eprintflib->printEOL();
 					}
 				}
@@ -645,17 +744,20 @@ class ExtensionsLib
 	{
 		$this->_printStart('Moving the upload extension from upload folder to extension folder');
 
-		$this->_printMessage('Current extension directory: '.$this->UPLOAD_PATH.$extensionName);
-		$this->_printMessage('Directory where it will be moved: '.$this->EXTENSIONS_PATH.$extensionName);
+		$this->_printMessage('Current extension directory: '.$this->_getUploadPath().$extensionName);
+		$this->_printMessage('Directory where it will be moved: '.$this->_getExtensionsPath().$extensionName);
 
-		if (rename($this->UPLOAD_PATH.$extensionName.'/', $this->EXTENSIONS_PATH.$extensionName))
+		if (!file_exists($this->_getExtensionsPath().$extensionName))
 		{
-			$this->_printSuccess(true);
-		}
-		else
-		{
-			$this->_errorOccurred = true;
-			$this->_printFailure('error while moving');
+			if (rename($this->_getUploadPath().$extensionName.DIRECTORY_SEPARATOR, $this->_getExtensionsPath().$extensionName))
+			{
+				$this->_printSuccess(true);
+			}
+			else
+			{
+				$this->_errorOccurred = true;
+				$this->_printFailure('error while moving');
+			}
 		}
 
 		$this->_printEnd();
@@ -689,13 +791,21 @@ class ExtensionsLib
 	{
 		$_delSoftLinks = false;
 
+		// For every set of target directories where:
+		// rootPath: is the prefix of the absolute path for the target directory
+		// targetDirectories: is an array of target directories
 		foreach ($this->SOFTLINK_TARGET_DIRECTORIES as $rootPath => $targetDirectories)
 		{
+			// For every target directory in the current set
 			foreach ($targetDirectories as $targetDirectory)
 			{
-				if (file_exists($rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
+				// If the symlink exists
+				if (file_exists($rootPath.$targetDirectory.DIRECTORY_SEPARATOR.ExtensionsLib::EXTENSIONS_DIR_NAME.DIRECTORY_SEPARATOR.$extensionName))
 				{
-					$_delSoftLinks = unlink($rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName);
+					// Try to delete it
+					$_delSoftLinks = unlink(
+						$rootPath.$targetDirectory.DIRECTORY_SEPARATOR.ExtensionsLib::EXTENSIONS_DIR_NAME.DIRECTORY_SEPARATOR.$extensionName
+					);
 				}
 			}
 		}
@@ -708,29 +818,23 @@ class ExtensionsLib
 	 */
 	private function _rrm($dir)
 	{
-		if (!file_exists($dir))
+		// If the directory does not exist return success
+		if (!file_exists($dir)) return true;
+
+		// If it is not a directory then delete it and return the result
+		if (!is_dir($dir)) return unlink($dir);
+
+		// For each subdirectory
+		foreach (scandir($dir) as $subdir)
 		{
-			return true;
+			// If it is the same directory or the parent directory skip to the next one
+			if ($subdir == '.' || $subdir == '..') continue;
+
+			// Try to remove a subdirectory, if it fails then return a failure
+			if (!$this->_rrm($dir.DIRECTORY_SEPARATOR.$subdir)) return false;
 		}
 
-		if (!is_dir($dir))
-		{
-			return unlink($dir);
-		}
-
-		foreach (scandir($dir) as $item)
-		{
-			if ($item == '.' || $item == '..')
-			{
-				continue;
-			}
-
-			if (!$this->_rrm($dir.DIRECTORY_SEPARATOR.$item))
-			{
-				return false;
-			}
-		}
-
+		// Delete the directory and return the result
 		return rmdir($dir);
 	}
 
@@ -740,27 +844,36 @@ class ExtensionsLib
 	private function _addSoftLinks($extensionName)
 	{
 		$_addSoftLinks = false;
-		$extensionPath = $this->EXTENSIONS_PATH.$extensionName.'/';
+		$extensionPath = $this->_getExtensionsPath().$extensionName.DIRECTORY_SEPARATOR;
 
-		// For every target directory
+		// For every set of target directories where:
+		// rootPath: is the prefix of the absolute path for the target directory
+		// targetDirectories: is an array of target directories
 		foreach ($this->SOFTLINK_TARGET_DIRECTORIES as $rootPath => $targetDirectories)
 		{
+			// For every target directory in the current set
 			foreach ($targetDirectories as $targetDirectory)
 			{
-				// If destination of the symlink does not exist
-				if (!file_exists($rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
+				// Checks if the link already exists
+				$_addSoftLinks = file_exists(
+					$rootPath.$targetDirectory.DIRECTORY_SEPARATOR.ExtensionsLib::EXTENSIONS_DIR_NAME.DIRECTORY_SEPARATOR.$extensionName
+				);
+
+				// If the symlink does not exist
+				if (!$_addSoftLinks)
 				{
-					// If the target directory does not exist than creates that
-					if (!is_dir($extensionPath.$targetDirectory))
-					{
-						mkdir($extensionPath.$targetDirectory);
-					}
+					// If the target directory does not exist than creates it
+					if (!is_dir($extensionPath.$targetDirectory)) mkdir($extensionPath.$targetDirectory);
 
 					// Create the symlink
-					$_addSoftLinks = symlink(
+					$_addSoftLinks = @symlink(
+						// Target
 						$extensionPath.$targetDirectory,
-						$rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName
+						// Link
+						$rootPath.$targetDirectory.DIRECTORY_SEPARATOR.ExtensionsLib::EXTENSIONS_DIR_NAME.DIRECTORY_SEPARATOR.$extensionName
 					);
+
+					// On failure
 					if (!$_addSoftLinks)
 					{
 						log_message('error', 'Failed to create Symlink to '.$extensionPath.$targetDirectory);
@@ -790,9 +903,9 @@ class ExtensionsLib
 		$this->_printMessage('Removing the extracted data from the upload directory');
 		if ($uploadData != null
 			&& isset($uploadData->extensionName)
-			&& file_exists($this->UPLOAD_PATH.$uploadData->extensionName))
+			&& file_exists($this->_getUploadPath().$uploadData->extensionName))
 		{
-			$this->_rrm($this->UPLOAD_PATH.$uploadData->extensionName);
+			$this->_rrm($this->_getUploadPath().$uploadData->extensionName);
 		}
 
 		// If the upload of the file is a success and the extension name is present and no previous installation were found
@@ -806,16 +919,13 @@ class ExtensionsLib
 			{
 				// Remove them all from file system and DB
 				$this->_printMessage('Removing entries in the DB related to this extension and from extensions directory');
-				$this->delExtension($result->retval[0]->extension_id);
+				$this->delExtension(getData($result)[0]->extension_id);
 			}
 		}
-		else // otherwise
+		// Otherwise remove them all only from DB
+		elseif ($extensionJson != null && isset($extensionJson->extension_id))
 		{
-			// Remove them all only from DB
-			if ($extensionJson != null && isset($extensionJson->extension_id))
-			{
-				$this->_ci->ExtensionsModel->delete($extensionJson->extension_id);
-			}
+			$this->_ci->ExtensionsModel->delete($extensionJson->extension_id);
 		}
 
 		$this->_printMessage('Rollback finished');
@@ -824,46 +934,19 @@ class ExtensionsLib
 	}
 
 	/**
-	 * To enable/disable an extension
+	 * Returns the absolute upload path
 	 */
-	private function _toggleExtension($extensionId, $enabled)
+	private function _getUploadPath()
 	{
-		$_toggleExtension = false;
+		return APPPATH.self::UPLOAD_PATH;
+	}
 
-		// Loads data from DB about the given extension
-		$result = $this->_ci->ExtensionsModel->load($extensionId);
-		if (hasData($result))
-		{
-			$extensionName = $result->retval[0]->name; // extension name
-
-			// If to be enabled
-			if ($enabled === true)
-			{
-				// Add the symlinks
-				$_toggleExtension = $this->_addSoftLinks($extensionName);
-			}
-			else // If to be disabled
-			{
-				// Remove all the symlinks
-				$_toggleExtension = $this->_delSoftLinks($extensionName);
-			}
-
-			if ($_toggleExtension) // if is a success
-			{
-				// Updates DB
-				$result = $this->_ci->ExtensionsModel->update($extensionId, array('enabled' => $enabled));
-				if (isSuccess($result))
-				{
-					$_toggleExtension = true;
-				}
-				else // if DB update fails remove symlinks from file system
-				{
-					$this->_delSoftLinks($extensionName);
-				}
-			}
-		}
-
-		return $_toggleExtension;
+	/**
+	 * Returns the absolute extensions path
+	 */
+	private function _getExtensionsPath()
+	{
+		return APPPATH.self::EXTENSIONS_DIR_NAME.DIRECTORY_SEPARATOR;
 	}
 
 	/**

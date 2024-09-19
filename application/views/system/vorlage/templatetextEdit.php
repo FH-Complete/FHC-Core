@@ -1,5 +1,5 @@
 <?php
-	$this->load->view('templates/header', array('title' => 'VorlageEdit', 'tinymce' => true, 'jsonforms' => true));
+	$this->load->view('templates/header', array('title' => 'VorlageEdit', 'tinymce4' => true, 'jsonforms' => true));
 ?>
 
 <div class="row">

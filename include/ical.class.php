@@ -109,7 +109,7 @@ class ical extends basis_db
 						$dtend='';
 					}
 				}
-				elseif($typ=='SoGo')
+				elseif($typ=='SoGo' || $typ=='Zeitsperren')
 				{
 					if(mb_strstr($row,'FREEBUSY'))
 					{

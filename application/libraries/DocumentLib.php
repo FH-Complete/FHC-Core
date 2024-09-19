@@ -14,20 +14,28 @@ class DocumentLib
 		// Gets CI instance
 		$this->ci =& get_instance();
 
-		exec('unoconv --version', $ret_arr);
-
-		if(isset($ret_arr[0]))
+		// Which document converter has to be used
+		if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
 		{
-			$hlp = explode(' ', $ret_arr[0]);
-			if(isset($hlp[1]))
-			{
-				$this->unoconv_version = $hlp[1];
-			}
-			else
-				show_error('Could not get Unoconv Version');
+			// Use docsbox!!
 		}
 		else
-			show_error('Unoconv not found - Please install Unoconv');
+		{
+			exec('unoconv --version', $ret_arr);
+
+			if(isset($ret_arr[0]))
+			{
+				$hlp = explode(' ', $ret_arr[0]);
+				if(isset($hlp[1]))
+				{
+					$this->unoconv_version = $hlp[1];
+				}
+				else
+					show_error('Could not get Unoconv Version');
+			}
+			else
+				show_error('Unoconv not found - Please install Unoconv');
+		}
 	}
 
 	/**
@@ -57,9 +65,16 @@ class DocumentLib
 			case 'application/vnd.ms-word':
 			case 'application/vnd.oasis.opendocument.text':
 			case 'text/plain':
-				// Unoconv Version 0.6 seems to fail on converting TXT Files
-				if ($this->unoconv_version == '0.6')
-					return error();
+				if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
+				{
+					// Use docsbox
+				}
+				else
+				{
+					// Unoconv Version 0.6 seems to fail on converting TXT Files
+					if ($this->unoconv_version == '0.6')
+						return error();
+				}
 
 				$ret = $this->convert($filename, $outFile, 'pdf');
 				if(isSuccess($ret))
@@ -105,6 +120,7 @@ class DocumentLib
 
 		finfo_close($finfo);
 
+		$out = null;
 		exec($cmd, $out, $ret);
 		if ($ret != 0)
 		{
@@ -123,13 +139,26 @@ class DocumentLib
 	 */
 	public function convert($inFile, $outFile, $format)
 	{
-		if ($this->unoconv_version == '0.6')
-			$command = 'unoconv -f %1$s  %3$s > %2$s';
-		else
-			$command = 'unoconv -f %s --output %s %s 2>&1';
-		$command = sprintf($command, $format, $outFile, $inFile);
+		$ret = 0;
 
-		exec($command, $out, $ret);
+		// If it is set to use docsbox
+		if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
+		{
+			require_once(dirname(__FILE__).'/../application/libraries/DocsboxLib.php');
+
+			$ret = DocsboxLib::convert($inFile, $outFile, $format);
+		}
+		else // otherwise use unoconv
+		{
+			if ($this->unoconv_version == '0.6')
+				$command = 'unoconv -f %1$s  %3$s > %2$s';
+			else
+				$command = 'unoconv -f %s --output %s %s 2>&1';
+			$command = sprintf($command, $format, $outFile, $inFile);
+
+			$out = null;
+			exec($command, $out, $ret);
+		}
 
 		if ($ret != 0)
 		{
@@ -191,6 +220,7 @@ class DocumentLib
 		$cmd .= '/countspaces {  [ exch { dup 32 ne { pop } if  } forall ] length } bind def  >> ';
 		$cmd .= 'setpagedevice viewJPEG"';
 
+		$out = null;
 		exec($cmd, $out, $ret);
 		if ($ret != 0)
 		{

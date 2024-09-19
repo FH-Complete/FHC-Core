@@ -73,7 +73,7 @@ if(!$generateuid_addon_found)
 	// ****
 	// * Gerneriert die Mitarbeiter UID
 	// ****
-	function generateMitarbeiterUID($vorname, $nachname, $lektor, $fixangestellt=true)
+	function generateMitarbeiterUID($vorname, $nachname, $lektor, $fixangestellt=true, $personalnummer=null)
 	{
 		$bn = new benutzer();
 		$reserviert = array();
@@ -110,4 +110,5 @@ if(!$generateuid_addon_found)
 		}
 	}
 }
+
 ?>

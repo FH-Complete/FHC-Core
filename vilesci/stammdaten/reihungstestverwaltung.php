@@ -847,6 +847,12 @@ if(isset($_GET['excel']))
 						if ($('.ort_listitem').length == 0 && $('#max_teilnehmer').val() == '' && $('#ort').val() == '')
 							confirm('Wenn der Reihungstest "Öffentlich" ist, sollten Räume zugeteilt sein, oder "Max TeilnehmerInnen" gesetzt sein');
 					}
+
+					if ($('#zugangs_ueberpruefung').is(":checked") && $('#zugangcode').val() == '')
+					{
+						alert('Wenn die Zugangsüberprüfung aktiviert ist, ist ein Zugangscode verpflichtend.');
+						return false;
+					}
 				});
 
 				if ($('#oeffentlich').is(":checked") && $('.ort_listitem').length == 0 && $('#max_teilnehmer').val() == '' && $('#ort').val() == '')
@@ -1396,6 +1402,12 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$error = true;
 		}
 	}
+	
+	if (isset($_POST['zugangs_ueberpruefung']) && $_POST['zugangcode'] === '')
+	{
+		$messageError .= '<p>Der Zugangscode muss ausgefüllt sein, wenn die Zugangsüberprüfung aktiviert ist. </p>';
+		$error = true;
+	}
 
 	if(!$error)
 	{
@@ -1407,6 +1419,8 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$reihungstest->stufe = filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT);
 			$reihungstest->aufnahmegruppe_kurzbz = filter_input(INPUT_POST, 'aufnahmegruppe');
 			$reihungstest->anmeldefrist = $datum_obj->formatDatum($_POST['anmeldefrist']);
+			$reihungstest->zugangs_ueberpruefung = false;
+			$reihungstest->zugangscode = null;
 		}
 		else
 		{
@@ -1421,6 +1435,8 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$reihungstest->anmeldefrist = $datum_obj->formatDatum($_POST['anmeldefrist']);
 			$reihungstest->updateamum = date('Y-m-d H:i:s');
 			$reihungstest->updatevon = $user;
+			$reihungstest->zugangs_ueberpruefung = isset($_POST['zugangs_ueberpruefung']);
+			$reihungstest->zugangscode = ($_POST['zugangcode'] === '' ? null : $_POST['zugangcode']);
 		}
 		$reihungstest->studiengang_kz = $_POST['studiengang_kz'];
 		//$reihungstest->ort_kurzbz = $_POST['ort_kurzbz'];
@@ -2502,6 +2518,18 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			<td>
 				<input type="checkbox" name="freigeschaltet"<?php echo $reihungstest->freigeschaltet ? 'checked="checked"' : '' ?>>
 				(Kurz vor Testbeginn aktivieren)
+			</td>
+		</tr>
+		<tr>
+			<td class="feldtitel">Zugangsüberprüfung</td>
+			<td>
+				<input type="checkbox" id="zugangs_ueberpruefung" name="zugangs_ueberpruefung"<?php echo $reihungstest->zugangs_ueberpruefung ? 'checked="checked"' : '' ?>>
+			</td>
+		</tr>
+		<tr>
+			<td class="feldtitel">Zugangscode</td>
+			<td>
+				<input type="number" class="input" id="zugangcode" name="zugangcode" value="<?php echo $db->convert_html_chars($reihungstest->zugangscode) ?>"> (Verpflichtend, wenn die Zugangsüberprüfung aktiviert ist)
 			</td>
 		</tr>
 		<tr>

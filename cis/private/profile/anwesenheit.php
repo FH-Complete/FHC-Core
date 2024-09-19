@@ -81,7 +81,7 @@ if(!$semester || !array_key_exists($semester, $alle_semester))
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
-		<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	</head>
 	<body class="anwesenheit">
 <?php

@@ -61,7 +61,7 @@ $i=0;
 if(isset($anwesenheit->result) && is_array($anwesenheit->result))
 {
 	foreach($anwesenheit->result as $row)
-	{	
+	{
 		$i=$oRdf->newObjekt($i);
 		$oRdf->obj[$i]->setAttribut('lehrveranstaltung_bezeichnung',$row->bezeichnung,true);
 		$oRdf->obj[$i]->setAttribut('prozent',$row->prozent,true);
@@ -69,12 +69,13 @@ if(isset($anwesenheit->result) && is_array($anwesenheit->result))
 		$oRdf->obj[$i]->setAttribut('nichtanwesend',$row->nichtanwesend,true);
 		$oRdf->obj[$i]->setAttribut('vorname',$row->vorname,true);
 		$oRdf->obj[$i]->setAttribut('nachname',$row->nachname,true);
+		$oRdf->obj[$i]->setAttribut('wahlname',$row->wahlname,true);
 		$oRdf->obj[$i]->setAttribut('uid',$row->uid,true);
 
-	
+
 		$ampel='makeIt'.$anwesenheit->getAmpel($row->prozent);
 		$oRdf->obj[$i]->setAttribut('ampel',$ampel,true);
-	
+
 		$oRdf->addSequence($i);
 		$i++;
 	}

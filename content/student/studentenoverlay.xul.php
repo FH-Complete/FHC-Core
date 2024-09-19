@@ -131,7 +131,7 @@ else
 											echo '<menuitem label="Student" oncommand="StudentUnterbrecherZuStudent()" disabled="false" tooltiptext="Status ändern auf Student"/>';
 										if ($id == 'interessent-toolbar-zustudent')
 											echo '<menuitem label="Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Status ändern auf Student"/>';
-										
+
 										foreach($gruende[$status_kurzbz] as $row)
 										{
 											$commandWithID = str_replace('STATUSGRUNDID',$row['statusgrund_id'],$command);
@@ -270,6 +270,10 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vorname" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+							<treecol id="student-treecol-wahlname" label="Wahlname" flex="1" hidden="true" persist="hidden, width, ordinal"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/student/rdf#wahlname" onclick="StudentTreeSort()"/>
+							<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-vornamen" label="Vornamen" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vornamen" onclick="StudentTreeSort()"/>
@@ -436,6 +440,7 @@ else
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#titelpre" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#nachname" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#vorname" />
+													<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#wahlname" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#titelpost" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#svnr" />

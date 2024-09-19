@@ -319,12 +319,13 @@ function func_rowUpdated(row){
  * Select all (filtered) rows that are bestellt
  */
 function tableWidgetHook_selectAllButton(tableWidgetDiv){
-	tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+	var resultRows = tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
 		.filter(row => row.getData().personalnummer >= 0 && // NOT dummies
 			row.getData().bestellt != null &&				// AND bestellt
 			row.getData().erteilt == null &&				// AND NOT erteilt
-			row.getData().status != 'Geändert')				// AND NOT geaendert
-		.forEach((row => row.select()));
+			row.getData().status != 'Geändert');				// AND NOT geaendert
+
+    tableWidgetDiv.find("#tableWidgetTabulator").tabulator('selectRow', resultRows);
 }
 
 // -----------------------------------------------------------------------------------------------------------------

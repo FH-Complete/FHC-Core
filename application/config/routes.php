@@ -60,3 +60,26 @@ $route['api/v1/organisation/[G|g]eschaeftsjahr/(:any)'] = 'api/v1/organisation/g
 $route['api/v1/organisation/[O|o]rganisationseinheit/(:any)'] = 'api/v1/organisation/organisationseinheit2/$1';
 $route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
 $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
+
+// load routes from extensions
+$subdir = 'application/config/extensions';
+$dirlist = scandir($subdir);
+
+if ($dirlist)
+{
+	$files = array_diff($dirlist, array('.','..'));
+
+	foreach ($files as &$item)
+	{
+		if (is_dir($subdir . DIRECTORY_SEPARATOR . $item))
+		{
+			$routes_file = $subdir . DIRECTORY_SEPARATOR . $item . DIRECTORY_SEPARATOR . 'routes.php';
+
+			if (file_exists($routes_file))
+			{
+				require($routes_file);
+			}
+		}
+	}
+}
+

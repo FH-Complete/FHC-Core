@@ -7,58 +7,7 @@ $(document).ready(function ()
 
 	var personid = $("#hiddenpersonid").val();
 
-	//add click events to "formal geprüft" checkboxes
-	$(".prchbox").click(function ()
-	{
-		var boxid = this.id;
-		var akteid = InfocenterDetails._getPrestudentIdFromElementId(boxid);
-		var checked = this.checked;
-		DocUeberpruefung.saveFormalGeprueft(personid, akteid, checked)
-	});
-
-	$('select.aktenid').change(function()
-	{
-		var akteid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
-		var typ = $(this).val();
-		DocUeberpruefung.saveDocTyp(personid, akteid, typ);
-	});
-
-	$('.nachreichungInfos').click(function()
-	{
-		var akteid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
-		DocUeberpruefung.checkNachreichungInputs(akteid);
-	});
-
-	$('.nachreichungAbbrechen').click(function()
-	{
-		var akteid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
-		DocUeberpruefung.checkNachreichungInputs(akteid);
-	});
-
-	$('.nachreichungSpeichern').click(function()
-	{
-		var akteid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
-		var typ = $('#aktenid_' + akteid).val();
-
-		var nachreichungAm = $('#nachreichungAm_' + akteid).val();
-		var nachreichungAnmerkung = $('#nachreichungAnmerkung_' + akteid).val();
-
-		if(nachreichungAm === '')
-		{
-			FHC_DialogLib.alertError(FHC_PhrasesLib.t('infocenter', 'datumUngueltig'));
-			return false;
-		}
-
-		var regEx = /^\d{2}\.\d{2}\.(\d{2}|\d{4})$/;
-
-		if(nachreichungAm.match(regEx) === null)
-		{
-			FHC_DialogLib.alertError(FHC_PhrasesLib.t('infocenter', 'datumUngueltig'))
-			return false;
-		}
-
-		DocUeberpruefung.saveNachreichung(personid, nachreichungAm, nachreichungAnmerkung, typ);
-	})
+	DocUeberpruefung._addDocUeberpruefungEvents(personid)
 });
 
 var DocUeberpruefung = {
@@ -158,6 +107,33 @@ var DocUeberpruefung = {
 		);
 	},
 
+	deleteDoc: function(personid, akteid)
+	{
+		FHC_AjaxClient.ajaxCallPost(
+			CALLED_PATH + "/deleteDoc/" + encodeURIComponent(personid),
+			{
+				"akteid": akteid
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isSuccess(data))
+					{
+						DocUeberpruefung._refreshUbersichtDoks();
+						InfocenterDetails._refreshLog();
+					}
+					else
+					{
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+					}
+				},
+				errorCallback: function(data)
+				{
+					FHC_DialogLib.alertWarning("Fehler beim Speichern!");
+				}
+			}
+		);
+	},
+
 	checkNachreichungInputs: function(akteid)
 	{
 		var inputs = $('#nachreichungInputs_' + akteid);
@@ -197,6 +173,19 @@ var DocUeberpruefung = {
 		}
 	},
 
+	_refreshUbersichtDoks: function()
+	{
+		var personid = $("#hiddenpersonid").val();
+
+		$("#uebersichtDoks").load(
+			CONTROLLER_URL + '/reloadUebersichtDoks/' + personid + '?fhc_controller_id=' + FHC_AjaxClient.getUrlParameter('fhc_controller_id'),
+			function () {
+				DocUeberpruefung._formatDocTable();
+				DocUeberpruefung._addDocUeberpruefungEvents(personid);
+			}
+		);
+	},
+
 	_refreshNachzureichendeDoks: function()
 	{
 		var personid = $("#hiddenpersonid").val();
@@ -205,8 +194,77 @@ var DocUeberpruefung = {
 			CONTROLLER_URL + '/reloadDoks/' + personid + '?fhc_controller_id=' + FHC_AjaxClient.getUrlParameter('fhc_controller_id'),
 			function () {
 				DocUeberpruefung._formatDocTable();
+				DocUeberpruefung._addDocUeberpruefungEvents(personid);
 			}
 		);
+	},
+
+	_addDocUeberpruefungEvents: function(personid)
+	{
+		//add click events to "formal geprüft" checkboxes
+		$(".prchbox").click(function ()
+		{
+			var boxid = this.id;
+			var akteid = InfocenterDetails._getPrestudentIdFromElementId(boxid);
+			var checked = this.checked;
+			DocUeberpruefung.saveFormalGeprueft(personid, akteid, checked)
+		});
+
+		$('select.aktenid').change(function()
+		{
+			var akteid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
+			var typ = $(this).val();
+			DocUeberpruefung.saveDocTyp(personid, akteid, typ);
+		});
+
+		$('.nachreichungInfos').click(function()
+		{
+			var akteid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
+			DocUeberpruefung.checkNachreichungInputs(akteid);
+		});
+
+		$('.nachreichungAbbrechen').click(function()
+		{
+			var akteid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
+			DocUeberpruefung.checkNachreichungInputs(akteid);
+		});
+
+		$('.nachreichungSpeichern').click(function()
+		{
+			var akteid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
+			var typ = $('#aktenid_' + akteid).val();
+
+			var nachreichungAm = $('#nachreichungAm_' + akteid).val();
+			var nachreichungAnmerkung = $('#nachreichungAnmerkung_' + akteid).val();
+
+			if(nachreichungAm === '')
+			{
+				FHC_DialogLib.alertError(FHC_PhrasesLib.t('infocenter', 'datumUngueltig'));
+				return false;
+			}
+
+			var regEx = /^\d{2}\.\d{2}\.(\d{2}|\d{4})$/;
+
+			if(nachreichungAm.match(regEx) === null)
+			{
+				FHC_DialogLib.alertError(FHC_PhrasesLib.t('infocenter', 'datumUngueltig'))
+				return false;
+			}
+
+			DocUeberpruefung.saveNachreichung(personid, nachreichungAm, nachreichungAnmerkung, typ);
+		})
+
+		$('.dokLoeschen').click(function()
+		{
+			var akteid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
+
+			var confirmed = confirm('Wollen Sie sicher das Dokument des Dokumentypens: ' + $('#aktenid_' + akteid).find(':selected').text() + ' löschen?');
+
+			if (confirmed)
+			{
+				DocUeberpruefung.deleteDoc(personid, akteid);
+			}
+		});
 	},
 
 	_formatDocTable: function()
