@@ -91,8 +91,20 @@ export default {
 						},
 						childactions: [
 						]
+					},
+					mergedperson: {
+						defaultaction: {
+							type: "link",
+							action: data => this.$fhcApi.getUri('/studentenverwaltung/person/' + data.person_id)
+						},
+						defaultactionstudent: {
+							type: "link",
+							action: data => this.$fhcApi.getUri('/studentenverwaltung/prestudent/' + data.prestudent_id)
+						},
+						childactions: []
 					}
-				}
+				},
+				mergeResults: 'person'
 			},
 			studiengangKz: undefined,
 			studiensemesterKurzbz: this.defaultSemester,
