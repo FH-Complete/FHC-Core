@@ -106,10 +106,15 @@ class FHCAPI_Controller extends Auth_Controller
 		$error = [];
 		
 		if (is_array($data)) {
-			if ($type == self::ERROR_TYPE_VALIDATION)
+			if ($type == self::ERROR_TYPE_VALIDATION) {
 				$error['messages'] = $data;
-			else
+			} elseif (array_is_list($data)) {
+				foreach ($data as $d)
+					$this->addError($d, $type);
+				return;
+			} else {
 				$error = $data;
+			}
 		} elseif (is_object($data)) {
 			$error = (array)$data;
 		} else {

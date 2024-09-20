@@ -40,6 +40,8 @@ export default {
 		function _clean_return_value(response) {
 			const result = response.data;
 			delete response.data;
+			if (!result)
+				return {meta: {response}, data: null};
 			if (!result.meta)
 				result.meta = {response};
 			else

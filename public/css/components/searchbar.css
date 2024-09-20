@@ -93,3 +93,41 @@
 .searchbar_inline_ul li {
     list-style: none;
 }
+
+/* new variant with template/frame */
+
+.searchbar-result {
+    border-bottom: 1px solid lightgrey;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+}
+
+.searchbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    padding: 0;
+    margin: 1rem 0 0;
+}
+
+.searchbar-square-image {
+    position: relative;
+    display: block;
+    height: 0;
+    padding-bottom: 100%;
+}
+
+.searchbar-square-image > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+.searchbar-square-image img {
+    object-fit: cover;
+}
+
+.no-margin-paragraphs p {
+    margin: 0;
+}

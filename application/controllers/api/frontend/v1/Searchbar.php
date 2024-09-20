@@ -50,6 +50,7 @@ class Searchbar extends FHCAPI_Controller
 	 */
 	public function search()
 	{
+		#$searchstrings = ['pid:71995', 'email:eder.iris', 'schnabl', 'schnabl thomas', 'schnabl thomas sarim', 'schnabl -thomas', 'nachname:schnabl -vorname:thomas', 'schnabl thomas -sarim', 'schnabl or hacker', '-ali', '-ali -baba', '-ali -baba -raub', '-ali -honig', '-ali -baba ali', 'hofer martin'];
 		$this->load->library('form_validation');
 
 		// Checks if the searchstr and the types parameters are in the POSTed JSON
@@ -57,13 +58,17 @@ class Searchbar extends FHCAPI_Controller
 		$this->form_validation->set_rules(self::TYPES_PARAM . '[]', null, 'required');
 
 		if (!$this->form_validation->run())
-			$this->terminateWithError(SearchBarLib::ERROR_WRONG_JSON, self::ERROR_TYPE_GENERAL);
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		// Convert to json the result from searchbarlib->search
 		$result = $this->searchbarlib->search($this->input->post(self::SEARCHSTR_PARAM), $this->input->post(self::TYPES_PARAM));
-		if (property_exists($result, 'error'))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$this->terminateWithSuccess($result);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->addMeta('time', $result->meta['time']);
+		$this->addMeta('searchstring', $result->meta['searchstring']);
+		
+		$this->terminateWithSuccess($data);
 	}
 }
 

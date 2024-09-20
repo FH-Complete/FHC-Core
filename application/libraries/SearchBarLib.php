@@ -39,6 +39,10 @@ class SearchBarLib
 
 	private $_ci; // Code igniter instance
 
+	private $_searchfunction_priorities = [];
+	private $_numeric_searchfunctions = [];
+	private $_allowed_searchfunctions = [];
+	
 	/**
 	 * Gets the CI instance and loads model
 	 */
@@ -46,8 +50,22 @@ class SearchBarLib
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		// It is loaded only to have the DB_Model available
+		// It is loaded only to have the DB functions available
 		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
+
+		// Load Config
+		$this->_ci->load->config('search', true);
+		$this->_ci->load->config('searchfunctions', true);
+
+		$this->_ci->load->library('PhrasesLib', [['search'], null], 'search_phrases');
+
+		// Precompute helper arrays
+		foreach ($this->_ci->config->item('searchfunctions') as $key => $arr) {
+			$this->_searchfunction_priorities[$key] = $arr['priority'];
+			if ($arr['force_integer'] ?? false)
+				$this->_numeric_searchfunctions[] = $key;
+			$this->_allowed_searchfunctions[] = $key;
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -55,383 +73,611 @@ class SearchBarLib
 
 	/**
 	 * It performes the search of the given search string using the specified search types
+	 * TODO(chris): permissions
+	 *
+	 * @param string							$searchstring
+	 * @param array								$types (optional)
+	 *
+	 * @return stdClass		containing an array with the result on index 0
+	 * 						and the overall query time on index 1.
 	 */
-	public function search($searchstr, $types)
+	public function search($searchstring, $types = [])
 	{
-		// Checks if the given parameters are fine
-		$search = $this->_checkParameters($searchstr, $types);
+		if (!$types) {
+			$types = $this->_ci->config->item('search');
+		} else {
+			$tmp = [];
+			$missing = [];
+			foreach ($types as $type) {
+				$typeconfig = $this->_ci->config->item($type, 'search');
+				if (!$typeconfig) {
+					$missing[] = $type;
+				} else {
+					$tmp[$type] = $typeconfig;
+				}
+			}
+			if ($missing) {
+				$p = $this->_ci->search_phrases;
+				return error(array_map(function ($type) use ($p) {
+					return $p->t('search', 'error_missing_config', [
+						'type' => $type
+					]); // TODO(chris): phrase
+				}, $missing));
+			}
+			$types = $tmp;
+		}
 
-		// If the check was successful then perform the search
-		if (isSuccess($search)) $search = $this->_search($searchstr, $types);
 
-		return $search; // return the result
+		// Convert searchstring into array
+		list($searchArray, $searchstring) = $this->_convertQuery($searchstring, $types);
+
+
+		$sql = $this->getDynamicSearchSqls($searchArray, array_keys($types));
+		if (isError($sql))
+			return $sql;
+		if (!hasData($sql)) {
+			$retval = success([]);
+			$retval->meta = ['time' => 0, 'searchstring' => $searchstring];
+			return $retval;
+		}
+
+		$msc = microtime(true);
+		$result = $this->_ci->BenutzerModel->execReadOnlyQuery(getData($sql));
+		$msc = microtime(true) - $msc;
+
+		if (isError($result))
+			return $result;
+
+		$retval = success($result->retval);
+		$retval->meta = [
+			'time' => $msc,
+			'searchstring' => $searchstring
+		];
+
+		return $retval;
+	}
+
+	/**
+	 * Generates the search query for the given search string and the
+	 * specified search type.
+	 *
+	 * @param array								$searchArray
+	 * @param string							$table
+	 *
+	 * @return stdClass		containing the query string.
+	 */
+	public function getDynamicSearchSql($searchArray, $table)
+	{
+		$res = $this->checkConfig($table);
+		if (isError($res))
+			return $res;
+		$table_config = getData($res);
+
+		$sql_with = [];
+		
+		$sql_select = $this->prepareDynamicSearchSql($sql_with, $searchArray, $table);
+
+		if (!$sql_select)
+			return success("");
+
+		$lang = getUserLanguage();
+
+		$output = "
+			WITH lang (index) AS (
+				SELECT index
+				FROM public.tbl_sprache
+				WHERE sprache=" . $this->_ci->db->escape($lang) . "
+				LIMIT 1
+			)";
+
+		if ($sql_with) {
+			$sql_with = array_unique($sql_with);
+			$output .= ", " . implode(", ", $sql_with);
+		}
+
+		$other_selects = "";
+		if (isset($table_config['resultfields']))
+			$other_selects = implode(", ", $table_config['resultfields']);
+		if ($other_selects)
+			$other_selects = ", " . $other_selects;
+
+		$output .= "
+			, q (" . $table_config['primarykey'] . ", rank) AS (
+				SELECT " . $table_config['primarykey'] . ", MAX(rank)
+				FROM (" . implode(" UNION ", $sql_select) . ") q
+				GROUP BY " . $table_config['primarykey'] . "
+			)
+			SELECT
+				" . $this->_ci->db->escape($table) . " AS type,
+				q.rank
+				" . $other_selects . "
+			FROM q
+			" . ($table_config['resultjoin'] ?? "") . "
+			ORDER BY rank DESC
+		";
+
+		return success($output);
+	}
+
+	/**
+	 * Generates the search query for the given search string and the
+	 * specified search types.
+	 *
+	 * @param array								$searchArray
+	 * @param array								$types
+	 *
+	 * @return stdClass		containing the query string.
+	 */
+	public function getDynamicSearchSqls($searchArray, $types)
+	{
+		$with = [];
+		$selects = [];
+		foreach ($types as $type) {
+			$res = $this->checkConfig($type);
+			if (isError($res))
+				return $res;
+			$table_config = getData($res);
+
+			$select = $this->prepareDynamicSearchSql($with, $searchArray, $type);
+			if (!$select)
+				continue;
+
+			$with[] = "final_" . $type . " (" . $table_config['primarykey'] . ", rank) AS (
+				SELECT " . $table_config['primarykey'] . ", MAX(rank)
+				FROM (" . implode(" UNION ", $select) . ") q
+				GROUP BY " . $table_config['primarykey'] . "
+			)";
+
+			$other_selects = 
+			$selects[] = "
+				SELECT
+					" . $this->_ci->db->escape($type) . " AS type,
+					rank,
+					TO_JSONB((SELECT x FROM (SELECT " . implode(", ", $table_config['resultfields'] ?? ['*']) . ") x)) AS data
+				FROM final_" . $type  . ($table_config['resultjoin'] ?? "");
+		}
+
+		if (!$selects)
+			return success("");
+
+		$with = array_unique($with);
+
+		$lang = getUserLanguage();
+		array_unshift($with, "lang (index) AS (
+			SELECT index
+			FROM public.tbl_sprache
+			WHERE sprache=" . $this->_ci->db->escape($lang) . "
+			LIMIT 1
+		)");
+
+		return success("
+			WITH " . implode(", ", $with) . "
+			SELECT *
+			FROM (" . implode(" UNION ", $selects) . ") q
+			ORDER BY rank DESC
+			LIMIT 100
+		");
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Protected methods
+
+	/**
+	 * Check config
+	 *
+	 * @param string							$name
+	 *
+	 * @return stdClass
+	 */
+	protected function checkConfig($name)
+	{
+		$table_config = $this->_ci->config->item($name, 'search');
+
+		if (!$table_config)
+			return error($this->_ci->search_phrases->t('search', 'error_missing_config', [
+				'type' => $name
+			])); // TODO(chris): phrase
+
+		$errors = [];
+		if (!isset($table_config['table'])
+			|| !is_string($table_config['table'])
+			|| !$table_config['table']
+		) {
+			$errors[] = $this->_ci->search_phrases->t('search', 'error_invalid_config', [
+				'type' => $name,
+				'field' => 'table'
+			]); // TODO(chris): phrase
+		}
+		if (!isset($table_config['primarykey'])
+			|| !is_string($table_config['primarykey'])
+			|| !$table_config['primarykey']
+		) {
+			$errors[] = $this->_ci->search_phrases->t('search', 'error_invalid_config', [
+				'type' => $name,
+				'field' => 'primarykey'
+			]);
+		}
+		if (!isset($table_config['resultfields'])
+			|| !is_array($table_config['resultfields'])
+			|| !$table_config['resultfields']
+		) {
+			$errors[] = $this->_ci->search_phrases->t('search', 'error_invalid_config', [
+				'type' => $name,
+				'field' => 'resultfields'
+			]);
+		}
+		if (!isset($table_config['searchfields'])
+			|| !is_array($table_config['searchfields'])
+			|| !$table_config['searchfields']
+		) {
+			$errors[] = $this->_ci->search_phrases->t('search', 'error_invalid_config', [
+				'type' => $name,
+				'field' => 'searchfields'
+			]);
+		} else {
+			foreach ($table_config['searchfields'] as $searchfield => $config) {
+				if (!isset($config['field'])
+					|| !is_string($config['field'])
+					|| !$config['field']
+				) {
+					$errors[] = $this->_ci->search_phrases->t('search', 'error_invalid_config_searchfield', [
+						'type' => $name,
+						'searchfield' => $searchfield,
+						'field' => 'field'
+					]); // TODO(chris): phrase
+				}
+				if (!isset($config['comparison'])
+					|| !is_string($config['comparison'])
+					|| !in_array($config['comparison'], $this->_allowed_searchfunctions)
+				) {
+					$errors[] = $this->_ci->search_phrases->t('search', 'error_invalid_config_searchfield', [
+						'type' => $name,
+						'searchfield' => $searchfield,
+						'field' => 'comparison'
+					]);
+				}
+			}
+		}
+
+		if ($errors)
+			return error($errors);
+
+		return success($table_config);
+	}
+
+	/**
+	 * Generates the with statements for the given search string and the
+	 * specified search type.
+	 *
+	 * @param array								&$sqlWith
+	 * @param array								$searchArray
+	 * @param string							$table
+	 *
+	 * @return string	a query string or the name of the prepared select.
+	 */
+	protected function prepareDynamicSearchSql(&$sqlWith, $searchArray, $table)
+	{
+		$table_config = $this->_ci->config->item($table, 'search');
+
+		$id_offset = count($sqlWith);
+
+
+		$allowed_codes_w_order = ['' => 0, '!' => -1];
+		$max = max($this->_searchfunction_priorities);
+		foreach ($table_config['searchfields'] as $code => $config) {
+			$allowed_codes_w_order[$code] = $this->_searchfunction_priorities[$config['comparison']];
+			$allowed_codes_w_order['!' . $code] = $this->_searchfunction_priorities[$config['comparison']] - $max - 2;
+		}
+
+		$check_order = $this->_searchfunction_priorities;
+		uasort($table_config['searchfields'], function ($a, $b) use ($check_order) {
+			return $check_order[$b['comparison']] - $check_order[$a['comparison']];
+		});
+
+		$integer_functions = $this->_numeric_searchfunctions;
+		$integer_fields = array_keys(array_filter($table_config['searchfields'], function ($a) use ($integer_functions) {
+				return in_array($a['comparison'], $integer_functions);
+		}));
+
+		$only_integer_fields = count($integer_fields) == count($table_config['searchfields']);
+
+		$aliases = [];
+		foreach ($table_config['searchfields'] as $field => $config) {
+			if (isset($config['alias'])) {
+				foreach ($config['alias'] as $alias) {
+					$aliases[$alias] = $field;
+					$aliases['!' . $alias] = '!' . $field;
+				}
+			}
+		}
+
+		$sql_select = [];
+
+		if (isset($table_config['prepare'])) {
+			if (is_array($table_config['prepare']))
+				$sqlWith = $table_config['prepare'];
+			else
+				$sqlWith[] = $table_config['prepare'];
+		}
+
+		foreach ($searchArray as $or_search) {
+			if (isset($or_search['-filter']) && !in_array($table, $or_search['-filter']))
+				continue;
+			unset($or_search['-filter']);
+			
+			foreach ($aliases as $alias => $field) {
+				if (isset($or_search[$alias])) {
+					$or_search[$field] = array_merge($or_search[$alias], $or_search[$field] ?? []);
+					unset($or_search[$alias]);
+				}
+			}
+
+			// NOTE(chris): early out if not allowed fields are in the search array
+			$used_codes = array_keys($or_search);
+			if (count(array_intersect($used_codes, array_keys($allowed_codes_w_order))) != count($used_codes))
+				continue;
+
+			// NOTE(chris): expand general excludes to all fields
+			if (isset($or_search['!'])) {
+				$not = $or_search['!'];
+				unset($or_search['!']);
+				foreach ($table_config['searchfields'] as $code => $config) {
+					if (isset($or_search['!' . $code]))
+						$or_search['!' . $code] = array_unique(array_merge($or_search['!' . $code], $not));
+					else
+						$or_search['!' . $code] = $not;
+				}
+			}
+
+			// NOTE(chris): early out if all searchfields require an integer and at least one searchword is not a number
+			if ($only_integer_fields
+				&& isset($or_search[""])
+				&& $this->_hasAtLeastOneNaN($or_search[""])
+			) {
+				continue;
+			}
+
+			$skip = false;
+			foreach ($integer_fields as $code) {
+				// NOTE(chris): filter non integer for integer fields
+				if (isset($or_search['!' . $code])) {
+					$or_search['!' . $code] = array_filter($or_search['!' . $code], function ($a) {
+						return is_numeric($a);
+					});
+					if (!$or_search['!' . $code])
+						unset($or_search['!' . $code]);
+				}
+				// NOTE(chris): early out if a searchword that is not a number is compared to a searchfield that requires an integer
+				if (isset($or_search[$code])
+					&& $this->_hasAtLeastOneNaN($or_search[$code])
+				) {
+					$skip = true;
+					break;
+				}
+			}
+			if ($skip)
+				continue;
+
+			// NOTE(chris): sort for performance reasons
+			uksort($or_search, function ($a, $b) use ($allowed_codes_w_order) {
+				return $allowed_codes_w_order[$b] - $allowed_codes_w_order[$a];
+			});
+
+			$or_with = [];
+			$or_select = [];
+			$or_prepare = [];
+
+			if (substr(key($or_search), 0, 1) == '!') {
+				// NOTE(chris): only negative searchwords
+				$sql = [];
+				foreach ($or_search as $code => $words) {
+					$code = substr($code, 1);
+					// NOTE(chris): sort for performance reasons
+					usort($words, function ($a, $b) {
+						return strlen($b) - strlen($a);
+					});
+					$field_config = $table_config['searchfields'][$code];
+
+					if (isset($field_config['prepare'])) {
+						if (is_array($field_config['prepare']))
+							$or_with = array_merge($or_with, $field_config['prepare']);
+						else
+							$or_with[] = $field_config['prepare'];
+						$or_prepare[$code] = $field_config['prepare'];
+						unset($table_config['searchfields'][$code]['prepare']);
+						unset($field_config['prepare']);
+					}
+					$field_sql = "
+						SELECT
+							" . $table_config['table'] . "." . $table_config['primarykey'] . "
+							FROM " . $table_config['table'] . "
+							" . $this->_makeJoin($field_config['join']) . "
+							WHERE ";
+					// TODO(chris): equals and equal-int could be IN () statement???
+					foreach ($words as $word) {
+						$sql[] = $field_sql . $this->_makeCompareBool($field_config['comparison'], $field_config['field'], $word);
+					}
+				}
+
+				$or_select[] = "
+					SELECT 
+						" . $table_config['primarykey'] . ",
+						1.0 AS rank
+					FROM " . $table_config['table'] . "
+					WHERE prestudent_id NOT IN (" . implode(" UNION ", $sql) . ")";
+			} else {
+				$current_select = false;
+				$count = 0;
+				$skip = false;
+				foreach ($or_search as $code => $words) {
+					// NOTE(chris): sort for performance reasons
+					if ($code && substr($code, 0, 1) == '!') {
+						usort($words, function ($a, $b) {
+							return strlen($a) - strlen($b);
+						});
+					} else {
+						usort($words, function ($a, $b) {
+							return strlen($b) - strlen($a);
+						});
+					}
+					if ($code == '') {
+						foreach ($words as $i => $word) {
+							$field_sql = [];
+							foreach ($table_config['searchfields'] as $c => $field_config) {
+								if (in_array($field_config['comparison'], $integer_functions) && !is_numeric($word))
+									continue;
+
+								$word_from = $table_config['table'];
+								$word_join = "";
+								$word_rank = "0";
+								if ($current_select) {
+									$word_from = $current_select;
+									if ($field_config['field'] != $table_config['primarykey']) {
+										$word_join .= " " . $this->_makeJoin($table_config);
+									}
+									$word_rank = "rank";
+								}
+								if (isset($field_config['prepare'])) {
+									if (is_array($field_config['prepare']))
+										$or_with = array_merge($or_with, $field_config['prepare']);
+									else
+										$or_with[] = $field_config['prepare'];
+									$or_prepare[$c] = $field_config['prepare'];
+									unset($table_config['searchfields'][$c]['prepare']);
+									unset($field_config['prepare']);
+								}
+								if (isset($field_config['join'])) {
+									$word_join .= " " . $this->_makeJoin($field_config['join']);
+								}
+								$field_sql[] = "
+									SELECT
+										" . $word_from . "." . $table_config['primarykey'] . ",
+										" . $word_rank . " AS w_rank,
+										" . $this->_makeRank($field_config['comparison'], $field_config['field'], $word) . " AS rank
+										FROM " . $word_from . "
+										" . $word_join . "
+										WHERE " . $this->_makeCompare($field_config['comparison'], $field_config['field'], $word);
+							}
+							// NOTE(chris): skip because the word is not numeric but all searchfields require integers
+							if (!$field_sql) {
+								$or_with = [];
+								$or_select = [];
+								$count = 0;
+								$skip = true;
+								foreach ($or_prepare as $k => $v)
+									$table_config['searchfields'][$k]['prepare'] = $v;
+								break;
+							}
+
+							$id = "w" . ($id_offset + count($or_with));
+							$or_with[] = "
+								" . $id . " (" . $table_config['primarykey'] . ", rank) AS (
+								SELECT
+									" . $table_config['primarykey'] . ",
+									(w_rank + 1.0 - CASE " .
+										"WHEN MIN(rank) = 0 THEN 0 " .
+										"ELSE EXP(SUM(LN(CASE WHEN rank = 0 THEN 1 ELSE rank " .
+										"END))) END) AS rank
+									FROM (" . implode(' UNION ALL ', $field_sql) . ") " . $id . "
+									GROUP BY " . $table_config['primarykey'] . ", w_rank
+								)";
+							$current_select = $id;
+						}
+					} else {
+						foreach ($words as $i => $word) {
+							$where = "";
+							$rank = "";
+							$jointype = "";
+							if (substr($code, 0, 1) == '!') {
+								$c = substr($code, 1);
+								$field_config = $table_config['searchfields'][$c];
+								
+								$rank = "1";
+
+								$jointype = "LEFT";
+
+								$where = $field_config['field'] .
+									" IS NULL OR NOT (" .
+									$this->_makeCompareBool(
+										$field_config['comparison'],
+										$field_config['field'],
+										$word
+									) .
+									")";
+								if ($field_config['1-n'] ?? false) {
+									$where = "GROUP BY " .
+										$table_config['primarykey'] .
+										", rank HAVING MIN(CASE WHEN " .
+										$where .
+										" THEN 1 ELSE 0 END) = 1";
+								} else {
+									$where = "WHERE " . $where;
+								}
+							} else {
+								$field_config = $table_config['searchfields'][$code];
+
+								$rank = $this->_makeRank($field_config['comparison'], $field_config['field'], $word);
+
+								$where = $this->_makeCompare($field_config['comparison'], $field_config['field'], $word);
+								$where = "WHERE " . $where;
+							}
+							$word_from = $table_config['table'];
+							$word_join = "";
+							$word_rank = "";
+							if ($current_select) {
+								$word_from = $current_select;
+								if ($field_config['field'] != $table_config['primarykey']) {
+									$word_join .= " " . $this->_makeJoin($table_config);
+								}
+								$word_rank = "rank + ";
+							}
+							if (isset($field_config['prepare'])) {
+								if (is_array($field_config['prepare']))
+									$or_with = array_merge($or_with, $field_config['prepare']);
+								else
+									$or_with[] = $field_config['prepare'];
+								$or_prepare[$code] = $field_config['prepare'];
+								unset($table_config['searchfields'][$code]['prepare']);
+								unset($field_config['prepare']);
+							}
+							if (isset($field_config['join'])) {
+								$word_join .= " " . $this->_makeJoin($field_config['join'], $jointype);
+							}
+
+							$id = "w" . ($id_offset + count($or_with));
+							$or_with[] = "
+								" . $id . " (" . $table_config['primarykey'] . ", rank) AS (
+								SELECT
+									" . $word_from . "." . $table_config['primarykey'] . ",
+									" . $word_rank . $rank . " AS rank
+									FROM " . $word_from . "
+									" . $word_join . "
+									" . $where . "
+								)";
+							$current_select = $id;
+						}
+					}
+					if ($skip)
+						break;
+					$count += count($words);
+				}
+
+				if (!$count || !$current_select)
+					continue;
+
+				$or_select[] = "
+					SELECT " . $table_config['primarykey'] . ", rank / " . $count . " AS rank FROM " . $current_select;
+			}
+
+			$sqlWith = array_merge($sqlWith, $or_with);
+			$sql_select = array_merge($sql_select, $or_select);
+		}
+
+		return $sql_select;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
-
-	/**
-	 * Checks:
-	 * - The given searchstr is a not empty string
-	 * - The given types is a not empty array and contains allowed search types
-	 */
-	private function _checkParameters($searchstr, $types)
-	{
-		// If searchstr is empty
-		if (isEmptyString($searchstr)) return error(self::ERROR_WRONG_SEARCHSTR);
-
-		// If types is not an array or it is empty
-		if (isEmptyArray($types)) return error(self::ERROR_NO_TYPES);
-
-		// If all the elements in types are allowed search types
-		if (!isEmptyArray(array_diff($types, self::ALLOWED_TYPES))) return error(self::ERROR_WRONG_TYPES);
-
-		return success(); // The check is fine!
-	}
-
-	/**
-	 * Loops on types and perform the search of that type using searchstr
-	 * Then it collects all the returned data into an array as property of an object
-	 */
-	private function _search($searchstr, $types)
-	{
-		// Object to be returned
-		$result = new stdClass();
-		$result->data = array();
-
-		// For each search type
-		foreach ($types as $type)
-		{
-			// Perform the search and then add the result to data
-			$result->data = array_merge($result->data, $this->{'_'.$type}($searchstr, $type));
-		}
-
-		return $result;
-	}
-
-	private function _mitarbeiter_ohne_zuordnung($searchstr, $type) 
-	{
-		$dbModel = new DB_Model();
-
-		$sql = '
-			SELECT
-				\''.$type.'\' AS type,
-				b.uid AS uid,
-				p.person_id AS person_id,
-				p.vorname || \' \' || p.nachname AS name,
-				ARRAY_AGG(DISTINCT(org.bezeichnung)) AS organisationunit_name,
-				COALESCE(b.alias, b.uid) || \''.'@'.DOMAIN.'\' AS email,
-				TRIM(COALESCE(k.kontakt, \'\') || \' \' || COALESCE(m.telefonklappe, \'\')) AS phone,
-				\''.base_url(self::PHOTO_IMG_URL).'\' || p.person_id AS photo_url, 
-				ARRAY_AGG(DISTINCT(stdkst.bezeichnung)) AS standardkostenstelle 
-			  FROM public.tbl_mitarbeiter m
-			  JOIN public.tbl_benutzer b ON(b.uid = m.mitarbeiter_uid)
-			  LEFT JOIN (
-				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
-				  FROM public.tbl_benutzerfunktion bf
-				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
-				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
-				 WHERE bf.funktion_kurzbz = \'kstzuordnung\'
-				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
-				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
-				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
-			) stdkst ON stdkst.uid = b.uid 
-			  JOIN public.tbl_person p USING(person_id)
-			  LEFT JOIN (
-				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
-				  FROM public.tbl_benutzerfunktion bf
-				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
-				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
-				 WHERE bf.funktion_kurzbz = \'oezuordnung\'
-				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
-				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
-				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
-			) org ON org.uid = b.uid 
-		     LEFT JOIN (
-				SELECT kontakt, standort_id
-				  FROM public.tbl_kontakt
-				 WHERE kontakttyp = \'telefon\'
-			) k ON(k.standort_id = m.standort_id)
-			 WHERE 
-				(stdkst.bezeichnung IS NULL 
-				OR org.bezeichnung IS NULL) 
-				AND (
-			' .
-			$this->buildSearchClause(
-				$dbModel, 
-				array('b.uid', 'p.vorname', 'p.nachname'), 
-				$searchstr
-			) .
-			'
-				)
-		      GROUP BY type, b.uid, p.person_id, name, email, m.telefonklappe, phone
-		';
-
-		$employees = $dbModel->execReadOnlyQuery($sql);
-		
-		// If something has been found then return it
-		if (hasData($employees)) return getData($employees);
-
-		// Otherwise return an empty array
-		return array();
-	}
-
-	protected function buildSearchClause(DB_Model $dbModel, array $columns, $searchstr)
-	{
-		$document			 = implode(' || \' \' || ', $columns);
-		$query				 = '\'' . implode(':* & ', explode(' ', trim($searchstr))) . ':*\'';
-		$reversequery		 = '\'*:' . implode(' & *:', explode(' ', trim($searchstr))) . '\'';
-		$nospacequery		 = '\'' . implode('', explode(' ', trim($searchstr))) . ':*\'';
-
-		$searchclause = <<<EOSC
-			to_tsvector(lower(regexp_replace({$document}, '[[:punct:]]', ' ', 'g'))) @@ to_tsquery(lower({$query}))
-			OR
-			to_tsvector(reverse(lower(regexp_replace({$document}, '[[:punct:]]', ' ', 'g')))) @@ to_tsquery(reverse(lower({$reversequery})))
-			OR
-			to_tsvector(lower(regexp_replace({$document}, '[[:punct:]]', ' ', 'g'))) @@ to_tsquery(lower({$nospacequery}))
-	
-EOSC;
-
-		return $searchclause;
-	}
-
-	/**
-	 * Search for employees
-	 */
-	private function _mitarbeiter($searchstr, $type)
-	{
-		$dbModel = new DB_Model();
-
-		$employees = $dbModel->execReadOnlyQuery('
-			SELECT
-				\''.$type.'\' AS type,
-				b.uid AS uid,
-				p.person_id AS person_id,
-				p.vorname || \' \' || p.nachname AS name,
-				ARRAY_AGG(DISTINCT(org.bezeichnung)) AS organisationunit_name,
-				COALESCE(b.alias, b.uid) || \''.'@'.DOMAIN.'\' AS email,
-				TRIM(COALESCE(k.kontakt, \'\') || \' \' || COALESCE(m.telefonklappe, \'\')) AS phone,
-				\''.base_url(self::PHOTO_IMG_URL).'\' || p.person_id AS photo_url, 
-				ARRAY_AGG(DISTINCT(stdkst.bezeichnung)) AS standardkostenstelle 
-			  FROM public.tbl_mitarbeiter m
-			  JOIN public.tbl_benutzer b ON(b.uid = m.mitarbeiter_uid)
-			  JOIN (
-				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
-				  FROM public.tbl_benutzerfunktion bf
-				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
-				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
-				 WHERE bf.funktion_kurzbz = \'kstzuordnung\'
-				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
-				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
-				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
-			) stdkst ON stdkst.uid = b.uid 
-			  JOIN public.tbl_person p USING(person_id)
-			  JOIN (
-				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
-				  FROM public.tbl_benutzerfunktion bf
-				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
-				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
-				 WHERE bf.funktion_kurzbz = \'oezuordnung\'
-				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
-				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
-				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
-			) org ON org.uid = b.uid 
-		     LEFT JOIN (
-				SELECT kontakt, standort_id
-				  FROM public.tbl_kontakt
-				 WHERE kontakttyp = \'telefon\'
-			) k ON(k.standort_id = m.standort_id)
-			 WHERE ' .
-			$this->buildSearchClause(
-				$dbModel, 
-				array('b.uid', 'p.vorname', 'p.nachname', 'org.bezeichnung', 'stdkst.bezeichnung'), 
-				$searchstr
-			) .
-			'
-		      GROUP BY type, b.uid, p.person_id, name, email, m.telefonklappe, phone
-		');
-
-		// If something has been found then return it
-		if (hasData($employees)) return getData($employees);
-
-		// Otherwise return an empty array
-		return array();
-	}
-
-	/**
-	 * Seach for organisation units
-	 */
-	private function _organisationunit($searchstr, $type)
-	{
-		$dbModel = new DB_Model();
-
-		$ous = $dbModel->execReadOnlyQuery('
-			SELECT
-				\''.$type.'\' AS type,
-				o.oe_kurzbz AS oe_kurzbz,
-				\'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS name,
-				oParent.oe_kurzbz AS parentoe_kurzbz,
-				(CASE WHEN oParent.bezeichnung IS NOT NULL THEN \'[\' || otParent.bezeichnung || \'] \' || oParent.bezeichnung END) AS parentoe_name,
-				ARRAY_AGG(DISTINCT(bfLeader.uid)) AS leader_uid,
-				ARRAY_AGG(DISTINCT(bfLeader.vorname || \' \' || bfLeader.nachname)) AS leader_name,
-				COUNT(bfCount.benutzerfunktion_id) AS number_of_people,
-				(CASE WHEN o.mailverteiler = TRUE THEN o.oe_kurzbz || \''.'@'.DOMAIN.'\' END) AS mailgroup
-			  FROM public.tbl_organisationseinheit o
-			  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
-		     LEFT JOIN public.tbl_organisationseinheit oParent ON(oParent.oe_kurzbz = o.oe_parent_kurzbz)
-			 LEFT JOIN public.tbl_organisationseinheittyp otParent ON(oParent.organisationseinheittyp_kurzbz = otParent.organisationseinheittyp_kurzbz)
-		     LEFT JOIN (
-				SELECT benutzerfunktion_id, oe_kurzbz
-				  FROM public.tbl_benutzerfunktion
-				 WHERE funktion_kurzbz = \'oezuordnung\'
-				   AND (datum_von IS NULL OR datum_von <= NOW())
-				   AND (datum_bis IS NULL OR datum_bis >= NOW())
-			) bfCount ON(bfCount.oe_kurzbz = o.oe_kurzbz)
-		     LEFT JOIN (
-				SELECT bf.oe_kurzbz, bf.uid, p.vorname, p.nachname
-				  FROM public.tbl_benutzerfunktion bf
-				  JOIN public.tbl_benutzer b USING(uid)
-				  JOIN public.tbl_person p USING(person_id)
-				 WHERE funktion_kurzbz = \'Leitung\'
-				   AND (datum_von IS NULL OR datum_von <= NOW())
-				   AND (datum_bis IS NULL OR datum_bis >= NOW())
-				   AND b.aktiv = TRUE
-			) bfLeader ON(bfLeader.oe_kurzbz = o.oe_kurzbz)
-			 WHERE ' .
-			$this->buildSearchClause(
-				$dbModel, 
-				array('o.oe_kurzbz', 'o.bezeichnung', 'ot.bezeichnung'), 
-				$searchstr
-			) .
-			'
-		      GROUP BY type, o.oe_kurzbz, o.bezeichnung, ot.bezeichnung, oParent.oe_kurzbz, oParent.bezeichnung, otParent.bezeichnung
-		');
-
-		// If something has been found
-		if (hasData($ous))
-		{
-			// Loop through the returned dataset
-			foreach (getData($ous) as $ou)
-			{
-				// Create the new property leaders as an empty array
-				$ou->leaders = array();
-
-				// Loop through the found leaders for this organisation unit
-				for ($i = 0; $i < count($ou->leader_uid); $i++)
-				{
-					// If a leader exists for this organisationunit and has a name :D
-					if (!isEmptyString($ou->leader_uid[$i]) && !isEmptyString($ou->leader_name[$i]))
-					{
-						// Empty object that will contains the leader uid and name
-						$leader = new stdClass();
-						// Set the properties name and uid
-						$leader->uid = $ou->leader_uid[$i];
-						$leader->name = $ou->leader_name[$i];
-						// Add the leader object to the leaders array
-						$ou->leaders[] = $leader;
-					}
-				}
-
-				// Remove the not needed properties leader_uid and leader_name
-				unset($ou->leader_uid);
-				unset($ou->leader_name);
-			}
-
-			// Returns the changed dataset
-			return getData($ous);
-		}
-
-		// Otherwise return an empty array
-		return array();
-	}
-
-	/**
-	 * Search for persons
-	 */
-	private function _person($searchstr, $type)
-	{
-		return array();
-	}
-
-	/**
-	 * Search for students
-	 */
-	private function _student($searchstr, $type)
-	{
-		$dbModel = new DB_Model();
-
-		$students = $dbModel->execReadOnlyQuery('
-		SELECT
-			\''.$type.'\' AS type,
-			s.student_uid AS uid,
-			s.matrikelnr,
-			p.person_id AS person_id,
-			p.vorname || \' \' || p.nachname AS name,
-			k.kontakt as email ,
-			p.foto
-			FROM public.tbl_student s
-			JOIN public.tbl_benutzer b ON(b.uid = s.student_uid)
-			JOIN public.tbl_person p USING(person_id)
-			LEFT JOIN (
-				SELECT kontakt, person_id
-				FROM public.tbl_kontakt
-					WHERE kontakttyp = \'email\'
-			) as k USING(person_id)
-				WHERE b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-					GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto
-	');
-
-		// If something has been found then return it
-		if (hasData($students)) return getData($students);
-
-		// Otherwise return an empty array
-		return array();
-	}
-
-	/**
-	 * Search for prestudents
-	 */
-	private function _prestudent($searchstr, $type)
-	{
-		$dbModel = new DB_Model();
-
-		$prestudent = $dbModel->execReadOnlyQuery('
-		SELECT
-			\''.$type.'\' AS type,
-			ps.prestudent_id,
-			ps.studiengang_kz,
-			p.person_id AS person_id,
-			b.uid,
-			p.vorname || \' \' || p.nachname AS name,
-			(
-				SELECT kontakt
-				FROM public.tbl_kontakt
-				WHERE kontakttyp = \'email\'
-				AND person_id = p.person_id
-				LIMIT 1
-			) as email,
-			p.foto,
-			sg.bezeichnung
-			FROM public.tbl_prestudent ps
-			LEFT JOIN public.tbl_student s USING (prestudent_id)
-			LEFT JOIN public.tbl_benutzer b ON (b.uid = s.student_uid)
-			JOIN public.tbl_person p ON (p.person_id = ps.person_id)
-			LEFT JOIN public.tbl_studiengang sg ON (sg.studiengang_kz = ps.studiengang_kz)
-			WHERE b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-				OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-				OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-				or cast(ps.prestudent_id as text) ILIKE \'%'.$dbModel->escapeLIKE($searchstr).'%\'
-			GROUP BY type, b.uid, ps.prestudent_id, ps.studiengang_kz, sg.bezeichnung, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto
-			');
-
-		// If something has been found then return it
-		if (hasData($prestudent)) return getData($prestudent);
-
-		// Otherwise return an empty array
-		return array();
-	}
 
 	/**
 	 * Search for documents
@@ -456,5 +702,324 @@ EOSC;
 	{
 		return array();
 	}
-}
 
+	/**
+	 * Checks if an array has at least on non numeric value.
+	 *
+	 * @param array								$arr
+	 *
+	 * @return boolean
+	 */
+	private function _hasAtLeastOneNaN($arr)
+	{
+		foreach ($arr as $value)
+			if (!is_numeric($value))
+				return true;
+		return false;
+	}
+
+	/**
+	 * Helper function for getDynamicSearchSql
+	 *
+	 * @param array								$join
+	 * @param string							$prefix
+	 *
+	 * @return string
+	 */
+	private function _makeJoin($join, $prefix = "")
+	{
+		if (!is_array($join))
+			return "";
+		if (!isset($join['table'])) {
+			$output = [];
+			foreach ($join as $j)
+				$output[] = trim($this->_makeJoin($j, $prefix));
+			return implode(" ", $output);
+		}
+		if (!isset($join['on']) && !isset($join['using']) && !isset($join['primarykey']))
+			return "";
+		$output = $prefix . " JOIN " . $join['table'];
+
+		if (isset($join['using']))
+			return $output . " USING (" . $join['using'] . ")";
+
+		if (isset($join['primarykey']))
+			return $output . " USING (" . $join['primarykey'] . ")";
+
+		return $output . " ON (" . $join['on'] . ")";
+	}
+
+	/**
+	 * Helper function for _makeRank, _makeCompare and _makeCompareBool
+	 *
+	 * @param string							$function
+	 * @param string							$mode
+	 * @param string							$field
+	 * @param string							$word
+	 *
+	 * @return string
+	 */
+	private function _makeFunction($function, $mode, $field, $word)
+	{
+		$searchfunction = $this->_ci->config->item($mode, 'searchfunctions');
+
+		if (!$searchfunction)
+			return "";
+		$tpl = $searchfunction[$function] ?? "";
+		
+		if (strstr($tpl, '{field}'))
+			$tpl = str_replace('{field}', $field, $tpl);
+
+		if (strstr($tpl, '{word}'))
+			$tpl = str_replace('{word}', $this->_ci->db->escape($word), $tpl);
+		if (strstr($tpl, '{like:word}'))
+			$tpl = str_replace('{like:word}', "'%" . $this->_ci->db->escapeLike($word) . "%'", $tpl);
+		
+		return $tpl;
+	}
+
+	/**
+	 * Helper function for getDynamicSearchSql
+	 *
+	 * @param string							$mode
+	 * @param string							$field
+	 * @param string							$word
+	 *
+	 * @return string
+	 */
+	private function _makeRank($mode, $field, $word)
+	{
+		return $this->_makeFunction('rank', $mode, $field, $word);
+	}
+
+	/**
+	 * Helper function for getDynamicSearchSql
+	 *
+	 * @param string							$mode
+	 * @param string							$field
+	 * @param string							$word
+	 *
+	 * @return string
+	 */
+	private function _makeCompare($mode, $field, $word)
+	{
+		return $this->_makeFunction('compare', $mode, $field, $word);
+	}
+
+	/**
+	 * Helper function for getDynamicSearchSql
+	 *
+	 * @param string							$mode
+	 * @param string							$field
+	 * @param string							$word
+	 *
+	 * @return string
+	 */
+	private function _makeCompareBool($mode, $field, $word)
+	{
+		$searchfunction = $this->_ci->config->item($mode, 'searchfunctions');
+
+		if (!$searchfunction)
+			return "";
+		$function = isset($searchfunction['compare_boolean']) ? 'compare_boolean' : 'compare';
+		return $this->_makeFunction($function, $mode, $field, $word);
+	}
+
+	/**
+	 * Converts the search string to an array.
+	 * First level should be joined with an OR.
+	 * Second level should be joined with an AND or AND NOT.
+	 * It is an associative array where the key is a code for the field
+	 * which the words should be compared with and the value is the array
+	 * of words.
+	 * Use AND NOT if the first letter in the key is "!".
+	 * Use AND if the first letter in the key is not "!".
+	 * E.g:
+	 * If the key is:
+	 * "": the words should be compared to all fields with AND.
+	 * "!": the words should be compared to all fields with AND NOT.
+	 * "somefield": the words should be compared to the field somefield with
+	 * AND.
+	 * "!somefield": the words should be compared to the field somefield with
+	 * AND NOT.
+	 *
+	 * @param string							$searchstring
+	 * @param array								$types
+	 *
+	 * @return array
+	 */
+	private function _convertQuery($searchstring, $types)
+	{
+		$searchAllTypes = count($types) == count($this->_ci->config->item('search'));
+		$allowedTypes = array_keys($types);
+
+		$currentArray = [];
+		$outputArray = [];
+		$cleanStrings = [];
+		$cleanSearchstring = '';
+		$filter = ['+' => [], '-' => []];
+		$typeAliases = [];
+
+		$tmp = explode(' ', strtolower($searchstring));
+		while ($tmp) {
+			$chunk = trim(array_shift($tmp));
+			if ($chunk == '')
+				continue;
+
+			if (strpos($chunk, '"') !== false) {
+				$test = explode('"', $chunk);
+				if (count($test) > 2) {
+					$rest = implode('"', array_slice($test, 2));
+					if ($rest) {
+						array_unshift($tmp, $rest);
+						$chunk = implode('"', array_slice($test, 0, 2)) . '"';
+					}
+				}
+				if (count($test) == 2) {
+					while ($tmp && strpos($test[1], '"') === false) {
+						$test[1] .= ' ' . trim(array_shift($tmp));
+					}
+					if (strpos($test[1], '"') === false) {
+						$chunk = implode('"', $test) . '"';
+					} else {
+						$test2 = explode('"', $test[1], 2);
+						$chunk = $test[0] . '"' . $test2[0] . '"';
+						if ($test2[1]) {
+							array_unshift($tmp, $test2[1]);
+						}
+					}
+				}
+				if (strpos($chunk, ' ') === false) {
+					$chunk = str_replace('"', '', $chunk);
+				}
+			}
+
+			if ($chunk == 'or') {
+				$this->_convertQueryCleanupOr($currentArray, $cleanStrings, $filter, $searchAllTypes, $allowedTypes);
+				$filter = ['+' => [], '-' => []];
+				if ($currentArray) {
+					$cleanSearchstring .= ($cleanSearchstring ? ' or ' : '') . implode(' ', $cleanStrings);
+					$cleanStrings = [];
+					$outputArray[] = $currentArray;
+					$currentArray = [];
+				}
+				continue;
+			}
+
+			if ($chunk == ':' || $chunk == '-' || substr($chunk, -1) == ':')
+				continue;
+
+			if ($chunk[0] == ':' || ($chunk[0] == '-' && $chunk[1] == ':')) {
+				if (!$typeAliases) {
+					foreach ($types as $type => $config) {
+						$typeAliases[$type] = $type;
+						if (isset($config['alias'])) {
+							foreach ($config['alias'] as $alias) {
+								if (!isset($typeAliases[$alias]))
+									$typeAliases[$alias] = $type;
+							}
+						}
+					}
+				}
+
+				$test = explode(':', $chunk, 2);
+				if (isset($typeAliases[$test[1]]))
+					$chunk = $test[0] . ':' . $typeAliases[$test[1]];
+				elseif ($test[0] == '-')
+					continue;
+			}
+
+			if (in_array($chunk, $cleanStrings))
+				continue;
+
+			$cleanStrings[] = $chunk;
+
+			$chunk = str_replace('"', '', $chunk);
+			$code = '';
+
+			if ($chunk[0] == '-') {
+				$code = '!';
+				$chunk = substr($chunk, 1);
+			}
+			if (strpos($chunk, ':') !== false) {
+				$chunk = explode(':', $chunk, 2);
+				if (!$chunk[0]) {
+					$filter[$code ? '-' : '+'][] = $chunk[1];
+					continue;
+				}
+				$code .= $chunk[0];
+				$chunk = $chunk[1];
+			}
+
+			if (!isset($currentArray[$code]))
+				$currentArray[$code] = [];
+			
+			$currentArray[$code][] = $chunk;
+		}
+
+		$this->_convertQueryCleanupOr($currentArray, $cleanStrings, $filter, $searchAllTypes, $allowedTypes);
+		if ($currentArray) {
+			$cleanSearchstring .= ($cleanSearchstring ? ' or ' : '') . implode(' ', $cleanStrings);
+			$outputArray[] = $currentArray;
+		}
+		return [$outputArray, $cleanSearchstring];
+	}
+
+	private function _convertQueryCleanupOr(&$currentArray, &$cleanStrings, $filter, $searchAllTypes, $allowedTypes)
+	{
+		if ($filter['+'] && $filter['-']) {
+			$double = array_intersect($filter['+'], $filter['-']);
+			if ($double) {
+				foreach ($double as $type) {
+					array_splice($cleanStrings, array_search(':' . $type, $cleanStrings), 1);
+					array_splice($cleanStrings, array_search('-:' . $type, $cleanStrings), 1);
+				}
+				$filter['+'] = array_diff($filter['+'], $double);
+				$filter['-'] = array_diff($filter['-'], $double);
+			}
+			if (!$filter['+'] && !$filter['-']) {
+				// All filters cancel each other out
+				$currentArray = [];
+				$cleanStrings = [];
+				return;
+			}
+			if ($filter['+']) {
+				foreach ($filter['-'] as $type) {
+					array_splice($cleanStrings, array_search('-:' . $type, $cleanStrings), 1);
+				}
+				$filter['-'] = [];
+			}
+		}
+		if ($filter['+']) {
+			$cleanFilter = array_intersect($allowedTypes, $filter['+']);
+			if (!$cleanFilter) {
+				// All filters are forbidden
+				$currentArray = [];
+				$cleanStrings = [];
+				return;
+			}
+			$forbiddenFilter = array_diff($cleanFilter, $filter['+']);
+			foreach ($forbiddenFilter as $type) {
+				array_splice($cleanStrings, array_search(':' . $type, $cleanStrings), 1);
+			}
+			$filter['+'] = $cleanFilter;
+		} elseif ($filter['-']) {
+			$filter['+'] = array_diff($allowedTypes, $filter['-']);
+			if (!$searchAllTypes) {
+				foreach ($filter['+'] as $type)
+					$cleanStrings[] = ':' . $type;
+				foreach ($filter['-'] as $type)
+					array_splice($cleanStrings, array_search('-:' . $type, $cleanStrings), 1);
+			}
+		} else {
+			if (!$searchAllTypes) {
+				foreach ($allowedTypes as $type)
+					$cleanStrings[] = ':' . $type;
+			}
+		}
+
+		if ($filter['+']) {
+			$currentArray['-filter'] = $filter['+'];
+		}
+	}
+}
