@@ -8,7 +8,7 @@
 		if($unruly) {
 			foreach ($unruly as $unruled)
 			{
-				echo '<a>Person ID: ' . $unruled->person_id . '<a/><br />';
+				echo '<p>Person ID: ' . $unruled->person_id . '<p/>';
 			}
 		}
 		?>
@@ -25,7 +25,7 @@
 		if($duplicate) {
 			foreach ($duplicate as $dupe)
 			{
-				echo '<a>Person ID: ' . $dupe->person_id . '<a/><br />';
+				echo '<p>Person ID: ' . $dupe->person_id . '<p/>';
 			}
 		}
 		?>

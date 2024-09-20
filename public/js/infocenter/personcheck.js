@@ -10,7 +10,6 @@ $(document).ready(function ()
 		duplicate.setAttribute('style', 'display: block;')
 	}
 
-
 });
 
 var PersonCheck = {
