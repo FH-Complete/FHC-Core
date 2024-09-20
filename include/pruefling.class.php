@@ -108,12 +108,13 @@ class pruefling extends basis_db
 
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'BEGIN;INSERT INTO testtool.tbl_pruefling (studiengang_kz, idnachweis, registriert, prestudent_id, semester) VALUES('.
+			$qry = 'BEGIN;INSERT INTO testtool.tbl_pruefling (studiengang_kz, idnachweis, registriert, prestudent_id, semester, gesperrt) VALUES('.
 			       $this->db_add_param($this->studiengang_kz).",".
 			       $this->db_add_param($this->idnachweis).",".
 			       $this->db_add_param($this->registriert).",".
 			       $this->db_add_param($this->prestudent_id).",".
-			       $this->db_add_param($this->semester).");";
+			       $this->db_add_param($this->semester).",".
+			       $this->db_add_param($this->gesperrt, FHC_BOOLEAN).");";
 		}
 		else
 		{
@@ -122,7 +123,8 @@ class pruefling extends basis_db
 			       ' idnachweis='.$this->db_add_param($this->idnachweis).','.
 			       ' registriert='.$this->db_add_param($this->registriert).','.
 			       ' semester='.$this->db_add_param($this->semester).','.
-			       ' prestudent_id='.$this->db_add_param($this->prestudent_id, FHC_INTEGER).
+			       ' prestudent_id='.$this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
+			       ' gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).
 			       " WHERE pruefling_id=".$this->db_add_param($this->pruefling_id, FHC_INTEGER, false).";";
 		}
 
@@ -550,6 +552,44 @@ class pruefling extends basis_db
 					$ergebnis+=$prozent*$row->gewicht;
 			}
 			return $ergebnis;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
+		}
+	}
+	
+	public function isGesperrt($pruefling_id = null, $prestudent_id = null)
+	{
+		if (is_null($pruefling_id) && is_null($prestudent_id))
+		{
+			$this->errormsg = 'Falsche Parameterübergabe';
+			return false;
+		}
+
+		$qry = "SELECT spruefling.gesperrt
+				FROM testtool.tbl_pruefling
+				RIGHT JOIN public.tbl_prestudent USING(prestudent_id)
+				JOIN public.tbl_person USING (person_id)
+				JOIN public.tbl_prestudent pss ON pss.person_id = tbl_person.person_id
+				JOIN testtool.tbl_pruefling spruefling ON pss.prestudent_id = spruefling.prestudent_id
+				WHERE spruefling.gesperrt";
+
+		if (!is_null($pruefling_id))
+			$qry .= " AND tbl_pruefling.pruefling_id = ".$this->db_add_param($pruefling_id, FHC_INTEGER);
+		
+		if (!is_null($prestudent_id))
+			$qry .= " AND tbl_prestudent.prestudent_id = ".$this->db_add_param($prestudent_id, FHC_INTEGER);
+		
+		$qry .= " LIMIT 1";
+
+		if($result = $this->db_query($qry))
+		{
+			if ($this->db_num_rows($result) == 0)
+				return false;
+			else
+				return true;
 		}
 		else
 		{

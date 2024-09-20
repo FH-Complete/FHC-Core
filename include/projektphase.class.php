@@ -190,7 +190,7 @@ class projektphase extends basis_db
 		if(!is_null($foreignkey))
 			$qry .= " and projektphase_fk is NULL";
 
-		$qry .= " ORDER BY start, projektphase_fk DESC;";
+		$qry .= " ORDER BY tbl_projektphase.start, tbl_projektphase.bezeichnung, projektphase_fk DESC;";
 
 		if($this->db_query($qry))
 		{
@@ -718,10 +718,10 @@ class projektphase extends basis_db
 				(
 					(
 						(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-						AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+						AND (tbl_projekt.ende + interval '7 month 1 day' >=now() OR tbl_projekt.ende is null)
 					) AND (
 						(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-						AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+						AND (tbl_projektphase.ende + interval '7 month 1 day' >=now() OR tbl_projektphase.ende is null)
 					)
 				)
 				AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
@@ -787,14 +787,15 @@ class projektphase extends basis_db
 		(
 			(
 				(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-				AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+				AND (tbl_projekt.ende + interval '7 month 1 day' >=now() OR tbl_projekt.ende is null)
 			) AND (
 				(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-				AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+				AND (tbl_projektphase.ende + interval '7 month 1 day' >=now() OR tbl_projektphase.ende is null)
 			)
 		)
 		AND mitarbeiter_uid = ".$this->db_add_param($mitarbeiter_uid)."
-		AND tbl_projekt.projekt_kurzbz = ".$this->db_add_param($projekt_kurzbz);
+		AND tbl_projekt.projekt_kurzbz = ".$this->db_add_param($projekt_kurzbz). "
+		ORDER BY tbl_projektphase.start, tbl_projektphase.bezeichnung";
 
 		if($result = $this->db_query($qry))
 		{

@@ -1,0 +1,115 @@
+@import './Fhc.css';
+@import './components/searchbar.css';
+@import './components/verticalsplit.css';
+@import './components/FilterComponent.css';
+@import './components/Tabs.css';
+@import './components/Notiz.css';
+
+html {
+  font-size: .875em;
+}
+
+.navbar-dark .navbar-brand:focus {
+	box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+	z-index: 3;
+}
+
+.searchbar {
+	margin-right: 0!important;
+}
+.searchbar > .input-group {
+	margin-right: 0!important;
+}
+.searchbar > .input-group > * {
+	border-radius: 0!important;
+}
+
+.stv {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+.stv > header {
+	flex: 0 0 auto;
+}
+.stv > div {
+	flex: 1 1 auto;
+}
+
+#sidebarMenu {
+	width: 0%;
+}
+
+.tabulator-row.disabled.tabulator-row-odd .tabulator-cell {
+	color: var(--gray-400);
+}
+.tabulator-row.disabled.tabulator-row-even .tabulator-cell {
+	color: var(--gray-500);
+}
+
+/* Dropdown Toolbar Interessent, submenu */
+.dropend .dropdown-toggle.d-flex::after {
+	height: 0;
+}
+
+@media (min-width: 768px) {
+	#sidebarMenu {
+		visibility: visible!important;
+		transform: none;
+		position: inherit;
+		z-index: 1;
+	}
+}
+
+
+@media (max-width: 769px) {
+	.stv-verband {
+		max-height: calc(100% - 3rem);
+		overflow: auto;
+	}
+}
+
+
+.stv-verband .p-treetable-tbody > tr > td {
+	display: flex;
+	padding-top: .25rem!important;
+	padding-bottom: .25rem!important;
+}
+.stv-verband .p-treetable-tbody > tr > td > button {
+	flex: 0 0 auto;
+}
+.stv-verband .p-treetable-tbody > tr > td > span {
+	flex: 1 1 auto;
+}
+
+
+.stv-verband.p-tree {
+	/*overflow: auto;*/
+}
+.stv-verband.p-tree .p-treenode-icon {
+	display: none;
+}
+
+
+.stv-list {
+	display: flex;
+	flex-direction: column;
+}
+.stv-list > #filterTableDataset {
+	flex: 1 1 auto;
+}
+
+.toast.toast-success {
+	color: #0f5132;
+	background-color: #d1e7dd!important;
+	border-color: #badbcc!important;
+}
+.toast.toast-danger {
+	color: #842029;
+	background-color: #f8d7da!important;
+	border-color: #f5c2c7!important;
+}
+
+.has-filter .fa-filter {
+	color: var(--bs-success);
+}

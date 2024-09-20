@@ -200,6 +200,10 @@ class dokument_export
 		chdir($this->temp_folder);
 		file_put_contents($this->temp_folder . '/content.xml', $contentbuffer);
 
+		if ($this->xml_data->firstChild->tagName == 'error') {
+			$this->errormsg = $this->xml_data->firstChild->textContent;
+			return false;
+		}
 		// styles.xml erstellen
 		if(!is_null($this->styles_xsl))
 		{
@@ -557,7 +561,7 @@ class dokument_export
 
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, SIGNATUR_URL);
+		curl_setopt($ch, CURLOPT_URL, SIGNATUR_URL.'/'.SIGNATUR_SIGN_API);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 7);
 		curl_setopt($ch, CURLOPT_USERAGENT, "FH-Complete");
 
@@ -589,18 +593,19 @@ class dokument_export
 			curl_close($ch);
 			$resultdata = json_decode($result);
 
-			if (isset($resultdata->success) && $resultdata->success == 'true')
+			// If it is success
+			if (isset($resultdata->error) && $resultdata->error == 0)
 			{
 				$this->signed_filename = $this->temp_folder .'/signed.pdf';
-				file_put_contents($this->signed_filename, base64_decode($resultdata->document));
+				file_put_contents($this->signed_filename, base64_decode($resultdata->retval));
 				return true;
 			}
-			else
+			else // otherwise if it is an error
 			{
-				if(isset($resultdata->errormsg))
-					$this->errormsg = $resultdata->errormsg;
+				if(isset($resultdata->retval))
+					$this->errormsg = $resultdata->retval;
 				else
-					$this->errormsg = 'Unknown Error:'.print_r($resultdata,true);
+					$this->errormsg = 'Unknown Error:'.print_r($resultdata, true);
 				return false;
 			}
 		}

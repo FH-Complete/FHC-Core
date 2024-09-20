@@ -19,4 +19,13 @@ class Gemeinde_model extends DB_Model
 		
 		return $this->loadWhere(array("plz" => $plz));
 	}
+
+	public function checkLocation($plz, $gemeinde, $ort)
+	{
+		$this->db->where('ortschaftsname', $ort);
+		$this->db->where('name', $gemeinde);
+		$this->db->where('plz', $plz);
+
+		return (boolean)$this->db->count_all_results($this->dbTable);
+	}
 }

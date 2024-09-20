@@ -181,6 +181,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	<vbox>
 		<spacer flex="1"/>
 		<button id="student-note-copy" label="&lt;=" style="font-weight: bold;" oncommand="StudentNotenMove();"/>
+		<spacer id="student-note-copy-antrag-spacer" flex="2"/>
+		<button id="student-note-copy-antrag" label="&lt;=" style="font-weight: bold;" oncommand="StudentNotenMoveFromAntrag();"/>
 		<spacer flex="1"/>
 	</vbox>
 
@@ -262,20 +264,107 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			</treechildren>
 		</template>
 	</tree>
+	<label id="student-antragnoten-tree-label" value="Wiederholung" hidden="true"/>
+	<tree id="student-antragnoten-tree" seltype="multi" hidecolumnpicker="false" flex="1"
+		datasources="rdf:null" ref="http://www.technikum-wien.at/antragnote/liste"
+		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
+		flags="dont-build-content"
+	>
+
+		<treecols>
+			<treecol id="student-antragnoten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="false" primary="true"
+				class="sortDirectionIndicator"
+				sortActive="true"
+				sortDirection="ascending"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#lehrveranstaltung_bezeichnung"
+				onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="student-antragnoten-tree-note_bezeichnung" label="Note" flex="5" hidden="false"
+			   class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#note_bezeichnung" onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="student-antragnoten-tree-mitarbeiter_uid" label="MitarbeiterInUID" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#mitarbeiter_uid"  onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="student-antragnoten-tree-benotungsdatum" label="Benotungsdatum" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#benotungsdatum_iso"  onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="student-antragnoten-tree-benotungsdatum-iso" label="BenotungsdatumISO" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#benotungsdatum_iso"  onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="student-antragnoten-tree-freigabedatum" label="Freigabedatum" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#freigabedatum_iso"  onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="student-antragnoten-tree-studiensemester_kurzbz" label="Studiensemester" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#studiensemester_kurzbz"  onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="student-antragnoten-tree-note" label="NoteID" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#note"  onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="student-antragnoten-tree-prestudent_id" label="PrestudentInID" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#prestudent_id"  onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="student-antragnoten-tree-lehrveranstaltung_id" label="LehrveranstaltungID" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#lehrveranstaltung_id"  onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="student-antragnoten-tree-studierendenantrag_lehrveranstaltung_id" label="StudierendenantragLehrveranstaltungID" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/antragnote/rdf#studierendenantrag_lehrveranstaltung_id"  onclick="StudentAntragNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
+		</treecols>
+
+		<template>
+			<treechildren flex="1" >
+					<treeitem uri="rdf:*">
+					<treerow>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#lehrveranstaltung_bezeichnung"/>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#note_bezeichnung"/>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#mitarbeiter_uid"/>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#benotungsdatum"/>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#benotungsdatum_iso"/>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#freigabedatum"/>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#studiensemester_kurzbz"/>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#note"/>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#prestudent_id"/>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#lehrveranstaltung_id"/>
+						<treecell label="rdf:http://www.technikum-wien.at/antragnote/rdf#studierendenantrag_lehrveranstaltung_id"/>
+					</treerow>
+				</treeitem>
+			</treechildren>
+		</template>
+	</tree>
 	</vbox>
 </hbox>
 <hbox>
 	<label value="Note" control="student-noten-menulist-note"/>
 	<menulist id="student-noten-menulist-note" disabled="true"
-	          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
-	          ref="http://www.technikum-wien.at/note/liste"
-	          oncommand="StudentNoteSpeichern()">
+				xmlns:NOTE="http://www.technikum-wien.at/note/rdf#"
+				datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
+				ref="http://www.technikum-wien.at/note/liste"
+				oncommand="StudentNoteSpeichern()">
 		<template>
-			<menupopup>
-				<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
-	        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
-				  		  uri="rdf:*"/>
+			<rule NOTE:aktiv='false'>
+				<menupopup>
+					<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+								label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+								uri="rdf:*" style="text-decoration:line-through;"/>
 				</menupopup>
+			</rule>
+			<rule>
+				<menupopup>
+					<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+								label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+								uri="rdf:*"/>
+				</menupopup>
+			</rule>
 		</template>
 	</menulist>
 	<label value="Punkte" control="student-noten-textbox-punkte" hidden="<?php echo $punktehidden; ?>"/>

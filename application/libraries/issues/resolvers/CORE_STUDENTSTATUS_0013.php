@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Current Ausbildungssemester shouldn't be 0.
  */
 class CORE_STUDENTSTATUS_0013 implements IIssueResolvedChecker
 {
@@ -17,10 +17,10 @@ class CORE_STUDENTSTATUS_0013 implements IIssueResolvedChecker
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		$this->_ci->load->library('issues/PlausicheckLib');
+		$this->_ci->load->library('issues/plausichecks/AktSemesterNull');
 
 		// check if issue persists
-		$checkRes = $this->_ci->plausichecklib->getAktSemesterNull($params['studiensemester_kurzbz'], null, $params['prestudent_id']);
+		$checkRes = $this->_ci->aktsemesternull->getAktSemesterNull($params['studiensemester_kurzbz'], null, $params['prestudent_id']);
 
 		if (isError($checkRes)) return $checkRes;
 

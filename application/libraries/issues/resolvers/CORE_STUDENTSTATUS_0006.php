@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Status Dates and status studysemester dates should be in correct order.
  */
 class CORE_STUDENTSTATUS_0006 implements IIssueResolvedChecker
 {
@@ -14,10 +14,10 @@ class CORE_STUDENTSTATUS_0006 implements IIssueResolvedChecker
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		$this->_ci->load->library('issues/PlausicheckLib');
+		$this->_ci->load->library('issues/plausichecks/DatumStudiensemesterFalscheReihenfolge');
 
 		// check if issue persists
-		$checkRes = $this->_ci->plausichecklib->getDatumStudiensemesterFalscheReihenfolge(null, $params['prestudent_id']);
+		$checkRes = $this->_ci->datumstudiensemesterfalschereihenfolge->getDatumStudiensemesterFalscheReihenfolge(null, $params['prestudent_id']);
 
 		if (isError($checkRes)) return $checkRes;
 

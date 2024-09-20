@@ -1287,7 +1287,7 @@ class content extends basis_db
 					sichtbar=true
 					AND aktiv=true
 					AND version = (SELECT campus.get_highest_content_version (content_id))
-					AND template_kurzbz IN('contentmittitel','contentohnetitel','redirect')";
+					AND template_kurzbz IN('contentmittitel','contentohnetitel','redirect','contentmittitel_filterwidget')";
 		foreach($searchItems as $value)
 		{
 			$qry .= " AND 
@@ -1309,7 +1309,7 @@ class content extends basis_db
 		foreach($searchItems as $value)
 		{
 			$qry .= " AND
-						(template_kurzbz IN('contentmittitel','contentohnetitel')
+						(template_kurzbz IN('contentmittitel','contentohnetitel','contentmittitel_filterwidget')
 							AND
 							(
 								lower(content::text) like lower('%".$this->db_escape($value)."%')

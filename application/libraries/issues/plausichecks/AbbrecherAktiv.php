@@ -9,35 +9,21 @@ require_once('PlausiChecker.php');
  */
 class AbbrecherAktiv extends PlausiChecker
 {
-	public function executePlausiCheck($params)
-	{
-		$results = array();
+	protected $_base_sql = "
+		SELECT
+			pre.person_id, pre.prestudent_id, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
+		FROM
+			public.tbl_prestudentstatus pre_status
+			JOIN public.tbl_prestudent pre USING(prestudent_id)
+			JOIN public.tbl_student student USING(prestudent_id)
+			JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
+			JOIN public.tbl_studiengang stg ON pre.studiengang_kz = stg.studiengang_kz
+		WHERE
+			pre_status.status_kurzbz ='Abbrecher'
+			AND benutzer.aktiv=true";
 
-		// pass parameters needed for plausicheck
-		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
-
-		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getAbbrecherAktiv($studiengang_kz);
-
-		if (isError($prestudentRes)) return $prestudentRes;
-
-		if (hasData($prestudentRes))
-		{
-			$prestudents = getData($prestudentRes);
-
-			// populate results with data necessary for writing issues
-			foreach ($prestudents as $prestudent)
-			{
-				$results[] = array(
-					'person_id' => $prestudent->person_id,
-					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
-					'fehlertext_params' => array('prestudent_id' => $prestudent->prestudent_id),
-					'resolution_params' => array('prestudent_id' => $prestudent->prestudent_id)
-				);
-			}
-		}
-
-		// return the results
-		return success($results);
-	}
+	protected $_config_params = ['exkludierteStudiengaenge' => " AND stg.studiengang_kz NOT IN ?"];
+	protected $_params_for_checking = ['studiengang_kz' => " AND stg.studiengang_kz = ?", 'prestudent_id' => " AND pre.prestudent_id = ?"];
+	protected $_fehlertext_params = ['prestudent_id'];
+	protected $_resolution_params = ['prestudent_id'];
 }

@@ -321,6 +321,10 @@ $lv->loadLehrveranstaltungStudienplan($studienplan_id);
 foreach($lv->lehrveranstaltungen as $row_lva)
 	$lv_arr[$row_lva->lehrveranstaltung_id]=$row_lva;
 
+// Anrechnungen laden
+$anrechnung = new anrechnung();
+$anrechnung->getAnrechnungPrestudent($student->prestudent_id);
+
 echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($studienplan_id) - $student->vorname $student->nachname ( $student->uid )</h1>";
 
 echo '<table style="border: 1px solid black">
@@ -357,6 +361,7 @@ function drawTree($tree, $depth)
 {
 	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr, $aktornext;
 	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr, $student;
+	global $anrechnung;
 
 	foreach($tree as $row_tree)
 	{
@@ -425,7 +430,7 @@ function drawTree($tree, $depth)
 		    echo $icon." ".$termine." <a href=\"#\" class='Item' onClick=\"javascript:window.open('../lehre/ects/preview.php?lv=$row_tree->lehrveranstaltung_id&language=$sprache','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">".$row_tree->kurzbz.' - '.$row_tree->bezeichnung."</a>";
 		else
 		// Bezeichnung der Lehrveranstaltung
-		    echo $icon." ".$termine." ".$row_tree->kurzbz.' - '.$row_tree->bezeichnung.'('.$row_tree->lehrveranstaltung_id.')';
+		    echo $icon." ".$termine." ".$row_tree->kurzbz.' - '.$row_tree->bezeichnung.' ('.$row_tree->lehrveranstaltung_id.')';
 		echo $bende.'</td>';
 
 		// Semester
@@ -534,26 +539,26 @@ function drawTree($tree, $depth)
 			}
 			elseif(count($kompatibleLVs) > 0)
 			{
-
                 $i = 0;
-                while(!$found && $i < count($kompatibleLVs))
+				while(!$found && $i < count($kompatibleLVs))
                 {
                     foreach($kompatibleLVs as $komp)
                     {
-                        $anrechnung = new anrechnung();
-                        $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
-
-                        if(count($anrechnung->result) == 1)
+                        if(count($anrechnung->result))
                         {
-                            $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
-                            if(isset($noten_arr[$lv][$stsem]))
-                            {
-                                $found = true;
-                                if($note_pruef_arr[$noten_arr[$lv][$stsem]]->positiv)
-                                        $tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
-                                else
-                                        $tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
-                            }
+							foreach($anrechnung->result as $row)
+							{
+								$lv = $row->lehrveranstaltung_id_kompatibel;
+								if(isset($noten_arr[$lv][$stsem]) && $lv == $komp && $row_tree->lehrveranstaltung_id == $row->lehrveranstaltung_id)
+								{
+									$found = true;
+									if($note_pruef_arr[$noten_arr[$lv][$stsem]]->positiv)
+										$tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
+									else
+										$tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
+								}
+							}
+
                         }
                         $i++;
                     }
@@ -669,38 +674,39 @@ function drawTree($tree, $depth)
 
 function checkKompatibleLvs($kompatibleLVs, $student, $row_tree, $noten_arr, $note_pruef_arr, $p, $uid, $negativeNote= null)
 {
+	global $anrechnung;
 	$positiv = false;
 	$found = false;
 	$i = 0;
+
 	while(!$found && $i < count($kompatibleLVs))
 	{
 		foreach($kompatibleLVs as $komp)
 		{
-
-			$anrechnung = new anrechnung();
-			$anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
-
-			if(count($anrechnung->result) == 1)
+			if(count($anrechnung->result))
 			{
-				$lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
-				if(isset($noten_arr[$lv]))
+				foreach($anrechnung->result as $row)
 				{
-					$positiv=false;
-					foreach($noten_arr[$lv] as $note)
+					$lv = $row->lehrveranstaltung_id_kompatibel;
+					if(isset($noten_arr[$lv]) && $lv == $komp && $row_tree->lehrveranstaltung_id == $row->lehrveranstaltung_id)
 					{
-						if($note_pruef_arr[$note]->positiv)
-							$positiv=true;
-					}
+						$positiv=false;
+						foreach($noten_arr[$lv] as $note)
+						{
+							if($note_pruef_arr[$note]->positiv)
+								$positiv=true;
+						}
 
-					$found = true;
-				}
-				else
-				{
-					/* wenn zu mehreren kompatiblen lvs eine Anrechnung existiert
-					 * darf found nicht auf false gesetzt werden wenn es zuvor bereits auf true gesetzt wurde
-					 */
-					if(!$found)
-						$found = false;
+						$found = true;
+					}
+					else
+					{
+						/* wenn zu mehreren kompatiblen lvs eine Anrechnung existiert
+                         * darf found nicht auf false gesetzt werden wenn es zuvor bereits auf true gesetzt wurde
+                         */
+						if(!$found)
+							$found = false;
+					}
 				}
 			}
 			$i++;

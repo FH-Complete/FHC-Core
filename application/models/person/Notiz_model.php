@@ -139,11 +139,50 @@ class Notiz_model extends DB_Model
 	 */
 	public function getNotiz($person_id)
 	{
-		// Join with the table public.tbl_notizzuordnung using notiz_id
+		$this->addSelect('public.tbl_notiz.*');
 		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
 
 		return $this->loadWhere(array('person_id' => $person_id));
 	}
+
+	/**
+	 * gets all Notizen with Documententries for a certain type and type_id
+	 * @param String type of id eg. person_id, prestudent_id, mitarbeiter_uid, projekt_kurzbz, projektphase_id, projekttask_id,
+	 *         bestellung_id, lehreinheit_id, anrechnung_id, uid)
+	 * @param $id the corresponding id, part of public.tbl_notizzuordnung
+	 */
+	public function getNotizWithDocEntries($id, $type)
+	{
+			$qry = "
+				SELECT 
+						n.*, count(dms_id) as countDoc, z.notizzuordnung_id,
+						TO_CHAR (CASE 
+							WHEN n.updateamum >= n.insertamum THEN n.updateamum 
+							ELSE n.insertamum
+						END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate,
+						regexp_replace(n.text, '<[^>]*>', '', 'g') as text_stripped,
+						TO_CHAR(n.start::timestamp, 'DD.MM.YYYY') AS start_format,
+						TO_CHAR(n.ende::timestamp, 'DD.MM.YYYY') AS ende_format,
+						z.notiz_id, z.person_id as id, ? as type_id
+						
+				FROM
+						public.tbl_notiz n
+				JOIN 
+							public.tbl_notizzuordnung z USING (notiz_id)
+				LEFT JOIN 
+							public.tbl_notiz_dokument dok USING (notiz_id)
+				LEFT JOIN 
+							campus.tbl_dms_version USING (dms_id)
+				WHERE 
+				   z.$type  = ?
+				GROUP BY 
+					notiz_id, z.notizzuordnung_id
+			";
+
+		return $this->execQuery($qry, array($type, $id));
+
+	}
+
 
 	/**
 	 * gets all Notizen for a person with a specific title
@@ -231,6 +270,4 @@ class Notiz_model extends DB_Model
 		
 		return $this->loadWhere(array('anrechnung_id' => $anrechnung_id));
 	}
-	// ------------------------------------------------------------------------------------------------------
-
 }

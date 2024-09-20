@@ -414,7 +414,17 @@ else
 </body>
 
 <script type="text/javascript">
+	$(document).ready(function () {
+		$(document).on("keydown", function (e) {
+			if (((e.ctrlKey || e.metaKey) && e.keyCode === 85) || e.keyCode === 123) {
+				e.preventDefault();
+			}
+		});
 
+		$(document).on("contextmenu", function (e) {
+			e.preventDefault();
+		});
+	});
     // Get users Browser
     var ua = navigator.userAgent;
 

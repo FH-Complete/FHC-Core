@@ -182,6 +182,7 @@ class MailLib
 	{
 		if ($this->sended == $this->email_number_per_time_range)
 		{
+			$this->sended = 0;
 			sleep($this->email_time_range); // Wait!!!
 		}
 	}
