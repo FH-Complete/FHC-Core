@@ -31,7 +31,7 @@ export default {
     },
     template: /*html*/ `
       <!-- div that contains the content -->
-      <div v-html="content" v-if="content" :content="content" />
+      <div v-html="content" v-if="content" ></div>
       <p v-else>Content was not found</p>
       `,
   };
