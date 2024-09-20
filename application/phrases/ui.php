@@ -2145,5 +2145,1061 @@ $phrases = array(
 			)
 		)
 	)
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'toggle_nav',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Navigation ein-/ausblenden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Toggle navigation',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'geloescht',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Gel&ouml;scht',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Deleted',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldWriteAccess',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sie haben keine Schreibrechte für dieses Feld',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'You do not have writing rights for this field',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldMustBeArray',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das {field} Feld muss ein Array sein',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The {field} field must be an array',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_invalid_date',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Datumsformat ist ungültig oder liegt außerhalb des gültigen Bereichs.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The date format is invalid or out of range.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'textUebernehmen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Text &uuml;bernehmen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Use this text',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bitteBegruendungVervollstaendigen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte vervollständigen Sie die Begründung.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please complete the reason.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'errorStartdatumNichtInStudiensemester',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Startdatum liegt außerhalb des gewählten Studiensemesters.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The startdate is not within the selected study semester.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'errorEndedatumNichtInStudiensemester',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Endedatum liegt außerhalb des gewählten Studiensemesters.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The enddate is not within the selected study semester.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'errorStartdatumNachEndedatum',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Startdatum muss VOR dem Endedatum liegen.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The startdate must be BEFORE the enddate.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'frageSicherLoeschen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sicher löschen?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Definitely delete?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bearbeitetVon',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'bearbeitet von',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'edited by',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bearbeitetAm',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'bearbeitet am',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'edited on',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'fehlendeMinZeichen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Fehlende min. Zeichen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Missing min. Characters',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'schliessen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Schließen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Close',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'keinen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Keinen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'None',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'suche',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Suche',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Search',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'skip',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Überspringen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Skip',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'select_studiensemester',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Studiensemester auswählen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Select a semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'keineBerechtigung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Keine Berechtigung',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'No authority',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldRequired',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} ist erforderlich',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The Input Field {field} is required',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldNotInteger',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} muss eine Ganzzahl enthalten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The Field {field} must contain an integer',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldNotNumeric',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} darf nur Zahlen enthalten.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The Field {Field} must contain only numbers.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldNoValidEmail',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} muss eine gültige Email-Adresse enthalten.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The field {field} must contain a valid email address.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'lehrauftrag',
+  'category' => 'ui',
+  'phrase' => 'hinweistextLehrauftrag',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '<strong>Hinweis:</strong> Das Akzeptieren von Lehraufträgen ersetzt alle vorhergehenden Lehraufträge dieses Studiensemesters.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '<strong>Note:</strong> Accepting teaching assignments replaces all previous teaching assignments for this study semester.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'existiertBereits',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Existiert bereits',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Already exists',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'datumEndeVorDatumStart',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Datumende vor Datumstart',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Enddate after startdate',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'ui',
+  'phrase' => 'existiertBereitsInKombinationMitDerVersion',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Existiert bereits in Kombination mit der Version',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Already exists in combination with the Version',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'ui',
+  'phrase' => 'nichtGleichzeitigUntergeordnetUndUebergeordnet',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Software kann einer anderen Software nicht gleichzeitig untergeordnet und übergeordnet sein',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Software cannot be both subordinate and superior to other software at the same time',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_missingId',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Id {id} nicht gefunden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Missing Id {id}',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successSave',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Speichern erfolgreich',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Successfully saved',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successDelete',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Löschen erfolgreich',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Delete successful',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successAdvance',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Vorrückung Status erfolgreich',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Advance status successful',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successConfirm',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bestätigung Status erfolgreich',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Confirmation status successful',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'betriebsmittel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Resources',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'betriebsmittel_delete',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel löschen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'delete operating resource',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'betriebsmittel_confirm_delete',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel wirklich löschen?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Really delete operating resource?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'add_betriebsmittel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel anlegen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'create operating resource',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'edit_betriebsmittel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel bearbeiten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'edit operating resource',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successNewStatus',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '{countSuccess} erfolgreiche Statusänderung(en) auf {status}, {countError} Fehler',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '{countSuccess} successful status changes to {status}, {countError} errors',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_location_combination',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Ort, Gemeinde und Postleitzahl passen nicht zusammen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'City, municipality and postcode do not match',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bittePlzWaehlen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte gültige PLZ wählen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please select valid postcode',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bitteGemeindeWaehlen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte gültige Gemeinde wählen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please select valid municipality',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bitteStandortWaehlen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte Standort wählen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please select location',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
 );
 
