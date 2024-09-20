@@ -39,24 +39,78 @@ class Pruefung extends FHCAPI_Controller
 			'getLvsAndMas' => self::PERM_LOGGED,
 			'getMitarbeiterLv' => self::PERM_LOGGED,
 			'getNoten' => self::PERM_LOGGED,
-			'insertPruefung' => ['admin:r', 'assistenz:r'],
-			'updatePruefung' =>['admin:r', 'assistenz:r'],
-			'deletePruefung' =>['admin:r', 'assistenz:r'],
+			'insertPruefung' => ['admin:rw', 'assistenz:rw'],
+			'updatePruefung' =>['admin:rw', 'assistenz:rw'],
+			'deletePruefung' =>['admin:rw', 'assistenz:rw'],
 		]);
 
 		//Load Models
 		$this->load->model('education/LePruefung_model', 'PruefungModel');
 
-		//TODO(Manu) check
 		// Additional Permission Checks
-		//not working if activated?
-/*		if ($this->router->method == 'insertPruefung'
-			|| $this->router->method == 'updatePruefung'
-			|| $this->router->method == 'deletePruefung'
-		) {
-			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
+		//TODO(Manu) avoid php warning: Message: Illegal offset type
+		//version with postParameter
+		if ($this->router->method == 'insertPruefung') {
+
+			$student_uid = $this->input->post('student_uid');
+
+			$this->load->model('crm/Student_model', 'StudentModel');
+			$result = $this->StudentModel->load($student_uid);
+			$student = $this->getDataOrTerminateWithError($result);
+
+			$prestudent_id = current($student)->prestudent_id;
+
+
+			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:w', 'assistenz:w']);
+		}
+
+		// parameter from uri
+		if ($this->router->method == 'updatePruefung' || $this->router->method == 'deletePruefung') {
+
+			$pruefung_id = current(array_slice($this->uri->rsegments, 2));
+
+			$result = $this->PruefungModel->load($pruefung_id);
+			$pruefung = $this->getDataOrTerminateWithError($result);
+			$student_uid = current($pruefung)->student_uid;
+
+
+			$this->load->model('crm/Student_model', 'StudentModel');
+			$result = $this->StudentModel->load($student_uid);
+			$student = $this->getDataOrTerminateWithError($result);
+			$prestudent_id = current($student)->prestudent_id;
+
 			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:rw', 'assistenz:rw']);
-		}*/
+		}
+
+		if ($this->router->method == 'loadPruefung') {
+
+			$pruefung_id = current(array_slice($this->uri->rsegments, 2));
+
+			$result = $this->PruefungModel->load($pruefung_id);
+			$pruefung = $this->getDataOrTerminateWithError($result);
+			$student_uid = current($pruefung)->student_uid;
+
+
+			$this->load->model('crm/Student_model', 'StudentModel');
+			$result = $this->StudentModel->load($student_uid);
+			$student = $this->getDataOrTerminateWithError($result);
+			$prestudent_id = current($student)->prestudent_id;
+
+			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:r', 'assistenz:r']);
+		}
+
+		if ($this->router->method == 'getPruefungen') {
+				$student_uid = current(array_slice($this->uri->rsegments, 2));
+
+		//	$this->terminateWithError($student_id, self::ERROR_TYPE_GENERAL);
+
+			$this->load->model('crm/Student_model', 'StudentModel');
+			$result = $this->StudentModel->load($student_uid);
+			$student = $this->getDataOrTerminateWithError($result);
+			$prestudent_id = current($student)->prestudent_id;
+
+			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:r', 'assistenz:r']);
+		}
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -266,8 +320,6 @@ class Pruefung extends FHCAPI_Controller
 
 	public function getAllLehreinheiten(){
 
-		//TODO MANU (validations)
-
 		$lv_id = $this->input->post('lv_id');
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
 
@@ -343,8 +395,8 @@ class Pruefung extends FHCAPI_Controller
 	public function getLvsByStudent($student_uid, $studiensemester_kurzbz=null )
 	{
 		//bei post request
-/*		$student_uid = $this->input->post('student_uid');
-		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');*/
+		/*		$student_uid = $this->input->post('student_uid');
+				$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');*/
 
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 

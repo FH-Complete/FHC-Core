@@ -9,21 +9,17 @@ export default{
 		BsModal
 	},
 	inject: {
-		defaultSemester: {
-			from: 'defaultSemester',
+		currentSemester: {
+			from: 'currentSemester',
 		},
 		showHintKommPrfg: {
 			from: 'configShowHintKommPrfg',
 			default: false
 		},
-		showZgvErfuellt: {
-			from: 'configShowZgvErfuellt',
-			default: false
-		},
-/*		$reloadList: {
-			from: '$reloadList',
-			required: true
-		}*/
+		/*		$reloadList: {
+					from: '$reloadList',
+					required: true
+				}*/
 	},
 	props: {
 		uid: Number
@@ -57,8 +53,8 @@ export default{
 
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-plus"></i>';
-							button.title = 'neue Prüfung aus dieser LV erstellen';
+							button.innerHTML = '<i class="fa fa-copy"></i>';
+							button.title = this.$p.t('exam', 'newFromOld_pruefung');
 							button.addEventListener(
 								'click',
 								(event) =>
@@ -69,7 +65,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.title = 'Prüfung bearbeiten';
+							button.title = this.$p.t('exam', 'edit_pruefung');
 							button.addEventListener(
 								'click',
 								(event) =>
@@ -80,7 +76,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.title = 'Prüfung löschen';
+							button.title = this.$p.t('exam', 'delete_pruefung');
 							button.addEventListener(
 								'click',
 								() =>
@@ -100,16 +96,28 @@ export default{
 				{
 					event: 'tableBuilt',
 					handler: async () => {
-						await this.$p.loadCategory(['fristenmanagement', 'global', 'person', 'ui',]);
+						//console.log('tableBuilt');
+
+						/*						const filter = this.$refs.table.tabulator.getFilters().filter(filter => filter.field == 'studiensemester_kurzbz').pop();
+												if (filter) {
+													this.isFilterSet = true;
+													if (this.currentSemester !== filter.value) {
+														this.$refs.table.tabulator.setFilter('studiensemester_kurzbz', '=', this.currentSemester);
+													}
+												}*/
+
+						await this.$p.loadCategory(['fristenmanagement', 'global', 'ui', 'exam']);
 						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
+						/*						cm.getColumnByField('bezeichnung').component.updateDefinition({
+													title: this.$p.t('global', 'typ')
+												});*/
 
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
 						});
+
+
 					}
 				}
 			],
@@ -124,46 +132,34 @@ export default{
 			filter: false,
 			statusNew: true,
 			isStartDropDown: false,
-			currentSemester: false,
-	//		componentKey: 0,
+			//		componentKey: 0,
 			isFilterSet: false,
 		}
 	},
 	computed:{
-/*		lehrveranstaltungen(){
-			return this.listLvsAndLes.filter((value, index, self) => {
-				return self.indexOf(value) === index;
-			});
-		},*/
+		/*		lehrveranstaltungen(){
+					return this.listLvsAndLes.filter((value, index, self) => {
+						return self.indexOf(value) === index;
+					});
+				},*/
 		lv_teile(){
 			return this.listLvsAndLes.filter(lv => lv.lehrveranstaltung_id == this.pruefungData.lehrveranstaltung_id);
 		},
 		lv_teile_ma(){
 			return this.listLvsAndMas.filter(lv => lv.lehrveranstaltung_id == this.pruefungData.lehrveranstaltung_id);
-		},
-		semester_intern: {
-			get() {
-				if (this.currentSemester)
-					return this.currentSemester;
-				else
-					return false;
-			},
-			set(value) {
-				this.currentSemester = value;
-			}
-		},
+		}
 	},
 	watch: {
-/*		defaultSemester(newVal, oldVal) {
-			if (newVal !== oldVal) {
-				console.log("variable did change");
-				//this.reload(); // Methode aufrufen, um die Komponente neu zu laden
-				this.componentKey += 1;
-			}
-		},
-		modelValue() {
-			this.$refs.table.reloadTable();
-		}*/
+		/*		defaultSemester(newVal, oldVal) {
+					if (newVal !== oldVal) {
+						console.log("variable did change");
+						//this.reload(); // Methode aufrufen, um die Komponente neu zu laden
+						this.componentKey += 1;
+					}
+				},
+				modelValue() {
+					this.$refs.table.reloadTable();
+				}*/
 	},
 	methods:{
 		loadPruefung(pruefung_id) {
@@ -214,13 +210,13 @@ export default{
 			this.loadPruefung(pruefung_id).then(() => {
 				if(this.pruefungData.pruefung_id)
 
-						this.$fhcAlert
-							.confirmDelete()
-							.then(result => result
-								? pruefung_id
-								: Promise.reject({handled: true}))
-							.then(this.deletePruefung)
-							.catch(this.$fhcAlert.handleSystemError);
+					this.$fhcAlert
+						.confirmDelete()
+						.then(result => result
+							? pruefung_id
+							: Promise.reject({handled: true}))
+						.then(this.deletePruefung)
+						.catch(this.$fhcAlert.handleSystemError);
 
 			});
 		},
@@ -267,33 +263,34 @@ export default{
 		resetModal() {
 			this.pruefungData = {};
 
-/*			this.pruefungData.strasse = null;
-			this.pruefungData.zustellpruefunge = true;
-			this.pruefungData.heimatpruefunge = true;
-			this.pruefungData.rechnungspruefunge = false;
-			this.pruefungData.co_name = null;
-			this.pruefungData.firma_id = null;
-			this.pruefungData.name = null;
-			this.pruefungData.anmerkung = null;
-			this.pruefungData.typ = 'h';
-			this.pruefungData.nation = 'A';
-			this.pruefungData.plz = null;*/
+			/*			this.pruefungData.strasse = null;
+						this.pruefungData.zustellpruefunge = true;
+						this.pruefungData.heimatpruefunge = true;
+						this.pruefungData.rechnungspruefunge = false;
+						this.pruefungData.co_name = null;
+						this.pruefungData.firma_id = null;
+						this.pruefungData.name = null;
+						this.pruefungData.anmerkung = null;
+						this.pruefungData.typ = 'h';
+						this.pruefungData.nation = 'A';
+						this.pruefungData.plz = null;*/
 
 			this.statusNew = true;
 		},
 		reload() {
+			console.log('reload triggered');
 			this.$refs.table.reloadTable();
 		},
-/*		setFilter(semester) {
-			if (semester == 'open')
-				window.localStorage.setItem(LOCAL_STORAGE_ID_FILTER, this.filter ? 1 : 0);
-			else if( semester == 'default_semester')
-				this.$fhcApi.factory
-					.stv.filter.setSemester(this.defaultSemester)
-					.catch(this.$fhcAlert.handleSystemError);
+		/*		setFilter(semester) {
+					if (semester == 'open')
+						window.localStorage.setItem(LOCAL_STORAGE_ID_FILTER, this.filter ? 1 : 0);
+					else if( semester == 'default_semester')
+						this.$fhcApi.factory
+							.stv.filter.setSemester(this.defaultSemester)
+							.catch(this.$fhcAlert.handleSystemError);
 
-			this.$nextTick(this.$refs.table.reloadTable);
-		},*/
+					this.$nextTick(this.$refs.table.reloadTable);
+				},*/
 		getLvsByStudent(student_uid){
 			return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getLvsByStudent/' + student_uid)
 				.then(result => {
@@ -301,18 +298,18 @@ export default{
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-/*		//version post request
-getLvsByStudent(student_uid, studiensemester_kurzbz){
-			const data = {
-				student_uid: student_uid,
-				studiensemester_kurzbz: studiensemester_kurzbz
-			};
-			return this.$fhcApi.post('api/frontend/v1/stv/pruefung/getLvsByStudent/', data)
-				.then(result => {
-					this.listLvs = result.data;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},*/
+		/*		//version post request
+		getLvsByStudent(student_uid, studiensemester_kurzbz){
+					const data = {
+						student_uid: student_uid,
+						studiensemester_kurzbz: studiensemester_kurzbz
+					};
+					return this.$fhcApi.post('api/frontend/v1/stv/pruefung/getLvsByStudent/', data)
+						.then(result => {
+							this.listLvs = result.data;
+						})
+						.catch(this.$fhcAlert.handleSystemError);
+				},*/
 		getMaFromLv(lv_id){
 			return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getMitarbeiterLv/' + lv_id)
 				.then(result => {
@@ -335,7 +332,7 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 		handleTypeChange(){
 			if( this.showHintKommPrfg
 				&& (this.pruefungData.pruefungstyp_kurzbz === 'kommPruef'
-				|| this.pruefungData.pruefungstyp_kurzbz === 'zusKommPruef')){
+					|| this.pruefungData.pruefungstyp_kurzbz === 'zusKommPruef')){
 
 				//TODO(Manu) phrase
 				this.pruefungData.anmerkung = 'Bitte bei Neuanlage einer kommissionellen Prüfung das Datum der Noteneintragung ' +
@@ -344,14 +341,6 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 
 		},
 		prepareDropdowns(){
-
-			// Get Lvs from Student
-/*			this.getLvsByStudent(this.pruefungData.student_uid).then(() => {
-
-			}).catch(error => {
-				console.error('Error loading Lvs:', error);
-			});*/
-
 
 			// Get Ma from Lv
 			this.getMaFromLv(this.pruefungData.lehrveranstaltung_id).then(() => {
@@ -366,18 +355,17 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 				console.error('Error loading Lehreinheiten multiple:', error);
 			});
 
-
-
 			this.$refs.pruefungModal.show();
 		},
 		onSwitchChange() {
 			if (this.isFilterSet) {
-				console.log('filter gesetzt: ' + this.defaultSemester + ' uid ' + this.uid);
-				this.$refs.table.setFilter("studiensemester_kurzbz", "=", this.defaultSemester);
+				console.log('filter gesetzt: ' + this.currentSemester + ' uid ' + this.uid);
+				this.$refs.table.tabulator.setFilter("studiensemester_kurzbz", "=", this.currentSemester);
 				//TODO(Manu) TypeError: this.$refs.table.setFilter is not a function
 
 			} else {
 				console.log('Alle anzeigen');
+				this.$refs.table.tabulator.clearFilter("studiensemester_kurzbz");
 			}
 		},
 	},
@@ -418,58 +406,28 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 	{{showHintKommPrfg}}
 	{{showZgvErfuellt}}
 	
-	{{lv_teile}}
-	
 	<hr>
-	{{listLes}}
-	aktuelles Sem: {{defaultSemester}} <br>
-	current Sem: {{currentSemester}}
+
+	aktuelles Sem: {{currentSemester}}
 	<hr>
 	
 	  <div>
 	  
-		<form-input
-			container-class="form-switch"
-			type="checkbox"
-			label="Nur aktuelles Studiensemester anzeigen"
-			v-model="isFilterSet"
-			@change="onSwitchChange"
-			>
-		</form-input>
-	
 		<div class="justify-content-end pb-3">
-				<form-input
-					container-class="form-switch"
-					type="checkbox"
-					label="Aktuelles Studiensemester Anzeigen"
-					v-model="defaultSemester"
-					 @change="setSemester('defaultSemester')"
-					>
-				</form-input>
-<!--				<form-input
-					container-class="form-switch"
-					type="checkbox"
-					label="Aktuelles Studiensemester Anzeigen"
-					v-model="semester_intern"
-					@update:model-value="setFilter('current_sem')"
-					>
-				</form-input>
-			<div class="col-lg-3">
-				<form-input
-					container-class="form-switch"
-					type="checkbox"
-					:label="$p.t('stv/konto_filter_current_stg')"
-					v-model="studiengang_kz_intern"
-					:disabled="!stg_kz"
-					@update:model-value="setFilter('current_stg')"
-					>
-				</form-input>
-			</div>-->
+			<form-input
+				container-class="form-switch"
+				type="checkbox"
+				label="Nur aktuelles Studiensemester anzeigen"
+				v-model="isFilterSet"
+				@change="onSwitchChange"
+				>
+			</form-input>
 		</div>
 	
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
+			:tabulator-events="tabulatorEvents"
 			table-only
 			:side-menu="false"
 			reload
@@ -482,8 +440,8 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 		<!--Modal: pruefungModal-->
 		<bs-modal ref="pruefungModal">
 			<template #title>
-				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('ui', 'add_pruefung')}}</p>
-				<p v-else class="fw-bold mt-3">{{$p.t('ui', 'edit_pruefung')}}</p>
+				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('exam', 'add_pruefung')}}</p>
+				<p v-else class="fw-bold mt-3">{{$p.t('exam', 'edit_pruefung')}}</p>
 			</template>
 	
 			<form ref="form-pruefung" @submit.prevent class="row pt-3">
@@ -521,7 +479,7 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 						:key="le.lehreinheit_id"
 						:value="le.lehreinheit_id"
 						>
-						{{le.kurzbz}}-{{le.lehrform_kurzbz}} {{le.bezeichnung}} {{le.gruppe}} ({{le.mitarbeiter_uid}})
+						{{le.kurzbz}}-{{le.lehrform_kurzbz}} {{le.bezeichnung}} {{le.gruppe}} ({{le.kuerzel}})
 					</option>
 				</form-input>
 			
@@ -614,8 +572,6 @@ getLvsByStudent(student_uid, studiensemester_kurzbz){
 			</form>
 			
 			<template #footer>
-			statusNew: {{statusNew}}<br>
-			isStartDropDown: {{isStartDropDown}}
 				<button type="button" class="btn btn-primary" @click="statusNew ? addPruefung() : updatePruefung(pruefungData.pruefung_id)">{{$p.t('ui', 'speichern')}}</button>
 			</template>
 		</bs-modal>

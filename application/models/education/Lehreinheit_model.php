@@ -31,7 +31,7 @@ class Lehreinheit_model extends DB_Model
 		$this->addOrder('lehreinheit_id');
 		$les = $this->loadWhere(
 			array('lehrveranstaltung_id' => $lehrveranstaltung_id,
-				  'studiensemester_kurzbz' => $studiensemester)
+				'studiensemester_kurzbz' => $studiensemester)
 		);
 
 		if (hasData($les))
@@ -139,16 +139,18 @@ class Lehreinheit_model extends DB_Model
 						STRING_AGG(CONCAT(leg.semester, leg.verband, leg.gruppe), ' ') 
 					FROM lehre.tbl_lehreinheitgruppe leg 
 					WHERE leg.lehreinheit_id = le.lehreinheit_id
-				) AS gruppe
+				) AS gruppe,
+			    tma.kurzbz as kuerzel
 			FROM 
 				lehre.tbl_lehreinheit le
 			JOIN 
 				lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id
 			JOIN 
 				lehre.tbl_lehreinheitmitarbeiter ma USING (lehreinheit_id)
+			JOIN
+				public.tbl_mitarbeiter tma USING (mitarbeiter_uid)
 			WHERE 
 				lv.lehrveranstaltung_id = ?
-				--AND le.studiensemester_kurzbz = 'WS2021'
 				";
 
 		if (isset($studiensemester_kurzbz))
