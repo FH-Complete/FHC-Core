@@ -377,7 +377,7 @@ class Person_model extends DB_Model
 
 	public function checkUnruly($vorname, $nachname, $gebdatum)
 	{
-		$qry = "SELECT *
+		$qry = "SELECT person_id, vorname, nachname, gebdatum, unruly
 				FROM tbl_person
 				WHERE tbl_person.vorname = ? 
 					AND tbl_person.nachname = ? 
