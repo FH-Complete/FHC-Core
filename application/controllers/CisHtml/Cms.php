@@ -55,7 +55,7 @@ class Cms extends FHC_Controller
 
 		$content = current($content);
 
-		$this->load->view('CisVue/Cms/Content', ['content_id' => $content_id, 'template_kurzbz'=>$content->template_kurzbz , 'version' => $version, 'sprache' => $sprache, 'sichtbar' => $sichtbar]);
+		$this->load->view('CisHtml/Cms/Content', ['content_id' => $content_id, 'template_kurzbz'=>$content->template_kurzbz , 'version' => $version, 'sprache' => $sprache, 'sichtbar' => $sichtbar]);
 	}
 
 	/**
