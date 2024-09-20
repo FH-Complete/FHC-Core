@@ -47,9 +47,8 @@ export default {
 			return result;
 		}
 		const baseURL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/";
-		console.log(baseURL)
 		const fhcApiAxios = axios.create({
-			timeout: 5000,
+			timeout: 500000,
 			baseURL: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"
 		});
 
