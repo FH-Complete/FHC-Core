@@ -129,11 +129,13 @@ export default{
 			listLes: [],
 			listMas: [], //TODO(Manu) Filter statt SELECT DISTINCT
 			listMarks: [],
+			zeugnisData: [],
 			filter: false,
 			statusNew: true,
 			isStartDropDown: false,
 			//		componentKey: 0,
 			isFilterSet: false,
+			showHint: false,
 		}
 	},
 	computed:{
@@ -234,7 +236,6 @@ export default{
 				});
 		},
 		updatePruefung(pruefung_id){
-			console.log("update Prüfung" + pruefung_id);
 			this.$fhcApi.post('api/frontend/v1/stv/pruefung/updatePruefung/' + pruefung_id,
 				this.pruefungData
 			).then(response => {
@@ -246,6 +247,37 @@ export default{
 					window.scrollTo(0, 0);
 					this.reload();
 				});
+		},
+		checkTypeExam(){
+			if( this.showHintKommPrfg
+				&& (this.pruefungData.pruefungstyp_kurzbz === 'kommPruef'
+					|| this.pruefungData.pruefungstyp_kurzbz === 'zusKommPruef')){
+				this.showHint = true;
+			}
+			else
+				this.showHint = false;
+		},
+		checkChangeAfterExamDate(){
+			const data = {
+				student_uid: this.pruefungData.student_uid,
+				studiensemester_kurzbz: this.pruefungData.studiensemester_kurzbz,
+				lehrveranstaltung_id: this.pruefungData.lehrveranstaltung_id
+			};
+			this.$fhcApi.post('api/frontend/v1/stv/pruefung/checkZeugnisnoteLv/', data)
+				.then(result => {
+					this.zeugnisData = result.data;
+
+					let checkDate = this.zeugnisData[0].uebernahmedatum === '' ||
+					this.zeugnisData[0].benotungsdatum > this.zeugnisData[0].uebernahmedatum
+						? this.zeugnisData[0].benotungsdatum
+						: this.zeugnisData[0].uebernahmedatum;
+
+					if (checkDate >= this.pruefungData.datum
+						&& this.pruefungData.note !== this.zeugnisData[0].note) {
+						this.$fhcAlert.alertInfo(this.$p.t('exam', 'hinweis_changeAfterExamDate'));
+					}
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		deletePruefung(pruefung_id) {
 			this.$fhcApi.post('api/frontend/v1/stv/pruefung/deletePruefung/' + pruefung_id)
@@ -278,19 +310,8 @@ export default{
 			this.statusNew = true;
 		},
 		reload() {
-			console.log('reload triggered');
 			this.$refs.table.reloadTable();
 		},
-		/*		setFilter(semester) {
-					if (semester == 'open')
-						window.localStorage.setItem(LOCAL_STORAGE_ID_FILTER, this.filter ? 1 : 0);
-					else if( semester == 'default_semester')
-						this.$fhcApi.factory
-							.stv.filter.setSemester(this.defaultSemester)
-							.catch(this.$fhcAlert.handleSystemError);
-
-					this.$nextTick(this.$refs.table.reloadTable);
-				},*/
 		getLvsByStudent(student_uid){
 			return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getLvsByStudent/' + student_uid)
 				.then(result => {
@@ -298,18 +319,6 @@ export default{
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		/*		//version post request
-		getLvsByStudent(student_uid, studiensemester_kurzbz){
-					const data = {
-						student_uid: student_uid,
-						studiensemester_kurzbz: studiensemester_kurzbz
-					};
-					return this.$fhcApi.post('api/frontend/v1/stv/pruefung/getLvsByStudent/', data)
-						.then(result => {
-							this.listLvs = result.data;
-						})
-						.catch(this.$fhcAlert.handleSystemError);
-				},*/
 		getMaFromLv(lv_id){
 			return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getMitarbeiterLv/' + lv_id)
 				.then(result => {
@@ -328,17 +337,6 @@ export default{
 					this.listLes = response.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-		},
-		handleTypeChange(){
-			if( this.showHintKommPrfg
-				&& (this.pruefungData.pruefungstyp_kurzbz === 'kommPruef'
-					|| this.pruefungData.pruefungstyp_kurzbz === 'zusKommPruef')){
-
-				//TODO(Manu) phrase
-				this.pruefungData.anmerkung = 'Bitte bei Neuanlage einer kommissionellen Prüfung das Datum der Noteneintragung ' +
-					'(i. d. R. heute) eintragen, um den korrekten Fristenablauf der Wiederholung zu ermöglichen.';
-			}
-
 		},
 		prepareDropdowns(){
 
@@ -359,12 +357,9 @@ export default{
 		},
 		onSwitchChange() {
 			if (this.isFilterSet) {
-				console.log('filter gesetzt: ' + this.currentSemester + ' uid ' + this.uid);
 				this.$refs.table.tabulator.setFilter("studiensemester_kurzbz", "=", this.currentSemester);
-				//TODO(Manu) TypeError: this.$refs.table.setFilter is not a function
-
-			} else {
-				console.log('Alle anzeigen');
+			}
+			else {
 				this.$refs.table.tabulator.clearFilter("studiensemester_kurzbz");
 			}
 		},
@@ -403,16 +398,9 @@ export default{
 	template: `
 	<div class="stv-details-pruefung-pruefung-list 100 pt-3">
 	
-	{{showHintKommPrfg}}
-	{{showZgvErfuellt}}
-	
-	<hr>
+	{{zeugnisData}}
 
-	aktuelles Sem: {{currentSemester}}
-	<hr>
-	
-	  <div>
-	  
+	  <div>	  
 		<div class="justify-content-end pb-3">
 			<form-input
 				container-class="form-switch"
@@ -483,9 +471,7 @@ export default{
 					</option>
 				</form-input>
 			
-				<!--DropDown MitarbeiterIn
-				//TODO(Manu) phrase
-				-->
+				<!--DropDown MitarbeiterIn	-->
 				<form-input
 					container-class="mb-3"
 					type="select"
@@ -494,7 +480,7 @@ export default{
 					v-model="pruefungData.mitarbeiter_uid"
 					>
 					
-					<option :value="null"> -- keine Auswahl -- </option>
+					<option :value="null"> -- {{$p.t('exam', 'keineAuswahl')}} -- </option>
 					<option
 						v-for="ma in isStartDropDown ? lv_teile_ma : listMas"
 						:key="ma.mitarbeiter_uid"
@@ -504,20 +490,16 @@ export default{
 					</option>				
 				</form-input>
 			
-				<!--DropDown Typ Prüfungstermin
-				//TODO (Manu) phrase
-				-->
+				<!--DropDown Typ Prüfungstermin	-->
 				<form-input
 					container-class="mb-3"
 					type="select"
 					name="typ"
 					:label="$p.t('global/typ')"
 					v-model="pruefungData.pruefungstyp_kurzbz"
-					@change="handleTypeChange()"
+					@change="checkTypeExam"
 					>			
-					<option :value="null">
-						-- keine Auswahl --
-					</option>
+					<option :value="null">-- {{$p.t('exam', 'keineAuswahl')}} --</option>
 					<option
 						v-for="typ in listTypesExam"
 						:key="typ.pruefungstyp_kurzbz"
@@ -534,6 +516,7 @@ export default{
 					name="typ"
 					:label="$p.t('lehre/note')"
 					v-model="pruefungData.note"
+					@change="checkChangeAfterExamDate"
 					>
 					<option
 						v-for="note in listMarks"
@@ -559,6 +542,14 @@ export default{
 					:teleport="true"
 					>
 				</form-input>
+				
+				<div v-if="showHint">
+					<div class="form-control d-flex align-items-start">
+						<i class="fa fa-info-circle text-primary me-2"></i>
+						<div>{{$p.t('exam', 'hinweis_kommPrfg')}}</div>
+					</div>
+				</div>
+
 				
 				<form-input
 					container-class="mb-3"

@@ -39,6 +39,7 @@ class Pruefung extends FHCAPI_Controller
 			'getLvsAndMas' => self::PERM_LOGGED,
 			'getMitarbeiterLv' => self::PERM_LOGGED,
 			'getNoten' => self::PERM_LOGGED,
+			'checkZeugnisnoteLv' => self::PERM_LOGGED,
 			'insertPruefung' => ['admin:rw', 'assistenz:rw'],
 			'updatePruefung' =>['admin:rw', 'assistenz:rw'],
 			'deletePruefung' =>['admin:rw', 'assistenz:rw'],
@@ -431,5 +432,22 @@ class Pruefung extends FHCAPI_Controller
 		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
+	public function checkZeugnisnoteLv()
+	{
+		$student_uid = $this->input->post('student_uid');
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		$lehrveranstaltung_id = $this->input->post('lehrveranstaltung_id');
 
+		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
+
+		$result = $this->ZeugnisnoteModel->loadWhere(array(
+			'lehrveranstaltung_id' => $lehrveranstaltung_id,
+			'student_uid' => $student_uid,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz)
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+		return $this->terminateWithSuccess($data);
+
+	}
 }
