@@ -16,7 +16,7 @@ if(isset($template_kurzbz)){
 	}
 }
 
-$this->load->view('templates/CISVUE-Header', $includesArray);
+$this->load->view('templates/CISHTML-Header', $includesArray);
 ?>
 
 <?php if(!isset($content_id)) {

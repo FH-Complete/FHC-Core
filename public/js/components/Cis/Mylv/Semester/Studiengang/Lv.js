@@ -111,21 +111,20 @@ export default {
 			stg_kurzbzlang:studien_semester,
 		}"/>
 
-		<div v-if="module" class="card-header">
-			{{module}}
-		</div>
-		<div class="card-body d-flex justify-content-center align-items-center" :style="bodyStyle">
+		<div class="card-header">
+			<!-- {{module}} if the module of the lv is important then query the module from the api endpoint for LV-->
 			<h6 class="card-title">{{bezeichnung}}</h6>
-
 		</div>
-		<ul class="list-group border-top-0 border-bottom-0 rounded-0">
-			<template v-if="menu">
-				<li type="button" v-for="menuItem in menu" @click="openLvOption(menuItem)" class="list-group-item border-start-0 border-end-0">{{menuItem.name}}</li>
-			</template>
-			<template v-else>
-				<li class="text-center" class="list-group-item"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
-			</template>	
-		</ul>
+		<div class="card-body " :style="bodyStyle">
+			<ul class="list-group border-top-0 border-bottom-0 rounded-0">
+				<template v-if="menu">
+					<li type="button" v-for="menuItem in menu" @click="openLvOption(menuItem)" class="list-group-item border-0">{{menuItem.name}}</li>
+				</template>
+				<template v-else>
+					<li class="text-center" class="list-group-item"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
+				</template>
+			</ul>
+		</div>
 		<div class="card-footer">
 			<div class="row">
 				<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
