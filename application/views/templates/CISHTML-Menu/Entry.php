@@ -22,6 +22,8 @@ switch ($entry->template_kurzbz) {
 
 			if (strpos($url, '../cms/news.php') === 0)
 				$url = site_url('/CisHtml/Cms/news' . substr($url, 15));
+			if (strpos($url, '../index.ci.php') === 0)
+				$url = site_url() . str_replace("../index.ci.php","",$url);
 			if (strpos($url, '../') === 0)
 				$url = APP_ROOT . substr($url, 3);
 		}
@@ -37,7 +39,8 @@ switch ($entry->template_kurzbz) {
 		$this->load->view('templates/CISHTML-Menu/EntryBase', [
 			'entry' => $entry,
 			'menu_id' => $menu_id,
-			'link' => site_url('/CisHtml/Cms/content/' . $entry->content_id)
+			'link' => site_url('/CisHtml/Cms/content/' . $entry->content_id),
+			'target' => ''
 		]);
 		break;
 }
