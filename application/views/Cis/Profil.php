@@ -8,11 +8,11 @@ $includesArray = array(
 	
 );
 
-$this->load->view('templates/CISHTML-Header', $includesArray);
+$this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 
 <div id="content" >
 
 </div>
 
-<?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>
+<?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>

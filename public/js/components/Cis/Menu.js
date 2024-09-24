@@ -16,19 +16,27 @@ export default {
     },
     data: () => {
         return {
-            entries: []
+            entries: [],
+			activeEntry:null,
+			url:null,
         };
     },
+	methods:{
+		setActiveEntry(content_id){
+			this.activeEntry = content_id;
+		}
+	},
     created() {
         axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/CisVue/Menu').then(res => {
             this.entries = res.data.retval.childs;
         });
+		
     },
-    template: `
+    template: /*html*/`
+	<p>CISVUE HEADER</p>
     <button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    
     <a id="nav-logo" :href="rootUrl">
         <img :src="logoUrl" alt="Logo">
     </a>
@@ -51,7 +59,7 @@ export default {
             </ul>
             <div id="nav-main-menu" class="collapse collapse-horizontal show">
                 <div>
-                    <cis-menu-entry v-for="entry in entries" :key="entry.content_id" :entry="entry" />
+                    <cis-menu-entry @activeEntry="setActiveEntry" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
                 </div>
             </div>
         </div>

@@ -18,7 +18,7 @@ $sitesettings = array(
 );
 
 $this->load->view(
-	'templates/CISHTML-Header',
+	'templates/CISVUE-Header',
 	$sitesettings
 );
 ?>
@@ -222,6 +222,6 @@ $this->load->view(
 
 <?php
 $this->load->view(
-	'templates/CISHTML-Footer',
+	'templates/CISVUE-Footer',
 	$sitesettings
 );
