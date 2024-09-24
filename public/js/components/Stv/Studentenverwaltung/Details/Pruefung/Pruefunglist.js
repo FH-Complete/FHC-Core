@@ -16,10 +16,9 @@ export default{
 			from: 'configShowHintKommPrfg',
 			default: false
 		},
-		/*		$reloadList: {
-					from: '$reloadList',
-					required: true
-				}*/
+		lists: {
+			from: 'lists'
+		},
 	},
 	props: {
 		uid: Number
@@ -31,16 +30,17 @@ export default{
 				ajaxRequestFunc: this.$fhcApi.get,
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
+					//TODO(Manu) remove not needed entries
 					{title: "Datum", field: "format_datum"},
 					{title: "Lehrveranstaltung", field: "lehrveranstaltung_bezeichnung"},
 					{title: "Note", field: "note_bezeichnung"},
-					{title: "StudSem", field: "studiensemester_kurzbz"}, //just testing
+					//{title: "StudSem", field: "studiensemester_kurzbz"}, //just testing
 					{title: "Anmerkung", field: "anmerkung"},
 					{title: "Typ", field: "pruefungstyp_kurzbz"},
 					{title: "PruefungId", field: "pruefung_id", visible: false},
 					{title: "LehreinheitId", field: "lehreinheit_id", visible: false},
 					{title: "Student_uid", field: "student_uid", visible: false},
-					{title: "LV_id", field: "lehrveranstaltung_id", visible: false}, //just for testing
+					//{title: "LV_id", field: "lehrveranstaltung_id", visible: false}, //just for testing
 					{title: "Mitarbeiter_uid", field: "mitarbeiter_uid", visible: false},
 					{title: "Punkte", field: "punkte", visible: false},
 					{
@@ -96,28 +96,31 @@ export default{
 				{
 					event: 'tableBuilt',
 					handler: async () => {
-						//console.log('tableBuilt');
-
-						/*						const filter = this.$refs.table.tabulator.getFilters().filter(filter => filter.field == 'studiensemester_kurzbz').pop();
-												if (filter) {
-													this.isFilterSet = true;
-													if (this.currentSemester !== filter.value) {
-														this.$refs.table.tabulator.setFilter('studiensemester_kurzbz', '=', this.currentSemester);
-													}
-												}*/
-
-						await this.$p.loadCategory(['fristenmanagement', 'global', 'ui', 'exam']);
+						await this.$p.loadCategory(['fristenmanagement', 'global', 'lehre', 'exam', 'ui']);
 						let cm = this.$refs.table.tabulator.columnManager;
 
-						/*						cm.getColumnByField('bezeichnung').component.updateDefinition({
-													title: this.$p.t('global', 'typ')
-												});*/
-
+						cm.getColumnByField('format_datum').component.updateDefinition({
+							title: this.$p.t('global', 'datum')
+						});
+						cm.getColumnByField('lehrveranstaltung_bezeichnung').component.updateDefinition({
+							title: this.$p.t('lehre', 'lehrveranstaltung')
+						});
+						cm.getColumnByField('note_bezeichnung').component.updateDefinition({
+							title: this.$p.t('lehre', 'note')
+						});
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
 						});
-
-
+						cm.getColumnByField('pruefungstyp_kurzbz').component.updateDefinition({
+							title: this.$p.t('global', 'typ')
+						});
+						cm.getColumnByField('punkte').component.updateDefinition({
+							title: this.$p.t('exam', 'punkte')
+						});
+						//TODO(Manu) Uncaught TypeError: e.element.after is not a function
+/*						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'actions')
+						});*/
 					}
 				}
 			],
@@ -125,43 +128,26 @@ export default{
 			listTypesExam: [],
 			listLvsAndLes: [],
 			listLvsAndMas: [],
-			listLvs: [], //TODO(Manu) nachträglich sortieren
+			listLvs: [],
 			listLes: [],
-			listMas: [], //TODO(Manu) Filter statt SELECT DISTINCT
+			listMas: [],
 			listMarks: [],
 			zeugnisData: [],
+			checkData:[],
 			filter: false,
 			statusNew: true,
 			isStartDropDown: false,
-			//		componentKey: 0,
 			isFilterSet: false,
 			showHint: false,
 		}
 	},
 	computed:{
-		/*		lehrveranstaltungen(){
-					return this.listLvsAndLes.filter((value, index, self) => {
-						return self.indexOf(value) === index;
-					});
-				},*/
 		lv_teile(){
 			return this.listLvsAndLes.filter(lv => lv.lehrveranstaltung_id == this.pruefungData.lehrveranstaltung_id);
 		},
 		lv_teile_ma(){
 			return this.listLvsAndMas.filter(lv => lv.lehrveranstaltung_id == this.pruefungData.lehrveranstaltung_id);
 		}
-	},
-	watch: {
-		/*		defaultSemester(newVal, oldVal) {
-					if (newVal !== oldVal) {
-						console.log("variable did change");
-						//this.reload(); // Methode aufrufen, um die Komponente neu zu laden
-						this.componentKey += 1;
-					}
-				},
-				modelValue() {
-					this.$refs.table.reloadTable();
-				}*/
 	},
 	methods:{
 		loadPruefung(pruefung_id) {
@@ -177,6 +163,7 @@ export default{
 			this.isStartDropDown = true;
 			this.resetModal();
 
+			this.pruefungData.student_uid = this.uid;
 			this.pruefungData.note = 9;
 			this.pruefungData.datum = new Date();
 			this.pruefungData.pruefungstyp_kurzbz = null;
@@ -226,7 +213,11 @@ export default{
 			this.$fhcApi.post('api/frontend/v1/stv/Pruefung/insertPruefung/',
 				this.pruefungData
 			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+				this.checkData = response.data;
+				if (this.checkData === 2 || this.checkData === 5)
+					this.$fhcAlert.alertInfo(this.$p.t('exam', 'hinweis_changeAfterExamDate'));
+				else
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 				this.hideModal('pruefungModal');
 				this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
@@ -236,9 +227,11 @@ export default{
 				});
 		},
 		updatePruefung(pruefung_id){
+			this.checkChangeAfterExamDate();
 			this.$fhcApi.post('api/frontend/v1/stv/pruefung/updatePruefung/' + pruefung_id,
 				this.pruefungData
 			).then(response => {
+				this.checkData = response.data;
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 				this.hideModal('pruefungModal');
 				this.resetModal();
@@ -249,7 +242,7 @@ export default{
 				});
 		},
 		checkTypeExam(){
-			if( this.showHintKommPrfg
+			if (this.showHintKommPrfg
 				&& (this.pruefungData.pruefungstyp_kurzbz === 'kommPruef'
 					|| this.pruefungData.pruefungstyp_kurzbz === 'zusKommPruef')){
 				this.showHint = true;
@@ -258,26 +251,23 @@ export default{
 				this.showHint = false;
 		},
 		checkChangeAfterExamDate(){
-			const data = {
-				student_uid: this.pruefungData.student_uid,
-				studiensemester_kurzbz: this.pruefungData.studiensemester_kurzbz,
-				lehrveranstaltung_id: this.pruefungData.lehrveranstaltung_id
-			};
-			this.$fhcApi.post('api/frontend/v1/stv/pruefung/checkZeugnisnoteLv/', data)
+	        const data = {
+		                student_uid: this.pruefungData.student_uid,
+		                studiensemester_kurzbz: this.pruefungData.studiensemester_kurzbz,
+		                lehrveranstaltung_id: this.pruefungData.lehrveranstaltung_id
+	        };
+	        this.$fhcApi.post('api/frontend/v1/stv/pruefung/checkZeugnisnoteLv/', data)
 				.then(result => {
-					this.zeugnisData = result.data;
-
-					let checkDate = this.zeugnisData[0].uebernahmedatum === '' ||
-					this.zeugnisData[0].benotungsdatum > this.zeugnisData[0].uebernahmedatum
-						? this.zeugnisData[0].benotungsdatum
-						: this.zeugnisData[0].uebernahmedatum;
-
-					if (checkDate >= this.pruefungData.datum
-						&& this.pruefungData.note !== this.zeugnisData[0].note) {
-						this.$fhcAlert.alertInfo(this.$p.t('exam', 'hinweis_changeAfterExamDate'));
-					}
-				})
-				.catch(this.$fhcAlert.handleSystemError);
+							this.zeugnisData = result.data;
+							let checkDate = this.zeugnisData[0].uebernahmedatum === '' ||
+							this.zeugnisData[0].benotungsdatum > this.zeugnisData[0].uebernahmedatum
+									? this.zeugnisData[0].benotungsdatum
+										: this.zeugnisData[0].uebernahmedatum;
+							if (checkDate >= this.pruefungData.datum
+										&& this.pruefungData.note !== this.zeugnisData[0].note) {
+										this.$fhcAlert.alertInfo(this.$p.t('exam', 'hinweis_changeAfterExamDate'));
+								}
+					}).catch(this.$fhcAlert.handleSystemError);
 		},
 		deletePruefung(pruefung_id) {
 			this.$fhcApi.post('api/frontend/v1/stv/pruefung/deletePruefung/' + pruefung_id)
@@ -294,19 +284,6 @@ export default{
 		},
 		resetModal() {
 			this.pruefungData = {};
-
-			/*			this.pruefungData.strasse = null;
-						this.pruefungData.zustellpruefunge = true;
-						this.pruefungData.heimatpruefunge = true;
-						this.pruefungData.rechnungspruefunge = false;
-						this.pruefungData.co_name = null;
-						this.pruefungData.firma_id = null;
-						this.pruefungData.name = null;
-						this.pruefungData.anmerkung = null;
-						this.pruefungData.typ = 'h';
-						this.pruefungData.nation = 'A';
-						this.pruefungData.plz = null;*/
-
 			this.statusNew = true;
 		},
 		reload() {
@@ -339,19 +316,16 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		prepareDropdowns(){
-
 			// Get Ma from Lv
 			this.getMaFromLv(this.pruefungData.lehrveranstaltung_id).then(() => {
-			}).catch(error => {
-				console.error('Error loading Ma data:', error);
-			});
+			}).catch(this.$fhcAlert.handleSystemError);
 
 			// Get Lehreinheiten
-			this.getLehreinheiten(this.pruefungData.lehrveranstaltung_id, this.pruefungData.studiensemester_kurzbz).then(() => {
-
-			}).catch(error => {
-				console.error('Error loading Lehreinheiten multiple:', error);
-			});
+			this.getLehreinheiten(
+				this.pruefungData.lehrveranstaltung_id,
+				this.pruefungData.studiensemester_kurzbz)
+				.then(() => {
+			}).catch(this.$fhcAlert.handleSystemError);
 
 			this.$refs.pruefungModal.show();
 		},
@@ -398,14 +372,12 @@ export default{
 	template: `
 	<div class="stv-details-pruefung-pruefung-list 100 pt-3">
 	
-	{{zeugnisData}}
-
 	  <div>	  
 		<div class="justify-content-end pb-3">
 			<form-input
 				container-class="form-switch"
 				type="checkbox"
-				label="Nur aktuelles Studiensemester anzeigen"
+				:label="$p.t('exam/filter_currentSem')"
 				v-model="isFilterSet"
 				@change="onSwitchChange"
 				>
@@ -428,8 +400,8 @@ export default{
 		<!--Modal: pruefungModal-->
 		<bs-modal ref="pruefungModal">
 			<template #title>
-				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('exam', 'add_pruefung')}}</p>
-				<p v-else class="fw-bold mt-3">{{$p.t('exam', 'edit_pruefung')}}</p>
+				<p v-if="statusNew" class="fw-bold mt-3">{{ $p.t('exam', 'add_pruefung') }}</p>
+				<p v-else class="fw-bold mt-3">{{ $p.t('exam', 'edit_pruefung') }}</p>
 			</template>
 	
 			<form ref="form-pruefung" @submit.prevent class="row pt-3">
@@ -449,7 +421,7 @@ export default{
 						:key="lv.lehrveranstaltung_id"
 						:value="lv.lehrveranstaltung_id"
 						>
-						{{lv.bezeichnung}} Semester {{lv.semester}} {{lv.lehrform_kurzbz}}
+						{{ lv.bezeichnung }} Semester {{ lv.semester }} {{ lv.lehrform_kurzbz }}
 					</option>
 				</form-input>
 			
@@ -461,13 +433,13 @@ export default{
 					:label="$p.t('lehre/lehreinheit')"
 					v-model="pruefungData.lehreinheit_id"
 					>
-					<option v-if="!listLes.length" disabled> -- Bitte Lv_Teil wählen --</option>
+					<option v-if="!listLes.length" disabled> -- {{ $p.t('exam', 'bitteLvteilWaehlen') }} --</option>
 					<option
 						v-for="le in isStartDropDown ? lv_teile : listLes"
 						:key="le.lehreinheit_id"
 						:value="le.lehreinheit_id"
 						>
-						{{le.kurzbz}}-{{le.lehrform_kurzbz}} {{le.bezeichnung}} {{le.gruppe}} ({{le.kuerzel}})
+						{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
 					</option>
 				</form-input>
 			
@@ -480,13 +452,13 @@ export default{
 					v-model="pruefungData.mitarbeiter_uid"
 					>
 					
-					<option :value="null"> -- {{$p.t('exam', 'keineAuswahl')}} -- </option>
+					<option :value="null"> -- {{ $p.t('exam', 'keineAuswahl') }} -- </option>
 					<option
 						v-for="ma in isStartDropDown ? lv_teile_ma : listMas"
 						:key="ma.mitarbeiter_uid"
 						:value="ma.mitarbeiter_uid"
 						>
-						{{ma.vorname}} {{ma.nachname}}
+						{{ ma.vorname }} {{ ma.nachname }}
 					</option>				
 				</form-input>
 			
@@ -499,13 +471,13 @@ export default{
 					v-model="pruefungData.pruefungstyp_kurzbz"
 					@change="checkTypeExam"
 					>			
-					<option :value="null">-- {{$p.t('exam', 'keineAuswahl')}} --</option>
+					<option :value="null">-- {{ $p.t('exam', 'keineAuswahl') }} --</option>
 					<option
 						v-for="typ in listTypesExam"
 						:key="typ.pruefungstyp_kurzbz"
 						:value="typ.pruefungstyp_kurzbz"
 						>
-						{{typ.beschreibung}}
+						{{ typ.beschreibung }}
 					</option>
 				</form-input>
 				
@@ -516,7 +488,6 @@ export default{
 					name="typ"
 					:label="$p.t('lehre/note')"
 					v-model="pruefungData.note"
-					@change="checkChangeAfterExamDate"
 					>
 					<option
 						v-for="note in listMarks"
@@ -524,10 +495,10 @@ export default{
 						:value="note.note"
 						:disabled="!note.aktiv"
 						>
-						{{note.bezeichnung}}
+						{{ note.bezeichnung }}
 					</option>
 				</form-input>
-				
+		
 				<!--DropDown Datum-->
 				<form-input
 					container-class="mb-3"
@@ -546,11 +517,10 @@ export default{
 				<div v-if="showHint">
 					<div class="form-control d-flex align-items-start">
 						<i class="fa fa-info-circle text-primary me-2"></i>
-						<div>{{$p.t('exam', 'hinweis_kommPrfg')}}</div>
+						<div>{{ $p.t('exam', 'hinweis_kommPrfg') }}</div>
 					</div>
 				</div>
-
-				
+		
 				<form-input
 					container-class="mb-3"
 					type="textarea"
