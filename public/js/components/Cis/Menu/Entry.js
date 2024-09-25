@@ -20,16 +20,16 @@ export default {
 			if(newValue == this.entry.content_id){
 				this.entry.menu_open = true;
 			}else{
-				if(this.entry.childs instanceof Array){
-					for(let child of this.entry.childs){
-						child.menu_open = false;
-						
-					}
-				}
-				if (this.searchRecursiveChild(this.entry,newValue)){
+				if (this.searchRecursiveChild(this.entry, newValue)) {
 					this.entry.menu_open = true;
-				}else{
+				} else {
 					this.entry.menu_open = false;
+					if (this.entry.childs instanceof Array) {
+						for (let child of this.entry.childs) {
+							child.menu_open = false;
+
+						}
+					}
 				}
 			}
 		},
@@ -103,20 +103,22 @@ export default {
     },
     methods: {
 		searchRecursiveChild(entry,child_content_id){
-			if (entry.childs instanceof Array) {
-				for (let child of entry.childs) {
-					if (child.content_id == child_content_id){
-						return true;
-					}
+			if (typeof entry.childs == 'object' && !Array.isArray(entry.childs) && Object.entries(entry.childs).length > 0){
+				entry.childs = Object.values(entry.childs);
+			}
+			for (let child of entry.childs) {
+				if (child.content_id == child_content_id) {
+					return true;
+				}
+				if ((child.childs instanceof Array && child.childs.length > 0) || Object.values(child.childs).length > 0) {
 					if (this.searchRecursiveChild(child, child_content_id)){
 						return true;
 					}
 				}
-			}
+			}	
 			return false;
 		},
 		resendEmit(event){
-			console.log(this.entry.titel);
 			this.entry.menu_open = true;
 			this.$emit('activeEntry',event);
 		},
@@ -144,8 +146,10 @@ export default {
 		}
     },
     template: /*html*/`
-	<!--<p>activeContent: {{JSON.stringify(activeContent,null,2)}}</p>
-	<p>entry menu: {{JSON.stringify(entry.menu_open,null,2)}}</p>-->
+	<!-- DEBUGGIING PRINTS
+	<p>entry content_id: {{JSON.stringify(entry.content_id,null,2)}}</p>
+	<p>entry menu: {{JSON.stringify(entry.menu_open,null,2)}}</p>
+	-->
 	<div v-if="entry.template_kurzbz == 'include'">
         INCLUDE
     </div>
