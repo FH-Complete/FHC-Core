@@ -140,8 +140,11 @@ export default {
             this.collapse = new bootstrap.Collapse(this.$refs.children, { toggle: false });
         }
 
-		this.url = window.location.href;
-		if (window.location.href == this.link) {
+		this.url = new URL(window.location.href);
+		if (this.url.hash && this.url.hash.slice(1) == this.entry.titel){
+			this.$emit("activeEntry", this.entry.content_id);
+		}
+		else if (this.url.href == this.link) {
 			this.$emit("activeEntry", this.entry.content_id);
 		}
     },
