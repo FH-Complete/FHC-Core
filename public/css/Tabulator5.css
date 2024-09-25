@@ -39,8 +39,18 @@
 	z-index: 999999;
 }
 
+.tabulator {
+	font-size: 1rem;
+}
+
 .tabulator-cell .btn {
 	padding: 0 .7rem;
 	min-height: 25px;
 	min-width: 25px;
+}
+
+.tabulator-row.tabulator-selectable:focus {
+	box-shadow: 0 0 0 .24rem rgba(13,110,253,.25);
+	z-index: 1;
+	outline: 0;
 }
