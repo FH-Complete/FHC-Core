@@ -67,6 +67,12 @@ html {
   /* border-color: var(--fhc-cis-menu-lvl-1-border-hover); */
   background-color: var(--fhc-cis-menu-lvl-1-bg-hover);
 }
+
+/* makes the dropdown button darker*/
+#cis-header .btn-level-1+.btn:not(.btn-level-1){
+	background-color:var(--fhc-cis-menu-lvl-1-bg-hover) !important;
+}
+
 #cis-header .btn-level-2,
 #cis-header .btn-level-2 + .btn,
 #cis-nav .btn-level-2,

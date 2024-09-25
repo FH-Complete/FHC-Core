@@ -148,19 +148,7 @@ export default {
     </div>
     <template v-else>
         <template v-if="hasChilds">
-			<a v-if="link.substr(0, 1) == '#'"
-                @click.prevent="toggleCollapse"
-                :aria-expanded="entry.menu_open"
-                :href="link"
-                :class="{
-                    'btn btn-default rounded-0 w-100 text-start dropdown-toggle': true,
-                    ['btn-level-' + level]: true,
-                    collapsed: !entry.menu_open
-                }">
-                <span :class="{'text-decoration-underline':active}">{{ entry.titel }}</span>
-
-            </a>
-            <div v-else class="btn-group w-100">
+			<div class="btn-group w-100">
                 <a :href="link" :target="target"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
