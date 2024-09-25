@@ -44,7 +44,6 @@ define('BEGINNING_OF_TIME',					'1970-01-01');
 |--------------------------------------------------------------------------
 */
 // Foreign authentication methods
-define('AUTH_HBA',	'httpBasicAuth');
 define('AUTH_HBALDAP',	'httpBasicAuthLDAP');
 define('AUTH_BT',		'bewerbung');
 
