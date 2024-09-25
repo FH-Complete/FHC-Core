@@ -46,7 +46,10 @@ export default {
 		
     computed: {
 		active: function () {
-			if (this.activeContent) {
+			if (this.entry.menu_open){
+				return true;
+			}
+			else if (this.activeContent) {
 				return this.activeContent == this.entry.content_id;
 			} else {
 				return false;
