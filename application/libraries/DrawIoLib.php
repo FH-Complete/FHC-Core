@@ -108,4 +108,48 @@ EDGEPOINTS;
 EDGE;
 
     }
+    
+    public function renderSemesterLabel($id, $sem, $ects, $x, $y, $width, $height) 
+    {
+	echo <<<EOTEXT
+        <mxCell id="{$id}" value="&lt;b&gt;{$sem}. Semester&lt;br&gt;&lt;/b&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;{$ects} ECTS&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+	  <mxGeometry x="{$x}" y="{$y}" width="{$width}" height="{$height}" as="geometry" />
+        </mxCell>
+
+EOTEXT;	
+    }
+    
+    public function renderModulList($listid, $mod, $x, $y, $ects_width, $lv_height)
+    {	
+	$width = ceil($mod->ects * $ects_width);
+	$height = (count($mod->childs) + 1) * $lv_height;
+	$modul_ects = (int) $mod->ects;
+	echo <<<EOLIST
+	<mxCell id="{$listid}" value="{$mod->bezeichnung} ({$modul_ects})" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize={$lv_height};horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="{$x}" y="{$y}" width="{$width}" height="{$height}" as="geometry">
+            <mxRectangle x="{$x}" y="{$y}" width="{$width}" height="{$height}" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+EOLIST;
+	
+	$childnumber = 0;
+	foreach ($mod->childs as $child)
+	{
+	    $childnumber++;
+	    $childid = uniqid();
+	    $childheight = $childnumber * $lv_height;
+	    $child_ects = (int) $child->ects;
+	    echo <<<EOLISTITEM
+	<mxCell id="{$childid}" value="{$child->bezeichnung} ({$child_ects})" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="{$listid}">
+          <mxGeometry y="{$childheight}" width="{$width}" height="{$lv_height}" as="geometry" />
+        </mxCell>
+EOLISTITEM;
+	    
+	}
+	
+	return (object) array(
+	    'width'	=> $width,
+	    'height'	=> $height
+	);
+    }
 }

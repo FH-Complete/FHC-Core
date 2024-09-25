@@ -11,9 +11,14 @@ class ModulgrafikTest extends JOB_Controller
     const DEFAULT_XOFFSET = 40;
     const DEFAULT_YOFFSET = 30;
     const DEFAULT_WIDTH	  = 160;
+    const DEFAULT_SEMESTER_LABEL_WIDTH = 80;
+    const DEFAULT_ECTS_WIDTH = 40;
     const DEFAULT_HEIGHT  = 50;
     const DEFAULT_SPACING = 40;
     const DEFAULT_FONTSIZE = 8;
+
+    protected $curx;
+    protected $cury;
 
     public function __construct()
 	{
@@ -101,6 +106,7 @@ EOSQL;
 		    }
 		}
 		
+		echo "<!--\n\n";
 		foreach($semester as $sem => $mods)
 		{
 		    echo $sem . ". Semester: \n";
@@ -111,18 +117,14 @@ EOSQL;
 			printchilds($mod->childs, $level . "\t");
 		    }
 		}
-		exit();
+		echo "-->\n\n";
 		
 		if(count($errors) === 0) {
 		    $this->DrawIoLib->renderFileStart();
-
-		    foreach($roots AS &$root)
-		    {
-			$this->maxxoffset = self::DEFAULT_XOFFSET;
-			$this->DrawIoLib->renderDiagramStart($studienplan_id, 'Modulgrafik');
-			$this->renderSemester($semster);
-			$this->DrawIoLib->renderDiagramEnd();
-		    }
+		    $this->maxxoffset = self::DEFAULT_XOFFSET;
+		    $this->DrawIoLib->renderDiagramStart($studienplan_id, 'Modulgrafik');
+		    $this->renderSemester($semester);
+		    $this->DrawIoLib->renderDiagramEnd();
 		    $this->DrawIoLib->renderFileEnd();
 		}
 		else 
@@ -136,6 +138,32 @@ EOSQL;
 	    else 
 	    {
 		echo "Keine LVs gefunden.\n";
+	    }
+	}
+	
+	protected function renderSemester($semester)
+	{
+	    $cury = self::DEFAULT_YOFFSET;
+	    
+	    foreach($semester as $sem => $mods)
+	    {
+		$curx = self::DEFAULT_XOFFSET;
+		$id = uniqid();
+		$ects = 30; //TODO calc
+		$this->DrawIoLib->renderSemesterLabel($id, $sem, $ects, self::DEFAULT_XOFFSET, $cury, self::DEFAULT_SEMESTER_LABEL_WIDTH, self::DEFAULT_HEIGHT);
+		$curx += self::DEFAULT_SEMESTER_LABEL_WIDTH + self::DEFAULT_SPACING;
+		$maxmodulheight = 0;
+		foreach($mods as $mod)
+		{
+		    $modid = uniqid();
+		    $size = $this->DrawIoLib->renderModulList($modid, $mod, $curx, $cury, self::DEFAULT_ECTS_WIDTH, self::DEFAULT_HEIGHT);
+		    $curx += $size->width + self::DEFAULT_SPACING;
+		    if( $size->height > $maxmodulheight)
+		    {
+			$maxmodulheight = $size->height;
+		    }
+		}
+		$cury += $maxmodulheight + self::DEFAULT_SPACING;
 	    }
 	}
 }
