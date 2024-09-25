@@ -52,8 +52,7 @@ class authentication extends auth
 	// derzeit checkldapuser in functions.inc.php bzw per htaccess
 	public function checkpassword($username, $passwort)
 	{
-		var_dump($username);
-		if ($passwort=='1q2w3' 
+		if($passwort=='1q2w3' 
 			&& ($username=='pam'
 			|| $username=='admin'
 			|| $username=='assistenz1'
@@ -67,12 +66,8 @@ class authentication extends auth
 			|| $username=='lektor1'
 			|| $username=='lektor2'
 			|| $username=='lektor3'
-			|| $username=='aufnahme')
-			)
-			{
-				$_SERVER['PHP_AUTH_USER']=$username;
-				return true;
-			}
+			|| $username == 'aufnahme'))
+			return true;
 		else
 			return false;
 	}

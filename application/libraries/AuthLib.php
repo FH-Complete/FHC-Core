@@ -37,8 +37,7 @@ class AuthLib
 		// Gets CI instance
 		$this->_ci =& get_instance();
 
-		if ($authenticate === true) 
-			$this->_authenticate(); // if required -> authenticate the current user
+		if ($authenticate === true) $this->_authenticate(); // if required -> authenticate the current user
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -363,40 +362,6 @@ class AuthLib
 	}
 
 	/**
-	 * Checks if the user is already authenticated with HTTP basic authentication 
-	 * NOTE: this method also display a login, not possible to be avoided due HTTP basic authentication limitations
-	 */
-	private function _checkHBAuthentication()
-	{
-		$hta = error('Not authenticated', AUTH_NOT_AUTHENTICATED); // by default is NOT authenticated
-
-		// Checks if an HTTP basic authentication is active and checks credentials using LDAP
-		if (!isset($_SERVER['PHP_AUTH_USER']))
-		{
-			// If NOT send the header to perform an HTTP basic authentication
-			header('WWW-Authenticate: Basic realm="'.AUTH_NAME.'"');
-		}
-		else // otherwise
-		{
-			// NOTE: Username needs to be trimmed and lowered because htaccess is allowing login
-			$hta = $this->_createAuthObjByPerson(array('uid' => mb_strtolower(trim($_SERVER['PHP_AUTH_USER']))));
-		}
-
-		// Invalid credentials
-		// NOTE: this is a corner case because of the HTTP basic authentication
-		if (getCode($hta) == AUTH_NOT_AUTHENTICATED || getCode($hta) == AUTH_INVALID_CREDENTIALS)
-		{
-			$this->_showInvalidAuthentication(); // this also stop the execution
-		}
-		elseif (isError($hta)) // display error and stop execution
-		{
-			$this->_showError(getError($hta));
-		}
-
-		return $hta; // if success then is returned!
-	}
-	
-	/**
 	 * Checks if the user is already authenticated with HTTP basic authentication + LDAP
 	 * NOTE: this method also display a login, not possible to be avoided due HTTP basic authentication limitations
 	 */
@@ -470,9 +435,6 @@ class AuthLib
 			{
 				case AUTH_BT: // Bewerbung tool
 					$auth = $this->_checkBTAuthentication();
-					break;
-				case AUTH_HBA: // HTTP basic authentication
-					$auth = $this->_checkHBAuthentication();
 					break;
 				case AUTH_HBALDAP: // HTTP basic authentication + LDAP
 					$auth = $this->_checkHBALDAPAuthentication();

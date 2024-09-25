@@ -7,11 +7,9 @@ vendor/
 .project
 .buildpath
 .ptp-sync*
-.vscode/
 
 .htaccess
 .htaccessbak
-.htpasswd
 
 application/config/development/
 application/config/extensions/
