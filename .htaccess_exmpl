@@ -1,0 +1,11 @@
+# Be careful if you change the AuthName, also change it in the configs
+AuthName "FH-Complete"
+AuthType Basic
+# Change this to your root-folder
+AuthUserFile /var/www/html/.htpasswd
+
+require valid-user 
+
+# Follow symbolic links.
+Options +FollowSymLinks
+

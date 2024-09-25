@@ -5,7 +5,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 // Array or a string of authentication methods sorted by priority (highest to lowest)
 // NOTE: AUTH_HBALDAP works also as login page (old ugly HTTP basic authentication)
 //		should be placed at the end of the array
-$config['authentication_foreign_methods'] = array(AUTH_BT, AUTH_HBALDAP);
+$config['authentication_foreign_methods'] = array(AUTH_BT, AUTH_HBA, AUTH_HBALDAP);
 
 // Login method
 $config['authentication_login'] = AUTH_LDAP;
