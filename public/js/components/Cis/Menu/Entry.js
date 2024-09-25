@@ -16,6 +16,7 @@ export default {
     },
 	emits: ["activeEntry"],
 	watch:{
+
 		activeContent: function(newValue){
 			if(newValue == this.entry.content_id){
 				this.entry.menu_open = true;
@@ -41,6 +42,10 @@ export default {
 				console.log(this.entry.titel,"close")
 				this.collapse && this.collapse.hide();
 			}
+		},
+		url: function(newValue){
+			// update the active menu based on the new url
+			this.checkActiveUrl();
 		}
 	},
 		
@@ -102,6 +107,19 @@ export default {
         }
     },
     methods: {
+		checkActiveUrl(){
+			let url_hash_spaceSymbol_regex = new RegExp("%20","gi");
+			let url_hash_sharpSymbol_regex = new RegExp("^#");
+			let url_hash = this.url.hash;
+			url_hash = url_hash.replace(url_hash_spaceSymbol_regex, " ").replace(url_hash_sharpSymbol_regex,"");
+			
+			// if the url hash contains the titel of the menu 
+			// or if the url equals the link of a menu 
+			// then set the menu active 
+			if (url_hash == this.entry.titel || this.url.href == this.link) {
+				this.$emit("activeEntry", this.entry.content_id);
+			}
+		},
 		searchRecursiveChild(entry,child_content_id){
 			if (typeof entry.childs == 'object' && !Array.isArray(entry.childs) && Object.entries(entry.childs).length > 0){
 				entry.childs = Object.values(entry.childs);
@@ -141,13 +159,17 @@ export default {
         }
 
 		this.url = new URL(window.location.href);
-		if (this.url.hash && this.url.hash.slice(1) == this.entry.titel){
-			this.$emit("activeEntry", this.entry.content_id);
-		}
-		else if (this.url.href == this.link) {
-			this.$emit("activeEntry", this.entry.content_id);
-		}
+
+		// needed to check for updates on window.location.href
+		window.addEventListener('hashchange', ()=>{
+			this.url = new URL(window.location.href);
+		});
+		
+		
     },
+	beforeDestroy() {
+		window.removeEventListener('hashchange', this.checkActiveUrl);
+	},
     template: /*html*/`
 	<!-- DEBUGGIING PRINTS
 	<p>entry content_id: {{JSON.stringify(entry.content_id,null,2)}}</p>
