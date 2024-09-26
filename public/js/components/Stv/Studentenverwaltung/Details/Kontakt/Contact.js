@@ -51,6 +51,7 @@ export default{
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = this.$p.t('person', 'kontakt_edit');
 							button.addEventListener('click', (event) =>
 								this.actionEditContact(cell.getData().kontakt_id)
 							);
@@ -59,6 +60,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.title = this.$p.t('person', 'kontakt_delete');
 							button.addEventListener('click', () =>
 								this.actionDeleteContact(cell.getData().kontakt_id)
 							);
@@ -393,7 +395,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Kontakt"
+			:new-btn-label="this.$p.t('global', 'kontakt')"
 			@click:new="actionNewContact"
 			>
 		</core-filter-cmpt>

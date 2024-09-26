@@ -63,6 +63,7 @@ export default{
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = this.$p.t('person', 'bankvb_edit');
 							button.addEventListener('click', (event) =>
 								this.actionEditBankverbindung(cell.getData().bankverbindung_id)
 							);
@@ -71,6 +72,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.title = this.$p.t('person', 'bankvb_delete');
 							button.addEventListener('click', () =>
 								this.actionDeleteBankverbindung(cell.getData().bankverbindung_id)
 							);
@@ -96,6 +98,14 @@ export default{
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
+						cm.getColumnByField('name').component.updateDefinition({
+							title: this.$p.t('global', 'name')
+						});
+
+						cm.getColumnByField('typ').component.updateDefinition({
+							title: this.$p.t('global', 'typ')
+						});
+
 						cm.getColumnByField('anschrift').component.updateDefinition({
 							title: this.$p.t('person', 'anschrift')
 						});
@@ -105,9 +115,7 @@ export default{
 						cm.getColumnByField('blz').component.updateDefinition({
 							title: this.$p.t('person', 'blz')
 						});
-						cm.getColumnByField('typ').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
+
 						cm.getColumnByField('verrechnung').component.updateDefinition({
 							title: this.$p.t('person', 'verrechnung')
 						});
@@ -234,7 +242,7 @@ export default{
 					<form-input 
 						type="text"
 						name="name"
-						label="Name"
+						:label="$p.t('global/name')"
 						v-model="bankverbindungData.name"
 					>
 					</form-input>
@@ -328,7 +336,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Bankverbindung"
+			:new-btn-label="this.$p.t('person', 'bankverbindung')"
 			@click:new="actionNewBankverbindung"
 		>
 		</core-filter-cmpt>

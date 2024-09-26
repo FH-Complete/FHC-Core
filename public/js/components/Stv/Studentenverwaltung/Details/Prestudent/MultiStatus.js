@@ -92,7 +92,7 @@ export default{
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-forward"></i>';
-							button.title = 'Status vorrücken';
+							button.title = this.$p.t('ui', 'btn_statusVorruecken');
 							button.addEventListener('click', () =>
 								this.actionAdvanceStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -103,7 +103,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-check"></i>';
-							button.title = 'Status bestätigen';
+							button.title = this.$p.t('ui', 'btn_confirmStatus');
 							button.addEventListener('click', () =>
 								this.actionConfirmStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -114,7 +114,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.title = 'Status bearbeiten';
+							button.title = this.$p.t('ui', 'btn_editStatus');
 							button.addEventListener('click', () =>
 								this.actionEditStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -125,7 +125,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.title = 'Status löschen';
+							button.title = this.$p.t('ui', 'btn_deleteStatus');
 							button.addEventListener('click', () =>
 								this.actionDeleteStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -154,7 +154,7 @@ export default{
 				{
 					event: 'tableBuilt',
 					handler: async () => {
-						await this.$p.loadCategory(['lehre','global','person']);
+						await this.$p.loadCategory(['lehre','global','person','ui']);
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
@@ -328,7 +328,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Status"
+			:new-btn-label="this.$p.t('global', 'status')"
 			@click:new="actionNewStatus"
 			>
 			

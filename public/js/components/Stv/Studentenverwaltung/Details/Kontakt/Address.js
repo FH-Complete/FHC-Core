@@ -60,7 +60,7 @@ export default{
 					{title:"letzte Änderung", field:"updateamum", visible:false},
 					{title:"Rechnungsadresse", field:"rechnungsadresse", visible:false,
 						formatter: (cell, formatterParams, onRendered) => {
-							let output = cell.getValue() ? "ja" : "nein";
+							let output = cell.getValue() ? this.$p.t('ui','ja') : this.$p.t('ui','nein');
 							return output;
 						}
 					},
@@ -74,6 +74,7 @@ export default{
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = this.$p.t('person', 'adresse_edit');
 							button.addEventListener('click', (event) =>
 								this.actionEditAdress(cell.getData().adresse_id)
 							);
@@ -82,6 +83,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.title = this.$p.t('person', 'adresse_delete');
 							button.addEventListener('click', () =>
 								this.actionDeleteAdress(cell.getData().adresse_id)
 							);
@@ -103,7 +105,7 @@ export default{
 				{
 					event: 'tableBuilt',
 					handler: async () => {
-						await this.$p.loadCategory(['notiz','global','person', 'ui']);
+						await this.$p.loadCategory(['notiz', 'global', 'person', 'ui']);
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
@@ -574,7 +576,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Adresse"
+			:new-btn-label="this.$p.t('person', 'adresse')"
 			@click:new="actionNewAdress"
 			>
 		</core-filter-cmpt>

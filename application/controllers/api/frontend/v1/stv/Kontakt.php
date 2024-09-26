@@ -439,7 +439,6 @@ class Kontakt extends FHCAPI_Controller
 		{
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Kontakt_id']), self::ERROR_TYPE_GENERAL);
 		}
-		//	$this->outputJsonSuccess(current(getData($result)));
 		$this->terminateWithSuccess(current(getData($result)));
 	}
 
@@ -523,13 +522,6 @@ class Kontakt extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
-/*		if(isset($_POST['standort']))
-		{
-			$standort_id = $_POST['standort']['standort_id'];
-		}
-		else
-			$standort_id = null;*/
-
 		$uid = getAuthUID();
 		$kontakttyp = $this->input->post('kontakttyp');
 		$anmerkung = $this->input->post('anmerkung');
@@ -537,8 +529,6 @@ class Kontakt extends FHCAPI_Controller
 		$ext_id = $this->input->post('ext_id');
 		$person_id = $this->input->post('person_id');
 		$standort_id = $this->input->post('standort_id');
-
-		//return $this->terminateWithError("in update " . $standort_id, self::ERROR_TYPE_GENERAL);
 
 		$result = $this->KontaktModel->update(
 			[

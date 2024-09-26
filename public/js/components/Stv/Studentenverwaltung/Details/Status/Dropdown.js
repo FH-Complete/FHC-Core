@@ -35,7 +35,6 @@ export default {
 	data() {
 		return {
 			listDataToolbar: [],
-			//TODO(Manu) get from config
 			statiInteressent: ["Bewerber", "Aufgenommener", "Student" , "Wartender", "Abgewiesener"],
 			statiStudent: ["Abbrecher", "Unterbrecher", "Student" , "Diplomand", "Absolvent"]
 		};
