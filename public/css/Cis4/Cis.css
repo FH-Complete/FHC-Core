@@ -68,9 +68,25 @@ html {
   background-color: var(--fhc-cis-menu-lvl-1-bg-hover);
 }
 
-/* makes the dropdown button darker*/
+/* makes the dropdown button darker for level1*/
 #cis-header .btn-level-1+.btn:not(.btn-level-1){
 	background-color:var(--fhc-cis-menu-lvl-1-bg-hover) !important;
+}
+/* makes the dropdown button darker for level2*/
+#cis-header .btn-level-2+.btn:not(.btn-level-2){
+		background-color: var(--fhc-cis-menu-lvl-2-bg-hover) !important;
+}
+/* makes the dropdown button darker for level3*/
+#cis-header .btn-level-3+.btn:not(.btn-level-3){
+		background-color: var(--fhc-cis-menu-lvl-3-bg-hover) !important;
+}
+/* makes the dropdown button darker for level4*/
+#cis-header .btn-level-4+.btn:not(.btn-level-4){
+		background-color: var(--fhc-cis-menu-lvl-4-bg-hover) !important;
+}
+/* makes the dropdown button darker for level5*/
+#cis-header .btn-level-5+.btn:not(.btn-level-5){
+		background-color: var(--fhc-cis-menu-lvl-5-bg-hover) !important;
 }
 
 #cis-header .btn-level-2,

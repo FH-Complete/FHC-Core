@@ -16,17 +16,22 @@ if(isset($template_kurzbz)){
 	}
 }
 
-
-$this->load->view('templates/CISVUE-Header', $includesArray);
+if(defined('CIS4')){
+	$this->load->view('templates/CISVUE-Header', $includesArray);
+}else{
+	$this->load->view('templates/FHC-Header', $includesArray);
+}
 ?>
 
-
-<h2 ><?php echo isset($content_id)? "Content" : "News" ?></h2>
-<hr/>
 <div id="cms">
 <?php echo (isset($content_id) ? '<cms-content :content_id="'.$content_id.'" :version="'.$version.'" :sprache="'.$sprache.'" :sichtbar="'.$sichtbar.'" />' : '<cms-news/>'); ?>
-	
 </div>
 
-<?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>
+<?php
+if (defined('CIS4')) {
+	$this->load->view('templates/CISVUE-Footer', $includesArray);
+} else {
+	$this->load->view('templates/FHC-Footer', $includesArray);
+}
+ ?>
 
