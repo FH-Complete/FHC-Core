@@ -28,25 +28,24 @@ export default {
 					this.entry.menu_open = true;
 				} else {
 					this.entry.menu_open = false;
-					/* if (this.entry.childs instanceof Array) {
-						for (let child of this.entry.childs) {
-							child.menu_open = false;
-
-						}
-					} */
 				}
 			}
 		},
 		'entry.menu_open': function (newValue,oldValue) {
-			if (this.entry.titel == "Mein Studium") {
+			if (this.entry.titel == "Mein Studium") 
+			{
 				console.log("here",this.entry.titel,newValue,"newValue");
 			}
-			if (newValue) {
-				
+			if (newValue) 
+			{
 				console.log(this.entry.titel,"open")
+				// only invokes .show if this.collapse is not null
 				this.collapse && this.collapse.show();
-			} else {
+			} 
+			else 
+			{
 				console.log(this.entry.titel,"close")
+				// only invokes .hide if this.collapse is not null
 				this.collapse && this.collapse.hide();
 			}
 		},
