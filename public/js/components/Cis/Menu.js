@@ -32,7 +32,9 @@ export default {
 		});
     },
     template: /*html*/`
-	<p>CISVUE HEADER</p>
+	<!--<p>CISVUE HEADER</p>
+	<p>active entry content_id : {{activeEntry}}</p>
+	-->
 	<button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>

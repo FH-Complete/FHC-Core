@@ -11,7 +11,6 @@ export default {
     data: () => {
         return {
             collapse: null,
-			url:null,
         }
     },
 	emits: ["activeEntry"],
@@ -19,23 +18,31 @@ export default {
 
 		activeContent: function(newValue){
 			if(newValue == this.entry.content_id){
-				this.entry.menu_open = true;
+				// wenn der Menupunkt nicht bereits offen ist
+				if(!this.entry.menu_open){
+					this.entry.menu_open = true;
+				}
+				
 			}else{
 				if (this.searchRecursiveChild(this.entry, newValue)) {
 					this.entry.menu_open = true;
 				} else {
 					this.entry.menu_open = false;
-					if (this.entry.childs instanceof Array) {
+					/* if (this.entry.childs instanceof Array) {
 						for (let child of this.entry.childs) {
 							child.menu_open = false;
 
 						}
-					}
+					} */
 				}
 			}
 		},
 		'entry.menu_open': function (newValue,oldValue) {
+			if (this.entry.titel == "Mein Studium") {
+				console.log("here",this.entry.titel,newValue,"newValue");
+			}
 			if (newValue) {
+				
 				console.log(this.entry.titel,"open")
 				this.collapse && this.collapse.show();
 			} else {
@@ -43,10 +50,6 @@ export default {
 				this.collapse && this.collapse.hide();
 			}
 		},
-		url: function(newValue){
-			// update the active menu based on the new url
-			this.checkActiveUrl();
-		}
 	},
 		
     computed: {
@@ -107,16 +110,16 @@ export default {
         }
     },
     methods: {
-		checkActiveUrl(){
+		checkActiveUrl(url){
 			let url_hash_spaceSymbol_regex = new RegExp("%20","gi");
 			let url_hash_sharpSymbol_regex = new RegExp("^#");
-			let url_hash = this.url.hash;
+			let url_hash = url.hash;
 			url_hash = url_hash.replace(url_hash_spaceSymbol_regex, " ").replace(url_hash_sharpSymbol_regex,"");
 			
 			// if the url hash contains the titel of the menu 
 			// or if the url equals the link of a menu 
 			// then set the menu active 
-			if (url_hash == this.entry.titel || this.url.href == this.link) {
+			if (url_hash == this.entry.titel || url.href == this.link) {
 				this.$emit("activeEntry", this.entry.content_id);
 			}
 		},
@@ -141,13 +144,19 @@ export default {
 			this.$emit('activeEntry',event);
 		},
         toggleCollapse(evt) {
-            if (this.level > 1 && this.collapse !== null) {
+            if (this.level > 1 && this.collapse !== null) 
+			{
                 this.entry.menu_open = !this.entry.menu_open;
                 this.collapse.toggle(evt.target);
             }else{
-				this.active ? 
-				this.$emit("activeEntry", null): 
-				this.$emit("activeEntry", this.entry.content_id);
+				if (this.active)
+				{
+					this.$emit("activeEntry", null); 
+				}
+				else
+				{
+					this.$emit("activeEntry", this.entry.content_id);
+				}
 			}
         }
     },
@@ -158,18 +167,8 @@ export default {
             this.collapse = new bootstrap.Collapse(this.$refs.children, { toggle: false });
         }
 
-		this.url = new URL(window.location.href);
-
-		// needed to check for updates on window.location.href
-		window.addEventListener('hashchange', ()=>{
-			this.url = new URL(window.location.href);
-		});
-		
-		
+		this.checkActiveUrl(new URL(window.location.href));
     },
-	beforeDestroy() {
-		window.removeEventListener('hashchange', this.checkActiveUrl);
-	},
     template: /*html*/`
 	<!-- DEBUGGIING PRINTS
 	<p>entry content_id: {{JSON.stringify(entry.content_id,null,2)}}</p>
@@ -181,7 +180,7 @@ export default {
     <template v-else>
         <template v-if="hasChilds">
 			<div class="btn-group w-100">
-                <a :href="link" :target="target"
+                <a :href="link" :target="target" @click="toggleCollapse"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
                         ['btn-level-' + level]: true,
