@@ -45,8 +45,12 @@ class Address extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	public function getPlaces($plz)
+	public function getPlaces($plz = null)
 	{
+		//TODO(Manu) check with Chris
+		if (!$plz){
+			$plz = $this->input->post('plz');
+		}
 		$this->load->model('codex/Gemeinde_model', 'GemeindeModel');
 
 		$this->load->library('form_validation');

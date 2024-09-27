@@ -18,10 +18,15 @@ export default{
 		uid: Number
 	},
 	data() {
-		return{
+		return {
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/kontakt/getAdressen/' + this.uid,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.$fhcApi.factory.stv.kontakt.getAdressen,
+				ajaxParams: () => {
+					return {
+						id: this.uid
+					};
+				},
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
 				columns:[
@@ -219,9 +224,8 @@ export default{
 			});
 		},
 		addNewAddress(addressData) {
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewAddress/' + this.uid,
-				this.addressData
-			).then(response => {
+			return this.$fhcApi.factory.stv.kontakt.addNewAddress(this.uid, this.addressData)
+				.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('adressModal');
 					this.resetModal();
@@ -236,7 +240,7 @@ export default{
 		},
 		loadAdress(adress_id) {
 			this.statusNew = false;
-			return this.$fhcApi.get('api/frontend/v1/stv/kontakt/loadAddress/' + adress_id)
+			return this.$fhcApi.factory.stv.kontakt.loadAddress(adress_id)
 				.then(result => {
 						this.addressData = result.data;
 						return result;
@@ -244,7 +248,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateAddress(adress_id) {
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateAddress/' + adress_id,
+			return this.$fhcApi.factory.stv.kontakt.updateAddress(adress_id,
 				this.addressData
 			).then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -257,7 +261,7 @@ export default{
 			});
 		},
 		deleteAddress(adress_id) {
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/deleteAddress/' + adress_id)
+			return this.$fhcApi.factory.stv.kontakt.deleteAddress(adress_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				}).catch(this.$fhcAlert.handleSystemError)
@@ -267,16 +271,14 @@ export default{
 				});
 		},
 		loadPlaces() {
-			if (this.abortController.places)
-				this.abortController.places.abort();
+			//TODO(Manu) check with chris if its okay without abortion controller
+/*			if (this.abortController.places)
+				this.abortController.places.abort();*/
 			if (this.addressData.nation != 'A' || !this.addressData.plz)
 				return;
 
-			this.abortController.places = new AbortController();
-			this.$fhcApi
-				.get('api/frontend/v1/stv/address/getPlaces/' + this.addressData.plz, undefined, {
-					signal: this.abortController.places.signal
-				})
+			//this.abortController.places = new AbortController();
+			return this.$fhcApi.factory.stv.kontakt.getPlaces(this.addressData.plz)
 				.then(result => {
 					this.places = result.data;
 				});
@@ -288,8 +290,7 @@ export default{
 					});*/
 		},
 		search(event) {
-			return this.$fhcApi
-				.get('api/frontend/v1/stv/kontakt/getFirmen/' + event.query)
+			return this.$fhcApi.factory.stv.kontakt.getFirmen(event.query)
 				.then(result => {
 					this.filteredFirmen = result.data.retval;
 				});
@@ -316,18 +317,17 @@ export default{
 		},
 	},
 	created() {
-		this.$fhcApi
-			.get('api/frontend/v1/stv/address/getNations')
+		this.$fhcApi.factory.stv.kontakt.getNations()
 			.then(result => {
 				this.nations = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.get('api/frontend/v1/stv/kontakt/getAdressentypen')
+
+		this.$fhcApi.factory.stv.kontakt.getAdressentypen()
 			.then(result => {
 				this.adressentypen = result.data;
 			})
-			.catch(this.$fhcAlert.handleSystemError)
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-details-kontakt-address h-100 pt-3">

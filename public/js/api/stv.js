@@ -2,12 +2,14 @@ import verband from './stv/verband.js';
 import students from './stv/students.js';
 import filter from './stv/filter.js';
 import konto from './stv/konto.js';
+import kontakt from './stv/kontakt.js';
 
 export default {
 	verband,
 	students,
 	filter,
 	konto,
+	kontakt,
 	configStudent() {
 		return this.$fhcApi.get('api/frontend/v1/stv/config/student');
 	},

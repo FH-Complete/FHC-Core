@@ -97,7 +97,22 @@ class Kontakt extends FHCAPI_Controller
 			|| $this->router->method == 'deleteContact'
 			|| $this->router->method == 'deleteBankverbindung'
 		) {
-			$id = current(array_slice($this->uri->rsegments, 2));
+
+			//TODO(manu) build all new with postparamater
+
+			if($this->input->post('address_id'))
+				$id = $this->input->post('address_id');
+			if($this->input->post('adresse_id'))
+				$id = $this->input->post('adresse_id');
+			if($this->input->post('bankverbindung_id'))
+				$id = $this->input->post('bankverbindung_id');
+			if($this->input->post('kontakt_id'))
+				$id = $this->input->post('kontakt_id');
+
+			//$id = current(array_slice($this->uri->rsegments, 2));
+		//	$id = $this->input->post('address_id') || $this->input->post('adresse_id');
+			//$id: no more uri parameter
+		//	$this->terminateWithError($this->router->method, self::ERROR_TYPE_GENERAL);
 
 			$model = 'person/Adresse_model';
 			if ($this->router->method == 'loadContact'
@@ -203,8 +218,11 @@ class Kontakt extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function updateAddress($address_id)
+	public function updateAddress()
 	{
+		//TODO(Manu) rename all to same
+		$address_id = $this->input->post('adresse_id');
+
 		$uid = getAuthUID();
 		$this->form_validation->set_rules('plz', 'PLZ', 'required|numeric', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'PLZ']),
@@ -279,8 +297,10 @@ class Kontakt extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function loadAddress($adresse_id)
+	public function loadAddress()
 	{
+		$adresse_id = $this->input->post('address_id');
+
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 
 		$this->AdresseModel->addSelect('public.tbl_adresse.*');
@@ -306,8 +326,12 @@ class Kontakt extends FHCAPI_Controller
 		$this->terminateWithSuccess(current(getData($result)) ? : null);
 	}
 
-	public function deleteAddress($adresse_id)
+	public function deleteAddress()
 	{
+		//TODO(Manu) rename all to same
+		$adresse_id = $this->input->post('address_id');
+	//	return $this->terminateWithError($adresse_id, self::ERROR_TYPE_GENERAL);
+
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 		$result = $this->AdresseModel->load([
 			'adresse_id'=> $adresse_id,
@@ -418,8 +442,9 @@ class Kontakt extends FHCAPI_Controller
 		}
 	}
 
-	public function loadContact($kontakt_id)
+	public function loadContact()
 	{
+		$kontakt_id = $this->input->post('kontakt_id');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
 		$this->KontaktModel->addSelect('*, public.tbl_kontakt.*');
@@ -494,8 +519,9 @@ class Kontakt extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function updateContact($kontakt_id)
+	public function updateContact()
 	{
+		$kontakt_id = $this->input->post('kontakt_id');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
 		if(!$kontakt_id)
@@ -554,8 +580,9 @@ class Kontakt extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function deleteContact($kontakt_id)
+	public function deleteContact()
 	{
+		$kontakt_id = $this->input->post('kontakt_id');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
 		$result = $this->KontaktModel->delete(
@@ -640,8 +667,10 @@ class Kontakt extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function loadBankverbindung($bankverbindung_id)
+	public function loadBankverbindung()
 	{
+		$bankverbindung_id = $this->input->post('bankverbindung_id');
+
 		$this->load->model('person/Bankverbindung_model', 'BankverbindungModel');
 
 		$this->BankverbindungModel->addSelect('*');
@@ -716,8 +745,10 @@ class Kontakt extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function deleteBankverbindung($bankverbindung_id)
+	public function deleteBankverbindung()
 	{
+		$bankverbindung_id = $this->input->post('bankverbindung_id');
+
 		$this->load->model('person/Bankverbindung_model', 'BankverbindungModel');
 
 		$result = $this->BankverbindungModel->delete(

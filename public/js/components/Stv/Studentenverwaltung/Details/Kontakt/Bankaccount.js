@@ -16,8 +16,13 @@ export default{
 	data() {
 		return{
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Kontakt/getBankverbindung/' + this.uid,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.$fhcApi.factory.stv.kontakt.getBankverbindung,
+				ajaxParams: () => {
+					return {
+						id: this.uid
+					};
+				},
 				ajaxResponse: (url, params, response) => response.data,
 				columns:[
 					{title:"Name", field:"name"},
@@ -159,9 +164,8 @@ export default{
 			});
 		},
 		addNewBankverbindung(bankverbindungData) {
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewBankverbindung/' + this.uid,
-				this.bankverbindungData
-			).then(response => {
+			return this.$fhcApi.factory.stv.kontakt.addNewBankverbindung(this.uid, this.bankverbindungData)
+			.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('bankverbindungModal');
 					this.resetModal();
@@ -173,7 +177,7 @@ export default{
 		},
 		loadBankverbindung(bankverbindung_id){
 			this.statusNew = false;
-			return this.$fhcApi.get('api/frontend/v1/stv/kontakt/loadBankverbindung/' + bankverbindung_id)
+			return this.$fhcApi.factory.stv.kontakt.loadBankverbindung(bankverbindung_id)
 				.then(
 				result => {
 					this.bankverbindungData = result.data;
@@ -182,7 +186,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateBankverbindung(bankverbindung_id){
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateBankverbindung/' + bankverbindung_id,
+			return this.$fhcApi.factory.stv.kontakt.updateBankverbindung(bankverbindung_id,
 				this.bankverbindungData)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -195,7 +199,7 @@ export default{
 			});
 		},
 		deleteBankverbindung(bankverbindung_id){
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/deleteBankverbindung/' + bankverbindung_id)
+			return this.$fhcApi.factory.stv.kontakt.deleteBankverbindung(bankverbindung_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				}).catch(this.$fhcAlert.handleSystemError)
