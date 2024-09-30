@@ -67,6 +67,28 @@ class Content_model extends DB_Model
 	}
 
 	/**
+	 * Sucht die content_id fuer den CIS4_Root Menu content
+	 *
+	 * @return integer|null			content_id of the Cis4_Root Menu
+	 */
+	public function getCIS4_ContentID(){
+		$CIS4_ROOT_CONTENT = $this->loadWhere(["beschreibung"=>"CIS4_ROOT"]);
+		if(isError($CIS4_ROOT_CONTENT))
+		{
+			return null;
+		}
+		$CIS4_ROOT_CONTENT = getData($CIS4_ROOT_CONTENT);
+		if(count($CIS4_ROOT_CONTENT) > 0)
+		{
+			return current($CIS4_ROOT_CONTENT)->content_id ?? null;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	/**
 	 * Laedt alle Content Eintraege unterhalb eines Contents
 	 * (Ohne Newseintraege)
 	 *
