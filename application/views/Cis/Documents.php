@@ -5,7 +5,7 @@ $includesArray = array(
 	'customJSModules' => ['public/js/apps/Cis/Documents.js']
 );
 
-$this->load->view('templates/CISHTML-Header', $includesArray);
+$this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 
 <div id="content">
@@ -210,4 +210,4 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 	</div>
 </div>
 
-<?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>
+<?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>

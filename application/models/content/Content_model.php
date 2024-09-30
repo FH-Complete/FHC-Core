@@ -118,7 +118,7 @@ class Content_model extends DB_Model
 			"content_id": 1000003,
 			"template_kurzbz": "redirect",
 			"titel": "COVID-19",
-			"content": "<content><url><![CDATA[' . site_url('/CisHtml/Cms/content/10012') . ']]></url><target><![CDATA[]]></target></content>",
+			"content": "<content><url><![CDATA[' . site_url('/CisVue/Cms/content/10012') . ']]></url><target><![CDATA[]]></target></content>",
 			"menu_open": false,
 			"aktiv": true,
 			"childs": []
@@ -138,7 +138,7 @@ class Content_model extends DB_Model
 						"content_id": 1000001,
 						"template_kurzbz": "redirect",
 						"titel": "News",
-						"content": "<content><url><![CDATA[' . site_url('/CisHtml/Cms/news') . ']]></url><target><![CDATA[]]></target></content>",
+						"content": "<content><url><![CDATA[' . site_url('/CisVue/Cms/news') . ']]></url><target><![CDATA[]]></target></content>",
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []

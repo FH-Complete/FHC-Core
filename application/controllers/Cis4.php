@@ -27,6 +27,6 @@ class Cis4 extends FHC_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('CisHtml/Dashboard.php');
+		$this->load->view('CisVue/Dashboard.php');
 	}
 }

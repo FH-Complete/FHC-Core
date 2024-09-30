@@ -5,7 +5,7 @@ $includesArray = array(
 	'customCSSs' => ['public/css/components/calendar.css']
 );
 
-$this->load->view('templates/CISHTML-Header', $includesArray);
+$this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 
 <div >
@@ -17,4 +17,4 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
     
 </div>
 
-<?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>
+<?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>

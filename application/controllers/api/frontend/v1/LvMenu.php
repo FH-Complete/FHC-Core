@@ -571,7 +571,7 @@ private function  fhc_menu_pinboard(&$menu, $angemeldet, $is_lector, $studiengan
 				'position'=>'110',
 				'name'=>$p->t('lehre/pinboard'),
 				'c4_icon'=>base_url('skin/images/button_pinboard.png'),
-				'c4_link'=>base_url('CisHtml/Cms/news'),
+				'c4_link'=>base_url('CisVue/Cms/news'),
 				'text'=>$text
 			);
 

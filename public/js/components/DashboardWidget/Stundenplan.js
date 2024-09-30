@@ -81,15 +81,6 @@ export default {
 			this.currentDay = day;
 			this.minimized = true;
 		},
-		showRoomInfo: function($ort_kurzbz){
-			
-			this.$fhcApi.factory.ort.getContentID($ort_kurzbz).then(res =>{
-
-				window.location.href = FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				"/CisHtml/Cms/content/" + res.data;
-			})
-		},
 
 		updateRange: function (data) {
 			

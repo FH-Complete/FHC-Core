@@ -8,7 +8,7 @@ $includesArray = array(
 	],
 );
 
-$this->load->view('templates/CISVUE-Header', $includesArray);
+$this->load->view('templates/CISHTML-Header', $includesArray);
 ?>
 
 <div id="content">
@@ -17,5 +17,5 @@ $this->load->view('templates/CISVUE-Header', $includesArray);
 	<fhc-dashboard dashboard="CIS"/>
 </div>
 
-<?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>
+<?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>
 
