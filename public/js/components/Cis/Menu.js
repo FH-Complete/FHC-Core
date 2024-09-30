@@ -39,6 +39,7 @@ export default {
 	<button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
+	<fhc-searchbar id="nav-search" class="fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction" :selectedtypes="selectedtypes"></fhc-searchbar>
     <a id="nav-logo" :href="rootUrl">
         <img :src="logoUrl" alt="Logo">
     </a>
@@ -49,7 +50,6 @@ export default {
             </button>
         </div>
         <div class="offcanvas-body p-0">
-            <fhc-searchbar id="nav-search" class="fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction" :selectedtypes="selectedtypes"></fhc-searchbar>
             <button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
                 <img :src="avatarUrl" class="avatar rounded-circle"/>
             </button>
