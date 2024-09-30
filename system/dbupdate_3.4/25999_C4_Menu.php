@@ -90,6 +90,24 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					'contentmittitel','tlc',NOW(),null,null,null,TRUE,FALSE,'TLC'
 				);
 
+				-- STUNDENPLAN
+
+				INSERT INTO campus.tbl_content 
+				(template_kurzbz, oe_kurzbz, insertamum, insertvon, updateamum, updatevon, aktiv, menu_open, beschreibung)
+				VALUES  
+				(
+					'redirect','etw',NOW(),null,null,null,TRUE,FALSE,'STUNDENPLAN'
+				);
+
+				-- MYLV
+
+				INSERT INTO campus.tbl_content 
+				(template_kurzbz, oe_kurzbz, insertamum, insertvon, updateamum, updatevon, aktiv, menu_open, beschreibung)
+				VALUES  
+				(
+					'redirect','etw',NOW(),null,null,null,TRUE,FALSE,'MYLV'
+				);
+
 				-- ##################################### CONTENTSPRACHE
 
 				-- CIS4_ROOT
@@ -156,7 +174,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the DOKUMENTE
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DOKUMENTE'),
 					1,TRUE,
-					'<content><url><![CDATA[#Dokumente]]></url><target><![CDATA[_self]]></target></content>',
+					'<content><url><![CDATA[../cis.php/Cis/Documents]]></url><target><![CDATA[]]></target></content>',
 					null,null,null,null,NOW(),null,'Dokumente',null
 				);
 
@@ -201,6 +219,34 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content of the latest german TLC version
 					(SELECT content FROM campus.tbl_contentsprache WHERE sprache ='German' AND titel='TLC' AND version = ( SELECT MAX(version) FROM campus.tbl_contentsprache WHERE sprache ='German' AND titel='TLC') ),
 					null,null,null,null,NOW(),null,'TLC',null
+				);
+
+				-- STUNDENPLAN
+				
+				INSERT INTO campus.tbl_contentsprache 
+				(sprache, content_id, version, sichtbar, content, reviewvon, reviewamum, updateamum, updatevon, insertamum, insertvon, titel, gesperrt_uid)
+				VALUES  
+				(
+					'German',
+					-- queries the content_id for the STUNDENPLAN
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUNDENPLAN'),
+					1,TRUE,
+					'<content><url><![CDATA[../cis.php/Cis/Stundenplan]]></url><target><![CDATA[]]></target></content>',
+					null,null,null,null,NOW(),null,'Stundenplan',null
+				);
+
+				-- MYLV
+				
+				INSERT INTO campus.tbl_contentsprache 
+				(sprache, content_id, version, sichtbar, content, reviewvon, reviewamum, updateamum, updatevon, insertamum, insertvon, titel, gesperrt_uid)
+				VALUES  
+				(
+					'German',
+					-- queries the content_id for the MYLV
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MYLV'),
+					1,TRUE,
+					'<content><url><![CDATA[../cis.php/Cis/MyLv]]></url><target><![CDATA[]]></target></content>',
+					null,null,null,null,NOW(),null,'MyLv',null
 				);
 
 				-- ##################################### CONTENTCHILD
@@ -282,6 +328,28 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 				);
 
 				-- Mein Studium childs
+
+				INSERT INTO campus.tbl_contentchild
+				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
+				VALUES
+				(
+					-- queries the content_id for the MEIN_STUDIUM
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
+					-- queries the content_id for the STUNDENPLAN
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUNDENPLAN'),
+					NOW(), null, null, null, 100
+				);
+
+				INSERT INTO campus.tbl_contentchild
+				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
+				VALUES
+				(
+					-- queries the content_id for the MEIN_STUDIUM
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
+					-- queries the content_id for the MYLV
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MYLV'),
+					NOW(), null, null, null, 100
+				);
 
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
