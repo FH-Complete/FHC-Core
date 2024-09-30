@@ -32,22 +32,17 @@ export default {
 			}
 		},
 		'entry.menu_open': function (newValue,oldValue) {
-			if (this.entry.titel == "Mein Studium") 
-			{
-				console.log("here",this.entry.titel,newValue,"newValue");
-			}
 			if (newValue) 
 			{
-				console.log(this.entry.titel,"open")
 				// only invokes .show if this.collapse is not null
 				this.collapse && this.collapse.show();
 			} 
 			else 
 			{
-				console.log(this.entry.titel,"close")
 				// only invokes .hide if this.collapse is not null
 				this.collapse && this.collapse.hide();
 			}
+			// debugging helpers - console.log(this.entry.titel,newValue?"open":"close")
 		},
 	},
 		
