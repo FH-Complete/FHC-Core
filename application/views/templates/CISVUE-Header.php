@@ -27,7 +27,8 @@ $this->load->view('templates/FHC-Header', $includesArray);
 		root-url="<?= site_url(''); ?>" 
 		logo-url="<?= base_url('/public/images/logo-300x160.png'); ?>" 
 		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" 
-		logout-url="<?= site_url('Cis/Auth/logout'); ?>" 
+		logout-url="<?= site_url('Cis/Auth/logout'); ?>"
+		:selectedtypes="selectedtypes" 
 		:searchbaroptions="searchbaroptions" 
 		:searchfunction="searchfunction" />
 </header>
