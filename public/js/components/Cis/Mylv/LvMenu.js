@@ -19,14 +19,6 @@ export default {
 			selectedMenu:null,
 		}
 	},
-	watch:{
-		isMenuSelected: function (newValue) {
-			// if no Menu point has been selected, show all Menu options
-			if (!newValue){
-				this.selectedMenu = null;
-			}
-		}
-	},
 	emits:["update:isMenuSelected"],
 	methods:{
 		selectMenu: function (menuItem, index = null) {
@@ -61,6 +53,12 @@ export default {
 			if (newValue) {
 				this.selectedMenu = newValue;
 				this.$emit("update:isMenuSelected", true);
+			}
+		},
+		isMenuSelected: function (newValue) {
+			// if no Menu point has been selected, show all Menu options
+			if (!newValue) {
+				this.selectedMenu = null;
 			}
 		}
 	},
