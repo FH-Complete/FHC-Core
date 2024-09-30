@@ -261,7 +261,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- queries the content_id for the MEIN_STUDIUM
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
-					NOW(), null, null, null, 100
+					NOW(), null, null, null, 1
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -271,7 +271,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the CIS4_ROOT
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- 10882 is the content_id for VPN Neu - Zugang für Student*innen
-					10882, NOW(), null, null, null, 100
+					10882, NOW(), null, null, null, 2
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -282,7 +282,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- queries the content_id for the NEWS
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'NEWS'),
-					NOW(), null, null, null, 100
+					NOW(), null, null, null, 3
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -293,7 +293,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- queries the content_id for the DOKUMENTE
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DOKUMENTE'),
-					NOW(), null, null, null, 100
+					NOW(), null, null, null, 4
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -302,9 +302,9 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 				(
 					-- queries the content_id for the CIS4_ROOT
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
-					-- queries the content_id for the DOKUMENTE
+					-- queries the content_id for the TLC
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'TLC'),
-					NOW(), null, null, null, 100
+					NOW(), null, null, null, 5
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -314,7 +314,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the CIS4_ROOT
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- 10487 is the content_id for Modul International Skills
-					10487, NOW(), null, null, null, 100
+					10487, NOW(), null, null, null, 6
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -324,7 +324,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the CIS4_ROOT
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- 10568 is the content_id for Zahlungen
-					10568, NOW(), null, null, null, 100
+					10568, NOW(), null, null, null, 7
 				);
 
 				-- Mein Studium childs
@@ -337,7 +337,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
 					-- queries the content_id for the STUNDENPLAN
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUNDENPLAN'),
-					NOW(), null, null, null, 100
+					NOW(), null, null, null, 1
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -348,7 +348,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
 					-- queries the content_id for the MYLV
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MYLV'),
-					NOW(), null, null, null, 100
+					NOW(), null, null, null, 2
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -359,7 +359,17 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
 					-- queries the content_id for the PROFIL
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'PROFIL'),
-					NOW(), null, null, null, 100
+					NOW(), null, null, null, 3
+				);
+
+				INSERT INTO campus.tbl_contentchild
+				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
+				VALUES
+				(
+					-- queries the content_id for the MEIN_STUDIUM
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
+					-- 10795 is the content_id for Studierendenstatus
+					10795, NOW(), null, null, null, 4
 				);
 
 				-- Profil childs
@@ -371,7 +381,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the PROFIL
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'PROFIL'),
 					-- 7358 is the content_id for password_aendern
-					7358, NOW(), null, null, null, 100
+					7358, NOW(), null, null, null, 1
 				);
 
 				-- News childs
@@ -383,7 +393,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the NEWS
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'NEWS'),
 					-- 6748 is the content_id for Newsletter FHTW
-					6748, NOW(), null, null, null, 100
+					6748, NOW(), null, null, null, 1
 				);
 
 				-- Dokumente childs
@@ -395,7 +405,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the DOKUMENTE
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DOKUMENTE'),
 					-- 10246 is the content_id for Allg. FHTW-Glossar
-					10246, NOW(), null, null, null, 100
+					10246, NOW(), null, null, null, 1
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -405,7 +415,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the DOKUMENTE
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DOKUMENTE'),
 					-- 10339 is the content_id for Hausordnung
-					10339, NOW(), null, null, null, 100
+					10339, NOW(), null, null, null, 2
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -415,7 +425,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the DOKUMENTE
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DOKUMENTE'),
 					-- 6830 is the content_id for Satzung
-					6830, NOW(), null, null, null, 100
+					6830, NOW(), null, null, null, 3
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -426,7 +436,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DOKUMENTE'),
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
-					NOW(), null, null, null, 100
+					NOW(), null, null, null, 4
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -437,7 +447,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DOKUMENTE'),
 					-- queries the content_id for the VORLAGEN
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'VORLAGEN'),
-					NOW(), null, null, null, 100
+					NOW(), null, null, null, 5
 				);
 
 				-- Studienbetrieb childs
@@ -449,7 +459,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7251 is the content_id for Administration
-					7251, NOW(), null, null, null, 100
+					7251, NOW(), null, null, null, 1
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -459,7 +469,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7252 is the content_id for Außerordentliche Studierende
-					7252, NOW(), null, null, null, 100
+					7252, NOW(), null, null, null, 2
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -469,7 +479,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7253 is the content_id for Berufspraktikum
-					7253, NOW(), null, null, null, 100
+					7253, NOW(), null, null, null, 3
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -479,7 +489,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7254 is the content_id for CRM @ FHTW
-					7254, NOW(), null, null, null, 100
+					7254, NOW(), null, null, null, 4
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -489,7 +499,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 9328 is the content_id for Datenschutz
-					9328, NOW(), null, null, null, 100
+					9328, NOW(), null, null, null, 5
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -499,7 +509,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 10139 is the content_id for Einteilung Studienjahr
-					10139, NOW(), null, null, null, 100
+					10139, NOW(), null, null, null, 6
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -509,7 +519,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7255 is the content_id for Formulare
-					7255, NOW(), null, null, null, 100
+					7255, NOW(), null, null, null, 7
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -519,7 +529,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 10841 is the content_id for Formulare
-					10841, NOW(), null, null, null, 100
+					10841, NOW(), null, null, null, 8
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -529,7 +539,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7256 is the content_id for Internationale BewerberInnen
-					7256, NOW(), null, null, null, 100
+					7256, NOW(), null, null, null, 9
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -539,7 +549,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7257 is the content_id for Leistungsstipendium
-					7257, NOW(), null, null, null, 100
+					7257, NOW(), null, null, null, 10
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -549,7 +559,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7258 is the content_id for ÖH-Studierendenvertretung
-					7258, NOW(), null, null, null, 100
+					7258, NOW(), null, null, null, 11
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -559,7 +569,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 8416 is the content_id for ÖH-Studierendenvertretung
-					8416, NOW(), null, null, null, 100
+					8416, NOW(), null, null, null, 12
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -569,7 +579,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7259 is the content_id for Prüfungen/Lehre
-					7259, NOW(), null, null, null, 100
+					7259, NOW(), null, null, null, 13
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -579,7 +589,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 10748 is the content_id for Studienbeitrag & ÖH-Beitrag
-					10748, NOW(), null, null, null, 100
+					10748, NOW(), null, null, null, 14
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -589,7 +599,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7260 is the content_id for Studieren, Wohnen & Finanzen
-					7260, NOW(), null, null, null, 100
+					7260, NOW(), null, null, null, 15
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -599,7 +609,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the STUDIENBETRIEB
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'STUDIENBETRIEB'),
 					-- 7261 is the content_id for Wissenschaftliches Arbeiten 
-					7261, NOW(), null, null, null, 100
+					7261, NOW(), null, null, null, 16
 				);
 
 				-- Vorlagen childs
@@ -611,7 +621,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the VORLAGEN
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'VORLAGEN'),
 					-- 7243 is the content_id for FHTW Corporate Identity & Design
-					7243, NOW(), null, null, null, 100
+					7243, NOW(), null, null, null, 1
 				);
 
 				-- TLC childs
@@ -623,7 +633,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the TLC
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'TLC'),
 					-- 9248 is the content_id for Service für Studierende
-					9248, NOW(), null, null, null, 100
+					9248, NOW(), null, null, null, 1
 				);
 				";
 
