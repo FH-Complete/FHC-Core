@@ -37,7 +37,6 @@ export default {
       fileID: null,
       breadcrumb: null,
       loading: false,
-
       result: false,
       info: null,
     };
@@ -50,7 +49,7 @@ export default {
   },
 
   methods: {
-    updateFileIDFunction: function (newFileID) {
+	updateFileIDFunction: function (newFileID) {
       this.fileID = newFileID;
     },
 
@@ -154,7 +153,16 @@ export default {
       }
     },
   },
-  computed: {},
+  computed: {
+	showFooter: function () {
+		switch(this.value.view){
+			case 'Status': return false;
+			case 'Kontakt':return false;
+			case 'Adresse':return false;
+			default: return true;
+		}	
+    },
+  },
   created() {
     if (this.editData.topic) {
       //? if the topic was passed through the prop add it to the component
@@ -188,7 +196,7 @@ export default {
 
     </template>
     <!-- optional footer -->
-    <template  v-slot:footer v-if="value.view? value.view != 'Status' : true">
+    <template v-slot:footer v-if="showFooter">
     <loader  ref="loaderRef" :timeout="0"></loader>
         
     <button class="btn btn-outline-danger " @click="hide">{{$p.t('ui','cancel')}}</button>    
