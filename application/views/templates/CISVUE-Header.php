@@ -15,6 +15,13 @@ $includesArray = array(
 
 $this->load->view('templates/FHC-Header', $includesArray);
 
+
+if (!isset($menu)) {
+	$ci =& get_instance(); // get CI instance
+	$ci->load->model('content/Content_model', 'ContentModel');
+	$result = $ci->ContentModel->getMenu(defined('CIS4_MENU_ENTRY') ? CIS4_MENU_ENTRY : null, get_uid());
+	$menu = getData($result)->childs ?? [];
+}
 ?>
 
 <script type="text/javascript">
@@ -30,7 +37,9 @@ $this->load->view('templates/FHC-Header', $includesArray);
 		logout-url="<?= site_url('Cis/Auth/logout'); ?>"
 		:selectedtypes="selectedtypes" 
 		:searchbaroptions="searchbaroptions" 
-		:searchfunction="searchfunction" />
+		:searchfunction="searchfunction"
+		:menu="<?= htmlspecialchars(json_encode(array_values($menu)), ENT_QUOTES, 'UTF-8') ?>"
+		></cis-menu>
 </header>
 
 <main id="cis-main" class="flex-grow-1 overflow-scroll p-4">

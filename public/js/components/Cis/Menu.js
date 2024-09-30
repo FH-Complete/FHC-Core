@@ -7,7 +7,8 @@ export default {
         FhcSearchbar
     },
     props: {
-        rootUrl: String,
+		menu: Array,
+		rootUrl: String,
         logoUrl: String,
         avatarUrl: String,
         logoutUrl: String,
@@ -27,11 +28,9 @@ export default {
 			this.activeEntry = content_id;
 		}
 	},
-    created() {
-        axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/CisVue/Menu').then(res => {
-            this.entries = res.data.retval.childs;
-		});
-    },
+	mounted(){
+		this.entries = this.menu;
+	},
     template: /*html*/`
 	<!--<p>CISVUE HEADER</p>
 	<p>active entry content_id : {{activeEntry}}</p>
