@@ -127,9 +127,8 @@ export default{
 					studiensemester_kurzbz,
 					ausbildungssemester
 				};
-				
-				this.$fhcApi
-					.post('api/frontend/v1/stv/status/loadStatus/', this.statusId)
+
+				this.$fhcApi.factory.stv.status.loadStatus(this.statusId)
 					.then(result => {
 						this.statusNew = false;
 						this.formData = result.data;
@@ -143,12 +142,9 @@ export default{
 			}
 		},
 		insertStatus() {
-			this.$refs.form
-				.post(
-					'api/frontend/v1/stv/status/insertStatus/' + this.statusId,
-					this.formData
-				)
+			this.$fhcApi.factory.stv.status.insertStatus(this.statusId, this.formData)
 				.then(result => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$reloadList();
 					this.$emit('saved');
 					this.$refs.modal.hide();
@@ -156,11 +152,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		editStatus() {
-			this.$refs.form
-				.post(
-					'api/frontend/v1/stv/status/updateStatus/' + Object.values(this.statusId).join('/'),
-					this.formData
-				)
+			this.$fhcApi.factory.stv.status.updateStatus(this.statusId, this.formData)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$reloadList();
@@ -174,24 +166,23 @@ export default{
 			this.prestudent = prestudent;
 			if (old_id == prestudent.prestudent_id)
 				return Promise.resolve();
-			
-			return this.$fhcApi
-				.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + prestudent.prestudent_id)
+
+			return this.$fhcApi.factory.stv.status.getStudienplaene(prestudent.prestudent_id)
 				.then(result => this.studienplaene = result.data)
-				.then(() => this.$fhcApi.get('api/frontend/v1/stv/prestudent/getStudiengang/' + prestudent.prestudent_id))
+				.then(() => this.$fhcApi.factory.stv.status.getStudiengang(prestudent.prestudent_id))
 				.then(result => this.mischform = result.data.mischform);
 		}
 	},
 	created() {
-		this.$fhcApi
-			.get('api/frontend/v1/stv/status/getStatusgruende')
+		this.$fhcApi.factory.stv.status.getStatusgruende()
 			.then(result => this.statusgruende = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
-		/*this.$fhcApi
-			.get('api/frontend/v1/stv/lists/getStati')
+
+		//TODO(Manu) check why it is/was hard coded
+		this.$fhcApi.factory.stv.status.getStati()
 			.then(result => this.stati = result.data)
-			.catch(this.$fhcAlert.handleSystemError);*/
-		this.stati = [
+			.catch(this.$fhcAlert.handleSystemError);
+/*		this.stati = [
 			{ status_kurzbz: 'Interessent', bezeichnung: 'Interessent'},
 			{ status_kurzbz: 'Bewerber', bezeichnung: 'Bewerber'},
 			{ status_kurzbz: 'Aufgenommener', bezeichnung: 'Aufgenommener'},
@@ -203,7 +194,7 @@ export default{
 			{ status_kurzbz: 'Abbrecher', bezeichnung: 'Abbrecher'},
 			{ status_kurzbz: 'Abgewiesener', bezeichnung: 'Abgewiesener'},
 			{ status_kurzbz: 'Wartender', bezeichnung: 'Wartender'}
-		];
+		];*/
 	},
 	template: `
 	<bs-modal class="stv-status-modal" ref="modal">
@@ -212,7 +203,7 @@ export default{
 		</template>
 
 		<core-form ref="form">
-
+					
 			<form-validation></form-validation>
 			
 			<p v-if="bisLocked && !isStatusBeforeStudent">

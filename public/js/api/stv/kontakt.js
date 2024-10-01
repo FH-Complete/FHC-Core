@@ -1,5 +1,6 @@
 export default {
 	//TODO(Manu) check if tabulatorConfig use here like in konto.js
+	//------------- address.js-----------
 	getAdressen (url, config, params){
 		return this.$fhcApi.get('api/frontend/v1/stv/kontakt/getAdressen/' + params.id);
 	},
@@ -31,6 +32,8 @@ export default {
 	getAdressentypen() {
 		return this.$fhcApi.get('api/frontend/v1/stv/kontakt/getAdressentypen/');
 	},
+
+	//------------- bankverbindung.js-----------
 	getBankverbindung (url, config, params){
 		return this.$fhcApi.get('api/frontend/v1/stv/kontakt/getBankverbindung/' + params.id);
 	},
@@ -50,6 +53,8 @@ export default {
 	deleteBankverbindung(bankverbindung_id) {
 		return this.$fhcApi.post('api/frontend/v1/stv/kontakt/deleteBankverbindung/', {bankverbindung_id});
 	},
+
+	//------------- contact.js-----------
 	getKontakte (url, config, params){
 		return this.$fhcApi.get('api/frontend/v1/stv/kontakt/getKontakte/' + params.id);
 	},

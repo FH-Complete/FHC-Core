@@ -138,12 +138,7 @@ export default {
 		addStudent(data) {
 			Promise
 				.allSettled(
-					this.prestudentIds.map(prestudent_id => this.$fhcApi.post(
-						'api/frontend/v1/stv/status/addStudent/' + prestudent_id,
-						data,
-						{ errorHeader: prestudent_id }
-					))
-				)
+					this.prestudentIds.map(prestudent_id => this.$fhcApi.factory.stv.status.addStudent(prestudent_id, data)))
 				.then(res => this.showFeedback(res, data.status_kurzbz));
 		},
 		changeStatusToAbbrecher(statusgrund_id) {
@@ -221,12 +216,7 @@ export default {
 		changeStatus(data) {
 			Promise
 				.allSettled(
-					this.prestudentIds.map(prestudent_id => this.$fhcApi.post(
-						'api/frontend/v1/stv/status/changeStatus/' + prestudent_id,
-						data,
-						{ errorHeader: prestudent_id }
-					))
-				)
+					this.prestudentIds.map(prestudent_id => this.$fhcApi.factory.stv.status.changeStatus(prestudent_id, data)))
 				.then(res => this.showFeedback(res, data.status_kurzbz));
 		},
 		showFeedback(results, status_kurzbz) {
@@ -247,8 +237,7 @@ export default {
 		}
 	},
 	created() {
-		this.$fhcApi
-			.get('api/frontend/v1/stv/status/getStatusarray/')
+		this.$fhcApi.factory.stv.status.getStatusarray()
 			.then(result => result.data)
 			.then(result => {
 				this.listDataToolbar = result;
@@ -257,7 +246,7 @@ export default {
 	},
 	template: `
 	<div class="stv-status-dropdown">
-		
+			
 		<div v-if="showToolbar"  class="btn-group">						
 			<button ref="toolbarButton" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
 				{{$p.t('lehre', 'btn_statusAendern')}}
