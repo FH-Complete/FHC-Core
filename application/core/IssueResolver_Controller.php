@@ -5,21 +5,18 @@
  */
 abstract class IssueResolver_Controller extends JOB_Controller
 {
-	const CI_PATH = 'application';
-	const CI_LIBRARY_FOLDER = 'libraries';
-	const EXTENSIONS_FOLDER = 'extensions';
-	const ISSUE_RESOLVERS_FOLDER = 'issues/resolvers';
-	const CHECK_ISSUE_RESOLVED_METHOD_NAME = 'checkIfIssueIsResolved';
+	// mappings in form fehlercode -> resolverlibrary name, fehler which have explicit resolver class defined
+	protected $_codeLibMappings = [];
 
-	protected $_codeLibMappings;
+	// mappings in form fehlercode -> producer library name, fehler which are resolved the same way they are produced
+	protected $_codeProducerLibMappings = [];
 
 	public function __construct()
 	{
 		parent::__construct();
 
+		// pass extension name if calling from extension
 		$this->load->model('system/Issue_model', 'IssueModel');
-
-		$this->load->library('IssuesLib');
 	}
 
 	/**
@@ -27,97 +24,29 @@ abstract class IssueResolver_Controller extends JOB_Controller
 	 */
 	public function run()
 	{
+		$this->load->library(
+			'issues/PlausicheckResolverLib',
+			[
+				'extensionName' => $this->_extensionName ?? null,
+				'codeLibMappings' => $this->_codeLibMappings,
+				'codeProducerLibMappings' => $this->_codeProducerLibMappings
+			]
+		);
+
 		$this->logInfo("Issue resolve job started");
 
 		// load open issues with given errorcodes
-		$openIssuesRes = $this->IssueModel->getOpenIssues(array_keys($this->_codeLibMappings));
+		$openIssuesRes = $this->IssueModel->getOpenIssues(
+			array_merge(array_keys($this->_codeLibMappings), array_keys($this->_codeProducerLibMappings))
+		);
 
-		// log error if occured
-		if (isError($openIssuesRes))
-		{
-			$this->logError(getError($openIssuesRes));
-		}
-		else
-		{
-			// log info if no data found
-			if (!hasData($openIssuesRes))
-			{
-				$this->logInfo("No open issues found");
-			}
-			else
-			{
-				$openIssues = getData($openIssuesRes);
+		$openIssues = hasData($openIssuesRes) ? getData($openIssuesRes) : [];
 
-				foreach ($openIssues as $issue)
-				{
-					// ignore if Fehlercode is not in libmappings (shouldn't be checked)
-					if (!isset($this->_codeLibMappings[$issue->fehlercode])) continue;
+		$result = $this->plausicheckresolverlib->resolvePlausicheckIssues($openIssues);
 
-					$libName = $this->_codeLibMappings[$issue->fehlercode];
-
-					// add person id and oe kurzbz automatically as params, merge it with additional params
-					// decode bewerbung_parameter into assoc array
-					$params = array_merge(
-						array('issue_id' => $issue->issue_id, 'issue_person_id' => $issue->person_id, 'issue_oe_kurzbz' => $issue->oe_kurzbz),
-						isset($issue->behebung_parameter) ? json_decode($issue->behebung_parameter, true) : array()
-					);
-
-					// if called from extension (extension name set), path includes extension names
-					$libRootPath = isset($this->_extensionName) ? self::EXTENSIONS_FOLDER . '/' . $this->_extensionName . '/' : '';
-
-					// path for loading issue library
-					$issuesLibPath = $libRootPath . self::ISSUE_RESOLVERS_FOLDER . '/';
-
-					// file path of library for check if file exists
-					$issuesLibFilePath = DOC_ROOT . self::CI_PATH
-						. '/' . $libRootPath . self::CI_LIBRARY_FOLDER . '/' . self::ISSUE_RESOLVERS_FOLDER . '/' . $libName . '.php';
-
-					// check if library file exists
-					if (!file_exists($issuesLibFilePath))
-					{
-						// log error and continue with next issue if not
-						$this->logError("Issue library file " . $issuesLibFilePath . " does not exist");
-						continue;
-					}
-
-					// load library connected to fehlercode
-					$this->load->library($issuesLibPath . $libName);
-
-					$lowercaseLibName = mb_strtolower($libName);
-
-					// check if method is defined in library class
-					if (!is_callable(array($this->{$lowercaseLibName}, self::CHECK_ISSUE_RESOLVED_METHOD_NAME)))
-					{
-						// log error and continue with next issue if not
-						$this->logError("Method " . self::CHECK_ISSUE_RESOLVED_METHOD_NAME . " is not defined in library $lowercaseLibName");
-						continue;
-					}
-
-					// call the function for checking for issue resolution
-					$issueResolvedRes = $this->{$lowercaseLibName}->{self::CHECK_ISSUE_RESOLVED_METHOD_NAME}($params);
-
-					if (isError($issueResolvedRes))
-					{
-						$this->logError(getError($issueResolvedRes));
-					}
-					else
-					{
-						$issueResolvedData = getData($issueResolvedRes);
-
-						if ($issueResolvedData === true)
-						{
-							// set issue to resolved if needed
-							$behobenRes = $this->issueslib->setBehoben($issue->issue_id, null);
-
-							if (isError($behobenRes))
-								$this->logError(getError($behobenRes));
-							else
-								$this->logInfo("Issue " . $issue->issue_id . " successfully resolved");
-						}
-					}
-				}
-			}
-		}
+		// log if error, or log info if inserted new issue
+		foreach ($result->errors as $error) $this->logError($error);
+		foreach ($result->infos as $info) $this->logInfo($info);
 
 		$this->logInfo("Issue resolve job ended");
 	}

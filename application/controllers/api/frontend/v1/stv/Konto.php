@@ -246,11 +246,11 @@ class Konto extends FHCAPI_Controller
 			if (isError($id)) {
 				$this->addError(getError($id), self::ERROR_TYPE_DB);
 			} else {
-				$data = $this->KontoModel->withAdditionalInfo()->load(getData($id));
-				if (isError($data))
-					$this->addError(getError($data), self::ERROR_TYPE_DB);
+				$kontodata = $this->KontoModel->withAdditionalInfo()->load(getData($id));
+				if (isError($kontodata))
+					$this->addError(getError($kontodata), self::ERROR_TYPE_DB);
 				else
-					$result[] = current(getData($data));
+					$result[] = current(getData($kontodata));
 			}
 		}
 

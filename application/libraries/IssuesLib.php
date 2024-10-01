@@ -246,7 +246,27 @@ class IssuesLib
 				$fehlertext = vsprintf($fehlertextVorlage, $fehlertext_params);
 			}
 
-			$openIssuesCountRes = $this->_ci->IssueModel->getOpenIssueCount($fehlercode, $person_id, $oe_kurzbz, $fehlercode_extern);
+			if (isset($resolution_params))
+			{
+				if (is_array($resolution_params))
+				{
+					foreach ($resolution_params as $resolution_key => $resolution_param)
+					{
+						if (!is_string($resolution_key))
+							return error("Invalid parameter for resolution, must be an associative array");
+					}
+				}
+				else
+					return error("Invalid parameters for resolution");
+			}
+
+			$openIssuesCountRes = $this->_ci->IssueModel->getOpenIssueCount(
+				$fehlercode,
+				$person_id,
+				$oe_kurzbz,
+				$fehlercode_extern,
+				$resolution_params
+			);
 
 			if (hasData($openIssuesCountRes))
 			{
@@ -256,20 +276,6 @@ class IssuesLib
 
 				if ($openIssueCount == 0)
 				{
-					if (isset($resolution_params))
-					{
-						if (is_array($resolution_params))
-						{
-							foreach ($resolution_params as $resolution_key => $resolution_param)
-							{
-								if (!is_string($resolution_key))
-									return error("Invalid parameter for resolution, must be an associative array");
-							}
-						}
-						else
-							return error("Invalid parameters for resolution");
-					}
-
 					// insert new issue
 					return $this->_ci->IssueModel->insert(
 						array(

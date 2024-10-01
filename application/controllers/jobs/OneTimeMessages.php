@@ -51,7 +51,7 @@ class OneTimeMessages extends JOB_Controller
 			   FROM public.tbl_prestudent p
 			   JOIN public.tbl_prestudentstatus ps USING (prestudent_id)
  			   JOIN public.tbl_studiengang s USING (studiengang_kz)
-			  WHERE ps.status_kurzbz = \'Wartender\'
+			  WHERE get_rolle_prestudent(ps.prestudent_id, NULL) = \'Wartender\'
 			    AND ps.studiensemester_kurzbz = ?
 			    AND ps.datum <= NOW() - \''.$days.' days\'::interval
 			    AND s.typ = ?

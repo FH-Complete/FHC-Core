@@ -25,7 +25,7 @@ class Paabgabe_model extends DB_Model
 				WHERE projektarbeit_id = ?
 				AND paabgabetyp_kurzbz = 'end'
 				AND paabg.abgabedatum IS NOT NULL
-				ORDER BY paabg.abgabedatum, paabg.datum DESC
+				ORDER BY paabg.abgabedatum DESC, paabg.datum DESC
 				LIMIT 1";
 
 		return $this->execQuery($qry, array($projektarbeit_id));

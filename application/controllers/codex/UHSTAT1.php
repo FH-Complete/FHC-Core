@@ -5,8 +5,12 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
 class UHSTAT1 extends FHC_Controller
 {
 	const BERECHTIGUNG_UHSTAT_VERWALTEN = 'student/uhstat1daten_verwalten';
+	const LOGIN_SESSION_INDEX = 'bewerbung/user';
 	const PERSON_ID_SESSION_INDEX = 'bewerbung/personId';
 	const CODEX_OESTERREICH = 'A';
+	const CODEX_UNKNOWN_YEAR = 9999;
+	const CODEX_UNKNOWN_NATION = 'XXX';
+	const CODEX_UNKNOWN_BILDUNGMAX = 999;
 	const LOWER_BOUNDARY_YEARS = 160;
 	const UPPER_BOUNDARY_YEARS = 20;
 
@@ -210,7 +214,9 @@ class UHSTAT1 extends FHC_Controller
 		else
 			return true;
 
-		if (!isset($bildungsstaat)) return true;
+		// if no Bildungsstaat or Bildungmax unknown - valid
+		if (!isset($bildungsstaat) || $bildungmax == self::CODEX_UNKNOWN_BILDUNGMAX) return true;
+
 
 		// find out if abschluss is in Austria
 		$this->AbschlussModel->addSelect("in_oesterreich");
@@ -219,8 +225,11 @@ class UHSTAT1 extends FHC_Controller
 		if (hasData($abschlussRes))
 		{
 			$in_oesterreich = getData($abschlussRes)[0]->in_oesterreich;
-			// invalid if abschluss in Austria, but not Bildungsstaat, or abschluss not in Austria, but Bildungsstaat in Austria
-			return ($in_oesterreich && $bildungsstaat == self::CODEX_OESTERREICH) || (!$in_oesterreich && $bildungsstaat != self::CODEX_OESTERREICH);
+
+			// valid if Bildungsstaat and Abschluss in Austria, or Bildungsstaat and Abschluss not in Austria
+			// (or Abschluss not in Austria and Bildungsstaat unknown)
+			return ($in_oesterreich && $bildungsstaat == self::CODEX_OESTERREICH)
+				|| (!$in_oesterreich && ($bildungsstaat != self::CODEX_OESTERREICH || $bildungsstaat == self::CODEX_UNKNOWN_NATION));
 		}
 
 		return false;
@@ -363,7 +372,11 @@ class UHSTAT1 extends FHC_Controller
 
 		// get realistic birth years, dated back from current year
 		$currYear = date("Y");
-		$formMetaData['jahre'] = range($currYear - self::UPPER_BOUNDARY_YEARS, $currYear - self::LOWER_BOUNDARY_YEARS);
+		$yearRange = range($currYear - self::UPPER_BOUNDARY_YEARS, $currYear - self::LOWER_BOUNDARY_YEARS);
+		$formMetaData['jahre'] = array_combine($yearRange, $yearRange);
+
+		// add "unknown" option
+		$formMetaData['jahre'][self::CODEX_UNKNOWN_YEAR] = 'unbekannt';
 
 		return success($formMetaData);
 	}
@@ -411,7 +424,10 @@ class UHSTAT1 extends FHC_Controller
 	private function _getValidPersonId($berechtigungsArt)
 	{
 		// if coming from bewerbungstool - person id is in session (person must be logged in bewerbungstool)
-		if (isset($_SESSION[self::PERSON_ID_SESSION_INDEX]) && is_numeric($_SESSION[self::PERSON_ID_SESSION_INDEX]))
+		if (isset($_SESSION[self::PERSON_ID_SESSION_INDEX])
+			&& is_numeric($_SESSION[self::PERSON_ID_SESSION_INDEX])
+			&& isset($_SESSION[self::LOGIN_SESSION_INDEX])
+		)
 			return $_SESSION[self::PERSON_ID_SESSION_INDEX];
 
 		// if person id passed directly...
