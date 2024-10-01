@@ -8,7 +8,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 
 		if (!$db->db_query("BEGIN;")) 
 		{
-			echo '<strong>wasnt able to start transaction: ' . $db->db_last_error() . '</strong><br>';
+			echo '<strong>wasnt able to start transaction for CIS4_ROOT_MENU: ' . $db->db_last_error() . '</strong><br>';
 		}
 		else
 		{
@@ -651,7 +651,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 				} 
 				else 
 				{
-					echo '<strong>ROLLED BACK</strong><br>';
+					echo '<strong>ROLLED BACK CIS4_ROOT_MENU</strong><br>';
 				}
 			} 
 			else 
@@ -663,7 +663,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 				} 
 				else 
 				{
-					echo '<strong>COMMITED</strong><br>';
+					echo '<strong>COMMITED CIS4_ROOT_MENU</strong><br>';
 				}
 
 				echo '<br>Menu content created';
