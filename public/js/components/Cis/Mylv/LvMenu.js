@@ -71,12 +71,14 @@ export default {
 		<iframe class="h-100 w-100" :src="selectedMenu.c4_link" :title="selectedMenu.name"></iframe>
 	</div>
 	<div v-else-if="!menu">No Menu available</div>
-	<div v-else :style="{'display':'grid', 'row-gap':'10px', 'column-gap':'10px', 'grid-template-columns':'repeat(3,minmax(100px,1fr))', 'grid-template-rows':'repeat('+Math.ceil(menu.length / 3)+',minmax(100px,1fr))'} ">
-		<div :title="menuItem.name" role="button" @click="selectMenu(menuItem)" class="lvUebersichtMenuPunkt border border-1 d-flex flex-column align-items-center justify-content-center p-1 text-center" v-for="(menuItem, index) in menu" :key="index">
-			<img :src="menuItem.c4_icon" :alt="menuItem.name" ></img>
-			<span @click="selectMenu(menuItem)" class="underline_hover mt-2">{{menuItem.name}}</span>
-			<span v-for="([text,link],index) in menuItem.c4_linkList" @click.stop="selectMenu(menuItem,index)"  :class="{'underline_hover':menuItem.c4_linkList[index][1] != '#'}" class="mt-1" :index="index">{{text}}</span>
+	<div v-else class="container">
+		<div class="row">
+			<div style="min-height:150px" :title="menuItem.name" role="button" @click="selectMenu(menuItem)" class="col-12 col-lg-6 col-xl-4 border border-1 d-flex flex-column align-items-center justify-content-center p-1 text-center" v-for="(menuItem, index) in menu" :key="index">
+				<img :src="menuItem.c4_icon" :alt="menuItem.name" ></img>
+				<span @click="selectMenu(menuItem)" class="underline_hover mt-2">{{menuItem.name}}</span>
+				<span v-for="([text,link],index) in menuItem.c4_linkList" @click.stop="selectMenu(menuItem,index)"  :class="{'underline_hover':menuItem.c4_linkList[index][1] != '#'}" class="mt-1" :index="index">{{text}}</span>
 
+			</div>
 		</div>
 	</div>
 	`
