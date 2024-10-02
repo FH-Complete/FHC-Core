@@ -108,8 +108,15 @@ class Stundenplan extends FHCAPI_Controller
 	 * 
 	 */
 	public function getStundenplan(){
+
+		// Query fuer Studenten prototyp ok
+		//TODO: getStundenplan fuer Mitarbeiter anpassen
+		//TODO: viele edge cases die es nicht moeglich machen besseren tbl_stundenplan index zu verwenden als idx_stundenplan_datum
+
 		// include Student model to fetch Studiengang_kz and Semester
 		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 
 		// form validation
 		$this->load->library('form_validation');
@@ -128,7 +135,8 @@ class Stundenplan extends FHCAPI_Controller
 		$student_data = $this->StudentModel->load([$student_uid]);
 		$student_data = getData($student_data)[0];
 		$this->addMeta('studg',$student_data->studiengang_kz);
-		$this->addMeta('sem', $student_data->semester);
+		$this->addMeta('sem', $student_data->semester);	
+
 		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(get_uid(),$start_date,$end_date,$student_data->studiengang_kz,$student_data->semester)); 
 		$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data) ?? [];
 
