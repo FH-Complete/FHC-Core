@@ -192,7 +192,7 @@ class Stundenplan_model extends DB_Model
 	 * 
 	 * @return string
 	 */
-	public function getStundenplanQuery($uid, $start_date, $end_date){
+	public function getStundenplanQuery($uid, $start_date, $end_date,$studiengang_kz,$semester){
 			return 
 			"select sp.*
 			from lehre.vw_stundenplan sp
@@ -201,9 +201,12 @@ class Stundenplan_model extends DB_Model
 			left join public.tbl_studentlehrverband slv ON sp.studiengang_kz=slv.studiengang_kz and slv.student_uid=".$this->escape($uid)." and (slv.semester=sp.semester OR sp.semester IS NULL) AND (slv.verband=sp.verband OR sp.verband IS NULL OR sp.verband='' OR sp.verband='0') AND
 			(slv.gruppe=sp.gruppe OR sp.gruppe IS NULL OR sp.gruppe='' OR sp.gruppe='0') AND sp.gruppe_kurzbz IS NULL
 			left join public.tbl_studiensemester ss2 ON slv.studiensemester_kurzbz=ss2.studiensemester_kurzbz AND ss2.start<=sp.datum and ss2.ende >= sp.datum
-			WHERE ss1.studiensemester_kurzbz IS NOT NULL or ss2.studiensemester_kurzbz IS NOT NULL
-			AND sp.datum >= ".$this->escape($start_date)." 
-			AND sp.datum <= ".$this->escape($end_date);
+			WHERE 
+			sp.datum >= ".$this->escape($start_date)." 
+			AND sp.datum <= ".$this->escape($end_date)."
+			AND sp.studiengang_kz = ".$this->escape($studiengang_kz)."
+			AND sp.semester = ".$this->escape($semester)."
+			AND (ss1.studiensemester_kurzbz IS NOT NULL or ss2.studiensemester_kurzbz IS NOT NULL)";
 	}
 
 	/**
