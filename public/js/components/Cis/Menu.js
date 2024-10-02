@@ -21,9 +21,17 @@ export default {
             entries: [],
 			activeEntry:null,
 			url:null,
+			highestMatchingUrlCount:0,
         };
     },
 	methods:{
+		checkHighestMatchingUrlCount(count){
+			if(count > this.highestMatchingUrlCount)
+			{
+				this.highestMatchingUrlCount = count;
+			}
+		},
+
 		setActiveEntry(content_id){
 			this.activeEntry = content_id;
 		}
@@ -34,6 +42,7 @@ export default {
     template: /*html*/`
 	<!--<p>CISVUE HEADER</p>
 	<p>active entry content_id : {{activeEntry}}</p>
+	<p>highest count : {{highestMatchingUrlCount}}</p>
 	-->
 	<button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -61,7 +70,7 @@ export default {
 				</ul>
 				<div id="nav-main-menu" class="collapse collapse-horizontal show">
 					<div>
-						<cis-menu-entry @activeEntry="setActiveEntry" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
+						<cis-menu-entry @UrlCount="checkHighestMatchingUrlCount" @activeEntry="setActiveEntry" :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
 					</div>
 				</div>
 			</div>

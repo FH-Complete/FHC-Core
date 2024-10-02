@@ -6,16 +6,29 @@ export default {
             type: Number,
             default: 1
         },
-		activeContent: String
+		activeContent: String,
+		highestMatchingUrlCount: Number,
     },
     data: () => {
         return {
             collapse: null,
+			urlCount:0,
         }
     },
-	emits: ["activeEntry"],
+	emits: ["activeEntry", "UrlCount"],
 	watch:{
-
+		highestMatchingUrlCount: function(newValue)
+		{
+			// if this entry has the most matching url parts then it should be active
+			if (newValue == this.urlCount)
+			{
+				this.entry.menu_open = true;
+			}
+			else
+			{
+				this.entry.menu_open = false;
+			}
+		},
 		activeContent: function(newValue){
 			if(newValue == this.entry.content_id){
 				// wenn der Menupunkt nicht bereits offen ist
@@ -104,7 +117,31 @@ export default {
         }
     },
     methods: {
+		passUrlCount(count){
+			this.$emit("UrlCount",count);
+		},
+		getUrlMatchPoints(url,link){
+			let splitted_link = link.split('/');
+			let splitted_url = url.href.split('/');
+
+			let count = 0;
+
+			for(let part_url of splitted_url)
+			{
+				for (let part_link of splitted_link)
+				{
+					if(part_url == part_link)
+					{
+						count++;
+					}
+				}
+			}
+			this.urlCount = count;
+			this.$emit("UrlCount",count);
+		},
 		checkActiveUrl(url){
+			this.getUrlMatchPoints(url,this.link);
+			
 			let url_hash_spaceSymbol_regex = new RegExp("%20","gi");
 			let url_hash_sharpSymbol_regex = new RegExp("^#");
 			let url_hash = url.hash;
@@ -167,6 +204,7 @@ export default {
 	<!-- DEBUGGIING PRINTS
 	<p>entry content_id: {{JSON.stringify(entry.content_id,null,2)}}</p>
 	<p>entry menu: {{JSON.stringify(entry.menu_open,null,2)}}</p>
+	<p>highest count : {{urlCount}}</p>
 	-->
 	<div v-if="entry.template_kurzbz == 'include'">
         INCLUDE
@@ -192,7 +230,7 @@ export default {
             </div>
             <ul ref="children"
                 class="nav w-100 collapse">
-                <cis-menu-entry @activeEntry="resendEmit" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
+                <cis-menu-entry @UrlCount="passUrlCount" @activeEntry="resendEmit" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
             </ul>
         </template>
         <a v-else
