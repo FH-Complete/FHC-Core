@@ -208,22 +208,30 @@ export default {
 				helperAppInstance.$refs.alert.add({ severity: 'error', summary: 'Systemfehler', detail: message});
 			},
 			confirmDelete() {
-				return confirm({
-					group: 'fhcAlertConfirm',
-					header: 'Achtung',
-					message: 'Möchten Sie sicher löschen?',
-					acceptLabel: 'Löschen',
-					acceptClass: 'btn btn-danger',
-					rejectLabel: 'Abbrechen',
-					rejectClass: 'btn btn-outline-secondary',
-				})
+				return new Promise((resolve, reject) => {
+					helperAppInstance.$confirm.require({
+						group: 'fhcAlertConfirm',
+						header: 'Achtung',
+						message: 'Möchten Sie sicher löschen?',
+						acceptLabel: 'Löschen',
+						acceptClass: 'btn btn-danger',
+						rejectLabel: 'Abbrechen',
+						rejectClass: 'btn btn-outline-secondary',
+						accept() {
+							resolve(true);
+						},
+						reject() {
+							resolve(false);
+						},
+					});
+				});
 			},
 			confirm(options) {
 				return new Promise((resolve, reject) => {
 					helperAppInstance.$confirm.require({
 						group: options?.group ?? 'fhcAlertConfirm',
 						header: options?.header ?? 'Achtung',
-						message: options?.message ?? 'Möchten',
+						message: options?.message ?? '',
 						acceptLabel: options?.acceptLabel ?? 'Ok',
 						acceptClass: options?.acceptClass ?? 'btn btn-primary',
 						rejectLabel: options?.rejectLabel ?? 'Abbrechen',
