@@ -196,9 +196,9 @@ export default{
 			this.resetModal();
 			this.$refs.adressModal.show();
 		},
-		actionEditAdress(adress_id) {
+		actionEditAdress(adresse_id) {
 			this.statusNew = false;
-			this.loadAdress(adress_id).then(() => {
+			this.loadAdress(adresse_id).then(() => {
 				if(this.addressData.adresse_id)
 				{
 					this.loadPlaces(this.addressData.plz);
@@ -207,8 +207,8 @@ export default{
 				}
 			});
 		},
-		actionDeleteAdress(adress_id) {
-			this.loadAdress(adress_id).then(() => {
+		actionDeleteAdress(adresse_id) {
+			this.loadAdress(adresse_id).then(() => {
 				if(this.addressData.adresse_id)
 					if(this.addressData.heimatadresse)
 						this.$fhcAlert.alertError(this.$p.t('person', 'error_deleteHomeAdress'));
@@ -216,7 +216,7 @@ export default{
 						this.$fhcAlert
 							.confirmDelete()
 							.then(result => result
-								? adress_id
+								? adresse_id
 								: Promise.reject({handled: true}))
 							.then(this.deleteAddress)
 							.catch(this.$fhcAlert.handleSystemError);
@@ -238,17 +238,17 @@ export default{
 		reload() {
 			this.$refs.table.reloadTable();
 		},
-		loadAdress(adress_id) {
+		loadAdress(adresse_id) {
 			this.statusNew = false;
-			return this.$fhcApi.factory.stv.kontakt.loadAddress(adress_id)
+			return this.$fhcApi.factory.stv.kontakt.loadAddress(adresse_id)
 				.then(result => {
 						this.addressData = result.data;
 						return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		updateAddress(adress_id) {
-			return this.$fhcApi.factory.stv.kontakt.updateAddress(adress_id,
+		updateAddress(adresse_id) {
+			return this.$fhcApi.factory.stv.kontakt.updateAddress(adresse_id,
 				this.addressData
 			).then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -260,8 +260,8 @@ export default{
 				this.reload();
 			});
 		},
-		deleteAddress(adress_id) {
-			return this.$fhcApi.factory.stv.kontakt.deleteAddress(adress_id)
+		deleteAddress(adresse_id) {
+			return this.$fhcApi.factory.stv.kontakt.deleteAddress(adresse_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				}).catch(this.$fhcAlert.handleSystemError)
