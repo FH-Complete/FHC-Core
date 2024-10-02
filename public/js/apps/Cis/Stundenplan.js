@@ -42,6 +42,8 @@ const app = Vue.createApp({
 			let tmp_date = new CalendarDate(data.start);
 			// only load month data if the month or year has changed
 			if(tmp_date.m != this.calendarDate.m || tmp_date.y != this.calendarDate.y){
+				// reset the events before querying the new events to activate the loading spinner
+				this.events = null;
 				this.calendarDate = tmp_date;
 				Vue.nextTick(() => {
 					this.loadEvents();
