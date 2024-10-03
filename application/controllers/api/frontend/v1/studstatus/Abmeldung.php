@@ -136,7 +136,6 @@ class Abmeldung extends FHCAPI_Controller
 		$grund = $this->input->post('grund');
 		$studiensemester = $this->input->post('studiensemester');
 		$prestudent_id = $this->input->post('prestudent_id');
-		$unruly = $this->input->post('unruly');
 
 		$result = $this->antraglib->getPrestudentAbmeldeBerechtigt($prestudent_id);
 		$result = $this->getDataOrTerminateWithError($result);
@@ -147,7 +146,7 @@ class Abmeldung extends FHCAPI_Controller
 		elseif ($result < 0)
 			$this->terminateWithError($this->p->t('studierendenantrag', 'error_antrag_exists'), self::ERROR_TYPE_GENERAL);
 
-		$result = $this->antraglib->createAbmeldung($prestudent_id, $studiensemester, getAuthUID(), $grund, $unruly);
+		$result = $this->antraglib->createAbmeldung($prestudent_id, $studiensemester, getAuthUID(), $grund);
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$result = $this->antraglib->getDetailsForAntrag($data);

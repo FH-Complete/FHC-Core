@@ -103,13 +103,11 @@ class Studierendenantrag extends FHC_Controller
 
 	public function abmeldungstgl($prestudent_id, $studierendenantrag_id = null)
 	{
-		$unruly = getData($this->PersonModel->loadPrestudent($prestudent_id))[0]->unruly;
 
 		$this->load->view('lehre/Antrag/Create', [
 			'prestudent_id' => $prestudent_id,
 			'studierendenantrag_id' => $studierendenantrag_id,
-			'antrag_type' => 'AbmeldungStgl',
-			'unruly' => $unruly
+			'antrag_type' => 'AbmeldungStgl'
 		]);
 	}
 

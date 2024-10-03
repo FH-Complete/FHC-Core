@@ -21,8 +21,7 @@ export default {
 		studierendenantragId: Number,
 		infoArray: Array,
 		statusMsg: String,
-		statusSeverity: String,
-		unruly: Boolean
+		statusSeverity: String
 	},
 	data() {
 		return {
@@ -50,7 +49,6 @@ export default {
 			v-model:status="status"
 			:prestudent-id="prestudentId"
 			:studierendenantrag-id="studierendenantragId"
-			:unruly="unruly"
 			@setInfos="$emit('update:infoArray', $event)"
 			@setStatus="$emit('update:statusMsg', $event.msg);$emit('update:statusSeverity', $event.severity)"
 			>
