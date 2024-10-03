@@ -23414,7 +23414,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
-		'phrase' => 'mark_person_as_unruly',
+		'phrase' => 'dropdown_unruly',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(

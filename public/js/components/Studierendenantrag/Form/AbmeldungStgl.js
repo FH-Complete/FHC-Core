@@ -125,7 +125,7 @@ export default {
 	},
 	watch: {
 		'formData.grund'(newVal) {
-			this.unrulyInternal = (newVal === this.$p.t('studierendenantrag', 'mark_person_as_unruly'))
+			this.unrulyInternal = (newVal === this.$p.t('studierendenantrag', 'textLong_unruly'))
 		}
 	},
 	template: `
@@ -190,7 +190,7 @@ export default {
 							</option>					
 							<option value="textLong_MissingZgv">{{$p.t('studierendenantrag', 'dropdown_MissingZgv')}}
 							</option>	
-							<option value="textLong_unruly">{{$p.t('studierendenantrag', 'mark_person_as_unruly')}}
+							<option value="textLong_unruly">{{$p.t('studierendenantrag', 'dropdown_unruly')}}
 							</option>						
 						</select>	
 					</div>
