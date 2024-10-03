@@ -18,8 +18,7 @@ export default {
 	],
 	props: {
 		prestudentId: Number,
-		studierendenantragId: Number,
-		unruly: Boolean
+		studierendenantragId: Number
 	},
 	data() {
 		return {
@@ -28,7 +27,7 @@ export default {
 			formData: {
 				grund: ''
 			},
-			unrulyInternal: this.unruly
+			unrulyInternal: false
 		}
 	},
 	computed: {

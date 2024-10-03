@@ -35,7 +35,6 @@ $this->load->view(
 				:prestudent-id="<?= $prestudent_id; ?>"
 				antrag-type="<?= $antrag_type; ?>"
 				:studierendenantrag-id="<?= $studierendenantrag_id ?: 'undefined'; ?>"
-				:unruly="<?php echo json_encode($unruly) ?>"
 				v-model:info-array="infoArray"
 				v-model:status-msg="status.msg"
 				v-model:status-severity="status.severity"
