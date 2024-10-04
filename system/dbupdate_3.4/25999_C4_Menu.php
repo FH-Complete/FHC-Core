@@ -36,6 +36,15 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					'redirect','etw',NOW(),null,null,null,TRUE,FALSE,'MEIN_STUDIUM'
 				);
 
+				-- VPN_STUDIERENDE
+
+				INSERT INTO campus.tbl_content 
+				(template_kurzbz, oe_kurzbz, insertamum, insertvon, updateamum, updatevon, aktiv, menu_open, beschreibung)
+				VALUES  
+				(
+					'redirect','etw',NOW(),null,null,null,TRUE,FALSE,'VPN_STUDIERENDE'
+				);
+
 				-- PROFIL
 
 				INSERT INTO campus.tbl_content 
@@ -134,6 +143,20 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					1,TRUE,
 					'<content><url><![CDATA[#Mein Studium]]></url><target><![CDATA[_self]]></target></content>',
 					null,null,null,null,NOW(),null,'Mein Studium',null
+				);
+
+				-- VPN_STUDIERENDE
+
+				INSERT INTO campus.tbl_contentsprache 
+				(sprache, content_id, version, sichtbar, content, reviewvon, reviewamum, updateamum, updatevon, insertamum, insertvon, titel, gesperrt_uid)
+				VALUES  
+				(
+					'German',
+					-- queries the content_id for the VPN_STUDIERENDE
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'VPN_STUDIERENDE'),
+					1,TRUE,
+					'<content><url><![CDATA[#VPN]]></url><target><![CDATA[_self]]></target></content>',
+					null,null,null,null,NOW(),null,'VPN Neu - Zugang für Student*innen',null
 				);
 
 				-- PROFIL
@@ -270,8 +293,9 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 				(
 					-- queries the content_id for the CIS4_ROOT
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
-					-- 10882 is the content_id for VPN Neu - Zugang für Student*innen
-					10882, NOW(), null, null, null, 2
+					-- queries the content_id for the VPN_STUDIERENDE
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'VPN_STUDIERENDE'),
+					NOW(), null, null, null, 2
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -370,6 +394,28 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
 					-- 10795 is the content_id for Studierendenstatus
 					10795, NOW(), null, null, null, 4
+				);
+
+				-- VPN_STUDIERENDE childs
+
+				INSERT INTO campus.tbl_contentchild
+				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
+				VALUES
+				(
+					-- queries the content_id for the MEIN_STUDIUM
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'VPN_STUDIERENDE'),
+					-- 10883 is the content_id for VPN Windows für Student*innen
+					10883, NOW(), null, null, null, 1
+				);
+
+				INSERT INTO campus.tbl_contentchild
+				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
+				VALUES
+				(
+					-- queries the content_id for the MEIN_STUDIUM
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'VPN_STUDIERENDE'),
+					-- 10884 is the content_id for VPN Linux für Student*innen
+					10884, NOW(), null, null, null, 2
 				);
 
 				-- Profil childs

@@ -20,13 +20,9 @@ export default {
 		highestMatchingUrlCount: function(newValue)
 		{
 			// if this entry has the most matching url parts then it should be active
-			if (newValue == this.urlCount)
+			if (this.activeContent == null && newValue == this.urlCount)
 			{
-				this.entry.menu_open = true;
-			}
-			else
-			{
-				this.entry.menu_open = false;
+				this.$emit("activeEntry", this.entry.content_id);
 			}
 		},
 		activeContent: function(newValue){
@@ -55,7 +51,8 @@ export default {
 				// only invokes .hide if this.collapse is not null
 				this.collapse && this.collapse.hide();
 			}
-			// debugging helpers - console.log(this.entry.titel,newValue?"open":"close")
+			// debugging helpers - console.log(this.entry.titel, newValue ? "open" : "close")
+			
 		},
 	},
 		
@@ -230,7 +227,7 @@ export default {
             </div>
             <ul ref="children"
                 class="nav w-100 collapse">
-                <cis-menu-entry @UrlCount="passUrlCount" @activeEntry="resendEmit" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
+                <cis-menu-entry @UrlCount="passUrlCount" :highestMatchingUrlCount="highestMatchingUrlCount" @activeEntry="resendEmit" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
             </ul>
         </template>
         <a v-else
