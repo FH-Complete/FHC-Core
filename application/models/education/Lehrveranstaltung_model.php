@@ -67,15 +67,50 @@ class Lehrveranstaltung_model extends DB_Model
 	/**
 	 * Get Lehrveranstaltungen with its Stg, OE and OE-type.
 	 * Filter by Studiensemester and Organisationseinheiten if necessary.
-	 * @param $eventQuery String
-	 * @param string $studiensemester_kurzbz Filter by Studiensemester
-	 * @param array $oes Filter by Organisationseinheiten
-	 * @param array $lv_ids Filter by Lehrveranstaltung-Ids
+	 * @param null|string $studiensemester_kurzbz Filter by Studiensemester
+	 * @param null|array $oes Filter by Organisationseinheiten
+	 * @param null|string $lehrtyp_kurzbz Filter by Lehrtyp 'lv' or 'modul'
+	 * @param null|array $lv_ids Filter by Lehrveranstaltung-Ids
+	 * @param string $oe_column 'lv'|'stg' Used when filtering $oes: Filter by lv.oe_kurzbz or stg.oe_kurzbz (the stg joined to lv)
 	 * @return array
 	 */
-	public function getLvsByStudienplan($studiensemester_kurzbz = null, $oes = null, $lv_ids = null)
+	public function getLvsByStudienplan($studiensemester_kurzbz = null, $oes = null, $lehrtyp_kurzbz = null, $lv_ids = null, $oe_column = 'lv')
 	{
-		$subQry = $this->_getQryLvsByStudienplan($studiensemester_kurzbz, $oes);
+		// Subquery LVs
+		$subQry = $this->_getQryLvsByStudienplan();
+		$params = [];
+
+		if (isset($studiensemester_kurzbz) && is_string($studiensemester_kurzbz))
+		{
+			/* filter by studiensemester */
+			$subQry.= ' AND stplsem.studiensemester_kurzbz = ?';
+			$params[] = $studiensemester_kurzbz;
+		}
+
+		if (isset($oes) && is_array($oes))
+		{
+			if ($oe_column === 'lv')
+			{
+				/* filter by lv organisationseinheit (Standard behaviour) */
+				$subQry.= ' AND lv.oe_kurzbz IN ?';
+			}
+			elseif ($oe_column === 'stg')
+			{
+				/* filter by lv studiengangs organisationseinheit () */
+				$subQry.= ' AND stg.oe_kurzbz IN ?';
+			}
+
+			$params[]= $oes;
+		}
+
+		if (isset($lehrtyp_kurzbz) && is_string($lehrtyp_kurzbz))
+		{
+			/* filter by lehrtyp_kurzbz */
+			$subQry .= ' AND lehrtyp_kurzbz = ?';
+			$params[] = $lehrtyp_kurzbz;
+		}
+
+		// Final Query
 		$qry = 'SELECT * FROM ('. $subQry. ') AS tmp';
 
 		if (isset($lv_ids) && is_array($lv_ids))
@@ -87,7 +122,7 @@ class Lehrveranstaltung_model extends DB_Model
 
 		$qry.= ' ORDER BY stg_typ_kurzbz, orgform_kurzbz DESC';
 
-		return $this->execQuery($qry);
+		return $this->execQuery($qry, $params);
 	}
 
 	/**
