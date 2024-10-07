@@ -130,7 +130,7 @@ class Lehrveranstaltung_model extends DB_Model
 	 *
 	 * @return string
 	 */
-	private function _getQryLvsByStudienplan($studiensemester_kurzbz = null, $oes = null,  $lehrtyp_kurzbz = 'lv')
+	private function _getQryLvsByStudienplan()
 	{
 		$qry = '
 			SELECT
@@ -152,6 +152,8 @@ class Lehrveranstaltung_model extends DB_Model
 			    lv.lehrveranstaltung_id,
 				lv.semester,   		
 				lv.bezeichnung AS lv_bezeichnung,
+			    lv.lehrtyp_kurzbz,
+			    lv.lehrveranstaltung_template_id,
 				(
 				    -- comma seperated string of all lehreinheitgruppen
 					SELECT string_agg(bezeichnung, \', \') AS lehreinheitgruppe_bezeichnung
@@ -186,23 +188,8 @@ class Lehrveranstaltung_model extends DB_Model
 				JOIN public.tbl_organisationseinheit 			oe USING (oe_kurzbz)
 				JOIN public.tbl_studiengang          			stg ON stg.studiengang_kz = sto.studiengang_kz
 				JOIN public.tbl_studiengangstyp 				stgtyp ON stgtyp.typ = stg.typ
-			/* filter by lehrtyp_kurzbz, default is lvs only */
-			WHERE 
-			      lehrtyp_kurzbz = '. $this->db->escape($lehrtyp_kurzbz);
-
-		if (isset($studiensemester_kurzbz) && is_string($studiensemester_kurzbz))
-		{
-			/* filter by studiensemester */
-			$qry.= ' AND stplsem.studiensemester_kurzbz = '. $this->db->escape($studiensemester_kurzbz);
-
-		}
-
-		if (isset($oes) && is_array($oes))
-		{
-			/* filter by organisationseinheit */
-			$implodedOes = "'". implode("', '", $oes). "'";
-			$qry.= ' AND lv.oe_kurzbz IN ('. $implodedOes. ')';
-		}
+			WHERE 1 = 1
+		';
 
 		return $qry;
 	}
