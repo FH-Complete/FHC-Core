@@ -20,19 +20,45 @@ class Lehrveranstaltung_model extends DB_Model
 	 * @param $eventQuery String
 	 * @param string $studiensemester_kurzbz Filter by Studiensemester
 	 * @param array $oes Filter by Organisationseinheiten
+	 * @param null $lehrtyp_kurzbz Filter by Lehrtyp 'lv' or 'modul'
 	 * @return array
 	 */
-	public function getAutocompleteSuggestions($eventQuery, $studiensemester_kurzbz = null, $oes = null)
+	public function getAutocompleteSuggestions($eventQuery, $studiensemester_kurzbz = null, $oes = null, $lehrtyp_kurzbz = null)
 	{
-		$subQry = $this->_getQryLvsByStudienplan($studiensemester_kurzbz, $oes);
+		// Subquery
+		$subQry = $this->_getQryLvsByStudienplan();
 		$params = [];
 
-		/* filter by input string */
-		if (is_string($eventQuery)) {
+		if (isset($studiensemester_kurzbz) && is_string($studiensemester_kurzbz))
+		{
+			/* filter by studiensemester */
+			$subQry.= ' AND stplsem.studiensemester_kurzbz = ?';
+			$params[] = $studiensemester_kurzbz;
+		}
+
+		if (isset($oes) && is_array($oes))
+		{
+			/* filter by organisationseinheit */
+			$subQry.= ' AND lv.oe_kurzbz IN ?';
+			$params[]= $oes;
+		}
+
+		if (isset($lehrtyp_kurzbz) && is_string($lehrtyp_kurzbz))
+		{
+			/* filter by lehrtyp_kurzbz */
+			$subQry .= ' AND lehrtyp_kurzbz = ?';
+			$params[] = $lehrtyp_kurzbz;
+		}
+
+
+		if (is_string($eventQuery))
+		{
+			/* filter by input string */
 			$subQry.= ' AND lv.bezeichnung ILIKE ?';
 			$params[] = '%' . $eventQuery . '%';
 		}
 
+		// Final Query
 		$qry = 'SELECT DISTINCT ON (lehrveranstaltung_id) * FROM ('. $subQry. ') AS tmp';
 
 		return $this->execQuery($qry, $params);
