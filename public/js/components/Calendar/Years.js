@@ -51,9 +51,9 @@ export default {
 	},
 	template: `
 	<div class="fhc-calendar-years">
-		<calendar-header :title="title" @prev="prev" @next="next" @click="$emit('update:mode')" />
+		<calendar-header :title="title" @prev="prev" @next="next" @click="$emit('updateMode')" @updateMode="$emit('updateMode')" />
 		<calendar-pane ref="pane" v-slot="slot" @slid="paneChanged">
-			<calendar-years-page :data-test="slot.index" :start="start+range*slot.offset" :end="start+range*slot.offset+range" @update:mode="$emit('update:mode')"/>
+			<calendar-years-page :data-test="slot.index" :start="start+range*slot.offset" :end="start+range*slot.offset+range" @updateMode="$emit('updateMode')"/>
 		</calendar-pane>
 	</div>`
 }

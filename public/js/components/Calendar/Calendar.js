@@ -6,6 +6,7 @@ import CalendarWeeks from './Weeks.js';
 import CalendarMinimized from './Minimized.js';
 import CalendarDate from '../../composables/CalendarDate.js';
 
+
 // TODO(chris): week/month toggle
 
 export default {
@@ -28,7 +29,8 @@ export default {
 			noMonthView: this.noMonthView,
 			noWeekView: this.noWeekView,
 			eventsAreNull: Vue.computed(() => this.events === null),
-			classHeader: this.classHeader
+			classHeader: this.classHeader,
+			mode: Vue.computed(()=>this.mode),
 		};
 	},
 	props: {
@@ -135,7 +137,7 @@ export default {
 	},
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card" :class="sizeClass">
-		<component v-slot="{event,day}" :is="'calendar-' + mode" @update:mode="mode=$event" @change:range="$emit('change:range',$event)" @input="handleInput" >
+		<component v-slot="{event,day}" :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)" @input="handleInput" >
 			<!--Week Page layout-->
 			<slot :event="event" :day="day"></slot>
 		</component>

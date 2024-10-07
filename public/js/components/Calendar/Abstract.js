@@ -10,7 +10,7 @@ export default {
 		'size'
 	],
 	emits: [
-		'update:mode',
+		'updateMode',
 		'change:range',
 		'input'
 	]

@@ -7,7 +7,7 @@ export default {
 		end: Number
 	},
 	emits: [
-		'update:mode'
+		'updateMode'
 	],
 	data() {
 		return {
@@ -21,7 +21,7 @@ export default {
 	template: `
 	<div class="fhc-calendar-years-page d-flex flex-wrap">
 		<div v-for="year in years" :key="year" class="d-grid col-4">
-			<button class="btn btn-outline-secondary" :class="{'border-0': year != focusDate.y}" @click="focusDate.y = year; $emit('update:mode')">
+			<button class="btn btn-outline-secondary" :class="{'border-0': year != focusDate.y}" @click="focusDate.y = year; $emit('updateMode')">
 				{{year}}
 			</button>
 		</div>

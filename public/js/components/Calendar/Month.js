@@ -61,9 +61,9 @@ export default {
 	},
 	template: `
 	<div class="fhc-calendar-month">
-		<calendar-header :title="title" @prev="prev" @next="next" @click="$emit('update:mode', 'months')" />
+		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'months')" />
 		<calendar-pane ref="pane" v-slot="slot" @slid="paneChanged">
-			<calendar-month-page :year="focusDate.y" :month="focusDate.m+slot.offset" @update:mode="$emit('update:mode', $event)" @page:back="prev" @page:forward="next" @input="selectDay" />
+			<calendar-month-page :year="focusDate.y" :month="focusDate.m+slot.offset" @updateMode="$emit('updateMode', $event)" @page:back="prev" @page:forward="next" @input="selectDay" />
 		</calendar-pane>
 	</div>`
 }

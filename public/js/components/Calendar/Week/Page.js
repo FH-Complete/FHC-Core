@@ -16,7 +16,7 @@ export default {
 		week: Number
 	},
 	emits: [
-		'update:mode',
+		'updateMode',
 		'page:back',
 		'page:forward',
 		'input'
@@ -82,7 +82,7 @@ export default {
 			if (!this.noMonthView) {
 				this.date.set(day);
 				this.focusDate.set(day);
-				this.$emit('update:mode', 'month');
+				this.$emit('updateMode', 'month');
 			}
 		},
 		dateToMinutesOfDay(day) {
@@ -97,9 +97,9 @@ export default {
 	
 		<div class="d-flex flex-column border-top">
 			<div class="fhc-calendar-week-page-header border-2 border-bottom text-center d-flex" style="position:sticky; top:0; " >
-				<div v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})">
+				<div type="button" v-for="day in days" :key="day" class="test flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
 					<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
-					<a href="#" class="small text-secondary text-decoration-none" @click.prevent="changeToMonth(day)">{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
+					<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
 				</div>
 			</div>
 			<div ref="eventcontainer" class="flex-grow-1">

@@ -14,7 +14,7 @@ export default {
 		month: Number
 	},
 	emits: [
-		'update:mode',
+		'updateMode',
 		'page:back',
 		'page:forward',
 		'input'
@@ -50,7 +50,7 @@ export default {
 			if (!this.noWeekView) {
 				if (!this.focusDate.isInWeek(week.no, week.y))
 					this.focusDate.set(week.days[0]);
-				this.$emit('update:mode', 'week');
+				this.$emit('updateMode', 'week');
 			}
 		}
 	},
