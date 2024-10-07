@@ -26095,6 +26095,9 @@ array(
 			)
 		)
 	),
+	//
+	// DIGITALE ANWESENHEITEN PHRASEN BEGIN
+	//
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
@@ -27578,7 +27581,7 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'anteil',
+		'phrase' => 'anteilAnw',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -28135,6 +28138,9 @@ array(
 			)
 		)
 	),
+	//
+	// DIGITALE ANWESENHEITEN PHRASEN END
+	//
 	array(
 		'app' => 'core',
 		'category' => 'global',
