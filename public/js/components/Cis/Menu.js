@@ -21,15 +21,25 @@ export default {
             entries: [],
 			activeEntry:null,
 			url:null,
-			highestMatchingUrlCount:0,
+			urlMatchRankings:[],
         };
     },
-	methods:{
-		checkHighestMatchingUrlCount(count){
-			if(count > this.highestMatchingUrlCount)
-			{
-				this.highestMatchingUrlCount = count;
+	computed:{
+		highestMatchingUrlCount(){
+			// gets the hightest ranking inside the array
+			let highestMatch = Math.max(...this.urlMatchRankings);
+
+			if(this.urlMatchRankings.length > 0){
+				// if more than one entry has the same ranking, none should be active
+				return this.urlMatchRankings.filter((value)=>value == highestMatch).length > 1 ? null : highestMatch;
 			}
+
+			return null;
+		},
+	},
+	methods:{
+		addUrlCount(count){
+			this.urlMatchRankings.push(count);
 		},
 
 		setActiveEntry(content_id){
@@ -51,6 +61,15 @@ export default {
     <a id="nav-logo" :href="rootUrl">
         <img :src="logoUrl" alt="Logo">
     </a>
+	<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
+		<img :src="avatarUrl" class="avatar rounded-circle"/>
+	</button>
+	<ul id="nav-user-menu" class="collapse list-unstyled" aria-labelledby="nav-user-btn">
+		<li><a class="btn btn-level-2 rounded-0 d-block" href="#" id="menu-profil">Profil</a></li>
+		<li><a class="btn btn-level-2 rounded-0 d-block" href="#">Ampeln</a></li>
+		<li><hr class="dropdown-divider"></li>
+		<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>
+	</ul>
     <nav id="nav-main" class="offcanvas offcanvas-start bg-dark" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
 			<div id="nav-main-toggle" class="position-static d-none d-lg-block bg-dark">
@@ -59,18 +78,9 @@ export default {
 				</button>
 			</div>
 			<div class="offcanvas-body p-0">
-				<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
-					<img :src="avatarUrl" class="avatar rounded-circle"/>
-				</button>
-				<ul id="nav-user-menu" class="collapse list-unstyled" aria-labelledby="nav-user-btn">
-					<li><a class="btn btn-level-2 rounded-0 d-block" href="#" id="menu-profil">Profil</a></li>
-					<li><a class="btn btn-level-2 rounded-0 d-block" href="#">Ampeln</a></li>
-					<li><hr class="dropdown-divider"></li>
-					<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>
-				</ul>
 				<div id="nav-main-menu" class="collapse collapse-horizontal show">
 					<div>
-						<cis-menu-entry @UrlCount="checkHighestMatchingUrlCount" @activeEntry="setActiveEntry" :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
+						<cis-menu-entry @UrlCount="addUrlCount" @activeEntry="setActiveEntry" :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
 					</div>
 				</div>
 			</div>
