@@ -77,7 +77,6 @@ export default {
 		}
 	},
 	template: `
-	<p>{{minimized}}</p>
 	<div class="fhc-calendar-month-page" :class="{'show-weeks': showWeeks}">
 		<div v-if="showWeeks" class=" bg-light fw-bold border-top border-bottom text-center"></div>
 		<div v-for="day in weeks[0].days" :key="day" class="bg-light fw-bold border-top border-bottom text-center">
