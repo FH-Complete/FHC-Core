@@ -327,7 +327,7 @@ class Recipient_model extends DB_Model
 						pr.nachname,
 						ms.person_id,
 						mrou.token
-			  ORDER BY sent DESC';
+			  ORDER BY sent DESC LIMIT 1500';
 
 		return $this->execQuery($sql, array($person_id, $functions, $person_id));
 	}

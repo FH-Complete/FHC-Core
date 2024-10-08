@@ -1403,14 +1403,53 @@ $filters = array(
 						{"name": "Wochenstunden"}, 
 						{"name": "WS_von"}, 
 						{"name": "WS_bis"}, 
-						{"name": "Standardkostenstelle"}
+						{"name": "Standardkostenstelle"},
+						{"name": "DV_status"}
 					],
 					"filters": [
 						{
-							"name": "Nachname",
+							"name": "DV_status",
 							"option": "",
-							"operation": "",
-							"condition": ""
+							"operation": "nequal",
+							"condition": "beendet"
+						}
+					]
+				}
+			',
+			'oe_kurzbz' => null,
+		),
+		array(
+			'app' => 'personalverwaltung',
+			'dataset_name' => 'handyverwaltung',
+			'filter_kurzbz' => 'ma4handyverwaltung_beendet',
+			'description' => '{MA Handyverwaltung (DV beendet)}',
+			'sort' => 2,
+			'default_filter' => false,
+			'filter' => '
+				{
+					"name": "MA Handyverwaltung (DV beendet)",
+					"columns": [
+						{"name": "UID"},
+						{"name": "PersonId"},
+						{"name": "Vorname"},
+						{"name": "Nachname"},
+						{"name": "EMail"}, 
+						{"name": "Unternehmen"}, 
+						{"name": "Vertragsart"}, 
+						{"name": "DV_von"}, 
+						{"name": "DV_bis"}, 
+						{"name": "Wochenstunden"}, 
+						{"name": "WS_von"}, 
+						{"name": "WS_bis"}, 
+						{"name": "Standardkostenstelle"},
+						{"name": "DV_status"}
+					],
+					"filters": [
+						{
+							"name": "DV_status",
+							"option": "",
+							"operation": "equal",
+							"condition": "beendet"
 						}
 					]
 				}
