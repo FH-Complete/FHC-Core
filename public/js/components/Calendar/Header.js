@@ -4,9 +4,7 @@ export default {
 			selected: this.mode,
 			modes:{
 				week:"Woche", 
-				weeks:"Kalendarwochen", 
 				month:"Monat", 
-				months:"Monate", 
 				years:"Jahre",
 			},
 		}
@@ -54,12 +52,16 @@ export default {
 						{{ title }}
 						<i v-if="eventsAreNull" class="fa fa-spinner fa-pulse"></i>
 					</button>
-					<select class="form-select w-auto" aria-label="Default select example">
-						<option :selected="mode_kurzbz == mode" @click="$emit('updateMode',mode_kurzbz)" v-for="(mode_bezeichnung,mode_kurzbz) in modes">{{mode_bezeichnung}}</option>
-					</select>
 				</div>
 			</div>
 			<button class="col-auto btn btn-outline-secondary border-0" :class="{'btn-sm': !this.size}" @click="$emit('next')"><i class="fa fa-chevron-right"></i></button>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-auto">
+				<div class="btn-group" role="group" aria-label="Kalender Modus">
+					<button type="button" :class="{'active':mode_kurzbz == mode}" @click.prevent="$emit('updateMode',mode_kurzbz)" class="btn btn-outline-secondary" v-for="(mode_bezeichnung,mode_kurzbz) in modes">{{mode_bezeichnung}}</button>
+				</div>
+			</div>
 		</div>
 	</div>`
 }
