@@ -22,7 +22,9 @@ class Lehrveranstaltung extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct(array(
-			'getTemplateLvTree' => self::PERM_LOGGED
+			'getTemplateLvTree' => array(
+			    'lehre/lehrveranstaltung:rw'
+			)
 		));
 
 		// Load model LehrveranstaltungModel
