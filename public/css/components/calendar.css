@@ -133,6 +133,11 @@
   position: relative;
   aspect-ratio: 1;
 }
+
+.fhc-calendar-month-page-day-highlight {
+	background-color: #f5f5f5;
+}
+
 .fhc-calendar-sm .fhc-calendar-month-page-day.active .no,
 .fhc-calendar-xs .fhc-calendar-month-page-day.active .no {
   background-color: rgba(var(--bs-info-rgb), 0.25);
