@@ -21,12 +21,11 @@ export default {
 		'page:forward',
 		'input'
 	],
-	data() {
-		return {
-			hours: [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
-		};
-	},
 	computed: {
+		hours(){
+			// returns an array with elements starting at 7 and ending at 24
+			return [...Array(24).keys()].filter(hour => hour >= 7 && hour <= 24);
+		},
 		days() {
 			
 			let tmpDate = new CalendarDate(this.year,1,1); // NOTE(chris): somewhere in the middle of the year
