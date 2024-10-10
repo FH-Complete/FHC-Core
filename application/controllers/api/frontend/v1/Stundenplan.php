@@ -109,14 +109,8 @@ class Stundenplan extends FHCAPI_Controller
 	 */
 	public function getStundenplan(){
 
-		// Query fuer Studenten prototyp ok
+		// Query fuer Studenten MVP
 		//TODO: getStundenplan fuer Mitarbeiter anpassen
-		//TODO: viele edge cases die es nicht moeglich machen besseren tbl_stundenplan index zu verwenden als idx_stundenplan_datum
-
-		// include Student model to fetch Studiengang_kz and Semester
-		$this->load->model('crm/Student_model', 'StudentModel');
-		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 
 		// form validation
 		$this->load->library('form_validation');
@@ -130,14 +124,81 @@ class Stundenplan extends FHCAPI_Controller
 		$start_date = $this->input->get('start_date', TRUE);
 		$end_date = $this->input->get('end_date', TRUE);
 		
-		// get Student_uid / Studiengang_kz / Semester in order to use index idx_stundenplan_datum_stgsem
-		$student_uid = get_uid();
-		$student_data = $this->StudentModel->load([$student_uid]);
-		$student_data = getData($student_data)[0];
-		$this->addMeta('studg',$student_data->studiengang_kz);
-		$this->addMeta('sem', $student_data->semester);	
+		$student_uid = getAuthUID();
+		if(is_null($student_uid))
+		{
+			$this->terminateWithError("No UID");
+		}
 
-		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(get_uid(),$start_date,$end_date,$student_data->studiengang_kz,$student_data->semester)); 
+		//semester des Studenten ermitteln
+		$lvplan_load_ueber_semesterhaelfte = false;
+		if (defined('LVPLAN_LOAD_UEBER_SEMESTERHAELFTE') && LVPLAN_LOAD_UEBER_SEMESTERHAELFTE === true)
+			$lvplan_load_ueber_semesterhaelfte = true;
+		else
+			$lvplan_load_ueber_semesterhaelfte = false;
+
+		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
+		$aktuelle_studiensemester = current(getData($this->StudiensemesterModel->getAkt()))->studiensemester_kurzbz;
+		if($lvplan_load_ueber_semesterhaelfte)
+		{
+			$next_studiensemester = current(getData($this->StudiensemesterModel->getNext()))->studiensemester_kurzbz;
+			$previous_studiensemester = current(getData($this->StudiensemesterModel->getPreviousFrom($aktuelle_studiensemester)))->studiensemester_kurzbz;
+		}
+		else
+		{
+			$nearest_studiensemester = current(getData($this->StudiensemesterModel->getNearestFrom($aktuelle_studiensemester)))->studiensemester_kurzbz;
+		}
+
+		// getting the gruppen_kurzbz of the student in the different studiensemester
+		$this->load->model('person/Benutzergruppe_model','BenutzergruppeModel');
+		$benutzer_gruppen = null;
+		if ($lvplan_load_ueber_semesterhaelfte) 
+		{
+			$benutzer_gruppen = $this->BenutzergruppeModel->execReadOnlyQuery("
+			SELECT * FROM tbl_benutzergruppe where uid = ? AND studiensemester_kurzbz IN ?",[$student_uid, [$aktuelle_studiensemester, $next_studiensemester, $previous_studiensemester]]);
+			$benutzer_gruppen = array_map(function($item){ return "'".$item->gruppe_kurzbz. "'";},getData($benutzer_gruppen));
+		}
+		else
+		{
+			$benutzer_gruppen = $this->BenutzergruppeModel->execReadOnlyQuery("
+			SELECT * FROM tbl_benutzergruppe where uid = ? AND studiensemester_kurzbz IN ?", [$student_uid, [$aktuelle_studiensemester,$nearest_studiensemester]]);
+			$benutzer_gruppen = array_map(function ($item) { return "'".$item->gruppe_kurzbz. "'";}, getData($benutzer_gruppen));
+		}
+
+		// getting the student_lehrverbaende of the student in the different studiensemester
+		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+		$student_lehrverbaende = null;
+		if ($lvplan_load_ueber_semesterhaelfte) {
+			$student_lehrverbaende = $this->BenutzergruppeModel->execReadOnlyQuery("
+			SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz IN ?", [$student_uid, [$aktuelle_studiensemester,$next_studiensemester, $previous_studiensemester]]);
+			$student_lehrverbaende = array_map(
+				function ($item)
+				{
+					$result = new stdClass();
+					$result->studiengang_kz = $item->studiengang_kz;
+					$result->semester = $item->semester;
+					$result->verband = $item->verband;
+					$result->gruppe = $item->gruppe;
+					return $result;
+				},
+				getData($student_lehrverbaende));
+		} else {
+			$student_lehrverbaende = $this->BenutzergruppeModel->execReadOnlyQuery("
+			SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz IN ?", [$student_uid, [$aktuelle_studiensemester,$nearest_studiensemester]]);
+			$student_lehrverbaende = array_map(
+				function ($item) {
+					$result = new stdClass();
+					$result->studiengang_kz = $item->studiengang_kz;
+					$result->semester = $item->semester;
+					$result->verband = $item->verband;
+					$result->gruppe = $item->gruppe;
+					return $result;
+				},
+				getData($student_lehrverbaende)
+			);
+		}
+
+		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery($start_date, $end_date, $benutzer_gruppen, $student_lehrverbaende)); 
 		$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data) ?? [];
 
 		$this->expand_object_information($stundenplan_data);

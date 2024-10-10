@@ -192,52 +192,22 @@ class Stundenplan_model extends DB_Model
 	 * 
 	 * @return string
 	 */
-	public function getStundenplanQuery($uid, $start_date, $end_date,$studiengang_kz,$semester){
+	public function getStundenplanQuery($start_date, $end_date,$gruppen,$studentlehrverbaende){
 
-		$studiensemester = null;
-
-		$check_with_start_date = $this->execReadOnlyQuery("SELECT * FROM public.tbl_studiensemester WHERE " . $this->escape($start_date) . " BETWEEN start AND ende ;");
-		$check_with_start_date = getData($check_with_start_date);
-		if (count($check_with_start_date)>0) 
-		{
-			$studiensemester = current($check_with_start_date)->studiensemester_kurzbz;
-		}
-		else
-		{
-			$check_with_end_date = $this->execReadOnlyQuery("SELECT * FROM public.tbl_studiensemester WHERE " . $this->escape($end_date) . " BETWEEN start AND ende ;");
-			$check_with_end_date = getData($check_with_end_date);
-			if (count($check_with_start_date) > 0) 
-			{
-				$studiensemester = current($check_with_end_date)->studiensemester_kurzbz;
-			}
-		}
-
-		if(!is_null($studiensemester))
-		{
-			$semester_with_studiensemester = $this->execReadOnlyQuery("SELECT * FROM public.tbl_studentlehrverband WHERE student_uid = " . $this->escape($uid) . " AND studiensemester_kurzbz = " . $this->escape($studiensemester));
-			$semester_with_studiensemester = getData($semester_with_studiensemester);
-			$semester_with_studiensemester = current($semester_with_studiensemester)->semester;
-
-		return 
+		$query =  
 		"select sp.*
 		from lehre.vw_stundenplan sp
-		left join public.tbl_benutzergruppe bg ON sp.gruppe_kurzbz=bg.gruppe_kurzbz AND bg.uid =".$this->escape($uid)." 
-		left join public.tbl_studiensemester ss1 ON bg.studiensemester_kurzbz=ss1.studiensemester_kurzbz AND ss1.start <=sp.datum AND ss1.ende>= sp.datum
-		left join public.tbl_studentlehrverband slv ON sp.studiengang_kz=slv.studiengang_kz and slv.student_uid=".$this->escape($uid)." and (slv.semester=sp.semester OR sp.semester IS NULL) AND (slv.verband=sp.verband OR sp.verband IS NULL OR sp.verband='' OR sp.verband='0') AND
-		(slv.gruppe=sp.gruppe OR sp.gruppe IS NULL OR sp.gruppe='' OR sp.gruppe='0') AND sp.gruppe_kurzbz IS NULL
-		left join public.tbl_studiensemester ss2 ON slv.studiensemester_kurzbz=ss2.studiensemester_kurzbz AND ss2.start<=sp.datum and ss2.ende >= sp.datum
-		WHERE 
+		WHERE
 		sp.datum >= ".$this->escape($start_date)." 
 		AND sp.datum <= ".$this->escape($end_date)."
-		AND sp.studiengang_kz = ".$this->escape($studiengang_kz)."
-		AND sp.semester = ".$this->escape($semester_with_studiensemester)."
-		AND (ss1.studiensemester_kurzbz IS NOT NULL or ss2.studiensemester_kurzbz IS NOT NULL)";
+		AND ( 
+		sp.gruppe_kurzbz IN (".implode(',',$gruppen).")";
+		foreach($studentlehrverbaende as $lehrverband){
+			$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe).")"; 
+		}
+		$query .= ")";
 
-		}
-		else
-		{
-			return error("studiensemester could not be retrieved with the student_uid: ".$uid);
-		}
+		return $query;
 	}
 
 	/**
