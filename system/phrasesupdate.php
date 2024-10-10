@@ -27106,7 +27106,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Entschuldigung hinzufügen!',
+				'text' => 'Entschuldigung hinzufügen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -28001,18 +28001,18 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'showAllDates',
+		'phrase' => 'showAllKontrollen',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Alle Termine anzeigen',
+				'text' => 'Alle Kontrollen anzeigen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Show All Dates',
+				'text' => 'Show All Attendance Checks',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -28133,6 +28133,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Attending at date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'minuten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Minuten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'minutes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'einheiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Einheiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'units',
 				'description' => '',
 				'insertvon' => 'system'
 			)
