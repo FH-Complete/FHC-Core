@@ -73,11 +73,14 @@ export default {
 			return res;
 		},
 		smallestTimeFrame() {
-			return 10;//[30,15,10,5][this.size];
+			return [30,15,10,5][this.size];
 		}
 	},
 	methods: {
-		
+		getAbsolutePositionForHour(hour){
+			// used for the absolute positioning of the gutters of hours
+			return (100 / this.hours.length) * (hour - (24-this.hours.length)) + '%';
+		},
 		changeToMonth(day) {
 			if (!this.noMonthView) {
 				this.date.set(day);
@@ -86,32 +89,30 @@ export default {
 			}
 		},
 		dateToMinutesOfDay(day) {
-			//console.log((day.getHours() * 60 + day.getMinutes()) / this.smallestTimeFrame,"this are the hours");
-			//console.log(Math.floor((day.getHours() * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1,"this is the result of the calculation");
 			return Math.floor(((day.getHours()-7) * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
 		}
 	},
 	mounted() {
-		console.log(this.hours,"this are the hours");
 		setTimeout(() => this.$refs.eventcontainer.scrollTop = this.$refs.eventcontainer.scrollHeight / 3 + 1, 0);
 	},
 	template: `
 	<div class="fhc-calendar-week-page">
 	
 		<div class="d-flex flex-column border-top">
-			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="{'grid-template-columns': 'repeat(' + days.length + ', 1fr)', 'grid-template-rows':1}" style="position:sticky; top:0; " >
+			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="{'z-index':2,'grid-template-columns': 'repeat(' + days.length + ', 1fr)', 'grid-template-rows':1}" style="position:sticky; top:0; " >
 				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
 					<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
 					<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
 				</div>
 			</div>
-			<div ref="eventcontainer" class="flex-grow-1">
+			<div ref="eventcontainer" class="position-relative flex-grow-1">
+			<div v-for="hour in hours" :key="hour"  class="position-absolute border-top" :style="{top:getAbsolutePositionForHour(hour),left:0,right:0,'z-index':0}"></div>
 				<div class="events">
 					<div class="hours">
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (1080 / smallestTimeFrame) + ', 1fr)'}">
-						<div :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="$emit('input', event.orig)" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">	
+						<div :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="$emit('input', event.orig)" :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">	
 							<slot :event="event" :day="day">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 							</slot>
