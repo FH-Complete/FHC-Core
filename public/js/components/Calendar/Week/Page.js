@@ -23,7 +23,7 @@ export default {
 	],
 	data() {
 		return {
-			hours: [...Array(24).keys()]
+			hours: [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
 		};
 	},
 	computed: {
@@ -73,7 +73,7 @@ export default {
 			return res;
 		},
 		smallestTimeFrame() {
-			return [30,15,10,5][this.size];
+			return 10;//[30,15,10,5][this.size];
 		}
 	},
 	methods: {
@@ -86,10 +86,13 @@ export default {
 			}
 		},
 		dateToMinutesOfDay(day) {
-			return Math.floor((day.getHours() * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
+			//console.log((day.getHours() * 60 + day.getMinutes()) / this.smallestTimeFrame,"this are the hours");
+			//console.log(Math.floor((day.getHours() * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1,"this is the result of the calculation");
+			return Math.floor(((day.getHours()-7) * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
 		}
 	},
 	mounted() {
+		console.log(this.hours,"this are the hours");
 		setTimeout(() => this.$refs.eventcontainer.scrollTop = this.$refs.eventcontainer.scrollHeight / 3 + 1, 0);
 	},
 	template: `
@@ -107,7 +110,7 @@ export default {
 					<div class="hours">
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
-					<div v-for="day in eventsPerDayAndHour" :key="day" class="day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (1440 / smallestTimeFrame) + ', 1fr)'}">
+					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (1080 / smallestTimeFrame) + ', 1fr)'}">
 						<div :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="$emit('input', event.orig)" :style="{'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">	
 							<slot :event="event" :day="day">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
