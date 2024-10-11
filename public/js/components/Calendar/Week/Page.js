@@ -4,6 +4,12 @@ function ggt(m,n) { return n==0 ? m : ggt(n, m%n); }
 function kgv(m,n) { return (m*n) / ggt(m,n); }
 
 export default {
+	data(){
+		return{
+			hourPosition:null,
+			hourPositionTime:null,
+		}
+	},
 	inject: [
 		'date',
 		'focusDate',
@@ -76,6 +82,26 @@ export default {
 		}
 	},
 	methods: {
+		calcHourPosition(event){
+			let top = this.$refs.eventcontainer.getBoundingClientRect().top;
+			let position = event.clientY - top;
+			this.hourPosition = position;
+			// position percentage of total height
+			let timePercentage = (position / this.$refs.eventcontainer.offsetHeight) * 100;
+			// minute percentage of total minutes
+			let result = (this.hours.length * 60) * (timePercentage/100);
+			// calculate time in float
+			let currentMinutes = ((result+(this.hours[0]*60))/60);
+			// get hour part of time
+			let currentHour = Math.floor(currentMinutes);
+			// get float part of time
+			let minutePercentage = currentMinutes % currentHour;
+			// calculate minutes from float part of time
+			let minute = Math.round(60 * minutePercentage);
+			// add padding to minutes that consist of only one digit
+			minute.toString().length == 1 ? minute = "0" + minute : minute;
+			this.hourPositionTime = currentHour + ":" + minute; 
+		},
 		getAbsolutePositionForHour(hour){
 			// used for the absolute positioning of the gutters of hours
 			return (100 / this.hours.length) * (hour - (24-this.hours.length)) + '%';
@@ -104,13 +130,14 @@ export default {
 					<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
 				</div>
 			</div>
-			<div ref="eventcontainer" class="position-relative flex-grow-1">
-			<div v-for="hour in hours" :key="hour"  class="position-absolute border-top" :style="{top:getAbsolutePositionForHour(hour),left:0,right:0,'z-index':0}"></div>
+			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition=null;hourPositionTime=null" >
+				<div v-for="hour in hours" :key="hour"  class="position-absolute border-top" style="pointer-events: none;" :style="{top:getAbsolutePositionForHour(hour),left:0,right:0,'z-index':0}"></div>
+				<div v-if="hourPosition" class="position-absolute border-top border-primary text-muted small"  style="pointer-events: none; padding-left:3.5rem; margin-top:-1px;z-index:2;" :style="{top:hourPosition+'px',left:0,right:0}">{{hourPositionTime}}</div>
 				<div class="events">
 					<div class="hours">
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
-					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (1080 / smallestTimeFrame) + ', 1fr)'}">
+					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (hours.length * 60 / smallestTimeFrame) + ', 1fr)'}">
 						<div :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="$emit('input', event.orig)" :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">	
 							<slot :event="event" :day="day">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>

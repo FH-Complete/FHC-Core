@@ -168,7 +168,8 @@ class Stundenplan extends FHCAPI_Controller
 		// getting the student_lehrverbaende of the student in the different studiensemester
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$student_lehrverbaende = null;
-		if ($lvplan_load_ueber_semesterhaelfte) {
+		if ($lvplan_load_ueber_semesterhaelfte) 
+		{
 			$student_lehrverbaende = $this->BenutzergruppeModel->execReadOnlyQuery("
 			SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz IN ?", [$student_uid, [$aktuelle_studiensemester,$next_studiensemester, $previous_studiensemester]]);
 			$student_lehrverbaende = array_map(
@@ -182,7 +183,9 @@ class Stundenplan extends FHCAPI_Controller
 					return $result;
 				},
 				getData($student_lehrverbaende));
-		} else {
+		} 
+		else 
+		{
 			$student_lehrverbaende = $this->BenutzergruppeModel->execReadOnlyQuery("
 			SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz IN ?", [$student_uid, [$aktuelle_studiensemester,$nearest_studiensemester]]);
 			$student_lehrverbaende = array_map(
@@ -240,13 +243,16 @@ class Stundenplan extends FHCAPI_Controller
 	}
 
 	private function expand_object_information($data){
-		foreach ($data as $item) {
+		
+		foreach ($data as $item) 
+		{
 
 			$lektor_obj_array = array();
 			$gruppe_obj_array = array();
 
 			// load lektor object
-			foreach ($item->lektor as $lv_lektor) {
+			foreach ($item->lektor as $lv_lektor) 
+			{
 				$this->StundenplanModel->addLimit(1);
 				$lektor_object = $this->StundenplanModel->execReadOnlyQuery("
 				SELECT mitarbeiter_uid, vorname, nachname, kurzbz 
@@ -263,7 +269,8 @@ class Stundenplan extends FHCAPI_Controller
 			}
 
 			// load gruppe object
-			foreach ($item->gruppe as $lv_gruppe) {
+			foreach ($item->gruppe as $lv_gruppe) 
+			{
 				$lv_gruppe = strtr($lv_gruppe, ['(' => '', ')' => '', '"' => '']);
 				$lv_gruppe_array = explode(",", $lv_gruppe);
 				list($gruppe, $verband, $semester, $studiengang_kz, $gruppen_kuerzel) = $lv_gruppe_array;
