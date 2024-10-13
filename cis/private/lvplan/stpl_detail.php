@@ -37,8 +37,8 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 
-$sprache = getSprache(); 
-$p = new phrasen($sprache); 
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
@@ -46,7 +46,7 @@ if (!$db = new basis_db())
 // Variablen uebernehmen
 if (isset($_GET['type']))
 	$type=$_GET['type'];
-else 
+else
 	$type='';
 
 if (isset($_GET['datum']))
@@ -61,7 +61,7 @@ if (isset($_GET['stg_kz']))
 	$stg_kz=$_GET['stg_kz'];
 if (isset($_GET['sem']))
 	$sem=$_GET['sem'];
-	
+
 if($sem!='' && !is_numeric($sem))
 	die($p->t('lvplan/semesterIstUngueltig'));
 
@@ -70,7 +70,7 @@ if($stunde!='' && !is_numeric($stunde))
 
 if (isset($_GET['ver']))
 	$ver=$_GET['ver'];
-	
+
 if (isset($_GET['grp']))
 	$grp=$_GET['grp'];
 if (isset($_GET['gruppe_kurzbz']))
@@ -83,32 +83,32 @@ if(!$datum_obj->checkDatum($datum))
 $stsem = getStudiensemesterFromDatum($datum);
 //Stundenplan
 $sql_query="
-SELECT 
-	campus.vw_stundenplan.*, lehrfach.bezeichnung, vw_mitarbeiter.titelpre, 
+SELECT
+	campus.vw_stundenplan.*, lehrfach.bezeichnung, vw_mitarbeiter.titelpre,
 	vw_mitarbeiter.titelpost, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname,
-	(SELECT 
-		count(*) 
-	 FROM 
-	 	public.tbl_studentlehrverband 
-	 WHERE 
-	 	studiengang_kz=vw_stundenplan.studiengang_kz 
+	(SELECT
+		count(*)
+	 FROM
+	 	public.tbl_studentlehrverband
+	 WHERE
+	 	studiengang_kz=vw_stundenplan.studiengang_kz
 	 	AND semester=vw_stundenplan.semester
 		AND (verband=vw_stundenplan.verband OR vw_stundenplan.verband is null OR trim(vw_stundenplan.verband)='')
 		AND (gruppe=vw_stundenplan.gruppe OR vw_stundenplan.gruppe is null OR trim(vw_stundenplan.gruppe)='')
-		AND studiensemester_kurzbz=".$db->db_add_param($stsem).") as anzahl_lvb, 
-	(SELECT 
-		count(*) 
-	 FROM 
-	 	public.tbl_benutzergruppe 
-	 WHERE 
-	 	gruppe_kurzbz=vw_stundenplan.gruppe_kurzbz 
+		AND studiensemester_kurzbz=".$db->db_add_param($stsem).") as anzahl_lvb,
+	(SELECT
+		count(*)
+	 FROM
+	 	public.tbl_benutzergruppe
+	 WHERE
+	 	gruppe_kurzbz=vw_stundenplan.gruppe_kurzbz
 	 	AND studiensemester_kurzbz=".$db->db_add_param($stsem).") as anzahl_grp
-FROM 
-	campus.vw_stundenplan 
+FROM
+	campus.vw_stundenplan
 	JOIN lehre.tbl_lehrveranstaltung as lehrfach ON (vw_stundenplan.lehrfach_id=lehrfach.lehrveranstaltung_id)
 	JOIN campus.vw_mitarbeiter USING (uid)
-WHERE 
-	datum=".$db->db_add_param($datum)." 
+WHERE
+	datum=".$db->db_add_param($datum)."
 	AND stunde=".$db->db_add_param($stunde);
 
 if ($type=='lektor')
@@ -121,7 +121,7 @@ else
 {
 	if($stg_kz=='' || $sem=='')
 		die('Fehlerhafte Parameteruebergabe');
-	
+
 	if($type=="verband" && $stg_kz!='' && $sem!='')
 	{
 		// Studiengangsansicht
@@ -133,7 +133,7 @@ else
 	else
 	{
 		// Pers. Ansicht
-		$sql_query.=" AND EXISTS (SELECT 1 FROM campus.vw_student_lehrveranstaltung 
+		$sql_query.=" AND EXISTS (SELECT 1 FROM campus.vw_student_lehrveranstaltung
 									WHERE lehreinheit_id=vw_stundenplan.lehreinheit_id AND uid=".$db->db_add_param($pers_uid).")";
 	}
 	// Manfred weiss nicht mehr warum, aber wir aktivieren 23-09-2009
@@ -154,16 +154,16 @@ $num_rows_stpl = $db->db_num_rows($erg_stpl);
 
 //Reservierungen
 $sql_query="
-SELECT 
-	vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.titelpost, 
-	vw_mitarbeiter.vorname, vw_mitarbeiter.nachname, reserviert_von.titelpre AS titelpre_reserviertvon, reserviert_von.titelpost AS titelpost_reserviertvon, 
-	reserviert_von.vorname AS vorname_reserviertvon, reserviert_von.nachname AS nachname_reserviertvon 
-FROM 
+SELECT
+	vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.titelpost,
+	vw_mitarbeiter.vorname, vw_mitarbeiter.nachname, reserviert_von.titelpre AS titelpre_reserviertvon, reserviert_von.titelpost AS titelpost_reserviertvon,
+	reserviert_von.vorname AS vorname_reserviertvon, reserviert_von.nachname AS nachname_reserviertvon
+FROM
 	campus.vw_reservierung
 	JOIN campus.vw_mitarbeiter ON vw_reservierung.uid=vw_mitarbeiter.uid
 	LEFT JOIN campus.vw_mitarbeiter reserviert_von ON vw_reservierung.insertvon=reserviert_von.uid
-WHERE 
-	datum=".$db->db_add_param($datum)." 
+WHERE
+	datum=".$db->db_add_param($datum)."
 	AND stunde=".$db->db_add_param($stunde);
 
 if (isset($ort_kurzbz) && $type=='ort')
@@ -172,7 +172,7 @@ if ($type=='lektor')
     $sql_query.=" AND vw_reservierung.uid=".$db->db_add_param($pers_uid);
 if ($type=='verband' || $type=='student')
 {
-    $sql_query.=" AND studiengang_kz=".$db->db_add_param($stg_kz)." 
+    $sql_query.=" AND studiengang_kz=".$db->db_add_param($stg_kz)."
     AND (semester=".$db->db_add_param($sem)." OR semester=0 OR semester IS NULL)";
 }
 $sql_query.=' ORDER BY  titel LIMIT 100';
@@ -258,12 +258,12 @@ if ($num_rows_stpl>0)
 		echo (!is_null($semester) && !empty($semester)?'</A>':'');
 		echo '
 			</td>
-	
+
 	        <td><A class="Item" title="'.$anzahl_grp.' Studierende" href="mailto:'.mb_strtolower($gruppe_kurzbz).'@'.DOMAIN.'">
 	        '.$db->convert_html_chars($gruppe_kurzbz).'</A></td>
 			<td>'.$db->convert_html_chars($titel).'</td>
-	        
-	    </tr>';    
+
+	    </tr>';
 	}
 	echo '</table><BR>';
 }
@@ -294,7 +294,7 @@ if ($num_rows_repl>0)
 		$pers_nachname_reserviertvon=$row->nachname_reserviertvon;
 
     	$ort->load($ortkurzbz);
-    	
+
         echo '<tr class="liste'.($i%2).'">';
         echo '<td>'.$db->convert_html_chars($titel).'</td>';
         echo '<td>'.(!empty($ortkurzbz)?($ort->content_id!=''?'<a href="../../../cms/content.php?content_id='.$ort->content_id.'" target="_self" onClick="window.resizeTo(1200,880)">'.$db->convert_html_chars($ortkurzbz).'</a>':$db->convert_html_chars($ortkurzbz)):$db->convert_html_chars($ortkurzbz)).'</td>';
@@ -304,6 +304,6 @@ if ($num_rows_repl>0)
     }
     echo '</table><br>';
 }
-echo '<P>'.$p->t('lvplan/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/lvKoordinationsstelle').'</A>.</P>
+echo '<P>'.<?php echo $p->t('lvplan/FragenZuLvPlan', array(MAIL_LVPLAN)); ?>.'</P>
 </body></html>';
 ?>
