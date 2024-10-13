@@ -58,6 +58,7 @@ require_once('dbupdate_3.4/17513_Entwicklungsteam.php');
 require_once('dbupdate_3.4/28575_softwarebereitstellung.php');
 require_once('dbupdate_3.4/41150_oe-pfad_db_view.php');
 require_once('dbupdate_3.4/44031_stv_favorites.php');
+require_once('dbupdate_3.4/40314_electronic_onboarding_anbindung_ida.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
