@@ -98,6 +98,11 @@ export default {
 			let minutePercentage = currentMinutes % currentHour;
 			// calculate minutes from float part of time
 			let minute = Math.round(60 * minutePercentage);
+			// in case the rounding made the minutes 60, increase the hour and reset the minutes
+			if(minute == 60){
+				currentHour++;
+				minute = 0;
+			}
 			// add padding to minutes that consist of only one digit
 			minute.toString().length == 1 ? minute = "0" + minute : minute;
 			this.hourPositionTime = currentHour + ":" + minute; 
@@ -130,9 +135,11 @@ export default {
 					<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
 				</div>
 			</div>
-			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition=null;hourPositionTime=null" >
+			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="" >
 				<div v-for="hour in hours" :key="hour"  class="position-absolute border-top" style="pointer-events: none;" :style="{top:getAbsolutePositionForHour(hour),left:0,right:0,'z-index':0}"></div>
-				<div v-if="hourPosition" class="position-absolute border-top border-primary text-muted small"  style="pointer-events: none; padding-left:3.5rem; margin-top:-1px;z-index:2;" :style="{top:hourPosition+'px',left:0,right:0}">{{hourPositionTime}}</div>
+				<div v-if="hourPosition" class="position-absolute border-top small"  style="pointer-events: none; padding-left:3.5rem; margin-top:-1px;z-index:2;border-color:#00649C !important" :style="{top:hourPosition+'px',left:0,right:0}">
+					<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
+				</div>
 				<div class="events">
 					<div class="hours">
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
