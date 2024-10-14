@@ -209,7 +209,7 @@ export default {
     <template v-else>
         <template v-if="hasChilds">
 			<div class="btn-group w-100">
-                <a :href="link" :target="target" @click="toggleCollapse"
+                <a :href="(entry.menu_open)?link:null" :target="target" @click="toggleCollapse"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
                         ['btn-level-' + level]: true,
