@@ -12,7 +12,7 @@ export default {
 		widget: null,
 		tmpConfig: {},
 		isLoading: false,
-		hasConfig: true,
+		hasConfig: false,
 		sharedData: null,
 	}),
 	emits: [
@@ -117,10 +117,10 @@ export default {
 			</div>
 		</div>
 		<div v-if="ready" class="card-body overflow-hidden">
-			<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
+		<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
 		</div>
 		<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
-		<bs-modal ref="config">
+		<bs-modal v-if="hasConfig" ref="config">
 			<template v-slot:title>
 				{{ widget ? 'Config for ' + widget.setup.name : '' }}
 			</template>

@@ -71,6 +71,10 @@ export default {
   async mounted() {
     await this.fetchBookmarks();
   },
+  created()
+  {
+	  this.$emit('setConfig', true);
+  },
   template: /*html*/ `
     <div class="widgets-url w-100 h-100">
         <div v-if="configMode">
