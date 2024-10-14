@@ -28041,18 +28041,18 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'anwInfoKeineTermineGefunden',
+		'phrase' => 'anwInfoKeineKontrollenGefunden',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Termine zum LV-Teil gefunden!',
+				'text' => 'Keine Kontrollen zum LV-Teil gefunden!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No dates found for teaching unit!',
+				'text' => 'No digital attendance checks found for teaching unit!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
