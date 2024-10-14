@@ -24,6 +24,11 @@ export default {
 			urlMatchRankings:[],
         };
     },
+	provide(){
+		return{
+			makeParentContentActive: this.makeParentContentActive,
+		}
+	},
 	computed:{
 		highestMatchingUrlCount(){
 			// gets the hightest ranking inside the array
@@ -38,6 +43,15 @@ export default {
 		},
 	},
 	methods:{
+		makeParentContentActive(content_id, collection=this.entries, parent=null){
+			for(let entry of collection){
+				if(entry.content_id == content_id){
+					this.activeEntry = parent;
+				}
+				this.makeParentContentActive(content_id, entry.childs, entry.content_id);
+			}
+			
+		},
 		addUrlCount(count){
 			this.urlMatchRankings.push(count);
 		},
@@ -51,8 +65,8 @@ export default {
 	},
     template: /*html*/`
 	<!--<p>CISVUE HEADER</p>
-	<p>active entry content_id : {{activeEntry}}</p>
 	<p>highest count : {{highestMatchingUrlCount}}</p>
+	<p>active entry content_id : {{activeEntry}}</p>
 	-->
 	<button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -80,7 +94,7 @@ export default {
 			<div class="offcanvas-body p-0">
 				<div id="nav-main-menu" class="collapse collapse-horizontal show">
 					<div>
-						<cis-menu-entry @UrlCount="addUrlCount" @activeEntry="setActiveEntry" :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
+						<cis-menu-entry @makeParentContentActive="makeParentContentActive" @UrlCount="addUrlCount" @activeEntry="setActiveEntry" :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
 					</div>
 				</div>
 			</div>

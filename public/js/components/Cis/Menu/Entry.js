@@ -10,12 +10,13 @@ export default {
 		highestMatchingUrlCount: Number,
     },
     data: () => {
-        return {
-            collapse: null,
+		return {
+			collapse: null,
 			urlCount:0,
         }
     },
 	emits: ["activeEntry", "UrlCount"],
+	inject: ['makeParentContentActive'],
 	watch:{
 		highestMatchingUrlCount: function(newValue)
 		{
@@ -50,6 +51,10 @@ export default {
 			{
 				// only invokes .hide if this.collapse is not null
 				this.collapse && this.collapse.hide();
+				if (this.activeContent == this.entry.content_id)
+				{
+					this.makeParentContentActive(this.entry.content_id);
+				}
 			}
 			// debugging helpers - console.log(this.entry.titel, newValue ? "open" : "close")
 			
@@ -172,19 +177,14 @@ export default {
 			this.$emit('activeEntry',event);
 		},
         toggleCollapse(evt) {
-            if (this.level > 1 && this.collapse !== null) 
+			if (this.active)
 			{
-                this.entry.menu_open = !this.entry.menu_open;
-                this.collapse.toggle(evt.target);
-            }else{
-				if (this.active)
-				{
-					this.$emit("activeEntry", null); 
-				}
-				else
-				{
-					this.$emit("activeEntry", this.entry.content_id);
-				}
+				this.makeParentContentActive(this.entry.content_id); 
+			}
+			else
+			{
+				console.log("entered here to make the content active")
+				this.$emit("activeEntry", this.entry.content_id);
 			}
         }
     },
