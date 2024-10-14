@@ -96,7 +96,8 @@ class Studierendenantrag_model extends DB_Model
 			Studierendenantragstatus_model::STATUS_REJECTED,
 			Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
 			Studierendenantragstatus_model::STATUS_DEREGISTERED,
-			Studierendenantragstatus_model::STATUS_PAUSE
+			Studierendenantragstatus_model::STATUS_PAUSE,
+			Studierendenantragstatus_model::STATUS_REMINDERSENT
 		]);
 		$this->db->or_group_start();
 		$this->db->where('s.studierendenantrag_statustyp_kurzbz', Studierendenantragstatus_model::STATUS_APPROVED);
