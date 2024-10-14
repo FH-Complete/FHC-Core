@@ -2937,5 +2937,53 @@ array (
     ),
   ),
 ),
+
+array (
+  'app' => 'core',
+  'category' => 'lehre',
+  'phrase' => 'lvTemplatesVerwalten',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'LV Templates verwalten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Administrate Course Templates',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'lehre',
+  'phrase' => 'lvTemplatesUebersicht',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'LV Templates Übersicht',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Course Templates Overview',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
 );
 

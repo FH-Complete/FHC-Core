@@ -3287,5 +3287,485 @@ array (
     ),
   ),
 ),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'softwareanforderung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Softwareanforderung',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Software Request',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'softwareanforderungSubtitle',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Softwareanforderung und Lizenzmanagement für die Lehre',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Software Request and License management for Education',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'swAnforderungenUndLizenen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Softwareanforderungen & Lizenzen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Software Requirements & Licenses',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'anforderungNachSw',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anforderung nach Software',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Request by Software',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'anforderungNachLv',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anforderung nach LV',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Request by Course',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'swNichtGefundenHierBestellen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Software nicht gefunden?<br>Hier bei IT-Services bestellen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Software not found?<br>Order here from IT Services',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'bereitsAngefordert',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bereits angefordert',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Requested already',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'mindEineZuorndungExistiertBereits',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Mindestens eine Zuordnung existiert bereits.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'At least one assignment already exists.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'swFuerLvAnfordern',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Software für LV anfordern',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Request software for courses',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'swWurdeBereitsAngefordert',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Software wurde bereits angefordert',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Software has already been requested',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'swAnforderungUeberAuswahlVonSw',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Softwareanforderung über die Auswahl von Software',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Software Requirements based on the Selection of Software',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'swAnforderungUeberAuswahlVonLvs',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Softwareanforderung über die Auswahl von Lehrveranstaltungen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Software Requirements based on the Selection of Courses',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'lizenzAnzahlNeu',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Lizenz-Anzahl NEU',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'License Number NEW',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'lizenzanzahlAendern',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Lizenzanzahl ändern',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Change Number of Licenses',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'global',
+  'phrase' => 'eingabeFehlt',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Eingabe fehlt',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Input missing',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'global',
+  'phrase' => 'unveraendert',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Unverändert',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Unchanged',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'anforderungenVorruecken',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anforderungen vorrücken',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Take over Requirements',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'vorrueckenInStudiensemester',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Vorrücken in Studiensemester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Take over to semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'global',
+  'phrase' => 'anteiligInProzent',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anteilig in %',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Percentage share',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'global',
+  'phrase' => 'verwalten',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Verwalten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Administrate',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
 );
 
