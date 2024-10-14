@@ -228,7 +228,6 @@ class SearchBarLib
 				GROUP BY " . $table_config['primarykey'] . "
 			)";
 
-			$other_selects = 
 			$selects[] = "
 				SELECT
 					" . $this->_ci->db->escape($type) . " AS type,

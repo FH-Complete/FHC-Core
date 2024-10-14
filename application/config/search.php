@@ -74,7 +74,10 @@ $config['person'] = [
 		"p.person_id",
 		"(p.vorname || ' ' || p.nachname) AS name",
 		"ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
-		"p.foto"
+		"CASE
+			WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
+			ELSE NULL END
+			AS photo_url"
 	],
 	'resultjoin' => "
 		JOIN public.tbl_person p USING (person_id)
@@ -200,7 +203,10 @@ $config['student'] = [
 		"p.person_id",
 		"(p.vorname || ' ' || p.nachname) AS name",
 		"ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
-		"p.foto"
+		"CASE
+			WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
+			ELSE NULL END
+			AS photo_url"
 	],
 	'resultjoin' => "
 		JOIN public.tbl_student s USING (student_uid)
@@ -298,7 +304,10 @@ $config['prestudent'] = [
 		"b.uid",
 		"(p.vorname || ' ' || p.nachname) AS name",
 		"ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
-		"p.foto",
+		"CASE
+			WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
+			ELSE NULL END
+			AS photo_url",
 		"UPPER(sg.typ || sg.kurzbz) AS stg_kuerzel",
 		"sg.bezeichnung",
 		"(

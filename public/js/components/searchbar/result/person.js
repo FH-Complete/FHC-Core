@@ -9,20 +9,13 @@ export default {
 		res: Object,
 		actions: Object
 	},
-	computed: {
-		foto() {
-			if (this.res.foto)
-				return 'data:image/jpeg;base64,' + this.res.foto;
-			return null;
-		}
-	},
 	template: `
 	<template-frame
 		class="searchbar-result-student"
 		:res="res"
 		:actions="actions"
 		:title="res.name"
-		:image="foto"
+		:image="res.photo_url"
 		image-fallback="fas fa-user-circle fa-7x"
 		@actionexecuted="$emit('actionexecuted')"
 		>

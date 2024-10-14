@@ -20,8 +20,9 @@ export default {
 			if (person.length)
 				return person.pop();
 
-			const { person_id, name, foto, photo_url, email } = this.res.list[0];
-			return { person_id, name, foto, photo_url, email };
+			// TODO(chris): first one might have not one of these but a later one
+			const { person_id, name, photo_url, email } = this.res.list[0];
+			return { person_id, name, photo_url, email };
 		},
 		employee() {
 			const ma = this.res.list.filter(item => [
@@ -33,11 +34,6 @@ export default {
 		students() {
 			const students = this.res.list.filter(item => item.type == 'prestudent');
 			return students.length ? students : null;
-		},
-		foto() {
-			if (this.person.foto)
-				return 'data:image/jpeg;base64,' + this.person.foto;
-			return this.person.photo_url;
 		},
 		emails() {
 			if (Array.isArray(this.person.email))
@@ -51,7 +47,7 @@ export default {
 		:res="person"
 		:actions="actions"
 		:title="person.name"
-		:image="foto"
+		:image="this.person.photo_url"
 		image-fallback="fas fa-user-circle fa-7x"
 		@actionexecuted="$emit('actionexecuted')"
 		>
