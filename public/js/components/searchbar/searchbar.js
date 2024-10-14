@@ -4,6 +4,7 @@ import ResultPrestudent from "./result/prestudent.js";
 import ResultEmployee from "./result/employee.js";
 import ResultOrganisationunit from "./result/organisationunit.js";
 import ResultRoom from "./result/room.js";
+import ResultCms from "./result/cms.js";
 import ResultMergedperson from "./result/mergedperson.js";
 import ResultMergedstudent from "./result/mergedstudent.js";
 
@@ -17,10 +18,17 @@ export default {
 		ResultEmployee,
 		ResultOrganisationunit,
 		ResultRoom,
+		ResultCms,
 		ResultMergedperson,
 		ResultMergedstudent
 	},
 	props: [ "searchoptions", "searchfunction" ],
+	provide() {
+		return {
+			languages: Vue.computed(() => this.languages),
+			query: Vue.computed(() => this.lastQuery)
+		};
+	},
 	data() {
 		return {
 			searchtimer: null,
@@ -35,8 +43,21 @@ export default {
 			searching: false,
 			error: null,
 			abortController: null,
-			retry: 5
+			retry: 0,
+			languages: null,
+			lastQuery: ''
 		};
+	},
+	created() {
+		this.$fhcApi.factory
+			.language.getAll()
+			.then(result => {
+				this.languages = result.data.reduce((a, c) => {
+					a[c.sprache] = c;
+					return a;
+				}, {});
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	beforeMount() {
 		this.updateSearchOptions();
@@ -82,12 +103,14 @@ export default {
 			this.abortController = new AbortController();
 
 			this
-				.searchfunction(this.searchsettings, { signal: this.abortController.signal })
+				.searchfunction(this.searchsettings, { timeout: 50000, signal: this.abortController.signal })
 				.then(response => {
 					if (!response.data) {
 						this.error = 'Bei der Suche ist ein Fehler aufgetreten.';
 					} else {
 						let res = response.data.map(el => ({...el, ...JSON.parse(el.data)}));
+						this.lastQuery = response.meta.searchstring;
+
 						if (this.searchoptions.mergeResults) {
 							let counter = 0;
 							let mergeTypes = [];
@@ -131,11 +154,11 @@ export default {
 						this.searchresult = res;
 					}
 					this.searching = false;
-					this.retry = 5;
+					this.retry = 0;
 				})
 				.catch(error => {
 					if (error.code == "ERR_CANCELED") {
-						return this.retry = 5;
+						return this.retry = 0;
 					}
 					if (error.code == "ECONNABORTED" && this.retry) {
 						this.retry--;
@@ -144,7 +167,7 @@ export default {
 
 					this.error = 'Bei der Suche ist ein Fehler aufgetreten.' + ' ' + error.message;
 					this.searching = false;
-					this.retry = 5;
+					this.retry = 0;
 				});
 		},
 		refreshsearch() {
@@ -239,6 +262,7 @@ export default {
 					<result-employee v-else-if="res.type === 'unassigned_employee'" :res="res" :actions="searchoptions.actions.employee" @actionexecuted="hideresult"></result-employee>
 					<result-organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="searchoptions.actions.organisationunit" @actionexecuted="hideresult"></result-organisationunit>
 					<result-room v-else-if="res.type === 'room'" :res="res" :actions="searchoptions.actions.room" @actionexecuted="hideresult"></result-room>
+					<result-cms v-else-if="res.type === 'cms'" :res="res" :actions="searchoptions.actions.cms" @actionexecuted="hideresult"></result-cms>
 					<result-mergedperson v-else-if="res.type === 'mergedperson'" :res="res" :actions="searchoptions.actions.mergedperson" @actionexecuted="hideresult"></result-mergedperson>
 					<result-mergedstudent v-else-if="res.type === 'mergedstudent'" :res="res" :actions="searchoptions.actions.mergedstudent" @actionexecuted="hideresult"></result-mergedstudent>
 					<div v-else>Unbekannter Ergebnistyp: '{{ res.type }}'.</div>

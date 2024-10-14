@@ -169,3 +169,18 @@ FROM pg_indexes WHERE indexname = 'idx_tbl_organisationseinheit_fts_bezeichnung_
 	else
 		echo 'public.tbl_organisationseinheit: added index "idx_tbl_organisationseinheit_fts_bezeichnung_vector"<br>';
 }
+// Add index for titel || ' ' || content to campus.tbl_contentsprache
+if (!$db->db_num_rows(@$db->db_query("SELECT 1 
+FROM pg_indexes WHERE indexname = 'idx_tbl_contentsprache_fts_titel_content_vector' LIMIT 1;")))
+{
+	$qry = "
+		CREATE INDEX idx_tbl_contentsprache_fts_titel_content_vector 
+		ON campus.tbl_contentsprache 
+		USING GIN ((setweight(to_tsvector('simple', COALESCE(titel, '')), 'A') || setweight(to_tsvector('simple', COALESCE(content, '')::text), 'B')));
+	";
+
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_contentsprache ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo 'campus.tbl_contentsprache: added index "idx_tbl_contentsprache_fts_titel_content_vector"<br>';
+}

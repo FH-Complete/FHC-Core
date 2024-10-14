@@ -671,3 +671,97 @@ $config['room'] = [
 		LEFT JOIN public.tbl_adresse address
 			USING (adresse_id)"
 ];
+
+$config['cms'] = [
+	'primarykey' => 'contentsprache_id',
+	'table' => 'cms',
+	'prepare' => "
+		cms_auth (content_id) AS (
+			SELECT content_id
+			FROM campus.tbl_content c
+			WHERE NOT EXISTS (SELECT 1 FROM campus.tbl_contentgruppe g WHERE g.content_id=c.content_id)
+			UNION
+			SELECT content_id
+			FROM public.vw_gruppen g
+			JOIN campus.tbl_contentgruppe c USING (gruppe_kurzbz)
+			WHERE uid = (TABLE auth)
+		),
+		cms_active (content_id, template_kurzbz) AS (
+			SELECT content_id, template_kurzbz
+			FROM cms_auth
+			JOIN campus.tbl_content USING (content_id)
+			WHERE aktiv = TRUE
+		),
+		cms_active_redirect (content_id) AS (
+			SELECT content_id
+			FROM cms_active
+			WHERE template_kurzbz = 'redirect'
+		),
+		cms_active_redirect_linked (content_id) AS (
+			SELECT content_id
+			FROM cms_active_redirect
+			JOIN campus.tbl_contentsprache USING (content_id)
+			WHERE LEFT((xpath('string(/content/url)', content))[1]::text, 1) <> '#'
+		),
+		cms_active_others (content_id) AS (
+			SELECT content_id
+			FROM cms_active
+			WHERE template_kurzbz IN ('contentmittitel', 'contentohnetitel', 'contentmittitel_filterwidget')
+		),
+		cms (contentsprache_id) AS (
+			SELECT contentsprache_id
+			FROM campus.tbl_contentsprache
+			WHERE content_id IN (
+				SELECT content_id 
+				FROM cms_active_redirect_linked 
+				UNION 
+				SELECT content_id 
+				FROM cms_active_others
+			)
+			AND version = campus.get_highest_content_version(content_id)
+		)
+	",
+	'searchfields' => [
+		'content' => [
+			'alias' => ['inhalt'],
+			'comparison' => "vector",
+			'field' => "(setweight(to_tsvector('simple', COALESCE(titel, '')), 'A') || setweight(to_tsvector('simple', COALESCE(content, '')::text), 'B'))",
+			'join' => [
+				'table' => "campus.tbl_contentsprache",
+				'using' => "contentsprache_id"
+			]
+		],
+		'content_id' => [
+			'alias' => ['id'],
+			'comparison' => "equal-int",
+			'field' => "content_id",
+			'join' => [
+				'table' => "campus.tbl_contentsprache",
+				'using' => "contentsprache_id"
+			]
+		],
+		'lang' => [
+			'alias' => ['language', 'sprache'],
+			'comparison' => "equals",
+			'field' => "sprache",
+			'join' => [
+				'table' => "campus.tbl_contentsprache",
+				'using' => "contentsprache_id"
+			]
+		]
+	],
+	'resultfields' => [
+		"contentsprache.content_id",
+		"content.template_kurzbz",
+		"contentsprache.version",
+		"contentsprache.sprache AS language",
+		"contentsprache.titel AS title",
+		"contentsprache.content",
+		"(xpath('string(/content/url)', contentsprache.content))[1] AS content_url"
+	],
+	'resultjoin' => "
+		JOIN campus.tbl_contentsprache contentsprache
+			USING (contentsprache_id)
+		JOIN campus.tbl_content content
+			USING (content_id)"
+];

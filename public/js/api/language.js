@@ -15,24 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import search from "./search.js";
-import phrasen from "./phrasen.js";
-import navigation from "./navigation.js";
-import filter from "./filter.js";
-import studstatus from "./studstatus.js";
-import stv from "./stv.js";
-import notiz from "./notiz.js";
-import betriebsmittel from "./betriebsmittel.js";
-import language from "./language.js";
-
 export default {
-    search,
-    phrasen,
-    navigation,
-    filter,
-    studstatus,
-    stv,
-    notiz,
-    betriebsmittel,
-    language
+	getAll() {
+		return this.$fhcApi.get('/api/frontend/v1/language/get');
+	}
 };

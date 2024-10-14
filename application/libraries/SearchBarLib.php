@@ -168,6 +168,9 @@ class SearchBarLib
 				FROM public.tbl_sprache
 				WHERE sprache=" . $this->_ci->db->escape($lang) . "
 				LIMIT 1
+			),
+			auth (uid) AS (
+				SELECT " . $this->_ci->db->escape(getAuthUID()) . " AS uid
 			)";
 
 		if ($sql_with) {
@@ -247,6 +250,9 @@ class SearchBarLib
 			FROM public.tbl_sprache
 			WHERE sprache=" . $this->_ci->db->escape($lang) . "
 			LIMIT 1
+		)");
+		array_unshift($with, "auth (uid) AS (
+			SELECT " . $this->_ci->db->escape(getAuthUID()) . " AS uid
 		)");
 
 		return success("
