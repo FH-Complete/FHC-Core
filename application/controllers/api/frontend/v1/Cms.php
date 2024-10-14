@@ -81,7 +81,6 @@ class Cms extends FHCAPI_Controller
         $sichtbar = $this->input->get("sichtbar",TRUE);
 
 		$content = $this->cmslib->getContent($content_id, $version, $sprache, $sichtbar);
-
 		$content = $this->getDataOrTerminateWithError($content);
 
 		$this->terminateWithSuccess($content);

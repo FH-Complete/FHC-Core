@@ -225,7 +225,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the VORLAGEN
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'VORLAGEN'),
 					1,TRUE,
-					'<content></content>',
+					'<content><url><![CDATA[#Vorlagen]]></url><target><![CDATA[_self]]></target></content>',
 					null,null,null,null,NOW(),null,'Vorlagen',null
 				);
 

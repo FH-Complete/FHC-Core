@@ -117,8 +117,11 @@ class CmsLib
 
 		
 		$transformed_content = $processor->transformToXML($XML);
+		//replaces all the dms.php with the new CIS4 Controller
 		$transformed_content = str_replace('dms.php', APP_ROOT . 'cms/dms.php', $transformed_content);
-
+		//replaces all the cms.php with the new CIS4 Controller
+		$transformed_content = preg_replace('/content\.php\?content\_id\=([0-9]+)/', APP_ROOT.'cis.php/CisVue/Cms/content/$1', $transformed_content);
+		
 		return success([
 			"betreff"=>$betreff,
 			"type"=>$content->template_kurzbz,
