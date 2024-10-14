@@ -15,15 +15,14 @@ export default {
 			urlCount:0,
         }
     },
-	emits: ["activeEntry", "UrlCount"],
-	inject: ['makeParentContentActive'],
+	inject: ['makeParentContentActive', 'setActiveEntry','addUrlCount'],
 	watch:{
 		highestMatchingUrlCount: function(newValue)
 		{
 			// if this entry has the most matching url parts then it should be active
 			if (this.activeContent == null && newValue == this.urlCount)
 			{
-				this.$emit("activeEntry", this.entry.content_id);
+				this.setActiveEntry(this.entry.content_id);
 			}
 		},
 		activeContent: function(newValue){
@@ -119,9 +118,6 @@ export default {
         }
     },
     methods: {
-		passUrlCount(count){
-			this.$emit("UrlCount",count);
-		},
 		getUrlMatchPoints(url,link){
 			let splitted_link = link.split('/');
 			let splitted_url = url.href.split('/');
@@ -139,7 +135,7 @@ export default {
 				}
 			}
 			this.urlCount = count;
-			this.$emit("UrlCount",count);
+			this.addUrlCount(count);
 		},
 		checkActiveUrl(url){
 			this.getUrlMatchPoints(url,this.link);
@@ -153,7 +149,7 @@ export default {
 			// or if the url equals the link of a menu 
 			// then set the menu active 
 			if (url_hash == this.entry.titel || url.href == this.link) {
-				this.$emit("activeEntry", this.entry.content_id);
+				this.setActiveEntry(this.entry.content_id);
 			}
 		},
 		searchRecursiveChild(entry,child_content_id){
@@ -172,10 +168,6 @@ export default {
 			}	
 			return false;
 		},
-		resendEmit(event){
-			this.entry.menu_open = true;
-			this.$emit('activeEntry',event);
-		},
         toggleCollapse(evt) {
 			if (this.active)
 			{
@@ -184,7 +176,7 @@ export default {
 			else
 			{
 				console.log("entered here to make the content active")
-				this.$emit("activeEntry", this.entry.content_id);
+				this.setActiveEntry(this.entry.content_id);
 			}
         }
     },
@@ -227,7 +219,7 @@ export default {
             </div>
             <ul ref="children"
                 class="nav w-100 collapse">
-                <cis-menu-entry @UrlCount="passUrlCount" :highestMatchingUrlCount="highestMatchingUrlCount" @activeEntry="resendEmit" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
+                <cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
             </ul>
         </template>
         <a v-else

@@ -26,6 +26,8 @@ export default {
     },
 	provide(){
 		return{
+			setActiveEntry: this.setActiveEntry,
+			addUrlCount: this.addUrlCount,
 			makeParentContentActive: this.makeParentContentActive,
 		}
 	},
@@ -94,7 +96,7 @@ export default {
 			<div class="offcanvas-body p-0">
 				<div id="nav-main-menu" class="collapse collapse-horizontal show">
 					<div>
-						<cis-menu-entry @makeParentContentActive="makeParentContentActive" @UrlCount="addUrlCount" @activeEntry="setActiveEntry" :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
+						<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
 					</div>
 				</div>
 			</div>
