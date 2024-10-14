@@ -304,6 +304,6 @@ if ($num_rows_repl>0)
     }
     echo '</table><br>';
 }
-echo '<P>'.<?php echo $p->t('lvplan/FragenZuLvPlan', array(MAIL_LVPLAN)); ?>.'</P>
+echo '<P>'.$p->t('lvplan/FragenZuLvPlan', array(MAIL_LVPLAN)).'</P>
 </body></html>';
 ?>
