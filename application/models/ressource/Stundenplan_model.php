@@ -199,13 +199,26 @@ class Stundenplan_model extends DB_Model
 		from lehre.vw_stundenplan sp
 		WHERE
 		sp.datum >= ".$this->escape($start_date)." 
-		AND sp.datum <= ".$this->escape($end_date)."
-		AND ( 
-		sp.gruppe_kurzbz IN (".implode(',',$gruppen).")";
+		AND sp.datum <= ".$this->escape($end_date);
+
+		if(count($gruppen) != 0 || count($studentlehrverbaende) != 0)
+		{
+			$query .= "AND ( ";
+		}
+
+		if(count($gruppen) != 0)
+		{
+			$query .="sp.gruppe_kurzbz IN (".implode(',',$gruppen).")";
+		}
+		
 		foreach($studentlehrverbaende as $lehrverband){
 			$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe).")"; 
 		}
-		$query .= ")";
+		
+		if(count($gruppen) != 0 || count($studentlehrverbaende) != 0)
+		{
+			$query .= ")";
+		}
 
 		return $query;
 	}
