@@ -1463,12 +1463,6 @@ class AntragLib
 				elseif($antrag->status == Studierendenantragstatus_model::STATUS_APPROVED && $antrag->datum > $datumStatus)
 					return success(-2);
 			}
-			if ($antrag->typ == Studierendenantrag_model::TYP_UNTERBRECHUNG)
-			{
-				// NOTE(chris): Ignore canceled ones
-				if ($antrag->status == Studierendenantragstatus_model::STATUS_CANCELLED)
-					continue;
-			}
 			if ($antrag->typ == Studierendenantrag_model::TYP_WIEDERHOLUNG)
 			{
 				if($antrag->status == Studierendenantragstatus_model::STATUS_PASS)
