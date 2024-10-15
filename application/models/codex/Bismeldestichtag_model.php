@@ -34,6 +34,23 @@ class Bismeldestichtag_model extends DB_Model
 	}
 
 	/**
+	 * Liefert nächstliegenden Bismeldestichtag.
+	 * @return object success or error
+	 */
+	public function getNextMeldestichtag()
+	{
+		$this->addSelect('meldestichtag');
+		$this->addSelect('studiensemester_kurzbz');
+
+		$this->addOrder('meldestichtag', 'ASC');
+		$this->addLimit(1);
+
+		return $this->loadWhere([
+			'meldestichtag >= NOW()' => null
+		]);
+	}
+
+	/**
 	 * Prüft, ob Meldestichtag für ein bestimmtes Statusdatum und Studiensemester erreicht ist.
 	 *
 	 * @param $status_datum

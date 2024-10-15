@@ -55,6 +55,12 @@ $config['navigation_header'] = array(
 					'description' => 'CIS',
 					'sort' => 10
 				),
+				'lehrveranstaltungen' => array(
+					'link' => site_url('lehre/lvplanung/LvTemplateUebersicht'),
+					'icon' => '',
+					'description' => 'Lehrveranstaltungen',
+					'sort' => 15
+				),
 				'reihungstest' => array(
 					'link' => site_url('organisation/Reihungstest'),
 					'description' => 'Reihungstests',
@@ -284,6 +290,15 @@ $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/*'] = array(
 		'icon' => '',
 		'sort' => 1,
 		'requiredPermissions' => array('lehre/lehrauftrag_erteilen:r')
+	)
+);
+
+$config['navigation_menu']['lehre/lvplanung/LvTemplateUebersicht/index'] = array(
+	'lvTemplateUebersicht' => array(
+		'link' => site_url('lehre/lvplanung/LvTemplateUebersicht'),
+		'description' => 'LV Template Übersicht',
+		'icon' => '',
+		'sort' => 1
 	)
 );
 
