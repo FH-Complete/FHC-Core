@@ -355,7 +355,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->db->where([
 			'prestudent_id' => $prestudent_id,
 			'typ' => Studierendenantrag_model::TYP_UNTERBRECHUNG,
-			'campus.get_status_studierendenantrag(studierendenantrag_id) !=' => Studierendenantragstatus_model::STATUS_CANCELLED,
+			'campus.get_status_studierendenantrag(studierendenantrag_id) NOT IN (\'' . Studierendenantragstatus_model::STATUS_CANCELLED . '\', \'' . Studierendenantragstatus_model::STATUS_REJECTED . '\')' => null,
 			'start < ' . $end => null,
 			'datum_wiedereinstieg > ' . $start => null,
 		]);
