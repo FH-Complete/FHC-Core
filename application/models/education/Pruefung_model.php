@@ -175,6 +175,8 @@ class Pruefung_model extends DB_Model
 		$this->addSelect('campus.get_status_studierendenantrag(a.studierendenantrag_id) status');
 		$this->addSelect('pss.ausbildungssemester');
 
+		$this->addJoin('(SELECT MAX(datum) AS datum, lehreinheit_id AS le_id, student_uid AS stud_uid FROM lehre.tbl_pruefung p WHERE pruefungstyp_kurzbz IN (\'kommPruef\', \'zusKommPruef\') GROUP BY lehreinheit_id, student_uid) lpd',
+			'p.datum = lpd.datum AND p.lehreinheit_id = lpd.le_id AND p.student_uid = lpd.stud_uid');
 		$this->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
 		$this->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
 		$this->addJoin('public.tbl_student s', 'student_uid');
