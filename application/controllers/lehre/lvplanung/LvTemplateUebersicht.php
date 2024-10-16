@@ -8,7 +8,7 @@ class LvTemplateUebersicht extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index' => 'basis/vilesci:rw',
+				'index' => 'lehre/lehrveranstaltung:rw',
 			)
 		);
 

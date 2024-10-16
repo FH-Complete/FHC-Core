@@ -106,7 +106,7 @@ echo '<!DOCTYPE HTML>
 	</script>
 </head>
 <body style="background-color:#eeeeee;">
-<h2>Lehreinheiten Vorr&uuml;ckung</h2>
+<h2>LV-Teile Vorr&uuml;ckung</h2>
 ';
 echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 echo 'Studiengang: <SELECT name="studiengang_kz">';
@@ -246,9 +246,17 @@ if ($studiengang_kz != '' && $stsem_von != '' && $stsem_nach != '')
 	{
 		$anzahl_nach = $db->db_num_rows($result);
 		$baseurl = basename($_SERVER['REQUEST_URI']);
-		if ($anzahl_nach >= $anzahl_von && !isset($_GET['continue']))
+		if ($anzahl_von == 0 && !isset($_GET['continue']))
 		{
-			echo '<br><br><span style="color:red">Es sind schon Lehreinheiten fuer das
+			echo '<br><br><span style="color:orange">Es sind kein LV-Teile im
+				'.$stsem_von.' in '.$stg_arr[$studiengang_kz].' '.$semester.' vorhanden.
+				Trotzdem fortsetzen?</span><br><br>
+					<form action="'.$baseurl.'&continue" method="POST"><input type="submit" value="Fortsetzen"></form>';
+			die ();
+		}
+		elseif ($anzahl_von > 0 && $anzahl_nach >= $anzahl_von && !isset($_GET['continue']))
+		{
+			echo '<br><br><span style="color:red">Es sind schon '.$anzahl_nach.' LV-Teile fuer das
 				'.$stsem_nach.' in '.$stg_arr[$studiengang_kz].' '.$semester.' vorhanden.
 				Trotzdem fortsetzen?</span><br><br>
 					<form action="'.$baseurl.'&continue" method="POST"><input type="submit" value="Fortsetzen"></form>';
@@ -553,15 +561,15 @@ if ($studiengang_kz != '' && $stsem_von != '' && $stsem_nach != '')
 	}
 	else
 	{
-		$text .= 'Fehler beim Laden der Lehreinheiten '.$db->db_last_error();
+		$text .= 'Fehler beim Laden der LV-Teile '.$db->db_last_error();
 		$error_lehreinheit++;
 	}
 
 	echo "<br><br>";
-	echo "Vorgerueckte Lehreinheiten: $anzahl_lehreinheiten<br>";
+	echo "Vorgerueckte LV-Teile: $anzahl_lehreinheiten<br>";
 	echo "Vorgerueckte LEMitarbeiter: $anzahl_lehreinheitmitarbeiter<br>";
 	echo "Vorgerueckte LEGruppen: $anzahl_lehreinheitgruppe<br>";
-	echo "Fehler bei Lehreinheiten: $error_lehreinheit<br>";
+	echo "Fehler bei LV-Teil: $error_lehreinheit<br>";
 	echo "Fehler bei LEMitarbeiter: $error_lehreinheitmitarbeiter<br>";
 	echo "Fehler bei LEGruppen: $error_lehreinheitmitarbeiter<br>";
 

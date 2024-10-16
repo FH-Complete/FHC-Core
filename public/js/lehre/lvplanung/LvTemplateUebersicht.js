@@ -21,6 +21,45 @@ export default {
 	},
 	computed: {
 		tabulatorOptions() {
+                        const fhcValuesLookup = function(cell) {
+                            var values = {};
+                            const field = cell.getField();
+                            const data = cell.getTable().getData();
+                            const collectvalues = function(rows, field) {
+                                var values = {};
+                                var childvalues = {};
+                                for(const row of rows) {
+                                    const rowvalue = (row[field] !== null) ? row[field] : '';
+                                    values[rowvalue] = rowvalue;
+                                    if(row['_children'] && row['_children'].length > 0) {
+                                      childvalues = collectvalues(row['_children'], field);
+                                      values = {...values, ...childvalues}
+                                    }
+                                }
+                                return values;
+                            }
+                            values = collectvalues(data, field);
+                            const vals = Object.keys(values).sort();
+                            if(vals.indexOf('') === -1) {
+                                vals.unshift('');
+                            }
+                            return vals;
+                        };
+                        const fhctreefilter = function(headerValue, rowValue, rowData, filterParams){
+                            if (rowData['_children'] && rowData['_children'].length > 0) {
+                               for (var i in rowData['_children']) {
+                                  return rowValue == headerValue || 
+                                            fhctreefilter(
+                                                headerValue, 
+                                                rowData['_children'][i][filterParams.field], 
+                                                rowData['_children'][i], 
+                                                filterParams
+                                            );
+                               }
+                            }
+
+                            return rowValue == headerValue;
+                        };
 			const self = this;
 			return {
 				// NOTE: data is set on table built to await preselected actual Studiensemester
@@ -42,11 +81,11 @@ export default {
 				columns: [
 					{title: 'LV-ID', field: 'lehrveranstaltung_id', headerFilter: true, visible: false},
 					{title: 'LV Kurzbz', field: 'kurzbz', headerFilter: true, visible:false, width: 70},
-					{title: 'STG Kurzbz', field: 'stg_typ_kurzbz', headerFilter: true, visible:true, width: 80},
+					{title: 'STG Kurzbz', field: 'stg_typ_kurzbz', headerFilter: "list", headerFilterParams: {valuesLookup: fhcValuesLookup}, headerFilterFunc: fhctreefilter, headerFilterFuncParams: {field: 'stg_typ_kurzbz'}, visible:true, width: 80},
 					{title: 'OrgEinheit', field: 'lv_oe_bezeichnung', headerFilter: true, visible: false, width: 250},
 					{title: 'Lehrtyp Kurzbz', field: 'lehrtyp_kurzbz', headerFilter: true, visible:false, width: 70},
-					{title: 'Studiengangtyp', field: 'stg_typ_bezeichnung', headerFilter: true, width: 150},
-					{title: 'OrgForm', field: 'orgform_kurzbz', headerFilter: true, width: 70},
+					{title: 'Studiengangtyp', field: 'stg_typ_bezeichnung', headerFilter: "list", headerFilterParams: {valuesLookup: fhcValuesLookup}, headerFilterFunc: fhctreefilter, headerFilterFuncParams: {field: 'stg_typ_bezeichnung'}, width: 150},
+					{title: 'OrgForm', field: 'orgform_kurzbz', headerFilter: "list", headerFilterParams: {valuesLookup: fhcValuesLookup}, headerFilterFunc: fhctreefilter, headerFilterFuncParams: {field: 'orgform_kurzbz'}, width: 70},
 					{title: 'Semester', field: 'semester', headerFilter: true, width: 50},
 					{title: 'Lehrveranstaltung', field: 'lv_bezeichnung', headerFilter: true, minWidth: 250},
 					{title: 'Lehrveranstaltung ENG', field: 'bezeichnung_english', headerFilter: true, minWidth: 250},

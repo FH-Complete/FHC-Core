@@ -10,7 +10,10 @@ $includesArray = array(
 	'navigationcomponent' => true,
 	'filtercomponent' => true,
 	'customJSModules' => array('public/js/apps/lehre/lvplanung/LvTemplates.js'),
-	'customCSSs' => array('public/css/Fhc.css')
+	'customCSSs' => array(
+	    'public/css/Fhc.css',
+	    'public/css/lvTemplateUebersicht.css'
+	)
 );
 
 $this->load->view('templates/FHC-Header', $includesArray);
