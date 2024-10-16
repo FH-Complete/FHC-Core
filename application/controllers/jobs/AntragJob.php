@@ -95,12 +95,15 @@ class AntragJob extends JOB_Controller
 					continue;
 				}
 
-				$leitung = current(getData($result));
-				if (!isset($stgLeitungen[$leitung->uid]))
-				{
-					$stgLeitungen[$leitung->uid] = [ 'Details' => $leitung, 'stgs' => [] ];
+				$leitungen = getData($result);
+
+				foreach ($leitungen as $leitung){
+					if (!isset($stgLeitungen[$leitung->uid]))
+					{
+						$stgLeitungen[$leitung->uid] = [ 'Details' => $leitung, 'stgs' => [] ];
+					}
+					$stgLeitungen[$leitung->uid]['stgs'][] = $antrag->studiengang_kz;
 				}
-				$stgLeitungen[$leitung->uid]['stgs'][] = $antrag->studiengang_kz;
 
 				$result = $this->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
 				if (isError($result))
