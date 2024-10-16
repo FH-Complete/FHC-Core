@@ -178,6 +178,7 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 			$this->mapLehreIntern($data);
 			$this->prepareZeitaufzeichnung($data);
 			$this->checkImporttage($data[self::STARTDT]);
+			$this->checkIfProjektAuswahlErlaubt($data[self::PROJEKT], $data[self::AKTIVITAET]);
 			$this->saveZeit($data[self::STARTDT], $data[self::ENDEDT]);
 		} catch (Exception $ex) {
 			$this->addError($ex->getMessage(), true);

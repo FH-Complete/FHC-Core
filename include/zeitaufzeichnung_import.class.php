@@ -11,6 +11,8 @@ require_once('../../../include/zeitaufzeichnung.class.php');
  */
 class zeitaufzeichnung_import {
 
+	const AKTIVITAET_OHNE_PROJEKTZUORDNUNG = array("Arztbesuch", "Behoerde", "DienstreiseMT", "Ersatzruhe", "Pause");
+
 	protected $errors;
 	protected $warnings;
 	protected $infos;
@@ -253,5 +255,14 @@ protected function checkIfArbeitspaketZuWaehlen($projekt_kurzbz, $phase)
 		}
 	}
 }
+
+	protected function checkIfProjektAuswahlErlaubt($projekt_kurzbz, $aktivitaet)
+	{
+		if ($projekt_kurzbz != '')
+		{
+			if (in_array($aktivitaet, self::AKTIVITAET_OHNE_PROJEKTZUORDNUNG))
+				throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") .  ': Keine Projektzuordnung erlaubt!');
+		}
+	}
 
 }

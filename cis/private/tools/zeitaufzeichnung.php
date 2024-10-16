@@ -277,6 +277,7 @@ echo '
             }
 
 			checkPausenblock();
+			checkProjektblock();
 
             $("#kunde_name").autocomplete({
 			source: "zeitaufzeichnung_autocomplete.php?autocomplete=kunde",
@@ -696,7 +697,26 @@ echo '
 			else
 				hidePausenblock();
 		}
+		
+		function checkProjektblock()
+		{
+			var sel = $("#aktivitaet").val();
+			var activities = ["Arztbesuch", "Behoerde", "DienstreiseMT", "Ersatzruhe", "Pause"];
+			if (activities.includes(sel))
+				hideProjektblock();
+			else
+				showProjektblock();
+		}
 
+		function hideProjektblock()
+		{
+			resetProjekt();
+			$("#projektblock").hide();
+		}
+		function showProjektblock()
+		{
+			$("#projektblock").show();
+		}
 		function hidePausenblock()
 		{
 			$("#pause_von").val("");
@@ -1131,7 +1151,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 
 		if($result = $db->db_query($qry))
 		{
-			echo '<SELECT name="aktivitaet" id="aktivitaet" onChange="checkPausenblock()">';
+			echo '<SELECT name="aktivitaet" id="aktivitaet" onChange="checkPausenblock(); checkProjektblock()">';
 
 			while($row = $db->db_fetch_object($result))
 			{
@@ -1217,7 +1237,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		if($anzprojekte > 0)
 		{
 			//Projekt
-			echo '<tr>
+			echo '<tr  id="projektblock">
 				<td>'.$p->t("zeitaufzeichnung/projekt").'</td>
 				<td colspan="4"><SELECT name="projekt" id="projekt">
 					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';

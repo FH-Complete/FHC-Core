@@ -74,6 +74,7 @@ class zeitaufzeichnung_import_post extends zeitaufzeichnung_import {
 			$this->processPause($this->data['von_pause'], $this->data['bis_pause']);
 			$this->checkPhaseBebuchbar($this->data['projektphase_id']);
 			$this->checkIfArbeitspaketZuWaehlen($this->data['projekt_kurzbz'], $this->data['projektphase_id']);
+			$this->checkIfProjektAuswahlErlaubt($this->data['projekt_kurzbz'], $this->data['aktivitaet_kurzbz']);
 			$this->saveZeit();
 		} catch (Exception $ex) {
 			$this->addError($ex->getMessage());
