@@ -114,6 +114,12 @@ class AntragJob extends JOB_Controller
 				if (!hasData($result))
 				{
 					$this->logError('Keine Details für Studiengang ' . $antrag->studiengang_kz . ' gefunden!');
+
+					if (in_array($antrag->studiengang_kz, $stgLeitungen[$leitung->uid]['stgs']))
+					{
+						unset($stgLeitungen[$leitung->uid]);
+					}
+
 					continue;
 				}
 				$details = current(getData($result));
