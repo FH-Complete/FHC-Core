@@ -12,7 +12,7 @@ $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 
 <div id="content">
-	<h2>Dashboard</h2>
+	<h2>Hallo <?= $name?>!</h2>
 	<hr>
 	<fhc-dashboard dashboard="CIS"/>
 </div>

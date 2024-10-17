@@ -117,6 +117,15 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					'redirect','etw',NOW(),null,null,null,TRUE,FALSE,'MYLV'
 				);
 
+				-- DASHBOARD
+
+				INSERT INTO campus.tbl_content 
+				(template_kurzbz, oe_kurzbz, insertamum, insertvon, updateamum, updatevon, aktiv, menu_open, beschreibung)
+				VALUES  
+				(
+					'redirect','etw',NOW(),null,null,null,TRUE,FALSE,'DASHBOARD'
+				);
+
 				-- ##################################### CONTENTSPRACHE
 
 				-- CIS4_ROOT
@@ -272,6 +281,20 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					null,null,null,null,NOW(),null,'MyLv',null
 				);
 
+				-- DASHBOARD
+				
+				INSERT INTO campus.tbl_contentsprache 
+				(sprache, content_id, version, sichtbar, content, reviewvon, reviewamum, updateamum, updatevon, insertamum, insertvon, titel, gesperrt_uid)
+				VALUES  
+				(
+					'German',
+					-- queries the content_id for the DASHBOARD
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DASHBOARD'),
+					1,TRUE,
+					'<content><url><![CDATA[../cis.php/Cis4]]></url><target><![CDATA[]]></target></content>',
+					null,null,null,null,NOW(),null,'Dashboard',null
+				);
+
 				-- ##################################### CONTENTCHILD
 
 				-- CIS4_ROOT childs
@@ -282,9 +305,20 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 				(
 					-- queries the content_id for the CIS4_ROOT
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
+					-- queries the content_id for the DASHBOARD
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DASHBOARD'),
+					NOW(), null, null, null, 1
+				);
+
+				INSERT INTO campus.tbl_contentchild
+				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
+				VALUES
+				(
+					-- queries the content_id for the CIS4_ROOT
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- queries the content_id for the MEIN_STUDIUM
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
-					NOW(), null, null, null, 1
+					NOW(), null, null, null, 2
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -295,7 +329,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- queries the content_id for the VPN_STUDIERENDE
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'VPN_STUDIERENDE'),
-					NOW(), null, null, null, 2
+					NOW(), null, null, null, 3
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -306,7 +340,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- queries the content_id for the NEWS
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'NEWS'),
-					NOW(), null, null, null, 3
+					NOW(), null, null, null, 4
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -317,7 +351,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- queries the content_id for the DOKUMENTE
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DOKUMENTE'),
-					NOW(), null, null, null, 4
+					NOW(), null, null, null, 5
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -328,7 +362,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- queries the content_id for the TLC
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'TLC'),
-					NOW(), null, null, null, 5
+					NOW(), null, null, null, 6
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -338,7 +372,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the CIS4_ROOT
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- 10487 is the content_id for Modul International Skills
-					10487, NOW(), null, null, null, 6
+					10487, NOW(), null, null, null, 7
 				);
 
 				INSERT INTO campus.tbl_contentchild
@@ -348,7 +382,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the CIS4_ROOT
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
 					-- 10568 is the content_id for Zahlungen
-					10568, NOW(), null, null, null, 7
+					10568, NOW(), null, null, null, 8
 				);
 
 				-- Mein Studium childs
