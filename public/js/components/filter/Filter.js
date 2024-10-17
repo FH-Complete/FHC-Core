@@ -42,7 +42,8 @@ export const CoreFilterCmpt = {
 	},
 	emits: [
 		'nwNewEntry',
-		'click:new'
+		'click:new',
+		'uuidDefined'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -568,6 +569,7 @@ export const CoreFilterCmpt = {
 		if (this.sideMenu && (!this.$props.onNwNewEntry || !(this.$props.onNwNewEntry instanceof Function)))
 			alert('"nwNewEntry" listener is mandatory when sideMenu is true');
 		this.uuid = _uuid++;
+		this.$emit('uuidDefined', this.uuid)
 		if (!this.tableOnly)
 			this.getFilter(); // get the filter data
 	},
