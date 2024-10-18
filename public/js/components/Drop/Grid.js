@@ -24,11 +24,16 @@ export default {
 		marginForExtraRow: {
 			type: Number,
 			default: 0
+		},
+		placeholders: {
+			type: Array,
+			default: () => []
 		}
 	},
 	emits: [
 		"rearrangeItems",
-		"newItem"
+		"newItem",
+		"gridHeight"
 	],
 	data() {
 		return {
@@ -108,6 +113,9 @@ export default {
 				};
 			});
 		},
+		placedItems_withPlaceholders(){
+			return [...this.placedItems,...this.placeholders];
+		},
 		showEmptyTileHover() {
 			if (!this.active || !this.grid || this.mode != MODE_IDLE || this.x < 0 || this.y < 0 || this.x >= this.cols || this.y >= this.rows)
 				return false;
@@ -122,6 +130,9 @@ export default {
 		cols() {
 			this.dragCancel();
 		},
+	    rows(value){
+			this.$emit('gridHeight',value);
+		}, 
 		indexedItems: {
 			handler(value) {
 				this.dragCancel();
@@ -333,6 +344,7 @@ export default {
 	<div
 		ref="container"
 		class="drop-grid position-relative h-0"
+		:class="{'empty-tile-background':active}"
 		:style="gridStyle"
 		@touchmove="dragOver"
 		@touchend="dragCancel"
@@ -341,7 +353,7 @@ export default {
 		@mousemove="updateCursor"
 		@mouseleave="mouseLeave">
 		<grid-item
-			v-for="item in placedItems"
+			v-for="item in (mode == 0 && active? placedItems_withPlaceholders : placedItems)"
 			:key="item.id"
 			:item="item"
 			@start-move="startMove"
@@ -357,21 +369,26 @@ export default {
 				height: 'calc(' + item.h + ' * var(--fhc-dg-row-height))'
 			}">
 			<template v-slot="item">
-				<slot v-bind="item.data"></slot>
+				<slot v-bind="item.data" v-bind="item" :x="item.x" :y="item.y" ></slot>
 			</template>
 		</grid-item>
-		<div
-			v-if="showEmptyTileHover"
-			class="position-absolute d-flex justify-content-center align-items-center"
-			:style="{
-				cursor: 'pointer',
-				top: 'calc(' + y + ' * var(--fhc-dg-row-height))',
-				left: 'calc(' + x + ' * var(--fhc-dg-col-width))',
-				width: 'var(--fhc-dg-col-width)',
-				height: 'var(--fhc-dg-row-height)'
-			}"
-			@click="emptyTileClicked">
-			<slot v-bind="{x,y}" name="empty-tile-hover"></slot>
-		</div>
+		
 	</div>`
 }
+
+/*
+OLD VERSION - ON HOVER
+<div
+	v-if="showEmptyTileHover"
+	class="position-absolute d-flex justify-content-center align-items-center"
+	:style="{
+		cursor: 'pointer',
+		top: 'calc(' + y + ' * var(--fhc-dg-row-height))',
+		left: 'calc(' + x + ' * var(--fhc-dg-col-width))',
+		width: 'var(--fhc-dg-col-width)',
+		height: 'var(--fhc-dg-row-height)'
+	}"
+	@click="emptyTileClicked">
+	<slot :x="x" :y="y" name="empty-tile-hover"></slot>
+</div>
+*/
