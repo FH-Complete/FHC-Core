@@ -74,8 +74,9 @@ class Projektarbeit_model extends DB_Model
 
 	/**
 	 * Gets all Projektarbeiten not uploaded in Time
+	 * with typ endupload and marked as fixtermin
 	 * @param String $startDate project works before this date will be ignored (in Dateformat: 'Y'-'m'-'d')
-	 * @return object
+	 * @return array of objects
 	 */
 	public function getAllProjektarbeitenNotUploadedInTime($startDate = null)
 	{
@@ -108,12 +109,116 @@ class Projektarbeit_model extends DB_Model
 
 		$this->db->where($this->dbTable. '.note', null);
 
-		return $this->loadWhere([
+		$result =  $this->loadWhere([
 			'pa.fixtermin' => 'true',
 			'pa.paabgabetyp_kurzbz' => 'end',
 			'pa.abgabedatum' => null,
 			'pa.datum < ' => $now->format('c'),
-			'pb.betreuerart_kurzbz' => 'Erstbegutachter'
 		]);
+
+		$query = $this->db->last_query();
+		var_dump($query);
+		if ($result)
+		{
+			echo "(UPDATE lehre.tbl_projektarbeit pa
+					SET note = NULL
+					WHERE projektarbeit_id in(";
+
+			$resultIds = getData($result);
+			if($resultIds){
+				foreach ($resultIds as $item)
+				{
+					echo $item->projektarbeit_id . ',';
+				}
+
+				echo ")\n";
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Gets all Projektarbeiten that have been negative
+	 * for student_uids with no open (null) or projektarbeiten with positive marks
+	 * @param String $startDate project works before this date will be ignored (in Dateformat: 'Y'-'m'-'d')
+	 * @return array of objects
+	 */
+	public function getAllProjektarbeitenNegative($startDate = null)
+	{
+		$allowedProjekttypes = ['Bachelor', 'Diplom'];
+		$now = new DateTime();
+
+		$this->db->distinct();
+		$this->addSelect($this->dbTable. '.projektarbeit_id');
+		$this->addSelect($this->dbTable. '.titel');
+		$this->addSelect($this->dbTable. '.student_uid');
+		$this->addSelect($this->dbTable. '.note');
+		$this->addSelect('p'. '.person_id');
+		$this->addSelect('p'. '.nachname');
+		$this->addSelect('p'. '.vorname');
+		$this->addSelect('le'. '.lehreinheit_id');
+		$this->addSelect('sg'. '.studiengang_kz');
+		$this->addJoin('campus.tbl_paabgabe pa', 'projektarbeit_id');
+		$this->addJoin('lehre.tbl_projektbetreuer pb', 'projektarbeit_id');
+		$this->addJoin('public.tbl_benutzer ben', 'ben.uid = tbl_projektarbeit.student_uid');
+		$this->addJoin('public.tbl_person p', 'p.person_id = ben.person_id', 'LEFT');
+		$this->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id', 'LEFT');
+		$this->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id', 'LEFT');
+		$this->addJoin('public.tbl_studiengang sg', 'studiengang_kz', 'LEFT');
+
+		$this->db->where_in($this->dbTable. '.projekttyp_kurzbz', $allowedProjekttypes);
+
+		if($startDate)
+			$this->db->where('pa.datum >', $startDate);
+
+		$this->db->where($this->dbTable. '.note', 5);
+		$this->db->where('NOT EXISTS (SELECT 1 FROM lehre.tbl_projektarbeit AS sub WHERE sub.student_uid = lehre.tbl_projektarbeit.student_uid AND sub.note IS null)', null, false);
+		$this->db->where('NOT EXISTS (SELECT 1 FROM lehre.tbl_projektarbeit AS sub WHERE sub.student_uid = lehre.tbl_projektarbeit.student_uid AND sub.note IN (1, 2, 3, 4))', null, false);
+
+		$this->db->where('ben.aktiv', true);
+		$result =  $this->loadWhere([
+			'pa.fixtermin' => 'true',
+			'pa.paabgabetyp_kurzbz' => 'end',
+			'pa.datum < ' => $now->format('c'),
+		]);
+
+		return $result;
+	}
+
+	/**
+	 * Gets the count of Projektarbeiten
+	 * @param String student_uid student_uid to check
+	 * @return true: maximum of allowed projektarbeiten reached
+	 * $return false: maximum of allowed projektarbeiten not reached
+	 */
+	public function checkifCountMaxProjektarbeiten($student_uid, $end_of_copy_bachelor, $end_of_copy_master)
+	{
+
+		$qry = "SELECT COUNT(*), projekttyp_kurzbz
+   				FROM lehre.tbl_projektarbeit AS sub
+    			WHERE sub.student_uid = ?
+    			GROUP BY projekttyp_kurzbz";
+
+		$params = array($student_uid);
+
+		$result =  $this->execQuery($qry, $params);
+
+		if (!empty($result->retval))
+		{
+			foreach ($result->retval as $row)
+			{
+				$count = $row->count;
+				$projekttyp = $row->projekttyp_kurzbz;
+
+				if ($projekttyp === 'Bachelor' && $count > $end_of_copy_bachelor)
+					return true;
+
+				if ($projekttyp === 'Diplom' && $count > $end_of_copy_master)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

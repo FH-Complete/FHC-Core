@@ -13,8 +13,8 @@
  * Cronjob to be run for Bachelor and Master Arbeiten failed to be uploaded in time
  *
  *  Actions:
- *  (1) missed endupload projektarbeit: grade projektarbeit with grade 7 (Nicht beurteilt)
- *  (2) copy projektarbeit
+ *  (1) missed endupload projektarbeit: grade projektarbeit with grade 5 (Nicht genügend)
+ *  (2) copy projektarbeit if max anzahl projektarbeiten nicht erreicht
  *  (3) set Betreuungen to 0 hours
  *  (4) sancho Mail to Studiengang with Link
  */
@@ -51,45 +51,96 @@ class ProjektarbeitJob extends JOB_Controller
 		$countMissedAbgaben = 0;
 		$countTotal = 0;
 		$countMails = 0;
+		$projektarbeiten = [];
 
 		$this->logInfo('Start Job Projektarbeit');
 
 		//get all Projektarbeiten not Uploaded in Time
-		$result = $this->ProjektarbeitModel->getAllProjektarbeitenNotUploadedInTime($startDate->format('c'));
-		if (isError($result))
-			return $this->logError(getError($result));
-		if (!hasData($result))
+		$resultNotUploaded = $this->ProjektarbeitModel->getAllProjektarbeitenNotUploadedInTime($startDate->format('c'));
+
+		if (isError($resultNotUploaded) && $resultNotUploaded != [])
+		{
+			return $this->logError(getError($resultNotUploaded));
+		}
+
+		$projektarbeitenNotUploaded = getData($resultNotUploaded);
+		if($projektarbeitenNotUploaded){
+			foreach ($projektarbeitenNotUploaded as $projectNotUploaded) {
+				$projectNotUploaded->reason = 'missedUpload';
+			}
+		}
+
+		//get all negative Projektarbeiten (5) of student_uid with no open (null) or positive marks
+		$resultNegative = $this->ProjektarbeitModel->getAllProjektarbeitenNegative($startDate->format('c'));
+
+		if (isError($resultNegative) && $resultNegative != [])
+		{
+			return $this->logError(getError($resultNegative));
+		}
+
+		$projektarbeitenNegative = getData($resultNegative) ?: [];
+		foreach ($projektarbeitenNegative as $projectNegative)
+			$projectNegative->reason = 'negative';
+
+		if (!hasData($resultNotUploaded) && !hasData($resultNegative
+			|| $resultNotUploaded) == [] && $resultNegative == [])
 			return $this->logInfo('End Job Projektarbeit Update: 0 Mails sent');
 
+		if (is_array($projektarbeitenNotUploaded) && is_array($projektarbeitenNegative))
+		{
+			$projektarbeiten = array_merge($projektarbeitenNotUploaded, $projektarbeitenNegative);
+		}
 
-
-		$projektarbeiten = getData($result);
-
-		// (1) note auf 7 setzen
+		// (1) set mark to 5
 		foreach ($projektarbeiten as $projekt)
 		{
 			$this->db->where('projektarbeit_id', $projekt->projektarbeit_id);
 
-			$result = $this->ProjektarbeitModel->update([
-				'projektarbeit_id' => $projekt->projektarbeit_id
-			], [
-				'note' => 7
-			]);
+			if (!$projekt->note)
+			{
+				$result = $this->ProjektarbeitModel->update([
+					'projektarbeit_id' => $projekt->projektarbeit_id
+				], [
+					'note' => 5
+				]);
+				if (isError($result))
+				{
+					$this->logError(getError($result));
+				}
+			}
 
-			if (isError($result))
-				$this->logError(getError($result));
+/*			else //log not necessary: always the case for negative marks
+			{
+				$this->logInfo('Note für Projektarbeit für projektarbeit_id ' .  $projekt->projektarbeit_id . 'bereits vorhanden');
+			}*/
 
 			// (2) copy Projektarbeit
-			$result = $this->ProjektarbeitModel->load($projekt->projektarbeit_id);
-			if (isError($result)) {
-				$this->logError(getError($result));
+			//no more copying if count bakk >= 6 or count_diplom >= 3
+			$end_of_copy_bachelor = $this->config->item('projektarbeitjob_finishCopy_bachelor') ? $this->config->item('projektarbeitjob_finishCopy_bachelor') : 6;
+			$end_of_copy_master = $this->config->item('projektarbeitjob_finishCopy_diplom') ? $this->config->item('projektarbeitjob_finishCopy_diplom') : 3;
+
+			$maxCountReached = $this->ProjektarbeitModel->checkifCountMaxProjektarbeiten(
+				$projekt->student_uid,
+				$end_of_copy_bachelor,
+				$end_of_copy_master
+			);
+			if ($maxCountReached)
+			{
 				continue;
 			}
-			if (!hasData($result)) {
-				$this->logInfo('Keine Projektarbeit für projektarbeit_id ' .  $projekt->projektarbeit_id . 'gefunden');
+
+			$result2 = $this->ProjektarbeitModel->load($projekt->projektarbeit_id);
+			if (isError($result2))
+			{
+				$this->logError(getError($result2));
 				continue;
 			}
-			$projektarbeit = current(getData($result));
+			if (!hasData($result2))
+			{
+				$this->logInfo('No Projektarbeit found for projektarbeit_id ' .  $projekt->projektarbeit_id);
+				continue;
+			}
+			$projektarbeit = current(getData($result2));
 
 			$now = new Datetime();
 
@@ -139,7 +190,7 @@ class ProjektarbeitJob extends JOB_Controller
 			}
 			elseif (!hasData($result))
 			{
-				$this->logInfo('Keine neu angelegte projektarbeit_id für StudentId' . $projektarbeit->student_uid . 'gefunden');
+				$this->logInfo('No projektarbeit_id for studentId ' . $projektarbeit->student_uid . ' found');
 				continue;
 			}
 			else
@@ -154,10 +205,13 @@ class ProjektarbeitJob extends JOB_Controller
 						'studiengang_kz' => $projekt->studiengang_kz
 					]);
 					if (isError($result))
+					{
 						$this->logError(getError($result));
+					}
+
 					elseif (!hasData($result))
 					{
-						$this->logInfo('Kein Studiengang für' . $projekt->studiengang_kz . 'gefunden');
+						$this->logInfo('No Studiengang for studiengang_kz ' . $projekt->studiengang_kz . ' found');
 					}
 					else
 					{
@@ -173,6 +227,8 @@ class ProjektarbeitJob extends JOB_Controller
 				$arrayStg[$projekt->studiengang_kz]['countMissedAbgaben'] = ($arrayStg[$projekt->studiengang_kz]['countMissedAbgaben'] + 1);
 
 				//Mailarray
+				$reason = $projekt->reason ? $projekt->reason : null;
+
 				$mailArray[] = 	array(
 					'studiengang_kz' => $projekt->studiengang_kz,
 					'projekt_id_alt' => $projekt->projektarbeit_id,
@@ -180,10 +236,12 @@ class ProjektarbeitJob extends JOB_Controller
 					'student_uid' => $projekt->student_uid,
 					'vorname' => $projekt->vorname,
 					'nachname' => $projekt->nachname,
-					'titel' => $projekt->titel);
+					'titel' => $projekt->titel,
+					'reason' => $reason
+					);
 			}
 
-			// (3)Betreuungen kopieren
+			// (3) copy Betreuungen
 			$result = $this->ProjektbetreuerModel->loadWhere([
 				'projektarbeit_id' => $projekt->projektarbeit_id
 			]);
@@ -193,7 +251,7 @@ class ProjektarbeitJob extends JOB_Controller
 			}
 			elseif (!hasData($result))
 			{
-				$this->logInfo('Keine Betreuung für' . $projekt->projektarbeit_id . 'gefunden');
+				$this->logInfo('No Betreuung found for projektarbeit_id ' . $projekt->projektarbeit_id);
 			}
 			else
 			{
@@ -226,7 +284,9 @@ class ProjektarbeitJob extends JOB_Controller
 							'zugangstoken' => null,
 							'zugangstoken_gueltigbis' => null
 						]);
-					} catch (ErrorException $e) {
+					}
+					catch (ErrorException $e)
+					{
 						$this->logError("Error Insert Betreuungen, check projekt_id: " . $projekt_id_copy);
 						continue;
 					}
@@ -236,14 +296,15 @@ class ProjektarbeitJob extends JOB_Controller
 		}
 		array_multisort($mailArray);
 
-		//(4) Sancho Mail
+		// (4) Sancho Mail
 		foreach ($arrayStg as $stg_kz => $item)
 		{
 			$maildata = " <table class='table table-striped'> <thead>
 							<tr>
 							<th align=left>UID </th>
 							<th align=left>Name</th>
-							<th align=left>Projektarbeit</th>
+							<th align=left>Projektarbeit / Title</th>
+							<th align=left></th>
 							</tr>
 							</thead>
 							<tbody>";
@@ -257,12 +318,13 @@ class ProjektarbeitJob extends JOB_Controller
 					$maildata .= "<tr>" .
 						"<td>". $m['student_uid'] . "</td>".
 						"<td>". trim($m['vorname'] . " " . $m['nachname']) ."</td>".
-						"<td>".	$m['titel'] . "</td></tr>";
+						"<td>". $m['titel'] . "</td>".
+						"<td>[".	$m['reason'] . "]</td></tr>";
 				}
 			}
 			$maildata .= "</tbody></table>";
 
-			$betreff = 'Versäumte Abgabe(n) Projektarbeiten / Project Work(s) not uploaded in time';
+			$betreff = 'Kopierte Projektarbeiten / Project Work(s) copied';
 			$data = [
 				'anzahlMissedAbgaben' => $anzahlMissedAbgaben,
 				'link' =>  APP_ROOT. '/vilesci/lehre/abgabe_assistenz_frameset.php?stg_kz=' . $stg_kz,
@@ -278,7 +340,7 @@ class ProjektarbeitJob extends JOB_Controller
 			}
 		}
 
-		$this->logInfo($countTotal . ' projektarbeiten not uploaded in time, ' . $countMails . ' sent mails.');
+		$this->logInfo($countTotal . ' projektarbeiten copied, ' . $countMails . ' sent mails.');
 		$this->logInfo('End Job Projektarbeit');
 	}
 }
