@@ -26,15 +26,65 @@ export default {
 	data() {
 		return {
 			gridWidth: 1,
+			gridHeight: null,
 			editMode: this.adminMode
 		}
 	},
 	computed: {
 		items() {
 			return this.widgets.map(item => {
-				return {...item, ...(item.place[this.gridWidth] || {h: 1, w:1, x:0, y:0})};
+				return { ...item, ...(item.place[this.gridWidth] || {h: 1, w:1, x:0, y:0})};
 			});
-		}
+		},
+		items_hashmap() {
+			let items = {};
+			this.items.forEach(item => {
+				items[`x${item.x}y${item.y}`] = item;
+			});
+			return items
+		},
+		items_placeholders(){
+			let placeholders = [];
+			let col_max = this.gridWidth;
+			// OLD way of calculating the max rows
+			//let max_row = Math.max(...this.items.map(item => item.y)) + 1;
+			//let max_row_max_height = Math.max(...this.items.filter(item => item.y == (max_row - 1)).map(item => item.h));
+			//max_row + max_row_max_height - 1;
+			let rows_max = this.gridHeight;
+
+			// occupied hashmap to keep track of the occupied cells
+			let occupied = {};
+
+			for (let y = 0; y < rows_max; y++) {
+				for (let x = 0; x < col_max; x++) {
+					// skip current position if it was registered as occupied
+					if (Object.keys(occupied).length && occupied[`x${x}y${y}`]) {
+						continue;
+					}
+					let current_item = this.items_hashmap[`x${x}y${y}`];
+					if (current_item) {
+						//calculate the occupied cells from the width and the height from the items 
+						let width = current_item.w;
+						let height = current_item.h;
+						let max_x = x + width - 1;
+						let max_y = y + height - 1;
+						if(x != max_x || y != max_y){
+							for (let occupied_y = y; occupied_y <= max_y; occupied_y++) {
+								for (let occupied_x = x; occupied_x <= max_x; occupied_x++) {
+									if (occupied_x != x || occupied_y != y) {
+										occupied[`x${occupied_x}y${occupied_y}`]=true;
+									}
+								}
+							}
+						}
+					}
+					else {
+						placeholders.push({ x: x, y: y, w: 1, h: 1, placeholder: true });
+					}
+				}
+			}
+			return placeholders;
+		},
 	},
 	methods: {
 		checkResizeLimit(item, w, h) {
@@ -80,7 +130,9 @@ export default {
 		updatePositions(updated) {
 			let result = {};
 			updated.forEach(update => {
+				
 				let item = {...update.item};
+				if (!item.placeholder) {
 				if (!item.place[this.gridWidth])
 					item.place[this.gridWidth] = {x: 0, y: 0, w: 1, h: 1};
 				delete item.x;
@@ -97,7 +149,9 @@ export default {
 					item.place[this.gridWidth].h = update.h;
 
 				result[item.id] = item;
+				}
 			});
+			
 			this.updatePreset(result);
 		},
 		updatePreset(update) {
@@ -121,9 +175,10 @@ export default {
 			<span class="col">{{name}}</span>
 			<button class="col-auto btn" @click.prevent="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
 		</h3>
-		<drop-grid v-model:cols="gridWidth" :items="items" :active="editMode" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions">
-			<template v-slot="item">
-				<dashboard-item
+		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editMode" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
+			<template #default="item" #default>
+				
+				<dashboard-item v-if="!item.placeholder"
 					:id="item.widget"
 					:width="item.w"
 					:height="item.h"
@@ -135,10 +190,17 @@ export default {
 					@change="saveConfig($event, item)"
 					@remove="removeWidget(item, $event)">
 				</dashboard-item>
+				<div v-else class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
+				
 			</template>
-			<template #empty-tile-hover="{x,y}">
-				<div class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x,y,w:1,h:1}}, custom: 1 })"></div>
-			</template>
+			
 		</drop-grid>
 	</div>`
 }
+
+/*
+OLD VERSION - ON HOVER
+<template #empty-tile-hover="{x,y}">
+	<div class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x,y,w:1,h:1}}, custom: 1 })"></div>
+</template>
+*/

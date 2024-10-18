@@ -205,7 +205,7 @@ export default {
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
                         ['btn-level-' + level]: true,
-						'text-decoration-underline':active
+						'fw-bold':active
                     }">
                     {{ entry.titel }}
                 </a>
@@ -228,7 +228,7 @@ export default {
             :class="{
                 'btn btn-default rounded-0 w-100 text-start': true,
                 ['btn-level-' + level]: true,
-				'text-decoration-underline':active
+				'fw-bold':active
             }">
             {{ entry.titel }}
         </a>

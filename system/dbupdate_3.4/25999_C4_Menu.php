@@ -126,6 +126,15 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					'redirect','etw',NOW(),null,null,null,TRUE,FALSE,'DASHBOARD'
 				);
 
+				-- BESTÄTIGUNGEN_ZEUGNISSE
+
+				INSERT INTO campus.tbl_content 
+				(template_kurzbz, oe_kurzbz, insertamum, insertvon, updateamum, updatevon, aktiv, menu_open, beschreibung)
+				VALUES  
+				(
+					'redirect','etw',NOW(),null,null,null,TRUE,FALSE,'BESTÄTIGUNGEN_ZEUGNISSE'
+				);
+
 				-- ##################################### CONTENTSPRACHE
 
 				-- CIS4_ROOT
@@ -206,7 +215,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the DOKUMENTE
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'DOKUMENTE'),
 					1,TRUE,
-					'<content><url><![CDATA[../cis.php/Cis/Documents]]></url><target><![CDATA[]]></target></content>',
+					'<content><url><![CDATA[#Dokumente]]></url><target><![CDATA[_self]]></target></content>',
 					null,null,null,null,NOW(),null,'Dokumente',null
 				);
 
@@ -295,9 +304,23 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					null,null,null,null,NOW(),null,'Dashboard',null
 				);
 
+				-- BESTÄTIGUNGEN_ZEUGNISSE
+				
+				INSERT INTO campus.tbl_contentsprache 
+				(sprache, content_id, version, sichtbar, content, reviewvon, reviewamum, updateamum, updatevon, insertamum, insertvon, titel, gesperrt_uid)
+				VALUES  
+				(
+					'German',
+					-- queries the content_id for the BESTÄTIGUNGEN_ZEUGNISSE
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'BESTÄTIGUNGEN_ZEUGNISSE'),
+					1,TRUE,
+					'<content><url><![CDATA[../cis.php/Cis/Documents]]></url><target><![CDATA[]]></target></content>',
+					null,null,null,null,NOW(),null,'Bestätigungen / Zeugnisse',null
+				);
+
 				-- ##################################### CONTENTCHILD
 
-				-- CIS4_ROOT childs
+				###### CIS4_ROOT childs
 
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
@@ -385,7 +408,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					10568, NOW(), null, null, null, 8
 				);
 
-				-- Mein Studium childs
+				###### Mein Studium childs
 
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
@@ -426,11 +449,22 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 				(
 					-- queries the content_id for the MEIN_STUDIUM
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
+					-- queries the content_id for the BESTÄTIGUNGEN_ZEUGNISSE
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'BESTÄTIGUNGEN_ZEUGNISSE'),
+					NOW(), null, null, null, 4
+				);
+				
+				INSERT INTO campus.tbl_contentchild
+				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
+				VALUES
+				(
+					-- queries the content_id for the MEIN_STUDIUM
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
 					-- 10795 is the content_id for Studierendenstatus
-					10795, NOW(), null, null, null, 4
+					10795, NOW(), null, null, null, 5
 				);
 
-				-- VPN_STUDIERENDE childs
+				###### VPN_STUDIERENDE childs
 
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
@@ -452,7 +486,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					10884, NOW(), null, null, null, 2
 				);
 
-				-- Profil childs
+				###### Profil childs
 
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
@@ -464,7 +498,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					7358, NOW(), null, null, null, 1
 				);
 
-				-- News childs
+				###### News childs
 
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
@@ -476,7 +510,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					6748, NOW(), null, null, null, 1
 				);
 
-				-- Dokumente childs
+				###### Dokumente childs
 
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
@@ -530,7 +564,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					NOW(), null, null, null, 5
 				);
 
-				-- Studienbetrieb childs
+				###### Studienbetrieb childs
 
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
@@ -692,7 +726,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					7261, NOW(), null, null, null, 16
 				);
 
-				-- Vorlagen childs
+				###### Vorlagen childs
 
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
@@ -704,7 +738,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					7243, NOW(), null, null, null, 1
 				);
 
-				-- TLC childs
+				###### TLC childs
 
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
@@ -718,7 +752,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 				";
 
 
-			// Execute query and ROLLBACK on error or COMMIT
+			// Execute query, COMMIT on success and ROLLBACK on error
 
 			if (!$db->db_query($qry)) 
 			{
