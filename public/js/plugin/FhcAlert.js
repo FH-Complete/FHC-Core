@@ -60,6 +60,13 @@
  * Displays a confirmation dialog and returns a Promise which resolves
  * with true or false depending und the pressed button.
  * @return Promise
+ *
+ * confirm
+ * ------------
+ * Displays a confirmation dialog and returns a Promise which resolves
+ * with true or false depending und the pressed button.
+ * @param string	message
+ * @return Promise
  * 
  * alertDefault
  * ------------
@@ -215,6 +222,25 @@ export default {
 						message: 'Möchten Sie sicher löschen?',
 						acceptLabel: 'Löschen',
 						acceptClass: 'btn btn-danger',
+						rejectLabel: 'Abbrechen',
+						rejectClass: 'btn btn-outline-secondary',
+						accept() {
+							resolve(true);
+						},
+						reject() {
+							resolve(false);
+						},
+					});
+				});
+			},
+			confirm(message) {
+				return new Promise((resolve, reject) => {
+					helperAppInstance.$confirm.require({
+						group: 'fhcAlertConfirm',
+						header: 'Achtung',
+						message: message,
+						acceptLabel: 'Ja',
+						acceptClass: 'btn btn-success',
 						rejectLabel: 'Abbrechen',
 						rejectClass: 'btn btn-outline-secondary',
 						accept() {
