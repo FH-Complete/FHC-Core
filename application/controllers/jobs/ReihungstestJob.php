@@ -860,8 +860,8 @@ class ReihungstestJob extends JOB_Controller
 			foreach ($result_prestudents->retval as $row_ps)
 			{
 				// Alle niedrigeren Prios laden
-				$qryNiedrPrios = "
-						SELECT DISTINCT
+				$qryAnderePrios = "
+						SELECT DISTINCT ON(prestudent_id)
 							get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') AS laststatus,
 							tbl_studienplan.orgform_kurzbz,
 							tbl_person.nachname,
@@ -876,81 +876,99 @@ class ReihungstestJob extends JOB_Controller
 							JOIN PUBLIC.tbl_studiengang ON (tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz)
 						WHERE tbl_prestudent.person_id = ".$row_ps->person_id."
 							AND tbl_prestudent.prestudent_id != ".$row_ps->prestudent_id."
-							AND get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') IN ('Aufgenommener','Bewerber','Wartender')
+							AND get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') IN ('Aufgenommener','Bewerber','Wartender', 'Student')
 							AND studiensemester_kurzbz = '".$row_ps->studiensemester_kurzbz."'
 							AND tbl_studiengang.typ IN ('b', 'm')
-							AND priorisierung > ".$row_ps->priorisierung."
-						ORDER BY studiengang_kz, laststatus
-					";
+							AND priorisierung != ".$row_ps->priorisierung."
+						ORDER BY prestudent_id, tbl_prestudentstatus.datum DESC, studiengang_kz, laststatus";
 
 				// Wenn der letzte Status "Aufgenommener" ist, alle niedrigeren Prios auf "Abgewiesen" setzen
 				// falls diese Bewerber oder Warteliste sind
 				// Danach Kaution einbuchen
 				if ($row_ps->laststatus == 'Aufgenommener')
 				{
-					$resultNiedrPrios = $db->execReadOnlyQuery($qryNiedrPrios);
+					$resultAnderePrios = $db->execReadOnlyQuery($qryAnderePrios);
 
-					if (hasdata($resultNiedrPrios))
+					if (hasdata($resultAnderePrios))
 					{
-						foreach ($resultNiedrPrios->retval as $rowNiedrPrios)
+						foreach ($resultAnderePrios->retval as $rowAnderePrios)
 						{
 							// nur Info wenn aufgenommen oder master
-							if ($rowNiedrPrios->laststatus == 'Aufgenommener' || $rowNiedrPrios->studiengang_typ == 'm')
+							if (($rowAnderePrios->laststatus == 'Student' || $rowAnderePrios->laststatus == 'Aufgenommener' || $rowAnderePrios->studiengang_typ == 'm') &&
+								$rowAnderePrios->priorisierung > $row_ps->priorisierung)
 							{
 								// Mail zur Info an Assistenz schicken, dass in höherer Prio aufgenommen wurde
-								$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
-									= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+								$mailArray[$rowAnderePrios->studiengang_kz][$rowAnderePrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
+									= $rowAnderePrios->nachname.' '.$rowAnderePrios->vorname.' ('.$rowAnderePrios->prestudent_id.')';
 							}
-							elseif ($rowNiedrPrios->laststatus == 'Bewerber' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum)
+							elseif ($rowAnderePrios->laststatus == 'Bewerber' && $row_ps->prestudenstatus_datum > $rowAnderePrios->datum)
 							{
-								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
-								$lastStatus = $this->PrestudentstatusModel->getLastStatus($rowNiedrPrios->prestudent_id);
-
-								$result = $this->PrestudentstatusModel->insert(
-									array(
-										'prestudent_id' => $rowNiedrPrios->prestudent_id,
-										'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
-										'ausbildungssemester' => $lastStatus->retval[0]->ausbildungssemester,
-										'datum' => date('Y-m-d'),
-										'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
-										'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
-										'status_kurzbz' => 'Abgewiesener',
-										'statusgrund_id' => 5,
-										'insertvon' => 'prioritizationJob',
-										'insertamum' => date('Y-m-d H:i:s')
-									)
-								);
-								if (isSuccess($result))
+								if ($rowAnderePrios->priorisierung > $row_ps->priorisierung)
 								{
-									// Derzeit nur Info an Admins schicken, wenn er Bewerber war
-									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenWeilBewerber'][]
-										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+									// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
+									$lastStatus = $this->PrestudentstatusModel->getLastStatus($rowAnderePrios->prestudent_id);
+
+									$result = $this->PrestudentstatusModel->insert(
+										array(
+											'prestudent_id' => $rowAnderePrios->prestudent_id,
+											'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
+											'ausbildungssemester' => $lastStatus->retval[0]->ausbildungssemester,
+											'datum' => date('Y-m-d'),
+											'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
+											'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
+											'status_kurzbz' => 'Abgewiesener',
+											'statusgrund_id' => 5,
+											'insertvon' => 'prioritizationJob',
+											'insertamum' => date('Y-m-d H:i:s')
+										)
+									);
+									if (isSuccess($result))
+									{
+										// Derzeit nur Info an Admins schicken, wenn er Bewerber war
+										$mailArray[$rowAnderePrios->studiengang_kz][$rowAnderePrios->orgform_kurzbz]['AbgewiesenWeilBewerber'][]
+											= $rowAnderePrios->nachname.' '.$rowAnderePrios->vorname.' ('.$rowAnderePrios->prestudent_id.')';
+									}
+								}
+								else
+								{
+									$mailArray[$rowAnderePrios->studiengang_kz][$rowAnderePrios->orgform_kurzbz]['InfoAnHoeherenStudiengang'][]
+										= $rowAnderePrios->nachname.' '.$rowAnderePrios->vorname.' ('.$rowAnderePrios->prestudent_id.')';
 								}
 							}
-							elseif ($rowNiedrPrios->laststatus == 'Wartender' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum)
+							elseif ($rowAnderePrios->laststatus == 'Wartender' && $row_ps->prestudenstatus_datum > $rowAnderePrios->datum)
 							{
-								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
-								// Mail zur Info an Assistenz schicken
-								$lastStatus = $this->PrestudentstatusModel->getLastStatus($rowNiedrPrios->prestudent_id);
-
-								$result = $this->PrestudentstatusModel->insert(
-									array(
-										'prestudent_id' => $rowNiedrPrios->prestudent_id,
-										'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
-										'ausbildungssemester' => $lastStatus->retval[0]->ausbildungssemester,
-										'datum' => date('Y-m-d'),
-										'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
-										'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
-										'status_kurzbz' => 'Abgewiesener',
-										'statusgrund_id' => 5,
-										'insertvon' => 'prioritizationJob',
-										'insertamum' => date('Y-m-d H:i:s')
-									)
-								);
-								if (isSuccess($result))
+								if ($rowAnderePrios->priorisierung > $row_ps->priorisierung)
 								{
-									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenGesetztWartender'][]
-										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+									// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
+									// Mail zur Info an Assistenz schicken
+									$lastStatus = $this->PrestudentstatusModel->getLastStatus($rowAnderePrios->prestudent_id);
+
+									$mailArray[$rowAnderePrios->studiengang_kz][$rowAnderePrios->orgform_kurzbz]['AbgewiesenGesetztWartender'][]
+										= $rowAnderePrios->nachname.' '.$rowAnderePrios->vorname.' ('.$rowAnderePrios->prestudent_id.')';
+									$result = $this->PrestudentstatusModel->insert(
+										array(
+											'prestudent_id' => $rowAnderePrios->prestudent_id,
+											'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
+											'ausbildungssemester' => $lastStatus->retval[0]->ausbildungssemester,
+											'datum' => date('Y-m-d'),
+											'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
+											'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
+											'status_kurzbz' => 'Abgewiesener',
+											'statusgrund_id' => 5,
+											'insertvon' => 'prioritizationJob',
+											'insertamum' => date('Y-m-d H:i:s')
+										)
+									);
+									if (isSuccess($result))
+									{
+										$mailArray[$rowAnderePrios->studiengang_kz][$rowAnderePrios->orgform_kurzbz]['AbgewiesenGesetztWartender'][]
+											= $rowAnderePrios->nachname.' '.$rowAnderePrios->vorname.' ('.$rowAnderePrios->prestudent_id.')';
+									}
+								}
+								else
+								{
+									$mailArray[$rowAnderePrios->studiengang_kz][$rowAnderePrios->orgform_kurzbz]['InfoAnHoeherenStudiengang'][]
+										= $rowAnderePrios->nachname.' '.$rowAnderePrios->vorname.' ('.$rowAnderePrios->prestudent_id.')';
 								}
 							}
 						}
@@ -1001,15 +1019,17 @@ class ReihungstestJob extends JOB_Controller
 				}
 				elseif ($row_ps->laststatus == 'Abgewiesener')
 				{
-					$resultNiedrPrios = $db->execReadOnlyQuery($qryNiedrPrios);
+					$resultNiedrPrios = $db->execReadOnlyQuery($qryAnderePrios);
 
 					if (hasdata($resultNiedrPrios))
 					{
-						foreach ($resultNiedrPrios->retval as $rowNiedrPrios)
+						foreach ($resultNiedrPrios->retval as $rowAnderePrios)
 						{
+							if ($rowAnderePrios->priorisierung < $row_ps->priorisierung)
+								continue;
 							// Mail zur Info an Assistenz schicken, dass in höherer Prio abgewiesen wurde
-							$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenHoeherePrio'][]
-								= $rowNiedrPrios->nachname . ' ' . $rowNiedrPrios->vorname . ' (' . $rowNiedrPrios->prestudent_id . ')';
+							$mailArray[$rowAnderePrios->studiengang_kz][$rowAnderePrios->orgform_kurzbz]['AbgewiesenHoeherePrio'][]
+								= $rowAnderePrios->nachname . ' ' . $rowAnderePrios->vorname . ' (' . $rowAnderePrios->prestudent_id . ')';
 						}
 					}
 				}
@@ -1069,6 +1089,20 @@ class ReihungstestJob extends JOB_Controller
 						$mailcontent .= '					<tbody>';
 						sort($value['AbgewiesenHoeherePrio']);
 						foreach ($value['AbgewiesenHoeherePrio'] AS $key=>$bewerber)
+						{
+							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
+						}
+						$mailcontent .= '</tbody></table>';
+						$content = true;
+					}
+					if (isset($value['InfoAnHoeherenStudiengang']) && !isEmptyArray($value['InfoAnHoeherenStudiengang']))
+					{
+						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
+									Folgende Bewerber wurden in einem niedrigeren priorisierten Studiengang aufgenommen:</p>';
+						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
+						$mailcontent .= '					<tbody>';
+						sort($value['InfoAnHoeherenStudiengang']);
+						foreach ($value['InfoAnHoeherenStudiengang'] AS $key=>$bewerber)
 						{
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
