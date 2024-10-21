@@ -352,12 +352,12 @@ html {
     position: relative;
   }
   #nav-user-btn {
-    width: 100%;
+
   }
   #nav-user-btn img {
     object-fit: cover;
-    height: 1.5rem;
-    width: 1.5rem;
+    height: 2rem;
+    width: 2rem;
   }
   #nav-user-menu {
     position: relative !important;
