@@ -28,12 +28,12 @@ class Cis4 extends FHC_Controller
 	public function index()
 	{
 		$this->load->model('person/Person_model','PersonModel');
-		$begrüsung = $this->PersonModel->getFirstName(getAuthUID());
-		if(isError($begrüsung))
+		$begruesung = $this->PersonModel->getFirstName(getAuthUID());
+		if(isError($begruesung))
 		{
 			show_error("name couldn't be loaded for username ".getAuthUID());
 		}
-		$begrüsung = getData($begrüsung);
-		$this->load->view('CisVue/Dashboard.php',["name"=> $begrüsung]);
+		$begruesung = getData($begruesung);
+		$this->load->view('CisVue/Dashboard.php',["name"=> $begruesung]);
 	}
 }
