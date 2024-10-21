@@ -32,7 +32,7 @@ if (!isset($menu)) {
 		<span class="navbar-toggler-icon"></span>
 	</button>
 	<fhc-searchbar id="nav-search" class=" fhc-searchbar w-100" @updatesearchtypes="updatesearchtypes" :selectedtypes="selectedtypes" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>	
-	<a id="nav-logo" href="<?= site_url(''); ?>">
+	<a id="nav-logo" class="d-none d-md-block" href="<?= site_url(''); ?>">
 		<img src="<?= base_url('/public/images/logo-300x160.png'); ?>" alt="Logo">
 	</a>
 	<nav id="nav-main" class="offcanvas offcanvas-start bg-dark" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
