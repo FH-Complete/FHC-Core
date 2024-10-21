@@ -31165,7 +31165,47 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorConfigFehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Config-Eintrag fehlt",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Missing config entry",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorUnbekannteUrl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Unbekannte URL. Seite bzw. Link kann nicht geöffnet werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Unknown URL. Cannot open to site or link",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 );
 
