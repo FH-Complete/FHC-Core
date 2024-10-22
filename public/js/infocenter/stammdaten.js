@@ -14,6 +14,7 @@ $(document).ready(function ()
 
 	$('.saveStammdaten').click(function()
 	{
+
 		var kontakt = [];
 		$('.kontakt_input').each(function(){
 			kontakt.push({
@@ -62,15 +63,16 @@ var Stammdaten = {
 			CALLED_PATH + "/updateStammdaten/",
 			data,
 			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.isSuccess(data))
+				successCallback: function(response, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isSuccess(response))
 					{
 						FHC_DialogLib.alertSuccess("Done!");
 						Stammdaten._updated();
+						PersonCheck.update(data)
 					}
 					else
 					{
-						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(response));
 					}
 				},
 				errorCallback: function() {
@@ -149,6 +151,7 @@ var Stammdaten = {
 
 	_updated: function()
 	{
+
 		$('.kontakt_input').each(function() {
 			var span = $(this).parent('td').children('span');
 			var value = $(this).val();
