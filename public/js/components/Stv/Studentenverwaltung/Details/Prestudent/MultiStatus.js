@@ -154,6 +154,7 @@ export default{
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				selectable: false,
+				//TODO(Manu) define Persistence Id to avoid empty result array if sort index not corresponding
 			},
 			tabulatorEvents: [
 				{

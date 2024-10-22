@@ -1,5 +1,43 @@
 export default {
 
+//------------- Prestudent.js------------------------------------------------------
+
+	get(prestudent_id){
+		return 	this.$fhcApi.post('api/frontend/v1/stv/prestudent/get/' + prestudent_id);
+	},
+	updatePrestudent(prestudent_id, data){
+		return this.$fhcApi.post('api/frontend/v1/stv/prestudent/updatePrestudent/' + prestudent_id,
+			data
+		);
+	},
+	getBezeichnungZGV() {
+		return this.$fhcApi.get('api/frontend/v1/stv/prestudent/getBezeichnungZGV/');
+	},
+	getBezeichnungMZgv() {
+		return this.$fhcApi.get('api/frontend/v1/stv/prestudent/getBezeichnungMZgv/');
+	},
+	getBezeichnungDZgv() {
+		return this.$fhcApi.get('api/frontend/v1/stv/prestudent/getBezeichnungDZgv/');
+	},
+	getStgs() {
+		return this.$fhcApi.get('api/frontend/v1/stv/lists/getStgs/');
+	},
+	getAusbildung() {
+		return this.$fhcApi.get('api/frontend/v1/stv/prestudent/getAusbildung/');
+	},
+	getAufmerksamdurch() {
+		return this.$fhcApi.get('api/frontend/v1/stv/prestudent/getAufmerksamdurch/');
+	},
+	getBerufstaetigkeit() {
+		return this.$fhcApi.get('api/frontend/v1/stv/prestudent/getBerufstaetigkeit/');
+	},
+	getTypenStg() {
+		return this.$fhcApi.get('api/frontend/v1/stv/prestudent/getTypenStg/');
+	},
+	getBisstandort() {
+		return this.$fhcApi.get('api/frontend/v1/stv/prestudent/getBisstandort/');
+	},
+
 //------------- MultiStatus.js------------------------------------------------------
 
 	getHistoryPrestudent (url, config, params){

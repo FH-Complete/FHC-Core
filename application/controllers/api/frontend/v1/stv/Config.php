@@ -46,11 +46,16 @@ class Config extends FHCAPI_Controller
 			'stv',
 			'konto'
 		]);
+
+		// Load Config
+		$this->load->config('stv');
 	}
 
 	public function student()
 	{
 		$result = [];
+		$config = $this->config->item('tabs');
+
 		$result['details'] = [
 			'title' => $this->p->t('stv', 'tab_details'),
 			'component' => './Stv/Studentenverwaltung/Details/Details.js'
@@ -69,7 +74,8 @@ class Config extends FHCAPI_Controller
 		];
 		$result['prestudent'] = [
 			'title' => $this->p->t('stv', 'tab_prestudent'),
-			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js'
+			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js',
+			'config' => $config['prestudent']
 		];
 		$result['status'] = [
 			'title' => 'Status',
