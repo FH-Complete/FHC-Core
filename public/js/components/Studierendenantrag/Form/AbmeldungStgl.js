@@ -189,8 +189,10 @@ export default {
 							</option>					
 							<option value="textLong_MissingZgv">{{$p.t('studierendenantrag', 'dropdown_MissingZgv')}}
 							</option>	
+<!--
 							<option value="textLong_unruly">{{$p.t('studierendenantrag', 'dropdown_unruly')}}
-							</option>						
+							</option>
+-->
 						</select>	
 					</div>
 					<form-input
