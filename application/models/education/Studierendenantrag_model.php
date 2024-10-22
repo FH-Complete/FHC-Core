@@ -97,7 +97,8 @@ class Studierendenantrag_model extends DB_Model
 			Studierendenantragstatus_model::STATUS_REJECTED,
 			Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
 			Studierendenantragstatus_model::STATUS_DEREGISTERED,
-			Studierendenantragstatus_model::STATUS_PAUSE
+			Studierendenantragstatus_model::STATUS_PAUSE,
+			Studierendenantragstatus_model::STATUS_REMINDERSENT
 		]);
 		$this->db->or_group_start();
 		$this->db->where('s.studierendenantrag_statustyp_kurzbz', Studierendenantragstatus_model::STATUS_APPROVED);
@@ -368,7 +369,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->db->where([
 			'prestudent_id' => $prestudent_id,
 			'typ' => Studierendenantrag_model::TYP_UNTERBRECHUNG,
-			'campus.get_status_studierendenantrag(studierendenantrag_id) !=' => Studierendenantragstatus_model::STATUS_CANCELLED,
+			'campus.get_status_studierendenantrag(studierendenantrag_id) NOT IN (\'' . Studierendenantragstatus_model::STATUS_CANCELLED . '\', \'' . Studierendenantragstatus_model::STATUS_REJECTED . '\')' => null,
 			'start < ' . $end => null,
 			'datum_wiedereinstieg > ' . $start => null,
 		]);
@@ -424,7 +425,7 @@ class Studierendenantrag_model extends DB_Model
 			FROM campus.tbl_studierendenantrag 
 			LEFT JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
 			WHERE typ=? 
-			AND campus.get_status_studierendenantrag(studierendenantrag_id) != ?
+			AND campus.get_status_studierendenantrag(studierendenantrag_id) NOT IN ?
 			AND prestudent_id=?
 		) a ON (s.start < a.ende AND s.ende > a.start)
 		WHERE s.start >= (" . $subquery . ")
@@ -434,7 +435,10 @@ class Studierendenantrag_model extends DB_Model
 		return $this->execQuery($sql, [
 			$max_length,
 			self::TYP_UNTERBRECHUNG,
-			Studierendenantragstatus_model::STATUS_CANCELLED,
+			array(
+			    Studierendenantragstatus_model::STATUS_CANCELLED,
+			    Studierendenantragstatus_model::STATUS_REJECTED
+			),
 			$prestudent_id,
 			$studiensemester ?: $prestudent_id,
 			$max_length * $max_starters

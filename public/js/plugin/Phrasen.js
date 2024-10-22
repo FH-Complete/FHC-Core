@@ -69,5 +69,6 @@ export default {
 			loadCategory: cat => phrasen.loadCategory.call(app, cat),
 			t_ref: phrasen.t_ref
 		};
+                app.provide('$p', app.config.globalProperties.$p);
 	}
 }
