@@ -58,7 +58,8 @@ class Config extends FHCAPI_Controller
 
 		$result['details'] = [
 			'title' => $this->p->t('stv', 'tab_details'),
-			'component' => './Stv/Studentenverwaltung/Details/Details.js'
+			'component' => './Stv/Studentenverwaltung/Details/Details.js',
+			'config' => $config['details']
 		];
 		$result['notes'] = [
 			'title' => $this->p->t('stv', 'tab_notes'),

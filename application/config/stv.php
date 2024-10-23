@@ -2,9 +2,15 @@
 
 $config['tabs'] =
 	[
+	'details' => [
+		//all fields can be configured to be hidden, see class attribute stv-details-details-name for name
+		'hiddenFields' => [],
+		'hideUDFs' => false
+	],
+
 	'prestudent' => [
 
-		//all fields can be configured to be hidden, see class attribute stv-prestudent-prestudent-name for name
+		//all fields can be configured to be hidden, see class attribute stv-details-prestudent-name for name
 		'hiddenFields' => [
 
 			//corresponding to config-entry 'ZGV_DOKTOR_ANZEIGEN' in global.config

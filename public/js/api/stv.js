@@ -5,6 +5,7 @@ import konto from './stv/konto.js';
 import kontakt from './stv/kontakt.js';
 import prestudent from './stv/prestudent.js';
 import status from './stv/status.js';
+import details from './stv/details.js';
 
 export default {
 	verband,
@@ -14,6 +15,7 @@ export default {
 	kontakt,
 	prestudent,
 	status,
+	details,
 	configStudent() {
 		return this.$fhcApi.get('api/frontend/v1/stv/config/student');
 	},
