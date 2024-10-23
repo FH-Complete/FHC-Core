@@ -148,7 +148,8 @@ class Kontakt extends FHCAPI_Controller
 			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
 		]);
 
-		if(isset($_POST['gemeinde']) && isset($_POST['ort']))
+		if(isset($_POST['gemeinde']) && isset($_POST['ort']) && isset($_POST['nation']) && $_POST['nation'] == 'A')
+
 		$this->form_validation->set_rules('plz', 'Postleitzahl', 'callback_validateLocationCombination', [
 			'validateLocationCombination' => $this->p->t('ui', 'error_location_combination')
 		]);
@@ -211,7 +212,7 @@ class Kontakt extends FHCAPI_Controller
 			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
 		]);
 
-		if(isset($_POST['gemeinde']) && isset($_POST['ort']))
+		if(isset($_POST['gemeinde']) && isset($_POST['ort']) && isset($_POST['nation']) && $_POST['nation'] == 'A')
 			$this->form_validation->set_rules('plz', 'Postleitzahl', 'callback_validateLocationCombination', [
 				'validateLocationCombination' => $this->p->t('ui', 'error_location_combination')
 			]);
