@@ -254,7 +254,7 @@ class PrestudentLib
 
 			$studiengang = current(getData($res));
 			$prestudent_status = current($result);
-			if($prestudent_status->ausbildungssemester + 1 < $studiengang->max_semester)
+			if ($prestudent_status->status_kurzbz != Prestudentstatus_model::STATUS_UNTERBRECHER && $prestudent_status->ausbildungssemester + 1 < $studiengang->max_semester)
 				$ausbildungssemester_plus = 1;
 
 			if(!$result)
@@ -264,6 +264,35 @@ class PrestudentLib
 					'studiensemester_kurzbz' => $studiensemester_kurzbz
 				]));
 			}
+		} elseif (current($result)->status_kurzbz == Prestudentstatus_model::STATUS_UNTERBRECHER) {
+			if ($studierendenantrag_id)
+			{
+				$resultAntrag = $this->_ci->StudierendenantragModel->load($studierendenantrag_id);
+				if (isError($resultAntrag))
+					return $resultAntrag;
+				$resultAntrag = getData($resultAntrag);
+				if (!$resultAntrag)
+					return error($this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $studierendenantrag_id]));
+
+				$antrag = current($resultAntrag);
+				$anmerkung = current($result)->anmerkung . ' Wiedereinstieg ' . $antrag->datum_wiedereinstieg;
+
+				$result = $this->_ci->PrestudentstatusModel->update([
+					'prestudent_id' => $prestudent_id,
+					'status_kurzbz' => Prestudentstatus_model::STATUS_UNTERBRECHER,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'ausbildungssemester' => current($result)->ausbildungssemester
+				], [
+					'updatevon' => $insertvon,
+					'updateamum' => date('c'),
+					'anmerkung'=> $anmerkung
+				]);
+
+				if (isError($result))
+					return $result;
+			}
+
+			return success();
 		}
 
 		$prestudent_status = current($result);
