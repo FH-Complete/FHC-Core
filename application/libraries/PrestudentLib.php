@@ -281,7 +281,7 @@ class PrestudentLib
 					'prestudent_id' => $prestudent_id,
 					'status_kurzbz' => Prestudentstatus_model::STATUS_UNTERBRECHER,
 					'studiensemester_kurzbz' => $studiensemester_kurzbz,
-					'ausbildungssemester' => $semester
+					'ausbildungssemester' => current($result)->ausbildungssemester
 				], [
 					'updatevon' => $insertvon,
 					'updateamum' => date('c'),
