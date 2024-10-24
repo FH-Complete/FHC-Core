@@ -5,4 +5,4 @@ Vue.createApp({
 	components: {
 		MylvStudent
 	}
-}).use(Phrasen).mount('#content');
+}).use(Phrasen, {reload: true}).mount('#content');

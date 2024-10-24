@@ -1,12 +1,13 @@
-import Phrasen from '../../mixins/Phrasen.js';
+// import Phrasen from '../../mixins/Phrasen.js';
+import Phrasen from '../../plugin/Phrasen.js';
 //import {TabulatorFull as Tabulator} from '../../../../vendor/olifolkerd/tabulator5/dist/js/tabulator_esm.min.js';
 //import CssLib from '../../helpers/CssLib.js';
 //CssLib.import('../../vendor/olifolkerd/tabulator5/dist/css/tabulator_bootstrap5.min.css');
 
 const app = Vue.createApp({
-	mixins: [
-		Phrasen
-	],
+	// mixins: [
+	// 	Phrasen
+	// ],
 	data() {
 		return {
 			inscriptiontable: null,
@@ -90,4 +91,5 @@ const app = Vue.createApp({
 		});
 	}
 });
+app.use(Phrasen, {reload: true});
 app.mount('#content');

@@ -12,6 +12,8 @@ export default {
         logoUrl: String,
         avatarUrl: String,
         logoutUrl: String,
+		atFlagUrl: String,
+		ukFlagUrl: String,
 		selectedtypes: Array,
         searchbaroptions: Object,
         searchfunction: Function
@@ -60,10 +62,14 @@ export default {
 
 		setActiveEntry(content_id){
 			this.activeEntry = content_id;
+		},
+		handleChangeLanguage(lang) {
+			this.$p.setLanguage(lang, this.$fhcApi)
 		}
 	},
 	mounted(){
 		this.entries = this.menu;
+		this.$p.loadCategory(['ui', 'global'])
 	},
     template: /*html*/`
 	<!--<p>CISVUE HEADER</p>
@@ -83,6 +89,10 @@ export default {
 	<ul id="nav-user-menu" class="collapse list-unstyled" aria-labelledby="nav-user-btn">
 		<li><a class="btn btn-level-2 rounded-0 d-block" href="#" id="menu-profil">Profil</a></li>
 		<li><a class="btn btn-level-2 rounded-0 d-block" href="#">Ampeln</a></li>
+		<li class="fhc-languages" style="text-align: center;">
+			<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('German')"><img :src="atFlagUrl"/></a>
+			<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('English')"><img :src="ukFlagUrl"/></a>
+		</li>
 		<li><hr class="dropdown-divider"></li>
 		<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>
 	</ul>

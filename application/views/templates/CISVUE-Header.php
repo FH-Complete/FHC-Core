@@ -36,11 +36,13 @@ if (!isset($menu)) {
 		logo-url="<?= base_url('/public/images/logo-300x160.png'); ?>" 
 		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" 
 		logout-url="<?= site_url('Cis/Auth/logout'); ?>"
-		:selectedtypes="selectedtypes" 
+		at-flag-url="<?= base_url('/public/images/icons/at.png'); ?>"
+		uk-flag-url="<?= base_url('/public/images/icons/uk.png'); ?>"
+		:selectedtypes="selectedtypes"
 		:searchbaroptions="searchbaroptions" 
 		:searchfunction="searchfunction"
 		:menu="<?= htmlspecialchars(json_encode(array_values($menu)), ENT_QUOTES, 'UTF-8') ?>"
 		></cis-menu>
 </header>
 
-<main id="cis-main" class="flex-grow-1 overflow-scroll p-4">
+<main id="cis-main" class="flex-grow-1 p-4">

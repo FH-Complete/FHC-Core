@@ -35,6 +35,6 @@ const app = Vue.createApp({
   },
 });
 app.use(primevue.config.default, { zIndex: { overlay: 9999 } });
-app.use(Phrasen);
+app.use(Phrasen, {reload: true});
 app.mount("#cms");
 //#cms [data-confirm], #cms [data-href]

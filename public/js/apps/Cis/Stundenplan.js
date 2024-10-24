@@ -109,5 +109,5 @@ const app = Vue.createApp({
 	`
 });
 app.config.unwrapInjectedRef = true;
-app.use(Phrasen);
+app.use(Phrasen, {reload: true});
 app.mount('#content');

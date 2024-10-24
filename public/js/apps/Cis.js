@@ -1,10 +1,11 @@
 import FhcSearchbar from "../components/searchbar/searchbar.js";
 import CisMenu from "../components/Cis/Menu.js";
-
+import FhcApi from '../plugin/FhcApi.js';
+import Phrasen from '../plugin/Phrasen.js';
 import fhcapifactory from "./api/fhcapifactory.js";
 Vue.$fhcapi = fhcapifactory;
 
-Vue.createApp({
+const app = Vue.createApp({
     components: {
         FhcSearchbar,
         CisMenu
@@ -90,4 +91,7 @@ Vue.createApp({
             
         },
     }
-}).mount('#cis-header');
+});
+app.use(FhcApi);
+app.use(Phrasen);
+app.mount('#cis-header');

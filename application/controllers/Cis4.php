@@ -34,6 +34,7 @@ class Cis4 extends FHC_Controller
 			show_error("name couldn't be loaded for username ".getAuthUID());
 		}
 		$begruesung = getData($begruesung);
+
 		$this->load->view('CisVue/Dashboard.php',["name"=> $begruesung]);
 	}
 }

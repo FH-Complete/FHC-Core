@@ -218,12 +218,27 @@ html {
 	max-height: calc(100vh - var(--fhc-cis-header-height));
 }
 
+#nav-user-menu img {
+  object-fit: cover;
+  height: calc( 3 * var(--fhc-cis-header-py));
+}
+
+#fhc-languages {
+  display: flex;
+  text-align: center;
+}
+
+#fhc-languages .btn {
+  flex: 1;
+  display: flex;
+}
+
 /* desktop */
 @media (min-width: 992px) {
   body {
     display: flex;
     padding-top: var(--fhc-cis-header-height);
-    width: 100vw;
+    width: 99vw;
     /* overflow: visible !important; */
   }
   #cis-header {
@@ -310,6 +325,22 @@ html {
     min-width: var(--fhc-cis-menu-width);
     background-color: var(--fhc-cis-menu-lvl-2-bg);
   }
+
+  #nav-user-menu img {
+    object-fit: cover;
+    height: calc( 3 * var(--fhc-cis-header-py));
+  }
+
+  #fhc-languages {
+    display: flex;
+    text-align: center;
+  }
+
+  #fhc-languages .btn {
+    flex: 1;
+    display: flex;
+  }
+
   #nav-main-menu {
     height: 100%;
     background-color: var(--fhc-cis-menu-bg);

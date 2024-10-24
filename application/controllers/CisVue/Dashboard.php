@@ -27,6 +27,15 @@ class Dashboard extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('CisVue/Dashboard.php');
+
+		$this->load->model('person/Person_model','PersonModel');
+		$begruesung = $this->PersonModel->getFirstName(getAuthUID());
+		if(isError($begruesung))
+		{
+			show_error("name couldn't be loaded for username ".getAuthUID());
+		}
+		$begruesung = getData($begruesung);
+		$this->load->view('CisVue/Dashboard.php',["name"=> $begruesung]);
+
 	}
 }
