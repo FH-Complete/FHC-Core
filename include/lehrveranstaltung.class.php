@@ -2861,5 +2861,34 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Lädt alle vorhandenen Templates und gibt Id und Label ("bezeichnung [kurzbz]") zurück
+	 *
+	 * @return array
+	 */
+	public function loadAllTemplates()
+	{
+		$qry = "SELECT
+					tbl_lehrveranstaltung.lehrveranstaltung_id as id, CONCAT(tbl_lehrveranstaltung.bezeichnung, ' [', tbl_lehrveranstaltung.kurzbz, ']') as label
+				FROM
+					lehre.tbl_lehrveranstaltung
+				WHERE
+					tbl_lehrveranstaltung.lehrtyp_kurzbz = 'tpl'
+			";
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$this->result[] = $row;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage ' .$this->db_last_error();
+			return false;
+		}
+	}
 }
 ?>
