@@ -102,6 +102,7 @@ import {CoreRESTClient} from '../RESTClient.js';
 const helperAppContainer = document.createElement('div');
 
 const helperApp = Vue.createApp({
+	name: "FhcAlertApp",
 	components: {
 		PvToast,
 		PvConfirm

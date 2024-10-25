@@ -6,6 +6,7 @@ import fhcapifactory from "./api/fhcapifactory.js";
 Vue.$fhcapi = fhcapifactory;
 
 const app = Vue.createApp({
+    name: 'CisApp',
     components: {
         FhcSearchbar,
         CisMenu

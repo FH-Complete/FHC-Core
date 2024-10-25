@@ -5,6 +5,7 @@ import CoreSearchbar from "../components/searchbar/searchbar.js";
 import FhcApi from "../plugin/FhcApi.js";
 
 const app = Vue.createApp({
+	name: "TestSearchApp",
 	components: {
 		CoreNavigationCmpt,
 		CoreFilterCmpt,
