@@ -37,7 +37,7 @@ export default {
 		},
 		emails() {
 			if (Array.isArray(this.person.email))
-				return this.person.email;
+				return new Set(this.person.email);
 			return [this.person.email];
 		}
 	},

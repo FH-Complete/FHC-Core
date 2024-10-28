@@ -9,6 +9,11 @@ export default {
 		res: Object,
 		actions: Object
 	},
+	computed: {
+		emails() {
+			return new Set(this.res.email);
+		}
+	},
 	template: `
 	<template-frame
 		class="searchbar-result-prestudent"
@@ -29,7 +34,7 @@ export default {
 			<div class="searchbar_tablerow">
 				<div class="searchbar_tablecell">EMails</div>
 				<div class="searchbar_tablecell">
-					<a v-for="email in res.email" :key="email" :href="'mailto:' + email" class="d-block">
+					<a v-for="email in emails" :key="email" :href="'mailto:' + email" class="d-block">
 						{{ email }}
 					</a>
 				</div>
