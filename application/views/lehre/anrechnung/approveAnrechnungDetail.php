@@ -1,65 +1,75 @@
 <?php
 $this->load->config('anrechnung');
-$this->load->view(
-	'templates/FHC-Header',
-	array(
-		'title' => $this->p->t('anrechnung', 'anrechnungenGenehmigen'),
-		'jquery3' => true,
-		'jqueryui1' => true,
-		'bootstrap3' => true,
-		'fontawesome4' => true,
-		'ajaxlib' => true,
-		'dialoglib' => true,
-		'phrases' => array(
-			'global' => array(
-				'anerkennungNachgewiesenerKenntnisse',
-				'antragStellen',
-                'begruendung'
-			),
-			'ui' => array(
-				'hilfeZuDieserSeite',
-				'hochladen',
-				'nichtSelektierbarAufgrundVon',
-				'nichtSelektierbarAufgrundVon',
-				'systemfehler',
-				'bitteMindEinenAntragWaehlen',
-				'bitteBegruendungAngeben',
-                'bitteBegruendungVervollstaendigen',
-				'empfehlungWurdeAngefordert',
-				'anrechnungenWurdenGenehmigt',
-				'anrechnungenWurdenAbgelehnt',
-                'nurLeseberechtigung'
-			),
-			'person' => array(
-				'student',
-				'personenkennzeichen'
-			),
-			'lehre' => array(
-				'studiensemester',
-				'studiengang',
-				'lehrveranstaltung',
-				'ects',
-				'lektor',
-			),
-            'anrechnung' => array(
-                'genehmigungAblehnungWirklichZuruecknehmen',
-                'empfehlungsanforderungWirklichZuruecknehmen',
-                'erfolgreichZurueckgenommen',
-                'empfehlungPositivConfirmed',
-                'empfehlungNegativConfirmed',
-                'anrechnungEctsTooltipTextBeiUeberschreitung'
-            )
-		),
-		'customCSSs' => array(
-			'public/css/Tabulator.css'
-		),
-		'customJSs' => array(
-			'public/js/bootstrapper.js',
-			'public/js/lehre/anrechnung/approveAnrechnungDetail.js'
 
+$includesArray = array(
+	'title' => $this->p->t('anrechnung', 'anrechnungenGenehmigen'),
+	'jquery3' => true,
+	'jqueryui1' => true,
+	'bootstrap3' => true,
+	'fontawesome4' => true,
+	'ajaxlib' => true,
+	'dialoglib' => true,
+	'phrases' => array(
+		'global' => array(
+			'anerkennungNachgewiesenerKenntnisse',
+			'antragStellen',
+			'begruendung'
+		),
+		'ui' => array(
+			'hilfeZuDieserSeite',
+			'hochladen',
+			'nichtSelektierbarAufgrundVon',
+			'nichtSelektierbarAufgrundVon',
+			'systemfehler',
+			'bitteMindEinenAntragWaehlen',
+			'bitteBegruendungAngeben',
+			'bitteBegruendungVervollstaendigen',
+			'empfehlungWurdeAngefordert',
+			'anrechnungenWurdenGenehmigt',
+			'anrechnungenWurdenAbgelehnt',
+			'nurLeseberechtigung'
+		),
+		'person' => array(
+			'student',
+			'personenkennzeichen'
+		),
+		'lehre' => array(
+			'studiensemester',
+			'studiengang',
+			'lehrveranstaltung',
+			'ects',
+			'lektor',
+		),
+		'anrechnung' => array(
+			'genehmigungAblehnungWirklichZuruecknehmen',
+			'empfehlungsanforderungWirklichZuruecknehmen',
+			'erfolgreichZurueckgenommen',
+			'empfehlungPositivConfirmed',
+			'empfehlungNegativConfirmed',
+			'anrechnungEctsTooltipTextBeiUeberschreitung'
 		)
+	),
+	'customCSSs' => array(
+		'public/css/Tabulator.css'
+	),
+	'customJSs' => array(
+		'public/js/bootstrapper.js',
+		'public/js/lehre/anrechnung/approveAnrechnungDetail.js'
+
 	)
 );
+
+if (defined("CIS4")) {
+	$this->load->view(
+		'templates/CISVUE-Header',
+		$includesArray
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Header',
+		$includesArray
+	);
+}
 ?>
 
 <div id="page-wrapper">
@@ -443,4 +453,16 @@ $this->load->view(
     </div><!--end container-fluid-->
 </div><!--end page-wrapper-->
 
-<?php $this->load->view('templates/FHC-Footer'); ?>
+<?php
+if (defined("CIS4")) {
+	$this->load->view(
+		'templates/CISVUE-Footer',
+		$includesArray
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Footer',
+		$includesArray
+	);
+}
+?>

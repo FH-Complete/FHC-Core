@@ -1,41 +1,51 @@
 <?php
-$this->load->view(
-	'templates/FHC-Header',
-	array(
-		'title' => $this->p->t('anrechnung', 'neueAnrechnung'),
-		'jquery3' => true,
-		'jqueryui1' => true,
-		'bootstrap3' => true,
-		'fontawesome4' => true,
-		'ajaxlib' => true,
-		'dialoglib' => true,
-		'tabulator4' => true,
-		'tablewidget' => true,
-		'phrases' => array(
-			'global' => array(
-				'anerkennungNachgewiesenerKenntnisse',
-				'antragWurdeGestellt',
-				'antragBereitsGestellt',
-				'antragBearbeiten'
-			),
-			'ui' => array(
-				'hochladen'
-			),
-			'lehre' => array(
-				'studiensemester',
-				'studiengang',
-				'lehrveranstaltung'
-			)
+
+$includesArray =array(
+	'title' => $this->p->t('anrechnung', 'neueAnrechnung'),
+	'jquery3' => true,
+	'jqueryui1' => true,
+	'bootstrap3' => true,
+	'fontawesome4' => true,
+	'ajaxlib' => true,
+	'dialoglib' => true,
+	'tabulator4' => true,
+	'tablewidget' => true,
+	'phrases' => array(
+		'global' => array(
+			'anerkennungNachgewiesenerKenntnisse',
+			'antragWurdeGestellt',
+			'antragBereitsGestellt',
+			'antragBearbeiten'
 		),
-		'customJSs' => array(
-			'public/js/bootstrapper.js',
-			'public/js/lehre/anrechnung/createAnrechnung.js'
+		'ui' => array(
+			'hochladen'
 		),
-		'customCSSs' => array(
-				'public/css/lehre/anrechnung.css'
+		'lehre' => array(
+			'studiensemester',
+			'studiengang',
+			'lehrveranstaltung'
 		)
+	),
+	'customJSs' => array(
+		'public/js/bootstrapper.js',
+		'public/js/lehre/anrechnung/createAnrechnung.js'
+	),
+	'customCSSs' => array(
+			'public/css/lehre/anrechnung.css'
 	)
 );
+
+if (defined("CIS4")) {
+	$this->load->view(
+		'templates/CISVUE-Header',
+		$includesArray
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Header',
+		$includesArray
+	);
+}
 ?>
 
 <div id="page-wrapper">
@@ -170,4 +180,17 @@ $this->load->view(
 </div>
 </div>
 
-<?php $this->load->view('templates/FHC-Footer'); ?>
+<?php
+
+if (defined("CIS4")) {
+	$this->load->view(
+		'templates/CISVUE-Footer',
+		$includesArray
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Footer',
+		$includesArray
+	);
+}
+?>

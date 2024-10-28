@@ -468,6 +468,7 @@ class LvMenu extends FHCAPI_Controller
 				'position'=>'100',
 				'name'=>$p->t('lehre/mail'),
 				'c4_icon'=>base_url('skin/images/button_feedback.png'),
+				'c4_icon2' => 'fa-regular fa-envelope',
 				'c4_link'=>$mailto,
 				'c4_linkList'=>$c4_linkList,
 				'link_onclick'=>$link_onclick
@@ -533,6 +534,7 @@ class LvMenu extends FHCAPI_Controller
 				'position'=>'128',
 				'name'=>$p->t('lehre/anrechnung'),
 				'c4_icon'=>base_url('skin/images/button_listen.png'),
+				'c4_icon2' => 'fa-regular fa-folder-open',
 				'c4_link' => base_url('index.ci.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid))
 			);
 		}
@@ -549,6 +551,7 @@ class LvMenu extends FHCAPI_Controller
 			'position'=>'128',
 			'name'=>$p->t('lehre/anrechnungen'),
 			'c4_icon'=> base_url('skin/images/button_listen.png'),
+			'c4_icon2' => 'fa-regular fa-folder-open',
 			'c4_link' => base_url('index.ci.php/lehre/anrechnung/ReviewAnrechnungUebersicht?studiensemester='.urlencode($angezeigtes_stsem))
 		);
 		}

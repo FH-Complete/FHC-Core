@@ -1,83 +1,93 @@
 <?php
-$this->load->view(
-	'templates/FHC-Header',
-	array(
-		'title' => $this->p->t('anrechnung', 'anrechnungenPruefen'),
-		'jquery3' => true,
-		'jqueryui1' => true,
-		'bootstrap3' => true,
-		'fontawesome4' => true,
-		'tabulator4' => true,
-		'ajaxlib' => true,
-		'dialoglib' => true,
-		'tablewidget' => true,
-		'phrases' => array(
-			'global' => array(
-				'begruendung',
-				'zgv'
-			),
-			'anrechnung' => array(
-				'nachweisdokumente',
-				'empfehlung',
-				'herkunft'
-			),
-			'ui' => array(
-				'anzeigen',
-				'alleAnzeigen',
-				'hilfeZuDieserSeite',
-				'hochladen',
-				'spaltenEinstellen',
-				'hilfeZuDieserSeite',
-				'alleAuswaehlen',
-				'alleAbwaehlen',
-				'ausgewaehlteZeilen',
-				'hilfe',
-				'tabelleneinstellungen',
-				'keineDatenVorhanden',
-				'spaltenEinstellen',
-				'ja',
-				'nein',
-				'nichtSelektierbarAufgrundVon',
-				'systemfehler',
-				'bitteMindEinenAntragWaehlen',
-				'bitteBegruendungAngeben',
-				'anrechnungenWurdenEmpfohlen',
-				'anrechnungenWurdenNichtEmpfohlen'
-			),
-			'person' => array(
-				'student',
-				'personenkennzeichen',
-				'vorname',
-				'nachname'
-			),
-			'lehre' => array(
-				'studiensemester',
-				'studiengang',
-				'lehrveranstaltung',
-				'ects',
-				'lektor',
-			),
-			'table' => array(
-				'spaltenEinAusblenden',
-				'spaltenEinAusblendenMitKlickOeffnen',
-				'spaltenEinAusblendenAufEinstellungenKlicken',
-				'spaltenEinAusblendenMitKlickAktivieren',
-				'spaltenEinAusblendenMitKlickSchliessen',
-				'spaltenbreiteVeraendern',
-				'spaltenbreiteVeraendernText',
-				'spaltenbreiteVeraendernInfotext',
-				'zeilenAuswaehlen',
-				'zeilenAuswaehlenEinzeln',
-				'zeilenAuswaehlenBereich',
-				'zeilenAuswaehlenAlle'
-			)
+
+$includesArray = array(
+	'title' => $this->p->t('anrechnung', 'anrechnungenPruefen'),
+	'jquery3' => true,
+	'jqueryui1' => true,
+	'bootstrap3' => true,
+	'fontawesome4' => true,
+	'tabulator4' => true,
+	'ajaxlib' => true,
+	'dialoglib' => true,
+	'tablewidget' => true,
+	'phrases' => array(
+		'global' => array(
+			'begruendung',
+			'zgv'
 		),
-		'customJSs' => array(
-			'public/js/bootstrapper.js',
-			'public/js/lehre/anrechnung/reviewAnrechnungUebersicht.js'
+		'anrechnung' => array(
+			'nachweisdokumente',
+			'empfehlung',
+			'herkunft'
+		),
+		'ui' => array(
+			'anzeigen',
+			'alleAnzeigen',
+			'hilfeZuDieserSeite',
+			'hochladen',
+			'spaltenEinstellen',
+			'hilfeZuDieserSeite',
+			'alleAuswaehlen',
+			'alleAbwaehlen',
+			'ausgewaehlteZeilen',
+			'hilfe',
+			'tabelleneinstellungen',
+			'keineDatenVorhanden',
+			'spaltenEinstellen',
+			'ja',
+			'nein',
+			'nichtSelektierbarAufgrundVon',
+			'systemfehler',
+			'bitteMindEinenAntragWaehlen',
+			'bitteBegruendungAngeben',
+			'anrechnungenWurdenEmpfohlen',
+			'anrechnungenWurdenNichtEmpfohlen'
+		),
+		'person' => array(
+			'student',
+			'personenkennzeichen',
+			'vorname',
+			'nachname'
+		),
+		'lehre' => array(
+			'studiensemester',
+			'studiengang',
+			'lehrveranstaltung',
+			'ects',
+			'lektor',
+		),
+		'table' => array(
+			'spaltenEinAusblenden',
+			'spaltenEinAusblendenMitKlickOeffnen',
+			'spaltenEinAusblendenAufEinstellungenKlicken',
+			'spaltenEinAusblendenMitKlickAktivieren',
+			'spaltenEinAusblendenMitKlickSchliessen',
+			'spaltenbreiteVeraendern',
+			'spaltenbreiteVeraendernText',
+			'spaltenbreiteVeraendernInfotext',
+			'zeilenAuswaehlen',
+			'zeilenAuswaehlenEinzeln',
+			'zeilenAuswaehlenBereich',
+			'zeilenAuswaehlenAlle'
 		)
+	),
+	'customJSs' => array(
+		'public/js/bootstrapper.js',
+		'public/js/lehre/anrechnung/reviewAnrechnungUebersicht.js'
 	)
 );
+
+if (defined("CIS4")) {
+	$this->load->view(
+		'templates/CISVUE-Header',
+		$includesArray
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Header',
+		$includesArray
+	);
+}
 ?>
 
 <div id="page-wrapper">
@@ -232,5 +242,17 @@ $this->load->view(
     </div>
 </div>
 
-<?php $this->load->view('templates/FHC-Footer'); ?>
+<?php
+if (defined("CIS4")) {
+	$this->load->view(
+		'templates/CISVUE-Footer',
+		$includesArray
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Footer',
+		$includesArray
+	);
+}
+?>
 
