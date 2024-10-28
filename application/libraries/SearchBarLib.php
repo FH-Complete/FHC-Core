@@ -778,7 +778,7 @@ class SearchBarLib
 		if (strstr($tpl, '{word}'))
 			$tpl = str_replace('{word}', $this->_ci->db->escape($word), $tpl);
 		if (strstr($tpl, '{like:word}'))
-			$tpl = str_replace('{like:word}', "'%" . $this->_ci->db->escapeLike($word) . "%'", $tpl);
+			$tpl = str_replace('{like:word}', "'%" . $this->_ci->db->escape_like_str($word) . "%'", $tpl);
 		
 		return $tpl;
 	}
