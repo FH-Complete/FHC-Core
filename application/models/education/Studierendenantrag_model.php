@@ -151,6 +151,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect('s.insertvon status_insertvon');
 		$this->addSelect('t.bezeichnung[(' . $lang . ')] statustyp');
 		$this->addSelect('p.unruly AS unruly');
+		$this->addSelect($this->dbTable . '.insertamum AS insertamum');
 
 		$this->addJoin(
 			'campus.tbl_studierendenantrag_status s',
