@@ -34,6 +34,7 @@ Vue.$collapseFormatter = function (data) {
 };
 
 const profilApp = Vue.createApp({
+  name: 'ProfilApp',
   components: {
     StudentProfil,
     MitarbeiterProfil,

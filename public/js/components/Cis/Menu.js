@@ -12,8 +12,6 @@ export default {
         logoUrl: String,
         avatarUrl: String,
         logoutUrl: String,
-		atFlagUrl: String,
-		ukFlagUrl: String,
 		selectedtypes: Array,
         searchbaroptions: Object,
         searchfunction: Function
@@ -90,8 +88,8 @@ export default {
 		<li><a class="btn btn-level-2 rounded-0 d-block" href="#" id="menu-profil">Profil</a></li>
 		<li><a class="btn btn-level-2 rounded-0 d-block" href="#">Ampeln</a></li>
 		<li class="fhc-languages" style="text-align: center;">
-			<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('German')"><img :src="atFlagUrl"/></a>
-			<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('English')"><img :src="ukFlagUrl"/></a>
+			<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('German')">Deutsch</a>
+			<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('English')">English</a>
 		</li>
 		<li><hr class="dropdown-divider"></li>
 		<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>

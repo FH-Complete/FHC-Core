@@ -12,9 +12,9 @@ export default {
 	props: {
 		event:Object,
 		title:{
-		type:String,
-		default:"title"
-	},
+			type:String,
+			default:"title"
+		},
 	/*
 	* NOTE(chris):
 	* Hack to expose in "emits" declared events to $props which we use

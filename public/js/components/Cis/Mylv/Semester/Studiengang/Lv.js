@@ -53,7 +53,9 @@ export default {
 		openLvOption(menuItem){
 			if (menuItem.id == "core_menu_mailanstudierende"){
 				window.location.href = menuItem.c4_link;
-			}else{
+			} else if (menuItem.id == "core_menu_digitale_anwesenheitslisten") {
+				window.location.href = menuItem.c4_link;
+			} else{
 				this.preselectedMenuItem = menuItem;
 				Vue.nextTick(() => {
 					this.$refs.lvUebersicht.show();

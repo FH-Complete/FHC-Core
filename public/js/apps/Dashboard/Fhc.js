@@ -3,6 +3,7 @@ import FhcApi from '../../plugin/FhcApi.js';
 import Phrasen from '../../plugin/Phrasen.js';
 
 const app = Vue.createApp({
+  name: 'FhcApp',
   data: () => ({
       appSideMenuEntries: {}
     }),

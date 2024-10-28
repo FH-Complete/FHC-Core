@@ -2,7 +2,7 @@ import Phrasen from "../../plugin/Phrasen.js";
 import RoomInformation from "../../components/Cis/Mylv/RoomInformation.js";
 
 const app = Vue.createApp({
-    
+	name: 'RoomInformationApp',
 	components: {
         RoomInformation
 	},

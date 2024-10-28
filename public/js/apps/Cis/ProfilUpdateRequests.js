@@ -2,6 +2,7 @@ import ProfilUpdateView from "../../components/Cis/ProfilUpdate/ProfilUpdateView
 import Phrasen from "../../plugin/Phrasen.js";
 
 const app = Vue.createApp({
+  name: 'ProfilUpdateRequestsApp',
   components: {
     ["profil-update-view"]: ProfilUpdateView,
   },

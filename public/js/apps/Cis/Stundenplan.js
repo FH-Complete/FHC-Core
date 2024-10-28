@@ -4,6 +4,7 @@ import CalendarDate from "../../composables/CalendarDate.js";
 import LvModal from "../../components/Cis/Mylv/LvModal.js";
 
 const app = Vue.createApp({
+	name: 'StundenplanApp',
 	data() {
 		return {
 			stunden: [],

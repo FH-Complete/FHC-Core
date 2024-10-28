@@ -5,6 +5,7 @@ import Phrasen from '../../plugin/Phrasen.js';
 //CssLib.import('../../vendor/olifolkerd/tabulator5/dist/css/tabulator_bootstrap5.min.css');
 
 const app = Vue.createApp({
+	name: 'DocumentsApp',
 	// mixins: [
 	// 	Phrasen
 	// ],

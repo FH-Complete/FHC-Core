@@ -36,8 +36,6 @@ if (!isset($menu)) {
 		logo-url="<?= base_url('/public/images/logo-300x160.png'); ?>" 
 		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" 
 		logout-url="<?= site_url('Cis/Auth/logout'); ?>"
-		at-flag-url="<?= base_url('/public/images/icons/at.png'); ?>"
-		uk-flag-url="<?= base_url('/public/images/icons/uk.png'); ?>"
 		:selectedtypes="selectedtypes"
 		:searchbaroptions="searchbaroptions" 
 		:searchfunction="searchfunction"

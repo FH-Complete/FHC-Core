@@ -6,6 +6,7 @@ import Phrasen from "../../plugin/Phrasen.js";
 
 
 const app = Vue.createApp({
+  name: 'CmsApp',
   components: {
     CmsNews,
     CmsContent,
