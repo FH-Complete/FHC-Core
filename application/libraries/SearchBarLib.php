@@ -162,8 +162,14 @@ class SearchBarLib
 
 		$lang = getUserLanguage();
 
-		$output = "
-			WITH lang (index) AS (
+		$output = "WITH";
+		if ($sql_with && $sql_with[0] === 'RECURSIVE') {
+			$output .= " RECURSIVE";
+			array_shift($sql_with);
+		}
+
+		$output .= "
+			lang (index) AS (
 				SELECT index
 				FROM public.tbl_sprache
 				WHERE sprache=" . $this->_ci->db->escape($lang) . "
@@ -185,10 +191,10 @@ class SearchBarLib
 			$other_selects = ", " . $other_selects;
 
 		$output .= "
-			, q (" . $table_config['primarykey'] . ", rank) AS (
-				SELECT " . $table_config['primarykey'] . ", MAX(rank)
+			, q (" . $this->_formatPrimarykeys($table_config['primarykey']) . ", rank) AS (
+				SELECT " . $this->_formatPrimarykeys($table_config['primarykey']) . ", MAX(rank)
 				FROM (" . implode(" UNION ", $sql_select) . ") q
-				GROUP BY " . $table_config['primarykey'] . "
+				GROUP BY " . $this->_formatPrimarykeys($table_config['primarykey']) . "
 			)
 			SELECT
 				" . $this->_ci->db->escape($table) . " AS type,
@@ -225,10 +231,10 @@ class SearchBarLib
 			if (!$select)
 				continue;
 
-			$with[] = "final_" . $type . " (" . $table_config['primarykey'] . ", rank) AS (
-				SELECT " . $table_config['primarykey'] . ", MAX(rank)
+			$with[] = "final_" . $type . " (" . $this->_formatPrimarykeys($table_config['primarykey']) . ", rank) AS (
+				SELECT " . $this->_formatPrimarykeys($table_config['primarykey']) . ", MAX(rank)
 				FROM (" . implode(" UNION ", $select) . ") q
-				GROUP BY " . $table_config['primarykey'] . "
+				GROUP BY " . $this->_formatPrimarykeys($table_config['primarykey']) . "
 			)";
 
 			$selects[] = "
@@ -241,6 +247,12 @@ class SearchBarLib
 
 		if (!$selects)
 			return success("");
+
+		$recursive = "";
+		if ($with && $with[0] === "RECURSIVE") {
+			$recursive = "RECURSIVE ";
+			array_shift($with);
+		}
 
 		$with = array_unique($with);
 
@@ -256,7 +268,7 @@ class SearchBarLib
 		)");
 
 		return success("
-			WITH " . implode(", ", $with) . "
+			WITH " . $recursive . implode(", ", $with) . "
 			SELECT *
 			FROM (" . implode(" UNION ", $selects) . ") q
 			ORDER BY rank DESC
@@ -399,10 +411,7 @@ class SearchBarLib
 		$sql_select = [];
 
 		if (isset($table_config['prepare'])) {
-			if (is_array($table_config['prepare']))
-				$sqlWith = $table_config['prepare'];
-			else
-				$sqlWith[] = $table_config['prepare'];
+			$this->_addPreparesToSqlWith($sqlWith, $table_config['prepare']);
 		}
 
 		foreach ($searchArray as $or_search) {
@@ -484,17 +493,14 @@ class SearchBarLib
 					$field_config = $table_config['searchfields'][$code];
 
 					if (isset($field_config['prepare'])) {
-						if (is_array($field_config['prepare']))
-							$or_with = array_merge($or_with, $field_config['prepare']);
-						else
-							$or_with[] = $field_config['prepare'];
+						$this->_addPreparesToSqlWith($or_with, $field_config['prepare']);
 						$or_prepare[$code] = $field_config['prepare'];
 						unset($table_config['searchfields'][$code]['prepare']);
 						unset($field_config['prepare']);
 					}
 					$field_sql = "
 						SELECT
-							" . $table_config['table'] . "." . $table_config['primarykey'] . "
+							" . $this->_formatPrimarykeys($table_config['primarykey'], $table_config['table']) . "
 							FROM " . $table_config['table'] . "
 							" . $this->_makeJoin($field_config['join']) . "
 							WHERE ";
@@ -506,7 +512,7 @@ class SearchBarLib
 
 				$or_select[] = "
 					SELECT 
-						" . $table_config['primarykey'] . ",
+						" . $table_config['table']($table_config['primarykey']) . ",
 						1.0 AS rank
 					FROM " . $table_config['table'] . "
 					WHERE prestudent_id NOT IN (" . implode(" UNION ", $sql) . ")";
@@ -537,16 +543,13 @@ class SearchBarLib
 								$word_rank = "0";
 								if ($current_select) {
 									$word_from = $current_select;
-									if ($field_config['field'] != $table_config['primarykey']) {
+									if ($this->_needBasicTableJoin($field_config['field'], $table_config['primarykey'])) {
 										$word_join .= " " . $this->_makeJoin($table_config);
 									}
 									$word_rank = "rank";
 								}
 								if (isset($field_config['prepare'])) {
-									if (is_array($field_config['prepare']))
-										$or_with = array_merge($or_with, $field_config['prepare']);
-									else
-										$or_with[] = $field_config['prepare'];
+									$this->_addPreparesToSqlWith($or_with, $field_config['prepare']);
 									$or_prepare[$c] = $field_config['prepare'];
 									unset($table_config['searchfields'][$c]['prepare']);
 									unset($field_config['prepare']);
@@ -556,7 +559,7 @@ class SearchBarLib
 								}
 								$field_sql[] = "
 									SELECT
-										" . $word_from . "." . $table_config['primarykey'] . ",
+										" . $this->_formatPrimarykeys($table_config['primarykey'], $word_from) . ",
 										" . $word_rank . " AS w_rank,
 										" . $this->_makeRank($field_config['comparison'], $field_config['field'], $word) . " AS rank
 										FROM " . $word_from . "
@@ -576,15 +579,15 @@ class SearchBarLib
 
 							$id = "w" . ($id_offset + count($or_with));
 							$or_with[] = "
-								" . $id . " (" . $table_config['primarykey'] . ", rank) AS (
+								" . $id . " (" . $this->_formatPrimarykeys($table_config['primarykey']) . ", rank) AS (
 								SELECT
-									" . $table_config['primarykey'] . ",
+									" . $this->_formatPrimarykeys($table_config['primarykey']) . ",
 									(w_rank + 1.0 - CASE " .
 										"WHEN MIN(rank) = 0 THEN 0 " .
 										"ELSE EXP(SUM(LN(CASE WHEN rank = 0 THEN 1 ELSE rank " .
 										"END))) END) AS rank
 									FROM (" . implode(' UNION ALL ', $field_sql) . ") " . $id . "
-									GROUP BY " . $table_config['primarykey'] . ", w_rank
+									GROUP BY " . $this->_formatPrimarykeys($table_config['primarykey']) . ", w_rank
 								)";
 							$current_select = $id;
 						}
@@ -611,7 +614,7 @@ class SearchBarLib
 									")";
 								if ($field_config['1-n'] ?? false) {
 									$where = "GROUP BY " .
-										$table_config['primarykey'] .
+										$this->_formatPrimarykeys($table_config['primarykey'], $current_select ?: $table_config['table']) .
 										", rank HAVING MIN(CASE WHEN " .
 										$where .
 										" THEN 1 ELSE 0 END) = 1";
@@ -631,16 +634,13 @@ class SearchBarLib
 							$word_rank = "";
 							if ($current_select) {
 								$word_from = $current_select;
-								if ($field_config['field'] != $table_config['primarykey']) {
+								if ($this->_needBasicTableJoin($field_config['field'], $table_config['primarykey'])) {
 									$word_join .= " " . $this->_makeJoin($table_config);
 								}
 								$word_rank = "rank + ";
 							}
 							if (isset($field_config['prepare'])) {
-								if (is_array($field_config['prepare']))
-									$or_with = array_merge($or_with, $field_config['prepare']);
-								else
-									$or_with[] = $field_config['prepare'];
+								$this->_addPreparesToSqlWith($or_with, $field_config['prepare']);
 								$or_prepare[$code] = $field_config['prepare'];
 								unset($table_config['searchfields'][$code]['prepare']);
 								unset($field_config['prepare']);
@@ -651,9 +651,9 @@ class SearchBarLib
 
 							$id = "w" . ($id_offset + count($or_with));
 							$or_with[] = "
-								" . $id . " (" . $table_config['primarykey'] . ", rank) AS (
+								" . $id . " (" . $this->_formatPrimarykeys($table_config['primarykey']) . ", rank) AS (
 								SELECT
-									" . $word_from . "." . $table_config['primarykey'] . ",
+									" . $this->_formatPrimarykeys($table_config['primarykey'], $word_from) . ",
 									" . $word_rank . $rank . " AS rank
 									FROM " . $word_from . "
 									" . $word_join . "
@@ -671,11 +671,12 @@ class SearchBarLib
 					continue;
 
 				$or_select[] = "
-					SELECT " . $table_config['primarykey'] . ", rank / " . $count . " AS rank FROM " . $current_select;
+					SELECT " . $this->_formatPrimarykeys($table_config['primarykey']) . ", rank / " . $count . " AS rank FROM " . $current_select;
 			}
 
 			$sqlWith = array_merge($sqlWith, $or_with);
 			$sql_select = array_merge($sql_select, $or_select);
+			$id_offset += count($or_with);
 		}
 
 		return $sql_select;
@@ -685,27 +686,76 @@ class SearchBarLib
 	// Private methods
 
 	/**
-	 * Search for documents
+	 * Checks if the field is not one of the primarykeys.
+	 *
+	 * @param string							$field
+	 * @param array|string						$primarykeys
+	 *
+	 * @return boolean
 	 */
-	private function _document($searchstr, $type)
+	private function _needBasicTableJoin($field, $primarykeys)
 	{
-		return array();
+		if (!is_array($primarykeys) && strpos($primarykeys, ",") !== false) {
+			return $field != $primarykeys;
+		}
+		if (!is_array($primarykeys))
+			$primarykeys = explode(",", $primarykeys);
+
+		foreach ($primarykeys as $key) {
+			if ($field == trim($key))
+				return false;
+		}
+		return true;
 	}
 
 	/**
-	 * Search for CMSs
+	 * Returns comma separated primarykeys. Optionally with table prefix
+	 *
+	 * @param array|string						$primarykeys
+	 * @param string							$prefix
+	 *
+	 * @return string
 	 */
-	private function _cms($searchstr, $type)
+	private function _formatPrimarykeys($primarykeys, $prefix = "")
 	{
-		return array();
+		if (is_array($primarykeys)) {
+			if ($prefix)
+				$prefix .= ".";
+			return $prefix . implode(", " . $prefix, $primarykeys);
+		}
+		if (!$prefix)
+			return $primarykeys;
+
+		return $prefix . "." . implode(", " . $prefix . ".", explode(",", $primarykeys));
 	}
 
 	/**
-	 * Search for rooms
+	 * Adds the prepare statement to the sqlWith stack and handles the
+	 * "RECURSIVE" modifier
+	 *
+	 * @param array								&$sqlWith
+	 * @param array								$prepares
+	 *
+	 * @return void
 	 */
-	private function _raum($searchstr, $type)
+	private function _addPreparesToSqlWith(&$sqlWith, $prepares)
 	{
-		return array();
+		$recursive = $sqlWith[0] ?? "" === "RECURSIVE";
+		if (!is_array($prepares))
+			$prepares = [$prepares];
+		
+		foreach ($prepares as $prep) {
+			$prep = trim($prep);
+			if (strtoupper(substr($prep, 0, 10)) === "RECURSIVE ") {
+				$recursive = true;
+				$sqlWith[] = substr($prep, 10);
+			} else {
+				$sqlWith[] = $prep;
+			}
+		}
+		if ($recursive && $sqlWith[0] !== "RECURSIVE") {
+			array_unshift($sqlWith, "RECURSIVE");
+		}
 	}
 
 	/**
