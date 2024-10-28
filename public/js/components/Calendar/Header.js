@@ -14,6 +14,8 @@ export default {
 		'classHeader',
 		'mode',
 		'updateMode',
+		'noWeekView',
+		'noMonthView',
 	],
 	props: {
 		title: String
@@ -44,12 +46,12 @@ export default {
 	template: `
 	<div class="calendar-header card-header w-100" :class="classHeader">
 
-		<div class="row justify-content-end" style="position: absolute; width: 98%; pointer-events: none;">
+		<div v-if="!noWeekView && !noMonthView" class="row justify-content-end" style="position: absolute; width: 98%; pointer-events: none;">
 			<div class="col-auto" style="pointer-events: all;">
-				<div role="group" aria-label="Kalender Modus">
+				<div  role="group" aria-label="Kalender Modus">
 					<button type="button" :class="{'active':mode_kurzbz == mode}" style="margin-right: 4px;" @click.prevent="$emit('updateMode',mode_kurzbz)" class="btn btn-outline-secondary" v-for="(mode_bezeichnung,mode_kurzbz) in modes">
-						<i v-if="mode_kurzbz == 'week'" class="fa fa-calendar-week"></i>
-						<i v-else-if="mode_kurzbz == 'month'" class="fa fa-calendar-days"></i>
+						<i v-if="!noWeekView && mode_kurzbz == 'week'" class="fa fa-calendar-week"></i>
+						<i v-else-if="!noMonthView && mode_kurzbz == 'month'" class="fa fa-calendar-days"></i>
 					</button>
 				</div>
 			</div>

@@ -118,7 +118,7 @@ export default {
 		<div class="card-body " :style="bodyStyle">
 			<ul class="list-group border-top-0 border-bottom-0 rounded-0">
 				<template v-if="menu">
-					<li type="button" v-for="menuItem in menu" @click="openLvOption(menuItem)" class="list-group-item border-0">{{menuItem.name}}</li>
+					<li type="button" v-for="menuItem in menu" class="list-group-item border-0"><a :target="menuItem.c4_target" :href="menuItem.c4_link ? menuItem.c4_link : null">{{menuItem.name}}</a></li>
 				</template>
 				<template v-else>
 					<li class="text-center" class="list-group-item"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
