@@ -35,12 +35,14 @@ export default {
 	template:/*html*/`
 	<div v-if="!menu">No Menu available</div>
 	<div v-else class="container">
-		<div class="row">
-			<a style="min-height:150px" :title="menuItem.name" role="button" :href="menuItem.c4_link" class="g-2 col-12 col-lg-6 col-xl-4 border border-1 d-flex flex-column align-items-center justify-content-center p-1 text-center text-decoration-none link-dark" v-for="(menuItem, index) in menu" :key="index">
-				<img :src="menuItem.c4_icon" :alt="menuItem.name" ></img>
-				<span @click="selectMenu(menuItem)" class=" mt-2">{{menuItem.name}}</span>
-				<span v-for="([text,link],index) in menuItem.c4_linkList" @click.stop="selectMenu(menuItem,index)"   class="mt-1" :index="index">{{text}}</span>
-			</a>
+		<div class="row g-2">
+			<div style="min-height:150px" class="col-12 col-lg-6 col-xl-4" v-for="(menuItem, index) in menu" :key="index">
+				<a :title="menuItem.name" role="button" :href="menuItem.c4_link" class="border border-1 d-flex flex-column align-items-center justify-content-center text-center text-decoration-none link-dark h-100">
+					<img :src="menuItem.c4_icon" :alt="menuItem.name" ></img>
+					<span @click="selectMenu(menuItem)" class=" mt-2">{{menuItem.name}}</span>
+					<span v-for="([text,link],index) in menuItem.c4_linkList" @click.stop="selectMenu(menuItem,index)"   class="mt-1" :index="index">{{text}}</span>
+				</a>
+			</div>
 		</div>
 	</div>
 	`
