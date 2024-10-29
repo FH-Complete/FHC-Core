@@ -45,7 +45,7 @@ const app = Vue.createApp({
                         },
                         childactions: [
                             {
-                                label: "Rauminformation",
+								label: "Raumübersicht",
                                 icon: "fas fa-info-circle",
                                 type: "link",
                                 action: function(data) {
@@ -60,14 +60,6 @@ const app = Vue.createApp({
                                     return data.booklink;
                                 }
                             },
-                            {
-                                label: "Raumübersicht",
-                                icon: "fas fa-bookmark",
-                                type: "link",
-                                action: function(data) {
-                                    return data.roomoverview;
-                                }
-                            }
                         ]
                     },
                     organisationunit: {

@@ -108,7 +108,6 @@ export default {
                 childactions:child,
                 defaultaction:this.searchoptions.actions.raum.defaultaction
             }
-            
             return computedActions;
             
             
