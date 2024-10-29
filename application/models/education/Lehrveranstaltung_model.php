@@ -550,10 +550,11 @@ class Lehrveranstaltung_model extends DB_Model
 	 * @param string		$student_uid
 	 * @param string		$studiensemester_kurzbz
 	 * @param string|null	$sprache
+	 * @param number|null	$lvid - returns only information about that single lv if the parameter is set
 	 * 
 	 * @return stdClass
 	 */
-	public function getLvsByStudentWithGrades($student_uid, $studiensemester_kurzbz, $sprache = null)
+	public function getLvsByStudentWithGrades($student_uid, $studiensemester_kurzbz, $sprache = null, $lvid=null)
 	{
 		if ($sprache) {
 			$sprache_qry = $this->db->compile_binds('SELECT index FROM public.tbl_sprache WHERE sprache = ?', [$sprache]);
@@ -615,6 +616,10 @@ class Lehrveranstaltung_model extends DB_Model
 		$this->addJoin('campus.vw_student_lehrveranstaltung v', 'lehrveranstaltung_id');
 		$this->addJoin('public.tbl_studiengang sg', $this->dbTable . '.studiengang_kz = sg.studiengang_kz');
 		$this->db->where("v.lehreverzeichnis<>''");
+		if(isset($lvid))
+		{
+			$this->db->where("v.lehrveranstaltung_id", $lvid);	
+		}
 
 		$this->addJoin('campus.tbl_lvgesamtnote gn', 'gn.lehrveranstaltung_id=v.lehrveranstaltung_id AND gn.student_uid=v.uid AND gn.studiensemester_kurzbz=v.studiensemester_kurzbz', 'LEFT');
 		$this->addJoin('lehre.tbl_note gnn', 'gn.note=gnn.note', 'LEFT');

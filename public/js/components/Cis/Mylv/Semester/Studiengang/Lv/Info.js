@@ -3,30 +3,18 @@
 const infos = {};
 
 export default {
-	props: {
-
-		lehrveranstaltung_id: Number,
-		bezeichnung: String,
-		studiengang_kuerzel: String,
-		semester: Number,
+	props:{
 		studien_semester: String,
-		orgform_kurzbz: String,
-		sprache: String,
-		ects: Number,
-		incoming: Number,
-		/*
-		 * NOTE(chris): 
-		 * Hack to expose in "emits" declared events to $props which we use 
-		 * in the v-bind directive to forward all events.
-		 * @see: https://github.com/vuejs/core/issues/3432
-		*/
-		onHideBsModal: Function,
-		onHiddenBsModal: Function,
-		onHidePreventedBsModal: Function,
-		onShowBsModal: Function,
-		onShownBsModal: Function
+		lehrveranstaltung_id: Number,
 	},
 	data: () => ({
+		bezeichnung: null,
+		studiengang_kuerzel: null,
+		semester: null,
+		orgform_kurzbz: null,
+		sprache: null,
+		ects: null,
+		incoming: null,
 		result: true,
 		info: null,
 	}),
@@ -61,10 +49,27 @@ export default {
 		}
 	},
 	created() {
+		this.$fhcApi.factory.lehre.getLvInfo(this.studien_semester, this.lehrveranstaltung_id)
+		.then(
+			res => res.data
+		).then(data =>{
+			Object.assign(this, 
+				{
+					bezeichnung : data.bezeichnung,
+					studiengang_kuerzel: data.studiengang_kuerzel,
+					semester: data.semester,
+					orgform_kurzbz: data.orgform_kurzbz,
+					sprache: data.sprache,
+					ects: data.ects,
+					incoming: data.incoming ?? '-',
+				});
+		})
+
 		if (infos[this.lehrveranstaltung_id]) {
 			this.info = infos[this.lehrveranstaltung_id];
 		} else {
 			axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Mylv/Info/' + this.studien_semester + '/' + this.lehrveranstaltung_id).then(res => {
+				
 				this.info = infos[this.lehrveranstaltung_id] = res.data.retval || [];
 			}).catch(() => this.info = {});
 		}

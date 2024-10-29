@@ -1,7 +1,8 @@
 <?php
 $includesArray = array(
 	'title' => 'MyLv',
-	'customJSModules' => ['public/js/apps/Cis/MyLv/Student.js']
+	'customJSModules' => ['public/js/apps/Cis/MyLv/Student.js'],
+	'customCSSs' => ['public/css/components/MyLv.css']
 );
 
 $this->load->view('templates/CISVUE-Header', $includesArray);

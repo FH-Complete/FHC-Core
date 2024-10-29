@@ -7,4 +7,10 @@ export default {
               { lehreinheit_id: lehreinheit_id }
           );
       },
+	getLvInfo(studiensemester_kurzbz, lehrveranstaltung_id) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Lehre/LV/${studiensemester_kurzbz}/${lehrveranstaltung_id}`
+			, {}
+		);
+	},
   }

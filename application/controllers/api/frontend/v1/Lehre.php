@@ -29,6 +29,7 @@ class Lehre extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'lvStudentenMail' => self::PERM_LOGGED,
+			'LV' => self::PERM_LOGGED,
 		]);
 
 		
@@ -64,6 +65,18 @@ class Lehre extends FHCAPI_Controller
 
         $this->terminateWithSuccess($studentenMails);
 	}
+
+	public function LV($studiensemester_kurzbz, $lehrveranstaltung_id)
+	{
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+
+		$result = $this->LehrveranstaltungModel->getLvsByStudentWithGrades(getAuthUID(), $studiensemester_kurzbz, getUserLanguage(), $lehrveranstaltung_id);
+
+		$result = current($this->getDataOrTerminateWithError($result));
+		
+		$this->terminateWithSuccess($result);
+	}
+	
 
 	
 

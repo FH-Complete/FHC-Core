@@ -120,12 +120,12 @@ export default {
 		<div class="card-body " :style="bodyStyle">
 			<ul class="list-group border-top-0 border-bottom-0 rounded-0">
 				<template v-if="menu">
-					<li type="button" v-for="menuItem in menu" class="list-group-item border-0 ">
-						<div class="d-flex flex-row">
+					<li :type="menuItem.c4_link ? 'button' : null" v-for="menuItem in menu" class="list-group-item border-0 ">
+						<div class="d-flex flex-row" >
 							<div class="mx-4">
-								<i :class="menuItem.c4_icon2 ? menuItem.c4_icon2 : 'fa-solid fa-pen-to-square'"></i>
+								<i :class="[menuItem.c4_icon2 ? menuItem.c4_icon2 : 'fa-solid fa-pen-to-square', !menuItem.c4_link ? 'unavailable' : null ]"></i>
 							</div>
-							<a class="text-decoration-none" :class="{'link-secondary':!menuItem.c4_link, 'link-dark':menuItem.c4_link}" :target="menuItem.c4_target" :href="menuItem.c4_link ? menuItem.c4_link : null">
+							<a class="text-decoration-none text-truncate" :class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link}" :target="menuItem.c4_target" :href="menuItem.c4_link ? menuItem.c4_link : null">
 							{{menuItem.name}}
 							</a>
 						</div>
