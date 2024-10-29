@@ -32,7 +32,6 @@ export default {
 			menu: [],
 			result: false,
 			info: null,
-			isMenuSelected:false,
 		};
 	},
 	computed: {
@@ -67,9 +66,6 @@ export default {
 				)
 			}
 		},
-		onModalHide:function(){
-			this.isMenuSelected = false;
-		}
 	},
 	mounted() {
 		this.modal = this.$refs.modalContainer.modal;
@@ -78,13 +74,13 @@ export default {
 		return BsModal.popup.bind(this)(null, options);
 	},
 	template: /*html*/ `
-	<bs-modal ref="modalContainer" @showBsModal="onModalShow" @hideBsModal="onModalHide" v-bind="$props" :bodyClass="''" :dialogClass="{'modal-lg': !isMenuSelected, 'modal-fullscreen':isMenuSelected}" class="bootstrap-alert" backdrop="false" >
+	<bs-modal ref="modalContainer" @showBsModal="onModalShow" @hideBsModal="onModalHide" v-bind="$props" :bodyClass="''" dialogClass='modal-lg' class="bootstrap-alert" backdrop="false" >
 		<template v-slot:title>
 			<template v-if="event.titel">{{ event.titel + ' - ' + event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
 			<template v-else>{{ event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
 		</template>
 		<template v-slot:default>
-			<template v-if="!isMenuSelected">
+			
 				<h3>{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
 				<table class="table table-hover mb-4">
 					<tbody>
@@ -139,8 +135,8 @@ export default {
 					</tbody>
 				</table>
 				<h3>Lehrveranstaltungs Menu</h3>
-			</template>
-			<lv-menu v-model:isMenuSelected="isMenuSelected" :menu="menu"></lv-menu>
+			
+			<lv-menu :menu="menu"></lv-menu>
 		</template>
 		<!-- optional footer -->
 		<template  v-slot:footer >

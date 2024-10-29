@@ -103,7 +103,10 @@ export default {
 			.then(res => {
 				this.menu = res.data;
 			})
-			.catch((error) => this.$fhcAlert.handleSystemError);
+			.catch((error) => {
+				this.$fhcAlert.handleSystemError(error);
+				this.menu = [];
+			});
 	},
 	template: /*html*/`<div class="mylv-semester-studiengang-lv card">
 		<lv-uebersicht ref="lvUebersicht" :preselectedMenu="preselectedMenuItem" :event="{
@@ -142,11 +145,13 @@ export default {
 					<i class="fa fa-check text-success" v-if="positiv"></i>
 					{{ grade || p.t('lehre/noGrades') }}
 				</a>
+				<!--
+				Not used anymore because the lehrveranstaltungs informationen is available as a menu point in the lehrveranstaltungs optionen
 				<div v-if="lvinfo" class="col text-end">
 					<a class="card-link" href="#" @click.prevent="openInfos">
 						<i class="fa fa-info-circle" aria-hidden="true"></i>
 					</a>
-				</div>
+				</div>-->
 			</div>
 		</div>
 	</div>`
