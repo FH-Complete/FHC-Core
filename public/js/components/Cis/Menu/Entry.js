@@ -28,12 +28,12 @@ export default {
 		activeContent: function(newValue){
 			if(newValue == this.entry.content_id){
 				// wenn der Menupunkt nicht bereits offen ist
-				if(!this.entry.menu_open){
+				if (!this.entry.menu_open){
 					this.entry.menu_open = true;
 				}
 				
 			}else{
-				if (this.searchRecursiveChild(this.entry, newValue)) {
+				if (this.searchRecursiveChild(this.entry, 'content_id',newValue)) {
 					this.entry.menu_open = true;
 				} else {
 					this.entry.menu_open = false;
@@ -84,6 +84,12 @@ export default {
 				if (url.includes("../cms/news.php")) {
 					let news_regex = new RegExp("^\.\./cms/news\.php");
 					url = url.replace(news_regex, FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/CisVue/Cms/news');
+				}
+				else if (url.includes("../cms/content.php?")) {
+					let content_regex = new RegExp("^\.\./cms/content.php\\?content_id=([0-9]+)");
+					let content_regex_result = content_regex.exec(url);
+					// content_regex_result[1] will be the first matched group
+					return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/CisVue/Cms/content/' + content_regex_result[1];
 				}
 				else if(url.includes("../index.ci.php")){
 					let index_regex = new RegExp("^\.\./index\.ci\.php");
@@ -149,19 +155,20 @@ export default {
 			// or if the url equals the link of a menu 
 			// then set the menu active 
 			if (url_hash == this.entry.titel || url.href == this.link) {
-				this.setActiveEntry(this.entry.content_id);
+					this.setActiveEntry(this.entry.content_id);
 			}
 		},
-		searchRecursiveChild(entry,child_content_id){
+		// searches the childs of an entry recursively based on the value of a property
+		searchRecursiveChild(entry,property,value){
 			if (typeof entry.childs == 'object' && !Array.isArray(entry.childs) && Object.entries(entry.childs).length > 0){
 				entry.childs = Object.values(entry.childs);
 			}
 			for (let child of entry.childs) {
-				if (child.content_id == child_content_id) {
+				if (child[property] == value) {
 					return true;
 				}
 				if ((child.childs instanceof Array && child.childs.length > 0) || Object.values(child.childs).length > 0) {
-					if (this.searchRecursiveChild(child, child_content_id)){
+					if (this.searchRecursiveChild(child, property, value)){
 						return true;
 					}
 				}
@@ -175,7 +182,6 @@ export default {
 			}
 			else
 			{
-				console.log("entered here to make the content active")
 				this.setActiveEntry(this.entry.content_id);
 			}
         }
