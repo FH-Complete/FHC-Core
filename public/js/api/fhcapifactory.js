@@ -27,6 +27,7 @@ import bookmark from "./bookmark.js";
 import stv from "./stv.js";
 import notiz from "./notiz.js";
 import betriebsmittel from "./betriebsmittel.js";
+import checkperson from "./checkperson.js";
 import ampeln from "./ampeln.js";
 import ort from "./ort.js";
 import cms from "./cms.js";
@@ -46,9 +47,10 @@ export default {
     stv,
     notiz,
     betriebsmittel,
+    checkperson,
     ampeln,
     ort,
     cms,
     lehre,
-    addons,
+    addons
 };
