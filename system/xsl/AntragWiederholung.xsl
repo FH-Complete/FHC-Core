@@ -345,6 +345,16 @@
 							</text:p>
 						</table:table-cell>
 					</table:table-row>
+					<table:table-row table:style-name="Tabelle2.1">
+						<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
+							<text:p text:style-name="P5">Abmeldedatum</text:p>
+						</table:table-cell>
+						<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
+							<text:p text:style-name="P5">
+								<text:span text:style-name="T4"><xsl:value-of select="abmeldedatum"/></text:span>
+							</text:p>
+						</table:table-cell>
+					</table:table-row>
 					<table:table-row table:style-name="Tabelle2.5">
 						<table:table-cell table:style-name="Tabelle2.A1" table:number-columns-spanned="2" office:value-type="string">
 							<text:p text:style-name="P8">Grund der Abmeldung:</text:p>

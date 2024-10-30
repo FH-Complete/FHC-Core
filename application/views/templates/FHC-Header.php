@@ -40,13 +40,14 @@ $customCSSs = isset($customCSSs) ? $customCSSs : null;
 	if ($fontawesome4 === true)
 		generateCSSsInclude('vendor/fortawesome/font-awesome4/css/font-awesome.min.css');
 
-	// Font Awesome 6 CSS free icons
-	if ($fontawesome6 === true) {
-		generateCSSsInclude('vendor/fortawesome/font-awesome6/css/fontawesome.min.css');
-		generateCSSsInclude('vendor/fortawesome/font-awesome6/css/solid.min.css');
-		generateCSSsInclude('vendor/fortawesome/font-awesome6/css/regular.min.css');
-		generateCSSsInclude('vendor/fortawesome/font-awesome6/css/brands.min.css');
-	}
+			// Font Awesome 6 CSS free icons
+			if ($fontawesome6 === true)
+			{
+				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/fontawesome.min.css');
+				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/solid.min.css');
+				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/regular.min.css'); // NOTE(chris): for favorites in stv
+				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/brands.min.css');
+			}
 
 	// jQuery UI CSS
 	if ($jqueryui1 === true)

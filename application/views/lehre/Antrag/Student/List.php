@@ -10,7 +10,8 @@ $sitesettings = array(
 	),
 	'customJSModules' => array('public/js/apps/lehre/Antrag/Student.js'),
 	'customCSSs' => array(
-		'public/css/Fhc.css'
+		'public/css/Fhc.css',
+		'public/css/components/primevue.css',
 	),
 	'customJSs' => array(
 	)
@@ -149,8 +150,6 @@ $this->load->view(
 											break;
 										case Studierendenantrag_model::TYP_ABMELDUNG_STGL:
 											$allowed = [
-												Studierendenantragstatus_model::STATUS_APPROVED,
-												Studierendenantragstatus_model::STATUS_OBJECTED,
 												Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
 												Studierendenantragstatus_model::STATUS_DEREGISTERED
 											];

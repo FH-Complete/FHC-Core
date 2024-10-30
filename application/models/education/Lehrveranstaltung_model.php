@@ -16,6 +16,297 @@ class Lehrveranstaltung_model extends DB_Model
 	}
 
 	/**
+	 * Get Lehrveranstaltungen by eventQuery string. Use with autocomplete event queries.
+	 * @param $eventQuery String
+	 * @param string $studiensemester_kurzbz Filter by Studiensemester
+	 * @param array $oes Filter by Organisationseinheiten
+	 * @return array
+	 */
+	public function getAutocompleteSuggestions($eventQuery, $studiensemester_kurzbz = null, $oes = null)
+	{
+		$subQry = $this->_getQryLvsByStudienplan($studiensemester_kurzbz, $oes);
+		$params = [];
+
+		/* filter by input string */
+		if (is_string($eventQuery)) {
+			$subQry.= ' AND lv.bezeichnung ILIKE ?';
+			$params[] = '%' . $eventQuery . '%';
+		}
+
+		$qry = 'SELECT DISTINCT ON (lehrveranstaltung_id) * FROM ('. $subQry. ') AS tmp';
+
+		return $this->execQuery($qry, $params);
+	}
+
+	/**
+	 * Get Lehrveranstaltungen with its Stg, OE and OE-type.
+	 * Filter by Studiensemester and Organisationseinheiten if necessary.
+	 * @param $eventQuery String
+	 * @param string $studiensemester_kurzbz Filter by Studiensemester
+	 * @param array $oes Filter by Organisationseinheiten
+	 * @param array $lv_ids Filter by Lehrveranstaltung-Ids
+	 * @return array
+	 */
+	public function getLvsByStudienplan($studiensemester_kurzbz = null, $oes = null, $lv_ids = null)
+	{
+		$subQry = $this->_getQryLvsByStudienplan($studiensemester_kurzbz, $oes);
+		$qry = 'SELECT * FROM ('. $subQry. ') AS tmp';
+
+		if (isset($lv_ids) && is_array($lv_ids))
+		{
+			/* filter by lv_ids */
+			$implodedLvIds = "'". implode("', '", $lv_ids). "'";
+			$qry.= ' WHERE lehrveranstaltung_id IN ('. $implodedLvIds. ')';
+		}
+
+		$qry.= ' ORDER BY stg_typ_kurzbz, orgform_kurzbz DESC';
+
+		return $this->execQuery($qry);
+	}
+
+	/**
+	 * Get basic query to retrieve Lehrveranstaltungen according to the Orgforms and Ausbildungssemesters actual Studienplan.
+	 *
+	 * @return string
+	 */
+	private function _getQryLvsByStudienplan($studiensemester_kurzbz = null, $oes = null,  $lehrtyp_kurzbz = 'lv')
+	{
+		$qry = '
+			SELECT
+				lv.oe_kurzbz AS lv_oe_kurzbz,
+				CASE
+                    WHEN oe.organisationseinheittyp_kurzbz = \'Kompetenzfeld\' THEN (\'KF \' || oe.bezeichnung)
+                    WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
+                    ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
+                END AS lv_oe_bezeichnung,
+				stplsem.studiensemester_kurzbz,
+				studienordnung_id,
+				sto.studiengang_kz,
+				stpl.studienplan_id,
+				stplsem.semester,
+				stpl.orgform_kurzbz,
+				upper(stg.typ || stg.kurzbz) AS stg_typ_kurzbz,    
+				stg.bezeichnung AS stg_bezeichnung,
+				stgtyp.bezeichnung AS stg_typ_bezeichnung,
+			    lv.lehrveranstaltung_id,
+				lv.semester,   		
+				lv.bezeichnung AS lv_bezeichnung,
+				(
+				    -- comma seperated string of all lehreinheitgruppen
+					SELECT string_agg(bezeichnung, \', \') AS lehreinheitgruppe_bezeichnung
+					FROM(
+					    -- distinct bezeichnung, as may come multiple times from different lehreinheiten
+						SELECT DISTINCT ON (studiengang_kz, bezeichnung) studiengang_kz, bezeichnung FROM
+						(
+							-- distinct lehreinheitgruppe, as may come multiple times from different lehrform
+							SELECT DISTINCT ON (legr.lehreinheitgruppe_id) legr.studiengang_kz,
+								-- get Spezialgruppe or Lehrverbandgruppe 
+								COALESCE(
+									legr.gruppe_kurzbz,
+									CONCAT( UPPER(stg1.typ), UPPER(stg1.kurzbz), \'-\', legr.semester, legr.verband, legr.gruppe )
+								) as bezeichnung
+							FROM lehre.tbl_lehreinheitgruppe 	legr
+							JOIN lehre.tbl_lehreinheit 			le USING (lehreinheit_id)
+							JOIN lehre.tbl_lehrveranstaltung 	lv1 USING (lehrveranstaltung_id)
+							JOIN public.tbl_studiengang 		stg1 ON stg1.studiengang_kz = legr.studiengang_kz
+							WHERE lv1.lehrveranstaltung_id 		= lv.lehrveranstaltung_id
+							AND le.studiensemester_kurzbz 		= stplsem.studiensemester_kurzbz
+						) AS lehreinheitgruppen
+					    GROUP BY studiengang_kz, bezeichnung
+						ORDER BY studiengang_kz DESC
+					) AS uniqueLehreinheitgruppen_bezeichnung
+				) AS lehreinheitgruppen_bezeichnung
+            FROM
+				lehre.tbl_studienplan 							stpl
+				JOIN lehre.tbl_studienordnung 					sto USING (studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester 			stplsem USING (studienplan_id)
+				JOIN lehre.tbl_studienplan_lehrveranstaltung 	stpllv ON (stpllv.studienplan_id = stpl.studienplan_id AND stpllv.semester = stplsem.semester)
+				JOIN lehre.tbl_lehrveranstaltung 				lv USING (lehrveranstaltung_id)
+				JOIN public.tbl_organisationseinheit 			oe USING (oe_kurzbz)
+				JOIN public.tbl_studiengang          			stg ON stg.studiengang_kz = sto.studiengang_kz
+				JOIN public.tbl_studiengangstyp 				stgtyp ON stgtyp.typ = stg.typ
+			/* filter by lehrtyp_kurzbz, default is lvs only */
+			WHERE 
+			      lehrtyp_kurzbz = '. $this->db->escape($lehrtyp_kurzbz);
+
+		if (isset($studiensemester_kurzbz) && is_string($studiensemester_kurzbz))
+		{
+			/* filter by studiensemester */
+			$qry.= ' AND stplsem.studiensemester_kurzbz = '. $this->db->escape($studiensemester_kurzbz);
+
+		}
+
+		if (isset($oes) && is_array($oes))
+		{
+			/* filter by organisationseinheit */
+			$implodedOes = "'". implode("', '", $oes). "'";
+			$qry.= ' AND lv.oe_kurzbz IN ('. $implodedOes. ')';
+		}
+
+		return $qry;
+	}
+
+	/**
+	 * Get all Templates and union with all Lehrveranstaltungen of given Studiensemester and Oes, that are assigned to
+	 * a template. This data structure can be used for nested tabulator data tree.
+	 *
+	 * @param null|string $studiensemester_kurzbz
+	 * @param null|array $oes
+	 * @return array|stdClass|null
+	 */
+	public function getTemplateLvTree($studiensemester_kurzbz = null, $oes = null){
+		$params = [];
+		$qry = '
+		WITH 	
+			-- All Lvs that are assigned to a template in given Studiensemester for given Oes
+			-- joining via actual Studienplan
+			standardisierteLvs AS (
+				SELECT
+					lv.*,
+					stpl.studienplan_id::text as studienplan_id,
+					stpl.bezeichnung AS studienplan_bezeichnung,
+					stplsem.studiensemester_kurzbz
+				FROM
+					lehre.tbl_studienplan 							stpl
+					JOIN lehre.tbl_studienordnung 					sto USING (studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester 			stplsem USING (studienplan_id)
+					JOIN lehre.tbl_studienplan_lehrveranstaltung 	stpllv ON (stpllv.studienplan_id = stpl.studienplan_id AND stpllv.semester = stplsem.semester)
+					JOIN lehre.tbl_lehrveranstaltung 				lv USING (lehrveranstaltung_id)
+					JOIN public.tbl_organisationseinheit 			oe USING (oe_kurzbz)
+					JOIN public.tbl_studiengang          			stg ON stg.studiengang_kz = sto.studiengang_kz
+					JOIN public.tbl_studiengangstyp 				stgtyp ON stgtyp.typ = stg.typ
+				WHERE 
+					-- filter type lv
+				  	lehrtyp_kurzbz = \'lv\'
+				  	-- filter lvs assigned to template (= standardisierte lv)
+					AND lehrveranstaltung_template_id IS NOT NULL';
+
+					if (is_string($studiensemester_kurzbz))
+					{
+						/* filter by studiensemester */
+						$params[]= $studiensemester_kurzbz;
+						$qry.= ' AND stplsem.studiensemester_kurzbz = ? ';
+
+					}
+
+					if (is_array($oes))
+					{
+						/* filter by organisationseinheit */
+						$params[]= $oes;
+						$qry.= ' AND lv.oe_kurzbz IN ? ';
+					}
+		$qry.= '
+			),
+			-- All templates
+			templateLvs AS (
+				SELECT 
+					lv.*,
+					NULL AS studienplan_id,
+					(
+						SELECT string_agg(stpl_bezeichnung, \', \')
+						FROM
+						(
+							SELECT stlv.studienplan_bezeichnung AS stpl_bezeichnung
+							FROM standardisierteLvs stlv
+							WHERE stlv.lehrveranstaltung_template_id = lv.lehrveranstaltung_id
+						) AS studienplaene
+					) AS studienplan_bezeichnung,
+					NULL AS studiensemester_kurzbz
+				FROM 
+					lehre.tbl_lehrveranstaltung lv
+				WHERE 
+					-- filter type template
+					lehrtyp_kurzbz = \'tpl\'
+					-- filter semester that were retrieved by standardisierte lvs semester for selected studiensemester
+					AND EXISTS (
+						SELECT 1
+						FROM standardisierteLvs std
+						WHERE std.lehrveranstaltung_template_id = lv.lehrveranstaltung_id
+					)';
+
+		if (is_array($oes))
+		{
+			/* filter by organisationseinheit */
+			$params[]= $oes;
+			$qry.= ' AND lv.oe_kurzbz IN ? ';
+		}
+		$qry.= '
+			)	
+		';
+
+		$qry.= '
+			SELECT 
+				lv.lehrveranstaltung_id,
+				lv.kurzbz,
+			    lv.lehrtyp_kurzbz,
+				lv.bezeichnung AS lv_bezeichnung, 
+				lv.bezeichnung_english,
+				lv.studiengang_kz,
+				lv.semester,
+				lv.oe_kurzbz,
+				lv.ects,
+				lv.lehrform_kurzbz,
+				lv.orgform_kurzbz,
+				lv.sprache, 
+				lv.aktiv,
+				lv.lehrveranstaltung_template_id,
+				lv.studienplan_id,
+			    lv.studienplan_bezeichnung,
+			    lv.studiensemester_kurzbz,
+			    upper(stg.typ || stg.kurzbz) AS "stg_typ_kurzbz",    
+				stg.bezeichnung AS "stg_bezeichnung",
+				stgtyp.bezeichnung AS "stg_typ_bezeichnung",
+				CASE
+   			 		WHEN oe.organisationseinheittyp_kurzbz = \'Kompetenzfeld\' THEN (\'KF \' || oe.bezeichnung)
+                    WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
+                    ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
+                END AS "lv_oe_bezeichnung",
+			   (
+				    -- comma seperated string of all lehreinheitgruppen
+					SELECT string_agg(bezeichnung, \', \') AS lehreinheitgruppe_bezeichnung
+					FROM(
+					    -- distinct bezeichnung, as may come multiple times from different lehreinheiten
+						SELECT DISTINCT ON (studiengang_kz, bezeichnung) studiengang_kz, bezeichnung FROM
+						(
+							-- distinct lehreinheitgruppe, as may come multiple times from different lehrform
+							SELECT DISTINCT ON (legr.lehreinheitgruppe_id) legr.studiengang_kz,
+								-- get Spezialgruppe or Lehrverbandgruppe 
+								COALESCE(
+									legr.gruppe_kurzbz,
+									CONCAT( UPPER(stg1.typ), UPPER(stg1.kurzbz), \'-\', legr.semester, legr.verband, legr.gruppe )
+								) as bezeichnung
+							FROM lehre.tbl_lehreinheitgruppe 	legr
+							JOIN lehre.tbl_lehreinheit 			le USING (lehreinheit_id)
+							JOIN lehre.tbl_lehrveranstaltung 	lv1 USING (lehrveranstaltung_id)
+							JOIN public.tbl_studiengang 		stg1 ON stg1.studiengang_kz = legr.studiengang_kz
+							WHERE lv1.lehrveranstaltung_id 		= lv.lehrveranstaltung_id
+							AND le.studiensemester_kurzbz 		= lv.studiensemester_kurzbz
+						) AS lehreinheitgruppen
+					    GROUP BY studiengang_kz, bezeichnung
+						ORDER BY studiengang_kz DESC
+					) AS uniqueLehreinheitgruppen_bezeichnung
+				) AS lehreinheitgruppen_bezeichnung
+			FROM (
+				SELECT 
+					* 
+				FROM 
+				     standardisierteLvs 
+				UNION
+				SELECT 
+				   * 
+				FROM templateLvs 
+			) AS lv
+				JOIN public.tbl_studiengang          	stg ON stg.studiengang_kz = lv.studiengang_kz
+				JOIN public.tbl_studiengangstyp 		stgtyp ON stgtyp.typ = stg.typ
+				JOIN public.tbl_organisationseinheit 	oe ON oe.oe_kurzbz = lv.oe_kurzbz
+		ORDER BY
+			oe.bezeichnung, lv.semester, lv.bezeichnung
+		';
+
+		return $this->execQuery($qry, $params);
+	}
+
+	/**
 	 * Gets unique Groupstrings for Lehrveranstaltungen, e.g. WS2018_BIF_1_PRJM_VZ_LV12345
 	 * @param string $studiensemester_kurzbz
 	 * @param string $ausbildungssemester
@@ -492,5 +783,12 @@ class Lehrveranstaltung_model extends DB_Model
         ';
 
         return $this->execQuery($qry, array($student_uid));
+    }
+
+    public function getStg($lehrveranstaltung_id)
+    {
+    	$this->addSelect('stg.*');
+    	$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz');
+    	return $this->load($lehrveranstaltung_id);
     }
 }

@@ -4,6 +4,7 @@ const CHAR_LENGTH150 = 150;
 const CHAR_LENGTH500 = 500;
 const CHAR_LENGTH1000 = 1000;
 
+$this->load->config('anrechnung');
 $this->load->view(
 	'templates/FHC-Header',
 	array(
@@ -209,6 +210,7 @@ $this->load->view(
 									</div>
 								</div>
 							</div>
+							<?php if ($this->config->item('explain_equivalence')): ?>
                             <!-- Begruendung ECTS -->
                             <div class="row mb-3">
                                 <div class="col-lg-12">
@@ -249,6 +251,8 @@ $this->load->view(
                                     </div>
                                 </div>
                             </div>
+							<?php endif; ?>
+
 							<!-- Dokument Upload-->
 							<div class="row mb-3">
 								<div class="col-lg-12">

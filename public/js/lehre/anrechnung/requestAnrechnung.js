@@ -101,8 +101,12 @@ $(function(){
                 begruendung: this.begruendung.value,
                 lv_id: this.lv_id.value,
                 studiensemester: this.studiensemester.value,
-                begruendung_ects: this.begruendung_ects.value,
-                begruendung_lvinhalt: this.begruendung_lvinhalt.value,
+                begruendung_ects: this.begruendung_ects && this.begruendung_ects.value
+                    ? this.begruendung_ects.value
+                    : null,
+                begruendung_lvinhalt: this.begruendung_lvinhalt && this.begruendung_lvinhalt.value
+                    ? this.begruendung_lvinhalt.value
+                    : null,
                 bestaetigung: this.bestaetigung.value,
                 uploadfile: this.uploadfile.files
             },
@@ -216,18 +220,22 @@ var requestAnrechnung = {
             $('#requestAnrechnung-herkunftDerKenntnisse-charCounter').text(length);
         });
 
-        $('#requestAnrechnung-begruendungEcts').keyup(function() {
-            let length = CHAR_LENGTH150 - $(this).val().length;
-            $('#requestAnrechnung-begruendungEcts-charCounter').text(length);
-        });
+        if ($('#requestAnrechnung-begruendungEcts').length) {
+            $('#requestAnrechnung-begruendungEcts').keyup(function () {
+                let length = CHAR_LENGTH150 - $(this).val().length;
+                $('#requestAnrechnung-begruendungEcts-charCounter').text(length);
+            });
+        }
 
-        $('#requestAnrechnung-begruendungLvinhalt').keyup(function() {
-            let maxlength = CHAR_LENGTH1000 - $(this).val().length;
-            $('#requestAnrechnung-begruendungLvinhalt-charCounterMax').text(maxlength);
+        if ($('#requestAnrechnung-begruendungLvinhalt').length){
+            $('#requestAnrechnung-begruendungLvinhalt').keyup(function() {
+                let maxlength = CHAR_LENGTH1000 - $(this).val().length;
+                $('#requestAnrechnung-begruendungLvinhalt-charCounterMax').text(maxlength);
 
-            let minlength = CHAR_LENGTH500 - $(this).val().length;
-            $('#requestAnrechnung-begruendungLvinhalt-charCounterMin').text(minlength);
-        });
+                let minlength = CHAR_LENGTH500 - $(this).val().length;
+                $('#requestAnrechnung-begruendungLvinhalt-charCounterMin').text(minlength);
+            });
+        }
     },
     formatAnrechnungIsApplied: function (antragdatum, dms_id, filename){
         $('#requestAnrechnung-antragdatum').text(antragdatum);

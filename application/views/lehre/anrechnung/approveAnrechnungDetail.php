@@ -1,4 +1,5 @@
 <?php
+$this->load->config('anrechnung');
 $this->load->view(
 	'templates/FHC-Header',
 	array(
@@ -197,6 +198,7 @@ $this->load->view(
 															data-begruendung_id="<?php echo $anrechnungData->begruendung_id ?>"><?php echo $anrechnungData->begruendung ?></span>
 													</td>
 												</tr>
+											<?php if ($this->config->item('explain_equivalence')): ?>
 												<tr>
 													<th class="col-4">
 														<?php echo $this->p->t('anrechnung', 'begruendungEctsLabel'); ?>
@@ -211,6 +213,7 @@ $this->load->view(
 													<td><span><?php echo $anrechnungData->begruendung_lvinhalt ?></span>
 													</td>
 												</tr>
+											<?php endif; ?>
 											</tbody>
 										</table>
 									</div>
