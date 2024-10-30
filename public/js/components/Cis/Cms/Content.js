@@ -30,13 +30,11 @@ export default {
   data() {
     return {
       content: null,
-      
     };
   },
   computed:{
     computeContentType: function(){
       switch(this.content_type){
-        
         case "raum_contentmittitel":
           return "raum_contentmittitel";
         default:
@@ -51,12 +49,11 @@ export default {
     });
   },
   mounted(){
-    
+	
   },
   template: /*html*/ `
     <!-- div that contains the content -->
     <component :is="computeContentType" v-if="content" :content="content" />
     <p v-else>No content is available to display</p>
-
     `,
 };

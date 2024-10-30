@@ -7,22 +7,20 @@ export default {
       },
     },
     mounted(){
-        let tables = document.getElementsByClassName("tablesorter");
-        
-        for(let table of tables){
-            new Tabulator(table, {
-                layout:"fitDataStretch",
-               
-                columnDefaults:{
-                    formatter:"html",
-                    resizable:false,
-                    minWidth: "100px",
-                }
-            })
+		// replaces the tablesorter with the tabulator
+		let tables = document.getElementsByClassName("tablesorter");
 
-            table.classList.add("mx-auto");
-            table.style.width="30em"; 
-        }
+		for (let table of tables) {
+			new Tabulator(table, {
+				layout: "fitDataStretch",
+
+				columnDefaults: {
+					formatter: "html",
+					resizable: false,
+					minWidth: "100px",
+				}
+			})
+		}
     },
     template: /*html*/ `
       <!-- div that contains the content -->

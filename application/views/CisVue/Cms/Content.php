@@ -8,13 +8,8 @@ $includesArray = array(
 	]
 );
 
-if(isset($template_kurzbz)){
-	switch($template_kurzbz){
-		case 'raum_contentmittitel': 
-			$includesArray['tabulator5'] = true; 
-			break;
-	}
-}
+// adds the tabulator5 dependency for all templates to replace the tablesorter
+$includesArray['tabulator5'] = true; 
 
 if(defined('CIS4')){
 	$this->load->view('templates/CISVUE-Header', $includesArray);

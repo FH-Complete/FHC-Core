@@ -7,6 +7,22 @@ export default {
       },
     },
     mounted(){
+
+		// replaces the tablesorter with the tabulator
+		let tables = document.getElementsByClassName("tablesorter");
+
+		for (let table of tables) {
+			new Tabulator(table, {
+				layout: "fitDataStretch",
+
+				columnDefaults: {
+					formatter: "html",
+					resizable: false,
+					minWidth: "100px",
+				}
+			})
+		}
+
         document.querySelectorAll("#cms [data-confirm]").forEach((el) => {
             el.addEventListener("click", (evt) => {
               evt.preventDefault();
