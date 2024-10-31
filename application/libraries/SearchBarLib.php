@@ -242,7 +242,8 @@ class SearchBarLib
 					" . $this->_ci->db->escape($type) . " AS type,
 					rank,
 					TO_JSONB((SELECT x FROM (SELECT " . implode(", ", $table_config['resultfields'] ?? ['*']) . ") x)) AS data
-				FROM final_" . $type  . ($table_config['resultjoin'] ?? "");
+				FROM final_" . $type  . "
+				" . ($table_config['resultjoin'] ?? "");
 		}
 
 		if (!$selects)

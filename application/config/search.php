@@ -400,7 +400,11 @@ $config['employee'] = [
 		'pid' => [
 			'alias' => ['person_id'],
 			'comparison' => 'equal-int',
-			'field' => "person_id"
+			'field' => "person_id",
+			'join' => [
+				'table' => "public.tbl_benutzer",
+				'on' => "uid = mitarbeiter_uid"
+			]
 		],
 		'oe' => [
 			'alias' => ['ou', 'organisationseinheit', 'organisationunit'],
