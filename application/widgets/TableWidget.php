@@ -35,6 +35,9 @@ class TableWidget extends Widget
 	// Required permissions to use this TableWidget
 	private $_requiredPermissions;
 
+	// optional bootstrap version can be set to use different bootstrap classes 
+	private $_bootstrapVersion=3;
+
 	// SQL statement
 	private $_query;
 
@@ -92,8 +95,10 @@ class TableWidget extends Widget
 	 */
 	public function display($widgetData)
 	{
+		
 		$this->view(self::WIDGET_URL_TABLE, array(
-			'tableUniqueId' => $widgetData[TableWidgetLib::TABLE_UNIQUE_ID]
+			'tableUniqueId' => $widgetData[TableWidgetLib::TABLE_UNIQUE_ID],
+			'bootstrapVersion' => $widgetData[TableWidgetLib::TABLE_BOOTSTRAP_VERSION],
 		)); // GUI starts here
 	}
 
@@ -135,6 +140,7 @@ class TableWidget extends Widget
 
 		// Initialize class properties
 		$this->_requiredPermissions = null;
+		$this->_bootstrapVersion = 3;
 		$this->_reloadDataset = true; // by default the dataset is NOT cached in session
 		$this->_query = null;
 		$this->_additionalColumns = null;
@@ -152,6 +158,12 @@ class TableWidget extends Widget
 		if (isset($args[TableWidgetLib::REQUIRED_PERMISSIONS]))
 		{
 			$this->_requiredPermissions = $args[TableWidgetLib::REQUIRED_PERMISSIONS];
+		}
+
+		// Retrieved the optional tableWindget Bootstrap version
+		if (isset($args[TableWidgetLib::TABLE_BOOTSTRAP_VERSION]) && !isEmptyString($args[TableWidgetLib::TABLE_BOOTSTRAP_VERSION]))
+		{
+			$this->_bootstrapVersion = $args[TableWidgetLib::TABLE_BOOTSTRAP_VERSION];
 		}
 
 		// How to retrieve data for the table: SQL statement or a result from DB
@@ -349,6 +361,7 @@ class TableWidget extends Widget
 				$this->tablewidgetlib->setSession(
 					array(
 						TableWidgetLib::TABLE_UNIQUE_ID => $tableUniqueId, // table unique id
+						TableWidgetLib::TABLE_BOOTSTRAP_VERSION => $this->_bootstrapVersion, // bootstrap version for tableWidget
 						TableWidgetLib::SESSION_FIELDS => $this->tablewidgetlib->getExecutedQueryListFields(), // all the fields of the dataset
 						TableWidgetLib::SESSION_COLUMNS_ALIASES => $this->_columnsAliases, // all the fields aliases
 						TableWidgetLib::SESSION_ADDITIONAL_COLUMNS => $this->_additionalColumns, // additional columns
