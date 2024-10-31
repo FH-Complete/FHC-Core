@@ -128,9 +128,12 @@ export default {
 							<div class="mx-4">
 								<i :class="[menuItem.c4_icon2 ? menuItem.c4_icon2 : 'fa-solid fa-pen-to-square', !menuItem.c4_link ? 'unavailable' : null ]"></i>
 							</div>
-							<a class="text-decoration-none text-truncate" :class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link}" :target="menuItem.c4_target" :href="menuItem.c4_link ? menuItem.c4_link : null">
+							<a class="text-decoration-none text-truncate" :id="'moodle_links_'+lehrveranstaltung_id" :data-bs-toggle="menuItem.c4_moodle_links?.length ? 'dropdown' : null" :class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }" :target="menuItem.c4_target" :href="menuItem.c4_link ? !menuItem.c4_moodle_links?.length && menuItem.c4_link : null">
 							{{menuItem.name}}
 							</a>
+							<ul v-if="menuItem.c4_moodle_links?.length" class="dropdown-menu p-0 mylv_dropdown" :aria-labelledby="'moodle_links_'+lehrveranstaltung_id">
+								<li v-for="item in menuItem.c4_moodle_links"><a class="dropdown-item border-bottom" :href="item.url">{{item.lehrform_kurzbz}}</a></li>
+							</ul>
 						</div>
 					</li>
 				</template>

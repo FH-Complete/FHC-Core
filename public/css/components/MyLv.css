@@ -2,3 +2,7 @@
 	color: #565e647f !important;
 	cursor: default;
 }
+
+.mylv_dropdown{
+	margin-left: -5px !important;
+}
