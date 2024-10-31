@@ -184,3 +184,18 @@ FROM pg_indexes WHERE indexname = 'idx_tbl_contentsprache_fts_titel_content_vect
 	else
 		echo 'campus.tbl_contentsprache: added index "idx_tbl_contentsprache_fts_titel_content_vector"<br>';
 }
+// Add index for schlagworte to campus.tbl_dms_version
+if (!$db->db_num_rows(@$db->db_query("SELECT 1 
+FROM pg_indexes WHERE indexname = 'idx_tbl_dms_version_fts_schlagworte_vector' LIMIT 1;")))
+{
+	$qry = "
+		CREATE INDEX idx_tbl_dms_version_fts_schlagworte_vector 
+		ON campus.tbl_dms_version 
+		USING GIN ((to_tsvector('simple', COALESCE(schlagworte, ''))));
+	";
+
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_dms_version ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo 'campus.tbl_contentsprache: added index "idx_tbl_dms_version_fts_schlagworte_vector"<br>';
+}

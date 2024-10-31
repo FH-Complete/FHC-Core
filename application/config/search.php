@@ -3,10 +3,6 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 
-// TODO(chris): permissions
-// TODO(chris): foto
-
-
 $config['person'] = [
 	'primarykey' => 'person_id',
 	'table' => 'public.tbl_person',
@@ -70,7 +66,7 @@ $config['person'] = [
 		]
 	],
 	'resultfields' => [
-		"b.uid",
+		"b.uid", // TODO(chris): multiple?
 		"p.person_id",
 		"(p.vorname || ' ' || p.nachname) AS name",
 		"ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
@@ -678,7 +674,7 @@ $config['room'] = [
 
 $config['cms'] = [
 	'primarykey' => 'contentsprache_id',
-	'table' => 'cms',
+	'table' => 'campus.tbl_contentsprache',
 	'prepare' => "
 		cms_auth (content_id) AS (
 			SELECT content_id
@@ -711,47 +707,23 @@ $config['cms'] = [
 			SELECT content_id
 			FROM cms_active
 			WHERE template_kurzbz IN ('contentmittitel', 'contentohnetitel', 'contentmittitel_filterwidget')
-		),
-		cms (contentsprache_id) AS (
-			SELECT contentsprache_id
-			FROM campus.tbl_contentsprache
-			WHERE content_id IN (
-				SELECT content_id 
-				FROM cms_active_redirect_linked 
-				UNION 
-				SELECT content_id 
-				FROM cms_active_others
-			)
-			AND version = campus.get_highest_content_version(content_id)
 		)
 	",
 	'searchfields' => [
 		'content' => [
 			'alias' => ['inhalt'],
 			'comparison' => "vector",
-			'field' => "(setweight(to_tsvector('simple', COALESCE(titel, '')), 'A') || setweight(to_tsvector('simple', COALESCE(content, '')::text), 'B'))",
-			'join' => [
-				'table' => "campus.tbl_contentsprache",
-				'using' => "contentsprache_id"
-			]
+			'field' => "(setweight(to_tsvector('simple', COALESCE(titel, '')), 'A') || setweight(to_tsvector('simple', COALESCE(content, '')::text), 'B'))"
 		],
 		'content_id' => [
 			'alias' => ['id'],
 			'comparison' => "equal-int",
-			'field' => "content_id",
-			'join' => [
-				'table' => "campus.tbl_contentsprache",
-				'using' => "contentsprache_id"
-			]
+			'field' => "content_id"
 		],
 		'lang' => [
 			'alias' => ['language', 'sprache'],
 			'comparison' => "equals",
-			'field' => "sprache",
-			'join' => [
-				'table' => "campus.tbl_contentsprache",
-				'using' => "contentsprache_id"
-			]
+			'field' => "sprache"
 		]
 	],
 	'resultfields' => [
@@ -767,5 +739,100 @@ $config['cms'] = [
 		JOIN campus.tbl_contentsprache contentsprache
 			USING (contentsprache_id)
 		JOIN campus.tbl_content content
-			USING (content_id)"
+			USING (content_id)
+		WHERE content_id IN (
+			SELECT content_id 
+			FROM cms_active_redirect_linked 
+			UNION 
+			SELECT content_id 
+			FROM cms_active_others
+		)
+		AND version = campus.get_highest_content_version(content_id)"
+];
+
+$config['dms'] = [
+	// TODO(chris): IMPLEMENT
+	// TODO(chris): TEST
+	// TODO(chris): project?
+	'primarykey' => 'dms_id, version',
+	'table' => 'campus.tbl_dms_version',
+	'searchfields' => [
+		'keywords' => [
+			'alias' => ['keyword', 'keywords', 'schlagwort', 'schlagworte'],
+			'comparison' => "vector",
+			'field' => "(to_tsvector('simple', COALESCE(schlagworte, '')))"
+		]
+	],
+	'resultfields' => [
+		"v.dms_id",
+		"v.version",
+		"v.filename",
+		"v.mimetype",
+		"v.name",
+		"v.beschreibung AS description",
+		"v.schlagworte AS keywords"
+	],
+	'resultjoin' => "
+		JOIN campus.tbl_dms_version v
+			USING (dms_id, version)
+		WHERE cis_suche = TRUE
+			AND version=(SELECT MAX(version) FROM campus.tbl_dms_version WHERE dms_id=v.dms_id)
+			AND NOT EXISTS (
+				SELECT
+					1
+				FROM
+					fue.tbl_projekt_dokument p
+				WHERE p.dms_id = v.dms_id
+			) AND (
+				NOT EXISTS (
+					WITH RECURSIVE categories (kategorie_kurzbz) AS (
+						SELECT
+							kategorie_kurzbz
+						FROM
+							campus.tbl_dms c
+						WHERE c.dms_id = v.dms_id
+						UNION ALL
+						SELECT
+							cat.parent_kategorie_kurzbz AS kategorie_kurzbz
+						FROM
+							categories
+							JOIN campus.tbl_dms_kategorie cat USING (kategorie_kurzbz)
+					)
+					SELECT
+						1
+					FROM
+						categories
+					JOIN campus.tbl_dms_kategorie_gruppe USING (kategorie_kurzbz)
+					UNION
+					SELECT
+						1
+					FROM
+						categories
+						JOIN campus.tbl_dms_kategorie USING (kategorie_kurzbz)
+					WHERE
+						berechtigung_kurzbz IS NOT NULL
+				) OR EXISTS (
+					WITH RECURSIVE categories (kategorie_kurzbz) AS (
+						SELECT
+							kategorie_kurzbz
+						FROM
+							campus.tbl_dms c
+						WHERE c.dms_id = v.dms_id
+						UNION ALL
+						SELECT
+							cat.parent_kategorie_kurzbz AS kategorie_kurzbz
+						FROM
+							categories
+							JOIN campus.tbl_dms_kategorie cat USING (kategorie_kurzbz)
+					)
+					SELECT
+						1
+					FROM
+						categories
+						JOIN campus.tbl_dms_kategorie_gruppe USING (kategorie_kurzbz)
+						JOIN public.tbl_benutzergruppe USING(gruppe_kurzbz)
+					WHERE
+						uid = (TABLE auth)
+				)
+			)"
 ];

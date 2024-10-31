@@ -5,6 +5,7 @@ import ResultEmployee from "./result/employee.js";
 import ResultOrganisationunit from "./result/organisationunit.js";
 import ResultRoom from "./result/room.js";
 import ResultCms from "./result/cms.js";
+import ResultDms from "./result/dms.js";
 import ResultMergedperson from "./result/mergedperson.js";
 import ResultMergedstudent from "./result/mergedstudent.js";
 
@@ -19,6 +20,7 @@ export default {
 		ResultOrganisationunit,
 		ResultRoom,
 		ResultCms,
+		ResultDms,
 		ResultMergedperson,
 		ResultMergedstudent
 	},
@@ -263,6 +265,7 @@ export default {
 					<result-organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="searchoptions.actions.organisationunit" @actionexecuted="hideresult"></result-organisationunit>
 					<result-room v-else-if="res.type === 'room'" :res="res" :actions="searchoptions.actions.room" @actionexecuted="hideresult"></result-room>
 					<result-cms v-else-if="res.type === 'cms'" :res="res" :actions="searchoptions.actions.cms" @actionexecuted="hideresult"></result-cms>
+					<result-dms v-else-if="res.type === 'dms'" :res="res" :actions="searchoptions.actions.dms" @actionexecuted="hideresult"></result-dms>
 					<result-mergedperson v-else-if="res.type === 'mergedperson'" :res="res" :actions="searchoptions.actions.mergedperson" @actionexecuted="hideresult"></result-mergedperson>
 					<result-mergedstudent v-else-if="res.type === 'mergedstudent'" :res="res" :actions="searchoptions.actions.mergedstudent" @actionexecuted="hideresult"></result-mergedstudent>
 					<div v-else>Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
