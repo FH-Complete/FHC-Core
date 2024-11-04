@@ -132,7 +132,7 @@ export default {
 							{{menuItem.name}}
 							</a>
 							<ul v-if="menuItem.c4_moodle_links?.length" class="dropdown-menu p-0 mylv_dropdown" :aria-labelledby="'moodle_links_'+lehrveranstaltung_id">
-								<li v-for="item in menuItem.c4_moodle_links"><a class="dropdown-item border-bottom" :href="item.url">{{item.lehrform_kurzbz}}</a></li>
+								<li v-for="item in menuItem.c4_moodle_links"><a class="dropdown-item border-bottom" :href="item.url">{{item.lehrform}}</a></li>
 							</ul>
 						</div>
 					</li>
