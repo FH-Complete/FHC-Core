@@ -31,7 +31,8 @@ class CisVue extends FHC_Controller
 	public function Menu()
 	{
 		$this->load->model('content/Content_model', 'ContentModel');
-		$result = $this->ContentModel->getMenu(defined('CIS4_MENU_ENTRY') ? CIS4_MENU_ENTRY : null, get_uid());
+		$menu_contentID = $this->ContentModel->getMenuContentID();
+		$result = $this->ContentModel->getMenu($menu_contentID, get_uid());
 		$menu = getData($result) ?? (object)['childs' => []];
 
 		$this->outputJsonSuccess($menu);
