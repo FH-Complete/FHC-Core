@@ -31,7 +31,7 @@ class Mylv extends Auth_Controller
 	{
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 
-		$result = $this->LehrveranstaltungModel->getLvsByStudentWithGrades(get_uid());
+		$result = $this->LehrveranstaltungModel->getLvsByStudentWithGrades(getAuthUID());
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
@@ -45,7 +45,7 @@ class Mylv extends Auth_Controller
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
-		$result = $this->StudiensemesterModel->getWhereStudentHasLvs(get_uid());
+		$result = $this->StudiensemesterModel->getWhereStudentHasLvs(getAuthUID());
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
@@ -59,7 +59,7 @@ class Mylv extends Auth_Controller
 	{
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 
-		$result = $this->LehrveranstaltungModel->getLvsByStudentWithGrades(get_uid(), $studiensemester_kurzbz, getUserLanguage());
+		$result = $this->LehrveranstaltungModel->getLvsByStudentWithGrades(getAuthUID(), $studiensemester_kurzbz, getUserLanguage());
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
@@ -202,7 +202,7 @@ class Mylv extends Auth_Controller
 	{
 		$this->load->model('education/Pruefung_model', 'PruefungModel');
 
-		$result = $this->PruefungModel->getByStudentAndLv(get_uid(), $lehrveranstaltung_id, getUserLanguage());
+		$result = $this->PruefungModel->getByStudentAndLv(getAuthUID(), $lehrveranstaltung_id, getUserLanguage());
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));

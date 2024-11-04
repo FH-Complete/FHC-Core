@@ -15,9 +15,9 @@ class Documents extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
+			'index' => [self::PERM_LOGGED],
 			'student' => ['admin:r'],
-			'download' => ['student/anrechnung_beantragen:r','user:r'] // TODO(chris): permissions?
+			'download' => [self::PERM_LOGGED]
 		]);
 
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');

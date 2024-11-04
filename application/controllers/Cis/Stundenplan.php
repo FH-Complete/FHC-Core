@@ -13,7 +13,7 @@ class Stundenplan extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => ['student/anrechnung_beantragen:r','user:r'] // TODO(chris): permissions?
+			'index' => ['basis/cis:r']
 		]);
 	}
 

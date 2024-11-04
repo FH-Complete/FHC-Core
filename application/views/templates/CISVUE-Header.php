@@ -20,7 +20,7 @@ if (!isset($menu)) {
 	$ci =& get_instance(); // get CI instance
 	$ci->load->model('content/Content_model', 'ContentModel');
 	$cis4_content_id = $ci->ContentModel->getCIS4_ContentID();
-	$result = $ci->ContentModel->getMenu($cis4_content_id, get_uid());
+	$result = $ci->ContentModel->getMenu($cis4_content_id, getAuthUID());
 	$menu = getData($result)->childs ?? [];
 }
 ?>

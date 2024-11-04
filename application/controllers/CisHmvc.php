@@ -7,16 +7,18 @@ use \DOMDocument as DOMDocument;
 /**
  *
  */
-class CisHmvc extends FHC_Controller
+class CisHmvc extends Auth_Controller
 {
 	/**
 	 * Constructor
 	 */
 	public function __construct()
 	{
-		parent::__construct();
-		$this->load->library('AuthLib');
-		$this->load->library('PermissionLib');
+		parent::__construct(
+		    array(
+			'index' => 'basis/cis:r'
+		    )
+		);
 
 		$this->load->model('content/Content_model', 'ContentModel');
 	}
@@ -43,7 +45,7 @@ class CisHmvc extends FHC_Controller
 		$path = explode('/', uri_string());
 		array_shift($path); // NOTE(chris): remove cis4/
 		
-		$menu = $this->ContentModel->getMenu(6739, get_uid());
+		$menu = $this->ContentModel->getMenu(6739, getAuthUID());
 		if (isError($menu)) {
 			// TODO(chris): Error Handling
 			return $this->load->view('CisHmvc/Error', ['error' => getError($menu)]);

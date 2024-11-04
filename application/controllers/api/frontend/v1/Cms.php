@@ -179,6 +179,8 @@ class Cms extends FHCAPI_Controller
 
 		$news = $this->getDataOrTerminateWithError($news);
 
+		$this->addMeta('test', $this->p->t('global', 'studiengangsleitung'));
+		$this->addMeta('phrases', json_decode($this->p->getJson()));
 		$this->terminateWithSuccess($news);
 
 	}

@@ -6,18 +6,24 @@ if (!defined('BASEPATH'))
 /**
  *
  */
-class Cms extends FHC_Controller
+class Cms extends Auth_Controller
 {
 	/**
 	 * Constructor
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+		    array(
+			'content' => 'basis/cis:r',
+			'getNews' => 'basis/cis:r',
+			'getNewsRowCount' => 'basis/cis:r',
+			'getRoomInformation' => 'basis/cis:r',
+			'news' => 'basis/cis:r'
+		    )
+		);
 
 		// Loads Libraries
-		$this->load->library('AuthLib');
-		$this->load->library('PermissionLib');
 		$this->load->library('CmsLib');
 
 		// Loads phrases system

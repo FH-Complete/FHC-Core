@@ -13,16 +13,16 @@ class Profil extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'foto_sperre_function' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getView' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'View' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'isMitarbeiter' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'isStudent' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getZustellAdresse' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getZustellKontakt' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getAllNationen' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getGemeinden' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'index' => ['basis/cis:r'],
+			'foto_sperre_function' => ['basis/cis:r'],
+			'getView' => ['basis/cis:r'],
+			'View' => ['basis/cis:r'],
+			'isMitarbeiter' => ['basis/cis:r'],
+			'isStudent' => ['basis/cis:r'],
+			'getZustellAdresse' => ['basis/cis:r'],
+			'getZustellKontakt' => ['basis/cis:r'],
+			'getAllNationen' => ['basis/cis:r'],
+			'getGemeinden' => ['basis/cis:r'],
 
 		]);
 
