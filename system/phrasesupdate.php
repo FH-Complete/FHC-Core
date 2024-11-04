@@ -31486,6 +31486,26 @@ array(
 	),
 	array(
 		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'invalidUrl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ungültiger Link',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invalid link',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'global',
 		'phrase' => 'gespeichert',
 		'insertvon' => 'system',
