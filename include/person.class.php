@@ -97,7 +97,7 @@ class person extends basis_db
 							familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
 							geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre,
 							matr_nr, bpk, wahlname";
-			if ($hasUDF = $udf->personHasUDF() && false)
+			if ($hasUDF = $udf->personHasUDF())
 				$qry .= ", udf_values";
 
 			$qry .= " FROM public.tbl_person
