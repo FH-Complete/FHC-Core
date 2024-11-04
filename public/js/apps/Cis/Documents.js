@@ -33,11 +33,11 @@ const app = Vue.createApp({
 		inscriptiontableEmpty() {
 			// NOTE(chris): empty result on filter
 			if (this.inscriptiontableFilters.Stsem)
-				return this.p.t('tools', 'studienbeitragFuerSSNochNichtBezahlt', {stsem: this.inscriptiontableFilters.Stsem});
+				return this.$p.t('tools', 'studienbeitragFuerSSNochNichtBezahlt', {stsem: this.inscriptiontableFilters.Stsem});
 			if (this.inscriptiontableFilters.Stg)
-				return this.p.t('tools', 'studienbeitragFuerStgNochNichtBezahlt', {stsem: this.inscriptiontableFilters.Stg});
+				return this.$p.t('tools', 'studienbeitragFuerStgNochNichtBezahlt', {stsem: this.inscriptiontableFilters.Stg});
 			
-			return this.p.t('tools', 'studienbeitragNochNichtBezahlt');
+			return this.$p.t('tools', 'studienbeitragNochNichtBezahlt');
 		},
 		studienerfolgsbestaetigungtableFilter() {
 			const filter = [];
@@ -62,14 +62,14 @@ const app = Vue.createApp({
 	mounted() {
 		this.inscriptiontable = new Tabulator(this.$refs.inscriptiontable, {
 			layout: 'fitDataStretch',
-			placeholder: this.p.t('tools', 'studienbeitragNochNichtBezahlt')
+			placeholder: this.$p.t('tools', 'studienbeitragNochNichtBezahlt')
 		});
 		this.studienerfolgsbestaetigungtable = new Tabulator(this.$refs.studienerfolgsbestaetigungtable, {
 			layout: 'fitDataStretch'
 		});
 		this.abschlussdokumentetable = new Tabulator(this.$refs.abschlussdokumentetable, {
 			layout: 'fitDataStretch',
-			placeholder: this.p.t('tools', 'nochKeineAbschlussdokumenteVorhanden')
+			placeholder: this.$p.t('tools', 'nochKeineAbschlussdokumenteVorhanden')
 		});
 
 		// NOTE(chris): empty result on filter
