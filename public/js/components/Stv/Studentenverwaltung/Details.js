@@ -43,6 +43,7 @@ export default {
 	},
 	template: `
 	<div class="stv-details h-100 pb-3 d-flex flex-column">
+
 		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
 			Bitte StudentIn auswählen!
 		</div>

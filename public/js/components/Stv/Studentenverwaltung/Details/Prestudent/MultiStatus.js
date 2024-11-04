@@ -318,6 +318,9 @@ export default{
 			@saved="reload"
 			>
 		</status-modal>
+		TEST1: Anzahl Students: 
+		{{modelValue.length}}
+		
 			
 		<core-filter-cmpt
 			v-if="!this.modelValue.length"
@@ -331,6 +334,8 @@ export default{
 			new-btn-label="Status"
 			@click:new="actionNewStatus"
 			>
+			
+			TEST 2
 			
 			<template #actions="{updateData2}">
 				<!-- SingleSelectButton-->

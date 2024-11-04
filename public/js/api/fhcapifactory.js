@@ -24,6 +24,7 @@ import stv from "./stv.js";
 import notiz from "./notiz.js";
 import betriebsmittel from "./betriebsmittel.js";
 import checkperson from "./checkperson.js";
+import vertraege from "./vertraege.js";
 
 export default {
     search,
@@ -34,5 +35,6 @@ export default {
     stv,
     notiz,
     betriebsmittel,
-    checkperson
+    checkperson,
+    vertraege
 };

@@ -330,4 +330,163 @@ class Vertrag_model extends DB_Model
 
         return $bezeichnung;
     }
+
+	/**
+	 * Loads all Contracts of a Person
+	 * @param $person_id
+	 * @return array of objects
+	 */
+	public function loadContractsOfPerson($person_id)
+	{
+		$query = "
+			SELECT
+					*,
+					tbl_vertrag.bezeichnung as bezeichnung,
+					tbl_vertragstyp.bezeichnung as vertragstyp_bezeichnung,
+					TO_CHAR(tbl_vertrag.vertragsdatum::timestamp, 'DD.MM.YYYY') AS format_vertragsdatum,
+					(SELECT bezeichnung FROM lehre.tbl_vertragsstatus 
+					    JOIN lehre.tbl_vertrag_vertragsstatus USING(vertragsstatus_kurzbz)
+						WHERE vertrag_id=tbl_vertrag.vertrag_id ORDER BY datum desc limit 1) as status, anmerkung
+				FROM
+					lehre.tbl_vertrag
+					LEFT JOIN lehre.tbl_vertragstyp USING(vertragstyp_kurzbz)
+				WHERE person_id= ?";
+
+
+		return $this->execQuery($query, array($person_id));
+	}
+
+	/**
+	 * Loads all Contracts of a Person that are not assigned yet
+	 * @param $person_id
+	 * @return array of objects
+	 */
+	public function loadContractsOfPersonNotAssigned($person_id)
+	{
+		$query = "
+SELECT
+			'Lehrauftrag' as type,
+			lehreinheit_id,
+			mitarbeiter_uid,
+			null as pruefung_id,
+			null as projektarbeit_id,
+			(tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
+			tbl_lehreinheit.studiensemester_kurzbz,
+			null as betreuerart_kurzbz,
+			(	SELECT
+					upper(tbl_studiengang.typ || tbl_studiengang.kurzbz) || tbl_lehrveranstaltung.semester  || '-' || tbl_lehrveranstaltung.kurzbz || '-' || tbl_lehreinheit.lehrform_kurzbz
+				FROM
+					lehre.tbl_lehrveranstaltung
+					JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE
+					lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
+			as bezeichnung
+		FROM
+			lehre.tbl_lehreinheitmitarbeiter
+			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+		WHERE
+			mitarbeiter_uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id=?)
+			AND vertrag_id IS NULL
+		UNION
+		SELECT
+			'Betreuung' as type,
+			tbl_projektarbeit.lehreinheit_id as lehreinheit_id,
+			null as mitarbeiter_uid,
+			null::integer as pruefung_id,
+			projektarbeit_id,
+			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
+			tbl_lehreinheit.studiensemester_kurzbz,
+			tbl_projektbetreuer.betreuerart_kurzbz,
+			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
+			as bezeichnung
+		FROM
+			lehre.tbl_projektbetreuer
+			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+		WHERE
+			tbl_projektbetreuer.person_id=?
+			AND vertrag_id IS NULL
+				";
+
+		return $this->execQuery($query, array($person_id, $person_id));
+	}
+
+	/**
+	 * Loads all Contracts of a Person that are assigned yet
+	 * @param $person_id, $vertrag_id
+	 * @return array of objects
+	 */
+	//TODO(Manu) vereinfachen!
+	public function loadContractsOfPersonAssigned($person_id, $vertrag_id)
+	{
+		$query = "
+		SELECT
+			'Lehrauftrag' as type,
+			lehreinheit_id,
+			mitarbeiter_uid,
+			null as pruefung_id,
+			null as projektarbeit_id,
+			(tbl_lehreinheitmitarbeiter.semesterstunden * tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
+			tbl_lehreinheit.studiensemester_kurzbz,
+			null as betreuerart_kurzbz,
+			(	SELECT
+					upper(tbl_studiengang.typ || tbl_studiengang.kurzbz) || tbl_lehrveranstaltung.semester  || '-' || tbl_lehrveranstaltung.kurzbz || '-' || tbl_lehreinheit.lehrform_kurzbz
+				FROM
+					lehre.tbl_lehrveranstaltung
+					JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE
+					lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
+			as bezeichnung
+		FROM
+			lehre.tbl_lehreinheitmitarbeiter
+			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+		WHERE
+			mitarbeiter_uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id=?)
+			AND vertrag_id = ?
+		UNION
+		SELECT
+			'Betreuung' as type,
+			tbl_projektarbeit.lehreinheit_id as lehreinheit_id,
+			null as mitarbeiter_uid,
+			null::integer as pruefung_id,
+			projektarbeit_id,
+			(tbl_projektbetreuer.stunden * tbl_projektbetreuer.stundensatz) as betrag,
+			tbl_lehreinheit.studiensemester_kurzbz,
+			tbl_projektbetreuer.betreuerart_kurzbz,
+			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
+			as bezeichnung
+		FROM
+			lehre.tbl_projektbetreuer
+			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+		WHERE
+			tbl_projektbetreuer.person_id=?
+			AND vertrag_id = ?
+				";
+
+		return $this->execQuery($query, array($person_id, $vertrag_id, $person_id, $vertrag_id));
+	}
+
+	/**
+	 * Returns all stati of a contract
+	 *
+	 * @param $vertrag_id
+	 * @return array
+	 */
+	public function getStatiOfContract($vertrag_id)
+	{
+		$query = " 
+			SELECT
+					*
+			FROM
+				lehre.tbl_vertrag_vertragsstatus
+				JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz)
+			WHERE
+				tbl_vertrag_vertragsstatus.vertrag_id = ?
+			ORDER BY datum DESC";
+
+		return $this->execQuery($query, array($vertrag_id));
+	}
+
+
 }

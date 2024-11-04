@@ -190,4 +190,6 @@ class Vertragvertragsstatus_model extends DB_Model
 		
 		return $this->loadWhere($condition);
 	}
+
+
 }

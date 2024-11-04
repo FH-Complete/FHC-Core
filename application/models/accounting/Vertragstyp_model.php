@@ -11,4 +11,5 @@ class Vertragstyp_model extends DB_Model
 		$this->dbTable = 'lehre.tbl_vertragstyp';
 		$this->pk = 'vertragstyp_kurzbz';
 	}
+
 }
