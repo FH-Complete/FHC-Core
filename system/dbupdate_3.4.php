@@ -66,6 +66,7 @@ require_once('dbupdate_3.4/44031_stv_favorites.php');
 require_once('dbupdate_3.4/40896_kennzeichnung_unruly_person.php');
 require_once('dbupdate_3.4/39911_tabulator_in_contentmittitel.php');
 require_once('dbupdate_3.4/25999_C4_Menu.php');
+require_once('dbupdate_3.4/25999_C4_permission.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
