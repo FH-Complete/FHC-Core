@@ -71,13 +71,23 @@ class Content_model extends DB_Model
 	 *
 	 * @return integer|null			content_id of the Cis4_Root Menu
 	 */
-	public function getCIS4_ContentID(){
+	public function getMenuContentID(){
+		// early return if the CIS4_MENU_ENTRY constant is defined  
+		if(defined('CIS4_MENU_ENTRY'))
+		{
+			return CIS4_MENU_ENTRY;
+		}
+		
+		// load the CIS4 Menu content_id from the database using the column 'beschreibugn' of the campus.tbl_content table
 		$CIS4_ROOT_CONTENT = $this->loadWhere(["beschreibung"=>"CIS4_ROOT"]);
+		
 		if(isError($CIS4_ROOT_CONTENT))
 		{
 			return null;
 		}
+
 		$CIS4_ROOT_CONTENT = getData($CIS4_ROOT_CONTENT);
+		
 		if(count($CIS4_ROOT_CONTENT) > 0)
 		{
 			return current($CIS4_ROOT_CONTENT)->content_id ?? null;

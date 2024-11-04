@@ -26,7 +26,8 @@ class CisVue extends Auth_Controller
 	public function Menu()
 	{
 		$this->load->model('content/Content_model', 'ContentModel');
-		$result = $this->ContentModel->getMenu(defined('CIS4_MENU_ENTRY') ? CIS4_MENU_ENTRY : null, getAuthUID());
+		$menu_contentID = $this->ContentModel->getMenuContentID();
+		$result = $this->ContentModel->getMenu($menu_contentID, getAuthUID());
 		$menu = getData($result) ?? (object)['childs' => []];
 
 		$this->outputJsonSuccess($menu);

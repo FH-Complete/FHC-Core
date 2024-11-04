@@ -5,6 +5,7 @@ export default {
   data: () => ({
     title_input: "",
     url_input: "",
+	invalidURL: false,
   }),
   mixins: [AbstractWidget],
   computed: {
@@ -35,6 +36,15 @@ export default {
       if ((await this.$fhcAlert.confirmDelete()) === false) return;
     },
     addLink() {
+	  // reset is-invalid css on url input field
+	  this.invalidURL = false;
+
+	  if(!URL.canParse(this.url_input)) 
+	  {
+		this.$fhcAlert.alertError(this.$p.t("bookmark", "invalidUrl"));
+		this.invalidURL = true;
+		return;
+	  }
       this.$fhcApi.factory.bookmark
         .insert({
           tag: this.config.tag,
@@ -83,7 +93,10 @@ export default {
                 <header><b>{{$p.t('bookmark','newLink')}}</b></header><br>
                 <div>
                     <input class="form-control form-control-sm" placeholder="Titel" type="text" v-model="title_input" name="title" maxlength="50" required>
-                    <input class="form-control form-control-sm mt-2" type="url" placeholder="URL" v-model="url_input" name="url" required>
+					<input required id="bookmark_link" class="form-control form-control-sm mt-2" :class="{'is-invalid':invalidURL}" type="url" placeholder="URL" v-model="url_input" name="url">
+				    <div class="invalid-feedback">
+					{{$p.t("bookmark", "invalidUrl")}}.
+					</div>
                     <button class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="addLink" type="button">{{$p.t('bookmark','saveLink')}}</button>
                 </div>
             </div>

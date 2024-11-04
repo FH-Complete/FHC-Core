@@ -410,16 +410,6 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					10487, NOW(), null, null, null, 8
 				);
 
-				INSERT INTO campus.tbl_contentchild
-				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
-				VALUES
-				(
-					-- queries the content_id for the CIS4_ROOT
-					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'CIS4_ROOT'),
-					-- 10568 is the content_id for Zahlungen
-					10568, NOW(), null, null, null, 9
-				);
-
 				###### Mein Studium childs
 
 				INSERT INTO campus.tbl_contentchild
@@ -465,6 +455,16 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'BESTÄTIGUNGEN_ZEUGNISSE'),
 					NOW(), null, null, null, 4
 				);
+
+				INSERT INTO campus.tbl_contentchild
+				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
+				VALUES
+				(
+					-- queries the content_id for the MEIN_STUDIUM
+					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
+					-- 10568 is the content_id for Zahlungen
+					10568, NOW(), null, null, null, 5
+				);
 				
 				INSERT INTO campus.tbl_contentchild
 				(content_id, child_content_id, insertamum, insertvon, updateamum, updatevon, sort)
@@ -473,7 +473,7 @@ if ($result = @$db->db_query("SELECT * FROM campus.tbl_content WHERE beschreibun
 					-- queries the content_id for the MEIN_STUDIUM
 					(SELECT content_id from campus.tbl_content WHERE beschreibung = 'MEIN_STUDIUM'),
 					-- 10795 is the content_id for Studierendenstatus
-					10795, NOW(), null, null, null, 5
+					10795, NOW(), null, null, null, 6
 				);
 
 				###### VPN_STUDIERENDE childs
