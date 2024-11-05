@@ -84,7 +84,7 @@ class LvMenu extends FHCAPI_Controller
 		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
 		// get the user
-		if (!$user=get_uid())
+		if (!$user=getAuthUID())
 			die($p->t('global/nichtAngemeldet'));
 
 		// check if is_lector

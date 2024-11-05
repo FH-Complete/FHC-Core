@@ -6,7 +6,7 @@ if (!defined('BASEPATH'))
 /**
  *
  */
-class Cms extends FHC_Controller
+class Cms extends Auth_Controller
 {
 	/**
 	 * Constructor
@@ -14,11 +14,14 @@ class Cms extends FHC_Controller
 
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+		    array(
+			'content' => 'basis/cis:r',
+			'news' => 'basis/cis:r',
+		    )
+		);
 
 		// Loads Libraries
-		$this->load->library('AuthLib');
-		$this->load->library('PermissionLib');
 		$this->load->library('CmsLib');
 
 		// Loads phrases system

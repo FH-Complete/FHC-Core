@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class CisVue extends FHC_Controller
+class CisVue extends Auth_Controller
 {
 
 	/**
@@ -13,14 +13,9 @@ class CisVue extends FHC_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
-
-		// Loads authentication library and starts authentication
-		$this->load->library('AuthLib');
-		$this->load->library('PermissionLib');
-
-		if (!isLogged())
-			show_404();
+		parent::__construct([
+			'Menu' => [self::PERM_LOGGED]
+		]);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -32,7 +27,7 @@ class CisVue extends FHC_Controller
 	{
 		$this->load->model('content/Content_model', 'ContentModel');
 		$menu_contentID = $this->ContentModel->getMenuContentID();
-		$result = $this->ContentModel->getMenu($menu_contentID, get_uid());
+		$result = $this->ContentModel->getMenu($menu_contentID, getAuthUID());
 		$menu = getData($result) ?? (object)['childs' => []];
 
 		$this->outputJsonSuccess($menu);

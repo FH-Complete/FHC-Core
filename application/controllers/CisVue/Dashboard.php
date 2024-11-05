@@ -14,7 +14,7 @@ class Dashboard extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'index' => 'user:r'
+				'index' => 'dashboard/benutzer:r'
 			)
 		);
 	}

@@ -24,16 +24,16 @@ class ProfilUpdate extends Auth_Controller
 			'getProfilUpdateWithPermission' => ['student/stammdaten:r', 'mitarbeiter/stammdaten:r'],
 			'acceptProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
 			'denyProfilRequest' => ['student/stammdaten:rw', 'mitarbeiter/stammdaten:rw'],
-			'show' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'show' => ['basis/cis:r'],
 
-			'insertProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'updateProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'deleteProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getStatus' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getTopic' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'insertProfilRequest' => ['basis/cis:rw'],
+			'updateProfilRequest' => ['basis/cis:rw'],
+			'deleteProfilRequest' => ['basis/cis:rw'],
+			'selectProfilRequest' => ['basis/cis:r'],
+			'insertFile' => ['basis/cis:rw'],
+			'getProfilRequestFiles' => ['basis/cis:r'],
+			'getStatus' => ['basis/cis:r'],
+			'getTopic' => ['basis/cis:r'],
 		]);
 
 

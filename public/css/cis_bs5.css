@@ -64,6 +64,7 @@ h6, .h6 {
 
 .tabulator {
 	font-size: var(--bs-body-font-size);
+	
 }
 
 .fhc-container .tabulator {
@@ -91,6 +92,50 @@ h6, .h6 {
 .fhc-container .tabulator .tabulator-row.tabulator-selectable:hover .tabulator-frozen,
 .fhc-container .tabulator .tabulator-row.tabulator-selectable:hover .tabulator-cell {
 	background-color: #ececec;
+}
+
+
+/* using bootstrap background classes to style the background color of tabulator rows */
+/* bg-warning */
+/* odd-rows */
+.fhc-container .tabulator .tabulator-row.tabulator-row-odd .tabulator-frozen.bg-warning,
+.fhc-container .tabulator .tabulator-row.tabulator-row-odd .tabulator-cell.bg-warning {
+	background-color: #fcf8e3;
+	
+}
+/* even-rows */
+.fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-frozen.bg-warning,
+.fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-cell.bg-warning {
+	background-color: #fcf8e3;
+	
+}
+
+/* bg-success */
+/* odd-rows */
+.fhc-container .tabulator .tabulator-row.tabulator-row-odd .tabulator-frozen.bg-success,
+.fhc-container .tabulator .tabulator-row.tabulator-row-odd .tabulator-cell.bg-success {
+	background-color: #dff0d8;
+	
+}
+/* even-rows */
+.fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-frozen.bg-success,
+.fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-cell.bg-success {
+	background-color: #dff0d8;
+	
+}
+
+/* bg-info */
+/* odd-rows */
+.fhc-container .tabulator .tabulator-row.tabulator-row-odd .tabulator-frozen.bg-info,
+.fhc-container .tabulator .tabulator-row.tabulator-row-odd .tabulator-cell.bg-info {
+	background-color: #d9edf7;
+	
+}
+/* even-rows */
+.fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-frozen.bg-info,
+.fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-cell.bg-info {
+	background-color: #d9edf7;
+	
 }
 
 .fhc-container .tabulator .tabulator-col,

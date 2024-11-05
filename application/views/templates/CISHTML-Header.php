@@ -18,7 +18,7 @@ $this->load->view('templates/FHC-Header', $includesArray);
 if (!isset($menu)) {
 	$ci =& get_instance(); // get CI instance
 	$ci->load->model('content/Content_model', 'ContentModel');
-	$result = $ci->ContentModel->getMenu(null, get_uid());
+	$result = $ci->ContentModel->getMenu(null, getAuthUID());
 	$menu = getData($result) ?? (object)['childs' => []];
 }
 ?>

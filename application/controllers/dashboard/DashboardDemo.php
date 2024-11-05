@@ -16,7 +16,7 @@ class DashboardDemo extends Auth_Controller
         // Set required permissions
         parent::__construct(
             array(
-                'index' => 'user:r',
+                'index' => 'dashboard/benutzer:r',
                 'admin' => 'dashboard/admin:rw'
             )
         );

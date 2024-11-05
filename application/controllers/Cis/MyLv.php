@@ -13,8 +13,8 @@ class MyLv extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'Info' => ['student/anrechnung_beantragen:r','user:r'] // TODO(chris): permissions?
+			'index' => ['basis/cis:r'],
+			'Info' => [self::PERM_LOGGED]
 		]);
 	}
 

@@ -14,9 +14,9 @@ class Stundenplan extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'Reservierungen' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'Stunden' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
+			'index' => ['basis/cis'],
+			'Reservierungen' => ['basis/cis'],
+			'Stunden' => ['basis/cis'],
 		]);
 	}
 
@@ -29,12 +29,12 @@ class Stundenplan extends Auth_Controller
 	{
 		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 
-		/* $result = $this->StundenplanModel->loadForUid(get_uid());
+		/* $result = $this->StundenplanModel->loadForUid(getAuthUID());
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
  		*/
-		$res = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(get_uid())); 
+		$res = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(getAuthUID())); 
 		
 		$res = getData($res);
 		
@@ -47,7 +47,7 @@ class Stundenplan extends Auth_Controller
 	{
 		$this->load->model('ressource/Reservierung_model', 'ReservierungModel');
 
-		$result = $this->ReservierungModel->loadForUid(get_uid());
+		$result = $this->ReservierungModel->loadForUid(getAuthUID());
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
