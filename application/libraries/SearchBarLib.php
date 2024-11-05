@@ -675,6 +675,12 @@ class SearchBarLib
 					SELECT " . $this->_formatPrimarykeys($table_config['primarykey']) . ", rank / " . $count . " AS rank FROM " . $current_select;
 			}
 
+			if ($or_with[0] === "RECURSIVE") {
+				if ($sqlWith[0] !== "RECURSIVE")
+					array_unshift($sqlWith, "RECURSIVE");
+				array_shift($or_with);
+			}
+
 			$sqlWith = array_merge($sqlWith, $or_with);
 			$sql_select = array_merge($sql_select, $or_select);
 			$id_offset += count($or_with);
