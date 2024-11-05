@@ -130,22 +130,20 @@ export default {
 			formData: {},
 			listContractsUnassigned: [],
 			listContractTypes: [],
-			contractSelected: []
+			contractSelected: [],
+			listContractStati: [],
+		//	isContractModalVisible: true,
 		}
 	},
 
 	methods: {
 		actionNewContract() {
-			console.log("actionNewContract");
 			this.resetModal();
-			//this.loadContractsNotAssigned(this.person_id);
 			this.$refs.contractModal.show();
 		},
 		actionEditContract(vertrag_id) {
-			console.log("actionEditContract " + vertrag_id);
 			this.statusNew = false;
-			this
-				.loadContract(vertrag_id)
+			this.loadContract(vertrag_id)
 				.then(this.$refs.contractModal.show);
 		},
 		actionDeleteContract(vertrag_id) {
@@ -172,6 +170,43 @@ export default {
 					this.resetModal();
 					window.scrollTo(0, 0);
 					this.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		addNewContractStatus({status, datum}) {
+			const date = new Date();
+
+			//TODO(Manu) refactor this
+			const formattedDate = datum.toLocaleDateString('en-CA');
+			let params = {
+				vertrag_id : this.contractSelected.vertrag_id,
+				status: {status},
+				datum: formattedDate
+			}
+
+			return this.endpoint
+				.insertContractStatus(params)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+
+					this.$refs.contractstati.closeModal();
+					window.scrollTo(0, 0);
+					this.$refs.contractstati.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		deleteContractStatus({status, vertrag_id}){
+			let params = {
+				vertrag_id : {vertrag_id},
+				status: {status}
+			}
+			return this.endpoint
+				.deleteContractStatus(params)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+
+					window.scrollTo(0, 0);
+					this.$refs.contractstati.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -210,11 +245,13 @@ export default {
 	created() {
 		Promise.all([
 			this.endpoint.getAllContractTypes(),
-			this.endpoint.getAllContractsNotAssigned2(this.person_id)
+			this.endpoint.getAllContractsNotAssigned2(this.person_id),
+			this.endpoint.getAllContractStati(),
 		])
-			.then(([result1, result2]) => {
+			.then(([result1, result2, result3]) => {
 				this.listContractTypes = result1.data;
 				this.listContractsUnassigned = result2.data;
+				this.listContractStati = result3.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
@@ -229,10 +266,6 @@ export default {
 	template: `
 
 	<div class="core-vertraege h-100 d-flex flex-column">
-	
-	{{formData}}
-	
-	{{contractSelected}}
 	
 		<core-filter-cmpt
 			ref="table"
@@ -253,35 +286,23 @@ export default {
 			<div class="col-sm-6">
 				<!-- ContractDetails -->
 				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">      
-					<ContractDetails :person_id="person_id" :vertrag_id="contractSelected.vertrag_id"></ContractDetails>
+					<contract-details :person_id="person_id" :vertrag_id="contractSelected.vertrag_id"></contract-details>
 				</div>
 			</div>
 			
 			<div class="col-sm-6">
 				<!-- ContractStati -->
 				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">      
-					<ContractStati :vertrag_id="contractSelected.vertrag_id"></ContractStati>
+					<contract-stati :vertrag_id="contractSelected.vertrag_id" :listContractStati="listContractStati"
+					@setContractStatus="addNewContractStatus"
+					@deleteContractStatus="deleteContractStatus"
+					ref="contractstati"
+					></contract-stati>
 				</div>
 			</div>
 				
 		</div>
-		
-<!--		<hr>
-		<div>
-			&lt;!&ndash; ContractDetails &ndash;&gt;
-			 <div class="row md-4" v-if="contractSelected.vertrag_id !=null">      
-				<ContractDetails :person_id="person_id" :vertrag_id="contractSelected.vertrag_id"></ContractDetails>
-			</div>
-		</div>
-		
-		<div>
-			&lt;!&ndash; ContractStati &ndash;&gt;
-			 <div class="row md-4" v-if="contractSelected.vertrag_id !=null">      
-				<ContractStati :vertrag_id="contractSelected.vertrag_id"></ContractStati>
-			</div>
-		</div>-->
 				
-		
 		<!--Modal: contractModal-->
 		<bs-modal ref="contractModal" dialog-class="modal-xl">
 			<template #title>
@@ -291,7 +312,7 @@ export default {
 			
 			<core-form class="row g-3" ref="unassignedData">
 		
-				<ListUnassigned :endpoint="$fhcApi.factory.vertraege.person" :person_id="person_id"></ListUnassigned>
+				<list-unassigned :endpoint="$fhcApi.factory.vertraege.person" :person_id="person_id"></list-unassigned>
 			
 				<div class="row mb-3">
 					<form-input

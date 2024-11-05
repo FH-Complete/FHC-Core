@@ -18,6 +18,9 @@ export default {
 	getAllContractTypes(){
 		return this.$fhcApi.get('api/frontend/v1/vertraege/vertraege/getAllContractTypes/');
 	},
+	getAllContractStati(){
+		return this.$fhcApi.get('api/frontend/v1/vertraege/vertraege/getAllContractStati/');
+	},
 	addNewContract(person_id, formData) {
 		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/addNewContract/' +
 			person_id, formData
@@ -33,4 +36,11 @@ export default {
 	deleteContract(vertrag_id){
 		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteContract/' + vertrag_id);
 	},
+	insertContractStatus(params) {
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/insertContractStatus/' + params.vertrag_id + '/' + params.datum + '/' + Object.values(params.status).join('/'));
+	},
+	deleteContractStatus(params) {
+		console.log("API", params.vertrag_id, params.status);
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteContractStatus/' + Object.values(params.vertrag_id).join('/') + '/' +  Object.values(params.status).join('/'));
+	}
 }

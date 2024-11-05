@@ -3,7 +3,6 @@ import {CoreFilterCmpt} from "../../filter/Filter.js";
 import BsModal from "../../Bootstrap/Modal.js";
 import CoreForm from '../../Form/Form.js';
 import FormInput from '../../Form/Input.js';
-import {BismeldestichtagHelper} from "../../../apps/Bismeldestichtag/BismeldestichtagHelper";
 
 export default {
 	components: {

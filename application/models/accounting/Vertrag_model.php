@@ -477,7 +477,9 @@ SELECT
 	{
 		$query = " 
 			SELECT
-					*
+				*,
+                TO_CHAR(tbl_vertrag_vertragsstatus.datum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_datum,
+                TO_CHAR(tbl_vertrag_vertragsstatus.insertamum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_insertamum
 			FROM
 				lehre.tbl_vertrag_vertragsstatus
 				JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz)
