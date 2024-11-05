@@ -7,7 +7,7 @@ import prestudent from "./prestudent.js";
 
 export default {
     props: [ "searchoptions", "searchfunction","selectedtypes" ],
-    
+    emits: ['showSettings'],
     data: function() {
       return {
         searchtimer: null,
@@ -21,6 +21,7 @@ export default {
         showresult: false,  
         searching: false,
         error: null,
+		settingsDropdown:null,
       };
     },
     components: {
@@ -32,18 +33,18 @@ export default {
       prestudent: prestudent
     },
     template: /*html*/`
-          <form ref="searchform" class="d-flex me-3" action="javascript:void(0);" 
+          <form ref="searchform" class="d-flex me-3" action="javascript:void(0);"
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
-           
+
             <div class="h-100 input-group me-2 bg-white">
-           
-                <input ref="searchbox" @keyup="this.search" @focus="this.showsearchresult" 
-                    v-model="this.searchsettings.searchstr" class="form-control" 
+
+                <input ref="searchbox" @keyup="this.search" @focus="this.showsearchresult"
+                    v-model="this.searchsettings.searchstr" class="form-control"
                     type="search" :placeholder="'Search: '+ searchsettings.types.join(' / ')" aria-label="Search">
                 <button data-bs-toggle="collapse" data-bs-target="#searchSettings" aria-expanded="false" aria-controls="searchSettings" ref="settingsbutton"  class="btn btn-outline-secondary" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
-            </div>            
-        
-            <div v-show="this.showresult" ref="result" 
+            </div>
+
+            <div v-show="this.showresult" ref="result"
                  class="searchbar_results" tabindex="-1">
               <div v-if="this.searching">
                 <i class="fas fa-spinner fa-spin fa-2x"></i>
@@ -61,7 +62,7 @@ export default {
               </template>
             </div>
 
-            <div id="searchSettings"  ref="settings" 
+            <div id="searchSettings"  ref="settings"  @[\`show.bs.collapse\`]="$emit('showSettings','settings')"
                  class="top-100 end-0 searchbar_settings text-white collapse" tabindex="-1">
               <div class="d-flex flex-column m-3" v-if="this.searchoptions.types.length > 0">
               <span class="fw-light mb-2">Suche filtern nach:</span>  
@@ -85,6 +86,11 @@ export default {
         this.updateSearchOptions();
         
     },
+	mounted(){
+		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {
+			toggle: false
+		});
+	},
     methods: {
         getActionsForRoom: function(res){
             res.booklink= FHC_JS_DATA_STORAGE_OBJECT.app_root +

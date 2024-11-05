@@ -73,7 +73,7 @@ export default {
 <div class="col-12 col-sm-6 mb-2">
 <div class="row justify-content-center">
       <div class="col-auto " style="position:relative">
-        <img class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"></img>
+        <img class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src">
         <!-- LOCKING IMAGE FUNCTIONALITY -->
         
         

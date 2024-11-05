@@ -22,6 +22,7 @@ export default {
 			activeEntry:null,
 			url:null,
 			urlMatchRankings:[],
+			navUserDropdown:null,
         };
     },
 	provide(){
@@ -48,6 +49,16 @@ export default {
 		}
 	},
 	methods:{
+		toggleCollapsibles(target){
+			switch(target){
+				case 'settings':
+					this.navUserDropdown?.hide();
+					break;
+				case 'navUserDropdown':
+					this.$refs.searchbar?.settingsDropdown?.hide();
+					break;
+			}
+		},
 		makeParentContentActive(content_id, collection=this.entries, parent=null){
 			for(let entry of collection){
 				if(entry.content_id == content_id){
@@ -71,6 +82,9 @@ export default {
 	mounted(){
 		this.entries = this.menu;
 		this.$p.loadCategory(['ui', 'global'])
+		this.navUserDropdown = new bootstrap.Collapse(this.$refs.navUserDropdown,{
+			toggle: false
+		});
 	},
     template: /*html*/`
 	<!--<p>CISVUE HEADER</p>
@@ -80,7 +94,7 @@ export default {
 	<button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-	<fhc-searchbar id="nav-search" class="fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction" :selectedtypes="selectedtypes"></fhc-searchbar>
+	<fhc-searchbar @showSettings="toggleCollapsibles" ref="searchbar" id="nav-search" class="fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction" :selectedtypes="selectedtypes"></fhc-searchbar>
     <a id="nav-logo" class="d-none d-md-block" :href="rootUrl">
         <img :src="logoUrl" alt="Logo">
     </a>
@@ -88,7 +102,7 @@ export default {
 		<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
 			<img :src="avatarUrl" class="avatar rounded-circle"/>
 		</button>
-		<ul id="nav-user-menu" class="collapse list-unstyled" aria-labelledby="nav-user-btn">
+		<ul ref="navUserDropdown" @[\`show.bs.collapse\`]="toggleCollapsibles('navUserDropdown')" id="nav-user-menu" class="collapse list-unstyled" aria-labelledby="nav-user-btn">
 			<li><a class="btn btn-level-2 rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
 			<li class="fhc-languages" style="text-align: center;">
 				<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('German')">Deutsch</a>
