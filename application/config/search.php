@@ -66,7 +66,7 @@ $config['person'] = [
 		]
 	],
 	'resultfields' => [
-		"b.uid", // TODO(chris): multiple?
+		"ARRAY( SELECT uid FROM public.tbl_benutzer WHERE person_id = p.person_id ) AS uids",
 		"p.person_id",
 		"(p.vorname || ' ' || p.nachname) AS name",
 		"ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
@@ -76,8 +76,7 @@ $config['person'] = [
 			AS photo_url"
 	],
 	'resultjoin' => "
-		JOIN public.tbl_person p USING (person_id)
-		LEFT JOIN public.tbl_benutzer b USING (person_id)"
+		JOIN public.tbl_person p USING (person_id)"
 ];
 
 $config['student'] = [
@@ -210,7 +209,6 @@ $config['student'] = [
 		JOIN public.tbl_person p USING(person_id)"
 ];
 
-// TODO(chris): "ref"
 $config['prestudent'] = [
 	'primarykey' => 'prestudent_id',
 	'table' => 'public.tbl_prestudent',
@@ -751,9 +749,6 @@ $config['cms'] = [
 ];
 
 $config['dms'] = [
-	// TODO(chris): IMPLEMENT
-	// TODO(chris): TEST
-	// TODO(chris): project?
 	'primarykey' => 'dms_id, version',
 	'table' => 'campus.tbl_dms_version',
 	'searchfields' => [
