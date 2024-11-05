@@ -43,6 +43,9 @@ export default {
 
 			return null;
 		},
+		site_url(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+		}
 	},
 	methods:{
 		makeParentContentActive(content_id, collection=this.entries, parent=null){
@@ -81,19 +84,20 @@ export default {
     <a id="nav-logo" class="d-none d-md-block" :href="rootUrl">
         <img :src="logoUrl" alt="Logo">
     </a>
-	<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
-		<img :src="avatarUrl" class="avatar rounded-circle"/>
-	</button>
-	<ul id="nav-user-menu" class="collapse list-unstyled" aria-labelledby="nav-user-btn">
-		<li><a class="btn btn-level-2 rounded-0 d-block" href="#" id="menu-profil">Profil</a></li>
-		<li><a class="btn btn-level-2 rounded-0 d-block" href="#">Ampeln</a></li>
-		<li class="fhc-languages" style="text-align: center;">
-			<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('German')">Deutsch</a>
-			<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('English')">English</a>
-		</li>
-		<li><hr class="dropdown-divider"></li>
-		<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>
-	</ul>
+	<div id="nav-user">
+		<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
+			<img :src="avatarUrl" class="avatar rounded-circle"/>
+		</button>
+		<ul id="nav-user-menu" class="collapse list-unstyled" aria-labelledby="nav-user-btn">
+			<li><a class="btn btn-level-2 rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
+			<li class="fhc-languages" style="text-align: center;">
+				<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('German')">Deutsch</a>
+				<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('English')">English</a>
+			</li>
+			<li><hr class="dropdown-divider"></li>
+			<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>
+		</ul>
+	</div>
     <nav id="nav-main" class="offcanvas offcanvas-start bg-dark" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
 			<div id="nav-main-toggle" class="position-static d-none d-lg-block bg-dark">

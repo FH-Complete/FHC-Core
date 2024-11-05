@@ -305,10 +305,12 @@ html {
     right: calc(var(--fhc-cis-header-height) + 2 * var(--fhc-cis-header-px) - 2 * var(--fhc-cis-header-py));
     width: auto !important;
   }
+  #nav-user {
+	position: fixed;
+	top: 0;
+	right: 0;
+  }
   #nav-user-btn {
-    position: fixed;
-    top: 0;
-    right: 0;
     border-width: 0;
     padding: var(--fhc-cis-header-py) var(--fhc-cis-header-px);
     background-color: var(--fhc-cis-primary);
@@ -381,6 +383,9 @@ html {
   }
   #nav-search {
     position: relative;
+  }
+  #nav-user{
+
   }
   #nav-user-btn {
 
