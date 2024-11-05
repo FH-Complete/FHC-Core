@@ -23,6 +23,7 @@ import studstatus from "./studstatus.js";
 import stv from "./stv.js";
 import notiz from "./notiz.js";
 import betriebsmittel from "./betriebsmittel.js";
+import checkperson from "./checkperson.js";
 
 export default {
     search,
@@ -32,5 +33,6 @@ export default {
     studstatus,
     stv,
     notiz,
-    betriebsmittel
+    betriebsmittel,
+    checkperson
 };

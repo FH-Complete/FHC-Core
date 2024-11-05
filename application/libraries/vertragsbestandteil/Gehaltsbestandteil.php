@@ -201,6 +201,10 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 
 	public function setGrundbetrag($grundbetrag)
 	{
+		if(is_float($grundbetrag))
+		{
+		    $grundbetrag = number_format($grundbetrag, 2, '.', '');
+		}
 		$this->markDirty('grundbetrag', $this->grundbetrag, $grundbetrag);
 		$this->grundbetrag = $grundbetrag;
 		return $this;
@@ -208,6 +212,10 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 
 	public function setBetrag_valorisiert($betrag_valorisiert)
 	{
+		if(is_float($betrag_valorisiert))
+		{
+		    $betrag_valorisiert = number_format($betrag_valorisiert, 2, '.', '');
+		}
 		$this->markDirty('betrag_valorisiert', $this->betrag_valorisiert, $betrag_valorisiert);
 		$this->betrag_valorisiert = $betrag_valorisiert;
 		return $this;

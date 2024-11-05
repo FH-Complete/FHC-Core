@@ -26,7 +26,8 @@ export default {
 			saving: false,
 			formData: {
 				grund: ''
-			}
+			},
+			unrulyInternal: false
 		}
 	},
 	computed: {
@@ -77,6 +78,16 @@ export default {
 					this.formData.grund
 				)
 				.then(result => {
+
+					if(this.unrulyInternal) {
+						this.$fhcApi.factory.checkperson.updatePersonUnrulyStatus(this.data.person_id, true).then(
+							(res)=> {
+								if(res?.meta?.status === "success") {
+									this.$fhcAlert.alertSuccess(this.$p.t('studierendenantrag', 'antrag_unruly_updated'))
+								}
+							})
+					}
+
 					if (result.data === true)
 						document.location += "";
 					
@@ -106,10 +117,15 @@ export default {
 			this.formData.grund = event.target.value
 				? this.$p.t('studierendenantrag', event.target.value)
 				: '';
-		},
+		}
 	},
 	created() {
 		this.uuid = _uuid++;
+	},
+	watch: {
+		'formData.grund'(newVal) {
+			this.unrulyInternal = (newVal === this.$p.t('studierendenantrag', 'textLong_unruly'))
+		}
 	},
 	template: `
 	<div class="studierendenantrag-form-abmeldung">
@@ -172,7 +188,11 @@ export default {
 							<option value="textLong_plageat">{{$p.t('studierendenantrag', 'dropdown_plageat')}}
 							</option>					
 							<option value="textLong_MissingZgv">{{$p.t('studierendenantrag', 'dropdown_MissingZgv')}}
-							</option>						
+							</option>	
+<!--
+							<option value="textLong_unruly">{{$p.t('studierendenantrag', 'dropdown_unruly')}}
+							</option>
+-->
 						</select>	
 					</div>
 					<form-input

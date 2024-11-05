@@ -256,9 +256,9 @@ if(isset($_GET['excel']))
 				SELECT studiensemester_kurzbz
 				FROM PUBLIC.tbl_studiensemester
 				WHERE studiensemester_kurzbz = rt.studiensemester_kurzbz
-				
+
 				UNION
-				
+
 				(
 					SELECT studiensemester_kurzbz
 					FROM PUBLIC.tbl_studiensemester
@@ -269,9 +269,9 @@ if(isset($_GET['excel']))
 							)
 					ORDER BY ende DESC LIMIT 1
 					)
-				
+
 				UNION
-				
+
 				(
 					SELECT studiensemester_kurzbz
 					FROM PUBLIC.tbl_studiensemester
@@ -820,8 +820,8 @@ if(isset($_GET['excel']))
 		<title>Reihungstest</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		
-		<?php 
+
+		<?php
 			include('../../include/meta/jquery.php');
 			include('../../include/meta/jquery-tablesorter.php');
 		?>
@@ -951,15 +951,15 @@ if(isset($_GET['excel']))
 				});
 
 				$("#studienplan_autocomplete").autocomplete({
-					source: function(request, response) 
+					source: function(request, response)
 					{
-						$.getJSON("reihungstestverwaltung_autocomplete.php", 
-						{ 
+						$.getJSON("reihungstestverwaltung_autocomplete.php",
+						{
 							autocomplete: 'studienplan',
 							aktiv: 'true',
 							studiensemester_kurzbz: $('#studiensemester_dropdown').val(),
 							term: request.term
-						}, 
+						},
 						response);
 					},
 					minLength:2,
@@ -1247,7 +1247,7 @@ if(isset($_GET['excel']))
 				});
 				window.location.href = "mailto:?bcc="+mailadressen;
 			}
-			
+
 			function SendMessage()
 			{
 				// Wenn Checkboxen markiert sind, an diese senden, sonst an alle
@@ -1411,7 +1411,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 		$reihungstest->insertvon = $user;
 		$reihungstest->insertamum = date('Y-m-d H:i:s');
 	}
-	
+
 	// OE über Studiengang des Reihungstests laden und Berechtigung prüfen
 	$stg_rechtecheck = new studiengang($reihungstest->studiengang_kz);
 	if(!$rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'sui'))
@@ -1439,7 +1439,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$error = true;
 		}
 	}
-	
+
 	if (isset($_POST['zugangs_ueberpruefung']) && $_POST['zugangcode'] === '')
 	{
 		$messageError .= '<p>Der Zugangscode muss ausgefüllt sein, wenn die Zugangsüberprüfung aktiviert ist. </p>';
@@ -1548,7 +1548,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 					$rt_stpl->new = true;
 					$rt_stpl->reihungstest_id = $reihungstest->reihungstest_id;
 					$rt_stpl->studienplan_id = $studienplan;
-					
+
 					if (!in_array($studienplan, $rt_stplaeneArray))
 					{
 						if (!$rt_stpl->saveStudienplanReihungstest())
@@ -1572,7 +1572,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 				$rt_studienplan = new reihungstest();
 				$rt_studienplan->getStudienplaeneReihungstest($_POST['reihungstest_id']);
 				$error = false;
-				foreach ($rt_studienplan->result as $row) 
+				foreach ($rt_studienplan->result as $row)
 				{
 					$rtKopieStudienplan = new reihungstest();
 					$rtKopieStudienplan->new = true;
@@ -1609,7 +1609,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 				{
 					$messageSuccess .= '<p>Der Termin wurde erfolgreich kopiert</p>';
 				}
-				else 
+				else
 				{
 					$messageSuccess .= '<p>Neuer Reihungstesttermin erfolgreich angelegt</p>';
 				}
@@ -1666,14 +1666,14 @@ if(isset($_POST['raumzuteilung_speichern']))
 		{
 			die($raumzuteilung->errormsg);
 		}
-		
+
 		// OE über Studiengang des Reihungstests laden und Berechtigung prüfen
 		$stg_rechtecheck = new studiengang($raumzuteilung->studiengang_kz);
 		if(!$rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'su'))
 		{
 			die($rechte->errormsg);
 		}
-		
+
 		if (isset($_POST['checkbox']))
 		{
 			$person_ids = $_POST['checkbox'];
@@ -1914,7 +1914,7 @@ if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 		{
 			die($rechte->errormsg);
 		}
-		
+
 		$orte = new Reihungstest();
 		$orte->getOrteReihungstest($reihungstest_id);
 
@@ -2001,7 +2001,7 @@ if(isset($_POST['aufsicht']) && $_POST['aufsicht']!='' && !isset($_POST['kopiere
 		{
 			die($rechte->errormsg);
 		}
-		
+
 		//Reihungstest laden
 		if(!$save_aufsicht->load($_POST['reihungstest_id']))
 		{
@@ -2047,7 +2047,7 @@ if(isset($_POST['delete_ort']))
 		{
 			die($rechte->errormsg);
 		}
-		
+
 		$delete_ort = new reihungstest();
 		$delete_ort->getPersonReihungstestOrt($_POST['reihungstest_id'], $_POST['delete_ort']);
 
@@ -2119,7 +2119,7 @@ echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=-1&studiensemester_kurzbz="
 foreach ($studiengang->result as $row)
 {
 	$stg_arr[$row->studiengang_kz] = $row->kuerzel;
-	
+
 	if ($typ != $row->typ || $typ == '')
 	{
 		if ($typ != '')
@@ -2128,14 +2128,14 @@ foreach ($studiengang->result as $row)
 		}
 		echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ] != ''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
 	}
-	
+
 	if ($stg_kz == '')
 		$stg_kz = $row->studiengang_kz;
 	if ($row->studiengang_kz == $stg_kz)
 		$selected = 'selected';
 	else
 		$selected = '';
-	
+
 	echo "<OPTION value='" . $_SERVER['PHP_SELF'] . "?stg_kz=$row->studiengang_kz&studiensemester_kurzbz=$studiensemester_kurzbz' $selected>" . $db->convert_html_chars($row->kuerzel) . " (" . $db->convert_html_chars($row->bezeichnung) . ")</OPTION>" . "\n";
 	$typ = $row->typ;
 }
@@ -2293,7 +2293,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			<td>
 				<select name='stufe'>
 				<option value=''>-- keine Auswahl --</option>
-					<?php 
+					<?php
 							// An der FHTW wird eine Beschreibung neben der Stufe angezeigt
 							if (defined('DOMAIN') && DOMAIN == 'technikum-wien.at')
 							{
@@ -2306,6 +2306,8 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 								echo '<option value="1" '.($reihungstest->stufe == 1 ? 'selected' : '').'>1</option>';
 								echo '<option value="2" '.($reihungstest->stufe == 2 ? 'selected' : '').'>2</option>';
 								echo '<option value="3" '.($reihungstest->stufe == 3 ? 'selected' : '').'>3</option>';
+								echo '<option value="4" '.($reihungstest->stufe == 4 ? 'selected' : '').'>4</option>';
+								echo '<option value="5" '.($reihungstest->stufe == 5 ? 'selected' : '').'>5</option>';
 							}
 					?>
 				</select>
@@ -2575,7 +2577,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 		<tr>
 			<td></td>
 			<td>
-				<?php 	
+				<?php
 					if(!$neu)
 					{
 						if($rechte->isBerechtigt('lehre/reihungstest',  $stg_rechtecheck->oe_kurzbz, 'sui'))
@@ -2588,7 +2590,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 					{
 						echo '<button type="submit" name="speichern">Neu anlegen</button>';
 					}
-					
+
 					if($rechte->isBerechtigt('lehre/reihungstest',  $stg_rechtecheck->oe_kurzbz, 'suid'))
 					{
 						$anzahl_teilnehmer = new reihungstest();
@@ -2701,9 +2703,9 @@ if($reihungstest_id!='')
 			SELECT studiensemester_kurzbz
 			FROM PUBLIC.tbl_studiensemester
 			WHERE studiensemester_kurzbz = rt.studiensemester_kurzbz
-			
+
 			UNION
-			
+
 			(
 				SELECT studiensemester_kurzbz
 				FROM PUBLIC.tbl_studiensemester
@@ -2714,9 +2716,9 @@ if($reihungstest_id!='')
 						)
 				ORDER BY ende DESC LIMIT 1
 				)
-			
+
 			UNION
-			
+
 			(
 				SELECT studiensemester_kurzbz
 				FROM PUBLIC.tbl_studiensemester
@@ -3152,7 +3154,7 @@ if($reihungstest_id!='')
 					echo '</div>';
 			}
 		}
-} 
+}
 
 /**
  * Liefert die interne Empfangsadresse des Studiengangs fuer den Mailversand.
@@ -3168,18 +3170,18 @@ if($reihungstest_id!='')
 function getMailEmpfaenger($studiengang_kz, $studienplan_id = null, $orgform_kurzbz = null)
 {
 	$studiengang = new studiengang($studiengang_kz);
-	
+
 	if ($studienplan_id != '')
 	{
 		$studienplan = new studienplan();
 		$studienplan->loadStudienplan($studienplan_id);
 	}
-	
+
 	$empf_array = array();
 	$empfaenger = '';
 	if(defined('BEWERBERTOOL_BEWERBUNG_EMPFAENGER'))
 		$empf_array = unserialize(BEWERBERTOOL_BEWERBUNG_EMPFAENGER);
-		
+
 	// Umgehung für FHTW. Ausprogrammiert im Code
 	if(defined('BEWERBERTOOL_MAILEMPFANG') && BEWERBERTOOL_MAILEMPFANG != '')
 	{
@@ -3199,7 +3201,7 @@ function getMailEmpfaenger($studiengang_kz, $studienplan_id = null, $orgform_kur
 	}
 	else
 		$empfaenger = $studiengang->email;
-		
+
 	if ($empfaenger != '')
 		return $empfaenger;
 	else

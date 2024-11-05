@@ -85,6 +85,8 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			betrag bytea,
 			gehaltsbestandteil_id integer,
 			mitarbeiter_uid character varying(32),
+			gehaltsbestandteil_von date,
+			gehaltsbestandteil_bis date,
 			CONSTRAINT tbl_gehaltshistorie_pk PRIMARY KEY (gehaltshistorie_id)
 		);
 
@@ -568,5 +570,39 @@ if ($result = $db->db_query("SELECT * FROM hr.tbl_vertragsart WHERE vertragsart_
 			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
 		else
 			echo 'Vertragsart "Dienstverhältnis zu einer anderen Bildungseinrichtung oder einem anderen Träger" erstellt.<br />';
+	}
+}
+
+if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE column_name='gehaltsbestandteil_von' AND table_name='tbl_gehaltshistorie' AND table_schema='hr'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+		    ALTER TABLE 
+			hr.tbl_gehaltshistorie 
+		    ADD COLUMN
+			gehaltsbestandteil_von date
+		";
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte gehaltsbestandteil_von wurde in hr.tbl_gehaltshistorie neu erstellt<br>';
+	}
+}
+
+if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE column_name='gehaltsbestandteil_bis' AND table_name='tbl_gehaltshistorie' AND table_schema='hr'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+		    ALTER TABLE 
+			hr.tbl_gehaltshistorie 
+		    ADD COLUMN
+			gehaltsbestandteil_bis date
+		";
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte gehaltsbestandteil_bis wurde in hr.tbl_gehaltshistorie neu erstellt<br>';
 	}
 }
