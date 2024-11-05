@@ -31526,6 +31526,26 @@ array(
 	),
 	array(
 		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'invalidTitel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ungültiger Titel',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invalid title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'global',
 		'phrase' => 'gespeichert',
 		'insertvon' => 'system',
