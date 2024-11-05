@@ -318,6 +318,6 @@ export default {
 		const mergedFhcApiFactory = options?.factory ? {...FhcApiFactory, ...options.factory} : FhcApiFactory;
 
 		app.config.globalProperties.$fhcApi.factory = new FhcApiFactoryWrapper(mergedFhcApiFactory);
-
+                app.provide('$fhcApi', app.config.globalProperties.$fhcApi);
 	}
 };

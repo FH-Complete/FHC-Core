@@ -394,5 +394,6 @@ export default {
 			}
 		};
 		app.config.globalProperties.$fhcAlert = $fhcAlert;
+                app.provide('$fhcAlert', app.config.globalProperties.$fhcAlert);
 	}
 }
