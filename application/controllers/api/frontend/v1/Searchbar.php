@@ -50,7 +50,6 @@ class Searchbar extends FHCAPI_Controller
 	 */
 	public function search()
 	{
-		#$searchstrings = ['pid:71995', 'email:eder.iris', 'schnabl', 'schnabl thomas', 'schnabl thomas sarim', 'schnabl -thomas', 'nachname:schnabl -vorname:thomas', 'schnabl thomas -sarim', 'schnabl or hacker', '-ali', '-ali -baba', '-ali -baba -raub', '-ali -honig', '-ali -baba ali', 'hofer martin'];
 		$this->load->library('form_validation');
 
 		// Checks if the searchstr and the types parameters are in the POSTed JSON

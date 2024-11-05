@@ -32,11 +32,6 @@ class SearchBarLib
 	const ERROR_WRONG_TYPES = 'ERR004';
 	const ERROR_NOT_AUTH = 'ERR005';
 
-	// List of allowed types of search
-	const ALLOWED_TYPES = ['mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'organisationunit', 'raum', 'person', 'student', 'prestudent', 'document', 'cms'];
-
-	const PHOTO_IMG_URL = '/cis/public/bild.php?src=person&person_id=';
-
 	private $_ci; // Code igniter instance
 
 	private $_searchfunction_priorities = [];
