@@ -2057,5 +2057,29 @@ array (
     ),
   ),
 ),
+
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'unrulyPersonFound',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Unruly Person wurde gefunden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Unruly Person detected',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
 );
 

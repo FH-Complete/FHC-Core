@@ -2681,5 +2681,29 @@ array (
     ),
   ),
 ),
+
+array (
+  'app' => 'core',
+  'category' => 'person',
+  'phrase' => 'unruly',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Unruly',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Unruly',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
 );
 

@@ -3483,4 +3483,124 @@ array (
     ),
   ),
 ),
+
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'antrag_unruly',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Unruly',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Unruly',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'antrag_unruly_updated',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Unruly Person Status wurde aktualisiert.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Unruly person status has been updated.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'textLong_unruly',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Person ist unruly',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Person is unruly',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'dropdown_unruly',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Person ist unruly.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Person is unruly.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'mark_person_as_unruly',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Person ist unruly.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Person is unruly.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
 );
