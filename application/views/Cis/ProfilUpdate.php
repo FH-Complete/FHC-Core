@@ -1,16 +1,49 @@
 <?php 
-$includesArray = ['title'=> 'Profil Änderungen',
-                  'customJSModules'=> ['public/js/apps/Cis/ProfilUpdateRequests.js'],
-                  'tabulator5'=> true,
-                  'customCSSs'=>['public/css/components/FilterComponent.css','public/css/components/FormUnderline.css'],
-                 ];
+$includesArray = array(
+    'title' => 'Profil Änderungen',
+    'vue3' => true,
+    'bootstrap5' => true,
+    'fontawesome6'=> true,
+    'axios027' => true,
+    'tabulator5' => true,
+    'customJSModules' => array(
+	'public/js/apps/Cis/ProfilUpdateRequests.js'
+    ),
+    'customCSSs' => array(
+	'public/css/components/FilterComponent.css','public/css/components/FormUnderline.css'
+    )
+);
 
-$this->load->view('templates/CISHTML-Header',$includesArray);
+if(defined("CIS4"))
+{
+	$this->load->view(
+		'templates/CISVUE-Header',
+		$includesArray
+	);
+}
+else
+{
+	$this->load->view(
+		'templates/FHC-Header',
+		$includesArray
+	);
+}
 ?>
-
 
 <div id="content">
 <profil-update-view id="<?php echo isset($profil_update_id)?$profil_update_id:null ?>"></profil-update-view>
 </div>
 
-<?php $this->load->view('templates/CISHTML-Footer',$includesArray); ?>
+<?php
+if (defined("CIS4")) {
+	$this->load->view(
+		'templates/CISVUE-Footer',
+		$includesArray
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Footer', 
+		$includesArray
+	);
+}
+?>
