@@ -44,7 +44,7 @@ export default {
 		:res="res"
 		:actions="actions"
 		:title="res.name"
-		:image-fallback="'fas fa-' + icon + ' fa-4x p-5 text-white bg-primary'"
+		:image-fallback="'fas fa-' + icon + ' fa-4x'"
 		@actionexecuted="$emit('actionexecuted')"
 		>
 		<div class="searchbar_table">

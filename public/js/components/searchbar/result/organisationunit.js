@@ -22,7 +22,7 @@ export default {
 		:res="res"
 		:actions="actions"
 		:title="res.name"
-		image-fallback="fas fa-sitemap fa-4x p-4 text-white bg-primary"
+		image-fallback="fas fa-sitemap fa-4x"
 		@actionexecuted="$emit('actionexecuted')"
 		>
 		<div class="searchbar_table">

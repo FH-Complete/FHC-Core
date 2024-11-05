@@ -97,37 +97,69 @@
 /* new variant with template/frame */
 
 .searchbar-result {
-    border-bottom: 1px solid lightgrey;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
+	border-bottom: 1px solid lightgrey;
+	margin-bottom: 1rem;
+	padding-bottom: 1rem;
 }
 
 .searchbar-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .5rem;
-    padding: 0;
-    margin: 1rem 0 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+	padding: 0;
+	margin: 1rem 0 0;
 }
 
 .searchbar-square-image {
-    position: relative;
-    display: block;
-    height: 0;
-    padding-bottom: 100%;
+	position: relative;
+	display: block;
+	height: 0;
+	padding-bottom: 100%;
+}
+.searchbar-square-image > * {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+}
+.searchbar-square-image > img {
+	object-fit: cover;
+}
+.searchbar-square-image > div {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	color: rgba(var(--bs-white-rgb),1);
+	background-color: rgba(var(--bs-primary-rgb),var(--bs-bg-opacity));
+}
+.searchbar-square-image.rounded-circle > img,
+.searchbar-square-image.rounded-circle > div {
+	border-radius: 50%;
 }
 
-.searchbar-square-image > * {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
+.searchbar-rounded-image {
+	display: block;
+	width: 100%;
 }
-.searchbar-square-image img {
-    object-fit: cover;
+.searchbar-rounded-image > img {
+	width: 100%;
+}
+.searchbar-rounded-image > div {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	color: rgba(var(--bs-white-rgb),1);
+	background-color: rgba(var(--bs-primary-rgb),var(--bs-bg-opacity));
+	height: calc((100px - .75em) * 1.3);
+}
+.searchbar-rounded-image > img,
+.searchbar-rounded-image > div {
+	border-radius: .25rem;
 }
 
 .no-margin-paragraphs p {
-    margin: 0;
+	margin: 0;
 }

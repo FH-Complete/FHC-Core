@@ -21,7 +21,7 @@ export default {
 		:actions="actions"
 		:title="res.name"
 		:image="res.photo_url"
-		image-fallback="fas fa-user-circle fa-7x"
+		image-fallback="fas fa-user fa-4x"
 		@actionexecuted="$emit('actionexecuted')"
 		>
 		<div class="searchbar_table">

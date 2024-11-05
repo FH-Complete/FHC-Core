@@ -22,14 +22,13 @@ export default {
 					:res="res"
 					:action="actions.defaultaction"
 					@actionexecuted="$emit('actionexecuted')"
-					class="searchbar-square-image"
+					class="searchbar-rounded-image"
 					>
 					<img
 						v-if="image"
 						:src="image"
-						class="rounded-circle"
 						/>
-					<div v-else class="d-flex justify-content-center align-items-center rounded-circle overflow-hidden">
+					<div v-else>
 						<i :class="imageFallback"></i>
 					</div>
 				</result-action>

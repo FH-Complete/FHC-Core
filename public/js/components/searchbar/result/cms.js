@@ -69,7 +69,7 @@ export default {
 		:res="res"
 		:actions="actions"
 		:title="res.title"
-		image-fallback="fas fa-newspaper fa-4x p-4 text-white bg-primary"
+		image-fallback="fas fa-newspaper fa-4x"
 		@actionexecuted="$emit('actionexecuted')"
 		>
 		<img v-if="flag" :src="flag" class="ms-2">
