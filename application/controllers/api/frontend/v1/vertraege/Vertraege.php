@@ -20,7 +20,9 @@ class Vertraege extends FHCAPI_Controller
 			'addNewContract' => ['admin:r', 'assistenz:r'],
 			'deleteContract' => ['admin:r', 'assistenz:r'],
 			'insertContractStatus' => ['admin:r', 'assistenz:r'],
+			'loadContractStatus' => ['admin:r', 'assistenz:r'],
 			'deleteContractStatus' => ['admin:r', 'assistenz:r'],
+			'updateContractStatus' => ['admin:r', 'assistenz:r'],
 		]);
 
 		//Load Models
@@ -30,6 +32,7 @@ class Vertraege extends FHCAPI_Controller
 		$this->load->model('accounting/Vertragvertragsstatus_model', 'VertragvertragsstatusModel');
 	}
 
+	//TODO(Manu) validations, phrases
 	public function getAllVertraege($person_id)
 	{
 		$result = $this->VertragModel->loadContractsOfPerson($person_id);
@@ -37,7 +40,6 @@ class Vertraege extends FHCAPI_Controller
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-
 		$this->terminateWithSuccess((getData($result) ?: []));
 	}
 
@@ -48,7 +50,6 @@ class Vertraege extends FHCAPI_Controller
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-
 		$this->terminateWithSuccess((getData($result) ?: []));
 	}
 
@@ -59,7 +60,6 @@ class Vertraege extends FHCAPI_Controller
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-
 		$this->terminateWithSuccess((getData($result) ?: []));
 	}
 
@@ -70,7 +70,6 @@ class Vertraege extends FHCAPI_Controller
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-
 		$this->terminateWithSuccess((getData($result) ?: []));
 	}
 
@@ -86,7 +85,6 @@ class Vertraege extends FHCAPI_Controller
 
 	public function getAllContractStati()
 	{
-		//TODO(MANUU)
 		$result = $this->VertragsstatusModel->load();
 		if (isError($result))
 		{
@@ -124,7 +122,6 @@ class Vertraege extends FHCAPI_Controller
 			'insertvon' => getAuthUID()
 		]);
 
-		//add entry with status neu in lehre.tbl_vertrag_vertragsstatus
 		//TODO(Manu) validation, dass status nicht schon bereits vorhanden
 		$status_result = $this->VertragvertragsstatusModel->insert([
 			'vertrag_id' => $result->retval,
@@ -232,7 +229,7 @@ class Vertraege extends FHCAPI_Controller
 		if (!hasData($result)) {
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Vertrag_id']), self::ERROR_TYPE_GENERAL);
 		}
-		return $this->outputJsonSuccess(current(getData($result)));
+		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
 	public function insertContractStatus ($vertrag_id, $datum, $status){
@@ -261,11 +258,11 @@ class Vertraege extends FHCAPI_Controller
 			$this->terminateWithError('Fehler beim Hinzufügen des Vertragsstatus.');
 		}
 
-		return $this->outputJsonSuccess(current(getData($status_result)));
+		return $this->terminateWithSuccess(current(getData($status_result)));
 	}
 
 	public function deleteContractStatus($vertrag_id, $status){
-		//return $this->terminateWithError($vertrag_id . " - " . $status, self::ERROR_TYPE_GENERAL);
+
 		$result = $this->VertragvertragsstatusModel->delete(
 			array(
 				'vertrag_id' => $vertrag_id,
@@ -279,6 +276,50 @@ class Vertraege extends FHCAPI_Controller
 		if (!hasData($result)) {
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'vertragsstatus_kurzb']), self::ERROR_TYPE_GENERAL);
 		}
-		return $this->outputJsonSuccess(current(getData($result)));
+		return $this->terminateWithSuccess(current(getData($result)));
+	}
+
+	public function loadContractStatus ($vertrag_id, $status){
+
+		$result = $this->VertragvertragsstatusModel->loadWhere(
+			array(
+				'vertrag_id' => $vertrag_id,
+				'vertragsstatus_kurzbz' => $status
+			)
+		);
+		if (!$result) {
+			$this->terminateWithError('Status not existing');
+		}
+		return $this->terminateWithSuccess(current(getData($result)));
+	}
+
+	public function updateContractStatus ($vertrag_id, $datum, $status){
+/*		$result = $this->VertragvertragsstatusModel->loadWhere(
+			array(
+				'vertrag_id' => $vertrag_id,
+				'vertragsstatus_kurzbz' => $status
+			)
+		);
+
+		if (hasData($result)) {
+			$this->terminateWithError("status bereits vorhanden", self::ERROR_TYPE_GENERAL);
+			// $this->terminateWithError($this->p->t('ui', 'error_status_existing', ['id' => 'Vertrag_id']), self::ERROR_TYPE_GENERAL);
+		}*/
+
+		$status_result = $this->VertragvertragsstatusModel->update([
+			'vertrag_id' => $vertrag_id,
+			'vertragsstatus_kurzbz' => $status],
+			[
+			'uid' => getAuthUID(),
+			'updateamum' => date('c'),
+			'updatevon' => getAuthUID(),
+			'datum' => $datum
+		]);
+
+		if (!$status_result) {
+			$this->terminateWithError('Fehler beim Updaten des Vertragsstatus.');
+		}
+
+		return $this->terminateWithSuccess(current(getData($status_result)));
 	}
 }

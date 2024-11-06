@@ -132,6 +132,10 @@ export default {
 			listContractTypes: [],
 			contractSelected: [],
 			listContractStati: [],
+			contractFormData: {
+				vertragsstatus_kurzbz: 'test',
+				datum: new Date()
+			}
 		//	isContractModalVisible: true,
 		}
 	},
@@ -147,7 +151,6 @@ export default {
 				.then(this.$refs.contractModal.show);
 		},
 		actionDeleteContract(vertrag_id) {
-			console.log("actionDeleteContract" + vertrag_id);
 			this.$fhcAlert
 				.confirmDelete()
 				.then(result => result
@@ -156,7 +159,7 @@ export default {
 				.then(this.endpoint.deleteContract)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-					window.scrollTo(0, 0);
+					//window.scrollTo(0, 0);
 					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -168,45 +171,8 @@ export default {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractModal.hide();
 					this.resetModal();
-					window.scrollTo(0, 0);
+					//window.scrollTo(0, 0);
 					this.reload();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
-		addNewContractStatus({status, datum}) {
-			const date = new Date();
-
-			//TODO(Manu) refactor this
-			const formattedDate = datum.toLocaleDateString('en-CA');
-			let params = {
-				vertrag_id : this.contractSelected.vertrag_id,
-				status: {status},
-				datum: formattedDate
-			}
-
-			return this.endpoint
-				.insertContractStatus(params)
-				.then(response => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-
-					this.$refs.contractstati.closeModal();
-					window.scrollTo(0, 0);
-					this.$refs.contractstati.reload();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
-		deleteContractStatus({status, vertrag_id}){
-			let params = {
-				vertrag_id : {vertrag_id},
-				status: {status}
-			}
-			return this.endpoint
-				.deleteContractStatus(params)
-				.then(response => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-
-					window.scrollTo(0, 0);
-					this.$refs.contractstati.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -217,7 +183,6 @@ export default {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractModal.hide();
 					this.resetModal();
-					window.scrollTo(0, 0);
 					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -229,6 +194,74 @@ export default {
 				.loadContract(vertrag_id)
 				.then(result => {
 					this.formData = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		addNewContractStatus({status, datum}) {
+			const date = new Date();
+			//TODO(Manu) refactor this
+			const formattedDate = datum.toLocaleDateString('en-CA');
+			let params = {
+				vertrag_id : this.contractSelected.vertrag_id,
+				status: {status},
+				datum: formattedDate
+			};
+
+			return this.endpoint
+				.insertContractStatus(params)
+				.then(response => {
+					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+
+					this.$refs.contractstati.closeModal();
+					//window.scrollTo(0, 0);
+					this.$refs.contractstati.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		deleteContractStatus({status, vertrag_id}){
+			let params = {
+				vertrag_id : {vertrag_id},
+				status: {status}
+			};
+			return this.endpoint
+				.deleteContractStatus(params)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+
+					//window.scrollTo(0, 0);
+					this.$refs.contractstati.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		updateContractStatus({datum, status}){
+			//TODO(Manu) refactor this
+			const formattedDate = datum.toLocaleDateString('en-CA');
+			let params = {
+				vertrag_id : this.contractSelected.vertrag_id,
+				datum : formattedDate,
+				status: {status}
+			};
+			return this.endpoint
+				.updateContractStatus(params)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+
+					//window.scrollTo(0, 0);
+					this.$refs.contractstati.closeModal();
+					this.$refs.contractstati.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		loadContractStatus({vertrag_id, status}){
+			let params = {
+				vertrag_id : {vertrag_id},
+				status: {status}
+			};
+			return this.endpoint
+				.loadContractStatus(params)
+				.then(response => {
+					this.contractFormData = response.data;
+					this.$refs.contractstati.openModal();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -259,7 +292,6 @@ export default {
 		this.$nextTick(() => {
 			this.$refs.table.tabulator.on("rowClick", (e, row) => {
 				this.contractSelected = row.getData();
-				console.log("vertrag_id: ", this.contractSelected.vertrag_id);
 			});
 		});
 	},
@@ -279,7 +311,6 @@ export default {
 			@click:new="actionNewContract"
 			>
 		</core-filter-cmpt>		
-		Vertrag: {{contractSelected.vertrag_id}}
 		
 		<div class = "row">
 		
@@ -293,9 +324,14 @@ export default {
 			<div class="col-sm-6">
 				<!-- ContractStati -->
 				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">      
-					<contract-stati :vertrag_id="contractSelected.vertrag_id" :listContractStati="listContractStati"
+					<contract-stati 
+					:vertrag_id="contractSelected.vertrag_id" 
+					:listContractStati="listContractStati"
+					:formDataParent="contractFormData"
 					@setContractStatus="addNewContractStatus"
 					@deleteContractStatus="deleteContractStatus"
+					@updateContractStatus="updateContractStatus"
+					@loadContractStatus="loadContractStatus"
 					ref="contractstati"
 					></contract-stati>
 				</div>

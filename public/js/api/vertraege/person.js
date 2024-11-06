@@ -36,11 +36,17 @@ export default {
 	deleteContract(vertrag_id){
 		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteContract/' + vertrag_id);
 	},
+	loadContractStatus(params){
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/loadContractStatus/' + Object.values(params.vertrag_id).join('/') + '/' + Object.values(params.status).join('/'));
+	},
 	insertContractStatus(params) {
 		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/insertContractStatus/' + params.vertrag_id + '/' + params.datum + '/' + Object.values(params.status).join('/'));
 	},
+	updateContractStatus(params) {
+		console.log("API", params.vertrag_id, params.status, params.datum);
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/updateContractStatus/' + params.vertrag_id + '/' + params.datum + '/' + Object.values(params.status).join('/'));
+	},
 	deleteContractStatus(params) {
-		console.log("API", params.vertrag_id, params.status);
 		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteContractStatus/' + Object.values(params.vertrag_id).join('/') + '/' +  Object.values(params.status).join('/'));
 	}
 }

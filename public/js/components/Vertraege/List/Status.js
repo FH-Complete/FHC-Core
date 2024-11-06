@@ -20,6 +20,10 @@ export default {
 			type: Array,
 			required: true
 		},
+		formDataParent: {
+			type: Object,
+			required: true
+		}
 	},
 	data() {
 		return {
@@ -53,6 +57,17 @@ export default {
 
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = 'Status bearbeiten';
+							button.addEventListener(
+								'click',
+								(event) =>
+									this.actionEditStatus(cell.getData().vertrag_id, cell.getData().vertragsstatus_kurzbz)
+							);
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = 'Status löschen';
 							button.addEventListener(
@@ -75,7 +90,8 @@ export default {
 				selectable: true,
 			},
 			clickedRows: [],
-			formContractData: {
+			statusNew: true,
+			formData: {
 				vertragsstatus_kurzbz: null,
 				datum: new Date()
 			},
@@ -84,34 +100,64 @@ export default {
 	watch: {
 		vertrag_id() {
 			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getStatiOfContract/' + this.vertrag_id);
+		},
+		formDataParent: {
+			handler(newVal, oldVal) {
+				this.formData = this.formDataParent;
+			},
+			deep: true
 		}
 	},
 	methods: {
 		actionNewStatus() {
-			console.log("actionNewStatus");
+			this.resetModal();
 			this.$refs.contractStatus.show();
 		},
+		actionEditStatus(vertrag_id, status) {
+			this.statusNew = false;
+			this.$emit('loadContractStatus', {
+				status: status,
+				vertrag_id: vertrag_id
+			});
+		},
 		actionDeleteStatus(vertrag_id, status) {
-			console.log("action: deleteStatus " + status + " from Vertrag" + vertrag_id);
 			this.$emit('deleteContractStatus', {
 				status: status,
 				vertrag_id: vertrag_id
 			  });
 		},
-		handleSubmit(){
-			this.$emit('setContractStatus', {
-				status: this.formContractData.vertragsstatus_kurzbz,
-				datum: this.formContractData.datum
-			  });
+		handleSubmit(action){
+			if (action == 'new') {
+				this.$emit('setContractStatus', {
+				status: this.formData.vertragsstatus_kurzbz,
+				datum: this.formData.datum
+				});
+			}
+			if (action == 'edit') {
+				this.$emit('updateContractStatus', {
+					status: this.formData.vertragsstatus_kurzbz,
+					datum: this.formData.datum
+				});
+			}
 		},
 		closeModal(){
 			this.$refs.contractStatus.hide();
 			this.$emit('close-modal');
 		},
+		openModal(){
+			this.$refs.contractStatus.show();
+			this.$emit('open-modal');
+		},
 		reload() {
 			this.$refs.table.reloadTable();
 			this.$emit('reload');
 		},
+		resetModal(){
+			this.formData = {};
+			this.formData.vertragsstatus_kurzbz = null;
+			this.formData.datum = new Date();
+			this.statusNew = true;
+		}
 	},
 	template: `
 	<!--TODO(Manu) check filter (akzeptiert, neu, erteilt?), design -->
@@ -144,7 +190,7 @@ export default {
 							type="DatePicker"
 							:label="$p.t('global/datum')"
 							name="datum"
-							v-model="formContractData.datum"
+							v-model="formData.datum"
 							auto-apply
 							:enable-time-picker="false"
 							format="dd.MM.yyyy"
@@ -157,8 +203,9 @@ export default {
 						<form-input
 							type="select"
 							:label="$p.t('global/typ')"
-							v-model="formContractData.vertragsstatus_kurzbz"
+							v-model="formData.vertragsstatus_kurzbz"
 							name="vertragsstatus_kurzbz"
+							:disabled="!statusNew"
 							>
 							<option :value="null">{{$p.t('ui', 'bitteWaehlen')}}</option>
 							<option
@@ -173,7 +220,7 @@ export default {
 				</core-form>
 
 				<template #footer>
-					<button type="button" class="btn btn-primary" @click="handleSubmit()">{{$p.t('ui', 'speichern')}}</button>
+					<button type="button" class="btn btn-primary" @click="statusNew ? handleSubmit('new') : handleSubmit('edit')">{{$p.t('ui', 'speichern')}}</button>
 				</template>
 
 			</bs-modal>
