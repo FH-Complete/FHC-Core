@@ -12,33 +12,38 @@ export default {
 		actions: Object
 	},
 	computed: {
-		telurl() {
-			return 'tel:' + this.employee?.phone;
-		},
 		person() {
-			const person = this.res.list.filter(item => item.type == 'person');
-			if (person.length)
-				return person.pop();
+			 // Cummulate all emails
+			const email = this.res.list.reduce((a, c) => [...a, ...(Array.isArray(c.email) ? c.email : [c.email])], []);
 
-			// TODO(chris): first one might have not one of these but a later one
-			const { person_id, name, photo_url, email } = this.res.list[0];
+			// Use person entry if available (with cummulated emails)
+			const person = this.res.list.find(item => item.type == 'person');
+			if (person)
+				return {...person, email};
+
+			 // Those properties should be the same in all entries
+			const { person_id, name } = this.res.list[0];
+			 // Get first photo (prefer student photo if available)
+			const photo_url = ((this.students ? this.students.find(el => el.photo_url) : null) || this.employee)?.photo_url;
+
 			return { person_id, name, photo_url, email };
 		},
 		employee() {
-			const ma = this.res.list.filter(item => [
+			return this.res.list.find(item => [
 				'employee',
 				'unassigned_employee'
-			].includes(item.type));
-			return ma.length ? ma.pop() : null;
+			].includes(item.type)) || null;
 		},
 		students() {
 			const students = this.res.list.filter(item => item.type == 'prestudent');
 			return students.length ? students : null;
 		},
 		emails() {
-			if (Array.isArray(this.person.email))
-				return new Set(this.person.email);
-			return [this.person.email];
+			// Remove duplicates
+			return new Set(this.person.email);
+		},
+		telurl() {
+			return 'tel:' + this.employee?.phone;
 		}
 	},
 	template: `
