@@ -39,6 +39,18 @@ class LvMenu extends FHCAPI_Controller
 			'getLvMenu' => self::PERM_LOGGED
 		]);
 
+		$this->load->model("ressource/Mitarbeiter_model");
+		$this->load->model("education/Lehreinheit_model");
+		$this->load->model("education/Lehrveranstaltung_model");
+		$this->load->model("organisation/Studiengang_model");
+		$this->load->model("accounting/Vertrag_model");
+		$this->load->model("system/Variable_model");
+		$this->load->model("person/Benutzergruppe_model");
+		$this->load->model("education/Lvangebot_model");
+		$this->load->model("ressource/Lehretools_model");
+
+		$this->load->library("PermissionLib", null, 'PermissionLib');
+
 		$this->load->library("PhrasesLib");
 		$this->loadPhrases(array('global'));
 	}
@@ -58,57 +70,36 @@ class LvMenu extends FHCAPI_Controller
 
 		// FH-Core Variables 
 		// ##########################################################################################
-
-		require_once(FHCPATH.'config/cis.config.inc.php');
-		require_once(FHCPATH.'include/lehrveranstaltung.class.php');
-		require_once(FHCPATH.'include/studiensemester.class.php');
-		require_once(FHCPATH.'include/lehreinheit.class.php');
-		require_once(FHCPATH.'include/vertrag.class.php');
-		require_once(FHCPATH.'include/functions.inc.php');
-		require_once(FHCPATH.'include/benutzerberechtigung.class.php');
-		require_once(FHCPATH.'include/studiengang.class.php');
 		require_once(FHCPATH.'include/phrasen.class.php');
-		require_once(FHCPATH.'include/lvangebot.class.php');
-		require_once(FHCPATH.'include/lehre_tools.class.php');
-		// data gets not returned
-		//require_once(FHCPATH.'addons/moodle/lib/LogicCourses.php');
-		//require_once(FHCPATH.'addons/moodle/lib/Database.php');
 
 		// get the sprache
-		$sprache = getSprache();
+		$sprache = getUserLanguage();
 		$p = new phrasen($sprache);
 		//$p = $this->$p;
 
-		// get the db
-		if (!$db = new basis_db())
-		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-
 		// get the user
 		if (!$user=getAuthUID())
-			die($p->t('global/nichtAngemeldet'));
+		    $this->terminateWithError($p->t('global/nichtAngemeldet'));
 
 		// check if is_lector
-		if(check_lektor($user))
-			$is_lector=true;
-		else
-			$is_lector=false;
+		$is_lector = false;
+		$mares = $this->Mitarbeiter_model->isMitarbeiter($user);
+		if(hasData($mares))
+		{
+		    $is_lector = getData($mares);
+		}
 
 		// definition of user_is_allowed_to_upload
 		$user_is_allowed_to_upload=false;
-
-		// rechte des users
-		$rechte = new benutzerberechtigung();
-		$rechte->getBerechtigungen($user);
-
 		$angezeigtes_stsem = $studiensemester_kurzbz;
 
-		// load lehreinheit
-		$lehreinheit = new lehreinheit($lvid);
-
 		// load lehrveranstaltung
-		$lv_obj = new lehrveranstaltung();
-		$lv_obj->load($lvid);
-		$lv=$lv_obj;
+		$lvres = $this->Lehrveranstaltung_model->load($lvid);
+		if(!hasData($lvres)) 
+		{
+		    $this->terminateWithError('LV ' . $lvid . ' not found.');
+		}
+		$lv = (getData($lvres))[0];
 
 		// define studiengang_kz / semester / lehrverzeichnis
 		$studiengang_kz = $lv->studiengang_kz;
@@ -116,20 +107,16 @@ class LvMenu extends FHCAPI_Controller
 		$short = $lv->lehreverzeichnis;
 
 		// load studiengang
-		$stg_obj = new studiengang();
-		$stg_obj->load($lv->studiengang_kz);
-		$kurzbz = $stg_obj->kuerzel;
+		$stgres = $this->Studiengang_model->load($lv->studiengang_kz);
+		if(!hasData($stgres))
+		{
+		    $this->terminateWithError('Stg ' . $lv->studiengang_kz . ' nof found.');
+		}
+		$stg = (getData($stgres))[0];
+		$kurzbz = strtoupper($stg->typ . $stg->kurzbz);
 
 		$short_name = $lv->bezeichnung;
 		$short_short_name = $lv->lehreverzeichnis;
-
-		// create documents directory
-		$dir_name=DOC_ROOT.'/documents';
-		if(!is_dir($dir_name))
-		{
-			exec('mkdir -m 755 '.escapeshellarg($dir_name));
-			exec('sudo chown www-data:teacher '.escapeshellarg($dir_name));
-		}
 
 		// angemeldet
 		$angemeldet = true;
@@ -137,10 +124,11 @@ class LvMenu extends FHCAPI_Controller
 		{
 			$angemeldet = false;
 
-			$lehrveranstaltung_obj = new lehrveranstaltung();
-			$result = $lehrveranstaltung_obj->getLehreinheitenOfLv($lvid, $user, $angezeigtes_stsem);
+			$lesres = $this->Lehreinheit_model->getLehreinheitenForStudentAndStudienSemester(
+			    $lvid, $user, $angezeigtes_stsem
+			);
 
-			if(count($result)>0)
+			if(hasData($lesres) && count(getData($lesres)) > 0)
 				$angemeldet = true;
 		}
 
@@ -153,72 +141,66 @@ class LvMenu extends FHCAPI_Controller
 			// wird zusätzlich das Lehrfach der Lehreinheit angezeigt.
 			if($is_lector )
 			{
-				$result = $lehreinheit->lehrfach_id_mitarbeiter($angezeigtes_stsem,$user,$lvid);
+				$result = $this->Lehreinheit_model->getLehrfachIdMitarbeiter($angezeigtes_stsem,$user,$lvid);
 			}
 			else
 			{
-				$result = $lehreinheit->lehrfach_id_studierender($angezeigtes_stsem,$user,$lvid);
-				
+				$result = $this->Lehreinheit_model->getLehrfachIdStudierender($angezeigtes_stsem,$user,$lvid);
 			}
 
 			// Wenn die LV mehrere verschiedenen Lehrfaecher hat, und der User zu mehreren davon zugeteilt ist
 			// wird das Lehrfach nicht angezeigt damit es nicht zu verwirrungen kommt.
-			if(count($result)==1 && $row = $result[0])
-			{   
-				$lehrfach_id=$row->lehrfach_id;
+			if( ($lehrfaecher = getData($result)) && count($lehrfaecher)==1 && ($lehrfach = $lehrfaecher[0]))
+			{
+				$lehrfach_id=$lehrfach->lehrfach_id;
 			}
 		}
 
 		// lektor der lv
 		$lektor_der_lv=false;
-		
-		$db_result = $lehreinheit->lehreinheitInfo($lvid,$angezeigtes_stsem,$lehrfach_id);
 
-		$num_rows_result = count($db_result);
+		$leinfores = $this->Lehreinheit_model->getLehreinheitInfo($lvid,$angezeigtes_stsem,$lehrfach_id);
+		$db_result = hasData($leinfores) ? getData($leinfores) : array();
 
-		if($num_rows_result > 0)
+		foreach($db_result as $row_lector)
 		{
-			
-			foreach($db_result as $row_lector)
+
+			// Lektor wird erst angezeigt wenn der Auftrag erteilt wurde
+			if (defined('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON')
+				&& CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON != '')
 			{
-				
-				// Lektor wird erst angezeigt wenn der Auftrag erteilt wurde
-				if (defined('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON')
-					&& CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON != '')
+				if (!$this->Vertrag_model->isVertragErteiltLV($lvid, $angezeigtes_stsem, $row_lector->uid))
 				{
-					$vertrag = new vertrag();
-					if (!$vertrag->isVertragErteiltLV($lvid, $angezeigtes_stsem, $row_lector->uid))
-					{
-						continue;
-					}
+					continue;
 				}
-
-			
-				if($user==$row_lector->uid)
-				{
-					$lektor_der_lv=true;
-					$user_is_allowed_to_upload=true;
-				}
-
-				// style of the link
-				if($row_lector->lvleiter=='t')
-					$style='style="font-weight: bold"';
-				else
-					$style='';
-
 			}
+
+
+			if($user == $row_lector->uid)
+			{
+				$lektor_der_lv=true;
+				$user_is_allowed_to_upload=true;
+			}
+
+			// style of the link
+			if($row_lector->lvleiter === true)
+				$style='style="font-weight: bold"';
+			else
+				$style='';
+
 		}
 
 		//Berechtigungen auf Fachbereichsebene
 		$lehrfach_oe_kurzbz_arr = array();
-		if($result = $lv_obj->getBerechtigungenAufFachberechsebene($lvid,$angezeigtes_stsem))
+		$fbres = $this->Lehrveranstaltung_model->getBerechtigungenAufFachberechsebene($lvid, $angezeigtes_stsem);
+		$fbs = (hasData($fbres)) ? getData($fbres) : array();
+		foreach($fbs as $row)
 		{
-			foreach($result as $row)
+			$lehrfach_oe_kurzbz_arr[] = $row->oe_kurzbz;
+			if($this->PermissionLib->isBerechtigt('lehre', null, $row->oe_kurzbz) 
+			    || $this->PermissionLib->isBerechtigt('assistenz', null, $stg->oe_kurzbz))
 			{
-				$lehrfach_oe_kurzbz_arr[]=$row->oe_kurzbz;
-				if($rechte->isBerechtigt('lehre',$row->oe_kurzbz) || $rechte->isBerechtigt('assistenz',$stg_obj->oe_kurzbz)){
-					$user_is_allowed_to_upload=true;
-				}
+				$user_is_allowed_to_upload=true;
 			}
 		}
 
@@ -230,21 +212,21 @@ class LvMenu extends FHCAPI_Controller
 		//todo: digitale anwesenheiten sollte ein Events.php im config/ folder beinhalten
 		//$this->fhc_menu_digitale_anwesenheiten($menu, $angemeldet, $studiengang_kz, $semester, $lvid, $angezeigtes_stsem, $p);
 
-		$this->fhc_menu_lvinfo($menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $rechte, $lehrfach_oe_kurzbz_arr, $p);
+		$this->fhc_menu_lvinfo($menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $lehrfach_oe_kurzbz_arr, $p);
 		
 		$this->fhc_menu_feedback($menu, $angemeldet, $lvid, $p);
 		
-		$this->fhc_menu_gesamtnote($menu, $angemeldet, $lvid, $lv_obj, $is_lector, $angezeigtes_stsem, $p);
+		$this->fhc_menu_gesamtnote($menu, $angemeldet, $lvid, $lv, $is_lector, $angezeigtes_stsem, $p);
 		
-		$this->fhc_menu_emailStudierende($menu, $angemeldet, $lehreinheit->lehreinheit_id, $p);
+		$this->fhc_menu_emailStudierende($menu, $user, $angemeldet, $lvid, $angezeigtes_stsem, $p);
 		
 		$this->fhc_menu_abmeldung($menu, $user, $is_lector, $lvid, $angezeigtes_stsem, $p);
 		
 		$this->fhc_menu_lehretools($menu, $lvid, $angezeigtes_stsem, $sprache);
 		
-		$this->fhc_menu_anrechnungStudent($menu, $rechte, $lvid, $angezeigtes_stsem, $p);
+		$this->fhc_menu_anrechnungStudent($menu, $lvid, $angezeigtes_stsem, $p);
 		
-		$this->fhc_menu_anrechnungLector($menu, $rechte, $angezeigtes_stsem, $p);
+		$this->fhc_menu_anrechnungLector($menu, $angezeigtes_stsem, $p);
 		
 		// LEGACY FH-CORE MENU POINTS
 		//$this->fhc_menu_notenliste($menu, $angemeldet, $is_lector, $lvid, $studiengang_kz, $angezeigtes_stsem, $kurzbz, $semester, $short_short_name, $p);
@@ -256,29 +238,29 @@ class LvMenu extends FHCAPI_Controller
 
 		// Addons Menu Logic
 		// ##########################################################################################		
-        
+
 		$params = [
 			'sprache'=>$sprache,
 			'p'=>$p,
 			'ci_p'=> $this->p,
-			'db'=>$db,
+			//'db'=>$db,
 			'user'=>$user,
 			'is_lector'=>$is_lector,
 			'user_is_allowed_to_upload'=>$user_is_allowed_to_upload,
-			'rechte'=>$rechte,
+			//'rechte'=>$rechte,
 			'angezeigtes_stsem'=>$angezeigtes_stsem,
-			'lehreinheit'=>$lehreinheit,
-			'lv_obj'=>$lv_obj,
+			//'lehreinheit'=>$lehreinheit,
+			'lv_obj'=>$lv,
 			'lv'=>$lv,
 			'lvid'=>$lvid,
 			'studiengang_kz'=>$studiengang_kz,
 			'semester'=>$semester,
 			'short'=>$short,
-			'stg_obj'=>$stg_obj,
+			'stg_obj'=>$stg,
 			'kurzbz'=>$kurzbz,
 			'short_name'=>$short_name,
 			'short_short_name'=>$short_short_name,
-			'dir_name'=>$dir_name,
+			//'dir_name'=>$dir_name,
 			'angemeldet'=>$angemeldet,
 			'lehrfach_id'=>$lehrfach_id,
 			'lektor_der_lv'=>$lektor_der_lv,
@@ -311,10 +293,6 @@ class LvMenu extends FHCAPI_Controller
 
 		array_multisort($pos, SORT_ASC, SORT_NUMERIC, $menu);
 
-		// DEBUGGING
-		$this->addMeta("is_lector",$is_lector);
-		$this->addMeta("lektor_der_lv",$lektor_der_lv);
-
 		// HTTP response
 		// ##########################################################################################
 		
@@ -340,7 +318,7 @@ class LvMenu extends FHCAPI_Controller
 		}
 	}
 
-	private function fhc_menu_lvinfo(&$menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $rechte, $lehrfach_oe_kurzbz_arr, $p){
+	private function fhc_menu_lvinfo(&$menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $lehrfach_oe_kurzbz_arr, $p){
 		
 		// LVINFO
 		if(!defined('CIS_LEHRVERANSTALTUNG_LVINFO_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_LVINFO_ANZEIGEN)
@@ -351,8 +329,8 @@ class LvMenu extends FHCAPI_Controller
 			// Oder Berechtigung zum Bearbeiten eingetragen ist
 			if((!defined('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT') && $lektor_der_lv)
 			|| (defined('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT') && CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT==true && $lektor_der_lv)
-			|| $rechte->isBerechtigt('lehre/lvinfo',$studiengang_kz)
-			|| $rechte->isBerechtigtMultipleOe('lehre/lvinfo', $lehrfach_oe_kurzbz_arr)
+			|| $this->PermissionLib->isBerechtigt('lehre/lvinfo',$studiengang_kz)
+			|| $this->PermissionLib->isBerechtigtMultipleOe('lehre/lvinfo', $lehrfach_oe_kurzbz_arr)
 			)
 			{
 				$c4_linkList[]= [$p->t('lehre/lvInfoBearbeiten'), 'ects/index.php?lvid='.$lvid];
@@ -424,43 +402,62 @@ class LvMenu extends FHCAPI_Controller
 
 	
 
-	private function fhc_menu_emailStudierende(&$menu, $angemeldet, $lehreinheit_id,$p){
+	private function fhc_menu_emailStudierende(&$menu, $user, $angemeldet, $lvid, $angezeigtes_stsem, $p){
 		// Email an Studierende
 		if((!defined('CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN) && $angemeldet)
 		{
 			$mailto='mailto:';
 			$c4_linkList=array();
 			
-			// load the Lehreinheit model and get the student mails
-			$this->load->model('education/Lehreinheit_model','LehreinheitModel');
-			$studentMails = $this->LehreinheitModel->getStudentenMail($lehreinheit_id);
+			$studentMailsRes = $this->Lehrveranstaltung_model->getStudentEMail($lvid, $angezeigtes_stsem);
 			
 			// get the data of the database result and map the array of objects to their object property
-			$studentMails = $this->getDataOrTerminateWithError($studentMails, 'No student mails found');
+			$studentMails = $this->getDataOrTerminateWithError($studentMailsRes, 'No student mails found');
 			
-			// emails used to create the mailto link
-			$mailtoMails = array();
-			$noMails = array();
-			$noMailLink = FALSE;
 
-			foreach($studentMails as $mail){
-				
-				if($mail->mail == 'nomail'){
-					$noMails[]=$mail->gruppe_kurzbz;
-					$noMailLink= TRUE;
-				}else{
-					$mailtoMails[]=$mail->mail;
+			$nomail='';
+			$variablesres = $this->Variable_model->getVariables($user);
+			$variables = (hasData($variablesres)) ? getData($variablesres) : array();
+
+			foreach ($studentMails as $row)
+			{
+				if($row->gruppe_kurzbz != '')
+				{
+					$bngrp_uids = $this->Benutzergrupp_model->getUids($row->gruppe_kurzbz, $angezeigtes_stsem);
+					if(count($bngrp_uids) > 0)
+					{
+						if(!$row->mailgrp)
+						{
+							$nomail = $row->gruppe_kurzbz . ' ';
+						}
+						else
+						{
+							$mailto .= mb_strtolower($row->gruppe_kurzbz . '@' 
+								. DOMAIN . $variables['emailadressentrennzeichen']);
+						}
+					}
+				}
+				else
+				{
+					$mailto .= mb_strtolower($row->stg_typ . $row->stg_kurzbz 
+						. $row->semester . trim($row->verband) . trim($row->gruppe) 
+						. '@' . DOMAIN . $variables['emailadressentrennzeichen']);
 				}
 			}
 
-			if($noMailLink){
-				$c4_linkList[]=[$p->t('lehre/keinMailverteiler',array(implode(" ",$noMails))), '#'];
-				$link_onclick='alert(\''.$p->t('lehre/keinMailverteiler',array(implode(" ",$noMails))).'\');';
-			}else{
-				$link_onclick='';
+			if($nomail != '') 
+			{
+				$c4_linkList[] = array(
+					$p->t('lehre/keinMailverteiler', array($nomail)), 
+					'#'
+				);
+				$link_onclick = 'alert(\''.$p->t('lehre/keinMailverteiler', array($nomail)) . '\');';
+			}
+			else
+			{
+				$link_onclick = '';
 			}
 			
-			$mailto .= implode(',',$mailtoMails);
 			
 			$menu[]=array
 			(
@@ -483,9 +480,8 @@ class LvMenu extends FHCAPI_Controller
 		{
 			if(!$is_lector)
 			{
-				$lvangebot = new lvangebot();
-				$gruppen = $lvangebot->AbmeldungMoeglich($lvid, $angezeigtes_stsem, $user);
-				if(count($gruppen)>0)
+				$gruppen = $this->Lvangebot_model->AbmeldungMoeglich($lvid, $angezeigtes_stsem, $user);
+				if(count($gruppen) > 0)
 				{
 					$menu[]=array
 					(
@@ -503,304 +499,50 @@ class LvMenu extends FHCAPI_Controller
 
 	private function fhc_menu_lehretools(&$menu, $lvid, $angezeigtes_stsem, $sprache){
 		//Anzeigen von zusaetzlichen Lehre-Tools
-		$lehretools = new lehre_tools();
-		if($lehretools->getTools($lvid, $angezeigtes_stsem))
+		$lehretools = $this->Lehretools_model->getTools($lvid, $angezeigtes_stsem, $sprache);
+		foreach($lehretools as $row)
 		{
-			if(count($lehretools->result)>0)
-			{
-				foreach($lehretools->result as $row)
-				{
-					$menu[]=array
-					(
-						'id'=>'core_menu_lehretools_'.$row->lehre_tools_id,
-						'position'=>'1000',
-						'name'=>$row->bezeichnung[$sprache],
-						'c4_icon'=>base_url('cms/dms.php?id='.$row->logo_dms_id),
-						'c4_link'=>$row->basis_url,
-					);
-				}
-			}
+			$menu[] = array(
+				'id' => 'core_menu_lehretools_' . $row->lehre_tools_id,
+				'position' => '1000',
+				'name' => $row->bezeichnung,
+				'c4_icon' => base_url('cms/dms.php?id='.$row->logo_dms_id),
+				'c4_link' => $row->basis_url,
+			);
 		}
 	}
 
-	private function fhc_menu_anrechnungStudent(&$menu, $rechte, $lvid, $angezeigtes_stsem, $p){
+    private function fhc_menu_anrechnungStudent(&$menu, $lvid, $angezeigtes_stsem, $p){
 		// Anerkennung nachgewiesener Kenntnisse (Anrechnung) - Anzeige fuer Studenten
 		if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN)
-        && $rechte->isBerechtigt('student/anrechnung_beantragen'))
+			&& $this->PermissionLib->isBerechtigt('student/anrechnung_beantragen'))
 		{
 			$menu[]=array
 			(
-				'id'=>'core_menu_anerkennungNachgewiesenerKenntnisse',
-				'position'=>'128',
-				'name'=>$p->t('lehre/anrechnung'),
-				'c4_icon'=>base_url('skin/images/button_listen.png'),
+				'id' => 'core_menu_anerkennungNachgewiesenerKenntnisse',
+				'position' => '128',
+				'name' => $p->t('lehre/anrechnung'),
+				'c4_icon' => base_url('skin/images/button_listen.png'),
 				'c4_icon2' => 'fa-regular fa-folder-open',
 				'c4_link' => base_url('cis.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid))
 			);
 		}
-	}
+    }
 
-	private function fhc_menu_anrechnungLector(&$menu, $rechte, $angezeigtes_stsem, $p){
+    private function fhc_menu_anrechnungLector(&$menu, $angezeigtes_stsem, $p){
 		// Anerkennung nachgewiesener Kenntnisse (Anrechnung) - Anzeige fuer LektorInnen
 		if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN)
-		&& $rechte->isBerechtigt('lehre/anrechnung_empfehlen'))
+			&& $this->PermissionLib->isBerechtigt('lehre/anrechnung_empfehlen'))
 		{
-		$menu[]=array
-		(
-			'id'=>'core_menu_anerkennungNachgewiesenerKenntnisse_empfehlen',
-			'position'=>'128',
-			'name'=>$p->t('lehre/anrechnungen'),
-			'c4_icon'=> base_url('skin/images/button_listen.png'),
-			'c4_icon2' => 'fa-regular fa-folder-open',
-			'c4_link' => base_url('cis.php/lehre/anrechnung/ReviewAnrechnungUebersicht?studiensemester='.urlencode($angezeigtes_stsem))
-		);
-		}
-	}
-
-// OLD PINBOARD MENU POINT *********************************************************************************************************************************************
-/*
-private function  fhc_menu_pinboard(&$menu, $angemeldet, $is_lector, $studiengang_kz, $semester, $p){
-		// Pinboard
-		if((!defined('CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN) && $angemeldet)
-		{
-			$text='';
-			if($is_lector)
-				$text.= "<a href='../../../cms/newsverwaltung.php?studiengang_kz=$studiengang_kz&semester=$semester' class='Item'>".$p->t('profil/adminstration')."</a>";
-			
-			// this is the new cis4 version
 			$menu[]=array
 			(
-				'id'=>'core_menu_pinboard',
-				'position'=>'110',
-				'name'=>$p->t('lehre/pinboard'),
-				'c4_icon'=>base_url('skin/images/button_pinboard.png'),
-				'c4_link'=>base_url('CisVue/Cms/news'),
-				'text'=>$text
-			);
-
-			
-		}
-	}
-*/
-
-// LEGACY MENU POINTS THAT USED OWN DIRECTORIES *************************************************************************************************************************
-/* 	
-	private function fhc_menu_semesterplan(&$menu, $angemeldet, $user_is_allowed_to_upload, $rechte, $lvid, $studiengang_kz, $kurzbz, $semester, $short_short_name, $p){
-		
-		// Semesterplan
-		if((!defined('CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_ANZEIGEN) && $angemeldet)
-		{
-			$dir_name = $this->ensureDirectoryExists($kurzbz, $semester, $short_short_name, 'semesterplan','teacher');
-			
-			$dir_empty = $this->isDirectoryEmpty($dir_name);
-
-			if($dir_empty == false)
-			{
-				$link = $dir_name.'/';
-			}
-			else
-				$link = '';
-
-			$text='';
-			if((!defined('CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_LEKTOR_EDIT') && $user_is_allowed_to_upload)
-			|| (defined('CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_LEKTOR_EDIT') && CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_LEKTOR_EDIT==true && $user_is_allowed_to_upload)
-			|| $rechte->isBerechtigt('admin',$studiengang_kz) || $rechte->isBerechtigt('lehre',$studiengang_kz))
-			{
-				$text.= '<a class="Item" href="#" onClick="javascript:window.open(\'semupload.php?lvid='.$lvid.'\',\'_blank\',\'width=400,height=300,location=no,menubar=no,status=no,toolbar=no\');return false;">';
-				$text.= $p->t('lehre/semesterplanUpload')."</a>";
-
-				$text.= '&nbsp;&nbsp;&nbsp;<a class="Item" href="semdownhlp.php" >';
-				$text.= $p->t('lehre/semesterplanVorlage');
-				$text.= ' [html]';
-				$text.= '</a>';
-				$text.= '&nbsp;<a class="Item" href="semdownhlp.php?format=doc" >';
-				$text.= '[doc]';
-				$text.= '</a>';
-				$text.= '&nbsp;<a href="#" onClick="showSemPlanHelp()";>('.$p->t('lehre/semesterplanVorlageHilfe').')</a>';
-			}
-
-			$menu[]=array
-			(
-				'id'=>'core_menu_semesterplan',
-				'position'=>'20',
-				'name'=>$p->t('lehre/semesterplan'),
-				'icon'=>'../../../skin/images/button_semplan.png',
-				'link'=>$link,
-				'c4_icon'=> base_url('skin/images/button_semplan.png'),
-				'c4_link'=> $link,
-				'link_target'=>'_blank',
-				'text'=>$text
-			);
-		}
-	} 
-	
-	private function fhc_menu_stundenupload(&$menu, $angemeldet, $lvid, $is_lector, $studiengang_kz, $kurzbz, $semester, $short, $short_short_name, $p){
-		// Studentenupload
-		if((!defined('CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN) && $angemeldet)
-		{
-			$link='';
-			$link_target='';
-
-			$dir_name = $this->ensureDirectoryExists($kurzbz, $semester, $short_short_name, 'upload','student');
-			$dir_empty = $this->isDirectoryEmpty($dir_name);
-
-			if(isset($dir_empty) && $dir_empty == false)
-			{
-				if($is_lector == true)
-				{
-					$link='lector_choice.php?lvid='.urlencode($lvid);
-					$link_target='_blank';
-				}
-				else
-				{
-					$link='upload.php?course_id='.urlencode($studiengang_kz).'&term_id='.urlencode($semester).'&short='.urlencode($short);
-					$link_target='_blank';
-				}
-			}
-			else
-			{
-				if($is_lector == true)
-				{
-					$link='';
-				}
-				else
-				{
-					$link='upload.php?course_id='.urlencode($studiengang_kz).'&term_id='.urlencode($semester).'&short='.urlencode($short);
-					$link_target='_blank';
-				}
-			}
-			$menu[]=array
-			(
-				'id'=>'core_menu_studentenupload',
-				'position'=>'90',
-				'name'=>$p->t('lehre/studentenAbgabe'),
-				'c4_icon'=>'skin/images/button_studiupload.png',
-				'c4_link'=>$link,
-				'link_target'=>$link_target
-			);
-		}
-	}
-	
-	private function fhc_menu_download(&$menu, $angemeldet, $user_is_allowed_to_upload, $rechte, $semester, $kurzbz, $studiengang_kz, $short_short_name, $short, $p){
-		
-		if((!defined('CIS_LEHRVERANSTALTUNG_DOWNLOAD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_DOWNLOAD_ANZEIGEN) && $angemeldet)
-		{
-			$dir_name = $this->ensureDirectoryExists($kurzbz, $semester, $short_short_name, 'download','teacher');
-			$dir_empty = $this->isDirectoryEmpty($dir_name);
-
-			$text = '';
-			if($dir_empty == false)
-			{
-				$link = $dir_name.'/';
-			}
-			else
-				$link = '';
-
-			//Wenn user eine Lehrfachzuteilung fuer dieses Lehrfach hat wird
-			//Ein Link zum Upload angezeigt und ein Link um das Download-Verzeichnis
-			//als Zip Archiv herunterzuladen
-			if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$studiengang_kz) || $rechte->isBerechtigt('lehre',$studiengang_kz))// || $rechte->isBerechtigt('lehre',null,null,$fachbereich_id))
-			{
-				$text.= mb_strtolower("$kurzbz/$semester/$short/download");
-				$text.=  '<br>';
-				$text.=  "<a class='Item' target='_blank' href='upload.php?course_id=$studiengang_kz&term_id=$semester&short=$short'>".$p->t('lehre/upload')."</a>";
-				$text.=  '&nbsp;&nbsp;&nbsp;';
-			}
-
-			$menu[]=array
-			(
-				'id'=>'core_menu_download',
-				'position'=>'30',
-				'name'=>$p->t('lehre/download'),
-				'icon'=>'../../../skin/images/button_download.png',
-				'link'=>$link,
-				'c4_icon'=> base_url('skin/images/button_download.png'),
-				'c4_link'=>$link,
-				'text'=>$text
-			);
-		}
-	}
-
-	private function fhc_menu_notenliste(&$menu, $angemeldet, $is_lector, $lvid, $studiengang_kz, $angezeigtes_stsem, $kurzbz, $semester, $short_short_name, $p){
-		// Anwesenheits und Notenlisten
-		if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN || $is_lector)
-		{
-			$link='';
-			$name='';
-			if($is_lector)
-			{
-				$name = $p->t('lehre/anwesenheitsUndNotenlisten');
-				$link= "anwesenheitsliste.php?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&stsem=$angezeigtes_stsem";
-			}
-
-			$text='';
-			if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && ($angemeldet || $is_lector))
-			{
-				$dir_name = $this->ensureDirectoryExists($kurzbz, $semester, $short_short_name, 'leistung','teacher');
-				$dir_empty = $this->isDirectoryEmpty($dir_name);
-
-				if($dir_empty == false)
-				{
-					
-					if($is_lector)
-					{
-						$text.= '<a href="'.$dir_name.'" target="_blank">';
-						$text.= '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
-						$text.= '</a>';
-					}
-					else
-					{
-						$name = $p->t('lehre/leistungsuebersicht');
-						$link = $dir_name;
-					}
-				}
-				else
-				{
-					if($is_lector)
-					{
-						$text.= '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
-					}
-					else
-					{
-						$name = $p->t('lehre/leistungsuebersicht');
-						$link = '';
-					}
-				}
-			}
-
-			$menu[]=array
-			(
-				'id'=>'core_menu_anwesenheitslisten',
-				'position'=>'40',
-				'name'=>$name,
-				'icon'=>'../../../skin/images/button_listen.png',
-				'link'=>$link,
+				'id' => 'core_menu_anerkennungNachgewiesenerKenntnisse_empfehlen',
+				'position' => '128',
+				'name' => $p->t('lehre/anrechnungen'),
 				'c4_icon'=> base_url('skin/images/button_listen.png'),
-				'c4_link'=>$link,
-				'text'=>$text
+				'c4_icon2' => 'fa-regular fa-folder-open',
+				'c4_link' => base_url('cis.php/lehre/anrechnung/ReviewAnrechnungUebersicht?studiensemester='.urlencode($angezeigtes_stsem))
 			);
 		}
-	}
-
-	private function ensureDirectoryExists($kurzbz, $semester, $short_short_name, $type, $role){
-		$dir_name = DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/'.$type;
-
-		if (!is_dir($dir_name)) {
-			exec('mkdir -m 775 -p '.escapeshellarg($dir_name));
-			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
-			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
-			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
-			exec('sudo chown www-data:'.$role.' '.escapeshellarg($dir_name));
-		}
-
-		return $dir_name;
-	}
-
-	private function isDirectoryEmpty($dir){
-		return count(scandir($dir)) == 2 ? true : false;
-	}
-
-	*/
-
-
+    }
 }
