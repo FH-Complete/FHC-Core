@@ -309,7 +309,18 @@ $config['prestudent'] = [
 			FROM public.tbl_status
 			WHERE status_kurzbz = public.get_rolle_prestudent(ps.prestudent_id, NULL)
 			LIMIT 1
-		) as status"
+		) AS status",
+		"COALESCE(
+			(
+				SELECT COALESCE(plan.orgform_kurzbz, pss.orgform_kurzbz)
+				FROM public.tbl_prestudentstatus pss
+				LEFT JOIN lehre.tbl_studienplan plan USING (studienplan_id)
+				WHERE pss.prestudent_id=ps.prestudent_id
+				ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
+				LIMIT 1
+			),
+			sg.orgform_kurzbz
+		) AS orgform"
 	],
 	'resultjoin' => "
 		LEFT JOIN public.tbl_prestudent ps USING (prestudent_id)

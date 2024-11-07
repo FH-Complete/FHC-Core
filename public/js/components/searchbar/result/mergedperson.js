@@ -139,7 +139,7 @@ export default {
 					<div class="searchbar_tablerow">
 						<div class="searchbar_tablecell ps-3">{{ $p.t('lehre/studiengang') }}</div>
 						<div class="searchbar_tablecell">
-							{{ student.bezeichnung }}
+							{{ student.bezeichnung }} {{ student.orgform ? '(' + student.orgform + ')' : '' }}
 						</div>
 					</div>
 					<div class="searchbar_tablerow">

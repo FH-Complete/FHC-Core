@@ -60,7 +60,7 @@ export default {
 			<div class="searchbar_tablerow">
 				<div class="searchbar_tablecell">{{ $p.t('lehre/studiengang') }}</div>
 				<div class="searchbar_tablecell">
-					{{ res.bezeichnung }}
+					{{ res.bezeichnung }} {{ res.orgform ? '(' + res.orgform + ')' : '' }}
 				</div>
 			</div>
 		</div>
