@@ -322,8 +322,6 @@ html {
   }
   #nav-user-menu {
     position: absolute;
-    top: var(--fhc-cis-header-height);
-    right: 0;
     min-width: var(--fhc-cis-menu-width);
     background-color: var(--fhc-cis-menu-lvl-2-bg);
   }
@@ -385,7 +383,7 @@ html {
     position: relative;
   }
   #nav-user{
-
+	position: relative;
   }
   #nav-user-btn {
 
@@ -396,8 +394,8 @@ html {
     width: 2rem;
   }
   #nav-user-menu {
-    position: relative !important;
-    transform: none !important;
+    position: absolute;
+	background-color: var(--fhc-cis-menu-lvl-2-bg);
   }
   #nav-main-menu {
     display: block;

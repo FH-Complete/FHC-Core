@@ -102,13 +102,13 @@ export default {
 		<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
 			<img :src="avatarUrl" class="avatar rounded-circle"/>
 		</button>
-		<ul ref="navUserDropdown" @[\`show.bs.collapse\`]="toggleCollapsibles('navUserDropdown')" id="nav-user-menu" class="collapse list-unstyled" aria-labelledby="nav-user-btn">
-			<li><a class="btn btn-level-2 rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
-			<li class="fhc-languages" style="text-align: center;">
+		<ul ref="navUserDropdown" @[\`show.bs.collapse\`]="toggleCollapsibles('navUserDropdown')" id="nav-user-menu" class="top-100 end-0 collapse list-unstyled" aria-labelledby="nav-user-btn">
+			<li class="btn-level-2"><a class="btn btn-level-2 rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
+			<li class="fhc-languages btn-level-2" style="text-align: center;">
 				<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('German')">Deutsch</a>
 				<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('English')">English</a>
 			</li>
-			<li><hr class="dropdown-divider"></li>
+			<li class="btn-level-2"><hr class="dropdown-divider p-0 "></li>
 			<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>
 		</ul>
 	</div>
