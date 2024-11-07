@@ -1,6 +1,7 @@
 import BsModal from "../../Bootstrap/Modal.js";
 import Alert from "../../Bootstrap/Alert.js";
 import LvMenu from "./LvMenu.js"
+import { numberPadding,formatDate } from "../../../helpers/DateHelpers.js"
 
 export default {
 	components: {
@@ -40,32 +41,24 @@ export default {
 			if (!this.event.start instanceof Date){
 				return this.event.start;
 			}
-			return this.event.start.getHours() + ":" + this.event.start.getMinutes();
+			return numberPadding(this.event.start.getHours()) + ":" + numberPadding(this.event.start.getMinutes());
 		},
 		end_time: function(){
 			if (!this.event.end) return 'N/A';
 			if (!this.event.end instanceof Date) {
 				return this.event.end;
 			}
-			return this.event.end.getHours() + ":" + 
-			// returns the string '00' if the function getMinutes returns 0
-			(this.event.end.getMinutes() || typeof this.event.end.getMinutes() === 'number' && this.event.end.getMinutes().toString() + '0');
+			return numberPadding(this.event.end.getHours()) + ":" + numberPadding(this.event.end.getMinutes());
 		}
 	},
 	methods:{
-		add_padding_to_date_number: function(number)
+		mehtodNumberPadding: function(number)
 		{
-			return number.toString().length == 1 ? '0' + number.toString() : number.toString();
+			return numberPadding(number);
 		},
-		format_date: function(d)
+		methodFormatDate: function(d)
 		{
-			let date = new Date(d);
-			// if the date is an invalid string then creating a date from the string will fail and N/A is returned
-			if (isNaN(date.valueOf()))
-			{
-				return 'N/A';
-			}
-			return `${this.add_padding_to_date_number(date.getDate())}.${this.add_padding_to_date_number(date.getMonth() + 1)}.${this.add_padding_to_date_number(date.getFullYear())}`;
+			return formatDate(d);
 		},
 		onModalShow: function()
 		{
@@ -107,7 +100,7 @@ export default {
 								$p.t('global','datum')+':'
 								:''
 							}}</th>
-							<td>{{format_date(event.datum)}}</td>
+							<td>{{methodFormatDate(event.datum)}}</td>
 						</tr>
 						<tr>
 							<th>{{
