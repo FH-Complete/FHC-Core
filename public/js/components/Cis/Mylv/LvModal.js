@@ -47,11 +47,28 @@ export default {
 			if (!this.event.end instanceof Date) {
 				return this.event.end;
 			}
-			return this.event.end.getHours() + ":" + this.event.end.getMinutes();
+			return this.event.end.getHours() + ":" + 
+			// returns the string '00' if the function getMinutes returns 0
+			(this.event.end.getMinutes() || typeof this.event.end.getMinutes() === 'number' && this.event.end.getMinutes().toString() + '0');
 		}
 	},
 	methods:{
-		onModalShow: function(){
+		add_padding_to_date_number: function(number)
+		{
+			return number.toString().length == 1 ? '0' + number.toString() : number.toString();
+		},
+		format_date: function(d)
+		{
+			let date = new Date(d);
+			// if the date is an invalid string then creating a date from the string will fail and N/A is returned
+			if (isNaN(date.valueOf()))
+			{
+				return 'N/A';
+			}
+			return `${this.add_padding_to_date_number(date.getDate())}.${this.add_padding_to_date_number(date.getMonth() + 1)}.${this.add_padding_to_date_number(date.getFullYear())}`;
+		},
+		onModalShow: function()
+		{
 			if (this.event.type == 'lehreinheit') {
 				this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(this.event.lehreinheit_id[0]).then(
 					res=>res.data
@@ -80,7 +97,7 @@ export default {
 			<template v-else>{{ event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
 		</template>
 		<template v-slot:default>
-			
+
 				<h3>{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
 				<table class="table table-hover mb-4">
 					<tbody>
@@ -90,7 +107,7 @@ export default {
 								$p.t('global','datum')+':'
 								:''
 							}}</th>
-							<td>{{event.datum}}</td>
+							<td>{{format_date(event.datum)}}</td>
 						</tr>
 						<tr>
 							<th>{{
