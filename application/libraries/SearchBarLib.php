@@ -68,7 +68,6 @@ class SearchBarLib
 
 	/**
 	 * It performes the search of the given search string using the specified search types
-	 * TODO(chris): permissions
 	 *
 	 * @param string							$searchstring
 	 * @param array								$types (optional)
@@ -498,9 +497,8 @@ class SearchBarLib
 						SELECT
 							" . $this->_formatPrimarykeys($table_config['primarykey'], $table_config['table']) . "
 							FROM " . $table_config['table'] . "
-							" . $this->_makeJoin($field_config['join']) . "
+							" . $this->_makeJoin($field_config['join'] ?? '') . "
 							WHERE ";
-					// TODO(chris): equals and equal-int could be IN () statement???
 					foreach ($words as $word) {
 						$sql[] = $field_sql . $this->_makeCompareBool($field_config['comparison'], $field_config['field'], $word);
 					}
@@ -508,10 +506,10 @@ class SearchBarLib
 
 				$or_select[] = "
 					SELECT 
-						" . $table_config['table']($table_config['primarykey']) . ",
+						" . $this->_formatPrimarykeys($table_config['primarykey'], $table_config['table']) . ",
 						1.0 AS rank
 					FROM " . $table_config['table'] . "
-					WHERE prestudent_id NOT IN (" . implode(" UNION ", $sql) . ")";
+					WHERE " . $table_config['primarykey'] . " NOT IN (" . implode(" UNION ", $sql) . ")";
 			} else {
 				$current_select = false;
 				$count = 0;
