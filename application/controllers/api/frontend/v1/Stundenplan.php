@@ -26,7 +26,7 @@ class Stundenplan extends FHCAPI_Controller
 	 */
 	public function __construct()
 	{
-	
+
 		parent::__construct([
 			'getRoomplan' => self::PERM_LOGGED,
             'Stunden' => self::PERM_LOGGED,
@@ -59,7 +59,7 @@ class Stundenplan extends FHCAPI_Controller
     /**
      * fetches Stunden layout from database
      * @access public
-     * 
+     *
      */
     public function Stunden()
 	{
@@ -75,7 +75,7 @@ class Stundenplan extends FHCAPI_Controller
     /**
      * fetches room events from a certain date
      * @access public
-     * 
+     *
      */
 	public function getRoomplan()
 	{
@@ -85,27 +85,27 @@ class Stundenplan extends FHCAPI_Controller
         $this->form_validation->set_rules('ort_kurzbz',"Ort","required");
         $this->form_validation->set_rules('start_date',"start_date","required");
         $this->form_validation->set_rules('end_date',"end_date","required");
-        if($this->form_validation->run() === FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array()); 
-        
+        if($this->form_validation->run() === FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
+
         // storing the get parameter in local variables
         $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
 
-		$roomplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getRoomQuery($ort_kurzbz, $start_date, $end_date));  
-		
+		$roomplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getRoomQuery($ort_kurzbz, $start_date, $end_date));
+
         $roomplan_data = $this->getDataOrTerminateWithError($roomplan_data);
 
 		$this->expand_object_information($roomplan_data);
 
 		$this->terminateWithSuccess($roomplan_data);
-		
+
 	}
 
 	/**
 	 * fetches stundenplan events from a UID and start/end date
 	 * @access public
-	 * 
+	 *
 	 */
 	public function getStundenplan(){
 
@@ -123,7 +123,7 @@ class Stundenplan extends FHCAPI_Controller
 		// storing the get parameter in local variables
 		$start_date = $this->input->get('start_date', TRUE);
 		$end_date = $this->input->get('end_date', TRUE);
-		
+
 		$student_uid = getAuthUID();
 		// check if authUID is mitarbeiter
 		$this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
@@ -145,7 +145,7 @@ class Stundenplan extends FHCAPI_Controller
 			$lvplan_load_ueber_semesterhaelfte = false;
 
 		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
-		$aktuelle_studiensemester = $this->StudiensemesterModel->getAkt();
+		$aktuelle_studiensemester = $this->StudiensemesterModel->getNearest();
 		$aktuelle_studiensemester = $this->getDataOrTerminateWithError($aktuelle_studiensemester);
 		if (count($aktuelle_studiensemester) == 0) {
 			$this->terminateWithError("No aktuelles semester");
@@ -153,7 +153,7 @@ class Stundenplan extends FHCAPI_Controller
 		$aktuelle_studiensemester = current($aktuelle_studiensemester)->studiensemester_kurzbz;
 		if($lvplan_load_ueber_semesterhaelfte)
 		{
-			$next_studiensemester = $this->StudiensemesterModel->getNext();
+			$next_studiensemester = $this->StudiensemesterModel->getNextFrom($aktuelle_studiensemester);
 			$next_studiensemester = $this->getDataOrTerminateWithError($next_studiensemester);
 			if(count($next_studiensemester) == 0)
 			{
@@ -180,7 +180,7 @@ class Stundenplan extends FHCAPI_Controller
 		// getting the gruppen_kurzbz of the student in the different studiensemester
 		$this->load->model('person/Benutzergruppe_model','BenutzergruppeModel');
 		$benutzer_gruppen = null;
-		if ($lvplan_load_ueber_semesterhaelfte) 
+		if ($lvplan_load_ueber_semesterhaelfte)
 		{
 			$benutzer_gruppen = $this->BenutzergruppeModel->execReadOnlyQuery("
 			SELECT * FROM tbl_benutzergruppe where uid = ? AND studiensemester_kurzbz IN ?",[$student_uid, [$aktuelle_studiensemester, $next_studiensemester, $previous_studiensemester]]);
@@ -198,7 +198,7 @@ class Stundenplan extends FHCAPI_Controller
 		// getting the student_lehrverbaende of the student in the different studiensemester
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$student_lehrverbaende = null;
-		if ($lvplan_load_ueber_semesterhaelfte) 
+		if ($lvplan_load_ueber_semesterhaelfte)
 		{
 			$student_lehrverbaende = $this->BenutzergruppeModel->execReadOnlyQuery("
 			SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz IN ?", [$student_uid, [$aktuelle_studiensemester,$next_studiensemester, $previous_studiensemester]]);
@@ -214,8 +214,8 @@ class Stundenplan extends FHCAPI_Controller
 					return $result;
 				},
 				$student_lehrverbaende);
-		} 
-		else 
+		}
+		else
 		{
 			$student_lehrverbaende = $this->BenutzergruppeModel->execReadOnlyQuery("
 			SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz IN ?", [$student_uid, [$aktuelle_studiensemester,$nearest_studiensemester]]);
@@ -233,11 +233,11 @@ class Stundenplan extends FHCAPI_Controller
 			);
 		}
 
-		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery($start_date, $end_date, $benutzer_gruppen, $student_lehrverbaende)); 
+		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery($start_date, $end_date, $benutzer_gruppen, $student_lehrverbaende));
 		$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data) ?? [];
 
 		$this->expand_object_information($stundenplan_data);
-		
+
 		$this->terminateWithSuccess($stundenplan_data);
 	}
 
@@ -263,7 +263,7 @@ class Stundenplan extends FHCAPI_Controller
 		$this->expand_object_information($reservierungen);
 
 		$this->terminateWithSuccess($reservierungen);
-        
+
 	}
 
 	public function getLehreinheitStudiensemester($lehreinheit_id){
@@ -271,26 +271,26 @@ class Stundenplan extends FHCAPI_Controller
 		$this->LehreinheitModel->addSelect(["studiensemester_kurzbz"]);
 		$result = $this->LehreinheitModel->load($lehreinheit_id);
 		$result = current($this->getDataOrTerminateWithError($result))->studiensemester_kurzbz;
-		$this->terminateWithSuccess($result);	
+		$this->terminateWithSuccess($result);
 	}
 
 	private function expand_object_information($data){
-		
-		foreach ($data as $item) 
+
+		foreach ($data as $item)
 		{
 
 			$lektor_obj_array = array();
 			$gruppe_obj_array = array();
 
 			// load lektor object
-			foreach ($item->lektor as $lv_lektor) 
+			foreach ($item->lektor as $lv_lektor)
 			{
 				$this->StundenplanModel->addLimit(1);
 				$lektor_object = $this->StundenplanModel->execReadOnlyQuery("
-				SELECT mitarbeiter_uid, vorname, nachname, kurzbz 
-				FROM public.tbl_mitarbeiter 
+				SELECT mitarbeiter_uid, vorname, nachname, kurzbz
+				FROM public.tbl_mitarbeiter
 				JOIN public.tbl_benutzer benutzer ON benutzer.uid = mitarbeiter_uid
-				JOIN public.tbl_person person ON person.person_id = benutzer.person_id 
+				JOIN public.tbl_person person ON person.person_id = benutzer.person_id
 				WHERE kurzbz = ?", [$lv_lektor]);
 				if (isError($lektor_object)) {
 					$this->show_error(getError($lektor_object));
@@ -301,12 +301,12 @@ class Stundenplan extends FHCAPI_Controller
 					$this->terminateWithError("No lektor object");
 				}
 				$lektor_object = current($lektor_object);
-				// only provide needed information of the mitarbeiter object 
+				// only provide needed information of the mitarbeiter object
 				$lektor_obj_array[] = $lektor_object;
 			}
 
 			// load gruppe object
-			foreach ($item->gruppe as $lv_gruppe) 
+			foreach ($item->gruppe as $lv_gruppe)
 			{
 				$lv_gruppe = strtr($lv_gruppe, ['(' => '', ')' => '', '"' => '']);
 				$lv_gruppe_array = explode(",", $lv_gruppe);
@@ -328,7 +328,6 @@ class Stundenplan extends FHCAPI_Controller
 		}
 	}
 
-    
+
 
 }
-
