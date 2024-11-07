@@ -23,6 +23,6 @@ export default {
 	},
 	template: `
 	<a :href="actionHref" @click="actionFunc">
-		<slot>Action</slot>
+		<slot>{{ $p.t('search/action_default_label') }}</slot>
 	</a>`
 };

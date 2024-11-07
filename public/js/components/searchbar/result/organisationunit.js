@@ -9,13 +9,6 @@ export default {
 		res: Object,
 		actions: Object
 	},
-	computed: {
-		foto() {
-			if (this.res.foto)
-				return 'data:image/jpeg;base64,' + this.res.foto;
-			return null;
-		}
-	},
 	template: `
 	<template-frame
 		class="searchbar-result-organisationunit"
@@ -27,14 +20,14 @@ export default {
 		>
 		<div class="searchbar_table">
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">übergeordnete OrgEinheit</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_parent_oe') }}</div>
 				<div class="searchbar_tablecell">
 					{{ res.parentoe_name }}
 				</div>
 			</div>
 
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Gruppen-EMail</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_group_emails') }}</div>
 				<div class="searchbar_tablecell">
 					<a :href="'mailto:' + res.mailgroup">
 						{{ res.mailgroup }}
@@ -43,17 +36,17 @@ export default {
 			</div>
 
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Leiter</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_leader') }}</div>
 				<div class="searchbar_tablecell">
 					<ul class="searchbar_inline_ul" v-if="res.leaders.length > 0">
 						<li v-for="(leader, idx) in res.leaders" :key="idx">{{ leader.name }}</li>
 					</ul>
-					<span v-else="">N.N.</span>
+					<span v-else="">{{ $p.t('search/result_leader_none') }}</span>
 				</div>
 			</div>
 
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Mitarbeiter-Anzahl</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_number_of_employees') }}</div>
 				<div class="searchbar_tablecell">
 					{{ res.number_of_people }}
 				</div>

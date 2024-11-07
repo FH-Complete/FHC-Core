@@ -47,19 +47,19 @@ export default {
 		:res="person"
 		:actions="actions"
 		:title="person.name"
-		:image="this.person.photo_url"
+		:image="person.photo_url"
 		image-fallback="fas fa-user fa-4x"
 		@actionexecuted="$emit('actionexecuted')"
 		>
 		<div class="searchbar_table">
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Person ID</div>
+				<div class="searchbar_tablecell">{{ $p.t('person/person_id') }}</div>
 				<div class="searchbar_tablecell">
 					{{ person.person_id }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">EMails</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_emails') }}</div>
 				<div class="searchbar_tablecell">
 					<a v-for="email in emails" :key="email" :href="'mailto:' + email" class="d-block">
 						{{ email }}
@@ -75,12 +75,12 @@ export default {
 							:action="actions.defaultactionemployee || actions.defaultaction"
 							@actionexecuted="$emit('actionexecuted')"
 							>
-							Mitarbeiter
+							{{ $p.t('search/result_employee') }}
 						</template-action>
 					</div>
 				</div>
 				<div class="searchbar_tablerow">
-					<div class="searchbar_tablecell ps-3">Standard-Kostenstelle</div>
+					<div class="searchbar_tablecell ps-3">{{ $p.t('search/result_stdkst') }}</div>
 					<div class="searchbar_tablecell">
 						<ul class="searchbar_inline_ul" v-if="employee.standardkostenstelle.length > 0">
 							<li
@@ -90,11 +90,11 @@ export default {
 								{{ stdkst }}
 							</li>
 						</ul>
-						<span v-else="">keine</span>
+						<span v-else="">{{ $p.t('search/result_stdkst_none') }}</span>
 					</div>
 				</div>
 				<div class="searchbar_tablerow">
-					<div class="searchbar_tablecell ps-3">Organisations-Einheit</div>
+					<div class="searchbar_tablecell ps-3">{{ $p.t('lehre/organisationseinheit') }}</div>
 					<div class="searchbar_tablecell">
 						<ul class="searchbar_inline_ul" v-if="employee.organisationunit_name.length > 0">
 							<li
@@ -104,11 +104,11 @@ export default {
 								{{ oe }}
 							</li>
 						</ul>
-						<span v-else="">keine</span>
+						<span v-else="">{{ $p.t('search/result_oe_none') }}</span>
 					</div>
 				</div>
 				<div class="searchbar_tablerow">
-					<div class="searchbar_tablecell ps-3">Telefon</div>
+					<div class="searchbar_tablecell ps-3">{{ $p.t('person/telefon') }}</div>
 					<div class="searchbar_tablecell">
 						<a :href="telurl">
 							{{ employee.phone }}
@@ -132,25 +132,25 @@ export default {
 						</div>
 					</div>
 					<div class="searchbar_tablerow">
-						<div class="searchbar_tablecell ps-3">Studiengang</div>
+						<div class="searchbar_tablecell ps-3">{{ $p.t('lehre/studiengang') }}</div>
 						<div class="searchbar_tablecell">
 							{{ student.bezeichnung }}
 						</div>
 					</div>
 					<div class="searchbar_tablerow">
-						<div class="searchbar_tablecell ps-3">Prestudent ID</div>
+						<div class="searchbar_tablecell ps-3">{{ $p.t('search/result_prestudent_id') }}</div>
 						<div class="searchbar_tablecell">
 							{{ student.prestudent_id }}
 						</div>
 					</div>
 					<div v-if="student.uid" class="searchbar_tablerow">
-						<div class="searchbar_tablecell ps-3">Student UID</div>
+						<div class="searchbar_tablecell ps-3">{{ $p.t('search/result_student_uid') }}</div>
 						<div class="searchbar_tablecell">
 							{{ student.uid }}
 						</div>
 					</div>
 					<div v-if="student.matrikelnr" class="searchbar_tablerow">
-						<div class="searchbar_tablecell ps-3">Matrikelnummer</div>
+						<div class="searchbar_tablecell ps-3">{{ $p.t('person/matrikelnummer') }}</div>
 						<div class="searchbar_tablecell">
 							{{ student.matrikelnr }}
 						</div>

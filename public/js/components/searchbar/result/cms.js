@@ -75,7 +75,7 @@ export default {
 		<img v-if="flag" :src="flag" class="ms-2">
 		<div v-if="preview" class="searchbar_table" v-html="preview"></div>
 		<div v-else class="searchbar_table text-muted">
-			No Content
+			{{ $p.t('search/result_content_none') }}
 		</div>
 	</template-frame>`
 };

@@ -21,25 +21,25 @@ export default {
 		>
 		<div class="searchbar_table">
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Standard-Kostenstelle</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_stdkst') }}</div>
 				<div class="searchbar_tablecell">
 					<ul class="searchbar_inline_ul" v-if="res.standardkostenstelle.length > 0">
 						<li v-for="(stdkst, idx) in res.standardkostenstelle" :key="idx">{{ stdkst }}</li>
 					</ul>
-					<span v-else="">keine</span>
+					<span v-else="">{{ $p.t('search/result_stdkst_none') }}</span>
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Organisations-Einheit</div>
+				<div class="searchbar_tablecell">{{ $p.t('lehre/organisationseinheit') }}</div>
 				<div class="searchbar_tablecell">
 					<ul class="searchbar_inline_ul" v-if="res.organisationunit_name.length > 0">
 						<li v-for="(oe, idx) in res.organisationunit_name" :key="idx">{{ oe }}</li>
 					</ul>
-					<span v-else="">keine</span>
+					<span v-else="">{{ $p.t('search/result_oe_none') }}</span>
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">EMails</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_emails') }}</div>
 				<div class="searchbar_tablecell">
 					<a :href="'mailto:' + res.email" class="d-block">
 						{{ res.email }}
@@ -47,7 +47,7 @@ export default {
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Telefon</div>
+				<div class="searchbar_tablecell">{{ $p.t('person/telefon') }}</div>
 				<div class="searchbar_tablecell">
 					<a :href="'tel:' + res.phone" class="d-block">
 						{{ res.phone }}

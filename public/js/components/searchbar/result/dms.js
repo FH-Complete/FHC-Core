@@ -9,9 +9,6 @@ export default {
 		res: Object,
 		actions: Object
 	},
-	inject: [
-		'query'
-	],
 	computed: {
 		icon() {
 			switch (this.res.mimetype) {
@@ -49,25 +46,25 @@ export default {
 		>
 		<div class="searchbar_table">
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">DMS ID</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_dms_id') }}</div>
 				<div class="searchbar_tablecell">
 					{{ res.dms_id }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Version</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_version') }}</div>
 				<div class="searchbar_tablecell">
 					{{ res.version }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Keywords</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_keywords') }}</div>
 				<div class="searchbar_tablecell">
 					{{ res.keywords }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Description</div>
+				<div class="searchbar_tablecell">{{ $p.t('global/beschreibung') }}</div>
 				<div class="searchbar_tablecell">
 					{{ res.description }}
 				</div>

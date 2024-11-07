@@ -22,9 +22,9 @@ export default {
 			if (this.res.street)
 				address += (address ? ', ' : '') + this.res.street;
 			if (this.res.floor)
-				address += (address ? ' / ' : '') + this.res.floor + ' Stockwerk';
+				address += (address ? ' / ' : '') + this.$p.t('search/result_address_floor', this.res);
 
-			return address || 'N/A';
+			return address || this.$p.t('search/result_address_none');
 		}
 	},
 	template: `
@@ -38,33 +38,33 @@ export default {
 		>
 		<div class="searchbar_table">
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Standort</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_room_address') }}</div>
 				<div class="searchbar_tablecell">
 					{{ address }}
 				</div>
 			</div>
 
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Sitzplätze</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_workplaces') }}</div>
 				<div class="searchbar_tablecell">
 					<template v-if="res.max_person !== null && res.workplaces !== null">
-						{{ res.max_person }}, davon {{ res.workplaces }} PC-Plätze
+						{{ $p.t('search/result_workplaces_pc', res) }}
 					</template>
 					<template v-else>
-						N/A
+						{{ $p.t('search/result_workplaces_none') }}
 					</template>
 				</div>
 			</div>
 
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Gebäude</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_building') }}</div>
 				<div class="searchbar_tablecell">
 					{{ res.building }}
 				</div>
 			</div>
 
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Zusatz Informationen</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_equipment') }}</div>
 				<div class="searchbar_tablecell">
 					<div class="no-margin-paragraphs" v-html="equipment"></div>
 				</div>

@@ -9,8 +9,6 @@ import ResultDms from "./result/dms.js";
 import ResultMergedperson from "./result/mergedperson.js";
 import ResultMergedstudent from "./result/mergedstudent.js";
 
-// TODO(chris): arrays in results
-
 export default {
 	components: {
 		ResultPerson,
@@ -108,7 +106,7 @@ export default {
 				.searchfunction(this.searchsettings, { timeout: 50000, signal: this.abortController.signal })
 				.then(response => {
 					if (!response.data) {
-						this.error = 'Bei der Suche ist ein Fehler aufgetreten.';
+						this.error = this.$p.t('search/error_general');
 					} else {
 						let res = response.data.map(el => ({...el, ...JSON.parse(el.data)}));
 						this.lastQuery = response.meta.searchstring;
@@ -167,7 +165,7 @@ export default {
 						return this.callsearchapi();
 					}
 
-					this.error = 'Bei der Suche ist ein Fehler aufgetreten.' + ' ' + error.message;
+					this.error = this.$p.t('search/error_general', error);
 					this.searching = false;
 					this.retry = 0;
 				});
@@ -230,8 +228,8 @@ export default {
 				v-model="searchsettings.searchstr"
 				class="form-control"
 				type="search"
-				placeholder="Suche..."
-				aria-label="Search"
+				:placeholder="$p.t('search/input_search_label')"
+				:aria-label="$p.t('search/input_search_label')"
 			>
 			<button
 				ref="settingsbutton"
@@ -239,6 +237,8 @@ export default {
 				class="btn btn-light border-start"
 				type="button"
 				id="search-filter"
+				:title="$p.t('search/button_filter_label')"
+				:aria-label="$p.t('search/button_filter_label')"
 				>
 				<i class="fas fa-cog"></i>
 			</button>
@@ -254,7 +254,7 @@ export default {
 				<i class="fas fa-spinner fa-spin fa-2x"></i>
 			</div>
 			<div v-else-if="error !== null">{{ error }}</div>
-			<div v-else-if="searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
+			<div v-else-if="searchresult.length < 1">{{  $p.t('search/error_no_results') }}</div>
 			<template v-else>
 				<template v-for="res in searchresult">
 					<result-person v-if="res.type === 'person'" :res="res" :actions="searchoptions.actions.person" @actionexecuted="hideresult"></result-person>
@@ -268,7 +268,7 @@ export default {
 					<result-dms v-else-if="res.type === 'dms'" :res="res" :actions="searchoptions.actions.dms" @actionexecuted="hideresult"></result-dms>
 					<result-mergedperson v-else-if="res.type === 'mergedperson'" :res="res" :actions="searchoptions.actions.mergedperson" @actionexecuted="hideresult"></result-mergedperson>
 					<result-mergedstudent v-else-if="res.type === 'mergedstudent'" :res="res" :actions="searchoptions.actions.mergedstudent" @actionexecuted="hideresult"></result-mergedstudent>
-					<div v-else>Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
+					<div v-else class="searchbar-result text-danger fw-bold">{{ $p.t('search/error_unknown_type', res) }}</div>
 				</template>
 			</template>
 		</div>
@@ -302,7 +302,7 @@ export default {
 				class="btn btn-primary"
 				type="button"
 			>
-				Übernehmen
+				{{ $p.t('search/button_applyfilter_label') }}
 			</button>
 		</div>
 	</form>`

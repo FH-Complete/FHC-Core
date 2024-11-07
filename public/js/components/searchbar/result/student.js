@@ -26,25 +26,25 @@ export default {
 		>
 		<div class="searchbar_table">
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Student UID</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_student_uid') }}</div>
 				<div class="searchbar_tablecell">
 					{{ res.uid }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Person ID</div>
+				<div class="searchbar_tablecell">{{ $p.t('person/person_id') }}</div>
 				<div class="searchbar_tablecell">
 					{{ res.person_id }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">Matrikelnummer</div>
+				<div class="searchbar_tablecell">{{ $p.t('person/matrikelnummer') }}</div>
 				<div class="searchbar_tablecell">
 					{{ res.matrikelnr }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">EMails</div>
+				<div class="searchbar_tablecell">{{ $p.t('search/result_emails') }}</div>
 				<div class="searchbar_tablecell">
 					<a v-for="email in emails" :key="email" :href="'mailto:' + email" class="d-block">
 						{{ email }}

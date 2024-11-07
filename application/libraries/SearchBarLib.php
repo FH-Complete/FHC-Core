@@ -95,7 +95,7 @@ class SearchBarLib
 				return error(array_map(function ($type) use ($p) {
 					return $p->t('search', 'error_missing_config', [
 						'type' => $type
-					]); // TODO(chris): phrase
+					]);
 				}, $missing));
 			}
 			$types = $tmp;
@@ -288,7 +288,7 @@ class SearchBarLib
 		if (!$table_config)
 			return error($this->_ci->search_phrases->t('search', 'error_missing_config', [
 				'type' => $name
-			])); // TODO(chris): phrase
+			]));
 
 		$errors = [];
 		if (!isset($table_config['table'])
@@ -298,7 +298,7 @@ class SearchBarLib
 			$errors[] = $this->_ci->search_phrases->t('search', 'error_invalid_config', [
 				'type' => $name,
 				'field' => 'table'
-			]); // TODO(chris): phrase
+			]);
 		}
 		if (!isset($table_config['primarykey'])
 			|| !is_string($table_config['primarykey'])
@@ -336,7 +336,7 @@ class SearchBarLib
 						'type' => $name,
 						'searchfield' => $searchfield,
 						'field' => 'field'
-					]); // TODO(chris): phrase
+					]);
 				}
 				if (!isset($config['comparison'])
 					|| !is_string($config['comparison'])
