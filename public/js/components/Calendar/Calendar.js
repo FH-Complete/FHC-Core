@@ -104,6 +104,7 @@ export default {
 	},
 	methods: {
 		handleInput(day) {
+			console.log(day[0], "first",day[1],"second")
 			this.$emit(day[0], day[1]);
 		}
 	},
@@ -137,9 +138,10 @@ export default {
 	},
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card" :class="sizeClass">
-		<component v-slot="{event,day}" :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)" @input="handleInput" >
-			<!--Week Page layout-->
-			<slot :event="event" :day="day"></slot>
+		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)" @input="handleInput" >
+			<template #weekPage="{event,day}">
+				<slot name="weekPage" :event="event" :day="day"></slot>
+			</template>
 		</component>
 	</div>`
 }

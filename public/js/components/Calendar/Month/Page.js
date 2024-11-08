@@ -69,11 +69,11 @@ export default {
 			return this.noWeekView ? day == this.highlightedDay : week.no == this.highlightedWeek;
 		},
 		clickEvent(day,week) {
-			if(this.noWeekView){
-				this.selectDay(day);
-			}else{
+			if(!this.noWeekView)
+			{
 				this.changeToWeek(week);
 			}
+			this.selectDay(day);
 		}
 	},
 	template: `

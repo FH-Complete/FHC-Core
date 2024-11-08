@@ -38,12 +38,14 @@ export default {
 	created() {
 		this.emitRangeChanged();
 	},
-	template: `
+	template: /*html*/`
 	<div class="fhc-calendar-week">
 		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'weeks')"/>
 		<calendar-pane ref="pane" v-slot="slot" @slid="paneChanged">
-			<calendar-week-page v-slot="{event,day}" :year="focusDate.y" :week="focusDate.w+slot.offset" @updateMode="$emit('updateMode', $event)" @page:back="prev" @page:forward="next" @input="selectEvent" >
-				<slot :event="event" :day="day" ></slot>
+			<calendar-week-page :year="focusDate.y" :week="focusDate.w+slot.offset" @updateMode="$emit('updateMode', $event)" @page:back="prev" @page:forward="next" @input="selectEvent" >
+				<template #weekPage="{event,day}">
+					<slot name="weekPage" :event="event" :day="day" ></slot>
+				</template>
 			</calendar-week-page>
 		</calendar-pane>
 	</div>`
