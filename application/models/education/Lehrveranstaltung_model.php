@@ -969,4 +969,47 @@ class Lehrveranstaltung_model extends DB_Model
     	$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz');
     	return $this->load($lehrveranstaltung_id);
     }
+    
+    //Berechtigungen auf Fachbereichsebene
+    public function getBerechtigungenAufFachberechsebene($lvid, $angezeigtes_stsem)
+    {
+	    $query = "
+		SELECT
+		    DISTINCT lehrfach.oe_kurzbz
+		FROM
+		    lehre.tbl_lehrveranstaltung
+		JOIN 
+		    lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
+		JOIN 
+		    lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+		WHERE 
+		    tbl_lehrveranstaltung.lehrveranstaltung_id = " . $this->escape(intval($lvid));
+
+	    if(isset($angezeigtes_stsem) && $angezeigtes_stsem != ''){
+		$query .= " AND studiensemester_kurzbz = " . $this->escape($angezeigtes_stsem);
+	    }
+
+	    $res = $this->execReadOnlyQuery($query);
+	    return $res;
+    }
+    
+    public function getStudentEMail($lvid, $angezeigtes_stsem)
+    {
+		$query = "
+			SELECT
+				DISTINCT vw_lehreinheit.stg_kurzbz, vw_lehreinheit.stg_typ, 
+				vw_lehreinheit.semester, COALESCE(vw_lehreinheit.verband,'') as verband, 
+				COALESCE(vw_lehreinheit.gruppe,'') as gruppe, 
+				vw_lehreinheit.gruppe_kurzbz, tbl_gruppe.mailgrp
+			FROM
+				campus.vw_lehreinheit
+			LEFT JOIN 
+				public.tbl_gruppe USING(gruppe_kurzbz)
+			WHERE
+				lehrveranstaltung_id = " . $this->escape(intval($lvid)) . "
+				AND studiensemester_kurzbz = " . $this->escape($angezeigtes_stsem);
+
+		$res = $this->execReadOnlyQuery($query);
+		return $res;
+    }
 }
