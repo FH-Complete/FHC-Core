@@ -79,11 +79,11 @@ export default {
 	},
 	methods: {
 		calcHourPosition(event) {
+			let height = this.$refs.eventcontainer.getBoundingClientRect().height;
 			let top = this.$refs.eventcontainer.getBoundingClientRect().top;
 			let position = event.clientY - top;
-			this.hourPosition = position;
 			// position percentage of total height
-			let timePercentage = (position / this.$refs.eventcontainer.offsetHeight) * 100;
+			let timePercentage = (position / height) * 100;
 			// minute percentage of total minutes
 			let result = (this.hours.length * 60) * (timePercentage / 100);
 			// calculate time in float
@@ -94,11 +94,27 @@ export default {
 			let minutePercentage = currentMinutes % currentHour;
 			// calculate minutes from float part of time
 			let minute = Math.round(60 * minutePercentage);
+			// convert minutes to 5 minute interval
+			if (minute % 5 != 0) 
+			{
+				minute = Math.round(minute / 5) * 5;
+			}
 			// in case the rounding made the minutes 60, increase the hour and reset the minutes
-			if (minute == 60) {
+			if (minute == 60) 
+			{
 				currentHour++;
 				minute = 0;
 			}
+			
+			// ## after rounding the time to the nearest 5 Minute interval, we have to convert the time back to the relative position
+			// convert current time in minutes
+			currentMinutes = currentHour * 60 + minute;
+			// calculate the minutes percentage of the total minutes 
+			timePercentage = ((currentMinutes - ( this.hours[0] * 60 ) ) / ( this.hours.length * 60 ) ) * 100;
+			// calculate the relative position of the time percentage
+			position = height * (timePercentage / 100);
+			this.hourPosition = position;
+			
 			// add padding to minutes that consist of only one digit
 			minute.toString().length == 1 ? minute = "0" + minute : minute;
 			this.hourPositionTime = currentHour + ":" + minute;
