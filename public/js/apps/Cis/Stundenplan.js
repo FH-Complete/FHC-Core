@@ -11,6 +11,8 @@ const app = Vue.createApp({
 			events: null,
 			calendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
+			currentDay: new Date(),
+			minimized: false,
 		}
 	},
 	components: {
@@ -32,17 +34,23 @@ const app = Vue.createApp({
 		},
 	},
 	methods:{
-
+		selectDay: function(day){
+			this.currentDay = day;
+		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
 			Vue.nextTick(() => {
 				this.$refs.lvmodal.show();
 			});
 		},
-		updateRange: function (data) {
-			let tmp_date = new CalendarDate(data.start);
+		updateRange: function ({start,end}) {
+
+			let checkDate = (date) => {
+				return date.m != this.calendarDate.m || date.y != this.calendarDate.y;
+			}
+
 			// only load month data if the month or year has changed
-			if(tmp_date.m != this.calendarDate.m || tmp_date.y != this.calendarDate.y){
+			if (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end))){
 				// reset the events before querying the new events to activate the loading spinner
 				this.events = null;
 				this.calendarDate = tmp_date;
@@ -51,15 +59,12 @@ const app = Vue.createApp({
 				});
 			}
 		},
-
 		calendarDateToString: function (calendarDate) {
-
 			return calendarDate instanceof CalendarDate ?
 				[calendarDate.y, calendarDate.m + 1, calendarDate.d].join('-') :
 				null;
 
 		},
-
 		loadEvents: function(){
 			Promise.allSettled([
 				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay),
@@ -96,11 +101,12 @@ const app = Vue.createApp({
 	created(){
 		this.loadEvents();
 	},
+	//TODO: Stundenplan phrase
 	template:/*html*/`
 	<h2>Stundenplan</h2>
 	<hr>
-	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal"  />
-	<fhc-calendar @change:range="updateRange" :events="events" initial-mode="week" show-weeks >
+	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
+	<fhc-calendar :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
 		<template #weekPage="{event,day}">
 			<div @click="showModal(event?.orig)" type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100">
 				<span>{{event?.orig.topic}}</span>
@@ -108,6 +114,14 @@ const app = Vue.createApp({
 				<span>{{event?.orig.ort_kurzbz}}</span>
 			</div>
 		</template>
+		<template #dayPage="{event,day}">
+			<div @click="showModal(event?.orig)" type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100">
+				<span>{{event?.orig.topic}}</span>
+				<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
+				<span>{{event?.orig.ort_kurzbz}}</span>
+			</div>
+		</template>
+		<template
 	</fhc-calendar>
 	`
 });

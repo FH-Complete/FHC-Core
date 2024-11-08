@@ -3,6 +3,7 @@ import CalendarMonths from './Months.js';
 import CalendarYears from './Years.js';
 import CalendarWeek from './Week.js';
 import CalendarWeeks from './Weeks.js';
+import CalendarDay from './Day.js';
 import CalendarMinimized from './Minimized.js';
 import CalendarDate from '../../composables/CalendarDate.js';
 
@@ -16,6 +17,7 @@ export default {
 		CalendarYears,
 		CalendarWeek,
 		CalendarWeeks,
+		CalendarDay,
 		CalendarMinimized,
 	},
 	provide() {
@@ -104,7 +106,6 @@ export default {
 	},
 	methods: {
 		handleInput(day) {
-			console.log(day[0], "first",day[1],"second")
 			this.$emit(day[0], day[1]);
 		}
 	},
@@ -141,6 +142,9 @@ export default {
 		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)" @input="handleInput" >
 			<template #weekPage="{event,day}">
 				<slot name="weekPage" :event="event" :day="day"></slot>
+			</template>
+			<template #dayPage="{event,day}">
+				<slot name="dayPage" :event="event" :day="day"></slot>
 			</template>
 		</component>
 	</div>`

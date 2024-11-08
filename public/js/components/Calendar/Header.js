@@ -4,7 +4,8 @@ export default {
 			selected: this.mode,
 			modes:{
 				week:"Woche", 
-				month:"Monat", 
+				month:"Monat",
+				day: "Tag", 
 			},
 		}
 	},
@@ -52,6 +53,7 @@ export default {
 					<button type="button" :class="{'active':mode_kurzbz == mode}" style="margin-right: 4px;" @click.prevent="$emit('updateMode',mode_kurzbz)" class="btn btn-outline-secondary" v-for="(mode_bezeichnung,mode_kurzbz) in modes">
 						<i v-if="!noWeekView && mode_kurzbz == 'week'" class="fa fa-calendar-week"></i>
 						<i v-else-if="!noMonthView && mode_kurzbz == 'month'" class="fa fa-calendar-days"></i>
+						<i v-else-if="mode_kurzbz == 'day'" class="fa-solid fa-sun"></i>
 					</button>
 				</div>
 			</div>

@@ -423,7 +423,7 @@ class LvMenu extends FHCAPI_Controller
 			{
 				if($row->gruppe_kurzbz != '')
 				{
-					$bngrp_uids = $this->Benutzergrupp_model->getUids($row->gruppe_kurzbz, $angezeigtes_stsem);
+					$bngrp_uids = $this->Benutzergruppe_model->getUids($row->gruppe_kurzbz, $angezeigtes_stsem);
 					if(count($bngrp_uids) > 0)
 					{
 						if(!$row->mailgrp)
