@@ -56,6 +56,45 @@ export default {
 						field: "vertragsstunden_studiensemester_kurzbz",
 						visible: false
 					},
+					{
+						title: 'Aktionen', field: 'actions',
+						minWidth: 50,
+						formatter: (cell, formatterParams, onRendered) => {
+
+							const container = document.createElement('div');
+							container.className = "d-flex gap-2";
+
+							let button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.title = 'Lehrauftrag löschen';
+
+							let type = cell.getData().type;
+							console.log(type);
+							if (type == 'Lehrauftrag')
+							{
+								button.addEventListener(
+									'click',
+									() =>
+										this.actionDeleteLehrauftrag(cell.getData().vertrag_id, cell.getData().lehreinheit_id, cell.getData().mitarbeiter_uid)
+								);
+							}
+
+							if (type == 'Betreuung')
+							{
+								button.addEventListener(
+									'click',
+									() =>
+										this.actionDeleteBetreuung(cell.getData().vertrag_id, cell.getData().projektarbeit_id,  cell.getData().betreuerart_kurzbz)
+								);
+							}
+
+							container.append(button);
+
+							return container;
+						},
+						frozen: true
+					},
 				],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
@@ -69,27 +108,48 @@ export default {
 		}
 	},
 	watch: {
-		person_id: 'updateTableData',
-		vertrag_id: 'updateTableData'
-/*		person_id() {
+/*		person_id: 'updateTableData',
+		vertrag_id: 'updateTableData'*/
+		person_id() {
+			console.log("person geändert");
 			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsAssigned/' + this.person_id + '/' + this.vertrag_id);
 		},
 		vertrag_id() {
+			console.log("vertrag geändert");
 			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsAssigned/' + this.person_id + '/' + this.vertrag_id);
-		},*/
+		},
 	},
 	methods: {
-		updateTableData() {
+/*		updateTableData() {
 			this.$refs.table.tabulator.setData(`api/frontend/v1/vertraege/vertraege/getAllContractsAssigned/ ' ${this.person_id}/${this.vertrag_id}`);
-		}
+		},*/
+		//TODO(Manu) delete vertrag_id: not necessary
+		actionDeleteLehrauftrag(vertrag_id, lehreinheit_id, mitarbeiter_uid) {
+			console.log("child", vertrag_id);
+			this.$emit('deleteLehrauftrag', {
+				lehreinheit_id: lehreinheit_id,
+				vertrag_id: vertrag_id,
+				mitarbeiter_uid: mitarbeiter_uid
+			});
+		},
+		actionDeleteBetreuung(vertrag_id, projektarbeit_id, betreuerart_kurzbz) {
+			this.$emit('deleteBetreuung', {
+				person_id: this.person_id,
+				vertrag_id: vertrag_id,
+				projektarbeit_id: projektarbeit_id,
+				betreuerart_kurzbz: betreuerart_kurzbz
+			});
+		},
+		reload() {
+			this.$refs.table.reloadTable();
+			this.$emit('reload');
+		},
 	},
 	template: `
-	<!--TODO(Manu) check css, design -->
+	<!--TODO(Manu) nicht anzeigen, wenn keine vorhanden ? check css, design -->
+	
 	<div class="core-vertraege h-50 d-flex flex-column w-100">
-		person_id: {{person_id}}
-		<br>
-		vertrag_id: {{vertrag_id}}
-		
+
 		  <div>
 			<!-- Tabulator-Container -->
 			<div ref="table"></div>
@@ -106,7 +166,8 @@ export default {
 			ref="table"
 			:tabulator-options="tabulatorOptions"
 			table-only
-			:side-menu="false"	
+			:side-menu="false"
+			reload
 			>
 		</core-filter-cmpt>		
 	</div>`

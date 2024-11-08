@@ -23,6 +23,8 @@ class Vertraege extends FHCAPI_Controller
 			'loadContractStatus' => ['admin:r', 'assistenz:r'],
 			'deleteContractStatus' => ['admin:r', 'assistenz:r'],
 			'updateContractStatus' => ['admin:r', 'assistenz:r'],
+			'deleteLehrauftrag' => ['admin:r', 'assistenz:r'],
+			'deleteBetreuung' => ['admin:r', 'assistenz:r']
 		]);
 
 		//Load Models
@@ -93,23 +95,31 @@ class Vertraege extends FHCAPI_Controller
 		$this->terminateWithSuccess(getData($result) ?: []);
 	}
 
-	public function addNewContract($person_id)
+	public function addNewContract()
 	{
 		//$this->validateNewOrUpdate();
 		//TODO(Manu) check validations
+		//$bezeichnung = $formData->bezeichnung;
 
-		//$person_id = $this->input->post('person_id');
-		$vertragsdatum = $this->input->post('vertragsdatum');
-		$bezeichnung = $this->input->post('bezeichnung');
-		$vertragstyp_kurzbz = $this->input->post('vertragstyp_kurzbz');
-		$betrag = $this->input->post('betrag');
-		$vertragsstunden = $this->input->post('vertragsstunden');
-		$vertragsstunden_studiensemester_kurzbz = $this->input->post('vertragsstunden_studiensemester_kurzbz');
-		$anmerkung = $this->input->post('anmerkung');
+		$person_id = $this->input->post('person_id');
+		$formData = $this->input->post('formData');
+
+		$vertragsdatum = $formData['vertragsdatum'];
+		$bezeichnung = $formData['bezeichnung'];
+		$vertragstyp_kurzbz = $formData['vertragstyp_kurzbz'];
+		$betrag = isset($formData['betrag']) ? $formData['betrag'] : null;
+		$vertragsstunden = isset($formData['vertragsstunden']) ? $formData['vertragsstunden'] : null;
+		$vertragsstunden_studiensemester_kurzbz = isset($formData['vertragsstunden_studiensemester_kurzbz']) ? $formData['vertragsstunden_studiensemester_kurzbz'] : null;
+		$anmerkung = isset($formData['anmerkung']) ? $formData['anmerkung'] : null;
+
+		$lehrauftraege = $this->input->post('clickedRows');
+
+
+		//$this->terminateWithError("in function" . $lehrauftraege[0]['lehreinheit_id'], self::ERROR_TYPE_GENERAL);
 
 		$this->db->trans_start();
 
-		$result = $this->VertragModel->insert( [
+		$result = $this->VertragModel->insert([
 			'person_id' => $person_id,
 			'vertragsdatum' => $vertragsdatum,
 			'bezeichnung' => $bezeichnung,
@@ -122,9 +132,13 @@ class Vertraege extends FHCAPI_Controller
 			'insertvon' => getAuthUID()
 		]);
 
+		$vertrag_id = $result->retval;
+
+		//$this->terminateWithError($result->retval, self::ERROR_TYPE_GENERAL);
+
 		//TODO(Manu) validation, dass status nicht schon bereits vorhanden
 		$status_result = $this->VertragvertragsstatusModel->insert([
-			'vertrag_id' => $result->retval,
+			'vertrag_id' => $vertrag_id,
 			'uid' => getAuthUID(),
 			'vertragsstatus_kurzbz' => 'neu',
 			'insertamum' => date('c'),
@@ -134,7 +148,140 @@ class Vertraege extends FHCAPI_Controller
 
 		if (!$status_result) {
 			$this->db->trans_rollback();
-			$this->terminateWithError('Fehler beim Hinzufügen des Vertragsstatus.');
+			$this->terminateWithError('Fehler beim Hinzufügen des Vertragsstatus.', self::ERROR_TYPE_GENERAL);
+		}
+
+		//Hinzufügen der Lehraufträge
+		foreach ($lehrauftraege as $row) {
+
+			if ($row['type'] == 'Lehrauftrag')
+			{
+				$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
+
+				$result_lehrauftrag = $this->LehreinheitmitarbeiterModel->update(
+					[
+						'lehreinheit_id' => $row['lehreinheit_id'],
+						'mitarbeiter_uid' => $row['mitarbeiter_uid']
+					],
+					[
+						'vertrag_id' => $vertrag_id
+					]);
+
+				if (!$result_lehrauftrag) {
+					$this->db->trans_rollback();
+					$this->terminateWithError('Fehler beim Verknüpfen Lehrauftrag mit Vertrag', self::ERROR_TYPE_GENERAL);
+				}
+			}
+
+			if ($row['type'] == 'Betreuung')
+			{
+
+				$this->load->model('education/Projektbetreuer_model', 'Projektbetreuermodel');
+
+				$result_projektbetreuer = $this->Projektbetreuermodel->update(
+					[
+						'person_id' => $person_id,
+						'projektarbeit_id' => $row['projektarbeit_id'],
+						'betreuerart_kurzbz' => $row['betreuerart_kurzbz']
+					],
+					[
+						'vertrag_id' => $vertrag_id
+					]);
+
+				if (!$result_projektbetreuer)
+				{
+					$this->db->trans_rollback();
+					$this->terminateWithError('Fehler beim Verknüpfen Lehrauftrag mit Betreuung', self::ERROR_TYPE_GENERAL);
+				}
+			}
+
+		}
+
+		$this->db->trans_complete();
+		$this->terminateWithSuccess(true);
+	}
+
+	public function updateContract()
+	{
+		$vertrag_id = $this->input->post('vertrag_id');
+		$person_id = $this->input->post('person_id');
+		$formData = $this->input->post('formData');
+
+		$vertragsdatum = $formData['vertragsdatum'];
+		$bezeichnung = $formData['bezeichnung'];
+		$vertragstyp_kurzbz = $formData['vertragstyp_kurzbz'];
+		$betrag = isset($formData['betrag']) ? $formData['betrag'] : null;
+		$vertragsstunden = isset($formData['vertragsstunden']) ? $formData['vertragsstunden'] : null;
+		$vertragsstunden_studiensemester_kurzbz = isset($formData['vertragsstunden_studiensemester_kurzbz']) ? $formData['vertragsstunden_studiensemester_kurzbz'] : null;
+		$anmerkung = isset($formData['anmerkung']) ? $formData['anmerkung'] : null;
+
+		$lehrauftraege = $this->input->post('clickedRows');
+
+		$this->db->trans_start();
+
+		$result = $this->VertragModel->update(
+			$vertrag_id, [
+			'person_id' => $person_id,
+			'vertragsdatum' => $vertragsdatum,
+			'bezeichnung' => $bezeichnung,
+			'vertragstyp_kurzbz' => $vertragstyp_kurzbz,
+			'betrag' => $betrag,
+			'vertragsstunden' => $vertragsstunden,
+			'vertragsstunden_studiensemester_kurzbz' => $vertragsstunden_studiensemester_kurzbz,
+			'anmerkung' => $anmerkung,
+			'vertragsstunden' => $vertragsstunden,
+			'updateamum' => date('c'),
+			'updatevon' => getAuthUID()
+		]);
+
+		$this->getDataOrTerminateWithError($result);
+
+		//TODO(MANU) Transaction: splitting of in error und rollback sonst weiter
+
+		//Adding of Lehraufträge
+		foreach ($lehrauftraege as $row) {
+
+			if ($row['type'] == 'Lehrauftrag')
+			{
+				$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
+
+				$result_lehrauftrag = $this->LehreinheitmitarbeiterModel->update(
+					[
+						'lehreinheit_id' => $row['lehreinheit_id'],
+						'mitarbeiter_uid' => $row['mitarbeiter_uid']
+					],
+					[
+						'vertrag_id' => $vertrag_id
+					]);
+
+				if (!$result_lehrauftrag) {
+					$this->db->trans_rollback();
+					$this->terminateWithError('Fehler beim Verknüpfen Lehrauftrag mit Vertrag', self::ERROR_TYPE_GENERAL);
+				}
+			}
+
+			if ($row['type'] == 'Betreuung')
+			{
+
+				$this->load->model('education/Projektbetreuer_model', 'Projektbetreuermodel');
+
+				$result_projektbetreuer = $this->Projektbetreuermodel->update(
+					[
+						'person_id' => $person_id,
+						'projektarbeit_id' => $row['projektarbeit_id'],
+						'betreuerart_kurzbz' => $row['betreuerart_kurzbz']
+					],
+					[
+						'vertrag_id' => $vertrag_id
+					]);
+
+				if (!$result_projektbetreuer)
+				{
+					$this->db->trans_rollback();
+					$this->terminateWithError('Fehler beim Verknüpfen Lehrauftrag mit Betreuung', self::ERROR_TYPE_GENERAL);
+				}
+			}
+
 		}
 
 		$this->db->trans_complete();
@@ -155,45 +302,6 @@ class Vertraege extends FHCAPI_Controller
 		}
 
 		$this->terminateWithSuccess(current(getData($result)));
-	}
-
-	public function updateContract($vertrag_id)
-	{
-		//$this->validateNewOrUpdate();
-		//TODO(Manu)validations
-
-
-		$vertrag_id = $this->input->post('vertrag_id');
-		$person_id = $this->input->post('person_id');
-		$vertragsdatum = $this->input->post('vertragsdatum');
-		$bezeichnung = $this->input->post('bezeichnung');
-		$vertragstyp_kurzbz = $this->input->post('vertragstyp_kurzbz');
-		$betrag = $this->input->post('betrag');
-		$vertragsstunden = $this->input->post('vertragsstunden');
-		$vertragsstunden_studiensemester_kurzbz = $this->input->post('vertragsstunden_studiensemester_kurzbz');
-		$anmerkung = $this->input->post('anmerkung');
-
-		$this->db->trans_start();
-
-		$result = $this->VertragModel->update($vertrag_id, [
-			'person_id' => $person_id,
-			'vertragsdatum' => $vertragsdatum,
-			'bezeichnung' => $bezeichnung,
-			'vertragstyp_kurzbz' => $vertragstyp_kurzbz,
-			'betrag' => $betrag,
-			'vertragsstunden' => $vertragsstunden,
-			'vertragsstunden_studiensemester_kurzbz' => $vertragsstunden_studiensemester_kurzbz,
-			'anmerkung' => $anmerkung,
-			'vertragsstunden' => $vertragsstunden,
-			'updateamum' => date('c'),
-			'updatevon' => getAuthUID()
-		]);
-
-		$this->getDataOrTerminateWithError($result);
-
-		$this->db->trans_complete();
-
-		$this->terminateWithSuccess(true);
 	}
 
 	public function deleteContract($vertrag_id)
@@ -322,4 +430,54 @@ class Vertraege extends FHCAPI_Controller
 
 		return $this->terminateWithSuccess(current(getData($status_result)));
 	}
+
+	public function deleteLehrauftrag($vertrag_id, $lehreinheit_id, $mitarbeiter_uid)
+	{
+		$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
+
+		//kein delete: ein update, bei dem die vertrag_id auf null gesetzt wird
+		$result = $this->LehreinheitmitarbeiterModel->update(
+			[
+				'lehreinheit_id' => $lehreinheit_id,
+				'mitarbeiter_uid' => $mitarbeiter_uid,
+				'vertrag_id' => $vertrag_id
+			],
+			[
+				'vertrag_id' => null
+			]);
+
+		if (isError($result)) {
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		if (!hasData($result)) {
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Id_Lehrauftrag']), self::ERROR_TYPE_GENERAL);
+		}
+		return $this->terminateWithSuccess(current(getData($result)));
+	}
+
+	public function deleteBetreuung($vertrag_id, $person_id, $projektarbeit_id, $betreuerart_kurzbz)
+	{
+		$this->load->model('education/Projektbetreuer_model', 'Projektbetreuermodel');
+
+		$result = $this->Projektbetreuermodel->update(
+			[
+				'person_id' => $person_id,
+				'projektarbeit_id' => $projektarbeit_id,
+				'betreuerart_kurzbz' => $betreuerart_kurzbz,
+				'vertrag_id' => $vertrag_id
+			],
+			[
+				'vertrag_id' => null
+			]);
+
+		if (isError($result)) {
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		if (!hasData($result)) {
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Id_Lehrauftrag']), self::ERROR_TYPE_GENERAL);
+		}
+		return $this->terminateWithSuccess(current(getData($result)));
+	}
+
+
 }

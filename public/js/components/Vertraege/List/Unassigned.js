@@ -31,10 +31,37 @@ export default {
 						person_id: this.person_id
 					};
 				},
+				//TODO(Manu) auch beträge von NULL anzeigen als 0.00
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title: "Typ", field: "type", width: 125},
-					{title: "Betrag", field: "betrag", width: 150},
+					{title: "Typ", field: "type"},
+/*					{
+						title: "Betrag",
+						field: "betrag",
+						formatter: function(cell) {
+							// Hole den Wert der Zelle
+							let value = cell.getValue();
+
+							// Falls der Wert null oder undefined ist, setze ihn auf "0,00"
+							if (value == null) {
+								return "0,00";
+							}
+
+							// Andernfalls formatiere ihn auf zwei Dezimalstellen
+							return parseFloat(value).toFixed(2).replace(".", ",");
+						}
+					},*/
+					{title: "Betrag",
+						field: "betrag1",
+						formatter: function(cell) {
+							let value = cell.getValue();
+
+							if (value == null) {
+								return "0.00";
+							}
+
+							return parseFloat(value).toFixed(2);
+						}},
 					{title: "Bezeichnung", field: "bezeichnung", width: 150},
 					{title: "Studiensemester", field: "studiensemester_kurzbz"},
 					{title: "PruefungId", field: "betrag", visible: false},
@@ -56,8 +83,16 @@ export default {
 				selectableRangeMode: 'click',
 				selectable: true,
 			},
-			clickedRows: []
+			clickedRows: [],
+			sumBetragLehrauftraege: 0
 		}
+	},
+	//TODO(Manu) auch auf fhcapi umbauen?
+	watch: {
+		person_id() {
+			console.log("data changed");
+			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsNotAssigned/' + this.person_id);
+		},
 	},
 	methods: {
 		toggleRowClick(rowData){
@@ -65,7 +100,7 @@ export default {
 			//const index = this.clickedRows.findIndex(row => row.id === id);
 
 
-			//id alleine reicht nicht: Betreuerart ebenfalls
+			//id alleine reicht nicht: Betreuerart ebenfalls, am besten gleich ganze Row!
 /*			if (this.clickedRows.indexOf(id) == -1) {
 				console.log("Die Zahl " + id + " ist NICHT Array enthalten.");
 				this.clickedRows.push(id);
@@ -81,11 +116,30 @@ export default {
 
 			if (exists) {
 				this.clickedRows = this.clickedRows.filter(row => JSON.stringify(row) !== JSON.stringify(rowData));
+				this.sumBetragLehrauftraege -= Number(rowData.betrag1);
+				this.handleSumUp();
 			} else {
 				this.clickedRows.push(rowData);
+				//hier soll der variable sumBetragLehrauftraege der Wert von this.clickedRows.betrag1 hinzugefügt werden
+				this.sumBetragLehrauftraege += Number(rowData.betrag1);
+				console.log(rowData.betrag1);
+				this.handleSumUp();
 			}
 
-		}
+		},
+		emitSaveEvent() {
+			// Emit ein Event und übergebe clickedRows an die Parent-Komponente
+			this.$emit('saveClickedRows', this.clickedRows);
+		},
+		reload() {
+			this.$refs.table.reloadTable();
+			this.$emit('reload');
+			this.clickedRows = {};
+		},
+		handleSumUp() {
+			//this.localValue += 1; // Increment the local value
+			this.$emit("sum-updated", this.sumBetragLehrauftraege); // Emit the updated value to the parent
+		},
 	},
 	mounted() {
 		this.$nextTick(() => {
@@ -99,14 +153,35 @@ export default {
 	<!--TODO(Manu) check css, design .. mybe list.js-->
 	<div class="core-vertraege h-50 d-flex flex-column w-100">
 	
-	{{clickedRows}}
+<!--	{{clickedRows}} <hr> sum:  {{sumBetragLehrauftraege}}-->
+	<!--TODO(Manu) nicht anzeigen wenn keine vertraege vorhanden, "KEINE DATEN vorhanden"-->
 	
+	
+		<p>Die folgenden Lehraufträge sind noch keinem Vertrag zugeordnet. Markieren Sie die Lehraufträge um diese dem Vertrag zuzuordnen:</p>
+
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
 			table-only
-			:side-menu="false"	
+			:side-menu="false"
 			>
-		</core-filter-cmpt>		
+		</core-filter-cmpt>
+		
+		
+		<p v-if="clickedRows.length > 0" >Folgende Lehraufträge werden hinzugefügt:</p>
+		  
+		<div v-for="item in clickedRows" :key="item.lehreinheit_id" class="row">
+			<div class="col-md-6">
+			  <input
+				class="form-control"
+				type="text"
+				:value="item.type + ' | ' + item.studiensemester_kurzbz + ' | ' + item.bezeichnung + ' ( lehreinheit_id: ' + item.lehreinheit_id + ')'"
+				aria-label="readonly input example"
+				readonly
+			  >
+			</div>
+
+		</div>
+
 	</div>`
 }

@@ -37,14 +37,14 @@ export default {
 				},
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title: "Status", field: "vertragsstatus_kurzbz"},
+					{title: "Status", field: "bezeichnung"},
 					{title: "Datum", field: "format_datum"},
 					{title: "vertrag_id", field: "vertrag_id", visible: false},
 					// {title: "User", field: "bezeichnung", visible: false},
-					// {title: "Vertragsstatus_kurzbz", field: "Vertragsstatus_kurzbz", visible: false},
 					{title: "insertvon", field: "insertvon", visible: false},
-					// {title: "insertamum", field: "insertamum", visible: false},
 					{title: "insertamum", field: "format_insertamum", visible: false},
+					{title: "updatevon", field: "updatevon", visible: false},
+					{title: "updateamum", field: "format_updateamum", visible: false},
 					{title: "betreuerart_kurzbz", field: "betreuerart_kurzbz", visible: false},
 					{title: "Vertragsstunden", field: "vertragsstunden", visible: false},
 					{

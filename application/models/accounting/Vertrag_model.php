@@ -370,7 +370,7 @@ SELECT
 			mitarbeiter_uid,
 			null as pruefung_id,
 			null as projektarbeit_id,
-			(tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
+			(tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag1,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			null as betreuerart_kurzbz,
 			(	SELECT
@@ -394,7 +394,7 @@ SELECT
 			null as mitarbeiter_uid,
 			null::integer as pruefung_id,
 			projektarbeit_id,
-			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
+			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag1,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
@@ -436,7 +436,7 @@ SELECT
 					JOIN public.tbl_studiengang USING(studiengang_kz)
 				WHERE
 					lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
-			as bezeichnung
+			as bezeichnung, vertrag_id
 		FROM
 			lehre.tbl_lehreinheitmitarbeiter
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
@@ -454,7 +454,7 @@ SELECT
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
-			as bezeichnung
+			as bezeichnung, vertrag_id
 		FROM
 			lehre.tbl_projektbetreuer
 			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
@@ -479,7 +479,8 @@ SELECT
 			SELECT
 				*,
                 TO_CHAR(tbl_vertrag_vertragsstatus.datum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_datum,
-                TO_CHAR(tbl_vertrag_vertragsstatus.insertamum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_insertamum
+                TO_CHAR(tbl_vertrag_vertragsstatus.insertamum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_insertamum,
+                TO_CHAR(tbl_vertrag_vertragsstatus.updateamum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_updateamum
 			FROM
 				lehre.tbl_vertrag_vertragsstatus
 				JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz)
