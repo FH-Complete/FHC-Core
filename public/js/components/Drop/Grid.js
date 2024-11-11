@@ -61,6 +61,8 @@ export default {
 			return {
 				'--fhc-dg-row-height': 100/(this.rows + addH) + '%',
 				'--fhc-dg-col-width': 100/this.cols + '%',
+				'--fhc-dg-item-padding-horizontal': '0.5%',
+				'--fhc-dg-item-padding-top': '0.5%',
 				'padding-bottom': 100 * (this.rows + addH)/this.cols + '%'
 			}
 		},
@@ -130,9 +132,12 @@ export default {
 		cols() {
 			this.dragCancel();
 		},
-	    rows(value){
-			this.$emit('gridHeight',value);
-		}, 
+	    rows: {
+			handler(value) {
+				this.$emit('gridHeight', value);
+			},
+			immediate: true
+		},
 		indexedItems: {
 			handler(value) {
 				this.dragCancel();
@@ -366,7 +371,10 @@ export default {
 				top: 'calc(' + item.y + ' * var(--fhc-dg-row-height))',
 				left: 'calc(' + item.x + ' * var(--fhc-dg-col-width))',
 				width: 'calc(' + item.w + ' * var(--fhc-dg-col-width))',
-				height: 'calc(' + item.h + ' * var(--fhc-dg-row-height))'
+				height: 'calc(' + item.h + ' * var(--fhc-dg-row-height))',
+				paddingTop: 'var(--fhc-dg-item-padding-top)',
+				paddingLeft: 'var(--fhc-dg-item-padding-horizontal)',
+				paddingRight: 'var(--fhc-dg-item-padding-horizontal)'
 			}">
 			<template v-slot="item">
 				<slot v-bind="item.data" v-bind="item" :x="item.x" :y="item.y" ></slot>

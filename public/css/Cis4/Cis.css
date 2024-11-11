@@ -238,7 +238,7 @@ html {
   body {
     display: flex;
     padding-top: var(--fhc-cis-header-height);
-    width: calc(100vw - var(--scrollbar-width, 0px));
+    width: calc(100svw - var(--scrollbar-width, 0px));
     /* overflow: visible !important; */
   }
   #cis-header {

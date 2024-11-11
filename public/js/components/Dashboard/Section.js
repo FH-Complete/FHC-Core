@@ -31,6 +31,13 @@ export default {
 		}
 	},
 	computed: {
+		getSectionStyle() {
+
+			const bgString = `background: 
+			  linear-gradient(0deg, rgba(128, 128, 128, 0.05) 0%, rgba(128, 128, 128, 0.1) 50%, rgba(128, 128, 128, 0.05) 100%)`
+
+			return 'margin-bottom: 8px;' + bgString;
+		},
 		items() {
 			return this.widgets.map(item => {
 				return { ...item, ...(item.place[this.gridWidth] || {h: 1, w:1, x:0, y:0})};
@@ -170,10 +177,10 @@ export default {
 		});
 	},
 	template: `
-	<div class="dashboard-section" ref="container">
-		<h3 class="d-flex">
-			<span class="col">{{name}}</span>
-			<button class="col-auto btn" @click.prevent="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
+	<div class="dashboard-section" ref="container" :style="getSectionStyle">
+		<h3>
+			<span >{{$p.t('ui/section' + name)}}</span>
+			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
 		</h3>
 		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editMode" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item" #default>
