@@ -63,6 +63,11 @@
   display: grid;
 }
 
+/* grid hour lines of the Stundenplan use box-shadow instead of border because box-shadow renders consistently on different viewports*/
+.box-shadow-border-top{
+	box-shadow: 0 0 0 1px #dee2e6 !important;
+}
+
 .fhc-calendar-day-page {
   /*aspect-ratio: 7/6;*/
   min-height: 0;
