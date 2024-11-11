@@ -63,6 +63,34 @@
   display: grid;
 }
 
+.fhc-calendar-day-page {
+  /*aspect-ratio: 7/6;*/
+  min-height: 0;
+}
+.fhc-calendar-day-page > div {
+  /*transform: translate(-0.75em, -0.75em);*/
+  /*width: calc(100% + 1.5em);*/
+  height: calc(100% + 1.5em);
+}
+.fhc-calendar-day-page .flex-column > div {
+  padding-left: 3em;
+}
+.fhc-calendar-day-page .flex-column {
+	border-right: 1px solid #dee2e6;
+}
+.fhc-calendar-day-page .events {
+  display: grid;
+  grid-template-columns: 3em 1fr;
+  margin-left: -3em;
+  /*min-height: 266.6666666667%;*/
+}
+.fhc-calendar-day-page .events .day {
+  gap: 1px;
+}
+.fhc-calendar-day-page .events .hours, .fhc-calendar-day-page .events .day {
+  display: grid;
+}
+
 .fhc-calendar-lg .fhc-calendar-month-page-day,
 .fhc-calendar-lg .fhc-calendar-month-page-weekday,
 .fhc-calendar-md .fhc-calendar-month-page-day,
