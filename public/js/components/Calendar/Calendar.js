@@ -56,20 +56,22 @@ export default {
 		minimized: Boolean,
 		noWeekView: Boolean,
 		noMonthView: Boolean,
-		scrollTime: Number,
 	},
 	watch:{
+		// scroll to the first event if the html element was found
 		scrollTime(newScrollTime){
 			let previousScrollAnchor = document.getElementById('scroll' + (newScrollTime-1) + this.focusDate.w)			// scroll the Stundenplan to the closest event
 			let scrollAnchor = document.getElementById('scroll' + newScrollTime+this.focusDate.w);
 			if (previousScrollAnchor)
 			{
-				previousScrollAnchor.scrollIntoView();
+				previousScrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
 			}else{
 				if (scrollAnchor) {
-					scrollAnchor.scrollIntoView();
+					scrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
 				}
 			}
+
+			
 		}
 	},
 	emits: [
@@ -117,7 +119,29 @@ export default {
 				}
 				return result;
 			}, {});
-		}
+		},
+		// returns the hour of the earliest event 
+		scrollTime: function () {
+			if (this.events && Array.isArray(this.events) && this.events.length > 0) {
+				let filteredEvents = this.events.filter(event => {
+					let eventDate = new CalendarDate(new Date(event.datum));
+					return this.focusDate.w == eventDate.w;
+				})
+				// return the first beginning time of the filtered events
+				if(filteredEvents.length > 0)
+				{
+					return parseInt(filteredEvents.sort((a, b) => parseInt(a.beginn) - parseInt(b.beginn))[0].beginn);
+				}
+				// if there is not filtered event that matches the current week
+				else 
+				{
+					return null;
+				}
+			}
+			else {
+				return null;
+			}
+		},
 	},
 	methods: {
 		handleInput(day) {
@@ -151,6 +175,7 @@ export default {
 				}
 			}).observe(this.$refs.container);
 		}
+
 	},
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card" :class="sizeClass">

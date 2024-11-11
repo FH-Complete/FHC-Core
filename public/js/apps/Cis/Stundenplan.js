@@ -32,17 +32,7 @@ const app = Vue.createApp({
 		monthLastDay: function () {
 			return this.calendarDateToString(this.calendarDate.cdLastDayOfCalendarMonth);
 		},
-		// returns the hour of the earliest event 
-		eventsBeginnTime: function(){
-			if(this.events && Array.isArray(this.events) && this.events.length > 0)
-			{
-				return parseInt(this.events.sort((a, b) => parseInt(a.beginn) - parseInt(b.beginn))[0].beginn);
-			}
-			else
-			{
-				return null;
-			}
-		},
+		
 	},
 	methods:{
 		selectDay: function(day){
@@ -64,7 +54,7 @@ const app = Vue.createApp({
 			if (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end))){
 				// reset the events before querying the new events to activate the loading spinner
 				this.events = null;
-				this.calendarDate = tmp_date;
+				this.calendarDate = new CalendarDate(end);
 				Vue.nextTick(() => {
 					this.loadEvents();
 				});
@@ -122,7 +112,7 @@ const app = Vue.createApp({
 	<h2>Stundenplan</h2>
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
-	<fhc-calendar :scrollTime="eventsBeginnTime" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
+	<fhc-calendar :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
 		<template #weekPage="{event,day}">
 			<div @click="showModal(event?.orig)" type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100">
 				<span>{{event?.orig.topic}}</span>
