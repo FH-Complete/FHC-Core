@@ -177,7 +177,7 @@ class FilterCmptLib
 		$session = $this->getSession();
 
 		// If session is NOT empty -> a filter was already loaded
-		if (false && $session != null)
+		if ($session != null)
 		{
 			// Retrieve the filterId stored in the session
 			$sessionFilterId = $this->_getSessionElement(FilterCmptLib::FILTER_ID);
@@ -221,7 +221,7 @@ class FilterCmptLib
 		}
 
 		// If the session is empty -> first time that this filter is loaded
-		if (true || $session == null)
+		if ($session == null)
 		{
 			// Load filter definition data from DB
 			$definition = $this->_loadDefinition(
@@ -1174,4 +1174,3 @@ class FilterCmptLib
 		return $filterName;
 	}
 }
-
