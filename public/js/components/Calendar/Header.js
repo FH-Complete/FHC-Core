@@ -3,9 +3,9 @@ export default {
 		return{
 			selected: this.mode,
 			modes:{
-				week:"Woche", 
-				month:"Monat",
-				day: "Tag", 
+				week: { mode_bezeichnung: "Woche", icon: "fa-calendar-week", condition: !this.noWeekView }, 
+				month: { mode_bezeichnung: "Monat", icon: "fa-calendar-days", condition: !this.noMonthView }, 
+				day: { mode_bezeichnung: "Tag", icon: "fa-sun" , condition:true}, 
 			},
 			headerPadding:null,
 		}
@@ -65,14 +65,12 @@ export default {
 						<button class="btn btn-outline-secondary border-0" :class="{'btn-sm': !this.size}" @click="$emit('next')"><i class="fa fa-chevron-right"></i></button>
 					</div>
 				</div>
-			</div>	
+			</div>
 			<div ref="viewButtons" v-if="!noWeekView && !noMonthView" class=" col-12 col-md-3 d-flex justify-content-center justify-content-md-end align-items-center" style="pointer-events: none;">
 				<div  style="pointer-events: all;">
 					<div  role="group" aria-label="Kalender Modus">
-						<button type="button" :class="{'active':mode_kurzbz == mode}" style="margin-right: 4px;" @click.prevent="$emit('updateMode',mode_kurzbz)" class="btn btn-outline-secondary" v-for="(mode_bezeichnung,mode_kurzbz) in modes">
-							<i v-if="!noWeekView && mode_kurzbz == 'week'" class="fa fa-calendar-week"></i>
-							<i v-else-if="!noMonthView && mode_kurzbz == 'month'" class="fa fa-calendar-days"></i>
-							<i v-else-if="mode_kurzbz == 'day'" class="fa-solid fa-sun"></i>
+						<button type="button" :class="{'active':mode_kurzbz === mode}" style="margin-right: 4px;" @click.prevent="$emit('updateMode',mode_kurzbz)" class="btn btn-outline-secondary" v-for="({mode_bezeichnung,icon,condition},mode_kurzbz) in modes">
+							<i v-if="condition" class="fa" :class="icon" ></i>
 						</button>
 					</div>
 				</div>
