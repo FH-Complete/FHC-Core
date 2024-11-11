@@ -148,17 +148,18 @@ export default {
 	template: `
 	<!--TODO(Manu) nicht anzeigen, wenn keine vorhanden ? check css, design -->
 	
-	<div class="core-vertraege h-50 d-flex flex-column w-100">
+	<div class="core-vertraege-details h-50 d-flex flex-column w-100">
+	<br>
 
-		  <div>
-			<!-- Tabulator-Container -->
+<!--		  <div>
+			&lt;!&ndash; Tabulator-Container &ndash;&gt;
 			<div ref="table"></div>
 		
-			<!-- Ausgabe der Daten -->
+			&lt;!&ndash; Ausgabe der Daten &ndash;&gt;
 			<div v-for="row in tableData" :key="row.id">
 			  <p>{{ row.name }} - {{ row.value }}</p>
 			</div>
-		  </div>
+		  </div>-->
 		
 		<h4>Vertragdetails</h4>
 	

@@ -147,10 +147,12 @@ export default {
 	methods: {
 		actionNewContract() {
 			this.resetModal();
+			this.$refs.unassignedLehrauftraege.reloadUnassigned();
 			this.$refs.contractModal.show();
 		},
 		actionEditContract(vertrag_id) {
 			this.statusNew = false;
+			this.$refs.unassignedLehrauftraege.reloadUnassigned();
 			this.loadContract(vertrag_id)
 				.then(this.$refs.contractModal.show);
 		},
@@ -184,7 +186,7 @@ export default {
 					this.$refs.contractModal.hide();
 					this.resetModal();
 					//this.$refs.contractdetails.reload(); //TOOD(Manu) check why error
-					this.$refs.unassignedLehrauftraege.reload();
+					this.$refs.unassignedLehrauftraege.reloadUnassigned();
 					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -205,7 +207,7 @@ export default {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractModal.hide();
 					this.resetModal();
-					this.$refs.unassignedLehrauftraege.reload();
+					this.$refs.unassignedLehrauftraege.reloadUnassigned();
 					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -272,7 +274,7 @@ export default {
 					//window.scrollTo(0, 0);
 					this.resetModal();
 					this.$refs.contractdetails.reload();
-					this.$refs.unassignedLehrauftraege.reload();
+					this.$refs.unassignedLehrauftraege.reloadUnassigned();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -290,7 +292,7 @@ export default {
 
 					//window.scrollTo(0, 0);
 					this.$refs.contractdetails.reload();
-					this.$refs.unassignedLehrauftraege.reload();
+					this.$refs.unassignedLehrauftraege.reloadUnassigned();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -441,7 +443,7 @@ export default {
 			
 			<core-form class="row g-3" ref="unassignedData">
 		
-		{{formData}}
+<!--		{{formData}}-->
 	
 		<!--TODO(Manu) wenn einer gelöscht wird, wird er auch nicht sofort angezeigt
 		Auswirkung von Vertragdetails of UnassignedList-->

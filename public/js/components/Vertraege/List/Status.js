@@ -161,7 +161,7 @@ export default {
 	},
 	template: `
 	<!--TODO(Manu) check filter (akzeptiert, neu, erteilt?), design -->
-	<div class="core-vertraege h-50 d-flex flex-column w-100">
+	<div class="core-vertraege-status h-50 d-flex flex-column w-100">
 		<br>
 		<h4>Vertragsstatus</h4>
 	

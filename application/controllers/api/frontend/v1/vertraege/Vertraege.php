@@ -306,7 +306,66 @@ class Vertraege extends FHCAPI_Controller
 
 	public function deleteContract($vertrag_id)
 	{
-		//TODO(Manu) validations,
+		//TODO(Manu) validations
+
+		//TODO(manu) use private function
+		$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
+
+		//check if attached Lehrauftrag
+		$resultLehrauftrag = $this->LehreinheitmitarbeiterModel->load([
+			'vertrag_id' => $vertrag_id
+		]);
+
+		if(hasData($resultLehrauftrag))
+		{
+			$resultLehrauftrag = getData($resultLehrauftrag);
+			foreach($resultLehrauftrag as $lehrauftrag)
+			{
+				$result = $this->LehreinheitmitarbeiterModel->update(
+				[
+					'lehreinheit_id' => $lehrauftrag->lehreinheit_id,
+					'mitarbeiter_uid' => $lehrauftrag->mitarbeiter_uid,
+					'vertrag_id' => $vertrag_id
+				],
+				[
+					'vertrag_id' => null
+				]);
+
+				$this->getDataOrTerminateWithError($result);
+
+			}
+		}
+
+		//if attached Betreuung
+		$this->load->model('education/Projektbetreuer_model', 'Projektbetreuermodel');
+
+		//if attached Betreuung
+		$resultBetreuung = $this->Projektbetreuermodel->load([
+			'vertrag_id' => $vertrag_id
+		]);
+
+		if(hasData($resultBetreuung))
+		{
+			$resultBetreuung = getData($resultBetreuung);
+			foreach($resultBetreuung as $betreuung)
+			{
+				$result = $this->Projektbetreuermodel->update(
+					[
+						'person_id' => $betreuung->person_id,
+						'projektarbeit_id' => $betreuung->projektarbeit_id,
+						'betreuerart_kurzbz' => $betreuung->betreuerart_kurzbz,
+						'vertrag_id' => $vertrag_id
+					],
+					[
+						'vertrag_id' => null
+					]);
+
+				$this->getDataOrTerminateWithError($result);
+
+			}
+
+		}
+
 		$result = $this->VertragvertragsstatusModel->load([
 			'vertrag_id' => $vertrag_id
 		]);
