@@ -1,0 +1,66 @@
+:is(.tag_notice, .tag_inwork, .tag_planning) {
+	display: inline-block;
+	padding: 5px 10px;
+	margin-right: 5px;
+	border-radius: 3px;
+	color: white;
+	cursor: default;
+	font-size: .75em;
+	font-weight: 700;
+	line-height: 1;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: baseline;
+}
+
+.tag_notice {
+	background-color: red !important;
+}
+.tag_inwork  {
+	background-color: violet !important;
+}
+.tag_planning  {
+	background-color: lightblue !important;
+}
+
+.dropdown-list {
+	list-style: none;
+	background-color: white;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+	z-index: 1000;
+	position: absolute;
+	padding: 10px 10px 10px;
+	max-width: 200px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.plus-button-container.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.plus-more-tags {
+	font-weight: bold;
+	color: #007bff;
+	cursor: pointer;
+}
+
+.all-tags-modal-content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.tag-done {
+	text-decoration: line-through;
+}
+
+.modificationdate {
+	font-style: italic;
+	font-size: 0.7em;
+	text-align: left;
+}

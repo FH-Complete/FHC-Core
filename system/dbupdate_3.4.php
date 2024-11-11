@@ -57,6 +57,8 @@ require_once('dbupdate_3.4/34543_ux_template.php');
 require_once('dbupdate_3.4/17513_Entwicklungsteam.php');
 require_once('dbupdate_3.4/28575_softwarebereitstellung.php');
 require_once('dbupdate_3.4/40717_lv_faktor.php');
+require_once('dbupdate_3.4/48526_pep_tagging.php');
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
