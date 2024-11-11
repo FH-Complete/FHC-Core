@@ -32,6 +32,17 @@ const app = Vue.createApp({
 		monthLastDay: function () {
 			return this.calendarDateToString(this.calendarDate.cdLastDayOfCalendarMonth);
 		},
+		// returns the hour of the earliest event 
+		eventsBeginnTime: function(){
+			if(this.events && Array.isArray(this.events) && this.events.length > 0)
+			{
+				return parseInt(this.events.sort((a, b) => parseInt(a.beginn) - parseInt(b.beginn))[0].beginn);
+			}
+			else
+			{
+				return null;
+			}
+		},
 	},
 	methods:{
 		selectDay: function(day){
@@ -98,15 +109,20 @@ const app = Vue.createApp({
 			});
 		},
 	},
-	created(){
+	created()
+	{
 		this.loadEvents();
+	},
+	mounted()
+	{
+		
 	},
 	//TODO: Stundenplan phrase
 	template:/*html*/`
 	<h2>Stundenplan</h2>
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
-	<fhc-calendar :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
+	<fhc-calendar :scrollTime="eventsBeginnTime" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
 		<template #weekPage="{event,day}">
 			<div @click="showModal(event?.orig)" type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100">
 				<span>{{event?.orig.topic}}</span>

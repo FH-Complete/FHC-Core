@@ -55,7 +55,22 @@ export default {
 		},
 		minimized: Boolean,
 		noWeekView: Boolean,
-		noMonthView: Boolean
+		noMonthView: Boolean,
+		scrollTime: Number,
+	},
+	watch:{
+		scrollTime(newScrollTime){
+			let previousScrollAnchor = document.getElementById('scroll' + (newScrollTime-1) + this.focusDate.w)			// scroll the Stundenplan to the closest event
+			let scrollAnchor = document.getElementById('scroll' + newScrollTime+this.focusDate.w);
+			if (previousScrollAnchor)
+			{
+				previousScrollAnchor.scrollIntoView();
+			}else{
+				if (scrollAnchor) {
+					scrollAnchor.scrollIntoView();
+				}
+			}
+		}
 	},
 	emits: [
 		'select:day',

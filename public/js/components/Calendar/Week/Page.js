@@ -137,11 +137,12 @@ export default {
 		}
 	},
 	mounted() {
+
 		setTimeout(() => this.$refs.eventcontainer.scrollTop = this.$refs.eventcontainer.scrollHeight / 3 + 1, 0);
 	},
-	template: `
+	template: /*html*/`
 	<div class="fhc-calendar-week-page">
-	
+
 		<div class="d-flex flex-column">
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="{'z-index':4,'grid-template-columns': 'repeat(' + days.length + ', 1fr)', 'grid-template-rows':1}" style="position:sticky; top:0; " >
 				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
@@ -150,7 +151,7 @@ export default {
 				</div>
 			</div>
 			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="" >
-				<div v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" style="pointer-events: none;" :style="{top:getAbsolutePositionForHour(hour),left:0,right:0,'z-index':0}"></div>
+				<div :id="'scroll'+hour+week" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" style="pointer-events: none;" :style="{top:getAbsolutePositionForHour(hour),left:0,right:0,'z-index':0}"></div>
 				<div v-if="hourPosition" class="position-absolute border-top small"  style="pointer-events: none; padding-left:3.5rem; margin-top:-1px;z-index:2;border-color:#00649C !important" :style="{top:hourPosition+'px',left:0,right:0}">
 					<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 				</div>
