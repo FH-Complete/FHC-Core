@@ -6,7 +6,13 @@ export default {
 		return {
 			carousel: null,
 			queue: 0,
-			offset: 0
+			offset: 0,
+			slideAnimation:false,
+		}
+	},
+	provide() {
+		return {
+			isSliding: Vue.computed(() => this.slideAnimation),
 		}
 	},
 	computed: {
@@ -34,6 +40,10 @@ export default {
 				else
 					this.carousel.prev();
 			}
+			this.slideAnimation = false;
+		},
+		slide(evt) {
+			this.slideAnimation = true;
 		}
 	},
 	mounted() {
@@ -45,7 +55,7 @@ export default {
 		}
 	},
 	template: `
-	<div ref="carousel" class="calendar-pane carousel slide" @[\`slid.bs.carousel\`]="slid" :data-queue="queue">
+	<div ref="carousel" class="calendar-pane carousel slide" @[\`slide.bs.carousel\`]="slide" @[\`slid.bs.carousel\`]="slid" :data-queue="queue">
 		<!--height calc function just for user testing purpose (has to be fixed)-->
 		<div class="carousel-inner " style="height:calc(100vh - 220px); overflow:scroll">
 			<div v-for="i in [...Array(3).keys()]" :key="i" class="carousel-item">

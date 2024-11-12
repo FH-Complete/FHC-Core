@@ -15,7 +15,8 @@ export default {
 		'focusDate',
 		'size',
 		'events',
-		'noMonthView'
+		'noMonthView',
+		'isSliding'
 	],
 	props: {
 		year: Number,
@@ -39,6 +40,9 @@ export default {
 			return result;
 		},
 		eventsPerDayAndHour() {
+			// return early if the calendar pane is sliding
+			if (this.isSliding) return {};
+
 			const res = {};
 			this.days.forEach(day => {
 				let key = day.toDateString();
