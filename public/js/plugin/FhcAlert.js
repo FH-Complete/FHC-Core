@@ -227,6 +227,25 @@ export default {
 					});
 				});
 			},
+			confirm(options) {
+				return new Promise((resolve, reject) => {
+					helperAppInstance.$confirm.require({
+						group: options?.group ?? 'fhcAlertConfirm',
+						header: options?.header ?? 'Achtung',
+						message: options?.message ?? '',
+						acceptLabel: options?.acceptLabel ?? 'Ok',
+						acceptClass: options?.acceptClass ?? 'btn btn-primary',
+						rejectLabel: options?.rejectLabel ?? 'Abbrechen',
+						rejectClass: options?.rejectClass ?? 'btn btn-outline-secondary',
+						accept() {
+							resolve(true);
+						},
+						reject() {
+							resolve(false);
+						},
+					});
+				});
+			},
 			alertDefault(severity, title, message, sticky = false) {
 				let options = { severity: severity, summary: title, detail: message};
 				
