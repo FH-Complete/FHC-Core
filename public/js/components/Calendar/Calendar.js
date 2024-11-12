@@ -59,19 +59,23 @@ export default {
 	},
 	watch:{
 		// scroll to the first event if the html element was found
-		scrollTime(newScrollTime){
-			let previousScrollAnchor = document.getElementById('scroll' + (newScrollTime-1) + this.focusDate.w)			// scroll the Stundenplan to the closest event
-			let scrollAnchor = document.getElementById('scroll' + newScrollTime+this.focusDate.w);
+		async scrollTime(newScrollTime){
+			// scroll the Stundenplan to the closest event
+			await Vue.nextTick();
+			let previousScrollAnchor = document.getElementById('scroll' + (newScrollTime-1) + this.focusDate.d + this.focusDate.w)			
+			let scrollAnchor = document.getElementById('scroll' + newScrollTime+this.focusDate.d+this.focusDate.w);
+
 			if (previousScrollAnchor)
 			{
 				previousScrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-			}else{
-				if (scrollAnchor) {
+			}
+			else
+			{
+				if (scrollAnchor) 
+				{
 					scrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
 				}
 			}
-
-			
 		}
 	},
 	emits: [
@@ -120,12 +124,20 @@ export default {
 				return result;
 			}, {});
 		},
-		// returns the hour of the earliest event 
+		// returns the hour of the earliest event, used to scroll to the events in the calendar (week / day view)
 		scrollTime: function () {
 			if (this.events && Array.isArray(this.events) && this.events.length > 0) {
 				let filteredEvents = this.events.filter(event => {
+					// week view filters the elements only for the same week
 					let eventDate = new CalendarDate(new Date(event.datum));
-					return this.focusDate.w == eventDate.w;
+					if(this.mode == 'week'){
+						return this.focusDate.w == eventDate.w;
+					}
+					// day view filters the elements for the same day and the same week
+					else if(this.mode == 'day'){
+						
+						return this.focusDate.d == eventDate.d && this.focusDate.w == eventDate.w;
+					}
 				})
 				// return the first beginning time of the filtered events
 				if(filteredEvents.length > 0)
