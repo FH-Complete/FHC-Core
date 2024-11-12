@@ -77,10 +77,10 @@ class Tag_Controller extends FHCAPI_Controller
 		if (!hasData($checkTyp))
 			$this->terminateWithError('Error occurred', self::ERROR_TYPE_GENERAL);
 
-		$return = "";
 
 		if ($withZuordnung)
 		{
+			$return = array();
 			$checkZuordnungType = $this->NotizzuordnungModel->isValidType($postData->zuordnung_typ);
 			if (!isSuccess($checkZuordnungType))
 				$this->terminateWithError('Error occurred', self::ERROR_TYPE_GENERAL);
@@ -104,6 +104,7 @@ class Tag_Controller extends FHCAPI_Controller
 
 				$return[] = [$postData->zuordnung_typ => $value, 'id' => $insertResult->retval];
 			}
+			$this->terminateWithSuccess($return);
 		}
 		else
 		{
@@ -111,10 +112,8 @@ class Tag_Controller extends FHCAPI_Controller
 			if (isError($insertResult))
 				$this->terminateWithError('Error occurred', self::ERROR_TYPE_GENERAL);
 
-			$return = $insertResult->retval;
+			return $insertResult->retval;
 		}
-
-		$this->terminateWithSuccess($return);
 	}
 
 	private function addNotiz($postData)
@@ -148,20 +147,31 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->terminateWithSuccess($updateData);
 	}
 
-	public function deleteTag()
+	public function deleteTag($withZuordnung = true)
 	{
 		$postData = $this->getPostJson();
-		$deleteZuordnung = $this->NotizzuordnungModel->delete(array(
-			'notiz_id' => $postData->id
-		));
 
-		if (isSuccess($deleteZuordnung))
+		$deleteNotiz = "";
+		if ($withZuordnung)
+		{
+			$deleteZuordnung = $this->NotizzuordnungModel->delete(array(
+				'notiz_id' => $postData->id
+			));
+
+			if (isSuccess($deleteZuordnung))
+			{
+				$deleteNotiz = $this->NotizModel->delete(array(
+					'notiz_id' => $postData->id
+				));
+			}
+		}
+		else
 		{
 			$deleteNotiz = $this->NotizModel->delete(array(
 				'notiz_id' => $postData->id
 			));
 		}
-		$this->terminateWithSuccess(true);
+		$this->terminateWithSuccess($deleteNotiz);
 	}
 
 	private function _setAuthUID()
