@@ -127,7 +127,6 @@ const app = Vue.createApp({
 				<span>{{event?.orig.ort_kurzbz}}</span>
 			</div>
 		</template>
-		<template
 	</fhc-calendar>
 	`
 });
