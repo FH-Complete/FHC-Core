@@ -346,7 +346,16 @@ class Vertrag_model extends DB_Model
 					TO_CHAR(tbl_vertrag.vertragsdatum::timestamp, 'DD.MM.YYYY') AS format_vertragsdatum,
 					(SELECT bezeichnung FROM lehre.tbl_vertragsstatus 
 					    JOIN lehre.tbl_vertrag_vertragsstatus USING(vertragsstatus_kurzbz)
-						WHERE vertrag_id=tbl_vertrag.vertrag_id ORDER BY datum desc limit 1) as status, anmerkung
+						WHERE vertrag_id=tbl_vertrag.vertrag_id ORDER BY datum desc limit 1) as status, anmerkung,
+			    CASE
+					WHEN EXISTS (
+						SELECT 1
+						FROM lehre.tbl_vertrag_vertragsstatus
+						WHERE vertrag_id = tbl_vertrag.vertrag_id
+						AND vertragsstatus_kurzbz = 'abgerechnet'
+					) THEN true 
+					ELSE false
+				END AS isAbgerechnet
 				FROM
 					lehre.tbl_vertrag
 					LEFT JOIN lehre.tbl_vertragstyp USING(vertragstyp_kurzbz)

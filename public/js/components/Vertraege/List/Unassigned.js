@@ -90,11 +90,9 @@ export default {
 	//TODO(Manu) auch auf fhcapi umbauen?
 	watch: {
 		person_id() {
-			console.log("data changed");
 			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsNotAssigned/' + this.person_id);
 		},
 		clickedRows() {
-			console.log("clicked rows changed");
 			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsNotAssigned/' + this.person_id);
 		},
 	},
@@ -132,18 +130,15 @@ export default {
 
 		},
 		emitSaveEvent() {
-			// Emit ein Event und übergebe clickedRows an die Parent-Komponente
 			this.$emit('saveClickedRows', this.clickedRows);
 		},
 		reloadUnassigned() {
 			this.$refs.table.reloadTable();
 			this.$emit('reloadUnassigned');
 			this.clickedRows = [];
-		//	console.log("clickedRows", this.clickedRows);
 		},
 		handleSumUp() {
-			//this.localValue += 1; // Increment the local value
-			this.$emit("sum-updated", this.sumBetragLehrauftraege); // Emit the updated value to the parent
+			this.$emit("sum-updated", this.sumBetragLehrauftraege);
 		},
 	},
 	mounted() {

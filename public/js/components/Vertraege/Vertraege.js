@@ -57,6 +57,7 @@ export default {
 					{title: "Vertragsstunden", field: "vertragsstunden", visible: false},
 					{title: "VertragsstundenStudiensemester", field: "vertragsstunden_studiensemester_kurzbz", visible: false},
 					{title: "Anmerkung", field: "anmerkung", visible: false},
+					{title: "isAbgerechnet", field: "isabgerechnet", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150,
@@ -136,7 +137,8 @@ export default {
 				vertragsstatus_kurzbz: 'test',
 				datum: new Date(),
 			},
-			childData: {}
+			childData: {},
+			isFilterSet: false
 		}
 	},
 	watch: {
@@ -151,7 +153,9 @@ export default {
 			this.$refs.contractModal.show();
 		},
 		actionEditContract(vertrag_id) {
+			this.resetModal();
 			this.statusNew = false;
+			//TODO(Manu) reload Assigned!!
 			this.$refs.unassignedLehrauftraege.reloadUnassigned();
 			this.loadContract(vertrag_id)
 				.then(this.$refs.contractModal.show);
@@ -186,6 +190,7 @@ export default {
 					this.$refs.contractModal.hide();
 					this.resetModal();
 					//this.$refs.contractdetails.reload(); //TOOD(Manu) check why error
+					//this.$refs.contractdetails.reload();
 					this.$refs.unassignedLehrauftraege.reloadUnassigned();
 					this.reload();
 				})
@@ -208,6 +213,7 @@ export default {
 					this.$refs.contractModal.hide();
 					this.resetModal();
 					this.$refs.unassignedLehrauftraege.reloadUnassigned();
+					this.$refs.contractdetails.reload();
 					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -312,6 +318,7 @@ export default {
 					//window.scrollTo(0, 0);
 					this.$refs.contractstati.closeModal();
 					this.$refs.contractstati.reload();
+					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -358,6 +365,14 @@ export default {
 
 			return `${year}${month}${day}`; // Format: YYYYMMDD
 		},
+		onSwitchChange() {
+			if (this.isFilterSet) {
+				this.$refs.table.tabulator.setFilter("isabgerechnet", "!=", true);
+			}
+			else {
+				this.$refs.table.tabulator.clearFilter("status");
+			}
+		},
 	},
 	created() {
 		Promise.all([
@@ -385,9 +400,18 @@ export default {
 
 	<div class="core-vertraege h-100 d-flex flex-column">
 	
-				parent:
-			{{childData}}
-	
+<!--	filter: open means no status abgerechnet yet-->
+		<div class="justify-content-end pb-3">
+			<form-input
+				container-class="form-switch"
+				type="checkbox"
+				:label="$p.t('vertrag/filter_offeneVertraege')"
+				v-model="isFilterSet"
+				@change="onSwitchChange"
+				>
+			</form-input>
+		</div>
+		
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"

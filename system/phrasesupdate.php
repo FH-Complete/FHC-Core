@@ -31247,6 +31247,66 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'filter_offeneVertraege',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur offene Verträge anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show only open contracts',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'error_addOrUpdateLehrauftraege',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Hinzufügen bzw. Aktualisieren von Lehraufträgen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error while adding or updating teaching assignments',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'error_insertOrUpdateStatusVertrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Hinzufügen bzw. Aktualisieren des Vertragsstatus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error while adding or updating the contract status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 );
 

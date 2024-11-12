@@ -34,11 +34,6 @@ export default {
 					};
 				},
 				ajaxResponse: (url, params, response) => response.data,
-				//Version with saving Data in tableData Object
-/*				ajaxResponse: (url, params, response) => {
-					this.tableData = response.data;
-					return response.data;
-				},*/
 				columns: [
 					{title: "Typ", field: "type"},
 					{title: "Betrag", field: "betrag"},
@@ -103,29 +98,19 @@ export default {
 				selectable: true,
 			},
 			clickedRows: [],
-/*			table: null,
-			tableData: []*/
 		}
 	},
 	watch: {
-/*		person_id: 'updateTableData',
-		vertrag_id: 'updateTableData'*/
+
 		person_id() {
-			console.log("person geändert");
 			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsAssigned/' + this.person_id + '/' + this.vertrag_id);
 		},
 		vertrag_id() {
-			console.log("vertrag geändert");
 			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsAssigned/' + this.person_id + '/' + this.vertrag_id);
 		},
 	},
 	methods: {
-/*		updateTableData() {
-			this.$refs.table.tabulator.setData(`api/frontend/v1/vertraege/vertraege/getAllContractsAssigned/ ' ${this.person_id}/${this.vertrag_id}`);
-		},*/
-		//TODO(Manu) delete vertrag_id: not necessary
 		actionDeleteLehrauftrag(vertrag_id, lehreinheit_id, mitarbeiter_uid) {
-			console.log("child", vertrag_id);
 			this.$emit('deleteLehrauftrag', {
 				lehreinheit_id: lehreinheit_id,
 				vertrag_id: vertrag_id,
@@ -149,18 +134,7 @@ export default {
 	<!--TODO(Manu) nicht anzeigen, wenn keine vorhanden ? check css, design -->
 	
 	<div class="core-vertraege-details h-50 d-flex flex-column w-100">
-	<br>
-
-<!--		  <div>
-			&lt;!&ndash; Tabulator-Container &ndash;&gt;
-			<div ref="table"></div>
-		
-			&lt;!&ndash; Ausgabe der Daten &ndash;&gt;
-			<div v-for="row in tableData" :key="row.id">
-			  <p>{{ row.name }} - {{ row.value }}</p>
-			</div>
-		  </div>-->
-		
+	<br>		
 		<h4>Vertragdetails</h4>
 	
 		<core-filter-cmpt
