@@ -121,10 +121,19 @@ const app = Vue.createApp({
 			</div>
 		</template>
 		<template #dayPage="{event,day}">
-			<div @click="showModal(event?.orig)" type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100">
-				<span>{{event?.orig.topic}}</span>
-				<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
-				<span>{{event?.orig.ort_kurzbz}}</span>
+			<div type="button" class="row">
+				<div class="col">
+					<p>Lehrveranstaltung:</p>
+					<p>{{event?.orig.topic}}</p>
+				</div>
+				<div class="col">
+					<p>Lektor:</p>
+					<p v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
+				</div>
+				<div class="col">
+					<p>Ort: </p>
+					<p>{{event?.orig.ort_kurzbz}}</p>
+				</div>
 			</div>
 		</template>
 	</fhc-calendar>

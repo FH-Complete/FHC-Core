@@ -1,13 +1,21 @@
 import CalendarDate from '../../../composables/CalendarDate.js';
+import LvMenu from "../../../components/Cis/Mylv/LvMenu.js"
+import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
 
 function ggt(m, n) { return n == 0 ? m : ggt(n, m % n); }
 function kgv(m, n) { return (m * n) / ggt(m, n); }
 
 export default {
+	components:{
+		LvMenu,
+		LvInfo,
+	},
 	data() {
 		return {
 			hourPosition: null,
 			hourPositionTime: null,
+			lvMenu:null,
+			selectedEvent: null,
 		}
 	},
 	inject: [
@@ -88,6 +96,24 @@ export default {
 		},
 	},
 	methods: {
+		eventClick(evt) {
+			let event = evt.orig;
+			this.selectedEvent = event;
+			if (event.type == 'lehreinheit') {
+				this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]).then(
+					res => res.data
+				).then(
+					studiensemester_kurzbz => {
+						this.$fhcApi.factory.addons.getLvMenu(event.lehrveranstaltung_id, studiensemester_kurzbz).then(res => {
+							if (res.data) {
+								this.lvMenu = res.data;
+							}
+						});
+					}
+				)
+			}
+			this.$emit('input', event);
+		},
 		calcHourPosition(event) {
 			let height = this.$refs.eventcontainer.getBoundingClientRect().height;
 			let top = this.$refs.eventcontainer.getBoundingClientRect().top;
@@ -149,8 +175,8 @@ export default {
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-day-page ">
-		<div class="row">
-			<div class="col-12 col-xl-6">
+		<div class="row m-0">
+			<div class="col-12 col-xl-6 p-0">
 				<div class="d-flex flex-column">
 				<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="{'z-index':4,'grid-template-columns': 'repeat(' + days.length + ', 1fr)', 'grid-template-rows':1}" style="position:sticky; top:0; " >
 					<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
@@ -166,12 +192,12 @@ export default {
 					<div>
 						<h1 v-if="filteredEvents.length==0" class="m-0 text-secondary" ref="noEventsText" :style="{'top':noEventsTextPosition+'px'}" style="position:absolute; left:0;  text-align:center; width: 100%; z-index:1">Keine Lehrveranstaltungen</h1>
 						<div class="events" :class="{'fhc-calendar-no-events-overlay':filteredEvents.length==0}">
-							
+
 							<div class="hours">
 								<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 							</div>
 							<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': '1 1fr', 'grid-template-rows': 'repeat(' + (hours.length * 60 / smallestTimeFrame) + ', 1fr)'}">
-								<div  :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="$emit('input', event.orig)" :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">
+								<div  :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="eventClick(event)" :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">
 									<slot  name="dayPage" :event="event" :day="day">
 										<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 									</slot>
@@ -180,13 +206,16 @@ export default {
 							</div>
 						</div>
 					</div>
-					
+
 				</div>
 			</div>
 			</div>
-			<div class="d-none d-xl-block col-xl-6">
-				<div class="bg-secondary h-100 d-flex justify-content-center align-items-center">
-					<p class="text-white fs-1" >other content goes in here</p>
+			<div class="d-none d-xl-block col-xl-6 p-0">
+				<div style="position:sticky; top:100px; " class="d-flex justify-content-center align-items-center flex-column">
+					<div class="w-100">
+						<lv-info v-if="selectedEvent && lvMenu" :titel="$p.t('lvinfo','lehrveranstaltungsinformationen')" :event="selectedEvent" />
+					</div>
+					<lv-menu  v-show="lvMenu" :titel="'Lehrveranstaltungs Menu'" :menu="lvMenu" />
 				</div>
 			</div>
 		</div>
