@@ -48,7 +48,25 @@ export default {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 		}
 	},
-	methods:{
+	methods: {
+		getLanguageButtonClass(lang) {
+			let classString = 'btn btn-level-2 rounded-0'
+			const langCookie = (function(lang) {
+				const cookieString = document.cookie;
+				const cookies = cookieString.split('; ');
+
+				for (let cookie of cookies) {
+					const [key, value] = cookie.split('=');
+					if (key === lang) {
+						return decodeURIComponent(value);
+					}
+				}
+
+				return null; // Return null if the cookie is not found
+			})('sprache');
+			if(langCookie === lang) classString += ' fhc-active';
+			return classString
+		},
 		toggleCollapsibles(target){
 			switch(target){
 				case 'settings':
@@ -77,6 +95,17 @@ export default {
 		},
 		handleChangeLanguage(lang) {
 			this.$p.setLanguage(lang, this.$fhcApi)
+			const gerButton = this.$refs.ger
+			const engButton = this.$refs.eng
+			
+			if(lang === 'German') {
+				gerButton.classList.add('fhc-active')
+				engButton.classList.remove('fhc-active')
+			} else if(lang === 'English') {
+				engButton.classList.add('fhc-active')
+				gerButton.classList.remove('fhc-active')
+			}
+			
 		}
 	},
 	mounted(){
@@ -105,8 +134,10 @@ export default {
 		<ul ref="navUserDropdown" @[\`show.bs.collapse\`]="toggleCollapsibles('navUserDropdown')" id="nav-user-menu" class="top-100 end-0 collapse list-unstyled" aria-labelledby="nav-user-btn">
 			<li class="btn-level-2"><a class="btn btn-level-2 rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
 			<li class="fhc-languages btn-level-2" style="text-align: center;">
-				<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('German')">Deutsch</a>
-				<a class="btn btn-level-2 rounded-0" href="#" @click="handleChangeLanguage('English')">English</a>
+				<div class="btn-group">
+					<a :class="getLanguageButtonClass('German')" ref="ger" href="#" @click="handleChangeLanguage('German')">Deutsch</a>
+					<a :class="getLanguageButtonClass('English')" ref="eng" href="#" @click="handleChangeLanguage('English')">English</a>
+				</div>
 			</li>
 			<li class="btn-level-2"><hr class="dropdown-divider p-0 "></li>
 			<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>

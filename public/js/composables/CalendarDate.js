@@ -75,7 +75,6 @@ class CalendarDate {
 			days[i] = new Date(this.y, this.m, this.d)
 			days[i].setDate(this.d -(date.getDay()+7-this.weekStart)%7 + i)
 		}
-		console.log('wholeWorkWeek', days)
 		return days
 	}
 	get cdLastDayOfWeek() {

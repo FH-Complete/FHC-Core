@@ -19,6 +19,7 @@ html {
   --fhc-cis-menu-lvl-2-color: #fff;
   --fhc-cis-menu-lvl-2-bg-hover: #2c3136;
   --fhc-cis-menu-lvl-2-color-hover: #fff;
+  --fhc-cis-menu-lvl-2-color-active: #292b2a;
   --fhc-cis-menu-lvl-3-bg: #72777A;
   --fhc-cis-menu-lvl-3-color: #fff;
   --fhc-cis-menu-lvl-3-bg-hover: #616568;
@@ -231,6 +232,10 @@ html {
 #fhc-languages .btn {
   flex: 1;
   display: flex;
+}
+
+.fhc-active {
+  background-color: var(--fhc-cis-menu-lvl-2-color-active) !important;
 }
 
 /* desktop */
