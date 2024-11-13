@@ -20,6 +20,9 @@ export default {
   methods: {},
 
   computed: {
+    editable() {
+      return this.data?.editAllowed ?? false;
+    },
     profilInformation() {
       if (!this.data) {
         return {};
@@ -89,7 +92,7 @@ export default {
                      <div class="row mb-4">
                      <div class="col">
                      
-                        <profil-information :data="profilInformation" :title="$p.t('profil','studentIn')"></profil-information>
+                        <profil-information :data="profilInformation" :title="$p.t('profil','studentIn')" :editable="editable"></profil-information>
                      
 		                </div>
                     </div>

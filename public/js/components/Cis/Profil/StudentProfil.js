@@ -139,6 +139,10 @@ export default {
   },
 
   computed: {
+    editable() {
+      return this.data?.editAllowed ?? false;
+    },
+    
     filteredEditData() {
       return this.editDataFilter
         ? this.editData.data[this.editDataFilter]
@@ -204,8 +208,7 @@ export default {
               </div>
 
               <!-- Bearbeiten Button -->
-  
-              <div class="row ">
+              <div v-if="editable" class="row ">
               <div class="col mb-3">
               
               <button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
@@ -248,7 +251,7 @@ export default {
                     <div class="col">
                     
                     <!-- PROFIL INFORMATION -->
-                    <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation"></profil-information>
+                    <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation" :editable="editable"></profil-information>
 
 
                     </div>

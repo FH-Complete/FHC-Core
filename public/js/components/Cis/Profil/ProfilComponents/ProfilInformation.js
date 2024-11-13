@@ -6,6 +6,10 @@ export default {
     data: {
       type: Object,
     },
+    editable: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -56,7 +60,7 @@ export default {
     <div class="card h-100">
     <div class="card-header">
       <div class="row">
-        <div @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button">
+        <div v-if="editable" @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button">
           <i class="fa fa-edit"></i>
         </div>
         <div class="col">
@@ -77,7 +81,7 @@ export default {
         <!-- LOCKING IMAGE FUNCTIONALITY -->
         
         
-        <div role="button" @click.prevent="sperre_foto_function" class="image-lock" >
+        <div v-if="editable" role="button" @click.prevent="sperre_foto_function" class="image-lock" >
         <i :class="{'fa':true, ...(FotoSperre?{'fa-lock':true}:{'fa-lock-open':true})} " ></i>
         </div>
 

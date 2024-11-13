@@ -195,6 +195,9 @@ export default {
   },
 
   computed: {
+    editable() {
+      return this.data?.editAllowed ?? false;
+    },
     filteredEditData() {
       return this.editDataFilter
         ? this.editData.data[this.editDataFilter]
@@ -299,7 +302,7 @@ export default {
                      <div class="col">
                      
                      <!-- PROFIL INFORMATION -->
-                     <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
+                     <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :editable="editable"></profil-information>
 
 
 		                 </div>

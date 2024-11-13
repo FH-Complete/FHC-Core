@@ -124,7 +124,7 @@ export default {
         <span class="navbar-toggler-icon"></span>
     </button>
 	<fhc-searchbar @showSettings="toggleCollapsibles" ref="searchbar" id="nav-search" class="fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction" :selectedtypes="selectedtypes"></fhc-searchbar>
-    <a id="nav-logo" class="d-none d-md-block" :href="rootUrl">
+    <a id="nav-logo" class="d-none d-sm-block" :href="rootUrl">
         <img :src="logoUrl" alt="Logo">
     </a>
 	<div id="nav-user">
