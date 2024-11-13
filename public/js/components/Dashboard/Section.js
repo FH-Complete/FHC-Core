@@ -16,7 +16,8 @@ export default {
 	},
 	props: [
 		"name",
-		"widgets"
+		"widgets",
+		"seperator"
 	],
 	emits: [
 		"widgetAdd",
@@ -32,11 +33,7 @@ export default {
 	},
 	computed: {
 		getSectionStyle() {
-
-			const bgString = `background: 
-			  linear-gradient(0deg, rgba(128, 128, 128, 0.05) 0%, rgba(128, 128, 128, 0.1) 50%, rgba(128, 128, 128, 0.05) 100%)`
-
-			return 'margin-bottom: 8px;' + bgString;
+			return 'margin-bottom: 8px;';
 		},
 		items() {
 			return this.widgets.map(item => {
@@ -177,6 +174,7 @@ export default {
 		});
 	},
 	template: `
+	<div v-if="seperator" class="fhc-seperator"/>
 	<div class="dashboard-section" ref="container" :style="getSectionStyle">
 		<h3>
 			<span >{{$p.t('ui/section' + name)}}</span>
