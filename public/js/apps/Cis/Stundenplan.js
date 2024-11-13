@@ -8,6 +8,7 @@ const app = Vue.createApp({
 	data() {
 		return {
 			stunden: [],
+			lv_id: null,
 			events: null,
 			calendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
@@ -35,6 +36,9 @@ const app = Vue.createApp({
 		
 	},
 	methods:{
+		getLvID: function () {
+			this.lv_id = window.location.pathname
+		},
 		selectDay: function(day){
 			this.currentDay = day;
 		},
@@ -101,11 +105,7 @@ const app = Vue.createApp({
 	},
 	created()
 	{
-		this.loadEvents();
-	},
-	mounted()
-	{
-		
+		this.getLvID()
 	},
 	//TODO: Stundenplan phrase
 	template:/*html*/`
@@ -136,6 +136,7 @@ const app = Vue.createApp({
 				</div>
 			</div>
 		</template>
+		<template
 	</fhc-calendar>
 	`
 });

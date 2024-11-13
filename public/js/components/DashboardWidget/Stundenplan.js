@@ -21,7 +21,7 @@ export default {
 			stunden: [],
 			minimized: true,
 			events: null,
-			currentDay: new Date(),
+			currentDay: this.getCurrentDate(),
 			calendarDate: new CalendarDate(new Date()),
 			roomInfoContentID: null,
 			ort_kurzbz: null,
@@ -29,7 +29,19 @@ export default {
 		}
 	},
 	computed: {
-		
+		allEventsGrouped() {
+			// groups all events of all days until end of week together
+			const currentCalendarDate = new CalendarDate(this.currentDay)
+			const mapArr = currentCalendarDate.wholeWorkWeek.map((d) => [new CalendarDate(d), []])
+
+			return new Map((this.events || []).filter(evt => evt.end < currentCalendarDate.lastDayOfWeek && evt.start >= currentCalendarDate.firstDayOfWeek).reduce((acc, cur) => {
+				const date = new CalendarDate(new Date(cur.datum))
+				const arr = acc.find(el => el[0].compare(date))
+				arr[1].push(cur)
+				
+				return acc
+			}, mapArr))
+		},
 		currentEvents() {
 			return (this.events || []).filter(evt => evt.end < this.dayAfterCurrentDay && evt.start >= this.currentDay);
 		},
@@ -46,6 +58,17 @@ export default {
 		},
 	},
 	methods: {
+		getEventStyle: function(evt) {
+			const styles = {'background-color': evt.color};
+			if(evt.start.getTime() < Date.now()) styles.opacity = 0.5;
+
+			return styles;
+		},
+		getCurrentDate: function() {
+			const today = new Date()
+			today.setHours(0,0,0)
+			return today
+		},
 		calendarDateToString: function (calendarDate) {
 
 			return calendarDate instanceof CalendarDate ?
@@ -127,6 +150,10 @@ export default {
 				this.events = promise_events;
 			});
 		},
+
+		setCalendarMaximized() {
+			this.minimized = false
+		}
 	
 
 	},
@@ -162,12 +189,15 @@ export default {
 		<content-modal :contentID="roomInfoContentID" :ort_kurzbz="" dialogClass="modal-lg" ref="contentModal"/>
 		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" >
 			<template #minimizedPage >
-				<div class="flex-grow-1 overflow-scroll">
+				<div class="flex-grow-1" style="overflow-y: scroll; overflow-x: hidden">
 					<div v-if="events === null" class="d-flex h-100 justify-content-center align-items-center">
 						<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 					</div>
-					<div v-else-if="currentEvents.length" class="list-group list-group-flush">
-						<div role="button" @click="showLvUebersicht(evt)" class="" v-for="evt in currentEvents" :key="evt.id" class="list-group-item small" :style="{'background-color':evt.color}">
+					<template ref="allWeek" v-else-if="allEventsGrouped.size" v-for="([key, value], index) in allEventsGrouped" :key="index" style="margin-top: 8px;">
+						<div class="card-header d-grid p-0">
+							<button class="btn btn-link link-secondary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"})}}</button>
+						</div>
+						<div role="button" @click="showLvUebersicht(evt)" v-for="evt in value" :key="evt.id" class="list-group-item small" :style="getEventStyle(evt)">
 							<b>{{evt.topic}}</b>
 							<br>
 							<small class="d-flex w-100 justify-content-between">
@@ -176,13 +206,13 @@ export default {
 								<span>{{evt.start.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}-{{evt.end.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}</span>
 							</small>
 						</div>
-					</div>
+					</template>
 					<div v-else class="d-flex h-100 justify-content-center align-items-center fst-italic text-center">
 						{{ p.t('lehre/noLvFound') }}
 					</div>
 				</div>
 			</template>
 		</fhc-calendar>
-		
+		</div>
 	</div>`
 }

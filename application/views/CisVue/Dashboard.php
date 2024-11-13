@@ -2,6 +2,7 @@
 $includesArray = array(
 	'title' => 'Dashboard',
 	'tabulator5'=>true,
+	'primevue3' => true,
 	'customJSModules' => ['public/js/apps/Dashboard/Fhc.js'],
 	'customCSSs' => [
 		'public/css/components/dashboard.css'
