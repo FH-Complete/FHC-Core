@@ -43,7 +43,8 @@ export const CoreFilterCmpt = {
 	emits: [
 		'nwNewEntry',
 		'click:new',
-		'tableBuilt'
+		'tableBuilt',
+		'uuidDefined'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -200,16 +201,16 @@ export const CoreFilterCmpt = {
 			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
-				height: 500,
-				layout: "fitDataStretch",
-				movableColumns: true,
-				columnDefaults:{
-					tooltip: true,
-				},
-				placeholder,
-				reactiveData: true,
-				persistence: true
-			}, ...(this.tabulatorOptions || {})};
+					height: 500,
+					layout: "fitDataStretch",
+					movableColumns: true,
+					columnDefaults:{
+						tooltip: true,
+					},
+					placeholder,
+					reactiveData: true,
+					persistence: true
+				}, ...(this.tabulatorOptions || {})};
 
 			if (!this.tableOnly) {
 				tabulatorOptions.data = this.filteredData;
@@ -573,6 +574,7 @@ export const CoreFilterCmpt = {
 		if (this.sideMenu && (!this.$props.onNwNewEntry || !(this.$props.onNwNewEntry instanceof Function)))
 			alert('"nwNewEntry" listener is mandatory when sideMenu is true');
 		this.uuid = _uuid++;
+		this.$emit('uuidDefined', this.uuid)
 		if (!this.tableOnly)
 			this.getFilter(); // get the filter data
 	},
@@ -664,4 +666,3 @@ export const CoreFilterCmpt = {
 		<div ref="table" :id="'filterTableDataset' + idExtra" class="filter-table-dataset"></div>
 	`
 };
-

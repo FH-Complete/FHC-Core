@@ -15,7 +15,11 @@ export default {
 		'focusDate',
 		'size',
 		'events',
-		'noMonthView'
+		'noMonthView',
+		'filteredEvents',
+		'isSliding',
+		'calendarScrollTop',
+		'calendarClientHeight',
 	],
 	props: {
 		year: Number,
@@ -28,6 +32,9 @@ export default {
 		'input'
 	],
 	computed: {
+		noEventsTextPosition(){
+				return this.calendarScrollTop + 100; 
+		},
 		hours() {
 			// returns an array with elements starting at 7 and ending at 24
 			return [...Array(24).keys()].filter(hour => hour >= 7 && hour <= 24);
@@ -39,6 +46,9 @@ export default {
 			return result;
 		},
 		eventsPerDayAndHour() {
+			// return early if the calendar pane is sliding
+			if (this.isSliding) return {};
+
 			const res = {};
 			this.days.forEach(day => {
 				let key = day.toDateString();
@@ -75,7 +85,7 @@ export default {
 		},
 		smallestTimeFrame() {
 			return [30, 15, 10, 5][this.size];
-		}
+		},
 	},
 	methods: {
 		calcHourPosition(event) {
@@ -149,23 +159,28 @@ export default {
 					</div>
 				</div>
 				<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="" >
-					<div v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" style="pointer-events: none;" :style="{top:getAbsolutePositionForHour(hour),left:0,right:0,'z-index':0}"></div>
+					<div :id="'scroll'+hour+focusDate.d+week" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" style="pointer-events: none;" :style="{top:getAbsolutePositionForHour(hour),left:0,right:0,'z-index':0}"></div>
 					<div v-if="hourPosition" class="position-absolute border-top small"  style="pointer-events: none; padding-left:3.5rem; margin-top:-1px;z-index:2;border-color:#00649C !important" :style="{top:hourPosition+'px',left:0,right:0}">
 						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 					</div>
-					<div class="events">
-						<div class="hours">
-							<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
-						</div>
-						<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': '1 1fr', 'grid-template-rows': 'repeat(' + (hours.length * 60 / smallestTimeFrame) + ', 1fr)'}">
-							<div  :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="$emit('input', event.orig)" :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">
-								<slot  name="dayPage" :event="event" :day="day">
-									<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
-								</slot>
+					<div>
+						<h1 v-if="filteredEvents.length==0" class="m-0 text-secondary" ref="noEventsText" :style="{'top':noEventsTextPosition+'px'}" style="position:absolute; left:0;  text-align:center; width: 100%; z-index:1">Keine Lehrveranstaltungen</h1>
+						<div class="events" :class="{'fhc-calendar-no-events-overlay':filteredEvents.length==0}">
+							
+							<div class="hours">
+								<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 							</div>
+							<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': '1 1fr', 'grid-template-rows': 'repeat(' + (hours.length * 60 / smallestTimeFrame) + ', 1fr)'}">
+								<div  :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="$emit('input', event.orig)" :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">
+									<slot  name="dayPage" :event="event" :day="day">
+										<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+									</slot>
+								</div>
 
+							</div>
 						</div>
 					</div>
+					
 				</div>
 			</div>
 			</div>

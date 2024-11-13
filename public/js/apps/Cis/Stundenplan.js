@@ -33,6 +33,7 @@ const app = Vue.createApp({
 		monthLastDay: function () {
 			return this.calendarDateToString(this.calendarDate.cdLastDayOfCalendarMonth);
 		},
+		
 	},
 	methods:{
 		getLvID: function () {
@@ -57,7 +58,7 @@ const app = Vue.createApp({
 			if (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end))){
 				// reset the events before querying the new events to activate the loading spinner
 				this.events = null;
-				this.calendarDate = tmp_date;
+				this.calendarDate = new CalendarDate(end);
 				Vue.nextTick(() => {
 					this.loadEvents();
 				});
@@ -102,9 +103,9 @@ const app = Vue.createApp({
 			});
 		},
 	},
-	created(){
+	created()
+	{
 		this.getLvID()
-		this.loadEvents();
 	},
 	//TODO: Stundenplan phrase
 	template:/*html*/`

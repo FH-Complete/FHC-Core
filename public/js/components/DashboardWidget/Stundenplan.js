@@ -43,7 +43,7 @@ export default {
 			}, []))
 		},
 		currentEvents() {
-			return (this.events || []).filter(evt => evt.end < this.dayAfterCurrentDay && evt.start >= this.currentDay)//.sort((e1, e2) => e1.beginn > e2.beginn);
+			return (this.events || []).filter(evt => evt.end < this.dayAfterCurrentDay && evt.start >= this.currentDay);
 		},
 		dayAfterCurrentDay() {
 			let currentDay = new Date(this.currentDay);
@@ -61,7 +61,7 @@ export default {
 		},
 		monthLastDay: function () {
 			return this.calendarDateToString(this.calendarDate.cdLastDayOfCalendarMonth);
-		}
+		},
 	},
 	methods: {
 		getEventStyle: function(evt) {
@@ -192,6 +192,30 @@ export default {
 	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">
 		<lv-modal v-if="selectedEvent" ref="lvmodal" :event="selectedEvent"  />
 		<content-modal :contentID="roomInfoContentID" :ort_kurzbz="" dialogClass="modal-lg" ref="contentModal"/>
+		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" >
+			<template #minimizedPage >
+				<div class="flex-grow-1 overflow-scroll">
+					<div v-if="events === null" class="d-flex h-100 justify-content-center align-items-center">
+						<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+					</div>
+					<div v-else-if="currentEvents.length" class="list-group list-group-flush">
+						<div role="button" @click="showLvUebersicht(evt)" class="" v-for="evt in currentEvents" :key="evt.id" class="list-group-item small" :style="{'background-color':evt.color}">
+							<b>{{evt.topic}}</b>
+							<br>
+							<small class="d-flex w-100 justify-content-between">
+								<!-- event modifier stop to prevent opening the modal for the lv Uebersicht when clicking on the ort_kurzbz -->
+								<span @click.stop="showRoomInfoModal(evt.ort_kurzbz)" style="text-decoration:underline" type="button">{{evt.ort_kurzbz}}</span>
+								<span>{{evt.start.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}-{{evt.end.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}</span>
+							</small>
+						</div>
+					</div>
+					<div v-else class="d-flex h-100 justify-content-center align-items-center fst-italic text-center">
+						{{ p.t('lehre/noLvFound') }}
+					</div>
+				</div>
+			</template>
+		</fhc-calendar>
+		
 		<fhc-calendar ref="calendar" @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" />
 		<div v-show="minimized" class="flex-grow-1 overflow-scroll">
 			<div v-if="events === null" class="d-flex h-100 justify-content-center align-items-center">

@@ -3,10 +3,11 @@ export default {
 		return{
 			selected: this.mode,
 			modes:{
-				week:"Woche", 
-				month:"Monat",
-				day: "Tag", 
+				week: { mode_bezeichnung: "Woche", icon: "fa-calendar-week", condition: !this.noWeekView }, 
+				month: { mode_bezeichnung: "Monat", icon: "fa-calendar-days", condition: !this.noMonthView }, 
+				day: { mode_bezeichnung: "Tag", icon: "fa-sun" , condition:true}, 
 			},
+			headerPadding:null,
 		}
 	},
 	inject: [
@@ -44,35 +45,35 @@ export default {
 			return c;
 		}
 	},
-	template: `
+	template: /*html*/`
 	<div class="calendar-header card-header w-100" :class="classHeader">
-
-		<div v-if="!noWeekView && !noMonthView" class="row justify-content-end" style="position: absolute; width: 98%; pointer-events: none;">
-			<div class="col-auto" style="pointer-events: all;">
-				<div  role="group" aria-label="Kalender Modus">
-					<button type="button" :class="{'active':mode_kurzbz == mode}" style="margin-right: 4px;" @click.prevent="$emit('updateMode',mode_kurzbz)" class="btn btn-outline-secondary" v-for="(mode_bezeichnung,mode_kurzbz) in modes">
-						<i v-if="!noWeekView && mode_kurzbz == 'week'" class="fa fa-calendar-week"></i>
-						<i v-else-if="!noMonthView && mode_kurzbz == 'month'" class="fa fa-calendar-days"></i>
-						<i v-else-if="mode_kurzbz == 'day'" class="fa-solid fa-sun"></i>
-					</button>
+		<div class="row align-items-center ">
+			<div class="col offset-0 offset-md-3" :style="{'padding-left':headerPadding}">
+				<div class="row align-items-center justify-content-center">
+					<div class="col-auto ">
+						<button class="btn btn-outline-secondary border-0" :class="{'btn-sm':!this.size}" @click="$emit('prev')"><i class="fa fa-chevron-left"></i></button>
+					</div>
+					<div class="justify-content-center text-center col-auto">
+						<div class="d-flex justify-content-center align-items-center">
+							<button class="btn btn-link link-secondary text-decoration-none" :class="{'btn-sm': !this.size}" @click="$emit('click')">
+								{{ title }}
+								<i v-if="eventsAreNull" class="fa fa-spinner fa-pulse"></i>
+							</button>
+						</div>
+					</div>
+					<div class="col-auto ">
+						<button class="btn btn-outline-secondary border-0" :class="{'btn-sm': !this.size}" @click="$emit('next')"><i class="fa fa-chevron-right"></i></button>
+					</div>
 				</div>
 			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-5 d-flex justify-content-end">
-				<button class="btn btn-outline-secondary border-0" :class="{'btn-sm':!this.size}" @click="$emit('prev')"><i class="fa fa-chevron-left"></i></button>
-			</div>
-			<div class="justify-content-center text-center col-2">
-				<div class="d-flex justify-content-center align-items-center">
-					<button class="btn btn-link link-secondary text-decoration-none" :class="{'btn-sm': !this.size}" @click="$emit('click')">
-						{{ title }}
-						<i v-if="eventsAreNull" class="fa fa-spinner fa-pulse"></i>
-					</button>
+			<div ref="viewButtons" v-if="!noWeekView && !noMonthView" class=" col-12 col-md-3 d-flex justify-content-center justify-content-md-end align-items-center" style="pointer-events: none;">
+				<div  style="pointer-events: all;">
+					<div  role="group" aria-label="Kalender Modus">
+						<button type="button" :class="{'active':mode_kurzbz === mode}" style="margin-right: 4px;" @click.prevent="$emit('updateMode',mode_kurzbz)" class="btn btn-outline-secondary" v-for="({mode_bezeichnung,icon,condition},mode_kurzbz) in modes">
+							<i v-if="condition" class="fa" :class="icon" ></i>
+						</button>
+					</div>
 				</div>
-			</div>
-			<div class="col-5 d-flex justify-content-start">
-				<button class="btn btn-outline-secondary border-0" :class="{'btn-sm': !this.size}" @click="$emit('next')"><i class="fa fa-chevron-right"></i></button>
 			</div>
 		</div>
 	</div>`
