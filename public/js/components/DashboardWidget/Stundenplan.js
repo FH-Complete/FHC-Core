@@ -189,7 +189,7 @@ export default {
 		<content-modal :contentID="roomInfoContentID" :ort_kurzbz="" dialogClass="modal-lg" ref="contentModal"/>
 		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" >
 			<template #minimizedPage >
-				<div class="flex-grow-1" style="overflow-y: scroll; overflow-x: hidden">
+				<div class="flex-grow-1" style="overflow-y: auto; overflow-x: hidden">
 					<div v-if="events === null" class="d-flex h-100 justify-content-center align-items-center">
 						<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 					</div>

@@ -61,7 +61,7 @@ export default {
       this.$refs.newsModal.show();
     },
   },
-  template: /*html*/ `<div class="widgets-news w-100 h-100">
+  template: /*html*/ `<div class="widgets-news h-100">
   
       <div class="d-flex flex-column h-100 ">
       <div class="d-flex">
@@ -69,10 +69,10 @@ export default {
         <a :href="allNewsURI()" class="ms-auto mb-2">
           <i class="fa fa-arrow-up-right-from-square me-1"></i>{{$p.t('news','allNews')}}</a>
       </div>
-      <div class="h-100 overflow-scroll" v-if="width == 1">
+      <div class="h-100" style="overflow-y: auto" v-if="width == 1">
         <div  v-for="news in newsList" :key="news.id" class="mt-2">
           <div  class="card">
-            <div class=" card-body">
+            <div class="card-body">
               <a :href="contentURI(news.content_id)" class="stretched-link" >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</a><br>
               <span class="small text-muted">{{ formatDateTime(news.insertamum) }}</span>
             </div>
