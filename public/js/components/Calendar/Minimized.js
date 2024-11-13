@@ -23,9 +23,6 @@ export default {
 	},
 	template: `
 	<div class="fhc-calendar-minimized h-100 d-flex flex-column">
-		<div class="card-header d-grid" :class="classHeader">
-			<button class="btn btn-link link-secondary text-decoration-none" @click="maximize">{{ date.format({dateStyle: ['long','full','full','full'][this.size]}) }}</button>
-		</div>
 		<slot name="minimizedPage"></slot>
 	</div>`
 }

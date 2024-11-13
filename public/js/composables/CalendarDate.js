@@ -68,6 +68,16 @@ class CalendarDate {
 		lastDayOfWeek.setDate(this.d -(lastDayOfWeek.getDay()+7-this.weekStart)%7 +6);
 		return lastDayOfWeek;
 	}
+	get wholeWorkWeek() {
+		const days = []
+		const date = new Date(this.y, this.m, this.d);
+		for(let i = 0; i < 5; i++) {
+			days[i] = new Date(this.y, this.m, this.d)
+			days[i].setDate(this.d -(date.getDay()+7-this.weekStart)%7 + i)
+		}
+		console.log('wholeWorkWeek', days)
+		return days
+	}
 	get cdLastDayOfWeek() {
 		return new CalendarDate(this.lastDayOfWeek);
 	}
