@@ -93,6 +93,10 @@ export default {
   },
 
   computed: {
+    editable() {
+      return this.data?.editAllowed ?? false;
+    },
+    
     personEmails() {
       return this.data?.emails ? this.data.emails : [];
     },
@@ -161,7 +165,7 @@ export default {
                      <div class="col">
                      
                         <!-- Profil Informationen -->
-                        <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation"></profil-information>
+                        <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :editable="editable"></profil-information>
                      
 		                </div>
                     </div>

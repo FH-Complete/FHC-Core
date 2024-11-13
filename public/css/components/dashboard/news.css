@@ -18,7 +18,5 @@
 }
 
 .widgets-news .card-body{
-
-    /*max-height: calc(var(--news-widget-height)*var(--fhc-dg-row-height));  */
-    overflow:scroll;
-} 
+    overflow: hidden;
+}

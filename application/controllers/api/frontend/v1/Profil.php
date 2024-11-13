@@ -34,7 +34,8 @@ class Profil extends FHCAPI_Controller
 			'isMitarbeiter' => self::PERM_LOGGED,
 			
 		]);
-
+		
+		$this->load->library('PermissionLib');
 
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -69,6 +70,7 @@ class Profil extends FHCAPI_Controller
 	public function getView($uid)
 	{
 		$res = new stdClass();
+		$editAllowed = getAuthUID() == $uid || $this->permissionlib->isBerechtigt('admin');
 
 		// if parsing the URL did not found a UID then the UID of the logged in user is used
 		if ($uid == "Profil" || $uid == $this->uid) {
@@ -86,6 +88,8 @@ class Profil extends FHCAPI_Controller
 				$res->data = $this->studentProfil();
 				$res->data->pid = $this->pid;
 			}
+
+			$editAllowed = true;
 		}
 		// UID is availabe when accessing Profil/View/:uid
 		else {
@@ -112,6 +116,7 @@ class Profil extends FHCAPI_Controller
 				$res->data = $this->viewStudentProfil($uid);
 			}
 		}
+		$res->data->editAllowed = $editAllowed;
 		$this->terminateWithSuccess($res);
 	}
 

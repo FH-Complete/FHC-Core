@@ -4,6 +4,7 @@ import ViewStudentProfil from "../../components/Cis/Profil/StudentViewProfil.js"
 import ViewMitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterViewProfil.js";
 import Loading from "../../components/Loader.js";
 import Phrasen from "../../plugin/Phrasen.js";
+import { setScrollbarWidth } from "../../helpers/CssVarCalcHelpers";
 
 
 Vue.$collapseFormatter = function (data) {
@@ -400,7 +401,7 @@ const profilApp = Vue.createApp({
 	
 	</div>`,
 });
-
+setScrollbarWidth()
 profilApp
   .use(primevue.config.default, { zIndex: { overlay: 9999 } })
   .use(Phrasen)

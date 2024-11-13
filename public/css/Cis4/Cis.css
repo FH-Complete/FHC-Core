@@ -238,6 +238,22 @@ html {
   background-color: var(--fhc-cis-menu-lvl-2-color-active) !important;
 }
 
+.fhc-seperator {
+  position: relative;
+}
+
+.fhc-seperator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-left: 12.5%;
+  width: 75%; /* Full width of the parent element */
+  height: 1px; /* Height of the border */
+  background: linear-gradient(to right, #ffffff, var(--fhc-cis-primary), #ffffff);
+  opacity: 0.8; /* Adjust opacity for a subtle fade effect */
+}
+
 /* desktop */
 @media (min-width: 992px) {
   body {

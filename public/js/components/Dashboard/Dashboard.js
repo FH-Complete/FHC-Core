@@ -140,8 +140,9 @@ export default {
 			}
 		}).catch(err => console.error('ERROR:', err));
 	},
-	template: `<div class="core-dashboard">
-		<dashboard-section v-for="section in sections" :key="section.name" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
+	template: `
+	<div class="core-dashboard">
+		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
 		<dashboard-widget-picker ref="widgetpicker" :widgets="widgets"></dashboard-widget-picker>
 	</div>`
 }
