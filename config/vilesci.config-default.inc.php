@@ -266,6 +266,8 @@ define('BIS_FUNKTIONSCODE_6_ARR', array(
 
 // bPk Abfrage
 define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);
+// bPk Typen in Form 'BEREICH' => 'kennzeichenTyp'
+define('VBPK_TYPES', array('AS' => 'vbpkAs', 'BF' => 'vbpkBf', 'ZP-TD' => 'vbpkTd'));
 
 // Docsbox configs
 define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
