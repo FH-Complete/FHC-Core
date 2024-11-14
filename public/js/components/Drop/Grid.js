@@ -349,7 +349,6 @@ export default {
 	<div
 		ref="container"
 		class="drop-grid position-relative h-0"
-		:class="{'empty-tile-background':active}"
 		:style="gridStyle"
 		@touchmove="dragOver"
 		@touchend="dragCancel"
