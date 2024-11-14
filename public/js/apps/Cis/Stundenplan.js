@@ -105,6 +105,7 @@ const app = Vue.createApp({
 	},
 	created()
 	{
+		this.loadEvents();
 		this.getLvID()
 	},
 	//TODO: Stundenplan phrase
@@ -136,7 +137,6 @@ const app = Vue.createApp({
 				</div>
 			</div>
 		</template>
-		<template
 	</fhc-calendar>
 	`
 });
