@@ -30,13 +30,14 @@ export default {
 	},
 	computed: {
 		allEventsGrouped() {
-			// groups all events of all days until end of week together
+			// groups all events of the next 7 days together
 			const currentCalendarDate = new CalendarDate(this.currentDay)
-			const mapArr = currentCalendarDate.wholeWorkWeek.map((d) => [new CalendarDate(d), []])
+			const mapArr = currentCalendarDate.nextSevenDays.map((d) => [new CalendarDate(d), []])
 
-			return new Map((this.events || []).filter(evt => evt.end < currentCalendarDate.lastDayOfWeek && evt.start >= currentCalendarDate.firstDayOfWeek).reduce((acc, cur) => {
+			return new Map((this.events || []).filter(evt => evt.start >= this.currentDay).reduce((acc, cur) => {
 				const date = new CalendarDate(new Date(cur.datum))
 				const arr = acc.find(el => el[0].compare(date))
+				if(!arr) return acc
 				arr[1].push(cur)
 				
 				return acc
@@ -54,7 +55,7 @@ export default {
 			return this.calendarDateToString(this.calendarDate.cdFirstDayOfCalendarMonth);
 		},
 		monthLastDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdLastDayOfCalendarMonth);
+			return this.calendarDateToString(this.calendarDate.cdLastDayOfNextCalendarMonth);
 		},
 	},
 	methods: {
