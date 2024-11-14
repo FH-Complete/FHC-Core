@@ -2861,36 +2861,5 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 	}
-//Berechtigungen auf Fachbereichsebene
-public function getBerechtigungenAufFachberechsebene($lvid,$angezeigtes_stsem)
-{
-	$qry = "SELECT
-	distinct lehrfach.oe_kurzbz
-	FROM
-	lehre.tbl_lehrveranstaltung
-	JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
-	JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
-	WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=".$this->db_add_param($lvid, FHC_INTEGER);
-
-	if(isset($angezeigtes_stsem) && $angezeigtes_stsem!=''){
-		$qry .= " AND studiensemester_kurzbz=".$this->db_add_param($angezeigtes_stsem);
-	}
-
-	$lehrveranstaltungen = [];
-	if($result = $this->db_query($qry))
-	{
-		while($row = $this->db_fetch_object($result))
-		{
-			$lehrveranstaltungen[] = $row;
-		}
-		return $lehrveranstaltungen;
-	}
-	else
-	{
-		$this->errormsg = 'Fehler beim Laden der Daten';
-		return false;
-	}
-}
-	
 }
 ?>
