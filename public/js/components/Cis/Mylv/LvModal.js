@@ -67,8 +67,10 @@ export default {
 			<template v-else>{{ event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
 		</template>
 		<template v-slot:default>
-			<lv-info :titel="$p.t('lvinfo','lehrveranstaltungsinformationen')" :event="event"></lv-info>
-			<lv-menu :titel="'Lehrveranstaltungs Menu'" :menu="menu"></lv-menu>
+			<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
+			<lv-info :event="event"></lv-info>
+			<h3 >Lehrveranstaltungs Menu</h3>
+			<lv-menu :menu="menu"></lv-menu>
 		</template>
 		<!-- optional footer -->
 		<template  v-slot:footer >

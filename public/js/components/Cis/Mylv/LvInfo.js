@@ -4,7 +4,6 @@ import { numberPadding, formatDate } from "../../../helpers/DateHelpers.js"
 export default {
 	props: {
 		event: Object,
-		titel: String,
 	},
 	data() {
 		return {
@@ -36,8 +35,6 @@ export default {
 		},
 	},
 	template:/*html*/`
-	<div>
-	<h3 v-if="titel">{{titel}}</h3>
 		<table class="table table-hover mb-4">
 			<tbody>
 				<tr>
@@ -90,7 +87,6 @@ export default {
 				</tr>
 			</tbody>
 		</table>
-		</div>
 	`
 }
 

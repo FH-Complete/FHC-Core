@@ -39,56 +39,87 @@ export default {
 		'page:forward',
 		'input'
 	],
+	watch:{
+		eventsPerDayAndHour:{
+			handler(newEvents) {
+				if (newEvents[this.day.toDateString()]?.events.length > 0) {
+					let events = newEvents[this.day.toDateString()]?.events;
+					if (Array.isArray(events) && events.length > 0) {
+						this.selectedEvent = events[0].orig;
+					}
+				} else {
+					this.selectedEvent = null;
+				}
+			},
+			immediate: true
+		},
+		selectedEvent:{
+			handler(event) {
+				this.lvMenu = null;
+				if (event && event.type == 'lehreinheit') {
+					this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]).then(
+						res => res.data
+					).then(
+						studiensemester_kurzbz => {
+							this.$fhcApi.factory.addons.getLvMenu(event.lehrveranstaltung_id, studiensemester_kurzbz).then(res => {
+								if (res.data) {
+									this.lvMenu = res.data;
+								}
+							});
+						}
+					)
+				}
+			},
+			immediate:true,
+		}
+	},
 	computed: {
-		noEventsTextPosition(){
-				return this.calendarScrollTop + 100; 
+		noEventsCondition(){
+			return !this.isSliding && this.filteredEvents.length === 0;
 		},
 		hours() {
 			// returns an array with elements starting at 7 and ending at 24
 			return [...Array(24).keys()].filter(hour => hour >= 7 && hour <= 24);
 		},
-		days() {
-			let startDay = this.focusDate;
-			let result = [];
-				result.push(new Date(startDay.y, startDay.m, startDay.d));
-			return result;
+		day() {
+			return new Date(this.focusDate.y, this.focusDate.m, this.focusDate.d);
 		},
 		eventsPerDayAndHour() {
 			// return early if the calendar pane is sliding
 			if (this.isSliding) return {};
 
 			const res = {};
-			this.days.forEach(day => {
-				let key = day.toDateString();
+			
+			let key = this.day.toDateString();
 
-				let nextDay = new Date(day);
-				nextDay.setDate(nextDay.getDate() + 1);
-				nextDay.setMilliseconds(nextDay.getMilliseconds() - 1);
-				let d = { events: [], lanes: 1 };
-				if (this.events[key]) {
-					this.events[key].forEach(evt => {
-						let event = {
-							orig: evt, lane: 1, maxLane: 1, start: evt.start < day ? day : evt.start, end: evt.end > nextDay ? nextDay : evt.end, shared: [], setSharedMaxRecursive(doneItems) {
-								this.maxLane = Math.max(doneItems[0].maxLane, this.maxLane);
-								doneItems.push(this);
-								this.shared.filter(other => !doneItems.includes(other)).forEach(i => i.setSharedMaxRecursive(doneItems));
-							}
-						};
-						event.shared = d.events.filter(other => other.start < event.end && other.end > event.start);
-						event.shared.forEach(other => other.shared.push(event));
-						let occupiedLanes = event.shared.map(other => other.lane);
-						while (occupiedLanes.includes(event.lane))
-							event.lane++;
-						event.maxLane = Math.max(...[event.lane], ...occupiedLanes);
-						if (event.maxLane > 1) {
-							event.setSharedMaxRecursive([event]);
+			let nextDay = new Date(this.day);
+			nextDay.setDate(nextDay.getDate() + 1);
+			nextDay.setMilliseconds(nextDay.getMilliseconds() - 1);
+			let d = { events: [], lanes: 1 };
+			if (this.events[key]) {
+				this.events[key].forEach(evt => {
+					let event = {
+						orig: evt, lane: 1, maxLane: 1, start: evt.start < this.day ? this.day : evt.start, end: evt.end > nextDay ? nextDay : evt.end, shared: [], setSharedMaxRecursive(doneItems) {
+							this.maxLane = Math.max(doneItems[0].maxLane, this.maxLane);
+							doneItems.push(this);
+							this.shared.filter(other => !doneItems.includes(other)).forEach(i => i.setSharedMaxRecursive(doneItems));
 						}
-						d.events.push(event);
-					});
-					d.lanes = d.events.map(e => e.maxLane).reduce((res, i) => kgv(res, i), 1);
-				}
-				res[key] = d;
-			});
+					};
+					event.shared = d.events.filter(other => other.start < event.end && other.end > event.start);
+					event.shared.forEach(other => other.shared.push(event));
+					let occupiedLanes = event.shared.map(other => other.lane);
+					while (occupiedLanes.includes(event.lane))
+						event.lane++;
+					event.maxLane = Math.max(...[event.lane], ...occupiedLanes);
+					if (event.maxLane > 1) {
+						event.setSharedMaxRecursive([event]);
+					}
+					d.events.push(event);
+				});
+				d.lanes = d.events.map(e => e.maxLane).reduce((res, i) => kgv(res, i), 1);
+			}
+			res[key] = d;
+			
 			return res;
 		},
 		smallestTimeFrame() {
@@ -99,19 +130,6 @@ export default {
 		eventClick(evt) {
 			let event = evt.orig;
 			this.selectedEvent = event;
-			if (event.type == 'lehreinheit') {
-				this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]).then(
-					res => res.data
-				).then(
-					studiensemester_kurzbz => {
-						this.$fhcApi.factory.addons.getLvMenu(event.lehrveranstaltung_id, studiensemester_kurzbz).then(res => {
-							if (res.data) {
-								this.lvMenu = res.data;
-							}
-						});
-					}
-				)
-			}
 			this.$emit('input', event);
 		},
 		calcHourPosition(event) {
@@ -170,16 +188,13 @@ export default {
 			return Math.floor(((day.getHours() - 7) * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
 		}
 	},
-	mounted() {
-		setTimeout(() => this.$refs.eventcontainer.scrollTop = this.$refs.eventcontainer.scrollHeight / 3 + 1, 0);
-	},
 	template: /*html*/`
 	<div class="fhc-calendar-day-page ">
 		<div class="row m-0">
 			<div class="col-12 col-xl-6 p-0">
 				<div class="d-flex flex-column">
-				<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="{'z-index':4,'grid-template-columns': 'repeat(' + days.length + ', 1fr)', 'grid-template-rows':1}" style="position:sticky; top:0; " >
-					<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
+				<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="{'z-index':4,'grid-template-columns': 'repeat(' + day.length + ', 1fr)', 'grid-template-rows':1}" style="position:sticky; top:0; " >
+					<div type="button" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
 						<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
 						<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
 					</div>
@@ -190,14 +205,14 @@ export default {
 						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 					</div>
 					<div>
-						<h1 v-if="filteredEvents.length==0" class="m-0 text-secondary" ref="noEventsText" :style="{'top':noEventsTextPosition+'px'}" style="position:absolute; left:0;  text-align:center; width: 100%; z-index:1">Keine Lehrveranstaltungen</h1>
-						<div class="events" :class="{'fhc-calendar-no-events-overlay':filteredEvents.length==0}">
+						<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="{'top':(calendarScrollTop + 100)+'px'}" style="position:absolute; left:0;  text-align:center; width: 100%; z-index:1">Keine Lehrveranstaltungen</h1>
+						<div class="events" :class="{'fhc-calendar-no-events-overlay':noEventsCondition}">
 
 							<div class="hours">
 								<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 							</div>
 							<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': '1 1fr', 'grid-template-rows': 'repeat(' + (hours.length * 60 / smallestTimeFrame) + ', 1fr)'}">
-								<div  :style="{'background-color':event.orig.color}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="eventClick(event)" :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">
+								<div  :style="{'background-color':event.orig.color}" :class="{'selectedEvent':event.orig == selectedEvent}" class="mx-2 border border-dark border-2 small rounded overflow-hidden "  @click.prevent="eventClick(event)" :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">
 									<slot  name="dayPage" :event="event" :day="day">
 										<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 									</slot>
@@ -211,11 +226,25 @@ export default {
 			</div>
 			</div>
 			<div class="d-none d-xl-block col-xl-6 p-0">
-				<div style="position:sticky; top:100px; " class="d-flex justify-content-center align-items-center flex-column">
-					<div class="w-100">
-						<lv-info v-if="selectedEvent && lvMenu" :titel="$p.t('lvinfo','lehrveranstaltungsinformationen')" :event="selectedEvent" />
+				<div class="p-5	 sticky-top d-flex justify-content-center align-items-center flex-column">
+					<div style="max-height: calc(-300px + 100vh); overflow-y:auto;">
+						<template v-if="selectedEvent && lvMenu">
+							<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
+							<div class="w-100">
+								<lv-info  :event="selectedEvent" />
+							</div>
+							<h3 >Lehrveranstaltungs Menu</h3>
+							<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-show="lvMenu" :menu="lvMenu" />
+						</template>
+						<template v-else-if="noEventsCondition">
+							<h3>Keine Lehrveranstaltungen</h3>
+						</template>
+						<template v-else>
+							<div class="d-flex h-100 justify-content-center align-items-center">
+								<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+							</div>
+						</template>
 					</div>
-					<lv-menu  v-show="lvMenu" :titel="'Lehrveranstaltungs Menu'" :menu="lvMenu" />
 				</div>
 			</div>
 		</div>

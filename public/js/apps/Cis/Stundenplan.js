@@ -122,18 +122,18 @@ const app = Vue.createApp({
 			</div>
 		</template>
 		<template #dayPage="{event,day}">
-			<div type="button" class="row">
-				<div class="col">
+			<div type="button" class="row h-100 justify-content-center align-items-center text-center">
+				<div class="col ">
 					<p>Lehrveranstaltung:</p>
-					<p>{{event?.orig.topic}}</p>
+					<p class="m-0">{{event?.orig.topic}}</p>
 				</div>
-				<div class="col">
+				<div class="col ">
 					<p>Lektor:</p>
-					<p v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
+					<p class="m-0" v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
 				</div>
-				<div class="col">
+				<div class="col ">
 					<p>Ort: </p>
-					<p>{{event?.orig.ort_kurzbz}}</p>
+					<p class="m-0">{{event?.orig.ort_kurzbz}}</p>
 				</div>
 			</div>
 		</template>
