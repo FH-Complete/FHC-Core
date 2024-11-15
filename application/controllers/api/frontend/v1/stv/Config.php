@@ -91,12 +91,11 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_resources'),
 			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
 		];
-		/* TODO(chris): Ausgeblendet für Testing
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js'
 		];
-		*/
+		
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
 			return $result;
