@@ -6,19 +6,63 @@ export default {
           required:true,
       },
     },
+	methods: {
+		sanitizeLegacyTables(table) {
+			
+			// find nested tables and replace with p element
+			const tt = table.querySelectorAll('table')
+			tt.forEach(t => {
+				const textContent = t.textContent.trim();
+				const pElement = document.createElement('p');
+				pElement.textContent = textContent;
+				t.parentNode.replaceChild(pElement, t);
+			})
+
+			// find unordered lists, traverse li childs and replace with p element -> more readable than 1 p tag for ul
+			const ul = table.querySelectorAll('ul')
+			ul.forEach(u => {
+				Array.from(u.children).forEach(li => {
+					const p = document.createElement('p');
+					p.textContent = li.textContent
+					u.parentNode.appendChild(p)
+				})
+				u.parentNode.removeChild(u)
+				
+			})
+			
+			// find bare text nodes and put into p element
+			const td = Array.from(table.querySelectorAll('td')).filter(el => el.scrollWidth > 200)
+			td.forEach(element => {
+				if (element.firstChild?.nodeType === Node.TEXT_NODE && element.firstChild.length > 10) {
+					const div = document.createElement('p');
+					div.appendChild(element.firstChild)
+					element.appendChild(div);
+				}
+			});
+
+			// let p elements wrap on overflow
+			const p = table.querySelectorAll('p')
+			p.forEach(p => {
+				p.style.setProperty('word-wrap', 'break-word');
+				p.style.setProperty('white-space', 'normal');
+			})
+		}
+	},
     mounted(){
 
 		// replaces the tablesorter with the tabulator
 		let tables = document.getElementsByClassName("tablesorter");
-
+		
 		for (let table of tables) {
+			this.sanitizeLegacyTables(table)
 			new Tabulator(table, {
-				layout: "fitDataStretch",
+				layout: "fitDataFill",
 
 				columnDefaults: {
 					formatter: "html",
-					resizable: false,
+					resizable: true,
 					minWidth: "100px",
+					maxWidth: "400px"
 				}
 			})
 		}

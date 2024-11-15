@@ -96,6 +96,18 @@ class CalendarDate {
 		let lastDayOfMonth = new Date(this.y, this.m+1, 0);
 		return new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDate()+6-(lastDayOfMonth.getDay() + 7 - this.weekStart)%7);
 	}
+	get cdLastDayOfNextCalendarMonth() {
+		let lastDayOfMonth = new Date(this.y, this.m+1, 0);
+		return new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth() + 1, lastDayOfMonth.getDate()+6-(lastDayOfMonth.getDay() + 7 - this.weekStart)%7);
+	}
+	get nextSevenDays() {
+		const days = []
+		
+		for(let i = 0; i < 7; i++) {
+			days[i] = new Date(this.y, this.m, this.d + i)
+		}
+		return days
+	}
 	get numWeeks() {
 		return (new CalendarDate(this.y+1,0,this.weekStart == 1 ? -3 : 0)).w;
 	}
