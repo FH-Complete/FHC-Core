@@ -15,7 +15,6 @@ export default {
 			hourPosition: null,
 			hourPositionTime: null,
 			lvMenu:null,
-			selectedEvent: null,
 		}
 	},
 	inject: [
@@ -28,6 +27,8 @@ export default {
 		'isSliding',
 		'calendarScrollTop',
 		'calendarClientHeight',
+		'setSelectedEvent',
+		'selectedEvent',
 	],
 	props: {
 		year: Number,
@@ -42,13 +43,12 @@ export default {
 	watch:{
 		eventsPerDayAndHour:{
 			handler(newEvents) {
-				if (newEvents[this.day.toDateString()]?.events.length > 0) {
+				// if no event is selected, select the first event of the day
+				if (this.selectedEvent == null && newEvents[this.day.toDateString()]?.events.length > 0) {
 					let events = newEvents[this.day.toDateString()]?.events;
 					if (Array.isArray(events) && events.length > 0) {
-						this.selectedEvent = events[0].orig;
+						this.setSelectedEvent(events[0].orig);
 					}
-				} else {
-					this.selectedEvent = null;
 				}
 			},
 			immediate: true
@@ -129,7 +129,7 @@ export default {
 	methods: {
 		eventClick(evt) {
 			let event = evt.orig;
-			this.selectedEvent = event;
+			this.setSelectedEvent(event);
 			this.$emit('input', event);
 		},
 		calcHourPosition(event) {
@@ -217,11 +217,9 @@ export default {
 										<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 									</slot>
 								</div>
-
 							</div>
 						</div>
 					</div>
-
 				</div>
 			</div>
 			</div>

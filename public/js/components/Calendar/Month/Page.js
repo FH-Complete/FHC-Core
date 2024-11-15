@@ -14,6 +14,8 @@ export default {
 		'events',
 		'showWeeks',
 		'noWeekView',
+		'selectedEvent',
+		'setSelectedEvent',
 	],
 	props: {
 		year: Number,
@@ -75,13 +77,12 @@ export default {
 		clickEvent(day,week) {
 			if(!this.noWeekView)
 			{
-				//this.changeToWeek(week);
 				this.changeToDay(day);
 			}
 			this.selectDay(day);
 		}
 	},
-	template: `
+	template: /*html*/`
 	<div class="fhc-calendar-month-page" :class="{'show-weeks': showWeeks}">
 		<div v-if="showWeeks" class=" bg-light fw-bold border-top border-bottom text-center"></div>
 		<div v-for="day in weeks[0].days" :key="day" class="bg-light fw-bold border-top border-bottom text-center">
@@ -92,9 +93,11 @@ export default {
 			<a href="#" @click.prevent="clickEvent(day,week)" @mouseover="highlight(week,day)" @mouseleave="highlightedWeek = null; highlightedDay = null" v-for="day in week.days" :key="day" :class="{'fhc-calendar-month-page-day-highlight': isHighlighted(week, day)}" class="fhc-calendar-month-page-day text-decoration-none overflow-hidden" :class="{active:date.compare(day),'opacity-50':day.getMonth() != month}" >
 				<span class="no">{{day.getDate()}}</span>
 				<span v-if="events[day.toDateString()] && events[day.toDateString()].length" class="events">
-					<span v-for="event in events[day.toDateString()]" :key="event.id" style="color:white" :style="{'background-color': event.color}">
-						{{event.topic}}
-					</span>
+					<div @click="setSelectedEvent(event);" v-for="event in events[day.toDateString()]" :key="event.id" >
+						<slot  name="monthPage" :event="event" :day="day" :isSelected="event == selectedEvent">
+							<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+						</slot>
+					</div>
 				</span>
 			</a>
 		</template>

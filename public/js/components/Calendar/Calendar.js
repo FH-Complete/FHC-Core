@@ -34,6 +34,8 @@ export default {
 			eventsAreNull: Vue.computed(() => this.events === null),
 			classHeader: this.classHeader,
 			mode: Vue.computed(()=>this.mode),
+			selectedEvent: Vue.computed(() => this.selectedEvent),
+			setSelectedEvent: (event)=>{this.selectedEvent = event;},
 		};
 	},
 	props: {
@@ -91,7 +93,8 @@ export default {
 			currMode: null,
 			date: new CalendarDate(),
 			focusDate: new CalendarDate(),
-			size: 0
+			size: 0,
+			selectedEvent:null,
 		}
 	},
 	computed: {
@@ -209,8 +212,11 @@ export default {
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card h-100" :class="sizeClass">
 		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)" @input="handleInput" >
-			<template #weekPage="{event,day}">
-				<slot name="weekPage" :event="event" :day="day"></slot>
+			<template #monthPage="{event,day,isSelected}">
+				<slot name="monthPage" :event="event" :day="day" :isSelected="isSelected"></slot>
+			</template>
+			<template #weekPage="{event,day,isSelected}">
+				<slot name="weekPage" :event="event" :day="day" :isSelected="isSelected"></slot>
 			</template>
 			<template #dayPage="{event,day}">
 				<slot name="dayPage" :event="event" :day="day"></slot>
