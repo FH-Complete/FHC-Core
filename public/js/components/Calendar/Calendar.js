@@ -60,23 +60,22 @@ export default {
 	},
 	watch:{
 		// scroll to the first event if the html element was found
-		async scrollTime(newScrollTime){
+		scrollTime({focusDate,scrollTime}){
+			// return early if the scrollTime is not set
+			if(!scrollTime) return;
 			// scroll the Stundenplan to the closest event
-			await Vue.nextTick();
-			let previousScrollAnchor = document.getElementById('scroll' + (newScrollTime-1) + this.focusDate.d + this.focusDate.w)			
-			let scrollAnchor = document.getElementById('scroll' + newScrollTime+this.focusDate.d+this.focusDate.w);
-
-			if (previousScrollAnchor)
-			{
-				previousScrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-			}
-			else
-			{
-				if (scrollAnchor) 
-				{
-					scrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			Vue.nextTick(()=>{
+				let previousScrollAnchor = document.getElementById('scroll' + (scrollTime - 1) + this.focusDate.d + this.focusDate.w)
+				let scrollAnchor = document.getElementById('scroll' + scrollTime + this.focusDate.d + this.focusDate.w);
+				if (previousScrollAnchor) {
+					previousScrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
 				}
-			}
+				else {
+					if (scrollAnchor) {
+						scrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}
+				}
+			});
 		}
 	},
 	emits: [
@@ -126,16 +125,18 @@ export default {
 			}, {});
 		},
 		// returns the hour of the earliest event, used to scroll to the events in the calendar (week / day view)
-		scrollTime: function () {
+		scrollTime() {
 				// return the first beginning time of the filtered events
 				if(this.filteredEvents && Array.isArray(this.filteredEvents) && this.filteredEvents.length > 0)
 				{
-					return parseInt(this.filteredEvents.sort((a, b) => parseInt(a.beginn) - parseInt(b.beginn))[0].beginn);
+					let scrollTime = parseInt(this.filteredEvents.sort((a, b) => parseInt(a.beginn) - parseInt(b.beginn))[0].beginn);
+					// to ensure that the scrollTime watcher triggers even if the scrollTime doesn't change, it returns both the scrollTime and the focusDate
+					return { focusDate: this.focusDate, scrollTime };
 				}
 				// there is no event that matches the current view mode constraints
 				else 
 				{
-					return null;
+					return { focusDate: this.focusDate, scrollTime: null };
 				}
 			},
 		// filters the events based on the current calendar view mode
