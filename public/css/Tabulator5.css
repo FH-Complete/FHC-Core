@@ -108,6 +108,23 @@
 	font-size: 1rem;
 }
 
+.tabulator-initialfontsize .tabulator {
+	font-size: 14px;
+}
+
+.tabulator-row.tabulator-unselectable .tabulator-cell {
+	pointer-events: all;
+}
+
+.tabulator-tooltip {
+	color: #fff;
+	background-color: #000;
+}
+
+.tabulator-row.tabulator-unselectable:not(.tabulator-calcs) {
+	color: #777 !important;
+}
+
 .tabulator-cell .btn {
 	padding: 0 .7rem;
 	min-height: 25px;
