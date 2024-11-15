@@ -176,7 +176,7 @@ $this->load->view(
 
 		<!-- tabulator data table -->
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-12 tabulator-initialfontsize">
                 <?php $this->load->view('lehre/lehrauftrag/approveLehrauftragData.php'); ?>
             </div>
         </div>
