@@ -1,5 +1,4 @@
 export default {
-	//TODO(Manu) check if tabulatorConfig use here like in konto.js
 	//------------- address.js-----------
 	getAdressen (url, config, params){
 		return this.$fhcApi.get('api/frontend/v1/stv/kontakt/getAdressen/' + params.id);

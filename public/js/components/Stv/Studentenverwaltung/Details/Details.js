@@ -45,21 +45,9 @@ export default {
 	},
 	data() {
 		return {
-			test: {udf_viaf: 'TEST'},
-			familienstaende: {
-				"": "--keine Auswahl--",
-				"g": "geschieden",
-				"l": "ledig",
-				"v": "verheiratet",
-				"w": "verwitwet"
-			},
 			original: null,
 			data: null,
-			changed: {},
-			udfChanges: false,
-			studentIn: null,
-			gebDatumIsValid: false,
-			gebDatumIsInvalid: false
+			changed: {}
 		}
 	},
 	computed: {
@@ -71,6 +59,15 @@ export default {
 		},
 		noImageSrc() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'skin/images/profilbild_dummy.jpg';
+		},
+		familienstaende() {
+			return {
+				"": "-- " + this.$p.t('fehlermonitoring', 'keineAuswahl') + " --",
+				"g": this.$p.t('person', 'geschieden'),
+				"l": this.$p.t('person', 'ledig'),
+				"v": this.$p.t('person', 'verheiratet'),
+				"w": this.$p.t('person', 'verwitwet'),
+			};
 		}
 	},
 	watch: {
@@ -78,7 +75,6 @@ export default {
 			this.updateStudent(n);
 		},
 		data: {
-			// TODO(chris): use @input instead?
 			handler(n) {
 				let res = {};
 				for (var k in this.original) {
@@ -86,7 +82,6 @@ export default {
 						if (new Date(this.original[k]).toString() != new Date(n[k]).toString())
 							res[k] = n[k];
 					} else {
-						// TODO(chris): null && ""? should there be an exception for this?
 						if (this.original[k] !== n[k] && !(this.original[k] === null && n[k] === ""))
 							res[k] = n[k];
 					}
@@ -98,7 +93,6 @@ export default {
 	},
 	methods: {
 		updateStudent(n) {
-			// TODO(chris): move to fhcapi.factory
 			return this.$fhcApi.factory.stv.details.get(n.prestudent_id)
 				.then(result => {
 					this.data = result.data;
@@ -131,12 +125,10 @@ export default {
 	created() {
 		this.updateStudent(this.modelValue);
 	},
-	//TODO(chris): Phrasen
-	//TODO(chris): Geburtszeit? Anzahl der Kinder?
 	template: `
 	<core-form ref="form" class="stv-details-details" @submit.prevent="save">
 		<div class="position-sticky top-0 z-1">
-			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!changedLength">Speichern</button>
+			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!changedLength">{{$p.t('ui', 'speichern')}}</button>
 		</div>
 		<fieldset class="overflow-hidden">
 			<legend>Person</legend>
@@ -282,8 +274,7 @@ export default {
 						v-model="data.geburtsnation"
 						name="geburtsnation"
  						>
-						<option value="">-- keine Auswahl --</option>
-						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
@@ -318,8 +309,7 @@ export default {
 						v-model="data.staatsbuergerschaft"
 						name="staatsbuergerschaft"
  						>
-						<option value="">-- keine Auswahl --</option>
-						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 					<form-input
@@ -399,7 +389,7 @@ export default {
 				</div>
 			</template>
 			<div v-else>
-				Loading...
+				{{$p.t('ui', 'dropdownLoading')}}...
 			</div>
 			<core-udf
 				v-if="!config.hideUDFs"
@@ -493,7 +483,7 @@ export default {
 				</div>
 			</template>
 			<div v-else>
-				Loading...
+				{{$p.t('ui', 'dropdownLoading')}}...
 			</div>
 		</fieldset>
 	</core-form>`

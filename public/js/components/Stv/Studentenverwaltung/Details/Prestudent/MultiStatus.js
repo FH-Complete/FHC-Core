@@ -84,6 +84,7 @@ export default{
 					{title: "InsertVon", field: "insertvon", visible: false},
 					{title: "UpdateAmUm", field: "format_updateamum", visible: false},
 					{title: "UpdateVon", field: "updatevon", visible: false},
+/*					{title: "Aufnahmestufe", field: "aufnahmestufe", visible: false},*/
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -154,7 +155,8 @@ export default{
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				selectable: false,
-				//TODO(Manu) define Persistence Id to avoid empty result array if sort index not corresponding
+				index: 'statusId',
+				persistenceID: 'stv-multistatus'
 			},
 			tabulatorEvents: [
 				{
@@ -203,6 +205,14 @@ export default{
 						cm.getColumnByField('insertvon').component.updateDefinition({
 							title: this.$p.t('lehre', 'insert_von')
 						});
+
+						cm.getColumnByField('prestudent_id').component.updateDefinition({
+							title: this.$p.t('ui', 'prestudent_id')
+						});
+
+						cm.getColumnByField('studienplan_id').component.updateDefinition({
+							title: this.$p.t('ui', 'studienplan_id')
+						});
 					}
 				}
 			],
@@ -214,13 +224,9 @@ export default{
 		};
 	},
 	watch: {
-		//TODO(Manu) Watcher to factory
 		modelValue() {
 			if (this.$refs.table) {
-				if (this.$refs.table.tableBuilt)
-					this.$refs.table.tabulator.setData('api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id);
-				else
-					this.data.tabulatorOptions.ajaxURL = 'api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id;
+				this.$refs.table.reloadTable();
 			}
 			this.getMaxSem();
 		}

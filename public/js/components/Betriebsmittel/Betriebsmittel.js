@@ -142,6 +142,18 @@ export default {
 						cm.getColumnByField('format_ausgabe').component.updateDefinition({
 							title: this.$p.t('wawi', 'ausgabedatum')
 						});
+						cm.getColumnByField('betriebsmittel_id').component.updateDefinition({
+							title: this.$p.t('ui', 'betriebsmittel_id')
+						});
+						cm.getColumnByField('betriebsmittelperson_id').component.updateDefinition({
+							title: this.$p.t('ui', 'betriebsmittelperson_id')
+						});
+						cm.getColumnByField('person_id').component.updateDefinition({
+							title: this.$p.t('person', 'person_id')
+						});
+						cm.getColumnByField('uid').component.updateDefinition({
+							title: this.$p.t('person', 'uid')
+						});
 					}
 				}
 			],

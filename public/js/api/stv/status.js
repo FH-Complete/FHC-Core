@@ -7,11 +7,24 @@ export default {
 			data
 		);
 	},
-	loadStatus(status_id) {
-		return this.$fhcApi.post('api/frontend/v1/stv/status/loadStatus/' + Object.values(status_id).join('/'));
+	loadStatus({prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester}) {
+		return this.$fhcApi.post(
+			'api/frontend/v1/stv/status/loadStatus/'
+			+ prestudent_id + '/'
+			+ status_kurzbz + '/'
+			+ studiensemester_kurzbz + '/'
+			+ ausbildungssemester
+		);
 	},
-	updateStatus(status_id, data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/status/updateStatus/' + Object.values(status_id).join('/'), data);
+	updateStatus({prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester}, data) {
+		return this.$fhcApi.post(
+			'api/frontend/v1/stv/status/updateStatus/'
+			+ prestudent_id + '/'
+			+ status_kurzbz + '/'
+			+ studiensemester_kurzbz + '/'
+			+ ausbildungssemester,
+			data
+		);
 	},
 	getStudienplaene(prestudent_id) {
 		return this.$fhcApi.get('api/frontend/v1/stv/prestudent/getStudienplaene/' + prestudent_id);

@@ -39,24 +39,38 @@ export default {
 	},
 
 //------------- MultiStatus.js------------------------------------------------------
-
 	getHistoryPrestudent (url, config, params){
 		return this.$fhcApi.get('api/frontend/v1/stv/status/getHistoryPrestudent/' + params.id);
 	},
 	getMaxSem(studiengang_kzs) {
 		return 	this.$fhcApi.post('api/frontend/v1/stv/status/getMaxSemester/', {studiengang_kzs});
 	},
-	advanceStatus(status_id) {
-		return this.$fhcApi.post('api/frontend/v1/stv/status/advanceStatus/' + Object.values(status_id).join('/'));
+	advanceStatus({prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester}) {
+		return this.$fhcApi.post('api/frontend/v1/stv/status/advanceStatus/'
+			+ prestudent_id + '/'
+			+ status_kurzbz + '/'
+			+ studiensemester_kurzbz + '/'
+			+ ausbildungssemester
+		);
 	},
-	confirmStatus(status_id) {
-		return this.$fhcApi.post('api/frontend/v1/stv/status/confirmStatus/' + Object.values(status_id).join('/'));
+	confirmStatus({prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester}) {
+		return this.$fhcApi.post('api/frontend/v1/stv/status/confirmStatus/'
+			+ prestudent_id + '/'
+			+ status_kurzbz + '/'
+			+ studiensemester_kurzbz + '/'
+			+ ausbildungssemester
+		);
 	},
 	isLastStatus(id) {
 		return this.$fhcApi.get('api/frontend/v1/stv/status/isLastStatus/' + id);
 	},
-	deleteStatus(status_id) {
-		return this.$fhcApi.post('api/frontend/v1/stv/status/deleteStatus/' + Object.values(status_id).join('/'));
+	deleteStatus({prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester}) {
+		return this.$fhcApi.post('api/frontend/v1/stv/status/deleteStatus/'
+			+ prestudent_id + '/'
+			+ status_kurzbz + '/'
+			+ studiensemester_kurzbz + '/'
+			+ ausbildungssemester
+		);
 	},
 	getLastBismeldestichtag() {
 		return this.$fhcApi.get('api/frontend/v1/stv/status/getLastBismeldestichtag/');

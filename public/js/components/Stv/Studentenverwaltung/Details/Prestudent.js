@@ -101,7 +101,7 @@ export default {
 			this.initialFormData = {...(this.initialFormData || {}), ...udfs};
 		},
 		updatePrestudent(){
-			return this.$fhcApi.factory.stv.prestudent.updatePrestudent(this.modelValue.prestudent_id, this.deltaArray)
+			return this.$refs.form.factory.stv.prestudent.updatePrestudent(this.modelValue.prestudent_id, this.deltaArray)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.deltaArray = [];

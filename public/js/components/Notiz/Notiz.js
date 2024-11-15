@@ -161,7 +161,7 @@ export default {
 					event: 'tableBuilt',
 					handler: async () => {
 
-						await this.$p.loadCategory(['notiz', 'global']);
+						await this.$p.loadCategory(['notiz', 'global', 'ui']);
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
@@ -202,18 +202,21 @@ export default {
 							visible: this.showVariables.showLastupdate
 						});
 						cm.getColumnByField('notiz_id').component.updateDefinition({
-							visible: this.showVariables.showNotiz_id
+							visible: this.showVariables.showNotiz_id,
+							title: this.$p.t('ui', 'notiz_id')
 						});
 						cm.getColumnByField('notizzuordnung_id').component.updateDefinition({
-							visible: this.showVariables.showNotizzuordnung_id
+							visible: this.showVariables.showNotizzuordnung_id,
+							title: this.$p.t('ui', 'notizzuordnung_id')
 						});
 						cm.getColumnByField('type_id').component.updateDefinition({
-							visible: this.showVariables.showType_id
+							visible: this.showVariables.showType_id,
+							title: this.$p.t('ui', 'type_id')
 						});
 						cm.getColumnByField('id').component.updateDefinition({
-							visible: this.showVariables.showId
+							visible: this.showVariables.showId,
+							title: this.$p.t('ui', 'extension_id')
 						});
-
 					}
 				}
 			],
@@ -302,7 +305,8 @@ export default {
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
 
-			return this.endpoint.addNewNotiz(this.id, formData)
+			//TODO(Manu) formvalidation: inform not working with tinymce textarea
+			return this.endpoint.addNewNotiz(this.$refs.formNotiz, this.id, formData)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetFormData();
@@ -318,7 +322,7 @@ export default {
 		},
 		deleteNotiz(notiz_id) {
 			return this.endpoint.deleteNotiz(notiz_id, this.typeId, this.id)
-				//return this.$fhcApi.post(this.endpoint + 'deleteNotiz/', this.param)
+				//return this.eost(this.endpoint + 'deleteNotiz/', this.param)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.$refs.deleteNotizModal.hide();
@@ -354,7 +358,8 @@ export default {
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
 
-			return this.endpoint.updateNotiz(notiz_id, formData)
+			//TODO(Manu) formvalidation: inform not working with tinymce textarea
+			return this.endpoint.updateNotiz(this.$refs.formNotiz, notiz_id, formData)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetFormData();
@@ -372,7 +377,9 @@ export default {
 			this.$refs.table.reloadTable();
 		},
 		resetFormData() {
-			this.$refs.formc.reset();
+			//TODO(Manu) check ref, needed here?
+			//this.$refs.formNotiz.reset();
+			//this.$refs.formc.reset();
 			this.notizData = {
 				typeId: this.typeId,
 				titel: null,
@@ -521,7 +528,7 @@ export default {
 			
 			<br>
 		
-			<form ref="formc" @submit.prevent class="row pt-3">
+			<form-form ref="formNotiz" @submit.prevent class="row pt-3">
 				<br><br>
 				<div class="pt-2">
 					<div class="row mb-3">
@@ -645,7 +652,7 @@ export default {
 				
 				<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
 				<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
-			</form>		
+			</form-form>
 		</div>
 
 		<div v-else-if="notizLayout=='twoColumnsFormRight'" class="notiz-notiz">
@@ -685,7 +692,7 @@ export default {
 					<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}} <span> [{{notizData.typeId}}]</span></p>
 					-->
 
-					<form ref="formc" @submit.prevent class="row pt-3">
+					<form-form ref="formNotiz" @submit.prevent class="row pt-3">
 						<div class="col pt-3">
 							<p v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}} <span> [{{notizData.typeId}}]</span></p>
 							<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}} <span> [{{notizData.typeId}}]</span></p>
@@ -843,7 +850,7 @@ export default {
 								<p class="small">{{notizData.lastupdate}}</p>
 							</div>
 						</div>
-					</form>		
+					</form-form>
 				</div>
 			</div> 
 		</div>
@@ -863,7 +870,7 @@ export default {
 			
 			<div class="row">
 				<div class="col-sm-6">
-				  	<form ref="formc" @submit.prevent class="row pt-3">
+				  	<form-form ref="formNotiz" @submit.prevent class="row pt-3">
 						<div class="col pt-3">
 							<p v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}} <span> [{{notizData.typeId}}]</span></p>
 							<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}} <span> [{{notizData.typeId}}]</span></p>
@@ -1021,7 +1028,7 @@ export default {
 							<button v-if="notizData.statusNew" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
 							<button v-else class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
 						</div>
-					</form>		
+					</form-form>
 				</div>
 				
 				<div class="col-sm-6 pt-6">
@@ -1062,7 +1069,7 @@ export default {
 				</template>
 				<template #default>
 					<div>
-				  	<form ref="formc" @submit.prevent class="row">
+				  	<form-form ref="formNotiz" @submit.prevent class="row">
 						<div class="row mb-3">
 							<form-input
 								container-class="col-12"
@@ -1209,7 +1216,7 @@ export default {
 							<button v-if="notizData.statusNew" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
 							<button v-else class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
 						</div>
-					</form>		
+					</form-form>
 				</div>
 				</template>
 			</BsModal>

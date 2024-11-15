@@ -62,7 +62,7 @@ export default{
 					{title:"Adresse_id", field:"adresse_id", visible:false},
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Name", field:"name", visible:false},
-					{title:"letzte Änderung", field:"updateamum", visible:false},
+					{title:"letzte Änderung", field:"lastupdate", visible:false},
 					{title:"Rechnungsadresse", field:"rechnungsadresse", visible:false,
 						formatter: (cell, formatterParams, onRendered) => {
 							let output = cell.getValue() ? this.$p.t('ui','ja') : this.$p.t('ui','nein');
@@ -89,9 +89,14 @@ export default{
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('person', 'adresse_delete');
-							button.addEventListener('click', () =>
-								this.actionDeleteAdress(cell.getData().adresse_id)
-							);
+
+							button.addEventListener('click', () => {
+								if (cell.getData().heimatadresse)
+									this.$fhcAlert.alertError(this.$p.t('person', 'error_deleteHomeAdress'));
+								else
+									this.actionDeleteAdress(cell.getData().adresse_id)
+							});
+
 							container.append(button);
 
 							return container;
@@ -134,6 +139,9 @@ export default{
 						cm.getColumnByField('heimatadresse').component.updateDefinition({
 							title: this.$p.t('person', 'heimatadresse')
 						});
+						cm.getColumnByField('zustelladresse').component.updateDefinition({
+							title: this.$p.t('person', 'zustelladresse')
+						});
 						cm.getColumnByField('co_name').component.updateDefinition({
 							title: this.$p.t('person', 'co_name')
 						});
@@ -143,7 +151,7 @@ export default{
 						cm.getColumnByField('firmenname').component.updateDefinition({
 							title: this.$p.t('person', 'firma')
 						});
-						cm.getColumnByField('updateamum').component.updateDefinition({
+						cm.getColumnByField('lastupdate').component.updateDefinition({
 							title: this.$p.t('notiz', 'letzte_aenderung')
 						});
 						cm.getColumnByField('rechnungsadresse').component.updateDefinition({
@@ -151,6 +159,18 @@ export default{
 						});
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
+						});
+						cm.getColumnByField('firma_id').component.updateDefinition({
+							title: this.$p.t('ui', 'firma_id')
+						});
+						cm.getColumnByField('adresse_id').component.updateDefinition({
+							title: this.$p.t('ui', 'adresse_id')
+						});
+						cm.getColumnByField('person_id').component.updateDefinition({
+							title: this.$p.t('person', 'person_id')
+						});
+						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
 						});
 					}
 				}
@@ -160,7 +180,9 @@ export default{
 				heimatadresse: true,
 				rechnungsadresse: false,
 				typ: 'h',
-				nation: 'A'
+				nation: 'A',
+				address: {plz: null},
+				plz: null
 			},
 			statusNew: true,
 			places: [],
@@ -201,37 +223,33 @@ export default{
 			this.loadAdress(adresse_id).then(() => {
 				if(this.addressData.adresse_id)
 				{
-					this.loadPlaces(this.addressData.plz);
+					this.addressData.address.plz = this.addressData.plz;
+				//	delete this.addressData.plz;
+					this.loadPlaces(this.addressData.address.plz);
 					this.$refs.adressModal.show();
 
 				}
 			});
 		},
 		actionDeleteAdress(adresse_id) {
-			this.loadAdress(adresse_id).then(() => {
-				if(this.addressData.adresse_id)
-					if(this.addressData.heimatadresse)
-						this.$fhcAlert.alertError(this.$p.t('person', 'error_deleteHomeAdress'));
-					else {
-						this.$fhcAlert
-							.confirmDelete()
-							.then(result => result
-								? adresse_id
-								: Promise.reject({handled: true}))
-							.then(this.deleteAddress)
-							.catch(this.$fhcAlert.handleSystemError);
-					}
-			});
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? adresse_id
+					: Promise.reject({handled: true}))
+				.then(this.deleteAddress)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewAddress(addressData) {
-			return this.$fhcApi.factory.stv.kontakt.addNewAddress(this.uid, this.addressData)
+			this.addressData.plz = this.addressData.address.plz;
+			return this.$refs.addressData.factory.stv.kontakt.addNewAddress(this.uid, this.addressData)
 				.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('adressModal');
 					this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-				window.scrollTo(0, 0);
+				//window.scrollTo(0, 0);
 				this.reload();
 			});
 		},
@@ -242,13 +260,18 @@ export default{
 			this.statusNew = false;
 			return this.$fhcApi.factory.stv.kontakt.loadAddress(adresse_id)
 				.then(result => {
-						this.addressData = result.data;
-						return result;
+					this.addressData = result.data;
+					this.addressData.address = {};
+					this.addressData.address.plz = this.addressData.plz || null;
+				//	delete this.addressData.plz;
+					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateAddress(adresse_id) {
-			return this.$fhcApi.factory.stv.kontakt.updateAddress(adresse_id,
+		//TODO(Manu) buggy with relad, warning/error: e.element.after is not a function
+			this.addressData.plz = this.addressData.address.plz;
+			return this.$refs.addressData.factory.stv.kontakt.updateAddress(adresse_id,
 				this.addressData
 			).then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -256,7 +279,7 @@ export default{
 					this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 			.finally(() => {
-				window.scrollTo(0, 0);
+				//window.scrollTo(0, 0);
 				this.reload();
 			});
 		},
@@ -271,23 +294,17 @@ export default{
 				});
 		},
 		loadPlaces() {
-			//TODO(Manu) check with chris if its okay without abortion controller
-/*			if (this.abortController.places)
-				this.abortController.places.abort();*/
-			if (this.addressData.nation != 'A' || !this.addressData.plz)
+			if (this.abortController.places)
+				this.abortController.places.abort();
+			if (this.addressData.nation != 'A' || !this.addressData.address.plz)
 				return;
 
-			//this.abortController.places = new AbortController();
-			return this.$fhcApi.factory.stv.kontakt.getPlaces(this.addressData.plz)
+			this.abortController.places = new AbortController();
+
+			return this.$refs.addressData.factory.stv.kontakt.getPlaces(this.addressData.address.plz)
 				.then(result => {
 					this.places = result.data;
 				});
-/*				.catch(error => {
-						if (error.code != "ERR_CANCELED")
-							window.setTimeout(this.loadPlaces, 100);
-						else
-							this.$fhcAlert.handleSystemError(error);
-					});*/
 		},
 		search(event) {
 			return this.$fhcApi.factory.stv.kontakt.getFirmen(event.query)
@@ -311,7 +328,7 @@ export default{
 			this.addressData.anmerkung = null;
 			this.addressData.typ = 'h';
 			this.addressData.nation = 'A';
-			this.addressData.plz = null;
+			this.addressData.address = {plz: null};
 
 			this.statusNew = true;
 		},
@@ -388,9 +405,9 @@ export default{
 				<div class="row mb-3">
 					<form-input
 						type="text"
-						name="plz"
+						name="address[plz]"
 						:label="$p.t('person/plz') + ' *'"
-						v-model="addressData.plz"
+						v-model="addressData.address.plz"
 						required
 						@input="loadPlaces"
 					>
@@ -418,6 +435,7 @@ export default{
 							v-else
 							type="text"
 							name="addressData.gemeinde"
+							:label="$p.t('person/gemeinde')"
 							v-model="addressData.gemeinde"
 						>	
 						</form-input>
@@ -444,6 +462,7 @@ export default{
 							v-else
 							type="text"
 							name="ort"
+							:label="$p.t('person/ort')"
 							v-model="addressData.ort"
 						>	
 					</form-input>
@@ -562,7 +581,7 @@ export default{
 			</form-form>
 			
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="reload()">{{$p.t('ui', 'abbrechen')}}</button>
 				<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewAddress()">OK</button>
 				<button v-else type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>
             </template>

@@ -103,7 +103,6 @@ export default{
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
 						});
-
 						cm.getColumnByField('lastupdate').component.updateDefinition({
 							title: this.$p.t('notiz', 'letzte_aenderung')
 						});
@@ -112,6 +111,21 @@ export default{
 						});
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
 							title: this.$p.t('person', 'standort')
+						});
+						cm.getColumnByField('firma_id').component.updateDefinition({
+							title: this.$p.t('ui', 'firma_id')
+						});
+						cm.getColumnByField('kontakt_id').component.updateDefinition({
+							title: this.$p.t('ui', 'kontakt_id')
+						});
+						cm.getColumnByField('person_id').component.updateDefinition({
+							title: this.$p.t('person', 'person_id')
+						});
+						cm.getColumnByField('standort_id').component.updateDefinition({
+							title: this.$p.t('ui', 'standort_id')
+						});
+						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
 						});
 				}}
 			],
@@ -163,7 +177,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewContact(formData) {
-			return this.$fhcApi.factory.stv.kontakt.addNewContact(this.uid, this.contactData)
+			return this.$refs.contactData.factory.stv.kontakt.addNewContact(this.uid, this.contactData)
 				.then(response => {
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 						this.hideModal("contactModal");
@@ -199,7 +213,7 @@ export default{
 			});
 		},
 		updateContact(kontakt_id){
-			return this.$fhcApi.factory.stv.kontakt.updateContact(kontakt_id,
+			return this.$refs.contactData.factory.stv.kontakt.updateContact(kontakt_id,
 				this.contactData)
 				.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
