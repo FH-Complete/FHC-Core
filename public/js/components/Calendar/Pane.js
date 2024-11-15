@@ -67,7 +67,7 @@ export default {
 	template: `
 	<div ref="carousel" class="calendar-pane carousel slide" @[\`slide.bs.carousel\`]="slide" @[\`slid.bs.carousel\`]="slid" :data-queue="queue">
 		<!--height calc function just for user testing purpose (has to be fixed)-->
-		<div @scroll="scrollCalendar" ref="calendarContainer" class="carousel-inner " style="height:calc(100vh - 220px); overflow:scroll">
+		<div @scroll="scrollCalendar" ref="calendarContainer" class="carousel-inner " style="height:var(--fhc-calendar-pane-height); overflow:scroll">
 			<div v-for="i in [...Array(3).keys()]" :key="i" class="carousel-item">
 				<slot :index="i" :offset="offsets[i]" />
 			</div>

@@ -1,3 +1,7 @@
+:root{
+	--fhc-calendar-pane-height: calc(100vh - 220px);
+}
+
 .fhc-calendar-week-page-header {
   background-color: #e9ecef;
 }

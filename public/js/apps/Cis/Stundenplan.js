@@ -36,11 +36,19 @@ const app = Vue.createApp({
 		
 	},
 	methods:{
+		setWindowWidth: function () {
+			this.windowWidth = window.innerWidth;
+		},
 		getLvID: function () {
 			this.lv_id = window.location.pathname
 		},
 		selectDay: function(day){
 			this.currentDay = day;
+		},
+		showDayModal: function (event) {
+			// only show the modal if the window width is smaller than 1200px
+			if(this.windowWidth >= 1200) return;
+			this.showModal(event);
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
@@ -108,6 +116,13 @@ const app = Vue.createApp({
 		this.loadEvents();
 		this.getLvID()
 	},
+	mounted(){
+		this.windowWidth = window.innerWidth;
+		window.addEventListener('resize', this.setWindowWidth);
+	},
+	beforeUnmount(){
+		window.removeEventListener('resize', this.setWindowWidth);
+	},
 	//TODO: Stundenplan phrase
 	template:/*html*/`
 	<h2>Stundenplan</h2>
@@ -122,7 +137,7 @@ const app = Vue.createApp({
 			</div>
 		</template>
 		<template #dayPage="{event,day}">
-			<div type="button" class="row h-100 justify-content-center align-items-center text-center">
+			<div @click="showDayModal(event?.orig)" type="button" class="row h-100 justify-content-center align-items-center text-center">
 				<div class="col ">
 					<p>Lehrveranstaltung:</p>
 					<p class="m-0">{{event?.orig.topic}}</p>

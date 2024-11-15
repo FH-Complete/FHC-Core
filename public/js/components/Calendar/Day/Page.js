@@ -227,7 +227,7 @@ export default {
 			</div>
 			<div class="d-none d-xl-block col-xl-6 p-0">
 				<div class="p-5	 sticky-top d-flex justify-content-center align-items-center flex-column">
-					<div style="max-height: calc(-300px + 100vh); overflow-y:auto;">
+					<div style="max-height: calc(var(--fhc-calendar-pane-height) - 100px); overflow-y:auto;">
 						<template v-if="selectedEvent && lvMenu">
 							<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
 							<div class="w-100">
