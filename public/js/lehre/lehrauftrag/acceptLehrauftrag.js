@@ -129,11 +129,11 @@ function func_rowFormatter(row) {
       (bestellt != null && betrag != vertrag_betrag) ||
       (bestellt != null && stunden != vertrag_stunden)
     ) {
-      cell.getElement().classList.add("bg-warning"); // geaenderte
+      cell.getElement().classList.add("bg-warning-bs3"); // geaenderte
     } else if (bestellt != null && erteilt != null && akzeptiert == null) {
       return; // bestellte + erteilte
     } else if (bestellt != null && erteilt != null && akzeptiert != null) {
-      cell.getElement().classList.add("bg-success"); // akzeptierte
+      cell.getElement().classList.add("bg-success-bs3"); // akzeptierte
     }
   });
 }
