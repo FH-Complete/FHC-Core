@@ -45,6 +45,7 @@ export default {
 			p.forEach(p => {
 				p.style.setProperty('word-wrap', 'break-word');
 				p.style.setProperty('white-space', 'normal');
+				p.style.setProperty('max-width', '400px');
 			})
 		}
 	},
@@ -61,8 +62,7 @@ export default {
 				columnDefaults: {
 					formatter: "html",
 					resizable: true,
-					minWidth: "100px",
-					maxWidth: "400px"
+					minWidth: "100px"
 				}
 			})
 		}
