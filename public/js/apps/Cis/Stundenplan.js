@@ -130,14 +130,14 @@ const app = Vue.createApp({
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
 	<fhc-calendar :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
 		<template #weekPage="{event,day}">
-			<div @click="showModal(event?.orig)" type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100">
+			<div @click="showModal(event?.orig)" type="button" class="fhc-entry border border-secondary border d-flex flex-column align-items-center justify-content-evenly h-100">
 				<span>{{event?.orig.topic}}</span>
 				<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
 				<span>{{event?.orig.ort_kurzbz}}</span>
 			</div>
 		</template>
 		<template #dayPage="{event,day}">
-			<div @click="showDayModal(event?.orig)" type="button" class="row h-100 justify-content-center align-items-center text-center">
+			<div @click="showDayModal(event?.orig)" type="button" class="border border-secondary border row h-100 justify-content-center align-items-center text-center">
 				<div class="col ">
 					<p>Lehrveranstaltung:</p>
 					<p class="m-0">{{event?.orig.topic}}</p>

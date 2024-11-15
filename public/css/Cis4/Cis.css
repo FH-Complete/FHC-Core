@@ -463,3 +463,15 @@ html {
   font-weight: var(--fa-style, 900);
   margin-inline-start: 0.5rem;
 }
+
+.fhc-entry:hover{
+	background-color:#00649c !important;
+	color:white !important;
+	border: none !important;
+}
+
+.fhc-entry {
+	transition-property: background,color;
+	transition-duration: 0.3s,0.2s;
+	transition-timing-function: ease-out,ease-out;
+}
