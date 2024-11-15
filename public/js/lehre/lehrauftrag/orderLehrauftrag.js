@@ -245,7 +245,7 @@ function func_tableBuilt(table) {
       field: "status",
       width: 40,
       hozAlign: "center",
-      downloadTitle: "Status",
+      titleDownload: "Status",
       formatter: status_formatter,
       tooltip: status_tooltip,
     },
@@ -548,10 +548,10 @@ $(function () {
       func_renderStarted(tabulatorInstance);
     });
 
-    // event dataLoaded needs to be attached as a callback to the tableBuilt event in tabulator5
-    $("#tableWidgetTabulator").tabulator("on", "dataLoaded", (data) => {
-      func_dataLoaded(data, tabulatorInstance);
-    });
+    // set initial filter
+    func_dataLoaded(null, tabulatorInstance);
+
+    $("#tableWidgetTabulator").tabulator("redraw", true);
   });
 
   // Redraw table on resize to fit tabulators height to windows height

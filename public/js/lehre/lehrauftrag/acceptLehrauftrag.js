@@ -172,7 +172,7 @@ function func_tableBuilt(table) {
       field: "status",
       width: 40,
       hozAlign: "center",
-      downloadTitle: "Status",
+      titleDownload: "Status",
       formatter: status_formatter,
       tooltip: status_tooltip,
     },
@@ -477,6 +477,7 @@ $(function () {
       default:
         break;
     }
+    tabulatorInstance.redraw(true);
   });
 
   var canPromise = !!window.Promise;
