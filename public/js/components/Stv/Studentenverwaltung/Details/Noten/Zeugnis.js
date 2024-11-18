@@ -1,5 +1,4 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
-import {CoreRESTClient} from '../../../../../RESTClient.js';
 import ZeugnisActions from './Zeugnis/Actions.js';
 
 const LOCAL_STORAGE_ID = 'stv_details_noten_zeugnis_2024-01-11_stdsem_all';
@@ -20,18 +19,24 @@ export default {
 		};
 	},
 	computed: {
-		ajaxURL() {
-			return CoreRESTClient._generateRouterURI('components/stv/Noten/getZeugnis/' + this.student.prestudent_id + this.stdsem);
-		},
 		tabulatorOptions() {
 			return {
-				ajaxURL: this.ajaxURL,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: (url, config, params) => {
+					return this.$fhcApi.factory.stv.grades.getCertificate(params.prestudent_id, params.stdsem);
+				},
+				ajaxParams: () => {
+					return {
+						prestudent_id: this.student.prestudent_id,
+						stdsem: this.stdsem
+					};
+				},
 				ajaxResponse: (url, params, response) => {
-					if (!response.retval)
+					if (!response.data)
 						this.validStudent = false;
 					else
 						this.validStudent = true;
-					return response.retval || [];
+					return response.data || [];
 				},
 				columns: [
 					{ field: 'zeugnis', title: 'Zeugnis', formatter: 'tickCross' },
@@ -63,15 +68,17 @@ export default {
 		}
 	},
 	watch: {
-		ajaxURL(n) {
-			if (this.$refs.table)
-				this.$refs.table.tabulator.setData(n);
+		student(n) {
+			this.$refs.table.reloadTable();
+		},
+		stdsem(n) {
+			this.$refs.table.reloadTable();
 		}
 	},
 	methods: {
 		setGrades(selected) {
-			CoreRESTClient
-				.post('components/stv/Noten/update', selected)
+			this.$fhcApi.factory
+				.stv.grades.updateCertificate(selected)
 				.then(this.$refs.table.reloadTable)
 				.catch(this.$fhcAlert.handleFormValidation);
 		},

@@ -1,5 +1,3 @@
-import {CoreRESTClient} from '../../../../../../RESTClient.js';
-
 export default {
 	emits: [
 		'setGrades'
@@ -36,11 +34,10 @@ export default {
 		}
 	},
 	created() {
-		CoreRESTClient
-			.get('components/stv/Noten/get')
-			.then(result => result.data)
+		this.$fhcApi.factory
+			.stv.grades.list()
 			.then(result => {
-				this.grades = result.retval;
+				this.grades = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
