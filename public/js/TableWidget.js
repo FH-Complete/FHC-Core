@@ -854,7 +854,7 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 	var accordionitemclass = 'accordion-item';
 	var accordionheaderclass = 'accordion-header';
 	var accordionh5class = '';
-	var accordiondataattr = 'data-bs-toggle="collapse" data-bs-parent="#accordion"';
+	var accordiondataattr = 'class="accordion-button" data-bs-toggle="collapse" data-bs-parent="#accordion"';
 	var accordioncollapseclass = 'accordion-collapse';
 	var accordionbodyclass = 'accordion-body';
 	var btngrpclass = 'd-flex flex-row flex-wrap btn-group';
