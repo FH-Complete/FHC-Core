@@ -63,7 +63,9 @@ $filterWidgetArray = array(
         bezeichnung: {visible: true, headerFilter:"input"}
     }', // col properties
 );
-
-echo $this->widgetlib->widget('TableWidget', $filterWidgetArray);
-
 ?>
+<div class="tabulator-initialfontsize">
+<?php
+	echo $this->widgetlib->widget('TableWidget', $filterWidgetArray);
+?>
+</div>
