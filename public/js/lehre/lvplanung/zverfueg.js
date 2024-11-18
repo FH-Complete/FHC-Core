@@ -113,8 +113,8 @@ $(function(){
                     if (FHC_AjaxClient.hasData(data)) {
 
                         // Delete row
-                        let row = $('#tableWidgetTabulator').tabulator('getRow', zeitsperre_id);
-                        row.delete(zeitsperre_id);
+						$('#tableWidgetTabulator').tabulator('deleteRow', zeitsperre_id);
+						
 
                         // Reset form
                         Zverfueg.resetFormFields();
