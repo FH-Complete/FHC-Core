@@ -937,10 +937,10 @@ function _renderTabulatorFooterHTML(tableWidgetFooterOptions){
 	var tabulatorFooterHTML = '';
 
 	var outerdivattr = 'class="btn-toolbar mt-4"';
-	var buttonclass = 'btn-outline-secondary float-start';
+	var buttonclass = 'btn btn-outline-secondary float-start';
 	if(_bootstrapVersion == 3) {
 		outerdivattr = 'style="margin-top:1.5rem;" class="btn-toolbar"';
-		buttonclass = 'btn-default pull-left';
+		buttonclass = 'btn btn-default pull-left';
 	}
 
 	// If property selectButtons is true, render 'Alle auswaehlen / Alle abwaehlen' buttons
