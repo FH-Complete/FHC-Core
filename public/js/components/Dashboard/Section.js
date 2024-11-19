@@ -26,6 +26,7 @@ export default {
 	],
 	data() {
 		return {
+			configOpened: false,
 			gridWidth: 1,
 			gridHeight: null,
 			editMode: this.adminMode
@@ -91,6 +92,12 @@ export default {
 		},
 	},
 	methods: {
+		handleConfigOpened() {
+			this.configOpened = true
+		},
+		handleConfigClosed() {
+			this.configOpened = false
+		},
 		checkResizeLimit(item, w, h) {
 			// NOTE(chris): widgets needs to be loaded for this to work
 			let widget = CachedWidgetLoader.getWidget(item.widget);
@@ -180,7 +187,7 @@ export default {
 			<span >{{$p.t('ui/section' + name)}}</span>
 			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
 		</h3>
-		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editMode" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
+		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editMode && !configOpened" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item" #default>
 				
 				<dashboard-item v-if="!item.placeholder"
@@ -193,7 +200,9 @@ export default {
 					:hidden="item.hidden"
 					:editMode="editMode"
 					@change="saveConfig($event, item)"
-					@remove="removeWidget(item, $event)">
+					@remove="removeWidget(item, $event)"
+					@config-opened="handleConfigOpened"
+					@config-closed="handleConfigClosed">
 				</dashboard-item>
 				<div v-else class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
 				
