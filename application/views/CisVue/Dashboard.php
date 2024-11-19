@@ -13,9 +13,7 @@ $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 
 <div id="content">
-	<h2>Hallo <?= $name?>!</h2>
-	<hr>
-	<fhc-dashboard dashboard="CIS"/>
+	<fhc-dashboard dashboard="CIS" view-data-string='<?php echo json_encode($viewData) ?>' />
 </div>
 
 <?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>

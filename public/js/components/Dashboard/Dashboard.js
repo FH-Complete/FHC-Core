@@ -9,11 +9,21 @@ export default {
 	},
 	props: [
 		"dashboard",
+		"viewDataString"
 	],
-	data: () => ({
-		sections: [],
-		widgets: null
-	}),
+	data() {
+		return {
+			sections: [],
+			widgets: null,
+			viewData: JSON.parse(this.viewDataString),
+			editMode: false
+		}
+	},
+	provide() {
+		return {
+			editMode: Vue.computed(()=>this.editMode),
+		}
+	},
 	computed: {
 		apiurl() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/dashboard';
@@ -142,6 +152,10 @@ export default {
 	},
 	template: `
 	<div class="core-dashboard">
+		<h3>
+			{{ $p.t('global/personalGreeting', [ viewData?.name ]) }}
+			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
+		</h3>
 		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
 		<dashboard-widget-picker ref="widgetpicker" :widgets="widgets"></dashboard-widget-picker>
 	</div>`
