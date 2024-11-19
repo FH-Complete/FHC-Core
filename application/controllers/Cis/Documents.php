@@ -71,11 +71,16 @@ class Documents extends Auth_Controller
 			]);
 
 		$stgs = [];
+		$stsemArray = [];
 		$buchungstypen = implode('\',\'', defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN") ? unserialize(CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN) : []);
 		$person_ids = [];
 		foreach ($stati as $status) {
 			$person_ids[] = $status->person_id;
 
+			if(!in_array($status->studiensemester_kurzbz, $stsemArray)) {
+				$stsemArray[] = $status->studiensemester_kurzbz;
+			}
+			
 			if (!isset($stgs[$status->studiengang_kz])) {
 				$stg = $this->StudiengangModel->load($status->studiengang_kz);
 				if (isError($stg))
@@ -122,6 +127,7 @@ class Documents extends Auth_Controller
 
 		
 		$this->load->view('Cis/Documents', [
+			'stsemArray' => $stsemArray,
 			'stgs' => $stgs,
 			'uid' => $uid,
 			'studienbuchblatt' => defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN,

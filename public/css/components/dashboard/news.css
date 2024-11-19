@@ -17,6 +17,11 @@
     height: 100%;
 }
 
+.widgets-news img
+{
+    max-width: 100%;
+}
+
 .widgets-news .card-body{
     overflow: hidden;
 }
