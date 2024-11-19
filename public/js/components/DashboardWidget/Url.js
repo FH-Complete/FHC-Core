@@ -1,7 +1,14 @@
 import AbstractWidget from './Abstract';
 
 export default {
-  name: "WidgetsUrl",
+	name: "WidgetsUrl", 
+	mixins: [AbstractWidget],
+	inject: {
+		editModeIsActive: {
+			type: Boolean,
+			default: false
+		}
+	},
   data: () => ({
     title_input: "",
     url_input: "",
@@ -10,7 +17,7 @@ export default {
 		invalidTitel:false,
 	}
   }),
-  mixins: [AbstractWidget],
+  
   computed: {
     tagName() {
       return this.config.tag !== undefined && this.config.tag.length > 0
@@ -97,16 +104,31 @@ export default {
   },
   created()
   {
-	  this.$emit('setConfig', true);
+	  // 
+	  // this.$emit('setConfig', true); -> use this to enable widget config mode if needed
   },
   template: /*html*/ `
     <div class="widgets-url w-100 h-100">
-        <div v-if="configMode">
-            <div class="mb-3">
-
-                <header><b>{{$p.t('bookmark','newLink')}}</b></header><br>
-                <div>
-  					<div class="form-group">
+        <div class="d-flex flex-column justify-content-between">
+        <!-- todo: widgetTag ?? -->
+            <template v-if="shared">
+                <header><b>{{ tagName }}</b></header>
+                <template v-if="!emptyBookmarks">
+                  <div v-for="link in shared" :key="link.id" class="d-flex mt-2">
+                      <a target="_blank" :href="link.url">
+					  	<i class="fa fa-solid fa-arrow-up-right-from-square"></i>
+						{{ link.title }}
+					  </a>
+                      <a class="ms-auto" href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode || editModeIsActive">
+					    <i class="fa fa-regular fa-trash-can" style="color: #e01b24;"></i>
+					  </a>
+                  </div>
+                </template>
+                <div v-else class="d-flex mt-2">
+                    <span>{{$p.t('bookmark','emptyBookmarks')}}</span>
+                </div>
+                <div v-if="editModeIsActive " class="mt-2">
+                	<div class="form-group">
 						<input maxlength="255" required class="form-control form-control-sm" :class="{'is-invalid':validation.invalidTitel}" placeholder="Titel" type="text" v-model="title_input" name="title" >
 						<!-- validation html for titel -->
 						<div class="invalid-feedback">
@@ -123,27 +145,7 @@ export default {
 					</div>
 
                     <button class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="addLink" type="button">{{$p.t('bookmark','saveLink')}}</button>
-                </div>
-            </div>
-        </div>
-        <div class="d-flex flex-column justify-content-between">
-        <!-- todo: widgetTag ?? -->
-            <template v-if="shared">
-                <header><b>{{ tagName }}</b></header>
-                <template v-if="!emptyBookmarks">
-                  <div v-for="link in shared" :key="link.id" class="d-flex mt-2">
-                      <a target="_blank" :href="link.url">
-					  	<i class="fa fa-solid fa-arrow-up-right-from-square"></i>
-						{{ link.title }}
-					  </a>
-                      <a class="ms-auto" href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode">
-					    <i class="fa fa-regular fa-trash-can" style="color: #e01b24;"></i>
-					  </a>
-                  </div>
-                </template>
-                <div v-else class="d-flex mt-2">
-                    <span>{{$p.t('bookmark','emptyBookmarks')}}</span>
-                </div>
+				</div>
             </template>
             <template v-else>
                 <p v-for="i in 4" class="placeholder-glow">

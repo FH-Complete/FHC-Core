@@ -32,7 +32,17 @@ export default {
 			editMode: this.adminMode
 		}
 	},
+	provide() {
+		return {
+			editModeIsActive: Vue.computed(() =>
+				this.editModeIsActive
+			),		
+		}
+	},
 	computed: {
+		editModeIsActive() {
+			return this.editMode && !this.configOpened	
+		},
 		getSectionStyle() {
 			return 'margin-bottom: 8px;';
 		},
@@ -187,7 +197,7 @@ export default {
 			<span >{{$p.t('ui/section' + name)}}</span>
 			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
 		</h3>
-		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editMode && !configOpened" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
+		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item" #default>
 				
 				<dashboard-item v-if="!item.placeholder"
