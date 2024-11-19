@@ -7,15 +7,6 @@ export default {
         action: action, 
         actions: actions
     },
-    created(){
-      //! this should be the default action for a raum
-      this.actions.defaultaction = {
-        type: "link",
-        action: function(data) { 
-            return FHC_JS_DATA_STORAGE_OBJECT.app_root+'cms/content.php?content_id='+data.content_id;
-        }
-      }; 
-    },
     emits: [ 'actionexecuted' ],
     template: /*html*/`
         <div class="searchbar_result searchbar_raum">

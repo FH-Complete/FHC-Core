@@ -13,12 +13,8 @@ const app = Vue.createApp({
     },
     data: function() {
         return {
-            selectedtypes:[
-                "mitarbeiter",
-                "raum",
-                "organisationunit"
-            ],
             searchbaroptions: {
+				cssclass: "",
                 types: [
                     "mitarbeiter",
                     "raum",
@@ -38,26 +34,41 @@ const app = Vue.createApp({
                     },
                     raum: {
                         defaultaction: {
-                            type: "function",
+                            type: "link",
                             action: function(data) { 
-                                alert('raum defaultaction ' + JSON.stringify(data));
+								const link= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									'/CisVue/Cms/content/' + data.content_id;
+								return link;
                             }
                         },
                         childactions: [
                             {
-								label: "Raumübersicht",
-                                icon: "fas fa-info-circle",
-                                type: "link",
-                                action: function(data) {
-                                    return data.infolink;
-                                }
-                            },
-                            {
-                                label: "Raumreservierung",
+                                label: "LV-Plan",
                                 icon: "fas fa-bookmark",
                                 type: "link",
                                 action: function(data) {
-                                    return data.booklink;
+									const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										'/CisVue/Cms/getRoomInformation/' + data.ort_kurzbz;
+									return link;
+                                }
+                            },
+                            {
+                                label: "Rauminformation",
+                                icon: "fas fa-info-circle",
+                                type: "link",
+                                renderif: function(data) {
+									if(data.content_id === "N/A"){
+										return false;
+									}
+									return true;
+                                },
+                                action: function(data) {
+									const link= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										'/CisVue/Cms/content/' + data.content_id;
+									return link;
                                 }
                             },
                         ]
@@ -78,10 +89,6 @@ const app = Vue.createApp({
     methods: {
         searchfunction: function(searchsettings) {
             return Vue.$fhcapi.Search.search(searchsettings);
-        },
-        updatesearchtypes: function(newValues){
-           this.selectedtypes= newValues;
-            
         },
     }
 });
