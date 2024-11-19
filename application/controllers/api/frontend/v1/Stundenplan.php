@@ -107,10 +107,13 @@ class Stundenplan extends FHCAPI_Controller
 	 * @access public
 	 *
 	 */
+	//TODO: getStundenplan fuer Mitarbeiter anpassen
 	public function getStundenplan(){
 
-		// Query fuer Studenten MVP
-		//TODO: getStundenplan fuer Mitarbeiter anpassen
+		$this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
+		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
+		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+		$this->load->model('person/Benutzergruppe_model','BenutzergruppeModel');
 
 		// form validation
 		$this->load->library('form_validation');
@@ -124,9 +127,9 @@ class Stundenplan extends FHCAPI_Controller
 		$start_date = $this->input->get('start_date', TRUE);
 		$end_date = $this->input->get('end_date', TRUE);
 
-		$student_uid = getAuthUID();
+ 		$student_uid = getAuthUID();
+
 		// check if authUID is mitarbeiter
-		$this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
 		$is_mitarbeiter = getData($this->MitarbeiterModel->isMitarbeiter($student_uid));
 		if($is_mitarbeiter)
 		{
@@ -137,73 +140,95 @@ class Stundenplan extends FHCAPI_Controller
 			$this->terminateWithError("No UID");
 		}
 
-		//semester des Studenten ermitteln
-		$lvplan_load_ueber_semesterhaelfte = false;
-		if (defined('LVPLAN_LOAD_UEBER_SEMESTERHAELFTE') && LVPLAN_LOAD_UEBER_SEMESTERHAELFTE === true)
-			$lvplan_load_ueber_semesterhaelfte = true;
-		else
-			$lvplan_load_ueber_semesterhaelfte = false;
+		// gets all studiensemester from the student from start_date to end_date
+		$semester_range = $this->StudiensemesterModel->getByDate($start_date,$end_date);
+		$semester_range = array_map( 
+			function($sem)
+			{
+				return $sem->studiensemester_kurzbz;
+			},
+			$this->getDataOrTerminateWithError($semester_range)
+		);
 
-		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
-		$aktuelle_studiensemester = $this->StudiensemesterModel->getNearest();
-		$aktuelle_studiensemester = $this->getDataOrTerminateWithError($aktuelle_studiensemester);
-		if (count($aktuelle_studiensemester) == 0) {
-			$this->terminateWithError("No aktuelles semester");
-		}
-		$aktuelle_studiensemester = current($aktuelle_studiensemester)->studiensemester_kurzbz;
-		if($lvplan_load_ueber_semesterhaelfte)
+		// if no studiensemester is found for the given timespan, get the nearest studiensemester
+		if(count($semester_range) == 0)
 		{
-			$next_studiensemester = $this->StudiensemesterModel->getNextFrom($aktuelle_studiensemester);
+			$aktuelle_studiensemester = $this->StudiensemesterModel->getNearest();
+			$aktuelle_studiensemester = $this->getDataOrTerminateWithError($aktuelle_studiensemester);
+			if (count($aktuelle_studiensemester) == 0) {
+				$this->terminateWithError("No aktuelles semester");
+			}
+			$aktuelle_studiensemester = current($aktuelle_studiensemester)->studiensemester_kurzbz;
+			// push aktuelles semester in active semester array
+			array_push($semester_range, $aktuelle_studiensemester);
+
+		}
+
+		
+		$this->sortStudienSemester($semester_range);
+
+		//semester des Studenten ermitteln
+		if (defined('LVPLAN_LOAD_UEBER_SEMESTERHAELFTE') && LVPLAN_LOAD_UEBER_SEMESTERHAELFTE === true)
+		{
+			// get next studiensemester
+			$next_studiensemester = $this->StudiensemesterModel->getNextFrom($semester_range[(count($semester_range)-1)]);
 			$next_studiensemester = $this->getDataOrTerminateWithError($next_studiensemester);
 			if(count($next_studiensemester) == 0)
 			{
 				$this->terminateWithError("No next semester");
 			}
 			$next_studiensemester = current($next_studiensemester)->studiensemester_kurzbz;
-			$previous_studiensemester = $this->StudiensemesterModel->getPreviousFrom($aktuelle_studiensemester);
+			//push next semester in active semester array
+			array_push($semester_range, $next_studiensemester);
+			$this->sortStudienSemester($semester_range);
+			
+			// get previous studiensemester
+			$previous_studiensemester = $this->StudiensemesterModel->getPreviousFrom($semester_range[0]);
 			$previous_studiensemester = $this->getDataOrTerminateWithError($previous_studiensemester);
 			if (count($previous_studiensemester) == 0) {
 				$this->terminateWithError("No previous semester");
 			}
 			$previous_studiensemester = current($previous_studiensemester)->studiensemester_kurzbz;
-		}
+			// push previous semester in active semester array
+			array_push($semester_range, $previous_studiensemester);
+			$this->sortStudienSemester($semester_range);
+		}	
 		else
 		{
-			$nearest_studiensemester = $this->StudiensemesterModel->getNearestFrom($aktuelle_studiensemester);
+			$nearest_studiensemester = $this->StudiensemesterModel->getNearestFrom($semester_range[(count($semester_range)-1)]);
 			$nearest_studiensemester = $this->getDataOrTerminateWithError($nearest_studiensemester);
 			if (count($nearest_studiensemester) == 0) {
 				$this->terminateWithError("No nearest semester");
 			}
 			$nearest_studiensemester = current($nearest_studiensemester)->studiensemester_kurzbz;
+			// push nearest semester in active semester array
+			array_push($semester_range, $nearest_studiensemester);
+			$this->sortStudienSemester($semester_range);
+
 		}
+
 
 		// getting the gruppen_kurzbz of the student in the different studiensemester
-		$this->load->model('person/Benutzergruppe_model','BenutzergruppeModel');
-		$benutzer_gruppen = null;
-		if ($lvplan_load_ueber_semesterhaelfte)
+		$benutzer_gruppen = [];
+		
+		foreach($semester_range as $semester)
 		{
-			$benutzer_gruppen = $this->BenutzergruppeModel->execReadOnlyQuery("
-			SELECT * FROM tbl_benutzergruppe where uid = ? AND studiensemester_kurzbz IN ?",[$student_uid, [$aktuelle_studiensemester, $next_studiensemester, $previous_studiensemester]]);
-			$benutzer_gruppen = $this->getDataOrTerminateWithError($benutzer_gruppen);
-			$benutzer_gruppen = array_map(function($item){ return "'".$item->gruppe_kurzbz. "'";}, $benutzer_gruppen);
-		}
-		else
-		{
-			$benutzer_gruppen = $this->BenutzergruppeModel->execReadOnlyQuery("
-			SELECT * FROM tbl_benutzergruppe where uid = ? AND studiensemester_kurzbz IN ?", [$student_uid, [$aktuelle_studiensemester,$nearest_studiensemester]]);
-			$benutzer_gruppen = $this->getDataOrTerminateWithError($benutzer_gruppen);
-			$benutzer_gruppen = array_map(function ($item) { return "'".$item->gruppe_kurzbz. "'";}, $benutzer_gruppen);
+			// for each active semester query the benutzer_gruppen associated to the semester
+			$benutzer_query = $this->BenutzergruppeModel->execReadOnlyQuery("
+			SELECT * FROM tbl_benutzergruppe where uid = ? AND studiensemester_kurzbz = ?",[$student_uid, $semester]);
+			$benutzer_query_result = $this->getDataOrTerminateWithError($benutzer_query);
+			$benutzer_gruppen[$semester] = array_map(function($item){ return "'".$item->gruppe_kurzbz. "'";}, $benutzer_query_result);
 		}
 
-		// getting the student_lehrverbaende of the student in the different studiensemester
-		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-		$student_lehrverbaende = null;
-		if ($lvplan_load_ueber_semesterhaelfte)
+		$student_lehrverband = [];
+		
+		foreach($semester_range as $semester)
 		{
-			$student_lehrverbaende = $this->BenutzergruppeModel->execReadOnlyQuery("
-			SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz IN ?", [$student_uid, [$aktuelle_studiensemester,$next_studiensemester, $previous_studiensemester]]);
-			$student_lehrverbaende = $this->getDataOrTerminateWithError($student_lehrverbaende);
-			$student_lehrverbaende = array_map(
+			// for each active semester query the student_lehrverband associated to the semester
+			$lehrverband_query = $this->BenutzergruppeModel->execReadOnlyQuery("
+			SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz = ?", [$student_uid, $semester]);
+			$lehrverband_query_result = $this->getDataOrTerminateWithError($lehrverband_query);
+			$student_lehrverband[$semester] = array_map(
 				function ($item)
 				{
 					$result = new stdClass();
@@ -213,27 +238,19 @@ class Stundenplan extends FHCAPI_Controller
 					$result->gruppe = $item->gruppe;
 					return $result;
 				},
-				$student_lehrverbaende);
-		}
-		else
-		{
-			$student_lehrverbaende = $this->BenutzergruppeModel->execReadOnlyQuery("
-			SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz IN ?", [$student_uid, [$aktuelle_studiensemester,$nearest_studiensemester]]);
-			$student_lehrverbaende = $this->getDataOrTerminateWithError($student_lehrverbaende);
-			$student_lehrverbaende = array_map(
-				function ($item) {
-					$result = new stdClass();
-					$result->studiengang_kz = $item->studiengang_kz;
-					$result->semester = $item->semester;
-					$result->verband = $item->verband;
-					$result->gruppe = $item->gruppe;
-					return $result;
-				},
-				$student_lehrverbaende
-			);
+				$lehrverband_query_result);
+
 		}
 
-		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery($start_date, $end_date, $benutzer_gruppen, $student_lehrverbaende));
+		$studienSemesterDateRanges=[]; 
+		foreach($semester_range as $semester){
+			$semester_start_ende = $this->StudiensemesterModel->getStartEndeFromStudiensemester($semester);
+			$semester_start_ende = current($this->getDataOrTerminateWithError($semester_start_ende)); 
+			$studienSemesterDateRanges[$semester] = $semester_start_ende; 
+		}
+		$semester_range = $studienSemesterDateRanges;
+
+		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery($start_date, $end_date, $semester_range, $benutzer_gruppen, $student_lehrverband));
 		$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data) ?? [];
 
 		$this->expand_object_information($stundenplan_data);
@@ -273,6 +290,8 @@ class Stundenplan extends FHCAPI_Controller
 		$result = current($this->getDataOrTerminateWithError($result))->studiensemester_kurzbz;
 		$this->terminateWithSuccess($result);
 	}
+
+	// ################# Private Functions
 
 	private function expand_object_information($data){
 
@@ -328,6 +347,48 @@ class Stundenplan extends FHCAPI_Controller
 		}
 	}
 
+	// function used to sort an array of studiensemester strings
+	private function sortStudienSemester(&$semester_range){
+		usort(
+			$semester_range,
+			function($first,$second)
+			{
+				$sem_first = null;
+				$year_first = null;
+				$match_first = null;
 
+				$sem_second = null;
+				$year_second = null;
+				$match_second = null;
+
+				preg_match('/([WS]+)([0-9]+)/',$first,$match_first);
+				preg_match('/([WS]+)([0-9]+)/',$second,$match_second);
+				
+				$sem_first = $match_first[1];
+				$year_first = intval($match_first[2]);
+
+				$sem_second = $match_second[1];
+				$year_second = intval($match_second[2]);
+
+				if($year_first < $year_second)
+				{
+					return -1;
+				}
+				else if($year_first > $year_second)
+				{
+					return 1;
+				}
+				else if($year_first == $year_second && $sem_first > $sem_second)
+				{
+					return 1;
+				}
+				else if($year_first == $year_second && $sem_first < $sem_second)
+				{
+					return -1;
+				}
+				return 0;
+			} 
+		);
+	}
 
 }

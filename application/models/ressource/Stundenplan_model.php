@@ -192,43 +192,77 @@ class Stundenplan_model extends DB_Model
 	 *
 	 * @return string
 	 */
-	public function getStundenplanQuery($start_date, $end_date,$gruppen,$studentlehrverbaende){
-
+	public function getStundenplanQuery($start_date, $end_date,$semester,$gruppen,$studentlehrverbaende){
+		
+		// helper function to check if either $gruppen or $studentlehrverbaende are empty for each semester
+		$emptyCheck = function($toBeCheckedArray) use ($semester){
+			$result = true;
+			$sem = array_keys($semester);
+			foreach($sem as $s){
+				if(count($toBeCheckedArray[$s]) > 0){
+					$result = false;
+					break;
+				}
+			}
+			return $result;
+		};
+		
 		$query =
 		"select sp.*
 		from lehre.vw_stundenplan sp
 		WHERE
 		sp.datum >= ".$this->escape($start_date)."
 		AND sp.datum <= ".$this->escape($end_date);
-
-		if(count($gruppen) != 0 || count($studentlehrverbaende) != 0)
+		
+		// adds the AND sql chain only if both $gruppen and $studentlehrverbaende are not empty
+		if(!$emptyCheck($gruppen) || !$emptyCheck($studentlehrverbaende))
 		{
 			$query .= " AND ( ";
-		}
-
-		if(count($gruppen) != 0)
+		} 
+		
+		foreach($semester as $sem => $date_range)
 		{
-			$query .="sp.gruppe_kurzbz IN (".implode(',',$gruppen).")";
-		}
-
-		foreach($studentlehrverbaende as $key=>$lehrverband){
-			// only append OR if not first entry or previous condition was added
-			if(($key == 0 && count($gruppen) != 0) || ($key > 0))
+			if(count($gruppen[$sem]) > 0)
 			{
-				$query .= " OR ";
+				// converts the array of gruppen strings into a sql IN (_,_,_) chain
+				$query .="(sp.gruppe_kurzbz IN (" .implode(',',$gruppen[$sem]).") AND sp.datum BETWEEN ".$this->escape($date_range->start)." AND ".$this->escape($date_range->ende)." )";
+				
+				// adds the OR sql chain only if the $studentlehrverbaende array is not empty 
+				// DOES not include the sql OR if the $studentlehrverbaende are empty and it is the last gruppen element in the iteration 
+				if(key($semester) != $sem || !$emptyCheck($studentlehrverbaende))
+				{
+					$query .="OR";
+				}
 			}
-			// Eintraege fuer die spezifische Gruppe
-			$query .= "(sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe).")";
-			// Eintraege fuer den ganzen Verband
-			$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND (sp.gruppe is null OR sp.gruppe=''))";
-			// Eintraege fuer das ganze Semester
-			$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='')) AND gruppe_kurzbz is null";
+		}
+		
+		foreach($semester as $sem=>$date_range)
+		{
+
+			if(count($studentlehrverbaende[$sem]) > 0)
+			{
+				foreach($studentlehrverbaende[$sem] as $key=>$lehrverband)
+				{
+					// adds the OR sql chain only if its not the first element in the first semester of the $studentlehrverbaende array
+					if($lehrverband != $studentlehrverbaende[array_keys($semester)[0]][0])
+					{
+						$query .="OR";
+					}
+					$query .= "((sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe)." AND sp.datum BETWEEN ".$this->escape($date_range->start)." AND ".$this->escape($date_range->ende).")";
+					// Eintraege fuer den ganzen Verband
+					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND (sp.gruppe is null OR sp.gruppe='') AND sp.datum BETWEEN ".$this->escape($date_range->start)." AND ".$this->escape($date_range->ende).")";
+					// Eintraege fuer das ganze Semester
+					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($date_range->start)." AND ".$this->escape($date_range->ende).") AND gruppe_kurzbz is null)";
+				}
+				
+			}
 		}
 
-		if(count($gruppen) != 0 || count($studentlehrverbaende) != 0)
+		// closes the AND sql chain only if it was opened previously
+		if(!$emptyCheck($gruppen) || !$emptyCheck($studentlehrverbaende))
 		{
 			$query .= ")";
-		}
+		} 
 
 		return $query;
 	}
