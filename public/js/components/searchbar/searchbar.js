@@ -6,7 +6,7 @@ import student from "./student.js";
 import prestudent from "./prestudent.js";
 
 export default {
-    props: [ "searchoptions", "searchfunction","selectedtypes" ],
+    props: [ "searchoptions", "searchfunction" ],
     emits: ['showSettings'],
     data: function() {
       return {
@@ -33,7 +33,7 @@ export default {
       prestudent: prestudent
     },
     template: /*html*/`
-          <form ref="searchform" class="d-flex me-3" action="javascript:void(0);"
+          <form ref="searchform" class="d-flex me-3" :class="searchoptions.cssclass" action="javascript:void(0);"
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
 
             <div class="h-100 input-group me-2 bg-white">
@@ -55,9 +55,9 @@ export default {
                 <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
                 <student v-else-if="res.type === 'student'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
                 <prestudent v-else-if="res.type === 'prestudent'" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
-                <employee v-else-if="res.type === 'mitarbeiter'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
+                <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                 <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
-                <raum v-else-if="res.type === 'raum'" :res="res" :actions="getActionsForRoom(res)" @actionexecuted="this.hideresult"></raum>
+                <raum v-else-if="res.type === 'raum'" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
                 <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
               </template>
             </div>
@@ -78,7 +78,7 @@ export default {
           </form>
     `,
     watch:{
-        'searchsettings.types'(newValue){
+        'searchsettings.types': function (newValue){
             this.search();
         },
     },
@@ -92,36 +92,10 @@ export default {
 		});
 	},
     methods: {
-        getActionsForRoom: function(res){
-            res.booklink= FHC_JS_DATA_STORAGE_OBJECT.app_root +
-            FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-            `/CisVue/Cms/getRoomInformation/${res.ort_kurzbz}`; 
-
-            if(res.content_id !=="N/A"){
-                res.infolink= FHC_JS_DATA_STORAGE_OBJECT.app_root +
-                FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-                `/CisVue/Cms/content/${res.content_id}`;
-            }
-
-            let child = this.searchoptions.actions.raum.childactions.filter((child)=>{
-                if(child.label =="Rauminformation" && res.content_id =="N/A"){
-                    return false;
-                }
-                return true;
-            });
-
-            let computedActions = {
-                childactions:child,
-                defaultaction:this.searchoptions.actions.raum.defaultaction
-            }
-            return computedActions;
-            
-            
-        },
         updateSearchOptions: function() {
             this.searchsettings.types = [];
-            for( const idx in this.selectedtypes ) {
-                this.searchsettings.types.push(this.selectedtypes[idx]);
+            for( const idx in this.searchoptions.types ) {
+                this.searchsettings.types.push(this.searchoptions.types[idx]);
             }
         },
         calcSearchResultExtent: function() {
@@ -135,7 +109,7 @@ export default {
             if( this.searchtimer !== null ) {
                 clearTimeout(this.searchtimer);
             }
-            if( this.searchsettings.searchstr.length >= 3 ) {
+            if( this.searchsettings.searchstr.length >= 2 ) {
                 this.calcSearchResultExtent();
                 this.searchtimer = setTimeout(
                     this.callsearchapi,
@@ -145,11 +119,16 @@ export default {
                 this.showresult = false;
             }
         },
-        callsearchapi: function() {            
+        callsearchapi: function() {
             this.error = null;
-            this.searchresult.splice(0,this.searchresult.length);
+            this.searchresult.splice(0, this.searchresult.length);
             this.searching = true;
-            this.showsearchresult();            
+            this.showsearchresult();
+			if(this.searchsettings.types.length === 0) {
+				this.error = 'Kein Ergebnistyp ausgewählt. Bitte mindestens einen Ergebnistyp auswählen.';
+				this.searching = false;
+				return;
+			}
             this.searchfunction(this.searchsettings)
             .then(response=>{
                 if( response.data?.error === 1 ) {
@@ -177,7 +156,7 @@ export default {
             window.removeEventListener('resize', this.calcSearchResultExtent);
         },
         showsearchresult: function() {
-            if( this.searchsettings.searchstr.length >= 3 ) {
+            if( this.searchsettings.searchstr.length >= 2 ) {
                 this.showresult = true;
                 window.addEventListener('resize', this.calcSearchResultExtent);
             }
