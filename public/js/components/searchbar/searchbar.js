@@ -62,7 +62,7 @@ export default {
                     <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
                   </template>
                 </div>
-              </duv>
+              </div>
             </div>
 
             <div id="searchSettings"  ref="settings"  @[\`show.bs.collapse\`]="$emit('showSettings','settings')"

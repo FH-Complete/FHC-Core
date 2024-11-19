@@ -178,6 +178,7 @@ class SearchBarLib
 
 	protected function buildSearchClause(DB_Model $dbModel, array $columns, $searchstr)
 	{
+		$searchstr = preg_replace('/[[:punct:]]/', ' ', $searchstr);
 		$document			 = implode(' || \' \' || ', $columns);
 		$query				 = '\'' . implode(':* & ', explode(' ', trim($searchstr))) . ':*\'';
 		$reversequery		 = '\'*:' . implode(' & *:', explode(' ', trim($searchstr))) . '\'';
@@ -297,13 +298,15 @@ EOSC;
 				   AND (datum_bis IS NULL OR datum_bis >= NOW())
 				   AND b.aktiv = TRUE
 			) bfLeader ON(bfLeader.oe_kurzbz = o.oe_kurzbz)
-			 WHERE ' .
+			 WHERE 
+				o.aktiv = true
+				AND (' .
 			$this->buildSearchClause(
 				$dbModel, 
 				array('o.oe_kurzbz', 'o.bezeichnung', 'ot.bezeichnung'), 
 				$searchstr
 			) .
-			'
+			') 
 		      GROUP BY type, o.oe_kurzbz, o.bezeichnung, ot.bezeichnung, oParent.oe_kurzbz, oParent.bezeichnung, otParent.bezeichnung
 		');
 
@@ -507,8 +510,17 @@ EOSC;
 					FROM public.tbl_standort
 					LEFT JOIN public.tbl_adresse USING(adresse_id)
 				) standort USING(standort_id)
-			 WHERE LOWER(ort.ort_kurzbz) like LOWER(\'%'. $searchstr . '%\') ' 
-			
+			 WHERE 
+				ort.aktiv = true 
+				AND 
+				ort.lehre = true
+				AND (' .
+					$this->buildSearchClause(
+						$dbModel, 
+						array('ort.ort_kurzbz', 'ort.bezeichnung'), 
+						$searchstr
+					) . 
+			')' 
 		);
 
 		// If something has been found
