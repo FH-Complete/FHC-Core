@@ -1,14 +1,8 @@
-// import Phrasen from '../../mixins/Phrasen.js';
 import Phrasen from '../../plugin/Phrasen.js';
-//import {TabulatorFull as Tabulator} from '../../../../vendor/olifolkerd/tabulator5/dist/js/tabulator_esm.min.js';
-//import CssLib from '../../helpers/CssLib.js';
-//CssLib.import('../../vendor/olifolkerd/tabulator5/dist/css/tabulator_bootstrap5.min.css');
+import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers";
 
 const app = Vue.createApp({
 	name: 'DocumentsApp',
-	// mixins: [
-	// 	Phrasen
-	// ],
 	data() {
 		return {
 			inscriptiontable: null,
@@ -92,5 +86,8 @@ const app = Vue.createApp({
 		});
 	}
 });
+
+setScrollbarWidth();
+
 app.use(Phrasen, {reload: true});
 app.mount('#content');
