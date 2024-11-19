@@ -512,6 +512,6 @@ html {
 
 	.searchbar_tablecell.searchbar_value {
 		padding-left: 2.5rem;
-		overflow-wrap: break-word;
+		overflow-wrap: anywhere;
 	}
 }

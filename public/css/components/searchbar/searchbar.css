@@ -30,6 +30,7 @@
 
 .searchbar_results_scroller {
     overflow-y: auto;
+	overscroll-behavior: none;
 }
 
 .searchbar_result {
