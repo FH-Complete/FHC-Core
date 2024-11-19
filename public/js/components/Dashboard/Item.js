@@ -43,6 +43,10 @@ export default {
 		},
 	},
 	methods: {
+		getWidgetC4Link(widget) {
+			return (FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				FHC_JS_DATA_STORAGE_OBJECT.ci_router + widget.setup.cis4link)
+		},
 		handleShowBsModal() {
 			this.$emit('configOpened')
 		},
@@ -116,6 +120,9 @@ export default {
 		<div v-if="widget" class="card-header d-flex ps-0 pe-2">
 			<span v-if="editMode" drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
 			<span class="col mx-2 px-2">{{ widget.setup.name }}</span>
+			<a v-if="widget.setup.cis4link" :href="getWidgetC4Link(widget)" class="ms-auto mb-2">
+          		<i class="fa fa-arrow-up-right-from-square me-1"></i>
+          	</a>
 			<a v-if="hasConfig" class="col-auto px-1" href="#" @click.prevent="openConfig"><i class="fa-solid fa-gear"></i></a>
 			<a v-if="custom && editMode" class="col-auto px-1" href="#" @click.prevent="$emit('remove')">
 				<i class="fa-solid fa-trash"></i>

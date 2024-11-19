@@ -67,10 +67,6 @@ export default {
   template: /*html*/ `<div class="widgets-news h-100" :style="getNewsWidgetStyle">
   
       <div class="d-flex flex-column h-100 ">
-      <div class="d-flex">
-        <a :href="allNewsURI()" class="ms-auto mb-2">
-          <i class="fa fa-arrow-up-right-from-square me-1"></i>{{$p.t('news','allNews')}}</a>
-      </div>
       <div class="h-100" style="overflow-y: auto" v-if="width == 1">
         <div  v-for="(news, index) in newsList" :key="news.id" class="mt-2">
           <div v-if="index > 0 " class="fhc-seperator"></div>
