@@ -104,7 +104,6 @@ $this->load->view('templates/CISVUE-Header', $includesArray);
 						<?php } ?>
 						<div class="col-auto">
 							<select class="form-select" @input="changeFilter('studienerfolgsbestaetigungtable', 'Stsem', $event)">
-								<option value="">Alle</option>
 								<option value="<?= $this->p->t('tools', 'alleStudiensemester'); ?>"><?= $this->p->t('tools', 'alleStudiensemester'); ?></option>
 								<?php foreach ($stsemArray as $sem) { ?>
 									<option value="<?= $sem; ?>">

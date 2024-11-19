@@ -28,24 +28,25 @@ export default {
                 <div class="searchbar_table">
         
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">übergeordnete OrgEinheit</div>
-                    <div class="searchbar_tablecell">
+                    <div class="searchbar_tablecell searchbar_label">übergeordnete OrgEinheit</div>
+                    <div class="searchbar_tablecell searchbar_value">
                           {{ res.parentoe_name }}
                     </div>
                   </div>
         
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">Gruppen-EMail</div>
-                    <div class="searchbar_tablecell">
-                        <a :href="this.mailtourl">
+                    <div class="searchbar_tablecell searchbar_label">Gruppen-EMail</div>
+                    <div class="searchbar_tablecell searchbar_value">
+                        <a :href="this.mailtourl" v-if="res.mailgroup">
                           {{ res.mailgroup }}
                         </a>
+                        <span v-else>-</span>
                     </div>
                   </div>
         
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">Leiter</div>
-                    <div class="searchbar_tablecell">
+                    <div class="searchbar_tablecell searchbar_label">Leiter</div>
+                    <div class="searchbar_tablecell searchbar_value">
                         <ul class="searchbar_inline_ul" v-if="res.leaders.length > 0">
                           <li v-for="(leader, idx) in res.leaders" :key="idx">{{ leader.name }}</li>
                         </ul>
@@ -54,8 +55,8 @@ export default {
                   </div>        
         
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">Mitarbeiter-Anzahl</div>
-                    <div class="searchbar_tablecell">
+                    <div class="searchbar_tablecell searchbar_label">Mitarbeiter-Anzahl</div>
+                    <div class="searchbar_tablecell searchbar_value">
                         {{ res.number_of_people }}
                     </div>
                   </div>
@@ -64,7 +65,7 @@ export default {
         
                 <actions :res="this.res" :actions="this.actions.childactions" @actionexecuted="$emit('actionexecuted')"></actions>
         
-              </div>        
+              </div>
           </div>
           
         </div>

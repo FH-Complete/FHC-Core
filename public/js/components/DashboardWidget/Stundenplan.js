@@ -34,6 +34,7 @@ export default {
 			const currentCalendarDate = new CalendarDate(this.currentDay)
 			const mapArr = currentCalendarDate.nextSevenDays.map((d) => [new CalendarDate(d), []])
 
+			// return map of key => calendar date of next 7 days & values the respective events on that date
 			return new Map((this.events || []).filter(evt => evt.start >= this.currentDay).reduce((acc, cur) => {
 				const date = new CalendarDate(new Date(cur.datum))
 				const arr = acc.find(el => el[0].compare(date))
@@ -188,6 +189,7 @@ export default {
 	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">
 		<lv-modal v-if="selectedEvent" ref="lvmodal" :event="selectedEvent"  />
 		<content-modal :contentID="roomInfoContentID" :ort_kurzbz="" dialogClass="modal-lg" ref="contentModal"/>
+		<header><b>{{ $p.t('lehre/stundenplan') }}</b></header>
 		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" >
 			<template #minimizedPage >
 				<div class="flex-grow-1" style="overflow-y: auto; overflow-x: hidden">
@@ -201,11 +203,14 @@ export default {
 						<div role="button" @click="showLvUebersicht(evt)" v-for="evt in value" :key="evt.id" class="list-group-item small" :style="getEventStyle(evt)">
 							<b>{{evt.topic}}</b>
 							<br>
-							<small class="d-flex w-100 justify-content-between">
+							<small v-if="evt.ort_kurzbz" class="d-flex w-100 justify-content-between">
 								<!-- event modifier stop to prevent opening the modal for the lv Uebersicht when clicking on the ort_kurzbz -->
 								<span @click.stop="showRoomInfoModal(evt.ort_kurzbz)" style="text-decoration:underline" type="button">{{evt.ort_kurzbz}}</span>
 								<span>{{evt.start.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}-{{evt.end.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}</span>
 							</small>
+						</div>
+						<div v-if="!value.length" class="list-group-item small text-center">
+							{{ p.t('lehre/noLvFound') }}
 						</div>
 					</template>
 					<div v-else class="d-flex h-100 justify-content-center align-items-center fst-italic text-center">

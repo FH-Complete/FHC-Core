@@ -29,8 +29,8 @@ export default {
         
                 <div class="searchbar_table">
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">EMail</div>
-                    <div class="searchbar_tablecell">
+                    <div class="searchbar_tablecell searchbar_label">EMail</div>
+                    <div class="searchbar_tablecell searchbar_value">
                         <a :href="this.mailtourl">
                           {{ res.mail }}
                         </a>

@@ -19,7 +19,9 @@ export default {
 		"change",
 		"remove",
 		"dragstart",
-		"resizestart"
+		"resizestart",
+		"configOpened",
+		"configClosed"
 	],
 	props: [
 		"id",
@@ -41,6 +43,12 @@ export default {
 		},
 	},
 	methods: {
+		handleShowBsModal() {
+			this.$emit('configOpened')
+		},
+		handleHideBsModal() {
+			this.$emit('configClosed')
+		},
 		mouseDown(e) {
 			this.target = e.target;
 		},
@@ -120,7 +128,7 @@ export default {
 		<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
 		</div>
 		<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
-		<bs-modal v-if="hasConfig" ref="config">
+		<bs-modal v-if="hasConfig" ref="config" @hideBsModal="handleHideBsModal" @showBsModal="handleShowBsModal">
 			<template v-slot:title>
 				{{ widget ? 'Config for ' + widget.setup.name : '' }}
 			</template>

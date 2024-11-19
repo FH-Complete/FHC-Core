@@ -87,12 +87,10 @@ export default {
             
           </div>
  		</div>
-       <div v-else class="h-100" :class="'row row-cols-' + width">
+      <div v-else class="h-100" :class="'row row-cols-' + width">
         <div class="h-100" v-for="news in newsList" :key="news.id">
-            
-              <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" v-html="news.content_obj.content"></div>
-            
-          </div>
+          <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" v-html="news.content_obj.content"></div>
+        </div>
       </div>
 </div>
 </div>`,

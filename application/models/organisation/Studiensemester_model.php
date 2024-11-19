@@ -272,4 +272,19 @@ class Studiensemester_model extends DB_Model
 		if (is_numeric($studienjahrNumber) && mb_substr($studiensemester_kurzbz, 0, 2) == 'SS') (int)$studienjahrNumber -= 1;
 		return $studienjahrNumber;
 	}
+
+	/**
+	 * Holt Start und Ende des Studiensemester_kurzbz
+	 * @param studiensemester_kurzbz
+	 * @return stdClass
+	 */
+	public function getStartEndeFromStudiensemester($studiensemester_kurzbz)
+	{
+		return $this->execReadOnlyQuery("
+		SELECT
+		start, ende
+		FROM public.tbl_studiensemester
+		WHERE studiensemester_kurzbz = ?",[$studiensemester_kurzbz]);
+
+	}
 }

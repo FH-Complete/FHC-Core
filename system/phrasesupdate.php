@@ -37116,6 +37116,26 @@ array(
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'stundenplan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stundenplan',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Timetable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 // CIS4 phrases from legacy code end
 );

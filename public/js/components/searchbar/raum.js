@@ -25,20 +25,20 @@ export default {
         
               <div class="searchbar_table">
                 <div class="searchbar_tablerow">
-                  <div class="searchbar_tablecell">Standort</div>
-                  <div class="searchbar_tablecell">{{ res.standort }}</div>
+                  <div class="searchbar_tablecell searchbar_label">Standort</div>
+                  <div class="searchbar_tablecell searchbar_value">{{ res.standort }}</div>
                 </div>
                 <div class="searchbar_tablerow">
-                  <div class="searchbar_tablecell">Sitzplätze</div>
-                  <div class="searchbar_tablecell">{{ res.sitzplaetze }}</div>
+                  <div class="searchbar_tablecell searchbar_label">Sitzplätze</div>
+                  <div class="searchbar_tablecell searchbar_value">{{ res.sitzplaetze }}</div>
                 </div>
                 <div class="searchbar_tablerow">
-                  <div class="searchbar_tablecell">Gebäude</div>
-                  <div class="searchbar_tablecell">{{ res.building }}</div>
+                  <div class="searchbar_tablecell searchbar_label">Gebäude</div>
+                  <div class="searchbar_tablecell searchbar_value">{{ res.building }}</div>
                 </div>
                 <div class="searchbar_tablerow">
-                  <div class="searchbar_tablecell">Zusatz Informationen</div>
-                  <div class="searchbar_tablecell"><div v-html="res.austattung.replace('<br />','')"></div></div>
+                  <div class="searchbar_tablecell searchbar_label">Zusatz Informationen</div>
+                  <div class="searchbar_tablecell searchbar_value"><div v-html="res.austattung.replace('<br />','')"></div></div>
                 </div>
               </div>
         
