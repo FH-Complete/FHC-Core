@@ -15,6 +15,7 @@ const app = Vue.createApp({
         return {
             searchbaroptions: {
 				cssclass: "",
+				calcheightonly: true,
                 types: [
                     "mitarbeiter",
                     "raum",
@@ -75,9 +76,16 @@ const app = Vue.createApp({
                     },
                     organisationunit: {
                         defaultaction: {
-                            type: "function",
+                            type: "link",
+							renderif: function(data) {
+								if(data.mailgroup) {
+									return true;
+								}
+								return false;
+							},
                             action: function(data) {
-                                alert('organisationunit defaultaction ' + JSON.stringify(data));
+                                const link = 'mailto:' + data.mailgroup;
+								return link;
                             }
                         },
                         childactions: []
