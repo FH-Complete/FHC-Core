@@ -1,6 +1,5 @@
 <?php
 
-
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 use \DateTime as DateTime;
 
@@ -12,28 +11,26 @@ class Vertraege extends FHCAPI_Controller
 			'getAllVertraege' => ['admin:r', 'assistenz:r'],
 			'getAllContractsNotAssigned' => ['admin:r', 'assistenz:r'],
 			'getAllContractsAssigned' => ['admin:r', 'assistenz:r'],
-			'getAllContractTypes' =>  self::PERM_LOGGED,
-			'getAllContractStati' =>  self::PERM_LOGGED,
-			'getStatiOfContract' =>  self::PERM_LOGGED,
+			'getAllContractTypes' =>  ['admin:r', 'assistenz:r'],
+			'getAllContractStati' =>  ['admin:r', 'assistenz:r'],
+			'getStatiOfContract' =>  ['admin:r', 'assistenz:r'],
 			'loadContract' => ['admin:r', 'assistenz:r'],
-			'updateContract' => ['admin:r', 'assistenz:r'],
-			'addNewContract' => ['admin:r', 'assistenz:r'],
-			'deleteContract' => ['admin:r', 'assistenz:r'],
-			'insertContractStatus' => ['admin:r', 'assistenz:r'],
 			'loadContractStatus' => ['admin:r', 'assistenz:r'],
-			'deleteContractStatus' => ['admin:r', 'assistenz:r'],
-			'updateContractStatus' => ['admin:r', 'assistenz:r'],
-			'deleteLehrauftrag' => ['admin:r', 'assistenz:r'],
-			'deleteBetreuung' => ['admin:r', 'assistenz:r']
-		]);
+			'updateContract' => self::PERM_LOGGED,
+			'addNewContract' => self::PERM_LOGGED,
+			'deleteContract' => self::PERM_LOGGED,
+			'insertContractStatus' => self::PERM_LOGGED,
+			'deleteContractStatus' => self::PERM_LOGGED,
+			'updateContractStatus' => self::PERM_LOGGED,
+			'deleteLehrauftrag' => self::PERM_LOGGED,
+			'deleteBetreuung' => self::PERM_LOGGED
+			]);
 
 		//Load Models and Libraries
 		$this->load->model('accounting/Vertrag_model', 'VertragModel');
 		$this->load->model('accounting/Vertragsstatus_model', 'VertragsstatusModel');
 		$this->load->model('accounting/Vertragstyp_model', 'VertragstypModel');
 		$this->load->model('accounting/Vertragvertragsstatus_model', 'VertragvertragsstatusModel');
-
-		//TODO(Manu) additional permission checks
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -42,7 +39,6 @@ class Vertraege extends FHCAPI_Controller
 		]);
 	}
 
-	//TODO(Manu) validations, phrases
 	public function getAllVertraege($person_id)
 	{
 		$result = $this->VertragModel->loadContractsOfPerson($person_id);
@@ -121,15 +117,25 @@ class Vertraege extends FHCAPI_Controller
 		$_POST['vertragsdatum']= $formData['vertragsdatum'];
 		$_POST['bezeichnung']= $formData['bezeichnung'];
 		$_POST['betrag'] = $formData['betrag'];
-		$_POST['vertragsstunden']= isset($formData['vertragsstunden']) ? $formData['vertragsstunden'] : null;
-		$_POST['vertragsstunden_studiensemester_kurzbz']= isset($formData['vertragsstunden_studiensemester_kurzbz']) ? $formData['vertragsstunden_studiensemester_kurzbz'] : null;
-		$_POST['anmerkung']= isset($formData['anmerkung']) ? $formData['anmerkung'] : null;
+		$_POST['vertragsstunden'] =
+			isset($formData['vertragsstunden'])
+			? $formData['vertragsstunden']
+			: null;
+		$_POST['vertragsstunden_studiensemester_kurzbz'] =
+			isset($formData['vertragsstunden_studiensemester_kurzbz'])
+				? $formData['vertragsstunden_studiensemester_kurzbz']
+				: null;
+		$_POST['anmerkung'] = isset($formData['anmerkung']) ? $formData['anmerkung'] : null;
 
+		$this->form_validation->set_rules('bezeichnung', 'Bezeichnung', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Bezeichnung'])
+		]);
 
 		$this->form_validation->set_rules('vertragstyp_kurzbz', 'Vertragstyp', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Vertragstyp'])
 		]);
-		$this->form_validation->set_rules('vertragsdatum', 'Vertragsdatum', 'required', [
+		$this->form_validation->set_rules('vertragsdatum', 'Vertragsdatum', 'required|is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Vertragsdatum']),
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Vertragsdatum'])
 		]);
 		$this->form_validation->set_rules('betrag', 'Betrag', 'required|numeric', [
@@ -151,13 +157,13 @@ class Vertraege extends FHCAPI_Controller
 
 		$result = $this->VertragModel->insert([
 			'person_id' => $person_id,
-			'vertragsdatum' => $_POST['vertragsdatum'],
-			'bezeichnung' => $_POST['bezeichnung'],
-			'vertragstyp_kurzbz' => $_POST['vertragstyp_kurzbz'],
-			'betrag' => $_POST['betrag'],
-			'vertragsstunden' => $_POST['vertragsstunden'],
-			'vertragsstunden_studiensemester_kurzbz' => $_POST['vertragsstunden_studiensemester_kurzbz'],
-			'anmerkung' => $_POST['anmerkung'],
+			'vertragsdatum' => $this->input->post('vertragsdatum'),
+			'bezeichnung' => $this->input->post('bezeichnung'),
+			'vertragstyp_kurzbz' => $this->input->post('vertragstyp_kurzbz'),
+			'betrag' => $this->input->post('betrag'),
+			'vertragsstunden' => $this->input->post('vertragsstunden'),
+			'vertragsstunden_studiensemester_kurzbz' => $this->input->post('vertragsstunden_studiensemester_kurzbz'),
+			'anmerkung' => $this->input->post('anmerkung'),
 			'insertamum' => date('c'),
 			'insertvon' => getAuthUID()
 		]);
@@ -180,8 +186,8 @@ class Vertraege extends FHCAPI_Controller
 		}
 
 		//Hinzufügen der Lehraufträge
-		foreach ($lehrauftraege as $row) {
-
+		foreach ($lehrauftraege as $row)
+		{
 			if ($row['type'] == 'Lehrauftrag')
 			{
 				$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
@@ -193,7 +199,8 @@ class Vertraege extends FHCAPI_Controller
 					],
 					[
 						'vertrag_id' => $vertrag_id
-					]);
+					]
+				);
 
 				if (!$result_lehrauftrag) {
 					$this->db->trans_rollback();
@@ -213,7 +220,8 @@ class Vertraege extends FHCAPI_Controller
 					],
 					[
 						'vertrag_id' => $vertrag_id
-					]);
+					]
+				);
 
 				if (!$result_projektbetreuer)
 				{
@@ -241,15 +249,25 @@ class Vertraege extends FHCAPI_Controller
 		$_POST['vertragsdatum']= $formData['vertragsdatum'];
 		$_POST['bezeichnung']= $formData['bezeichnung'];
 		$_POST['betrag'] = $formData['betrag'];
-		$_POST['vertragsstunden']= isset($formData['vertragsstunden']) ? $formData['vertragsstunden'] : null;
-		$_POST['vertragsstunden_studiensemester_kurzbz']= isset($formData['vertragsstunden_studiensemester_kurzbz']) ? $formData['vertragsstunden_studiensemester_kurzbz'] : null;
+		$_POST['vertragsstunden'] =
+			isset($formData['vertragsstunden'])
+				? $formData['vertragsstunden']
+				: null;
+		$_POST['vertragsstunden_studiensemester_kurzbz']=
+			isset($formData['vertragsstunden_studiensemester_kurzbz'])
+				? $formData['vertragsstunden_studiensemester_kurzbz']
+				: null;
 		$_POST['anmerkung']= isset($formData['anmerkung']) ? $formData['anmerkung'] : null;
 
+		$this->form_validation->set_rules('bezeichnung', 'Bezeichnung', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Bezeichnung'])
+		]);
 
 		$this->form_validation->set_rules('vertragstyp_kurzbz', 'Vertragstyp', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Vertragstyp'])
 		]);
-		$this->form_validation->set_rules('vertragsdatum', 'Vertragsdatum', 'required', [
+		$this->form_validation->set_rules('vertragsdatum', 'Vertragsdatum', 'required|is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Vertragsdatum']),
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Vertragsdatum'])
 		]);
 		$this->form_validation->set_rules('betrag', 'Betrag', 'required|numeric', [
@@ -271,23 +289,23 @@ class Vertraege extends FHCAPI_Controller
 			$vertrag_id,
 			[
 				'person_id' => $person_id,
-				'vertragsdatum' => $_POST['vertragsdatum'],
-				'bezeichnung' => $_POST['bezeichnung'],
-				'vertragstyp_kurzbz' => $_POST['vertragstyp_kurzbz'],
-				'betrag' => $_POST['betrag'],
-				'vertragsstunden' => $_POST['vertragsstunden'],
-				'vertragsstunden_studiensemester_kurzbz' => $_POST['vertragsstunden_studiensemester_kurzbz'],
-				'anmerkung' => $_POST['anmerkung'],
-				'vertragsstunden' => $_POST['vertragsstunden'],
+				'vertragsdatum' => $this->input->post('vertragsdatum'),
+				'bezeichnung' => $this->input->post('bezeichnung'),
+				'vertragstyp_kurzbz' => $this->input->post('vertragstyp_kurzbz'),
+				'betrag' => $this->input->post('betrag'),
+				'vertragsstunden' => $this->input->post('vertragsstunden'),
+				'vertragsstunden_studiensemester_kurzbz' => $this->input->post('vertragsstunden_studiensemester_kurzbz'),
+				'anmerkung' => $this->input->post('anmerkung'),
 				'updateamum' => date('c'),
 				'updatevon' => getAuthUID()
-		]);
+			]
+		);
 
 		$this->getDataOrTerminateWithError($result);
 
 		//Adding of Lehraufträge
-		foreach ($lehrauftraege as $row) {
-
+		foreach ($lehrauftraege as $row)
+		{
 			if ($row['type'] == 'Lehrauftrag')
 			{
 				$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
@@ -299,7 +317,8 @@ class Vertraege extends FHCAPI_Controller
 					],
 					[
 						'vertrag_id' => $vertrag_id
-					]);
+					]
+				);
 
 				if (!$result_lehrauftrag) {
 					$this->db->trans_rollback();
@@ -319,7 +338,8 @@ class Vertraege extends FHCAPI_Controller
 					],
 					[
 						'vertrag_id' => $vertrag_id
-					]);
+					]
+				);
 
 				if (!$result_projektbetreuer)
 				{
@@ -350,9 +370,6 @@ class Vertraege extends FHCAPI_Controller
 
 	public function deleteContract($vertrag_id)
 	{
-		//TODO(Manu) validations
-
-		//TODO(manu) use private function
 		$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
 
 		//check if attached Lehrauftrag
@@ -366,17 +383,17 @@ class Vertraege extends FHCAPI_Controller
 			foreach($resultLehrauftrag as $lehrauftrag)
 			{
 				$result = $this->LehreinheitmitarbeiterModel->update(
-				[
-					'lehreinheit_id' => $lehrauftrag->lehreinheit_id,
-					'mitarbeiter_uid' => $lehrauftrag->mitarbeiter_uid,
-					'vertrag_id' => $vertrag_id
-				],
-				[
-					'vertrag_id' => null
-				]);
+					[
+						'lehreinheit_id' => $lehrauftrag->lehreinheit_id,
+						'mitarbeiter_uid' => $lehrauftrag->mitarbeiter_uid,
+						'vertrag_id' => $vertrag_id
+					],
+					[
+						'vertrag_id' => null
+					]
+				);
 
 				$this->getDataOrTerminateWithError($result);
-
 			}
 		}
 
@@ -402,7 +419,8 @@ class Vertraege extends FHCAPI_Controller
 					],
 					[
 						'vertrag_id' => null
-					]);
+					]
+				);
 
 				$this->getDataOrTerminateWithError($result);
 			}
@@ -412,10 +430,11 @@ class Vertraege extends FHCAPI_Controller
 			'vertrag_id' => $vertrag_id
 		]);
 
-		//TODO(Manu) check if there are exceptions for deletions (status abgerechnet?)
-		if(hasData($result)){
+		if(hasData($result))
+		{
 			$data = getData($result);
-			foreach ($data as $item) {
+			foreach ($data as $item)
+			{
 				//delete all entries in lehre.tbl_vertrag_vertragsstatus
 				$result = $this->VertragvertragsstatusModel->delete([
 					'vertrag_id' => $vertrag_id,
@@ -442,26 +461,42 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
-	public function insertContractStatus ($vertrag_id, $datum, $status){
+	public function insertContractStatus($vertrag_id)
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('vertragsstatus_kurzbz', 'vertragsstatus_kurzbz', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'vertragsstatus_kurzbz'])
+		]);
+		$this->form_validation->set_rules('datum', 'Datum', 'required|is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Datum']),
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Datum'])
+		]);
+
+		if ($this->form_validation->run() == false)
+		{
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
+
 		$result = $this->VertragvertragsstatusModel->loadWhere(
             array(
                 'vertrag_id' => $vertrag_id,
-                'vertragsstatus_kurzbz' => $status
+                'vertragsstatus_kurzbz' => $this->input->post('vertragsstatus_kurzbz')
             )
         );
 
-        if (hasData($result)) {
-			$this->terminateWithError("status bereits vorhanden", self::ERROR_TYPE_GENERAL);
-           // $this->terminateWithError($this->p->t('ui', 'error_status_existing', ['id' => 'Vertrag_id']), self::ERROR_TYPE_GENERAL);
+        if (hasData($result))
+		{
+			$this->terminateWithError($this->p->t('vertrag', 'error_statusVorhanden'), self::ERROR_TYPE_GENERAL);
         }
 
 		$status_result = $this->VertragvertragsstatusModel->insert([
 			'vertrag_id' => $vertrag_id,
 			'uid' => getAuthUID(),
-			'vertragsstatus_kurzbz' => $status,
+			'vertragsstatus_kurzbz' => $this->input->post('vertragsstatus_kurzbz'),
 			'insertamum' => date('c'),
 			'insertvon' => getAuthUID(),
-			'datum' => $datum
+			'datum' => $this->input->post('datum')
 		]);
 
 		if (!$status_result) {
@@ -471,7 +506,9 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($status_result)));
 	}
 
-	public function deleteContractStatus($vertrag_id, $status){
+	public function deleteContractStatus($vertrag_id)
+	{
+		$status = $this->input->post('vertragsstatus_kurzbz');
 
 		$result = $this->VertragvertragsstatusModel->delete(
 			array(
@@ -480,16 +517,20 @@ class Vertraege extends FHCAPI_Controller
 			)
 		);
 
-		if (isError($result)) {
+		if (isError($result))
+		{
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		if (!hasData($result)) {
+		if (!hasData($result))
+		{
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'vertragsstatus_kurzb']), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
-	public function loadContractStatus ($vertrag_id, $status){
+	public function loadContractStatus($vertrag_id)
+	{
+		$status = $this->input->post('vertragsstatus_kurzbz');
 
 		$result = $this->VertragvertragsstatusModel->loadWhere(
 			array(
@@ -503,28 +544,34 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
-	public function updateContractStatus ($vertrag_id, $datum, $status){
-/*		$result = $this->VertragvertragsstatusModel->loadWhere(
-			array(
-				'vertrag_id' => $vertrag_id,
-				'vertragsstatus_kurzbz' => $status
-			)
-		);
+	public function updateContractStatus($vertrag_id)
+	{
+		$this->load->library('form_validation');
 
-		if (hasData($result)) {
-			$this->terminateWithError("status bereits vorhanden", self::ERROR_TYPE_GENERAL);
-			// $this->terminateWithError($this->p->t('ui', 'error_status_existing', ['id' => 'Vertrag_id']), self::ERROR_TYPE_GENERAL);
-		}*/
+		$this->form_validation->set_rules('vertragsstatus_kurzbz', 'vertragsstatus_kurzbz', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'vertragsstatus_kurzbz'])
+		]);
+		$this->form_validation->set_rules('datum', 'Datum', 'required|is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Datum']),
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Datum'])
+		]);
 
-		$status_result = $this->VertragvertragsstatusModel->update([
+		if ($this->form_validation->run() == false)
+		{
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
+
+		$status_result = $this->VertragvertragsstatusModel->update(
+			[
 			'vertrag_id' => $vertrag_id,
-			'vertragsstatus_kurzbz' => $status],
+			'vertragsstatus_kurzbz' => $this->input->post('vertragsstatus_kurzbz')],
 			[
 			'uid' => getAuthUID(),
 			'updateamum' => date('c'),
 			'updatevon' => getAuthUID(),
-			'datum' => $datum
-		]);
+			'datum' => $this->input->post('datum')
+			]
+		);
 
 		if (!$status_result) {
 			$this->terminateWithError('Fehler beim Updaten des Vertragsstatus.');
@@ -533,8 +580,11 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($status_result)));
 	}
 
-	public function deleteLehrauftrag($vertrag_id, $lehreinheit_id, $mitarbeiter_uid)
+	public function deleteLehrauftrag($vertrag_id)
 	{
+		$lehreinheit_id = $this->input->post('lehreinheit_id');
+		$mitarbeiter_uid = $this->input->post('mitarbeiter_uid');
+
 		$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
 
 		//kein delete: ein update, bei dem die vertrag_id auf null gesetzt wird
@@ -546,19 +596,26 @@ class Vertraege extends FHCAPI_Controller
 			],
 			[
 				'vertrag_id' => null
-			]);
+			]
+		);
 
-		if (isError($result)) {
+		if (isError($result))
+		{
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		if (!hasData($result)) {
+		if (!hasData($result))
+		{
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Id_Lehrauftrag']), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
-	public function deleteBetreuung($vertrag_id, $person_id, $projektarbeit_id, $betreuerart_kurzbz)
+	public function deleteBetreuung($vertrag_id)
 	{
+		$person_id= $this->input->post('person_id');
+		$projektarbeit_id = $this->input->post('projektarbeit_id');
+		$betreuerart_kurzbz = $this->input->post('betreuerart_kurzbz');
+
 		$this->load->model('education/Projektbetreuer_model', 'Projektbetreuermodel');
 
 		$result = $this->Projektbetreuermodel->update(
@@ -570,16 +627,17 @@ class Vertraege extends FHCAPI_Controller
 			],
 			[
 				'vertrag_id' => null
-			]);
+			]
+		);
 
-		if (isError($result)) {
+		if (isError($result))
+		{
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		if (!hasData($result)) {
-			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Id_Lehrauftrag']), self::ERROR_TYPE_GENERAL);
+		if (!hasData($result))
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Id_Projektbetreuung']), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess(current(getData($result)));
 	}
-
-
 }

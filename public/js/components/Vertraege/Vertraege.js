@@ -34,7 +34,6 @@ export default {
 	},
 	data() {
 		return {
-			//TODO(Manu) filter: alle vs offene Verträge
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: this.$fhcApi.factory.vertraege.person.getAllVertraege,
@@ -47,11 +46,21 @@ export default {
 				columns: [
 					{title: "Bezeichnung", field: "bezeichnung", width: 150},
 					{title: "lehreinheit_id", field: "lehreinheit_id", visible: true},
-					{title: "Betrag", field: "betrag", width: 150},
+					{
+						title: "Betrag", field: "betrag", width: 150,
+						formatter: function (cell) {
+							let value = cell.getValue();
+
+							if (value == null) {
+								return "0.00";
+							}
+
+							return parseFloat(value).toFixed(2);
+						}
+					},
 					{title: "Vertragstyp", field: "vertragstyp_bezeichnung", width: 125},
 					{title: "Status", field: "status"},
 					{title: "Vertragsdatum", field: "format_vertragsdatum", width: 128},
-					{title: "VertragstypKurzbz", field: "vertragstyp_kurzbz", visible: false},
 					{title: "VertragId", field: "vertrag_id", visible: false},
 					{title: "Vertragsdatum_iso", field: "vertragsdatum", visible: false},
 					{title: "Vertragsstunden", field: "vertragsstunden", visible: false},
@@ -69,7 +78,7 @@ export default {
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.title = 'Vertrag bearbeiten';
+							button.title = this.$p.t('vertrag', 'editVertrag');
 							button.addEventListener(
 								'click',
 								(event) =>
@@ -80,7 +89,7 @@ export default {
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.title = 'Vertrag löschen';
+							button.title = this.$p.t('vertrag', 'deleteVertrag');
 							button.addEventListener(
 								'click',
 								() =>
@@ -101,30 +110,53 @@ export default {
 			},
 			tabulatorEvents: [
 				{
-/*					event: 'tableBuilt',
+					event: 'tableBuilt',
 					handler: async() => {
 
-						await this.$p.loadCategory(['wawi', 'global', 'infocenter']);
+						await this.$p.loadCategory(['ui', 'global', 'vertrag']);
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('nummer').component.updateDefinition({
-							title: this.$p.t('wawi', 'nummer')
+						cm.getColumnByField('bezeichnung').component.updateDefinition({
+							title: this.$p.t('ui', 'bezeichnung')
+						});
+						cm.getColumnByField('lehreinheit_id').component.updateDefinition({
+							title: this.$p.t('ui', 'lehreinheit_id')
+						});
+						cm.getColumnByField('betrag').component.updateDefinition({
+							title: this.$p.t('ui', 'betrag')
+						});
+						cm.getColumnByField('status').component.updateDefinition({
+							title: this.$p.t('global', 'status')
+						});
+						cm.getColumnByField('vertragstyp_bezeichnung').component.updateDefinition({
+							title: this.$p.t('vertrag', 'vertragstyp')
+						});
+						cm.getColumnByField('format_vertragsdatum').component.updateDefinition({
+							title: this.$p.t('vertrag', 'vertragsdatum')
+						});
+						cm.getColumnByField('vertragsdatum').component.updateDefinition({
+							title: this.$p.t('vertrag', 'vertragsdatum_iso')
+						});
+						cm.getColumnByField('vertragsstunden').component.updateDefinition({
+							title: this.$p.t('vertrag', 'vertragsstunden')
+						});
+						cm.getColumnByField('vertragsstunden_studiensemester_kurzbz').component.updateDefinition({
+							title: this.$p.t('vertrag', 'vertragsstunden_studiensemester')
+						});
+						cm.getColumnByField('vertrag_id').component.updateDefinition({
+							title: this.$p.t('ui', 'vertrag_id')
 						});
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
 						});
-						cm.getColumnByField('format_retour').component.updateDefinition({
-							title: this.$p.t('wawi', 'retourdatum')
+						cm.getColumnByField('isabgerechnet').component.updateDefinition({
+							title: this.$p.t('vertrag', 'abgerechnet')
 						});
-						cm.getColumnByField('kaution').component.updateDefinition({
-							title: this.$p.t('infocenter', 'kaution')
+						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
 						});
-						cm.getColumnByField('format_ausgabe').component.updateDefinition({
-							title: this.$p.t('wawi', 'ausgabedatum')
-						});
-
-					}*/
+					}
 				}
 			],
 			statusNew: true,
@@ -143,7 +175,8 @@ export default {
 	},
 	watch: {
 		person_id() {
-			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllVertraege/' + this.person_id);
+			this.$refs.table.reloadTable();
+			//this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllVertraege/' + this.person_id);
 		},
 	},
 	methods: {
@@ -184,12 +217,11 @@ export default {
 			};
 
 			return this.endpoint
-				.addNewContract(dataToSend)
+				.addNewContract(this.$refs.contractData, dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractModal.hide();
 					this.resetModal();
-					//this.$refs.contractdetails.reload(); //TOOD(Manu) check why error
 					//this.$refs.contractdetails.reload();
 					this.$refs.unassignedLehrauftraege.reloadUnassigned();
 					this.reload();
@@ -207,7 +239,7 @@ export default {
 			};
 
 			return this.endpoint
-				.updateContract(dataToSend)
+				.updateContract(this.$refs.contractData, dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractModal.hide();
@@ -231,91 +263,68 @@ export default {
 		//Methods Contract Stati
 		addNewContractStatus({status, datum}) {
 			const date = new Date();
-			//TODO(Manu) refactor this
-			const formattedDate = datum.toLocaleDateString('en-CA');
+			const formattedDate = datum != null ? datum.toLocaleDateString('en-CA',
+				{
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit',
+					hour: '2-digit',
+					minute: '2-digit',
+					hour12: false, // Use 24-hour format
+				}
+				) : null;
 			let params = {
 				vertrag_id : this.contractSelected.vertrag_id,
-				status: {status},
+				vertragsstatus_kurzbz: status,
 				datum: formattedDate
 			};
 
 			return this.endpoint
-				.insertContractStatus(params)
+				.insertContractStatus(this.$refs.contractstati.$refs.statusData, params)
 				.then(response => {
 					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 
 					this.$refs.contractstati.closeModal();
-					//window.scrollTo(0, 0);
 					this.$refs.contractstati.reload();
+					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		deleteContractStatus({status, vertrag_id}){
 			let params = {
-				vertrag_id : {vertrag_id},
-				status: {status}
+				vertrag_id : vertrag_id,
+				vertragsstatus_kurzbz: status
 			};
 			return this.endpoint
 				.deleteContractStatus(params)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 
-					//window.scrollTo(0, 0);
 					this.$refs.contractstati.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		deleteLehrauftrag({lehreinheit_id, vertrag_id, mitarbeiter_uid}){
-
-			let params = {
-				vertrag_id : {vertrag_id},
-				lehreinheit_id: {lehreinheit_id},
-				mitarbeiter_uid: {mitarbeiter_uid},
-			};
-			return this.endpoint
-				.deleteLehrauftrag(params)
-				.then(response => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-
-					//window.scrollTo(0, 0);
-					this.resetModal();
-					this.$refs.contractdetails.reload();
-					this.$refs.unassignedLehrauftraege.reloadUnassigned();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
-		deleteBetreuung({person_id, vertrag_id, projektarbeit_id, betreuerart_kurzbz}){
-			let params = {
-				vertrag_id : {vertrag_id},
-				person_id: {person_id},
-				projektarbeit_id: {projektarbeit_id},
-				betreuerart_kurzbz: {betreuerart_kurzbz},
-			};
-			return this.endpoint
-				.deleteBetreuung(params)
-				.then(response => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-
-					//window.scrollTo(0, 0);
-					this.$refs.contractdetails.reload();
-					this.$refs.unassignedLehrauftraege.reloadUnassigned();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
 		updateContractStatus({datum, status}){
-			//TODO(Manu) refactor this
-			const formattedDate = datum.toLocaleDateString('en-CA');
+			const date = new Date();
+			const formattedDate = datum != null ? datum.toLocaleDateString('en-CA',
+				{
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit',
+					hour: '2-digit',
+					minute: '2-digit',
+					hour12: false, // Use 24-hour format
+				}
+			) : null;
 			let params = {
 				vertrag_id : this.contractSelected.vertrag_id,
 				datum : formattedDate,
-				status: {status}
+				vertragsstatus_kurzbz: status
 			};
 			return this.endpoint
-				.updateContractStatus(params)
+				.updateContractStatus(this.$refs.contractstati.$refs.statusData, params)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-
-					//window.scrollTo(0, 0);
 					this.$refs.contractstati.closeModal();
 					this.$refs.contractstati.reload();
 					this.reload();
@@ -324,8 +333,8 @@ export default {
 		},
 		loadContractStatus({vertrag_id, status}){
 			let params = {
-				vertrag_id : {vertrag_id},
-				status: {status}
+				vertrag_id : vertrag_id,
+				vertragsstatus_kurzbz: status
 			};
 			return this.endpoint
 				.loadContractStatus(params)
@@ -335,6 +344,40 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		deleteLehrauftrag({lehreinheit_id, vertrag_id, mitarbeiter_uid}){
+
+			let params = {
+				vertrag_id : vertrag_id,
+				lehreinheit_id: lehreinheit_id,
+				mitarbeiter_uid: mitarbeiter_uid
+			};
+			return this.endpoint
+				.deleteLehrauftrag(params)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+					this.resetModal();
+					this.$refs.contractdetails.reload();
+					this.$refs.unassignedLehrauftraege.reloadUnassigned();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		deleteBetreuung({person_id, vertrag_id, projektarbeit_id, betreuerart_kurzbz}){
+			let params = {
+				vertrag_id : vertrag_id,
+				person_id: person_id,
+				projektarbeit_id: projektarbeit_id,
+				betreuerart_kurzbz: betreuerart_kurzbz
+			};
+			return this.endpoint
+				.deleteBetreuung(params)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+					this.$refs.contractdetails.reload();
+					this.$refs.unassignedLehrauftraege.reloadUnassigned();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+
 		//Methods Unassigned List
 		saveClickedRows(clickedRows) {
 			this.childData = clickedRows;
@@ -397,8 +440,7 @@ export default {
 
 	},
 	template: `
-
-	<div class="core-vertraege h-100 d-flex flex-column">
+	<div class="core-contracts h-100 d-flex flex-column">
 	
 <!--	filter: open means no status abgerechnet yet-->
 		<div class="justify-content-end pb-3">
@@ -420,18 +462,17 @@ export default {
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Vertrag"
+			:new-btn-label="this.$p.t('ui', 'vertrag')"
 			@click:new="actionNewContract"
 			>
-		</core-filter-cmpt>		
+		</core-filter-cmpt>
 		
 		<div class = "row">
-		
 			<div class="col-sm-6">
 				<!-- ContractDetails -->
-				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">      
-					<contract-details 
-						:person_id="person_id" 
+				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">
+					<contract-details
+						:person_id="person_id"
 						:vertrag_id="contractSelected.vertrag_id"
 						@deleteLehrauftrag="deleteLehrauftrag"
 						@deleteBetreuung="deleteBetreuung"
@@ -439,12 +480,11 @@ export default {
 					></contract-details>
 				</div>
 			</div>
-
 			<div class="col-sm-6">
 				<!-- ContractStati -->
 				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">      
-					<contract-stati 
-						:vertrag_id="contractSelected.vertrag_id" 
+					<contract-stati
+						:vertrag_id="contractSelected.vertrag_id"
 						:listContractStati="listContractStati"
 						:formDataParent="contractFormData"
 						@setContractStatus="addNewContractStatus"
@@ -455,123 +495,110 @@ export default {
 					></contract-stati>
 				</div>
 			</div>
-				
 		</div>
-				
-		<!--Modal: contractModal-->
-		<bs-modal ref="contractModal" dialog-class="modal-xl">
-			<template #title>
-				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('vertrag', 'addVertrag')}}</p>
-				<p v-else class="fw-bold mt-3">{{$p.t('vertrag', 'editVertrag')}}</p>
-			</template>
-			
-			<core-form class="row g-3" ref="unassignedData">
 		
-<!--		{{formData}}-->
-	
-		<!--TODO(Manu) wenn einer gelöscht wird, wird er auch nicht sofort angezeigt
-		Auswirkung von Vertragdetails of UnassignedList-->
-				<list-unassigned 
-					:endpoint="$fhcApi.factory.vertraege.person" 
-					:person_id="person_id"
-					ref="unassignedLehrauftraege"
-					@saveClickedRows="saveClickedRows"
-					@sum-updated="updateBetrag"
-					></list-unassigned>
-
-				<hr>
+		<!--Modal: contractModal-->
+			<bs-modal ref="contractModal" dialog-class="modal-xl">
+				<template #title>
+					<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('vertrag', 'addVertrag')}}</p>
+					<p v-else class="fw-bold mt-3">{{$p.t('vertrag', 'editVertrag')}}</p>
+				</template>
 				
-				<div class="row mb-3">
-					<form-input
-						type="DatePicker"
-						:label="$p.t('vertrag/datum_vertrag')"
-						name="vertragsdatum"
-						v-model="formData.vertragsdatum"
-						auto-apply
-						:enable-time-picker="false"
-						format="dd.MM.yyyy"
-						preview-format="dd.MM.yyyy"
-						:teleport="true"
-						>
-					</form-input>
-				</div>
-				
-				<div class="row mb-3">		
-					<form-input
-						type="text"
-						:label="$p.t('ui/bezeichnung')"
-						name="bezeichnung"
-						v-model="formData.bezeichnung"
-						>
-					</form-input>
-				</div>
-				
-				<div class="row mb-3">
-					<form-input
-						type="select"
-						:label="$p.t('global/typ')"
-						v-model="formData.vertragstyp_kurzbz"
-						name="vertragstyp_kurzbz"
-						>
-						<option :value="null">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
-						<option
-							v-for="entry in listContractTypes"
-							:key="entry.vertragstyp_kurzbz"
-							:value="entry.vertragstyp_kurzbz"
-							>
-							{{entry.bezeichnung}}
-						</option>
-					</form-input>
-				</div>
-				
-				<div class="row mb-3">		
-					<form-input
-						:label="$p.t('ui/betrag')"
-						name="betrag"
-						v-model="formData.betrag"
-						>
-					</form-input>
-				</div>
-				
-				<div class="row mb-3" v-if="!statusNew">		
-					<form-input
-						type="text"
-						:label="$p.t('ui/stunden') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
-						name="vertragsstunden"
-						v-model="formData.vertragsstunden"
-						disabled
-						>
-					</form-input>
-				</div>
-				
-				<div class="row mb-3" v-if="!statusNew">		
-					<form-input
-						type="text"
-						:label="$p.t('lehre/studiensemester') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
-						name="vertragsstunden_studiensemester_kurzbz"
-						v-model="formData.vertragsstunden_studiensemester_kurzbz"
-						disabled
-						>
-					</form-input>
-				</div>
+					<list-unassigned
+						:endpoint="$fhcApi.factory.vertraege.person"
+						:person_id="person_id"
+						ref="unassignedLehrauftraege"
+						@saveClickedRows="saveClickedRows"
+						@sum-updated="updateBetrag"
+						></list-unassigned>
+					<hr>
+					<core-form ref="contractData">
+						<div class="row mb-3">
+							<form-input
+								type="DatePicker"
+								:label="$p.t('vertrag/datum_vertrag')"
+								name="vertragsdatum"
+								v-model="formData.vertragsdatum"
+								auto-apply
+								:enable-time-picker="false"
+								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
+								:teleport="true"
+								>
+							</form-input>
+						</div>
 						
-				<div class="row mb-3">
-					<form-input
-						type="textarea"
-						:label="$p.t('global/anmerkung')"
-						name="anmerkung"
-						v-model="formData.anmerkung"
-						>
-					</form-input>
-				</div>
+						<div class="row mb-3">
+							<form-input
+								type="text"
+								:label="$p.t('ui/bezeichnung')"
+								name="bezeichnung"
+								v-model="formData.bezeichnung"
+								>
+							</form-input>
+						</div>
+						<div class="row mb-3">
+							<form-input
+								type="select"
+								:label="$p.t('global/typ')"
+								v-model="formData.vertragstyp_kurzbz"
+								name="vertragstyp_kurzbz"
+								>
+								<option :value="null">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
+								<option
+									v-for="entry in listContractTypes"
+									:key="entry.vertragstyp_kurzbz"
+									:value="entry.vertragstyp_kurzbz"
+									>
+									{{entry.bezeichnung}}
+								</option>
+							</form-input>
+						</div>
+						<div class="row mb-3">
+							<form-input
+								:label="$p.t('ui/betrag')"
+								name="betrag"
+								v-model="formData.betrag"
+								>
+							</form-input>
+						</div>
+						<div class="row mb-3" v-if="!statusNew">
+							<form-input
+								type="text"
+								:label="$p.t('ui/stunden') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
+								name="vertragsstunden"
+								v-model="formData.vertragsstunden"
+								disabled
+								>
+							</form-input>
+						</div>
+						<div class="row mb-3" v-if="!statusNew">
+							<form-input
+								type="text"
+								:label="$p.t('lehre/studiensemester') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
+								name="vertragsstunden_studiensemester_kurzbz"
+								v-model="formData.vertragsstunden_studiensemester_kurzbz"
+								disabled
+								>
+							</form-input>
+						</div>
+						<div class="row mb-3">
+							<form-input
+								type="textarea"
+								:label="$p.t('global/anmerkung')"
+								name="anmerkung"
+								v-model="formData.anmerkung"
+								>
+							</form-input>
+						</div>
+				</core-form>
 				
-			</core-form>
-			
-			<template #footer>
-				<button type="button" class="btn btn-primary" @click="statusNew ? addNewContract() : updateContract(formData.vertrag_id)">{{$p.t('ui', 'speichern')}}</button>
-			</template>
-			
-		</bs-modal>
+				<template #footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="reload()">{{$p.t('ui', 'abbrechen')}}</button>
+					<button type="button" class="btn btn-primary" @click="statusNew ? addNewContract() : updateContract(formData.vertrag_id)">{{$p.t('vertrag', 'vertragErstellen')}}</button>
+				</template>
+			</bs-modal>
+		</core-form>
 	</div>`
 }
 

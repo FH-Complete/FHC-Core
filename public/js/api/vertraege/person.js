@@ -20,58 +20,34 @@ export default {
 	getAllContractStati(){
 		return this.$fhcApi.get('api/frontend/v1/vertraege/vertraege/getAllContractStati/');
 	},
-/*	addNewContract(person_id, formData) {
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/addNewContract/' +
-			person_id, formData
-		);
-	},*/
-	addNewContract(data) {
-		//TODO(Manu) Refactor
-		const { person_id, formData, clickedRows } = data;
-		console.log("Person ID:", person_id);
-		console.log("Form Data:", formData);
-		console.log("Clicked Rows:", clickedRows);
-		//return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/addNewContract/' + Object.values(params.person_id).join('/') + '/' +  Object.values(params.formData).join('/') + '/' + Object.values(params.clickedRows).join('/'));
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/addNewContract/', data);
+	addNewContract(form, data) {
+		return this.$fhcApi.post(form,'api/frontend/v1/vertraege/vertraege/addNewContract/', data);
 	},
 	loadContract(vertrag_id){
 		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/loadContract/' + vertrag_id);
 	},
-/*	updateContract(vertrag_id, formData) {
-		return this.$fhcApi.post( 'api/frontend/v1/vertraege/vertraege/updateContract/' + vertrag_id,
-			formData);
-	},*/
-	updateContract(data) {
-		//TODO(Manu) Refactor
-		const { vertrag_id, person_id, formData, clickedRows } = data;
-		console.log("Person ID:", person_id);
-		console.log("Vertrag ID:", vertrag_id);
-		console.log("Form Data:", formData);
-		console.log("Clicked Rows:", clickedRows);
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/updateContract/', data);
+	updateContract(form, data) {
+		return this.$fhcApi.post(form,'api/frontend/v1/vertraege/vertraege/updateContract/', data);
 	},
 	deleteContract(vertrag_id){
 		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteContract/' + vertrag_id);
 	},
 	loadContractStatus(params){
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/loadContractStatus/' + Object.values(params.vertrag_id).join('/') + '/' + Object.values(params.status).join('/'));
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/loadContractStatus/' + params.vertrag_id, params);
 	},
-	insertContractStatus(params) {
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/insertContractStatus/' + params.vertrag_id + '/' + params.datum + '/' + Object.values(params.status).join('/'));
+	insertContractStatus(form, params) {
+		return this.$fhcApi.post(form,'api/frontend/v1/vertraege/vertraege/insertContractStatus/' + params.vertrag_id, params);
 	},
-	updateContractStatus(params) {
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/updateContractStatus/' + params.vertrag_id + '/' + params.datum + '/' + Object.values(params.status).join('/'));
+	updateContractStatus(form, params) {
+		return this.$fhcApi.post(form,'api/frontend/v1/vertraege/vertraege/updateContractStatus/' + params.vertrag_id, params);
 	},
 	deleteContractStatus(params) {
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteContractStatus/' + Object.values(params.vertrag_id).join('/') + '/' +  Object.values(params.status).join('/'));
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteContractStatus/' + params.vertrag_id, params);
 	},
 	deleteLehrauftrag(params) {
-		//TODO Manu (Refactor!)
-		console.log(params.vertrag_id, params.lehreinheit_id, params.mitarbeiter_uid);
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteLehrauftrag/' + Object.values(params.vertrag_id).join('/') + '/' +  Object.values(params.lehreinheit_id).join('/') + '/' + Object.values(params.mitarbeiter_uid).join('/'));
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteLehrauftrag/' + params.vertrag_id, params);
 	},
 	deleteBetreuung(params) {
-		console.log(params.vertrag_id, params.person_id, params.projektarbeit_id, params.betreuerart_kurzbz);
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteBetreuung/' + Object.values(params.vertrag_id).join('/') + '/' +  Object.values(params.person_id).join('/') + '/' + Object.values(params.projektarbeit_id).join('/') + '/' + Object.values(params.betreuerart_kurzbz).join('/'));
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteBetreuung/' + params.vertrag_id, params);
 	}
 }

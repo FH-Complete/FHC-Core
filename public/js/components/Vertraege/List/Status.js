@@ -40,13 +40,12 @@ export default {
 					{title: "Status", field: "bezeichnung"},
 					{title: "Datum", field: "format_datum"},
 					{title: "vertrag_id", field: "vertrag_id", visible: false},
-					// {title: "User", field: "bezeichnung", visible: false},
+					{title: "Vertragsstatus", field: "vertragsstatus_kurzbz", visible: false},
+					{title: "User", field: "mitarbeiter_uid", visible: false},
 					{title: "insertvon", field: "insertvon", visible: false},
 					{title: "insertamum", field: "format_insertamum", visible: false},
 					{title: "updatevon", field: "updatevon", visible: false},
 					{title: "updateamum", field: "format_updateamum", visible: false},
-					{title: "betreuerart_kurzbz", field: "betreuerart_kurzbz", visible: false},
-					{title: "Vertragsstunden", field: "vertragsstunden", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150,
@@ -58,7 +57,7 @@ export default {
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.title = 'Status bearbeiten';
+							button.title = this.$p.t('vertrag', 'editStatus');
 							button.addEventListener(
 								'click',
 								(event) =>
@@ -69,7 +68,7 @@ export default {
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.title = 'Status löschen';
+							button.title = this.$p.t('vertrag', 'deleteStatus');
 							button.addEventListener(
 								'click',
 								() =>
@@ -88,7 +87,50 @@ export default {
 				height: '200',
 				selectableRangeMode: 'click',
 				selectable: true,
+				persistenceID: 'core-contracts-status'
 			},
+			tabulatorEvents: [
+				{
+					event: 'tableBuilt',
+					handler: async() => {
+
+						await this.$p.loadCategory(['ui', 'global', 'vertrag']);
+
+						let cm = this.$refs.table.tabulator.columnManager;
+
+						cm.getColumnByField('bezeichnung').component.updateDefinition({
+							title: this.$p.t('global', 'status')
+						});
+						cm.getColumnByField('format_datum').component.updateDefinition({
+							title: this.$p.t('global', 'datum')
+						});
+						cm.getColumnByField('mitarbeiter_uid').component.updateDefinition({
+							title: this.$p.t('person', 'uid')
+						});
+						cm.getColumnByField('vertrag_id').component.updateDefinition({
+							title: this.$p.t('ui', 'vertrag_id')
+						});
+						cm.getColumnByField('vertragsstatus_kurzbz').component.updateDefinition({
+							title: this.$p.t('vertrag', 'vertragStatus')
+						});
+						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
+						});
+						cm.getColumnByField('updatevon').component.updateDefinition({
+							title: this.$p.t('global', 'updatevon')
+						});
+						cm.getColumnByField('format_updateamum').component.updateDefinition({
+							title: this.$p.t('global', 'updateamum')
+						});
+						cm.getColumnByField('insertvon').component.updateDefinition({
+							title: this.$p.t('global', 'insertvon')
+						});
+						cm.getColumnByField('format_insertamum').component.updateDefinition({
+							title: this.$p.t('global', 'insertamum')
+						});
+					}
+				}
+			],
 			clickedRows: [],
 			statusNew: true,
 			formData: {
@@ -99,6 +141,7 @@ export default {
 	},
 	watch: {
 		vertrag_id() {
+			//this.reloadTable();
 			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getStatiOfContract/' + this.vertrag_id);
 		},
 		formDataParent: {
@@ -160,19 +203,19 @@ export default {
 		}
 	},
 	template: `
-	<!--TODO(Manu) check filter (akzeptiert, neu, erteilt?), design -->
-	<div class="core-vertraege-status h-50 d-flex flex-column w-100">
+	<div class="core-contracts-status h-50 d-flex flex-column w-100">
 		<br>
-		<h4>Vertragsstatus</h4>
+		<h4>{{$p.t('vertrag', 'vertragStatus')}}</h4>
 	
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
+			:tabulator-events="tabulatorEvents"
 			table-only
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Status"
+			:new-btn-label="this.$p.t('global', 'status')"
 			@click:new="actionNewStatus"
 			>
 		</core-filter-cmpt>
@@ -180,11 +223,11 @@ export default {
 		<div >
 			<bs-modal ref="contractStatus">
 				<template #title>
-					<p class="fw-bold mt-3">{{$p.t('ui', 'add_Status')}}</p>
+					<p class="fw-bold mt-3">{{$p.t('vertrag', 'addStatus')}}</p>
 
 				</template>
 
-				<core-form>
+				<core-form ref="statusData">
 					<div class="row mb-3">
 						<form-input
 							type="DatePicker"
@@ -192,7 +235,7 @@ export default {
 							name="datum"
 							v-model="formData.datum"
 							auto-apply
-							:enable-time-picker="false"
+							:enable-time-picker="true"
 							format="dd.MM.yyyy"
 							preview-format="dd.MM.yyyy"
 							:teleport="true"
