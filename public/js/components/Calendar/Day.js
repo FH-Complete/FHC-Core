@@ -42,7 +42,7 @@ export default {
 	<div class="fhc-calendar-day">
 		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'week')"/>
 		<calendar-pane ref="pane" v-slot="slot" @slid="paneChanged">
-			<calendar-day-page :year="focusDate.y" :week="focusDate.w+slot.offset" @updateMode="$emit('updateMode', $event)" @page:back="prev" @page:forward="next" @input="selectEvent" >
+			<calendar-day-page :active="slot.active" :year="focusDate.y" :week="focusDate.w+slot.offset" @updateMode="$emit('updateMode', $event)" @page:back="prev" @page:forward="next" @input="selectEvent" >
 				<template #dayPage="{event,day}">
 					<slot name="dayPage" :event="event" :day="day" ></slot>
 				</template>

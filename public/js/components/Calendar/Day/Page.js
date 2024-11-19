@@ -1,6 +1,7 @@
 import CalendarDate from '../../../composables/CalendarDate.js';
 import LvMenu from "../../../components/Cis/Mylv/LvMenu.js"
 import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
+import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 
 function ggt(m, n) { return n == 0 ? m : ggt(n, m % n); }
 function kgv(m, n) { return (m * n) / ggt(m, n); }
@@ -9,6 +10,7 @@ export default {
 	components:{
 		LvMenu,
 		LvInfo,
+		LvModal,
 	},
 	data() {
 		return {
@@ -32,7 +34,8 @@ export default {
 	],
 	props: {
 		year: Number,
-		week: Number
+		week: Number,
+		active: Boolean,
 	},
 	emits: [
 		'updateMode',
@@ -41,6 +44,18 @@ export default {
 		'input'
 	],
 	watch:{
+		//TODO: on first render non of the day-page components are active and the watcher on selectedEvent does not fetch the lvMenu
+		//TODO: workaround is to watch the active state and refetch in case the lvMenu is empty
+		active:{
+			handler(value){
+				if(value){
+					if(!this.lvMenu){
+						this.fetchLvMenu(this.selectedEvent);
+					}
+				}
+			},
+			immediate:true,
+		},
 		eventsPerDayAndHour:{
 			handler(newEvents) {
 				// if no event is selected, select the first event of the day
@@ -55,27 +70,20 @@ export default {
 		},
 		selectedEvent:{
 			handler(event) {
-				this.lvMenu = null;
-				if (event && event.type == 'lehreinheit') {
-					this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]).then(
-						res => res.data
-					).then(
-						studiensemester_kurzbz => {
-							this.$fhcApi.factory.addons.getLvMenu(event.lehrveranstaltung_id, studiensemester_kurzbz).then(res => {
-								if (res.data) {
-									this.lvMenu = res.data;
-								}
-							});
-						}
-					)
+				// return early if the day-page component is not the active carousel item
+				if(!this.active)
+				{
+					return;
 				}
+				this.lvMenu = null;
+				this.fetchLvMenu(event);
 			},
 			immediate:true,
 		}
 	},
 	computed: {
 		noEventsCondition(){
-			return !this.isSliding && this.filteredEvents.length === 0;
+			return !this.isSliding && this.filteredEvents?.length === 0;
 		},
 		hours() {
 			// returns an array with elements starting at 7 and ending at 24
@@ -127,6 +135,28 @@ export default {
 		},
 	},
 	methods: {
+		fetchLvMenu(event){
+			if (event && event.type == 'lehreinheit') {
+				this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]).then(
+					res => res.data
+				).then(
+					studiensemester_kurzbz => {
+						this.$fhcApi.factory.addons.getLvMenu(event.lehrveranstaltung_id, studiensemester_kurzbz).then(res => {
+							if (res.data) {
+								this.lvMenu = res.data;
+							}
+						});
+					}
+				)
+			}
+		},
+		showModal: function (evt) {
+			let event = evt.orig;
+			this.setSelectedEvent(event);
+			Vue.nextTick(() => {
+				this.$refs.lvmodal.show();
+			});
+		},
 		eventClick(evt) {
 			let event = evt.orig;
 			this.setSelectedEvent(event);
@@ -190,6 +220,8 @@ export default {
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-day-page ">
+	<!-- lvModal for mobile view -->
+	<lv-modal v-if="selectedEvent" :event="selectedEvent" ref="lvmodal" />
 		<div class="row m-0">
 			<div class="col-12 col-xl-6 p-0">
 				<div class="d-flex flex-column">
@@ -212,10 +244,20 @@ export default {
 								<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 							</div>
 							<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': '1 1fr', 'grid-template-rows': 'repeat(' + (hours.length * 60 / smallestTimeFrame) + ', 1fr)'}">
-								<div  :style="{'background-color':event.orig.color}" :class="{'selectedEvent':event.orig == selectedEvent}" class="mx-2 small rounded overflow-hidden "  @click.prevent="eventClick(event)" :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">
-									<slot  name="dayPage" :event="event" :day="day">
-										<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
-									</slot>
+								<div  :style="{'background-color':event.orig.color}" :class="{'selectedEvent':event.orig == selectedEvent}" class="mx-2 small rounded overflow-hidden " :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">
+									<!-- desktop version opens the lvMenu next to the calendar -->
+									<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
+										<slot  name="dayPage" :event="event" :day="day">
+											<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+										</slot>
+									</div>
+									<!-- mobile version opens the lvModal in a modal -->
+									<div class="d-block d-xl-none h-100" @click.prevent="showModal(event)">
+										<slot  name="dayPage" :event="event" :day="day">
+											<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+										</slot>
+									</div>
+
 								</div>
 							</div>
 						</div>
@@ -225,7 +267,7 @@ export default {
 			</div>
 			<div class="d-none d-xl-block col-xl-6 p-0">
 				<div class="p-5	 sticky-top d-flex justify-content-center align-items-center flex-column">
-					<div style="max-height: calc(var(--fhc-calendar-pane-height) - 100px); overflow-y:auto;">
+					<div style="max-height: calc(var(--fhc-calendar-pane-height) - 100px); overflow-y:auto;" class="w-100">
 						<template v-if="selectedEvent && lvMenu">
 							<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
 							<div class="w-100">
@@ -238,7 +280,7 @@ export default {
 							<h3>Keine Lehrveranstaltungen</h3>
 						</template>
 						<template v-else>
-							<div class="d-flex h-100 justify-content-center align-items-center">
+							<div style="height: calc(var(--fhc-calendar-pane-height) - 100px);" class="d-flex w-100 justify-content-center align-items-center">
 								<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 							</div>
 						</template>

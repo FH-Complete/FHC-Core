@@ -175,7 +175,7 @@ html {
 }
 #cis-header .btn.dropdown-toggle:after,
 #cis-nav .btn.dropdown-toggle:after {
-  transition: all 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
 }
 #cis-header .btn.dropdown-toggle.collapsed:after,
 #cis-nav .btn.dropdown-toggle.collapsed:after {

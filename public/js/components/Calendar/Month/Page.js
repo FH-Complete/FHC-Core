@@ -63,10 +63,6 @@ export default {
 				this.$emit('updateMode', 'week');
 			}
 		},
-		changeToDay(day) {
-			this.focusDate.set(day);
-			this.$emit('updateMode', 'day');			
-		},
 		highlight(week, day){
 			this.highlightedWeek = week.no; 
 			this.highlightedDay = day;
@@ -77,7 +73,8 @@ export default {
 		clickEvent(day,week) {
 			if(!this.noWeekView)
 			{
-				this.changeToDay(day);
+				this.focusDate.set(day);
+				this.$emit('updateMode', 'day');
 			}
 			this.selectDay(day);
 		}
