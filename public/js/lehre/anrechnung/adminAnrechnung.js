@@ -258,10 +258,9 @@ var adminAnrechnung = {
 
           if (FHC_AjaxClient.hasData(data)) {
             let row = $("#tableWidgetTabulator").tabulator(
-              "getRow",
+              "deleteRow",
               anrechnungszeitraum_id
             );
-            row.delete(anrechnungszeitraum_id);
 
             // Success message
             FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "geloescht"));

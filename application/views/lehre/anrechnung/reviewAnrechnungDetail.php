@@ -49,7 +49,7 @@ $includesArray = array(
 		'customJSs' => array(
 			'public/js/bootstrapper.js',
 			'public/js/lehre/anrechnung/reviewAnrechnungDetail.js'
-
+		)
 	)
 );
 

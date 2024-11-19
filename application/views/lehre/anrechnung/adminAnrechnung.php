@@ -76,11 +76,10 @@ if (defined("CIS4")) {
 
             <!--Titel-->
             <div class="page-header">
-                <h3><?php echo $this->p->t('anrechnung', 'anrechnungenVerwalten'); ?></h3>
+                <h3><?php echo $this->p->t('anrechnung', 'anrechnungenVerwalten') 
+					. ' - ' . $this->p->t('anrechnung', 'anrechnungszeitraumFestlegen'); ?>
+				</h3>
             </div><br>
-
-            <!--Untertitel-->
-            <h4><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumFestlegen'); ?></h4><br>
 
             <div class="row">
                 <div class="col-xs-4">

@@ -216,7 +216,7 @@ function func_tableBuilt(table) {
       field: "status",
       width: 40,
       hozAlign: "center",
-      downloadTitle: "Status",
+      titleDownload: "Status",
       formatter: status_formatter,
       tooltip: status_tooltip,
     },
@@ -488,6 +488,7 @@ $(function () {
     $("#tableWidgetTabulator").tabulator("on", "rowUpdated", (row) =>
       func_rowUpdated(row)
     );
+    $("#tableWidgetTabulator").tabulator("redraw", true);
   });
 
   // Redraw table on resize to fit tabulators height to windows height

@@ -142,3 +142,12 @@ h6, .h6 {
 .fhc-container .tabulator .tabulator-cell {
 	border-right: 1px solid #dee2e6;
 }
+
+/* lehrauftrag begin */
+.bg-success-bs3 {
+	background-color: #dff0d8 !important;
+}
+.bg-warning-bs3 {
+	background-color: #fcf8e3 !important;
+}
+/* lehrauftrag end */

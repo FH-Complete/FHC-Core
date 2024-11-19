@@ -43,5 +43,9 @@ $filterWidgetArray = array(
 		insertvon:              {visible: false, headerFilter:"input"}
 	 }'
 );
-
-echo $this->widgetlib->widget('TableWidget', $filterWidgetArray);
+?>
+<div class="tabulator-initialfontsize">
+<?php
+	echo $this->widgetlib->widget('TableWidget', $filterWidgetArray);
+?>
+</div>
