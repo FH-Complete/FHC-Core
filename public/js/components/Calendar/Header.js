@@ -48,7 +48,7 @@ export default {
 	template: /*html*/`
 	<div class="calendar-header card-header w-100" :class="classHeader">
 		<div class="row align-items-center ">
-			<div class="col offset-0 offset-md-3" :style="{'padding-left':headerPadding}">
+			<div class="col offset-0" :style="{'padding-left':headerPadding}">
 				<div class="row align-items-center justify-content-center">
 					<div class="col-auto ">
 						<button class="btn btn-outline-secondary border-0" :class="{'btn-sm':!this.size}" @click="$emit('prev')"><i class="fa fa-chevron-left"></i></button>

@@ -37136,6 +37136,26 @@ array(
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'personalGreeting',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "{0}'s persönliches Dashboard",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "{0}'s personal Dashboard",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 // CIS4 phrases from legacy code end
 );

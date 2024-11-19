@@ -12,12 +12,15 @@ export default {
 		adminMode: {
 			type: Boolean,
 			default: false
+		},
+		editMode: {
+			type: Boolean,
+			default: false
 		}
 	},
 	props: [
 		"name",
-		"widgets",
-		"seperator"
+		"widgets"
 	],
 	emits: [
 		"widgetAdd",
@@ -29,7 +32,6 @@ export default {
 			configOpened: false,
 			gridWidth: 1,
 			gridHeight: null,
-			editMode: this.adminMode
 		}
 	},
 	provide() {
@@ -41,7 +43,7 @@ export default {
 	},
 	computed: {
 		editModeIsActive() {
-			return this.editMode && !this.configOpened	
+			return (this.editMode || this.adminMode) && !this.configOpened	
 		},
 		getSectionStyle() {
 			return 'margin-bottom: 8px;';
@@ -191,12 +193,7 @@ export default {
 		});
 	},
 	template: `
-	<div v-if="seperator" class="fhc-seperator"/>
 	<div class="dashboard-section" ref="container" :style="getSectionStyle">
-		<h3>
-			<span >{{$p.t('ui/section' + name)}}</span>
-			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
-		</h3>
 		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item" #default>
 				

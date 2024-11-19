@@ -134,7 +134,7 @@
 .fhc-calendar-lg .fhc-calendar-month-page-day .events,
 .fhc-calendar-md .fhc-calendar-month-page-day .events {
   display: block;
-  overflow: scroll;
+  overflow: auto;
   font-size: 0.7em;
 }
 .fhc-calendar-lg .fhc-calendar-month-page-day .events span,

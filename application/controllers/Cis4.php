@@ -34,7 +34,10 @@ class Cis4 extends Auth_Controller
 			show_error("name couldn't be loaded for username ".getAuthUID());
 		}
 		$begruesung = getData($begruesung);
+		$viewData = array(
+			'name' => $begruesung
+		);
 
-		$this->load->view('CisVue/Dashboard.php',["name"=> $begruesung]);
+		$this->load->view('CisVue/Dashboard.php',['viewData' => $viewData]);
 	}
 }

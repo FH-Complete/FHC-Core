@@ -108,11 +108,10 @@ export default {
 	  // this.$emit('setConfig', true); -> use this to enable widget config mode if needed
   },
   template: /*html*/ `
-    <div class="widgets-url w-100 h-100">
+    <div class="widgets-url w-100 h-100" style="padding: 1rem 1rem;">
         <div class="d-flex flex-column justify-content-between">
         <!-- todo: widgetTag ?? -->
             <template v-if="shared">
-                <header><b>{{ tagName }}</b></header>
                 <template v-if="!emptyBookmarks">
                   <div v-for="link in shared" :key="link.id" class="d-flex mt-2">
                       <a target="_blank" :href="link.url">

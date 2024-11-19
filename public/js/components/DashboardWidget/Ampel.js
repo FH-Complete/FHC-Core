@@ -121,7 +121,7 @@ export default {
 		}
 	},
 	template: /*html*/`
-	<div class="widgets-ampel w-100 h-100">
+	<div class="widgets-ampel w-100 h-100" style="padding: 1rem 1rem;">
 		<div  v-if="!configMode">
 			<div v-if="activeAmpeln" class="d-flex flex-column justify-content-between">
 				<div class="d-flex">

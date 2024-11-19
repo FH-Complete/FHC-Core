@@ -113,19 +113,19 @@ export default {
 		</div>
 	</div>
 	<div v-else-if="!hidden || editMode" class="dashboard-item card overflow-hidden h-100" :class="arguments && arguments.className ? arguments.className : ''">
-		<div v-if="editMode && widget" class="card-header d-flex ps-0 pe-2">
-			<span drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
-			<span class="col">{{ widget.setup.name }}</span>
+		<div v-if="widget" class="card-header d-flex ps-0 pe-2">
+			<span v-if="editMode" drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
+			<span class="col mx-2 px-2">{{ widget.setup.name }}</span>
 			<a v-if="hasConfig" class="col-auto px-1" href="#" @click.prevent="openConfig"><i class="fa-solid fa-gear"></i></a>
-			<a v-if="custom" class="col-auto px-1" href="#" @click.prevent="$emit('remove')">
+			<a v-if="custom && editMode" class="col-auto px-1" href="#" @click.prevent="$emit('remove')">
 				<i class="fa-solid fa-trash"></i>
 			</a>
-			<div v-else class="col-auto px-1 form-switch">
+			<div v-else-if="editMode" class="col-auto px-1 form-switch">
 				<input class="form-check-input ms-0" type="checkbox" role="switch" id="flexSwitchCheckChecked" :checked="!hidden" @input="$emit('remove', hidden)">
 			</div>
 		</div>
-		<div v-if="ready" class="card-body overflow-hidden">
-		<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
+		<div v-if="ready" class="card-body overflow-hidden" style="padding: 0px;">
+			<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
 		</div>
 		<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
 		<bs-modal v-if="hasConfig" ref="config" @hideBsModal="handleHideBsModal" @showBsModal="handleShowBsModal">
