@@ -111,7 +111,7 @@ export default {
 		calcSearchResultHeight: function() {
 			const rect = this.$refs.results.getBoundingClientRect();
 			if( rect.height > 0 && rect.height < (window.innerHeight * 0.8) ) {
-				this.$refs.result.style.height = Math.ceil(rect.height) + 'px';
+				this.$refs.result.style.height = Math.ceil(rect.height + 16) + 'px';
 			} else {
 				this.$refs.result.style.height = Math.floor(window.innerHeight * 0.8) + 'px';
 			}
