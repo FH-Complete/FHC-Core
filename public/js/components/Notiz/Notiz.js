@@ -126,6 +126,7 @@ export default {
 
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
+							button.title = this.$p.t('ui', 'notiz_edit');
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.addEventListener(
 								'click',
@@ -136,6 +137,7 @@ export default {
 
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
+							button.title = this.$p.t('notiz', 'notiz_delete');
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.addEventListener(
 								'click',

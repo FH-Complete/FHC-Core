@@ -169,9 +169,9 @@ export default{
 						cm.getColumnByField('person_id').component.updateDefinition({
 							title: this.$p.t('person', 'person_id')
 						});
-						cm.getColumnByField('actions').component.updateDefinition({
+/*						cm.getColumnByField('actions').component.updateDefinition({
 							title: this.$p.t('global', 'aktionen')
-						});
+						});*/
 					}
 				}
 			],
@@ -269,7 +269,6 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateAddress(adresse_id) {
-		//TODO(Manu) buggy with relad, warning/error: e.element.after is not a function
 			this.addressData.plz = this.addressData.address.plz;
 			return this.$refs.addressData.factory.stv.kontakt.updateAddress(adresse_id,
 				this.addressData

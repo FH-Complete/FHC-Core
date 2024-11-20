@@ -124,9 +124,9 @@ export default{
 						cm.getColumnByField('standort_id').component.updateDefinition({
 							title: this.$p.t('ui', 'standort_id')
 						});
-						cm.getColumnByField('actions').component.updateDefinition({
+/*						cm.getColumnByField('actions').component.updateDefinition({
 							title: this.$p.t('global', 'aktionen')
-						});
+						});*/
 				}}
 			],
 			lastSelected: null,

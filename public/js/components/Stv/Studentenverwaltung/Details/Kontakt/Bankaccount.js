@@ -128,9 +128,9 @@ export default{
 						cm.getColumnByField('bankverbindung_id').component.updateDefinition({
 							title: this.$p.t('ui', 'bankverbindung_id')
 						});
-						cm.getColumnByField('actions').component.updateDefinition({
+/*						cm.getColumnByField('actions').component.updateDefinition({
 							title: this.$p.t('global', 'aktionen')
-						});
+						});*/
 					}
 				}
 			],

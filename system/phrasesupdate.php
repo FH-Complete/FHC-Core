@@ -23374,6 +23374,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'notiz',
+		'phrase' => 'notiz_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notiz löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
 		'phrase' => 'verfasser',
 		'insertvon' => 'system',
 		'phrases' => array(
