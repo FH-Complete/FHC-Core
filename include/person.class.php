@@ -98,9 +98,9 @@ class person extends basis_db
 							geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre,
 							matr_nr, bpk, wahlname";
 			if ($hasUDF = $udf->personHasUDF())
-				$qry .= ", udf_values ";
+				$qry .= ", udf_values";
 
-			$qry .= "FROM public.tbl_person
+			$qry .= " FROM public.tbl_person
 					 WHERE person_id = " . $this->db_add_param($personId, FHC_INTEGER);
 
 			if (!$this->db_query($qry))

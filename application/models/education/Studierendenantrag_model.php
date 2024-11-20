@@ -38,6 +38,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect('studienjahr_kurzbz');
 		$this->addSelect('vorname');
 		$this->addSelect('nachname');
+		$this->addSelect('unruly');
 		$this->addSelect('p.prestudent_id');
 		$this->addSelect('p.studiengang_kz');
 		$this->addSelect('semester');
@@ -149,6 +150,8 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect('s.studierendenantrag_statustyp_kurzbz status');
 		$this->addSelect('s.insertvon status_insertvon');
 		$this->addSelect('t.bezeichnung[(' . $lang . ')] statustyp');
+		$this->addSelect('p.unruly AS unruly');
+		$this->addSelect($this->dbTable . '.insertamum AS insertamum');
 
 		$this->addJoin(
 			'campus.tbl_studierendenantrag_status s',
@@ -157,6 +160,18 @@ class Studierendenantrag_model extends DB_Model
 		$this->addJoin(
 			'campus.tbl_studierendenantrag_statustyp t',
 			's.studierendenantrag_statustyp_kurzbz=t.studierendenantrag_statustyp_kurzbz'
+		);
+		$this->addJoin(
+			'public.tbl_student st',
+			'st.prestudent_id=tbl_studierendenantrag.prestudent_id'
+		);
+		$this->addJoin(
+			'public.tbl_benutzer b',
+			'st.student_uid=b.uid'
+		);
+		$this->addJoin(
+			'public.tbl_person p',
+			'b.person_id=p.person_id'
 		);
 
 		if ($types && is_array($types)) {
@@ -355,7 +370,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->db->where([
 			'prestudent_id' => $prestudent_id,
 			'typ' => Studierendenantrag_model::TYP_UNTERBRECHUNG,
-			'campus.get_status_studierendenantrag(studierendenantrag_id) !=' => Studierendenantragstatus_model::STATUS_CANCELLED,
+			'campus.get_status_studierendenantrag(studierendenantrag_id) NOT IN (\'' . Studierendenantragstatus_model::STATUS_CANCELLED . '\', \'' . Studierendenantragstatus_model::STATUS_REJECTED . '\')' => null,
 			'start < ' . $end => null,
 			'datum_wiedereinstieg > ' . $start => null,
 		]);
@@ -411,7 +426,7 @@ class Studierendenantrag_model extends DB_Model
 			FROM campus.tbl_studierendenantrag 
 			LEFT JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
 			WHERE typ=? 
-			AND campus.get_status_studierendenantrag(studierendenantrag_id) != ?
+			AND campus.get_status_studierendenantrag(studierendenantrag_id) NOT IN ?
 			AND prestudent_id=?
 		) a ON (s.start < a.ende AND s.ende > a.start)
 		WHERE s.start >= (" . $subquery . ")
@@ -421,7 +436,10 @@ class Studierendenantrag_model extends DB_Model
 		return $this->execQuery($sql, [
 			$max_length,
 			self::TYP_UNTERBRECHUNG,
-			Studierendenantragstatus_model::STATUS_CANCELLED,
+			array(
+			    Studierendenantragstatus_model::STATUS_CANCELLED,
+			    Studierendenantragstatus_model::STATUS_REJECTED
+			),
 			$prestudent_id,
 			$studiensemester ?: $prestudent_id,
 			$max_length * $max_starters

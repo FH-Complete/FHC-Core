@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2024 fhcomplete.org
+ * Copyright (C) 2022 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,24 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import search from "./search.js";
-import phrasen from "./phrasen.js";
-import navigation from "./navigation.js";
-import filter from "./filter.js";
-import studstatus from "./studstatus.js";
-import stv from "./stv.js";
-import notiz from "./notiz.js";
-import betriebsmittel from "./betriebsmittel.js";
-import checkperson from "./checkperson.js";
-
-export default {
-    search,
-    phrasen,
-    navigation,
-    filter,
-    studstatus,
-    stv,
-    notiz,
-    betriebsmittel,
-    checkperson
-};
+export const BismeldestichtagHelper = {
+	formatDate: function(date) {
+		return date.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
+	}
+}
