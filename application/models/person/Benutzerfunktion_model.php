@@ -51,6 +51,53 @@ class Benutzerfunktion_model extends DB_Model
 	}
 
 	/**
+	 * Lädt alle Benutzerfunktionen zu einer UID im Zeitraum eines Studiensemesters
+	 *
+	 * @param string						$uid
+	 * @param string						$stdsem
+	 * @param string						(optional) $funktion_kurzbz
+	 *
+	 * @return stdClass
+	 */
+	public function getBenutzerFunktionByUidInStdsem($uid, $stdsem, $funktion_kurzbz = null)
+	{
+		$stdsemEscaped = $this->escape($stdsem);
+		$this->addSelect($this->dbTable . ".*");
+		$this->addSelect("oe.bezeichnung AS organisationseinheit_bezeichnung");
+		$this->addSelect("oe.organisationseinheittyp_kurzbz");
+
+		$this->addJoin("public.tbl_organisationseinheit oe", "oe_kurzbz");
+
+		$this->db->where("uid", $uid);
+		
+		if ($funktion_kurzbz !== null)
+			$this->db->where("funktion_kurzbz", $funktion_kurzbz);
+
+		$this->db->group_start();
+		$this->db->where("datum_bis IS NULL");
+		$this->db->or_where("datum_bis >=", "(
+			SELECT start 
+			FROM public.tbl_studiensemester 
+			WHERE studiensemester_kurzbz = " . $stdsemEscaped . "
+		)", false);
+		$this->db->group_end();
+
+		$this->db->group_start();
+		$this->db->where("datum_von IS NULL");
+		$this->db->or_where("datum_von <=", "(
+			SELECT ende 
+			FROM public.tbl_studiensemester 
+			WHERE studiensemester_kurzbz = " . $stdsemEscaped . "
+		)", false);
+		$this->db->group_end();
+
+		$this->addOrder("datum_bis", "NULLS LAST");
+		$this->addOrder("datum_von", "NULLS LAST");
+
+		return $this->load();
+	}
+
+	/**
 	 * Get the Benutzerfunktion using the person_id
 	 */
 	public function getActiveFunctionsByPersonId($person_id)

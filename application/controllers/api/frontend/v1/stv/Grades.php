@@ -30,7 +30,9 @@ class Grades extends FHCAPI_Controller
 		parent::__construct([
 			'list' => 'student/noten:r',
 			'getCertificate' => 'student/noten:r',
+			'getTeacherProposal' => 'student/noten:r',
 			'updateCertificate' => ['admin:w', 'assistenz:w'],
+			'copyTeacherProposalToCertificate' => 'student/noten:w',
 			'getGradeFromPoints' => 'student/noten:r'
 		]);
 
@@ -71,6 +73,32 @@ class Grades extends FHCAPI_Controller
 
 		
 		$result = $this->ZeugnisnoteModel->getZeugnisnoten($student_uid, $studiensemester_kurzbz);
+
+		$grades = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($grades);
+	}
+
+	public function getTeacherProposal($prestudent_id, $all = null)
+	{
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
+
+		$result = $this->StudentModel->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
+
+		$student = $this->getDataOrTerminateWithError($result);
+		if (!$student)
+			$this->terminateWithSuccess([]);
+		
+		
+		$student_uid = current($student)->student_uid;
+
+		$studiensemester_kurzbz = ($all === null) ? $this->variablelib->getVar('semester_aktuell') : null;
+
+		
+		$result = $this->LvgesamtnoteModel->getLvGesamtNoten(null, $student_uid, $studiensemester_kurzbz);
 
 		$grades = $this->getDataOrTerminateWithError($result);
 		
@@ -136,6 +164,95 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess(true);
 	}
 
+	public function copyTeacherProposalToCertificate()
+	{
+		$this->load->library('form_validation');
+	
+		$this->form_validation->set_rules("lehrveranstaltung_id", "Lehrverantaltung ID", "required|integer"); // TODO(chris): phrase
+		$this->form_validation->set_rules("student_uid", "Student UID", "required"); // TODO(chris): phrase
+		$this->form_validation->set_rules("studiensemester_kurzbz", "Studiensemester", "required"); // TODO(chris): phrase
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$lehrveranstaltung_id = $this->input->post('lehrveranstaltung_id');
+		$student_uid = $this->input->post('student_uid');
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		$authUID = getAuthUID();
+		
+		// NOTE(chris): Stg Permissions
+		if (!$this->hasPermissionCopy($lehrveranstaltung_id, $student_uid))
+			return $this->_outputAuthError([$this->router->method => 'student/noten']);
+
+		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
+
+		$result = $this->LvgesamtnoteModel->load([
+			$student_uid,
+			$studiensemester_kurzbz,
+			$lehrveranstaltung_id
+		]);
+		$teacherGrade = $this->getDataOrTerminateWithError($result);
+
+		if (!$teacherGrade)
+			show_404();
+
+		$teacherGrade = current($teacherGrade);
+
+		$data = [
+			'note' => $teacherGrade->note,
+			'punkte' => $teacherGrade->punkte,
+			'uebernahmedatum' => date('c'),
+			'benotungsdatum' => $teacherGrade->benotungsdatum,
+			'bemerkung' => $teacherGrade->bemerkung
+		];
+
+		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
+
+		$this->ZeugnisnoteModel->addJoin('lehre.tbl_note n', 'note');
+		$result = $this->ZeugnisnoteModel->load([
+			$studiensemester_kurzbz,
+			$student_uid,
+			$lehrveranstaltung_id
+		]);
+		$certificateGrade = $this->getDataOrTerminateWithError($result);
+
+		if ($certificateGrade) {
+			$certificateGrade = current($certificateGrade);
+			
+			if (!$certificateGrade->lkt_ueberschreibbar)
+				$this->terminateWithError("Nicht überschreibbar"); // TODO(chris): phrase
+
+			// NOTE(chris): update
+			$data['updateamum'] = $data['uebernahmedatum'];
+			$data['updatevon'] = $authUID;
+
+			$this->ZeugnisnoteModel->update([
+				$studiensemester_kurzbz,
+				$student_uid,
+				$lehrveranstaltung_id
+			], $data);
+		} else {
+			// NOTE(chris): insert
+			$data['insertamum'] = $data['uebernahmedatum'];
+			$data['insertvon'] = $authUID;
+			$data['lehrveranstaltung_id'] = $lehrveranstaltung_id;
+			$data['student_uid'] = $student_uid;
+			$data['studiensemester_kurzbz'] = $studiensemester_kurzbz;
+			
+			$this->ZeugnisnoteModel->insert($data);
+
+			// TODO(chris): FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN
+			if (defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN')
+				&& FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN) {
+				$result = $this->addTestsForGrade($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $teacherGrade->note, $teacherGrade->punkte);
+				$this->getDataOrTerminateWithError($result);// TODO(chris): terminate?
+			}
+		}
+
+		
+		$this->terminateWithSuccess();
+	}
+
 	public function getGradeFromPoints()
 	{
 		$this->load->library('form_validation');
@@ -159,6 +276,68 @@ class Grades extends FHCAPI_Controller
 		$note = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($note);
+	}
+
+	protected function addTestsForGrade($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $note, $punkte)
+	{
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+
+		// Get Lehreinheit
+		$result = $this->LehrveranstaltungModel->getLeByStudent($student_uid, $studiensemester_kurzbz, $lehrveranstaltung_id);
+
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return error('Fehler beim Ermitteln der Lehreinheit ID'); // TODO(chris): phrase
+		$le = current(getData($result));
+
+		// Prepare
+		$this->load->model('education/LePruefung_model', 'LePruefungModel');
+		$data = [
+			"student_uid" => $student_uid,
+			"lehreinheit_id" => $le->lehreinheit_id,
+			"datum" => date('Y-m-d'),
+			"pruefungstyp_kurzbz" => "Termin1", // TODO(chris): const?
+			"note" => $note
+		];
+
+		if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+			$data["punkte"] = $punkte;
+		
+		// Get Anwesenheit
+		$this->load->model('education/Anwesenheit_model', 'AnwesenheitModel');
+		$result = $this->AnwesenheitModel->loadAnwesenheitStudiensemester($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id);
+		if (isError($result))
+			return $result;
+		$anwesenheit = getData($result);
+
+		if ($anwesenheit && (float)current($anwesenheit)->prozent < FAS_ANWESENHEIT_ROT) {
+			// Get Anwesenheitsbefreiung
+			$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+			$result = $this->BenutzerfunktionModel->getBenutzerFunktionByUidInStdsem($student_uid, $studiensemester_kurzbz, 'awbefreit');
+
+			if (isError($result))
+				return $result;
+
+			$anwesenheitsbefreit = hasData($result);
+
+			// Wenn nicht Anwesenheitsbefreit und Anwesenheit unter einem bestimmten Prozentsatz fällt dann wird ein Pruefungsantritt abgezogen
+			if (!$anwesenheitsbefreit) {
+				$data2 = $data;
+				$data2["note"] = 7; // TODO(chris): const?
+				if (isset($data2["punkte"]))
+					unset($data2["punkte"]);
+
+				$result = $this->LePruefungModel->insert($data2);
+
+				if (isError($result))
+					return $result;
+
+				$data["pruefungstyp_kurzbz"] = "Termin2"; // TODO(chris): const?
+			}
+		}
+
+		return $this->LePruefungModel->insert($data);
 	}
 
 	protected function hasPermissionUpdate($lehrveranstaltung_id, $student_uid)
@@ -196,5 +375,35 @@ class Grades extends FHCAPI_Controller
 		}
 
 		return error('Forbidden');
+	}
+
+	protected function hasPermissionCopy($lehrveranstaltung_id, $student_uid)
+	{
+		if ($lehrveranstaltung_id === null || $student_uid === null)
+			return true;
+
+		$this->load->model('crm/Student_model', 'StudentModel');
+		
+		$result = $this->StudentModel->load([$student_uid]);
+		if (isError($result) || !hasData($result))
+			return false;
+		
+		$student = current(getData($result));
+
+		if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $student->studiengang_kz))
+			return true;
+
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		
+		$result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
+		if (isError($result) || !hasData($result))
+			return false;
+		
+		$oe = current(getData($result));
+
+		if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $oe->oe_kurzbz))
+			return true;
+
+		return false;
 	}
 }
