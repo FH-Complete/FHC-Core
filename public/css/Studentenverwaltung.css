@@ -1,5 +1,5 @@
 @import './Fhc.css';
-@import './components/searchbar.css';
+@import './components/searchbar/searchbar.css';
 @import './components/verticalsplit.css';
 @import './components/FilterComponent.css';
 @import './components/Tabs.css';
