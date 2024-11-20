@@ -474,3 +474,44 @@ html {
 	transition-duration: 0.3s,0.2s;
 	transition-timing-function: ease-out,ease-out;
 }
+@media screen and ( max-width: 767px ) {
+	#nav-search  {
+		position: static;
+	}
+
+	#nav-search .searchbar_results {
+		top: 100%;
+		width: 98vw !important;
+		left: 1vw !important;
+		right: 1vw !important;
+	}
+}
+
+@media screen and ( max-width: 576px ) {
+	.searchbar_icon img {
+		max-width: 65px !important;
+	}
+
+	.searchbar_icon i {
+		font-size: 3em !important;
+	}
+
+	.searchbar_grid {
+		grid-template-columns: [icon] 75px [data] auto;
+	}
+
+	.searchbar_table,
+	.searchbar_tablerow,
+	.searchbar_tablecell {
+		display: block;
+	}
+
+	.searchbar_tablecell.searchbar_label {
+		font-weight: bold;
+	}
+
+	.searchbar_tablecell.searchbar_value {
+		padding-left: 2.5rem;
+		overflow-wrap: anywhere;
+	}
+}

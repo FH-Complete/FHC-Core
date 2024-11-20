@@ -61,7 +61,7 @@ export default {
 			return {
 				'--fhc-dg-row-height': 100/(this.rows + addH) + '%',
 				'--fhc-dg-col-width': 100/this.cols + '%',
-				'--fhc-dg-item-padding-horizontal': '0.5%',
+				'--fhc-dg-item-padding-horizontal': '0.25%',
 				'--fhc-dg-item-padding-top': '0.5%',
 				'padding-bottom': 100 * (this.rows + addH)/this.cols + '%'
 			}

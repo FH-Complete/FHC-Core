@@ -11,6 +11,9 @@ export default {
   }),
   mixins: [AbstractWidget],
   computed: {
+    getNewsWidgetStyle() {
+      return this.width == 1 ? "padding: 1rem 1rem;" : "padding: 0px;"
+    },
     newsList() {
       //Return news amount depending on widget width and size
       let quantity = this.width;
@@ -61,33 +64,22 @@ export default {
       this.$refs.newsModal.show();
     },
   },
-  template: /*html*/ `<div class="widgets-news h-100">
+  template: /*html*/ `<div class="widgets-news h-100" :style="getNewsWidgetStyle">
   
       <div class="d-flex flex-column h-100 ">
-      <div class="d-flex">
-        <header><b>{{$p.t('news','topNews')}}</b></header>
-        <a :href="allNewsURI()" class="ms-auto mb-2">
-          <i class="fa fa-arrow-up-right-from-square me-1"></i>{{$p.t('news','allNews')}}</a>
-      </div>
       <div class="h-100" style="overflow-y: auto" v-if="width == 1">
-        <div  v-for="news in newsList" :key="news.id" class="mt-2">
-          <div  class="card">
-            <div class="card-body">
-              <a :href="contentURI(news.content_id)" class="stretched-link" >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</a><br>
-              <span class="small text-muted">{{ formatDateTime(news.insertamum) }}</span>
-            </div>
-          </div>
+        <div  v-for="(news, index) in newsList" :key="news.id" class="mt-2">
+          <div v-if="index > 0 " class="fhc-seperator"></div>
+          <a :href="contentURI(news.content_id)" >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</a><br>
+          <span class="small text-muted">{{ formatDateTime(news.insertamum) }}</span>
         </div>
       </div>
       <div v-else-if="width > 1 && height === 1" class="h-100" :class="'row row-cols-' + width">
         <div class="h-100" v-for="news in newsList" :key="news.id">
-            
-              <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" v-html="news.content_obj.content"></div>
-                   
-            
-          </div>
- 		</div>
-      <div v-else class="h-100" :class="'row row-cols-' + width">
+          <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" v-html="news.content_obj.content"></div>
+        </div>
+ 	  </div>
+      <div v-else class="h-100" :class="'row row-cols-' + width + ' gx-2'">
         <div class="h-100" v-for="news in newsList" :key="news.id">
           <div class="news-content h-100" :style="'--news-widget-height: '+height" ref="htmlContent" v-html="news.content_obj.content"></div>
         </div>
