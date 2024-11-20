@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2024 fhcomplete.org
+ * Copyright (C) 2023 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,24 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import search from "./search.js";
-import phrasen from "./phrasen.js";
-import navigation from "./navigation.js";
-import filter from "./filter.js";
-import studstatus from "./studstatus.js";
-import stv from "./stv.js";
-import notiz from "./notiz.js";
-import betriebsmittel from "./betriebsmittel.js";
-import checkperson from "./checkperson.js";
+import LvTemplateUebersicht from '../../../lehre/lvplanung/LvTemplateUebersicht.js';
+import {CoreNavigationCmpt} from '../../../components/navigation/Navigation.js';
+import FhcAlert from '../../../plugin/FhcAlert.js';
+import FhcApi from "../../../plugin/FhcApi.js";
+import Phrasen from "../../../plugin/Phrasen.js";
 
-export default {
-    search,
-    phrasen,
-    navigation,
-    filter,
-    studstatus,
-    stv,
-    notiz,
-    betriebsmittel,
-    checkperson
-};
+
+const lvTemplatesApp = Vue.createApp({
+	components: {
+		CoreNavigationCmpt,
+		LvTemplateUebersicht
+	}
+});
+
+lvTemplatesApp
+	.use(primevue.config.default,{zIndex: {overlay: 9999}})
+	.use(FhcAlert)
+	.use(FhcApi)
+	.use(Phrasen)
+	.mount('#main')

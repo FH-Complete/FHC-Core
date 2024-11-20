@@ -15,8 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {BismeldestichtagTabulatorOptions} from './TabulatorSetup.js';
-import {BismeldestichtagTabulatorEventHandlers} from './TabulatorSetup.js';
+import {BismeldestichtagHelper} from './BismeldestichtagHelper.js';
 
 import {CoreFilterCmpt} from '../../components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../components/navigation/Navigation.js';
@@ -29,8 +28,60 @@ import Phrasen from '../../plugin/Phrasen.js';
 const bismeldestichtagApp = Vue.createApp({
 	data: function() {
 		return {
-			bismeldestichtagTabulatorOptions: BismeldestichtagTabulatorOptions,
-			bismeldestichtagTabulatorEventHandlers: BismeldestichtagTabulatorEventHandlers,
+			bismeldestichtagTabulatorOptions: {
+				maxHeight: "100%",
+				minHeight: 50,
+				layout: 'fitColumns',
+				index: 'meldestichtag_id',
+				initialSort:[
+					{column:"meldestichtag", dir:"desc"}
+				],
+				columns: [
+					{title: 'Meldestichtag', field: 'meldestichtag', headerFilter: true, formatter: function(cell){
+							return BismeldestichtagHelper.formatDate(cell.getValue());
+						}
+					},
+					{title: 'Studiensemester', field: 'studiensemester_kurzbz', headerFilter: true, sorter:function(a, b, aRow, bRow, column, dir, sorterParams) {
+
+							//aRow, bRow - the row components for the values being compared
+							let semesterStartA = new Date(aRow.getData().semester_start);
+							let semesterStartB = new Date(bRow.getData().semester_start);
+
+							return semesterStartA - semesterStartB; // difference between studiensemester start dates
+						}
+					},
+					{title: 'Semesterstart',field: 'semester_start', headerFilter: true, visible: false, formatter: function(cell){
+							return BismeldestichtagHelper.formatDate(cell.getValue());
+						}
+					},
+					{title: 'ID', field: 'meldestichtag_id', headerFilter: true, visible: false},
+					{title: 'Insertamum', field: 'insertamum', headerFilter: true, visible: false},
+					{title: 'Insertvon', field: 'insertvon', headerFilter: true, visible: false},
+					{title: 'Löschen', field: 'loeschen', headerFilter: false, formatter:function(cell){
+							return	'<button class="btn btn-outline-secondary delete-btn" data-meldestichtag-id="'+cell.getRow().getIndex()+'">'+
+										'<i class="fa fa-xmark"></i>'+
+									'</button>';
+						}
+					}
+				]
+			},
+			bismeldestichtagTabulatorEventHandlers: [
+				{
+					event: "rowClick",
+					handler: function(e, row) {
+						if (e.target.nodeName == 'DIV') {
+							let data = row.getData();
+							alert(data.studiensemester_kurzbz + ': ' + BismeldestichtagHelper.formatDate(data.meldestichtag));
+						}
+					}
+				},
+				{
+					event: "tableBuilt",
+					handler: () => {
+						this.handlerStudiensemester();
+					}
+				}
+			],
 			meldestichtag: null, // date of Meldestichtag
 			semList: null, // all Studiensemester for dropdown
 			currSem: null, // selected Studiensemester
@@ -46,9 +97,6 @@ const bismeldestichtagApp = Vue.createApp({
 		BismeldestichtagAPIs,
 		CoreFetchCmpt,
 		"datepicker": VueDatePicker
-	},
-	created() {
-		this.handlerStudiensemester();
 	},
 	methods: {
 		/**
