@@ -35,6 +35,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('codex/Bisverwendung_model', 'BisverwendungModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->load->model('vertragsbestandteil/Dienstverhaeltnis_model', 'DienstverhaeltnisModel');
 
 		// Load libraries
 		$this->load->library('WidgetLib');
@@ -94,9 +95,9 @@ class LehrauftragAkzeptieren extends Auth_Controller
 			'lektor' => true,
 			'aktiv' => true
 		));
-		
+
 		$is_external_lector = hasData($result) ? true : false;
-		
+
 		$view_data = array(
 			'studiensemester_selected' => $studiensemester_kurzbz,
 			'is_external_lector' => $is_external_lector
@@ -207,15 +208,41 @@ class LehrauftragAkzeptieren extends Auth_Controller
 	 */
 	public function checkInkludierteLehre()
 	{
-		$result = $this->BisverwendungModel->getLast($this->_uid, false);
-
-		if (hasData($result))
+		if(defined('DIENSTVERHAELTNIS_SUPPORT') && DIENSTVERHAELTNIS_SUPPORT)
 		{
-			$this->outputJsonSuccess(!is_null($result->retval[0]->inkludierte_lehre) && $result->retval[0]->inkludierte_lehre != 0);
+			// Bei neuer Vertragsstruktur wird nur anhand des echten DVs entschieden ob eine Anzeige
+			// des Stundensatzes erfolgt oder nicht.
+			$result = $this->DienstverhaeltnisModel->getDVByPersonUID($this->_uid, null, date('Y-m-d'));
+
+			if (hasData($result))
+			{
+				$data = getData($result);
+				foreach($data as $row)
+				{
+					if($row->vertragsart_kurzbz == 'echterdv')
+						$this->outputJsonSuccess(true);
+					else
+						$this->outputJsonSuccess(false);
+				}
+			}
+			else
+			{
+				$this->outputJsonError(getError($result));
+			}
 		}
 		else
 		{
-			$this->outputJsonError(getError($result));
+			// DEPRECATED
+			$result = $this->BisverwendungModel->getLast($this->_uid, false);
+
+			if (hasData($result))
+			{
+				$this->outputJsonSuccess(!is_null($result->retval[0]->inkludierte_lehre) && $result->retval[0]->inkludierte_lehre != 0);
+			}
+			else
+			{
+				$this->outputJsonError(getError($result));
+			}
 		}
 	}
 

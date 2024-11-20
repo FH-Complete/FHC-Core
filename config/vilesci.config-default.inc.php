@@ -266,6 +266,8 @@ define('BIS_FUNKTIONSCODE_6_ARR', array(
 
 // bPk Abfrage
 define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);
+// bPk Typen in Form 'BEREICH' => 'kennzeichenTyp'
+define('VBPK_TYPES', array('AS' => 'vbpkAs', 'BF' => 'vbpkBf', 'ZP-TD' => 'vbpkTd'));
 
 // Docsbox configs
 define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
@@ -276,8 +278,14 @@ define('DOCSBOX_WAITING_SLEEP_TIME', 1);
 // Bei folgenden Buchungstypen wird ein Anlegen geprüft ob bereits ein Eintrag für diesen Typ vorhanden ist im selben
 // Semester und ggf ein Hinweis ausgegeben
 define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
-        array('StudiengebuehrAnzahlung', 'Studiengebuehr', 'StudiengebuehrRestzahlung', 'OEH')
-));
+	array(
+			'Studiengebuehr' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung', 'StudiengebuehrRestzahlung'),
+			'StudiengebuehrErhoeht' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung', 'StudiengebuehrRestzahlung'),
+			'StudiengebuehrAnzahlung' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung'),
+			'StudiengebuehrRestzahlung' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrRestzahlung'),
+			'OEH' => array('OEH')
+	))
+);
 
 // Spezialnoten die am Zeunigs und Diplomasupplement ignoriert werden
 define('ZEUGNISNOTE_NICHT_ANZEIGEN',serialize(array('iar', 'nz')));
@@ -288,5 +296,14 @@ define ('DEFAULT_LEHRMODUS','regulaer');
 
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,110]);
+
+//Buchungstypen die fix auf eine bestimmte Kostenstelle gebucht werden sollen
+//Buchungstyp => Studiengang_kz
+define('FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE', serialize(
+	array(
+		'Test_1' => 0,
+		'Test_2' => 2
+	)
+));
 
 ?>

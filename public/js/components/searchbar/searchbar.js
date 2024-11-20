@@ -2,6 +2,8 @@ import person from "./person.js";
 import raum from "./raum.js";
 import employee from "./employee.js";
 import organisationunit from "./organisationunit.js";
+import student from "./student.js";
+import prestudent from "./prestudent.js";
 
 export default {
     props: [ "searchoptions", "searchfunction" ],
@@ -24,16 +26,18 @@ export default {
       person: person,
       raum: raum,
       employee: employee,
-      organisationunit: organisationunit
+      organisationunit: organisationunit,
+      student: student,
+      prestudent: prestudent
     },
     template: `
-          <form ref="searchform" class="d-flex me-3" action="javascript:void(0);" 
+          <form ref="searchform" class="d-flex me-3 position-relative" action="javascript:void(0);" 
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
             <div class="input-group me-2 bg-white">
                 <input ref="searchbox" @keyup="this.search" @focus="this.showsearchresult" 
-                    v-model="this.searchsettings.searchstr" class="form-control" 
-                    type="search" placeholder="Search" aria-label="Search">
-                <button ref="settingsbutton" @click="this.togglesettings" class="btn btn-outline-secondary" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
+                    v-model="this.searchsettings.searchstr" class="form-control"
+                    type="search" placeholder="Suche..." aria-label="Search">
+                <button ref="settingsbutton" @click="this.togglesettings" class="btn btn-light border-start" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
             </div>            
         
             <div v-show="this.showresult" ref="result" 
@@ -45,7 +49,10 @@ export default {
               <div v-else-if="this.searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
               <template v-else="" v-for="res in this.searchresult">
                 <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
+                <student v-else-if="res.type === 'student'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
+                <prestudent v-else-if="res.type === 'prestudent'" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
                 <employee v-else-if="res.type === 'mitarbeiter'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
+                <employee v-else-if="res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                 <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
                 <raum v-else-if="res.type === 'raum'" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
                 <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
@@ -78,16 +85,13 @@ export default {
         calcSearchResultExtent: function() {
             var rect = this.$refs.searchbox.getBoundingClientRect();
             //console.log(window.innerWidth + ' ' + window.innerHeight + ' ' + JSON.stringify(rect));
-            this.$refs.result.style.top = Math.floor(rect.bottom + 3) + 'px';
-            this.$refs.result.style.right = Math.floor(window.innerWidth - rect.right) + 'px';
-            this.$refs.result.style.width = Math.floor(window.innerWidth * 0.75) + 'px';
-            this.$refs.result.style.height = Math.floor(window.innerHeight * 0.75) + 'px';
+             this.$refs.result.style.height = Math.floor(window.innerHeight * 0.80) + 'px';
         },
         search: function() {
             if( this.searchtimer !== null ) {
                 clearTimeout(this.searchtimer);
             }
-            if( this.searchsettings.searchstr.length >= 3 ) {
+            if( this.searchsettings.searchstr.length >= 2 ) {
                 this.calcSearchResultExtent();
                 this.searchtimer = setTimeout(
                     this.callsearchapi,
@@ -105,7 +109,11 @@ export default {
             this.showsearchresult();            
             this.searchfunction(this.searchsettings)
             .then(function(response) {
-                that.searchresult = response.data.data;
+                if( response.data?.error === 1 ) {
+                    that.error = 'Bei der Suche ist ein Fehler aufgetreten.';
+                } else {
+                    that.searchresult = response.data.data;
+                }
             })
             .catch(function(error) {
                 that.error = 'Bei der Suche ist ein Fehler aufgetreten.' 
