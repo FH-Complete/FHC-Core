@@ -14,9 +14,11 @@ export default{
 	},
 	data() {
 		return {
-			stunden: [],
 			events: null,
-            calendarWeek: new CalendarDate(new Date()),
+			calendarDate: new CalendarDate(new Date()),
+			currentlySelectedEvent: null,
+			currentDay: new Date(),
+			minimized: false,
             
         }
 	},
@@ -24,38 +26,62 @@ export default{
         currentDate: function(){
             return new Date(this.calendarWeek.y, this.calendarWeek.m, this.calendarWeek.d);
         },
-        weekFirstDay: function(){
-            return this.calendarDateToString(this.calendarWeek.cdFirstDayOfWeek);
-        },
-        weekLastDay: function(){
-            return this.calendarDateToString(this.calendarWeek.cdLastDayOfWeek);
-        },
+		weekFirstDay: function () {
+			return this.calendarDateToString(this.calendarDate.cdFirstDayOfWeek);
+		},
+		weekLastDay: function () {
+			return this.calendarDateToString(this.calendarDate.cdLastDayOfWeek);
+		},
+		monthFirstDay: function () {
+			return this.calendarDateToString(this.calendarDate.cdFirstDayOfCalendarMonth);
+		},
+		monthLastDay: function () {
+			return this.calendarDateToString(this.calendarDate.cdLastDayOfCalendarMonth);
+		},
     },
     methods:{
-		updateRange: function(data){
-			this.calendarWeek = new CalendarDate(data.start);
+		getLvID: function () {
+			this.lv_id = window.location.pathname
+		},
+		selectDay: function (day) {
+			this.currentDay = day;
+		},
+		showModal: function (event) {
+			this.currentlySelectedEvent = event;
 			Vue.nextTick(() => {
-				this.loadEvents();
+				this.$refs.lvmodal.show();
 			});
 		},
+		updateRange: function ({ start, end }) {
 
-        // returns the string YYYY-MM-DD if param is instance of CalendarDate and null otherwise
-        calendarDateToString: function(calendarDate){
-            
-            return calendarDate instanceof CalendarDate? 
-            [calendarDate.y, calendarDate.m+1, calendarDate.d].join('-'):
-            null; 
-            
-        },
+			let checkDate = (date) => {
+				return date.m != this.calendarDate.m || date.y != this.calendarDate.y;
+			}
 
+			// only load month data if the month or year has changed
+			if (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end))) {
+				// reset the events before querying the new events to activate the loading spinner
+				this.events = null;
+				this.calendarDate = new CalendarDate(end);
+				Vue.nextTick(() => {
+					this.loadEvents();
+				});
+			}
+		},
+		calendarDateToString: function (calendarDate) {
+			return calendarDate instanceof CalendarDate ?
+				[calendarDate.y, calendarDate.m + 1, calendarDate.d].join('-') :
+				null;
+
+		},
 		loadEvents: function(){
 
 			// bundles the room_events and the reservierungen together into the this.events array
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getRoomInfo(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay),
-				this.$fhcApi.factory.stundenplan.getOrtReservierungen(this.ort_kurzbz, this.weekFirstDay, this.weekLastDay)
+				this.$fhcApi.factory.stundenplan.getRoomInfo(this.ort_kurzbz, this.monthFirstDay, this.monthLastDay),
+				this.$fhcApi.factory.stundenplan.getOrtReservierungen(this.ort_kurzbz, this.monthFirstDay, this.monthLastDay)
 			]).then((result) => {
-				let events = [];
+				let promise_events = [];
 				result.forEach((promise_result) => {
 					if(promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success"){
 						
@@ -75,30 +101,46 @@ export default{
 								
 							});
 						}
-						events = events.concat(data);
+						promise_events = promise_events.concat(data);
 					}
 				})
-				this.events = events;
+				this.events = promise_events;
 			})
 		},
-		
     },
+	created() {
+		this.loadEvents();
+	},
     template: /*html*/`
-    <div>
-		<fhc-calendar @change:range="updateRange" v-slot="{event,day}" :initialDate="currentDate" :events="events" initial-mode="week" show-weeks>
-            <a class="text-decoration-none text-dark" href="#" :title="event.orig.title + ' - ' + event.orig.lehrfach_bez + ' [' + event.orig.ort_kurzbz+']'"   >
-                <div type="button" class="d-flex flex-column align-items-center justify-content-evenly h-100" >
-
-                        <!-- render content for stundenplan -->
-                        <span >{{event.orig.topic}}</span>
-                        <span v-for="gruppe in event.orig.gruppe" >{{gruppe.kuerzel}} </span>
-                        <span v-for="lektor in event.orig.lektor" >{{lektor.kurzbz}}</span>
-                        <!-- add the beschreibung if the event is a reservierung
-                        <span v-if="event.orig.type === 'reservierung'">{{event.orig.beschreibung}}</span>-->
-                        
-                </div>
-            </a>
+		<fhc-calendar :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
+            <template #monthPage="{event,day,isSelected}">
+				<span class="fhc-entry" :class="{'selectedEvent':isSelected}" style="color:white" :style="{'background-color': event.color}">
+					{{event.topic}}
+				</span>
+			</template>
+			<template #weekPage="{event,day,isSelected}">
+				<div @click="showModal(event?.orig)" type="button" :class="{'selectedEvent':isSelected}" class="fhc-entry border border-secondary border d-flex flex-column align-items-center justify-content-evenly h-100">
+					<span>{{event?.orig.topic}}</span>
+					<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
+					<span>{{event?.orig.ort_kurzbz}}</span>
+				</div>
+			</template>
+			<template #dayPage="{event,day}">
+				<div type="button" class="fhc-entry border border-secondary border row h-100 justify-content-center align-items-center text-center">
+					<div class="col ">
+						<p>Lehrveranstaltung:</p>
+						<p class="m-0">{{event?.orig.topic}}</p>
+					</div>
+					<div class="col ">
+						<p>Lektor:</p>
+						<p class="m-0" v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
+					</div>
+					<div class="col ">
+						<p>Ort: </p>
+						<p class="m-0">{{event?.orig.ort_kurzbz}}</p>
+					</div>
+				</div>
+			</template>
         </fhc-calendar>
-    </div>
     `,
 };
