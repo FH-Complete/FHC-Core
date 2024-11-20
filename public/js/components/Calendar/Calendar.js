@@ -36,6 +36,7 @@ export default {
 			mode: Vue.computed(()=>this.mode),
 			selectedEvent: Vue.computed(() => this.selectedEvent),
 			setSelectedEvent: (event)=>{this.selectedEvent = event;},
+			widget: this.widget
 		};
 	},
 	props: {
@@ -59,6 +60,10 @@ export default {
 		minimized: Boolean,
 		noWeekView: Boolean,
 		noMonthView: Boolean,
+		widget: {
+			type: Boolean,
+			default: false
+		}
 	},
 	watch:{
 		// scroll to the first event if the html element was found
