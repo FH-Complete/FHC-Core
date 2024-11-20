@@ -38,6 +38,12 @@ class Grades extends FHCAPI_Controller
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+
+		// Load Phrases
+		$this->loadPhrases([
+			'person',
+			'lehre'
+		]);
 	}
 
 	public function list()
@@ -168,9 +174,9 @@ class Grades extends FHCAPI_Controller
 	{
 		$this->load->library('form_validation');
 	
-		$this->form_validation->set_rules("lehrveranstaltung_id", "Lehrverantaltung ID", "required|integer"); // TODO(chris): phrase
-		$this->form_validation->set_rules("student_uid", "Student UID", "required"); // TODO(chris): phrase
-		$this->form_validation->set_rules("studiensemester_kurzbz", "Studiensemester", "required"); // TODO(chris): phrase
+		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrverantaltung'), "required|integer");
+		$this->form_validation->set_rules("student_uid", $this->p->t('person', 'student'), "required");
+		$this->form_validation->set_rules("studiensemester_kurzbz", $this->p->t('lehre', 'studiensemester'), "required");
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -241,11 +247,16 @@ class Grades extends FHCAPI_Controller
 			
 			$this->ZeugnisnoteModel->insert($data);
 
-			// TODO(chris): FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN
 			if (defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN')
 				&& FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN) {
-				$result = $this->addTestsForGrade($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $teacherGrade->note, $teacherGrade->punkte);
-				$this->getDataOrTerminateWithError($result);// TODO(chris): terminate?
+				$result = $this->addTestsForGrade(
+					$studiensemester_kurzbz,
+					$student_uid,
+					$lehrveranstaltung_id,
+					$teacherGrade->note,
+					$teacherGrade->punkte
+				);
+				$this->getDataOrTerminateWithError($result);
 			}
 		}
 
@@ -257,7 +268,7 @@ class Grades extends FHCAPI_Controller
 	{
 		$this->load->library('form_validation');
 	
-		$this->form_validation->set_rules("lehrveranstaltung_id", "Lehrverantaltung ID", "required|integer"); // TODO(chris): phrase
+		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrverantaltung'), "required|integer");
 		$this->form_validation->set_rules("points", "Punkte", "required|numeric"); // TODO(chris): phrase
 
 		if (!$this->form_validation->run())
