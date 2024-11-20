@@ -716,6 +716,28 @@ class Lehrveranstaltung_model extends DB_Model
 		return $this->execQuery($qry);
 	}
 
+	/**
+	 * Check if given LV is a template (Quellkurs)
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @return array|stdClass|void
+	 */
+	public function checkIsTemplate($lehrveranstaltung_id)
+	{
+		$this->addSelect('lehrtyp_kurzbz, lehrveranstaltung_template_id');
+		$result = $this->load($lehrveranstaltung_id);
+
+		if (isError($result))
+			return error(getError($result));
+
+		if (hasData($result))
+		{
+			return success(
+				getData($result)[0]->lehrtyp_kurzbz === 'tpl' &&
+				getData($result)[0]->lehrveranstaltung_template_id === null
+			);
+		}
+	}
 
     /**
      * Get ECTS Summe pro angerechnetes Quereinstiegssemester.
