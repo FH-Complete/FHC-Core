@@ -17,7 +17,6 @@ export default {
 	},
 	methods: {
 		maximize() {
-			// NOTE(chris): set "app.config.unwrapInjectedRef = true" for this to work
 			this.minimized = false;
 		}
 	},

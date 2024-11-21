@@ -6,7 +6,7 @@ export default {
             type: Number,
             default: 1
         },
-		activeContent: String,
+		activeContent: [String, Number],
 		highestMatchingUrlCount: Number,
     },
     data: () => {

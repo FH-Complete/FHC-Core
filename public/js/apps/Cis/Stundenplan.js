@@ -143,6 +143,5 @@ const app = Vue.createApp({
 	</fhc-calendar>
 	`
 });
-app.config.unwrapInjectedRef = true;
 app.use(Phrasen, {reload: true});
 app.mount('#content');

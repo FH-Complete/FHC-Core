@@ -15,6 +15,5 @@ const app = Vue.createApp({
 
 setScrollbarWidth();
 
-app.config.unwrapInjectedRef = true;
 app.use(Phrasen);
 app.mount('#content');

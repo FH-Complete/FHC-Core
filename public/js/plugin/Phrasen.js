@@ -83,6 +83,6 @@ export default {
 			setLanguage: phrasen.setLanguage,
 			t_ref: phrasen.t_ref
 		};
-                app.provide('$p', app.config.globalProperties.$p);
+		app.provide('$p', app.config.globalProperties.$p);
 	}
 }
