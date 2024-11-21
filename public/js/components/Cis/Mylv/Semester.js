@@ -10,7 +10,7 @@ export default {
 		}
 	},
 	props: {
-		semester: String,
+		semester: [String, Number],
 		lvs: Array
 	},
 	computed: {

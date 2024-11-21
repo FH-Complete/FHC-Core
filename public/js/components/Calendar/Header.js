@@ -15,7 +15,6 @@ export default {
 		'size',
 		'classHeader',
 		'mode',
-		'updateMode',
 		'noWeekView',
 		'noMonthView',
 		'widget'

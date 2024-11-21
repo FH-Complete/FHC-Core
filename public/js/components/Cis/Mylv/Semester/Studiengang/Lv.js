@@ -23,10 +23,10 @@ export default {
 		lvnote: String,
 		znote: String,
 		studiengang_kuerzel: String,
-		semester: String,
+		semester: [String, Number],
 		orgform_kurzbz: String,
 		sprache: String,
-		ects: Number,
+		ects: String,
 		incoming: Number,
 		positiv: Boolean
 	},
@@ -138,7 +138,7 @@ export default {
 					</li>
 				</template>
 				<template v-else>
-					<li class="text-center" class="list-group-item"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
+					<li class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
 				</template>
 			</ul>
 		</div>
