@@ -107,9 +107,8 @@ const app = Vue.createApp({
 		this.loadEvents();
 		this.getLvID();
 	},
-	//TODO: Stundenplan phrase
 	template:/*html*/`
-	<h2>Stundenplan</h2>
+	<h2>{{$p.t('lehre/stundenplan')}}</h2>
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
 	<fhc-calendar :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">

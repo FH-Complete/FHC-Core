@@ -9,8 +9,6 @@ $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 
 <div id="content">
-	<h2>MyLv</h2>
-	<hr>
 	<mylv-student></mylv-student>
 </div>
 

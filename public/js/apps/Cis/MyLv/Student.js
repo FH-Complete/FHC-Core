@@ -1,9 +1,14 @@
 import MylvStudent from "../../../components/Cis/Mylv/Student.js";
 import Phrasen from "../../../plugin/Phrasen.js";
+import {setScrollbarWidth} from "../../../helpers/CssVarCalcHelpers";
 
-Vue.createApp({
+const app = Vue.createApp({
 	name: 'MyLvStudentApp',
 	components: {
 		MylvStudent
 	}
-}).use(Phrasen, {reload: true}).mount('#content');
+})
+
+setScrollbarWidth();
+
+app.use(Phrasen, {reload: true}).mount('#content');
