@@ -8,7 +8,6 @@ const app = Vue.createApp({
 	name: 'StundenplanApp',
 	data() {
 		return {
-			stunden: [],
 			lv_id: null,
 			events: null,
 			calendarDate: new CalendarDate(new Date()),
@@ -106,7 +105,7 @@ const app = Vue.createApp({
 	created()
 	{
 		this.loadEvents();
-		this.getLvID()
+		this.getLvID();
 	},
 	//TODO: Stundenplan phrase
 	template:/*html*/`
