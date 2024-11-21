@@ -13,8 +13,8 @@ if (!$result = @$db->db_query("SELECT xslt_xhtml_c4 FROM campus.tbl_template LIM
 
 	$xml01 = <<<EOXML01
 <xsl:stylesheet version="1.0"
-    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="html"/>
     <xsl:template match="content">
 	<h1>
 	    <xsl:value-of select="titel" />
@@ -27,8 +27,8 @@ EOXML01;
 	$xml02 = <<<EOXML02
 
 <xsl:stylesheet version="1.0"
-	xmlns:fo="http://www.w3.org/1999/XSL/Format"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	<xsl:output method="html"/>
 	<xsl:template match="content">
 		<xsl:value-of select="inhalt" disable-output-escaping="yes" />
 	</xsl:template>
@@ -39,8 +39,8 @@ EOXML02;
 	$xml03 = <<<EOXML03
 
 	<xsl:stylesheet version="1.0"
-	xmlns:fo="http://www.w3.org/1999/XSL/Format"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	<xsl:output method="html"/>
 	<xsl:template match="content">
 		<script type="text/javascript">
 		window.location.href=''<xsl:value-of select="url" />'';
@@ -57,8 +57,8 @@ EOXML03;
 	$xml04 = <<<EOXML04
 
 <xsl:stylesheet version="1.0"
-	xmlns:fo="http://www.w3.org/1999/XSL/Format"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	<xsl:output method="html"/>
 	<xsl:template match="content">
 		<div class="alert alert-danger" role="alert">Diese Seite sollte nicht direkt aufgerufen werden!</div>
 	</xsl:template>
@@ -71,6 +71,7 @@ EOXML04;
 <xsl:stylesheet version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:output encoding="UTF-8" omit-xml-declaration="yes" indent="yes"/>
+	<xsl:output method="html"/>
 	<xsl:template match="/">
 		<h1>News</h1>
 		<div class="row">

@@ -1,5 +1,6 @@
 import Phrasen from "../../plugin/Phrasen.js";
 import RoomInformation from "../../components/Cis/Mylv/RoomInformation.js";
+import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers";
 
 const app = Vue.createApp({
 	name: 'RoomInformationApp',
@@ -11,6 +12,8 @@ const app = Vue.createApp({
 		}
 	}
 });
-app.config.unwrapInjectedRef = true;
+
+setScrollbarWidth();
+
 app.use(Phrasen);
 app.mount('#content');

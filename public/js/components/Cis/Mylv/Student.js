@@ -90,10 +90,13 @@ export default {
 		});
 	},
 	template: `
+
+	<h2>{{p.t('lehre/myLV')}}</h2>
+	<hr>
 	<div class="mylv-student" v-if="ready">
 		<div v-if="currentSemester" class="row justify-content-center mb-3">
 			<div class="col-auto d-none">
-				<label class="col-form-label">{{p.t('lehre/studiensemester')}}</label>
+				<label class="col-form-label">{{$p.t('lehre/studiensemester')}}</label>
 			</div>
 			<div class="col-auto">
 				<div class="input-group">

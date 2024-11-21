@@ -13,12 +13,10 @@ export default {
     },
     props:{
         contentID:{
-            type: Number,
-            required: true,
+            type: Number
         },
         ort_kurzbz:{
-            type: String,
-            required: true,
+            type: String
         }
     },
     data(){
@@ -51,7 +49,7 @@ export default {
     },
     
     template:/*html*/`
-    <bs-modal @hideBsModal="modalHidden" dialogClass="modal-xl" @showBsModal="modalShown" ref="modalContainer" dialogClass="modal-lg">
+    <bs-modal @hideBsModal="modalHidden" dialogClass="modal-xl" @showBsModal="modalShown" ref="modalContainer">
         <template #title>
             <span v-if="ort_kurzbz">{{ort_kurzbz}}</span>
             <span v-else>Raum Informationen</span>

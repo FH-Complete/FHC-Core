@@ -13,7 +13,6 @@ const app = Vue.createApp({
     DashboardAdmin
   }
 });
-app.config.unwrapInjectedRef = true;
 app.use(FhcApi);
 app.use(Phrasen);
 app.mount('#main');

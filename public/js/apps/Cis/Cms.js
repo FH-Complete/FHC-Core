@@ -1,8 +1,8 @@
 import BsConfirm from "../../components/Bootstrap/Confirm.js";
-//import Pagination from "../../components/Pagination/Pagination.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
 import CmsContent from "../../components/Cis/Cms/Content.js";
 import Phrasen from "../../plugin/Phrasen.js";
+import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers";
 
 
 const app = Vue.createApp({
@@ -35,6 +35,9 @@ const app = Vue.createApp({
     });
   },
 });
+
+setScrollbarWidth();
+
 app.use(primevue.config.default, { zIndex: { overlay: 9999 } });
 app.use(Phrasen, {reload: true});
 app.mount("#cms");

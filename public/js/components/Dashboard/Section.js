@@ -195,7 +195,7 @@ export default {
 	template: `
 	<div class="dashboard-section" ref="container" :style="getSectionStyle">
 		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
-			<template #default="item" #default>
+			<template #default="item">
 				
 				<dashboard-item v-if="!item.placeholder"
 					:id="item.widget"
