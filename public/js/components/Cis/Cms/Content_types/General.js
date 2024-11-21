@@ -29,16 +29,25 @@ export default {
 				u.parentNode.removeChild(u)
 				
 			})
-			
+
 			// find bare text nodes and put into p element
-			const td = Array.from(table.querySelectorAll('td')).filter(el => el.scrollWidth > 200)
+			const td = Array.from(table.querySelectorAll('td')).filter(el => el.scrollWidth > 100)
 			td.forEach(element => {
 				if (element.firstChild?.nodeType === Node.TEXT_NODE && element.firstChild.length > 10) {
-					const div = document.createElement('p');
-					div.appendChild(element.firstChild)
-					element.appendChild(div);
+					const p = document.createElement('p');
+					p.appendChild(element.firstChild)
+					element.appendChild(p);
 				}
 			});
+
+			// flatten nested th elements
+			const ths = Array.from(table.querySelectorAll('th'))
+			ths.forEach(th => {
+
+				if(th.children.length > 1) {
+					th.innerHTML = Array.from(th.childNodes).find(cn => cn.textContent).textContent
+				}
+			})
 
 			// let p elements wrap on overflow
 			const p = table.querySelectorAll('p')
@@ -50,13 +59,14 @@ export default {
 		}
 	},
     mounted(){
-
 		// replaces the tablesorter with the tabulator
-		let tables = document.getElementsByClassName("tablesorter");
-		
-		for (let table of tables) {
+		let tables = Array.from(document.getElementsByClassName("tablesorter"));
+
+		tables.forEach((table, index) =>  {
 			this.sanitizeLegacyTables(table)
+			
 			new Tabulator(table, {
+				index: index,
 				layout: "fitDataFill",
 
 				columnDefaults: {
@@ -65,7 +75,7 @@ export default {
 					minWidth: "100px"
 				}
 			})
-		}
+		})
 
         document.querySelectorAll("#cms [data-confirm]").forEach((el) => {
             el.addEventListener("click", (evt) => {
@@ -91,7 +101,9 @@ export default {
     },
     template: /*html*/ `
       <!-- div that contains the content -->
-      <div v-html="content" v-if="content" ></div>
+      <div v-if="content" class="container" style="max-width: 100%;"><div class="row"><div class="col">
+      	<div v-html="content"  ></div>
+      </div></div></div>
       <p v-else>Content was not found</p>
       `,
   };
