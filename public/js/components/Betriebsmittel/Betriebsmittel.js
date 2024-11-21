@@ -117,7 +117,7 @@ export default {
 					event: 'tableBuilt',
 					handler: async() => {
 
-						await this.$p.loadCategory(['wawi', 'global', 'infocenter', 'betriebsmittel']);
+						await this.$p.loadCategory(['wawi', 'global', 'infocenter', 'betriebsmittel', 'person']);
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
@@ -295,7 +295,7 @@ export default {
 				<div class="row mb-3">
 					<form-input
 						type="select"
-						:label="$p.t('global/typ')"
+						:label="$p.t('global/typ') + ' *'"
 						name="betriebsmitteltyp"
 						v-model="formData.betriebsmitteltyp"
 						:disabled="!statusNew"
