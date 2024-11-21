@@ -193,8 +193,9 @@ export default{
 			filteredFirmen: [],
 			abortController: {
 				suggestions: null,
-				places: null
-			}
+				places: null,
+				firmen: null
+			},
 		}
 	},
 	computed:{
@@ -306,7 +307,13 @@ export default{
 				});
 		},
 		search(event) {
-			return this.$fhcApi.factory.stv.kontakt.getFirmen(event.query)
+			if (this.abortController.firmen) {
+				this.abortController.firmen.abort();
+			}
+
+			this.abortController.firmen = new AbortController();
+
+			return this.$refs.addressData.factory.stv.kontakt.getFirmen(event.query)
 				.then(result => {
 					this.filteredFirmen = result.data.retval;
 				});

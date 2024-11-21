@@ -140,6 +140,10 @@ export default{
 			firmen: [],
 			filteredFirmen: [],
 			filteredOrte: null,
+			abortController: {
+				firmen: null,
+				standorte: null
+			},
 		}
 	},
 	watch: {
@@ -234,13 +238,24 @@ export default{
 			this.$refs.table.reloadTable();
 		},
 		searchFirma(event) {
-			return this.$fhcApi
-				.get('api/frontend/v1/stv/kontakt/getFirmen/' + event.query)
+			if (this.abortController.firmen) {
+				this.abortController.firmen.abort();
+			}
+
+			this.abortController.firmen = new AbortController();
+
+			return this.$fhcApi.factory.stv.kontakt.getFirmen(event.query)
 				.then(result => {
 					this.filteredFirmen = result.data.retval;
 				});
 		},
 		loadStandorte(firmen_id) {
+			if (this.abortController.standorte) {
+				this.abortController.standorte.abort();
+			}
+
+			this.abortController.standorte = new AbortController();
+
 			return this.$fhcApi.factory.stv.kontakt.getStandorteByFirma(firmen_id)
 				.then(result => {
 					this.filteredOrte = result.data;
