@@ -38,23 +38,45 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<title>Ampel</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	
-	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script> 
+
+<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>';
+
+
+	include('../../include/meta/jquery.php');
+	include('../../include/meta/jquery-tablesorter.php');
+
+echo '	
 	<script type="text/javascript">
-	
+		$.tablesorter.addParser({
+					id: "customDate",
+					is: function(s) {
+						//return false;
+						//use the above line if you don\'t want table sorter to auto detected this parser
+						// match dd.mm.yyyy e.g. 01.01.2001 as regex
+						//return /\d{1,4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2} .*/.test(s);
+						return /\d{1,2}.\d{1,2}.\d{1,4}.*/.test(s);
+					},
+					// replace regex-wildcards and return new date
+					format: function(s) {
+						s = s.replace(/\-/g," ");
+						s = s.replace(/:/g," ");
+						s = s.replace(/\./g," ");
+						s = s.split(" ");
+						return $.tablesorter.formatFloat(new Date(s[2], s[1]-1, s[0]).getTime());
+					},
+					type: "numeric"
+				});
 		$(document).ready(function() 
 			{ 
 			    $("#myTable").tablesorter(
 				{
-					sortList: [[2,0]],
-					widgets: [\'zebra\']
+					sortList: [[2,1]],
+					widgets: [\'zebra\',\'filter\'],
+					headers: { 2: { sorter: "customDate"}}
 				}); 
 			} 
 		);
@@ -107,8 +129,8 @@ echo '<table class="tablesorter" id="myTable">
 foreach($ampel->result as $row)
 {
 	echo '<tr>';
-	echo '<td><a href="ampel_details.php?action=update&ampel_id=',$row->ampel_id,' " target="detail_ampel">',$row->ampel_id,'</a></td>';
-	echo '<td>',$row->kurzbz,'</td>';
+	echo '<td>',$row->ampel_id,'</td>';
+	echo '<td><a href="ampel_details.php?action=update&ampel_id=',$row->ampel_id,' " target="detail_ampel">',$row->kurzbz,'</a></td>';
 	echo '<td>',$datum_obj->formatDatum($row->deadline,'d.m.Y'),'</td>';
 	echo '<td>',$row->vorlaufzeit,'</td>';
 	echo '<td>',$row->verfallszeit,'</td>';
