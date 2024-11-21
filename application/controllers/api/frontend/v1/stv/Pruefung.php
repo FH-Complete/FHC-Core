@@ -30,19 +30,19 @@ class Pruefung extends FHCAPI_Controller
 		parent::__construct([
 			'getPruefungen' => ['admin:r', 'assistenz:r'],
 			'loadPruefung' => ['admin:r', 'assistenz:r'],
-			'getTypenPruefungen' => self::PERM_LOGGED,
-			'getLehreinheiten' => self::PERM_LOGGED,
-			'getAllLehreinheiten' => self::PERM_LOGGED,
-			'getLvsByStudent' => self::PERM_LOGGED,
-			'getLvsandLesByStudent' => self::PERM_LOGGED,
-			'getLvsAndMas' => self::PERM_LOGGED,
-			'getMitarbeiterLv' => self::PERM_LOGGED,
-			'getNoten' => self::PERM_LOGGED,
-			'checkZeugnisnoteLv' => self::PERM_LOGGED,
-			'checkTermin1' => self::PERM_LOGGED,
-			'insertPruefung' => ['admin:rw', 'assistenz:rw'],
-			'updatePruefung' =>['admin:rw', 'assistenz:rw'],
-			'deletePruefung' =>['admin:rw', 'assistenz:rw'],
+			'getTypenPruefungen' => ['admin:r', 'assistenz:r'],
+			'getLehreinheiten' => ['admin:r', 'assistenz:r'],
+			'getAllLehreinheiten' => ['admin:r', 'assistenz:r'],
+			'getLvsByStudent' => ['admin:r', 'assistenz:r'],
+			'getLvsandLesByStudent' => ['admin:r', 'assistenz:r'],
+			'getLvsAndMas' => ['admin:r', 'assistenz:r'],
+			'getMitarbeiterLv' => ['admin:r', 'assistenz:r'],
+			'getNoten' => ['admin:r', 'assistenz:r'],
+			'checkZeugnisnoteLv' => ['admin:r', 'assistenz:r'],
+			'checkTermin1' => ['admin:r', 'assistenz:r'],
+			'insertPruefung' => self::PERM_LOGGED,
+			'updatePruefung' =>self::PERM_LOGGED,
+			'deletePruefung' =>self::PERM_LOGGED,
 		]);
 
 		//Load Models
@@ -185,30 +185,18 @@ class Pruefung extends FHCAPI_Controller
 	public function insertPruefung()
 	{
 		$authUID = getAuthUID();
-		$lehrveranstaltung_id = $this->input->post('lehrveranstaltung_id');
-
-		$lehreinheit_id = $this->input->post('lehreinheit_id');
-		$student_uid = $this->input->post('student_uid');
-		$mitarbeiter_uid = $this->input->post('mitarbeiter_uid');
-		$datum = $this->input->post('datum');
-		$note = $this->input->post('note');
-		$pruefungstyp_kurzbz = $this->input->post('pruefungstyp_kurzbz');
-		$anmerkung = $this->input->post('anmerkung');
 
 		$this->load->library('form_validation');
 
 		$this->form_validation->set_rules('lehrveranstaltung_id', $this->p->t('lehre', 'lehrveranstaltung'), 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehrveranstaltung')]),
 		]);
-
 		$this->form_validation->set_rules('lehreinheit_id', $this->p->t('lehre', 'lehreinheit'), 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehreinheit')]),
 		]);
-
 		$this->form_validation->set_rules('pruefungstyp_kurzbz', $this->p->t('lehre', 'pruefung'), 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('global', 'typ')]),
 		]);
-
 		$this->form_validation->set_rules(
 			'datum',
 			$this->p->t('global', 'datum'),
@@ -226,7 +214,7 @@ class Pruefung extends FHCAPI_Controller
 		{
 			$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
 
-			$result = $this->LehreinheitModel->load($lehreinheit_id);
+			$result = $this->LehreinheitModel->load($this->input->post('lehreinheit_id'));
 
 			$lehreinheit = $this->getDataOrTerminateWithError($result);
 			$studiensemester_kurzbz = current($lehreinheit)->studiensemester_kurzbz;
@@ -238,13 +226,13 @@ class Pruefung extends FHCAPI_Controller
 		}
 
 		$result = $this->PruefungModel->insert([
-			'lehreinheit_id' => $lehreinheit_id,
-			'student_uid' => $student_uid,
-			'mitarbeiter_uid' => $mitarbeiter_uid,
-			'datum' => $datum,
-			'pruefungstyp_kurzbz' => $pruefungstyp_kurzbz,
-			'note' => $note,
-			'anmerkung' => $anmerkung,
+			'lehreinheit_id' => $this->input->post('lehreinheit_id'),
+			'student_uid' => $this->input->post('student_uid'),
+			'mitarbeiter_uid' => $this->input->post('mitarbeiter_uid'),
+			'datum' => $this->input->post('datum'),
+			'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
+			'note' => $this->input->post('note'),
+			'anmerkung' => $this->input->post('anmerkung'),
 			'insertamum' => date('c'),
 			'insertvon' => $authUID,
 		]);
@@ -255,9 +243,9 @@ class Pruefung extends FHCAPI_Controller
 		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
 
 		$result = $this->ZeugnisnoteModel->loadWhere(array(
-				'lehrveranstaltung_id' => $lehrveranstaltung_id,
-				'student_uid' => $student_uid,
-				'studiensemester_kurzbz' => $studiensemester_kurzbz));
+			'lehrveranstaltung_id' => $this->input->post('lehrveranstaltung_id'),
+			'student_uid' => $this->input->post('student_uid'),
+			'studiensemester_kurzbz' => $studiensemester_kurzbz));
 
 		if (isError($result))
 		{
@@ -268,12 +256,12 @@ class Pruefung extends FHCAPI_Controller
 		{
 			//insert zeugnisnote, if not existing
 			$result = $this->ZeugnisnoteModel->insert(array(
-				'lehrveranstaltung_id' => $lehrveranstaltung_id,
-				'student_uid' => $student_uid,
+				'lehrveranstaltung_id' => $this->input->post('lehrveranstaltung_id'),
+				'student_uid' => $this->input->post('student_uid'),
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
-				'note' => $note,
+				'note' => $this->input->post('note'),
 				'uebernahmedatum' => date('c'),
-				'benotungsdatum' => $datum,
+				'benotungsdatum' => $this->input->post('datum'),
 				'insertamum' => date('c'),
 				'insertvon' =>  $authUID
 			));
@@ -288,12 +276,12 @@ class Pruefung extends FHCAPI_Controller
 		$return_code = 0;
 
 		//handling Termin1 if not existing
-		if($pruefungstyp_kurzbz == "Termin2")
+		if($this->input->post('pruefungstyp_kurzbz') == "Termin2")
 		{
 			$resultP = $this->PruefungModel->loadWhere(array(
-					'lehreinheit_id' => $lehreinheit_id,
-					'student_uid' => $student_uid,
-					'pruefungstyp_kurzbz' => 'Termin1'));
+				'lehreinheit_id' => $this->input->post('lehreinheit_id'),
+				'student_uid' => $this->input->post('student_uid'),
+				'pruefungstyp_kurzbz' => 'Termin1'));
 
 			if (isError($resultP))
 			{
@@ -306,9 +294,9 @@ class Pruefung extends FHCAPI_Controller
 				$this->ZeugnisnoteModel->addJoin('lehre.tbl_lehreinheit', 'lehrveranstaltung_id');
 
 				$resultP = $this->ZeugnisnoteModel->loadWhere(array(
-						'lehrveranstaltung_id' => $lehrveranstaltung_id,
-						'student_uid' => $student_uid,
-						'lehre.tbl_zeugnisnote.studiensemester_kurzbz' => $studiensemester_kurzbz));
+					'lehrveranstaltung_id' => $this->input->post('lehrveranstaltung_id'),
+					'student_uid' => $this->input->input->post('student_uid'),
+					'lehre.tbl_zeugnisnote.studiensemester_kurzbz' => $studiensemester_kurzbz));
 				if (isError($resultP))
 				{
 					$this->terminateWithError(getError($resultP), self::ERROR_TYPE_GENERAL);
@@ -320,9 +308,9 @@ class Pruefung extends FHCAPI_Controller
 				$dataNote = current(getData($resultP));
 
 				$resultN = $this->PruefungModel->insert([
-					'lehreinheit_id' => $lehreinheit_id,
-					'student_uid' => $student_uid,
-					'mitarbeiter_uid' => $mitarbeiter_uid,
+					'lehreinheit_id' => $this->input->post('lehreinheit_id'),
+					'student_uid' => $this->input->post('student_uid'),
+					'mitarbeiter_uid' => $this->input->post('mitarbeiter_uid'),
 					'datum' => $dataNote->benotungsdatum,
 					'pruefungstyp_kurzbz' => 'Termin1',
 					'note' => $dataNote->note,
@@ -347,7 +335,7 @@ class Pruefung extends FHCAPI_Controller
 			? $benotungsdatum
 			: $uebernahmedatum;
 
-		if ($checkDate >= $datum && $note !== $note->note)
+		if ($checkDate >= $this->input->post('datum') && $note !== $note->note)
 		{
 			$this->terminateWithSuccess($return_code + 2);
 		}
@@ -373,43 +361,17 @@ class Pruefung extends FHCAPI_Controller
 
 		$authUID = getAuthUID();
 
-		$lehreinheit_id = $this->input->post('lehreinheit_id');
-		$student_uid = $this->input->post('student_uid');
-		$mitarbeiter_uid = $this->input->post('mitarbeiter_uid');
-		$datum = $this->input->post('datum');
-		$note = $this->input->post('note');
-		$pruefungstyp_kurzbz = $this->input->post('pruefungstyp_kurzbz');
-		$anmerkung = $this->input->post('anmerkung');
-
 		$this->load->library('form_validation');
 
-		$this->form_validation->set_rules(
-			'lehrveranstaltung_id',
-			$this->p->t('lehre', 'lehrveranstaltung'),
-			'required',
-			[
-				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehrveranstaltung')]),
-			]
-		);
-
-		$this->form_validation->set_rules(
-			'lehreinheit_id',
-			$this->p->t('lehre', 'lehreinheit'),
-			'required',
-			[
-				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehreinheit')]),
-			]
-		);
-
-		$this->form_validation->set_rules(
-			'pruefungstyp_kurzbz',
-			$this->p->t('lehre', 'pruefung'),
-			'required',
-			[
+		$this->form_validation->set_rules('lehrveranstaltung_id', $this->p->t('lehre', 'lehrveranstaltung'), 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehrveranstaltung')]),
+		]);
+		$this->form_validation->set_rules('lehreinheit_id', $this->p->t('lehre', 'lehreinheit'), 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehreinheit')]),
+		]);
+		$this->form_validation->set_rules('pruefungstyp_kurzbz', $this->p->t('lehre', 'pruefung'), 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('global', 'typ')]),
-			]
-		);
-
+		]);
 		$this->form_validation->set_rules(
 			'datum',
 			$this->p->t('global', 'datum'),
@@ -425,22 +387,22 @@ class Pruefung extends FHCAPI_Controller
 			[
 				'pruefung_id' => $pruefung_id
 			],
-			[	'lehreinheit_id' => $lehreinheit_id,
-				'student_uid' =>  $student_uid,
-				'mitarbeiter_uid' =>  $mitarbeiter_uid,
-				'note' => $note,
-				'pruefungstyp_kurzbz' => $pruefungstyp_kurzbz,
-				'datum' => $datum,
-				'anmerkung' => $anmerkung,
+			[	'lehreinheit_id' => $this->input->post('lehreinheit_id'),
+				'student_uid' =>  $this->input->post('student_uid'),
+				'mitarbeiter_uid' =>  $this->input->post('mitarbeiter_uid'),
+				'note' => $this->input->post('note'),
+				'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
+				'datum' => $this->input->post('datum'),
+				'anmerkung' => $this->input->post('anmerkung'),
 				'updatevon' => $authUID,
 				'updateamum' => date('c'),
 			]
 		);
-
 		$this->getDataOrTerminateWithError($result);
 
 		return $this->outputJsonSuccess(true);
 	}
+
 	/**
 	 * Deletes a pruefung
 	 *
@@ -449,7 +411,7 @@ class Pruefung extends FHCAPI_Controller
 	 * @return success or error
 	 *
 	 * no impact on lehre.tbl_zeugnisnote
- */
+	 */
 	public function deletePruefung($pruefung_id)
 	{
 		$result = $this->PruefungModel->load($pruefung_id);

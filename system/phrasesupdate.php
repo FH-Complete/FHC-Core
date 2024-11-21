@@ -30385,7 +30385,28 @@ array(
 			)
 		)
 	),
-);
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'student_uid',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student UID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'student UID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	);
 
 
 //*****		CHECK PHRASES & PHRASENTEXTE in German and English.
