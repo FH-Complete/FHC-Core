@@ -181,13 +181,13 @@ export default {
 		return BsModal.popup(null, options);
 	},
 	template: /*html*/ `
-<bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
-	<template v-if="title" v-slot:title>{{title }}</template>
+<bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false">
+	<template v-if="title" v-slot:title>{{title}}</template>
 	<template v-slot:default>
-		<div >
-			<nav aria-label="breadcrumb" class="ps-2  ">
-				<ol class="breadcrumb ">
-					<li class="breadcrumb-item"  v-for="element in breadcrumb">{{element}}</li>
+		<div>
+			<nav aria-label="breadcrumb" class="ps-2">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item" v-for="element in breadcrumb">{{element}}</li>
 				</ol>
 			</nav>
 			<edit-profil-select @submit="submitProfilChange" v-model:breadcrumb="breadcrumb" v-model:topic="topic" v-model:profilUpdate="profilUpdate" ariaLabel="select" :list="editData"></edit-profil-select>

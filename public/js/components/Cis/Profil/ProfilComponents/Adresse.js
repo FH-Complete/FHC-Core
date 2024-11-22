@@ -53,11 +53,8 @@ export default {
         <div v-if="withZustelladresse" class="order-5 offset-1 col-11">
             <div class="form-underline">
                 <div class="form-underline-titel">{{$p.t('person','zustelladresse')}}</div>
-                    <div class="ms-2 form-check ">
-                        <input class="form-check-input" type="checkbox"  @click.prevent :checked="data.zustelladresse"  >
-                       
-                    </div>
-        
+                <div class="ms-2 form-check ">
+                    <input class="form-check-input" type="checkbox"  @click.prevent :checked="data.zustelladresse"  >
                 </div>
             </div>
         </div>
