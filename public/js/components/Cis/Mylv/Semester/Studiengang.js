@@ -11,7 +11,7 @@ export default {
 	props: {
 		bezeichnung: String,
 		kuerzel: String,
-		semester: Number,
+		semester: [String,Number],
 		lvs: Array
 	},
 	computed: {

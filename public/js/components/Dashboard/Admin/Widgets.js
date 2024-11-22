@@ -36,7 +36,8 @@ export default {
 			}
 		).catch(err => console.error('ERROR:', err));
 	},
-	template: `<div class="dashboard-admin-widgets">
+	template: `
+	<div class="dashboard-admin-widgets">
 		<div v-for="widget in widgets" :key="widget.widget_id" class="form-check form-switch">
 			<input class="form-check-input" type="checkbox" role="switch" :id="'dashboard-admin-widgets-' + widget.widget_id" v-model="widget.allowed" @input.prevent="sendChange(widget.widget_id)">
 			<label class="form-check-label" :for="'dashboard-admin-widgets-' + widget.widget_id">{{(widget.setup && widget.setup.name) || widget.widget_kurzbz}}</label>

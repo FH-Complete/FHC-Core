@@ -23,10 +23,10 @@ export default {
 		lvnote: String,
 		znote: String,
 		studiengang_kuerzel: String,
-		semester: String,
+		semester: [String, Number],
 		orgform_kurzbz: String,
 		sprache: String,
-		ects: Number,
+		ects: String,
 		incoming: Number,
 		positiv: Boolean
 	},
@@ -50,6 +50,15 @@ export default {
 		}
 	},
 	methods: {
+		c4_link(menuItem) {
+			if (!menuItem) return null;
+			if (Array.isArray(menuItem.c4_moodle_links) && menuItem.c4_moodle_links.length) {
+				return '#';
+			}
+			else {
+				return menuItem.c4_link ?? null;
+			}
+		},
 		openLvOption(menuItem){
 			if (menuItem.id == "core_menu_mailanstudierende"){
 				window.location.href = menuItem.c4_link;
@@ -128,7 +137,7 @@ export default {
 							<div class="mx-4">
 								<i :class="[menuItem.c4_icon2 ? menuItem.c4_icon2 : 'fa-solid fa-pen-to-square', !menuItem.c4_link ? 'unavailable' : null ]"></i>
 							</div>
-							<a class="text-decoration-none text-truncate" :id="'moodle_links_'+lehrveranstaltung_id"  :class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }" :target="menuItem.c4_target" :href="menuItem.c4_link ? !menuItem.c4_moodle_links?.length && menuItem.c4_link : null">
+							<a class="text-decoration-none text-truncate" :id="'moodle_links_'+lehrveranstaltung_id"  :class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }" :target="menuItem.c4_target" :href="c4_link(menuItem) ? c4_link(menuItem) : null">
 							{{menuItem.name}}
 							</a>
 							</div>
@@ -138,7 +147,7 @@ export default {
 					</li>
 				</template>
 				<template v-else>
-					<li class="text-center" class="list-group-item"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
+					<li class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
 				</template>
 			</ul>
 		</div>

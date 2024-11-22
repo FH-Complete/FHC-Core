@@ -73,7 +73,6 @@ EOXML04;
 	<xsl:output encoding="UTF-8" omit-xml-declaration="yes" indent="yes"/>
 	<xsl:output method="html"/>
 	<xsl:template match="/">
-		<h1>News</h1>
 		<div class="row">
 			<xsl:choose>
 				<xsl:when test="content/stg_extras">
