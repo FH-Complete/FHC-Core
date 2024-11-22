@@ -345,6 +345,16 @@ export default{
 			}
 		},
 	},
+	watch: {
+		//adaption to go directly through different semesters
+		currentSemester(newVal, oldVal) {
+			this.$refs.table.tabulator.clearFilter("studiensemester_kurzbz");
+
+			if (newVal && this.isFilterSet) {
+				this.$refs.table.tabulator.setFilter("studiensemester_kurzbz", "=", newVal);
+			}
+		},
+	},
 	created(){
 		this.$fhcApi.factory.stv.exam.getLvsByStudent(this.uid)
 			.then(result => {
