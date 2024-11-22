@@ -100,5 +100,5 @@ $this->phrasen['lvplan/folgendeAenderungen']='There have been the following chan
 $this->phrasen['lvplan/reserviertInDev']='not<br>available';
 $this->phrasen['lvplan/raumNichtReservierbar']='Reservation is disabled for this room.';
 $this->phrasen['lvplan/reserviertVon']='Reserved by';
-$this->phrasen['lvplan/FragenZuLvPlan']='For questions about your personal schedule, please contant the <a class="Item" href="mailto:%s">administrative assistant</a>';
+$this->phrasen['lvplan/FragenZuLvPlan']='For questions about your personal schedule, please contact the <a class="Item" href="mailto:%s">Course-Coordination Office</a>';
 ?>
