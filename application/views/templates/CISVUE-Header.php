@@ -19,7 +19,8 @@ $this->load->view('templates/FHC-Header', $includesArray);
 if (!isset($menu)) {
 	$ci =& get_instance(); // get CI instance
 	$ci->load->model('content/Content_model', 'ContentModel');
-	$cis4_content_id = $ci->ContentModel->getMenuContentID();
+	$ci->load->config('cis');
+	$cis4_content_id = $ci->config->item('cis_menu_root_content_id');
 	$result = $ci->ContentModel->getMenu($cis4_content_id, getAuthUID());
 	$menu = getData($result)->childs ?? [];
 }

@@ -376,7 +376,7 @@ export default {
 				paddingRight: 'var(--fhc-dg-item-padding-horizontal)'
 			}">
 			<template v-slot="item">
-				<slot v-bind="item.data" :x="item.x" :y="item.y" ></slot>
+				<slot v-bind="item.data" v-bind="item" :x="item.x" :y="item.y" ></slot>
 			</template>
 		</grid-item>
 		
