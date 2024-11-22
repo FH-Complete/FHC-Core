@@ -82,6 +82,34 @@ export default {
 		}
 	},
 	computed: {
+		dayGridStyle(){
+			return {
+				'grid-template-columns': '1 1fr',
+				'grid-template-rows': 'repeat(' + (this.hours.length * 60 / this.smallestTimeFrame) + ', 1fr)',
+			}
+		},
+		noLvStyle(){
+			return {
+				top: (this.calendarScrollTop + 100) + 'px',
+				position: 'absolute',
+				left: 0,
+				'text-align': 'center',
+				width: '100%',
+				'z-index': 1,
+			}
+		},
+		indicatorStyle(){
+			return {
+				'pointer-events': 'none',
+				'padding-left': '3.5rem',
+				'margin-top': '-1px',
+				'z-index': 2,
+				'border-color':'#00649C!important',
+				top: this.hourPosition + 'px',
+				left: 0,
+				right: 0,
+			}    
+		},
 		noEventsCondition(){
 			return !this.isSliding && this.filteredEvents?.length === 0;
 		},
@@ -150,6 +178,19 @@ export default {
 				)
 			}
 		},
+		hourGridIdentifier(hour) {
+			// this is the id attribute that is responsible to scroll the calender to the first event
+			return 'scroll' + hour + this.focusDate.d + this.week;
+		},
+		hourGridStyle(hour){
+			return {
+				'pointer-events': 'none',
+				top: this.getAbsolutePositionForHour(hour),
+				left: 0,
+				right: 0,
+				'z-index': 0,
+			}  
+		},
 		showModal: function (evt) {
 			let event = evt.orig;
 			this.setSelectedEvent(event);
@@ -216,6 +257,17 @@ export default {
 		},
 		dateToMinutesOfDay(day) {
 			return Math.floor(((day.getHours() - 7) * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
+		},
+		eventGridStyle(day,event){
+			return { 
+				'z-index': 1,
+			 	'grid-column-start': 1 + (event.lane - 1) * day.lanes / event.maxLane,
+				'grid-column-end': 1 + event.lane * day.lanes / event.maxLane,
+				'grid-row-start': this.dateToMinutesOfDay(event.start),
+				'grid-row-end': this.dateToMinutesOfDay(event.end),
+				'background-color': event.orig.color,
+				'--test': this.dateToMinutesOfDay(event.end),
+			}
 		}
 	},
 	template: /*html*/`
@@ -232,19 +284,19 @@ export default {
 					</div>
 				</div>
 				<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="" >
-					<div :id="'scroll'+hour+focusDate.d+week" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" style="pointer-events: none;" :style="{top:getAbsolutePositionForHour(hour),left:0,right:0,'z-index':0}"></div>
-					<div v-if="hourPosition" class="position-absolute border-top small"  style="pointer-events: none; padding-left:3.5rem; margin-top:-1px;z-index:2;border-color:#00649C !important" :style="{top:hourPosition+'px',left:0,right:0}">
+					<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
+					<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
 						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 					</div>
 					<div>
-						<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="{'top':(calendarScrollTop + 100)+'px'}" style="position:absolute; left:0;  text-align:center; width: 100%; z-index:1">Keine Lehrveranstaltungen</h1>
-						<div class="events" :class="{'fhc-calendar-no-events-overlay':noEventsCondition}">
+						<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
+						<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
 
 							<div class="hours">
 								<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 							</div>
-							<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': '1 1fr', 'grid-template-rows': 'repeat(' + (hours.length * 60 / smallestTimeFrame) + ', 1fr)'}">
-								<div  :style="{'background-color':event.orig.color}" :class="{'selectedEvent':event.orig == selectedEvent}" class="mx-2 small rounded overflow-hidden " :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">
+							<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle">
+								<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" :class="{'selectedEvent':event.orig == selectedEvent}" class="mx-2 small rounded overflow-hidden " >
 									<!-- desktop version opens the lvMenu next to the calendar -->
 									<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
 										<slot  name="dayPage" :event="event" :day="day">
@@ -280,7 +332,7 @@ export default {
 							<h3>Keine Lehrveranstaltungen</h3>
 						</template>
 						<template v-else>
-							<div style="height: calc(var(--fhc-calendar-pane-height) - 100px);" class="d-flex w-100 justify-content-center align-items-center">
+							<div class="p-4 d-flex w-100 justify-content-center align-items-center">
 								<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 							</div>
 						</template>
