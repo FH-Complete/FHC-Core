@@ -241,7 +241,7 @@ function checkZeilenUmbruch()
 	}
 
 	// Digitale Anwesenheiten
-	if(CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet
+	if(defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet
 			&& ($rechte->isBerechtigt('extension/anw_ent_admin')
 				|| $rechte->isBerechtigt('extension/anwesenheit_lektor')
 				|| $rechte->isBerechtigt('extension/anwesenheit_student')
