@@ -30907,7 +30907,46 @@ array(
 			)
 		)
 	),
-
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_noInteger',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur Eingabe von ganzen Zahlen erlaubt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Only input of whole numbers allowed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_maxSem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausbildungssemester nicht zulässig: größer als Höchstsemester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Semester not allowed: higher than max Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

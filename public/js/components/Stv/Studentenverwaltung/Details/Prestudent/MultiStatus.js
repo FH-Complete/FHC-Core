@@ -355,6 +355,7 @@ export default{
 					:show-toolbar-student="showToolbarStudent"
 					:show-toolbar-interessent="showToolbarInteressent"
 					:prestudent-ids="prestudentIds"
+					:max-sem="maxSem"
 					@reload-table="reload"
 				>		
 				</status-dropdown>
@@ -369,6 +370,7 @@ export default{
 				:show-toolbar-student="showToolbarStudent"
 				:show-toolbar-interessent="showToolbarInteressent"
 				:prestudent-ids="prestudentIds"
+				:max-sem="maxSem"
 				@reload-table="reload"
 				>		
 			</status-dropdown>

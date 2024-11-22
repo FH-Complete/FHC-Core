@@ -30,6 +30,10 @@ export default {
 			type: Array,
 			required: true,
 			default: () => []
+		},
+		maxSem: {
+			type: Number,
+			required: true
 		}
 	},
 	data() {
@@ -201,17 +205,35 @@ export default {
 		},
 		promtAusbildungssemester(status, statusgrund_id) {
 			const count = this.prestudentIds.length;
-			return BsPrompt
-				.popup(this.$p.t(
-					'lehre',
-					count > 1 ? 'modal_askAusbildungssemPlural' : 'modal_askAusbildungssem',
-					{ count, status }
-				))
-				.then(ausbildungssemester => ({
-					status_kurzbz: status,
-					ausbildungssemester,
-					statusgrund_id
-				}));
+
+			const askForSemester = () => {
+				return BsPrompt
+					.popup(this.$p.t(
+						'lehre',
+						count > 1 ? 'modal_askAusbildungssemPlural' : 'modal_askAusbildungssem',
+						{ count, status }
+					))
+					.then(input => {
+						const ausbildungssemester = parseInt(input, 10);
+						//check if valid number
+						if ((!/^\d+$/.test(input) || ausbildungssemester < 0)) {
+							this.$fhcAlert.alertError(this.$p.t('ui', 'error_noInteger'));
+
+							return askForSemester();
+						}
+						if (ausbildungssemester > this.maxSem) {
+							this.$fhcAlert.alertError(this.$p.t('ui', 'error_maxSem'));
+
+							return askForSemester();
+						}
+						return {
+							status_kurzbz: status,
+							ausbildungssemester,
+							statusgrund_id
+						};
+					});
+			};
+			return askForSemester();
 		},
 		changeStatus(data) {
 			Promise
