@@ -10,8 +10,9 @@ export default {
 		all = all ? '/all' : '';
 		return this.$fhcApi.get('api/frontend/v1/stv/grades/getTeacherProposal/' + prestudent_id + all);
 	},
-	getRepeaterGrades(prestudent_id) {
-		return this.$fhcApi.get('api/frontend/v1/stv/grades/getRepeaterGrades/' + prestudent_id);
+	getRepeaterGrades(prestudent_id, all) {
+		all = all ? '/all' : '';
+		return this.$fhcApi.get('api/frontend/v1/stv/grades/getRepeaterGrades/' + prestudent_id + all);
 	},
 	updateCertificate(data) {
 		return this.$fhcApi.post('api/frontend/v1/stv/grades/updateCertificate', data);

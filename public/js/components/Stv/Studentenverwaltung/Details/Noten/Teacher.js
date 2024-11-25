@@ -9,7 +9,7 @@ export default {
 	],
 	props: {
 		student: Object,
-		stdsem: String
+		allSemester: Boolean
 	},
 	data() {
 		return {
@@ -26,7 +26,7 @@ export default {
 				ajaxParams: () => {
 					return {
 						prestudent_id: this.student.prestudent_id,
-						stdsem: this.stdsem
+						stdsem: this.allSemester
 					};
 				},
 				ajaxResponse: (url, params, response) => {
@@ -57,7 +57,7 @@ export default {
 		student(n) {
 			this.$refs.table.reloadTable();
 		},
-		stdsem(n) {
+		allSemester(n) {
 			this.$refs.table.reloadTable();
 		}
 	},
@@ -82,9 +82,11 @@ export default {
 		}
 	},
 	template: `
-	<div class="stv-details-noten-teacher h-100 d-flex flex-column">
+	<div class="stv-details-noten-teacher d-flex flex-column">
+		<!-- TODO(chris): phrase -->
 		<core-filter-cmpt
 			ref="table"
+			title="Teacher Proposals"
 			:tabulator-options="tabulatorOptions"
 			:tabulator-events="tabulatorEvents"
 			table-only

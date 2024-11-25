@@ -113,11 +113,11 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess($grades);
 	}
 
-	public function getRepeaterGrades($prestudent_id)
+	public function getRepeaterGrades($prestudent_id, $all = null)
 	{
 		$this->load->library('AntragLib');
 
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
+		$studiensemester_kurzbz = ($all === null) ? $this->variablelib->getVar('semester_aktuell') : false;
 
 		
 		$result = $this->antraglib->getLvsForPrestudent($prestudent_id, $studiensemester_kurzbz);

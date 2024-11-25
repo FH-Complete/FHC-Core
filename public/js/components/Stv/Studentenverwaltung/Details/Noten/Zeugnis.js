@@ -1,15 +1,14 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import ZeugnisActions from './Zeugnis/Actions.js';
 
-const LOCAL_STORAGE_ID = 'stv_details_noten_zeugnis_2024-01-11_stdsem_all';
-
 export default {
 	components: {
 		CoreFilterCmpt,
 		ZeugnisActions
 	},
 	props: {
-		student: Object
+		student: Object,
+		allSemester: Boolean
 	},
 	data() {
 		return {
@@ -28,7 +27,7 @@ export default {
 				ajaxParams: () => {
 					return {
 						prestudent_id: this.student.prestudent_id,
-						stdsem: this.stdsem
+						stdsem: this.allSemester
 					};
 				},
 				ajaxResponse: (url, params, response) => {
@@ -71,7 +70,7 @@ export default {
 		student(n) {
 			this.$refs.table.reloadTable();
 		},
-		stdsem(n) {
+		allSemester(n) {
 			this.$refs.table.reloadTable();
 		}
 	},
@@ -81,26 +80,13 @@ export default {
 				.stv.grades.updateCertificate(selected)
 				.then(this.$refs.table.reloadTable)
 				.catch(this.$fhcAlert.handleFormValidation);
-		},
-		saveStdsem(event) {
-			window.localStorage.setItem(LOCAL_STORAGE_ID, event.target.value ? 'true' : '');
 		}
-	},
-	created() {
-		const savedPath = window.localStorage.getItem(LOCAL_STORAGE_ID);
-		this.stdsem = savedPath ? '/all' : '';
 	},
 	// TODO(chris): phrasen
 	template: `
 	<div class="stv-details-noten-zeugnis h-100 d-flex flex-column">
 		<div v-if="!validStudent">Kein Student</div>
 		<template v-else>
-			<div class="mb-3">
-				<select class="form-select" v-model="stdsem" @input="saveStdsem">
-					<option value="">Aktuelles Semester</option>
-					<option value="/all">Alle Semester</option>
-				</select>
-			</div>
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"
