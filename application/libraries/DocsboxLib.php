@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022 fhcomplete.net
+/* Copyright (C) 2024 fhcomplete.net
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -32,7 +32,8 @@ class DocsboxLib
 	const STATUS_QUEUED = 'queued'; // Docsbox status when a file has been queued for the conversion
 	const STATUS_STARTED = 'started'; // Docsbox status when a file has started being worked
 	const STATUS_WORKING = 'working'; // Docsbox status when a file is being converted
-	const OUTPUT_FILENAME = 'out.zip.pdf'; // File name used by docsbox to save a converted document
+	const OUTPUT_FILENAME = 'out.zip.%s'; // File name used by docsbox to save a converted document
+	const JSON_FORMATS = '{"formats": ["%s"]}'; // JSON object to be sent to docsbox to specify the file format
 
 	const DEFAULT_FORMAT = 'pdf'; // Default supported format
 
@@ -50,7 +51,7 @@ class DocsboxLib
 		if (($format == null) || ($format != null && ctype_space($format) === true)) $format = self::DEFAULT_FORMAT;
 
 		// Posts the file to docsbox
-		$queueId = self::_postFile($inputFileName);
+		$queueId = self::_postFile($inputFileName, $format);
 		// If an error occurred
 		if ($queueId == null) return self::ERROR;
 
@@ -60,7 +61,7 @@ class DocsboxLib
 		if ($resultUrl == null) return self::ERROR;
 
 		// Download and rename the converted file
-		$downloaded = self::_downloadFile($resultUrl, $outputFileName);
+		$downloaded = self::_downloadFile($resultUrl, $outputFileName, $format);
 		// If an error occurred
 		if (!$downloaded) return self::ERROR;
 
@@ -74,7 +75,7 @@ class DocsboxLib
 	 * Posts the given file to a Docsboxserver and checks the response to return a valid queue id
 	 * On failure it returns a null value
 	 */
-	private static function _postFile($inputFileName)
+	private static function _postFile($inputFileName, $format)
 	{
 		$queueId = null;
 
@@ -82,8 +83,14 @@ class DocsboxLib
 		{
 			// Posts the given file and expects a response in JSON format
 			$postFileResponse = \Httpful\Request::post(DOCSBOX_SERVER.DOCSBOX_PATH_API)
-				->attach(array('file' => $inputFileName))
+				->sendsType(\Httpful\Mime::FORM)
 				->expectsJson()
+				->body(
+					array(
+						'options' => sprintf(self::JSON_FORMATS, $format)
+					)
+				)
+				->attach(array('file' => $inputFileName))
 				->send();
 
 			// Checks that:
@@ -220,7 +227,7 @@ class DocsboxLib
 	/**
 	 * Download the converted file using the provided URL, unzip it, and renames it into the provided file name
 	 */
-	private static function _downloadFile($resultUrl, $outputFileName)
+	private static function _downloadFile($resultUrl, $outputFileName, $format)
 	{
 		$downloaded = false; // pessimistic assumption
 
@@ -252,7 +259,7 @@ class DocsboxLib
 						// Opened, extracted and closed!
 
 						// Rename the extracted file to the given output file name
-						if (rename($outputDirectory.'/'.self::OUTPUT_FILENAME, $outputFileName))
+						if (rename($outputDirectory.'/'.sprintf(self::OUTPUT_FILENAME, $format), $outputFileName))
 						{
 							$downloaded = true;
 						}
@@ -260,7 +267,7 @@ class DocsboxLib
 						{
 							error_log(
 								'An error occurred while renaming the extracted file: '.
-								$outputDirectory.'/'.self::OUTPUT_FILENAME.' into: '.
+								$outputDirectory.'/'.sprintf(self::OUTPUT_FILENAME, $format).' into: '.
 								$outputFileName
 							);
 						}
