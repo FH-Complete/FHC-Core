@@ -102,7 +102,7 @@ const app = Vue.createApp({
     },
     methods: {
         searchfunction: function(searchsettings) {
-            return Vue.$fhcapi.Search.search(searchsettings);
+            return Vue.$fhcapi.search.search(searchsettings);
         },
     }
 });
