@@ -82,6 +82,15 @@ export default {
 		}
 	},
 	computed: {
+		pageHeaderStyle(){
+			return {
+				'z-index': 4,
+				'grid-template-columns': 'repeat(' + this.day.length + ', 1fr)',
+				'grid-template-rows': 1,
+				position: 'sticky',
+				top: 0,
+			}
+		},
 		dayGridStyle(){
 			return {
 				'grid-template-columns': '1 1fr',
@@ -191,6 +200,17 @@ export default {
 				'z-index': 0,
 			}  
 		},
+		eventGridStyle(day, event) {
+			return {
+				'z-index': 1,
+				'grid-column-start': 1 + (event.lane - 1) * day.lanes / event.maxLane,
+				'grid-column-end': 1 + event.lane * day.lanes / event.maxLane,
+				'grid-row-start': this.dateToMinutesOfDay(event.start),
+				'grid-row-end': this.dateToMinutesOfDay(event.end),
+				'background-color': event.orig.color,
+				'--test': this.dateToMinutesOfDay(event.end),
+			}
+		},
 		showModal: function (evt) {
 			let event = evt.orig;
 			this.setSelectedEvent(event);
@@ -258,17 +278,7 @@ export default {
 		dateToMinutesOfDay(day) {
 			return Math.floor(((day.getHours() - 7) * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
 		},
-		eventGridStyle(day,event){
-			return { 
-				'z-index': 1,
-			 	'grid-column-start': 1 + (event.lane - 1) * day.lanes / event.maxLane,
-				'grid-column-end': 1 + event.lane * day.lanes / event.maxLane,
-				'grid-row-start': this.dateToMinutesOfDay(event.start),
-				'grid-row-end': this.dateToMinutesOfDay(event.end),
-				'background-color': event.orig.color,
-				'--test': this.dateToMinutesOfDay(event.end),
-			}
-		}
+		
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-day-page ">
@@ -277,7 +287,7 @@ export default {
 		<div class="row m-0">
 			<div class="col-12 col-xl-6 p-0">
 				<div class="d-flex flex-column">
-				<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="{'z-index':4,'grid-template-columns': 'repeat(' + day.length + ', 1fr)', 'grid-template-rows':1}" style="position:sticky; top:0; " >
+				<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
 					<div type="button" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
 						<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
 						<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
