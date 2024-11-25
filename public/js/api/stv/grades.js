@@ -10,6 +10,9 @@ export default {
 		all = all ? '/all' : '';
 		return this.$fhcApi.get('api/frontend/v1/stv/grades/getTeacherProposal/' + prestudent_id + all);
 	},
+	getRepeaterGrades(prestudent_id) {
+		return this.$fhcApi.get('api/frontend/v1/stv/grades/getRepeaterGrades/' + prestudent_id);
+	},
 	updateCertificate(data) {
 		return this.$fhcApi.post('api/frontend/v1/stv/grades/updateCertificate', data);
 	},
@@ -23,6 +26,17 @@ export default {
 			},
 			{
 				errorHeader: lehrveranstaltung_bezeichnung
+			}
+		);
+	},
+	copyRepeaterGradeToCertificate({studierendenantrag_lehrveranstaltung_id, lv_bezeichnung}) {
+		return this.$fhcApi.post(
+			'api/frontend/v1/stv/grades/copyRepeaterGradeToCertificate',
+			{
+				studierendenantrag_lehrveranstaltung_id
+			},
+			{
+				errorHeader: lv_bezeichnung
 			}
 		);
 	},

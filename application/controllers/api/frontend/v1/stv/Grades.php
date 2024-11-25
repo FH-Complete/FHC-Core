@@ -31,8 +31,10 @@ class Grades extends FHCAPI_Controller
 			'list' => 'student/noten:r',
 			'getCertificate' => 'student/noten:r',
 			'getTeacherProposal' => 'student/noten:r',
+			'getRepeaterGrades' => 'student/noten:r',
 			'updateCertificate' => ['admin:w', 'assistenz:w'],
 			'copyTeacherProposalToCertificate' => 'student/noten:w',
+			'copyRepeaterGradeToCertificate' => 'student/noten:w',
 			'getGradeFromPoints' => 'student/noten:r'
 		]);
 
@@ -105,6 +107,20 @@ class Grades extends FHCAPI_Controller
 
 		
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoten(null, $student_uid, $studiensemester_kurzbz);
+
+		$grades = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($grades);
+	}
+
+	public function getRepeaterGrades($prestudent_id)
+	{
+		$this->load->library('AntragLib');
+
+		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
+
+		
+		$result = $this->antraglib->getLvsForPrestudent($prestudent_id, $studiensemester_kurzbz);
 
 		$grades = $this->getDataOrTerminateWithError($result);
 		
@@ -258,6 +274,79 @@ class Grades extends FHCAPI_Controller
 				);
 				$this->getDataOrTerminateWithError($result);
 			}
+		}
+
+		
+		$this->terminateWithSuccess();
+	}
+
+	public function copyRepeaterGradeToCertificate()
+	{
+		$this->load->library('form_validation');
+	
+		$this->form_validation->set_rules("studierendenantrag_lehrveranstaltung_id", "", "required|integer"); // TODO(chris): phrase
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$id = $this->input->post('studierendenantrag_lehrveranstaltung_id');
+		$authUID = getAuthUID();
+		
+		$this->load->model('education/Studierendenantraglehrveranstaltung_model', 'StudierendenantraglehrveranstaltungModel');
+
+		$this->StudierendenantraglehrveranstaltungModel->addSelect("tbl_studierendenantrag_lehrveranstaltung.*");
+		$this->StudierendenantraglehrveranstaltungModel->addSelect("student_uid");
+		$this->StudierendenantraglehrveranstaltungModel->addJoin("campus.tbl_studierendenantrag", "studierendenantrag_id");
+		$this->StudierendenantraglehrveranstaltungModel->addJoin("public.tbl_student", "prestudent_id", "LEFT");
+		
+		$result = $this->StudierendenantraglehrveranstaltungModel->load($id);
+		$repeaterGrade = $this->getDataOrTerminateWithError($result);
+
+		if (!$repeaterGrade)
+			show_404();
+
+		$repeaterGrade = current($repeaterGrade);
+
+		// NOTE(chris): Stg Permissions
+		// TODO(chris): Are those permissions correct?
+		if (!$this->hasPermissionCopy($repeaterGrade->lehrveranstaltung_id, $repeaterGrade->student_uid))
+			return $this->_outputAuthError([$this->router->method => 'student/noten']);
+
+		$data = [
+			'note' => $repeaterGrade->note,
+			'uebernahmedatum' => date('c'),
+			'benotungsdatum' => $repeaterGrade->insertamum,
+			'bemerkung' => $repeaterGrade->anmerkung
+		];
+
+		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
+
+		$result = $this->ZeugnisnoteModel->load([
+			$repeaterGrade->studiensemester_kurzbz,
+			$repeaterGrade->student_uid,
+			$repeaterGrade->lehrveranstaltung_id
+		]);
+		$certificateGrade = $this->getDataOrTerminateWithError($result);
+
+		if ($certificateGrade) {
+			// NOTE(chris): update
+			$data['updateamum'] = $data['uebernahmedatum'];
+			$data['updatevon'] = $authUID;
+
+			$this->ZeugnisnoteModel->update([
+				$repeaterGrade->studiensemester_kurzbz,
+				$repeaterGrade->student_uid,
+				$repeaterGrade->lehrveranstaltung_id
+			], $data);
+		} else {
+			// NOTE(chris): insert
+			$data['insertamum'] = $data['uebernahmedatum'];
+			$data['insertvon'] = $authUID;
+			$data['lehrveranstaltung_id'] = $repeaterGrade->lehrveranstaltung_id;
+			$data['student_uid'] = $repeaterGrade->student_uid;
+			$data['studiensemester_kurzbz'] = $repeaterGrade->studiensemester_kurzbz;
+			
+			$this->ZeugnisnoteModel->insert($data);
 		}
 
 		
