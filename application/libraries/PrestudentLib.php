@@ -222,18 +222,18 @@ class PrestudentLib
 		$statusgrund_id = null
 	) {
 		$ausbildungssemester_plus = 0;
-		
+
 		if (!$insertvon)
 			$insertvon = getAuthUID();
 
 
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
-		
+
 		if (isError($result))
 			return $result;
-		
+
 		$result = getData($result);
-		
+
 		if (!$result) { // NOTE(chris): no status in target stdsem
 			//NOTE(manu): only valid if nextSemester focus max
 
@@ -304,7 +304,7 @@ class PrestudentLib
 			return $result;
 
 		$result = getData($result);
-		
+
 		if (!$result)
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
 
@@ -612,16 +612,17 @@ class PrestudentLib
 
 
 		// Genererate Personenkennzeichen
-		$personenkennzeichen = $this->_ci->StudentModel->generateMatrikelnummer2(
+		$personenkennzeichen = $this->_ci->StudentModel->generatePersonenkennzeichen(
 			$student_data->studiengang_kz,
 			$studiensemester_kurzbz,
+			$today,
 			$student_data->typ
 		);
 		if (isError($personenkennzeichen))
 			return $personenkennzeichen;
 		$personenkennzeichen = getData($personenkennzeichen);
-		
-		
+
+
 		// Generate UID
 		$uid = $this->_ci->StudentModel->generateUID(
 			$student_data->kurzbz,
@@ -695,7 +696,7 @@ class PrestudentLib
 
 		if (isError($result))
 			return $result;
-		
+
 
 		// Add Student
 		$result = $this->_ci->StudentModel->insert([
@@ -712,14 +713,14 @@ class PrestudentLib
 
 		if (isError($result))
 			return $result;
-		
+
 
 		// Add Lehrverband if it does not exist
 		$result = $this->_ci->LehrverbandModel->load([' ', ' ', $ausbildungssemester, $student_data->studiengang_kz]);
-		
+
 		if (isError($result))
 			return $result;
-		
+
 		if (!hasData($result)) {
 			$result = $this->_ci->LehrverbandModel->insert([
 				'studiengang_kz' => $student_data->studiengang_kz,
@@ -804,7 +805,7 @@ class PrestudentLib
 		if (isError($result))
 			return $result;
 
-		
+
 		// Load Student
 		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 

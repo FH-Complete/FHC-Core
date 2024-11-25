@@ -15,6 +15,8 @@ class Student_model extends DB_Model
 		$this->dbTable = 'public.tbl_student';
 		$this->pk = array('student_uid');
 		$this->hasSequence = false;
+
+		$this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
 	}
 
 	// ****
@@ -62,15 +64,15 @@ class Student_model extends DB_Model
 	 * logic FH Burgenland
 	 *
 	 * TODO(chris): replace function above with this?
-	 * TODO(chris): rename to generatePersonenkennzeichen?
 	 *
 	 * @param integer					$studiengang_kz
 	 * @param string					$studiensemester_kurzbz
+	 * @param string					$beginndatum
 	 * @param string					$typ
 	 *
 	 * @return stdClass
 	 */
-	public function generateMatrikelnummer2($studiengang_kz, $studiensemester_kurzbz, $typ = null)
+	public function generatePersonenkennzeichen($studiengang_kz, $studiensemester_kurzbz, $beginndatum, $typ = null)
 	{
 		$personenkennzeichen = false;
 
@@ -128,7 +130,22 @@ class Student_model extends DB_Model
 					break;
 			}
 		}
-		if($art=='2' || $art=='4')
+
+		// get Bismeldestichtag for the semester
+		$meldestichtagRes = $this->BismeldestichtagModel->getByStudiensemester($studiensemester_kurzbz);
+
+		if (isError($meldestichtagRes))
+			return $meldestichtagRes;
+
+		// if start of study is after Bismeldestichtag, Studienjahr of next semester is used, so 1 doesn't need to be subtracted for SS
+		$afterMeldeStichtag = false;
+		if (hasData($meldestichtagRes))
+		{
+			$meldestichtag = getData($meldestichtagRes)[0]->meldestichtag;
+			$afterMeldeStichtag = isset($beginndatum) && new DateTime($beginndatum) > new DateTime($meldestichtag);
+		}
+
+		if (($art=='2' || $art=='4') && !$afterMeldeStichtag)
 			$jahr = $jahr-1;
 
 		//FH-Burgenland - weil leider die AO Studiengänge aufgeteilt sind
