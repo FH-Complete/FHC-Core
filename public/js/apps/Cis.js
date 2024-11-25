@@ -36,6 +36,12 @@ const app = Vue.createApp({
                     raum: {
                         defaultaction: {
                             type: "link",
+							renderif: function(data) {
+								if(data.content_id === "N/A"){
+									return false;
+								}
+								return true;
+							},
                             action: function(data) { 
 								const link= FHC_JS_DATA_STORAGE_OBJECT.app_root +
 									FHC_JS_DATA_STORAGE_OBJECT.ci_router +
