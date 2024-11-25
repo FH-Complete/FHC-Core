@@ -43,8 +43,14 @@ export default {
 		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'week')"/>
 		<calendar-pane ref="pane" v-slot="slot" @slid="paneChanged">
 			<calendar-day-page :active="slot.active" :year="focusDate.y" :week="focusDate.w+slot.offset" @updateMode="$emit('updateMode', $event)" @page:back="prev" @page:forward="next" @input="selectEvent" >
-				<template #dayPage="{event,day}">
-					<slot name="dayPage" :event="event" :day="day" ></slot>
+				<template #dayPage="{event,day,mobile}">
+					<slot name="dayPage" :event="event" :day="day" :mobile="mobile" ></slot>
+				</template>
+				<template #pageMobilContent="{lvMenu}">
+					<slot name="pageMobilContent" :lvMenu="lvMenu" ></slot>
+				</template>
+				<template #pageMobilContentEmpty>
+					<slot name="pageMobilContentEmpty" ></slot>
 				</template>
 			</calendar-day-page>
 		</calendar-pane>

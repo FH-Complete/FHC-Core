@@ -1,6 +1,4 @@
 import CalendarDate from '../../../composables/CalendarDate.js';
-import LvMenu from "../../../components/Cis/Mylv/LvMenu.js"
-import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
 import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 
 function ggt(m, n) { return n == 0 ? m : ggt(n, m % n); }
@@ -8,8 +6,6 @@ function kgv(m, n) { return (m * n) / ggt(m, n); }
 
 export default {
 	components:{
-		LvMenu,
-		LvInfo,
 		LvModal,
 	},
 	data() {
@@ -211,13 +207,6 @@ export default {
 				'--test': this.dateToMinutesOfDay(event.end),
 			}
 		},
-		showModal: function (evt) {
-			let event = evt.orig;
-			this.setSelectedEvent(event);
-			Vue.nextTick(() => {
-				this.$refs.lvmodal.show();
-			});
-		},
 		eventClick(evt) {
 			let event = evt.orig;
 			this.setSelectedEvent(event);
@@ -282,8 +271,6 @@ export default {
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-day-page ">
-	<!-- lvModal for mobile view -->
-	<lv-modal v-if="selectedEvent" :event="selectedEvent" ref="lvmodal" />
 		<div class="row m-0">
 			<div class="col-12 col-xl-6 p-0">
 				<div class="d-flex flex-column">
@@ -307,16 +294,16 @@ export default {
 							</div>
 							<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle">
 								<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" :class="{'selectedEvent':event.orig == selectedEvent}" class="mx-2 small rounded overflow-hidden " >
-									<!-- desktop version opens the lvMenu next to the calendar -->
+									<!-- desktop version of the page template, parent receives slotProp mobile = false -->
 									<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
-										<slot  name="dayPage" :event="event" :day="day">
-											<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+										<slot  name="dayPage" :event="event" :day="day" :mobile="false">
+											<p>this is a slot placeholder</p>
 										</slot>
 									</div>
-									<!-- mobile version opens the lvModal in a modal -->
-									<div class="d-block d-xl-none h-100" @click.prevent="showModal(event)">
-										<slot  name="dayPage" :event="event" :day="day">
-											<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+									<!-- mobile version of the page template, parent receives slotProp mobile = true -->
+									<div class="d-block d-xl-none h-100" @click.prevent="eventClick(event)">
+										<slot  name="dayPage" :event="event" :day="day" :mobile="true">
+											<p>this is a slot placeholder</p>
 										</slot>
 									</div>
 
@@ -328,18 +315,17 @@ export default {
 			</div>
 			</div>
 			<div class="d-none d-xl-block col-xl-6 p-0">
-				<div class="p-5	 sticky-top d-flex justify-content-center align-items-center flex-column">
+				<div style="z-index:0" class="p-5 sticky-top d-flex justify-content-center align-items-center flex-column">
 					<div style="max-height: calc(var(--fhc-calendar-pane-height) - 100px); overflow-y:auto;" class="w-100">
 						<template v-if="selectedEvent && lvMenu">
-							<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
-							<div class="w-100">
-								<lv-info  :event="selectedEvent" />
-							</div>
-							<h3 >Lehrveranstaltungs Menu</h3>
-							<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-show="lvMenu" :menu="lvMenu" />
+							<slot name="pageMobilContent" :lvMenu="lvMenu" >
+								<p>this is a slot placeholder</p>
+							</slot>
 						</template>
 						<template v-else-if="noEventsCondition">
-							<h3>Keine Lehrveranstaltungen</h3>
+							<slot name="pageMobilContentEmpty" >
+								<h3>This is an slot placeholder</h3>
+							</slot>
 						</template>
 						<template v-else>
 							<div class="p-4 d-flex w-100 justify-content-center align-items-center">
