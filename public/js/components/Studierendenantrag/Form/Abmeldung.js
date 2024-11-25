@@ -77,6 +77,7 @@ export default {
 					this.formData.grund
 				)
 				.then(result => {
+
 					if (result.data === true)
 						document.location += "";
 

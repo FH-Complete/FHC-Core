@@ -15,7 +15,6 @@ class PlausicheckDefinitionLib
 		'AktSemesterNull' => 'AktSemesterNull',
 		'AktiverStudentOhneStatus' => 'AktiverStudentOhneStatus',
 		'AusbildungssemPrestudentUngleichAusbildungssemStatus' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
-		'BewerberNichtZumRtAngetreten' => 'BewerberNichtZumRtAngetreten',
 		'DatumAbschlusspruefungFehlt' => 'DatumAbschlusspruefungFehlt',
 		'DatumSponsionFehlt' => 'DatumSponsionFehlt',
 		'DatumStudiensemesterFalscheReihenfolge' => 'DatumStudiensemesterFalscheReihenfolge',
@@ -36,6 +35,7 @@ class PlausicheckDefinitionLib
 		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher',
 		'DualesStudiumOhneMarkierung' => 'DualesStudiumOhneMarkierung'
 		//'StudienplanUngueltig' => 'StudienplanUngueltig'
+		//'BewerberNichtZumRtAngetreten' => 'BewerberNichtZumRtAngetreten'
 	);
 
 	/**
