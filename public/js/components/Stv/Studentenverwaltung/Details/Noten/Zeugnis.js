@@ -87,8 +87,10 @@ export default {
 	<div class="stv-details-noten-zeugnis h-100 d-flex flex-column">
 		<div v-if="!validStudent">Kein Student</div>
 		<template v-else>
+			<!-- TODO(chris): phrase -->
 			<core-filter-cmpt
 				ref="table"
+				title="Certificate"
 				:tabulator-options="tabulatorOptions"
 				:tabulator-events="tabulatorEvents"
 				table-only
