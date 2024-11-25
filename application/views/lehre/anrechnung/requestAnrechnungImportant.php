@@ -1,70 +1,71 @@
-<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-    <!--    Beantragung: Fristen panel -->
-    <div class="panel panel-info">
-        <div class="panel-heading" role="tab" id="headingOne">
-            <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
-                   aria-expanded="true" aria-controls="collapseOne">
-                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
-					<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoFristenTitle'); ?>
-                </a>
-            </h4>
+
+
+    <div class="accordion" id="requestAnrechnungImportant">
+       <!--    Beantragung: Fristen panel -->
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+        <div  class="bg-info-subtle accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#Beantragung" aria-expanded="true" aria-controls="Beantragung">
+        <div class="d-flex">
+        
+        <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
+				<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoFristenTitle'); ?>
+        
         </div>
-        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-            <div class="panel-body">
-				<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoFristenBody'); ?>
-            </div>
         </div>
+    </h2>
+    <div id="Beantragung" class="accordion-collapse collapse show" data-bs-parent="#requestAnrechnungImportant">
+      <div class="accordion-body">
+      <?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoFristenBody'); ?>
+      </div>
     </div>
-    <!--    Referenzbeispiele ECTS Berechnung panel -->
-    <div class="panel panel-info">
-        <div class="panel-heading" role="tab" id="headingBegruendung">
-            <h4 class="panel-title">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseBegruendung"
-                   aria-expanded="false" aria-controls="collapseBegruendung">
-                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
+  </div>
+  <!--    Referenzbeispiele ECTS Berechnung panel -->
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+        <div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#Referenzbeispiele" aria-expanded="false" aria-controls="Referenzbeispiele">
+        <div class="d-flex">
+        <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
 					<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoEctsBerechnungTitle'); ?>
-                </a>
-            </h4>
         </div>
-        <div id="collapseBegruendung" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingBegruendung">
-            <div class="panel-body">
-				<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoEctsBerechnungBody'); ?>
-            </div>
         </div>
+    </h2>
+    <div id="Referenzbeispiele" class="accordion-collapse collapse" data-bs-parent="#requestAnrechnungImportant">
+      <div class="accordion-body">
+      <?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoEctsBerechnungBody'); ?>
+      </div>
     </div>
-    <!--    Nachweisdokumente: Voraussetzung panel -->
-    <div class="panel panel-info">
-        <div class="panel-heading" role="tab" id="headingTwo">
-            <h4 class="panel-title">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"
-                   aria-expanded="false" aria-controls="collapseTwo">
-                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
+  </div>
+  <!--    Nachweisdokumente: Voraussetzung panel -->
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+    <div class="d-flex">
+        <div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#Nachweisdokumente" aria-expanded="false" aria-controls="Nachweisdokumente">
+        <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
 					<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoNachweisdokumenteTitle'); ?>
-                </a>
-            </h4>
         </div>
-        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-            <div class="panel-body">
-				<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoNachweisdokumenteBody'); ?>
-            </div>
         </div>
+    </h2>
+    <div id="Nachweisdokumente" class="accordion-collapse collapse" data-bs-parent="#requestAnrechnungImportant">
+      <div class="accordion-body">
+      <?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoNachweisdokumenteBody'); ?>
+      </div>
     </div>
+  </div>
     <!--    Herkunft der Kenntnisse: Angaben panel -->
-    <div class="panel panel-info">
-        <div class="panel-heading" role="tab" id="headingThree">
-            <h4 class="panel-title">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree"
-                   aria-expanded="false" aria-controls="collapseThree">
-                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+        <div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#HerkunftKenntnisse" aria-expanded="false" aria-controls="HerkunftKenntnisse">
+        <div class="d-flex">
+        <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
 					<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoHerkunftKenntnisseTitle'); ?>
-                </a>
-            </h4>
         </div>
-        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-            <div class="panel-body">
-				<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoHerkunftKenntnisseBody'); ?>
-            </div>
         </div>
+    </h2>
+    <div id="HerkunftKenntnisse" class="accordion-collapse collapse" data-bs-parent="#requestAnrechnungImportant">
+      <div class="accordion-body">
+      <?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoHerkunftKenntnisseBody'); ?>
+      </div>
     </div>
+  </div>
+
 </div>
