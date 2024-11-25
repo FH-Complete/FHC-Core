@@ -151,7 +151,12 @@ class Stundenplan extends FHCAPI_Controller
 		// getting the student_lehrverbaende of the student in the different studiensemester
 		$student_lehrverband = $this->fetchStudentlehrverbandFromStudiensemester($semester_range);
 		
-		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery($start_date, $end_date, $semester_range, $benutzer_gruppen, $student_lehrverband));
+		$stundenplan_query = $this->StundenplanModel->getStundenplanQuery($start_date, $end_date, $semester_range, $benutzer_gruppen, $student_lehrverband);
+		if(!$stundenplan_query)
+		{
+			$this->terminateWithSuccess([]);
+		}
+		$stundenplan_data = $this->StundenplanModel->stundenplanGruppierung($stundenplan_query);
 		$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data) ?? [];
 
 		$this->expand_object_information($stundenplan_data);
