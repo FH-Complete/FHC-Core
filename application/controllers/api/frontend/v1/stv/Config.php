@@ -93,7 +93,8 @@ class Config extends FHCAPI_Controller
 		];
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
-			'component' => './Stv/Studentenverwaltung/Details/Noten.js'
+			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
+			'showOnlyWithUid' => true
 		];
 		
 

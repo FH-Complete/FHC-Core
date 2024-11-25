@@ -12,7 +12,6 @@ export default {
 	},
 	data() {
 		return {
-			validStudent: true,
 			tabulatorEvents: [],
 			stdsem: ''
 		};
@@ -31,10 +30,6 @@ export default {
 					};
 				},
 				ajaxResponse: (url, params, response) => {
-					if (!response.data)
-						this.validStudent = false;
-					else
-						this.validStudent = true;
 					return response.data || [];
 				},
 				columns: [
@@ -85,22 +80,19 @@ export default {
 	// TODO(chris): phrasen
 	template: `
 	<div class="stv-details-noten-zeugnis h-100 d-flex flex-column">
-		<div v-if="!validStudent">Kein Student</div>
-		<template v-else>
-			<!-- TODO(chris): phrase -->
-			<core-filter-cmpt
-				ref="table"
-				title="Certificate"
-				:tabulator-options="tabulatorOptions"
-				:tabulator-events="tabulatorEvents"
-				table-only
-				:side-menu="false"
-				reload
-				>
-				<template #actions="{selected}">
-					<zeugnis-actions :selected="selected" @set-grades="setGrades"></zeugnis-actions>
-				</template>
-			</core-filter-cmpt>
-		</template>
+		<!-- TODO(chris): phrase -->
+		<core-filter-cmpt
+			ref="table"
+			title="Certificate"
+			:tabulator-options="tabulatorOptions"
+			:tabulator-events="tabulatorEvents"
+			table-only
+			:side-menu="false"
+			reload
+			>
+			<template #actions="{selected}">
+				<zeugnis-actions :selected="selected" @set-grades="setGrades"></zeugnis-actions>
+			</template>
+		</core-filter-cmpt>
 	</div>`
 };
