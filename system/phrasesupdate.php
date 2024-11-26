@@ -28432,7 +28432,27 @@ array(
 				'description' => '',
 				'insertvon' => 'system'
 			)
-		)
+		),
+		array(
+			'app' => 'anwesenheiten',
+			'category' => 'global',
+			'phrase' => 'tooltipStudentTestphase',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Hinweis: Es handelt sich um einen nicht repräsentativen Testbetrieb und die Ergebnisse werden nicht für die Benotung herangezogen.',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Note: This is a non-representative test operation and the results are not used for grading.',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
 	),
 	//
 	// DIGITALE ANWESENHEITEN PHRASEN END
