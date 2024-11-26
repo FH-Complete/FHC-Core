@@ -130,7 +130,7 @@ const app = Vue.createApp({
 			</div>
 		</template>
 		<template #dayPage="{event,day,mobile}">
-			<div @click="mobile? showModal(event?.orig):null" type="button" class="fhc-entry border border-secondary border row h-100 justify-content-center align-items-center text-center">
+			<div @click="mobile? showModal(event?.orig):null" type="button" class="fhc-entry border border-secondary border row m-0 h-100 justify-content-center align-items-center text-center">
 				<div class="col ">
 					<p>Lehrveranstaltung:</p>
 					<p class="m-0">{{event?.orig.topic}}</p>
