@@ -1,10 +1,12 @@
 import CisMenuEntry from "./Menu/Entry.js";
 import FhcSearchbar from "../searchbar/searchbar.js";
+import CisSprachen from "./Sprachen.js"
 
 export default {
     components: {
         CisMenuEntry,
-        FhcSearchbar
+        FhcSearchbar,
+		CisSprachen,
     },
     props: {
 		menu: Array,
@@ -151,6 +153,7 @@ export default {
 				</button>
 			</div>
 			<div class="offcanvas-body p-0">
+				<cis-sprachen :sprachenChangeFunction="handleChangeLanguage" ></cis-sprachen>
 				<div id="nav-main-menu" class="collapse collapse-horizontal show">
 					<div>
 						<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
