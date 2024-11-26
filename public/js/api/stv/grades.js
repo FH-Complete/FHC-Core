@@ -14,8 +14,19 @@ export default {
 		all = all ? '/all' : '';
 		return this.$fhcApi.get('api/frontend/v1/stv/grades/getRepeaterGrades/' + prestudent_id + all);
 	},
-	updateCertificate(data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/grades/updateCertificate', data);
+	updateCertificate({lehrveranstaltung_id, student_uid, studiensemester_kurzbz, note, lehrveranstaltung_bezeichnung}) {
+		return this.$fhcApi.post(
+			'api/frontend/v1/stv/grades/updateCertificate',
+			{
+				lehrveranstaltung_id,
+				student_uid,
+				studiensemester_kurzbz,
+				note
+			},
+			{
+				errorHeader: lehrveranstaltung_bezeichnung
+			}
+		);
 	},
 	copyTeacherProposalToCertificate({lehrveranstaltung_id, student_uid, studiensemester_kurzbz, lehrveranstaltung_bezeichnung}) {
 		return this.$fhcApi.post(

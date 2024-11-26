@@ -129,59 +129,41 @@ class Grades extends FHCAPI_Controller
 
 	public function updateCertificate()
 	{
-		$this->load->model('crm/Student_model', 'StudentModel');
-		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
-		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
-		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
-
 		$this->load->library('form_validation');
 
-		if (empty($_POST) || !is_array(current($_POST))) {
-			$result = $this->hasPermissionUpdate($this->input->post('lehrveranstaltung_id'), $this->input->post('student_uid'));
-			if (isError($result)) {
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_AUTH, REST_Controller::HTTP_FORBIDDEN);
-			}
+		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrveranstaltung'), "required|integer");
+		$this->form_validation->set_rules("student_uid", $this->p->t('person', 'student'), "required");
+		$this->form_validation->set_rules("studiensemester_kurzbz", $this->p->t('lehre', 'studiensemester'), "required");
+		$this->form_validation->set_rules('note', $this->p->t('lehre', 'note'), 'required|numeric');
 
-			$this->form_validation->set_rules('lehrveranstaltung_id', 'Lehrverantaltung ID', 'required|numeric');
-			$this->form_validation->set_rules('student_uid', 'Student UID', 'required');
-			$this->form_validation->set_rules('studiensemester_kurzbz', 'Studiensemester Kurzbezeichnung', 'required');
-			$this->form_validation->set_rules('note', 'Note', 'required|numeric');
-			$post = [$_POST];
-		} else {
-			foreach ($_POST as $i => $data) {
-				$lvid = isset($data['lehrveranstaltung_id']) ? $data['lehrveranstaltung_id'] : null;
-				$uid = isset($data['student_uid']) ? $data['student_uid'] : null;
-				$result = $this->hasPermissionUpdate($lvid, $uid);
-				if (isError($result)) {
-					$this->terminateWithError(getError($result), self::ERROR_TYPE_AUTH, REST_Controller::HTTP_FORBIDDEN);
-				}
-
-				$this->form_validation->set_rules($i . '[lehrveranstaltung_id]', '#' . $i . ' Lehrverantaltung ID', 'required|numeric');
-				$this->form_validation->set_rules($i . '[student_uid]', '#' . $i . ' Student UID', 'required');
-				$this->form_validation->set_rules($i . '[studiensemester_kurzbz]', '#' . $i . ' Studiensemester Kurzbezeichnung', 'required');
-				$this->form_validation->set_rules($i . '[note]', '#' . $i . ' Note', 'required|numeric');
-			}
-			$post = $_POST;
-		}
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		$this->ZeugnisnoteModel->db->trans_start();
+
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		$student_uid = $this->input->post('student_uid');
+		$lehrveranstaltung_id = $this->input->post('lehrveranstaltung_id');
+		$note = $this->input->post('note');
 		$authUID = getAuthUID();
+		$now = date('c');
 
-		foreach ($post as $i => $data) {
-			$note = $data['note'];
-			unset($data['note']);
-			$result = $this->ZeugnisnoteModel->update($data, [
-				'note' => $note,
-				'benotungsdatum' => date('c'),
-				'updateamum' => date('c'),
-				'updatevon' => $authUID
-			]);
-			$this->getDataOrTerminateWithError($result);
-		}
+		// NOTE(chris): Stg Permissions
+		if (!$this->hasPermissionUpdate($lehrveranstaltung_id, $student_uid))
+			return $this->_outputAuthError([$this->router->method => ['admin', 'assistenz']]);
 
-		$this->ZeugnisnoteModel->db->trans_complete();
+		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
+
+		$result = $this->ZeugnisnoteModel->update([
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'student_uid' => $student_uid,
+			'lehrveranstaltung_id' => $lehrveranstaltung_id
+		], [
+			'note' => $note,
+			'benotungsdatum' => $now,
+			'updateamum' => $now,
+			'updatevon' => $authUID
+		]);
+		$this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess(true);
 	}
@@ -190,7 +172,7 @@ class Grades extends FHCAPI_Controller
 	{
 		$this->load->library('form_validation');
 	
-		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrverantaltung'), "required|integer");
+		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrveranstaltung'), "required|integer");
 		$this->form_validation->set_rules("student_uid", $this->p->t('person', 'student'), "required");
 		$this->form_validation->set_rules("studiensemester_kurzbz", $this->p->t('lehre', 'studiensemester'), "required");
 
@@ -209,9 +191,9 @@ class Grades extends FHCAPI_Controller
 		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
 
 		$result = $this->LvgesamtnoteModel->load([
-			$student_uid,
-			$studiensemester_kurzbz,
-			$lehrveranstaltung_id
+			'student_uid' => $student_uid,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'lehrveranstaltung_id' => $lehrveranstaltung_id
 		]);
 		$teacherGrade = $this->getDataOrTerminateWithError($result);
 
@@ -232,9 +214,9 @@ class Grades extends FHCAPI_Controller
 
 		$this->ZeugnisnoteModel->addJoin('lehre.tbl_note n', 'note');
 		$result = $this->ZeugnisnoteModel->load([
-			$studiensemester_kurzbz,
-			$student_uid,
-			$lehrveranstaltung_id
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'student_uid' => $student_uid,
+			'lehrveranstaltung_id' => $lehrveranstaltung_id
 		]);
 		$certificateGrade = $this->getDataOrTerminateWithError($result);
 
@@ -249,9 +231,9 @@ class Grades extends FHCAPI_Controller
 			$data['updatevon'] = $authUID;
 
 			$this->ZeugnisnoteModel->update([
-				$studiensemester_kurzbz,
-				$student_uid,
-				$lehrveranstaltung_id
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'student_uid' => $student_uid,
+				'lehrveranstaltung_id' => $lehrveranstaltung_id
 			], $data);
 		} else {
 			// NOTE(chris): insert
@@ -277,7 +259,7 @@ class Grades extends FHCAPI_Controller
 		}
 
 		
-		$this->terminateWithSuccess();
+		$this->terminateWithSuccess(true);
 	}
 
 	public function copyRepeaterGradeToCertificate()
@@ -350,14 +332,14 @@ class Grades extends FHCAPI_Controller
 		}
 
 		
-		$this->terminateWithSuccess();
+		$this->terminateWithSuccess(true);
 	}
 
 	public function getGradeFromPoints()
 	{
 		$this->load->library('form_validation');
 	
-		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrverantaltung'), "required|integer");
+		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrveranstaltung'), "required|integer");
 		$this->form_validation->set_rules("points", "Punkte", "required|numeric"); // TODO(chris): phrase
 
 		if (!$this->form_validation->run())
@@ -442,39 +424,47 @@ class Grades extends FHCAPI_Controller
 
 	protected function hasPermissionUpdate($lehrveranstaltung_id, $student_uid)
 	{
-		// TODO(chris): error phrases!
 		if ($lehrveranstaltung_id === null || $student_uid === null)
-			return success();
+			return true;
+
+		$this->load->model('crm/Student_model', 'StudentModel');
+		
 		$result = $this->StudentModel->load([$student_uid]);
-		if (isError($result))
-			return $result;
-		if (!hasData($result))
-			return error('Fehler beim Ermitteln des Studenten');
+		if (isError($result) || !hasData($result))
+			return false;
+
 		$student = current(getData($result));
 
 		if ($this->permissionlib->isBerechtigt('admin', 'suid', $student->studiengang_kz))
-			return success();
+			return true;
 		if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $student->studiengang_kz))
-			return success();
+			return true;
+
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 
 		$result = $this->StudienplanModel->getAllOesForLv($lehrveranstaltung_id);
 		if (isError($result))
-			return $result;
+			return false;
+
 		$oes = getData($result) ?: [];
+
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+
 		$result = $this->LehrveranstaltungModel->getStg($lehrveranstaltung_id);
 		if (isError($result))
-			return $result;
+			return false;
+
 		if (hasData($result))
 			$oes[] = current(getData($result));
 
 		foreach ($oes as $oe) {
 			if ($this->permissionlib->isBerechtigt('admin', 'suid', $oe->oe_kurzbz))
-				return success();
+				return true;
 			if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $oe->oe_kurzbz))
-				return success();
+				return true;
 		}
 
-		return error('Forbidden');
+		return false;
 	}
 
 	protected function hasPermissionCopy($lehrveranstaltung_id, $student_uid)

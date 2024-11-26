@@ -16,13 +16,13 @@ export default {
 				if (!this.selected.length)
 					return '';
 				if (this.selected.length == 1)
-					return this.selected[0].note;
+					return this.selected.find(Boolean).note;
 				const grades = Object.keys(this.selected.reduce((a,c) => {
 					a[c.note] = true;
 					return a;
 				}, {}));
 				if (grades.length == 1)
-					return grades[0];
+					return grades.find(Boolean);
 				return '';
 			},
 			set(note) {
@@ -41,6 +41,7 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
+	// TODO(chris): phrases
 	template: `
 	<div class="stv-details-noten-zeugnis-actions">
 		<select class="form-select" v-model="current" :disabled="!selected.length">

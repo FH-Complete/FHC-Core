@@ -55,7 +55,7 @@ export default {
 				],
 				layout: 'fitDataStretch',
 				height: '100%',
-				selectable: true,
+				selectable: 1,
 				selectableRangeMode: 'click',
 				persistenceID: 'stv-details-noten-zeugnis'
 			};
@@ -72,7 +72,7 @@ export default {
 	methods: {
 		setGrades(selected) {
 			this.$fhcApi.factory
-				.stv.grades.updateCertificate(selected)
+				.stv.grades.updateCertificate(selected.find(Boolean))
 				.then(this.$refs.table.reloadTable)
 				.catch(this.$fhcAlert.handleFormValidation);
 		}
