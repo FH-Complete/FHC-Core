@@ -32,7 +32,6 @@ class DocsboxLib
 	const STATUS_QUEUED = 'queued'; // Docsbox status when a file has been queued for the conversion
 	const STATUS_STARTED = 'started'; // Docsbox status when a file has started being worked
 	const STATUS_WORKING = 'working'; // Docsbox status when a file is being converted
-	const OUTPUT_FILENAME = 'out.zip.%s'; // File name used by docsbox to save a converted document
 	const JSON_FORMATS = '{"formats": ["%s"]}'; // JSON object to be sent to docsbox to specify the file format
 
 	const DEFAULT_FORMAT = 'pdf'; // Default supported format
@@ -61,7 +60,7 @@ class DocsboxLib
 		if ($resultUrl == null) return self::ERROR;
 
 		// Download and rename the converted file
-		$downloaded = self::_downloadFile($resultUrl, $outputFileName, $format);
+		$downloaded = self::_downloadFile($inputFileName, $resultUrl, $outputFileName, $format);
 		// If an error occurred
 		if (!$downloaded) return self::ERROR;
 
@@ -227,7 +226,7 @@ class DocsboxLib
 	/**
 	 * Download the converted file using the provided URL, unzip it, and renames it into the provided file name
 	 */
-	private static function _downloadFile($resultUrl, $outputFileName, $format)
+	private static function _downloadFile($inputFileName, $resultUrl, $outputFileName, $format)
 	{
 		$downloaded = false; // pessimistic assumption
 
@@ -259,7 +258,7 @@ class DocsboxLib
 						// Opened, extracted and closed!
 
 						// Rename the extracted file to the given output file name
-						if (rename($outputDirectory.'/'.sprintf(self::OUTPUT_FILENAME, $format), $outputFileName))
+						if (@rename($inputFileName.'.'.$format, $outputFileName))
 						{
 							$downloaded = true;
 						}
@@ -267,7 +266,7 @@ class DocsboxLib
 						{
 							error_log(
 								'An error occurred while renaming the extracted file: '.
-								$outputDirectory.'/'.sprintf(self::OUTPUT_FILENAME, $format).' into: '.
+								$inputFileName.'.'.$format.' into: '.
 								$outputFileName
 							);
 						}
