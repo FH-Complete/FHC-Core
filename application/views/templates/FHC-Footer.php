@@ -99,7 +99,8 @@
 
 	// Tabulator 5 JS
 	if ($tabulator5 === true) generateJSsInclude('vendor/olifolkerd/tabulator5/dist/js/tabulator.min.js');
-
+	// Tabulator 5 JQuery
+	if ($tabulator5JQuery === true) generateJSsInclude('public/js/tabulator/jquery_wrapper.js');
 	// Tinymce 3 JS
 	if ($tinymce3 === true) generateJSsInclude('include/tiny_mce/tiny_mce.js');
 
@@ -127,6 +128,11 @@
 		generateJSsInclude('vendor/npm-asset/primevue/autocomplete/autocomplete.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/overlaypanel/overlaypanel.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/datatable/datatable.min.js');
+        // TODO check ob notwendig
+		generateJSsInclude('vendor/npm-asset/primevue/toast/toast.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/toastservice/toastservice.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/confirmdialog/confirmdialog.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/confirmationservice/confirmationservice.min.js');
 	}
 
 	// --------------------------------------------------------------------------------------------------------
@@ -172,4 +178,3 @@
 </html>
 
 <!-- Footer end -->
-

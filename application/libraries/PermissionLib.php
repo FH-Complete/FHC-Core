@@ -96,6 +96,33 @@ class PermissionLib
 	}
 
 	/**
+	 * Prueft ob die Berechtigung zumindest fuer eine der angegebenen OE vorhanden ist.
+	 * @param $berechtigung_kurzbz
+	 * @param $oe_kurzbz
+	 * @param $art
+	 * @param $kostenstelle_id
+	 * @return boolean
+	 */
+	public function isBerechtigtMultipleOe($berechtigung_kurzbz, $oe_kurzbz, $art=null, $kostenstelle_id=null)
+	{
+		$results = array();
+
+		foreach($oe_kurzbz as $value)
+		{
+			$results[] = $this->isBerechtigt($berechtigung_kurzbz, $value, $art, $kostenstelle_id);
+		}
+
+		if(!in_array(true, $results))
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	/**
 	 * Checks if the caller is allowed to access to this content with the given permissions
 	 * - if it's called from command line than it's trusted
 	 * - checks if the parameter $requiredPermissions is set, is an array and contains at least one element
@@ -147,19 +174,7 @@ class PermissionLib
 							if (strpos($permissions[$pCounter], PermissionLib::PERMISSION_SEPARATOR) !== false)
 							{
 								// Retrieves permission and required access type from the $requiredPermissions array
-								list($permission, $requiredAccessType) = explode(PermissionLib::PERMISSION_SEPARATOR, $permissions[$pCounter]);
-
-								$accessType = '';
-
-								// Set the access type
-								if (strpos($requiredAccessType, PermissionLib::READ_RIGHT) !== false)
-								{
-									$accessType = PermissionLib::SELECT_RIGHT; // S
-								}
-								if (strpos($requiredAccessType, PermissionLib::WRITE_RIGHT) !== false)
-								{
-									$accessType .= PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT; // UID
-								}
+								list($permission, $accessType) = $this->convertAccessType($permissions[$pCounter]);
 
 								if (!isEmptyString($accessType)) // if compliant
 								{
@@ -207,6 +222,24 @@ class PermissionLib
 		}
 
 		return $checkPermissions;
+	}
+
+	/**
+	 * Retrieves permission and required access type from the newly formatted permission string
+	 *
+	 * @param string $permission
+	 *
+	 * @return array
+	 */
+	public function convertAccessType($permission)
+	{
+		list($permission, $reqAccessType) = explode(PermissionLib::PERMISSION_SEPARATOR, $permission);
+		$accessType = '';
+		if (strpos($reqAccessType, PermissionLib::READ_RIGHT) !== false)
+			$accessType = PermissionLib::SELECT_RIGHT;
+		if (strpos($reqAccessType, PermissionLib::WRITE_RIGHT) !== false)
+			$accessType = PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT;
+		return [$permission, $accessType];
 	}
 
 	/**

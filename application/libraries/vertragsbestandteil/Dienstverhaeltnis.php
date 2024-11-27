@@ -29,6 +29,9 @@ class Dienstverhaeltnis extends AbstractBestandteil {
 	protected $updateamum;
 	protected $updatevon;
 
+	protected $dvendegrund_kurzbz;
+	protected $dvendegrund_anmerkung;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -49,6 +52,8 @@ class Dienstverhaeltnis extends AbstractBestandteil {
 		isset($data->insertvon) && $this->setInsertvon($data->insertvon);
 		isset($data->updateamum) && $this->setUpdateamum($data->updateamum);
 		isset($data->updatevon) && $this->setUpdatevon($data->updatevon);
+		isset($data->dvendegrund_kurzbz) && $this->setDvendegrund_kurzbz($data->dvendegrund_kurzbz);
+		isset($data->dvendegrund_anmerkung) && $this->setDvendegrund_anmerkung($data->dvendegrund_anmerkung);
 		$this->fromdb = false;
 	}
 	
@@ -64,7 +69,9 @@ class Dienstverhaeltnis extends AbstractBestandteil {
 			'insertamum' => $this->getInsertamum(),
 			'insertvon' => $this->getInsertvon(),
 			'updateamum' => $this->getUpdateamum(),
-			'updatevon' => $this->getUpdatevon()
+			'updatevon' => $this->getUpdatevon(), 
+			'dvendegrund_kurzbz' => $this->getDvendegrund_kurzbz(), 
+			'dvendegrund_anmerkung' => $this->getDvendegrund_anmerkung()
 		);
 		
 		$tmp = array_filter($tmp, function($k) {
@@ -137,6 +144,16 @@ EOTXT;
 	public function getUpdatevon()
 	{
 		return $this->updatevon;
+	}
+
+	public function getDvendegrund_kurzbz()
+	{
+	    return $this->dvendegrund_kurzbz;
+	}
+
+	public function getDvendegrund_anmerkung()
+	{
+	    return $this->dvendegrund_anmerkung;
 	}
 
 	public function setDienstverhaeltnis_id($dienstverhaeltnis_id)
@@ -214,6 +231,20 @@ EOTXT;
 		return $this;
 	}
 	
+	public function setDvendegrund_kurzbz($dvendegrund_kurzbz)
+	{
+	    $this->markDirty('dvendegrund_kurzbz', $this->dvendegrund_kurzbz, $dvendegrund_kurzbz);
+	    $this->dvendegrund_kurzbz = $dvendegrund_kurzbz;
+	    return $this;
+	}
+
+	public function setDvendegrund_anmerkung($dvendegrund_anmerkung)
+	{
+	    $this->markDirty('dvendegrund_anmerkung', $this->dvendegrund_anmerkung, $dvendegrund_anmerkung);
+	    $this->dvendegrund_anmerkung = $dvendegrund_anmerkung;
+	    return $this;
+	}
+
 	public function validate() {		
 		//do Validation here
 		$ci = get_instance();

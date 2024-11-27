@@ -343,7 +343,7 @@ if ($xmlformat=='rdf')
 	$rdf_url='http://www.technikum-wien.at/abschlusspruefung';
 	function draw_content($row)
 	{
-		global $rdf_url, $datum_obj;
+		global $rdf_url, $datum_obj, $abschlussbeurteilung_arr;
 		$vorsitz = '';
 		$pruefer1= '';
 		$pruefer2= '';
@@ -380,6 +380,7 @@ if ($xmlformat=='rdf')
 				<ABSCHLUSSPRUEFUNG:pruefer3><![CDATA['.$row->pruefer3.']]></ABSCHLUSSPRUEFUNG:pruefer3>
 				<ABSCHLUSSPRUEFUNG:pruefer3_nachname><![CDATA['.$pruefer3.']]></ABSCHLUSSPRUEFUNG:pruefer3_nachname>
 				<ABSCHLUSSPRUEFUNG:abschlussbeurteilung_kurzbz><![CDATA['.$row->abschlussbeurteilung_kurzbz.']]></ABSCHLUSSPRUEFUNG:abschlussbeurteilung_kurzbz>
+				<ABSCHLUSSPRUEFUNG:abschlussbeurteilung_bezeichnung><![CDATA['.($row->abschlussbeurteilung_kurzbz!=''?$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz]:'').']]></ABSCHLUSSPRUEFUNG:abschlussbeurteilung_bezeichnung>
 				<ABSCHLUSSPRUEFUNG:notekommpruef><![CDATA['.$row->note.']]></ABSCHLUSSPRUEFUNG:notekommpruef>
 				<ABSCHLUSSPRUEFUNG:akadgrad_id><![CDATA['.$row->akadgrad_id.']]></ABSCHLUSSPRUEFUNG:akadgrad_id>
 				<ABSCHLUSSPRUEFUNG:datum><![CDATA['.$datum_obj->convertISODate($row->datum).']]></ABSCHLUSSPRUEFUNG:datum>

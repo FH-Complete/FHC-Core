@@ -41,6 +41,7 @@
 			{
 				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/fontawesome.min.css');
 				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/solid.min.css');
+				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/regular.min.css'); // NOTE(chris): for favorites in stv
 				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/brands.min.css');
 			}
 
@@ -116,7 +117,7 @@
 			if ($widgets === true) generateCSSsInclude('public/css/Widgets.css');
 
 			// CIS
-			if ($cis === true) generateCSSsInclude('public/css/cis_bs5.css');
+			if ($cis === true) generateCSSsInclude(defined('CIS4') ? 'public/css/cis4.css' : 'public/css/cis_bs5.css');
 
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS

@@ -20,11 +20,37 @@ import phrasen from "./phrasen.js";
 import navigation from "./navigation.js";
 import filter from "./filter.js";
 import studstatus from "./studstatus.js";
+import profil from "./profil.js";
+import profilUpdate from "./profilUpdate.js";
+import stundenplan from "./stundenplan.js";
+import bookmark from "./bookmark.js";
+import stv from "./stv.js";
+import notiz from "./notiz.js";
+import betriebsmittel from "./betriebsmittel.js";
+import checkperson from "./checkperson.js";
+import ampeln from "./ampeln.js";
+import ort from "./ort.js";
+import cms from "./cms.js";
+import lehre from "./lehre.js";
+import addons from "./addons.js";
 
 export default {
     search,
     phrasen,
     navigation,
     filter,
-    studstatus
+    studstatus,
+    profil,
+    profilUpdate,
+    stundenplan,
+    bookmark,
+    stv,
+    notiz,
+    betriebsmittel,
+    checkperson,
+    ampeln,
+    ort,
+    cms,
+    lehre,
+    addons
 };
