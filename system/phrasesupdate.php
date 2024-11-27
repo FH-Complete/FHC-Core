@@ -9040,6 +9040,50 @@ Any unusual occurrences
 	),
 	array(
 		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'pruefungsnotizenBachelor2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsteil/e in Englisch (Optional - entsprechend der Vorgabe des Studiengangs):
+<< Nichtzutreffendes löschen >>
+* Präsentation der Bachelorarbeit
+* Prüfungsgespräch über die Bachelorarbeit
+
+Fragen zur Eröffnung des Prüfungsgesprächs
+<< Bitte ausfüllen >>
+
+Gründe für negative Beurteilung ODER allfällige Anmerkungen bei positiver Beurteilung
+<< Bitte ausfüllen >>
+
+Allfällige besondere Vorkommnisse
+<< Bitte ausfüllen >>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Parts of the examination held in English (Optional - in line with the degree program\'s guidelines):
+<< Delete as appropriate >>
+* Presentation of the Bachelor Paper
+* Examination interview on the Bachelor Paper
+
+Question(s) to open the examination interview
+<< Please fill out >>
+
+Reasons for failing OR any possible explanatory notes on a passing grade
+<< Please fill out >>
+
+Any unusual occurrences
+<< Please fill out >>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'abschlusspruefung',
 		'phrase' => 'pruefungsnotizenMaster',
 		'insertvon' => 'system',
@@ -31165,7 +31209,27 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_finalexam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschlussprüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Final exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 );
 

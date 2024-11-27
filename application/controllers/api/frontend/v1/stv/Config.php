@@ -97,6 +97,10 @@ class Config extends FHCAPI_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js'
 		];
 		*/
+		$result['finalexam'] = [
+			'title' => $this->p->t('stv', 'tab_finalexam'),
+			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js'
+		];
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
 			return $result;
