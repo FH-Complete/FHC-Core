@@ -66,18 +66,21 @@ class Lehrveranstaltung_model extends DB_Model
 
 	/**
 	 * Get Lehrveranstaltungen with its Stg, OE and OE-type.
-	 * Filter by Studiensemester and Organisationseinheiten if necessary.
+	 * Can be filtered by Studienesemester, lv oes or lv's stg oes, and also by specific lvs.
 	 * @param null|string $studiensemester_kurzbz Filter by Studiensemester
-	 * @param null|array $oes Filter by Organisationseinheiten
-	 * @param null|string $lehrtyp_kurzbz Filter by Lehrtyp 'lv' or 'modul'
-	 * @param null|array $lv_ids Filter by Lehrveranstaltung-Ids
-	 * @param string $oe_column 'lv'|'stg' Used when filtering $oes: Filter by lv.oe_kurzbz or stg.oe_kurzbz (the stg joined to lv)
+	 * @param null $lv_oes Filter oes by lv oe (default behaviour)
+	 * @param null $stg_oes Filter oes by lv's stg oe
+	 * @param null|array $lv_ids Filter by Lehrveranstaltungen
 	 * @return array
 	 */
-	public function getLvsByStudienplan($studiensemester_kurzbz = null, $oes = null, $lehrtyp_kurzbz = null, $lv_ids = null, $oe_column = 'lv')
+	public function getLvs($studiensemester_kurzbz = null, $lv_oes = null, $stg_oes = null, $lv_ids = null)
 	{
 		// Subquery LVs
 		$subQry = $this->_getQryLvsByStudienplan();
+
+		/* filter by lehrtyp_kurzbz 'lv' */
+		$subQry .= ' AND lehrtyp_kurzbz = \'lv\'';
+
 		$params = [];
 
 		if (isset($studiensemester_kurzbz) && is_string($studiensemester_kurzbz))
@@ -87,27 +90,18 @@ class Lehrveranstaltung_model extends DB_Model
 			$params[] = $studiensemester_kurzbz;
 		}
 
-		if (isset($oes) && is_array($oes))
+		if (isset($lv_oes) && is_array($lv_oes))
 		{
-			if ($oe_column === 'lv')
-			{
-				/* filter by lv organisationseinheit (Standard behaviour) */
-				$subQry.= ' AND lv.oe_kurzbz IN ?';
-			}
-			elseif ($oe_column === 'stg')
-			{
-				/* filter by lv studiengangs organisationseinheit () */
-				$subQry.= ' AND stg.oe_kurzbz IN ?';
-			}
-
-			$params[]= $oes;
+			/* filter by lv organisationseinheit */
+			$subQry.= ' AND lv.oe_kurzbz IN ?';
+			$params[]= $lv_oes;
 		}
 
-		if (isset($lehrtyp_kurzbz) && is_string($lehrtyp_kurzbz))
+		if (isset($stg_oes) && is_array($stg_oes))
 		{
-			/* filter by lehrtyp_kurzbz */
-			$subQry .= ' AND lehrtyp_kurzbz = ?';
-			$params[] = $lehrtyp_kurzbz;
+			/* filter by lv studiengangs organisationseinheit */
+			$subQry.= ' AND stg.oe_kurzbz IN ?';
+			$params[]= $stg_oes;
 		}
 
 		// Final Query
