@@ -189,14 +189,15 @@ class Lehrveranstaltung_model extends DB_Model
 	}
 
 	/**
-	 * Get all Templates and union with all Lehrveranstaltungen of given Studiensemester and Oes, that are assigned to
-	 * a template. This data structure can be used for nested tabulator data tree.
+	 * Get all Templates and its assigned Lehrveranstaltungen of given Studiensemester and Oes.
+	 * Lvs are queried via actual Studienordnung and Studienplan.
 	 *
 	 * @param null|string $studiensemester_kurzbz
 	 * @param null|array $oes
+	 * @param null $lehrveranstaltung_id Queries certain LV only
 	 * @return array|stdClass|null
 	 */
-	public function getTemplateLvTree($studiensemester_kurzbz = null, $oes = null){
+	public function getTemplateLvTree($studiensemester_kurzbz = null, $oes = null, $lehrveranstaltung_id = null){
 		$params = [];
 		$qry = '
 		WITH 	
@@ -222,6 +223,13 @@ class Lehrveranstaltung_model extends DB_Model
 				  	lehrtyp_kurzbz = \'lv\'
 				  	-- filter lvs assigned to template (= standardisierte lv)
 					AND lehrveranstaltung_template_id IS NOT NULL';
+
+					if (is_numeric($lehrveranstaltung_id))
+					{
+						/* filter by studiensemester */
+						$params[]= $lehrveranstaltung_id;
+						$qry.= ' AND lv.lehrveranstaltung_template_id = ? ';
+					}
 
 					if (is_string($studiensemester_kurzbz))
 					{
@@ -265,6 +273,13 @@ class Lehrveranstaltung_model extends DB_Model
 						FROM standardisierteLvs std
 						WHERE std.lehrveranstaltung_template_id = lv.lehrveranstaltung_id
 					)';
+
+		if (is_numeric($lehrveranstaltung_id))
+		{
+			/* filter by studiensemester */
+			$params[]= $lehrveranstaltung_id;
+			$qry.= ' AND lv.lehrveranstaltung_id = ? ';
+		}
 
 		if (is_array($oes))
 		{
@@ -342,7 +357,17 @@ class Lehrveranstaltung_model extends DB_Model
 				JOIN public.tbl_studiengangstyp 		stgtyp ON stgtyp.typ = stg.typ
 				JOIN public.tbl_organisationseinheit 	oe ON oe.oe_kurzbz = lv.oe_kurzbz
 		ORDER BY
-			oe.bezeichnung, lv.semester, lv.bezeichnung
+		 	-- Sort by organisationseinheit, semester, and lv.bezeichnung
+			oe.bezeichnung,
+			lv.semester,
+			lv.bezeichnung,
+			-- Within each group, ensure templates appear first
+			CASE 
+				WHEN lv.lehrtyp_kurzbz = \'tpl\' THEN 0
+				ELSE 1
+			END,
+			-- Ensure assigend lvs follow their template, grouped by lehrveranstaltung_template_id
+			COALESCE(lv.lehrveranstaltung_template_id, lv.lehrveranstaltung_id)
 		';
 
 		return $this->execQuery($qry, $params);
