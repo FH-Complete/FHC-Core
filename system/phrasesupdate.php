@@ -29361,18 +29361,18 @@ array(
 	array(
 		'app' => 'softwarebereitstellung',
 		'category' => 'global',
-		'phrase' => 'softwareanforderungSubtitle',
+		'phrase' => 'softwarebereitstellungSubtitle',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Softwareanforderung und Lizenzmanagement für die Lehre',
+				'text' => 'Softwarebereitstellung für die Lehre',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Software Request and License management for Education',
+				'text' => 'Software delivery for Education',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31381,6 +31381,86 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "Change Software for courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'anforderungNachQuellkurs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anforderung nach Quellkurs',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Request by Course-Template',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungFuerQuellkurs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwareanforderung für Quellkurse",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Requirements for Course-Templates",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungFuerEinzelneLvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwareanforderung für einzelne Lehrveranstaltungen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Requirements for individual Courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwarebereitstellung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwarebereitstellung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Delivery",
 				'description' => '',
 				'insertvon' => 'system'
 			)
