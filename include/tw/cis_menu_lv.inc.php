@@ -240,13 +240,37 @@ function checkZeilenUmbruch()
 		);
 	}
 
+	// Digitale Anwesenheiten
+	if(defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet
+			&& ($rechte->isBerechtigt('extension/anw_ent_admin')
+				|| $rechte->isBerechtigt('extension/anwesenheit_lektor')
+				|| $rechte->isBerechtigt('extension/anwesenheit_student')
+				|| $rechte->isBerechtigt('extension/anwesenheit_admin')))
+	{
+
+		$link='';
+		$text='';
+
+		$link= APP_ROOT."index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&sem_kurzbz=$angezeigtes_stsem";
+
+		$menu[]=array
+		(
+			'id'=>'core_menu_digitale_anwesenheitslisten',
+			'position'=>'50',
+			'name'=> $p->t('lehre/digiAnw'),
+			'icon'=>'../../../skin/images/button_kreuzerltool.png',
+			'link'=>$link,
+			'text'=>$text
+		);
+	}
+
 	//FEEDBACK
 	if((!defined('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN) && $angemeldet)
 	{
 		$menu[]=array
 		(
 			'id'=>'core_menu_feedback',
-			'position'=>'50',
+			'position'=>'60',
 			'name'=>$p->t('lehre/feedback'),
 			'icon'=>'../../../skin/images/button_feedback.png',
 			'link'=>'feedback.php?lvid='.$lvid,

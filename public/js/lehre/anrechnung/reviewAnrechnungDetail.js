@@ -205,16 +205,16 @@ var reviewAnrechnung = {
 
         switch (status_kurzbz) {
             case ANRECHNUNGSTATUS_APPROVED:
-                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-success');
+                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-success-subtle');
                 break;
             case ANRECHNUNGSTATUS_REJECTED:
-                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-danger');
+                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-danger-subtle');
                 break;
             case '':
-                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-info');
+                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-info-subtle');
                 break;
             default:
-                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-warning');
+                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-warning-subtle');
         }
     },
     setEmpfehlungstext: function () {
@@ -236,7 +236,7 @@ var reviewAnrechnung = {
         }
     },
     initTooltips: function (){
-        $('[data-toggle="tooltip"]').tooltip({
+        $('[data-bs-toggle="tooltip"]').tooltip({
                 delay: { "show": 200, "hide": 200 },
                 html: true
         }
