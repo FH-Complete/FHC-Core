@@ -478,7 +478,7 @@ html {
 }
 
 .fhc-entry:hover{
-	background-color:#00649C !important;
+	background-color:#005585 !important;
 	color:white !important;
 }
 
@@ -497,7 +497,7 @@ html {
 }
 
 [selected].fhc-entry {
-	background-color: #005585 !important;
+	background-color: #00649C !important;
 }
 
 @media screen and ( max-width: 767px ) {

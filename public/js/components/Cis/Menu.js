@@ -112,7 +112,9 @@ export default {
 	</div>
     <nav id="nav-main" class="offcanvas offcanvas-start bg-dark" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
-			<cis-sprachen></cis-sprachen>
+			<div class="border-top border-bottom border-dark" >
+				<cis-sprachen></cis-sprachen>
+			</div>
 			<div id="nav-main-toggle" class="position-static d-none d-lg-block bg-dark">
 				<button type="button" class="btn bg-dark text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#nav-main-menu" aria-expanded="true" aria-controls="nav-main-menu">
 					<i class="fa fa-arrow-circle-left"></i>
