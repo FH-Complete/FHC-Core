@@ -482,6 +482,14 @@ html {
 	color:white !important;
 }
 
+.fhc-entry.btn:focus {
+	box-shadow: none !important;
+}
+
+.fhc-entry.btn {
+	border-radius: 0 !important;
+}
+
 .fhc-entry {
 	transition-property: background,color;
 	transition-duration: 0.3s,0.2s;

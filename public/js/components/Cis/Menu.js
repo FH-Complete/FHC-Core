@@ -51,24 +51,6 @@ export default {
 		}
 	},
 	methods: {
-		getLanguageButtonClass(lang) {
-			let classString = 'btn btn-level-2 rounded-0'
-			const langCookie = (function(lang) {
-				const cookieString = document.cookie;
-				const cookies = cookieString.split('; ');
-
-				for (let cookie of cookies) {
-					const [key, value] = cookie.split('=');
-					if (key === lang) {
-						return decodeURIComponent(value);
-					}
-				}
-
-				return null; // Return null if the cookie is not found
-			})('sprache');
-			if(langCookie === lang) classString += ' fhc-active';
-			return classString
-		},
 		toggleCollapsibles(target){
 			switch(target){
 				case 'settings':
@@ -95,20 +77,6 @@ export default {
 		setActiveEntry(content_id){
 			this.activeEntry = content_id;
 		},
-		handleChangeLanguage(lang) {
-			this.$p.setLanguage(lang, this.$fhcApi)
-			const gerButton = this.$refs.ger
-			const engButton = this.$refs.eng
-			
-			if(lang === 'German') {
-				gerButton.classList.add('fhc-active')
-				engButton.classList.remove('fhc-active')
-			} else if(lang === 'English') {
-				engButton.classList.add('fhc-active')
-				gerButton.classList.remove('fhc-active')
-			}
-			
-		}
 	},
 	mounted(){
 		this.entries = this.menu;
@@ -135,25 +103,23 @@ export default {
 		</button>
 		<ul ref="navUserDropdown" @[\`show.bs.collapse\`]="toggleCollapsibles('navUserDropdown')" id="nav-user-menu" class="top-100 end-0 collapse list-unstyled" aria-labelledby="nav-user-btn">
 			<li class="btn-level-2"><a class="btn btn-level-2 rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
-			<li class="fhc-languages btn-level-2" style="text-align: center;">
-				<div class="btn-group">
-					<a :class="getLanguageButtonClass('German')" ref="ger" href="#" @click="handleChangeLanguage('German')">Deutsch</a>
-					<a :class="getLanguageButtonClass('English')" ref="eng" href="#" @click="handleChangeLanguage('English')">English</a>
-				</div>
+			<li class="btn-level-2">
+				<cis-sprachen></cis-sprachen>
 			</li>
-			<li class="btn-level-2"><hr class="dropdown-divider p-0 "></li>
+			<li class="btn-level-2"><hr class="dropdown-divider m-0 "></li>
 			<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>
 		</ul>
 	</div>
     <nav id="nav-main" class="offcanvas offcanvas-start bg-dark" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
+			<cis-sprachen></cis-sprachen>
 			<div id="nav-main-toggle" class="position-static d-none d-lg-block bg-dark">
 				<button type="button" class="btn bg-dark text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#nav-main-menu" aria-expanded="true" aria-controls="nav-main-menu">
 					<i class="fa fa-arrow-circle-left"></i>
 				</button>
 			</div>
 			<div class="offcanvas-body p-0">
-				<cis-sprachen :sprachenChangeFunction="handleChangeLanguage" ></cis-sprachen>
+				
 				<div id="nav-main-menu" class="collapse collapse-horizontal show">
 					<div>
 						<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
