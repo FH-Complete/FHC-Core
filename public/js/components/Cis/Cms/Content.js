@@ -53,7 +53,7 @@ export default {
   },
   template: /*html*/ `
     <!-- div that contains the content -->
-    <component :is="computeContentType" v-if="content" :content="content" />
+    <component :is="computeContentType" v-if="content" :content="content" :content_id="content_id" />
     <p v-else>No content is available to display</p>
     `,
 };
