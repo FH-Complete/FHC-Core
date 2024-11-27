@@ -265,10 +265,7 @@ export default {
 		<component
 			v-else-if="tag == 'PvAutocomplete'"
 			ref="input"
-			:is="tag"
-			:type="type"
 			v-model="modelValueCmp"
-			v-bind="$attrs"
 			:id="idCmp"
 			:input-props="{name}"
 			:class="validationClass"

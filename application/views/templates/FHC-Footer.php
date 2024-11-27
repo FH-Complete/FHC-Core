@@ -99,7 +99,8 @@
 
 	// Tabulator 5 JS
 	if ($tabulator5 === true) generateJSsInclude('vendor/olifolkerd/tabulator5/dist/js/tabulator.min.js');
-
+	// Tabulator 5 JQuery
+	if ($tabulator5JQuery === true) generateJSsInclude('public/js/tabulator/jquery_wrapper.js');
 	// Tinymce 3 JS
 	if ($tinymce3 === true) generateJSsInclude('include/tiny_mce/tiny_mce.js');
 
@@ -177,4 +178,3 @@
 </html>
 
 <!-- Footer end -->
-
