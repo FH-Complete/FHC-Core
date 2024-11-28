@@ -135,7 +135,7 @@ class Stundenplan_model extends DB_Model
 
 
 	/**
-	 * function that takes a query that fetches lehre.vw_stundenplan rows and groups them so that they can be displayed in a calendar
+	 * groups rows of a subquery that fetches data from the lehre.vw_stundenplan table
 	 * @param string $stundenplanViewQuery the subquery used to group the result
 	 *
 	 * @return stdClass
@@ -190,7 +190,7 @@ class Stundenplan_model extends DB_Model
 	 * NO STANDALONE FUNCTION - Generates a SQL query string to fetch 'stundenplan' events for a specific student within the current semester.
 	 * @param string $uid the user id that is used to fetch the stundenplan rows from the lehre.vw_stundenplan table
 	 *
-	 * @return string
+	 * @return mixed
 	 */
 	public function getStundenplanQuery($start_date, $end_date,$semester,$gruppen,$studentlehrverbaende){
 		
@@ -207,10 +207,10 @@ class Stundenplan_model extends DB_Model
 			return $result;
 		};
 
-		// if both the gruppen and the studentlehrverbaende are empty we return nothing
+		// if both the gruppen and the studentlehrverbaende are empty we early return 
 		if($emptyCheck($gruppen) && $emptyCheck($studentlehrverbaende))
 		{
-			return "";
+			return false;
 		}
 
 		$query =
@@ -239,13 +239,11 @@ class Stundenplan_model extends DB_Model
 				// converts the array of gruppen strings into a sql IN (_,_,_) chain
 				$query .="(sp.gruppe_kurzbz IN (" .implode(',',$gruppen[$sem_date]).") AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende)." )";
 				
-				// adds the OR sql chain only if the $studentlehrverbaende array is not empty 
-				// or its not the last semester to add the groups from
 				$query .="OR";
 			}
 		} 
 
-		// if there are no studentlehrverbaende, we can remove the last OR added after the groups
+		// if there are no studentlehrverbaende and the gruppen are not empty, we can remove the last OR added after the groups
 		if($emptyCheck($studentlehrverbaende) && !$emptyCheck($gruppen))
 		{
 			$query = substr($query, 0, -2);
@@ -267,7 +265,7 @@ class Stundenplan_model extends DB_Model
 					// Eintraege fuer das ganze Semester
 					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).") AND gruppe_kurzbz is null)";
 					
-						$query .="OR";
+					$query .="OR";
 					 
 				}
 			}	

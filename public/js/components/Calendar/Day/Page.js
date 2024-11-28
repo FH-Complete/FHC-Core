@@ -75,6 +75,14 @@ export default {
 				this.fetchLvMenu(event);
 			},
 			immediate:true,
+		},
+		isSliding:{
+			handler(value){
+				if(value)
+				{
+					this.setSelectedEvent(null);
+				}
+			}
 		}
 	},
 	computed: {

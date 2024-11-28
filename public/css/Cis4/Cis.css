@@ -478,8 +478,16 @@ html {
 }
 
 .fhc-entry:hover{
-	background-color:#0088d6 !important;
+	background-color:#005585 !important;
 	color:white !important;
+}
+
+.fhc-entry.btn:focus {
+	box-shadow: none !important;
+}
+
+.fhc-entry.btn {
+	border-radius: 0 !important;
 }
 
 .fhc-entry {
@@ -487,6 +495,11 @@ html {
 	transition-duration: 0.3s,0.2s;
 	transition-timing-function: ease-out,ease-out;
 }
+
+[selected].fhc-entry {
+	background-color: #00649C !important;
+}
+
 @media screen and ( max-width: 767px ) {
 	#nav-search  {
 		position: static;
