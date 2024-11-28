@@ -27,6 +27,77 @@ class Prestudentstatus_model extends DB_Model
 	}
 
 	/**
+	 * loadWhereUid
+	 * 
+	 * loads all rows for a student_uid
+	 * 
+	 * @param string			$uid
+	 * @param array 			$where Optional. Default empty array
+	 * @param boolean 			$withPrestudent Optional. Default true
+	 * 
+	 * @return stdClass
+	 */
+	public function loadWhereUid($uid, $where = null, $withPrestudent = false)
+	{
+		$this->addSelect($this->dbTable . '.*');
+		$this->addJoin('public.tbl_student', 'prestudent_id');
+
+		if ($withPrestudent) {
+			$this->addJoin('public.tbl_prestudent s', 'prestudent_id');
+			$this->addSelect('s.aufmerksamdurch_kurzbz');
+			$this->addSelect('s.person_id');
+			$this->addSelect('s.studiengang_kz');
+			$this->addSelect('s.berufstaetigkeit_code');
+			$this->addSelect('s.ausbildungcode');
+			$this->addSelect('s.zgv_code');
+			$this->addSelect('s.zgvort');
+			$this->addSelect('s.zgvdatum');
+			$this->addSelect('s.zgvmas_code');
+			$this->addSelect('s.zgvmaort');
+			$this->addSelect('s.zgvmadatum');
+			$this->addSelect('s.aufnahmeschluessel');
+			$this->addSelect('s.facheinschlberuf');
+			$this->addSelect('s.reihungstest_id');
+			$this->addSelect('s.anmeldungreihungstest');
+			$this->addSelect('s.reihungstestangetreten');
+			$this->addSelect('s.rt_gesamtpunkte');
+			$this->addSelect('s.bismelden');
+			$this->addSelect('s.dual');
+			$this->addSelect('s.rt_punkte1');
+			$this->addSelect('s.rt_punkte2');
+			$this->addSelect('s.ausstellungsstaat');
+			$this->addSelect('s.rt_punkte3');
+			$this->addSelect('s.zgvdoktor_code');
+			$this->addSelect('s.zgvdoktorort');
+			$this->addSelect('s.zgvdoktordatum');
+			$this->addSelect('s.mentor');
+			$this->addSelect('s.zgvnation');
+			$this->addSelect('s.zgvmanation');
+			$this->addSelect('s.zgvdoktornation');
+			$this->addSelect('s.gsstudientyp_kurzbz');
+			$this->addSelect('s.aufnahmegruppe_kurzbz');
+			$this->addSelect('s.udf_values');
+			$this->addSelect('s.priorisierung');
+			$this->addSelect('s.foerderrelevant');
+			$this->addSelect('s.standort_code');
+			$this->addSelect('s.zgv_erfuellt');
+			$this->addSelect('s.zgvmas_erfuellt');
+			$this->addSelect('s.zgvdoktor_erfuellt');
+		}
+
+
+		$this->addOrder('datum');
+		$this->addOrder('insertamum');
+
+		if (!$where)
+			$where = [];
+
+		$where['student_uid'] = $uid;
+
+		return $this->loadWhere($where);
+	}
+
+	/**
 	 * getLastStatus
 	 */
 	public function getLastStatus($prestudent_id, $studiensemester_kurzbz = '', $status_kurzbz = '')
@@ -289,6 +360,7 @@ class Prestudentstatus_model extends DB_Model
 		$this->addSelect('ss.studienjahr_kurzbz');
 		$this->addSelect('pers.vorname');
 		$this->addSelect('pers.nachname');
+		$this->addSelect('pers.unruly');
 		$this->addSelect('TRIM(CONCAT(pers.vorname, \' \', pers.nachname)) AS name');
 		$this->addSelect('pers.person_id');
 		$this->addSelect('g.studiengang_kz');
@@ -571,12 +643,12 @@ class Prestudentstatus_model extends DB_Model
 		$this->addOrder('tbl_prestudentstatus.datum', 'DESC');
 		$this->addOrder('tbl_prestudentstatus.insertamum', 'DESC');
 		$this->addOrder('tbl_prestudentstatus.ext_id', 'DESC');
-		
+
 		$this->addLimit(1);
 
 		$this->db->where('prestudent_id', $prestudent_id);
 		$this->db->where('status_kurzbz', self::STATUS_STUDENT);
-		
+
 		$sql = $this->db->get_compiled_select($this->dbTable);
 
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');

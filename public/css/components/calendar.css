@@ -1,0 +1,230 @@
+:root{
+	--fhc-calendar-pane-height: calc(100vh - 220px);
+}
+
+.fhc-calendar-week-page-header {
+  background-color: #e9ecef;
+}
+
+.fhc-calendar-week-page-header > div:hover{
+	background-color: #dddfe2;
+}
+
+.fhc-calendar-months .col-4,
+.fhc-calendar-years .col-4 {
+  padding: 0.1875em 0;
+}
+.show-weeks .fhc-calendar-months .col-4,
+.show-weeks .fhc-calendar-years .col-4 {
+  padding: 0.1875em 0.25em;
+}
+.fhc-calendar-months .col-4 button,
+.fhc-calendar-years .col-4 button {
+  aspect-ratio: 28/18;
+}
+
+.fhc-calendar-month-page {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 1.5em repeat(6, 1fr);
+}
+.fhc-calendar-month-page.show-weeks {
+  grid-template-columns: 1.5em repeat(7, 1fr);
+  grid-template-rows: 1.5em repeat(6, 1fr);
+}
+
+.fhc-calendar-month-page-weekday,
+.fhc-calendar-month-page-day {
+  color: inherit;
+}
+
+.fhc-calendar-week .carousel-item {
+  /*padding: 0.75em;*/
+}
+
+.fhc-calendar-week-page {
+  /*aspect-ratio: 7/6;*/
+  min-height: 0;
+}
+.fhc-calendar-week-page > div {
+  /*transform: translate(-0.75em, -0.75em);*/
+  /*width: calc(100% + 1.5em);*/
+  height: calc(100% + 1.5em);
+}
+.fhc-calendar-week-page > div > div {
+  padding-left: 3em;
+}
+.fhc-calendar-week-page .events {
+  display: grid;
+  grid-template-columns: 3em repeat(7, 1fr);
+  margin-left: -3em;
+  /*min-height: 266.6666666667%;*/
+}
+.fhc-calendar-week-page .events .day {
+  gap: 1px;
+}
+.fhc-calendar-week-page .events .hours, .fhc-calendar-week-page .events .day {
+  display: grid;
+}
+
+/* grid hour lines of the Stundenplan use box-shadow instead of border because box-shadow renders consistently on different viewports*/
+.box-shadow-border-top{
+	box-shadow: 0 0 0 1px #dee2e6 !important;
+}
+
+.fhc-calendar-no-events-overlay{
+	position: relative;
+}
+
+.fhc-calendar-no-events-overlay::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin:auto;
+	width: 100%;
+	height: 100%;
+	background-image: linear-gradient(120deg, white, gray );
+	opacity: .7;
+}
+.fhc-calendar-day-page {
+  /*aspect-ratio: 7/6;*/
+  min-height: 0;
+}
+.fhc-calendar-day-page > div {
+  /*transform: translate(-0.75em, -0.75em);*/
+  /*width: calc(100% + 1.5em);*/
+  height: calc(100% + 1.5em);
+}
+.fhc-calendar-day-page .flex-column > .flex-grow-1 {
+  padding-left: 3em;
+}
+.fhc-calendar-day-page .flex-column {
+	border-right: 1px solid #dee2e6;
+}
+.fhc-calendar-day-page .events {
+  display: grid;
+  grid-template-columns: 3em 1fr;
+  margin-left: -3em;
+  /*min-height: 266.6666666667%;*/
+}
+.fhc-calendar-day-page .events .day {
+  gap: 1px;
+}
+.fhc-calendar-day-page .events .hours, .fhc-calendar-day-page .events .day {
+  display: grid;
+}
+
+.fhc-calendar-lg .fhc-calendar-month-page-day,
+.fhc-calendar-lg .fhc-calendar-month-page-weekday,
+.fhc-calendar-md .fhc-calendar-month-page-day,
+.fhc-calendar-md .fhc-calendar-month-page-weekday {
+  border: solid 1px #dee2e6;
+}
+.fhc-calendar-lg .fhc-calendar-month-page-day,
+.fhc-calendar-md .fhc-calendar-month-page-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+}
+.fhc-calendar-lg .fhc-calendar-month-page-day.active,
+.fhc-calendar-md .fhc-calendar-month-page-day.active {
+  border-color: var(--bs-secondary);
+}
+.fhc-calendar-lg .fhc-calendar-month-page-day .events,
+.fhc-calendar-md .fhc-calendar-month-page-day .events {
+  display: block;
+  overflow: auto;
+  font-size: 0.7em;
+}
+.fhc-calendar-lg .fhc-calendar-month-page-day .events span,
+.fhc-calendar-md .fhc-calendar-month-page-day .events span {
+  display: block;
+  margin: 0.2em;
+  padding: 0.1em 0.4em;
+  border-radius: 0.1em;
+}
+.fhc-calendar-lg .fhc-calendar-years .col-4,
+.fhc-calendar-md .fhc-calendar-years .col-4 {
+  padding: 0.09375em 0;
+}
+.show-weeks .fhc-calendar-lg .fhc-calendar-years .col-4,
+.show-weeks .fhc-calendar-md .fhc-calendar-years .col-4 {
+  padding: 0.09375em 0.25em;
+}
+.fhc-calendar-lg .fhc-calendar-years .col-4 button,
+.fhc-calendar-md .fhc-calendar-years .col-4 button {
+  aspect-ratio: 28/9;
+}
+
+.fhc-calendar-xs {
+  font-size: 0.6em;
+}
+
+.fhc-calendar-sm .fhc-calendar-month-page {
+  font-size: 0.8em;
+}
+
+.fhc-calendar-sm .fhc-calendar-month-page-weekday,
+.fhc-calendar-xs .fhc-calendar-month-page-weekday {
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}
+
+.fhc-calendar-month-page-weekday:hover {
+	background-color:#37789c;
+	color:white;
+	
+}
+
+.fhc-calendar-sm .fhc-calendar-month-page-day,
+.fhc-calendar-xs .fhc-calendar-month-page-day {
+  position: relative;
+  aspect-ratio: 1;
+}
+
+.fhc-calendar-month-page-day-highlight {
+	background-color: #f5f5f5;
+}
+
+.fhc-calendar-sm .fhc-calendar-month-page-day.active .no,
+.fhc-calendar-xs .fhc-calendar-month-page-day.active .no {
+  background-color: rgba(var(--bs-info-rgb), 0.25);
+  border-radius: 50%;
+  font-weight: bold;
+}
+.fhc-calendar-sm .fhc-calendar-month-page-day:not(.active):hover .no,
+.fhc-calendar-xs .fhc-calendar-month-page-day:not(.active):hover .no {
+  background-color: rgba(var(--bs-secondary-rgb), 0.25);
+  border-radius: 50%;
+}
+.fhc-calendar-sm .fhc-calendar-month-page-day .no,
+.fhc-calendar-xs .fhc-calendar-month-page-day .no {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  height: 80%;
+  margin: 10%;
+}
+.fhc-calendar-sm .fhc-calendar-month-page-day .events,
+.fhc-calendar-xs .fhc-calendar-month-page-day .events {
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 10%;
+  overflow: hidden;
+  display: flex;
+}
+.fhc-calendar-sm .fhc-calendar-month-page-day .events span,
+.fhc-calendar-xs .fhc-calendar-month-page-day .events span {
+  overflow: hidden;
+}
+
+.selectedEvent {
+	background-color: #00649c !important;
+	color: white;
+}
