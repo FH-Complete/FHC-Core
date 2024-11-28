@@ -86,10 +86,6 @@ export default {
 		});
 	},
     template: /*html*/`
-	<!--<p>CISVUE HEADER</p>
-	<p>highest count : {{highestMatchingUrlCount}}</p>
-	<p>active entry content_id : {{activeEntry}}</p>
-	-->
 	<button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -112,17 +108,17 @@ export default {
 	</div>
     <nav id="nav-main" class="offcanvas offcanvas-start bg-dark" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
-			<div class="border-top border-bottom border-dark" >
+			<div id="nav-sprachen" class="nav-menu-collapse collapse collapse-horizontal show border-top border-bottom border-dark flex-shrink-0" >
 				<cis-sprachen></cis-sprachen>
 			</div>
 			<div id="nav-main-toggle" class="position-static d-none d-lg-block bg-dark">
-				<button type="button" class="btn bg-dark text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#nav-main-menu" aria-expanded="true" aria-controls="nav-main-menu">
+				<button type="button" class="btn bg-dark text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target=".nav-menu-collapse" aria-expanded="true" aria-controls="nav-sprachen nav-main-menu">
 					<i class="fa fa-arrow-circle-left"></i>
 				</button>
 			</div>
 			<div class="offcanvas-body p-0">
-				
-				<div id="nav-main-menu" class="collapse collapse-horizontal show">
+
+				<div id="nav-main-menu" class="nav-menu-collapse collapse collapse-horizontal show">
 					<div>
 						<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
 					</div>

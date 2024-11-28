@@ -22,8 +22,8 @@ export default {
 		);
 	},
 	template:/*html*/`
-	<div class="container flex-shrink-0">
-		<div class="row justify-content-center align-items-center">
+	<div class="container">
+		<div class="row justify-content-center align-items-center flex-nowrap overflow-hidden">
 			<button v-for="lang in allActiveLanguages" @click.prevent="changeLanguage(lang)" class="col text-white fhc-entry btn text-center w-100" :selected="$p.user_language.value==lang?'':null">{{lang}}</button>
 		</div>
 	</div>

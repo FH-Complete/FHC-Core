@@ -182,6 +182,10 @@ html {
   transform: rotate(-90deg);
 }
 
+#nav-sprachen{
+	transition: none;
+}
+
 /* searchbar */
 #nav-search {
   z-index: 1;
