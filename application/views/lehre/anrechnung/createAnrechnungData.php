@@ -37,6 +37,7 @@ $query = '
 
 $filterWidgetArray = array(
 	'query' => $query,
+	'bootstrapVersion'=>5,
 	'tableUniqueId' => 'createAnrechnung',
 	'requiredPermissions' => 'lehre/anrechnung_anlegen',
 	'datasetRepresentation' => 'tabulator',
@@ -56,17 +57,13 @@ $filterWidgetArray = array(
 		layout: "fitColumns",           // fit columns to width of table
 		persistentLayout:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
         index: "prestudent_id",         // assign specific column as unique id (important for row indexing)
         selectable: 1,                  // allow row selection
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        rowSelected: function(row) {
-	        func_rowSelected(row);
-        },
-        rowSelectionChanged:function(data, rows){
-            func_rowSelectionChanged(data, rows);
-        },
-		tableWidgetHeader: false
+		tableWidgetHeader: false,
+		columnDefaults:{
+			headerFilterPlaceholder: " ",
+		}
 	 }',
 	'datasetRepFieldsDefs' => '{
 		prestudent_id:          {visible: false, headerFilter:"input"},

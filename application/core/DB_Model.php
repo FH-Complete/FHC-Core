@@ -60,6 +60,9 @@ class DB_Model extends CI_Model
 	protected $pk;  	// Name of the PrimaryKey for DB-Update, Load, ...
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
 				// True if this table has a primary key that uses a sequence
+	//protected $paginationOptions; // $page and $page_size together in an associative array
+	protected $page;
+	protected $page_size;
 
 	private $executedQueryMetaData;
 	private $executedQueryListFields;
@@ -531,7 +534,7 @@ class DB_Model extends CI_Model
 		if (!is_numeric($start) || (is_numeric($start) && $start <= 0))
 			return error('The start parameter is not valid', EXIT_MODEL);
 
-		if (is_numeric($end) && $end > $start)
+		if (is_numeric($end))
 		{
 			$this->db->limit($start, $end);
 		}
@@ -1358,6 +1361,52 @@ class DB_Model extends CI_Model
 		}
 
 		return $udfs;
+	}
+
+	/**
+	 * addPagination
+	 * adds a limit and an optional offset depending on the arguments passed to the function
+	 * @param   int $page	page to be queried
+	 * @param   int $page_size	page_size used to calculate the offset of the pagination
+	 * @param   int | null $num_rows	used to calculate the total amout of pages that are available with the $page and $page_size arguments
+	 * 
+	 * @return	void
+	 */
+	function addPagination( $page, $page_size, $num_rows=null)
+	{
+		if (isset($page) && is_numeric($page) && isset($page_size) && is_numeric($page_size) && $page > 0 && $page_size > 0) {
+			
+			if (isset($num_rows) && is_numeric($num_rows) && $num_rows > 0) {
+				$floatMaxPageCount = $num_rows / $page_size;
+				$maxPageCount = ceil($floatMaxPageCount);
+				if($page > $maxPageCount){
+					$page = $maxPageCount;
+				}
+			}
+			$offset = (($page-1) * $page_size); 
+			$this->addLimit($page_size, $offset);
+
+		} else {
+			$this->addLimit($page_size);
+		}
+	}
+
+	/**
+	 * getQueryNumRows
+	 * returns the number of rows of the current build query of the codeigniter query builder instance
+	 * @param   bool $reset	resets the select of the query 
+	 * 
+	 * @return	Result_object $num_rows
+	 */
+	function getNumRows($reset=false)
+	{
+		// returns the number of rows when executing the current query without reseting the select statement of the query
+		$num_rows = $this->db->count_all_results($this->dbTable,$reset);
+		if($num_rows){
+			return success($num_rows);
+		}else{
+			return error($this->db->error(), EXIT_DATABASE);
+		}
 	}
 }
 

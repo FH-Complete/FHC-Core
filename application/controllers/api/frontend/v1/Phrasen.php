@@ -28,8 +28,11 @@ class Phrasen extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'loadModule' => self::PERM_ANONYMOUS
+			'loadModule' => self::PERM_ANONYMOUS,
+			'setLanguage' => self::PERM_ANONYMOUS
 		]);
+
+		$this->load->helper('hlp_language');
 	}
 	
 	//------------------------------------------------------------------------------------------------------------------
@@ -42,5 +45,19 @@ class Phrasen extends FHCAPI_Controller
 	{
 		$this->load->library('PhrasesLib', [$module], 'pj');
 		$this->terminateWithSuccess(json_decode($this->pj->getJSON()));
+	}
+
+	public function setLanguage()
+	{
+		$postParams = $this->getPostJSON();
+		$language = $postParams->language;
+		$categories = $postParams->categories;
+
+		setUserLanguage($language);
+
+		$this->load->library('PhrasesLib', array($categories, $language), 'p');
+
+		$phrases = $this->p->setPhrases($categories, $language);
+		$this->terminateWithSuccess($phrases);
 	}
 }

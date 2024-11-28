@@ -18,5 +18,9 @@
 export default {
 	loadCategory(category) {
 		return this.$fhcApi.get('/api/frontend/v1/phrasen/loadModule/' + category);
+	},
+	setLanguage(categories,language) {
+		const payload = {categories, language}
+		return this.$fhcApi.post('/api/frontend/v1/phrasen/setLanguage', payload);
 	}
 };

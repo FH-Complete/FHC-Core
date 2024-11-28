@@ -99,7 +99,7 @@ export default {
 			this.suggestions = [];
 			this.$refs.form.clearValidation();
 		},
-		loadSuggestions() {console.log('loadSuggestions');
+		loadSuggestions() {
 			if (this.abortController.suggestions)
 				this.abortController.suggestions.abort();
 			if (this.person !== null)
