@@ -3,17 +3,15 @@ export default {
 	getAbschlusspruefung (url, config, params){
 		return this.$fhcApi.get('api/frontend/v1/stv/abschlusspruefung/getAbschlusspruefung/' + params.id);
 	},
-	addNewAbschlusspruefung(id, data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/abschlusspruefung/addNewAbschlusspruefung/' + id,
-			data
+	addNewAbschlusspruefung(data) {
+		return this.$fhcApi.post('api/frontend/v1/stv/abschlusspruefung/insertAbschlusspruefung/', data
 		);
 	},
 	loadAbschlusspruefung(id){
 		return this.$fhcApi.post('api/frontend/v1/stv/abschlusspruefung/loadAbschlusspruefung/', {id});
 	},
-	updateAbschlusspruefung(id, data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/abschlusspruefung/updateAbschlusspruefung/' + id,
-			data
+	updateAbschlusspruefung(data) {
+		return this.$fhcApi.post('api/frontend/v1/stv/abschlusspruefung/updateAbschlusspruefung/', data
 		);
 	},
 	deleteAbschlusspruefung(id){

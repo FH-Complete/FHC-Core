@@ -13,6 +13,11 @@ export default {
 		FormInput,
 		PvAutoComplete
 	},
+	inject: {
+		cisRoot: {
+			from: 'cisRoot'
+		},
+	},
 	props: {
 		student: Object
 	},
@@ -36,7 +41,7 @@ export default {
 					{title: "datum", field: "format_datum"},
 					{title: "uhrzeit", field: "uhrzeit"},
 					{title: "freigabe", field: "format_freigabedatum"},
-					{title: "pruefungsantritt", field: "pruefungsantritt_kurzbz"},
+					{title: "pruefungsantritt", field: "antritt_bezeichnung"},
 					{title: "sponsion", field: "format_sponsion"},
 					{title: "anmerkung", field: "anmerkung"},
 					{title: "abschlusspruefung_id", field: "abschlusspruefung_id", visible: false},
@@ -132,7 +137,19 @@ export default {
 			formData: {
 				typStg: null,
 				pruefungstyp_kurzbz: null,
-				akadgrad_id: null
+				akadgrad_id: null,
+				vorsitz: null,
+				pruefungsantritt_kurzbz: null,
+				abschlussbeurteilung_kurzbz: null,
+				datum: null,
+				sponsion: null,
+				pruefer1: null,
+				pruefer2: null,
+				pruefer3: null,
+				anmerkung: null,
+				protokoll: null,
+				note: null,
+				link: null
 			},
 			statusNew: true,
 			arrTypen: [],
@@ -145,22 +162,19 @@ export default {
 			abortController: {
 				mitarbeiter: null,
 				pruefer: null
-			}
+			},
 		}
 	},
 	methods: {
 		actionNewAbschlusspruefung() {
 			this.resetForm();
-			this.statusNew = false;
+			this.statusNew = true;
+			this.setDefaultFormData();
 		},
 		actionEditAbschlusspruefung(abschlusspruefung_id) {
+			this.resetForm();
 			this.statusNew = false;
-			console.log("action edit: ", abschlusspruefung_id);
-			this.loadAbschlusspruefung(abschlusspruefung_id).then(() => {
-				if (this.formData.abschlusspruefung_id){
-					console.log("activate form?");
-				}
-			});
+			this.loadAbschlusspruefung(abschlusspruefung_id);
 		},
 		actionDeleteAbschlusspruefung(abschlusspruefung_id) {
 			this.$fhcAlert
@@ -171,15 +185,19 @@ export default {
 				.then(this.deleteAbschlusspruefung)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		addNewAbschlusspruefung(formData) {
-			this.formData.plz = this.formData.address.plz;
-			return this.$refs.formData.factory.stv.abschlusspruefung.addNewAbschlusspruefung(this.uid, this.formData)
+		addNewAbschlusspruefung(){
+			const dataToSend = {
+				uid: this.student.uid,
+				formData: this.formData
+			};
+
+			return this.$refs.formFinalExam.factory.stv.abschlusspruefung.addNewAbschlusspruefung(dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetForm();
-				}).catch(this.$fhcAlert.handleSystemError)
+				})
+				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-					//window.scrollTo(0, 0);
 					this.reload();
 				});
 		},
@@ -187,25 +205,26 @@ export default {
 			this.$refs.table.reloadTable();
 		},
 		loadAbschlusspruefung(abschlusspruefung_id) {
-			this.statusNew = false;
 			return this.$fhcApi.factory.stv.abschlusspruefung.loadAbschlusspruefung(abschlusspruefung_id)
 				.then(result => {
 					this.formData = result.data;
+					this.formData.link = this.cisRoot + 'index.ci.php/lehre/Pruefungsprotokoll/showProtokoll?abschlusspruefung_id='+this.formData.abschlusspruefung_id+'&fhc_controller_id=67481e5ed5490';
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateAbschlusspruefung(abschlusspruefung_id) {
-			this.formData.plz = this.formData.address.plz;
-			return this.$refs.formData.factory.stv.abschlusspruefung.updateAbschlusspruefung(abschlusspruefung_id,
-				this.formData
-			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				this.hideModal('adressModal');
-				this.resetForm();
-			}).catch(this.$fhcAlert.handleSystemError)
+			const dataToSend = {
+				id: abschlusspruefung_id,
+				formData: this.formData
+			};
+			return this.$refs.formFinalExam.factory.stv.abschlusspruefung.updateAbschlusspruefung(dataToSend)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.resetForm();
+				})
+				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-					//window.scrollTo(0, 0);
 					this.reload();
 				});
 		},
@@ -213,15 +232,26 @@ export default {
 			return this.$fhcApi.factory.stv.abschlusspruefung.deleteAbschlusspruefung(abschlusspruefung_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-				}).catch(this.$fhcAlert.handleSystemError)
+				})
+				.catch(this.$fhcAlert.handleSystemError)
 				.finally(()=> {
-					window.scrollTo(0, 0);
 					this.reload();
 				});
 		},
 		resetForm() {
-			this.formData = {};
-			this.statusNew = true;
+				this.formData.pruefungstyp_kurzbz = null;
+				this.formData.akadgrad_id = null;
+				this.formData.vorsitz = null;
+				this.formData.pruefungsantritt_kurzbz = null;
+				this.formData.abschlussbeurteilung_kurzbz = null;
+				this.formData.datum = null; //oder new Date();
+				this.formData.sponsion = null;
+				this.formData.pruefer1 = null;
+				this.formData.pruefer2 = null;
+				this.formData.pruefer3 = null;
+				this.formData.anmerkung = null;
+				this.formData.protokoll = null;
+				this.formData.note = null;
 		},
 		search(event) {
 			if (this.abortController.mitarbeiter) {
@@ -229,7 +259,7 @@ export default {
 			}
 			this.abortController.mitarbeiter = new AbortController();
 
-			return this.$refs.formData.factory.stv.abschlusspruefung.getMitarbeiter(event.query)
+			return this.$refs.formFinalExam.factory.stv.abschlusspruefung.getMitarbeiter(event.query)
 				.then(result => {
 					this.filteredMitarbeiter = result.data.retval;
 				});
@@ -240,34 +270,33 @@ export default {
 			}
 			this.abortController.pruefer = new AbortController();
 
-			return this.$refs.formData.factory.stv.abschlusspruefung.getPruefer(event.query)
+			return this.$refs.formFinalExam.factory.stv.abschlusspruefung.getPruefer(event.query)
 				.then(result => {
 					this.filteredPruefer = result.data.retval;
 				});
 		},
 		setDefaultFormData(){
 
-			//TODO(Manu) check why phrasen not working
+			this.resetForm();
+
+			//TODO(Manu) check why phrasen abschlusspruefung not working
 			//check lg: if no prüfungsnotizen
 			if (this.formData.typStg === 'b')
 			{
 				this.formData.pruefungstyp_kurzbz = 'Bachelor';
 				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenBachelor');
-				this.formData.protokoll = this.$p.t('ui', 'pruefungsnotizenMaster');
+				this.formData.protokoll = this.$p.t('ui', 'pruefungsnotizenBachelor2');
 			}
 			if (this.formData.typStg === 'd'){
 				this.formData.pruefungstyp_kurzbz = 'Diplom';
-				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenBachelor');
+				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
 			if (this.formData.typStg === 'lg')
 			{
 				this.formData.pruefungstyp_kurzbz =  'lgabschluss';
 			}
-		//	else
-		//		console.log("no Typ??");
 
 			if (!this.formData.akadgrad_id && this.arrAkadGrad.length > 0) {
-				console.log("in here");
 				this.formData.akadgrad_id = this.arrAkadGrad[0].akadgrad_id;
 			}
 		}
@@ -308,10 +337,6 @@ export default {
 	template: `
 	<div class="stv-details-abschlusspruefung h-100 pb-3">
 		<h1>{{this.$p.t('stv','tab_finalexam')}} </h1>
-<!--			{{typStg}}
-			<hr>
-			{{formData}}
-			{{arrAkadGrad}}-->
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
@@ -325,8 +350,9 @@ export default {
 			>
 		</core-filter-cmpt>
 		
-		<form-form ref="formData">
+		<form-form ref="formFinalExam" @submit.prevent>
 			<legend>{{this.$p.t('global','details')}}</legend>
+			<p v-if="statusNew">[neu]</p>
 			<div class="row mb-3">
 				<form-input
 					container-class="col-6 stv-details-abschlusspruefung-typ"
@@ -350,6 +376,7 @@ export default {
 					v-model="formData.note"
 					name="note"
 					>
+					<option :value="null">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
 					<option 
 						v-for="note in arrNoten" 
 						:key="note.note" 
@@ -380,7 +407,8 @@ export default {
 			</div>
 			
 			<div class="row mb-3">
-				<form-input
+			<!--TODO(Manu) Bug Autocompletefelder: nach Behebung wieder einblenden!-->
+<!--				<form-input
 					container-class="col-6 stv-details-abschlusspruefung-vorsitz"
 					label="Vorsitz"
 					type="autocomplete"
@@ -391,8 +419,16 @@ export default {
 					@complete="search" 
 					:min-length="3"
 					>
-				</form-input>
+				</form-input>-->
 				<form-input
+					container-class="col-6 stv-details-abschlusspruefung-vorsitz"
+					label="vorsitz"
+					type="text"
+					v-model="formData.vorsitz"
+					name="vorsitz"
+					>
+				</form-input>
+<!--				<form-input
 					container-class="col-6 stv-details-abschlusspruefung-pruefer1"
 					label="Prüferin1"
 					type="autocomplete"
@@ -402,6 +438,15 @@ export default {
 					:suggestions="filteredPruefer"
 					@complete="searchNotAkad" 
 					:min-length="3"
+					>
+				</form-input>-->
+				<!--TODO(Manu) Umbau auf Person_id-->
+				<form-input
+					container-class="col-6 stv-details-abschlusspruefung-pruefer1"
+					label="pruefer1"
+					type="text"
+					v-model="formData.pruefer1"
+					name="pruefer1"
 					>
 				</form-input>
 			</div>
@@ -415,6 +460,7 @@ export default {
 					v-model="formData.abschlussbeurteilung_kurzbz"
 					name="abschlussbeurteilung_kurzbz"
 					>
+					<option :value="null">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
 					<option 
 						v-for="beurteilung in arrBeurteilungen" 
 						:key="beurteilung.abschlussbeurteilung_kurzbz" 
@@ -423,7 +469,7 @@ export default {
 						{{beurteilung.bezeichnung}}
 					</option>
 				</form-input>
-				<form-input
+<!--				<form-input
 					container-class="col-6 stv-details-abschlusspruefung-pruefer2"
 					label="Prüferin2"
 					type="autocomplete"
@@ -433,6 +479,14 @@ export default {
 					:suggestions="filteredPruefer"
 					@complete="searchNotAkad" 
 					:min-length="3"
+					>
+				</form-input>-->
+				<form-input
+					container-class="col-6 stv-details-abschlusspruefung-pruefer2"
+					label="pruefer2"
+					type="text"
+					v-model="formData.pruefer2"
+					name="pruefer2"
 					>
 				</form-input>
 			</div>
@@ -453,7 +507,7 @@ export default {
 						{{grad.titel}}
 					</option>
 				</form-input>
-				<form-input
+<!--				<form-input
 					container-class="col-6 stv-details-abschlusspruefung-pruefer3"
 					label="Prüferin3"
 					type="autocomplete"
@@ -463,6 +517,14 @@ export default {
 					:suggestions="filteredPruefer"
 					@complete="searchNotAkad" 
 					:min-length="3"
+					>
+				</form-input>-->
+				<form-input
+					container-class="col-6 stv-details-abschlusspruefung-pruefer3"
+					label="pruefer3"
+					type="text"
+					v-model="formData.pruefer3"
+					name="pruefer3"
 					>
 				</form-input>
 			</div>
@@ -513,8 +575,22 @@ export default {
 					>
 				</form-input>
 			</div>
+			
+			<div class="row mb-3 col-6">
+				<div class="col">
+					<p >Zur Beurteilung</p>
+				</div>
+				<div class="col">
+				<!--TODO(Manu) vl auch als action mit icon_auge?-->
+					<p>
+					   <a :href="formData.link" target="_blank" rel="noopener noreferrer">
+						  Prüfungsprotokoll
+						</a>
+					</p>
+				</div>
+			</div>
 						
-			<div>
+			<div class="text-end mb-3">
 				<button v-if="statusNew" class="btn btn-primary" @click="addNewAbschlusspruefung()"> {{$p.t('ui', 'speichern')}}</button>
 				<button v-else class="btn btn-primary" @click="updateAbschlusspruefung(formData.abschlusspruefung_id)"> {{$p.t('ui', 'speichern')}}</button>
 			</div>

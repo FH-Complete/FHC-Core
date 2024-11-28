@@ -11,7 +11,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 		parent::__construct([
 			'getAbschlusspruefung' => ['admin:r', 'assistenz:r'],
 			'loadAbschlusspruefung' => ['admin:r', 'assistenz:r'],
-			'addNewAbschlusspruefung' => ['admin:rw', 'assistenz:rw'],
+			'insertAbschlusspruefung' => ['admin:rw', 'assistenz:rw'],
 			'updateAbschlusspruefung' => ['admin:rw', 'assistenz:rw'],
 			'deleteAbschlusspruefung' => ['admin:rw', 'assistenz:rw'],
 			'getTypenAbschlusspruefung' => ['admin:rw', 'assistenz:rw'],
@@ -58,11 +58,9 @@ class Abschlusspruefung extends FHCAPI_Controller
 			array('abschlusspruefung_id' => $abschlusspruefung_id)
 		);
 
-		if (isError($result)) {
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
+		$data = $this->getDataOrTerminateWithError($result);
 
-		$this->terminateWithSuccess((getData($result) ?: []));
+		$this->terminateWithSuccess(current($data));
 	}
 
 	public function getTypenAbschlusspruefung()
@@ -166,4 +164,172 @@ class Abschlusspruefung extends FHCAPI_Controller
 		return $this->terminateWithSuccess(getData($result) ?: []);
 	}
 
+	public function insertAbschlusspruefung()
+	{
+		$this->load->library('form_validation');
+
+		$student_uid = $this->input->post('uid');
+
+		if(!$student_uid)
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Student UID']), self::ERROR_TYPE_GENERAL);
+		}
+
+		$formData = $this->input->post('formData');
+		$_POST['pruefungstyp_kurzbz'] = $formData['pruefungstyp_kurzbz'];
+		$_POST['akadgrad_id']= $formData['akadgrad_id'];
+		$_POST['vorsitz']= $formData['vorsitz'];
+		$_POST['pruefungsantritt_kurzbz'] = $formData['pruefungsantritt_kurzbz'];
+		$_POST['abschlussbeurteilung_kurzbz'] = $formData['abschlussbeurteilung_kurzbz'];
+		$_POST['datum']= $formData['datum'];
+		$_POST['sponsion']= $formData['sponsion'];
+		$_POST['pruefer1'] = $formData['pruefer1'];
+		$_POST['pruefer2']= $formData['pruefer2'];
+		$_POST['pruefer3']= $formData['pruefer3'];
+		$_POST['anmerkung'] = $formData['anmerkung'];
+		$_POST['protokoll']= $formData['protokoll'];
+		$_POST['note'] = $formData['note'];
+
+		$this->form_validation->set_rules('pruefungstyp_kurzbz', 'Typ', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
+		]);
+
+		$this->form_validation->set_rules('datum', 'Datum', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Datum'])
+		]);
+
+		//TODO(Manu) just for testing, not really required
+		$this->form_validation->set_rules('sponsion', 'Sponsion', 'required|is_valid_date', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Sponsion']),
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Sponsion'])
+		]);
+
+/*		$this->form_validation->set_rules('sponsion', 'Sponsion', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Sponsion'])
+		]);*/
+
+
+		if ($this->form_validation->run() == false)
+		{
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
+
+		$result = $this->AbschlusspruefungModel->insert([
+			'student_uid' => $student_uid,
+			'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
+			'akadgrad_id' => $this->input->post('akadgrad_id'),
+			'vorsitz' => $this->input->post('vorsitz'),
+			'pruefungsantritt_kurzbz' => $this->input->post('pruefungsantritt_kurzbz'),
+			'abschlussbeurteilung_kurzbz' => $this->input->post('abschlussbeurteilung_kurzbz'),
+			'datum' => $this->input->post('datum'),
+			'sponsion' => $this->input->post('sponsion'),
+			'pruefer1' => $this->input->post('pruefer1'),
+			'pruefer2' => $this->input->post('pruefer2'),
+			'pruefer3' => $this->input->post('pruefer3'),
+			'protokoll' => $this->input->post('protokoll'),
+			'note' => $this->input->post('note'),
+			'anmerkung' => $this->input->post('anmerkung'),
+			'insertamum' => date('c'),
+			'insertvon' => getAuthUID()
+		]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function updateAbschlusspruefung()
+	{
+		$this->load->library('form_validation');
+
+		$abschlusspruefung_id = $this->input->post('id');
+
+		if(!$abschlusspruefung_id)
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Abschlussprüfung ID']), self::ERROR_TYPE_GENERAL);
+		}
+
+		$formData = $this->input->post('formData');
+		$_POST['student_uid'] = $formData['student_uid'];
+		$_POST['pruefungstyp_kurzbz'] = $formData['pruefungstyp_kurzbz'];
+		$_POST['akadgrad_id']= $formData['akadgrad_id'];
+		$_POST['vorsitz']= $formData['vorsitz'];
+		$_POST['pruefungsantritt_kurzbz'] = $formData['pruefungsantritt_kurzbz'];
+		$_POST['abschlussbeurteilung_kurzbz'] = $formData['abschlussbeurteilung_kurzbz'];
+		$_POST['datum']= $formData['datum'];
+		$_POST['sponsion']= $formData['sponsion'];
+		$_POST['pruefer1'] = $formData['pruefer1'];
+		$_POST['pruefer2']= $formData['pruefer2'];
+		$_POST['pruefer3']= $formData['pruefer3'];
+		$_POST['anmerkung'] = $formData['anmerkung'];
+		$_POST['protokoll']= $formData['protokoll'];
+		$_POST['note'] = $formData['note'];
+
+		$this->form_validation->set_rules('pruefungstyp_kurzbz', 'Typ', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
+		]);
+
+		$this->form_validation->set_rules('datum', 'Datum', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Datum'])
+		]);
+
+		//TODO(Manu) just for testing, not really required
+		$this->form_validation->set_rules('sponsion', 'Sponsion', 'required|is_valid_date', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Sponsion']),
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Sponsion'])
+		]);
+
+
+		if ($this->form_validation->run() == false)
+		{
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
+
+		$result = $this->AbschlusspruefungModel->update(
+			[
+			'abschlusspruefung_id' => $abschlusspruefung_id
+			],
+			[
+			'student_uid' => $this->input->post('student_uid'),
+			'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
+			'akadgrad_id' => $this->input->post('akadgrad_id'),
+			'vorsitz' => $this->input->post('vorsitz'),
+			'pruefungsantritt_kurzbz' => $this->input->post('pruefungsantritt_kurzbz'),
+			'abschlussbeurteilung_kurzbz' => $this->input->post('abschlussbeurteilung_kurzbz'),
+			'datum' => $this->input->post('datum'),
+			'sponsion' => $this->input->post('sponsion'),
+			'pruefer1' => $this->input->post('pruefer1'),
+			'pruefer2' => $this->input->post('pruefer2'),
+			'pruefer3' => $this->input->post('pruefer3'),
+			'protokoll' => $this->input->post('protokoll'),
+			'note' => $this->input->post('note'),
+			'anmerkung' => $this->input->post('anmerkung'),
+			'insertamum' => date('c'),
+			'insertvon' => getAuthUID()
+			]
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function deleteAbschlusspruefung()
+	{
+		$abschlusspruefung_id = $this->input->post('id');
+
+		$result = $this->AbschlusspruefungModel->delete(
+			array('abschlusspruefung_id' => $abschlusspruefung_id)
+		);
+
+		if (isError($result))
+		{
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		if (!hasData($result))
+		{
+			$this->outputJson($result);
+		}
+		return $this->terminateWithSuccess(current(getData($result)) ? : null);
+	}
 }
