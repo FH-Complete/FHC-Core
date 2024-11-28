@@ -241,9 +241,9 @@ function checkZeilenUmbruch()
 	}
 
 	// Digitale Anwesenheiten
-	// $lv->studiengang_kz == 257 -> only show the extension for studiengang BIF - Bachelor Informatik 
 	if(defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet
-			&& $lv->studiengang_kz == 257 && ($rechte->isBerechtigt('extension/anw_ent_admin')
+			&& (!defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG') || in_array($lv->studiengang_kz, unserialize(CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG)))
+			&& ($rechte->isBerechtigt('extension/anw_ent_admin')
 				|| $rechte->isBerechtigt('extension/anwesenheit_lektor')
 				|| $rechte->isBerechtigt('extension/anwesenheit_student')
 				|| $rechte->isBerechtigt('extension/anwesenheit_admin')))
