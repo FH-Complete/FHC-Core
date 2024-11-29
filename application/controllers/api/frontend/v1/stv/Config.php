@@ -94,7 +94,10 @@ class Config extends FHCAPI_Controller
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
-			'showOnlyWithUid' => true
+			'showOnlyWithUid' => true,
+			'config' => [
+				'edit' => 'both', // Possible values: both|header|inline
+			]
 		];
 		
 

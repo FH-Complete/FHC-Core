@@ -2,6 +2,9 @@ export default {
 	emits: [
 		'setGrades'
 	],
+	inject: [
+		'config'
+	],
 	props: {
 		selected: Array
 	},
@@ -44,7 +47,7 @@ export default {
 	// TODO(chris): phrases
 	template: `
 	<div class="stv-details-noten-zeugnis-actions">
-		<select class="form-select" v-model="current" :disabled="!selected.length">
+		<select v-if="['both', 'header'].includes(config.edit)" class="form-select" v-model="current" :disabled="!selected.length">
 			<option value="" disabled>Note setzen</option>
 			<option v-for="grade in grades" :key="grade.note" :value="grade.note">{{ grade.bezeichnung }}</option>
 		</select>

@@ -10,8 +10,14 @@ export default {
 		NotenTeacher,
 		NotenRepeater
 	},
+	provide() {
+		return {
+			config: this.config
+		}
+	},
 	props: {
-		modelValue: Object
+		modelValue: Object,
+		config: Object
 	},
 	data() {
 		return {
