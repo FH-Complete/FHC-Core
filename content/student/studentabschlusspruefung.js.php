@@ -195,6 +195,8 @@ function StudentAbschlusspruefungResetFields()
 	document.getElementById('student-abschlusspruefung-datum-uhrzeit').value='00:00';
 	document.getElementById('student-abschlusspruefung-datum-sponsion').value='';
 	document.getElementById('student-abschlusspruefung-textbox-anmerkung').value='';
+	document.getElementById('student-abschlusspruefung-link-value').value='';
+	document.getElementById('student-abschlusspruefung-link').value='';
 }
 
 // ****
@@ -353,6 +355,7 @@ function StudentAbschlusspruefungAuswahl()
 	pruefungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungstyp_kurzbz" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	protokoll = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#protokoll" ));
+	link_abschlusspruefung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#link_abschlusspruefung" ));
 
 	stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
@@ -412,6 +415,8 @@ function StudentAbschlusspruefungAuswahl()
 	document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value=abschlusspruefung_id;
 	document.getElementById('student-abschlusspruefung-checkbox-neu').checked=false;
 	document.getElementById('student-abschlusspruefung-textbox-protokoll').value=protokoll;
+	document.getElementById('student-abschlusspruefung-link-value').value=link_abschlusspruefung;
+	document.getElementById('student-abschlusspruefung-link').value='Prüfungsprotokoll';
 
 	StudentAbschlusspruefungTypChange();
 }

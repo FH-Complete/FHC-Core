@@ -1952,7 +1952,6 @@ function GenerateXMLBewerberBlock($studiengang_kz, $orgformcode=null)
 			AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang_kz)."
 			AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
 			AND status_kurzbz='Bewerber'
-			AND reihungstestangetreten
 			";
 
 		if(!is_null($orgformcode))

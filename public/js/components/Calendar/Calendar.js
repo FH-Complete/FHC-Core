@@ -66,6 +66,12 @@ export default {
 		}
 	},
 	watch:{
+		selectedEvent:{
+			handler(newSelectedEvent) {
+				this.$emit('selectedEvent', newSelectedEvent);
+			},
+			immediate: true,
+		},
 		// scroll to the first event if the html element was found
 		scrollTime({focusDate,scrollTime}){
 			// return early if the scrollTime is not set
@@ -89,7 +95,8 @@ export default {
 		'select:day',
 		'select:event',
 		'change:range',
-		'update:minimized'
+		'update:minimized',
+		'selectedEvent'
 	],
 	data() {
 		return {
@@ -223,8 +230,14 @@ export default {
 			<template #weekPage="{event,day,isSelected}">
 				<slot name="weekPage" :event="event" :day="day" :isSelected="isSelected"></slot>
 			</template>
-			<template #dayPage="{event,day}">
-				<slot name="dayPage" :event="event" :day="day"></slot>
+			<template #dayPage="{event,day,mobile}">
+				<slot name="dayPage" :event="event" :day="day" :mobile="mobile"></slot>
+			</template>
+			<template #pageMobilContent="{lvMenu}">
+				<slot name="pageMobilContent" :lvMenu="lvMenu"></slot>
+			</template>
+			<template #pageMobilContentEmpty>
+				<slot name="pageMobilContentEmpty" ></slot>
 			</template>
 			<template #minimizedPage="{event,day}">
 				<slot name="minimizedPage" :event="event" :day="day"></slot>

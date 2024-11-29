@@ -288,7 +288,7 @@ class LvMenu extends FHCAPI_Controller
 	private function fhc_menu_digitale_anwesenheiten(&$menu, $angemeldet, $studiengang_kz, $semester, $lvid, $angezeigtes_stsem){
 		
 		// DIGITALE ANWESENHEITEN
-		if (CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet) {
+		if (defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet) {
 
 			$menu[] = array
 			(

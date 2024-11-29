@@ -17,6 +17,10 @@ export default {
 			type:String,
 			default:"title"
 		},
+		showMenu:{
+			type:Boolean,
+			default:true,
+		},
 	/*
 	* NOTE(chris):
 	* Hack to expose in "emits" declared events to $props which we use
@@ -39,6 +43,9 @@ export default {
 	methods:{
 		onModalShow: function()
 		{
+			// do not load the menu if the menu is not getting rendered
+			if(!this.showMenu) return;
+
 			if (this.event.type == 'lehreinheit') {
 				this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(this.event.lehreinheit_id[0]).then(
 					res=>res.data
@@ -69,8 +76,10 @@ export default {
 		<template v-slot:default>
 			<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
 			<lv-info :event="event"></lv-info>
-			<h3 >Lehrveranstaltungs Menu</h3>
-			<lv-menu :menu="menu"></lv-menu>
+			<template v-if="showMenu">
+				<h3 >Lehrveranstaltungs Menu</h3>
+				<lv-menu :menu="menu"></lv-menu>
+			</template>
 		</template>
 		<!-- optional footer -->
 		<template  v-slot:footer >

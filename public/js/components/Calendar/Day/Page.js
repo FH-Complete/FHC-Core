@@ -1,6 +1,4 @@
 import CalendarDate from '../../../composables/CalendarDate.js';
-import LvMenu from "../../../components/Cis/Mylv/LvMenu.js"
-import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
 import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 
 function ggt(m, n) { return n == 0 ? m : ggt(n, m % n); }
@@ -8,8 +6,6 @@ function kgv(m, n) { return (m * n) / ggt(m, n); }
 
 export default {
 	components:{
-		LvMenu,
-		LvInfo,
 		LvModal,
 	},
 	data() {
@@ -79,9 +75,26 @@ export default {
 				this.fetchLvMenu(event);
 			},
 			immediate:true,
+		},
+		isSliding:{
+			handler(value){
+				if(value)
+				{
+					this.setSelectedEvent(null);
+				}
+			}
 		}
 	},
 	computed: {
+		pageHeaderStyle(){
+			return {
+				'z-index': 4,
+				'grid-template-columns': 'repeat(' + this.day.length + ', 1fr)',
+				'grid-template-rows': 1,
+				position: 'sticky',
+				top: 0,
+			}
+		},
 		dayGridStyle(){
 			return {
 				'grid-template-columns': '1 1fr',
@@ -191,12 +204,16 @@ export default {
 				'z-index': 0,
 			}  
 		},
-		showModal: function (evt) {
-			let event = evt.orig;
-			this.setSelectedEvent(event);
-			Vue.nextTick(() => {
-				this.$refs.lvmodal.show();
-			});
+		eventGridStyle(day, event) {
+			return {
+				'z-index': 1,
+				'grid-column-start': 1 + (event.lane - 1) * day.lanes / event.maxLane,
+				'grid-column-end': 1 + event.lane * day.lanes / event.maxLane,
+				'grid-row-start': this.dateToMinutesOfDay(event.start),
+				'grid-row-end': this.dateToMinutesOfDay(event.end),
+				'background-color': event.orig.color,
+				'--test': this.dateToMinutesOfDay(event.end),
+			}
 		},
 		eventClick(evt) {
 			let event = evt.orig;
@@ -258,36 +275,26 @@ export default {
 		dateToMinutesOfDay(day) {
 			return Math.floor(((day.getHours() - 7) * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
 		},
-		eventGridStyle(day,event){
-			return { 
-				'z-index': 1,
-			 	'grid-column-start': 1 + (event.lane - 1) * day.lanes / event.maxLane,
-				'grid-column-end': 1 + event.lane * day.lanes / event.maxLane,
-				'grid-row-start': this.dateToMinutesOfDay(event.start),
-				'grid-row-end': this.dateToMinutesOfDay(event.end),
-				'background-color': event.orig.color,
-				'--test': this.dateToMinutesOfDay(event.end),
-			}
-		}
+		
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-day-page ">
-	<!-- lvModal for mobile view -->
-	<lv-modal v-if="selectedEvent" :event="selectedEvent" ref="lvmodal" />
 		<div class="row m-0">
 			<div class="col-12 col-xl-6 p-0">
 				<div class="d-flex flex-column">
-				<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="{'z-index':4,'grid-template-columns': 'repeat(' + day.length + ', 1fr)', 'grid-template-rows':1}" style="position:sticky; top:0; " >
+				<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
 					<div type="button" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
 						<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
 						<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
 					</div>
 				</div>
-				<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="" >
+				<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
 					<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
-					<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
-						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
-					</div>
+					<Transition>
+						<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
+							<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
+						</div>
+					</Transition>
 					<div>
 						<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
 						<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
@@ -297,16 +304,16 @@ export default {
 							</div>
 							<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle">
 								<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" :class="{'selectedEvent':event.orig == selectedEvent}" class="mx-2 small rounded overflow-hidden " >
-									<!-- desktop version opens the lvMenu next to the calendar -->
+									<!-- desktop version of the page template, parent receives slotProp mobile = false -->
 									<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
-										<slot  name="dayPage" :event="event" :day="day">
-											<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+										<slot  name="dayPage" :event="event" :day="day" :mobile="false">
+											<p>this is a slot placeholder</p>
 										</slot>
 									</div>
-									<!-- mobile version opens the lvModal in a modal -->
-									<div class="d-block d-xl-none h-100" @click.prevent="showModal(event)">
-										<slot  name="dayPage" :event="event" :day="day">
-											<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+									<!-- mobile version of the page template, parent receives slotProp mobile = true -->
+									<div class="d-block d-xl-none h-100" @click.prevent="eventClick(event)">
+										<slot  name="dayPage" :event="event" :day="day" :mobile="true">
+											<p>this is a slot placeholder</p>
 										</slot>
 									</div>
 
@@ -318,18 +325,17 @@ export default {
 			</div>
 			</div>
 			<div class="d-none d-xl-block col-xl-6 p-0">
-				<div class="p-5	 sticky-top d-flex justify-content-center align-items-center flex-column">
+				<div style="z-index:0" class="p-5 sticky-top d-flex justify-content-center align-items-center flex-column">
 					<div style="max-height: calc(var(--fhc-calendar-pane-height) - 100px); overflow-y:auto;" class="w-100">
 						<template v-if="selectedEvent && lvMenu">
-							<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
-							<div class="w-100">
-								<lv-info  :event="selectedEvent" />
-							</div>
-							<h3 >Lehrveranstaltungs Menu</h3>
-							<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-show="lvMenu" :menu="lvMenu" />
+							<slot name="pageMobilContent" :lvMenu="lvMenu" >
+								<p>this is a slot placeholder</p>
+							</slot>
 						</template>
 						<template v-else-if="noEventsCondition">
-							<h3>Keine Lehrveranstaltungen</h3>
+							<slot name="pageMobilContentEmpty" >
+								<h3>This is an slot placeholder</h3>
+							</slot>
 						</template>
 						<template v-else>
 							<div class="p-4 d-flex w-100 justify-content-center align-items-center">
