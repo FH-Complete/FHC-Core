@@ -545,3 +545,14 @@ html {
 		overflow-wrap: anywhere;
 	}
 }
+
+/* classes used for the Vue <Transition> component*/
+.v-enter-active,
+.v-leave-active {
+	transition: opacity 0.2s ease-out;
+}
+
+.v-enter-from,
+.v-leave-to {
+	opacity: 0;
+}
