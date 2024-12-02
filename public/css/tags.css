@@ -1,10 +1,9 @@
-:is(.tag_notice, .tag_inwork, .tag_planning) {
+:is(.tag_notice, .tag_inwork, .tag_planning, .tag_prio_one, .tag_prio_two, .tag_finished) {
 	display: inline-block;
 	padding: 5px 10px;
 	margin-right: 5px;
 	border-radius: 3px;
 	color: white;
-	cursor: default;
 	font-size: .75em;
 	font-weight: 700;
 	line-height: 1;
@@ -13,15 +12,36 @@
 	vertical-align: baseline;
 }
 
+:is(.tag_notice, .tag_inwork, .tag_planning, .tag_prio_one, .tag_prio_two, .tag_finished):hover {
+	transform: scale(1.05);
+}
+
 .tag_notice {
 	background-color: red !important;
 }
-.tag_inwork  {
+
+
+.tag_finished {
+	background-color: green !important;
+}
+
+.tag_inwork {
 	background-color: violet !important;
 }
-.tag_planning  {
+
+.tag_planning {
 	background-color: lightblue !important;
 }
+
+.tag_prio_one {
+	background-color: red !important;
+}
+
+.tag_prio_two {
+	background-color: yellow !important;
+	color: black;
+}
+
 
 .dropdown-list {
 	list-style: none;

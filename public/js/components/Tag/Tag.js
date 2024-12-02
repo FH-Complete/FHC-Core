@@ -181,8 +181,8 @@ export default {
 		<div class="plus-button-container" @mouseleave="hideList">
 			<button @mouseover="showList = true" 
 					:disabled="!values || values.length === 0"
-					class="btn btn-secondary btn-sm">
-				<i class="fa-solid fa-plus fa-xl"></i>
+					class="btn btn-sm">
+				<i class="fa-solid fa-tag fa-xl"></i>
 			</button>
 			<ul v-if="showList" class="dropdown-list">
 				<li v-for="(item, index) in tags" :key="index" @click="openModal(item)" :title="item.bezeichnung">
@@ -209,7 +209,6 @@ export default {
 						placeholder="Notiz..."
 					></form-input>
 					<div class="modificationdate">angelegt von {{ tagData.insertvon }} am {{ tagData.insertamum }}</div>
-
 				</div>
 			</template>
 			<template #footer>
