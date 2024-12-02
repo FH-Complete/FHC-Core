@@ -288,11 +288,13 @@ export default {
 						<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
 					</div>
 				</div>
-				<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="" >
+				<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
 					<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
-					<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
-						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
-					</div>
+					<Transition>
+						<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
+							<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
+						</div>
+					</Transition>
 					<div>
 						<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
 						<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">

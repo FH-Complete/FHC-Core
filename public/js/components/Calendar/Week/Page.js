@@ -212,11 +212,13 @@ export default {
 					<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
 				</div>
 			</div>
-			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="" >
+			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
 				<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
-				<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
-					<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
-				</div>
+				<Transition>
+					<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
+						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
+					</div>
+				</Transition>
 				<div class="events">
 					<div class="hours">
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>

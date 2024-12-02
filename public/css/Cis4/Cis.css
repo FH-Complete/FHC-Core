@@ -182,6 +182,10 @@ html {
   transform: rotate(-90deg);
 }
 
+#nav-sprachen{
+	transition: none;
+}
+
 /* searchbar */
 #nav-search {
   z-index: 1;
@@ -540,4 +544,25 @@ html {
 		padding-left: 2.5rem;
 		overflow-wrap: anywhere;
 	}
+}
+
+/* classes used for the Vue <Transition> component*/
+.v-enter-active,
+.v-leave-active {
+	transition: opacity 0.2s ease-out;
+}
+
+.v-enter-from,
+.v-leave-to {
+	opacity: 0;
+}
+
+.height-enter-active,
+.height-leave-active {
+	transition: height 0.3s ease-out;
+}
+
+.height-enter-from,
+.height-leave-to {
+	height: 0px;
 }
