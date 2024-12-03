@@ -52,7 +52,8 @@ export default {
 			}
 		);
 	},
-	getGradeFromPoints(points) {
-		return this.$fhcApi.post('api/frontend/v1/stv/grades/getGradeFromPoints', data);
+	getGradeFromPoints(points, lehrveranstaltung_id, manualErrorHandling) {
+		const config = manualErrorHandling ? {errorHandling: false} : {};
+		return this.$fhcApi.post('api/frontend/v1/stv/grades/getGradeFromPoints', {points, lehrveranstaltung_id}, config);
 	}
 }

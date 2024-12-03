@@ -26,7 +26,8 @@ class Notenschluesselzuordnung_model extends DB_Model
 		
 		$this->db->where("lehrveranstaltung_id", $lehrveranstaltung_id);
 		if ($studiensemester_kurzbz) {
-			$this->db->where_in("studiensemester_kurzbz", [$studiensemester_kurzbz, null]);
+			$this->db->where("studiensemester_kurzbz", $studiensemester_kurzbz);
+			$this->db->or_where("studiensemester_kurzbz", null);
 		} else {
 			$this->db->where("studiensemester_kurzbz", null);
 		}

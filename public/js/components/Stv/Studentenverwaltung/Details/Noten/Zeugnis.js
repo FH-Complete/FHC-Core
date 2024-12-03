@@ -33,48 +33,73 @@ export default {
 				tooltip: (evt, cell) => cell.getData().note_bezeichnung
 			};
 			if (['both', 'inline'].includes(this.config.edit)) {
-				gradeField = {...gradeField, ...{
-					editor: 'list',
-					editorParams: {
-						valuesLookup: (cell, filterTerm) => listPromise,
-						placeholderLoading: "Loading Remote Data...", // TODO(chris): phrase
-					},
-					cellEdited: cell => {
-						// get row data
-						const {lehrveranstaltung_id, uid: student_uid, studiensemester_kurzbz} = cell.getData();
-						// get changed value
-						const note = cell.getValue();
-						
-						listPromise
-							// get bezeichnung
-							.then(list => list.find(el => el.value == note))
-							.then(found => found ? found.label : Promise.reject({message: 'not found'}))
-							// prepare data object
-							.then(note_bezeichnung => ({
-								lehrveranstaltung_id,
-								student_uid,
-								studiensemester_kurzbz,
-								note,
-								note_bezeichnung
-							}))
-							// send to backend
-							.then(this.$fhcApi.factory.stv.grades.updateCertificate)
-							// get bezeichnung again
-							.then(() => listPromise)
-							.then(list => list.find(el => el.value == note))
-							.then(found => found ? found.label : Promise.reject({message: 'not found'}))
-							// update other fields in row
-							.then(note_bezeichnung => cell.getRow().update({note_bezeichnung}))
-							.then(() => cell.getRow().reformat())
-							// cleanup
-							.then(cell.clearEdited)
-							.catch(err => {
-								cell.restoreOldValue();
-								cell.clearEdited();
-								this.$fhcAlert.handleFormValidation(err);
-							});
-					}
-				}};
+				gradeField.editor = 'list';
+				gradeField.cellEdited = cell => {
+					// get changed value
+					const note = cell.getValue();
+					if (note === '')
+						return;
+
+					// get row data
+					const {lehrveranstaltung_id, uid: student_uid, studiensemester_kurzbz} = cell.getData();
+
+					listPromise
+						// get bezeichnung
+						.then(list => list.find(el => el.value == note))
+						.then(found => found ? found.label : Promise.reject({message: 'not found'}))
+						// prepare data object
+						.then(note_bezeichnung => ({
+							lehrveranstaltung_id,
+							student_uid,
+							studiensemester_kurzbz,
+							note,
+							note_bezeichnung
+						}))
+						// send to backend
+						.then(this.$fhcApi.factory.stv.grades.updateCertificate)
+						// get bezeichnung again
+						.then(() => listPromise)
+						.then(list => list.find(el => el.value == note))
+						.then(found => found ? found.label : Promise.reject({message: 'not found'}))
+						// update other fields in row
+						.then(note_bezeichnung => cell.getRow().update({note_bezeichnung}))
+						.then(() => cell.getRow().reformat())
+						// cleanup
+						.then(cell.clearEdited)
+						.catch(err => {
+							cell.restoreOldValue();
+							cell.clearEdited();
+							this.$fhcAlert.handleFormValidation(err);
+						});
+				};
+				if (this.config.usePoints) {
+					gradeField.editorParams = {
+						valuesLookup: (cell, filterTerm) => {
+							if (filterTerm) {
+								return this.$fhcApi.factory
+									.stv.grades.getGradeFromPoints(filterTerm, cell.getData().lehrveranstaltung_id, true)
+									.then(result => 
+										result.data === null
+										? []
+										: listPromise.then(res => res.filter(grade => grade.value === result.data))
+									)
+									.catch(err => []);
+							}
+							return listPromise;
+						},
+						autocomplete: true,
+						filterRemote: true,
+						allowEmpty: true, 
+						listOnEmpty: true
+					};
+					gradeField.cellEditing = cell => cell.setValue('');
+					gradeField.cellEditCancelled = cell => cell;
+				} else {
+					gradeField.editorParams = {
+						valuesLookup: (cell, filterTerm) => listPromise
+					};
+				}
+				gradeField.editorParams.placeholderLoading = "Loading Remote Data..." // TODO(chris): phrase
 			}
 
 			const columns = [

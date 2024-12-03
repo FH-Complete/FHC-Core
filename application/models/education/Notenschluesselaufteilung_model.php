@@ -19,7 +19,7 @@ class Notenschluesselaufteilung_model extends DB_Model
 	 * @param integer					$lehrveranstaltung_id
 	 * @param string					$studiensemester_kurzbz
 	 *
-	 * @return stdClass
+	 * @return stdClass		returns success(null) if no entry is found
 	 */
 	public function getNote($points, $lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
@@ -38,7 +38,7 @@ class Notenschluesselaufteilung_model extends DB_Model
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error("Es wurde kein passender eintrag gefunden"); // TODO(chris): phrase
+			return success(null);
 		return success(current(getData($result))->note);
 	}
 }

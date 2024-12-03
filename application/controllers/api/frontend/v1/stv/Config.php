@@ -97,6 +97,7 @@ class Config extends FHCAPI_Controller
 			'showOnlyWithUid' => true,
 			'config' => [
 				'edit' => 'both', // Possible values: both|header|inline
+				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE
 			]
 		];
 		

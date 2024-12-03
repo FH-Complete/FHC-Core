@@ -54,3 +54,12 @@
 	z-index: 1;
 	outline: 0;
 }
+
+
+/**
+ * Make keyboard-focused list items look like the mouse-hovered list items
+ */
+.tabulator-edit-list .tabulator-edit-list-item.focused {
+	color: #fff;
+	background: #1d68cd;
+}
