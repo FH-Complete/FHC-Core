@@ -14587,6 +14587,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'felderFehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte füllen Sie alle Formularfelder aus",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Please fill in all form fields",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'errorUploadFehlt',
 		'insertvon' => 'system',
 		'phrases' => array(
