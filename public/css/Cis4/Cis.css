@@ -556,3 +556,13 @@ html {
 .v-leave-to {
 	opacity: 0;
 }
+
+.height-enter-active,
+.height-leave-active {
+	transition: height 0.3s ease-out;
+}
+
+.height-enter-from,
+.height-leave-to {
+	height: 0px;
+}

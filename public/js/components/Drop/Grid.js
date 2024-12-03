@@ -356,29 +356,31 @@ export default {
 		@drop="dragEnd"
 		@mousemove="updateCursor"
 		@mouseleave="mouseLeave">
-		<grid-item
-			v-for="item in (mode == 0 && active? placedItems_withPlaceholders : placedItems)"
-			:key="item.id"
-			:item="item"
-			@start-move="startMove"
-			@start-resize="startResize"
-			@end-drag="dragCancel"
-			@drop-drag="dragEnd"
-			class="position-absolute"
-			:active="active"
-			:style="{
-				top: 'calc(' + item.y + ' * var(--fhc-dg-row-height))',
-				left: 'calc(' + item.x + ' * var(--fhc-dg-col-width))',
-				width: 'calc(' + item.w + ' * var(--fhc-dg-col-width))',
-				height: 'calc(' + item.h + ' * var(--fhc-dg-row-height))',
-				paddingTop: 'var(--fhc-dg-item-padding-top)',
-				paddingLeft: 'var(--fhc-dg-item-padding-horizontal)',
-				paddingRight: 'var(--fhc-dg-item-padding-horizontal)'
-			}">
-			<template v-slot="item">
-				<slot v-bind="item.data" v-bind="item" :x="item.x" :y="item.y" ></slot>
-			</template>
-		</grid-item>
+		<TransitionGroup tag="div">
+			<grid-item
+				v-for="item in (mode == 0 && active? placedItems_withPlaceholders : placedItems)"
+				:key="item.id"
+				:item="item"
+				@start-move="startMove"
+				@start-resize="startResize"
+				@end-drag="dragCancel"
+				@drop-drag="dragEnd"
+				class="position-absolute"
+				:active="active"
+				:style="{
+					top: 'calc(' + item.y + ' * var(--fhc-dg-row-height))',
+					left: 'calc(' + item.x + ' * var(--fhc-dg-col-width))',
+					width: 'calc(' + item.w + ' * var(--fhc-dg-col-width))',
+					height: 'calc(' + item.h + ' * var(--fhc-dg-row-height))',
+					paddingTop: 'var(--fhc-dg-item-padding-top)',
+					paddingLeft: 'var(--fhc-dg-item-padding-horizontal)',
+					paddingRight: 'var(--fhc-dg-item-padding-horizontal)'
+				}">
+				<template v-slot="item">
+					<slot v-bind="item.data" v-bind="item" :x="item.x" :y="item.y" ></slot>
+				</template>
+			</grid-item>
+		</TransitionGroup>
 		
 	</div>`
 }

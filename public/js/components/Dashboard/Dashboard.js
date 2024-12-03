@@ -22,6 +22,7 @@ export default {
 	provide() {
 		return {
 			editMode: Vue.computed(()=>this.editMode),
+			viewData: Vue.computed(()=>Vue.reactive(this.viewData)),
 		}
 	},
 	computed: {
