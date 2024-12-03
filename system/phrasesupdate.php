@@ -26528,13 +26528,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Mitarbeiter und Projekt sind der Organisationseinheit nicht zugeordnet.',
+				'text' => 'Info an DepL/KFL',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Employee and project are not assigned to the organizational unit.',
+				'text' => 'Info to DepL/KFL:',
 				'description' => '',
 				'insertvon' => 'system'
 			)
