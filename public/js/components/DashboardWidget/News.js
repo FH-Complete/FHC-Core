@@ -164,7 +164,7 @@ export default {
 						data-bs-interval="false"
 						ref="carocontrols">
 						<div class="carousel-indicators">
-							<button v-for="(news, index) in newsList" :id="'indicator-'+news_news_id" type="button" data-bs-target="#carouselExample" data-bs-slide-to="index"></button>
+							<button v-for="(news, index) in newsList" :id="'indicator-'+news.news_id" type="button" data-bs-target="#carouselExample" data-bs-slide-to="index"></button>
 						 </div>
 
 						<div class="carousel-inner"  style="height: 100%; max-width: 100%;">
