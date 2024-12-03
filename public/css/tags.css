@@ -1,4 +1,4 @@
-:is(.tag_notice, .tag_inwork, .tag_planning, .tag_prio_one, .tag_prio_two, .tag_finished) {
+:is(.tag_notice, .tag_inwork, .tag_planning, .tag_prio_one, .tag_prio_two, .tag_finished, .display_all) {
 	display: inline-block;
 	padding: 5px 10px;
 	margin-right: 5px;
@@ -13,7 +13,7 @@
 }
 
 :is(.tag_notice, .tag_inwork, .tag_planning, .tag_prio_one, .tag_prio_two, .tag_finished):hover {
-	transform: scale(1.05);
+	transform: scale(1.15);
 }
 
 .tag_notice {
@@ -41,6 +41,11 @@
 	color: black;
 }
 
+.display_all {
+	background-color: darkgrey !important;
+	border: none;
+}
+
 
 .dropdown-list {
 	list-style: none;
@@ -60,18 +65,6 @@
 .plus-button-container.disabled {
 	pointer-events: none;
 	opacity: 0.5;
-}
-
-.plus-more-tags {
-	font-weight: bold;
-	color: #007bff;
-	cursor: pointer;
-}
-
-.all-tags-modal-content {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
 }
 
 .tag-done {

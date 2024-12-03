@@ -95,7 +95,11 @@ export default {
 				this.tagData.notiz = "";
 				this.mode = "create";
 			}
-			this.$refs.tagModal.show();
+
+			if (this.mode === "create" && item.tag)
+				this.saveTag()
+			else
+				this.$refs.tagModal.show();
 		},
 		async saveTag()
 		{
