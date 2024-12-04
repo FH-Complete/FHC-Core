@@ -7,12 +7,10 @@ import prestudent from "./prestudent.js";
 
 export default {
     props: [ "searchoptions", "searchfunction" ],
-    emits: ['showSettings'],
     data: function() {
       return {
         searchtimer: null,
         hidetimer: null,
-        showsettings: false,
         searchsettings: {
             searchstr: '',
             types: [],
@@ -65,8 +63,10 @@ export default {
               </div>
             </div>
 
-            <div id="searchSettings"  ref="settings"  @[\`show.bs.collapse\`]="$emit('showSettings','settings')"
-                 class="top-100 end-0 searchbar_settings text-white collapse" tabindex="-1">
+            <div id="searchSettings"  ref="settings"
+				@[\`shown.bs.collapse\`]="handleShowSettings"
+				@[\`hide.bs.collapse\`]="handleHideSettings"
+                class="top-100 end-0 searchbar_settings text-white collapse" tabindex="-1">
               <div class="d-flex flex-column m-3" v-if="this.searchoptions.types.length > 0">
               <span class="fw-light mb-2">Suche filtern nach:</span>  
               <template v-for="(type, index) in this.searchoptions.types" :key="type">
@@ -87,7 +87,6 @@ export default {
     },
     beforeMount: function() {
         this.updateSearchOptions();
-        
     },
 	mounted(){
 		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {
@@ -102,6 +101,21 @@ export default {
 		}
 	},
     methods: {
+		checkSettingsVisibility: function(event) {
+			// hides the settings collapsible if the user clicks somewhere else
+			if (!this.$refs.settings.contains(event.target))
+			{
+				this.settingsDropdown.hide();
+			}
+		},
+		handleShowSettings: function() {
+			// adds the event listener checkSettingsVisibility only when the collapsible is shown
+			document.addEventListener("click", this.checkSettingsVisibility);
+		},
+		handleHideSettings: function () {
+			// removes the event listener checkSettingsVisibility when the collapsible is hidden
+			document.removeEventListener("click", this.checkSettingsVisibility);
+		},
         updateSearchOptions: function() {
             this.searchsettings.types = [];
             for( const idx in this.searchoptions.types ) {
