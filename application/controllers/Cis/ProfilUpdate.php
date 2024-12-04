@@ -36,6 +36,7 @@ class ProfilUpdate extends Auth_Controller
 			'getTopic' => ['basis/cis:r'],
 		]);
 
+		$this->load->config('cis');
 
 		$this->load->model('person/Profil_update_model', 'ProfilUpdateModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
@@ -111,6 +112,10 @@ class ProfilUpdate extends Auth_Controller
 
 	private function sendEmail_onProfilUpdate_response($uid, $topic, $status)
 	{
+		if($this->config->item('cis_send_profil_update_mails') === false)
+		{
+			return;
+		}
 
 		$this->load->helper('hlp_sancho_helper');
 		$email = $uid . "@" . DOMAIN;
@@ -138,6 +143,10 @@ class ProfilUpdate extends Auth_Controller
 
 	private function sendEmail_onProfilUpdate_insertion($uid, $profil_update_id, $topic)
 	{
+		if($this->config->item('cis_send_profil_update_mails') === false)
+		{
+			return;
+		}
 
 		$this->load->helper('hlp_sancho_helper');
 		$emails = [];
