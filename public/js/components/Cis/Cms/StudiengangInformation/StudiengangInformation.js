@@ -18,14 +18,32 @@ components:{
 	StudiengangPerson
 },
 template:/*html*/`
+	<template v-if="studiengang?.bezeichnung && semester">
+		<h5>Studiengang: {{studiengang.bezeichnung}}</h5>
+		<h5>Semester: {{semester}}</h5>
+	</template>
 	<template v-for="{title, collection} in collection_array">
-	<h3 v-if="Array.isArray(collection)  && collection.length !==0">{{title}}</h3>
+	<h5 v-if="Array.isArray(collection)  && collection.length !==0">{{title}}</h5>
 	<template v-for="person in studiengangs_person_data(collection)">
 		<div class="mb-3">
 			<studiengang-person :person_data="person"></studiengang-person>
 		</div>
 	</template>
 	</template>
+	<div v-if="studiengang?.zusatzinfo_html" v-html="studiengang?.zusatzinfo_html"></div>
+	<template v-if="hochschulvertr && Array.isArray(hochschulvertr) && hochschulvertr.length >0">
+		<h5>Hochschulvertretung</h5>
+		<p v-for="vertretung in hochschulvertr">{{vertretungFormatedName(vertretung)}}</p>
+	</template>
+	<template v-if="stdv && Array.isArray(stdv) && stdv.length >0">
+		<h5>Studienvertretung {{studiengang.kurzbzlang??''}}</h5>
+		<p v-for="vertretung in stdv">{{vertretungFormatedName(vertretung,false)}}</p>
+	</template>
+	<template v-if="jahrgangsvertr && Array.isArray(jahrgangsvertr) && jahrgangsvertr.length >0">
+		<h5>Jahrgangsvertretung</h5>
+		<p v-for="vertretung in jahrgangsvertr">{{vertretungFormatedName(vertretung,false)}}</p>
+	</template>
+	
 `,
 computed:{
 	collection_array: function(){
@@ -48,6 +66,10 @@ computed:{
 	},
 },
 methods:{
+	vertretungFormatedName: function(vertretung,bezeichnung=true){
+		if(!vertretung) return null;
+		return `${vertretung.vorname ?? ''} ${vertretung.nachname ?? ''} ${vertretung.bezeichnung && bezeichnung ? '('.concat(vertretung.bezeichnung.replace("(","").replace(")","")).concat(")") : ''}`
+	},
 	studiengangs_person_data: function (collection) {
 		// early return if the reactive data is not yet loaded or not present
 		if (!collection || !Array.isArray(collection) || collection.length === 0)
@@ -110,6 +132,7 @@ mounted(){
 	.then(res => res.data)
 	.then(studiengangInformationen => {
 		Object.assign(this, studiengangInformationen);
+		console.log(studiengangInformationen,"das sind die Informationen")
 	});
 
 },

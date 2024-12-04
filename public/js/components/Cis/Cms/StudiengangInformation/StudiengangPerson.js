@@ -25,7 +25,7 @@ export default {
 			<img  :src="person_data.foto" alt="person_dataFoto" style="width: 110px; height: auto; object-fir:scale-down;" class="card-img-top" >
 		</div>
 		<div class="card-body">
-			<h5 class="text-center card-title mb-0">{{person_data.fullname}}</h5>
+			<h6 class="text-center card-title mb-0">{{person_data.fullname}}</h6>
 		</div>
 		<hr class="my-0">
 		<div class="card-body">

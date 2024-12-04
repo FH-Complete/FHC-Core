@@ -181,7 +181,6 @@ class Cms extends FHCAPI_Controller
 		$page_size = $page_size ?? 10;
 		
 		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size);
-
 		$news = $this->getDataOrTerminateWithError($news);
 
 		$this->addMeta('test', $this->p->t('global', 'studiengangsleitung'));

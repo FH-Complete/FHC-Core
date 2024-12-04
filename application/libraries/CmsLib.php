@@ -236,7 +236,7 @@ class CmsLib
 			return $news;
 
 		$news = getData($news);
-		//var_dump($news->maxPageCount);
+		
 		foreach ($news as $newsobj) {
 			if ($studiengang_kz && $edit && !$newsobj->studiengang_kz)
 				continue;
@@ -247,7 +247,7 @@ class CmsLib
 			$xml .= "<newswrapper>" . $newsobj->content . $datum . $id . "</newswrapper>";
 		}
 
-		if ($studiengang_kz != 0) {
+		/* if ($studiengang_kz != 0) {
 			$stg_obj = $this->ci->StudiengangModel->load($studiengang_kz);
 			if (isError($stg_obj))
 				return $stg_obj;
@@ -262,7 +262,7 @@ class CmsLib
 				}
 				$xml .= '<studiengang_bezeichnung><![CDATA[' . $stg_obj->bezeichnung . ']]></studiengang_bezeichnung>';
 			}
-		}
+		} */
 
 		if ($titel != '') {
 			$xml .= '<news_titel>' . $titel . '</news_titel>';
