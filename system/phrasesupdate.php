@@ -37196,7 +37196,7 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
 // CIS4 phrases from legacy code end
 // FHC4 Phrases Abschlusspruefung
 	array(

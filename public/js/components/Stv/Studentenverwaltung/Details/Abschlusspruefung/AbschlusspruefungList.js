@@ -252,6 +252,10 @@ export default {
 				this.formData.anmerkung = null;
 				this.formData.protokoll = null;
 				this.formData.note = null;
+				this.formData.p1 = null;
+				this.formData.p2 = null;
+				this.formData.p3 = null;
+				this.formData.pv= null;
 		},
 		search(event) {
 			if (this.abortController.mitarbeiter) {
@@ -336,7 +340,7 @@ export default {
 	},
 	template: `
 	<div class="stv-details-abschlusspruefung h-100 pb-3">
-		<h1>{{this.$p.t('stv','tab_finalexam')}} </h1>
+		<h4>{{this.$p.t('stv','tab_finalexam')}} </h4>
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
@@ -406,49 +410,84 @@ export default {
 				</form-input>
 			</div>
 			
-			<div class="row mb-3">
-			<!--TODO(Manu) Bug Autocompletefelder: nach Behebung wieder einblenden!-->
-<!--				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-vorsitz"
-					label="Vorsitz"
-					type="autocomplete"
-					optionLabel="mitarbeiter" 
-					v-model="formData.vorsitz"
-					name="vorsitz"
-					:suggestions="filteredMitarbeiter"
-					@complete="search" 
-					:min-length="3"
-					>
-				</form-input>-->
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-vorsitz"
-					label="vorsitz"
-					type="text"
-					v-model="formData.vorsitz"
-					name="vorsitz"
-					>
-				</form-input>
-<!--				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-pruefer1"
-					label="Prüferin1"
-					type="autocomplete"
-					optionLabel="mitarbeiter" 
-					v-model="formData.pruefer1"
-					name="pruefer1"
-					:suggestions="filteredPruefer"
-					@complete="searchNotAkad" 
-					:min-length="3"
-					>
-				</form-input>-->
-				<!--TODO(Manu) Umbau auf Person_id-->
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-pruefer1"
-					label="pruefer1"
-					type="text"
-					v-model="formData.pruefer1"
-					name="pruefer1"
-					>
-				</form-input>
+			<div class="row mb-3">	
+				<template v-if="statusNew">
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-vorsitz"
+						label="Vorsitz"
+						type="autocomplete"
+						optionLabel="mitarbeiter"
+						v-model="formData.vorsitz"
+						name="vorsitz"
+						:suggestions="filteredMitarbeiter"
+						@complete="search"
+						:min-length="3"
+						>
+					</form-input>
+				</template>
+				<template v-else >
+					<form-input
+						v-if= "formData.pv"
+						container-class="col-6 stv-details-abschlusspruefung-vorsitz"
+						type="text"
+						name="name"
+						label="vorsitz"
+						v-model="formData.pv"
+						>
+					</form-input>
+					<form-input
+						v-else
+						container-class="col-6 stv-details-abschlusspruefung-vorsitz"
+						label="Vorsitz"
+						type="autocomplete"
+						optionLabel="mitarbeiter"
+						v-model="formData.vorsitz"
+						name="vorsitz"
+						:suggestions="filteredMitarbeiter"
+						@complete="search"
+						:min-length="3"
+						>
+					</form-input>
+				</template>
+				
+				<template v-if="statusNew">
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-pruefer1"
+						label="Prüferin1"
+						type="autocomplete"
+						optionLabel="mitarbeiter"
+						v-model="formData.pruefer1"
+						name="pruefer1"
+						:suggestions="filteredPruefer"
+						@complete="searchNotAkad"
+						:min-length="3"
+						>
+					</form-input>
+				</template>
+				<template v-else >
+					<form-input
+						v-if= "formData.p1" 
+						container-class="col-6 stv-details-abschlusspruefung-pruefer1"
+						type="text"
+						name="name"
+						label="Prüferin1"
+						v-model="formData.p1"
+						>
+					</form-input>
+					<form-input
+						v-else
+						container-class="col-6 stv-details-abschlusspruefung-pruefer1"
+						label="Prüferin1"
+						type="autocomplete"
+						optionLabel="mitarbeiter" 
+						v-model="formData.pruefer1"
+						name="pruefer1"
+						:suggestions="filteredPruefer"
+						@complete="searchNotAkad"
+						:min-length="3"
+						>
+					</form-input>
+				</template>
 			</div>
 			
 			<div class="row mb-3">
@@ -469,26 +508,44 @@ export default {
 						{{beurteilung.bezeichnung}}
 					</option>
 				</form-input>
-<!--				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-pruefer2"
-					label="Prüferin2"
-					type="autocomplete"
-					optionLabel="mitarbeiter" 
-					v-model="formData.pruefer2"
-					name="pruefer2"
-					:suggestions="filteredPruefer"
-					@complete="searchNotAkad" 
-					:min-length="3"
-					>
-				</form-input>-->
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-pruefer2"
-					label="pruefer2"
-					type="text"
-					v-model="formData.pruefer2"
-					name="pruefer2"
-					>
-				</form-input>
+				<template v-if="statusNew">
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-pruefer2"
+						label="Prüferin2"
+						type="autocomplete"
+						optionLabel="mitarbeiter"
+						v-model="formData.pruefer2"
+						name="pruefer2"
+						:suggestions="filteredPruefer"
+						@complete="searchNotAkad" 
+						:min-length="3"
+						>
+					</form-input>
+				</template>
+				<template v-else >
+					<form-input
+						v-if= "formData.p2"
+						container-class="col-6 stv-details-abschlusspruefung-pruefer2"
+						type="text"
+						name="name"
+						label="Prüferin2"
+						v-model="formData.p2"
+						>
+					</form-input>
+					<form-input
+						v-else
+						container-class="col-6 stv-details-abschlusspruefung-pruefer2"
+						label="Prüferin2"
+						type="autocomplete"
+						optionLabel="mitarbeiter"
+						v-model="formData.pruefer2"
+						name="pruefer2"
+						:suggestions="filteredPruefer"
+						@complete="searchNotAkad"
+						:min-length="3"
+						>
+					</form-input>
+				</template>
 			</div>
 			
 			<div class="row mb-3">
@@ -507,26 +564,44 @@ export default {
 						{{grad.titel}}
 					</option>
 				</form-input>
-<!--				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-pruefer3"
-					label="Prüferin3"
-					type="autocomplete"
-					optionLabel="mitarbeiter" 
-					v-model="formData.pruefer3"
-					name="pruefer3"
-					:suggestions="filteredPruefer"
-					@complete="searchNotAkad" 
-					:min-length="3"
-					>
-				</form-input>-->
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-pruefer3"
-					label="pruefer3"
-					type="text"
-					v-model="formData.pruefer3"
-					name="pruefer3"
-					>
-				</form-input>
+				<template v-if="statusNew">
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-pruefer3"
+						label="Prüferin3"
+						type="autocomplete"
+						optionLabel="mitarbeiter" 
+						v-model="formData.pruefer3"
+						name="pruefer3"
+						:suggestions="filteredPruefer"
+						@complete="searchNotAkad" 
+						:min-length="3"
+						>
+					</form-input>
+				</template>
+				<template v-else >
+					<form-input
+						v-if= "formData.p3" 
+						container-class="col-6 stv-details-abschlusspruefung-pruefer3"
+						type="text"
+						name="name"
+						label="Prüferin3"
+						v-model="formData.p3"
+						>
+					</form-input>
+					<form-input
+						v-else
+						container-class="col-6 stv-details-abschlusspruefung-pruefer3"
+						label="Prüferin3"
+						type="autocomplete"
+						optionLabel="mitarbeiter" 
+						v-model="formData.pruefer3"
+						name="pruefer3"
+						:suggestions="filteredPruefer"
+						@complete="searchNotAkad" 
+						:min-length="3"
+						>
+					</form-input>
+				</template>
 			</div>
 			
 			<div class="row mb-3">

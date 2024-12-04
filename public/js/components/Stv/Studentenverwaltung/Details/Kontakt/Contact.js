@@ -251,6 +251,8 @@ export default{
 	},
 	template: `	
 		<div class="stv-details-kontakt-contact h-100 pt-3">
+		
+		{{contactData}}
 
 		<!--Modal: contactModal-->
 		<BsModal ref="contactModal">

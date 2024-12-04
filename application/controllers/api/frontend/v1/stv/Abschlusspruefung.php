@@ -54,6 +54,41 @@ class Abschlusspruefung extends FHCAPI_Controller
 	public function loadAbschlusspruefung()
 	{
 		$abschlusspruefung_id = $this->input->post('id');
+
+		$this->AbschlusspruefungModel->addSelect('lehre.tbl_abschlusspruefung.*');
+		$this->AbschlusspruefungModel->addSelect("
+			CASE
+				WHEN pruefer1 IS NOT NULL
+				THEN CONCAT(p1.nachname, ' ', p1.vorname, COALESCE(' ' || p1.titelpre, ''))
+				ELSE NULL
+   			 END AS p1
+   		");
+		$this->AbschlusspruefungModel->addSelect("
+			CASE
+				WHEN pruefer2 IS NOT NULL
+				THEN CONCAT(p2.nachname, ' ', p2.vorname, COALESCE(' ' || p2.titelpre, ''))
+				ELSE NULL
+   			 END AS p2
+		");
+		$this->AbschlusspruefungModel->addSelect("
+			CASE
+				WHEN pruefer3 IS NOT NULL
+				THEN CONCAT(p3.nachname, ' ', p3.vorname, COALESCE(' ' || p3.titelpre, ''))
+				ELSE NULL
+   			 END AS p3
+		");
+		$this->AbschlusspruefungModel->addSelect("
+			CASE
+				WHEN vorsitz IS NOT NULL
+				THEN CONCAT(pv.nachname, ' ', pv.vorname, COALESCE(' ' || pv.titelpre, ''), ' (', ben.uid , ')' )
+				ELSE NULL
+   			 END AS pv
+		");
+		$this->AbschlusspruefungModel->addJoin('public.tbl_benutzer ben', 'ON (ben.uid = lehre.tbl_abschlusspruefung.vorsitz)', 'LEFT');
+		$this->AbschlusspruefungModel->addJoin('public.tbl_person pv', 'ON (pv.person_id = ben.person_id)', 'LEFT');
+		$this->AbschlusspruefungModel->addJoin('public.tbl_person p1', 'ON (p1.person_id = lehre.tbl_abschlusspruefung.pruefer1)', 'LEFT');
+		$this->AbschlusspruefungModel->addJoin('public.tbl_person p2', 'ON (p2.person_id = lehre.tbl_abschlusspruefung.pruefer2)', 'LEFT');
+		$this->AbschlusspruefungModel->addJoin('public.tbl_person p3', 'ON (p3.person_id = lehre.tbl_abschlusspruefung.pruefer3)', 'LEFT');
 		$result = $this->AbschlusspruefungModel->loadWhere(
 			array('abschlusspruefung_id' => $abschlusspruefung_id)
 		);
@@ -148,6 +183,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 		if (isError($result)) {
 			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
+
 		$this->terminateWithSuccess($result ?: []);
 	}
 
@@ -175,17 +211,21 @@ class Abschlusspruefung extends FHCAPI_Controller
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Student UID']), self::ERROR_TYPE_GENERAL);
 		}
 
+
 		$formData = $this->input->post('formData');
+
+
+
 		$_POST['pruefungstyp_kurzbz'] = $formData['pruefungstyp_kurzbz'];
 		$_POST['akadgrad_id']= $formData['akadgrad_id'];
-		$_POST['vorsitz']= $formData['vorsitz'];
+		$_POST['vorsitz'] = isset($formData['vorsitz']['mitarbeiter_uid']) ? $formData['vorsitz']['mitarbeiter_uid'] :  $formData['vorsitz'];
+		$_POST['pruefer1'] = isset($formData['pruefer1']['person_id']) ? $formData['pruefer1']['person_id'] : $formData['pruefer1'];
+		$_POST['pruefer2'] = isset($formData['pruefer2']['person_id']) ? $formData['pruefer2']['person_id'] : $formData['pruefer2'];
+		$_POST['pruefer3'] = isset($formData['pruefer3']['person_id']) ? $formData['pruefer3']['person_id'] : $formData['pruefer3'];
 		$_POST['pruefungsantritt_kurzbz'] = $formData['pruefungsantritt_kurzbz'];
 		$_POST['abschlussbeurteilung_kurzbz'] = $formData['abschlussbeurteilung_kurzbz'];
 		$_POST['datum']= $formData['datum'];
 		$_POST['sponsion']= $formData['sponsion'];
-		$_POST['pruefer1'] = $formData['pruefer1'];
-		$_POST['pruefer2']= $formData['pruefer2'];
-		$_POST['pruefer3']= $formData['pruefer3'];
 		$_POST['anmerkung'] = $formData['anmerkung'];
 		$_POST['protokoll']= $formData['protokoll'];
 		$_POST['note'] = $formData['note'];
@@ -198,16 +238,9 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Datum'])
 		]);
 
-		//TODO(Manu) just for testing, not really required
-		$this->form_validation->set_rules('sponsion', 'Sponsion', 'required|is_valid_date', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Sponsion']),
+		$this->form_validation->set_rules('sponsion', 'Sponsion', 'is_valid_date', [
 			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Sponsion'])
 		]);
-
-/*		$this->form_validation->set_rules('sponsion', 'Sponsion', 'is_valid_date', [
-			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Sponsion'])
-		]);*/
-
 
 		if ($this->form_validation->run() == false)
 		{
@@ -253,14 +286,14 @@ class Abschlusspruefung extends FHCAPI_Controller
 		$_POST['student_uid'] = $formData['student_uid'];
 		$_POST['pruefungstyp_kurzbz'] = $formData['pruefungstyp_kurzbz'];
 		$_POST['akadgrad_id']= $formData['akadgrad_id'];
-		$_POST['vorsitz']= $formData['vorsitz'];
+		$_POST['vorsitz'] =  isset($formData['vorsitz']['mitarbeiter_uid']) ? $formData['vorsitz']['mitarbeiter_uid'] :  $formData['vorsitz'];
+		$_POST['pruefer1'] = isset($formData['pruefer1']['person_id']) ? $formData['pruefer1']['person_id'] : $formData['pruefer1'];
+		$_POST['pruefer2'] = isset($formData['pruefer2']['person_id']) ? $formData['pruefer2']['person_id'] : $formData['pruefer2'];
+		$_POST['pruefer3'] = isset($formData['pruefer3']['person_id']) ? $formData['pruefer3']['person_id'] : $formData['pruefer3'];
 		$_POST['pruefungsantritt_kurzbz'] = $formData['pruefungsantritt_kurzbz'];
 		$_POST['abschlussbeurteilung_kurzbz'] = $formData['abschlussbeurteilung_kurzbz'];
 		$_POST['datum']= $formData['datum'];
 		$_POST['sponsion']= $formData['sponsion'];
-		$_POST['pruefer1'] = $formData['pruefer1'];
-		$_POST['pruefer2']= $formData['pruefer2'];
-		$_POST['pruefer3']= $formData['pruefer3'];
 		$_POST['anmerkung'] = $formData['anmerkung'];
 		$_POST['protokoll']= $formData['protokoll'];
 		$_POST['note'] = $formData['note'];
@@ -273,9 +306,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Datum'])
 		]);
 
-		//TODO(Manu) just for testing, not really required
-		$this->form_validation->set_rules('sponsion', 'Sponsion', 'required|is_valid_date', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Sponsion']),
+		$this->form_validation->set_rules('sponsion', 'Sponsion', 'is_valid_date', [
 			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Sponsion'])
 		]);
 
