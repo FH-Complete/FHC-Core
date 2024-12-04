@@ -506,7 +506,6 @@ class ProfilUpdate extends FHCAPI_Controller
 
 	private function sendEmail_onProfilUpdate_insertion($uid, $profil_update_id, $topic)
 	{
-		$this->addMeta('cis_send_profil_update_mails', $this->config->item('cis_send_profil_update_mails'));
 		if($this->config->item('cis_send_profil_update_mails') === false)
 		{
 			return;
