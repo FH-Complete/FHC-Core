@@ -11,15 +11,6 @@ export default {
         );
     },
 
-    news(limit) {
-        return this.$fhcApi.get(
-            "/api/frontend/v1/Cms/news",
-            {
-        		limit: limit
-            }
-        );
-    },
-
 	getNews(page = 1, page_size = 10) {
 		return this.$fhcApi.get(
 			"/api/frontend/v1/Cms/getNews",
@@ -36,5 +27,12 @@ export default {
 			{}
 		);
 	},
+
+	getNewsExtra: function(){
+		return this.$fhcApi.get(
+			"/api/frontend/v1/Cms/getStudiengangInfoForNews",
+			{}
+		);
+	}
    
   }
