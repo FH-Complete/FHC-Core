@@ -302,7 +302,7 @@ export default {
 						}
 					})
 
-				this.bindKeys(factorypart)
+				this.bindKeys(factorypart, root)
 			}
 
 			bindKeys(factorypart, root) {
