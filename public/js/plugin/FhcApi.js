@@ -136,7 +136,7 @@ export default {
 			return Promise.reject(error);
 		});
 
-		app.config.globalProperties.$fhcApi = Vue.reactive({
+		app.config.globalProperties.$fhcApi = {
 			getUri(url) {
 				return fhcApiAxios.getUri({url});
 			},
@@ -289,7 +289,7 @@ export default {
 						$fhcAlert.alertDefault('error', error.message, message);
 				}
 			}
-		});
+		};
 
 		class FhcApiFactoryWrapper {
 			constructor(factorypart, root) {
@@ -301,11 +301,6 @@ export default {
 							return (root || this).$fhcApi;
 						}
 					})
-				
-				this.bindKeys(factorypart)
-			}
-
-			bindKeys(factorypart, root) {
 				Object.keys(factorypart).forEach(key => {
 					Object.defineProperty(this, key, {
 						get() {
