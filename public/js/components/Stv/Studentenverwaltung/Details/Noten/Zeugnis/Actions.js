@@ -8,7 +8,8 @@ export default {
 		FormInput
 	},
 	emits: [
-		'setGrades'
+		'setGrade',
+		'deleteGrade'
 	],
 	inject: [
 		'config'
@@ -24,6 +25,12 @@ export default {
 		};
 	},
 	computed: {
+		selectedData() {
+			return this.selected.map(zeugnis => {
+				const { lehrveranstaltung_id, uid: student_uid, studiensemester_kurzbz } = zeugnis;
+				return { lehrveranstaltung_id, student_uid, studiensemester_kurzbz };
+			})
+		},
 		current: {
 			get() {
 				if (!this.selected.length)
@@ -39,10 +46,7 @@ export default {
 				return '';
 			},
 			set(note) {
-				this.$emit('setGrades', this.selected.map(zeugnis => {
-					const { lehrveranstaltung_id, uid: student_uid, studiensemester_kurzbz } = zeugnis;
-					return { lehrveranstaltung_id, student_uid, studiensemester_kurzbz, note };
-				}));
+				this.selectedData.forEach(data => this.$emit('setGrade', {...data, ...{note}}));
 			}
 		},
 		currentLabel() {
@@ -72,6 +76,9 @@ export default {
 				this.selected.forEach(grade => grade.note = note);
 			this.currentPoints = '';
 			this.current = note;
+		},
+		deleteGrades() {
+			this.selectedData.forEach(data => this.$emit('deleteGrade', data));
 		}
 	},
 	created() {
@@ -84,7 +91,7 @@ export default {
 	},
 	// TODO(chris): phrases
 	template: `
-	<div class="stv-details-noten-zeugnis-actions">
+	<div class="stv-details-noten-zeugnis-actions d-flex gap-2">
 		<template v-if="['both', 'header'].includes(config.edit)">
 			<core-form
 				v-if="config.usePoints"
@@ -110,5 +117,13 @@ export default {
 				<option v-for="grade in grades" :key="grade.note" :value="grade.note">{{ grade.bezeichnung }}</option>
 			</select>
 		</template>
+		<button
+			v-if="['both', 'header'].includes(config.delete)"
+			class="btn btn-outline-secondary"
+			:disabled="!selected.length"
+			@click="deleteGrades"
+			>
+			<i class="fa fa-trash"></i>
+		</button>
 	</div>`
 };

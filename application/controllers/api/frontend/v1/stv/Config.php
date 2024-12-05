@@ -96,8 +96,9 @@ class Config extends FHCAPI_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
 			'showOnlyWithUid' => true,
 			'config' => [
+				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
 				'edit' => 'both', // Possible values: both|header|inline
-				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE
+				'delete' => 'both', // Possible values: both|header|inline
 			]
 		];
 		

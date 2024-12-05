@@ -28,6 +28,19 @@ export default {
 			}
 		);
 	},
+	deleteCertificate({lehrveranstaltung_id, student_uid, studiensemester_kurzbz, lehrveranstaltung_bezeichnung}) {
+		return this.$fhcApi.post(
+			'api/frontend/v1/stv/grades/deleteCertificate',
+			{
+				lehrveranstaltung_id,
+				student_uid,
+				studiensemester_kurzbz
+			},
+			{
+				errorHeader: lehrveranstaltung_bezeichnung
+			}
+		);
+	},
 	copyTeacherProposalToCertificate({lehrveranstaltung_id, student_uid, studiensemester_kurzbz, lehrveranstaltung_bezeichnung}) {
 		return this.$fhcApi.post(
 			'api/frontend/v1/stv/grades/copyTeacherProposalToCertificate',

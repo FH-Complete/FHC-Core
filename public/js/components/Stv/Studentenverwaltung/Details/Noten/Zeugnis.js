@@ -66,6 +66,7 @@ export default {
 						.then(() => cell.getRow().reformat())
 						// cleanup
 						.then(cell.clearEdited)
+						.then(() => this.$fhcAlert.alertSuccess('updated')) // TODO(chris): phrase
 						.catch(err => {
 							cell.restoreOldValue();
 							cell.clearEdited();
@@ -124,6 +125,39 @@ export default {
 				{ field: 'lehrveranstaltung_bezeichnung_english', title: 'Englisch', visible: false }
 			];
 
+			const hasDownload = ['both', 'inline'].includes(this.config.download);
+			const hasDelete = ['both', 'inline'].includes(this.config.delete);
+
+			if (hasDownload || hasDelete) {
+				columns.push({
+					field: 'actions',
+					title: 'Actions',
+					headerSort: false,
+					formatter: cell => {
+						// get row data
+						const data = cell.getData();
+						data.student_uid = data.uid;
+
+						let container = document.createElement('div');
+						container.className = "d-flex gap-2 justify-content-end";
+
+						if (hasDelete) {
+							let deleteButton = document.createElement('button');
+							deleteButton.className = 'btn btn-outline-secondary';
+							deleteButton.innerHTML = '<i class="fa fa-trash"></i>';
+							deleteButton.addEventListener('click', evt => {
+								evt.stopPropagation();
+								this.deleteGrade(data);
+							});
+							container.append(deleteButton);
+						}
+
+						return container;
+					},
+					frozen: true
+				});
+			}
+
 			return {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: (url, config, params) => {
@@ -139,7 +173,6 @@ export default {
 					return response.data || [];
 				},
 				columns,
-				layout: 'fitDataStretch',
 				height: '100%',
 				selectable: 1,
 				selectableRangeMode: 'click',
@@ -156,11 +189,21 @@ export default {
 		}
 	},
 	methods: {
-		setGrades(selected) {
+		setGrade(data) {
 			this.$fhcApi.factory
-				.stv.grades.updateCertificate(selected.find(Boolean))
+				.stv.grades.updateCertificate(data)
 				.then(this.$refs.table.reloadTable)
+				.then(() => this.$fhcAlert.alertSuccess('updated')) // TODO(chris): phrase
 				.catch(this.$fhcAlert.handleFormValidation);
+		},
+		deleteGrade(data) {
+			return this.$fhcAlert
+				.confirmDelete()
+				.then(result => result ? data : Promise.reject({handled:true}))
+				.then(this.$fhcApi.factory.stv.grades.deleteCertificate)
+				.then(this.$refs.table.reloadTable)
+				.then(() => this.$fhcAlert.alertSuccess('deleted')) // TODO(chris): phrase
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	// TODO(chris): phrasen
@@ -176,8 +219,8 @@ export default {
 			:side-menu="false"
 			reload
 			>
-			<template v-if="['both', 'header'].includes(config.edit)" #actions="{selected}">
-				<zeugnis-actions :selected="selected" @set-grades="setGrades"></zeugnis-actions>
+			<template v-if="['both', 'header'].includes(config.edit) || ['both', 'header'].includes(config.delete)" #actions="{selected}">
+				<zeugnis-actions :selected="selected" @set-grade="setGrade" @delete-grade="deleteGrade"></zeugnis-actions>
 			</template>
 		</core-filter-cmpt>
 	</div>`

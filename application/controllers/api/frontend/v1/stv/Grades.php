@@ -33,6 +33,7 @@ class Grades extends FHCAPI_Controller
 			'getTeacherProposal' => 'student/noten:r',
 			'getRepeaterGrades' => 'student/noten:r',
 			'updateCertificate' => ['admin:w', 'assistenz:w'],
+			'deleteCertificate' => ['admin:w', 'assistenz:w'],
 			'copyTeacherProposalToCertificate' => 'student/noten:w',
 			'copyRepeaterGradeToCertificate' => 'student/noten:w',
 			'getGradeFromPoints' => 'student/noten:r'
@@ -153,15 +154,66 @@ class Grades extends FHCAPI_Controller
 
 		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
 
-		$result = $this->ZeugnisnoteModel->update([
+		$result = $this->ZeugnisnoteModel->load([
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'student_uid' => $student_uid,
 			'lehrveranstaltung_id' => $lehrveranstaltung_id
-		], [
-			'note' => $note,
-			'benotungsdatum' => $now,
-			'updateamum' => $now,
-			'updatevon' => $authUID
+		]);
+		$current = $this->getDataOrTerminateWithError($result);
+
+		if ($current) {
+			$result = $this->ZeugnisnoteModel->update([
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'student_uid' => $student_uid,
+				'lehrveranstaltung_id' => $lehrveranstaltung_id
+			], [
+				'note' => $note,
+				'benotungsdatum' => $now,
+				'updateamum' => $now,
+				'updatevon' => $authUID
+			]);
+		} else {
+			$result = $this->ZeugnisnoteModel->insert([
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'student_uid' => $student_uid,
+				'lehrveranstaltung_id' => $lehrveranstaltung_id,
+				'note' => $note,
+				'benotungsdatum' => $now,
+				'insertamum' => $now,
+				'insertvon' => $authUID
+			]);
+		}
+		$this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess(true);
+	}
+
+	public function deleteCertificate()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrveranstaltung'), "required|integer");
+		$this->form_validation->set_rules("student_uid", $this->p->t('person', 'student'), "required");
+		$this->form_validation->set_rules("studiensemester_kurzbz", $this->p->t('lehre', 'studiensemester'), "required");
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		$student_uid = $this->input->post('student_uid');
+		$lehrveranstaltung_id = $this->input->post('lehrveranstaltung_id');
+
+		// NOTE(chris): Stg Permissions
+		if (!$this->hasPermissionDelete($lehrveranstaltung_id, $student_uid))
+			return $this->_outputAuthError([$this->router->method => ['admin', 'assistenz']]);
+
+		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
+
+		$result = $this->ZeugnisnoteModel->delete([
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'student_uid' => $student_uid,
+			'lehrveranstaltung_id' => $lehrveranstaltung_id
 		]);
 		$this->getDataOrTerminateWithError($result);
 
@@ -463,6 +515,40 @@ class Grades extends FHCAPI_Controller
 			if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $oe->oe_kurzbz))
 				return true;
 		}
+
+		return false;
+	}
+
+	protected function hasPermissionDelete($lehrveranstaltung_id, $student_uid)
+	{
+		if ($lehrveranstaltung_id === null || $student_uid === null)
+			return true;
+
+		$this->load->model('crm/Student_model', 'StudentModel');
+		
+		$result = $this->StudentModel->load([$student_uid]);
+		if (isError($result) || !hasData($result))
+			return false;
+
+		$student = current(getData($result));
+
+		if ($this->permissionlib->isBerechtigt('admin', 'suid', $student->studiengang_kz))
+			return true;
+		if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $student->studiengang_kz))
+			return true;
+
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+
+		$result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
+		if (isError($result) || !hasData($result))
+			return false;
+
+		$oe = current(getData($result));
+
+		if ($this->permissionlib->isBerechtigt('admin', 'suid', $oe->oe_kurzbz))
+			return true;
+		if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $oe->oe_kurzbz))
+			return true;
 
 		return false;
 	}
