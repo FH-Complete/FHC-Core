@@ -18,31 +18,34 @@ components:{
 	StudiengangPerson
 },
 template:/*html*/`
-	<template v-if="studiengang?.bezeichnung && semester">
-		<h5>Studiengang: {{studiengang.bezeichnung}}</h5>
-		<h5>Semester: {{semester}}</h5>
-	</template>
-	<template v-for="{title, collection} in collection_array">
-	<h5 v-if="Array.isArray(collection)  && collection.length !==0">{{title}}</h5>
-	<template v-for="person in studiengangs_person_data(collection)">
-		<div class="mb-3">
-			<studiengang-person :person_data="person"></studiengang-person>
-		</div>
-	</template>
-	</template>
-	<div v-if="studiengang?.zusatzinfo_html" v-html="studiengang?.zusatzinfo_html"></div>
-	<template v-if="hochschulvertr && Array.isArray(hochschulvertr) && hochschulvertr.length >0">
-		<h5>Hochschulvertretung</h5>
-		<p v-for="vertretung in hochschulvertr">{{vertretungFormatedName(vertretung)}}</p>
-	</template>
-	<template v-if="stdv && Array.isArray(stdv) && stdv.length >0">
-		<h5>Studienvertretung {{studiengang.kurzbzlang??''}}</h5>
-		<p v-for="vertretung in stdv">{{vertretungFormatedName(vertretung,false)}}</p>
-	</template>
-	<template v-if="jahrgangsvertr && Array.isArray(jahrgangsvertr) && jahrgangsvertr.length >0">
-		<h5>Jahrgangsvertretung</h5>
-		<p v-for="vertretung in jahrgangsvertr">{{vertretungFormatedName(vertretung,false)}}</p>
-	</template>
+
+		<template v-if="studiengang?.bezeichnung && semester">
+			<div class="card card-body mb-3">
+				<div class="mb-3"><b>Studiengang:</b> </h5>{{studiengang.bezeichnung}}</div>
+				<div><b>Semester: </b>{{semester}}</div>
+			</div>
+		</template>
+		<template v-for="{title, collection} in collection_array">
+		<h5 v-if="Array.isArray(collection)  && collection.length !==0">{{title}}</h5>
+		<template v-for="person in studiengangs_person_data(collection)">
+			<div class="mb-3">
+				<studiengang-person :person_data="person"></studiengang-person>
+			</div>
+		</template>
+		</template>
+		<div v-if="studiengang?.zusatzinfo_html" v-html="studiengang?.zusatzinfo_html"></div>
+		<template v-if="hochschulvertr && Array.isArray(hochschulvertr) && hochschulvertr.length >0">
+			<h5>Hochschulvertretung</h5>
+			<p v-for="vertretung in hochschulvertr">{{vertretungFormatedName(vertretung)}}</p>
+		</template>
+		<template v-if="stdv && Array.isArray(stdv) && stdv.length >0">
+			<h5>Studienvertretung {{studiengang.kurzbzlang??''}}</h5>
+			<p v-for="vertretung in stdv">{{vertretungFormatedName(vertretung,false)}}</p>
+		</template>
+		<template v-if="jahrgangsvertr && Array.isArray(jahrgangsvertr) && jahrgangsvertr.length >0">
+			<h5>Jahrgangsvertretung</h5>
+			<p v-for="vertretung in jahrgangsvertr">{{vertretungFormatedName(vertretung,false)}}</p>
+		</template>
 	
 `,
 computed:{
@@ -108,23 +111,13 @@ methods:{
 		{
 			return "tel:".concat(telefone).concat(" "+telefoneklappe);
 		}
-		else if(telefone)
-		{
-			return "tel:".concat(telefone);
-		}
 		else
 		{
-			return null;
+			return telefon ? "tel:".concat(telefone): null;
 		}
 	},
 	studiengangs_person_email: function (email) {
-		if (email) 
-		{
-			return "mailto:".concat(email);
-		}
-		else {
-			return null;
-		}
+		return email? "mailto:".concat(email): null;
 	},
 },
 mounted(){
@@ -132,7 +125,6 @@ mounted(){
 	.then(res => res.data)
 	.then(studiengangInformationen => {
 		Object.assign(this, studiengangInformationen);
-		console.log(studiengangInformationen,"das sind die Informationen")
 	});
 
 },

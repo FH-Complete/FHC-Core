@@ -41,12 +41,14 @@ export default {
 	<hr/>
 	<pagination  :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
 	</pagination>
-	<div class="container-xxl">
+	<div class="container-fluid">
 		<div class="row">
-			<div class="col-12 col-md-8 col-xl-9" v-html="content">
+			<div class="col" v-html="content">
 			</div>
-			<div class="col-12 col-md-4 col-xl-3">
-  				<studiengang-information></studiengang-information>
+			<div class="col-auto">
+				<div style="width:15rem">
+					<studiengang-information></studiengang-information>
+				</div>
 			</div>
 		</div>
 	</div>
