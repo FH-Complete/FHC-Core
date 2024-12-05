@@ -3,7 +3,13 @@ $includesArray = array(
 	'title' => 'Dashboard',
 	'tabulator5'=>true,
 	'primevue3' => true,
-	'customJSModules' => ['public/js/apps/Dashboard/Fhc.js'],
+	'customJSModules' => [
+		'public/js/apps/Dashboard/Fhc.js'
+	],
+	'customJSs' => [
+		'vendor/npm-asset/primevue/accordion/accordion.js',
+		'vendor/npm-asset/primevue/accordiontab/accordiontab.js'
+	],
 	'customCSSs' => [
 		'public/css/components/dashboard.css'
 	],

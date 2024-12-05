@@ -107,5 +107,11 @@ const app = Vue.createApp({
     }
 });
 app.use(FhcApi);
+app.use(primevue.config.default, {
+	zIndex: {
+		overlay: 9000,
+		tooltip: 8000
+	}
+})
 app.use(Phrasen);
 app.mount('#cis-header');
