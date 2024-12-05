@@ -1,31 +1,12 @@
 export default {
-	data(){
-
-	},
-	props:{
-		person_data:
-		{
-			type: Object,
-			required: true
-		}
-	},
-	computed:{
-		formattedEmail: function(){
-			if(!this.person_data ) return null;
-			let emailString= this.person_data.email.replace("mailto:", "");
-			// when splitting a string, the letter that is used to split the string will be removed from the result
-			let emailArray = emailString.split('@');
-			// returns both parts of the splitted string in combination with the removed letter and a word break
-			return emailArray[0] + '@<wbr>' + emailArray[1];
-		},
-	},
+	props:["uid","vorname","nachname","titelpre","kontakt","telefonklappe","email","planbezeichnung","foto"],
 	template:/*html*/`
 	<div class="card" style="width: 15rem;">
 		<div class="bg-dark d-flex justify-content-center">
-			<img  :src="person_data.foto" alt="person_dataFoto" style="width: 110px; height: auto; object-fir:scale-down;" class="card-img-top" >
+			<img  :src="base64Image" alt="mitarbeiter_foto" style="width: 110px; height: auto; object-fir:scale-down;" class="card-img-top" >
 		</div>
 		<div class="card-body">
-			<h6 class="text-center card-title mb-0">{{person_data.fullname}}</h6>
+			<h6 class="text-center card-title mb-0">{{fullname}} <a v-if="profilViewLink" :href="profilViewLink"><i class="ms-2 fa fa-arrow-up-right-from-square" style="color:#00649C"></i></a></h6>
 		</div>
 		<hr class="my-0">
 		<div class="card-body">
@@ -34,52 +15,75 @@ export default {
 			<div class="mb-3">
 				<span>
 					<i class="fa fa-phone me-2"></i>
-					<a :href="person_data.telefone">{{person_data.telefone?.replace("tel:","")}}</a>
+					<a :href="phone.link">{{phone.number}}</a>
 				</span>
 			</div>
 			<div class="mb-3">
 				<span>
 					<i class="fa fa-home me-2"></i>
-					{{person_data.ort}}
+					{{ort}}
 				</span>
 			</div>
 			<div>
 				<span>
 					<i class="fa-regular fa-envelope me-2"></i>
-					<a :href="person_data.email" v-html="formattedEmail"></a>
+					<a :href="email_link" v-html="formattedEmail"></a>
 				</span>
 			</div>
 			
 			</div>
 		</div>
 	</div>
-	<!--<div class="flex flex-column gap-3">
-		<div class="mb-3">
-			<span>
-				<i class="fa fa-user me-2"></i>
-				{{person_data.fullname}}
-			</span>
-		</div>
-		<div class="mb-3">
-			<span>
-				<i class="fa fa-phone me-2"></i>
-				<a :href="person_data.telefone">{{person_data.telefone?.replace("tel:","")}}</a>
-			</span>
-		</div>
-		<div class="mb-3">
-			<span>
-				<i class="fa fa-home me-2"></i>
-				{{person_data.ort}}
-			</span>
-		</div>
-		<div class="mb-3">
-			<span>
-				<i class="fa-regular fa-envelope me-2"></i>
-				<a :href="person_data.email"> {{person_data.email.replace("mailto:","")}}</a>
-			</span>
-		</div>
-		<div class="mb-3">
-			<img :src="person_data.foto" alt="person_dataFoto" style="width: 100px; height: auto; object-fir:scale-down;">
-		</div>
-	</div>-->`,
+	`,
+	computed:{
+		formattedEmail: function(){
+			if(!this.email ) return null;
+			let emailString= this.email.replace("mailto:", "");
+			// when splitting a string, the letter that is used to split the string will be removed from the result
+			let emailArray = emailString.split('@');
+			// returns both parts of the splitted string in combination with the removed letter and a word break
+			return emailArray[0] + '@<wbr>' + emailArray[1];
+		},
+		fullname: function () {
+			if (this.titelpre && this.vorname && this.nachname) {
+				return `${this.titelpre} ${this.vorname} ${this.nachname}`;
+			}
+			else if (this.vorname && this.nachname) {
+				return `${this.vorname} ${this.nachname}`;
+			}
+			else if (this.nachname) {
+				return this.vorname;
+			}
+			else {
+				return null;
+			}
+		},
+		phone: function () {
+			if (this.kontakt && this.telefoneklappe) {
+				return {
+					link: "tel:".concat(this.kontakt).concat(" " + this.telefoneklappe),
+					number: this.kontakt.concat(" " + this.telefoneklappe),
+				} 
+			}
+			else {
+				return this.kontakt ? {
+					link: "tel:".concat(this.kontakt),
+					number: this.kontakt,
+				} : null;
+			}
+		},
+		email_link: function () {
+			return this.email ? "mailto:".concat(this.email) : null;
+		},
+		base64Image:function(){
+			return this.foto ? 'data:image/png;base64,'.concat(this.foto) : null;
+		},
+		ort:function(){
+			return this.planbezeichnung ?? null;
+		},
+		profilViewLink: function(){
+			return this.uid ? FHC_JS_DATA_STORAGE_OBJECT.app_root.concat(FHC_JS_DATA_STORAGE_OBJECT.ci_router).concat("/Cis/Profil/View/").concat(this.uid): null; 
+		},
+	},
+	
 }
