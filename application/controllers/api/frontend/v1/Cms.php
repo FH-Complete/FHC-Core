@@ -106,7 +106,6 @@ class Cms extends FHCAPI_Controller
 		$this->terminateWithSuccess($content_id);
 	}
 
-	//todo: there is the method news and getNews but only one should exist
 	public function news()
 	{
 

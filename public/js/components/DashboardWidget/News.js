@@ -40,21 +40,6 @@ export default {
 			return this.allNewsList.find(news => news.minimized === false) ?? this.allNewsList[0] ?? null
 		}
 	},
-	created() {
-		this.$fhcApi.factory.cms
-			.news(MAX_LOADED_NEWS)
-			.then((res) => {
-				this.allNewsList = Array.from(Object.values(res.data));
-
-				this.selected = this.allNewsList.length ? this.allNewsList[0] : null
-				
-			})
-			.catch((err) => {
-				console.error("ERROR: ", err.response.data);
-			});
-
-		this.$emit("setConfig", false);
-	},
 	methods: {
 		setNext(){
 			const thisIndex = this.allNewsList.findIndex(n=>n.news_id == this.selected.news_id)
@@ -132,6 +117,22 @@ export default {
 			this.singleNews = singleNews;
 			this.$refs.newsModal.show();
 		},
+	},
+	created() {
+		this.$fhcApi.factory.cms
+			.news(MAX_LOADED_NEWS)
+			.then(res => res.data)
+			.then((news) => {
+				this.allNewsList = Array.from(Object.values(news));
+
+				this.selected = this.allNewsList.length ? this.allNewsList[0] : null
+
+			})
+			.catch((err) => {
+				console.error("ERROR: ", err.response.data);
+			});
+
+		this.$emit("setConfig", false);
 	},
 	template: /*html*/ `
 <div class="widgets-news h-100" :style="getNewsWidgetStyle">

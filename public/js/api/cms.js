@@ -11,6 +11,7 @@ export default {
         );
     },
 
+	//api function used for the news View that renders the html
 	getNews(page = 1, page_size = 10) {
 		return this.$fhcApi.get(
 			"/api/frontend/v1/Cms/getNews",
@@ -18,6 +19,16 @@ export default {
 				page,
 				page_size,
 			},
+		);
+	},
+
+	//api function used for the widget component
+	news(limit) {
+		return this.$fhcApi.get(
+			"/api/frontend/v1/Cms/news",
+			{
+				limit: limit
+			}
 		);
 	},
 
