@@ -145,13 +145,13 @@ export default {
                 <span class="small text-muted">{{ formatDateTime(news.insertamum) }}</span>
 			</div>
 		</div>
-        <div v-else class="row h-100">
-<!--        	TODO: mobile responsiveness of this part-->
+        <div v-else class="row h-100 g-0">
         	<div :class="'col-'+(width == 2? 6 : 4) + ' h-100 g-0'" style="overflow: auto;">
         		<template v-for="news in newsList" :key="'menu-'+news.news_id">
 					
-					<div class="row fhc-news-menu-item" @click="setSelected(news)" :class="getMenuItemClass(news)" style="margin-right: 0px; margin-left: 0px;">
-						<div class="col-8 fhc-news-menu-item-betreff" style="overflow-y: hidden;"><p>{{news.content_obj.betreff ?? ''}}</p></div>
+					<div class="row fhc-news-menu-item" @click="setSelected(news)" :class="getMenuItemClass(news)" style="margin-right: 0px; margin-left: 0px; overflow-y: hidden;">
+						<div class="col-8 fhc-news-menu-item-betreff"><p>{{news.content_obj.betreff ?? ''}}</p></div>
+<!--						TODO: format date in short form dd/mm/yyyy-->
 						<span class="fhc-news-menu-item-date fw-bold"
 						 >{{ news.datum ?? ''}}</span>
 					</div>
@@ -173,11 +173,10 @@ export default {
 								
 							</div>
 						</div>
-<!--						TODO: prev/next button styling && placement-->
-						<button @click="setPrev" style="z-index: 9999; color: black; opacity: 1;" data-bs-target="#carouselExample" class="carousel-control-prev" type="button">
+						<button @click="setPrev" style="z-index: 9999; color: black; overflow: hidden; width: 10%; margin-left: 5%;" data-bs-target="#carouselExample" class="carousel-control-prev" type="button">
 							<i class="fa fa-chevron-left"></i>
 						</button>
-						<button @click="setNext" style="z-index: 9999; color: black; opacity: 1;" data-bs-target="#carouselExample" class="carousel-control-next"  type="button">
+						<button @click="setNext" style="z-index: 9999; color: black; overflow: hidden; width: 10%; margin-right: 5%;" data-bs-target="#carouselExample" class="carousel-control-next"  type="button">
 							<i class="fa fa-chevron-right"></i>
 						</button>
 					</div>

@@ -70,3 +70,15 @@
 .fhc-carousel .carousel-item-end {
     transition: transform 0.44s ease-in-out, opacity 0.8s ease-in-out;
 }
+
+.carousel-control-prev,
+.carousel-control-next {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Show the buttons when the carousel is hovered */
+.carousel:hover .carousel-control-prev,
+.carousel:hover .carousel-control-next {
+    opacity: 1;
+}
