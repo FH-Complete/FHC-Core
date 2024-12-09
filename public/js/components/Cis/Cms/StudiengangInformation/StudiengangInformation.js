@@ -15,31 +15,47 @@ data(){
 		jahrgangsvertr: null,
 	}
 },
+props:{
+	displayWidget:{
+		type:Boolean,
+		default:false,
+	}
+},
 components:{
 	StudiengangPerson,
 	StudiengangVertretung,
 },
 template:/*html*/`
-
 		<template v-if="studiengang?.bezeichnung && semester">
 			<div class="card card-body mb-3">
 				<div class="mb-3">
-					<h6 class="fw-bold">Studiengang:</h6>
+					<h2 >Studiengang:</h2>
 					{{studiengang.bezeichnung}}
 				</div>
 				<div :class="{'mb-3':studiengang?.zusatzinfo_html}">
-					<h6 class="fw-bold">Semester: </h6>
+					<h2 >Semester: </h2>
 					{{semester}}
 				</div>
 				<div v-if="studiengang?.zusatzinfo_html" v-html="studiengang?.zusatzinfo_html"></div>
 			</div>
 		</template>
 		<template v-for="{title, collection} in collection_array">
-			<h5 class="fw-bold" v-if="Array.isArray(collection)  && collection.length !==0">{{title}}</h5>
-			<template v-for="person in collection">
-				<div class="mb-3">
-					<studiengang-person v-bind="person"></studiengang-person>
-				</div>
+			<template v-if="Array.isArray(collection)  && collection.length !==0">
+				<h2 >{{title}}</h2>
+				<template v-if="displayWidget">
+					<div class="d-flex flex-wrap flex-row mb-3 gap-2">
+						<template v-for="person in collection">
+							<studiengang-person displayWidget v-bind="person"></studiengang-person>
+						</template>
+					</div>
+				</template>
+				<template v-else>
+					<template v-for="person in collection">
+						<div class="mb-3">
+							<studiengang-person v-bind="person"></studiengang-person>
+						</div>
+					</template>
+				</template>
 			</template>
 		</template>
 		<template v-if="hochschulvertr && Array.isArray(hochschulvertr) && hochschulvertr.length >0">
@@ -54,8 +70,31 @@ template:/*html*/`
 	
 `,
 computed:{
+	// this function concatenates the studiengangsleitung and the assistenz or the 
+	// geschaeftsfuehrende-Stellvertretende Leitung if both collections only contain one person
 	collection_array: function(){
-		return [{ title: "Studiengangsleitung", collection: this.stg_ltg }, { title: "geschäftsführende Leitung", collection: this.gf_ltg },{ title: "stellvertretende Leitung", collection: this.stv_ltg },{ title: "Sekretariat", collection: this.ass} ];
+		let returnData = [];
+
+		if (Array.isArray(this.stg_ltg) && this.stg_ltg.length == 1 && Array.isArray(this.ass) && this.ass.length == 1)
+		{
+			returnData.push({ title: "Studiengangsleitung / Assistenz", collection: [...this.stg_ltg, ...this.ass] });
+		}
+		else
+		{
+			returnData.push({ title: "Studiengangsleitung", collection: this.stg_ltg });
+			returnData.push({ title: "Sekretariat", collection: this.ass });
+		}
+		if (Array.isArray(this.gf_ltg) && this.gf_ltg.length == 1 && Array.isArray(this.stv_ltg) && this.stv_ltg.length == 1)
+		{
+			returnData.push({ title: "Geschäftsführende/Stellvertretende Leitung", collection: [...this.gf_ltg, ...this.stv_ltg] });
+		}
+		else
+		{
+			returnData.push({ title: "Geschäftsführende Leitung", collection: this.gf_ltg });
+			returnData.push({ title: "Stellvertretende Leitung", collection: this.stv_ltg });
+		}
+
+		return returnData;
 	},
 },
 mounted(){
