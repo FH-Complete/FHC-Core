@@ -126,24 +126,33 @@ class Stundenplan extends FHCAPI_Controller
 		// storing the get parameter in local variables
 		$start_date = $this->input->get('start_date', TRUE);
 		$end_date = $this->input->get('end_date', TRUE);
+		$lv_id = $this->input->get('lv_id', TRUE);
 
 		$student_uid = getAuthUID();
 		if(is_null($student_uid))
 		{
 			$this->terminateWithError("No UID");
 		}
+		
+		$semester_range = $this->studienSemesterErmitteln($start_date,$end_date);
+		$this->sortStudienSemester($semester_range);
+		$this->applyLoadUeberSemesterHaelfte($semester_range);
+		
+		if($lv_id) { // fetch Stundenplan for lva, irrelevant of who is requesting it (for now)
 
+			$stundenplan_data = $this->StundenplanModel->getStundenplanLVA($start_date, $end_date, $lv_id);
+			$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data) ?? [];
+			$this->expand_object_information($stundenplan_data);
+			$this->terminateWithSuccess($stundenplan_data);
+			
+		}
+		
 		$is_mitarbeiter = getData($this->MitarbeiterModel->isMitarbeiter($student_uid));
 		if($is_mitarbeiter)
 		{
 			$this->terminateWithError("Not possible to look at the Student Calendar as a Mitarbeiter");
 		}
 		
-		$semester_range = $this->studienSemesterErmitteln($start_date,$end_date);
-
-		$this->sortStudienSemester($semester_range);
-
-		$this->applyLoadUeberSemesterHaelfte($semester_range);
 		
 		// getting the gruppen_kurzbz of the student in the different studiensemester
 		$benutzer_gruppen = $this->fetchBenutzerGruppenFromStudiensemester($semester_range);

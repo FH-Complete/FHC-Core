@@ -1,6 +1,7 @@
 <?php
 $includesArray = array(
 	'title' => 'MyLv',
+	'primevue3' => true,
 	'customJSModules' => ['public/js/apps/Cis/MyLv/Student.js'],
 	'customCSSs' => ['public/css/components/MyLv.css']
 );

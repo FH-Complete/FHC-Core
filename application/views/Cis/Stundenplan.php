@@ -1,6 +1,7 @@
 <?php
 $includesArray = array(
 	'title' => 'Stundenplan',
+	'primevue3' => true,
 	'customJSModules' => ['public/js/apps/Cis/Stundenplan.js'],
 	'customCSSs' => ['public/css/components/calendar.css']
 );

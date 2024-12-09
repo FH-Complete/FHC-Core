@@ -10,7 +10,6 @@ const app = Vue.createApp({
 	name: 'StundenplanApp',
 	data() {
 		return {
-			lv_id: null,
 			events: null,
 			calendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
@@ -22,6 +21,11 @@ const app = Vue.createApp({
 		FhcCalendar, LvModal, LvMenu, LvInfo
 	},
 	computed:{
+		lv_id() { // computed so we can theoretically change path/lva selection and reload without page refresh
+			const pathParts = window.location.pathname.split('/').filter(Boolean);
+			const id = pathParts[pathParts.length - 1];
+			return id && !isNaN(Number(id)) ? id : null; // only return id if it is a number string since the path might contain invalid elements
+		},
 		weekFirstDay: function () {
 			return this.calendarDateToString(this.calendarDate.cdFirstDayOfWeek);
 		},
@@ -39,9 +43,6 @@ const app = Vue.createApp({
 	methods:{
 		setSelectedEvent: function (event) {
 			this.currentlySelectedEvent = event;
-		},
-		getLvID: function () {
-			this.lv_id = window.location.pathname
 		},
 		selectDay: function(day){
 			this.currentDay = day;
@@ -76,7 +77,7 @@ const app = Vue.createApp({
 		},
 		loadEvents: function(){
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay),
+				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.lv_id),
 				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay)
 			]).then((result) => {
 				let promise_events = [];
@@ -110,7 +111,6 @@ const app = Vue.createApp({
 	created()
 	{
 		this.loadEvents();
-		this.getLvID();
 	},
 	template:/*html*/`
 	<h2>{{$p.t('lehre/stundenplan')}}</h2>
