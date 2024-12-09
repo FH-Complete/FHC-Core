@@ -30,25 +30,25 @@ export default {
 
 			return this.allNewsList.slice(0, quantity);
 		},
-		placeHolderImgURL: function () {
-			return (
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				"skin/images/fh_technikum_wien_illustration_klein.png"
-			);
-		},
-		activeNews() {
-			return this.allNewsList.find(news => news.minimized === false) ?? this.allNewsList[0] ?? null
+		carouselItems() {
+			return this.allNewsList.reduce((acc, cur) => {
+				const el = document.getElementById('card-'+cur.news_id)
+				acc.push(el);
+				return acc
+			}, [])
 		}
 	},
 	methods: {
 		setNext(){
 			const thisIndex = this.allNewsList.findIndex(n=>n.news_id == this.selected.news_id)
 			const nextIndex = thisIndex == (this.allNewsList.length - 1) ? 0 : thisIndex + 1
-			this.setSelected(this.allNewsList[nextIndex]) 
+
+			this.setSelected(this.allNewsList[nextIndex], 'next')
 		},
 		setPrev() {
 			const thisIndex = this.allNewsList.findIndex(n=>n.news_id == this.selected.news_id)
 			const prevIndex = thisIndex ? thisIndex - 1 : this.allNewsList.length - 1
+			
 			this.setSelected(this.allNewsList[prevIndex], 'prev')
 		},
 		getMenuItemClass(news) {
@@ -80,13 +80,25 @@ export default {
 			
 			return classString;
 		},
-		setSelected(news, direction = "next") {
+		setSelected(news, direction) {
 			if (this.selected && news && this.selected === news) return
 			
+			this.carouselItems.forEach(item => { 
+				// remove all classes from every card to secure valid active/prev/next state
+				// that can never have funny side effects with bootstrap event handling
+				item.classList.remove('carousel-item-next')
+				item.classList.remove('carousel-item-prev')
+				item.classList.remove('carousel-item-start')
+				item.classList.remove('carousel-item-end')
+				item.classList.remove('active')
+			})
+			
 			const oldCard = document.getElementById('card-'+this.selected.news_id)
+			const indexActive = this.allNewsList.indexOf(this.selected)
+			const indexSelected = this.allNewsList.indexOf(news)
 
-			// TODO: to show animation of non neighbour item through menu reapply css classes 
-			if(direction === 'next') {
+			const order = indexSelected > indexActive ? 'next' : 'prev';
+			if(direction === 'next' || order === 'next') {
 				// set nextCard .carousel-item-next.carousel-item-start
 				oldCard.classList.add('carousel-item-start')
 
@@ -94,7 +106,18 @@ export default {
 				// set prevCard .carousel-item-prev.carousel-item-end
 				oldCard.classList.add('carousel-item-end')
 			}
+			
+			const prevIndex = indexSelected > 0 ? indexSelected - 1 : 0
+			const nextIndex = indexSelected === this.allNewsList.length - 1 ? 0 : indexSelected + 1
+			const prev = this.allNewsList[prevIndex]
+			const next = this.allNewsList[nextIndex]
+			const n = document.getElementById('card-'+next.news_id)
+			const p = document.getElementById('card-'+prev.news_id)
 
+			n.classList.add('carousel-item-next')
+			p.classList.add('carousel-item-prev')
+			
+			this.carouselInstance.to(this.allNewsList.indexOf(news))
 			this.selected = news
 
 		},
@@ -124,15 +147,19 @@ export default {
 			.then(res => res.data)
 			.then((news) => {
 				this.allNewsList = Array.from(Object.values(news));
-
 				this.selected = this.allNewsList.length ? this.allNewsList[0] : null
-
 			})
 			.catch((err) => {
 				console.error("ERROR: ", err.response.data);
 			});
 
 		this.$emit("setConfig", false);
+	},
+	mounted() {
+		this.carouselInstance = new bootstrap.Carousel(this.$refs.carousel, {
+			wrap: false, // keep this off even though it actually wraps
+			interval: false
+		})
 	},
 	template: /*html*/ `
 <div class="widgets-news h-100" :style="getNewsWidgetStyle">
@@ -151,24 +178,18 @@ export default {
 					
 					<div class="row fhc-news-menu-item" @click="setSelected(news)" :class="getMenuItemClass(news)" style="margin-right: 0px; margin-left: 0px; overflow-y: hidden;">
 						<div class="col-8 fhc-news-menu-item-betreff"><p>{{news.content_obj.betreff ?? ''}}</p></div>
-<!--						TODO: format date in short form dd/mm/yyyy-->
 						<span class="fhc-news-menu-item-date fw-bold"
-						 >{{ news.datum ?? ''}}</span>
+						 >{{ news.datumformatted ?? ''}}</span>
 					</div>
 					
 				</template>
 			</div>
 			<div :class="'col-'+(width == 2? 6 : 8) + ' h-100'" style="padding-left: 0px; padding-right: 0px;" ref="htmlContent">
 				<div class="container h-100" style="padding: 0px;"  ref="carocontainer">
-				
-					<div id="carouselExample" style="height: 100%;" class="carousel slide fhc-carousel" data-bs-ride="carousel" 
-						data-bs-interval="false"
-						ref="carocontrols">
-						<div class="carousel-indicators">
-							<button v-for="(news, index) in newsList" :id="'indicator-'+news_news_id" type="button" data-bs-target="#carouselExample" data-bs-slide-to="index"></button>
-						 </div>
+					<div id="carouselExample" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel" data-bs-ride="carousel" 
+						data-bs-interval="false">
 
-						<div class="carousel-inner"  style="height: 100%; max-width: 100%;">
+						<div class="carousel-inner" ref="carouselInner"  style="height: 100%; max-width: 100%;">
 							<div v-for="(news, index) in newsList" class="carousel-item" :class="getDynClassCarouselItem(news, index)" style="overflow-y: auto; height: 100%;" :id="'card-'+news.news_id" v-html="news.content_obj.content">
 								
 							</div>
