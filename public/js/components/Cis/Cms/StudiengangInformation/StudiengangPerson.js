@@ -1,7 +1,21 @@
 export default {
-	props:["uid","vorname","nachname","titelpre","kontakt","telefonklappe","email","planbezeichnung","foto"],
+	props:{
+		uid:String,
+		vorname:String,
+		nachname:String,
+		titelpre:String,
+		kontakt:String,	
+		telefoneklappe:String,
+		email:String,
+		planbezeichnung:String,
+		foto:String,
+		displayWidget:{
+			type:Boolean,
+			default:false,
+		}
+	},
 	template:/*html*/`
-	<div class="card" style="width: 15rem;">
+	<div class="card" :style="{'width':displayWidget?'12rem':'15rem'}">
 		<div class="bg-dark d-flex justify-content-center">
 			<img  :src="base64Image" alt="mitarbeiter_foto" style="width: 110px; height: auto; object-fir:scale-down;" class="card-img-top" >
 		</div>
