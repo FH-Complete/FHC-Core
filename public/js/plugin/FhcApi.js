@@ -310,7 +310,7 @@ export default {
 					})
 				}
 
-				this.bindKeys(factorypart)
+				this.addEndpoints(factorypart)
 			}
 
 			addEndpoints(factorypart) {
