@@ -284,24 +284,6 @@ class LvMenu extends FHCAPI_Controller
 
 	}
 
-
-	private function fhc_menu_digitale_anwesenheiten(&$menu, $angemeldet, $studiengang_kz, $semester, $lvid, $angezeigtes_stsem){
-		
-		// DIGITALE ANWESENHEITEN
-		if (defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet) {
-
-			$menu[] = array
-			(
-				'id' => 'core_menu_digitale_anwesenheitslisten',
-				'position' => '50',
-				'name' => $this->p->t('lehre', 'digiAnw'),
-				'c4_icon' => base_url('skin/images/button_kreuzerltool.png'),
-				'c4_link' => base_url("index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&sem_kurzbz=$angezeigtes_stsem&nav=false"),
-				'c4_linkList' => []
-			);
-		}
-	}
-
 	private function fhc_menu_lvinfo(&$menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $lehrfach_oe_kurzbz_arr){
 		
 		// LVINFO

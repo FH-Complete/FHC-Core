@@ -4,6 +4,12 @@ import FhcApiFactory from '../api/fhcapifactory.js';
 
 export default {
 	install: (app, options) => {
+		if (app.config.globalProperties.$fhcApi) {
+			if (options?.factory) {
+				app.config.globalProperties.$fhcApi.factory.addEndpoints(options.factory);
+			}
+			return;
+		}
 		app.use(FhcAlert);
 
 		function _get_config(form, uri, data, config) {
@@ -136,7 +142,7 @@ export default {
 			return Promise.reject(error);
 		});
 
-		app.config.globalProperties.$fhcApi = Vue.reactive({
+		app.config.globalProperties.$fhcApi = {
 			getUri(url) {
 				return fhcApiAxios.getUri({url});
 			},
@@ -289,38 +295,43 @@ export default {
 						$fhcAlert.alertDefault('error', error.message, message);
 				}
 			}
-		});
+		};
 
 		class FhcApiFactoryWrapper {
 			constructor(factorypart, root) {
-				if (root === undefined)
+				if (root === undefined) {
 					this.$fhcApi = app.config.globalProperties.$fhcApi;
-				else
+					this.$fhcApi.factory = this;
+				} else {
 					Object.defineProperty(this, '$fhcApi', {
 						get() {
 							return (root || this).$fhcApi;
 						}
 					})
+				}
 
-				this.bindKeys(factorypart, root)
+				this.bindKeys(factorypart)
 			}
 
-			bindKeys(factorypart, root) {
+			addEndpoints(factorypart) {
 				Object.keys(factorypart).forEach(key => {
 					Object.defineProperty(this, key, {
 						get() {
 							if (typeof factorypart[key] == 'function')
 								return factorypart[key].bind(this);
-							return new FhcApiFactoryWrapper(factorypart[key], root || this);
+							return new FhcApiFactoryWrapper(factorypart[key], this.$fhcApi.factory);
 						}
 					});
 				});
 			}
 		}
 
-		const mergedFhcApiFactory = options?.factory ? {...FhcApiFactory, ...options.factory} : FhcApiFactory;
+		const factory = new FhcApiFactoryWrapper(FhcApiFactory);
+		if (options?.factory)
+			factory.addEndpoints(options.factory);
 
-		app.config.globalProperties.$fhcApi.factory = new FhcApiFactoryWrapper(mergedFhcApiFactory);
+		app.config.globalProperties.$fhcApi.factory = factory;
+
 		app.provide('$fhcApi', app.config.globalProperties.$fhcApi);
 	}
 };
