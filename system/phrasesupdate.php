@@ -37196,8 +37196,28 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
 // CIS4 phrases from legacy code end
+	array(
+		'app' => 'core',
+		'category' => 'gruppenmanagement',
+		'phrase' => 'nichtZumEditierenDerGruppeBerechtigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Nicht zum Editieren der Gruppe berechtigt",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No authorization for editing the group",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 
