@@ -38,9 +38,16 @@ export default {
                         </div>
         
                         <div class="searchbar_tablerow">
-                            <div class="searchbar_tablecell">Person_id</div>
+                            <div class="searchbar_tablecell">Studiengang</div>
                             <div class="searchbar_tablecell">
-                                {{ res.person_id }}
+                                {{ res.studiengang }}
+                            </div>
+                        </div>
+
+						<div class="searchbar_tablerow">
+                            <div class="searchbar_tablecell">Verband</div>
+                            <div class="searchbar_tablecell">
+                                {{ res.verband }}
                             </div>
                         </div>
         

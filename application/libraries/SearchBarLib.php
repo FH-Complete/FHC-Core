@@ -367,12 +367,18 @@ EOSC;
 		SELECT
 			\''.$type.'\' AS type,
 			s.student_uid AS uid,
+			'.
+			(defined("DOMAIN")?
+			'CONCAT(s.student_uid,\'@'.DOMAIN.'\') AS email,':'')
+			.'
 			s.matrikelnr,
+			CONCAT(stg.kurzbzlang,s.semester,s.verband) as verband,
+			stg.bezeichnung AS studiengang,
 			p.person_id AS person_id,
 			p.vorname || \' \' || p.nachname AS name,
-			k.kontakt as email ,
 			p.foto
 			FROM public.tbl_student s
+			JOIN public.tbl_studiengang stg USING(studiengang_kz)
 			JOIN public.tbl_benutzer b ON(b.uid = s.student_uid)
 			JOIN public.tbl_person p USING(person_id)
 			LEFT JOIN (
@@ -383,7 +389,7 @@ EOSC;
 				WHERE b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-					GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto
+					GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto, s.verband, s.semester, stg.bezeichnung, stg.kurzbzlang
 	');
 
 		// If something has been found then return it
