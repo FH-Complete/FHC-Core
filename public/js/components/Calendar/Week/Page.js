@@ -31,6 +31,27 @@ export default {
 		'input',
 	],
 	computed: {
+		pageHeaderStyle(){
+			return {
+				'z-index': 4,
+				'grid-template-columns': 'repeat(' + this.days.length + ', 1fr)',
+				'grid-template-rows': 1,
+				position: 'sticky',
+				top: 0,
+			}
+		},
+		indicatorStyle() {
+			return {
+				'pointer-events': 'none',
+				'padding-left': '3.5rem',
+				'margin-top': '-1px',
+				'z-index': 2,
+				'border-color': '#00649C!important',
+				top: this.hourPosition + 'px',
+				left: 0,
+				right: 0,
+			}
+		},
 		hours(){
 			// returns an array with elements starting at 7 and ending at 24
 			return [...Array(24).keys()].filter(hour => hour >= 7 && hour <= 24);
@@ -88,6 +109,36 @@ export default {
 		}
 	},
 	methods: {
+		hourGridIdentifier(hour) {
+			// this is the id attribute that is responsible to scroll the calender to the first event
+			return 'scroll' + hour + this.focusDate.d + this.week;
+		},
+		hourGridStyle(hour) {
+			return {
+				'pointer-events': 'none',
+				top: this.getAbsolutePositionForHour(hour),
+				left: 0,
+				right: 0,
+				'z-index': 0,
+			}
+		},
+		dayGridStyle(day) {
+			return {
+				'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)',
+				'grid-template-rows': 'repeat(' + (this.hours.length * 60 / this.smallestTimeFrame) + ', 1fr)',
+			}
+		},
+		eventGridStyle(day, event) {
+			return {
+				'z-index': 1,
+				'grid-column-start': 1 + (event.lane - 1) * day.lanes / event.maxLane,
+				'grid-column-end': 1 + event.lane * day.lanes / event.maxLane,
+				'grid-row-start': this.dateToMinutesOfDay(event.start),
+				'grid-row-end': this.dateToMinutesOfDay(event.end),
+				'background-color': event.orig.color,
+				'--test': this.dateToMinutesOfDay(event.end),
+			}
+		},
 		calcHourPosition(event) {
 			let height = this.$refs.eventcontainer.getBoundingClientRect().height;
 			let top = this.$refs.eventcontainer.getBoundingClientRect().top;
@@ -155,23 +206,25 @@ export default {
 	<div class="fhc-calendar-week-page">
 
 		<div class="d-flex flex-column">
-			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="{'z-index':4,'grid-template-columns': 'repeat(' + days.length + ', 1fr)', 'grid-template-rows':1}" style="position:sticky; top:0; " >
+			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
 				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
 					<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
 					<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
 				</div>
 			</div>
-			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="" >
-				<div :id="'scroll'+hour+focusDate.d+week" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" style="pointer-events: none;" :style="{top:getAbsolutePositionForHour(hour),left:0,right:0,'z-index':0}"></div>
-				<div v-if="hourPosition" class="position-absolute border-top small"  style="pointer-events: none; padding-left:3.5rem; margin-top:-1px;z-index:2;border-color:#00649C !important" :style="{top:hourPosition+'px',left:0,right:0}">
-					<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
-				</div>
+			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
+				<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
+				<Transition>
+					<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
+						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
+					</div>
+				</Transition>
 				<div class="events">
 					<div class="hours">
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
-					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="{'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)', 'grid-template-rows': 'repeat(' + (hours.length * 60 / smallestTimeFrame) + ', 1fr)'}">
-						<div  :style="{'background-color':event.orig.color}" class="mx-2 small rounded overflow-hidden "  @click.prevent="weekPageClick(event.orig, day)" :style="{'z-index':1,'grid-column-start': 1+(event.lane-1)*day.lanes/event.maxLane, 'grid-column-end': 1+event.lane*day.lanes/event.maxLane, 'grid-row-start': dateToMinutesOfDay(event.start), 'grid-row-end': dateToMinutesOfDay(event.end) ,'--test': dateToMinutesOfDay(event.end)}" v-for="event in day.events" :key="event">
+					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
+						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" :style="eventGridStyle(day,event)" class="mx-2 small rounded overflow-hidden "  >
 							<slot  name="weekPage" :event="event" :day="day" :isSelected="event.orig == selectedEvent" >
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 							</slot>
