@@ -64,6 +64,7 @@ class Tag_Controller extends FHCAPI_Controller
 			tag
 			'
 		);
+		$this->NotiztypModel->addOrder('prioritaet');
 		$notiztypen = $this->NotiztypModel->loadWhere(array('aktiv' => true));
 		$this->terminateWithSuccess(hasData($notiztypen) ? getData($notiztypen) : array());
 	}

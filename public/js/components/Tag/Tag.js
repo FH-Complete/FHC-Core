@@ -23,6 +23,10 @@ export default {
 		values: {
 			type: Array,
 			required: true
+		},
+		confirmLimit: {
+			type: Number,
+			default: 20
 		}
 	},
 	data() {
@@ -120,11 +124,16 @@ export default {
 			}
 			else
 			{
+				if (this.$fhcAlert && postData.values.length >= this.confirmLimit)
+				{
+					if (await this.$fhcAlert.confirm({message: `Der Tag wird für ${postData.values.length} Einträge gesetzt. Sind Sie sicher?`}) === false)
+						return;
+				}
+
 				this.endpoint.addTag(postData)
 					.then(response => response.data)
 					.then(response => {
 						if (typeof response === 'number') {
-							console.log(response);
 							this.tagData.id = response;
 						} else {
 							this.tagData.response = response;
@@ -182,13 +191,13 @@ export default {
 		}
 	},
 	template: `
-		<div class="plus-button-container" @mouseleave="hideList">
+		<div class="plus_button_container" @mouseleave="hideList">
 			<button @mouseover="showList = true" 
 					:disabled="!values || values.length === 0"
 					class="btn btn-sm">
 				<i class="fa-solid fa-tag fa-xl"></i>
 			</button>
-			<ul v-if="showList" class="dropdown-list">
+			<ul v-if="showList" class="dropdown_list">
 				<li v-for="(item, index) in tags" :key="index" @click="openModal(item)" :title="item.bezeichnung">
 					{{ item.bezeichnung }}
 				</li>
@@ -202,7 +211,7 @@ export default {
 			@hidden-bs-modal="reset"
 		>
 			<template #title>
-				<span :class="tagData.style">{{ tagData.beschreibung }}</span>
+				<span :class="['tag', tagData.style]">{{ tagData.beschreibung }}</span>
 			</template>
 			<template #default>
 				<div class="col">

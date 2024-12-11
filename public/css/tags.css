@@ -1,4 +1,4 @@
-:is(.tag_notice, .tag_inwork, .tag_planning, .tag_prio_one, .tag_prio_two, .tag_finished, .display_all) {
+.tag {
 	display: inline-block;
 	padding: 5px 10px;
 	margin-right: 5px;
@@ -12,33 +12,59 @@
 	vertical-align: baseline;
 }
 
-:is(.tag_notice, .tag_inwork, .tag_planning, .tag_prio_one, .tag_prio_two, .tag_finished):hover {
+.tag:hover
+{
 	transform: scale(1.15);
 }
 
-.tag_notice {
-	background-color: orangered !important;
+.tag_rot {
+	background-color: #ff0000ff;
 }
 
-.tag_finished {
-	background-color: green !important;
-}
-
-.tag_inwork {
-	background-color: violet !important;
-}
-
-.tag_planning {
-	background-color: lightblue !important;
-}
-
-.tag_prio_one {
-	background-color: red !important;
-}
-
-.tag_prio_two {
-	background-color: yellow !important;
+.tag_gelb {
+	background-color: #ffff00ff;
 	color: black;
+}
+.tag_gruen {
+	background-color: #008000ff;
+}
+
+.tag_rosa {
+	background-color: #FFC1C1;
+	color: black;
+}
+
+.tag_aprikose {
+	background-color: #4f7596;
+}
+
+.tag_pfirsich {
+	background-color: #a15f95;
+}
+
+.tag_orange {
+	background-color: #ffA500ff;
+}
+
+
+.tag_braun {
+	background-color: #6d4c41;
+}
+
+.tag_blau {
+	background-color: #508498;
+}
+
+.tag_lavendel {
+	background-color: #C7A3FF;
+}
+
+.tag_limette {
+	background-color: #D3FFCE;
+}
+
+.tag_done {
+	text-decoration: line-through;
 }
 
 .display_all {
@@ -46,13 +72,12 @@
 	border: none;
 }
 
-
-.dropdown-list {
+.dropdown_list {
 	list-style: none;
 	background-color: white;
 	border: 1px solid #ccc;
 	border-radius: 5px;
-	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 	z-index: 1000;
 	position: absolute;
 	padding: 10px 10px 10px;
@@ -60,15 +85,12 @@
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+	cursor: pointer;
 }
 
-.plus-button-container.disabled {
+.plus_button_container.disabled {
 	pointer-events: none;
 	opacity: 0.5;
-}
-
-.tag-done {
-	text-decoration: line-through;
 }
 
 .modificationdate {

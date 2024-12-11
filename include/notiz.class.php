@@ -325,7 +325,7 @@ class notiz extends basis_db
 				FROM
 					public.tbl_notiz
 					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
-				WHERE 1=1";
+				WHERE 1=1 AND AND tbl_notiz.typ IS NULL ";
 
 		if(!is_null($erledigt))
 		{
@@ -523,7 +523,7 @@ class notiz extends basis_db
 				FROM
 					public.tbl_notiz
 					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
-				WHERE 1=1";
+				WHERE 1=1 AND tbl_notiz.typ IS NULL ";
 
 		if(!is_null($erledigt))
 		{
