@@ -79,6 +79,10 @@ export default {
 			this.selectDay(day);
 		}
 	},
+	mounted() {
+		const container = document.getElementById("calendarContainer")
+		if(container) container.style.overflow = 'scroll'	
+	},
 	template: /*html*/`
 	<div class="fhc-calendar-month-page" :class="{'show-weeks': showWeeks}">
 		<div v-if="showWeeks" class=" bg-light fw-bold border-top border-bottom text-center"></div>

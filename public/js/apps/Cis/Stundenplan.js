@@ -123,7 +123,9 @@ const app = Vue.createApp({
 			</span>
 		</template>
 		<template #weekPage="{event,day,isSelected}">
-			<div @click="showModal(event?.orig)" type="button" :class="{'selectedEvent':isSelected}" class="fhc-entry border border-secondary border d-flex flex-column align-items-center justify-content-evenly h-100">
+			<div @click="showModal(event?.orig)" type="button" :class="{'selectedEvent':isSelected}" 
+			class="fhc-entry border border-secondary border d-flex flex-column align-items-center 
+			justify-content-evenly h-100" style="max-height: 75px; overflow: auto;">
 				<span>{{event?.orig.topic}}</span>
 				<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
 				<span>{{event?.orig.ort_kurzbz}}</span>
