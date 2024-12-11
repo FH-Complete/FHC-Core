@@ -72,11 +72,11 @@ class Bank extends FHCAPI_Controller
 			array($loggedPersonId)
 		);
 
-		// If a db error occurred then terminate
-		if (isError($bankDataResult)) $this->terminateWithError('Database error while retrieving bank data', self::ERROR_TYPE_DB);
+		// Get the retrieved data or terminate
+		$data = $this->getDataOrTerminateWithError($bankDataResult);
 
-		// If everythin was fine then return the database results
-		$this->terminateWithSuccess(getData($bankDataResult));
+		// Anyway terminate it!
+		$this->terminateWithSuccess($data);
 	}
 
 	/**
@@ -120,7 +120,7 @@ class Bank extends FHCAPI_Controller
 
 		$writeDataResult = null; // it is considered as an error
 
-		// If at least a record exists
+		// If at least a record exists then update
 		if (hasData($bankDataResult))
 		{
 			// Then update
@@ -136,7 +136,7 @@ class Bank extends FHCAPI_Controller
 				)
 			);
 		}
-		else
+		else // otherwise insert
 		{
 			// Otherwise insert
 			$writeDataResult = $this->BankverbindungModel->insert(
