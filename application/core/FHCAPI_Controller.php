@@ -94,7 +94,7 @@ class FHCAPI_Controller extends Auth_Controller
 	// ---------------------------------------------------------------
 
 	/**
-	 * @param array					$data
+	 * @param string|array|object	$data
 	 * @param string				$type (optional)
 	 * @return void
 	 */
@@ -110,12 +110,17 @@ class FHCAPI_Controller extends Auth_Controller
 				$error['messages'] = $data;
 			else
 				$error = $data;
+		} elseif (is_object($data)) {
+			$error = (array)$data;
 		} else {
 			$error['message'] = $data;
 		}
 		
 		if ($type)
 			$error['type'] = $type;
+
+		if (!isset($error['type']))
+			$error['type'] = self::ERROR_TYPE_GENERAL;
 
 		$this->returnObj['errors'][] = $error;
 	}
@@ -139,6 +144,19 @@ class FHCAPI_Controller extends Auth_Controller
 		if (!isset($this->returnObj['meta']))
 			$this->returnObj['meta'] = [];
 		$this->returnObj['meta'][$key] = $value;
+	}
+
+	/**
+	 * @param string				$key
+	 * @return mixed
+	 */
+	public function getMeta($key)
+	{
+		if (!isset($this->returnObj['meta']))
+			return null;
+		if (!isset($this->returnObj['meta'][$key]))
+			return null;
+		return $this->returnObj['meta'][$key];
 	}
 
 	/**
@@ -179,7 +197,7 @@ class FHCAPI_Controller extends Auth_Controller
 	}
 
 	/**
-	 * @param array					$error
+	 * @param string|array|object					$error
 	 * @param string				$type (optional)
 	 * @param integer				$status (optional)
 	 * @return void
@@ -195,7 +213,7 @@ class FHCAPI_Controller extends Auth_Controller
 	/**
 	 * @param stdclass				$result
 	 * @param string				$errortype
-	 * @return void
+	 * @return mixed
 	 */
 	protected function getDataOrTerminateWithError($result, $errortype = self::ERROR_TYPE_GENERAL)
 	{

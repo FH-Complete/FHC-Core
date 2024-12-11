@@ -121,7 +121,7 @@ class AntragLib
 	public function unpauseAntrag($antrag_id, $insertvon)
 	{
 		if ($insertvon == Studierendenantragstatus_model::INSERTVON_DEREGISTERED)
-			return error($this->p->t('studierendenantrag', 'error_no_right'));
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_right'));
 		if ($insertvon == Studierendenantragstatus_model::INSERTVON_ABMELDUNGSTGL) {
 			return $this->_ci->StudierendenantragstatusModel->resumeAntraegeForAbmeldungStgl($antrag_id);
 		}
@@ -257,18 +257,28 @@ class AntragLib
 						if (isError($result))
 							$errors[] = getError($result);
 
+						$this->_ci->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+						$result = $this->_ci->StatusgrundModel->loadWhere(['statusgrund_kurzbz' => 'abbrecherStud']);
+						if (isError($result)) {
+							$errors[] = getError($result);
+							continue;
+						} elseif (!hasData($result)) {
+							$errors[] = $this->_ci->p->t('lehre', 'error_noStatusgrund', ['statusgrund_kurzbz' => 'abbrecherStud']);
+							continue;
+						}
+						$statusgrund = current(getData($result));
+
 						$result = $this->_ci->prestudentlib->setAbbrecher(
                             $antrag->prestudent_id,
                             $antrag->studiensemester_kurzbz,
                             $insertvon,
-                            'abbrecherStud',
+                            $statusgrund->statusgrund_id,
                             $antrag->datum,
                             $insertam
                         );
-						if (isError($result))
-						{
+						if (isError($result)) {
 							$errors[] = getError($result);
-							return $errors;
+							continue;
 						}
 
 						$result = $this->_ci->PersonModel->loadPrestudent($antrag->prestudent_id);
@@ -421,11 +431,20 @@ class AntragLib
 			// NOTE(chris): here we should have error handling but at the
 			// moment there is no way to notify the user for "soft" errors
 
+			$this->_ci->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+			$result = $this->_ci->StatusgrundModel->loadWhere(['statusgrund_kurzbz' => 'abbrecherStgl']);
+			if (isError($result))
+				return $result;
+			if (!hasData($result))
+				return error($this->_ci->p->t('lehre', 'error_noStatusgrund', ['statusgrund_kurzbz' => 'abbrecherStgl']));
+			
+			$statusgrund = current(getData($result));
+
 			$result = $this->_ci->prestudentlib->setAbbrecher(
                 $antrag->prestudent_id,
                 $antrag->studiensemester_kurzbz,
                 $insertvon,
-                'abbrecherStgl',
+                $statusgrund->statusgrund_id,
                 $status->insertamum
             );
 
@@ -911,7 +930,7 @@ class AntragLib
 	public function createWiederholung($prestudent_id, $studiensemester_kurzbz, $insertvon, $repeat)
 	{
 		$result = $this->_ci->StudierendenantragModel->loadIdAndStatusWhere([
-			'prestudent_id' => $prestudent_id,
+			'tbl_studierendenantrag.prestudent_id' => $prestudent_id,
 			'studiensemester_kurzbz'=> $studiensemester_kurzbz,
 			'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG
 		]);
@@ -1341,7 +1360,7 @@ class AntragLib
 
 		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist_abmeldung'))) {
 			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
-				'prestudent_id' => $prestudent_id,
+				'tbl_studierendenantrag.prestudent_id' => $prestudent_id,
 				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED
 			], [
 				Studierendenantrag_model::TYP_ABMELDUNG,
@@ -1353,7 +1372,7 @@ class AntragLib
 				return success(-1);
 
 			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
-				'prestudent_id' => $prestudent_id,
+				'tbl_studierendenantrag.prestudent_id' => $prestudent_id,
 				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_PAUSE
 			], [
 				Studierendenantrag_model::TYP_ABMELDUNG,
@@ -1367,7 +1386,7 @@ class AntragLib
 			return success(0);
 		}
 
-		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id]);
+		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['tbl_studierendenantrag.prestudent_id' => $prestudent_id]);
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
@@ -1428,7 +1447,7 @@ class AntragLib
 			&& $result->status_kurzbz != 'Unterbrecher') {
 			return success(0);
 		}
-		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id]);
+		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['tbl_studierendenantrag.prestudent_id' => $prestudent_id]);
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
@@ -1443,12 +1462,6 @@ class AntragLib
 					return success(-2);
 				elseif($antrag->status == Studierendenantragstatus_model::STATUS_APPROVED && $antrag->datum > $datumStatus)
 					return success(-2);
-			}
-			if ($antrag->typ == Studierendenantrag_model::TYP_UNTERBRECHUNG)
-			{
-				// NOTE(chris): Ignore canceled ones
-				if ($antrag->status == Studierendenantragstatus_model::STATUS_CANCELLED)
-					continue;
 			}
 			if ($antrag->typ == Studierendenantrag_model::TYP_WIEDERHOLUNG)
 			{
@@ -1510,7 +1523,7 @@ class AntragLib
 		$datumStatus = $result->datum;
 		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist'))) {
 			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
-				'prestudent_id' => $prestudent_id,
+				'tbl_studierendenantrag.prestudent_id' => $prestudent_id,
 				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
 				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED
 			]);
@@ -1520,7 +1533,7 @@ class AntragLib
 				return success(-1);
 
 			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
-				'prestudent_id' => $prestudent_id,
+				'tbl_studierendenantrag.prestudent_id' => $prestudent_id,
 				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
 				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_DEREGISTERED
 			]);
@@ -1530,7 +1543,7 @@ class AntragLib
 				return success(-1);
 
 			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
-				'prestudent_id' => $prestudent_id,
+				'tbl_studierendenantrag.prestudent_id' => $prestudent_id,
 				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
 				's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_PAUSE
 			]);
@@ -1541,7 +1554,7 @@ class AntragLib
 
 			return success(0);
 		}
-		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id]);
+		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['tbl_studierendenantrag.prestudent_id' => $prestudent_id]);
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
@@ -1594,7 +1607,7 @@ class AntragLib
 	public function getDetailsForLastAntrag($prestudent_id, $typ = null)
 	{
 		$where = [
-			'prestudent_id' => $prestudent_id
+			'tbl_studierendenantrag.prestudent_id' => $prestudent_id
 		];
 		$types = null;
 		if ($typ) {

@@ -19,6 +19,7 @@ import {CoreFetchCmpt} from '../../components/Fetch.js';
 import FilterConfig from './Filter/Config.js';
 import FilterColumns from './Filter/Columns.js';
 import TableDownload from './Table/Download.js';
+import collapseAutoClose from '../../directives/collapseAutoClose.js';
 
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
@@ -36,9 +37,14 @@ export const CoreFilterCmpt = {
 		FilterColumns,
 		TableDownload
 	},
+	directives: {
+		collapseAutoClose
+	},
 	emits: [
 		'nwNewEntry',
-		'click:new'
+		'click:new',
+		'tableBuilt',
+		'uuidDefined'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -48,12 +54,12 @@ export const CoreFilterCmpt = {
 			default: true
 		},
 		filterType: {
-			type: String,
-			required: true
+			type: String
 		},
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
 		tableOnly: Boolean,
+		noColumnFilter:Boolean,
 		reload: Boolean,
 		download: {
 			type: [Boolean, String, Function, Array, Object],
@@ -154,7 +160,7 @@ export const CoreFilterCmpt = {
 				return [];
 			return this.tabulator.getColumns().filter(col => {
 				let def = col.getDefinition();
-				return !def.frozen && def.title;
+				return !def.frozen && def.title && def.formatter != "responsiveCollapse";
 			}).map(col => col.getField());
 		},
 		fieldNames() {
@@ -195,23 +201,23 @@ export const CoreFilterCmpt = {
 			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
-				height: 500,
-				layout: "fitDataStretch",
-				movableColumns: true,
-				columnDefaults:{
-					tooltip: true,
-				},
-				placeholder,
-				reactiveData: true,
-				persistence: true
-			}, ...(this.tabulatorOptions || {})};
+					height: 500,
+					layout: "fitDataStretch",
+					movableColumns: true,
+					columnDefaults:{
+						tooltip: true,
+					},
+					placeholder,
+					reactiveData: true,
+					persistence: true
+				}, ...(this.tabulatorOptions || {})};
 
 			if (!this.tableOnly) {
 				tabulatorOptions.data = this.filteredData;
 				tabulatorOptions.columns = this.filteredColumns;
 			}
 
-			if (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length)
+			if (tabulatorOptions.selectable || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
 				this.tabulatorHasSelector = true;
 			// TODO check ob im core bleiben soll
 			if (this.idField) {
@@ -233,7 +239,7 @@ export const CoreFilterCmpt = {
 				for (let evt of this.tabulatorEvents)
 					this.tabulator.on(evt.event, evt.handler);
 			}
-			this.tabulator.on('tableBuilt', () => this.tableBuilt = true);
+			this.tabulator.on('tableBuilt', () => {this.tableBuilt = true; this.$emit('tableBuilt');});
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
@@ -269,8 +275,11 @@ export const CoreFilterCmpt = {
 					const cols = this.tabulator.getColumns();
 					this.fields = cols.map(col => col.getField());
 					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+					
 				});
+				
 			}
+			
 		},
 		updateTabulator() {
 			if (this.tabulator) {
@@ -281,7 +290,7 @@ export const CoreFilterCmpt = {
 			}
 		},
 		_updateTabulator() {
-			this.tabulatorHasSelector = this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
+			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
 		},
@@ -565,6 +574,7 @@ export const CoreFilterCmpt = {
 		if (this.sideMenu && (!this.$props.onNwNewEntry || !(this.$props.onNwNewEntry instanceof Function)))
 			alert('"nwNewEntry" listener is mandatory when sideMenu is true');
 		this.uuid = _uuid++;
+		this.$emit('uuidDefined', this.uuid)
 		if (!this.tableOnly)
 			this.getFilter(); // get the filter data
 	},
@@ -601,12 +611,12 @@ export const CoreFilterCmpt = {
 						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
 					</button>
 					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten:</span>
-					<slot name="actions" v-bind="tabulatorHasSelector ? selectedData : []"></slot>
+					<slot name="actions" v-bind="{selected: tabulatorHasSelector ? selectedData : []}"></slot>
 					<slot name="search"></slot>
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
-					<a v-if="!tableOnly" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
+					<a v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
 						<span class="fa-solid fa-xl fa-filter"></span>
 					</a>
 					<a href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
@@ -625,6 +635,7 @@ export const CoreFilterCmpt = {
 				:names="fieldNames"
 				@hide="tabulator.hideColumn($event)"
 				@show="tabulator.showColumn($event)"
+				v-collapse-auto-close
 			></filter-columns>
 
 			<filter-config
@@ -638,11 +649,20 @@ export const CoreFilterCmpt = {
 				@switch-filter="switchFilter"
 				@apply-filter-config="applyFilterConfig"
 				@save-custom-filter="handlerSaveCustomFilter"
+				v-collapse-auto-close
 			></filter-config>
+			<div
+				v-else-if="$slots.filter"
+				:id="'collapseFilters' + idExtra"
+				class="card-body collapse"
+				:data-bs-parent="'#filterCollapsables' + idExtra"
+				v-collapse-auto-close
+				>
+				<slot name="filter"></slot>
+			</div>
 		</div>
 
 		<!-- Tabulator -->
 		<div ref="table" :id="'filterTableDataset' + idExtra" class="filter-table-dataset"></div>
 	`
 };
-

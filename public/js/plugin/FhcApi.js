@@ -46,9 +46,9 @@ export default {
 				result.meta.response = response;
 			return result;
 		}
-
+		const baseURL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/";
 		const fhcApiAxios = axios.create({
-			timeout: 5000,
+			timeout: 500000,
 			baseURL: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"
 		});
 
@@ -58,7 +58,7 @@ export default {
 
 			if (config.data instanceof FormData)
 				return config;
-			
+
 			if (!Object.values(config.data).every(item => {
 				if (item instanceof FileList)
 					return false;
@@ -96,7 +96,7 @@ export default {
 				|| response.config?.errorHandling === false
 				|| response.config?.errorHandling == 'fail')
 				return _clean_return_value(response);
-			
+
 			// NOTE(chris): loop through errors
 			if (response.data.errors)
 				response.data.errors = response.data.errors.filter(
@@ -107,7 +107,7 @@ export default {
 		}, error => {
 			if (error.code == 'ERR_CANCELED')
 				return Promise.reject({...{handled: true}, ...error});
-			
+
 			if (error.config?.errorHandling == 'off'
 				|| error.config?.errorHandling === false
 				|| error.config?.errorHandling == 'success')
@@ -118,7 +118,7 @@ export default {
 					app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL, true);
 					return Promise.reject({...{handled: true}, ...error});
 				}
-				
+
 				// NOTE(chris): loop through errors
 				error.response.data.errors = error.response.data.errors.filter(
 					err => (error.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, error.config)
@@ -132,11 +132,14 @@ export default {
 				app.config.globalProperties.$fhcAlert.alertError(error.message);
 				return Promise.reject({...{handled: true}, ...error});
 			}
-			
+
 			return Promise.reject(error);
 		});
 
 		app.config.globalProperties.$fhcApi = {
+			getUri(url) {
+				return fhcApiAxios.getUri({url});
+			},
 			get(form, uri, params, config) {
 				[uri, params, config] = _get_config(form, uri, params, config);
 				if (params) {
@@ -313,6 +316,6 @@ export default {
 		const mergedFhcApiFactory = options?.factory ? {...FhcApiFactory, ...options.factory} : FhcApiFactory;
 
 		app.config.globalProperties.$fhcApi.factory = new FhcApiFactoryWrapper(mergedFhcApiFactory);
-
+                app.provide('$fhcApi', app.config.globalProperties.$fhcApi);
 	}
 };

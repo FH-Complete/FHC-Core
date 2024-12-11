@@ -21,3 +21,6 @@ $config['grades_blocking_application'] = array(
 $config['fbl'] = FALSE;
 //Enables Info Mails
 $config['send_mail'] = TRUE;
+
+// Display fields to explain equivalence of ECTS and LV-Inhalte
+$config['explain_equivalence'] = TRUE;

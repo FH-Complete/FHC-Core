@@ -27,6 +27,10 @@ define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN',false);
 define('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN', true);
 define('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN', true);
+define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN', true);
+
+// Wenn gesetzt, werden die Digitale Anwesenheit-Icons nur fuer diese Studiengaenge angezeigt, sonst für alle
+// define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG', serialize(array('257')));
 
 // Im CIS Menue Links bei Modulen anzeigen wenn Lehrauftrag
 define('CIS_LEHRVERANSTALTUNG_MODULE_LINK',true);
@@ -332,4 +336,6 @@ define('DOCSBOX_ENABLED', false);
 // (true | false)
 define('DIENSTVERHAELTNIS_SUPPORT', false);
 
+// Falls Studstatus (Abmeldung, AbmeldungStg, Unterbrechung, Wiederholung) verwendet wird zeige Hinweistext bei Eingabe einer kommissionellen oder zusaetzlichen kommissionellen Pruefung
+define('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT', false);
 ?>

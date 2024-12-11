@@ -29,6 +29,7 @@ require_once(dirname(__FILE__).'/studiensemester.class.php');
 require_once(dirname(__FILE__).'/adresse.class.php');
 require_once(dirname(__FILE__).'/webservicelog.class.php');
 require_once(dirname(__FILE__).'/prestudent.class.php');
+require_once(dirname(__FILE__).'/kennzeichen.class.php');
 require_once(dirname(__FILE__).'/errorhandler.class.php');
 
 class dvb extends basis_db
@@ -42,6 +43,7 @@ class dvb extends basis_db
 	const DVB_URL_WEBSERVICE_RESERVIERUNG = DVB_PORTAL.'/rws/0.6/matrikelreservierung.xml';
 	const DVB_URL_WEBSERVICE_MELDUNG = DVB_PORTAL.'/rws/0.6/matrikelmeldung.xml';
 	const DVB_URL_WEBSERVICE_BPK = DVB_PORTAL.'/rws/0.6/pruefebpk.xml';
+	const DVB_URL_WEBSERVICE_BPK_ALL = DVB_PORTAL.'/rws/0.8/pruefebpk.xml';
 
 	public $authentication;
 	private $username;
@@ -1149,15 +1151,29 @@ class dvb extends basis_db
 	 */
 	public function getBPK($person_id)
 	{
+		$vbpkTypes = defined('VBPK_TYPES') && is_array(VBPK_TYPES) ? VBPK_TYPES : null;
+
 		$person = new person();
 		if ($person->load($person_id))
 		{
 			if ($person->bpk != '')
 			{
-				// BPK exisitert bereits
 				$retval = new stdClass();
 				$retval->bpk = $person->bpk;
-				return ErrorHandler::success($retval);
+
+				// BPK existiert bereits
+				if (!isset($vbpkTypes)) return ErrorHandler::success($retval);
+
+				$kennzeichen = new kennzeichen();
+
+				if ($kennzeichen->load_pers($person_id, $vbpkTypes))
+				{
+					if (array_unique(array_column($kennzeichen->result, 'kennzeichentyp_kurzbz')) == array_values($vbpkTypes))
+					{
+						// BPKs exisiteren bereits
+						return ErrorHandler::success($retval);
+					}
+				}
 			}
 
 			if ($person->gebdatum == '')
@@ -1178,7 +1194,8 @@ class dvb extends basis_db
 				return ErrorHandler::error($errormsg);
 			}
 
-			$geburtsdatum = str_replace("-", "", $person->gebdatum);
+			//$geburtsdatum = str_replace("-", "", $person->gebdatum);
+			$geburtsdatum = $person->gebdatum;
 			$vorname = $person->vorname;
 			$nachname = $person->nachname;
 			$geschlecht = mb_strtoupper($person->geschlecht);
@@ -1258,6 +1275,8 @@ class dvb extends basis_db
 	 */
 	public function pruefeBPK($geburtsdatum, $vorname, $nachname, $geschlecht, $plz = null, $strasse = null)
 	{
+		$vbpkTypes = defined('VBPK_TYPES') && is_array(VBPK_TYPES) ? VBPK_TYPES : null;
+
 		if ($this->tokenIsExpired())
 		{
 			$result = $this->authenticate();
@@ -1271,7 +1290,7 @@ class dvb extends basis_db
 
 		$uuid = $this->getUUID();
 
-		$url = self::DVB_URL_WEBSERVICE_BPK;
+		$url = self::DVB_URL_WEBSERVICE_BPK_ALL;
 		$url .= '?geburtsdatum='.curl_escape($curl, $geburtsdatum);
 		$url .= '&vorname='.curl_escape($curl, $vorname);
 		$url .= '&nachname='.curl_escape($curl, $nachname);
@@ -1311,24 +1330,15 @@ class dvb extends basis_db
 		if ($curl_info['http_code'] == '200')
 		{
 			/* Example Response:
-			 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-			 <simpleBpkResponse xmlns="http://www.brz.gv.at/datenverbund-unis">
-			 	<bpk>12345ABCDEFGHXXXXXXX=</bpk>
-				<personInfo>
-				<person>
-					<vorname>Hans</vorname>
-					<nachname>Huber</nachname>
-					<geschlecht>M</geschlecht>
-					<gebdat>1990-01-01</gebdat>
-				</person>
-				<adresse>
-					<staat></staat>
-					<plz>1100</plz>
-					<ort></ort>
-					<strasse></strasse>
-				</adresse>
-				</personInfo>
-			</simpleBpkResponse>
+			<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+				<bpkResponse xmlns="http://www.brz.gv.at/datenverbund-unis">
+					<uuid>5cc93441-a46a-4f97-a5e3-e64891b39f10</uuid>
+					<bpk>12345ABCDEFG</bpk>
+					<vbpk bereich="AS" vkz="BBA-STA">12345ABCDEFG</vbpk>
+					<vbpk bereich="BF" vkz="BMBWF">12345ABCDEFG</vbpk>
+					<vbpk bereich="ZP-TD" vkz="BMF">12345ABCDEFG</vbpk>
+					<geprueft>true</geprueft>
+				</bpkResponse>
 
 			Example Error:
 			<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -1369,10 +1379,30 @@ class dvb extends basis_db
 			}
 
 			$domnodes_bpk = $dom->getElementsByTagNameNS($namespace, 'bpk');
+
 			if ($domnodes_bpk->length > 0)
 			{
 				$retval = new stdClass();
 				$retval->bpk = $domnodes_bpk->item(0)->textContent;
+
+				// vbpks auslesen
+				$domnodes_vbpks = $dom->getElementsByTagNameNS($namespace, 'vbpk');
+
+				$retval->vbpks = array();
+				if ($domnodes_vbpks->length > 0)
+				{
+					foreach ($domnodes_vbpks as $domnode_vbpk)
+					{
+						foreach ($domnode_vbpk->attributes as $attribute)
+						{
+							if ($attribute->nodeName == 'bereich' && isset($vbpkTypes[$attribute->nodeValue]))
+							{
+								$retval->vbpks[$vbpkTypes[$attribute->nodeValue]] = $domnode_vbpk->nodeValue;
+							}
+						}
+					}
+				}
+
 				return ErrorHandler::success($retval);
 			}
 			else
@@ -1384,6 +1414,27 @@ class dvb extends basis_db
 					$retval = new stdClass();
 					$retval->multiple = true;
 					return ErrorHandler::error(null, $retval);
+				}
+				else
+				{
+					$errorTexts = array();
+					$domnodes_fehler = $dom->getElementsByTagNameNS($namespace, 'fehlerliste');
+
+					if ($domnodes_fehler->length > 0)
+					{
+						foreach ($domnodes_fehler as $domnode_fehler)
+						{
+							if ($domnode_fehler->childNodes->length > 0)
+							{
+								foreach ($domnode_fehler->childNodes as $childNode)
+								{
+									$errorTexts[] = $childNode->nodeValue;
+								}
+							}
+						}
+						$this->errormsg = count($errorTexts) > 0 ? implode('; ', $errorTexts) : null;
+						return ErrorHandler::error(null);
+					}
 				}
 			}
 			return ErrorHandler::error();
