@@ -22,5 +22,11 @@ export default {
 	setLanguage(categories,language) {
 		const payload = {categories, language}
 		return this.$fhcApi.post('/api/frontend/v1/phrasen/setLanguage', payload);
+	},
+	getLanguage() {
+		return this.$fhcApi.get('/api/frontend/v1/phrasen/getLanguage', {});
+	},
+	getActiveDbLanguages() {
+		return this.$fhcApi.get('/api/frontend/v1/phrasen/getAllLanguages', {});
 	}
 };
