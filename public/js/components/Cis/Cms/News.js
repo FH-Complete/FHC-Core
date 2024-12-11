@@ -38,7 +38,7 @@ export default {
   template: /*html*/ `
   	<h2 >News</h2>
 	<hr/>
-	<pagination  :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
+	<pagination v-show="content?true:false" :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
 	</pagination>
 	<div class="container-fluid">
 		<div class="row">
@@ -51,5 +51,7 @@ export default {
 			</div>
 		</div>
 	</div>
+	<pagination v-show="content?true:false" :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
+	</pagination>
     `,
 };
