@@ -88,7 +88,7 @@ class Profil extends FHCAPI_Controller
 				$res->data = $this->studentProfil();
 				$res->data->pid = $this->pid;
 			}
-
+			// editing your own profil - true
 			$editAllowed = true;
 		}
 		// UID is availabe when accessing Profil/View/:uid

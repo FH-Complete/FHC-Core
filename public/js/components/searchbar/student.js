@@ -16,7 +16,7 @@ export default {
                     <action :res="this.res" :action="this.actions.defaultaction" @actionexecuted="$emit('actionexecuted')">
                         <img v-if="(typeof res.foto !== 'undefined') && (res.foto !== null)"
                              :src="'data:image/jpeg;base64,' + res.foto"
-                             class="rounded-circle" height="100"/>
+                             class="rounded" style="max-height: 120px; max-width: 90px;" />
                         <i v-else class="fas fa-user-circle fa-5x"></i>
                     </action>
                 </div>
