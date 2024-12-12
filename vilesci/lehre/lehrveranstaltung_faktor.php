@@ -14,7 +14,7 @@ $rechte->getBerechtigungen($uid);
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
-if(!$rechte->isBerechtigt('basis/person', 'suid'))
+if(!$rechte->isBerechtigt('lehre/lehrveranstaltung', null, 'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 echo '<!DOCTYPE HTML>
