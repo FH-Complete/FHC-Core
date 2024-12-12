@@ -385,9 +385,9 @@ EOSC;
 			) as k USING(person_id)
 				WHERE 
 			b.aktiv = TRUE 
-			AND b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			AND (b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\')
 					GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto, s.verband, s.semester, stg.bezeichnung, stg.kurzbzlang
 	');
 
