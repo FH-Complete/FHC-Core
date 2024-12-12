@@ -26,15 +26,20 @@ components:{
 	StudiengangVertretung,
 },
 template:/*html*/`
+
 		<template v-if="studiengang?.bezeichnung && semester">
 			<div class="card card-body mb-3">
-				<div class="mb-3">
-					<h2 >Studiengang:</h2>
-					{{studiengang.bezeichnung}}
+				<div class="mb-1">
+					<h2 class="mb-1 pb-0">Studiengang:</h2>
+					<span class="mb-1">{{studiengang.bezeichnung}}</span>
 				</div>
-				<div :class="{'mb-3':studiengang?.zusatzinfo_html}">
-					<h2 >Semester: </h2>
-					{{semester}}
+				<div class="mb-1">
+					<h2 class="mb-1 pb-0">Moodle:</h2>
+					<a class="mb-1" target="_blank" :href="moodleLink">{{studiengang.kurzbzlang}}</a>
+				</div>
+				<div :class="{'mb-1':studiengang?.zusatzinfo_html}">
+					<h2 class="mb-1 pb-0">Semester: </h2>
+					<span class="mb-1">{{semester}}</span>
 				</div>
 				<div v-if="studiengang?.zusatzinfo_html" v-html="studiengang?.zusatzinfo_html"></div>
 			</div>
@@ -95,6 +100,12 @@ computed:{
 		}
 
 		return returnData;
+	},
+	moodleLink: function(){
+		// early return if the studiengang information is not available
+		if(!this.studiengang || !this.studiengang.studiengang_kz) return;
+
+		return `https://moodle.technikum-wien.at/course/view.php?idnumber=dl` + this.studiengang.studiengang_kz;
 	},
 },
 mounted(){

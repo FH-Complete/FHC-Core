@@ -4,6 +4,7 @@ import StudiengangInformation from "./StudiengangInformation/StudiengangInformat
 export default {
   components: {
     Pagination,
+	StudiengangInformation,
   },
   data() {
     return {
