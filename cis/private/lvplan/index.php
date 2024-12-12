@@ -533,7 +533,6 @@ if(!defined('CIS_LVPLAN_ZUSATZMENUE_ANZEIGEN') || CIS_LVPLAN_ZUSATZMENUE_ANZEIGE
 	<td class="menubox">
 	<p><a href="raumsuche.php">'.$p->t('lvplan/raumsuche').'</a></p>
 	<p><a href="../../../cms/content.php?content_id='.$p->t('dms_link/lvPlanFAQ').'" class="hilfe" target="_blank">'.$p->t('global/hilfe').'</a></p>
-	<p>'.$p->t('lvplan/FragenZuLvPlan', array(MAIL_LVPLAN)).'</p>
 	</td>';
 }
 
