@@ -141,8 +141,8 @@ export default {
 			<h6 class="card-title">{{bezeichnung}}</h6>
 		</div>
 		<div class="card-body " :style="bodyStyle">
-			<ul class="list-group border-top-0 border-bottom-0 rounded-0">
-				<template v-if="menu">
+			<template v-if="menu">
+				<ul class="list-group border-top-0 border-bottom-0 rounded-0">
 					<li :type="menuItem.c4_link ? 'button' : null" v-for="menuItem in menu" class="list-group-item border-0 " >
 						<div class="d-flex flex-row"  :data-bs-toggle="menuItem.c4_moodle_links?.length ? 'dropdown' : null">
 							<div class="mx-4">
@@ -156,11 +156,13 @@ export default {
 								<li v-for="item in menuItem.c4_moodle_links"><a class="dropdown-item border-bottom" :href="item.url">{{item.lehrform}}</a></li>
 							</ul>
 					</li>
-				</template>
-				<template v-else>
-					<li class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
-				</template>
-			</ul>
+				</ul>
+			</template>
+			<template v-else>
+				<div class="text-center d-flex justify-content-center align-items-center h-100" >
+					<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+				</div>
+			</template>
 		</div>
 		<div class="card-footer">
 			<div class="row">
