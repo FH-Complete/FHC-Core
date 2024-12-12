@@ -16,7 +16,7 @@ export default {
                     <action :res="this.res" :action="this.actions.defaultaction" @actionexecuted="$emit('actionexecuted')">
                         <img v-if="(typeof res.foto !== 'undefined') && (res.foto !== null)"
                              :src="'data:image/jpeg;base64,' + res.foto"
-                             class="rounded-circle" height="100"/>
+                             class="rounded" style="max-height: 120px; max-width: 90px;" />
                         <i v-else class="fas fa-user-circle fa-5x"></i>
                     </action>
                 </div>
@@ -38,9 +38,16 @@ export default {
                         </div>
         
                         <div class="searchbar_tablerow">
-                            <div class="searchbar_tablecell">Person_id</div>
+                            <div class="searchbar_tablecell">Studiengang</div>
                             <div class="searchbar_tablecell">
-                                {{ res.person_id }}
+                                {{ res.studiengang }}
+                            </div>
+                        </div>
+
+						<div class="searchbar_tablerow">
+                            <div class="searchbar_tablecell">Verband</div>
+                            <div class="searchbar_tablecell">
+                                {{ res.verband }}
                             </div>
                         </div>
         
