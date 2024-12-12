@@ -33,7 +33,7 @@ class SearchBarLib
 	const ERROR_NOT_AUTH = 'ERR005';
 
 	// List of allowed types of search
-	const ALLOWED_TYPES = ['mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'organisationunit', 'raum', 'person', 'student', 'prestudent', 'document', 'cms'];
+	const ALLOWED_TYPES = ['mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'organisationunit', 'raum', 'person', 'student','studentStv', 'prestudent', 'document', 'cms'];
 
 	const PHOTO_IMG_URL = '/cis/public/bild.php?src=person&person_id=';
 
@@ -367,10 +367,7 @@ EOSC;
 		SELECT
 			\''.$type.'\' AS type,
 			s.student_uid AS uid,
-			'.
-			(defined("DOMAIN")?
-			'CONCAT(s.student_uid,\'@'.DOMAIN.'\') AS email,':'')
-			.'
+			CONCAT(s.student_uid,\'@'.DOMAIN.'\') AS email,
 			s.matrikelnr,
 			CONCAT(stg.kurzbzlang,s.semester,s.verband) as verband,
 			stg.bezeichnung AS studiengang,
@@ -386,7 +383,47 @@ EOSC;
 				FROM public.tbl_kontakt
 					WHERE kontakttyp = \'email\'
 			) as k USING(person_id)
-				WHERE b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+				WHERE 
+			b.aktiv = TRUE 
+			AND b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+					GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto, s.verband, s.semester, stg.bezeichnung, stg.kurzbzlang
+	');
+
+		// If something has been found then return it
+		if (hasData($students)) return getData($students);
+
+		// Otherwise return an empty array
+		return array();
+	}
+
+	private function _studentStv($searchstr, $type)
+	{
+		$dbModel = new DB_Model();
+
+		$students = $dbModel->execReadOnlyQuery('
+		SELECT
+			\''.$type.'\' AS type,
+			s.student_uid AS uid,
+			CONCAT(s.student_uid,\'@'.DOMAIN.'\') AS email,
+			s.matrikelnr,
+			CONCAT(stg.kurzbzlang,s.semester,s.verband) as verband,
+			stg.bezeichnung AS studiengang,
+			p.person_id AS person_id,
+			p.vorname || \' \' || p.nachname AS name,
+			p.foto
+			FROM public.tbl_student s
+			JOIN public.tbl_studiengang stg USING(studiengang_kz)
+			JOIN public.tbl_benutzer b ON(b.uid = s.student_uid)
+			JOIN public.tbl_person p USING(person_id)
+			LEFT JOIN (
+				SELECT kontakt, person_id
+				FROM public.tbl_kontakt
+					WHERE kontakttyp = \'email\'
+			) as k USING(person_id)
+				WHERE 
+			b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 					GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto, s.verband, s.semester, stg.bezeichnung, stg.kurzbzlang
