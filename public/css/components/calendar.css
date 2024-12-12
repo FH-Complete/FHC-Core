@@ -49,7 +49,8 @@
 .fhc-calendar-week-page > div {
   /*transform: translate(-0.75em, -0.75em);*/
   /*width: calc(100% + 1.5em);*/
-  height: calc(100% + 1.5em);
+  /*height: calc(100% + 1.5em);*/
+	max-height: 100%;
 }
 .fhc-calendar-week-page > div > div {
   padding-left: 3em;
@@ -105,7 +106,6 @@
 .fhc-calendar-day-page .events {
   display: grid;
   grid-template-columns: 3em 1fr;
-  margin-left: -3em;
   /*min-height: 266.6666666667%;*/
 }
 .fhc-calendar-day-page .events .day {

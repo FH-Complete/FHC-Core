@@ -201,10 +201,12 @@ export default {
 	mounted() {
 
 		setTimeout(() => this.$refs.eventcontainer.scrollTop = this.$refs.eventcontainer.scrollHeight / 3 + 1, 0);
+
+		const container = document.getElementById("calendarContainer")
+		if(container) container.style.overflow = 'scroll'
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-week-page">
-
 		<div class="d-flex flex-column">
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
 				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
@@ -225,7 +227,7 @@ export default {
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
 						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" :style="eventGridStyle(day,event)" class="mx-2 small rounded overflow-hidden "  >
-							<slot  name="weekPage" :event="event" :day="day" :isSelected="event.orig == selectedEvent" >
+							<slot name="weekPage" :event="event" :day="day" :isSelected="event.orig == selectedEvent">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 							</slot>
 						</div>
