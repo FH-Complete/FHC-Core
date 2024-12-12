@@ -32,7 +32,7 @@ export default {
 	},
 	data: () => {
 		return {
-			pruefungen: null,
+			pruefungenData: null,
 			info: null,
 			menu: null,
 			preselectedMenuItem: null,
@@ -47,7 +47,10 @@ export default {
 		},
 		grade() {
 			return this.benotung ? this.znote || this.lvnote || null : null;
-		}
+		},
+		LvHasPruefungenInformation(){
+			return this.pruefungenData && this.pruefungenData.length > 0;
+		},
 	},
 	methods: {
 		c4_link(menuItem) {
@@ -72,13 +75,13 @@ export default {
 			}
 		},
 		openPruefungen() {
-			if (!this.pruefungen) {
-				this.pruefungen = true;
-				LvPruefungen.popup({
-					lehrveranstaltung_id: this.lehrveranstaltung_id, 
-					bezeichnung: this.bezeichnung
-				}).then(() => this.pruefungen = false).catch(() => this.pruefungen = false);
-			}
+			// early return if the pruefungenData is empty or not set
+			if (!this.LvHasPruefungenInformation) return;
+
+			LvPruefungen.popup({
+				pruefungenData: this.pruefungenData, 
+				bezeichnung: this.bezeichnung
+			});
 		},
 		openInfos() {
 			if (!this.info) {
@@ -106,6 +109,14 @@ export default {
 				})
 				.catch((error) => this.$fhcAlert.handleSystemError);	
 		}
+	},
+	created(){
+		this.$fhcApi.factory.lehre.getStudentPruefungen(this.lehrveranstaltung_id)
+		.then(res => res.data)
+		.then(pruefungen =>{
+			this.pruefungenData = pruefungen;
+		}); 
+		
 	},
 	mounted() {
 		this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, this.studien_semester)
@@ -153,17 +164,18 @@ export default {
 		</div>
 		<div class="card-footer">
 			<div class="row">
-				<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
-					<i class="fa fa-check text-success" v-if="positiv"></i>
-					{{ grade || p.t('lehre/noGrades') }}
-				</a>
-				<!--
-				Not used anymore because the lehrveranstaltungs informationen is available as a menu point in the lehrveranstaltungs optionen
-				<div v-if="lvinfo" class="col text-end">
-					<a class="card-link" href="#" @click.prevent="openInfos">
-						<i class="fa fa-info-circle" aria-hidden="true"></i>
+				<template v-if="LvHasPruefungenInformation">
+					<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
+						<i class="fa fa-check text-success" v-if="positiv"></i>
+						{{ grade || p.t('lehre/noGrades') }}
 					</a>
-				</div>-->
+				</template>
+				<template v-else>
+					<span  class="col-auto text-start text-decoration-none" >
+						<i class="fa fa-check text-success" v-if="positiv"></i>
+						{{ grade || p.t('lehre/noGrades') }}
+					</span>
+				</template>
 			</div>
 		</div>
 	</div>`
