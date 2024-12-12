@@ -98,6 +98,7 @@ if(!$result_ort)
   	die("ort not found!");
 $num_rows_ort=$db->db_num_rows($result_ort);
 
+
 /*$sql_query="SELECT student_uid FROM public.tbl_student ORDER BY student_uid";
 $result_lektor=$db->db_query($sql_query);
 if(!$result_lektor)
@@ -531,8 +532,8 @@ if(!defined('CIS_LVPLAN_ZUSATZMENUE_ANZEIGEN') || CIS_LVPLAN_ZUSATZMENUE_ANZEIGE
 	echo '
 	<td class="menubox">
 	<p><a href="raumsuche.php">'.$p->t('lvplan/raumsuche').'</a></p>
-	<p><a class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/fehlerUndFeedback').'</a></p>
 	<p><a href="../../../cms/content.php?content_id='.$p->t('dms_link/lvPlanFAQ').'" class="hilfe" target="_blank">'.$p->t('global/hilfe').'</a></p>
+	<p>'.$p->t('lvplan/FragenZuLvPlan', array(MAIL_LVPLAN)).'</p>
 	</td>';
 }
 
