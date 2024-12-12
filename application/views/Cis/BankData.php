@@ -1,9 +1,19 @@
 <?php
 	$includesArray = array(
 		'title' => 'Bank data',
+		'cis' => true,
+		'vue3' => true,
+		'axios027' => true,
+		'bootstrap5' => true,
+		'fontawesome6' => true,
+		'phrases' => array(),
 		'primevue3' => true,
-		'customJSModules' => ['public/js/apps/Cis/BankData.js'],
-		'customCSSs' => ['public/css/components/FormUnderline.css']
+		'customJSModules' => array('public/js/apps/Cis/BankData.js'),
+		'customCSSs' => array(
+			'public/css/Fhc.css',
+			'public/css/components/primevue.css',
+			'public/css/components/FormUnderline.css'
+		)
 	);
 
 	if (defined('CIS4'))
