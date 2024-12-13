@@ -20,6 +20,7 @@ import FilterConfig from './Filter/Config.js';
 import FilterColumns from './Filter/Columns.js';
 import TableDownload from './Table/Download.js';
 import collapseAutoClose from '../../directives/collapseAutoClose.js';
+import { defaultHeaderFilter } from '../../tabulator/filters/defaultHeaderFilter.js';
 
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
@@ -207,6 +208,7 @@ export const CoreFilterCmpt = {
 					movableColumns: true,
 					columnDefaults:{
 						tooltip: true,
+						headerFilterFunc: defaultHeaderFilter,
 					},
 					placeholder,
 					reactiveData: true,
