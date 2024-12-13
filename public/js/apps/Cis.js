@@ -107,6 +107,7 @@ const app = Vue.createApp({
     }
 });
 app.use(FhcApi);
+//TODO: EVERY View that uses CISVUE-HEADER includes Cis.js and needs to import primevue.js even if they don't use it (might be needed for Vue Router)
 app.use(primevue.config.default, {
 	zIndex: {
 		overlay: 9000,

@@ -34,6 +34,7 @@ import cms from "./cms.js";
 import lehre from "./lehre.js";
 import addons from "./addons.js";
 import studiengang from "./studiengang.js";
+import menu from "./menu.js";
 
 export default {
     search,
@@ -55,4 +56,5 @@ export default {
     lehre,
     addons,
 	studiengang,
+	menu,
 };
