@@ -362,7 +362,7 @@ EOSC;
 	private function _student($searchstr, $type)
 	{
 		$dbModel = new DB_Model();
-
+		$gesperrtes_foto = base64_encode(file_get_contents(DOC_ROOT.'skin/images/profilbild_dummy.jpg'));
 		$students = $dbModel->execReadOnlyQuery('
 		SELECT
 			\''.$type.'\' AS type,
@@ -373,7 +373,11 @@ EOSC;
 			stg.bezeichnung AS studiengang,
 			p.person_id AS person_id,
 			p.vorname || \' \' || p.nachname AS name,
-			p.foto
+			CASE 
+				when s.student_uid = \''.getAuthUID().'\' then p.foto
+				when p.foto_sperre = false then p.foto
+				else \''.$gesperrtes_foto.'\'
+			end as foto
 			FROM public.tbl_student s
 			JOIN public.tbl_studiengang stg USING(studiengang_kz)
 			JOIN public.tbl_benutzer b ON(b.uid = s.student_uid)
@@ -388,7 +392,7 @@ EOSC;
 			AND (b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\')
-					GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto, s.verband, s.semester, stg.bezeichnung, stg.kurzbzlang
+			GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto, s.verband, s.semester, stg.bezeichnung, stg.kurzbzlang
 	');
 
 		// If something has been found then return it
