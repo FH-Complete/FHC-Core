@@ -3,43 +3,44 @@ import StudiengangInformation from "./StudiengangInformation/StudiengangInformat
 
 export default {
 	name: "NewsComponent",
-	components: {
-		Pagination,
-	},
-	data() {
-		return {
-			content: null,
-			maxPageCount: 0,
-			page_size: 10,
-		};
-	},
-	methods: {
-		loadNewPageContent: function (data) {
-			this.$fhcApi.factory.cms.getNews(data.page, data.rows)
-				.then(res => res.data)
-				.then(result => {
-					this.content = result;
-				});
+  components: {
+    Pagination,
+	StudiengangInformation,
+  },
+  data() {
+    return {
+      content: null,
+      maxPageCount: 0,
+      page_size: 10,
+    };
+  },
+  methods: {
+    loadNewPageContent: function (data) {
+		this.$fhcApi.factory.cms.getNews(data.page, data.rows)
+		.then(res => res.data)
+		.then(result => {
+			this.content = result;
+		});
+		
+    },
+  },
+  created() {
+    this.$fhcApi.factory.cms.getNews(1, this.page_size)
+	.then(res => res.data)
+	.then(result => {
+		this.content = result;
+	});
 
-		},
-	},
-	created() {
-		this.$fhcApi.factory.cms.getNews(1, this.page_size)
-			.then(res => res.data)
-			.then(result => {
-				this.content = result;
-			});
-
-		this.$fhcApi.factory.cms.getNewsRowCount()
-			.then(res => res.data)
-			.then(result => {
-				this.maxPageCount = result;
-			});
-	},
-	template: /*html*/ `
+    this.$fhcApi.factory.cms.getNewsRowCount()
+	.then(res => res.data)
+	.then(result => {
+    	this.maxPageCount = result;
+    });
+  },
+  template: /*html*/ `
   	<h2 >News</h2>
 	<hr/>
-	<pagination  :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
+	<pagination v-show="content?true:false" :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
 	</pagination>
 	<div class="container-fluid">
 		<div class="row">
@@ -52,5 +53,7 @@ export default {
 			</div>
 		</div>
 	</div>
+	<pagination v-show="content?true:false" :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
+	</pagination>
     `,
 };

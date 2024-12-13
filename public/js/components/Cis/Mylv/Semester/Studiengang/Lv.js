@@ -32,7 +32,7 @@ export default {
 	},
 	data: () => {
 		return {
-			pruefungen: null,
+			pruefungenData: null,
 			info: null,
 			menu: null,
 			preselectedMenuItem: null,
@@ -47,7 +47,10 @@ export default {
 		},
 		grade() {
 			return this.benotung ? this.znote || this.lvnote || null : null;
-		}
+		},
+		LvHasPruefungenInformation(){
+			return this.pruefungenData && this.pruefungenData.length > 0;
+		},
 	},
 	methods: {
 		c4_link(menuItem) {
@@ -72,13 +75,13 @@ export default {
 			}
 		},
 		openPruefungen() {
-			if (!this.pruefungen) {
-				this.pruefungen = true;
-				LvPruefungen.popup({
-					lehrveranstaltung_id: this.lehrveranstaltung_id, 
-					bezeichnung: this.bezeichnung
-				}).then(() => this.pruefungen = false).catch(() => this.pruefungen = false);
-			}
+			// early return if the pruefungenData is empty or not set
+			if (!this.LvHasPruefungenInformation) return;
+
+			LvPruefungen.popup({
+				pruefungenData: this.pruefungenData, 
+				bezeichnung: this.bezeichnung
+			});
 		},
 		openInfos() {
 			if (!this.info) {
@@ -107,6 +110,14 @@ export default {
 				.catch((error) => this.$fhcAlert.handleSystemError);	
 		}
 	},
+	created(){
+		this.$fhcApi.factory.lehre.getStudentPruefungen(this.lehrveranstaltung_id)
+		.then(res => res.data)
+		.then(pruefungen =>{
+			this.pruefungenData = pruefungen;
+		}); 
+		
+	},
 	mounted() {
 		this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, this.studien_semester)
 			.then(res => {
@@ -130,8 +141,8 @@ export default {
 			<h6 class="card-title">{{bezeichnung}}</h6>
 		</div>
 		<div class="card-body " :style="bodyStyle">
-			<ul class="list-group border-top-0 border-bottom-0 rounded-0">
-				<template v-if="menu">
+			<template v-if="menu">
+				<ul class="list-group border-top-0 border-bottom-0 rounded-0">
 					<li :type="menuItem.c4_link ? 'button' : null" v-for="menuItem in menu" class="list-group-item border-0 " >
 						<div class="d-flex flex-row"  :data-bs-toggle="menuItem.c4_moodle_links?.length ? 'dropdown' : null">
 							<div class="mx-4">
@@ -145,25 +156,28 @@ export default {
 								<li v-for="item in menuItem.c4_moodle_links"><a class="dropdown-item border-bottom" :href="item.url">{{item.lehrform}}</a></li>
 							</ul>
 					</li>
-				</template>
-				<template v-else>
-					<li class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
-				</template>
-			</ul>
+				</ul>
+			</template>
+			<template v-else>
+				<div class="text-center d-flex justify-content-center align-items-center h-100" >
+					<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+				</div>
+			</template>
 		</div>
 		<div class="card-footer">
 			<div class="row">
-				<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
-					<i class="fa fa-check text-success" v-if="positiv"></i>
-					{{ grade || p.t('lehre/noGrades') }}
-				</a>
-				<!--
-				Not used anymore because the lehrveranstaltungs informationen is available as a menu point in the lehrveranstaltungs optionen
-				<div v-if="lvinfo" class="col text-end">
-					<a class="card-link" href="#" @click.prevent="openInfos">
-						<i class="fa fa-info-circle" aria-hidden="true"></i>
+				<template v-if="LvHasPruefungenInformation">
+					<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
+						<i class="fa fa-check text-success" v-if="positiv"></i>
+						{{ grade || p.t('lehre/noGrades') }}
 					</a>
-				</div>-->
+				</template>
+				<template v-else>
+					<span  class="col-auto text-start text-decoration-none" >
+						<i class="fa fa-check text-success" v-if="positiv"></i>
+						{{ grade || p.t('lehre/noGrades') }}
+					</span>
+				</template>
 			</div>
 		</div>
 	</div>`
