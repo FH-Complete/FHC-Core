@@ -369,7 +369,7 @@ EOSC;
 			s.student_uid AS uid,
 			CONCAT(s.student_uid,\'@'.DOMAIN.'\') AS email,
 			s.matrikelnr,
-			CONCAT(stg.kurzbzlang,s.semester,s.verband) as verband,
+			CONCAT(UPPER(stg.typ),UPPER(stg.kurzbz),\'-\',s.semester,s.verband) as verband,
 			stg.bezeichnung AS studiengang,
 			p.person_id AS person_id,
 			p.vorname || \' \' || p.nachname AS name,
@@ -396,7 +396,7 @@ EOSC;
 			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\')
 			GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, 
 				email, p.foto, s.verband, s.semester, stg.bezeichnung, 
-				stg.kurzbzlang, b.aktiv
+				stg.typ, stg.kurzbz, b.aktiv
 			ORDER BY b.aktiv DESC, p.nachname ASC, p.vorname ASC
 	');
 
@@ -415,12 +415,12 @@ EOSC;
 		SELECT
 			\''.$type.'\' AS type,
 			s.student_uid AS uid,
-			CONCAT(s.student_uid,\'@'.DOMAIN.'\') AS email,
 			s.matrikelnr,
-			CONCAT(stg.kurzbzlang,s.semester,s.verband) as verband,
+			CONCAT(UPPER(stg.typ),UPPER(stg.kurzbz),\'-\',s.semester,s.verband) as verband,
 			stg.bezeichnung AS studiengang,
 			p.person_id AS person_id,
 			p.vorname || \' \' || p.nachname AS name,
+			k.kontakt AS email,
 			p.foto,
 			b.aktiv
 			FROM public.tbl_student s
@@ -437,8 +437,8 @@ EOSC;
 			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, 
-				email, p.foto, s.verband, s.semester, stg.bezeichnung, 
-				stg.kurzbzlang, b.aktiv
+				k.kontakt, p.foto, s.verband, s.semester, stg.bezeichnung, 
+				stg.typ, stg.kurzbz, b.aktiv
 			ORDER BY b.aktiv DESC, p.nachname ASC, p.vorname ASC
 	');
 

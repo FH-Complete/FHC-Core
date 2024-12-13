@@ -495,12 +495,11 @@ class Profil extends FHCAPI_Controller
 	 */
 	private function getPersonInfo($uid, $geburtsInfo = null)
 	{
-		$selectClause = ["foto", "anrede", "titelpost as postnomen", "titelpre as titel", "vorname", "nachname"];
+		$selectClause = ["foto", "foto_sperre", "anrede", "titelpost as postnomen", "titelpre as titel", "vorname", "nachname"];
 		/** @param integer $geburtsInfo */
 		if ($geburtsInfo) {
 			array_push($selectClause, "gebort");
 			array_push($selectClause, "gebdatum");
-			array_push($selectClause, "foto_sperre");
 		}
 		$this->BenutzerModel->addSelect($selectClause);
 		$this->BenutzerModel->addJoin("tbl_person", "person_id");
@@ -510,6 +509,12 @@ class Profil extends FHCAPI_Controller
 			show_error("was not able to query the table public.tbl_benutzer:" . getData($person_res));
 		} else {
 			$person_res = hasData($person_res) ? getData($person_res)[0] : null;
+		}
+
+		if( ($person_res->foto === null) || (($this->uid !== $uid) && ($person_res->foto_sperre !== false)) )
+		{
+			$dummy_foto = base64_encode(file_get_contents(DOC_ROOT.'skin/images/profilbild_dummy.jpg'));
+			$person_res->foto = $dummy_foto;
 		}
 
 		return $person_res;
