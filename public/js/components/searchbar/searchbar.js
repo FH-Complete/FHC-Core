@@ -52,7 +52,7 @@ export default {
                   <div v-else-if="searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
                   <template v-else="" v-for="res in searchresult">
                     <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
-                    <student v-else-if="res.type === 'student'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
+                    <student v-else-if="res.type === 'student' || res.type === 'studentStv'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
                     <prestudent v-else-if="res.type === 'prestudent'" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
                     <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                     <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
