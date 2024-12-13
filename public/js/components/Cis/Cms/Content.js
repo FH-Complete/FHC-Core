@@ -31,7 +31,6 @@ export default {
 	watch:{
 		sprache: function(sprache){
 			this.fetchContent();
-			console.log(sprache);
 		},
 	},
 	computed: {
