@@ -375,9 +375,11 @@ EOSC;
 			p.vorname || \' \' || p.nachname AS name,
 			CASE 
 				when s.student_uid = \''.getAuthUID().'\' then p.foto
+				when p.foto IS NULL then \''.$gesperrtes_foto.'\' 
 				when p.foto_sperre = false then p.foto
 				else \''.$gesperrtes_foto.'\'
-			end as foto
+			end as foto,
+			b.aktiv
 			FROM public.tbl_student s
 			JOIN public.tbl_studiengang stg USING(studiengang_kz)
 			JOIN public.tbl_benutzer b ON(b.uid = s.student_uid)
@@ -392,7 +394,10 @@ EOSC;
 			AND (b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\')
-			GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto, s.verband, s.semester, stg.bezeichnung, stg.kurzbzlang
+			GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, 
+				email, p.foto, s.verband, s.semester, stg.bezeichnung, 
+				stg.kurzbzlang, b.aktiv
+			ORDER BY b.aktiv DESC, p.nachname ASC, p.vorname ASC
 	');
 
 		// If something has been found then return it
@@ -416,7 +421,8 @@ EOSC;
 			stg.bezeichnung AS studiengang,
 			p.person_id AS person_id,
 			p.vorname || \' \' || p.nachname AS name,
-			p.foto
+			p.foto,
+			b.aktiv
 			FROM public.tbl_student s
 			JOIN public.tbl_studiengang stg USING(studiengang_kz)
 			JOIN public.tbl_benutzer b ON(b.uid = s.student_uid)
@@ -430,7 +436,10 @@ EOSC;
 			b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-					GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto, s.verband, s.semester, stg.bezeichnung, stg.kurzbzlang
+			GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, 
+				email, p.foto, s.verband, s.semester, stg.bezeichnung, 
+				stg.kurzbzlang, b.aktiv
+			ORDER BY b.aktiv DESC, p.nachname ASC, p.vorname ASC
 	');
 
 		// If something has been found then return it

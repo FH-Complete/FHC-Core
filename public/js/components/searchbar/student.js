@@ -9,7 +9,7 @@ export default {
     },
     emits: [ 'actionexecuted' ],
     template: `
-        <div class="searchbar_result searchbar_student">
+        <div class="searchbar_result searchbar_student" :class="(!res?.aktiv) ? 'searchbar_inaktiv' : ''">
         
             <div class="searchbar_grid">
                 <div class="searchbar_icon">
@@ -29,7 +29,14 @@ export default {
                     <div class="mb-3"></div>
                 
                     <div class="searchbar_table">
-        
+
+                        <div class="searchbar_tablerow">
+                            <div class="searchbar_tablecell">Student UID</div>
+                            <div class="searchbar_tablecell">
+                                {{ res.uid }}
+                            </div>
+                        </div>
+
                         <div class="searchbar_tablerow">
                             <div class="searchbar_tablecell">Studiengang</div>
                             <div class="searchbar_tablecell">
