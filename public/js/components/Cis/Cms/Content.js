@@ -12,10 +12,6 @@ export default {
 			type: [String, Number],
 			default: null,
 		},
-		sprache: {
-			type: [String, Number],
-			default: null,
-		},
 		sichtbar: {
 			type: [String, Number],
 			default: null,
@@ -32,7 +28,16 @@ export default {
 			content: null,
 		};
 	},
+	watch:{
+		sprache: function(sprache){
+			this.fetchContent();
+			console.log(sprache);
+		},
+	},
 	computed: {
+		sprache(){
+			return this.$p.user_language.value;
+		},
 		computeContentType: function () {
 			switch (this.content_type) {
 				case "raum_contentmittitel":
@@ -43,14 +48,16 @@ export default {
 			;
 		},
 	},
-	created() {
-		this.$fhcApi.factory.cms.content(this.content_id, this.version, this.sprache, this.sichtbar).then(res => {
-			this.content = res.data.content;
-			this.content_type = res.data.type;
-		});
+	methods:{
+		fetchContent(){
+			return this.$fhcApi.factory.cms.content(this.content_id, this.version, this.sprache, this.sichtbar).then(res => {
+				this.content = res.data.content;
+				this.content_type = res.data.type;
+			});
+		}
 	},
-	mounted() {
-
+	created() {
+		this.fetchContent();
 	},
 	template: /*html*/ `
     <!-- div that contains the content -->

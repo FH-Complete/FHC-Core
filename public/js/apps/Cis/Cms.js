@@ -39,6 +39,6 @@ const app = Vue.createApp({
 setScrollbarWidth();
 
 app.use(primevue.config.default, { zIndex: { overlay: 9999 } });
-app.use(Phrasen, {reload: true});
+app.use(Phrasen);
 app.mount("#cms");
 //#cms [data-confirm], #cms [data-href]

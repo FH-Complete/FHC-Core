@@ -12,12 +12,13 @@ export default {
     },
 
 	//api function used for the news View that renders the html
-	getNews(page = 1, page_size = 10) {
+	getNews(page = 1, page_size = 10, sprache) {
 		return this.$fhcApi.get(
 			"/api/frontend/v1/Cms/getNews",
 			{
 				page,
 				page_size,
+				sprache,
 			},
 		);
 	},
