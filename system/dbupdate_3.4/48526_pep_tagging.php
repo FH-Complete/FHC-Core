@@ -41,7 +41,7 @@ if (!$result = @$db->db_query('SELECT 0 FROM public.tbl_notiz_typ WHERE 0 = 1'))
 if(!@$db->db_query("SELECT typ FROM public.tbl_notiz LIMIT 1"))
 {
 	$qry = 'ALTER TABLE public.tbl_notiz ADD COLUMN typ varchar(32);
-			ALTER TABLE public.tbl_notiz ADD CONSTRAINT tbl_notiz_typ_fkey FOREIGN KEY (typ) REFERENCES public.tbl_notiz_typ (typ_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;';
+			ALTER TABLE public.tbl_notiz ADD CONSTRAINT tbl_notiz_typ_fkey FOREIGN KEY (typ) REFERENCES public.tbl_notiz_typ (typ_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;';
 
 	if(!$db->db_query($qry))
 		echo '<strong> public.tbl_notiz '.$db->db_last_error().'</strong><br>';
