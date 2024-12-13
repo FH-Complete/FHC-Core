@@ -72,7 +72,8 @@ export const CoreFilterCmpt = {
 		uniqueId: String,
 		// TODO soll im master kommen?
 		idField: String,
-		parentIdField: String
+		parentIdField: String,
+		countOnly: Boolean
 	},
 	data: function() {
 		return {
@@ -275,11 +276,11 @@ export const CoreFilterCmpt = {
 					const cols = this.tabulator.getColumns();
 					this.fields = cols.map(col => col.getField());
 					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
-					
+
 				});
-				
+
 			}
-			
+
 		},
 		updateTabulator() {
 			if (this.tabulator) {
@@ -610,7 +611,10 @@ export const CoreFilterCmpt = {
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
 						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
 					</button>
-					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten:</span>
+					<span v-if="$slots.actions && tabulatorHasSelector">
+						<span v-if="countOnly">{{ selectedData.length }} ausgewählt</span>
+						<span v-else> Mit {{ selectedData.length }} ausgewählten:</span>
+					</span>
 					<slot name="actions" v-bind="{selected: tabulatorHasSelector ? selectedData : []}"></slot>
 					<slot name="search"></slot>
 				</div>
