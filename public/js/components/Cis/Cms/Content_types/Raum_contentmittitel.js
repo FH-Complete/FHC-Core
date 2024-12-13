@@ -1,5 +1,6 @@
 
 export default {
+	name: "RaumComponent",
     props:{
       content:{
           type:String,

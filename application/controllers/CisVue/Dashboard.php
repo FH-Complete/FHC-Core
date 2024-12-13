@@ -29,17 +29,15 @@ class Dashboard extends Auth_Controller
 	{
 
 		$this->load->model('person/Person_model','PersonModel');
-		$begruesung = $this->PersonModel->getFirstName(getAuthUID());
-		if(isError($begruesung))
-		{
-			show_error("name couldn't be loaded for username ".getAuthUID());
-		}
-		$begruesung = getData($begruesung);
+		$personData = getData($this->PersonModel->getByUid(getAuthUID()))[0];
+
 		$viewData = array(
-			'name' => $begruesung
+			'uid' => getAuthUID(),
+			'name' => $personData->vorname,
+			'person_id' => $personData->person_id
 		);
-		
-		$this->load->view('CisVue/Dashboard.php', ['viewData' => $viewData]);
+
+		$this->load->view('CisVue/Dashboard.php',['viewData' => $viewData]);
 
 	}
 }

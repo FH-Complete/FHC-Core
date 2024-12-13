@@ -1,5 +1,6 @@
 
 export default {
+	name: "GeneralComponent",
     props:{
       content:{
           type:String,
