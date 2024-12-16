@@ -12,9 +12,28 @@ export default {
       content: null,
       maxPageCount: 0,
       page_size: 10,
+	  page:1,
     };
   },
+  watch:{
+	'$p.user_language.value':function(sprache){
+		this.fetchNews();
+		console.log("ere")
+	}
+  },
+  computed:{
+	sprache: function(){
+		return this.$p.user_language.value;
+	},
+  },
   methods: {
+	fetchNews: function(){
+		return this.$fhcApi.factory.cms.getNews(this.page, this.page_size, this.sprache)
+		.then(res => res.data)
+		.then(result => {
+			this.content = result;
+		});
+	},
     loadNewPageContent: function (data) {
 		this.$fhcApi.factory.cms.getNews(data.page, data.rows)
 		.then(res => res.data)
@@ -25,11 +44,7 @@ export default {
     },
   },
   created() {
-    this.$fhcApi.factory.cms.getNews(1, this.page_size)
-	.then(res => res.data)
-	.then(result => {
-		this.content = result;
-	});
+    this.fetchNews();
 
     this.$fhcApi.factory.cms.getNewsRowCount()
 	.then(res => res.data)
@@ -40,7 +55,7 @@ export default {
   template: /*html*/ `
   	<h2 >News</h2>
 	<hr/>
-	<pagination v-show="content?true:false" :page_size="page_size"  @page="loadNewPageContent" :maxPageCount="maxPageCount">
+	<pagination v-show="content?true:false" :page_size="page_size"  @page="page=$event.page; loadNewPageContent($event)" :maxPageCount="maxPageCount">
 	</pagination>
 	<div class="container-fluid">
 		<div class="row">

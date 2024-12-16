@@ -1,6 +1,7 @@
 import raum_contentmittitel from './Content_types/Raum_contentmittitel.js'
 import general from './Content_types/General.js'
 
+
 export default {
 	name: "ContentComponent",
 	
@@ -10,10 +11,6 @@ export default {
 			required: true,
 		},
 		version: {
-			type: [String, Number],
-			default: null,
-		},
-		sprache: {
 			type: [String, Number],
 			default: null,
 		},
@@ -45,9 +42,23 @@ export default {
 				context.content_type = res.data.type;
 
 			});
+		},
+		fetchContent(){
+			return this.$fhcApi.factory.cms.content(this.content_id, this.version, this.sprache, this.sichtbar).then(res => {
+				this.content = res.data.content;
+				this.content_type = res.data.type;
+			});
 		}
 	},
+	watch:{
+		sprache: function(sprache){
+			this.fetchContent();
+		},
+	},
 	computed: {
+		sprache(){
+			return this.$p.user_language.value;
+		},
 		computeContentType: function () {
 			switch (this.content_type) {
 				case "raum_contentmittitel":
@@ -58,9 +69,13 @@ export default {
 		},
 	},
 	created() {
-		this.load()
+		this.$fhcApi.factory.cms.content(this.content_id, this.version, this.sprache, this.sichtbar).then(res => {
+			this.content = res.data.content;
+			this.content_type = res.data.type;
+		});
 	},
 	mounted() {
+
 	},
 	template: /*html*/ `
     <!-- div that contains the content -->

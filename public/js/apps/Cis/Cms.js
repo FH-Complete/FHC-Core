@@ -105,8 +105,6 @@ const app = Vue.createApp({
 
 setScrollbarWidth();
 
-app.use(FhcApi);
-app.use(router);
-app.use(primevue.config.default, {zIndex: {overlay: 9999}});
-app.use(Phrasen, {reload: true});
+app.use(primevue.config.default, { zIndex: { overlay: 9999 } });
+app.use(Phrasen);
 app.mount("#cms");

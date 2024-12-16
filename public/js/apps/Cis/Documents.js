@@ -89,5 +89,5 @@ const app = Vue.createApp({
 
 setScrollbarWidth();
 
-app.use(Phrasen, {reload: true});
+app.use(Phrasen);
 app.mount('#content');

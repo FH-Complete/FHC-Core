@@ -5,11 +5,17 @@ export default {
 			sprachenTranslation:null,
 		}
 	}, 
+	emits: ['languageChanged'],
 	methods:{
 		changeLanguage: function(lang){
 			if(this.allActiveLanguages.some(l => l === lang))
 			{
-				this.$p.setLanguage(lang, this.$fhcApi);
+				this.$p.setLanguage(lang, this.$fhcApi)
+				.then(res => res.data)
+				.then(data =>
+				{
+					this.$emit('languageChanged', lang);
+				})
 			}
 		},
 		getSprachenBezeichnung: function(lang){

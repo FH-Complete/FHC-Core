@@ -161,5 +161,5 @@ const app = Vue.createApp({
 	</fhc-calendar>
 	`
 });
-app.use(Phrasen, {reload: true});
+app.use(Phrasen);
 app.mount('#content');

@@ -175,14 +175,18 @@ class Cms extends FHCAPI_Controller
 		// getting the GET parameters
 		$page = intval($this->input->get('page', true));
 		$page_size = intval($this->input->get('page_size', true));
+		$sprache = $this->input->get('sprache', true);
+		if(!$sprache)
+		{
+			$sprache = getUserLanguage();
+		}
 
 		// default value for the page_size is 10
 		$page_size = $page_size ?? 10;
 		
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size);
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache);
 		$news = $this->getDataOrTerminateWithError($news);
 
-		$this->addMeta('test', $this->p->t('global', 'studiengangsleitung'));
 		$this->addMeta('phrases', json_decode($this->p->getJson()));
 		$this->terminateWithSuccess($news);
 

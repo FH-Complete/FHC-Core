@@ -221,7 +221,7 @@ class CmsLib
 	 * 
 	 * @return void
 	 */
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10, $sprache)
 	{
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		list($studiengang_kz, $semester) = $this->getStgAndSem($studiengang_kz, $semester);
@@ -230,7 +230,7 @@ class CmsLib
 		$xml = '<?xml version="1.0" encoding="UTF-8"?><content>';
 
 		$this->ci->load->model('content/News_model', 'NewsModel');
-		$news = $this->ci->NewsModel->getNewsWithContent(getSprache(), $studiengang_kz, $semester, null, $sichtbar, 0, $page, $page_size, $all, $mischen);
+		$news = $this->ci->NewsModel->getNewsWithContent($sprache, $studiengang_kz, $semester, null, $sichtbar, 0, $page, $page_size, $all, $mischen);
 
 		if (isError($news))
 			return $news;
