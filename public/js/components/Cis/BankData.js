@@ -34,6 +34,7 @@ export default {
 	},
 	methods: {
 		save() {
+			this.$refs.form.clearValidation();
 			this.$refs.form.factory.bankData.postBankData(this.bankName, this.bic, this.iban)
 				.then(result => {
 					this.$emit('saved', result.data);
@@ -63,36 +64,40 @@ export default {
 				<div class="row mb-3">
 					<form-input
 						container-class="col-4"
-						label="Bank name"
+						:label="$p.t('person', 'bank')"
 						type="text"
 						v-model="bankName"
 						name="bankName"
 					>
 					</form-input>
 				</div>
+				<div class="row mb-3"></div>
 				<div class="row mb-3">
 					<form-input
 						container-class="col-4"
-						label="BIC"
+						:label="$p.t('person', 'bic')"
 						type="text"
 						v-model="bic"
 						name="bic"
 					>
 					</form-input>
 				</div>
+				<div class="row mb-3"></div>
 				<div class="row mb-3">
 					<form-input
 						container-class="col-4"
-						label="IBAN"
+						:label="$p.t('person', 'iban')"
 						type="text"
 						v-model="iban"
 						name="iban"
+						style="-webkit-text-security: disc; text-security: disc;"
 					>
 					</form-input>
 				</div>
+				<div class="row mb-3"></div>
 			</fieldset>
-			<div class="btn-group flex-grow-0" role="group" aria-label="Save">
-				<button type="button" class="btn btn-outline-secondary" @click="save">Save</button>
+			<div class="btn-group flex-grow-0" role="group">
+				<button type="button" class="btn btn-outline-secondary" @click="save">{{$p.t('global', 'speichern')}}</button>
 			</div>
 		</core-form>
 	</div>`

@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/> .
  */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
@@ -37,6 +37,9 @@ class Bank extends FHCAPI_Controller
 			'getBankData' => self::PERM_LOGGED,
 			'postBankData' => self::PERM_LOGGED
 		));
+
+		// Load language phrases
+		$this->loadPhrases(array('person'));
 
 		// Loads model Bankverbindung_model
 		$this->load->model('person/Bankverbindung_model', 'BankverbindungModel');
@@ -67,7 +70,7 @@ class Bank extends FHCAPI_Controller
 			  FROM
 				public.tbl_bankverbindung bv
 			 WHERE bv.person_id = ?
-		      ORDER BY update_date DESC, bv.insertamum DESC
+		      ORDER BY bv.insertamum DESC, update_date DESC
 			 LIMIT 1',
 			array($loggedPersonId)
 		);
@@ -84,11 +87,19 @@ class Bank extends FHCAPI_Controller
 	 */
 	public function postBankData()
 	{
-		// Person id of the logged user
+		// UID and Person id of the logged user
+		$loggedUID = getAuthUID();
 		$loggedPersonId = getAuthPersonId();
 
 		// If null then not authenticated then terminate
-		if ($loggedPersonId == null) $this->terminateWithError('Not logged user/User without an associated person', self::ERROR_TYPE_AUTH);
+		if ($loggedUID == null) $this->terminateWithError('Not logged user/User without UID', self::ERROR_TYPE_AUTH);
+		if ($loggedPersonId == null) $this->terminateWithError('Not logged user/User without Person Id', self::ERROR_TYPE_AUTH);
+
+		// Loads model Mitarbeiter_model
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+
+		// Checks if the logged user is an amployee, in case stop the execution
+		if ($this->MitarbeiterModel->isMitarbeiter($loggedUID)) $this->terminateWithValidationErrors(array('' => $this->p->t('person', 'notForEmployees')));
 
 		// Loads the CI validation library
 		$this->load->library('form_validation');
@@ -99,7 +110,15 @@ class Bank extends FHCAPI_Controller
 		$this->form_validation->set_rules(self::IBAN_PARAM, null, array('required', 'alpha_numeric_spaces'));
 
 		// Run the validation and checks the result
-		if (!$this->form_validation->run()) $this->terminateWithError('The required data are not valid or missing', self::ERROR_TYPE_VALIDATION);
+		if (!$this->form_validation->run()) $this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		// Checks if the provided BIC is fine
+		$bic = preg_replace("/[^A-Za-z0-9 ]/", '', $this->input->post(self::BIC_PARAM));
+		if (!$this->_checkBic($bic)) $this->terminateWithValidationErrors(array('bic' => $this->p->t('person', 'notValidaBIC')));
+
+		// Checks if the provided IBAN is fine using the php-iban library
+		$iban = preg_replace("/[^A-Za-z0-9 ]/", '', $this->input->post(self::IBAN_PARAM));
+		if (!verify_iban($iban)) $this->terminateWithValidationErrors(array('iban' => $this->p->t('person', 'notValidaIBAN')));
 
 		// Check if there is at least a record in the bank data table
 		$bankDataResult = $this->BankverbindungModel->execReadOnlyQuery(
@@ -110,7 +129,7 @@ class Bank extends FHCAPI_Controller
 			  FROM
 				public.tbl_bankverbindung bv
 			 WHERE bv.person_id = ?
-		      ORDER BY update_date DESC, bv.insertamum DESC
+		      ORDER BY bv.insertamum DESC, update_date DESC
 			 LIMIT 1',
 			array($loggedPersonId)
 		);
@@ -128,10 +147,11 @@ class Bank extends FHCAPI_Controller
 				getData($bankDataResult)[0]->bankverbindung_id,
 				array(
 					'name' => $this->input->post(self::BANK_NAME_PARAM),
-					'bic' => $this->input->post(self::BIC_PARAM),
-					'iban' => $this->input->post(self::IBAN_PARAM),
+					'bic' => $bic,
+					'iban' => $iban,
 					'updateamum' => 'NOW()',
 					'verrechnung' => true,
+					'updatevon' => $loggedUID,
 					'typ' => 'p'
 				)
 			);
@@ -147,6 +167,7 @@ class Bank extends FHCAPI_Controller
 					'iban' => $this->input->post(self::IBAN_PARAM),
 					'insertamum' => 'NOW()',
 					'verrechnung' => true,
+					'insertvon' => $loggedUID,
 					'typ' => 'p'
 				)
 			);
@@ -157,6 +178,15 @@ class Bank extends FHCAPI_Controller
 
 		// If everything was fine then return a success
 		$this->terminateWithSuccess('Database updated');
+	}
+
+	/**
+	 * Generic BIC check
+	 */
+	private function _checkBic($bic)
+	{
+		// Check if the provided BIC is fine
+		return preg_match("^([a-zA-Z]){4}([a-zA-Z]){2}([0-9a-zA-Z]){2}([0-9a-zA-Z]{3})?$^", $bic) == 1;
 	}
 }
 
