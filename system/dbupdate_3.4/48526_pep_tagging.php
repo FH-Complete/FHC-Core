@@ -1,6 +1,20 @@
 <?php
 if (! defined('DB_NAME')) exit('No direct script access allowed');
 
+// add app pep
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='pep'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+	$qry = "INSERT INTO system.tbl_app (app) VALUES('pep');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>System Tabelle app: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>app pep hinzugefuegt<br>';
+	}
+}
+
 // Creates table public.tbl_notiz_typ if it doesn't exist and grants privileges
 if (!$result = @$db->db_query('SELECT 0 FROM public.tbl_notiz_typ WHERE 0 = 1'))
 {
@@ -11,7 +25,7 @@ if (!$result = @$db->db_query('SELECT 0 FROM public.tbl_notiz_typ WHERE 0 = 1'))
 				beschreibung text,
 				automatisiert boolean NOT NULL,
 				aktiv boolean NOT NULL,
-				zuordnung text, 
+				zuordnung text,
 				tag boolean NOT NULL,
 				style text,
 				vorrueckung boolean NOT NULL,
