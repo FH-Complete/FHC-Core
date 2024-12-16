@@ -32,6 +32,7 @@ require_once('../../include/organisationsform.class.php');
 require_once('../../include/addon.class.php');
 require_once('../../include/sprache.class.php');
 require_once('../../include/lehrmodus.class.php');
+require_once('../../include/lehrveranstaltung_faktor.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -1108,7 +1109,8 @@ if ($result_lv!=0)
 		  {
 			  echo "<th>LV-Angebot</th>
 			  <th>kompatible LV</th>
-			  <th>Aktion</th>";
+			  <th>Aktion</th>
+			  <th>Faktor</th>";
 		  }
 
 	echo "</tr></thead>";
@@ -1326,7 +1328,20 @@ if ($result_lv!=0)
 				</td>';
 
 			echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'&type=edit" target="lv_detail">Kompatible LV</a></td>';
-			echo '<td><a href="'.$_SERVER['PHP_SELF'].'?delete_lvid='.$row->lehrveranstaltung_id.'&stg_kz='.$stg_kz.'&semester='.$semester.'&fachbereich_kurzbz='.$oe_fachbereich.'&isaktiv='.$isaktiv.'&oe_kurzbz='.$oe_kurzbz.'&orgform='.$orgform_kurzbz.'" onclick="return conf_del()">löschen</a></td>';
+			echo '<td>
+						<a href="'.$_SERVER['PHP_SELF'].'?delete_lvid='.$row->lehrveranstaltung_id.'&stg_kz='.$stg_kz.'&semester='.$semester.'&fachbereich_kurzbz='.$oe_fachbereich.'&isaktiv='.$isaktiv.'&oe_kurzbz='.$oe_kurzbz.'&orgform='.$orgform_kurzbz.'" onclick="return conf_del()">löschen</a>
+						';
+
+			if (in_array($row->lehrtyp_kurzbz, array("tpl", "lv")))
+				echo '<br /><a href="lehrveranstaltung_faktor.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">Faktor</a>';
+			echo '</td>';
+			echo '
+				<td nowrap>';
+
+			$lv_faktor = new lehrveranstaltung_faktor();
+			$lv_faktor->getAkt($row->lehrveranstaltung_id);
+
+			echo $lv_faktor->faktor.'</td>';
 			echo "</tr>\n";
 		}
 	}
