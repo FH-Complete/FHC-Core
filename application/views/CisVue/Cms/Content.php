@@ -18,8 +18,8 @@ if(defined('CIS4')){
 }
 ?>
 
-<div id="cms">
-<?php echo (isset($content_id) ? '<cms-content :content_id="'.$content_id.'" :version="'.$version.'" :sprache="'.$sprache.'" :sichtbar="'.$sichtbar.'" />' : '<cms-news/>'); ?>
+<div ref="cmsContainer" id="cms">
+	<?php echo (isset($content_id) ? '<router-view ref="cms" :content_id="'.$content_id.'" :version="'.$version.'" :sprache="'.$sprache.'" :sichtbar="'.$sichtbar.'" />' : '<router-view ref="cms" />'); ?>
 </div>
 
 <?php

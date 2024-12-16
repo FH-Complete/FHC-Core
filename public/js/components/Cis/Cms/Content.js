@@ -1,13 +1,11 @@
 import raum_contentmittitel from './Content_types/Raum_contentmittitel.js'
 import general from './Content_types/General.js'
 
-
 export default {
 	name: "ContentComponent",
-	
 	props: {
 		content_id: {
-			type: Number,
+			type: [Number, String],
 			required: true,
 		},
 		version: {
@@ -26,25 +24,12 @@ export default {
 	data() {
 		return {
 			content: null,
-			content_idInternal: this.content_id
+			content_id_internal: this.content_id
 		};
 	},
 	methods: {
-		reload(id, api, context) {
-			// to be called from app bound interceptor function that has access to the same api, but not via this
-			context.content_idInternal = id
-			this.load(api, context)
-		},
-		load(apiParam = null, context = this) {
-			const api = apiParam ?? context.$fhcApi 
-			api.factory.cms.content(context.content_idInternal, context.version, context.sprache, context.sichtbar).then(res => {
-				context.content = res.data.content;
-				context.content_type = res.data.type;
-
-			});
-		},
 		fetchContent(){
-			return this.$fhcApi.factory.cms.content(this.content_id, this.version, this.sprache, this.sichtbar).then(res => {
+			return this.$fhcApi.factory.cms.content(this.content_id_internal, this.version, this.sprache, this.sichtbar).then(res => {
 				this.content = res.data.content;
 				this.content_type = res.data.type;
 			});
@@ -54,6 +39,10 @@ export default {
 		sprache: function(sprache){
 			this.fetchContent();
 		},
+		'$route.params.content_id'(newVal) {
+			this.content_id_internal = newVal
+			this.fetchContent();
+		}
 	},
 	computed: {
 		sprache(){
@@ -69,17 +58,13 @@ export default {
 		},
 	},
 	created() {
-		this.$fhcApi.factory.cms.content(this.content_id, this.version, this.sprache, this.sichtbar).then(res => {
-			this.content = res.data.content;
-			this.content_type = res.data.type;
-		});
+		this.fetchContent();
 	},
 	mounted() {
-
 	},
 	template: /*html*/ `
     <!-- div that contains the content -->
-    <component ref="content" :is="computeContentType" v-if="content" :content="content" :content_id="content_idInternal" />
+    <component ref="content" :is="computeContentType" v-if="content" :content="content" :content_id="content_id_internal" />
     <p v-else>No content is available to display</p>
     `,
 };
