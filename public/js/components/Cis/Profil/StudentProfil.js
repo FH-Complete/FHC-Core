@@ -172,13 +172,13 @@ export default {
 			}
 
 			return {
-				Geburtsdatum: this.data.gebdatum,
-				Geburtsort: this.data.gebort,
-				Personenkennzeichen: this.data.personenkennzeichen,
-				Studiengang: this.data.studiengang,
-				Semester: this.data.semester,
-				Verband: this.data.verband,
-				Gruppe: this.data.gruppe.trim(),
+				[`${this.$p.t('profil','Geburtsdatum')}`]: this.data.gebdatum,
+				[`${this.$p.t('profil', 'Geburtsort')}`]: this.data.gebort,
+				[`${this.$p.t('person', 'personenkennzeichen')}`]: this.data.personenkennzeichen,
+				[`${this.$p.t('lehre', 'studiengang')}`]: this.data.studiengang,
+				[`${this.$p.t('lehre', 'semester')}`]: this.data.semester,
+				[`${this.$p.t('lehre', 'lehrverband')}`]: this.data.verband,
+				[`${this.$p.t('lehre', 'gruppe')}`]: this.data.gruppe.trim(),
 			};
 		},
 	},
