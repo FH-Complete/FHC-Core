@@ -37277,6 +37277,26 @@ array(
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'ibanBicCountryNotMatch',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'IBAN and BIC codes are not for the same country DE',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'IBAN and BIC codes are not for the same country',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 );
 

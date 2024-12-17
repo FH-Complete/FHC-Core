@@ -99,7 +99,7 @@ class Bank extends FHCAPI_Controller
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
 		// Checks if the logged user is an amployee, in case stop the execution
-		if ($this->MitarbeiterModel->isMitarbeiter($loggedUID)) $this->terminateWithValidationErrors(array('' => $this->p->t('person', 'notForEmployees')));
+		if (!$this->MitarbeiterModel->isMitarbeiter($loggedUID)) $this->terminateWithValidationErrors(array('' => $this->p->t('person', 'notForEmployees')));
 
 		// Loads the CI validation library
 		$this->load->library('form_validation');
@@ -119,6 +119,9 @@ class Bank extends FHCAPI_Controller
 		// Checks if the provided IBAN is fine using the php-iban library
 		$iban = preg_replace("/[^A-Za-z0-9 ]/", '', $this->input->post(self::IBAN_PARAM));
 		if (!verify_iban($iban)) $this->terminateWithValidationErrors(array('iban' => $this->p->t('person', 'notValidaIBAN')));
+
+		// If the IBAN and the BIC code are for different countries
+		if (substr($iban, 0, 2) != substr($bic, 4, 2)) $this->terminateWithValidationErrors(array('' => $this->p->t('person', 'ibanBicCountryNotMatch')));
 
 		// Check if there is at least a record in the bank data table
 		$bankDataResult = $this->BankverbindungModel->execReadOnlyQuery(
@@ -181,12 +184,30 @@ class Bank extends FHCAPI_Controller
 	}
 
 	/**
-	 * Generic BIC check
+	 * Generic SWIFT/BIC check
+	 * Given the fake SWIFT/BIC: TBIC AT 12 ABC
+	 * - 4 letters: Institution Code or bank code.
+	 * - 2 letters: ISO 3166-1 alpha-2 country code
+	 * - 2 letters or digits: location code
+	 * (8 chars BIC)
+	 * - 3 letters or digits: branch code, optional
+	 * (11 chars BIC)
 	 */
 	private function _checkBic($bic)
 	{
-		// Check if the provided BIC is fine
-		return preg_match("^([a-zA-Z]){4}([a-zA-Z]){2}([0-9a-zA-Z]){2}([0-9a-zA-Z]{3})?$^", $bic) == 1;
+		// If the provided BIC is made up of 11 chars
+		if (strlen($bic) == 11)
+		{
+			// Check if the provided BIC is fine
+			return preg_match("^([a-zA-Z]){4}([a-zA-Z]){2}([0-9a-zA-Z]){2}([0-9a-zA-Z]{3})?$^", $bic) == 1;
+		}
+		elseif (strlen($bic) == 8) // otherwise if it is made up of 8 chars
+		{
+			// Check if the provided BIC is fine
+			return preg_match("^([a-zA-Z]){4}([a-zA-Z]){2}([0-9a-zA-Z]){2}?$^", $bic) == 1;
+		}
+
+		return false;
 	}
 }
 
