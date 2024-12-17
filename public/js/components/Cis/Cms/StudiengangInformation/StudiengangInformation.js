@@ -30,7 +30,7 @@ template:/*html*/`
 		<template v-if="studiengang?.bezeichnung && semester">
 			<div class="card card-body mb-3">
 				<div class="mb-1">
-					<h2 class="mb-1 pb-0">Studiengang:</h2>
+					<h2 class="mb-1 pb-0">{{$p.t('lehre','studiengang')}}:</h2>
 					<span class="mb-1">{{studiengang.bezeichnung}}</span>
 				</div>
 				<div class="mb-1">
@@ -38,7 +38,7 @@ template:/*html*/`
 					<a class="mb-1" target="_blank" :href="moodleLink">{{studiengang.kurzbzlang}}</a>
 				</div>
 				<div :class="{'mb-1':studiengang?.zusatzinfo_html}">
-					<h2 class="mb-1 pb-0">Semester: </h2>
+					<h2 class="mb-1 pb-0">{{$p.t('lehre','studiensemester')}}: </h2>
 					<span class="mb-1">{{semester}}</span>
 				</div>
 				<div v-if="studiengang?.zusatzinfo_html" v-html="studiengang?.zusatzinfo_html"></div>
@@ -64,13 +64,13 @@ template:/*html*/`
 			</template>
 		</template>
 		<template v-if="hochschulvertr && Array.isArray(hochschulvertr) && hochschulvertr.length >0">
-			<studiengang-vertretung showBezeichnung title="Hochschulvertretung" :vertretungsList="hochschulvertr"></studiengang-vertretung>
+			<studiengang-vertretung showBezeichnung :title="$p.t('studiengangInformation', 'Hochschulvertretung')" :vertretungsList="hochschulvertr"></studiengang-vertretung>
 		</template>
 		<template v-if="stdv && Array.isArray(stdv) && stdv.length >0">
-			<studiengang-vertretung :title="'Studienvertretung'.concat(studiengang.kurzbzlang??'')" :vertretungsList="stdv"></studiengang-vertretung>
+			<studiengang-vertretung :title="$p.t('studiengangInformation', 'Studienvertretung').concat(studiengang.kurzbzlang??'')" :vertretungsList="stdv"></studiengang-vertretung>
 		</template>
 		<template v-if="jahrgangsvertr && Array.isArray(jahrgangsvertr) && jahrgangsvertr.length >0">
-			<studiengang-vertretung title="Jahrgangsvertretung" :vertretungsList="jahrgangsvertr"></studiengang-vertretung>
+			<studiengang-vertretung :title="$p.t('studiengangInformation', 'Jahrgangsvertretung')" :vertretungsList="jahrgangsvertr"></studiengang-vertretung>
 		</template>
 	
 `,
@@ -82,21 +82,21 @@ computed:{
 
 		if (Array.isArray(this.stg_ltg) && this.stg_ltg.length == 1 && Array.isArray(this.ass) && this.ass.length == 1)
 		{
-			returnData.push({ title: "Studiengangsleitung / Assistenz", collection: [...this.stg_ltg, ...this.ass] });
+			returnData.push({ title: `${this.$p.t('global', 'studiengangsleitung')}/${this.$p.t('studiengangInformation', 'assistenz')}` , collection: [...this.stg_ltg, ...this.ass] });
 		}
 		else
 		{
-			returnData.push({ title: "Studiengangsleitung", collection: this.stg_ltg });
-			returnData.push({ title: "Sekretariat", collection: this.ass });
+			returnData.push({ title: this.$p.t('global', 'studiengangsleitung'), collection: this.stg_ltg });
+			returnData.push({ title: this.$p.t('studiengangInformation', 'assistenz'), collection: this.ass });
 		}
 		if (Array.isArray(this.gf_ltg) && this.gf_ltg.length == 1 && Array.isArray(this.stv_ltg) && this.stv_ltg.length == 1)
 		{
-			returnData.push({ title: "Geschäftsführende/Stellvertretende Leitung", collection: [...this.gf_ltg, ...this.stv_ltg] });
+			returnData.push({ title: this.$p.t('studiengangInformation', 'geschaeftsfuehrende_stellvertretende_leitung'), collection: [...this.gf_ltg, ...this.stv_ltg] });
 		}
 		else
 		{
-			returnData.push({ title: "Geschäftsführende Leitung", collection: this.gf_ltg });
-			returnData.push({ title: "Stellvertretende Leitung", collection: this.stv_ltg });
+			returnData.push({ title: this.$p.t('studiengangInformation', 'geschaeftsfuehrende_leitung'), collection: this.gf_ltg });
+			returnData.push({ title: this.$p.t('studiengangInformation', 'stellvertretende_leitung'), collection: this.stv_ltg });
 		}
 
 		return returnData;

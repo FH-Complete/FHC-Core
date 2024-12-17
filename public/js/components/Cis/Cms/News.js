@@ -18,7 +18,6 @@ export default {
   watch:{
 	'$p.user_language.value':function(sprache){
 		this.fetchNews();
-		console.log("ere")
 	}
   },
   computed:{
