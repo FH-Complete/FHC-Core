@@ -876,7 +876,7 @@ class ReihungstestJob extends JOB_Controller
 							JOIN PUBLIC.tbl_studiengang ON (tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz)
 						WHERE tbl_prestudent.person_id = ".$row_ps->person_id."
 							AND tbl_prestudent.prestudent_id != ".$row_ps->prestudent_id."
-							AND get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') IN ('Aufgenommener','Bewerber','Wartender')
+							AND get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') IN ('Aufgenommener','Bewerber','Wartender', 'Student')
 							AND studiensemester_kurzbz = '".$row_ps->studiensemester_kurzbz."'
 							AND tbl_studiengang.typ IN ('b', 'm')
 							AND priorisierung > ".$row_ps->priorisierung."
@@ -894,12 +894,22 @@ class ReihungstestJob extends JOB_Controller
 					{
 						foreach ($resultNiedrPrios->retval as $rowNiedrPrios)
 						{
-							// nur Info wenn aufgenommen oder master
-							if ($rowNiedrPrios->laststatus == 'Aufgenommener' || $rowNiedrPrios->studiengang_typ == 'm')
+							// nur Info wenn aufgenommen/student oder master
+							if ($rowNiedrPrios->laststatus == 'Aufgenommener' || $rowNiedrPrios->laststatus == 'Student' || $rowNiedrPrios->studiengang_typ == 'm')
 							{
-								// Mail zur Info an Assistenz schicken, dass in höherer Prio aufgenommen wurde
-								$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
-									= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+
+								if ($rowNiedrPrios->laststatus == 'Aufgenommener')
+								{
+									// Mail zur Info an Assistenz schicken, dass in höherer Prio aufgenommen wurde
+									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
+										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+								}
+								else if ($rowNiedrPrios->laststatus == 'Student')
+								{
+									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['StudentHoeherePrio'][]
+										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+								}
+
 							}
 							elseif ($rowNiedrPrios->laststatus == 'Bewerber' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum)
 							{
@@ -1055,6 +1065,20 @@ class ReihungstestJob extends JOB_Controller
 						$mailcontent .= '					<tbody>';
 						sort($value['AufnahmeHoeherePrio']);
 						foreach ($value['AufnahmeHoeherePrio'] AS $key=>$bewerber)
+						{
+							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
+						}
+						$mailcontent .= '</tbody></table>';
+						$content = true;
+					}
+					if (isset($value['StudentHoeherePrio']) && !isEmptyArray($value['StudentHoeherePrio']))
+					{
+						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
+									Folgende Studenten wurden in einem höher priorisierten Studiengang aufgenommen:</p>';
+						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
+						$mailcontent .= '					<tbody>';
+						sort($value['StudentHoeherePrio']);
+						foreach ($value['StudentHoeherePrio'] AS $key=>$bewerber)
 						{
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
