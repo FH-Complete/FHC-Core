@@ -37277,7 +37277,30 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	// FHC4 Phrases Mobility Start
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_mobility',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobilität',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mobility',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC4 Phrases Mobility Start
+
 );
 
 
