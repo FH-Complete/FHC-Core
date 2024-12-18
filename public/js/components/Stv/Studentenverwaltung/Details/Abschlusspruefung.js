@@ -1,11 +1,17 @@
-import AbschlusspruefungList from "./Abschlusspruefung/AbschlusspruefungList.js";
+import AbschlussPruefung from "./Abschlusspruefung/Abschlusspruefung.js";
 
 export default {
 	components: {
-		AbschlusspruefungList
+		AbschlussPruefung
+	},
+	provide() {
+		return {
+			config: this.config
+		};
 	},
 	props: {
-		modelValue: Object
+		modelValue: Object,
+		config: Object
 	},
 	data(){
 		return {}
@@ -13,6 +19,6 @@ export default {
 	template: `
 	<div class="stv-details-abschlusspruefung h-100 d-flex flex-column">
 	
-		<abschlusspruefung-list ref="finalexam" :student="modelValue"></abschlusspruefung-list>
+		<abschluss-pruefung ref="finalexam" :student="modelValue"></abschluss-pruefung>
 	</div>`
 };

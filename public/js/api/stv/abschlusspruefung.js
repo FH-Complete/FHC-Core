@@ -41,4 +41,8 @@ export default {
 	getNoten(){
 		return this.$fhcApi.get('api/frontend/v1/stv/abschlusspruefung/getNoten/');
 	},
+	checkForExistingExams(uids) {
+		return this.$fhcApi.post('api/frontend/v1/stv/abschlusspruefung/checkForExistingExams/', {uids}
+		);
+	}
 }

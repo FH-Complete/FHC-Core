@@ -22,7 +22,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'getMitarbeiter' => ['admin:rw', 'assistenz:rw'],
 			'getPruefer' => ['admin:rw', 'assistenz:rw'],
 			'getTypStudiengang' => ['admin:rw', 'assistenz:rw'],
-
+			'checkForExistingExams' => ['admin:rw', 'assistenz:rw'],
 		]);
 
 		// Load Libraries
@@ -149,6 +149,17 @@ class Abschlusspruefung extends FHCAPI_Controller
 	{
 		$studiengang_kz= $this->input->post('studiengang_kz');
 
+/*		if (!$studiengang_kzs || !is_array($studiengang_kzs)) {
+			$this->load->library('form_validation');
+
+			$this->form_validation->set_rules('studiengang_kzs', '', 'required|is_null', [
+				'is_null' => $this->p->t('ui', 'error_fieldMustBeArray')
+			]);
+
+			if (!$this->form_validation->run())
+				$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}*/
+
 
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
@@ -211,10 +222,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Student UID']), self::ERROR_TYPE_GENERAL);
 		}
 
-
 		$formData = $this->input->post('formData');
-
-
 
 		$_POST['pruefungstyp_kurzbz'] = $formData['pruefungstyp_kurzbz'];
 		$_POST['akadgrad_id']= $formData['akadgrad_id'];
@@ -254,7 +262,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'vorsitz' => $this->input->post('vorsitz'),
 			'pruefungsantritt_kurzbz' => $this->input->post('pruefungsantritt_kurzbz'),
 			'abschlussbeurteilung_kurzbz' => $this->input->post('abschlussbeurteilung_kurzbz'),
-			'datum' => $this->input->post('datum'),
+			'datum' => $this->input->post('datum'), //TODO(Manu) check if minute format like FAS
 			'sponsion' => $this->input->post('sponsion'),
 			'pruefer1' => $this->input->post('pruefer1'),
 			'pruefer2' => $this->input->post('pruefer2'),
@@ -362,5 +370,38 @@ class Abschlusspruefung extends FHCAPI_Controller
 			$this->outputJson($result);
 		}
 		return $this->terminateWithSuccess(current(getData($result)) ? : null);
+	}
+
+	public function checkForExistingExams()
+	{
+		$warning = false;
+		$output = [];
+
+		$student_uids = $this->input->post('uids');
+
+		if (empty($student_uids)) {
+			throw new InvalidArgumentException("Keine UID(s) übergeben.");
+		}
+
+		foreach ($student_uids as $uid)
+		{
+			$result = $this->AbschlusspruefungModel->loadWhere(
+				array('student_uid' => $uid)
+			);
+			if (isError($result)) {
+				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			}
+			if (!hasData($result))
+			{
+				$warning = true;
+				$output[] = $uid;
+			}
+		}
+		if($warning)
+		{
+			$uids = is_array($output) ? implode(", ", $output) : $output;
+			return $this->terminateWithError($this->p->t('abschlusspruefung', 'error_studentOhneFinalExam', ['id'=> $uids]), self::ERROR_TYPE_GENERAL);
+		}
+		$this->terminateWithSuccess('step3');
 	}
 }
