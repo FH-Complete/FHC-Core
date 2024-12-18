@@ -30,6 +30,8 @@
 	require_once('../../include/lehrmodus.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');
 	require_once('../../include/studienplan.class.php');
+	require_once('../../include/lehrveranstaltung_faktor.class.php');
+	require_once('../../include/studiensemester.class.php');
 
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -139,6 +141,31 @@
 			    $reloadstr .= " window.location.href='".$_SERVER['PHP_SELF']."?stg_kz=$lv->studiengang_kz&semester=$lv->semester&neu=true';";
 			}
 			$reloadstr .= "</script>\n";
+
+			if (in_array($lv->lehrtyp_kurzbz, array('tpl', 'lv')) && $lv->new === true)
+			{
+				$lv_faktor = new lehrveranstaltung_faktor();
+				$studiensemester = new studiensemester();
+				$studiensemester_von = $studiensemester->getLastOrAktSemester();
+				if ($lv->lehrtyp_kurzbz === 'lv' && $_POST['lehrveranstaltung_template_id'] !== '')
+				{
+
+					$lv_faktor->getAkt($_POST['lehrveranstaltung_template_id']);
+					//TODO Faktor in eine Config
+					if (is_null($lv_faktor->faktor))
+						$lv_faktor->addFaktor($lv->lehrveranstaltung_id, 2, $studiensemester_von);
+					else
+						$lv_faktor->addFaktor($lv->lehrveranstaltung_id, $lv_faktor->faktor, $studiensemester_von);
+				}
+				else
+				{
+					$lv_faktor->loadByLV($lv->lehrveranstaltung_id);
+					if (empty($lv_faktor->lv_faktoren))
+					{
+						$lv_faktor->addFaktor($lv->lehrveranstaltung_id, 2, $studiensemester_von);
+					}
+				}
+			}
 		}
 	}
 

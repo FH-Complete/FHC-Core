@@ -27,8 +27,6 @@ require_once('dbupdate_3.4/example.php');
 require_once('dbupdate_3.4/example2.php');
 ...
 */
-require_once('dbupdate_3.4/25003_notenimport_nachpruefung.php');
-
 require_once('dbupdate_3.4/dbupdate_dashboard.php');
 require_once('dbupdate_3.4/26173_index_webservicelog.php');
 require_once('dbupdate_3.4/24682_reihungstest_zugangscode_fuer_login.php');
@@ -66,6 +64,10 @@ require_once('dbupdate_3.4/44031_stv_favorites.php');
 require_once('dbupdate_3.4/40896_kennzeichnung_unruly_person.php');
 require_once('dbupdate_3.4/39911_tabulator_in_contentmittitel.php');
 require_once('dbupdate_3.4/25999_C4_permission.php');
+require_once('dbupdate_3.4/33683_digitale_anwesenheitsliste_und_entschuldigungsmanagement_fuer_studierende_prototyp.php');
+require_once('dbupdate_3.4/40717_lv_faktor.php');
+require_once('dbupdate_3.4/48526_pep_tagging.php');
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -158,7 +160,7 @@ $tabellen=array(
 	"campus.tbl_studierendenantrag_statustyp"=> array("studierendenantrag_statustyp_kurzbz","bezeichnung"),
 	"campus.tbl_studentbeispiel"  => array("student_uid","beispiel_id","vorbereitet","probleme","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_studentuebung"  => array("student_uid","mitarbeiter_uid","abgabe_id","uebung_id","note","mitarbeitspunkte","punkte","anmerkung","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
-	"campus.tbl_template"  => array("template_kurzbz","bezeichnung","xsd","xslt_xhtml","xslfo_pdf"),
+	"campus.tbl_template"  => array("template_kurzbz","bezeichnung","xsd","xslt_xhtml","xslfo_pdf","xslt_xhtml_c4"),
 	"campus.tbl_uebung"  => array("uebung_id","gewicht","punkte","angabedatei","freigabevon","freigabebis","abgabe","beispiele","statistik","bezeichnung","positiv","defaultbemerkung","lehreinheit_id","maxstd","maxbsp","liste_id","prozent","nummer","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_veranstaltung"  => array("veranstaltung_id","titel","beschreibung","veranstaltungskategorie_kurzbz","inhalt","start","ende","freigabevon","freigabeamum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_veranstaltungskategorie"  => array("veranstaltungskategorie_kurzbz","bezeichnung","bild","farbe"),
@@ -168,6 +170,11 @@ $tabellen=array(
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon", "zeitwunsch_id", "zeitwunsch_gueltigkeit_id"),
 	"campus.tbl_zeitwunsch_gueltigkeit"  => array("zeitwunsch_gueltigkeit_id","mitarbeiter_uid","von","bis","insertamum","insertvon", "updateamum","updatevon"),
+	"dashboard.tbl_dashboard" => array("dashboard_id", "dashboard_kurzbz", "beschreibung"),
+	"dashboard.tbl_dashboard_benutzer_override" => array("override_id","dashboard_id","uid","override"),
+	"dashboard.tbl_dashboard_preset" => array("preset_id","dashboard_id","funktion_kurzbz","preset"),
+	"dashboard.tbl_dashboard_widget" => array("dashboard_id","widget_id"),
+	"dashboard.tbl_widget" => array("widget_id","widget_kurzbz","beschreibung","arguments","setup"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung","sort"),
 	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
 	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id","anzahl_ma","aufwand_pt","projekt_id","projekttyp_kurzbz","zeitaufzeichnung"),
@@ -256,6 +263,7 @@ $tabellen=array(
 	"lehre.tbl_zeitfenster"  => array("wochentag","stunde","ort_kurzbz","studiengang_kz","gewicht"),
 	"lehre.tbl_zeugnis"  => array("zeugnis_id","student_uid","zeugnis","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
+	"lehre.tbl_lehrveranstaltung_faktor"  => array("lehrveranstaltung_faktor_id", "lehrveranstaltung_id","faktor","studiensemester_kurzbz_von","studiensemester_kurzbz_bis","insertamum","insertvon","updateamum","updatevon"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung", "co_name"),
 	"public.tbl_adressentyp"  => array("adressentyp_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig", "sort"),
@@ -302,9 +310,10 @@ $tabellen=array(
 	"public.tbl_msg_message" => array("message_id","person_id","subject","body","priority","relationmessage_id","oe_kurzbz","insertamum","insertvon"),
 	"public.tbl_msg_recipient" => array("message_id","person_id","token","sent","sentinfo","insertamum","insertvon","oe_kurzbz"),
 	"public.tbl_msg_status" => array("message_id","person_id","status","statusinfo","insertamum","insertvon","updateamum","updatevon"),
-	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon","ext_id", "typ"),
 	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id","ext_id","anrechnung_id"),
 	"public.tbl_notiz_dokument" => array("notiz_id","dms_id"),
+	"public.tbl_notiz_typ" => array("typ_kurzbz","bezeichnung_mehrsprachig", "beschreibung", "automatisiert", "aktiv", "zuordnung", "tag", "style", "vorrueckung", "prioritaet"),
 	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz","arbeitsplaetze"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre","standort","warn_semesterstunden_frei","warn_semesterstunden_fix","standort_id"),
@@ -323,7 +332,10 @@ $tabellen=array(
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation","gsstudientyp_kurzbz","aufnahmegruppe_kurzbz","udf_values","priorisierung","foerderrelevant","standort_code","zgv_erfuellt","zgvmas_erfuellt","zgvdoktor_erfuellt"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung","bewerbung_abgeschicktamum","rt_stufe","statusgrund_id"),
-	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
+	"public.tbl_profil_update" => array("profil_update_id","uid","topic","requested_change","updateamum","updatevon","insertamum","insertvon","status","status_timestamp","status_message","attachment_id"),
+	"public.tbl_profil_update_status" => array("status_kurzbz","beschreibung","bezeichnung_mehrsprachig"),
+	"public.tbl_profil_update_topic" => array("topic_kurzbz","beschreibung","bezeichnung_mehrsprachig"),
+	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten","aktiv"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz","aufnahmegruppe_kurzbz","stufe","anmeldefrist","zugangs_ueberpruefung","zugangscode"),
 	"public.tbl_rueckstellung" => array("rueckstellung_id","person_id","status_kurzbz","datum_bis","insertamum","insertvon"),
 	"public.tbl_rueckstellung_status" => array("status_kurzbz", "bezeichnung_mehrsprachig", "sort", "aktiv"),

@@ -7,6 +7,7 @@
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Interessent rejected\', \'Attempt to register with existing mailadress\', \'Access code sent\', \'Personal data saved\'';
+	$LOGDATA_DELETED_BY_USER = '\'% deleted by user\'';
 	$POSTPONE_STATUS_PARKED = '\'parked\'';
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
@@ -283,6 +284,7 @@
 					FROM system.tbl_log l
 					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+					AND l.logdata->>\'message\' NOT LIKE ('.$LOGDATA_DELETED_BY_USER.')
 					AND l.person_id = p.person_id
 					ORDER BY l.log_id DESC
 					LIMIT 1

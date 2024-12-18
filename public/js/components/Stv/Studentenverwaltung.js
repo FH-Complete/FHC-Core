@@ -71,7 +71,7 @@ export default {
 				cssclass: "position-relative",
 				calcheightonly: true,
 				types: [
-					"student",
+					"studentStv",
 					"prestudent"
 				],
 				actions: {

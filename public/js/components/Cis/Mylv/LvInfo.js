@@ -11,6 +11,15 @@ export default {
 		}
 	},
 	computed: {
+		lektorenLinks: function(){
+			if (!this.event || !Array.isArray(this.event.lektor) || !this.event.lektor.length) return "a";
+
+			let lektorenLinks ={};
+			this.event.lektor.forEach((lektor)=>{
+				lektorenLinks[lektor.kurzbz] = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/Cis/Profil/View/${lektor.mitarbeiter_uid}`;
+			})
+			return lektorenLinks;
+		},
 		start_time: function () {
 			if (!this.event.start) return 'N/A';
 			if (!this.event.start instanceof Date) {
@@ -67,7 +76,12 @@ export default {
 						$p.t('lehre','lektor')+':'
 						:''
 					}}</th>
-					<td>{{event.lektor.map(lektor=>lektor.kurzbz).join("/")}}</td>
+					<td>
+						<div v-for="lektor in event.lektor" class="d-block">
+							<a v-if="lektorenLinks[lektor.kurzbz]" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
+							{{lektor.kurzbz}}
+						</div>
+					</td>
 				</tr>
 				<tr>
 					<th>{{

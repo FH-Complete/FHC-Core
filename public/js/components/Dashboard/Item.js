@@ -1,9 +1,11 @@
 import BsModal from "../Bootstrap/Modal.js";
 import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
+import HeightTransition from "../Tranistion/HeightTransition.js";
 
 export default {
 	components: {
 		BsModal,
+		HeightTransition
 	},
 	data: () => ({
 		component: "",
@@ -118,7 +120,9 @@ export default {
 	</div>
 	<div v-else-if="!hidden || editMode" class="dashboard-item card overflow-hidden h-100" :class="arguments && arguments.className ? arguments.className : ''">
 		<div v-if="widget" class="card-header d-flex ps-0 pe-2">
-			<span v-if="editMode" drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
+			<Transition>
+				<span v-if="editMode" drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
+			</Transition>
 			<span class="col mx-2 px-2">{{ widget.setup.name }}</span>
 			<a v-if="widget.setup.cis4link" :href="getWidgetC4Link(widget)" class="ms-auto mb-2">
           		<i class="fa fa-arrow-up-right-from-square me-1"></i>
@@ -127,9 +131,11 @@ export default {
 			<a v-if="custom && editMode" class="col-auto px-1" href="#" @click.prevent="$emit('remove')">
 				<i class="fa-solid fa-trash"></i>
 			</a>
-			<div v-else-if="editMode" class="col-auto px-1 form-switch">
-				<input class="form-check-input ms-0" type="checkbox" role="switch" id="flexSwitchCheckChecked" :checked="!hidden" @input="$emit('remove', hidden)">
-			</div>
+			<Transition>
+				<div v-if="!custom && editMode" class="col-auto px-1 form-switch">
+					<input class="form-check-input ms-0" type="checkbox" role="switch" id="flexSwitchCheckChecked" :checked="!hidden" @input="$emit('remove', hidden)">
+				</div>
+			</Transition>
 		</div>
 		<div v-if="ready" class="card-body overflow-hidden" style="padding: 0px;">
 			<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
@@ -148,8 +154,10 @@ export default {
 				<button type="button" class="btn btn-primary" @click="changeConfig">Save changes</button>
 			</template>
 		</bs-modal>
-		<div v-if="editMode && isResizeable" class="card-footer d-flex justify-content-end p-0">
-			<span drag-action="resize" class="col-auto px-1 cursor-nw-resize"><i class="fa-solid fa-up-right-and-down-left-from-center mirror-x"></i></span>
-		</div>
+		<height-transition>
+			<div v-if="editMode && isResizeable" class="card-footer d-flex justify-content-end p-0">
+				<span drag-action="resize" class="col-auto px-1 cursor-nw-resize"><i class="fa-solid fa-up-right-and-down-left-from-center mirror-x"></i></span>
+			</div>
+		</height-transition>
 	</div>`,
 };

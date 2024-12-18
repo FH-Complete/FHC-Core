@@ -26,6 +26,7 @@
     width: 100%;
     left: 0;
     right: 0;
+	box-shadow: 2px 2px 4px rgba(0, 0, 0, .4);
 }
 
 .searchbar_results_scroller {
@@ -109,3 +110,7 @@
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE/Edge */
   }
+
+.searchbar_inaktiv {
+	opacity: .6;
+}
