@@ -132,6 +132,7 @@
 		generateJSsInclude('vendor/npm-asset/primevue/toastservice/toastservice.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/confirmdialog/confirmdialog.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/confirmationservice/confirmationservice.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/tieredmenu/tieredmenu.min.js');
 	}
 
 	// --------------------------------------------------------------------------------------------------------
