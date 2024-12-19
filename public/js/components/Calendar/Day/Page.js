@@ -99,6 +99,13 @@ export default {
 				top: 0,
 			}
 		},
+		dayText(){
+			if(!this.size || !this.day)return {};
+			return {
+				tag: this.day.toLocaleString(this.$p.user_language_locale_identifier.value, { weekday: this.size < 2 ? 'narrow' : (this.size < 3 ? 'short' : 'long') }),
+				datum: this.day.toLocaleString(this.$p.user_language_locale_identifier.value, [{ day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { dateStyle: 'short' }][this.size]),
+			}
+		},
 		dayGridStyle() {
 			return {
 				'grid-template-columns': '1 1fr',
@@ -289,15 +296,15 @@ export default {
 		const container = document.getElementById("calendarContainer")
 		if(container) container.style.overflow = 'hidden'
 	},
-	template: `
+	template: /*html*/`
 	<div class="fhc-calendar-day-page h-100">
 		<div class="row m-0 h-100">
 			<div class="col-12 col-xl-6 p-0 h-100">
 				<div class="d-flex flex-column h-100">
 					<div ref="header" class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle">
 						<div type="button" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
-							<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
-							<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
+							<div class="fw-bold">{{dayText.tag}}</div>
+							<a href="#" class="small text-secondary text-decoration-none" >{{dayText.datum}}</a>
 						</div>
 					</div>
 					<div id="scroll g-0" style="height: 100%; overflow: scroll;">
@@ -310,7 +317,6 @@ export default {
 									<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 								</div>
 							</Transition>
-							
 							<div>
 								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
 								<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
@@ -342,7 +348,7 @@ export default {
 				</div>
 			</div>
 			<div class="d-xl-block col-xl-6 p-0">
-				<div style="z-index:0" class="p-2 sticky-top d-flex justify-content-center align-items-center flex-column">
+				<div style="z-index:0" class="p-4 sticky-top d-flex justify-content-center align-items-center flex-column">
 					<div style="max-height: calc(var(--fhc-calendar-pane-height)); overflow-y:auto;" class="w-100">
 						<template v-if="selectedEvent && lvMenu">
 							<slot name="pageMobilContent" :lvMenu="lvMenu" >

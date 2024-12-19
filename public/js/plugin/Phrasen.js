@@ -3,6 +3,14 @@ import FhcApi from './FhcApi.js';
 const categories = Vue.reactive({});
 const loadingModules = {};
 let user_language = Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
+let user_language_locale_identifier = Vue.computed(()=>{
+	if(!user_language.value) return undefined;
+	switch(user_language.value){
+		case 'German': return 'de-AT';
+		case 'English': return 'en-GB';
+		default: return undefined;
+	}
+});
 
 function extractCategory(obj, category) {
 	return obj.filter(e => e.category == category).reduce((res, elem) => {
@@ -22,6 +30,7 @@ function getValueForLoadedPhrase(category, phrase, params) {
 
 const phrasen = {
 	user_language,
+	user_language_locale_identifier,
 	setLanguage(language, api) {
 		const catArray = Object.keys(categories)
 		return api.factory.phrasen.setLanguage(catArray, language).then(res => {
@@ -84,6 +93,7 @@ export default {
 			loadCategory: cat => phrasen.loadCategory.call(app, cat),
 			setLanguage: phrasen.setLanguage,
 			user_language: user_language,
+			user_language_locale_identifier: user_language_locale_identifier,
 			t_ref: phrasen.t_ref
 		};
 		app.provide('$p', app.config.globalProperties.$p);

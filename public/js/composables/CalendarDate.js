@@ -127,8 +127,8 @@ class CalendarDate {
 		this._w = null;
 		this._wd = null;
 	}
-	format(options) {
-		return (new Date(this._y, this._m, this._d)).toLocaleString(undefined, options);
+	format(options, lang=undefined) {
+		return (new Date(this._y, this._m, this._d)).toLocaleString(lang, options);
 	}
 	compare(d) {
 		if (Object.prototype.toString.call(d) === '[object Date]')
