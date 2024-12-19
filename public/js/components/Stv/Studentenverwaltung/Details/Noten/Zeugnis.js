@@ -175,7 +175,7 @@ export default {
 							deleteButton.append(icon);
 							deleteButton.addEventListener('click', evt => {
 								evt.stopPropagation();
-								this.deleteGrade(data);// TODO(chris): test with new data object
+								this.deleteGrade(data);
 							});
 							container.append(deleteButton);
 						}
@@ -225,6 +225,7 @@ export default {
 				.catch(this.$fhcAlert.handleFormValidation);
 		},
 		deleteGrade(data) {
+			// NOTE(chris): There is no check if there is an entry to be deleted, but it works anyway
 			return this.$fhcAlert
 				.confirmDelete()
 				.then(result => result ? data : Promise.reject({handled:true}))
@@ -234,10 +235,9 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
-	// TODO(chris): phrasen
+	// TODO(chris): phrasen (title)
 	template: `
 	<div class="stv-details-noten-zeugnis h-100 d-flex flex-column">
-		<!-- TODO(chris): phrase -->
 		<core-filter-cmpt
 			ref="table"
 			title="Certificate"

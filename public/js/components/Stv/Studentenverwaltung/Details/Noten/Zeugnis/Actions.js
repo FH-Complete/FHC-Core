@@ -91,7 +91,7 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	// TODO(chris): phrases
+	// TODO(chris): phrases (option"")
 	template: `
 	<div class="stv-details-noten-zeugnis-actions d-flex gap-2">
 		<template v-if="['both', 'header'].includes(config.edit)">

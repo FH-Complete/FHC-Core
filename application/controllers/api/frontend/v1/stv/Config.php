@@ -269,7 +269,7 @@ class Config extends FHCAPI_Controller
 			"&lvid={lehrveranstaltung_id}";
 
 		$archive_url = "api/frontend/v1/documents/archiveSigned";
-		$archive_response = $this->p->t("stv", "document_signed_and_archived");
+		$archive_response = $this->p->t("stv", "document_signed_and_archived"); // TODO(chris): phrase
 		$archive_post_ff = [
 			"xml" => "zertifikat.rdf.php",
 			"xsl" => "Zertifikat",

@@ -62,7 +62,7 @@ export default {
 									);
 							this.$fhcApi
 								.post(this.addParamsToString(part.action.url), post)
-								.then(() => part.action.response || 'TODO(chris): phrase default')
+								.then(() => part.action.response || this.$p.t('ui/successSave'))
 								.then(this.$fhcAlert.alertSuccess)
 								.catch(this.$fhcAlert.handleSystemError);
 						};
