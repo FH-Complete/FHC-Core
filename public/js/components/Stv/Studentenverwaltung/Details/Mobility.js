@@ -20,6 +20,6 @@ export default {
 
 	<h1>TEST Mob</h1>
 	
-		<table-mobility ref="tbl_mobility" :prestudent="modelValue"></table-mobility>
+		<table-mobility ref="tbl_mobility" :student="modelValue"></table-mobility>
 	</div>`
 };

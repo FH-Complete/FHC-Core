@@ -17,7 +17,7 @@ export default {
 		}
 	},
 	props: {
-		prestudent: Object
+		student: Object
 	},
 	data() {
 		return {
@@ -26,25 +26,16 @@ export default {
 				ajaxRequestFunc: this.$fhcApi.factory.stv.mobility.getMobilitaeten,
 				ajaxParams: () => {
 					return {
-						id: this.prestudent.prestudent_id
+						id: this.student.student_uid
 					};
 				},
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Kurzbz", field: "kurzbz"},
-					{title: "Nation", field: "beurteilung_bezeichnung"},
-					{title: "firma_id", field: "firma_id", visible: false},
-					// {title: "prueferIn2", field: "p2_nachname", visible: false},
-					// {title: "prueferIn3", field: "p3_nachname", visible: false},
-					// {title: "datum", field: "format_datum"},
-					// {title: "uhrzeit", field: "uhrzeit"},
-					// {title: "freigabe", field: "format_freigabedatum"},
-					// {title: "pruefungsantritt", field: "antritt_bezeichnung"},
-					// {title: "sponsion", field: "format_sponsion"},
-					// {title: "anmerkung", field: "anmerkung"},
-					// {title: "mobility_id", field: "mobility_id", visible: false},
-					// {title: "typ", field: "pruefungstyp_kurzbz", visible: false},
-
+					{title: "Nation", field: "nation_code"},
+					{title: "Von", field: "von"},
+					{title: "Bis", field: "bis"},
+					{title: "bisio_id", field: "bisio_id"},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -139,24 +130,9 @@ export default {
 					}
 				}
 			],
-			tabulatorData: [],
-			lastSelected: null,
 			formData: {
 			},
 			statusNew: true,
-			arrTypen: [],
-			arrAntritte: [],
-			arrBeurteilungen: [],
-			arrAkadGrad: [],
-			arrNoten: [],
-			filteredMitarbeiter: [],
-			filteredPruefer: [],
-			abortController: {
-				mitarbeiter: null,
-				pruefer: null
-			},
-			stgTyp: null,
-			stgKz: null,
 		}
 	},
 	watch: {
@@ -304,7 +280,7 @@ export default {
 			>
 		</core-filter-cmpt>
 
-		<form-form v-if="!this.prestudent.length" ref="formMobility" @submit.prevent>
+		<form-form v-if="!this.student.length" ref="formMobility" @submit.prevent>
 		
 			<!-- <legend>{{this.$p.t('global','details')}}</legend>
 			<p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p>

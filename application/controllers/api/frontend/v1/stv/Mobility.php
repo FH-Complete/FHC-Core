@@ -27,15 +27,15 @@ class Mobility extends FHCAPI_Controller
 		]);
 
 		// Load models
-		$this->load->model('codex/Mobilitaet_model', 'MobilitaetModel');
+		$this->load->model('codex/Bisio_model', 'BisioModel');
 	}
 
-	public function getMobilitaeten($prestudent_id)
+	public function getMobilitaeten($student_uid)
 	{
-		$this->MobilitaetModel->addJoin('bis.tbl_mobilitaetsprogramm mp', 'ON (mp.mobilitaetsprogramm_code = bis.tbl_mobilitaet.mobilitaetsprogramm_code)', 'LEFT');
+		// $this->BisioModel->addJoin('bis.tbl_Bisiosprogramm mp', 'ON (mp.Bisiosprogramm_code = bis.tbl_Bisio.Bisiosprogramm_code)', 'LEFT');
 
-		$result = $this->MobilitaetModel->loadWhere(
-			array('prestudent_id' => $prestudent_id)
+		$result = $this->BisioModel->loadWhere(
+			array('student_uid' => $student_uid)
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
