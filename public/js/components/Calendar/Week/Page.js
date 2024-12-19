@@ -56,6 +56,17 @@ export default {
 			// returns an array with elements starting at 7 and ending at 24
 			return [...Array(24).keys()].filter(hour => hour >= 7 && hour <= 24);
 		},
+		dayText() {
+			if (!this.size || !this.days) return {};
+			let dayTextMap ={};
+			this.days.forEach((day)=>{
+				dayTextMap[day] = {
+					tag: day.toLocaleString(this.$p.user_language_locale_identifier.value, { weekday: this.size < 2 ? 'narrow' : (this.size < 3 ? 'short' : 'long') }),
+					datum: day.toLocaleString(this.$p.user_language_locale_identifier.value, [{ day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { dateStyle: 'short' }][this.size]),
+				};
+			});
+			return dayTextMap;
+		},
 		days() {
 			
 			let tmpDate = new CalendarDate(this.year,1,1); // NOTE(chris): somewhere in the middle of the year
@@ -210,8 +221,8 @@ export default {
 		<div class="d-flex flex-column">
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
 				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
-					<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
-					<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
+					<div class="fw-bold">{{dayText[day]?.tag}}</div>
+					<a href="#" class="small text-secondary text-decoration-none" >{{dayText[day]?.datum}}</a>
 				</div>
 			</div>
 			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >

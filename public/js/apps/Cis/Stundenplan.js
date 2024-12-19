@@ -4,6 +4,7 @@ import CalendarDate from "../../composables/CalendarDate.js";
 import LvModal from "../../components/Cis/Mylv/LvModal.js";
 import LvInfo from "../../components/Cis/Mylv/LvInfo.js"
 import LvMenu from "../../components/Cis/Mylv/LvMenu.js"
+import Json from "../../helpers/Json.js"
 
 
 const app = Vue.createApp({
@@ -162,4 +163,5 @@ const app = Vue.createApp({
 	`
 });
 app.use(Phrasen);
+app.component('json', Json);
 app.mount('#content');
