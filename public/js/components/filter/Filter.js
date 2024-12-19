@@ -20,6 +20,7 @@ import FilterConfig from './Filter/Config.js';
 import FilterColumns from './Filter/Columns.js';
 import TableDownload from './Table/Download.js';
 import collapseAutoClose from '../../directives/collapseAutoClose.js';
+import { defaultHeaderFilter } from '../../tabulator/filters/defaultHeaderFilter.js';
 
 import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
 
@@ -44,7 +45,9 @@ export const CoreFilterCmpt = {
 	},
 	emits: [
 		'nwNewEntry',
-		'click:new'
+		'click:new',
+		'tableBuilt',
+		'uuidDefined'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -59,6 +62,7 @@ export const CoreFilterCmpt = {
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
 		tableOnly: Boolean,
+		noColumnFilter:Boolean,
 		reload: Boolean,
 		download: {
 			type: [Boolean, String, Function, Array, Object],
@@ -71,7 +75,8 @@ export const CoreFilterCmpt = {
 		uniqueId: String,
 		// TODO soll im master kommen?
 		idField: String,
-		parentIdField: String
+		parentIdField: String,
+		countOnly: Boolean
 	},
 	data: function() {
 		return {
@@ -159,7 +164,7 @@ export const CoreFilterCmpt = {
 				return [];
 			return this.tabulator.getColumns().filter(col => {
 				let def = col.getDefinition();
-				return !def.frozen && def.title;
+				return !def.frozen && def.title && def.formatter != "responsiveCollapse";
 			}).map(col => col.getField());
 		},
 		fieldNames() {
@@ -200,16 +205,17 @@ export const CoreFilterCmpt = {
 			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
-				height: 500,
-				layout: "fitDataStretchFrozen",
-				movableColumns: true,
-				columnDefaults:{
-					tooltip: true,
-				},
-				placeholder,
-				reactiveData: true,
-				persistence: true
-			}, ...(this.tabulatorOptions || {})};
+					height: 500,
+					layout: "fitDataStretchFrozen",
+					movableColumns: true,
+					columnDefaults:{
+						tooltip: true,
+						headerFilterFunc: defaultHeaderFilter,
+					},
+					placeholder,
+					reactiveData: true,
+					persistence: true
+				}, ...(this.tabulatorOptions || {})};
 
 			if (!this.tableOnly) {
 				tabulatorOptions.data = this.filteredData;
@@ -238,7 +244,7 @@ export const CoreFilterCmpt = {
 				for (let evt of this.tabulatorEvents)
 					this.tabulator.on(evt.event, evt.handler);
 			}
-			this.tabulator.on('tableBuilt', () => this.tableBuilt = true);
+			this.tabulator.on('tableBuilt', () => {this.tableBuilt = true; this.$emit('tableBuilt');});
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
@@ -274,8 +280,11 @@ export const CoreFilterCmpt = {
 					const cols = this.tabulator.getColumns();
 					this.fields = cols.map(col => col.getField());
 					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+
 				});
+
 			}
+
 		},
 		updateTabulator() {
 			if (this.tabulator) {
@@ -570,6 +579,7 @@ export const CoreFilterCmpt = {
 		if (this.sideMenu && (!this.$props.onNwNewEntry || !(this.$props.onNwNewEntry instanceof Function)))
 			alert('"nwNewEntry" listener is mandatory when sideMenu is true');
 		this.uuid = _uuid++;
+		this.$emit('uuidDefined', this.uuid)
 		if (!this.tableOnly)
 			this.getFilter(); // get the filter data
 	},
@@ -605,7 +615,10 @@ export const CoreFilterCmpt = {
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
 						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
 					</button>
-					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten:</span>
+					<span v-if="$slots.actions && tabulatorHasSelector">
+						<span v-if="countOnly">{{ selectedData.length }} ausgewählt</span>
+						<span v-else> Mit {{ selectedData.length }} ausgewählten:</span>
+					</span>
 					<slot name="actions" v-bind="{selected: tabulatorHasSelector ? selectedData : []}"></slot>
 					<slot name="search"></slot>
 				</div>
@@ -661,4 +674,3 @@ export const CoreFilterCmpt = {
 		<div ref="table" :id="'filterTableDataset' + idExtra" class="filter-table-dataset"></div>
 	`
 };
-

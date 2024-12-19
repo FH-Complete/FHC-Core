@@ -1,6 +1,12 @@
 <?php
 // Header menu
 
+if(defined('CIS4') && CIS4) {
+	$root = APP_ROOT;
+} else {
+	$root = CIS_ROOT;
+}
+
 $config['navigation_header'] = array(
 	'*' => array(
 		'fhcomplete' => array(
@@ -50,7 +56,7 @@ $config['navigation_header'] = array(
 			'requiredPermissions' => 'basis/vilesci:r',
 			'children' => array(
 				'cis' => array(
-					'link' => CIS_ROOT,
+					'link' => $root,
 					'icon' => '',
 					'description' => 'CIS',
 					'sort' => 10
@@ -223,7 +229,7 @@ $config['navigation_menu']['organisation/Reihungstest/index'] = array(
 		'target' => '_blank'
 	),
 	'auswertung' => array(
-		'link' => CIS_ROOT.'/cis/testtool/admin/auswertung.php',
+		'link' => $root.'/cis/testtool/admin/auswertung.php',
 		'description' => 'Auswertung',
 		'icon' => 'list-alt',
 		'sort' => 1,
@@ -320,4 +326,3 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 		'requiredPermissions' => array('admin:rw')
 	),
 );
-

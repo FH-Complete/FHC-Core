@@ -67,8 +67,10 @@ export default {
 		return {
 			selected: [],
 			searchbaroptions: {
+				cssclass: "position-relative",
+				calcheightonly: true,
 				types: [
-					"student",
+					"studentStv",
 					"prestudent"
 				],
 				actions: {

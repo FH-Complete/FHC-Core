@@ -23,6 +23,7 @@
 	$tablesorter2 = isset($tablesorter2) ? $tablesorter2 : false;
 	$tabulator4 = isset($tabulator4) ? $tabulator4 : false;
 	$tabulator5 = isset($tabulator5) ? $tabulator5 : false;
+	$tabulator5JQuery = isset($tabulator5JQuery) ? $tabulator5JQuery : false;
 	$tinymce3 = isset($tinymce3) ? $tinymce3 : false;
 	$tinymce5 = isset($tinymce5) ? $tinymce5 : false;
 	$vue3 = isset($vue3) ? $vue3 : false;
@@ -44,3 +45,4 @@
 	$tablewidget = isset($tablewidget) ? $tablewidget : false;
 	$udfs = isset($udfs) ? $udfs : false;
 	$widgets = isset($widgets) ? $widgets : false;
+	$tags = isset($tags) ? $tags : false;

@@ -1,0 +1,35 @@
+/* FORM UNDERLINE
+*/
+.form-underline{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: space-between;
+  
+  }
+  
+  
+  
+  .form-underline .form-underline-content{
+    border-width: 1px;
+    border-color: transparent transparent #dee2e6 transparent;
+    border-style: solid;
+    padding-bottom: 0.25rem;
+    padding-left: 0.5rem;
+  
+    /*optional not wrapping text that is horizontally scrollable and does not display a scrollbar */
+    white-space: nowrap;
+    overflow: auto;
+    scrollbar-width: none;
+  
+  }
+  
+  .form-underline .form-underline-content::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .form-underline .form-underline-titel{
+    opacity: 0.65;
+    font-size: .85rem;
+    padding-left: 0.5rem;
+  }
