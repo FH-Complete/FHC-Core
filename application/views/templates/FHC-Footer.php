@@ -125,7 +125,7 @@
 	}
 	
 	// Highcharts
-	if ($highcharts)
+	if (isset($highcharts) && $highcharts === true)
 	{
 		generateJSsInclude('vendor/highcharts/highcharts-dist/highcharts.js');
 		generateJSsInclude('vendor/highcharts/highcharts-dist/modules/current-date-indicator.js');
