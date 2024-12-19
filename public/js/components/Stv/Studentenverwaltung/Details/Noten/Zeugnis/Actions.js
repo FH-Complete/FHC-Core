@@ -1,11 +1,13 @@
 import CoreForm from '../../../../../Form/Form.js';
 import FormInput from '../../../../../Form/Input.js';
+import ZeugnisDocuments from './Documents.js';
 
 
 export default {
 	components: {
 		CoreForm,
-		FormInput
+		FormInput,
+		ZeugnisDocuments
 	},
 	emits: [
 		'setGrade',
@@ -117,13 +119,20 @@ export default {
 				<option v-for="grade in grades" :key="grade.note" :value="grade.note">{{ grade.bezeichnung }}</option>
 			</select>
 		</template>
+		<zeugnis-documents
+			v-if="['both', 'header'].includes(config.documents)"
+			:data="selected.find(Boolean)"
+			:list="config.documentslist"
+			:disabled="!selected.length"
+			>
+		</zeugnis-documents>
 		<button
 			v-if="['both', 'header'].includes(config.delete)"
 			class="btn btn-outline-secondary"
 			:disabled="!selected.length"
 			@click="deleteGrades"
 			>
-			<i class="fa fa-trash"></i>
+			<i class="fa fa-trash" :title="$p.t('ui/loeschen')"></i>
 		</button>
 	</div>`
 };

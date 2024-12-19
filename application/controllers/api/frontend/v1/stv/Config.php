@@ -99,6 +99,8 @@ class Config extends FHCAPI_Controller
 				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
 				'edit' => 'both', // Possible values: both|header|inline
 				'delete' => 'both', // Possible values: both|header|inline
+				'documents' => 'both', // Possible values: both|header|inline
+				'documentslist' => $this->gradesDocumentsList()
 			]
 		];
 		
@@ -234,5 +236,158 @@ class Config extends FHCAPI_Controller
 				'title' => $this->p->t('person', 'nachname')
 			]
 		] + $this->kontoColumns();
+	}
+	protected function gradesDocumentsList()
+	{
+		$permissioncheck = site_url("api/frontend/v1/documents/permissionAlternativeFormat/{studiengang_kz}");
+
+		$title_ger = $this->p->t("global", "deutsch");
+		$title_eng = $this->p->t("global", "englisch");
+		$title_ff = 'Zertifikat'; // TODO(chris): phrase
+		$title_lv = 'LV Zeugnis'; // TODO(chris): phrase
+		
+		$link_ff = "documents/export/" .
+			"zertifikat.rdf.php/" .
+			"Zertifikat" .
+			"?stg_kz={studiengang_kz_lv}" .
+			"&uid={uid}" .
+			"&ss={studiensemester_kurzbz}" .
+			"&lvid={lehrveranstaltung_id}";
+		$link_lv_ger = "documents/export/" .
+			"lehrveranstaltungszeugnis.rdf.php/" .
+			"LVZeugnis" .
+			"?stg_kz={studiengang_kz}" .
+			"&uid={uid}" .
+			"&ss={studiensemester_kurzbz}" .
+			"&lvid={lehrveranstaltung_id}";
+		$link_lv_eng = "documents/export/" .
+			"lehrveranstaltungszeugnis.rdf.php/" .
+			"LVZeugnisEng" .
+			"?stg_kz={studiengang_kz}" .
+			"&uid={uid}" .
+			"&ss={studiensemester_kurzbz}" .
+			"&lvid={lehrveranstaltung_id}";
+
+		$archive_url = "api/frontend/v1/documents/archiveSigned";
+		$archive_response = $this->p->t("stv", "document_signed_and_archived");
+		$archive_post_ff = [
+			"xml" => "zertifikat.rdf.php",
+			"xsl" => "Zertifikat",
+			"stg_kz" => "{studiengang_kz_lv}",
+			"uid" => "{uid}",
+			"ss" => "{studiensemester_kurzbz}",
+			"lvid" => "{lehrveranstaltung_id}"
+		];
+		$archive_post_lv_ger = [
+			"xml" => "lehrveranstaltungszeugnis.rdf.php",
+			"xsl" => "LVZeugnis",
+			"stg_kz" => "{studiengang_kz}",
+			"uid" => "{uid}",
+			"ss" => "{studiensemester_kurzbz}",
+			"lvid" => "{lehrveranstaltung_id}"
+		];
+		$archive_post_lv_eng = [
+			"xml" => "lehrveranstaltungszeugnis.rdf.php",
+			"xsl" => "LVZeugnisEng",
+			"stg_kz" => "{studiengang_kz}",
+			"uid" => "{uid}",
+			"ss" => "{studiensemester_kurzbz}",
+			"lvid" => "{lehrveranstaltung_id}"
+		];
+
+		$list = [
+			[
+				'title' => '<i class="fa fa-download" title="Download"></i>', // TODO(chris): phrase
+				'children' => [
+					[
+						'title' => $title_ff,
+						'link' => site_url($link_ff)
+					],
+					[
+						'title' => $title_lv,
+						'children' => [
+							[
+								'title' => $title_ger,
+								'link' => site_url($link_lv_ger),
+								'children' => [
+									[
+										'title' => 'PDF',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_ger)
+									],
+									[
+										'title' => 'DOC',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_ger . "&output=doc")
+									],
+									[
+										'title' => 'ODT',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_ger . "&output=odt")
+									]
+								]
+							],
+							[
+								'title' => $title_eng,
+								'link' => site_url($link_lv_eng),
+								'children' => [
+									[
+										'title' => 'PDF',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_eng)
+									],
+									[
+										'title' => 'DOC',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_eng . "&output=doc")
+									],
+									[
+										'title' => 'ODT',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_eng . "&output=odt")
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				'title' => '<i class="fas fa-archive" title="Archivieren"></i>', // TODO(chris): phrase
+				'children' => [
+					[
+						'title' => $title_ff,
+						'action' => [
+							'url' => site_url($archive_url),
+							'post' => $archive_post_ff,
+							'response' => $archive_response
+						]
+					],
+					[
+						'title' => $title_lv,
+						'children' => [
+							[
+								'title' => $title_ger,
+								'action' => [
+									'url' => site_url($archive_url),
+									'post' => $archive_post_lv_ger,
+									'response' => $archive_response
+								]
+							],
+							[
+								'title' => $title_eng,
+								'action' => [
+									'url' => site_url($archive_url),
+									'post' => $archive_post_lv_eng,
+									'response' => $archive_response
+								]
+							]
+						]
+					]
+				]
+			]
+		];
+
+		return $list;
 	}
 }

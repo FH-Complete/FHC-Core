@@ -1,10 +1,12 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import ZeugnisActions from './Zeugnis/Actions.js';
+import ZeugnisDocuments from './Zeugnis/Documents.js';
 
 export default {
 	components: {
 		CoreFilterCmpt,
-		ZeugnisActions
+		ZeugnisActions,
+		ZeugnisDocuments
 	},
 	inject: [
 		'config'
@@ -15,9 +17,27 @@ export default {
 	},
 	data() {
 		return {
-			tabulatorEvents: [],
+			tabulatorEvents: [
+				{
+					event: "dataLoaded",
+					handler: data => this.data = data.map(item => {
+						item.documentslist = document.createElement("div");
+						return item;
+					})
+				},
+				{
+					event: "rowSelected",
+					handler: row => row.getElement().style.zIndex = 12
+				},
+				{
+					event: "rowDeselected",
+					handler: row => row.getElement().style.zIndex = ''
+				}
+			],
 			stdsem: '',
-			lastGradeList: []
+			lastGradeList: [],
+			lastClickedRow: null,
+			data: []
 		};
 	},
 	computed: {
@@ -125,13 +145,14 @@ export default {
 				{ field: 'lehrveranstaltung_bezeichnung_english', title: 'Englisch', visible: false }
 			];
 
-			const hasDownload = ['both', 'inline'].includes(this.config.download);
+			const hasDocuments = ['both', 'inline'].includes(this.config.documents);
 			const hasDelete = ['both', 'inline'].includes(this.config.delete);
 
-			if (hasDownload || hasDelete) {
+			if (hasDocuments || hasDelete) {
 				columns.push({
 					field: 'actions',
 					title: 'Actions',
+					cssClass: "overflow-visible",
 					headerSort: false,
 					formatter: cell => {
 						// get row data
@@ -141,13 +162,20 @@ export default {
 						let container = document.createElement('div');
 						container.className = "d-flex gap-2 justify-content-end";
 
+						if (hasDocuments) {
+							container.append(data.documentslist);
+						}
+
 						if (hasDelete) {
 							let deleteButton = document.createElement('button');
 							deleteButton.className = 'btn btn-outline-secondary';
-							deleteButton.innerHTML = '<i class="fa fa-trash"></i>';
+							const icon = document.createElement('i');
+							icon.className = 'fa fa-trash';
+							icon.title = this.$p.t('ui/loeschen');
+							deleteButton.append(icon);
 							deleteButton.addEventListener('click', evt => {
 								evt.stopPropagation();
-								this.deleteGrade(data);
+								this.deleteGrade(data);// TODO(chris): test with new data object
 							});
 							container.append(deleteButton);
 						}
@@ -202,7 +230,7 @@ export default {
 				.then(result => result ? data : Promise.reject({handled:true}))
 				.then(this.$fhcApi.factory.stv.grades.deleteCertificate)
 				.then(this.$refs.table.reloadTable)
-				.then(() => this.$fhcAlert.alertSuccess('deleted')) // TODO(chris): phrase
+				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui/successDelete')))
 				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
@@ -223,5 +251,12 @@ export default {
 				<zeugnis-actions :selected="selected" @set-grade="setGrade" @delete-grade="deleteGrade"></zeugnis-actions>
 			</template>
 		</core-filter-cmpt>
+		<Teleport
+			v-for="grade in data"
+			:key="grade.uid + '_' + grade.studiensemester_kurzbz + '_' + grade.lehrveranstaltung_id"
+			:to="grade.documentslist"
+			>
+			<zeugnis-documents :data="grade" :list="config.documentslist"></zeugnis-documents>
+		</Teleport>
 	</div>`
 };
