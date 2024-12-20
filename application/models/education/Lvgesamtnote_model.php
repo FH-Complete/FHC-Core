@@ -16,9 +16,9 @@ class Lvgesamtnote_model extends DB_Model
 	/**
 	 * Laedt die Noten
 	 *
-	 * @param $lehrveranstaltung_id
-	 * @param $student_uid
-	 * @param $studiensemester_kurzbz
+	 * @param integer				$lehrveranstaltung_id
+	 * @param string				$student_uid
+	 * @param string				$studiensemester_kurzbz
 	 *
 	 * @return stdClass
 	 */

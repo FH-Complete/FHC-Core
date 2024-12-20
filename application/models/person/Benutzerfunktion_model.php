@@ -55,7 +55,7 @@ class Benutzerfunktion_model extends DB_Model
 	 *
 	 * @param string						$uid
 	 * @param string						$stdsem
-	 * @param string						(optional) $funktion_kurzbz
+	 * @param string						$funktion_kurzbz (optional)
 	 *
 	 * @return stdClass
 	 */

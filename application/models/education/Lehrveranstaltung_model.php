@@ -733,9 +733,9 @@ class Lehrveranstaltung_model extends DB_Model
 	/**
 	 * Get Lehreinheit.
 	 *
-	 * @param $student_uid
-	 * @param $studiensemester_kurzbz
-	 * @param $lehrveranstaltung_id
+	 * @param string				$student_uid
+	 * @param string				$studiensemester_kurzbz
+	 * @param integer				$lehrveranstaltung_id
 	 *
 	 * @return stdClass
 	 */

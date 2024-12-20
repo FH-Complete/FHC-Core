@@ -115,7 +115,7 @@ class Anwesenheit_model extends DB_Model
 				AND studiensemester_kurzbz = " . $this->escape($studiensemester_kurzbz) . "
 			GROUP BY
 				lehrveranstaltung_id, bezeichnung, uid, studiensemester_kurzbz
-		) nichtanwesend", "lehrveranstaltung_id,student_uid,studiensemester_kurzbz", "LEFT", false); // TODO(chris): use USING
+		) nichtanwesend", "lehrveranstaltung_id,student_uid,studiensemester_kurzbz", "LEFT", false);
 
 		$this->addGroupBy("vorname");
 		$this->addGroupBy("nachname");

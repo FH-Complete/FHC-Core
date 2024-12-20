@@ -237,6 +237,35 @@ class Config extends FHCAPI_Controller
 			]
 		] + $this->kontoColumns();
 	}
+
+	/**
+	 * Helper function to generate the default documentslist config for the
+	 * grades tab.
+	 *
+	 * The resulting array consists of elements which are associative arrays
+	 * that can have the following entries:
+	 * title			(required) on the first level this can be HTML code.
+	 * permissioncheck	(optional) an URL to an FHCAPI endpoint which returns
+	 * 						true or false.
+	 * link				(optional) an URL that will be called if "action" and
+	 * 						"children" are not defined.
+	 * action			(optional) an associative array that describes an
+	 * 						POST action that will be called if "children" is
+	 * 						not defined.
+	 * 						It can have the following entries:
+	 * - url			(required) an URL to an FHCAPI endpoint.
+	 * - post			(optional) an associative array with the POST data to
+	 * 						be sent.
+	 * - response		(optional) a string that will be displayed on success.
+	 * children			(optional) an array of child elements
+	 *
+	 * All strings that start with { and end with } in the URLs and the
+	 * actions post parameter will be replaced with the corresponding
+	 * attribute of the current dataset (e.G: {uid} will be replaced with the
+	 * uid of the current dataset)
+	 *
+	 * @return array
+	 */
 	protected function gradesDocumentsList()
 	{
 		$permissioncheck = site_url("api/frontend/v1/documents/permissionAlternativeFormat/{studiengang_kz}");

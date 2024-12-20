@@ -46,6 +46,15 @@ class Studierendenantraglehrveranstaltung_model extends DB_Model
 		}
 	}
 
+	/**
+	 * Gets all LVs for a repeating prestudent that are either not allowed or
+	 * already done.
+	 *
+	 * @param string				$prestudent_id
+	 * @param string				$studiensemester_kurzbz
+	 *
+	 * @return stdClass
+	 */
 	public function getLvsForPrestudent($prestudent_id, $studiensemester_kurzbz)
 	{
 		$this->addSelect($this->dbTable . '.*');

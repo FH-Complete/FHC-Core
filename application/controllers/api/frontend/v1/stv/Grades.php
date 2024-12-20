@@ -49,6 +49,12 @@ class Grades extends FHCAPI_Controller
 		]);
 	}
 
+	/**
+	 * List all possible grades
+	 * (Entries in lehre.tbl_note)
+	 *
+	 * @return void
+	 */
 	public function list()
 	{
 		$this->load->model('codex/Note_model', 'NoteModel');
@@ -62,6 +68,15 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess($grades);
 	}
 
+	/**
+	 * List grades for the certificate of a prestudent.
+	 * (Entries in lehre.tbl_zeugnisnote)
+	 *
+	 * @param string				$prestudent_id
+	 * @param string|null			$all (optional) If null only the current semesters grades will be loaded, otherwise all semesters grades will be loaded.
+	 *
+	 * @return void
+	 */
 	public function getCertificate($prestudent_id, $all = null)
 	{
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -88,6 +103,15 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess($grades);
 	}
 
+	/**
+	 * List grades of a prestudent that teachers gave.
+	 * (Entries in campus.tbl_lvgesamtnote)
+	 *
+	 * @param string				$prestudent_id
+	 * @param string|null			$all (optional) If null only the current semesters grades will be loaded, otherwise all semesters grades will be loaded.
+	 *
+	 * @return void
+	 */
 	public function getTeacherProposal($prestudent_id, $all = null)
 	{
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -114,6 +138,15 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess($grades);
 	}
 
+	/**
+	 * List grades of a prestudent that an assistant marked as already done
+	 * or as not allowed because of the repeating of a semester.
+	 *
+	 * @param string				$prestudent_id
+	 * @param string|null			$all (optional) If null only the current semesters grades will be loaded, otherwise all semesters grades will be loaded.
+	 *
+	 * @return void
+	 */
 	public function getRepeaterGrades($prestudent_id, $all = null)
 	{
 		$this->load->library('AntragLib');
@@ -128,6 +161,12 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess($grades);
 	}
 
+	/**
+	 * Update or Insert a grade for the certificate of a prestudent.
+	 * (Entry in lehre.tbl_zeugnisnote)
+	 *
+	 * @return void
+	 */
 	public function updateCertificate()
 	{
 		$this->load->library('form_validation');
@@ -188,6 +227,12 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess(true);
 	}
 
+	/**
+	 * Delete a grade from the certificate of a prestudent.
+	 * (Entry in lehre.tbl_zeugnisnote)
+	 *
+	 * @return void
+	 */
 	public function deleteCertificate()
 	{
 		$this->load->library('form_validation');
@@ -220,6 +265,12 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess(true);
 	}
 
+	/**
+	 * Copy a grade that teachers gave to the certificate of a prestudent.
+	 * (Entry in campus.tbl_lvgesamtnote to an entry in lehre.tbl_zeugnisnote)
+	 *
+	 * @return void
+	 */
 	public function copyTeacherProposalToCertificate()
 	{
 		$this->load->library('form_validation');
@@ -314,6 +365,13 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess(true);
 	}
 
+	/**
+	 * Copy a grade that was marked by an assistant as already done or not
+	 * allowed because of the repeating of a semester to the certificate of a
+	 * prestudent.
+	 *
+	 * @return void
+	 */
 	public function copyRepeaterGradeToCertificate()
 	{
 		$this->load->library('form_validation');
@@ -342,7 +400,6 @@ class Grades extends FHCAPI_Controller
 		$repeaterGrade = current($repeaterGrade);
 
 		// NOTE(chris): Stg Permissions
-		// TODO(chris): Are those permissions correct?
 		if (!$this->hasPermissionCopy($repeaterGrade->lehrveranstaltung_id, $repeaterGrade->student_uid))
 			return $this->_outputAuthError([$this->router->method => 'student/noten']);
 
@@ -387,6 +444,11 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess(true);
 	}
 
+	/**
+	 * Loads the grade from the points using the gradingkey
+	 *
+	 * @return void
+	 */
 	public function getGradeFromPoints()
 	{
 		$this->load->library('form_validation');
@@ -412,6 +474,18 @@ class Grades extends FHCAPI_Controller
 		$this->terminateWithSuccess($note);
 	}
 
+	/**
+	 * Helper function that adds tests for a student
+	 * (Entries in lehre.tbl_pruefung)
+	 *
+	 * @param string				$studiensemester_kurzbz
+	 * @param string				$student_uid
+	 * @param integer				$lehrveranstaltung_id
+	 * @param integer				$note
+	 * @param numeric				$punkte
+	 *
+	 * @return stdClass
+	 */
 	protected function addTestsForGrade($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $note, $punkte)
 	{
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
@@ -431,7 +505,7 @@ class Grades extends FHCAPI_Controller
 			"student_uid" => $student_uid,
 			"lehreinheit_id" => $le->lehreinheit_id,
 			"datum" => date('Y-m-d'),
-			"pruefungstyp_kurzbz" => "Termin1", // TODO(chris): const?
+			"pruefungstyp_kurzbz" => "Termin1",
 			"note" => $note
 		];
 
@@ -458,7 +532,7 @@ class Grades extends FHCAPI_Controller
 			// Wenn nicht Anwesenheitsbefreit und Anwesenheit unter einem bestimmten Prozentsatz fällt dann wird ein Pruefungsantritt abgezogen
 			if (!$anwesenheitsbefreit) {
 				$data2 = $data;
-				$data2["note"] = 7; // TODO(chris): const?
+				$data2["note"] = 7;
 				if (isset($data2["punkte"]))
 					unset($data2["punkte"]);
 
@@ -467,13 +541,21 @@ class Grades extends FHCAPI_Controller
 				if (isError($result))
 					return $result;
 
-				$data["pruefungstyp_kurzbz"] = "Termin2"; // TODO(chris): const?
+				$data["pruefungstyp_kurzbz"] = "Termin2";
 			}
 		}
 
 		return $this->LePruefungModel->insert($data);
 	}
 
+	/**
+	 * Helper function to check permissions for updateCertificate()
+	 *
+	 * @param integer				$lehrveranstaltung_id
+	 * @param string				$student_uid
+	 *
+	 * @return boolean
+	 */
 	protected function hasPermissionUpdate($lehrveranstaltung_id, $student_uid)
 	{
 		if ($lehrveranstaltung_id === null || $student_uid === null)
@@ -519,6 +601,14 @@ class Grades extends FHCAPI_Controller
 		return false;
 	}
 
+	/**
+	 * Helper function to check permissions for deleteCertificate()
+	 *
+	 * @param integer				$lehrveranstaltung_id
+	 * @param string				$student_uid
+	 *
+	 * @return boolean
+	 */
 	protected function hasPermissionDelete($lehrveranstaltung_id, $student_uid)
 	{
 		if ($lehrveranstaltung_id === null || $student_uid === null)
@@ -553,6 +643,15 @@ class Grades extends FHCAPI_Controller
 		return false;
 	}
 
+	/**
+	 * Helper function to check permissions for
+	 * copyTeacherProposalToCertificate() and copyRepeaterGradeToCertificate()
+	 *
+	 * @param integer				$lehrveranstaltung_id
+	 * @param string				$student_uid
+	 *
+	 * @return boolean
+	 */
 	protected function hasPermissionCopy($lehrveranstaltung_id, $student_uid)
 	{
 		if ($lehrveranstaltung_id === null || $student_uid === null)
