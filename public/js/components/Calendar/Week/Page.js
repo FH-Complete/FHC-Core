@@ -61,6 +61,7 @@ export default {
 			let dayTextMap ={};
 			this.days.forEach((day)=>{
 				dayTextMap[day] = {
+					heading: day.toLocaleString(this.$p.user_language_locale_identifier.value, { dateStyle: 'short' }),
 					tag: day.toLocaleString(this.$p.user_language_locale_identifier.value, { weekday: this.size < 2 ? 'narrow' : (this.size < 3 ? 'short' : 'long') }),
 					datum: day.toLocaleString(this.$p.user_language_locale_identifier.value, [{ day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { dateStyle: 'short' }][this.size]),
 				};
@@ -118,7 +119,7 @@ export default {
 		smallestTimeFrame() {
 			return [30,15,10,5][this.size];
 		}
-	},
+	}, 
 	methods: {
 		hourGridIdentifier(hour) {
 			// this is the id attribute that is responsible to scroll the calender to the first event
@@ -220,7 +221,7 @@ export default {
 	<div class="fhc-calendar-week-page">
 		<div class="d-flex flex-column">
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
-				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
+				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="dayText[day]?.heading" @click.prevent="changeToMonth(day)">
 					<div class="fw-bold">{{dayText[day]?.tag}}</div>
 					<a href="#" class="small text-secondary text-decoration-none" >{{dayText[day]?.datum}}</a>
 				</div>

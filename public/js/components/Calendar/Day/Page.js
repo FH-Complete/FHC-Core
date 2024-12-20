@@ -102,6 +102,7 @@ export default {
 		dayText(){
 			if(!this.size || !this.day)return {};
 			return {
+				heading: this.day.toLocaleString(this.$p.user_language_locale_identifier.value, { dateStyle: 'short' }),
 				tag: this.day.toLocaleString(this.$p.user_language_locale_identifier.value, { weekday: this.size < 2 ? 'narrow' : (this.size < 3 ? 'short' : 'long') }),
 				datum: this.day.toLocaleString(this.$p.user_language_locale_identifier.value, [{ day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { dateStyle: 'short' }][this.size]),
 			}
@@ -302,7 +303,7 @@ export default {
 			<div class="col-12 col-xl-6 p-0 h-100">
 				<div class="d-flex flex-column h-100">
 					<div ref="header" class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle">
-						<div type="button" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
+						<div type="button" class="flex-grow-1" :title="dayText.heading" @click.prevent="changeToMonth(day)">
 							<div class="fw-bold">{{dayText.tag}}</div>
 							<a href="#" class="small text-secondary text-decoration-none" >{{dayText.datum}}</a>
 						</div>
