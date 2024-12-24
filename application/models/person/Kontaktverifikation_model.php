@@ -29,7 +29,7 @@ class Kontaktverifikation_model extends DB_Model
 			FROM
 				public.tbl_kontakt_verifikation kv
 				JOIN public.tbl_kontakt kt USING(kontakt_id)
-				WHERE kt.person_id = ?
+			WHERE kt.person_id = ?
 				AND kt.kontakttyp = ?
 				AND kv.verifikation_code = ?
 				AND kv.erstelldatum >= NOW() - INTERVAL '".$this->escape($expiration_days)." days'

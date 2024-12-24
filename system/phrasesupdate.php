@@ -31310,18 +31310,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'onboarding',
-		'phrase' => 'registrierungVerifzierenFuer',
+		'phrase' => 'bewerbungVerifizierung',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Registrierung verifizieren für',
+				'text' => 'Verifizierung Ihrer Bewerbung',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Verify registration for',
+				'text' => 'Application verification',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31330,18 +31330,143 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'onboarding',
-		'phrase' => 'registrierungVerifzieren',
+		'phrase' => 'bewerbungVerifzieren',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Registrierung verifizieren',
+				'text' => 'Bewerbung verifizieren',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Verify registration',
+				'text' => 'Verify application',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'onboarding',
+		'phrase' => 'bewerbungVerifizierungEinleitung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wenn Ihre Daten stimmen, geben Sie bitte Ihre E-Mail Adresse ein und drücken Sie auf "Bewerbung verfifizieren".
+Danach erhalten Sie eine E-Mail mit dem Link zu Ihrer Bewerbung an die angegebene Adresse.
+Dort können Sie Studienrichtungen hinzufügen, Ihre Daten vervollständigen, und sich unverbindlich bewerben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If your data is correct, please enter your email and click "Verify application".
+We will then send you a link via e-mail to the address specified. There, you can add personal information or degree programs and submit non-binding applications.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'onboarding',
+		'phrase' => 'bewerbungVerifizierungKontakthinweis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wenn Sie mehr Informationen benötigen, steht Ihnen unsere <a href="{0}" target="_blank">Studienberatung</a> gerne persönlich, telefonisch, per E-Mail oder WhatsApp zur Verfügung.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Should you require any additional information, please do not hesitate to contact our <a href="{0}" target="_blank">student counselling team</a> in person, by phone, or via e-mail or WhatsApp.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'onboarding',
+		'phrase' => 'bewerbungVerifizierungDatenschutzhinweis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datenschutz-Hinweis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Privacy information',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'onboarding',
+		'phrase' => 'bewerbungVerifizierungDatenschutzhinweisText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die uns von Ihnen zum Zwecke der Bewerbung bekanntgegebenen Daten werden von uns ausschließlich zur Abwicklung der Bewerbung auf der Grundlage von vor- bzw vertraglichen Zwecken verarbeitet und mit der unten beschriebenen Ausnahme bei Unklarheiten betreffend die Zugangsvoraussetzungen nicht an Dritte weitergegeben.
+Kommt es zu keinem weiteren Kontakt bzw zu keiner Aufnahme, löschen wir Ihre Daten nach drei Jahren.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The data communicated to us by you for the purpose of the application will be used by us exclusively for the processing of the application on the basis of pre-contractual or contractual purposes and will not be passed on to third parties with the exception described below in case of uncertainties regarding the entry requirements.
+If there is no further contact or enrolment, your data will be deleted after three years.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'onboarding',
+		'phrase' => 'bewerbungVerifizierungInformationenDatenschutzGrundverordnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Informationen zu Ihren Betroffenenrechten finden Sie hier:',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Information on your data subject rights can be found here:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'onboarding',
+		'phrase' => 'bewerbungVerifizierungDatenschutzFragen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bei Fragen stehen wir Ihnen jederzeit unter folgender Mail zur Verfügung: ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If you have any questions, please contact us at ',
 				'description' => '',
 				'insertvon' => 'system'
 			)
