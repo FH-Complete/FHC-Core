@@ -272,8 +272,8 @@ class Config extends FHCAPI_Controller
 
 		$title_ger = $this->p->t("global", "deutsch");
 		$title_eng = $this->p->t("global", "englisch");
-		$title_ff = 'Zertifikat'; // TODO(chris): phrase
-		$title_lv = 'LV Zeugnis'; // TODO(chris): phrase
+		$title_ff = $this->p->t("stv", "document_certificate");
+		$title_lv = $this->p->t("stv", "document_coursecertificate");
 		
 		$link_ff = "documents/export/" .
 			"zertifikat.rdf.php/" .
@@ -298,7 +298,7 @@ class Config extends FHCAPI_Controller
 			"&lvid={lehrveranstaltung_id}";
 
 		$archive_url = "api/frontend/v1/documents/archiveSigned";
-		$archive_response = $this->p->t("stv", "document_signed_and_archived"); // TODO(chris): phrase
+		$archive_response = $this->p->t("stv", "document_signed_and_archived");
 		$archive_post_ff = [
 			"xml" => "zertifikat.rdf.php",
 			"xsl" => "Zertifikat",
@@ -326,7 +326,7 @@ class Config extends FHCAPI_Controller
 
 		$list = [
 			[
-				'title' => '<i class="fa fa-download" title="Download"></i>', // TODO(chris): phrase
+				'title' => '<i class="fa fa-download" title="' . $this->p->t("stv", "document_download") . '"></i>',
 				'children' => [
 					[
 						'title' => $title_ff,
@@ -382,7 +382,7 @@ class Config extends FHCAPI_Controller
 				]
 			],
 			[
-				'title' => '<i class="fas fa-archive" title="Archivieren"></i>', // TODO(chris): phrase
+				'title' => '<i class="fas fa-archive" title="' . $this->p->t("stv", "document_archive") . '"></i>',
 				'children' => [
 					[
 						'title' => $title_ff,

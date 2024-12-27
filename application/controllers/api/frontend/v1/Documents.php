@@ -45,6 +45,11 @@ class Documents extends FHCAPI_Controller
 			'archive' => ['admin:rw', 'assistenz:rw'],
 			'archiveSigned' => ['admin:rw', 'assistenz:rw']
 		]);
+
+		// Load Phrases
+		$this->loadPhrases([
+			'stv'
+		]);
 	}
 
 	/**
@@ -177,7 +182,7 @@ class Documents extends FHCAPI_Controller
 				$result = $this->PrestudentstatusModel->getLastStatus($student->prestudent_id, $ss);
 				$status = current($this->getDataOrTerminateWithError($result));
 				if (!$status)
-					$this->terminateWithError('StudentIn hat keinen Status in diesem Semester'); // TODO(chris): phrase
+					$this->terminateWithError($this->p->t("stv", "grades_error_prestudentstatus"));
 				$semester = $status->ausbildungssemester;
 
 				$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
@@ -388,10 +393,10 @@ class Documents extends FHCAPI_Controller
 		}
 
 		if (!$vorlage->archivierbar)
-			$this->terminateWithError('Dieses Dokument ist nicht archivierbar'); // TODO(chris): phrase
+			$this->terminateWithError($this->p->t("stv", "grades_error_archive"));
 		
 		if ($sign_user && !$vorlage->signierbar)
-			$this->terminateWithError('Diese Vorlage darf nicht signiert werden'); // TODO(chris): phrase
+			$this->terminateWithError($this->p->t("stv", "grades_error_sign"));
 
 		
 		$this->load->library('DocumentExportLib');

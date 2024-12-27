@@ -48,7 +48,7 @@ export default {
 
 			let gradeField = {
 				field: 'note',
-				title: 'Note',
+				title: this.$p.t('lehre/note'),
 				formatter: cell => cell.getData().note_bezeichnung,
 				tooltip: (evt, cell) => cell.getData().note_bezeichnung
 			};
@@ -66,7 +66,7 @@ export default {
 					listPromise
 						// get bezeichnung
 						.then(list => list.find(el => el.value == note))
-						.then(found => found ? found.label : Promise.reject({message: 'not found'}))
+						.then(found => found ? found.label : Promise.reject({message: 'grade ' + note + ' not found in list'}))
 						// prepare data object
 						.then(note_bezeichnung => ({
 							lehrveranstaltung_id,
@@ -80,13 +80,13 @@ export default {
 						// get bezeichnung again
 						.then(() => listPromise)
 						.then(list => list.find(el => el.value == note))
-						.then(found => found ? found.label : Promise.reject({message: 'not found'}))
+						.then(found => found?.label)
 						// update other fields in row
 						.then(note_bezeichnung => cell.getRow().update({note_bezeichnung}))
 						.then(() => cell.getRow().reformat())
 						// cleanup
 						.then(cell.clearEdited)
-						.then(() => this.$fhcAlert.alertSuccess('updated')) // TODO(chris): phrase
+						.then(() => this.$fhcAlert.alertSuccess(this.$p.t('stv/grades_updated')))
 						.catch(err => {
 							cell.restoreOldValue();
 							cell.clearEdited();
@@ -120,29 +120,32 @@ export default {
 						valuesLookup: (cell, filterTerm) => listPromise
 					};
 				}
-				gradeField.editorParams.placeholderLoading = "Loading Remote Data..." // TODO(chris): phrase
+				const node = document.createElement('span');
+				this.$p.loadCategory('stv')
+					.then(() => node.innerText = this.$p.t('ui/loading'))
+					.catch(this.$fhcAlert.handleSystemError);
+				gradeField.editorParams.placeholderLoading = node;
 			}
 
 			const columns = [
-				{ field: 'zeugnis', title: 'Zeugnis', formatter: 'tickCross' },
-				{ field: 'lehrveranstaltung_bezeichnung', title: 'Lehrveranstaltung' },
+				{ field: 'zeugnis', title: this.$p.t('stv/grades_zeugnis'), formatter: 'tickCross' },
+				{ field: 'lehrveranstaltung_bezeichnung', title: this.$p.t('lehre/lehrveranstaltung') },
 				gradeField,
-				{ field: 'uebernahmedatum', title: 'Übernahmedatum', visible: false },
-				{ field: 'benotungsdatum', title: 'Benotungsdatum', visible: false },
-				{ field: 'benotungsdatum-iso', title: 'Benotungsdatum ISO', visible: false },
-				{ field: 'studiensemester_kurzbz', title: 'Studiensemester', visible: false },
-				{ field: 'note_number', title: 'Note Numerisch', visible: false, formatter: cell => cell.getData().note, tooltip: (evt, cell) => cell.getData().note },
-				{ field: 'lehrveranstaltung_id', title: 'Lehrveranstaltung ID', visible: false },
-				{ field: 'studiengang', title: 'Studiengang', visible: false },
-				{ field: 'studiengang_kz', title: 'Studiengang Kennzahl', visible: false },
-				{ field: 'studiengang_lv', title: 'StudiengangLV', visible: false },
-				{ field: 'studiengang_kz_lv', title: 'Studiengang_kzLV', visible: false },
-				{ field: 'semester_lv', title: 'SemesterLV', visible: false },
-				{ field: 'ects_lv', title: 'ECTS', visible: false },
-				{ field: 'lehrform', title: 'Lehrform', visible: false },
-				{ field: 'kurzbz', title: 'Kurzbz', visible: false },
-				{ field: 'punkte', title: 'Punkte', visible: false },
-				{ field: 'lehrveranstaltung_bezeichnung_english', title: 'Englisch', visible: false }
+				{ field: 'uebernahmedatum', title: this.$p.t('stv/grades_takeoverdate'), visible: false },
+				{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false },
+				{ field: 'studiensemester_kurzbz', title: this.$p.t('lehre/studiensemester'), visible: false },
+				{ field: 'note_number', title: this.$p.t('stv/grades_numericgrade'), visible: false, formatter: cell => cell.getData().note, tooltip: (evt, cell) => cell.getData().note },
+				{ field: 'lehrveranstaltung_id', title: this.$p.t('lehre/lehrveranstaltung_id'), visible: false },
+				{ field: 'studiengang', title: this.$p.t('lehre/studiengang'), visible: false },
+				{ field: 'studiengang_kz', title: this.$p.t('lehre/studiengangskennzahlLehre'), visible: false },
+				{ field: 'studiengang_lv', title: this.$p.t('stv/grades_studiengang_lv'), visible: false },
+				{ field: 'studiengang_kz_lv', title: this.$p.t('stv/grades_studiengang_kz_lv'), visible: false },
+				{ field: 'semester_lv', title: this.$p.t('stv/grades_semester_lv'), visible: false },
+				{ field: 'ects_lv', title: this.$p.t('lehre/ects'), visible: false },
+				{ field: 'lehrform', title: this.$p.t('lehre/lehrform'), visible: false },
+				{ field: 'kurzbz', title: this.$p.t('lehre/kurzbz'), visible: false },
+				{ field: 'punkte', title: this.$p.t('stv/grades_points'), visible: false },
+				{ field: 'lehrveranstaltung_bezeichnung_english', title: this.$p.t('stv/grades_lehrveranstaltung_bezeichnung_english'), visible: false }
 			];
 
 			const hasDocuments = ['both', 'inline'].includes(this.config.documents);
@@ -151,7 +154,7 @@ export default {
 			if (hasDocuments || hasDelete) {
 				columns.push({
 					field: 'actions',
-					title: 'Actions',
+					title: this.$p.t('global/actions'),
 					cssClass: "overflow-visible",
 					headerSort: false,
 					formatter: cell => {
@@ -221,7 +224,7 @@ export default {
 			this.$fhcApi.factory
 				.stv.grades.updateCertificate(data)
 				.then(this.$refs.table.reloadTable)
-				.then(() => this.$fhcAlert.alertSuccess('updated')) // TODO(chris): phrase
+				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('stv/grades_updated')))
 				.catch(this.$fhcAlert.handleFormValidation);
 		},
 		deleteGrade(data) {
@@ -235,12 +238,18 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
-	// TODO(chris): phrasen (title)
+	created() {
+		this.$p.loadCategory(['global', 'stv', 'lehre'])
+			.then(() => {
+				if (this.$refs.table.tableBuilt)
+					this.$refs.table.tabulator.columnManager.setColumns(this.tabulatorOptions.columns);
+			});
+	},
 	template: `
 	<div class="stv-details-noten-zeugnis h-100 d-flex flex-column">
 		<core-filter-cmpt
 			ref="table"
-			title="Certificate"
+			:title="$p.t('stv/grades_title_zeugnis')"
 			:tabulator-options="tabulatorOptions"
 			:tabulator-events="tabulatorEvents"
 			table-only

@@ -85,7 +85,6 @@ export default {
 		<template v-for="(item, i) in filteredList" :key="i">
 			<button
 				type="button"
-				label="Toggle"
 				@click="evt => $refs.menu[i].toggle(evt)"
 				aria-haspopup="true"
 				class="btn btn-outline-secondary dropdown-toggle"

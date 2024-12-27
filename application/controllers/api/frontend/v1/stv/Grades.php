@@ -44,6 +44,7 @@ class Grades extends FHCAPI_Controller
 
 		// Load Phrases
 		$this->loadPhrases([
+			'stv',
 			'person',
 			'lehre'
 		]);
@@ -327,7 +328,7 @@ class Grades extends FHCAPI_Controller
 			$certificateGrade = current($certificateGrade);
 			
 			if (!$certificateGrade->lkt_ueberschreibbar)
-				$this->terminateWithError("Nicht überschreibbar"); // TODO(chris): phrase
+				$this->terminateWithError($this->p->t("stv", "grades_error_overwrite"));
 
 			// NOTE(chris): update
 			$data['updateamum'] = $data['uebernahmedatum'];
@@ -376,7 +377,7 @@ class Grades extends FHCAPI_Controller
 	{
 		$this->load->library('form_validation');
 	
-		$this->form_validation->set_rules("studierendenantrag_lehrveranstaltung_id", "", "required|integer"); // TODO(chris): phrase
+		$this->form_validation->set_rules("studierendenantrag_lehrveranstaltung_id", "studierendenantrag_lehrveranstaltung_id", "required|integer");
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -454,7 +455,7 @@ class Grades extends FHCAPI_Controller
 		$this->load->library('form_validation');
 	
 		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrveranstaltung'), "required|integer");
-		$this->form_validation->set_rules("points", "Punkte", "required|numeric"); // TODO(chris): phrase
+		$this->form_validation->set_rules("points", $this->p->t("stv", "grades_points"), "required|numeric");
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -496,7 +497,7 @@ class Grades extends FHCAPI_Controller
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error('Fehler beim Ermitteln der Lehreinheit ID'); // TODO(chris): phrase
+			return error($this->p->t("stv", "grades_error_lehreinheit_id"));
 		$le = current(getData($result));
 
 		// Prepare

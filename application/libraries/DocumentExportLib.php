@@ -87,6 +87,9 @@ class DocumentExportLib
 		// Gets CI instance
 		$this->ci =& get_instance();
 
+		// Load Phrases
+		$this->ci->load->library('PhrasesLib', ['document_export', null], 'documentExportPhrases');
+
 		// Which document converter has to be used
 		if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
 		{
@@ -104,10 +107,10 @@ class DocumentExportLib
 					$this->unoconv_version = $hlp[1];
 				}
 				else
-					show_error('Could not get Unoconv Version'); // TODO(chris): phrase
+					show_error($this->ci->documentExportPhrases->t("document_export", "error_unoconv_version"));
 			}
 			else
-				show_error('Unoconv not found - Please install Unoconv'); // TODO(chris): phrase
+				show_error($this->ci->documentExportPhrases->t("document_export", "error_unoconv"));
 		}
 	}
 
@@ -169,7 +172,11 @@ class DocumentExportLib
 		$xml_data = new DOMDocument;
 
 		if (!$xml_data->load($xml_url))
-			return error('unable to load xml: ' . $xml_url . ' XML:' . $xml . ' PARAMs:' . $params); // TODO(chris): phrase
+			return error($this->ci->documentExportPhrases->t("document_export", "error_xml_load", [
+				"url" => $xml_url,
+				"xml" => $xml,
+				"params" => $params
+			]));
 
 		return success($xml_data);
 	}
@@ -249,7 +256,7 @@ class DocumentExportLib
 		$fsize = filesize($temp_filename);
 		$handle = fopen($temp_filename, 'r');
 		if (!$handle)
-			return error('load failed'); // TODO(chris): phrase
+			return error($this->ci->documentExportPhrases->t("document_export", "error_file_load"));
 		$result = fread($handle, $fsize);
 		fclose($handle);
 
@@ -311,12 +318,12 @@ class DocumentExportLib
 		$handle = fopen($temp_filename, 'r');
 		if (!$handle) {
 			$this->close($temp_folder, $source_folder);
-			exit('load failed'); // TODO(chris): phrase
+			exit($this->ci->documentExportPhrases->t("document_export", "error_file_load"));
 		}
 
 		if (headers_sent()) {
 			$this->close($temp_folder, $source_folder);
-			exit('Header wurden bereits gesendet -> Abbruch'); // TODO(chris): phrase
+			exit($this->ci->documentExportPhrases->t("document_export", "error_headers"));
 		}
 
 		switch ($outputformat) {
@@ -339,7 +346,7 @@ class DocumentExportLib
 				break;
 			default:
 				$this->close($temp_folder, $source_folder);
-				exit('Outputformat is not defined'); // TODO(chris): phrase
+				exit($this->ci->documentExportPhrases->t("document_export", "error_outputformat_missing"));
 		}
 
 		while (!feof($handle)) {
@@ -386,7 +393,7 @@ class DocumentExportLib
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error('no vorlage found'); // TODO(chris): phrase
+			return error($this->ci->documentExportPhrases->t("document_export", "error_template_missing"));
 		$vorlage_stg = current(getData($result));
 		foreach ($vorlage_stg as $k => $v)
 			$vorlage->$k = $v;
@@ -426,7 +433,7 @@ class DocumentExportLib
 	{
 		$content_xsl = new DOMDocument();
 		if (!$content_xsl->loadXML($vorlage->text))
-			return error('unable to load xsl'); // TODO(chris): phrase
+			return error($this->ci->documentExportPhrases->t("document_export", "error_xsl_load"));
 
 		$proc = new XSLTProcessor();
 		$proc->importStyleSheet($content_xsl);
@@ -442,7 +449,7 @@ class DocumentExportLib
 		if ($vorlage->style) {
 			$styles_xsl = new DOMDocument();
 			if (!$styles_xsl->loadXML($vorlage->style))
-				return error('unable to load styles xsl'); // TODO(chris): phrase
+				return error($this->ci->documentExportPhrases->t("document_export", "error_styles_load"));
 			$style_proc = new XSLTProcessor();
 			$style_proc->importStyleSheet($styles_xsl);
 
@@ -470,7 +477,7 @@ class DocumentExportLib
 		$tempname_zip = $temp_folder . '/out.zip';
 
 		if (!copy($zipfile, $tempname_zip))
-			return error('copy failed'); // TODO(chris): phrase
+			return error($this->ci->documentExportPhrases->t("document_export", "error_file_copy"));
 
 		exec("zip $tempname_zip content.xml");
 		if (!is_null($styles_xsl))
@@ -490,7 +497,7 @@ class DocumentExportLib
 
 			$manifest_xml = new DOMDocument;
 			if (!$manifest_xml->loadXML($manifest))
-				return error('Manifest File ungueltig'); // TODO(chris): phrase
+				return error($this->ci->documentExportPhrases->t("document_export", "error_manifest"));
 
 			//root-node holen
 			$root = $manifest_xml->getElementsByTagName('manifest')->item(0);
@@ -547,11 +554,8 @@ class DocumentExportLib
 					exec($command, $out, $ret);
 				}
 
-				if ($ret) {
-					return error('Dokumentenkonvertierung ist derzeit nicht' .
-						' möglich. Bitte versuchen Sie es in einer Minute' .
-						' erneut oder kontaktieren Sie einen Administrator'); // TODO(chris): phrase
-				}
+				if ($ret)
+					return error($this->ci->documentExportPhrases->t("document_export", "error_conv_timeout"));
 				break;
 			case 'odt':
 			default:
@@ -576,7 +580,7 @@ class DocumentExportLib
 	protected function sign($temp_folder, $temp_filename, $outputformat, $user, $profile)
 	{
 		if ($outputformat != 'pdf')
-			return error('Derzeit koennen nur PDFs signiert werden'); // TODO(chris): phrase
+			return error($this->ci->documentExportPhrases->t("document_export", "error_sign_pdf"));
 
 		// Load the File
 		$file_data = file_get_contents($temp_filename);
@@ -618,7 +622,7 @@ class DocumentExportLib
 		$result = curl_exec($ch);
 		if (curl_errno($ch)) {
 			curl_close($ch);
-			return error('Signaturserver ist derzeit nicht erreichbar'); // TODO(chris): phrase
+			return error($this->ci->documentExportPhrases->t("document_export", "error_sign_timeout"));
 		}
 		curl_close($ch);
 		$resultdata = json_decode($result);
@@ -631,7 +635,7 @@ class DocumentExportLib
 		}
 
 		// otherwise if it is an error
-		return error($resultdata->retval ?? 'Unknown Error:' . $result); // TODO(chris): phrase
+		return error($resultdata->retval ?? $this->ci->documentExportPhrases->t("global", "unknown_error", ["error" => $result]));
 	}
 
 	/**

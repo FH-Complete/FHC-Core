@@ -38,13 +38,12 @@ export default {
 		const savedPath = window.localStorage.getItem(LOCAL_STORAGE_ID);
 		this.stdsem = savedPath || '';
 	},
-	// TODO(chris): phrasen
 	template: `
 	<div class="stv-details-noten d-flex flex-column overflow-hidden">
 		<div class="mb-3">
 			<select class="form-select" v-model="stdsem" @input="saveStdsem">
-				<option value="">Aktuelles Semester</option>
-				<option value="true">Alle Semester</option>
+				<option value="">$p.t('ui/current_semester')</option>
+				<option value="true">$p.t('ui/all_semester')</option>
 			</select>
 		</div>
 		<div class="row">

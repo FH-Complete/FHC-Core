@@ -37,6 +37,11 @@ class Documents extends Auth_Controller
 			'export' => self::PERM_LOGGED,
 			'exportSigned' => self::PERM_LOGGED
 		]);
+
+		// Load Phrases
+		$this->loadPhrases([
+			'stv'
+		]);
 	}
 
 	/**
@@ -227,7 +232,7 @@ class Documents extends Auth_Controller
 		
 		$vorlage = current(getData($result));
 		if ($sign_user && !$vorlage->signierbar)
-			return show_error('Diese Vorlage darf nicht signiert werden'); // TODO(chris): phrase
+			return show_error($this->p->t("stv", "grades_error_sign"));
 
 		
 		// Filename

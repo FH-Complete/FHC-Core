@@ -32,18 +32,17 @@ export default {
 				ajaxResponse: (url, params, response) => {
 					return response.data || [];
 				},
-				// TODO(chris): phrasen
 				columns: [
-					{ field: 'lehrveranstaltung_bezeichnung', title: 'Lehrveranstaltung' },
-					{ field: 'note_bezeichnung', title: 'Note' },
-					{ field: 'mitarbeiter_uid', title: 'MitarbeiterInUID', visible: false },
-					{ field: 'benotungsdatum', title: 'Benotungsdatum', visible: false },
-					{ field: 'freigabedatum', title: 'Freigabedatum', visible: false },
-					{ field: 'studiensemester_kurzbz', title: 'Studiensemester', visible: false },
-					{ field: 'note', title: 'Note', visible: false },
-					{ field: 'student_uid', title: 'StudentInUID', visible: false },
-					{ field: 'lehrveranstaltung_id', title: 'Lehrveranstaltung ID', visible: false },
-					{ field: 'punkte', title: 'Punkte', visible: false }
+					{ field: 'lehrveranstaltung_bezeichnung', title: this.$p.t('lehre/lehrveranstaltung') },
+					{ field: 'note_bezeichnung', title: this.$p.t('lehre/note') },
+					{ field: 'mitarbeiter_uid', title: this.$p.t('profil/mitarbeiterIn'), visible: false },
+					{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false },
+					{ field: 'freigabedatum', title: this.$p.t('stv/grades_approvaldate'), visible: false },
+					{ field: 'studiensemester_kurzbz', title: this.$p.t('lehre/studiensemester'), visible: false },
+					{ field: 'note', title: this.$p.t('stv/grades_numericgrade'), visible: false },
+					{ field: 'student_uid', title: this.$p.t('profil/studentIn'), visible: false },
+					{ field: 'lehrveranstaltung_id', title: this.$p.t('lehre/lehrveranstaltung_id'), visible: false },
+					{ field: 'punkte', title: this.$p.t('stv/grades_points'), visible: false }
 				],
 				layout: 'fitDataStretch',
 				height: '100%',
@@ -74,19 +73,24 @@ export default {
 				.allSettled(promises)
 				.then(results => {
 					if (results.some(res => res.status == "fulfilled")) {
-						// TODO(chris): phrase
-						this.$fhcAlert.alertSuccess("updated");
+						this.$fhcAlert.alertSuccess(this.$p.t('stv/grades_updated'));
 						this.$emit('copied');
 					}
 				});
 		}
 	},
+	created() {
+		this.$p.loadCategory(['stv', 'lehre', 'profil'])
+			.then(() => {
+				if (this.$refs.table.tableBuilt)
+					this.$refs.table.tabulator.columnManager.setColumns(this.tabulatorOptions.columns);
+			});
+	},
 	template: `
 	<div class="stv-details-noten-teacher d-flex flex-column">
-		<!-- TODO(chris): phrase -->
 		<core-filter-cmpt
 			ref="table"
-			title="Teacher Proposals"
+			:title="$p.t('stv/grades_title_teacher')"
 			:tabulator-options="tabulatorOptions"
 			:tabulator-events="tabulatorEvents"
 			table-only
@@ -95,8 +99,7 @@ export default {
 			>
 			<template #actions="{selected}">
 				<button class="btn btn-primary" :disabled="!selected.length" @click="copyGrades(selected)">
-					<!-- TODO(chris): phrase -->
-					<i class="fa-solid fa-arrow-left"></i> copy
+					<i class="fa-solid fa-arrow-left"></i> {{ $p.t('stv/grades_action_copy') }}
 				</button>
 			</template>
 		</core-filter-cmpt>

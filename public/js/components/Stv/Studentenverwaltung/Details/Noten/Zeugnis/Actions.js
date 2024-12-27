@@ -53,7 +53,7 @@ export default {
 		},
 		currentLabel() {
 			if (this.current == '')
-				return 'Note setzen'; // TODO(chris): phrase
+				return this.$p.t('stv/grades_setgrade');
 			return this.grades.find(grade => grade.note === this.current)?.bezeichnung || '';
 		}
 	},
@@ -91,7 +91,6 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	// TODO(chris): phrases (option"")
 	template: `
 	<div class="stv-details-noten-zeugnis-actions d-flex gap-2">
 		<template v-if="['both', 'header'].includes(config.edit)">
@@ -115,7 +114,7 @@ export default {
 				</form-input>
 			</core-form>
 			<select v-else class="form-select" v-model="current" :disabled="!selected.length">
-				<option value="" disabled>Note setzen</option>
+				<option value="" disabled>{{ $p.t('stv/grades_setgrade') }}</option>
 				<option v-for="grade in grades" :key="grade.note" :value="grade.note">{{ grade.bezeichnung }}</option>
 			</select>
 		</template>
