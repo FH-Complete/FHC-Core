@@ -39,6 +39,12 @@ export default {
 		}
 	},
 	computed: {
+		is_organisatorische_einheit(){
+			return this.menu == "organisatorische_einheit";
+		},
+		emptyMenu(){
+			return !this.menu || !Array.isArray(this.menu) || Array.isArray(this.menu) && this.menu.length == 0;
+		},
 		bodyStyle() {return {};
 			const bodyStyle = {};
 			if (this.farbe)
@@ -53,6 +59,17 @@ export default {
 		},
 	},
 	methods: {
+		fetchMenu(lehrveranstaltung_id = this.lehrveranstaltung_id, studien_semester = this.studien_semester){
+			return this.$fhcApi.factory.addons.getLvMenu(lehrveranstaltung_id, studien_semester)
+				.then(res => {
+					this.menu = res.data;
+				})
+				.catch((error) => {
+					this.$fhcAlert.handleSystemError(error);
+					this.menu = [];
+				});
+		},
+
 		c4_link(menuItem) {
 			if (!menuItem) return null;
 			if (Array.isArray(menuItem.c4_moodle_links) && menuItem.c4_moodle_links.length) {
@@ -103,11 +120,7 @@ export default {
 	},
 	watch:{
 		studien_semester(newValue){
-			this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, newValue)
-				.then(res => {
-					this.menu = res.data;
-				})
-				.catch((error) => this.$fhcAlert.handleSystemError);	
+			this.fetchMenu(this.lehrveranstaltung_id, newValue);
 		}
 	},
 	created(){
@@ -119,14 +132,7 @@ export default {
 		
 	},
 	mounted() {
-		this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, this.studien_semester)
-			.then(res => {
-				this.menu = res.data;
-			})
-			.catch((error) => {
-				this.$fhcAlert.handleSystemError(error);
-				this.menu = [];
-			});
+		this.fetchMenu(this.lehrveranstaltung_id, this.studien_semester);
 	},
 	template: /*html*/`<div class="mylv-semester-studiengang-lv card">
 		<lv-uebersicht ref="lvUebersicht" :preselectedMenu="preselectedMenuItem" :event="{
@@ -136,11 +142,12 @@ export default {
 			stg_kurzbzlang:studien_semester,
 		}"/>
 
-		<div class="card-header">
+		<div class="p-2" :class="is_organisatorische_einheit?'':'card-header'">
 			<!-- {{module}} if the module of the lv is important then query the module from the api endpoint for LV-->
-			<h6 class="card-title">{{bezeichnung}}</h6>
+			<h6 class="fw-bold" v-if="is_organisatorische_einheit" >Organisatorische Einheit:</h6>
+			<h6 class="mb-0">{{bezeichnung}}</h6>
 		</div>
-		<div class="card-body " :style="bodyStyle">
+		<div v-if="!emptyMenu" class="card-body " :style="bodyStyle">
 			<template v-if="menu">
 				<ul class="list-group border-top-0 border-bottom-0 rounded-0">
 					<li :type="menuItem.c4_link ? 'button' : null" v-for="menuItem in menu" class="list-group-item border-0 " >
@@ -164,7 +171,7 @@ export default {
 				</div>
 			</template>
 		</div>
-		<div class="card-footer">
+		<div v-if="!emptyMenu" class="card-footer">
 			<div class="row">
 				<template v-if="LvHasPruefungenInformation">
 					<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">

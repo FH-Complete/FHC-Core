@@ -58,6 +58,22 @@ class LvMenu extends FHCAPI_Controller
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
+
+	/**
+	 * alternative function to get multiple lvMenus with a single http request
+	 */
+	public function getMultipleLvMenu($lvMenuOptionList){
+		$result =[];
+		foreach($lvMenuOptionList as $lvMenuOptions){
+			$lvMenu = $this->getLvMenu($lvMenuOptions['lvid'],$lvMenuOptions['studiensemester_kurzbz']);
+			if(isError($lvMenu)){
+				// TODO: some lvMenu threw an error, handle error here
+			}
+			$result[$lvMenuOptions['lvid']]=$lvMenu;
+		}
+		$this->terminateWithSuccess($result);
+	}
+
 	/**
 	 * 
 	 */
@@ -91,20 +107,24 @@ class LvMenu extends FHCAPI_Controller
 		$lvres = $this->Lehrveranstaltung_model->load($lvid);
 		if(!hasData($lvres)) 
 		{
-		    $this->terminateWithError('LV ' . $lvid . ' not found.');
+			$this->terminateWithError('LV ' . $lvid . ' not found.');
 		}
 		$lv = (getData($lvres))[0];
-
+		$this->addMeta('lvInfo',$lv);
 		// define studiengang_kz / semester / lehrverzeichnis
 		$studiengang_kz = $lv->studiengang_kz;
 		$semester = $lv->semester;
 		$short = $lv->lehreverzeichnis;
+		// return empty menu for studiengang_kz = 0
+		if($studiengang_kz == 0){
+			$this->terminateWithSuccess("organisatorische_einheit");
+		}
 
 		// load studiengang
-		$stgres = $this->Studiengang_model->load($lv->studiengang_kz);
+		$stgres = $this->Studiengang_model->load(strval($studiengang_kz));
 		if(!hasData($stgres))
 		{
-		    $this->terminateWithError('Stg ' . $lv->studiengang_kz . ' nof found.');
+		    $this->terminateWithError('Stg ' . $lv->studiengang_kz . ' not found.');
 		}
 		$stg = (getData($stgres))[0];
 		$kurzbz = strtoupper($stg->typ . $stg->kurzbz);
