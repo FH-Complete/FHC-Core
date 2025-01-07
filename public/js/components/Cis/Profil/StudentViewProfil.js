@@ -69,11 +69,12 @@ export default {
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
-              <div  class="d-md-none col-12 ">
+              <!-- uncomment when implemented
+			  <div  class="d-md-none col-12 ">
              
              <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
 
-              </div>
+              </div>-->
               <!-- END OF HIDDEN QUCK LINKS -->
 
               <!-- MAIN PANNEL -->
@@ -148,13 +149,15 @@ export default {
 
               <!-- START OF THE FIRDT ROW IN THE SIDE PANEL -->
               <!-- THESE QUCK LINKS ARE ONLY VISIBLE UNTIL VIEWPORT MD -->
-                <div  class="row d-none d-md-block mb-3">
+                
+			  <!--TODO: uncomment when implemented
+				<div  class="row d-none d-md-block mb-3">
                   <div class="col">
                  
                    <quick-links :title="$p.t('profil','quickLinks')"></quick-links>
 
                   </div>
-                </div>
+                </div>-->
 
                 <!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
                 <div  class="row">
