@@ -89,6 +89,8 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 {
 	$user_language = getUserLanguage();
 
+	// default locale
+	//user_locale: "'.Locale::DEFAULT_LOCALE.'",
 	$toPrint = "\n";
 	$toPrint .= '<script type="text/javascript">';
 	$toPrint .= '
@@ -97,7 +99,8 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 			ci_router: "'.$indexPage.'",
 			called_path: "'.$calledPath.'",
 			called_method: "'.$calledMethod.'",
-			user_language: "'.$user_language.'"
+			user_language: "'.$user_language.'",
+			timezone: "'.date_default_timezone_get().'",
 		};';
 	$toPrint .= "\n";
 	$toPrint .= '</script>';
