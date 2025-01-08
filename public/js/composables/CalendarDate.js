@@ -118,13 +118,24 @@ class CalendarDate {
 		return (new CalendarDate(this.y+1,0,this.weekStart == 1 ? -3 : 0)).w;
 	}
 	set(y,m,d,noClean) {
+
 		if (y !== undefined && (m === undefined || m === true) && d === undefined) {
-			if (Object.prototype.toString.call(y) === '[object Date]')
+			if (this.#isDate(y))
+			{
+				// set year/month/day from date object
 				return this.set(y.getFullYear(), y.getMonth(), y.getDate(), m);
+			}
 			if (y.y !== undefined && y.m !== undefined && y.d !== undefined)
+			{
+				// set year/month/day from CalendarDate object
 				return this.set(y.y, y.m, y.d, m);
+			}
 		}
-		[this._y,this._m,this._d] = [y || 0, m || 0, d || 0];
+		// initialize year/month/day
+		this._y = y ?? 0;
+		this._m = m ?? 0;
+		this._d = d ?? 0;
+		
 		if (!noClean)
 			this._clean();
 	}
@@ -137,7 +148,7 @@ class CalendarDate {
 		return (new Date(this._y, this._m, this._d)).toLocaleString(lang, options);
 	}
 	compare(d) {
-		if (Object.prototype.toString.call(d) === '[object Date]')
+		if (this.#isDate(d))
 			return (this.y === d.getFullYear() && this.m === d.getMonth() && this.d === d.getDate());
 		return (this.y === d.y && this.m === d.m && this.d === d.d);
 	}
@@ -157,6 +168,10 @@ class CalendarDate {
 	setLocale(locale) {
 		this.weekStart = CalendarDate.getWeekStart(locale);
 	}
+	// private method that checks if the parameter is of type Date
+	#isDate(obj){
+		return Object.prototype.toString.call(obj) === '[object Date]';
+	}
 }
 /**
  * Returns the weekday number (Date.getDay()) on which the week starts depending on the locale.
@@ -169,19 +184,37 @@ class CalendarDate {
  * @return integer
  */
 CalendarDate.getWeekStart = function(locale) {
+
 	locale = locale || navigator.language;
 	const parts = locale.match(/^([a-z]{2,3})(?:-([a-z]{3})(?=$|-))?(?:-([a-z]{4})(?=$|-))?(?:-([a-z]{2}|\d{3})(?=$|-))?/i);
-	const regionSat = 'AEAFBHDJDZEGIQIRJOKWLYOMQASDSY'.match(/../g);
-	const regionSun = 'AGARASAUBDBRBSBTBWBZCACNCODMDOETGTGUHKHNIDILINJMJPKEKHKRLAMHMMMOMTMXMZNINPPAPEPHPKPRPTPYSASGSVTHTTTWUMUSVEVIWSYEZAZW'.match(/../g);
-	const languageSat = ['ar','arq','arz','fa'];
-	const languageSun = 'amasbndzengnguhehiidjajvkmknkolomhmlmrmtmyneomorpapssdsmsnsutatethtnurzhzu'.match(/../g);
 
-	return (
-		parts[4] ? (
-			regionSun.includes(parts[4]) ? 0 :
-			regionSat.includes(parts[4]) ? 6 : 1) : (
-			languageSun.includes(parts[1]) ? 0 :
-			languageSat.includes(parts[1]) ? 6 : 1));
+	const region_code = parts[1];
+	const region_starting_Sat = 'AEAFBHDJDZEGIQIRJOKWLYOMQASDSY'.match(/../g);
+	const region_starting_Sun = 'AGARASAUBDBRBSBTBWBZCACNCODMDOETGTGUHKHNIDILINJMJPKEKHKRLAMHMMMOMTMXMZNINPPAPEPHPKPRPTPYSASGSVTHTTTWUMUSVEVIWSYEZAZW'.match(/../g);
+
+	const language_code = parts[4];
+	const language_starting_Sat = ['ar','arq','arz','fa'];
+	const language_starting_Sun = 'amasbndzengnguhehiidjajvkmknkolomhmlmrmtmyneomorpapssdsmsnsutatethtnurzhzu'.match(/../g);
+
+	if (language_code){
+		if (language_starting_Sun.includes(language_code))
+			return 0;
+		else if (language_starting_Sat.includes(language_code))
+			return 6;
+		else
+			return 1;
+	}
+	else if(region_code)
+	{
+		if (region_starting_Sun.includes(region_code))
+			return 0;
+		else if (region_starting_Sat.includes(region_code)) 
+			return 6;
+		else
+			return 1;
+	}
+	else
+		return 1;
 }
 
 
