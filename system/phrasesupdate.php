@@ -31622,13 +31622,13 @@ If there is no further contact or enrolment, your data will be deleted after thr
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Da ist etwas schief gelaufen. Wir bitten um Entschuldigung.',
+				'text' => 'Es ist ein Fehler bei der Registrierung aufgetreten.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Sorry, something went wrong.',
+				'text' => 'An error occured during registration.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
