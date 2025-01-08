@@ -17,7 +17,7 @@ export default {
 			return this.focusDate.format({year: 'numeric'});
 		},
 		months() {
-			return this.monthIndices.map(i => (new Date(0, i, 1)).toLocaleString(this.$p.user_language_locale_identifier.value, {month: this.size < 2 ? 'short' : 'long'}));
+			return this.monthIndices.map(i => (new Date(0, i, 1)).toLocaleString(this.$p.user_locale.value, {month: this.size < 2 ? 'short' : 'long'}));
 		}
 	},
 	template: `

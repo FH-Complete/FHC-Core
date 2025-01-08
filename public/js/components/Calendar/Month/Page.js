@@ -32,7 +32,7 @@ export default {
 			if (!this.size || !this.weeks[0]?.days) return {};
 			let dayTextMap ={};
 			this.weeks[0].days.forEach((day)=>{
-				dayTextMap[day] = day.toLocaleString(this.$p.user_language_locale_identifier.value, { weekday: this.size < 1 ? 'narrow' : (this.size < 3 ? 'short' : 'long') });
+				dayTextMap[day] = day.toLocaleString(this.$p.user_locale.value, { weekday: this.size < 1 ? 'narrow' : (this.size < 3 ? 'short' : 'long') });
 			});
 			return dayTextMap;
 		},

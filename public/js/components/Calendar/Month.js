@@ -17,7 +17,7 @@ export default {
 	},
 	computed: {
 		title() {
-			return this.focusDate.format({month: ['short','long','long','long'][this.size], year: 'numeric'}, this.$p.user_language_locale_identifier.value);
+			return this.focusDate.format({month: ['short','long','long','long'][this.size], year: 'numeric'}, this.$p.user_locale.value);
 		}
 	},
 	methods: {
