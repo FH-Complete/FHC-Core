@@ -87,18 +87,28 @@ function generateCSSsInclude($CSSs)
  */
 function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 {
+	$ci =& get_instance();
+	$ci->load->model('system/Sprache_model','SpracheModel');
+	$server_language = getData($ci->SpracheModel->loadWhere(['content' => true]));
+	$server_language = array_map(function($language){
+		return ['sprache'=>$language->sprache, 'locale'=>$language->locale, 'bezeichnung'=>$language->bezeichnung[$language->index-1]];
+	}, $server_language);
 	$user_language = getUserLanguage();
+
+	$FHC_JS_DATA_STORAGE_OBJECT = array(
+		'app_root' => APP_ROOT,
+		'ci_router' => $indexPage,
+		'called_path' => $calledPath,
+		'called_method' => $calledMethod,
+		'server_languages' => $server_language,
+		'user_language' => $user_language,
+		'timezone' => date_default_timezone_get(),
+	);
 
 	$toPrint = "\n";
 	$toPrint .= '<script type="text/javascript">';
 	$toPrint .= '
-		var FHC_JS_DATA_STORAGE_OBJECT = {
-			app_root: "'.APP_ROOT.'",
-			ci_router: "'.$indexPage.'",
-			called_path: "'.$calledPath.'",
-			called_method: "'.$calledMethod.'",
-			user_language: "'.$user_language.'"
-		};';
+		var FHC_JS_DATA_STORAGE_OBJECT = '.json_encode($FHC_JS_DATA_STORAGE_OBJECT).';';
 	$toPrint .= "\n";
 	$toPrint .= '</script>';
 	$toPrint .= "\n\n";

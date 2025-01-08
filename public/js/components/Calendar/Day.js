@@ -13,7 +13,7 @@ export default {
 	},
 	computed: {
 		title() {
-			return this.focusDate.format({ year: 'numeric' }) + ' KW ' + this.focusDate.w;
+			return this.focusDate.wYear + ' KW ' + this.focusDate.w;
 		}
 	},
 	methods: {

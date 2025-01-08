@@ -61,9 +61,9 @@ export default {
 			let dayTextMap ={};
 			this.days.forEach((day)=>{
 				dayTextMap[day] = {
-					heading: day.toLocaleString(this.$p.user_language_locale_identifier.value, { dateStyle: 'short' }),
-					tag: day.toLocaleString(this.$p.user_language_locale_identifier.value, { weekday: this.size < 2 ? 'narrow' : (this.size < 3 ? 'short' : 'long') }),
-					datum: day.toLocaleString(this.$p.user_language_locale_identifier.value, [{ day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { dateStyle: 'short' }][this.size]),
+					heading: day.toLocaleString(this.$p.user_locale.value, { dateStyle: 'short' }),
+					tag: day.toLocaleString(this.$p.user_locale.value, { weekday: this.size < 2 ? 'narrow' : (this.size < 3 ? 'short' : 'long') }),
+					datum: day.toLocaleString(this.$p.user_locale.value, [{ day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { dateStyle: 'short' }][this.size]),
 				};
 			});
 			return dayTextMap;

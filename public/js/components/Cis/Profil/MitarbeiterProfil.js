@@ -252,12 +252,12 @@ export default {
           <div class="row">
               <div  class="d-md-none col-12 ">
            
-              <div class="row mb-3">
+              <!--TODO: uncomment when implemented
+			  <div class="row mb-3">
                 <div class="col">
-                <!-- MOBILE QUICK LINKS --> 
                 <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>    
                 </div>
-              </div>
+              </div>-->
 
               <!-- Bearbeiten Button -->
 
@@ -426,17 +426,17 @@ export default {
             
 
              
-              <div  class="row d-none d-md-block mb-3">
+              <!--TODO: uncomment when implemented
+			  <div  class="row d-none d-md-block mb-3">
                 
                 <div class="col">
                  
-                    <!-- QUICK LINKS --> 
                     <quick-links :title="$p.t('profil','quickLinks')"></quick-links>
                    
                       
                   
                   </div>
-                </div>
+                </div>-->
 
                 <!-- Bearbeiten Button -->
 

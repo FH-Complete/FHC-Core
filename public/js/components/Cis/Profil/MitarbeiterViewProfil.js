@@ -134,27 +134,29 @@ export default {
     },
   },
 
-  template: /*html*/ ` 
+  template: /*html*/ `
 
   <div class="container-fluid text-break fhc-form"  >
-    <!-- ROW --> 
+    <!-- ROW -->
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
+  			<!-- TODO: uncomment when implemented
               <div  class="d-md-none col-12 ">
-             
+
               <quick-links :title="$p.t('profil','quickLinks')" :mobile="true" ></quick-links>
 
               </div>
+			  -->
               <!-- END OF HIDDEN QUCK LINKS -->
 
               <!-- MAIN PANNEL -->
               <div class="col-sm-12 col-md-8 col-xxl-9 ">
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
-               
-              
+
+
 
                     <!-- INFORMATION CONTENT START -->
-                    <!-- ROW WITH THE PROFIL INFORMATION --> 
+                    <!-- ROW WITH THE PROFIL INFORMATION -->
                     <div class="row mb-4">
 
 
@@ -163,17 +165,17 @@ export default {
                      <div  class="col-lg-12 col-xl-6 ">
                      <div class="row mb-4">
                      <div class="col">
-                     
+
                         <!-- Profil Informationen -->
                         <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :editable="editable"></profil-information>
-                     
+
 		                </div>
                     </div>
-                    
+
 
 
                       <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
-                     
+
 
                     <!-- END OF PROFIL INFORMATION ROW -->
                     <!-- INFORMATION CONTENT END -->
@@ -185,21 +187,21 @@ export default {
 
                     <!-- EMAILS -->
                     <profil-emails :title="this.$p.t('person','email')" :data="personEmails"></profil-emails>
-                   
+
                     </div></div>
 
 
                     <!-- SECOND ROW OF SECOND COLUMN IN MAIN CONTENT -->
                     <div class="row mb-4">
-                     
+
 
                     <div  class=" col-lg-12">
-       
+
                     <!-- roleInformation -->
                     <role-information :data="roleInformation" :title="$p.t('profil','mitarbeiterInformation')"></role-information>
 
-                    </div>  
-                           
+                    </div>
+
                      </div>
                      <!-- END OF SECOND ROW OF SECOND COLUMN IN MAIN CONTENT -->
 
@@ -210,15 +212,15 @@ export default {
                     </div>
 
 
-                    <!-- START OF THE SECOND PROFIL INFORMATION ROW --> 
-                  
-                    
+                    <!-- START OF THE SECOND PROFIL INFORMATION ROW -->
+
+
                   <!-- ROW WITH PROFIL IMAGE AND INFORMATION END -->
                 </div  >
 
 
 
-                
+
 
 
 
@@ -231,7 +233,7 @@ export default {
                     <core-filter-cmpt @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   </div>
 
-               
+
 
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
                 </div>
@@ -243,15 +245,15 @@ export default {
               <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
 
               <!-- VISIBLE UNTIL VIEWPORT MD -->
+			  <!--TODO: uncomment when implemented
                 <div  class="row d-none d-md-block mb-3">
                   <div class="col">
-                 
-                   <!-- QUICKLINKS -->
+
                    <quick-links :title="$p.t('profil','quickLinks')" ></quick-links>
 
                   </div>
                 </div>
-
+  				-->
                 <div  class="row">
                 
                   <div class="col">
