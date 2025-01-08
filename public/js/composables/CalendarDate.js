@@ -49,6 +49,12 @@ class CalendarDate {
 			}
 		}
 	}
+	get wYear() {
+		if( this.w === 1 ) {
+			return this.cdLastDayOfWeek.format({ year: 'numeric' });
+		}
+		return this.cdFirstDayOfWeek.format({ year: 'numeric' });
+	}
 	get wd() {
 		if (this._wd === null) {
 			this._wd = ((new Date(this.y, this.m, this.d)).getDay()+7-this.weekStart)%7;

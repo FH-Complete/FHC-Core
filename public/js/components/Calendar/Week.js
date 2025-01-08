@@ -12,7 +12,7 @@ export default {
 	},
 	computed: {
 		title() {
-			return this.focusDate.cdLastDayOfWeek.format({ year: 'numeric' }) + ' KW ' + this.focusDate.cdLastDayOfWeek.w;
+			return this.focusDate.wYear + ' KW ' + this.focusDate.w;
 		}
 	},
 	methods: {
