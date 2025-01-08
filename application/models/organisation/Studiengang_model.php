@@ -768,4 +768,19 @@ class Studiengang_model extends DB_Model
 
 		return success($result_object);
 	}
+	
+	public function getLvaForStudiengangInStudiensemester($studiengang_kz, $orgform_kurzbz, $studiensemester_kurzbz) {
+		$qry = '
+		SELECT DISTINCT ON (lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,
+			kurzbz, bezeichnung, semester,
+			lehre.tbl_lehrveranstaltung.sprache, orgform_kurzbz,
+			lehre.tbl_lehrveranstaltung.lehrform_kurzbz)
+			lehre.tbl_lehrveranstaltung.lehrveranstaltung_id, kurzbz, bezeichnung,
+			semester, lehre.tbl_lehrveranstaltung.sprache, orgform_kurzbz, lehre.tbl_lehrveranstaltung.lehrform_kurzbz,
+			tbl_lehreinheit.*, tbl_lehrveranstaltung.*
+		FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+		WHERE aktiv = TRUE AND studiengang_kz = ? AND orgform_kurzbz = ? AND tbl_lehreinheit.studiensemester_kurzbz IN ?';
+
+		return $this->execReadOnlyQuery($qry, array($studiengang_kz, $orgform_kurzbz, $studiensemester_kurzbz));
+	}
 }
