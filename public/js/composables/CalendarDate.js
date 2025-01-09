@@ -63,6 +63,8 @@ class CalendarDate {
 	}
 	get firstDayOfWeek() {
 		let firstDayOfWeek = new Date(this.y, this.m, this.d);
+		// the following calculation can be seen as = this.d - (firstDayOfWeek.getDay()-this.weekStart)
+		// to ensure that firstDayOfWeek.getDay() is always greater than this.weekStart we add 7 and wrap the result around with %7
 		firstDayOfWeek.setDate(this.d -(firstDayOfWeek.getDay()+7-this.weekStart)%7);
 		return firstDayOfWeek;
 	}
@@ -71,6 +73,7 @@ class CalendarDate {
 	}
 	get lastDayOfWeek() {
 		let lastDayOfWeek = new Date(this.y, this.m, this.d);
+		// uses the calculation from firstDayOfWeek and adds 6 days to the result to get the last day of the week
 		lastDayOfWeek.setDate(this.d -(lastDayOfWeek.getDay()+7-this.weekStart)%7 +6);
 		return lastDayOfWeek;
 	}
@@ -88,15 +91,19 @@ class CalendarDate {
 	}
 	get firstDayOfCalendarMonth() {
 		let firstDayOfMonth = new Date(this.y, this.m, 1);
-		return new Date(this.y, this.m, 1-(firstDayOfMonth.getDay() + 7 - this.weekStart)%7);
+		let offset = (firstDayOfMonth.getDay() + 7 - this.weekStart) % 7;
+		// offset will be greater than 1 most of the time, using a negative number for a date returns a date in the past
+		return new Date(this.y, this.m, 1-offset);
 	}
 	get cdFirstDayOfCalendarMonth() {
 		let firstDayOfMonth = new Date(this.y, this.m, 1);
 		return new CalendarDate(this.y, this.m, 1-(firstDayOfMonth.getDay() + 7 - this.weekStart)%7);
 	}
 	get lastDayOfCalendarMonth() {
+		// In JavaScript, the Date constructor interprets: A day of 0 as the last day of the previous month 
 		let lastDayOfMonth = new Date(this.y, this.m+1, 0);
-		return new Date(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDate()+6-(lastDayOfMonth.getDay() + 7 - this.weekStart)%7);
+		let offset = (lastDayOfMonth.getDay() + 7 - this.weekStart) % 7;
+		return new Date(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDate()+6-offset);
 	}
 	get cdLastDayOfCalendarMonth() {
 		let lastDayOfMonth = new Date(this.y, this.m+1, 0);
