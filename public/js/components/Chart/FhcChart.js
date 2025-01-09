@@ -31,14 +31,14 @@ export const FhcChart = {
 			type: String,
 			default: ''
 		},
-		fhcType: { // TODO: ist das notwendig?
-			type: String,
-			default: 'hcnorm',
-			required: true,
-			validator(val) {
-				return ['hcnorm', 'hcgroupedstacked', 'hcdrill'].includes(val)
-			}
-		},
+		// fhcType: { // TODO: ist das notwendig?
+		// 	type: String,
+		// 	default: 'hcnorm',
+		// 	required: true,
+		// 	validator(val) {
+		// 		return ['hcnorm', 'hcgroupedstacked', 'hcdrill'].includes(val)
+		// 	}
+		// },
 		type: {
 			type: String,
 			default: 'line',
@@ -79,8 +79,6 @@ export const FhcChart = {
 			validator(val) {
 				return Array.isArray(val.categories) // https://api.highcharts.com/highcharts/xAxis.categories
 					&& val.categories.every(c => typeof c === 'string')
-					&& Array.isArray(val.title)
-					&& Array.isArray(val.labels)
 			}
 		},
 		yAxis: {
@@ -107,7 +105,10 @@ export const FhcChart = {
 			
 		},
 		createNewChart() {
-			
+			this.setupGraph()
+		},
+		createNewChartFromOptions(chartOptions) {
+			this.setupGraph()
 		},
 		setupGraph() {
 			const wrapperDiv = document.getElementById(this.id)
