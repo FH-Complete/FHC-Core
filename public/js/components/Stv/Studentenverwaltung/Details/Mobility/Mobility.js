@@ -14,6 +14,9 @@ export default {
 		$reloadList: {
 			from: '$reloadList',
 			required: true
+		},
+		lists: {
+			from: 'lists'
 		}
 	},
 	props: {
@@ -26,15 +29,15 @@ export default {
 				ajaxRequestFunc: this.$fhcApi.factory.stv.mobility.getMobilitaeten,
 				ajaxParams: () => {
 					return {
-						id: this.student.student_uid
+						id: this.student.uid
 					};
 				},
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Kurzbz", field: "kurzbz"},
 					{title: "Nation", field: "nation_code"},
-					{title: "Von", field: "von"},
-					{title: "Bis", field: "bis"},
+					{title: "Von", field: "format_von"},
+					{title: "Bis", field: "format_bis"},
 					{title: "bisio_id", field: "bisio_id"},
 					{
 						title: 'Aktionen', field: 'actions',
@@ -48,7 +51,7 @@ export default {
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.title = this.$p.t('ui', 'bearbeiten');
 							button.addEventListener('click', (event) =>
-								this.actionEditmobility(cell.getData().mobility_id)
+								this.actionEditMobility(cell.getData().mobility_id)
 							);
 							container.append(button);
 
@@ -57,7 +60,7 @@ export default {
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('ui', 'loeschen');
 							button.addEventListener('click', () =>
-								this.actionDeletemobility(cell.getData().mobility_id)
+								this.actionDeleteMobility(cell.getData().mobility_id)
 							);
 							container.append(button);
 
@@ -69,7 +72,6 @@ export default {
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
-				minHeight: '200',
 				selectable: true,
 				index: 'mobility_id',
 				persistenceID: 'stv-details-table_mobiliy'
@@ -131,8 +133,14 @@ export default {
 				}
 			],
 			formData: {
+				von: new Date(),
+				bis: new Date(),
+				mobilitaetsprogramm: 7,
+				gastnation: 'A',
+				herkunftsland: 'A',
 			},
 			statusNew: true,
+			programsMobility: [],
 		}
 	},
 	watch: {
@@ -149,17 +157,17 @@ export default {
 					.then(result => this.stgTyp = result.data)
 					.catch(this.$fhcAlert.handleSystemError);
 		},
-		actionNewmobility() {
+		actionNewMobility() {
 			this.resetForm();
 			this.statusNew = true;
-			this.setDefaultFormData();
+			//this.setDefaultFormData();
 		},
-		actionEditmobility(mobility_id) {
+		actionEditMobility(mobility_id) {
 			this.resetForm();
 			this.statusNew = false;
-			this.loadmobility(mobility_id);
+			this.loadMobility(mobility_id);
 		},
-		actionDeletemobility(mobility_id) {
+		actionDeleteMobility(mobility_id) {
 			this.$fhcAlert
 				.confirmDelete()
 				.then(result => result
@@ -168,7 +176,7 @@ export default {
 				.then(this.deletemobility)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		addNewmobility() {
+		addNewMobility() {
 			const dataToSend = {
 				uid: this.student.uid,
 				formData: this.formData
@@ -187,7 +195,7 @@ export default {
 		reload() {
 			this.$refs.table.reloadTable();
 		},
-		loadmobility(mobility_id) {
+		loadMobility(mobility_id) {
 			return this.$fhcApi.factory.stv.mobility.loadmobility(mobility_id)
 				.then(result => {
 					this.formData = result.data;
@@ -197,7 +205,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		updatemobility(mobility_id) {
+		updateMobility(mobility_id) {
 			const dataToSend = {
 				id: mobility_id,
 				formData: this.formData
@@ -212,7 +220,7 @@ export default {
 					this.reload();
 				});
 		},
-		deletemobility(mobility_id) {
+		deleteMobility(mobility_id) {
 			return this.$fhcApi.factory.stv.mobility.deletemobility(mobility_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
@@ -227,44 +235,17 @@ export default {
 		},
 	},
 	created() {
-		// this.$fhcApi.factory.stv.mobility.getTypenmobility()
-		// 	.then(result => {
-		// 		this.arrTypen = result.data;
-		// 	})
-		// 	.catch(this.$fhcAlert.handleSystemError);
-		// this.$fhcApi.factory.stv.mobility.getTypenAntritte()
-		// 	.then(result => {
-		// 		this.arrAntritte = result.data;
-		// 	})
-		// 	.catch(this.$fhcAlert.handleSystemError);
-		// this.$fhcApi.factory.stv.mobility.getBeurteilungen()
-		// 	.then(result => {
-		// 		this.arrBeurteilungen = result.data;
-		// 	})
-		// 	.catch(this.$fhcAlert.handleSystemError);
-		// this.$fhcApi.factory.stv.mobility.getNoten()
-		// 	.then(result => {
-		// 		this.arrNoten = result.data;
-		// 	})
-		// 	.catch(this.$fhcAlert.handleSystemError);
-		// this.$fhcApi.factory.stv.mobility.getAkadGrade(this.student.studiengang_kz)
-		// 	.then(result => {
-		// 		this.arrAkadGrad = result.data;
-		// 	})
-		// 	.catch(this.$fhcAlert.handleSystemError);
-		// if (!this.student.length) {
-		// 	this.$fhcApi.factory.stv.mobility.getTypStudiengang(this.student.studiengang_kz)
-		// 		.then(result => {
-		// 			this.stgTyp = result.data;
-		// 			this.setDefaultFormData();
-		// 		})
-		// 		.catch(this.$fhcAlert.handleSystemError);
-		// } else
-		// 	this.getStudiengangsTyp();
+		this.$fhcApi.factory.stv.mobility.getProgramsMobility()
+			.then(result => {
+				this.programsMobility = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-details-mobility h-100 pb-3">
 		<h4>In/out</h4>
+		
+		{{formData}}
 	
 
 		<core-filter-cmpt
@@ -281,320 +262,191 @@ export default {
 		</core-filter-cmpt>
 
 		<form-form v-if="!this.student.length" ref="formMobility" @submit.prevent>
-		
-			<!-- <legend>{{this.$p.t('global','details')}}</legend>
-			<p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p>
+
+		<div class="row mb-3">
+			<legend class="col-6">BIS</legend>
+			<legend class="col-6">Outgoing</legend>
+		</div>
+			
 			<div class="row mb-3">
 				<form-input
-					container-class="col-6 stv-details-mobility-typ"
-					:label="$p.t('global', 'typ')"
-					type="select"
-					v-model="formData.pruefungstyp_kurzbz"
-					name="pruefungstyp_kurzbz"
+					container-class="col-6 stv-details-mobility-von"
+					:label="$p.t('ui', 'von')"
+					type="DatePicker"
+					v-model="formData.von"
+					auto-apply
+					:enable-time-picker="false"
+					format="dd.MM.yyyy"
+					name="von"
+					:teleport="true"
 					>
-					<option
+				</form-input>
+				<form-input
+					container-class="col-6 stv-details-mobility-typ"
+					:label="$p.t('lehre', 'lehrveranstaltung')"
+					type="select"
+					v-model="formData.lehrveranstaltung"
+					name="lehrveranstaltung"
+					>
+<!--					<option
 						v-for="typ in arrTypen"
 						:key="typ.pruefungstyp_kurzbz"
 						:value="typ.pruefungstyp_kurzbz"
 						>
 						{{typ.beschreibung}}
-					</option>
-				</form-input>
-				<form-input
-					container-class="col-6 stv-details-mobility-note"
-					:label="$p.t('lehre', 'note')"
-					type="select"
-					v-model="formData.note"
-					name="note"
-					>
-					<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
-					<option
-						v-for="note in arrNoten"
-						:key="note.note"
-						:value="note.note"
-						>
-						{{note.bezeichnung}}
-					</option>
+					</option>-->
 				</form-input>
 			</div>
-
+			
 			<div class="row mb-3">
 				<form-input
-					container-class="col-6 stv-details-mobility-pruefungsantritt"
-					:label="$p.t('mobility', 'pruefungsantritt')"
-					type="select"
-					v-model="formData.pruefungsantritt_kurzbz"
-					name="pruefungsantritt_kurzbz"
-					>
-					<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
-					<option
-						v-for="antritt in arrAntritte"
-						:key="antritt.pruefungsantritt_kurzbz"
-						:value="antritt.pruefungsantritt_kurzbz"
-						>
-						{{antritt.bezeichnung}}
-					</option>
-				</form-input>
-			</div>
-
-			<div class="row mb-3">
-				<template v-if="statusNew">
-					<form-input
-						container-class="col-6 stv-details-mobility-vorsitz"
-						:label="$p.t('mobility', 'vorsitz_header')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.vorsitz"
-						name="vorsitz"
-						:suggestions="filteredMitarbeiter"
-						@complete="search"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-				<template v-else >
-					<form-input
-						v-if= "formData.pv"
-						container-class="col-6 stv-details-mobility-vorsitz"
-						type="text"
-						name="name"
-						:label="$p.t('mobility', 'vorsitz_header')"
-						v-model="formData.pv"
-						>
-					</form-input>
-					<form-input
-						v-else
-						container-class="col-6 stv-details-mobility-vorsitz"
-						:label="$p.t('mobility', 'vorsitz_header')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.vorsitz"
-						name="vorsitz"
-						:suggestions="filteredMitarbeiter"
-						@complete="search"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-
-				<template v-if="statusNew">
-					<form-input
-						container-class="col-6 stv-details-mobility-pruefer1"
-						:label="$p.t('mobility', 'pruefer1')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer1"
-						name="pruefer1"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-				<template v-else >
-					<form-input
-						v-if= "formData.p1"
-						container-class="col-6 stv-details-mobility-pruefer1"
-						type="text"
-						name="name"
-						:label="$p.t('mobility', 'pruefer1')"
-						v-model="formData.p1"
-						>
-					</form-input>
-					<form-input
-						v-else
-						container-class="col-6 stv-details-mobility-pruefer1"
-						:label="$p.t('mobility', 'pruefer1')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer1"
-						name="pruefer1"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-			</div>
-
-			<div class="row mb-3">
-
-				<form-input
-					container-class="col-6 stv-details-mobility-abschlussbeurteilung_kurzbz"
-					:label="$p.t('mobility', 'abschlussbeurteilung')"
-					type="select"
-					v-model="formData.abschlussbeurteilung_kurzbz"
-					name="abschlussbeurteilung_kurzbz"
-					>
-					<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
-					<option
-						v-for="beurteilung in arrBeurteilungen"
-						:key="beurteilung.abschlussbeurteilung_kurzbz"
-						:value="beurteilung.abschlussbeurteilung_kurzbz"
-						>
-						{{beurteilung.bezeichnung}}
-					</option>
-				</form-input>
-				<template v-if="statusNew">
-					<form-input
-						container-class="col-6 stv-details-mobility-pruefer2"
-						:label="$p.t('mobility', 'pruefer2')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer2"
-						name="pruefer2"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-				<template v-else >
-					<form-input
-						v-if= "formData.p2"
-						container-class="col-6 stv-details-mobility-pruefer2"
-						type="text"
-						name="name"
-						:label="$p.t('mobility', 'pruefer2')"
-						v-model="formData.p2"
-						>
-					</form-input>
-					<form-input
-						v-else
-						container-class="col-6 stv-details-mobility-pruefer2"
-						:label="$p.t('mobility', 'pruefer2')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer2"
-						name="pruefer2"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-			</div>
-
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-mobility-akadgrad"
-					:label="$p.t('mobility', 'akadGrad')"
-					type="select"
-					v-model="formData.akadgrad_id"
-					name="akadgrad"
-					>
-					<option
-						v-for="grad in arrAkadGrad"
-						:key="grad.akadgrad_id"
-						:value="grad.akadgrad_id"
-						>
-						{{grad.titel}}
-					</option>
-				</form-input>
-				<template v-if="statusNew">
-					<form-input
-						container-class="col-6 stv-details-mobility-pruefer3"
-						:label="$p.t('mobility', 'pruefer3')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer3"
-						name="pruefer3"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-				<template v-else >
-					<form-input
-						v-if= "formData.p3"
-						container-class="col-6 stv-details-mobility-pruefer3"
-						type="text"
-						name="name"
-						:label="$p.t('mobility', 'pruefer3')"
-						v-model="formData.p3"
-						>
-					</form-input>
-					<form-input
-						v-else
-						container-class="col-6 stv-details-mobility-pruefer3"
-						:label="$p.t('mobility', 'pruefer3')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer3"
-						name="pruefer3"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-			</div>
-
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-mobility-datum"
-					:label="$p.t('global', 'datum')"
+					container-class="col-6 stv-details-mobility-bis"
+					:label="$p.t('global', 'bis')"
 					type="DatePicker"
-					v-model="formData.datum"
+					v-model="formData.bis"
 					auto-apply
 					:enable-time-picker="false"
 					format="dd.MM.yyyy"
-					name="datum"
+					name="bis"
 					:teleport="true"
 					>
 				</form-input>
 				<form-input
-					container-class="col-6 stv-details-mobility-anmerkung"
-					:label="$p.t('global', 'anmerkung')"
-					type="textarea"
-					v-model="formData.anmerkung"
-					name="anmerkung"
+					container-class="col-6 stv-details-mobility-typ"
+					:label="$p.t('lehre', 'lehreinheit')"
+					type="select"
+					v-model="formData.lehreinheit"
+					name="lehreinheit"
 					>
+<!--					<option
+						v-for="typ in arrTypen"
+						:key="typ.pruefungstyp_kurzbz"
+						:value="typ.pruefungstyp_kurzbz"
+						>
+						{{typ.beschreibung}}
+					</option>-->
 				</form-input>
 			</div>
-
+			
 			<div class="row mb-3">
 				<form-input
-					container-class="col-6 stv-details-mobility-sponsion"
-					:label="$p.t('mobility', 'sponsion')"
-					type="DatePicker"
-					v-model="formData.sponsion"
-					auto-apply
-					:enable-time-picker="false"
-					format="dd.MM.yyyy"
-					name="sponsion"
-					:teleport="true"
+					container-class="col-6 stv-details-mobility-mobilitaetsprogramm"
+					:label="$p.t('mobility', 'mobilitaetsprogramm')"
+					type="select"
+					v-model="formData.mobilitaetsprogramm"
+					name="mobilitaetsprogramm"
 					>
+					<option
+						v-for="mob in programsMobility"
+						:key="mob.mobilitaetsprogramm_code"
+						:value="mob.mobilitaetsprogramm_code"
+						>
+						{{mob.kurzbz}} - {{mob.beschreibung}}
+					</option>
 				</form-input>
 				<form-input
-					container-class="col-6 stv-details-mobility-protokoll"
-					:label="$p.t('mobility', 'protokoll')"
-					type="textarea"
-					v-model="formData.protokoll"
-					name="protokoll"
-					:rows= 10
+					container-class="col-6 stv-details-mobility-ort"
+					:label="$p.t('person', 'ort')"
+					type="select"
+					v-model="formData.ort"
+					name="ort"
+					>
+<!--					<option
+						v-for="typ in arrTypen"
+						:key="typ.pruefungstyp_kurzbz"
+						:value="typ.pruefungstyp_kurzbz"
+						>
+						{{typ.beschreibung}}
+					</option>-->
+				</form-input>
+			</div>
+			
+			<div class="row mb-3">
+				<form-input
+					container-class="col-6 stv-details-mobility-gastnation"
+					:label="$p.t('mobility', 'gastnation')"
+					type="select"
+					v-model="formData.gastnation"
+					name="gastnation"
+					>
+					<option 
+					v-for="nation in lists.nations" 
+					:key="nation.nation_code" 
+					:value="nation.nation_code" 
+					:disabled="nation.sperre"
+					>
+					{{nation.kurztext}}
+					</option>
+				</form-input>
+				<form-input
+					container-class="col-6 stv-details-mobility-universitaet"
+					:label="$p.t('mobility', 'universitaet')"
+					type="select"
+					v-model="formData.ort"
+					name="ort"
+					>
+
+				</form-input>
+			</div>
+			
+			<div class="row mb-3">
+				<form-input
+					container-class="col-6 stv-details-mobility-herkunftsland"
+					:label="$p.t('mobility', 'herkunftsland')"
+					type="select"
+					v-model="formData.herkunftsland"
+					name="herkunftsland"
+					>
+					<option 
+					v-for="nation in lists.nations" 
+					:key="nation.nation_code" 
+					:value="nation.nation_code" 
+					:disabled="nation.sperre"
+					>
+					{{nation.kurztext}}
+					</option>
+				</form-input>
+				<form-input
+					container-class="col-3 stv-details-mobility-ects_erworben"
+					:label="$p.t('mobility', 'ects_erworben')"
+					type="input"
+					v-model="formData.ects_erworben"
+					name="ects_erworben"
+					>
+				</form-input>				
+				<form-input
+					container-class="col-3 stv-details-mobility-ects_angerechnet"
+					:label="$p.t('mobility', 'ects_angerechnet')"
+					type="input"
+					v-model="formData.ects_angerechnet"
+					name="ects_angerechnet"
 					>
 				</form-input>
 			</div>
-
-			<div class="row mb-3 col-6">
-				<div class="col">
-					<p >{{$p.t('mobility', 'zurBeurteilung')}}</p>
-				</div>
-				<div class="col">
-					<p>
-					   <a :href="formData.link" target="_blank" rel="noopener noreferrer">
-						  {{$p.t('mobility', 'pruefungsprotokoll')}}
-						</a>
-					</p>
-				</div>
+			
+			<div class="row mb-3">
+				<form-input
+					container-class="col-6 stv-details-mobility-zweck"
+					:label="$p.t('mobility', 'zweck')"
+					type="textarea"
+					v-model="formData.zweck"
+					name="zweck"
+					>
+				</form-input>
+				<form-input
+					container-class="col-6 stv-details-mobility-aufenthalt"
+					:label="$p.t('mobility', 'aufenthalt')"
+					type="textarea"
+					v-model="formData.aufenthalt"
+					name="aufenthalt"
+					>
+				</form-input>
 			</div>
 
 			<div class="text-end mb-3">
-				<button v-if="statusNew" class="btn btn-primary" @click="addNewmobility()"> {{$p.t('ui', 'speichern')}}</button>
-				<button v-else class="btn btn-primary" @click="updatemobility(formData.mobility_id)"> {{$p.t('ui', 'speichern')}}</button>
-			</div> -->
+				<button v-if="statusNew" class="btn btn-primary" @click="addNewMobility()"> {{$p.t('ui', 'speichern')}}</button>
+				<button v-else class="btn btn-primary" @click="updateMobility(formData.mobility_id)"> {{$p.t('ui', 'speichern')}}</button>
+			</div>
 
 		</form-form>
 
