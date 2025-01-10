@@ -314,7 +314,7 @@ export default {
 							<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
 							
 							<Transition>
-								<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
+								<div v-if="hourPosition && !noEventsCondition" class="position-absolute border-top small"  :style="indicatorStyle">
 									<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 								</div>
 							</Transition>
