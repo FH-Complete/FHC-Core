@@ -71,6 +71,7 @@ export default {
 		days() {
 			
 			let tmpDate = new CalendarDate(this.year,1,1); // NOTE(chris): somewhere in the middle of the year
+			tmpDate.setLocale(this.$p.user_locale.value);
 			tmpDate.w = this.week;
 			let startDay = tmpDate.firstDayOfWeek;
 			let result = [];

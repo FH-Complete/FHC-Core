@@ -57,14 +57,15 @@ class CalendarDate {
 	}
 	get wd() {
 		if (this._wd === null) {
+			// the .getDay() method from js Date object ALWAYS returns values from 0 to 6, where 0 is Sunday and 6 is Saturday
+			// aligns the getDay() result of the Date to the weekStart of the CalendarDate
 			this._wd = ((new Date(this.y, this.m, this.d)).getDay()+7-this.weekStart)%7;
 		}
 		return this._wd;
 	}
 	get firstDayOfWeek() {
 		let firstDayOfWeek = new Date(this.y, this.m, this.d);
-		// the following calculation can be seen as = this.d - (firstDayOfWeek.getDay()-this.weekStart)
-		// to ensure that firstDayOfWeek.getDay() is always greater than this.weekStart we add 7 and wrap the result around with %7
+		// to ensure that firstDayOfWeek.getDay() is always greater than this.weekStart we add 7 and wrap the result around with %7 to avoid negative numbers
 		firstDayOfWeek.setDate(this.d -(firstDayOfWeek.getDay()+7-this.weekStart)%7);
 		return firstDayOfWeek;
 	}
@@ -97,7 +98,8 @@ class CalendarDate {
 	}
 	get cdFirstDayOfCalendarMonth() {
 		let firstDayOfMonth = new Date(this.y, this.m, 1);
-		return new CalendarDate(this.y, this.m, 1-(firstDayOfMonth.getDay() + 7 - this.weekStart)%7);
+		let offset = (firstDayOfMonth.getDay() + 7 - this.weekStart) % 7;
+		return new CalendarDate(this.y, this.m, 1-offset);
 	}
 	get lastDayOfCalendarMonth() {
 		// In JavaScript, the Date constructor interprets: A day of 0 as the last day of the previous month 
@@ -107,11 +109,13 @@ class CalendarDate {
 	}
 	get cdLastDayOfCalendarMonth() {
 		let lastDayOfMonth = new Date(this.y, this.m+1, 0);
-		return new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDate()+6-(lastDayOfMonth.getDay() + 7 - this.weekStart)%7);
+		let offset = (lastDayOfMonth.getDay() + 7 - this.weekStart) % 7;
+		return new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDate()+6-offset);
 	}
 	get cdLastDayOfNextCalendarMonth() {
 		let lastDayOfMonth = new Date(this.y, this.m+1, 0);
-		return new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth() + 1, lastDayOfMonth.getDate()+6-(lastDayOfMonth.getDay() + 7 - this.weekStart)%7);
+		let offset = (lastDayOfMonth.getDay() + 7 - this.weekStart) % 7;
+		return new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth() + 1, lastDayOfMonth.getDate()+6-offset);
 	}
 	get nextSevenDays() {
 		const days = []
@@ -122,12 +126,14 @@ class CalendarDate {
 		return days
 	}
 	get numWeeks() {
+		// if the week starts with Monday we have to go 3 days in the past from the start of the next year to get the correct numWeek of the current year
+		// this is because for example 30.12.2024 - 05.01.2025 is the first calendarWeek of 2025 
 		return (new CalendarDate(this.y+1,0,this.weekStart == 1 ? -3 : 0)).w;
 	}
 	set(y,m,d,noClean) {
 
 		if (y !== undefined && (m === undefined || m === true) && d === undefined) {
-			if (this.#isDate(y))
+			if (this.isDate(y))
 			{
 				// set year/month/day from date object
 				return this.set(y.getFullYear(), y.getMonth(), y.getDate(), m);
@@ -155,7 +161,7 @@ class CalendarDate {
 		return (new Date(this._y, this._m, this._d)).toLocaleString(lang, options);
 	}
 	compare(d) {
-		if (this.#isDate(d))
+		if (this.isDate(d))
 			return (this.y === d.getFullYear() && this.m === d.getMonth() && this.d === d.getDate());
 		return (this.y === d.y && this.m === d.m && this.d === d.d);
 	}
@@ -175,8 +181,8 @@ class CalendarDate {
 	setLocale(locale) {
 		this.weekStart = CalendarDate.getWeekStart(locale);
 	}
-	// private method that checks if the parameter is of type Date
-	#isDate(obj){
+	// method that checks if the parameter is of type Date
+	isDate(obj){
 		return Object.prototype.toString.call(obj) === '[object Date]';
 	}
 }
@@ -195,27 +201,27 @@ CalendarDate.getWeekStart = function(locale) {
 	locale = locale || navigator.language;
 	const parts = locale.match(/^([a-z]{2,3})(?:-([a-z]{3})(?=$|-))?(?:-([a-z]{4})(?=$|-))?(?:-([a-z]{2}|\d{3})(?=$|-))?/i);
 
-	const region_code = parts[1];
+	const language_code = parts[1];
+	const language_starting_Sat = ['ar','arq','arz','fa'];
+	const language_starting_Sun = 'amasbndzengnguhehiidjajvkmknkolomhmlmrmtmyneomorpapssdsmsnsutatethtnurzhzu'.match(/../g);
+	
+	const region_code = parts[4];
 	const region_starting_Sat = 'AEAFBHDJDZEGIQIRJOKWLYOMQASDSY'.match(/../g);
 	const region_starting_Sun = 'AGARASAUBDBRBSBTBWBZCACNCODMDOETGTGUHKHNIDILINJMJPKEKHKRLAMHMMMOMTMXMZNINPPAPEPHPKPRPTPYSASGSVTHTTTWUMUSVEVIWSYEZAZW'.match(/../g);
 
-	const language_code = parts[4];
-	const language_starting_Sat = ['ar','arq','arz','fa'];
-	const language_starting_Sun = 'amasbndzengnguhehiidjajvkmknkolomhmlmrmtmyneomorpapssdsmsnsutatethtnurzhzu'.match(/../g);
-
-	if (language_code){
-		if (language_starting_Sun.includes(language_code))
+	if (region_code){
+		if (region_starting_Sun.includes(region_code))
 			return 0;
-		else if (language_starting_Sat.includes(language_code))
+		else if (region_starting_Sat.includes(region_code))
 			return 6;
 		else
 			return 1;
 	}
-	else if(region_code)
+	else if(language_code)
 	{
-		if (region_starting_Sun.includes(region_code))
+		if (language_starting_Sun.includes(language_code))
 			return 0;
-		else if (region_starting_Sat.includes(region_code)) 
+		else if (language_starting_Sat.includes(language_code)) 
 			return 6;
 		else
 			return 1;

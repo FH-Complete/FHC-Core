@@ -89,7 +89,12 @@ export default {
 					}
 				}
 			});
-		}
+		},
+		"$p.user_locale.value"(newUserLocale){
+			// reset the calculation of the calendarWeek when changing user_locale
+			this.focusDate._clean();
+			this.focusDate.setLocale(newUserLocale);
+		},
 	},
 	emits: [
 		'select:day',
@@ -201,6 +206,7 @@ export default {
 		this.mode = allowedInitialModes[allowedInitialModes.indexOf(this.initialMode)] || allowedInitialModes.pop();
 		this.date.set(new Date(this.initialDate));
 		this.focusDate.set(this.date);
+		this.focusDate.setLocale(this.$p.user_locale.value);
 	},
 	mounted() {
 		if (this.$refs.container) {
