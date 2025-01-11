@@ -18,12 +18,16 @@
  *
  * Authors: Cristina Hainberger <hainberg@technikum-wien.at>
  */
+
+require_once(dirname(__FILE__).'/../config/global.config.inc.php');
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/mail.class.php');
 require_once(dirname(__FILE__).'/vorlage.class.php');
 
-const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_DEFAULT.jpg';
-const DEFAULT_SANCHO_FOOTER_IMG = 'sancho_footer_DEFAULT.jpg';
+// TODO: keep this so that an image is used in any case?
+//const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_DEFAULT.jpg';
+//const DEFAULT_SANCHO_FOOTER_IMG = 'sancho_footer_DEFAULT.jpg';
+const DEFAULT_SENDER = 'noreply';
 
 /**
  * Send single Mail with Sancho Design and Layout.
@@ -32,22 +36,75 @@ const DEFAULT_SANCHO_FOOTER_IMG = 'sancho_footer_DEFAULT.jpg';
  *  to be replaced in the content template.
  * @param string $to Email-adress.
  * @param string $subject Subject of mail.
- * @param string $headerImg Filename of the specific Sancho header image.
- * @param string $footerImg
+ * @param string $headerImg Filename of the specific Sancho header image, false if no header image
+ * @param string $footerImg - false if no footer image
  * @param string $replyTo default Email-adress for reply.
  * @param string | array $cc
  * @return boolean True, if succeeded.
  */
-function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = DEFAULT_SANCHO_HEADER_IMG, $footerImg = DEFAULT_SANCHO_FOOTER_IMG, $replyTo = '', $cc = '')
-{	
-	$from = 'noreply@'. DOMAIN;
-	$sanchoHeader_img = dirname(__FILE__). '/../skin/images/sancho/'. $headerImg;
-	$sanchoFooter_img = dirname(__FILE__). '/../skin/images/sancho/'. $footerImg;
+function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = '', $footerImg = '', $replyTo = '', $cc = '')
+{
+	$from = defined('CUSTOM_MAIl_SENDER') && CUSTOM_MAIl_SENDER != '' ? CUSTOM_MAIl_SENDER : DEFAULT_SENDER;
+	$from = $from.'@'. DOMAIN;
+
+	$image_path_prefix = dirname(__FILE__). '/../skin/images/sancho/';
+
+	//$sanchoHeader_img = dirname(__FILE__). '/../skin/images/sancho/'. self::DEFAULT_SANCHO_HEADER_IMG;
+	// hide header by default
+	$sanchoHeader_img = false;
+	$header_visibility = 'display:none';
+
+	if ($headerImg !== false)
+	{
+		if (isset($headerImg) && $headerImg != '')
+		{
+			// use provided header image
+			$sanchoHeader_img = $headerImg;
+		}
+		elseif (defined('CUSTOM_MAIl_HEADER_IMG') && CUSTOM_MAIl_HEADER_IMG != '')
+		{
+			// use default header image
+			$sanchoHeader_img = CUSTOM_MAIl_HEADER_IMG;
+		}
+
+		if ($sanchoHeader_img !== false)
+		{
+			// set full image path and visibility
+			$sanchoHeader_img = $image_path_prefix.$sanchoHeader_img;
+			$header_visibility = '';
+		}
+	}
+
+	//$sanchoFooter_img = dirname(__FILE__). '/../skin/images/sancho/'. self::DEFAULT_SANCHO_FOOTER_IMG;
+	// hide footer by default
+	$sanchoFooter_img = false;
+	$footer_visibility = 'display:none';
+
+	if ($footerImg !== false)
+	{
+		if (isset($footerImg) && $footerImg != '')
+		{
+			// use provided footer image
+			$sanchoFooter_img = $footerImg;
+		}
+		elseif (defined('CUSTOM_MAIl_FOOTER_IMG') && CUSTOM_MAIl_FOOTER_IMG != '')
+		{
+			// use default footer image
+			$sanchoFooter_img = CUSTOM_MAIl_FOOTER_IMG;
+		}
+
+		if ($sanchoFooter_img !== false)
+		{
+			// set full image path and visibility
+			$sanchoFooter_img = $image_path_prefix.$sanchoFooter_img;
+			$footer_visibility = '';
+		}
+	}
 
 	// Set unique content id for embedding header and footer image
 	$cid_header = uniqid();
 	$cid_footer = uniqid();
-			
+
 	// Set specific mail content into specific content template
 	$content = parseMailContent($vorlage_kurzbz, $vorlage_data);
 
@@ -55,7 +112,9 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 	$layout = array(
 		'CID_header' => $cid_header,
 		'CID_footer' => $cid_footer,
-		'content' => $content
+		'content' => $content,
+		'header_visibility' => $header_visibility,
+		'footer_visibility' => $footer_visibility
 	);
 
 	// Set the data array into overall sancho mail template
@@ -63,22 +122,22 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 
 	// Send mail
 	$mail = new Mail($to, $from, $subject, $body);
-	
-	// * embed the images
-	$mail->addEmbeddedImage($sanchoHeader_img, 'image/jpg', '', $cid_header);
-	$mail->addEmbeddedImage($sanchoFooter_img, 'image/jpg', '', $cid_footer);
+
+	// * embed the images if needed
+	if ($sanchoHeader_img !== false) $mail->addEmbeddedImage($sanchoHeader_img, 'image/jpg', '', $cid_header);
+	if ($sanchoFooter_img !== false) $mail->addEmbeddedImage($sanchoFooter_img, 'image/jpg', '', $cid_footer);
 
 	// * Set reply-to
 	if (isset($replyTo) && $replyTo != '')
 		$mail->setReplyTo($replyTo);
-	
+
 	// * Set cc
 	if (isset($cc) && $cc != '')
 		$mail->setCCRecievers($cc);
 
 	// * embed the html content
 	$mail->setHTMLContent($body);
-	
+
 	return $mail->send();
 }
 
@@ -95,7 +154,7 @@ function parseMailContent($vorlage_kurzbz, $vorlage_data)
 {
 	$vorlage = new Vorlage();
 	$vorlage->getAktuelleVorlage('etw', $vorlage_kurzbz);
-	
+
 	// If the text and the subject of the template are not empty
 	if (!empty($vorlage->text))
 	{
