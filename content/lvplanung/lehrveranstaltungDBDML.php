@@ -1584,6 +1584,9 @@ if(!$error)
 					$stundensatz = new stundensatz();
 					$stundensatz->getStundensatzDatum($mitarbeiter->uid, $studiensemester->start, $studiensemester->ende, 'lehre');
 					$hasEchtesDv = hasEchtesDienstverhaeltnis($mitarbeiter->uid, $studiensemester->studiensemester_kurzbz);
+
+					// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+					// geliefert da dies im Vertrag inkludiert ist.
 					$data = is_bool($hasEchtesDv) && $hasEchtesDv ? '' : $stundensatz->stundensatz;
 
 					$return = true;
