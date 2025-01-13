@@ -70,7 +70,9 @@ class CalendarDate {
 		return firstDayOfWeek;
 	}
 	get cdFirstDayOfWeek() {
-		return new CalendarDate(this.firstDayOfWeek);
+		let FirstDayOfWeek = new CalendarDate(this.firstDayOfWeek);
+		FirstDayOfWeek.weekStart = this.weekStart;
+		return FirstDayOfWeek;
 	}
 	get lastDayOfWeek() {
 		let lastDayOfWeek = new Date(this.y, this.m, this.d);
@@ -88,7 +90,9 @@ class CalendarDate {
 		return days
 	}
 	get cdLastDayOfWeek() {
-		return new CalendarDate(this.lastDayOfWeek);
+		let LastDayOfWeek = new CalendarDate(this.lastDayOfWeek);
+		LastDayOfWeek.weekStart = this.weekStart;
+		return LastDayOfWeek;
 	}
 	get firstDayOfCalendarMonth() {
 		let firstDayOfMonth = new Date(this.y, this.m, 1);
@@ -99,7 +103,9 @@ class CalendarDate {
 	get cdFirstDayOfCalendarMonth() {
 		let firstDayOfMonth = new Date(this.y, this.m, 1);
 		let offset = (firstDayOfMonth.getDay() + 7 - this.weekStart) % 7;
-		return new CalendarDate(this.y, this.m, 1-offset);
+		let FirstDayOfCalendarMonth = new CalendarDate(this.y, this.m, 1 - offset);
+		FirstDayOfCalendarMonth.weekStart = this.weekStart;
+		return FirstDayOfCalendarMonth;
 	}
 	get lastDayOfCalendarMonth() {
 		// In JavaScript, the Date constructor interprets: A day of 0 as the last day of the previous month 
@@ -110,12 +116,16 @@ class CalendarDate {
 	get cdLastDayOfCalendarMonth() {
 		let lastDayOfMonth = new Date(this.y, this.m+1, 0);
 		let offset = (lastDayOfMonth.getDay() + 7 - this.weekStart) % 7;
-		return new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDate()+6-offset);
+		let LasyDayOfCalendarMonth = new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDate() + 6 - offset);
+		LasyDayOfCalendarMonth.weekStart = this.weekStart;
+		return LasyDayOfCalendarMonth;
 	}
 	get cdLastDayOfNextCalendarMonth() {
 		let lastDayOfMonth = new Date(this.y, this.m+1, 0);
 		let offset = (lastDayOfMonth.getDay() + 7 - this.weekStart) % 7;
-		return new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth() + 1, lastDayOfMonth.getDate()+6-offset);
+		let LastDayOfNextCalendarMonth = new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth() + 1, lastDayOfMonth.getDate() + 6 - offset);
+		LastDayOfNextCalendarMonth.weekStart = this.weekStart;
+		return LastDayOfNextCalendarMonth;
 	}
 	get nextSevenDays() {
 		const days = []
