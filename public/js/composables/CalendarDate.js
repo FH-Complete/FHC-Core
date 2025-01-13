@@ -128,7 +128,9 @@ class CalendarDate {
 	get numWeeks() {
 		// if the week starts with Monday we have to go 3 days in the past from the start of the next year to get the correct numWeek of the current year
 		// this is because for example 30.12.2024 - 05.01.2025 is the first calendarWeek of 2025 
-		return (new CalendarDate(this.y+1,0,this.weekStart == 1 ? -3 : 0)).w;
+		let lastCalendarWeek = new CalendarDate(this.y + 1, 0, this.weekStart == 1 ? -3 : 0);
+		lastCalendarWeek.weekStart = this.weekStart;
+		return lastCalendarWeek.w;
 	}
 	set(y,m,d,noClean) {
 
