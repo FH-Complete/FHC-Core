@@ -3,7 +3,7 @@ import FhcApi from './FhcApi.js';
 const categories = Vue.reactive({});
 const loadingModules = {};
 let user_language = Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
-let user_locale = Vue.computed(()=>{
+export let user_locale = Vue.computed(()=>{
 	if(!user_language.value) return null;
 	return FHC_JS_DATA_STORAGE_OBJECT.server_languages.find(language => language.sprache == user_language.value).locale;
 });

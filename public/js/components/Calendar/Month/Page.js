@@ -38,7 +38,6 @@ export default {
 		},
 		weeks() {
 			let firstDayOfMonth = new CalendarDate(this.year, this.month, 1);
-			firstDayOfMonth.setLocale(this.$p.user_locale.value);
 			let startDay = firstDayOfMonth.firstDayOfCalendarMonth;
 			let endDay = firstDayOfMonth.lastDayOfCalendarMonth;
 			
@@ -49,7 +48,6 @@ export default {
 				
 				if (week.days.length == 7) {
 					let d = new CalendarDate(week.days[5]);
-					d.setLocale(this.$p.user_locale.value);
 					week.no = d.w;
 					week.y = d.y;
 					res.push(week);

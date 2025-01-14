@@ -6,7 +6,7 @@ import CalendarWeeks from './Weeks.js';
 import CalendarDay from './Day.js';
 import CalendarMinimized from './Minimized.js';
 import CalendarDate from '../../composables/CalendarDate.js';
-
+import CalendarDates from '../../composables/CalendarDates.js';
 
 // TODO(chris): week/month toggle
 
@@ -89,11 +89,6 @@ export default {
 					}
 				}
 			});
-		},
-		"$p.user_locale.value"(newUserLocale){
-			// reset the calculation of the calendarWeek when changing user_locale
-			this.focusDate._clean();
-			this.focusDate.setLocale(newUserLocale);
 		},
 	},
 	emits: [
@@ -206,7 +201,6 @@ export default {
 		this.mode = allowedInitialModes[allowedInitialModes.indexOf(this.initialMode)] || allowedInitialModes.pop();
 		this.date.set(new Date(this.initialDate));
 		this.focusDate.set(this.date);
-		this.focusDate.setLocale(this.$p.user_locale.value);
 	},
 	mounted() {
 		if (this.$refs.container) {
@@ -226,6 +220,9 @@ export default {
 			}).observe(this.$refs.container);
 		}
 
+	},
+	unmounted(){
+		CalendarDates.cleanup();
 	},
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card h-100" :class="sizeClass">

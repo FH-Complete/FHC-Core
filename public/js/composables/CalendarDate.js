@@ -1,8 +1,23 @@
+import {user_locale} from "../plugin/Phrasen.js";
+import CalendarDates from "./CalendarDates.js";
+
 class CalendarDate {
 	constructor(y, m, d) {
 		this.weekStart = CalendarDate.getWeekStart();
+		this.watchLocale = Vue.watch(
+			user_locale,
+			(newLocale, oldLocale, onCleanup) =>{
+				this.weekStart = CalendarDate.getWeekStart();
+				this._clean();
+				onCleanup((cleanup)=>{
+					console.log(cleanup,"HERE IA M")
+				});
+			},
+			
+		);
 		this.set(y, m, d);
 		this._clean();
+		CalendarDates.subscribe(this);
 	}
 	get y() { return this._y }
 	set y(v) { this._y = v; this._clean() }
@@ -71,7 +86,6 @@ class CalendarDate {
 	}
 	get cdFirstDayOfWeek() {
 		let FirstDayOfWeek = new CalendarDate(this.firstDayOfWeek);
-		FirstDayOfWeek.weekStart = this.weekStart;
 		return FirstDayOfWeek;
 	}
 	get lastDayOfWeek() {
@@ -91,7 +105,6 @@ class CalendarDate {
 	}
 	get cdLastDayOfWeek() {
 		let LastDayOfWeek = new CalendarDate(this.lastDayOfWeek);
-		LastDayOfWeek.weekStart = this.weekStart;
 		return LastDayOfWeek;
 	}
 	get firstDayOfCalendarMonth() {
@@ -104,7 +117,6 @@ class CalendarDate {
 		let firstDayOfMonth = new Date(this.y, this.m, 1);
 		let offset = (firstDayOfMonth.getDay() + 7 - this.weekStart) % 7;
 		let FirstDayOfCalendarMonth = new CalendarDate(this.y, this.m, 1 - offset);
-		FirstDayOfCalendarMonth.weekStart = this.weekStart;
 		return FirstDayOfCalendarMonth;
 	}
 	get lastDayOfCalendarMonth() {
@@ -117,14 +129,12 @@ class CalendarDate {
 		let lastDayOfMonth = new Date(this.y, this.m+1, 0);
 		let offset = (lastDayOfMonth.getDay() + 7 - this.weekStart) % 7;
 		let LasyDayOfCalendarMonth = new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDate() + 6 - offset);
-		LasyDayOfCalendarMonth.weekStart = this.weekStart;
 		return LasyDayOfCalendarMonth;
 	}
 	get cdLastDayOfNextCalendarMonth() {
 		let lastDayOfMonth = new Date(this.y, this.m+1, 0);
 		let offset = (lastDayOfMonth.getDay() + 7 - this.weekStart) % 7;
 		let LastDayOfNextCalendarMonth = new CalendarDate(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth() + 1, lastDayOfMonth.getDate() + 6 - offset);
-		LastDayOfNextCalendarMonth.weekStart = this.weekStart;
 		return LastDayOfNextCalendarMonth;
 	}
 	get nextSevenDays() {
@@ -139,7 +149,6 @@ class CalendarDate {
 		// if the week starts with Monday we have to go 3 days in the past from the start of the next year to get the correct numWeek of the current year
 		// this is because for example 30.12.2024 - 05.01.2025 is the first calendarWeek of 2025 
 		let lastCalendarWeek = new CalendarDate(this.y + 1, 0, this.weekStart == 1 ? -3 : 0);
-		lastCalendarWeek.weekStart = this.weekStart;
 		return lastCalendarWeek.w;
 	}
 	set(y,m,d,noClean) {
@@ -197,6 +206,9 @@ class CalendarDate {
 	isDate(obj){
 		return Object.prototype.toString.call(obj) === '[object Date]';
 	}
+	cleanup(){
+		this.watchLocale.stop();
+	}
 }
 /**
  * Returns the weekday number (Date.getDay()) on which the week starts depending on the locale.
@@ -210,7 +222,7 @@ class CalendarDate {
  */
 CalendarDate.getWeekStart = function(locale) {
 
-	locale = locale || navigator.language;
+	locale = user_locale.value || locale || navigator.language;
 	const parts = locale.match(/^([a-z]{2,3})(?:-([a-z]{3})(?=$|-))?(?:-([a-z]{4})(?=$|-))?(?:-([a-z]{2}|\d{3})(?=$|-))?/i);
 
 	const language_code = parts[1];
@@ -239,7 +251,9 @@ CalendarDate.getWeekStart = function(locale) {
 			return 1;
 	}
 	else
+	{
 		return 1;
+	}
 }
 
 
