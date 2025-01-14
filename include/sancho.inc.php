@@ -24,9 +24,6 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/mail.class.php');
 require_once(dirname(__FILE__).'/vorlage.class.php');
 
-// TODO: keep this so that an image is used in any case?
-//const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_DEFAULT.jpg';
-//const DEFAULT_SANCHO_FOOTER_IMG = 'sancho_footer_DEFAULT.jpg';
 const DEFAULT_SENDER = 'noreply';
 
 /**
@@ -44,60 +41,47 @@ const DEFAULT_SENDER = 'noreply';
  */
 function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = '', $footerImg = '', $replyTo = '', $cc = '')
 {
-	$from = defined('CUSTOM_MAIl_SENDER') && CUSTOM_MAIl_SENDER != '' ? CUSTOM_MAIl_SENDER : DEFAULT_SENDER;
-	$from = $from.'@'. DOMAIN;
+	$from = DEFAULT_SENDER.'@'. DOMAIN;
 
-	$image_path_prefix = dirname(__FILE__). '/../skin/images/sancho/';
+	$header_image_path_prefix = dirname(__FILE__). '/../skin/images/sancho/';
+	$footer_image_path_prefix = dirname(__FILE__). '/../skin/images/sancho/';
+	$sanchoHeader_img = '';
+	$sanchoFooter_img = '';
 
-	//$sanchoHeader_img = dirname(__FILE__). '/../skin/images/sancho/'. self::DEFAULT_SANCHO_HEADER_IMG;
-	// hide header by default
-	$sanchoHeader_img = false;
-	$header_visibility = 'display:none';
-
-	if ($headerImg !== false)
+	if (!defined('CUSTOM_MAIL_USE_IMAGES') || CUSTOM_MAIL_USE_IMAGES)
 	{
 		if (isset($headerImg) && $headerImg != '')
 		{
 			// use provided header image
 			$sanchoHeader_img = $headerImg;
 		}
-		elseif (defined('CUSTOM_MAIl_HEADER_IMG') && CUSTOM_MAIl_HEADER_IMG != '')
+		elseif (defined('CUSTOM_MAIL_HEADER_IMG') && CUSTOM_MAIL_HEADER_IMG != '')
 		{
 			// use default header image
-			$sanchoHeader_img = CUSTOM_MAIl_HEADER_IMG;
+			$sanchoHeader_img = CUSTOM_MAIL_HEADER_IMG;
 		}
 
-		if ($sanchoHeader_img !== false)
+		if ($sanchoHeader_img != '')
 		{
-			// set full image path and visibility
-			$sanchoHeader_img = $image_path_prefix.$sanchoHeader_img;
-			$header_visibility = '';
+			// set full image path
+			$sanchoHeader_img = $header_image_path_prefix.$sanchoHeader_img;
 		}
-	}
 
-	//$sanchoFooter_img = dirname(__FILE__). '/../skin/images/sancho/'. self::DEFAULT_SANCHO_FOOTER_IMG;
-	// hide footer by default
-	$sanchoFooter_img = false;
-	$footer_visibility = 'display:none';
-
-	if ($footerImg !== false)
-	{
 		if (isset($footerImg) && $footerImg != '')
 		{
 			// use provided footer image
 			$sanchoFooter_img = $footerImg;
 		}
-		elseif (defined('CUSTOM_MAIl_FOOTER_IMG') && CUSTOM_MAIl_FOOTER_IMG != '')
+		elseif (defined('CUSTOM_MAIL_FOOTER_IMG') && CUSTOM_MAIL_FOOTER_IMG != '')
 		{
 			// use default footer image
-			$sanchoFooter_img = CUSTOM_MAIl_FOOTER_IMG;
+			$sanchoFooter_img = CUSTOM_MAIL_FOOTER_IMG;
 		}
 
-		if ($sanchoFooter_img !== false)
+		if ($sanchoFooter_img !== '')
 		{
-			// set full image path and visibility
-			$sanchoFooter_img = $image_path_prefix.$sanchoFooter_img;
-			$footer_visibility = '';
+			// set full image path
+			$sanchoFooter_img = $footer_image_path_prefix.$sanchoFooter_img;
 		}
 	}
 
@@ -112,9 +96,7 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 	$layout = array(
 		'CID_header' => $cid_header,
 		'CID_footer' => $cid_footer,
-		'content' => $content,
-		'header_visibility' => $header_visibility,
-		'footer_visibility' => $footer_visibility
+		'content' => $content
 	);
 
 	// Set the data array into overall sancho mail template
@@ -124,8 +106,8 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 	$mail = new Mail($to, $from, $subject, $body);
 
 	// * embed the images if needed
-	if ($sanchoHeader_img !== false) $mail->addEmbeddedImage($sanchoHeader_img, 'image/jpg', '', $cid_header);
-	if ($sanchoFooter_img !== false) $mail->addEmbeddedImage($sanchoFooter_img, 'image/jpg', '', $cid_footer);
+	if ($sanchoHeader_img != '') $mail->addEmbeddedImage($sanchoHeader_img, 'image/jpg', '', $cid_header);
+	if ($sanchoFooter_img != '') $mail->addEmbeddedImage($sanchoFooter_img, 'image/jpg', '', $cid_footer);
 
 	// * Set reply-to
 	if (isset($replyTo) && $replyTo != '')

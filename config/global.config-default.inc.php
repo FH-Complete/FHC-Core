@@ -314,12 +314,12 @@ define ('ZAHLUNGSBESTAETIGUNG_ANZEIGEN_FUER_LEHRGAENGE', true);
 // Gibt an, ob im CIS die Zahlungsreferenz angezeigt wird
 define ('ZAHLUNGSBESTAETIGUNG_ZAHLUNGSREFERENZ_ANZEIGEN', false);
 
-// sender for custom mails
-define('CUSTOM_MAIl_SENDER', 'noreply');
+// header und footer Bilder für eigene Mails verwenden
+define('CUSTOM_MAIL_USE_IMAGES', true);
 
-// header image for custom mails
-define('CUSTOM_MAIl_HEADER_IMG', 'sancho_header_DEFAULT.jpg');
+// header Bild für eigene Mails
+define('CUSTOM_MAIL_HEADER_IMG', 'sancho_header_DEFAULT.jpg');
 
-// footer image for custom mails
-define('CUSTOM_MAIl_FOOTER_IMG', 'sancho_footer_DEFAULT.jpg');
+// footer image for eigene Mails
+define('CUSTOM_MAIL_FOOTER_IMG', 'sancho_footer_DEFAULT.jpg');
 ?>
