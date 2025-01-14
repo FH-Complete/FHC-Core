@@ -66,13 +66,6 @@ $data = '';
 $error = false;
 $warnung = false;
 
-//Default BA1Codes für echte Dienstverträge aus Config Laden
-$arrEchterDV = [103];
-if (defined('DEFAULT_ECHTER_DIENSTVERTRAG') && DEFAULT_ECHTER_DIENSTVERTRAG != '')
-{
-	$arrEchterDV = DEFAULT_ECHTER_DIENSTVERTRAG;
-}
-
 loadVariables($user);
 
 //Berechtigungen laden
@@ -589,7 +582,13 @@ if(!$error)
 
 						$stundensatz = new stundensatz();
 						$stundensatz->getStundensatzDatum($mitarbeiter->uid, $studiensemester->start, $studiensemester->ende, 'lehre');
-						$lem->stundensatz = is_bool($hasEchtesDv) && $hasEchtesDv ? '' : $stundensatz->stundensatz;
+						$lem->stundensatz =
+							defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+							&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ
+							&& is_bool($hasEchtesDv)
+							&& $hasEchtesDv
+							? ''
+							: $stundensatz->stundensatz;
 					}
 					else
 					{
@@ -1585,9 +1584,15 @@ if(!$error)
 					$stundensatz->getStundensatzDatum($mitarbeiter->uid, $studiensemester->start, $studiensemester->ende, 'lehre');
 					$hasEchtesDv = hasEchtesDienstverhaeltnis($mitarbeiter->uid, $studiensemester->studiensemester_kurzbz);
 
-					// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+					// Bei echten Dienstvertraegen wird kein Stundensatz
 					// geliefert da dies im Vertrag inkludiert ist.
-					$data = is_bool($hasEchtesDv) && $hasEchtesDv ? '' : $stundensatz->stundensatz;
+					$data =
+						defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+						&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ
+						&& is_bool($hasEchtesDv)
+						&& $hasEchtesDv
+						? ''
+						: $stundensatz->stundensatz;
 
 					$return = true;
 				}
