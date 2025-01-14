@@ -604,6 +604,7 @@ elseif (isset($prestudent_id))
 
 				$ps_obj->lastStatus = $ps_tmp->status_kurzbz; // letzten Status dem result array hinzufügen
 				$ps_obj->status_mehrsprachig = $ps_tmp->status_mehrsprachig;
+				$ps_obj->ausbildungssemester = $ps_tmp->ausbildungssemester;
 			}
 
 			// Falls Status 'Abgewiesene' vorhanden, nach hinten reihen

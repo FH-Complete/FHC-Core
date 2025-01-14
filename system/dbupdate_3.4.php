@@ -67,6 +67,7 @@ require_once('dbupdate_3.4/25999_C4_permission.php');
 require_once('dbupdate_3.4/33683_digitale_anwesenheitsliste_und_entschuldigungsmanagement_fuer_studierende_prototyp.php');
 require_once('dbupdate_3.4/40717_lv_faktor.php');
 require_once('dbupdate_3.4/48526_pep_tagging.php');
+require_once('dbupdate_3.4/54225_reihungstest_ablauf_fuer_quereinsteiger.php');
 
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -377,6 +378,7 @@ $tabellen=array(
 	"testtool.tbl_pruefling_frage"  => array("prueflingfrage_id","pruefling_id","frage_id","nummer","begintime","endtime"),
 	"testtool.tbl_frage_sprache"  => array("frage_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
 	"testtool.tbl_vorschlag_sprache"  => array("vorschlag_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
+	"testtool.tbl_pruefling_gebiet"  => array("prueflinggebiet_id","pruefling_id","gebiet_id","insertamum"),
 	"system.tbl_app" => array("app"),
 	"system.tbl_appdaten" => array("appdaten_id","uid","app","appversion","version","bezeichnung","daten","freigabe","insertamum","insertvon","updateamum","updatevon"),
 	"system.tbl_cronjob"  => array("cronjob_id","server_kurzbz","titel","beschreibung","file","last_execute","aktiv","running","jahr","monat","tag","wochentag","stunde","minute","standalone","reihenfolge","updateamum", "updatevon","insertamum","insertvon","variablen"),
