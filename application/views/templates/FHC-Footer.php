@@ -13,6 +13,9 @@
 	$calledPath = $this->router->directory.$this->router->class;
 	$calledMethod = $this->router->method;
 
+	$this->load->config('javascript');
+	$use_vuejs_dev_version = $this->config->item('use_vuejs_dev_version');
+
 	// By default set the parameters to null
 	$customJSs = isset($customJSs) ? $customJSs : null;
 	$customJSModules = isset($customJSModules) ? $customJSModules : null;
@@ -110,7 +113,14 @@
 	// Vue 3 JS
 	if ($vue3 === true)
 	{
-		generateJSsInclude('vendor/vuejs/vuejs3/vue.global.prod.js');
+		if($use_vuejs_dev_version && $use_vuejs_dev_version === true)
+		{
+			generateJSsInclude('vendor/vuejs/vuejs3_dev/vue.global.js');
+		}
+		else
+		{
+			generateJSsInclude('vendor/vuejs/vuejs3/vue.global.prod.js');
+		}
 		generateJSsInclude('vendor/vuejs/vuerouter4/vue-router.global.js');
 	}
 
