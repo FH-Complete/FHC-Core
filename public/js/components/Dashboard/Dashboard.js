@@ -15,7 +15,7 @@ export default {
 		return {
 			sections: [],
 			widgets: null,
-			viewData: JSON.parse(this.viewDataString),
+			viewData: JSON.parse(this.viewDataString ?? '{}'),
 			editMode: false
 		}
 	},

@@ -36,8 +36,8 @@ class Dashboard extends Auth_Controller
 			'name' => $personData->vorname,
 			'person_id' => $personData->person_id
 		);
-
-		$this->load->view('CisVue/Dashboard.php',['viewData' => $viewData]);
+		
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData]);
 
 	}
 }

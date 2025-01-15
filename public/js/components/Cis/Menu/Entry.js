@@ -15,7 +15,7 @@ export default {
 			urlCount:0,
         }
     },
-	inject: ['makeParentContentActive', 'setActiveEntry','addUrlCount'],
+	inject: ['makeParentContentActive', 'setActiveEntry','addUrlCount', 'routeMap'],
 	watch:{
 		highestMatchingUrlCount: function(newValue)
 		{
@@ -77,6 +77,7 @@ export default {
                     return '';
                 let xmlDoc = (new DOMParser()).parseFromString(this.entry.content,"text/xml");
                 let url = xmlDoc.getElementsByTagName('url')[0];
+				
                 if (!url)
                     return '';
                 // TODO(chris): replace get params
@@ -184,7 +185,19 @@ export default {
 			{
 				this.setActiveEntry(this.entry.content_id);
 			}
-        }
+        },
+		handleClick(e) {
+			// TODO: this needs to be done more resilient
+			const linkParts = this.link.split('/')
+			const routePath = linkParts.reverse()[0]
+			const r = this.routeMap.find(route => route.paths.includes(routePath))
+			if(window.fhcVueRouter && r) {
+				const re = new CustomEvent("fhcnavigate", { detail: r.routeName })
+				window.dispatchEvent(re)
+			} else {
+				location.href = this.link
+			}
+		}
     },
     mounted() {
         if (this.$refs.children) {
@@ -224,7 +237,7 @@ export default {
             </ul>
         </template>
         <a v-else
-            :href="link"
+            @click="handleClick"
             :target="target"
             :class="{
                 'btn btn-default rounded-0 w-100 text-start': true,
