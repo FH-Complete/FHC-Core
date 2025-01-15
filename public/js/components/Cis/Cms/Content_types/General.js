@@ -1,4 +1,4 @@
-
+import { replaceRelativeLegacyLink } from "../../../../helpers/LegacyLinkReplaceHelper.js"
 export default {
 	name: "GeneralComponent",
     props:{
@@ -99,13 +99,12 @@ export default {
               FHC_JS_DATA_STORAGE_OBJECT.app_root
             );
           });
-		document.querySelectorAll("[href]").forEach((el) => {
-			let original_href = el.getAttribute("href");
-			// replaces the old relative paths with the new app_root path
-			if (original_href.match(/^\.\.\/index\.ci\.php/)){
-				el.href = original_href.replace(/^\.\.\/index\.ci\.php\//,FHC_JS_DATA_STORAGE_OBJECT.app_root);
-			}			
-		});
+			
+			document.querySelectorAll("[href]").forEach((element) => {
+				let orignal_href = element.getAttribute("href");
+				let new_href = replaceRelativeLegacyLink(orignal_href);
+				element.href = new_href;
+			});
     },
     template: /*html*/ `
       <!-- div that contains the content -->
