@@ -99,6 +99,13 @@ export default {
               FHC_JS_DATA_STORAGE_OBJECT.app_root
             );
           });
+		document.querySelectorAll("[href]").forEach((el) => {
+			let original_href = el.getAttribute("href");
+			// replaces the old relative paths with the new app_root path
+			if (original_href.match(/^\.\.\/index\.ci\.php/)){
+				el.href = original_href.replace(/^\.\.\/index\.ci\.php\//,FHC_JS_DATA_STORAGE_OBJECT.app_root);
+			}			
+		});
     },
     template: /*html*/ `
       <!-- div that contains the content -->
