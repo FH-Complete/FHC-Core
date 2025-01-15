@@ -47,6 +47,8 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 	$footer_image_path_prefix = dirname(__FILE__). '/../skin/images/sancho/';
 	$sanchoHeader_img = '';
 	$sanchoFooter_img = '';
+	$cid_header = '';
+	$cid_footer = '';
 
 	if (!defined('CUSTOM_MAIL_USE_IMAGES') || CUSTOM_MAIL_USE_IMAGES)
 	{
@@ -83,11 +85,11 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 			// set full image path
 			$sanchoFooter_img = $footer_image_path_prefix.$sanchoFooter_img;
 		}
-	}
 
-	// Set unique content id for embedding header and footer image
-	$cid_header = uniqid();
-	$cid_footer = uniqid();
+		// Set unique content id for embedding header and footer image
+		$cid_header = uniqid();
+		$cid_footer = uniqid();
+	}
 
 	// Set specific mail content into specific content template
 	$content = parseMailContent($vorlage_kurzbz, $vorlage_data);

@@ -32,3 +32,12 @@ $config['validate'] = false; // If true then the email address will be validated
 
 // If enabled will be logged info about emails in Codeigniter error logs
 $config['enable_debug'] = false;
+
+// If to use images for custom mails
+$config['custom_mail_use_images'] = CUSTOM_MAIL_USE_IMAGES;
+
+// header image for custom mails
+$config['custom_mail_header_img'] = CUSTOM_MAIL_HEADER_IMG;
+
+// footer image for custom mails
+$config['custom_mail_footer_img'] = CUSTOM_MAIL_FOOTER_IMG;

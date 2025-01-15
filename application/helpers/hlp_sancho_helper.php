@@ -23,9 +23,6 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 // Functions needed in the view FHC-Header
 // ------------------------------------------------------------------------
 
-const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_DEFAULT.jpg';
-const DEFAULT_SANCHO_FOOTER_IMG = 'sancho_footer_DEFAULT.jpg';
-
 /**
  * Send single Mail with Sancho Design and Layout.
  * @param string $vorlage_kurzbz Name of the template for specific mail content.
@@ -43,8 +40,8 @@ function sendSanchoMail(
 	$vorlage_data,
 	$to,
 	$subject,
-	$headerImg = DEFAULT_SANCHO_HEADER_IMG,
-	$footerImg = DEFAULT_SANCHO_FOOTER_IMG,
+	$headerImg = '',
+	$footerImg = '',
 	$from = null,
 	$cc = null,
 	$bcc = null
@@ -54,8 +51,8 @@ function sendSanchoMail(
 	$ci->load->library('email');
 	$ci->load->library('MailLib');
 
-	$sanchoHeader_img = 'skin/images/sancho/'. $headerImg;
-	$sanchoFooter_img = 'skin/images/sancho/'. $footerImg;
+	$custom_mail_use_images = $ci->config->item('mail');
+
 
 	if ($from == '')
 	{
@@ -65,10 +62,42 @@ function sendSanchoMail(
 	// Embed sancho header and footer image
 	// reset important to ensure embedding of images when called in a loop
 	$ci->email->clear(true);  // clear vars and attachments
-	$ci->email->attach($sanchoHeader_img);
-	$ci->email->attach($sanchoFooter_img);
-	$cid_header = $ci->email->attachment_cid($sanchoHeader_img); // sets unique content id for embedding
-	$cid_footer = $ci->email->attachment_cid($sanchoFooter_img); // sets unique content id for embedding
+
+	$cid_header = '';
+	$cid_footer = '';
+
+	if (isset($custom_mail_use_images['custom_mail_use_images']) && $custom_mail_use_images['custom_mail_use_images'])
+	{
+		$sanchoHeader_img = '';
+		$sanchoFooter_img = '';
+
+		if (isset($headerImg) && $headerImg != '')
+		{
+			// use provided header image
+			$sanchoHeader_img = $headerImg;
+		}
+		elseif (isset($custom_mail_use_images['custom_mail_header_img']) && $custom_mail_use_images['custom_mail_header_img'])
+		{
+			// use default header image
+			$sanchoHeader_img = 'skin/images/sancho/'. $custom_mail_use_images['custom_mail_header_img'];
+		}
+
+		if (isset($footerImg) && $footerImg != '')
+		{
+			// use provided footer image
+			$sanchoFooter_img = $footerImg;
+		}
+		elseif (isset($custom_mail_use_images['custom_mail_footer_img']) && $custom_mail_use_images['custom_mail_footer_img'])
+		{
+			// use default footer image
+			$sanchoFooter_img = 'skin/images/sancho/'. $custom_mail_use_images['custom_mail_footer_img'];
+		}
+
+		$ci->email->attach($sanchoHeader_img);
+		$ci->email->attach($sanchoFooter_img);
+		$cid_header = $ci->email->attachment_cid($sanchoHeader_img); // sets unique content id for embedding
+		$cid_footer = $ci->email->attachment_cid($sanchoFooter_img); // sets unique content id for embedding
+	}
 
 	// Set specific mail content into specific content template
 	$content = _parseMailContent($vorlage_kurzbz, $vorlage_data);
