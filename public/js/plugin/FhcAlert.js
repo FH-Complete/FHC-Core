@@ -263,6 +263,10 @@ export default {
 				return false;
 			},
 			handleSystemError(error) {
+				// don't show an error message to the user if the error was an aborted request
+				if(error.hasOwnProperty('name') && error.name.toLowerCase() === "AbortError".toLowerCase())
+					return;
+				
 				// Error is string
 				if (typeof error === 'string')
 					return $fhcAlert.alertSystemError(error);
@@ -278,6 +282,7 @@ export default {
 				// Error is object
 				if (typeof error === 'object' && error !== null) {
 					let errMsg = '';
+
 
 					if (error.hasOwnProperty('response') && error.response?.data?.retval)
 						errMsg += 'Error Message: ' + (error.response.data.retval.message || error.response.data.retval) + '\r\n';
