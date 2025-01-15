@@ -991,8 +991,8 @@ class DB_Model extends CI_Model
 
 						// Find and replace all the occurrences of the provided encrypted columns
 						// with the postgresql decryption function
-						$query = str_replace(
-							$encryptedColumn,
+						$query = preg_replace(
+							'/\b' . $encryptedColumn . '\b/',
 							sprintf(
 								self::CRYPT_WHERE_TEMPLATE,
 								$encryptedColumn,
@@ -1106,8 +1106,8 @@ class DB_Model extends CI_Model
 						{
 							// Find and replace all the occurrences of the provided encrypted columns
 							// with the postgresql decryption function
-							$where = str_replace(
-								$encryptedColumn,
+							$where = preg_replace(
+								'/\b' . $encryptedColumn . '\b/',
 								sprintf(
 									self::CRYPT_WHERE_TEMPLATE,
 									$encryptedColumn,
