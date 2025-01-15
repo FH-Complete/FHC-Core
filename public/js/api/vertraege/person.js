@@ -49,5 +49,18 @@ export default {
 	},
 	deleteBetreuung(params) {
 		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/deleteBetreuung/' + params.vertrag_id, params);
+	},
+	getMitarbeiter(params){
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/getMitarbeiter/');
+	},
+	getHeader(person_id){
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/getHeader/' + person_id);
+	},
+	getPersonAbteilung(person_id){
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/getPersonAbteilung/' + person_id);
+	},
+	getLeitungOrg(oekurzbz){
+		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/getLeitungOrg/' + oekurzbz);
 	}
+
 }

@@ -32,6 +32,11 @@ export default {
 			required: true
 		},
 	},
+	computed: {
+		appRoot() {
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root;
+		}
+	},
 	data() {
 		return {
 			tabulatorOptions: {
@@ -170,7 +175,7 @@ export default {
 				datum: new Date(),
 			},
 			childData: {},
-			isFilterSet: false
+			isFilterSet: false,
 		}
 	},
 	watch: {
@@ -434,6 +439,7 @@ export default {
 		this.$nextTick(() => {
 			this.$refs.table.tabulator.on("rowClick", (e, row) => {
 				this.contractSelected = row.getData();
+				console.log("selected Row ", this.contractSelected);
 			});
 		});
 		this.getFormattedDate();
@@ -441,6 +447,17 @@ export default {
 	},
 	template: `
 	<div class="core-contracts h-100 d-flex flex-column">
+	
+	
+	
+
+<!--	<div 
+		class="d-flex justify-content-start align-items-center w-100 pb-3 gap-3" 
+		style="max-height: 8rem; overflow: hidden;">
+	<img class="d-block h-100 rounded" alt="profilbild" :src="appRoot + 'cis/public/bild.php?src=person&person_id=' + person_id">
+&lt;!&ndash;		<img class="d-block h-100 rounded" alt="profilbild" :src="appRoot + 'cis/public/bild.php?src=person&person_id=' + student.person_id">
+			<h2 class="h4">{{students[0].titlepre}} {{students[0].vorname}} {{students[0].nachname}} {{students[0].titlepost}}</h2>&ndash;&gt;
+	</div>-->
 	
 <!--	filter: open means no status abgerechnet yet-->
 		<div class="justify-content-end pb-3">
@@ -467,7 +484,7 @@ export default {
 			>
 		</core-filter-cmpt>
 		
-		<div class = "row">
+		<div class="row">
 			<div class="col-sm-6">
 				<!-- ContractDetails -->
 				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">

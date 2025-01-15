@@ -23,7 +23,12 @@ class Vertraege extends FHCAPI_Controller
 			'deleteContractStatus' => self::PERM_LOGGED,
 			'updateContractStatus' => self::PERM_LOGGED,
 			'deleteLehrauftrag' => self::PERM_LOGGED,
-			'deleteBetreuung' => self::PERM_LOGGED
+			'deleteBetreuung' => self::PERM_LOGGED,
+			//TODO(Manu) Berechtigung
+			'getMitarbeiter' => self::PERM_LOGGED,
+			'getHeader' => self::PERM_LOGGED,
+			'getPersonAbteilung' => self::PERM_LOGGED,
+			'getLeitungOrg' => self::PERM_LOGGED,
 			]);
 
 		//Load Models and Libraries
@@ -640,4 +645,84 @@ class Vertraege extends FHCAPI_Controller
 		}
 		return $this->terminateWithSuccess(current(getData($result)));
 	}
+
+	public function getMitarbeiter()
+	{
+		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
+
+		$result = $this->Mitarbeitermodel->getPersonenWithContractDetails();
+
+		if (isError($result))
+		{
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		if (!hasData($result))
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Id_Lehrauftrag']), self::ERROR_TYPE_GENERAL);
+		}
+		return $this->terminateWithSuccess(getData($result));
+	}
+
+	public function getPersonAbteilung($person_id)
+	{
+		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
+
+		$result = $this->Mitarbeitermodel->getPersonAbteilung($person_id);
+
+		if (isError($result))
+		{
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		if (!hasData($result))
+		{
+			//TODO(Manu) rewrite better
+			return $this->terminateWithSuccess("no benutzerdata", self::ERROR_TYPE_GENERAL);
+
+		//	return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'personID']), self::ERROR_TYPE_GENERAL);
+		}
+		return $this->terminateWithSuccess(getData($result));
+	}
+
+	public function getLeitungOrg($oekurzbz)
+	{
+		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
+
+		$result = $this->Mitarbeitermodel->getLeitungOrg($oekurzbz);
+
+		if (isError($result))
+		{
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		if (!hasData($result))
+		{
+			//TODO(Manu) rewrite better
+			return $this->terminateWithSuccess("no benutzerdata", self::ERROR_TYPE_GENERAL);
+
+		//	return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'personID']), self::ERROR_TYPE_GENERAL);
+		}
+		return $this->terminateWithSuccess(getData($result));
+	}
+
+	public function getHeader($person_id)
+	{
+		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
+
+		$result = $this->Mitarbeitermodel->getHeader($person_id);
+
+		if (isError($result))
+		{
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		if (!hasData($result))
+		{
+				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'personID']), self::ERROR_TYPE_GENERAL);
+		}
+
+/*		$result = current(getData($result));
+		$header = $result->name;*/
+
+		//return $this->terminateWithSuccess($header);
+		return $this->terminateWithSuccess(getData($result));
+	}
+
 }
