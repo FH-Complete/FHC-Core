@@ -31355,7 +31355,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Wenn Ihre Daten stimmen, geben Sie bitte Ihre E-Mail Adresse ein und drücken Sie auf "Bewerbung verfifizieren".
+				'text' => 'Wenn Ihre Daten stimmen, geben Sie bitte Ihre E-Mail Adresse ein und drücken Sie auf "Bewerbung verifizieren".
 Danach erhalten Sie eine E-Mail mit dem Link zu Ihrer Bewerbung an die angegebene Adresse.
 Dort können Sie Studienrichtungen hinzufügen, Ihre Daten vervollständigen, und sich unverbindlich bewerben.',
 				'description' => '',
