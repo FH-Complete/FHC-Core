@@ -164,7 +164,7 @@ export default {
 	template: /*html*/ `
 <div class="widgets-news h-100" :style="getNewsWidgetStyle">
     <div class="d-flex flex-column h-100">
-    
+
         <div class="h-100" style="overflow-y: auto" v-if="width == 1">
             <div  v-for="(news, index) in newsList" :key="news.news_id" class="mt-2">
                 <div v-if="index > 0 " class="fhc-seperator"></div>
@@ -175,30 +175,34 @@ export default {
         <div v-else class="row h-100 g-0">
         	<div :class="'col-'+(width == 2? 6 : 4) + ' h-100 g-0'" style="overflow: auto;">
         		<template v-for="news in newsList" :key="'menu-'+news.news_id">
-					
+
 					<div class="row fhc-news-menu-item" @click="setSelected(news)" :class="getMenuItemClass(news)" style="margin-right: 0px; margin-left: 0px; overflow-y: hidden;">
 						<div class="col-8 fhc-news-menu-item-betreff"><p>{{news.content_obj.betreff ?? ''}}</p></div>
 						<span class="fhc-news-menu-item-date fw-bold"
 						 >{{ news.datumformatted ?? ''}}</span>
 					</div>
-					
+
 				</template>
 			</div>
 			<div :class="'col-'+(width == 2? 6 : 8) + ' h-100'" style="padding-left: 0px; padding-right: 0px;" ref="htmlContent">
 				<div class="container h-100" style="padding: 0px;"  ref="carocontainer">
-					<div id="carouselExample" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel" data-bs-ride="carousel" 
+					<div id="carouselExample" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel" data-bs-ride="carousel"
 						data-bs-interval="false">
 
 						<div class="carousel-inner" ref="carouselInner"  style="height: 100%; max-width: 100%;">
 							<div v-for="(news, index) in newsList" class="carousel-item" :class="getDynClassCarouselItem(news, index)" style="overflow-y: auto; height: 100%;" :id="'card-'+news.news_id" v-html="news.content_obj.content">
-								
+
 							</div>
 						</div>
-						<button @click="setPrev" style="z-index: 9999; color: black; overflow: hidden; width: 10%; margin-left: 5%;" data-bs-target="#carouselExample" class="carousel-control-prev" type="button">
-							<i class="fa fa-chevron-left"></i>
+						<button @click="setPrev" style="z-index: 100; color: black; overflow: hidden; width: 10%; margin-left: 5%;" data-bs-target="#carouselExample" class="carousel-control-prev" type="button">
+							<div class="border rounded-circle" style="padding-left: 0.4rem; padding-right: 0.4rem; background-color:rgba(138,138,138,0.4)">
+								<i class="fa fa-chevron-left"></i>
+							</div>
 						</button>
-						<button @click="setNext" style="z-index: 9999; color: black; overflow: hidden; width: 10%; margin-right: 5%;" data-bs-target="#carouselExample" class="carousel-control-next"  type="button">
-							<i class="fa fa-chevron-right"></i>
+						<button @click="setNext" style="z-index: 100; color: black; overflow: hidden; width: 10%; margin-right: 5%;" data-bs-target="#carouselExample" class="carousel-control-next"  type="button">
+							<div class="border rounded-circle" style="padding-left: 0.4rem; padding-right: 0.4rem; background-color:rgba(138,138,138,0.4)">
+								<i class="fa fa-chevron-right"></i>
+							</div>
 						</button>
 					</div>
 				</div>
