@@ -237,7 +237,7 @@ export default {
 						<button v-if="mode === 'edit'" class="btn btn-danger" @click="deleteTag">Löschen</button>
 					</div>
 					<button type="button" class="btn btn-primary" @click="saveTag">
-						{{ mode === "edit" ? $p.t('ui', 'bearbeiten') : $p.t('studierendenantrag', 'btn_create') }}
+						{{ mode === "edit" ? $p.t('global', 'speichern') : $p.t('global', 'create') }}
 					</button>
 				</div>
 			</template>

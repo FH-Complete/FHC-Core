@@ -1236,6 +1236,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'global',
+		'phrase' => 'create',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
 		'phrase' => 'loeschen',
 		'insertvon' => 'system',
 		'phrases' => array(
