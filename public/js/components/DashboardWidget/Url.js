@@ -107,14 +107,14 @@ export default {
 		// this.$emit('setConfig', true); -> use this to enable widget config mode if needed
 	},
 	template: /*html*/ `
-    <div class="widgets-url w-100 h-100" style="padding: 1rem 1rem;">
+    <div class="widgets-url w-100 h-100 overflow-scroll" style="padding: 1rem 1rem;">
         <div class="d-flex flex-column justify-content-between">
         <!-- todo: widgetTag ?? -->
             <template v-if="shared">
                 <template v-if="!emptyBookmarks">
 					<div v-for="link in shared" :key="link.id" class="d-flex mt-2">
 						<a target="_blank" :href="link.url">
-							<i class="fa fa-solid fa-arrow-up-right-from-square"></i>{{ link.title }}
+							<i class="fa fa-solid fa-arrow-up-right-from-square me-1"></i>{{ link.title }}
 						</a>
 						<a class="ms-auto" href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode || editModeIsActive">
 							<i class="fa fa-regular fa-trash-can" style="color: #e01b24;"></i>
