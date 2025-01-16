@@ -36,6 +36,6 @@ class Cis4 extends Auth_Controller
 			'person_id' => $personData->person_id
 		);
 
-		$this->load->view('CisRouterView/CisRouterView.php',['viewData' => $viewData]);
+		$this->load->view('CisRouterView/CisRouterView.php',['viewData' => $viewData, 'route' => 'FhcDashboard']);
 	}
 }

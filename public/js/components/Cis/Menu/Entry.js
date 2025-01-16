@@ -15,7 +15,7 @@ export default {
 			urlCount:0,
         }
     },
-	inject: ['makeParentContentActive', 'setActiveEntry','addUrlCount', 'routeMap'],
+	inject: ['makeParentContentActive', 'setActiveEntry','addUrlCount'],
 	watch:{
 		highestMatchingUrlCount: function(newValue)
 		{
@@ -55,11 +55,8 @@ export default {
 					this.makeParentContentActive(this.entry.content_id);
 				}
 			}
-			// debugging helpers - console.log(this.entry.titel, newValue ? "open" : "close")
-			
 		},
 	},
-		
     computed: {
 		active: function () {
 			if (this.entry.menu_open){
@@ -185,19 +182,7 @@ export default {
 			{
 				this.setActiveEntry(this.entry.content_id);
 			}
-        },
-		handleClick(e) {
-			// TODO: this needs to be done more resilient
-			const linkParts = this.link.split('/')
-			const routePath = linkParts.reverse()[0]
-			const r = this.routeMap.find(route => route.paths.includes(routePath))
-			if(window.fhcVueRouter && r) {
-				const re = new CustomEvent("fhcnavigate", { detail: r.routeName })
-				window.dispatchEvent(re)
-			} else {
-				location.href = this.link
-			}
-		}
+        }
     },
     mounted() {
         if (this.$refs.children) {
@@ -215,7 +200,9 @@ export default {
     <template v-else>
         <template v-if="hasChilds">
 			<div class="btn-group w-100">
-                <a :href="(entry.menu_open)?link:null" :target="target" @click="toggleCollapse"
+ 				<a :target="target" 
+ 					:href="(entry.menu_open)?link:null"
+					@click="toggleCollapse"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
                         ['btn-level-' + level]: true,
@@ -236,8 +223,8 @@ export default {
                 <cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
             </ul>
         </template>
-        <a v-else
-            @click="handleClick"
+		<a v-else
+            :href="link"
             :target="target"
             :class="{
                 'btn btn-default rounded-0 w-100 text-start': true,

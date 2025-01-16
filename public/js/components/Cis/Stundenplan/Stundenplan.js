@@ -13,8 +13,12 @@ export const Stundenplan = {
 			currentlySelectedEvent: null,
 			currentDay: new Date(),
 			minimized: false,
+			viewData: JSON.parse(this.viewDataString ?? '{}'),
 		}
 	},
+	props: [
+		"viewDataString"
+	],
 	components: {
 		FhcCalendar, LvModal, LvMenu, LvInfo
 	},
@@ -75,7 +79,7 @@ export const Stundenplan = {
 		},
 		loadEvents: function(){
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.lv_id),
+				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.viewData.lv_id),
 				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay)
 			]).then((result) => {
 				let promise_events = [];

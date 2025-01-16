@@ -2,12 +2,6 @@ import CisMenuEntry from "./Menu/Entry.js";
 import FhcSearchbar from "../searchbar/searchbar.js";
 import CisSprachen from "./Sprachen.js"
 
-// TODO: maybe get this from global vue router variable
-const routeMap = [
-	{ routeName: 'FhcDashboard', paths: ['', '/', 'Cis4']},
-	{ routeName: 'Stundenplan', paths: ['Stundenplan']}
-]
-
 export default {
     components: {
         CisMenuEntry,
@@ -34,7 +28,6 @@ export default {
     },
 	provide(){
 		return{
-			routeMap,
 			setActiveEntry: this.setActiveEntry,
 			addUrlCount: this.addUrlCount,
 			makeParentContentActive: this.makeParentContentActive,

@@ -28,42 +28,9 @@ const router = VueRouter.createRouter({
 
 const app = Vue.createApp({
 	name: 'CmsApp',
-	data() {
-		return {
-			interceptHandler: this.intercept
-		}
-	},
 	components: {
 		CmsNews,
 		CmsContent,
-	},
-	methods: {
-		intercept(e) {
-			// TODO: maybe a more sophisticated menu link click detection is possible?
-			if (e.target.tagName === "A" && e.target.pathname?.includes(ciPath) && e.target.pathname.includes('Cms/content')) {
-				const pathParts = e.target.pathname.split('/').filter(Boolean);
-				const idString = pathParts[pathParts.length - 1];
-				const content_id = idString && !isNaN(Number(idString)) ? idString : null; // only return id if it is a number string since the path might contain invalid elements
-
-				e.preventDefault() // prevents normal browser page load
-				this.$router.push({
-					name: 'Content',
-					params: {
-						content_id
-					}
-				})
-
-			} else if(e.target.tagName === "A" && e.target.pathname?.includes(ciPath) && e.target.pathname.includes('Cms/news')) {
-				//handle news content
-				
-				e.preventDefault() // prevents normal browser page load
-				this.$router.push({
-					name: 'News',
-
-				})
-			}
-
-		}
 	},
 	mounted() {
 		document.querySelectorAll("#cms [data-confirm]").forEach((el) => {
@@ -88,16 +55,13 @@ const app = Vue.createApp({
 				FHC_JS_DATA_STORAGE_OBJECT.app_root
 			);
 		});
-		document.addEventListener("click", this.interceptHandler, {capture: true, passive: false})
-	},
-	unmounted() {
-		document.removeEventListener('click', this.interceptHandler)
 	}
 });
 
 setScrollbarWidth();
 
 app.use(router);
+window.cmsRouter = router;
 app.use(FhcApi);
 app.use(primevue.config.default, { zIndex: { overlay: 9999 } });
 app.use(Phrasen);
