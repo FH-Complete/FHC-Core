@@ -18271,46 +18271,6 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
-		'phrase' => 'internationalCredits',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'International Credits',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'International Credits',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'international',
-		'category' => 'international',
-		'phrase' => 'alledurchgefuehrten',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Alle durchgeführten anzeigen',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Show all performed',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'international',
-		'category' => 'international',
 		'phrase' => 'bestaetigungHochladen',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -24686,6 +24646,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Last updated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mark_person_as_unruly',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Person ist unerwünscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Person is unruly.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31478,7 +31458,27 @@ array(
 				'description' => '',
 				'insertvon' => 'system'
 			)
-		)
+		),
+		array(
+			'app' => 'anwesenheiten',
+			'category' => 'global',
+			'phrase' => 'tooltipStudentTestphase',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Hinweis: Es handelt sich um einen nicht repräsentativen Testbetrieb und die Ergebnisse werden nicht für die Benotung herangezogen.',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Note: This is a non-representative test operation and the results are not used for grading.',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
 	),
 	array(
 		'app' => 'anwesenheiten',
@@ -34790,18 +34790,18 @@ array(
 	array(
 		'app' => 'softwarebereitstellung',
 		'category' => 'global',
-		'phrase' => 'softwareanforderungSubtitle',
+		'phrase' => 'softwarebereitstellungSubtitle',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Softwareanforderung und Lizenzmanagement für die Lehre',
+				'text' => 'Softwarebereitstellung für die Lehre',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Software Request and License management for Education',
+				'text' => 'Software delivery for Education',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -36575,6 +36575,187 @@ array(
 		)
 	),
 	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'maprojohneoe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mitarbeiter und Projekt sind der Organisationseinheit nicht zugeordnet.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Employee and project are not assigned to the organizational unit.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'infoandepl/kfl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Info an DepL/KFL',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Info to DepL/KFL:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'userAnzahl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'User-Anzahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'User Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'userAnzahlAendern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'User-Anzahl ändern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Change User Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'userAnzahlNeu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'User-Anzahl NEU',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'NEW User Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'standardLvTemplate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Standard LV-Template',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Standard Course Template',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'anforderungNachStandardLvTemplate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anforderung nach Standard LV-Template',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Request by Standard Course Template',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungUeberAuswahlVonStandardisiertenLvTemplates',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwareanforderung über die Auswahl von standardisierten LV-Templates (Quellkurse)",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Requirements based on the Selection of Standardized Course-Templates",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swFuerLvAnfordern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Software für LV anfordern",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Request software for courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// Betriebsmittel end
+	array(
 		'app' => 'core',
 		'category' => 'uhstat',
 		'phrase' => 'unbekannt',
@@ -36589,6 +36770,166 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'unknown',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorConfigFehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Config-Eintrag fehlt",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Missing config entry",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorUnbekannteUrl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Unbekannte URL. Seite bzw. Link kann nicht geöffnet werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Unknown URL. Cannot open to site or link",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'zuordnungExistiertBereits',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zuordnung existiert bereits.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Assignment already exists.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swFuerLvAendern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Software für LV ändern",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Change Software for courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'anforderungNachQuellkurs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anforderung nach Quellkurs',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Request by Course-Template',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungFuerQuellkurs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwareanforderung für Quellkurse",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Requirements for Course-Templates",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungFuerEinzelneLvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwareanforderung für einzelne Lehrveranstaltungen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Requirements for individual Courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwarebereitstellung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwarebereitstellung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Delivery",
 				'description' => '',
 				'insertvon' => 'system'
 			)

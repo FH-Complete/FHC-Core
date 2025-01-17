@@ -60,7 +60,7 @@
  * Displays a confirmation dialog and returns a Promise which resolves
  * with true or false depending und the pressed button.
  * @return Promise
- * 
+ *
  * alertDefault
  * ------------
  * Displays an alert

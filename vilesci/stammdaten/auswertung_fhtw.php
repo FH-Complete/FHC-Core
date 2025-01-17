@@ -1220,6 +1220,7 @@ $reihungstest = isset($_REQUEST['reihungstest']) ? $_REQUEST['reihungstest'] : '
 $studiengang = isset($_REQUEST['studiengang']) ? $_REQUEST['studiengang'] : '';
 $semester = isset($_REQUEST['semester']) ? $_REQUEST['semester'] : '';
 $prestudent_id = isset($_REQUEST['prestudent_id']) ? $_REQUEST['prestudent_id'] : '';
+$prestudent_ids = isset($_REQUEST['prestudent_ids']) ? $_REQUEST['prestudent_ids'] : '';
 $orgform_kurzbz = isset($_REQUEST['orgform_kurzbz']) ? $_REQUEST['orgform_kurzbz'] : '';
 $format = (isset($_REQUEST['format']) ? $_REQUEST['format'] : '');
 $stgtyp = (isset($_REQUEST['stgtyp']) ? $_REQUEST['stgtyp'] : '');
@@ -1259,7 +1260,7 @@ if ($prestudent_id != '' && !is_numeric($prestudent_id))
 {
 	die('PrestudentID ist ungueltig');
 }
-if (isset($_POST['rtauswsubmit']) && $reihungstest == '' && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '')
+if (isset($_POST['rtauswsubmit']) && $reihungstest == '' && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '' && $prestudent_ids == '')
 {
 	die('Waehlen Sie bitte mindestens eine der Optionen aus');
 }
@@ -1377,6 +1378,10 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	if ($prestudent_id != '')
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
+	}
+	if ($prestudent_ids != '')
+	{
+		$query .= " AND ps.prestudent_id IN (" .$db->db_implode4SQL(explode(',', $prestudent_ids)) . ")";
 	}
 	if ($orgform_kurzbz != '' && $studiengang != '')
 	{
@@ -1529,6 +1534,41 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 							AND testtool.tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
 						)
 				END AS punkte,
+			CASE WHEN (
+				(SELECT count(*)
+				FROM testtool.tbl_pruefling_frage
+				WHERE tbl_pruefling_frage.pruefling_id = tbl_pruefling.pruefling_id
+					AND tbl_pruefling_frage.frage_id IN (
+						SELECT frage.frage_id
+						FROM testtool.tbl_gebiet gebiet
+							JOIN testtool.tbl_frage frage USING(gebiet_id)
+						WHERE gebiet_id = tbl_gebiet.gebiet_id
+					)
+				AND begintime IS NOT NULL) > 0)
+			THEN
+				(CASE WHEN
+					(SELECT count(*)
+					FROM testtool.tbl_pruefling_frage
+					WHERE tbl_pruefling_frage.pruefling_id = tbl_pruefling.pruefling_id
+						AND tbl_pruefling_frage.frage_id IN (
+							SELECT frage.frage_id
+							FROM testtool.tbl_gebiet gebiet
+								JOIN testtool.tbl_frage frage USING(gebiet_id)
+							WHERE gebiet_id = tbl_gebiet.gebiet_id)
+							AND endtime IS NULL
+					) = (
+						SELECT count(*)
+						FROM testtool.tbl_pruefling_frage
+						WHERE tbl_pruefling_frage.pruefling_id = tbl_pruefling.pruefling_id
+							AND tbl_pruefling_frage.frage_id IN (
+								SELECT frage.frage_id
+								FROM testtool.tbl_gebiet gebiet
+									JOIN testtool.tbl_frage frage USING(gebiet_id)
+								WHERE gebiet_id = tbl_gebiet.gebiet_id)
+					)
+				THEN TRUE ELSE FALSE END
+			)
+			ELSE TRUE END AS gebiet_markieren,
 			rt.reihungstest_id,
 		    tbl_gebiet.gebiet_id,
 			tbl_gebiet.bezeichnung AS gebiet,
@@ -1611,6 +1651,10 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
 	}
+	if ($prestudent_ids != '')
+	{
+		$query .= " AND ps.prestudent_id IN (" .$db->db_implode4SQL(explode(',',$prestudent_ids)) . ")";
+	}
 	if ($orgform_kurzbz != '')
 	{
 		//$query .= " AND tbl_prestudentstatus.orgform_kurzbz=" . $db->db_add_param($orgform_kurzbz);
@@ -1691,6 +1735,8 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		}
 
 		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->name = $row->gebiet;
+
+		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->gebiet_markieren = $row->gebiet_markieren === 't';
 
 		if ($row->punkte >= $row->maxpunkte)
 		{
@@ -2891,7 +2937,7 @@ else
 	$selectedrtstr = '';
 	$checkbxstr = '';
 	$first = true;
-	$noparamsselected = $prestudent_id == '' && $reihungstest == '' && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '';
+	$noparamsselected = $prestudent_id == '' && $reihungstest == '' && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '' && $prestudent_ids == '';
 	//$maxeachline = 1;
 	foreach ($rtest as $rt)
 	{
@@ -3007,6 +3053,9 @@ else
 	echo '</td></tr>';
 	echo '<tr><td>';
 	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
+	echo '</td></tr>';
+	echo '<tr><td>';
+	echo 'PrestudentIn (Mehrfachauswahl): <input name="prestudent_ids" disabled type="text" size="50" value="' . $prestudent_ids . '"/><input type="hidden" id="prestudent_ids" name="prestudent_ids" value="' . $prestudent_ids . '" />';
 	echo '</td></tr>
 			</table></td><td id="auswertencell">';
 	echo '<INPUT type="submit" class="btn btn-primary" value="Anzeigen" name="rtauswsubmit" id="auswertenButton"/><br><br>';
@@ -3015,6 +3064,7 @@ else
 										&datum_von=' . $datum_von . '
 										&datum_bis=' . $datum_bis . '
 										&prestudent_id=' . $prestudent_id . '
+										&' . http_build_query(array('prestudent_ids' => $prestudent_ids)) . '
 										&' . http_build_query(array('reihungstest' => $reihungstest)) . '
 										&orgform_kurzbz=' . $orgform_kurzbz . '
 										&stgtyp=' . $stgtyp . '
@@ -3068,6 +3118,7 @@ else
 				datum_von=' . $datum_von . '&
 				datum_bis=' . $datum_bis . '&
 				prestudent_id=' . $prestudent_id . '&
+				&' . http_build_query(array('prestudent_ids' => $prestudent_ids)) . '
 				&' . http_build_query(array('reihungstest' => $reihungstest)) . '">
 		<div class="row">';
 	echo '<div class="col-xs-12" id="miscfunctionscol">';
@@ -3351,8 +3402,7 @@ else
 							$zerovalclass = ' zerovalcolor';
 						}
 
-						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>
-								';
+						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap style=background-color:' . ($erg->gebiet[$gbt->gebiet_id]->gebiet_markieren ? 'yellow' : '') .'>';
 						// Punkte können nur gelöscht werden, solange "Zum Reihungstest angetreten" nicht gesetzt ist
 						if ($erg->teilgenommen == false || $rechte->isBerechtigt('admin'))
 						{

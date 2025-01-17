@@ -207,7 +207,7 @@ class Studiensemester_model extends DB_Model
 
 	/**
 	 * @param string		$student_uid
-	 * 
+	 *
 	 * @return StdClass
 	 */
 	public function getWhereStudentHasLvs($student_uid)
@@ -220,7 +220,7 @@ class Studiensemester_model extends DB_Model
 		$this->db->where("v.lehreverzeichnis<>''");
 
 		$this->addOrder($this->dbTable . '.start');
-		
+
 		return $this->loadWhere(['uid' => $student_uid, 'v.lehre' => true]);
 	}
 
@@ -271,6 +271,42 @@ class Studiensemester_model extends DB_Model
 		$studienjahrNumber = mb_substr($studiensemester_kurzbz, 4, 2);
 		if (is_numeric($studienjahrNumber) && mb_substr($studiensemester_kurzbz, 0, 2) == 'SS') (int)$studienjahrNumber -= 1;
 		return $studienjahrNumber;
+	}
+
+	/**
+	 * Get Studienjahr by Studiensemester.
+	 *
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass
+	 */
+	public function getStudienjahrByStudiensemester($studiensemester_kurzbz)
+	{
+		$studienjahrObj = null;
+
+		if (!is_numeric($studiensemester_kurzbz))
+		{
+			$this->StudiensemesterModel->addSelect('studienjahr_kurzbz');
+			$result = $this->StudiensemesterModel->loadWhere(array('studiensemester_kurzbz =' => $studiensemester_kurzbz));
+		}
+
+		if (hasData($result))
+		{
+			$studienjahr = getData($result)[0]->studienjahr_kurzbz;
+			$startstudienjahr = substr($studienjahr, 0, 4);
+			$endstudienjahr = substr($studienjahr, 0, 2) . substr($studienjahr, -2);
+
+			$studienjahrObj = new StdClass();
+
+			$studienjahrObj->studienjahr_kurzbz = $studienjahr;
+			$studienjahrObj->startstudienjahr = $startstudienjahr;
+			$studienjahrObj->endstudienjahr= $endstudienjahr;
+		}
+
+		if (isError($result)) {
+			return error(getError($result));
+		}
+
+		return success($studienjahrObj);
 	}
 
 	/**
