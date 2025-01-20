@@ -43,30 +43,29 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 {
 	$from = DEFAULT_SENDER.'@'. DOMAIN;
 
-	$header_image_path_prefix = dirname(__FILE__). '/../skin/images/sancho/';
-	$footer_image_path_prefix = dirname(__FILE__). '/../skin/images/sancho/';
+	$image_path_prefix = dirname(__DIR__).'/'.(defined('SANCHO_MAIL_IMG_PATH') ? SANCHO_MAIL_IMG_PATH : '');
 	$sanchoHeader_img = '';
 	$sanchoFooter_img = '';
 	$cid_header = '';
 	$cid_footer = '';
 
-	if (!defined('CUSTOM_MAIL_USE_IMAGES') || CUSTOM_MAIL_USE_IMAGES)
+	if (!defined('SANCHO_MAIL_USE_IMAGES') || SANCHO_MAIL_USE_IMAGES)
 	{
 		if (isset($headerImg) && $headerImg != '')
 		{
 			// use provided header image
 			$sanchoHeader_img = $headerImg;
 		}
-		elseif (defined('CUSTOM_MAIL_HEADER_IMG') && CUSTOM_MAIL_HEADER_IMG != '')
+		elseif (defined('SANCHO_MAIL_HEADER_IMG') && SANCHO_MAIL_HEADER_IMG != '')
 		{
 			// use default header image
-			$sanchoHeader_img = CUSTOM_MAIL_HEADER_IMG;
+			$sanchoHeader_img = SANCHO_MAIL_HEADER_IMG;
 		}
 
 		if ($sanchoHeader_img != '')
 		{
 			// set full image path
-			$sanchoHeader_img = $header_image_path_prefix.$sanchoHeader_img;
+			$sanchoHeader_img = $image_path_prefix.$sanchoHeader_img;
 		}
 
 		if (isset($footerImg) && $footerImg != '')
@@ -74,16 +73,16 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 			// use provided footer image
 			$sanchoFooter_img = $footerImg;
 		}
-		elseif (defined('CUSTOM_MAIL_FOOTER_IMG') && CUSTOM_MAIL_FOOTER_IMG != '')
+		elseif (defined('SANCHO_MAIL_FOOTER_IMG') && SANCHO_MAIL_FOOTER_IMG != '')
 		{
 			// use default footer image
-			$sanchoFooter_img = CUSTOM_MAIL_FOOTER_IMG;
+			$sanchoFooter_img = SANCHO_MAIL_FOOTER_IMG;
 		}
 
 		if ($sanchoFooter_img !== '')
 		{
 			// set full image path
-			$sanchoFooter_img = $footer_image_path_prefix.$sanchoFooter_img;
+			$sanchoFooter_img = $image_path_prefix.$sanchoFooter_img;
 		}
 
 		// Set unique content id for embedding header and footer image

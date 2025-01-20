@@ -34,10 +34,13 @@ $config['validate'] = false; // If true then the email address will be validated
 $config['enable_debug'] = false;
 
 // If to use images for custom mails
-$config['custom_mail_use_images'] = CUSTOM_MAIL_USE_IMAGES;
+$config['sancho_mail_use_images'] = SANCHO_MAIL_USE_IMAGES;
+
+// image path for sancho mail, relativ to document root
+$config['sancho_mail_img_path'] = SANCHO_MAIL_IMG_PATH;
 
 // header image for custom mails
-$config['custom_mail_header_img'] = CUSTOM_MAIL_HEADER_IMG;
+$config['sancho_mail_header_img'] = SANCHO_MAIL_HEADER_IMG;
 
 // footer image for custom mails
-$config['custom_mail_footer_img'] = CUSTOM_MAIL_FOOTER_IMG;
+$config['sancho_mail_footer_img'] = SANCHO_MAIL_FOOTER_IMG;

@@ -340,11 +340,14 @@ define('DIENSTVERHAELTNIS_SUPPORT', false);
 define('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT', false);
 
 // header und footer Bilder für eigene Mails verwenden
-define('CUSTOM_MAIL_USE_IMAGES', true);
+define('SANCHO_MAIL_USE_IMAGES', true);
+
+// Pfad für Bilder für eigene Mails, relativ zu document root
+define('SANCHO_MAIL_IMG_PATH', 'skin/images/sancho/');
 
 // header Bild für eigene Mails
-define('CUSTOM_MAIL_HEADER_IMG', 'sancho_header_DEFAULT.jpg');
+define('SANCHO_MAIL_HEADER_IMG', 'sancho_header_DEFAULT.jpg');
 
 // footer image for eigene Mails
-define('CUSTOM_MAIL_FOOTER_IMG', 'sancho_footer_DEFAULT.jpg');
+define('SANCHO_MAIL_FOOTER_IMG', 'sancho_footer_DEFAULT.jpg');
 ?>

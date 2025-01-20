@@ -51,7 +51,7 @@ function sendSanchoMail(
 	$ci->load->library('email');
 	$ci->load->library('MailLib');
 
-	$custom_mail_use_images = $ci->config->item('mail');
+	$sancho_mail_use_images = $ci->config->item('mail');
 
 
 	if ($from == '')
@@ -66,7 +66,7 @@ function sendSanchoMail(
 	$cid_header = '';
 	$cid_footer = '';
 
-	if (isset($custom_mail_use_images['custom_mail_use_images']) && $custom_mail_use_images['custom_mail_use_images'])
+	if (isset($sancho_mail_use_images['sancho_mail_use_images']) && $sancho_mail_use_images['sancho_mail_use_images'])
 	{
 		$sanchoHeader_img = '';
 		$sanchoFooter_img = '';
@@ -76,10 +76,10 @@ function sendSanchoMail(
 			// use provided header image
 			$sanchoHeader_img = $headerImg;
 		}
-		elseif (isset($custom_mail_use_images['custom_mail_header_img']) && $custom_mail_use_images['custom_mail_header_img'])
+		elseif (isset($sancho_mail_use_images['sancho_mail_header_img']) && $sancho_mail_use_images['sancho_mail_header_img'])
 		{
 			// use default header image
-			$sanchoHeader_img = 'skin/images/sancho/'. $custom_mail_use_images['custom_mail_header_img'];
+			$sanchoHeader_img = $sancho_mail_use_images['sancho_mail_header_img'];
 		}
 
 		if (isset($footerImg) && $footerImg != '')
@@ -87,14 +87,29 @@ function sendSanchoMail(
 			// use provided footer image
 			$sanchoFooter_img = $footerImg;
 		}
-		elseif (isset($custom_mail_use_images['custom_mail_footer_img']) && $custom_mail_use_images['custom_mail_footer_img'])
+		elseif (isset($sancho_mail_use_images['sancho_mail_footer_img']) && $sancho_mail_use_images['sancho_mail_footer_img'])
 		{
 			// use default footer image
-			$sanchoFooter_img = 'skin/images/sancho/'. $custom_mail_use_images['custom_mail_footer_img'];
+			$sanchoFooter_img =  $sancho_mail_use_images['sancho_mail_footer_img'];
 		}
 
-		$ci->email->attach($sanchoHeader_img);
-		$ci->email->attach($sanchoFooter_img);
+		// add image file paths
+		if (isset($sancho_mail_use_images['sancho_mail_img_path']))
+		{
+			if ($sanchoHeader_img != '')
+			{
+				$sanchoHeader_img = $sancho_mail_use_images['sancho_mail_img_path'].$sanchoHeader_img;
+			}
+
+			if ($sanchoFooter_img != '')
+			{
+				$sanchoFooter_img = $sancho_mail_use_images['sancho_mail_img_path'].$sanchoFooter_img;
+			}
+		}
+
+		// attach header and footer
+		$ci->email->attach($sanchoHeader_img, 'inline');
+		$ci->email->attach($sanchoFooter_img, 'inline');
 		$cid_header = $ci->email->attachment_cid($sanchoHeader_img); // sets unique content id for embedding
 		$cid_footer = $ci->email->attachment_cid($sanchoFooter_img); // sets unique content id for embedding
 	}
