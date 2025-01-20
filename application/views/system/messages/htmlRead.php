@@ -3,15 +3,14 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Read message - Lies die Nachricht',
-			'jquery' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'sbadmintemplate' => true,
+			'jquery3' => true,
+			'bootstrap3' => true,
+			'fontawesome4' => true,
+			'sbadmintemplate3' => true,
 			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css')
 		)
 	);
 ?>
-	<body>
 		<div id="wrapper">
 			<div id="page-wrapper">
 				<div class="container-fluid">
@@ -99,6 +98,5 @@
 				</div>
 			</div>
 		</div>
-	</body>
 
 <?php $this->load->view("templates/FHC-Footer"); ?>

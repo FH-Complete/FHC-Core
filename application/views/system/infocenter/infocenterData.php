@@ -7,14 +7,15 @@
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Interessent rejected\', \'Attempt to register with existing mailadress\', \'Access code sent\', \'Personal data saved\'';
-	$LOGDATA_NAME_PARKED = '\'Parked\'';
-	$LOGDATA_NAME_ONHOLD = '\'Onhold\'';
-	$LOGTYPE_KURZBZ = '\'Processstate\'';
+	$LOGDATA_DELETED_BY_USER = '\'% deleted by user\'';
+	$POSTPONE_STATUS_PARKED = '\'parked\'';
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
+	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
 	$ORG_NAME = '\'InfoCenter\'';
+	$ONLINE = '\'online\'';
 
 	$query = '
 		SELECT
@@ -26,8 +27,6 @@
 			p.staatsbuergerschaft AS "Nation",
 			pl.zeitpunkt AS "LockDate",
 			pl.lockuser AS "LockUser",
-			pd.parkdate AS "ParkDate",
-		    ohd.onholddate AS "OnholdDate",
 			(
 				SELECT l.zeitpunkt
 				  FROM system.tbl_log l
@@ -55,10 +54,13 @@
 				  a.dokument_kurzbz in ('.$AKTE_TYP.')
 			) AS "AnzahlAkte",
 			(
-				SELECT CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END
+				SELECT CASE WHEN student.student_uid IS NULL THEN
+					(CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END)
+					ELSE '. $ONLINE .' END
 				  FROM system.tbl_log l
 				  LEFT JOIN  public.tbl_benutzer on l.insertvon = tbl_benutzer.uid
 				  LEFT JOIN public.tbl_person sp on tbl_benutzer.person_id = sp.person_id
+				  LEFT JOIN public.tbl_student student ON tbl_benutzer.uid = student.student_uid
 				 WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
@@ -255,10 +257,26 @@
 				 LIMIT 1
 			) AS "ZGVMNation",
 			(
+				SELECT upper(tbl_nation.nationengruppe_kurzbz)
+				FROM public.tbl_prestudent ps
+				JOIN bis.tbl_nation ON ps.zgvnation = tbl_nation.nation_code
+				WHERE ps.person_id = p.person_id
+				ORDER BY ps.zgvnation DESC NULLS LAST, ps.prestudent_id DESC
+				LIMIT 1
+			) AS "ZGVNationGruppe",
+			(
+				SELECT upper(tbl_nation.nationengruppe_kurzbz)
+				FROM public.tbl_prestudent ps
+				JOIN bis.tbl_nation ON ps.zgvmanation = tbl_nation.nation_code
+				WHERE ps.person_id = p.person_id
+				ORDER BY ps.zgvmanation DESC NULLS LAST, ps.prestudent_id DESC
+				LIMIT 1
+			) AS "ZGVMNationGruppe",
+			(
 				SELECT tbl_organisationseinheit.bezeichnung
-				FROM public.tbl_benutzerfunktion 
+				FROM public.tbl_benutzerfunktion
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
-				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now()) 
+				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now())
 				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
 				AND tbl_organisationseinheit.bezeichnung = '.$ORG_NAME.'
 				AND tbl_benutzerfunktion.uid = (
@@ -266,12 +284,26 @@
 					FROM system.tbl_log l
 					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+					AND l.logdata->>\'message\' NOT LIKE ('.$LOGDATA_DELETED_BY_USER.')
 					AND l.person_id = p.person_id
 					ORDER BY l.log_id DESC
 					LIMIT 1
 				)
-				LIMIT 1 
-			) AS "InfoCenterMitarbeiter"
+				LIMIT 1
+			) AS "InfoCenterMitarbeiter",
+			rueck.datum_bis AS "HoldDate",
+			rueck.bezeichnung AS "Rueckstellgrund",
+			(
+				SELECT
+					CASE
+						WHEN COUNT(CASE WHEN konto.betrag != 0 THEN 1 END) = 0 THEN null
+						ELSE SUM(konto.betrag)
+					END AS "Kaution"
+				FROM public.tbl_konto konto
+				WHERE konto.person_id = p.person_id
+					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
+					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'
+			) AS "Kaution"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 				SELECT tpl.person_id,
@@ -282,22 +314,24 @@
 				  JOIN public.tbl_person sp ON sb.person_id = sp.person_id
 				 WHERE tpl.app = '.$APP.'
 			) pl USING(person_id)
-	 LEFT JOIN (
-				SELECT l.person_id,
-					   l.zeitpunkt AS parkdate
-				  FROM system.tbl_log l
-				 WHERE l.logtype_kurzbz = '.$LOGTYPE_KURZBZ.'
-				   AND l.logdata->>\'name\' = '.$LOGDATA_NAME_PARKED.'
-				   AND l.zeitpunkt >= NOW()
-			) pd USING(person_id)
 	LEFT JOIN (
-				SELECT l.person_id,
-					   l.zeitpunkt AS onholddate
-				  FROM system.tbl_log l
-				 WHERE l.logtype_kurzbz = '.$LOGTYPE_KURZBZ.'
-				   AND l.logdata->>\'name\' = '.$LOGDATA_NAME_ONHOLD.'
-				   AND l.zeitpunkt >= NOW()
-			) ohd USING(person_id)
+				SELECT
+					tbl_rueckstellung.person_id,
+					tbl_rueckstellung.datum_bis,
+					tbl_rueckstellung.status_kurzbz,
+					array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung
+				FROM public.tbl_rueckstellung
+				JOIN public.tbl_rueckstellung_status USING(status_kurzbz)
+				JOIN public.tbl_person sp ON tbl_rueckstellung.person_id = sp.person_id
+				WHERE tbl_rueckstellung.rueckstellung_id =
+				(
+					SELECT srueck.rueckstellung_id
+					FROM public.tbl_rueckstellung srueck
+					WHERE srueck.person_id = tbl_rueckstellung.person_id
+						AND datum_bis >= NOW()
+					ORDER BY srueck.datum_bis DESC LIMIT 1
+				)
+			) rueck ON rueck.person_id = p.person_id
 		 WHERE
 			EXISTS (
 				SELECT 1
@@ -324,7 +358,12 @@
 						   AND spss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 					)
 			)
-	ORDER BY "LastAction" ASC';
+	ORDER BY CASE
+		WHEN rueck.status_kurzbz IS NULL THEN 1
+		WHEN rueck.status_kurzbz = ' .$POSTPONE_STATUS_PARKED .' THEN 2
+		WHEN rueck.status_kurzbz != '. $POSTPONE_STATUS_PARKED .' THEN 3
+	END,
+	rueck.datum_bis NULLS LAST, "LastAction" ASC';
 
 	$filterWidgetArray = array(
 		'query' => $query,
@@ -346,8 +385,6 @@
 			ucfirst($this->p->t('person', 'nation')),
 			ucfirst($this->p->t('global', 'sperrdatum')),
 			ucfirst($this->p->t('global', 'gesperrtVon')),
-			ucfirst($this->p->t('global', 'parkdatum')),
-			ucfirst($this->p->t('global', 'rueckstelldatum')),
 			ucfirst($this->p->t('global', 'letzteAktion')),
 			'Aktionstyp',
 			'AnzahlAktePflicht',
@@ -361,7 +398,12 @@
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
 			'ZGV Nation BA',
 			'ZGV Nation MA',
-			'InfoCenter Mitarbeiter'
+			'ZGV Gruppe BA',
+			'ZGV Gruppe MA',
+			'InfoCenter Mitarbeiter',
+			ucfirst($this->p->t('infocenter', 'rueckstelldatum')),
+			ucfirst($this->p->t('infocenter', 'rueckstellgrund')),
+			ucfirst($this->p->t('infocenter', 'kaution'))
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -408,18 +450,13 @@
 				$datasetRaw->{'LockUser'} = '-';
 			}
 
-			if ($datasetRaw->{'ParkDate'} == null)
+			if ($datasetRaw->{'HoldDate'} == null)
 			{
-				$datasetRaw->{'ParkDate'} = '-';
-			}
-
-			if ($datasetRaw->{'OnholdDate'} == null)
-			{
-				$datasetRaw->{'OnholdDate'} = '-';
+				$datasetRaw->{'HoldDate'} = '-';
 			}
 			else
 			{
-				$datasetRaw->{'OnholdDate'} = date_format(date_create($datasetRaw->{'OnholdDate'}), 'Y-m-d H:i');
+				$datasetRaw->{'HoldDate'} = date_format(date_create($datasetRaw->{'HoldDate'}), 'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'StgAbgeschickt'} == null)
@@ -452,6 +489,16 @@
 				$datasetRaw->{'ZGVMNation'} = '-';
 			}
 
+			if ($datasetRaw->{'ZGVNationGruppe'} == null)
+			{
+				$datasetRaw->{'ZGVNationGruppe'} = '-';
+			}
+
+			if ($datasetRaw->{'ZGVMNationGruppe'} == null)
+			{
+				$datasetRaw->{'ZGVMNationGruppe'} = '-';
+			}
+
 			if ($datasetRaw->{'InfoCenterMitarbeiter'} === null)
 			{
 				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
@@ -459,6 +506,24 @@
 			else
 			{
 				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
+			}
+
+			if ($datasetRaw->{'Rueckstellgrund'} === null)
+			{
+				$datasetRaw->{'Rueckstellgrund'} = '-';
+			}
+
+			if ($datasetRaw->{'Kaution'} === null)
+			{
+				$datasetRaw->{'Kaution'} = '-';
+			}
+			else if ($datasetRaw->{'Kaution'} === '0.00')
+			{
+				$datasetRaw->{'Kaution'} = 'Bezahlt';
+			}
+			else
+			{
+				$datasetRaw->{'Kaution'} = 'Offen';
 			}
 
 			return $datasetRaw;
@@ -472,16 +537,12 @@
 				$mark = FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}
 
-			if ($datasetRaw->OnholdDate != null)
-			{
+			if ($datasetRaw->Rueckstellgrund != null && $datasetRaw->Rueckstellgrund !== 'Parken')
 				$mark = "onhold";
-			}
 
 			// Parking has priority over locking
-			if ($datasetRaw->ParkDate != null)
-			{
+			if ($datasetRaw->Rueckstellgrund === 'Parken')
 				$mark = "text-info";
-			}
 
 			return $mark;
 		}

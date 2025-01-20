@@ -131,7 +131,7 @@ else
 											echo '<menuitem label="Student" oncommand="StudentUnterbrecherZuStudent()" disabled="false" tooltiptext="Status ändern auf Student"/>';
 										if ($id == 'interessent-toolbar-zustudent')
 											echo '<menuitem label="Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Status ändern auf Student"/>';
-										
+
 										foreach($gruende[$status_kurzbz] as $row)
 										{
 											$commandWithID = str_replace('STATUSGRUNDID',$row['statusgrund_id'],$command);
@@ -208,7 +208,9 @@ else
 								<menupopup id="student-filter-menu-popup" >
 									<menuitem id="student-toolbar-filter-dokumente" label="fehlende Dokumente" oncommand="InteressentDokumenteFilter()" disabled="false" tooltiptext="Liste aller Studenten mit Fehlenden Dokumenten"/>
 									<menuitem id="student-toolbar-filter-offenebuchungen" label="offene Buchungen" oncommand="StudentKontoFilterStudenten('konto')" disabled="false" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
-									<menuitem id="student-toolbar-filter-studiengebuehr" label="nicht gebuchte Studiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" disabled="false" tooltiptext="Liste aller Studenten die noch nicht mit Studienbebuehr belastet wurden" />
+									<menuitem id="student-toolbar-filter-ueberfaelligebuchungen" label="überfällige Buchungen" oncommand="StudentKontoFilterStudenten('ueberfaelligebuchungen')" disabled="false" tooltiptext="Liste aller Studenten mit überfälligen Buchungen"/>
+									<menuitem id="student-toolbar-filter-studiengebuehr" label="nicht gebuchte Studiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" disabled="false" tooltiptext="Liste aller Studenten die noch nicht mit der Studiengebühr belastet wurden" />
+									<menuitem id="student-toolbar-filter-erhoehte-studiengebuehr" label="erhöhten Studienbeitrag" oncommand="StudentKontoFilterStudenten('StudiengebuehrErhoeht')" disabled="false" tooltiptext="Liste aller Studenten denen der erhöhte Studienbeitrag eingebucht wurde" />
 									<menuitem id="student-toolbar-filter-zgvohnedatum" label="ZGV eingetragen ohne Datum" oncommand="StudentKontoFilterStudenten('zgvohnedatum')" disabled="false" tooltiptext="Liste aller Studenten die ZGV eingetragen haben bei denen aber kein ZGV Datum gesetzt ist" />
 									<menu label="nach Statusgrund">
 									    <menupopup id="student-filter-statusgrund-menu-popup">
@@ -270,6 +272,10 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vorname" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+							<treecol id="student-treecol-wahlname" label="Wahlname" flex="1" hidden="true" persist="hidden, width, ordinal"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/student/rdf#wahlname" onclick="StudentTreeSort()"/>
+							<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-vornamen" label="Vornamen" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#vornamen" onclick="StudentTreeSort()"/>
@@ -436,6 +442,7 @@ else
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#titelpre" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#nachname" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#vorname" />
+													<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#wahlname" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#titelpost" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#svnr" />

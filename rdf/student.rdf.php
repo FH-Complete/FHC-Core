@@ -107,6 +107,21 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 				if($row_filter->anzahl>0 || $prestudent->status_kurzbz=='Incoming')
 					return false;
 	}
+	elseif($filter2 == 'StudiengebuehrErhoeht')
+	{
+		// Alle Personen die eine erhöhte Studiengebuehrbelastung haben
+		$prestudent = new prestudent();
+		$prestudent->getLastStatus($row->prestudent_id);
+
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE
+					studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
+					person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)." AND
+					buchungstyp_kurzbz='StudiengebuehrErhoeht'";
+		if($db->db_query($qry))
+			if($row_filter = $db->db_fetch_object())
+				if($row_filter->anzahl == 0)
+					return false;
+	}
 	elseif(strstr($filter2,'buchungstyp;'))
 	{
 		// Alle Personen die keine Belastung auf den uebergebenen Buchungstyp haben
@@ -175,6 +190,25 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 		      : false;
 	    return $filtered;
 	}
+	else if ($filter2 === 'ueberfaelligebuchungen')
+	{
+		$qry = "SELECT sum(betrag) as summe 
+				FROM tbl_konto 
+				WHERE person_id=".$db->db_add_param($row->person_id, FHC_INTEGER) ."
+					AND buchungsdatum < NOW()
+				"
+		;
+
+		if($kontofilterstg=='true')
+			$qry.=" AND studiengang_kz=".$db->db_add_param($row->studiengang_kz);
+		if($buchungstyp != null && $buchungstyp != "alle")
+			$qry.=" AND buchungstyp_kurzbz=".$db->db_add_param($buchungstyp);
+
+		if($db->db_query($qry))
+			if($row_filter = $db->db_fetch_object())
+				if($row_filter->summe=='0.00' || $row_filter->summe=='' || $row_filter->summe=='0')
+					return false;
+	}
 	return true;
 }
 
@@ -196,6 +230,7 @@ function draw_content_liste($row)
 			<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
 			<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
 			<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
+			<STUDENT:wahlname><![CDATA['.$row->wahlname.']]></STUDENT:wahlname>
 			<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
 			<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
 			<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
@@ -304,6 +339,7 @@ function draw_content($row)
 			<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
 			<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
 			<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
+			<STUDENT:wahlname><![CDATA['.$row->wahlname.']]></STUDENT:wahlname>
 			<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
 			<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
 			<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
@@ -424,6 +460,7 @@ function draw_empty_content()
 			<STUDENT:titelpre><![CDATA[]]></STUDENT:titelpre>
 			<STUDENT:titelpost><![CDATA[]]></STUDENT:titelpost>
 			<STUDENT:vornamen><![CDATA[]]></STUDENT:vornamen>
+			<STUDENT:wahlname><![CDATA[]]></STUDENT:wahlname>
 			<STUDENT:vorname><![CDATA[]]></STUDENT:vorname>
 			<STUDENT:nachname><![CDATA[KEINE RESULTATE]]></STUDENT:nachname>
 			<STUDENT:geburtsdatum><![CDATA[]]></STUDENT:geburtsdatum>
@@ -609,7 +646,7 @@ if($xmlformat=='rdf')
 
 		$sql_query="
 		SELECT
-			p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,vorname, vornamen, geschlecht,
+			p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,vorname, wahlname, vornamen, geschlecht,
 			nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
@@ -733,8 +770,8 @@ if($xmlformat=='rdf')
 		}
 	}
 	elseif(in_array($typ, array('prestudent', 'interessenten', 'bewerber', 'aufgenommen',
-		'warteliste', 'absage', 'zgv', 'reihungstestangemeldet', 'reihungstestnichtangemeldet', 'absolvent',
-		'diplomand', 'bewerbungnichtabgeschickt', 'bewerbungabgeschickt', 'statusbestaetigt')))
+		'warteliste', 'absage', 'zgv', 'reihungstestangemeldet', 'reihungstestnichtangemeldet', 'bewerberrtangemeldetteilgenommen', 'bewerberrtangemeldetnichtteilgenommen','absolvent',
+		'diplomand', 'bewerbungnichtabgeschickt', 'bewerbungabgeschickt', 'statusbestaetigt', 'statusbestaetigtrtnichtangemeldet', 'statusbestaetigtrtangemeldet', 'bewerberrtangemeldet', 'bewerberrtnichtangemeldet')))
 	{
 		$prestd = new prestudent();
 
@@ -879,8 +916,11 @@ if($xmlformat=='rdf')
 					WHERE
 						UPPER(nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
 						UPPER(vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(wahlname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
 						UPPER(vorname || ' ' || nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
-						UPPER(nachname || ' ' || vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).");";
+						UPPER(nachname || ' ' || vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(wahlname || ' ' || nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(nachname || ' ' || wahlname) = UPPER(".$db->db_add_param($searchItems_string_orig).");";
 
 				if($db->db_query($qry))
 				{
@@ -931,6 +971,10 @@ if($xmlformat=='rdf')
 				{
 					$qry .= "	UPPER(vorname || ' ' || nachname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
 								UPPER(nachname || ' ' || vorname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(nachname || ' ' || wahlname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(wahlname || ' ' || nachname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(vorname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(nachname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
 								student_uid ~* LOWER(".$db->db_add_param($searchItems_string).")";
 				}
 				else
@@ -1187,6 +1231,20 @@ else
 			else
 				$studienjahr = intval($semester/2)+1;
 
+			$abbrecher = ($prestudent->status_kurzbz === 'Abbrecher' ? 'true' : 'false');
+			
+			$abbrecher_ende = '';
+			$studiensemester_abbrecher_kurzbz='';
+			$qry = "SELECT * FROM public.tbl_prestudentstatus
+					WHERE prestudent_id='$student->prestudent_id' AND status_kurzbz = 'Abbrecher' ORDER BY datum LIMIT 1";
+			if($db->db_query($qry))
+			{
+				if($row = $db->db_fetch_object())
+				{
+					$abbrecher_ende = $row->datum;
+					$studiensemester_abbrecher_kurzbz = $row->studiensemester_kurzbz;
+				}
+			}
 			echo '
 			<student>
 				<uid><![CDATA['.$student->uid.']]></uid>
@@ -1194,6 +1252,7 @@ else
 				<titelpre><![CDATA['.$student->titelpre.']]></titelpre>
 				<titelpost><![CDATA['.$student->titelpost.']]></titelpost>
 				<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
+				<wahlname><![CDATA['.$student->wahlname.']]></wahlname>
 				<vorname><![CDATA['.$student->vorname.']]></vorname>
 				<nachname><![CDATA['.$student->nachname.']]></nachname>
 				<matrikelnummer><![CDATA['.$student->matrikelnr.']]></matrikelnummer>
@@ -1209,6 +1268,7 @@ else
 				<student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
 				<studiengang_kz><![CDATA['.$stg_kz.']]></studiengang_kz>
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
+				<studiengang_bezeichnung_eng><![CDATA['.$studiengang->english.']]></studiengang_bezeichnung_eng>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>
 				<studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
 				<studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>
@@ -1232,6 +1292,9 @@ else
 				<studienjahr_kurzbz><![CDATA['.$stsem->studienjahr_kurzbz.']]></studienjahr_kurzbz>
 				<studiensemester_aktuell_bezeichnung><![CDATA['.$stsem->bezeichnung.']]></studiensemester_aktuell_bezeichnung>
 				<studienbeginn_aktuell><![CDATA['.$datum_obj->convertISODate($stsem->start).']]></studienbeginn_aktuell>
+				<abbrecher><![CDATA['.$abbrecher.']]></abbrecher>
+				<abbrecher_ende><![CDATA['.$datum_obj->convertISODate($abbrecher_ende).']]></abbrecher_ende>
+				<studiensemester_abbrecher_kurzbz><![CDATA['.$studiensemester_abbrecher_kurzbz.']]></studiensemester_abbrecher_kurzbz>
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>
 				<max_semester><![CDATA['.$studiengang->max_semester.']]></max_semester>
 				<anmerkungpre><![CDATA['.$prestudent->anmerkung.']]></anmerkungpre>

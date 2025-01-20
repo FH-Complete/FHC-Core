@@ -33,7 +33,7 @@ $menu=array
 		'Lehrveranstaltung'=>array('name'=>'Lehrveranstaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
 		/* Leerzeile */'emptyrow1'=>array('name'=>'', 'link'=>'#empty', 'target'=>'main'),
 		'Verplanungsuebersicht'=>array('name'=>'Verplanungsübersicht', 'link'=>'lehre/check/verplanungsuebersicht.php', 'target'=>'main'),
-		'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main','permissions'=>array('reihungstest')),
+		'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main','permissions'=>array('lehre/reihungstest')),
 		'LV-Planung'=>array
 		(
 			'name'=>'LV-Planung', 'permissions'=>array('admin','lv-plan','support'),
@@ -53,7 +53,7 @@ $menu=array
 		(
 			'name'=>'Mitarbeiter','permissions'=>array('admin','lv-plan','support'),
 			'Übersicht'=>array('name'=>'Zeitwünsche', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main','permissions'=>array('mitarbeiter')),
-			'Zeitsperren'=>array('name'=>'Zeitsperren', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main','permissions'=>array('mitarbeiter/zeitsperre')),
+			'Zeitsperren'=>array('name'=>'Zeitsperren', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main','permissions'=>array('mitarbeiter/zeitsperre:begrenzt')),
 		),
 
 		'Vorrueckung'=>	array
@@ -70,9 +70,10 @@ $menu=array
 		'link'=>'left.php?categorie=Lehre', 'target'=>'nav',
 		'Gruppenverwaltung'=>array('name'=>'Gruppen', 'permissions'=>array('admin','lv-plan','support','lehre/gruppe'), 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
 		'Lehrveranstaltung'=>array('name'=>'Lehrveranstaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+		'lvTemplateUebersicht'=>array('name'=>'LV-Template Übersicht', 'link'=>'../index.ci.php/lehre/lvplanung/LvTemplateUebersicht', 'target'=>'_blank'),
 		'Studienordnung'=>array('name'=>'Studienordnung', 'link'=>'lehre/studienordnung.php', 'target'=>'_blank','permissions'=>array('lehre/studienordnung')),
 		'StudienplanGueltigkeit'=>array('name'=>'Studienplan Gültigkeit', 'link'=>'lehre/studienplan_gueltigkeit.php', 'target'=>'main','permissions'=>array('lehre/studienordnung')),
-		'StudienplanVorruecken'=>array('name'=>'Studienplan vorrücken', 'link'=>'lehre/studienplan_vorrueckung.php', 'target'=>'main','permissions'=>array('lehre/studienordnung')),
+		'StudienplanVorruecken'=>array('name'=>'Studienplan vorrücken', 'link'=>'lehre/studienplan_vorrueckung.php', 'target'=>'main','permissions'=>array('lehre/studienplan')),
 
 		'Freifach'=>array
 		(
@@ -109,7 +110,7 @@ $menu=array
 		),
 		'Benutzer'=>array
 		(
-			'name'=>'Benutzer','permissions'=>array('admin','lv-plan','support'),
+			'name'=>'Benutzer','permissions'=>array('admin','lv-plan','support','mitarbeiter'),
 			'Funktionen'=>array('name'=>'Funktionen', 'link'=>'personen/funktion.php', 'target'=>'main', 'permissions'=>array('mitarbeiter')),
 			'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main','permissions'=>array('basis/berechtigung')),
 			'Rollen'=>array('name'=>'Rollen', 'link'=>'stammdaten/berechtigungrolle.php', 'target'=>'main','permissions'=>array('basis/berechtigung')),
@@ -119,7 +120,8 @@ $menu=array
 		(
 			'name'=>'Mitarbeiter','permissions'=>array('admin','mitarbeiter','support'),
 			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main'),
-			'Zeitsperren'=>array('name'=>'Zeitsperren/Urlaub', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main','permissions'=>array('mitarbeiter/zeitsperre')),
+			'Zeitsperren'=>array('name'=>'Zeitsperren/Urlaub', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main','permissions'=>array('mitarbeiter/zeitsperre:begrenzt')),
+			'Projektexport'=>array('name'=>'Projektexport', 'link'=>'personen/projektexport.php', 'target'=>'main','permissions'=>array('mitarbeiter/zeitsperre')),
 		),
 		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.php', 'target'=>'main','permissions'=>array('basis/betriebsmittel')),
 		'AnwesenheitslistenBarcode'=>array('name'=>'Anwesenheitslisten mit Barcodes', 'link'=>'personen/anwesenheitslisten_barcode.php', 'target'=>'main','permissions'=>array('basis/person')),
@@ -132,14 +134,15 @@ $menu=array
 		'name'=>'Stammdaten', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','basis/berechtigung','basis/variable','basis/studiengang','basis/ort','basis/firma','basis/fhausweis','basis/infoscreen','basis/organisationseinheit'), 'image'=>'vilesci_stammdaten.png',
 		'link'=>'left.php?categorie=Stammdaten', 'target'=>'nav',
 		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.php', 'target'=>'main','permissions'=>array('basis/betriebsmittel')),
-		'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main','permissions'=>array('admin','assistenz')),
+		'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main','permissions'=>array('lehre/reihungstest')),
 
-		'User'=>array
+		'Rechtemanagement'=>array
 		(
-			'name'=>'User', 'permissions'=>array('basis/variable','basis/berechtigung'),
+			'name'=>'Rechtemanagement', 'permissions'=>array('basis/berechtigung','mitarbeiter'),
 			'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main','permissions'=>array('basis/berechtigung')),
+			'Rechte'=>array('name'=>'Rechte', 'link'=>'stammdaten/berechtigungen.php', 'target'=>'main','permissions'=>array('basis/berechtigung')),
 			'Rollen'=>array('name'=>'Rollen', 'link'=>'stammdaten/berechtigungrolle.php', 'target'=>'main','permissions'=>array('basis/berechtigung')),
-			'Variablen'=>array('name'=>'Variablen', 'link'=>'stammdaten/variablen_frameset.html', 'target'=>'main', 'target'=>'main','permissions'=>array('basis/variable')),
+			'Funktionen'=>array('name'=>'Funktionen', 'link'=>'personen/funktion.php', 'target'=>'main', 'permissions'=>array('mitarbeiter')),
 		),
 		'Personal'=>array
 		(
@@ -155,7 +158,7 @@ $menu=array
 		'Statistik'=>array('name'=>'Statistik', 'link'=>'stammdaten/statistik_frameset.html', 'target'=>'main','permissions'=>array('basis/statistik')),
 		'Ampel'=>array('name'=>'Ampel', 'link'=>'stammdaten/ampel_frameset.html', 'target'=>'main','permissions'=>array('basis/ampel')),
 		'Infoscreen'=>array('name'=>'Infoscreen', 'link'=>'stammdaten/infoscreen_frameset.html', 'target'=>'main','permissions'=>array('basis/infoscreen')),
-		'Ferien'=>array('name'=>'Ferien', 'link'=>'lehre/ferienverwaltung.php', 'target'=>'main','permissions'=>array('admin')),
+			'Ferien'=>array('name'=>'Ferien', 'link'=>'lehre/ferienverwaltung.php', 'target'=>'main','permissions'=>array('basis/ferien')),
 		'Service'=>array('name'=>'Service', 'link'=>'stammdaten/service_frameset.html', 'target'=>'main','permissions'=>array('basis/service')),
 		'Dokumentvorlagen'=>array('name'=>'Dokumentvorlagen', 'link'=>'stammdaten/dokumentvorlagen_verwaltung.php', 'target'=>'main','permissions'=>array('basis/dokumente')),
 		'GSProgramm'=>array('name'=>'GSProgramm', 'link'=>'stammdaten/gsprogramm.php', 'target'=>'main','permissions'=>array('inout/uebersicht')),

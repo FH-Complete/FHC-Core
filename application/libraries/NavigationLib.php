@@ -1,4 +1,20 @@
 <?php
+/**
+ * Copyright (C) 2022 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -37,7 +53,7 @@ class NavigationLib
 		// Loads library ExtensionsLib
 		$this->_ci->load->library('ExtensionsLib');
 
-		$this->_navigationPage = $this->_getNavigationtPage($params); // sets the id for the related navigation widget
+		$this->_navigationPage = $this->_getNavigationPage($params); // sets the id for the related navigation widget
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -67,9 +83,19 @@ class NavigationLib
 	 * Returns the structure for one level of the menu
 	 */
 	public function oneLevel(
-		$description, $link = '#', $children = null, $icon = '', $expand = false,
-		$subscriptDescription = null, $subscriptLinkClass = null, $subscriptLinkValue = null, $target = '',
-		$sort = null, $requiredPermissions = null, $subscriptLinkHref = '#')
+		$description,
+		$link = '#',
+		$children = null,
+		$icon = '',
+		$expand = false,
+		$subscriptDescription = null,
+		$subscriptLinkClass = null,
+		$subscriptLinkValue = null,
+		$target = '',
+		$sort = null,
+		$requiredPermissions = null,
+		$subscriptLinkHref = '#'
+	)
 	{
 		return array(
 			'description' => $description,
@@ -223,7 +249,8 @@ class NavigationLib
 					$filename = APPPATH.'config/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_NAVIGATION_FILENAME;
 					if (file_exists($filename))
 					{
-						unset($config);
+						$config = array(); // default value
+
 						include($filename);
 
 						if (isset($config[$configName]) && is_array($config[$configName]))
@@ -278,7 +305,7 @@ class NavigationLib
 		}
 		else
 		{
-			foreach ($navigationArray as $key=>$row)
+			foreach ($navigationArray as $key => $row)
 			{
 				// Search for * Entries
 				if (mb_strpos($key, '*') === 0 || mb_strpos($key, '*') === mb_strlen($key) - 1)
@@ -300,7 +327,7 @@ class NavigationLib
 	 * Return an unique string that identify this navigation widget
 	 * NOTE: The default value is the URI where the NavigationWidget is called
 	 */
-	private function _getNavigationtPage($params)
+	private function _getNavigationPage($params)
 	{
 		if ($params != null
 			&& is_array($params)

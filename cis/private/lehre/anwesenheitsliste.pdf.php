@@ -68,7 +68,7 @@ isset($_GET['lehreinheit_id']) ? $lehreinheit = $_GET['lehreinheit_id'] : $lehre
 $stg = new studiengang();
 $stg->load($lv->studiengang_kz);
 
-$doc = new dokument_export('Anwesenheitslist');
+$doc = new dokument_export('Anwesenheitslist',  $stg->oe_kurzbz);
 
 $lehrelisthelper = new LehreListHelper($db, $studiensemester, $lvid, $lv, $stg, $lehreinheit);
 $arr_lehrende = $lehrelisthelper->getArr_Lehrende();

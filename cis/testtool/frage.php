@@ -37,6 +37,7 @@ require_once('../../include/gebiet.class.php');
 require_once('../../include/sprache.class.php');
 require_once '../../include/phrasen.class.php';
 require_once '../../include/reihungstest.class.php';
+require_once '../../include/pruefling.class.php';
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -79,10 +80,10 @@ echo '
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8" />
-	<link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+	<link rel="stylesheet" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css" type="text/css"/>
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
-	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 	<script language="Javascript" type="text/javascript">
 	//<![CDATA[
 	function killChildNodes(an_element)
@@ -147,6 +148,30 @@ echo '
 		alert(<?php echo "'".$p->t("testtool/alleFragenBeantwortet")."'"?>);
 		return true;
 	}
+	
+	$(document).ready(function () {
+		$(document).bind('cut copy paste', function(e)
+		{
+			if (document.querySelector('.frage'))
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("keydown", function (e)
+		{
+			if (((e.ctrlKey || e.metaKey) && e.keyCode === 85) || e.keyCode === 123)
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("contextmenu", function (e)
+		{
+			e.preventDefault();
+		});
+
+	});
 
 	//]]>
 	</script>
@@ -156,6 +181,15 @@ echo '
 <?php
 if(!isset($_SESSION['pruefling_id']))
 	die($p->t('testtool/bitteZuerstAnmelden'));
+
+$pruefling = new pruefling();
+$pruefling->load($_SESSION['pruefling_id']);
+
+if ($pruefling->isGesperrt($_SESSION['pruefling_id']))
+	die("<script>document.location.href='prueflinggesperrt.php';</script>");
+
+if (!in_array($gebiet_id, $_SESSION['alleGebiete']))
+	die($p->t('testtool/dasGebietIstNichtFuerSieBestimmt'));
 
 $gebiet = new gebiet($gebiet_id);
 
@@ -588,7 +622,7 @@ if($frage->frage_id!='')
 
 	$display_well = $frage->nummer == 0 ? '' : 'well'; // don't style frage 0 because this is always the introduction to gebiet
 	echo '
-		<div class="row">
+		<div class="row frage">
 			<div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8">
 				<div class="'. $display_well. ' text-center">'. $frage->text. '</div>
 			</div>

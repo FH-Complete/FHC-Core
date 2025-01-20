@@ -496,7 +496,7 @@ if(!$error)
 		elseif(isset($_POST['stsem_aktuell']))
 		{
 			$stsem = new studiensemester();
-			$studiensemester_kurzbz = $stsem->getakt();
+			$studiensemester_kurzbz = $stsem->getNearest();
 
 			$variable->name = 'semester_aktuell';
 			$variable->wert = $studiensemester_kurzbz;

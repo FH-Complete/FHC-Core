@@ -12,6 +12,8 @@
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$ORG_NAME = '\'InfoCenter\'';
 	$IDENTITY = '\'identity\'';
+	$ONLINE = '\'online\'';
+	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
 
 $query = '
 		SELECT
@@ -42,10 +44,13 @@ $query = '
 				 LIMIT 1
 			) AS "LastActionType",
 			(
-				SELECT CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END
+				SELECT CASE WHEN student.student_uid IS NULL THEN
+					(CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END)
+					ELSE '. $ONLINE .' END
 				  FROM system.tbl_log l
 				  LEFT JOIN  public.tbl_benutzer on l.insertvon = tbl_benutzer.uid
 				  LEFT JOIN public.tbl_person sp on tbl_benutzer.person_id = sp.person_id
+				  LEFT JOIN public.tbl_student student ON tbl_benutzer.uid = student.student_uid
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
@@ -178,7 +183,7 @@ $query = '
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
 				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
-			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
+			  ORDER BY rtp.teilgenommen NULLS FIRST, pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
 			) AS "ReihungstestAngetreten",
 			(
@@ -199,21 +204,25 @@ $query = '
 				 LIMIT 1
 			) AS "ReihungstestApplied",
 			(
-				SELECT rtp.datum
+				SELECT (ARRAY_TO_STRING(array_agg(DISTINCT(CONCAT(rtp.datum, \' \', to_char(rtp.uhrzeit, \'HH24:MI\'), \' \', studiengang.kurzbzlang))), \', \'))
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 		  	 LEFT JOIN (
 					SELECT rtp.person_id,
 						   rt.studiensemester_kurzbz,
 						   rtp.teilgenommen,
-						   rt.datum
+						   rt.datum,
+						   rt.uhrzeit,
+						   rt.studiengang_kz
 					  FROM public.tbl_rt_person rtp
 		   			  JOIN tbl_reihungstest rt ON(rtp.rt_id = rt.reihungstest_id)
 					 WHERE rt.stufe = 1
 				) rtp ON(rtp.person_id = ps.person_id AND rtp.studiensemester_kurzbz = pss.studiensemester_kurzbz)
+				JOIN tbl_studiengang studiengang ON rtp.studiengang_kz = studiengang.studiengang_kz
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
 				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+				   GROUP BY pss.datum, pss.insertamum, pss.ext_id
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
 			) AS "ReihungstestDate",
@@ -256,7 +265,18 @@ $query = '
 				WHERE akte.person_id = p.person_id
 				AND dokument_kurzbz = '. $IDENTITY .'
 				LIMIT 1
-			) AS "AktenId"
+			) AS "AktenId",
+			(
+				SELECT
+					CASE
+						WHEN COUNT(CASE WHEN konto.betrag != 0 THEN 1 END) = 0 THEN null
+						ELSE SUM(konto.betrag)
+					END AS "Kaution"
+				FROM public.tbl_konto konto
+				WHERE konto.person_id = p.person_id
+					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
+					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'
+			) AS "Kaution"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
@@ -329,7 +349,8 @@ $query = '
 			'ZGV Nation BA',
 			'ZGV Nation MA',
 			'InfoCenter Mitarbeiter',
-			'Identitätsnachweis'
+			'Identitätsnachweis',
+			ucfirst($this->p->t('infocenter', 'kaution'))
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -409,13 +430,9 @@ $query = '
 				$datasetRaw->{'ReihungstestApplied'} = 'Nein';
 			}
 
-			if ($datasetRaw->{'ReihungstestDate'} == null)
+			if ($datasetRaw->{'ReihungstestDate'} == '')
 			{
 				$datasetRaw->{'ReihungstestDate'} = '-';
-			}
-			else
-			{
-				$datasetRaw->{'ReihungstestDate'} = date_format(date_create($datasetRaw->{'ReihungstestDate'}),'Y-m-d');
 			}
 
 			if ($datasetRaw->{'ZGVNation'} == null)
@@ -449,6 +466,18 @@ $query = '
 				$datasetRaw->{'AktenId'} = '-';
 			}
 
+			if ($datasetRaw->{'Kaution'} === null)
+			{
+				$datasetRaw->{'Kaution'} = '-';
+			}
+			else if ($datasetRaw->{'Kaution'} === '0.00')
+			{
+				$datasetRaw->{'Kaution'} = 'Bezahlt';
+			}
+			else
+			{
+				$datasetRaw->{'Kaution'} = 'Offen';
+			}
 
 			return $datasetRaw;
 		},

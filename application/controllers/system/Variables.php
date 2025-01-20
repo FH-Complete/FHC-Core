@@ -18,10 +18,10 @@ class Variables extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'setVar' => 'basis/variable:rw',
-				'getVar' => 'basis/variable:rw',
-				'changeStudiensemesterVar' => 'basis/variable:rw',
-				'changeStudengangsTypVar' => 'basis/variable:rw'
+				'setVar' => array('basis/variable:rw','basis/variable_persoenlich:rw'),
+				'getVar' => array('basis/variable:rw','basis/variable_persoenlich:rw'),
+				'changeStudiensemesterVar' => array('basis/variable:rw','basis/variable_persoenlich:rw'),
+				'changeStudengangsTypVar' => array('basis/variable:rw','basis/variable_persoenlich:rw')
 			)
 		);
 

@@ -71,6 +71,7 @@ $this->phrasen['global/aenderungenZuruecksetzen']= "&Auml;nderungen zur&uuml;cks
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='Vorname';
 $this->phrasen['global/nachname']='Nachname';
+$this->phrasen['global/wahlname']='Wahlname';
 $this->phrasen['global/anrede']='Anrede';
 $this->phrasen['global/name']='Name';
 $this->phrasen['global/uid']='UID';

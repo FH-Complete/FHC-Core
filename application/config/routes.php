@@ -50,7 +50,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples: my-controller/index -> my_controller/index
 |   my-controller/my-method -> my_controller/my_method
 */
-$route['default_controller'] = 'Vilesci';
+$route['default_controller'] = defined('CIS4') && CIS4 ? 'Cis4' : 'Vilesci';
 $route['translate_uri_dashes'] = FALSE;
 
 // Class name conflicts
@@ -60,3 +60,28 @@ $route['api/v1/organisation/[G|g]eschaeftsjahr/(:any)'] = 'api/v1/organisation/g
 $route['api/v1/organisation/[O|o]rganisationseinheit/(:any)'] = 'api/v1/organisation/organisationseinheit2/$1';
 $route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
 $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
+
+$route['CisVue'] = 'CisVue/dashboard';
+$route['Cis/Stundenplan/(:any)'] = 'Cis/Stundenplan';
+
+// load routes from extensions
+$subdir = 'application/config/extensions';
+$dirlist = scandir($subdir);
+
+if ($dirlist)
+{
+	$files = array_diff($dirlist, array('.','..'));
+
+	foreach ($files as &$item)
+	{
+		if (is_dir($subdir . DIRECTORY_SEPARATOR . $item))
+		{
+			$routes_file = $subdir . DIRECTORY_SEPARATOR . $item . DIRECTORY_SEPARATOR . 'routes.php';
+
+			if (file_exists($routes_file))
+			{
+				require($routes_file);
+			}
+		}
+	}
+}

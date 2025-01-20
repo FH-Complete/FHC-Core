@@ -532,6 +532,33 @@ class student extends benutzer
 	}
 
 	/**
+	 * Check, ob inputparameter gültige studenten_id ist
+	 * @param matrikelnummer oder student_uid
+	 * @return ok, wenn gültige Id, sonst false
+	 */
+	public function checkIfValidStudentUID($uid)
+	{
+		$qry = "SELECT student_uid FROM public.tbl_student WHERE student_uid=".$this->db_add_param($uid);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
 	 * Laedt die UID anhand der Matrikelnummer
 	 * @param matrikelnummer
 	 * @return uid wenn ok, false wenn Fehler

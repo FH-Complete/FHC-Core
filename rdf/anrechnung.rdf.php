@@ -32,8 +32,10 @@ if(is_numeric($anrechnung_id))
 	// Add last Anrechnungstatus
 	$anrechnungstatus = new Anrechnung();
 	$anrechnungstatus->getLastAnrechnungstatus($anrechnung_id);
-
-	$anrechnung->result[0]->status = $anrechnungstatus->result[0]->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
+	if(isset($anrechnungstatus->result[0]))
+		$anrechnung->result[0]->status = $anrechnungstatus->result[0]->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
+	else
+		$anrechnung->result[0]->status = '';
 }
 elseif(is_numeric($prestudent_id))
 {
@@ -46,7 +48,10 @@ elseif(is_numeric($prestudent_id))
 	    {
 	        $anrechnungstatus = new Anrechnung();
 	        $status = 	$anrechnungstatus->getLastAnrechnungstatus($row->anrechnung_id);
-	        $row->status = $anrechnungstatus->result[0]->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
+			if(isset($anrechnungstatus->result[0]))
+	        	$row->status = $anrechnungstatus->result[0]->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
+			else
+				$row->status = '';
 	    }
 	}
 }

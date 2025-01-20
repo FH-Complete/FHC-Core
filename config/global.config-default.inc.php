@@ -27,6 +27,10 @@ define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN',false);
 define('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN', true);
 define('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN', true);
+define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN', true);
+
+// Wenn gesetzt, werden die Digitale Anwesenheit-Icons nur fuer diese Studiengaenge angezeigt, sonst für alle
+// define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG', serialize(array('257')));
 
 // Im CIS Menue Links bei Modulen anzeigen wenn Lehrauftrag
 define('CIS_LEHRVERANSTALTUNG_MODULE_LINK',true);
@@ -47,6 +51,9 @@ define('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN',true);
 // Zeitaufzeichnung gesperrt_bis Datum YYYY-MM-DD
 define('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS','');
 
+// maximale Dauer einer Zeitsperre in Tagen
+define('CIS_ZEITSPERREN_MAX_DAUER', 730);
+
 // Anzeige des Links zur Noteneingabe in der LVA Uebersicht
 define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
 
@@ -54,7 +61,12 @@ define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
 define('CIS_SUCHE_LVPLAN_ANZEIGEN',true);
 
 // Anzeige des Links zum Profil von Personen bei globaler Suche
+// Wenn ein Mitarbeiter sucht, wird der Link IMMER angezeigt, unabhängig von der Config
+// Wenn ein Studierender sucht und die Config auf false ist, wird der Link nicht angezeigt - ansonsten schon
 define('CIS_SUCHE_PROFIL_ANZEIGEN',true);
+
+// Anzeige von Personen bei globaler Suche
+define('CIS_ALLOW_PERSON_SEARCH', true);
 
 // Soll geprueft werden ob das Passwort innerhalb des letzten Jahres geaendert wurde true|false
 // Wenn dies nicht geaendert wurde wird nach dem Login auf die Passwort aendern Seite umgeleitet
@@ -258,6 +270,9 @@ define('STIP_USER_PASSWORD','password');
 // Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
 
+// UID des Dummy Lektors
+define('DUMMY_LEKTOR_UID','_DummyLektor');
+
 // Soll der Lageplan am Infoterminal angezeigt werden (true|false)
 //define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN', true);
 
@@ -313,6 +328,16 @@ define ('ZAHLUNGSBESTAETIGUNG_ANZEIGEN_FUER_LEHRGAENGE', true);
 
 // Gibt an, ob im CIS die Zahlungsreferenz angezeigt wird
 define ('ZAHLUNGSBESTAETIGUNG_ZAHLUNGSREFERENZ_ANZEIGEN', false);
+
+define('DOCSBOX_ENABLED', false);
+
+// Aktiviert Abfragen auf die Dienstverhaeltnisse im HR Schema anstatt auf die BIS-Verwendung
+// Uebergangsphase bis zur entfernung der BIS-Verwendungen
+// (true | false)
+define('DIENSTVERHAELTNIS_SUPPORT', false);
+
+// Falls Studstatus (Abmeldung, AbmeldungStg, Unterbrechung, Wiederholung) verwendet wird zeige Hinweistext bei Eingabe einer kommissionellen oder zusaetzlichen kommissionellen Pruefung
+define('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT', false);
 
 // header und footer Bilder für eigene Mails verwenden
 define('CUSTOM_MAIL_USE_IMAGES', true);

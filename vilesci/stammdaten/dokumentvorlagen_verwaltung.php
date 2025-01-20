@@ -70,7 +70,7 @@ echo '<!DOCTYPE HTML>
 		<meta charset="UTF-8" />
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 		<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 		<script type="text/javascript" src="../../include/tiny_mce/tiny_mce.js"></script>
@@ -112,7 +112,7 @@ echo '<!DOCTYPE HTML>
 		<style>
 		textarea
 		{
-			font-family: Tahoma, Arial, Helvetica, Verdana, Geneva, sans-serif; 
+			font-family: Tahoma, Arial, Helvetica, Verdana, Geneva, sans-serif;
 			font-size: small;
 		}
 		#tinymce
@@ -476,10 +476,17 @@ else
 		$neuevorlage->stud_selfservice = isset($_POST['neueVorlage_stud_selfservice']);
 		$neuevorlage->insertamum = date('Y-m-d H:i:s');
 		$neuevorlage->insertvon = $user;
-		if (!($neuevorlage->saveVorlage(true)))
+
+		if(!hasOnlyAllowedChars($neuevorlage->vorlage_kurzbz))
+			echo '<b>Keine Sonderzeichen und Umlaute für die Vorlagenkurzbezeichnung erlaubt!</b>';
+		else
 		{
-			echo 'Fehler beim Speichern';
+			if (!($neuevorlage->saveVorlage(true)))
+			{
+				echo 'Fehler beim Speichern';
+			}
 		}
+
 	}
 	elseif (isset($_GET['updateVorlage']) && $_GET['updateVorlage'] == 'true')
 	{
@@ -659,7 +666,7 @@ else
 						<input type="hidden" value="'.$vorlageOE->vorlagestudiengang_id.'" name="vorlagestudiengang_id" />
 						<input type="hidden" value="'.$oe_auswahl.'" name="oe_auswahl" />';
 
-						
+
 						if(!$neu)
 						{
 							echo '<input type="submit" style="padding: 2px 4px" name="speichern" value="Änderung Speichern">&nbsp;&nbsp;';

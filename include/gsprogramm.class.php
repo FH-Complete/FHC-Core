@@ -34,6 +34,7 @@ class gsprogramm extends basis_db
 	public $programm_code;
 	public $bezeichnung;
 	public $gsprogrammtyp_kurzbz;
+	public $studienkennung_uni;
 
 	public function getAll()
 	{
@@ -57,6 +58,7 @@ class gsprogramm extends basis_db
 				$obj->gsprogrammtyp_kurzbz = $row->gsprogrammtyp_kurzbz;
 
 				$obj->gsprogrammtyp_bezeichnung = $row->gsprogrammtyp_bezeichnung;
+				$obj->studienkennung_uni = $row->studienkennung_uni;
 
 				$this->result[]=$obj;
 			}
@@ -86,6 +88,7 @@ class gsprogramm extends basis_db
 				$this->programm_code = $row->programm_code;
 				$this->bezeichnung = $row->bezeichnung;
 				$this->gsprogrammtyp_kurzbz = $row->gsprogrammtyp_kurzbz;
+				$this->studienkennung_uni = $row->studienkennung_uni;
 				$this->new = false;
 			}
 			return true;
@@ -126,22 +129,56 @@ class gsprogramm extends basis_db
 		}
 	}
 
+	/**
+	 * Prueft die Daten vor dem Speichern
+	 *
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function validate()
+	{
+		if(!is_numeric($this->programm_code))
+		{
+			$this->errormsg = 'Programm Code muss eine Zahl sein';
+			return false;
+		}
+		if($this->gsprogrammtyp_kurzbz=='')
+		{
+			$this->errormsg = 'Gsprogrammtyp Kurzbezeichnung muss eingegeben werden';
+			return false;
+		}
+		if($this->bezeichnung=='')
+		{
+			$this->errormsg = 'Bezeichnung muss eingetragen werden';
+			return false;
+		}
+		if($this->studienkennung_uni != '' && preg_match("/^[AFHLU][UPF][A-Z]([0-9]{3}){1,3}(0[1-6]|[UP][A-W]){0,1}$/", $this->studienkennung_uni) !== 1)
+		{
+			$this->errormsg = 'Ungültige Studienkennung Uni';
+			return false;
+		}
+		return true;
+	}
+
 	public function save()
 	{
+		if(!$this->validate())
+			return false;
 		if($this->new)
 		{
 			$qry = 'BEGIN;INSERT INTO bis.tbl_gsprogramm(programm_code,
-				bezeichnung, gsprogrammtyp_kurzbz) VALUES('.
+				bezeichnung, gsprogrammtyp_kurzbz, studienkennung_uni) VALUES('.
 				$this->db_add_param($this->programm_code).','.
 				$this->db_add_param($this->bezeichnung).','.
-				$this->db_add_param($this->gsprogrammtyp_kurzbz).');';
+				$this->db_add_param($this->gsprogrammtyp_kurzbz).','.
+				$this->db_add_param($this->studienkennung_uni).');';
 		}
 		else
 		{
 			$qry = 'UPDATE bis.tbl_gsprogramm SET
 				bezeichnung='.$this->db_add_param($this->bezeichnung).',
 				gsprogrammtyp_kurzbz='.$this->db_add_param($this->gsprogrammtyp_kurzbz).',
-				programm_code='.$this->db_add_param($this->programm_code, FHC_INTEGER).'
+				programm_code='.$this->db_add_param($this->programm_code, FHC_INTEGER).',
+				studienkennung_uni='.$this->db_add_param($this->studienkennung_uni).'
 				WHERE gsprogramm_id='.$this->db_add_param($this->gsprogramm_id, FHC_INTEGER, false);
 
 		}

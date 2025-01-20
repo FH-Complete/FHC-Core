@@ -21,6 +21,7 @@ class InfoCenter extends Auth_Controller
 	const FREIGEGEBEN_PAGE = 'freigegeben';
 	const REIHUNGSTESTABSOLVIERT_PAGE = 'reihungstestAbsolviert';
 	const ABGEWIESEN_PAGE = 'abgewiesen';
+	const AUFGENOMMEN_PAGE = 'aufgenommen';
 	const SHOW_DETAILS_PAGE = 'showDetails';
 	const SHOW_ZGV_DETAILS_PAGE = 'showZGVDetails';
 	const ZGV_UBERPRUEFUNG_PAGE = 'ZGVUeberpruefung';
@@ -88,6 +89,12 @@ class InfoCenter extends Auth_Controller
 			'message' => 'Type of Document %s was updated, set to %s',
 			'success' => null
 		),
+		'deletedoc' => array(
+			'logtype' => 'Action',
+			'name' => 'Document deleted',
+			'message' => 'Document %s deleted',
+			'success' => null
+		),
 	);
 
 	// Name of Interessentenstatus
@@ -109,12 +116,14 @@ class InfoCenter extends Auth_Controller
 				'index' => 'infocenter:r',
 				'freigegeben' => 'infocenter:r',
 				'abgewiesen' => 'infocenter:r',
+				'aufgenommen' => 'infocenter:r',
 				'reihungstestAbsolviert' => 'infocenter:r',
 				'showDetails' => 'infocenter:r',
 				'showZGVDetails' => 'lehre/zgvpruefung:r',
 				'unlockPerson' => 'infocenter:rw',
 				'saveFormalGeprueft' => 'infocenter:rw',
 				'saveDocTyp' => 'infocenter:rw',
+				'updateStammdaten' => 'infocenter:rw',
 				'saveNachreichung' => 'infocenter:rw',
 				'getPrestudentData' => 'infocenter:r',
 				'getLastPrestudentWithZgvJson' => 'infocenter:r',
@@ -131,18 +140,15 @@ class InfoCenter extends Auth_Controller
 				'reloadZgvPruefungen' => 'infocenter:r',
 				'reloadMessages' => 'infocenter:r',
 				'reloadDoks' => 'infocenter:r',
+				'reloadUebersichtDoks' => 'infocenter:r',
 				'reloadNotizen' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'reloadLogs' => 'infocenter:r',
 				'outputAkteContent' => array('infocenter:r', 'lehre/zgvpruefung:r'),
-				'getPostponeDate' => array('infocenter:r', 'lehre/zgvpruefung:r'),
-				'park' => 'infocenter:rw',
-				'unpark' => 'infocenter:rw',
-				'setOnHold' => 'infocenter:rw',
-				'removeOnHold' => array('infocenter:rw', 'lehre/zgvpruefung:rw'),
-				'getStudienjahrEnd' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'setNavigationMenuArrayJson' => 'infocenter:r',
 				'getAbsageData' => 'infocenter:r',
-				'saveAbsageForAll' => 'infocenter:rw'
+				'saveAbsageForAll' => 'infocenter:rw',
+				'deleteDoc' => 'infocenter:rw',
+				'getStudienartData' => 'infocenter:rw'
 			)
 		);
 
@@ -154,15 +160,25 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
 		$this->load->model('crm/ZGVPruefung_model', 'ZGVPruefungModel');
 		$this->load->model('crm/ZGVPruefungStatus_model', 'ZGVPruefungStatusModel');
+		$this->load->model('crm/Rueckstellung_model', 'RueckstellungModel');
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('system/Message_model', 'MessageModel');
 		$this->load->model('system/Filters_model', 'FiltersModel');
 		$this->load->model('system/PersonLock_model', 'PersonLockModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('codex/Zgv_model', 'ZgvModel');
+		$this->load->model('codex/Zgvmaster_model', 'ZgvmasterModel');
+		$this->load->model('codex/Nation_model', 'NationModel');
+		$this->load->model('person/Kontakt_model', 'KontaktModel');
+		$this->load->model('person/Geschlecht_model', 'GeschlechtModel');
+		$this->load->model('person/adresse_model', 'AdresseModel');
 
 		// Loads libraries
 		$this->load->library('PersonLogLib');
 		$this->load->library('WidgetLib');
+
+		$this->load->config('infocenter');
 
 		$this->loadPhrases(
 			array(
@@ -213,6 +229,16 @@ class InfoCenter extends Auth_Controller
 		$this->_setNavigationMenu(self::ABGEWIESEN_PAGE); // define the navigation menu for this page
 
 		$this->load->view('system/infocenter/infocenterAbgewiesen.php');
+	}
+	
+	/**
+	 * Aufgenommene page of the InfoCenter tool
+	 */
+	public function aufgenommen()
+	{
+		$this->_setNavigationMenu(self::AUFGENOMMEN_PAGE); // define the navigation menu for this page
+		
+		$this->load->view('system/infocenter/infocenterAufgenommen.php');
 	}
 
 	/**
@@ -300,7 +326,7 @@ class InfoCenter extends Auth_Controller
 			show_error('Person does not exist!');
 
 		$origin_page = $this->input->get(self::ORIGIN_PAGE);
-		if ($origin_page == self::INDEX_PAGE)
+		if (in_array($origin_page, array(self::INDEX_PAGE, self::ABGEWIESEN_PAGE)))
 		{
 			// mark person as locked for editing
 			$result = $this->PersonLockModel->lockPerson($person_id, $this->_uid, self::APP);
@@ -311,10 +337,13 @@ class InfoCenter extends Auth_Controller
 		$persondata = $this->_loadPersonData($person_id);
 
 		$checkPerson = $this->PersonModel->checkDuplicate($person_id);
-
 		if (isError($checkPerson)) show_error(getError($checkPerson));
 
-		$duplicate = array('duplicated' => getData($checkPerson));
+		$checkUnruly = $this->PersonModel->checkUnruly($persondata['stammdaten']->vorname, $persondata['stammdaten']->nachname, $persondata['stammdaten']->gebdatum);
+		if (isError($checkUnruly)) show_error(getError($checkUnruly));
+
+		$duplicate = array('duplicate' => getData($checkPerson));
+		$unruly = array('unruly' => getData($checkUnruly));
 
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
@@ -325,7 +354,8 @@ class InfoCenter extends Auth_Controller
 			$persondata,
 			$prestudentdata,
 			$dokumentdata,
-			$duplicate
+			$duplicate,
+			$unruly
 		);
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
@@ -345,7 +375,14 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($result)) show_error(getError($result));
 
-		$redirectLink = '/'.self::INFOCENTER_URI.'?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
+		$origin_page = $this->input->get(self::ORIGIN_PAGE);
+
+		if ($origin_page === self::ABGEWIESEN_PAGE)
+			$redirectLink = self::INFOCENTER_URI. '/' .self::ABGEWIESEN_PAGE;
+		else
+			$redirectLink = '/'.self::INFOCENTER_URI;
+
+		$redirectLink .= '?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
 
 		// Force reload of Dataset after Unlock
 		$redirectLink .= '&'.self::KEEP_TABLESORTER_FILTER.'=true';
@@ -396,6 +433,35 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$this->outputJsonSuccess(array($json));
+	}
+
+	public function deleteDoc($person_id)
+	{
+		$akte_id = $this->input->post('akteid');
+
+		if (isset($akte_id) && isset($person_id))
+		{
+			$this->load->library('AkteLib');
+			$akte = $this->aktelib->get($akte_id);
+
+			if (hasData($akte))
+			{
+				$akte = getData($akte);
+				if ($akte->person_id === (int)$person_id)
+				{
+					$result = $this->aktelib->remove($akte_id);
+
+					if (isError($result))
+					{
+						$this->terminateWithJsonError('Error deleting document');
+					}
+
+					$this->_log($person_id, 'deletedoc', array($akte->bezeichnung));
+
+					$this->outputJsonSuccess('success');
+				}
+			}
+		}
 	}
 
 	/**
@@ -558,7 +624,7 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
-	 * Sendet bei einer neuen ZGV Prüfung die Mail raus an den Studiengang
+	 * Sendet bei einer neuen ZGV Prüfung eine Mail an den Studiengang
 	 */
 	private function sendZgvMail($mail, $typ, $person){
 		$data = array(
@@ -649,7 +715,7 @@ class InfoCenter extends Auth_Controller
 
 	/**
 	 * Fügt einen neuen ZGV Status hinzu oder updated einen bestehenden
-	 * Falls es erfolgreich war, sendet er die Mail raus
+	 * Falls es erfolgreich war, wird eine Mail rausgeschickt
 	 */
 	public function zgvRueckfragen()
 	{
@@ -703,7 +769,8 @@ class InfoCenter extends Auth_Controller
 				$this->sendZgvMail($mail, $typ, $person);
 			elseif (isError($insert))
 				$this->terminateWithJsonError('Fehler beim Speichern');
-		}else
+		}
+		else
 		{
 			$insert = $this->ZGVPruefungModel->insert(
 				array(
@@ -733,7 +800,7 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$hold = false;
-		if ($this->personloglib->getOnHoldDate($person_id) !== null)
+		if (hasData($this->RueckstellungModel->getByPersonId($person_id, 'onhold_zgv')))
 			$hold = true;
 
 		$this->outputJsonSuccess(
@@ -1069,9 +1136,20 @@ class InfoCenter extends Auth_Controller
 
 	public function reloadDoks($person_id)
 	{
-		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
+		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true, false);
 
 		$this->load->view('system/infocenter/dokNachzureichend.php', array('dokumente_nachgereicht' => $dokumente_nachgereicht->retval));
+	}
+
+	public function reloadUebersichtDoks($person_id)
+	{
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false, false);
+
+		$this->DokumentModel->addOrder('bezeichnung');
+		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
+		$data = array_merge($dokumentdata, ['dokumente' => $dokumente->retval]);
+
+		$this->load->view('system/infocenter/dokpruefung.php', $data);
 	}
 
 	/**
@@ -1103,107 +1181,7 @@ class InfoCenter extends Auth_Controller
 			->set_output($aktecontent->retval)
 			->_display();
 	}
-
-	/**
-	 * Gets the date until which a person is parked
-	 * @param $person_id
-	 */
-	public function getPostponeDate($person_id)
-	{
-		$result = array(
-			'type' => null,
-			'date' => null
-		);
-
-		$parkedDate = $this->personloglib->getParkedDate($person_id);
-
-		if (isset($parkedDate))
-		{
-			$result['type'] = 'parked';
-			$result['date'] = $parkedDate;
-		}
-		else
-		{
-			$onholdDate = $this->personloglib->getOnHoldDate($person_id);
-
-			if (isset($onholdDate))
-			{
-				$result['type'] = 'onhold';
-				$result['date'] = $onholdDate;
-			}
-		}
-
-		$this->outputJsonSuccess($result);
-	}
-
-	/**
-	 * Initializes parking of a person, i.e. a person is not expected to do any actions while parked
-	 */
-	public function park()
-	{
-		$person_id = $this->input->post('person_id');
-		$date = $this->input->post('parkdate');
-
-		$result = $this->personloglib->park($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid);
-
-		$this->outputJson($result);
-	}
-
-	/**
-	 * Removes parking of a person
-	 */
-	public function unPark()
-	{
-		$person_id = $this->input->post('person_id');
-
-		$result = $this->personloglib->unPark($person_id);
-
-		$this->outputJson($result);
-	}
-
-	/**
-	 * Sets a person on hold ("zurückstellen")
-	 */
-	public function setOnHold()
-	{
-		$person_id = $this->input->post('person_id');
-		$date = $this->input->post('onholddate');
-
-		$result = $this->personloglib->setOnHold($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid);
-
-		$this->outputJson($result);
-	}
-
-	/**
-	 * Removed on hold status of a person
-	 */
-	public function removeOnHold()
-	{
-		$person_id = $this->input->post('person_id');
-
-		$result = $this->personloglib->removeOnHold($person_id);
-
-		$this->outputJson($result);
-	}
-
-	/**
-	 * Gets the End date of the current Studienjahr
-	 */
-	public function getStudienjahrEnd()
-	{
-		$this->load->model('organisation/studienjahr_model', 'StudienjahrModel');
-
-		$result = $this->StudienjahrModel->getCurrStudienjahr();
-
-		$json = null;
-
-		if (hasData($result))
-		{
-			$json = $result->retval[0]->ende;
-		}
-
-		$this->outputJsonSuccess(array($json));
-	}
+	
 
 	/**
 	 * Wrapper for setNavigationMenu, returns JSON message
@@ -1267,6 +1245,128 @@ class InfoCenter extends Auth_Controller
 		$this->outputJsonSuccess('success');
 	}
 
+	public function updateStammdaten()
+	{
+		if (isEmptyString($this->input->post('nachname')) ||
+			isEmptyString($this->input->post('geschlecht')) ||
+			isEmptyString($this->input->post('gebdatum')))
+		{
+			$this->terminateWithJsonError($this->p->t('infocenter', 'stammdatenFeldFehlt'));
+		}
+
+		$datum = explode('.', $this->input->post('gebdatum'));
+
+		if (!checkdate($datum[1], $datum[0], $datum[2]))
+		{
+			$this->terminateWithJsonError($this->p->t('infocenter', 'datumUngueltig'));
+		}
+
+		$person_id = $this->input->post('personid');
+
+		$update = $this->PersonModel->update(
+			array
+			(
+				'person_id' => $person_id
+			),
+			array
+			(
+				'titelpre' => isEmptyString($this->input->post('titelpre')) ? null : $this->input->post('titelpre'),
+				'vorname' => isEmptyString($this->input->post('vorname')) ? null : $this->input->post('vorname'),
+				'nachname' => $this->input->post('nachname'),
+				'titelpost' => isEmptyString($this->input->post('titelpost')) ? null : $this->input->post('titelpost'),
+				'gebdatum' => isEmptyString($this->input->post('gebdatum')) ? null : date("Y-m-d", strtotime($this->input->post('gebdatum'))),
+				'svnr' => isEmptyString($this->input->post('svnr')) ? null : $this->input->post('svnr'),
+				'staatsbuergerschaft' => isEmptyString($this->input->post('buergerschaft')) ? null : $this->input->post('buergerschaft'),
+				'geschlecht' => $this->input->post('geschlecht'),
+				'geburtsnation' => isEmptyString($this->input->post('gebnation')) ? null : $this->input->post('gebnation'),
+				'gebort' => isEmptyString($this->input->post('gebort')) ? null : $this->input->post('gebort'),
+				'updateamum' => date('Y-m-d H:i:s'),
+				'updatevon' => $this->_uid
+			)
+		);
+
+		if (isError($update))
+			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+
+		$kontakte = $this->input->post('kontakt');
+		if($kontakte) {
+
+			foreach ($kontakte as $kontakt) {
+				$kontaktExists = $this->KontaktModel->loadWhere(array(
+					'kontakt_id' => $kontakt['id'],
+					'person_id' => $person_id,
+				));
+
+				if (hasData($kontaktExists)) {
+					$kontaktExists = getData($kontaktExists)[0];
+
+					if ($kontaktExists->kontakt === $kontakt['value'])
+						continue;
+
+					$update = $this->KontaktModel->update(
+						array
+						(
+							'kontakt_id' => $kontakt['id']
+						),
+						array
+						(
+							'kontakt' => isEmptyString($kontakt['value']) ? null : $kontakt['value'],
+							'updateamum' => date('Y-m-d H:i:s'),
+							'updatevon' => $this->_uid
+						)
+					);
+
+					if (isError($update))
+						$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+				}
+			}
+
+		}
+
+		$adressen = $this->input->post('adresse');
+
+		if($adressen) {
+
+			foreach ($adressen as $adresse) {
+				$adresseExists = $this->AdresseModel->loadWhere(array(
+					'adresse_id' => $adresse['id'],
+					'person_id' => $person_id,
+				));
+
+				if (hasData($adresseExists)) {
+					$adresse = $adresse['value'];
+					$adresseExists = getData($adresseExists)[0];
+					if ($adresseExists->strasse !== $adresse['strasse'] ||
+						$adresseExists->plz !== $adresse['plz'] ||
+						$adresseExists->ort !== $adresse['ort'] ||
+						$adresseExists->nation !== $adresse['nation']) {
+						$update = $this->AdresseModel->update(
+							array
+							(
+								'adresse_id' => $adresseExists->adresse_id
+							),
+							array
+							(
+								'strasse' => isEmptyString($adresse['strasse']) ? null : $adresse['strasse'],
+								'plz' => isEmptyString($adresse['plz']) ? null : $adresse['plz'],
+								'ort' => isEmptyString($adresse['ort']) ? null : $adresse['ort'],
+								'nation' => isEmptyString($adresse['nation']) ? null : $adresse['nation'],
+								'updateamum' => date('Y-m-d H:i:s'),
+								'updatevon' => $this->_uid
+							)
+						);
+
+						if (isError($update))
+							$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+					}
+
+				}
+			}
+		}
+
+		$this->outputJsonSuccess('Success');
+	}
+
 	public function saveNachreichung($person_id)
 	{
 		$nachreichungAm = $this->input->post('nachreichungAm');
@@ -1304,7 +1404,6 @@ class InfoCenter extends Auth_Controller
 
 		if($nachreichungAm < $today)
 			$this->terminateWithJsonError($this->p->t('infocenter', 'nachreichDatumNichtVergangenheit'));
-
 
 		$akte = $this->AkteModel->loadWhere(array('person_id' => $person_id, 'dokument_kurzbz' => $allowedTypes[$typ]));
 
@@ -1452,6 +1551,7 @@ class InfoCenter extends Auth_Controller
 		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		$reihungstestAbsolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$abgewiesenLink = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
+		$aufgenommenLink = site_url(self::INFOCENTER_URI.'/'.self::AUFGENOMMEN_PAGE);
 
 		$currentFilterId = $this->input->get(self::FILTER_ID);
 		if (isset($currentFilterId))
@@ -1459,6 +1559,7 @@ class InfoCenter extends Auth_Controller
 			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 			$abgewiesenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+			$aufgenommenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -1509,7 +1610,19 @@ class InfoCenter extends Auth_Controller
 					null, 				// subscriptLinkValue
 					'', 				// target
 					30   				// sort
-				)
+				),
+				'aufgenommen' => $this->navigationlib->oneLevel(
+					'Aufgenommene',		// description
+					$aufgenommenLink,				// link
+					null,				// children
+					'check',					// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					40   				// sort
+				),
 			)
 		);
 	}
@@ -1536,6 +1649,9 @@ class InfoCenter extends Auth_Controller
 			$link = site_url(self::ZGV_UEBERPRUEFUNG_URI);
 		if ($origin_page === self::ABGEWIESEN_PAGE)
 			$link = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
+
+		if ($origin_page === self::AUFGENOMMEN_PAGE)
+			$link = site_url(self::INFOCENTER_URI.'/'.self::AUFGENOMMEN_PAGE);
 
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
@@ -1741,14 +1857,14 @@ class InfoCenter extends Auth_Controller
 		if (!isset($stammdaten->retval))
 			return null;
 
-		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false);
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false, false);
 
 		if (isError($dokumente))
 		{
 			show_error(getError($dokumente));
 		}
 
-		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
+		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true, false);
 
 		if (isError($dokumente_nachgereicht))
 		{
@@ -1932,10 +2048,33 @@ class InfoCenter extends Auth_Controller
 		$abwstatusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
 		$intstatusgruende = $this->StatusgrundModel->getStatus(self::INTERESSENTSTATUS)->retval;
 
+		$studienArtBerechtigung = array_column($this->getStudienArtBerechtigung(), 'typ');
+
+		$this->ZgvModel->addOrder('zgv_bez');
+		$allZGVs = getData($this->ZgvModel->load());
+
+		$this->ZgvModel->addOrder('zgvmas_bez');
+		$allZGVsMaster = getData($this->ZgvmasterModel->load());
+
+		$this->NationModel->addOrder('langtext');
+		$allNations = getData($this->NationModel->load());
+
+
+		$additional_stg = explode(',', ($this->config->item('infocenter_studiengang_kz')));
+
+		$this->GeschlechtModel->addOrder('sort');
+		$allGenders = getData($this->GeschlechtModel->load());
+
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
 			'abwstatusgruende' => $abwstatusgruende,
-			'intstatusgruende' => $intstatusgruende
+			'intstatusgruende' => $intstatusgruende,
+			'studienArtBerechtigung' => $studienArtBerechtigung,
+			'all_zgvs' => $allZGVs,
+			'all_zgvs_master' => $allZGVsMaster,
+			'all_nations' => $allNations,
+			'additional_stg' => $additional_stg,
+			'all_genders' => $allGenders
 		);
 
 		return $data;
@@ -2096,8 +2235,8 @@ class InfoCenter extends Auth_Controller
 		$prestudentstatus = $prestudent->prestudentstatus;
 		$person_id = $prestudent->person_id;
 		$person = $this->PersonModel->getPersonStammdaten($person_id, true)->retval;
-		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false)->retval;
-		$dokumenteNachzureichen = $this->AkteModel->getAktenWithDokInfo($person_id, null, true)->retval;
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false, false)->retval;
+		$dokumenteNachzureichen = $this->AkteModel->getAktenWithDokInfo($person_id, null, true, false)->retval;
 
 		//fill mail variables
 		$interessentbez = $person->geschlecht == 'm' ? 'Ein Interessent' : 'Eine Interessentin';
@@ -2194,18 +2333,35 @@ class InfoCenter extends Auth_Controller
 
 	public function getAbsageData()
 	{
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$stg_typ = $this->getStudienArtBerechtigung(['b', 'm']);
 
-		$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
-		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
-		$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(['b', 'm'], $studienSemester);
+		if (!is_null($stg_typ))
+		{
+			$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
+			$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
+			$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(array_column($stg_typ, 'typ'), $studienSemester);
 
-		$data = array (
-			'statusgruende' => $statusgruende,
-			'studiengaenge' => $studiengaenge->retval
-		);
+			$data = array (
+				'statusgruende' => $statusgruende,
+				'studiengaenge' => $studiengaenge->retval
+			);
 
-		$this->outputJsonSuccess($data);
+			$this->outputJsonSuccess($data);
+		}
+		else
+			$this->outputJsonSuccess(null);
+	}
+
+	public function getStudienArtBerechtigung($typ = null)
+	{
+		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
+		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, $typ);
+		return getData($stg_typ);
+	}
+
+	public function getStudienartData()
+	{
+		$this->outputJsonSuccess($this->getStudienArtBerechtigung(['b', 'm', 'l']));
 	}
 
 	public function saveAbsageForAll()

@@ -1,5 +1,5 @@
 <?php
-	$this->load->view('templates/header', array('title' => 'TemplateEdit', 'jquery' => true, 'textile' => true));
+	$this->load->view('templates/header', array('title' => 'TemplateEdit', 'jquery3' => true, 'textile' => true));
 ?>
 
 <div class="row">

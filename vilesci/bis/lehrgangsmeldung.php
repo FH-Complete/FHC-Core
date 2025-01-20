@@ -172,6 +172,33 @@ if ($stg_kz == '')
 
 $datumobj=new datum();
 
+// orgform codes auslesen
+$qry='SELECT * FROM bis.tbl_orgform';
+
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		$orgform_code_array[$row->orgform_kurzbz]=$row->code;
+	}
+}
+
+$qry = 'SELECT * FROM bis.tbl_gsstudientyp';
+
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		$kodex_studientyp_array[$row->gsstudientyp_kurzbz]=$row->studientyp_code;
+	}
+}
+
+// StudStatusCode
+$kodex_studstatuscode_array['Student']     =1;
+$kodex_studstatuscode_array['Unterbrecher']=2;
+$kodex_studstatuscode_array['Absolvent']   =3;
+$kodex_studstatuscode_array['Abbrecher']   =4;
+
 //Lehrgangsdaten auslesen
 $qry="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz=".$db->db_add_param($stg_kz);
 if($result = $db->db_query($qry))
@@ -216,12 +243,14 @@ $tabelle = '<table>
 	</tr>';
 $anzahl_gemeldet=0;
 //Hauptselect
-$qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+$qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
+		tbl_studiengang.orgform_kurzbz AS stg_orgform_kurzbz
 	FROM public.tbl_student
 	JOIN public.tbl_benutzer ON(student_uid=uid)
 	JOIN public.tbl_person USING (person_id)
 	JOIN public.tbl_prestudent USING (prestudent_id)
 	JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+	JOIN public.tbl_studiengang ON(tbl_prestudent.studiengang_kz=tbl_studiengang.studiengang_kz)
 	WHERE bismelden IS TRUE
 	AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
 	AND (((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem).") AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
@@ -238,7 +267,6 @@ $qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.pe
 
 if($result = $db->db_query($qry))
 {
-
 	$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
 	<ErhKz>".$erhalter."</ErhKz>
@@ -249,6 +277,12 @@ if($result = $db->db_query($qry))
 
 	while($row = $db->db_fetch_object($result))
 	{
+		//Pruefen ob Ausserordnetlicher Studierender (4.Stelle in Personenkennzeichen = 9)
+		if(mb_substr($row->matrikelnr,3,1)=='9')
+			$ausserordentlich=true;
+		else
+			$ausserordentlich=false;
+
 		//Plausichecks
 		$qryadr="SELECT * FROM public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id=".$db->db_add_param($row->pers_id).";";
 		$results=$db->db_query($qryadr);
@@ -273,7 +307,7 @@ if($result = $db->db_query($qry))
 			$nation='';
 			$co_name = '';
 		}
-		
+
 		// Zustelladresse & c/o Name(=abweichender Empfaenger)
 		$qryzustelladr = "
 			SELECT *
@@ -282,17 +316,17 @@ if($result = $db->db_query($qry))
 			AND person_id=". $db->db_add_param($row->pers_id). ";
 		";
 		$results = $db->db_query($qryzustelladr);
-		
+
 		if ($db->db_num_rows($results) != 1)
 		{
 			$error_log1.= "Es sind ".$db->db_num_rows($results)." Zustelladressen eingetragen\n";
 		}
-		
+
 		$zustell_plz = '';
 		$zustell_gemeinde = '';
 		$zustell_strasse = '';
 		$zustell_nation = '';
-		
+
 		if ($rowzustelladr = $db->db_fetch_object($results))
 		{
 			$zustell_plz = $rowzustelladr->plz;
@@ -449,45 +483,46 @@ if($result = $db->db_query($qry))
 		{
 			$error_log_hinweis .= (!empty($error_log_hinweis) ? ', ' : '') . "bPK fehlt";
 		}
-		
+
 		if($row->bpk != '' && $row->bpk != null)
 		{
 			if (!preg_match('/[a-zA-Z0-9\+\/]{27}=/', $row->bpk))
 			{
 				$error_log.=(!empty($error_log) ? ', ' : ''). "bPK-Zeichenfolge ist ung&uuml;ltig";
 			}
-			
+
 			if (strlen($row->bpk) != 28)
 			{
 				$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
 			}
 		}
-		
+
 		if ($zustell_plz == '' || $zustell_plz == null)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Zustell-PLZ fehlt";
 		}
-		
+
 		if ($zustell_gemeinde == '' || $zustell_gemeinde == null)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Zustell-Gemeinde fehlt";
 		}
-		
+
 		if ($zustell_strasse == '' || $zustell_strasse == null)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Zustell-Strasse fehlt";
 		}
-		
+
 		if ($zustell_nation == '' || $zustell_nation == null)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Zustell-Nation fehlt";
 		}
-		
+
 		if ($email == '' || $email == null)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."eMail Adresse fehlt oder eMail-Zustellung auf 'Nein' gesetzt.";
 		}
-		
+
+		$aktstatus_stsem = $ssem;
 		//Bestimmen der aktuellen Prestudentrolle (Status) und des akt. Ausbildungssemesters des Studenten
 		$qrystatus="SELECT * FROM public.tbl_prestudentstatus
 		WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND studiensemester_kurzbz=".$db->db_add_param($ssem)."
@@ -523,18 +558,22 @@ if($result = $db->db_query($qry))
 						|| $rowstatus->status_kurzbz=="Diplomand")
 					{
 						$status=1;
+						$meldestatus='I';
 					}
 					else if($rowstatus->status_kurzbz=="Unterbrecher" )
 					{
 						$status=2;
+						$meldestatus='U';
 					}
 					else if($rowstatus->status_kurzbz=="Absolvent" )
 					{
 						$status=3;
+						$meldestatus='I';
 					}
 					else if($rowstatus->status_kurzbz=="Abbrecher" )
 					{
 						$status=4;
+						$meldestatus='O';
 					}
 					else
 					{
@@ -546,6 +585,7 @@ if($result = $db->db_query($qry))
 					$aktstatus=$rowstatus->status_kurzbz;
 					$aktstatus_datum=$rowstatus->datum;
 					$storgform=$rowstatus->orgform_kurzbz;
+					$aktstatus_stsem = $rowstatus->studiensemester_kurzbz;
 				}
 			}
 			else
@@ -578,10 +618,12 @@ if($result = $db->db_query($qry))
 						if($rowstatus->status_kurzbz=="Absolvent" )
 						{
 							$status=3;
+							$meldestatus='I';
 						}
 						else if($rowstatus->status_kurzbz=="Abbrecher" )
 						{
 							$status=4;
+							$meldestatus='O';
 						}
 						else
 						{
@@ -592,11 +634,79 @@ if($result = $db->db_query($qry))
 						}
 						$aktstatus=$rowstatus->status_kurzbz;
 						$aktstatus_datum=$rowstatus->datum;
-						//$storgform=$rowstatus->orgform_kurzbz;
+						$storgform=$rowstatus->orgform_kurzbz;
+						$aktstatus_stsem = $rowstatus->studiensemester_kurzbz;
 					}
 				}
 			}
 		}
+
+		//Wenn im Status keine Organisationsform eingetragen ist, wird die des Studienganges uebernommen
+		if($storgform=='')
+		{
+			//$storgform=$orgform_kurzbz;
+			$storgform=$row->stg_orgform_kurzbz;
+		}
+
+		// **** GS Container ****/
+		$gsstatus='';
+		$gsblock='';
+		$qrygs="SELECT
+					tbl_mobilitaet.*,
+					tbl_gsprogramm.programm_code,
+					tbl_gsprogramm.studienkennung_uni,
+					tbl_firma.partner_code
+				FROM
+					bis.tbl_mobilitaet
+					LEFT JOIN bis.tbl_gsprogramm USING(gsprogramm_id)
+					LEFT JOIN public.tbl_firma USING(firma_id)
+				WHERE
+					prestudent_id=".$db->db_add_param($row->prestudent_id)."
+					AND (studiensemester_kurzbz=".$db->db_add_param($aktstatus_stsem)." OR (studiensemester_kurzbz=".$db->db_add_param($psem)." AND status_kurzbz = 'Absolvent'))
+				ORDER BY tbl_mobilitaet.insertamum DESC limit 1;";
+
+		$studtyp = '';
+		if($resultgs = $db->db_query($qrygs))
+		{
+			while($rowgs = $db->db_fetch_object($resultgs))
+			{
+				$gsstatus = 'GS '.$rowgs->status_kurzbz.' '.$row->gsstudientyp_kurzbz;
+				$studtyp = $kodex_studientyp_array[$row->gsstudientyp_kurzbz];
+				$studstatuscode = (isset($kodex_studstatuscode_array[$rowgs->status_kurzbz])?$kodex_studstatuscode_array[$rowgs->status_kurzbz]:'');
+
+				$gserror='';
+				if($studstatuscode=='')
+					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Status ist nicht gesetzt\n";
+				if($studtyp=='')
+					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Studientyp ist nicht gesetzt\n";
+				if($rowgs->partner_code=='')
+					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Partner Code ist leer\n";
+				if($rowgs->programm_code=='')
+					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Programm ist leer\n";
+
+				if($gserror!='')
+				{
+					$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
+					$v.=$gserror."\n";
+					return '';
+				}
+				$gsblock.="
+				<GS>
+					<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
+					<ProgrammNr>".$rowgs->programm_code."</ProgrammNr>
+					<StudTyp>".$studtyp."</StudTyp>
+					<PartnerCode>".$rowgs->partner_code."</PartnerCode>
+					<StudStatusCode>".$studstatuscode."</StudStatusCode>";
+					if (isset($rowgs->studienkennung_uni))
+					{
+						$gsblock.="
+					<StudienkennungUNI>".$rowgs->studienkennung_uni."</StudienkennungUNI>";
+					}
+					$gsblock.="
+				</GS>";
+			}
+		}
+
 		//bei Absolventen das Beendigungsdatum (Sponsion oder Abschlussprüfung) überprüfen
 
 		if($aktstatus=='Absolvent')
@@ -625,13 +735,15 @@ if($result = $db->db_query($qry))
 			}
 		}
 
+		$ausstellungsstaat = '';
+		$ausstellungsstaat_master = '';
 		if($row->zgvmanation!='' && $lgartcode==1) // Master Lehrgang
-			$ausstellungsstaat = $row->zgvmanation;
-		elseif($row->zgvnation!='')
+			$ausstellungsstaat_master = $row->zgvmanation;
+		if($row->zgvnation!='')
 			$ausstellungsstaat = $row->zgvnation;
 		else
 			$ausstellungsstaat = $row->ausstellungsstaat;
-		if($ausstellungsstaat == '')
+		if($ausstellungsstaat == '' && ausstellungsstaat_master == '')
 		{
 			$error_log.=(!empty($error_log)?', ':'')." Ausstellungsstaat fehlt";
 		}
@@ -675,22 +787,30 @@ if($result = $db->db_query($qry))
 			$datei.="
 			<StudentIn>
 				<PersKz>".trim($row->matrikelnr)."</PersKz>
-				<Matrikelnummer>".$row->matr_nr."</Matrikelnummer>
+				<Matrikelnummer>".$row->matr_nr."</Matrikelnummer>";
+				
+				if (!$ausserordentlich)
+				{
+					$datei .= "
+				<OrgFormCode>" . $orgform_code_array[$storgform] . "</OrgFormCode>";
+				}
+
+			$datei.="
 				<GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
 				<Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
-			
+
 				if ($row->titelpre != '')
 				{
 					$datei .= "
 				<AkadGradeVorName>" . $row->titelpre . "</AkadGradeVorName>";
 				}
-				
+
 				if ($row->titelpost != '')
 				{
 					$datei .= "
 				<AkadGradeNachName>" . $row->titelpost . "</AkadGradeNachName>";
 				}
-				
+
 			$datei .= "
 				<Vorname>".$row->vorname."</Vorname>
 				<Familienname>".$row->nachname."</Familienname>";
@@ -710,8 +830,7 @@ if($result = $db->db_query($qry))
 				if($row->bpk != '' && $row->bpk != null)
 				{
 					$datei.="
-					<bPK>".$row->bpk."</bPK>
-					";
+				<bPK>".$row->bpk."</bPK>";
 				}
 
 				$datei.="
@@ -724,28 +843,36 @@ if($result = $db->db_query($qry))
 				<ZustellGemeinde>". $zustell_gemeinde. "</ZustellGemeinde>
 				<ZustellStrasse>". $zustell_strasse. "</ZustellStrasse>
 				<ZustellNation>". $zustell_nation. "</ZustellNation>";
-				
+
 				if ($co_name != '')
 				{
 					$datei .= "
 					<coName>". $co_name. "</coName>";
 				}
-			
+
 				$datei.="
 				<eMailAdresse>". $email_privat. "</eMailAdresse>
 				<eMailAdresseBE>". $email. "</eMailAdresseBE>
 				<ZugangCode>".$row->zgv_code."</ZugangCode>
 				<ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
 
+				if ($ausstellungsstaat != '')
+				{
+					$datei.="
+				<ZugangAusstellungsstaat>".$ausstellungsstaat."</ZugangAusstellungsstaat>";
+				}
+
 				if($lgartcode==1)
 				{
 					$datei.="
 				<ZugangMasterCode>".$row->zgvmas_code."</ZugangMasterCode>
 				<ZugangMasterDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMasterDatum>";
+					if ($ausstellungsstaat_master != '')
+					{
+						$datei.="
+				<ZugangMaAusstellungsstaat>".$ausstellungsstaat_master."</ZugangMaAusstellungsstaat>";
+					}
 				}
-
-				$datei.="
-				<Ausstellungsstaat>".$ausstellungsstaat."</Ausstellungsstaat>";
 
 				$qryad="SELECT
 							*
@@ -777,7 +904,10 @@ if($result = $db->db_query($qry))
 				}
 				$datei.="
 				<StudStatusCode>".$status."</StudStatusCode>
-				<StandortCode>" .$standortcode. "</StandortCode>
+				<MeldeStatus>".$meldestatus."</MeldeStatus>
+				<StandortCode>".$standortcode."</StandortCode>";
+				$datei.= $gsblock;
+				$datei.="
 			</StudentIn>";
 		}
 	}

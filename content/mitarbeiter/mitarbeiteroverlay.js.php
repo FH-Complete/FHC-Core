@@ -39,6 +39,7 @@ var MitarbeiterFunktionTreeDatasource=null; // Datasource des Verwendungstrees
 var MitarbeiterFunktionSelectVerwendungID=null; // ID der Verwendung der Funktion die nach dem rebuild markiert werden soll
 var MitarbeiterFunktionSelectStudiengangID=null; // ID des Studiengangs der Funktion die nach dem rebuild markiert werden soll
 var MitarbeiterEntwicklungsteamTreeDatasource=null; // Datasource des Entwicklungsteamtrees
+var MitarbeiterEntwicklungsteamSelectEntwicklungsteamID=null; //ID Entwicklungsteameintrag
 var MitarbeiterEntwicklungsteamSelectMitarbeiterUID=null; // UID des Mitarbeiters des Entwicklugnsteams das nach dem rebuild markiert werden soll
 var MitarbeiterEntwicklungsteamSelectStudiengangID=null; // ID des Stg des Entwicklungsteams das nach dem rebuild markiert werden soll
 var MitarbeiterEntwicklungsteamDoubleRefresh=false; // Wenn auf einen Tree der eine leere Datasource enthaelt eine neue Datasource angehaengt wird, dann muss doppelt refresht werden
@@ -414,6 +415,7 @@ function MitarbeiterDetailDisableFields(val)
 	document.getElementById('mitarbeiter-detail-textbox-titelpost').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-nachname').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-vorname').disabled=val;
+	document.getElementById('mitarbeiter-detail-textbox-wahlname').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-vornamen').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-geburtsdatum').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-geburtsort').disabled=val;
@@ -435,7 +437,6 @@ function MitarbeiterDetailDisableFields(val)
 	//document.getElementById('mitarbeiter-detail-textbox-personalnummer').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-kurzbezeichnung').disabled=val;
 	document.getElementById('mitarbeiter-detail-checkbox-lektor').disabled=val;
-	document.getElementById('mitarbeiter-detail-textbox-stundensatz').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-telefonklappe').disabled=val;
 	document.getElementById('mitarbeiter-detail-checkbox-fixangestellt').disabled=val;
 	document.getElementById('mitarbeiter-detail-checkbox-bismelden').disabled=val;
@@ -535,6 +536,7 @@ function MitarbeiterAuswahl()
 	titelpre=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpre" ));
 	titelpost=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpost" ));
 	vorname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vorname" ));
+	wahlname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#wahlname" ));
 	vornamen=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vornamen" ));
 	nachname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nachname" ));
 	geburtsdatum=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geburtsdatum" ));
@@ -555,7 +557,6 @@ function MitarbeiterAuswahl()
 
 	personalnummer=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personalnummer" ));
 	kurzbezeichnung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kurzbz" ));
-	stundensatz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundensatz" ));
 	telefonklappe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#telefonklappe" ));
 	lektor=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lektor" ));
 	fixangestellt=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fixangestellt" ));
@@ -576,6 +577,7 @@ function MitarbeiterAuswahl()
 	document.getElementById('mitarbeiter-detail-textbox-titelpre').value=titelpre;
 	document.getElementById('mitarbeiter-detail-textbox-titelpost').value=titelpost;
 	document.getElementById('mitarbeiter-detail-textbox-vorname').value=vorname;
+	document.getElementById('mitarbeiter-detail-textbox-wahlname').value=wahlname;
 	document.getElementById('mitarbeiter-detail-textbox-vornamen').value=vornamen;
 	document.getElementById('mitarbeiter-detail-textbox-nachname').value=nachname;
 	document.getElementById('mitarbeiter-detail-textbox-geburtsdatum').value=geburtsdatum;
@@ -602,7 +604,6 @@ function MitarbeiterAuswahl()
 	//Mitarbeiterdaten
 	document.getElementById('mitarbeiter-detail-textbox-personalnummer').value=personalnummer;
 	document.getElementById('mitarbeiter-detail-textbox-kurzbezeichnung').value=kurzbezeichnung;
-	document.getElementById('mitarbeiter-detail-textbox-stundensatz').value=stundensatz;
 	document.getElementById('mitarbeiter-detail-textbox-telefonklappe').value=telefonklappe;
 	if(lektor=='Ja')
 		document.getElementById('mitarbeiter-detail-checkbox-lektor').checked=true;
@@ -631,7 +632,7 @@ function MitarbeiterAuswahl()
 	document.getElementById('mitarbeiter-detail-textbox-alias').value=alias;
 
 	// ***** KONTAKTE *****
-	document.getElementById('mitarbeiter-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
+	document.getElementById('mitarbeiter-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id+'&'+gettimestamp());
 
 	// ***** BETRIEBSMITTEL *****
 	document.getElementById('mitarbeiter-betriebsmittel').setAttribute('src','betriebsmitteloverlay.xul.php?person_id='+person_id+'&uid='+uid);
@@ -648,6 +649,8 @@ function MitarbeiterAuswahl()
 	{
 		document.getElementById('mitarbeiter-udf').setAttribute('src', 'udf.xul.php?person_id='+person_id);
 	}
+
+	document.getElementById('mitarbeiter-stundensatz').setAttribute('src','mitarbeiter/stundensatzoverlay.xul.php?mitarbeiter_uid='+uid);
 
 	// **** VERWENDUNG ****
 	verwendungtree = document.getElementById('mitarbeiter-tree-verwendung');
@@ -683,6 +686,7 @@ function MitarbeiterAuswahl()
 
 	// **** ENTWICKLUNGSTEAM ****
 	entwicklungsteamtree = document.getElementById('mitarbeiter-tree-entwicklungsteam');
+
 	url='<?php echo APP_ROOT;?>rdf/entwicklungsteam.rdf.php?mitarbeiter_uid='+uid+"&"+gettimestamp();
 
 	try
@@ -818,6 +822,7 @@ function MitarbeiterSave()
 	titelpre = document.getElementById('mitarbeiter-detail-textbox-titelpre').value;
 	titelpost = document.getElementById('mitarbeiter-detail-textbox-titelpost').value;
 	vorname = document.getElementById('mitarbeiter-detail-textbox-vorname').value;
+	wahlname = document.getElementById('mitarbeiter-detail-textbox-wahlname').value;
 	vornamen = document.getElementById('mitarbeiter-detail-textbox-vornamen').value;
 	nachname = document.getElementById('mitarbeiter-detail-textbox-nachname').value;
 	geburtsdatum = document.getElementById('mitarbeiter-detail-textbox-geburtsdatum').value;
@@ -839,7 +844,6 @@ function MitarbeiterSave()
 	//Mitarbeiterdaten
 	personalnummer = document.getElementById('mitarbeiter-detail-textbox-personalnummer').value;
 	kurzbezeichnung = document.getElementById('mitarbeiter-detail-textbox-kurzbezeichnung').value;
-	stundensatz = document.getElementById('mitarbeiter-detail-textbox-stundensatz').value;
 	telefonklappe = document.getElementById('mitarbeiter-detail-textbox-telefonklappe').value;
 	lektor = document.getElementById('mitarbeiter-detail-checkbox-lektor').checked;
 	fixangestellt = document.getElementById('mitarbeiter-detail-checkbox-fixangestellt').checked;
@@ -873,6 +877,7 @@ function MitarbeiterSave()
 	req.add('titelpre', titelpre);
 	req.add('titelpost', titelpost);
 	req.add('vorname', vorname);
+	req.add('wahlname', wahlname);
 	req.add('vornamen', vornamen);
 	req.add('nachname', nachname);
 	req.add('geburtsdatum', ConvertDateToISO(geburtsdatum));
@@ -890,7 +895,6 @@ function MitarbeiterSave()
 	req.add('geburtsnation', geburtsnation);
 	req.add('sprache', sprache);
 	req.add('kurzbezeichnung', kurzbezeichnung);
-	req.add('stundensatz', stundensatz);
 	req.add('telefonklappe', telefonklappe);
 	req.add('lektor', lektor);
 	req.add('fixangestellt', fixangestellt);
@@ -988,6 +992,7 @@ function MitarbeiterDetailgetSpaltenname(id)
 	if(id=='mitarbeiter-treecol-titelpre') return 'titelpre';
 	if(id=='mitarbeiter-treecol-vorname') return 'vorname';
 	if(id=='mitarbeiter-treecol-vornamen') return 'vornamen';
+	if(id=='mitarbeiter-treecol-wahlname') return 'wahlname';
 	if(id=='mitarbeiter-treecol-nachname') return 'nachname';
 	if(id=='mitarbeiter-treecol-titelpost') return 'titelpost';
 	if(id=='mitarbeiter-treecol-personalnummer') return 'personalnummer';
@@ -1600,24 +1605,27 @@ function MitarbeiterEntwicklungsteamTreeSelect()
 	var tree=document.getElementById('mitarbeiter-tree-entwicklungsteam');
 	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 
-	//In der globalen Variable ist der zu selektierende Verwendung gespeichert
-	if(MitarbeiterEntwicklungsteamSelectStudiengangID!=null)
+	//In der globalen Variable ist der zu selektierende Entwicklungsteameintrag gespeichert
+	if (MitarbeiterEntwicklungsteamSelectStudiengangID!=null)
 	{
 	   	for(var i=0;i<items;i++)
 	   	{
+			col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id"] : "mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id";
+			entwicklungsteam_id=tree.view.getCellText(i,col);
 			col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
-			mitarbeiter_uid=tree.view.getCellText(i,col);
+ 			mitarbeiter_uid=tree.view.getCellText(i,col);
 			col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
 			studiengang_kz=tree.view.getCellText(i,col);
 
-			if(mitarbeiter_uid == MitarbeiterEntwicklungsteamSelectMitarbeiterUID && studiengang_kz==MitarbeiterEntwicklungsteamSelectStudiengangID)
-			{
-				//Zeile markieren
-				tree.view.selection.select(i);
-				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
-				tree.treeBoxObject.ensureRowIsVisible(i);
-				return true;
-			}
+
+				if(entwicklungsteam_id == MitarbeiterEntwicklungsteamSelectEntwicklungsteamID && mitarbeiter_uid == MitarbeiterEntwicklungsteamSelectMitarbeiterUID && studiengang_kz==MitarbeiterEntwicklungsteamSelectStudiengangID)
+				{
+					//Zeile markieren
+					tree.view.selection.select(i);
+					//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+					tree.treeBoxObject.ensureRowIsVisible(i);
+					return true;
+				}
 	   	}
 	}
 }
@@ -1670,20 +1678,21 @@ function MitarbeiterEntwicklungsteamSelect()
 	if (tree.currentIndex==-1)
 		return false;
 
+	var col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id"] : "mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id";
+	entwicklungsteam_id=tree.view.getCellText(tree.currentIndex,col);
 	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
 	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-
 	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
 	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
 
-	var url = '<?php echo APP_ROOT ?>rdf/entwicklungsteam.rdf.php?studiengang_kz='+studiengang_kz+'&mitarbeiter_uid='+mitarbeiter_uid+'&'+gettimestamp();
+	var url = '<?php echo APP_ROOT ?>rdf/entwicklungsteam.rdf.php?studiengang_kz='+studiengang_kz+'&mitarbeiter_uid='+mitarbeiter_uid+'&entwicklungsteam_id='+entwicklungsteam_id+'&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
 
-    var dsource = rdfService.GetDataSourceBlocking(url);
+  var dsource = rdfService.GetDataSourceBlocking(url);
 
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/entwicklungsteam/" + mitarbeiter_uid+'/'+studiengang_kz);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/entwicklungsteam/" + mitarbeiter_uid+'/'+studiengang_kz+'/'+entwicklungsteam_id);
 
 	var predicateNS = "http://www.technikum-wien.at/entwicklungsteam/rdf";
 
@@ -1740,6 +1749,7 @@ function MitarbeiterEntwicklungsteamSpeichern()
 	req.add('type', 'entwicklungsteamsave');
 
 	req.add('neu', neu);
+	req.add('entwicklungsteam_id', entwicklungsteam_id);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('studiengang_kz_old', studiengang_kz_old);
 	req.add('besqualcode', besqualcode);
@@ -1762,6 +1772,7 @@ function MitarbeiterEntwicklungsteamSpeichern()
 	else
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		MitarbeiterEntwicklungsteamSelectEntwicklungsteamID = entwicklungsteam_id;
 		MitarbeiterEntwicklungsteamSelectMitarbeiterUID = mitarbeiter_uid;
 		MitarbeiterEntwicklungsteamSelectStudiengangID = studiengang_kz;
 		MitarbeiterEntwicklungsteamDoubleRefresh=true;
@@ -1785,11 +1796,8 @@ function MitarbeiterEntwicklungsteamLoeschen()
 		return false;
 	}
 
-	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
-	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-
-	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
-	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id"] : "mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id";
+	entwicklungsteam_id=tree.view.getCellText(tree.currentIndex,col);
 
 	if(confirm("Wollen Sie diesen Eintrag wirklich loeschen?"))
 	{
@@ -1797,9 +1805,7 @@ function MitarbeiterEntwicklungsteamLoeschen()
 		var req = new phpRequest(url,'','');
 
 		req.add('type', 'entwicklungsteamdelete');
-
-		req.add('studiengang_kz', studiengang_kz);
-		req.add('mitarbeiter_uid', mitarbeiter_uid);
+		req.add('entwicklungsteam_id', entwicklungsteam_id);
 
 		var response = req.executePOST();
 

@@ -166,12 +166,12 @@ $db = new basis_db();
 	<link rel="stylesheet" href="../skin/jquery.css" type="text/css">
 	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" type="text/css" href="../skin/jquery-ui-1.9.2.custom.min.css">
-	<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript" src="../vendor/jquery/sizzle/sizzle.js"></script>
-	<link rel="stylesheet" type="text/css" href="../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css">
 </head>
 <script type="text/javascript">
 function changeSprache(sprache)
@@ -215,7 +215,13 @@ function loadampel()
 		        </td>
 		         <td valign="middle" align="center">
 					<form name="searchform" action="private/tools/suche.php" method="GET" target="content" style="display:inline">
-		        	<input id="globalsearch" type="search" size="55" name="search" placeholder=" <?php echo $p->t('menu/suchePersonOrtDokumentInhalt');?> ..." title="<?php echo $p->t('menu/suchePersonOrtDokumentInhaltLang');?>"/>
+					<?php
+					if (defined('CIS_ALLOW_PERSON_SEARCH') && !CIS_ALLOW_PERSON_SEARCH)
+						$searchText = $p->t('menu/sucheOrtDokumentInhalt');
+					else
+						$searchText = $p->t('menu/suchePersonOrtDokumentInhalt');
+					?>
+		        	<input id="globalsearch" type="search" size="55" name="search" placeholder=" <?php echo $searchText ;?> ..." title="<?php echo $searchText ;?>"/>
 		        	<img src="../skin/images/search.png" onclick="document.searchform.submit()" class="suchicon"/>
 		        	</form>
 		        </td>

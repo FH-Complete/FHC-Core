@@ -6,13 +6,13 @@ class requestAnrechnung extends Auth_Controller
 {
 	const REQUEST_ANRECHNUNG_URI = '/lehre/anrechnung/RequestAnrechnung';
 	const APPROVE_ANRECHNUNG_URI = '/lehre/anrechnung/ApproveAnrechnungUebersicht';
-	
+
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
-	
+
 	public function __construct()
 	{
 		// Set required permissions
@@ -23,22 +23,22 @@ class requestAnrechnung extends Auth_Controller
 				'download'  => 'student/anrechnung_beantragen:rw',
 			)
 		);
-		
+
 		// Load models
 		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
 		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
-		
+
 		// Load libraries
 		$this->load->library('WidgetLib');
 		$this->load->library('PermissionLib');
 		$this->load->library('AnrechnungLib');
 		$this->load->library('DmsLib');
-		
+
 		// Load helpers
 		$this->load->helper('form');
 		$this->load->helper('url');
 		$this->load->helper('hlp_sancho_helper');
-		
+
 		// Load configs
 		$this->load->config('anrechnung');
 		
@@ -80,11 +80,7 @@ class requestAnrechnung extends Auth_Controller
 		$prestudent_id = getData($result)[0]->prestudent_id;
 		
 		// Check if application deadline is expired
-		$is_expired = self::_isExpired(
-			$this->config->item('submit_application_start'),
-			$this->config->item('submit_application_end'),
-			$studiensemester_kurzbz
-		);
+		$is_expired = $this->_isExpired($studiensemester_kurzbz);
 		
 		// Check if Lehrveranstaltung was already graded with application blocking grades
 		$is_blocked = self::_LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id);
@@ -93,7 +89,7 @@ class requestAnrechnung extends Auth_Controller
 		$anrechnungData = $this->anrechnunglib->getAnrechnungDataByLv($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id);
 
 		// Get Antrag data
-		$antragData = $this->anrechnunglib->getAntragData($prestudent_id, $studiensemester_kurzbz, $lehrveranstaltung_id);
+		$antragData = $this->anrechnunglib->getAntragData($prestudent_id, $studiensemester_kurzbz, $lehrveranstaltung_id, $anrechnungData->anrechnung_id);
 		
 		$viewData = array(
 			'antragData' => $antragData,
@@ -115,6 +111,13 @@ class requestAnrechnung extends Auth_Controller
 		$lehrveranstaltung_id = $this->input->post('lv_id');
 		$studiensemester_kurzbz = $this->input->post('studiensemester');
 		$bestaetigung = $this->input->post('bestaetigung');
+		$begruendung_ects = $this->config->item('explain_equivalence') === TRUE
+			? $this->input->post('begruendung_ects')
+			: NULL;
+		$begruendung_lvinhalt = $this->config->item('explain_equivalence') === TRUE
+			? $this->input->post('begruendung_lvinhalt')
+			: NULL;
+
 
 		// Validate data
 		if (empty($_FILES['uploadfile']['name']))
@@ -125,7 +128,9 @@ class requestAnrechnung extends Auth_Controller
 		if (isEmptyString($begruendung_id) ||
 			isEmptyString($anmerkung) ||
 			isEmptyString($lehrveranstaltung_id) ||
-			isEmptyString($studiensemester_kurzbz))
+			isEmptyString($studiensemester_kurzbz) ||
+			($this->config->item('explain_equivalence') === TRUE && isEmptyString($begruendung_ects)) ||
+			($this->config->item('explain_equivalence') === TRUE && isEmptyString($begruendung_lvinhalt)))
 		{
 			return $this->outputJsonError($this->p->t('ui', 'errorFelderFehlen'));
 		}
@@ -152,10 +157,10 @@ class requestAnrechnung extends Auth_Controller
 			return $this->outputJsonError($this->p->t('anrechnung', 'antragBereitsGestellt'));
 		}
 		
-		// Exit if application is not for actual studysemester
-		if (!self::_applicationIsForActualSS($studiensemester_kurzbz))
+		// Exit if application is a past ( < actual ) studysemester
+		if (self::_applicationIsPastSS($studiensemester_kurzbz))
 		{
-			return $this->outputJsonError($this->p->t('anrechnung', 'antragNurImAktSS'));
+			return $this->outputJsonError($this->p->t('anrechnung', 'antragNichtFuerVerganganeSS'));
 		}
 		
 		// Upload document
@@ -168,7 +173,7 @@ class requestAnrechnung extends Auth_Controller
 		
 		// Hold just inserted DMS ID
 		$lastInsert_dms_id = $result->retval['dms_id'];
-		
+
 		// Save Anrechnung and Anrechnungstatus
 		$result = $this->AnrechnungModel->createAnrechnungsantrag(
 			$prestudent_id,
@@ -176,7 +181,9 @@ class requestAnrechnung extends Auth_Controller
 			$lehrveranstaltung_id,
 			$begruendung_id,
 			$lastInsert_dms_id,
-			$anmerkung
+			$anmerkung,
+            $begruendung_ects,
+            $begruendung_lvinhalt
 		);
 		
 		if (isError($result))
@@ -205,9 +212,14 @@ class requestAnrechnung extends Auth_Controller
 		}
 
 		// Check if user is entitled to read dms doc
-		self::_checkIfEntitledToReadDMSDoc($dms_id);
+		$this->_checkIfEntitledToReadDMSDoc($dms_id);
 
-		$this->dmslib->download($dms_id);
+		// Get file to be downloaded from DMS
+        $download = $this->dmslib->download($dms_id);
+        if (isError($download)) return $download;
+
+        // Download file
+        $this->outputFile(getData($download));
 	}
 
 	/**
@@ -216,10 +228,10 @@ class requestAnrechnung extends Auth_Controller
 	private function _setAuthUID()
 	{
 		$this->_uid = getAuthUID();
-		
+
 		if (!$this->_uid) show_error('User authentification failed');
 	}
-	
+
 	/**
 	 * Check if application deadline is expired.
 	 *
@@ -229,34 +241,32 @@ class requestAnrechnung extends Auth_Controller
 	 * @return bool True if deadline is expired
 	 * @throws Exception
 	 */
-	private function _isExpired($start, $ende, $studiensemester_kurzbz)
+	private function _isExpired($studiensemester_kurzbz)
 	{
-		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-		
-		// If start is not given, set to Semesterstart.
-		if (!isset($start) || isEmptyString($start))
-		{
-			$this->StudiensemesterModel->addSelect('start');
-			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
-			$start = getData($result)[0]->start;
-		}
-		
-		// If ende is not given, set to Semesterende.
-		if (!isset($ende) || isEmptyString($ende))
-		{
-			$this->StudiensemesterModel->addSelect('ende');
-			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
-			$ende = getData($result)[0]->ende;
-		}
-		
-		$today = new DateTime('today midnight');
-		$start = new DateTime($start);
-		$ende = new DateTime($ende);
-		
-		// True if expired
-		return ($today < $start || $today > $ende);
+        $today = new DateTime('today midnight');
+
+        // Load all Anrechnungszeitfenster for this Studiensemester
+        $this->load->model('education/Anrechnungszeitraum_model', 'AnrechnungszeitraumModel');
+        $result = $this->AnrechnungszeitraumModel->loadWhere(array('studiensemester_kurzbz' => $studiensemester_kurzbz));
+
+        if (hasData($result))
+        {
+            // Loop through Anrechnungszeitfenster
+            foreach (getData($result) as $azrObj)
+            {
+                $start = new DateTime($azrObj->anrechnungstart);
+                $ende = new DateTime($azrObj->anrechnungende);
+
+                // Return false if today is at least within one Anrechnungszeitraum
+                if (($today >= $start && $today <= $ende)) return false;
+
+            }
+        }
+
+        // Return true if today is in none Anrechnungszeitraum
+        return true;
 	}
-	
+
 	/**
 	 * Check if user is entitled to read dms doc.
 	 *
@@ -268,9 +278,9 @@ class requestAnrechnung extends Auth_Controller
 		{
 			show_error('Failed loading Student');
 		}
-		
+
 		$result = $this->AnrechnungModel->loadWhere(array('dms_id' => $dms_id));
-		
+
 		if($result = getData($result)[0])
 		{
 			if ($result->prestudent_id == $student->prestudent_id)
@@ -278,10 +288,10 @@ class requestAnrechnung extends Auth_Controller
 				return;
 			}
 		}
-		
+
 		show_error('You are not entitled to read this document');
 	}
-	
+
 	/**
 	 * Check if application already exists.
 	 *
@@ -297,30 +307,33 @@ class requestAnrechnung extends Auth_Controller
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'prestudent_id' => $prestudent_id
 		));
-		
+
 		if (isError($result))
 		{
 			show_error(getError($result));
 		}
-		
+
 		return hasData($result);
 	}
-	
+
 	/**
-	 * Check if applications' study semester is actual study semester.
+	 * Check if applications' study semester is < actual study semester.
 	 *
 	 * @param $studiensemester_kurzbz
 	 * @return bool
 	 */
-	private function _applicationIsForActualSS($studiensemester_kurzbz)
+	private function _applicationIsPastSS($studiensemester_kurzbz)
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$result = $this->StudiensemesterModel->getNearest();
-		$actual_ss = getData($result)[0]->studiensemester_kurzbz;
-		
-		return $studiensemester_kurzbz == $actual_ss;
+		$actual_ss = getData($result)[0];
+
+		$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
+		$anrechnung_ss = getData($result)[0];
+
+		return $anrechnung_ss->ende < $actual_ss->start;
 	}
-	
+
 	private function _LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id)
 	{
 		// Get Note of Lehrveranstaltung
@@ -331,12 +344,12 @@ class requestAnrechnung extends Auth_Controller
 				'lehrveranstaltung_id' => $lehrveranstaltung_id
 			)
 		);
-		
+
 		// If Lehrveranstaltung has Note
 		if (hasData($result))
 		{
 			$note = getData($result)[0]->note;
-			
+
 			// Check if Note is a blocking grade
 			if (in_array($note, $this->config->item('grades_blocking_application')))
 			{
@@ -345,7 +358,7 @@ class requestAnrechnung extends Auth_Controller
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Upload file via DMS library.
 	 *
@@ -362,7 +375,7 @@ class requestAnrechnung extends Auth_Controller
 			'insertamum'        => (new DateTime())->format('Y-m-d H:i:s'),
 			'insertvon'         => $this->_uid
 		);
-		
+
 		// Upload document
 		return $this->dmslib->upload($dms, 'uploadfile', array('pdf'));
 	}

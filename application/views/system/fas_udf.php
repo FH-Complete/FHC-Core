@@ -1,28 +1,30 @@
 <?php
-	$this->load->view(
-		'templates/FHC-Header',
-		array(
-			'title' => 'InfocenterDetails',
-			'jquery' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'jqueryui' => true,
-			'dialoglib' => true,
-			'ajaxlib' => true,
-			'udfs' => true,
-			'widgets' => true,
-			'sbadmintemplate' => true,
-			'customCSSs' => array(
-				'public/css/sbadmin2/admintemplate.css'
-			),
-			'customJSs' => array(
-				'public/js/bootstrapper.js'
-			)
-		)
-	);
+$sitesettings = array(
+	'title' => 'InfocenterDetails',
+	'jquery3' => true,
+	'bootstrap3' => true,
+	'fontawesome4' => true,
+	'jqueryui1' => true,
+	'dialoglib' => true,
+	'ajaxlib' => true,
+	'udfs' => true,
+	'widgets' => true,
+	'sbadmintemplate3' => true,
+	'customCSSs' => array(
+		'public/css/sbadmin2/admintemplate.css'
+	),
+	'customJSs' => array(
+		'public/js/bootstrapper.js'
+	)
+);
+
+$this->load->view(
+	'templates/FHC-Header',
+	$sitesettings
+);
 ?>
 
-	<body style="background-color: #eff0f1;">
+
 
 			<div class="div-table">
 				<div class="div-row">
@@ -104,7 +106,4 @@
 				</div>
 			</div>
 
-	</body>
-
-<?php $this->load->view("templates/footer"); ?>
-
+<?php $this->load->view("templates/FHC-Footer", $sitesettings); ?>

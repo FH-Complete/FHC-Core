@@ -1,6 +1,23 @@
 <?php
 
 /**
+ * Copyright (C) 2023 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
  * To display a table that shows data retriev by a SQL statement
  */
 class TableWidget extends Widget
@@ -17,6 +34,9 @@ class TableWidget extends Widget
 
 	// Required permissions to use this TableWidget
 	private $_requiredPermissions;
+
+	// optional bootstrap version can be set to use different bootstrap classes 
+	private $_bootstrapVersion=3;
 
 	// SQL statement
 	private $_query;
@@ -39,6 +59,8 @@ class TableWidget extends Widget
 	private $_reloadDataset; // Force Reload of Dataset
 
 	private $_sessionTimeout; // session expiring time
+
+	private $_encryptedColumns; // contains info about encrypted columns
 
 	private static $_TableWidgetInstance; // static property that contains the instance of itself
 
@@ -73,8 +95,10 @@ class TableWidget extends Widget
 	 */
 	public function display($widgetData)
 	{
+		
 		$this->view(self::WIDGET_URL_TABLE, array(
-			'tableUniqueId' => $widgetData[TableWidgetLib::TABLE_UNIQUE_ID]
+			'tableUniqueId' => $widgetData[TableWidgetLib::TABLE_UNIQUE_ID],
+			'bootstrapVersion' => $widgetData[TableWidgetLib::TABLE_BOOTSTRAP_VERSION],
 		)); // GUI starts here
 	}
 
@@ -116,6 +140,7 @@ class TableWidget extends Widget
 
 		// Initialize class properties
 		$this->_requiredPermissions = null;
+		$this->_bootstrapVersion = 3;
 		$this->_reloadDataset = true; // by default the dataset is NOT cached in session
 		$this->_query = null;
 		$this->_additionalColumns = null;
@@ -127,11 +152,18 @@ class TableWidget extends Widget
 		$this->_datasetRepresentationOptions = null;
 		$this->_datasetRepFieldsDefs = null;
 		$this->_sessionTimeout = TableWidgetLib::SESSION_DEFAULT_TIMEOUT;
+		$this->_encryptedColumns = null;
 
 		// Retrieved the required permissions parameter if present
 		if (isset($args[TableWidgetLib::REQUIRED_PERMISSIONS]))
 		{
 			$this->_requiredPermissions = $args[TableWidgetLib::REQUIRED_PERMISSIONS];
+		}
+
+		// Retrieved the optional tableWindget Bootstrap version
+		if (isset($args[TableWidgetLib::TABLE_BOOTSTRAP_VERSION]) && !isEmptyString($args[TableWidgetLib::TABLE_BOOTSTRAP_VERSION]))
+		{
+			$this->_bootstrapVersion = $args[TableWidgetLib::TABLE_BOOTSTRAP_VERSION];
 		}
 
 		// How to retrieve data for the table: SQL statement or a result from DB
@@ -205,6 +237,14 @@ class TableWidget extends Widget
 		if (isset($args[TableWidgetLib::SESSION_TIMEOUT]) && is_numeric($args[TableWidgetLib::SESSION_TIMEOUT]))
 		{
 			$this->_sessionTimeout = $args[TableWidgetLib::SESSION_TIMEOUT];
+		}
+
+		// Parameter is used to define the ecrypted columns
+		if (isset($args[TableWidgetLib::ENCRYPTED_COLUMNS])
+			&& is_array($args[TableWidgetLib::ENCRYPTED_COLUMNS])
+			&& count($args[TableWidgetLib::ENCRYPTED_COLUMNS]) > 0)
+		{
+			$this->_encryptedColumns = $args[TableWidgetLib::ENCRYPTED_COLUMNS];
 		}
 	}
 
@@ -288,7 +328,7 @@ class TableWidget extends Widget
 				$datasetQuery = $this->tablewidgetlib->generateDatasetQuery($this->_query);
 
 				// Then retrieve dataset from DB
-				$dataset = $this->tablewidgetlib->getDataset($datasetQuery);
+				$dataset = $this->tablewidgetlib->getDataset($datasetQuery, $this->_encryptedColumns);
 
 				// Save changes into session if data are valid
 				if (!isError($dataset))
@@ -310,7 +350,7 @@ class TableWidget extends Widget
 			$datasetQuery = $this->tablewidgetlib->generateDatasetQuery($this->_query);
 
 			// Then retrieve dataset from DB
-			$dataset = $this->tablewidgetlib->getDataset($datasetQuery);
+			$dataset = $this->tablewidgetlib->getDataset($datasetQuery, $this->_encryptedColumns);
 
 			// Save changes into session if data are valid
 			if (!isError($dataset))
@@ -321,9 +361,11 @@ class TableWidget extends Widget
 				$this->tablewidgetlib->setSession(
 					array(
 						TableWidgetLib::TABLE_UNIQUE_ID => $tableUniqueId, // table unique id
+						TableWidgetLib::TABLE_BOOTSTRAP_VERSION => $this->_bootstrapVersion, // bootstrap version for tableWidget
 						TableWidgetLib::SESSION_FIELDS => $this->tablewidgetlib->getExecutedQueryListFields(), // all the fields of the dataset
 						TableWidgetLib::SESSION_COLUMNS_ALIASES => $this->_columnsAliases, // all the fields aliases
 						TableWidgetLib::SESSION_ADDITIONAL_COLUMNS => $this->_additionalColumns, // additional columns
+						TableWidgetLib::SESSION_ENCRYPTED_COLUMNS => $this->_encryptedColumns, // encrypted columns
 						TableWidgetLib::SESSION_CHECKBOXES => $this->_checkboxes, // the name of the field used to build the checkboxes column
 						TableWidgetLib::SESSION_METADATA => $this->tablewidgetlib->getExecutedQueryMetaData(), // the metadata of the dataset
 						TableWidgetLib::SESSION_ROW_NUMBER => count($dataset->retval), // the number of loaded rows by this table
@@ -412,24 +454,6 @@ class TableWidget extends Widget
 	}
 
 	/**
-	 * Utility method that retrieves the name of the columns present in a table JSON definition
-	 */
-	private function _getColumnsNames($columns)
-	{
-		$columnsNames = array();
-
-		foreach ($columns as $key => $obj)
-		{
-			if (isset($obj->name))
-			{
-				$columnsNames[] = $obj->name;
-			}
-		}
-
-		return $columnsNames;
-	}
-
-	/**
 	 * Loads a view using the given viewName and eventually other parameters
 	 */
 	private static function _loadView($viewName, $parameters = null)
@@ -438,3 +462,4 @@ class TableWidget extends Widget
 		$ci->load->view($viewName, $parameters);
 	}
 }
+

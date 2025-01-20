@@ -3,12 +3,12 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Reihungstest',
-			'jquery' => true,
-			'jqueryui' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'sbadmintemplate' => true,
-			'tablesorter' => true,
+			'jquery3' => true,
+			'jqueryui1' => true,
+			'bootstrap3' => true,
+			'fontawesome4' => true,
+			'sbadmintemplate3' => true,
+			'tablesorter2' => true,
 			'ajaxlib' => true,
 			'filterwidget' => true,
 			'navigationwidget' => true,
@@ -21,7 +21,6 @@
 	);
 ?>
 
-<body>
 	<div id="wrapper">
 
 		<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
@@ -41,6 +40,5 @@
 			</div>
 		</div>
 	</div>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

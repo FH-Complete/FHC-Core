@@ -56,7 +56,7 @@ $uid_benutzer = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid_benutzer);
-if(!$rechte->isBerechtigt('mitarbeiter', null, 's'))
+if(!$rechte->isBerechtigt('mitarbeiter/zeitwuensche', null, 's'))
 	die($rechte->errormsg);
 
 $datum_obj = new datum();
@@ -333,7 +333,7 @@ $selected_zwg_id = !is_null($selected_zwg) ? $selected_zwg->zeitwunsch_gueltigke
 <title>Profil</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript">
     $(function(){
         // Bei Wechsel von Zeitwunschgueltigkeit die Seite mit GET params neu laden

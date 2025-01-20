@@ -4,8 +4,6 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
-
-
 $(function(){
 
     const genehmigung_panel = $('#approveAnrechnungDetail-genehmigung-panel');
@@ -35,6 +33,8 @@ $(function(){
 
     // Init tooltips
     approveAnrechnungDetail.initTooltips();
+
+    approveAnrechnungDetail.alertIfMaxEctsExceeded();
 
     // Ask if Approve Anrechnungen
     $("#approveAnrechnungDetail-approve-anrechnung-ask").click(function(){
@@ -91,8 +91,12 @@ $(function(){
                         approveAnrechnungDetail.formatGenehmigungIsPositiv(
                             data.retval[0].abgeschlossen_am,
                             data.retval[0].abgeschlossen_von,
-                            data.retval[0].status_bezeichnung
+                            data.retval[0].status_kurzbz,
+                            data.retval[0].status_bezeichnung,
                         );
+
+                        approveAnrechnungDetail.sumUpEcts();
+                        approveAnrechnungDetail.alertIfMaxEctsExceeded();
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -137,6 +141,13 @@ $(function(){
             return;
         }
 
+        // Check if forgot to fulfill begruendung
+        if (begruendung.trim().endsWith('weil') || begruendung.endsWith('because of'))
+        {
+            FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteBegruendungVervollstaendigen"));
+            return;
+        }
+
         // Get form data
         let form_data = $('form').serializeArray();
 
@@ -168,6 +179,7 @@ $(function(){
                         approveAnrechnungDetail.formatGenehmigungIsNegativ(
                             data.retval[0].abgeschlossen_am,
                             data.retval[0].abgeschlossen_von,
+                            data.retval[0].status_kurzbz,
                             data.retval[0].status_bezeichnung,
                             begruendung
                         );
@@ -189,17 +201,9 @@ $(function(){
         // Get form data
         let form_data = $('#form-empfehlung').serializeArray();
 
-
-        // Prepare data object for ajax call
-        let data = {
-            'data': [{
-                'anrechnung_id' : form_data[0].value
-            }]
-        };
-
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/requestRecommendation",
-            data,
+            {anrechnung_id: form_data[0].value},
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
@@ -236,6 +240,7 @@ $(function(){
 
         // Get form data
         let form_data = $('form').serializeArray();
+        var init_status_kurzbz = $('#approveAnrechnungDetail-status_kurzbz').data('status_kurzbz');
 
         // Prepare data object for ajax call
         let data = {
@@ -248,20 +253,23 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    console.log(data);
                     if (data.error && data.retval != null)
                     {
-                        console.log('inside error');
                         // Print error message
                         FHC_DialogLib.alertWarning(data.retval);
                     }
 
                     if (!data.error && data.retval != null)
                     {
-                        console.log('inside success');
                         approveAnrechnungDetail.formatGenehmigungIsWithdrawed(
                             data.retval.status_bezeichnung
                         );
+
+                        if (init_status_kurzbz == 'approved')
+                        {
+                            approveAnrechnungDetail.substractEcts(ects, sumEctsSchulisch, sumEctsBeruflich);
+                            approveAnrechnungDetail.alertIfMaxEctsExceeded();
+                        }
 
                         FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("anrechnung", "erfolgreichZurueckgenommen"));
 
@@ -299,7 +307,6 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    console.log(data);
                     if (data.error && data.retval != null)
                     {
                         // Print error message
@@ -386,16 +393,16 @@ var approveAnrechnungDetail = {
 
         switch (status_kurzbz) {
             case ANRECHNUNGSTATUS_APPROVED:
-                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-success');
+                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-success-subtle');
                 break;
             case ANRECHNUNGSTATUS_REJECTED:
-                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-danger');
+                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-danger-subtle');
                 break;
             case '':
-                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-info');
+                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-info-subtle');
                 break;
             default:
-                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-warning');
+                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-warning-subtle');
         }
     },
     setEmpfehlungstext: function () {
@@ -417,7 +424,7 @@ var approveAnrechnungDetail = {
         }
     },
     initTooltips: function (){
-        $('[data-toggle="tooltip"]').tooltip({
+        $('[data-bs-toggle="tooltip"]').tooltip({
                 delay: { "show": 200, "hide": 200 },
                 html: true
         }
@@ -462,11 +469,27 @@ var approveAnrechnungDetail = {
             textarea.val($.trim($('#approveAnrechnungDetail-empfehlungDetail-begruendung').text()));
             return;
         }
-        else
+        
+        // Find Begruendung span
+        let textspan = $(elem).parent().find('span:first');
+
+        // Get Begruendung
+        let begruendung = textspan.text();
+
+        // Check if Begruendung has helptext
+        let hasHelptext = textspan.children('span #helpTxtBegruendungErgaenzen').length > 0;
+
+        if (hasHelptext)
         {
-            // Copy begruendung into textarea
-            textarea.val($.trim($(elem).parent().find('span:first').text()));
+            let helptext = textspan.children('span #helpTxtBegruendungErgaenzen').text();
+
+            // Remove helptext
+            begruendung = begruendung.replace(helptext, '');
+
         }
+
+        // Copy begruendung into textarea and set focus
+        textarea.val($.trim(begruendung)).focus();
     },
     formatEmpfehlungIsRequested: function(statusBezeichnung, empfehlungsanfrageAm, empfehlungsanfrageAn) {
         $('#approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm').html(empfehlungsanfrageAm);
@@ -475,14 +498,15 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
         $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', true);
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
-        $('#approveAnrechnungDetail-withdraw-request-recommedation').removeClass('hidden');
+        $('#approveAnrechnungDetail-withdraw-request-recommedation').removeClass('visually-hidden');
     },
-    formatGenehmigungIsPositiv: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung){
-        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').addClass('hidden');
-        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').addClass('hidden');
-        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').removeClass('hidden');
+    formatGenehmigungIsPositiv: function(abgeschlossenAm, abgeschlossenVon, statusKurzbz, statusBezeichnung){
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').addClass('visually-hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').addClass('visually-hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').removeClass('visually-hidden');
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
-        $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-success');
+        $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('bg-warning-subtle').addClass('bg-success-subtle');
+        $('#approveAnrechnungDetail-status_kurzbz').data('status_kurzbz', statusKurzbz);
         $('#approveAnrechnungDetail-abgeschlossenAm').text(abgeschlossenAm);
         $('#approveAnrechnungDetail-abgeschlossenVon').text(abgeschlossenVon);
         $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
@@ -490,14 +514,15 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
 
         // Show button to withdraw approval
-        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('hidden');
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('visually-hidden');
     },
-    formatGenehmigungIsNegativ: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung, begruendung){
-        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').addClass('hidden');
-        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').addClass('hidden');
-        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').removeClass('hidden');
+    formatGenehmigungIsNegativ: function(abgeschlossenAm, abgeschlossenVon, statusKurzbz, statusBezeichnung, begruendung){
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').addClass('visually-hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').addClass('visually-hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').removeClass('visually-hidden');
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
-        $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-danger');
+        $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('bg-warning-subtle').addClass('bg-danger-subtle');
+        $('#approveAnrechnungDetail-status_kurzbz').data('status_kurzbz', statusKurzbz);
         $('#approveAnrechnungDetail-abgeschlossenAm').text(abgeschlossenAm);
         $('#approveAnrechnungDetail-abgeschlossenVon').text(abgeschlossenVon);
         $('#approveAnrechnungDetail-genehmigungDetail-begruendung').text(begruendung);
@@ -506,18 +531,18 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
 
         // Show button to withdraw approval
-        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('hidden');
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('visually-hidden');
     },
     formatGenehmigungIsWithdrawed: function (statusBezeichnung){
         let empfehlung = $('#approveAnrechnungDetail-empfehlung').data('empfehlung'); // null / false / true
 
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
-        $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-danger').removeClass('alert-success');
-        $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-warning');
+        $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('bg-danger-subtle').removeClass('bg-success-subtle');
+        $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('bg-warning-subtle');
 
-        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').removeClass('hidden');
-        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').addClass('hidden');
-        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').removeClass('visually-hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').addClass('visually-hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').addClass('visually-hidden');
 
         $('#approveAnrechnungDetail-abgeschlossenAm').text('-');
         $('#approveAnrechnungDetail-abgeschlossenVon').text('-');
@@ -530,12 +555,12 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', false);
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', false);
         // Hide button to withdraw approval
-        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').addClass('hidden');
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').addClass('visually-hidden');
     },
     formatEmpfehlungIsWithdrawed: function (statusBezeichnung){
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
 
-        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungIsNull').removeClass('hidden');
+        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungIsNull').removeClass('visually-hidden');
         $('#approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm').html('-');
         $('#approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAn').html('-');
 
@@ -543,6 +568,78 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', false);
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', false);
         // Hide button to withdraw approval
-        $('#approveAnrechnungDetail-withdraw-request-recommedation').addClass('hidden');
-    }
+        $('#approveAnrechnungDetail-withdraw-request-recommedation').addClass('visually-hidden');
+    },
+    sumUpEcts: function(){
+        var ects = parseFloat($('#ects').text());
+        var sumEctsSchulisch = parseFloat($('#sumEctsSchulisch').text());
+        var sumEctsBeruflich = parseFloat($('#sumEctsBeruflich').text());
+        var begruendung_id = $('#begruendung_id').data('begruendung_id');
+
+        if (begruendung_id == 5)
+        {
+            return;
+        }
+
+        if (begruendung_id == 4)
+        {
+            $('#sumEctsBeruflich').text(sumEctsBeruflich + ects);
+        }
+        else
+        {
+            $('#sumEctsSchulisch').text(sumEctsSchulisch + ects);
+        }
+
+        $('#sumEctsTotal').text(sumEctsSchulisch + sumEctsBeruflich + ects);
+
+    },
+    substractEcts: function(ects, sumEctsSchulisch, sumEctsBeruflich){
+        var ects = parseFloat($('#ects').text());
+        var sumEctsSchulisch = parseFloat($('#sumEctsSchulisch').text());
+        var sumEctsBeruflich = parseFloat($('#sumEctsBeruflich').text());
+        var begruendung_id = $('#begruendung_id').data('begruendung_id');
+
+        if (begruendung_id == 5)
+        {
+            return;
+        }
+
+        if (begruendung_id == 4)
+        {
+            $('#sumEctsBeruflich').text(sumEctsBeruflich - ects);
+        }
+        else
+        {
+            $('#sumEctsSchulisch').text(sumEctsSchulisch - ects);
+        }
+
+         $('#sumEctsTotal').text(sumEctsSchulisch + sumEctsBeruflich - ects);
+    },
+    
+    alertIfMaxEctsExceeded: function(){
+    
+        if (begruendung_id == 5)
+        {
+            return;
+        }
+
+        if (
+            (begruendung_id != 4 && (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text()))) > 60 ||
+            (begruendung_id == 4 && (parseFloat($('#ects').text()) + parseFloat($('#sumEctsBeruflich').text()))) > 60 ||
+            (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90
+        ){
+       
+            $('#sumEctsMsg')
+                .html("<span class='flex-fill fw-bold'>Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz ist überschritten. </span><i class='mx-4 fa fa-lg fa-info-circle'></i>")
+                .addClass('bg-danger-subtle')
+                .tooltip({
+                    title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),
+                    placement: 'right',
+                    html: true
+            });
+        }else
+        {
+            $('#sumEctsMsg').html('').css('border', 'none');
+        }
+    },
 }

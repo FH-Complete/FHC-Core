@@ -6,10 +6,6 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 // Deadline for Application given as Time-Interval after Semesterstart.
 $config['interval_blocking_application'] = 'P1M';
 
-// Application submission period given by start- and enddate.
-$config['submit_application_start'] = '01.02.2021';
-$config['submit_application_end'] = '22.02.2021';
-
 // Lehrveranstaltungen with these grades will be blocked for application
 $config['grades_blocking_application'] = array(
 	5,  // nicht genügend
@@ -20,3 +16,11 @@ $config['grades_blocking_application'] = array(
 	15, // nicht teilgenommen
 	18  // unentschuldigt
 );
+
+//Enables Fachbereichsleiter instead of LV Leiter
+$config['fbl'] = FALSE;
+//Enables Info Mails
+$config['send_mail'] = TRUE;
+
+// Display fields to explain equivalence of ECTS and LV-Inhalte
+$config['explain_equivalence'] = TRUE;

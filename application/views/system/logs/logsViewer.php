@@ -1,47 +1,41 @@
 <?php
-	$this->load->view(
-		'templates/FHC-Header',
-		array(
-			'title' => 'Logs Viewer',
-			'jquery' => true,
-			'jqueryui' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'sbadmintemplate' => true,
-			'tablesorter' => true,
-			'ajaxlib' => true,
-			'filterwidget' => true,
-			'navigationwidget' => true,
-			'phrases' => array(
-				'global' => array('mailAnXversandt'),
-				'ui' => array('bitteEintragWaehlen')
-			),
-			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
-			'customJSs' => array('public/js/bootstrapper.js')
-		)
+	$includesArray = array(
+		'title' => 'Logs Viewer',
+		'axios027' => true,
+		'bootstrap5' => true,
+		'fontawesome6' => true,
+		'vue3' => true,
+		'filtercomponent' => true,
+		'navigationcomponent' => true,
+		'tabulator5' => true,
+		'phrases' => array(
+			'global' => array('mailAnXversandt'),
+			'ui' => array('bitteEintragWaehlen')
+		),
+		'customJSModules' => array('public/js/apps/LogsViewer/LogsViewer.js')
 	);
+
+	$this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
-<body>
-	<div id="wrapper">
+	<div id="main">
 
-		<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
+		<!-- Navigation component -->
+		<core-navigation-cmpt v-bind:add-side-menu-entries="appSideMenuEntries"></core-navigation-cmpt>
 
-		<div id="page-wrapper">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-lg-12">
-						<h3 class="page-header">
-							Job Logs Viewer
-						</h3>
-					</div>
-				</div>
-				<div>
-					<?php $this->load->view('system/logs/logsViewerData.php'); ?>
-				</div>
+		<div id="content">
+			<div>
+				<!-- Filter component -->
+				<core-filter-cmpt
+					title="Job Logs Viewer"
+					filter-type="LogsViewer"
+					:tabulator-options="logsViewerTabulatorOptions"
+					:tabulator-events="logsViewerTabulatorEventHandlers"
+					@nw-new-entry="newSideMenuEntryHandler">
+				</core-filter-cmpt>
 			</div>
 		</div>
 	</div>
-</body>
 
-<?php $this->load->view('templates/FHC-Footer'); ?>
+<?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
+

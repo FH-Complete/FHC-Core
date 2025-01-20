@@ -865,5 +865,64 @@ class bisverwendung extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Lädt die letzte zeitaufzeichnungspflichtige Bisverwendung
+	 * @param $uid	UID des Mitarbeiters
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getLastBisZAPflicht($uid)
+	{
+		$qry = '
+				SELECT
+					*
+				FROM
+					bis.tbl_bisverwendung
+				WHERE
+					mitarbeiter_uid = '. $this->db_add_param($uid).'
+				AND
+					zeitaufzeichnungspflichtig = true
+				ORDER BY ende DESC NULLS FIRST LIMIT 1
+		';
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+
+				$obj = new bisverwendung();
+
+				$obj->bisverwendung_id = $row->bisverwendung_id;
+				$obj->ba1code = $row->ba1code;
+				$obj->ba2code = $row->ba2code;
+				$obj->beschausmasscode = $row->beschausmasscode;
+				$obj->verwendung_code = $row->verwendung_code;
+				$obj->hauptberufcode = $row->hauptberufcode;
+				$obj->hauptberuflich = $row->hauptberuflich;
+				$obj->habilitation = $row->habilitation;
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->updatevon = $row->updatevon;
+				$obj->updateamum = $row->updateamum;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->vertragsstunden = $row->vertragsstunden;
+				$obj->dv_art = $row->dv_art;
+				$obj->inkludierte_lehre = $row->inkludierte_lehre;
+				$obj->azgrelevant = $row->azgrelevant;
+				$obj->homeoffice = $row->homeoffice;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
+
+
 }
 ?>

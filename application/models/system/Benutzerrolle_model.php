@@ -43,7 +43,7 @@ class Benutzerrolle_model extends DB_Model
 	 * @param null $oe_kurzbz
 	 * @return array
 	 */
-	public function getBenutzerByBerechtigung($berechtigung_kurzbz, $oe_kurzbz = null)
+	public function getBenutzerByBerechtigung($berechtigung_kurzbz, $oe_kurzbz = null, $art = null)
 	{
 		$params = array();
 		$query = '
@@ -61,6 +61,12 @@ class Benutzerrolle_model extends DB_Model
 			$query .= ' AND oe_kurzbz = ?';
 			$params[] = $oe_kurzbz;
 		}
+
+        if (!is_null($art))
+        {
+            $query .= ' AND art = ?';
+            $params[] = $art;
+        }
 
 		return $this->execQuery($query, $params);
 	}

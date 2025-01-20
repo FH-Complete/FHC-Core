@@ -22,21 +22,21 @@
  */
 session_start();
 
-	require_once('../../config/cis.config.inc.php');
-	require_once('../../include/wochenplan.class.php');
-	require_once('../../include/benutzerberechtigung.class.php');
-    require_once('../../include/betriebsmittel.class.php');
-  	require_once('../../include/betriebsmittelperson.class.php');
-  	require_once('../../include/betriebsmitteltyp.class.php');
-  	require_once('../../include/mail.class.php');
-  	require_once('../../include/news.class.php');
-  	require_once('../../include/content.class.php');
-    require_once('../../include/studiensemester.class.php');
-    require_once('../../include/konto.class.php');
-    require_once('../../include/functions.inc.php');
-    require_once('../../include/authentication.class.php');
-    require_once('../../include/addon.class.php');
-	require_once('../../include/'.EXT_FKT_PATH.'/serviceterminal.inc.php');
+require_once('../../config/cis.config.inc.php');
+require_once('../../include/wochenplan.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/betriebsmittel.class.php');
+require_once('../../include/betriebsmittelperson.class.php');
+require_once('../../include/betriebsmitteltyp.class.php');
+require_once('../../include/mail.class.php');
+require_once('../../include/news.class.php');
+require_once('../../include/content.class.php');
+require_once('../../include/studiensemester.class.php');
+require_once('../../include/konto.class.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/authentication.class.php');
+require_once('../../include/addon.class.php');
+require_once('../../include/'.EXT_FKT_PATH.'/serviceterminal.inc.php');
 
 	if (!$db = new basis_db())
 		$db=false;
@@ -214,7 +214,7 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="expires" content="-1">
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
@@ -679,10 +679,6 @@ function meine_uid_informationen($db,$uid,$user="")
 	if ($db)
 		$user_array=personen_id_read_mitarbeiter_oder_student($db,$user->person_id);
 
-#echo '<hr>';
-##var_dump($user_array);
-#var_dump($_SESSION[constSESSIONNAME]["ldap_get_entries"]);
-
 	if (isset($user_array) && is_array($user_array) && count($user_array)>1)
 	{
 			$html_user_daten.='<table class="persoenlichedaten">';
@@ -724,54 +720,6 @@ function meine_uid_informationen($db,$uid,$user="")
 
 	$html_user_daten.='<hr>';
 
-	// eMail senden nach anforderung
-    /*
-  	$send_mail=(isset($_REQUEST['send_mail']) ? $_REQUEST['send_mail']:false);
-	if ($send_mail)
-	{
-		$to=$uid.'@'.DOMAIN;
-		$from=MAIL_CIS;
-		$subject=CAMPUS_NAME.' Informationen';
-
-		$mail=new mail($to, $from, $subject, $html_user_daten_detail);
-		if (isset($user_array) && is_array($user_array) && count($user_array)>1)
-		{
-			reset($user_array);
-			for ($i=0;$i<count($user_array);$i++)
-			{
-				if ($uid!=$user_array[$i]->uid && ($user_array[$i]->aktiv='t' || ($user_array[$i]->aktiv !='f' && $user_array[$i]->aktiv)) )
-					$mail->setCCRecievers($user_array[$i]->uid.'@'.DOMAIN);
-			}
-		}
-		$mail->setHTMLContent($html_user_daten_detail);
-		if ($mail->send())
-			$html_user_daten.='<p>email gesendet an '.$mail->to.' '.($mail->CC_recievers?$mail->CC_recievers:'').'</p>';
-		else
-			$html_user_daten.='<p>email nicht gesendet an '.$mail->to.'</p>';
-	}
-	// Send eMail Auswahl anzeigen
-	else
-	{
-		$farbe='gruen';
-		$html_user_daten.='<table class="persoenlichedaten">';
-			$html_user_daten.='<tr>';
-				$html_user_daten.='<td>';
-					$html_user_daten.='<a href="'.$_SERVER['PHP_SELF'].'?work=meinedaten&amp;send_mail=x&amp;standort_id='.$standort_id.'">';
-					$html_user_daten.='<b class="'.$farbe.'_rtop">
-								  <b class="'.$farbe.'_r1"></b> <b class="'.$farbe.'_r2"></b> <b class="'.$farbe.'_r3"></b> <b class="'.$farbe.'_r4"></b>
-								</b>
-							<span class="'.$farbe.'_mitteText">';
-					$html_user_daten.='Informationen per Mail senden';
-					$html_user_daten.='
-							</span>
-							<b class="'.$farbe.'_rbottom">
-								  <b class="'.$farbe.'_r4"></b><b class="'.$farbe.'_r3"></b> <b class="'.$farbe.'_r2"></b> <b class="'.$farbe.'_r1"></b>
-							</b>';
-				$html_user_daten.='</a>';
-				$html_user_daten.='</td>';
-			$html_user_daten.='</tr>';
-		$html_user_daten.='</table>';
-	}*/
 	return $html_user_daten;
 }
 #-------------------------------------------------------------------------------------------
@@ -952,33 +900,6 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 		die($db->db_last_error());
 	$nr_mg=$db->db_num_rows($erg_mg);
 
-	// Betriebsmittel zur Person lesen
-    /*
-	$betriebsmittelperson=array();
-	$qry="SELECT nummer,betriebsmitteltyp FROM public.vw_betriebsmittelperson where uid='".addslashes(trim($uid))."' and aktiv and benutzer_aktiv and ( retouram  IS NULL ) LIMIT 50 ; ";
-	if(!$result=$db->db_query($qry))
-		die('Probleme beim Lesen der Benutzer uid '.$db->db_last_error());
-	if ($result)
-	{
-		while($rows = $db->db_fetch_object($result))
-		{
-			$rows->asco='ASCO Datens&auml;tze gefunden';
-			if (is_numeric($rows->nummer) && $mssql_verbindung)
-			{
-				$card_no=$rows->nummer;
-				$anfrage = mssql_query('SELECT * FROM view_fh_technikum_mitarbeiterkarten_berechtigungen where card_no='.$card_no);
-				if (mssql_num_rows($anfrage))
-				{
-			       	$rows->asco=array();
-				    while ($datensatz = mssql_fetch_object($anfrage))
-				       	$rows->asco[]=$datensatz;
-				}
-				mssql_free_result($anfrage);
-			}
-			$betriebsmittelperson[]=$rows;
-		}
-	}*/
-
 	if ($count==0)
 	{
 		$html_user_daten.='<h1>Pers&ouml;nliche Daten</h1>';
@@ -1022,49 +943,6 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 		$html_user_daten.='<tr><td style="background-color: #E9ECEE;" align="center" colspan="2" ><b><font size="+1">Email</font></b></td></tr>';
 		$html_user_daten.='<tr><td ><b>Intern</b></td><td >'.$email.'</td></tr>';
 		$html_user_daten.='<tr><td ><b>Alias</b></td><td >'.$email_alias.'</td></tr>';
-		/*
-
-		$html_user_daten.='<tr><td style="background-color: #E9ECEE;" align="center" colspan="2" ><b>Mitglied in folgenden Verteilern</b></td></tr>';
-  		for($i=0;$i<$nr_mg;$i++)
-		{
-				$row=$db->db_fetch_object($erg_mg,$i);
-
-				$html_user_daten.='<tr>';
-					$html_user_daten.='<td valign="top"><a class="Item" href="mailto:'.trim(strtolower($row->gruppe_kurzbz)).'@'.DOMAIN.'">'.strtolower($row->gruppe_kurzbz).'&nbsp;</td>';
-					$html_user_daten.='<td >'.$row->beschreibung.'&nbsp;</td>';
-				$html_user_daten.='</tr>';
-		}
-
-		if (isset($matrikelnr))
-		{
-			$html_user_daten.='<TR><TD valign="top"><A class="Item" href="mailto:'.strtolower(trim($stgkz)).'_std@'.DOMAIN.'">'.strtolower($stgkz).'_std&nbsp;</TD>';
-	    	$html_user_daten.="\n<TD >&nbsp;Alle Studierdenden von $stgbez</TD><TD></TD></TR>";
-			$html_user_daten.='<TR><TD valign="top">'.strtolower($stgkz).$semester.'&nbsp;</TD>';
-	    	$html_user_daten.="\n<TD >&nbsp;Alle Studierenden von $stgkz $semester</TD><TD></TD></TR>";
-			$html_user_daten.='<TR><TD valign="top"><A class="Item" href="mailto:'.strtolower(trim($stgkz)).trim($semester).strtolower(trim($verband)).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).'&nbsp;</TD>';
-	    	$html_user_daten.="\n<TD >&nbsp;Alle Studierenden von $stgkz $semester$verband</TD><TD></TD></TR>";
-			$html_user_daten.='<TR><TD valign="top"><A class="Item" href="mailto:'.strtolower(trim($stgkz)).trim($semester).strtolower(trim($verband)).trim($gruppe).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'&nbsp;</TD>';
-	    	$html_user_daten.="\n<TD >&nbsp;Alle Studierenden von $stgkz $semester$verband$gruppe</TD><TD></TD></TR>";
-		}
-		$html_user_daten.='</table>&nbsp;</td>';
-
-		$html_user_daten.='<td valign="top" width="50%"><table width="100%">';
-		if ($stud_num_rows==1)
-		{
-			$html_user_daten.='<tr><td colspan="2"  align="center"  style="background-color: #E9ECEE;"><b><font size="+1">StudentIn</font></b></td></tr>';
-			$html_user_daten.="<td colspan='2' >
-				Studiengang: $stgbez<br>
-				Semester: $semester<br>
-				Verband: $verband<br>
-				Gruppe: $gruppe<br>
-    			Matrikelnummer: $matrikelnr";
-			$html_user_daten.='</td></tr>';
-		}
-		else if ($lekt_num_rows==1)
-		{
-			$html_user_daten.='<tr><td colspan="2"  align="center"  style="background-color: #E9ECEE;"><b><font size="+1">Lektor </font></b></td></tr>';
-			$html_user_daten.='<td colspan="2"><b>Kurzzeichen: </b>'.$kurzbz.'<br><b>Standort: </b>'.$ort.'<br><b>'.($tel!=''?'Telefon TW:</b> '.$vorwahl.' '.$tel:'').'</td></tr>';
-		}*/
 
 		$html_user_daten.='</table>';
 		$html_user_daten.='&nbsp;</td></tr></table>';
@@ -1096,30 +974,6 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 		return $html_liste_raum;
 	}
 
-// ------------------------------------------------------------------------------------------
-//	Kalenderwoche und Tage Initialisieren
-// ------------------------------------------------------------------------------------------
-/*
-	$date    = date('d');
-	$month   = date('m');
-	$year    = date('y');
-	$weekday = date('w');
-	$kalenderweek = ((int)date('W')<10?'0'.(int)date('W'):date('W'));
-
-	// Montag ermitteln
-	if($weekday == 0)
-	{
-		$datum=mktime(0, 0, 0, $month, $date-$weekday -6, $year);
-		$ersterTagMonat=date('m', mktime(0, 0, 0, $month, $date-$weekday -6, $year));
-		$ersterTag=date('d', mktime(0, 0, 0, $month, $date-$weekday -6, $year));
-	}
-	else
-	{
-		$datum=mktime(0, 0, 0, $month, $date-$weekday +1, $year);
-		$ersterTagMonat=date('m', mktime(0, 0, 0, $month, $date-$weekday +1, $year));
-		$ersterTag=date('d', mktime(0, 0, 0, $month, $date-$weekday +1, $year));
-	}
-*/
 // ------------------------------------------------------------------------------------------
 //	Alle Termine zum User lesen
 // ------------------------------------------------------------------------------------------
@@ -1334,18 +1188,19 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 	$qry.=" SELECT DISTINCT ";
 	$qry.=" tbl_ortraumtyp.ort_kurzbz ";
 	$qry.=" ,tbl_ort.bezeichnung ,tbl_ort.aktiv ";
+	$qry.=" , (SELECT 'gesperrt'::text FROM public.tbl_ortraumtyp WHERE raumtyp_kurzbz='Gesperrt' AND ort_kurzbz=tbl_ort.ort_kurzbz) as gesperrt";
 	$qry.=" FROM tbl_raumtyp , tbl_ortraumtyp , tbl_ort ";
 	$qry.=" WHERE tbl_ortraumtyp.raumtyp_kurzbz=tbl_raumtyp.raumtyp_kurzbz ";
 	$qry.=" AND tbl_ort.ort_kurzbz=tbl_ortraumtyp.ort_kurzbz ";
 	$qry.=" AND tbl_ort.aktiv ";
 	$qry.=" AND lower(tbl_raumtyp.raumtyp_kurzbz) like lower('%".$db->db_escape(trim($raumtyp_kurzbz))."%') ";
 	if($standort_id!='')
-		$qry.=" AND (tbl_ort.standort_id=".$db->db_add_param($standort_id, FHC_INTEGER).' OR tbl_ort.standort_id is null)';
+		$qry.=" AND (tbl_ort.standort_id=".$db->db_add_param($standort_id, FHC_INTEGER)." OR tbl_ort.standort_id is null)";
 	$qry.=" order by tbl_ortraumtyp.ort_kurzbz ";
 	$qry.=" ; ";
 
 	if(!$result=$db->db_query($qry))
-			die('Probleme beim lesen der Raumtyptabelle '.$db->db_last_error());
+			die('Probleme beim lesen der Raumtyptabelle ');
 	$num_rows_stunde=$db->db_num_rows($result);
 
 	if($num_rows_stunde==0)
@@ -1372,7 +1227,6 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 	// Raumreservierungen fuer Aktive Raumauswahl
 	// --------------------------------------------------------------
 
-
 	// Die aktive Stunde ermitteln - zum lesen welcher Raum jetzt besetzt ist - aktive Lehreinheit
 	$row_stunde=array();
 
@@ -1381,9 +1235,6 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 	$qry.=" FROM lehre.tbl_stunde ";
 	$qry.=" WHERE ".$db->db_add_param(constAktuelleZeitHHMi,FHC_STRING)." between to_char(tbl_stunde.beginn, 'HH24MI') and  to_char(tbl_stunde.ende, 'HH24MI') ";
 	$qry.=" ORDER BY stunde LIMIT 1 ; ";
-
-#	$qry.=" WHERE '". constAktuelleZeitHH."' between to_char(tbl_stunde.beginn, 'HH24') and  to_char(tbl_stunde.ende, 'HH24') ";
-#	$qry.=" ORDER BY stunde desc LIMIT 1; ";
 
 	if(!$result=$db->db_query($qry))
 			die('Probleme beim lesen der Raumtyptabelle '.$db->db_last_error());
@@ -1436,8 +1287,8 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 			$farbe="gruen";
 		}
 
-#	if ($farbe=="orange")
-#		var_dump($info);
+		if ($row_raum[$i]->gesperrt=="gesperrt")
+			$farbe="rot";
 
 		// Nach 4 Raumanzeigen eine Neuezeile erzeugen
 		$html_liste_raum.=($i==0 || $i%4?"":"</tr><tr>");
@@ -1461,7 +1312,7 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 
 		$html_liste_raum.='<td><table><tr><td><span class="gruen_mitteText">&nbsp;&nbsp;&nbsp;</span></td><td>Mindestens n&auml;chsten 2 Einheiten frei</td></tr></table></td>';
 		$html_liste_raum.='<td><table><tr><td><span class="orange_mitteText">&nbsp;&nbsp;&nbsp;</span></td><td>Derzeit frei</td></tr></table></td>';
-		$html_liste_raum.='<td><table><tr><td><span class="rot_mitteText">&nbsp;&nbsp;&nbsp;</span></td><td>Raum derzeit besetzt</td></tr></table></td>';
+		$html_liste_raum.='<td><table><tr><td><span class="rot_mitteText">&nbsp;&nbsp;&nbsp;</span></td><td>Raum derzeit besetzt / gesperrt</td></tr></table></td>';
 	$html_liste_raum.='</tr>';
 	$html_liste_raum.='</table>';
 	$html_liste_raum.='<hr>';
@@ -1506,7 +1357,6 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 		// dh. Letztes Ende ist gleich Start aktueller Datensatz
 		if ($lastEnde && $row->time_beginn!=$lastEnde)
 		{
-#			echo "<p>Zeit korr. Funktion:alle_raum_informationen ".$row->beginn_show." wird zu ".$lastShowEnde."</p>";
 			 $row->time_beginn=$lastEnde;
 		}
 
@@ -1900,7 +1750,7 @@ function uid_read_mitarbeiter_oder_student($db,$uid)
 	// Wenn kein Mitarbeiter pruefen ob Student
 	$qry="SELECT  uid,person_id,anrede,titelpre,vorname,vornamen,nachname,aktiv  FROM campus.vw_student where uid=".$db->db_add_param(trim($uid), FHC_STRING)." LIMIT 1 ; ";
 	if(!$result=$db->db_query($qry))
-		die('Probleme beim Lesen der Studierenden '.$db->db_last_error());
+		die('Probleme beim Lesen der Studierenden ');
 	if ($num_rows_stunde=$db->db_num_rows($result))
 	{
 		while($rows = $db->db_fetch_object($result))
@@ -1976,7 +1826,7 @@ function read_create_html_news($db,$fachbereich_kurzbz,$studiengang_kz,$semester
 {
 	if(defined('CIS_INFOSCREEN_NEWS_ANZEIGEN') && CIS_INFOSCREEN_NEWS_ANZEIGEN==false)
 		return '';
-	
+
 	// ------------------------------------------------------------------------------------------
 	//	Lesen Newstickerzeilen
 	// ------------------------------------------------------------------------------------------
