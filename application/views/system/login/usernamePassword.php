@@ -16,7 +16,7 @@
 	);
 ?>
 
-<body>
+
 	<div class="login-form">
 
 		<p class="text-center">
@@ -40,6 +40,5 @@
 		<p class="text-center"><a href="#">Forgot Password?</a></p>
 
 	</div>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

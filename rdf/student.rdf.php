@@ -190,6 +190,25 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 		      : false;
 	    return $filtered;
 	}
+	else if ($filter2 === 'ueberfaelligebuchungen')
+	{
+		$qry = "SELECT sum(betrag) as summe 
+				FROM tbl_konto 
+				WHERE person_id=".$db->db_add_param($row->person_id, FHC_INTEGER) ."
+					AND buchungsdatum < NOW()
+				"
+		;
+
+		if($kontofilterstg=='true')
+			$qry.=" AND studiengang_kz=".$db->db_add_param($row->studiengang_kz);
+		if($buchungstyp != null && $buchungstyp != "alle")
+			$qry.=" AND buchungstyp_kurzbz=".$db->db_add_param($buchungstyp);
+
+		if($db->db_query($qry))
+			if($row_filter = $db->db_fetch_object())
+				if($row_filter->summe=='0.00' || $row_filter->summe=='' || $row_filter->summe=='0')
+					return false;
+	}
 	return true;
 }
 

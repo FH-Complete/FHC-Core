@@ -1,0 +1,4 @@
+.unavailable, .unavailable:hover{
+	color: #565e647f !important;
+	cursor: default;
+}

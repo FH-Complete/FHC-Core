@@ -1073,7 +1073,7 @@ class lehrstunde extends basis_db
 	}
 
 	/**
-	 * Holt Studenplandaten.
+	 * Holt Stundenplandaten.
 	 *
 	 * @param $db_stpl_table
 	 * @param null $lehrveranstaltung_id

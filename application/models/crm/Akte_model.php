@@ -193,4 +193,55 @@ class Akte_model extends DB_Model
 
 		return success($dokumente->retval);
 	}
+
+	/**
+	 * Liefert die Archivdokumente einer Person
+	 *
+	 * @param integer				$person_id
+	 * @param boolean|null			$signiert			Wenn true werden nur Dokumente geliefert die digital signiert wurden.
+	 * @param boolean|null			$stud_selfservice	Wenn true werden nur Dokumente geliefert die Studierende selbst herunterladen duerfen.
+	 *
+	 * @return stdClass
+	 */
+	public function getArchiv($person_id, $signiert = null, $stud_selfservice = null)
+	{
+		$this->addSelect('akte_id');
+		$this->addSelect('person_id');
+		$this->addSelect('dokument_kurzbz');
+		$this->addSelect('mimetype');
+		$this->addSelect('erstelltam');
+		$this->addSelect('gedruckt');
+		$this->addSelect('titel_intern');
+		$this->addSelect('anmerkung_intern');
+		$this->addSelect('titel');
+		$this->addSelect('bezeichnung');
+		$this->addSelect('updateamum');
+		$this->addSelect('insertamum');
+		$this->addSelect('updatevon');
+		$this->addSelect('insertvon');
+		$this->addSelect('uid');
+		$this->addSelect('dms_id');
+		$this->addSelect('anmerkung');
+		$this->addSelect('nachgereicht');
+		$this->addSelect('CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden', false);
+		$this->addSelect('nachgereicht_am');
+		$this->addSelect('ausstellungsnation');
+		$this->addSelect('formal_geprueft_amum');
+		$this->addSelect('archiv');
+		$this->addSelect('signiert');
+		$this->addSelect('stud_selfservice');
+		$this->addSelect('akzeptiertamum');
+
+		if ($signiert !== null)
+			$this->db->where('signiert', (boolean)$signiert);
+		if ($stud_selfservice !== null)
+			$this->db->where('stud_selfservice', (boolean)$stud_selfservice);
+
+		$this->addOrder('erstelltam', 'DESC');
+
+		return $this->loadWhere([
+			'person_id' => $person_id,
+			'archiv' => true
+		]);
+	}
 }

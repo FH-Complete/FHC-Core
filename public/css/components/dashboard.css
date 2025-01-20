@@ -1,0 +1,44 @@
+@import './calendar.css';
+@import './dashboard/news.css';
+
+.empty-tile-hover {
+	height: 100%;
+	width: 100%;
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 1448 1512"><path fill="rgb(211, 211, 211,0.35)" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM200 344V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H248v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+	cursor:pointer;
+}
+
+.empty-tile-hover:hover {
+		background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 1448 1512"><path fill="rgb(211, 211, 211)" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM200 344V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H248v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>');
+}
+
+.alert-danger .form-check-input:checked {
+	border-color: #842029;
+	background-color: #842029;
+}
+
+:root {
+	--fhc-dashboard-grid-size: 4;
+}
+@media(max-width: 577px) {
+	:root {
+		--fhc-dashboard-grid-size: 1;
+	}
+}
+
+.mirror-x {
+	transform: scaleX(-1);
+}
+
+.cursor-nw-resize {
+	cursor: nw-resize;
+}
+.cursor-move {
+	cursor: move;
+}
+
+
+

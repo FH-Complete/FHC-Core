@@ -16,6 +16,7 @@ $this->phrasen['lehre/upload']='Upload';
 $this->phrasen['lehre/ziparchiv']='Zip-Archiv';
 $this->phrasen['lehre/ziparchivTitle']='Alle Dateien im Download Verzeichnis als Zip-Archiv herunterladen';
 $this->phrasen['lehre/anwesenheitsUndNotenlisten']='Anwesenheits- und Notenlisten';
+$this->phrasen['lehre/digiAnw']='Digitale Anwesenheiten';
 $this->phrasen['lehre/leistungsuebersicht']='Leistungsübersicht';
 $this->phrasen['lehre/newsgroups']='Newsgroups';
 $this->phrasen['lehre/feedback']='Feedback';

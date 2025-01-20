@@ -26,6 +26,8 @@ class TableWidgetLib
 {
 	const TABLE_UNIQUE_ID = 'tableUniqueId'; // TableWidget unique id
 
+	const TABLE_BOOTSTRAP_VERSION = 'bootstrapVersion'; // TableWidget bootstrap version
+
 	// TableWidget session name
 	const SESSION_NAME = 'FHC_TABLE_WIDGET';
 

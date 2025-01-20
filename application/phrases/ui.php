@@ -3201,5 +3201,77 @@ array (
     ),
   ),
 ),
+
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'neuUndGeaenderteAnzeigen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Neue und geänderte anzeigen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Show new and changed',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'pep',
+  'category' => 'ui',
+  'phrase' => 'maprojohneoe',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Mitarbeiter und Projekt sind der Organisationseinheit nicht zugeordnet.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Employee and project are not assigned to the organizational unit.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
+
+array (
+  'app' => 'pep',
+  'category' => 'ui',
+  'phrase' => 'infoandepl/kfl',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Info an DepL/KFL',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Info to DepL/KFL:',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
 );
 

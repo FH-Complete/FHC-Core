@@ -290,6 +290,21 @@ class Person_model extends DB_Model
 		return success($result->vorname. ' '. $result->nachname);
 	}
 
+	/**
+	 * Get first name of given uid. (Vorname Nachname)
+	 * @param $uid
+	 * @return array
+	 */
+	public function getFirstName($uid)
+	{
+		$result = getData($this->getByUid($uid))[0];
+		if (!$result) {
+			show_error('Failed loading person');
+		}
+
+		return success($result->vorname);
+	}
+
 	public function checkDuplicate($person_id)
 	{
 		$qry = "SELECT person_id

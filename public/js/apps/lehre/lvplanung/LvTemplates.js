@@ -23,6 +23,7 @@ import Phrasen from "../../../plugin/Phrasen.js";
 
 
 const lvTemplatesApp = Vue.createApp({
+	name: 'LvTemplatesApp',
 	components: {
 		CoreNavigationCmpt,
 		LvTemplateUebersicht

@@ -23,12 +23,12 @@ require_once("../../config/vilesci.config.inc.php");
 require_once("../../include/functions.inc.php");
 require_once("../../include/benutzerberechtigung.class.php");
 require_once("../../include/datum.class.php");
-
 require_once("../../include/studiengang.class.php");
 require_once("../../include/studiensemester.class.php");
 require_once("../../include/studienjahr.class.php");
 require_once("../../include/student.class.php");
 require_once("../../include/konto.class.php");
+require_once("../../include/bankverbindung.class.php");
 
 // Get the uid of the logged user
 $user = get_uid();
@@ -71,7 +71,7 @@ $fileTmpName = null;
 $fileMimeType = null;
 
 // Constants
-$L_CSV_N_COLS = 6; // Number of columns of the CSV file
+$L_CSV_N_COLS = 10; // Number of columns of the CSV file
 $L_ERROR = "Error";
 $L_WARNING = "Warning";
 $L_INFO = "Info";
@@ -246,15 +246,19 @@ if (!$errorOccurred && $dataPosted)
 				// Checks if character encoding is UTF-8
 				if (mb_detect_encoding(implode(";", $fileRow), "UTF-8", true))
 				{
-					$rowName = $fileRow[0];
-					$rowSurname = $fileRow[1];
-					$rowCode = $fileRow[2]; // uid or matrikelnr
-					$rowStudiengang = $fileRow[3];
-					$rowAmount = $fileRow[4];
-					$rowDate = $fileRow[5];
+					$rowSurname = $fileRow[0];
+					$rowName = $fileRow[1];
+					$rowGebdat = $fileRow[2];
+					$rowCode = $fileRow[3]; // uid or matrikelnr
+					$rowStudiengang = $fileRow[4];
+					$rowAmount = $fileRow[5];
+					$rowIBAN = $fileRow[6];
+					$rowBIC = $fileRow[7];
+					$rowBank = $fileRow[8];
+					$rowDate = date('Y-m-d');
 
 					// If this row is not the header
-					if (strtolower($rowName) != "nachname")
+					if (strtolower($rowSurname) != "nachname")
 					{
 						// If $rowCode is a matrikelnr gets the uid
 						if (($uid = $student->getUidFromMatrikelnummer($rowCode)) === false)
@@ -293,6 +297,12 @@ if (!$errorOccurred && $dataPosted)
 									// Inserting positive amount
 									if ($konto->save(true) === true)
 									{
+										lAddToLogArray(
+											$L_INFO,
+											$lineNumber,
+											"Added!!!"
+										);
+										/* Keine Gegenbuchung erstellen
 										lDebit($konto); // Negative amount
 										if ($konto->save(true) === true) // Inserting negative amount
 										{
@@ -310,6 +320,7 @@ if (!$errorOccurred && $dataPosted)
 												"This file row has been discarted because an error has occurred while inserting in DB"
 											);
 										}
+										*/
 									}
 									else
 									{
@@ -321,6 +332,79 @@ if (!$errorOccurred && $dataPosted)
 									}
 								}
 
+								// Bankverbindung hinterlegen
+								$bank = new bankverbindung();
+								$found = false;
+								if($bank->load_pers($student->person_id))
+								{
+									foreach($bank->result as $row_bank)
+									{
+										if(str_replace(' ', '', $row_bank->iban) == str_replace(' ', '', $rowIBAN))
+										{
+											lAddToLogArray(
+												$L_WARNING,
+												$lineNumber,
+												"Bank IBAN already found for PersonID ".$student->person_id
+											);
+											$found = true;
+
+											// Update Datum aktualisieren damit Update in Fremdsystem getriggert wird
+											$row_bank->new=false;
+											$row_bank->updateamum = date('Y-m-d H:i:s');
+											$row_bank->updatevon = 'Leistungsimport';
+											if($row_bank->save())
+											{
+												lAddToLogArray(
+													$L_INFO,
+													$lineNumber,
+													"Bank Date Update for PersonID ".$student->person_id
+												);
+											}
+											else
+											{
+												lAddToLogArray(
+													$L_WARNING,
+													$lineNumber,
+													"Bank Date Update Failed for PersonID ".$student->person_id
+												);
+											}
+
+											break;
+										}
+									}
+								}
+
+								if(!$found)
+								{
+									$bank = new bankverbindung();
+									$bank->new = true;
+									$bank->iban = $rowIBAN;
+									$bank->person_id = $student->person_id;
+									$bank->bic = $rowBIC;
+									$bank->name = $rowBank;
+									$bank->typ = 'p';
+									$bank->verrechnung = true;
+									$bank->insertamum = date('Y-m-d H:i:s');
+									$bank->insertvon = 'Leistungsimport';
+									$bank->updateamum = date('Y-m-d H:i:s');
+									$bank->updatevon = 'Leistungsimport';
+									if($bank->save())
+									{
+										lAddToLogArray(
+											$L_INFO,
+											$lineNumber,
+											"Bankdaten hinzugefügt"
+										);
+									}
+									else
+									{
+										lAddToLogArray(
+											$L_WARNING,
+											$lineNumber,
+											"Failed to Add Bankdata".$bank->errormsg
+										);
+									}
+								}
 							}
 							else
 							{

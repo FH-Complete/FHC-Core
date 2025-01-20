@@ -46,6 +46,20 @@ class CI3_Events
  * NOTE(chris): Autoload Events config
  */
 require_once(APPPATH.'config/Events.php');
+
+$active_addons_array = explode(";", ACTIVE_ADDONS);
+
 foreach (scandir(APPPATH.'config/extensions') as $dir)
 	if ($dir[0] != '.' && file_exists(APPPATH.'config/extensions/'.$dir.'/Events.php'))
 		require_once APPPATH.'config/extensions/'.$dir.'/Events.php';
+
+foreach (scandir(FHCPATH.'addons') as $dir)
+	if ($dir[0] != '.' && file_exists(FHCPATH.'addons/'.$dir.'/Events.php'))
+	{
+		// only includes the Events of the addon if the addon is one of the active addons in the cis config
+		if(in_array($dir,$active_addons_array))
+		{
+			require_once FHCPATH . 'addons/' . $dir . '/Events.php';
+		}
+	}
+		

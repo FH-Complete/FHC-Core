@@ -17,7 +17,6 @@
 		)
 	);
 ?>
-<body>
 	<div id="wrapper">
 		<div id="page-wrapper">
 			<div class="container-fluid">
@@ -191,6 +190,5 @@
 			</div>
 		</div>
 	</div>
-</body>
 
 <?php $this->load->view("templates/FHC-Footer"); ?>

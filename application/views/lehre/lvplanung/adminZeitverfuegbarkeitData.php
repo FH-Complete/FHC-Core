@@ -15,7 +15,7 @@ $qry = '
         JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
         JOIN public.tbl_studiensemester ss USING (studiensemester_kurzbz)
         JOIN campus.tbl_zeitsperre zsp ON zsp.mitarbeiter_uid = lema.mitarbeiter_uid
-        WHERE lv.studiengang_kz IN ('. implode (',', $STUDIENGANG_KZ_ARR). ')
+        WHERE lv.studiengang_kz IN (' . implode(',', $STUDIENGANG_KZ_ARR) . ')
         AND b.aktiv
 		AND zsp.vondatum >= ss.start
         AND zeitsperretyp_kurzbz = \'ZVerfueg\'
@@ -40,18 +40,17 @@ $filterWidgetArray = array(
         ucfirst($this->p->t('global', 'notiz'))
     ),
     'datasetRepOptions' => '{
+        height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
         index: "zeitsperre_id",             // assign specific column as unique id (important for row indexing)
         selectable: 1,               // allow row selection
         tableWidgetHeader: false,
-        rowSelected: function(row) {
-            func_rowSelected(row);
+        columnDefaults:{
+            headerFilterPlaceholder: " ",
         },
-        rowDeselected: function(row) {
-            func_rowDeselected(row);
-        }
+       
+      
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         zeitsperre_id: {visible:false},
@@ -64,7 +63,9 @@ $filterWidgetArray = array(
         bezeichnung: {visible: true, headerFilter:"input"}
     }', // col properties
 );
-
-echo $this->widgetlib->widget('TableWidget', $filterWidgetArray);
-
 ?>
+<div class="tabulator-initialfontsize">
+<?php
+	echo $this->widgetlib->widget('TableWidget', $filterWidgetArray);
+?>
+</div>

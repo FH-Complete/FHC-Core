@@ -28,7 +28,7 @@ $this->load->view(
 ?>
 
 <div id="wrapper" class="overflow-hidden">
-	<div class="fhc-header" v-if="notinframe">
+	<div class="fhc-header hide-in-frame" v-if="notinframe">
 		<h1 class="h2"><?= $this->p->t('studierendenantrag', 'title_lvzuweisen', ['name' => $antrag->name]);?></h1>
 	</div>
 	<div class="fhc-container row mt-3">

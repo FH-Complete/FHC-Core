@@ -1,4 +1,3 @@
-
 import BsAlert from './Alert.js';
 
 export default {

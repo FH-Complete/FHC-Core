@@ -275,6 +275,17 @@ class PhrasesLib
 		}
 	}
 
+	/**
+	 * Workaround to reload the phrases array on an already constructed library.
+	 * @parameters -> look for _setPhrases docs
+	 */
+	public function setPhrases($categories, $language)
+	{
+		if (count($categories) > 0) $this->_setPhrases($categories, $language);
+
+		return $this->_phrases;
+	}
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 

@@ -524,6 +524,6 @@ if (isset($reservdelcount))
 	echo "Es wurde".($reservdelcount!=1?'n':'')." $reservdelcount Stunde".($reservdelcount!=1?'n':'')." gel&ouml;scht!<BR>";
 ?>
 
-<P><br><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>
+<P><br><?php echo $p->t('lvplan/FragenZuLvPlan', array(MAIL_LVPLAN)); ?>.</P>
 </BODY>
 </HTML>

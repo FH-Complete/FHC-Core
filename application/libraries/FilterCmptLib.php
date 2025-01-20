@@ -565,6 +565,7 @@ class FilterCmptLib
 			getAuthPersonId()
 		);
 
+
 		// If filters were loaded
 		if (hasData($filters))
 		{
@@ -1173,4 +1174,3 @@ class FilterCmptLib
 		return $filterName;
 	}
 }
-

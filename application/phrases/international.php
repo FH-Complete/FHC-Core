@@ -1408,4 +1408,28 @@ array (
     ),
   ),
 ),
+
+array (
+  'app' => 'international',
+  'category' => 'international',
+  'phrase' => 'internationalCredits',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'International Credits',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'International Credits',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
 );

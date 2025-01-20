@@ -2,6 +2,7 @@ import StudierendenantragLeitung from '../../../components/Studierendenantrag/Le
 import Phrasen from '../../../plugin/Phrasen.js';
 
 const app = Vue.createApp({
+	name: 'LeitungApp',
 	components: {
 		StudierendenantragLeitung
 	}

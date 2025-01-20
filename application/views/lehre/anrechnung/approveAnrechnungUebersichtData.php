@@ -4,7 +4,7 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 
 $STUDIENSEMESTER = $studiensemester_selected;
 $STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);						// alle STG mit Lese- und Schreibberechtigung
-$ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT = "'". implode('\',\'', $oes_schreibberechtigt). "'";		// alle OE nur mit Schreibberechtigung; singlequote für jeden string notwendig
+$ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT = "'" . implode('\',\'', $oes_schreibberechtigt) . "'";		// alle OE nur mit Schreibberechtigung; singlequote für jeden string notwendig
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
 
 $query = '
@@ -109,9 +109,8 @@ $query = '
                     LIMIT 1)
             END "empfehlungsanfrageAm",';
 
-if ($configFachbereichsleitung === TRUE)
-{
-	$query.= ' CASE
+if ($configFachbereichsleitung === TRUE) {
+	$query .= ' CASE
                 WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
                 ELSE
                 (SELECT COALESCE(
@@ -136,10 +135,8 @@ if ($configFachbereichsleitung === TRUE)
                         ) as tmp_empfehlungsanfrageEmpfaenger
                     )
             END "empfehlungsanfrageAn"';
-}
-else
-{
-	$query.= ' CASE
+} else {
+	$query .= ' CASE
                 WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
                 ELSE
                 (SELECT COALESCE(
@@ -164,7 +161,7 @@ else
             END "empfehlungsanfrageAn"';
 }
 
-$query.= '	FROM anrechnungen
+$query .= '	FROM anrechnungen
 	JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
 	WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
 	AND studiengang_kz IN (' . $STUDIENGAENGE_ENTITLED . ')
@@ -172,6 +169,7 @@ $query.= '	FROM anrechnungen
 
 $filterWidgetArray = array(
 	'query' => $query,
+	'bootstrapVersion' => 5,
 	'tableUniqueId' => 'approveAnrechnungUebersicht',
 	'requiredPermissions' => 'lehre/anrechnung_genehmigen',
 	'datasetRepresentation' => 'tabulator',
@@ -189,8 +187,8 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('lehre', 'lehrveranstaltung')),
 		'ECTS (LV)',
 		'ECTS (LV + Bisher)',
-        'ECTS (Bisher schulisch)',
-        'ECTS (Bisher beruflich',
+		'ECTS (Bisher schulisch)',
+		'ECTS (Bisher beruflich',
 		ucfirst($this->p->t('global', 'begruendung')),
 		ucfirst($this->p->t('person', 'studentIn')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
@@ -200,46 +198,45 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
 		'Status',
-	  	'PrestudentID',
+		'PrestudentID',
 		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')),
 		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAn'))
 	),
+
 	'datasetRepOptions' => '{
+
 		height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
 		persistenceID: "approveAnrechnungUebersicht_V1",
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
-        index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
+		index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        tableBuilt: function(){
-            func_tableBuilt(this);
-        },
         tableWidgetFooter: {
-			selectButtons: true
+			selectButtons: true  // tableWidgetFooter properties are checked in _renderTabulatorFooterHTML function
 		},
 		selectableCheck: function(row){
             return func_selectableCheck(row);
         },
-        rowFormatter:function(row){
-            func_rowFormatter(row);
-        },
-        rowSelectionChanged:function(data, rows){
-            func_rowSelectionChanged(data, rows);
-        },
-        tooltips: function(cell){
-            return func_tooltips(cell);
-        }
+		rowFormatter:function(row){
+			return func_rowFormatter(row);
+		},
+		
+		columnDefaults:{
+			tooltip:func_tooltips,
+			headerFilterPlaceholder: " ",
+		}
+		
 	 }', // tabulator properties
+
 	'datasetRepFieldsDefs' => '{
 		anrechnung_id: {visible: false, headerFilter:"input"},
 		lehrveranstaltung_id: {visible: false, headerFilter:"input"},
 		begruendung_id: {visible: false, headerFilter:"input"},
 		dms_id: {visible: false, headerFilter:"input"},
 		schreibberechtigt: {
-			formatter:"tickCross", align:"center", 
+			formatter:"tickCross", hozAlign:"center", 
 		    headerFilter:"tickCross", headerFilterParams:{tristate: true}, headerFilterFunc: hf_schreibberechtigt
 		},
 		studiensemester_kurzbz: {visible: false, headerFilter:"input"},
@@ -248,21 +245,22 @@ $filterWidgetArray = array(
 		orgform_kurzbz: {headerFilter:"input"},
 		ausbildungssemester: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
-		ects: {headerFilter:"input", align:"center"},
+		ects: {headerFilter:"input", hozAlign:"center"},
 		ectsSumBisherUndNeu: {formatter: format_ectsSumBisherUndNeu},
-		ectsSumSchulisch: {visible: false, headerFilter:"input", align:"right"},
-		ectsSumBeruflich: {visible: false, headerFilter:"input", align:"right"},
+		ectsSumSchulisch: {visible: false, headerFilter:"input", hozAlign:"right"},
+		ectsSumBeruflich: {visible: false, headerFilter:"input", hozAlign:"right"},
 		begruendung: {headerFilter:"input", visible: true},
+		
 		student: {headerFilter:"input"},
 		zgv: {headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams: paramLookup_dokBez},
 		anmerkung_student: {headerFilter:"input"},
-		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
-		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
+		antragsdatum: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate},
+		empfehlung_anrechnung: {headerFilter:"input", hozAlign:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false, headerFilter:"input"},
 		status_bezeichnung: {headerFilter:"input"},
 		prestudent_id: {visible: false, headerFilter:"input"},
-		empfehlungsanfrageAm: {visible: false, align:"center", headerFilter:"input", mutator: mut_formatStringDate},
+		empfehlungsanfrageAm: {visible: false, hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlungsanfrageAn: {visible: false, headerFilter:"input"}
 	 }', // col properties
 );

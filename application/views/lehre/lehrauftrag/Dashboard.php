@@ -16,7 +16,6 @@ $this->load->view(
 );
 ?>
 
-<body>
     <?php echo $this->widgetlib->widget('NavigationWidget'); ?>
     <div id="page-wrapper">
         <div class="container-fluid">
@@ -33,6 +32,5 @@ $this->load->view(
 
         </div>
     </div>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

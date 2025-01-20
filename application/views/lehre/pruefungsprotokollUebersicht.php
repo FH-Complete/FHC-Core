@@ -9,6 +9,9 @@
 			'bootstrap3' => true,
 			'fontawesome4' => true,
 			'tablesorter2' => true,
+			'tabulator5' => true,
+			'tabulator5JQuery' => true,
+			'cis'=>true,
 			'ajaxlib' => true,
 			'dialoglib' => true,
 			'tablewidget' => true,
@@ -27,7 +30,6 @@
 	);
 ?>
 
-<body>
 <div id="page-wrapper">
 	<div class="container-fluid">
 		<div class="row">
@@ -63,6 +65,5 @@
 		</div>
 	</div>
 </div>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

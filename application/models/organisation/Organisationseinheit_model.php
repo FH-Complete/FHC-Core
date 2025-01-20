@@ -189,6 +189,19 @@ class Organisationseinheit_model extends DB_Model
         return $this->loadWhere($condition);
     }
 
+    /**
+     * @param string $oe_kurzbz
+     * 
+     * @return stdClass
+     */
+    public function getWithType($oe_kurzbz)
+    {
+    	$this->addSelect($this->dbTable . '.*, t.bezeichnung AS organisationseinheittyp');
+    	$this->addJoin('public.tbl_organisationseinheittyp t', 'organisationseinheittyp_kurzbz');
+
+    	return $this->load($oe_kurzbz);
+    }
+
 	/**
 	 * Get OEs by eventQuery string. Use with autocomplete event queries.
 	 * @param $eventQuery String

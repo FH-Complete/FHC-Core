@@ -102,6 +102,7 @@ import {CoreRESTClient} from '../RESTClient.js';
 const helperAppContainer = document.createElement('div');
 
 const helperApp = Vue.createApp({
+	name: "FhcAlertApp",
 	components: {
 		PvToast,
 		PvConfirm
@@ -217,6 +218,25 @@ export default {
 						acceptClass: 'btn btn-danger',
 						rejectLabel: 'Abbrechen',
 						rejectClass: 'btn btn-outline-secondary',
+						accept() {
+							resolve(true);
+						},
+						reject() {
+							resolve(false);
+						},
+					});
+				});
+			},
+			confirm(options) {
+				return new Promise((resolve, reject) => {
+					helperAppInstance.$confirm.require({
+						group: options?.group ?? 'fhcAlertConfirm',
+						header: options?.header ?? 'Achtung',
+						message: options?.message ?? '',
+						acceptLabel: options?.acceptLabel ?? 'Ok',
+						acceptClass: options?.acceptClass ?? 'btn btn-primary',
+						rejectLabel: options?.rejectLabel ?? 'Abbrechen',
+						rejectClass: options?.rejectClass ?? 'btn btn-outline-secondary',
 						accept() {
 							resolve(true);
 						},

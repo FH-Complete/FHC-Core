@@ -147,6 +147,38 @@ class Benutzerfunktion_model extends DB_Model
 		return $this->execQuery($query, $parametersArray);
 	}
 
+	/**
+	 * Gets all Benutzer with details for a given Benutzerfunktion and optionally specified Oe and semester
+	 * 
+	 * @param string			$funktion_kurzbz
+	 * @param string			$oe_kurzbz
+	 * @param integer | null	$semester
+	 * @return array|null
+	 */
+	public function getBenutzerFunktionenDetailed($funktion_kurzbz, $oe_kurzbz = null, $semester = null)
+	{
+		$this->addSelect($this->dbTable . '.funktion_kurzbz, ' . $this->dbTable . '.oe_kurzbz, ' . $this->dbTable . '.semester, ' . $this->dbTable . '.bezeichnung, f.beschreibung, b.uid, b.alias, b.aktiv, p.vorname, p.nachname, p.titelpre, p.titelpost, m.telefonklappe, k.kontakt, o.planbezeichnung');
+		$this->addJoin('public.tbl_funktion f', 'funktion_kurzbz');
+		$this->addJoin('public.tbl_benutzer b', 'uid');
+		$this->addJoin('public.tbl_person p', 'person_id');
+		$this->addJoin('public.tbl_mitarbeiter m', 'mitarbeiter_uid=uid', 'LEFT');
+		$this->addJoin('public.tbl_kontakt k', 'k.standort_id=m.standort_id AND kontakttyp=\'telefon\'', 'LEFT');
+		$this->addJoin('public.tbl_ort o', 'ort_kurzbz', 'LEFT');
+
+		$this->addOrder('LOWER(uid)');
+
+		$where = [$this->dbTable . '.funktion_kurzbz' => $funktion_kurzbz];
+		if ($oe_kurzbz !== null)
+			$where[$this->dbTable . '.oe_kurzbz'] = $oe_kurzbz;
+		if ($semester !== null)
+			$where[$this->dbTable . '.semester'] = $semester;
+
+		$this->db->where('(' . $this->dbTable . '.datum_bis >= NOW() OR ' . $this->dbTable . '.datum_bis IS NULL)', NULL, FALSE);
+		$this->db->where('(' . $this->dbTable . '.datum_von <= NOW() OR ' . $this->dbTable . '.datum_von IS NULL)', NULL, FALSE);
+
+		return $this->loadWhere($where);
+	}
+
     /**
      * Get active Studiengangsleitung(en) of the user by UID.
      * @param $uid

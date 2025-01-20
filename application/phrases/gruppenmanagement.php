@@ -169,4 +169,28 @@ array (
     ),
   ),
 ),
+
+array (
+  'app' => 'core',
+  'category' => 'gruppenmanagement',
+  'phrase' => 'nichtZumEditierenDerGruppeBerechtigt',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Nicht zum Editieren der Gruppe berechtigt',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'No authorization for editing the group',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+),
 );

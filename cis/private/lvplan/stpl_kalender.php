@@ -341,7 +341,7 @@ elseif($format=='excel')
 // Print in HTML-File
 else
 {
-	echo '<P class="dont-print">'.$p->t('lvplan/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/lvKoordinationsstelle').'</A></P>';
+	echo '<br><P class="dont-print">'.$p->t('lvplan/FragenZuLvPlan', array(MAIL_LVPLAN)).'</P>';
 	echo '</body></html>';
 }
 
