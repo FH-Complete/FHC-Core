@@ -4,9 +4,13 @@ export default {
 			headerData: {},
 			departmentData: {},
 			leitungData: {},
-			//TODO(Manu) get from config
-			domain: 'c3p0.ma0068.technikum-wien.at',
 		};
+	},
+	inject: {
+		domain: {
+			from: 'configDomain',
+			default: 'technikum-wien.at'
+		},
 	},
 	props: {
 		person_id: Number
@@ -83,7 +87,7 @@ export default {
 				</div>
 			
 				<!--show Ma-Details-->
-				<div class="col-md-8">
+				<div class="col-md-10">
 					<h5>{{headerData.titelpre}} {{headerData.vorname}} {{headerData.nachname}} {{headerData.titelpost}} </h5>
 					<strong class="text-muted">{{departmentData.organisationseinheittyp_kurzbz}}</strong> {{departmentData.bezeichnung}} <span v-if="leitungData.uid"> | </span><strong v-if="leitungData.uid" class="text-muted">Vorgesetzte/e </strong>{{leitungData.titelpre}} {{leitungData.vorname}} {{leitungData.nachname}} {{leitungData.titelpost}}  
 					<p>

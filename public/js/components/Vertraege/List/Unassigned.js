@@ -150,7 +150,7 @@ export default {
 			} else {
 				this.clickedRows.push(rowData);
 				this.sumBetragLehrauftraege += Number(rowData.betrag1);
-				console.log(rowData.betrag1);
+				//console.log(rowData.betrag1);
 				this.handleSumUp();
 			}
 

@@ -105,63 +105,12 @@ class Mitarbeiter_model extends DB_Model
 	 */
 	public function getPersonenWithContractDetails($person_id=null)
 	{
-		/*		$qry = "SELECT DISTINCT ON(mitarbeiter_uid) mitarbeiter_uid, person_id, titelpost, titelpre,
-											nachname, vorname, vornamen,
-							TO_CHAR(gebdatum::timestamp, 'DD.MM.YYYY') AS format_gebdatum
-							FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid))
-							JOIN public.tbl_person USING(person_id))
-							   LEFT JOIN public.tbl_benutzerfunktion USING(uid)
-							   LEFT JOIN public.tbl_benutzerfunktion akt_funk ON tbl_mitarbeiter.mitarbeiter_uid = akt_funk.uid AND akt_funk.funktion_kurzbz = 'fachzuordnung'
-																		   AND (akt_funk.datum_von IS NULL OR akt_funk.datum_von <= now()) AND (akt_funk.datum_bis IS NULL OR akt_funk.datum_bis >= now())
-						   WHERE true";
-
-				if ($fix === true)
-			$qry .= " AND fixangestellt=true";
-		elseif ($fix === false)
-			$qry .= " AND fixangestellt=false";
-
-		if ($aktiv === true)
-			$qry .= " AND tbl_benutzer.aktiv=true";
-		elseif ($aktiv === false)
-			$qry .= " AND tbl_benutzer.aktiv=false";
-
-		if ($verwendung === true)
-		{
-			$qry.=" AND EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)";
-		}
-		elseif ($verwendung === false)
-		{
-			$qry.=" AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)";
-		}
-
-		if ($personaccount === true)
-			$qry .= " AND tbl_mitarbeiter.personalnummer >= 0";
-		elseif ($personaccount === false)
-			$qry .= " AND tbl_mitarbeiter.personalnummer < 0";
-
-		$params = array();
-		if (!isEmptyArray($uids))
-		{
-			$qry .= " AND tbl_mitarbeiter.mitarbeiter_uid IN ?";
-			$params[] = $uids;
-		}
-
-		return $this->execQuery($qry, $params);
-		*/
-
-		//TODO(Manu) filter nach DV-Art? was, wenn mehrere? oder einfach wenn extern ODER fix?
-		//TODO(Manu) email: plus dieses @domainzeugs:  mohamed.aburaia@c3p0.ma0068.technikum-wien.at
-		//Standardkostenstelle...
-		//was wenn 2 echte DV? schmarrn
-
 		$qry = "
 		SELECT
 			 b.uid , p.person_id,
 			p.vorname, p.nachname,
 			TO_CHAR(gebdatum::timestamp, 'DD.MM.YYYY') AS format_gebdatum,
 			COALESCE(b.alias, b.uid) AS email, 
-			--COALESCE(b.alias, b.uid) AS EMail, 
-			--u.bezeichnung AS Unternehmen,
 			STRING_AGG(DISTINCT va.bezeichnung, ', ') AS Vertragsarten,
 			STRING_AGG(DISTINCT u.bezeichnung, ', ') AS Unternehmen,
 			STRING_AGG(d.dienstverhaeltnis_id::TEXT, ', ') AS ids,
@@ -180,32 +129,10 @@ class Mitarbeiter_model extends DB_Model
 		    JOIN
 			    hr.tbl_vertragsart va ON d.vertragsart_kurzbz = va.vertragsart_kurzbz ";
 
-/*		if ($aktiv === true)
-			$qry .= " WHERE b.aktiv = true";
-		elseif ($aktiv === false)
-			$qry .= " WHERE b.aktiv = false";
-
-		if($fix)
-		{
-			$filterVertragsart = "echterdv";
-
-			$filterVertragsart = addslashes($filterVertragsart); // Escaping von Sonderzeichen
-			$qry .= " AND d.vertragsart_kurzbz = '" . $filterVertragsart . "'";
-		}
-
-		if($extern)
-		{
-			$filterVertragsart2 = "externerlehrender";
-
-			$filterVertragsart2 = addslashes($filterVertragsart2); // Escaping von Sonderzeichen
-			$qry .= " AND d.vertragsart_kurzbz = '" . $filterVertragsart2 . "'";
-		}*/
-
 		if($person_id)
 		{
 			$qry .= " WHERE p.person_id = ?";
 		}
-
 
 		$qry.= " 
 		GROUP BY 
@@ -229,37 +156,7 @@ class Mitarbeiter_model extends DB_Model
 	 */
 	function getPersonAbteilung($person_id)
 	{
-/*
-		$qry = "
-        SELECT tbl_benutzer.uid
-        FROM tbl_mitarbeiter
-            JOIN tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
-            JOIN tbl_person USING (person_id)
-        WHERE tbl_person.person_id=?
-        ";
-
-
-		$result = $this->execQuery($qry, array($person_id));
-
-		$uid = current(getData($result));
-		$uid = $uid->uid;
-
-
-		$qry2 ="
-            SELECT
-                bf.benutzerfunktion_id,bf.fachbereich_kurzbz,bf.uid,bf.funktion_kurzbz,bf.updateamum,bf.updatevon,bf.insertamum,bf.insertvon,bf.ext_id,bf.semester,bf.oe_kurzbz,bf.datum_von,bf.datum_bis,bf.bezeichnung,bf.wochenstunden,
-                oe.oe_kurzbz,oe.oe_parent_kurzbz,oe.bezeichnung,oe.organisationseinheittyp_kurzbz,oe.aktiv,oe.mailverteiler,oe.freigabegrenze,oe.kurzzeichen,oe.lehre,oe.standort,oe.warn_semesterstunden_frei,oe.warn_semesterstunden_fix,oe.standort_id
-            FROM tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
-            WHERE uid = ? AND funktion_kurzbz='oezuordnung'
-                AND datum_von<=now() AND (datum_bis is null OR datum_bis>=now())
-        ";
-
-		$result2 = $this->execQuery($qry2, array($uid));
-
-
-		return $result2;*/
-
-		// First Query
+		//TODO(Manu) use function getMitarbeiter_uid
 		$qry = "
         SELECT tbl_benutzer.uid
         FROM tbl_mitarbeiter
@@ -269,14 +166,12 @@ class Mitarbeiter_model extends DB_Model
     ";
 		$result = $this->execQuery($qry, [$person_id]);
 
-		// Validate and extract UID
 		$data = getData($result);
 		if (empty($data)) {
 			return null; // No UID found
 		}
 
 		$uid = isset($data[0]->uid) ? $data[0]->uid : null;
-	//	$uid = isset($data[0]['uid']) ? $data[0]['uid'] : null;
 
 		if (!$uid) {
 			return null; // UID extraction failed
@@ -474,5 +369,31 @@ class Mitarbeiter_model extends DB_Model
 				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'";
 
 		return $this->execQuery($qry);
+	}
+
+	public function getMitarbeiter_uid($person_id){
+		//TODO(Manu) refactor function
+		//and use in function getPersonAbteilung
+		//check function in Vertraege.php
+		$qry = "
+        SELECT tbl_benutzer.uid
+        FROM tbl_mitarbeiter
+            JOIN tbl_benutzer ON CAST(tbl_mitarbeiter.mitarbeiter_uid AS TEXT) = CAST(tbl_benutzer.uid AS TEXT)
+            JOIN tbl_person USING (person_id)
+        WHERE tbl_person.person_id = ?
+    ";
+		$result = $this->execQuery($qry, [$person_id]);
+
+		$data = getData($result);
+		if (empty($data)) {
+			return null; // No UID found
+		}
+		//else
+		//	$data = current($data);
+
+	//	$uid = $data->uid;
+
+		$uid = isset($data[0]->uid) ? $data[0]->uid : null;
+		return $uid;
 	}
 }

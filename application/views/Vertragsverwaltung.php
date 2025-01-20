@@ -30,10 +30,20 @@ $includesArray = array(
 $this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
+<?php
+$configArray = [
+	'generateAlias' => !defined('GENERATE_ALIAS_STUDENT') ? 'notDefined' : GENERATE_ALIAS_STUDENT,
+	'domain' => !defined('DOMAIN') ? 'notDefined' : DOMAIN,
+	'chooseLayout' => !defined('CHOOSE_LAYOUT') ? 'notDefined' : CHOOSE_LAYOUT,
+];
+?>
+
 <div id="main">
 	<router-view
 		stv-root="<?= site_url('Vertragsverwaltung'); ?>"
 		cis-root="<?= CIS_ROOT; ?>"
+		:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
+		:config="<?=  htmlspecialchars(json_encode($configArray)); ?>"
 	>
 	</router-view>
 </div>

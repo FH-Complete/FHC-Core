@@ -4,6 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vertragsverwaltung extends Auth_Controller
 {
+	//TODO(Manu) Permissions
 	public function __construct()
 	{
 		$permissions = [];

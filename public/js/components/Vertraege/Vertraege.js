@@ -59,7 +59,6 @@ export default {
 							if (value == null) {
 								return "0.00";
 							}
-
 							return parseFloat(value).toFixed(2);
 						}
 					},
@@ -162,7 +161,21 @@ export default {
 							title: this.$p.t('global', 'aktionen')
 						});
 					}
-				}
+				},
+				{
+					//is just enabled for ADDON Injection KU: MultiprintHonorarvertrag
+					//(maybe enable also for ADDON FH Burgenland: MultiAccept later)
+					event: 'rowClick',
+					handler: (e, row) => {
+						if (this.dataPrintHonorar.multiselect) {
+							const selectedContract = row.getData().vertrag_id;
+							const status = row.getData().status;
+							const bezeichnung =	row.getData().bezeichnung;
+
+							this.toggleRowClick(selectedContract, status, bezeichnung);
+						}
+					}
+				},
 			],
 			statusNew: true,
 			formData: {	},
@@ -174,13 +187,19 @@ export default {
 				vertragsstatus_kurzbz: 'test',
 				datum: new Date(),
 			},
+			dataPrintHonorar: [],
+			triggeredData: [],
 			childData: {},
 			isFilterSet: false,
+			ma_uid: null,
+			clickedRows: [],
+			arraySelectedContracts: [],
 		}
 	},
 	watch: {
 		person_id() {
 			this.$refs.table.reloadTable();
+			this.arraySelectedContracts = [];
 			//this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllVertraege/' + this.person_id);
 		},
 	},
@@ -218,7 +237,7 @@ export default {
 			const dataToSend = {
 				person_id: this.person_id,
 				formData: this.formData,
-				clickedRows: this.childData, //do I need all Data, maybe smaller array?
+				clickedRows: this.childData, //all data needed, maybe smaller array?
 			};
 
 			return this.endpoint
@@ -240,7 +259,7 @@ export default {
 				vertrag_id: vertrag_id,
 				person_id: this.person_id,
 				formData: this.formData,
-				clickedRows: this.childData, //do I need all Data, maybe smaller array?
+				clickedRows: this.childData,
 			};
 
 			return this.endpoint
@@ -421,44 +440,111 @@ export default {
 				this.$refs.table.tabulator.clearFilter("status");
 			}
 		},
+		//methods for functionality ADDON KU
+		printContract(){
+			this.getMitarbeiter_uid().then(()=> {
+
+				//check if at least 2 contracts chosen
+				if(this.arraySelectedContracts.length < 2) {
+					this.$fhcAlert.alertError('Bitte mindestens 2 Verträge auswählen');
+					return;
+				}
+
+				//check if status=="Genehmigt"
+				const statusNotGenehmigtExists = this.arraySelectedContracts.some(([_, status]) => status !== 'Genehmigt');
+				if(statusNotGenehmigtExists) {
+					this.$fhcAlert.alertError('Alle Verträge müssen genehmigt sein');
+					return;
+				}
+
+				//build String to Print PDF
+				let vertragString = '';
+
+				this.arraySelectedContracts.forEach(element => {
+					vertragString += '&vertrag_id[]=' + element[0].toString();
+				});
+
+				let linkToPdf = this.dataPrintHonorar.link +
+						'content/pdfExport.php?xml=' + this.dataPrintHonorar.xml + '&xsl=' + this.dataPrintHonorar.xsl + '&mitarbeiter_uid=' + this.ma_uid + vertragString + '&output=pdf&uid=' + this.ma_uid;
+				window.open(linkToPdf, '_blank');
+				});
+		},
+		getMitarbeiter_uid(){
+			return this.endpoint
+				.getMitarbeiter_uid(this.person_id)
+				.then(response => {
+					this.ma_uid = response.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		toggleRowClick(contractId, status, bezeichnung) {
+			const index = this.arraySelectedContracts.findIndex(
+				([id]) => id === contractId
+			);
+			if (index !== -1) {
+				this.arraySelectedContracts.splice(index, 1);
+			} else {
+				this.arraySelectedContracts.push([contractId, status, bezeichnung]);
+			}
+		},
+		clearSelection(){
+			this.arraySelectedContracts = [];
+		}
 	},
 	created() {
 		Promise.all([
 			this.endpoint.getAllContractTypes(),
 			this.endpoint.getAllContractsNotAssigned2(this.person_id),
 			this.endpoint.getAllContractStati(),
+			this.$fhcApi.factory.vertraege.configPrintDocument()
 		])
-			.then(([result1, result2, result3]) => {
+			.then(([result1, result2, result3, result4]) => {
 				this.listContractTypes = result1.data;
 				this.listContractsUnassigned = result2.data;
 				this.listContractStati = result3.data;
+				this.dataPrintHonorar = result4.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	mounted() {
-		this.$nextTick(() => {
+		//TODO(Manu) check if necessary
+/*		this.$nextTick(() => {
 			this.$refs.table.tabulator.on("rowClick", (e, row) => {
 				this.contractSelected = row.getData();
 				console.log("selected Row ", this.contractSelected);
 			});
-		});
+		});*/
 		this.getFormattedDate();
 
 	},
 	template: `
 	<div class="core-contracts h-100 d-flex flex-column">
 	
+	<!--	injected print functionality for KU Linz (printHonorarvertrag)  -->
+	   <div v-if="arraySelectedContracts.length >= 2" class="container mt-2">
+		 
+		   <div v-for="item in arraySelectedContracts" :key="item[0]" class="row">
+				<div class="col-md-6">
+				  <input
+					class="form-control"
+					type="text"
+					:value="item[2] + ' | ' + item[1] + ' (ID: ' + item[0] + ')'"
+					aria-label="readonly input example"
+					readonly
+				  >
+				</div>
+			</div>
+			
+		<div class="d-flex">
+			<div class="ms-auto">
+				<button type="button" class="btn btn-secondary mx-1" @click="clearSelection()"><i class="fa fa-trash"></i></button>
+				<button type="button" class="btn btn-primary o" @click="printContract()">Honorarvertrag drucken</button>
+			</div>
+		</div>
+    </div>
 	
-	
-
-<!--	<div 
-		class="d-flex justify-content-start align-items-center w-100 pb-3 gap-3" 
-		style="max-height: 8rem; overflow: hidden;">
-	<img class="d-block h-100 rounded" alt="profilbild" :src="appRoot + 'cis/public/bild.php?src=person&person_id=' + person_id">
-&lt;!&ndash;		<img class="d-block h-100 rounded" alt="profilbild" :src="appRoot + 'cis/public/bild.php?src=person&person_id=' + student.person_id">
-			<h2 class="h4">{{students[0].titlepre}} {{students[0].vorname}} {{students[0].nachname}} {{students[0].titlepost}}</h2>&ndash;&gt;
-	</div>-->
-	
+	<hr> 
+		
 <!--	filter: open means no status abgerechnet yet-->
 		<div class="justify-content-end pb-3">
 			<form-input

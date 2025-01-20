@@ -61,6 +61,9 @@ export default {
 	},
 	getLeitungOrg(oekurzbz){
 		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/getLeitungOrg/' + oekurzbz);
-	}
+	},
+	getMitarbeiter_uid(person_id){
+		return this.$fhcApi.get('api/frontend/v1/vertraege/vertraege/getMitarbeiter_uid/' + person_id);
+	},
 
 }

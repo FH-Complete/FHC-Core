@@ -10,6 +10,21 @@ export default {
 		MitarbeiterDetails,
 		Vertraege
 	},
+	props: {
+		config: Object,
+		permissions: Object, //TODO(Manu)
+	},
+	provide() {
+		return {
+		//	activeAddonBewerbung: this.activeAddons.split(';').includes('bewerbung'),
+		//	configGenerateAlias: this.config.generateAlias,
+		//	configChooseLayout: this.config.chooseLayout,
+			configDomain: this.config.domain,
+			//TODO(Manu) check permissions
+			hasSchreibrechtAss: this.permissions['assistenz_schreibrechte'],
+			hasAdminPermission: this.permissions['admin'],
+		}
+	},
 	data() {
 		//TODO(Manu) props for filter: actually not necessary
 		return {
@@ -30,6 +45,7 @@ export default {
 	template: `
 <div>
 	<div class="container-fluid overflow-hidden">
+<!--	DOM: {{configDomain}} alias {{configAlias}} layout {{configChooseLayout}}-->
 		<div class="row h-100">
 			<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 			<!--<div class="col-md-12">-->

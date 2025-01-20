@@ -1,6 +1,7 @@
 <?php
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
+
 use \DateTime as DateTime;
 
 class Vertraege extends FHCAPI_Controller
@@ -24,11 +25,12 @@ class Vertraege extends FHCAPI_Controller
 			'updateContractStatus' => self::PERM_LOGGED,
 			'deleteLehrauftrag' => self::PERM_LOGGED,
 			'deleteBetreuung' => self::PERM_LOGGED,
-			//TODO(Manu) Berechtigung
+			//TODO(Manu) Berechtigungen
 			'getMitarbeiter' => self::PERM_LOGGED,
 			'getHeader' => self::PERM_LOGGED,
 			'getPersonAbteilung' => self::PERM_LOGGED,
 			'getLeitungOrg' => self::PERM_LOGGED,
+			'getMitarbeiter_uid' => self::PERM_LOGGED,
 			]);
 
 		//Load Models and Libraries
@@ -678,7 +680,6 @@ class Vertraege extends FHCAPI_Controller
 			//TODO(Manu) rewrite better
 			return $this->terminateWithSuccess("no benutzerdata", self::ERROR_TYPE_GENERAL);
 
-		//	return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'personID']), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess(getData($result));
 	}
@@ -718,11 +719,29 @@ class Vertraege extends FHCAPI_Controller
 				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'personID']), self::ERROR_TYPE_GENERAL);
 		}
 
-/*		$result = current(getData($result));
-		$header = $result->name;*/
-
-		//return $this->terminateWithSuccess($header);
 		return $this->terminateWithSuccess(getData($result));
 	}
+
+
+	public function getMitarbeiter_uid($person_id)
+	{
+		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
+
+		$result = $this->Mitarbeitermodel->getMitarbeiter_uid($person_id);
+
+		if (isError($result))
+		{
+			//TODO(Manu) check ErrorLogic
+			return $this->terminateWithSuccess($result);
+			//return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		if (!hasData($result))
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'personID']), self::ERROR_TYPE_GENERAL);
+		}
+
+		return $this->terminateWithSuccess($result);
+	}
+
 
 }
