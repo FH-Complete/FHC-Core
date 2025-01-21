@@ -7,23 +7,23 @@ Vue.$fhcapi = fhcapifactory;
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers";
 import FhcApi from "../../plugin/FhcApi";
 
-const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-const router = VueRouter.createRouter({
-	history: VueRouter.createWebHistory(`/${ciPath}/CisVue/Cms/`),
-	routes: [
-		{
-			path: `/content/:content_id`,
-			name: 'Content',
-			component: CmsContent,
-			props: (route) => ({ content_id: route.params.content_id })
-		},
-		{
-			path: `/news`,
-			name: 'News',
-			component: CmsNews,
-		}
-	]
-})
+// const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+// const router = VueRouter.createRouter({
+// 	history: VueRouter.createWebHistory(`/${ciPath}/CisVue/Cms/`),
+// 	routes: [
+// 		{
+// 			path: `/content/:content_id`,
+// 			name: 'Content',
+// 			component: CmsContent,
+// 			props: (route) => ({ content_id: route.params.content_id })
+// 		},
+// 		{
+// 			path: `/news`,
+// 			name: 'News',
+// 			component: CmsNews,
+// 		}
+// 	]
+// })
 
 
 const app = Vue.createApp({
@@ -33,6 +33,8 @@ const app = Vue.createApp({
 		CmsContent,
 	},
 	mounted() {
+		
+		// TODO: warum ist das hier? Content? News?
 		document.querySelectorAll("#cms [data-confirm]").forEach((el) => {
 			el.addEventListener("click", (evt) => {
 				evt.preventDefault();
@@ -60,8 +62,6 @@ const app = Vue.createApp({
 
 setScrollbarWidth();
 
-app.use(router);
-window.cmsRouter = router;
 app.use(FhcApi);
 app.use(primevue.config.default, { zIndex: { overlay: 9999 } });
 app.use(Phrasen);

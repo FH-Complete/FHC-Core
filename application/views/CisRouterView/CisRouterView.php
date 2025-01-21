@@ -17,7 +17,8 @@ $includesArray = array(
 		'public/css/components/MyLv.css',
 		'public/css/components/FilterComponent.css',
 		'public/css/components/Profil.css',
-		'public/css/components/FormUnderline.css'
+		'public/css/components/FormUnderline.css',
+		'public/css/Cis4/Cms.css',
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.js',
@@ -32,6 +33,8 @@ $includesArray = array(
 $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 <div id="fhccontent" route=<?php echo $route ?>>
-	<router-view view-data-string='<?php echo json_encode($viewData) ?>'></router-view>
+	<router-view 
+			:view-data='<?php echo json_encode($viewData) ?>'
+	></router-view>
 </div>
 <?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>

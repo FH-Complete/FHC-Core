@@ -35,11 +35,13 @@ import lehre from "./lehre.js";
 import addons from "./addons.js";
 import studiengang from "./studiengang.js";
 import menu from "./menu.js";
+import dashboard from "./dashboard";
 
 export default {
     search,
     phrasen,
     navigation,
+    dashboard,
     filter,
     studstatus,
     profil,

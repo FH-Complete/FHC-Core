@@ -60,7 +60,15 @@ class Cms extends Auth_Controller
 
 		$content = current($content);
 
-		$this->load->view('CisVue/Cms/Content', ['content_id' => $content_id, 'template_kurzbz' => $content->template_kurzbz, 'version' => $version, 'sprache' => $sprache, 'sichtbar' => $sichtbar]);
+		$viewData = array(
+			'content_id' => $content_id,
+			'template_kurzbz' => $content->template_kurzbz,
+			'version' => $version,
+			'sichtbar' => $sichtbar
+		);
+		
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Content']);
+//		$this->load->view('CisVue/Cms/Content', ['content_id' => $content_id, 'template_kurzbz' => $content->template_kurzbz, 'version' => $version, 'sprache' => $sprache, 'sichtbar' => $sichtbar]);
 	}
 
 	/**
@@ -76,7 +84,10 @@ class Cms extends Auth_Controller
 	 */
 	public function news($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
 	{
-		$this->load->view('CisVue/Cms/Content', ['infoscreen' => $infoscreen, 'studiengang_kz' => $studiengang_kz, 'semester' => $semester, 'mischen' => $mischen, 'titel' => $titel, 'edit' => $edit, 'sichtbar' => $sichtbar]);
+		// TODO: what are those parameters and what are they used for?
+		
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'News']);
+//		$this->load->view('CisVue/Cms/Content', ['infoscreen' => $infoscreen, 'studiengang_kz' => $studiengang_kz, 'semester' => $semester, 'mischen' => $mischen, 'titel' => $titel, 'edit' => $edit, 'sichtbar' => $sichtbar]);
 	}
 
 	public function getRoomInformation($ort_kurzbz){

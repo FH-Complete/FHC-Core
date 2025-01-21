@@ -6,7 +6,7 @@ export default {
 	props: {
 		content_id: {
 			type: [Number, String],
-			required: true,
+			required: true
 		},
 		version: {
 			type: [String, Number],
