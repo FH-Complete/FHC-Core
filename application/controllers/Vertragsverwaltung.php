@@ -4,12 +4,13 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vertragsverwaltung extends Auth_Controller
 {
+
 	//TODO(Manu) Permissions
 	public function __construct()
 	{
 		$permissions = [];
 		$router = load_class('Router');
-		$permissions[$router->method] = ['admin:r', 'assistenz:r'];
+		$permissions[$router->method] = ['vertrag/mitarbeiter:r'];
 		parent::__construct($permissions);
 
 		// Load Libraries
@@ -23,9 +24,7 @@ class Vertragsverwaltung extends Auth_Controller
 	{
 		$this->load->view('Vertragsverwaltung', [
 			'permissions' => [
-				'assistenz_stgs' => $this->permissionlib->getSTG_isEntitledFor('assistenz'),
-				'admin' => $this->permissionlib->isBerechtigt('admin'),
-				'assistenz_schreibrechte' => $this->permissionlib->isBerechtigt('assistenz','suid'),
+				'vertragsverwaltung_schreibrechte' => $this->permissionlib->isBerechtigt('vertrag/mitarbeiter','suid')
 			]
 		]);
 	}

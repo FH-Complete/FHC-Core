@@ -93,12 +93,12 @@ export default {
 					<p>
 						<strong class="text-muted">Email </strong>
 						 <span v-if="!headerData?.alias">
-							<a :href="'mailto:'+headerData?.uid+'@'+domain">{{  headerData.uid }}@{{ domain }}</a>
+							<a :href="'mailto:'+headerData?.uid+'@'+domain">{{headerData.uid}}@{{domain}}</a>
 						</span>
 						<span v-if="headerData?.alias">
-							<a :href="'mailto:'+headerData?.alias+'@'+domain">{{  headerData.alias }}@{{ domain }}</a>
+							<a :href="'mailto:'+headerData?.alias+'@'+domain">{{headerData.alias}}@{{domain}}</a>
 						</span>
-						<span v-if="headerData?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW</strong> {{  headerData?.telefonklappe }}</span>
+						<span v-if="headerData?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW </strong>{{headerData?.telefonklappe}}</span>
 					</p>
 		
 				</div>

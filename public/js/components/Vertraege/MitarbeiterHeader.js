@@ -78,53 +78,39 @@ export default {
 					handler: this.rowSelectionChanged
 				},
 		{
-/*					event: 'tableBuilt',
+					event: 'tableBuilt',
 					handler: async() => {
 
-						await this.$p.loadCategory(['ui', 'global', 'vertrag']);
+						await this.$p.loadCategory(['person', 'global', 'vertrag']);
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('ui', 'bezeichnung')
+						cm.getColumnByField('person_id').component.updateDefinition({
+							title: this.$p.t('person', 'person_id')
 						});
-						cm.getColumnByField('lehreinheit_id').component.updateDefinition({
-							title: this.$p.t('ui', 'lehreinheit_id')
+
+						cm.getColumnByField('nachname').component.updateDefinition({
+							title: this.$p.t('person', 'nachname')
 						});
-						cm.getColumnByField('betrag').component.updateDefinition({
-							title: this.$p.t('ui', 'betrag')
+						cm.getColumnByField('vorname').component.updateDefinition({
+							title: this.$p.t('person', 'vorname')
 						});
-						cm.getColumnByField('status').component.updateDefinition({
-							title: this.$p.t('global', 'status')
+						cm.getColumnByField('aktiv').component.updateDefinition({
+							title: this.$p.t('global', 'aktiv')
 						});
-						cm.getColumnByField('vertragstyp_bezeichnung').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragstyp')
+						cm.getColumnByField('format_gebdatum').component.updateDefinition({
+							title: this.$p.t('person', 'geburtsdatum')
 						});
-						cm.getColumnByField('format_vertragsdatum').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsdatum')
+						cm.getColumnByField('unternehmen').component.updateDefinition({
+							title: this.$p.t('person', 'firma')
 						});
-						cm.getColumnByField('vertragsdatum').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsdatum_iso')
+						cm.getColumnByField('vertragsarten').component.updateDefinition({
+							title: this.$p.t('vertrag', 'vertragsarten')
 						});
-						cm.getColumnByField('vertragsstunden').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsstunden')
+						cm.getColumnByField('ids').component.updateDefinition({
+							title: this.$p.t('vertrag', 'idsDienstverhaeltnisse')
 						});
-						cm.getColumnByField('vertragsstunden_studiensemester_kurzbz').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsstunden_studiensemester')
-						});
-						cm.getColumnByField('vertrag_id').component.updateDefinition({
-							title: this.$p.t('ui', 'vertrag_id')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('isabgerechnet').component.updateDefinition({
-							title: this.$p.t('vertrag', 'abgerechnet')
-						});
-						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});
-					} */
+					}
 				}
 			],
 			selectedPerson: null,
@@ -147,14 +133,14 @@ export default {
 	},
 	template: `
 	<div class="core-mitarbeiter h-100 d-flex flex-column">
-		<h4>Vertragsverwaltung</h4>
+		<h4>{{$p.t('vertrag', 'vertragsverwaltung')}}</h4>
 		
 <!--	filter: show only active employees-->
 		<div class="justify-content-end py-3">
 			<form-input
 				container-class="form-switch"
 				type="checkbox"
-				label="nur aktive Mitarbeiter:innen anzeigen"
+				:label="$p.t('vertrag/nurAktiveMaAnzeigen')"
 				v-model="isFilterSet"
 				@change="onSwitchChange"
 				>

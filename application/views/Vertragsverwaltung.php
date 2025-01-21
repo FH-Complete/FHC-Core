@@ -32,9 +32,7 @@ $this->load->view('templates/FHC-Header', $includesArray);
 
 <?php
 $configArray = [
-	'generateAlias' => !defined('GENERATE_ALIAS_STUDENT') ? 'notDefined' : GENERATE_ALIAS_STUDENT,
 	'domain' => !defined('DOMAIN') ? 'notDefined' : DOMAIN,
-	'chooseLayout' => !defined('CHOOSE_LAYOUT') ? 'notDefined' : CHOOSE_LAYOUT,
 ];
 ?>
 

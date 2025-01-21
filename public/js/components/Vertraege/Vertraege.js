@@ -21,6 +21,10 @@ export default {
 		cisRoot: {
 			from: 'cisRoot'
 		},
+		hasSchreibrechte: {
+			from: 'hasSchreibrechte',
+			default: false
+		},
 	},
 	props: {
 		endpoint: {
@@ -94,11 +98,17 @@ export default {
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('vertrag', 'deleteVertrag');
-							button.addEventListener(
-								'click',
-								() =>
-									this.actionDeleteContract(cell.getData().vertrag_id)
-							);
+
+							if (!this.hasSchreibrechte) {
+								button.disabled = true;
+								button.classList.add('disabled');
+							} else {
+								button.addEventListener(
+									'click',
+									() =>
+										this.actionDeleteContract(cell.getData().vertrag_id)
+								);
+							}
 							container.append(button);
 
 							return container;
@@ -443,17 +453,16 @@ export default {
 		//methods for functionality ADDON KU
 		printContract(){
 			this.getMitarbeiter_uid().then(()=> {
-
 				//check if at least 2 contracts chosen
 				if(this.arraySelectedContracts.length < 2) {
-					this.$fhcAlert.alertError('Bitte mindestens 2 Verträge auswählen');
+					this.$fhcAlert.alertError(this.$p.t('vertrag', 'alertMindestensZweiVertraege'));
 					return;
 				}
 
 				//check if status=="Genehmigt"
 				const statusNotGenehmigtExists = this.arraySelectedContracts.some(([_, status]) => status !== 'Genehmigt');
 				if(statusNotGenehmigtExists) {
-					this.$fhcAlert.alertError('Alle Verträge müssen genehmigt sein');
+					this.$fhcAlert.alertError(this.$p.t('vertrag', 'alertOnlyApprovedContracts'));
 					return;
 				}
 
@@ -507,42 +516,38 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	mounted() {
-		//TODO(Manu) check if necessary
-/*		this.$nextTick(() => {
+		//necessary for reloading components Status and Details
+		this.$nextTick(() => {
 			this.$refs.table.tabulator.on("rowClick", (e, row) => {
 				this.contractSelected = row.getData();
-				console.log("selected Row ", this.contractSelected);
 			});
-		});*/
+		});
 		this.getFormattedDate();
-
 	},
 	template: `
 	<div class="core-contracts h-100 d-flex flex-column">
 	
-	<!--	injected print functionality for KU Linz (printHonorarvertrag)  -->
-	   <div v-if="arraySelectedContracts.length >= 2" class="container mt-2">
+		<!--	injected print functionality for KU Linz (printHonorarvertrag)  -->
+	   <template v-if="arraySelectedContracts.length >= 2" class="container mt-2">
 		 
-		   <div v-for="item in arraySelectedContracts" :key="item[0]" class="row">
-				<div class="col-md-6">
-				  <input
-					class="form-control"
-					type="text"
-					:value="item[2] + ' | ' + item[1] + ' (ID: ' + item[0] + ')'"
-					aria-label="readonly input example"
-					readonly
-				  >
-				</div>
+		   <div v-for="item in arraySelectedContracts" :key="item[0]">
+			  <input
+				class="form-control"
+				type="text"
+				:value="item[2] + ' | ' + item[1] + ' (ID: ' + item[0] + ')'"
+				aria-label="readonly input example"
+				readonly
+			  >
 			</div>
-			
-		<div class="d-flex">
-			<div class="ms-auto">
+		</template>
+		
+		<template v-if="arraySelectedContracts.length >= 2" class="d-flex">
+			<div class="ms-auto mt-2">
 				<button type="button" class="btn btn-secondary mx-1" @click="clearSelection()"><i class="fa fa-trash"></i></button>
-				<button type="button" class="btn btn-primary o" @click="printContract()">Honorarvertrag drucken</button>
+				<button :disabled="!this.hasSchreibrechte" type="button" class="btn btn-primary" @click="printContract()">{{$p.t('vertrag', 'printHonorarvertrag')}}</button>
 			</div>
-		</div>
-    </div>
-	
+		</template>
+
 	<hr> 
 		
 <!--	filter: open means no status abgerechnet yet-->
@@ -698,7 +703,7 @@ export default {
 				
 				<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="reload()">{{$p.t('ui', 'abbrechen')}}</button>
-					<button type="button" class="btn btn-primary" @click="statusNew ? addNewContract() : updateContract(formData.vertrag_id)">{{$p.t('vertrag', 'vertragErstellen')}}</button>
+					<button type="button" class="btn btn-primary" :disabled="!this.hasSchreibrechte" @click="statusNew ? addNewContract() : updateContract(formData.vertrag_id)">{{$p.t('vertrag', 'vertragErstellen')}}</button>
 				</template>
 			</bs-modal>
 		</core-form>

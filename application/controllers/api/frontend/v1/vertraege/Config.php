@@ -29,16 +29,8 @@ class Config extends FHCAPI_Controller
 {
 	public function __construct()
 	{
-		// TODO(Manu): permissions
 		parent::__construct([
-			'printDocument' => ['admin:r', 'assistenz:r'],
-		]);
-
-
-		// Load Phrases
-		$this->loadPhrases([
-			'global',
-			'person',
+			'printDocument' => ['vertrag/mitarbeiter:r'],
 		]);
 	}
 

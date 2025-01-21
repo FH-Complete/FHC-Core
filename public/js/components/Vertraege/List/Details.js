@@ -11,6 +11,12 @@ export default {
 		CoreForm,
 		FormInput
 	},
+	inject: {
+		hasSchreibrechte: {
+			from: 'hasSchreibrechte',
+			default: false
+		},
+	},
 	props: {
 		person_id: {
 			type: [Number],
@@ -69,20 +75,30 @@ export default {
 							let type = cell.getData().type;
 							if (type == 'Lehrauftrag')
 							{
-								button.addEventListener(
-									'click',
-									() =>
-										this.actionDeleteLehrauftrag(cell.getData().vertrag_id, cell.getData().lehreinheit_id, cell.getData().mitarbeiter_uid)
-								);
+								if (!this.hasSchreibrechte) {
+									button.disabled = true;
+									button.classList.add('disabled');
+								} else {
+									button.addEventListener(
+										'click',
+										() =>
+											this.actionDeleteLehrauftrag(cell.getData().vertrag_id, cell.getData().lehreinheit_id, cell.getData().mitarbeiter_uid)
+									);
+								}
 							}
 
 							if (type == 'Betreuung')
 							{
-								button.addEventListener(
-									'click',
-									() =>
-										this.actionDeleteBetreuung(cell.getData().vertrag_id, cell.getData().projektarbeit_id,  cell.getData().betreuerart_kurzbz)
-								);
+								if (!this.hasSchreibrechte) {
+									button.disabled = true;
+									button.classList.add('disabled');
+								} else {
+									button.addEventListener(
+										'click',
+										() =>
+											this.actionDeleteBetreuung(cell.getData().vertrag_id, cell.getData().projektarbeit_id, cell.getData().betreuerart_kurzbz)
+									);
+								}
 							}
 
 							container.append(button);

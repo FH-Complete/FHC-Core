@@ -11,6 +11,12 @@ export default {
 		CoreForm,
 		FormInput
 	},
+	inject: {
+		hasSchreibrechte: {
+			from: 'hasSchreibrechte',
+			default: false
+		},
+	},
 	props: {
 		vertrag_id: {
 			type: [Number],
@@ -69,11 +75,16 @@ export default {
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('vertrag', 'deleteStatus');
-							button.addEventListener(
-								'click',
-								() =>
-									this.actionDeleteStatus(cell.getData().vertrag_id, cell.getData().vertragsstatus_kurzbz)
-							);
+							if (!this.hasSchreibrechte) {
+								button.disabled = true;
+								button.classList.add('disabled');
+							} else {
+								button.addEventListener(
+									'click',
+									() =>
+										this.actionDeleteStatus(cell.getData().vertrag_id, cell.getData().vertragsstatus_kurzbz)
+								);
+							}
 
 							container.append(button);
 
@@ -263,7 +274,7 @@ export default {
 				</core-form>
 
 				<template #footer>
-					<button type="button" class="btn btn-primary" @click="statusNew ? handleSubmit('new') : handleSubmit('edit')">{{$p.t('ui', 'speichern')}}</button>
+					<button type="button" class="btn btn-primary" :disabled="!this.hasSchreibrechte" @click="statusNew ? handleSubmit('new') : handleSubmit('edit')">{{$p.t('ui', 'speichern')}}</button>
 				</template>
 
 			</bs-modal>

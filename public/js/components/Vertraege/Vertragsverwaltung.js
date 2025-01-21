@@ -16,13 +16,8 @@ export default {
 	},
 	provide() {
 		return {
-		//	activeAddonBewerbung: this.activeAddons.split(';').includes('bewerbung'),
-		//	configGenerateAlias: this.config.generateAlias,
-		//	configChooseLayout: this.config.chooseLayout,
 			configDomain: this.config.domain,
-			//TODO(Manu) check permissions
-			hasSchreibrechtAss: this.permissions['assistenz_schreibrechte'],
-			hasAdminPermission: this.permissions['admin'],
+			hasSchreibrechte: this.permissions['vertragsverwaltung_schreibrechte'],
 		}
 	},
 	data() {
@@ -45,10 +40,8 @@ export default {
 	template: `
 <div>
 	<div class="container-fluid overflow-hidden">
-<!--	DOM: {{configDomain}} alias {{configAlias}} layout {{configChooseLayout}}-->
 		<div class="row h-100">
 			<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
-			<!--<div class="col-md-12">-->
 				<vertical-split>
 					<template #top>	
 						<MitarbeiterHeader :filterMa="filterMa" :vertragsarten="vertragsarten" @selectedPerson="selectPerson" />
@@ -57,7 +50,7 @@ export default {
 						<div class="col" v-if="person_id!=null">
 							<mitarbeiter-details :person_id="person_id"></mitarbeiter-details>
 							<h5>Verträge</h5>
-							<Vertraege :endpoint="$fhcApi.factory.vertraege.person" :person_id="this.person_id" />
+							<Vertraege :endpoint="$fhcApi.factory.vertraege.person" :person_id="this.person_id"/>
 						</div>
 					<template>
 				</vertical-split>
