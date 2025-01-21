@@ -18,6 +18,7 @@ const app = Vue.createApp({
 				calcheightonly: true,
                 types: [
                     "mitarbeiter",
+					"student",
                     "raum",
                     "organisationunit"
                 ],
@@ -33,6 +34,17 @@ const app = Vue.createApp({
                         },
                         childactions: []
                     },
+					student: {
+						defaultaction: {
+							type: "link",
+							action: function (data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									"/Cis/Profil/View/" + data.uid;
+
+							}
+						},
+						childactions: []
+					},
                     raum: {
                         defaultaction: {
                             type: "link",
