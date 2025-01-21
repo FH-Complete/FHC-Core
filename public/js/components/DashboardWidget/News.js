@@ -39,6 +39,9 @@ export default {
 		}
 	},
 	methods: {
+		isString(value){
+			return Object.prototype.toString.call(value) === '[object String]';
+		},
 		setNext(){
 			const thisIndex = this.allNewsList.findIndex(n=>n.news_id == this.selected.news_id)
 			const nextIndex = thisIndex == (this.allNewsList.length - 1) ? 0 : thisIndex + 1
@@ -175,13 +178,16 @@ export default {
         <div v-else class="row h-100 g-0">
         	<div :class="'col-'+(width == 2? 6 : 4) + ' h-100 g-0'" style="overflow: auto;">
         		<template v-for="news in newsList" :key="'menu-'+news.news_id">
-
 					<div class="row fhc-news-menu-item" @click="setSelected(news)" :class="getMenuItemClass(news)" style="margin-right: 0px; margin-left: 0px; overflow-y: hidden;">
-						<div class="col-8 fhc-news-menu-item-betreff"><p>{{news.content_obj.betreff ?? ''}}</p></div>
-						<span class="fhc-news-menu-item-date fw-bold"
-						 >{{ news.datumformatted ?? ''}}</span>
+						<div class="col-8 fhc-news-menu-item-betreff">
+							<p >
+								{{news.content_obj.betreff ?? ''}}
+							</p>
+						</div>
+						<span class="fhc-news-menu-item-date fw-bold">
+							{{ news.datumformatted ?? ''}}
+						</span>
 					</div>
-
 				</template>
 			</div>
 			<div :class="'col-'+(width == 2? 6 : 8) + ' h-100'" style="padding-left: 0px; padding-right: 0px;" ref="htmlContent">

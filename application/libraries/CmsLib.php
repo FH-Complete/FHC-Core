@@ -43,7 +43,7 @@ class CmsLib
 	 * @param string	$sprache
 	 * @param boolean	$sichtbar
 	 * 
-	 * @return void
+	 * @return stdClass
 	 */
 	public function getContent($content_id, $version = null, $sprache = null, $sichtbar = true)
 	{
@@ -105,7 +105,19 @@ class CmsLib
 		if($content->titel){
 			$betreff = $content->titel;
 		}else{
+			//DomDocument getElementsByTagName returns a DomNodeList
 			$betreff = $XML->getElementsByTagName('betreff');
+			//check if any betreff was found and if it is not empty
+			if($betreff->length > 0 && !empty($betreff->item(0)->nodeValue))
+			{
+				//DomNodeList item() return a DomNode, property nodeValue contains the value of the node
+				$betreff = $betreff->item(0)->nodeValue;
+
+			}
+			else
+			{
+				return error('no betreff found for the content');
+			}
 		}
 
 		$xsltemplate = new DOMDocument();

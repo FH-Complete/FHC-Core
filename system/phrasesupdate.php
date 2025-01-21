@@ -31607,6 +31607,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'bookmark',
+		'phrase' => 'editLink',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit link',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
 		'phrase' => 'bookmarkDeleted',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -31639,6 +31659,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Link added',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
+	,array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'bookmarkAdded',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link hinzugefügt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Link added',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
+	,array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'bookmarkUpdated',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link geändert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Link updated',
 				'description' => '',
 				'insertvon' => 'system'
 			)
