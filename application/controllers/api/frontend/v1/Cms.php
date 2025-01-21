@@ -124,25 +124,35 @@ class Cms extends FHCAPI_Controller
 
 		//get the data or terminate with error
 		$news = $this->getDataOrTerminateWithError($news);
-		
+		// array that keeps track of which news don't have a betreff and have to be removed from the news array
+		$newsToRemove = array();
 		// collect the content of the news
-		foreach($news as $news_element){
-			$this->addMeta("content_id",$news_element->content_id);
+		foreach($news as $index=>$news_element){
 			
-			//todo: quick fix, for query builder error when fetching content
 			$this->NewsModel->resetQuery();
 			$content = $this->cmslib->getContent($news_element->content_id);
-
-			$content = getData($content);
-			
-			$news_element->content_obj = $content;
+			if(isError($content))
+			{
+				// removes the news from the news array, so that the response does not include a invalid news
+				array_push($newsToRemove,$index);
+				//add the error to the api response? visual feedback
+				//$this->addError(print_r($content->retval,true));
+				continue;
+			}
+			$content = getData($content);		
+			$news_element->content_obj = $content; 
 		}
+
+		//removes all news that don't have a betreff
+		foreach($newsToRemove as $removeNewsIndex)
+		{
+			unset($news[$removeNewsIndex]);
+		}
+
 		$withContent = function($news) {
 			return $news->content_obj != null;
-		};
-		
+		}; 
 		$newsWithContent = array_filter($news, $withContent);
-
 		$this->terminateWithSuccess($newsWithContent);
         
 	}
