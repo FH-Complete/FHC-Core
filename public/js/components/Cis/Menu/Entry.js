@@ -230,7 +230,8 @@ export default {
                 'btn btn-default rounded-0 w-100 text-start': true,
                 ['btn-level-' + level]: true,
 				'fw-bold':active
-            }">
+            }"
+            @mouseup="setActiveEntry(entry.content_id)">
             {{ entry.titel }}
         </a>
     </template>`
