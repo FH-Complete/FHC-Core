@@ -1,5 +1,6 @@
 import raum_contentmittitel from './Content_types/Raum_contentmittitel.js'
 import general from './Content_types/General.js'
+import BsConfirm from "../../Bootstrap/Confirm";
 
 export default {
 	name: "ContentComponent",
@@ -32,6 +33,29 @@ export default {
 			return this.$fhcApi.factory.cms.content(this.content_id_internal, this.version, this.sprache, this.sichtbar).then(res => {
 				this.content = res.data.content;
 				this.content_type = res.data.type;
+				
+				document.querySelectorAll("#cms [data-confirm]").forEach((el) => {
+					el.addEventListener("click", (evt) => {
+						evt.preventDefault();
+						BsConfirm.popup(el.dataset.confirm)
+							.then(() => {
+								Axios.get(el.href)
+									.then((res) => {
+										// TODO(chris): check for success then show message and/or reload
+										location = location;
+									})
+									.catch((err) => console.error("ERROR:", err));
+							})
+							.catch(() => {
+							});
+					});
+				});
+				document.querySelectorAll("#cms [data-href]").forEach((el) => {
+					el.href = el.dataset.href.replace(
+						/^ROOT\//,
+						FHC_JS_DATA_STORAGE_OBJECT.app_root
+					);
+				});
 			});
 		}
 	},

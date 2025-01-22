@@ -40,6 +40,12 @@ export const Profil = {
 		ViewMitarbeiterProfil,
 		Loading,
 	},
+	props: {
+		uid: {
+			type: String,
+			default: 'Profil'
+		}
+	},
 	data() {
 		return {
 			//? loading property is used for showing/hiding the loading modal
@@ -124,6 +130,35 @@ export const Profil = {
 		};
 	},
 	methods: {
+		async load() {
+			// fetch profilUpdateStates to provide them to children components
+			await this.$fhcApi.factory.profilUpdate.getStatus()
+				.then((response) => {
+					this.profilUpdateStates = response.data;
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+
+			this.$fhcApi.factory.profilUpdate.getTopic()
+				.then((response) => {
+					this.profilUpdateTopic = response.data;
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+			
+			let uid = this.uid ?? location.pathname.split("/").pop();
+
+			this.$fhcApi.factory.profil.getView(uid).then((res) => {
+				if (!res.data) {
+					this.notFoundUID = uid;
+				} else {
+					this.view = res.data?.view;
+					this.data = res.data?.data;
+				}
+			});	
+		},
 		zustellAdressenCount() {
 			if (!this.data || !this.data.adressen) {
 				return null;
@@ -319,39 +354,14 @@ export const Profil = {
 				this.$refs.loadingModalRef.hide();
 			}
 		},
+		uid (newVal, oldVal) {
+			console.log('watch uid', newVal)
+			this.load()
+		}
 	},
 	async created() {
-		// fetch profilUpdateStates to provide them to children components
-
-		await this.$fhcApi.factory.profilUpdate.getStatus()
-			.then((response) => {
-				this.profilUpdateStates = response.data;
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-
-		this.$fhcApi.factory.profilUpdate.getTopic()
-			.then((response) => {
-				this.profilUpdateTopic = response.data;
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-
-		//? uid contains the last part of the uri
-		let uid = location.pathname.split("/").pop();
-
-		this.$fhcApi.factory.profil.getView(uid).then((res) => {
-			if (!res.data) {
-				this.notFoundUID = uid;
-			} else {
-				this.view = res.data?.view;
-				this.data = res.data?.data;
-			}
-		});
+		this.load()
 	},
-
 	template: `
 	<div>
 		<div v-if="notFoundUID">

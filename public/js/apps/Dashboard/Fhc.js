@@ -14,18 +14,19 @@ const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*
 const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(`/${ciPath}`),
 	routes: [
-		// {
-		// 	path: `/Cis/Profil`,
-		// 	name: 'Profil',
-		// 	component: Profil,
-		// 	props: true
-		// },
-		// {
-		// 	path: `/Cis/Profil/View/`,
-		// 	name: 'Profil',
-		// 	component: Profil,
-		// 	props: true
-		// },
+		{
+			path: `/Cis/Profil/View/:uid`,
+			name: 'ProfilView',
+			component: Profil,
+			props: true
+		},
+		{
+			path: `/Cis/Profil`,
+			name: 'Profil',
+			component: Profil,
+			props: true
+		},
+		
 		{
 			path: `/CisVue/Cms/Content/:content_id`,
 			name: 'Content',
@@ -75,6 +76,11 @@ const router = VueRouter.createRouter({
 		// 	props: true
 		// }
 	]
+})
+
+router.beforeEach((to, from) => {
+	console.log('from', from)
+	console.log('to', to)
 })
 
 const app = Vue.createApp({

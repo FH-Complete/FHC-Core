@@ -68,7 +68,6 @@ class Cms extends Auth_Controller
 		);
 		
 		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Content']);
-//		$this->load->view('CisVue/Cms/Content', ['content_id' => $content_id, 'template_kurzbz' => $content->template_kurzbz, 'version' => $version, 'sprache' => $sprache, 'sichtbar' => $sichtbar]);
 	}
 
 	/**
