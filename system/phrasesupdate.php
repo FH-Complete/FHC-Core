@@ -31310,26 +31310,6 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'onboarding',
-		'phrase' => 'bewerbungVerifizierung',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Verifizierung Ihrer Bewerbung',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Application verification',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'onboarding',
 		'phrase' => 'bewerbungVerifzieren',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -31654,6 +31634,88 @@ If there is no further contact or enrolment, your data will be deleted after thr
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'onboarding',
+		'phrase' => 'zustimmungDatenuebermittlung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Können in Ausnahmefällen die Zugangsvoraussetzungen von der FH Technikum Wien nicht abschließend abgeklärt werden, erteile ich die Zustimmung, dass die FH Technikum Wien die Dokumente zur Überprüfung an die zuständigen Behörden weiterleiten kann.<br>
+Ich wurde darüber informiert, dass ich nicht verpflichtet bin, der Übermittlung meiner Daten zuzustimmen. Diese Zustimmung ist allerdings notwendig, um die Bewerbung berücksichtigen zu können.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If in exceptional cases the admission requirements can not be finally clarified by the UAS Technikum Wien, I give my consent that the UAS Technikum Wien can forward the documents to the competent authorities for verification.<br>
+I have been informed that I am under no obligation to consent to the transmission of my data. However, this consent is necessary in order for the application to be considered.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'onboarding',
+		'phrase' => 'zustimmungDatenschutzerklaerung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ich habe die Datenschutzerklärung zu Kenntnis genommen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'I have taken note of the privacy policy.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'onboarding',
+		'phrase' => 'bitteDatenuebermittlungZustimmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie müssen der Datenübermittlung zustimmen, um Ihre Bewerbung abschicken zu können.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You have to consent the transmission of your data to send the application.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'onboarding',
+		'phrase' => 'bitteDatenschutzerklaerungZustimmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie müssen der Datenschutzerklärung zustimmen, um Ihre Bewerbung abschicken zu können.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You have to consent to the privacy statement to send the application.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 
