@@ -67,20 +67,8 @@ const router = VueRouter.createRouter({
 			name: 'Cis4',
 			component: FhcDashboard,
 			props: {dashboard: 'CIS'},
-		},
-		// only use the catchAll route if every cis4 Route is being handled in vue router, currently Profil is being
-		// codeigniter routed
-		// {
-		// 	path: '/:catchAll(.*)',
-		// 	redirect: {name: 'FhcDashboard'},
-		// 	props: true
-		// }
+		}
 	]
-})
-
-router.beforeEach((to, from) => {
-	console.log('from', from)
-	console.log('to', to)
 })
 
 const app = Vue.createApp({
