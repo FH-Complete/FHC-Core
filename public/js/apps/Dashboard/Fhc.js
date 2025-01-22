@@ -104,19 +104,10 @@ const app = Vue.createApp({
 				event.preventDefault(); // Prevent browser navigation
 				this.$router.push(route);
 			}
-		},
-		getInitialRoute() {
-			const el = document.getElementById('fhccontent')
-			const r = el?.getAttribute('route')
-			if (r) return r
-			return 'FhcDashboard'
 		}
 	},
 	mounted() {
 		document.addEventListener('click', this.handleClick);
-		
-		// TODO: handle required property content_id
-		this.$router.push({name: this.getInitialRoute()});
 	},
 	beforeUnmount() {
 		document.removeEventListener('click', this.handleClick);
