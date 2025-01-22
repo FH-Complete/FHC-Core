@@ -993,9 +993,9 @@ class DB_Model extends CI_Model
 						// with the postgresql decryption function
 						$query = preg_replace_callback(
 							'/(?<! (as|AS) )\b(\w+\.)?(' . $encryptedColumn . ')\b/',
-							function($matches) {
+							function($matches) use (&$decryptionPassword, &$definition) {
 							    $aliased_column = $matches[2] . $matches[3];
-								sprintf(
+								return sprintf(
 									self::CRYPT_WHERE_TEMPLATE,
 									$aliased_column,
 									$decryptionPassword,
@@ -1111,9 +1111,9 @@ class DB_Model extends CI_Model
 							// with the postgresql decryption function
 							$where = preg_replace_callback(
 								'/(?<! (as|AS) )\b(\w+\.)?(' . $encryptedColumn . ')\b/',
-								function($matches) {
+								function($matches) use (&$decryptionPassword, &$definition) {
 									$aliased_column = $matches[2] . $matches[3];
-									sprintf(
+									return sprintf(
 										self::CRYPT_WHERE_TEMPLATE,
 										$aliased_column,
 										$decryptionPassword,
