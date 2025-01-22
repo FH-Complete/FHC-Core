@@ -16,7 +16,7 @@ $includesArray = array(
 	'customCSSs' => [
 		'public/css/components/vue-datepicker.css',
 		'public/css/components/primevue.css',
-/*		'public/css/Vertragsverwaltung.css'*/
+		'public/css/Vertragsverwaltung.css'
 	],
 	'customJSs' => [
 		#'vendor/npm-asset/primevue/tree/tree.min.js',

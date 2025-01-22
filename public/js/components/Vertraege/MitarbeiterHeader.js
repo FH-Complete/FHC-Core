@@ -132,7 +132,7 @@ export default {
 		},
 	},
 	template: `
-	<div class="core-mitarbeiter h-100 d-flex flex-column">
+	<div class="core-mitarbeiter-header">
 		<h4>{{$p.t('vertrag', 'vertragsverwaltung')}}</h4>
 		
 <!--	filter: show only active employees-->

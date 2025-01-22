@@ -194,9 +194,10 @@ export default {
 	},
 	template: `
 
-	<div class="ore-contracts-details h-50 d-flex flex-column w-100">
+	<div class="ore-contracts-details h-50 d-flex flex-column w-100 mt-2">
+<!--	<div class="core-contracts-details vv">-->
 	<br>		
-		<h4>{{$p.t('vertrag', 'vertragDetails')}}</h4>
+		<h5>{{$p.t('vertrag', 'vertragDetails')}}</h5>
 	
 		<core-filter-cmpt
 			ref="table"

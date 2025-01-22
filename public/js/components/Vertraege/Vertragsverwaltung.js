@@ -1,6 +1,6 @@
 import MitarbeiterHeader from "./MitarbeiterHeader.js";
 import MitarbeiterDetails from "./MitarbeiterDetails.js";
-import Vertraege from "./Vertraege.js";
+import VertraegeMitarbeiter from "./Vertraege.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 
 export default {
@@ -8,11 +8,11 @@ export default {
 		VerticalSplit,
 		MitarbeiterHeader,
 		MitarbeiterDetails,
-		Vertraege
+		VertraegeMitarbeiter
 	},
 	props: {
 		config: Object,
-		permissions: Object, //TODO(Manu)
+		permissions: Object,
 	},
 	provide() {
 		return {
@@ -38,24 +38,23 @@ export default {
 		}
 	},
 	template: `
-<div>
+<div class="vv">
 	<div class="container-fluid overflow-hidden">
-		<div class="row h-100">
 			<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
-				<vertical-split>
+				<vertical-split ref="vsplit">
 					<template #top>	
-						<MitarbeiterHeader :filterMa="filterMa" :vertragsarten="vertragsarten" @selectedPerson="selectPerson" />
+	<!--					<div class="d-flex flex-column" style="height: 100%;">-->
+							<MitarbeiterHeader :filterMa="filterMa" :vertragsarten="vertragsarten" @selectedPerson="selectPerson" />
+<!--						</div>-->
 					</template>
 					<template #bottom>
 						<div class="col" v-if="person_id!=null">
 							<mitarbeiter-details :person_id="person_id"></mitarbeiter-details>
-							<h5>Verträge</h5>
-							<Vertraege :endpoint="$fhcApi.factory.vertraege.person" :person_id="this.person_id"/>
+							<VertraegeMitarbeiter :endpoint="$fhcApi.factory.vertraege.person" :person_id="this.person_id"/>
 						</div>
 					<template>
 				</vertical-split>
 			</main>	
-			</div>
 		</div>
 	</div>
 	`

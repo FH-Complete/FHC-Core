@@ -214,9 +214,9 @@ export default {
 		}
 	},
 	template: `
-	<div class="core-contracts-status h-50 d-flex flex-column w-100">
+	<div class="core-contracts-status h-50 d-flex flex-column w-100 mt-2">
 		<br>
-		<h4>{{$p.t('vertrag', 'vertragStatus')}}</h4>
+		<h5>{{$p.t('vertrag', 'vertragStatus')}}</h5>
 	
 		<core-filter-cmpt
 			ref="table"
