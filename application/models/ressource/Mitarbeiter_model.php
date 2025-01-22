@@ -103,31 +103,32 @@ class Mitarbeiter_model extends DB_Model
 	 *
 	 * @return array
 	 */
-	public function getPersonenWithContractDetails($person_id=null)
+	public function getPersonenWithContractDetails($person_id = null)
 	{
 		$qry = "
-		SELECT
-			 b.uid , p.person_id,
-			p.vorname, p.nachname,
-			TO_CHAR(gebdatum::timestamp, 'DD.MM.YYYY') AS format_gebdatum,
-			COALESCE(b.alias, b.uid) AS email, 
-			STRING_AGG(DISTINCT va.bezeichnung, ', ') AS Vertragsarten,
-			STRING_AGG(DISTINCT u.bezeichnung, ', ') AS Unternehmen,
-			STRING_AGG(d.dienstverhaeltnis_id::TEXT, ', ') AS ids,
-			b.aktiv
---			CASE WHEN b.aktiv=true THEN 'aktiv'
---			 	 ELSE 'nicht aktiv'
---				 END as status //not working in header filter	*/	  
-		    FROM 
-			    hr.tbl_dienstverhaeltnis d 
-		    JOIN 
-			    public.tbl_benutzer b ON d.mitarbeiter_uid = b.uid 
-		    JOIN 
-			    public.tbl_person p ON p.person_id = b.person_id 
-		    JOIN
-			    public.tbl_organisationseinheit u ON d.oe_kurzbz = u.oe_kurzbz
-		    JOIN
-			    hr.tbl_vertragsart va ON d.vertragsart_kurzbz = va.vertragsart_kurzbz ";
+			SELECT
+				 b.uid , p.person_id,
+				p.vorname, p.nachname,
+				TO_CHAR(gebdatum::timestamp, 'DD.MM.YYYY') AS format_gebdatum,
+				COALESCE(b.alias, b.uid) AS email,
+				STRING_AGG(DISTINCT va.bezeichnung, ', ') AS Vertragsarten,
+				STRING_AGG(DISTINCT u.bezeichnung, ', ') AS Unternehmen,
+				STRING_AGG(d.dienstverhaeltnis_id::TEXT, ', ') AS ids,
+				b.aktiv
+	--			CASE WHEN b.aktiv=true THEN 'aktiv'
+	--			 	 ELSE 'nicht aktiv'
+	--				 END as status //not working in header filter	*/  
+				FROM
+					hr.tbl_dienstverhaeltnis d
+				JOIN
+					public.tbl_benutzer b ON d.mitarbeiter_uid = b.uid
+				JOIN
+					public.tbl_person p ON p.person_id = b.person_id
+				JOIN
+					public.tbl_organisationseinheit u ON d.oe_kurzbz = u.oe_kurzbz
+				JOIN
+					hr.tbl_vertragsart va ON d.vertragsart_kurzbz = va.vertragsart_kurzbz
+			    ";
 
 		if($person_id)
 		{
@@ -135,12 +136,11 @@ class Mitarbeiter_model extends DB_Model
 		}
 
 		$qry.= " 
-		GROUP BY 
-    		b.uid, p.person_id, p.vorname, p.nachname, b.alias
-		 ORDER BY
-			    p.nachname, p.vorname; ";
-
-
+			GROUP BY
+				b.uid, p.person_id, p.vorname, p.nachname, b.alias
+			 ORDER BY
+					p.nachname, p.vorname;
+			    ";
 
 		$params = array($person_id);
 
@@ -154,56 +154,47 @@ class Mitarbeiter_model extends DB_Model
 	 *
 	 * @return Array benutzerfunktionsdata
 	 */
-	function getPersonAbteilung($person_id)
+	public function getPersonAbteilung($person_id)
 	{
-		//TODO(Manu) use function getMitarbeiter_uid
-		$qry = "
-        SELECT tbl_benutzer.uid
-        FROM tbl_mitarbeiter
-            JOIN tbl_benutzer ON CAST(tbl_mitarbeiter.mitarbeiter_uid AS TEXT) = CAST(tbl_benutzer.uid AS TEXT)
-            JOIN tbl_person USING (person_id)
-        WHERE tbl_person.person_id = ?
-    ";
-		$result = $this->execQuery($qry, [$person_id]);
-
-		$data = getData($result);
-		if (empty($data)) {
-			return null; // No UID found
-		}
-
-		$uid = isset($data[0]->uid) ? $data[0]->uid : null;
-
+		$uid = $this->getMitarbeiterUid($person_id);
 		if (!$uid) {
-			return null; // UID extraction failed
+			return null;
 		}
+		$qry = "
+			SELECT
+				bf.benutzerfunktion_id, bf.fachbereich_kurzbz, bf.uid, bf.funktion_kurzbz, bf.updateamum,
+				bf.updatevon, bf.insertamum, bf.insertvon, bf.ext_id, bf.semester, bf.oe_kurzbz,
+				bf.datum_von, bf.datum_bis, bf.bezeichnung, bf.wochenstunden,
+				oe.oe_kurzbz, oe.oe_parent_kurzbz, oe.bezeichnung,
+				oe.organisationseinheittyp_kurzbz, oe.aktiv, oe.mailverteiler,
+				oe.freigabegrenze, oe.kurzzeichen, oe.lehre, oe.standort,
+				oe.warn_semesterstunden_frei, oe.warn_semesterstunden_fix, oe.standort_id
+			FROM tbl_benutzerfunktion bf
+			JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
+			WHERE uid = ?
+				AND funktion_kurzbz = 'oezuordnung'
+				AND datum_von <= NOW()
+				AND (datum_bis IS NULL OR datum_bis >= NOW())
+		";
+		$result = $this->execQuery($qry, [$uid]);
 
-		// Second Query
-		$qry2 = "
-        SELECT
-            bf.benutzerfunktion_id, bf.fachbereich_kurzbz, bf.uid, bf.funktion_kurzbz, bf.updateamum,
-            bf.updatevon, bf.insertamum, bf.insertvon, bf.ext_id, bf.semester, bf.oe_kurzbz, 
-            bf.datum_von, bf.datum_bis, bf.bezeichnung, bf.wochenstunden,
-            oe.oe_kurzbz, oe.oe_parent_kurzbz, oe.bezeichnung, 
-            oe.organisationseinheittyp_kurzbz, oe.aktiv, oe.mailverteiler, 
-            oe.freigabegrenze, oe.kurzzeichen, oe.lehre, oe.standort, 
-            oe.warn_semesterstunden_frei, oe.warn_semesterstunden_fix, oe.standort_id
-        FROM tbl_benutzerfunktion bf
-        JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
-        WHERE uid = ? 
-            AND funktion_kurzbz = 'oezuordnung'
-            AND datum_von <= NOW() 
-            AND (datum_bis IS NULL OR datum_bis >= NOW())
-    ";
-		$result2 = $this->execQuery($qry2, [$uid]);
-
-		return $result2;
+		return $result;
 	}
 
-	function getLeitungOrg($oe_kurzbz)
+	/**
+	 * get Leitung / Vorgesetzten of current OE
+	 *
+	 * @param $oe_kurzbz
+	 *
+	 * @return Array persondata / benutzerfunktionsdata
+	 */
+	public function getLeitungOrg($oe_kurzbz)
 	{
 		$qry = "
-            SELECT bf.benutzerfunktion_id,bf.fachbereich_kurzbz,bf.uid,bf.funktion_kurzbz,bf.updateamum,bf.updatevon,bf.insertamum,bf.insertvon,bf.ext_id,bf.semester,bf.oe_kurzbz,bf.datum_von,bf.datum_bis,bf.bezeichnung,bf.wochenstunden,
-                p.person_id, p.vorname,p.nachname,p.titelpre,p.titelpost
+            SELECT bf.benutzerfunktion_id,bf.fachbereich_kurzbz,bf.uid,bf.funktion_kurzbz,
+                   bf.updateamum,bf.updatevon,bf.insertamum,bf.insertvon,bf.ext_id,bf.semester,
+                   bf.oe_kurzbz,bf.datum_von,bf.datum_bis,bf.bezeichnung,bf.wochenstunden,
+                   p.person_id, p.vorname,p.nachname,p.titelpre,p.titelpost
             FROM public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
             JOIN public.tbl_benutzer b USING (uid) JOIN public.tbl_mitarbeiter ma ON(b.uid=ma.mitarbeiter_uid)
             JOIN public.tbl_person p  USING(person_id)
@@ -214,7 +205,14 @@ class Mitarbeiter_model extends DB_Model
 		return $this->execQuery($qry, array($oe_kurzbz));
 	}
 
-	function getHeader($person_id)
+	/**
+	 * get persondata for person_id
+	 *
+	 * @param $oe_kurzbz
+	 *
+	 * @return Array persondata
+	 */
+	public function getHeader($person_id)
 	{
 		$qry = "
 			SELECT
@@ -371,10 +369,8 @@ class Mitarbeiter_model extends DB_Model
 		return $this->execQuery($qry);
 	}
 
-	public function getMitarbeiter_uid($person_id){
-		//TODO(Manu) refactor function
-		//and use in function getPersonAbteilung
-		//check function in Vertraege.php
+	public function getMitarbeiterUid($person_id)
+	{
 		$qry = "
         SELECT tbl_benutzer.uid
         FROM tbl_mitarbeiter
@@ -388,10 +384,6 @@ class Mitarbeiter_model extends DB_Model
 		if (empty($data)) {
 			return null; // No UID found
 		}
-		//else
-		//	$data = current($data);
-
-	//	$uid = $data->uid;
 
 		$uid = isset($data[0]->uid) ? $data[0]->uid : null;
 		return $uid;

@@ -452,7 +452,7 @@ export default {
 		},
 		//methods for functionality ADDON KU
 		printContract(){
-			this.getMitarbeiter_uid().then(()=> {
+			this.getMitarbeiterUid().then(()=> {
 				//check if at least 2 contracts chosen
 				if(this.arraySelectedContracts.length < 2) {
 					this.$fhcAlert.alertError(this.$p.t('vertrag', 'alertMindestensZweiVertraege'));
@@ -478,9 +478,9 @@ export default {
 				window.open(linkToPdf, '_blank');
 				});
 		},
-		getMitarbeiter_uid(){
+		getMitarbeiterUid(){
 			return this.endpoint
-				.getMitarbeiter_uid(this.person_id)
+				.getMitarbeiterUid(this.person_id)
 				.then(response => {
 					this.ma_uid = response.data;
 				})

@@ -52,7 +52,8 @@ export default {
 			return this.$fhcApi.factory.vertraege.person
 				.getHeader(person_id)
 				.then(result => {
-					this.headerData = result.data[0];
+					this.headerData = result.data;
+
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -60,7 +61,7 @@ export default {
 			return this.$fhcApi.factory.vertraege.person
 				.getPersonAbteilung(person_id)
 				.then(result => {
-					this.departmentData = result.data[0];
+					this.departmentData = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -68,7 +69,7 @@ export default {
 			return this.$fhcApi.factory.vertraege.person
 				.getLeitungOrg(oekurzbz)
 				.then(result => {
-					this.leitungData = result.data[0];
+					this.leitungData = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		}

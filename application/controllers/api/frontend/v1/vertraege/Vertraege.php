@@ -670,17 +670,9 @@ class Vertraege extends FHCAPI_Controller
 
 		$result = $this->Mitarbeitermodel->getPersonAbteilung($person_id);
 
-		if (isError($result))
-		{
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		if (!hasData($result))
-		{
-			//TODO(Manu) rewrite better
-			return $this->terminateWithSuccess("no benutzerdata", self::ERROR_TYPE_GENERAL);
+		$data = $this->getDataOrTerminateWithError($result);
 
-		}
-		return $this->terminateWithSuccess(getData($result));
+		$this->terminateWithSuccess(current($data));
 	}
 
 	public function getLeitungOrg($oekurzbz)
@@ -689,18 +681,9 @@ class Vertraege extends FHCAPI_Controller
 
 		$result = $this->Mitarbeitermodel->getLeitungOrg($oekurzbz);
 
-		if (isError($result))
-		{
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		if (!hasData($result))
-		{
-			//TODO(Manu) rewrite better
-			return $this->terminateWithSuccess("no benutzerdata", self::ERROR_TYPE_GENERAL);
+		$data = $this->getDataOrTerminateWithError($result);
 
-		//	return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'personID']), self::ERROR_TYPE_GENERAL);
-		}
-		return $this->terminateWithSuccess(getData($result));
+		$this->terminateWithSuccess(current($data));
 	}
 
 	public function getHeader($person_id)
@@ -709,38 +692,20 @@ class Vertraege extends FHCAPI_Controller
 
 		$result = $this->Mitarbeitermodel->getHeader($person_id);
 
-		if (isError($result))
-		{
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		if (!hasData($result))
-		{
-				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'personID']), self::ERROR_TYPE_GENERAL);
-		}
+		$data = $this->getDataOrTerminateWithError($result);
 
-		return $this->terminateWithSuccess(getData($result));
+		$this->terminateWithSuccess(current($data));
 	}
 
 
-	public function getMitarbeiter_uid($person_id)
+	public function getMitarbeiterUid($person_id)
 	{
 		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
 
 		$result = $this->Mitarbeitermodel->getMitarbeiter_uid($person_id);
 
-		if (isError($result))
-		{
-			//TODO(Manu) check ErrorLogic
-			return $this->terminateWithSuccess($result);
-			//return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		if (!hasData($result))
-		{
-			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'personID']), self::ERROR_TYPE_GENERAL);
-		}
+		$data = $this->getDataOrTerminateWithError($result);
 
-		return $this->terminateWithSuccess($result);
+		$this->terminateWithSuccess($data);
 	}
-
-
 }

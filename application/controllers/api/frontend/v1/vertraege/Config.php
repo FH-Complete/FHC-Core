@@ -34,11 +34,12 @@ class Config extends FHCAPI_Controller
 		]);
 	}
 
-	public function printDocument() {
-
+	public function printDocument()
+	{
 		$params = [];
 
-		Events::trigger('multiActionPrintHonorarvertrag',
+		Events::trigger(
+			'multiActionPrintHonorarvertrag',
 			// passing $menu per reference
 			function & () use (&$menu) {
 				return $menu;
@@ -48,5 +49,4 @@ class Config extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($menu[0]);
 	}
-
 }

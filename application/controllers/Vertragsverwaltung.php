@@ -4,8 +4,6 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vertragsverwaltung extends Auth_Controller
 {
-
-	//TODO(Manu) Permissions
 	public function __construct()
 	{
 		$permissions = [];
@@ -24,7 +22,7 @@ class Vertragsverwaltung extends Auth_Controller
 	{
 		$this->load->view('Vertragsverwaltung', [
 			'permissions' => [
-				'vertragsverwaltung_schreibrechte' => $this->permissionlib->isBerechtigt('vertrag/mitarbeiter','suid')
+				'vertragsverwaltung_schreibrechte' => $this->permissionlib->isBerechtigt('vertrag/mitarbeiter', 'suid')
 			]
 		]);
 	}
