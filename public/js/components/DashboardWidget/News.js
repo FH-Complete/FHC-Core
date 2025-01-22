@@ -11,10 +11,14 @@ export default {
 	data: () => ({
 		allNewsList: [],
 		singleNews: {},
-		selected: null
+		selected: null,
+		size:0,
 	}),
 	mixins: [AbstractWidget],
 	computed: {
+		sizeClass() {
+			return 'fhc-news-' + ['xs', 'sm', 'md', 'lg'][this.size];
+		},
 		getNewsWidgetStyle() {
 			return this.width == 1 ? "padding: 1rem 1rem;" : "padding: 0px;"
 		},
@@ -162,12 +166,29 @@ export default {
 		this.carouselInstance = new bootstrap.Carousel(this.$refs.carousel, {
 			wrap: false, // keep this off even though it actually wraps
 			interval: false
-		})
+		});
+
+		if (this.$refs.container) {
+			new ResizeObserver(entries => {
+				console.log(entries,"this are the entries")
+				for (const entry of entries) {
+					let w = entry.contentBoxSize ? entry.contentBoxSize[0].inlineSize : entry.contentRect.width;
+					// TODO(chris): rework sizing
+					if (w > 600)
+						this.size = 3;
+					else if (w > 350)
+						this.size = 2;
+					else if (w > 250)
+						this.size = 1;
+					else
+						this.size = 0;
+				}
+			}).observe(this.$refs.container);
+		}
 	},
 	template: /*html*/ `
-<div class="widgets-news h-100" :style="getNewsWidgetStyle">
+<div ref="container" class="widgets-news h-100" :class="sizeClass" :style="getNewsWidgetStyle">
     <div class="d-flex flex-column h-100">
-
         <div class="h-100" style="overflow-y: auto" v-if="width == 1">
             <div  v-for="(news, index) in newsList" :key="news.news_id" class="mt-2">
                 <div v-if="index > 0 " class="fhc-seperator"></div>
@@ -178,15 +199,17 @@ export default {
         <div v-else class="row h-100 g-0">
         	<div :class="'col-'+(width == 2? 6 : 4) + ' h-100 g-0'" style="overflow: auto;">
         		<template v-for="news in newsList" :key="'menu-'+news.news_id">
-					<div class="row fhc-news-menu-item" @click="setSelected(news)" :class="getMenuItemClass(news)" style="margin-right: 0px; margin-left: 0px; overflow-y: hidden;">
-						<div class="col-8 fhc-news-menu-item-betreff">
-							<p >
-								{{news.content_obj.betreff ?? ''}}
-							</p>
+					<div class="position-relative">
+						<div class="row fhc-news-menu-item " @click="setSelected(news)" :class="getMenuItemClass(news)" style="margin-right: 0px; margin-left: 0px; overflow-y: hidden;">
+							<div class="col-8 fhc-news-menu-item-betreff">
+								<p class="fhc-news-text mb-0">
+									{{news.content_obj.betreff ?? ''}}
+								</p>
+							</div>
+							<span style="top:2px; right:0" class=" position-absolute d-none d-xl-block fhc-news-text fhc-news-menu-item-date fw-bold">
+								{{ news.datumformatted ?? ''}}
+							</span>
 						</div>
-						<span class="fhc-news-menu-item-date fw-bold">
-							{{ news.datumformatted ?? ''}}
-						</span>
 					</div>
 				</template>
 			</div>
