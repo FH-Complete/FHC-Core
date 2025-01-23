@@ -223,12 +223,12 @@ export default {
 
 							</div>
 						</div>
-						<button @click="setPrev" style="z-index: 100; color: black; overflow: hidden; width: 10%; margin-left: 5%;" data-bs-target="#carouselExample" class="carousel-control-prev" type="button">
+						<button @click="setPrev" @focus="$event.target.blur()" style="z-index: 100; color: black; overflow: hidden; margin-left: 10px; width:35px;" data-bs-target="#carouselExample" class="carousel-control-prev" type="button">
 							<div class="border rounded-circle" style="padding-left: 0.4rem; padding-right: 0.4rem; background-color:rgba(138,138,138,0.4)">
 								<i class="fa fa-chevron-left"></i>
 							</div>
 						</button>
-						<button @click="setNext" style="z-index: 100; color: black; overflow: hidden; width: 10%; margin-right: 5%;" data-bs-target="#carouselExample" class="carousel-control-next"  type="button">
+						<button @click="setNext" @focus="$event.target.blur()" style="z-index: 100; color: black; overflow: hidden; margin-right: 10px; width:35px;" data-bs-target="#carouselExample" class="carousel-control-next"  type="button">
 							<div class="border rounded-circle" style="padding-left: 0.4rem; padding-right: 0.4rem; background-color:rgba(138,138,138,0.4)">
 								<i class="fa fa-chevron-right"></i>
 							</div>
