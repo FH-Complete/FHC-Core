@@ -24,7 +24,7 @@ ON CONFLICT(valorisierung_methode_kurzbz) DO NOTHING;
 		if (! $db->db_query($qry))
 			echo '<strong>Valorisierung: ' . $db->db_last_error() . '</strong><br>';
 		else
-			echo 'hr.tbl_valorisierung_methode wurden neu erstellt<br>';
+			echo 'hr.tbl_valorisierung_methode wurde neu erstellt<br>';
 	}
 }
 
@@ -56,7 +56,7 @@ GRANT SELECT,UPDATE ON SEQUENCE hr.tbl_valorisierung_instanz_valorisierung_insta
 		if (! $db->db_query($qry))
 			echo '<strong>Valorisierung: ' . $db->db_last_error() . '</strong><br>';
 		else
-			echo 'hr.tbl_valorisierung_instanz wurden neu erstellt<br>';
+			echo 'hr.tbl_valorisierung_instanz wurde neu erstellt<br>';
 	}
 }
 
