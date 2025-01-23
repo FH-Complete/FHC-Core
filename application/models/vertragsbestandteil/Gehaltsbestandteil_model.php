@@ -130,9 +130,11 @@ LEFT JOIN
 			$this->getEncryptedColumns());
     }
 	
-	public function getGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
+	public function getGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null, 
+		$includefuture=false, $withvalorisationhistory=true)
 	{
-		if( !is_null($stichtag) && (time() > strtotime($stichtag)) ) 
+		if( !is_null($stichtag) && (time() > strtotime($stichtag)) 
+			&& $withvalorisationhistory !== false ) 
 		{
 			$query = $this->getGehaltsbestandteileMitValorisierungsHistorie(
 				$dienstverhaeltnis_id, $stichtag, $includefuture
