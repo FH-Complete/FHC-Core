@@ -371,21 +371,21 @@ class FilterCmptLib
 			foreach ($filterFields as $filterField)
 			{
 				// If not an empty array
-				if ($filterField != null)
+				if (!isEmptyArray($filterField))
 				{
 					//
-					if (isset($filterField->name) && isset($filterField->operation) && isset($filterField->condition)
-						&& !isEmptyString($filterField->name) && !isEmptyString($filterField->operation)
-						&& !isEmptyString($filterField->condition))
+					if (isset($filterField['name']) && isset($filterField['operation']) && isset($filterField['condition'])
+						&& !isEmptyString($filterField['name']) && !isEmptyString($filterField['operation'])
+						&& !isEmptyString($filterField['condition']))
 					{
 						// Fine
 						$filter = new stdClass();
-						$filter->name = $filterField->name;
-						$filter->operation = $filterField->operation;
-						$filter->condition = $filterField->condition;
-						if (isset($filterField->option) && !isEmptyString($filterField->option))
+						$filter->name = $filterField['name'];
+						$filter->operation = $filterField['operation'];
+						$filter->condition = $filterField['condition'];
+						if (isset($filterField['option']) && !isEmptyString($filterField['option']))
 						{
-							$filter->option = $filterField->option;
+							$filter->option = $filterField['option'];
 						}
 						else
 						{
