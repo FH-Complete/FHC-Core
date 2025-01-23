@@ -41,6 +41,11 @@ class VertragsbestandteilLib
 
 	protected $loggedInUser;
 
+	/**
+	 * @var PermissionLib
+	 */
+	protected $PermissionLib;
+
 	public function __construct()
 	{
 		$this->loggedInUser = getAuthUID();
@@ -57,6 +62,8 @@ class VertragsbestandteilLib
 		$this->CI->load->library('vertragsbestandteil/GehaltsbestandteilLib',
 			null, 'GehaltsbestandteilLib');
 		$this->GehaltsbestandteilLib = $this->CI->GehaltsbestandteilLib;
+		$this->CI->load->library('PermissionLib', null, 'PermissionLib');
+		$this->PermissionLib = $this->CI->PermissionLib;
 	}
 
 	public function handleGUIData($guidata, $employeeUID, $userUID)
@@ -93,7 +100,12 @@ class VertragsbestandteilLib
 	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
 	{
 		$vbs = $this->VertragsbestandteilModel->getVertragsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
-		$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
+		$dv = $this->fetchDienstverhaeltnis($dienstverhaeltnis_id);
+		$gbs = array();
+		if($dv && $this->PermissionLib->isberechtigt('basis/gehaelter', 's', $dv->getOe_kurzbz())) 
+		{
+			$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
+		}
 
 		$gbsByVBid = array();
 		foreach( $gbs as $gb )
