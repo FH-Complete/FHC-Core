@@ -2,13 +2,17 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
+import MobilityPurpose from './List/Purpose.js';
+//import LocalPurpose from './List/PurposesLocal.js';
 
 export default {
 	components: {
 		CoreFilterCmpt,
 		BsModal,
 		FormForm,
-		FormInput
+		FormInput,
+		MobilityPurpose,
+//		LocalPurpose
 	},
 	inject: {
 		$reloadList: {
@@ -51,7 +55,7 @@ export default {
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.title = this.$p.t('ui', 'bearbeiten');
 							button.addEventListener('click', (event) =>
-								this.actionEditMobility(cell.getData().mobility_id)
+								this.actionEditMobility(cell.getData().bisio_id)
 							);
 							container.append(button);
 
@@ -60,7 +64,7 @@ export default {
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('ui', 'loeschen');
 							button.addEventListener('click', () =>
-								this.actionDeleteMobility(cell.getData().mobility_id)
+								this.actionDeleteMobility(cell.getData().bisio_id)
 							);
 							container.append(button);
 
@@ -73,7 +77,7 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				selectable: true,
-				index: 'mobility_id',
+				index: 'bisio_id',
 				persistenceID: 'stv-details-table_mobiliy'
 			},
 			tabulatorEvents: [
@@ -121,8 +125,8 @@ export default {
 						// cm.getColumnByField('pruefungstyp_kurzbz').component.updateDefinition({
 						// 	title: this.$p.t('global', 'typ')
 						// });
-						// cm.getColumnByField('mobility_id').component.updateDefinition({
-						// 	title: this.$p.t('ui', 'mobility_id')
+						// cm.getColumnByField('bisio_id').component.updateDefinition({
+						// 	title: this.$p.t('ui', 'bisio_id')
 						// });
 						/*
 						cm.getColumnByField('actions').component.updateDefinition({
@@ -135,12 +139,17 @@ export default {
 			formData: {
 				von: new Date(),
 				bis: new Date(),
-				mobilitaetsprogramm: 7,
+				mobilitaetsprogramm_code: 7,
 				gastnation: 'A',
 				herkunftsland: 'A',
+				bisio_id: null,
+				localPurposes: []
 			},
 			statusNew: true,
 			programsMobility: [],
+			listLvs: [],
+			listPurposes: [],
+			listSupports: [],
 		}
 	},
 	watch: {
@@ -151,38 +160,39 @@ export default {
 		}
 	},
 	methods: {
-		getStudiengangsTyp(){
-			this.stgTyp = '';
-			this.$fhcApi.factory.stv.mobility.getTypStudiengang(this.stg_kz)
-					.then(result => this.stgTyp = result.data)
-					.catch(this.$fhcAlert.handleSystemError);
-		},
 		actionNewMobility() {
 			this.resetForm();
 			this.statusNew = true;
 			//this.setDefaultFormData();
 		},
-		actionEditMobility(mobility_id) {
+		actionEditMobility(bisio_id) {
 			this.resetForm();
+		//	this.formData.bisio_id = bisio_id;
 			this.statusNew = false;
-			this.loadMobility(mobility_id);
+			this.loadMobility(bisio_id);
 		},
-		actionDeleteMobility(mobility_id) {
+		actionDeleteMobility(bisio_id) {
 			this.$fhcAlert
 				.confirmDelete()
 				.then(result => result
-					? mobility_id
+					? bisio_id
 					: Promise.reject({handled: true}))
-				.then(this.deletemobility)
+				.then(this.deleteMobility(bisio_id))
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewMobility() {
+			//TODO(Manu) um localPurposes erweitern
+/*			console.log(this.formData.localPurposes[0]);
+			if(this.formData.localPurposes.length){
+				this.$fhcAlert.alertSuccess('nach speichern purposes mit neuer bisio_id zusammenführen');
+				return;
+			}*/
 			const dataToSend = {
 				uid: this.student.uid,
 				formData: this.formData
 			};
-
-			return this.$refs.formFinalExam.factory.stv.mobility.addNewmobility(dataToSend)
+			return this.$fhcApi.factory.stv.mobility.addNewMobility(dataToSend)
+			//return this.$refs.formMobility.factory.stv.mobility.addNewMobility(dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetForm();
@@ -195,22 +205,22 @@ export default {
 		reload() {
 			this.$refs.table.reloadTable();
 		},
-		loadMobility(mobility_id) {
-			return this.$fhcApi.factory.stv.mobility.loadmobility(mobility_id)
+		loadMobility(bisio_id) {
+			return this.$fhcApi.factory.stv.mobility.loadMobility(bisio_id)
 				.then(result => {
+
 					this.formData = result.data;
-					//TODO(Manu) check if cisRoot is okay
-					this.formData.link = this.cisRoot + 'index.ci.php/lehre/Pruefungsprotokoll/showProtokoll?mobility_id=' + this.formData.mobility_id + '&fhc_controller_id=67481e5ed5490';
-					return result;
+					console.log("after");
+					//return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		updateMobility(mobility_id) {
+		updateMobility(bisio_id) {
 			const dataToSend = {
-				id: mobility_id,
-				formData: this.formData
+				formData: this.formData,
+				uid: this.student.uid,
 			};
-			return this.$refs.formFinalExam.factory.stv.mobility.updatemobility(dataToSend)
+			return this.$fhcApi.factory.stv.mobility.updateMobility(dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetForm();
@@ -220,8 +230,9 @@ export default {
 					this.reload();
 				});
 		},
-		deleteMobility(mobility_id) {
-			return this.$fhcApi.factory.stv.mobility.deletemobility(mobility_id)
+		deleteMobility(bisio_id) {
+			//TODO(Manu) prompt wird nicht abgewartet!
+			return this.$fhcApi.factory.stv.mobility.deleteMobility(bisio_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				})
@@ -231,8 +242,73 @@ export default {
 				});
 		},
 		resetForm() {
-			this.formData = null;
+			this.formData = {};
+			this.formData.von = new Date();
+			this.formData.bis = new Date();
+			this.formData.mobilitaetsprogramm_code = 7;
+			this.formData.gastnation = 'A';
+			this.formData.herkunftsland = 'A';
+			this.formData.bisio_id = null;
+			this.formData.localPurposes = [];
 		},
+		// --- methods purposes ---
+		addMobilityPurpose({zweck_code, bisio_id}){
+			let params = {
+				bisio_id : bisio_id,
+				zweck_code: zweck_code
+			};
+			return this.$fhcApi.factory.stv.mobility.addMobilityPurpose(params)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+
+					this.$refs.purposes.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		deleteMobilityPurpose({zweck_code, bisio_id}){
+			let params = {
+				bisio_id : bisio_id,
+				zweck_code: zweck_code
+			};
+			return this.$fhcApi.factory.stv.mobility.deleteMobilityPurpose(params)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+
+					this.$refs.purposes.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		addPurposeToMobility({zweck_code}){
+
+			console.log("localPurposes befüllen: " , zweck_code);
+			this.formData.localPurposes.push(zweck_code);
+/*			this.formData.firstPurpose = zweck_code;
+			this.$refs.purposes.closeModal();*/
+		},
+/*		addPurposeToMobility(purpose) {
+			this.localPurposes.push(purpose);
+		},*/
+		//lokale Variante
+/*		async saveAllChanges() {
+			try {
+				const savedData = await this.$fhcApi.factory.stv.mobility.savePurposes({
+					id: this.bisio_id,
+					purposes: this.localData.filter(item => !item.zweck_code.startsWith('temp_')) // Nur echte IDs senden
+				});
+
+				// Synchronisiere temporäre IDs mit echten Daten
+				savedData.forEach((item) => {
+					const localItem = this.localData.find(local => local.zweck_code === item.tempId);
+					if (localItem) {
+						localItem.zweck_code = item.zweck_code; // Aktualisiere die echte ID
+					}
+				});
+
+				this.updateTabulatorData();
+			} catch (error) {
+				console.error('Fehler beim Speichern der Änderungen:', error);
+			}
+		},*/
 	},
 	created() {
 		this.$fhcApi.factory.stv.mobility.getProgramsMobility()
@@ -240,12 +316,36 @@ export default {
 				this.programsMobility = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+		this.$fhcApi.factory.stv.mobility.getLVList(this.student.studiengang_kz)
+			.then(result => {
+				this.listLvs = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		this.$fhcApi.factory.stv.mobility.getListPurposes()
+			.then(result => {
+				this.listPurposes = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		this.$fhcApi.factory.stv.mobility.getListSupports()
+			.then(result => {
+				this.listSupports = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-details-mobility h-100 pb-3">
 		<h4>In/out</h4>
 		
+<!--		{{listSupports}}-->
+		<hr>
 		{{formData}}
+<!--		
+		<hr>
+		
+		{{listPurposes}}-->
+		
+<!--		{{programsMobility}}-->
+<!--		{{listLvs}}-->
 	
 
 		<core-filter-cmpt
@@ -257,7 +357,7 @@ export default {
 			reload
 			new-btn-show
 			new-btn-label="Mobilität"
-			@click:new="actionNewmobility"
+			@click:new="actionNewMobility"
 			>
 		</core-filter-cmpt>
 
@@ -281,6 +381,7 @@ export default {
 					:teleport="true"
 					>
 				</form-input>
+				
 				<form-input
 					container-class="col-6 stv-details-mobility-typ"
 					:label="$p.t('lehre', 'lehrveranstaltung')"
@@ -288,13 +389,13 @@ export default {
 					v-model="formData.lehrveranstaltung"
 					name="lehrveranstaltung"
 					>
-<!--					<option
-						v-for="typ in arrTypen"
-						:key="typ.pruefungstyp_kurzbz"
-						:value="typ.pruefungstyp_kurzbz"
+					<option
+						v-for="lv in listLvs"
+						:key="lv.lehrveranstaltung_id"
+						:value="lv.lehrveranstaltung_id"
 						>
-						{{typ.beschreibung}}
-					</option>-->
+						{{lv.bezeichnung}} - Semester {{lv.semester}}
+					</option>
 				</form-input>
 			</div>
 			
@@ -333,8 +434,8 @@ export default {
 					container-class="col-6 stv-details-mobility-mobilitaetsprogramm"
 					:label="$p.t('mobility', 'mobilitaetsprogramm')"
 					type="select"
-					v-model="formData.mobilitaetsprogramm"
-					name="mobilitaetsprogramm"
+					v-model="formData.mobilitaetsprogramm_code"
+					name="mobilitaetsprogramm_code"
 					>
 					<option
 						v-for="mob in programsMobility"
@@ -347,17 +448,11 @@ export default {
 				<form-input
 					container-class="col-6 stv-details-mobility-ort"
 					:label="$p.t('person', 'ort')"
-					type="select"
+					type="text"
 					v-model="formData.ort"
 					name="ort"
 					>
-<!--					<option
-						v-for="typ in arrTypen"
-						:key="typ.pruefungstyp_kurzbz"
-						:value="typ.pruefungstyp_kurzbz"
-						>
-						{{typ.beschreibung}}
-					</option>-->
+
 				</form-input>
 			</div>
 			
@@ -366,7 +461,7 @@ export default {
 					container-class="col-6 stv-details-mobility-gastnation"
 					:label="$p.t('mobility', 'gastnation')"
 					type="select"
-					v-model="formData.gastnation"
+					v-model="formData.nation_code"
 					name="gastnation"
 					>
 					<option 
@@ -381,9 +476,9 @@ export default {
 				<form-input
 					container-class="col-6 stv-details-mobility-universitaet"
 					:label="$p.t('mobility', 'universitaet')"
-					type="select"
-					v-model="formData.ort"
-					name="ort"
+					type="text"
+					v-model="formData.universitaet"
+					name="universitaet"
 					>
 
 				</form-input>
@@ -394,7 +489,7 @@ export default {
 					container-class="col-6 stv-details-mobility-herkunftsland"
 					:label="$p.t('mobility', 'herkunftsland')"
 					type="select"
-					v-model="formData.herkunftsland"
+					v-model="formData.herkunftsland_code"
 					name="herkunftsland"
 					>
 					<option 
@@ -409,7 +504,7 @@ export default {
 				<form-input
 					container-class="col-3 stv-details-mobility-ects_erworben"
 					:label="$p.t('mobility', 'ects_erworben')"
-					type="input"
+					type="text"
 					v-model="formData.ects_erworben"
 					name="ects_erworben"
 					>
@@ -417,7 +512,7 @@ export default {
 				<form-input
 					container-class="col-3 stv-details-mobility-ects_angerechnet"
 					:label="$p.t('mobility', 'ects_angerechnet')"
-					type="input"
+					type="text"
 					v-model="formData.ects_angerechnet"
 					name="ects_angerechnet"
 					>
@@ -425,27 +520,38 @@ export default {
 			</div>
 			
 			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-mobility-zweck"
-					:label="$p.t('mobility', 'zweck')"
-					type="textarea"
-					v-model="formData.zweck"
-					name="zweck"
-					>
-				</form-input>
-				<form-input
+				<div class="col-6 stv-details-mobility-zweck">
+					<MobilityPurpose 
+						:bisio_id="formData.bisio_id" 
+						:listPurposes="listPurposes"
+						@deleteMobilityPurpose="deleteMobilityPurpose"
+						@setMobilityPurpose="addMobilityPurpose"
+						@setMobilityPurposeToNewMobility="addPurposeToMobility"
+						ref="purposes"
+						></MobilityPurpose>
+				</div>
+				
+<!--				<div class="col-6 stv-details-mobility-zweck">
+					<LocalPurpose 
+						:listPurposes="listPurposes"
+						ref="purposesLocal"
+						></LocalPurpose>
+				</div>-->
+			
+				
+<!--				<form-input
 					container-class="col-6 stv-details-mobility-aufenthalt"
 					:label="$p.t('mobility', 'aufenthalt')"
 					type="textarea"
 					v-model="formData.aufenthalt"
 					name="aufenthalt"
 					>
-				</form-input>
+				</form-input>-->
 			</div>
 
 			<div class="text-end mb-3">
 				<button v-if="statusNew" class="btn btn-primary" @click="addNewMobility()"> {{$p.t('ui', 'speichern')}}</button>
-				<button v-else class="btn btn-primary" @click="updateMobility(formData.mobility_id)"> {{$p.t('ui', 'speichern')}}</button>
+				<button v-else class="btn btn-primary" @click="updateMobility(formData.bisio_id)"> {{$p.t('ui', 'speichern')}}</button>
 			</div>
 
 		</form-form>

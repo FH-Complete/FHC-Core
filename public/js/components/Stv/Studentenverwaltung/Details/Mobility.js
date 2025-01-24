@@ -16,10 +16,7 @@ export default {
 		return {}
 	},
 	template: `
-	<div class="stv-details-mobility h-100 d-flex flex-column">
-
-	<h1>TEST Mob</h1>
-	
+	<div class="stv-details-mobility h-100 d-flex flex-column">	
 		<table-mobility ref="tbl_mobility" :student="modelValue"></table-mobility>
 	</div>`
 };
