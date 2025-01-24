@@ -46,7 +46,7 @@ template:/*html*/`
 		</template>
 		<template v-for="{title, collection} in collection_array">
 			<template v-if="Array.isArray(collection)  && collection.length !==0">
-				<h2 >{{title}}</h2>
+				<h2 class="text-truncate">{{title}}</h2>
 				<template v-if="displayWidget">
 					<div class="d-flex flex-wrap flex-row mb-3 gap-2">
 						<template v-for="person in collection">

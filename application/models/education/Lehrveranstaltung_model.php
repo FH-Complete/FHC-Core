@@ -608,7 +608,11 @@ class Lehrveranstaltung_model extends DB_Model
 		$this->addSelect($lvbezeichnung . ' AS bezeichnung');
 		$this->addSelect($sgbezeichnung . ' AS sg_bezeichnung');
 		$this->addSelect('UPPER(sg.typ::VARCHAR(1) || sg.kurzbz) AS studiengang_kuerzel');
-
+		
+		//also adds returns the index of the grade
+		//TODO: ist zeugnissnote immer gleich wie die lvgesamtnote
+		$this->addSelect('COALESCE(zn.note::numeric,gn.note::numeric) as note_index');
+		$this->addSelect('COALESCE(znn.positiv,gnn.positiv) as positiv');
 		$this->addSelect('COALESCE(gnn.' . $bezeichnung . ', gnn.bezeichnung, gn.note::text) AS lvnote');
 		$this->addSelect('COALESCE(znn.' . $bezeichnung . ', znn.bezeichnung, zn.note::text) AS znote');
 

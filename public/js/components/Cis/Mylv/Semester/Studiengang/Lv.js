@@ -28,7 +28,8 @@ export default {
 		sprache: String,
 		ects: String,
 		incoming: Number,
-		positiv: Boolean
+		positiv: Boolean,
+		note_index: String,
 	},
 	data: () => {
 		return {
@@ -39,6 +40,19 @@ export default {
 		}
 	},
 	computed: {
+		gradeColor() {
+			// early return if value is null or undefined
+			if (this.positiv == null) return;
+			// returns a suitable color for the given grade
+			if (this.positiv)
+			{
+				return 'var(--fhc-cis-grade-positive)';
+			}
+			else
+			{
+				return 'var(--fhc-cis-grade-negative)';
+			}
+		},
 		is_organisatorische_einheit(){
 			return this.menu == "organisatorische_einheit";
 		},
@@ -59,6 +73,7 @@ export default {
 		},
 	},
 	methods: {
+		
 		fetchMenu(lehrveranstaltung_id = this.lehrveranstaltung_id, studien_semester = this.studien_semester){
 			return this.$fhcApi.factory.addons.getLvMenu(lehrveranstaltung_id, studien_semester)
 				.then(res => {
@@ -155,11 +170,11 @@ export default {
 							<div class="mx-4">
 								<i :class="[menuItem.c4_icon2 ? menuItem.c4_icon2 : 'fa-solid fa-pen-to-square', !menuItem.c4_link ? 'unavailable' : null ]"></i>
 							</div>
-							<a 
-							class="text-decoration-none text-truncate" 
-							:id="'moodle_links_'+lehrveranstaltung_id"  
-							:class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }" 
-							:target="menuItem.c4_target" 
+							<a
+							class="text-decoration-none text-truncate"
+							:id="'moodle_links_'+lehrveranstaltung_id"
+							:class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }"
+							:target="menuItem.c4_target"
 							:href="c4_link(menuItem) ? c4_link(menuItem) : null">
 								{{menuItem.name}}
 							</a>
@@ -178,16 +193,18 @@ export default {
 		</div>
 		<div v-if="!emptyMenu" class="card-footer">
 			<div class="row">
+				<!-- template for the LV if there are multiple pruefungen -->
 				<template v-if="LvHasPruefungenInformation">
 					<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
 						<i class="fa fa-check text-success" v-if="positiv"></i>
-						{{ grade || p.t('lehre/noGrades') }}
+						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || p.t('lehre/noGrades') }}</span>
 					</a>
 				</template>
+				<!-- template for the LV with no pruefungen -->
 				<template v-else>
 					<span  class="col-auto text-start text-decoration-none" >
 						<i class="fa fa-check text-success" v-if="positiv"></i>
-						{{ grade || p.t('lehre/noGrades') }}
+						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || p.t('lehre/noGrades') }}</span>
 					</span>
 				</template>
 			</div>
