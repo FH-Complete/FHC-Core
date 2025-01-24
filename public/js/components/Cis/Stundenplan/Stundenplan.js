@@ -43,6 +43,14 @@ export const Stundenplan = {
 
 	},
 	methods:{
+		convertTime: function([hour,minute]){
+			let date = new Date();
+			date.setHours(hour);
+			date.setMinutes(minute);
+			// returns date string as hh:mm
+			return date.toLocaleTimeString(this.$p.user_locale, { hour: '2-digit', minute: '2-digit', hour12:false}); 
+
+		},
 		setSelectedEvent: function (event) {
 			this.currentlySelectedEvent = event;
 		},
@@ -125,16 +133,31 @@ export const Stundenplan = {
 			</span>
 		</template>
 		<template #weekPage="{event,day,isSelected}">
-			<div @click="showModal(event?.orig)" type="button" :class="{'selectedEvent':isSelected}" 
-			class="fhc-entry border border-secondary border d-flex flex-column align-items-center 
+			<div @click="showModal(event?.orig); console.log(event.orig)" type="button" :class="{'selectedEvent':isSelected}"
+			class="fhc-entry position-relative border border-secondary border d-flex flex-row align-items-center
 			justify-content-evenly h-100" style="max-height: 75px; overflow: auto;">
-				<span>{{event?.orig.topic}}</span>
-				<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
-				<span>{{event?.orig.ort_kurzbz}}</span>
+
+				<div v-if="event?.orig?.beginn && event?.orig?.ende" >
+					<div class="d-flex flex-column p-4 border-end border-secondary">
+						<span class="small">{{convertTime(event.orig.beginn.split(":"))}}</span>
+						<span class="small">{{convertTime(event.orig.ende.split(":"))}}</span>
+					</div>
+				</div>
+				<div class="d-flex flex-column flex-grow-1 align-items-center">
+					<span>{{event?.orig.topic}}</span>
+					<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
+					<span>{{event?.orig.ort_kurzbz}}</span>
+				</div>
 			</div>
 		</template>
 		<template #dayPage="{event,day,mobile}">
 			<div @click="mobile? showModal(event?.orig):null" type="button" class="fhc-entry border border-secondary border row m-0 h-100 justify-content-center align-items-center text-center">
+				<div class="col-auto" v-if="event?.orig?.beginn && event?.orig?.ende" >
+					<div class="d-flex flex-column p-4 border-end border-secondary">
+						<span class="small">{{convertTime(event.orig.beginn.split(":"))}}</span>
+						<span class="small">{{convertTime(event.orig.ende.split(":"))}}</span>
+					</div>
+				</div>
 				<div class="col ">
 					<p>Lehrveranstaltung:</p>
 					<p class="m-0">{{event?.orig.topic}}</p>
