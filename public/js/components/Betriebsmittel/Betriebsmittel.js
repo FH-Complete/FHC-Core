@@ -66,7 +66,7 @@ export default {
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-print"></i>';
-							button.title = 'Übernahmebestätigung drucken';
+							button.title = this.$p.t('betriebsmittel', 'btn_printUebernahmebestaetigung');
 							let cellData = cell.getData();
 							button.addEventListener(
 								'click',
@@ -82,7 +82,7 @@ export default {
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.title = 'Betriebsmittel bearbeiten';
+							button.title = this.$p.t('betriebsmittel', 'btn_editBetriebsmittel');
 							button.addEventListener(
 								'click',
 								(event) =>
@@ -93,7 +93,7 @@ export default {
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.title = 'Betriebsmittel löschen';
+							button.title = this.$p.t('betriebsmittel', 'btn_deleteBetriebsmittel');
 							button.addEventListener(
 								'click',
 								() =>
@@ -117,12 +117,15 @@ export default {
 					event: 'tableBuilt',
 					handler: async() => {
 
-						await this.$p.loadCategory(['wawi', 'global', 'infocenter']);
+						await this.$p.loadCategory(['wawi', 'global', 'infocenter', 'betriebsmittel', 'person']);
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('nummer').component.updateDefinition({
 							title: this.$p.t('wawi', 'nummer')
+						});
+						cm.getColumnByField('betriebsmitteltyp').component.updateDefinition({
+							title: this.$p.t('global', 'typ')
 						});
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
@@ -130,13 +133,27 @@ export default {
 						cm.getColumnByField('format_retour').component.updateDefinition({
 							title: this.$p.t('wawi', 'retourdatum')
 						});
+						cm.getColumnByField('beschreibung').component.updateDefinition({
+							title: this.$p.t('global', 'beschreibung')
+						});
 						cm.getColumnByField('kaution').component.updateDefinition({
 							title: this.$p.t('infocenter', 'kaution')
 						});
 						cm.getColumnByField('format_ausgabe').component.updateDefinition({
 							title: this.$p.t('wawi', 'ausgabedatum')
 						});
-
+						cm.getColumnByField('betriebsmittel_id').component.updateDefinition({
+							title: this.$p.t('ui', 'betriebsmittel_id')
+						});
+						cm.getColumnByField('betriebsmittelperson_id').component.updateDefinition({
+							title: this.$p.t('ui', 'betriebsmittelperson_id')
+						});
+						cm.getColumnByField('person_id').component.updateDefinition({
+							title: this.$p.t('person', 'person_id')
+						});
+						cm.getColumnByField('uid').component.updateDefinition({
+							title: this.$p.t('person', 'uid')
+						});
 					}
 				}
 			],
@@ -261,7 +278,7 @@ export default {
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Betriebsmittel"
+			:new-btn-label="this.$p.t('ui', 'betriebsmittel')"
 			@click:new="actionNewBetriebsmittel"
 			>
 		</core-filter-cmpt>		
@@ -278,7 +295,7 @@ export default {
 				<div class="row mb-3">
 					<form-input
 						type="select"
-						:label="$p.t('global/typ')"
+						:label="$p.t('global/typ') + ' *'"
 						name="betriebsmitteltyp"
 						v-model="formData.betriebsmitteltyp"
 						:disabled="!statusNew"

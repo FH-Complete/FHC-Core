@@ -57,8 +57,13 @@ export default{
 	data() {
 		return {
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.$fhcApi.factory.stv.prestudent.getHistoryPrestudent,
+				ajaxParams: () => {
+					return {
+						id: this.modelValue.prestudent_id
+					};
+				},
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Kurzbz", field: "status_kurzbz", tooltip: true},
@@ -79,6 +84,7 @@ export default{
 					{title: "InsertVon", field: "insertvon", visible: false},
 					{title: "UpdateAmUm", field: "format_updateamum", visible: false},
 					{title: "UpdateVon", field: "updatevon", visible: false},
+/*					{title: "Aufnahmestufe", field: "aufnahmestufe", visible: false},*/
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -92,7 +98,7 @@ export default{
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-forward"></i>';
-							button.title = 'Status vorrücken';
+							button.title = this.$p.t('ui', 'btn_statusVorruecken');
 							button.addEventListener('click', () =>
 								this.actionAdvanceStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -103,7 +109,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-check"></i>';
-							button.title = 'Status bestätigen';
+							button.title = this.$p.t('ui', 'btn_confirmStatus');
 							button.addEventListener('click', () =>
 								this.actionConfirmStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -114,7 +120,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.title = 'Status bearbeiten';
+							button.title = this.$p.t('ui', 'btn_editStatus');
 							button.addEventListener('click', () =>
 								this.actionEditStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -125,7 +131,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.title = 'Status löschen';
+							button.title = this.$p.t('ui', 'btn_deleteStatus');
 							button.addEventListener('click', () =>
 								this.actionDeleteStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -149,12 +155,14 @@ export default{
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				selectable: false,
+				index: 'statusId',
+				persistenceID: 'stv-multistatus'
 			},
 			tabulatorEvents: [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
-						await this.$p.loadCategory(['lehre','global','person']);
+						await this.$p.loadCategory(['lehre','global','person','ui']);
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
@@ -197,6 +205,14 @@ export default{
 						cm.getColumnByField('insertvon').component.updateDefinition({
 							title: this.$p.t('lehre', 'insert_von')
 						});
+
+						cm.getColumnByField('prestudent_id').component.updateDefinition({
+							title: this.$p.t('ui', 'prestudent_id')
+						});
+
+						cm.getColumnByField('studienplan_id').component.updateDefinition({
+							title: this.$p.t('ui', 'studienplan_id')
+						});
 					}
 				}
 			],
@@ -210,10 +226,7 @@ export default{
 	watch: {
 		modelValue() {
 			if (this.$refs.table) {
-				if (this.$refs.table.tableBuilt)
-					this.$refs.table.tabulator.setData('api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id);
-				else
-					this.data.tabulatorOptions.ajaxURL = 'api/frontend/v1/stv/Status/getHistoryPrestudent/' + this.modelValue.prestudent_id;
+				this.$refs.table.reloadTable();
 			}
 			this.getMaxSem();
 		}
@@ -224,8 +237,7 @@ export default{
 				? [this.modelValue.studiengang_kz]
 				: this.modelValue.map(prestudent => prestudent.studiengang_kz);
 			this.maxSem = 0;
-			this.$fhcApi
-				.post('api/frontend/v1/stv/status/getMaxSemester/', {studiengang_kzs})
+			this.$fhcApi.factory.stv.prestudent.getMaxSem(studiengang_kzs)
 				.then(result => this.maxSem = result.data)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -245,24 +257,32 @@ export default{
 
 			this.$fhcAlert
 				.confirmDelete()
-				.then(result => result
-					? 'api/frontend/v1/stv/status/isLastStatus/' + statusId.prestudent_id
-					: Promise.reject({handled: true})
-				)
-				.then(this.$fhcApi.get)
-				.then(result => result.data
-					? new Promise((resolve, reject) => { BsConfirm.popup(this.$p.t('lehre', 'last_status_confirm_delete')).then(resolve).catch(() => reject({handled:true})) })
-					: true
-				)
-				.then(result => result
-					? 'api/frontend/v1/stv/status/deleteStatus/' + Object.values(statusId).join('/')
-					: Promise.reject({handled: true})
-				)
-				.then(this.$fhcApi.post)
-				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete')))
-				.then(this.reload)
-				.then(this.$reloadList)
-				.catch(this.$fhcAlert.handleSystemError);
+				.then(result => {
+					// If confirmed, check if this is the last status
+					return result
+						? this.$fhcApi.factory.stv.prestudent.isLastStatus(statusId.prestudent_id)
+						: Promise.reject({handled: true});
+				})
+				.then(result => {
+					return result.data
+						? new Promise((resolve, reject) => {
+							BsConfirm.popup(this.$p.t('lehre', 'last_status_confirm_delete'))
+								.then(resolve)
+								.catch(() => reject({handled: true}));
+						})
+						: true;
+				})
+				.then(result => {
+					return result
+						? this.$fhcApi.factory.stv.prestudent.deleteStatus(statusId)
+						: Promise.reject({handled: true});
+				})
+				.then(() => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+					this.reload();
+					this.$reloadList();
+				})
+				.catch(this.$fhcAlert.handleSystemError); // Handle any errors
 		},
 		actionAdvanceStatus(status, stdsem, ausbildungssemester) {
 			const statusId = {
@@ -271,22 +291,21 @@ export default{
 				studiensemester_kurzbz: stdsem,
 				ausbildungssemester: ausbildungssemester
 			};
-			this.$fhcApi
-				.post('api/frontend/v1/stv/status/advanceStatus/' + Object.values(statusId).join('/'))
+			return this.$fhcApi.factory.stv.prestudent.advanceStatus(statusId)
 				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successAdvance')))
 				.then(this.reload)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		actionConfirmStatus(status, stdsem, ausbildungssemester) {
+			const statusId = {
+				prestudent_id: this.modelValue.prestudent_id,
+				status_kurzbz: status,
+				studiensemester_kurzbz: stdsem,
+				ausbildungssemester: ausbildungssemester
+			};
 			BsConfirm
 				.popup(this.$p.t('stv', 'status_confirm_popup'))
-				.then(() => this.$fhcApi.post(
-					'api/frontend/v1/stv/status/confirmStatus/' +
-					this.modelValue.prestudent_id + '/' +
-					status + '/' +
-					stdsem + '/' +
-					ausbildungssemester
-				))
+				.then(() => this.$fhcApi.factory.stv.prestudent.confirmStatus(statusId))
 				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successConfirm')))
 				.then(this.reload)
 				.catch(this.$fhcAlert.handleSystemError);
@@ -298,9 +317,7 @@ export default{
 	},
 	created() {
 		this.getMaxSem();
-
-		this.$fhcApi
-			.get('api/frontend/v1/stv/status/getLastBismeldestichtag/')
+		this.$fhcApi.factory.stv.prestudent.getLastBismeldestichtag()
 			.then(result => {
 				this.dataMeldestichtag = result.data[0].meldestichtag;
 				if (this.$refs.table && this.$refs.table.tableBuilt)
@@ -309,8 +326,7 @@ export default{
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-	<div class="stv-multistatus h-100 pt-3">
-		
+	<div class="stv-multistatus h-100 pt-3">			
 		<status-modal
 			ref="test"
 			:meldestichtag="new Date(dataMeldestichtag)"
@@ -328,7 +344,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Status"
+			:new-btn-label="this.$p.t('global', 'status')"
 			@click:new="actionNewStatus"
 			>
 			
@@ -339,6 +355,7 @@ export default{
 					:show-toolbar-student="showToolbarStudent"
 					:show-toolbar-interessent="showToolbarInteressent"
 					:prestudent-ids="prestudentIds"
+					:max-sem="maxSem"
 					@reload-table="reload"
 				>		
 				</status-dropdown>
@@ -353,6 +370,7 @@ export default{
 				:show-toolbar-student="showToolbarStudent"
 				:show-toolbar-interessent="showToolbarInteressent"
 				:prestudent-ids="prestudentIds"
+				:max-sem="maxSem"
 				@reload-table="reload"
 				>		
 			</status-dropdown>

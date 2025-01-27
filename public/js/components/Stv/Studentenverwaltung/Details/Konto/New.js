@@ -124,7 +124,7 @@ export default {
 					type="select"
 					v-model="data.buchungstyp_kurzbz"
 					name="buchungstyp_kurzbz"
-					:label="$p.t('konto/buchungstyp')"
+					:label="$p.t('konto/buchungstyp') + ' *'"
 					@update:model-value="checkDefaultBetrag"
 					>
 					<option v-for="typ in activeBuchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz" :class="typ.aktiv ? '' : 'text-decoration-line-through text-muted'">

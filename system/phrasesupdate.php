@@ -24614,6 +24614,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'notiz',
+		'phrase' => 'notiz_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notiz löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
 		'phrase' => 'verfasser',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -33264,6 +33284,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bankverbindung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankverbindung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'bank details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//Status
 	array(
 		'app' => 'core',
@@ -34385,6 +34425,87 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'btn_statusVorruecken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status vorrücken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'advance status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'btn_confirmStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status bestätigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'confirm status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'btn_editStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'edit status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'btn_deleteStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 	// Betriebsmittel begin
 	array(
 		'app' => 'core',
@@ -36576,6 +36697,67 @@ array(
 	),
 	array(
 		'app' => 'core',
+		'category' => 'betriebsmittel',
+		'phrase' => 'btn_printUebernahmebestaetigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Übernahmebestätigung drucken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Print acceptance confirmation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),	
+	array(
+		'app' => 'core',
+		'category' => 'betriebsmittel',
+		'phrase' => 'btn_editBetriebsmittel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Resource',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),	
+	array(
+		'app' => 'core',
+		'category' => 'betriebsmittel',
+		'phrase' => 'btn_deleteBetriebsmittel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete Resource',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// Betriebsmittel end
+	array(
+		'app' => 'core',
 		'category' => 'uhstat',
 		'phrase' => 'unbekannt',
 		'insertvon' => 'system',
@@ -37297,7 +37479,569 @@ array(
 				'insertvon' => 'system'
 			)
 		)
+	),
+// FHC4 Phrases CleanUpTasks End
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'wahlname',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Wahlname',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'elective name',
+			'description' => '',
+			'insertvon' => 'system'
+		)
 	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'familienstand',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Familienstand',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'marital status',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'foto',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Foto',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'photo',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'homepage',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Homepage',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'homepage',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'lehre',
+	'phrase' => 'verband',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Verband',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'verband',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'aktiv',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Aktiv',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'active',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'lehre',
+	'phrase' => 'error_no_person',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Keine Person gefunden',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'No Person found',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'lehre',
+	'phrase' => 'error_no_student',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Kein/e Student/in gefunden',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'No Student found',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'geschieden',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'geschieden',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'divorced',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'ledig',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'ledig',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'single',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'verheiratet',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'verheiratet',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'married',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'verwitwet',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'verwitwet',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'widowed',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'firma_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Firma Id',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Company Id',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'adresse_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Adresse ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Address ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'kontakt_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Kontakt ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Contact ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'standort_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Standort ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Location ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'bankverbindung_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Bankverbindung ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Bankdetails ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'studienplan_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Studienplan ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Studyplan ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'prestudent_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'PrestudentIn ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Prestudent ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'notiz_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Notiz ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Notes ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'notizzuordnung_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Notizzuordnung ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Noteassignment ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'extension_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Extension ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Extension ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'type_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Type ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Type ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'betriebsmittel_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Betriebsmittel ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Ressource ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'betriebsmittelperson_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Betriebsmittelperson ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Ressourceperson ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'dropdownLoading',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Daten werden geladen',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Loading',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'error_noInteger',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Nur Eingabe von ganzen Zahlen erlaubt',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Error: Only input of whole numbers allowed',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'error_maxSem',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Ausbildungssemester nicht zulässig: größer als Höchstsemester',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Error: Semester not allowed: higher than max Semester',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+// FHC4 Phrases CleanUpTasks End
 );
 
 

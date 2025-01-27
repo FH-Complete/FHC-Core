@@ -97,7 +97,14 @@ class Kontakt extends FHCAPI_Controller
 			|| $this->router->method == 'deleteContact'
 			|| $this->router->method == 'deleteBankverbindung'
 		) {
-			$id = current(array_slice($this->uri->rsegments, 2));
+			if($this->input->post('address_id'))
+				$id = $this->input->post('address_id');
+			if($this->input->post('adresse_id'))
+				$id = $this->input->post('adresse_id');
+			if($this->input->post('bankverbindung_id'))
+				$id = $this->input->post('bankverbindung_id');
+			if($this->input->post('kontakt_id'))
+				$id = $this->input->post('kontakt_id');
 
 			$model = 'person/Adresse_model';
 			if ($this->router->method == 'loadContact'
@@ -125,7 +132,12 @@ class Kontakt extends FHCAPI_Controller
 	}
 	public function getAdressen($person_id)
 	{
-		$this->AdresseModel->addSelect('public.tbl_adresse.*');
+		$this->AdresseModel->addSelect("public.tbl_adresse.*,
+					TO_CHAR (CASE
+					WHEN public.tbl_adresse.updateamum >= public.tbl_adresse.insertamum
+					THEN public.tbl_adresse.updateamum
+					ELSE public.tbl_adresse.insertamum
+				END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate");
 		$this->AdresseModel->addSelect('t.*');
 		$this->AdresseModel->addSelect('f.firma_id');
 		$this->AdresseModel->addSelect('f.name as firmenname');
@@ -143,15 +155,19 @@ class Kontakt extends FHCAPI_Controller
 
 	public function addNewAddress($person_id)
 	{
-		$this->form_validation->set_rules('plz', 'PLZ', 'required|numeric', [
+		$this->form_validation->set_data(['address.plz' => $_POST['plz']]);
+
+		$this->form_validation->set_rules('address.plz', 'PLZ', 'required|numeric', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'PLZ']),
 			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
 		]);
 
-		if(isset($_POST['gemeinde']) && isset($_POST['ort']))
-		$this->form_validation->set_rules('plz', 'Postleitzahl', 'callback_validateLocationCombination', [
-			'validateLocationCombination' => $this->p->t('ui', 'error_location_combination')
-		]);
+		if(isset($_POST['gemeinde']) && isset($_POST['ort']) && isset($_POST['nation']) && $_POST['nation'] == 'A')
+		{
+			$this->form_validation->set_rules('address.plz', 'Postleitzahl', 'callback_validateLocationCombination', [
+				'validateLocationCombination' => $this->p->t('ui', 'error_location_combination')
+			]);
+		}
 
 		if ($this->form_validation->run() == false)
 		{
@@ -196,25 +212,33 @@ class Kontakt extends FHCAPI_Controller
 
 			]
 		);
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		return $this->outputJsonSuccess(true);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
-	public function updateAddress($address_id)
+	public function updateAddress()
 	{
+		$address_id = $this->input->post('adresse_id');
+
+		$this->form_validation->set_data(['address.plz' => $_POST['plz']]);
+
 		$uid = getAuthUID();
-		$this->form_validation->set_rules('plz', 'PLZ', 'required|numeric', [
+
+		$this->form_validation->set_rules('address.plz', 'PLZ', 'required|numeric', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'PLZ']),
 			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
 		]);
 
-		if(isset($_POST['gemeinde']) && isset($_POST['ort']))
-			$this->form_validation->set_rules('plz', 'Postleitzahl', 'callback_validateLocationCombination', [
+		if(isset($_POST['gemeinde']) && ($_POST['gemeinde'] != '')
+			&& isset($_POST['ort']) && ($_POST['ort'] != '')
+			&& isset($_POST['nation']) && ($_POST['nation'] == 'A')
+			&& isset($_POST['plz']) && ($_POST['plz'] != '')  )
+		{
+			$this->form_validation->set_rules('address.plz', 'Postleitzahl', 'callback_validateLocationCombination', [
 				'validateLocationCombination' => $this->p->t('ui', 'error_location_combination')
 			]);
+		}
 
 		if ($this->form_validation->run() == false)
 		{
@@ -272,15 +296,15 @@ class Kontakt extends FHCAPI_Controller
 			]
 		);
 
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		return $this->outputJsonSuccess(true);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
-	public function loadAddress($adresse_id)
+	public function loadAddress()
 	{
+		$adresse_id = $this->input->post('address_id');
+
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 
 		$this->AdresseModel->addSelect('public.tbl_adresse.*');
@@ -306,8 +330,10 @@ class Kontakt extends FHCAPI_Controller
 		$this->terminateWithSuccess(current(getData($result)) ? : null);
 	}
 
-	public function deleteAddress($adresse_id)
+	public function deleteAddress()
 	{
+		$adresse_id = $this->input->post('address_id');
+
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 		$result = $this->AdresseModel->load([
 			'adresse_id'=> $adresse_id,
@@ -366,10 +392,10 @@ class Kontakt extends FHCAPI_Controller
 		$this->load->model('organisation/standort_model', 'StandortModel');
 
 		$result = $this->StandortModel->searchStandorte($searchString);
-		if (isError($result)) {
-			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		$this->terminateWithSuccess($result ?: []);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
 	public function getStandorteByFirma($firma_id)
@@ -418,8 +444,9 @@ class Kontakt extends FHCAPI_Controller
 		}
 	}
 
-	public function loadContact($kontakt_id)
+	public function loadContact()
 	{
+		$kontakt_id = $this->input->post('kontakt_id');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
 		$this->KontaktModel->addSelect('*, public.tbl_kontakt.*');
@@ -439,7 +466,6 @@ class Kontakt extends FHCAPI_Controller
 		{
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Kontakt_id']), self::ERROR_TYPE_GENERAL);
 		}
-		//	$this->outputJsonSuccess(current(getData($result)));
 		$this->terminateWithSuccess(current(getData($result)));
 	}
 
@@ -495,8 +521,9 @@ class Kontakt extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function updateContact($kontakt_id)
+	public function updateContact()
 	{
+		$kontakt_id = $this->input->post('kontakt_id');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
 		if(!$kontakt_id)
@@ -523,13 +550,6 @@ class Kontakt extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
-/*		if(isset($_POST['standort']))
-		{
-			$standort_id = $_POST['standort']['standort_id'];
-		}
-		else
-			$standort_id = null;*/
-
 		$uid = getAuthUID();
 		$kontakttyp = $this->input->post('kontakttyp');
 		$anmerkung = $this->input->post('anmerkung');
@@ -537,8 +557,6 @@ class Kontakt extends FHCAPI_Controller
 		$ext_id = $this->input->post('ext_id');
 		$person_id = $this->input->post('person_id');
 		$standort_id = $this->input->post('standort_id');
-
-		//return $this->terminateWithError("in update " . $standort_id, self::ERROR_TYPE_GENERAL);
 
 		$result = $this->KontaktModel->update(
 			[
@@ -557,15 +575,14 @@ class Kontakt extends FHCAPI_Controller
 			]
 		);
 
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		return $this->outputJsonSuccess(true);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
-	public function deleteContact($kontakt_id)
+	public function deleteContact()
 	{
+		$kontakt_id = $this->input->post('kontakt_id');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
 		$result = $this->KontaktModel->delete(
@@ -643,15 +660,15 @@ class Kontakt extends FHCAPI_Controller
 				'orgform_kurzbz' => $orgform_kurzbz
 			]
 		);
-		if (isError($result))
-		{
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		return $this->outputJsonSuccess(true);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
-	public function loadBankverbindung($bankverbindung_id)
+	public function loadBankverbindung()
 	{
+		$bankverbindung_id = $this->input->post('bankverbindung_id');
+
 		$this->load->model('person/Bankverbindung_model', 'BankverbindungModel');
 
 		$this->BankverbindungModel->addSelect('*');
@@ -719,15 +736,15 @@ class Kontakt extends FHCAPI_Controller
 			]
 		);
 
-		if (isError($result))
-		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		return $this->outputJsonSuccess(true);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
-	public function deleteBankverbindung($bankverbindung_id)
+	public function deleteBankverbindung()
 	{
+		$bankverbindung_id = $this->input->post('bankverbindung_id');
+
 		$this->load->model('person/Bankverbindung_model', 'BankverbindungModel');
 
 		$result = $this->BankverbindungModel->delete(
