@@ -67,6 +67,7 @@ require_once('dbupdate_3.4/25999_C4_permission.php');
 require_once('dbupdate_3.4/33683_digitale_anwesenheitsliste_und_entschuldigungsmanagement_fuer_studierende_prototyp.php');
 require_once('dbupdate_3.4/40717_lv_faktor.php');
 require_once('dbupdate_3.4/48526_pep_tagging.php');
+require_once('dbupdate_3.4/25999_locale_update.php');
 
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen

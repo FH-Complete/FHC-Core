@@ -91,7 +91,7 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 	$ci->load->model('system/Sprache_model','SpracheModel');
 	$server_language = getData($ci->SpracheModel->loadWhere(['content' => true]));
 	$server_language = array_map(function($language){
-		return ['sprache'=>$language->sprache, 'locale'=>$language->locale, 'bezeichnung'=>$language->bezeichnung[$language->index-1]];
+		return ['sprache'=>$language->sprache, 'LC_Time'=>$language->locale, 'bezeichnung'=>$language->bezeichnung[$language->index-1]];
 	}, $server_language);
 	$user_language = getUserLanguage();
 
