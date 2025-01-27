@@ -101,6 +101,10 @@ export default {
 					handler: this.autoSelectRows
 				},
 				{
+					event: 'dataLoaded',
+					handler: data => this.count = data.length
+				},
+				{
 					event: 'rowClick',
 					handler: this.handleRowClick // TODO(chris): this should be in the filter component
 				}
@@ -108,7 +112,8 @@ export default {
 			focusObj: null, // TODO(chris): this should be in the filter component
 			lastSelected: null,
 			filterKontoCount0: undefined,
-			filterKontoMissingCounter: undefined
+			filterKontoMissingCounter: undefined,
+			count: 0
 		}
 	},
 	methods: {
@@ -231,6 +236,7 @@ export default {
 		<div class="tabulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @keydown="onKeydown">
 			<core-filter-cmpt
 				ref="table"
+				:description="$p.t('global/anzahl') + ': ' + (count || 0)"
 				:tabulator-options="tabulatorOptions"
 				:tabulator-events="tabulatorEvents"
 				table-only
