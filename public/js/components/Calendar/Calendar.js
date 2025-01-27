@@ -6,7 +6,7 @@ import CalendarWeeks from './Weeks.js';
 import CalendarDay from './Day.js';
 import CalendarMinimized from './Minimized.js';
 import CalendarDate from '../../composables/CalendarDate.js';
-
+import CalendarDates from '../../composables/CalendarDates.js';
 
 // TODO(chris): week/month toggle
 
@@ -89,7 +89,7 @@ export default {
 					}
 				}
 			});
-		}
+		},
 	},
 	emits: [
 		'select:day',
@@ -220,6 +220,9 @@ export default {
 			}).observe(this.$refs.container);
 		}
 
+	},
+	unmounted(){
+		CalendarDates.cleanup();
 	},
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card h-100" :class="sizeClass">

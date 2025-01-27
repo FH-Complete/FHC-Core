@@ -11,22 +11,25 @@ export default {
         );
     },
 
-    news(limit) {
-        return this.$fhcApi.get(
-            "/api/frontend/v1/Cms/news",
-            {
-        		limit: limit
-            }
-        );
-    },
-
-	getNews(page = 1, page_size = 10) {
+	//api function used for the news View that renders the html
+	getNews(page = 1, page_size = 10, sprache) {
 		return this.$fhcApi.get(
 			"/api/frontend/v1/Cms/getNews",
 			{
 				page,
 				page_size,
+				sprache,
 			},
+		);
+	},
+
+	//api function used for the widget component
+	news(limit) {
+		return this.$fhcApi.get(
+			"/api/frontend/v1/Cms/news",
+			{
+				limit: limit
+			}
 		);
 	},
 
@@ -36,5 +39,12 @@ export default {
 			{}
 		);
 	},
+
+	getNewsExtra: function(){
+		return this.$fhcApi.get(
+			"/api/frontend/v1/Cms/getStudiengangInfoForNews",
+			{}
+		);
+	}
    
   }

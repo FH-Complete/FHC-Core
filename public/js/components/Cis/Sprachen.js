@@ -1,30 +1,27 @@
 export default {
 	data(){
 		return {
-			allActiveLanguages: null,
+			allActiveLanguages: FHC_JS_DATA_STORAGE_OBJECT.server_languages,
 		}
 	}, 
+	emits: ['languageChanged'],
 	methods:{
 		changeLanguage: function(lang){
-			if(this.allActiveLanguages.some(l => l === lang))
+			if(this.allActiveLanguages.some(l => l.sprache === lang))
 			{
-				this.$p.setLanguage(lang, this.$fhcApi);
+				this.$p.setLanguage(lang, this.$fhcApi)
+				.then(res => res.data)
+				.then(data =>
+				{
+					this.$emit('languageChanged', lang);
+				})
 			}
 		},
-	},
-	mounted(){
-		this.$fhcApi.factory.phrasen.getActiveDbLanguages()
-			.then(res => res.data)
-			.then(
-				(langs) => {
-					this.allActiveLanguages = langs;
-				}
-		);
 	},
 	template:/*html*/`
 	<div class="container">
 		<div class="row justify-content-center align-items-center flex-nowrap overflow-hidden">
-			<button v-for="lang in allActiveLanguages" @click.prevent="changeLanguage(lang)" class="col text-white fhc-entry btn text-center w-100" :selected="$p.user_language.value==lang?'':null">{{lang}}</button>
+			<button v-for="lang in allActiveLanguages" @click.prevent="changeLanguage(lang.sprache)" class="col text-white fhc-entry btn text-center w-100" :selected="$p.user_language.value==lang.sprache?'':null">{{lang.bezeichnung}}</button>
 		</div>
 	</div>
 	`,

@@ -9,7 +9,6 @@ export default {
 		CisSprachen,
     },
     props: {
-		menu: Array,
 		rootUrl: String,
         logoUrl: String,
         avatarUrl: String,
@@ -51,6 +50,13 @@ export default {
 		}
 	},
 	methods: {
+		fetchMenu: function(){
+			return this.$fhcApi.factory.menu.getMenu()
+			.then(res => res.data)
+			.then(menu => {
+				this.entries = menu;
+			})	
+		},
 		checkSettingsVisibility: function (event) {
 			// hides the settings collapsible if the user clicks somewhere else
 			if (!this.$refs.navUserDropdown.contains(event.target)) {
@@ -64,6 +70,10 @@ export default {
 			document.removeEventListener("click", this.checkSettingsVisibility);
 		},
 		makeParentContentActive(content_id, collection=this.entries, parent=null){
+			if(!collection) return;
+			if (typeof collection == 'object' && !Array.isArray(collection) && Object.entries(collection).length > 0) {
+				collection = Object.values(collection);
+			}
 			for(let entry of collection){
 				if(entry.content_id == content_id){
 					this.activeEntry = parent;
@@ -80,8 +90,10 @@ export default {
 			this.activeEntry = content_id;
 		},
 	},
+	created(){
+		this.fetchMenu();
+	},
 	mounted(){
-		this.entries = this.menu;
 		this.$p.loadCategory(['ui', 'global'])
 		this.navUserDropdown = new bootstrap.Collapse(this.$refs.navUserDropdown,{
 			toggle: false
@@ -91,7 +103,7 @@ export default {
 	<button id="nav-main-btn" class="navbar-toggler rounded-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-	<fhc-searchbar ref="searchbar" id="nav-search" class="fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
+	<fhc-searchbar ref="searchbar" id="nav-search" style="background-color:var(--fhc-cis-primary)" class="fhc-searchbar w-100 p-1 p-lg-2" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
     <a id="nav-logo" class="d-none d-lg-block" :href="rootUrl">
         <img :src="logoUrl" alt="Logo">
     </a>
@@ -105,7 +117,7 @@ export default {
 		id="nav-user-menu" class="top-100 end-0 collapse list-unstyled" aria-labelledby="nav-user-btn">
 			<li class="btn-level-2"><a class="btn btn-level-2 rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
 			<li class="btn-level-2">
-				<cis-sprachen></cis-sprachen>
+				<cis-sprachen @languageChanged="fetchMenu"></cis-sprachen>
 			</li>
 			<li class="btn-level-2"><hr class="dropdown-divider m-0 "></li>
 			<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>
@@ -119,7 +131,6 @@ export default {
 				</button>
 			</div>
 			<div class="offcanvas-body p-0">
-
 				<div id="nav-main-menu" class="nav-menu-collapse collapse collapse-horizontal show">
 					<div>
 						<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />

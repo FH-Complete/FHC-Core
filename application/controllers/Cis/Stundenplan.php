@@ -23,8 +23,13 @@ class Stundenplan extends Auth_Controller
 	/**
 	 * @return void
 	 */
-	public function index()
+	public function index($lv_id = null)
 	{
-		$this->load->view('Cis/Stundenplan');
+
+		$viewData = array(
+			'lv_id' => $lv_id
+		);
+		
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Stundenplan']);
 	}
 }

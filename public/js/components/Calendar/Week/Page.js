@@ -56,6 +56,18 @@ export default {
 			// returns an array with elements starting at 7 and ending at 24
 			return [...Array(24).keys()].filter(hour => hour >= 7 && hour <= 24);
 		},
+		dayText() {
+			if (!this.size || !this.days) return {};
+			let dayTextMap ={};
+			this.days.forEach((day)=>{
+				dayTextMap[day] = {
+					heading: day.toLocaleString(this.$p.user_locale.value, { dateStyle: 'short' }),
+					tag: day.toLocaleString(this.$p.user_locale.value, { weekday: this.size < 2 ? 'narrow' : (this.size < 3 ? 'short' : 'long') }),
+					datum: day.toLocaleString(this.$p.user_locale.value, [{ day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { dateStyle: 'short' }][this.size]),
+				};
+			});
+			return dayTextMap;
+		},
 		days() {
 			
 			let tmpDate = new CalendarDate(this.year,1,1); // NOTE(chris): somewhere in the middle of the year
@@ -107,7 +119,7 @@ export default {
 		smallestTimeFrame() {
 			return [30,15,10,5][this.size];
 		}
-	},
+	}, 
 	methods: {
 		hourGridIdentifier(hour) {
 			// this is the id attribute that is responsible to scroll the calender to the first event
@@ -201,15 +213,17 @@ export default {
 	mounted() {
 
 		setTimeout(() => this.$refs.eventcontainer.scrollTop = this.$refs.eventcontainer.scrollHeight / 3 + 1, 0);
+
+		const container = document.getElementById("calendarContainer")
+		if(container) container.style.overflow = 'scroll'
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-week-page">
-
 		<div class="d-flex flex-column">
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
-				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
-					<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
-					<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
+				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="dayText[day]?.heading" @click.prevent="changeToMonth(day)">
+					<div class="fw-bold">{{dayText[day]?.tag}}</div>
+					<a href="#" class="small text-secondary text-decoration-none" >{{dayText[day]?.datum}}</a>
 				</div>
 			</div>
 			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
@@ -225,7 +239,7 @@ export default {
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
 						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" :style="eventGridStyle(day,event)" class="mx-2 small rounded overflow-hidden "  >
-							<slot  name="weekPage" :event="event" :day="day" :isSelected="event.orig == selectedEvent" >
+							<slot name="weekPage" :event="event" :day="day" :isSelected="event.orig == selectedEvent">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 							</slot>
 						</div>

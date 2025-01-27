@@ -32,6 +32,8 @@ html {
   --fhc-cis-menu-lvl-5-color: #000;
   --fhc-cis-menu-lvl-5-bg-hover: #eceff1;
   --fhc-cis-menu-lvl-5-color-hover: #000;
+  --fhc-cis-grade-positive: rgb(0, 128, 0);
+  --fhc-cis-grade-negative: rgb(128, 0, 0);
 }
 @media (min-width: 992px) {
   :root {

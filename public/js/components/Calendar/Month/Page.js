@@ -28,6 +28,14 @@ export default {
 		'input'
 	],
 	computed: {
+		dayText(){
+			if (!this.size || !this.weeks[0]?.days) return {};
+			let dayTextMap ={};
+			this.weeks[0].days.forEach((day)=>{
+				dayTextMap[day] = day.toLocaleString(this.$p.user_locale.value, { weekday: this.size < 1 ? 'narrow' : (this.size < 3 ? 'short' : 'long') });
+			});
+			return dayTextMap;
+		},
 		weeks() {
 			let firstDayOfMonth = new CalendarDate(this.year, this.month, 1);
 			let startDay = firstDayOfMonth.firstDayOfCalendarMonth;
@@ -39,7 +47,7 @@ export default {
 				week.days.push(new Date(startDay));
 				
 				if (week.days.length == 7) {
-					let d = new CalendarDate(week.days[res.length ? 0 : 6]);
+					let d = new CalendarDate(week.days[5]);
 					week.no = d.w;
 					week.y = d.y;
 					res.push(week);
@@ -79,11 +87,15 @@ export default {
 			this.selectDay(day);
 		}
 	},
+	mounted() {
+		const container = document.getElementById("calendarContainer")
+		if(container) container.style.overflow = 'scroll'	
+	},
 	template: /*html*/`
 	<div class="fhc-calendar-month-page" :class="{'show-weeks': showWeeks}">
 		<div v-if="showWeeks" class=" bg-light fw-bold border-top border-bottom text-center"></div>
 		<div v-for="day in weeks[0].days" :key="day" class="bg-light fw-bold border-top border-bottom text-center">
-			{{day.toLocaleString(undefined, {weekday: size < 1 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}
+			{{dayText[day]}}
 		</div>
 		<template v-for="week in weeks" :key="week.no">
 			<a href="#" v-if="showWeeks" class="fhc-calendar-month-page-weekday text-decoration-none text-end opacity-25" @click.prevent="changeToWeek(week)">{{week.no}}</a>

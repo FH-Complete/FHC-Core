@@ -172,13 +172,13 @@ export default {
 			}
 
 			return {
-				Geburtsdatum: this.data.gebdatum,
-				Geburtsort: this.data.gebort,
-				Personenkennzeichen: this.data.personenkennzeichen,
-				Studiengang: this.data.studiengang,
-				Semester: this.data.semester,
-				Verband: this.data.verband,
-				Gruppe: this.data.gruppe.trim(),
+				[`${this.$p.t('profil','Geburtsdatum')}`]: this.data.gebdatum,
+				[`${this.$p.t('profil', 'Geburtsort')}`]: this.data.gebort,
+				[`${this.$p.t('person', 'personenkennzeichen')}`]: this.data.personenkennzeichen,
+				[`${this.$p.t('lehre', 'studiengang')}`]: this.data.studiengang,
+				[`${this.$p.t('lehre', 'semester')}`]: this.data.semester,
+				[`${this.$p.t('lehre', 'lehrverband')}`]: this.data.verband,
+				[`${this.$p.t('lehre', 'gruppe')}`]: this.data.gruppe.trim(),
 			};
 		},
 	},
@@ -194,11 +194,12 @@ export default {
     <div class="row">
         <!-- HIDDEN QUICK LINKS -->
         <div  class="d-md-none col-12 ">
-            <div class="row py-2">
+            <!--TODO: uncomment when implemented
+			<div class="row py-2">
                 <div class="col">
                     <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
                 </div>
-            </div>
+            </div>-->
             
 			<!-- Bearbeiten Button -->
 			<div v-if="editable" class="row ">
@@ -314,12 +315,12 @@ export default {
 		</div>
 		<!-- START OF SIDE PANEL -->
 		<div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
+			<!--TODO: uncomment when implemented
 			<div  class="row d-none d-md-block mb-3">
 				<div class="col">
-					<!-- QUICK LINKS -->     
 					<quick-links :title="$p.t('profil','quickLinks')"></quick-links>
 				</div>
-			</div>
+			</div>-->
 			<!-- Bearbeiten Button -->
 			<div class="row d-none d-md-block">
 				<div class="col mb-3">

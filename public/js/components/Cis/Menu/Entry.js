@@ -55,11 +55,8 @@ export default {
 					this.makeParentContentActive(this.entry.content_id);
 				}
 			}
-			// debugging helpers - console.log(this.entry.titel, newValue ? "open" : "close")
-			
 		},
 	},
-		
     computed: {
 		active: function () {
 			if (this.entry.menu_open){
@@ -77,6 +74,7 @@ export default {
                     return '';
                 let xmlDoc = (new DOMParser()).parseFromString(this.entry.content,"text/xml");
                 let url = xmlDoc.getElementsByTagName('url')[0];
+				
                 if (!url)
                     return '';
                 // TODO(chris): replace get params
@@ -202,7 +200,9 @@ export default {
     <template v-else>
         <template v-if="hasChilds">
 			<div class="btn-group w-100">
-                <a :href="(entry.menu_open)?link:null" :target="target" @click="toggleCollapse"
+ 				<a :target="target" 
+ 					:href="(entry.menu_open)?link:null"
+					@click="toggleCollapse"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
                         ['btn-level-' + level]: true,
@@ -223,14 +223,15 @@ export default {
                 <cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
             </ul>
         </template>
-        <a v-else
+		<a v-else
             :href="link"
             :target="target"
             :class="{
                 'btn btn-default rounded-0 w-100 text-start': true,
                 ['btn-level-' + level]: true,
 				'fw-bold':active
-            }">
+            }"
+            @mouseup="setActiveEntry(entry.content_id)">
             {{ entry.titel }}
         </a>
     </template>`

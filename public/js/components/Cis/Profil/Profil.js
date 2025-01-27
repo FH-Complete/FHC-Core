@@ -1,11 +1,8 @@
-import StudentProfil from "../../components/Cis/Profil/StudentProfil.js";
-import MitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterProfil.js";
-import ViewStudentProfil from "../../components/Cis/Profil/StudentViewProfil.js";
-import ViewMitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterViewProfil.js";
-import Loading from "../../components/Loader.js";
-import Phrasen from "../../plugin/Phrasen.js";
-import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers";
-
+import StudentProfil from "./StudentProfil.js";
+import MitarbeiterProfil from "./MitarbeiterProfil.js";
+import ViewStudentProfil from "./StudentViewProfil.js";
+import ViewMitarbeiterProfil from "./MitarbeiterViewProfil.js";
+import Loading from "../../Loader.js";
 
 Vue.$collapseFormatter = function (data) {
 	//data - an array of objects containing the column title and value for each cell
@@ -34,8 +31,8 @@ Vue.$collapseFormatter = function (data) {
 	return Object.keys(data).length ? container : "";
 };
 
-const profilApp = Vue.createApp({
-	name: 'ProfilApp',
+export const Profil = {
+	name: 'Profil',
 	components: {
 		StudentProfil,
 		MitarbeiterProfil,
@@ -43,7 +40,12 @@ const profilApp = Vue.createApp({
 		ViewMitarbeiterProfil,
 		Loading,
 	},
-
+	props: {
+		uid: {
+			type: String,
+			default: 'Profil'
+		}
+	},
 	data() {
 		return {
 			//? loading property is used for showing/hiding the loading modal
@@ -56,8 +58,6 @@ const profilApp = Vue.createApp({
 			notFoundUID: null,
 		};
 	},
-
-	//? use function syntax for provide so that we can access `this`
 	provide() {
 		return {
 			profilUpdateStates: Vue.computed(() =>
@@ -129,8 +129,36 @@ const profilApp = Vue.createApp({
 			},
 		};
 	},
-
 	methods: {
+		async load() {
+			// fetch profilUpdateStates to provide them to children components
+			await this.$fhcApi.factory.profilUpdate.getStatus()
+				.then((response) => {
+					this.profilUpdateStates = response.data;
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+
+			this.$fhcApi.factory.profilUpdate.getTopic()
+				.then((response) => {
+					this.profilUpdateTopic = response.data;
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+			
+			let uid = this.uid ?? location.pathname.split("/").pop();
+
+			this.$fhcApi.factory.profil.getView(uid).then((res) => {
+				if (!res.data) {
+					this.notFoundUID = uid;
+				} else {
+					this.view = res.data?.view;
+					this.data = res.data?.data;
+				}
+			});	
+		},
 		zustellAdressenCount() {
 			if (!this.data || !this.data.adressen) {
 				return null;
@@ -172,22 +200,13 @@ const profilApp = Vue.createApp({
 			}
 
 			return [...new Set(adressenArray)];
-
-			// OLD version
-			// return this.data.adressen.filter(adresse => {
-			// 	return adresse.zustelladresse;
-			// }).map(adr => {
-
-			// 	return adr.adresse_id;
-			// });
+			
 		},
-
 		zustellKontakteCount() {
 			if (!this.data || !this.data.kontakte) {
 				return null;
 			}
 
-			//TODO: not sure if how it is implemented is the best way
 			let kontakteArray = [];
 
 			if (this.data.profilUpdates?.length) {
@@ -225,16 +244,8 @@ const profilApp = Vue.createApp({
 			}
 
 			return [...new Set(kontakteArray)];
-
-			// OLD version
-			// return this.data.kontakte.filter(kontakt => {
-			// 	return kontakt.zustellung;
-			// }).map(kon =>{
-			// 	return kon.kontakt_id;
-			// });
 		},
 	},
-
 	computed: {
 		filteredEditData() {
 			if (!this.data) {
@@ -331,60 +342,26 @@ const profilApp = Vue.createApp({
 								};
 							}),
 					},
-					//  Password_Change : {
-					// 	title:"Passwort Ändern",
-					// 	view:"ChangePassword",
-					// 	data:{
-					// 	  test:"testvalue",
-					// 	  }
-					// 	},
 				},
 			};
 		},
 	},
-
 	watch: {
-		loading: function (newValue, oldValue) {
+		loading: function (newValue) {
 			if (newValue) {
 				this.$refs.loadingModalRef.show();
 			} else {
 				this.$refs.loadingModalRef.hide();
 			}
 		},
+		uid (newVal, oldVal) {
+			console.log('watch uid', newVal)
+			this.load()
+		}
 	},
-
 	async created() {
-		// fetch profilUpdateStates to provide them to children components
-
-		await this.$fhcApi.factory.profilUpdate.getStatus()
-			.then((response) => {
-				this.profilUpdateStates = response.data;
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-
-		this.$fhcApi.factory.profilUpdate.getTopic()
-			.then((response) => {
-				this.profilUpdateTopic = response.data;
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-
-		//? uid contains the last part of the uri
-		let uid = location.pathname.split("/").pop();
-
-		this.$fhcApi.factory.profil.getView(uid).then((res) => {
-			if (!res.data) {
-				this.notFoundUID = uid;
-			} else {
-				this.view = res.data?.view;
-				this.data = res.data?.data;
-			}
-		});
+		this.load()
 	},
-
 	template: `
 	<div>
 		<div v-if="notFoundUID">
@@ -395,9 +372,6 @@ const profilApp = Vue.createApp({
             <component  :is="view" :data="data" :editData="filteredEditData" ></component>
 		</div>
 	</div>`,
-});
-setScrollbarWidth();
-profilApp
-	.use(primevue.config.default, {zIndex: {overlay: 9999}})
-	.use(Phrasen)
-	.mount("#content");
+}
+
+export default Profil

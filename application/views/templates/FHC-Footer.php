@@ -30,7 +30,7 @@
 	// Generates the global object to pass phrases to javascripts
 	// NOTE: must be called before including the PhrasesLib.js
 	if ($phrases != null) generateJSPhrasesStorageObject($phrases);
-
+	
 	// --------------------------------------------------------------------------------------------------------
 	// From vendor folder
 
@@ -122,6 +122,13 @@
 			generateJSsInclude('vendor/vuejs/vuejs3/vue.global.prod.js');
 		}
 		generateJSsInclude('vendor/vuejs/vuerouter4/vue-router.global.js');
+	}
+	
+	// Highcharts
+	if (isset($highcharts) && $highcharts === true)
+	{
+		generateJSsInclude('vendor/highcharts/highcharts-dist/highcharts.js');
+		generateJSsInclude('vendor/highcharts/highcharts-dist/modules/current-date-indicator.js');
 	}
 
 	// PrimeVue

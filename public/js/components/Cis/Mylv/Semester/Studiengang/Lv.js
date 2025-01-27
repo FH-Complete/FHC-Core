@@ -28,17 +28,37 @@ export default {
 		sprache: String,
 		ects: String,
 		incoming: Number,
-		positiv: Boolean
+		positiv: Boolean,
+		note_index: String,
 	},
 	data: () => {
 		return {
-			pruefungen: null,
+			pruefungenData: null,
 			info: null,
 			menu: null,
 			preselectedMenuItem: null,
 		}
 	},
 	computed: {
+		gradeColor() {
+			// early return if value is null or undefined
+			if (this.positiv == null) return;
+			// returns a suitable color for the given grade
+			if (this.positiv)
+			{
+				return 'var(--fhc-cis-grade-positive)';
+			}
+			else
+			{
+				return 'var(--fhc-cis-grade-negative)';
+			}
+		},
+		is_organisatorische_einheit(){
+			return this.menu == "organisatorische_einheit";
+		},
+		emptyMenu(){
+			return !this.menu || !Array.isArray(this.menu) || Array.isArray(this.menu) && this.menu.length == 0;
+		},
 		bodyStyle() {return {};
 			const bodyStyle = {};
 			if (this.farbe)
@@ -47,9 +67,24 @@ export default {
 		},
 		grade() {
 			return this.benotung ? this.znote || this.lvnote || null : null;
-		}
+		},
+		LvHasPruefungenInformation(){
+			return this.pruefungenData && this.pruefungenData.length > 0;
+		},
 	},
 	methods: {
+		
+		fetchMenu(lehrveranstaltung_id = this.lehrveranstaltung_id, studien_semester = this.studien_semester){
+			return this.$fhcApi.factory.addons.getLvMenu(lehrveranstaltung_id, studien_semester)
+				.then(res => {
+					this.menu = res.data;
+				})
+				.catch((error) => {
+					this.$fhcAlert.handleSystemError(error);
+					this.menu = [];
+				});
+		},
+
 		c4_link(menuItem) {
 			if (!menuItem) return null;
 			if (Array.isArray(menuItem.c4_moodle_links) && menuItem.c4_moodle_links.length) {
@@ -72,13 +107,13 @@ export default {
 			}
 		},
 		openPruefungen() {
-			if (!this.pruefungen) {
-				this.pruefungen = true;
-				LvPruefungen.popup({
-					lehrveranstaltung_id: this.lehrveranstaltung_id, 
-					bezeichnung: this.bezeichnung
-				}).then(() => this.pruefungen = false).catch(() => this.pruefungen = false);
-			}
+			// early return if the pruefungenData is empty or not set
+			if (!this.LvHasPruefungenInformation) return;
+
+			LvPruefungen.popup({
+				pruefungenData: this.pruefungenData, 
+				bezeichnung: this.bezeichnung
+			});
 		},
 		openInfos() {
 			if (!this.info) {
@@ -100,22 +135,19 @@ export default {
 	},
 	watch:{
 		studien_semester(newValue){
-			this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, newValue)
-				.then(res => {
-					this.menu = res.data;
-				})
-				.catch((error) => this.$fhcAlert.handleSystemError);	
+			this.fetchMenu(this.lehrveranstaltung_id, newValue);
 		}
 	},
+	created(){
+		this.$fhcApi.factory.lehre.getStudentPruefungen(this.lehrveranstaltung_id)
+		.then(res => res.data)
+		.then(pruefungen =>{
+			this.pruefungenData = pruefungen;
+		}); 
+		
+	},
 	mounted() {
-		this.$fhcApi.factory.addons.getLvMenu(this.lehrveranstaltung_id, this.studien_semester)
-			.then(res => {
-				this.menu = res.data;
-			})
-			.catch((error) => {
-				this.$fhcAlert.handleSystemError(error);
-				this.menu = [];
-			});
+		this.fetchMenu(this.lehrveranstaltung_id, this.studien_semester);
 	},
 	template: /*html*/`<div class="mylv-semester-studiengang-lv card">
 		<lv-uebersicht ref="lvUebersicht" :preselectedMenu="preselectedMenuItem" :event="{
@@ -125,45 +157,56 @@ export default {
 			stg_kurzbzlang:studien_semester,
 		}"/>
 
-		<div class="card-header">
+		<div class="p-2" :class="is_organisatorische_einheit?'':'card-header'">
 			<!-- {{module}} if the module of the lv is important then query the module from the api endpoint for LV-->
-			<h6 class="card-title">{{bezeichnung}}</h6>
+			<h6 class="fw-bold" v-if="is_organisatorische_einheit" >Organisatorische Einheit:</h6>
+			<h6 class="mb-0">{{bezeichnung}}</h6>
 		</div>
-		<div class="card-body " :style="bodyStyle">
-			<ul class="list-group border-top-0 border-bottom-0 rounded-0">
-				<template v-if="menu">
+		<div v-if="!emptyMenu" class="card-body " :style="bodyStyle">
+			<template v-if="menu">
+				<ul class="list-group border-top-0 border-bottom-0 rounded-0">
 					<li :type="menuItem.c4_link ? 'button' : null" v-for="menuItem in menu" class="list-group-item border-0 " >
 						<div class="d-flex flex-row"  :data-bs-toggle="menuItem.c4_moodle_links?.length ? 'dropdown' : null">
 							<div class="mx-4">
 								<i :class="[menuItem.c4_icon2 ? menuItem.c4_icon2 : 'fa-solid fa-pen-to-square', !menuItem.c4_link ? 'unavailable' : null ]"></i>
 							</div>
-							<a class="text-decoration-none text-truncate" :id="'moodle_links_'+lehrveranstaltung_id"  :class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }" :target="menuItem.c4_target" :href="c4_link(menuItem) ? c4_link(menuItem) : null">
-							{{menuItem.name}}
+							<a
+							class="text-decoration-none text-truncate"
+							:id="'moodle_links_'+lehrveranstaltung_id"
+							:class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }"
+							:target="menuItem.c4_target"
+							:href="c4_link(menuItem) ? c4_link(menuItem) : null">
+								{{menuItem.name}}
 							</a>
 							</div>
 							<ul v-if="menuItem.c4_moodle_links?.length" class="dropdown-menu p-0" :aria-labelledby="'moodle_links_'+lehrveranstaltung_id">
 								<li v-for="item in menuItem.c4_moodle_links"><a class="dropdown-item border-bottom" :href="item.url">{{item.lehrform}}</a></li>
 							</ul>
 					</li>
-				</template>
-				<template v-else>
-					<li class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></li>
-				</template>
-			</ul>
+				</ul>
+			</template>
+			<template v-else>
+				<div class="text-center d-flex justify-content-center align-items-center h-100" >
+					<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+				</div>
+			</template>
 		</div>
-		<div class="card-footer">
+		<div v-if="!emptyMenu" class="card-footer">
 			<div class="row">
-				<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
-					<i class="fa fa-check text-success" v-if="positiv"></i>
-					{{ grade || p.t('lehre/noGrades') }}
-				</a>
-				<!--
-				Not used anymore because the lehrveranstaltungs informationen is available as a menu point in the lehrveranstaltungs optionen
-				<div v-if="lvinfo" class="col text-end">
-					<a class="card-link" href="#" @click.prevent="openInfos">
-						<i class="fa fa-info-circle" aria-hidden="true"></i>
+				<!-- template for the LV if there are multiple pruefungen -->
+				<template v-if="LvHasPruefungenInformation">
+					<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
+						<i class="fa fa-check text-success" v-if="positiv"></i>
+						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || p.t('lehre/noGrades') }}</span>
 					</a>
-				</div>-->
+				</template>
+				<!-- template for the LV with no pruefungen -->
+				<template v-else>
+					<span  class="col-auto text-start text-decoration-none" >
+						<i class="fa fa-check text-success" v-if="positiv"></i>
+						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || p.t('lehre/noGrades') }}</span>
+					</span>
+				</template>
 			</div>
 		</div>
 	</div>`

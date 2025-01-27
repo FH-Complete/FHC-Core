@@ -3,9 +3,9 @@ export default {
 		return{
 			selected: this.mode,
 			modes:{
+				day: { mode_bezeichnung: "Tag", icon: "fa-calendar-day" , condition:true}, 
 				week: { mode_bezeichnung: "Woche", icon: "fa-calendar-week", condition: !this.noWeekView }, 
 				month: { mode_bezeichnung: "Monat", icon: "fa-calendar-days", condition: !this.noMonthView }, 
-				day: { mode_bezeichnung: "Tag", icon: "fa-sun" , condition:true}, 
 			},
 			headerPadding:null,
 		}

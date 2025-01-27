@@ -19,7 +19,7 @@ export default{
         <div :class="{...(data.anmerkung? {'col-11':true, 'col-md-6':true, 'col-xl-11':true, 'col-xxl-6':true} : {'col-10':true, 'col-xl-9':true, 'col-xxl-10':true})}">
             <!-- rendering KONTAKT emails -->
             <div  class="form-underline ">
-                <div class="form-underline-titel">{{data.kontakttyp}}</div>
+                <div class="form-underline-titel">{{$p.t('profil',data.kontakttyp.toUpperCase())}}</div>
                 <a v-if="data.kontakt.includes('@')" role="link" :aria-disabled="view?true:false" :href="!view?('mailto:'+data.kontakt):null" class="form-underline-content">{{data.kontakt}} </a>
                 <a v-else role="link" :aria-disabled="view?true:false" :href="!view?('tel:'+data.kontakt):null" class="form-underline-content">{{data.kontakt}} </a>
             </div>
