@@ -18291,6 +18291,26 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
+		'phrase' => 'studentstatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studentstatus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
 		'phrase' => 'alledurchgefuehrten',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -19418,6 +19438,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => '>=5 international credits planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'stgtodo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'Nur offene Massnahmen',
+				'text' => 'O',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'only open measures',
 				'description' => '',
 				'insertvon' => 'system'
 			)
