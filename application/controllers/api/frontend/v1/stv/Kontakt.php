@@ -230,10 +230,7 @@ class Kontakt extends FHCAPI_Controller
 			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
 		]);
 
-		if(isset($_POST['gemeinde']) && ($_POST['gemeinde'] != '')
-			&& isset($_POST['ort']) && ($_POST['ort'] != '')
-			&& isset($_POST['nation']) && ($_POST['nation'] == 'A')
-			&& isset($_POST['plz']) && ($_POST['plz'] != '')  )
+		if(isset($_POST['gemeinde']) && isset($_POST['ort']) && isset($_POST['nation']) && $_POST['nation'] == 'A')
 		{
 			$this->form_validation->set_rules('address.plz', 'Postleitzahl', 'callback_validateLocationCombination', [
 				'validateLocationCombination' => $this->p->t('ui', 'error_location_combination')

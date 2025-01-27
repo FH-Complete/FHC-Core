@@ -440,6 +440,7 @@ export default{
 						<form-input
 							v-else
 							type="text"
+							:label="$p.t('person/gemeinde')"
 							name="addressData.gemeinde"
 							:label="$p.t('person/gemeinde')"
 							v-model="addressData.gemeinde"
@@ -467,6 +468,7 @@ export default{
 					<form-input
 							v-else
 							type="text"
+							:label="$p.t('person/ort')"
 							name="ort"
 							:label="$p.t('person/ort')"
 							v-model="addressData.ort"
