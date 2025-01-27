@@ -45,6 +45,7 @@ export default {
 			cisRoot: this.cisRoot,
 			activeAddonBewerbung: this.activeAddons.split(';').includes('bewerbung'),
 			configGenerateAlias: this.config.generateAlias,
+			configShowHintKommPrfg: this.config.showHintKommPrfg,
 			hasBpkPermission: this.permissions['student/bpk'],
 			hasAliasPermission: this.permissions['student/alias'],
 			hasPrestudentPermission: this.permissions['basis/prestudent'],
@@ -55,6 +56,7 @@ export default {
 			hasPermissionToSkipStatusCheck: this.permissions['student/keine_studstatuspruefung'],
 			hasPermissionRtAufsicht: this.permissions['lehre/reihungstestAufsicht'],
 			lists: this.lists,
+			currentSemester: Vue.computed(() => this.studiensemesterKurzbz),
 			defaultSemester: this.defaultSemester,
 			$reloadList: () => {
 				this.$refs.stvList.reload();
@@ -75,7 +77,7 @@ export default {
 					student: {
 						defaultaction: {
 							type: "link",
-							action: function(data) { 
+							action: function(data) {
 								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/studentenverwaltung/student/' + data.uid;
 							}
 						},

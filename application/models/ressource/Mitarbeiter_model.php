@@ -238,4 +238,28 @@ class Mitarbeiter_model extends DB_Model
 
 		return $this->execQuery($qry);
 	}
+
+	/**
+	 * Gets Mitarbeiter for a certain Lehrveranstaltung.
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @return array with Mitarbeiter and their Lehreinheiten
+	 */
+	public function getMitarbeiterFromLV($lehrveranstaltung_id){
+	//TODO(manu) maybe filter that in pruefungslist.js ?
+	$qry = "SELECT DISTINCT
+    			lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid 
+			FROM 
+			    lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
+			WHERE 
+			    lehrveranstaltung_id= ?
+			AND 
+				mitarbeiter_uid=uid 
+			AND 
+				tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
+
+		$parametersArray = array($lehrveranstaltung_id);
+
+		return $this->execQuery($qry, $parametersArray);
+	}
 }
