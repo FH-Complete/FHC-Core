@@ -217,12 +217,28 @@ class Mitarbeiter_model extends DB_Model
 		return success($kurzbz);
 	}
 
-	public function searchMitarbeiter($filter)
+	/**
+	 * Search function for mitarbeiter
+	 * @param $filter searchstring: searches for nachname, vorname, mitarbeiter_uid
+	 * $param $mode gives the resultobject in different version:
+	 * 				null : "[mitarbeiter_uid], Nachname, Vorname, (mitarbeiter_uid)"
+	 * 				'mitAkadGrad': "[mitarbeiter_uid], Nachname, Vorname, Titelpre, Titelpost (mitarbeiter_uid)"
+	 *				'ohneMaUid' : "[mitarbeiter_uid], Nachname, Vorname, Titelpre, Titelpost"
+	 * @return object in 3 versions
+	 */
+	public function searchMitarbeiter($filter, $mode=null)
 	{
 		$filter = strtoLower($filter);
+
+		if ($mode == "mitAkadGrad")
+			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+		elseif ($mode == "ohneMaUid")
+			$returnwert = "p.person_id, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre) as mitarbeiter";
+		else
+			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+
 		$qry = "
-			SELECT 
-					ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter
+			SELECT " . $returnwert . "  
 			FROM 
 			    public.tbl_mitarbeiter ma 
 			JOIN 

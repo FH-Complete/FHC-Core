@@ -44,7 +44,8 @@ class Config extends FHCAPI_Controller
 			'person',
 			'lehre',
 			'stv',
-			'konto'
+			'konto',
+			'abschlusspruefung'
 		]);
 
 		// Load Config
@@ -109,6 +110,12 @@ class Config extends FHCAPI_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Pruefung.js'
 		];
 
+		$result['finalexam'] = [
+			'title' => $this->p->t('stv', 'tab_finalexam'),
+			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'config' => $config['finalexam']
+		];
+
 		Events::trigger('stv_conf_student', function & () use (&$result) {
 			return $result;
 		});
@@ -119,6 +126,7 @@ class Config extends FHCAPI_Controller
 	public function students()
 	{
 		$result = [];
+		$config = $this->config->item('tabs');
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
 			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
@@ -141,6 +149,11 @@ class Config extends FHCAPI_Controller
 				'changeStatusToDiplomand' => $this->permissionlib->isBerechtigt('admin'),
 				'changeStatusToAbsolvent' => $this->permissionlib->isBerechtigt('admin')
 			]
+		];
+		$result['finalexam'] = [
+			'title' =>  $this->p->t('stv', 'tab_finalexam'),
+			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'config' => $config['finalexam']
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {

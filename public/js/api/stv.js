@@ -7,6 +7,7 @@ import prestudent from './stv/prestudent.js';
 import status from './stv/status.js';
 import details from './stv/details.js';
 import exam from './stv/exam.js';
+import abschlusspruefung from './stv/abschlusspruefung.js';
 
 export default {
 	verband,
@@ -18,6 +19,7 @@ export default {
 	status,
 	details,
 	exam,
+	abschlusspruefung,
 	configStudent() {
 		return this.$fhcApi.get('api/frontend/v1/stv/config/student');
 	},

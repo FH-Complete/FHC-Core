@@ -113,4 +113,60 @@ class Abschlusspruefung_model extends DB_Model
 		
 		return success($abschlusspruefungdata);
 	}
+
+	/**
+	 * Gets data of an Abschlusspruefung
+	 * @param $student_uid
+	 * @return object
+	 */
+	public function getAbschlusspruefungForPrestudent($student_uid)
+	{
+		$qry = "
+			SELECT
+				exam.*, 
+				CONCAT(
+					person_pruefer1.nachname || ' ',
+					person_pruefer1.vorname,
+					COALESCE(' ' || person_pruefer1.titelpre)
+				) AS person_pruefer1,
+				CONCAT(
+					person_pruefer2.nachname || ' ',
+					person_pruefer2.vorname,
+					COALESCE(' ' || person_pruefer2.titelpre)
+				) AS person_pruefer2,
+				CONCAT(
+					person_pruefer3.nachname || ' ',
+					person_pruefer3.vorname,
+					COALESCE(' ' || person_pruefer3.titelpre)
+				) AS person_pruefer3,
+				CONCAT(
+					person_vorsitzender.nachname || ' ',
+					person_vorsitzender.vorname,
+					COALESCE(' ' || person_vorsitzender.titelpre)
+				) AS person_vorsitzender,
+				TO_CHAR(datum::timestamp, 'DD.MM.YYYY') AS format_datum,
+				TO_CHAR(freigabedatum::timestamp, 'DD.MM.YYYY') AS format_freigabedatum,
+				TO_CHAR(sponsion::timestamp, 'DD.MM.YYYY') AS format_sponsion,
+				person_pruefer1.nachname as p1_nachname,
+				person_pruefer2.nachname as p2_nachname,
+				person_pruefer3.nachname as p3_nachname,
+				person_vorsitzender.nachname as vorsitz_nachname,
+				beurteilung.bezeichnung as beurteilung_bezeichnung,
+				antritt.bezeichnung as antritt_bezeichnung
+			FROM
+				lehre.tbl_abschlusspruefung exam
+				JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz)
+				LEFT JOIN public.tbl_benutzer ben_vorsitzender ON (ben_vorsitzender.uid = vorsitz)
+				LEFT JOIN public.tbl_person person_vorsitzender ON (ben_vorsitzender.person_id = person_vorsitzender.person_id)
+				LEFT JOIN public.tbl_person person_pruefer1 ON (person_pruefer1.person_id = pruefer1)
+				LEFT JOIN public.tbl_person person_pruefer2 ON (person_pruefer2.person_id = pruefer2)
+				LEFT JOIN public.tbl_person person_pruefer3 ON (person_pruefer3.person_id = pruefer3)
+				LEFT JOIN lehre.tbl_abschlussbeurteilung beurteilung USING (abschlussbeurteilung_kurzbz)
+				LEFT JOIN lehre.tbl_abschlusspruefung_antritt antritt USING (pruefungsantritt_kurzbz)
+				WHERE student_uid = ?
+				ORDER BY datum DESC	
+					";
+
+		return $this->execQuery($qry, array('student_uid' => $student_uid));
+	}
 }
