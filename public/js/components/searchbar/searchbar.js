@@ -34,6 +34,9 @@ export default {
           <form ref="searchform" class="d-flex me-3" :class="searchoptions.cssclass" action="javascript:void(0);"
 		 	 @focusin="this.searchfocusin" @focusout="this.searchfocusout">
 			<div ref="searchbox" class="h-100 input-group me-2 bg-white">
+				<span style="background-color:inherit" class="input-group-text">
+					<i class="fa-solid fa-magnifying-glass"></i>
+				</span>
                 <input @keyup="this.search" @focus="this.showsearchresult"
                     v-model="this.searchsettings.searchstr" class="form-control"
                     type="search" :placeholder="'Search: '+ search_types_string" aria-label="Search">
