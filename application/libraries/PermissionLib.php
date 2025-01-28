@@ -21,6 +21,8 @@ require_once(FHCPATH.'include/functions.inc.php');
 require_once(FHCPATH.'include/wawi_kostenstelle.class.php');
 require_once(FHCPATH.'include/benutzerberechtigung.class.php');
 
+use \benutzerberechtigung as benutzerberechtigung;
+
 class PermissionLib
 {
 	// Available rights in the DB
@@ -65,8 +67,10 @@ class PermissionLib
 		if (!is_cli())
 		{
 			// API Caller rights initialization
+			$authObj = $this->_ci->authlib->getAuthObj();
 			self::$bb = new benutzerberechtigung();
-			self::$bb->getBerechtigungen(($this->_ci->authlib->getAuthObj())->{AuthLib::AO_USERNAME});
+			if ($authObj)
+				self::$bb->getBerechtigungen($authObj->{AuthLib::AO_USERNAME});
 		}
 	}
 
@@ -89,6 +93,33 @@ class PermissionLib
 		}
 
 		return $isBerechtigt;
+	}
+
+	/**
+	 * Prueft ob die Berechtigung zumindest fuer eine der angegebenen OE vorhanden ist.
+	 * @param $berechtigung_kurzbz
+	 * @param $oe_kurzbz
+	 * @param $art
+	 * @param $kostenstelle_id
+	 * @return boolean
+	 */
+	public function isBerechtigtMultipleOe($berechtigung_kurzbz, $oe_kurzbz, $art=null, $kostenstelle_id=null)
+	{
+		$results = array();
+
+		foreach($oe_kurzbz as $value)
+		{
+			$results[] = $this->isBerechtigt($berechtigung_kurzbz, $value, $art, $kostenstelle_id);
+		}
+
+		if(!in_array(true, $results))
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	/**
@@ -143,19 +174,7 @@ class PermissionLib
 							if (strpos($permissions[$pCounter], PermissionLib::PERMISSION_SEPARATOR) !== false)
 							{
 								// Retrieves permission and required access type from the $requiredPermissions array
-								list($permission, $requiredAccessType) = explode(PermissionLib::PERMISSION_SEPARATOR, $permissions[$pCounter]);
-
-								$accessType = '';
-
-								// Set the access type
-								if (strpos($requiredAccessType, PermissionLib::READ_RIGHT) !== false)
-								{
-									$accessType = PermissionLib::SELECT_RIGHT; // S
-								}
-								if (strpos($requiredAccessType, PermissionLib::WRITE_RIGHT) !== false)
-								{
-									$accessType .= PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT; // UID
-								}
+								list($permission, $accessType) = $this->convertAccessType($permissions[$pCounter]);
 
 								if (!isEmptyString($accessType)) // if compliant
 								{
@@ -165,6 +184,16 @@ class PermissionLib
 									// If the user has one of the permissionsm than exit the loop
 									if ($checkPermissions === true) break;
 								}
+							}
+							elseif ($permissions[$pCounter] == Auth_Controller::PERM_ANONYMOUS)
+							{
+								$checkPermissions = true;
+								break;
+							}
+							elseif ($permissions[$pCounter] == Auth_Controller::PERM_LOGGED)
+							{
+								$checkPermissions = isLogged();
+								break;
 							}
 							else
 							{
@@ -193,6 +222,24 @@ class PermissionLib
 		}
 
 		return $checkPermissions;
+	}
+
+	/**
+	 * Retrieves permission and required access type from the newly formatted permission string
+	 *
+	 * @param string $permission
+	 *
+	 * @return array
+	 */
+	public function convertAccessType($permission)
+	{
+		list($permission, $reqAccessType) = explode(PermissionLib::PERMISSION_SEPARATOR, $permission);
+		$accessType = '';
+		if (strpos($reqAccessType, PermissionLib::READ_RIGHT) !== false)
+			$accessType = PermissionLib::SELECT_RIGHT;
+		if (strpos($reqAccessType, PermissionLib::WRITE_RIGHT) !== false)
+			$accessType = PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT;
+		return [$permission, $accessType];
 	}
 
 	/**

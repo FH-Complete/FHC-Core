@@ -1,5 +1,9 @@
+import FhcApi from './FhcApi.js';
+
 const categories = Vue.reactive({});
+const user_language = Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
 const loadingModules = {};
+let reload = false;
 
 function extractCategory(obj, category) {
 	return obj.filter(e => e.category == category).reduce((res, elem) => {
@@ -17,24 +21,37 @@ function getValueForLoadedPhrase(category, phrase, params) {
 	return result;
 }
 
-
 const phrasen = {
+	setLanguage(language, api) {
+		const catArray = Object.keys(categories)
+		return api.factory.phrasen.setLanguage(catArray, language).then(res => {
+			if(reload) window.location.reload()
+
+			res.data.forEach(row => {
+				categories[row.category][row.phrase] = row.text
+			})
+
+			// update the reactive data that holds the current active user_language
+			user_language.value = language;
+
+			return res
+		})
+	},
 	loadCategory(category) {
 		if (Array.isArray(category))
-			return Promise.all(category.map(cat => this.loadCategory(cat)));
+			return Promise.all(category.map(this.config.globalProperties
+				.$p.loadCategory));
 		if (!loadingModules[category])
-			loadingModules[category] = axios
-				.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Phrasen/loadModule/' + category)
+			loadingModules[category] = this.config.globalProperties
+				.$fhcApi.factory.phrasen.loadCategory(category)
+				.then(res => res?.data ? extractCategory(res.data, category) : {})
 				.then(res => {
-					if (res.data.retval)
-						categories[category] = extractCategory(res.data.retval, category);
-					else
-						categories[category] = {};
+					categories[category] = res;
 				});
 		return loadingModules[category];
 	},
 	t_ref(category, phrase, params) {
-		console.warn('depricated');
+		console.warn('deprecated');
 		return Vue.computed(() => this.t(category, phrase, params));
 	},
 	t(category, phrase, params) {
@@ -62,6 +79,15 @@ const phrasen = {
 
 export default {
 	install(app, options) {
-		app.config.globalProperties.$p = phrasen;
+		reload = options?.reload ?? reload
+		app.use(FhcApi, options?.fhcApi || undefined);
+		app.config.globalProperties.$p = {
+			t: phrasen.t,
+			loadCategory: cat => phrasen.loadCategory.call(app, cat),
+			setLanguage: phrasen.setLanguage,
+			user_language: user_language,
+			t_ref: phrasen.t_ref
+		};
+		app.provide('$p', app.config.globalProperties.$p);
 	}
 }

@@ -1,3 +1,14 @@
+
+.btn-w200
+{
+    width: 200px;
+}
+
+.btn-mr5
+{
+    margin-right: 10px;
+}
+
 .select-w500 {
     width: 500px;
 }
@@ -5,3 +16,58 @@
 .pl-15 {
     padding-left: 15px !important;
 }
+
+.bg-secondary-subtle{
+    background-color: #E9ECEF !important; 
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-color: #DEE2E6 !important;
+}
+
+.bg-info-subtle{
+    background-color: #D9EDF7 !important; 
+    color: #31708F !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-color: #BCE8F1 !important;
+}
+
+.bg-warning-subtle{
+    background-color: #FFF3CD !important; 
+    color: #664D03 !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-color: #FFE69C !important;
+}
+
+.bg-success-subtle{
+    background-color: #D1E7DD !important; 
+    color: #0A3622 !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-color: #A3CFBB !important;
+}
+
+.bg-danger-subtle{
+    background-color: #F8D7DA !important; 
+    color: #672B31 !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-color: #F1AEB5 !important;
+}
+
+.bg-primary-subtle{
+    background-color: #CFE2FF !important; 
+    color: #052C65 !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-color: #9EC5FE !important;
+}
+
+
+/* html attribute disabled and title don't work together, sets the pointer-event to auto in order to see the title toolip */
+.btn:disabled {
+    pointer-events: auto !important;
+    cursor: default;
+}
+

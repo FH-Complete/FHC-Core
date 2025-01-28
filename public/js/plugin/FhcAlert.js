@@ -102,6 +102,7 @@ import {CoreRESTClient} from '../RESTClient.js';
 const helperAppContainer = document.createElement('div');
 
 const helperApp = Vue.createApp({
+	name: "FhcAlertApp",
 	components: {
 		PvToast,
 		PvConfirm
@@ -226,6 +227,25 @@ export default {
 					});
 				});
 			},
+			confirm(options) {
+				return new Promise((resolve, reject) => {
+					helperAppInstance.$confirm.require({
+						group: options?.group ?? 'fhcAlertConfirm',
+						header: options?.header ?? 'Achtung',
+						message: options?.message ?? '',
+						acceptLabel: options?.acceptLabel ?? 'Ok',
+						acceptClass: options?.acceptClass ?? 'btn btn-primary',
+						rejectLabel: options?.rejectLabel ?? 'Abbrechen',
+						rejectClass: options?.rejectClass ?? 'btn btn-outline-secondary',
+						accept() {
+							resolve(true);
+						},
+						reject() {
+							resolve(false);
+						},
+					});
+				});
+			},
 			alertDefault(severity, title, message, sticky = false) {
 				let options = { severity: severity, summary: title, detail: message};
 				
@@ -250,6 +270,10 @@ export default {
 				// Error is array of strings
 				if (Array.isArray(error) && error.every(err => typeof err === 'string'))
 					return error.every($fhcAlert.alertSystemError);
+
+				// Error has been handled already
+				if (error.hasOwnProperty('handled') && error.handled)
+					return;
 				
 				// Error is object
 				if (typeof error === 'object' && error !== null) {
@@ -390,5 +414,6 @@ export default {
 			}
 		};
 		app.config.globalProperties.$fhcAlert = $fhcAlert;
+                app.provide('$fhcAlert', app.config.globalProperties.$fhcAlert);
 	}
 }

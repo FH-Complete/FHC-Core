@@ -5,7 +5,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * Controller using JSON
  */
-class FHCAPI_Controller extends FHC_Controller
+class FHCAPI_Controller extends Auth_Controller
 {
 
 	/**
@@ -19,12 +19,13 @@ class FHCAPI_Controller extends FHC_Controller
 	/**
 	 * Error types
 	 */
-	const ERROR_TYPE_PHP = 'php'; // TODO(chris): php types from severity?
+	const ERROR_TYPE_PHP = 'php';
 	const ERROR_TYPE_EXCEPTION = 'exception';
 	const ERROR_TYPE_GENERAL = 'general';
 	const ERROR_TYPE_404 = '404';
 	const ERROR_TYPE_DB = 'db';
 	const ERROR_TYPE_VALIDATION = 'validation';
+	const ERROR_TYPE_AUTH = 'auth';
 
 	/**
 	 * Return Object
@@ -44,10 +45,6 @@ class FHCAPI_Controller extends FHC_Controller
 	{
 		if (is_cli())
 			show_404();
-
-		parent::__construct();
-		
-		$this->config->set_item('error_views_path', VIEWPATH.'errors'.DIRECTORY_SEPARATOR.'json'.DIRECTORY_SEPARATOR);
 
 		global $g_result;
 		$g_result = $this;
@@ -74,18 +71,14 @@ class FHCAPI_Controller extends FHC_Controller
 				}
 			}
 
-			#$this->returnObj['test'] = implode('/n', headers_list());
-
 			return json_encode($this->returnObj);
 		});
 
-		// Load libraries
-		$this->load->library('AuthLib');
-		$this->load->library('PermissionLib');
+		// NOTE(chris): overwrite error_views_path before constructor
+		load_class('Config')->set_item('error_views_path', VIEWPATH.'errors'.DIRECTORY_SEPARATOR.'json'.DIRECTORY_SEPARATOR);
 
-		// Checks if the caller is allowed to access to this content
-		$this->_isAllowed($requiredPermissions);
-
+		parent::__construct($requiredPermissions);
+		
 		// For JSON Requests (as opposed to multipart/form-data) get the $_POST variable from the input stream instead
 		if ($this->input->get_request_header('Content-Type', true) == 'application/json')
 			$_POST = json_decode($this->security->xss_clean($this->input->raw_input_stream), true);
@@ -101,7 +94,7 @@ class FHCAPI_Controller extends FHC_Controller
 	// ---------------------------------------------------------------
 
 	/**
-	 * @param array					$data
+	 * @param string|array|object	$data
 	 * @param string				$type (optional)
 	 * @return void
 	 */
@@ -117,12 +110,17 @@ class FHCAPI_Controller extends FHC_Controller
 				$error['messages'] = $data;
 			else
 				$error = $data;
+		} elseif (is_object($data)) {
+			$error = (array)$data;
 		} else {
 			$error['message'] = $data;
 		}
 		
 		if ($type)
 			$error['type'] = $type;
+
+		if (!isset($error['type']))
+			$error['type'] = self::ERROR_TYPE_GENERAL;
 
 		$this->returnObj['errors'][] = $error;
 	}
@@ -137,20 +135,54 @@ class FHCAPI_Controller extends FHC_Controller
 	}
 
 	/**
+	 * @param string				$key
+	 * @param mixed					$value
+	 * @return void
+	 */
+	public function addMeta($key, $value)
+	{
+		if (!isset($this->returnObj['meta']))
+			$this->returnObj['meta'] = [];
+		$this->returnObj['meta'][$key] = $value;
+	}
+
+	/**
+	 * @param string				$key
+	 * @return mixed
+	 */
+	public function getMeta($key)
+	{
+		if (!isset($this->returnObj['meta']))
+			return null;
+		if (!isset($this->returnObj['meta'][$key]))
+			return null;
+		return $this->returnObj['meta'][$key];
+	}
+
+	/**
 	 * @param string				$status
 	 * @return void
 	 */
 	public function setStatus($status)
 	{
-		if (!isset($this->returnObj['meta']))
-			$this->returnObj['meta'] = [];
-		$this->returnObj['meta']['status'] = $status;
+		$this->addMeta('status', $status);
 	}
 
 
 	// ---------------------------------------------------------------
 	// Handle Output object - Shortcut functions
 	// ---------------------------------------------------------------
+
+	/**
+	 * @param mixed					$data (optional)
+	 * @return void
+	 */
+	protected function terminateWithSuccess($data = null)
+	{
+		$this->setData($data);
+		$this->setStatus(self::STATUS_SUCCESS);
+		exit;
+	}
 
 	/**
 	 * @param array					$errors
@@ -165,24 +197,14 @@ class FHCAPI_Controller extends FHC_Controller
 	}
 
 	/**
-	 * @param mixed					$data (optional)
-	 * @return void
-	 */
-	protected function terminateWithSuccess($data = null)
-	{
-		$this->setData($data);
-		$this->setStatus(self::STATUS_SUCCESS);
-		exit;
-	}
-
-	/**
-	 * @param array					$error
+	 * @param string|array|object					$error
 	 * @param string				$type (optional)
+	 * @param integer				$status (optional)
 	 * @return void
 	 */
-	protected function terminateWithError($error, $type = null)
+	protected function terminateWithError($error, $type = null, $status = REST_Controller::HTTP_INTERNAL_SERVER_ERROR)
 	{
-		$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		$this->output->set_status_header($status);
 		$this->addError($error, $type);
 		$this->setStatus(self::STATUS_ERROR);
 		exit;
@@ -191,18 +213,15 @@ class FHCAPI_Controller extends FHC_Controller
 	/**
 	 * @param stdclass				$result
 	 * @param string				$errortype
-	 * @return void
+	 * @return mixed
 	 */
-	protected function checkForErrors($result, $errortype = self::ERROR_TYPE_GENERAL)
+	protected function getDataOrTerminateWithError($result, $errortype = self::ERROR_TYPE_GENERAL)
 	{
-		// TODO(chris): IMPLEMENT!
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), $errortype);
 		}
 		return $result->retval;
 	}
-
-	// TODO(chris): complete list
 
 
 	// ---------------------------------------------------------------
@@ -210,46 +229,21 @@ class FHCAPI_Controller extends FHC_Controller
 	// ---------------------------------------------------------------
 
 	/**
-	 * Checks if the caller is allowed to access to this content with the given permissions
-	 * If it is not allowed will set the HTTP header with code 401
-	 * Wrapper for permissionlib->isEntitled
+	 * Outputs an error message and sets the HTTP Header.
+	 * This overwrites the default behaviour to output a json object.
 	 *
 	 * @param array					$requiredPermissions
 	 * @return void
 	 */
-	protected function _isAllowed($requiredPermissions)
+	protected function _outputAuthError($requiredPermissions)
 	{
-		// Checks if this user is entitled to access to this content
-		if (!$this->permissionlib->isEntitled($requiredPermissions, $this->router->method))
-		{
-			$this->output->set_status_header(isLogged() ? REST_Controller::HTTP_FORBIDDEN : REST_Controller::HTTP_UNAUTHORIZED);
+		$this->output->set_status_header(isLogged() ? REST_Controller::HTTP_FORBIDDEN : REST_Controller::HTTP_UNAUTHORIZED);
 
-			$this->addError([
-				'message' => 'You are not allowed to access to this content',
-				'controller' => $this->router->class,
-				'method' => $this->router->method,
-				'required_permissions' => $this->_rpsToString($requiredPermissions, $this->router->method)
-			]);
-			exit; // immediately terminate the execution
-		}
-	}
-
-	/**
-	 * Converts an array of permissions to a string that contains them as a comma separated list
-	 * Ex: "<permission 1>, <permission 2>, <permission 3>"
-	 *
-	 * @param array					$requiredPermissions
-	 * @param string				$method
-	 * @return void
-	 */
-	protected function _rpsToString($requiredPermissions, $method)
-	{
-		if (!isset($requiredPermissions[$method]))
-			return '';
-
-		if (!is_array($requiredPermissions[$method]))
-			return $requiredPermissions[$method];
-
-		return implode(', ', $requiredPermissions[$method]);
+		$this->addError([
+			'message' => 'You are not allowed to access to this content',
+			'controller' => $this->router->class,
+			'method' => $this->router->method,
+			'required_permissions' => $this->_rpsToString($requiredPermissions, $this->router->method)
+		], self::ERROR_TYPE_AUTH);
 	}
 }

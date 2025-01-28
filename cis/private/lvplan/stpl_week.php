@@ -270,7 +270,7 @@ if (isset($_POST['titel']))
 	foreach($addon_obj->result as $addon)
 	{
 		if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
-			echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+			echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php"></script>';
 	}
 
 	// Wenn Seite fertig geladen ist Addons aufrufen
@@ -524,6 +524,6 @@ if (isset($reservdelcount))
 	echo "Es wurde".($reservdelcount!=1?'n':'')." $reservdelcount Stunde".($reservdelcount!=1?'n':'')." gel&ouml;scht!<BR>";
 ?>
 
-<P><br><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>
+<P><br><?php echo $p->t('lvplan/FragenZuLvPlan', array(MAIL_LVPLAN)); ?>.</P>
 </BODY>
 </HTML>
