@@ -35,7 +35,7 @@ import lehre from "./lehre.js";
 import addons from "./addons.js";
 import studiengang from "./studiengang.js";
 import menu from "./menu.js";
-import dashboard from "./dashboard";
+import dashboard from "./dashboard.js";
 
 export default {
     search,

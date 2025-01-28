@@ -4,7 +4,7 @@ import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 import PvAutoComplete
 	from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
-import AbschlusspruefungDropdown from "./AbschlusspruefungDropdown";
+import AbschlusspruefungDropdown from "./AbschlusspruefungDropdown.js";
 
 export default {
 	components: {
