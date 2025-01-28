@@ -45,3 +45,4 @@
 	$tablewidget = isset($tablewidget) ? $tablewidget : false;
 	$udfs = isset($udfs) ? $udfs : false;
 	$widgets = isset($widgets) ? $widgets : false;
+	$tags = isset($tags) ? $tags : false;

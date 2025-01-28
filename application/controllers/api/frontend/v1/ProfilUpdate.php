@@ -47,6 +47,8 @@ class ProfilUpdate extends FHCAPI_Controller
 			'show' => self::PERM_LOGGED,
 			]);
 
+		$this->load->config('cis');
+
 		// Load language phrases
 		$this->loadPhrases(
 			array(
@@ -504,6 +506,10 @@ class ProfilUpdate extends FHCAPI_Controller
 
 	private function sendEmail_onProfilUpdate_insertion($uid, $profil_update_id, $topic)
 	{
+		if($this->config->item('cis_send_profil_update_mails') === false)
+		{
+			return;
+		}
 
 		$this->load->helper('hlp_sancho_helper');
 		$emails = [];
@@ -573,6 +579,11 @@ class ProfilUpdate extends FHCAPI_Controller
 	
 	private function sendEmail_onProfilUpdate_response($uid, $topic, $status)
 	{
+		if($this->config->item('cis_send_profil_update_mails') === false)
+		{
+			return;
+		}
+
 		$this->load->helper('hlp_sancho_helper');
 		$email = $uid . "@" . DOMAIN;
 

@@ -2,6 +2,8 @@ import FhcCalendar from "../../components/Calendar/Calendar.js";
 import Phrasen from "../../plugin/Phrasen.js";
 import CalendarDate from "../../composables/CalendarDate.js";
 import LvModal from "../../components/Cis/Mylv/LvModal.js";
+import LvInfo from "../../components/Cis/Mylv/LvInfo.js"
+import LvMenu from "../../components/Cis/Mylv/LvMenu.js"
 
 
 const app = Vue.createApp({
@@ -17,7 +19,7 @@ const app = Vue.createApp({
 		}
 	},
 	components: {
-		FhcCalendar, LvModal
+		FhcCalendar, LvModal, LvMenu, LvInfo
 	},
 	computed:{
 		weekFirstDay: function () {
@@ -35,6 +37,9 @@ const app = Vue.createApp({
 		
 	},
 	methods:{
+		setSelectedEvent: function (event) {
+			this.currentlySelectedEvent = event;
+		},
 		getLvID: function () {
 			this.lv_id = window.location.pathname
 		},
@@ -111,7 +116,7 @@ const app = Vue.createApp({
 	<h2>{{$p.t('lehre/stundenplan')}}</h2>
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
-	<fhc-calendar :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
+	<fhc-calendar @selectedEvent="setSelectedEvent" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
 		<template #monthPage="{event,day,isSelected}">
 			<span class="fhc-entry" :class="{'selectedEvent':isSelected}" style="color:white" :style="{'background-color': event.color}">
 				{{event.topic}}
@@ -124,8 +129,8 @@ const app = Vue.createApp({
 				<span>{{event?.orig.ort_kurzbz}}</span>
 			</div>
 		</template>
-		<template #dayPage="{event,day}">
-			<div type="button" class="fhc-entry border border-secondary border row h-100 justify-content-center align-items-center text-center">
+		<template #dayPage="{event,day,mobile}">
+			<div @click="mobile? showModal(event?.orig):null" type="button" class="fhc-entry border border-secondary border row m-0 h-100 justify-content-center align-items-center text-center">
 				<div class="col ">
 					<p>Lehrveranstaltung:</p>
 					<p class="m-0">{{event?.orig.topic}}</p>
@@ -139,6 +144,17 @@ const app = Vue.createApp({
 					<p class="m-0">{{event?.orig.ort_kurzbz}}</p>
 				</div>
 			</div>
+		</template>
+		<template #pageMobilContent="{lvMenu}">
+			<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
+			<div class="w-100">
+				<lv-info  :event="currentlySelectedEvent" />
+			</div>
+			<h3 >Lehrveranstaltungs Menu</h3>
+			<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-show="lvMenu" :menu="lvMenu" />
+		</template>
+		<template #pageMobilContentEmpty >
+			<h3>Keine Lehrveranstaltungen</h3>
 		</template>
 	</fhc-calendar>
 	`

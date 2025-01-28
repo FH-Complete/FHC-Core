@@ -19,8 +19,16 @@ export default {
 		info: null,
 	}),
 	computed: {
-		lektorNames() {
-			return this.info.lektoren.map(e => ((e.titelpre || '') + ' ' + (e.vorname || '') + ' ' + (e.nachname || '') + ' ' + (e.titelpost || '')).trim());
+		lektorNamesLinks(){
+			let lektorenLinks = {};
+			this.info.lektoren.forEach(e => {
+				let name = ((e.titelpre || '') + ' ' + (e.vorname || '') + ' ' + (e.nachname || '') + ' ' + (e.titelpost || '')).trim();
+				lektorenLinks[name] = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/Cis/Profil/View/${e.uid}`;
+			});
+			return lektorenLinks;
+		},
+		lektorNames(){
+			return this.info.lektoren.map((e)=>((e.titelpre || '') + ' ' + (e.vorname || '') + ' ' + (e.nachname || '') + ' ' + (e.titelpost || '')).trim());
 		},
 		lvLeitung() {
 			return this.info.lvLeitung && this.info.lvLeitung.length ? this.info.lvLeitung.map(e => ((e.titelpre || '') + ' ' + (e.vorname || '') + ' ' + (e.nachname || '') + ' ' + (e.titelpost || '')).trim()) : null;
@@ -69,16 +77,11 @@ export default {
 			this.info = infos[this.lehrveranstaltung_id];
 		} else {
 			axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Mylv/Info/' + this.studien_semester + '/' + this.lehrveranstaltung_id).then(res => {
-				
 				this.info = infos[this.lehrveranstaltung_id] = res.data.retval || [];
 			}).catch(() => this.info = {});
 		}
 	},
 	template: /*html*/`
-
-			<!-- debugging print
-			<p>{{JSON.stringify(info,null,2)}}</p>
-			-->
 			<h1>{{$p.t('lvinfo/lehrveranstaltungsinformationen')}}</h1>
 			<hr>
 				<div v-if="!info" class="text-center">
@@ -110,8 +113,8 @@ export default {
 							<th>{{$p.t('lehre/lehrbeauftragter')}}</th>
 							<td>
 								<ul v-if="lektorNames.length" class="list-unstyled mb-0">
-									<li v-for="name in lektorNames" :key="name">
-										<!-- TODO(chris): link? -->
+									<li v-for="name in new Set(lektorNames)" :key="name">
+									<a :href="lektorNamesLinks[name]?lektorNamesLinks[name]:null"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
 										{{name}}
 									</li>
 								</ul>
@@ -125,7 +128,7 @@ export default {
 							<td>
 								<ul class="list-unstyled mb-0">
 									<li v-for="name in lvLeitung" :key="name">
-										<!-- TODO(chris): link? -->
+										<a :href="lektorNamesLinks[name]?lektorNamesLinks[name]:null"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
 										{{name}}
 									</li>
 								</ul>
