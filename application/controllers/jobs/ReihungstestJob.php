@@ -431,8 +431,8 @@ class ReihungstestJob extends JOB_Controller
 								$mailcontent_data_arr,
 								$applicant->email,
 								'Ihre Anmeldung zum Reihungstest - Reminder / Your registration for the placement test - Reminder',
-								DEFAULT_SANCHO_HEADER_IMG,
-								DEFAULT_SANCHO_FOOTER_IMG,
+								'',
+								'',
 								$from,
 								'',
 								$bcc);

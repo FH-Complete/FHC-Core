@@ -22,6 +22,8 @@ import TableDownload from './Table/Download.js';
 import collapseAutoClose from '../../directives/collapseAutoClose.js';
 import { defaultHeaderFilter } from '../../tabulator/filters/defaultHeaderFilter.js';
 
+import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
+
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
 const FILTER_COMPONENT_NEW_FILTER_TYPE = 'Filter Component New Filter Type';
@@ -205,7 +207,7 @@ export const CoreFilterCmpt = {
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
 					height: 500,
-					layout: "fitDataStretch",
+					layout: "fitDataStretchFrozen",
 					movableColumns: true,
 					columnDefaults:{
 						tooltip: true,
