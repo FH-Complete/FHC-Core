@@ -24,7 +24,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/mail.class.php');
 require_once(dirname(__FILE__).'/vorlage.class.php');
 
-const DEFAULT_SENDER = 'noreply';
+const FALLBACK_SENDER = 'noreply';
 
 /**
  * Send single Mail with Sancho Design and Layout.
@@ -41,7 +41,10 @@ const DEFAULT_SENDER = 'noreply';
  */
 function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = '', $footerImg = '', $replyTo = '', $cc = '')
 {
-	$from = DEFAULT_SENDER.'@'. DOMAIN;
+	$from = ((defined('SANCHO_MAIL_DEFAULT_SENDER') && SANCHO_MAIL_DEFAULT_SENDER != '') 
+		  ? SANCHO_MAIL_DEFAULT_SENDER 
+		  : FALLBACK_SENDER) 
+		  . '@' . DOMAIN;
 
 	$image_path_prefix = dirname(__DIR__).'/'.(defined('SANCHO_MAIL_IMG_PATH') ? SANCHO_MAIL_IMG_PATH : '');
 	$sanchoHeader_img = '';

@@ -33,6 +33,9 @@ $config['validate'] = false; // If true then the email address will be validated
 // If enabled will be logged info about emails in Codeigniter error logs
 $config['enable_debug'] = false;
 
+// default sender
+$config['sancho_mail_default_sender'] = SANCHO_MAIL_DEFAULT_SENDER;
+
 // If to use images for custom mails
 $config['sancho_mail_use_images'] = SANCHO_MAIL_USE_IMAGES;
 

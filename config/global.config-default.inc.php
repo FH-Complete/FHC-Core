@@ -339,6 +339,9 @@ define('DIENSTVERHAELTNIS_SUPPORT', false);
 // Falls Studstatus (Abmeldung, AbmeldungStg, Unterbrechung, Wiederholung) verwendet wird zeige Hinweistext bei Eingabe einer kommissionellen oder zusaetzlichen kommissionellen Pruefung
 define('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT', false);
 
+// default absender (@DOMAIN wird hinzugefuegt daher ohne angeben)
+define('SANCHO_MAIL_DEFAULT_SENDER', 'noreply');
+
 // header und footer Bilder für eigene Mails verwenden
 define('SANCHO_MAIL_USE_IMAGES', true);
 
