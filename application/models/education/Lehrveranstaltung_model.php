@@ -736,6 +736,37 @@ class Lehrveranstaltung_model extends DB_Model
 	}
 
 	/**
+	 * Get Lehreinheit.
+	 *
+	 * @param string				$student_uid
+	 * @param string				$studiensemester_kurzbz
+	 * @param integer				$lehrveranstaltung_id
+	 *
+	 * @return stdClass
+	 */
+	public function getLeByStudent($student_uid, $studiensemester_kurzbz, $lehrveranstaltung_id)
+	{
+		$this->addSelect("lehreinheit_id");
+
+		$this->addOrder("lehreinheit_id", "ASC");
+
+		$this->addLimit(1);
+
+		$tmp = $this->dbTable;
+		$this->dbTable = "campus.vw_student_lehrveranstaltung";
+		
+		$result = $this->loadWhere([
+			"uid" => $student_uid,
+			"lehrveranstaltung_id" => $lehrveranstaltung_id,
+			"studiensemester_kurzbz" => $studiensemester_kurzbz
+		]);
+		
+		$this->dbTable = $tmp;
+		
+		return $result;
+	}
+
+	/**
 	 * Sucht nach LV Templates und gibt Id und Label ("bezeichnung [kurzbz]") aus
 	 * Diese funktion ist für autocomplete gedacht
 	 *

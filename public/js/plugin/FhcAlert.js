@@ -215,9 +215,9 @@ export default {
 						header: 'Achtung',
 						message: 'Möchten Sie sicher löschen?',
 						acceptLabel: 'Löschen',
-						acceptClass: 'btn btn-danger',
+						acceptClass: 'p-button-danger',
 						rejectLabel: 'Abbrechen',
-						rejectClass: 'btn btn-outline-secondary',
+						rejectClass: 'p-button-secondary',
 						accept() {
 							resolve(true);
 						},
