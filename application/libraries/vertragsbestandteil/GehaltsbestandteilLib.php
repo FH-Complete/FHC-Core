@@ -28,6 +28,11 @@ class GehaltsbestandteilLib
 		$this->GehaltsbestandteilModel = $this->CI->GehaltsbestandteilModel;
 	}
 
+	public function fetchGehaltsbestandteileValorisiertForChart($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
+	{
+		return $this->GehaltsbestandteilModel->getGehaltsbestandteileValorisiertForChart($dienstverhaeltnis_id, $stichtag, $includefuture);
+	}
+
 	public function fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null, 
 		$includefuture=false, $withvalorisationhistory=true)
 	{
