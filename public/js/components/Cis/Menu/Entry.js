@@ -196,11 +196,6 @@ export default {
 		this.checkActiveUrl(new URL(window.location.href));
     },
     template: /*html*/`
-	<!-- DEBUGGIING PRINTS
-	<p>entry content_id: {{JSON.stringify(entry.content_id,null,2)}}</p>
-	<p>entry menu: {{JSON.stringify(entry.menu_open,null,2)}}</p>
-	<p>highest count : {{urlCount}}</p>
-	-->
 	<div v-if="entry.template_kurzbz == 'include'">
         INCLUDE
     </div>

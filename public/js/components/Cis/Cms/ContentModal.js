@@ -12,7 +12,7 @@ export default {
         RaumContent,
     },
     props:{
-        contentID:{
+        content_id:{
             type: Number
         },
         ort_kurzbz:{
@@ -34,8 +34,8 @@ export default {
         // this method is always called when the modal is shown
         modalShown: function(){
             
-            if(this.contentID){
-                this.$fhcApi.factory.cms.content(this.contentID).then(res =>{
+            if(this.content_id){
+                this.$fhcApi.factory.cms.content(this.content_id).then(res =>{
                 this.content = res.data.content;
                 this.type = res.data.type;
                 
@@ -55,7 +55,7 @@ export default {
             <span v-else>Raum Informationen</span>
         </template>
         <template #default>
-            <RaumContent v-if="content" :content="content"></RaumContent>
+            <RaumContent v-if="content" :content="content" :content_id="content_id"></RaumContent>
             <div v-else>Der Content für diesen Raum konnte nicht geladen werden</div>
         </template>
         <template #footer>

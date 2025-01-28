@@ -7,12 +7,10 @@ import prestudent from "./prestudent.js";
 
 export default {
     props: [ "searchoptions", "searchfunction" ],
-    emits: ['showSettings'],
     data: function() {
       return {
         searchtimer: null,
         hidetimer: null,
-        showsettings: false,
         searchsettings: {
             searchstr: '',
             types: [],
@@ -54,7 +52,7 @@ export default {
                   <div v-else-if="searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
                   <template v-else="" v-for="res in searchresult">
                     <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
-                    <student v-else-if="res.type === 'student'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
+                    <student v-else-if="res.type === 'student' || res.type === 'studentStv'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
                     <prestudent v-else-if="res.type === 'prestudent'" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
                     <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                     <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
@@ -65,8 +63,10 @@ export default {
               </div>
             </div>
 
-            <div id="searchSettings"  ref="settings"  @[\`show.bs.collapse\`]="$emit('showSettings','settings')"
-                 class="top-100 end-0 searchbar_settings text-white collapse" tabindex="-1">
+            <div id="searchSettings"  ref="settings"
+				@[\`shown.bs.collapse\`]="handleShowSettings"
+				@[\`hide.bs.collapse\`]="handleHideSettings"
+                class="top-100 end-0 searchbar_settings text-white collapse" tabindex="-1">
               <div class="d-flex flex-column m-3" v-if="this.searchoptions.types.length > 0">
               <span class="fw-light mb-2">Suche filtern nach:</span>  
               <template v-for="(type, index) in this.searchoptions.types" :key="type">
@@ -87,7 +87,6 @@ export default {
     },
     beforeMount: function() {
         this.updateSearchOptions();
-        
     },
 	mounted(){
 		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {
@@ -102,6 +101,21 @@ export default {
 		}
 	},
     methods: {
+		checkSettingsVisibility: function(event) {
+			// hides the settings collapsible if the user clicks somewhere else
+			if (!this.$refs.settings.contains(event.target))
+			{
+				this.settingsDropdown.hide();
+			}
+		},
+		handleShowSettings: function() {
+			// adds the event listener checkSettingsVisibility only when the collapsible is shown
+			document.addEventListener("click", this.checkSettingsVisibility);
+		},
+		handleHideSettings: function () {
+			// removes the event listener checkSettingsVisibility when the collapsible is hidden
+			document.removeEventListener("click", this.checkSettingsVisibility);
+		},
         updateSearchOptions: function() {
             this.searchsettings.types = [];
             for( const idx in this.searchoptions.types ) {

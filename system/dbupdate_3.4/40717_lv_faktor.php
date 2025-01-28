@@ -63,3 +63,18 @@ if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrveranstaltung_faktor 
 	else
 		echo 'Tabelle: lehre.tbl_lehrveranstaltung_faktor befüllt!';
 }
+
+// Add index to lehre.tbl_lehrveranstaltung_faktor
+if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_lehrveranstaltung_faktor_lvid'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "CREATE INDEX idx_tbl_lehrveranstaltung_faktor_lvid ON lehre.tbl_lehrveranstaltung_faktor USING btree (lehrveranstaltung_id);";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Index fuer lehre.tbl_lehrveranstaltung_faktor.lehrveranstaltung_id hinzugefuegt';
+	}
+}
+

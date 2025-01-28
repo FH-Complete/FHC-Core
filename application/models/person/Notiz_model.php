@@ -142,7 +142,7 @@ class Notiz_model extends DB_Model
 		$this->addSelect('public.tbl_notiz.*');
 		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
 
-		return $this->loadWhere(array('person_id' => $person_id));
+		return $this->loadWhere(array('person_id' => $person_id, 'tbl_notiz.typ' => NULL));
 	}
 
 	/**
