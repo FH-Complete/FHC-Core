@@ -43,8 +43,8 @@ export default {
 		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'weeks')"/>
 		<calendar-pane ref="pane" v-slot="slot" @slid="paneChanged">
 			<calendar-week-page :year="focusDate.wYear" :week="focusDate.w+slot.offset" @updateMode="$emit('updateMode', $event)" @page:back="prev" @page:forward="next" @input="selectEvent" >
-				<template #weekPage="{event,day,isSelected}">
-					<slot name="weekPage" :event="event" :day="day" :isSelected="isSelected"></slot>
+				<template #weekPage="{event,day}">
+					<slot name="weekPage" :event="event" :day="day" ></slot>
 				</template>
 			</calendar-week-page>
 		</calendar-pane>

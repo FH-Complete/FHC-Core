@@ -238,8 +238,8 @@ export default {
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
-						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" :style="eventGridStyle(day,event)" class="mx-2 small rounded overflow-hidden "  >
-							<slot name="weekPage" :event="event" :day="day" :isSelected="event.orig == selectedEvent">
+						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" :selected="event.orig == selectedEvent" :style="eventGridStyle(day,event)" class="mx-2 small rounded overflow-hidden fhc-entry " v-contrast >
+						<slot name="weekPage" :event="event" :day="day">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 							</slot>
 						</div>

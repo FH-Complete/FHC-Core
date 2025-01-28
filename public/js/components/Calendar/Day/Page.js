@@ -309,10 +309,10 @@ export default {
 						</div>
 					</div>
 					<div id="scroll g-0" style="height: 100%; overflow: scroll;">
-					
+
 						<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
 							<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
-							
+
 							<Transition>
 								<div v-if="hourPosition && !noEventsCondition" class="position-absolute border-top small"  :style="indicatorStyle">
 									<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
@@ -321,12 +321,12 @@ export default {
 							<div>
 								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
 								<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
-		
+
 									<div class="hours">
 										<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 									</div>
 									<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle">
-										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" :class="{'selectedEvent':event.orig == selectedEvent}" class="mx-2 small rounded overflow-hidden " >
+										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast :selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden " >
 											<!-- desktop version of the page template, parent receives slotProp mobile = false -->
 											<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
 												<slot  name="dayPage" :event="event" :day="day" :mobile="false">
