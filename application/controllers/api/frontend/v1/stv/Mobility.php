@@ -17,12 +17,13 @@ class Mobility extends FHCAPI_Controller
 			'getProgramsMobility' => ['admin:r', 'assistenz:r'],
 			'getLVList' => ['admin:r', 'assistenz:r'],
 			'getPurposes' => ['admin:r', 'assistenz:r'],
+			'getSupports' => ['admin:r', 'assistenz:r'],
 			'getListPurposes' => ['admin:r', 'assistenz:r'],
 			'getListSupports' => ['admin:r', 'assistenz:r'],
 			'deleteMobilityPurpose' => ['admin:r', 'assistenz:r'],
 			'addMobilityPurpose' => ['admin:r', 'assistenz:r'],
-
-
+			'deleteMobilitySupport' => ['admin:r', 'assistenz:r'],
+			'addMobilitySupport' => ['admin:r', 'assistenz:r'],
 		]);
 
 		// Load Libraries
@@ -73,14 +74,15 @@ class Mobility extends FHCAPI_Controller
 		$formData = $this->input->post('formData');
 
 		$von =	(isset($formData['von']) && !empty($formData['von'])) ? $formData['von'] : null;
-$nation_code =	(isset($formData['nation_code']) && !empty($formData['nation_code'])) ? $formData['nation_code'] : 'A';
-$mobilitaetsprogramm_code =	(isset($formData['mobilitaetsprogramm_code']) && !empty($formData['mobilitaetsprogramm_code'])) ? $formData['mobilitaetsprogramm_code'] : null;
-$herkunftsland_code =	(isset($formData['herkunftsland_code']) && !empty($formData['herkunftsland_code'])) ? $formData['herkunftsland_code'] : 'A';
-$ort =	(isset($formData['ort']) && !empty($formData['ort'])) ? $formData['ort'] : null;
-$universitaet =	(isset($formData['universitaet']) && !empty($formData['universitaet'])) ? $formData['universitaet'] : null;
-$ects_erworben =	(isset($formData['ects_erworben']) && !empty($formData['ects_erworben'])) ? $formData['ects_erworben'] : null;
-$ects_angerechnet =	(isset($formData['ects_angerechnet']) && !empty($formData['ects_angerechnet'])) ? $formData['ects_angerechnet'] : null;
-$localPurposes =	(isset($formData['localPurposes']) && !empty($formData['localPurposes'])) ? $formData['localPurposes'] : null;
+		$nation_code =	(isset($formData['nation_code']) && !empty($formData['nation_code'])) ? $formData['nation_code'] : 'A';
+		$mobilitaetsprogramm_code =	(isset($formData['mobilitaetsprogramm_code']) && !empty($formData['mobilitaetsprogramm_code'])) ? $formData['mobilitaetsprogramm_code'] : null;
+		$herkunftsland_code =	(isset($formData['herkunftsland_code']) && !empty($formData['herkunftsland_code'])) ? $formData['herkunftsland_code'] : 'A';
+		$ort =	(isset($formData['ort']) && !empty($formData['ort'])) ? $formData['ort'] : null;
+		$universitaet =	(isset($formData['universitaet']) && !empty($formData['universitaet'])) ? $formData['universitaet'] : null;
+		$ects_erworben = (isset($formData['ects_erworben']) && !empty($formData['ects_erworben'])) ? $formData['ects_erworben'] : null;
+		$ects_angerechnet = (isset($formData['ects_angerechnet']) && !empty($formData['ects_angerechnet'])) ? $formData['ects_angerechnet'] : null;
+		$localPurposes = (isset($formData['localPurposes']) && !empty($formData['localPurposes'])) ? $formData['localPurposes'] : null;
+		$localSupports = (isset($formData['localSupports']) && !empty($formData['localSupports'])) ? $formData['localSupports'] : null;
 
 
 		//strange fields
@@ -110,11 +112,16 @@ $localPurposes =	(isset($formData['localPurposes']) && !empty($formData['localPu
 		//check if localData (purposes)
 		if(count($localPurposes) > 0){
 
-		//	$this->terminateWithError('Speichern von Zweck notwendig mit neuer  bisio_id ' . $bisio_id,  self::ERROR_TYPE_GENERAL);
-
 			foreach ($localPurposes as $zweck){
 				$zweck = (int) $zweck;
 				$this->addMobilityPurpose($bisio_id, $zweck);
+			}
+		}
+
+		//check if localData (supports)
+		if(count($localSupports) > 0){
+			foreach ($localSupports as $support){
+				$this->addMobilitySupport($bisio_id, $support);
 			}
 		}
 
@@ -169,7 +176,7 @@ $localPurposes =	(isset($formData['localPurposes']) && !empty($formData['localPu
 		);
 
 		//TODO(Manu) foreign key restraint
-		//nämlich Extension mo
+		//check Extension mo
 		//fk_mobisioidzuordnung_prestudent_id" on table "tbl_mo_bisioidzuordnung"
 
 		$data = $this->getDataOrTerminateWithError($result);
@@ -198,6 +205,24 @@ $localPurposes =	(isset($formData['localPurposes']) && !empty($formData['localPu
 		$this->BisiozweckModel->addJoin('bis.tbl_zweck zw', 'ON (zw.zweck_code = bis.tbl_bisio_zweck.zweck_code)');
 
 		$result = $this->BisiozweckModel->loadWhere(
+			array('bisio_id' => $bisio_id)
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getSupports($bisio_id)
+	{
+		$bisio_id = (int) $bisio_id;
+
+		$this->load->model('codex/Bisioaufenthaltfoerderung_model', 'BisioaufenthaltfoerderungModel');
+
+		$this->BisioaufenthaltfoerderungModel->addSelect("*");
+		$this->BisioaufenthaltfoerderungModel->addJoin('bis.tbl_aufenthaltfoerderung af', 'ON (af.aufenthaltfoerderung_code = bis.tbl_bisio_aufenthaltfoerderung.aufenthaltfoerderung_code)');
+
+		$result = $this->BisioaufenthaltfoerderungModel->loadWhere(
 			array('bisio_id' => $bisio_id)
 		);
 
@@ -264,6 +289,45 @@ $localPurposes =	(isset($formData['localPurposes']) && !empty($formData['localPu
 			)
 		);
 
+		$data = $this->getDataOrTerminateWithError($result);
+
+		return $this->terminateWithSuccess(current($data));
+	}
+
+	public function addMobilitySupport($bisio_id, $local_support = null)
+	{
+		$aufenthaltfoerderung_code = $this->input->post('aufenthaltfoerderung_code');
+
+		if($local_support){
+			$aufenthaltfoerderung_code = $local_support;
+		}
+
+		$this->load->model('codex/Bisioaufenthaltfoerderung_model', 'BisioaufenthaltfoerderungModel');
+
+		$result = $this->BisioaufenthaltfoerderungModel->insert(
+			array(
+				'bisio_id' => $bisio_id,
+				'aufenthaltfoerderung_code' => $aufenthaltfoerderung_code
+			)
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		return $this->terminateWithSuccess(current($data));
+	}
+
+	public function deleteMobilitySupport($bisio_id)
+	{
+		$aufenthaltfoerderung_code = $this->input->post('aufenthaltfoerderung_code');
+
+		$this->load->model('codex/Bisioaufenthaltfoerderung_model', 'BisioaufenthaltfoerderungModel');
+
+		$result = $this->BisioaufenthaltfoerderungModel->delete(
+			array(
+				'bisio_id' => $bisio_id,
+				'aufenthaltfoerderung_code' => $aufenthaltfoerderung_code
+			)
+		);
 		$data = $this->getDataOrTerminateWithError($result);
 
 		return $this->terminateWithSuccess(current($data));

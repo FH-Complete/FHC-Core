@@ -6,7 +6,6 @@ export default {
 		return this.$fhcApi.get('api/frontend/v1/stv/mobility/getProgramsMobility/');
 	},
 	addNewMobility(data){
-		//TODO(Manu) formvalidation
 		return this.$fhcApi.post('api/frontend/v1/stv/mobility/insertMobility/', data);
 	},
 	loadMobility(bisio_id){
@@ -22,9 +21,10 @@ export default {
 		return this.$fhcApi.get('api/frontend/v1/stv/mobility/getLVList/' + studiengang_kz);
 	},
 	getPurposes(url, config, params){
-		console.log("in getPurposes");
-		//console.log(params);
 		return this.$fhcApi.get('api/frontend/v1/stv/mobility/getPurposes/' + params.id);
+	},
+	getSupports(url, config, params){
+		return this.$fhcApi.get('api/frontend/v1/stv/mobility/getSupports/' + params.id);
 	},
 	getListPurposes() {
 		return this.$fhcApi.get('api/frontend/v1/stv/mobility/getListPurposes/');
@@ -37,6 +37,12 @@ export default {
 	},
 	addMobilityPurpose(params) {
 		return this.$fhcApi.post('api/frontend/v1/stv/mobility/addMobilityPurpose/' + params.bisio_id, params);
+	},
+	deleteMobilitySupport(params) {
+		return this.$fhcApi.post('api/frontend/v1/stv/mobility/deleteMobilitySupport/' + params.bisio_id, params);
+	},
+	addMobilitySupport(params) {
+		return this.$fhcApi.post('api/frontend/v1/stv/mobility/addMobilitySupport/' + params.bisio_id, params);
 	},
 
 }

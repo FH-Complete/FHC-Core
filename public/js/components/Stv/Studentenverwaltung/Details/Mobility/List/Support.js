@@ -16,7 +16,7 @@ export default {
 			type: [Number],
 			required: true
 		},
-		listPurposes: {
+		listSupports: {
 			type: Array,
 			required: true
 		},
@@ -34,7 +34,7 @@ export default {
 						const params = {
 							id: this.bisio_id,
 						};
-						return this.$fhcApi.factory.stv.mobility.getPurposes('dummy', config, params)
+						return this.$fhcApi.factory.stv.mobility.getSupports('dummy', config, params)
 					}
 					else
 					{
@@ -52,10 +52,8 @@ export default {
 				},
 				ajaxResponse: (url, params, response) => response.data || this.localData,
 
-
 				columns: [
-					{title: "Zweck_code", field: "zweck_code", visible: false},
-					{title: "Kurzbz", field: "kurzbz", visible: false},
+					{title: "Aufenthaltsförderung_code", field: "aufenthaltfoerderung_code", visible: false},
 					{title: "Bezeichnung", field: "bezeichnung"},
 					{
 						title: 'Aktionen', field: 'actions',
@@ -69,11 +67,11 @@ export default {
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('global', 'loeschen');
-								button.addEventListener(
-									'click',
-									() =>
-										this.actionDeletePurpose(cell.getData().zweck_code)
-								);
+							button.addEventListener(
+								'click',
+								() =>
+									this.actionDeleteSupport(cell.getData().aufenthaltfoerderung_code)
+							);
 							container.append(button);
 
 							return container;
@@ -86,7 +84,7 @@ export default {
 				height: '200',
 				selectableRangeMode: 'click',
 				selectable: true,
-				persistenceID: 'core-mobility-purpose'
+				persistenceID: 'core-mobility-support'
 			},
 			tabulatorEvents: [
 				{
@@ -95,23 +93,20 @@ export default {
 
 						await this.$p.loadCategory(['ui', 'global', 'mobility']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+												let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('ui', 'bezeichnung')
-						});
-						cm.getColumnByField('kurzbz').component.updateDefinition({
-							title: this.$p.t('mobility', 'kurzbz')
-						});
-/*						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});*/
+												cm.getColumnByField('bezeichnung').component.updateDefinition({
+													title: this.$p.t('ui', 'bezeichnung')
+												});
+						/*						cm.getColumnByField('actions').component.updateDefinition({
+													title: this.$p.t('global', 'aktionen')
+												});*/
 					}
 				}
 			],
 			clickedRows: [],
 			formData: {
-				zweck_code: ""
+				aufenthaltfoerderung_code: "",
 			},
 			localData: [],
 		}
@@ -124,21 +119,21 @@ export default {
 		},
 	},
 	methods: {
-		actionNewPurpose() {
+		actionNewSupport() {
 			this.resetModal();
-			this.$refs.mobilityPurpose.show();
+			this.$refs.mobilitySupport.show();
 		},
-		actionDeletePurpose(zweck_code) {
+		actionDeleteSupport(aufenthaltfoerderung_code) {
 			if (this.bisio_id)
 			{
-				this.$emit('deleteMobilityPurpose', {
+				this.$emit('deleteMobilitySupport', {
 					bisio_id: this.bisio_id,
-					zweck_code: zweck_code
+					aufenthaltfoerderung_code: aufenthaltfoerderung_code
 				});
 			}
 			else
 			{
-				const index = this.localData.findIndex(item => item.zweck_code === zweck_code);
+				const index = this.localData.findIndex(item => item.aufenthaltfoerderung_code === aufenthaltfoerderung_code);
 
 				if (index !== -1) {
 					this.localData.splice(index, 1);
@@ -147,33 +142,31 @@ export default {
 		},
 		handleSubmitAction() {
 			if (this.bisio_id) {
-
-				this.$emit('setMobilityPurpose', {
-					zweck_code: this.formData.zweck_code,
+				this.$emit('setMobilitySupport', {
+					aufenthaltfoerderung_code: this.formData.aufenthaltfoerderung_code,
 					bisio_id: this.bisio_id
 				});
 			} else {
-				const purpose = this.listPurposes.find(item => item.zweck_code === this.formData.zweck_code);
+				const support = this.listSupports.find(item => item.aufenthaltfoerderung_code === this.formData.aufenthaltfoerderung_code);
 				const newEntry = {
-					zweck_code: this.formData.zweck_code,
-					kurzbz: purpose.kurzbz,
-					bezeichnung: purpose.bezeichnung
+					aufenthaltfoerderung_code: this.formData.aufenthaltfoerderung_code,
+					bezeichnung: support.bezeichnung
 				};
 				this.localData.push(newEntry);
 
-				this.$emit('setMobilityPurposeToNewMobility', {
-					zweck_code: this.formData.zweck_code,
+				this.$emit('setMobilitySupportToNewMobility', {
+					aufenthaltfoerderung_code: this.formData.aufenthaltfoerderung_code,
 				});
 			}
-		this.closeModal();
+			this.closeModal();
 		},
 
 		closeModal(){
-			this.$refs.mobilityPurpose.hide();
+			this.$refs.mobilitySupport.hide();
 			this.$emit('close-modal');
 		},
 		openModal(){
-			this.$refs.mobilityPurpose.show();
+			this.$refs.mobilitySupport.show();
 			this.$emit('open-modal');
 		},
 		reload() {
@@ -182,13 +175,13 @@ export default {
 		},
 		resetModal(){
 			this.formData = {};
-			this.formData.zweck_code = null;
+			this.formData.aufenthaltfoerderung_code = null;
 		}
 	},
 	template: `
-		<div class="core-mobility-purpose h-50 d-flex flex-column w-100 mt-2">
+		<div class="core-mobility-support h-50 d-flex flex-column w-100 mt-2">
 		<br>
-
+		
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
@@ -197,31 +190,30 @@ export default {
 			:side-menu="false"
 			reload
 			new-btn-show
-			:new-btn-label="this.$p.t('mobility', 'zweck')"
-			@click:new="actionNewPurpose"
+			:new-btn-label="this.$p.t('mobility', 'aufenthalt')"
+			@click:new="actionNewSupport"
 			>
 		</core-filter-cmpt>
-	
-		<div >
-			<bs-modal ref="mobilityPurpose">
+		
+		<div>
+			<bs-modal ref="mobilitySupport">
 				<template #title>
-					<p class="fw-bold mt-3">{{$p.t('mobility', 'zweck_neu')}}</p>
-	
+					<p class="fw-bold mt-3">{{$p.t('mobility', 'foerderung_neu')}}</p>
 				</template>
-	
+				
 				<core-form ref="mobilityData">
 					<div class="row mb-3">
 						<form-input
 							type="select"
-							:label="$p.t('mobility/zweck')"
-							v-model="formData.zweck_code"
-							name="zweck_code"
+							:label="$p.t('mobility/aufenthalt')"
+							v-model="formData.aufenthaltfoerderung_code"
+							name="aufenthaltfoerderung_code"
 							>
 							<option :value="null"> {{$p.t('ui', 'bitteWaehlen')}}</option>
 							<option
-								v-for="entry in listPurposes"
-								:key="entry.zweck_code"
-								:value="entry.zweck_code"
+								v-for="entry in listSupports"
+								:key="entry.aufenthaltfoerderung_code"
+								:value="entry.aufenthaltfoerderung_code"
 								>
 								{{entry.bezeichnung}}
 							</option>
@@ -237,4 +229,4 @@ export default {
 		</div>
 
 	</div>`
-	}
+}

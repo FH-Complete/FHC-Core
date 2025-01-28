@@ -3,7 +3,8 @@ import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 import MobilityPurpose from './List/Purpose.js';
-//import LocalPurpose from './List/PurposesLocal.js';
+import MobilitySupport from './List/Support.js';
+
 
 export default {
 	components: {
@@ -12,7 +13,7 @@ export default {
 		FormForm,
 		FormInput,
 		MobilityPurpose,
-//		LocalPurpose
+		MobilitySupport
 	},
 	inject: {
 		$reloadList: {
@@ -82,6 +83,13 @@ export default {
 			},
 			tabulatorEvents: [
 				{
+					event: 'dataLoaded',
+					handler: data => this.tabulatorData = data.map(item => {
+					//	item.actionDiv = document.createElement('div');
+						return item;
+					}),
+				},
+				{
 					event: 'tableBuilt',
 					handler: async() => {
 						await this.$p.loadCategory(['global', 'person', 'stv', 'mobility', 'ui']);
@@ -89,50 +97,25 @@ export default {
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
-						// cm.getColumnByField('vorsitz_nachname').component.updateDefinition({
-						// 	title: this.$p.t('mobility', 'vorsitz_header')
-						// });
-						// cm.getColumnByField('beurteilung_bezeichnung').component.updateDefinition({
-						// 	title: this.$p.t('mobility', 'abschlussbeurteilung')
-						// });
-						// cm.getColumnByField('p1_nachname').component.updateDefinition({
-						// 	title: this.$p.t('mobility', 'pruefer1')
-						// });
-						// cm.getColumnByField('p2_nachname').component.updateDefinition({
-						// 	title: this.$p.t('mobility', 'pruefer2')
-						// });
-						// cm.getColumnByField('p3_nachname').component.updateDefinition({
-						// 	title: this.$p.t('mobility', 'pruefer3')
-						// });
-						// cm.getColumnByField('format_datum').component.updateDefinition({
-						// 	title: this.$p.t('global', 'datum')
-						// });
-						// cm.getColumnByField('uhrzeit').component.updateDefinition({
-						// 	title: this.$p.t('global', 'uhrzeit')
-						// });
-						// cm.getColumnByField('format_freigabedatum').component.updateDefinition({
-						// 	title: this.$p.t('mobility', 'freigabe')
-						// });
-						// cm.getColumnByField('antritt_bezeichnung').component.updateDefinition({
-						// 	title: this.$p.t('mobility', 'pruefungsantritt')
-						// });
-						// cm.getColumnByField('format_sponsion').component.updateDefinition({
-						// 	title: this.$p.t('mobility', 'sponsion')
-						// });
-						// cm.getColumnByField('anmerkung').component.updateDefinition({
-						// 	title: this.$p.t('global', 'anmerkung')
-						// });
-						// cm.getColumnByField('pruefungstyp_kurzbz').component.updateDefinition({
-						// 	title: this.$p.t('global', 'typ')
-						// });
-						// cm.getColumnByField('bisio_id').component.updateDefinition({
-						// 	title: this.$p.t('ui', 'bisio_id')
-						// });
-						/*
-						cm.getColumnByField('actions').component.updateDefinition({
+						cm.getColumnByField('kurzbz').component.updateDefinition({
+							title: this.$p.t('mobility', 'kurzbz_program')
+						});
+						cm.getColumnByField('nation_code').component.updateDefinition({
+							title: this.$p.t('mobility', 'gastnation')
+						});
+						cm.getColumnByField('format_von').component.updateDefinition({
+							title: this.$p.t('ui', 'von')
+						});
+						cm.getColumnByField('format_bis').component.updateDefinition({
+							title: this.$p.t('global', 'bis')
+						});
+						cm.getColumnByField('bisio_id').component.updateDefinition({
+							title: this.$p.t('mobility', 'bisio_id')
+						});
+
+/*						cm.getColumnByField('actions').component.updateDefinition({
 						title: this.$p.t('global', 'aktionen')
-												});
-						*/
+						});*/
 					}
 				}
 			],
@@ -140,16 +123,18 @@ export default {
 				von: new Date(),
 				bis: new Date(),
 				mobilitaetsprogramm_code: 7,
-				gastnation: 'A',
-				herkunftsland: 'A',
+				nation_code: 'A',
+				herkunftsland_code: 'A',
 				bisio_id: null,
-				localPurposes: []
+				localPurposes: [],
+				localSupports: []
 			},
 			statusNew: true,
 			programsMobility: [],
 			listLvs: [],
 			listPurposes: [],
 			listSupports: [],
+			tabulatorData: []
 		}
 	},
 	watch: {
@@ -163,11 +148,9 @@ export default {
 		actionNewMobility() {
 			this.resetForm();
 			this.statusNew = true;
-			//this.setDefaultFormData();
 		},
 		actionEditMobility(bisio_id) {
 			this.resetForm();
-		//	this.formData.bisio_id = bisio_id;
 			this.statusNew = false;
 			this.loadMobility(bisio_id);
 		},
@@ -177,22 +160,15 @@ export default {
 				.then(result => result
 					? bisio_id
 					: Promise.reject({handled: true}))
-				.then(this.deleteMobility(bisio_id))
+				.then(this.deleteMobility)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewMobility() {
-			//TODO(Manu) um localPurposes erweitern
-/*			console.log(this.formData.localPurposes[0]);
-			if(this.formData.localPurposes.length){
-				this.$fhcAlert.alertSuccess('nach speichern purposes mit neuer bisio_id zusammenführen');
-				return;
-			}*/
 			const dataToSend = {
 				uid: this.student.uid,
 				formData: this.formData
 			};
 			return this.$fhcApi.factory.stv.mobility.addNewMobility(dataToSend)
-			//return this.$refs.formMobility.factory.stv.mobility.addNewMobility(dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetForm();
@@ -208,10 +184,7 @@ export default {
 		loadMobility(bisio_id) {
 			return this.$fhcApi.factory.stv.mobility.loadMobility(bisio_id)
 				.then(result => {
-
 					this.formData = result.data;
-					console.log("after");
-					//return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -231,7 +204,6 @@ export default {
 				});
 		},
 		deleteMobility(bisio_id) {
-			//TODO(Manu) prompt wird nicht abgewartet!
 			return this.$fhcApi.factory.stv.mobility.deleteMobility(bisio_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
@@ -246,12 +218,13 @@ export default {
 			this.formData.von = new Date();
 			this.formData.bis = new Date();
 			this.formData.mobilitaetsprogramm_code = 7;
-			this.formData.gastnation = 'A';
-			this.formData.herkunftsland = 'A';
+			this.formData.nation_code = 'A';
+			this.formData.herkunftsland_code = 'A';
 			this.formData.bisio_id = null;
 			this.formData.localPurposes = [];
+			this.formData.localSupports = [];
 		},
-		// --- methods purposes ---
+		// ----------------------------------- methods purposes -----------------------------------
 		addMobilityPurpose({zweck_code, bisio_id}){
 			let params = {
 				bisio_id : bisio_id,
@@ -279,36 +252,38 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addPurposeToMobility({zweck_code}){
-
-			console.log("localPurposes befüllen: " , zweck_code);
 			this.formData.localPurposes.push(zweck_code);
-/*			this.formData.firstPurpose = zweck_code;
-			this.$refs.purposes.closeModal();*/
 		},
-/*		addPurposeToMobility(purpose) {
-			this.localPurposes.push(purpose);
-		},*/
-		//lokale Variante
-/*		async saveAllChanges() {
-			try {
-				const savedData = await this.$fhcApi.factory.stv.mobility.savePurposes({
-					id: this.bisio_id,
-					purposes: this.localData.filter(item => !item.zweck_code.startsWith('temp_')) // Nur echte IDs senden
-				});
+		// ----------------------------------- methods supports -----------------------------------
+		addMobilitySupport({aufenthaltfoerderung_code, bisio_id}){
+			let params = {
+				bisio_id : bisio_id,
+				aufenthaltfoerderung_code: aufenthaltfoerderung_code
+			};
+			return this.$fhcApi.factory.stv.mobility.addMobilitySupport(params)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 
-				// Synchronisiere temporäre IDs mit echten Daten
-				savedData.forEach((item) => {
-					const localItem = this.localData.find(local => local.zweck_code === item.tempId);
-					if (localItem) {
-						localItem.zweck_code = item.zweck_code; // Aktualisiere die echte ID
-					}
-				});
+					this.$refs.supports.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		deleteMobilitySupport({aufenthaltfoerderung_code, bisio_id}){
+			let params = {
+				bisio_id : bisio_id,
+				aufenthaltfoerderung_code: aufenthaltfoerderung_code
+			};
+			return this.$fhcApi.factory.stv.mobility.deleteMobilitySupport(params)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 
-				this.updateTabulatorData();
-			} catch (error) {
-				console.error('Fehler beim Speichern der Änderungen:', error);
-			}
-		},*/
+					this.$refs.supports.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		addSupportToMobility({aufenthaltfoerderung_code}){
+			this.formData.localSupports.push(aufenthaltfoerderung_code);
+		},
 	},
 	created() {
 		this.$fhcApi.factory.stv.mobility.getProgramsMobility()
@@ -334,19 +309,7 @@ export default {
 	},
 	template: `
 	<div class="stv-details-mobility h-100 pb-3">
-		<h4>In/out</h4>
-		
-<!--		{{listSupports}}-->
-		<hr>
-		{{formData}}
-<!--		
-		<hr>
-		
-		{{listPurposes}}-->
-		
-<!--		{{programsMobility}}-->
-<!--		{{listLvs}}-->
-	
+		<h4>In / Out</h4>
 
 		<core-filter-cmpt
 			ref="table"
@@ -356,7 +319,7 @@ export default {
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Mobilität"
+			:new-btn-label="this.$p.t('stv', 'tab_mobility')"
 			@click:new="actionNewMobility"
 			>
 		</core-filter-cmpt>
@@ -462,7 +425,7 @@ export default {
 					:label="$p.t('mobility', 'gastnation')"
 					type="select"
 					v-model="formData.nation_code"
-					name="gastnation"
+					name="nation_code"
 					>
 					<option 
 					v-for="nation in lists.nations" 
@@ -490,7 +453,7 @@ export default {
 					:label="$p.t('mobility', 'herkunftsland')"
 					type="select"
 					v-model="formData.herkunftsland_code"
-					name="herkunftsland"
+					name="herkunftsland_code"
 					>
 					<option 
 					v-for="nation in lists.nations" 
@@ -531,22 +494,16 @@ export default {
 						></MobilityPurpose>
 				</div>
 				
-<!--				<div class="col-6 stv-details-mobility-zweck">
-					<LocalPurpose 
-						:listPurposes="listPurposes"
-						ref="purposesLocal"
-						></LocalPurpose>
-				</div>-->
-			
-				
-<!--				<form-input
-					container-class="col-6 stv-details-mobility-aufenthalt"
-					:label="$p.t('mobility', 'aufenthalt')"
-					type="textarea"
-					v-model="formData.aufenthalt"
-					name="aufenthalt"
-					>
-				</form-input>-->
+				<div class="col-6 stv-details-mobility-aufenthaltfoerderung">
+					<MobilitySupport
+						:bisio_id="formData.bisio_id"
+						:listSupports="listSupports"
+						@deleteMobilitySupport="deleteMobilitySupport"
+						@setMobilitySupport="addMobilitySupport"
+						@setMobilitySupportToNewMobility="addSupportToMobility"
+						ref="supports"
+						></MobilitySupport>
+				</div>
 			</div>
 
 			<div class="text-end mb-3">
