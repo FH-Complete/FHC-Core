@@ -287,9 +287,9 @@
 				"name": "tomazdragar/simplecropper",
 				"version": "1.0",
 				"source": {
-					"url": "https://github.com/tomazdragar/SimpleCropper.git",
+					"url": "https://github.com/deveshsinghal22/SimpleCropper.git",
 					"type": "git",
-					"reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
+					"reference": "873e5e1ca57c370bedd07a512d0bf562930d4b89"
 				}
 			}
 		},
