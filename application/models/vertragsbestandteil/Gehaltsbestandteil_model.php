@@ -243,7 +243,7 @@ EOSQL;
 		return $result;
 	}
 
-	public function getGehaltsbestandteileValorisiert($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
+	public function getGehaltsbestandteileValorisiertForChart($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
 	{
 		$stichtagclause = '';
 		if( !is_null($stichtag) )
