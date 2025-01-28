@@ -240,6 +240,17 @@
 		{
 			"type": "package",
 			"package": {
+				"name": "olifolkerd/tabulator6",
+				"version": "6.3.0",
+				"dist": {
+					"url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/6.3.0.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
 				"name": "rmariuzzo/jquery-checkboxes",
 				"version": "1.0.7",
 				"dist": {
@@ -427,6 +438,7 @@
 
 		"olifolkerd/tabulator4": "4.9.*",
 		"olifolkerd/tabulator5": "5.5.*",
+		"olifolkerd/tabulator6": "6.3.0",
 
 		"phpseclib/phpseclib": "2.0.*",
 

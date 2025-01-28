@@ -104,6 +104,10 @@ export const CoreFilterCmpt = {
 		};
 	},
 	computed: {
+		rowHeight() {
+			// assumes equal height on all rows
+			return this.tabulator.options.rowHeight ?? this.tabulator.rowManager.activeRows[0]?.height 
+		},
 		filteredData() {
 			if (!this.dataset)
 				return [];
@@ -189,6 +193,13 @@ export const CoreFilterCmpt = {
 		}
 	},
 	methods: {
+		scrollToLastActive() {
+			const rowIndex = Math.round(this.tabulator.rowManager.scrollTop / this.rowHeight) + 1
+			const row = this.tabulator.getRowFromPosition(rowIndex)
+			if(row) {
+				this.tabulator.scrollToRow(row, 'top')
+			}
+		},
 		reloadTable() {
 			if (this.tableOnly)
 				this.tabulator.setData();
