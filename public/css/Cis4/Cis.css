@@ -484,8 +484,7 @@ html {
 }
 
 .fhc-entry:hover{
-	background-color:#005585 !important;
-	color:white !important;
+	filter: brightness(120%) !important;
 }
 
 .fhc-entry.btn:focus {
@@ -502,8 +501,8 @@ html {
 	transition-timing-function: ease-out,ease-out;
 }
 
-[selected].fhc-entry {
-	background-color: #00649C !important;
+[selected="true"].fhc-entry {
+	filter: brightness(120%);
 }
 
 @media screen and ( max-width: 767px ) {
