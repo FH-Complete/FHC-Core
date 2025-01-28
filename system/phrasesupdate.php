@@ -18271,6 +18271,26 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
+		'phrase' => 'internationalCredits',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'International Credits',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'International Credits',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
 		'phrase' => 'alledurchgefuehrten',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -18397,11 +18417,11 @@ array(
 			array(
 				'sprache' => 'German',
 				'text' => 'Ab dem Studienjahr 2022/23 ist der Erwerb von internationalen und interkulturellen Kompetenzen Teil des Curriculums. <br />
-							Auf der Grundlage der vorliegenden Maßnahmen absolvieren Sie im Laufe ihres Studiums Internationalisierungsaktivitäten, die mit unterschiedlichen ECTS-Punkten hinterlegt sind. <br />
-							In Summe müssen 5 ECTS erworben werden, die im 6. Semester wirksam werden. <br/>
+							Auf der Grundlage der vorliegenden Maßnahmen absolvieren Sie im Laufe ihres Studiums Internationalisierungsaktivitäten, die mit unterschiedlichen International Credits hinterlegt sind. <br />
+							In Summe müssen 5 International Credits erworben werden, die im 6. Semester wirksam werden. <br/>
 							Das Modul „International skills“ wird mit der Beurteilung „Mit Erfolg teilgenommen“ abgeschlossen. <br />
 							Bitte wählen Sie die für Sie in Frage kommenden Maßnahmen aus und planen Sie das entsprechende Semester. <br />
-							Sobald die 5 ECTS erreicht wurden, überprüft der Studiengang die von Ihnen hochgeladenen Dokumente. <br /><br />
+							Sobald die 5 International Credits erreicht wurden, überprüft der Studiengang die von Ihnen hochgeladenen Dokumente. <br /><br />
 							Fragen zum Status Ihrer Maßnahme u.ä. richten Sie bitte an den Studiengang. <br />
 							Bei allen weiteren Fragen zum Thema Organisation und Finanzierung des Auslandsaufenthalts und/oder Sprachkurs gibt Ihnen das International Office der FH Technikum Wien unter <a href="mailto:international.office@technikum-wien.at">international.office@technikum-wien.at</a> gerne Auskunft.',
 				'description' => '',
@@ -18410,11 +18430,11 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Starting with the study year 2022/23, the acquisition of international and intercultural competencies is part of the curriculum.<br />
-							On the basis of the measures at-hand, you will complete internationalization activities during the course of your studies, which are assigned different ECTS credits.<br />
-							In total, 5 ECTS must be acquired, which become effective in the 6th semester.<br />
+							On the basis of the measures at-hand, you will complete internationalization activities during the course of your studies, which are assigned different International Credits.<br />
+							In total, 5 International Credits must be acquired, which become effective in the 6th semester.<br />
 							The module “International skills” is completed with the assessment "Successfully participated". <br />
 							Please select the measures that apply to you and schedule the appropriate semester. <br />
-							Once the 5 ECTS have been achieved, the degree program will review the documents you have uploaded. <br /><br />
+							Once the 5 International Credits have been achieved, the degree program will review the documents you have uploaded. <br /><br />
 							Please direct questions regarding the status of your measure and the like should be directed to the study program. <br />
 							For all further questions regarding the organization and financing of your stay abroad and/or language course, please contact the International Office of the UAS Technikum Wien at <a href="mailto:international.office@technikum-wien.at">international.office@technikum-wien.at</a>.
 							',
@@ -18771,13 +18791,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ECTS bestätigt',
+				'text' => 'International Credits bestätigt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'ECTS confirmed',
+				'text' => 'International Credits confirmed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -18791,13 +18811,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ECTS - Maßnahme',
+				'text' => 'International Credits - Maßnahme',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'ECTS - Measures',
+				'text' => 'International Credits - Measures',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19071,13 +19091,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Nur bestätigte Maßnahmen vorhanden, aber weniger als 5 ECTs.',
+				'text' => 'Nur bestätigte Maßnahmen vorhanden, aber weniger als 5 International Credits.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Only confirmed measures, but fewer than 5 ECTs.',
+				'text' => 'Only confirmed measures, but fewer than 5 International Credits.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19091,13 +19111,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Es wurden 5 ECTs erreicht.',
+				'text' => 'Es wurden 5 International Credits erreicht.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '5 ECTs points have been achieved.',
+				'text' => '5 International Credits have been achieved.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19251,13 +19271,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ECTS - bestätigt',
+				'text' => 'International Credits - bestätigt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'ECTS - confirmed',
+				'text' => 'International Credits - confirmed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19391,13 +19411,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '>=5 ECTS verplant',
+				'text' => '>=5 International Credits verplant',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '>=5 ECTS planned',
+				'text' => '>=5 international credits planned',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19411,13 +19431,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<5 ECTS verplant',
+				'text' => '<5 International Credits verplant',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '<5 ECTS planned',
+				'text' => '<5 International Credits planned',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19431,13 +19451,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '>=5 ECTS bestätigt',
+				'text' => '>=5 International Credits bestätigt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '>=5 ECTS confirmed',
+				'text' => '>=5 International Credits confirmed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19451,13 +19471,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<5 ECTS bestätigt',
+				'text' => '<5 International Credits bestätigt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '<5 ECTS confirmed',
+				'text' => '<5 International Credits confirmed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
