@@ -125,7 +125,7 @@ class Cms extends FHCAPI_Controller
 
 		//get the data or terminate with error
 		$news = $this->getDataOrTerminateWithError($news);
-
+		
 		// collect the content of the news
 		foreach($news as $news_element){
 			$this->addMeta("content_id",$news_element->content_id);
@@ -134,12 +134,17 @@ class Cms extends FHCAPI_Controller
 			$this->NewsModel->resetQuery();
 			$content = $this->cmslib->getContent($news_element->content_id);
 
-			$content = $this->getDataOrTerminateWithError($content);
+			$content = getData($content);
 			
 			$news_element->content_obj = $content;
 		}
+		$withContent = function($news) {
+			return $news->content_obj != null;
+		};
+		
+		$newsWithContent = array_filter($news, $withContent);
 
-		$this->terminateWithSuccess($news);
+		$this->terminateWithSuccess($newsWithContent);
         
 	}
 

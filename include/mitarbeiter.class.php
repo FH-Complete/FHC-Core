@@ -1237,7 +1237,7 @@ class mitarbeiter extends benutzer
 										".$this->db_add_param($datumvon)." BETWEEN COALESCE(vbskarenz.von, '1970-01-01') AND COALESCE(vbskarenz.bis, '2170-12-31')
 										OR
 										".$this->db_add_param($datumbis)." BETWEEN COALESCE(vbskarenz.von, '1970-01-01') AND COALESCE(vbskarenz.bis, '2170-12-31')
-									)
+									) LIMIT 1
 							) NULLS FIRST LIMIT 1
 
 						)

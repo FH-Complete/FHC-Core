@@ -1,6 +1,7 @@
 import FhcApi from './FhcApi.js';
 
 const categories = Vue.reactive({});
+const user_language = Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
 const loadingModules = {};
 let reload = false;
 
@@ -29,6 +30,9 @@ const phrasen = {
 			res.data.forEach(row => {
 				categories[row.category][row.phrase] = row.text
 			})
+
+			// update the reactive data that holds the current active user_language
+			user_language.value = language;
 
 			return res
 		})
@@ -81,6 +85,7 @@ export default {
 			t: phrasen.t,
 			loadCategory: cat => phrasen.loadCategory.call(app, cat),
 			setLanguage: phrasen.setLanguage,
+			user_language: user_language,
 			t_ref: phrasen.t_ref
 		};
 		app.provide('$p', app.config.globalProperties.$p);
