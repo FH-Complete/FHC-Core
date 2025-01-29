@@ -348,7 +348,7 @@ html {
     background-color: var(--fhc-cis-primary);
   }
   #nav-user-btn img {
-    object-fit: cover;
+    object-fit: contain;
     height: calc(var(--fhc-cis-header-height) - 2 * var(--fhc-cis-header-py));
     width: calc(var(--fhc-cis-header-height) - 2 * var(--fhc-cis-header-py));
   }
@@ -359,7 +359,7 @@ html {
   }
 
   #nav-user-menu img {
-    object-fit: cover;
+    object-fit: contain;
     height: calc( 3 * var(--fhc-cis-header-py));
   }
 
