@@ -38,7 +38,7 @@ export default {
                         </div>
 
                         <div class="searchbar_tablerow">
-                            <div class="searchbar_tablecell">Studiengang</div>
+                            <div class="searchbar_tablecell">{{$p.t('lehre','studiengang')}}</div>
                             <div class="searchbar_tablecell">
                                 {{ res.studiengang }}
                             </div>
@@ -52,14 +52,14 @@ export default {
                         </div>
         
                         <div class="searchbar_tablerow">
-                            <div class="searchbar_tablecell">Matrikelnummer</div>
+                            <div class="searchbar_tablecell">{{$p.t('person','personenkennzeichen')}}</div>
                             <div class="searchbar_tablecell">
                                 {{ res.matrikelnr }}
                             </div>
                         </div>
         
                         <div class="searchbar_tablerow">
-                            <div class="searchbar_tablecell">EMail</div>
+                            <div class="searchbar_tablecell">{{$p.t('person','email')}}</div>
                             <div class="searchbar_tablecell">
                                 <a :href="this.mailtourl">
                                     {{ res.email }}

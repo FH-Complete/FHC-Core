@@ -10,7 +10,7 @@ class CalendarDate {
 				this.weekStart = CalendarDate.getWeekStart();
 				this._clean();
 				onCleanup((cleanup)=>{
-					console.log(cleanup,"HERE IA M")
+					// do clean up
 				});
 			},
 			

@@ -1,5 +1,7 @@
 /* basic */
 @import '../components/searchbar/searchbar.css';
+@import '../components/Sprachen.css';
+
 html {
   font-size: 0.875em;
 }
@@ -7,6 +9,7 @@ html {
 /* variables */
 :root {
   --fhc-cis-primary: #00649c;
+  --fhc-cis-primary-hover: #005585;
   --fhc-cis-header-px: 1rem;
   --fhc-cis-header-py: .5rem;
   --fhc-cis-main-px: 1.5rem;
@@ -49,6 +52,8 @@ html {
     --fhc-cis-menu-bg: #343a40;
   }
 }
+
+
 
 /* buttons */
 #cis-header .btn-level-1,
