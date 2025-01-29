@@ -6,6 +6,7 @@ require_once('../../include/phrasen.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/lehrveranstaltung_faktor.class.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/lehrform.class.php');
 
 $uid = get_uid();
 $rechte = new benutzerberechtigung();
@@ -38,12 +39,14 @@ echo '<!DOCTYPE HTML>
 			var row = $(this).closest('tr');
 			var id = row.data('id');
 			var faktor = row.find('.faktor').text();
+			var lehrform = row.find('.lehrform').text();
 			var von = row.find('.von').text();
 			var bis = row.find('.bis').text();
 
 			$('#action').val('edit');
 			$('#id').val(id);
 			$('#faktor').val(faktor);
+			$('#lehrform').val(lehrform);
 			$('#von').val(von);
 			$('#bis').val(bis);
 		});
@@ -63,12 +66,14 @@ echo '<!DOCTYPE HTML>
 			var id = $('#id').val();
 
 			var faktor = $('#faktor').val();
+			var lehrform = $('#lehrform').val();
 			var von = $('#von').val();
 			var bis = $('#bis').val();
 			var lv_id = $('#lv_id').val();
 
 			var formData = {
 				faktor: faktor,
+				lehrform_kurzbz: lehrform,
 				von: von,
 				bis: bis,
 				lv_id: lv_id
@@ -132,6 +137,7 @@ echo '<!DOCTYPE HTML>
 				{
 					var row = $('#faktorTable tbody tr[data-id="' + formData.id + '"]');
 					row.find('.faktor').text(formData.faktor);
+					row.find('.lehrform').text(formData.lehrform_kurzbz);
 					row.find('.von').text(formData.von);
 					row.find('.bis').text(formData.bis);
 
@@ -189,6 +195,7 @@ echo '<!DOCTYPE HTML>
 		var row = tr
 			.append(
 				$('<td>').text(faktor.faktor).addClass('faktor'),
+				$('<td>').text(faktor.lehrform_kurzbz || "").addClass('lehrform'),
 				$('<td>').text(faktor.von).addClass('von'),
 				$('<td>').text(faktor.bis).addClass('bis'),
 				$('<td>').append(editButton).addClass('edit'),
@@ -232,6 +239,9 @@ $faktor->loadByLV($lv->lehrveranstaltung_id);
 $studiensemester = new studiensemester();
 $studiensemester->getAll('desc');
 
+$lehrform = new lehrform();
+$lehrform->getAll();
+
 
 echo '
 </head>
@@ -267,6 +277,17 @@ echo	'
 		
 echo '
 		</select>
+		<label for="lehrform">Lehrform</label>
+		<select id="lehrform" name="lehrform">
+			<option value="">---keine Auswahl---</option>';
+
+			foreach ($lehrform->lehrform as $lehrform)
+			{
+				echo '<option value="'.$lehrform->lehrform_kurzbz.'">'.$lehrform->bezeichnung.'</option>';
+			}
+
+echo '
+		</select>			
 		<button type="submit">'.$p->t('global/speichern').'</button>
 		<span id="success_message_save" class="alert alert-success" style="display:none;">'. $p->t('global/erfolgreichgespeichert') . '</span>
 		<span id="success_message_delete" class="alert alert-success" style="display:none;">'. $p->t('global/erfolgreichgelöscht') . '</span>
@@ -276,6 +297,7 @@ echo '
 		<thead>
 			<tr>
 				<th>'.$p->t('lv/faktor').'</th>
+				<th>'.$p->t('lvaliste/lehrform').'</th>
 				<th>'.$p->t('global/von').'</th>
 				<th>'.$p->t('global/bis').'</th>
 				<th>'.$p->t('global/bearbeiten').'</th>
@@ -291,6 +313,7 @@ if(count($faktor->lv_faktoren) > 0)
 	{
 		echo "<tr data-id=". $lv_faktor->lehrveranstaltung_faktor_id .">
 				<td class='faktor'>".$lv_faktor->faktor."</td>
+				<td class='lehrform'>".$lv_faktor->lehrform_kurzbz."</td>
 				<td class='von'>".$lv_faktor->studiensemester_kurzbz_von."</td>
 				<td class='bis'>".$lv_faktor->studiensemester_kurzbz_bis."</td>
 				<td><button class='edit'>".$p->t('global/bearbeiten')."</button></td>

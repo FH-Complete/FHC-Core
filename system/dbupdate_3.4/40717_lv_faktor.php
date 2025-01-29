@@ -78,3 +78,16 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_lehrv
 	}
 }
 
+if(!@$db->db_query("SELECT lehrform_kurzbz FROM lehre.tbl_lehrveranstaltung_faktor LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung_faktor ADD COLUMN lehrform_kurzbz varchar(8);			        
+			ALTER TABLE lehre.tbl_lehrveranstaltung_faktor ADD CONSTRAINT fk_lehrveranstaltung_faktor_lehrform_kurzbz FOREIGN KEY (lehrform_kurzbz) REFERENCES lehre.tbl_lehrform (lehrform_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE lehre.tbl_lehrveranstaltung_faktor DROP CONSTRAINT fk_lehrveranstaltung_faktor_lehrveranstaltung_id;
+			ALTER TABLE lehre.tbl_lehrveranstaltung_faktor ADD CONSTRAINT fk_lehrveranstaltung_faktor_lehrveranstaltung_id FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON DELETE CASCADE ON UPDATE CASCADE;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung_faktor '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte lehrform_kurzbz zu Tabelle lehre.tbl_lehrveranstaltung_faktor hinzugefügt';
+}

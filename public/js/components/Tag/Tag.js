@@ -192,11 +192,13 @@ export default {
 	},
 	template: `
 		<div class="plus_button_container" @mouseleave="hideList">
+			 <span :title="values.length === 0 ? 'Bitte Zeilen markieren' : ''">
 			<button @mouseover="showList = true" 
 					:disabled="!values || values.length === 0"
 					class="btn btn-sm">
 				<i class="fa-solid fa-tag fa-xl"></i>
 			</button>
+			</span>
 			<ul v-if="showList" class="dropdown_list">
 				<li v-for="(item, index) in tags" :key="index" @click="openModal(item)" :title="item.bezeichnung">
 					{{ item.bezeichnung }}
