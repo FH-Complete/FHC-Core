@@ -207,7 +207,7 @@ class CalendarDate {
 		return Object.prototype.toString.call(obj) === '[object Date]';
 	}
 	cleanup(){
-		this.watchLocale.stop();
+		this.watchLocale();
 	}
 }
 /**
