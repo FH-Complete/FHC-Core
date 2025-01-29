@@ -168,7 +168,7 @@ export default {
 				uid: this.student.uid,
 				formData: this.formData
 			};
-			return this.$fhcApi.factory.stv.mobility.addNewMobility(dataToSend)
+			return this.$refs.formMobility.factory.stv.mobility.addNewMobility(dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetForm();
@@ -176,6 +176,8 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					this.reload();
+					this.$refs.purposes.resetLocalData();
+					this.$refs.supports.resetLocalData();
 				});
 		},
 		reload() {
@@ -193,7 +195,7 @@ export default {
 				formData: this.formData,
 				uid: this.student.uid,
 			};
-			return this.$fhcApi.factory.stv.mobility.updateMobility(dataToSend)
+			this.$refs.formMobility.factory.stv.mobility.updateMobility(dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetForm();

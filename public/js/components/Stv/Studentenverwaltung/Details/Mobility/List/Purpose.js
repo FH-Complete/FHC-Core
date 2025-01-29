@@ -83,7 +83,7 @@ export default {
 				],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
-				height: '200',
+				height: '250',
 				selectableRangeMode: 'click',
 				selectable: true,
 				persistenceID: 'core-mobility-purpose'
@@ -138,16 +138,16 @@ export default {
 			}
 			else
 			{
-				const index = this.localData.findIndex(item => item.zweck_code === zweck_code);
+				const data = this.$refs.table.tabulator.getData();
+				const rowExists = data.some(item => item.zweck_code === zweck_code);
 
-				if (index !== -1) {
-					this.localData.splice(index, 1);
+				if (rowExists) {
+					this.$refs.table.tabulator.deleteRow(zweck_code);
 				}
 			}
 		},
 		handleSubmitAction() {
 			if (this.bisio_id) {
-
 				this.$emit('setMobilityPurpose', {
 					zweck_code: this.formData.zweck_code,
 					bisio_id: this.bisio_id
@@ -155,15 +155,27 @@ export default {
 			} else {
 				const purpose = this.listPurposes.find(item => item.zweck_code === this.formData.zweck_code);
 				const newEntry = {
-					zweck_code: this.formData.zweck_code,
+					id: Number (this.formData.zweck_code), //id necessary due to tabulator deleteRow-Action
+					zweck_code: Number (this.formData.zweck_code),
 					kurzbz: purpose.kurzbz,
 					bezeichnung: purpose.bezeichnung
 				};
-				this.localData.push(newEntry);
 
-				this.$emit('setMobilityPurposeToNewMobility', {
-					zweck_code: this.formData.zweck_code,
-				});
+				const data = this.$refs.table.tabulator.getData();
+				const rowExists = data.some(item => item.zweck_code === Number (this.formData.zweck_code));
+
+				if(rowExists){
+					this.$fhcAlert.alertError(this.$p.t('ui', 'error_entryExisting'));
+				}
+				else
+				{
+					this.localData.push(newEntry);
+
+					this.$emit('setMobilityPurposeToNewMobility', {
+						zweck_code: this.formData.zweck_code,
+					});
+				}
+
 			}
 		this.closeModal();
 		},
@@ -183,6 +195,9 @@ export default {
 		resetModal(){
 			this.formData = {};
 			this.formData.zweck_code = null;
+		},
+		resetLocalData() {
+			this.$refs.table.tabulator.clearData();
 		}
 	},
 	template: `

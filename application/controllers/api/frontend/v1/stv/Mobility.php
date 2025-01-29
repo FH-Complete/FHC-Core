@@ -67,42 +67,73 @@ class Mobility extends FHCAPI_Controller
 
 	public function insertMobility()
 	{
-		//TODO(Manu) Validations
-		//Pflicht gast und herkunftsland
+		$this->load->library('form_validation');
 		$authUID = getAuthUID();
+
+		$student_uid = $this->input->post('uid');
+
+		if(!$student_uid)
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Student UID']), self::ERROR_TYPE_GENERAL);
+		}
 
 		$formData = $this->input->post('formData');
 
-		$von =	(isset($formData['von']) && !empty($formData['von'])) ? $formData['von'] : null;
-		$nation_code =	(isset($formData['nation_code']) && !empty($formData['nation_code'])) ? $formData['nation_code'] : 'A';
-		$mobilitaetsprogramm_code =	(isset($formData['mobilitaetsprogramm_code']) && !empty($formData['mobilitaetsprogramm_code'])) ? $formData['mobilitaetsprogramm_code'] : null;
-		$herkunftsland_code =	(isset($formData['herkunftsland_code']) && !empty($formData['herkunftsland_code'])) ? $formData['herkunftsland_code'] : 'A';
+		$_POST['von'] =	(isset($formData['von']) && !empty($formData['von'])) ? $formData['von'] : null;
+		$_POST['bis'] =	(isset($formData['bis']) && !empty($formData['bis'])) ? $formData['bis'] : null;
+		$_POST['nation_code'] =	(isset($formData['nation_code']) && !empty($formData['nation_code'])) ? $formData['nation_code'] : 'A';
+		$_POST['mobilitaetsprogramm_code'] =	(isset($formData['mobilitaetsprogramm_code']) && !empty($formData['mobilitaetsprogramm_code'])) ? $formData['mobilitaetsprogramm_code'] : null;
+		$_POST['herkunftsland_code'] = (isset($formData['herkunftsland_code']) && !empty($formData['herkunftsland_code'])) ? $formData['herkunftsland_code'] : 'A';
+		$_POST['ects_erworben']  = (isset($formData['ects_erworben']) && !empty($formData['ects_erworben'])) ? $formData['ects_erworben'] : null;
+		$_POST['ects_angerechnet'] = (isset($formData['ects_angerechnet']) && !empty($formData['ects_angerechnet'])) ? $formData['ects_angerechnet'] : null;
+
+
+		$this->form_validation->set_rules('nation_code', 'Nation_code', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Nation_code'])
+		]);
+		$this->form_validation->set_rules('herkunftsland_code', 'Herkunftsland_code', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Herkunftsland_code'])
+		]);
+		$this->form_validation->set_rules('mobilitaetsprogramm_code', 'Mobilitaetsprogramm_code', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Mobilitaetsprogramm_code'])
+		]);
+		$this->form_validation->set_rules('von', 'VonDatum', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'VonDatum'])
+		]);
+
+		$this->form_validation->set_rules('bis', 'VBisDatum', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'VBisDatum'])
+		]);
+
+		$this->form_validation->set_rules('ects_erworben', 'Ects_erworben', 'numeric', [
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Ects_erworben'])
+		]);
+
+		$this->form_validation->set_rules('ects_angerechnet', 'Ects_angerechnet', 'numeric', [
+		'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Ects_angerechnet'])
+		]);
+
+		if ($this->form_validation->run() == false)
+		{
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
+
 		$ort =	(isset($formData['ort']) && !empty($formData['ort'])) ? $formData['ort'] : null;
 		$universitaet =	(isset($formData['universitaet']) && !empty($formData['universitaet'])) ? $formData['universitaet'] : null;
-		$ects_erworben = (isset($formData['ects_erworben']) && !empty($formData['ects_erworben'])) ? $formData['ects_erworben'] : null;
-		$ects_angerechnet = (isset($formData['ects_angerechnet']) && !empty($formData['ects_angerechnet'])) ? $formData['ects_angerechnet'] : null;
 		$localPurposes = (isset($formData['localPurposes']) && !empty($formData['localPurposes'])) ? $formData['localPurposes'] : null;
 		$localSupports = (isset($formData['localSupports']) && !empty($formData['localSupports'])) ? $formData['localSupports'] : null;
 
-
-		//strange fields
-		/*			'zweck_code' => $this->input->post('zweck_code'),
-					'aufenthalt_foerderung' => $this->input->post('aufenthalt_foerderung'),
-					'lehreinheit_id' => $this->input->post('lehreinheit_id'),
-					'lehrveranstaltung_id' => $this->input->post('lehrveranstaltung_id'),*/
-
-
 		$result = $this->BisioModel->insert([
-			'student_uid' => $this->input->post('uid'),
-			'von' => $von,
-			'bis' => $formData['bis'],
-			'mobilitaetsprogramm_code' => $mobilitaetsprogramm_code,
-			'nation_code' => $nation_code,
-			'herkunftsland_code' => $herkunftsland_code,
+			'student_uid' => $student_uid,
+			'von' => $_POST['von'],
+			'bis' => $_POST['bis'],
+			'mobilitaetsprogramm_code' => $_POST['mobilitaetsprogramm_code'],
+			'nation_code' => $_POST['nation_code'],
+			'herkunftsland_code' => $_POST['herkunftsland_code'],
 			'ort' => $ort,
 			'universitaet' => $universitaet,
-			'ects_erworben' => $ects_erworben,
-			'ects_angerechnet' => $ects_angerechnet,
+			'ects_erworben' => $_POST['ects_erworben'] ,
+			'ects_angerechnet' => $_POST['ects_angerechnet'],
 			'insertamum' => date('c'),
 			'insertvon' => $authUID,
 		]);
@@ -111,7 +142,6 @@ class Mobility extends FHCAPI_Controller
 
 		//check if localData (purposes)
 		if(count($localPurposes) > 0){
-
 			foreach ($localPurposes as $zweck){
 				$zweck = (int) $zweck;
 				$this->addMobilityPurpose($bisio_id, $zweck);
@@ -139,24 +169,71 @@ class Mobility extends FHCAPI_Controller
 
 	public function updateMobility()
 	{
+		$this->load->library('form_validation');
 		$authUID = getAuthUID();
+
+		$student_uid = $this->input->post('uid');
+
+		if(!$student_uid)
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Student UID']), self::ERROR_TYPE_GENERAL);
+		}
 		$formData = $this->input->post('formData');
+
+		$_POST['von'] =	(isset($formData['von']) && !empty($formData['von'])) ? $formData['von'] : null;
+		$_POST['bis'] =	(isset($formData['bis']) && !empty($formData['bis'])) ? $formData['bis'] : null;
+		$_POST['nation_code'] =	(isset($formData['nation_code']) && !empty($formData['nation_code'])) ? $formData['nation_code'] : 'A';
+		$_POST['mobilitaetsprogramm_code'] =	(isset($formData['mobilitaetsprogramm_code']) && !empty($formData['mobilitaetsprogramm_code'])) ? $formData['mobilitaetsprogramm_code'] : null;
+		$_POST['herkunftsland_code'] = (isset($formData['herkunftsland_code']) && !empty($formData['herkunftsland_code'])) ? $formData['herkunftsland_code'] : 'A';
+		$_POST['ects_erworben']  = (isset($formData['ects_erworben']) && !empty($formData['ects_erworben'])) ? $formData['ects_erworben'] : null;
+		$_POST['ects_angerechnet'] = (isset($formData['ects_angerechnet']) && !empty($formData['ects_angerechnet'])) ? $formData['ects_angerechnet'] : null;
+
+
+		$this->form_validation->set_rules('nation_code', 'Nation_code', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Nation_code'])
+		]);
+		$this->form_validation->set_rules('herkunftsland_code', 'Herkunftsland_code', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Herkunftsland_code'])
+		]);
+		$this->form_validation->set_rules('mobilitaetsprogramm_code', 'Mobilitaetsprogramm_code', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Mobilitaetsprogramm_code'])
+		]);
+		$this->form_validation->set_rules('von', 'VonDatum', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'VonDatum'])
+		]);
+
+		$this->form_validation->set_rules('bis', 'VBisDatum', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'VBisDatum'])
+		]);
+
+		$this->form_validation->set_rules('ects_erworben', 'Ects_erworben', 'numeric', [
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Ects_erworben'])
+		]);
+
+		$this->form_validation->set_rules('ects_angerechnet', 'Ects_angerechnet', 'numeric', [
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Ects_angerechnet'])
+		]);
+
+		if ($this->form_validation->run() == false)
+		{
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
 
 		$result = $this->BisioModel->update(
 			[
 				'bisio_id' =>  $formData['bisio_id']
 			],
 			[
-				'student_uid' => $this->input->post('uid'),
-				'von' => $formData['von'],
-				'bis' => $formData['bis'],
-				'mobilitaetsprogramm_code' => $formData['mobilitaetsprogramm_code'],
-				'nation_code' => $formData['nation_code'],
-				'herkunftsland_code' => $formData['herkunftsland_code'],
+				'student_uid' => $student_uid,
+				'von' => $_POST['von'],
+				'bis' => $_POST['bis'],
+				'mobilitaetsprogramm_code' => $_POST['mobilitaetsprogramm_code'],
+				'nation_code' => $_POST['nation_code'],
+				'herkunftsland_code' => $_POST['herkunftsland_code'],
 				'ort' => $formData['ort'],
 				'universitaet' => $formData['universitaet'],
-				'ects_erworben' => $formData['ects_erworben'],
-				'ects_angerechnet' => $formData['ects_angerechnet'],
+				'ects_erworben' => $_POST['ects_erworben'] ,
+				'ects_angerechnet' => $_POST['ects_angerechnet'],
 				'updateamum' => date('c'),
 				'updatevon' => $authUID,
 			]
@@ -169,8 +246,6 @@ class Mobility extends FHCAPI_Controller
 
 	public function deleteMobility($bisio_id)
 	{
-	//	$this->terminateWithError('test ' . $bisio_id,  self::ERROR_TYPE_GENERAL);
-
 		$result = $this->BisioModel->delete(
 			array('bisio_id' => $bisio_id)
 		);
@@ -262,6 +337,19 @@ class Mobility extends FHCAPI_Controller
 		}
 
 		$this->load->model('codex/Bisiozweck_model', 'BisiozweckModel');
+		if(!$local_purpose)
+		{
+			$check = $this->BisiozweckModel->loadWhere(
+				[
+					'bisio_id' => $bisio_id,
+					'zweck_code' => $zweck_code,
+				]
+			);
+			if (hasData($check))
+			{
+				$this->terminateWithError( $this->p->t('ui', 'error_entryExisting'), self::ERROR_TYPE_GENERAL);
+			}
+		}
 
 		$result = $this->BisiozweckModel->insert(
 			array(
@@ -271,6 +359,11 @@ class Mobility extends FHCAPI_Controller
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
+
+		if($local_purpose)
+		{
+			return $data;
+		}
 
 		return $this->terminateWithSuccess(current($data));
 	}
@@ -304,6 +397,20 @@ class Mobility extends FHCAPI_Controller
 
 		$this->load->model('codex/Bisioaufenthaltfoerderung_model', 'BisioaufenthaltfoerderungModel');
 
+		if(!$local_support)
+		{
+			$check = $this->BisioaufenthaltfoerderungModel->loadWhere(
+				[
+					'bisio_id' => $bisio_id,
+					'aufenthaltfoerderung_code' => $aufenthaltfoerderung_code,
+				]
+			);
+			if (hasData($check))
+			{
+				$this->terminateWithError( $this->p->t('ui', 'error_entryExisting'), self::ERROR_TYPE_GENERAL);
+			}
+		}
+
 		$result = $this->BisioaufenthaltfoerderungModel->insert(
 			array(
 				'bisio_id' => $bisio_id,
@@ -313,11 +420,17 @@ class Mobility extends FHCAPI_Controller
 
 		$data = $this->getDataOrTerminateWithError($result);
 
+		if($local_support)
+		{
+			return $data;
+		}
+
 		return $this->terminateWithSuccess(current($data));
 	}
 
 	public function deleteMobilitySupport($bisio_id)
 	{
+		//TODO(Manu) Validierung Extension
 		$aufenthaltfoerderung_code = $this->input->post('aufenthaltfoerderung_code');
 
 		$this->load->model('codex/Bisioaufenthaltfoerderung_model', 'BisioaufenthaltfoerderungModel');

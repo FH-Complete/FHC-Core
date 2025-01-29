@@ -81,7 +81,7 @@ export default {
 				],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
-				height: '200',
+				height: '250',
 				selectableRangeMode: 'click',
 				selectable: true,
 				persistenceID: 'core-mobility-support'
@@ -133,10 +133,11 @@ export default {
 			}
 			else
 			{
-				const index = this.localData.findIndex(item => item.aufenthaltfoerderung_code === aufenthaltfoerderung_code);
+				const data = this.$refs.table.tabulator.getData();
+				const rowExists = data.some(item => item.aufenthaltfoerderung_code === aufenthaltfoerderung_code);
 
-				if (index !== -1) {
-					this.localData.splice(index, 1);
+				if (rowExists) {
+					this.$refs.table.tabulator.deleteRow(aufenthaltfoerderung_code);
 				}
 			}
 		},
@@ -149,18 +150,29 @@ export default {
 			} else {
 				const support = this.listSupports.find(item => item.aufenthaltfoerderung_code === this.formData.aufenthaltfoerderung_code);
 				const newEntry = {
+					id: Number (this.formData.aufenthaltfoerderung_code), //id necessary due to tabulator deleteRow-Action
 					aufenthaltfoerderung_code: this.formData.aufenthaltfoerderung_code,
 					bezeichnung: support.bezeichnung
 				};
-				this.localData.push(newEntry);
 
-				this.$emit('setMobilitySupportToNewMobility', {
-					aufenthaltfoerderung_code: this.formData.aufenthaltfoerderung_code,
-				});
+				const data = this.$refs.table.tabulator.getData();
+				const rowExists = data.some(item => item.aufenthaltfoerderung_code === Number (this.formData.aufenthaltfoerderung_code));
+
+				if(rowExists){
+					this.$fhcAlert.alertError(this.$p.t('ui', 'error_entryExisting'));
+				}
+				else
+				{
+					this.localData.push(newEntry);
+
+					this.$emit('setMobilitySupportToNewMobility', {
+						aufenthaltfoerderung_code: this.formData.aufenthaltfoerderung_code,
+					});
+				}
+
 			}
 			this.closeModal();
 		},
-
 		closeModal(){
 			this.$refs.mobilitySupport.hide();
 			this.$emit('close-modal');
@@ -176,6 +188,9 @@ export default {
 		resetModal(){
 			this.formData = {};
 			this.formData.aufenthaltfoerderung_code = null;
+		},
+		resetLocalData() {
+			this.$refs.table.tabulator.clearData();
 		}
 	},
 	template: `
