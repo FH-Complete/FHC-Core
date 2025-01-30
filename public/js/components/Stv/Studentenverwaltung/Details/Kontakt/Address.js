@@ -250,7 +250,6 @@ export default{
 					this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-				//window.scrollTo(0, 0);
 				this.reload();
 			});
 		},
@@ -470,7 +469,6 @@ export default{
 							type="text"
 							:label="$p.t('person/ort')"
 							name="ort"
-							:label="$p.t('person/ort')"
 							v-model="addressData.ort"
 						>	
 					</form-input>
