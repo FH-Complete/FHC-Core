@@ -28,7 +28,7 @@ $config['explain_equivalence'] = TRUE;
 // Displays infobox if set to true
 $config['display_infobox'] = [
 	'fristen' => TRUE,
-	'referenzbeispiele_ects' => FALSE,
+	'referenzbeispiele_ects' => TRUE,
 	'voraussetzungen' => TRUE,
 	'nachweisdokumente' => TRUE,
 	'herkunft_kenntnisse' => TRUE
