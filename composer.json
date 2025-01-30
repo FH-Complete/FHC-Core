@@ -481,6 +481,7 @@
 		"phpmd/phpmd": "2.*",
 		"phpmetrics/phpmetrics": "2.*",
 		"sebastian/phpcpd": "3.*",
-		"phpunit/phpunit": "^6"
+		"phpunit/phpunit": "^6",
+		"zircote/swagger-php": "^2.0"
 	}
 }

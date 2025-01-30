@@ -8,7 +8,7 @@ export default {
     },
   
     delete: function (bookmark_id) {
-      return this.$fhcApi.get(
+      return this.$fhcApi.post(
         `/api/frontend/v1/Bookmark/delete/${bookmark_id}`
         ,{}
       ); 

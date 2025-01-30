@@ -1,39 +1,30 @@
 <?php
-// Set environment
+
 define('ENVIRONMENT', 'testing');
 $_SERVER['CI_ENV'] = 'testing';
 
-// Setup CI core constants
 $system_path = __DIR__ . '/vendor/codeigniter/framework/system';
 $application_folder = __DIR__ . '/application';
-$view_folder = $application_folder . '/views';
+$view_folder = '';
 
-if (!defined('ICONV_ENABLED')) define('ICONV_ENABLED', function_exists('iconv'));
-if (!defined('MB_ENABLED')) define('MB_ENABLED', extension_loaded('mbstring'));
+if (($_temp = realpath($system_path)) !== FALSE) {
+	$system_path = $_temp . '/';
+} else {
+	$system_path = rtrim($system_path, '/') . '/';
+}
+define('BASEPATH', str_replace("\\", "/", $system_path));
+define('APPPATH', str_replace("\\", "/", realpath($application_folder)) . '/');
 
+if (!empty($view_folder) && is_dir($view_folder)) {
+	$view_folder = realpath($view_folder) . '/';
+} elseif (is_dir(APPPATH . 'views/')) {
+	$view_folder = APPPATH . 'views/';
+} else {
+	exit('Your view folder path is invalid');
+}
+define('VIEWPATH', $view_folder);
 define('SELF', pathinfo(__FILE__, PATHINFO_BASENAME));
-define('BASEPATH', rtrim(realpath($system_path), '/') . '/');
-define('APPPATH', rtrim(realpath($application_folder), '/') . '/');
-define('VIEWPATH', rtrim(realpath($view_folder), '/') . '/');
+define('FCPATH', __DIR__ . '/');
 
-// Autoload Composer and project config
 require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/config/global.config.inc.php';
-require_once __DIR__ . '/config/vilesci.config.inc.php';
-require_once __DIR__ . '/application/config/core_includes.php';
-
-// Load base CI functionality manually, without routing
-require_once BASEPATH . 'core/Common.php';
-
-$CFG =& load_class('Config', 'core');
-$UNI =& load_class('Utf8', 'core');
-$URI =& load_class('URI', 'core');
-$RTR =& load_class('Router', 'core'); // Optional: Don't route
-$OUT =& load_class('Output', 'core');
-
-require_once BASEPATH . 'core/Controller.php';
-
-//require_once BASEPATH . 'core/CodeIgniter.php';
-function &get_instance() { return CI_Controller::get_instance(); }
-
-// Manually load your custom controller later in tests
+require_once BASEPATH . 'core/CodeIgniter.php';

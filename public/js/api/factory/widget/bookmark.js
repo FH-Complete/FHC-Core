@@ -24,7 +24,7 @@ export default {
 	},
 	delete(bookmark_id) {
 		return {
-			method: 'get',
+			method: 'post',
 			url: `/api/frontend/v1/Bookmark/delete/${bookmark_id}`
 		};
 	},

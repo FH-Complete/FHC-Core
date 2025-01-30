@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<phpunit bootstrap="index.phpunit.php">
+<phpunit bootstrap="testbootstrap.php">
     <testsuites>
         <testsuite name="BookmarkTest">
-            <directory>system/UnitTests/api/</directory>
+            <directory>./system/IntegrationTests/api/</directory>
         </testsuite>
     </testsuites>
     <php>
-        <ini name="display_errors" value="1"/>
-        <ini name="display_startup_errors" value="1" />
-        <const name="PHPUNIT_TEST" value="1" />
+        <server name="CI_ENV" value="testing"/>
     </php>
 </phpunit>

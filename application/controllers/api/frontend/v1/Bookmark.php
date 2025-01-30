@@ -17,6 +17,27 @@
  */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * @SWG\Info(
+ *     title="Bookmark API",
+ *     version="1.0.0"
+ * )
+ */
+
+/**
+ * @SWG\Swagger(
+ *     schemes={"https"},
+ *     basePath="/fhcompletecis4/cis.php/api/frontend/v1/Bookmark/"
+ * )
+ */
+
+/**
+ * @SWG\SecurityScheme(
+ *     securityDefinition="basicAuth",
+ *     type="basic"
+ * )
+ */
+
 
 class Bookmark extends FHCAPI_Controller
 {
@@ -31,6 +52,7 @@ class Bookmark extends FHCAPI_Controller
             'delete' => self::PERM_LOGGED,
             'insert' => self::PERM_LOGGED,
 			'update' => self::PERM_LOGGED,
+			'test_true' => self::PERM_LOGGED
         ]);
 
 		$this->load->model('dashboard/Bookmark_model', 'BookmarkModel');
@@ -48,6 +70,21 @@ class Bookmark extends FHCAPI_Controller
 	 * gets the bookmarks associated to a user 
 	 * @access public
 	 * @return void
+	 * @SWG\Get(
+	 *      path="/getBookmarks",
+	 *      security={{"basicAuth":{}}},
+	 *      tags={"bookmarks"},
+	 *      summary="Get user's bookmarks",
+	 *      description="Returns all bookmarks associated with the authenticated user.",
+	 *      @SWG\Response(
+	 *          response=200,
+	 *          description="List of bookmarks"
+	 *      ),
+	 *      @SWG\Response(
+	 *          response=401,
+	 *          description="Unauthorized"
+	 *      )
+	 *  )
 	 */
 	public function getBookmarks()
 	{
@@ -63,6 +100,31 @@ class Bookmark extends FHCAPI_Controller
 	 * deletes bookmark from associated user 
 	 * @access public
 	 * @return void
+	 * @SWG\Post(
+	 *      path="/delete/{bookmark_id}",
+	 *      security={{"basicAuth":{}}},
+	 *      tags={"bookmarks"},
+	 *      summary="Delete a bookmark",
+	 *      description="Deletes a bookmark if the user is the owner or an admin.",
+	 *      @SWG\Parameter(
+	 *          name="bookmark_id",
+	 *          in="path",
+	 *          required=true,
+	 *          type="integer"
+	 *      ),
+	 *      @SWG\Response(
+	 *          response=200,
+	 *          description="Bookmark deleted successfully"
+	 *      ),
+	 *      @SWG\Response(
+	 *          response=403,
+	 *          description="Forbidden - not the owner"
+	 *      ),
+	 *      @SWG\Response(
+	 *          response=404,
+	 *          description="Bookmark not found"
+	 *      )
+	 *  )
 	 */
     public function delete($bookmark_id)
 	{
@@ -87,6 +149,44 @@ class Bookmark extends FHCAPI_Controller
 	 * inserts new bookmark into the bookmark table 
 	 * @access public
 	 * @return void
+	 * @SWG\Post(
+	 *      path="/insert",
+	 *      security={{"basicAuth":{}}},
+	 *      tags={"bookmarks"},
+	 *      summary="Insert a new bookmark",
+	 *      @SWG\Parameter(
+	 *           name="body",
+	 *           in="body",
+	 *           required=true,
+	 *           @SWG\Schema(
+	 *               type="object",
+	 *               required={"url", "title"},
+	 *               @SWG\Property(
+	 *                   property="url",
+	 *                   type="string",
+	 *                   example="https://github.com/swagger-api/swagger-codegen"
+	 *               ),
+	 *               @SWG\Property(
+	 *                   property="title",
+	 *                   type="string",
+	 *                   example="Swagger Codegen"
+	 *               ),
+	 *               @SWG\Property(
+	 *                   property="tag",
+	 *                   type="string",
+	 *                   example="API"
+	 *               )
+	 *           )
+	 *       ),
+	 *       @SWG\Response(
+	 *           response=201,
+	 *           description="Bookmark created"
+	 *       ),
+	 *       @SWG\Response(
+	 *           response=400,
+	 *           description="Validation error"
+	 *       )
+	 *  )
 	 */
     public function insert()
 	{
@@ -109,9 +209,47 @@ class Bookmark extends FHCAPI_Controller
     }
 
 	/**
-	 * updates bookmark in the bookmark table 
-	 * @access public
-	 * @return void
+	 * @SWG\Post(
+	 *      path="/update/{bookmark_id}",
+	 *      security={{"basicAuth":{}}},
+	 *      tags={"bookmarks"},
+	 *      summary="Update a bookmark",
+	 *      description="Updates a bookmark's URL and title for the given ID.",
+	 *      @SWG\Parameter(
+	 *          name="bookmark_id",
+	 *          in="path",
+	 *          required=true,
+	 *          type="integer",
+	 *          description="ID of the bookmark to update"
+	 *      ),
+	 *      @SWG\Parameter(
+	 *          name="body",
+	 *          in="body",
+	 *          required=true,
+	 *          @SWG\Schema(
+	 *              type="object",
+	 *              required={"url", "title"},
+	 *              @SWG\Property(
+	 *                  property="url",
+	 *                  type="string",
+	 *                  example="https://updated-url.com"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="title",
+	 *                  type="string",
+	 *                  example="Updated Title"
+	 *              )
+	 *          )
+	 *      ),
+	 *      @SWG\Response(
+	 *          response=200,
+	 *          description="Bookmark updated"
+	 *      ),
+	 *      @SWG\Response(
+	 *          response=400,
+	 *          description="Validation error"
+	 *      )
+	 * )
 	 */
     public function update($bookmark_id)
 	{
@@ -134,5 +272,23 @@ class Bookmark extends FHCAPI_Controller
         $this->terminateWithSuccess($update_result);
 
     }
+
+	/**
+	 * @SWG\Get(
+	 *     path="/test_true",
+	 *     security={{"basicAuth":{}}},
+	 *     tags={"bookmarks"},
+	 *     summary="Test endpoint",
+	 *     description="Simple test endpoint that returns 'expected response'.",
+	 *     @SWG\Response(
+	 *         response=200,
+	 *         description="Expected response"
+	 *     )
+	 * )
+	 */
+	public function test_true()
+	{
+		echo "expected response";
+	}
 }
 
