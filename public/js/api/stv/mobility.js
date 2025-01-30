@@ -20,6 +20,12 @@ export default {
 	getLVList(studiengang_kz){
 		return this.$fhcApi.get('api/frontend/v1/stv/mobility/getLVList/' + studiengang_kz);
 	},
+	getAllLehreinheiten(data){
+		return this.$fhcApi.post('api/frontend/v1/stv/mobility/getAllLehreinheiten/', data)
+	},
+	getLvsandLesByStudent(uid){
+		return this.$fhcApi.get('api/frontend/v1/stv/mobility/getLvsandLesByStudent/' + uid);
+	},
 	getPurposes(url, config, params){
 		return this.$fhcApi.get('api/frontend/v1/stv/mobility/getPurposes/' + params.id);
 	},

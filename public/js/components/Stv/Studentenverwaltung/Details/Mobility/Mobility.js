@@ -22,7 +22,10 @@ export default {
 		},
 		lists: {
 			from: 'lists'
-		}
+		},
+		currentSemester: {
+			from: 'currentSemester',
+		},
 	},
 	props: {
 		student: Object
@@ -132,6 +135,8 @@ export default {
 			statusNew: true,
 			programsMobility: [],
 			listLvs: [],
+			listLes: [],
+			listLvsAndLes: [],
 			listPurposes: [],
 			listSupports: [],
 			tabulatorData: []
@@ -142,7 +147,15 @@ export default {
 			if (this.$refs.table) {
 				this.$refs.table.reloadTable();
 			}
-		}
+		},
+/*		formData.lehrveranstaltung_id(){
+
+		}*/
+	},
+	computed:{
+		lv_teile(){
+			return this.listLvsAndLes.filter(lv => lv.lehreinheit_id == this.formData.lehreinheit_id);
+		},
 	},
 	methods: {
 		actionNewMobility() {
@@ -179,6 +192,22 @@ export default {
 					this.$refs.purposes.resetLocalData();
 					this.$refs.supports.resetLocalData();
 				});
+		},
+		loadItems(){
+			if(this.formData.lehrveranstaltung) {
+				this.getLehreinheiten(this.formData.lehrveranstaltung, this.currentSemester);
+			}
+		},
+		getLehreinheiten(lv_id, studiensemester_kurzbz) {
+			const data = {
+				lv_id: lv_id,
+				studiensemester_kurzbz: studiensemester_kurzbz
+			};
+			return this.$fhcApi.factory.stv.mobility.getAllLehreinheiten(data)
+				.then(response => {
+					this.listLes = response.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		reload() {
 			this.$refs.table.reloadTable();
@@ -308,11 +337,16 @@ export default {
 				this.listSupports = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+		this.$fhcApi.factory.stv.mobility.getLvsandLesByStudent(this.student.uid)
+			.then(result => {
+				this.listLvsAndLes = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-details-mobility h-100 pb-3">
 		<h4>In / Out</h4>
-
+		
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
@@ -328,7 +362,7 @@ export default {
 
 		<form-form v-if="!this.student.length" ref="formMobility" @submit.prevent>
 
-		<div class="row mb-3">
+		<div class="row my-3">
 			<legend class="col-6">BIS</legend>
 			<legend class="col-6">Outgoing</legend>
 		</div>
@@ -352,7 +386,7 @@ export default {
 					:label="$p.t('lehre', 'lehrveranstaltung')"
 					type="select"
 					v-model="formData.lehrveranstaltung"
-					name="lehrveranstaltung"
+					name="lehrveranstaltung_id"
 					>
 					<option
 						v-for="lv in listLvs"
@@ -377,21 +411,43 @@ export default {
 					:teleport="true"
 					>
 				</form-input>
-				<form-input
-					container-class="col-6 stv-details-mobility-typ"
-					:label="$p.t('lehre', 'lehreinheit')"
-					type="select"
-					v-model="formData.lehreinheit"
-					name="lehreinheit"
+				<template v-if="formData.lehreinheit_id && !formData.lehrveranstaltung">
+					<form-input v-if="formData.lehreinheit_id"
+						container-class="col-6 stv-details-mobility-typ"
+						:label="$p.t('lehre', 'lehreinheit')"
+						type="select"
+						v-model="formData.lehreinheit_id"
+						name="lehreinheit_id"
+						disabled
 					>
-<!--					<option
-						v-for="typ in arrTypen"
-						:key="typ.pruefungstyp_kurzbz"
-						:value="typ.pruefungstyp_kurzbz"
+						<option
+							v-for="le in lv_teile"
+							:key="le.lehreinheit_id"
+							:value="le.lehreinheit_id"
+							>
+							{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
+						</option>
+					</form-input>
+				</template>
+				<template v-else>
+					<form-input
+						container-class="col-6 stv-details-mobility-typ"
+						:label="$p.t('lehre', 'lehreinheit')"
+						type="select"
+						v-model="formData.lehreinheit_id"
+						name="lehreinheit_id"
+						@focus="loadItems"
 						>
-						{{typ.beschreibung}}
-					</option>-->
-				</form-input>
+						<option v-if="!listLes.length" disabled> -- {{ $p.t('exam', 'bitteLvteilWaehlen') }} --</option>
+						<option
+							v-for="le in listLes"
+							:key="le.lehreinheit_id"
+							:value="le.lehreinheit_id"
+							>
+							{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
+						</option>
+					</form-input>
+				</template>
 			</div>
 			
 			<div class="row mb-3">

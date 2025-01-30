@@ -16,6 +16,8 @@ class Mobility extends FHCAPI_Controller
 			'deleteMobility' => ['admin:rw', 'assistenz:rw'],
 			'getProgramsMobility' => ['admin:r', 'assistenz:r'],
 			'getLVList' => ['admin:r', 'assistenz:r'],
+			'getAllLehreinheiten' => ['admin:r', 'assistenz:r'],
+			'getLvsandLesByStudent' => ['admin:r', 'assistenz:r'],
 			'getPurposes' => ['admin:r', 'assistenz:r'],
 			'getSupports' => ['admin:r', 'assistenz:r'],
 			'getListPurposes' => ['admin:r', 'assistenz:r'],
@@ -32,7 +34,8 @@ class Mobility extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui'
+			'ui',
+			'mobility'
 		]);
 
 		// Load models
@@ -82,11 +85,11 @@ class Mobility extends FHCAPI_Controller
 		$_POST['von'] =	(isset($formData['von']) && !empty($formData['von'])) ? $formData['von'] : null;
 		$_POST['bis'] =	(isset($formData['bis']) && !empty($formData['bis'])) ? $formData['bis'] : null;
 		$_POST['nation_code'] =	(isset($formData['nation_code']) && !empty($formData['nation_code'])) ? $formData['nation_code'] : 'A';
-		$_POST['mobilitaetsprogramm_code'] =	(isset($formData['mobilitaetsprogramm_code']) && !empty($formData['mobilitaetsprogramm_code'])) ? $formData['mobilitaetsprogramm_code'] : null;
+		$_POST['mobilitaetsprogramm_code'] = (isset($formData['mobilitaetsprogramm_code']) && !empty($formData['mobilitaetsprogramm_code'])) ? $formData['mobilitaetsprogramm_code'] : null;
 		$_POST['herkunftsland_code'] = (isset($formData['herkunftsland_code']) && !empty($formData['herkunftsland_code'])) ? $formData['herkunftsland_code'] : 'A';
-		$_POST['ects_erworben']  = (isset($formData['ects_erworben']) && !empty($formData['ects_erworben'])) ? $formData['ects_erworben'] : null;
+		$_POST['ects_erworben'] = (isset($formData['ects_erworben']) && !empty($formData['ects_erworben'])) ? $formData['ects_erworben'] : null;
 		$_POST['ects_angerechnet'] = (isset($formData['ects_angerechnet']) && !empty($formData['ects_angerechnet'])) ? $formData['ects_angerechnet'] : null;
-
+		$_POST['lehreinheit_id'] = (isset($formData['lehreinheit_id']) && !empty($formData['lehreinheit_id'])) ? $formData['lehreinheit_id'] : null;
 
 		$this->form_validation->set_rules('nation_code', 'Nation_code', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Nation_code'])
@@ -113,6 +116,10 @@ class Mobility extends FHCAPI_Controller
 		'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Ects_angerechnet'])
 		]);
 
+		$this->form_validation->set_rules('lehreinheit_id', 'Lehreinheit', 'numeric', [
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Lehreinheit'])
+		]);
+
 		if ($this->form_validation->run() == false)
 		{
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -130,6 +137,7 @@ class Mobility extends FHCAPI_Controller
 			'mobilitaetsprogramm_code' => $_POST['mobilitaetsprogramm_code'],
 			'nation_code' => $_POST['nation_code'],
 			'herkunftsland_code' => $_POST['herkunftsland_code'],
+			'lehreinheit_id' => $_POST['lehreinheit_id'],
 			'ort' => $ort,
 			'universitaet' => $universitaet,
 			'ects_erworben' => $_POST['ects_erworben'] ,
@@ -143,7 +151,7 @@ class Mobility extends FHCAPI_Controller
 		//check if localData (purposes)
 		if(count($localPurposes) > 0){
 			foreach ($localPurposes as $zweck){
-				$zweck = (int) $zweck;
+				$zweck = (int)$zweck;
 				$this->addMobilityPurpose($bisio_id, $zweck);
 			}
 		}
@@ -183,11 +191,11 @@ class Mobility extends FHCAPI_Controller
 		$_POST['von'] =	(isset($formData['von']) && !empty($formData['von'])) ? $formData['von'] : null;
 		$_POST['bis'] =	(isset($formData['bis']) && !empty($formData['bis'])) ? $formData['bis'] : null;
 		$_POST['nation_code'] =	(isset($formData['nation_code']) && !empty($formData['nation_code'])) ? $formData['nation_code'] : 'A';
-		$_POST['mobilitaetsprogramm_code'] =	(isset($formData['mobilitaetsprogramm_code']) && !empty($formData['mobilitaetsprogramm_code'])) ? $formData['mobilitaetsprogramm_code'] : null;
+		$_POST['mobilitaetsprogramm_code'] = (isset($formData['mobilitaetsprogramm_code']) && !empty($formData['mobilitaetsprogramm_code'])) ? $formData['mobilitaetsprogramm_code'] : null;
 		$_POST['herkunftsland_code'] = (isset($formData['herkunftsland_code']) && !empty($formData['herkunftsland_code'])) ? $formData['herkunftsland_code'] : 'A';
 		$_POST['ects_erworben']  = (isset($formData['ects_erworben']) && !empty($formData['ects_erworben'])) ? $formData['ects_erworben'] : null;
 		$_POST['ects_angerechnet'] = (isset($formData['ects_angerechnet']) && !empty($formData['ects_angerechnet'])) ? $formData['ects_angerechnet'] : null;
-
+		$_POST['lehreinheit_id'] = (isset($formData['lehreinheit_id']) && !empty($formData['lehreinheit_id'])) ? $formData['lehreinheit_id'] : null;
 
 		$this->form_validation->set_rules('nation_code', 'Nation_code', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Nation_code'])
@@ -214,6 +222,10 @@ class Mobility extends FHCAPI_Controller
 			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Ects_angerechnet'])
 		]);
 
+		$this->form_validation->set_rules('lehreinheit_id', 'Lehreinheit', 'numeric', [
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Lehreinheit'])
+		]);
+
 		if ($this->form_validation->run() == false)
 		{
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -230,6 +242,7 @@ class Mobility extends FHCAPI_Controller
 				'mobilitaetsprogramm_code' => $_POST['mobilitaetsprogramm_code'],
 				'nation_code' => $_POST['nation_code'],
 				'herkunftsland_code' => $_POST['herkunftsland_code'],
+				'lehreinheit_id' => $_POST['lehreinheit_id'],
 				'ort' => $formData['ort'],
 				'universitaet' => $formData['universitaet'],
 				'ects_erworben' => $_POST['ects_erworben'] ,
@@ -246,16 +259,34 @@ class Mobility extends FHCAPI_Controller
 
 	public function deleteMobility($bisio_id)
 	{
+		//check if extension table exists
+		$result =  $this->BisioModel->tableExists('extension', 'tbl_mo_bisioidzuordnung');
+		$data = $this->getDataOrTerminateWithError($result);
+
+		//if table exists check if existing entry
+		if(!empty($data))
+		{
+			$this->BisioModel->addSelect("count(*)");
+			$this->BisioModel->addJoin('extension.tbl_mo_bisioidzuordnung mo', 'ON (mo.bisio_id = bis.tbl_bisio.bisio_id)', 'LEFT');
+
+			$resultCheckMo = $this->BisioModel->loadWhere(
+				array('mo.bisio_id' => $bisio_id)
+			);
+
+			$resultCheckMo = $this->getDataOrTerminateWithError($resultCheckMo);
+			$count = current($resultCheckMo)->count;
+
+			$existsInExtension = $count > 0 ? true : false;
+
+			if($existsInExtension)
+				$this->terminateWithError($this->p->t('mobility', 'error_existingEntryInExtension'), self::ERROR_TYPE_GENERAL);
+		}
+
 		$result = $this->BisioModel->delete(
 			array('bisio_id' => $bisio_id)
 		);
 
-		//TODO(Manu) foreign key restraint
-		//check Extension mo
-		//fk_mobisioidzuordnung_prestudent_id" on table "tbl_mo_bisioidzuordnung"
-
 		$data = $this->getDataOrTerminateWithError($result);
-
 		$this->terminateWithSuccess($data);
 	}
 
@@ -270,9 +301,53 @@ class Mobility extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
+	public function getAllLehreinheiten()
+	{
+		$lv_id = $this->input->post('lv_id');
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+
+		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+
+		$result = $this->LehreinheitModel->getLesFromLvIds($lv_id, $studiensemester_kurzbz);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getLvsandLesByStudent($student_uid)
+	{
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+
+		$result = $this->LehrveranstaltungModel->getLvsByStudent($student_uid);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$lv_ids = array();
+		$allData = array();
+
+		foreach ($data as $lehrveranstaltung) {
+			$lv_ids[] = $lehrveranstaltung->lehrveranstaltung_id;
+		}
+
+		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+
+		foreach ($lv_ids as $id)
+		{
+			$result = $this->LehreinheitModel->getLesFromLvIds($id);
+			$data = $this->getDataOrTerminateWithError($result);
+
+			if (is_array($data)) {
+				$allData = array_merge($allData, $data);
+			}
+		}
+
+		return $this->terminateWithSuccess($allData);
+	}
+
 	public function getPurposes($bisio_id)
 	{
-		$bisio_id = (int) $bisio_id;
+		$bisio_id = (int)$bisio_id;
 
 		$this->load->model('codex/Bisiozweck_model', 'BisiozweckModel');
 
@@ -290,7 +365,7 @@ class Mobility extends FHCAPI_Controller
 
 	public function getSupports($bisio_id)
 	{
-		$bisio_id = (int) $bisio_id;
+		$bisio_id = (int)$bisio_id;
 
 		$this->load->model('codex/Bisioaufenthaltfoerderung_model', 'BisioaufenthaltfoerderungModel');
 
@@ -347,7 +422,7 @@ class Mobility extends FHCAPI_Controller
 			);
 			if (hasData($check))
 			{
-				$this->terminateWithError( $this->p->t('ui', 'error_entryExisting'), self::ERROR_TYPE_GENERAL);
+				$this->terminateWithError($this->p->t('ui', 'error_entryExisting'), self::ERROR_TYPE_GENERAL);
 			}
 		}
 
@@ -407,7 +482,7 @@ class Mobility extends FHCAPI_Controller
 			);
 			if (hasData($check))
 			{
-				$this->terminateWithError( $this->p->t('ui', 'error_entryExisting'), self::ERROR_TYPE_GENERAL);
+				$this->terminateWithError($this->p->t('ui', 'error_entryExisting'), self::ERROR_TYPE_GENERAL);
 			}
 		}
 
@@ -430,7 +505,6 @@ class Mobility extends FHCAPI_Controller
 
 	public function deleteMobilitySupport($bisio_id)
 	{
-		//TODO(Manu) Validierung Extension
 		$aufenthaltfoerderung_code = $this->input->post('aufenthaltfoerderung_code');
 
 		$this->load->model('codex/Bisioaufenthaltfoerderung_model', 'BisioaufenthaltfoerderungModel');

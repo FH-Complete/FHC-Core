@@ -37579,6 +37579,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'error_existingEntryInExtension',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dieser Datensatz wird von der Mobility Extension verwendet und muss zuerst dort gelöscht werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This record is used by the Mobility Extension and must first be deleted there.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// FHC4 Phrases Mobility End
 
 );
