@@ -348,9 +348,9 @@ export default {
 					</div>
 				</div>
 			</div>
-			<div class="d-xl-block col-xl-6 p-0">
-				<div style="z-index:0" class="p-4 sticky-top d-flex justify-content-center align-items-center flex-column">
-					<div style="max-height: calc(var(--fhc-calendar-pane-height)); overflow-y:auto;" class="w-100">
+			<div class="d-xl-block col-xl-6 p-4" style="max-height: 100%">
+				<div style="z-index:0; max-height: 100%" class="sticky-top d-flex justify-content-center align-items-center flex-column">
+					<div style="max-height: 100%; overflow-y:auto;" class="w-100">
 						<template v-if="selectedEvent && lvMenu">
 							<slot name="pageMobilContent" :lvMenu="lvMenu" >
 								<p>this is a slot placeholder</p>

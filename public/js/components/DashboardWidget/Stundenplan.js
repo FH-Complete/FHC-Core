@@ -162,28 +162,6 @@ export default {
 	created() {
 		this.$emit('setConfig', false);
 		this.loadEvents();
-		/* axios
-			.get(this.apiurl + '/components/Cis/Stundenplan/Stunden').then(res => {
-				res.data.retval.forEach(std => {
-					this.stunden[std.stunde] = std; // TODO(chris): geht besser
-				});
-				axios
-					.get(this.apiurl + '/components/Cis/Stundenplan')
-					.then(res => {
-						res.data.retval.forEach((el, i) => {
-							el.id = i;
-							el.color = '#' + (el.farbe || 'CCCCCC');
-							el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-							el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
-							el.title = el.lehrfach;
-							if (el.lehrform)
-								el.title += '-' + el.lehrform;
-						});
-						this.events = res.data.retval || [];
-					})
-					.catch(err => { console.log(err);console.error('ERROR: ', err.response.data) });
-			})
-			.catch(err => { console.error('ERROR: ', err.response.data) }); */
 	},
 	template: /*html*/`
 	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">

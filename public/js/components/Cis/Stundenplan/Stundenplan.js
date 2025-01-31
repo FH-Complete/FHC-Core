@@ -134,16 +134,16 @@ export const Stundenplan = {
 		</template>
 		<template #weekPage="{event,day}">
 			<div @click="showModal(event?.orig); " type="button"
-			class=" position-relative border border-secondary border d-flex flex-row align-items-center
-			justify-content-evenly h-100" style="max-height: 75px; overflow: auto;">
+			class=" position-relative border border-secondary border d-flex flex-col align-items-center
+			justify-content-evenly h-100" style="overflow: auto;">
 
-				<div v-if="event?.orig?.beginn && event?.orig?.ende" >
-					<div class="d-flex flex-column p-4 border-end border-secondary">
+				<div v-if="event?.orig?.beginn && event?.orig?.ende" class="d-none d-xl-block" >
+					<div class="d-flex flex-column p-4 p-xl-2 border-end border-secondary">
 						<span class="small">{{convertTime(event.orig.beginn.split(":"))}}</span>
 						<span class="small">{{convertTime(event.orig.ende.split(":"))}}</span>
 					</div>
 				</div>
-				<div class="d-flex flex-column flex-grow-1 align-items-center">
+				<div class="d-flex flex-column flex-grow-1 align-items-center" style="font-size: 0.75rem">
 					<span>{{event?.orig.topic}}</span>
 					<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
 					<span>{{event?.orig.ort_kurzbz}}</span>

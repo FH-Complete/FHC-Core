@@ -4,6 +4,7 @@ function ggt(m,n) { return n==0 ? m : ggt(n, m%n); }
 function kgv(m,n) { return (m*n) / ggt(m,n); }
 
 export default {
+	name: 'WeekPage',
 	data(){
 		return{
 			hourPosition:null,
@@ -83,7 +84,6 @@ export default {
 		eventsPerDayAndHour() {
 			// return early if the calendar pane is sliding
 			if (this.isSliding) return {};
-			
 			const res = {};
 			this.days.forEach(day => {
 				let key = day.toDateString();
@@ -148,7 +148,7 @@ export default {
 				'grid-row-start': this.dateToMinutesOfDay(event.start),
 				'grid-row-end': this.dateToMinutesOfDay(event.end),
 				'background-color': event.orig.color,
-				'--test': this.dateToMinutesOfDay(event.end),
+				'max-height': '75px'				
 			}
 		},
 		calcHourPosition(event) {
@@ -218,7 +218,7 @@ export default {
 		if(container) container.style.overflow = 'scroll'
 	},
 	template: /*html*/`
-	<div class="fhc-calendar-week-page">
+	<div class="fhc-calendar-week-page" style="min-width: 700px;">
 		<div class="d-flex flex-column">
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
 				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="dayText[day]?.heading" @click.prevent="changeToMonth(day)">
@@ -238,7 +238,11 @@ export default {
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
-						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" :selected="event.orig == selectedEvent" :style="eventGridStyle(day,event)" class="mx-2 small rounded overflow-hidden fhc-entry " v-contrast >
+						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" 
+						:selected="event.orig == selectedEvent"
+						:style="eventGridStyle(day,event)"
+						class="mx-2 small rounded overflow-hidden fhc-entry "
+						v-contrast >
 						<slot name="weekPage" :event="event" :day="day">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 							</slot>

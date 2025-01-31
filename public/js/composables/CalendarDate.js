@@ -199,6 +199,11 @@ class CalendarDate {
 			return true;
 		return false;
 	}
+	isInPast(d) {
+		if (this.isDate(d))
+			return (this.y > d.getFullYear() || this.m > d.getMonth() || this.d > d.getDate());
+		return false
+	}
 	setLocale(locale) {
 		this.weekStart = CalendarDate.getWeekStart(locale);
 	}
@@ -207,7 +212,7 @@ class CalendarDate {
 		return Object.prototype.toString.call(obj) === '[object Date]';
 	}
 	cleanup(){
-		this.watchLocale();
+		if(this.watchLocale && this.watchLocale.stop) this.watchLocale.stop(); // TODO: ?
 	}
 }
 /**
