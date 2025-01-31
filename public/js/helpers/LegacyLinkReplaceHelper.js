@@ -19,12 +19,12 @@ const regexList = {
 		},
 		{ 
 			priority: 3,
-			regex: new RegExp(/^\.\.\/index\.ci\.php\//),
+			regex: new RegExp(/^\.\.\/index\.ci\.php/),
 			replacement: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router,
 		},
 		{ 
 			priority: 10, 
-			regex: new RegExp("/^\.\.\//"),
+			regex: new RegExp(/^\.\.\//),
 			replacement: FHC_JS_DATA_STORAGE_OBJECT.app_root,
 		},
 	],
@@ -61,7 +61,7 @@ const absolute_regex = regexList.absolute
 
 
 export function replaceRelativeLegacyLink(relativeLegacyLink){
-	for (let {regex,replacement,group_replacement_strategy} of relative_regex){		
+	for (let {regex,replacement,group_replacement_strategy} of relative_regex){	
 		// if any of the regex matches the relativeLegacyLink, replace the matched part with the new app_root path
 		let match = relativeLegacyLink.match(regex);
 		if (match) {
