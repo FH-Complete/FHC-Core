@@ -243,7 +243,7 @@ export default{
 		},
 		addNewAddress(addressData) {
 			this.addressData.plz = this.addressData.address.plz;
-			return this.$refs.addressData.factory.stv.kontakt.addNewAddress(this.uid, this.addressData)
+			return this.$fhcApi.factory.stv.kontakt.addNewAddress(this.$refs.addressData, this.uid, this.addressData)
 				.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('adressModal');
@@ -263,14 +263,13 @@ export default{
 					this.addressData = result.data;
 					this.addressData.address = {};
 					this.addressData.address.plz = this.addressData.plz || null;
-				//	delete this.addressData.plz;
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateAddress(adresse_id) {
 			this.addressData.plz = this.addressData.address.plz;
-			return this.$refs.addressData.factory.stv.kontakt.updateAddress(adresse_id,
+			return this.$fhcApi.factory.stv.kontakt.updateAddress(this.$refs.addressData, adresse_id,
 				this.addressData
 			).then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -278,7 +277,6 @@ export default{
 					this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 			.finally(() => {
-				//window.scrollTo(0, 0);
 				this.reload();
 			});
 		},

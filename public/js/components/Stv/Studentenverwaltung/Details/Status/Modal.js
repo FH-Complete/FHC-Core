@@ -142,7 +142,7 @@ export default{
 			}
 		},
 		insertStatus() {
-			this.$fhcApi.factory.stv.status.insertStatus(this.statusId, this.formData)
+			this.$fhcApi.factory.stv.status.insertStatus(this.$refs.form, this.statusId, this.formData)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$reloadList();
@@ -152,7 +152,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		editStatus() {
-			this.$fhcApi.factory.stv.status.updateStatus(this.statusId, this.formData)
+			this.$fhcApi.factory.stv.status.updateStatus(this.$refs.form, this.statusId, this.formData)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$reloadList();

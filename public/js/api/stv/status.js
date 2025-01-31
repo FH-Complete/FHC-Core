@@ -2,8 +2,8 @@ export default {
 
 //------------- Modal.js------------------------------------------------------
 
-	insertStatus(id, data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/status/insertStatus/' + id,
+	insertStatus(form, id, data) {
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/status/insertStatus/' + id,
 			data
 		);
 	},
@@ -16,8 +16,9 @@ export default {
 			+ ausbildungssemester
 		);
 	},
-	updateStatus({prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester}, data) {
+	updateStatus(form, {prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester}, data) {
 		return this.$fhcApi.post(
+			form,
 			'api/frontend/v1/stv/status/updateStatus/'
 			+ prestudent_id + '/'
 			+ status_kurzbz + '/'

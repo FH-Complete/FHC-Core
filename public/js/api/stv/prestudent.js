@@ -5,8 +5,8 @@ export default {
 	get(prestudent_id){
 		return 	this.$fhcApi.post('api/frontend/v1/stv/prestudent/get/' + prestudent_id);
 	},
-	updatePrestudent(prestudent_id, data){
-		return this.$fhcApi.post('api/frontend/v1/stv/prestudent/updatePrestudent/' + prestudent_id,
+	updatePrestudent(form, prestudent_id, data){
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/prestudent/updatePrestudent/' + prestudent_id,
 			data
 		);
 	},

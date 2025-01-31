@@ -181,7 +181,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewContact(formData) {
-			return this.$refs.contactData.factory.stv.kontakt.addNewContact(this.uid, this.contactData)
+			return this.$fhcApi.factory.stv.kontakt.addNewContact(this.$refs.contactData, this.uid, this.contactData)
 				.then(response => {
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 						this.hideModal("contactModal");
@@ -217,7 +217,7 @@ export default{
 			});
 		},
 		updateContact(kontakt_id){
-			return this.$refs.contactData.factory.stv.kontakt.updateContact(kontakt_id,
+			return this.$fhcApi.factory.stv.kontakt.updateContact(this.$refs.contactData, kontakt_id,
 				this.contactData)
 				.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
