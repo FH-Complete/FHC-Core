@@ -27,6 +27,10 @@ define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN',false);
 define('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN', true);
 define('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN', true);
+define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN', true);
+
+// Wenn gesetzt, werden die Digitale Anwesenheit-Icons nur fuer diese Studiengaenge angezeigt, sonst für alle
+// define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG', serialize(array('257')));
 
 // Im CIS Menue Links bei Modulen anzeigen wenn Lehrauftrag
 define('CIS_LEHRVERANSTALTUNG_MODULE_LINK',true);
@@ -334,4 +338,19 @@ define('DIENSTVERHAELTNIS_SUPPORT', false);
 
 // Falls Studstatus (Abmeldung, AbmeldungStg, Unterbrechung, Wiederholung) verwendet wird zeige Hinweistext bei Eingabe einer kommissionellen oder zusaetzlichen kommissionellen Pruefung
 define('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT', false);
+
+// default absender (@DOMAIN wird hinzugefuegt daher ohne angeben)
+define('SANCHO_MAIL_DEFAULT_SENDER', 'noreply');
+
+// header und footer Bilder für eigene Mails verwenden
+define('SANCHO_MAIL_USE_IMAGES', true);
+
+// Pfad für Bilder für eigene Mails, relativ zu document root
+define('SANCHO_MAIL_IMG_PATH', 'skin/images/sancho/');
+
+// header Bild für eigene Mails
+define('SANCHO_MAIL_HEADER_IMG', 'sancho_header_DEFAULT.jpg');
+
+// footer image for eigene Mails
+define('SANCHO_MAIL_FOOTER_IMG', 'sancho_footer_DEFAULT.jpg');
 ?>

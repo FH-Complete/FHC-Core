@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eedcd2abe226d372ff8d735498eb3b0a",
+    "content-hash": "01ea35652d88680f8262c5365828eb46",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -4679,6 +4679,15 @@
                 "source": "https://github.com/theseer/tokenizer/tree/master"
             },
             "time": "2019-06-13T22:48:21+00:00"
+        },
+        {
+            "name": "vuejs/vuejs3_dev",
+            "version": "3.3.8",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/vue@3.3.8/dist/vue.global.js"
+            },
+            "type": "library"
         },
         {
             "name": "webmozart/assert",

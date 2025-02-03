@@ -397,6 +397,7 @@ if ($xmlformat=='rdf')
 				<ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz>
 				<ABSCHLUSSPRUEFUNG:beschreibung><![CDATA['.$row->beschreibung.']]></ABSCHLUSSPRUEFUNG:beschreibung>
 				<ABSCHLUSSPRUEFUNG:anmerkung><![CDATA['.$row->anmerkung.']]></ABSCHLUSSPRUEFUNG:anmerkung>
+				<ABSCHLUSSPRUEFUNG:link_abschlusspruefung><![CDATA['.APP_ROOT.'index.ci.php/lehre/Pruefungsprotokoll/showProtokoll?abschlusspruefung_id='.$row->abschlusspruefung_id.']]></ABSCHLUSSPRUEFUNG:link_abschlusspruefung>
 			</RDF:Description>
 		</RDF:li>
 		';

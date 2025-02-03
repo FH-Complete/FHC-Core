@@ -183,8 +183,8 @@ class AntragJob extends JOB_Controller
 				$data,
 				$to,
 				'Anträge - Aktion(en) erforderlich',
-				DEFAULT_SANCHO_HEADER_IMG,
-				DEFAULT_SANCHO_FOOTER_IMG,
+				'',
+				'',
 				'',
 				$cc
 			))

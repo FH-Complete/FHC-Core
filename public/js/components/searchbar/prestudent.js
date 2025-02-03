@@ -31,36 +31,36 @@ export default {
 					<div class="searchbar_table">
 		
 						<div class="searchbar_tablerow">
-							<div class="searchbar_tablecell">Prestudent_id</div>
-							<div class="searchbar_tablecell">
+							<div class="searchbar_tablecell searchbar_label">Prestudent_id</div>
+							<div class="searchbar_tablecell searchbar_value">
 								{{ res.prestudent_id }}
 							</div>
 						</div>
 		
 						<div class="searchbar_tablerow">
-							<div class="searchbar_tablecell">Student_uid</div>
-							<div class="searchbar_tablecell">
+							<div class="searchbar_tablecell searchbar_label">Student_uid</div>
+							<div class="searchbar_tablecell searchbar_value">
 								{{ res.uid }}
 							</div>
 						</div>
 		
 						<div class="searchbar_tablerow">
-							<div class="searchbar_tablecell">Person_id</div>
-							<div class="searchbar_tablecell">
+							<div class="searchbar_tablecell searchbar_label">Person_id</div>
+							<div class="searchbar_tablecell searchbar_value">
 								{{ res.person_id }}
 							</div>
 						</div>
 		
 						<div class="searchbar_tablerow">
-							<div class="searchbar_tablecell">Studiengang</div>
-							<div class="searchbar_tablecell">
+							<div class="searchbar_tablecell searchbar_label">Studiengang</div>
+							<div class="searchbar_tablecell searchbar_value">
 								{{ res.bezeichnung }}
 							</div>
 						</div>
 		
 						<div class="searchbar_tablerow">
-							<div class="searchbar_tablecell">EMail</div>
-							<div class="searchbar_tablecell">
+							<div class="searchbar_tablecell searchbar_label">EMail</div>
+							<div class="searchbar_tablecell searchbar_value">
 								<a :href="this.mailtourl">
 									{{ res.email }}
 								</a>

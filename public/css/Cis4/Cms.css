@@ -1,0 +1,1037 @@
+
+/* New */
+#cms article.news-list-item img {
+	max-width: 100%;
+	height: auto;
+}
+#cms article.news-list-item footer > a:last-child {
+	margin-inline-end: 0 !important;
+}
+#cms article.news-list-item footer > a:first-child {
+	margin-inline-start: 0 !important;
+}
+#cms a.btn-outline-primary {
+	color: var(--fhc-cis-primary);
+	border-color: var(--fhc-cis-primary);
+}
+#cms a.btn-outline-primary:hover,
+#cms a.btn-outline-primary:focus {
+	color: #fff;
+	background-color: var(--fhc-cis-primary);
+	border-color: var(--fhc-cis-primary);
+}
+#cms a.btn-primary {
+	color: var(--fhc-cis-menu-lvl-1-color);
+	background-color: var(--fhc-cis-menu-lvl-1-bg);
+	border-color: var(--fhc-cis-menu-lvl-1-bg);
+}
+#cms a.btn-primary:hover,
+#cms a.btn-primary:focus {
+	color: var(--fhc-cis-menu-lvl-1-color-hover);
+	background-color: var(--fhc-cis-menu-lvl-1-bg-hover);
+	border-color: var(--fhc-cis-menu-lvl-1-bg-hover);
+	text-decoration: none;
+}
+
+/* Allgemein */
+#cms {
+	background-color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	width: 100%;
+	height: 100%;
+	margin:0px;
+	border-width:0px;
+	border-style:none;
+	padding:0px;
+}
+#cms.main /* Workaround fuer Farbverlauf im IE statt ShadowBox */ {
+	background-color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	height: 100%;
+	width: 100%;
+	margin:0px;
+	border-width: 2px;
+	border-style: none;
+	padding:0px;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc',endColorstr='#ffffff');
+}
+#cms iframe {
+	margin:0px;
+	padding:0px;
+	height: 100%;
+
+	 /* border-width:1px;
+	border-style:solid;  */
+}
+#cms textarea {
+	font-family: Arial, Helvetica, sans-serif;
+}
+#cms form {
+	font-family: Arial, Helvetica, sans-serif;
+}
+#cms p {
+	margin-top: 0px;
+}
+#cms hr {
+	color:#CCCCCC;
+	height:1px;
+}
+#cms ul {
+	padding-left: 0px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	margin-left: 6px;
+}
+#cms ol {
+	padding-left: 13px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	margin-left: 6px;
+}
+#cms ul li {
+	list-style-image:url(../../../skin/images/square_blue.png);
+	padding-left: 0px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	margin-left: 6px;
+}
+#cms li.ui-menu-item {
+	list-style-image:none;
+}
+#cms .btn-testtool {
+	width: 200px;
+	margin-top: 20px;
+}
+#cms #menue {
+	bottom: 2%;
+	width: 17%;
+	height: 81%;
+	z-index: 10;
+	padding: 0px;
+	margin: 0px;
+}
+#cms #menue {
+	position:absolute;
+}
+
+#cms #content {
+	bottom: 2%;
+	width:81%;
+	height:81%;
+	z-index: 10;
+	left:18%;
+	padding: 0px;
+	margin: 0px;
+}
+#cms #content /* Hack für IE8 */ {
+	*width: 75\%;
+	*left: 21\%;
+}
+#cms #content {
+	position:absolute;
+}
+
+/*   Druckausgabe */
+@media print
+{
+	#cms #menue {
+		display:none;
+	}
+	#cms #content {
+	width:98%;
+	z-index: 10;
+	left:1%;
+	}
+}
+#cms input.TextBox {
+	background-color: White;
+}
+/*
+==== Formularfelder und Buttons ====
+*/
+
+/* Such-Feld CIS-Suche */
+#cms input.search input.text {
+	background-color: #E9ECEE;
+	border-width: 1px;
+	border-style:solid;
+	border-color: #A5AFB6;
+}
+#cms #globalsearch {
+	background-color: #E9ECEE;
+	border-width: 1px;
+	border-style:solid;
+	border-color: #A5AFB6;
+	height: 25px;
+}
+/* Login-Button CIS-Seite */
+#cms input.cis_login {
+	cursor: pointer;
+	color: #666666;
+	border: 1px solid #A5AFB6;
+	background-color: #E9ECEE;
+	width: 150px;
+	height: 35px;
+	font-size: 20px;
+}
+#cms #GlobalMenu {
+	margin-top: 3px;
+	text-align: right;
+}
+#cms .home_logo {
+	background-image:url(styles/tw/TWLogo_klein.jpg);
+	background-repeat: no-repeat;
+	width:170px;
+	height:53px;
+}
+
+#cms div.tip {
+	position: absolute;
+	display: none;
+	width: 300px;
+	background-color: #f7f7ee;
+	padding: 3px 7px 4px 6px;
+	border: 1px solid #336;
+	background-color: #f7f7ee;
+	text-align: left;
+}
+#cms #header {
+	vertical-align:middle;
+}
+
+/*
+==== Links ====
+*/
+#cms a /*allgmeiner Link, Hauptmenuelinks*/ {
+	color: #0086CC; /*tw-blau*/
+	text-decoration: none;
+	cursor: pointer;
+}
+#cms a:hover /*link ohne Item-Definition*/ {
+	color: #0086CC; /*tw-blau*/
+	text-decoration: underline;
+}
+#cms a.ItemTesttool {
+	color: #000;
+	line-height: 25px;
+	display:block;
+	padding: 5px 10px 5px 10px;
+}
+
+#cms a.ItemTesttool.navButton {
+	background-color: #0a629c;
+	color: white;
+	padding: 10px;
+}
+#cms a.ItemTesttoolAktiv {
+	color: #000;
+	line-height: 25px;
+	display:block;
+	padding: 5px 10px 5px 10px;
+	text-decoration: none;
+}
+#cms a.ItemTesttoolBeendet {
+	color: #C7C8C9;
+	line-height: 25px;
+	display:block;
+	padding: 5px 10px 5px 10px;
+	cursor: default;
+	text-decoration: none;
+}
+#cms a:hover.ItemTesttool {
+	color: #000;
+	line-height: 25px;
+	text-decoration: none;
+	padding: 5px 10px 5px 10px;
+}
+#cms a:hover.ItemTesttool.navButton {
+	background-color: steelblue;
+	color: white;
+	padding: 10px;
+}
+#cms a.HyperItem /* ? */ {
+	color: Black; text-decoration: none;
+	font-weight: bold;
+}
+#cms a:hover.HyperItem /* ? */ {
+	color: #008381; text-decoration: none;
+	font-weight: bold;
+}
+#cms a[onClick]:hover.Item /* ? */ {
+	color: Black; text-decoration: none;
+}
+#cms a:hover.Item /*allgemeine Links, Hauptmenuelink*/ {
+	color: #0086CC; /*tw-blau*/
+	text-decoration: underline;
+}
+#cms a.Item2 /* zB in den Lehrveranstaltungen (Buttons) verwendet bei den Lektoren */ {
+	color: Black; text-decoration: none;
+}
+#cms a:hover.Item2 /* zB in den Lehrveranstaltungen (Buttons) verwendet bei den Lektoren */ {
+	color: #008381; text-decoration: none;
+}
+#cms a.MenuItem /* Hauptmenuelink zum aufklappen */ {
+	color: #0086CC; text-decoration: none;
+	font-weight: bold;
+}
+#cms a:hover.MenuItem /* Hauptmenuelink zum aufklappen */ {
+	color: #0086CC; /*tw-blau*/
+	text-decoration: none;
+	font-weight: bold;
+}
+#cms a:focus.MenuItem /* Hauptmenuelink zum aufklappen */ {
+	color: #0086CC; /*tw-blau*/
+	text-decoration: none;
+	font-weight: bold;
+}
+#cms A.stpl_detail {
+	font-size:x-small;
+	color:#000000;
+	text-decoration:none;
+}
+#cms A.stpl_detail:hover {	
+	font-size:x-small;
+	color:#000000;
+	text-decoration:underline;
+	/*cursor:hand;*/
+}
+#cms a.head {
+   color:#ffffff;
+}
+#cms a.head:hover {
+	color:#000000;
+}
+
+
+/*
+==== Tables ====
+*/
+#cms TABLE {
+	font-size: 13px;
+}
+#cms TABLE.header {
+	width:100%;
+	height:100%;
+	/* background-image:url(../skin/images/header.png); */
+	/* background-repeat:no-repeat; */
+	background-color: white;
+	position: relative;
+}
+#cms TABLE.header_content {
+	height: 13%;
+	width: 100%;
+	position: absolute;
+	z-index:4;
+}
+/* Firefox Hack, da er den absolute-Wert der position als einziger nicht richtig dargestellt hat*/
+#cms @-moz-document url-prefix() {
+    TABLE.header_content
+    #cms {
+        height: 13%;
+		width: 100%;
+		position: relative;
+		z-index:4;
+    }
+}
+#cms TABLE.cmstable /* Die Haupttable aller CMS-Contentseiten */ {
+	margin: 0px;
+	padding: 0px;
+	border: none;
+	width: 100%;
+}
+#cms TABLE.tabcontent {
+	margin: 0px;
+	padding: 0px;
+	border-style: none;
+	width: 100%;
+	background-color: white;
+	vertical-align: top;
+	border-spacing:0;
+}
+#cms TABLE.menue {
+	margin: 0px;
+	padding: 0px;
+	border-style: none;
+	width: 100%;
+}
+#cms TABLE.menue TD {
+	padding-bottom: 2px;
+	padding-top: 2px;
+}
+#cms TABLE.tabcontent2 {
+	margin: 0px;
+	padding: 0px;
+	border-style: none;
+}
+#cms TABLE.tabborder {
+	width: 100%;
+	/*border: 1px solid black; foo*/
+}
+#cms TABLE#tabterm {
+	margin:auto;
+}
+
+#cms .well {
+	background-color: white;
+	border: 2px solid #add4ea;
+}
+#cms td.rand /* Seitenraender des CIS */ {
+	font-size: 11px;
+	padding-top: 0px;
+	padding-left: 6px;
+	width: 3%;
+	height: 100%;
+	vertical-align: middle;
+}
+#cms td.boxshadow /* Farbverlauf im Hintergrund der CIS*/ {
+	position: relative;
+	width:94%;
+	height: 100%;
+	box-shadow: 0px 100px 0px 0px #FFFFFF, /* Unterer weisser Rand bei sehr kleinen Aufloesungen */
+				0px 0px 5px 5px #888, /* schmaler dunkler Schatten */
+				/*0px 300px 5px 5px #888, /* schmaler dunkler Schatten unten bei sehr kleinen Aufloesungen*/
+				20px 20px 70px 30px #DDDDDD, /* heller Verlauf rechts */
+				-20px 20px 70px 30px #DDDDDD; /* heller Verlauf links */
+}
+#cms td.ContentHeader {
+	background-color: #A5AFB6; /*#DCE4EF;*/
+	font-weight: bold;
+	height: 19px;
+}
+#cms td.ContentHeader2 {
+	color: #0086CC; /*tw-blau */
+	font-weight: normal;
+}
+#cms td.ContentHeader3 {
+	color: #0086CC;; /*tw-blau */
+	font-weight: bold;
+}
+#cms td.MarkLine {
+	background-color: #F2F2F2; /*wie EEEEEE; also grau fast weiss */
+}
+#cms td.HeaderTesttool /*fuer die Button-Optik beim Testtool*/ {
+	color: #FFFFFF;
+	background-color: #00639C;
+	white-space:nowrap;
+	line-height: 25px;
+	box-shadow: inset 0 0 2px #FFFFFF;
+	padding: 10px;
+	width: 170px;
+}
+#cms td.HeaderTesttoolSTG /*fuer die Button-Optik der Quereinstiegs-Studiengänge beim Testtool*/ {
+	color: white;
+	border: 2px solid #73a9d6;
+	padding: 10px;
+	max-width: 100px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: normal;
+}
+#cms td.Inaktiv  /*fuer Inaktive Items bei der Raumbeschreibung */ {
+  background-color: #F2F2F2; /*wie EEEEEE; also grau fast weiss */
+  color: #CFCFCF;
+  text-decoration: line-through;
+}
+#cms td.ItemTesttool /*fuer die Button-Optik beim Testtool*/ {
+	color: #000;
+	white-space: initial;
+	box-shadow: inset 0 0 2px #00639C;
+	width: 170px;
+	display: inline-block;
+}
+#cms td:hover.ItemTesttool {
+	color: #000;
+	white-space: initial;
+	box-shadow: inset 0px 0px 2px 2px #00639C;
+	width: 170px;
+	display: inline-block;
+}
+#cms td.ItemTesttoolAktiv /*fuer die Button-Optik beim Testtool*/ {
+	color: #000;
+	white-space: initial;
+	box-shadow: 0px 0px 2px 2px #00639C;
+}
+#cms td.ItemTesttoolBeendet /*fuer die Button-Optik beim Testtool*/ {
+	background-color: #FFFFFF;
+	white-space: initial;
+	box-shadow: inset 0px 0px 2px 2px #EAECED;
+}
+#cms td:hover.ItemTesttoolBeendet {
+	color: #EAECED;
+	background-color: #FFFFFF;
+	white-space: initial;
+	box-shadow: inset 0px 0px 2px 2px #EAECED;
+}
+#cms div.TesttoolTitle /* Ueberschrift auf den Titelfolien */ {
+	font-size: 400%;
+	font-family: Helvetica, Arial, sans-serif;
+	text-transform: uppercase;
+	color: #FFFFFF;
+	white-space: nowrap;
+	text-shadow: -1px 0 #00639C, 0 1px #00639C, 1px 0 #00639C, 0 -1px #00639C;
+	margin: 0 0 20px 0;
+}
+#cms td.tdwidth10 {
+	width: 5px;
+	/* width: 10px; */
+}
+#cms td.tdwidth30 {
+	width: 30px;
+}
+#cms td.tdgreen {
+	background-color: #CCFFCC;
+}
+#cms td.tdborder {
+	text-align: center;
+	border:2px solid black;
+	background-color: #ffffff;
+}
+#cms td.tdwrap {
+	white-space: nowrap;
+	color: #0086CC;
+}
+#cms td.tdvertical /* Für Ausrichtung der Icons bei der LV-Übersicht */ {
+	vertical-align: top;
+	padding: 10px 0 10px 0;
+	width: 33.33%;
+	/* height: 100px; */
+}
+#cms td.menubox /* Navigationsboxen in den CIS-Contentseiten */ {
+	width: 20%;
+	height: 10px;
+	background-color: #eeeeee;
+	padding: 20px 15px 20px 15px;
+	vertical-align: middle;
+}
+#cms td.menubox p {
+	line-height: 110%;
+}
+#cms td.cmscontent {
+	vertical-align: top;
+	padding-right: 25px;
+	padding-left: 0px;
+}
+#cms td.teambox {
+	vertical-align: top;
+	padding-top: 20px;
+}
+#cms TR.liste {
+	background-color: #D3DCE3; /*grau wie #DDDDDD*/
+}
+#cms TR.liste0 {
+	background-color: #FFFFFF; /*wei�*/
+}
+#cms TR.liste1 {
+	background-color: #EEEEEE; /*grau fast wei�*/
+}
+#cms TR.tryellow {
+	background-color: #FFFF99;
+}
+
+/* private/profile/zeitsperre.php */
+#cms TABLE#zeitsperren {
+	/*border: 1px solid black; foo*/
+	width:100%;
+}
+#cms TABLE#zeitsperren TH {
+	background-color: #DDDDDD; /*hellgrau*/
+}
+#cms TABLE#zeitsperren TH.feiertag {
+	background-color: #FFFF00; /*grelles gelb*/
+}
+#cms TABLE#zeitsperren TD.feiertag {
+	background-color: #FFFF22; /*bissi helleres gelb*/
+}
+#cms TABLE#zeitsperren TD {
+	background-color: #EEEEEE; /*grau fast wei�*/
+}
+
+/*
+==== Stundenplan ====
+*/
+
+#cms TABLE.stdplan {
+	margin: 0px;
+	padding: 0px;
+	/* border: 1px solid; */
+	width: 100%;
+	background-color: white;
+	vertical-align: top;
+	border-spacing:1;
+}
+#cms TABLE.stdplan TH {
+	background-color: #A5AFB6;
+}
+#cms TABLE.stdplan TD {
+	background-color: #E9ECEE;
+}
+
+/*reservation delete-"x"*/
+#cms TABLE.stdplan div.reservdelete {
+	text-align: right;
+	margin-bottom:-4px;
+	padding-top: 2px;
+	padding-right: 2px;
+}
+
+#cms .row-even { /*liste1*/
+ background-color:#f2f2f2;
+}
+
+#cms .row-odd { /*liste0*/
+  background-color:#ffffff;
+}
+
+/*lecturer reservation rows*/
+#cms td.lecturercell {
+	border: 1px solid;
+}
+
+#cms td.lecturercell div.lecturercellname {
+	width: 95%;
+	float: left;
+}
+
+#cms td.lecturercell div.lecturercelldelete {
+	width: 5%;
+	float: left;
+	text-align: right;
+	cursor: pointer;
+}
+
+/*
+==== Fonts ====
+*/
+
+#cms h1 {
+	color: black;
+	padding: 0px;
+	padding-bottom: 20px;
+	/* padding-left: 10px; */
+	/* width:20%; */
+	margin:0px;
+	white-space:nowrap;
+	font-size: 20px;
+	/* letter-spacing: 2px;
+	border-bottom:solid 1px #0086CC;*/
+	font-weight:normal;
+}
+#cms h1 td {
+	color: #0a0a0a;
+	background-color: #FFFFFF;
+}
+#cms h2 {
+	margin: 0px;
+	padding-top: 0px;
+	padding-bottom: 15px;
+	/* padding-left: 10px; */
+	font-weight: bold;
+	font-size: 15px;
+}
+#cms h3 {
+	margin: 0px;
+	padding-top: 0px; /* 20px */
+	padding-bottom: 2px;
+	font-weight: bold;
+	font-size:13px;
+}
+#cms h4 {
+	margin: 0px;
+	padding: 0px;
+	text-decoration: underline;
+	font-weight: normal;
+	font-size:13px;
+}
+#cms .error {
+	color: #ff0000;
+}
+#cms #news .news {
+	width: 99%;
+	background-color: #A5AFB6; /* grauvariante A5AFB6 */
+}
+#cms #news .news .titel table {
+	padding: 3px 10px 3px 10px;
+	color: #ffffff;
+	font-weight: 500;
+	border-collapse: initial;
+}
+#cms #news .news .text {
+	background-color: #E9ECEE; /* grauvariante E9ECEE */
+	padding: 10px;
+}
+
+/* Margin von ersten und letzten P tag entfernen, da sonst
+   breite Raender entstehen koenne*/
+#cms #news .news .text p:first-child {
+	margin-top:0px;
+
+}
+#cms #news .news .text p:last-child {
+	margin-bottom:0px;
+}
+
+/*
+==== Images ====
+*/
+#cms img.testtoolfrage {
+	max-width:400px;
+	max-height:300px;
+}
+#cms img.testtoolvorschlag {
+	max-width:200px;
+	max-height:150px;
+}
+#cms img {
+	border: 0;
+}
+#cms img.lvplanbutton {
+	border:0;
+	vertical-align: bottom;
+}
+#cms img#layout {
+	border: 1px solid #AAAAAA;
+}
+#cms img.lv {
+	width: 40px;
+	height: 40px;
+	padding-bottom: 5px;
+}
+#cms /*img.header_left {
+	position: absolute;
+	left: 0px;
+	z-index: 1;
+	max-width: 100%;
+	height: 16%;
+}
+#cms img.header_right {
+	position: absolute;
+	right: 0px;
+	z-index: 2;
+	max-width: 100%;
+	height: 16%;
+}*/
+#cms img.header_logo {
+	position: absolute;
+	left: 16px;
+	top: 3%;
+	z-index: 5000;
+	height: 8%;
+}
+#cms img.screenshot_boxshadow {
+	border: 1px solid grey;
+	box-shadow: 0px 0px 5px 5px #888888;
+	margin-left: 10px;
+}
+#cms a:hover img.screenshot_boxshadow {
+	border: 1px solid grey;
+	box-shadow: 0px 0px 5px 5px #0086CC;
+	margin-left: 10px;
+}
+/*
+==== Farben ====
+*/
+
+#cms .grey {
+	color: #999999;
+}
+#cms #bgcolor0 {
+	background-color: #CC0000;
+}
+#cms #bgcolor1 {
+	background-color: #FF2200;
+}
+#cms #bgcolor2 {
+	background-color: #FF9922;
+}
+#cms #bgcolor3 {
+	background-color: #FFFF55;
+}
+#cms #bgcolor4 {
+	background-color: #88FF88;
+}
+#cms #bgcolor5 {
+	background-color: #AAFFAA;
+}
+#cms #bgcolor6 {
+	background-color: #CCFFCC;
+}
+#cms .studentnote {
+	font-weight:bold;
+}
+#cms .benotungstool_tabs {
+	border-top: 1px solid gray;
+	border-left: 1px solid gray;
+	border-right: 1px solid gray;
+	text-align: center;
+}
+#cms .benotungstool_tabs_active {
+	border-top: 2px solid gray;
+	border-left: 2px solid gray;
+	border-right: 2px solid gray;
+	background-color: #eeeeee;
+	text-align: center;
+}
+#cms .benotungstool_subtab {
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+}
+#cms .ok {
+	color: green;
+}
+#cms .ausblenden {display:none;}
+#cms .einblenden {display:block;}
+
+/* Inaktive Elemente in einem DropDown */
+#cms option.inactive {
+	text-decoration:line-through;
+}
+
+/* Difference Engine */
+#cms .diffchange-inline {
+	background-color: yellow;
+}
+#cms .diff-deletedline {
+	background-color: lightgray;
+}
+#cms .diff-marker {
+	background-color: none;
+}
+#cms .diff-addedline {
+	background-color: lightgreen;
+}
+
+#cms .suchmarker {
+	font-weight: bold;
+	text-decoration: underline;
+	font-size: medium;
+}
+#cms .suchergebnis:hover {
+	background-color: #EEEEEE;
+}
+#cms .suchergebnis a {
+	font-weight: bold;
+}
+#cms .suchergebnis {
+	padding-bottom: 15px;
+}
+#cms .suchicon {
+	margin:0px;
+	height: 14px;
+}
+#cms .suchicon:hover {
+	cursor:pointer;
+	cursor:hand;
+}
+
+/*
+==== Kalender-Jump-Effekt im LV-Plan ====
+*/
+#cms div.hoverbox div.preview div.hoverbox_inhalt {
+	display:none;
+	vertical-align: top;
+}
+#cms div.preview {
+	position: relative;
+	vertical-align: top;
+}
+#cms div.hoverbox div.preview:hover div.hoverbox_inhalt {
+	display: block;
+	position: absolute;
+	top: 15px;
+	left: -190px;
+	z-index: 2;
+	border:1px;
+	border-color:grey;
+	background-color:white;
+}
+#cms table.hoverbox {
+	border:1px;
+	border-style:solid;
+	border-color:grey;
+	padding: 5px;
+}
+
+/*
+==== Gestaltung des Hauptmenues ====
+*/
+
+#cms ul.menu {
+	padding:0;
+	margin:0;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#0086CC;
+	font-size:13px;
+	line-height:15px;
+	width:200px;
+	list-style-type:none;
+}
+#cms #menu {
+	padding:0;
+	margin:0;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#0086CC;
+	font-size:13px;
+	line-height:18px;
+	width:200px;
+	list-style-type:none;
+}
+#cms #menu a {
+	display:block;
+	padding:0 0 0 5px;
+	outline:none;
+	text-decoration:none;
+}
+#cms #menu li {
+	margin:0 0 0 10px;
+	padding: 5px 0 0 0;
+	display:block;
+	border:1px solid #FFFFFF;
+}
+#cms #menu a.selected {
+	padding:0 0 0 5px;
+}
+#cms #menu a:hover {
+	text-decoration: underline;
+}
+#cms #menu a.leaf {
+	color: #616B71;
+	padding-left: 5px;
+}
+
+
+/* LV Angebot im Studienplan */
+#cms .angebot {
+	border: 1px solid #edd400;
+}
+
+/* Empfehlung im Studienplan */
+#cms .empfehlung {
+	border: 1px solid green;
+}
+
+/*
+==== Menubox-Effekt am Seitenrand. Nettes Feature aber dzt. nicht sinnvoll einsetzbar ====
+*/
+
+#cms.bewerbung table,
+#cms.anwesenheit table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+#cms.bewerbung table.reihungstest,
+#cms.anwesenheit table {
+	table-layout: fixed;
+}
+
+#cms.bewerbung table th,
+#cms.bewerbung table td,
+#cms.anwesenheit table th,
+#cms.anwesenheit table td {
+	padding: 3px;
+	border: 1px solid black;
+	text-align: center;
+}
+
+#cms.bewerbung table.reihungstest td:nth-child(5) {
+	text-align: left;
+}
+
+#cms.bewerbung .ui-tabs-vertical .ui-tabs-panel {
+	width: 75em;
+}
+
+#cms.bewerbung table.reihungstest th:nth-child(1),
+#cms.bewerbung table.reihungstest th:nth-child(2),
+#cms.bewerbung table.reihungstest th:nth-child(3),
+#cms.bewerbung table.reihungstest th:nth-child(4),
+#cms.bewerbung table.reihungstest th:nth-child(6) {
+	width: 10%;
+}
+
+#cms.bewerbung table.reihungstest th:nth-child(5) {
+	width: 50%;
+}
+
+#cms.anwesenheit {
+	padding-bottom: 20px;
+}
+
+#cms.anwesenheit div.lv {
+	margin: 10px;
+	padding-top: 10px;
+	padding-left: 10px;
+	background-color: #f2f8ff;
+	border: 1px solid #2353b2;
+}
+
+#cms.anwesenheit div.lv + div.lv {
+/*	border-top: 1px dashed rgb(193,193,193);*/
+}
+
+#cms.anwesenheit div.lv > div {
+	width: 300px;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+#cms.anwesenheit div.progress-wrapper {
+	border: 1px solid black;
+}
+
+#cms.anwesenheit div.progress {
+	height: 20px;
+}
+
+#cms.anwesenheit div.progress.green {
+	background-color: #008000;
+}
+
+#cms.anwesenheit div.progress.yellow {
+	background-color: #ffa500;
+}
+
+#cms.anwesenheit div.progress.red {
+	background-color: #dc143c;
+}
+
+#cms.anwesenheit span.fehlstunden-details {
+	cursor: pointer;
+	font-weight: bold;
+}
+
+#cms.anwesenheit table {
+	margin: 5px;
+}
+
+#cms.anwesenheit form {
+	margin: 10px;
+}
+
+#cms div.header_logo {
+	position: absolute;
+	left: 16px;
+	top: 3%;
+	z-index: 5000;
+
+	background-image:url(styles/tw/logo_250x130.png);
+	background-repeat: no-repeat;
+	width:170px;
+	height:51px;
+	background-size: contain;
+}
+
+#cms td.headerbar {
+	background-image: url(styles/tw/header.png);
+	background-position: top;
+	background-repeat: repeat-x;"
+}
+
+#cms div.cis_logo {
+	background-image:url(styles/tw/cis_logo_text_400x78.png);
+	background-repeat: no-repeat;
+	width: 400px;
+	height: 78px;
+}
