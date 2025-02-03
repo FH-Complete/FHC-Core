@@ -1048,4 +1048,27 @@ class Lehrveranstaltung_model extends DB_Model
 		$res = $this->execReadOnlyQuery($query);
 		return $res;
     }
+
+	/**
+	 * Gets lehrveranstaltungen of a studiengang
+	 * @param integer $studiengang_kz
+	 * @return array|null
+	 */
+	public function getLvsByStudiengangkz($studiengang_kz)
+	{
+		$params = array($studiengang_kz);
+
+		$qry = "SELECT
+    				* 
+				FROM 
+				    lehre.tbl_lehrveranstaltung
+				WHERE lehrveranstaltung_id IN
+				      (SELECT lehrveranstaltung_id 
+				       FROM campus.vw_student_lehrveranstaltung 
+					WHERE studiengang_kz = ?";
+
+		$qry .= ") ORDER BY semester, bezeichnung";
+
+		return $this->execQuery($qry, $params);
+	}
 }

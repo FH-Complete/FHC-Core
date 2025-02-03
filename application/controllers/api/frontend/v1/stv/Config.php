@@ -123,6 +123,11 @@ class Config extends FHCAPI_Controller
 			'config' => $config['finalexam']
 		];
 
+		$result['mobility'] = [
+			'title' => $this->p->t('stv', 'tab_mobility'),
+			'component' => './Stv/Studentenverwaltung/Details/Mobility.js'
+		];
+
 		Events::trigger('stv_conf_student', function & () use (&$result) {
 			return $result;
 		});

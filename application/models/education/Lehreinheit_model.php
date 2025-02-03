@@ -260,27 +260,27 @@ EOSQL;
 			SELECT
 			    lv.lehrveranstaltung_id,
 			    le.lehreinheit_id,
-				le.lehrform_kurzbz, 
-				lv.kurzbz, 
-				lv.bezeichnung, 
-				lv.semester, 
-				ma.mitarbeiter_uid, 
+				le.lehrform_kurzbz,
+				lv.kurzbz,
+				lv.bezeichnung,
+				lv.semester,
+				ma.mitarbeiter_uid,
 				(
-					SELECT 
-						STRING_AGG(CONCAT(leg.semester, leg.verband, leg.gruppe), ' ') 
-					FROM lehre.tbl_lehreinheitgruppe leg 
+					SELECT
+						STRING_AGG(CONCAT(leg.semester, leg.verband, leg.gruppe), ' ')
+					FROM lehre.tbl_lehreinheitgruppe leg
 					WHERE leg.lehreinheit_id = le.lehreinheit_id
 				) AS gruppe,
 			    tma.kurzbz as kuerzel
-			FROM 
+			FROM
 				lehre.tbl_lehreinheit le
-			JOIN 
+			JOIN
 				lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id
-			JOIN 
+			JOIN
 				lehre.tbl_lehreinheitmitarbeiter ma USING (lehreinheit_id)
 			JOIN
 				public.tbl_mitarbeiter tma USING (mitarbeiter_uid)
-			WHERE 
+			WHERE
 				lv.lehrveranstaltung_id = ?
 				";
 
@@ -290,12 +290,11 @@ EOSQL;
 			$params[] = $studiensemester_kurzbz;
 		}
 
-		$query .="	
-			ORDER BY 
+		$query .="
+			ORDER BY
 				le.lehreinheit_id;
 		";
 
 		return $this->execQuery($query, $params);
-
 	}
 }
