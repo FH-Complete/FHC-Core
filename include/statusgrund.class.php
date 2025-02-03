@@ -58,11 +58,12 @@ class statusgrund extends basis_db
 		$beschreibung = $sprache->getSprachQuery('beschreibung');
 		$qry = "
 			SELECT
-				*,".$bezeichnung_mehrsprachig.",".$beschreibung."
+				statusgrund.*, statusgrund.".$bezeichnung_mehrsprachig.",".$beschreibung.", statusgrundstatus.status_kurzbz
 			FROM
-				public.tbl_status_grund
+				public.tbl_status_grund statusgrund
+				JOIN public.tbl_status_grund_status statusgrundstatus ON statusgrund.statusgrund_id = statusgrundstatus.statusgrund_id
 			WHERE
-				statusgrund_id=".$this->db_add_param($statusgrund_id, FHC_INTEGER);
+				statusgrund.statusgrund_id=".$this->db_add_param($statusgrund_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -103,14 +104,16 @@ class statusgrund extends basis_db
 		$beschreibung = $sprache->getSprachQuery('beschreibung');
 		$qry = "
 			SELECT
-				*,".$bezeichnung_mehrsprachig.",".$beschreibung."
+				statusgrund.*, 
+				statusgrund.".$bezeichnung_mehrsprachig.",".$beschreibung."
 			FROM
-				public.tbl_status_grund
+				public.tbl_status_grund statusgrund
+				JOIN public.tbl_status_grund_status statusgrundstatus ON statusgrund.statusgrund_id = statusgrundstatus.statusgrund_id
 			WHERE
-				status_kurzbz=".$this->db_add_param($status_kurzbz);
+				statusgrundstatus.status_kurzbz=".$this->db_add_param($status_kurzbz);
 		if(!is_null($aktiv))
-			$qry.=" AND aktiv=".($aktiv?'true':'false');
-		$qry.=" ORDER BY bezeichnung_mehrsprachig[0]";
+			$qry.=" AND statusgrund.aktiv=".($aktiv?'true':'false');
+		$qry.=" ORDER BY statusgrund.bezeichnung_mehrsprachig[0]";
 
 		if($this->db_query($qry))
 		{
@@ -150,14 +153,16 @@ class statusgrund extends basis_db
 		$beschreibung = $sprache->getSprachQuery('beschreibung');
 		$qry = "
 			SELECT
-				*,".$bezeichnung_mehrsprachig.",".$beschreibung."
+				statusgrund.*,statusgrund.".$bezeichnung_mehrsprachig.",".$beschreibung.", statusgrundstatus.status_kurzbz
 			FROM
-				public.tbl_status_grund
+				public.tbl_status_grund statusgrund
+				JOIN public.tbl_status_grund_status statusgrundstatus ON statusgrund.statusgrund_id = statusgrundstatus.statusgrund_id
+		
 			";
 
 		if(!is_null($aktiv))
-			$qry.="WHERE aktiv=".($aktiv?'true':'false');
-		$qry.=" ORDER BY status_kurzbz, bezeichnung_mehrsprachig[0]";
+			$qry.="WHERE statusgrund.aktiv=".($aktiv?'true':'false');
+		$qry.=" ORDER BY statusgrundstatus.status_kurzbz, statusgrund.bezeichnung_mehrsprachig[0]";
 
 		if($this->db_query($qry))
 		{

@@ -69,6 +69,7 @@ require_once('dbupdate_3.4/40717_lv_faktor.php');
 require_once('dbupdate_3.4/48526_pep_tagging.php');
 require_once('dbupdate_3.4/41950_perm_gehaelter.php');
 require_once('dbupdate_3.4/53903_valorisierung.php');
+require_once('dbupdate_3.4/40431_statusgrund_tabelle_zuordnung_zu_status.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';

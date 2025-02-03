@@ -8,7 +8,7 @@ class Statusgrund_widget extends DropdownWidget
 		$this->load->model('crm/statusgrund_model', 'StatusgrundModel');
 		$this->StatusgrundModel->addOrder('statusgrund_id');
 
-		$this->addSelectToModel($this->StatusgrundModel, 'statusgrund_id', 'bezeichnung_mehrsprachig[1]');
+		$this->addSelectToModel($this->StatusgrundModel, 'statusgrund_id', '(bezeichnung_mehrsprachig[1])');
 
 		$this->setElementsArray(
 			$this->StatusgrundModel->load(),

@@ -16,8 +16,12 @@ class Statusgrund_model extends DB_Model
 	{
 		$this->addOrder('bezeichnung_mehrsprachig');
 		$where = array();
+
 		if (!is_null($status_kurzbz))
-			$where['status_kurzbz'] = $status_kurzbz;
+		{
+			$this->addJoin('public.tbl_status_grund_status', 'statusgrund_id');
+			$where['tbl_status_grund_status.status_kurzbz'] = $status_kurzbz;
+		}
 		if (!is_null($aktiv))
 			$where['aktiv'] = $aktiv;
 		if (!is_null($statusgrund_kurzbz))
@@ -32,9 +36,11 @@ class Statusgrund_model extends DB_Model
 	{
 		$lang = '[(SELECT index FROM public.tbl_sprache WHERE sprache=' . $this->escape(getUserLanguage()) . ' LIMIT 1)]';
 
-		$this->addSelect('tbl_status_grund.*');
+		$this->addSelect('tbl_status_grund.*, tbl_status_grund_status.status_kurzbz');
+
 		$this->addSelect('bezeichnung_mehrsprachig' . $lang . ' AS bezeichnung');
 		$this->addSelect('beschreibung' . $lang . ' AS beschreibung');
+		$this->addJoin('public.tbl_status_grund_status', 'statusgrund_id');
 
 		$this->addOrder('bezeichnung_mehrsprachig' . $lang);
 

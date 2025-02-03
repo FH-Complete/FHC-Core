@@ -23,6 +23,7 @@ class Statusgrund extends Auth_Controller
         $this->load->model('crm/Status_model', 'StatusModel');
         $this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
         $this->load->model('system/Sprache_model', 'SpracheModel');
+        $this->load->model('crm/Statusgrundstatus_model', 'StatusgrundstatusModel');
     }
 
 	public function index()
@@ -47,7 +48,8 @@ class Statusgrund extends Auth_Controller
 
 	public function listGrund($status_kurzbz)
 	{
-		$statusGrund = $this->StatusgrundModel->loadWhere(array("status_kurzbz" => $status_kurzbz));
+		$this->StatusgrundModel->addJoin('public.tbl_status_grund_status', 'statusgrund_id');
+		$statusGrund = $this->StatusgrundModel->loadWhere(array("tbl_status_grund_status.status_kurzbz" => $status_kurzbz));
 		if ($statusGrund->error)
 		{
 			show_error(getError($statusGrund));
@@ -245,7 +247,6 @@ class Statusgrund extends Auth_Controller
 		}
 
 		$data = array(
-			"status_kurzbz" => $status_kurzbz,
 			"aktiv" => $aktiv,
 			"bezeichnung_mehrsprachig" => $bezeichnung_mehrsprachig,
 			"beschreibung" => $beschreibung,
@@ -257,6 +258,19 @@ class Statusgrund extends Auth_Controller
 		if ($statusgrund->error)
 		{
 			show_error(getError($statusgrund));
+		}
+		else
+		{
+			$statusData = array(
+				"status_kurzbz" => $status_kurzbz,
+				"statusgrund_id" => $statusgrund->retval
+			);
+			$statusgrundstatus = $this->StatusgrundstatusModel->insert($statusData);
+
+			if ($statusgrundstatus->error)
+			{
+				show_error(getError($statusgrundstatus));
+			}
 		}
 
 		redirect("/crm/Statusgrund/editGrund/" . $statusgrund->retval . "/" . true);
