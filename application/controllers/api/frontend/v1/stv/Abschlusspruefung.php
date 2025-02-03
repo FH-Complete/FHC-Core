@@ -242,6 +242,10 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
 		]);
 
+		$this->form_validation->set_rules('akadgrad_id', 'AkadGrad', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'AkadGrad'])
+		]);
+
 		$this->form_validation->set_rules('datum', 'Datum', 'is_valid_date', [
 			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Datum'])
 		]);
@@ -308,6 +312,10 @@ class Abschlusspruefung extends FHCAPI_Controller
 
 		$this->form_validation->set_rules('pruefungstyp_kurzbz', 'Typ', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
+		]);
+		
+		$this->form_validation->set_rules('akadgrad_id', 'AkadGrad', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'AkadGrad'])
 		]);
 
 		$this->form_validation->set_rules('datum', 'Datum', 'is_valid_date', [

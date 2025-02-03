@@ -181,7 +181,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewContact(formData) {
-			return this.$refs.contactData.factory.stv.kontakt.addNewContact(this.uid, this.contactData)
+			return this.$fhcApi.factory.stv.kontakt.addNewContact(this.$refs.contactData, this.uid, this.contactData)
 				.then(response => {
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 						this.hideModal("contactModal");
@@ -217,7 +217,7 @@ export default{
 			});
 		},
 		updateContact(kontakt_id){
-			return this.$refs.contactData.factory.stv.kontakt.updateContact(kontakt_id,
+			return this.$fhcApi.factory.stv.kontakt.updateContact(this.$refs.contactData, kontakt_id,
 				this.contactData)
 				.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -284,11 +284,9 @@ export default{
 	},
 	template: `	
 		<div class="stv-details-kontakt-contact h-100 pt-3">
-		
-		{{contactData}}
 
 		<!--Modal: contactModal-->
-		<BsModal ref="contactModal">
+		<bs-modal ref="contactModal">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('person', 'kontakt_new')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('person', 'kontakt_edit')}}</p>
@@ -314,8 +312,8 @@ export default{
 						type="text" 
 						name="kontakt" 
 						:label="$p.t('global/kontakt')+ ' *'"
-						v-model="contactData.kontakt">
-						required
+						v-model="contactData.kontakt"
+						required>
 						>
 					</form-input>
 				</div>
@@ -418,7 +416,7 @@ export default{
 				<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewContact()">OK</button>
 				<button v-else type="button" class="btn btn-primary" @click="updateContact(contactData.kontakt_id)">OK</button>
 			</template>
-		</BsModal>
+		</bs-modal>
 														
 		<core-filter-cmpt
 			ref="table"

@@ -3,6 +3,7 @@ import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.j
 import HeightTransition from "../Tranistion/HeightTransition.js";
 
 export default {
+	name: 'Item',
 	components: {
 		BsModal,
 		HeightTransition

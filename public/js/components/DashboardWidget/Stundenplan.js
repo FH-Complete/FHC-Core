@@ -162,36 +162,14 @@ export default {
 	created() {
 		this.$emit('setConfig', false);
 		this.loadEvents();
-		/* axios
-			.get(this.apiurl + '/components/Cis/Stundenplan/Stunden').then(res => {
-				res.data.retval.forEach(std => {
-					this.stunden[std.stunde] = std; // TODO(chris): geht besser
-				});
-				axios
-					.get(this.apiurl + '/components/Cis/Stundenplan')
-					.then(res => {
-						res.data.retval.forEach((el, i) => {
-							el.id = i;
-							el.color = '#' + (el.farbe || 'CCCCCC');
-							el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-							el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
-							el.title = el.lehrfach;
-							if (el.lehrform)
-								el.title += '-' + el.lehrform;
-						});
-						this.events = res.data.retval || [];
-					})
-					.catch(err => { console.log(err);console.error('ERROR: ', err.response.data) });
-			})
-			.catch(err => { console.error('ERROR: ', err.response.data) }); */
 	},
 	template: /*html*/`
 	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">
 		<lv-modal v-if="selectedEvent" ref="lvmodal" :event="selectedEvent"  />
 		<content-modal :content_id="roomInfoContentID" dialogClass="modal-lg" ref="contentModal"/>
 		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" :widget="true" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" >
-			<template #monthPage="{event,day,isSelected}">
-				<span class="fhc-entry" :class="{'selectedEvent':isSelected}" style="color:white" :style="{'background-color': event.color}">
+			<template #monthPage="{event,day}">
+				<span  >
 					{{event.topic}}
 				</span>
 			</template>

@@ -258,7 +258,7 @@ export default {
 				formData: this.formData
 			};
 
-			return this.$refs.formFinalExam.factory.stv.abschlusspruefung.addNewAbschlusspruefung(dataToSend)
+			return this.$fhcApi.factory.stv.abschlusspruefung.addNewAbschlusspruefung(this.$refs.formFinalExam, dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetForm();
@@ -286,7 +286,7 @@ export default {
 				id: abschlusspruefung_id,
 				formData: this.formData
 			};
-			return this.$refs.formFinalExam.factory.stv.abschlusspruefung.updateAbschlusspruefung(dataToSend)
+			return this.$fhcApi.factory.stv.abschlusspruefung.updateAbschlusspruefung(this.$refs.formFinalExam, dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetForm();
@@ -415,7 +415,7 @@ export default {
 		<h4>{{this.$p.t('stv','tab_finalexam')}}</h4>
 		
 		<div v-if="this.student.length">
-			<AbschlusspruefungDropdown
+			<abschlusspruefung-dropdown
 				:showAllFormats="isBerechtigtDocAndOdt"
 				:studentUids="studentUids"
 				:showDropDownMulti="true"
@@ -423,7 +423,7 @@ export default {
 				:stgKz="stg_kz"
 				:cisRoot="cisRoot"
 				@linkGenerated="printDocument"
-			></AbschlusspruefungDropdown>
+			></abschlusspruefung-dropdown>
 		</div>
 
 		<core-filter-cmpt
@@ -641,7 +641,7 @@ export default {
 					:label="$p.t('abschlusspruefung', 'akadGrad')"
 					type="select"
 					v-model="formData.akadgrad_id"
-					name="akadgrad"
+					name="akadgrad_id"
 					>
 					<option
 						v-for="grad in arrAkadGrad"
@@ -744,8 +744,8 @@ export default {
 				</div>
 				<div class="col">
 					<p>
-					   <a :href="formData.link" target="_blank" rel="noopener noreferrer">
-						  {{$p.t('abschlusspruefung', 'pruefungsprotokoll')}}
+						<a :href="formData.link" target="_blank" rel="noopener noreferrer">
+							{{$p.t('abschlusspruefung', 'pruefungsprotokoll')}}
 						</a>
 					</p>
 				</div>
@@ -758,7 +758,7 @@ export default {
 
 		</form-form>
 		<Teleport v-for="data in tabulatorData" :key="data.abschlusspruefung_id" :to="data.actionDiv">
-			<AbschlusspruefungDropdown
+			<abschlusspruefung-dropdown
 				:showAllFormats="isBerechtigtDocAndOdt"
 				:showDropDownMulti="false"
 				:abschlusspruefung_id="data.abschlusspruefung_id"
@@ -767,7 +767,7 @@ export default {
 				:stgKz="stg_kz"
 				:cisRoot="cisRoot"
 				@linkGenerated="printDocument"
-			></AbschlusspruefungDropdown>
+			></abschlusspruefung-dropdown>
 		</Teleport>
 
 				

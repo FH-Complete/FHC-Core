@@ -169,7 +169,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewBankverbindung(bankverbindungData) {
-			return this.$refs.bankverbindungData.factory.stv.kontakt.addNewBankverbindung(this.uid, this.bankverbindungData)
+			return this.$fhcApi.factory.stv.kontakt.addNewBankverbindung(this.$refs.bankverbindungData, this.uid, this.bankverbindungData)
 			.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('bankverbindungModal');
@@ -191,7 +191,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateBankverbindung(bankverbindung_id){
-			return this.$refs.bankverbindungData.factory.stv.kontakt.updateBankverbindung(bankverbindung_id,
+			return this.$fhcApi.factory.stv.kontakt.updateBankverbindung(this.$refs.bankverbindungData, bankverbindung_id,
 				this.bankverbindungData)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -239,7 +239,7 @@ export default{
 		<div class="stv-details-kontakt-bankaccount h-100 pt-3">
 		
 		<!--Modal: Bankverbindung-->
-		<BsModal ref="bankverbindungModal">
+		<bs-modal ref="bankverbindungModal">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('person', 'bankvb_new')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('person', 'bankvb_edit')}}</p>
@@ -335,7 +335,7 @@ export default{
 				<button v-else type="button" class="btn btn-primary" @click="updateBankverbindung(bankverbindungData.bankverbindung_id)">OK</button>
 			</template>
 			
-		</BsModal>
+		</bs-modal>
 				
 		<core-filter-cmpt
 			ref="table"

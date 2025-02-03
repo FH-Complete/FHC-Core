@@ -1337,13 +1337,13 @@ class Status extends FHCAPI_Controller
 			'updatevon' => $authUID
 		];
 		foreach ([
-					 'orgform_kurzbz',
-					 'anmerkung',
-					 'bewerbung_abgeschicktamum',
-					 'studienplan_id',
-					 'rt_stufe',
-					 'statusgrund_id'
-				 ] as $key)
+					'orgform_kurzbz',
+					'anmerkung',
+					'bewerbung_abgeschicktamum',
+					'studienplan_id',
+					'rt_stufe',
+					'statusgrund_id'
+				] as $key)
 			if ($this->input->post($key))
 				$updateData[$key] = $this->input->post($key);
 

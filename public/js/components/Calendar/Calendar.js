@@ -190,7 +190,7 @@ export default {
 	methods: {
 		handleInput(day) {
 			this.$emit(day[0], day[1]);
-		}
+		},
 	},
 	created() {
 		const allowedInitialModes = ['years'];
@@ -227,11 +227,11 @@ export default {
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card h-100" :class="sizeClass">
 		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)" @input="handleInput" >
-			<template #monthPage="{event,day,isSelected}">
-				<slot name="monthPage" :event="event" :day="day" :isSelected="isSelected"></slot>
+			<template #monthPage="{event,day}">
+				<slot name="monthPage" :event="event" :day="day" ></slot>
 			</template>
-			<template #weekPage="{event,day,isSelected}">
-				<slot name="weekPage" :event="event" :day="day" :isSelected="isSelected"></slot>
+			<template #weekPage="{event,day}">
+				<slot name="weekPage" :event="event" :day="day" ></slot>
 			</template>
 			<template #dayPage="{event,day,mobile}">
 				<slot name="dayPage" :event="event" :day="day" :mobile="mobile"></slot>

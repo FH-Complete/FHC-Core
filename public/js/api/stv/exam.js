@@ -9,11 +9,9 @@ export default {
 		return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getTypenPruefungen');
 	},
 	getAllLehreinheiten(data){
-		console.log("all Lehreinheiten");
 		return this.$fhcApi.post('api/frontend/v1/stv/pruefung/getAllLehreinheiten/', data)
 	},
 	getLvsByStudent(uid){
-		console.log(uid);
 		return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getLvsByStudent/' + uid)
 	},
 	getLvsandLesByStudent(uid){

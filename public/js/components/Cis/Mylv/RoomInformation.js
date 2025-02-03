@@ -121,13 +121,13 @@ export default{
     template: /*html*/`
 		<lv-modal v-if="currentlySelectedEvent" :showMenu="false" :event="currentlySelectedEvent" ref="lvmodal" />
 		<fhc-calendar @selectedEvent="setSelectedEvent" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
-            <template #monthPage="{event,day,isSelected}">
-				<span class="fhc-entry" :class="{'selectedEvent':isSelected}" style="color:white" :style="{'background-color': event.color}">
+            <template #monthPage="{event,day}">
+				<span >
 					{{event.topic}}
 				</span>
 			</template>
-			<template #weekPage="{event,day,isSelected}">
-				<div @click="showModal(event?.orig)" type="button" :class="{'selectedEvent':isSelected}" class="fhc-entry border border-secondary border d-flex flex-column align-items-center justify-content-evenly h-100">
+			<template #weekPage="{event,day}">
+				<div @click="showModal(event?.orig)" type="button" class=" border border-secondary border d-flex flex-column align-items-center justify-content-evenly h-100">
 					<span>{{event?.orig.topic}}</span>
 					<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
 					<span>{{event?.orig.ort_kurzbz}}</span>

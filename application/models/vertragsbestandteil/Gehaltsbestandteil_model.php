@@ -243,6 +243,85 @@ EOSQL;
 		return $result;
 	}
 
+	public function getGehaltsbestandteileValorisiertForChart($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
+	{
+		$stichtagclause = '';
+		if( !is_null($stichtag) )
+		{
+			$date = strftime('%Y-%m-%d', strtotime($stichtag));
+			$stichtagclause = 'AND (' . $this->escape($date)
+				. ' BETWEEN COALESCE(von, \'1970-01-01\'::date)'
+				. ' AND COALESCE(bis, \'2170-01-01\'::date)';
+			if( $includefuture ) 
+			{
+				$stichtagclause .= ' OR COALESCE(von, \'1970-01-01\'::date) > ' 
+					. $this->escape($date);
+			}
+			$stichtagclause .= ')';
+		}
+
+		// Note: replaced gb.betrag_valorisiert with vh.betrag_valorisiert!
+		$qry = "
+        	SELECT 
+				gb.gehaltsbestandteil_id,gb.dienstverhaeltnis_id,gb.vertragsbestandteil_id,gb.gehaltstyp_kurzbz,
+				gb.von,gb.bis,gb.anmerkung,gb.grundbetrag as grundbetrag,gb.valorisierungssperre,gb.insertamum,
+				gb.insertvon,gb.updateamum,gb.updatevon,gb.valorisierung,gb.auszahlungen,
+				vh.valorisierungsdatum, vh.betrag_valorisiert as betrag_valorisiert
+			FROM hr.tbl_gehaltsbestandteil gb LEFT JOIN hr.tbl_valorisierung_historie vh using (gehaltsbestandteil_id) 
+			WHERE dienstverhaeltnis_id=? 
+			      $stichtagclause
+			ORDER BY gb.von,vh.valorisierungsdatum, gb.gehaltsbestandteil_id;
+        ";
+
+        $query = $this->execQuery($qry,
+			array($dienstverhaeltnis_id),
+			$this->getEncryptedColumns());
+
+		$gehaltsbestandteile = array();
+		if( null !== ($rows = getData($query)) )
+		{
+			// store for preserving the last records of every gehaltsbestandteil_id
+			$lastRecords = array();
+
+			foreach( $rows as $row ) {
+				$tmpgb = new Gehaltsbestandteil();
+				$tmpgb->hydrateByStdClass($row, true);
+				
+				// prevent duplication (caused by the join with historic values)
+				if (!isset($lastRecords[(string)$row->gehaltsbestandteil_id])) {
+					$gehaltsbestandteile[] = $tmpgb;
+					$lastRecords[(string)$row->gehaltsbestandteil_id] = $tmpgb;
+				}
+
+				if ($row->betrag_valorisiert != null && $row->valorisierungsdatum != null 
+					&& $row->valorisierungsdatum != $row->von && $row->valorisierungsdatum != $row->bis) {
+						
+						// create additional row
+						$tmpgbv = new Gehaltsbestandteil();
+						$tmpgbv->hydrateByStdClass($row, true);
+						$tmpgbv->setVon($row->valorisierungsdatum);
+						$tmpgbv->setBis($lastRecords[(string)$row->gehaltsbestandteil_id]->getBis());
+						// overwrite Grundbetrag with the current valorized loan
+						// (otherwise the chart would show the wrong value)
+						$tmpgbv->setGrundbetrag($row->betrag_valorisiert);
+						$gehaltsbestandteile[] = $tmpgbv;
+
+						// finish previous
+						$daybefore = new DateTimeImmutable($row->valorisierungsdatum);
+						$daybefore = $daybefore->sub(new \DateInterval('P1D'));
+						$lastRecords[(string)$row->gehaltsbestandteil_id]->setBis($daybefore->format('Y-m-d'));
+
+						// preserve as last row, because there might be another valorization
+						$lastRecords[(string)$row->gehaltsbestandteil_id] = $tmpgbv;
+						
+				} 
+				
+			}
+		}
+
+		return $gehaltsbestandteile;
+	}
+
 	public function getGehaltsbestandteil($id)
 	{	
 		$this->addSelect('*');

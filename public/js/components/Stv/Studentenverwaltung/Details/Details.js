@@ -107,7 +107,7 @@ export default {
 				return;
 
 			this.$refs.form.clearValidation();
-			return this.$fhcApi.factory.stv.details.save(this.modelValue.prestudent_id, this.changed)
+			return this.$fhcApi.factory.stv.details.save(this.$refs.form, this.modelValue.prestudent_id, this.changed)
 				.then(result => {
 					this.original = {...this.data};
 					this.changed = {};

@@ -2,8 +2,8 @@ import BsConfirm from "../Bootstrap/Confirm.js";
 import DropGrid from '../Drop/Grid.js'
 import DashboardItem from "./Item.js";
 import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
-
 export default {
+	name: 'Section',
 	components: {
 		DropGrid,
 		DashboardItem

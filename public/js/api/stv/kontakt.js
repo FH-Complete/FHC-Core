@@ -3,16 +3,16 @@ export default {
 	getAdressen (url, config, params){
 		return this.$fhcApi.get('api/frontend/v1/stv/kontakt/getAdressen/' + params.id);
 	},
-	addNewAddress(id, data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewAddress/' + id,
+	addNewAddress(form, id, data) {
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/kontakt/addNewAddress/' + id,
 			data
 		);
 	},
 	loadAddress(address_id){
 		return this.$fhcApi.post('api/frontend/v1/stv/kontakt/loadAddress/', {address_id});
 	},
-	updateAddress(address_id, data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateAddress/' + address_id,
+	updateAddress(form, address_id, data) {
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/kontakt/updateAddress/' + address_id,
 			data
 		);
 	},
@@ -36,16 +36,16 @@ export default {
 	getBankverbindung (url, config, params){
 		return this.$fhcApi.get('api/frontend/v1/stv/kontakt/getBankverbindung/' + params.id);
 	},
-	addNewBankverbindung(id, data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewBankverbindung/' + id,
+	addNewBankverbindung(form, id, data) {
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/kontakt/addNewBankverbindung/' + id,
 			data
 		);
 	},
 	loadBankverbindung(bankverbindung_id){
 		return this.$fhcApi.post('api/frontend/v1/stv/kontakt/loadBankverbindung/', {bankverbindung_id});
 	},
-	updateBankverbindung(bankverbindung_id, data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateBankverbindung/' + bankverbindung_id,
+	updateBankverbindung(form, bankverbindung_id, data) {
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/kontakt/updateBankverbindung/' + bankverbindung_id,
 			data
 		);
 	},
@@ -57,16 +57,16 @@ export default {
 	getKontakte (url, config, params){
 		return this.$fhcApi.get('api/frontend/v1/stv/kontakt/getKontakte/' + params.id);
 	},
-	addNewContact(id, data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewContact/' + id,
+	addNewContact(form, id, data) {
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/kontakt/addNewContact/' + id,
 			data
 		);
 	},
 	loadContact(kontakt_id){
 		return this.$fhcApi.post('api/frontend/v1/stv/kontakt/loadContact/', {kontakt_id});
 	},
-	updateContact(kontakt_id, data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateContact/' + kontakt_id,
+	updateContact(form, kontakt_id, data) {
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/kontakt/updateContact/' + kontakt_id,
 			data
 		);
 	},

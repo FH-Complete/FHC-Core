@@ -9,6 +9,7 @@ import details from './stv/details.js';
 import exam from './stv/exam.js';
 import abschlusspruefung from './stv/abschlusspruefung.js';
 import grades from './stv/grades.js';
+import mobility from './stv/mobility.js';
 
 export default {
 	verband,
@@ -22,6 +23,7 @@ export default {
 	exam,
 	abschlusspruefung,
 	grades,
+	mobility,
 	configStudent() {
 		return this.$fhcApi.get('api/frontend/v1/stv/config/student');
 	},

@@ -8,6 +8,7 @@ const MODE_MOVE = 1;
 const MODE_RESIZE = 2;
 
 export default {
+	name: 'Grid',
 	components: {
 		GridItem
 	},
