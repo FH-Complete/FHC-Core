@@ -1,6 +1,7 @@
 import FhcDashboard from '../../components/Dashboard/Dashboard.js';
 import FhcApi from '../../plugin/FhcApi.js';
 import Phrasen from '../../plugin/Phrasen.js';
+import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers";
 import Stundenplan from "../../components/Cis/Stundenplan/Stundenplan";
 import MylvStudent from "../../components/Cis/Mylv/Student";
@@ -119,4 +120,5 @@ app.use(primevue.config.default, {
 	}
 })
 app.use(Phrasen);
+app.directive('contrast', contrast);
 app.mount('#fhccontent');

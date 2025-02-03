@@ -14,6 +14,7 @@ $includesArray = array(
 		'public/css/Fhc.css',
 		'public/css/components/dashboard.css',
 		'public/css/components/calendar.css',
+		'public/css/components/Sprachen.css',
 		'public/css/components/MyLv.css',
 		'public/css/components/FilterComponent.css',
 		'public/css/components/Profil.css',
