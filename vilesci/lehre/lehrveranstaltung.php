@@ -1331,9 +1331,6 @@ if ($result_lv!=0)
 			echo '<td>
 						<a href="'.$_SERVER['PHP_SELF'].'?delete_lvid='.$row->lehrveranstaltung_id.'&stg_kz='.$stg_kz.'&semester='.$semester.'&fachbereich_kurzbz='.$oe_fachbereich.'&isaktiv='.$isaktiv.'&oe_kurzbz='.$oe_kurzbz.'&orgform='.$orgform_kurzbz.'" onclick="return conf_del()">löschen</a>
 						';
-
-			if (in_array($row->lehrtyp_kurzbz, array("tpl", "lv")))
-				echo '<br /><a href="lehrveranstaltung_faktor.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">Faktor</a>';
 			echo '</td>';
 			echo '
 				<td nowrap>';
@@ -1341,7 +1338,10 @@ if ($result_lv!=0)
 			$lv_faktor = new lehrveranstaltung_faktor();
 			$lv_faktor->getAkt($row->lehrveranstaltung_id);
 
-			echo $lv_faktor->faktor.'</td>';
+			$faktortext = isset($lv_faktor->faktor) ? $lv_faktor->faktor : 'Hinzufügen';
+			if (in_array($row->lehrtyp_kurzbz, array("tpl", "lv")))
+				echo '<a href="lehrveranstaltung_faktor.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">'. $faktortext .'</a>';
+			echo '</td>';
 			echo "</tr>\n";
 		}
 	}
