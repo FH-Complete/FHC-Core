@@ -105,7 +105,8 @@ class statusgrund extends basis_db
 		$qry = "
 			SELECT
 				statusgrund.*, 
-				statusgrund.".$bezeichnung_mehrsprachig.",".$beschreibung."
+				statusgrund.".$bezeichnung_mehrsprachig.",".$beschreibung.",
+				statusgrundstatus.status_kurzbz
 			FROM
 				public.tbl_status_grund statusgrund
 				JOIN public.tbl_status_grund_status statusgrundstatus ON statusgrund.statusgrund_id = statusgrundstatus.statusgrund_id

@@ -65,7 +65,8 @@ class Statusgrund extends Auth_Controller
 
 	public function editGrund($statusgrund_id, $update = null)
 	{
-		$statusGrund = $this->StatusgrundModel->load($statusgrund_id);
+		$this->StatusgrundModel->addJoin('public.tbl_status_grund_status', 'statusgrund_id');
+		$statusGrund = $this->StatusgrundModel->load(array('public.tbl_status_grund.statusgrund_id' => $statusgrund_id));
 		if ($statusGrund->error)
 		{
 			show_error(getError($statusGrund));

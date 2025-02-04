@@ -21,12 +21,20 @@ if (!$result = @$db->db_query('SELECT 1 FROM public.tbl_status_grund_status LIMI
 
 			INSERT INTO public.tbl_status_grund_status (status_kurzbz, statusgrund_id)
 			SELECT status_kurzbz, statusgrund_id FROM public.tbl_status_grund;
-
-			/*ALTER TABLE public.tbl_status_grund DROP COLUMN status_kurzbz;*/
 		';
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_status_grund_status: '.$db->db_last_error().'</strong><br>';
 	else
+	{
 		echo 'public.tbl_status_grund_status: Tabelle hinzugefuegt<br>';
+
+		$qryDrop = "ALTER TABLE public.tbl_status_grund DROP COLUMN status_kurzbz;";
+
+		if(!$db->db_query($qryDrop))
+			echo '<strong>public.tbl_status_grund: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_status_grund: Spalte status_kurzbz entfernt.<br>';
+	}
+
 }
