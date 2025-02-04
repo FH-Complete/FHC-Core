@@ -171,12 +171,30 @@ class Studiensemester_model extends DB_Model
 	}
 
 	/**
+	 * Gets a Studiensemester for a date
+	 * @param $date
+	 * @return string
+	 */
+	public function getByDate($date)
+	{
+		// gets the studiensemster of a date or the next closest previous studiensemester if a date is not within a studiensemester
+		$query = "
+			SELECT  studiensemester_kurzbz, start, ende
+			FROM	public.tbl_studiensemester
+			WHERE   ( ende >= ?::date AND start <= ?::date ) OR ( ende >= ?::date + '45 days'::interval AND start <= ?::date + '45 days'::interval )
+			ORDER BY start DESC
+			LIMIT 1";
+
+		return $this->execQuery($query, array($date,$date,$date,$date));
+	}
+
+	/**
 	 * Gets all Studiensemester between two dates
 	 * @param $from
 	 * @param $to
 	 * @return array|null
 	 */
-	public function getByDate($from, $to)
+	public function getByDateRange($from, $to)
 	{
 		if (date_format(date_create($from), 'Y-m-d') > (date_format(date_create($to), 'Y-m-d')))
 			return success(array());

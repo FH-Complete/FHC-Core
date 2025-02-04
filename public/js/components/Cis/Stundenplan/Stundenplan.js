@@ -10,19 +10,44 @@ export const Stundenplan = {
 		return {
 			events: null,
 			calendarDate: new CalendarDate(new Date()),
+			eventCalendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
 			currentDay: new Date(),
 			minimized: false,
-			viewData: JSON.parse(this.viewDataString ?? '{}'),
+			studiensemester_kurzbz:null,
+			studiensemester_start:null,
+			studiensemester_ende:null,
+		}
+	},
+	watch: {
+		weekFirstDay: {
+			handler: async function (newValue) {
+				let data = await this.fetchStudiensemesterDetails(newValue);
+				let { studiensemester_kurzbz, start, ende } = data.data;
+				this.studiensemester_kurzbz = studiensemester_kurzbz;
+				this.studiensemester_start = start;
+				this.studiensemester_ende = ende;
+			},
+			immediate: true,
 		}
 	},
 	props: [
-		"viewDataString"
+		"viewData",
 	],
 	components: {
 		FhcCalendar, LvModal, LvMenu, LvInfo
 	},
 	computed:{
+		downloadLinks: function(){
+			if(!this.studiensemester_start || !this.studiensemester_ende)return;
+			let start = new Date(this.studiensemester_start);
+			start = Math.floor(start.getTime()/1000);
+			let ende = new Date(this.studiensemester_ende);
+			ende = Math.floor(ende.getTime() / 1000);
+
+			let download_link = (format, version = "", target = "") => `${FHC_JS_DATA_STORAGE_OBJECT.app_root}cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=${this.viewData.uid}&begin=${start}&ende=${ende}&format=${format}${version ? '&version=' + version : ''}${target ? '&target=' + target : ''}`;
+			return [{ title: "excel", link: download_link('excel') }, { title: "csv", link: download_link('csv') }, { title: "ical1", link: download_link('ical', '1', 'ical') }, { title: "ical2", link: download_link('ical', '2', 'ical') }];
+		},
 		lv_id() { // computed so we can theoretically change path/lva selection and reload without page refresh
 			const pathParts = window.location.pathname.split('/').filter(Boolean);
 			const id = pathParts[pathParts.length - 1];
@@ -35,14 +60,17 @@ export const Stundenplan = {
 			return this.calendarDateToString(this.calendarDate.cdLastDayOfWeek);
 		},
 		monthFirstDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdFirstDayOfCalendarMonth);
+			return this.calendarDateToString(this.eventCalendarDate.cdFirstDayOfCalendarMonth);
 		},
 		monthLastDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdLastDayOfCalendarMonth);
+			return this.calendarDateToString(this.eventCalendarDate.cdLastDayOfCalendarMonth);
 		},
 
 	},
 	methods:{
+		fetchStudiensemesterDetails: async function (date) {
+			return this.$fhcApi.factory.stundenplan.studiensemesterDateInterval(date);
+		},
 		convertTime: function([hour,minute]){
 			let date = new Date();
 			date.setHours(hour);
@@ -66,14 +94,15 @@ export const Stundenplan = {
 		updateRange: function ({start,end}) {
 
 			let checkDate = (date) => {
-				return date.m != this.calendarDate.m || date.y != this.calendarDate.y;
+				return date.m != this.eventCalendarDate.m || date.y != this.eventCalendarDate.y;
 			}
+			this.calendarDate = new CalendarDate(end);
 
 			// only load month data if the month or year has changed
 			if (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end))){
 				// reset the events before querying the new events to activate the loading spinner
 				this.events = null;
-				this.calendarDate = new CalendarDate(end);
+				this.eventCalendarDate = new CalendarDate(end);
 				Vue.nextTick(() => {
 					this.loadEvents();
 				});
@@ -127,6 +156,11 @@ export const Stundenplan = {
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
 	<fhc-calendar @selectedEvent="setSelectedEvent" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
+		<template #calendarDownloads>
+			<div v-for="{title,link} in downloadLinks">
+				<a :href="link" class="m-1 btn btn-outline-secondary">{{title}}</a>
+			</div>
+		</template>
 		<template #monthPage="{event,day}">
 			<span class="fhc-entry" >
 				{{event.topic}}

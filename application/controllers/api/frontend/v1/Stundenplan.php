@@ -33,6 +33,7 @@ class Stundenplan extends FHCAPI_Controller
             'Reservierungen' => self::PERM_LOGGED,
 			'getStundenplan' => self::PERM_LOGGED,
 			'getLehreinheitStudiensemester' => self::PERM_LOGGED,
+			'studiensemesterDateInterval' => self::PERM_LOGGED,
 		]);
 
         $this->load->library('LogLib');
@@ -55,6 +56,15 @@ class Stundenplan extends FHCAPI_Controller
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
+
+	//TODO: delete this function if we don't use the old calendar export endpoints anymore
+	public function studiensemesterDateInterval($date){
+		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
+		$studiensemester =$this->StudiensemesterModel->getByDate(date_format(date_create($date),'Y-m-d'));
+		$studiensemester =current($this->getDataOrTerminateWithError($studiensemester));
+		$this->terminateWithSuccess($studiensemester);
+	}
+		
 
     /**
      * fetches Stunden layout from database
@@ -545,7 +555,7 @@ class Stundenplan extends FHCAPI_Controller
 	private function studienSemesterErmitteln($start_date,$end_date){
 		
 		// gets all studiensemester from the student from start_date to end_date
-		$semester_range = $this->StudiensemesterModel->getByDate($start_date,$end_date);
+		$semester_range = $this->StudiensemesterModel->getByDateRange($start_date,$end_date);
 		$semester_range = array_map( 
 			function($sem)
 			{

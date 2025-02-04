@@ -36,4 +36,10 @@ export default {
 			{}
 		);
 	},
+	studiensemesterDateInterval(date) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Stundenplan/studiensemesterDateInterval/${date}`,
+			{}
+		);
+	},
 };

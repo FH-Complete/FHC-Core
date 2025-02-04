@@ -227,6 +227,9 @@ export default {
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card h-100" :class="sizeClass">
 		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)" @input="handleInput" >
+			<template #calendarDownloads>
+				<slot name="calendarDownloads" ></slot>
+			</template>
 			<template #monthPage="{event,day}">
 				<slot name="monthPage" :event="event" :day="day" ></slot>
 			</template>
