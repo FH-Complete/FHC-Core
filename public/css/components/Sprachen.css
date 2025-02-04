@@ -1,9 +1,9 @@
 .sprachen-entry{
-	background-color: var(--fhc-cis-primary);
+	background-color: var(--fhc-cis-primary-hover);
 }
 
 [selected="true"].sprachen-entry {
-	background-color: var(--fhc-cis-primary-hover);
+	background-color: var(--fhc-cis-primary);
 }
 
 .sprachen-entry.btn {
