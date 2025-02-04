@@ -27,7 +27,7 @@ export default {
 					{field: "uid", type: "=", value: this.student.uid},
 					[
 						{field: "studiensemester_kurzbz", type: "=", value: this.currentSemester},
-						{field: "insertvon", type: "=", value: "mlists_generate"}
+						{field: "studiensemester_kurzbz", type: "=", value: null}
 					]
 				],
 				columns: [
@@ -45,7 +45,6 @@ export default {
 						}
 					},
 					{title: "UID", field: "uid"},
-					{title: "InsertVon", field: "insertvon", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -153,7 +152,7 @@ export default {
 					{field: "uid", type: "=", value: this.student.uid},
 					[
 						{field: "studiensemester_kurzbz", type: "=", value: newVal},
-						{field: "insertvon", type: "=", value: "mlists_generate"}
+						{field: "studiensemester_kurzbz", type: "=", value: null}
 					]
 				]);
 

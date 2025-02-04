@@ -33,7 +33,6 @@ class Gruppen extends FHCAPI_Controller
 		$this->BenutzergruppeModel ->addSelect('generiert');
 		$this->BenutzergruppeModel ->addSelect('uid');
 		$this->BenutzergruppeModel ->addSelect('studiensemester_kurzbz');
-		$this->BenutzergruppeModel ->addSelect('public.tbl_benutzergruppe.insertvon');
 		$this->BenutzergruppeModel ->addJoin('public.tbl_gruppe', 'gruppe_kurzbz');
 		$this->BenutzergruppeModel-> addOrder('bezeichnung', 'ASC');
 
