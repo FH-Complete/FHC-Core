@@ -78,6 +78,11 @@ const app = Vue.createApp({
 		appSideMenuEntries: {}
 	}),
 	components: {},
+	computed: {
+		isMobile() {
+			return /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+		}	
+	},
 	methods: {
 		isInternalRoute(href) {
 			const internalBase = window.location.origin
@@ -97,6 +102,11 @@ const app = Vue.createApp({
 				if(!res?.matched?.length) return
 				
 				event.preventDefault(); // Prevent browser navigation
+				
+				if(this.isMobile) { // toggle the menu
+					document.getElementById('nav-main-btn').click();
+				}
+				
 				this.$router.push(route);
 			}
 		}

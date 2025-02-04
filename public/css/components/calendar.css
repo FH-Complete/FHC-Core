@@ -185,8 +185,25 @@
   aspect-ratio: 1;
 }
 
+
+
+.fhc-calendar-past {
+	background-color:#F5E9D7;
+	border-color: #E8E8E8;
+	opacity: 0.5;
+}
+
 .fhc-calendar-month-page-day-highlight {
-	background-color: #f5f5f5;
+	 /*background-color: #f5f5f5;*/
+	 /*background-color: red;*/
+ }
+.fhc-highlight-week {
+	/*border-color: black !important;*/
+}
+
+.fhc-highlight-day {
+	border-width: 2px !important;
+	border-color: black !important;
 }
 
 .fhc-calendar-sm .fhc-calendar-month-page-day.active .no,

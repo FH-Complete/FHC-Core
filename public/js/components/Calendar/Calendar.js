@@ -8,7 +8,9 @@ import CalendarMinimized from './Minimized.js';
 import CalendarDate from '../../composables/CalendarDate.js';
 import CalendarDates from '../../composables/CalendarDates.js';
 
-// TODO(chris): week/month toggle
+
+const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
+const today = todayDate.getTime()
 
 export default {
 	components: {
@@ -22,6 +24,8 @@ export default {
 	},
 	provide() {
 		return {
+			today,
+			todayDate,
 			date: this.date,
 			focusDate: this.focusDate,
 			size: Vue.computed({ get: () => this.size, set: v => this.size = v }),

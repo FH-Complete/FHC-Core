@@ -17,11 +17,14 @@ export default {
 	data() {
 		return {
 			hourPosition: null,
+			curHourPosition: null,
 			hourPositionTime: null,
 			lvMenu: null,
 		}
 	},
 	inject: [
+		'today',
+		'todayDate',
 		'date',
 		'focusDate',
 		'size',
@@ -107,12 +110,6 @@ export default {
 				datum: this.day.toLocaleString(this.$p.user_locale.value, [{ day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { dateStyle: 'short' }][this.size]),
 			}
 		},
-		dayGridStyle() {
-			return {
-				'grid-template-columns': '1 1fr',
-				'grid-template-rows': 'repeat(' + (this.hours.length * 60 / this.smallestTimeFrame) + ', 1fr)',
-			}
-		},
 		noLvStyle() {
 			return {
 				top: (this.calendarScrollTop + 100) + 'px',
@@ -131,6 +128,22 @@ export default {
 				'z-index': 2,
 				'border-color': '#00649C!important',
 				top: this.hourPosition + 'px',
+				left: 0,
+				right: 0,
+			}
+		},
+		curTime() {
+			const now = new Date();
+			return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+		},
+		curIndicatorStyle() {
+			return {
+				'pointer-events': 'none',
+				'padding-left': '7rem',
+				'margin-top': '-1px',
+				'z-index': 2,
+				'border-color': '#00649C!important',
+				top:  this.getDayTimePercent + '%',
 				left: 0,
 				right: 0,
 			}
@@ -192,8 +205,32 @@ export default {
 		smallestTimeFrame() {
 			return [30, 15, 10, 5][this.size];
 		},
+		lookingAtToday() {
+			return this.date.compare(this.todayDate)
+		},
+		getDayTimePercent() {
+			const now = new Date(Date.now())
+			const currentMinutes = now.getMinutes() + now.getHours() * 60
+			let timePercentage = ((currentMinutes - (this.hours[0] * 60)) / (this.hours.length * 60)) * 100;
+
+			return timePercentage
+		}
 	},
 	methods: {
+		dayGridStyle(day) {
+			const styleObj = {
+				'grid-template-columns': '1 1fr',
+				'grid-template-rows': 'repeat(' + (this.hours.length * 60 / this.smallestTimeFrame) + ', 1fr)',
+			}
+
+			if(this.date.compare(this.todayDate)) {
+				styleObj['backgroundImage'] = 'linear-gradient(to bottom, #F5E9D7 '+this.getDayTimePercent+'%, #FFFFFF '+this.getDayTimePercent+'%)'
+				styleObj['border-color'] = '#E8E8E8';
+				// styleObj.opacity = 0.5; // would opaque the whole column
+			}
+
+			return styleObj
+		},
 		fetchLvMenu(event) {
 			if (event && event.type == 'lehreinheit') {
 				this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]).then(
@@ -270,6 +307,7 @@ export default {
 			// calculate the minutes percentage of the total minutes 
 			timePercentage = ((currentMinutes - (this.hours[0] * 60)) / (this.hours.length * 60)) * 100;
 			// calculate the relative position of the time percentage
+			console.log('height: ', height)
 			position = height * (timePercentage / 100);
 			this.hourPosition = position;
 
@@ -290,12 +328,8 @@ export default {
 		},
 		dateToMinutesOfDay(day) {
 			return Math.floor(((day.getHours() - 7) * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
-		},
+		}
 
-	},
-	mounted() {
-		const container = document.getElementById("calendarContainer")
-		if(container) container.style.overflow = 'hidden'
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-day-page h-100">
@@ -308,7 +342,7 @@ export default {
 							<a href="#" class="small text-secondary text-decoration-none" >{{dayText.datum}}</a>
 						</div>
 					</div>
-					<div id="scroll g-0" style="height: 100%; overflow: scroll;">
+					<div id="scroll g-0" style="height: 100%; overflow-y: scroll;">
 
 						<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
 							<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
@@ -318,6 +352,11 @@ export default {
 									<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 								</div>
 							</Transition>
+							<Transition>
+								<div v-if="lookingAtToday && !noEventsCondition" class="position-absolute border-top small"  :style="curIndicatorStyle">
+									<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
+								</div>
+							</Transition>
 							<div>
 								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
 								<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
@@ -325,7 +364,7 @@ export default {
 									<div class="hours">
 										<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 									</div>
-									<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle">
+									<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
 										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast :selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden " >
 											<!-- desktop version of the page template, parent receives slotProp mobile = false -->
 											<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
@@ -348,7 +387,7 @@ export default {
 					</div>
 				</div>
 			</div>
-			<div class="d-xl-block col-xl-6 p-4" style="max-height: 100%">
+			<div class="d-xl-block col-xl-6 p-4 d-none" style="max-height: 100%">
 				<div style="z-index:0; max-height: 100%" class="sticky-top d-flex justify-content-center align-items-center flex-column">
 					<div style="max-height: 100%; overflow-y:auto;" class="w-100">
 						<template v-if="selectedEvent && lvMenu">

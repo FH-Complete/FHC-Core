@@ -9,6 +9,8 @@ export default {
 		}
 	},
 	inject: [
+		'today',
+		'todayDate',
 		'date',
 		'focusDate',
 		'size',
@@ -63,14 +65,20 @@ export default {
 	methods: {
 		getDayClass(week, day) {
 			let classstring = 'fhc-calendar-month-page-day text-decoration-none overflow-hidden'
-			const isHighlighted = this.isHighlighted(week, day)
+			const isHighlightedWeek = this.isHighlightedWeek(week)
+			const isHighlightedDay = this.isHighlightedDay(day)
 			const isThisDate = this.date.compare(day)
 			const isNotThisMonth = day.getMonth() != this.month
-			const isInThePast = this.date.isInPast(day)
-			if(isHighlighted) classstring += ' fhc-calendar-month-page-day-highlight'
-			if(isThisDate) classstring += ' active'
-			if(isNotThisMonth || isInThePast) classstring += ' opacity-50'
+			const isInThePast = day.getTime() < this.today // this.date is just the focusDate but not the initial Date
 			
+			
+			
+			if(isHighlightedWeek) classstring += ' fhc-highlight-week'
+			if(isHighlightedDay) classstring += ' fhc-highlight-day'
+
+			if(isThisDate) classstring += ' active'
+			if(isNotThisMonth) classstring += ' opacity-25'
+			if(isInThePast) classstring += ' fhc-calendar-past'
 			return classstring
 		},
 		selectDay(day) {
@@ -85,12 +93,14 @@ export default {
 			}
 		},
 		highlight(week, day){
-			console.log('highlight method')
 			this.highlightedWeek = week.no; 
 			this.highlightedDay = day;
 		},
-		isHighlighted(week, day) {
-			return this.noWeekView ? day == this.highlightedDay : week.no == this.highlightedWeek;
+		isHighlightedDay(day) {
+			return day == this.highlightedDay
+		},
+		isHighlightedWeek(week) {
+			return  week.no == this.highlightedWeek
 		},
 		clickEvent(day,week) {
 			if(!this.noWeekView)
@@ -99,12 +109,41 @@ export default {
 				this.$emit('updateMode', 'day');
 			}
 			this.selectDay(day);
-		}
+		},
+		getNumberStyle(day) {
+			
+			// TODO: move this to active css class in calendar.css
+			const styleObj = {}
+			// styleObj.display = 'inline-block';
+			// styleObj.widt = '32px';  /* Adjust based on the calendar cell size */
+			// styleObj.height = '32px';
+			// styleObj['line-height'] = '32px';
+			// styleObj['text-align'] = 'center';
+			// styleObj['font-weight'] = 'bold';
+			// styleObj['font-size'] = '14px';
+			//
+			// if(day.getDate() === this.todayDate.getDate() 
+			// 	&& day.getMonth() === this.todayDate.getMonth() 
+			// 	&& day.getFullYear() === this.todayDate.getFullYear()) {
+			// 	styleObj['background-color'] = '#00649c'; // fh blau
+			// 	styleObj.color = 'white';
+			// } else {
+			// 	// styleObj['background-color'] = '#ffffff'; // fh blau
+			// 	// styleObj.color = 'white'; /* White text for contrast */
+			// }
+			
+			return styleObj
+		} 
 	},
 	mounted() {
 		const container = document.getElementById("calendarContainer")
-		if(container) container.style.overflow = 'scroll'	
+		if(container) container.style['overflow-y'] = 'scroll'
+		
 	},
+	// unmounted() {
+	// 	const container = document.getElementById("calendarContainer")
+	// 	if(container) container.style['overflow-y'] = ''
+	// },
 	template: /*html*/`
 	<div class="fhc-calendar-month-page" :class="{'show-weeks': showWeeks}">
 		<div v-if="showWeeks" class=" bg-light fw-bold border-top border-bottom text-center"></div>
@@ -113,7 +152,8 @@ export default {
 		</div>
 		<template v-for="week in weeks" 
 		:key="week.no">
-			<a href="#" v-if="showWeeks" class="fhc-calendar-month-page-weekday text-decoration-none text-end opacity-25" @click.prevent="changeToWeek(week)">{{week.no}}</a>
+			<a href="#" v-if="showWeeks" class="fhc-calendar-month-page-weekday text-decoration-none text-end opacity-25"
+			@click.prevent="changeToWeek(week)">{{week.no}}</a>
 			<a href="#" 
 			@click.prevent="clickEvent(day,week)" 
 			@mouseover="highlight(week,day)" 
@@ -122,9 +162,10 @@ export default {
 			:key="day"
 			:class="getDayClass(week, day)" 
 			>
-				<span class="no">{{day.getDate()}}</span>
+				<span class="no" :style="getNumberStyle(day)">{{day.getDate()}}</span>
 				<span v-if="events[day.toDateString()] && events[day.toDateString()].length" class="events">
-					<div @click="setSelectedEvent(event);" v-for="event in events[day.toDateString()]" :key="event.id" :style="{'background-color': event.color}" class="fhc-entry" :selected="event == selectedEvent" v-contrast >
+					<div @click="setSelectedEvent(event);" v-for="event in events[day.toDateString()]" :key="event.id" 
+					:style="{'background-color': event.color}" class="fhc-entry" :selected="event == selectedEvent" v-contrast >
 						<slot  name="monthPage" :event="event" :day="day" >
 							<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 						</slot>

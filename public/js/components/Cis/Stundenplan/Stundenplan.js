@@ -151,6 +151,9 @@ export const Stundenplan = {
 	{
 		this.loadEvents();
 	},
+	beforeUnmount() {
+		if(this.$refs.lvmodal) this.$refs.lvmodal.hide()	
+	},
 	template:/*html*/`
 	<h2>{{$p.t('lehre/stundenplan')}}</h2>
 	<hr>
