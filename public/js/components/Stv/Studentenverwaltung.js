@@ -57,6 +57,7 @@ export default {
 			hasPermissionToSkipStatusCheck: this.permissions['student/keine_studstatuspruefung'],
 			hasPermissionRtAufsicht: this.permissions['lehre/reihungstestAufsicht'],
 			lists: this.lists,
+			currentSemester: Vue.computed(() => this.studiensemesterKurzbz),
 			defaultSemester: this.defaultSemester,
 			$reloadList: () => {
 				this.$refs.stvList.reload();
