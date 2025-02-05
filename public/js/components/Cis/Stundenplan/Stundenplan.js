@@ -17,8 +17,12 @@ export const Stundenplan = {
 			studiensemester_kurzbz:null,
 			studiensemester_start:null,
 			studiensemester_ende:null,
+			uid:null,
 		}
 	},
+	props: [
+		"viewData",
+	],
 	watch: {
 		weekFirstDay: {
 			handler: async function (newValue) {
@@ -31,21 +35,18 @@ export const Stundenplan = {
 			immediate: true,
 		}
 	},
-	props: [
-		"viewData",
-	],
 	components: {
 		FhcCalendar, LvModal, LvMenu, LvInfo
 	},
 	computed:{
 		downloadLinks: function(){
-			if(!this.studiensemester_start || !this.studiensemester_ende)return;
+			if(!this.studiensemester_start || !this.studiensemester_ende || !this.uid )return;
 			let start = new Date(this.studiensemester_start);
 			start = Math.floor(start.getTime()/1000);
 			let ende = new Date(this.studiensemester_ende);
 			ende = Math.floor(ende.getTime() / 1000);
 
-			let download_link = (format, version = "", target = "") => `${FHC_JS_DATA_STORAGE_OBJECT.app_root}cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=${this.viewData.uid}&begin=${start}&ende=${ende}&format=${format}${version ? '&version=' + version : ''}${target ? '&target=' + target : ''}`;
+			let download_link = (format, version = "", target = "") => `${FHC_JS_DATA_STORAGE_OBJECT.app_root}cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=${this.uid}&begin=${start}&ende=${ende}&format=${format}${version ? '&version=' + version : ''}${target ? '&target=' + target : ''}`;
 			return [{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link('excel') }, { title: "csv", icon: 'fa-solid fa-file-csv', link: download_link('csv') }, { title: "ical1", icon: 'fa-regular fa-calendar', link: download_link('ical', '1', 'ical') }, { title: "ical2", icon: 'fa-regular fa-calendar', link: download_link('ical', '2', 'ical') }];
 		},
 		lv_id() { // computed so we can theoretically change path/lva selection and reload without page refresh
@@ -149,6 +150,10 @@ export const Stundenplan = {
 	},
 	created()
 	{
+		this.$fhcApi.factory.authinfo.getAuthUID().then((res) => res.data)
+		.then(data=>{
+			this.uid = data.uid;
+		})
 		this.loadEvents();
 	},
 	beforeUnmount() {
