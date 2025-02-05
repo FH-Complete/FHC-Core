@@ -104,7 +104,9 @@ const app = Vue.createApp({
 				event.preventDefault(); // Prevent browser navigation
 				
 				if(this.isMobile) { // toggle the menu
-					document.getElementById('nav-main-btn').click();
+					const navMain = document.getElementById('nav-main');
+					// fix unwanted toggle from off to on for some links on mobile
+					if(navMain.classList.contains('show')) document.getElementById('nav-main-btn').click();
 				}
 				
 				this.$router.push(route);

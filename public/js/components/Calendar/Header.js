@@ -13,11 +13,9 @@ export default {
 	inject: [
 		'eventsAreNull',
 		'size',
-		'classHeader',
 		'mode',
 		'noWeekView',
 		'noMonthView',
-		'widget'
 	],
 	props: {
 		title: String
@@ -28,25 +26,8 @@ export default {
 		'next',
 		'click'
 	],
-	computed: {
-		myClassHeader() {
-			// TODO(chris): + {'btn-sm': !this.size}
-			let c = this.classHeader;
-			if (Array.isArray(c)) {
-				if (!this.size)
-					c.push('btn-sm');
-			} else if (typeof c === 'string' || c instanceof String) {
-				if (!this.size)
-					c += ' btn-sm';
-			} else {
-				c['btn-sm'] = !this.size;
-			}
-
-			return c;
-		}
-	},
 	template: /*html*/`
-	<div class="calendar-header card-header w-100" :class="classHeader">
+	<div class="calendar-header card-header w-100">
 		<div class="row align-items-center ">
 			<div  class=" col-12 col-md-3 d-flex justify-content-center justify-content-md-start align-items-center">
 				<slot name="calendarDownloads"></slot>

@@ -18,7 +18,7 @@ export default {
 		'showWeeks',
 		'noWeekView',
 		'selectedEvent',
-		'setSelectedEvent',
+		'setSelectedEvent'
 	],
 	props: {
 		year: Number,
@@ -71,12 +71,9 @@ export default {
 			const isNotThisMonth = day.getMonth() != this.month
 			const isInThePast = day.getTime() < this.today // this.date is just the focusDate but not the initial Date
 			
-			
-			
 			if(isHighlightedWeek) classstring += ' fhc-highlight-week'
 			if(isHighlightedDay) classstring += ' fhc-highlight-day'
-
-			if(isThisDate) classstring += ' active'
+			
 			if(isNotThisMonth) classstring += ' opacity-25'
 			if(isInThePast) classstring += ' fhc-calendar-past'
 			return classstring
@@ -112,38 +109,29 @@ export default {
 		},
 		getNumberStyle(day) {
 			
-			// TODO: move this to active css class in calendar.css
 			const styleObj = {}
-			// styleObj.display = 'inline-block';
-			// styleObj.widt = '32px';  /* Adjust based on the calendar cell size */
-			// styleObj.height = '32px';
-			// styleObj['line-height'] = '32px';
-			// styleObj['text-align'] = 'center';
-			// styleObj['font-weight'] = 'bold';
-			// styleObj['font-size'] = '14px';
-			//
-			// if(day.getDate() === this.todayDate.getDate() 
-			// 	&& day.getMonth() === this.todayDate.getMonth() 
-			// 	&& day.getFullYear() === this.todayDate.getFullYear()) {
-			// 	styleObj['background-color'] = '#00649c'; // fh blau
-			// 	styleObj.color = 'white';
-			// } else {
-			// 	// styleObj['background-color'] = '#ffffff'; // fh blau
-			// 	// styleObj.color = 'white'; /* White text for contrast */
-			// }
+			styleObj.display = 'inline-block';
+			styleObj.height = '32px';
+			styleObj['line-height'] = '32px';
+			styleObj['text-align'] = 'center';
+			styleObj['font-weight'] = 'bold';
+			styleObj['font-size'] = '14px';
+
+			if(day.getDate() === this.todayDate.getDate() 
+				&& day.getMonth() === this.todayDate.getMonth() 
+				&& day.getFullYear() === this.todayDate.getFullYear()) {
+				styleObj['background-color'] = '#00649c'; // fh blau
+				styleObj.color = 'white';
+			}
 			
 			return styleObj
 		} 
 	},
 	mounted() {
 		const container = document.getElementById("calendarContainer")
-		if(container) container.style['overflow-y'] = 'scroll'
+		if(container) container.style['overflow-y'] = 'auto'
 		
 	},
-	// unmounted() {
-	// 	const container = document.getElementById("calendarContainer")
-	// 	if(container) container.style['overflow-y'] = ''
-	// },
 	template: /*html*/`
 	<div class="fhc-calendar-month-page" :class="{'show-weeks': showWeeks}">
 		<div v-if="showWeeks" class=" bg-light fw-bold border-top border-bottom text-center"></div>
@@ -173,5 +161,6 @@ export default {
 				</span>
 			</a>
 		</template>
-	</div>`
+	</div>
+`
 }

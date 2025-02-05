@@ -36,6 +36,9 @@ export default {
 		'input',
 	],
 	computed: {
+		laneWidth() {
+			return this.width / this.days.length
+		},
 		curTime() {
 			const now = new Date();
 			return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
@@ -137,10 +140,6 @@ export default {
 			)
 		},
 		curIndicatorStyle() {
-			const todayIndex = this.days.findIndex(d => d.getFullYear() === this.todayDate.getFullYear() &&
-				d.getMonth() === this.todayDate.getMonth() &&
-				d.getDate() === this.todayDate.getDate()
-			)
 
 			return {
 				'pointer-events': 'none',
@@ -149,8 +148,7 @@ export default {
 				'z-index': 2,
 				'border-color': '#00649C!important',
 				top: this.getDayTimePercent + '%',
-				left: 'calc(('+this.width+'px + 3em) /'+this.days.length+'*'+todayIndex+')',
-				right: 'calc(('+this.width+'px - 3em)/'+this.days.length+'*'+(this.days.length - 1 - todayIndex)+')',
+				width: this.laneWidth + 'px' // todo: manage the real value of 1fr somehow
 			}
 		},
 		getDayTimePercent() {
@@ -314,16 +312,17 @@ export default {
 						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 					</div>
 				</Transition>
-				<Transition>
-					<div v-if="lookingAtToday" class="position-absolute border-top small"  :style="curIndicatorStyle">
-						<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
-					</div>
-				</Transition>
+				
 				<div class="events" :ref="'eventsRef'+week">
 					<div class="hours">
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
+						<Transition>
+							<div v-if="day.isToday" class="position-absolute border-top small"  :style="curIndicatorStyle">
+								<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
+							</div>
+						</Transition>
 						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" 
 						:selected="event.orig == selectedEvent"
 						:style="eventGridStyle(day,event)"
@@ -331,7 +330,7 @@ export default {
 						v-contrast >
 							<slot name="weekPage" :event="event" :day="day">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
-							</slot>
+							</slot>		
 						</div>
 						
 					</div>

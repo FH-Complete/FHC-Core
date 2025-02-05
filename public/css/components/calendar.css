@@ -131,19 +131,19 @@
 .fhc-calendar-md .fhc-calendar-month-page-day.active {
   border-color: var(--bs-secondary);
 }
-.fhc-calendar-lg .fhc-calendar-month-page-day .events,
-.fhc-calendar-md .fhc-calendar-month-page-day .events {
-  display: block;
-  overflow: auto;
-  font-size: 0.7em;
-}
-.fhc-calendar-lg .fhc-calendar-month-page-day .events span,
-.fhc-calendar-md .fhc-calendar-month-page-day .events span {
-  display: block;
-  margin: 0.2em;
-  padding: 0.1em 0.4em;
-  border-radius: 0.1em;
-}
+/*.fhc-calendar-lg .fhc-calendar-month-page-day .events,*/
+/*.fhc-calendar-md .fhc-calendar-month-page-day .events {*/
+/*  display: block;*/
+/*  overflow: auto;*/
+/*  font-size: 0.7em;*/
+/*}*/
+/*.fhc-calendar-lg .fhc-calendar-month-page-day .events span,*/
+/*.fhc-calendar-md .fhc-calendar-month-page-day .events span {*/
+/*  display: block;*/
+/*  margin: 0.2em;*/
+/*  padding: 0.1em 0.4em;*/
+/*  border-radius: 0.1em;*/
+/*}*/
 .fhc-calendar-lg .fhc-calendar-years .col-4,
 .fhc-calendar-md .fhc-calendar-years .col-4 {
   padding: 0.09375em 0;
@@ -217,25 +217,25 @@
   background-color: rgba(var(--bs-secondary-rgb), 0.25);
   border-radius: 50%;
 }
-.fhc-calendar-sm .fhc-calendar-month-page-day .no,
-.fhc-calendar-xs .fhc-calendar-month-page-day .no {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 80%;
-  height: 80%;
-  margin: 10%;
-}
-.fhc-calendar-sm .fhc-calendar-month-page-day .events,
-.fhc-calendar-xs .fhc-calendar-month-page-day .events {
-  position: absolute;
-  bottom: 0;
-  left: 10%;
-  width: 80%;
-  height: 10%;
-  overflow: hidden;
-  display: flex;
-}
+/*.fhc-calendar-sm .fhc-calendar-month-page-day .no,*/
+/*.fhc-calendar-xs .fhc-calendar-month-page-day .no {*/
+/*  display: flex;*/
+/*  align-items: center;*/
+/*  justify-content: center;*/
+/*  width: 80%;*/
+/*  height: 80%;*/
+/*  margin: 10%;*/
+/*}*/
+/*.fhc-calendar-sm .fhc-calendar-month-page-day .events,*/
+/*.fhc-calendar-xs .fhc-calendar-month-page-day .events {*/
+/*  position: absolute;*/
+/*  bottom: 0;*/
+/*  left: 10%;*/
+/*  width: 80%;*/
+/*  height: 10%;*/
+/*  overflow: hidden;*/
+/*  display: flex;*/
+/*}*/
 .fhc-calendar-sm .fhc-calendar-month-page-day .events span,
 .fhc-calendar-xs .fhc-calendar-month-page-day .events span {
   overflow: hidden;

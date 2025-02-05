@@ -103,7 +103,7 @@ export default {
 			}
 		},
 		dayText(){
-			if(!this.size || !this.day)return {};
+			if(!this.day)return {};
 			return {
 				heading: this.day.toLocaleString(this.$p.user_locale.value, { dateStyle: 'short' }),
 				tag: this.day.toLocaleString(this.$p.user_locale.value, { weekday: this.size < 2 ? 'narrow' : (this.size < 3 ? 'short' : 'long') }),
