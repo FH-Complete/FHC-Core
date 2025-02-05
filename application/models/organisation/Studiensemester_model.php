@@ -181,7 +181,7 @@ class Studiensemester_model extends DB_Model
 		$query = "
 			SELECT  studiensemester_kurzbz, start, ende
 			FROM	public.tbl_studiensemester
-			WHERE   ( ende >= ?::date AND start <= ?::date ) OR ( ende >= ?::date + '45 days'::interval AND start <= ?::date + '45 days'::interval )
+			WHERE   ( ende >= ?::date AND start <= ?::date ) OR ( ende >= ?::date + '-45 days'::interval AND start <= ?::date + '-45 days'::interval )
 			ORDER BY start DESC
 			LIMIT 1";
 
