@@ -33524,26 +33524,6 @@ array(
 			)
 		)
 	),
-	array(
-		'app' => 'core',
-		'category' => 'person',
-		'phrase' => 'bankverbindung',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Bankverbindung',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'bank details',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
 	//Status
 	array(
 		'app' => 'core',
