@@ -199,11 +199,7 @@ class CalendarDate {
 			return true;
 		return false;
 	}
-	isInPast(d) {
-		if (this.isDate(d))
-			return (this.y > d.getFullYear() || this.m > d.getMonth() || this.d > d.getDate());
-		return false
-	}
+	
 	setLocale(locale) {
 		this.weekStart = CalendarDate.getWeekStart(locale);
 	}
@@ -260,6 +256,5 @@ CalendarDate.getWeekStart = function(locale) {
 		return 1;
 	}
 }
-
 
 export default CalendarDate

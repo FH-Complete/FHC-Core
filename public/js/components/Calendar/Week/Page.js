@@ -9,9 +9,13 @@ export default {
 		return{
 			hourPosition:null,
 			hourPositionTime:null,
+			resizeObserver: null,
+			width: 0
 		}
 	},
 	inject: [
+		'today',
+		'todayDate',
 		'date',
 		'focusDate',
 		'size',
@@ -32,6 +36,13 @@ export default {
 		'input',
 	],
 	computed: {
+		laneWidth() {
+			return this.width / this.days.length
+		},
+		curTime() {
+			const now = new Date();
+			return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+		},
 		pageHeaderStyle(){
 			return {
 				'z-index': 4,
@@ -91,7 +102,9 @@ export default {
 				let nextDay = new Date(day);
 				nextDay.setDate(nextDay.getDate()+1);
 				nextDay.setMilliseconds(nextDay.getMilliseconds()-1);
-				let d = {events:[],lanes:1};
+				let d = {events:[],lanes:1, isPast: false};
+				d.isPast = nextDay.getTime() < this.today
+				d.isToday = nextDay.getFullYear() === this.todayDate.getFullYear() && nextDay.getMonth() === this.todayDate.getMonth() && nextDay.getDate() === this.todayDate.getDate()
 				if (this.events[key]) {
 					this.events[key].forEach(evt => {
 						let event = {orig:evt,lane:1,maxLane:1,start: evt.start < day ? day : evt.start, end: evt.end > nextDay ? nextDay : evt.end,shared:[],setSharedMaxRecursive(doneItems) {
@@ -118,6 +131,32 @@ export default {
 		},
 		smallestTimeFrame() {
 			return [30,15,10,5][this.size];
+		},
+		lookingAtToday() {
+			return this.days.some(d => 
+				d.getFullYear() === this.todayDate.getFullYear() &&
+				d.getMonth() === this.todayDate.getMonth() &&
+				d.getDate() === this.todayDate.getDate()
+			)
+		},
+		curIndicatorStyle() {
+
+			return {
+				'pointer-events': 'none',
+				'padding-left': '1rem',
+				'margin-top': '-1px',
+				'z-index': 2,
+				'border-color': '#00649C!important',
+				top: this.getDayTimePercent + '%',
+				width: this.laneWidth + 'px' // todo: manage the real value of 1fr somehow
+			}
+		},
+		getDayTimePercent() {
+			const now = new Date(Date.now())
+			const currentMinutes = now.getMinutes() + now.getHours() * 60
+			let timePercentage = ((currentMinutes - (this.hours[0] * 60)) / (this.hours.length * 60)) * 100;
+
+			return timePercentage
 		}
 	}, 
 	methods: {
@@ -135,10 +174,23 @@ export default {
 			}
 		},
 		dayGridStyle(day) {
-			return {
+			const styleObj = {
 				'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)',
 				'grid-template-rows': 'repeat(' + (this.hours.length * 60 / this.smallestTimeFrame) + ', 1fr)',
 			}
+			
+			if(day.isPast) {
+				styleObj['background-color'] = '#F5E9D7'
+				styleObj['border-color'] = '#E8E8E8';
+				styleObj.opacity = 0.5;
+			} else if (day.isToday) {
+				
+				styleObj['backgroundImage'] = 'linear-gradient(to bottom, #F5E9D7 '+this.getDayTimePercent+'%, #FFFFFF '+this.getDayTimePercent+'%)'
+				styleObj['border-color'] = '#E8E8E8';
+				styleObj.opacity = 0.5;
+			}
+			
+			return styleObj
 		},
 		eventGridStyle(day, event) {
 			return {
@@ -208,17 +260,44 @@ export default {
 			this.setSelectedEvent(event);
 			this.focusDate.set(new CalendarDate(new Date(event.datum)));
 			this.$emit('input', event)
-		}
+		},
+		initResizeObserver() {
+			const events = this.$refs['eventsRef'+this.week];
+			if (!events) return;
+
+			this.resizeObserver = new ResizeObserver((entries) => {
+				for (let entry of entries) {
+					const { width, height } = entry.contentRect;
+					if(width > 0) this.width = width
+				}
+			});
+
+			this.resizeObserver.observe(events);
+		},
+		destroyResizeObserver() {
+			if (this.resizeObserver) {
+				this.resizeObserver.disconnect();
+				this.resizeObserver = null;
+			}
+		},
 	},
 	mounted() {
 
 		setTimeout(() => this.$refs.eventcontainer.scrollTop = this.$refs.eventcontainer.scrollHeight / 3 + 1, 0);
 
 		const container = document.getElementById("calendarContainer")
-		if(container) container.style.overflow = 'scroll'
+		if(container) {
+			container.style['overflow-y'] = 'scroll'
+			container.style['overflow-x'] = 'auto'
+		}
+
+		this.initResizeObserver();
+	},
+	beforeUnmount() {
+		this.destroyResizeObserver();
 	},
 	template: /*html*/`
-	<div class="fhc-calendar-week-page" style="min-width: 700px;">
+	<div ref="page" class="fhc-calendar-week-page" style="min-width: 700px;">
 		<div class="d-flex flex-column">
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
 				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="dayText[day]?.heading" @click.prevent="changeToMonth(day)">
@@ -233,19 +312,25 @@ export default {
 						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 					</div>
 				</Transition>
-				<div class="events">
+				
+				<div class="events" :ref="'eventsRef'+week">
 					<div class="hours">
 						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
+						<Transition>
+							<div v-if="day.isToday" class="position-absolute border-top small"  :style="curIndicatorStyle">
+								<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
+							</div>
+						</Transition>
 						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" 
 						:selected="event.orig == selectedEvent"
 						:style="eventGridStyle(day,event)"
 						class="mx-2 small rounded overflow-hidden fhc-entry "
 						v-contrast >
-						<slot name="weekPage" :event="event" :day="day">
+							<slot name="weekPage" :event="event" :day="day">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
-							</slot>
+							</slot>		
 						</div>
 						
 					</div>

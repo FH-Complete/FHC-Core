@@ -178,7 +178,7 @@ export default {
 					<div v-if="events === null" class="d-flex h-100 justify-content-center align-items-center">
 						<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 					</div>
-					<template ref="allWeek" v-else-if="allEventsGrouped.size" v-for="([key, value], index) in allEventsGrouped" :key="index" style="margin-top: 8px;">
+					<template v-else-if="allEventsGrouped.size" v-for="([key, value], index) in allEventsGrouped" :key="index" style="margin-top: 8px;">
 						<div class="card-header d-grid p-0">
 							<button class="btn btn-link link-secondary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"})}}</button>
 						</div>

@@ -13,11 +13,9 @@ export default {
 	inject: [
 		'eventsAreNull',
 		'size',
-		'classHeader',
 		'mode',
 		'noWeekView',
 		'noMonthView',
-		'widget'
 	],
 	props: {
 		title: String
@@ -28,30 +26,13 @@ export default {
 		'next',
 		'click'
 	],
-	computed: {
-		getHeaderOffsetClass() {
-			return 'col offset-0' + (this.widget ? '' : ' offset-md-3')
-		},
-		myClassHeader() {
-			// TODO(chris): + {'btn-sm': !this.size}
-			let c = this.classHeader;
-			if (Array.isArray(c)) {
-				if (!this.size)
-					c.push('btn-sm');
-			} else if (typeof c === 'string' || c instanceof String) {
-				if (!this.size)
-					c += ' btn-sm';
-			} else {
-				c['btn-sm'] = !this.size;
-			}
-
-			return c;
-		}
-	},
 	template: /*html*/`
-	<div class="calendar-header card-header w-100" :class="classHeader">
+	<div class="calendar-header card-header w-100">
 		<div class="row align-items-center ">
-			<div :class="getHeaderOffsetClass" :style="{'padding-left':headerPadding}">
+			<div  class=" col-12 col-md-3 d-flex justify-content-center justify-content-md-start align-items-center">
+				<slot name="calendarDownloads"></slot>
+			</div>
+			<div class="col-12 col-md-6" :style="{'padding-left':headerPadding}">
 				<div class="row align-items-center justify-content-center">
 					<div class="col-auto ">
 						<button class="btn btn-outline-secondary border-0" :class="{'btn-sm':!this.size}" @click="$emit('prev')"><i class="fa fa-chevron-left"></i></button>
