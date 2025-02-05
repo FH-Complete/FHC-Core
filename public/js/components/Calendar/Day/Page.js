@@ -93,6 +93,18 @@ export default {
 		}
 	},
 	computed: {
+		overlayStyle() {
+			return {
+				'background-color': '#F5E9D7',
+				'position': 'absolute',
+				'pointer-events': 'none',
+				'z-index': 2,
+				height:  this.getDayTimePercent + '%',
+				width: '100%',
+				opacity: 0.5,
+				overflow: 'hidden'
+			}
+		},
 		pageHeaderStyle() {
 			return {
 				'z-index': 4,
@@ -307,7 +319,6 @@ export default {
 			// calculate the minutes percentage of the total minutes 
 			timePercentage = ((currentMinutes - (this.hours[0] * 60)) / (this.hours.length * 60)) * 100;
 			// calculate the relative position of the time percentage
-			console.log('height: ', height)
 			position = height * (timePercentage / 100);
 			this.hourPosition = position;
 
@@ -365,6 +376,7 @@ export default {
 										<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 									</div>
 									<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
+										<div v-if="lookingAtToday && !noEventsCondition" :style="overlayStyle"></div>
 										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast :selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden " >
 											<!-- desktop version of the page template, parent receives slotProp mobile = false -->
 											<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">

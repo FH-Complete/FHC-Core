@@ -8,7 +8,6 @@ import CalendarMinimized from './Minimized.js';
 import CalendarDate from '../../composables/CalendarDate.js';
 import CalendarDates from '../../composables/CalendarDates.js';
 
-
 const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
 const today = todayDate.getTime()
 
