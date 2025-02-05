@@ -46,7 +46,7 @@ export const Stundenplan = {
 			ende = Math.floor(ende.getTime() / 1000);
 
 			let download_link = (format, version = "", target = "") => `${FHC_JS_DATA_STORAGE_OBJECT.app_root}cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=${this.viewData.uid}&begin=${start}&ende=${ende}&format=${format}${version ? '&version=' + version : ''}${target ? '&target=' + target : ''}`;
-			return [{ title: "excel", link: download_link('excel') }, { title: "csv", link: download_link('csv') }, { title: "ical1", link: download_link('ical', '1', 'ical') }, { title: "ical2", link: download_link('ical', '2', 'ical') }];
+			return [{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link('excel') }, { title: "csv", icon: 'fa-solid fa-file-csv', link: download_link('csv') }, { title: "ical1", icon: 'fa-regular fa-calendar', link: download_link('ical', '1', 'ical') }, { title: "ical2", icon: 'fa-regular fa-calendar', link: download_link('ical', '2', 'ical') }];
 		},
 		lv_id() { // computed so we can theoretically change path/lva selection and reload without page refresh
 			const pathParts = window.location.pathname.split('/').filter(Boolean);
@@ -160,8 +160,13 @@ export const Stundenplan = {
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
 	<fhc-calendar @selectedEvent="setSelectedEvent" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
 		<template #calendarDownloads>
-			<div v-for="{title,link} in downloadLinks">
-				<a :href="link" class="m-1 btn btn-outline-secondary">{{title}}</a>
+			<div v-for="{title,icon,link} in downloadLinks">
+				<a :href="link" :title="title" class="py-1 px-2 m-1 btn btn-outline-secondary">
+					<div class="d-flex flex-column">
+						<i :class="icon"></i>
+						<span class="small">{{title}}</span>
+					</div>
+				</a>
 			</div>
 		</template>
 		<template #monthPage="{event,day}">
