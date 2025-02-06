@@ -13,7 +13,7 @@ export default {
 	},
 	props: {
 		bisio_id: {
-			type: [Number],
+			type: [Number, null],
 			required: true
 		},
 		listPurposes: {
