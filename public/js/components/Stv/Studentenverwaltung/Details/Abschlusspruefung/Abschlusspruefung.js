@@ -49,6 +49,9 @@ export default {
 		},
 		stg_kz(){
 			return this.studentKzs[0];
+		},
+		showAllFormats() {
+			return this.isBerechtigtDocAndOdt.includes(this.stgInfo.oe_kurzbz);
 		}
 	},
 	props: {
@@ -214,8 +217,7 @@ export default {
 				mitarbeiter: null,
 				pruefer: null
 			},
-			stgTyp: null,
-			stgKz: null,
+			stgInfo: { typ: '', oe_kurzbz: '' }
 		}
 	},
 	watch: {
@@ -223,14 +225,14 @@ export default {
 			if (this.$refs.table) {
 				this.$refs.table.reloadTable();
 			}
-			this.getStudiengangsTyp();
+			this.getStudiengangByKz();
 		}
 	},
 	methods: {
-		getStudiengangsTyp(){
-			this.stgTyp = '';
-			this.$fhcApi.factory.stv.abschlusspruefung.getTypStudiengang(this.stg_kz)
-					.then(result => this.stgTyp = result.data)
+		getStudiengangByKz(){
+			this.stgInfo = { typ: '', oe_kurzbz: '' };
+			this.$fhcApi.factory.studiengang.getStudiengangByKz(this.stg_kz)
+					.then(result => this.stgInfo = result.data)
 					.catch(this.$fhcAlert.handleSystemError);
 		},
 		actionNewAbschlusspruefung() {
@@ -352,17 +354,17 @@ export default {
 			this.resetForm();
 			//TODO(Manu) test with uid in browser
 			//check lg: if no prüfungsnotizen
-			if (this.stgTyp === 'b') {
-		//	if (this.stgTyp === 'b' || this.formData.pruefungstyp_kurzbz == 'Bachelor') {
+			if (this.stgInfo.typ === 'b') {
+		//	if (this.stgInfo.typ === 'b' || this.formData.pruefungstyp_kurzbz == 'Bachelor') {
 				this.formData.pruefungstyp_kurzbz = 'Bachelor';
 
 				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
-			if (this.stgTyp === 'd' || this.stgTyp === 'm') {
+			if (this.stgInfo.typ === 'd' || this.stgInfo === 'm') {
 				this.formData.pruefungstyp_kurzbz = 'Diplom';
 				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
-			if (this.stgTyp === 'lg') {
+			if (this.stgInfo.typ === 'lg') {
 				this.formData.pruefungstyp_kurzbz = 'lgabschluss';
 			}
 
@@ -401,14 +403,14 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		if (!this.student.length) {
-			this.$fhcApi.factory.stv.abschlusspruefung.getTypStudiengang(this.student.studiengang_kz)
+			this.$fhcApi.factory.studiengang.getStudiengangByKz(this.student.studiengang_kz)
 				.then(result => {
-					this.stgTyp = result.data;
+					this.stgInfo = result.data;
 					this.setDefaultFormData();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		} else
-			this.getStudiengangsTyp();
+			this.getStudiengangByKz();
 	},
 	template: `
 	<div class="stv-details-abschlusspruefung h-100 pb-3">
@@ -416,10 +418,10 @@ export default {
 		
 		<div v-if="this.student.length">
 			<abschlusspruefung-dropdown
-				:showAllFormats="isBerechtigtDocAndOdt"
+				:showAllFormats="showAllFormats"
 				:studentUids="studentUids"
 				:showDropDownMulti="true"
-				:stgTyp="stgTyp"
+				:stgTyp="stgInfo.typ"
 				:stgKz="stg_kz"
 				:cisRoot="cisRoot"
 				@linkGenerated="printDocument"
@@ -462,7 +464,7 @@ export default {
 				</form-input>
 				<form-input
 					container-class="col-6 stv-details-abschlusspruefung-note"
-					:label="$p.t('lehre', 'note')"
+					:label="$p.t('abschlusspruefung', 'notekommpruefung')"
 					type="select"
 					v-model="formData.note"
 					name="note"
@@ -759,7 +761,7 @@ export default {
 		</form-form>
 		<Teleport v-for="data in tabulatorData" :key="data.abschlusspruefung_id" :to="data.actionDiv">
 			<abschlusspruefung-dropdown
-				:showAllFormats="isBerechtigtDocAndOdt"
+				:showAllFormats="showAllFormats"
 				:showDropDownMulti="false"
 				:abschlusspruefung_id="data.abschlusspruefung_id"
 				:studentUids="data.student_uid"
