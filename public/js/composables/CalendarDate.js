@@ -1,6 +1,11 @@
 import {user_locale} from "../plugin/Phrasen.js";
 import CalendarDates from "./CalendarDates.js";
 
+const monthDayRanges = []
+for(let i = 1; i < 13; i++) {
+	monthDayRanges.push(new Date(1995, i, 0).getDate())
+}
+
 class CalendarDate {
 	constructor(y, m, d) {
 		this.weekStart = CalendarDate.getWeekStart();
@@ -209,6 +214,15 @@ class CalendarDate {
 	}
 	cleanup(){
 		if(this.watchLocale && this.watchLocale.stop) this.watchLocale.stop(); // TODO: ?
+	}
+	moveMonthInDirection (dir) {
+		// avoid setting date in wrong month if we try to create a date which does not exist like 30th of february
+		const newM = this.m + dir
+		const maxDaysTarget = monthDayRanges[newM]
+
+		if (this.d > maxDaysTarget) this.d = maxDaysTarget
+		
+		this.m = newM // calls _clean which sets a new Date
 	}
 }
 /**
