@@ -192,8 +192,7 @@ export default {
 					</form-input>
 					<form-input
 						v-if="!config.hiddenFields.includes('person_id')"
-						container-class="col-4 stv-details-prestudent-person_id"
-						container-class="col-3"
+						container-class="col-3 stv-details-prestudent-person_id"
 						label="Person_id"
 						type="text"
 						v-model="data.person_id"
