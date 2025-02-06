@@ -145,7 +145,7 @@ export default {
 						>
 					</form-input>
 					<div v-if="showZugangscode && !config.hiddenFields.includes('zugangscode')" class="col-4 stv-details-details-zugangscode">
-						<label>{{$p.t('person', 'zugangscode')}}</label>
+						<label>{{$p.t('global', 'zugangscode')}}</label>
 						<div class="align-self-center">
 							<span class="form-text">
 								<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat" target="_blank">{{data.zugangscode}}</a>

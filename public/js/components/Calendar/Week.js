@@ -40,7 +40,11 @@ export default {
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-week">
-		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'weeks')"/>
+		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'weeks')">
+			<template #calendarDownloads>
+				<slot name="calendarDownloads"></slot>
+			</template>
+		</calendar-header>
 		<calendar-pane ref="pane" v-slot="slot" @slid="paneChanged">
 			<calendar-week-page :year="focusDate.wYear" :week="focusDate.w+slot.offset" @updateMode="$emit('updateMode', $event)" @page:back="prev" @page:forward="next" @input="selectEvent" >
 				<template #weekPage="{event,day}">

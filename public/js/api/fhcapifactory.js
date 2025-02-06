@@ -36,6 +36,7 @@ import addons from "./addons.js";
 import studiengang from "./studiengang.js";
 import menu from "./menu.js";
 import dashboard from "./dashboard.js";
+import authinfo from "./authinfo.js";
 
 export default {
     search,
@@ -59,4 +60,5 @@ export default {
     addons,
 	studiengang,
 	menu,
+	authinfo,
 };

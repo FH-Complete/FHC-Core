@@ -120,8 +120,6 @@ export default {
 			.catch((err) => {
 				console.error("ERROR: ", err);
 			});
-	
-		
 		
 	},
 	mounted() {
@@ -141,10 +139,13 @@ export default {
 			}
 			}).observe(this.$refs.container);
 		}
-		this.carouselInstance = new bootstrap.Carousel(this.$refs.carousel, {
-			wrap: false, // keep this off even though it actually wraps
-			interval: false
-		});
+		Vue.nextTick(()=>{
+			this.carouselInstance = new bootstrap.Carousel(this.$refs.carousel, {
+				wrap: false, // keep this off even though it actually wraps
+				interval: false
+			});
+		})
+		
 	},
 	template: /*html*/ `
 <div ref="container" class="widgets-news h-100" :class="sizeClass" :style="getNewsWidgetStyle">
@@ -177,9 +178,8 @@ export default {
 				<div class="container h-100" style="padding: 0px;"  ref="carocontainer">
 					<div id="FhcCarouselContainer" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel" data-bs-ride="carousel" data-bs-interval="false">
 
-					<div class="carousel-inner" ref="carouselInner"  style="height: 100%; max-width: 100%;">
-							<div ref="carouselItems" v-for="(news, index) in newsList" class="carousel-item " style="overflow-y: auto; height: 100%;" :id="'card-'+news.news_id" v-html="news.content_obj.content">
-							</div>
+						<div class="carousel-inner" ref="carouselInner"  style="height: 100%; max-width: 100%;">
+							<div ref="carouselItems" v-for="(news, index) in newsList" class="carousel-item " style="overflow-y: auto; overflow-x: hidden; height: 100%;" :id="'card-'+news.news_id" v-html="news.content_obj.content"/>
 						</div>
 						<button @click="setPrev" @focus="$event.target.blur()" style="z-index: 100; color: black; overflow: hidden; margin-left: 10px; width:35px;" data-bs-target="#FhcCarouselContainer" class="carousel-control-prev" type="button">
 							<div class="border rounded-circle" style="padding-left: 0.4rem; padding-right: 0.4rem; background-color:rgba(138,138,138,0.4)">

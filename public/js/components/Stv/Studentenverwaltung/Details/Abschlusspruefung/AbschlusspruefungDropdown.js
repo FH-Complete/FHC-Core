@@ -14,7 +14,7 @@ export default {
 	],
 	props: {
 		studentUids: {
-			type: Array,
+			type: [Array, String],
 			required: true,
 			default: () => []
 		},
@@ -24,7 +24,7 @@ export default {
 		},
 		stgTyp: {
 			type: String,
-			required: true
+			required: false
 		},
 		cisRoot: {
 			type: String,
@@ -36,11 +36,11 @@ export default {
 		},
 		abschlusspruefung_id: {
 			type: Number,
-			required: true
+			required: false
 		},
 		stgPrfgTyp: {
 			type: String,
-			required: true
+			required: false
 		},
 		showAllFormats: {
 			type: Boolean,

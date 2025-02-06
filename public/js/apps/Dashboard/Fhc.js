@@ -78,6 +78,11 @@ const app = Vue.createApp({
 		appSideMenuEntries: {}
 	}),
 	components: {},
+	computed: {
+		isMobile() {
+			return /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+		}	
+	},
 	methods: {
 		isInternalRoute(href) {
 			const internalBase = window.location.origin
@@ -97,6 +102,13 @@ const app = Vue.createApp({
 				if(!res?.matched?.length) return
 				
 				event.preventDefault(); // Prevent browser navigation
+				
+				if(this.isMobile) { // toggle the menu
+					const navMain = document.getElementById('nav-main');
+					// fix unwanted toggle from off to on for some links on mobile
+					if(navMain.classList.contains('show')) document.getElementById('nav-main-btn').click();
+				}
+				
 				this.$router.push(route);
 			}
 		}

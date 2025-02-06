@@ -439,7 +439,6 @@ export default{
 							type="text"
 							:label="$p.t('person/gemeinde')"
 							name="addressData.gemeinde"
-							:label="$p.t('person/gemeinde')"
 							v-model="addressData.gemeinde"
 						>	
 						</form-input>

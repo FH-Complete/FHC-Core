@@ -5449,13 +5449,13 @@ The invoice will be sent to you again. <u><strong>The amount is only to be trans
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unruly Person wurde gefunden',
+				'text' => 'Person mit Markierung „unruly“ gefunden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Unruly Person detected',
+				'text' => 'Person flagged as "unruly" detected',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -33524,26 +33524,6 @@ array(
 			)
 		)
 	),
-	array(
-		'app' => 'core',
-		'category' => 'person',
-		'phrase' => 'bankverbindung',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Bankverbindung',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'bank details',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
 	//Status
 	array(
 		'app' => 'core',
@@ -39122,6 +39102,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'No final exams found for Student_uid(s) {id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'notekommpruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Note komm. Prüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade committee exam',
 				'description' => '',
 				'insertvon' => 'system'
 			)
