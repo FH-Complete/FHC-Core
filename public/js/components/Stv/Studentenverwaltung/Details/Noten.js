@@ -42,8 +42,8 @@ export default {
 	<div class="stv-details-noten d-flex flex-column overflow-hidden">
 		<div class="mb-3">
 			<select class="form-select" v-model="stdsem" @input="saveStdsem">
-				<option value="">$p.t('ui/current_semester')</option>
-				<option value="true">$p.t('ui/all_semester')</option>
+				<option value="">{{ $p.t('ui/current_semester') }}</option>
+				<option value="true">{{ $p.t('ui/all_semester') }}</option>
 			</select>
 		</div>
 		<div class="row">
