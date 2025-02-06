@@ -23,7 +23,7 @@ export default{
 		},
 	},
 	props: {
-		uid: Number
+		uid: String
 	},
 	data(){
 		return {
