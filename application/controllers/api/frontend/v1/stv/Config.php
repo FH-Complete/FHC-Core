@@ -91,6 +91,10 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_resources'),
 			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
 		];
+		$result['messages'] = [
+			'title' => $this->p->t('stv', 'tab_messages'),
+			'component' => './Stv/Studentenverwaltung/Details/Messages.js'
+		];
 		/* TODO(chris): Ausgeblendet für Testing
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),

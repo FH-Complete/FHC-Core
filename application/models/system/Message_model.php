@@ -85,7 +85,7 @@ class Message_model extends DB_Model
 	 */
 	public function getMessagesOfPerson($person_id, $status = null)
 	{
-		$sql = 'SELECT m.message_id,
+		$sql = "SELECT m.message_id,
 						m.person_id,
 						m.subject,
 						m.body,
@@ -109,7 +109,10 @@ class Message_model extends DB_Model
 						re.vornamen AS revornamen,
 						s.status,
 						s.statusinfo,
-						s.insertamum AS statusamum
+						s.insertamum AS statusamum,
+						CONCAT(se.titelpre, ' ', se.vorname, ' ', se.nachname, ' ', se.titelpost) as sender,
+						CONCAT(re.titelpre, ' ', re.vorname, ' ', re.nachname, ' ', re.titelpost ) as recipient,
+						TO_CHAR(s.insertamum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_insertamum
 				  FROM public.tbl_msg_message m
 						JOIN public.tbl_msg_recipient r ON m.message_id = r.message_id
 						JOIN public.tbl_person se ON (m.person_id = se.person_id)
@@ -122,7 +125,7 @@ class Message_model extends DB_Model
 						  ) s ON (m.message_id = s.message_id AND re.person_id = s.person_id)
 				 WHERE se.person_id = ?
 				 OR re.person_id = ?
-				 ';
+				 ";
 
 		if (is_numeric($status))
 		{

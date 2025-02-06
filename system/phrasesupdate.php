@@ -37297,7 +37297,30 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	/////////// FHC4 Phrases Messages START ///////////
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_messages',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachrichten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Messages',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	/////////// FHC4 Phrases Messages END ///////////
+
 );
 
 

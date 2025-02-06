@@ -33,6 +33,7 @@ import ort from "./ort.js";
 import cms from "./cms.js";
 import lehre from "./lehre.js";
 import addons from "./addons.js";
+import messages from "./messages.js";
 
 export default {
     search,
@@ -52,5 +53,6 @@ export default {
     ort,
     cms,
     lehre,
-    addons
+    addons,
+    messages
 };
