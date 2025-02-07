@@ -46,7 +46,26 @@ export default{
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Kontakt_id", field:"kontakt_id", visible:false},
 					{title:"Standort_id", field:"standort_id", visible:false},
-					{title:"letzte Änderung", field:"lastupdate", visible:false},
+					{
+						title:"letzte Änderung",
+						field:"lastupdate",
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {

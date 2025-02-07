@@ -62,7 +62,26 @@ export default{
 					{title:"Adresse_id", field:"adresse_id", visible:false},
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Name", field:"name", visible:false},
-					{title:"letzte Änderung", field:"lastupdate", visible:false},
+					{
+						title:"letzte Änderung",
+						field:"lastupdate",
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{title:"Rechnungsadresse", field:"rechnungsadresse", visible:false,
 						formatter: (cell, formatterParams, onRendered) => {
 							let output = cell.getValue() ? this.$p.t('ui','ja') : this.$p.t('ui','nein');
