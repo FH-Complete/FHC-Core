@@ -70,19 +70,104 @@ export default{
 					{title: "StSem", field: "studiensemester_kurzbz"},
 					{title: "Sem", field: "ausbildungssemester"},
 					{title: "Lehrverband", field: "lehrverband", width: 72},
-					{title: "Datum", field: "format_datum"},
+					{
+						title: "Datum",
+						field: "datum",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+							});
+						}
+					},
 					{title: "Studienplan", field: "bezeichnung"},
-					{title: "BestätigtAm", field: "format_bestaetigtam"},
-					{title: "AbgeschicktAm", field: "format_bewerbung_abgeschicktamum", visible:false},
+					{
+						title: "BestätigtAm",
+						field: "bestaetigtam",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+							});
+						}
+					},
+					{
+						title: "AbgeschicktAm",
+						field: "bewerbung_abgeschicktamum",
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{title: "Statusgrund", field: "statusgrund_bezeichnung"},
 					{title: "Organisationsform", field: "orgform_kurzbz", visible: false},
 					{title: "PrestudentInId", field: "prestudent_id", visible: false},
 					{title: "StudienplanId", field: "studienplan_id", visible: false},
 					{title: "Anmerkung", field: "anmerkung", visible: false},
 					{title: "BestätigtVon", field: "bestaetigtvon", visible: false},
-					{title: "InsertAmUm", field: "format_insertamum", visible: false},
+					{
+						title: "InsertAmUm",
+						field: "insertamum",
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{title: "InsertVon", field: "insertvon", visible: false},
-					{title: "UpdateAmUm", field: "format_updateamum", visible: false},
+					{
+						title: "UpdateAmUm",
+						field: "updateamum",
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{title: "UpdateVon", field: "updatevon", visible: false},
 /*					{title: "Aufnahmestufe", field: "aufnahmestufe", visible: false},*/
 					{
@@ -170,11 +255,11 @@ export default{
 									title: this.$p.t('lehre', 'lehrverband')
 								});
 
-						cm.getColumnByField('format_bestaetigtam').component.updateDefinition({
+						cm.getColumnByField('bestaetigtam').component.updateDefinition({
 							title: this.$p.t('lehre', 'bestaetigt_am')
 						});
 
-						cm.getColumnByField('format_bewerbung_abgeschicktamum').component.updateDefinition({
+						cm.getColumnByField('bewerbung_abgeschicktamum').component.updateDefinition({
 							title: this.$p.t('lehre', 'bewerbung_abgeschickt_am')
 						});
 
@@ -186,7 +271,7 @@ export default{
 							title: this.$p.t('global', 'aktionen')
 						});
 
-						cm.getColumnByField('format_datum').component.updateDefinition({
+						cm.getColumnByField('datum').component.updateDefinition({
 							title: this.$p.t('global', 'datum')
 						});
 
@@ -198,7 +283,7 @@ export default{
 							title: this.$p.t('lehre', 'bestaetigt_von')
 						});
 
-						cm.getColumnByField('format_insertamum').component.updateDefinition({
+						cm.getColumnByField('insertamum').component.updateDefinition({
 							title: this.$p.t('lehre', 'insert_am')
 						});
 
