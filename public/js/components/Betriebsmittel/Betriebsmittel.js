@@ -48,11 +48,44 @@ export default {
 					{title: "PersonId", field: "person_id", visible: false},
 					{title: "Typ", field: "betriebsmitteltyp", width: 125},
 					{title: "Anmerkung", field: "anmerkung", visible: false},
-					{title: "Retourdatum", field: "format_retour", width: 128},
+					{
+						title: "Retourdatum",
+						field: "retouram",
+						width: 128,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}
+					},
 					{title: "Beschreibung", field: "beschreibung"},
 					{title: "UID", field: "uid", width: 87},
 					{title: "Kaution", field: "kaution", visible: false},
-					{title: "Ausgabedatum", field: "format_ausgabe", width: 144, visible: false},
+					{
+						title: "Ausgabedatum",
+						field: "ausgegebenam",
+						width: 144,
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}
+					},
 					{title: "Betriebsmittel ID", field: "betriebsmittel_id", visible: false},
 					{title: "Betriebsmittelperson ID", field: "betriebsmittelperson_id", visible: false},
 					{
@@ -130,7 +163,7 @@ export default {
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
 						});
-						cm.getColumnByField('format_retour').component.updateDefinition({
+						cm.getColumnByField('retouram').component.updateDefinition({
 							title: this.$p.t('wawi', 'retourdatum')
 						});
 						cm.getColumnByField('beschreibung').component.updateDefinition({
@@ -139,7 +172,7 @@ export default {
 						cm.getColumnByField('kaution').component.updateDefinition({
 							title: this.$p.t('infocenter', 'kaution')
 						});
-						cm.getColumnByField('format_ausgabe').component.updateDefinition({
+						cm.getColumnByField('ausgegebenam').component.updateDefinition({
 							title: this.$p.t('wawi', 'ausgabedatum')
 						});
 						cm.getColumnByField('betriebsmittel_id').component.updateDefinition({
