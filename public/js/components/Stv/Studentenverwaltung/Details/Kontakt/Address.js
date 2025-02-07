@@ -298,7 +298,7 @@ export default{
 
 			this.abortController.places = new AbortController();
 
-			return this.$refs.addressData.factory.stv.kontakt.getPlaces(this.addressData.address.plz)
+			return this.$fhcApi.factory.stv.kontakt.getPlaces(this.addressData.address.plz)
 				.then(result => {
 					this.places = result.data;
 				});
@@ -310,7 +310,7 @@ export default{
 
 			this.abortController.firmen = new AbortController();
 
-			return this.$refs.addressData.factory.stv.kontakt.getFirmen(event.query)
+			return this.$fhcApi.factory.stv.kontakt.getFirmen(event.query)
 				.then(result => {
 					this.filteredFirmen = result.data.retval;
 				});
