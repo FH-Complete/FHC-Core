@@ -44,8 +44,36 @@ export default {
 				columns: [
 					{title: "Kurzbz", field: "kurzbz"},
 					{title: "Nation", field: "nation_code"},
-					{title: "Von", field: "format_von"},
-					{title: "Bis", field: "format_bis"},
+					{
+						title: "Von",
+						field: "von",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+							});
+						}
+					},
+					{
+						title: "Bis",
+						 field: "bis",
+						 formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+							});
+						}
+					},
 					{title: "bisio_id", field: "bisio_id"},
 					{
 						title: 'Aktionen', field: 'actions',
@@ -106,10 +134,10 @@ export default {
 						cm.getColumnByField('nation_code').component.updateDefinition({
 							title: this.$p.t('mobility', 'gastnation')
 						});
-						cm.getColumnByField('format_von').component.updateDefinition({
+						cm.getColumnByField('von').component.updateDefinition({
 							title: this.$p.t('ui', 'von')
 						});
-						cm.getColumnByField('format_bis').component.updateDefinition({
+						cm.getColumnByField('bis').component.updateDefinition({
 							title: this.$p.t('global', 'bis')
 						});
 						cm.getColumnByField('bisio_id').component.updateDefinition({
