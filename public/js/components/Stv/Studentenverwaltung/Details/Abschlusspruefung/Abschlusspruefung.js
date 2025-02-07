@@ -79,6 +79,8 @@ export default {
 						field: "datum",
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
 							const date = new Date(dateStr);
 							return date.toLocaleString("de-DE", {
 								day: "2-digit",
@@ -94,6 +96,8 @@ export default {
 						field: "freigabedatum",
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
 							const date = new Date(dateStr);
 							return date.toLocaleString("de-DE", {
 								day: "2-digit",
@@ -109,6 +113,8 @@ export default {
 						field: "sponsion",
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
 							const date = new Date(dateStr);
 							return date.toLocaleString("de-DE", {
 								day: "2-digit",
