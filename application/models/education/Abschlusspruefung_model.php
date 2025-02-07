@@ -144,9 +144,10 @@ class Abschlusspruefung_model extends DB_Model
 					person_vorsitzender.vorname,
 					COALESCE(' ' || person_vorsitzender.titelpre)
 				) AS person_vorsitzender,
-				TO_CHAR(datum::timestamp, 'DD.MM.YYYY') AS format_datum,
-				TO_CHAR(freigabedatum::timestamp, 'DD.MM.YYYY') AS format_freigabedatum,
-				TO_CHAR(sponsion::timestamp, 'DD.MM.YYYY') AS format_sponsion,
+				datum,
+				freigabedatum,
+				sponsion,
+				uhrzeit,
 				person_pruefer1.nachname as p1_nachname,
 				person_pruefer2.nachname as p2_nachname,
 				person_pruefer3.nachname as p3_nachname,
@@ -164,7 +165,7 @@ class Abschlusspruefung_model extends DB_Model
 				LEFT JOIN lehre.tbl_abschlussbeurteilung beurteilung USING (abschlussbeurteilung_kurzbz)
 				LEFT JOIN lehre.tbl_abschlusspruefung_antritt antritt USING (pruefungsantritt_kurzbz)
 				WHERE student_uid = ?
-				ORDER BY datum DESC	
+				ORDER BY exam.datum DESC	
 					";
 
 		return $this->execQuery($qry, array('student_uid' => $student_uid));

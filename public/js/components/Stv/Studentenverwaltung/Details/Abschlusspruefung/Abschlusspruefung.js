@@ -74,11 +74,50 @@ export default {
 					{title: "prueferIn1", field: "p1_nachname", visible: false},
 					{title: "prueferIn2", field: "p2_nachname", visible: false},
 					{title: "prueferIn3", field: "p3_nachname", visible: false},
-					{title: "datum", field: "format_datum"},
+					{
+						title: "datum", 
+						field: "datum",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}
+					},
 					{title: "uhrzeit", field: "uhrzeit"},
-					{title: "freigabe", field: "format_freigabedatum"},
+					{
+						title: "freigabe", 
+						field: "freigabedatum",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}
+					},
 					{title: "pruefungsantritt", field: "antritt_bezeichnung"},
-					{title: "sponsion", field: "format_sponsion"},
+					{
+						title: "sponsion", 
+						field: "sponsion",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}
+					},
 					{title: "anmerkung", field: "anmerkung"},
 					{title: "abschlusspruefung_id", field: "abschlusspruefung_id", visible: false},
 					{title: "typ", field: "pruefungstyp_kurzbz", visible: false},
@@ -154,19 +193,19 @@ export default {
 						cm.getColumnByField('p3_nachname').component.updateDefinition({
 							title: this.$p.t('abschlusspruefung', 'pruefer3')
 						});
-						cm.getColumnByField('format_datum').component.updateDefinition({
+						cm.getColumnByField('datum').component.updateDefinition({
 							title: this.$p.t('global', 'datum')
 						});
 						cm.getColumnByField('uhrzeit').component.updateDefinition({
 							title: this.$p.t('global', 'uhrzeit')
 						});
-						cm.getColumnByField('format_freigabedatum').component.updateDefinition({
+						cm.getColumnByField('freigabedatum').component.updateDefinition({
 							title: this.$p.t('abschlusspruefung', 'freigabe')
 						});
 						cm.getColumnByField('antritt_bezeichnung').component.updateDefinition({
 							title: this.$p.t('abschlusspruefung', 'pruefungsantritt')
 						});
-						cm.getColumnByField('format_sponsion').component.updateDefinition({
+						cm.getColumnByField('sponsion').component.updateDefinition({
 							title: this.$p.t('abschlusspruefung', 'sponsion')
 						});
 						cm.getColumnByField('anmerkung').component.updateDefinition({
