@@ -100,7 +100,6 @@ export default {
 				'pointer-events': 'none',
 				'z-index': 2,
 				height:  this.getDayTimePercent + '%',
-				width: '100%',
 				opacity: 0.5,
 				overflow: 'hidden'
 			}
@@ -161,7 +160,7 @@ export default {
 			}
 		},
 		noEventsCondition() {
-			return !this.isSliding && this.filteredEvents?.length === 0;
+			return !this.isSliding && (this.filteredEvents?.length === 0 || !this.filteredEvents);
 		},
 		hours() {
 			// returns an array with elements starting at 7 and ending at 24

@@ -28,8 +28,8 @@ export default {
 			date: this.date,
 			focusDate: this.focusDate,
 			size: Vue.computed({ get: () => this.size }),
-			calendarHeight: Vue.computed({ get: () => this.calendarHeight }),
-			calendarWidth: Vue.computed({ get: () => this.calendarWidth }),
+			containerHeight: Vue.computed({ get: () => this.containerHeight }),
+			containerWidth: Vue.computed({ get: () => this.containerWidth }),
 			
 			events: Vue.computed(() => this.eventsPerDay),
 			filteredEvents: Vue.computed(() => this.filteredEvents),

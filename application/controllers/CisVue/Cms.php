@@ -83,13 +83,13 @@ class Cms extends Auth_Controller
 	 */
 	public function news($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
 	{
-		// TODO: what are those parameters and what are they used for?
-		
 		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'News']);
-//		$this->load->view('CisVue/Cms/Content', ['infoscreen' => $infoscreen, 'studiengang_kz' => $studiengang_kz, 'semester' => $semester, 'mischen' => $mischen, 'titel' => $titel, 'edit' => $edit, 'sichtbar' => $sichtbar]);
 	}
-
+	
 	public function getRoomInformation($ort_kurzbz){
-		$this->load->view('CisVue/Cms/RoomInformation',['ort_kurzbz'=>$ort_kurzbz]);
+		$viewData = array(
+			'ort_kurzbz' => $ort_kurzbz
+		);
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'CmsRoom']);
 	}
 }
