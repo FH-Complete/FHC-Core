@@ -1338,9 +1338,8 @@ if ($result_lv!=0)
 			$lv_faktor = new lehrveranstaltung_faktor();
 			$lv_faktor->getAkt($row->lehrveranstaltung_id);
 
-			$faktortext = isset($lv_faktor->faktor) ? $lv_faktor->faktor : 'Hinzufügen';
 			if (in_array($row->lehrtyp_kurzbz, array("tpl", "lv")))
-				echo '<a href="lehrveranstaltung_faktor.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">'. $faktortext .'</a>';
+				echo '<a href="lehrveranstaltung_faktor.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">Bearbeiten</a>';
 			echo '</td>';
 			echo "</tr>\n";
 		}

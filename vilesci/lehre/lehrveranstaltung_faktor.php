@@ -283,7 +283,7 @@ echo '
 
 			foreach ($lehrform->lehrform as $lehrform)
 			{
-				echo '<option value="'.$lehrform->lehrform_kurzbz.'">'.$lehrform->bezeichnung.'</option>';
+				echo '<option value="'.$lehrform->lehrform_kurzbz.'">'.$lehrform->lehrform_kurzbz . ' ' . $lehrform->bezeichnung.'</option>';
 			}
 
 echo '
@@ -296,7 +296,7 @@ echo '
 	<table class="tablesorter" id="faktorTable">
 		<thead>
 			<tr>
-				<th>'.$p->t('lv/faktor').'</th>
+				<th>'.$p->t('lvaliste/faktor').'</th>
 				<th>'.$p->t('lvaliste/lehrform').'</th>
 				<th>'.$p->t('global/von').'</th>
 				<th>'.$p->t('global/bis').'</th>
