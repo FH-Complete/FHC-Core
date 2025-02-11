@@ -84,23 +84,6 @@ export default {
 			})
 		}
 		
-		
-		const parser = new DOMParser()
-		const doc = parser.parseFromString(`<div>${this.content}</div>`, "text/html");
-		
-		const img = doc.querySelector("img")
-		// let img = document.getElementsByTagName("img");
-		if(img && img.title)
-		{
-			const imgAttributes = {}
-			for (let attr of img.attributes) {
-				imgAttributes[attr.name] = attr.value
-			}
-
-			this.imgContent = imgAttributes;  // Now it's a plain object
-			return
-		}
-		
 		let title = document.getElementsByTagName("h1");
 		title = title.length ? title[0] : null;
 		// tries to wrap the Raum titel with a link tag that redirects to the Reservierungen of that Raum
@@ -123,11 +106,25 @@ export default {
 				console.error(`the regular expression did not match the room name: ${room_name}`);
 			}
 			
+			return
 		}
-		else
+		
+		const parser = new DOMParser()
+		const doc = parser.parseFromString(`<div>${this.content}</div>`, "text/html");
+
+		const img = doc.querySelector("img")
+		if(img && img.title)
 		{
-			console.error(`was not able to get the title of the raum_contentmittitel by searching for the first h1 element`);
+			const imgAttributes = {}
+			for (let attr of img.attributes) {
+				imgAttributes[attr.name] = attr.value
+			}
+
+			this.imgContent = imgAttributes
 		}
+		
+		console.error(`was not able to get the title of the raum_contentmittitel`);
+		
     },
     template: /*html*/ `
       <!-- div that contains the content -->
