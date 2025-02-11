@@ -3,7 +3,7 @@ import CalendarDates from "./CalendarDates.js";
 
 const monthDayRanges = []
 for(let i = 1; i < 13; i++) {
-	monthDayRanges.push(new Date(1995, i, 0).getDate())
+	monthDayRanges.push(new Date(new Date(Date.now).getFullYear(), i, 0).getDate())
 }
 
 class CalendarDate {
