@@ -1,8 +1,12 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
+import FormForm from '../../Form/Form.js';
+//import FormInput from '../../Form/Input.js';
 
 export default {
 	components: {
 		CoreFilterCmpt,
+		FormForm,
+	//	FormInput
 	},
 	props: {
 		endpoint: {
@@ -14,6 +18,7 @@ export default {
 			type: [Number, String],
 			required: true
 		},
+		messageLayout: String,
 	},
 	//TODO(Manu) endpoint macht Probleme
 	data(){
@@ -32,12 +37,65 @@ export default {
 					{title: "subject", field: "subject"},
 					{title: "body", field: "body", visible: false},
 					{title: "message_id", field: "message_id", visible: false},
-					{title: "datum", field: "format_insertamum"},
+					{
+						title: "Datum",
+						field: "insertamum",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr); // Convert to Date object
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{title: "sender", field: "sender"},
 					{title: "recipient", field: "recipient"},
-					{title: "sepersonid", field: "sepersonid"},
-					{title: "repersonid", field: "repersonid"},
-					{title: "status", field: "status"},
+					{title: "senderId", field: "sender_id"},
+					{title: "recipientId", field: "recipient_id"},
+					{
+						title: "status",
+						field: "status",
+						formatter: function (cell) {
+							//TODO(Manu) get phrases in this context to work?
+
+							/*							const statusMap = {
+															0: this.$p.t('messsages', 'unread'),
+															1: this.$p.t('messsages', 'read'),
+															2: this.$p.t('messsages', 'archived'),
+															3: this.$p.t('messsages', 'deleted')
+														};*/
+							const statusMap = {
+								0: 'unread',
+								1: 'read',
+								2: 'archived',
+								3: 'deleted'
+							};
+							return statusMap[cell.getValue()];
+							// return this.$p.t('messsages', 'deleted');
+						}
+
+					},
+					{
+						title: "letzte Änderung",
+						field: "statusdatum",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr); // Convert to Date object
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{
 						title: 'Aktionen', field: 'actions',
 						width: 100,
@@ -47,23 +105,23 @@ export default {
 
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
-							button.title = this.$p.t('ui', 'notiz_edit');
-							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = this.$p.t('global', 'reply');
+							button.innerHTML = '<i class="fa fa-reply"></i>';
 							button.addEventListener(
 								'click',
 								(event) =>
-									this.actionEditNotiz(cell.getData().notiz_id)
+									this.reply(cell.getData().message_id)
 							);
 							container.append(button);
 
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
-							button.title = this.$p.t('notiz', 'notiz_delete');
+							button.title = this.$p.t('ui', 'loeschen');
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.addEventListener(
 								'click',
 								() =>
-									this.actionDeleteNotiz(cell.getData().notiz_id)
+									this.deleteMessage(cell.getData().message_id)
 							);
 							container.append(button);
 
@@ -71,46 +129,186 @@ export default {
 						},
 						frozen: true
 					}],
-				layout: 'fitColumns',
-				layoutColumnsOnNewData: false,
-				height: '250',
+				layout: 'fitDataFill',
+				layoutColumnsOnNewData:	false,
+			//	height:	'auto',
+				height: '400',
+				selectable:	true,
+				selectableRangeMode: 'click',
+/*				layoutColumnsOnNewData: false,
+
 				selectableRangeMode: 'click',
 				selectable: true,
 				index: 'message_id',
-				persistenceID: 'core-message'
+				persistenceID: 'core-message'*/
 			},
+			tabulatorEvents: [
+				{
+					event: 'dataLoaded',
+					handler: data => this.tabulatorData = data.map(item => {
+						return item;
+					}),
+				},
+				{
+					event: 'tableBuilt',
+					handler: async() => {
+						await this.$p.loadCategory(['global', 'person', 'stv', 'messages', 'ui', 'notiz']);
+
+
+						let cm = this.$refs.table.tabulator.columnManager;
+
+						cm.getColumnByField('subject').component.updateDefinition({
+							title: this.$p.t('global', 'betreff')
+						});
+						cm.getColumnByField('body').component.updateDefinition({
+							title: this.$p.t('messages', 'body')
+						});
+						cm.getColumnByField('message_id').component.updateDefinition({
+							title: this.$p.t('messages', 'message_id')
+						});
+						cm.getColumnByField('insertamum').component.updateDefinition({
+							title: this.$p.t('global', 'datum')
+						});
+						cm.getColumnByField('sender').component.updateDefinition({
+							title: this.$p.t('messages', 'sender')
+						});
+						cm.getColumnByField('recipient').component.updateDefinition({
+							title: this.$p.t('messages', 'recipient')
+						});
+						cm.getColumnByField('sender_id').component.updateDefinition({
+							title: this.$p.t('messages', 'senderId')
+						});
+						cm.getColumnByField('recipient_id').component.updateDefinition({
+							title: this.$p.t('messages', 'recipientId')
+						});
+						cm.getColumnByField('statusdatum').component.updateDefinition({
+							title: this.$p.t('notiz', 'letzte_aenderung')
+						});
+						/*
+						cm.getColumnByField('actions').component.updateDefinition({
+						title: this.$p.t('global', 'aktionen')
+												});
+						*/
+					}
+				},
+				{
+					event: 'rowClick',
+					handler: (e, row) => {
+							const selectedMessage = row.getData().message_id;
+							const body = row.getData().body;
+							this.previewBody = body;
+							console.log(selectedMessage);
+					}
+				},
+			],
+			tabulatorData: [],
+			previewBody: ""
 		}
 	},
-/*	computed: {
+	methods: {
+		reply(message_id){
+			console.log("in reply " + message_id);
+		},
+		deleteMessage(message_id){
+			console.log("deleteMessage " + message_id);
+		},
+		actionNewMessage(){
+			console.log("action new message");
+		},
+	},
+	computed: {
 		statusText(){
-			0: this.$p.t('messsages', 'unread'),
-			1: this.$p.t('messsages', 'read'),
-			2: this.$p.t('messsages', 'archived'),
-			0: this.$p.t('messsages', 'unread'),
-			3: this.$p.t('person', 'deleted'),
+			return {
+				0: this.$p.t('messsages', 'unread'),
+				1: this.$p.t('messsages', 'read'),
+				2: this.$p.t('messsages', 'archived'),
+				3: this.$p.t('messsages', 'deleted')
+			}
 		}
-	},*/
+	},
+	mounted() {
+		// change to target="_blank"
+/*		this.$nextTick(() => {
+			const links = document.querySelectorAll('.preview a');
+			links.forEach(link => {
+				link.setAttribute('target', '_blank');
+				link.setAttribute('rel', 'noopener noreferrer'); // Sicherheitsmaßnahme
+			});
+		});*/
+	},
 	template: `
 	<div class="messages-detail-table">
-		<h4>Table Messages</h4>
-		<p>type_id: {{typeId}}</p>
-		<p>id: {{id}}</p>
 		<p>endpoint: {{endpoint}}</p>
+		<p>{{messageLayout}}</p>
+
+		<!-- {{statusText[0] }}
+		<hr>
+		{{$p.t('messages', 'unread')}} -->
+		<!-- {{statusText.0}} -->
+		<!-- <p v-for="(bezeichnung, key) in statusText" :key="key" :value="key">{{bezeichnung}}</p> -->
+
+		<!--View Studierendenverwaltung-->
+		<div v-if="messageLayout=='twoColumnsTableLeft'">
 		
-<!--		{{statusText}}-->
-		
-		
-		<core-filter-cmpt
-			ref="table"
-			:tabulator-options="tabulatorOptions"
-			table-only
-			:side-menu="false"
-			reload
-			new-btn-show
-			:new-btn-label="this.$p.t('global', 'nachricht')"
-			@click:new="actionNewNotiz"
-			>
-		</core-filter-cmpt>
+			<div class="row">
+				<!--table-->
+				<div class="col-sm-6 pt-6">
+					<core-filter-cmpt
+						ref="table"
+						:tabulator-options="tabulatorOptions"
+						:tabulator-events="tabulatorEvents"
+						table-only
+						:side-menu="false"
+						reload
+						new-btn-show
+						:new-btn-label="this.$p.t('global', 'nachricht')"
+						@click:new="actionNewMessage"
+						>
+					</core-filter-cmpt>
+				</div>
+
+				<!--preview wysiwyg-window-->
+				<div class="col-sm-6 pt-6">
+				<br><br><br><br>
+
+					<div ref="preview">
+						<div v-html="previewBody" class="p-3 border rounded overflow-scroll twoColumns"></div>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<!--View Infocenter-->
+		<div v-if="messageLayout=='listTableTop'">
+
+				<!--table-->
+				<div class="col-sm-12 pt-6">
+					<core-filter-cmpt
+						ref="table"
+						:tabulator-options="tabulatorOptions"
+						:tabulator-events="tabulatorEvents"
+						table-only
+						:side-menu="false"
+						reload
+						new-btn-show
+						:new-btn-label="this.$p.t('global', 'nachricht')"
+						@click:new="actionNewMessage"
+						>
+					</core-filter-cmpt>
+				</div>
+
+				<!--preview wysiwyg-window-->
+				<div class="col-sm-12">
+
+					<div ref="preview">
+						<div v-html="previewBody" class="p-3 border rounded overflow-scroll twoColumns"></div>
+					</div>
+
+				</div>
+		</div>
+
 	</div>
 	`
 

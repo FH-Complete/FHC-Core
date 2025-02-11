@@ -17,14 +17,24 @@ export default {
 			required: true
 		},
 		showNew: Boolean,
-		showTable: Boolean
+		showTable: Boolean,
+		messageLayout: {
+			type: String,
+			default: 'twoColumnsTableLeft',
+			validator(value) {
+				return [
+					'twoColumnsTableLeft',
+					'listTableTop'
+				].includes(value)
+			}
+		},
 	},
 	data() {
 		return {}
 	},
 	template: `
 	<div class="core-messages h-100 pb-3">
-	<p>endpoint: {{endpoint}}</p>
+	<p>endpoint Messages.js: {{endpoint}}</p>
 		<div v-if="showNew">
 			<NewMessage
 				
@@ -37,6 +47,7 @@ export default {
 				:type-id="typeId"
 				:id="id"
 				:endpoint="endpoint"
+				:messageLayout="messageLayout"
 			>
 			
 			</TableMessages>

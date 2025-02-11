@@ -14,12 +14,11 @@ export default {
 			endpoint="$fhcApi.factory.messages.person"
 			type-id="person_id"
 			:id="modelValue.person_id"
+			messageLayout="listTableTop"
 			show-table
 			>
 		</core-messages>
 
-
-		
 	</div>
 	`
 };

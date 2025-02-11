@@ -36,7 +36,7 @@ class Messages extends FHCAPI_Controller
 			$this->terminateWithError("logic for type_id " . $type_id . " not defined yet", self::ERROR_TYPE_GENERAL);
 		}
 
-		$result = $this->MessageModel->getMessagesOfPerson($id);
+		$result = $this->MessageModel->getMessagesForTable($id);
 
 		$data = $this->getDataOrTerminateWithError($result);
 

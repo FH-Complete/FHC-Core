@@ -109,10 +109,7 @@ class Message_model extends DB_Model
 						re.vornamen AS revornamen,
 						s.status,
 						s.statusinfo,
-						s.insertamum AS statusamum,
-						CONCAT(se.titelpre, ' ', se.vorname, ' ', se.nachname, ' ', se.titelpost) as sender,
-						CONCAT(re.titelpre, ' ', re.vorname, ' ', re.nachname, ' ', re.titelpost ) as recipient,
-						TO_CHAR(s.insertamum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_insertamum
+						s.insertamum AS statusamum
 				  FROM public.tbl_msg_message m
 						JOIN public.tbl_msg_recipient r ON m.message_id = r.message_id
 						JOIN public.tbl_person se ON (m.person_id = se.person_id)
@@ -232,5 +229,57 @@ class Message_model extends DB_Model
 		$query = 'SELECT * FROM public.vw_msg_vars_user WHERE my_uid = ?';
 		
 		return $this->execQuery($query, $params);
+	}
+
+	/**
+	 * Gets messages for a person for tableMessages.
+	 * @param $person_id
+	 * @param null $status message status. by default, latest status is returned
+	 * @return array|null
+	 */
+	public function getMessagesForTable($person_id, $status = null)
+	{
+		$sql = "
+			SELECT
+				m.message_id AS message_id,
+				m.subject AS subject,
+				m.body AS body,
+				m.insertamum AS insertamum,
+				m.relationmessage_id AS relationmessage_id,
+				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = m.person_id) as sender,
+				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = r.person_id) as recipient,
+				m.person_id as sender_id,
+				r.person_id as recipient_id,
+				MAX(ss.status) as status,
+				MAX(ss.insertamum) as statusdatum
+			FROM public.tbl_msg_message m
+				 JOIN public.tbl_msg_recipient r USING(message_id)
+				 JOIN public.tbl_msg_status ss ON(r.message_id = ss.message_id AND ss.person_id = r.person_id)
+			WHERE m.person_id = ?
+			GROUP BY m.message_id, m.subject, m.body, m.insertamum, m.relationmessage_id, sender, recipient, sender_id, recipient_id
+			UNION ALL
+			SELECT
+				m.message_id AS message_id,
+				m.subject AS subject,
+				m.body AS body,
+				m.insertamum AS insertamum,
+				m.relationmessage_id AS relationmessage_id,
+				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = m.person_id) as sender,
+				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = r.person_id) as recipient,
+				m.person_id as sender_id,
+				r.person_id as recipient_id,
+				MAX(ss.status) as status,
+				MAX(ss.insertamum) as statusdatum
+			FROM public.tbl_msg_recipient r
+				 JOIN public.tbl_msg_status ss USING(message_id, person_id)
+				 JOIN public.tbl_msg_message m USING(message_id)
+			WHERE r.person_id = ?
+			GROUP BY m.message_id, m.subject, m.body, m.insertamum, m.relationmessage_id, sender, recipient, sender_id, recipient_id
+			ORDER BY insertamum
+				 ";
+
+		$parametersArray = array($person_id, $person_id);
+
+		return $this->execQuery($sql, $parametersArray);
 	}
 }
