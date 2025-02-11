@@ -515,7 +515,7 @@ class Kontakt extends FHCAPI_Controller
 		{
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		return $this->outputJsonSuccess(true);
+		$this->terminateWithSuccess($result);
 	}
 
 	public function updateContact()
@@ -754,7 +754,7 @@ class Kontakt extends FHCAPI_Controller
 		}
 		if (!hasData($result))
 		{
-			$this->outputJson($result);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Bankverbindung_id']), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess(current(getData($result)) ? : null);
 	}

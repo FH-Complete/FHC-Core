@@ -342,7 +342,7 @@ class BetriebsmittelP extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Betriebsmittelperson_id']), self::ERROR_TYPE_GENERAL);
 		}
 
-		$this->terminateWithSuccess(current(getData($result)));
+		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
 	public function deleteBetriebsmittel($betriebsmittelperson_id)
@@ -358,7 +358,7 @@ class BetriebsmittelP extends FHCAPI_Controller
 		if (!hasData($result)) {
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Betriebsmittelperson_id']), self::ERROR_TYPE_GENERAL);
 		}
-		return $this->outputJsonSuccess(current(getData($result)));
+		$this->terminateWithSuccess(current(getData($result)));
 	}
 
 	public function getTypenBetriebsmittel()
