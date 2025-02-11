@@ -1431,9 +1431,9 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		echo '<hr>';
 		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
 		if ($alle===true)
-			echo '<a href="?normal" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)).'"></a>';
+			echo '<a href="?normal'. ($passuid ? '&uid='.$user : '').'" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)).'"></a>';
 		else
-			echo '<a href="?alle" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
+			echo '<a href="?alle'. ($passuid ? '&uid='.$user : '') .'" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
 
 
 
