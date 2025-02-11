@@ -353,4 +353,7 @@ define('SANCHO_MAIL_HEADER_IMG', 'sancho_header_DEFAULT.jpg');
 
 // footer image for eigene Mails
 define('SANCHO_MAIL_FOOTER_IMG', 'sancho_footer_DEFAULT.jpg');
+
+// Gibt an, ob Sancho Mails verschickt werden oder nicht
+define('SANCHO_MAIL_ENABLED', true);
 ?>

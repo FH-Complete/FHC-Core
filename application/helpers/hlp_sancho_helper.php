@@ -53,6 +53,8 @@ function sendSanchoMail(
 
 	$sancho_mail_config = $ci->config->item('mail');
 
+	if ($sancho_mail_config['sancho_mail_enabled'] === false)
+		return true;
 
 	if ($from == '')
 	{

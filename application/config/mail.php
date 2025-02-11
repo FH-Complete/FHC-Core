@@ -47,3 +47,6 @@ $config['sancho_mail_header_img'] = defined('SANCHO_MAIL_HEADER_IMG') ? SANCHO_M
 
 // footer image for custom mails
 $config['sancho_mail_footer_img'] = defined('SANCHO_MAIL_FOOTER_IMG') ? SANCHO_MAIL_FOOTER_IMG : '';
+
+// If true, Sancho mails will be sent
+$config['sancho_mail_enabled'] = defined('SANCHO_MAIL_ENABLED') ? SANCHO_MAIL_ENABLED : true;

@@ -41,6 +41,9 @@ const FALLBACK_SENDER = 'noreply';
  */
 function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = '', $footerImg = '', $replyTo = '', $cc = '')
 {
+	if (defined('SANCHO_MAIL_ENABLED') && (SANCHO_MAIL_ENABLED === false))
+		return true;
+
 	$from = ((defined('SANCHO_MAIL_DEFAULT_SENDER') && SANCHO_MAIL_DEFAULT_SENDER != '') 
 		  ? SANCHO_MAIL_DEFAULT_SENDER 
 		  : FALLBACK_SENDER) 
