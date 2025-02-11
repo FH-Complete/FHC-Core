@@ -36,8 +36,16 @@ export default {
 		'input',
 	],
 	computed: {
+		getGridStyle() {
+			return {
+				'min-height': '100px',
+				// this.size is the magic number anyway which directs font-size,
+				// which in turn influences a lot of layout
+				width: '42px'
+			}
+		},
 		laneWidth() {
-			return this.width / this.days.length
+			return (this.width - 42) / this.days.length
 		},
 		curTime() {
 			const now = new Date();
@@ -50,6 +58,17 @@ export default {
 				'grid-template-rows': 1,
 				position: 'sticky',
 				top: 0,
+			}
+		},
+		overlayStyle() {
+			return {
+				'background-color': '#F5E9D7',
+				'position': 'absolute',
+				'pointer-events': 'none',
+				'z-index': 2,
+				height:  this.getDayTimePercent + '%',
+				width: this.laneWidth + 'px',
+				opacity: 0.5
 			}
 		},
 		indicatorStyle() {
@@ -148,7 +167,7 @@ export default {
 				'z-index': 2,
 				'border-color': '#00649C!important',
 				top: this.getDayTimePercent + '%',
-				width: this.laneWidth + 'px' // todo: manage the real value of 1fr somehow
+				width: this.laneWidth + 'px'
 			}
 		},
 		getDayTimePercent() {
@@ -170,7 +189,7 @@ export default {
 				top: this.getAbsolutePositionForHour(hour),
 				left: 0,
 				right: 0,
-				'z-index': 0,
+				'z-index': 0
 			}
 		},
 		dayGridStyle(day) {
@@ -185,9 +204,9 @@ export default {
 				styleObj.opacity = 0.5;
 			} else if (day.isToday) {
 				
-				styleObj['backgroundImage'] = 'linear-gradient(to bottom, #F5E9D7 '+this.getDayTimePercent+'%, #FFFFFF '+this.getDayTimePercent+'%)'
-				styleObj['border-color'] = '#E8E8E8';
-				styleObj.opacity = 0.5;
+				// styleObj['backgroundImage'] = 'linear-gradient(to bottom, #F5E9D7 '+this.getDayTimePercent+'%, #FFFFFF '+this.getDayTimePercent+'%)'
+				// styleObj['border-color'] = '#E8E8E8';
+				// styleObj.opacity = 0.5;
 			}
 			
 			return styleObj
@@ -315,7 +334,7 @@ export default {
 				
 				<div class="events" :ref="'eventsRef'+week">
 					<div class="hours">
-						<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
+						<div v-for="hour in hours" :style="getGridStyle" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
 						<Transition>
@@ -323,6 +342,7 @@ export default {
 								<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
 							</div>
 						</Transition>
+						<div v-if="day.isToday" :style="overlayStyle"></div>
 						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" 
 						:selected="event.orig == selectedEvent"
 						:style="eventGridStyle(day,event)"

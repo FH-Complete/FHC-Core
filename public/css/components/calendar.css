@@ -1,5 +1,6 @@
 :root{
 	--fhc-calendar-pane-height: calc(100vh - 220px);
+	--fhc-calendar-past: #F5E9D7
 }
 
 .fhc-calendar-week-page-header {
@@ -188,7 +189,7 @@
 
 
 .fhc-calendar-past {
-	background-color:#F5E9D7;
+	background-color: var(--fhc-calendar-past);
 	border-color: #E8E8E8;
 	opacity: 0.5;
 }

@@ -34,4 +34,4 @@ $this->load->view('templates/FHC-Header', $includesArray);
 		></cis-menu>
 </header>
 
-<main id="cis-main" class="flex-grow-1 p-4">
+<main id="cis-main" class="flex-grow-1 p-4 pt-2">

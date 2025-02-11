@@ -9,6 +9,7 @@ import Profil from "../../components/Cis/Profil/Profil";
 import CmsNews from "../../components/Cis/Cms/News";
 import CmsContent from "../../components/Cis/Cms/Content";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info";
+import RoomInformation from "../../components/Cis/Mylv/RoomInformation";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -27,7 +28,12 @@ const router = VueRouter.createRouter({
 			component: Profil,
 			props: true
 		},
-		
+		{
+			path: `/CisVue/Cms/getRoomInformation/:ort_kurzbz`,
+			name: 'RoomInformation',
+			component: RoomInformation,
+			props: true
+		},
 		{
 			path: `/CisVue/Cms/Content/:content_id`,
 			name: 'Content',
