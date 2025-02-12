@@ -31,6 +31,7 @@ class Studgang extends FHCAPI_Controller
 		]);
 
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 
 		// Loads phrases system
 		$this->loadPhrases([
@@ -43,7 +44,12 @@ class Studgang extends FHCAPI_Controller
 	// Public methods
 
 	public function getStudiengangInfo(){
-		// fetches the Studiengang Information which is used next the the news
+		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());
+		if($isMitarbeiter) {
+			$this->terminateWithSuccess();
+		}
+		
+		// fetches the Studiengang Information which is used next to the news
 		$studiengangInfo = $this->StudiengangModel->getStudiengangInfoForNews();
 		$studiengangInfo= $this->getDataOrTerminateWithError($studiengangInfo);
 		$this->terminateWithSuccess($studiengangInfo);

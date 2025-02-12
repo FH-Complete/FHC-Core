@@ -131,11 +131,6 @@ const app = Vue.createApp({
 	},
 });
 
-router.beforeEach((to,from) => {
-	console.log('to', to)
-	console.log('from', from)
-})
-
 // kind of a bandaid for bad css on some pages to avoid horizontal scroll
 setScrollbarWidth();
 app.use(router);
