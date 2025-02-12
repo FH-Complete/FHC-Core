@@ -10,7 +10,7 @@ $includesArray = array(
 	'primevue3' => true,
 	'customCSSs' => array(
 		'public/css/components/verticalsplit.css',
-		'public/css/components/searchbar.css',
+		'public/css/components/searchbar/searchbar.css',
 		'public/css/Fhc.css',
 		'public/css/components/dashboard.css',
 		'public/css/components/calendar.css',
