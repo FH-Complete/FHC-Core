@@ -26,7 +26,7 @@ export default {
 				this.syncOnNextChange = false;
 				this.focusDate.set(this.date);
 			} else {
-				this.focusDate.m += dir;
+				this.focusDate.moveMonthInDirection(dir)
 			}
 			this.$emit('change:range', {
 				start: new Date(this.focusDate.y, this.focusDate.m, 1), 

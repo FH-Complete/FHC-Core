@@ -242,8 +242,9 @@ function checkZeilenUmbruch()
 
 	// Digitale Anwesenheiten
 	if(defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet
-			&& (!defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG') || in_array($lv->studiengang_kz, unserialize(CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG)))
-			&& ($rechte->isBerechtigt('extension/anw_ent_admin')
+		&& (!defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG') || in_array($lv->studiengang_kz, unserialize(CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG)))
+		&& (!defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_LVA') || in_array($lv->lehrveranstaltung_id, unserialize(CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_LVA)))
+		&& ($rechte->isBerechtigt('extension/anw_ent_admin')
 				|| $rechte->isBerechtigt('extension/anwesenheit_lektor')
 				|| $rechte->isBerechtigt('extension/anwesenheit_student')
 				|| $rechte->isBerechtigt('extension/anwesenheit_admin')))

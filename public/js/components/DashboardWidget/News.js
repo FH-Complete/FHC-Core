@@ -139,11 +139,13 @@ export default {
 			}
 			}).observe(this.$refs.container);
 		}
-		Vue.nextTick(()=>{
-			this.carouselInstance = new bootstrap.Carousel(this.$refs.carousel, {
-				wrap: false, // keep this off even though it actually wraps
-				interval: false
-			});
+		Vue.nextTick(()=> {
+			if(this.$refs.carousel) { // carousel ref might not exist in every widget width/height
+				this.carouselInstance = new bootstrap.Carousel(this.$refs.carousel, {
+					wrap: false, // keep this off even though it actually wraps
+					interval: false
+				});
+			}
 		})
 		
 	},

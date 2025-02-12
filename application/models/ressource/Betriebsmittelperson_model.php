@@ -115,13 +115,18 @@ class Betriebsmittelperson_model extends DB_Model
 
 		$query = "
 			SELECT 
-			    bm.nummer, bmp.person_id, bm.betriebsmitteltyp, bmp.anmerkung as anmerkung, bmp.retouram, TO_CHAR(bmp.retouram::timestamp, 'DD.MM.YYYY') AS format_retour, bmp.ausgegebenam, TO_CHAR(bmp.ausgegebenam::timestamp, 'DD.MM.YYYY') AS format_ausgabe, bm.beschreibung, bmp.uid, bmp.kaution, bm.betriebsmittel_id, bmp.betriebsmittelperson_id, bm.inventarnummer, bm.nummer2
+			bm.nummer, bmp.person_id, bm.betriebsmitteltyp, bmp.anmerkung as anmerkung,
+				bmp.retouram,
+				bmp.ausgegebenam,
+				bm.beschreibung, bmp.uid, bmp.kaution,
+				bm.betriebsmittel_id, bmp.betriebsmittelperson_id,
+				bm.inventarnummer, bm.nummer2
 			FROM 
-			    wawi.tbl_betriebsmittelperson bmp
+				wawi.tbl_betriebsmittelperson bmp
 			JOIN 
-			        wawi.tbl_betriebsmittel bm ON (bmp.betriebsmittel_id = bm.betriebsmittel_id)
+				wawi.tbl_betriebsmittel bm ON (bmp.betriebsmittel_id = bm.betriebsmittel_id)
 			WHERE 
-			    " . $cond . " = ? ";
+				" . $cond . " = ? ";
 
 		return $this->execQuery($query, array($id));
 	}

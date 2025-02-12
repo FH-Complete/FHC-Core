@@ -4,6 +4,7 @@ import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
 
 export default{
+	name: "RoomInformation",
     props:{
         ort_kurzbz: {
             type: String,
@@ -119,6 +120,8 @@ export default{
 		this.loadEvents();
 	},
     template: /*html*/`
+		<h2>Room Information {{ ort_kurzbz }}</h2>
+		<hr>
 		<lv-modal v-if="currentlySelectedEvent" :showMenu="false" :event="currentlySelectedEvent" ref="lvmodal" />
 		<fhc-calendar @selectedEvent="setSelectedEvent" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
             <template #monthPage="{event,day}">

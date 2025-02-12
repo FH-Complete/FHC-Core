@@ -116,7 +116,27 @@ export default {
 					{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: false},
 					{title: "type_id", field: "type_id", width: 164, visible: false},
 					{title: "extension_id", field: "id", width: 135, visible: false},
-					{title: "letzte Änderung", field: "lastupdate", width: 146, visible: false},
+					{
+						title: "letzte Änderung", 
+						field: "lastupdate",
+						width: 146,
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{
 						title: 'Aktionen', field: 'actions',
 						width: 100,

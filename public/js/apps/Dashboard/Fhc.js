@@ -9,6 +9,7 @@ import Profil from "../../components/Cis/Profil/Profil";
 import CmsNews from "../../components/Cis/Cms/News";
 import CmsContent from "../../components/Cis/Cms/Content";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info";
+import RoomInformation from "../../components/Cis/Mylv/RoomInformation";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -27,7 +28,12 @@ const router = VueRouter.createRouter({
 			component: Profil,
 			props: true
 		},
-		
+		{
+			path: `/CisVue/Cms/getRoomInformation/:ort_kurzbz`,
+			name: 'RoomInformation',
+			component: RoomInformation,
+			props: true
+		},
 		{
 			path: `/CisVue/Cms/Content/:content_id`,
 			name: 'Content',
@@ -92,11 +98,12 @@ const app = Vue.createApp({
 			const target = event.target.closest('a');
 			
 			if (target && this.isInternalRoute(target.href)) {
+				const url = new URL(target.href)
 				
-				const path = new URL(target.href).pathname
+				const path = url.pathname
 				const base = this.$router.options.history.base
 				const route = path.replace(base, '') || '/'
-				
+
 				// let click event propagate normally if we dont route internally
 				const res = this.$router.resolve(route)
 				if(!res?.matched?.length) return
@@ -106,10 +113,13 @@ const app = Vue.createApp({
 				if(this.isMobile) { // toggle the menu
 					const navMain = document.getElementById('nav-main');
 					// fix unwanted toggle from off to on for some links on mobile
-					if(navMain.classList.contains('show')) document.getElementById('nav-main-btn').click();
+					if(navMain.classList.contains('show')){
+						document.getElementById('nav-main-btn').click();
+					} 
 				}
 				
 				this.$router.push(route);
+				
 			}
 		}
 	},
@@ -120,6 +130,11 @@ const app = Vue.createApp({
 		document.removeEventListener('click', this.handleClick);
 	},
 });
+
+router.beforeEach((to,from) => {
+	console.log('to', to)
+	console.log('from', from)
+})
 
 // kind of a bandaid for bad css on some pages to avoid horizontal scroll
 setScrollbarWidth();

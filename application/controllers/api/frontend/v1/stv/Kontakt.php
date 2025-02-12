@@ -133,11 +133,11 @@ class Kontakt extends FHCAPI_Controller
 	public function getAdressen($person_id)
 	{
 		$this->AdresseModel->addSelect("public.tbl_adresse.*,
-					TO_CHAR (CASE
-					WHEN public.tbl_adresse.updateamum >= public.tbl_adresse.insertamum
-					THEN public.tbl_adresse.updateamum
-					ELSE public.tbl_adresse.insertamum
-				END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate");
+			(CASE
+				WHEN public.tbl_adresse.updateamum >= public.tbl_adresse.insertamum
+				THEN public.tbl_adresse.updateamum
+				ELSE public.tbl_adresse.insertamum
+			END) AS lastUpdate");
 		$this->AdresseModel->addSelect('t.*');
 		$this->AdresseModel->addSelect('f.firma_id');
 		$this->AdresseModel->addSelect('f.name as firmenname');
@@ -409,11 +409,11 @@ class Kontakt extends FHCAPI_Controller
 	public function getKontakte($person_id)
 	{
 		$this->KontaktModel->addSelect("public.tbl_kontakt.*,
-			TO_CHAR (CASE 
-					WHEN public.tbl_kontakt.updateamum >= public.tbl_kontakt.insertamum 
-					THEN public.tbl_kontakt.updateamum 
-					ELSE public.tbl_kontakt.insertamum 
-				END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate, st.bezeichnung, f.name");
+			(CASE
+				WHEN public.tbl_kontakt.updateamum >= public.tbl_kontakt.insertamum
+				THEN public.tbl_kontakt.updateamum
+				ELSE public.tbl_kontakt.insertamum
+			END) AS lastUpdate, st.bezeichnung, f.name");
 		$this->StandortModel->addJoin('public.tbl_standort st', 'ON (public.tbl_kontakt.standort_id = st.standort_id)', 'LEFT');
 		$this->FirmaModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = st.firma_id)', 'LEFT');
 		$result = $this->KontaktModel->loadWhere(
@@ -515,7 +515,7 @@ class Kontakt extends FHCAPI_Controller
 		{
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		return $this->outputJsonSuccess(true);
+		$this->terminateWithSuccess($result);
 	}
 
 	public function updateContact()
@@ -754,7 +754,7 @@ class Kontakt extends FHCAPI_Controller
 		}
 		if (!hasData($result))
 		{
-			$this->outputJson($result);
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Bankverbindung_id']), self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess(current(getData($result)) ? : null);
 	}
