@@ -499,7 +499,7 @@ class Profil extends FHCAPI_Controller
 		/** @param integer $geburtsInfo */
 		if ($geburtsInfo) {
 			array_push($selectClause, "gebort");
-			array_push($selectClause, "gebdatum");
+			array_push($selectClause, "TO_CHAR(gebdatum, 'DD.MM.YYYY') as gebdatum");
 		}
 		$this->BenutzerModel->addSelect($selectClause);
 		$this->BenutzerModel->addJoin("tbl_person", "person_id");
