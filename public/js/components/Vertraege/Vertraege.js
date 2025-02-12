@@ -68,9 +68,21 @@ export default {
 					},
 					{title: "Vertragstyp", field: "vertragstyp_bezeichnung", width: 125},
 					{title: "Status", field: "status"},
-					{title: "Vertragsdatum", field: "format_vertragsdatum", width: 128},
+					{
+						title: "Vertragsdatum",
+						field: "vertragsdatum",
+						width: 128,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+							});
+						}
+					},
 					{title: "VertragId", field: "vertrag_id", visible: false},
-					{title: "Vertragsdatum_iso", field: "vertragsdatum", visible: false},
 					{title: "Vertragsstunden", field: "vertragsstunden", visible: false},
 					{title: "VertragsstundenStudiensemester", field: "vertragsstunden_studiensemester_kurzbz", visible: false},
 					{title: "Anmerkung", field: "anmerkung", visible: false},
@@ -146,11 +158,8 @@ export default {
 						cm.getColumnByField('vertragstyp_bezeichnung').component.updateDefinition({
 							title: this.$p.t('vertrag', 'vertragstyp')
 						});
-						cm.getColumnByField('format_vertragsdatum').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsdatum')
-						});
 						cm.getColumnByField('vertragsdatum').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsdatum_iso')
+							title: this.$p.t('vertrag', 'vertragsdatum')
 						});
 						cm.getColumnByField('vertragsstunden').component.updateDefinition({
 							title: this.$p.t('vertrag', 'vertragsstunden')
@@ -177,7 +186,7 @@ export default {
 					//(maybe enable also for ADDON FH Burgenland: MultiAccept later)
 					event: 'rowClick',
 					handler: (e, row) => {
-						if (this.dataPrintHonorar.multiselect) {
+						if (this.dataPrintHonorar != null && this.dataPrintHonorar.multiselect != null) {
 							const selectedContract = row.getData().vertrag_id;
 							const status = row.getData().status;
 							const bezeichnung =	row.getData().bezeichnung;

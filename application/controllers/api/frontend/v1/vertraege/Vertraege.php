@@ -659,7 +659,12 @@ class Vertraege extends FHCAPI_Controller
 		}
 		if (!hasData($result))
 		{
-			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id' => 'Id_Lehrauftrag']), self::ERROR_TYPE_GENERAL);
+			//return data before PV21 (with filter fix angestellt, active and with bisverwendung)
+			$result = $this->Mitarbeitermodel->getPersonal(true, true, true);
+			if (isError($result))
+			{
+				return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+			}
 		}
 		return $this->terminateWithSuccess(getData($result));
 	}

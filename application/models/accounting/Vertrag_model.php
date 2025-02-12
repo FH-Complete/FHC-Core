@@ -343,9 +343,9 @@ class Vertrag_model extends DB_Model
 					*,
 					tbl_vertrag.bezeichnung as bezeichnung,
 					tbl_vertragstyp.bezeichnung as vertragstyp_bezeichnung,
-					TO_CHAR(tbl_vertrag.vertragsdatum::timestamp, 'DD.MM.YYYY') AS format_vertragsdatum,
+					tbl_vertrag.vertragsdatum,
 					(SELECT bezeichnung FROM lehre.tbl_vertragsstatus 
-					    JOIN lehre.tbl_vertrag_vertragsstatus USING(vertragsstatus_kurzbz)
+					JOIN lehre.tbl_vertrag_vertragsstatus USING(vertragsstatus_kurzbz)
 						WHERE vertrag_id=tbl_vertrag.vertrag_id ORDER BY datum desc limit 1) as status, anmerkung,
 			    CASE
 					WHEN EXISTS (
@@ -487,15 +487,15 @@ SELECT
 		$query = " 
 			SELECT
 				*,
-                TO_CHAR(tbl_vertrag_vertragsstatus.datum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_datum,
-                TO_CHAR(tbl_vertrag_vertragsstatus.insertamum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_insertamum,
-                TO_CHAR(tbl_vertrag_vertragsstatus.updateamum::timestamp, 'DD.MM.YYYY HH24:MI') AS format_updateamum
+                tbl_vertrag_vertragsstatus.datum,
+                tbl_vertrag_vertragsstatus.insertamum,
+                tbl_vertrag_vertragsstatus.updateamum
 			FROM
 				lehre.tbl_vertrag_vertragsstatus
 				JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz)
 			WHERE
 				tbl_vertrag_vertragsstatus.vertrag_id = ?
-			ORDER BY datum DESC";
+			ORDER BY tbl_vertrag_vertragsstatus.datum DESC";
 
 		return $this->execQuery($query, array($vertrag_id));
 	}

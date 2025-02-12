@@ -109,7 +109,7 @@ class Mitarbeiter_model extends DB_Model
 			SELECT
 				 b.uid , p.person_id,
 				p.vorname, p.nachname,
-				TO_CHAR(gebdatum::timestamp, 'DD.MM.YYYY') AS format_gebdatum,
+				gebdatum,
 				COALESCE(b.alias, b.uid) AS email,
 				STRING_AGG(DISTINCT va.bezeichnung, ', ') AS Vertragsarten,
 				STRING_AGG(DISTINCT u.bezeichnung, ', ') AS Unternehmen,

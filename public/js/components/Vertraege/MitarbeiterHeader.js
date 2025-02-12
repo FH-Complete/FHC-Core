@@ -62,7 +62,20 @@ export default {
 							crossElement: '<i class="fa fa-xmark text-danger"></i>'
 						}
 					},
-					{title: "Geburtsdatum", field: "format_gebdatum", headerFilter:"input"},
+					{
+						title: "Geburtsdatum",
+						field: "gebdatum",
+						headerFilter:"input",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+							});
+						}
+					},
 					{title: "Unternehmen", field: "unternehmen", headerFilter:"input"},
 					{title: "Vertragsarten", field: "vertragsarten", headerFilter:"input"},
 					{title: "Ids Dienstverträge", field: "ids", headerFilter:"input"},
@@ -98,7 +111,7 @@ export default {
 						cm.getColumnByField('aktiv').component.updateDefinition({
 							title: this.$p.t('global', 'aktiv')
 						});
-						cm.getColumnByField('format_gebdatum').component.updateDefinition({
+						cm.getColumnByField('gebdatum').component.updateDefinition({
 							title: this.$p.t('person', 'geburtsdatum')
 						});
 						cm.getColumnByField('unternehmen').component.updateDefinition({
