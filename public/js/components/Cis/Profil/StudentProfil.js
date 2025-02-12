@@ -84,6 +84,11 @@ export default {
 		data: Object,
 		editData: Object,
 	},
+	provide() {
+		return {
+			studiengang_kz: Vue.computed({ get: () => this.data.studiengang_kz }),
+		}
+	},
 	methods: {
 
 		betriebsmittelTableBuilt: function () {
@@ -172,14 +177,46 @@ export default {
 			}
 
 			return {
-				[`${this.$p.t('profil','Geburtsdatum')}`]: this.data.gebdatum,
-				[`${this.$p.t('profil', 'Geburtsort')}`]: this.data.gebort,
-				[`${this.$p.t('person', 'personenkennzeichen')}`]: this.data.personenkennzeichen,
-				[`${this.$p.t('lehre', 'studiengang')}`]: this.data.studiengang,
-				[`${this.$p.t('lehre', 'semester')}`]: this.data.semester,
-				[`${this.$p.t('lehre', 'lehrverband')}`]: this.data.verband,
-				[`${this.$p.t('lehre', 'gruppe')}`]: this.data.gruppe.trim(),
+				geburtsdatum: {
+					label: `${this.$p.t('profil','Geburtsdatum')}`,
+					value: this.data.gebdatum
+				},
+				geburtsort: {
+					label: `${this.$p.t('profil','Geburtsort')}`,
+					value: this.data.gebort
+				},
+				personenkennzeichen: {
+					label: `${this.$p.t('person','personenkennzeichen')}`,
+					value: this.data.personenkennzeichen
+				},
+				studiengang: {
+					label: `${this.$p.t('lehre','studiengang')}`,
+					value: this.data.studiengang
+				},
+				semester: {
+					label: `${this.$p.t('lehre','semester')}`,
+					value: this.data.semester
+				},
+				verband: {
+					label: `${this.$p.t('lehre','lehrverband')}`,
+					value: this.data.verband
+				},
+				gruppe: {
+					label: `${this.$p.t('lehre','gruppe')}`,
+					value: this.data.gruppe.trim()
+				}
 			};
+			
+			// so nicht
+			// return {
+			// 	[`${this.$p.t('profil','Geburtsdatum')}`]: this.data.gebdatum,
+			// 	[`${this.$p.t('profil', 'Geburtsort')}`]: this.data.gebort,
+			// 	[`${this.$p.t('person', 'personenkennzeichen')}`]: this.data.personenkennzeichen,
+			// 	[`${this.$p.t('lehre', 'studiengang')}`]: this.data.studiengang,
+			// 	[`${this.$p.t('lehre', 'semester')}`]: this.data.semester,
+			// 	[`${this.$p.t('lehre', 'lehrverband')}`]: this.data.verband,
+			// 	[`${this.$p.t('lehre', 'gruppe')}`]: this.data.gruppe.trim(),
+			// };
 		},
 	},
 	created() {

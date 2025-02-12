@@ -17,6 +17,12 @@ export default {
 	},
 
 	props: ["data"],
+	provide() {
+		return {
+			studiengang_kz: Vue.computed({ get: () => this.data.studiengang_kz }),
+		}
+	},
+	
 	methods: {},
 
 	computed: {
@@ -49,15 +55,47 @@ export default {
 				return {};
 			}
 
+
 			return {
-				Geburtsdatum: this.data.gebdatum,
-				Geburtsort: this.data.gebort,
-				Personenkennzeichen: this.data.personenkennzeichen,
-				Studiengang: this.data.studiengang,
-				Semester: this.data.semester,
-				Verband: this.data.verband,
-				Gruppe: this.data.gruppe.trim(),
+				geburtsdatum: {
+					label: `${this.$p.t('profil','Geburtsdatum')}`,
+					value: this.data.gebdatum
+				},
+				geburtsort: {
+					label: `${this.$p.t('profil','Geburtsort')}`,
+					value: this.data.gebort
+				},
+				personenkennzeichen: {
+					label: `${this.$p.t('person','Geburtsort')}`,
+					value: this.data.personenkennzeichen
+				},
+				studiengang: {
+					label: `${this.$p.t('lehre','Geburtsort')}`,
+					value: this.data.studiengang
+				},
+				semester: {
+					label: `${this.$p.t('lehre','Geburtsort')}`,
+					value: this.data.semester
+				},
+				verband: {
+					label: `${this.$p.t('lehre','Geburtsort')}`,
+					value: this.data.verband
+				},
+				gruppe: {
+					label: `${this.$p.t('lehre','Geburtsort')}`,
+					value: this.data.gruppe.trim()
+				}
 			};
+			
+			// return {
+			// 	Geburtsdatum: this.data.gebdatum,
+			// 	Geburtsort: this.data.gebort,
+			// 	Personenkennzeichen: this.data.personenkennzeichen,
+			// 	Studiengang: this.data.studiengang,
+			// 	Semester: this.data.semester,
+			// 	Verband: this.data.verband,
+			// 	Gruppe: this.data.gruppe.trim(),
+			// };
 		},
 	},
 

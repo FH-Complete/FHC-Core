@@ -93,6 +93,15 @@ export default {
 	},
 
 	computed: {
+		getTelefonValue() {
+			if(this.data.standort_telefon?.kontakt) {
+				return this.data.standort_telefon.kontakt + " " + this.data.telefonklappe
+			} else if(this.data.standort_telefon) {
+				return this.data.standort_telefon + " " + this.data.telefonklappe
+			} else {
+				return this.data.telefonklappe
+			}
+		},
 		editable() {
 			return this.data?.editAllowed ?? false;
 		},
@@ -122,15 +131,37 @@ export default {
 			if (!this.data) {
 				return {};
 			}
-
 			return {
-				[`${this.$p.t('profil', 'Geburtsdatum')}`]: this.data.gebdatum,
-				[`${this.$p.t('profil', 'Geburtsort')}`]: this.data.gebort,
-				[`${this.$p.t('profil', 'Kurzzeichen')}`]: this.data.kurzbz,
-				[`${this.$p.t('profil', 'Telefon')}`]:
-					(this.data.standort_telefon ? this.data.standort_telefon + " " + this.data.telefonklappe : this.data.telefonklappe),
-				[`${this.$p.t('profil', 'Büro')}`]: this.data.ort_kurzbz,
+				geburtsdatum: {
+					label: `${this.$p.t('profil','Geburtsdatum')}`,
+					value: this.data.gebdatum
+				},
+				geburtsort: {
+					label: `${this.$p.t('profil','Geburtsort')}`,
+					value: this.data.gebort
+				},
+				personenkennzeichen: {
+					label: `${this.$p.t('profil','Kurzzeichen')}`,
+					value: this.data.kurzbz
+				},
+				telefon: {
+					label: `${this.$p.t('profil','Telefon')}`,
+					value: this.getTelefonValue
+				},
+				office: {
+					label: `${this.$p.t('profil','Büro')}`,
+					value: this.data.ort_kurzbz
+				}
 			};
+
+			// return {
+			// 	[`${this.$p.t('profil', 'Geburtsdatum')}`]: this.data.gebdatum,
+			// 	[`${this.$p.t('profil', 'Geburtsort')}`]: this.data.gebort,
+			// 	[`${this.$p.t('profil', 'Kurzzeichen')}`]: this.data.kurzbz,
+			// 	[`${this.$p.t('profil', 'Telefon')}`]:
+			// 		(this.data.standort_telefon ? this.data.standort_telefon + " " + this.data.telefonklappe : this.data.telefonklappe),
+			// 	[`${this.$p.t('profil', 'Büro')}`]: this.data.ort_kurzbz,
+			// };
 		},
 	},
 
