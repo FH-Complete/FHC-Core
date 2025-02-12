@@ -278,6 +278,23 @@ class Stundenplan extends FHCAPI_Controller
 
 				$gruppe_obj_array[] = $lv_gruppe_object;
 			}
+			
+			if($item->ort_kurzbz) {
+
+				$ort_content_object = $this->StundenplanModel->execReadOnlyQuery("
+				SELECT content_id
+				FROM public.tbl_ort
+				WHERE ort_kurzbz = ?", [$item->ort_kurzbz]);
+				if (isError($ort_content_object)) {
+					$this->show_error(getError($ort_content_object));
+				}
+				$ort_content_object = getData($ort_content_object)[0];
+				if($ort_content_object) {
+					$item->ort_content_id = $ort_content_object->content_id;
+				}
+				
+				
+			}
 
 			$item->gruppe = $gruppe_obj_array;
 			$item->lektor = $lektor_obj_array;

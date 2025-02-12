@@ -230,7 +230,7 @@ export default {
 				[`${this.$p.t('profil', 'Geburtsort')}`]: this.data.gebort,
 				[`${this.$p.t('profil', 'Kurzzeichen')}`]: this.data.kurzbz,
 				[`${this.$p.t('profil', 'Telefon')}`]:
-					(this.data.standort_telefon ? this.data.standort_telefon + " " + this.data.telefonklappe : this.data.telefonklappe),
+					(this.data.standort_telefon ? this.data.standort_telefon.kontakt + " " + this.data.telefonklappe : this.data.telefonklappe),
 				[`${this.$p.t('profil', 'Büro')}`]: this.data.ort_kurzbz,
 			};
 		},

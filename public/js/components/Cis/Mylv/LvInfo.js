@@ -24,8 +24,7 @@ export default {
 		{
 			if (!this.event || !this.event.ort_content_id) return "a";
 
-			// TODO: define/build link with content_id and/or roomname
-			// return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/CisVue/cms/content/${this.event.ort_content_id}`
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/CisVue/Cms/content/${this.event.ort_content_id}`
 		},
 		start_time: function () {
 			if (!this.event.start) return 'N/A';
