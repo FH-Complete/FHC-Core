@@ -37327,13 +37327,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bewertung',
+				'text' => 'Bewertung (Prozent)',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Score',
+				'text' => 'Score (percentage)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37353,7 +37353,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Problem Definition and Objective Setting',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37374,7 +37374,8 @@ Die Zielsetzung sowie eventuelle Messgrößen sind eindeutig formuliert.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'The problem is clearly and precisely defined and embedded in a scientific context.
+The objective, along with any potential metrics, is clearly formulated.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37394,7 +37395,7 @@ Die Zielsetzung sowie eventuelle Messgrößen sind eindeutig formuliert.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Methodology and Approach',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37416,7 +37417,9 @@ Die Methodik ist fachspezifisch angemessen, literaturbasiert begründet und wiss
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'The methodological approach is logically and comprehensively structured,
+aligned with the objective, and the applied methods are implemented correctly and soundly.
+The methodology is appropriate to the field, justified based on literature, and scientifically valid.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37436,7 +37439,7 @@ Die Methodik ist fachspezifisch angemessen, literaturbasiert begründet und wiss
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Results and Discussion',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37457,7 +37460,9 @@ Die Diskussion reflektiert die Relevanz und Grenzen der Ergebnisse kritisch und 
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'The quality of the solution sufficiently meets the objective.
+The results are thoroughly analyzed and coherently interpreted with respect to the objective.
+The discussion critically reflects on the relevance and limitations of the results and is logically structured.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37477,7 +37482,7 @@ Die Diskussion reflektiert die Relevanz und Grenzen der Ergebnisse kritisch und 
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Structure and Organization',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37498,7 +37503,8 @@ Verzeichnisse, Grafiken, Tabellen und der Text sind gemäß den aktuell gültige
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'The work follows a logical and clear outline with a consistent narrative thread.
+Directories, graphics, tables, and text are prepared in accordance with the currently valid scientific guidelines of FH Technikum Wien.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37518,7 +37524,7 @@ Verzeichnisse, Grafiken, Tabellen und der Text sind gemäß den aktuell gültige
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Style and Expression',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37539,7 +37545,8 @@ fachlich korrekt und erfüllt die Anforderungen an gendergerechte Sprache gemä�
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'The linguistic expression is precise, professionally accurate,
+and meets the requirements of gender-sensitive language as per the applicable guidelines of FH Technikum Wien.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37559,7 +37566,7 @@ fachlich korrekt und erfüllt die Anforderungen an gendergerechte Sprache gemä�
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Citation Rules and References',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37580,7 +37587,8 @@ und repräsentieren den aktuellen Stand der Forschung zum Thema. Die Zitierregel
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'The scope, quality, and timeliness of the sources processed are appropriate
+and represent the current state of research on the topic. The prescribed citation rules are consistently and correctly applied.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37594,13 +37602,13 @@ und repräsentieren den aktuellen Stand der Forschung zum Thema. Die Zitierregel
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Falls ein Kriterium negativ bewertet wird, ist die {0} insgesamt als negativ zu beurteilen.',
+				'text' => 'Wenn ein Kriterium mit unter 50% bewertet wird, ist die Arbeit insgesamt als negativ zu beurteilen.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'If a criterion has a negative score, the {0} is to be assessed as negative overall.',
+				'text' => 'Each criterion must receive a minimum score of 50%; otherwise, the entire work is rated negatively.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
