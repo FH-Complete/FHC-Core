@@ -355,7 +355,6 @@ export const Profil = {
 			}
 		},
 		uid (newVal, oldVal) {
-			console.log('watch uid', newVal)
 			this.load()
 		}
 	},

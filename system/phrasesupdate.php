@@ -26736,6 +26736,26 @@ array(
 				)
 			)
 		),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'MOBIL',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobiltelefonnummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cell phone number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 		array(
 			'app' => 'core',
 			'category' => 'profil',
