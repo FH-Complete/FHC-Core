@@ -656,6 +656,7 @@ class Studiengang_model extends DB_Model
 
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
 
 		$addEmailProperty= function(&$benutzerfunktionen){
 			if(count($benutzerfunktionen) && defined('DOMAIN'))
@@ -691,11 +692,6 @@ class Studiengang_model extends DB_Model
 		if (isError($student))
 			return error($student);
 		if (getData($student)) {
-			//TODO: if a mitarbeiter requests this site, empty data should be returned
-			if(count($student) == 0)
-			{
-				return new stdClass();
-			}
 			$student = current(getData($student));
 			$studiengang_kz = $student->studiengang_kz;
 			$semester = $student->semester;
