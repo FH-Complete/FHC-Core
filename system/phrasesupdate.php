@@ -37613,6 +37613,46 @@ and represent the current state of research on the topic. The prescribed citatio
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'begruendung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Begründung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Overall comment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'begruendungVerpflichtend',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eine Begründung der Bewertung ist notwendig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An overall comment is mandatory and must be completed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 	// PROJEKTARBEITSBEURTEILUNG SS2025 ENDE ---------------------------------------------------------------------------
 );
