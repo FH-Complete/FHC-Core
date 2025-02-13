@@ -5,7 +5,7 @@ const loadingModules = {};
 let user_language = Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
 export let user_locale = Vue.computed(()=>{
 	if(!user_language.value) return null;
-	return FHC_JS_DATA_STORAGE_OBJECT.server_languages.find(language => language.sprache == user_language.value).locale;
+	return FHC_JS_DATA_STORAGE_OBJECT.server_languages.find(language => language.sprache == user_language.value).LC_Time;
 });
 
 function extractCategory(obj, category) {
@@ -30,7 +30,7 @@ const phrasen = {
 	setLanguage(language, api) {
 		const catArray = Object.keys(categories)
 		return api.factory.phrasen.setLanguage(catArray, language).then(res => {
-
+			console.log('setLanguage', res)
 			res.data.forEach(row => {
 				categories[row.category][row.phrase] = row.text
 			})
