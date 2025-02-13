@@ -30,7 +30,6 @@ const phrasen = {
 	setLanguage(language, api) {
 		const catArray = Object.keys(categories)
 		return api.factory.phrasen.setLanguage(catArray, language).then(res => {
-			console.log('setLanguage', res)
 			res.data.forEach(row => {
 				categories[row.category][row.phrase] = row.text
 			})
