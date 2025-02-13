@@ -169,7 +169,7 @@ export default {
 	},
 	template: `
 	<div class="core-dashboard">
-		<h3>
+		<h3 v-show="viewDataInternal?.name">
 			{{ $p.t('global/personalGreeting', [ viewDataInternal?.name ]) }}
 			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
 		</h3>

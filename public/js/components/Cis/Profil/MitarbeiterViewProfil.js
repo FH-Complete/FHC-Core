@@ -25,15 +25,6 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
-				data: [
-					{
-						Bezeichnung: "",
-						Organisationseinheit: "",
-						Gültig_von: "",
-						Gültig_bis: "",
-						Wochenstunden: "",
-					},
-				],
 				columns: [
 					//? option when wanting to hide the collapsed list
 
@@ -97,7 +88,11 @@ export default {
 			this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
 		},
 	},
-
+	watch: {
+		'data.funktionen'(newVal) {
+			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setData(newVal);
+		},
+	},
 	computed: {
 		getTelefonValue() {
 			if(this.data.standort_telefon?.kontakt) {

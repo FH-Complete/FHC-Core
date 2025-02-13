@@ -39,15 +39,6 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
-				data: [
-					{
-						Bezeichnung: "",
-						Organisationseinheit: "",
-						Gültig_von: "",
-						Gültig_bis: "",
-						Wochenstunden: "",
-					},
-				],
 				columns: [
 					{
 						title:
@@ -150,7 +141,12 @@ export default {
 		data: Object,
 		editData: Object,
 	},
-
+	'data.funktionen'(newVal) {
+		if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setData(newVal);
+	},
+	'data.mittel'(newVal) {
+		if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setData(newVal);
+	},
 	methods: {
 		betriebsmittelTableBuilt: function () {
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
