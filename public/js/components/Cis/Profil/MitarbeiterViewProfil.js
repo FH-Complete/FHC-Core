@@ -46,18 +46,21 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
+						visible: true
 					},
 					{
 						title: "Bezeichnung",
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Organisationseinheit",
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Gültig_von",
@@ -65,6 +68,7 @@ export default {
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Gültig_bis",
@@ -72,12 +76,14 @@ export default {
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Wochenstunden",
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 				],
 			},
@@ -153,15 +159,6 @@ export default {
 					value: this.data.ort_kurzbz
 				}
 			};
-
-			// return {
-			// 	[`${this.$p.t('profil', 'Geburtsdatum')}`]: this.data.gebdatum,
-			// 	[`${this.$p.t('profil', 'Geburtsort')}`]: this.data.gebort,
-			// 	[`${this.$p.t('profil', 'Kurzzeichen')}`]: this.data.kurzbz,
-			// 	[`${this.$p.t('profil', 'Telefon')}`]:
-			// 		(this.data.standort_telefon ? this.data.standort_telefon + " " + this.data.telefonklappe : this.data.telefonklappe),
-			// 	[`${this.$p.t('profil', 'Büro')}`]: this.data.ort_kurzbz,
-			// };
 		},
 	},
 

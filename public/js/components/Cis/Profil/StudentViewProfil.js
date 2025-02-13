@@ -66,36 +66,26 @@ export default {
 					value: this.data.gebort
 				},
 				personenkennzeichen: {
-					label: `${this.$p.t('person','Geburtsort')}`,
+					label: `${this.$p.t('person','personenkennzeichen')}`,
 					value: this.data.personenkennzeichen
 				},
 				studiengang: {
-					label: `${this.$p.t('lehre','Geburtsort')}`,
+					label: `${this.$p.t('lehre','studiengang')}`,
 					value: this.data.studiengang
 				},
 				semester: {
-					label: `${this.$p.t('lehre','Geburtsort')}`,
+					label: `${this.$p.t('lehre','semester')}`,
 					value: this.data.semester
 				},
 				verband: {
-					label: `${this.$p.t('lehre','Geburtsort')}`,
+					label: `${this.$p.t('lehre','lehrverband')}`,
 					value: this.data.verband
 				},
 				gruppe: {
-					label: `${this.$p.t('lehre','Geburtsort')}`,
+					label: `${this.$p.t('lehre','gruppe')}`,
 					value: this.data.gruppe.trim()
 				}
 			};
-			
-			// return {
-			// 	Geburtsdatum: this.data.gebdatum,
-			// 	Geburtsort: this.data.gebort,
-			// 	Personenkennzeichen: this.data.personenkennzeichen,
-			// 	Studiengang: this.data.studiengang,
-			// 	Semester: this.data.semester,
-			// 	Verband: this.data.verband,
-			// 	Gruppe: this.data.gruppe.trim(),
-			// };
 		},
 	},
 
