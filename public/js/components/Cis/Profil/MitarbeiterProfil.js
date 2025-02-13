@@ -34,6 +34,10 @@ export default {
 
 			// tabulator options
 			funktionen_table_options: {
+				persistenceID: "filterTableMaProfilFunktionen",
+				persistence: {
+					columns: false
+				},
 				height: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",

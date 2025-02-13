@@ -20,6 +20,10 @@ export default {
 			collapseIconFunktionen: true,
 
 			funktionen_table_options: {
+				persistenceID: "filterTableMaViewProfilFunktionen",
+				persistence: {
+					columns: false
+				},
 				height: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
