@@ -66,6 +66,7 @@ export default {
 			return bodyStyle;
 		},
 		grade() {
+			// TODO: noten phrasen
 			return this.benotung ? this.znote || this.lvnote || null : null;
 		},
 		LvHasPruefungenInformation(){
@@ -159,7 +160,7 @@ export default {
 
 		<div class="p-2" :class="is_organisatorische_einheit?'':'card-header'">
 			<!-- {{module}} if the module of the lv is important then query the module from the api endpoint for LV-->
-			<h6 class="fw-bold" v-if="is_organisatorische_einheit" >Organisatorische Einheit:</h6>
+			<h6 class="fw-bold" v-if="is_organisatorische_einheit" >{{ $p.t('lehre/organisationseinheit') }}:</h6>
 			<h6 class="mb-0">{{bezeichnung}}</h6>
 		</div>
 		<div v-if="!emptyMenu" class="card-body " :style="bodyStyle">
@@ -197,14 +198,14 @@ export default {
 				<template v-if="LvHasPruefungenInformation">
 					<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
 						<i class="fa fa-check text-success" v-if="positiv"></i>
-						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || p.t('lehre/noGrades') }}</span>
+						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || $p.t('lehre/noGrades') }}</span>
 					</a>
 				</template>
 				<!-- template for the LV with no pruefungen -->
 				<template v-else>
 					<span  class="col-auto text-start text-decoration-none" >
 						<i class="fa fa-check text-success" v-if="positiv"></i>
-						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || p.t('lehre/noGrades') }}</span>
+						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || $p.t('lehre/noGrades') }}</span>
 					</span>
 				</template>
 			</div>

@@ -206,15 +206,15 @@ export const Stundenplan = {
 					</div>
 				</div>
 				<div class="col ">
-					<p>Lehrveranstaltung:</p>
+					<p>{{ $p.t('lehre/lehrveranstaltung') }}:</p>
 					<p class="m-0">{{event?.orig.topic}}</p>
 				</div>
 				<div class="col ">
-					<p>Lektor:</p>
+					<p>{{ $p.t('lehre/lektor') }}:</p>
 					<p class="m-0" v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
 				</div>
 				<div class="col ">
-					<p>Ort: </p>
+					<p>{{ $p.t('profil/Ort') }}: </p>
 					<p class="m-0">{{event?.orig.ort_kurzbz}}</p>
 				</div>
 			</div>
@@ -224,11 +224,11 @@ export const Stundenplan = {
 			<div class="w-100">
 				<lv-info  :event="currentlySelectedEvent" />
 			</div>
-			<h3 >Lehrveranstaltungs Menu</h3>
+			<h3 >{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
 			<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-show="lvMenu" :menu="lvMenu" />
 		</template>
 		<template #pageMobilContentEmpty >
-			<h3>Keine Lehrveranstaltungen</h3>
+			<h3>{{ $p.t('lehre/noLvFound') }}</h3>
 		</template>
 	</fhc-calendar>
 	`

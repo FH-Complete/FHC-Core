@@ -25,7 +25,7 @@ export default {
 		ProfilInformation,
 	},
 
-	inject: ["sortProfilUpdates", "collapseFunction"],
+	inject: ["sortProfilUpdates", "collapseFunction", "language"],
 
 	data() {
 		return {
@@ -56,21 +56,21 @@ export default {
 						visible: true
 					},
 					{
-						title: "Bezeichnung",
+						title: Vue.computed(() => this.$p.t('ui/bezeichnung')),
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "Organisationseinheit",
+						title: Vue.computed(() => this.$p.t('lehre/organisationseinheit')),
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "Gültig_von",
+						title: Vue.computed(() => this.$p.t('global/gueltigVon')),
 						field: "Gültig_von",
 						headerFilter: true,
 						resizable: true,
@@ -78,7 +78,7 @@ export default {
 						visible: true
 					},
 					{
-						title: "Gültig_bis",
+						title: Vue.computed(() => this.$p.t('global/gueltigBis')),
 						field: "Gültig_bis",
 						headerFilter: true,
 						resizable: true,
@@ -86,7 +86,7 @@ export default {
 						visible: true
 					},
 					{
-						title: "Wochenstunden",
+						title: Vue.computed(() => this.$p.t('profil/wochenstunden')),
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
@@ -96,6 +96,10 @@ export default {
 			},
 
 			betriebsmittel_table_options: {
+				persistenceID: "filterTableMaProfilBetriebsmittel",
+				persistence: {
+					columns: false
+				},
 				height: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
@@ -115,14 +119,14 @@ export default {
 						visible: true
 					},
 					{
-						title: "Betriebsmittel",
+						title:  Vue.computed(() => this.$p.t('profil/entlehnteBetriebsmittel')),
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "Nummer",
+						title:  Vue.computed(() => this.$p.t('profil/inventarnummer')),
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
@@ -130,7 +134,7 @@ export default {
 						visible: true
 					},
 					{
-						title: "Ausgegeben_am",
+						title: Vue.computed(() => this.$p.t('profil/ausgabedatum')),
 						field: "Ausgegeben_am",
 						headerFilter: true,
 						minWidth: 200,
@@ -145,17 +149,14 @@ export default {
 		data: Object,
 		editData: Object,
 	},
-	'data.funktionen'(newVal) {
-		if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setData(newVal);
-	},
-	'data.mittel'(newVal) {
-		if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setData(newVal);
-	},
+	
 	methods: {
 		betriebsmittelTableBuilt: function () {
+			this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
 		},
 		funktionenTableBuilt: function () {
+			this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
 			this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
 		},
 		hideEditProfilModal: function () {
@@ -202,6 +203,10 @@ export default {
 				}
 			});
 		},
+		setTableColumnTitles() { // reevaluates computed phrasen
+			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
+			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
+		}
 	},
 
 	computed: {
@@ -274,10 +279,17 @@ export default {
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
 
 	},
-	mounted() {
-
+	watch: {
+		'data.funktionen'(newVal) {
+			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setData(newVal);
+		},
+		'data.mittel'(newVal) {
+			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setData(newVal);
+		},
+		'language.value'(newVal) {
+			this.setTableColumnTitles()
+		}
 	},
-
 	template: /*html*/ ` 
 <div class="container-fluid text-break fhc-form"  >
     <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :title="$p.t('profil','profilBearbeiten')"></edit-profil>

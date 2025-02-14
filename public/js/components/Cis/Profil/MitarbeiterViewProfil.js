@@ -14,7 +14,7 @@ export default {
 		ProfilEmails,
 		ProfilInformation,
 	},
-	inject: ["collapseFunction"],
+	inject: ["collapseFunction", "language"],
 	data() {
 		return {
 			collapseIconFunktionen: true,
@@ -44,21 +44,21 @@ export default {
 						visible: true
 					},
 					{
-						title: "Bezeichnung",
+						title: Vue.computed(() => this.$p.t('ui/bezeichnung')),
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "Organisationseinheit",
+						title: Vue.computed(() => this.$p.t('lehre/organisationseinheit')),
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "Gültig_von",
+						title: Vue.computed(() => this.$p.t('global/gueltigVon')),
 						field: "Gültig_von",
 						headerFilter: true,
 						resizable: true,
@@ -66,7 +66,7 @@ export default {
 						visible: true
 					},
 					{
-						title: "Gültig_bis",
+						title: Vue.computed(() => this.$p.t('global/gueltigBis')),
 						field: "Gültig_bis",
 						headerFilter: true,
 						resizable: true,
@@ -74,7 +74,7 @@ export default {
 						visible: true
 					},
 					{
-						title: "Wochenstunden",
+						title: Vue.computed(() => this.$p.t('profil/wochenstunden')),
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
@@ -96,6 +96,9 @@ export default {
 		'data.funktionen'(newVal) {
 			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setData(newVal);
 		},
+		'language.value'(newVal) {  // reevaluates computed phrasen
+			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
+		}
 	},
 	computed: {
 		getTelefonValue() {
