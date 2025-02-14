@@ -34,20 +34,15 @@ export default {
 
 			// tabulator options
 			funktionen_table_options: {
+				persistenceID: "filterTableMaProfilFunktionen",
+				persistence: {
+					columns: false
+				},
 				height: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
-				data: [
-					{
-						Bezeichnung: "",
-						Organisationseinheit: "",
-						Gültig_von: "",
-						Gültig_bis: "",
-						Wochenstunden: "",
-					},
-				],
 				columns: [
 					{
 						title:
@@ -58,18 +53,21 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
+						visible: true
 					},
 					{
 						title: "Bezeichnung",
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Organisationseinheit",
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Gültig_von",
@@ -77,6 +75,7 @@ export default {
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Gültig_bis",
@@ -84,12 +83,14 @@ export default {
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Wochenstunden",
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 				],
 			},
@@ -111,12 +112,14 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
+						visible: true
 					},
 					{
 						title: "Betriebsmittel",
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Nummer",
@@ -124,15 +127,17 @@ export default {
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Ausgegeben_am",
 						field: "Ausgegeben_am",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 				],
-			},
+			}
 		};
 	},
 
@@ -140,7 +145,12 @@ export default {
 		data: Object,
 		editData: Object,
 	},
-
+	'data.funktionen'(newVal) {
+		if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setData(newVal);
+	},
+	'data.mittel'(newVal) {
+		if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setData(newVal);
+	},
 	methods: {
 		betriebsmittelTableBuilt: function () {
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
@@ -256,15 +266,6 @@ export default {
 					value: this.data.ort_kurzbz
 				}
 			};
-			
-			// return {
-			// 	[`${this.$p.t('profil', 'Geburtsdatum')}`]: this.data.gebdatum,
-			// 	[`${this.$p.t('profil', 'Geburtsort')}`]: this.data.gebort,
-			// 	[`${this.$p.t('profil', 'Kurzzeichen')}`]: this.data.kurzbz,
-			// 	[`${this.$p.t('profil', 'Telefon')}`]:
-			// 		(this.data.standort_telefon ? this.data.standort_telefon.kontakt + " " + this.data.telefonklappe : this.data.telefonklappe),
-			// 	[`${this.$p.t('profil', 'Büro')}`]: this.data.ort_kurzbz,
-			// };
 		},
 	},
 
@@ -390,11 +391,25 @@ export default {
             <div class="row">
                 <div class="col-12 mb-4" >
                     <!-- FUNKTIONEN TABELLE -->
-                    <core-filter-cmpt @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt 
+                    	@tableBuilt="funktionenTableBuilt"
+						:title="$p.t('person','funktionen')"  
+						ref="funktionenTable" 
+						:tabulator-options="funktionen_table_options"  
+						tableOnly 
+						:sideMenu="false"
+                     />
                 </div>
                 <div class="col-12 mb-4" >
                     <!-- BETRIEBSMITTEL TABELLE -->
-                    <core-filter-cmpt @tableBuilt="betriebsmittelTableBuilt" :title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
+                    <core-filter-cmpt 
+                    	@tableBuilt="betriebsmittelTableBuilt"
+						:title="$p.t('profil','entlehnteBetriebsmittel')"
+						ref="betriebsmittelTable"
+						:tabulator-options="betriebsmittel_table_options"
+						tableOnly
+						:sideMenu="false"
+                    />
                 </div>
             </div>
         </div>

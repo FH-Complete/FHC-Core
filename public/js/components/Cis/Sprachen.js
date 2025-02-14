@@ -9,11 +9,13 @@ export default {
 		changeLanguage: function(lang){
 			if(this.allActiveLanguages.some(l => l.sprache === lang))
 			{
+				const isReload = document.querySelector('[cis4Reload]')
 				this.$p.setLanguage(lang, this.$fhcApi)
 				.then(res => res.data)
 				.then(data =>
 				{
-					this.$emit('languageChanged', lang);
+					if(isReload) window.location.reload()
+					else this.$emit('languageChanged', lang);
 				})
 			}
 		},
