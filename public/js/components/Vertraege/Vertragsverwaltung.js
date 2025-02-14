@@ -21,15 +21,8 @@ export default {
 		}
 	},
 	data() {
-		//TODO(Manu) props for filter: actually not necessary
 		return {
 			person_id: null,
-/*			filterMa: {
-				active: true,
-				hasVertraege: true
-			},*/
-/*			vertragsarten:
-				[ 'echterdv', 'externerlehrender', 'gastlektor']*/
 		}
 	},
 	methods: {
@@ -43,9 +36,9 @@ export default {
 			<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 				<vertical-split ref="vsplit">
 					<template #top>	
-	<!--					<div class="d-flex flex-column" style="height: 100%;">-->
+						<div class="d-flex flex-column" style="height: 100%;">
 							<mitarbeiter-header :filterMa="filterMa" :vertragsarten="vertragsarten" @selectedPerson="selectPerson" />
-<!--						</div>-->
+						</div>
 					</template>
 					<template #bottom>
 						<div class="col" v-if="person_id!=null">
