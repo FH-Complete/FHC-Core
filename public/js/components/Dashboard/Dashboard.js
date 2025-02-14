@@ -55,6 +55,7 @@ export default {
 			}
 			this.$refs.widgetpicker.getWidget().then(widget_id => {
 				widget.widget = widget_id;
+				widget.id = 'loading_' + String((new Date()).valueOf());
 				let loading = {...widget};
 				loading.loading = true;
 				this.sections.forEach(section => {
