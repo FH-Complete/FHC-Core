@@ -8,8 +8,6 @@ export default {
 		'size',
 		'focusDate'
 	],
-	data() {
-	},
 	computed: {
 		weeks(){
 			return [...Array(this.focusDate.numWeeks).keys()].map(i => i + 1);

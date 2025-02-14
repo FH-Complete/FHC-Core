@@ -71,9 +71,9 @@ class CalendarDate {
 	}
 	get wYear() {
 		if( this.w === 1 ) {
-			return this.cdLastDayOfWeek.format({ year: 'numeric' });
+			return this.cdLastDayOfWeek.y;
 		}
-		return this.cdFirstDayOfWeek.format({ year: 'numeric' });
+		return this.cdFirstDayOfWeek.y;
 	}
 	get wd() {
 		if (this._wd === null) {

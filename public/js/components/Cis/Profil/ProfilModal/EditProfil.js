@@ -181,7 +181,7 @@ export default {
 		return BsModal.popup(null, options);
 	},
 	template: /*html*/ `
-<bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false">
+<bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" :backdrop="false">
 	<template v-if="title" v-slot:title>{{title}}</template>
 	<template v-slot:default>
 		<div>

@@ -368,7 +368,7 @@ export default {
 								</div>
 							</Transition>
 							<div>
-								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
+								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">{{ $p.t('lehre/noLvFound') }}</h1>
 								<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
 
 									<div class="hours">

@@ -24,7 +24,7 @@ export default {
 		FetchProfilUpdates,
 		EditProfil,
 	},
-	inject: ["sortProfilUpdates", "collapseFunction"],
+	inject: ["sortProfilUpdates", "collapseFunction", "language"],
 	data() {
 		return {
 			showModal: false,
@@ -33,18 +33,27 @@ export default {
 
 			// tabulator options
 			zutrittsgruppen_table_options: {
+				persistenceID: "filterTableStudentProfilZutrittsgruppen",
+				persistence: {
+					columns: false
+				},
 				height: 200,
 				layout: "fitColumns",
-				data: [{bezeichnung: ""}],
-				columns: [{title: "Zutritt", field: "bezeichnung"}],
+				columns: [{
+					title: Vue.computed(() => this.$p.t('profil/zutrittsGruppen')),
+					field: "bezeichnung"
+				}],
 			},
 			betriebsmittel_table_options: {
+				persistenceID: "filterTableStudentProfilBetriebsmittel",
+				persistence: {
+					columns: false
+				},
 				height: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
-				data: [{betriebsmittel: "", Nummer: "", Ausgegeben_am: ""}],
 				columns: [
 					{
 						title:
@@ -57,23 +66,26 @@ export default {
 						headerClick: this.collapseFunction,
 					},
 					{
-						title: "Betriebsmittel",
+						title:  Vue.computed(() => this.$p.t('profil/entlehnteBetriebsmittel')),
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
-						title: "Nummer",
+						title:  Vue.computed(() => this.$p.t('profil/inventarnummer')),
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
-						title: "Ausgegeben_am",
+						title: Vue.computed(() => this.$p.t('profil/ausgabedatum')),
 						field: "Ausgegeben_am",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 				],
 			},
@@ -92,9 +104,11 @@ export default {
 	methods: {
 
 		betriebsmittelTableBuilt: function () {
+			this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
 		},
 		zutrittsgruppenTableBuilt: function () {
+			this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
 			this.$refs.zutrittsgruppenTable.tabulator.setData(
 				this.data.zuttritsgruppen
 			);
@@ -211,6 +225,12 @@ export default {
 	created() {
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
+	},
+	watch: {
+		'language.value'(newVal) {
+			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
+			if(this.$refs.zutrittsgruppenTable) this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
+		}
 	},
 	template: /*html*/ `
 <div class="container-fluid text-break fhc-form">
@@ -331,10 +351,23 @@ export default {
 			<!-- SECOND ROW UNDER THE PROFIL IMAGE AND INFORMATION WITH THE TABLES -->
 			<div class="row">
 				<div class="col-12 mb-4" >
-					<core-filter-cmpt @tableBuilt="betriebsmittelTableBuilt" :title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
+					<core-filter-cmpt 
+					@tableBuilt="betriebsmittelTableBuilt" 
+					:title="$p.t('profil','entlehnteBetriebsmittel')"  
+					ref="betriebsmittelTable" 
+					:tabulator-options="betriebsmittel_table_options" 
+					tableOnly 
+					:sideMenu="false" />
 				</div> 
 				<div class="col-12 mb-4" >
-					<core-filter-cmpt @tableBuilt="zutrittsgruppenTableBuilt" :title="$p.t('profil','zutrittsGruppen')" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options"  tableOnly :sideMenu="false" noColumnFilter />
+					<core-filter-cmpt 
+					@tableBuilt="zutrittsgruppenTableBuilt" 
+					:title="$p.t('profil','zutrittsGruppen')" 
+					ref="zutrittsgruppenTable" 
+					:tabulator-options="zutrittsgruppen_table_options"  
+					tableOnly 
+					:sideMenu="false" 
+					noColumnFilter />
 				</div>
 			</div>
 		<!-- END OF MAIN CONTENT COL -->
