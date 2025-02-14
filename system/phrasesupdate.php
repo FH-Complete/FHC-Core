@@ -37327,13 +37327,35 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bewertung (Prozent)',
+				'text' => 'Erfüllungsgrad (Prozent) zum Ausfüllen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Score (percentage)',
+				'text' => 'Degree of Fulfilment (Percentage) to Fill In',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'details',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Details (angemessener und korrekter Einsatz von
+Werkzeugen und Technologien in jedem Schritt)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Details
+(appropriate and correct use of tools and technologies at each step)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -37453,8 +37475,9 @@ The methodology is appropriate to the field, justified based on literature, and 
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die Ergebnisse werden fundiert analysiert und in Bezug auf die Zielsetzung schlüssig interpretiert.
-Die Diskussion reflektiert die Relevanz und Grenzen der Ergebnisse kritisch und ist logisch strukturiert.',
+				'text' => 'Die Qualität der Lösung ist bezogen auf die Zielsetzung ausreichend.
+				Die Ergebnisse werden fundiert analysiert und in Bezug auf die Zielsetzung schlüssig interpretiert.
+				Die Diskussion reflektiert die Relevanz und Grenzen der Ergebnisse kritisch und ist logisch strukturiert.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -37602,7 +37625,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Wenn ein Kriterium mit unter 50% bewertet wird, ist die Arbeit insgesamt als negativ zu beurteilen.',
+				'text' => 'Jedes Kriterium muss mit mind. 50% bewertet werden, sonst ist die gesamte Arbeit negativ.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -37617,12 +37640,12 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'begruendung',
+		'phrase' => 'gesamtkommentar',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Begründung',
+				'text' => 'Gesamtkommentar',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -37637,12 +37660,12 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'begruendungVerpflichtend',
+		'phrase' => 'gesamtkommentarVerpflichtend',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Eine Begründung der Bewertung ist notwendig',
+				'text' => 'Gesamtkommentar verpflichtend auszufüllen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
