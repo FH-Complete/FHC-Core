@@ -196,41 +196,41 @@ if (isset($_GET['output']) && $_GET['output'] != 'pdf')
 else
 	$output = 'pdf';
 
-if (isset($_GET['xsl']) && ($_GET['xsl'] === 'Projektbeurteilung'))
-{
-	if (!isset($_GET['betreuerart_kurzbz']) || !isset($_GET['person_id']) || !isset($_GET['projektarbeit_id']))
-		die('Fehlerhafte Parameteruebergabe');
+//~ if (isset($_GET['xsl']) && ($_GET['xsl'] === 'Projektbeurteilung'))
+//~ {
+	//~ if (!isset($_GET['betreuerart_kurzbz']) || !isset($_GET['person_id']) || !isset($_GET['projektarbeit_id']))
+		//~ die('Fehlerhafte Parameteruebergabe');
 
-	$projektarbeit = new projektarbeit();
-	$projektarbeit->load($_GET['projektarbeit_id']);
+	//~ $projektarbeit = new projektarbeit();
+	//~ $projektarbeit->load($_GET['projektarbeit_id']);
 
-	$betreuer = new person();
-	$betreuer->getPersonFromBenutzer($user);
+	//~ $betreuer = new person();
+	//~ $betreuer->getPersonFromBenutzer($user);
 
-	//Überprüft ob es der Betreuer oder der Student ist
-	if ($betreuer->person_id !== $_GET['person_id'] && $projektarbeit->student_uid !== $user && !$rechte->isBerechtigt('assistenz'))
-		die("<html><body><h3>Sie haben keine Berechtigung für diese Aktion.</h3></body></html>");
+	//~ //Überprüft ob es der Betreuer oder der Student ist
+	//~ if ($betreuer->person_id !== $_GET['person_id'] && $projektarbeit->student_uid !== $user && !$rechte->isBerechtigt('assistenz'))
+		//~ die("<html><body><h3>Sie haben keine Berechtigung für diese Aktion.</h3></body></html>");
 
-	switch ($_GET['betreuerart_kurzbz'])
-	{
-		case 'Begutachter' :
-		case 'Senatsvorsitz' :
-			$xsl = 'ProjektBeurteilungBA';
-			break;
-		case 'Erstbegutachter' :
-			$xsl = 'ProjektBeurteilungMAErst';
-			break;
-		case 'Zweitbegutachter' :
-			$xsl = 'ProjektBeurteilungMAZweit';
-			break;
-	}
+	//~ switch ($_GET['betreuerart_kurzbz'])
+	//~ {
+		//~ case 'Begutachter' :
+		//~ case 'Senatsvorsitz' :
+			//~ $xsl = 'ProjektBeurteilungBA';
+			//~ break;
+		//~ case 'Erstbegutachter' :
+			//~ $xsl = 'ProjektBeurteilungMAErst';
+			//~ break;
+		//~ case 'Zweitbegutachter' :
+			//~ $xsl = 'ProjektBeurteilungMAZweit';
+			//~ break;
+	//~ }
 
-	$allowed = true;
-}
+	//~ $allowed = true;
+//~ }
 
 
 $konto = new konto();
-if ((((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin')) || (isset($allowed) && $allowed === true))
+if (((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin'))
 {
 	$buchungstypen = array();
 	if (defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
