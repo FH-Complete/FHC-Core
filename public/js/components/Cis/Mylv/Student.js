@@ -91,7 +91,7 @@ export default {
 	},
 	template: `
 
-	<h2>{{p.t('lehre/myLV')}}</h2>
+	<h2>{{$p.t('lehre/myLV')}}</h2>
 	<hr>
 	<div class="mylv-student" v-if="ready">
 		<div v-if="currentSemester" class="row justify-content-center mb-3">

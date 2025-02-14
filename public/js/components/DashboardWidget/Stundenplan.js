@@ -180,7 +180,7 @@ export default {
 					</div>
 					<template v-else-if="allEventsGrouped.size" v-for="([key, value], index) in allEventsGrouped" :key="index" style="margin-top: 8px;">
 						<div class="card-header d-grid p-0">
-							<button class="btn btn-link link-secondary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"})}}</button>
+							<button class="btn btn-link link-secondary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"}, $p.user_locale.value)}}</button>
 						</div>
 						<div role="button" @click="showLvUebersicht(evt)" v-for="evt in value" :key="evt.id" class="list-group-item small" :style="getEventStyle(evt)">
 							<b>{{evt.topic}}</b>

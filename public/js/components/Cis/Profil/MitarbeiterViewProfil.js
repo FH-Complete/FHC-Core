@@ -20,20 +20,15 @@ export default {
 			collapseIconFunktionen: true,
 
 			funktionen_table_options: {
+				persistenceID: "filterTableMaViewProfilFunktionen",
+				persistence: {
+					columns: false
+				},
 				height: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
-				data: [
-					{
-						Bezeichnung: "",
-						Organisationseinheit: "",
-						Gültig_von: "",
-						Gültig_bis: "",
-						Wochenstunden: "",
-					},
-				],
 				columns: [
 					//? option when wanting to hide the collapsed list
 
@@ -46,18 +41,21 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
+						visible: true
 					},
 					{
 						title: "Bezeichnung",
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Organisationseinheit",
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Gültig_von",
@@ -65,6 +63,7 @@ export default {
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Gültig_bis",
@@ -72,12 +71,14 @@ export default {
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
 						title: "Wochenstunden",
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 				],
 			},
@@ -91,7 +92,11 @@ export default {
 			this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
 		},
 	},
-
+	watch: {
+		'data.funktionen'(newVal) {
+			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setData(newVal);
+		},
+	},
 	computed: {
 		getTelefonValue() {
 			if(this.data.standort_telefon?.kontakt) {
@@ -153,15 +158,6 @@ export default {
 					value: this.data.ort_kurzbz
 				}
 			};
-
-			// return {
-			// 	[`${this.$p.t('profil', 'Geburtsdatum')}`]: this.data.gebdatum,
-			// 	[`${this.$p.t('profil', 'Geburtsort')}`]: this.data.gebort,
-			// 	[`${this.$p.t('profil', 'Kurzzeichen')}`]: this.data.kurzbz,
-			// 	[`${this.$p.t('profil', 'Telefon')}`]:
-			// 		(this.data.standort_telefon ? this.data.standort_telefon + " " + this.data.telefonklappe : this.data.telefonklappe),
-			// 	[`${this.$p.t('profil', 'Büro')}`]: this.data.ort_kurzbz,
-			// };
 		},
 	},
 
