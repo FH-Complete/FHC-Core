@@ -89,6 +89,11 @@ const app = Vue.createApp({
 			return /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 		}	
 	},
+	provide() {
+		return { // provide injectable & watchable language property
+			language: Vue.computed(() => this.$p.user_language)
+		}	
+	},
 	methods: {
 		isInternalRoute(href) {
 			const internalBase = window.location.origin
