@@ -108,7 +108,7 @@ export default {
   },
   template: /*html*/ `
 
-  <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
+  <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" :backdrop="false" >
     
     <template v-slot:title>
       {{title}}  
