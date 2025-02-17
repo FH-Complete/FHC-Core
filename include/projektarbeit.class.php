@@ -59,7 +59,7 @@ class projektarbeit extends basis_db
 
 	public $abgabedatum;
 
-	// Welche Version der Projektarbeit wird in welchem Semester verwendet
+	// Welche Version der Projektarbeit wird ab welchem Semester verwendet
 	private $_versions = array(
 		'Diplom' => array(
 			'SS2025' => 3,
@@ -72,7 +72,7 @@ class projektarbeit extends basis_db
 		)
 	);
 
-	// welche Vorlagen werden für welche Projekarbeitsversion verwendet (beginnend mit 0)
+	// welche Vorlagen werden ab welcher Projekarbeitsversion verwendet (0 - erste "default" Vorlage)
 	private $_projektarbeitVorlageMappings = array(
 		'Begutachter' => array(
 			2 => 'ProjektBeurteilungBAProzent',
@@ -625,6 +625,21 @@ class projektarbeit extends basis_db
 			isset($this->_projektarbeitVorlageMappings[$betreuerart_kurzbz][$key])
 			? $this->_projektarbeitVorlageMappings[$betreuerart_kurzbz][$key]
 			: '';
+	}
+
+	/**
+	 * Holt alle möglichen, jemals verwendeten Projektarbeits-Vorlagen
+	 * @return array mit Vorlagennamen
+	 */
+	public function getAllVorlagen()
+	{
+		$vorlagen = array();
+		foreach ($this->_projektarbeitVorlageMappings as $mappings)
+		{
+			$vorlagen = array_unique(array_merge($vorlagen, $mappings));
+		}
+
+		return $vorlagen;
 	}
 }
 ?>

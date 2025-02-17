@@ -196,41 +196,35 @@ if (isset($_GET['output']) && $_GET['output'] != 'pdf')
 else
 	$output = 'pdf';
 
-//~ if (isset($_GET['xsl']) && ($_GET['xsl'] === 'Projektbeurteilung'))
-//~ {
-	//~ if (!isset($_GET['betreuerart_kurzbz']) || !isset($_GET['person_id']) || !isset($_GET['projektarbeit_id']))
-		//~ die('Fehlerhafte Parameteruebergabe');
+// Berechtigungprüfung Projektarbeit
+if (isset($_GET['projektarbeit_id']))
+{
+	$projektarbeitVorlage = new projektarbeit();
+	$allePaVorlagen = $projektarbeitVorlage->getAllVorlagen();
 
-	//~ $projektarbeit = new projektarbeit();
-	//~ $projektarbeit->load($_GET['projektarbeit_id']);
+	if (!is_array($allePaVorlagen))
+		die("<html><body><h3>Fehler beim Holen der Projektarbeit Vorlagen</h3></body></html>");
 
-	//~ $betreuer = new person();
-	//~ $betreuer->getPersonFromBenutzer($user);
+	if (in_array($xsl, $allePaVorlagen))
+	{
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($user);
 
-	//~ //Überprüft ob es der Betreuer oder der Student ist
-	//~ if ($betreuer->person_id !== $_GET['person_id'] && $projektarbeit->student_uid !== $user && !$rechte->isBerechtigt('assistenz'))
-		//~ die("<html><body><h3>Sie haben keine Berechtigung für diese Aktion.</h3></body></html>");
+		$projektarbeit = new projektarbeit();
+		$projektarbeit->load($_GET['projektarbeit_id']);
 
-	//~ switch ($_GET['betreuerart_kurzbz'])
-	//~ {
-		//~ case 'Begutachter' :
-		//~ case 'Senatsvorsitz' :
-			//~ $xsl = 'ProjektBeurteilungBA';
-			//~ break;
-		//~ case 'Erstbegutachter' :
-			//~ $xsl = 'ProjektBeurteilungMAErst';
-			//~ break;
-		//~ case 'Zweitbegutachter' :
-			//~ $xsl = 'ProjektBeurteilungMAZweit';
-			//~ break;
-	//~ }
+		$betreuer = new person();
+		$betreuer->getPersonFromBenutzer($user);
 
-	//~ $allowed = true;
-//~ }
-
+		//Überprüft ob es der Betreuer oder der Student ist
+		if ($betreuer->person_id !== $_GET['person_id'] && $projektarbeit->student_uid !== $user && !$rechte->isBerechtigt('assistenz'))
+			die("<html><body><h3>Sie haben keine Berechtigung für diese Aktion.</h3></body></html>");
+		$paBerechtigt = true;
+	}
+}
 
 $konto = new konto();
-if (((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin'))
+if (((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin') || (isset($paBerechtigt) && $paBerechtigt === true))
 {
 	$buchungstypen = array();
 	if (defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
