@@ -1937,7 +1937,6 @@ class AntragLib
 
 	public function getAntragHistory($antrag_id)
 	{
-		$this->_ci->StudierendenantragstatusModel->addOrder('insertamum', 'DESC');
 		$result = $this->_ci->StudierendenantragstatusModel->loadWithTypWhere([
 			'studierendenantrag_id' => $antrag_id
 		]);

@@ -50,7 +50,7 @@ class Studierendenantragstatus_model extends DB_Model
 		$this->addSelect('bezeichnung[(' . $lang . ')] AS typ');
 
 		$this->addJoin('campus.tbl_studierendenantrag_statustyp', 'studierendenantrag_statustyp_kurzbz');
-
+		$this->addOrder($this->dbTable. '.insertamum', 'DESC');
 		return $this->loadWhere($where);
 	}
 
