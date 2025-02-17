@@ -150,6 +150,11 @@ export const Stundenplan = {
 	},
 	created()
 	{
+		let time_start = Math.floor(this.eventCalendarDate.firstDayOfCalendarMonth.getTime() / 1000);
+		let time_end = Math.floor(this.eventCalendarDate.lastDayOfCalendarMonth.getTime() / 1000);
+		this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid('io23m005', time_start, time_end).then((response) => {
+			console.log(response);
+		})
 		this.$fhcApi.factory.authinfo.getAuthUID().then((res) => res.data)
 		.then(data=>{
 			this.uid = data.uid;

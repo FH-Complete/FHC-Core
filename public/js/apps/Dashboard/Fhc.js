@@ -2,14 +2,14 @@ import FhcDashboard from '../../components/Dashboard/Dashboard.js';
 import FhcApi from '../../plugin/FhcApi.js';
 import Phrasen from '../../plugin/Phrasen.js';
 import contrast from '../../directives/contrast.js';
-import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers";
-import Stundenplan from "../../components/Cis/Stundenplan/Stundenplan";
-import MylvStudent from "../../components/Cis/Mylv/Student";
-import Profil from "../../components/Cis/Profil/Profil";
-import CmsNews from "../../components/Cis/Cms/News";
-import CmsContent from "../../components/Cis/Cms/Content";
-import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info";
-import RoomInformation from "../../components/Cis/Mylv/RoomInformation";
+import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
+import Stundenplan from "../../components/Cis/Stundenplan/Stundenplan.js";
+import MylvStudent from "../../components/Cis/Mylv/Student.js";
+import Profil from "../../components/Cis/Profil/Profil.js";
+import CmsNews from "../../components/Cis/Cms/News.js";
+import CmsContent from "../../components/Cis/Cms/Content.js";
+import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
+import RoomInformation from "../../components/Cis/Mylv/RoomInformation.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 

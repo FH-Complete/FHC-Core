@@ -197,7 +197,9 @@ export default {
 				'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)',
 				'grid-template-rows': 'repeat(' + (this.hours.length * 60 / this.smallestTimeFrame) + ', 1fr)',
 			}
-			
+			console.log(this.smallestTimeFrame,"this is the smallest timeframe")
+			console.log(this.hours.length,"this is the length of the hours")
+			console.log(this.hours.length/60, "this is the length of the hours multiplied by 60 resulting in minutes")
 			if(day.isPast) {
 				styleObj['background-color'] = '#F5E9D7'
 				styleObj['border-color'] = '#E8E8E8';
