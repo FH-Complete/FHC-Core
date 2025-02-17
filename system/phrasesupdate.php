@@ -5389,13 +5389,13 @@ The invoice will be sent to you again. <u><strong>The amount is only to be trans
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unruly Person wurde gefunden',
+				'text' => 'Person mit Markierung „unruly“ gefunden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Unruly Person detected',
+				'text' => 'Person flagged as "unruly" detected',
 				'description' => '',
 				'insertvon' => 'system'
 			)
