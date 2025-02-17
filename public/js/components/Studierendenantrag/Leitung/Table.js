@@ -53,7 +53,7 @@ export default {
 			return this.$fhcApi.factory
 				.studstatus.leitung.getHistory(this.lastHistoryClickedId)
 				.then(res => {
-					this.historyData = res.data.sort((a, b) => a.insertamum > b.insertamum);
+					this.historyData = res.data;
 				})
 				.catch(this.$fhcApi.handleSystemError);
 		},

@@ -15,7 +15,8 @@ export default {
 	},
 	props: {
 		stgL: Array,
-		stgA: Array
+		stgA: Array,
+		abmeldung_enabled: Boolean
 	},
 	data() {
 		return {
@@ -230,6 +231,7 @@ export default {
 		<leitung-actions
 			:stg-a="stgkzA"
 			:stg-l="stgkzL"
+			:abmeldung_enabled="abmeldung_enabled"
 			:selectedData="selectedData"
 			:columns="columns"
 			@reload="reload"

@@ -40,6 +40,13 @@ class AntragJob extends JOB_Controller
 	 */
 	public function sendStglSammelmail()
 	{
+
+		if ($this->config->item('abmeldung_enabled') !== true &&
+			$this->config->item('abmeldung_stg_enabled') !== true &&
+			$this->config->item('unterbrechung_enabled') !== true &&
+			$this->config->item('wiederholung_enabled') !== true)
+			return $this->logError('Konnte Job nicht starten: Keine der Configs "abmeldung_stg_enabled", "abmeldung_enabled", "unterbrechung_enabled",  "wiederholung_enabled" auf true gesetzt');
+
 		$this->load->model('person/Person_model', 'PersonModel');
 
 		$this->logInfo('Start Job sendStglSammelmail');
@@ -47,25 +54,38 @@ class AntragJob extends JOB_Controller
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
 		$this->StudierendenantragModel->addJoin('public.tbl_prestudent', 'prestudent_id');
-		$this->db->group_start();
-		$this->db->where('typ', Studierendenantrag_model::TYP_ABMELDUNG);
-		$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CREATED);
-		$this->db->group_end();
 
-		$this->db->or_group_start();
-		$this->db->where('typ', Studierendenantrag_model::TYP_ABMELDUNG_STGL);
-		$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CREATED);
-		$this->db->group_end();
+		if ($this->config->item('abmeldung_enabled') === true)
+		{
+			$this->db->group_start();
+			$this->db->where('typ', Studierendenantrag_model::TYP_ABMELDUNG);
+			$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CREATED);
+			$this->db->group_end();
+		}
 
-		$this->db->or_group_start();
-		$this->db->where('typ', Studierendenantrag_model::TYP_UNTERBRECHUNG);
-		$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CREATED);
-		$this->db->group_end();
+		if ($this->config->item('abmeldung_stg_enabled') === true)
+		{
+			$this->db->or_group_start();
+			$this->db->where('typ', Studierendenantrag_model::TYP_ABMELDUNG_STGL);
+			$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CREATED);
+			$this->db->group_end();
+		}
 
-		$this->db->or_group_start();
-		$this->db->where('typ', Studierendenantrag_model::TYP_WIEDERHOLUNG);
-		$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_LVSASSIGNED);
-		$this->db->group_end();
+		if ($this->config->item('unterbrechung_enabled') === true)
+		{
+			$this->db->or_group_start();
+			$this->db->where('typ', Studierendenantrag_model::TYP_UNTERBRECHUNG);
+			$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CREATED);
+			$this->db->group_end();
+		}
+
+		if ($this->config->item('wiederholung_enabled') === true)
+		{
+			$this->db->or_group_start();
+			$this->db->where('typ', Studierendenantrag_model::TYP_WIEDERHOLUNG);
+			$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_LVSASSIGNED);
+			$this->db->group_end();
+		}
 
 		$result =  $this->StudierendenantragModel->load();
 		if(isError($result))
@@ -203,6 +223,10 @@ class AntragJob extends JOB_Controller
 	public function sendReminderWiedereinstieg()
 	{
 		$now = new DateTime();
+
+		if ($this->config->item('unterbrechung_enabled') !== true)
+			return $this->logError('Konnte Job nicht starten: Config "unterbrechung_enabled" nicht auf true gesetzt');
+
 		$modifier = $this->config->item('unterbrechung_job_remind_wiedereinstieg_date_modifier');
 		if (!$modifier)
 			return $this->logError('Konnte Job nicht starten: Config "unterbrechung_job_remind_wiedereinstieg_date_modifiers" nicht gesetzt');
@@ -275,6 +299,13 @@ class AntragJob extends JOB_Controller
 	public function handleWiederholerDeadline()
 	{
 		$this->logInfo('Start Job handleWiederholerDeadline');
+
+		if ($this->config->item('wiederholung_enabled') !== true)
+		{
+			$this->logError('Config "wiederholung_enabled" nicht auf true gesetzt');
+			$this->logInfo('Ende Job handleWiederholerDeadline');
+			return;
+		}
 
 		$this->load->library('PrestudentLib');
 
@@ -393,6 +424,13 @@ class AntragJob extends JOB_Controller
 	public function handleAbmeldungenStglDeadline()
 	{
 		$this->logInfo('Start Job handleAbmeldungenStglDeadline');
+
+		if ($this->config->item('abmeldung_stg_enabled') !== true)
+		{
+			$this->logError('Config "abmeldung_stg_enabled" nicht auf true gesetzt');
+			$this->logInfo('Ende Job handleAbmeldungenStglDeadline');
+			return;
+		}
 
 		$insertvon = $this->config->item('antrag_job_systemuser');
 		if (!$insertvon) {
@@ -526,6 +564,13 @@ class AntragJob extends JOB_Controller
 	public function sendAufforderungWiederholer()
 	{
 		$this->logInfo('Start Job sendAufforderungWiederholer');
+
+		if ($this->config->item('wiederholung_enabled') !== true)
+		{
+			$this->logError('Config "wiederholung_enabled" nicht auf true gesetzt');
+			$this->logInfo('Ende Job sendAufforderungWiederholer');
+			return;
+		}
 
 		$modifier_request_1 = $this->config->item('wiederholung_job_request_1_date_modifier');
 		$modifier_request_2 = $this->config->item('wiederholung_job_request_2_date_modifier');

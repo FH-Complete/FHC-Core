@@ -28,7 +28,9 @@ class Studierendenantrag extends FHC_Controller
 			'studierendenantrag'
 		]);
 
-        if (strtolower($this->router->method) === 'leitung')
+		$this->load->config('studierendenantrag');
+
+		if (strtolower($this->router->method) === 'leitung')
         	$this->_isAllowed([
         		'leitung' => ['student/studierendenantrag:r', 'student/antragfreigabe:r']
         	]);
@@ -54,18 +56,27 @@ class Studierendenantrag extends FHC_Controller
 					'bezeichnungStg' => $antrag->bezeichnung,
 					'bezeichnungOrgform' => $antrag->orgform
 				);
-				
-				$result = $this->antraglib->getPrestudentWiederholungsBerechtigt($antrag->prestudent_id);
-				if (getData($result) == 1)
-					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Wiederholung';
 
-				$result = $this->antraglib->getPrestudentUnterbrechungsBerechtigt($antrag->prestudent_id);
-				if (getData($result) == 1)
-					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Unterbrechung';
+				if ($this->config->item('wiederholung_enabled') === true)
+				{
+					$result = $this->antraglib->getPrestudentWiederholungsBerechtigt($antrag->prestudent_id);
+					if (getData($result) == 1)
+						$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Wiederholung';
+				}
 
-				$result = $this->antraglib->getPrestudentAbmeldeBerechtigt($antrag->prestudent_id);
-				if (getData($result) == 1)
-					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Abmeldung';
+				if ($this->config->item('unterbrechung_enabled') === true)
+				{
+					$result = $this->antraglib->getPrestudentUnterbrechungsBerechtigt($antrag->prestudent_id);
+					if (getData($result) == 1)
+						$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Unterbrechung';
+				}
+
+				if ($this->config->item('abmeldung_enabled') === true)
+				{
+					$result = $this->antraglib->getPrestudentAbmeldeBerechtigt($antrag->prestudent_id);
+					if (getData($result) == 1)
+						$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Abmeldung';
+				}
 			}
 			if ($antrag->studierendenantrag_id == null)
 				continue;
@@ -88,45 +99,59 @@ class Studierendenantrag extends FHC_Controller
 
 		$this->load->view('lehre/Antrag/Leitung/List', [
 			'stgA' => $stgA,
-			'stgL' => $stgL
+			'stgL' => $stgL,
+			'abmeldung_enabled' => $this->config->item('abmeldung_stg_enabled')
 		]);
 	}
 
 	public function abmeldung($prestudent_id, $studierendenantrag_id = null)
 	{
-		$this->load->view('lehre/Antrag/Create', [
-			'prestudent_id' => $prestudent_id,
-			'studierendenantrag_id' => $studierendenantrag_id,
-			'antrag_type' => 'Abmeldung'
-		]);
+		if ($this->config->item('abmeldung_enabled') === true)
+		{
+			$this->load->view('lehre/Antrag/Create', [
+				'prestudent_id' => $prestudent_id,
+				'studierendenantrag_id' => $studierendenantrag_id,
+				'antrag_type' => 'Abmeldung'
+			]);
+		}
 	}
 
 	public function abmeldungstgl($prestudent_id, $studierendenantrag_id = null)
 	{
 
-		$this->load->view('lehre/Antrag/Create', [
-			'prestudent_id' => $prestudent_id,
-			'studierendenantrag_id' => $studierendenantrag_id,
-			'antrag_type' => 'AbmeldungStgl'
-		]);
+		if ($this->config->item('abmeldung_stg_enabled') === true)
+		{
+			$this->load->view('lehre/Antrag/Create', [
+				'prestudent_id' => $prestudent_id,
+				'studierendenantrag_id' => $studierendenantrag_id,
+				'antrag_type' => 'AbmeldungStgl'
+			]);
+		}
 	}
 
 	public function unterbrechung($prestudent_id, $studierendenantrag_id = null)
 	{
-		$this->load->view('lehre/Antrag/Create', [
-			'prestudent_id' => $prestudent_id,
-			'studierendenantrag_id' => $studierendenantrag_id,
-			'antrag_type' => 'Unterbrechung'
-		]);
+		if ($this->config->item('unterbrechung_enabled') === true)
+		{
+			$this->load->view('lehre/Antrag/Create', [
+				'prestudent_id' => $prestudent_id,
+				'studierendenantrag_id' => $studierendenantrag_id,
+				'antrag_type' => 'Unterbrechung'
+			]);
+		}
+
 	}
 
 	public function wiederholung($prestudent_id, $studierendenantrag_id = null)
 	{
-		$this->load->view('lehre/Antrag/Create', [
-			'prestudent_id' => $prestudent_id,
-			'studierendenantrag_id' => $studierendenantrag_id,
-			'antrag_type' => 'Wiederholung'
-		]);
+		if ($this->config->item('wiederholung_enabled') === true)
+		{
+			$this->load->view('lehre/Antrag/Create', [
+				'prestudent_id' => $prestudent_id,
+				'studierendenantrag_id' => $studierendenantrag_id,
+				'antrag_type' => 'Wiederholung'
+			]);
+		}
 	}
 
 	/**
