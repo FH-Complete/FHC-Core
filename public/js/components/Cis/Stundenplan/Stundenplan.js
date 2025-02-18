@@ -4,14 +4,14 @@ import LvModal from "../Mylv/LvModal.js";
 import LvInfo from "../Mylv/LvInfo.js"
 import LvMenu from "../Mylv/LvMenu.js"
 
-export const DEFAULT_MODE = 'Week'
+export const DEFAULT_MODE_STUNDENPLAN = 'Week'
 
 const Stundenplan = {
 	name: 'Stundenplan',
 	data() {
 		return {
 			events: null,
-			calendarMode: DEFAULT_MODE,
+			calendarMode: DEFAULT_MODE_STUNDENPLAN,
 			calendarDate: new CalendarDate(new Date()),
 			eventCalendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
@@ -20,11 +20,11 @@ const Stundenplan = {
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
 			studiensemester_ende: null,
-			uid: null,
+			uid: null
 		}
 	},
 	props: [
-		"viewData"
+		"propsViewData"
 	],
 	watch: {
 		weekFirstDay: {
@@ -37,12 +37,12 @@ const Stundenplan = {
 			},
 			immediate: true,
 		},
-		'viewData.lv_id'(newVal) {
-			// console.log('viewData.lv_id', newVal)
+		// forward/backward on history entries happening in stundenplan
+		'propsViewData.lv_id'(newVal) {
 		},
-		'viewData.focus_date'(newVal) {
-			// console.log('viewData.focus_date', newVal)
-		}
+		'propsViewData.mode'(newVal) {
+			if(this.$refs.calendar) this.$refs.calendar.setMode(newVal)
+		},
 	},
 	components: {
 		FhcCalendar, LvModal, LvMenu, LvInfo
@@ -91,12 +91,12 @@ const Stundenplan = {
 				String(day.getMonth() + 1).padStart(2, "0") + "-" +
 				String(day.getDate()).padStart(2, "0");
 			
-			this.$router.replace({
+			this.$router.push({
 				name: "Stundenplan",
 				params: {
 					mode: this.calendarMode,
 					focus_date: date,
-					lv_id: this.viewData?.lv_id || null
+					lv_id: this.propsViewData?.lv_id || null
 				}
 			})
 			
@@ -104,19 +104,18 @@ const Stundenplan = {
 		},
 		handleChangeMode(mode) {
 			const modeCapitalized = mode.charAt(0).toUpperCase() + mode.slice(1)
-			const calendarModeCapitalized = this.calendarMode.charAt(0).toUpperCase() + this.calendarMode.slice(1)
-			if(modeCapitalized !== calendarModeCapitalized) { // avoid the first $emit event where mode is initialized 
-				this.$router.replace({
-					name: "Stundenplan",
-					params: {
-						mode: modeCapitalized,
-						focus_date: this.currentDay.toISOString().split("T")[0],
-						lv_id: this.viewData?.lv_id || null
-					}
-				})
 
-				this.calendarMode = mode
-			}
+			this.$router.push({
+				name: "Stundenplan",
+				params: {
+					mode: modeCapitalized,
+					focus_date: this.currentDay.toISOString().split("T")[0],
+					lv_id: this.propsViewData?.lv_id ?? null
+				}
+			})
+		
+			this.calendarMode = mode
+
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
@@ -149,7 +148,7 @@ const Stundenplan = {
 		},
 		loadEvents: function(){
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.viewData.lv_id),
+				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id),
 				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay)
 			]).then((result) => {
 				let promise_events = [];
@@ -196,11 +195,12 @@ const Stundenplan = {
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
 	<fhc-calendar 
+		ref="calendar"
 		@selectedEvent="setSelectedEvent"
 		:initial-date="currentDay"
 		@change:range="updateRange"
 		:events="events"
-		:initial-mode="viewData.mode"
+		:initial-mode="propsViewData.mode"
 		show-weeks
 		@select:day="selectDay"
 		@change:mode="handleChangeMode"

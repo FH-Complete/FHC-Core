@@ -63,7 +63,7 @@ export default {
 	},
 	watch:{
 		mode(newVal) {
-			console.log('mode watcher', newVal)
+			this.$emit('change:mode', newVal)
 		},
 		selectedEvent:{
 			handler(newSelectedEvent) {
@@ -125,7 +125,6 @@ export default {
 					this.prevMode = this.currMode;
 					this.currMode = v;
 				}
-				this.$emit('change:mode', this.currMode)
 			}
 		},
 		eventsPerDay() {
@@ -165,12 +164,12 @@ export default {
 			if (this.events && Array.isArray(this.events) && this.events.length > 0) {
 				let filteredEvents = this.events.filter(event => {
 					let eventDate = new CalendarDate(new Date(event.datum));
-					if (this.mode == 'week') 
+					if (this.mode == 'week' || this.mode == 'Week')
 					{
 						// week view filters the elements only for the same week
 						return this.focusDate.w == eventDate.w;
 					}
-					else if (this.mode == 'day') 
+					else if (this.mode == 'day' || this.mode == 'Day')
 					{
 						// day view filters the elements for the same day and the same week
 						return this.focusDate.d == eventDate.d && this.focusDate.w == eventDate.w;
@@ -191,13 +190,16 @@ export default {
 		},
 	},
 	methods: {
+		setMode(mode) {
+			this.mode = mode
+		},
 		handleInput(day) {
 			this.$emit(day[0], day[1]);
 		},
 	},
 	created() {
 		const initMode = this.initialMode.toLowerCase()
-		const allowedInitialModes = ['years', 'day'];
+		const allowedInitialModes = ['day'];
 		if (!this.noWeekView)
 			allowedInitialModes.push('week');
 		if (!this.noMonthView)
