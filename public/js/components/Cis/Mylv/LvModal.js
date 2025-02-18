@@ -35,7 +35,7 @@ export default {
 	},
 	data() {
 		return {
-			menu: [],
+			menu: null,
 			result: false,
 			info: null,
 		};
@@ -76,7 +76,7 @@ export default {
 		<template v-slot:default>
 			<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
 			<lv-info :event="event"></lv-info>
-			<template v-if="showMenu">
+			<template v-if="showMenu && this.menu">
 				<h3 >Lehrveranstaltungs Menu</h3>
 				<lv-menu :menu="menu"></lv-menu>
 			</template>

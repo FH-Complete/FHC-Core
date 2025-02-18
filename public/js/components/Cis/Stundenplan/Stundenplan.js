@@ -118,7 +118,8 @@ export const Stundenplan = {
 		loadEvents: function(){
 			Promise.allSettled([
 				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.viewData.lv_id),
-				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay)
+				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay),
+				this.loadMoodleEvents(this.monthFirstDay, this.monthLastDay)
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {
@@ -147,14 +148,49 @@ export const Stundenplan = {
 				this.events = promise_events;
 			});
 		},
+		loadMoodleEvents: function(start_date, end_date){
+			
+			let date_start = Math.floor(new Date(start_date).getTime() / 1000);
+			let date_end = Math.floor(new Date(end_date).getTime() / 1000);
+			return this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid('io23m005', date_start, date_end).then((response) => response.events).then(events => {
+				let data =events.map(event =>{
+					const start_date = new Date(event.timestart * 1000);
+					const formatted_year = Intl.DateTimeFormat(this.$p.user_locale, { year: 'numeric' }).format(start_date);
+					const formatted_month = Intl.DateTimeFormat(this.$p.user_locale, { month: '2-digit' }).format(start_date);
+					const formatted_day = Intl.DateTimeFormat(this.$p.user_locale, { year: '2-digit' }).format(start_date);
+					const formatted_date = `${formatted_year}-${formatted_month}-${formatted_day}`;
+					return {
+						type:'moodle',
+						beginn: "14:00:00",
+						ende: "15:00:00",
+						allDayEvent: true,
+						datum: formatted_date,
+						topic: event.activityname,
+						lektor:[],
+						gruppe:[],
+						ort_kurzbz: event.location,
+						lehreinheit_id:0,
+						titel: event.activitystr,
+						lehrfach:'',
+						lehrform:'',
+						lehrfach_bez:'',
+						organisationseinheit:'',
+						farbe:'00689E',
+						lehrveranstaltung_id:0,
+						ort_content_id:0,
+					}
+				});
+				return {
+					data: data,
+					meta: { status: 'success' }
+				};
+			})
+			
+		},
 	},
 	created()
 	{
-		let time_start = Math.floor(this.eventCalendarDate.firstDayOfCalendarMonth.getTime() / 1000);
-		let time_end = Math.floor(this.eventCalendarDate.lastDayOfCalendarMonth.getTime() / 1000);
-		this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid('io23m005', time_start, time_end).then((response) => {
-			console.log(response);
-		})
+		
 		this.$fhcApi.factory.authinfo.getAuthUID().then((res) => res.data)
 		.then(data=>{
 			this.uid = data.uid;
@@ -185,20 +221,24 @@ export const Stundenplan = {
 			</span>
 		</template>
 		<template #weekPage="{event,day}">
-			<div @click="showModal(event?.orig); " type="button"
-			class=" position-relative border border-secondary border d-flex flex-col align-items-center
-			justify-content-evenly h-100" style="overflow: auto;">
-
-				<div v-if="event?.orig?.beginn && event?.orig?.ende" class="d-none d-xl-block" >
+			<div @click="showModal(event); " type="button"
+			class=" position-relative border border-secondary border d-flex flex-col align-items-center justify-content-evenly h-100"
+			:class="{'p-1':event.allDayEvent}"
+			style="overflow: auto;">
+				<div v-if="!event.allDayEvent && event?.beginn && event?.ende" class="d-none d-xl-block" >
 					<div class="d-flex flex-column p-4 p-xl-2 border-end border-secondary">
-						<span class="small">{{convertTime(event.orig.beginn.split(":"))}}</span>
-						<span class="small">{{convertTime(event.orig.ende.split(":"))}}</span>
+						<span class="small">{{convertTime(event.beginn.split(":"))}}</span>
+						<span class="small">{{convertTime(event.ende.split(":"))}}</span>
 					</div>
 				</div>
-				<div class="d-flex flex-column flex-grow-1 align-items-center" style="font-size: 0.75rem">
-					<span>{{event?.orig.topic}}</span>
-					<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
-					<span>{{event?.orig.ort_kurzbz}}</span>
+				<div v-if="event.type=='moodle'" class="d-flex small w-100" >
+					<span >moodle:</span>
+					<span class="flex-grow-1 text-center">{{event.titel}}</span>
+				</div>
+				<div v-else class="d-flex flex-column flex-grow-1 align-items-center small">
+					<span>{{event.topic}}</span>
+					<span v-for="lektor in event.lektor">{{lektor.kurzbz}}</span>
+					<span>{{event.ort_kurzbz}}</span>
 				</div>
 			</div>
 		</template>

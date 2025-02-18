@@ -10,7 +10,7 @@ export default {
 			hourPosition:null,
 			hourPositionTime:null,
 			resizeObserver: null,
-			width: 0
+			width: 0,
 		}
 	},
 	inject: [
@@ -36,6 +36,16 @@ export default {
 		'input',
 	],
 	computed: {
+		allDayEvents(){
+			let allDayEvents = {};
+			for(let day in this.events){
+				const filteredAllDayEvents = this.events[day].filter(event=>event.allDayEvent);
+				if (filteredAllDayEvents.length > 0){
+					allDayEvents[day]=filteredAllDayEvents;
+				}
+			};
+			return allDayEvents;
+		},
 		getGridStyle() {
 			return {
 				'min-height': '100px',
@@ -126,6 +136,7 @@ export default {
 				d.isToday = nextDay.getFullYear() === this.todayDate.getFullYear() && nextDay.getMonth() === this.todayDate.getMonth() && nextDay.getDate() === this.todayDate.getDate()
 				if (this.events[key]) {
 					this.events[key].forEach(evt => {
+						if (evt.allDayEvent) return;
 						let event = {orig:evt,lane:1,maxLane:1,start: evt.start < day ? day : evt.start, end: evt.end > nextDay ? nextDay : evt.end,shared:[],setSharedMaxRecursive(doneItems) {
 							this.maxLane = Math.max(doneItems[0].maxLane, this.maxLane);
 							doneItems.push(this);
@@ -197,31 +208,44 @@ export default {
 				'grid-template-columns': 'repeat(' + day.lanes + ', 1fr)',
 				'grid-template-rows': 'repeat(' + (this.hours.length * 60 / this.smallestTimeFrame) + ', 1fr)',
 			}
-			console.log(this.smallestTimeFrame,"this is the smallest timeframe")
-			console.log(this.hours.length,"this is the length of the hours")
-			console.log(this.hours.length/60, "this is the length of the hours multiplied by 60 resulting in minutes")
 			if(day.isPast) {
 				styleObj['background-color'] = '#F5E9D7'
 				styleObj['border-color'] = '#E8E8E8';
 				styleObj.opacity = 0.5;
 			} else if (day.isToday) {
 				
-				// styleObj['backgroundImage'] = 'linear-gradient(to bottom, #F5E9D7 '+this.getDayTimePercent+'%, #FFFFFF '+this.getDayTimePercent+'%)'
-				// styleObj['border-color'] = '#E8E8E8';
-				// styleObj.opacity = 0.5;
+				styleObj['backgroundImage'] = 'linear-gradient(to bottom, #F5E9D7 '+this.getDayTimePercent+'%, #FFFFFF '+this.getDayTimePercent+'%)'
+				styleObj['border-color'] = '#E8E8E8';
+				styleObj.opacity = 0.5;
 			}
 			
 			return styleObj
 		},
 		eventGridStyle(day, event) {
-			return {
-				'z-index': 1,
-				'grid-column-start': 1 + (event.lane - 1) * day.lanes / event.maxLane,
-				'grid-column-end': 1 + event.lane * day.lanes / event.maxLane,
-				'grid-row-start': this.dateToMinutesOfDay(event.start),
-				'grid-row-end': this.dateToMinutesOfDay(event.end),
-				'background-color': event.orig.color,
-				'max-height': '75px'				
+			if (event.orig.allDayEvent)
+			{
+				return;
+				return {
+					'z-index': '2',
+					'grid-column': '1 / -1',
+					'background-color': 'rgb(204, 204, 204)',
+					'max-height': '75px',
+					color: 'black',
+					position: 'sticky',
+					top: '44px',
+				};
+			}
+			else
+			{
+				return {
+					'z-index': 1,
+					'grid-column-start': 1 + (event.lane - 1) * day.lanes / event.maxLane,
+					'grid-column-end': 1 + event.lane * day.lanes / event.maxLane,
+					'grid-row-start': this.dateToMinutesOfDay(event.start),
+					'grid-row-end': this.dateToMinutesOfDay(event.end),
+					'background-color': event.orig.color,
+					'max-height': '75px'
+				};
 			}
 		},
 		calcHourPosition(event) {
@@ -333,12 +357,27 @@ export default {
 						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 					</div>
 				</Transition>
-				
+
 				<div class="events" :ref="'eventsRef'+week">
+
 					<div class="hours">
 						<div v-for="hour in hours" :style="getGridStyle" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
-					<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
+					<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start position-relative" :style="dayGridStyle(day)">
+						<div class="position-absolute w-100" style="top:0; bottom:0;">
+							<div class="position-sticky d-grid gap-1" style="top:44px;" v-for="(events,_day) in allDayEvents" :key="day">
+								<div v-if="dayindex == _day" v-for="event in events" :key="event" @click.prevent="weekPageClick(event, _day)"
+									:selected="event == selectedEvent"
+									:style="{'background-color': event?.color, 'z-index':2}"
+									class="small rounded overflow-hidden fhc-entry "
+									v-contrast
+									>
+									<slot class="p-1" name="weekPage" :event="event" :day="day">
+										<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+									</slot>
+								</div>
+							</div>
+						</div>
 						<Transition>
 							<div v-if="day.isToday" class="position-absolute border-top small"  :style="curIndicatorStyle">
 								<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
@@ -350,7 +389,7 @@ export default {
 						:style="eventGridStyle(day,event)"
 						class="mx-2 small rounded overflow-hidden fhc-entry "
 						v-contrast >
-							<slot name="weekPage" :event="event" :day="day">
+							<slot name="weekPage" :event="event.orig" :day="day">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 							</slot>		
 						</div>
