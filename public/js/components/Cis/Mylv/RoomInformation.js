@@ -3,7 +3,9 @@ import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
 
-export default{
+export const DEFAULT_MODE = 'Week'
+
+const RoomInformation = {
 	name: "RoomInformation",
     props:{
         ort_kurzbz: {
@@ -123,7 +125,7 @@ export default{
 		<h2>Room Information {{ ort_kurzbz }}</h2>
 		<hr>
 		<lv-modal v-if="currentlySelectedEvent" :showMenu="false" :event="currentlySelectedEvent" ref="lvmodal" />
-		<fhc-calendar @selectedEvent="setSelectedEvent" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
+		<fhc-calendar @selectedEvent="setSelectedEvent" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="DEFAULT_MODE" show-weeks @select:day="selectDay" v-model:minimized="minimized">
             <template #monthPage="{event,day}">
 				<span >
 					{{event.topic}}
@@ -155,7 +157,7 @@ export default{
 			<template #pageMobilContent>
 				<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
 				<div class="w-100">
-					<lv-info  :event="currentlySelectedEvent" />
+					<lv-info :event="currentlySelectedEvent" />
 				</div>
 			</template>
 			<template #pageMobilContentEmpty >
@@ -164,3 +166,5 @@ export default{
         </fhc-calendar>
     `,
 };
+
+export default RoomInformation

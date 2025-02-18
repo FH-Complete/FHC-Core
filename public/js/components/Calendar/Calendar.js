@@ -62,6 +62,9 @@ export default {
 		noMonthView: Boolean
 	},
 	watch:{
+		mode(newVal) {
+			console.log('mode watcher', newVal)
+		},
 		selectedEvent:{
 			handler(newSelectedEvent) {
 				this.$emit('selectedEvent', newSelectedEvent);
@@ -122,6 +125,7 @@ export default {
 					this.prevMode = this.currMode;
 					this.currMode = v;
 				}
+				this.$emit('change:mode', this.currMode)
 			}
 		},
 		eventsPerDay() {

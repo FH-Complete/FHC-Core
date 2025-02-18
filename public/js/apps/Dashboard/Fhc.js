@@ -64,7 +64,6 @@ const router = VueRouter.createRouter({
 			name: "StundenplanNumeric",
 			component: Stundenplan,
 			redirect: (to) => {
-				debugger
 				return { // redirect to longer Stundenplan url and map params
 					name: "Stundenplan",
 					params: {
@@ -106,7 +105,6 @@ const router = VueRouter.createRouter({
 				};
 			},
 			beforeEnter: (to, from, next) => {
-				console.log('beforeEnter')
 				// If missing mode or focus_date, redirect with defaults
 				if (!to.params.mode || !to.params.focus_date) {
 					next({

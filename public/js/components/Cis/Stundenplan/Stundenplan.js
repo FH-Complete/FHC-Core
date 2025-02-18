@@ -4,13 +4,14 @@ import LvModal from "../Mylv/LvModal.js";
 import LvInfo from "../Mylv/LvInfo.js"
 import LvMenu from "../Mylv/LvMenu.js"
 
-// TODO: define in one place that week is the default mode, it is hardcoded in 27 places currently
-export const Stundenplan = {
+export const DEFAULT_MODE = 'Week'
+
+const Stundenplan = {
 	name: 'Stundenplan',
 	data() {
 		return {
 			events: null,
-			calendarMode: "Week",
+			calendarMode: DEFAULT_MODE,
 			calendarDate: new CalendarDate(new Date()),
 			eventCalendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
@@ -102,20 +103,20 @@ export const Stundenplan = {
 			this.currentDay = day;
 		},
 		handleChangeMode(mode) {
-			console.log('handleChangeMode', mode)
 			const modeCapitalized = mode.charAt(0).toUpperCase() + mode.slice(1)
-			
-			// TODO: clashes with initial mode and needs to be differentiated
-			// this.$router.replace({
-			// 	name: "Stundenplan",
-			// 	params: {
-			// 		mode: modeCapitalized,
-			// 		focus_date: this.currentDay.toISOString().split("T")[0],
-			// 		lv_id: this.viewData?.lv_id || null
-			// 	}
-			// })
-			
-			this.calendarMode = mode
+			const calendarModeCapitalized = this.calendarMode.charAt(0).toUpperCase() + this.calendarMode.slice(1)
+			if(modeCapitalized !== calendarModeCapitalized) { // avoid the first $emit event where mode is initialized 
+				this.$router.replace({
+					name: "Stundenplan",
+					params: {
+						mode: modeCapitalized,
+						focus_date: this.currentDay.toISOString().split("T")[0],
+						lv_id: this.viewData?.lv_id || null
+					}
+				})
+
+				this.calendarMode = mode
+			}
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
