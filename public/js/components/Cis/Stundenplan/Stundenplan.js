@@ -4,24 +4,26 @@ import LvModal from "../Mylv/LvModal.js";
 import LvInfo from "../Mylv/LvInfo.js"
 import LvMenu from "../Mylv/LvMenu.js"
 
+// TODO: define in one place that week is the default mode, it is hardcoded in 27 places currently
 export const Stundenplan = {
 	name: 'Stundenplan',
 	data() {
 		return {
 			events: null,
+			calendarMode: "Week",
 			calendarDate: new CalendarDate(new Date()),
 			eventCalendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
-			currentDay: new Date(),
+			currentDay: this.viewData?.focus_date ? new Date(this.viewData.focus_date) : new Date(),
 			minimized: false,
-			studiensemester_kurzbz:null,
-			studiensemester_start:null,
-			studiensemester_ende:null,
-			uid:null,
+			studiensemester_kurzbz: null,
+			studiensemester_start: null,
+			studiensemester_ende: null,
+			uid: null,
 		}
 	},
 	props: [
-		"viewData",
+		"viewData"
 	],
 	watch: {
 		weekFirstDay: {
@@ -33,6 +35,12 @@ export const Stundenplan = {
 				this.studiensemester_ende = ende;
 			},
 			immediate: true,
+		},
+		'viewData.lv_id'(newVal) {
+			// console.log('viewData.lv_id', newVal)
+		},
+		'viewData.focus_date'(newVal) {
+			// console.log('viewData.focus_date', newVal)
 		}
 	},
 	components: {
@@ -49,11 +57,6 @@ export const Stundenplan = {
 			let download_link = (format, version = "", target = "") => `${FHC_JS_DATA_STORAGE_OBJECT.app_root}cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=${this.uid}&begin=${start}&ende=${ende}&format=${format}${version ? '&version=' + version : ''}${target ? '&target=' + target : ''}`;
 			return [{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link('excel') }, { title: "csv", icon: 'fa-solid fa-file-csv', link: download_link('csv') }, { title: "ical1", icon: 'fa-regular fa-calendar', link: download_link('ical', '1', 'ical') }, { title: "ical2", icon: 'fa-regular fa-calendar', link: download_link('ical', '2', 'ical') }];
 		},
-		lv_id() { // computed so we can theoretically change path/lva selection and reload without page refresh
-			const pathParts = window.location.pathname.split('/').filter(Boolean);
-			const id = pathParts[pathParts.length - 1];
-			return id && !isNaN(Number(id)) ? id : null; // only return id if it is a number string since the path might contain invalid elements
-		},
 		weekFirstDay: function () {
 			return this.calendarDateToString(this.calendarDate.cdFirstDayOfWeek);
 		},
@@ -66,7 +69,6 @@ export const Stundenplan = {
 		monthLastDay: function () {
 			return this.calendarDateToString(this.eventCalendarDate.cdLastDayOfCalendarMonth);
 		},
-
 	},
 	methods:{
 		fetchStudiensemesterDetails: async function (date) {
@@ -84,7 +86,36 @@ export const Stundenplan = {
 			this.currentlySelectedEvent = event;
 		},
 		selectDay: function(day){
+			const date = day.getFullYear() + "-" +
+				String(day.getMonth() + 1).padStart(2, "0") + "-" +
+				String(day.getDate()).padStart(2, "0");
+			
+			this.$router.replace({
+				name: "Stundenplan",
+				params: {
+					mode: this.calendarMode,
+					focus_date: date,
+					lv_id: this.viewData?.lv_id || null
+				}
+			})
+			
 			this.currentDay = day;
+		},
+		handleChangeMode(mode) {
+			console.log('handleChangeMode', mode)
+			const modeCapitalized = mode.charAt(0).toUpperCase() + mode.slice(1)
+			
+			// TODO: clashes with initial mode and needs to be differentiated
+			// this.$router.replace({
+			// 	name: "Stundenplan",
+			// 	params: {
+			// 		mode: modeCapitalized,
+			// 		focus_date: this.currentDay.toISOString().split("T")[0],
+			// 		lv_id: this.viewData?.lv_id || null
+			// 	}
+			// })
+			
+			this.calendarMode = mode
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
@@ -163,7 +194,17 @@ export const Stundenplan = {
 	<h2>{{$p.t('lehre/stundenplan')}}</h2>
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
-	<fhc-calendar @selectedEvent="setSelectedEvent" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
+	<fhc-calendar 
+		@selectedEvent="setSelectedEvent"
+		:initial-date="currentDay"
+		@change:range="updateRange"
+		:events="events"
+		:initial-mode="viewData.mode"
+		show-weeks
+		@select:day="selectDay"
+		@change:mode="handleChangeMode"
+		v-model:minimized="minimized"
+	>     
 		<template #calendarDownloads>
 			<div v-for="{title,icon,link} in downloadLinks">
 				<a :href="link" :title="title" class="py-1 px-2 m-1 btn btn-outline-secondary">
@@ -230,8 +271,7 @@ export const Stundenplan = {
 		<template #pageMobilContentEmpty >
 			<h3>{{ $p.t('lehre/noLvFound') }}</h3>
 		</template>
-	</fhc-calendar>
-	`
+	</fhc-calendar>`
 }
 
 export default Stundenplan

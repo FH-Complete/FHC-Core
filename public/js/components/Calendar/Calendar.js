@@ -192,12 +192,13 @@ export default {
 		},
 	},
 	created() {
-		const allowedInitialModes = ['years'];
+		const initMode = this.initialMode.toLowerCase()
+		const allowedInitialModes = ['years', 'day'];
 		if (!this.noWeekView)
 			allowedInitialModes.push('week');
 		if (!this.noMonthView)
 			allowedInitialModes.push('month');
-		this.mode = allowedInitialModes[allowedInitialModes.indexOf(this.initialMode)] || allowedInitialModes.pop();
+		this.mode = allowedInitialModes[allowedInitialModes.indexOf(initMode)] || allowedInitialModes.pop();
 		this.date.set(new Date(this.initialDate));
 		this.focusDate.set(this.date);
 	},
@@ -227,7 +228,6 @@ export default {
 				}
 			}).observe(this.$refs.container);
 		}
-
 	},
 	unmounted(){
 		CalendarDates.cleanup();

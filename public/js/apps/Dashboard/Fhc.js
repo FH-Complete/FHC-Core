@@ -58,10 +58,71 @@ const router = VueRouter.createRouter({
 			component: Info,
 			props: true
 		},
+		// Redirect old links to new format
 		{
-			path: `/Cis/Stundenplan/:lv_id?`,
+			path: "/Cis/Stundenplan/:lv_id(\\d+)", // define lv_id as numeric so this matches
+			name: "StundenplanNumeric",
+			component: Stundenplan,
+			redirect: (to) => {
+				debugger
+				return { // redirect to longer Stundenplan url and map params
+					name: "Stundenplan",
+					params: {
+						mode: "Week",
+						focus_date: new Date().toISOString().split("T")[0],
+						lv_id: to.params.lv_id || null
+						
+					},
+				};
+			},
+		},
+		{ 
+			// actual routes after Stundenplan -> config/routes.php
+			// actual param handling -> controllers/Cis/Stundenplan.php
+			path: `/Cis/Stundenplan/:mode?/:focus_date?/:lv_id?`,
 			name: 'Stundenplan',
-			component: Stundenplan
+			component: Stundenplan,
+			props: (route) => { // validate and set mode/focus date if for some reason missing
+				const validModes = ["Month", "Week", "Day"];
+
+				// default to mode week if not provided
+				let mode = route.params.mode &&
+					validModes.includes(route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase())
+						? route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase()
+						: "Week";
+
+				// default focus_date: today date if not provided
+				let focusDate = route.params.focus_date || new Date().toISOString().split("T")[0];
+				
+				// for consistency reasons format the props into the viewData object so we have consistency in the form 
+				// we access route specific data whether it is codigniter served or just another vue component that has been
+				// mounted
+				return {
+					viewData: {
+						mode,
+						focusDate,
+						lv_id: route.params.lv_id || null
+					}
+				};
+			},
+			beforeEnter: (to, from, next) => {
+				console.log('beforeEnter')
+				// If missing mode or focus_date, redirect with defaults
+				if (!to.params.mode || !to.params.focus_date) {
+					next({
+						name: "Stundenplan",
+						params: {
+							
+							mode: to.params.mode || "Week",
+							focus_date: to.params.focus_date || new Date().toISOString().split("T")[0],
+							lv_id: to.params.lv_id || null
+							
+						},
+					});
+				} else {
+					next();
+				}
+			}
 		},
 		{
 			path: `/`,
