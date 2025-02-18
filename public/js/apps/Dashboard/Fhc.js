@@ -9,7 +9,7 @@ import Profil from "../../components/Cis/Profil/Profil";
 import CmsNews from "../../components/Cis/Cms/News";
 import CmsContent from "../../components/Cis/Cms/Content";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info";
-import RoomInformation from "../../components/Cis/Mylv/RoomInformation";
+import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../../components/Cis/Mylv/RoomInformation";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -28,11 +28,62 @@ const router = VueRouter.createRouter({
 			component: Profil,
 			props: true
 		},
+		
+		// Redirect old links to new format
 		{
-			path: `/CisVue/Cms/getRoomInformation/:ort_kurzbz`,
+			path: "/CisVue/Cms/getRoomInformation/:ort_kurzbz",
+			name: "RoomInformationOld",
+			component: RoomInformation,
+			redirect: (to) => {
+				return { // redirect to longer Rauminfo url and map params
+					name: "RoomInformation",
+					params: {
+						ort_kurzbz: to.params.ort_kurzbz
+					},
+				};
+			},
+		},
+		{
+			path: `/CisVue/Cms/getRoomInformation/:mode/:focus_date/:ort_kurzbz`,
 			name: 'RoomInformation',
 			component: RoomInformation,
-			props: true
+			props: (route) => { // validate and set mode/focus date if for some reason missing
+				const validModes = ["Month", "Week", "Day"];
+
+				// check mode string
+				const mode = route.params.mode &&
+				validModes.includes(route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase())
+					? route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase()
+					: DEFAULT_MODE_RAUMINFO;
+
+				// default to today date if not provided
+				const focus_date = route.params.focus_date || new Date().toISOString().split("T")[0];
+
+				// for consistency reasons format the props into one object but actually use a new name to we dont collide with
+				// existing viewData declaration written from codeigniter 3 into routerview tag
+				return {
+					propsViewData: {
+						mode,
+						focus_date,
+						ort_kurzbz: route.params.ort_kurzbz
+					}
+				};
+			},
+			beforeEnter: (to, from, next) => {
+				//  missing mode or focus_date -> set defaults
+				if (!to.params.mode || !to.params.focus_date) {
+					next({
+						name: "RoomInformation",
+						params: {
+							mode: to.params.mode || DEFAULT_MODE_RAUMINFO,
+							focus_date: to.params.focus_date || new Date().toISOString().split("T")[0],
+							ort_kurzbz: route.params.ort_kurzbz
+						}
+					});
+				} else {
+					next();
+				}
+			}
 		},
 		{
 			path: `/CisVue/Cms/Content/:content_id`,
@@ -81,20 +132,19 @@ const router = VueRouter.createRouter({
 				const validModes = ["Month", "Week", "Day"];
 
 				// check mode string
-				let mode = route.params.mode &&
+				const mode = route.params.mode &&
 					validModes.includes(route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase())
 						? route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase()
 						: DEFAULT_MODE_STUNDENPLAN;
 
 				// default to today date if not provided
-				let focusDate = route.params.focus_date || new Date().toISOString().split("T")[0];
-				
+				const focus_date = route.params.focus_date || new Date().toISOString().split("T")[0];
 				// for consistency reasons format the props into one object but actually use a new name to we dont collide with
 				// existing viewData declaration written from codeigniter 3 into routerview tag
 				return {
 					propsViewData: {
 						mode,
-						focusDate,
+						focus_date,
 						lv_id: route.params.lv_id
 					}
 				};
@@ -116,17 +166,31 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
+			path: `/Cis4`,
+			name: 'Cis4',
+			component: FhcDashboard,
+			props: {dashboard: 'CIS'},
+		},
+		{
 			path: `/`,
 			name: 'FhcDashboard',
 			component: FhcDashboard,
 			props: {dashboard: 'CIS'},
 		},
 		{
-			path: `/Cis4`,
-			name: 'Cis4',
+			path: '/:pathMatch(.*)*',
+			name: 'Fallback',
 			component: FhcDashboard,
 			props: {dashboard: 'CIS'},
-		}
+			redirect: () => {
+				return {
+					name: "Cis4",
+					params: {
+						dashboard: 'CIS'
+					},
+				};
+			},
+		},
 	]
 })
 

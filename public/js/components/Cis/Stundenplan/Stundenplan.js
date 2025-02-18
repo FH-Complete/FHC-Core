@@ -15,7 +15,7 @@ const Stundenplan = {
 			calendarDate: new CalendarDate(new Date()),
 			eventCalendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
-			currentDay: this.viewData?.focus_date ? new Date(this.viewData.focus_date) : new Date(),
+			currentDay: this.propsViewData?.focus_date ? new Date(this.propsViewData.focus_date) : new Date(),
 			minimized: false,
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
@@ -23,9 +23,9 @@ const Stundenplan = {
 			uid: null
 		}
 	},
-	props: [
-		"propsViewData"
-	],
+	props: {
+		propsViewData: Object
+	},
 	watch: {
 		weekFirstDay: {
 			handler: async function (newValue) {
@@ -39,10 +39,14 @@ const Stundenplan = {
 		},
 		// forward/backward on history entries happening in stundenplan
 		'propsViewData.lv_id'(newVal) {
+			// relevant if lv_id can be changed from within this component
 		},
 		'propsViewData.mode'(newVal) {
 			if(this.$refs.calendar) this.$refs.calendar.setMode(newVal)
 		},
+		'propsViewData.focus_date'(newVal) {
+			this.currentDate = new Date(newVal)
+		}
 	},
 	components: {
 		FhcCalendar, LvModal, LvMenu, LvInfo
@@ -115,7 +119,6 @@ const Stundenplan = {
 			})
 		
 			this.calendarMode = mode
-
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
