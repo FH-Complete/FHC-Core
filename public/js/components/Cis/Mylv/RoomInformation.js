@@ -64,7 +64,6 @@ const RoomInformation = {
 			this.lv_id = window.location.pathname
 		},
 		selectDay: function(day){
-			debugger
 			const date = day.getFullYear() + "-" +
 				String(day.getMonth() + 1).padStart(2, "0") + "-" +
 				String(day.getDate()).padStart(2, "0");
@@ -81,7 +80,6 @@ const RoomInformation = {
 			this.currentDay = day;
 		},
 		handleChangeMode(mode) {
-			debugger
 			const modeCapitalized = mode.charAt(0).toUpperCase() + mode.slice(1)
 
 			this.$router.push({
