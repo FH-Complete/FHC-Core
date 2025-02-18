@@ -14,6 +14,8 @@ if (!$result = @$db->db_query('SELECT 1 FROM testtool.tbl_pruefling_gebiet LIMIT
 			
 			ALTER TABLE testtool.tbl_pruefling_gebiet OWNER TO fhcomplete;
 			ALTER TABLE testtool.tbl_pruefling_gebiet ADD CONSTRAINT pk_tbl_pruefling_gebiet PRIMARY KEY (prueflinggebiet_id);
+			ALTER TABLE testtool.tbl_pruefling_gebiet ADD CONSTRAINT fk_tbl_pruefling_gebiet_pruefling_id FOREIGN KEY (pruefling_id) REFERENCES testtool.tbl_pruefling(pruefling_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE testtool.tbl_pruefling_gebiet ADD CONSTRAINT fk_tbl_pruefling_gebiet_gebiet_id FOREIGN KEY (gebiet_id) REFERENCES testtool.tbl_gebiet(gebiet_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 			CREATE SEQUENCE testtool.tbl_pruefling_gebiet_prueflinggebiet_id_seq
 				START WITH 1
