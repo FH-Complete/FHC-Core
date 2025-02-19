@@ -194,7 +194,7 @@ export default {
 			contractSelected: [],
 			listContractStati: [],
 			contractFormData: {
-				vertragsstatus_kurzbz: 'test',
+				vertragsstatus_kurzbz: '',
 				datum: new Date(),
 			},
 			dataPrintHonorar: [],

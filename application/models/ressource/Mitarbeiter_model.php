@@ -387,5 +387,6 @@ class Mitarbeiter_model extends DB_Model
 
 		$uid = isset($data[0]->uid) ? $data[0]->uid : null;
 		return $uid;
+
 	}
 }
