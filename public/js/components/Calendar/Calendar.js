@@ -247,8 +247,8 @@ export default {
 			<template #dayPage="{event,day,mobile}">
 				<slot name="dayPage" :event="event" :day="day" :mobile="mobile"></slot>
 			</template>
-			<template #pageMobilContent="{lvMenu}">
-				<slot name="pageMobilContent" :lvMenu="lvMenu"></slot>
+			<template #pageMobilContent="{lvMenu, event}">
+				<slot name="pageMobilContent" :lvMenu="lvMenu" :event="event"></slot>
 			</template>
 			<template #pageMobilContentEmpty>
 				<slot name="pageMobilContentEmpty" ></slot>

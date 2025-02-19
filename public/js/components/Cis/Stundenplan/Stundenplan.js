@@ -154,23 +154,28 @@ export const Stundenplan = {
 			let date_end = Math.floor(new Date(end_date).getTime() / 1000);
 			return this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid('io23m005', date_start, date_end).then((response) => response.events).then(events => {
 				let data =events.map(event =>{
-					const start_date = new Date(event.timestart * 1000);
-					const formatted_year = Intl.DateTimeFormat(this.$p.user_locale, { year: 'numeric' }).format(start_date);
-					const formatted_month = Intl.DateTimeFormat(this.$p.user_locale, { month: '2-digit' }).format(start_date);
-					const formatted_day = Intl.DateTimeFormat(this.$p.user_locale, { year: '2-digit' }).format(start_date);
-					const formatted_date = `${formatted_year}-${formatted_month}-${formatted_day}`;
+					const event_start_date = new Date(Number(event.timestart) * 1000);
+					const event_end_date = new Date(((Number(event.timestart) + Number(event.timeduration)) * 1000));
+					const formatted_date = `${event_start_date.getFullYear()}-${event_start_date.getMonth()+1}-${event_start_date.getDate()}`;
+					// to get the same date and time as in moodle, we use the default UTC time zone 
+					const formatted_start_time = event_start_date.toLocaleTimeString(this.$p.user_locale, {hour:'2-digit',minute:'2-digit', second:'2-digit',hour12:false, timeZone:'UTC'});
+					const formatted_end_time = event_end_date.toLocaleTimeString(this.$p.user_locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'UTC' });
+					
 					return {
 						type:'moodle',
-						beginn: "14:00:00",
-						ende: "15:00:00",
+						beginn: formatted_start_time,
+						ende: formatted_end_time,
 						allDayEvent: true,
 						datum: formatted_date,
-						topic: event.activityname,
+						purpose: event.purpose,
+						assignment: event.activityname,
+						topic: event.activitystr,
 						lektor:[],
 						gruppe:[],
 						ort_kurzbz: event.location,
-						lehreinheit_id:0,
-						titel: event.activitystr,
+						//moodle idnumber entspricht der course id number die man den Kurs in Moodle vergeben kann
+						lehreinheit_id:event.lehreinheitsNummber??null,
+						titel: event.course.fullname,
 						lehrfach:'',
 						lehrform:'',
 						lehrfach_bez:'',
@@ -233,7 +238,7 @@ export const Stundenplan = {
 				</div>
 				<div v-if="event.type=='moodle'" class="d-flex small w-100" >
 					<span >moodle:</span>
-					<span class="flex-grow-1 text-center">{{event.titel}}</span>
+					<span class="flex-grow-1 text-center">{{event.topic}}</span>
 				</div>
 				<div v-else class="d-flex flex-column flex-grow-1 align-items-center small">
 					<span>{{event.topic}}</span>
@@ -243,34 +248,46 @@ export const Stundenplan = {
 			</div>
 		</template>
 		<template #dayPage="{event,day,mobile}">
-			<div @click="mobile? showModal(event?.orig):null" type="button" class="fhc-entry border border-secondary border row m-0 h-100 justify-content-center align-items-center text-center">
-				<div class="col-auto" v-if="event?.orig?.beginn && event?.orig?.ende" >
-					<div class="d-flex flex-column p-4 border-end border-secondary">
-						<span class="small">{{convertTime(event.orig.beginn.split(":"))}}</span>
-						<span class="small">{{convertTime(event.orig.ende.split(":"))}}</span>
+			<div @click="mobile? showModal(event):null" type="button" class="fhc-entry border border-secondary border m-0 h-100  text-center">
+				<template v-if="event.type=='moodle'">
+					<div class="d-flex align-items-center w-100" >
+						<span class="p-2">moodle:</span>
+						<span class="flex-grow-1 text-center">{{event.topic}}</span>
 					</div>
-				</div>
-				<div class="col ">
-					<p>Lehrveranstaltung:</p>
-					<p class="m-0">{{event?.orig.topic}}</p>
-				</div>
-				<div class="col ">
-					<p>Lektor:</p>
-					<p class="m-0" v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
-				</div>
-				<div class="col ">
-					<p>Ort: </p>
-					<p class="m-0">{{event?.orig.ort_kurzbz}}</p>
-				</div>
+				</template>
+				<template v-else>
+					<div class="row justify-content-center align-items-center">
+						<div class="col-auto" v-if="!event.allDayEvent && event?.beginn && event?.ende" >
+							<div class="d-flex flex-column p-4 border-end border-secondary">
+								<span class="small">{{convertTime(event.beginn.split(":"))}}</span>
+								<span class="small">{{convertTime(event.ende.split(":"))}}</span>
+							</div>
+						</div>
+						<div class="col ">
+							<p>Lehrveranstaltung:</p>
+							<p class="m-0">{{event?.topic}}</p>
+						</div>
+						<div class="col ">
+							<p>Lektor:</p>
+							<p class="m-0" v-for="lektor in event?.lektor">{{lektor.kurzbz}}</p>
+						</div>
+						<div class="col ">
+							<p>Ort: </p>
+							<p class="m-0">{{event?.ort_kurzbz}}</p>
+						</div>
+					</div>
+				</template>
 			</div>
 		</template>
-		<template #pageMobilContent="{lvMenu}">
+		<template #pageMobilContent="{lvMenu, event}">
 			<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
 			<div class="w-100">
-				<lv-info  :event="currentlySelectedEvent" />
+				<lv-info  :event="event" />
 			</div>
-			<h3 >Lehrveranstaltungs Menu</h3>
-			<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-show="lvMenu" :menu="lvMenu" />
+			<template v-if="event.type != 'moodle'">
+				<h3 >Lehrveranstaltungs Menu</h3>
+				<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-show="lvMenu" :menu="lvMenu" />
+			</template>
 		</template>
 		<template #pageMobilContentEmpty >
 			<h3>Keine Lehrveranstaltungen</h3>

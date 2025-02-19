@@ -365,11 +365,11 @@ export default {
 					</div>
 					<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start position-relative" :style="dayGridStyle(day)">
 						<div class="position-absolute w-100" style="top:0; bottom:0;">
-							<div class="position-sticky d-grid gap-1" style="top:44px;" v-for="(events,_day) in allDayEvents" :key="day">
+							<div class="position-sticky d-grid " style="top:44px;" v-for="(events,_day) in allDayEvents" :key="day">
 								<div v-if="dayindex == _day" v-for="event in events" :key="event" @click.prevent="weekPageClick(event, _day)"
 									:selected="event == selectedEvent"
-									:style="{'background-color': event?.color, 'z-index':2}"
-									class="small rounded overflow-hidden fhc-entry "
+									:style="{'background-color': event?.color, 'z-index':2, 'margin-bottom':'1px'}"
+									class="small rounded overflow-hidden fhc-entry"
 									v-contrast
 									>
 									<slot class="p-1" name="weekPage" :event="event" :day="day">

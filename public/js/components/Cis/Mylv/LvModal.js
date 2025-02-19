@@ -70,11 +70,19 @@ export default {
 	template: /*html*/ `
 	<bs-modal ref="modalContainer" @showBsModal="onModalShow" @hideBsModal="onModalHide" v-bind="$props" :bodyClass="''" dialogClass='modal-lg' class="bootstrap-alert" backdrop="false" >
 		<template v-slot:title>
-			<template v-if="event.titel">{{ event.titel + ' - ' + event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
+			<template v-if="event?.type=='moodle'">{{event.titel}}</template>
+			<template v-else-if="event.titel">{{ event.titel + ' - ' + event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
 			<template v-else>{{ event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
 		</template>
 		<template v-slot:default>
-			<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
+			<h3>
+				<template v-if="event?.type =='moodle'">
+					{{$p.t('lvinfo','Moodleinformationen')}}
+				</template>
+				<template v-else>
+					{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}
+				</template>
+			</h3>
 			<lv-info :event="event"></lv-info>
 			<template v-if="showMenu && this.menu">
 				<h3 >Lehrveranstaltungs Menu</h3>

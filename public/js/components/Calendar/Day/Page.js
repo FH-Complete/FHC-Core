@@ -93,6 +93,16 @@ export default {
 		}
 	},
 	computed: {
+		allDayEvents() {
+			let allDayEvents = {};
+			for (let day in this.events) {
+				const filteredAllDayEvents = this.events[day].filter(event => event.allDayEvent);
+				if (filteredAllDayEvents.length > 0) {
+					allDayEvents[day] = filteredAllDayEvents;
+				}
+			};
+			return allDayEvents;
+		},
 		overlayStyle() {
 			return {
 				'background-color': '#F5E9D7',
@@ -183,6 +193,7 @@ export default {
 			let d = {events: [], lanes: 1};
 			if (this.events[key]) {
 				this.events[key].forEach(evt => {
+					if (evt.allDayEvent) return;
 					let event = {
 						orig: evt,
 						lane: 1,
@@ -282,7 +293,7 @@ export default {
 			}
 		},
 		eventClick(evt) {
-			let event = evt.orig;
+			let event = evt.orig || evt;
 			this.setSelectedEvent(event);
 			this.$emit('input', event);
 		},
@@ -374,18 +385,32 @@ export default {
 									<div class="hours">
 										<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 									</div>
-									<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
+									<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
+										<div class="position-absolute w-100" style="top:0; bottom:0;">
+											<div class="position-sticky d-grid " style="top:0;" v-for="(events,_day) in allDayEvents" :key="day">
+												<div v-if="dayindex == _day" v-for="event in events" :key="event" @click.prevent="eventClick(event)"
+													:selected="event == selectedEvent"
+													:style="{'background-color': event?.color, 'z-index':2, 'margin-bottom':'1px'}"
+													class="small rounded overflow-hidden fhc-entry"
+													v-contrast
+													>
+													<slot class="p-1" name="dayPage" :event="event" :day="day">
+														<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+													</slot>
+												</div>
+											</div>
+										</div>
 										<div v-if="lookingAtToday && !noEventsCondition" :style="overlayStyle"></div>
 										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast :selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden " >
 											<!-- desktop version of the page template, parent receives slotProp mobile = false -->
 											<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
-												<slot  name="dayPage" :event="event" :day="day" :mobile="false">
+												<slot  name="dayPage" :event="event.orig" :day="day" :mobile="false">
 													<p>this is a slot placeholder</p>
 												</slot>
 											</div>
 											<!-- mobile version of the page template, parent receives slotProp mobile = true -->
 											<div class="d-block d-xl-none h-100" @click.prevent="eventClick(event)">
-												<slot  name="dayPage" :event="event" :day="day" :mobile="true">
+												<slot  name="dayPage" :event="event.orig" :day="day" :mobile="true">
 													<p>this is a slot placeholder</p>
 												</slot>
 											</div>
@@ -401,8 +426,8 @@ export default {
 			<div class="d-xl-block col-xl-6 p-4 d-none" style="max-height: 100%">
 				<div style="z-index:0; max-height: 100%" class="sticky-top d-flex justify-content-center align-items-center flex-column">
 					<div style="max-height: 100%; overflow-y:auto;" class="w-100">
-						<template v-if="selectedEvent && lvMenu">
-							<slot name="pageMobilContent" :lvMenu="lvMenu" >
+						<template v-if="selectedEvent ">
+							<slot name="pageMobilContent" :event="selectedEvent" :lvMenu="lvMenu" >
 								<p>this is a slot placeholder</p>
 							</slot>
 						</template>

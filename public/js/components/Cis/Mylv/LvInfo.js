@@ -1,6 +1,5 @@
 import { numberPadding, formatDate } from "../../../helpers/DateHelpers.js"
 
-
 export default {
 	props: {
 		event: Object,
@@ -11,17 +10,23 @@ export default {
 		}
 	},
 	computed: {
-		lektorenLinks: function(){
+		LV_TYPES: function () {
+			return {
+				lehreinheit: "lehreinheit",
+				reservierung: "reservierung",
+				moodle: "moodle",
+			};
+		},
+		lektorenLinks: function () {
 			if (!this.event || !Array.isArray(this.event.lektor) || !this.event.lektor.length) return "a";
 
-			let lektorenLinks ={};
-			this.event.lektor.forEach((lektor)=>{
+			let lektorenLinks = {};
+			this.event.lektor.forEach((lektor) => {
 				lektorenLinks[lektor.kurzbz] = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/Cis/Profil/View/${lektor.mitarbeiter_uid}`;
 			})
 			return lektorenLinks;
 		},
-		getOrtContentLink: function()
-		{
+		getOrtContentLink: function () {
 			if (!this.event || !this.event.ort_content_id) return "a";
 
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/CisVue/Cms/content/${this.event.ort_content_id}`
@@ -61,52 +66,74 @@ export default {
 					<td>{{methodFormatDate(event.datum)}}</td>
 				</tr>
 				<tr>
-					<th>{{
-						$p.t('global','raum')?
-						$p.t('global','raum')+':'
-						:''
-					}}</th>
-					<td>
-						<a v-if="event.ort_content_id" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
-						{{event.ort_kurzbz}}
-					</td>
+					<template v-if="event.type == LV_TYPES.moodle">
+						<th>{{$p.t('global','aktivitaet')}}:</th>
+						<td>{{event?.assignment}}</td>
+					</template>
+					<template v-else>
+						<th>{{
+							$p.t('global','raum')?
+							$p.t('global','raum')+':'
+							:''
+						}}</th>
+						<td>
+							<a v-if="event.ort_content_id" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
+							{{event.ort_kurzbz}}
+						</td>
+					</template>
+				</tr>
+				<template v-if="event.type != LV_TYPES.moodle">
+					<tr>
+						<th>{{
+							$p.t('lehre','lehrveranstaltung')?
+							$p.t('lehre','lehrveranstaltung')+':'
+							:''
+						}}</th>
+						<td>{{'('+event.lehrform+') ' + event.lehrfach_bez}}</td>
+					</tr>
+				</template>
+				<template v-if="event.type != LV_TYPES.moodle">
+					<tr>
+						<th>{{
+							$p.t('lehre','lektor')?
+							$p.t('lehre','lektor')+':'
+							:''
+						}}</th>
+						<td>
+							<div v-for="lektor in event.lektor" class="d-block">
+								<a v-if="lektorenLinks[lektor.kurzbz]" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
+								{{lektor.kurzbz}}
+							</div>
+						</td>
+					</tr>
+				</template>
+				<tr>
+					<template v-if="event.type == LV_TYPES.moodle">
+						<th>{{$p.t('global','typ')}}:</th>
+						<td>{{event?.purpose}}</td>
+					</template>
+					<template v-else>
+						<th>{{
+							$p.t('ui','zeitraum')?
+							$p.t('ui','zeitraum')+':'
+							:''
+						}}</th>
+						<td>{{start_time + ' - ' + end_time}}</td>
+					</template>
 				</tr>
 				<tr>
-					<th>{{
-						$p.t('lehre','lehrveranstaltung')?
-						$p.t('lehre','lehrveranstaltung')+':'
-						:''
-					}}</th>
-					<td>{{'('+event.lehrform+') ' + event.lehrfach_bez}}</td>
-				</tr>
-				<tr>
-					<th>{{
-						$p.t('lehre','lektor')?
-						$p.t('lehre','lektor')+':'
-						:''
-					}}</th>
-					<td>
-						<div v-for="lektor in event.lektor" class="d-block">
-							<a v-if="lektorenLinks[lektor.kurzbz]" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
-							{{lektor.kurzbz}}
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<th>{{
-						$p.t('ui','zeitraum')?
-						$p.t('ui','zeitraum')+':'
-						:''
-					}}</th>
-					<td>{{start_time + ' - ' + end_time}}</td>
-				</tr>
-				<tr>
-					<th>{{
-						$p.t('lehre','organisationseinheit')?
-						$p.t('lehre','organisationseinheit')+':'
-						:''
-					}}</th>
-					<td>{{event.organisationseinheit}}</td>
+				    <template v-if="event.type == LV_TYPES.moodle">
+						<th>{{$p.t('fristenmanagement','frist')}}:</th>
+						<td>{{start_time}}</td>
+					</template>
+					<template v-else>
+						<th>{{
+							$p.t('lehre','organisationseinheit')?
+							$p.t('lehre','organisationseinheit')+':'
+							:''
+						}}</th>
+						<td>{{event.organisationseinheit}}</td>
+					</template>
 				</tr>
 			</tbody>
 		</table>
