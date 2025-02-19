@@ -376,7 +376,7 @@ class FilterCmptLib
 					//
 					if (isset($filterField['name']) && isset($filterField['operation']) && isset($filterField['condition'])
 						&& !isEmptyString($filterField['name']) && !isEmptyString($filterField['operation'])
-						&& !isEmptyString($filterField['condition']))
+						&& !isEmptyString((string)$filterField['condition']))
 					{
 						// Fine
 						$filter = new stdClass();
