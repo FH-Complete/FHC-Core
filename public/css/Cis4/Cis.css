@@ -53,7 +53,11 @@ html {
   }
 }
 
-
+/* lvMenu entry style */
+#cis-menu .menu-entry:hover{
+	background-color: var(--fhc-cis-primary);
+	color:white;
+}
 
 /* buttons */
 #cis-header .btn-level-1,
