@@ -37519,6 +37519,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successSent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachricht erfolgreich versandt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Message sent successfully',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	/////////// FHC4 Phrases Messages END ///////////
 
 );

@@ -1,12 +1,15 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import FormForm from '../../Form/Form.js';
-//import FormInput from '../../Form/Input.js';
 
 export default {
 	components: {
 		CoreFilterCmpt,
 		FormForm,
-	//	FormInput
+	},
+	inject: {
+		cisRoot: {
+			from: 'cisRoot'
+		},
 	},
 	props: {
 		endpoint: {
@@ -121,7 +124,7 @@ export default {
 							button.addEventListener(
 								'click',
 								() =>
-									this.deleteMessage(cell.getData().message_id)
+									this.actionDeleteMessage(cell.getData().message_id)
 							);
 							container.append(button);
 
@@ -197,7 +200,6 @@ export default {
 							const selectedMessage = row.getData().message_id;
 							const body = row.getData().body;
 							this.previewBody = body;
-							console.log(selectedMessage);
 					}
 				},
 			],
@@ -209,11 +211,45 @@ export default {
 		reply(message_id){
 			console.log("in reply " + message_id);
 		},
+		actionDeleteMessage(message_id){
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? message_id
+					: Promise.reject({handled: true}))
+				.then(this.deleteMessage)
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 		deleteMessage(message_id){
-			console.log("deleteMessage " + message_id);
+		//	console.log("deleteMessage " + message_id);
+			return this.$fhcApi.factory.messages.person.deleteMessage(message_id)
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+				}).catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
 		},
 		actionNewMessage(){
-			console.log("action new message");
+			//console.log("action new message");
+			if (this.openMode == "window") {
+				console.log("openInNewWindow")
+				const linkWindowNewMessage = this.cisRoot + '/public/js/components/Messages/Details/NewMessage.js';
+				window.open(linkWindowNewMessage, '_blank');
+			}
+			else if (this.openmode == "modal"){
+				console.log("open with bootstrap Modal");
+			}
+			else if (this.openmode == "showDiv"){
+				console.log("open div in NewMessage.js");
+				//emit to NewMessage.js
+			}
+			else
+				console.log("no valid openmode: yet to be developed");
+		},
+		reload() {
+			this.$refs.table.reloadTable();
 		},
 	},
 	computed: {
@@ -238,8 +274,9 @@ export default {
 	},
 	template: `
 	<div class="messages-detail-table">
-		<p>endpoint: {{endpoint}}</p>
-		<p>{{messageLayout}}</p>
+<!--		<p>endpoint: {{endpoint}}</p>-->
+<!--				{{cisRoot}}-->
+<!--		<p>{{messageLayout}}</p>-->
 
 		<!-- {{statusText[0] }}
 		<hr>

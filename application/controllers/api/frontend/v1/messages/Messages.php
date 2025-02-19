@@ -9,6 +9,14 @@ class Messages extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getMessages' => ['admin:r', 'assistenz:r'],
+			'getVorlagen' => ['admin:r', 'assistenz:r'],
+			'getMessageVarsPerson' => ['admin:r', 'assistenz:r'],
+			'getMsgVarsPrestudent' => ['admin:r', 'assistenz:r'],
+			'getMsgVarsLoggedInUser' => ['admin:r', 'assistenz:r'],
+			'getNameOfDefaultRecipient' => ['admin:r', 'assistenz:r'],
+			'sendMessage' => ['admin:r', 'assistenz:r'],
+			'deleteMessage' => ['admin:r', 'assistenz:r'],
+			'getVorlagentext' => ['admin:r', 'assistenz:r'],
 		]);
 
 		//Load Models
@@ -20,6 +28,7 @@ class Messages extends FHCAPI_Controller
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 		$this->load->library('form_validation');
+		$this->load->library('MessageLib');
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -29,11 +38,17 @@ class Messages extends FHCAPI_Controller
 
 	public function getMessages($id, $type_id)
 	{
-		//$this->terminateWithError("in backend " . $type_id . ": " . $id, self::ERROR_TYPE_GENERAL);
-
-		if ($type_id != "person_id")
+		switch($type_id)
 		{
-			$this->terminateWithError("logic for type_id " . $type_id . " not defined yet", self::ERROR_TYPE_GENERAL);
+			case 'uid':
+				$id = $this->_getPersonIdFromUid($id);
+				break;
+			case 'person_id':
+				$id = $id;
+				break;
+			default:
+				$this->terminateWithError("MESSAGES::getMessages logic for type_id " . $type_id . " not defined yet", self::ERROR_TYPE_GENERAL);
+				break;
 		}
 
 		$result = $this->MessageModel->getMessagesForTable($id);
@@ -41,5 +56,228 @@ class Messages extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
+	}
+
+	public function getVorlagen()
+	{
+		//get oe of user
+		$uid = getAuthUID();
+		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		$result = $this->BenutzerfunktionModel->getBenutzerfunktionByUid($uid, 'oezuordnung');
+
+		$data = $this->getDataOrTerminateWithError($result);
+		$oe_kurzbz = current($data);
+
+	//	$this->terminateWithError("oe: ". $oe_kurzbz->oe_kurzbz, self::ERROR_TYPE_GENERAL);
+
+		$this->load->model('system/Vorlage_model', 'VorlageModel');
+
+		//39 Stück Variante OE
+		$result = $this->VorlageModel->getAllVorlagenByOe($oe_kurzbz->oe_kurzbz);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+
+		//IF ADMIN 167
+		$this->VorlageModel->addOrder('vorlage_kurzbz', 'ASC');
+		//only HTML-vorlagen -> for admin
+		$result = $this->VorlageModel->loadWhere(
+			array(
+				'mimetype' => 'text/html'
+			));
+
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getVorlagentext($vorlage_kurzbz)
+	{
+		//$this->terminateWithError("vor " . $vorlage_kurzbz, self::ERROR_TYPE_GENERAL);
+		//$studiengang_kz = 227; //TODO(Manu) check dynamisieren NULL
+		$studiengang_kz = 0;
+		$this->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
+		$this->VorlagestudiengangModel->addOrder('version', 'DESC');
+
+		$result = $this->VorlagestudiengangModel->loadWhere(
+			[
+				'vorlage_kurzbz' =>$vorlage_kurzbz,
+				'studiengang_kz' => $studiengang_kz
+			]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		//not correct with Vorlage
+		$vorlage = current($data);
+
+		//$this->terminateWithSuccess($data);
+		$this->terminateWithSuccess($vorlage->text);
+	}
+
+	public function getMessageVarsPerson()
+	{
+		$result = $this->MessageModel->getMessageVarsPerson();
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getMsgVarsPrestudent($uid)
+	{
+
+		$prestudent_id = $this-> _getPrestudentIdFromUid($uid);
+
+	//	$this->terminateWithError("prestudent_id " . $prestudent_id, self::ERROR_TYPE_GENERAL);
+
+		$result = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getMsgVarsLoggedInUser()
+	{
+		$uid = getAuthUID();
+
+		$result = $this->MessageModel->getMsgVarsLoggedInUser();
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getNameOfDefaultRecipient($id, $type_id)
+	{
+		switch($type_id)
+		{
+			case 'uid':
+				$id = $this->_getPersonIdFromUid($id);
+				break;
+			case 'person_id':
+				$id = $id;
+				break;
+			default:
+				$this->terminateWithError("MESSAGES::getNameOfDefaultRecipient logic for type_id " . $type_id . " not defined yet", self::ERROR_TYPE_GENERAL);
+				break;
+		}
+
+		$this->load->model('person/Person_model', 'PersonModel');
+
+		$result = $this->PersonModel->load($id);
+		//$this->terminateWithSuccess($result);
+		$data = $this->getDataOrTerminateWithError($result);
+		$name = current($data);
+
+		$this->terminateWithSuccess($name->vorname . " " . $name->nachname );
+	}
+
+	public function sendMessage($recipient_id)
+	{
+		//TODO(manu) Problems with Vorlagen...
+		//TODO(Manu) Problems with VARS
+		$receiversPersonId = $this->_getPersonIdFromUid($recipient_id);
+
+		$uid = getAuthUID();
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$result = $this->BenutzerModel->loadWhere(
+			['uid' => $uid]
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+		$benutzer = current($data);
+
+		if (isset($_POST['data']))
+		{
+			$data = json_decode($_POST['data']);
+			unset($_POST['data']);
+			foreach ($data as $k => $v) {
+				$_POST[$k] = $v;
+			}
+		}
+
+		$subject = $this->input->post('subject');
+
+		$body = $this->input->post('body');
+
+	//	$this->terminateWithError("rp_id " . $receiversPersonId, self::ERROR_TYPE_GENERAL);
+
+/*		$subject = $this->input->post('subject');
+
+		$formData = $this->input->post('data');*/
+
+		//$_POST['subject'] = $formData['subject'];
+	//	$subject = $formData['subject'];
+	//	$body = $formData['body'];
+
+	//	$subject = isset($_POST['subject']) ? $_POST['subject'] : null;
+	//	$body = isset($_POST['body']) ? $_POST['body'] : null;
+
+	//	$this->terminateWithError("person_id " . $receiversPersonId, self::ERROR_TYPE_GENERAL);
+
+	//	$this->terminateWithError("subject " . $subject, self::ERROR_TYPE_GENERAL);
+	//	$this->terminateWithError("body " . $body, self::ERROR_TYPE_GENERAL);
+
+	//	$this->terminateWithError("person_id " . $benutzer->person_id, self::ERROR_TYPE_GENERAL);
+	//	$this->terminateWithError("subject " . $subject, self::ERROR_TYPE_GENERAL);
+		$result = $this->messagelib->sendMessageUser($receiversPersonId, $subject, $body, $benutzer->person_id);
+
+		$this->terminateWithSuccess($result);
+	}
+
+	public function deleteMessage($messageId)
+	{
+		// Start DB transaction
+		$this->db->trans_begin();
+
+		$result = $this->MessageModel->deleteMessageRecipient($messageId);
+		if (isError($result)) {
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+
+		$result = $this->MessageModel->deleteMessageStatus($messageId);
+		if (isError($result)) {
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+
+		$result = $this->MessageModel->deleteMessage($messageId);
+		if (isError($result)) {
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+
+		$this->db->trans_commit();
+
+		$this->terminateWithSuccess($result);
+	}
+
+	private function _getPersonIdFromUid($uid)
+	{
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$result = $this->BenutzerModel->loadWhere(
+			['uid' => $uid]
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+		$benutzer = current($data);
+
+		return $benutzer->person_id;
+	}
+
+	private function _getPrestudentIdFromUid($uid)
+	{
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$result = $this->StudentModel->loadWhere(
+			['student_uid' => $uid]
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+		$student = current($data);
+
+		return $student->prestudent_id;
 	}
 }

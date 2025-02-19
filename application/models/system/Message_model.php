@@ -282,4 +282,46 @@ class Message_model extends DB_Model
 
 		return $this->execQuery($sql, $parametersArray);
 	}
+
+	/**
+	 * Deletes a messages from tableMessages and tbl_msg_recipient
+	 * TODO(MANU) CHECK IF NECESSARY
+	 * dependency with other tables
+	 * in case of reply... more messages
+	 * maybe anonimize it
+	 * @param $message_id
+	 * @return boolean success
+	 */
+	public function deleteMessageRecipient($message_id)
+	{
+		$sql = "
+		 DELETE FROM public.tbl_msg_recipient
+			WHERE message_id = ?;
+		 ";
+
+		return $this->execQuery($sql, array($message_id));
+	}
+
+
+	public function deleteMessageStatus($message_id)
+	{
+		$sql = "
+		 DELETE FROM public.tbl_msg_status
+			WHERE message_id = ?;
+		 ";
+
+		return $this->execQuery($sql, array($message_id));
+	}
+
+	public function deleteMessage($message_id)
+	{
+		$sql = "
+		 DELETE FROM public.tbl_msg_message
+			WHERE message_id = ?;
+		 ";
+
+		return $this->execQuery($sql, array($message_id));
+	}
+	
+	
 }

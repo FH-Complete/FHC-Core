@@ -34,10 +34,12 @@ export default {
 	},
 	template: `
 	<div class="core-messages h-100 pb-3">
-	<p>endpoint Messages.js: {{endpoint}}</p>
+<!--	<p>endpoint Messages.js: {{endpoint}}</p>-->
 		<div v-if="showNew">
 			<NewMessage
-				
+				:type-id="typeId"
+				:id="id"
+				:endpoint="endpoint"
 			>
 			</NewMessage>
 		</div>

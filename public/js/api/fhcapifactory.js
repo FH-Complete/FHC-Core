@@ -34,6 +34,7 @@ import cms from "./cms.js";
 import lehre from "./lehre.js";
 import addons from "./addons.js";
 import messages from "./messages.js";
+import vorlagen from "./vorlagen.js";
 
 export default {
     search,
@@ -54,5 +55,6 @@ export default {
     cms,
     lehre,
     addons,
-    messages
+    messages,
+    vorlagen
 };

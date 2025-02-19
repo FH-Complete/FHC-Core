@@ -12,10 +12,11 @@ export default {
 		<core-messages
 			ref="formc"
 			endpoint="$fhcApi.factory.messages.person"
-			type-id="person_id"
-			:id="modelValue.person_id"
-			messageLayout="listTableTop"
+			type-id="uid"
+			:id="modelValue.uid"
+			messageLayout="twoColumnsTableLeft"
 			show-table
+			show-new
 			>
 		</core-messages>
 
