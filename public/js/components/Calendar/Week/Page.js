@@ -273,6 +273,7 @@ export default {
 			}
 		},
 		dateToMinutesOfDay(day) {
+			// subtract 7 from the total hours because the hours range from 7 to 24
 			return Math.floor(((day.getHours()-7) * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
 		},
 		weekPageClick(event, day) {

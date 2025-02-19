@@ -177,7 +177,7 @@ export default {
 							:class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }"
 							:target="menuItem.c4_target"
 							:href="c4_link(menuItem) ? c4_link(menuItem) : null">
-								{{menuItem.name}}
+								{{ menuItem.phrase ? $p.t(menuItem.phrase) : menuItem.name}}
 							</a>
 							</div>
 							<ul v-if="menuItem.c4_moodle_links?.length" class="dropdown-menu p-0" :aria-labelledby="'moodle_links_'+lehrveranstaltung_id">

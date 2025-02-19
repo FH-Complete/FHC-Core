@@ -159,11 +159,11 @@ export default {
 	template: /*html*/ `
     <div class="widgets-url w-100 h-100 overflow-scroll" style="padding: 1rem 1rem;">
         <div class="d-flex flex-column justify-content-between">
-        <!-- todo: widgetTag ?? -->
+        	<button v-if="editModeIsActive" class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
+
             <template v-if="shared">
 
                 <template v-if="!emptyBookmarks">
-					<button v-if="editModeIsActive" class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
 					<div v-for="link in shared" :key="link.id" class="d-flex mt-2">
 						<a target="_blank" :href="link.url">
 							<i class="fa fa-solid fa-arrow-up-right-from-square me-1"></i>{{ link.title }}
@@ -208,7 +208,7 @@ export default {
 				<form-input id="editUrl" v-model="url_input" name="url"></form-input>
 			</template>
 			<template #footer>
-				<button @click="editBookmark" class="btn btn-primary">{{$p.t('bookmark','editLink')}}</button>
+				<button @click="editBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
 			</template>
 		</bs-modal>
 	</core-form>

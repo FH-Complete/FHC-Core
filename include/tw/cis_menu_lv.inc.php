@@ -403,6 +403,7 @@ function checkZeilenUmbruch()
 			'id'=>'core_menu_mailanstudierende',
 			'position'=>'100',
 			'name'=>$p->t('lehre/mail'),
+			'phrase'=>'lehre/mail',
 			'icon'=>'../../../skin/images/button_feedback.png',
 			'link'=>$mailto,
 			'link_onclick'=>$link_onclick
@@ -478,6 +479,7 @@ function checkZeilenUmbruch()
             'id'=>'core_menu_anerkennungNachgewiesenerKenntnisse',
             'position'=>'128',
             'name'=>$p->t('lehre/anrechnung'),
+			'phrase'=>'lehre/anrechnung',
             'icon'=>'../../../skin/images/button_listen.png',
             'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid)
         );
@@ -492,6 +494,7 @@ if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTU
 		'id'=>'core_menu_anerkennungNachgewiesenerKenntnisse_empfehlen',
 		'position'=>'128',
 		'name'=>$p->t('lehre/anrechnungen'),
+		'phrase'=>'lehre/anrechnung',
 		'icon'=>'../../../skin/images/button_listen.png',
 		'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/ReviewAnrechnungUebersicht?studiensemester='.urlencode($angezeigtes_stsem)
 	);
