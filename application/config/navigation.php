@@ -1,6 +1,12 @@
 <?php
 // Header menu
 
+if(defined('CIS4') && CIS4) {
+	$root = APP_ROOT;
+} else {
+	$root = CIS_ROOT;
+}
+
 $config['navigation_header'] = array(
 	'*' => array(
 		'fhcomplete' => array(
@@ -31,6 +37,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 20,
 					'requiredPermissions' => 'admin:w'
+				),
+				'bismeldestichtagsverwaltung' => array(
+					'link' => site_url('codex/Bismeldestichtag'),
+					'icon' => '',
+					'description' => 'BIS-Meldestichtagsverwaltung',
+					'expand' => true,
+					'sort' => 30,
+					'requiredPermissions' => 'admin:w'
 				)
 			)
 		),
@@ -42,10 +56,16 @@ $config['navigation_header'] = array(
 			'requiredPermissions' => 'basis/vilesci:r',
 			'children' => array(
 				'cis' => array(
-					'link' => CIS_ROOT,
+					'link' => $root,
 					'icon' => '',
 					'description' => 'CIS',
 					'sort' => 10
+				),
+				'lehrveranstaltungen' => array(
+					'link' => site_url('lehre/lvplanung/LvTemplateUebersicht'),
+					'icon' => '',
+					'description' => 'Lehrveranstaltungen',
+					'sort' => 15
 				),
 				'reihungstest' => array(
 					'link' => site_url('organisation/Reihungstest'),
@@ -120,11 +140,18 @@ $config['navigation_header'] = array(
 					'sort' => 30,
 					'requiredPermissions' => 'system/issues_verwalten:r'
 				),
+				'plausichecks' => array(
+					'link' => site_url('system/issues/Plausichecks'),
+					'description' => 'Plausichecks',
+					'expand' => true,
+					'sort' => 40,
+					'requiredPermissions' => 'system/issues_verwalten:r'
+				),
 				'gruppenmanagement' => array(
 					'link' => site_url('person/Gruppenmanagement'),
 					'description' => 'Gruppenmanagement',
 					'expand' => true,
-					'sort' => 40,
+					'sort' => 50,
 					'requiredPermissions' => 'lehre/gruppenmanager:r'
 				)
 			)
@@ -157,7 +184,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 20,
 					'requiredPermissions' => 'system/developer:r'
-				)
+				),
+                'anrechnungen' => array(
+                    'link' => site_url('lehre/anrechnung/AdminAnrechnung'),
+                    'description' => 'Anrechnungen',
+                    'expand' => true,
+                    'sort' => 30,
+                    'requiredPermissions' => 'lehre/anrechnungszeitfenster:rw'
+                )
 			)
 		)
 	)
@@ -177,6 +211,15 @@ $config['navigation_menu']['Vilesci/index'] = array(
 	)
 );
 
+$config['navigation_menu']['Vilesci/index'] = array(
+    'dashboard' => array(
+        'link' => '#',
+        'description' => 'Dashboard',
+        'icon' => 'dashboard',
+        'sort' => 1
+    )
+);
+
 $config['navigation_menu']['organisation/Reihungstest/index'] = array(
 	'reihungstestverwalung' => array(
 		'link' => base_url('vilesci/stammdaten/reihungstestverwaltung.php'),
@@ -186,7 +229,7 @@ $config['navigation_menu']['organisation/Reihungstest/index'] = array(
 		'target' => '_blank'
 	),
 	'auswertung' => array(
-		'link' => CIS_ROOT.'/cis/testtool/admin/auswertung.php',
+		'link' => $root.'/cis/testtool/admin/auswertung.php',
 		'description' => 'Auswertung',
 		'icon' => 'list-alt',
 		'sort' => 1,
@@ -256,14 +299,30 @@ $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/*'] = array(
 	)
 );
 
+$config['navigation_menu']['lehre/lvplanung/LvTemplateUebersicht/index'] = array(
+	'lvTemplateUebersicht' => array(
+		'link' => site_url('lehre/lvplanung/LvTemplateUebersicht'),
+		'description' => 'LV Template Übersicht',
+		'icon' => '',
+		'sort' => 1
+	)
+);
+
 $config['navigation_menu']['system/issues/Issues/*'] = array(
 	'fehlerzustaendigkeiten' => array(
 		'link' => site_url('system/issues/IssuesZustaendigkeiten'),
 		'description' => 'Fehler Zuständigkeiten',
-		'icon' => 'cogs',
+		'icon' => 'users',
 		'sort' => 100,
 		'target' => '_blank',
 		'requiredPermissions' => array('admin:rw')
-	)
+	),
+	'fehlerkonfiguration' => array(
+		'link' => site_url('system/issues/IssuesKonfiguration'),
+		'description' => 'Fehler Konfiguration',
+		'icon' => 'cogs',
+		'sort' => 200,
+		'target' => '_blank',
+		'requiredPermissions' => array('admin:rw')
+	),
 );
-

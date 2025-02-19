@@ -1,6 +1,7 @@
 <?php
 require_once('zeitaufzeichnung_import.class.php');
 require_once('../../../include/organisationseinheit.class.php');
+require_once('../../../include/vertragsbestandteil.class.php');
 
 /**
  * Description of zeitaufzeichnung_csv_import
@@ -163,7 +164,8 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 			$this->initData($data);
 			$this->checkProject($data[self::PROJEKT], $data[self::PHASE]);
 			$this->checkPhase($data[self::PHASE]);
-
+			$this->checkPhaseBebuchbar($data[self::PHASE]);
+			$this->checkIfArbeitspaketZuWaehlen($data[self::PROJEKT], $data[self::PHASE]);
 			$this->checkZeitsperren($this->user, $this->datum->formatDatum($data[self::STARTDT], 'Y-m-d'));
 			$this->checkSperrdatum($data[self::STARTDT]);
 			$this->checkLimitdatum($data[self::STARTDT]);
@@ -347,17 +349,16 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 			if (strtolower($data[self::HOMEOFFICE]) == 'true') {
 				// check, ob homeoffice gemäß Bisverwendung
 				$vonCSV = $this->datum->formatDatum($data[self::STARTDT], 'Y-m-d');
-				$verwendung = new bisverwendung();
-				$verwendung->getVerwendungDatum($data[self::USER], $vonCSV);
 
-				foreach ($verwendung->result as $v) {
-					if ($v->homeoffice) {
-						$this->zeit->homeoffice = true;
-					} else {
-						$this->addWarning($this->p->t("zeitaufzeichnung/homeofficeNichtErlaubt", [$vonCSV]));
-						$this->zeit->homeoffice = false;
-					}
-				}
+                $vbt = new vertragsbestandteil();
+                $homeoffice = $vbt->hasHomeoffice($data[self::USER], $vonCSV);
+
+                if ($homeoffice) {
+                    $this->zeit->homeoffice = true;
+                } else {
+                    $this->addWarning($this->p->t("zeitaufzeichnung/homeofficeNichtErlaubt", [$vonCSV]));
+                    $this->zeit->homeoffice = false;
+                }
 			}
 		}
 	}

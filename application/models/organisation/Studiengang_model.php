@@ -457,7 +457,7 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getLeitung($studiengang_kz = null)
 	{
-		$this->addSelect('uid, studiengang_kz, oe_kurzbz, vorname, nachname, email');
+		$this->addSelect('uid, studiengang_kz, oe_kurzbz, vorname, nachname, email, titelpre, titelpost, alias');
 		$this->addJoin('public.tbl_benutzerfunktion', 'oe_kurzbz');
 		$this->addJoin('public.tbl_benutzer', 'uid');
 		$this->addJoin('public.tbl_person', 'person_id');
@@ -493,6 +493,53 @@ class Studiengang_model extends DB_Model
 		return $this->loadWhere($condition);
 	}
 
+	/**
+	 * Get Studiengangsleitung/en of Studiengang/Studiengaenge. With Details
+	 *
+	 * @param null $studiengang_kz Numeric or Array
+	 * @return array
+	 */
+	public function getLeitungDetailed($studiengang_kz = null)
+	{
+		$this->addSelect('studiengang_kz, email, f.oe_kurzbz, b.uid, b.alias, b.aktiv, p.vorname, p.nachname, p.titelpre, p.titelpost, m.telefonklappe, k.kontakt, o.planbezeichnung');
+		$this->addJoin('public.tbl_benutzerfunktion f', 'oe_kurzbz');
+		$this->addJoin('public.tbl_benutzer b', 'uid');
+		$this->addJoin('public.tbl_person p', 'person_id');
+		$this->addJoin('public.tbl_mitarbeiter m', 'mitarbeiter_uid=uid', 'LEFT');
+		$this->addJoin('public.tbl_kontakt k', 'k.standort_id=m.standort_id AND kontakttyp=\'telefon\'', 'LEFT');
+		$this->addJoin('public.tbl_ort o', 'ort_kurzbz', 'LEFT');
+
+		if (!is_numeric($studiengang_kz) && !is_array($studiengang_kz))
+		{
+			return error('Studiengangskennzahl ungültig');
+		}
+
+		if (is_null($studiengang_kz))
+		{
+			$condition = '
+			funktion_kurzbz = \'Leitung\'
+			AND ( datum_von <= NOW() OR datum_von IS NULL )
+			AND ( datum_bis >= NOW() OR datum_bis IS NULL )
+			';
+		}
+		elseif (is_numeric($studiengang_kz) || is_array($studiengang_kz))
+		{
+			if (is_array($studiengang_kz))
+			{
+				$studiengang_kz = array_map(array($this,'escape'), $studiengang_kz);
+				$studiengang_kz = implode(', ', $studiengang_kz);
+			}
+			$condition =  '
+			funktion_kurzbz = \'Leitung\'
+			AND ( datum_von <= NOW() OR datum_von IS NULL )
+			AND ( datum_bis >= NOW() OR datum_bis IS NULL )
+			AND studiengang_kz IN (' . $studiengang_kz. ')';
+			;
+		}
+
+		return $this->loadWhere($condition);
+	}
+
 	public function getStudiengaengeWithOrgForm($typ, $semester)
 	{
 		$query = "SELECT DISTINCT (UPPER(so.studiengangkurzbzlang || ':' || sp.orgform_kurzbz)) AS Studiengang
@@ -508,13 +555,96 @@ class Studiengang_model extends DB_Model
 		return $this->execQuery($query, array($typ, $semester));
 	}
 
-	public function getStudiengangTyp($studiengang_kz, $typ)
+	public function getStudiengangTyp($studiengang_kz, $typ = null)
 	{
 		$query = "SELECT DISTINCT(sgt.*)
-					FROM tbl_studiengangstyp sgt JOIN tbl_studiengang sg on sgt.typ = sg.typ 
-					WHERE studiengang_kz IN ? and sgt.typ IN ?";
+					FROM tbl_studiengangstyp sgt JOIN tbl_studiengang sg on sgt.typ = sg.typ
+					WHERE studiengang_kz IN ?";
 
-		return $this->execQuery($query, array($studiengang_kz, $typ));
+		$params = [$studiengang_kz];
 
+		if (!is_null($typ))
+		{
+			$query .= " AND sgt.typ IN ?";
+			$params[] = $typ;
+		}
+
+		return $this->execQuery($query, $params);
+	}
+
+	/**
+	 * @param array		$studiengang_kzs
+	 * @param array		$not_antrag_typ		(optional) If the prestudent has an antrag with one of the specified types it will be excluded from the result
+	 * @param array		$prestudent_stati	(optional)
+	 *
+	 * @return stdClass
+	 */
+	public function getAktivePrestudenten($studiengang_kzs, $not_antrag_typ = null, $query = null)
+	{
+		$this->load->config('studierendenantrag');
+
+		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
+
+		$this->addSelect($this->dbTable . '.studiengang_kz');
+		$this->addSelect($this->dbTable . '.bezeichnung');
+		$this->addSelect('o.orgform_kurzbz');
+		$this->addSelect('o.bezeichnung_mehrsprachig[(' . $sql . ')] AS orgform', false);
+		$this->addSelect('ps.ausbildungssemester AS semester');
+		$this->addSelect('ps.studiensemester_kurzbz');
+		$this->addSelect('p.prestudent_id');
+		$this->addSelect('pers.vorname');
+		$this->addSelect('pers.nachname');
+		$this->addSelect("CONCAT(UPPER(pers.nachname), ' ', pers.vorname, ' (', " . $this->dbTable . ".bezeichnung, ')') AS name");
+
+		$this->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+		$this->addJoin(
+			'public.tbl_prestudentstatus ps',
+			'ps.prestudent_id=p.prestudent_id
+				AND ps.studiensemester_kurzbz=get_stdsem_prestudent(p.prestudent_id, NULL)
+				AND ps.ausbildungssemester=get_absem_prestudent(p.prestudent_id, NULL)
+				AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, NULL)'
+		);
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id');
+		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, ' . $this->dbTable . '.orgform_kurzbz)=o.orgform_kurzbz');
+		$this->addJoin('public.tbl_person pers', 'person_id');
+		$this->addJoin('public.tbl_student stud', 'p.prestudent_id=stud.prestudent_id', 'LEFT');
+
+		$this->db->where_in($this->dbTable . '.studiengang_kz', $studiengang_kzs);
+		$this->db->where_in('ps.status_kurzbz', $this->config->item('antrag_prestudentstatus_whitelist_abmeldung'));
+		$this->db->where($this->dbTable . ".aktiv", true);
+
+		if ($not_antrag_typ !== null && is_array($not_antrag_typ)) {
+			foreach($not_antrag_typ as $k => $v)
+				$not_antrag_typ[$k] = $this->db->escape($v);
+			$this->addJoin(
+				'campus.tbl_studierendenantrag a',
+				'a.prestudent_id=p.prestudent_id and a.typ in ('.
+				implode(',', $not_antrag_typ).
+				") AND campus.get_status_studierendenantrag (a.studierendenantrag_id)<>'" .
+				Studierendenantragstatus_model::STATUS_CANCELLED . "'",
+				'LEFT'
+			);
+			$this->db->where('a.typ IS NULL');
+		}
+
+		if ($query) {
+			$query = explode(' ', $query);
+			$this->db->group_start();
+			foreach ($query as $q) {
+				$this->db->group_start();
+					$this->db->where('pers.vorname ILIKE', "%" . $q . "%");
+					$this->db->or_where('pers.nachname ILIKE', "%" . $q . "%");
+					$this->db->or_where('stud.student_uid ILIKE', "%" . $q . "%");
+					$this->db->or_where($this->dbTable . '.bezeichnung ILIKE', "%" . $q . "%");
+					if (is_numeric($q))
+						$this->db->or_where('p.prestudent_id', $q);
+				$this->db->group_end();
+			}
+			$this->db->group_end();
+		}
+
+		$this->addOrder('name');
+
+		return $this->load();
 	}
 }

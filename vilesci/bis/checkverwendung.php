@@ -450,6 +450,13 @@ if($resultall = $db->db_query($qryall))
 }
 
 //**** Echter Dienstvertrag ohne Vertragsstunden
+$arrayEchterDV= array(103, 110);
+if (defined('DEFAULT_ECHTER_DIENSTVERTRAG') && DEFAULT_ECHTER_DIENSTVERTRAG != '')
+{
+	$arrayEchterDV = DEFAULT_ECHTER_DIENSTVERTRAG;
+}
+$str_ba1codein = trim(array_reduce($arrayEchterDV, function($c, $i) { global $db; return $c .= $db->db_add_param($i, FHC_INTEGER) . ','; }), ',');
+
 $qryall="
 	SELECT
 		distinct mitarbeiter_uid as uid, vorname, nachname
@@ -461,7 +468,7 @@ $qryall="
 		WHERE
 		(beginn is null or beginn<".$db->db_add_param($bismeldedatum_ende).")
 		and (ende is null or ende>=".$db->db_add_param($bismeldedatum_start).")
-		and ba1code=103
+		and ba1code IN (" . $str_ba1codein . ")
 		and vertragsstunden is null
 		and beschausmasscode!=5
 	ORDER by nachname, vorname, mitarbeiter_uid;";

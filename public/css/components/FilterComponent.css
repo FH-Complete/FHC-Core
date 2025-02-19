@@ -64,3 +64,12 @@
 	margin-top: 20px;
 }
 
+.tabulator {
+	font-size: 1rem;
+}
+.tabulator-cell .btn {
+	padding: 0 .375rem;
+	font-size: .875rem;
+	border-radius: .2rem;
+}
+

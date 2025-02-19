@@ -41,6 +41,7 @@
 			{
 				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/fontawesome.min.css');
 				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/solid.min.css');
+				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/regular.min.css'); // NOTE(chris): for favorites in stv
 				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/brands.min.css');
 			}
 
@@ -77,10 +78,7 @@
 			}
 
 			// Tabulator 5 CSS
-			if ($tabulator5 === true) generateCSSsInclude('vendor/olifolkerd/tabulator5/dist/css/tabulator_bootstrap5.min.css');
-
-			// Tinymce 4 CSS
-			if ($tinymce4 === true) generateCSSsInclude('public/css/TinyMCE4.css');
+			if ($tabulator5 === true) generateCSSsInclude('public/css/Tabulator5.css');
 
 			// Tinymce 5 CSS
 			if ($tinymce5 === true) generateCSSsInclude('public/css/TinyMCE5.css');
@@ -117,6 +115,12 @@
 
 			// HTML Widget CSS
 			if ($widgets === true) generateCSSsInclude('public/css/Widgets.css');
+
+			// CIS
+			if ($cis === true) generateCSSsInclude(defined('CIS4') ? 'public/css/cis4.css' : 'public/css/cis_bs5.css');
+
+			//Tags
+			if ($tags === true) generateCSSsInclude('public/css/tags.css');
 
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS

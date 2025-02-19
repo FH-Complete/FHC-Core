@@ -122,7 +122,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			<splitter class="tree-splitter"/>
 			<treecol id="lehrveranstaltung-noten-tree-verband" label="Verband" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#verband" />						
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#verband" />
             <splitter class="tree-splitter"/>
             <treecol id="lehrveranstaltung-noten-tree-studiengang_kz_lv" label="LehrveranstaltungStudiengang_kz" flex="1" hidden="true" persist="hidden, width, ordinal"
                      class="sortDirectionIndicator"
@@ -261,15 +261,25 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 <hbox>
 	<label value="Note" control="lehrveranstaltung-noten-menulist-note"/>
 	<menulist id="lehrveranstaltung-noten-menulist-note" disabled="true"
-	          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
-	          ref="http://www.technikum-wien.at/note/liste"
-	          oncommand="LehrveranstaltungNoteSpeichern()">
+				xmlns:NOTE="http://www.technikum-wien.at/note/rdf#"
+				datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
+				ref="http://www.technikum-wien.at/note/liste"
+				oncommand="LehrveranstaltungNoteSpeichern()">
 		<template>
-			<menupopup>
-				<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
-	        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
-				  		  uri="rdf:*"/>
+			<rule NOTE:aktiv='false'>
+				<menupopup>
+					<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+								label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+								uri="rdf:*" style="text-decoration:line-through;"/>
 				</menupopup>
+			</rule>
+			<rule>
+				<menupopup>
+					<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+								label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+								uri="rdf:*"/>
+				</menupopup>
+			</rule>
 		</template>
 	</menulist>
 	<label value="Punkte" control="lehrveranstaltung-noten-textbox-punkte" hidden="<?php echo $punktehidden; ?>"/>
@@ -289,7 +299,7 @@ if(defined('FAS_GESAMTNOTE_PRUEFUNGSHONORAR') && FAS_GESAMTNOTE_PRUEFUNGSHONORAR
 		<hbox>
 			<label value="MitarbeiterIn" control="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"/>
 			<menulist id="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"
-				      datasources="'.APP_ROOT.'rdf/mitarbeiter.rdf.php" flex="1"
+				      datasources="'.APP_ROOT.'rdf/mitarbeiter.rdf.php?aktiv=true" flex="1"
 				      ref="http://www.technikum-wien.at/mitarbeiter/_alle"
 		              minwidth="250"
 				      >

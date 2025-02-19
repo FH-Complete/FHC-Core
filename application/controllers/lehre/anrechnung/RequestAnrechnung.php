@@ -80,11 +80,7 @@ class requestAnrechnung extends Auth_Controller
 		$prestudent_id = getData($result)[0]->prestudent_id;
 		
 		// Check if application deadline is expired
-		$is_expired = self::_isExpired(
-			$this->config->item('submit_application_start'),
-			$this->config->item('submit_application_end'),
-			$studiensemester_kurzbz
-		);
+		$is_expired = $this->_isExpired($studiensemester_kurzbz);
 		
 		// Check if Lehrveranstaltung was already graded with application blocking grades
 		$is_blocked = self::_LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id);
@@ -93,7 +89,7 @@ class requestAnrechnung extends Auth_Controller
 		$anrechnungData = $this->anrechnunglib->getAnrechnungDataByLv($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id);
 
 		// Get Antrag data
-		$antragData = $this->anrechnunglib->getAntragData($prestudent_id, $studiensemester_kurzbz, $lehrveranstaltung_id);
+		$antragData = $this->anrechnunglib->getAntragData($prestudent_id, $studiensemester_kurzbz, $lehrveranstaltung_id, $anrechnungData->anrechnung_id);
 		
 		$viewData = array(
 			'antragData' => $antragData,
@@ -115,6 +111,13 @@ class requestAnrechnung extends Auth_Controller
 		$lehrveranstaltung_id = $this->input->post('lv_id');
 		$studiensemester_kurzbz = $this->input->post('studiensemester');
 		$bestaetigung = $this->input->post('bestaetigung');
+		$begruendung_ects = $this->config->item('explain_equivalence') === TRUE
+			? $this->input->post('begruendung_ects')
+			: NULL;
+		$begruendung_lvinhalt = $this->config->item('explain_equivalence') === TRUE
+			? $this->input->post('begruendung_lvinhalt')
+			: NULL;
+
 
 		// Validate data
 		if (empty($_FILES['uploadfile']['name']))
@@ -125,7 +128,9 @@ class requestAnrechnung extends Auth_Controller
 		if (isEmptyString($begruendung_id) ||
 			isEmptyString($anmerkung) ||
 			isEmptyString($lehrveranstaltung_id) ||
-			isEmptyString($studiensemester_kurzbz))
+			isEmptyString($studiensemester_kurzbz) ||
+			($this->config->item('explain_equivalence') === TRUE && isEmptyString($begruendung_ects)) ||
+			($this->config->item('explain_equivalence') === TRUE && isEmptyString($begruendung_lvinhalt)))
 		{
 			return $this->outputJsonError($this->p->t('ui', 'errorFelderFehlen'));
 		}
@@ -152,10 +157,10 @@ class requestAnrechnung extends Auth_Controller
 			return $this->outputJsonError($this->p->t('anrechnung', 'antragBereitsGestellt'));
 		}
 		
-		// Exit if application is not for actual studysemester
-		if (!self::_applicationIsForActualSS($studiensemester_kurzbz))
+		// Exit if application is a past ( < actual ) studysemester
+		if (self::_applicationIsPastSS($studiensemester_kurzbz))
 		{
-			return $this->outputJsonError($this->p->t('anrechnung', 'antragNurImAktSS'));
+			return $this->outputJsonError($this->p->t('anrechnung', 'antragNichtFuerVerganganeSS'));
 		}
 		
 		// Upload document
@@ -168,7 +173,7 @@ class requestAnrechnung extends Auth_Controller
 		
 		// Hold just inserted DMS ID
 		$lastInsert_dms_id = $result->retval['dms_id'];
-		
+
 		// Save Anrechnung and Anrechnungstatus
 		$result = $this->AnrechnungModel->createAnrechnungsantrag(
 			$prestudent_id,
@@ -176,7 +181,9 @@ class requestAnrechnung extends Auth_Controller
 			$lehrveranstaltung_id,
 			$begruendung_id,
 			$lastInsert_dms_id,
-			$anmerkung
+			$anmerkung,
+            $begruendung_ects,
+            $begruendung_lvinhalt
 		);
 		
 		if (isError($result))
@@ -234,32 +241,30 @@ class requestAnrechnung extends Auth_Controller
 	 * @return bool True if deadline is expired
 	 * @throws Exception
 	 */
-	private function _isExpired($start, $ende, $studiensemester_kurzbz)
+	private function _isExpired($studiensemester_kurzbz)
 	{
-		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+        $today = new DateTime('today midnight');
 
-		// If start is not given, set to Semesterstart.
-		if (!isset($start) || isEmptyString($start))
-		{
-			$this->StudiensemesterModel->addSelect('start');
-			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
-			$start = getData($result)[0]->start;
-		}
+        // Load all Anrechnungszeitfenster for this Studiensemester
+        $this->load->model('education/Anrechnungszeitraum_model', 'AnrechnungszeitraumModel');
+        $result = $this->AnrechnungszeitraumModel->loadWhere(array('studiensemester_kurzbz' => $studiensemester_kurzbz));
 
-		// If ende is not given, set to Semesterende.
-		if (!isset($ende) || isEmptyString($ende))
-		{
-			$this->StudiensemesterModel->addSelect('ende');
-			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
-			$ende = getData($result)[0]->ende;
-		}
+        if (hasData($result))
+        {
+            // Loop through Anrechnungszeitfenster
+            foreach (getData($result) as $azrObj)
+            {
+                $start = new DateTime($azrObj->anrechnungstart);
+                $ende = new DateTime($azrObj->anrechnungende);
 
-		$today = new DateTime('today midnight');
-		$start = new DateTime($start);
-		$ende = new DateTime($ende);
+                // Return false if today is at least within one Anrechnungszeitraum
+                if (($today >= $start && $today <= $ende)) return false;
 
-		// True if expired
-		return ($today < $start || $today > $ende);
+            }
+        }
+
+        // Return true if today is in none Anrechnungszeitraum
+        return true;
 	}
 
 	/**
@@ -312,18 +317,21 @@ class requestAnrechnung extends Auth_Controller
 	}
 
 	/**
-	 * Check if applications' study semester is actual study semester.
+	 * Check if applications' study semester is < actual study semester.
 	 *
 	 * @param $studiensemester_kurzbz
 	 * @return bool
 	 */
-	private function _applicationIsForActualSS($studiensemester_kurzbz)
+	private function _applicationIsPastSS($studiensemester_kurzbz)
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$result = $this->StudiensemesterModel->getNearest();
-		$actual_ss = getData($result)[0]->studiensemester_kurzbz;
+		$actual_ss = getData($result)[0];
 
-		return $studiensemester_kurzbz == $actual_ss;
+		$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
+		$anrechnung_ss = getData($result)[0];
+
+		return $anrechnung_ss->ende < $actual_ss->start;
 	}
 
 	private function _LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id)

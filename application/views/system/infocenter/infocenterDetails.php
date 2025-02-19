@@ -8,7 +8,7 @@
 		'dialoglib' => true,
 		'ajaxlib' => true,
 		'tablesorter2' => true,
-		'tinymce4' => true,
+		'tinymce5' => true,
 		'sbadmintemplate3' => true,
 		'addons' => true,
 		'navigationwidget' => true,
@@ -24,46 +24,29 @@
 			'public/js/tablesort/tablesort.js',
 			'public/js/infocenter/messageList.js',
 			'public/js/infocenter/infocenterDetails.js',
+			'public/js/infocenter/rueckstellung.js',
 			'public/js/infocenter/zgvUeberpruefung.js',
-			'public/js/infocenter/docUeberpruefung.js'
+			'public/js/infocenter/docUeberpruefung.js',
+			'public/js/infocenter/stammdaten.js',
+			'public/js/infocenter/personcheck.js'
 		),
 		'phrases' => array(
-			'infocenter' => array(
-				'notizHinzufuegen',
-				'notizAendern',
-				'bewerberParken',
-				'bewerberAusparken',
-				'nichtsZumAusparken',
-				'fehlerBeimAusparken',
-				'fehlerBeimParken',
-				'bewerberGeparktBis',
-				'bewerberOnHold',
-				'bewerberOnHoldEntfernen',
-				'bewerberOnHoldBis',
-				'nichtsZumEntfernen',
-				'fehlerBeimEntfernen',
-				'rueckstelldatumUeberschritten',
-				'parkenZurueckstellenInfo',
-				'zgvInPruefung',
-				'zgvErfuellt',
-				'zgvNichtErfuellt',
-				'zgvErfuelltPruefung',
-				'datumUngueltig',
-				'nachreichDatumNichtVergangenheit'
-			),
-			'ui' => array(
-				'gespeichert',
-				'fehlerBeimSpeichern'
-			),
-			'global' => array(
-				'bis',
-				'zeilen'
-			)
+			'infocenter',
+			'ui',
+			'global'
 		)
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);
 ?>
+
+	<script>
+		// Embed PHP data into JS as JSON to access from script files
+		const viewData = {
+			checkPerson: <?php echo json_encode(array('unruly' => $unruly, 'duplicate' => $duplicate)); ?>,
+		};
+	</script>
+
 	<div id="wrapper">
 	
 		<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
@@ -83,10 +66,11 @@
 							if (isset($lockedby)):
 								echo $this->p->t('global', 'wirdBearbeitetVon').': ';
 								echo $lockedby;
-								if ($origin_page == 'index'):
+								if (in_array($origin_page, array('index', 'abgewiesen'))):
 									$unlockpath = 'unlockPerson/'.$stammdaten->person_id;
 									$unlockpath .= '?fhc_controller_id='.$fhc_controller_id;
 									$unlockpath .= '&filter_id='.$prev_filter_id;
+									$unlockpath .= '&origin_page='.$origin_page;
 							?>
 									&nbsp;&nbsp;
 									<a href="<?php echo $unlockpath; ?>">
@@ -99,22 +83,8 @@
 						</div>
 					</div>
 				</div>
-				<?php if (!is_null($duplicated)): ?>
-					<div class="row alert-warning">
-						<h3 class="header col-lg-12">
-							<?php echo $this->p->t('global', 'bewerberVorhanden') . ':'; ?>
-						</h3>
-						<div class="text-left col-lg-12">
-							<?php
-							foreach ($duplicated as $duplicate)
-							{
-								echo  'Person ID: ' . $duplicate->person_id . '<br />';
-							}
-							?>
-						</div>
-	
-					</div>
-				<?php endif; ?>
+				<br/>
+					<?php $this->load->view('system/infocenter/personCheck.php', array('unruly' => $unruly, 'duplicate' => $duplicate)); ?>
 				<br/>
 				<section>
 					<div class="row">
@@ -227,4 +197,3 @@
 	<button id="scrollToTop" title="Go to top"><i class="fa fa-chevron-up"></i></button>
 
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
-

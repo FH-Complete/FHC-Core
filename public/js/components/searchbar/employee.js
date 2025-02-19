@@ -15,7 +15,7 @@ export default {
               <div class="searchbar_icon">
                 <action :res="this.res" :action="this.actions.defaultaction" @actionexecuted="$emit('actionexecuted')">
                   <img v-if="(typeof res.photo_url !== 'undefined') && (res.photo_url !== null)" :src="res.photo_url" 
-                    class="rounded-circle" height="100" />
+                    class="rounded" style="max-height: 120px; max-width: 90px;" />
                   <i v-else class="fas fa-user-circle fa-5x"></i>
                 </action>
               </div>
@@ -30,8 +30,8 @@ export default {
                 <div class="searchbar_table">
 
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">Standard-Kostenstelle</div>
-                    <div class="searchbar_tablecell">
+                    <div class="searchbar_tablecell searchbar_label">Standard-Kostenstelle</div>
+                    <div class="searchbar_tablecell searchbar_value">
                         <ul class="searchbar_inline_ul" v-if="res.standardkostenstelle.length > 0">
                           <li v-for="(stdkst, idx) in res.standardkostenstelle" :key="idx">{{ stdkst }}</li>
                         </ul>
@@ -40,8 +40,8 @@ export default {
                   </div>
 
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">Organisations-Einheit</div>
-                    <div class="searchbar_tablecell">
+                    <div class="searchbar_tablecell searchbar_label">Organisations-Einheit</div>
+                    <div class="searchbar_tablecell searchbar_value">
                         <ul class="searchbar_inline_ul" v-if="res.organisationunit_name.length > 0">
                           <li v-for="(oe, idx) in res.organisationunit_name" :key="idx">{{ oe }}</li>
                         </ul>
@@ -50,8 +50,8 @@ export default {
                   </div>
         
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">EMail</div>
-                    <div class="searchbar_tablecell">
+                    <div class="searchbar_tablecell searchbar_label">EMail</div>
+                    <div class="searchbar_tablecell searchbar_value">
                         <a :href="this.mailtourl">
                           {{ res.email }}
                         </a>
@@ -59,8 +59,8 @@ export default {
                   </div>
         
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">Telefon</div>
-                    <div class="searchbar_tablecell">
+                    <div class="searchbar_tablecell searchbar_label">Telefon</div>
+                    <div class="searchbar_tablecell searchbar_value">
                         <a :href="this.telurl">
                           {{ res.phone }}
                         </a>

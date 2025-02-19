@@ -227,8 +227,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		    		<checkbox label="Kleriker" id="mitarbeiter-detail-checkbox-kleriker" checked="false" disabled="true" hidden="true" onchange="MitarbeiterDetailValueChange()"/>
 		    	</row>
 		    	<row>
-		    	    <label align="end" control="mitarbeiter-detail-textbox-stundensatz" value="Stundensatz"/>
-		    		<textbox id="mitarbeiter-detail-textbox-stundensatz" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
 		    		<label align="end" control="mitarbeiter-detail-textbox-telefonklappe" value="Telefonklappe"/>
 		    		<hbox>
 	    				<textbox id="mitarbeiter-detail-textbox-telefonklappe" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
@@ -255,13 +253,22 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<label align="end" control="mitarbeiter-detail-menulist-standort" value="Standort"/>
 					<vbox>
 					 	<menulist id="mitarbeiter-detail-menulist-standort" disabled="true"
+								  xmlns:STANDORT="http://www.technikum-wien.at/standort/rdf#"
 					              datasources="<?php echo APP_ROOT; ?>rdf/standort.rdf.php?optional=true&amp;firmentyp_kurzbz=Intern"
 						          ref="http://www.technikum-wien.at/standort/liste" oncommand="MitarbeiterDetailValueChange()">
 						    <template>
-						       <menupopup>
-							      <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/standort/rdf#bezeichnung"
-							                            value="rdf:http://www.technikum-wien.at/standort/rdf#standort_id"/>
-							      </menupopup>
+								<rule STANDORT:bezeichnung_null="t">
+									<menupopup>
+										<menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/standort/rdf#kurzbz"
+												  value="rdf:http://www.technikum-wien.at/standort/rdf#standort_id"/>
+									</menupopup>
+								</rule>
+								<rule>
+									<menupopup>
+										<menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/standort/rdf#bezeichnung"
+												  value="rdf:http://www.technikum-wien.at/standort/rdf#standort_id"/>
+									</menupopup>
+								</rule>
 							</template>
 						</menulist>
 						<spacer flex="1"/>

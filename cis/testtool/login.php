@@ -82,7 +82,8 @@ if (isset($_REQUEST['prestudent']))
 	$ps = new prestudent($_REQUEST['prestudent']);
 
 	$login_ok = false;
-	if (defined('TESTTOOL_LOGIN_BEWERBUNGSTOOL') && TESTTOOL_LOGIN_BEWERBUNGSTOOL && isset($_GET['confirmation']))
+	if (defined('TESTTOOL_LOGIN_BEWERBUNGSTOOL') && TESTTOOL_LOGIN_BEWERBUNGSTOOL &&
+		(isset($_GET['confirmation']) || isset($_GET['confirmed_code'])))
 	{
 		if (isset($_SESSION['bewerbung/personId']) && $ps->person_id == $_SESSION['bewerbung/personId'])
 		{
@@ -125,10 +126,6 @@ if (isset($_REQUEST['prestudent']))
 			$rt->getReihungstestPerson($ps->person_id);
 			if (isset($rt->result[0]))
 				$reihungstest_id = $rt->result[0]->reihungstest_id;
-			else
-			{
-				$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
-			}
 		}
 		else
 		{
@@ -137,10 +134,6 @@ if (isset($_REQUEST['prestudent']))
 				// TODO Was ist wenn da mehrere Zurueckkommen?!
 				if (isset($rt->result[0]))
 					$reihungstest_id = $rt->result[0]->reihungstest_id;
-				else
-				{
-					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
-				}
 			}
 			else
 			{
@@ -153,6 +146,33 @@ if (isset($_REQUEST['prestudent']))
 			{
 				// regenerate Session ID after Login
 				session_regenerate_id();
+				if (defined('TESTTOOL_LOGIN_BEWERBUNGSTOOL') && TESTTOOL_LOGIN_BEWERBUNGSTOOL)
+				{
+					if ($rt->zugangs_ueberpruefung && !is_null($rt->zugangscode))
+					{
+						$_SESSION['confirmed_code'] = false;
+						if (isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true)
+						{
+							if (isset($_GET['confirmed_code']))
+							{
+								if ($_GET['confirmed_code'] === $_SESSION['reihungstest_code'])
+								{
+									$_SESSION['confirmed_code'] = true;
+								}
+								else
+									$alertmsg .= '<div class="alert alert-danger">Code ist nicht korrekt.</div>';
+							}
+						}
+
+						if ($_SESSION['confirmed_code'] === false)
+						{
+							$_SESSION['reihungstest_code'] = $rt->zugangscode;
+							$_SESSION['confirmation_needed'] = true;
+						}
+						else
+							$reload_menu = true;
+					}
+				}
 
 				$pruefling = new pruefling();
 				if ($pruefling->getPruefling($ps->prestudent_id))
@@ -314,8 +334,11 @@ else
 	}
 }
 
-
-if (isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
+if ((isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
+	!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code'])) ||
+	(isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
+	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
+	isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])))
 {
 	$pruefling = new pruefling();
 
@@ -331,6 +354,8 @@ if (isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 		$pruefling->idnachweis = '';
 		$pruefling->registriert = date('Y-m-d H:i:s');
 		$pruefling->prestudent_id = $_SESSION['prestudent_id'];
+		$pruefling->gesperrt = $pruefling->isGesperrt(null, $_SESSION['prestudent_id']);
+
 		if ($pruefling->save())
 		{
 			$_SESSION['pruefling_id']=$pruefling->pruefling_id;
@@ -354,6 +379,7 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	$pruefling->registriert = date('Y-m-d H:i:s');
 	$pruefling->prestudent_id = $_SESSION['prestudent_id'];
 	$pruefling->semester = $_POST['semester'];
+	$pruefling->gesperrt = $pruefling->isGesperrt(null, $_SESSION['prestudent_id']);
 	if ($pruefling->save())
 	{
 		$_SESSION['pruefling_id']=$pruefling->pruefling_id;
@@ -400,6 +426,26 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 				});';
 		?>
 
+		$(document).bind('cut copy paste', function(e)
+		{
+			if (document.querySelector('.frage'))
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("keydown", function (e)
+		{
+			if (((e.ctrlKey || e.metaKey) && e.keyCode === 85) || e.keyCode === 123)
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("contextmenu", function (e)
+		{
+			e.preventDefault();
+		});
 		// If Browser is any other than Mozilla Firefox and the test includes any MathML,
 		// show message to use Mozilla Firefox
 		var ua = navigator.userAgent;
@@ -421,8 +467,32 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 
 <?php
 
+if (isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
+	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === false)
+{
+	echo '
+		<div class="col-xs-11">
+			<div id="alertmsgdiv"></div>
+			<div id="alert">'.$alertmsg.'</div>
+			<div class="row text-center">
+			'.$p->t('testtool/freischalttext').'
+					<br />
+					<br />
+					<b>'.$p->t('testtool/freischaltcode').':</b>
+				<form action="login.php">
+					<input type="hidden" name="prestudent" value="'.$_REQUEST['prestudent'].'" />
+					<input id="confirmed_code" type="number" name="confirmed_code"/>
+					<br />
+					<br />
+					<button id="confirmation_access_submit" type="submit" class="btn btn-primary"/>
+						'.$p->t('testtool/start').'
+					</button>
+				</form>
+			</div>
+		</div>';
+}
 //REIHUNGSTEST STARTSEITE (nach Login)
-if (isset($prestudent_id))
+elseif (isset($prestudent_id))
 {
 	$prestudent = new prestudent($prestudent_id);
 	$stg_obj = new studiengang($prestudent->studiengang_kz);

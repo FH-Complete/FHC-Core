@@ -23,7 +23,8 @@
 	$tablesorter2 = isset($tablesorter2) ? $tablesorter2 : false;
 	$tabulator4 = isset($tabulator4) ? $tabulator4 : false;
 	$tabulator5 = isset($tabulator5) ? $tabulator5 : false;
-	$tinymce4 = isset($tinymce4) ? $tinymce4 : false;
+	$tabulator5JQuery = isset($tabulator5JQuery) ? $tabulator5JQuery : false;
+	$tinymce3 = isset($tinymce3) ? $tinymce3 : false;
 	$tinymce5 = isset($tinymce5) ? $tinymce5 : false;
 	$vue3 = isset($vue3) ? $vue3 : false;
 	$primevue3 = isset($primevue3) ? $primevue3 : false;
@@ -34,6 +35,7 @@
 	// Internal resources
 	$ajaxlib = isset($ajaxlib) ? $ajaxlib : false;
 	$bootstrapper = isset($bootstrapper) ? $bootstrapper : false;
+	$cis = isset($cis) ? $cis : false;
 	$dialoglib = isset($dialoglib) ? $dialoglib : false;
 	$filtercomponent = isset($filtercomponent) ? $filtercomponent : false;
 	$filterwidget = isset($filterwidget) ? $filterwidget : false;
@@ -43,4 +45,4 @@
 	$tablewidget = isset($tablewidget) ? $tablewidget : false;
 	$udfs = isset($udfs) ? $udfs : false;
 	$widgets = isset($widgets) ? $widgets : false;
-
+	$tags = isset($tags) ? $tags : false;

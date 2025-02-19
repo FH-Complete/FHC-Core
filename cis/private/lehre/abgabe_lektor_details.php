@@ -37,6 +37,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/projektarbeit.class.php');
 require_once('../../../include/projektbetreuer.class.php');
 require_once('../../../include/sancho.inc.php');
+require_once('../../../application/libraries/SignatureLib.php');
 
 if (!$db = new basis_db())
 	$db=false;
@@ -119,11 +120,12 @@ if(!$projektarbeit_obj->load($projektarbeit_id))
 	die('Fehler beim Laden der Projektarbeit');
 $titel = $projektarbeit_obj->titel;
 $student_uid = $projektarbeit_obj->student_uid;
+$projekttyp_kurzbz = $projektarbeit_obj->projekttyp_kurzbz;
 
 // paarbeit sollte nur ab bestimmten Zeitpunkt online bewertet werden
-$num_rows_sem = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
+$paIsCurrent = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
 
-if(!is_numeric($num_rows_sem) || $num_rows_sem < 0)
+if(!is_numeric($paIsCurrent) || $paIsCurrent < 0)
 {
 	echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerAktualitaetProjektarbeit')."</font><br>&nbsp;";
 }
@@ -143,27 +145,28 @@ if($num_rows_endupload < 0)
 }
 
 // Zweitbegutachter holen
-if($betreuerart=="Erstbegutachter")
+if(in_array($betreuerart, array('Erstbegutachter', 'Senatsvorsitz')))
 {
-	$projektbetreuer = new projektbetreuer();
-	$alleBegutachter = $projektbetreuer->getProjektbetreuer($projektarbeit_id);
+	$alleBegutachter = new projektbetreuer();
+	$alleBegutachterRes = $alleBegutachter->getProjektbetreuer($projektarbeit_id);
 
-	if ($alleBegutachter)
+	if ($alleBegutachterRes)
 	{
-		$alleBegutachterResults = $projektbetreuer->result;
-
-		foreach ($alleBegutachterResults as $begutachter)
+		$zweitbetreuerArr = array();
+		foreach ($alleBegutachter->result as $begutachter)
 		{
-			if ($begutachter->betreuerart_kurzbz == "Erstbegutachter")
+			if (in_array($begutachter->betreuerart_kurzbz, array('Erstbegutachter', 'Senatsvorsitz')))
 			{
+				// dem Erstbetreuer zugewiesene Zweitbetreuer holen
 				$erstbetreuer_id = $begutachter->person_id;
-				$zweitbegutachter = $projektbetreuer->getZweitbegutachterWithToken($erstbetreuer_id, $projektarbeit_id, $student_uid);
-				break;
+				$zweitbegutachter = new projektbetreuer();
+				$zweitbegutachterRes = $zweitbegutachter->getZweitbegutachterWithToken($erstbetreuer_id, $projektarbeit_id, $student_uid);
+				if ($zweitbegutachterRes) $zweitbetreuerArr = array_merge($zweitbetreuerArr, $zweitbegutachter->result);
 			}
 		}
 
 		// Mail mit Token an Zweitbegutachter senden
-		if ($zweitbegutachter && $num_rows_sem >= 1 && isset($_GET['zweitbegutachtertoken']))
+		if (count($zweitbetreuerArr) > 0 && $paIsCurrent >= 1 && isset($_GET['zweitbegutachtertoken']) && isset($_GET['zweitbetreuer_person_id']))
 		{
 			$qry_std="SELECT * FROM campus.vw_benutzer where uid=".$db->db_add_param($uid);
 			if(!$result_std=$db->db_query($qry_std))
@@ -173,15 +176,24 @@ if($betreuerart=="Erstbegutachter")
 			else
 			{
 				$row_std=@$db->db_fetch_object($result_std);
-				$mailres = sendZweitbegutachterMail($zweitbegutachter, $erstbetreuer_id, $row_std);
+				foreach ($zweitbetreuerArr as $zbg)
+				{
+					// if Zweitbetreuer is the one for which token was requested, send mail
+					if ($zbg->person_id == $_GET['zweitbetreuer_person_id'])
+					{
+						$mailres = sendZweitbegutachterMail($zbg, $erstbetreuer_id, $row_std, $projekttyp_kurzbz);
 
-				if ($mailres)
-				{
-					echo "<br><span style='color: green; '>".$p->t('abgabetool/zweitbegutachterMailGesendet', $zweitbegutachter->email)."</span><br>&nbsp;";
-				}
-				else
-				{
-					echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailZweitBegutachter')." Mail: ".$zweitbegutachter->email."</font><br>&nbsp;";
+						if ($mailres)
+						{
+							echo "<br><span style='color: green; '>"
+								.$p->t('abgabetool/zweitbegutachterMailGesendet', array($zbg->voller_name, $zbg->email))
+								."</span><br>&nbsp;";
+						}
+						else
+						{
+							echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailZweitBegutachter')." Mail: ".$zbg->email."</font><br>&nbsp;";
+						}
+					}
 				}
 			}
 		}
@@ -214,12 +226,14 @@ echo '
 				cursor: pointer;
 				outline: inherit;
 			}
+
 			#zweitbetrmailicon {
 				top: 4px;
 				height: 18px;
 				width: 18px;
 				position: relative;
 			}
+
 			#tokenmailicon {
 				top: 2px;
 				height: 15px;
@@ -227,6 +241,9 @@ echo '
 				position: relative;
 			}
 
+			.warningtext {
+				color: #8a6d3b;
+			}
 		</style>
 
 		<script language="Javascript">
@@ -465,12 +482,13 @@ $htmlstr .= "<table id='beurteilungheadertable' width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>".$p->t('abgabetool/student').": <b>".$db->convert_html_chars($studentenname)."</b></td>";
 $htmlstr .= "<td width=10% align=center>";
 
-$semester_benotbar = $num_rows_sem >= 1;
+$semester_benotbar = $paIsCurrent >= 1;
 $endupload_vorhanden = $num_rows_endupload >= 1;
 
 if ($semester_benotbar && $endupload_vorhanden)
 {
-	$htmlstr .= "<form action='../../../index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung' title='Benotungsformular' target='_blank' method='GET'>";
+	$beurtPfad = $betreuerart == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
+	$htmlstr .= "<form action='../../../index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/".$beurtPfad."' title='Benotungsformular' target='_blank' method='GET'>";
 	$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 	$htmlstr .= "<input type='submit' name='note' value='".$p->t('abgabetool/benoten')."'></form>";
@@ -496,32 +514,51 @@ else
 {
 	$htmlstr .= "<td>&nbsp;</td></tr>";
 }
-$htmlstr .= "<tr><td style='font-size:16px'>" . $p->t('abgabetool/titel') . ": <b>".$db->convert_html_chars($titel)."<b></td><td></td><td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
+$htmlstr .= "<tr>
+					<td style='font-size:16px'>" . $p->t('abgabetool/titel') . ": <b>".$db->convert_html_chars($titel)."<b></td>
+					<td align='center' class='warningtext'>".(isset($quick_info) ? $quick_info : '')."</td>
+					<td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
 $htmlstr .= "</tr>\n";
-if (isset($zweitbegutachter) && $zweitbegutachter) // wenn es Zweitbegutachter gibt
+
+if (isset($zweitbetreuerArr) && is_array($zweitbetreuerArr)) // wenn es Zweitbetreuer gibt
 {
-	// Zweitbegutachter anzeigen
+	// Zweitbetreuer anzeigen
 	$htmlstr .= "<tr>\n";
-	$htmlstr .= "<td style='font-size:16px'>" . $p->t('abgabetool/zweitBegutachter') . ": <b>" . $zweitbegutachter->voller_name . "</b>";
-
-	// keine Mail -> Fehler anzeigen
-	if (!isset($zweitbegutachter->email))
-		$htmlstr .= "&nbsp;&nbsp;<img src='../../../skin/images/exclamation.png' title='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "' alt='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "'/>";
-
-	// Token senden button wenn Zweitbegutachter extern ist und Projektarbeit nicht für altes Semester ist
-	if (isset($zweitbegutachter->email) && !isset($zweitbegutachter->uid) && $num_rows_sem >= 1)
+	$htmlstr .= "<td style='font-size:16px'>";
+	$bart = '';
+	foreach($zweitbetreuerArr as $zweitbetreuer)
 	{
-		$htmlstr .= "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='GET' style='display: inline'>\n";
-		$htmlstr .= "<input type='hidden' name='uid' value='" . $student_uid . "'>";
-		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='" . $projektarbeit_id . "'>";
-		$htmlstr .= "<input type='hidden' name='betreuerart' value='" . $betreuerart . "'>";
-		$htmlstr .= "&nbsp;<a href='mailto:".$zweitbegutachter->email."'><img id='zweitbetrmailicon' src='../../../skin/images/email.png'
-						title='" . $p->t('abgabetool/zweitbetreuerMailSenden', $zweitbegutachter->email) . "' alt='" . $p->t('abgabetool/zweitbetreuerMailSenden', $zweitbegutachter->email) . "'/></a>\n";
-		$htmlstr .= "&nbsp;<button type='submit' name='zweitbegutachtertoken' title='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'>
-						<img id='tokenmailicon' src='../../../skin/images/repeat.png' alt='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'/></button>\n";
-		$htmlstr .= "</form>";
-	}
+		if ($bart !== $zweitbetreuer->betreuerart_kurzbz)
+		{
+			$htmlstr .= ($zweitbetreuer->betreuerart_kurzbz == 'Senatsmitglied' ? $p->t('abgabetool/senatsMitglied') : $p->t('abgabetool/zweitBegutachter'));
+			$htmlstr .= ": ";
+			$bart = $zweitbetreuer->betreuerart_kurzbz;
+		}
+		else
+			$htmlstr .= ", ";
 
+		$htmlstr .= "<b>" . $zweitbetreuer->voller_name . "</b>";
+
+		// keine Mail -> Fehler anzeigen
+		if (!isset($zweitbetreuer->email))
+			$htmlstr .= "&nbsp;&nbsp;<img src='../../../skin/images/exclamation.png' title='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "' alt='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "'/>";
+
+		// Token senden button wenn Zweitbegutachter extern ist und Projektarbeit nicht für altes Semester ist
+		if (isset($zweitbetreuer->email) && !isset($zweitbetreuer->uid) && $paIsCurrent >= 1)
+		{
+			$htmlstr .= "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='GET' style='display: inline'>\n";
+			$htmlstr .= "<input type='hidden' name='uid' value='" . $student_uid . "'>";
+			$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='" . $projektarbeit_id . "'>";
+			$htmlstr .= "<input type='hidden' name='betreuerart' value='" . $betreuerart . "'>";
+			$htmlstr .= "<input type='hidden' name='zweitbetreuer_person_id' value='" . $zweitbetreuer->person_id . "'>";
+			$htmlstr .= "&nbsp;<a href='mailto:".$zweitbetreuer->email."'><img id='zweitbetrmailicon' src='../../../skin/images/email.png'
+			title='" . $p->t('abgabetool/zweitbetreuerMailSenden', array($zweitbetreuer->voller_name, $zweitbetreuer->email)) . "'
+			alt='" . $p->t('abgabetool/zweitbetreuerMailSenden', array($zweitbetreuer->voller_name, $zweitbetreuer->email)) . "'/></a>\n";
+			$htmlstr .= "&nbsp;<button type='submit' name='zweitbegutachtertoken' title='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'>
+			<img id='tokenmailicon' src='../../../skin/images/repeat.png' alt='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'/></button>";
+			$htmlstr .= "</form>";
+		}
+	}
 	$htmlstr .= "</td>\n";
 	$htmlstr .= "<td></td>\n";
 	$htmlstr .= "<td></td>\n";
@@ -545,122 +582,178 @@ $htmlstr .= "<tr>
 				<td></td>
 			</tr>\n";
 $result=@$db->db_query($qry);
-	while ($row=@$db->db_fetch_object($result))
+while ($row=@$db->db_fetch_object($result))
+{
+	$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$row->projektarbeit_id."'>\n";
+	$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
+	$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
+	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+	$htmlstr .= "<input type='hidden' name='betreuerart' value='".$betreuerart."'>\n";
+	$htmlstr .= "<input type='hidden' name='command' value='update'>\n";
+	$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
+
+	$uploadedDocumentSigned = null;
+	if (!$row->abgabedatum)
 	{
-		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$row->projektarbeit_id."'>\n";
-		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
-		$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
-		$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
-		$htmlstr .= "<input type='hidden' name='betreuerart' value='".$betreuerart."'>\n";
-		$htmlstr .= "<input type='hidden' name='command' value='update'>\n";
-		$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
-		if(!$row->abgabedatum)
+		if ($row->datum<date('Y-m-d'))
 		{
-			if ($row->datum<date('Y-m-d'))
-			{
-				//Termin vorbei - weiß auf rot
-				$bgcol='#FF0000';
-				$fcol='#FFFFFF';
-			}
-			elseif (($row->datum>=date('Y-m-d')) && ($row->datum<date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+11, date("Y")))))
-			{
-				//Termin nahe - schwarz auf gelb
-				$bgcol='#FFFF00';
-				$fcol='#000000';
-			}
-			else
-			{
-				//"normaler" Termin - schwarz auf weiß
-				$bgcol='#FFFFFF';
-				$fcol='#000000';
-			}
+			//Termin vorbei - weiß auf rot
+			$bgcol='#FF0000';
+			$fcol='#FFFFFF';
+		}
+		elseif (($row->datum>=date('Y-m-d')) && ($row->datum<date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+11, date("Y")))))
+		{
+			//Termin nahe - schwarz auf gelb
+			$bgcol='#FFFF00';
+			$fcol='#000000';
 		}
 		else
 		{
-			if($row->abgabedatum>$row->datum)
-			{
-				//Abgabe nach Termin - weiß auf hellrot
-				$bgcol='#EA7B7B';
-				$fcol='#FFFFFF';
-			}
-			else
-			{
-				//Abgabe vor Termin - schwarz auf grün
-				$bgcol='#00FF00';
-				$fcol='#000000';
-			}
+			//"normaler" Termin - schwarz auf weiß
+			$bgcol='#FFFFFF';
+			$fcol='#000000';
 		}
-		//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." >";
-		//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked="checked" style="background-color:#FF0000;"':'')." disabled>";
-		if($row->fixtermin=='t')
+	}
+	else
+	{
+		if($row->abgabedatum>$row->datum)
 		{
-			$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='".$p->t('abgabetool/fixerAbgabetermin')."' border=0></td>";
+			//Abgabe nach Termin - weiß auf hellrot
+			$bgcol='#EA7B7B';
+			$fcol='#FFFFFF';
 		}
 		else
 		{
-			$htmlstr .= "<td><img src='../../../skin/images/bullet_green.png' alt='N' title='".$p->t('abgabetool/variablerAbgabetermin')."' border=0></td>";
+			//Abgabe vor Termin - schwarz auf grün
+			$bgcol='#00FF00';
+			$fcol='#000000';
 		}
-		$htmlstr .= "		</td>\n";
-		$htmlstr .= "		<td><input  type='text' name='datum' style='background-color:".$bgcol.";font-weight:bold; color:".$fcol." ' value='".$datum_obj->formatDatum($row->datum,'d.m.Y')."' size='10' maxlegth='10'></td>\n";
-		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
-		//$htmlstr .= "			<option value=''>&nbsp;</option>";
-		$qry_typ="SELECT * FROM campus.tbl_paabgabetyp";
-		$result_typ=@$db->db_query($qry_typ);
-		while ($row_typ=@$db->db_fetch_object($result_typ))
+	}
+
+	if($row->fixtermin=='t')
+	{
+		$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='".$p->t('abgabetool/fixerAbgabetermin')."' border=0></td>";
+	}
+	else
+	{
+		$htmlstr .= "<td><img src='../../../skin/images/bullet_green.png' alt='N' title='".$p->t('abgabetool/variablerAbgabetermin')."' border=0></td>";
+	}
+	$htmlstr .= "		</td>\n";
+	$htmlstr .= "		<td><input  type='text' name='datum' style='background-color:".$bgcol.";font-weight:bold; color:".$fcol." ' value='".$datum_obj->formatDatum($row->datum,'d.m.Y')."' size='10' maxlegth='10'></td>\n";
+	$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
+	//$htmlstr .= "			<option value=''>&nbsp;</option>";
+	$qry_typ="SELECT * FROM campus.tbl_paabgabetyp";
+	$result_typ=@$db->db_query($qry_typ);
+	while ($row_typ=@$db->db_fetch_object($result_typ))
+	{
+		if($row->paabgabetyp_kurzbz==$row_typ->paabgabetyp_kurzbz)
 		{
-			if($row->paabgabetyp_kurzbz==$row_typ->paabgabetyp_kurzbz)
+			$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."' selected>$row_typ->bezeichnung</option>";
+		}
+		else
+		{
+			if($row_typ->paabgabetyp_kurzbz!='end' && $row_typ->paabgabetyp_kurzbz!='note' && $row_typ->paabgabetyp_kurzbz!='enda')
 			{
-				$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."' selected>$row_typ->bezeichnung</option>";
+				$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
 			}
-			else
+		}
+	}
+	$htmlstr .= "		</select></td>\n";
+	$htmlstr .= "		<td><input type='text' name='kurzbz' value='".htmlspecialchars($row->kurzbz,ENT_QUOTES)."' size='60' maxlegth='256'></td>\n";
+	$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";
+
+	if ($user==$row->insertvon && $betreuerart!="Zweitbegutachter")
+	{
+		$htmlstr .= "		<td><input type='submit' name='schick' value='".$p->t('global/speichern')."' title='".$p->t('abgabetool/terminaenderungSpeichern')."'></td>";
+
+		if (!$row->abgabedatum)
+		{
+			$htmlstr .= "		<td><input type='submit' name='del' value='".$p->t('global/loeschen')."' onclick='return confdel()' title='".$p->t('abgabetool/terminLoeschen')."'></td>";
+		}
+		else
+		{
+			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+		}
+	}
+	else
+	{
+		$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+	}
+	if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
+	{
+		$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' title='".$p->t('abgabetool/abgegebeneDatei')."' border=0></a></td>";
+	}
+	else
+	{
+		$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+	}
+	if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
+	{
+		$htmlstr .= "		<td><a href='abgabe_lektor_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../../skin/images/folder.gif' alt='zusätzliche Daten' title='".$p->t('abgabetool/kontrolleZusatzdaten')."' border=0></a></td>";
+	}
+	else
+	{
+		$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+	}
+
+	if (file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
+	{
+		$signaturVorhanden = false;
+		if ($row->paabgabetyp_kurzbz == 'end')
+		{
+			if(defined('ABGABETOOL_CHECK_SIGNATURE') && ABGABETOOL_CHECK_SIGNATURE)
 			{
-				if($row_typ->paabgabetyp_kurzbz!='end' && $row_typ->paabgabetyp_kurzbz!='note' && $row_typ->paabgabetyp_kurzbz!='enda')
+				// Check if the document is signed
+				$signList = SignatureLib::list(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf');
+				if (is_array($signList) && count($signList) > 0)
 				{
-					$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
+					$signaturVorhanden = true;
+					// The document is signed
+				}
+				elseif (isset($signList->code) && $signList->code == 1)
+				{
+					$uploadedDocumentSigned = $p->t('abgabetool/uploaddDocumentToBigForSignature');
+				}
+				elseif ($signList === null)
+				{
+					$uploadedDocumentSigned = 'WARNING: signature server error';
+				}
+				else
+				{
+					$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
 				}
 			}
 		}
-		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td><input type='text' name='kurzbz' value='".htmlspecialchars($row->kurzbz,ENT_QUOTES)."' size='60' maxlegth='256'></td>\n";
-		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";
-		if($user==$row->insertvon && $betreuerart!="Zweitbegutachter")
+		if ($uploadedDocumentSigned != null)
 		{
-			$htmlstr .= "		<td><input type='submit' name='schick' value='".$p->t('global/speichern')."' title='".$p->t('abgabetool/terminaenderungSpeichern')."'></td>";
-
-			if(!$row->abgabedatum)
-			{
-				$htmlstr .= "		<td><input type='submit' name='del' value='".$p->t('global/loeschen')."' onclick='return confdel()' title='".$p->t('abgabetool/terminLoeschen')."'></td>";
-			}
-			else
-			{
-				$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-			}
+			$htmlstr .= '
+					<td>
+						<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 5px; border: 1px solid; border-radius: 4px; ">
+							<b>'.$uploadedDocumentSigned.'</b>
+						</div>
+					</td>';
 		}
-		else
+		elseif($signaturVorhanden)
 		{
-			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+			$htmlstr .= '
+					<td>
+						<div style="color: #198754; background-color: #d1e7dd; border-color: #a3cfbb; padding: 5px; border: 1px solid; border-radius: 4px; ">
+							<b>'.$p->t('abgabetool/uploadedDocumentSigned').'</b>
+						</div>
+					</td>';
 		}
-		if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
-		{
-			$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' title='".$p->t('abgabetool/abgegebeneDatei')."' border=0></a></td>";
-		}
-		else
-		{
-			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-		}
-		if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
-		{
-			$htmlstr .= "		<td><a href='abgabe_lektor_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../../skin/images/folder.gif' alt='zusätzliche Daten' title='".$p->t('abgabetool/kontrolleZusatzdaten')."' border=0></a></td>";
-		}
-		else
-		{
-			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-		}
-		$htmlstr .= "	</tr>\n";
-
-
-		$htmlstr .= "</form>\n";
 	}
+	else
+	{
+		$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+	}
+
+
+	$htmlstr .= "	</tr>\n";
+
+
+	$htmlstr .= "</form>\n";
+}
 
 //Eingabezeile fuer neuen Termin
 $htmlstr .= '<form action="'.htmlspecialchars($_SERVER['PHP_SELF']).'" method="POST" name="'.$db->convert_html_chars($projektarbeit_id).'">'."\n";
@@ -674,7 +767,7 @@ $htmlstr .= '<tr id="'.$db->convert_html_chars($projektarbeit_id).'">'."\n";
 //$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
 $htmlstr .= "<td>&nbsp;&nbsp;</td>";
 
-$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10' style='font-weight:bold;' ></td>\n";
+$htmlstr .= "		<td><input type='text' name='datum' size='10' maxlegth='10' style='font-weight:bold;' ></td>\n";
 
 $htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 $qry_typ = "SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz!='end' AND paabgabetyp_kurzbz!='enda' AND paabgabetyp_kurzbz!='note'";
@@ -708,7 +801,7 @@ echo $htmlstr;
  * @param object $student
  * @return bool|projektbetreuer|void|null
  */
-function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id, $student)
+function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id, $student, $projekttyp_kurzbz)
 {
 	if (!isset($zweitbegutachter->email) || $zweitbegutachter->email == '')
 		return false;
@@ -721,12 +814,20 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 	if (!$projektbetreuer)
 		return $projektbetreuer;
 
-	$zweitbetr = $projektbetreuer->getZweitbegutachterWithToken($erstbegutachter_person_id, $zweitbegutachter->projektarbeit_id, $student->uid);
+	$zweitbetrRes = $projektbetreuer->getZweitbegutachterWithToken(
+		$erstbegutachter_person_id,
+		$zweitbegutachter->projektarbeit_id,
+		$student->uid,
+		$zweitbegutachter->person_id
+	);
 
-	if ($zweitbetr)
+	if ($zweitbetrRes && isset($projektbetreuer->result[0]))
 	{
+		$zweitbetr = $projektbetreuer->result[0];
 		$intern = isset($zweitbetr->uid);
-		$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
+		$mail_link_path = $zweitbetr->betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
+		$mail_subject = $projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
+		$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/$mail_link_path";
 		$mail_fulllink = "$mail_baselink?projektarbeit_id=".$zweitbegutachter->projektarbeit_id."&uid=".$student->uid;
 		$mail_link = $intern ? $mail_fulllink : $mail_baselink;
 
@@ -745,7 +846,7 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 			'ParbeitsbeurteilungEndupload',
 			$maildata,
 			$zweitbetr->email,
-			"Masterarbeitsbetreuung",
+			$mail_subject,
 			'sancho_header_min_bw.jpg',
 			'sancho_footer_min_bw.jpg'
 		);

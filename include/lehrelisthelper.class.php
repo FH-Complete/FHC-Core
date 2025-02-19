@@ -206,9 +206,10 @@ class LehreListHelper
 					WHERE prestudent_id=tbl_student.prestudent_id
 					ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 					tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
-					tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_studiengang.kurzbzlang,
+					tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_person.geschlecht, tbl_studiengang.kurzbzlang,
 					tbl_mobilitaet.mobilitaetstyp_kurzbz, tbl_zeugnisnote.note,
-					(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN 1 ELSE 0 END) as doubledegree
+					(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN 1 ELSE 0 END) as doubledegree,
+					(tbl_bisio.bis::timestamp - tbl_bisio.von::timestamp) as daysout
 				FROM
 					campus.vw_student_lehrveranstaltung
 					JOIN public.tbl_benutzer USING(uid)
@@ -230,10 +231,11 @@ class LehreListHelper
 		if($this->lehreinheit!='')
 			$qry.=' AND vw_student_lehrveranstaltung.lehreinheit_id='.$this->db->db_add_param($this->lehreinheit, FHC_INTEGER);
 
-		$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis, doubledegree DESC';
+		$qry.=' ORDER BY nachname, vorname, person_id, daysout DESC, doubledegree DESC';
 
 		$stsem_obj = new studiensemester();
 		$stsem_obj->load($this->studiensemester);
+
 		$stsemdatumvon = $stsem_obj->start;
 		$stsemdatumbis = $stsem_obj->ende;
 
@@ -295,6 +297,7 @@ class LehreListHelper
 									'uid' => $row->student_uid,
 									'vorname'=>$vorname,
 									'nachname'=>$row->nachname,
+									'geschlecht'=>$row->geschlecht,
 									'personenkennzeichen'=>trim($row->matrikelnr),
 									'matr_nr'=>$row->matr_nr,
 									'semester'=>$row->semester,

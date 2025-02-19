@@ -289,7 +289,7 @@ var IssuesZustaendigkeiten = {
 			let val = data[i];
 
 			// the value selected by default
-			let selected = val === defaultValue ? " selected" : "";
+			let selected = val[valueName] === defaultValue ? " selected" : "";
 
 			// append option
 			$("#"+dropdownId).append("<option value='"+val[valueName]+"'"+selected+">"+val[textName]+"</option>");

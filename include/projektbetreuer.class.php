@@ -395,40 +395,66 @@ class projektbetreuer extends basis_db
 	 * @param $erstbegutachter_person_id int person_id des Erstbegutachters
 	 * @param $projektarbeit_id int
 	 * @param $student_uid string uid des Studenten der Arbeit abgibt
+	 * @param $zweitbegutachter_person_id int person_id des Zweitbegutachters (wenn mehrere Zweitbetreuer zu einem Erstbegutachter erwartet werden)
 	 * @return object | bool
 	 */
-	public function getZweitbegutachterWithToken($erstbegutachter_person_id, $projektarbeit_id, $student_uid)
+	public function getZweitbegutachterWithToken($erstbegutachter_person_id, $projektarbeit_id, $student_uid, $zweitbegutachter_person_id = null)
 	{
-		$qry_betr="SELECT betr.person_id, betr.projektarbeit_id, pers.anrede, betr.zugangstoken, betr.zugangstoken_gueltigbis, tbl_benutzer.uid, kontakt,
+		$qry_betr="SELECT DISTINCT ON (betr.person_id) betr.person_id, betr.projektarbeit_id, pers.anrede, betr.zugangstoken, betr.zugangstoken_gueltigbis,
+				tbl_benutzer.uid, kontakt, betr.betreuerart_kurzbz,
        			trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as voller_name,
        			CASE WHEN tbl_benutzer.uid IS NULL THEN kontakt ELSE tbl_benutzer.uid || '@".DOMAIN."' END AS email, abg.abgabedatum
 				FROM lehre.tbl_projektbetreuer betr
-				JOIN lehre.tbl_projektarbeit parb ON betr.projektarbeit_id = parb.projektarbeit_id 
+				JOIN lehre.tbl_projektarbeit parb ON betr.projektarbeit_id = parb.projektarbeit_id
 				JOIN public.tbl_person pers ON betr.person_id = pers.person_id
 				LEFT JOIN public.tbl_kontakt ON pers.person_id = tbl_kontakt.person_id AND kontakttyp = 'email' AND zustellung = true
 				LEFT JOIN public.tbl_benutzer ON pers.person_id = tbl_benutzer.person_id
 				LEFT JOIN campus.tbl_paabgabe abg ON betr.projektarbeit_id = abg.projektarbeit_id AND abg.paabgabetyp_kurzbz = 'end'
-				WHERE betr.betreuerart_kurzbz = 'Zweitbegutachter'
+				WHERE
+				(
+					(
+						betr.betreuerart_kurzbz  = 'Zweitbegutachter'
+						AND EXISTS (
+							SELECT 1 FROM lehre.tbl_projektbetreuer
+							WHERE person_id = ".$this->db_add_param($erstbegutachter_person_id, FHC_INTEGER)."
+							AND betreuerart_kurzbz = 'Erstbegutachter'
+							AND projektarbeit_id = betr.projektarbeit_id
+						)
+					)
+					OR /* either Zweitbegutachter of masterarbeit, or Kommissionsprüfer if Kommission */
+					(
+						betr.betreuerart_kurzbz  = 'Senatsmitglied'
+						AND EXISTS (
+							SELECT 1 FROM lehre.tbl_projektbetreuer
+							WHERE person_id = ".$this->db_add_param($erstbegutachter_person_id, FHC_INTEGER)."
+							AND betreuerart_kurzbz = 'Senatsvorsitz'
+							AND projektarbeit_id = betr.projektarbeit_id
+						)
+					)
+				)
 				AND betr.projektarbeit_id = ".$this->db_add_param($projektarbeit_id, FHC_INTEGER)."
 				AND parb.student_uid = ".$this->db_add_param($student_uid)."
-				AND EXISTS (
-					SELECT 1 FROM lehre.tbl_projektbetreuer
-					WHERE person_id = ".$this->db_add_param($erstbegutachter_person_id, FHC_INTEGER)."
-					AND betreuerart_kurzbz = 'Erstbegutachter'
-					AND projektarbeit_id = betr.projektarbeit_id
-				)
-				AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL)
-				ORDER BY betr.insertamum DESC
-				LIMIT 1";
+				AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL)";
+
+				if (isset($zweitbegutachter_person_id))
+				{
+					$qry_betr .= " AND betr.person_id = ".$this->db_add_param($zweitbegutachter_person_id, FHC_INTEGER);
+				}
+
+				$qry_betr .= " ORDER BY betr.person_id DESC,
+				(CASE WHEN EXISTS ( /* if multiple accounts, prioritize mitarbeiter */
+					SELECT 1 FROM public.tbl_mitarbeiter ma
+					WHERE ma.mitarbeiter_uid = tbl_benutzer.uid
+				) THEN 0 ELSE 1 END), betr.insertamum DESC";
 
 		if ($betr=$this->db_query($qry_betr))
 		{
-			$row_betr = $this->db_fetch_object($betr);
-
-			if ($row_betr)
-				return $row_betr;
-			else
-				return false;
+			$result = array();
+			while ($row_betr = $this->db_fetch_object())
+			{
+				$this->result[] = $row_betr;
+			}
+			return true;
 		}
 		else
 		{
@@ -451,7 +477,7 @@ class projektbetreuer extends basis_db
 							LEFT JOIN public.tbl_benutzer USING(person_id)
 							WHERE projektarbeit_id = ".$this->db_add_param($projektarbeit_id, FHC_INTEGER)."
 							AND tbl_projektbetreuer.person_id = ".$this->db_add_param($zweitbegutachter_person_id, FHC_INTEGER)."
-							AND betreuerart_kurzbz = 'Zweitbegutachter'
+							AND betreuerart_kurzbz IN ('Zweitbegutachter', 'Senatsmitglied')
 							LIMIT 1";
 
 		if ($betreueruidres = $this->db_query($betreuerUidQry))
@@ -494,7 +520,7 @@ class projektbetreuer extends basis_db
 						zugangstoken_gueltigbis = CURRENT_DATE + interval '1 year'
 						WHERE projektarbeit_id = " . $this->db_add_param($projektarbeit_id, FHC_INTEGER) . "
 						AND person_id = " . $this->db_add_param($row_betr->person_id, FHC_INTEGER) . "
-						AND betreuerart_kurzbz = 'Zweitbegutachter'";
+						AND betreuerart_kurzbz IN ('Zweitbegutachter', 'Senatsmitglied')";
 
 					if ($this->db_query($qry_upd))
 					{

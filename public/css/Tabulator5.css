@@ -1,0 +1,149 @@
+@import '../../vendor/olifolkerd/tabulator5/dist/css/tabulator_simple.min.css';
+
+/* Apply borders and background to Cell instead of the Row
+ * otherwise frozen columns won't look good (columns behind
+ * will be partial visible)
+ */
+.tabulator-row {
+	border-bottom: none;
+}
+.tabulator-row .tabulator-frozen,
+.tabulator-row .tabulator-cell {
+	border-bottom: 1px solid #dee2e6;
+}
+.tabulator-row.tabulator-row-even {
+	background-color: transparent;
+}
+.tabulator-headers .tabulator-frozen,
+.tabulator-row.tabulator-row-odd .tabulator-frozen,
+.tabulator-row.tabulator-row-odd .tabulator-cell {
+	background-color: #fff;
+}
+.tabulator-row.tabulator-row-even .tabulator-frozen,
+.tabulator-row.tabulator-row-even .tabulator-cell {
+	background-color: #f2f2f2;
+}
+.tabulator-row.tabulator-selectable:hover .tabulator-frozen,
+.tabulator-row.tabulator-selectable:hover .tabulator-cell {
+	background-color: #ececec;
+}
+.tabulator-row.tabulator-selected .tabulator-frozen,
+.tabulator-row.tabulator-selected .tabulator-cell {
+	background-color: #9abcea;
+}
+.tabulator-row.tabulator-selected:hover .tabulator-frozen,
+.tabulator-row.tabulator-selected:hover .tabulator-cell {
+	background-color: #769bcc;
+}
+.tabulator .tabulator-col-resize-handle:last-of-type {
+	z-index: 999999;
+}
+
+/* classes for rows that are not selectable in the tabulator, except for rows that are used for calculation */
+.tabulator-row.tabulator-unselectable:not(.tabulator-calcs) {
+	color: #adb5bd !important;
+	pointer-events: none !important;
+}
+
+.tabulator-row.tabulator-unselectable a {
+	pointer-events: auto !important;
+}
+
+/* using bootstrap background classes to style the background color of tabulator rows */
+/* bg-warning */
+/* odd-rows */
+.tabulator-headers .tabulator-frozen.bg-warning,
+.tabulator-row.tabulator-row-odd .tabulator-frozen.bg-warning,
+.tabulator-row.tabulator-row-odd .tabulator-cell.bg-warning {
+	background-color: #fcf8e3;
+	
+}
+/* even-rows */
+.tabulator-headers .tabulator-frozen.bg-warning,
+.tabulator-row.tabulator-row-even .tabulator-frozen.bg-warning,
+.tabulator-row.tabulator-row-even .tabulator-cell.bg-warning {
+	background-color: #fcf8e3;
+	
+}
+
+/* bg-success */
+/* odd-rows */
+.tabulator-headers .tabulator-frozen.bg-success,
+.tabulator-row.tabulator-row-odd .tabulator-frozen.bg-success,
+.tabulator-row.tabulator-row-odd .tabulator-cell.bg-success {
+	background-color: #dff0d8;
+	
+}
+/* even-rows */
+.tabulator-headers .tabulator-frozen.bg-success,
+.tabulator-row.tabulator-row-even .tabulator-frozen.bg-success,
+.tabulator-row.tabulator-row-even .tabulator-cell.bg-success {
+	background-color: #dff0d8;
+	
+}
+
+/* bg-info */
+/* odd-rows */
+.tabulator-headers .tabulator-frozen.bg-info,
+.tabulator-row.tabulator-row-odd .tabulator-frozen.bg-info,
+.tabulator-row.tabulator-row-odd .tabulator-cell.bg-info {
+	background-color: #d9edf7;
+	
+}
+/* even-rows */
+.tabulator-headers .tabulator-frozen.bg-info,
+.tabulator-row.tabulator-row-even .tabulator-frozen.bg-info,
+.tabulator-row.tabulator-row-even .tabulator-cell.bg-info {
+	background-color: #d9edf7;
+	
+}
+
+/* special bootstrap5 styling for tableWidget and their accordion-item ::after content */
+.accordion-button::after{
+	content:none !important;
+}
+
+
+.tabulator {
+	font-size: 1rem;
+}
+
+.tabulator-initialfontsize .tabulator {
+	font-size: 14px;
+}
+
+.tabulator-row.tabulator-unselectable .tabulator-cell {
+	pointer-events: all;
+}
+
+.tabulator-tooltip {
+	color: #fff;
+	background-color: #000;
+}
+
+.tabulator-row.tabulator-unselectable:not(.tabulator-calcs) {
+	color: #777 !important;
+}
+
+.tabulator-cell .btn {
+	padding: 0 .7rem;
+	min-height: 25px;
+	min-width: 25px;
+}
+
+.tabulator-row.tabulator-selectable:focus {
+	box-shadow: 0 0 0 .24rem rgba(13,110,253,.25);
+	z-index: 1;
+	outline: 0;
+}
+
+.btn-select-col-selected
+{
+	background-color: #e6e6e6;
+}
+
+.accordion-item-dark, .accordion-item-dark:focus{
+	background-color:#CED4DA !important;
+	 border-color:#ADB5BD !important;
+	 box-shadow: none !important;
+}

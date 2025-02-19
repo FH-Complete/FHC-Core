@@ -15,6 +15,39 @@ class Prestudent_model extends DB_Model
 	}
 
 	/**
+	 * Update Data in DB-Table
+	 *
+	 * @param   string $id  PK for DB-Table
+	 * @param   array $data  DataArray for Insert
+	 * @return  array
+	 */
+	public function update($id, $data, $encryptedColumns = null)
+	{
+		if (isset($data['zgvmas_code'])
+			|| isset($data['zgvmanation'])
+			|| isset($data['zgv_code'])
+			|| isset($data['zgvnation'])
+		) {
+			/**
+			 * Falls ZGV vorhanden, setze Ausstellungsstaat (für BIS-Meldung)
+			 * auf Nation der höchsten angegebenen ZGV
+			 */
+			$case = '(CASE 
+				WHEN zgvmas_code IS NOT NULL AND zgvmanation IS NOT NULL THEN zgvmanation 
+				WHEN zgv_code IS NOT NULL AND zgvnation IS NOT NULL THEN zgvnation 
+				ELSE NULL END)';
+			
+			foreach (['zgvmas_code', 'zgvmanation', 'zgv_code', 'zgvnation'] as $key)
+				if (isset($data[$key]))
+					$case = str_replace($key, $this->escape($data[$key]), $case);
+			
+			$this->db->set('ausstellungsstaat', $case, false);
+		}
+
+		return parent::update($id, $data, $encryptedColumns);
+	}
+
+	/**
 	 * getLastStatuses
 	 */
 	public function getLastStatuses($person_id, $studiensemester_kurzbz = null, $studiengang_kz = null, $status_kurzbz = null)
@@ -309,13 +342,39 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getLastPrestudent($person_id, $withzgv = false)
 	{
-		$qry = 'SELECT * FROM public.tbl_prestudent
-				WHERE person_id = ?
+		$qry = 'SELECT * FROM public.tbl_prestudent ps
 				%s
+				WHERE ps.person_id = ?
 				ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST
 				LIMIT 1';
 
-		$zgvwhere = $withzgv === true ? 'AND zgv_code IS NOT NULL' : '';
+		$zgvwhere = '';
+		if ($withzgv === true)
+		{
+			$zgvwhere = '
+				LEFT JOIN (
+					SELECT ps2.zgvmas_code,
+						ps2.zgvmanation,
+						ps2.zgvmadatum,
+						ps2.zgvmaort,
+						ps2.zgvmas_erfuellt,
+						ps2.person_id
+					FROM tbl_prestudent ps2
+					WHERE zgvmas_code IS NOT NULL
+					ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST
+				) zgvmas ON zgvmas.person_id = ps.person_id
+				LEFT JOIN (
+					SELECT ps2.zgv_code,
+						ps2.zgvnation,
+						ps2.zgvdatum,
+						ps2.zgvort,
+						ps2.zgv_erfuellt,
+						ps2.person_id
+					FROM tbl_prestudent ps2
+					WHERE zgv_code IS NOT NULL
+					ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST
+				)zgv ON zgv.person_id = ps.person_id';
+		}
 
 		$qry = sprintf($qry, $zgvwhere);
 
@@ -560,9 +619,10 @@ class Prestudent_model extends DB_Model
 						o.bezeichnung,
 						(CASE
 							WHEN sg.typ = \'b\' THEN ps.prestudent_id
-							WHEN sg.typ = \'m\' THEN ps.prestudent_id
+							WHEN sg.typ = \'m\' THEN mps.prestudent_id
             				ELSE NULL
-       					END) AS prestudent_id
+       					END) AS prestudent_id,
+       					sg.typ
 					FROM public.tbl_prestudent p
 			  		JOIN public.tbl_studiengang sg USING(studiengang_kz)
 					JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
@@ -571,11 +631,17 @@ class Prestudent_model extends DB_Model
 							  FROM public.tbl_prestudentstatus
 							 WHERE status_kurzbz = \'Bewerber\'
 						) ps USING(prestudent_id)
+				LEFT JOIN (
+					SELECT prestudent_id
+					FROM public.tbl_prestudentstatus
+					WHERE status_kurzbz = \'Interessent\' AND bestaetigtam IS NOT NULL
+				) mps ON p.prestudent_id = mps.prestudent_id
 				   WHERE p.person_id = ?
 				GROUP BY o.oe_kurzbz,
 						o.bezeichnung,
 						sg.typ,
 						ps.prestudent_id,
+						mps.prestudent_id,
 						p.prestudent_id
 				ORDER BY o.bezeichnung';
 
@@ -667,4 +733,33 @@ class Prestudent_model extends DB_Model
 		return $this->execQuery($query, array($prestudent_id));
 	}
 
+	/**
+	 * Gets history of all prestudents, person_id given
+	 * @param int $person_id
+	 * @return object
+	 */
+	public function getHistoryPrestudents($person_id)
+	{
+
+		$query = "
+			SELECT ps.studiensemester_kurzbz, p.priorisierung, p.studiengang_kz, sg.kurzbzlang, ps.orgform_kurzbz, 
+					ps.status_kurzbz, s.student_uid, sp.bezeichnung, ps.ausbildungssemester,
+			       CONCAT(ps.status_kurzbz, ' (', ps.ausbildungssemester, '. Semester)') as status, p.prestudent_id
+			FROM public.tbl_prestudent p
+			JOIN (
+					SELECT DISTINCT ON(prestudent_id) *
+						FROM public.tbl_prestudentstatus
+						WHERE prestudent_id IN (SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id = ?)
+					ORDER BY prestudent_id, datum desc, insertamum desc
+				) ps USING(prestudent_id)
+			JOIN public.tbl_status USING(status_kurzbz)
+			LEFT JOIN public.tbl_status_grund g USING (statusgrund_id)
+			JOIN public.tbl_studiengang sg USING(studiengang_kz)
+			LEFT JOIN lehre.tbl_studienplan sp USING (studienplan_id)
+			LEFT JOIN public.tbl_student s USING (prestudent_id)
+			ORDER BY p.priorisierung
+		";
+
+		return $this->execQuery($query, array($person_id));
+	}
 }
