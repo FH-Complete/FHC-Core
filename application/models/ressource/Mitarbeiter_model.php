@@ -107,17 +107,14 @@ class Mitarbeiter_model extends DB_Model
 	{
 		$qry = "
 			SELECT
-				 b.uid , p.person_id,
+				b.uid , p.person_id,
 				p.vorname, p.nachname,
-				TO_CHAR(gebdatum::timestamp, 'DD.MM.YYYY') AS format_gebdatum,
+				gebdatum,
 				COALESCE(b.alias, b.uid) AS email,
 				STRING_AGG(DISTINCT va.bezeichnung, ', ') AS Vertragsarten,
 				STRING_AGG(DISTINCT u.bezeichnung, ', ') AS Unternehmen,
 				STRING_AGG(d.dienstverhaeltnis_id::TEXT, ', ') AS ids,
 				b.aktiv
-	--			CASE WHEN b.aktiv=true THEN 'aktiv'
-	--			 	 ELSE 'nicht aktiv'
-	--				 END as status //not working in header filter	*/  
 				FROM
 					hr.tbl_dienstverhaeltnis d
 				JOIN
@@ -128,7 +125,7 @@ class Mitarbeiter_model extends DB_Model
 					public.tbl_organisationseinheit u ON d.oe_kurzbz = u.oe_kurzbz
 				JOIN
 					hr.tbl_vertragsart va ON d.vertragsart_kurzbz = va.vertragsart_kurzbz
-			    ";
+			";
 
 		if($person_id)
 		{
@@ -138,9 +135,9 @@ class Mitarbeiter_model extends DB_Model
 		$qry.= " 
 			GROUP BY
 				b.uid, p.person_id, p.vorname, p.nachname, b.alias
-			 ORDER BY
+			ORDER BY
 					p.nachname, p.vorname;
-			    ";
+			";
 
 		$params = array($person_id);
 

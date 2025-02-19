@@ -44,14 +44,61 @@ export default {
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Status", field: "bezeichnung"},
-					{title: "Datum", field: "format_datum"},
+					{
+						title: "Datum",
+						field: "datum",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr); // Convert to Date object
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{title: "vertrag_id", field: "vertrag_id", visible: false},
 					{title: "Vertragsstatus", field: "vertragsstatus_kurzbz", visible: false},
 					{title: "User", field: "mitarbeiter_uid", visible: false},
 					{title: "insertvon", field: "insertvon", visible: false},
-					{title: "insertamum", field: "format_insertamum", visible: false},
+					{
+						title: "insertamum",
+						field: "insertamum",
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{title: "updatevon", field: "updatevon", visible: false},
-					{title: "updateamum", field: "format_updateamum", visible: false},
+					{
+						title: "updateamum",
+						field: "updateamum",
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150,
@@ -112,7 +159,7 @@ export default {
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
 							title: this.$p.t('global', 'status')
 						});
-						cm.getColumnByField('format_datum').component.updateDefinition({
+						cm.getColumnByField('datum').component.updateDefinition({
 							title: this.$p.t('global', 'datum')
 						});
 						cm.getColumnByField('mitarbeiter_uid').component.updateDefinition({
@@ -130,13 +177,13 @@ export default {
 						cm.getColumnByField('updatevon').component.updateDefinition({
 							title: this.$p.t('global', 'updatevon')
 						});
-						cm.getColumnByField('format_updateamum').component.updateDefinition({
+						cm.getColumnByField('updateamum').component.updateDefinition({
 							title: this.$p.t('global', 'updateamum')
 						});
 						cm.getColumnByField('insertvon').component.updateDefinition({
 							title: this.$p.t('global', 'insertvon')
 						});
-						cm.getColumnByField('format_insertamum').component.updateDefinition({
+						cm.getColumnByField('insertamum').component.updateDefinition({
 							title: this.$p.t('global', 'insertamum')
 						});
 					}
