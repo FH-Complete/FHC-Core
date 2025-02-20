@@ -24,7 +24,21 @@ const Stundenplan = {
 		}
 	},
 	props: {
-		propsViewData: Object
+		propsViewData: Object,
+		rowMinHeight: {
+			type: String,
+			default: '100px'
+		},
+		eventMaxHeight: {
+			type: String,
+			default: '125px'
+		}
+	},
+	provide() {
+		return {
+			rowMinHeight: this.rowMinHeight,
+			eventMaxHeight: this.eventMaxHeight
+		}	
 	},
 	watch: {
 		weekFirstDay: {
@@ -94,7 +108,7 @@ const Stundenplan = {
 			const date = day.getFullYear() + "-" +
 				String(day.getMonth() + 1).padStart(2, "0") + "-" +
 				String(day.getDate()).padStart(2, "0");
-			
+
 			this.$router.push({
 				name: "Stundenplan",
 				params: {
@@ -128,19 +142,23 @@ const Stundenplan = {
 		},
 		handleChangeMode(mode) {
 			const modeCapitalized = mode.charAt(0).toUpperCase() + mode.slice(1)
+			const date = this.currentDay.getFullYear() + "-" +
+				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
+				String(this.currentDay.getDate()).padStart(2, "0");
 
 			this.$router.push({
 				name: "Stundenplan",
 				params: {
 					mode: modeCapitalized,
-					focus_date: this.currentDay.toISOString().split("T")[0],
+					focus_date: date,
 					lv_id: this.propsViewData?.lv_id ?? null
 				}
 			})
 		
 			this.calendarMode = mode
 		},
-		showModal: function(event){
+		showModal: function(e, event){
+			e.stopPropagation()
 			this.currentlySelectedEvent = event;
 			Vue.nextTick(() => {
 				this.$refs.lvmodal.show();
@@ -241,12 +259,15 @@ const Stundenplan = {
 			</div>
 		</template>
 		<template #monthPage="{event,day}">
-			<span class="fhc-entry" >
-				{{event.topic}}
-			</span>
+			<div @click="showModal($event, event); ">
+				<span class="fhc-entry">
+					{{event.topic}}
+				</span>
+			</div>
+			
 		</template>
 		<template #weekPage="{event,day}">
-			<div @click="showModal(event?.orig); " type="button"
+			<div @click="showModal($event, event?.orig);" type="button"
 			class=" position-relative border border-secondary border d-flex flex-col align-items-center
 			justify-content-evenly h-100" style="overflow: auto;">
 
@@ -264,22 +285,22 @@ const Stundenplan = {
 			</div>
 		</template>
 		<template #dayPage="{event,day,mobile}">
-			<div @click="mobile? showModal(event?.orig):null" type="button" class="fhc-entry border border-secondary border row m-0 h-100 justify-content-center align-items-center text-center">
+			<div @click="mobile? showModal($event, event?.orig):null" type="button" class="fhc-entry border border-secondary border row m-0 h-100 justify-content-center align-items-center text-center">
 				<div class="col-auto" v-if="event?.orig?.beginn && event?.orig?.ende" >
 					<div class="d-flex flex-column p-4 border-end border-secondary">
 						<span class="small">{{convertTime(event.orig.beginn.split(":"))}}</span>
 						<span class="small">{{convertTime(event.orig.ende.split(":"))}}</span>
 					</div>
 				</div>
-				<div class="col ">
+				<div class="col">
 					<p>{{ $p.t('lehre/lehrveranstaltung') }}:</p>
 					<p class="m-0">{{event?.orig.topic}}</p>
 				</div>
-				<div class="col ">
+				<div class="col" :style="'max-height: ' + eventMaxHeight + '; overflow: auto;'">
 					<p>{{ $p.t('lehre/lektor') }}:</p>
 					<p class="m-0" v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
 				</div>
-				<div class="col ">
+				<div class="col">
 					<p>{{ $p.t('profil/Ort') }}: </p>
 					<p class="m-0">{{event?.orig.ort_kurzbz}}</p>
 				</div>

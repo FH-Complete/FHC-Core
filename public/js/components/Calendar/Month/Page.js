@@ -143,16 +143,16 @@ export default {
 			<a href="#" v-if="showWeeks" class="fhc-calendar-month-page-weekday text-decoration-none text-end opacity-25"
 			@click.prevent="changeToWeek(week)">{{week.no}}</a>
 			<a href="#" 
-			@click.prevent="clickEvent(day,week)" 
+			@click="clickEvent(day,week)"
 			@mouseover="highlight(week,day)" 
 			@mouseleave="highlightedWeek = null; highlightedDay = null"
 			v-for="day in week.days" 
 			:key="day"
 			:class="getDayClass(week, day)" 
 			>
-				<span class="no" :style="getNumberStyle(day)">{{day.getDate()}}</span>
+				<span @click="clickEvent(day,week)" class="no" :style="getNumberStyle(day)">{{day.getDate()}}</span>
 				<span v-if="events[day.toDateString()] && events[day.toDateString()].length" class="events">
-					<div @click="setSelectedEvent(event);" v-for="event in events[day.toDateString()]" :key="event.id" 
+					<div v-for="event in events[day.toDateString()]" :key="event.id" 
 					:style="{'background-color': event.color}" class="fhc-entry" :selected="event == selectedEvent" v-contrast >
 						<slot  name="monthPage" :event="event" :day="day" >
 							<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>

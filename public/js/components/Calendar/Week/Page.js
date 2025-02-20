@@ -23,7 +23,8 @@ export default {
 		'noMonthView',
 		'isSliding',
 		'selectedEvent',
-		'setSelectedEvent'
+		'setSelectedEvent',
+		'rowMinHeight'
 	],
 	props: {
 		year: Number,
@@ -38,7 +39,7 @@ export default {
 	computed: {
 		getGridStyle() {
 			return {
-				'min-height': '100px',
+				'min-height': this.rowMinHeight,
 				// this.size is the magic number anyway which directs font-size,
 				// which in turn influences a lot of layout
 				width: '42px'
