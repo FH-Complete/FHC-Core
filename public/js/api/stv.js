@@ -3,6 +3,7 @@ import students from './stv/students.js';
 import filter from './stv/filter.js';
 import konto from './stv/konto.js';
 import grades from './stv/grades.js';
+import archiv from './stv/archiv.js';
 
 export default {
 	verband,
@@ -10,6 +11,7 @@ export default {
 	filter,
 	konto,
 	grades,
+	archiv,
 	configStudent() {
 		return this.$fhcApi.get('api/frontend/v1/stv/config/student');
 	},

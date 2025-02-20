@@ -91,6 +91,7 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_resources'),
 			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
 		];
+		/* TODO(chris): Ausgeblendet für Testing
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
@@ -103,7 +104,14 @@ class Config extends FHCAPI_Controller
 				'documentslist' => $this->gradesDocumentsList()
 			]
 		];
-		
+		*/
+		$result['archive'] = [
+			'title' => $this->p->t('stv', 'tab_archive'),
+			'component' => './Stv/Studentenverwaltung/Details/Archiv.js'
+			//~ 'config' => [
+				//~ //'columns' => $this->kontoColumns()
+			//~ ]
+		];
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
 			return $result;
@@ -137,6 +145,13 @@ class Config extends FHCAPI_Controller
 				'changeStatusToDiplomand' => $this->permissionlib->isBerechtigt('admin'),
 				'changeStatusToAbsolvent' => $this->permissionlib->isBerechtigt('admin')
 			]
+		];
+		$result['archive'] = [
+			'title' => $this->p->t('stv', 'tab_archive'),
+			'component' => './Stv/Studentenverwaltung/Details/Archiv.js'
+			//~ 'config' => [
+				//~ //'columns' => $this->kontoColumns()
+			//~ ]
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {
