@@ -366,7 +366,7 @@ export default {
 					<div id="scroll g-0" style="height: 100%; overflow-y: scroll;">
 
 						<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
-							<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
+							<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border" :style="hourGridStyle(hour)"></div>
 
 							<Transition>
 								<div v-if="hourPosition && !noEventsCondition" class="position-absolute border-top small"  :style="indicatorStyle">
@@ -381,7 +381,6 @@ export default {
 							<div>
 								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
 								<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
-
 									<div class="hours">
 										<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 									</div>
@@ -394,9 +393,16 @@ export default {
 													class="small rounded overflow-hidden fhc-entry"
 													v-contrast
 													>
-													<slot class="p-1" name="dayPage" :event="event" :day="day">
-														<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
-													</slot>
+													<div class="d-none d-xl-block">
+														<slot name="dayPage" :event="event" :day="day" :mobile="false">
+															<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+														</slot>
+													</div>
+													<div class="d-block d-xl-none">
+														<slot name="dayPage" :event="event" :day="day" :mobile="true">
+															<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+														</slot>
+													</div>
 												</div>
 											</div>
 										</div>
@@ -414,7 +420,7 @@ export default {
 													<p>this is a slot placeholder</p>
 												</slot>
 											</div>
-		
+
 										</div>
 									</div>
 								</div>
@@ -432,9 +438,7 @@ export default {
 							</slot>
 						</template>
 						<template v-else-if="noEventsCondition">
-							<slot name="pageMobilContentEmpty" >
-								<h3>This is an slot placeholder</h3>
-							</slot>
+							<h3>Keine Lehrveranstaltungen</h3>
 						</template>
 						<template v-else>
 							<div class="p-4 d-flex w-100 justify-content-center align-items-center">

@@ -250,9 +250,6 @@ export default {
 			<template #pageMobilContent="{lvMenu, event}">
 				<slot name="pageMobilContent" :lvMenu="lvMenu" :event="event"></slot>
 			</template>
-			<template #pageMobilContentEmpty>
-				<slot name="pageMobilContentEmpty" ></slot>
-			</template>
 			<template #minimizedPage="{event,day}">
 				<slot name="minimizedPage" :event="event" :day="day"></slot>
 			</template>

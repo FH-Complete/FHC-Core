@@ -53,9 +53,6 @@ export default {
 				<template #pageMobilContent="{lvMenu, event}">
 					<slot name="pageMobilContent" :lvMenu="lvMenu" :event="event" ></slot>
 				</template>
-				<template #pageMobilContentEmpty>
-					<slot name="pageMobilContentEmpty" ></slot>
-				</template>
 			</calendar-day-page>
 		</calendar-pane>
 	</div>`

@@ -69,8 +69,27 @@
   display: grid;
 }
 
+.all-day-event-border{
+	box-shadow: 1px 1px 0 #dee2e6;
+}
+
+.all-day-event{
+	max-height: 75px;
+	overflow:scroll;
+}
+
+.all-day-event-container{
+	position: sticky;
+	top: 44px;
+	display:grid;
+	grid-template-columns:repeat(7,1fr);
+	width:100%;
+	box-shadow: 0px 1px 0px #dee2e6;
+	z-index:3;
+}
+
 /* grid hour lines of the Stundenplan use box-shadow instead of border because box-shadow renders consistently on different viewports*/
-.box-shadow-border-top{
+.box-shadow-border{
 	box-shadow: 0 0 0 1px #dee2e6 !important;
 }
 

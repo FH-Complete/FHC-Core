@@ -249,8 +249,8 @@ export default {
 			}
 		},
 		calcHourPosition(event) {
-			let height = this.$refs.eventcontainer.getBoundingClientRect().height;
-			let top = this.$refs.eventcontainer.getBoundingClientRect().top;
+			let height = this.$refs['eventsRef' + this.week].getBoundingClientRect().height;
+			let top = this.$refs['eventsRef' + this.week].getBoundingClientRect().top;
 			let position = event.clientY - top;
 			// position percentage of total height
 			let timePercentage = (position / height) * 100;
@@ -350,34 +350,35 @@ export default {
 					<a href="#" class="small text-secondary text-decoration-none" >{{dayText[day]?.datum}}</a>
 				</div>
 			</div>
-			<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
-				<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
-				<Transition>
-					<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
-						<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
-					</div>
-				</Transition>
-
-				<div class="events" :ref="'eventsRef'+week">
-
-					<div class="hours">
-						<div v-for="hour in hours" :style="getGridStyle" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
-					</div>
-					<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start position-relative" :style="dayGridStyle(day)">
-						<div class="position-absolute w-100" style="top:0; bottom:0;">
-							<div class="position-sticky d-grid " style="top:44px;" v-for="(events,_day) in allDayEvents" :key="day">
-								<div v-if="dayindex == _day" v-for="event in events" :key="event" @click.prevent="weekPageClick(event, _day)"
+			<div ref="eventcontainer" class="position-relative flex-grow-1" >
+				<div class="all-day-event-container" >
+					<div class="all-day-event all-day-event-border" v-for="(day,dayindex) in eventsPerDayAndHour">
+						<div class="position-sticky d-grid mx-1" style="top:0;" v-for="(events,_day) in allDayEvents" :key="_day">
+						
+						<div v-if="dayindex == _day" v-for="event in events" :key="event" @click.prevent="weekPageClick(event, _day)"
 									:selected="event == selectedEvent"
-									:style="{'background-color': event?.color, 'z-index':2, 'margin-bottom':'1px'}"
+									:style="{'background-color': event?.color, 'margin-bottom':'1px'}"
 									class="small rounded overflow-hidden fhc-entry"
 									v-contrast
-									>
+									>		
 									<slot class="p-1" name="weekPage" :event="event" :day="day">
 										<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 									</slot>
 								</div>
 							</div>
+					</div>
+				</div>
+				<div class="events position-relative" :ref="'eventsRef'+week" @mousemove="calcHourPosition" @mouseleave="hourPosition = null">
+					<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border" :style="hourGridStyle(hour)"></div>
+					<Transition>
+						<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
+							<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 						</div>
+					</Transition>
+					<div class="hours">
+						<div v-for="hour in hours" :style="getGridStyle" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
+					</div>
+					<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start position-relative" :style="dayGridStyle(day)">
 						<Transition>
 							<div v-if="day.isToday" class="position-absolute border-top small"  :style="curIndicatorStyle">
 								<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
