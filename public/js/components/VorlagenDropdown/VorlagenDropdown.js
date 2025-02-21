@@ -1,5 +1,5 @@
 import {CoreFilterCmpt} from "../filter/Filter.js";
-import FormForm from '../Form/Form';
+import FormForm from '../Form/Form.js';
 import FormInput from '../Form/Input.js';
 
 export default {
@@ -39,16 +39,13 @@ export default {
 	},
 	methods: {
 		updateValue() {
-		//	console.log("in COMPO: update: " + this.selectedValue + ' jetzt ' + 'InfocenterMailErgaenzungsprfEng');
 			this.$emit('change', this.selectedValue);
-			//this.$emit('change', this.selectedValue); // Emit-Event beim Ändern des Wertes
 		},
 		setValue(value) {
 			this.selectedValue = value;
 		},
 	},
-	 created() {
-
+	created() {
 		if(this.isAdmin) {
 			this.$fhcApi.factory.vorlagen.getVorlagen()
 				.then(result => {
@@ -103,7 +100,6 @@ template: `
 				</option>
 			</form-input>
 		</div>
-		
 	</div>
 	`,
 }

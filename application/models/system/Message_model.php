@@ -323,5 +323,4 @@ class Message_model extends DB_Model
 		return $this->execQuery($sql, array($message_id));
 	}
 	
-	
 }

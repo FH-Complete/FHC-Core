@@ -3,7 +3,6 @@ import FormInput from '../../Form/Input.js';
 import ListBox from "../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
 import DropdownComponent from '../../VorlagenDropdown/VorlagenDropdown.js';
 
-
 export default {
 	components: {
 		FormForm,
@@ -21,6 +20,7 @@ export default {
 			type: [Number, String],
 			required: true
 		},
+		openMode: String,
 	},
 	data(){
 		return {
@@ -45,12 +45,14 @@ export default {
 			itemsPrestudent: [],
 			itemsPerson: [],
 			itemsUser: [],
-			selectedFieldStudent: null,
+/*			selectedFieldStudent: null,
 			itemsStudent: [
 				{ label: "Variable 1", value: "var1" },
 				{ label: "Variable 2", value: "var2" },
 				{ label: "Variable 3", value: "var3" }
-			]
+			]*/
+			previewText: null,
+			previewBody: ""
 		}
 	},
 	methods: {
@@ -86,22 +88,35 @@ export default {
 		updateText(value) {
 			this.formData.body = value;
 		},
-		sendMessage(){
+		sendMessage() {
 			//TODO(Manu) check default recipient(s)
 			const data = new FormData();
+			const params = {
+					id: this.id,
+					type_id: this.typeId
+			};
+			const merged = {
+				...this.formData,
+				...params
+			};
+			data.append('data', JSON.stringify(merged));
 
-			data.append('data', JSON.stringify(this.formData));
-			return this.$fhcApi.factory.messages.person.sendMessage(this.$refs.formVorlage, this.id, data)
+			return this.$fhcApi.factory.messages.person.sendMessage(
+				this.$refs.formMessage,
+				this.id,
+				data)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					//this.hideModal('messageModal');
+					this.hideTemplate();
 					this.resetForm();
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-					//this.resetForm();
-					//closeModal
-					//closewindwo
-				}
+						//this.resetForm();
+						//closeModal
+						//closewindwo
+						this.$emit('reloadTable');
+					}
 				);
 		},
 		getVorlagentext(vorlage_kurzbz){
@@ -120,9 +135,37 @@ export default {
 					//closewindwo
 				});
 		},
+		getPreviewText(){
+			const data = new FormData();
+
+			data.append('data', JSON.stringify(this.formData.body));
+			return this.$fhcApi.factory.messages.person.getPreviewText({
+				id: this.id,
+				type_id: this.typeId}, data)
+				.then(response => {
+					this.previewText = response.data;
+				}).catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					//this.resetForm();
+					//closeModal
+					//closewindwo
+				});
+		},
 		insertVariable(selectedItem){
 			if (this.editor) {
 				this.editor.insertContent(selectedItem.value + " ");
+				//TODO(Manu) check: nicht mal mit Punkt adden gehts ohne eintrag nach vars
+/*				this.editor.focus();
+				this.editor.setDirty(true);*/
+
+				//this.editor.fire('change'); //forces
+
+				//this.editor.undoManager.add();
+
+				//this.editor.insertContent(selectedItem.value + "\u00A0");
+				//this.editor.insertContent(`<span>${selectedItem.value}&nbsp;</span>`);
+				//this.editor.selection.setCursorLocation(this.editor.getBody(), 1);
+
 			} else {
 				console.error("Editor instance is not available.");
 			}
@@ -207,6 +250,19 @@ export default {
 				this.formData.subject = vorlage_kurzbz;
 			}
 		},
+		hideTemplate(){
+			if (this.openMode == "showDiv")
+				this.isVisible = false;
+		},
+		showTemplate(){
+			if (this.openMode == "showDiv")
+				this.isVisible = true;
+		},
+		showPreview(){
+			this.getPreviewText().then(() => {
+				this.previewBody = this.previewText;
+			});
+		}
 	},
 	watch: {
 		'formData.body': {
@@ -227,14 +283,10 @@ export default {
 					this.formData.subject = newVal;
 					return this.getVorlagentext(newVal);
 				}
-				//TODO(Manu) own function or retval to getVorlagentext
-				//component VorlagenComponent
-
 			}
 		}
 	},
 	created(){
-
 		if(this.typeId == 'person_id'){
 			this.$fhcApi.factory.messages.person.getMessageVarsPerson()
 				.then(result => {
@@ -246,7 +298,6 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		}
-
 		if(this.typeId == 'uid') {
 			this.$fhcApi.factory.messages.person.getMsgVarsPrestudent(this.id)
 				.then(result => {
@@ -258,8 +309,8 @@ export default {
 						value: value
 					}));*/
 					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
-						label: key,
-						value: '{' + key + '}'
+						label: key.toLowerCase(),
+						value: '{' + key.toLowerCase() + '}'
 					}));
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -292,157 +343,185 @@ export default {
 	},
 	template: `
 	<div class="messages-detail-newmessage">
-	
-		<div v-show="isVisible">
-			<h4>New Message</h4>
-			
-				{{typeId}} {{id}}
-			
-				{{formData.subject}}
-				{{formData.vorlage_kurzbz}}
-	
-			<p v-if="formData.body">
-				formData.body befüllt
-			</p>
-
-			<div class="row">
-			
-				<div class="col-sm-8">
-		
-					<form-form class="row g-3 mt-2" ref="formMessage">
-					
-						<div class="row mb-3">
-						
-							<form-input
-								type="text"
-								name="recipient"
-								:label="$p.t('messages/recipient')"
-								v-model="defaultRecipient"
-								disabled
-							>
-							</form-input>					
-						</div>
-						
-						<div class="row mb-3">
-							<form-input
-								type="text"
-								name="subject"
-								:label="$p.t('global/betreff') + ' *'"
-								v-model="formData.subject"
-							>
-							</form-input>					
-						</div>
-				
-						<!--Tiny MCE-->
-						<div class="row mb-3">
-							<form-input
-								ref="editor"
-								:label="$p.t('global','nachricht')  + ' *'"
-								type="textarea"
-								v-model="formData.body"
-								name="text"
-								rows="15"
-								cols="75"
-								>
-							</form-input>
-						</div>
-								
-						<div class="row">				
-							<DropdownComponent
-								ref="dropdownComp"
-								:label="$p.t('global/vorlage')"
-								@change="handleSelectedVorlage"
-								useLoggedInUserOe
-							>
-							</DropdownComponent>
-						</div>
-											
-					</form-form>
-				</div>
-		
-				<div class="col-sm-4">
-				
-					<div v-if="this.fieldsPrestudent.length > 0">
-						<strong>Felder Prestudent</strong>
-						<div class="border p-3 overflow-auto" style="height: 200px;">
-							
-							<list-box
-								v-model="selectedFieldPrestudent"
-								:options="itemsPrestudent"
-								optionLabel="label"
-							>
-							  <template #option="slotProps">
-								<div @dblclick="insertVariable(slotProps.option)">
-								  {{ slotProps.option.label }}
-								</div>
-							  </template>
-							</list-box>
-													
-						</div>
-						
-						<button class="m-3" @click="insertVariablePrestudent">Insert Variable</button>
-						<p>{{selectedFieldPrestudent}}</p>
-
-					</div>
-					
-					<div v-if="this.fieldsPerson.length > 0">
-						<strong>Felder Person</strong>
-						<div class="border p-3 overflow-auto" style="height: 200px;">
-							
-							<list-box
-								v-model="selectedFieldPerson"
-								:options="itemsPerson"
-								optionLabel="label"
-							>
-								<template #option="slotProps">
-									<div @dblclick="insertVariable(slotProps.option)">
-									  {{ slotProps.option.label }}
-									</div>
-							  </template>
-							</list-box>
-													
-						</div>
-						<button class="m-3" @click="insertVariablePerson">Insert Variable</button>
-						<p>{{selectedFieldPerson}}</p>
-					</div>
-							
-					<div>
-						<strong>Meine Felder</strong>
-						<div class="border p-3 overflow-auto" style="height: 200px;">
-							
-							<list-box
-								v-model="selectedFieldUser"
-								:options="itemsUser"
-								optionLabel="label"
-							>
-								<template #option="slotProps">
-									<div @dblclick="insertVariable(slotProps.option)">
-									  {{ slotProps.option.label }}
-									</div>
-							  </template>
-							</list-box>
-													
-						</div>
-						<button class="m-3" @click="insertVariableUser">Insert Variable</button>
-					</div>
-					
-					
-					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
-					
-						<button class="btn btn-secondary" @click="resetForm">Reset All</button>
-						
-						<button v-if="statusNew" type="button" class="btn btn-primary" @click="sendMessage()">{{$p.t('ui', 'nachrichtSenden')}}</button>
-						<button v-else type="button" class="btn btn-primary" @click="replyMessage(formData.message_id)">{{$p.t('global', 'reply')}}</button>
-					</div>
-					
-				</div>
-				
-			</div>
-		</div>
-		
-		<hr>
+			<hr>
 		<button type="button" class="btn btn-warning" @click="toggleDivNewMessage()">Toggle NewMessage</button>
 		<hr>
+
+		<div v-show="isVisible">
+			<div class="overflow-auto" style="max-height: 500px; border: 1px solid #ccc;">
+
+				<h4>New Message</h4>
+	<!--			{{formData.body}}
+				||
+				{{previewText}}-->
+
+				<div class="row">
+					<div class="col-sm-8">
+						<form-form class="row g-3 mt-2" ref="formMessage">
+
+						<!--TODO(Manu) ist eigentlich ein Array, hier werden alle Einträge angegeben als String-->
+							<div class="row mb-3">
+
+								<form-input
+									type="text"
+									name="recipient"
+									:label="$p.t('messages/recipient')"
+									v-model="defaultRecipient"
+									disabled
+								>
+								</form-input>
+							</div>
+							
+							<div class="row mb-3">
+								<form-input
+									type="text"
+									name="subject"
+									:label="$p.t('global/betreff') + ' *'"
+									v-model="formData.subject"
+								>
+								</form-input>
+							</div>
+
+							<!--Tiny MCE-->
+							<div class="row mb-3">
+								<form-input
+									ref="editor"
+									:label="$p.t('global','nachricht')  + ' *'"
+									type="textarea"
+									v-model="formData.body"
+									name="text"
+									rows="15"
+									cols="75"
+									>
+								</form-input>
+							</div>
+
+							<div class="row">
+								<DropdownComponent
+									ref="dropdownComp"
+									:label="$p.t('global/vorlage')"
+									@change="handleSelectedVorlage"
+									useLoggedInUserOe
+								>
+								</DropdownComponent>
+							</div>
+
+						</form-form>
+					</div>
+
+					<div class="col-sm-4">
+						<div v-if="this.fieldsPrestudent.length > 0">
+							<strong>Felder Prestudent</strong>
+							<div class="border p-3 overflow-auto" style="height: 200px;">
+
+								<list-box
+									v-model="selectedFieldPrestudent"
+									:options="itemsPrestudent"
+									optionLabel="label"
+								>
+								  <template #option="slotProps">
+									<div @dblclick="insertVariable(slotProps.option)">
+									  {{ slotProps.option.label }}
+									</div>
+								  </template>
+								</list-box>
+
+							</div>
+
+							<button class="m-3" @click="insertVariablePrestudent">Insert Variable</button>
+							<p>{{selectedFieldPrestudent}}</p>
+
+						</div>
+
+						<div v-if="this.fieldsPerson.length > 0">
+							<strong>Felder Person</strong>
+							<div class="border p-3 overflow-auto" style="height: 200px;">
+
+								<list-box
+									v-model="selectedFieldPerson"
+									:options="itemsPerson"
+									optionLabel="label"
+								>
+									<template #option="slotProps">
+										<div @dblclick="insertVariable(slotProps.option)">
+										  {{ slotProps.option.label }}
+										</div>
+								  </template>
+								</list-box>
+
+							</div>
+							<button class="m-3" @click="insertVariablePerson">Insert Variable</button>
+							<p>{{selectedFieldPerson}}</p>
+						</div>
+
+						<div>
+							<strong>Meine Felder</strong>
+							<div class="border p-3 overflow-auto" style="height: 200px;">
+
+								<list-box
+									v-model="selectedFieldUser"
+									:options="itemsUser"
+									optionLabel="label"
+								>
+									<template #option="slotProps">
+										<div @dblclick="insertVariable(slotProps.option)">
+										  {{ slotProps.option.label }}
+										</div>
+								  </template>
+								</list-box>
+
+							</div>
+							<button class="m-3" @click="insertVariableUser">Insert Variable</button>
+						</div>
+
+						<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+
+							<button class="btn btn-secondary" @click="resetForm">Reset All</button>
+
+							<button v-if="statusNew" type="button" class="btn btn-primary" @click="sendMessage()">{{$p.t('ui', 'nachrichtSenden')}}</button>
+							<button v-else type="button" class="btn btn-primary" @click="replyMessage(formData.message_id)">{{$p.t('global', 'reply')}}</button>
+						</div>
+
+					</div>
+
+				</div>
+
+				<div class="row mt-4">
+
+					<h4>Vorschau:</h4>
+					<div>
+						<form-form class="row g-3 mt-2" ref="formPreview">
+
+							<div class="col-sm-2 mb-3">
+								<form-input
+									type="select"
+									name="recipient"
+									:label="$p.t('messages/recipient')"
+									v-model="defaultRecipient"
+								>
+								</form-input>
+							</div>
+
+							<div class="col-md-2 mt-4">
+								<br>
+								<button type="button" class="btn bt		n-secondary" @click="showPreview()">Aktualisieren</button>
+							</div>
+						</form-form>
+
+						<div class="col-sm-12 overflow-scroll">
+								<div ref="preview">
+									<div v-html="previewBody" class="p-3 border rounded overflow-scroll twoColumns"></div>
+								</div>
+						</div>
+
+					</div>
+
+				</div>
+	
+			</div>
+
+		</div>
+
 	</div>
 	`
 

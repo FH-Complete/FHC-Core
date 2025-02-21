@@ -28,31 +28,56 @@ export default {
 				].includes(value)
 			}
 		},
+		openMode: {
+			type: String,
+			default: 'window',
+			validator(value) {
+				return [
+					'window',
+					'modal',
+					'showDiv'
+				].includes(value)
+			}
+		}
 	},
 	data() {
 		return {}
+	},
+	methods: {
+		showNewMessageTemplate(){
+			this.$refs.templateNewMessage.showTemplate();
+		},
+		reloadTable(){
+			this.$refs.templateTableMessage.reload();
+		}
 	},
 	template: `
 	<div class="core-messages h-100 pb-3">
 <!--	<p>endpoint Messages.js: {{endpoint}}</p>-->
 		<div v-if="showNew">
-			<NewMessage
+			<new-message
+				ref="templateNewMessage"
 				:type-id="typeId"
 				:id="id"
 				:endpoint="endpoint"
+				:openMode="openMode"
+				@reloadTable="reloadTable"
 			>
-			</NewMessage>
+			</new-message>
 		</div>
 		
 		<div v-if="showTable">
-			<TableMessages
+			<table-messages
+				ref="templateTableMessage"
 				:type-id="typeId"
 				:id="id"
 				:endpoint="endpoint"
 				:messageLayout="messageLayout"
+				:openMode="openMode"
+				@showNewMessageTemplate="showNewMessageTemplate"
 			>
 			
-			</TableMessages>
+			</table-messages>
 		</div>
 		
 	</div>

@@ -22,6 +22,7 @@ export default {
 			required: true
 		},
 		messageLayout: String,
+		openMode: String
 	},
 	//TODO(Manu) endpoint macht Probleme
 	data(){
@@ -238,15 +239,14 @@ export default {
 				const linkWindowNewMessage = this.cisRoot + '/public/js/components/Messages/Details/NewMessage.js';
 				window.open(linkWindowNewMessage, '_blank');
 			}
-			else if (this.openmode == "modal"){
+			else if (this.openMode == "modal"){
 				console.log("open with bootstrap Modal");
 			}
-			else if (this.openmode == "showDiv"){
-				console.log("open div in NewMessage.js");
-				//emit to NewMessage.js
+			else if (this.openMode == "showDiv"){
+				this.$emit('showNewMessageTemplate');
 			}
 			else
-				console.log("no valid openmode: yet to be developed");
+				console.log("no valid openMode");
 		},
 		reload() {
 			this.$refs.table.reloadTable();

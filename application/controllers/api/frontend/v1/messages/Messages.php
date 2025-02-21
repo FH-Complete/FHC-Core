@@ -17,10 +17,12 @@ class Messages extends FHCAPI_Controller
 			'sendMessage' => ['admin:r', 'assistenz:r'],
 			'deleteMessage' => ['admin:r', 'assistenz:r'],
 			'getVorlagentext' => ['admin:r', 'assistenz:r'],
+			'getPreviewText' => ['admin:r', 'assistenz:r'],
 		]);
 
 		//Load Models
 		$this->load->model('system/Message_model', 'MessageModel');
+		$this->load->model('CL/Messages_model', 'MessagesModel');
 
 		// Additional Permission Checks
 		//TODO(manu) check permissions
@@ -179,8 +181,7 @@ class Messages extends FHCAPI_Controller
 
 	public function sendMessage($recipient_id)
 	{
-		//TODO(manu) Problems with Vorlagen...
-		//TODO(Manu) Problems with VARS
+		//default setting
 		$receiversPersonId = $this->_getPersonIdFromUid($recipient_id);
 
 		$uid = getAuthUID();
@@ -201,33 +202,92 @@ class Messages extends FHCAPI_Controller
 			}
 		}
 
-		$subject = $this->input->post('subject');
+		$this->load->library('form_validation');
 
+		$this->form_validation->set_rules('subject', 'Betreff', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Betreff'])
+		]);
+
+		$this->form_validation->set_rules('body', 'Text', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Text'])
+		]);
+
+		if ($this->form_validation->run() == false)
+		{
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
+
+		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
 
-	//	$this->terminateWithError("rp_id " . $receiversPersonId, self::ERROR_TYPE_GENERAL);
 
-/*		$subject = $this->input->post('subject');
 
-		$formData = $this->input->post('data');*/
+		$typeId = $this->input->post('type_id');
+		$id = $this->input->post('id');
 
-		//$_POST['subject'] = $formData['subject'];
-	//	$subject = $formData['subject'];
-	//	$body = $formData['body'];
+		if($typeId == 'uid')
+		{
+			//$this->terminateWithError("uid ", self::ERROR_TYPE_GENERAL);
+			$prestudent_id = $this-> _getPrestudentIdFromUid($id);
 
-	//	$subject = isset($_POST['subject']) ? $_POST['subject'] : null;
-	//	$body = isset($_POST['body']) ? $_POST['body'] : null;
+			//parseMessagetext for variables Prestudent
+			$result = $this->MessagesModel->parseMessageTextPrestudent($prestudent_id, $body);
+			$bodyParsed = $this->getDataOrTerminateWithError($result);
+		}
+		elseif($typeId == 'person_id')
+		{
+			$this->terminateWithError("person_id ", self::ERROR_TYPE_GENERAL);
 
-	//	$this->terminateWithError("person_id " . $receiversPersonId, self::ERROR_TYPE_GENERAL);
+			$result = $this->MessagesModel->parseMessageTextPerson($id, $body);
+			$bodyParsed = $this->getDataOrTerminateWithError($result);
+		}
+		elseif($typeId == 'prestudent_id')
+		{
+			$this->terminateWithError("prestudent_id ", self::ERROR_TYPE_GENERAL);
 
-	//	$this->terminateWithError("subject " . $subject, self::ERROR_TYPE_GENERAL);
-	//	$this->terminateWithError("body " . $body, self::ERROR_TYPE_GENERAL);
+			$result = $this->MessagesModel->parseMessageTextPrestudent($id, $body);
+			$bodyParsed = $this->getDataOrTerminateWithError($result);
+		}
+		else
+		{
+			$this->terminateWithError("type_id " . $typeId . " not valid", self::ERROR_TYPE_GENERAL);
+		}
 
-	//	$this->terminateWithError("person_id " . $benutzer->person_id, self::ERROR_TYPE_GENERAL);
-	//	$this->terminateWithError("subject " . $subject, self::ERROR_TYPE_GENERAL);
-		$result = $this->messagelib->sendMessageUser($receiversPersonId, $subject, $body, $benutzer->person_id);
+		$result = $this->messagelib->sendMessageUser($receiversPersonId, $subject, $bodyParsed, $benutzer->person_id);
 
 		$this->terminateWithSuccess($result);
+	}
+
+	public function getPreviewText($id, $type_id)
+	{
+		if (isset($_POST['data']))
+		{
+			$data = json_decode($_POST['data']);
+			unset($_POST['data']);
+
+		}
+		else
+			$this->terminateWithError("Textbody missing ", self::ERROR_TYPE_GENERAL);
+
+		switch($type_id)
+		{
+			case 'uid':
+				$prestudent_id = $this->_getPrestudentIdFromUid($id);
+				$result = $this->MessagesModel->parseMessageTextPrestudent($prestudent_id, $data);
+
+				break;
+			case 'person_id':
+				$id = $id;
+				break;
+			default:
+				$this->terminateWithError("MESSAGES::getPreviewText logic for type_id " . $type_id . " not defined yet", self::ERROR_TYPE_GENERAL);
+				break;
+		}
+
+		//$this->terminateWithSuccess($result);
+		$bodyParsed = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($bodyParsed);
 	}
 
 	public function deleteMessage($messageId)
@@ -237,6 +297,7 @@ class Messages extends FHCAPI_Controller
 
 		$result = $this->MessageModel->deleteMessageRecipient($messageId);
 		if (isError($result)) {
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 
@@ -265,6 +326,7 @@ class Messages extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 		$benutzer = current($data);
 
+		//return $data->person_id;
 		return $benutzer->person_id;
 	}
 

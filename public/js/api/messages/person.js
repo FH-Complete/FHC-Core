@@ -20,13 +20,13 @@ export default {
 	getNameOfDefaultRecipient(params){
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getNameOfDefaultRecipient/' + params.id + '/' + params.type_id);
 	},
+	getPreviewText(params, data){
+		return this.$fhcApi.post('api/frontend/v1/messages/messages/getPreviewText/' + params.id + '/' + params.type_id,
+			data);
+	},
 	sendMessage(form, id, data) {
-	console.log("factory " + id);
-		console.log(JSON.stringify(data));
-
-		return this.$fhcApi.post(form, 'api/frontend/v1/messages/messages/sendMessage/' + id,
-			data
-		);
+		return this.$fhcApi.post(form,'api/frontend/v1/messages/messages/sendMessage/' + id,
+			data);
 	},
 	deleteMessage(messageId){
 		return this.$fhcApi.post('api/frontend/v1/messages/messages/deleteMessage/' + messageId);

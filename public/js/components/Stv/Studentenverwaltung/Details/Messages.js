@@ -1,4 +1,5 @@
 import CoreMessages from "../../../Messages/Messages.js";
+//import CoreMessages from "@/Messages/Messages.js";
 
 export default {
 	components: {
@@ -17,6 +18,7 @@ export default {
 			messageLayout="twoColumnsTableLeft"
 			show-table
 			show-new
+			open-mode="showDiv"
 			>
 		</core-messages>
 
