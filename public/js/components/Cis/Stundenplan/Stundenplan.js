@@ -16,6 +16,7 @@ const Stundenplan = {
 			eventCalendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
 			currentDay: this.propsViewData?.focus_date ? new Date(this.propsViewData.focus_date) : new Date(),
+			lv: null,
 			minimized: false,
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
@@ -73,8 +74,17 @@ const Stundenplan = {
 			let ende = new Date(this.studiensemester_ende);
 			ende = Math.floor(ende.getTime() / 1000);
 
-			let download_link = (format, version = "", target = "") => `${FHC_JS_DATA_STORAGE_OBJECT.app_root}cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=${this.uid}&begin=${start}&ende=${ende}&format=${format}${version ? '&version=' + version : ''}${target ? '&target=' + target : ''}`;
-			return [{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link('excel') }, { title: "csv", icon: 'fa-solid fa-file-csv', link: download_link('csv') }, { title: "ical1", icon: 'fa-regular fa-calendar', link: download_link('ical', '1', 'ical') }, { title: "ical2", icon: 'fa-regular fa-calendar', link: download_link('ical', '2', 'ical') }];
+			let download_link = 
+				(format, version = "", target = "") => 
+					`${FHC_JS_DATA_STORAGE_OBJECT.app_root}cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=
+					${this.uid}&begin=${start}&ende=${ende}&format=${format}
+					${version ? '&version=' + version : ''}${target ? '&target=' + target : ''}`;
+			return [
+				{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link('excel') },
+				{ title: "csv", icon: 'fa-solid fa-file-csv', link: download_link('csv') },
+				{ title: "ical1", icon: 'fa-regular fa-calendar', link: download_link('ical', '1', 'ical') },
+				{ title: "ical2", icon: 'fa-regular fa-calendar', link: download_link('ical', '2', 'ical') }
+			];
 		},
 		weekFirstDay: function () {
 			return this.calendarDateToString(this.calendarDate.cdFirstDayOfWeek);
@@ -195,7 +205,9 @@ const Stundenplan = {
 				let promise_events = [];
 				result.forEach((promise_result) => {
 					if (promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success") {
-
+						
+						if(promise_result.value.meta?.lv) this.lv = promise_result.value.meta.lv
+						
 						let data = promise_result.value.data;
 						// adding additional information to the events 
 						if (data && data.forEach) {
@@ -232,7 +244,11 @@ const Stundenplan = {
 		if(this.$refs.lvmodal) this.$refs.lvmodal.hide()	
 	},
 	template:/*html*/`
-	<h2>{{$p.t('lehre/stundenplan')}}</h2>
+	<h2>
+		{{$p.t('lehre/stundenplan')}}
+		<span style="padding-left: 0.4em;" v-show="studiensemester_kurzbz">{{studiensemester_kurzbz}}</span>
+		<span style="padding-left: 0.5em;" v-show="propsViewData?.lv_id && lv"> {{ $p.user_language.value === 'German' ? lv?.bezeichnung : lv?.bezeichnung_english}}</span>
+	</h2>
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
 	<fhc-calendar 
