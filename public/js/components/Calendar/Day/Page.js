@@ -61,13 +61,13 @@ export default {
 			},
 			immediate: true,
 		},
-		eventsPerDayAndHour: {
+		events: {
 			handler(newEvents) {
 				// if no event is selected, select the first event of the day
-				if (this.selectedEvent == null && newEvents[this.day.toDateString()]?.events.length > 0) {
-					let events = newEvents[this.day.toDateString()]?.events;
+				if (this.selectedEvent == null && newEvents[this.day.toDateString()].length > 0) {
+					let events = newEvents[this.day.toDateString()];
 					if (Array.isArray(events) && events.length > 0) {
-						this.setSelectedEvent(events[0].orig);
+						this.setSelectedEvent(events[0]);
 					}
 				}
 			},
@@ -298,8 +298,8 @@ export default {
 			this.$emit('input', event);
 		},
 		calcHourPosition(event) {
-			let height = this.$refs.eventcontainer.getBoundingClientRect().height;
-			let top = this.$refs.eventcontainer.getBoundingClientRect().top;
+			let height = this.$refs.events.getBoundingClientRect().height;
+			let top = this.$refs.events.getBoundingClientRect().top;
 			let position = event.clientY - top;
 			// position percentage of total height
 			let timePercentage = (position / height) * 100;
@@ -365,35 +365,18 @@ export default {
 					</div>
 					<div id="scroll g-0" style="height: 100%; overflow-y: scroll;">
 
-						<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
-							<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border" :style="hourGridStyle(hour)"></div>
+						<div ref="eventcontainer" class="position-relative flex-grow-1"  >
+							<div class="all-day-event-container" >
+								<div class="all-day-event all-day-event-border" v-for="(day,dayindex) in eventsPerDayAndHour">
+									<template v-for="(events,_day) in allDayEvents" :key="_day">
 
-							<Transition>
-								<div v-if="hourPosition && !noEventsCondition" class="position-absolute border-top small"  :style="indicatorStyle">
-									<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
-								</div>
-							</Transition>
-							<Transition>
-								<div v-if="lookingAtToday && !noEventsCondition" class="position-absolute border-top small"  :style="curIndicatorStyle">
-									<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
-								</div>
-							</Transition>
-							<div>
-								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
-								<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
-									<div class="hours">
-										<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
-									</div>
-									<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
-										<div class="position-absolute w-100" style="top:0; bottom:0;">
-											<div class="position-sticky d-grid " style="top:0;" v-for="(events,_day) in allDayEvents" :key="day">
-												<div v-if="dayindex == _day" v-for="event in events" :key="event" @click.prevent="eventClick(event)"
-													:selected="event == selectedEvent"
-													:style="{'background-color': event?.color, 'z-index':2, 'margin-bottom':'1px'}"
-													class="small rounded overflow-hidden fhc-entry"
-													v-contrast
-													>
-													<div class="d-none d-xl-block">
+									<div v-if="dayindex == _day" v-for="event in events" :key="event" class="d-grid m-1" style="top:0;" @click.prevent="eventClick(event)"
+												:selected="event == selectedEvent"
+												:style="{'background-color': event?.color, 'margin-bottom':'1px'}"
+												class="small rounded overflow-hidden fhc-entry"
+												v-contrast
+												>
+												<div class="d-none d-xl-block">
 														<slot name="dayPage" :event="event" :day="day" :mobile="false">
 															<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 														</slot>
@@ -403,9 +386,32 @@ export default {
 															<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 														</slot>
 													</div>
-												</div>
 											</div>
+										</template>
+								</div>
+							</div>
+
+
+
+							<div >
+								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
+								<div class="events position-relative" :class="{'fhc-calendar-no-events-overlay':noEventsCondition}" ref="events" @mousemove="calcHourPosition" @mouseleave="hourPosition = null">
+									<Transition>
+										<div v-if="hourPosition && !noEventsCondition" class="position-absolute border-top small"  :style="indicatorStyle">
+											<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
 										</div>
+									</Transition>
+									<Transition>
+										<div v-if="lookingAtToday && !noEventsCondition" class="position-absolute border-top small"  :style="curIndicatorStyle">
+											<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
+										</div>
+									</Transition>
+									<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border" :style="hourGridStyle(hour)"></div>
+									<div class="hours">
+										<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
+									</div>
+									<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
+										
 										<div v-if="lookingAtToday && !noEventsCondition" :style="overlayStyle"></div>
 										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast :selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden " >
 											<!-- desktop version of the page template, parent receives slotProp mobile = false -->

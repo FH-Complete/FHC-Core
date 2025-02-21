@@ -138,15 +138,15 @@ export default {
 		<div v-for="day in weeks[0].days" :key="day" class="bg-light fw-bold border-top border-bottom text-center">
 			{{dayText[day]}}
 		</div>
-		<template v-for="week in weeks" 
+		<template v-for="week in weeks"
 		:key="week.no">
 			<a href="#" v-if="showWeeks" class="fhc-calendar-month-page-weekday text-decoration-none text-end opacity-25"
 			@click.prevent="changeToWeek(week)">{{week.no}}</a>
-			<a href="#" 
-			@click.prevent="clickEvent(day,week)" 
-			@mouseover="highlight(week,day)" 
+			<a href="#"
+			@click.prevent="clickEvent(day,week)"
+			@mouseover="highlight(week,day)"
 			@mouseleave="highlightedWeek = null; highlightedDay = null"
-			v-for="day in week.days" 
+			v-for="day in week.days"
 			:key="day"
 			:class="getDayClass(week, day)" 
 			>
