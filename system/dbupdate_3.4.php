@@ -72,6 +72,7 @@ require_once('dbupdate_3.4/25999_C4_permission.php');
 require_once('dbupdate_3.4/41950_perm_gehaelter.php');
 require_once('dbupdate_3.4/53903_valorisierung.php');
 require_once('dbupdate_3.4/55968_index_anrechnung.php');
+require_once('dbupdate_3.4/55289_pep_fine_tuning.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -271,7 +272,7 @@ $tabellen=array(
 	"lehre.tbl_zeitfenster"  => array("wochentag","stunde","ort_kurzbz","studiengang_kz","gewicht"),
 	"lehre.tbl_zeugnis"  => array("zeugnis_id","student_uid","zeugnis","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
-	"lehre.tbl_lehrveranstaltung_faktor"  => array("lehrveranstaltung_faktor_id", "lehrveranstaltung_id","faktor","studiensemester_kurzbz_von","studiensemester_kurzbz_bis","insertamum","insertvon","updateamum","updatevon"),
+	"lehre.tbl_lehrveranstaltung_faktor"  => array("lehrveranstaltung_faktor_id", "lehrveranstaltung_id","faktor", "lehrform_kurzbz", "studiensemester_kurzbz_von","studiensemester_kurzbz_bis","insertamum","insertvon","updateamum","updatevon"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung", "co_name"),
 	"public.tbl_adressentyp"  => array("adressentyp_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig", "sort"),
@@ -321,6 +322,7 @@ $tabellen=array(
 	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id","ext_id","anrechnung_id"),
 	"public.tbl_notiz_dokument" => array("notiz_id","dms_id"),
+	"public.tbl_notiz_typ" => array("typ_kurzbz","bezeichnung_mehrsprachig", "beschreibung", "automatisiert", "aktiv", "zuordnung", "tag", "style", "vorrueckung", "prioritaet"),
 	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz","arbeitsplaetze"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre","standort","warn_semesterstunden_frei","warn_semesterstunden_fix","standort_id"),

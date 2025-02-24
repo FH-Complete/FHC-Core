@@ -192,11 +192,13 @@ export default {
 	},
 	template: `
 		<div class="plus_button_container" @mouseleave="hideList">
+			 <span :title="values.length === 0 ? 'Bitte Zeilen markieren' : ''">
 			<button @mouseover="showList = true" 
 					:disabled="!values || values.length === 0"
 					class="btn btn-sm">
 				<i class="fa-solid fa-tag fa-xl"></i>
 			</button>
+			</span>
 			<ul v-if="showList" class="dropdown_list">
 				<li v-for="(item, index) in tags" :key="index" @click="openModal(item)" :title="item.bezeichnung">
 					{{ item.bezeichnung }}
@@ -237,7 +239,7 @@ export default {
 						<button v-if="mode === 'edit'" class="btn btn-danger" @click="deleteTag">Löschen</button>
 					</div>
 					<button type="button" class="btn btn-primary" @click="saveTag">
-						{{ mode === "edit" ? $p.t('ui', 'bearbeiten') : $p.t('studierendenantrag', 'btn_create') }}
+						{{ mode === "edit" ? $p.t('global', 'speichern') : $p.t('global', 'create') }}
 					</button>
 				</div>
 			</template>
