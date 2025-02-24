@@ -10,12 +10,26 @@ const RoomInformation = {
     props:{
 		propsViewData: {
 			type: Object
+		},
+		rowMinHeight: {
+			type: String,
+			default: '100px'
+		},
+		eventMaxHeight: {
+			type: String,
+			default: '125px'
 		}
     },
 	components: {
 		FhcCalendar,
 		LvModal,
 		LvInfo,
+	},
+	provide() {
+		return {
+			rowMinHeight: this.rowMinHeight,
+			eventMaxHeight: this.eventMaxHeight
+		}
 	},
 	data() {
 		return {
@@ -79,14 +93,37 @@ const RoomInformation = {
 
 			this.currentDay = day;
 		},
+		handleOffset: function(offset)  {
+			this.currentDay = new Date(
+				this.currentDay.getFullYear() + offset.y,
+				this.currentDay.getMonth() + offset.m,
+				this.currentDay.getDate() + offset.d
+			)
+
+			const date = this.currentDay.getFullYear() + "-" +
+				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
+				String(this.currentDay.getDate()).padStart(2, "0");
+
+			this.$router.push({
+				name: "Stundenplan",
+				params: {
+					mode: this.calendarMode,
+					focus_date: date,
+					lv_id: this.propsViewData?.lv_id || null
+				}
+			})
+		},
 		handleChangeMode(mode) {
 			const modeCapitalized = mode.charAt(0).toUpperCase() + mode.slice(1)
-
+			const date = this.currentDay.getFullYear() + "-" +
+				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
+				String(this.currentDay.getDate()).padStart(2, "0");
+			
 			this.$router.push({
 				name: "RoomInformation",
 				params: {
 					mode: modeCapitalized,
-					focus_date: this.currentDay.toISOString().split("T")[0],
+					focus_date: date,
 					ort_kurzbz: this.propsViewData.ort_kurzbz
 				}
 			})
@@ -167,7 +204,8 @@ const RoomInformation = {
 			ref="calendar"
 			@selectedEvent="setSelectedEvent" 
 			:initial-date="currentDay"
-			@change:range="updateRange" 
+			@change:range="updateRange"
+			@change:offset="handleOffset"
 			:events="events" 
 			:initial-mode="propsViewData.mode"
 			show-weeks 

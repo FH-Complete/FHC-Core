@@ -153,6 +153,11 @@ class Stundenplan extends FHCAPI_Controller
 			$stundenplan_data = $this->StundenplanModel->getStundenplanLVA($start_date, $end_date, $lv_id);
 			$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data) ?? [];
 			$this->expand_object_information($stundenplan_data);
+
+			// query lv itself in case its Stundenplan is being queried and it has no entries
+			$this->load->model('education/Lehrveranstaltung_model','LehrveranstaltungModel');
+			$lv = getData($this->LehrveranstaltungModel->load($lv_id))[0];
+			$this->addMeta('lv', $lv);
 			$this->terminateWithSuccess($stundenplan_data);
 			
 		}

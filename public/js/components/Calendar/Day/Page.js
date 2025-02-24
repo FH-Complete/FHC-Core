@@ -36,6 +36,7 @@ export default {
 		'calendarClientHeight',
 		'setSelectedEvent',
 		'selectedEvent',
+		'rowMinHeight'
 	],
 	props: {
 		year: Number,
@@ -372,11 +373,12 @@ export default {
 								<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
 
 									<div class="hours">
-										<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
+										<div v-for="hour in hours" :style="'min-height:' + rowMinHeight " :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 									</div>
 									<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
 										<div v-if="lookingAtToday && !noEventsCondition" :style="overlayStyle"></div>
-										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast :selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden " >
+										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast 
+											:selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden" >
 											<!-- desktop version of the page template, parent receives slotProp mobile = false -->
 											<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
 												<slot  name="dayPage" :event="event" :day="day" :mobile="false">

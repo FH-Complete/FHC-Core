@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "86d9ee6aa7cbf758f847f7aad13177a2",
+    "content-hash": "d6cd19af6c321a0bf24efde2d65e1361",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -629,15 +629,15 @@
             "type": "component",
             "extra": {
                 "component": {
-                    "scripts": [
-                        "jquery.js"
-                    ],
                     "files": [
                         "jquery.min.js",
                         "jquery.min.map",
                         "jquery.slim.js",
                         "jquery.slim.min.js",
                         "jquery.slim.min.map"
+                    ],
+                    "scripts": [
+                        "jquery.js"
                     ]
                 }
             },
@@ -1759,8 +1759,8 @@
             "version": "1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/tomazdragar/SimpleCropper.git",
-                "reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
+                "url": "https://github.com/deveshsinghal22/SimpleCropper.git",
+                "reference": "873e5e1ca57c370bedd07a512d0bf562930d4b89"
             },
             "type": "library"
         },

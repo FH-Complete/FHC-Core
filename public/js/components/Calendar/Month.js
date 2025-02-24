@@ -35,9 +35,11 @@ export default {
 		},
 		prev() {
 			this.$refs.pane.prev();
+			this.$emit('change:offset', { y: 0, m: -1, d: 0 });
 		},
 		next() {
 			this.$refs.pane.next();
+			this.$emit('change:offset', { y: 0, m: 1, d: 0 });
 		},
 		selectDay(day) {
 			let m = day.getMonth();

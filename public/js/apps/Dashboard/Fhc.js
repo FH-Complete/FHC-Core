@@ -37,8 +37,10 @@ const router = VueRouter.createRouter({
 			redirect: (to) => {
 				return { // redirect to longer Rauminfo url and map params
 					name: "RoomInformation",
-					params: {
-						ort_kurzbz: to.params.ort_kurzbz
+					params: { // in this case always populate other params since they are not optional
+						ort_kurzbz: to.params.ort_kurzbz,
+						mode: DEFAULT_MODE_RAUMINFO,
+						focus_date: new Date().toISOString().split("T")[0]
 					},
 				};
 			},
@@ -57,7 +59,8 @@ const router = VueRouter.createRouter({
 					: DEFAULT_MODE_RAUMINFO;
 
 				// default to today date if not provided
-				const focus_date = route.params.focus_date || new Date().toISOString().split("T")[0];
+				const d = new Date(route.params.focus_date)
+				const focus_date = !isNaN(d) ? route.params.focus_date : new Date().toISOString().split("T")[0];
 
 				// for consistency reasons format the props into one object but actually use a new name to we dont collide with
 				// existing viewData declaration written from codeigniter 3 into routerview tag
@@ -137,8 +140,9 @@ const router = VueRouter.createRouter({
 						? route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase()
 						: DEFAULT_MODE_STUNDENPLAN;
 
-				// default to today date if not provided
-				const focus_date = route.params.focus_date || new Date().toISOString().split("T")[0];
+				// default to today date if not provided or string forms invalid date
+				const d = new Date(route.params.focus_date)
+				const focus_date = !isNaN(d) ? route.params.focus_date : new Date().toISOString().split("T")[0];
 				// for consistency reasons format the props into one object but actually use a new name to we dont collide with
 				// existing viewData declaration written from codeigniter 3 into routerview tag
 				return {
@@ -227,7 +231,7 @@ const app = Vue.createApp({
 
 				// let click event propagate normally if we dont route internally
 				const res = this.$router.resolve(route)
-				if(!res?.matched?.length) return
+				if(!res?.matched?.length || res.name === 'Fallback') return
 				
 				event.preventDefault(); // Prevent browser navigation
 				

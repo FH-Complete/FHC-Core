@@ -95,7 +95,8 @@ export default {
 		'select:event',
 		'change:range',
 		'update:minimized',
-		'selectedEvent'
+		'selectedEvent',
+		'change:offset'
 	],
 	data() {
 		return {
@@ -240,7 +241,8 @@ export default {
 	},
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card h-100" :class="sizeClass">
-		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)" @input="handleInput" >
+		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)"
+		 @input="handleInput" @change:offset="$emit('change:offset', $event)">
 			<template #calendarDownloads>
 				<slot name="calendarDownloads" ></slot>
 			</template>

@@ -151,6 +151,7 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
 			</div>
 		</div>
 	</div>
+	<!-- Ausgeblendet, weil für FHTW derzeit nicht relevant
 	<div class="row well">
 		<div class="col-sm-12">
 			<h2>Audiofiles</h2>
@@ -162,7 +163,7 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
 				<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
 			</audio>
 		</div>
-	</div>
+	</div>-->
 </div>
 
 </body>
