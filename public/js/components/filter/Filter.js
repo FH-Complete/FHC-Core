@@ -20,7 +20,6 @@ import FilterConfig from './Filter/Config.js';
 import FilterColumns from './Filter/Columns.js';
 import TableDownload from './Table/Download.js';
 import collapseAutoClose from '../../directives/collapseAutoClose.js';
-import { defaultHeaderFilter } from '../../tabulator/filters/defaultHeaderFilter.js';
 
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
@@ -81,6 +80,7 @@ export const CoreFilterCmpt = {
 			uuid: 0,
 			// FilterCmpt properties
 			filterName: null,
+			filterActive: false,
 			fields: null,
 			dataset: null,
 			datasetMetadata: null,
@@ -100,7 +100,15 @@ export const CoreFilterCmpt = {
 			tabulator: null,
 			tableBuilt: false,
 			tabulatorHasSelector: false,
-			selectedData: []
+			selectedData: [],
+			persistence: {
+				sort: true,
+				columns: true,
+				filter: false,
+				headerFilter: false,
+				group: false,
+				page: false,
+			}
 		};
 	},
 	computed: {
@@ -207,12 +215,11 @@ export const CoreFilterCmpt = {
 					layout: "fitDataStretch",
 					movableColumns: true,
 					columnDefaults:{
-						tooltip: true,
-						headerFilterFunc: defaultHeaderFilter,
+						tooltip: true
 					},
 					placeholder,
 					reactiveData: true,
-					persistence: true
+					persistence: this.persistence,
 				}, ...(this.tabulatorOptions || {})};
 
 			if (!this.tableOnly) {
@@ -278,11 +285,15 @@ export const CoreFilterCmpt = {
 					const cols = this.tabulator.getColumns();
 					this.fields = cols.map(col => col.getField());
 					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
-
+					if (this.tabulator.options.persistence.headerFilter)
+						this._setHeaderFilter();
 				});
 
 			}
 
+			this.tabulator.on("dataFiltered", filters => {
+				this.filterActive = filters.length > 0;
+			});
 		},
 		updateTabulator() {
 			if (this.tabulator) {
@@ -296,6 +307,23 @@ export const CoreFilterCmpt = {
 			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
+			this._setHeaderFilter()
+		},
+		clearFilters()
+		{
+			let existingFilters = this.tabulator.getHeaderFilters();
+			existingFilters.forEach(filter => {
+				this.tabulator.setHeaderFilterValue(filter.field, "");
+			});
+			this.tabulator.clearFilter();
+			this.filterActive = false;
+		},
+		_setHeaderFilter()
+		{
+			const existingFilters = this.tabulator.getHeaderFilters();
+			existingFilters.forEach(filter => {
+				this.tabulator.setHeaderFilterValue(filter.field, filter.value);
+			});
 		},
 		/**
 		 *
@@ -578,16 +606,21 @@ export const CoreFilterCmpt = {
 			alert('"nwNewEntry" listener is mandatory when sideMenu is true');
 		this.uuid = _uuid++;
 		this.$emit('uuidDefined', this.uuid)
-		if (!this.tableOnly)
-			this.getFilter(); // get the filter data
 	},
 	mounted() {
-		this.initTabulator();
+
+		this.initTabulator().then(() => {
+			if (!this.tableOnly) {
+				this.selectedFilter = window.location.hash ? window.location.hash.slice(1) : null;
+				this.getFilter(); // get the filter data
+			}
+		});
+
 	},
 	template: `
 		<!-- Load filter data -->
 		<core-fetch-cmpt
-			v-if="!tableOnly"
+			v-if="!tableOnly && fetchCmptApiFunction"
 			v-bind:api-function="fetchCmptApiFunction"
 			v-bind:api-function-parameters="fetchCmptApiFunctionParams"
 			v-bind:refresh="fetchCmptRefresh"
@@ -624,6 +657,9 @@ export const CoreFilterCmpt = {
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
 					<a v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
 						<span class="fa-solid fa-xl fa-filter"></span>
+					</a>
+					<a v-if="filterActive"  class="btn btn-link px-0 text-dark" :title="$p.t('ui','filterdelete')" @click="clearFilters">
+						<span class="fa-solid fa-xl fa-filter-circle-xmark"></span>
 					</a>
 					<a href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
 						<span class="fa-solid fa-xl fa-table-columns"></span>
