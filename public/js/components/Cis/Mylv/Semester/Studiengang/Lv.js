@@ -29,7 +29,7 @@ export default {
 		ects: String,
 		incoming: Number,
 		positiv: Boolean,
-		note_index: String,
+		note_index: String
 	},
 	data: () => {
 		return {
@@ -66,8 +66,8 @@ export default {
 			return bodyStyle;
 		},
 		grade() {
-			// TODO: noten phrasen
-			return this.benotung ? this.znote || this.lvnote || null : null;
+			const languageIndex = this.$p.user_language.value === 'English' ? 1 : 0
+			return this.benotung ? this.znotebez[languageIndex] || this.lvnotebez[languageIndex] || null : null;
 		},
 		LvHasPruefungenInformation(){
 			return this.pruefungenData && this.pruefungenData.length > 0;
@@ -123,6 +123,7 @@ export default {
 				LvInfo.popup({
 					lehrveranstaltung_id: this.lehrveranstaltung_id, 
 					bezeichnung: this.bezeichnung,
+					bezeichnung_eng: this.bezeichnung_eng,
 					studiengang_kuerzel: this.studiengang_kuerzel,
 					semester: this.semester,
 					studien_semester: this.studien_semester,
@@ -161,7 +162,7 @@ export default {
 		<div class="p-2" :class="is_organisatorische_einheit?'':'card-header'">
 			<!-- {{module}} if the module of the lv is important then query the module from the api endpoint for LV-->
 			<h6 class="fw-bold" v-if="is_organisatorische_einheit" >{{ $p.t('lehre/organisationseinheit') }}:</h6>
-			<h6 class="mb-0">{{bezeichnung}}</h6>
+			<h6 class="mb-0">{{$p.user_language.value === 'English' ? bezeichnung_eng : bezeichnung}}</h6>
 		</div>
 		<div v-if="!emptyMenu" class="card-body " :style="bodyStyle">
 			<template v-if="menu">

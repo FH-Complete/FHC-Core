@@ -118,16 +118,17 @@ const Stundenplan = {
 			const date = day.getFullYear() + "-" +
 				String(day.getMonth() + 1).padStart(2, "0") + "-" +
 				String(day.getDate()).padStart(2, "0");
-
-			this.$router.push({
-				name: "Stundenplan",
-				params: {
-					mode: this.calendarMode,
-					focus_date: date,
-					lv_id: this.propsViewData?.lv_id || null
-				}
-			})
+			const capitalizedMode = this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1);
 			
+			this.$router.push({
+					name: "Stundenplan",
+					params: {
+						mode: capitalizedMode,
+						focus_date: date,
+						lv_id: this.propsViewData?.lv_id || null
+					}
+				})
+
 			this.currentDay = day;
 		},
 		handleOffset: function(offset)  {
@@ -144,14 +145,14 @@ const Stundenplan = {
 			this.$router.push({
 				name: "Stundenplan",
 				params: {
-					mode: this.calendarMode,
+					mode: this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1),
 					focus_date: date,
 					lv_id: this.propsViewData?.lv_id || null
 				}
 			})
 		},
 		handleChangeMode(mode) {
-			const modeCapitalized = mode.charAt(0).toUpperCase() + mode.slice(1)
+			let m = mode[0].toUpperCase() + mode.slice(1)
 			const date = this.currentDay.getFullYear() + "-" +
 				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
 				String(this.currentDay.getDate()).padStart(2, "0");
@@ -159,30 +160,29 @@ const Stundenplan = {
 			this.$router.push({
 				name: "Stundenplan",
 				params: {
-					mode: modeCapitalized,
+					mode: m,
 					focus_date: date,
 					lv_id: this.propsViewData?.lv_id ?? null
 				}
 			})
-		
-			this.calendarMode = mode
+			this.calendarMode = m
 		},
 		showModal: function(e, event){
-			e.stopPropagation()
 			this.currentlySelectedEvent = event;
 			Vue.nextTick(() => {
 				this.$refs.lvmodal.show();
 			});
 		},
-		updateRange: function ({start,end}) {
-			
+		updateRange: function ({start,end, mounted}) {
 			let checkDate = (date) => {
 				return date.m != this.eventCalendarDate.m || date.y != this.eventCalendarDate.y;
 			}
 			this.calendarDate = new CalendarDate(end);
 
 			// only load month data if the month or year has changed
-			if (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end))){
+			// or we receive a reload flag from the mounted routine of the components
+			// or this handler is being called from the mounted lifecycle of a component
+			if (mounted || (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end)))){
 				// reset the events before querying the new events to activate the loading spinner
 				this.events = null;
 				this.eventCalendarDate = new CalendarDate(end);
@@ -238,7 +238,7 @@ const Stundenplan = {
 		.then(data=>{
 			this.uid = data.uid;
 		})
-		this.loadEvents();
+
 	},
 	beforeUnmount() {
 		if(this.$refs.lvmodal) this.$refs.lvmodal.hide()	
@@ -275,7 +275,7 @@ const Stundenplan = {
 			</div>
 		</template>
 		<template #monthPage="{event,day}">
-			<div @click="showModal($event, event); ">
+			<div>
 				<span class="fhc-entry">
 					{{event.topic}}
 				</span>

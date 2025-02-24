@@ -22,7 +22,7 @@ export default {
 			this.focusDate.d += dir;
 			this.emitRangeChanged(previousDate);
 		},
-		emitRangeChanged(previousDate) {
+		emitRangeChanged(previousDate, mounted) {
 			this.$emit('change:range', { start: previousDate, end:this.focusDate });
 		},
 		prev() {
@@ -37,8 +37,8 @@ export default {
 			this.$emit('input', ['select:event', event]);
 		}
 	},
-	created() {
-		this.emitRangeChanged();
+	mounted() {
+		this.emitRangeChanged(new CalendarDate(this.focusDate.y, this.focusDate.m, this.focusDate.d -1), true);
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-day">

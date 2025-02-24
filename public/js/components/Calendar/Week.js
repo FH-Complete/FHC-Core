@@ -20,10 +20,10 @@ export default {
 			this.focusDate.d += dir * 7;
 			this.emitRangeChanged();
 		},
-		emitRangeChanged() {
+		emitRangeChanged(mounted = false) {
 			let start = this.focusDate.firstDayOfWeek;
 			let end = this.focusDate.lastDayOfWeek;
-			this.$emit('change:range', { start, end });
+			this.$emit('change:range', { start, end, mounted });
 		},
 		prev() {
 			this.$refs.pane.prev();
@@ -37,8 +37,8 @@ export default {
 			this.$emit('input', ['select:event',event]);
 		}
 	},
-	created() {
-		this.emitRangeChanged();
+	mounted() {
+		this.emitRangeChanged(true);
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-week">
