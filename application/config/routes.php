@@ -61,17 +61,7 @@ $route['api/v1/organisation/[O|o]rganisationseinheit/(:any)'] = 'api/v1/organisa
 $route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
 $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 
-$route['Cis/Stundenplan'] = 'Cis/Stundenplan/index/null/null/null';
-$route['Cis/Stundenplan/(:num)'] = 'Cis/Stundenplan/index/null/null/$1';
-$route['Cis/Stundenplan/(:num)/(:any)'] = 'Cis/Stundenplan/index/null/$2/$1';
-
-// Specific route (for mode: month|week|day, focusdate, lv_id optional)
-$route['Cis/Stundenplan/([M|m]onth|[W|w]eek|[D|d]ay)'] = 'Cis/Stundenplan/index/$1';
-$route['Cis/Stundenplan/([M|m]onth|[W|w]eek|[D|d]ay)(/(:any))?'] = 'Cis/Stundenplan/index/$1/$3';
-$route['Cis/Stundenplan/([M|m]onth|[W|w]eek|[D|d]ay)(/(:any))?(/(:num))?'] = 'Cis/Stundenplan/index/$1/$3/$5';
-
-
-
+$route['Cis/Stundenplan/.*'] = 'Cis/Stundenplan/index/$1';
 
 // load routes from extensions
 $subdir = 'application/config/extensions';

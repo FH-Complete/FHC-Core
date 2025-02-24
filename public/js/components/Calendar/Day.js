@@ -27,9 +27,11 @@ export default {
 		},
 		prev() {
 			this.$refs.pane.prev();
+			this.$emit('change:offset', { y: 0, m: 0, d: -1 });
 		},
 		next() {
 			this.$refs.pane.next();
+			this.$emit('change:offset', { y: 0, m: 0, d: 1 });
 		},
 		selectEvent(event) {
 			this.$emit('input', ['select:event', event]);
