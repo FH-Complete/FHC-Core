@@ -53,6 +53,7 @@ export default {
 		//TODO: workaround is to watch the active state and refetch in case the lvMenu is empty
 		active: {
 			handler(value) {
+				// handles fetching the lvMenu
 				if (value) {
 					if (!this.lvMenu) {
 						this.fetchLvMenu(this.selectedEvent);
@@ -64,7 +65,7 @@ export default {
 		events: {
 			handler(newEvents) {
 				// if no event is selected, select the first event of the day
-				if (this.selectedEvent == null && newEvents[this.day.toDateString()].length > 0) {
+				if (this.selectedEvent == null && newEvents[this.day.toDateString()]?.length > 0) {
 					let events = newEvents[this.day.toDateString()];
 					if (Array.isArray(events) && events.length > 0) {
 						this.setSelectedEvent(events[0]);
@@ -239,6 +240,9 @@ export default {
 		}
 	},
 	methods: {
+		dayScrollBehavior(event){
+			this.$refs.dayScrollContainer?.scrollBy({ top: Math.sign(event.deltaY) * 100, behavior: 'instant' });
+		},
 		dayGridStyle(day) {
 			const styleObj = {
 				'grid-template-columns': '1 1fr',
@@ -355,7 +359,7 @@ export default {
 	template: /*html*/`
 	<div class="fhc-calendar-day-page h-100">
 		<div class="row m-0 h-100">
-			<div class="col-12 col-xl-6 p-0 h-100">
+			<div style="overflow:auto" class="col-12 col-xl-6 p-0 h-100">
 				<div class="d-flex flex-column h-100">
 					<div ref="header" class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle">
 						<div type="button" class="flex-grow-1" :title="dayText.heading" @click.prevent="changeToMonth(day)">
@@ -363,11 +367,11 @@ export default {
 							<a href="#" class="small text-secondary text-decoration-none" >{{dayText.datum}}</a>
 						</div>
 					</div>
-					<div id="scroll g-0" style="height: 100%; overflow-y: scroll;">
+					<div @wheel.prevent="dayScrollBehavior" id="scrollContainer" ref="dayScrollContainer" style="height: 100%; overflow-y: scroll;">
 
 						<div ref="eventcontainer" class="position-relative flex-grow-1"  >
 							<div class="all-day-event-container" >
-								<div class="all-day-event all-day-event-border" v-for="(day,dayindex) in eventsPerDayAndHour">
+								<div @wheel.stop class="all-day-event all-day-event-border" v-for="(day,dayindex) in eventsPerDayAndHour">
 									<template v-for="(events,_day) in allDayEvents" :key="_day">
 
 									<div v-if="dayindex == _day" v-for="event in events" :key="event" class="d-grid m-1" style="top:0;" @click.prevent="eventClick(event)"

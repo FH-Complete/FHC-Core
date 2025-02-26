@@ -11,7 +11,6 @@ export default {
 			hourPositionTime:null,
 			resizeObserver: null,
 			width: 0,
-			scrollContainer: null,
 		}
 	},
 	inject: [
@@ -37,23 +36,6 @@ export default {
 		'page:forward',
 		'input',
 	],
-	watch: {
-		active: {
-			handler(value) {
-				const activeContainer = document.querySelector("#calendarContainer")
-				if(value){
-					Vue.nextTick(() => {
-						this.scrollContainer = activeContainer;
-						activeContainer.addEventListener('wheel', this.scrollFunction);
-					})
-				}else{
-					this.scrollContainer=null;
-					activeContainer?.removeEventListener('wheel', this.scrollFunction);
-				}
-			},
-			immediate: true,
-		}
-	},
 	computed: {
 		allDayEvents(){
 			let allDayEvents = {};
@@ -209,10 +191,6 @@ export default {
 		}
 	}, 
 	methods: {
-		scrollFunction(event){
-				event.preventDefault();
-				this.scrollContainer?.scrollBy({ top: Math.sign(event.deltaY) * 100, behavior: 'instant' });
-		},
 		hourGridIdentifier(hour) {
 			// this is the id attribute that is responsible to scroll the calender to the first event
 			return 'scroll' + hour + this.focusDate.d + this.week;
@@ -375,7 +353,7 @@ export default {
 			</div>
 			<div ref="eventcontainer" class="position-relative flex-grow-1"  >
 				<div class="all-day-event-container" >
-					<div class="all-day-event all-day-event-border" v-for="(day,dayindex) in eventsPerDayAndHour">
+					<div @wheel.stop class="all-day-event all-day-event-border" v-for="(day,dayindex) in eventsPerDayAndHour">
 						<template v-for="(events,_day) in allDayEvents" :key="_day">
 
 						<div v-if="dayindex == _day" v-for="event in events" :key="event" class="d-grid m-1" style="top:0;" @click.prevent="weekPageClick(event, _day)"

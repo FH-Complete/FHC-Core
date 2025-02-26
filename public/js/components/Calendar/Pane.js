@@ -39,6 +39,9 @@ export default {
 		
 	},
 	methods: {
+		scrollBehavior(event){
+			this.$refs.calendarContainer?.scrollBy({ top: Math.sign(event.deltaY) * 100, behavior: 'instant' });
+		},
 		scrollCalendar(event){
 			this.scrollTop = this.$refs.calendarContainer.scrollTop;
 			this.clientHeight = this.$refs.calendarContainer.clientHeight;
@@ -82,7 +85,7 @@ export default {
 	},
 	template: `
 	<div ref="carousel" class="calendar-pane carousel slide" @[\`slide.bs.carousel\`]="slide" @[\`slid.bs.carousel\`]="slid" :data-queue="queue">
-		<div id="calendarContainer" @scroll="scrollCalendar" ref="calendarContainer" class="carousel-inner " style="height:var(--fhc-calendar-pane-height);">
+		<div id="calendarContainer" @wheel.prevent="scrollBehavior" @scroll="scrollCalendar" ref="calendarContainer" class="carousel-inner " style="height:var(--fhc-calendar-pane-height);">
 			<div ref="carouselItems" v-for="i in [...Array(3).keys()]" :key="i" class="carousel-item" style="height:var(--fhc-calendar-pane-height);">
 				<slot :active="i == activeCarouselItemIndex" :index="i" :offset="offsets[i]" />
 			</div>
