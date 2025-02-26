@@ -221,7 +221,7 @@ export default {
 		actionDownload(akte_id) {
 			window.open(
 				FHC_JS_DATA_STORAGE_OBJECT.app_root
-				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/stv/archiv/download?akte_id=' + encodeURIComponent(akte_id),
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/stv/akte/download?akte_id=' + encodeURIComponent(akte_id),
 				'_blank'
 			);
 		},
