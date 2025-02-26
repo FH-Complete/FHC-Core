@@ -85,10 +85,22 @@
 	grid-template-columns:repeat(7,1fr);
 	width:100%;
 	z-index:3;
+	background-color:white;
+}
+
+.fhc-calendar-week-page .all-day-event-container::before {
+	position: absolute;
+	content:'';
+	top: 0;
+	bottom: 0;
+	left: -3em;
+	right: 100%;
+	background-color: white;
+	box-shadow: 1px 1px 0 #dee2e6;
 }
 
 .fhc-calendar-day-page .all-day-event-border {
-	box-shadow: 1px 1px 0 #dee2e6;
+	box-shadow: 0 0 0 1px #dee2e6;
 }
 
 .fhc-calendar-day-page .all-day-event {
@@ -104,6 +116,8 @@
 	grid-template-columns: 3em 1fr;
 	width: 100%;
 	z-index: 3;
+	background-color:white;
+	box-shadow: 1px 1px 0 #dee2e6;
 }
 
 /* grid hour lines of the Stundenplan use box-shadow instead of border because box-shadow renders consistently on different viewports*/

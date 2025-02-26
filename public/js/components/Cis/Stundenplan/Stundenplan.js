@@ -146,6 +146,17 @@ export const Stundenplan = {
 						promise_events = promise_events.concat(data);
 					}
 				})
+				promise_events.sort((a, b) => {
+					if(a.type=='moodle'){
+						return -1;
+					}
+					else if(b.type=='moodle'){
+						return 1;
+					}
+					else{
+						return 0;
+					}
+				});
 				this.events = promise_events;
 			});
 		},
@@ -155,12 +166,12 @@ export const Stundenplan = {
 			let date_end = Math.floor(new Date(end_date).getTime() / 1000);
 			return this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid('io23m005', date_start, date_end).then((response) => response.events).then(events => {
 				let data =events.map(event =>{
-					const event_start_date = new Date(Number(event.timestart) * 1000);
-					const event_end_date = new Date(((Number(event.timestart) + Number(event.timeduration)) * 1000));
+					const event_start_date = new Date(event.timestart);
+					const event_end_date = new Date(event.timeend);
 					const formatted_date = `${event_start_date.getFullYear()}-${event_start_date.getMonth()+1}-${event_start_date.getDate()}`;
 					// to get the same date and time as in moodle, we use the default UTC time zone 
-					const formatted_start_time = event_start_date.toLocaleTimeString(this.$p.user_locale, {hour:'2-digit',minute:'2-digit', second:'2-digit',hour12:false, timeZone:'UTC'});
-					const formatted_end_time = event_end_date.toLocaleTimeString(this.$p.user_locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'UTC' });
+					const formatted_start_time = event_start_date.toLocaleTimeString(this.$p.user_locale, {hour:'2-digit',minute:'2-digit', second:'2-digit',hour12:false});
+					const formatted_end_time = event_end_date.toLocaleTimeString(this.$p.user_locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 					
 					return {
 						type:'moodle',
@@ -184,6 +195,7 @@ export const Stundenplan = {
 						farbe:'00689E',
 						lehrveranstaltung_id:0,
 						ort_content_id:0,
+						url:event?.url,
 					}
 				});
 				return {

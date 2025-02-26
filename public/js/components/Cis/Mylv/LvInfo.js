@@ -135,6 +135,10 @@ export default {
 						<td>{{event.organisationseinheit}}</td>
 					</template>
 				</tr>
+				<tr v-if="event.type == LV_TYPES.moodle">
+				    <th>Link:</th>
+					<td><a :href="event?.url" target="_blank"><i class="fa fa-arrow-up-right-from-square me-1"></i></a></td>
+				</tr>
 			</tbody>
 		</table>
 	`
