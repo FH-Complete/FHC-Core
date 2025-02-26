@@ -1,6 +1,6 @@
 import raum_contentmittitel from './Content_types/Raum_contentmittitel.js'
 import general from './Content_types/General.js'
-import BsConfirm from "../../Bootstrap/Confirm";
+import BsConfirm from "../../Bootstrap/Confirm.js";
 
 export default {
 	name: "ContentComponent",

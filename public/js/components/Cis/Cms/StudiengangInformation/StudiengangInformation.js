@@ -1,5 +1,5 @@
-import StudiengangPerson from "./StudiengangPerson";
-import StudiengangVertretung from "./StudiengangVertretung";
+import StudiengangPerson from "./StudiengangPerson.js";
+import StudiengangVertretung from "./StudiengangVertretung.js";
 
 export default {
 data(){

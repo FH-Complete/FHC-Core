@@ -1,5 +1,5 @@
-import BsModal from "../../Bootstrap/Modal";
-import LvMenu from "./LvMenu";
+import BsModal from "../../Bootstrap/Modal.js";
+import LvMenu from "./LvMenu.js";
 export default  {
   
     props:{

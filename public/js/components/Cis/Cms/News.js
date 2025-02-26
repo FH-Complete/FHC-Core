@@ -1,6 +1,6 @@
 import Pagination from "../../Pagination/Pagination.js";
 import StudiengangInformation from "./StudiengangInformation/StudiengangInformation.js";
-import BsConfirm from "../../Bootstrap/Confirm";
+import BsConfirm from "../../Bootstrap/Confirm.js";
 
 export default {
 	name: "NewsComponent",

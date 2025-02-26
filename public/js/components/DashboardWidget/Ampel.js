@@ -1,5 +1,5 @@
-import AbstractWidget from './Abstract';
-import BaseOffcanvas from '../Base/Offcanvas';
+import AbstractWidget from './Abstract.js';
+import BaseOffcanvas from '../Base/Offcanvas.js';
 
 let _idcounter = 0;
 
