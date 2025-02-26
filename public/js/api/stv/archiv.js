@@ -21,9 +21,9 @@ export default {
 			data
 		);
 	},
-	//~ edit(data) {
-		//~ return this.$fhcApi.post('api/frontend/v1/stv/konto/update', data);
-	//~ },
+	update(data) {
+		return this.$fhcApi.post('api/frontend/v1/stv/archiv/update', data);
+	},
 	delete({akte_id, studiengang_kz}) {
 		return this.$fhcApi.post('api/frontend/v1/stv/archiv/delete', {akte_id, studiengang_kz});
 	}

@@ -94,23 +94,15 @@ class Config extends FHCAPI_Controller
 		/* TODO(chris): Ausgeblendet für Testing
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
-			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
-			'showOnlyWithUid' => true,
-			'config' => [
-				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
-				'edit' => 'both', // Possible values: both|header|inline
-				'delete' => 'both', // Possible values: both|header|inline
-				'documents' => 'both', // Possible values: both|header|inline
-				'documentslist' => $this->gradesDocumentsList()
-			]
+			'component' => './Stv/Studentenverwaltung/Details/Noten.js'
 		];
 		*/
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
-			'component' => './Stv/Studentenverwaltung/Details/Archiv.js'
-			//~ 'config' => [
-				//~ //'columns' => $this->kontoColumns()
-			//~ ]
+			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
+			'config' => [
+				'showEdit' => $this->permissionlib->isBerechtigt('admin')
+			]
 		];
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
@@ -148,10 +140,10 @@ class Config extends FHCAPI_Controller
 		];
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
-			'component' => './Stv/Studentenverwaltung/Details/Archiv.js'
-			//~ 'config' => [
-				//~ //'columns' => $this->kontoColumns()
-			//~ ]
+			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
+			'config' => [
+				'showEdit' => $this->permissionlib->isBerechtigt('admin')
+			]
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {

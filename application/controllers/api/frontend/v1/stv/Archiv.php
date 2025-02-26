@@ -38,7 +38,7 @@ class Archiv extends FHCAPI_Controller
 			'getArchivVorlagen' => ['admin:r', 'assistenz:r'],
 			'archive' => ['admin:w', 'assistenz:w'],
 			'download' => ['admin:w', 'assistenz:w'],
-			//'update' => ['admin:w', 'assistenz:w'],
+			'update' => ['admin:w'],
 			'delete' => ['admin:w', 'assistenz:w']
 		]);
 
@@ -147,11 +147,81 @@ class Archiv extends FHCAPI_Controller
 			$result = $this->aktelib->get($akte_id);
 		}
 
-		/*	 * 	$fileObj->filename
+	/*	$fileObj->filename
 	 * 	$fileObj->file
 	 * 	$fileObj->name
 	 * 	$fileObj->mimetype
 	 * 	$fileObj->disposition*/
+	}
+
+	/**
+	 * Updating an Akte
+	 * @return void
+	 */
+	public function update()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('akte_id', 'Akte Id', 'required');
+		$this->form_validation->set_rules('signiert', 'Signiert', 'is_bool');
+		$this->form_validation->set_rules('stud_selfservice', 'Self-Service', 'is_bool');
+
+		//Events::trigger('konto_update_validation', $this->form_validation);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$id = $this->input->post('akte_id');
+
+		// get the akte
+		$result = $this->AkteModel->load($id);
+
+		if (!hasData($result)) $this->terminateWithError("Akte not found!");
+
+		$akte = getData($result)[0];
+
+		$allowed = [
+			'signiert',
+			'stud_selfservice'
+		];
+
+		$data = [
+			'updateamum' => date('c'),
+			'updatevon' => getAuthUID()
+		];
+
+		// if Akte has Inhalt directly in Akte table
+		if (isset($_FILES['datei']['tmp_name']))
+		{
+		$this->addMeta('read', "read");
+			// update inhalt directly
+
+			// get tmp file
+			$filename = $_FILES['datei']['tmp_name'];
+			// open it
+			$fp = fopen($filename,'r');
+			// read it
+			$content = fread($fp, filesize($filename));
+			fclose($fp);
+			// encode it
+			$data['inhalt'] = base64_encode($content);
+			$this->addMeta('content', base64_encode($content));
+		}
+
+		
+		foreach ($allowed as $field)
+			if ($this->input->post($field) !== null)
+				$data[$field] = $this->input->post($field);
+
+		$this->addMeta("data", $data);
+
+		$result = $this->AkteModel->update($id, $data);
+
+		$this->getDataOrTerminateWithError($result);
+
+		$result = null;
+
+		$this->terminateWithSuccess($result);
 	}
 
 

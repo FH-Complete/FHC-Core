@@ -1,14 +1,12 @@
 import {CoreFilterCmpt} from "../../../filter/Filter.js";
 import FormInput from "../../../Form/Input.js";
-//~ import KontoNew from "./Konto/New.js";
-//~ import KontoEdit from "./Konto/Edit.js";
+import AkteEdit from "./Archiv/Edit.js";
 
 export default {
 	components: {
 		CoreFilterCmpt,
-		FormInput
-		//~ KontoNew,
-		//~ KontoEdit
+		FormInput,
+		AkteEdit
 	},
 	inject: {
 		defaultSemester: {
@@ -76,31 +74,62 @@ export default {
 		tabulatorColumns() {
 			const columns = [
 				{title: "Akte Id", field: "akte_id", visible: false},
-				{title: "Titel", field: "titel"},
-				{title: "Bezeichnung", field: "bezeichnung"},
-				{title: "Erstelldatum", field: "erstelltam"},
-				{title: "Signiert", field: "erstelltam"},
-				{title: "Selfservice", field: "signiert"},
-				{title: "AkzeptiertAmUm", field: "akzeptiertamum"},
-				{title: "Gedruckt", field: "gedruckt", visible: false},
+				{title: this.$p.t('stv', 'archiv_title'), field: "titel"},
+				{title: this.$p.t('stv', 'archiv_description'), field: "bezeichnung"},
+				{title: this.$p.t('stv', 'archiv_creation_date'), field: "erstelltam"},
+				{
+					title: this.$p.t('stv', 'archiv_signiert'),
+					field: "signiert",
+					formatter:"tickCross",
+					hozAlign:"center",
+					formatterParams: {
+						tickElement: '<i class="fa fa-check text-success"></i>',
+						crossElement: '<i class="fa fa-xmark text-danger"></i>'
+					}
+				},
+				{
+					title: "Selfservice",
+					field: "stud_selfservice",
+					formatter:"tickCross",
+					hozAlign:"center",
+					formatterParams: {
+						tickElement: '<i class="fa fa-check text-success"></i>',
+						crossElement: '<i class="fa fa-xmark text-danger"></i>'
+					},
+				},
+				{title: this.$p.t('stv', 'archiv_accepted_on_at'), field: "akzeptiertamum"},
+				{
+					title: this.$p.t('stv', 'archiv_gedruckt'),
+					field: "gedruckt",
+					visible: false,
+					formatter:"tickCross",
+					hozAlign:"center",
+					formatterParams: {
+						tickElement: '<i class="fa fa-check text-success"></i>',
+						crossElement: '<i class="fa fa-xmark text-danger"></i>'
+					}
+				},
 				{
 					title: 'Aktionen', field: 'actions',
 					formatter: (cell, formatterParams, onRendered) => {
 						let container = document.createElement('div');
 						container.className = "d-flex gap-2";
 
-						//~ let button = document.createElement('button');
-						//~ button.className = 'btn btn-outline-secondary';
-						//~ button.innerHTML = '<i class="fa fa-edit"></i>';
-						//~ button.addEventListener('click', () =>
-							//~ this.$refs.edit.open(cell.getData())
-						//~ );
-						//~ container.append(button);
+						if (this.config.showEdit)
+						{
+							let editButton = document.createElement('button');
+							editButton.className = 'btn btn-outline-secondary';
+							editButton.innerHTML = '<i class="fa fa-edit"></i>';
+							editButton.addEventListener('click', () =>
+								this.$refs.edit.open(cell.getData())
+							);
+							container.append(editButton);
+						}
 
-						let button = document.createElement('button');
-						button.className = 'btn btn-outline-secondary';
-						button.innerHTML = '<i class="fa fa-trash"></i>';
-						button.addEventListener('click', evt => {
+						let deleteButton = document.createElement('button');
+						deleteButton.className = 'btn btn-outline-secondary';
+						deleteButton.innerHTML = '<i class="fa fa-trash"></i>';
+						deleteButton.addEventListener('click', evt => {
 							evt.stopPropagation();
 							this.$fhcAlert
 								.confirmDelete()
@@ -112,7 +141,7 @@ export default {
 								})
 								.catch(this.$fhcAlert.handleSystemError);
 						});
-						container.append(button);
+						container.append(deleteButton);
 
 						return container;
 					},
@@ -158,31 +187,36 @@ export default {
 		updateData(data) {
 			if (!data)
 				return this.reload();
-			// TODO(chris): check children (!delete?, multiple children)
-			//this.$refs.table.tabulator.updateOrAddData(data.map(row => row.buchungsnr_verweis ? {buchungsnr:row.buchungsnr_verweis, _children:row} : row));
 			this.$refs.table.tabulator.updateOrAddData(data);
 		},
 		actionArchive() {
-			this.loading = true;
-			this.$fhcApi
-				.factory.stv.archiv.archive({
-					xml: this.getXmlByXsl(this.vorlage_kurzbz),
-					xsl: this.vorlage_kurzbz,
-					ss: this.defaultSemester,
-					uid: this.modelValue.uid,
-					prestudent_id: this.modelValue.prestudent_id
-				})
-				.then(result => result.data)
-				.then(() => {
-					this.reload();
-					this.loading = false;
-				})
-				.then(() => this.$p.t('ui/gespeichert'))
-				.then(this.$fhcAlert.alertSuccess)
-				.catch(error => {
-					this.$fhcAlert.handleSystemError(error);
-					this.loading = false;
-				});
+			console.log(this.modelValue);
+			let archiveDataArr = Array.isArray(this.modelValue) ? this.modelValue : [this.modelValue];
+
+			for (let archiveData of archiveDataArr)
+			{
+				this.loading = true;
+				this.$fhcApi
+					.factory.stv.archiv.archive({
+						xml: this.getXmlByXsl(this.vorlage_kurzbz),
+						xsl: this.vorlage_kurzbz,
+						ss: this.defaultSemester,
+						uid: archiveData.uid,
+						prestudent_id: archiveData.prestudent_id
+					})
+					.then(result => result.data)
+					.then(() => {
+						this.reload();
+						this.loading = false;
+					})
+					.then(() => this.$p.t('ui/gespeichert'))
+					.then(this.$fhcAlert.alertSuccess)
+					.catch(error => {
+						this.$fhcAlert.handleSystemError(error);
+						this.loading = false;
+					});
+				
+			}
 		},
 		actionDownload(akte_id) {
 			window.open(
@@ -235,7 +269,6 @@ export default {
 				</div>
 			</template>
 		</core-filter-cmpt>
+		<akte-edit ref="edit" :config="config" @saved="updateData"></akte-edit>
 	</div>`
 };
-		//~ <konto-new ref="new" :config="config" @saved="updateData" :person-ids="personIds" :stg-kz="stg_kz"></konto-new>
-		//~ <konto-edit ref="edit" :config="config" @saved="updateData"></konto-edit>
