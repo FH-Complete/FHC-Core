@@ -92,7 +92,12 @@
 				generateCSSsInclude('vendor/npm-asset/primeicons/primeicons.css');
 			}
 
-			// --------------------------------------------------------------------------------------------------------
+			if ($vuedatepicker11 === true)
+			{
+				generateCSSsInclude('vendor/vuejs/vuedatepicker_css11/main.css');
+			}
+			
+		// --------------------------------------------------------------------------------------------------------
 			// From public folder
 
 			// AjaxLib CSS

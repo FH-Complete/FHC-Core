@@ -152,6 +152,8 @@
 		generateJSsInclude('vendor/npm-asset/primevue/confirmationservice/confirmationservice.min.js');
 	}
 
+	if($vuedatepicker11) generateJSsInclude('vendor/vuejs/vuedatepicker_js11/vue-datepicker.iife.js');
+	
 	// --------------------------------------------------------------------------------------------------------
 	// From public folder
 
@@ -181,11 +183,13 @@
 
 	// User Defined Fields
 	if ($udfs === true) generateJSsInclude('public/js/UDFWidget.js');
-
+	
 	// Load addon hooks JS
 	// NOTE: keep it as the last but one
 	if ($addons === true) generateAddonsJSsInclude($calledPath.'/'.$calledMethod);
 
+	
+	
 	// Eventually required JS
 	// NOTE: keep it as the latest
 	generateJSsInclude($customJSs);

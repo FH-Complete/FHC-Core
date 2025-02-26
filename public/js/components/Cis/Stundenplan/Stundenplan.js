@@ -355,12 +355,12 @@ const Stundenplan = {
 					<span class="flex-grow-1 text-center ">{{event.topic}}</span>
 				</div>
 			</div>
-			<div v-else @click="showModal($event, event)" class="p-1">
+			<div v-else @click="showModal(event)" class="p-1">
 				<span>{{event.topic}}</span>
 			</div>
 		</template>
 		<template #weekPage="{event,day}">
-			<div @click="showModal(event); " type="button"
+			<div @click="showModal(event)" type="button"
 			class=" position-relative border border-secondary border d-flex flex-col align-items-center justify-content-evenly h-100"
 			:class="{'p-1':event.allDayEvent}"
 			style="overflow: auto;">

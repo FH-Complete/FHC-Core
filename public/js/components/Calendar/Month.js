@@ -1,14 +1,17 @@
 import CalendarAbstract from './Abstract.js';
 import CalendarPane from './Pane.js';
 import CalendarMonthPage from './Month/Page.js';
-
+import BsModal from "../Bootstrap/Modal.js";
+import Months from "./Months";
 export default {
 	mixins: [
 		CalendarAbstract
 	],
 	components: {
 		CalendarMonthPage,
-		CalendarPane
+		CalendarPane,
+		BsModal,
+		Months
 	},
 	data() {
 		return {
@@ -21,6 +24,16 @@ export default {
 		}
 	},
 	methods: {
+		handleMonthChanged(month) {
+			this.$emit('change:offset', { y: 0, m: month - this.focusDate.m, d: 0 });
+			this.$refs.modalDatepickerContainer.hide()
+		},
+		hideMonthsModal() {
+			this.$refs.modalDatepickerContainer.hide()
+		},
+		handleHeaderClickMonth() {
+			this.$refs.modalDatepickerContainer.show()
+		},
 		paneChanged(dir) {
 			if (this.syncOnNextChange) {
 				this.syncOnNextChange = false;
@@ -65,7 +78,7 @@ export default {
 	},
 	template: `
 	<div class="fhc-calendar-month">
-		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'months')" >
+		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="handleHeaderClickMonth">
 			<template #calendarDownloads>
 				<slot name="calendarDownloads"></slot>
 			</template>
@@ -77,5 +90,12 @@ export default {
 				</template>
 			</calendar-month-page>
 		</calendar-pane>
-	</div>`
+	</div>
+
+	<bs-modal ref="modalDatepickerContainer" dialogClass='modal-lg' class="bootstrap-prompt">
+		<template v-slot:default>
+			<months @change="handleMonthChanged"></months>
+		</template>
+	</bs-modal>
+`
 }

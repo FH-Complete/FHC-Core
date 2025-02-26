@@ -8,6 +8,7 @@ $includesArray = array(
 	'tabulator5' => true,
 	'vue3' => true,
 	'primevue3' => true,
+	'vuedatepicker11' => true,
 	'customCSSs' => array(
 		'public/css/components/verticalsplit.css',
 		'public/css/components/searchbar/searchbar.css',
