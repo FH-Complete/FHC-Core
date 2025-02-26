@@ -20,23 +20,25 @@ export default {
 			this.focusDate.d += dir * 7;
 			this.emitRangeChanged();
 		},
-		emitRangeChanged() {
+		emitRangeChanged(mounted = false) {
 			let start = this.focusDate.firstDayOfWeek;
 			let end = this.focusDate.lastDayOfWeek;
-			this.$emit('change:range', { start, end });
+			this.$emit('change:range', { start, end, mounted });
 		},
 		prev() {
 			this.$refs.pane.prev();
+			this.$emit('change:offset', { y: 0, m: 0, d: -7 });
 		},
 		next() {
 			this.$refs.pane.next();
+			this.$emit('change:offset', { y: 0, m: 0, d: 7 });
 		},
 		selectEvent(event) {
 			this.$emit('input', ['select:event',event]);
 		}
 	},
-	created() {
-		this.emitRangeChanged();
+	mounted() {
+		this.emitRangeChanged(true);
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-week">

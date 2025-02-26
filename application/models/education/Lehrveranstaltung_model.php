@@ -556,16 +556,6 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function getLvsByStudentWithGrades($student_uid, $studiensemester_kurzbz, $sprache = null, $lvid=null)
 	{
-		if ($sprache) {
-			$sprache_qry = $this->db->compile_binds('SELECT index FROM public.tbl_sprache WHERE sprache = ?', [$sprache]);
-			$bezeichnung = 'bezeichnung_mehrsprachig[(' . $sprache_qry . ')]';
-			$sgbezeichnung = $sprache == 'English' ? 'COALESCE(sg.english, sg.bezeichnung)' : 'sg.bezeichnung';
-			$lvbezeichnung = $sprache == 'English' ? 'COALESCE(v.bezeichnung_english, v.bezeichnung)' : 'v.bezeichnung';
-		} else {
-			$bezeichnung = 'bezeichnung';
-			$sgbezeichnung = 'sg.bezeichnung';
-			$lvbezeichnung = 'v.bezeichnung';
-		}
 
 		$this->addDistinct();
 		// TODO(chris): selects
@@ -605,16 +595,20 @@ class Lehrveranstaltung_model extends DB_Model
 		$this->addSelect('znn.positiv');
 
 		#$this->addSelect('splv.module');
-		$this->addSelect($lvbezeichnung . ' AS bezeichnung');
-		$this->addSelect($sgbezeichnung . ' AS sg_bezeichnung');
+		$this->addSelect('v.bezeichnung AS bezeichnung');
+		$this->addSelect('v.bezeichnung_english AS bezeichnung_eng');
+		$this->addSelect('sg.bezeichnung AS sg_bezeichnung');
+		$this->addSelect('sg.english AS sg_bezeichnung_eng');
 		$this->addSelect('UPPER(sg.typ::VARCHAR(1) || sg.kurzbz) AS studiengang_kuerzel');
 		
 		//also adds returns the index of the grade
 		//TODO: ist zeugnissnote immer gleich wie die lvgesamtnote
 		$this->addSelect('COALESCE(zn.note::numeric,gn.note::numeric) as note_index');
 		$this->addSelect('COALESCE(znn.positiv,gnn.positiv) as positiv');
-		$this->addSelect('COALESCE(gnn.' . $bezeichnung . ', gnn.bezeichnung, gn.note::text) AS lvnote');
-		$this->addSelect('COALESCE(znn.' . $bezeichnung . ', znn.bezeichnung, zn.note::text) AS znote');
+		$this->addSelect('gnn.bezeichnung_mehrsprachig AS lvnotebez');
+		$this->addSelect('gnn.note AS lvnote');
+		$this->addSelect('znn.bezeichnung_mehrsprachig AS znotebez');
+		$this->addSelect('znn.note AS znote');
 
 		// TODO(chris): Potentielle Anpassung "Eine UID"
 		$this->addJoin('campus.vw_student_lehrveranstaltung v', 'lehrveranstaltung_id');

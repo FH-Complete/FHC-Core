@@ -23,7 +23,8 @@ export default {
 		'noMonthView',
 		'isSliding',
 		'selectedEvent',
-		'setSelectedEvent'
+		'setSelectedEvent',
+		'rowMinHeight'
 	],
 	props: {
 		year: Number,
@@ -49,7 +50,7 @@ export default {
 		},
 		getGridStyle() {
 			return {
-				'min-height': '100px',
+				'min-height': this.rowMinHeight,
 				// this.size is the magic number anyway which directs font-size,
 				// which in turn influences a lot of layout
 				width: '42px'
@@ -299,7 +300,13 @@ export default {
 				this.$emit('updateMode', 'month');
 			}
 		},
+		changeToDay(day) {
+			this.date.set(day);
+			this.focusDate.set(day);
+			this.$emit('updateMode', 'day');
+		},
 		dateToMinutesOfDay(day) {
+			// subtract 7 from the total hours because the hours range from 7 to 24
 			return Math.floor(((day.getHours()-7) * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
 		},
 		weekPageClick(event, day) {
@@ -346,7 +353,7 @@ export default {
 	<div ref="page" class="fhc-calendar-week-page" style="min-width: 700px;">
 		<div class="d-flex flex-column">
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
-				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="dayText[day]?.heading" @click.prevent="changeToMonth(day)">
+				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="dayText[day]?.heading" @click.prevent="changeToDay(day)">
 					<div class="fw-bold">{{dayText[day]?.tag}}</div>
 					<a href="#" class="small text-secondary text-decoration-none" >{{dayText[day]?.datum}}</a>
 				</div>

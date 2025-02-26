@@ -23,10 +23,10 @@ class Stundenplan extends Auth_Controller
 	/**
 	 * @return void
 	 */
-	public function index($lv_id = null)
+	public function index()
 	{
+		
 		$viewData = array(
-			'lv_id' => $lv_id,
 			'uid'=>getAuthUID(),
 		);
 		

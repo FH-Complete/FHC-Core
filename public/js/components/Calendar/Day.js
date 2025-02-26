@@ -22,21 +22,23 @@ export default {
 			this.focusDate.d += dir;
 			this.emitRangeChanged(previousDate);
 		},
-		emitRangeChanged(previousDate) {
+		emitRangeChanged(previousDate, mounted) {
 			this.$emit('change:range', { start: previousDate, end:this.focusDate });
 		},
 		prev() {
 			this.$refs.pane.prev();
+			this.$emit('change:offset', { y: 0, m: 0, d: -1 });
 		},
 		next() {
 			this.$refs.pane.next();
+			this.$emit('change:offset', { y: 0, m: 0, d: 1 });
 		},
 		selectEvent(event) {
 			this.$emit('input', ['select:event', event]);
 		}
 	},
-	created() {
-		this.emitRangeChanged();
+	mounted() {
+		this.emitRangeChanged(new CalendarDate(this.focusDate.y, this.focusDate.m, this.focusDate.d -1), true);
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-day">

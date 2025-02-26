@@ -28,16 +28,23 @@ export default {
 			} else {
 				this.focusDate.moveMonthInDirection(dir)
 			}
+			this.emitRangeChanged()
+		},
+		emitRangeChanged(mounted = false) {
+
 			this.$emit('change:range', {
-				start: new Date(this.focusDate.y, this.focusDate.m, 1), 
-				end: new Date(this.focusDate.y, this.focusDate.m+1, 0)
+				start: new Date(this.focusDate.y, this.focusDate.m, 1),
+				end: new Date(this.focusDate.y, this.focusDate.m+1, 0),
+				mounted
 			});
 		},
 		prev() {
 			this.$refs.pane.prev();
+			this.$emit('change:offset', { y: 0, m: -1, d: 0 });
 		},
 		next() {
 			this.$refs.pane.next();
+			this.$emit('change:offset', { y: 0, m: 1, d: 0 });
 		},
 		selectDay(day) {
 			let m = day.getMonth();
@@ -53,11 +60,8 @@ export default {
 			this.$emit('input', ['select:day',day])
 		}
 	},
-	created() {
-		this.$emit('change:range', {
-			start: new Date(this.focusDate.y, this.focusDate.m, 1), 
-			end: new Date(this.focusDate.y, this.focusDate.m+1, 0)
-		});
+	mounted() {
+		this.emitRangeChanged(true)
 	},
 	template: `
 	<div class="fhc-calendar-month">

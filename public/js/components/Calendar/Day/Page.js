@@ -36,6 +36,7 @@ export default {
 		'calendarClientHeight',
 		'setSelectedEvent',
 		'selectedEvent',
+		'rowMinHeight'
 	],
 	props: {
 		year: Number,
@@ -398,7 +399,7 @@ export default {
 
 
 							<div >
-								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
+								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">{{ $p.t('lehre/noLvFound') }}</h1>
 								<div class="events position-relative" :class="{'fhc-calendar-no-events-overlay':noEventsCondition}" ref="events" @mousemove="calcHourPosition" @mouseleave="hourPosition = null">
 									<Transition>
 										<div v-if="hourPosition && !noEventsCondition" class="position-absolute border-top small"  :style="indicatorStyle">
@@ -412,12 +413,13 @@ export default {
 									</Transition>
 									<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border" :style="hourGridStyle(hour)"></div>
 									<div class="hours">
-										<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
+										<div v-for="hour in hours" :style="'min-height:' + rowMinHeight " :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 									</div>
 									<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
 										
 										<div v-if="lookingAtToday && !noEventsCondition" :style="overlayStyle"></div>
-										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast :selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden " >
+										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast 
+											:selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden" >
 											<!-- desktop version of the page template, parent receives slotProp mobile = false -->
 											<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
 												<slot  name="dayPage" :event="event.orig" :day="day" :mobile="false">

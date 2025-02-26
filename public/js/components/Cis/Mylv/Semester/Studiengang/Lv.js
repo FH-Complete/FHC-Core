@@ -21,7 +21,9 @@ export default {
 		lvinfo: Boolean,
 		benotung: Boolean,
 		lvnote: String,
+		lvnotebez: Array,
 		znote: String,
+		znotebez: Array,
 		studiengang_kuerzel: String,
 		semester: [String, Number],
 		orgform_kurzbz: String,
@@ -29,7 +31,7 @@ export default {
 		ects: String,
 		incoming: Number,
 		positiv: Boolean,
-		note_index: String,
+		note_index: String
 	},
 	data: () => {
 		return {
@@ -66,7 +68,12 @@ export default {
 			return bodyStyle;
 		},
 		grade() {
-			return this.benotung ? this.znote || this.lvnote || null : null;
+			const languageIndex = this.$p.user_language.value === 'English' ? 1 : 0
+			if(this.benotung && this.znotebez?.length) {
+				return this.znotebez[languageIndex]
+			} else if(this.benotung && this.lvnotebez?.length) {
+				return this.lvnotebez[languageIndex]
+			} else return null
 		},
 		LvHasPruefungenInformation(){
 			return this.pruefungenData && this.pruefungenData.length > 0;
@@ -122,6 +129,7 @@ export default {
 				LvInfo.popup({
 					lehrveranstaltung_id: this.lehrveranstaltung_id, 
 					bezeichnung: this.bezeichnung,
+					bezeichnung_eng: this.bezeichnung_eng,
 					studiengang_kuerzel: this.studiengang_kuerzel,
 					semester: this.semester,
 					studien_semester: this.studien_semester,
@@ -159,8 +167,8 @@ export default {
 
 		<div class="p-2" :class="is_organisatorische_einheit?'':'card-header'">
 			<!-- {{module}} if the module of the lv is important then query the module from the api endpoint for LV-->
-			<h6 class="fw-bold" v-if="is_organisatorische_einheit" >Organisatorische Einheit:</h6>
-			<h6 class="mb-0">{{bezeichnung}}</h6>
+			<h6 class="fw-bold" v-if="is_organisatorische_einheit" >{{ $p.t('lehre/organisationseinheit') }}:</h6>
+			<h6 class="mb-0">{{$p.user_language.value === 'English' ? bezeichnung_eng : bezeichnung}}</h6>
 		</div>
 		<div v-if="!emptyMenu" class="card-body " :style="bodyStyle">
 			<template v-if="menu">
@@ -176,7 +184,7 @@ export default {
 							:class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }"
 							:target="menuItem.c4_target"
 							:href="c4_link(menuItem) ? c4_link(menuItem) : null">
-								{{menuItem.name}}
+								{{ menuItem.phrase ? $p.t(menuItem.phrase) : menuItem.name}}
 							</a>
 							</div>
 							<ul v-if="menuItem.c4_moodle_links?.length" class="dropdown-menu p-0" :aria-labelledby="'moodle_links_'+lehrveranstaltung_id">
@@ -197,14 +205,14 @@ export default {
 				<template v-if="LvHasPruefungenInformation">
 					<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
 						<i class="fa fa-check text-success" v-if="positiv"></i>
-						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || p.t('lehre/noGrades') }}</span>
+						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || $p.t('lehre/noGrades') }}</span>
 					</a>
 				</template>
 				<!-- template for the LV with no pruefungen -->
 				<template v-else>
 					<span  class="col-auto text-start text-decoration-none" >
 						<i class="fa fa-check text-success" v-if="positiv"></i>
-						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || p.t('lehre/noGrades') }}</span>
+						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || $p.t('lehre/noGrades') }}</span>
 					</span>
 				</template>
 			</div>

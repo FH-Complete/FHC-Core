@@ -5,25 +5,43 @@ import LvInfo from "../Mylv/LvInfo.js"
 import LvMenu from "../Mylv/LvMenu.js"
 import moodleSvg from "../../../helpers/moodleSVG.js"
 
-export const Stundenplan = {
+export const DEFAULT_MODE_STUNDENPLAN = 'Week'
+
+const Stundenplan = {
 	name: 'Stundenplan',
 	data() {
 		return {
 			events: null,
+			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_STUNDENPLAN,
 			calendarDate: new CalendarDate(new Date()),
 			eventCalendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
-			currentDay: new Date(),
+			currentDay: this.propsViewData?.focus_date ? new Date(this.propsViewData.focus_date) : new Date(),
+			lv: null,
 			minimized: false,
-			studiensemester_kurzbz:null,
-			studiensemester_start:null,
-			studiensemester_ende:null,
-			uid:null,
+			studiensemester_kurzbz: null,
+			studiensemester_start: null,
+			studiensemester_ende: null,
+			uid: null
 		}
 	},
-	props: [
-		"viewData",
-	],
+	props: {
+		propsViewData: Object,
+		rowMinHeight: {
+			type: String,
+			default: '100px'
+		},
+		eventMaxHeight: {
+			type: String,
+			default: '125px'
+		}
+	},
+	provide() {
+		return {
+			rowMinHeight: this.rowMinHeight,
+			eventMaxHeight: this.eventMaxHeight
+		}	
+	},
 	watch: {
 		weekFirstDay: {
 			handler: async function (newValue) {
@@ -34,6 +52,17 @@ export const Stundenplan = {
 				this.studiensemester_ende = ende;
 			},
 			immediate: true,
+		},
+		// forward/backward on history entries happening in stundenplan
+		'propsViewData.lv_id'(newVal) {
+			// relevant if lv_id can be changed from within this component
+		},
+		'propsViewData.mode'(newVal) {
+			if(this.$refs.calendar) this.$refs.calendar.setMode(newVal)
+		},
+		'propsViewData.focus_date'(newVal) {
+			// todo: navigate around with date in current mode
+			this.currentDate = new Date(newVal)
 		}
 	},
 	components: {
@@ -47,13 +76,17 @@ export const Stundenplan = {
 			let ende = new Date(this.studiensemester_ende);
 			ende = Math.floor(ende.getTime() / 1000);
 
-			let download_link = (format, version = "", target = "") => `${FHC_JS_DATA_STORAGE_OBJECT.app_root}cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=${this.uid}&begin=${start}&ende=${ende}&format=${format}${version ? '&version=' + version : ''}${target ? '&target=' + target : ''}`;
-			return [{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link('excel') }, { title: "csv", icon: 'fa-solid fa-file-csv', link: download_link('csv') }, { title: "ical1", icon: 'fa-regular fa-calendar', link: download_link('ical', '1', 'ical') }, { title: "ical2", icon: 'fa-regular fa-calendar', link: download_link('ical', '2', 'ical') }];
-		},
-		lv_id() { // computed so we can theoretically change path/lva selection and reload without page refresh
-			const pathParts = window.location.pathname.split('/').filter(Boolean);
-			const id = pathParts[pathParts.length - 1];
-			return id && !isNaN(Number(id)) ? id : null; // only return id if it is a number string since the path might contain invalid elements
+			let download_link = 
+				(format, version = "", target = "") => 
+					`${FHC_JS_DATA_STORAGE_OBJECT.app_root}cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=
+					${this.uid}&begin=${start}&ende=${ende}&format=${format}
+					${version ? '&version=' + version : ''}${target ? '&target=' + target : ''}`;
+			return [
+				{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link('excel') },
+				{ title: "csv", icon: 'fa-solid fa-file-csv', link: download_link('csv') },
+				{ title: "ical1", icon: 'fa-regular fa-calendar', link: download_link('ical', '1', 'ical') },
+				{ title: "ical2", icon: 'fa-regular fa-calendar', link: download_link('ical', '2', 'ical') }
+			];
 		},
 		weekFirstDay: function () {
 			return this.calendarDateToString(this.calendarDate.cdFirstDayOfWeek);
@@ -67,7 +100,6 @@ export const Stundenplan = {
 		monthLastDay: function () {
 			return this.calendarDateToString(this.eventCalendarDate.cdLastDayOfCalendarMonth);
 		},
-
 	},
 	methods:{
 		fetchStudiensemesterDetails: async function (date) {
@@ -85,7 +117,71 @@ export const Stundenplan = {
 			this.currentlySelectedEvent = event;
 		},
 		selectDay: function(day){
+			const date = day.getFullYear() + "-" +
+				String(day.getMonth() + 1).padStart(2, "0") + "-" +
+				String(day.getDate()).padStart(2, "0");
+			const capitalizedMode = this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1);
+			const isMonthMode = capitalizedMode === 'Month'
+			const isInCurrentMonth = day.getMonth() == this.currentDay.getMonth()
+			
+			if(isMonthMode && isInCurrentMonth) {
+				this.$router.replace({
+					name: "Stundenplan",
+					params: {
+						mode: capitalizedMode,
+						focus_date: date,
+						lv_id: this.propsViewData?.lv_id || null
+					}
+				})
+			} else {
+				this.$router.push({
+					name: "Stundenplan",
+					params: {
+						mode: capitalizedMode,
+						focus_date: date,
+						lv_id: this.propsViewData?.lv_id || null
+					}
+				})
+			}
+
 			this.currentDay = day;
+		},
+		handleOffset: function(offset)  {
+			this.currentDay = new Date(
+				this.currentDay.getFullYear() + offset.y, 
+				this.currentDay.getMonth() + offset.m,
+				this.currentDay.getDate() + offset.d
+			)
+
+			const date = this.currentDay.getFullYear() + "-" +
+				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
+				String(this.currentDay.getDate()).padStart(2, "0");
+			
+			this.$router.push({
+				name: "Stundenplan",
+				params: {
+					mode: this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1),
+					focus_date: date,
+					lv_id: this.propsViewData?.lv_id || null
+				}
+			})
+		},
+		handleChangeMode(mode) {
+			let m = mode[0].toUpperCase() + mode.slice(1)
+			if(m === this.calendarMode) return
+			const date = this.currentDay.getFullYear() + "-" +
+				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
+				String(this.currentDay.getDate()).padStart(2, "0");
+			
+			this.$router.push({
+				name: "Stundenplan",
+				params: {
+					mode: m,
+					focus_date: date,
+					lv_id: this.propsViewData?.lv_id ?? null
+				}
+			})
+			this.calendarMode = m
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
@@ -93,15 +189,16 @@ export const Stundenplan = {
 				this.$refs.lvmodal.show();
 			});
 		},
-		updateRange: function ({start,end}) {
-
+		updateRange: function ({start,end, mounted}) {
 			let checkDate = (date) => {
 				return date.m != this.eventCalendarDate.m || date.y != this.eventCalendarDate.y;
 			}
 			this.calendarDate = new CalendarDate(end);
 
 			// only load month data if the month or year has changed
-			if (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end))){
+			// or we receive a reload flag from the mounted routine of the components
+			// or this handler is being called from the mounted lifecycle of a component
+			if (mounted || (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end)))){
 				// reset the events before querying the new events to activate the loading spinner
 				this.events = null;
 				this.eventCalendarDate = new CalendarDate(end);
@@ -118,14 +215,16 @@ export const Stundenplan = {
 		},
 		loadEvents: function(){
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.viewData.lv_id),
+				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id),
 				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay),
 				this.loadMoodleEvents(this.monthFirstDay, this.monthLastDay)
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {
 					if (promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success") {
-
+						
+						if(promise_result.value.meta?.lv) this.lv = promise_result.value.meta.lv
+						
 						let data = promise_result.value.data;
 						// adding additional information to the events 
 						if (data && data.forEach) {
@@ -213,16 +312,32 @@ export const Stundenplan = {
 		.then(data=>{
 			this.uid = data.uid;
 		})
-		this.loadEvents();
+		
 	},
 	beforeUnmount() {
 		if(this.$refs.lvmodal) this.$refs.lvmodal.hide()	
 	},
 	template:/*html*/`
-	<h2>{{$p.t('lehre/stundenplan')}}</h2>
+	<h2>
+		{{$p.t('lehre/stundenplan')}}
+		<span style="padding-left: 0.4em;" v-show="studiensemester_kurzbz">{{studiensemester_kurzbz}}</span>
+		<span style="padding-left: 0.5em;" v-show="propsViewData?.lv_id && lv"> {{ $p.user_language.value === 'German' ? lv?.bezeichnung : lv?.bezeichnung_english}}</span>
+	</h2>
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
-	<fhc-calendar @selectedEvent="setSelectedEvent" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
+	<fhc-calendar
+		ref="calendar"
+		@selectedEvent="setSelectedEvent"
+		:initial-date="currentDay"
+		@change:range="updateRange"
+		@change:offset="handleOffset"
+		:events="events"
+		:initial-mode="propsViewData.mode"
+		show-weeks
+		@select:day="selectDay"
+		@change:mode="handleChangeMode"
+		v-model:minimized="minimized"
+	>
 		<template #calendarDownloads>
 			<div v-for="{title,icon,link} in downloadLinks">
 				<a :href="link" :title="title" class="py-1 px-2 m-1 btn btn-outline-secondary">
@@ -240,7 +355,7 @@ export const Stundenplan = {
 					<span class="flex-grow-1 text-center ">{{event.topic}}</span>
 				</div>
 			</div>
-			<div v-else class="p-1">
+			<div v-else @click="showModal($event, event)" class="p-1">
 				<span>{{event.topic}}</span>
 			</div>
 		</template>
@@ -282,17 +397,17 @@ export const Stundenplan = {
 								<span class="small">{{convertTime(event.ende.split(":"))}}</span>
 							</div>
 						</div>
-						<div class="col ">
-							<p>Lehrveranstaltung:</p>
-							<p class="m-0">{{event?.topic}}</p>
+						<div class="col">
+							<p>{{ $p.t('lehre/lehrveranstaltung') }}:</p>
+							<p class="m-0">{{event?.orig.topic}}</p>
 						</div>
-						<div class="col ">
-							<p>Lektor:</p>
-							<p class="m-0" v-for="lektor in event?.lektor">{{lektor.kurzbz}}</p>
+						<div class="col" :style="'max-height: ' + eventMaxHeight + '; overflow: auto;'">
+							<p>{{ $p.t('lehre/lektor') }}:</p>
+							<p class="m-0" v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
 						</div>
-						<div class="col ">
-							<p>Ort: </p>
-							<p class="m-0">{{event?.ort_kurzbz}}</p>
+						<div class="col">
+							<p>{{ $p.t('profil/Ort') }}: </p>
+							<p class="m-0">{{event?.orig.ort_kurzbz}}</p>
 						</div>
 					</div>
 				</template>
@@ -304,12 +419,14 @@ export const Stundenplan = {
 				<lv-info  :event="event" />
 			</div>
 			<template v-if="event.type != 'moodle'">
-				<h3 >Lehrveranstaltungs Menu</h3>
+				<h3 >{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
 				<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-show="lvMenu" :menu="lvMenu" />
 			</template>
 		</template>
-	</fhc-calendar>
-	`
+		<template #pageMobilContentEmpty >
+			<h3>{{ $p.t('lehre/noLvFound') }}</h3>
+		</template>
+	</fhc-calendar>`
 }
 
 export default Stundenplan

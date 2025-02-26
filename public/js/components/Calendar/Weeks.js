@@ -8,8 +8,6 @@ export default {
 		'size',
 		'focusDate'
 	],
-	data() {
-	},
 	computed: {
 		weeks(){
 			return [...Array(this.focusDate.numWeeks).keys()].map(i => i + 1);
@@ -34,7 +32,7 @@ export default {
 		},
 	},
 	template: `
-	<div class="fhc-calendar-weeks">
+	<div class="fhc-calendar-weeks h-100">
 		<calendar-header :title="title" @prev="prev" @next="next" @click="$emit('updateMode', 'years')" @updateMode="$emit('updateMode', $event)" />
 		<div class="d-flex flex-wrap">
 			<div v-for="(week, key) in weeks" :key="key" class="d-grid col-2">

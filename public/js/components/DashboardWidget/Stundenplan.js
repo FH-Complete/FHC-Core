@@ -265,11 +265,11 @@ export default {
 							
 						</div>
 						<div v-if="!value.length" class="list-group-item small text-center">
-							{{ p.t('lehre/noLvFound') }}
+							{{ $p.t('lehre/noLvFound') }}
 						</div>
 					</template>
 					<div v-else class="d-flex h-100 justify-content-center align-items-center fst-italic text-center">
-						{{ p.t('lehre/noLvFound') }}
+						{{ $p.t('lehre/noLvFound') }}
 					</div>
 				</div>
 			</template>
