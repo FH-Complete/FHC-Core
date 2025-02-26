@@ -1,5 +1,5 @@
-import AbstractWidget from './Abstract';
-import BsModal from '../Bootstrap/Modal';
+import AbstractWidget from './Abstract.js';
+import BsModal from '../Bootstrap/Modal.js';
 
 const MAX_LOADED_NEWS = 30;
 
