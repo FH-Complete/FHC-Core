@@ -63,10 +63,6 @@ export default {
 		
 	},
 	methods: {
-		handleEventClick(e, day) {
-			this.selectDay(day)
-			e.stopPropagation()
-		},
 		getDayClass(week, day) {
 			let classstring = 'fhc-calendar-month-page-day text-decoration-none overflow-hidden'
 			const isHighlightedWeek = this.isHighlightedWeek(week)
@@ -158,7 +154,7 @@ export default {
 				<span v-if="events[day.toDateString()] && events[day.toDateString()].length" class="events">
 					<div v-for="event in events[day.toDateString()]" :key="event.id" 
 					:style="{'background-color': event.color}" class="fhc-entry" :selected="event == selectedEvent"
-					v-contrast @click="handleEventClick($event, day)">
+					v-contrast @click.stop="selectDay(day)">
 						<slot  name="monthPage" :event="event" :day="day" >
 							<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 						</slot>

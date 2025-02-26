@@ -203,6 +203,7 @@ router.beforeEach((to, from) => {
 	// beforeEnter navigation guard
 	
 	// TODO: manage the infinite forward navigation issue somehow
+	// https://stackoverflow.com/questions/28028297/how-can-i-delete-a-window-history-state?rq=3
 	if (to.fullPath === from.fullPath) {
 		return false
 	}

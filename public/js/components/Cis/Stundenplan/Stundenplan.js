@@ -399,15 +399,15 @@ const Stundenplan = {
 						</div>
 						<div class="col">
 							<p>{{ $p.t('lehre/lehrveranstaltung') }}:</p>
-							<p class="m-0">{{event?.orig.topic}}</p>
+							<p class="m-0">{{event?.topic}}</p>
 						</div>
 						<div class="col" :style="'max-height: ' + eventMaxHeight + '; overflow: auto;'">
 							<p>{{ $p.t('lehre/lektor') }}:</p>
-							<p class="m-0" v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
+							<p class="m-0" v-for="lektor in event?.lektor">{{lektor.kurzbz}}</p>
 						</div>
 						<div class="col">
 							<p>{{ $p.t('profil/Ort') }}: </p>
-							<p class="m-0">{{event?.orig.ort_kurzbz}}</p>
+							<p class="m-0">{{event?.ort_kurzbz}}</p>
 						</div>
 					</div>
 				</template>
