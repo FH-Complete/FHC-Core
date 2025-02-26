@@ -1,7 +1,7 @@
 import CoreForm from "../Form/Form.js";
 import FormInput from "../Form/Input.js";
 import BsModal from "../Bootstrap/Modal.js";
-import AbstractWidget from './Abstract';
+import AbstractWidget from './Abstract.js';
 
 export default {
 	name: "WidgetsUrl",

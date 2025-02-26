@@ -240,7 +240,7 @@ export const Stundenplan = {
 					<span class="flex-grow-1 text-center ">{{event.topic}}</span>
 				</div>
 			</div>
-			<div class="p-1" v-else>
+			<div v-else class="p-1">
 				<span>{{event.topic}}</span>
 			</div>
 		</template>

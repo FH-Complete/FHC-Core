@@ -4,6 +4,7 @@ import FhcCalendar from '../Calendar/Calendar.js';
 import LvModal from '../Cis/Mylv/LvModal.js';
 import ContentModal from '../Cis/Cms/ContentModal.js'
 import CalendarDate from '../../composables/CalendarDate.js';
+import moodleSvg from "../../helpers/moodleSVG.js"
 
 export default {
 	mixins: [
@@ -14,6 +15,7 @@ export default {
 		FhcCalendar,
 		LvModal,
 		ContentModal,
+		moodleSvg
 	},
 	
 	data() {
@@ -123,7 +125,8 @@ export default {
 		loadEvents: function () {
 			Promise.allSettled([
 				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay),
-				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay)
+				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay),
+				this.loadMoodleEvents(this.monthFirstDay, this.monthLastDay)
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {
@@ -149,10 +152,65 @@ export default {
 						promise_events = promise_events.concat(data);
 					}
 				})
+				promise_events.sort((a, b) => {
+					if (a.type == 'moodle') {
+						return -1;
+					}
+					else if (b.type == 'moodle') {
+						return 1;
+					}
+					else {
+						return 0;
+					}
+				});
 				this.events = promise_events;
 			});
 		},
+		loadMoodleEvents: function (start_date, end_date) {
 
+			let date_start = Math.floor(new Date(start_date).getTime() / 1000);
+			let date_end = Math.floor(new Date(end_date).getTime() / 1000);
+			return this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid('io23m005', date_start, date_end).then((response) => response.events).then(events => {
+				let data = events.map(event => {
+					const event_start_date = new Date(event.timestart);
+					const event_end_date = new Date(event.timeend);
+					const formatted_date = `${event_start_date.getFullYear()}-${event_start_date.getMonth() + 1}-${event_start_date.getDate()}`;
+					// to get the same date and time as in moodle, we use the default UTC time zone 
+					const formatted_start_time = event_start_date.toLocaleTimeString(this.$p.user_locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+					const formatted_end_time = event_end_date.toLocaleTimeString(this.$p.user_locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+					return {
+						type: 'moodle',
+						beginn: formatted_start_time,
+						ende: formatted_end_time,
+						allDayEvent: true,
+						datum: formatted_date,
+						purpose: event.purpose,
+						assignment: event.activityname,
+						topic: event.activitystr,
+						lektor: [],
+						gruppe: [],
+						ort_kurzbz: event.location,
+						//moodle idnumber entspricht der course id number die man den Kurs in Moodle vergeben kann
+						lehreinheit_id: event.lehreinheitsNummber ?? null,
+						titel: event.course.fullname,
+						lehrfach: '',
+						lehrform: '',
+						lehrfach_bez: '',
+						organisationseinheit: '',
+						farbe: '00689E',
+						lehrveranstaltung_id: 0,
+						ort_content_id: 0,
+						url: event?.url,
+					}
+				});
+				return {
+					data: data,
+					meta: { status: 'success' }
+				};
+			})
+
+		},
 		setCalendarMaximized() {
 			this.minimized = false
 		}
@@ -169,7 +227,13 @@ export default {
 		<content-modal :content_id="roomInfoContentID" dialogClass="modal-lg" ref="contentModal"/>
 		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" :widget="true" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" >
 			<template #monthPage="{event,day}">
-				<span  >
+				<div  v-if="event.type=='moodle'">
+					<div class="d-flex small w-100" >
+						<moodle-svg></moodle-svg>
+						<span class="flex-grow-1 text-center ">{{event.topic}}</span>
+					</div>
+				</div>
+				<span v-else class="small" >
 					{{event.topic}}
 				</span>
 			</template>
@@ -183,13 +247,22 @@ export default {
 							<button class="btn btn-link link-secondary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"}, $p.user_locale.value)}}</button>
 						</div>
 						<div role="button" @click="showLvUebersicht(evt)" v-for="evt in value" :key="evt.id" class="list-group-item small" :style="getEventStyle(evt)">
-							<b>{{evt.topic}}</b>
-							<br>
-							<small v-if="evt.ort_kurzbz" class="d-flex w-100 justify-content-between">
-								<!-- event modifier stop to prevent opening the modal for the lv Uebersicht when clicking on the ort_kurzbz -->
-								<span @click.stop="showRoomInfoModal(evt.ort_kurzbz)" style="text-decoration:underline" type="button">{{evt.ort_kurzbz}}</span>
-								<span>{{evt.start.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}-{{evt.end.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}</span>
-							</small>
+							<template v-if="evt.type=='moodle'">
+								<div class="d-flex align-items-center ">
+									<moodle-svg></moodle-svg>
+									<b class="flex-grow-1 text-center">{{evt.topic}}</b>
+								</div>
+							</template>
+							<template v-else>
+								<b>{{evt.topic}}</b>
+								<br>
+								<small v-if="evt.ort_kurzbz" class="d-flex w-100 justify-content-between">
+									<!-- event modifier stop to prevent opening the modal for the lv Uebersicht when clicking on the ort_kurzbz -->
+									<span @click.stop="showRoomInfoModal(evt.ort_kurzbz)" style="text-decoration:underline" type="button">{{evt.ort_kurzbz}}</span>
+									<span>{{evt.start.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}-{{evt.end.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}</span>
+								</small>
+							</template>
+							
 						</div>
 						<div v-if="!value.length" class="list-group-item small text-center">
 							{{ p.t('lehre/noLvFound') }}
