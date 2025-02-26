@@ -21,7 +21,9 @@ export default {
 		lvinfo: Boolean,
 		benotung: Boolean,
 		lvnote: String,
+		lvnotebez: Array,
 		znote: String,
+		znotebez: Array,
 		studiengang_kuerzel: String,
 		semester: [String, Number],
 		orgform_kurzbz: String,
@@ -67,7 +69,11 @@ export default {
 		},
 		grade() {
 			const languageIndex = this.$p.user_language.value === 'English' ? 1 : 0
-			return this.benotung ? this.znotebez[languageIndex] || this.lvnotebez[languageIndex] || null : null;
+			if(this.benotung && this.znotebez?.length) {
+				return this.znotebez[languageIndex]
+			} else if(this.benotung && this.lvnotebez?.length) {
+				return this.lvnotebez[languageIndex]
+			} else return null
 		},
 		LvHasPruefungenInformation(){
 			return this.pruefungenData && this.pruefungenData.length > 0;

@@ -198,6 +198,16 @@ const router = VueRouter.createRouter({
 	]
 })
 
+router.beforeEach((to, from) => {
+	// this avoids redundant routing navigation in place due to router.replace on a route with param function and
+	// beforeEnter navigation guard
+	
+	// TODO: manage the infinite forward navigation issue somehow
+	if (to.fullPath === from.fullPath) {
+		return false
+	}
+})
+
 const app = Vue.createApp({
 	name: 'FhcApp',
 	data: () => ({

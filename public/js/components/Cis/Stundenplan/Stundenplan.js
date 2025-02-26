@@ -11,7 +11,7 @@ const Stundenplan = {
 	data() {
 		return {
 			events: null,
-			calendarMode: DEFAULT_MODE_STUNDENPLAN,
+			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_STUNDENPLAN,
 			calendarDate: new CalendarDate(new Date()),
 			eventCalendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
@@ -60,6 +60,7 @@ const Stundenplan = {
 			if(this.$refs.calendar) this.$refs.calendar.setMode(newVal)
 		},
 		'propsViewData.focus_date'(newVal) {
+			// todo: navigate around with date in current mode
 			this.currentDate = new Date(newVal)
 		}
 	},
@@ -119,8 +120,11 @@ const Stundenplan = {
 				String(day.getMonth() + 1).padStart(2, "0") + "-" +
 				String(day.getDate()).padStart(2, "0");
 			const capitalizedMode = this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1);
+			const isMonthMode = capitalizedMode === 'Month'
+			const isInCurrentMonth = day.getMonth() == this.currentDay.getMonth()
 			
-			this.$router.push({
+			if(isMonthMode && isInCurrentMonth) {
+				this.$router.replace({
 					name: "Stundenplan",
 					params: {
 						mode: capitalizedMode,
@@ -128,6 +132,16 @@ const Stundenplan = {
 						lv_id: this.propsViewData?.lv_id || null
 					}
 				})
+			} else {
+				this.$router.push({
+					name: "Stundenplan",
+					params: {
+						mode: capitalizedMode,
+						focus_date: date,
+						lv_id: this.propsViewData?.lv_id || null
+					}
+				})
+			}
 
 			this.currentDay = day;
 		},
@@ -141,7 +155,7 @@ const Stundenplan = {
 			const date = this.currentDay.getFullYear() + "-" +
 				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
 				String(this.currentDay.getDate()).padStart(2, "0");
-
+			
 			this.$router.push({
 				name: "Stundenplan",
 				params: {
@@ -153,10 +167,11 @@ const Stundenplan = {
 		},
 		handleChangeMode(mode) {
 			let m = mode[0].toUpperCase() + mode.slice(1)
+			if(m === this.calendarMode) return
 			const date = this.currentDay.getFullYear() + "-" +
 				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
 				String(this.currentDay.getDate()).padStart(2, "0");
-
+			
 			this.$router.push({
 				name: "Stundenplan",
 				params: {
@@ -238,7 +253,7 @@ const Stundenplan = {
 		.then(data=>{
 			this.uid = data.uid;
 		})
-
+		
 	},
 	beforeUnmount() {
 		if(this.$refs.lvmodal) this.$refs.lvmodal.hide()	
@@ -275,7 +290,7 @@ const Stundenplan = {
 			</div>
 		</template>
 		<template #monthPage="{event,day}">
-			<div>
+			<div @click="showModal($event, event)">
 				<span class="fhc-entry">
 					{{event.topic}}
 				</span>
