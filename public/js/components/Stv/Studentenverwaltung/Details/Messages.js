@@ -18,7 +18,7 @@ export default {
 			messageLayout="twoColumnsTableLeft"
 			show-table
 			show-new
-			open-mode="showDiv"
+			open-mode="newTab"
 			>
 		</core-messages>
 

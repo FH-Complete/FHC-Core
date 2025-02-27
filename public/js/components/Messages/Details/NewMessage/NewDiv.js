@@ -1,8 +1,7 @@
-import FormForm from '../../Form/Form.js';
-import FormInput from '../../Form/Input.js';
-import ListBox from "../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
-import DropdownComponent from '../../VorlagenDropdown/VorlagenDropdown.js';
-import MessageModal from "../Details/NewMessage/Modal.js";
+import FormForm from '../../../Form/Form.js';
+import FormInput from '../../../Form/Input.js';
+import ListBox from "../../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
+import DropdownComponent from '../../../VorlagenDropdown/VorlagenDropdown.js';
 
 export default {
 	components: {
@@ -10,19 +9,34 @@ export default {
 		FormInput,
 		ListBox,
 		DropdownComponent,
-		MessageModal,
 	},
 	props: {
 		endpoint: {
 			type: String,
 			required: true
 		},
-		typeId: String,
+		//for open in div and modal
+/*		typeId: String,
 		id: {
 			type: [Number, String],
 			required: true
-		},
+		},*/
 		openMode: String,
+	},
+	computed: {
+		//params with routes for new tab and new window AND props
+/*		id(){
+			return this.$route.params.id || this.id;
+		},
+		typeId(){
+			return this.$route.params.typeId || this.typeId;
+		},*/
+		id(){
+			return this.$route.params.id || this.$props.id;
+		},
+		typeId(){
+			return this.$route.params.typeId || this.$props.id;
+		}
 	},
 	data(){
 		return {
@@ -88,8 +102,8 @@ export default {
 			//TODO(Manu) check default recipient(s)
 			const data = new FormData();
 			const params = {
-					id: this.id,
-					type_id: this.typeId
+				id: this.id,
+				type_id: this.typeId
 			};
 			const merged = {
 				...this.formData,
@@ -116,7 +130,6 @@ export default {
 				);
 		},
 		getVorlagentext(vorlage_kurzbz){
-			//console.log(typeof vorlage_kurzbz);
 			return this.$fhcApi.factory.messages.person.getVorlagentext(vorlage_kurzbz)
 				.then(response => {
 					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
@@ -151,8 +164,8 @@ export default {
 			if (this.editor) {
 				this.editor.insertContent(selectedItem.value + " ");
 				//TODO(Manu) check: nicht mal mit Punkt adden gehts ohne eintrag nach vars
-/*				this.editor.focus();
-				this.editor.setDirty(true);*/
+				/*				this.editor.focus();
+								this.editor.setDirty(true);*/
 
 				//this.editor.fire('change'); //forces
 
@@ -180,10 +193,12 @@ export default {
 			}
 			this.$refs.dropdownComp.setValue(null);
 
+			this.previewBody = null;
+
 		},
-/*		toggleDivNewMessage(){
+		toggleDivNewMessage(){
 			this.isVisible = !this.isVisible;
-		},*/
+		},
 		handleSelectedVorlage(vorlage_kurzbz) {
 			if (typeof vorlage_kurzbz === "string") {
 				this.getVorlagentext(vorlage_kurzbz);
@@ -194,7 +209,7 @@ export default {
 			if (this.openMode == "showDiv")
 				this.isVisible = false;
 		},
-		showTemplate(id, typeId){
+		showTemplate(){
 			if (this.openMode == "showDiv")
 				this.isVisible = true;
 			//just for testing:
@@ -219,14 +234,14 @@ export default {
 		},
 		'formData.vorlage_kurzbz': {
 			handler(newVal){
-			//	console.log("Vorlage: " + newVal);
+				//	console.log("Vorlage: " + newVal);
 
 				if (newVal && newVal != null) {
 					this.formData.subject = newVal;
 					return this.getVorlagentext(newVal);
 				}
 			}
-		}
+		},
 	},
 	created(){
 		if(this.typeId == 'person_id'){
@@ -246,10 +261,10 @@ export default {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
 					//Just for testing with inserting values
-/*					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
-						label: key,
-						value: value
-					}));*/
+					/*					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
+											label: key,
+											value: value
+										}));*/
 					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
 						label: key.toLowerCase(),
 						value: '{' + key.toLowerCase() + '}'
@@ -271,11 +286,13 @@ export default {
 
 		this.$fhcApi.factory.messages.person.getNameOfDefaultRecipient({
 			id: this.id,
-			type_id: this.typeId})
+			type_id: this.typeId
+		})
 			.then(result => {
 				this.defaultRecipient = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+
 	},
 	async mounted() {
 		this.initTinyMCE();
@@ -284,23 +301,16 @@ export default {
 		this.editor.destroy();
 	},
 	template: `
+
 	<div class="messages-detail-newmessage">
 
-			<message-modal
-				ref="modalMsg"
-				:type-id="typeId"
-				:id="id"
-				:endpoint="endpoint"
-				:openMode="openMode"
-				@reloadTable="reloadTable"
-				>
-			</message-modal>
-<!--			<hr>
-		<button type="button" class="btn btn-warning" @click="toggleDivNewMessage()">Toggle NewMessage</button>
-		<hr>-->
+			<!--passt für showdiv-->
+<!--			<div class="overflow-auto" style="max-height: 500px; border: 1px solid #ccc;">-->
 
-		<div v-show="isVisible">
-			<div class="overflow-auto" style="max-height: 500px; border: 1px solid #ccc;">
+			<!--new page-->
+			<div class="overflow-auto m-3">
+
+			{{id}} || {{typeId}}
 
 				<h4>New Message</h4>
 	<!--			{{formData.body}}
@@ -323,7 +333,7 @@ export default {
 								>
 								</form-input>
 							</div>
-							
+
 							<div class="row mb-3">
 								<form-input
 									type="text"
@@ -362,9 +372,9 @@ export default {
 					</div>
 
 					<div class="col-sm-4">
-						<div v-if="this.fieldsPrestudent.length > 0">
+						<div v-if="this.fieldsPrestudent.length > 0"  class="mt-3">
 							<strong>Felder Prestudent</strong>
-							<div class="border p-3 overflow-auto" style="height: 200px;">
+							<div class="border p-3 overflow-auto" style="height: 250px;">
 
 								<list-box
 									v-model="selectedFieldPrestudent"
@@ -380,14 +390,13 @@ export default {
 
 							</div>
 
-							<button class="m-3" @click="insertVariablePrestudent">Insert Variable</button>
-							<p>{{selectedFieldPrestudent}}</p>
-
 						</div>
 
-						<div v-if="this.fieldsPerson.length > 0">
+						<br>
+
+						<div v-if="this.fieldsPerson.length > 0" class="mt-3">
 							<strong>Felder Person</strong>
-							<div class="border p-3 overflow-auto" style="height: 200px;">
+							<div class="border p-3 overflow-auto" style="height: 250px;">
 
 								<list-box
 									v-model="selectedFieldPerson"
@@ -402,8 +411,7 @@ export default {
 								</list-box>
 
 							</div>
-							<button class="m-3" @click="insertVariablePerson">Insert Variable</button>
-							<p>{{selectedFieldPerson}}</p>
+
 						</div>
 
 						<div>
@@ -423,8 +431,10 @@ export default {
 								</list-box>
 
 							</div>
-							<button class="m-3" @click="insertVariableUser">Insert Variable</button>
+
 						</div>
+
+						<br>
 
 						<div class="d-grid gap-2 d-md-flex justify-content-md-end">
 
@@ -462,15 +472,13 @@ export default {
 
 						<div class="col-sm-12 overflow-scroll">
 								<div ref="preview">
-									<div v-html="previewBody" class="p-3 border rounded overflow-scroll twoColumns"></div>
+									<div v-html="previewBody" class="p-3 border rounded overflow-scroll" style="height: 300px;"></div>
 								</div>
 						</div>
 
 					</div>
 
 				</div>
-	
-			</div>
 
 		</div>
 

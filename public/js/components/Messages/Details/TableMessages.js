@@ -1,10 +1,12 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import FormForm from '../../Form/Form.js';
+import NewMessage from "../Details/NewMessage.js";
 
 export default {
 	components: {
 		CoreFilterCmpt,
 		FormForm,
+		NewMessage,
 	},
 	inject: {
 		cisRoot: {
@@ -205,7 +207,8 @@ export default {
 				},
 			],
 			tabulatorData: [],
-			previewBody: ""
+			previewBody: "",
+			open: false
 		}
 	},
 	methods: {
@@ -233,20 +236,9 @@ export default {
 				});
 		},
 		actionNewMessage(){
+			this.$emit('newMessage', this.id, this.typeId);
 			//console.log("action new message");
-			if (this.openMode == "window") {
-				console.log("openInNewWindow")
-				const linkWindowNewMessage = this.cisRoot + '/public/js/components/Messages/Details/NewMessage.js';
-				window.open(linkWindowNewMessage, '_blank');
-			}
-			else if (this.openMode == "modal"){
-				console.log("open with bootstrap Modal");
-			}
-			else if (this.openMode == "showDiv"){
-				this.$emit('showNewMessageTemplate');
-			}
-			else
-				console.log("no valid openMode");
+
 		},
 		reload() {
 			this.$refs.table.reloadTable();
@@ -274,19 +266,10 @@ export default {
 	},
 	template: `
 	<div class="messages-detail-table">
-<!--		<p>endpoint: {{endpoint}}</p>-->
-<!--				{{cisRoot}}-->
-<!--		<p>{{messageLayout}}</p>-->
-
-		<!-- {{statusText[0] }}
-		<hr>
-		{{$p.t('messages', 'unread')}} -->
-		<!-- {{statusText.0}} -->
-		<!-- <p v-for="(bezeichnung, key) in statusText" :key="key" :value="key">{{bezeichnung}}</p> -->
 
 		<!--View Studierendenverwaltung-->
 		<div v-if="messageLayout=='twoColumnsTableLeft'">
-		
+
 			<div class="row">
 				<!--table-->
 				<div class="col-sm-6 pt-6">
@@ -307,7 +290,6 @@ export default {
 				<!--preview wysiwyg-window-->
 				<div class="col-sm-6 pt-6">
 				<br><br><br><br>
-
 					<div ref="preview">
 						<div v-html="previewBody" class="p-3 border rounded overflow-scroll twoColumns"></div>
 					</div>

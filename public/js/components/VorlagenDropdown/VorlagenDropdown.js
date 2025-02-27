@@ -57,7 +57,7 @@ export default {
 		if(this.useLoggedInUserOe){
 			this.$fhcApi.factory.vorlagen.getVorlagenByLoggedInUser()
 				.then(result => {
-					console.log(this.vorlagenOe);
+					//console.log(this.vorlagenOe);
 					this.vorlagenOe = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);

@@ -1,16 +1,16 @@
-import FormForm from '../../Form/Form.js';
-import FormInput from '../../Form/Input.js';
-import ListBox from "../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
-import DropdownComponent from '../../VorlagenDropdown/VorlagenDropdown.js';
-import MessageModal from "../Details/NewMessage/Modal.js";
+import BsModal from "../../../Bootstrap/Modal.js";
+import FormForm from "../../../Form/Form.js";
+import FormInput from '../../../Form/Input.js';
+import ListBox from "../../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
+import DropdownComponent from "../../../VorlagenDropdown/VorlagenDropdown.js";
 
 export default {
 	components: {
+		BsModal,
 		FormForm,
-		FormInput,
-		ListBox,
 		DropdownComponent,
-		MessageModal,
+		FormInput,
+		ListBox
 	},
 	props: {
 		endpoint: {
@@ -37,7 +37,6 @@ export default {
 			vorlagen: [],
 			defaultRecipient: null,
 			editor: null,
-			isVisible: false,
 			fieldsUser: [],
 			fieldsPerson: [],
 			fieldsPrestudent: [],
@@ -88,8 +87,8 @@ export default {
 			//TODO(Manu) check default recipient(s)
 			const data = new FormData();
 			const params = {
-					id: this.id,
-					type_id: this.typeId
+				id: this.id,
+				type_id: this.typeId
 			};
 			const merged = {
 				...this.formData,
@@ -151,8 +150,8 @@ export default {
 			if (this.editor) {
 				this.editor.insertContent(selectedItem.value + " ");
 				//TODO(Manu) check: nicht mal mit Punkt adden gehts ohne eintrag nach vars
-/*				this.editor.focus();
-				this.editor.setDirty(true);*/
+				/*				this.editor.focus();
+								this.editor.setDirty(true);*/
 
 				//this.editor.fire('change'); //forces
 
@@ -181,9 +180,6 @@ export default {
 			this.$refs.dropdownComp.setValue(null);
 
 		},
-/*		toggleDivNewMessage(){
-			this.isVisible = !this.isVisible;
-		},*/
 		handleSelectedVorlage(vorlage_kurzbz) {
 			if (typeof vorlage_kurzbz === "string") {
 				this.getVorlagentext(vorlage_kurzbz);
@@ -194,17 +190,18 @@ export default {
 			if (this.openMode == "showDiv")
 				this.isVisible = false;
 		},
-		showTemplate(id, typeId){
+		showTemplate(){
 			if (this.openMode == "showDiv")
 				this.isVisible = true;
-			//just for testing:
-			this.isVisible = true;
 		},
 		showPreview(){
 			this.getPreviewText().then(() => {
 				this.previewBody = this.previewText;
 			});
 		},
+		show(){
+			this.$refs.modalNewMessage.show();
+		}
 	},
 	watch: {
 		'formData.body': {
@@ -219,7 +216,7 @@ export default {
 		},
 		'formData.vorlage_kurzbz': {
 			handler(newVal){
-			//	console.log("Vorlage: " + newVal);
+				//	console.log("Vorlage: " + newVal);
 
 				if (newVal && newVal != null) {
 					this.formData.subject = newVal;
@@ -246,10 +243,10 @@ export default {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
 					//Just for testing with inserting values
-/*					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
-						label: key,
-						value: value
-					}));*/
+					/*					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
+											label: key,
+											value: value
+										}));*/
 					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
 						label: key.toLowerCase(),
 						value: '{' + key.toLowerCase() + '}'
@@ -284,28 +281,16 @@ export default {
 		this.editor.destroy();
 	},
 	template: `
-	<div class="messages-detail-newmessage">
+		<bs-modal class="messages-detail-newmessage-modal" ref="modalNewMessage" dialog-class="modal-xl">
 
-			<message-modal
-				ref="modalMsg"
-				:type-id="typeId"
-				:id="id"
-				:endpoint="endpoint"
-				:openMode="openMode"
-				@reloadTable="reloadTable"
-				>
-			</message-modal>
-<!--			<hr>
-		<button type="button" class="btn btn-warning" @click="toggleDivNewMessage()">Toggle NewMessage</button>
-		<hr>-->
+			<template #title>
+				New Message
+			</template>
 
-		<div v-show="isVisible">
-			<div class="overflow-auto" style="max-height: 500px; border: 1px solid #ccc;">
+			<form-form ref="formNewMassage">
 
-				<h4>New Message</h4>
-	<!--			{{formData.body}}
-				||
-				{{previewText}}-->
+				<div class="overflow-auto" style="max-height: 500px; border: 1px solid #ccc;">
+
 
 				<div class="row">
 					<div class="col-sm-8">
@@ -323,7 +308,7 @@ export default {
 								>
 								</form-input>
 							</div>
-							
+
 							<div class="row mb-3">
 								<form-input
 									type="text"
@@ -426,14 +411,6 @@ export default {
 							<button class="m-3" @click="insertVariableUser">Insert Variable</button>
 						</div>
 
-						<div class="d-grid gap-2 d-md-flex justify-content-md-end">
-
-							<button class="btn btn-secondary" @click="resetForm">Reset All</button>
-
-							<button v-if="statusNew" type="button" class="btn btn-primary" @click="sendMessage()">{{$p.t('ui', 'nachrichtSenden')}}</button>
-							<button v-else type="button" class="btn btn-primary" @click="replyMessage(formData.message_id)">{{$p.t('global', 'reply')}}</button>
-						</div>
-
 					</div>
 
 				</div>
@@ -469,12 +446,23 @@ export default {
 					</div>
 
 				</div>
-	
+
 			</div>
 
-		</div>
+			</form-form>
+
+			<template #footer>
+				<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+
+					<button class="btn btn-secondary" @click="resetForm">Reset All</button>
+
+					<button v-if="statusNew" type="button" class="btn btn-primary" @click="sendMessage()">{{$p.t('ui', 'nachrichtSenden')}}</button>
+					<button v-else type="button" class="btn btn-primary" @click="replyMessage(formData.message_id)">{{$p.t('global', 'reply')}}</button>
+				</div>
+			</template>
+
+		</bs-modal>
 
 	</div>
-	`
-
+	`,
 }

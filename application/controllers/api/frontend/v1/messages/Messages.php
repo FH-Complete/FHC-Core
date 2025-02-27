@@ -129,7 +129,7 @@ class Messages extends FHCAPI_Controller
 
 	public function getMsgVarsPrestudent($uid)
 	{
-
+		//$this->terminateWithError($uid, self::ERROR_TYPE_GENERAL);
 		$prestudent_id = $this-> _getPrestudentIdFromUid($uid);
 
 	//	$this->terminateWithError("prestudent_id " . $prestudent_id, self::ERROR_TYPE_GENERAL);
