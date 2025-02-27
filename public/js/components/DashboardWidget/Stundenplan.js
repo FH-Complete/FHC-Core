@@ -170,7 +170,7 @@ export default {
 
 			let date_start = Math.floor(new Date(start_date).getTime() / 1000);
 			let date_end = Math.floor(new Date(end_date).getTime() / 1000);
-			return this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid('io23m005', date_start, date_end).then((response) => response.events).then(events => {
+			return this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid(date_start, date_end).then((response) => response?.data?.events).then(events => {
 				let data = events.map(event => {
 					const event_start_date = new Date(event.timestart);
 					const event_end_date = new Date(event.timeend);
@@ -230,7 +230,7 @@ export default {
 				<div  v-if="event.type=='moodle'">
 					<div class="d-flex small w-100" >
 						<moodle-svg></moodle-svg>
-						<span class="flex-grow-1 text-center ">{{event.topic}}</span>
+						<span v-contrast class="flex-grow-1 text-center ">{{event.topic}}</span>
 					</div>
 				</div>
 				<span v-else class="small" >
@@ -250,7 +250,7 @@ export default {
 							<template v-if="evt.type=='moodle'">
 								<div class="d-flex align-items-center ">
 									<moodle-svg></moodle-svg>
-									<b class="flex-grow-1 text-center">{{evt.topic}}</b>
+									<b v-contrast class="flex-grow-1 text-center">{{evt.topic}}</b>
 								</div>
 							</template>
 							<template v-else>

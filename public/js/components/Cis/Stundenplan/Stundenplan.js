@@ -250,7 +250,7 @@ const Stundenplan = {
 			
 			let date_start = Math.floor(new Date(start_date).getTime() / 1000);
 			let date_end = Math.floor(new Date(end_date).getTime() / 1000);
-			return this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid('io23m005', date_start, date_end).then((response) => response.events).then(events => {
+			return this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid(date_start, date_end).then((response) => response?.data?.events).then(events => {
 				let data =events.map(event =>{
 					const event_start_date = new Date(event.timestart);
 					const event_end_date = new Date(event.timeend);

@@ -18,6 +18,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use CI3_Events as Events;
+
 class Stundenplan extends FHCAPI_Controller
 {
 
@@ -28,6 +30,7 @@ class Stundenplan extends FHCAPI_Controller
 	{
 
 		parent::__construct([
+			'fetchMoodleEvents' => self::PERM_LOGGED,
 			'getRoomplan' => self::PERM_LOGGED,
             'Stunden' => self::PERM_LOGGED,
             'Reservierungen' => self::PERM_LOGGED,
@@ -56,6 +59,21 @@ class Stundenplan extends FHCAPI_Controller
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
+
+	public function fetchMoodleEvents(){
+		$this->load->library('form_validation');
+        $this->form_validation->set_data($_GET);
+        $this->form_validation->set_rules('timestart',"timestart","required");
+        $this->form_validation->set_rules('timeend',"timeend","required");
+        if($this->form_validation->run() === FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
+
+        $timestart = intval($this->input->get('timestart', TRUE));
+        $timeend = intval($this->input->get('timeend', TRUE));
+		Events::trigger('moodleCalendarEvents',
+						['timestart'=>$timestart,'timeend'=>$timeend, 'username'=>getAuthUID()]
+		);
+		$this->terminateWithSuccess(json_decode(ob_get_contents()));
+	}
 
 	//TODO: delete this function if we don't use the old calendar export endpoints anymore
 	public function studiensemesterDateInterval($date){

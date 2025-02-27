@@ -42,12 +42,10 @@ export default {
 			{}
 		);
 	},
-	getMoodleEventsByUserid(username, timestart, timeend) {
+	getMoodleEventsByUserid(timestart, timeend) {
 		return this.$fhcApi.get(
-			FHC_JS_DATA_STORAGE_OBJECT.app_root +
-			`addons/moodle/cis/get_events_by_userid.php`,
+			`/api/frontend/v1/Stundenplan/fetchMoodleEvents`,
 			{
-				username: username,
 				timestart: timestart,
 				timeend: timeend,
 			}
