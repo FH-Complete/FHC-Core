@@ -19211,13 +19211,33 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Maßnahmen - geplant',
+				'text' => 'Maßnahme - geplant',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Measures - planned',
+				'text' => 'Measure - planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'geplanteMassnahmenDesc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Maßhname wurde geplant.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The measure was planned.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19271,13 +19291,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Maßnahmen - durchgeführt',
+				'text' => 'Maßnahme - durchgeführt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Measures - performed',
+				'text' => 'Measure - performed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19311,13 +19331,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Maßnahmen - abgelehnt',
+				'text' => 'Maßnahme - abgelehnt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Measures - declined',
+				'text' => 'Measure - declined',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19411,13 +19431,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Anmerkung - Studiengangsleitung',
+				'text' => 'Begründung - Studiengangsleitung',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Note - Study course Director',
+				'text' => 'Reason - Study course Director',
 				'description' => '',
 				'insertvon' => 'system'
 			)
