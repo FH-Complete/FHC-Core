@@ -319,8 +319,8 @@ class Student extends FHCAPI_Controller
 		$this->form_validation->set_rules('geschlecht', 'Geschlecht', 'callback_requiredIfNotPersonId', [
 			'requiredIfNotPersonId' => $this->p->t('ui', 'error_required')
 		]);
-		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'callback_isValidDate', [
-			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
+		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_invalid_date')
 		]);
 		$this->form_validation->set_rules('address[func]', 'Address', 'required|integer|less_than[2]|greater_than[-2]');
 		$this->form_validation->set_rules('address[plz]', 'PLZ', 'callback_requiredIfAddressFunc', [

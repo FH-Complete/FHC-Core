@@ -127,9 +127,9 @@ class Unterbrechung extends FHCAPI_Controller
 		$this->form_validation->set_rules(
 			'datum_wiedereinstieg',
 			'Datum Wiedereinstieg',
-			'required|callback_isValidDate|callback_isDateInFuture',
+			'required|is_valid_date|callback_isDateInFuture',
 			[
-				'isValidDate' => $this->p->t('ui', 'error_invalid_date'),
+				'is_valid_date' => $this->p->t('ui', 'error_invalid_date'),
 				'isDateInFuture' => $this->p->t('ui', 'error_invalid_date')
 			]
 		);
@@ -209,18 +209,9 @@ class Unterbrechung extends FHCAPI_Controller
 		$this->terminateWithSuccess(getData($result));
 	}
 
-	public function isValidDate($date)
-	{
-		try {
-		    new DateTime($date);
-		} catch (Exception $e) {
-			return false;
-		}
-		return true;
-	}
-
 	public function isDateInFuture($date)
 	{
 		return new DateTime() < new DateTime($date);
 	}
 }
+
