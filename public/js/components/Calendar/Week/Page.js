@@ -363,17 +363,17 @@ export default {
 					<div @wheel.stop class="all-day-event all-day-event-border" v-for="(day,dayindex) in eventsPerDayAndHour">
 						<template v-for="(events,_day) in allDayEvents" :key="_day">
 
-						<div v-if="dayindex == _day" v-for="event in events" :key="event" class="d-grid m-1" style="top:0;" @click.prevent="weekPageClick(event, _day)"
-									:selected="event == selectedEvent"
-									:style="{'background-color': event?.color, 'margin-bottom':'1px'}"
-									class="small rounded overflow-hidden fhc-entry"
-									v-contrast
-									>		
-									<slot class="p-1" name="weekPage" :event="event" :day="day">
-										<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
-									</slot>
-								</div>
-							</template>
+							<div v-if="dayindex == _day" v-for="event in events" :key="event" class="d-grid m-1" style="top:0;" @click.prevent="weekPageClick(event, _day)"
+								:selected="event == selectedEvent"
+								:style="{'background-color': event?.color, 'margin-bottom':'1px'}"
+								class="small rounded overflow-hidden fhc-entry"
+								v-contrast
+								>		
+								<slot class="p-1" name="weekPage" :event="event" :day="day">
+									<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+								</slot>
+							</div>
+						</template>
 					</div>
 				</div>
 				<div class="events position-relative" :ref="'eventsRef'+week" @mousemove="calcHourPosition" @mouseleave="hourPosition = null">

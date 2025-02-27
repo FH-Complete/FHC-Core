@@ -72,7 +72,7 @@ export default {
 			const isNotThisMonth = day.getMonth() != this.month
 			const isInThePast = day.getTime() < this.today // this.date is just the focusDate but not the initial Date
 			
-			if(isThisDate) classstring += ' border-8'
+			if(isThisDate) classstring += ' fhc-calendar-month-page-day-focusday'
 			if(isHighlightedWeek) classstring += ' fhc-highlight-week'
 			if(isHighlightedDay) classstring += ' fhc-highlight-day'
 			
