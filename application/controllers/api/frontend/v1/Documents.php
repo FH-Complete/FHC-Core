@@ -149,9 +149,11 @@ class Documents extends FHCAPI_Controller
 	}
 
 	/**
+	 * @param string				$xml
+	 * @param string				$xsl
+	 * @param string				$sign_user (optional)
 	 * 
-	 * @param
-	 * @return object success or error
+	 * @return array with Akte data and export data
 	 */
 	private function _getAkteExportData($xml, $xsl, $sign_user = null)
 	{
