@@ -472,8 +472,8 @@ if($command=="update" && $error!=true)
 							else
 							{
 								// paarbeit sollte nur ab bestimmten Zeitpunkt online bewertet werden
-								$num_rows_sem = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
-								if(!is_numeric($num_rows_sem) || $num_rows_sem < 0)
+								$paIsCurrent = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
+								if(!is_bool($paIsCurrent))
 								{
 									echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerAktualitaetProjektarbeit')."</font><br>&nbsp;";
 								}

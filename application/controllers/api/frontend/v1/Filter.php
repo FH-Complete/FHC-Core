@@ -113,7 +113,7 @@ class Filter extends FHCAPI_Controller
 	 */
 	public function applyFilterFields()
 	{
-		$this->form_validation->set_rules('filterFields', 'filterFields', 'required');
+		$this->form_validation->set_rules('filterFields[]', 'filterFields', 'required');
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
