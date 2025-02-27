@@ -2,7 +2,7 @@ import CalendarAbstract from './Abstract.js';
 import CalendarPane from './Pane.js';
 import CalendarWeekPage from './Week/Page.js';
 import BsModal from "../Bootstrap/Modal.js";
-import Weeks from "./Weeks";
+import Weeks from "./Weeks.js";
 
 export default {
 	mixins: [

@@ -2,7 +2,7 @@ import CalendarAbstract from './Abstract.js';
 import CalendarPane from './Pane.js';
 import CalendarMonthPage from './Month/Page.js';
 import BsModal from "../Bootstrap/Modal.js";
-import Months from "./Months";
+import Months from "./Months.js";
 export default {
 	mixins: [
 		CalendarAbstract

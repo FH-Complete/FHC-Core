@@ -336,7 +336,7 @@ const Stundenplan = {
 			</div>
 		</template>
 		<template #monthPage="{event,day}">
-			<div class="p-1" v-if="event.type=='moodle'">
+			<div class="p-1" v-if="event.type=='moodle'" @click="showModal(event)">
 				<div class="d-flex small w-100" >
 					<moodle-svg></moodle-svg>
 					<span class="flex-grow-1 text-center ">{{event.topic}}</span>

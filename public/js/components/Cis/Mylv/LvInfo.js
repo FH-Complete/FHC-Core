@@ -56,21 +56,47 @@ export default {
 	},
 	template:/*html*/`
 		<table class="table table-hover mb-4">
-			<tbody>
-				<tr>
-					<th>{{
-						$p.t('global','datum')?
-						$p.t('global','datum')+':'
-						:''
-					}}</th>
-					<td>{{methodFormatDate(event.datum)}}</td>
-				</tr>
-				<tr>
-					<template v-if="event.type == LV_TYPES.moodle">
+			<template v-if="event.type == LV_TYPES.moodle">
+				<tbody>
+					<tr>
+						<th>{{
+							$p.t('global','datum')?
+							$p.t('global','datum')+':'
+							:''
+						}}</th>
+						<td>{{methodFormatDate(event.datum)}}</td>
+					</tr>
+					<tr>
 						<th>{{$p.t('global','aktivitaet')}}:</th>
 						<td>{{event?.assignment}}</td>
-					</template>
-					<template v-else>
+					</tr>
+					<tr>
+						<th>{{$p.t('global','typ')}}:</th>
+						<td>{{event?.purpose}}</td>
+					</tr>
+					<tr>
+						<th>{{$p.t('fristenmanagement','frist')}}:</th>
+						<td>{{start_time}}</td>
+					</tr>
+					<tr >
+				    	<th>Link:</th>
+						<td>
+							<a :href="event?.url" target="_blank"><i class="fa fa-arrow-up-right-from-square me-1"></i></a>
+						</td>
+					</tr>
+				</tbody>
+			</template>
+			<template v-else>
+				<tbody>
+					<tr>
+						<th>{{
+							$p.t('global','datum')?
+							$p.t('global','datum')+':'
+							:''
+						}}</th>
+						<td>{{methodFormatDate(event.datum)}}</td>
+					</tr>
+					<tr>
 						<th>{{
 							$p.t('global','raum')?
 							$p.t('global','raum')+':'
@@ -80,9 +106,7 @@ export default {
 							<a v-if="event.ort_content_id" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
 							{{event.ort_kurzbz}}
 						</td>
-					</template>
-				</tr>
-				<template v-if="event.type != LV_TYPES.moodle">
+					</tr>
 					<tr>
 						<th>{{
 							$p.t('lehre','lehrveranstaltung')?
@@ -91,8 +115,6 @@ export default {
 						}}</th>
 						<td>{{'('+event.lehrform+') ' + event.lehrfach_bez}}</td>
 					</tr>
-				</template>
-				<template v-if="event.type != LV_TYPES.moodle">
 					<tr>
 						<th>{{
 							$p.t('lehre','lektor')?
@@ -106,40 +128,24 @@ export default {
 							</div>
 						</td>
 					</tr>
-				</template>
-				<tr>
-					<template v-if="event.type == LV_TYPES.moodle">
-						<th>{{$p.t('global','typ')}}:</th>
-						<td>{{event?.purpose}}</td>
-					</template>
-					<template v-else>
+					<tr>
 						<th>{{
-							$p.t('ui','zeitraum')?
-							$p.t('ui','zeitraum')+':'
-							:''
-						}}</th>
+								$p.t('ui','zeitraum')?
+								$p.t('ui','zeitraum')+':'
+								:''
+							}}</th>
 						<td>{{start_time + ' - ' + end_time}}</td>
-					</template>
-				</tr>
-				<tr>
-				    <template v-if="event.type == LV_TYPES.moodle">
-						<th>{{$p.t('fristenmanagement','frist')}}:</th>
-						<td>{{start_time}}</td>
-					</template>
-					<template v-else>
+					</tr>
+					<tr>
 						<th>{{
 							$p.t('lehre','organisationseinheit')?
 							$p.t('lehre','organisationseinheit')+':'
 							:''
 						}}</th>
 						<td>{{event.organisationseinheit}}</td>
-					</template>
-				</tr>
-				<tr v-if="event.type == LV_TYPES.moodle">
-				    <th>Link:</th>
-					<td><a :href="event?.url" target="_blank"><i class="fa fa-arrow-up-right-from-square me-1"></i></a></td>
-				</tr>
-			</tbody>
+					</tr>
+				</tbody>
+			</template>
 		</table>
 	`
 }
