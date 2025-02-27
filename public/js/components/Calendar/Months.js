@@ -12,6 +12,7 @@ export default {
 	],
 	data() {
 		return {
+			// TODO: 36, 24, 16 (2+ 12 + 2) months to enable year switch?
 			monthIndices: [...Array(12).keys()]
 		}
 	},

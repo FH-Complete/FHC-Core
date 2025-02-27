@@ -1,6 +1,8 @@
 import CalendarAbstract from './Abstract.js';
 import CalendarPane from './Pane.js';
 import CalendarWeekPage from './Week/Page.js';
+import BsModal from "../Bootstrap/Modal.js";
+import Weeks from "./Weeks";
 
 export default {
 	mixins: [
@@ -8,7 +10,9 @@ export default {
 	],
 	components: {
 		CalendarWeekPage,
-		CalendarPane
+		CalendarPane,
+		BsModal,
+		Weeks
 	},
 	computed: {
 		title() {
@@ -16,6 +20,16 @@ export default {
 		}
 	},
 	methods: {
+		handleWeekChanged(week) {
+			// this.$emit('change:offset', { y: 0, m: month - this.focusDate.m, d: 0 });
+			this.$refs.modalDatepickerContainer.hide()
+		},
+		hideMonthsModal() {
+			this.$refs.modalDatepickerContainer.hide()
+		},
+		handleHeaderClickWeek() {
+			this.$refs.modalDatepickerContainer.show()
+		},
 		paneChanged(dir) {
 			this.focusDate.d += dir * 7;
 			this.emitRangeChanged();
@@ -42,7 +56,7 @@ export default {
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-week">
-		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'weeks')">
+		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="handleHeaderClickWeek">
 			<template #calendarDownloads>
 				<slot name="calendarDownloads"></slot>
 			</template>
@@ -54,5 +68,12 @@ export default {
 				</template>
 			</calendar-week-page>
 		</calendar-pane>
-	</div>`
+	</div>
+
+	<bs-modal ref="modalDatepickerContainer" dialogClass='modal-lg' class="bootstrap-prompt">
+		<template v-slot:default>
+			<weeks :header="false" @change="handleWeekChanged"></weeks>
+		</template>
+	</bs-modal>
+`
 }

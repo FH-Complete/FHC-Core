@@ -121,28 +121,15 @@ const Stundenplan = {
 				String(day.getMonth() + 1).padStart(2, "0") + "-" +
 				String(day.getDate()).padStart(2, "0");
 			const capitalizedMode = this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1);
-			const isMonthMode = capitalizedMode === 'Month'
-			const isInCurrentMonth = day.getMonth() == this.currentDay.getMonth()
-			
-			if(isMonthMode && isInCurrentMonth) {
-				this.$router.replace({
-					name: "Stundenplan",
-					params: {
-						mode: capitalizedMode,
-						focus_date: date,
-						lv_id: this.propsViewData?.lv_id || null
-					}
-				})
-			} else {
-				this.$router.push({
-					name: "Stundenplan",
-					params: {
-						mode: capitalizedMode,
-						focus_date: date,
-						lv_id: this.propsViewData?.lv_id || null
-					}
-				})
-			}
+
+			this.$router.push({
+				name: "Stundenplan",
+				params: {
+					mode: capitalizedMode,
+					focus_date: date,
+					lv_id: this.propsViewData?.lv_id || null
+				}
+			})
 
 			this.currentDay = day;
 		},

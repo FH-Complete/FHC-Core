@@ -44,7 +44,6 @@ export default {
 			this.emitRangeChanged()
 		},
 		emitRangeChanged(mounted = false) {
-
 			this.$emit('change:range', {
 				start: new Date(this.focusDate.y, this.focusDate.m, 1),
 				end: new Date(this.focusDate.y, this.focusDate.m+1, 0),

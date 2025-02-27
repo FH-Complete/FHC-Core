@@ -198,17 +198,6 @@ const router = VueRouter.createRouter({
 	]
 })
 
-router.beforeEach((to, from) => {
-	// this avoids redundant routing navigation in place due to router.replace on a route with param function and
-	// beforeEnter navigation guard
-	
-	// TODO: manage the infinite forward navigation issue somehow
-	// https://stackoverflow.com/questions/28028297/how-can-i-delete-a-window-history-state?rq=3
-	if (to.fullPath === from.fullPath) {
-		return false
-	}
-})
-
 const app = Vue.createApp({
 	name: 'FhcApp',
 	data: () => ({
