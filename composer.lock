@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "01ea35652d88680f8262c5365828eb46",
+    "content-hash": "d1ed276d478102b0f2b03f7a883ee058",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -1515,6 +1515,15 @@
             "dist": {
                 "type": "zip",
                 "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/5.5.2.zip"
+            },
+            "type": "library"
+        },
+        {
+            "name": "olifolkerd/tabulator6",
+            "version": "6.3.1",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/6.3.1.zip"
             },
             "type": "library"
         },
@@ -4752,5 +4761,5 @@
         "php": ">=5.6.40"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.6.0"
 }
