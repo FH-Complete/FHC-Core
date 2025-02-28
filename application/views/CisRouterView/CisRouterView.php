@@ -5,7 +5,7 @@ $includesArray = array(
 	'axios027' => true,
 	'bootstrap5' => true,
 	'fontawesome6' => true,
-	'tabulator5' => true,
+	'tabulator5' => true, // TODO: upgrade to 6 when available
 	'vue3' => true,
 	'primevue3' => true,
 	'vuedatepicker11' => true,
@@ -24,7 +24,8 @@ $includesArray = array(
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.js',
-		'vendor/npm-asset/primevue/accordiontab/accordiontab.js'
+		'vendor/npm-asset/primevue/accordiontab/accordiontab.js',
+		'vendor/npm-asset/primevue/inputnumber/inputnumber.js'
 	),
 	'customJSModules' => array(
 		'public/js/apps/Dashboard/Fhc.js'

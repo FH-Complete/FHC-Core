@@ -60,5 +60,5 @@ export default {
     addons,
 	studiengang,
 	menu,
-	authinfo,
+	authinfo
 };

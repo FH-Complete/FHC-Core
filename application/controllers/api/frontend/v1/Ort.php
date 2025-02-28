@@ -35,6 +35,8 @@ class Ort extends FHCAPI_Controller
 		parent::__construct([
 			'ContentID' => self::PERM_LOGGED,
 			'getOrtKurzbzContent' => self::PERM_LOGGED,
+			'getRooms' => self::PERM_LOGGED,
+			'getTypes' => self::PERM_LOGGED
 		]);
 
 		$this->load->model('ressource/Ort_model', 'OrtModel');
@@ -44,6 +46,57 @@ class Ort extends FHCAPI_Controller
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
+	/**
+	 * Retrieves all Ort entries filtered by the provided parameters
+	 */
+	public function getRooms()
+	{
+		// TODO: form validation
+		$datum = $this->input->get('datum', TRUE);
+		$von = $this->input->get('von', TRUE);
+		$bis = $this->input->get('bis', TRUE);
+		$typ = $this->input->get('typ', TRUE);
+		$personenanzahl = $this->input->get('personenanzahl', TRUE);
+
+		$this->load->model('ressource/Stunde_model', 'StundeModel');
+		$vonStunde = getData($this->StundeModel->getStundeForTime($von))[0]->stunde;
+		$bisStunde = getData($this->StundeModel->getStundeForTime($bis))[0]->stunde;
+		
+		$params = array();
+		$qry = "SELECT DISTINCT tbl_ort.*
+			FROM public.tbl_ort JOIN public.tbl_ortraumtyp USING(ort_kurzbz)
+			WHERE aktiv AND lehre AND ort_kurzbz NOT LIKE '\\\\_%'";
+		if($typ) {
+			$params[] = $typ;
+			$qry.= "AND raumtyp_kurzbz= ?";
+		}
+		$qry.= "AND (max_person>= ? OR max_person is null)";
+		$params[] = $personenanzahl;
+
+		$qry.="	AND ort_kurzbz NOT IN 
+			(
+				SELECT ort_kurzbz FROM lehre.tbl_stundenplandev WHERE datum=? AND stunde>=? AND stunde<=?
+				UNION
+				SELECT ort_kurzbz FROM campus.tbl_reservierung WHERE datum=? AND stunde>=? AND stunde<=?
+			)
+		";
+		$params = array_merge($params, [$datum, $vonStunde, $bisStunde, $datum, $vonStunde, $bisStunde]);
+		
+		$result = $this->OrtModel->execReadOnlyQuery($qry, $params);
+		
+		$this->terminateWithSuccess($result);
+	}
+
+	public function getTypes()
+	{
+		$this->load->model('ressource/Raumtyp_model', 'RaumtypModel');
+		$result = $this->OrtModel->execReadOnlyQuery("
+			SELECT * FROM public.tbl_raumtyp WHERE aktiv = true ORDER BY raumtyp_kurzbz;
+		");
+
+		$this->terminateWithSuccess(getData($result));
+	}
+	
 	/**
 	 * Gets a JSON body via HTTP POST and provides the parameters
 	 */

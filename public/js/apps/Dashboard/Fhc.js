@@ -6,6 +6,7 @@ import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import Stundenplan, {DEFAULT_MODE_STUNDENPLAN} from "../../components/Cis/Stundenplan/Stundenplan.js";
 import MylvStudent from "../../components/Cis/Mylv/Student.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
+import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
 import CmsContent from "../../components/Cis/Cms/Content.js";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
@@ -28,7 +29,12 @@ const router = VueRouter.createRouter({
 			component: Profil,
 			props: true
 		},
-		
+		{
+			path: `/Cis/Raumsuche`,
+			name: 'Raumsuche',
+			component: Raumsuche,
+			props: true
+		},
 		// Redirect old links to new format
 		{
 			path: "/CisVue/Cms/getRoomInformation/:ort_kurzbz",

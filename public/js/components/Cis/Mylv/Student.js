@@ -76,6 +76,7 @@ export default {
 			this.$refs.studiensemester.dispatchEvent(new Event('change', { bubbles: true }));
 		},
 		setHash(val) {
+			// TODO: make this a router param to enable history
 			location.hash = val;
 		}
 	},
