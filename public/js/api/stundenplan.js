@@ -6,12 +6,6 @@ export default {
 			{  ort_kurzbz, start_date, end_date}
 		);
 	},
-	getStundenplan(start_date, end_date, lv_id) {
-		return this.$fhcApi.get(
-			'/api/frontend/v1/Stundenplan/getStundenplan',
-			{ start_date, end_date, lv_id }
-		);
-	},
 	getStunden() {
 		return this.$fhcApi.get(
 			'/api/frontend/v1/Stundenplan/Stunden',
@@ -42,14 +36,12 @@ export default {
 			{}
 		);
 	},
-	getMoodleEventsByUserid(timestart, timeend) {
+	StundenplanEvents(start_date, end_date, lv_id) {
 		return this.$fhcApi.get(
-			`/api/frontend/v1/Stundenplan/fetchMoodleEvents`,
-			{
-				timestart: timestart,
-				timeend: timeend,
-			}
+			'/api/frontend/v1/Stundenplan/StundenplanEvents',
+			{ start_date, end_date, lv_id }
 		);
 	},
+	
 	
 };

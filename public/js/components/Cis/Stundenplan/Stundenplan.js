@@ -191,6 +191,7 @@ const Stundenplan = {
 				this.eventCalendarDate = new CalendarDate(end);
 				Vue.nextTick(() => {
 					this.loadEvents();
+					
 				});
 			}
 		},
@@ -202,9 +203,8 @@ const Stundenplan = {
 		},
 		loadEvents: function(){
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id),
+				this.$fhcApi.factory.stundenplan.StundenplanEvents(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id),
 				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay),
-				this.loadMoodleEvents(this.monthFirstDay, this.monthLastDay)
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {
@@ -232,64 +232,9 @@ const Stundenplan = {
 						promise_events = promise_events.concat(data);
 					}
 				})
-				promise_events.sort((a, b) => {
-					if(a.type=='moodle'){
-						return -1;
-					}
-					else if(b.type=='moodle'){
-						return 1;
-					}
-					else{
-						return 0;
-					}
-				});
+			
 				this.events = promise_events;
 			});
-		},
-		loadMoodleEvents: function(start_date, end_date){
-			
-			let date_start = Math.floor(new Date(start_date).getTime() / 1000);
-			let date_end = Math.floor(new Date(end_date).getTime() / 1000);
-			return this.$fhcApi.factory.stundenplan.getMoodleEventsByUserid(date_start, date_end).then((response) => response?.data?.events).then(events => {
-				let data =events.map(event =>{
-					const event_start_date = new Date(event.timestart);
-					const event_end_date = new Date(event.timeend);
-					const formatted_date = `${event_start_date.getFullYear()}-${event_start_date.getMonth()+1}-${event_start_date.getDate()}`;
-					// to get the same date and time as in moodle, we use the default UTC time zone 
-					const formatted_start_time = event_start_date.toLocaleTimeString(this.$p.user_locale, {hour:'2-digit',minute:'2-digit', second:'2-digit',hour12:false});
-					const formatted_end_time = event_end_date.toLocaleTimeString(this.$p.user_locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-					
-					return {
-						type:'moodle',
-						beginn: formatted_start_time,
-						ende: formatted_end_time,
-						allDayEvent: true,
-						datum: formatted_date,
-						purpose: event.purpose,
-						assignment: event.activityname,
-						topic: event.activitystr,
-						lektor:[],
-						gruppe:[],
-						ort_kurzbz: event.location,
-						//moodle idnumber entspricht der course id number die man den Kurs in Moodle vergeben kann
-						lehreinheit_id:event.lehreinheitsNummber??null,
-						titel: event.course.fullname,
-						lehrfach:'',
-						lehrform:'',
-						lehrfach_bez:'',
-						organisationseinheit:'',
-						farbe:'00689E',
-						lehrveranstaltung_id:0,
-						ort_content_id:0,
-						url:event?.url,
-					}
-				});
-				return {
-					data: data,
-					meta: { status: 'success' }
-				};
-			})
-			
 		},
 	},
 	created()
