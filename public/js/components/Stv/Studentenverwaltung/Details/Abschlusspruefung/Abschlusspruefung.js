@@ -377,7 +377,7 @@ export default {
 			}
 			this.abortController.mitarbeiter = new AbortController();
 
-			return this.$refs.formFinalExam.factory.stv.abschlusspruefung.getMitarbeiter(event.query)
+			return this.$fhcApi.factory.stv.abschlusspruefung.getMitarbeiter(event.query)
 				.then(result => {
 					this.filteredMitarbeiter = result.data.retval;
 				});
@@ -388,7 +388,7 @@ export default {
 			}
 			this.abortController.pruefer = new AbortController();
 
-			return this.$refs.formFinalExam.factory.stv.abschlusspruefung.getPruefer(event.query)
+			return this.$fhcApi.factory.stv.abschlusspruefung.getPruefer(event.query)
 				.then(result => {
 					this.filteredPruefer = result.data.retval;
 				});
