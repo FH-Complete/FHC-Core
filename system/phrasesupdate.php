@@ -39287,6 +39287,46 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'abschluessPruefungAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschlussprüfung anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Final Exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'abschluessPruefungBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschlussprüfung bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Final Exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// FHC4 Phrases Abschlusspruefung End
 	array(
 		'app' => 'core',
@@ -40226,6 +40266,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'This record is used by the Mobility Extension and must first be deleted there.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'mobility_anlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobilität anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create mobility',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+		array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'mobility_bearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobilität bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit mobility',
 				'description' => '',
 				'insertvon' => 'system'
 			)

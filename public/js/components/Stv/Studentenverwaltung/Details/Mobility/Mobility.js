@@ -176,9 +176,6 @@ export default {
 				this.$refs.table.reloadTable();
 			}
 		},
-/*		formData.lehrveranstaltung_id(){
-
-		}*/
 	},
 	computed:{
 		lv_teile(){
@@ -189,11 +186,13 @@ export default {
 		actionNewMobility() {
 			this.resetForm();
 			this.statusNew = true;
+			this.$refs.mobilityModal.show();
 		},
 		actionEditMobility(bisio_id) {
 			this.resetForm();
 			this.statusNew = false;
 			this.loadMobility(bisio_id);
+			this.$refs.mobilityModal.show();
 		},
 		actionDeleteMobility(bisio_id) {
 			this.$fhcAlert
@@ -212,6 +211,7 @@ export default {
 			return this.$fhcApi.factory.stv.mobility.addNewMobility(this.$refs.formMobility, dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.hideModal("mobilityModal");
 					this.resetForm();
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -237,6 +237,9 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		hideModal(modalRef){
+			this.$refs[modalRef].hide();
+		},
 		reload() {
 			this.$refs.table.reloadTable();
 		},
@@ -255,6 +258,7 @@ export default {
 			this.$fhcApi.factory.stv.mobility.updateMobility(this.$refs.formMobility, dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.hideModal("mobilityModal");
 					this.resetForm();
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -282,6 +286,7 @@ export default {
 			this.formData.bisio_id = null;
 			this.formData.localPurposes = [];
 			this.formData.localSupports = [];
+			this.statusNew = true;
 		},
 		// ----------------------------------- methods purposes -----------------------------------
 		addMobilityPurpose({zweck_code, bisio_id}){
@@ -387,217 +392,233 @@ export default {
 			@click:new="actionNewMobility"
 			>
 		</core-filter-cmpt>
+		
+		<!--Modal: mobilityModal-->
+		<bs-modal ref="mobilityModal" dialog-class="modal-xl">
+			<template #title>
+				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('mobility', 'mobility_anlegen')}}</p>
+				<p v-else class="fw-bold mt-3">{{$p.t('mobility', 'mobility_bearbeiten')}}</p>
+			</template>
 
-		<form-form v-if="!this.student.length" ref="formMobility" @submit.prevent>
 
-		<div class="row my-3">
-			<legend class="col-6">BIS</legend>
-			<legend class="col-6">Outgoing</legend>
-		</div>
-			
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-mobility-von"
-					:label="$p.t('ui', 'von')"
-					type="DatePicker"
-					v-model="formData.von"
-					auto-apply
-					:enable-time-picker="false"
-					format="dd.MM.yyyy"
-					name="von"
-					:teleport="true"
-					>
-				</form-input>
-				
-				<form-input
-					container-class="col-6 stv-details-mobility-typ"
-					:label="$p.t('lehre', 'lehrveranstaltung')"
-					type="select"
-					v-model="formData.lehrveranstaltung"
-					name="lehrveranstaltung_id"
-					>
-					<option
-						v-for="lv in listLvs"
-						:key="lv.lehrveranstaltung_id"
-						:value="lv.lehrveranstaltung_id"
-						>
-						{{lv.bezeichnung}} - Semester {{lv.semester}}
-					</option>
-				</form-input>
+			<form-form v-if="!this.student.length" ref="formMobility" @submit.prevent>
+
+			<div class="row my-3">
+				<legend class="col-6">BIS</legend>
+				<legend class="col-6">Outgoing</legend>
 			</div>
-			
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-mobility-bis"
-					:label="$p.t('global', 'bis')"
-					type="DatePicker"
-					v-model="formData.bis"
-					auto-apply
-					:enable-time-picker="false"
-					format="dd.MM.yyyy"
-					name="bis"
-					:teleport="true"
-					>
-				</form-input>
-				<template v-if="formData.lehreinheit_id && !formData.lehrveranstaltung">
-					<form-input v-if="formData.lehreinheit_id"
-						container-class="col-6 stv-details-mobility-typ"
-						:label="$p.t('lehre', 'lehreinheit')"
-						type="select"
-						v-model="formData.lehreinheit_id"
-						name="lehreinheit_id"
-						disabled
-					>
-						<option
-							v-for="le in lv_teile"
-							:key="le.lehreinheit_id"
-							:value="le.lehreinheit_id"
-							>
-							{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
-						</option>
+				
+				<div class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-mobility-von"
+						:label="$p.t('ui', 'von')"
+						type="DatePicker"
+						v-model="formData.von"
+						auto-apply
+						:enable-time-picker="false"
+						format="dd.MM.yyyy"
+						name="von"
+						:teleport="true"
+						>
 					</form-input>
-				</template>
-				<template v-else>
+					
 					<form-input
 						container-class="col-6 stv-details-mobility-typ"
-						:label="$p.t('lehre', 'lehreinheit')"
+						:label="$p.t('lehre', 'lehrveranstaltung')"
 						type="select"
-						v-model="formData.lehreinheit_id"
-						name="lehreinheit_id"
-						@focus="loadItems"
+						v-model="formData.lehrveranstaltung"
+						name="lehrveranstaltung_id"
 						>
-						<option v-if="!listLes.length" disabled> -- {{ $p.t('exam', 'bitteLvteilWaehlen') }} --</option>
 						<option
-							v-for="le in listLes"
-							:key="le.lehreinheit_id"
-							:value="le.lehreinheit_id"
+							v-for="lv in listLvs"
+							:key="lv.lehrveranstaltung_id"
+							:value="lv.lehrveranstaltung_id"
 							>
-							{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
+							{{lv.bezeichnung}} - Semester {{lv.semester}}
 						</option>
 					</form-input>
-				</template>
-			</div>
-			
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-mobility-mobilitaetsprogramm"
-					:label="$p.t('mobility', 'mobilitaetsprogramm')"
-					type="select"
-					v-model="formData.mobilitaetsprogramm_code"
-					name="mobilitaetsprogramm_code"
-					>
-					<option
-						v-for="mob in programsMobility"
-						:key="mob.mobilitaetsprogramm_code"
-						:value="mob.mobilitaetsprogramm_code"
-						>
-						{{mob.kurzbz}} - {{mob.beschreibung}}
-					</option>
-				</form-input>
-				<form-input
-					container-class="col-6 stv-details-mobility-ort"
-					:label="$p.t('person', 'ort')"
-					type="text"
-					v-model="formData.ort"
-					name="ort"
-					>
-
-				</form-input>
-			</div>
-			
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-mobility-gastnation"
-					:label="$p.t('mobility', 'gastnation')"
-					type="select"
-					v-model="formData.nation_code"
-					name="nation_code"
-					>
-					<option 
-					v-for="nation in lists.nations" 
-					:key="nation.nation_code" 
-					:value="nation.nation_code" 
-					:disabled="nation.sperre"
-					>
-					{{nation.kurztext}}
-					</option>
-				</form-input>
-				<form-input
-					container-class="col-6 stv-details-mobility-universitaet"
-					:label="$p.t('mobility', 'universitaet')"
-					type="text"
-					v-model="formData.universitaet"
-					name="universitaet"
-					>
-
-				</form-input>
-			</div>
-			
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-mobility-herkunftsland"
-					:label="$p.t('mobility', 'herkunftsland')"
-					type="select"
-					v-model="formData.herkunftsland_code"
-					name="herkunftsland_code"
-					>
-					<option 
-					v-for="nation in lists.nations" 
-					:key="nation.nation_code" 
-					:value="nation.nation_code" 
-					:disabled="nation.sperre"
-					>
-					{{nation.kurztext}}
-					</option>
-				</form-input>
-				<form-input
-					container-class="col-3 stv-details-mobility-ects_erworben"
-					:label="$p.t('mobility', 'ects_erworben')"
-					type="text"
-					v-model="formData.ects_erworben"
-					name="ects_erworben"
-					>
-				</form-input>				
-				<form-input
-					container-class="col-3 stv-details-mobility-ects_angerechnet"
-					:label="$p.t('mobility', 'ects_angerechnet')"
-					type="text"
-					v-model="formData.ects_angerechnet"
-					name="ects_angerechnet"
-					>
-				</form-input>
-			</div>
-			
-			<div class="row mb-3">
-				<div class="col-6 stv-details-mobility-zweck">
-					<MobilityPurpose 
-						:bisio_id="formData.bisio_id" 
-						:listPurposes="listPurposes"
-						@deleteMobilityPurpose="deleteMobilityPurpose"
-						@setMobilityPurpose="addMobilityPurpose"
-						@setMobilityPurposeToNewMobility="addPurposeToMobility"
-						ref="purposes"
-						></MobilityPurpose>
 				</div>
 				
-				<div class="col-6 stv-details-mobility-aufenthaltfoerderung">
-					<MobilitySupport
-						:bisio_id="formData.bisio_id"
-						:listSupports="listSupports"
-						@deleteMobilitySupport="deleteMobilitySupport"
-						@setMobilitySupport="addMobilitySupport"
-						@setMobilitySupportToNewMobility="addSupportToMobility"
-						ref="supports"
-						></MobilitySupport>
+				<div class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-mobility-bis"
+						:label="$p.t('global', 'bis')"
+						type="DatePicker"
+						v-model="formData.bis"
+						auto-apply
+						:enable-time-picker="false"
+						format="dd.MM.yyyy"
+						name="bis"
+						:teleport="true"
+						>
+					</form-input>
+					<template v-if="formData.lehreinheit_id && !formData.lehrveranstaltung">
+						<form-input v-if="formData.lehreinheit_id"
+							container-class="col-6 stv-details-mobility-typ"
+							:label="$p.t('lehre', 'lehreinheit')"
+							type="select"
+							v-model="formData.lehreinheit_id"
+							name="lehreinheit_id"
+							disabled
+						>
+							<option
+								v-for="le in lv_teile"
+								:key="le.lehreinheit_id"
+								:value="le.lehreinheit_id"
+								>
+								{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
+							</option>
+						</form-input>
+					</template>
+					<template v-else>
+						<form-input
+							container-class="col-6 stv-details-mobility-typ"
+							:label="$p.t('lehre', 'lehreinheit')"
+							type="select"
+							v-model="formData.lehreinheit_id"
+							name="lehreinheit_id"
+							@focus="loadItems"
+							>
+							<option v-if="!listLes.length" disabled> -- {{ $p.t('exam', 'bitteLvteilWaehlen') }} --</option>
+							<option
+								v-for="le in listLes"
+								:key="le.lehreinheit_id"
+								:value="le.lehreinheit_id"
+								>
+								{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
+							</option>
+						</form-input>
+					</template>
 				</div>
-			</div>
+				
+				<div class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-mobility-mobilitaetsprogramm"
+						:label="$p.t('mobility', 'mobilitaetsprogramm')"
+						type="select"
+						v-model="formData.mobilitaetsprogramm_code"
+						name="mobilitaetsprogramm_code"
+						>
+						<option
+							v-for="mob in programsMobility"
+							:key="mob.mobilitaetsprogramm_code"
+							:value="mob.mobilitaetsprogramm_code"
+							>
+							{{mob.kurzbz}} - {{mob.beschreibung}}
+						</option>
+					</form-input>
+					<form-input
+						container-class="col-6 stv-details-mobility-ort"
+						:label="$p.t('person', 'ort')"
+						type="text"
+						v-model="formData.ort"
+						name="ort"
+						>
 
-			<div class="text-end mb-3">
+					</form-input>
+				</div>
+				
+				<div class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-mobility-gastnation"
+						:label="$p.t('mobility', 'gastnation')"
+						type="select"
+						v-model="formData.nation_code"
+						name="nation_code"
+						>
+						<option 
+						v-for="nation in lists.nations" 
+						:key="nation.nation_code" 
+						:value="nation.nation_code" 
+						:disabled="nation.sperre"
+						>
+						{{nation.kurztext}}
+						</option>
+					</form-input>
+					<form-input
+						container-class="col-6 stv-details-mobility-universitaet"
+						:label="$p.t('mobility', 'universitaet')"
+						type="text"
+						v-model="formData.universitaet"
+						name="universitaet"
+						>
+
+					</form-input>
+				</div>
+				
+				<div class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-mobility-herkunftsland"
+						:label="$p.t('mobility', 'herkunftsland')"
+						type="select"
+						v-model="formData.herkunftsland_code"
+						name="herkunftsland_code"
+						>
+						<option 
+						v-for="nation in lists.nations" 
+						:key="nation.nation_code" 
+						:value="nation.nation_code" 
+						:disabled="nation.sperre"
+						>
+						{{nation.kurztext}}
+						</option>
+					</form-input>
+					<form-input
+						container-class="col-3 stv-details-mobility-ects_erworben"
+						:label="$p.t('mobility', 'ects_erworben')"
+						type="text"
+						v-model="formData.ects_erworben"
+						name="ects_erworben"
+						>
+					</form-input>				
+					<form-input
+						container-class="col-3 stv-details-mobility-ects_angerechnet"
+						:label="$p.t('mobility', 'ects_angerechnet')"
+						type="text"
+						v-model="formData.ects_angerechnet"
+						name="ects_angerechnet"
+						>
+					</form-input>
+				</div>
+				
+				<div class="row mb-3">
+					<div class="col-6 stv-details-mobility-zweck">
+						<mobility-purpose 
+							:bisio_id="formData.bisio_id" 
+							:listPurposes="listPurposes"
+							@deleteMobilityPurpose="deleteMobilityPurpose"
+							@setMobilityPurpose="addMobilityPurpose"
+							@setMobilityPurposeToNewMobility="addPurposeToMobility"
+							ref="purposes"
+							></mobility-purpose>
+					</div>
+					
+					<div class="col-6 stv-details-mobility-aufenthaltfoerderung">
+						<mobility-support
+							:bisio_id="formData.bisio_id"
+							:listSupports="listSupports"
+							@deleteMobilitySupport="deleteMobilitySupport"
+							@setMobilitySupport="addMobilitySupport"
+							@setMobilitySupportToNewMobility="addSupportToMobility"
+							ref="supports"
+							></mobility-support>
+					</div>
+				</div>
+
+				<!-- <div class="text-end mb-3">
+					<button v-if="statusNew" class="btn btn-primary" @click="addNewMobility()"> {{$p.t('ui', 'speichern')}}</button>
+					<button v-else class="btn btn-primary" @click="updateMobility(formData.bisio_id)"> {{$p.t('ui', 'speichern')}}</button>
+				</div> -->
+
+			</form-form>
+
+			<template #footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
 				<button v-if="statusNew" class="btn btn-primary" @click="addNewMobility()"> {{$p.t('ui', 'speichern')}}</button>
 				<button v-else class="btn btn-primary" @click="updateMobility(formData.bisio_id)"> {{$p.t('ui', 'speichern')}}</button>
-			</div>
+			</template>
 
-		</form-form>
+		</bs-modal>
 
 				
 	</div>
