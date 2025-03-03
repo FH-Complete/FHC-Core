@@ -522,11 +522,8 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function getLvsByStudent($student_uid, $studiensemester_kurzbz = null)
 	{
-	//	$studiensemester_kurzbz = 'WS2024';
-	//$studiensemester_kurzbz = null;
-
 		$params = array($student_uid);
-		$qry = "SELECT DISTINCT * FROM lehre.tbl_lehrveranstaltung
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung
 				WHERE lehrveranstaltung_id IN(
 					SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
 						WHERE uid=?";

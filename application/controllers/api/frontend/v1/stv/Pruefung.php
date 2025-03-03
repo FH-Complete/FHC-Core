@@ -465,8 +465,6 @@ class Pruefung extends FHCAPI_Controller
 	{
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 
-		//return $this->terminateWithError($semester_kurzbz, self::ERROR_TYPE_GENERAL);
-
 		$result = $this->LehrveranstaltungModel->getLvsByStudent($student_uid, $semester_kurzbz);
 
 		$data = $this->getDataOrTerminateWithError($result);
@@ -482,7 +480,7 @@ class Pruefung extends FHCAPI_Controller
 
 		foreach ($lv_ids as $id)
 		{
-			$result = $this->LehreinheitModel->getLesFromLvIds($id);
+			$result = $this->LehreinheitModel->getLesFromLvIds($id, $semester_kurzbz);
 			$data = $this->getDataOrTerminateWithError($result);
 
 			if (is_array($data)) {

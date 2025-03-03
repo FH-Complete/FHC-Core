@@ -264,14 +264,13 @@ EOSQL;
 				lv.kurzbz,
 				lv.bezeichnung,
 				lv.semester,
-				ma.mitarbeiter_uid,
 				(
 					SELECT
 						STRING_AGG(CONCAT(leg.semester, leg.verband, leg.gruppe), ' ')
 					FROM lehre.tbl_lehreinheitgruppe leg
 					WHERE leg.lehreinheit_id = le.lehreinheit_id
 				) AS gruppe,
-			    tma.kurzbz as kuerzel
+			     STRING_AGG(tma.kurzbz, ' ') as kuerzel
 			FROM
 				lehre.tbl_lehreinheit le
 			JOIN
@@ -291,6 +290,13 @@ EOSQL;
 		}
 
 		$query .="
+			GROUP BY
+                lv.lehrveranstaltung_id,
+				le.lehreinheit_id,
+				le.lehrform_kurzbz,
+				lv.kurzbz,
+				lv.bezeichnung,
+				lv.semester
 			ORDER BY
 				le.lehreinheit_id;
 		";
