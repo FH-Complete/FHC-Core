@@ -33,8 +33,8 @@ export default {
 			this.$refs.form.clearValidation();
 			this.loading = true;
 
-			this.$refs.form
-				.factory.stv.konto.edit(this.data)
+			this.$fhcApi
+				.factory.stv.konto.edit(this.$refs.form, this.data)
 				.then(result => {
 					this.$emit('saved', result.data);
 					this.loading = false;

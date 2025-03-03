@@ -58,8 +58,8 @@ export default {
 				studiengang_kz: this.stgKz
 			}, ...this.data};
 
-			this.$refs.form
-				.factory.stv.konto.checkDoubles(data)
+			this.$fhcApi
+				.factory.stv.konto.checkDoubles(this.$refs.form, data)
 				.then(result => result.data
 					? Promise.all(
 						result.errors
@@ -68,7 +68,7 @@ export default {
 					)
 					: Promise.resolve())
 				.then(() => data)
-				.then(this.$refs.form.factory.stv.konto.insert)
+				.then(this.$fhcApi.factory.stv.konto.insert(this.$refs.form))
 				.then(result => {
 					this.$emit('saved', result.data);
 					this.loading = false;
