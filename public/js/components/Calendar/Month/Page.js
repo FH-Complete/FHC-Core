@@ -80,7 +80,8 @@ export default {
 			if(isInThePast) classstring += ' fhc-calendar-past'
 			return classstring
 		},
-		selectDay(day) {
+		selectDay(day, event) {
+			this.setSelectedEvent(event);
 			this.date.set(day);
 			this.$emit('input', day);
 		},
@@ -156,7 +157,7 @@ export default {
 				<span v-if="events[day.toDateString()] && events[day.toDateString()].length" class="events">
 					<div v-for="event in events[day.toDateString()]" :key="event.id" 
 					:style="{'background-color': event.color}" class="fhc-entry" :selected="event == selectedEvent"
-					v-contrast @click.stop="selectDay(day)">
+					v-contrast @click.stop="selectDay(day,event)">
 						<slot  name="monthPage" :event="event" :day="day" >
 							<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 						</slot>
