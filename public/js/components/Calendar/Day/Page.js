@@ -52,28 +52,26 @@ export default {
 	watch: {
 		//TODO: on first render non of the day-page components are active and the watcher on selectedEvent does not fetch the lvMenu
 		//TODO: workaround is to watch the active state and refetch in case the lvMenu is empty
-		active: {
-			handler(value) {
+		activeAndEventsReady: {
+			handler({active,events}) {
 				// handles fetching the lvMenu
-				if (value) {
+				if (active) {
 					if (!this.lvMenu) {
 						this.fetchLvMenu(this.selectedEvent);
+					}
+				
+					if(events){
+						// if no event is selected, select the first event of the day
+						if (this.selectedEvent == null && this.events[this.day.toDateString()]?.length > 0) {
+							let events = this.events[this.day.toDateString()];
+							if (Array.isArray(events) && events.length > 0) {
+								this.setSelectedEvent(events[0]);
+							}
+						}
 					}
 				}
 			},
 			immediate: true,
-		},
-		events: {
-			handler(newEvents) {
-				// if no event is selected, select the first event of the day
-				if (this.selectedEvent == null && newEvents[this.day.toDateString()]?.length > 0) {
-					let events = newEvents[this.day.toDateString()];
-					if (Array.isArray(events) && events.length > 0) {
-						this.setSelectedEvent(events[0]);
-					}
-				}
-			},
-			immediate: true
 		},
 		selectedEvent: {
 			handler(event) {
@@ -95,6 +93,12 @@ export default {
 		}
 	},
 	computed: {
+		activeAndEventsReady(){
+			return {
+				active: this.active,
+				events: this.events,
+			}
+		},
 		allDayEvents() {
 			let allDayEvents = {};
 			for (let day in this.events) {
