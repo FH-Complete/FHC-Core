@@ -495,7 +495,8 @@ if ($semester_benotbar && $endupload_vorhanden)
 }
 else
 {
-	$quick_info = !$semester_benotbar ? $p->t('abgabetool/aeltereParbeitBenoten') : $p->t('abgabetool/keinEnduploadErfolgt');
+	$quick_info = !$semester_benotbar ? $p->t('abgabetool/aeltereParbeitBenotenQuickInfo') : $p->t('abgabetool/keinEnduploadErfolgt');
+	$info_text = !$semester_benotbar ? $p->t('abgabetool/aeltereParbeitBenoten') : $p->t('abgabetool/keinEnduploadErfolgt');
 	$htmlstr .= "<form action='javascript:void(0);'>";
 	$htmlstr .= "<input type='submit' value='".$p->t('abgabetool/benoten')."' title='".$quick_info."'
 					alt='".$quick_info."' disabled>";
@@ -516,7 +517,7 @@ else
 }
 $htmlstr .= "<tr>
 					<td style='font-size:16px'>" . $p->t('abgabetool/titel') . ": <b>".$db->convert_html_chars($titel)."<b></td>
-					<td align='center' class='warningtext'>".(isset($quick_info) ? $quick_info : '')."</td>
+					<td align='center' class='warningtext'>".(isset($info_text) ? $info_text : '')."</td>
 					<td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
 $htmlstr .= "</tr>\n";
 
