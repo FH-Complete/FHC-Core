@@ -79,19 +79,19 @@ export default {
 						<td>{{start_time}}</td>
 					</tr>
 					<tr v-if="event?.actionname">
-						<th>Action required:</th>
+						<th>{{$p.t('lvinfo','actionname')}}:</th>
 						<td>
 							{{event?.actionname}}
 						</td>
 					</tr>
 					<tr v-if="event?.overdue">
-						<th>Overdue:</th>
+						<th>{{$p.t('lvinfo','overdue')}}:</th>
 						<td>
-							This event is overdue
+							{{$p.t('lvinfo','overdueEvent')}}
 						</td>
 					</tr>
 					<tr >
-				    	<th>Link:</th>
+				    	<th>{{$p.t('lvinfo','moodleLink')}}</th>
 						<td>
 							<a :href="event?.url" target="_blank"><i class="fa fa-arrow-up-right-from-square me-1"></i></a>
 						</td>
