@@ -63,7 +63,32 @@ export default {
 					if(events){
 						// if no event is selected, select the first event of the day
 						if (this.selectedEvent == null && this.events[this.day.toDateString()]?.length > 0) {
-							let events = this.events[this.day.toDateString()];
+							let events = this.events[this.day.toDateString()].sort((a,b)=>{
+								let [a_stunde,a_minute,a_sekunden]= a.beginn.split(":");
+								let [b_stunde, b_minute, b_sekunden] = b.beginn.split(":");
+								a_stunde = Number(a_stunde);
+								a_minute = Number(a_minute);
+								a_sekunden= Number(a_sekunden);
+								b_stunde = Number(b_stunde);
+								b_minute = Number(b_minute);
+								b_sekunden = Number(b_sekunden);
+								if(a_stunde > b_stunde){
+									return 1;
+								}
+								else if(b_stunde > a_stunde){
+									return -1;
+								}
+								else if(a_minute > b_minute){
+									return 1;
+								}
+								else if (b_minute > a_minute){
+									return -1;
+								}
+								else{
+									return a_sekunden > b_sekunden? 1:-1;
+								}
+								
+							});
 							if (Array.isArray(events) && events.length > 0) {
 								this.setSelectedEvent(events[0]);
 							}

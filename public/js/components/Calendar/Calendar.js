@@ -74,23 +74,22 @@ export default {
 		// scroll to the first event if the html element was found
 		scrollTime(newValue,oldValue){
 			// return early if the scrollTime is not set
-			if(!newValue.scrollTime || !newValue?.doScroll) return;
-			if(newValue?.scrollTime == oldValue?.scrollTime && newValue?.focusDate.compare(oldValue?.focusDate)){
+			if (!newValue.scrollTime || !newValue?.doScroll) return;
+			if (newValue?.scrollTime == oldValue?.scrollTime && newValue?.focusDate.d==oldValue?.focusDate.d) {
 				return;
 			}
 			// scroll the Stundenplan to the closest event
-			Vue.nextTick(()=>{
-				let previousScrollAnchor = document.getElementById('scroll' + (newValue.scrollTime - 1) + this.focusDate.d + this.focusDate.w)
-				let scrollAnchor = document.getElementById('scroll' + newValue.scrollTime + this.focusDate.d + this.focusDate.w);
-				if (previousScrollAnchor) {
-					previousScrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			let previousScrollAnchor = document.getElementById('scroll' + (newValue.scrollTime - 1) + this.focusDate.d + this.focusDate.w)
+			let scrollAnchor = document.getElementById('scroll' + newValue.scrollTime + this.focusDate.d + this.focusDate.w);
+			if (previousScrollAnchor) {
+				previousScrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}
+			else {
+				if (scrollAnchor) {
+					scrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
 				}
-				else {
-					if (scrollAnchor) {
-						scrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-					}
-				}
-			});
+			}
+			
 		},
 	},
 	emits: [
@@ -147,10 +146,10 @@ export default {
 		},
 		// returns the hour of the earliest event, used to scroll to the events in the calendar (week / day view)
 		scrollTime() {
+				let doScroll = true;	
 				// return the first beginning time of the filtered events
 				if(this.filteredEvents && Array.isArray(this.filteredEvents) && this.filteredEvents.length > 0)
 				{
-					let doScroll = true;
 					let scrollTimeEvents = this.filteredEvents.filter(event=>{
 						return event.type !== 'moodle';
 					});
@@ -160,12 +159,12 @@ export default {
 					}
 					let scrollTime = parseInt(scrollTimeEvents.sort((a, b) => parseInt(a.beginn) - parseInt(b.beginn))[0]?.beginn);
 					// to ensure that the scrollTime watcher triggers even if the scrollTime doesn't change, it returns both the scrollTime and the focusDate
-					return { focusDate: this.focusDate, doScroll, scrollTime };
+					return { focusDate: { d: this.focusDate.d, w: this.focusDate.w}, doScroll, scrollTime };	
 				}
 				// there is no event that matches the current view mode constraints
 				else 
 				{
-					return { focusDate: this.focusDate, scrollTime: null };
+					return { focusDate: { d: this.focusDate.d, w: this.focusDate.w }, doScroll,scrollTime: null };
 				}
 			},
 		// filters the events based on the current calendar view mode
