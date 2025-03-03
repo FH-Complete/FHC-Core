@@ -114,6 +114,7 @@ export default {
 				zweck_code: ""
 			},
 			localData: [],
+			isCentered: false,
 		}
 	},
 	watch: {
@@ -123,9 +124,15 @@ export default {
 			}
 		},
 	},
+	computed: {
+		modalClasses() {
+			return this.isCentered ? "modal-dialog-centered" : "";
+		},
+	},
 	methods: {
 		actionNewPurpose() {
 			this.resetModal();
+			this.isCentered = true;
 			this.$refs.mobilityPurpose.show();
 		},
 		actionDeletePurpose(zweck_code) {
@@ -182,11 +189,10 @@ export default {
 
 		closeModal(){
 			this.$refs.mobilityPurpose.hide();
-			this.$emit('close-modal');
 		},
 		openModal(){
+			this.isCentered = true;
 			this.$refs.mobilityPurpose.show();
-			this.$emit('open-modal');
 		},
 		reload() {
 			this.$refs.table.reloadTable();
@@ -218,10 +224,9 @@ export default {
 		</core-filter-cmpt>
 	
 		<div >
-			<bs-modal ref="mobilityPurpose">
+			<bs-modal ref="mobilityPurpose" :class="modalClasses">
 				<template #title>
 					<p class="fw-bold mt-3">{{$p.t('mobility', 'zweck_neu')}}</p>
-	
 				</template>
 	
 				<core-form ref="mobilityData">
