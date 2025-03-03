@@ -97,7 +97,7 @@ export default {
 			const d = data.map(room => {
 				return {
 					ort_kurzbz: room.ort_kurzbz,
-					bezeichnung: room.bezeichnung,
+					bezeichnung: room.bezeichnung.replace('&amp;', '&'),
 					nummer: room.planbezeichnung,
 					personen: room.max_person,
 					linkInfo: room.content_id ? this.roomInfoLink(room) : null,
@@ -111,12 +111,15 @@ export default {
 		},
 		loadRoomTypes() {
 			this.$fhcApi.factory.ort.getRoomTypes().then(res => {
+				res?.data?.forEach(type => {
+					type.beschreibung = type.beschreibung.replace('&amp;', '&')
+				})
 				this.selectedType = this.defaultType
 				this.roomtypes = res?.data ?? []
 			})
 		},
 		loadRooms() {
-			this.$fhcApi.factory.ort.getRooms(this.date, this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl)
+			this.$fhcApi.factory.ort.getRooms(this.datum, this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl)
 				.then(res => {
 					if(res?.data?.retval) this.setupData(res.data.retval)
 			})
@@ -181,9 +184,9 @@ export default {
 				v-model="datum"
 				:clearable="false"
 				date-picker
-				:enable-time="false"
+				:enable-time-picker="false"
 				:format="dateFormat"
-				text-input="true"
+				:text-input="true"
 				auto-apply>
 			</VueDatePicker>
 		</div>
@@ -193,7 +196,7 @@ export default {
 				:clearable="false"
 				time-picker
 				:format="timeFormat"
-				text-input="true"
+				:text-input="true"
 				auto-apply
 				>
 			</VueDatePicker>
@@ -204,7 +207,7 @@ export default {
 				:clearable="false"
 				time-picker
 				:format="timeFormat"
-				text-input="true"
+				:text-input="true"
 				auto-apply>
 			</VueDatePicker>
 		</div>
@@ -224,7 +227,6 @@ export default {
 	</div>
 
      <core-filter-cmpt 
-		@tableBuilt="raumsucheTableBuilt"
 		@uuidDefined="handleUuidDefined"
 		:title="''"  
 		ref="raumsucheTable" 

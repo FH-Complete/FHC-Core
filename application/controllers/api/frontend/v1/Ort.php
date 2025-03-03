@@ -40,7 +40,7 @@ class Ort extends FHCAPI_Controller
 		]);
 
 		$this->load->model('ressource/Ort_model', 'OrtModel');
-
+		$this->config->load('raumsuche');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -51,13 +51,16 @@ class Ort extends FHCAPI_Controller
 	 */
 	public function getRooms()
 	{
-		// TODO: form validation
 		$datum = $this->input->get('datum', TRUE);
 		$von = $this->input->get('von', TRUE);
 		$bis = $this->input->get('bis', TRUE);
 		$typ = $this->input->get('typ', TRUE);
 		$personenanzahl = $this->input->get('personenanzahl', TRUE);
-
+		
+		
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID())->retval;
+		
 		$this->load->model('ressource/Stunde_model', 'StundeModel');
 		$vonStunde = getData($this->StundeModel->getStundeForTime($von))[0]->stunde;
 		$bisStunde = getData($this->StundeModel->getStundeForTime($bis))[0]->stunde;
@@ -68,20 +71,28 @@ class Ort extends FHCAPI_Controller
 			WHERE aktiv AND lehre AND ort_kurzbz NOT LIKE '\\\\_%'";
 		if($typ) {
 			$params[] = $typ;
-			$qry.= "AND raumtyp_kurzbz= ?";
+			$qry.= "AND raumtyp_kurzbz = ?";
 		}
+		
+		if(!$isMitarbeiter) { // students are only allowed to get a subset defined by config
+			$qry.= ' AND raumtyp_kurzbz IN ?';
+			$params[] = $this->config->item('roomtypes_student');
+			$this->addMeta('config', $this->config->item('roomtypes_student'));
+		}
+		
 		$qry.= "AND (max_person>= ? OR max_person is null)";
 		$params[] = $personenanzahl;
 
 		$qry.="	AND ort_kurzbz NOT IN 
 			(
-				SELECT ort_kurzbz FROM lehre.tbl_stundenplandev WHERE datum=? AND stunde>=? AND stunde<=?
-				UNION
-				SELECT ort_kurzbz FROM campus.tbl_reservierung WHERE datum=? AND stunde>=? AND stunde<=?
+				SELECT ort_kurzbz FROM lehre.tbl_stundenplandev WHERE datum = ? AND stunde >= ? AND stunde <= ? 
+				UNION 
+				SELECT ort_kurzbz FROM campus.tbl_reservierung WHERE datum= ? AND stunde >= ? AND stunde <= ?
 			)
 		";
 		$params = array_merge($params, [$datum, $vonStunde, $bisStunde, $datum, $vonStunde, $bisStunde]);
-		
+		$this->addMeta('qry', $qry);
+		$this->addMeta('params', $params);
 		$result = $this->OrtModel->execReadOnlyQuery($qry, $params);
 		
 		$this->terminateWithSuccess($result);
@@ -90,9 +101,19 @@ class Ort extends FHCAPI_Controller
 	public function getTypes()
 	{
 		$this->load->model('ressource/Raumtyp_model', 'RaumtypModel');
-		$result = $this->OrtModel->execReadOnlyQuery("
-			SELECT * FROM public.tbl_raumtyp WHERE aktiv = true ORDER BY raumtyp_kurzbz;
-		");
+		$qry = "SELECT * FROM public.tbl_raumtyp WHERE aktiv = true";
+		$params = array();
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+		
+		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID())->retval;
+		if(!$isMitarbeiter) { // students are only allowed to get a subset defined by config
+			$qry.= ' AND raumtyp_kurzbz IN ?';
+			$params[] = $this->config->item('roomtypes_student');
+		}
+                                 
+        $qry .= " ORDER BY raumtyp_kurzbz;";
+		
+		$result = $this->OrtModel->execReadOnlyQuery($qry, $params);
 
 		$this->terminateWithSuccess(getData($result));
 	}
