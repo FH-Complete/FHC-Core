@@ -380,7 +380,18 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 																da es der gleiche Inhalt wie beim Kennzeichen mit der ID '". $kennzeichen_has_personToKeep[$key]->kennzeichen_id ."' ist.";
 											continue 2;
 										}
-										$msg_error[] = 'Beide Personen haben ein Kennzeichen mit dem gleichen Typ ('. $kennzeichen_toDelete->kennzeichentyp_kurzbz.') und den gleichen Inhalt. Können nicht zusammengelegt werden.<br>
+										else if ($kennzeichen_has_personToKeep[$key]->aktiv === 'f')
+										{
+											$sql_query_upd1 .= "DELETE FROM public.tbl_kennzeichen WHERE kennzeichen_id=" . $db->db_add_param($kennzeichen_has_personToKeep[$key]->kennzeichen_id, FHC_INTEGER) . ";";
+											$sql_query_upd1 .= "UPDATE public.tbl_kennzeichen SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE kennzeichen_id=" . $db->db_add_param($kennzeichen_toDelete->kennzeichen_id, FHC_INTEGER) . ";";
+											$kennzeichen_has_personToKeep[] = $kennzeichen_toDelete;
+
+											$msg_warning[] = "Das Kennzeichen mit der ID '" . $kennzeichen_has_personToKeep[$key]->kennzeichen_id . "' wurde gelöscht, <br>
+																da es der gleiche Inhalt wie beim Kennzeichen mit der ID '". $kennzeichen_toDelete->kennzeichen_id ."' ist.";
+											continue 2;
+										}
+
+										$msg_error[] = 'Beide Personen haben ein Kennzeichen mit dem gleichen Typ ('. $kennzeichen_toDelete->kennzeichentyp_kurzbz.') und den gleichen Inhalt. Der Aktiv Status unterscheidet sich. Können nicht zusammengelegt werden.<br>
 														Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
 										$error = true;
 										break 2;
@@ -388,10 +399,18 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 								}
 								else if ($kennzeichen_has_personToKeep[$key]->aktiv === 't' && $kennzeichen_toDelete->aktiv === 't')
 								{
-									$msg_error[] = 'Beide Personen haben ein aktives Kennzeichen mit dem gleichen Typ ('. $kennzeichen_toDelete->kennzeichentyp_kurzbz.'). Können nicht zusammengelegt werden.<br>
+									if ($kennzeichen_has_personToKeep[$key]->inhalt === $kennzeichen_toDelete->inhalt)
+									{
+										$sql_query_upd1 .= "DELETE FROM public.tbl_kennzeichen WHERE kennzeichen_id=" . $db->db_add_param($kennzeichen_toDelete->kennzeichen_id, FHC_INTEGER) . ";";
+										continue 2;
+									}
+									else
+									{
+										$msg_error[] = 'Beide Personen haben ein aktives Kennzeichen mit dem gleichen Typ ('. $kennzeichen_toDelete->kennzeichentyp_kurzbz.'). Können nicht zusammengelegt werden.<br>
 													Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
 										$error = true;
 										break 2;
+									}
 								}
 							}
 						}
@@ -508,6 +527,99 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						{
 							$sql_query_upd1 .= "UPDATE public.tbl_rueckstellung SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE rueckstellung_id=" . $db->db_add_param($rueckstellung_toDelete->rueckstellung_id, FHC_INTEGER) . ";";
 						}
+					}
+				}
+			}
+
+			//prüfen ob tbl_dvuh_stammdaten existiert
+			if ($result = @$db->db_query("SELECT 1 FROM sync.tbl_dvuh_stammdaten LIMIT 1"))
+			{
+				$sql_query_upd1 .= "UPDATE system.tbl_dvuh_stammdaten SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+			}
+
+			//prüfen ob tbl_anwesenheit_entschuldigung existiert
+			if ($result = @$db->db_query("SELECT 1 FROM extension.tbl_anwesenheit_entschuldigung LIMIT 1"))
+			{
+				$sql_query_upd1 .= "UPDATE extension.tbl_anwesenheit_entschuldigung SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+			}
+
+			//prüfen ob tbl_anwesenheit_entschuldigung_history existiert
+			if ($result = @$db->db_query("SELECT 1 FROM extension.tbl_anwesenheit_entschuldigung_history LIMIT 1"))
+			{
+				$sql_query_upd1 .= "UPDATE extension.tbl_anwesenheit_entschuldigung_history SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+			}
+
+			//prüfen ob tbl_tdb_bpks existiert
+			if($result = @$db->db_query("SELECT 1 FROM extension.tbl_tdb_bpks LIMIT 1"))
+			{
+				$tdb_bpks_personToKeep = array();
+				$tdb_bpks_personToDelete = array();
+
+				$tdb_bpks_query = "
+					SELECT *
+					FROM extension.tbl_tdb_bpks
+					WHERE (
+						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
+						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
+					)";
+
+				if ($result = $db->db_query($tdb_bpks_query))
+				{
+					while ($row = $db->db_fetch_object($result))
+					{
+						if ($row->person_id === $personToKeep)
+						{
+							$tdb_bpks_personToKeep[] = $row;
+						}
+						else if ($row->person_id === $personToDelete)
+						{
+							$tdb_bpks_personToDelete[] = $row;
+						}
+					}
+				};
+
+				if (!empty($tdb_bpks_personToDelete))
+				{
+					if (!isset($tdb_bpks_personToKeep[0]))
+					{
+
+						$sql_query_upd1 .= "UPDATE extension.tbl_tdb_bpks SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+					}
+					else
+					{
+						if (isset($tdb_bpks_personToKeep[0]->vbpk_zp_td) && isset($tdb_bpks_personToKeep[0]->vbpk_as))
+						{
+							$sql_query_upd1 .= "DELETE FROM extension.tbl_tdb_bpks WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+						}
+						else
+						{
+							$msg_error[] = 'Beide Personen haben TDB Bpks Daten. Können nicht zusammengelegt werden.<br>
+											Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
+							$error = true;
+						}
+					}
+				}
+			}
+
+			if($result = @$db->db_query("SELECT 1 FROM system.tbl_person_lock LIMIT 1"))
+			{
+				$person_lock_query = "
+						SELECT 1
+						FROM system.tbl_person_lock
+						WHERE (
+							person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . "
+						)
+					";
+
+				if ($result = $db->db_query($person_lock_query))
+				{
+					if ($db->db_num_rows($result) > 0)
+					{
+						$sql_query_upd1 .= "DELETE FROM system.tbl_person_lock WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+					}
+					else
+					{
+						$sql_query_upd1 .= "UPDATE system.tbl_person_lock SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 					}
 				}
 			}
@@ -679,7 +791,6 @@ Zusammengelegt mit Person-ID ".$personToDelete_obj->person_id." am ".date('d.m.Y
 				$sql_query_upd1 .= "UPDATE public.tbl_prestudent SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE system.tbl_filters SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE system.tbl_log SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
-				$sql_query_upd1 .= "UPDATE system.tbl_person_lock SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE system.tbl_issue SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE wawi.tbl_betriebsmittelperson SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE wawi.tbl_konto SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
