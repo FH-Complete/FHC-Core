@@ -68,7 +68,7 @@ export default {
 					)
 					: Promise.resolve())
 				.then(() => data)
-				.then(this.$fhcApi.factory.stv.konto.insert(this.$refs.form))
+				.then((data) => this.$fhcApi.factory.stv.konto.insert(this.$refs.form, data))
 				.then(result => {
 					this.$emit('saved', result.data);
 					this.loading = false;
