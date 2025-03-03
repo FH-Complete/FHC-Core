@@ -227,7 +227,8 @@ const app = Vue.createApp({
 		},
 		handleClick(event) {
 			const target = event.target.closest('a');
-			
+
+			if(target?.id == 'skiplink') return
 			if (target && this.isInternalRoute(target.href)) {
 				const url = new URL(target.href)
 				

@@ -9,12 +9,15 @@
 	$title = isset($title) ? $title : null;
 	$refresh = isset($refresh) ? $refresh : null;
 	$customCSSs = isset($customCSSs) ? $customCSSs : null;
+	$skipID = isset($skipID) ? $skipID : null;
 ?>
 <!-- Header start -->
 
 <!DOCTYPE HTML>
 <html>
 	<head>
+		<?php if($skipID) generateSkipLink($skipID); ?>
+		
 		<title><?php printPageTitle($title); ?></title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1">

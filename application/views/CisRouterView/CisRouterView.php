@@ -8,6 +8,7 @@ $includesArray = array(
 	'tabulator5' => true, // TODO: upgrade to 6 when available
 	'vue3' => true,
 	'primevue3' => true,
+	'skipID' => '#fhccontent',
 	'vuedatepicker11' => true,
 	'customCSSs' => array(
 		'public/css/components/verticalsplit.css',

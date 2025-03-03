@@ -227,3 +227,13 @@ function generateBackwardCompatibleJSMsIe($js)
 	echo "<![endif]-->\n";
 }
 
+/**
+ * Constructs an accessibility skipLink https://www.w3schools.com/accessibility/accessibility_skip_links.php
+ */
+function generateSkipLink($skipID)
+{
+	$toPrint = '<a id="skiplink" href="';
+	$toPrint.=$skipID;
+	$toPrint.='" class="fhcSkipLink"></a>';
+	echo $toPrint;
+}
