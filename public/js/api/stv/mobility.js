@@ -5,14 +5,14 @@ export default {
 	getProgramsMobility(){
 		return this.$fhcApi.get('api/frontend/v1/stv/mobility/getProgramsMobility/');
 	},
-	addNewMobility(data){
-		return this.$fhcApi.post('api/frontend/v1/stv/mobility/insertMobility/', data);
+	addNewMobility(form, data){
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/mobility/insertMobility/', data);
 	},
 	loadMobility(bisio_id){
 		return this.$fhcApi.get('api/frontend/v1/stv/mobility/loadMobility/' + bisio_id);
 	},
-	updateMobility(data){
-		return this.$fhcApi.post('api/frontend/v1/stv/mobility/updateMobility/', data);
+	updateMobility(form, data){
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/mobility/updateMobility/', data);
 	},
 	deleteMobility(bisio_id){
 		return this.$fhcApi.post('api/frontend/v1/stv/mobility/deleteMobility/' + bisio_id);

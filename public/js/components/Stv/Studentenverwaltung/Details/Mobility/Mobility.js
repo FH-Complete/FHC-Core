@@ -209,7 +209,7 @@ export default {
 				uid: this.student.uid,
 				formData: this.formData
 			};
-			return this.$refs.formMobility.factory.stv.mobility.addNewMobility(dataToSend)
+			return this.$fhcApi.factory.stv.mobility.addNewMobility(this.$refs.formMobility, dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetForm();
@@ -252,7 +252,7 @@ export default {
 				formData: this.formData,
 				uid: this.student.uid,
 			};
-			this.$refs.formMobility.factory.stv.mobility.updateMobility(dataToSend)
+			this.$fhcApi.factory.stv.mobility.updateMobility(this.$refs.formMobility, dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetForm();
