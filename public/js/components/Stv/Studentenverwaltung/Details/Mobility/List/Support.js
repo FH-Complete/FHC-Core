@@ -58,6 +58,7 @@ export default {
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 50,
+						maxWidth: 100,
 						formatter: (cell, formatterParams, onRendered) => {
 
 							let container = document.createElement('div');
