@@ -495,7 +495,7 @@ if($command=="update" && $error!=true)
 								$maildata['student_voller_name'] = trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost);
 								$maildata['abgabetyp'] = $abgabetyp;
 								$maildata['parbeituebersichtlink'] = "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>";
-								$maildata['bewertunglink'] = $num_rows_sem >= 1 && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
+								$maildata['bewertunglink'] = $paIsCurrent && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
 								$maildata['token'] = "";
 
 								$mailres = sendSanchoMail(
@@ -557,8 +557,8 @@ if($command=="update" && $error!=true)
 												$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
 												$zweitbetmaildata['abgabetyp'] = $abgabetyp;
 												$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
-												$zweitbetmaildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
-												$zweitbetmaildata['token'] = $num_rows_sem >= 1 && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
+												$zweitbetmaildata['bewertunglink'] = $paIsCurrent ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
+												$zweitbetmaildata['token'] = $paIsCurrent && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
 
 												$mailres = sendSanchoMail(
 													'ParbeitsbeurteilungEndupload',
