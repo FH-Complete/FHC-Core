@@ -84,8 +84,8 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '250',
-				selectableRangeMode: 'click',
-				selectable: true,
+				// selectableRangeMode: 'click',
+				// selectable: true,
 				persistenceID: 'core-mobility-purpose'
 			},
 			tabulatorEvents: [
@@ -133,7 +133,7 @@ export default {
 		actionNewPurpose() {
 			this.resetModal();
 			this.isCentered = true;
-			this.$refs.mobilityPurpose.show();
+		//	this.$refs.mobilityPurpose.show();
 		},
 		actionDeletePurpose(zweck_code) {
 			if (this.bisio_id)
@@ -184,22 +184,22 @@ export default {
 				}
 
 			}
-		this.closeModal();
+	//	this.closeModal();
 		},
 
-		closeModal(){
-			this.$refs.mobilityPurpose.hide();
-		},
-		openModal(){
-			this.isCentered = true;
-			this.$refs.mobilityPurpose.show();
-		},
+		// closeModal(){
+		// 	this.$refs.mobilityPurpose.hide();
+		// },
+		// openModal(){
+		// 	this.isCentered = true;
+		// 	this.$refs.mobilityPurpose.show();
+		// },
 		reload() {
 			this.$refs.table.reloadTable();
 			this.$emit('reload');
 		},
 		resetModal(){
-			this.formData = {};
+			this.formData = {};mobility_purpose
 			this.formData.zweck_code = null;
 		},
 		resetLocalData() {
@@ -210,50 +210,41 @@ export default {
 		<div class="core-mobility-purpose h-50 d-flex flex-column w-100 mt-2">
 		<br>
 
-		<core-filter-cmpt
-			ref="table"
-			:tabulator-options="tabulatorOptions"
-			:tabulator-events="tabulatorEvents"
-			table-only
-			:side-menu="false"
-			reload
-			new-btn-show
-			:new-btn-label="this.$p.t('mobility', 'zweck')"
-			@click:new="actionNewPurpose"
-			>
-		</core-filter-cmpt>
-	
-		<div >
-			<bs-modal ref="mobilityPurpose" :class="modalClasses">
-				<template #title>
-					<p class="fw-bold mt-3">{{$p.t('mobility', 'zweck_neu')}}</p>
-				</template>
-	
-				<core-form ref="mobilityData">
-					<div class="row mb-3">
-						<form-input
-							type="select"
-							:label="$p.t('mobility/zweck')"
-							v-model="formData.zweck_code"
-							name="zweck_code"
-							>
-							<option :value="null"> {{$p.t('ui', 'bitteWaehlen')}}</option>
-							<option
-								v-for="entry in listPurposes"
-								:key="entry.zweck_code"
-								:value="entry.zweck_code"
+		<div class="override_filtercmpt_actions_style">
+
+			<core-filter-cmpt
+				ref="table"
+				:tabulator-options="tabulatorOptions"
+				:tabulator-events="tabulatorEvents"
+				table-only
+				:side-menu="false"
+				reload
+				@click:new="handleSubmitAction"
+				>
+				<template #actions>
+					<core-form ref="mobilityData">
+						<div class="row">
+							<form-input
+								type="select"
+								v-model="formData.zweck_code"
+								name="zweck_code"
+								:label="$p.t('mobility/zweck')"
 								>
-								{{entry.bezeichnung}}
-							</option>
-						</form-input>
-					</div>
-				</core-form>
-	
-				<template #footer>
-					<button type="button" class="btn btn-primary" @click="handleSubmitAction">{{$p.t('ui', 'speichern')}}</button>
+								<option value=""> {{$p.t('ui', 'bitteWaehlen')}}</option>
+								<option
+									v-for="entry in listPurposes"
+									:key="entry.zweck_code"
+									:value="entry.zweck_code"
+									>
+									{{entry.bezeichnung}}
+								</option>
+							</form-input>
+						</div>
+					</core-form>
+					<button class="btn btn-primary" @click="handleSubmitAction">{{$p.t('mobility', 'zweck')}}</button>
 				</template>
+			</core-filter-cmpt>
 	
-			</bs-modal>
 		</div>
 
 	</div>`
