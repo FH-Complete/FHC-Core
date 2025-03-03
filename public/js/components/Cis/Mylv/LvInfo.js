@@ -72,11 +72,23 @@ export default {
 					</tr>
 					<tr>
 						<th>{{$p.t('global','typ')}}:</th>
-						<td>{{event?.purpose}}</td>
+						<td><img v-if="event?.activityIcon" class="me-1" :src="event?.activityIcon" />{{event?.purpose}}</td>
 					</tr>
 					<tr>
 						<th>{{$p.t('fristenmanagement','frist')}}:</th>
 						<td>{{start_time}}</td>
+					</tr>
+					<tr v-if="event?.actionname">
+						<th>Action required:</th>
+						<td>
+							{{event?.actionname}}
+						</td>
+					</tr>
+					<tr v-if="event?.overdue">
+						<th>Overdue:</th>
+						<td>
+							This event is overdue
+						</td>
 					</tr>
 					<tr >
 				    	<th>Link:</th>

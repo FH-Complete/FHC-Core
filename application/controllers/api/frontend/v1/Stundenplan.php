@@ -95,7 +95,6 @@ class Stundenplan extends FHCAPI_Controller
 						},
 						['timestart'=>$moodle_start_date,'timeend'=>$moodle_end_date, 'username'=>getAuthUID()]
 		);
-		
 		$moodle_events = array_map(function($event){
 			$moodle_event_timestart = new DateTime($event->timestart);
 			$moodle_event_timeend = new DateTime($event->timeend);
@@ -112,7 +111,7 @@ class Stundenplan extends FHCAPI_Controller
 			$convertedEvent->gruppe = [];
 			$convertedEvent->ort_kurzbz = $event->location;
 			$convertedEvent->lehreinheit_id = $event->lehreinheitsNummber ?? null;
-			$convertedEvent->titel = $event->course->fullname;
+			$convertedEvent->titel = isset($event->course->fullname)? $event->course->fullname:null;
 			$convertedEvent->lehrfach = '';
 			$convertedEvent->lehrform = '';
 			$convertedEvent->lehrfach_bez = '';
@@ -121,6 +120,9 @@ class Stundenplan extends FHCAPI_Controller
 			$convertedEvent->lehrveranstaltung_id = 0;
 			$convertedEvent->ort_content_id = 0;
 			$convertedEvent->url = $event->url;
+			$convertedEvent->activityIcon = isset($event->icon->iconurl)? $event->icon->iconurl:null;
+			$convertedEvent->actionname = isset($event->action->name)?$event->action->name:null;
+			$convertedEvent->overdue = !empty($event->overdue);
 			return $convertedEvent;
 		},$moodle_events);
 		

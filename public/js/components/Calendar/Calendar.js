@@ -72,13 +72,16 @@ export default {
 			immediate: true,
 		},
 		// scroll to the first event if the html element was found
-		scrollTime({focusDate,scrollTime}){
+		scrollTime(newValue,oldValue){
 			// return early if the scrollTime is not set
-			if(!scrollTime) return;
+			if(!newValue.scrollTime || !newValue?.doScroll) return;
+			if(newValue?.scrollTime == oldValue?.scrollTime && newValue?.focusDate.compare(oldValue?.focusDate)){
+				return;
+			}
 			// scroll the Stundenplan to the closest event
 			Vue.nextTick(()=>{
-				let previousScrollAnchor = document.getElementById('scroll' + (scrollTime - 1) + this.focusDate.d + this.focusDate.w)
-				let scrollAnchor = document.getElementById('scroll' + scrollTime + this.focusDate.d + this.focusDate.w);
+				let previousScrollAnchor = document.getElementById('scroll' + (newValue.scrollTime - 1) + this.focusDate.d + this.focusDate.w)
+				let scrollAnchor = document.getElementById('scroll' + newValue.scrollTime + this.focusDate.d + this.focusDate.w);
 				if (previousScrollAnchor) {
 					previousScrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
 				}
@@ -147,9 +150,17 @@ export default {
 				// return the first beginning time of the filtered events
 				if(this.filteredEvents && Array.isArray(this.filteredEvents) && this.filteredEvents.length > 0)
 				{
-					let scrollTime = parseInt(this.filteredEvents.sort((a, b) => parseInt(a.beginn) - parseInt(b.beginn))[0].beginn);
+					let doScroll = true;
+					let scrollTimeEvents = this.filteredEvents.filter(event=>{
+						return event.type !== 'moodle';
+					});
+					// do not compute a new scroll time if there are no other events than moodle events
+					if(!(scrollTimeEvents.length >0)){
+						doScroll = false;
+					}
+					let scrollTime = parseInt(scrollTimeEvents.sort((a, b) => parseInt(a.beginn) - parseInt(b.beginn))[0]?.beginn);
 					// to ensure that the scrollTime watcher triggers even if the scrollTime doesn't change, it returns both the scrollTime and the focusDate
-					return { focusDate: this.focusDate, scrollTime };
+					return { focusDate: this.focusDate, doScroll, scrollTime };
 				}
 				// there is no event that matches the current view mode constraints
 				else 
@@ -181,7 +192,7 @@ export default {
 						return true;
 					}
 				})
-
+				
 				return filteredEvents;
 			}
 			else
