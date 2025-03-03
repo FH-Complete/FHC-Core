@@ -362,7 +362,7 @@ export default{
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi.factory.stv.exam.getLvsandLesByStudent(this.uid)
+		this.$fhcApi.factory.stv.exam.getLvsandLesByStudent(this.uid, this.currentSemester)
 			.then(result => {
 				this.listLvsAndLes = result.data;
 			})
@@ -387,6 +387,10 @@ export default{
 	},
 	template: `
 	<div class="stv-details-pruefung-pruefung-list 100 pt-3">
+
+	{{currentSemester}}
+
+	{{listLvsAndLes.gruppe}}
 	
 	  <div>	  
 		<div class="justify-content-end pb-3">

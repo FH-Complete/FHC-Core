@@ -522,24 +522,27 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function getLvsByStudent($student_uid, $studiensemester_kurzbz = null)
 	{
-		$params = array($student_uid);
+	//	$studiensemester_kurzbz = 'WS2024';
+	//$studiensemester_kurzbz = null;
 
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung
-				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
-											  WHERE uid=?";
+		$params = array($student_uid);
+		$qry = "SELECT DISTINCT * FROM lehre.tbl_lehrveranstaltung
+				WHERE lehrveranstaltung_id IN(
+					SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
+						WHERE uid=?";
 
 		if (isset($studiensemester_kurzbz))
 		{
-			$qry .= " AND studiensemester_kurzbz=?";
 			$params[] = $studiensemester_kurzbz;
+			$qry .= " AND studiensemester_kurzbz=?";
 		}
-		$qry .= ") OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE student_uid=?";
+		$qry .= ")";
+
+		$qry .= " OR lehrveranstaltung_id IN(
+			SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote 
+			WHERE student_uid=?";
 		$params[] = $student_uid;
-/*		if (isset($studiensemester_kurzbz))
-		{
-			$qry .= " AND studiensemester_kurzbz=?";
-			$params[] = $studiensemester_kurzbz;
-		}*/
+
 		$qry .= ") ORDER BY semester, bezeichnung";
 
 		return $this->execQuery($qry, $params);

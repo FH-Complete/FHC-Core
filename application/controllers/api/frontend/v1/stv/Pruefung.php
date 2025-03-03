@@ -461,11 +461,13 @@ class Pruefung extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	public function getLvsandLesByStudent($student_uid)
+	public function getLvsandLesByStudent($student_uid, $semester_kurzbz=null)
 	{
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 
-		$result = $this->LehrveranstaltungModel->getLvsByStudent($student_uid);
+		//return $this->terminateWithError($semester_kurzbz, self::ERROR_TYPE_GENERAL);
+
+		$result = $this->LehrveranstaltungModel->getLvsByStudent($student_uid, $semester_kurzbz);
 
 		$data = $this->getDataOrTerminateWithError($result);
 

@@ -14,8 +14,8 @@ export default {
 	getLvsByStudent(uid){
 		return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getLvsByStudent/' + uid)
 	},
-	getLvsandLesByStudent(uid){
-		return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getLvsandLesByStudent/' + uid);
+	getLvsandLesByStudent(uid, semester){
+		return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getLvsandLesByStudent/' + uid + '/' + semester);
 	},
 	getLvsAndMas(uid){
 		return this.$fhcApi.get('api/frontend/v1/stv/pruefung/getLvsAndMas/' + uid)
