@@ -91,7 +91,9 @@ export default {
 				+ '/CisVue/Cms/content/' + room.content_id
 		},
 		getTimeString(time) {
-			return `${time.hours}:${time.minutes}:00`
+			const hours = String(time.hours).padStart(2, '0');
+			const minutes = String(time.minutes).padStart(2, '0');
+			return `${hours}:${minutes}`
 		},
 		setupData(data){
 			const d = data.map(room => {
@@ -119,7 +121,7 @@ export default {
 			})
 		},
 		loadRooms() {
-			this.$fhcApi.factory.ort.getRooms(this.datum, this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl)
+			this.$fhcApi.factory.ort.getRooms(this.datum.toISOString(), this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl)
 				.then(res => {
 					if(res?.data?.retval) this.setupData(res.data.retval)
 			})
@@ -179,7 +181,7 @@ export default {
 	<h2>{{$p.t('lvplan/raumsuche')}}</h2>
 	<hr>
 	<div class="row">
-		<div class="col-2">
+		<div class="col-12 col-lg-2">
 			<VueDatePicker
 				v-model="datum"
 				:clearable="false"
@@ -190,7 +192,7 @@ export default {
 				auto-apply>
 			</VueDatePicker>
 		</div>
-		<div class="col-1">
+		<div class="col-12 col-lg-1">
 			<VueDatePicker
 				v-model="von"
 				:clearable="false"
@@ -201,7 +203,7 @@ export default {
 				>
 			</VueDatePicker>
 		</div>
-		<div class="col-1">
+		<div class="col-12 col-lg-1">
 			<VueDatePicker
 				v-model="bis"
 				:clearable="false"
@@ -211,20 +213,24 @@ export default {
 				auto-apply>
 			</VueDatePicker>
 		</div>
-		<div class="col-auto">
+		
+		<div class="col-lg-auto">
 			<select ref="raumtyp" id="raumtypSelect" v-model="selectedType" class="form-select" 
 			:aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setRoute($event.target.value)">
 				<option :key="defaultType" selected :value="defaultType">{{defaultType.beschreibung}}</option>
 				<option v-for="typ in roomtypes" :key="typ" :value="typ">{{typ.beschreibung}}</option>
 			</select>
 		</div>
-		<div class="col-2">
+		
+
+		<div class="col-4 col-lg-2">
 			<InputNumber v-model="anzahl" :prefix="$p.t('rauminfo/anzahlPersonen') + ': '" inputId="anzahlInput" :min="1" :max="100" />
 		</div>
-		<div class="col-2">
+		<div class="col-8 col-lg-2 d-flex justify-content-center align-items-center">
 			<button class="btn btn-primary border-0" @click="search">{{ $p.t('rauminfo/roomSearch') }} <i class="fa fa-magnifying-glass"></i></button>
 		</div>
 	</div>
+	
 
      <core-filter-cmpt 
 		@uuidDefined="handleUuidDefined"

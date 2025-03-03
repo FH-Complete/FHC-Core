@@ -51,6 +51,15 @@ class Ort extends FHCAPI_Controller
 	 */
 	public function getRooms()
 	{
+		$this->load->library('form_validation');
+		$this->form_validation->set_data($_GET);
+		$this->form_validation->set_rules('datum','Datum','required');
+		$this->form_validation->set_rules('von','Uhrzeit Von','required|regex_match[/^[0-9]{2}:[0-9]{2}$/]');
+		$this->form_validation->set_rules('bis','Uhrzeit Bis','required|regex_match[/^[0-9]{2}:[0-9]{2}$/]');
+		if($this->form_validation->run() == FALSE) {
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
+		
 		$datum = $this->input->get('datum', TRUE);
 		$von = $this->input->get('von', TRUE);
 		$bis = $this->input->get('bis', TRUE);
