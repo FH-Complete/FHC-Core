@@ -605,11 +605,6 @@ export default {
 					</div>
 				</div>
 
-				<!-- <div class="text-end mb-3">
-					<button v-if="statusNew" class="btn btn-primary" @click="addNewMobility()"> {{$p.t('ui', 'speichern')}}</button>
-					<button v-else class="btn btn-primary" @click="updateMobility(formData.bisio_id)"> {{$p.t('ui', 'speichern')}}</button>
-				</div> -->
-
 			</form-form>
 
 			<template #footer>

@@ -49,9 +49,6 @@ export default {
 		stg_kz(){
 			return this.studentKzs[0];
 		},
-		showAllFormats() {
-			return this.isBerechtigtDocAndOdt.includes(this.stgInfo.oe_kurzbz);
-		}
 	},
 	props: {
 		student: Object
@@ -282,11 +279,13 @@ export default {
 		actionNewAbschlusspruefung() {
 			this.resetForm();
 			this.statusNew = true;
+			this.$refs.finalexamModal.show();
 			this.setDefaultFormData();
 		},
 		actionEditAbschlusspruefung(abschlusspruefung_id) {
 			this.resetForm();
 			this.statusNew = false;
+			this.$refs.finalexamModal.show();
 			this.loadAbschlusspruefung(abschlusspruefung_id);
 		},
 		actionDeleteAbschlusspruefung(abschlusspruefung_id) {
@@ -307,12 +306,16 @@ export default {
 			return this.$fhcApi.factory.stv.abschlusspruefung.addNewAbschlusspruefung(this.$refs.formFinalExam, dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.hideModal('finalexamModal');
 					this.resetForm();
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					this.reload();
 				});
+		},
+		hideModal(modalRef){
+			this.$refs[modalRef].hide();
 		},
 		reload() {
 			this.$refs.table.reloadTable();
@@ -335,6 +338,7 @@ export default {
 			return this.$fhcApi.factory.stv.abschlusspruefung.updateAbschlusspruefung(this.$refs.formFinalExam, dataToSend)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.hideModal('finalexamModal');
 					this.resetForm();
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -396,12 +400,9 @@ export default {
 		setDefaultFormData() {
 
 			this.resetForm();
-			//TODO(Manu) test with uid in browser
-			//check lg: if no prüfungsnotizen
-			if (this.stgInfo.typ === 'b') {
-		//	if (this.stgInfo.typ === 'b' || this.formData.pruefungstyp_kurzbz == 'Bachelor') {
-				this.formData.pruefungstyp_kurzbz = 'Bachelor';
 
+			if (this.stgInfo.typ === 'b') {
+				this.formData.pruefungstyp_kurzbz = 'Bachelor';
 				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
 			if (this.stgInfo.typ === 'd' || this.stgInfo === 'm') {
@@ -462,7 +463,7 @@ export default {
 		
 		<div v-if="this.student.length">
 			<abschlusspruefung-dropdown
-				:showAllFormats="showAllFormats"
+				:showAllFormats="isBerechtigtDocAndOdt"
 				:studentUids="studentUids"
 				:showDropDownMulti="true"
 				:stgTyp="stgInfo.typ"
@@ -485,327 +486,338 @@ export default {
 			@click:new="actionNewAbschlusspruefung"
 			>
 		</core-filter-cmpt>
-
-		<form-form v-if="!this.student.length" ref="formFinalExam" @submit.prevent>
 		
-			<legend>{{this.$p.t('global','details')}}</legend>
-			<p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p>
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-typ"
-					:label="$p.t('global', 'typ')"
-					type="select"
-					v-model="formData.pruefungstyp_kurzbz"
-					name="pruefungstyp_kurzbz"
-					>
-					<option
-						v-for="typ in arrTypen"
-						:key="typ.pruefungstyp_kurzbz"
-						:value="typ.pruefungstyp_kurzbz"
-						>
-						{{typ.beschreibung}}
-					</option>
-				</form-input>
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-note"
-					:label="$p.t('abschlusspruefung', 'notekommpruefung')"
-					type="select"
-					v-model="formData.note"
-					name="note"
-					>
-					<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
-					<option
-						v-for="note in arrNoten"
-						:key="note.note"
-						:value="note.note"
-						>
-						{{note.bezeichnung}}
-					</option>
-				</form-input>
-			</div>
+		<!--Modal: finalexamModal-->
+		<bs-modal ref="finalexamModal" dialog-class="modal-xl modal-dialog-scrollable">
+			<template #title>
+				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('abschlusspruefung', 'abschluessPruefungAnlegen')}}</p>
+				<p v-else class="fw-bold mt-3">{{$p.t('abschlusspruefung', 'abschluessPruefungBearbeiten')}}</p>
+			</template>
 
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-pruefungsantritt"
-					:label="$p.t('abschlusspruefung', 'pruefungsantritt')"
-					type="select"
-					v-model="formData.pruefungsantritt_kurzbz"
-					name="pruefungsantritt_kurzbz"
-					>
-					<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
-					<option
-						v-for="antritt in arrAntritte"
-						:key="antritt.pruefungsantritt_kurzbz"
-						:value="antritt.pruefungsantritt_kurzbz"
-						>
-						{{antritt.bezeichnung}}
-					</option>
-				</form-input>
-			</div>
+			<form-form v-if="!this.student.length" ref="formFinalExam" @submit.prevent>
 
-			<div class="row mb-3">
-				<template v-if="statusNew">
+				<legend>{{this.$p.t('global','details')}}</legend>
+				<p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p>
+				<div class="row mb-3">
 					<form-input
-						container-class="col-6 stv-details-abschlusspruefung-vorsitz"
-						:label="$p.t('abschlusspruefung', 'vorsitz_header')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.vorsitz"
-						name="vorsitz"
-						:suggestions="filteredMitarbeiter"
-						@complete="search"
-						:min-length="3"
+						container-class="col-6 stv-details-abschlusspruefung-typ"
+						:label="$p.t('global', 'typ')"
+						type="select"
+						v-model="formData.pruefungstyp_kurzbz"
+						name="pruefungstyp_kurzbz"
 						>
-					</form-input>
-				</template>
-				<template v-else >
-					<form-input
-						v-if= "formData.pv"
-						container-class="col-6 stv-details-abschlusspruefung-vorsitz"
-						type="text"
-						name="name"
-						:label="$p.t('abschlusspruefung', 'vorsitz_header')"
-						v-model="formData.pv"
-						>
+						<option
+							v-for="typ in arrTypen"
+							:key="typ.pruefungstyp_kurzbz"
+							:value="typ.pruefungstyp_kurzbz"
+							>
+							{{typ.beschreibung}}
+						</option>
 					</form-input>
 					<form-input
-						v-else
-						container-class="col-6 stv-details-abschlusspruefung-vorsitz"
-						:label="$p.t('abschlusspruefung', 'vorsitz_header')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.vorsitz"
-						name="vorsitz"
-						:suggestions="filteredMitarbeiter"
-						@complete="search"
-						:min-length="3"
+						container-class="col-6 stv-details-abschlusspruefung-note"
+						:label="$p.t('abschlusspruefung', 'notekommpruefung')"
+						type="select"
+						v-model="formData.note"
+						name="note"
 						>
+						<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
+						<option
+							v-for="note in arrNoten"
+							:key="note.note"
+							:value="note.note"
+							>
+							{{note.bezeichnung}}
+						</option>
 					</form-input>
-				</template>
-
-				<template v-if="statusNew">
-					<form-input
-						container-class="col-6 stv-details-abschlusspruefung-pruefer1"
-						:label="$p.t('abschlusspruefung', 'pruefer1')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer1"
-						name="pruefer1"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-				<template v-else >
-					<form-input
-						v-if= "formData.p1"
-						container-class="col-6 stv-details-abschlusspruefung-pruefer1"
-						type="text"
-						name="name"
-						:label="$p.t('abschlusspruefung', 'pruefer1')"
-						v-model="formData.p1"
-						>
-					</form-input>
-					<form-input
-						v-else
-						container-class="col-6 stv-details-abschlusspruefung-pruefer1"
-						:label="$p.t('abschlusspruefung', 'pruefer1')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer1"
-						name="pruefer1"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-			</div>
-
-			<div class="row mb-3">
-
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-abschlussbeurteilung_kurzbz"
-					:label="$p.t('abschlusspruefung', 'abschlussbeurteilung')"
-					type="select"
-					v-model="formData.abschlussbeurteilung_kurzbz"
-					name="abschlussbeurteilung_kurzbz"
-					>
-					<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
-					<option
-						v-for="beurteilung in arrBeurteilungen"
-						:key="beurteilung.abschlussbeurteilung_kurzbz"
-						:value="beurteilung.abschlussbeurteilung_kurzbz"
-						>
-						{{beurteilung.bezeichnung}}
-					</option>
-				</form-input>
-				<template v-if="statusNew">
-					<form-input
-						container-class="col-6 stv-details-abschlusspruefung-pruefer2"
-						:label="$p.t('abschlusspruefung', 'pruefer2')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer2"
-						name="pruefer2"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-				<template v-else >
-					<form-input
-						v-if= "formData.p2"
-						container-class="col-6 stv-details-abschlusspruefung-pruefer2"
-						type="text"
-						name="name"
-						:label="$p.t('abschlusspruefung', 'pruefer2')"
-						v-model="formData.p2"
-						>
-					</form-input>
-					<form-input
-						v-else
-						container-class="col-6 stv-details-abschlusspruefung-pruefer2"
-						:label="$p.t('abschlusspruefung', 'pruefer2')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer2"
-						name="pruefer2"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-			</div>
-
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-akadgrad"
-					:label="$p.t('abschlusspruefung', 'akadGrad')"
-					type="select"
-					v-model="formData.akadgrad_id"
-					name="akadgrad_id"
-					>
-					<option
-						v-for="grad in arrAkadGrad"
-						:key="grad.akadgrad_id"
-						:value="grad.akadgrad_id"
-						>
-						{{grad.titel}}
-					</option>
-				</form-input>
-				<template v-if="statusNew">
-					<form-input
-						container-class="col-6 stv-details-abschlusspruefung-pruefer3"
-						:label="$p.t('abschlusspruefung', 'pruefer3')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer3"
-						name="pruefer3"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-				<template v-else >
-					<form-input
-						v-if= "formData.p3"
-						container-class="col-6 stv-details-abschlusspruefung-pruefer3"
-						type="text"
-						name="name"
-						:label="$p.t('abschlusspruefung', 'pruefer3')"
-						v-model="formData.p3"
-						>
-					</form-input>
-					<form-input
-						v-else
-						container-class="col-6 stv-details-abschlusspruefung-pruefer3"
-						:label="$p.t('abschlusspruefung', 'pruefer3')"
-						type="autocomplete"
-						optionLabel="mitarbeiter"
-						v-model="formData.pruefer3"
-						name="pruefer3"
-						:suggestions="filteredPruefer"
-						@complete="searchNotAkad"
-						:min-length="3"
-						>
-					</form-input>
-				</template>
-			</div>
-
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-datum"
-					:label="$p.t('global', 'datum')"
-					type="DatePicker"
-					v-model="formData.datum"
-					auto-apply
-					:enable-time-picker="false"
-					format="dd.MM.yyyy"
-					name="datum"
-					:teleport="true"
-					>
-				</form-input>
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-anmerkung"
-					:label="$p.t('global', 'anmerkung')"
-					type="textarea"
-					v-model="formData.anmerkung"
-					name="anmerkung"
-					>
-				</form-input>
-			</div>
-
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-sponsion"
-					:label="$p.t('abschlusspruefung', 'sponsion')"
-					type="DatePicker"
-					v-model="formData.sponsion"
-					auto-apply
-					:enable-time-picker="false"
-					format="dd.MM.yyyy"
-					name="sponsion"
-					:teleport="true"
-					>
-				</form-input>
-				<form-input
-					container-class="col-6 stv-details-abschlusspruefung-protokoll"
-					:label="$p.t('abschlusspruefung', 'protokoll')"
-					type="textarea"
-					v-model="formData.protokoll"
-					name="protokoll"
-					:rows= 10
-					>
-				</form-input>
-			</div>
-
-			<div class="row mb-3 col-6">
-				<div class="col">
-					<p >{{$p.t('abschlusspruefung', 'zurBeurteilung')}}</p>
 				</div>
-				<div class="col">
-					<p>
-						<a :href="formData.link" target="_blank" rel="noopener noreferrer">
-							{{$p.t('abschlusspruefung', 'pruefungsprotokoll')}}
-						</a>
-					</p>
+
+				<div class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-pruefungsantritt"
+						:label="$p.t('abschlusspruefung', 'pruefungsantritt')"
+						type="select"
+						v-model="formData.pruefungsantritt_kurzbz"
+						name="pruefungsantritt_kurzbz"
+						>
+						<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
+						<option
+							v-for="antritt in arrAntritte"
+							:key="antritt.pruefungsantritt_kurzbz"
+							:value="antritt.pruefungsantritt_kurzbz"
+							>
+							{{antritt.bezeichnung}}
+						</option>
+					</form-input>
 				</div>
-			</div>
 
-			<div class="text-end mb-3">
-				<button v-if="statusNew" class="btn btn-primary" @click="addNewAbschlusspruefung()"> {{$p.t('ui', 'speichern')}}</button>
-				<button v-else class="btn btn-primary" @click="updateAbschlusspruefung(formData.abschlusspruefung_id)"> {{$p.t('ui', 'speichern')}}</button>
-			</div>
+				<div class="row mb-3">
+					<template v-if="statusNew">
+						<form-input
+							container-class="col-6 stv-details-abschlusspruefung-vorsitz"
+							:label="$p.t('abschlusspruefung', 'vorsitz_header')"
+							type="autocomplete"
+							optionLabel="mitarbeiter"
+							v-model="formData.vorsitz"
+							name="vorsitz"
+							:suggestions="filteredMitarbeiter"
+							@complete="search"
+							:min-length="3"
+							>
+						</form-input>
+					</template>
+					<template v-else >
+						<form-input
+							v-if= "formData.pv"
+							container-class="col-6 stv-details-abschlusspruefung-vorsitz"
+							type="text"
+							name="name"
+							:label="$p.t('abschlusspruefung', 'vorsitz_header')"
+							v-model="formData.pv"
+							>
+						</form-input>
+						<form-input
+							v-else
+							container-class="col-6 stv-details-abschlusspruefung-vorsitz"
+							:label="$p.t('abschlusspruefung', 'vorsitz_header')"
+							type="autocomplete"
+							optionLabel="mitarbeiter"
+							v-model="formData.vorsitz"
+							name="vorsitz"
+							:suggestions="filteredMitarbeiter"
+							@complete="search"
+							:min-length="3"
+							>
+						</form-input>
+					</template>
 
-		</form-form>
+					<template v-if="statusNew">
+						<form-input
+							container-class="col-6 stv-details-abschlusspruefung-pruefer1"
+							:label="$p.t('abschlusspruefung', 'pruefer1')"
+							type="autocomplete"
+							optionLabel="mitarbeiter"
+							v-model="formData.pruefer1"
+							name="pruefer1"
+							:suggestions="filteredPruefer"
+							@complete="searchNotAkad"
+							:min-length="3"
+							>
+						</form-input>
+					</template>
+					<template v-else >
+						<form-input
+							v-if= "formData.p1"
+							container-class="col-6 stv-details-abschlusspruefung-pruefer1"
+							type="text"
+							name="name"
+							:label="$p.t('abschlusspruefung', 'pruefer1')"
+							v-model="formData.p1"
+							>
+						</form-input>
+						<form-input
+							v-else
+							container-class="col-6 stv-details-abschlusspruefung-pruefer1"
+							:label="$p.t('abschlusspruefung', 'pruefer1')"
+							type="autocomplete"
+							optionLabel="mitarbeiter"
+							v-model="formData.pruefer1"
+							name="pruefer1"
+							:suggestions="filteredPruefer"
+							@complete="searchNotAkad"
+							:min-length="3"
+							>
+						</form-input>
+					</template>
+				</div>
+
+				<div class="row mb-3">
+
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-abschlussbeurteilung_kurzbz"
+						:label="$p.t('abschlusspruefung', 'abschlussbeurteilung')"
+						type="select"
+						v-model="formData.abschlussbeurteilung_kurzbz"
+						name="abschlussbeurteilung_kurzbz"
+						>
+						<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
+						<option
+							v-for="beurteilung in arrBeurteilungen"
+							:key="beurteilung.abschlussbeurteilung_kurzbz"
+							:value="beurteilung.abschlussbeurteilung_kurzbz"
+							>
+							{{beurteilung.bezeichnung}}
+						</option>
+					</form-input>
+					<template v-if="statusNew">
+						<form-input
+							container-class="col-6 stv-details-abschlusspruefung-pruefer2"
+							:label="$p.t('abschlusspruefung', 'pruefer2')"
+							type="autocomplete"
+							optionLabel="mitarbeiter"
+							v-model="formData.pruefer2"
+							name="pruefer2"
+							:suggestions="filteredPruefer"
+							@complete="searchNotAkad"
+							:min-length="3"
+							>
+						</form-input>
+					</template>
+					<template v-else >
+						<form-input
+							v-if= "formData.p2"
+							container-class="col-6 stv-details-abschlusspruefung-pruefer2"
+							type="text"
+							name="name"
+							:label="$p.t('abschlusspruefung', 'pruefer2')"
+							v-model="formData.p2"
+							>
+						</form-input>
+						<form-input
+							v-else
+							container-class="col-6 stv-details-abschlusspruefung-pruefer2"
+							:label="$p.t('abschlusspruefung', 'pruefer2')"
+							type="autocomplete"
+							optionLabel="mitarbeiter"
+							v-model="formData.pruefer2"
+							name="pruefer2"
+							:suggestions="filteredPruefer"
+							@complete="searchNotAkad"
+							:min-length="3"
+							>
+						</form-input>
+					</template>
+				</div>
+
+				<div class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-akadgrad"
+						:label="$p.t('abschlusspruefung', 'akadGrad')"
+						type="select"
+						v-model="formData.akadgrad_id"
+						name="akadgrad_id"
+						>
+						<option
+							v-for="grad in arrAkadGrad"
+							:key="grad.akadgrad_id"
+							:value="grad.akadgrad_id"
+							>
+							{{grad.titel}}
+						</option>
+					</form-input>
+					<template v-if="statusNew">
+						<form-input
+							container-class="col-6 stv-details-abschlusspruefung-pruefer3"
+							:label="$p.t('abschlusspruefung', 'pruefer3')"
+							type="autocomplete"
+							optionLabel="mitarbeiter"
+							v-model="formData.pruefer3"
+							name="pruefer3"
+							:suggestions="filteredPruefer"
+							@complete="searchNotAkad"
+							:min-length="3"
+							>
+						</form-input>
+					</template>
+					<template v-else >
+						<form-input
+							v-if= "formData.p3"
+							container-class="col-6 stv-details-abschlusspruefung-pruefer3"
+							type="text"
+							name="name"
+							:label="$p.t('abschlusspruefung', 'pruefer3')"
+							v-model="formData.p3"
+							>
+						</form-input>
+						<form-input
+							v-else
+							container-class="col-6 stv-details-abschlusspruefung-pruefer3"
+							:label="$p.t('abschlusspruefung', 'pruefer3')"
+							type="autocomplete"
+							optionLabel="mitarbeiter"
+							v-model="formData.pruefer3"
+							name="pruefer3"
+							:suggestions="filteredPruefer"
+							@complete="searchNotAkad"
+							:min-length="3"
+							>
+						</form-input>
+					</template>
+				</div>
+
+				<div class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-datum"
+						:label="$p.t('global', 'datum')"
+						type="DatePicker"
+						v-model="formData.datum"
+						auto-apply
+						:enable-time-picker="false"
+						format="dd.MM.yyyy"
+						name="datum"
+						:teleport="true"
+						>
+					</form-input>
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-anmerkung"
+						:label="$p.t('global', 'anmerkung')"
+						type="textarea"
+						v-model="formData.anmerkung"
+						name="anmerkung"
+						>
+					</form-input>
+				</div>
+
+				<div class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-sponsion"
+						:label="$p.t('abschlusspruefung', 'sponsion')"
+						type="DatePicker"
+						v-model="formData.sponsion"
+						auto-apply
+						:enable-time-picker="false"
+						format="dd.MM.yyyy"
+						name="sponsion"
+						:teleport="true"
+						>
+					</form-input>
+					<form-input
+						container-class="col-6 stv-details-abschlusspruefung-protokoll"
+						:label="$p.t('abschlusspruefung', 'protokoll')"
+						type="textarea"
+						v-model="formData.protokoll"
+						name="protokoll"
+						:rows= 10
+						>
+					</form-input>
+				</div>
+
+				<div class="row mb-3 col-6">
+					<div class="col">
+						<p >{{$p.t('abschlusspruefung', 'zurBeurteilung')}}</p>
+					</div>
+					<div class="col">
+						<p>
+							<a :href="formData.link" target="_blank" rel="noopener noreferrer">
+								{{$p.t('abschlusspruefung', 'pruefungsprotokoll')}}
+							</a>
+						</p>
+					</div>
+				</div>
+
+			</form-form>
+
+			<template #footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
+					<button v-if="statusNew" class="btn btn-primary" @click="addNewAbschlusspruefung()"> {{$p.t('ui', 'speichern')}}</button>
+					<button v-else class="btn btn-primary" @click="updateAbschlusspruefung(formData.abschlusspruefung_id)"> {{$p.t('ui', 'speichern')}}</button>
+			</template>
+
+		</bs-modal>
+
 		<Teleport v-for="data in tabulatorData" :key="data.abschlusspruefung_id" :to="data.actionDiv">
 			<abschlusspruefung-dropdown
-				:showAllFormats="showAllFormats"
+				:showAllFormats="isBerechtigtDocAndOdt"
 				:showDropDownMulti="false"
 				:abschlusspruefung_id="data.abschlusspruefung_id"
 				:studentUids="data.student_uid"
@@ -814,9 +826,7 @@ export default {
 				:cisRoot="cisRoot"
 				@linkGenerated="printDocument"
 			></abschlusspruefung-dropdown>
-		</Teleport>
-
-				
+		</Teleport>		
 	</div>
 `
 }
