@@ -228,6 +228,10 @@ export default {
 				this.getLehreinheiten(this.formData.lehrveranstaltung_id, this.currentSemester);
 			}
 		},
+		changeItems(){
+			this.resetLehreinheit();
+			this.loadItems();
+		},
 		resetLehreinheit(){
 			this.formData.lehreinheit_id = null;
 		},
@@ -460,12 +464,14 @@ export default {
 					</form-input>
 
 					<template v-if="formData.lehreinheit_id && formData.lehrveranstaltung_id">
-						<form-input v-if="formData.lehreinheit_id"
+						<form-input
+							type="select"
 							container-class="col-6 stv-details-mobility-typ"
 							:label="$p.t('lehre', 'lehreinheit')"
 							type="select"
 							v-model="formData.lehreinheit_id"
 							name="lehreinheit_id"
+							@click="changeItems"
 						>
 							<option
 								v-for="le in lv_teile"
@@ -476,26 +482,9 @@ export default {
 							</option>
 						</form-input>
 					</template>
-<!--					<template v-else-if="formData.lehreinheit_id && !formData.lehrveranstaltung_id">
-						<form-input v-if="formData.lehreinheit_id"
-							container-class="col-6 stv-details-mobility-typ"
-							:label="$p.t('lehre', 'lehreinheit')"
-							type="select"
-							v-model="formData.lehreinheit_id"
-							name="lehreinheit_id"
-							@focus="loadItems"
-						>
-							<option
-								v-for="le in listles"
-								:key="le.lehreinheit_id"
-								:value="le.lehreinheit_id"
-								>
-								{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
-							</option>
-						</form-input>
-					</template>-->
 					<template v-else>
 						<form-input
+							type="select"
 							container-class="col-6 stv-details-mobility-typ"
 							:label="$p.t('lehre', 'lehreinheit')"
 							type="select"
