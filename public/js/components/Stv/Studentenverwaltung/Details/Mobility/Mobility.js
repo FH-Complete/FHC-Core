@@ -482,7 +482,6 @@ export default {
 							type="select"
 							v-model="formData.lehreinheit_id"
 							name="lehreinheit_id"
-							disabled
 						>
 							<option
 								v-for="le in lv_teile"
