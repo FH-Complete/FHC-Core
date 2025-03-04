@@ -161,8 +161,6 @@ export default {
 				bisio_id: null,
 				localPurposes: [],
 				localSupports: [],
-				lehreinheit_id: null,
-				lehrveranstaltung_id: null
 			},
 			statusNew: true,
 			programsMobility: [],
@@ -229,6 +227,9 @@ export default {
 			if(this.formData.lehrveranstaltung_id) {
 				this.getLehreinheiten(this.formData.lehrveranstaltung_id, this.currentSemester);
 			}
+		},
+		resetLehreinheit(){
+			this.formData.lehreinheit_id = null;
 		},
 		getLehreinheiten(lv_id, studiensemester_kurzbz) {
 			const data = {
@@ -432,6 +433,7 @@ export default {
 						type="select"
 						v-model="formData.lehrveranstaltung_id"
 						name="lehrveranstaltung_id"
+						@change="resetLehreinheit"
 						>
 						<option
 							v-for="lv in listLvs"
@@ -474,7 +476,7 @@ export default {
 							</option>
 						</form-input>
 					</template>
-					<template v-else-if="formData.lehreinheit_id && !formData.lehrveranstaltung_id">
+<!--					<template v-else-if="formData.lehreinheit_id && !formData.lehrveranstaltung_id">
 						<form-input v-if="formData.lehreinheit_id"
 							container-class="col-6 stv-details-mobility-typ"
 							:label="$p.t('lehre', 'lehreinheit')"
@@ -491,7 +493,7 @@ export default {
 								{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
 							</option>
 						</form-input>
-					</template>
+					</template>-->
 					<template v-else>
 						<form-input
 							container-class="col-6 stv-details-mobility-typ"
