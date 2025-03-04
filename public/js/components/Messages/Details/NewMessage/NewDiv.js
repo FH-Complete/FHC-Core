@@ -36,6 +36,9 @@ export default {
 		},
 		typeId(){
 			return this.$route.params.typeId || this.$props.id;
+		},
+		messageId(){
+			return this.$route.params.messageId;
 		}
 	},
 	data(){
@@ -62,7 +65,8 @@ export default {
 			itemsPerson: [],
 			itemsUser: [],
 			previewText: null,
-			previewBody: ""
+			previewBody: "",
+			replyData: null
 		}
 	},
 	methods: {
@@ -179,9 +183,9 @@ export default {
 				console.error("Editor instance is not available.");
 			}
 		},
-		replyMessage(message_id){
+/*		replyMessage(message_id){
 			console.log("auf message " + message_id + " antworten");
-		},
+		},*/
 		resetForm(){
 			this.formData = {
 				vorlage_kurzbz: null,
@@ -293,6 +297,19 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
+		if(this.messageId != null) {
+
+			//get replayBody.. body receivername, receiverSurname, sentDate of message
+			this.$fhcApi.factory.messages.person.getReplyData(this.messageId)
+				.then(result => {
+					this.replyData = result.data;
+					this.formData.subject = this.replyData[0].replySubject;
+					this.formData.body = this.replyData[0].replyBody;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+
+		}
+
 	},
 	async mounted() {
 		this.initTinyMCE();
@@ -309,13 +326,7 @@ export default {
 
 			<!--new page-->
 			<div class="overflow-auto m-3">
-
-			{{id}} || {{typeId}}
-
 				<h4>New Message</h4>
-	<!--			{{formData.body}}
-				||
-				{{previewText}}-->
 
 				<div class="row">
 					<div class="col-sm-8">

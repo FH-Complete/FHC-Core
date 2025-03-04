@@ -18,6 +18,8 @@ class Messages extends FHCAPI_Controller
 			'deleteMessage' => ['admin:r', 'assistenz:r'],
 			'getVorlagentext' => ['admin:r', 'assistenz:r'],
 			'getPreviewText' => ['admin:r', 'assistenz:r'],
+			'getReplyData' => ['admin:r', 'assistenz:r'],
+			'getPersonIdFromUid' => ['admin:r', 'assistenz:r'],
 		]);
 
 		//Load Models
@@ -69,8 +71,6 @@ class Messages extends FHCAPI_Controller
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$oe_kurzbz = current($data);
-
-	//	$this->terminateWithError("oe: ". $oe_kurzbz->oe_kurzbz, self::ERROR_TYPE_GENERAL);
 
 		$this->load->model('system/Vorlage_model', 'VorlageModel');
 
@@ -129,10 +129,7 @@ class Messages extends FHCAPI_Controller
 
 	public function getMsgVarsPrestudent($uid)
 	{
-		//$this->terminateWithError($uid, self::ERROR_TYPE_GENERAL);
 		$prestudent_id = $this-> _getPrestudentIdFromUid($uid);
-
-	//	$this->terminateWithError("prestudent_id " . $prestudent_id, self::ERROR_TYPE_GENERAL);
 
 		$result = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
 
@@ -290,6 +287,46 @@ class Messages extends FHCAPI_Controller
 		$this->terminateWithSuccess($bodyParsed);
 	}
 
+	public function getReplyData($messageId)
+	{
+	//	return $this->terminateWithError("in get ReplyBody" . $messageId, self::ERROR_TYPE_GENERAL);
+		//TODO(Manu) validation of messageId: if number
+
+
+		$this->MessageModel->addSelect('public.tbl_msg_message.*');
+		$this->MessageModel->addSelect('r.*');
+		$this->MessageModel->addSelect('p.nachname');
+		$this->MessageModel->addSelect('p.vorname');
+		$this->MessageModel->addJoin('public.tbl_msg_recipient r', 'ON (r.message_id = public.tbl_msg_message.message_id)');
+		$this->MessageModel->addJoin('public.tbl_person p', 'ON (p.person_id = public.tbl_msg_message.person_id)');
+
+		$result = $this->MessageModel->loadWhere(
+			array('r.message_id' => $messageId)
+		);
+
+	//	$this->terminateWithSuccess((getData($result) ?: []));
+		$dataMessage = $this->getDataOrTerminateWithError($result);
+
+		$prefix = "Re: "; // reply subject prefix
+
+/*		$body = current($dataMessage->body);
+		$subject = $dataMessage->subject;*/
+
+		$subject = $dataMessage[0]->subject;
+		$body = $dataMessage[0]->body;
+
+
+		$replyBody = $this->_getReplyBody($body, $dataMessage[0]->nachname, $dataMessage[0]->vorname, $dataMessage[0]->insertamum);
+
+		$dataMessage[0]->replyBody = $replyBody;
+		$dataMessage[0]->rest = "Help Manu";
+		$dataMessage[0]->replySubject = $prefix . $subject;
+
+		$this->terminateWithSuccess($dataMessage);
+
+
+	}
+
 	public function deleteMessage($messageId)
 	{
 		// Start DB transaction
@@ -298,7 +335,7 @@ class Messages extends FHCAPI_Controller
 		$result = $this->MessageModel->deleteMessageRecipient($messageId);
 		if (isError($result)) {
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+
 		}
 
 		$result = $this->MessageModel->deleteMessageStatus($messageId);
@@ -316,6 +353,19 @@ class Messages extends FHCAPI_Controller
 		$this->terminateWithSuccess($result);
 	}
 
+	public function getPersonIdFromUid($uid)
+	{
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$result = $this->BenutzerModel->loadWhere(
+			['uid' => $uid]
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+		$benutzer = current($data);
+
+		$this->terminateWithSuccess($benutzer->person_id);
+	}
+
 	private function _getPersonIdFromUid($uid)
 	{
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
@@ -326,7 +376,6 @@ class Messages extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 		$benutzer = current($data);
 
-		//return $data->person_id;
 		return $benutzer->person_id;
 	}
 
@@ -341,5 +390,24 @@ class Messages extends FHCAPI_Controller
 		$student = current($data);
 
 		return $student->prestudent_id;
+	}
+
+	private function _getReplyBody($body, $receiverName, $receiverSurname, $sentDate)
+	{
+		// To quote a reply body message
+		$bodyFormat = "<br>
+					<br>
+					<blockquote>
+						<i>
+							On %s %s %s wrote:
+						</i>
+					</blockquote>
+					<blockquote style='border-left:2px solid; padding-left: 8px'>
+						%s
+					</blockquote>";
+		return sprintf(
+			$bodyFormat,
+			date_format(date_create($sentDate), 'd.m.Y H:i'), $receiverName, $receiverSurname, $body
+		);
 	}
 }

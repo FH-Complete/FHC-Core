@@ -8,6 +8,7 @@ const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(),
 	routes: [
 		{ path: `/${ciPath}/NeueNachricht/:id/:typeId`, component: NewMessage },
+		{ path: `/${ciPath}/NeueNachricht/:id/:typeId/:messageId`, component: NewMessage },
 	]
 });
 

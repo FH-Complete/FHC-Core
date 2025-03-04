@@ -1,12 +1,12 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import FormForm from '../../Form/Form.js';
-import NewMessage from "../Details/NewMessage.js";
+//import NewMessage from "../Details/NewMessage.js";
 
 export default {
 	components: {
 		CoreFilterCmpt,
 		FormForm,
-		NewMessage,
+	//	NewMessage,
 	},
 	inject: {
 		cisRoot: {
@@ -110,13 +110,15 @@ export default {
 							container.className = "d-flex gap-2";
 
 							let button = document.createElement('button');
+							if (this.personId != cell.getData().recipient_id)
+								button.disabled = true;
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.title = this.$p.t('global', 'reply');
 							button.innerHTML = '<i class="fa fa-reply"></i>';
 							button.addEventListener(
 								'click',
 								(event) =>
-									this.reply(cell.getData().message_id)
+									this.actionReplyToMessage(cell.getData().message_id)
 							);
 							container.append(button);
 
@@ -141,6 +143,8 @@ export default {
 				height: '400',
 				selectable:	true,
 				selectableRangeMode: 'click',
+				pagination: true,
+			//	paginationSize: 5,
 /*				layoutColumnsOnNewData: false,
 
 				selectableRangeMode: 'click',
@@ -208,13 +212,11 @@ export default {
 			],
 			tabulatorData: [],
 			previewBody: "",
-			open: false
+			open: false,
+			personId: null
 		}
 	},
 	methods: {
-		reply(message_id){
-			console.log("in reply " + message_id);
-		},
 		actionDeleteMessage(message_id){
 			this.$fhcAlert
 				.confirmDelete()
@@ -225,7 +227,6 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		deleteMessage(message_id){
-		//	console.log("deleteMessage " + message_id);
 			return this.$fhcApi.factory.messages.person.deleteMessage(message_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
@@ -239,6 +240,9 @@ export default {
 			this.$emit('newMessage', this.id, this.typeId);
 			//console.log("action new message");
 
+		},
+		actionReplyToMessage(message_id){
+			this.$emit('replyToMessage', this.id, this.typeId, message_id);
 		},
 		reload() {
 			this.$refs.table.reloadTable();
@@ -263,6 +267,15 @@ export default {
 				link.setAttribute('rel', 'noopener noreferrer'); // Sicherheitsmaßnahme
 			});
 		});*/
+	},
+	created(){
+		if(this.typeId == 'uid') {
+		this.$fhcApi.factory.messages.person.getPersonIdFromUid(this.id)
+			.then(result => {
+				this.personId = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		}
 	},
 	template: `
 	<div class="messages-detail-table">

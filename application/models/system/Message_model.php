@@ -275,7 +275,7 @@ class Message_model extends DB_Model
 				 JOIN public.tbl_msg_message m USING(message_id)
 			WHERE r.person_id = ?
 			GROUP BY m.message_id, m.subject, m.body, m.insertamum, m.relationmessage_id, sender, recipient, sender_id, recipient_id
-			ORDER BY insertamum
+			ORDER BY insertamum DESC
 				 ";
 
 		$parametersArray = array($person_id, $person_id);
@@ -287,7 +287,7 @@ class Message_model extends DB_Model
 	 * Deletes a messages from tableMessages and tbl_msg_recipient
 	 * TODO(MANU) CHECK IF NECESSARY
 	 * dependency with other tables
-	 * in case of reply... more messages
+	 * in case of reply... more messages?? delete all dependent ones?
 	 * maybe anonimize it
 	 * @param $message_id
 	 * @return boolean success

@@ -23,7 +23,7 @@ class NeueNachricht extends Auth_Controller
 		//now working
 		$this->load->view('Nachrichten', [
 			'permissions' => [
-				'vertragsverwaltung_schreibrechte' => $this->permissionlib->isBerechtigt('vertrag/mitarbeiter', 'suid')
+				'assistenz_schreibrechte' => $this->permissionlib->isBerechtigt('assistenz','suid'),
 			]
 		]);
 	}

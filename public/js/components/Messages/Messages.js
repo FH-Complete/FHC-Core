@@ -76,6 +76,23 @@ export default {
 			else
 				console.log("no valid openMode");
 		},
+		handleMessage(id, typeId, messageId){
+			console.log("in handleMessage " + messageId);
+			if (this.openMode == "window") {
+				this.openInNewWindow(id, typeId, messageId);
+			}
+			else if (this.openMode == "newTab"){
+				this.openInNewTab(id, typeId, messageId);
+			}
+			else if (this.openMode == "modal"){
+				this.openInModal(id, typeId, messageId);
+			}
+			else if (this.openMode == "showDiv"){
+				this.$refs.templateNewMessage.showTemplate(id, typeId, messageId);
+			}
+			else
+				console.log("no valid openMode");
+		},
 		openInDiv(id, typeId){
 			this.$refs.templateNewMessage.showTemplate(id, typeId);
 			//this.showDiv = true; //local variante
@@ -85,14 +102,25 @@ export default {
 			//TODO(manu) define bs-modal in this component
 			this.$refs.templateNewMessage.$refs.modalMsg.show();
 		},
-		openInNewTab(id, typeId){
+/*		openInNewTab(id, typeId){
 			//TODO(MANU) check if array of ids...
-/*			let path = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-			path += "/NeueNachricht/" + this.id + "/" + this.typeId;*/
-
-			//als param
 			let path = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 			path += "/NeueNachricht/" + id + "/" + typeId;
+
+			const newTab = window.open(path, "_blank");
+		},*/
+		openInNewTab(id, typeId, messageId=null){
+			//TODO(MANU) check if array of ids...
+			let path = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+
+			if (messageId){
+				path += "/NeueNachricht/" + id + "/" + typeId + "/" + messageId;
+			}
+
+			else {
+				path += "/NeueNachricht/" + id + "/" + typeId;
+			}
+
 
 			const newTab = window.open(path, "_blank");
 		},
@@ -152,7 +180,8 @@ export default {
 				:endpoint="endpoint"
 				:messageLayout="messageLayout"
 				:openMode="openMode"
-				@newMessage="newMessage"
+				@newMessage="newMessage"		
+				@replyToMessage="handleMessage"
 			>
 			
 			</table-messages>
