@@ -75,6 +75,8 @@ export default {
 						}
 					},
 					{title: "bisio_id", field: "bisio_id"},
+					{title: "lehrveranstaltung_id", field: "lehrveranstaltung_id"},
+					{title: "lehreinheit_id", field: "lehreinheit_id"},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -158,7 +160,9 @@ export default {
 				herkunftsland_code: 'A',
 				bisio_id: null,
 				localPurposes: [],
-				localSupports: []
+				localSupports: [],
+				lehreinheit_id: null,
+				lehrveranstaltung_id: null
 			},
 			statusNew: true,
 			programsMobility: [],
@@ -222,8 +226,8 @@ export default {
 				});
 		},
 		loadItems(){
-			if(this.formData.lehrveranstaltung) {
-				this.getLehreinheiten(this.formData.lehrveranstaltung, this.currentSemester);
+			if(this.formData.lehrveranstaltung_id) {
+				this.getLehreinheiten(this.formData.lehrveranstaltung_id, this.currentSemester);
 			}
 		},
 		getLehreinheiten(lv_id, studiensemester_kurzbz) {
@@ -394,7 +398,7 @@ export default {
 		</core-filter-cmpt>
 		
 		<!--Modal: mobilityModal-->
-		<bs-modal ref="mobilityModal" dialog-class="modal-xl">
+		<bs-modal ref="mobilityModal" dialog-class="modal-xl modal-dialog-scrollable">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('mobility', 'mobility_anlegen')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('mobility', 'mobility_bearbeiten')}}</p>
@@ -403,10 +407,10 @@ export default {
 
 			<form-form v-if="!this.student.length" ref="formMobility" @submit.prevent>
 
-			<div class="row my-3">
-				<legend class="col-6">BIS</legend>
-				<legend class="col-6">Outgoing</legend>
-			</div>
+				<div class="row my-3">
+					<legend class="col-6">BIS</legend>
+					<legend class="col-6">Outgoing</legend>
+				</div>
 				
 				<div class="row mb-3">
 					<form-input
@@ -426,7 +430,7 @@ export default {
 						container-class="col-6 stv-details-mobility-typ"
 						:label="$p.t('lehre', 'lehrveranstaltung')"
 						type="select"
-						v-model="formData.lehrveranstaltung"
+						v-model="formData.lehrveranstaltung_id"
 						name="lehrveranstaltung_id"
 						>
 						<option
@@ -452,7 +456,8 @@ export default {
 						:teleport="true"
 						>
 					</form-input>
-					<template v-if="formData.lehreinheit_id && !formData.lehrveranstaltung">
+
+					<template v-if="formData.lehreinheit_id && formData.lehrveranstaltung_id">
 						<form-input v-if="formData.lehreinheit_id"
 							container-class="col-6 stv-details-mobility-typ"
 							:label="$p.t('lehre', 'lehreinheit')"
