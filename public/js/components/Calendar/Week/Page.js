@@ -224,22 +224,7 @@ export default {
 			return styleObj
 		},
 		eventGridStyle(day, event) {
-			if (event.orig.allDayEvent)
-			{
-				return;
-				/*return {
-					'z-index': '2',
-					'grid-column': '1 / -1',
-					'background-color': 'rgb(204, 204, 204)',
-					'max-height': '75px',
-					color: 'black',
-					position: 'sticky',
-					top: '44px',
-				};*/
-			}
-			else
-			{
-				return {
+			return {
 					'z-index': 1,
 					'grid-column-start': 1 + (event.lane - 1) * day.lanes / event.maxLane,
 					'grid-column-end': 1 + event.lane * day.lanes / event.maxLane,
@@ -247,8 +232,7 @@ export default {
 					'grid-row-end': this.dateToMinutesOfDay(event.end),
 					'background-color': event.orig.color,
 					'max-height': '75px'
-				};
-			}
+			};
 		},
 		calcHourPosition(event) {
 			let height = this.$refs['eventsRef' + this.week].getBoundingClientRect().height;
