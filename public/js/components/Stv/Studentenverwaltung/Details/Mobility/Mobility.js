@@ -481,10 +481,10 @@ export default {
 							type="select"
 							v-model="formData.lehreinheit_id"
 							name="lehreinheit_id"
-							disabled
+							@focus="loadItems"
 						>
 							<option
-								v-for="le in lv_teile"
+								v-for="le in listles"
 								:key="le.lehreinheit_id"
 								:value="le.lehreinheit_id"
 								>
