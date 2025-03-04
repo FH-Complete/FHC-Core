@@ -85,8 +85,6 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '250',
-				// selectableRangeMode: 'click',
-				// selectable: true,
 				persistenceID: 'core-mobility-purpose'
 			},
 			tabulatorEvents: [
@@ -114,8 +112,7 @@ export default {
 			formData: {
 				zweck_code: ""
 			},
-			localData: [],
-			isCentered: false,
+			localData: []
 		}
 	},
 	watch: {
@@ -183,24 +180,14 @@ export default {
 						zweck_code: this.formData.zweck_code,
 					});
 				}
-
 			}
-	//	this.closeModal();
 		},
-
-		// closeModal(){
-		// 	this.$refs.mobilityPurpose.hide();
-		// },
-		// openModal(){
-		// 	this.isCentered = true;
-		// 	this.$refs.mobilityPurpose.show();
-		// },
 		reload() {
 			this.$refs.table.reloadTable();
 			this.$emit('reload');
 		},
 		resetModal(){
-			this.formData = {};mobility_purpose
+			this.formData = {};
 			this.formData.zweck_code = null;
 		},
 		resetLocalData() {
@@ -220,7 +207,6 @@ export default {
 				table-only
 				:side-menu="false"
 				reload
-				@click:new="handleSubmitAction"
 				>
 				<template #actions>
 					<core-form ref="mobilityData">
@@ -242,7 +228,7 @@ export default {
 							</form-input>
 						</div>
 					</core-form>
-					<button class="btn btn-primary" @click="handleSubmitAction">{{$p.t('mobility', 'zweck')}}</button>
+					<button class="btn btn-primary" @click="handleSubmitAction">{{$p.t('ui', 'hinzufuegen')}}</button>
 				</template>
 			</core-filter-cmpt>
 	

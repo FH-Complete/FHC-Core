@@ -83,8 +83,6 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '250',
-				selectableRangeMode: 'click',
-				selectable: true,
 				persistenceID: 'core-mobility-support'
 			},
 			tabulatorEvents: [
@@ -172,15 +170,6 @@ export default {
 				}
 
 			}
-			this.closeModal();
-		},
-		closeModal(){
-			this.$refs.mobilitySupport.hide();
-			this.$emit('close-modal');
-		},
-		openModal(){
-			this.$refs.mobilitySupport.show();
-			this.$emit('open-modal');
 		},
 		reload() {
 			this.$refs.table.reloadTable();
@@ -198,51 +187,39 @@ export default {
 		<div class="core-mobility-support h-50 d-flex flex-column w-100 mt-2">
 		<br>
 		
-		<core-filter-cmpt
-			ref="table"
-			:tabulator-options="tabulatorOptions"
-			:tabulator-events="tabulatorEvents"
-			table-only
-			:side-menu="false"
-			reload
-			new-btn-show
-			:new-btn-label="this.$p.t('mobility', 'aufenthalt')"
-			@click:new="actionNewSupport"
-			>
-		</core-filter-cmpt>
-		
-		<div>
-			<bs-modal ref="mobilitySupport">
-				<template #title>
-					<p class="fw-bold mt-3">{{$p.t('mobility', 'foerderung_neu')}}</p>
-				</template>
-				
-				<core-form ref="mobilityData">
-					<div class="row mb-3">
-						<form-input
-							type="select"
-							:label="$p.t('mobility/aufenthalt')"
-							v-model="formData.aufenthaltfoerderung_code"
-							name="aufenthaltfoerderung_code"
-							>
-							<option :value="null"> {{$p.t('ui', 'bitteWaehlen')}}</option>
-							<option
-								v-for="entry in listSupports"
-								:key="entry.aufenthaltfoerderung_code"
-								:value="entry.aufenthaltfoerderung_code"
+		<div class="override_filtercmpt_actions_style">
+			<core-filter-cmpt
+				ref="table"
+				:tabulator-options="tabulatorOptions"
+				:tabulator-events="tabulatorEvents"
+				table-only
+				:side-menu="false"
+				reload
+				>
+				<template #actions>
+					<core-form ref="mobilityData">
+						<div class="row">
+							<form-input
+								type="select"
+								:label="$p.t('mobility/aufenthalt')"
+								v-model="formData.aufenthaltfoerderung_code"
+								name="aufenthaltfoerderung_code"
 								>
-								{{entry.bezeichnung}}
-							</option>
-						</form-input>
-					</div>
-				</core-form>
-	
-				<template #footer>
-					<button type="button" class="btn btn-primary" @click="handleSubmitAction">{{$p.t('ui', 'speichern')}}</button>
+								<option :value=""> {{$p.t('ui', 'bitteWaehlen')}}</option>
+								<option
+									v-for="entry in listSupports"
+									:key="entry.aufenthaltfoerderung_code"
+									:value="entry.aufenthaltfoerderung_code"
+									>
+									{{entry.bezeichnung}}
+								</option>
+							</form-input>
+						</div>
+					</core-form>
+					<button type="button" class="btn btn-primary" @click="handleSubmitAction">{{$p.t('ui', 'hinzufuegen')}}</button>
 				</template>
-	
-			</bs-modal>
+			</core-filter-cmpt>
+		
 		</div>
-
 	</div>`
 }
