@@ -309,6 +309,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		}
 
 		//update(1) loading all dms-entries with this notiz_id
+		$dms_id_arr = [];
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 		$this->NotizdokumentModel->addJoin('campus.tbl_dms_version', 'dms_id');
 

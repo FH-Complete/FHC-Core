@@ -1,6 +1,6 @@
 <?php
 $includesArray = array(
-	'title' => 'Stundenplan',
+	'title' => 'Profil',
 	'customJSModules' => ['public/js/apps/Cis/Profil.js'],
 	'tabulator5' => true,
 	'primevue3' => true,

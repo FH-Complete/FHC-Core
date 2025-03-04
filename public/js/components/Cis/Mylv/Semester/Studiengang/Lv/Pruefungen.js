@@ -10,7 +10,7 @@ export default {
 		BsModal
 	],
 	props: {
-		lehrveranstaltung_id: Number,
+		pruefungenData: Array|null,
 		bezeichnung: String,
 		/*
 		 * NOTE(chris): 
@@ -26,16 +26,7 @@ export default {
 	},
 	data: () => ({
 		result: true,
-		pruefungen: null
 	}),
-	created() {
-		if (pruefungen[this.lehrveranstaltung_id])
-			this.pruefungen = pruefungen[this.lehrveranstaltung_id];
-		else
-			axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Mylv/Pruefungen/' + this.lehrveranstaltung_id).then(res => {
-				this.pruefungen = pruefungen[this.lehrveranstaltung_id] = res.data.retval || [];
-			});
-	},
 	mounted() {
 		this.modal = this.$refs.modalContainer.modal;
 	},
@@ -47,10 +38,10 @@ export default {
 			Prüfungen: {{bezeichnung}}
 		</template>
 		<template v-slot:default>
-			<div v-if="!pruefungen" class="text-center">
+			<div v-if="!pruefungenData" class="text-center">
 				<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 			</div>
-			<p v-else-if="!pruefungen.length" class="alert alert-info mb-0">
+			<p v-else-if="!pruefungenData.length" class="alert alert-info mb-0">
 				Keine Prüfungen vorhanden!
 			</p>
 			<table v-else class="table table-hover">
@@ -60,7 +51,7 @@ export default {
 					<td class="text-end">Note</td>
 				</thead>
 				<tbody>
-					<tr v-for="pruefung in pruefungen" :key="pruefung.pruefung_id">
+					<tr v-for="pruefung in pruefungenData" :key="pruefung.pruefung_id">
 						<th>{{pruefung.pruefungstyp_kurzbz}}</th>
 						<td>{{pruefung.datum}}</td>
 						<td class="text-end">{{pruefung.note}}</td>

@@ -22,6 +22,8 @@ import TableDownload from './Table/Download.js';
 import collapseAutoClose from '../../directives/collapseAutoClose.js';
 import { defaultHeaderFilter } from '../../tabulator/filters/defaultHeaderFilter.js';
 
+import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
+
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
 const FILTER_COMPONENT_NEW_FILTER_TYPE = 'Filter Component New Filter Type';
@@ -50,6 +52,7 @@ export const CoreFilterCmpt = {
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
 		title: String,
+		description: String,
 		sideMenu: {
 			type: Boolean,
 			default: true
@@ -204,7 +207,7 @@ export const CoreFilterCmpt = {
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
 					height: 500,
-					layout: "fitDataStretch",
+					layout: "fitDataStretchFrozen",
 					movableColumns: true,
 					columnDefaults:{
 						tooltip: true,
@@ -622,6 +625,7 @@ export const CoreFilterCmpt = {
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
+					<span v-else-if="description">{{ description }}</span>
 					<a v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
 						<span class="fa-solid fa-xl fa-filter"></span>
 					</a>
