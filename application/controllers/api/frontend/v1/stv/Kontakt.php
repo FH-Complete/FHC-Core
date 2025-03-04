@@ -157,10 +157,17 @@ class Kontakt extends FHCAPI_Controller
 	{
 		$this->form_validation->set_data(['address.plz' => $_POST['plz']]);
 
-		$this->form_validation->set_rules('address.plz', 'PLZ', 'required|numeric', [
+		$this->form_validation->set_rules('address.plz', 'PLZ', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'PLZ']),
-			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
 		]);
+
+		if(isset($_POST['nation']) && $_POST['nation'] == 'A')
+		{
+			$this->form_validation->set_rules('address.plz', 'PLZ', 'required|numeric', [
+				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'PLZ']),
+				'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
+			]);
+		}
 
 		if(isset($_POST['gemeinde']) && isset($_POST['ort']) && isset($_POST['nation']) && $_POST['nation'] == 'A')
 		{
@@ -225,10 +232,17 @@ class Kontakt extends FHCAPI_Controller
 
 		$uid = getAuthUID();
 
-		$this->form_validation->set_rules('address.plz', 'PLZ', 'required|numeric', [
+		$this->form_validation->set_rules('address.plz', 'PLZ', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'PLZ']),
-			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
 		]);
+
+		if(isset($_POST['nation']) && $_POST['nation'] == 'A')
+		{
+			$this->form_validation->set_rules('address.plz', 'PLZ', 'required|numeric', [
+				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'PLZ']),
+				'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ'])
+			]);
+		}
 
 		if(isset($_POST['gemeinde']) && isset($_POST['ort']) && isset($_POST['nation']) && $_POST['nation'] == 'A')
 		{

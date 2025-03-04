@@ -372,7 +372,7 @@ export default{
 	<div class="stv-details-kontakt-address h-100 pt-3">
 		
 		<!--Modal: AddressModal-->
-		<bs-modal ref="adressModal">
+		<bs-modal ref="adressModal" dialog-class="modal-dialog-scrollable">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('person', 'adresse_new')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('person', 'adresse_edit')}}</p>
