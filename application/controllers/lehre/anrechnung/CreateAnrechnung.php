@@ -13,9 +13,9 @@ class CreateAnrechnung extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'lehre/anrechnung_anlegen:r',
-				'getLVsByStudent' => 'lehre/anrechnung_anlegen:r',
-				'create' => 'lehre/anrechnung_anlegen:rw'
+				'index'     => self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN . ':r',
+				'getLVsByStudent' => self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN . ':r',
+				'create' => self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN . ':rw'
 			)
 		);
 		
@@ -24,6 +24,7 @@ class CreateAnrechnung extends Auth_Controller
 		$this->load->model('education/Anrechnungstatus_model', 'AnrechnungstatusModel');
 		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		
 		// Load libraries
@@ -67,13 +68,22 @@ class CreateAnrechnung extends Auth_Controller
 			$result = $this->StudiensemesterModel->getNearest();
 			$studiensemester_kurzbz = getData($result)[0]->studiensemester_kurzbz;
 		}
-		
+
+		$studiengang_kz_arr = array();
 		// Get Studiengaenge the user is entitled for
-		if (!$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN))
+		if ($studiengaenge = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN, 'suid'))
 		{
-			show_error('Failed retrieving Studiengaenge');
+			foreach($studiengaenge as $studiengang)
+			{
+				$berechtigt = $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN, 'suid', $studiengang);
+
+				if ($berechtigt)
+					$studiengang_kz_arr[]= $studiengang;
+			}
 		}
-		
+		else
+			show_error('Failed retrieving Studiengaenge');
+
 		// Get Anrechnungsbegruendungen
 		$this->load->model('education/Anrechnungbegruendung_model', 'AnrechnungbegruendungModel');
 		$begruendung_arr = getData($this->AnrechnungbegruendungModel->load());
@@ -124,7 +134,17 @@ class CreateAnrechnung extends Auth_Controller
 		$lehrveranstaltung_id = $this->input->post('lehrveranstaltung_id');
 		$begruendung_id = $this->input->post('begruendung_id');
 		$herkunftKenntnisse = $this->input->post('herkunftKenntnisse');
-		
+
+		$prestudent = $this->PrestudentModel->load(array('prestudent_id' => $prestudent_id));
+
+		if (!hasData($prestudent) || isError($prestudent))
+			$this->terminateWithJsonError($this->p->t('ui', 'keineBerechtigung'));
+
+		$studiengang = getData($prestudent)[0]->studiengang_kz;
+
+		if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN, 'suid', $studiengang))
+			$this->terminateWithJsonError($this->p->t('ui', 'keineBerechtigung'));
+
 		// Validate upload file
 		if (empty($_FILES['uploadfile']['name']))
 		{

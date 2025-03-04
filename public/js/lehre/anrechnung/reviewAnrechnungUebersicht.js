@@ -95,7 +95,7 @@ function func_selectableCheck(row) {
   let status_kurzbz = row.getData().status_kurzbz;
   let empfehlungsberechtigt = row.getData().empfehlungsberechtigt;
 
-  return  status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR || empfehlungsberechtigt == "false";
+  return  status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR && empfehlungsberechtigt == "true";
   
 }
 
@@ -158,7 +158,7 @@ function tableWidgetHook_selectAllButton(tableWidgetDiv) {
     .tabulator("getRows", true)
     .filter(
       (row) =>
-        row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
+        row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR && row.getData().empfehlungsberechtigt == "true"
     );
 
   tableWidgetDiv

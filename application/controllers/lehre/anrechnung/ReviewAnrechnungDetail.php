@@ -21,10 +21,10 @@ class reviewAnrechnungDetail extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'lehre/anrechnung_empfehlen:rw',
-				'download'  => 'lehre/anrechnung_empfehlen:rw',
-				'recommend'   => 'lehre/anrechnung_empfehlen:rw',
-				'dontRecommend'   => 'lehre/anrechnung_empfehlen:rw'
+				'index'     => self::BERECHTIGUNG_ANRECHNUNG_EMPFEHLEN . ':rw',
+				'download'  => self::BERECHTIGUNG_ANRECHNUNG_EMPFEHLEN . ':rw',
+				'recommend'   => self::BERECHTIGUNG_ANRECHNUNG_EMPFEHLEN . ':rw',
+				'dontRecommend'   => self::BERECHTIGUNG_ANRECHNUNG_EMPFEHLEN . ':rw'
 			)
 		);
 
@@ -127,17 +127,23 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
-			if($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id']))
+			$empfehlungData = $this->anrechnunglib->getEmpfehlungData($item['anrechnung_id']);
+			$isEmpfehlungsberechtigt = $this->anrechnunglib->isEmpfehlungsberechtigt($item['anrechnung_id']);
+
+			if (is_null($empfehlungData) && $isEmpfehlungsberechtigt)
 			{
-				$json[]= array(
-					'anrechnung_id'         => $item['anrechnung_id'],
-					'empfehlung_anrechnung' => 'true',
-					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL),
-					'empfehlung_am'          => (new DateTime())->format('d.m.Y'),
-					'empfehlung_von'         => $person->vorname. ' '. $person->nachname
-				);
+				// Approve Anrechnung
+				if($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id']))
+				{
+					$json[]= array(
+						'anrechnung_id'         => $item['anrechnung_id'],
+						'empfehlung_anrechnung' => 'true',
+						'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
+						'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL),
+						'empfehlung_am'          => (new DateTime())->format('d.m.Y'),
+						'empfehlung_von'         => $person->vorname. ' '. $person->nachname
+					);
+				}
 			}
 		}
 
@@ -184,18 +190,25 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
-			if($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung']))
+			$empfehlungData = $this->anrechnunglib->getEmpfehlungData($item['anrechnung_id']);
+			$isEmpfehlungsberechtigt = $this->anrechnunglib->isEmpfehlungsberechtigt($item['anrechnung_id']);
+
+			if (is_null($empfehlungData) && $isEmpfehlungsberechtigt)
 			{
-				$json[]= array(
-					'anrechnung_id'         => $item['anrechnung_id'],
-					'empfehlung_anrechnung' => 'false',
-					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL),
-					'empfehlung_am'          => (new DateTime())->format('d.m.Y'),
-					'empfehlung_von'         => $person->vorname. ' '. $person->nachname
-				);
+				// Approve Anrechnung
+				if($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung']))
+				{
+					$json[]= array(
+						'anrechnung_id'         => $item['anrechnung_id'],
+						'empfehlung_anrechnung' => 'false',
+						'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
+						'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL),
+						'empfehlung_am'          => (new DateTime())->format('d.m.Y'),
+						'empfehlung_von'         => $person->vorname. ' '. $person->nachname
+					);
+				}
 			}
+
 		}
 
 		// Output json to ajax
@@ -256,7 +269,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 	/**
 	 * Check if user is entitled to read dms doc
-	 * @param $dms_id
+	 * @param $anrechnung_id
 	 */
 	private function _checkIfEntitledToReadAnrechnung($anrechnung_id)
 	{

@@ -20,11 +20,11 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'lehre/anrechnung_genehmigen:r',
-				'download'  => 'lehre/anrechnung_genehmigen:r',
-				'approve'   => 'lehre/anrechnung_genehmigen:rw',
-				'reject'    => 'lehre/anrechnung_genehmigen:rw',
-				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw'
+				'index'     => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN . ':r',
+				'download'  => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN . ':r',
+				'approve'   => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN . ':rw',
+				'reject'    => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN . ':rw',
+				'requestRecommendation' => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN . ':rw'
 			)
 		);
 
@@ -135,6 +135,9 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		// Approve Anrechnung
 		foreach ($data as $item)
 		{
+			if (!$this->_checkBerechtigung($item['anrechnung_id']))
+				continue;
+
             // Get Prestudent
             $this->AnrechnungModel->addSelect('prestudent_id');
             $result = $this->AnrechnungModel->load($item['anrechnung_id']);
@@ -174,6 +177,9 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		// Reject Anrechnung
 		foreach ($data as $item)
 		{
+			if (!$this->_checkBerechtigung($item['anrechnung_id']))
+				continue;
+
 			if ($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'], $item['begruendung']))
 			{
 				$json[]= array(
@@ -212,6 +218,9 @@ class approveAnrechnungUebersicht extends Auth_Controller
 
 		foreach ($data as $item)
 		{
+			if (!$this->_checkBerechtigung($item['anrechnung_id']))
+				continue;
+
 			// Check if Anrechnungs-LV has lector
 			if (!$this->anrechnunglib->LVhasLector($item['anrechnung_id']))
 			{
@@ -483,4 +492,17 @@ class approveAnrechnungUebersicht extends Auth_Controller
 
         return $oeLeitung_arr;
     }
+
+	private function _checkBerechtigung($anrechnung_id)
+	{
+		$this->AnrechnungModel->addJoin('tbl_prestudent', 'prestudent_id');
+		$result = $this->AnrechnungModel->loadWhere(array('anrechnung_id' => $anrechnung_id));
+
+		if (isError($result) || !hasData($result))
+			show_error('Failed retrieving anrechnung');
+
+		$antragData = getData($result)[0];
+
+		return $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $antragData->studiengang_kz);
+	}
 }

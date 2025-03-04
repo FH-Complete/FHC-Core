@@ -19,10 +19,10 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'lehre/anrechnung_empfehlen:rw',
-				'download'  => 'lehre/anrechnung_empfehlen:rw',
-				'recommend'   => 'lehre/anrechnung_empfehlen:rw',
-				'dontRecommend'   => 'lehre/anrechnung_empfehlen:rw'
+				'index'     => self::BERECHTIGUNG_ANRECHNUNG_EMPFEHLEN . ':rw',
+				'download'  => self::BERECHTIGUNG_ANRECHNUNG_EMPFEHLEN . ':rw',
+				'recommend'   => self::BERECHTIGUNG_ANRECHNUNG_EMPFEHLEN . ':rw',
+				'dontRecommend'   => self::BERECHTIGUNG_ANRECHNUNG_EMPFEHLEN . ':rw'
 			)
 		);
 
@@ -96,15 +96,21 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
-			if($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id']))
+			$empfehlungData = $this->anrechnunglib->getEmpfehlungData($item['anrechnung_id']);
+			$isEmpfehlungsberechtigt = $this->anrechnunglib->isEmpfehlungsberechtigt($item['anrechnung_id']);
+
+			if (is_null($empfehlungData) && $isEmpfehlungsberechtigt)
 			{
-				$json[]= array(
-					'anrechnung_id'         => $item['anrechnung_id'],
-					'empfehlung_anrechnung' => 'true',
-					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
-				);
+				// Approve Anrechnung
+				if($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id']))
+				{
+					$json[]= array(
+						'anrechnung_id'         => $item['anrechnung_id'],
+						'empfehlung_anrechnung' => 'true',
+						'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
+						'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
+					);
+				}
 			}
 		}
 
@@ -145,15 +151,21 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
-			if($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung']))
+			$empfehlungData = $this->anrechnunglib->getEmpfehlungData($item['anrechnung_id']);
+			$isEmpfehlungsberechtigt = $this->anrechnunglib->isEmpfehlungsberechtigt($item['anrechnung_id']);
+
+			if (is_null($empfehlungData) && $isEmpfehlungsberechtigt)
 			{
-				$json[]= array(
-					'anrechnung_id'         => $item['anrechnung_id'],
-					'empfehlung_anrechnung' => 'false',
-					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
-				);
+				// Approve Anrechnung
+				if($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung']))
+				{
+					$json[]= array(
+						'anrechnung_id'         => $item['anrechnung_id'],
+						'empfehlung_anrechnung' => 'false',
+						'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
+						'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
+					);
+				}
 			}
 		}
 

@@ -187,11 +187,12 @@ var format_ectsSumBisherUndNeu = function (cell, formatterParams, onRendered) {
 // Formats row selectable/unselectable
 function func_selectableCheck(row) {
   let status_kurzbz = row.getData().status_kurzbz;
+  let schreibberechtigt = row.getData().schreibberechtigt;
 
   return (
-    status_kurzbz != ANRECHNUNGSTATUS_APPROVED &&
+    (status_kurzbz != ANRECHNUNGSTATUS_APPROVED &&
     status_kurzbz != ANRECHNUNGSTATUS_REJECTED &&
-    status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
+    status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR && schreibberechtigt == "true")
   );
 }
 
@@ -280,7 +281,7 @@ function tableWidgetHook_selectAllButton(tableWidgetDiv) {
     .tabulator("getRows", true)
     .filter(
       (row) =>
-        row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_STGL
+        row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_STGL && row.getData().schreibberechtigt == "true"
     );
 
   tableWidgetDiv

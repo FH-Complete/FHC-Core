@@ -22,14 +22,14 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'lehre/anrechnung_genehmigen:r',
-				'download'  => 'lehre/anrechnung_genehmigen:r',
-				'approve'   => 'lehre/anrechnung_genehmigen:rw',
-				'reject'    => 'lehre/anrechnung_genehmigen:rw',
-				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw',
-				'withdraw' => 'lehre/anrechnung_genehmigen:rw',
-				'withdrawRequestRecommendation' => 'lehre/anrechnung_genehmigen:rw',
-				'saveEmpfehlungsNotiz' => 'lehre/anrechnung_genehmigen:rw'
+				'index'     => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN .':r',
+				'download'  => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN .':r',
+				'approve'   => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN .':rw',
+				'reject'    => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN .':rw',
+				'requestRecommendation' => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN .':rw',
+				'withdraw' => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN .':rw',
+				'withdrawRequestRecommendation' => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN .':rw',
+				'saveEmpfehlungsNotiz' => self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN .':rw'
 			)
 		);
 
@@ -140,6 +140,9 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Approve Anrechnung
 		foreach ($data as $item)
 		{
+			if (!$this->_checkBerechtigung($item['anrechnung_id']))
+				continue;
+
 			if ($this->anrechnunglib->approveAnrechnung($item['anrechnung_id']))
 			{
 				$json[]= array(
@@ -185,6 +188,9 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Reject Anrechnung
 		foreach ($data as $item)
 		{
+			if (!$this->_checkBerechtigung($item['anrechnung_id']))
+				continue;
+
 			if ($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'], $item['begruendung']))
 			{
 				$json[]= array(
@@ -219,6 +225,9 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
+
+		if (!$this->_checkBerechtigung($anrechnung_id))
+			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 
 		$retval = array();
         
@@ -285,6 +294,9 @@ class approveAnrechnungDetail extends Auth_Controller
 			$this->terminateWithJsonError($this->p->t('ui', 'errorFelderFehlen'));
 		}
 
+		if (!$this->_checkBerechtigung($anrechnung_id))
+			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+
 		// Delete last status approved / rejected.
 		// If last status is 'approved', Genehmigung is resetted.
 		$result = $this->AnrechnungModel->withdrawApprovement($anrechnung_id);
@@ -312,6 +324,9 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			show_error('Wrong parameter.');
 		}
+
+		if (!$this->_checkBerechtigung($anrechnung_id))
+			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 
 		// Get boolean empfehlung of given Anrechnung
 		if (!$result = getData($this->AnrechnungModel->load($anrechnung_id))[0])
@@ -361,6 +376,9 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			$this->terminateWithJsonError($this->p->t('ui', 'systemFehler'));
 		}
+
+		if (!$this->_checkBerechtigung($anrechnung_id))
+			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 
 		// Save Empfehlungstext
 		$result = self::_saveEmpfehlungsNotiz($anrechnung_id, $empfehlungstext, $notiz_id);
@@ -600,5 +618,18 @@ class approveAnrechnungDetail extends Auth_Controller
 			trim($empfehlungstext),
 			$this->_uid
 		);
+	}
+
+	private function _checkBerechtigung($anrechnung_id)
+	{
+		$this->AnrechnungModel->addJoin('tbl_prestudent', 'prestudent_id');
+		$result = $this->AnrechnungModel->loadWhere(array('anrechnung_id' => $anrechnung_id));
+
+		if (isError($result) || !hasData($result))
+			show_error('Failed retrieving anrechnung');
+
+		$antragData = getData($result)[0];
+
+		return $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $antragData->studiengang_kz);
 	}
 }
