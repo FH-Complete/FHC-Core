@@ -266,7 +266,6 @@ const app = Vue.createApp({
 // kind of a bandaid for bad css on some pages to avoid horizontal scroll
 setScrollbarWidth();
 app.use(router);
-app.use(FhcApi);
 app.use(primevue.config.default, {
 	zIndex: {
 		overlay: 9000,

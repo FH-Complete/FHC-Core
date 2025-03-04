@@ -26,6 +26,7 @@ const Stundenplan = {
 		}
 	},
 	props: {
+		viewData: Object, // NOTE(chris): this is inherited from router-view
 		propsViewData: Object,
 		rowMinHeight: {
 			type: String,
@@ -155,10 +156,12 @@ const Stundenplan = {
 		},
 		handleChangeMode(mode) {
 			let m = mode[0].toUpperCase() + mode.slice(1)
-			if(m === this.calendarMode) return
+			if(m === this.calendarMode) return; // TODO(chris): check for date and lv_id too!
 			const date = this.currentDay.getFullYear() + "-" +
 				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
 				String(this.currentDay.getDate()).padStart(2, "0");
+			
+			if (m == 'Weeks' || m == 'Years' || m == 'Months') return;
 			
 			this.$router.push({
 				name: "Stundenplan",

@@ -227,7 +227,7 @@ export default {
 			if (event.orig.allDayEvent)
 			{
 				return;
-				return {
+				/*return {
 					'z-index': '2',
 					'grid-column': '1 / -1',
 					'background-color': 'rgb(204, 204, 204)',
@@ -235,7 +235,7 @@ export default {
 					color: 'black',
 					position: 'sticky',
 					top: '44px',
-				};
+				};*/
 			}
 			else
 			{
@@ -363,10 +363,15 @@ export default {
 					<div @wheel.stop class="all-day-event all-day-event-border" v-for="(day,dayindex) in eventsPerDayAndHour">
 						<template v-for="(events,_day) in allDayEvents" :key="_day">
 
-							<div v-if="dayindex == _day" v-for="event in events" :key="event" class="d-grid m-1" style="top:0;" @click.prevent="weekPageClick(event, _day)"
+							<div
+								v-if="dayindex == _day"
+								v-for="event in events"
+								:key="event"
+								style="top:0;"
+								@click.prevent="weekPageClick(event, _day)"
 								:selected="event == selectedEvent"
 								:style="{'background-color': event?.color, 'margin-bottom':'1px'}"
-								class="small rounded overflow-hidden fhc-entry"
+								class="d-grid m-1 small rounded overflow-hidden fhc-entry"
 								v-contrast
 								>		
 								<slot class="p-1" name="weekPage" :event="event" :day="day">
