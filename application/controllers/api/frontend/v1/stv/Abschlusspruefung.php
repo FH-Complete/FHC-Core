@@ -391,6 +391,11 @@ class Abschlusspruefung extends FHCAPI_Controller
 			throw new InvalidArgumentException("Keine UID(s) übergeben.");
 		}
 
+		if( !is_array($student_uids) )
+		{
+			$student_uids = array($student_uids);
+		}
+
 		foreach ($student_uids as $uid)
 		{
 			$result = $this->AbschlusspruefungModel->loadWhere(
