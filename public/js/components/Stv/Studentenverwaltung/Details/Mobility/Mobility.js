@@ -475,6 +475,24 @@ export default {
 							</option>
 						</form-input>
 					</template>
+					<template v-else-if="formData.lehreinheit_id && !formData.lehrveranstaltung_id">
+						<form-input v-if="formData.lehreinheit_id"
+							container-class="col-6 stv-details-mobility-typ"
+							:label="$p.t('lehre', 'lehreinheit')"
+							type="select"
+							v-model="formData.lehreinheit_id"
+							name="lehreinheit_id"
+							disabled
+						>
+							<option
+								v-for="le in lv_teile"
+								:key="le.lehreinheit_id"
+								:value="le.lehreinheit_id"
+								>
+								{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
+							</option>
+						</form-input>
+					</template>
 					<template v-else>
 						<form-input
 							container-class="col-6 stv-details-mobility-typ"
