@@ -75,6 +75,8 @@ export default {
 						}
 					},
 					{title: "bisio_id", field: "bisio_id"},
+					{title: "lehrveranstaltung_id", field: "lehrveranstaltung_id"},
+					{title: "lehreinheit_id", field: "lehreinheit_id"},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -108,6 +110,7 @@ export default {
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
+				minHeight: 200,
 				selectable: true,
 				index: 'bisio_id',
 				persistenceID: 'stv-details-table_mobiliy'
@@ -158,7 +161,9 @@ export default {
 				herkunftsland_code: 'A',
 				bisio_id: null,
 				localPurposes: [],
-				localSupports: []
+				localSupports: [],
+				lehrveranstaltung_id: '',
+				lehreinheit_id: ''
 			},
 			statusNew: true,
 			programsMobility: [],
@@ -221,10 +226,21 @@ export default {
 					this.$refs.supports.resetLocalData();
 				});
 		},
+		handleLVchanged: function() {
+			this.loadItems();
+			this.resetLehreinheit();
+		},
 		loadItems(){
-			if(this.formData.lehrveranstaltung) {
-				this.getLehreinheiten(this.formData.lehrveranstaltung, this.currentSemester);
+			if(this.formData.lehrveranstaltung_id) {
+				this.getLehreinheiten(this.formData.lehrveranstaltung_id, this.currentSemester);
 			}
+		},
+		changeItems(){
+			this.resetLehreinheit();
+			this.loadItems();
+		},
+		resetLehreinheit(){
+			this.formData.lehreinheit_id = '';
 		},
 		getLehreinheiten(lv_id, studiensemester_kurzbz) {
 			const data = {
@@ -247,6 +263,15 @@ export default {
 			return this.$fhcApi.factory.stv.mobility.loadMobility(bisio_id)
 				.then(result => {
 					this.formData = result.data;
+					if(this.formData.lehrveranstaltung_id === null) {
+						this.formData.lehrveranstaltung_id = '';
+					}
+					if(this.formData.lehreinheit_id === null) {
+						this.formData.lehreinheit_id = '';
+					}
+					if(this.formData.lehrveranstaltung_id > 0 ) {
+						this.loadItems();
+					}
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -286,7 +311,10 @@ export default {
 			this.formData.bisio_id = null;
 			this.formData.localPurposes = [];
 			this.formData.localSupports = [];
+			this.formData.lehrveranstaltung_id = '',
+			this.formData.lehreinheit_id = '',
 			this.statusNew = true;
+			this.listLes = [];
 		},
 		// ----------------------------------- methods purposes -----------------------------------
 		addMobilityPurpose({zweck_code, bisio_id}){
@@ -394,7 +422,7 @@ export default {
 		</core-filter-cmpt>
 		
 		<!--Modal: mobilityModal-->
-		<bs-modal ref="mobilityModal" dialog-class="modal-xl">
+		<bs-modal ref="mobilityModal" dialog-class="modal-xl modal-dialog-scrollable">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('mobility', 'mobility_anlegen')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('mobility', 'mobility_bearbeiten')}}</p>
@@ -403,10 +431,10 @@ export default {
 
 			<form-form v-if="!this.student.length" ref="formMobility" @submit.prevent>
 
-			<div class="row my-3">
-				<legend class="col-6">BIS</legend>
-				<legend class="col-6">Outgoing</legend>
-			</div>
+				<div class="row my-3">
+					<legend class="col-6">BIS</legend>
+					<legend class="col-6">Outgoing</legend>
+				</div>
 				
 				<div class="row mb-3">
 					<form-input
@@ -426,9 +454,11 @@ export default {
 						container-class="col-6 stv-details-mobility-typ"
 						:label="$p.t('lehre', 'lehrveranstaltung')"
 						type="select"
-						v-model="formData.lehrveranstaltung"
+						v-model="formData.lehrveranstaltung_id"
 						name="lehrveranstaltung_id"
+						@change="handleLVchanged"
 						>
+						<option value=""> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
 						<option
 							v-for="lv in listLvs"
 							:key="lv.lehrveranstaltung_id"
@@ -452,43 +482,25 @@ export default {
 						:teleport="true"
 						>
 					</form-input>
-					<template v-if="formData.lehreinheit_id && !formData.lehrveranstaltung">
-						<form-input v-if="formData.lehreinheit_id"
-							container-class="col-6 stv-details-mobility-typ"
-							:label="$p.t('lehre', 'lehreinheit')"
-							type="select"
-							v-model="formData.lehreinheit_id"
-							name="lehreinheit_id"
-							disabled
+
+					<form-input
+						type="select"
+						container-class="col-6 stv-details-mobility-typ"
+						:label="$p.t('lehre', 'lehreinheit')"
+						type="select"
+						v-model="formData.lehreinheit_id"
+						name="lehreinheit_id"
+						:disabled="listLes.length > 0 ? false : true"
 						>
-							<option
-								v-for="le in lv_teile"
-								:key="le.lehreinheit_id"
-								:value="le.lehreinheit_id"
-								>
-								{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
-							</option>
-						</form-input>
-					</template>
-					<template v-else>
-						<form-input
-							container-class="col-6 stv-details-mobility-typ"
-							:label="$p.t('lehre', 'lehreinheit')"
-							type="select"
-							v-model="formData.lehreinheit_id"
-							name="lehreinheit_id"
-							@focus="loadItems"
+						<option value=""> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+						<option
+							v-for="le in listLes"
+							:key="le.lehreinheit_id"
+							:value="le.lehreinheit_id"
 							>
-							<option v-if="!listLes.length" disabled> -- {{ $p.t('exam', 'bitteLvteilWaehlen') }} --</option>
-							<option
-								v-for="le in listLes"
-								:key="le.lehreinheit_id"
-								:value="le.lehreinheit_id"
-								>
-								{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
-							</option>
-						</form-input>
-					</template>
+							{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
+						</option>
+					</form-input>
 				</div>
 				
 				<div class="row mb-3">

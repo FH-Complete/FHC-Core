@@ -46,7 +46,10 @@ class Mobility extends FHCAPI_Controller
 	{
 		$this->BisioModel->addSelect("*");
 		$this->BisioModel->addJoin('bis.tbl_mobilitaetsprogramm mp', 'ON (mp.mobilitaetsprogramm_code = bis.tbl_bisio.mobilitaetsprogramm_code)', 'LEFT');
-
+		$this->BisioModel->addJoin('lehre.tbl_lehreinheit le', 'ON (le.lehreinheit_id = bis.tbl_bisio.lehreinheit_id)','LEFT');
+		$this->BisioModel->addOrder('von', 'DESC');
+		$this->BisioModel->addOrder('bis', 'DESC');
+		$this->BisioModel->addOrder('bisio_id', 'DESC');
 		$result = $this->BisioModel->loadWhere(
 			array('student_uid' => $student_uid)
 		);
@@ -161,13 +164,17 @@ class Mobility extends FHCAPI_Controller
 			}
 		}
 
-		$this->terminateWithSuccess();
+		$this->terminateWithSuccess($bisio_id);
 	}
 
 	public function loadMobility($bisio_id)
 	{
-		$result = $this->BisioModel->load($bisio_id);
-
+		$this->BisioModel->addSelect("*");
+		$this->BisioModel->addJoin('bis.tbl_mobilitaetsprogramm mp', 'ON (mp.mobilitaetsprogramm_code = bis.tbl_bisio.mobilitaetsprogramm_code)', 'LEFT');
+		$this->BisioModel->addJoin('lehre.tbl_lehreinheit le', 'ON (le.lehreinheit_id = bis.tbl_bisio.lehreinheit_id)','LEFT');
+		$result = $this->BisioModel->loadWhere(
+			array('bisio_id' => $bisio_id)
+		);
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess(current($data));
@@ -175,6 +182,7 @@ class Mobility extends FHCAPI_Controller
 
 	public function updateMobility()
 	{
+
 		$this->load->library('form_validation');
 		$authUID = getAuthUID();
 
