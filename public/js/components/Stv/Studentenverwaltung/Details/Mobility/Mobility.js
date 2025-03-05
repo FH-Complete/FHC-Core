@@ -110,6 +110,7 @@ export default {
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
+				minHeight: 200,
 				selectable: true,
 				index: 'bisio_id',
 				persistenceID: 'stv-details-table_mobiliy'
@@ -161,6 +162,8 @@ export default {
 				bisio_id: null,
 				localPurposes: [],
 				localSupports: [],
+				lehrveranstaltung_id: '',
+				lehreinheit_id: ''
 			},
 			statusNew: true,
 			programsMobility: [],
@@ -223,6 +226,10 @@ export default {
 					this.$refs.supports.resetLocalData();
 				});
 		},
+		handleLVchanged: function() {
+			this.loadItems();
+			this.resetLehreinheit();
+		},
 		loadItems(){
 			if(this.formData.lehrveranstaltung_id) {
 				this.getLehreinheiten(this.formData.lehrveranstaltung_id, this.currentSemester);
@@ -233,7 +240,7 @@ export default {
 			this.loadItems();
 		},
 		resetLehreinheit(){
-			this.formData.lehreinheit_id = null;
+			this.formData.lehreinheit_id = '';
 		},
 		getLehreinheiten(lv_id, studiensemester_kurzbz) {
 			const data = {
@@ -256,6 +263,15 @@ export default {
 			return this.$fhcApi.factory.stv.mobility.loadMobility(bisio_id)
 				.then(result => {
 					this.formData = result.data;
+					if(this.formData.lehrveranstaltung_id === null) {
+						this.formData.lehrveranstaltung_id = '';
+					}
+					if(this.formData.lehreinheit_id === null) {
+						this.formData.lehreinheit_id = '';
+					}
+					if(this.formData.lehrveranstaltung_id > 0 ) {
+						this.loadItems();
+					}
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -295,7 +311,10 @@ export default {
 			this.formData.bisio_id = null;
 			this.formData.localPurposes = [];
 			this.formData.localSupports = [];
+			this.formData.lehrveranstaltung_id = '',
+			this.formData.lehreinheit_id = '',
 			this.statusNew = true;
+			this.listLes = [];
 		},
 		// ----------------------------------- methods purposes -----------------------------------
 		addMobilityPurpose({zweck_code, bisio_id}){
@@ -437,8 +456,9 @@ export default {
 						type="select"
 						v-model="formData.lehrveranstaltung_id"
 						name="lehrveranstaltung_id"
-						@change="resetLehreinheit"
+						@change="handleLVchanged"
 						>
+						<option value=""> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
 						<option
 							v-for="lv in listLvs"
 							:key="lv.lehrveranstaltung_id"
@@ -463,45 +483,24 @@ export default {
 						>
 					</form-input>
 
-					<template v-if="formData.lehreinheit_id && formData.lehrveranstaltung_id">
-						<form-input
-							type="select"
-							container-class="col-6 stv-details-mobility-typ"
-							:label="$p.t('lehre', 'lehreinheit')"
-							type="select"
-							v-model="formData.lehreinheit_id"
-							name="lehreinheit_id"
-							@click="changeItems"
+					<form-input
+						type="select"
+						container-class="col-6 stv-details-mobility-typ"
+						:label="$p.t('lehre', 'lehreinheit')"
+						type="select"
+						v-model="formData.lehreinheit_id"
+						name="lehreinheit_id"
+						:disabled="listLes.length > 0 ? false : true"
 						>
-							<option
-								v-for="le in lv_teile"
-								:key="le.lehreinheit_id"
-								:value="le.lehreinheit_id"
-								>
-								{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
-							</option>
-						</form-input>
-					</template>
-					<template v-else>
-						<form-input
-							type="select"
-							container-class="col-6 stv-details-mobility-typ"
-							:label="$p.t('lehre', 'lehreinheit')"
-							type="select"
-							v-model="formData.lehreinheit_id"
-							name="lehreinheit_id"
-							@focus="loadItems"
+						<option value=""> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+						<option
+							v-for="le in listLes"
+							:key="le.lehreinheit_id"
+							:value="le.lehreinheit_id"
 							>
-							<option v-if="!listLes.length" disabled> -- {{ $p.t('exam', 'bitteLvteilWaehlen') }} --</option>
-							<option
-								v-for="le in listLes"
-								:key="le.lehreinheit_id"
-								:value="le.lehreinheit_id"
-								>
-								{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
-							</option>
-						</form-input>
-					</template>
+							{{ le.kurzbz }}-{{ le.lehrform_kurzbz }} {{ le.bezeichnung }} {{ le.gruppe }} ({{ le.kuerzel }})
+						</option>
+					</form-input>
 				</div>
 				
 				<div class="row mb-3">
