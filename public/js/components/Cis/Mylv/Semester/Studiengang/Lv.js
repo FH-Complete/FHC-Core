@@ -62,10 +62,10 @@ export default {
 			return !this.menu || !Array.isArray(this.menu) || Array.isArray(this.menu) && this.menu.length == 0;
 		},
 		bodyStyle() {return {};
-			const bodyStyle = {};
+			/*const bodyStyle = {};
 			if (this.farbe)
 				bodyStyle['background-color'] = '#' + this.farbe;
-			return bodyStyle;
+			return bodyStyle;*/
 		},
 		grade() {
 			const languageIndex = this.$p.user_language.value === 'English' ? 1 : 0

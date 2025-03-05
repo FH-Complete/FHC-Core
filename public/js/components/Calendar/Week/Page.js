@@ -224,22 +224,7 @@ export default {
 			return styleObj
 		},
 		eventGridStyle(day, event) {
-			if (event.orig.allDayEvent)
-			{
-				return;
-				return {
-					'z-index': '2',
-					'grid-column': '1 / -1',
-					'background-color': 'rgb(204, 204, 204)',
-					'max-height': '75px',
-					color: 'black',
-					position: 'sticky',
-					top: '44px',
-				};
-			}
-			else
-			{
-				return {
+			return {
 					'z-index': 1,
 					'grid-column-start': 1 + (event.lane - 1) * day.lanes / event.maxLane,
 					'grid-column-end': 1 + event.lane * day.lanes / event.maxLane,
@@ -247,8 +232,7 @@ export default {
 					'grid-row-end': this.dateToMinutesOfDay(event.end),
 					'background-color': event.orig.color,
 					'max-height': '75px'
-				};
-			}
+			};
 		},
 		calcHourPosition(event) {
 			let height = this.$refs['eventsRef' + this.week].getBoundingClientRect().height;
@@ -363,10 +347,15 @@ export default {
 					<div @wheel.stop class="all-day-event all-day-event-border" v-for="(day,dayindex) in eventsPerDayAndHour">
 						<template v-for="(events,_day) in allDayEvents" :key="_day">
 
-							<div v-if="dayindex == _day" v-for="event in events" :key="event" class="d-grid m-1" style="top:0;" @click.prevent="weekPageClick(event, _day)"
+							<div
+								v-if="dayindex == _day"
+								v-for="event in events"
+								:key="event"
+								style="top:0;"
+								@click.prevent="weekPageClick(event, _day)"
 								:selected="event == selectedEvent"
 								:style="{'background-color': event?.color, 'margin-bottom':'1px'}"
-								class="small rounded overflow-hidden fhc-entry"
+								class="d-grid m-1 small rounded overflow-hidden fhc-entry"
 								v-contrast
 								>		
 								<slot class="p-1" name="weekPage" :event="event" :day="day">

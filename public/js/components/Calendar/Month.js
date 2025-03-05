@@ -13,6 +13,9 @@ export default {
 		BsModal,
 		Months
 	},
+	emits: [
+		"change:offset"
+	],
 	data() {
 		return {
 			syncOnNextChange: false

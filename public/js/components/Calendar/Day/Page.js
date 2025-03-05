@@ -403,25 +403,29 @@ export default {
 							<div class="all-day-event-container" >
 								<div @wheel.stop class="all-day-event all-day-event-border" v-for="(day,dayindex) in eventsPerDayAndHour">
 									<template v-for="(events,_day) in allDayEvents" :key="_day">
-
-									<div v-if="dayindex == _day" v-for="event in events" :key="event" class="d-grid m-1" style="top:0;" @click.prevent="eventClick(event)"
-												:selected="event == selectedEvent"
-												:style="{'background-color': event?.color, 'margin-bottom':'1px'}"
-												class="small rounded overflow-hidden fhc-entry"
-												v-contrast
-												>
-												<div class="d-none d-xl-block">
-														<slot name="dayPage" :event="event" :day="day" :mobile="false">
-															<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
-														</slot>
-													</div>
-													<div class="d-block d-xl-none">
-														<slot name="dayPage" :event="event" :day="day" :mobile="true">
-															<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
-														</slot>
-													</div>
-											</div>
-										</template>
+										<div
+											v-if="dayindex == _day"
+											v-for="event in events"
+											:key="event"
+											style="top:0;"
+											@click.prevent="eventClick(event)"
+											:selected="event == selectedEvent"
+											:style="{'background-color': event?.color, 'margin-bottom':'1px'}"
+											class="d-grid m-1 small rounded overflow-hidden fhc-entry"
+											v-contrast
+											>
+											<div class="d-none d-xl-block">
+													<slot name="dayPage" :event="event" :day="day" :mobile="false">
+														<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+													</slot>
+												</div>
+												<div class="d-block d-xl-none">
+													<slot name="dayPage" :event="event" :day="day" :mobile="true">
+														<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
+													</slot>
+												</div>
+										</div>
+									</template>
 								</div>
 							</div>
 

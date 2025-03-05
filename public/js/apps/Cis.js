@@ -117,7 +117,6 @@ const app = Vue.createApp({
         }
     }
 });
-app.use(FhcApi);
 app.use(primevue.config.default, {
 	zIndex: {
 		overlay: 9000,

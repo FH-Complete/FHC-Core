@@ -96,6 +96,7 @@ export default {
 		'select:day',
 		'select:event',
 		'change:range',
+		'change:mode',
 		'update:minimized',
 		'selectedEvent',
 		'change:offset'

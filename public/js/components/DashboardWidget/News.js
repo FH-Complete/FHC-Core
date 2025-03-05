@@ -169,14 +169,14 @@ export default {
 	template: /*html*/ `
 <div ref="container" class="widgets-news h-100" :class="sizeClass" :style="getNewsWidgetStyle">
     <div class="d-flex flex-column h-100">
-        <div class="h-100" style="overflow-y: auto" v-if="width == 1">
+        <div class="h-100" style="overflow-y: auto" v-show="width == 1">
             <div  v-for="(news, index) in newsList" :key="news.news_id" class="mt-2">
                 <div v-if="index > 0 " class="fhc-seperator"></div>
                 <a :href="contentURI(news.content_id)" >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</a><br>
                 <span class="small text-muted">{{ formatDateTime(news.insertamum) }}</span>
 			</div>
 		</div>
-        <div v-else class="row h-100 g-0">
+        <div v-show="width >1" class="row h-100 g-0">
         	<div :class="'col-'+(width == 2? 6 : 4) + ' h-100 g-0'" style="overflow: auto;">
         		<template v-for="news in newsList" :key="'menu-'+news.news_id">
 					<div class="position-relative">

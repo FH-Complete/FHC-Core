@@ -29,7 +29,7 @@ export default {
 		setWeek(week) {
 			// TODO(chris): test is there a week jump on year select? => yes there is if the same month/day are in different weeks ... should we prevent that?
 			this.focusDate.w = week;
-			this.$emit('change', week);
+			this.$emit('updateMode', 'week');
 		},
 		prev(){
 			this.focusDate.y--;

@@ -14,6 +14,9 @@ export default {
 		BsModal,
 		Weeks
 	},
+	emits: [
+		"change:offset"
+	],
 	computed: {
 		title() {
 			return this.focusDate.wYear + ' KW ' + this.focusDate.w;
@@ -28,7 +31,8 @@ export default {
 			this.$refs.modalDatepickerContainer.hide()
 		},
 		handleHeaderClickWeek() {
-			this.$refs.modalDatepickerContainer.show()
+			this.$emit('updateMode', 'weeks');//
+			//this.$refs.modalDatepickerContainer.show()
 		},
 		paneChanged(dir) {
 			this.focusDate.d += dir * 7;
