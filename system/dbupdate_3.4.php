@@ -70,6 +70,7 @@ require_once('dbupdate_3.4/48526_pep_tagging.php');
 require_once('dbupdate_3.4/41950_perm_gehaelter.php');
 require_once('dbupdate_3.4/53903_valorisierung.php');
 require_once('dbupdate_3.4/55968_index_anrechnung.php');
+require_once('dbupdate_3.4/25999_locale_update.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
