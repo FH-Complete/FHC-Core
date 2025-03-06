@@ -19,37 +19,41 @@ class Lehrveranstaltung_model extends DB_Model
 	 * Get Lehrveranstaltungen by eventQuery string. Use with autocomplete event queries.
 	 * @param $eventQuery String
 	 * @param string $studiensemester_kurzbz Filter by Studiensemester
-	 * @param array $oes Filter by Organisationseinheiten
+	 * @param array $oes Filter by Organisationseinheiten. Checks against STG OE
 	 * @param null $lehrtyp_kurzbz Filter by Lehrtyp 'lv' or 'modul'
 	 * @return array
 	 */
-	public function getAutocompleteSuggestions($eventQuery, $studiensemester_kurzbz = null, $oes = null, $lehrtyp_kurzbz = null)
+	public function getNonQuellkursLvsAutocompleteSuggestions($eventQuery, $studienjahr_kurzbz = null, $oes = null)
 	{
 		// Subquery
 		$subQry = $this->_getQryLvsByStudienplan();
 		$params = [];
 
-		if (isset($studiensemester_kurzbz) && is_string($studiensemester_kurzbz))
+		// filter lvs only (no templates)
+		$subQry .= ' 
+			AND lehrtyp_kurzbz = \'lv\' 
+			AND lehrveranstaltung_template_id IS NULL';
+
+		if (isset($studienjahr_kurzbz) && is_string($studienjahr_kurzbz))
 		{
-			/* filter by studiensemester */
-			$subQry.= ' AND stplsem.studiensemester_kurzbz = ?';
-			$params[] = $studiensemester_kurzbz;
+			/* filter by studienjahr*/
+			$params[] = $studienjahr_kurzbz;
+			$subQry.= ' 
+				AND stplsem.studiensemester_kurzbz IN 
+				(
+					SELECT studiensemester_kurzbz
+					FROM public.tbl_studiensemester
+					WHERE studienjahr_kurzbz = ? 
+				)
+			';
 		}
 
 		if (isset($oes) && is_array($oes))
 		{
-			/* filter by organisationseinheit */
-			$subQry.= ' AND lv.oe_kurzbz IN ?';
+			/* filter by STG organisationseinheit */
+			$subQry.= ' AND stg.oe_kurzbz IN ?';
 			$params[]= $oes;
 		}
-
-		if (isset($lehrtyp_kurzbz) && is_string($lehrtyp_kurzbz))
-		{
-			/* filter by lehrtyp_kurzbz */
-			$subQry .= ' AND lehrtyp_kurzbz = ?';
-			$params[] = $lehrtyp_kurzbz;
-		}
-
 
 		if (is_string($eventQuery))
 		{
@@ -59,42 +63,44 @@ class Lehrveranstaltung_model extends DB_Model
 		}
 
 		// Final Query
-		$qry = 'SELECT DISTINCT ON (lehrveranstaltung_id) * FROM ('. $subQry. ') AS tmp';
+		$qry = 'SELECT * FROM ('. $subQry. ') AS tmp
+				ORDER BY lv_bezeichnung';
 
 		return $this->execQuery($qry, $params);
 	}
 
 	/**
 	 * Get Lehrveranstaltungen with its Stg, OE and OE-type.
-	 * Can be filtered by Studienesemester, lv oes or lv's stg oes, and also by specific lvs.
-	 * @param null|string $studiensemester_kurzbz Filter by Studiensemester
-	 * @param null $lv_oes Filter oes by lv oe (default behaviour)
+	 * @param null|string $studienjahr_kurzbz Filter by Studienjahr
 	 * @param null $stg_oes Filter oes by lv's stg oe
 	 * @param null|array $lv_ids Filter by Lehrveranstaltungen
 	 * @return array
 	 */
-	public function getLvs($studiensemester_kurzbz = null, $lv_oes = null, $stg_oes = null, $lv_ids = null)
+	public function getNonQuellkursLvs($studienjahr_kurzbz = null, $stg_oes = null, $lv_ids = null)
 	{
 		// Subquery LVs
 		$subQry = $this->_getQryLvsByStudienplan();
 
-		/* filter by lehrtyp_kurzbz 'lv' */
-		$subQry .= ' AND lehrtyp_kurzbz = \'lv\'';
+		/* filter by lehrtyp_kurzbz 'lv' and that are not assigned to a Quellkurs */
+		$subQry .= ' 
+			AND lehrtyp_kurzbz = \'lv\' 
+			AND lehrveranstaltung_template_id IS NULL
+		';
 
 		$params = [];
 
-		if (isset($studiensemester_kurzbz) && is_string($studiensemester_kurzbz))
+		if (is_string($studienjahr_kurzbz))
 		{
-			/* filter by studiensemester */
-			$subQry.= ' AND stplsem.studiensemester_kurzbz = ?';
-			$params[] = $studiensemester_kurzbz;
-		}
-
-		if (isset($lv_oes) && is_array($lv_oes))
-		{
-			/* filter by lv organisationseinheit */
-			$subQry.= ' AND lv.oe_kurzbz IN ?';
-			$params[]= $lv_oes;
+			/* filter by studienjahr */
+			$params[] = $studienjahr_kurzbz;
+			$subQry .= ' 
+				AND stplsem.studiensemester_kurzbz IN 
+				(
+					SELECT studiensemester_kurzbz
+					FROM public.tbl_studiensemester
+					WHERE studienjahr_kurzbz = ?
+			  	)
+			';
 		}
 
 		if (isset($stg_oes) && is_array($stg_oes))
@@ -114,7 +120,7 @@ class Lehrveranstaltung_model extends DB_Model
 			$qry.= ' WHERE lehrveranstaltung_id IN ('. $implodedLvIds. ')';
 		}
 
-		$qry.= ' ORDER BY stg_typ_kurzbz, orgform_kurzbz DESC';
+		$qry.= ' ORDER BY lv_bezeichnung';
 
 		return $this->execQuery($qry, $params);
 	}
@@ -138,10 +144,12 @@ class Lehrveranstaltung_model extends DB_Model
 				studienordnung_id,
 				sto.studiengang_kz,
 				stpl.studienplan_id,
+				stpl.bezeichnung AS studienplan_bezeichnung,
 				stplsem.semester,
 				stpl.orgform_kurzbz,
 				upper(stg.typ || stg.kurzbz) AS stg_typ_kurzbz,    
 				stg.bezeichnung AS stg_bezeichnung,
+				stg.oe_kurzbz AS stg_oe_kurzbz,
 				stgtyp.bezeichnung AS stg_typ_bezeichnung,
 			    lv.lehrveranstaltung_id,
 				lv.semester,   		
@@ -197,7 +205,13 @@ class Lehrveranstaltung_model extends DB_Model
 	 * @param null $lehrveranstaltung_id Queries certain LV only
 	 * @return array|stdClass|null
 	 */
-	public function getTemplateLvTree($studiensemester_kurzbz = null, $oes = null, $lehrveranstaltung_id = null){
+	public function getTemplateLvTree($studiensemester_kurzbz = null, $oes = null, $studienjahr_kurzbz = null){
+
+		if (is_string($studiensemester_kurzbz) && is_string($studienjahr_kurzbz))
+		{
+			return error('Query not possible for both studiensemester and studienjahr');
+		}
+
 		$params = [];
 		$qry = '
 		WITH 	
@@ -224,19 +238,23 @@ class Lehrveranstaltung_model extends DB_Model
 				  	-- filter lvs assigned to template (= standardisierte lv)
 					AND lehrveranstaltung_template_id IS NOT NULL';
 
-					if (is_numeric($lehrveranstaltung_id))
-					{
-						/* filter by studiensemester */
-						$params[]= $lehrveranstaltung_id;
-						$qry.= ' AND lv.lehrveranstaltung_template_id = ? ';
-					}
-
 					if (is_string($studiensemester_kurzbz))
 					{
 						/* filter by studiensemester */
 						$params[]= $studiensemester_kurzbz;
 						$qry.= ' AND stplsem.studiensemester_kurzbz = ? ';
 
+					}
+
+					if (is_string($studienjahr_kurzbz)) {
+						/* filter by studiensemester */
+						$params[] = $studienjahr_kurzbz;
+						$qry .= ' 
+							AND stplsem.studiensemester_kurzbz IN (
+								SELECT studiensemester_kurzbz
+								FROM public.tbl_studiensemester
+								WHERE studienjahr_kurzbz = ?
+							  )';
 					}
 
 					if (is_array($oes))
@@ -273,13 +291,6 @@ class Lehrveranstaltung_model extends DB_Model
 						FROM standardisierteLvs std
 						WHERE std.lehrveranstaltung_template_id = lv.lehrveranstaltung_id
 					)';
-
-		if (is_numeric($lehrveranstaltung_id))
-		{
-			/* filter by studiensemester */
-			$params[]= $lehrveranstaltung_id;
-			$qry.= ' AND lv.lehrveranstaltung_id = ? ';
-		}
 
 		if (is_array($oes))
 		{
@@ -357,9 +368,7 @@ class Lehrveranstaltung_model extends DB_Model
 				JOIN public.tbl_studiengangstyp 		stgtyp ON stgtyp.typ = stg.typ
 				JOIN public.tbl_organisationseinheit 	oe ON oe.oe_kurzbz = lv.oe_kurzbz
 		ORDER BY
-		 	-- Sort by organisationseinheit, semester, and lv.bezeichnung
-			oe.bezeichnung,
-			lv.semester,
+		 	-- Sort by lv.bezeichnung
 			lv.bezeichnung,
 			-- Within each group, ensure templates appear first
 			CASE 
