@@ -3,6 +3,11 @@ function parseFilterExpression(expression){
 	const excludeTerms = [];
 	const comparisons = [];
 
+	if( typeof expression !== 'string' ) {
+		comparisons.push({ operator: '=', number: expression });
+		return { includeGroups, excludeTerms, comparisons };
+	}
+
 	const andParts = expression.split('&&').map(part => part.trim());
 
 	andParts.forEach(part => {
@@ -54,7 +59,7 @@ export function defaultHeaderFilter(headerValue, rowValue)
 	const comparisonCheck = comparisons.every(({ operator, number }) => {
 		let value = rowValue;
 
-		if (!isNaN(number))
+		if (!isNaN(number) && typeof number !== 'boolean')
 		{
 			value = parseFloat(rowValue);
 			if (isNaN(value)) return false;
