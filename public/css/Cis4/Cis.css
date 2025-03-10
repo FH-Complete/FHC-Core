@@ -572,3 +572,7 @@ html {
 .height-leave-to {
 	height: 0px;
 }
+
+.zusatzinfo h2 {
+	font-size: 1.5em;
+}

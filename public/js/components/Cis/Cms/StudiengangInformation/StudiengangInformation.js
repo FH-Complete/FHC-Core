@@ -30,23 +30,23 @@ template:/*html*/`
 		<template v-if="studiengang?.bezeichnung && semester">
 			<div class="card card-body mb-3">
 				<div class="mb-1">
-					<h2 class="mb-1 pb-0">{{$p.t('lehre','studiengang')}}:</h2>
+					<h2 class="h4 mb-1 pb-0">{{$p.t('lehre','studiengang')}}:</h2>
 					<span class="mb-1">{{studiengang?.bezeichnung}}</span>
 				</div>
 				<div class="mb-1">
-					<h2 class="mb-1 pb-0">Moodle:</h2>
+					<h2 class="h4 mb-1 pb-0">Moodle:</h2>
 					<a class="mb-1" target="_blank" :href="moodleLink">{{studiengang?.kurzbzlang}}</a>
 				</div>
 				<div :class="{'mb-1':studiengang?.zusatzinfo_html}">
-					<h2 class="mb-1 pb-0">{{$p.t('lehre','studiensemester')}}: </h2>
+					<h2 class="h4 mb-1 pb-0">{{$p.t('lehre','studiensemester')}}: </h2>
 					<span class="mb-1">{{semester}}</span>
 				</div>
-				<div v-if="studiengang?.zusatzinfo_html" v-html="studiengang?.zusatzinfo_html"></div>
+				<div class="zusatzinfo" v-if="studiengang?.zusatzinfo_html" v-html="studiengang?.zusatzinfo_html"></div>
 			</div>
 		</template>
 		<template v-for="{title, collection} in collection_array">
 			<template v-if="Array.isArray(collection)  && collection.length !==0">
-				<h2 class="text-truncate">{{title}}</h2>
+				<h2 class="h5 text-truncate">{{title}}</h2>
 				<template v-if="displayWidget">
 					<div class="d-flex flex-wrap flex-row mb-3 gap-2">
 						<template v-for="person in collection">
