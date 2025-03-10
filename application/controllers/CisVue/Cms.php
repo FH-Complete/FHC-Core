@@ -82,8 +82,9 @@ class Cms extends Auth_Controller
 	 * @return void
 	 */
 	public function news($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
-	{
-		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'News']);
+	{	
+		$viewData = array();
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData'=>$viewData, 'route' => 'News']);
 	}
 	
 	public function getRoomInformation($ort_kurzbz){

@@ -45,8 +45,9 @@ class Studgang extends FHCAPI_Controller
 
 	public function getStudiengangInfo(){
 		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());
+		$isMitarbeiter = $this->getDataOrTerminateWithError($isMitarbeiter);
 		if($isMitarbeiter) {
-			$this->terminateWithSuccess();
+			$this->terminateWithSuccess(null);
 		}
 		
 		// fetches the Studiengang Information which is used next to the news

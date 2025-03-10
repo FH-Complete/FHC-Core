@@ -82,7 +82,7 @@ export default {
 				],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
-				height: '250',
+				height: 200,
 				persistenceID: 'core-mobility-support'
 			},
 			tabulatorEvents: [
@@ -112,6 +112,7 @@ export default {
 	},
 	watch: {
 		bisio_id() {
+			this.resetFormData();
 			if (this.$refs.table) {
 				this.$refs.table.reloadTable();
 			}
@@ -141,6 +142,9 @@ export default {
 			}
 		},
 		handleSubmitAction() {
+			if( this.formData.aufenthaltfoerderung_code === "" ) {
+				return; //TODO form validation
+			}
 			if (this.bisio_id) {
 				this.$emit('setMobilitySupport', {
 					aufenthaltfoerderung_code: this.formData.aufenthaltfoerderung_code,
@@ -170,6 +174,12 @@ export default {
 				}
 
 			}
+			this.resetFormData();
+		},
+		resetFormData: function() {
+			this.formData = {
+				aufenthaltfoerderung_code: ""
+			};
 		},
 		reload() {
 			this.$refs.table.reloadTable();
