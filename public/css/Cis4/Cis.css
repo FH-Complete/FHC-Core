@@ -576,3 +576,7 @@ html {
 .zusatzinfo h2 {
 	font-size: 1.5em;
 }
+
+.dashboard-item {
+	overscroll-behavior: none;
+}
