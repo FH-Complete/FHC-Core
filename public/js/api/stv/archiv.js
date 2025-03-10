@@ -17,6 +17,12 @@ export default {
 	},
 	archive(data) {
 		return this.$fhcApi.post(
+			'api/frontend/v1/documents/archive',
+			data
+		);
+	},
+	archiveSigned(data) {
+		return this.$fhcApi.post(
 			'api/frontend/v1/documents/archiveSigned',
 			data
 		);

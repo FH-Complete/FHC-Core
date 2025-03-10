@@ -23,7 +23,7 @@ export default {
 	data() {
 		return {
 			loading: false,
-			vorlage_kurzbz: '',
+			selectedVorlage: {},
 			vorlagenArchiv: [],
 			vorlageXmlXslMappings: {
 				'zeugnis.rdf.php': [
@@ -190,32 +190,34 @@ export default {
 			this.$refs.table.tabulator.updateOrAddData(data);
 		},
 		actionArchive() {
-			console.log(this.modelValue);
 			let archiveDataArr = Array.isArray(this.modelValue) ? this.modelValue : [this.modelValue];
 
 			for (let archiveData of archiveDataArr)
 			{
 				this.loading = true;
-				this.$fhcApi
-					.factory.stv.archiv.archive({
-						xml: this.getXmlByXsl(this.vorlage_kurzbz),
-						xsl: this.vorlage_kurzbz,
-						ss: this.defaultSemester,
-						uid: archiveData.uid,
-						prestudent_id: archiveData.prestudent_id
-					})
-					.then(result => result.data)
-					.then(() => {
-						this.reload();
-						this.loading = false;
-					})
-					.then(() => this.$p.t('ui/gespeichert'))
-					.then(this.$fhcAlert.alertSuccess)
-					.catch(error => {
-						this.$fhcAlert.handleSystemError(error);
-						this.loading = false;
-					});
-				
+				let archiveFunction =
+					this.selectedVorlage.signierbar
+					? this.$fhcApi.factory.stv.archiv.archiveSigned
+					: this.$fhcApi.factory.stv.archiv.archive;
+
+				archiveFunction({
+					xml: this.getXmlByXsl(this.selectedVorlage.vorlage_kurzbz),
+					xsl: this.selectedVorlage.vorlage_kurzbz,
+					ss: this.defaultSemester,
+					uid: archiveData.uid,
+					prestudent_id: archiveData.prestudent_id
+				})
+				.then(result => result.data)
+				.then(() => {
+					this.reload();
+					this.loading = false;
+				})
+				.then(() => this.$p.t('ui/gespeichert'))
+				.then(this.$fhcAlert.alertSuccess)
+				.catch(error => {
+					this.$fhcAlert.handleSystemError(error);
+					this.loading = false;
+				});
 			}
 		},
 		actionDownload(akte_id) {
@@ -237,7 +239,7 @@ export default {
 	created() {
 		this.$fhcApi
 			.factory.stv.archiv.getArchivVorlagen()
-			.then(result => {this.vorlagenArchiv = result.data; this.vorlage_kurzbz = result.data.length > 0 ? result.data[0].vorlage_kurzbz : '';})
+			.then(result => {this.vorlagenArchiv = result.data; this.selectedVorlage = result.data.filter(o => o.vorlage_kurzbz == 'Zeugnis')[0];})
 			.catch(this.$fhcAlert.handleSystemError);
 
 	},
@@ -253,8 +255,8 @@ export default {
 			>
 			<template #actions>
 				<div class="input-group w-auto">
-					<select class="form-select" v-model="vorlage_kurzbz">
-						<option v-for="vorlage in vorlagenArchiv" :key="vorlage.vorlage_kurzbz" :value="vorlage.vorlage_kurzbz">
+					<select class="form-select" v-model="selectedVorlage">
+						<option v-for="vorlage in vorlagenArchiv" :key="vorlage.vorlage_kurzbz" :value="vorlage">
 							{{ vorlage.bezeichnung }}
 						</option>
 					</select>
