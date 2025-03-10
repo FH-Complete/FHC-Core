@@ -524,29 +524,29 @@ html {
 }
 
 @media screen and ( max-width: 576px ) {
-	.searchbar_icon img {
+	#nav-search .searchbar_results .searchbar_icon img {
 		max-width: 65px !important;
 	}
 
-	.searchbar_icon i {
+	#nav-search .searchbar_results .searchbar_icon i {
 		font-size: 3em !important;
 	}
 
-	.searchbar_grid {
+	#nav-search .searchbar_results .searchbar_grid {
 		grid-template-columns: [icon] 75px [data] auto;
 	}
 
-	.searchbar_table,
-	.searchbar_tablerow,
-	.searchbar_tablecell {
+	#nav-search .searchbar_results .searchbar_table,
+	#nav-search .searchbar_results .searchbar_tablerow,
+	#nav-search .searchbar_results .searchbar_tablecell {
 		display: block;
 	}
 
-	.searchbar_tablecell.searchbar_label {
+	#nav-search .searchbar_results .searchbar_tablecell.searchbar_label {
 		font-weight: bold;
 	}
 
-	.searchbar_tablecell.searchbar_value {
+	#nav-search .searchbar_results .searchbar_tablecell.searchbar_value {
 		padding-left: 2.5rem;
 		overflow-wrap: anywhere;
 	}
