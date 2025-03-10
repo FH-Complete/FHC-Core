@@ -19,7 +19,8 @@ class Messages extends FHCAPI_Controller
 			'getVorlagentext' => ['admin:r', 'assistenz:r'],
 			'getPreviewText' => ['admin:r', 'assistenz:r'],
 			'getReplyData' => ['admin:r', 'assistenz:r'],
-			'getPersonIdFromUid' => ['admin:r', 'assistenz:r'],
+			'getPersonId' => ['admin:r', 'assistenz:r'],
+			'getUid' => ['admin:r', 'assistenz:r'],
 		]);
 
 		//Load Models
@@ -42,17 +43,8 @@ class Messages extends FHCAPI_Controller
 
 	public function getMessages($id, $type_id)
 	{
-		switch($type_id)
-		{
-			case 'uid':
-				$id = $this->_getPersonIdFromUid($id);
-				break;
-			case 'person_id':
-				$id = $id;
-				break;
-			default:
-				$this->terminateWithError("MESSAGES::getMessages logic for type_id " . $type_id . " not defined yet", self::ERROR_TYPE_GENERAL);
-				break;
+		if($type_id != 'person_id'){
+			$id = $this->_getPersonId($id, $type_id);
 		}
 
 		$result = $this->MessageModel->getMessagesForTable($id);
@@ -74,15 +66,13 @@ class Messages extends FHCAPI_Controller
 
 		$this->load->model('system/Vorlage_model', 'VorlageModel');
 
-		//39 Stück Variante OE
 		$result = $this->VorlageModel->getAllVorlagenByOe($oe_kurzbz->oe_kurzbz);
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
 
-		//IF ADMIN 167
+		//If admin
 		$this->VorlageModel->addOrder('vorlage_kurzbz', 'ASC');
-		//only HTML-vorlagen -> for admin
 		$result = $this->VorlageModel->loadWhere(
 			array(
 				'mimetype' => 'text/html'
@@ -97,7 +87,7 @@ class Messages extends FHCAPI_Controller
 	public function getVorlagentext($vorlage_kurzbz)
 	{
 		//$this->terminateWithError("vor " . $vorlage_kurzbz, self::ERROR_TYPE_GENERAL);
-		//$studiengang_kz = 227; //TODO(Manu) check dynamisieren NULL
+		//$studiengang_kz = 227; //TODO(Manu) dynamisieren NULL
 		$studiengang_kz = 0;
 		$this->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
 		$this->VorlagestudiengangModel->addOrder('version', 'DESC');
@@ -127,49 +117,32 @@ class Messages extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	public function getMsgVarsPrestudent($uid)
+	public function getMsgVarsPrestudent($id, $typeId)
 	{
-		$prestudent_id = $this-> _getPrestudentIdFromUid($uid);
+		$prestudent_id = ($typeId == 'prestudent_id') ? $id : $this->_getPrestudentIdFromUid($id);
 
 		$result = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
 
 		$data = $this->getDataOrTerminateWithError($result);
-
 
 		$this->terminateWithSuccess($data);
 	}
 
 	public function getMsgVarsLoggedInUser()
 	{
-		$uid = getAuthUID();
-
 		$result = $this->MessageModel->getMsgVarsLoggedInUser();
-
 		$data = $this->getDataOrTerminateWithError($result);
-
 
 		$this->terminateWithSuccess($data);
 	}
 
 	public function getNameOfDefaultRecipient($id, $type_id)
 	{
-		switch($type_id)
-		{
-			case 'uid':
-				$id = $this->_getPersonIdFromUid($id);
-				break;
-			case 'person_id':
-				$id = $id;
-				break;
-			default:
-				$this->terminateWithError("MESSAGES::getNameOfDefaultRecipient logic for type_id " . $type_id . " not defined yet", self::ERROR_TYPE_GENERAL);
-				break;
-		}
+		$id = $type_id!='person_id)' ? $this->_getPersonId($id, $type_id) : $id;
 
 		$this->load->model('person/Person_model', 'PersonModel');
 
 		$result = $this->PersonModel->load($id);
-		//$this->terminateWithSuccess($result);
 		$data = $this->getDataOrTerminateWithError($result);
 		$name = current($data);
 
@@ -178,8 +151,11 @@ class Messages extends FHCAPI_Controller
 
 	public function sendMessage($recipient_id)
 	{
+		//is always uid in FAS
+		//TODO(Manu) make dynamic for other ids
+
 		//default setting
-		$receiversPersonId = $this->_getPersonIdFromUid($recipient_id);
+		$receiversPersonId = $this->_getPersonId($recipient_id, 'uid');
 
 		$uid = getAuthUID();
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
@@ -216,15 +192,13 @@ class Messages extends FHCAPI_Controller
 
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
-
-
+		$relationmessage_id = $this->input->post('relationmessage_id');
 
 		$typeId = $this->input->post('type_id');
 		$id = $this->input->post('id');
 
 		if($typeId == 'uid')
 		{
-			//$this->terminateWithError("uid ", self::ERROR_TYPE_GENERAL);
 			$prestudent_id = $this-> _getPrestudentIdFromUid($id);
 
 			//parseMessagetext for variables Prestudent
@@ -240,7 +214,7 @@ class Messages extends FHCAPI_Controller
 		}
 		elseif($typeId == 'prestudent_id')
 		{
-			$this->terminateWithError("prestudent_id ", self::ERROR_TYPE_GENERAL);
+		//	$this->terminateWithError("prestudent_id ", self::ERROR_TYPE_GENERAL);
 
 			$result = $this->MessagesModel->parseMessageTextPrestudent($id, $body);
 			$bodyParsed = $this->getDataOrTerminateWithError($result);
@@ -250,7 +224,7 @@ class Messages extends FHCAPI_Controller
 			$this->terminateWithError("type_id " . $typeId . " not valid", self::ERROR_TYPE_GENERAL);
 		}
 
-		$result = $this->messagelib->sendMessageUser($receiversPersonId, $subject, $bodyParsed, $benutzer->person_id);
+		$result = $this->messagelib->sendMessageUser($receiversPersonId, $subject, $bodyParsed, $benutzer->person_id, null, $relationmessage_id);
 
 		$this->terminateWithSuccess($result);
 	}
@@ -271,17 +245,15 @@ class Messages extends FHCAPI_Controller
 			case 'uid':
 				$prestudent_id = $this->_getPrestudentIdFromUid($id);
 				$result = $this->MessagesModel->parseMessageTextPrestudent($prestudent_id, $data);
-
 				break;
-			case 'person_id':
-				$id = $id;
+			case 'prestudent_id':
+				$result = $this->MessagesModel->parseMessageTextPrestudent($id, $data);
 				break;
 			default:
 				$this->terminateWithError("MESSAGES::getPreviewText logic for type_id " . $type_id . " not defined yet", self::ERROR_TYPE_GENERAL);
 				break;
 		}
 
-		//$this->terminateWithSuccess($result);
 		$bodyParsed = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($bodyParsed);
@@ -289,9 +261,7 @@ class Messages extends FHCAPI_Controller
 
 	public function getReplyData($messageId)
 	{
-	//	return $this->terminateWithError("in get ReplyBody" . $messageId, self::ERROR_TYPE_GENERAL);
 		//TODO(Manu) validation of messageId: if number
-
 
 		$this->MessageModel->addSelect('public.tbl_msg_message.*');
 		$this->MessageModel->addSelect('r.*');
@@ -304,13 +274,8 @@ class Messages extends FHCAPI_Controller
 			array('r.message_id' => $messageId)
 		);
 
-	//	$this->terminateWithSuccess((getData($result) ?: []));
 		$dataMessage = $this->getDataOrTerminateWithError($result);
-
 		$prefix = "Re: "; // reply subject prefix
-
-/*		$body = current($dataMessage->body);
-		$subject = $dataMessage->subject;*/
 
 		$subject = $dataMessage[0]->subject;
 		$body = $dataMessage[0]->body;
@@ -323,8 +288,6 @@ class Messages extends FHCAPI_Controller
 		$dataMessage[0]->replySubject = $prefix . $subject;
 
 		$this->terminateWithSuccess($dataMessage);
-
-
 	}
 
 	public function deleteMessage($messageId)
@@ -353,30 +316,94 @@ class Messages extends FHCAPI_Controller
 		$this->terminateWithSuccess($result);
 	}
 
-	public function getPersonIdFromUid($uid)
+	public function getPersonId($id, $typeId)
 	{
-		$this->load->model('person/Benutzer_model', 'BenutzerModel');
-		$result = $this->BenutzerModel->loadWhere(
-			['uid' => $uid]
-		);
+		if ($typeId == 'uid')
+		{
+			$this->load->model('person/Benutzer_model', 'BenutzerModel');
+			$result = $this->BenutzerModel->loadWhere(
+				['uid' => $id]
+			);
+		}
+		elseif($typeId == 'prestudent_id')
+		{
+			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+			$result = $this->PrestudentModel->loadWhere(
+				['prestudent_id' => $id]
+			);
+		}
 
 		$data = $this->getDataOrTerminateWithError($result);
-		$benutzer = current($data);
+		$person = current($data);
 
-		$this->terminateWithSuccess($benutzer->person_id);
+		$this->terminateWithSuccess($person->person_id);
 	}
 
-	private function _getPersonIdFromUid($uid)
+	public function getUid($id, $typeId)
 	{
-		$this->load->model('person/Benutzer_model', 'BenutzerModel');
-		$result = $this->BenutzerModel->loadWhere(
-			['uid' => $uid]
-		);
+		if (!$typeId)
+		{
+			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Type ID']), self::ERROR_TYPE_GENERAL);
+		}
+		elseif ($typeId == 'person_id')
+		{
+			$this->load->model('person/Benutzer_model', 'BenutzerModel');
+			$result = $this->BenutzerModel->loadWhere(
+				['person_id' => $id]
+			);
+		}
+		elseif($typeId == 'prestudent_id')
+		{
+			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+			$result = $this->PrestudentModel->loadWhere(
+				['prestudent_id' => $id]
+			);
+
+			$data = $this->getDataOrTerminateWithError($result);
+			$person = current($data);
+			$person_id = $person->person_id;
+
+			$this->load->model('person/Benutzer_model', 'BenutzerModel');
+			$result = $this->BenutzerModel->loadWhere(
+				['person_id' => $person_id]
+			);
+		}
+		elseif($typeId == 'uid')
+		{
+			$this->terminateWithSuccess($id);
+		}
+		else
+		{
+			$this->terminateWithError("MESSAGES::getUID logic for type_id " . $typeId . " not defined yet", self::ERROR_TYPE_GENERAL);
+		}
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$benutzer = current($data);
 
-		return $benutzer->person_id;
+		$this->terminateWithSuccess($benutzer->uid);
+	}
+
+	private function _getPersonId($id, $typeId)
+	{
+		if ($typeId == 'uid')
+		{
+			$this->load->model('person/Benutzer_model', 'BenutzerModel');
+			$result = $this->BenutzerModel->loadWhere(
+				['uid' => $id]
+			);
+		}
+		elseif($typeId == 'prestudent_id')
+		{
+			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+			$result = $this->PrestudentModel->loadWhere(
+				['prestudent_id' => $id]
+			);
+		}
+
+		$data = $this->getDataOrTerminateWithError($result);
+		$person = current($data);
+
+		return $person->person_id;
 	}
 
 	private function _getPrestudentIdFromUid($uid)

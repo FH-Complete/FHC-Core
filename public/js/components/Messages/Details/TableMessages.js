@@ -26,7 +26,6 @@ export default {
 		messageLayout: String,
 		openMode: String
 	},
-	//TODO(Manu) endpoint macht Probleme
 	data(){
 		return {
 			tabulatorOptions: {
@@ -38,7 +37,7 @@ export default {
 						type: this.typeId
 					};
 				},
-				ajaxResponse: (url, params, response) => response.data,
+				ajaxResponse: (url, params, response) => this.buildTreemap(response.data),
 				columns: [
 					{title: "subject", field: "subject"},
 					{title: "body", field: "body", visible: false},
@@ -63,6 +62,7 @@ export default {
 					{title: "recipient", field: "recipient"},
 					{title: "senderId", field: "sender_id"},
 					{title: "recipientId", field: "recipient_id"},
+					{title: "relationmessage_id", field: "relationmessage_id"},
 					{
 						title: "status",
 						field: "status",
@@ -110,7 +110,7 @@ export default {
 							container.className = "d-flex gap-2";
 
 							let button = document.createElement('button');
-							if (this.personId != cell.getData().recipient_id)
+							if (this.personId != cell.getData().sender_id)
 								button.disabled = true;
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.title = this.$p.t('global', 'reply');
@@ -136,29 +136,23 @@ export default {
 							return container;
 						},
 						frozen: true
-					}],
+					}
+					],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
-			//	height:	'auto',
 				height: '400',
-				selectable:	true,
 				selectableRangeMode: 'click',
-				pagination: true,
-			//	paginationSize: 5,
-/*				layoutColumnsOnNewData: false,
-
-				selectableRangeMode: 'click',
-				selectable: true,
 				index: 'message_id',
-				persistenceID: 'core-message'*/
+				pagination: true,
+				dataTree: true,
+				headerSort: true,
+				dataTreeChildField: "children",
+				dataTreeCollapseElement:"<i class='fas fa-minus-square'></i>",
+				dataTreeChildIndent: 15,
+				dataTreeStartExpanded: false,
+				persistenceID: 'core-message'
 			},
 			tabulatorEvents: [
-				{
-					event: 'dataLoaded',
-					handler: data => this.tabulatorData = data.map(item => {
-						return item;
-					}),
-				},
 				{
 					event: 'tableBuilt',
 					handler: async() => {
@@ -213,7 +207,59 @@ export default {
 			tabulatorData: [],
 			previewBody: "",
 			open: false,
-			personId: null
+			personId: null,
+			//Testdata
+/*			messages: [
+				{
+					message_id: 7,
+					subject: "Antwort auf 4",
+					body: "Text 5",
+					insertamum: "2024-03-05",
+					relationmessage_id: 6,
+				},
+				{
+					message_id: 1,
+					subject: "Hauptnachricht",
+					body: "Text 1",
+					insertamum: "2024-03-05",
+					relationmessage_id: null,
+				},
+				{
+					message_id: 2,
+					subject: "Antwort auf 1",
+					body: "Text 2",
+					insertamum: "2024-03-05",
+					relationmessage_id: 1,
+				},
+				{
+					message_id: 3,
+					subject: "Antwort auf 2",
+					body: "Text 3",
+					insertamum: "2024-03-05",
+					relationmessage_id: 2,
+				},
+				{
+					message_id: 4,
+					subject: "Neue Nachricht",
+					body: "Text 4",
+					insertamum: "2024-03-05",
+					relationmessage_id: null,
+				},
+				{
+					message_id: 5,
+					subject: "Antwort auf 4",
+					body: "Text 5",
+					insertamum: "2024-03-05",
+					relationmessage_id: 4,
+				},
+				{
+					message_id: 6,
+					subject: "Antwort auf 4",
+					body: "Text 5",
+					insertamum: "2024-03-05",
+					relationmessage_id: 5,
+				},
+			],*/
 		}
 	},
 	methods: {
@@ -237,7 +283,11 @@ export default {
 				});
 		},
 		actionNewMessage(){
+		//	this.$emit('newMessage', this.id, this.typeId);
+
+			//here already use person_id??
 			this.$emit('newMessage', this.id, this.typeId);
+
 			//console.log("action new message");
 
 		},
@@ -247,6 +297,47 @@ export default {
 		reload() {
 			this.$refs.table.reloadTable();
 		},
+		buildTreemap(messages) {
+			const messageMap = new Map();
+			const messageNested = [];
+			const remainingMessages = new Set(messages);
+
+			//save all Data in Map
+			messages.forEach(msg => messageMap.set(msg.message_id, msg));
+
+			let iteration = 0;
+			let changes = true;
+
+			// do until each relationmessage_id finds message_id (not sensitive to order)
+			while (changes) {
+				changes = false;
+				iteration++;
+
+				remainingMessages.forEach(msg => {
+					if (msg.relationmessage_id === null) {
+						messageNested.push(messageMap.get(msg.message_id));
+						remainingMessages.delete(msg);
+						changes = true;
+					} else if (messageMap.has(msg.relationmessage_id)) {
+
+						const parent = messageMap.get(msg.relationmessage_id);
+
+						if (!parent.children) {
+							parent.children = [];
+						}
+						parent.children.push(messageMap.get(msg.message_id));
+						remainingMessages.delete(msg);
+						changes = true;
+					}
+				});
+
+		// to avoid endless loop
+		if (iteration > messages.length) break;
+	}
+	return messageNested;
+}
+
+
 	},
 	computed: {
 		statusText(){
@@ -256,7 +347,7 @@ export default {
 				2: this.$p.t('messsages', 'archived'),
 				3: this.$p.t('messsages', 'deleted')
 			}
-		}
+		},
 	},
 	mounted() {
 		// change to target="_blank"
@@ -269,8 +360,12 @@ export default {
 		});*/
 	},
 	created(){
-		if(this.typeId == 'uid') {
-		this.$fhcApi.factory.messages.person.getPersonIdFromUid(this.id)
+		if(this.typeId == 'uid' || this.typeId == 'prestudent_id') {
+			const params = {
+				id: this.id,
+				type_id: this.typeId
+			};
+		this.$fhcApi.factory.messages.person.getPersonId(params)
 			.then(result => {
 				this.personId = result.data;
 			})
@@ -279,7 +374,7 @@ export default {
 	},
 	template: `
 	<div class="messages-detail-table">
-
+	
 		<!--View Studierendenverwaltung-->
 		<div v-if="messageLayout=='twoColumnsTableLeft'">
 
@@ -313,6 +408,7 @@ export default {
 		</div>
 
 		<!--View Infocenter-->
+		<!--TODO(Manu) update-->
 		<div v-if="messageLayout=='listTableTop'">
 
 				<!--table-->

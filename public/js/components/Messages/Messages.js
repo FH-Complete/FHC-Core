@@ -58,6 +58,7 @@ export default {
 	},
 	methods: {
 		reloadTable(){
+			console.log("in parent reload");
 			this.$refs.templateTableMessage.reload();
 		},
 		newMessage(id, typeId){
@@ -121,7 +122,6 @@ export default {
 				path += "/NeueNachricht/" + id + "/" + typeId;
 			}
 
-
 			const newTab = window.open(path, "_blank");
 		},
 		openInNewWindow(id, typeId){
@@ -160,6 +160,7 @@ export default {
 			<button class="btn btn-secondary" @click="openInNewWindow(id,typeId)">Open in Page</button>
 		</div>-->
 <!--	<p>endpoint Messages.js: {{endpoint}}</p>-->
+
 		<div v-if="showNew">
 			<new-message
 				ref="templateNewMessage"

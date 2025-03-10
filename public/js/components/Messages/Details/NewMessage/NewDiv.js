@@ -44,14 +44,16 @@ export default {
 	data(){
 		return {
 			formData: {
-				recipient: this.id,
+				recipient: null,
 				subject: null,
 				body: null,
 				vorlage_kurzbz: null,
 				selectedValue: '',
+				relationmessage_id: null
 			},
 			statusNew: true,
 			vorlagen: [],
+			recipientsArray: [],
 			defaultRecipient: null,
 			editor: null,
 			isVisible: false,
@@ -66,7 +68,9 @@ export default {
 			itemsUser: [],
 			previewText: null,
 			previewBody: "",
-			replyData: null
+			replyData: null,
+			uid: null,
+			messageSent: false
 		}
 	},
 	methods: {
@@ -105,19 +109,22 @@ export default {
 		sendMessage() {
 			//TODO(Manu) check default recipient(s)
 			const data = new FormData();
+
 			const params = {
 				id: this.id,
 				type_id: this.typeId
 			};
+
 			const merged = {
 				...this.formData,
 				...params
 			};
 			data.append('data', JSON.stringify(merged));
 
+			//this.uid is important for existing sendFunction
 			return this.$fhcApi.factory.messages.person.sendMessage(
 				this.$refs.formMessage,
-				this.id,
+				this.uid,
 				data)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
@@ -129,6 +136,10 @@ export default {
 						//this.resetForm();
 						//closeModal
 						//closewindwo
+					this.messageSent = true;
+					//TODO(Manu) hier route definieren? ist kein child sondern mit route aufgerufen
+					//würde allerdings neues fenster aktualisiert öffnen, altes bleibt ohne reload gleich
+					//Reload vorheriges tab???
 						this.$emit('reloadTable');
 					}
 				);
@@ -148,13 +159,13 @@ export default {
 					//closewindwo
 				});
 		},
-		getPreviewText(){
+		getPreviewText(id, typeId){
 			const data = new FormData();
 
 			data.append('data', JSON.stringify(this.formData.body));
 			return this.$fhcApi.factory.messages.person.getPreviewText({
-				id: this.id,
-				type_id: this.typeId}, data)
+				id: id,
+				type_id: typeId}, data)
 				.then(response => {
 					this.previewText = response.data;
 				}).catch(this.$fhcAlert.handleSystemError)
@@ -167,7 +178,8 @@ export default {
 		insertVariable(selectedItem){
 			if (this.editor) {
 				this.editor.insertContent(selectedItem.value + " ");
-				//TODO(Manu) check: nicht mal mit Punkt adden gehts ohne eintrag nach vars
+				//TODO(Manu) check: Laden von Variblen geht nicht wenn kein Zeichen danach kommt
+				// nicht mal mit Punkt adden gehts ohne eintrag nach vars
 				/*				this.editor.focus();
 								this.editor.setDirty(true);*/
 
@@ -183,9 +195,6 @@ export default {
 				console.error("Editor instance is not available.");
 			}
 		},
-/*		replyMessage(message_id){
-			console.log("auf message " + message_id + " antworten");
-		},*/
 		resetForm(){
 			this.formData = {
 				vorlage_kurzbz: null,
@@ -219,11 +228,22 @@ export default {
 			//just for testing:
 			this.isVisible = true;
 		},
-		showPreview(){
-			this.getPreviewText().then(() => {
+		showPreview(id, typeId){
+			this.getPreviewText(id, typeId).then(() => {
 				this.previewBody = this.previewText;
 			});
 		},
+		getUid(id, typeId){
+			const params = {
+				id: id,
+				type_id: typeId
+			};
+			this.$fhcApi.factory.messages.person.getUid(params)
+				.then(result => {
+					this.uid = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
 	},
 	watch: {
 		'formData.body': {
@@ -238,7 +258,6 @@ export default {
 		},
 		'formData.vorlage_kurzbz': {
 			handler(newVal){
-				//	console.log("Vorlage: " + newVal);
 
 				if (newVal && newVal != null) {
 					this.formData.subject = newVal;
@@ -248,6 +267,9 @@ export default {
 		},
 	},
 	created(){
+		if(this.typeId != 'uid')
+			this.getUid(this.id, this.typeId);
+
 		if(this.typeId == 'person_id'){
 			this.$fhcApi.factory.messages.person.getMessageVarsPerson()
 				.then(result => {
@@ -259,8 +281,13 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		}
-		if(this.typeId == 'uid') {
-			this.$fhcApi.factory.messages.person.getMsgVarsPrestudent(this.id)
+
+		if(this.typeId == 'uid' || this.typeId == 'prestudent_id') {
+			const params = {
+				id: this.id,
+				type_id: this.typeId
+			};
+			this.$fhcApi.factory.messages.person.getMsgVarsPrestudent(params)
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
@@ -294,20 +321,21 @@ export default {
 		})
 			.then(result => {
 				this.defaultRecipient = result.data;
+				this.recipientsArray.push({'uid': this.uid,
+											'details': this.defaultRecipient});
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
+		//case of reply
 		if(this.messageId != null) {
-
-			//get replayBody.. body receivername, receiverSurname, sentDate of message
 			this.$fhcApi.factory.messages.person.getReplyData(this.messageId)
 				.then(result => {
 					this.replyData = result.data;
 					this.formData.subject = this.replyData[0].replySubject;
 					this.formData.body = this.replyData[0].replyBody;
+					this.formData.relationmessage_id = this.messageId;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-
 		}
 
 	},
@@ -320,12 +348,11 @@ export default {
 	template: `
 
 	<div class="messages-detail-newmessage">
-
 			<!--passt für showdiv-->
 <!--			<div class="overflow-auto" style="max-height: 500px; border: 1px solid #ccc;">-->
 
 			<!--new page-->
-			<div class="overflow-auto m-3">
+			<div v-if="!messageSent" class="overflow-auto m-3">
 				<h4>New Message</h4>
 
 				<div class="row">
@@ -465,19 +492,26 @@ export default {
 					<div>
 						<form-form class="row g-3 mt-2" ref="formPreview">
 
-							<div class="col-sm-2 mb-3">
+							<div class="col-sm-3 mb-3">
+							
 								<form-input
 									type="select"
 									name="recipient"
 									:label="$p.t('messages/recipient')"
-									v-model="defaultRecipient"
+									v-model="formData.recipient"
 								>
+									<option 
+										v-for="recipient in recipientsArray"
+										:key="recipient.uid" 
+										:value="recipient.uid" 
+										>{{recipient.details}}
+									</option>
 								</form-input>
 							</div>
 
 							<div class="col-md-2 mt-4">
 								<br>
-								<button type="button" class="btn bt		n-secondary" @click="showPreview()">Aktualisieren</button>
+								<button type="button" class="btn btn-secondary" @click="showPreview(formData.recipient,'uid')">Aktualisieren</button>
 							</div>
 						</form-form>
 
@@ -492,6 +526,43 @@ export default {
 				</div>
 
 		</div>
+		
+					
+		<div v-else class="container d-flex justify-content-center align-items-center m-3">
+			<div class="card" style="width: 80%">
+			  <div class="card-body alert alert-success text-dar p-5 rounded">
+						<div class="row">
+							<div class="col-6">
+								Message sent successfully!
+							</div>
+							<div class="col-6">
+								Nachricht erfolgreich versandt!
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col-6" style="border-right: 1px">
+								You can safely close this window.
+							</div>
+							<div class="col-6">
+								Sie können dieses Fenster schließen.
+							</div>
+						</div>
+				</div>
+				<div class="text-center">
+					<p class="signatureblock">
+						Fachhochschule Technikum Wien | University of Applied Sciences Technikum Wien
+						<br>Hoechstaedtplatz 6, 1200 Wien, AUSTRIA
+						<br><a class="signatureblocklink" href="https://www.technikum-wien.at">www.technikum-wien.at</a>
+					</p>
+				
+				</div>
+						
+
+			</div>
+	
+	</div>
+
 
 	</div>
 	`

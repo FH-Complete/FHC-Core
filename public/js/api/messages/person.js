@@ -11,11 +11,14 @@ export default {
 	getMessageVarsPerson(){
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getMessageVarsPerson/');
 	},
-	getMsgVarsPrestudent(uid){
-		return this.$fhcApi.get('api/frontend/v1/messages/messages/getMsgVarsPrestudent/' + uid);
+	getMsgVarsPrestudent(params){
+		return this.$fhcApi.get('api/frontend/v1/messages/messages/getMsgVarsPrestudent/' + params.id + '/' + params.type_id);
 	},
-	getPersonIdFromUid(uid){
-		return this.$fhcApi.get('api/frontend/v1/messages/messages/getPersonIdFromUid/' + uid);
+	getPersonId(params){
+		return this.$fhcApi.get('api/frontend/v1/messages/messages/getPersonId/'+ params.id + '/' + params.type_id);
+	},
+	getUid(params){
+		return this.$fhcApi.get('api/frontend/v1/messages/messages/getUid/'+ params.id + '/' + params.type_id);
 	},
 	getVorlagentext(vorlage_kurzbz){
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getVorlagentext/' + vorlage_kurzbz);
@@ -29,7 +32,6 @@ export default {
 	},
 	getReplyData(messageId){
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getReplyData/' + messageId);
-
 	},
 	sendMessage(form, id, data) {
 		return this.$fhcApi.post(form,'api/frontend/v1/messages/messages/sendMessage/' + id,
