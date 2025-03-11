@@ -14,6 +14,8 @@ export default {
 		selected: null,
 		size:0,
 	}),
+	props: ['width', 'height']
+	,
 	mixins: [AbstractWidget],
 	computed: {
 		sizeClass() {
@@ -102,6 +104,31 @@ export default {
 			this.singleNews = singleNews;
 			this.$refs.newsModal.show();
 		},
+		initCarouselInstance() {
+			Vue.nextTick(()=> {
+				if(this.$refs.carousel) { // carousel ref might not exist in every widget width/height
+					this.carouselInstance = new bootstrap.Carousel(this.$refs.carousel, {
+						wrap: false, // keep this off even though it actually wraps
+						interval: false
+					});
+				}
+			})
+		},
+		initActiveItem() {
+			Vue.nextTick(()=> {
+				if (Array.isArray(this.$refs.carouselItems) && this.$refs.carouselItems.length >0) {
+					this.$refs.carouselItems[0].classList.add("active")
+				}
+			})
+		}
+	},
+	watch: {
+		width(newVal, oldVal) {
+			if(oldVal == 1 && newVal > 1) { // carousel instance will have been disposed
+				this.initCarouselInstance()
+				this.initActiveItem()
+			}
+		}
 	},
 	created() {
 		this.$emit("setConfig", false);
@@ -111,12 +138,9 @@ export default {
 			.then((news) => {
 				this.allNewsList = Array.from(Object.values(news));
 				this.selected = this.allNewsList.length ? this.allNewsList[0] : null
-				Vue.nextTick(()=>{
-					if (Array.isArray(this.$refs.carouselItems) && this.$refs.carouselItems.length >0) {
-						this.$refs.carouselItems[0].classList.add("active")
-					}
-				})
-				})
+				this.initActiveItem()
+				
+			})
 			.catch((err) => {
 				console.error("ERROR: ", err);
 			});
@@ -139,15 +163,8 @@ export default {
 			}
 			}).observe(this.$refs.container);
 		}
-		Vue.nextTick(()=> {
-			if(this.$refs.carousel) { // carousel ref might not exist in every widget width/height
-				this.carouselInstance = new bootstrap.Carousel(this.$refs.carousel, {
-					wrap: false, // keep this off even though it actually wraps
-					interval: false
-				});
-			}
-		})
 		
+		this.initCarouselInstance()
 	},
 	template: /*html*/ `
 <div ref="container" class="widgets-news h-100" :class="sizeClass" :style="getNewsWidgetStyle">
