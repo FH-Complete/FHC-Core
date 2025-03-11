@@ -474,15 +474,20 @@ function checkZeilenUmbruch()
     if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN)
         && $rechte->isBerechtigt('student/anrechnung_beantragen'))
     {
-        $menu[]=array
-        (
-            'id'=>'core_menu_anerkennungNachgewiesenerKenntnisse',
-            'position'=>'128',
-            'name'=>$p->t('lehre/anrechnung'),
-			'phrase'=>'lehre/anrechnung',
-            'icon'=>'../../../skin/images/button_listen.png',
-            'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid)
-        );
+		$lehrveranstaltung_obj = new lehrveranstaltung($lvid);
+
+		if ($lehrveranstaltung_obj->anrechenbar !== false)
+		{
+			$menu[]=array
+			(
+				'id'=>'core_menu_anerkennungNachgewiesenerKenntnisse',
+				'position'=>'128',
+				'name'=>$p->t('lehre/anrechnung'),
+				'phrase'=>'lehre/anrechnung',
+				'icon'=>'../../../skin/images/button_listen.png',
+				'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid)
+			);
+		}
     }
 
 // Anerkennung nachgewiesener Kenntnisse (Anrechnung) - Anzeige fuer LektorInnen

@@ -124,6 +124,7 @@
 		$lv->benotung = isset($_POST['benotung']);
 		$lv->lvinfo = isset($_POST['lvinfo']);
 		$lv->lehrauftrag = isset($_POST['lehrauftrag']);
+		$lv->anrechenbar = isset($_POST['anrechenbar']);
 		$lv->lehrveranstaltung_template_id = $lv->lehrtyp_kurzbz == 'tpl' ? '' : $_POST['lehrveranstaltung_template_id'];
 
 		if(!$lv->save())
@@ -477,8 +478,8 @@
 			<td>Template</td>
 			<td colspan="2"><input type="text" name="lehrveranstaltung_template_id" value="'.$lv->lehrveranstaltung_template_id.'" size="6"> <span class="text-template_name"></span></td>
 			<td></td>
-			<td></td>
-			<td></td>
+			<td>Anrechenbar</td>
+			<td><input type="checkbox" name="anrechenbar" '.($lv->anrechenbar ? 'checked':'').'></td>
 		</tr>
 		<tr>
 			<td></td>

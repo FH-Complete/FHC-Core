@@ -69,6 +69,7 @@ class lehrveranstaltung extends basis_db
 	public $semester_alternativ; // smallint
 	public $farbe;
 	public $lehrauftrag=true;
+	public $anrechenbar=true;
 	public $lehrveranstaltung_template_id; // integer
 
 
@@ -170,6 +171,7 @@ class lehrveranstaltung extends basis_db
 			$this->benotung = $this->db_parse_bool($row->benotung);
 			$this->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$this->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$this->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 			// FIXME: LV-Bezeichnung richtig mehrsprachig machen
 			// Zwischenzeitlich 'Italian' zum bezeichnung_arr dazugegeben
@@ -244,6 +246,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -394,6 +397,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['Italian'] = $row->bezeichnung;
@@ -607,6 +611,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -779,7 +784,7 @@ class lehrveranstaltung extends basis_db
 				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,
 				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz,
 				raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ, farbe, lehrveranstaltung_template_id,sws,lvs,alvs,lvps,las,benotung,lvinfo,
-				lehrauftrag, lehrmodus_kurzbz) VALUES ('.
+				lehrauftrag, anrechenbar, lehrmodus_kurzbz) VALUES ('.
 					$this->db_add_param($this->studiengang_kz). ', '.
 					$this->db_add_param($this->bezeichnung). ', '.
 					$this->db_add_param($this->kurzbz). ', '.
@@ -824,6 +829,7 @@ class lehrveranstaltung extends basis_db
 					$this->db_add_param($this->benotung, FHC_BOOLEAN).','.
 					$this->db_add_param($this->lvinfo, FHC_BOOLEAN).','.
 					$this->db_add_param($this->lehrauftrag, FHC_BOOLEAN).','.
+					$this->db_add_param($this->anrechenbar, FHC_BOOLEAN).','.
 					$this->db_add_param($this->lehrmodus_kurzbz)
 					.');';
 		}
@@ -880,7 +886,8 @@ class lehrveranstaltung extends basis_db
 					'las = '.$this->db_add_param($this->las).', '.
 					'benotung = '.$this->db_add_param($this->benotung, FHC_BOOLEAN).', '.
 					'lvinfo = '.$this->db_add_param($this->lvinfo, FHC_BOOLEAN).', '.
-					'lehrauftrag = '.$this->db_add_param($this->lehrauftrag, FHC_BOOLEAN).' '.
+					'lehrauftrag = '.$this->db_add_param($this->lehrauftrag, FHC_BOOLEAN).', '.
+					'anrechenbar = '.$this->db_add_param($this->anrechenbar, FHC_BOOLEAN).' '.
 					'WHERE lehrveranstaltung_id = ' . $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER, false) . ';';
 		}
 
@@ -991,6 +998,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$lv_obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 				$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1086,6 +1094,7 @@ class lehrveranstaltung extends basis_db
 				$l->benotung = $this->db_parse_bool($row->benotung);
 				$l->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$l->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$l->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 				$l->bezeichnung_arr['German'] = $row->bezeichnung;
 				$l->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1170,6 +1179,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1271,6 +1281,7 @@ class lehrveranstaltung extends basis_db
 				$obj->benotung = $this->db_parse_bool($row->benotung);
 				$obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 				$obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1396,6 +1407,7 @@ class lehrveranstaltung extends basis_db
 				$obj->lvinfo =$this->db_parse_bool( $lv->lvinfo);
 				$obj->zeugnis = $this->db_parse_bool($lv->zeugnis);
 				$obj->lehrauftrag = $this->db_parse_bool($lv->lehrauftrag);
+				$obj->anrechenbar = $this->db_parse_bool($lv->anrechenbar);
 
 				$values[] = $obj;
 
@@ -1422,6 +1434,7 @@ class lehrveranstaltung extends basis_db
 			$obj->lvinfo =$this->db_parse_bool( $this->lvinfo);
 			$obj->zeugnis = $this->db_parse_bool($this->zeugnis);
 			$obj->lehrauftrag = $this->db_parse_bool($this->lehrauftrag);
+			$obj->anrechenbar = $this->db_parse_bool($this->anrechenbar);
 
 			$values[] = $obj;
 		}
@@ -1476,6 +1489,7 @@ class lehrveranstaltung extends basis_db
 				$obj->export = $lv->export;
 				$obj->genehmigung = $lv->genehmigung;
 				$obj->lehrauftrag = $lv->lehrauftrag;
+				$obj->anrechenbar = $lv->anrechenbar;
 				$obj->lehre = $lv->lehre;
 				$obj->children = array();
 				if(count($lv->childs) > 0)
@@ -1507,6 +1521,7 @@ class lehrveranstaltung extends basis_db
 			$obj->zeugnis = $this->db_parse_bool($this->zeugnis);
 			$obj->curriculum = $this->db_parse_bool($this->curriculum);
 			$obj->lehrauftrag = $this->lehrauftrag;
+			$obj->anrechenbar = $this->anrechenbar;
 
 			$values[] = $obj;
 		}
@@ -1613,6 +1628,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$lv_obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 				$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1700,6 +1716,7 @@ class lehrveranstaltung extends basis_db
                 $lv_obj->benotung = $this->db_parse_bool($row->benotung);
                 $lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
                 $lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+                $lv_obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
                 $lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
                 $lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1873,6 +1890,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -2003,6 +2021,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$lv_obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 				$lv_obj->studiengang_kurzbzlang = $row->studiengang_kurzbzlang;
 
@@ -2131,6 +2150,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$lv_obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 				$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -2402,6 +2422,7 @@ class lehrveranstaltung extends basis_db
 				$obj->benotung = $this->db_parse_bool($row->benotung);
 				$obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$obj->anrechenbar = $this->db_parse_bool($row->anrechenbar);
 
 				$obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $row->bezeichnung_english;

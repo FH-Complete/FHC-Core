@@ -71,6 +71,7 @@ require_once('dbupdate_3.4/41950_perm_gehaelter.php');
 require_once('dbupdate_3.4/53903_valorisierung.php');
 require_once('dbupdate_3.4/55968_index_anrechnung.php');
 require_once('dbupdate_3.4/25999_locale_update.php');
+require_once('dbupdate_3.4/56017_anrechnungen_lvs_markieren_die_nicht_angerecht_werden_koennen.php');
 require_once('dbupdate_3.4/55289_pep_fine_tuning.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen

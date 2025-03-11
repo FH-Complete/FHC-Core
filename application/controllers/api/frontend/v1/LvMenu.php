@@ -503,15 +503,19 @@ class LvMenu extends FHCAPI_Controller
 		if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN)
 			&& $this->PermissionLib->isBerechtigt('student/anrechnung_beantragen'))
 		{
-			$menu[]=array
-			(
-				'id' => 'core_menu_anerkennungNachgewiesenerKenntnisse',
-				'position' => '128',
-				'name' => $this->p->t('lehre', 'anrechnung'),
-				'c4_icon' => base_url('skin/images/button_listen.png'),
-				'c4_icon2' => 'fa-regular fa-folder-open',
-				'c4_link' => base_url('cis.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid))
-			);
+			$lvres = $this->Lehrveranstaltung_model->load($lvid);
+			if(hasData($lvres) && getData($lvres)[0]->anrechenbar !== false)
+			{
+				$menu[]=array
+				(
+					'id' => 'core_menu_anerkennungNachgewiesenerKenntnisse',
+					'position' => '128',
+					'name' => $this->p->t('lehre', 'anrechnung'),
+					'c4_icon' => base_url('skin/images/button_listen.png'),
+					'c4_icon2' => 'fa-regular fa-folder-open',
+					'c4_link' => base_url('cis.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid))
+				);
+			}
 		}
     }
 
