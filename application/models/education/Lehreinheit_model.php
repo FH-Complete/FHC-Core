@@ -31,7 +31,7 @@ class Lehreinheit_model extends DB_Model
 		$this->addOrder('lehreinheit_id');
 		$les = $this->loadWhere(
 			array('lehrveranstaltung_id' => $lehrveranstaltung_id,
-				  'studiensemester_kurzbz' => $studiensemester)
+				'studiensemester_kurzbz' => $studiensemester)
 		);
 
 		if (hasData($les))
@@ -244,4 +244,63 @@ EOSQL;
 	$res = $this->execReadOnlyQuery($query);
 	return $res;
     }
+
+	/**
+	 * Gets Lehreinheiten for Lehrveranstaltungen in a Studiensemester.
+	 * Without using tbl_lehrfach: bezeichnung and kurzbz ALWAYS from lehrveranstaltung
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester
+	 * @return array with Lehreinheiten and their Lehreinheitgruppen
+	 */
+	public function getLesFromLvIds($lehrveranstaltung_id, $studiensemester_kurzbz = null)
+	{
+		$params = array($lehrveranstaltung_id);
+
+		$query = "
+			SELECT
+			    lv.lehrveranstaltung_id,
+			    le.lehreinheit_id,
+				le.lehrform_kurzbz,
+				lv.kurzbz,
+				lv.bezeichnung,
+				lv.semester,
+				(
+					SELECT
+						STRING_AGG(CONCAT(leg.semester, leg.verband, leg.gruppe), ' ')
+					FROM lehre.tbl_lehreinheitgruppe leg
+					WHERE leg.lehreinheit_id = le.lehreinheit_id
+				) AS gruppe,
+			     STRING_AGG(tma.kurzbz, ' ') as kuerzel
+			FROM
+				lehre.tbl_lehreinheit le
+			JOIN
+				lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id
+			JOIN
+				lehre.tbl_lehreinheitmitarbeiter ma USING (lehreinheit_id)
+			JOIN
+				public.tbl_mitarbeiter tma USING (mitarbeiter_uid)
+			WHERE
+				lv.lehrveranstaltung_id = ?
+				";
+
+		if (isset($studiensemester_kurzbz))
+		{
+			$query .= " AND le.studiensemester_kurzbz = ?";
+			$params[] = $studiensemester_kurzbz;
+		}
+
+		$query .="
+			GROUP BY
+                lv.lehrveranstaltung_id,
+				le.lehreinheit_id,
+				le.lehrform_kurzbz,
+				lv.kurzbz,
+				lv.bezeichnung,
+				lv.semester
+			ORDER BY
+				le.lehreinheit_id;
+		";
+
+		return $this->execQuery($query, $params);
+	}
 }

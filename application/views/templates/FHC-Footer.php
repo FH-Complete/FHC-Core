@@ -30,7 +30,7 @@
 	// Generates the global object to pass phrases to javascripts
 	// NOTE: must be called before including the PhrasesLib.js
 	if ($phrases != null) generateJSPhrasesStorageObject($phrases);
-
+	
 	// --------------------------------------------------------------------------------------------------------
 	// From vendor folder
 
@@ -104,6 +104,8 @@
 	if ($tabulator5 === true) generateJSsInclude('vendor/olifolkerd/tabulator5/dist/js/tabulator.min.js');
 	// Tabulator 5 JQuery
 	if ($tabulator5JQuery === true) generateJSsInclude('public/js/tabulator/jquery_wrapper.js');
+	// Tabulator 6 JS
+	if ($tabulator6 === true) generateJSsInclude('vendor/olifolkerd/tabulator6/dist/js/tabulator.min.js');
 	// Tinymce 3 JS
 	if ($tinymce3 === true) generateJSsInclude('include/tiny_mce/tiny_mce.js');
 
@@ -122,6 +124,13 @@
 			generateJSsInclude('vendor/vuejs/vuejs3/vue.global.prod.js');
 		}
 		generateJSsInclude('vendor/vuejs/vuerouter4/vue-router.global.js');
+	}
+	
+	// Highcharts
+	if (isset($highcharts) && $highcharts === true)
+	{
+		generateJSsInclude('vendor/highcharts/highcharts-dist/highcharts.js');
+		generateJSsInclude('vendor/highcharts/highcharts-dist/modules/current-date-indicator.js');
 	}
 
 	// PrimeVue
@@ -143,6 +152,7 @@
 		generateJSsInclude('vendor/npm-asset/primevue/toastservice/toastservice.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/confirmdialog/confirmdialog.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/confirmationservice/confirmationservice.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/tieredmenu/tieredmenu.min.js');
 	}
 
 	// --------------------------------------------------------------------------------------------------------

@@ -11,8 +11,13 @@ export default{
 	data() {
 		return {
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.personId,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.$fhcApi.factory.stv.prestudent.getHistoryPrestudents,
+				ajaxParams: () => {
+					return {
+						id: this.personId
+					};
+				},
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
 				columns:[
@@ -63,8 +68,12 @@ export default{
 	},
 	watch: {
 		personId() {
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.personId);
-		}
+			this.$fhcApi.factory.stv.prestudent.getHistoryPrestudents(this.personId)
+				.then(result => {
+					this.$refs.table.tabulator.setData(result.data);
+				})
+				.catch(this.$fhcAlert.handleSystemError);  // Handle any errors
+		},
 	},
 	template: `
 	<div class="stv-details-prestudent-history h-100 pt-3">

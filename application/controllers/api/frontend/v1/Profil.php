@@ -499,7 +499,7 @@ class Profil extends FHCAPI_Controller
 		/** @param integer $geburtsInfo */
 		if ($geburtsInfo) {
 			array_push($selectClause, "gebort");
-			array_push($selectClause, "gebdatum");
+			array_push($selectClause, "TO_CHAR(gebdatum, 'DD.MM.YYYY') as gebdatum");
 		}
 		$this->BenutzerModel->addSelect($selectClause);
 		$this->BenutzerModel->addJoin("tbl_person", "person_id");
@@ -567,7 +567,7 @@ class Profil extends FHCAPI_Controller
 	 */
 	private function getStudentInfo($uid)
 	{
-		$this->StudentModel->addSelect(['tbl_studiengang.bezeichnung as studiengang', 'tbl_student.semester', 'tbl_student.verband', 'tbl_student.gruppe', 'tbl_student.matrikelnr as personenkennzeichen']);
+		$this->StudentModel->addSelect(['tbl_studiengang.bezeichnung as studiengang', 'tbl_studiengang.studiengang_kz as studiengang_kz', 'tbl_student.semester', 'tbl_student.verband', 'tbl_student.gruppe', 'tbl_student.matrikelnr as personenkennzeichen']);
 		$this->StudentModel->addJoin('tbl_studiengang', "tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz");
 
 		$student_res = $this->StudentModel->load([$uid]);

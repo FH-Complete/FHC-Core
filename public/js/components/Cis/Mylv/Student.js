@@ -91,7 +91,7 @@ export default {
 	},
 	template: `
 
-	<h2>{{p.t('lehre/myLV')}}</h2>
+	<h2>{{$p.t('lehre/myLV')}}</h2>
 	<hr>
 	<div class="mylv-student" v-if="ready">
 		<div v-if="currentSemester" class="row justify-content-center mb-3">
@@ -103,7 +103,7 @@ export default {
 					<button class="btn btn-outline-secondary" type="button" :disabled="currentIsFirst" @click="prevSem">
 						<i class="fa fa-caret-left" aria-hidden="true"></i>
 					</button>
-					<select ref="studiensemester" v-model="currentSemester" class="form-select" :aria-label="p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
+					<select ref="studiensemester" v-model="currentSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
 						<option v-for="semester in studiensemester" :key="semester.studiensemester_kurzbz">{{semester.studiensemester_kurzbz}}</option>
 					</select>
 					<button class="btn btn-outline-secondary" type="button" :disabled="currentIsLast" @click="nextSem">
@@ -113,7 +113,7 @@ export default {
 			</div>
 		</div>
 		<div class="alert alert-danger" role="alert" v-else>
-			{{p.t('lehre/noLvFound')}}
+			{{$p.t('lehre/noLvFound')}}
 		</div>
 		<mylv-semester v-bind="current"/>
 	</div>

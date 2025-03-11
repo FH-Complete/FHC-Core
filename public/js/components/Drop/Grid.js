@@ -8,6 +8,7 @@ const MODE_MOVE = 1;
 const MODE_RESIZE = 2;
 
 export default {
+	name: 'Grid',
 	components: {
 		GridItem
 	},
@@ -358,8 +359,8 @@ export default {
 		@mouseleave="mouseLeave">
 		<TransitionGroup tag="div">
 			<grid-item
-				v-for="item in (mode == 0 && active? placedItems_withPlaceholders : placedItems)"
-				:key="item.id"
+				v-for="item in (mode == 0 && active ? placedItems_withPlaceholders : placedItems)"
+				:key="item.data.id"
 				:item="item"
 				@start-move="startMove"
 				@start-resize="startResize"
@@ -377,7 +378,7 @@ export default {
 					paddingRight: 'var(--fhc-dg-item-padding-horizontal)'
 				}">
 				<template v-slot="item">
-					<slot v-bind="item.data" v-bind="item" :x="item.x" :y="item.y" ></slot>
+					<slot v-bind="{...item, ...item.data}" :x="item.x" :y="item.y" ></slot>
 				</template>
 			</grid-item>
 		</TransitionGroup>

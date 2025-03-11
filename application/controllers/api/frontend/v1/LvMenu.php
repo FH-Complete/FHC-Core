@@ -58,6 +58,22 @@ class LvMenu extends FHCAPI_Controller
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
+
+	/**
+	 * alternative function to get multiple lvMenus with a single http request
+	 */
+	public function getMultipleLvMenu($lvMenuOptionList){
+		$result =[];
+		foreach($lvMenuOptionList as $lvMenuOptions){
+			$lvMenu = $this->getLvMenu($lvMenuOptions['lvid'],$lvMenuOptions['studiensemester_kurzbz']);
+			if(isError($lvMenu)){
+				// TODO: some lvMenu threw an error, handle error here
+			}
+			$result[$lvMenuOptions['lvid']]=$lvMenu;
+		}
+		$this->terminateWithSuccess($result);
+	}
+
 	/**
 	 * 
 	 */
@@ -91,20 +107,24 @@ class LvMenu extends FHCAPI_Controller
 		$lvres = $this->Lehrveranstaltung_model->load($lvid);
 		if(!hasData($lvres)) 
 		{
-		    $this->terminateWithError('LV ' . $lvid . ' not found.');
+			$this->terminateWithError('LV ' . $lvid . ' not found.');
 		}
 		$lv = (getData($lvres))[0];
-
+		$this->addMeta('lvInfo',$lv);
 		// define studiengang_kz / semester / lehrverzeichnis
 		$studiengang_kz = $lv->studiengang_kz;
 		$semester = $lv->semester;
 		$short = $lv->lehreverzeichnis;
+		// return empty menu for studiengang_kz = 0
+		if($studiengang_kz == 0){
+			$this->terminateWithSuccess("organisatorische_einheit");
+		}
 
 		// load studiengang
-		$stgres = $this->Studiengang_model->load($lv->studiengang_kz);
+		$stgres = $this->Studiengang_model->load(strval($studiengang_kz));
 		if(!hasData($stgres))
 		{
-		    $this->terminateWithError('Stg ' . $lv->studiengang_kz . ' nof found.');
+		    $this->terminateWithError('Stg ' . $lv->studiengang_kz . ' not found.');
 		}
 		$stg = (getData($stgres))[0];
 		$kurzbz = strtoupper($stg->typ . $stg->kurzbz);
@@ -282,24 +302,6 @@ class LvMenu extends FHCAPI_Controller
 		
 		$this->terminateWithSuccess($menu);
 
-	}
-
-
-	private function fhc_menu_digitale_anwesenheiten(&$menu, $angemeldet, $studiengang_kz, $semester, $lvid, $angezeigtes_stsem){
-		
-		// DIGITALE ANWESENHEITEN
-		if (defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet) {
-
-			$menu[] = array
-			(
-				'id' => 'core_menu_digitale_anwesenheitslisten',
-				'position' => '50',
-				'name' => $this->p->t('lehre', 'digiAnw'),
-				'c4_icon' => base_url('skin/images/button_kreuzerltool.png'),
-				'c4_link' => base_url("index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&sem_kurzbz=$angezeigtes_stsem&nav=false"),
-				'c4_linkList' => []
-			);
-		}
 	}
 
 	private function fhc_menu_lvinfo(&$menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $lehrfach_oe_kurzbz_arr){

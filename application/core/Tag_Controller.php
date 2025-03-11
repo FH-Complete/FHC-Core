@@ -33,22 +33,30 @@ class Tag_Controller extends FHCAPI_Controller
 
 	public function getTag()
 	{
+		$language = $this->_getLanguageIndex();
 		$id = $this->input->get('id');
 
 		$this->NotizModel->addSelect(
-			'tbl_notiz.titel, 
+			"tbl_notiz.titel, 
 			tbl_notiz.text, 
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $language. " as bezeichnung,
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
 			tbl_notiz.erledigt as done,
 			tbl_notiz.insertamum,
 			tbl_notiz.updateamum,
-			tbl_notiz.insertvon,
-			tbl_notiz.updatevon
-			'
+			(verfasserperson.vorname || ' ' || verfasserperson.nachname || ' ' || '(' || verfasserbenutzer.uid || ')') as verfasser,
+			(bearbeiterperson.vorname || ' ' || bearbeiterperson.nachname || ' ' || '(' || bearbeiterbenutzer.uid || ')') as bearbeiter
+			"
 		);
 		$this->NotizModel->addJoin('public.tbl_notiz_typ', 'public.tbl_notiz.typ = public.tbl_notiz_typ.typ_kurzbz');
+
+		$this->NotizModel->addJoin('public.tbl_benutzer verfasserbenutzer', 'tbl_notiz.verfasser_uid = verfasserbenutzer.uid', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_person verfasserperson', 'verfasserbenutzer.person_id = verfasserperson.person_id', 'LEFT');
+
+		$this->NotizModel->addJoin('public.tbl_benutzer bearbeiterbenutzer', 'tbl_notiz.verfasser_uid = bearbeiterbenutzer.uid', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_person bearbeiterperson', 'bearbeiterbenutzer.person_id = bearbeiterperson.person_id', 'LEFT');
+
 		$notiz = $this->NotizModel->loadWhere(array('notiz_id' => $id));
 
 		$this->terminateWithSuccess(hasData($notiz) ? getData($notiz)[0] : array());
@@ -134,7 +142,11 @@ class Tag_Controller extends FHCAPI_Controller
 	{
 		$postData = $this->getPostJson();
 		$updateData = $this->NotizModel->update(array('notiz_id' => $postData->id),
-			array('text' => $postData->notiz)
+			array('text' => $postData->notiz,
+				'updateamum' => date('Y-m-d H:i:s'),
+				'updatevon' => $this->_uid,
+				'bearbeiter_uid' => $this->_uid,
+				)
 		);
 		$this->terminateWithSuccess($updateData);
 	}
@@ -142,7 +154,11 @@ class Tag_Controller extends FHCAPI_Controller
 	{
 		$postData = $this->getPostJson();
 		$updateData = $this->NotizModel->update(array('notiz_id' => $postData->id),
-			array('erledigt' => !$postData->done)
+			array('erledigt' => !$postData->done,
+				'updateamum' => date('Y-m-d H:i:s'),
+				'updatevon' => $this->_uid,
+				'bearbeiter_uid' => $this->_uid,
+			)
 		);
 
 		$this->terminateWithSuccess($updateData);
@@ -181,6 +197,15 @@ class Tag_Controller extends FHCAPI_Controller
 
 		if (!$this->_uid)
 			show_error('User authentification failed');
+	}
+
+	private function _getLanguageIndex()
+	{
+		$this->load->model('system/Sprache_model', 'SpracheModel');
+		$this->SpracheModel->addSelect('index');
+		$result = $this->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+
+		return hasData($result) ? getData($result)[0]->index : 1;
 	}
 
 

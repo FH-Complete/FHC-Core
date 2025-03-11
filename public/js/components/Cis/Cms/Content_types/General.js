@@ -1,5 +1,6 @@
-
+import { replaceRelativeLegacyLink } from "../../../../helpers/LegacyLinkReplaceHelper.js"
 export default {
+	name: "GeneralComponent",
     props:{
       content:{
           type:String,
@@ -98,6 +99,12 @@ export default {
               FHC_JS_DATA_STORAGE_OBJECT.app_root
             );
           });
+			
+			document.querySelectorAll("[href]").forEach((element) => {
+				let orignal_href = element.getAttribute("href");
+				let new_href = replaceRelativeLegacyLink(orignal_href);
+				element.href = new_href;
+			});
     },
     template: /*html*/ `
       <!-- div that contains the content -->

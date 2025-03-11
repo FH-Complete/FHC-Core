@@ -30,6 +30,7 @@ class Bookmark extends FHCAPI_Controller
 			'getBookmarks' => self::PERM_LOGGED,
             'delete' => self::PERM_LOGGED,
             'insert' => self::PERM_LOGGED,
+			'update' => self::PERM_LOGGED,
         ]);
 
 		$this->load->model('dashboard/Bookmark_model', 'BookmarkModel');
@@ -50,7 +51,8 @@ class Bookmark extends FHCAPI_Controller
 	 */
 	public function getBookmarks()
 	{
-        $bookmarks = $this->BookmarkModel->loadWhere(["uid"=>$this->uid]);
+        $this->BookmarkModel->addOrder("bookmark_id");
+		$bookmarks = $this->BookmarkModel->loadWhere(["uid"=>$this->uid]);
 
         $bookmarks = $this->getDataOrTerminateWithError($bookmarks);
 
@@ -103,6 +105,33 @@ class Bookmark extends FHCAPI_Controller
         $insert_into_result = $this->getDataOrTerminateWithError($insert_into_result);
 
         $this->terminateWithSuccess($insert_into_result);
+
+    }
+
+	/**
+	 * updates bookmark in the bookmark table 
+	 * @access public
+	 * @return void
+	 */
+    public function update($bookmark_id)
+	{
+        // form validation
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('url', 'URL', 'required|valid_url|max_length[511]');
+        $this->form_validation->set_rules('title', 'Title', 'required|max_length[255]');
+        if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
+
+        $url = $this->input->post('url',true);
+        $title = $this->input->post('title',true);
+
+		$now = new DateTime();
+		$now = $now->format('Y-m-d H:i:s');
+
+        $update_result = $this->BookmarkModel->update($bookmark_id,['url'=>$url, 'title'=>$title,'updateamum'=>$now]);
+
+        $update_result = $this->getDataOrTerminateWithError($update_result);
+
+        $this->terminateWithSuccess($update_result);
 
     }
 }

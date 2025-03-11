@@ -1,6 +1,8 @@
 import ProfilUpdateView from "../../components/Cis/ProfilUpdate/ProfilUpdateView.js";
 import Phrasen from "../../plugin/Phrasen.js";
 
+
+// TODO: sobald in verwendung den vue router pfad zu ProfilUpdateView definieren und diese app in component auslagern
 const app = Vue.createApp({
   name: 'ProfilUpdateRequestsApp',
   components: {

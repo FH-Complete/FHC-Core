@@ -21,7 +21,7 @@ class News_model extends DB_Model
 	{
 		$this->addJoin("campus.tbl_content","content_id");
 		return $this->execReadOnlyQuery('
-			SELECT * 
+			SELECT *, TO_CHAR(campus.tbl_news.datum, ?) as datumformatted
 			FROM campus.tbl_news
 			JOIN campus.tbl_content content ON content.content_id = campus.tbl_news.content_id
 			WHERE
@@ -29,7 +29,7 @@ class News_model extends DB_Model
 			datum <= NOW() AND (datum_bis IS NULL OR datum_bis >= now()::date)
 			ORDER BY datum DESC
 			LIMIT ' . $this->escape($limit)
-		);
+		, ['DD/MM/YYYY']);
 	}
 
 	public function getNewsContentIDs($limit=10){

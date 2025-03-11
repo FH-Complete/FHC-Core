@@ -6,10 +6,10 @@ export default {
 			{  ort_kurzbz, start_date, end_date}
 		);
 	},
-	getStundenplan(start_date, end_date) {
+	getStundenplan(start_date, end_date, lv_id) {
 		return this.$fhcApi.get(
 			'/api/frontend/v1/Stundenplan/getStundenplan',
-			{ start_date, end_date }
+			{ start_date, end_date, lv_id }
 		);
 	},
 	getStunden() {
@@ -33,6 +33,12 @@ export default {
 	getLehreinheitStudiensemester(lehreinheit_id) {
 		return this.$fhcApi.get(
 			`/api/frontend/v1/Stundenplan/getLehreinheitStudiensemester/${lehreinheit_id}`,
+			{}
+		);
+	},
+	studiensemesterDateInterval(date) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Stundenplan/studiensemesterDateInterval/${date}`,
 			{}
 		);
 	},

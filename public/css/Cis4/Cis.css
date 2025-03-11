@@ -1,5 +1,7 @@
 /* basic */
 @import '../components/searchbar/searchbar.css';
+@import '../components/Sprachen.css';
+
 html {
   font-size: 0.875em;
 }
@@ -7,6 +9,7 @@ html {
 /* variables */
 :root {
   --fhc-cis-primary: #00649c;
+  --fhc-cis-primary-hover: #005585;
   --fhc-cis-header-px: 1rem;
   --fhc-cis-header-py: .5rem;
   --fhc-cis-main-px: 1.5rem;
@@ -32,6 +35,8 @@ html {
   --fhc-cis-menu-lvl-5-color: #000;
   --fhc-cis-menu-lvl-5-bg-hover: #eceff1;
   --fhc-cis-menu-lvl-5-color-hover: #000;
+  --fhc-cis-grade-positive: rgb(0, 128, 0);
+  --fhc-cis-grade-negative: rgb(128, 0, 0);
 }
 @media (min-width: 992px) {
   :root {
@@ -47,6 +52,8 @@ html {
     --fhc-cis-menu-bg: #343a40;
   }
 }
+
+
 
 /* buttons */
 #cis-header .btn-level-1,
@@ -341,7 +348,7 @@ html {
     background-color: var(--fhc-cis-primary);
   }
   #nav-user-btn img {
-    object-fit: cover;
+    object-fit: contain;
     height: calc(var(--fhc-cis-header-height) - 2 * var(--fhc-cis-header-py));
     width: calc(var(--fhc-cis-header-height) - 2 * var(--fhc-cis-header-py));
   }
@@ -352,7 +359,7 @@ html {
   }
 
   #nav-user-menu img {
-    object-fit: cover;
+    object-fit: contain;
     height: calc( 3 * var(--fhc-cis-header-py));
   }
 
@@ -482,8 +489,7 @@ html {
 }
 
 .fhc-entry:hover{
-	background-color:#005585 !important;
-	color:white !important;
+	filter: brightness(120%) !important;
 }
 
 .fhc-entry.btn:focus {
@@ -500,8 +506,8 @@ html {
 	transition-timing-function: ease-out,ease-out;
 }
 
-[selected].fhc-entry {
-	background-color: #00649C !important;
+[selected="true"].fhc-entry {
+	filter: brightness(120%);
 }
 
 @media screen and ( max-width: 767px ) {
@@ -518,29 +524,29 @@ html {
 }
 
 @media screen and ( max-width: 576px ) {
-	.searchbar_icon img {
+	#nav-search .searchbar_results .searchbar_icon img {
 		max-width: 65px !important;
 	}
 
-	.searchbar_icon i {
+	#nav-search .searchbar_results .searchbar_icon i {
 		font-size: 3em !important;
 	}
 
-	.searchbar_grid {
+	#nav-search .searchbar_results .searchbar_grid {
 		grid-template-columns: [icon] 75px [data] auto;
 	}
 
-	.searchbar_table,
-	.searchbar_tablerow,
-	.searchbar_tablecell {
+	#nav-search .searchbar_results .searchbar_table,
+	#nav-search .searchbar_results .searchbar_tablerow,
+	#nav-search .searchbar_results .searchbar_tablecell {
 		display: block;
 	}
 
-	.searchbar_tablecell.searchbar_label {
+	#nav-search .searchbar_results .searchbar_tablecell.searchbar_label {
 		font-weight: bold;
 	}
 
-	.searchbar_tablecell.searchbar_value {
+	#nav-search .searchbar_results .searchbar_tablecell.searchbar_value {
 		padding-left: 2.5rem;
 		overflow-wrap: anywhere;
 	}
@@ -565,4 +571,12 @@ html {
 .height-enter-from,
 .height-leave-to {
 	height: 0px;
+}
+
+.zusatzinfo h2 {
+	font-size: 1.5em;
+}
+
+.dashboard-item {
+	overscroll-behavior: none;
 }

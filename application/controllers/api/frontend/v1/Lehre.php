@@ -30,6 +30,7 @@ class Lehre extends FHCAPI_Controller
 		parent::__construct([
 			'lvStudentenMail' => self::PERM_LOGGED,
 			'LV' => self::PERM_LOGGED,
+			'Pruefungen' => self::PERM_LOGGED,
 		]);
 
 		
@@ -74,6 +75,23 @@ class Lehre extends FHCAPI_Controller
 
 		$result = current($this->getDataOrTerminateWithError($result));
 		
+		$this->terminateWithSuccess($result);
+	}
+
+	/**
+	 * fetches all Pruefungen of a student for a specific lehrveranstaltung
+	 * if the student passed the Pruefung on the first attempt, no information about the Pruefungen is stored in the database 
+	 * @param mixed $lehrveranstaltung_id
+	 * @return void
+	 */
+	public function Pruefungen($lehrveranstaltung_id)
+	{
+		$this->load->model('education/Pruefung_model', 'PruefungModel');
+
+		$result = $this->PruefungModel->getByStudentAndLv(getAuthUID(), $lehrveranstaltung_id, getUserLanguage());
+
+		$result = $this->getDataOrTerminateWithError($result);
+
 		$this->terminateWithSuccess($result);
 	}
 	

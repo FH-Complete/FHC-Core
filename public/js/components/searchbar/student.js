@@ -31,36 +31,36 @@ export default {
                     <div class="searchbar_table">
 
                         <div class="searchbar_tablerow">
-                            <div class="searchbar_tablecell">Student UID</div>
-                            <div class="searchbar_tablecell">
+                            <div class="searchbar_tablecell searchbar_label">Student UID</div>
+                            <div class="searchbar_tablecell searchbar_value">
                                 {{ res.uid }}
                             </div>
                         </div>
 
                         <div class="searchbar_tablerow">
-                            <div class="searchbar_tablecell">Studiengang</div>
-                            <div class="searchbar_tablecell">
+                            <div class="searchbar_tablecell searchbar_label">{{$p.t('lehre','studiengang')}}</div>
+                            <div class="searchbar_tablecell searchbar_value">
                                 {{ res.studiengang }}
                             </div>
                         </div>
 
 						<div class="searchbar_tablerow">
-                            <div class="searchbar_tablecell">Verband</div>
-                            <div class="searchbar_tablecell">
+                            <div class="searchbar_tablecell searchbar_label">Verband</div>
+                            <div class="searchbar_tablecell searchbar_value">
                                 {{ res.verband }}
                             </div>
                         </div>
         
                         <div class="searchbar_tablerow">
-                            <div class="searchbar_tablecell">Matrikelnummer</div>
-                            <div class="searchbar_tablecell">
+                            <div class="searchbar_tablecell searchbar_label">{{$p.t('person','personenkennzeichen')}}</div>
+                            <div class="searchbar_tablecell searchbar_value">
                                 {{ res.matrikelnr }}
                             </div>
                         </div>
         
                         <div class="searchbar_tablerow">
-                            <div class="searchbar_tablecell">EMail</div>
-                            <div class="searchbar_tablecell">
+                            <div class="searchbar_tablecell searchbar_label">{{$p.t('person','email')}}</div>
+                            <div class="searchbar_tablecell searchbar_value">
                                 <a :href="this.mailtourl">
                                     {{ res.email }}
                                 </a>

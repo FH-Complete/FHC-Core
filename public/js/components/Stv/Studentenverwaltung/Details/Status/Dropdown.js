@@ -30,12 +30,15 @@ export default {
 			type: Array,
 			required: true,
 			default: () => []
+		},
+		maxSem: {
+			type: Number,
+			required: true
 		}
 	},
 	data() {
 		return {
 			listDataToolbar: [],
-			//TODO(Manu) get from config
 			statiInteressent: ["Bewerber", "Aufgenommener", "Student" , "Wartender", "Abgewiesener"],
 			statiStudent: ["Abbrecher", "Unterbrecher", "Student" , "Diplomand", "Absolvent"]
 		};
@@ -139,12 +142,7 @@ export default {
 		addStudent(data) {
 			Promise
 				.allSettled(
-					this.prestudentIds.map(prestudent_id => this.$fhcApi.post(
-						'api/frontend/v1/stv/status/addStudent/' + prestudent_id,
-						data,
-						{ errorHeader: prestudent_id }
-					))
-				)
+					this.prestudentIds.map(prestudent_id => this.$fhcApi.factory.stv.status.addStudent(prestudent_id, data)))
 				.then(res => this.showFeedback(res, data.status_kurzbz));
 		},
 		changeStatusToAbbrecher(statusgrund_id) {
@@ -207,27 +205,40 @@ export default {
 		},
 		promtAusbildungssemester(status, statusgrund_id) {
 			const count = this.prestudentIds.length;
-			return BsPrompt
-				.popup(this.$p.t(
-					'lehre',
-					count > 1 ? 'modal_askAusbildungssemPlural' : 'modal_askAusbildungssem',
-					{ count, status }
-				))
-				.then(ausbildungssemester => ({
-					status_kurzbz: status,
-					ausbildungssemester,
-					statusgrund_id
-				}));
+
+			const askForSemester = () => {
+				return BsPrompt
+					.popup(this.$p.t(
+						'lehre',
+						count > 1 ? 'modal_askAusbildungssemPlural' : 'modal_askAusbildungssem',
+						{ count, status }
+					))
+					.then(input => {
+						const ausbildungssemester = parseInt(input, 10);
+						//check if valid number
+						if ((!/^\d+$/.test(input) || ausbildungssemester < 0)) {
+							this.$fhcAlert.alertError(this.$p.t('ui', 'error_noInteger'));
+
+							return askForSemester();
+						}
+						if (ausbildungssemester > this.maxSem) {
+							this.$fhcAlert.alertError(this.$p.t('ui', 'error_maxSem'));
+
+							return askForSemester();
+						}
+						return {
+							status_kurzbz: status,
+							ausbildungssemester,
+							statusgrund_id
+						};
+					});
+			};
+			return askForSemester();
 		},
 		changeStatus(data) {
 			Promise
 				.allSettled(
-					this.prestudentIds.map(prestudent_id => this.$fhcApi.post(
-						'api/frontend/v1/stv/status/changeStatus/' + prestudent_id,
-						data,
-						{ errorHeader: prestudent_id }
-					))
-				)
+					this.prestudentIds.map(prestudent_id => this.$fhcApi.factory.stv.status.changeStatus(prestudent_id, data)))
 				.then(res => this.showFeedback(res, data.status_kurzbz));
 		},
 		showFeedback(results, status_kurzbz) {
@@ -248,8 +259,7 @@ export default {
 		}
 	},
 	created() {
-		this.$fhcApi
-			.get('api/frontend/v1/stv/status/getStatusarray/')
+		this.$fhcApi.factory.stv.status.getStatusarray()
 			.then(result => result.data)
 			.then(result => {
 				this.listDataToolbar = result;
@@ -258,7 +268,7 @@ export default {
 	},
 	template: `
 	<div class="stv-status-dropdown">
-		
+			
 		<div v-if="showToolbar"  class="btn-group">						
 			<button ref="toolbarButton" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
 				{{$p.t('lehre', 'btn_statusAendern')}}

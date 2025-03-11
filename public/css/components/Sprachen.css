@@ -1,0 +1,11 @@
+.sprachen-entry{
+	background-color: var(--fhc-cis-primary-hover);
+}
+
+[selected="true"].sprachen-entry {
+	background-color: var(--fhc-cis-primary);
+}
+
+.sprachen-entry.btn {
+	border-radius: 0 !important;
+}

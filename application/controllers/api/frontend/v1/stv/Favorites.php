@@ -48,7 +48,7 @@ class Favorites extends FHCAPI_Controller
 		if (!$data)
 			$this->terminateWithSuccess(null);
 		else
-			$this->terminateWithSuccess($data['stv_favorites']);
+			$this->terminateWithSuccess($data['stv_favorites'] ?? null);
 	}
 
 	public function set()

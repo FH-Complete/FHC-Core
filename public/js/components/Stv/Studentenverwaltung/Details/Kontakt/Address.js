@@ -18,10 +18,15 @@ export default{
 		uid: Number
 	},
 	data() {
-		return{
+		return {
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/kontakt/getAdressen/' + this.uid,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.$fhcApi.factory.stv.kontakt.getAdressen,
+				ajaxParams: () => {
+					return {
+						id: this.uid
+					};
+				},
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
 				columns:[
@@ -57,10 +62,29 @@ export default{
 					{title:"Adresse_id", field:"adresse_id", visible:false},
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Name", field:"name", visible:false},
-					{title:"letzte Änderung", field:"updateamum", visible:false},
+					{
+						title:"letzte Änderung",
+						field:"lastupdate",
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{title:"Rechnungsadresse", field:"rechnungsadresse", visible:false,
 						formatter: (cell, formatterParams, onRendered) => {
-							let output = cell.getValue() ? "ja" : "nein";
+							let output = cell.getValue() ? this.$p.t('ui','ja') : this.$p.t('ui','nein');
 							return output;
 						}
 					},
@@ -74,6 +98,7 @@ export default{
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = this.$p.t('person', 'adresse_edit');
 							button.addEventListener('click', (event) =>
 								this.actionEditAdress(cell.getData().adresse_id)
 							);
@@ -82,9 +107,15 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.addEventListener('click', () =>
-								this.actionDeleteAdress(cell.getData().adresse_id)
-							);
+							button.title = this.$p.t('person', 'adresse_delete');
+
+							button.addEventListener('click', () => {
+								if (cell.getData().heimatadresse)
+									this.$fhcAlert.alertError(this.$p.t('person', 'error_deleteHomeAdress'));
+								else
+									this.actionDeleteAdress(cell.getData().adresse_id)
+							});
+
 							container.append(button);
 
 							return container;
@@ -103,7 +134,7 @@ export default{
 				{
 					event: 'tableBuilt',
 					handler: async () => {
-						await this.$p.loadCategory(['notiz','global','person', 'ui']);
+						await this.$p.loadCategory(['notiz', 'global', 'person', 'ui']);
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
@@ -127,6 +158,9 @@ export default{
 						cm.getColumnByField('heimatadresse').component.updateDefinition({
 							title: this.$p.t('person', 'heimatadresse')
 						});
+						cm.getColumnByField('zustelladresse').component.updateDefinition({
+							title: this.$p.t('person', 'zustelladresse')
+						});
 						cm.getColumnByField('co_name').component.updateDefinition({
 							title: this.$p.t('person', 'co_name')
 						});
@@ -136,7 +170,7 @@ export default{
 						cm.getColumnByField('firmenname').component.updateDefinition({
 							title: this.$p.t('person', 'firma')
 						});
-						cm.getColumnByField('updateamum').component.updateDefinition({
+						cm.getColumnByField('lastupdate').component.updateDefinition({
 							title: this.$p.t('notiz', 'letzte_aenderung')
 						});
 						cm.getColumnByField('rechnungsadresse').component.updateDefinition({
@@ -145,6 +179,18 @@ export default{
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
 						});
+						cm.getColumnByField('firma_id').component.updateDefinition({
+							title: this.$p.t('ui', 'firma_id')
+						});
+						cm.getColumnByField('adresse_id').component.updateDefinition({
+							title: this.$p.t('ui', 'adresse_id')
+						});
+						cm.getColumnByField('person_id').component.updateDefinition({
+							title: this.$p.t('person', 'person_id')
+						});
+/*						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
+						});*/
 					}
 				}
 			],
@@ -153,7 +199,9 @@ export default{
 				heimatadresse: true,
 				rechnungsadresse: false,
 				typ: 'h',
-				nation: 'A'
+				nation: 'A',
+				address: {plz: null},
+				plz: null
 			},
 			statusNew: true,
 			places: [],
@@ -164,8 +212,9 @@ export default{
 			filteredFirmen: [],
 			abortController: {
 				suggestions: null,
-				places: null
-			}
+				places: null,
+				firmen: null
+			},
 		}
 	},
 	computed:{
@@ -189,60 +238,57 @@ export default{
 			this.resetModal();
 			this.$refs.adressModal.show();
 		},
-		actionEditAdress(adress_id) {
+		actionEditAdress(adresse_id) {
 			this.statusNew = false;
-			this.loadAdress(adress_id).then(() => {
+			this.loadAdress(adresse_id).then(() => {
 				if(this.addressData.adresse_id)
 				{
-					this.loadPlaces(this.addressData.plz);
+					this.addressData.address.plz = this.addressData.plz;
+				//	delete this.addressData.plz;
+					this.loadPlaces(this.addressData.address.plz);
 					this.$refs.adressModal.show();
 
 				}
 			});
 		},
-		actionDeleteAdress(adress_id) {
-			this.loadAdress(adress_id).then(() => {
-				if(this.addressData.adresse_id)
-					if(this.addressData.heimatadresse)
-						this.$fhcAlert.alertError(this.$p.t('person', 'error_deleteHomeAdress'));
-					else {
-						this.$fhcAlert
-							.confirmDelete()
-							.then(result => result
-								? adress_id
-								: Promise.reject({handled: true}))
-							.then(this.deleteAddress)
-							.catch(this.$fhcAlert.handleSystemError);
-					}
-			});
+		actionDeleteAdress(adresse_id) {
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? adresse_id
+					: Promise.reject({handled: true}))
+				.then(this.deleteAddress)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewAddress(addressData) {
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewAddress/' + this.uid,
-				this.addressData
-			).then(response => {
+			this.addressData.plz = this.addressData.address.plz;
+			return this.$fhcApi.factory.stv.kontakt.addNewAddress(this.$refs.addressData, this.uid, this.addressData)
+				.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('adressModal');
 					this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-				window.scrollTo(0, 0);
 				this.reload();
 			});
 		},
 		reload() {
 			this.$refs.table.reloadTable();
 		},
-		loadAdress(adress_id) {
+		loadAdress(adresse_id) {
 			this.statusNew = false;
-			return this.$fhcApi.get('api/frontend/v1/stv/kontakt/loadAddress/' + adress_id)
+			return this.$fhcApi.factory.stv.kontakt.loadAddress(adresse_id)
 				.then(result => {
-						this.addressData = result.data;
-						return result;
+					this.addressData = result.data;
+					this.addressData.address = {};
+					this.addressData.address.plz = this.addressData.plz || null;
+					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		updateAddress(adress_id) {
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateAddress/' + adress_id,
+		updateAddress(adresse_id) {
+			this.addressData.plz = this.addressData.address.plz;
+			return this.$fhcApi.factory.stv.kontakt.updateAddress(this.$refs.addressData, adresse_id,
 				this.addressData
 			).then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -250,12 +296,11 @@ export default{
 					this.resetModal();
 			}).catch(this.$fhcAlert.handleSystemError)
 			.finally(() => {
-				window.scrollTo(0, 0);
 				this.reload();
 			});
 		},
-		deleteAddress(adress_id) {
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/deleteAddress/' + adress_id)
+		deleteAddress(adresse_id) {
+			return this.$fhcApi.factory.stv.kontakt.deleteAddress(adresse_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				}).catch(this.$fhcAlert.handleSystemError)
@@ -267,27 +312,24 @@ export default{
 		loadPlaces() {
 			if (this.abortController.places)
 				this.abortController.places.abort();
-			if (this.addressData.nation != 'A' || !this.addressData.plz)
+			if (this.addressData.nation != 'A' || !this.addressData.address.plz)
 				return;
 
 			this.abortController.places = new AbortController();
-			this.$fhcApi
-				.get('api/frontend/v1/stv/address/getPlaces/' + this.addressData.plz, undefined, {
-					signal: this.abortController.places.signal
-				})
+
+			return this.$fhcApi.factory.stv.kontakt.getPlaces(this.addressData.address.plz)
 				.then(result => {
 					this.places = result.data;
 				});
-/*				.catch(error => {
-						if (error.code != "ERR_CANCELED")
-							window.setTimeout(this.loadPlaces, 100);
-						else
-							this.$fhcAlert.handleSystemError(error);
-					});*/
 		},
 		search(event) {
-			return this.$fhcApi
-				.get('api/frontend/v1/stv/kontakt/getFirmen/' + event.query)
+			if (this.abortController.firmen) {
+				this.abortController.firmen.abort();
+			}
+
+			this.abortController.firmen = new AbortController();
+
+			return this.$fhcApi.factory.stv.kontakt.getFirmen(event.query)
 				.then(result => {
 					this.filteredFirmen = result.data.retval;
 				});
@@ -308,30 +350,29 @@ export default{
 			this.addressData.anmerkung = null;
 			this.addressData.typ = 'h';
 			this.addressData.nation = 'A';
-			this.addressData.plz = null;
+			this.addressData.address = {plz: null};
 
 			this.statusNew = true;
 		},
 	},
 	created() {
-		this.$fhcApi
-			.get('api/frontend/v1/stv/address/getNations')
+		this.$fhcApi.factory.stv.kontakt.getNations()
 			.then(result => {
 				this.nations = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.get('api/frontend/v1/stv/kontakt/getAdressentypen')
+
+		this.$fhcApi.factory.stv.kontakt.getAdressentypen()
 			.then(result => {
 				this.adressentypen = result.data;
 			})
-			.catch(this.$fhcAlert.handleSystemError)
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-details-kontakt-address h-100 pt-3">
 		
 		<!--Modal: AddressModal-->
-		<bs-modal ref="adressModal">
+		<bs-modal ref="adressModal" dialog-class="modal-dialog-scrollable">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('person', 'adresse_new')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('person', 'adresse_edit')}}</p>
@@ -386,9 +427,9 @@ export default{
 				<div class="row mb-3">
 					<form-input
 						type="text"
-						name="plz"
+						name="address[plz]"
 						:label="$p.t('person/plz') + ' *'"
-						v-model="addressData.plz"
+						v-model="addressData.address.plz"
 						required
 						@input="loadPlaces"
 					>
@@ -415,6 +456,7 @@ export default{
 						<form-input
 							v-else
 							type="text"
+							:label="$p.t('person/gemeinde')"
 							name="addressData.gemeinde"
 							v-model="addressData.gemeinde"
 						>	
@@ -441,6 +483,7 @@ export default{
 					<form-input
 							v-else
 							type="text"
+							:label="$p.t('person/ort')"
 							name="ort"
 							v-model="addressData.ort"
 						>	
@@ -560,7 +603,7 @@ export default{
 			</form-form>
 			
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="reload()">{{$p.t('ui', 'abbrechen')}}</button>
 				<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewAddress()">OK</button>
 				<button v-else type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>
             </template>
@@ -574,7 +617,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Adresse"
+			:new-btn-label="this.$p.t('person', 'adresse')"
 			@click:new="actionNewAdress"
 			>
 		</core-filter-cmpt>

@@ -9,8 +9,8 @@ export default {
 	},
 	data() {
 		return {
-			configStudent: null,
-			configStudents: null
+			configStudent: {},
+			configStudents: {}
 		};
 	},
 	props: {
@@ -19,6 +19,17 @@ export default {
 	computed: {
 		appRoot() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root;
+		},
+		config() {
+			if (!this.students.length)
+				return {};
+			if (this.students.length == 1) {
+				const student = this.students[0];
+				if (student.uid)
+					return Object.fromEntries(Object.entries(this.configStudent).filter(([key, value]) => !value.showOnlyWithoutUid));
+				return Object.fromEntries(Object.entries(this.configStudent).filter(([key, value]) => !value.showOnlyWithUid));
+			}
+			return this.configStudents;
 		}
 	},
 	methods: {
@@ -53,8 +64,11 @@ export default {
 					<h2 class="h4">{{students[0].titlepre}} {{students[0].vorname}} {{students[0].nachname}} {{students[0].titlepost}}</h2>
 				</div>
 			</div>
-			<fhc-tabs v-if="students.length == 1" ref="tabs" :modelValue="students[0]" :config="configStudent" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
-			<fhc-tabs v-else ref="tabs" :modelValue="students" :config="configStudents" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
+			<fhc-tabs v-if="students.length == 1" ref="tabs" :modelValue="students[0]" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
+			<fhc-tabs v-else ref="tabs" :modelValue="students" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
+		</div>
+		<div v-else>
+			Loading...
 		</div>
 	</div>`
 };

@@ -55,7 +55,10 @@ class Profil extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('Cis/Profil');
+		$viewData = array(
+
+		);
+		$this->load->view('CisRouterView/CisRouterView.php',['viewData' => $viewData, 'route' => 'profilIndex']);
 	}
 
 	/**
@@ -65,7 +68,9 @@ class Profil extends Auth_Controller
 	 */
 	public function View($uid)
 	{
-		$this->load->view('Cis/Profil');
+		$viewData = array ('uid' => $uid);
+		
+		$this->load->view('CisRouterView/CisRouterView.php',['viewData' => $viewData, 'route' => 'profilViewUid']);
 	}
 
 	/**
