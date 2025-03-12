@@ -517,28 +517,29 @@ class Lehrveranstaltung_model extends DB_Model
 	/**
 	 * Gets Lehrveranstaltungen of a student
 	 * @param $student_uid
-	 * @param null $studiensemester_kurzbz
+	 * @param $studiensemester_kurzbz
 	 * @return array|null
 	 */
 	public function getLvsByStudent($student_uid, $studiensemester_kurzbz = null)
 	{
 		$params = array($student_uid);
-
 		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung
-				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
-											  WHERE uid=?";
+				WHERE lehrveranstaltung_id IN(
+					SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
+						WHERE uid=?";
+
 		if (isset($studiensemester_kurzbz))
 		{
-			$qry .= " AND studiensemester_kurzbz=?";
 			$params[] = $studiensemester_kurzbz;
+			$qry .= " AND studiensemester_kurzbz=?";
 		}
-		$qry .= ") OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE student_uid=?";
+		$qry .= ")";
+
+		$qry .= " OR lehrveranstaltung_id IN(
+			SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote 
+			WHERE student_uid=?";
 		$params[] = $student_uid;
-		if (isset($studiensemester_kurzbz))
-		{
-			$qry .= " AND studiensemester_kurzbz=?";
-			$params[] = $studiensemester_kurzbz;
-		}
+
 		$qry .= ") ORDER BY semester, bezeichnung";
 
 		return $this->execQuery($qry, $params);
@@ -608,7 +609,11 @@ class Lehrveranstaltung_model extends DB_Model
 		$this->addSelect($lvbezeichnung . ' AS bezeichnung');
 		$this->addSelect($sgbezeichnung . ' AS sg_bezeichnung');
 		$this->addSelect('UPPER(sg.typ::VARCHAR(1) || sg.kurzbz) AS studiengang_kuerzel');
-
+		
+		//also adds returns the index of the grade
+		//TODO: ist zeugnissnote immer gleich wie die lvgesamtnote
+		$this->addSelect('COALESCE(zn.note::numeric,gn.note::numeric) as note_index');
+		$this->addSelect('COALESCE(znn.positiv,gnn.positiv) as positiv');
 		$this->addSelect('COALESCE(gnn.' . $bezeichnung . ', gnn.bezeichnung, gn.note::text) AS lvnote');
 		$this->addSelect('COALESCE(znn.' . $bezeichnung . ', znn.bezeichnung, zn.note::text) AS znote');
 
@@ -728,6 +733,37 @@ class Lehrveranstaltung_model extends DB_Model
 		';
 
 		return $this->execQuery($query, array($uid, $studiensemester_kurzbz, $lehrveranstaltung_id));
+	}
+
+	/**
+	 * Get Lehreinheit.
+	 *
+	 * @param string				$student_uid
+	 * @param string				$studiensemester_kurzbz
+	 * @param integer				$lehrveranstaltung_id
+	 *
+	 * @return stdClass
+	 */
+	public function getLeByStudent($student_uid, $studiensemester_kurzbz, $lehrveranstaltung_id)
+	{
+		$this->addSelect("lehreinheit_id");
+
+		$this->addOrder("lehreinheit_id", "ASC");
+
+		$this->addLimit(1);
+
+		$tmp = $this->dbTable;
+		$this->dbTable = "campus.vw_student_lehrveranstaltung";
+		
+		$result = $this->loadWhere([
+			"uid" => $student_uid,
+			"lehrveranstaltung_id" => $lehrveranstaltung_id,
+			"studiensemester_kurzbz" => $studiensemester_kurzbz
+		]);
+		
+		$this->dbTable = $tmp;
+		
+		return $result;
 	}
 
 	/**
@@ -1012,4 +1048,27 @@ class Lehrveranstaltung_model extends DB_Model
 		$res = $this->execReadOnlyQuery($query);
 		return $res;
     }
+
+	/**
+	 * Gets lehrveranstaltungen of a studiengang
+	 * @param integer $studiengang_kz
+	 * @return array|null
+	 */
+	public function getLvsByStudiengangkz($studiengang_kz)
+	{
+		$params = array($studiengang_kz);
+
+		$qry = "SELECT
+    				* 
+				FROM 
+				    lehre.tbl_lehrveranstaltung
+				WHERE lehrveranstaltung_id IN
+				      (SELECT lehrveranstaltung_id 
+				       FROM campus.vw_student_lehrveranstaltung 
+					WHERE studiengang_kz = ?";
+
+		$qry .= ") ORDER BY semester, bezeichnung";
+
+		return $this->execQuery($qry, $params);
+	}
 }

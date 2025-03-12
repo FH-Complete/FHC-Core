@@ -21,5 +21,5 @@ const app = Vue.createApp({
 	}
 });
 app
-	.use(Phrasen, {reload: true})
+	.use(Phrasen)
 	.mount('#wrapper');

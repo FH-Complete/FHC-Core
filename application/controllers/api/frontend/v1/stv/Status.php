@@ -647,15 +647,8 @@ class Status extends FHCAPI_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function loadStatus()
+	public function loadStatus($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
 	{
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
-
-		$prestudent_id = $this->input->post('prestudent_id');
-		$status_kurzbz = $this->input->post('status_kurzbz');
-		$ausbildungssemester = $this->input->post('ausbildungssemester');
-		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
-
 		$result = $this->PrestudentstatusModel->loadWhere(
 			array(
 				'prestudent_id' => $prestudent_id,
@@ -1344,13 +1337,13 @@ class Status extends FHCAPI_Controller
 			'updatevon' => $authUID
 		];
 		foreach ([
-					 'orgform_kurzbz',
-					 'anmerkung',
-					 'bewerbung_abgeschicktamum',
-					 'studienplan_id',
-					 'rt_stufe',
-					 'statusgrund_id'
-				 ] as $key)
+					'orgform_kurzbz',
+					'anmerkung',
+					'bewerbung_abgeschicktamum',
+					'studienplan_id',
+					'rt_stufe',
+					'statusgrund_id'
+				] as $key)
 			if ($this->input->post($key))
 				$updateData[$key] = $this->input->post($key);
 

@@ -8,9 +8,10 @@ export default {
 		modelValue: Object
 	},
 	template: `
-	<div class="stv-details-notizen h-100 pb-3 overflow-hidden">
+	<div class="stv-details-notizen h-100 pb-3">
 <!--	mit factory als endpoint	-->
 		<core-notiz
+			class="overflow-hidden"
 			:endpoint="$fhcApi.factory.notiz.person"
 			ref="formc"
 			notiz-layout="twoColumnsFormLeft"

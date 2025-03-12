@@ -68,7 +68,7 @@ export default {
 		return BsModal.popup.bind(this)(null, options);
 	},
 	template: /*html*/ `
-	<bs-modal ref="modalContainer" @showBsModal="onModalShow" @hideBsModal="onModalHide" v-bind="$props" :bodyClass="''" dialogClass='modal-lg' class="bootstrap-alert" backdrop="false" >
+	<bs-modal ref="modalContainer" @showBsModal="onModalShow" @hideBsModal="onModalHide" v-bind="$props" :bodyClass="''" dialogClass='modal-lg' class="bootstrap-alert" :backdrop="false" >
 		<template v-slot:title>
 			<template v-if="event.titel">{{ event.titel + ' - ' + event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
 			<template v-else>{{ event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
@@ -77,7 +77,7 @@ export default {
 			<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
 			<lv-info :event="event"></lv-info>
 			<template v-if="showMenu">
-				<h3 >Lehrveranstaltungs Menu</h3>
+				<h3>{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
 				<lv-menu :menu="menu"></lv-menu>
 			</template>
 		</template>

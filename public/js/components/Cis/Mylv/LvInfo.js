@@ -20,6 +20,12 @@ export default {
 			})
 			return lektorenLinks;
 		},
+		getOrtContentLink: function()
+		{
+			if (!this.event || !this.event.ort_content_id) return "a";
+
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/CisVue/Cms/content/${this.event.ort_content_id}`
+		},
 		start_time: function () {
 			if (!this.event.start) return 'N/A';
 			if (!this.event.start instanceof Date) {
@@ -60,7 +66,10 @@ export default {
 						$p.t('global','raum')+':'
 						:''
 					}}</th>
-					<td>{{event.ort_kurzbz}}</td>
+					<td>
+						<a v-if="event.ort_content_id" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
+						{{event.ort_kurzbz}}
+					</td>
 				</tr>
 				<tr>
 					<th>{{

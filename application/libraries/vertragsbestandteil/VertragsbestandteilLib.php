@@ -26,6 +26,8 @@ class VertragsbestandteilLib
 {
 	const INCLUDE_FUTURE = true;
 	const DO_NOT_INCLUDE_FUTURE = false;
+	const WITH_VALORISATION_HISTORY = true;
+	const NOT_WITH_VALORISATION_HISTORY = false;
 
 	protected $CI;
 	/** @var Dienstverhaeltnis_model */
@@ -97,14 +99,19 @@ class VertragsbestandteilLib
 		return $dv;
 	}
 
-	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
+	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null, 
+		$includefuture=false, $withvalorisationhistory=true)
 	{
-		$vbs = $this->VertragsbestandteilModel->getVertragsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
+		$vbs = $this->VertragsbestandteilModel->getVertragsbestandteile(
+			$dienstverhaeltnis_id, $stichtag, $includefuture
+		);
 		$dv = $this->fetchDienstverhaeltnis($dienstverhaeltnis_id);
 		$gbs = array();
 		if($dv && $this->PermissionLib->isberechtigt('basis/gehaelter', 's', $dv->getOe_kurzbz())) 
 		{
-			$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
+			$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile(
+				$dienstverhaeltnis_id, $stichtag, $includefuture, $withvalorisationhistory
+			);
 		}
 
 		$gbsByVBid = array();
