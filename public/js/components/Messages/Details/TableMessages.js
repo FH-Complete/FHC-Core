@@ -37,7 +37,8 @@ export default {
 						type: this.typeId
 					};
 				},
-				ajaxResponse: (url, params, response) => this.buildTreemap(response.data),
+				ajaxResponse: (url, params, response) => this.buildTreemap(response),
+				//ajaxResponse: (url, params, response) => this.buildTreemap(response.data),
 				columns: [
 					{title: "subject", field: "subject"},
 					{title: "body", field: "body", visible: false},
@@ -66,25 +67,15 @@ export default {
 					{
 						title: "status",
 						field: "status",
-						formatter: function (cell) {
-							//TODO(Manu) get phrases in this context to work?
-
-							/*							const statusMap = {
-															0: this.$p.t('messsages', 'unread'),
-															1: this.$p.t('messsages', 'read'),
-															2: this.$p.t('messsages', 'archived'),
-															3: this.$p.t('messsages', 'deleted')
-														};*/
-							const statusMap = {
-								0: 'unread',
-								1: 'read',
-								2: 'archived',
-								3: 'deleted'
-							};
-							return statusMap[cell.getValue()];
-							// return this.$p.t('messsages', 'deleted');
+						formatterParams: [
+							"unread",
+							"read",
+							"archived",
+							"deleted"
+						],
+						formatter: (cell, formatterParams) => {
+							return formatterParams[cell.getValue()];
 						}
-
 					},
 					{
 						title: "letzte Änderung",
@@ -144,6 +135,9 @@ export default {
 				selectableRangeMode: 'click',
 				index: 'message_id',
 				pagination: true,
+				paginationMode: "remote",
+				paginationSize: 15,
+				paginationInitialPage: 1,
 				dataTree: true,
 				headerSort: true,
 				dataTreeChildField: "children",
@@ -188,6 +182,15 @@ export default {
 						cm.getColumnByField('statusdatum').component.updateDefinition({
 							title: this.$p.t('notiz', 'letzte_aenderung')
 						});
+						cm.getColumnByField('status').component.updateDefinition({
+							formatterParams: [
+								this.$p.t('messages/unread'),
+								this.$p.t('messages/read'),
+								this.$p.t('messages/archived'),
+								this.$p.t('messages/deleted')
+							]
+						});
+						this.$refs.table.tabulator.rowManager.getDisplayRows();
 						/*
 						cm.getColumnByField('actions').component.updateDefinition({
 						title: this.$p.t('global', 'aktionen')
@@ -204,62 +207,9 @@ export default {
 					}
 				},
 			],
-			tabulatorData: [],
 			previewBody: "",
 			open: false,
 			personId: null,
-			//Testdata
-/*			messages: [
-				{
-					message_id: 7,
-					subject: "Antwort auf 4",
-					body: "Text 5",
-					insertamum: "2024-03-05",
-					relationmessage_id: 6,
-				},
-				{
-					message_id: 1,
-					subject: "Hauptnachricht",
-					body: "Text 1",
-					insertamum: "2024-03-05",
-					relationmessage_id: null,
-				},
-				{
-					message_id: 2,
-					subject: "Antwort auf 1",
-					body: "Text 2",
-					insertamum: "2024-03-05",
-					relationmessage_id: 1,
-				},
-				{
-					message_id: 3,
-					subject: "Antwort auf 2",
-					body: "Text 3",
-					insertamum: "2024-03-05",
-					relationmessage_id: 2,
-				},
-				{
-					message_id: 4,
-					subject: "Neue Nachricht",
-					body: "Text 4",
-					insertamum: "2024-03-05",
-					relationmessage_id: null,
-				},
-				{
-					message_id: 5,
-					subject: "Antwort auf 4",
-					body: "Text 5",
-					insertamum: "2024-03-05",
-					relationmessage_id: 4,
-				},
-				{
-					message_id: 6,
-					subject: "Antwort auf 4",
-					body: "Text 5",
-					insertamum: "2024-03-05",
-					relationmessage_id: 5,
-				},
-			],*/
 		}
 	},
 	methods: {
@@ -283,13 +233,7 @@ export default {
 				});
 		},
 		actionNewMessage(){
-		//	this.$emit('newMessage', this.id, this.typeId);
-
-			//here already use person_id??
 			this.$emit('newMessage', this.id, this.typeId);
-
-			//console.log("action new message");
-
 		},
 		actionReplyToMessage(message_id){
 			this.$emit('replyToMessage', this.id, this.typeId, message_id);
@@ -298,6 +242,8 @@ export default {
 			this.$refs.table.reloadTable();
 		},
 		buildTreemap(messages) {
+			const last_page = messages.meta.count;
+			messages = messages.data;
 			const messageMap = new Map();
 			const messageNested = [];
 			const remainingMessages = new Set(messages);
@@ -334,7 +280,7 @@ export default {
 		// to avoid endless loop
 		if (iteration > messages.length) break;
 	}
-	return messageNested;
+	return {data: messageNested, last_page};
 }
 
 
@@ -360,7 +306,7 @@ export default {
 		});*/
 	},
 	created(){
-		if(this.typeId == 'uid' || this.typeId == 'prestudent_id') {
+		if(this.typeId != 'person_id') {
 			const params = {
 				id: this.id,
 				type_id: this.typeId
@@ -408,7 +354,7 @@ export default {
 		</div>
 
 		<!--View Infocenter-->
-		<!--TODO(Manu) update-->
+		<!--TODO(Manu) finish later -->
 		<div v-if="messageLayout=='listTableTop'">
 
 				<!--table-->

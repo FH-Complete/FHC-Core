@@ -22,19 +22,25 @@ export default {
 			type: [Number, String],
 			required: true
 		},
+		messageId: {
+			type: Number,
+			required: false,
+		},
 		openMode: String,
 	},
 	data(){
 		return {
 			formData: {
-				recipient: this.id,
+				recipient: null,
 				subject: null,
 				body: null,
 				vorlage_kurzbz: null,
 				selectedValue: '',
+				relationmessage_id: null
 			},
 			statusNew: true,
 			vorlagen: [],
+			recipientsArray: [],
 			defaultRecipient: null,
 			editor: null,
 			fieldsUser: [],
@@ -47,7 +53,9 @@ export default {
 			itemsPerson: [],
 			itemsUser: [],
 			previewText: null,
-			previewBody: ""
+			previewBody: "",
+			replyData: null,
+			uid: null,
 		}
 	},
 	methods: {
@@ -98,12 +106,14 @@ export default {
 
 			return this.$fhcApi.factory.messages.person.sendMessage(
 				this.$refs.formMessage,
-				this.id,
+				this.uid,
 				data)
+/*			return this.$fhcApi.factory.messages.person.sendMessage(
+				this.uid,
+				data)*/
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
-					//this.hideModal('messageModal');
-					this.hideTemplate();
+					this.hideModal('modalNewMessage');
 					this.resetForm();
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -119,7 +129,7 @@ export default {
 			return this.$fhcApi.factory.messages.person.getVorlagentext(vorlage_kurzbz)
 				.then(response => {
 					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
-					//this.hideModal('messageModal');
+					//this.hideModal('modalNewMessage');
 					//this.resetForm();
 					//TODO(Manu) CHECK
 					this.formData.body = response.data;
@@ -165,19 +175,21 @@ export default {
 				console.error("Editor instance is not available.");
 			}
 		},
-		replyMessage(message_id){
-			console.log("auf message " + message_id + " antworten");
-		},
 		resetForm(){
 			this.formData = {
 				vorlage_kurzbz: null,
 				body: null,
 				subject: null,
 			};
+			this.$emit('resetMessageId');
+
 			if (this.editor) {
 				this.editor.setContent("");
 			}
+
 			this.$refs.dropdownComp.setValue(null);
+
+			this.previewBody = null;
 
 		},
 		handleSelectedVorlage(vorlage_kurzbz) {
@@ -186,22 +198,28 @@ export default {
 				this.formData.subject = vorlage_kurzbz;
 			}
 		},
-		hideTemplate(){
-			if (this.openMode == "showDiv")
-				this.isVisible = false;
-		},
-		showTemplate(){
-			if (this.openMode == "showDiv")
-				this.isVisible = true;
-		},
 		showPreview(){
 			this.getPreviewText().then(() => {
 				this.previewBody = this.previewText;
 			});
 		},
+		getUid(id, typeId){
+			const params = {
+				id: id,
+				type_id: typeId
+			};
+			this.$fhcApi.factory.messages.person.getUid(params)
+				.then(result => {
+					this.uid = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 		show(){
 			this.$refs.modalNewMessage.show();
-		}
+		},
+		hideModal(modalRef){
+			this.$refs[modalRef].hide();
+		},
 	},
 	watch: {
 		'formData.body': {
@@ -223,11 +241,37 @@ export default {
 					return this.getVorlagentext(newVal);
 				}
 			}
+		},
+		messageId: {
+			immediate: true,
+			handler: async function (newMessageId) {
+				if (!newMessageId) return;
+
+				try {
+					const result = await this.$fhcApi.factory.messages.person.getReplyData(newMessageId);
+					this.replyData = result.data;
+					console.log(this.replyData);
+
+					if (this.replyData.length > 0) {
+						this.formData.subject = this.replyData[0].replySubject;
+						this.formData.body = this.replyData[0].replyBody;
+						this.formData.relationmessage_id = newMessageId;
+					}
+				} catch (error) {
+					this.$fhcAlert.handleSystemError(error);
+				}
+			}
 		}
 	},
 	created(){
-		if(this.typeId == 'person_id'){
-			this.$fhcApi.factory.messages.person.getMessageVarsPerson()
+		this.getUid(this.id, this.typeId);
+
+		if(this.typeId == 'person_id' || this.typeId == 'mitarbeiter_uid'){
+			const params = {
+				id: this.id,
+				type_id: this.typeId
+			};
+			this.$fhcApi.factory.messages.person.getMessageVarsPerson(params)
 				.then(result => {
 					this.fieldsPerson = result.data;
 					this.itemsPerson = Object.entries(this.fieldsPerson).map(([key, value]) => ({
@@ -237,16 +281,16 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		}
-		if(this.typeId == 'uid') {
-			this.$fhcApi.factory.messages.person.getMsgVarsPrestudent(this.id)
+
+		if(this.typeId == 'prestudent_id' || this.typeId == 'uid'){
+			const params = {
+				id: this.id,
+				type_id: this.typeId
+			};
+			this.$fhcApi.factory.messages.person.getMsgVarsPrestudent(params)
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
-					//Just for testing with inserting values
-					/*					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
-											label: key,
-											value: value
-										}));*/
 					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
 						label: key.toLowerCase(),
 						value: '{' + key.toLowerCase() + '}'
@@ -271,8 +315,25 @@ export default {
 			type_id: this.typeId})
 			.then(result => {
 				this.defaultRecipient = result.data;
+			//	console.log("check " + this.uid + "|" + this.defaultRecipient);
+				this.recipientsArray.push({
+					'uid': this.uid,
+					'details': this.defaultRecipient});
+			//	console.log(JSON.stringify(this.recipientsArray));
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+
+		//case of reply
+		if(this.messageId) {
+			this.$fhcApi.factory.messages.person.getReplyData(this.messageId)
+				.then(result => {
+					this.replyData = result.data;
+					this.formData.subject = this.replyData[0].replySubject;
+					this.formData.body = this.replyData[0].replyBody;
+					this.formData.relationmessage_id = this.messageId;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
 	},
 	async mounted() {
 		this.initTinyMCE();
@@ -281,10 +342,15 @@ export default {
 		this.editor.destroy();
 	},
 	template: `
-		<bs-modal class="messages-detail-newmessage-modal" ref="modalNewMessage" dialog-class="modal-xl">
+		<bs-modal
+			class="messages-detail-newmessage-modal"
+			ref="modalNewMessage" 
+			dialog-class="modal-xl"
+			@hidden.bs.modal="resetForm"
+			>
 
 			<template #title>
-				New Message
+				{{ $p.t('messages', 'neueNachricht') }}
 			</template>
 
 			<form-form ref="formNewMassage">
@@ -296,7 +362,6 @@ export default {
 					<div class="col-sm-8">
 						<form-form class="row g-3 mt-2" ref="formMessage">
 
-						<!--TODO(Manu) ist eigentlich ein Array, hier werden alle Einträge angegeben als String-->
 							<div class="row mb-3">
 
 								<form-input
@@ -348,7 +413,7 @@ export default {
 
 					<div class="col-sm-4">
 						<div v-if="this.fieldsPrestudent.length > 0">
-							<strong>Felder Prestudent</strong>
+							<strong>{{$p.t('ui', 'felder')}} {{$p.t('lehre', 'prestudent')}}</strong>
 							<div class="border p-3 overflow-auto" style="height: 200px;">
 
 								<list-box
@@ -364,9 +429,6 @@ export default {
 								</list-box>
 
 							</div>
-
-							<button class="m-3" @click="insertVariablePrestudent">Insert Variable</button>
-							<p>{{selectedFieldPrestudent}}</p>
 
 						</div>
 
@@ -387,12 +449,10 @@ export default {
 								</list-box>
 
 							</div>
-							<button class="m-3" @click="insertVariablePerson">Insert Variable</button>
-							<p>{{selectedFieldPerson}}</p>
 						</div>
 
 						<div>
-							<strong>Meine Felder</strong>
+							<strong>{{$p.t('messages', 'meineFelder')}}</strong>
 							<div class="border p-3 overflow-auto" style="height: 200px;">
 
 								<list-box
@@ -408,7 +468,6 @@ export default {
 								</list-box>
 
 							</div>
-							<button class="m-3" @click="insertVariableUser">Insert Variable</button>
 						</div>
 
 					</div>
@@ -417,7 +476,7 @@ export default {
 
 				<div class="row mt-4">
 
-					<h4>Vorschau:</h4>
+					<h4>{{ $p.t('global', 'vorschau') }}:</h4>
 					<div>
 						<form-form class="row g-3 mt-2" ref="formPreview">
 
@@ -428,12 +487,19 @@ export default {
 									:label="$p.t('messages/recipient')"
 									v-model="defaultRecipient"
 								>
+									<option :value="null">{{ $p.t('messages', 'recipient') }}...</option>
+									<option
+										v-for="recipient in recipientsArray"
+										:key="recipient.uid"
+										:value="recipient.uid" 
+										>{{recipient.details}}
+									</option>
 								</form-input>
 							</div>
 
 							<div class="col-md-2 mt-4">
 								<br>
-								<button type="button" class="btn bt		n-secondary" @click="showPreview()">Aktualisieren</button>
+								<button type="button" class="btn btn-secondary" @click="showPreview()">{{ $p.t('ui', 'btnAktualisieren') }}</button>
 							</div>
 						</form-form>
 
@@ -454,7 +520,7 @@ export default {
 			<template #footer>
 				<div class="d-grid gap-2 d-md-flex justify-content-md-end">
 
-					<button class="btn btn-secondary" @click="resetForm">Reset All</button>
+					<button class="btn btn-secondary" @click="resetForm">{{$p.t('ui', 'reset')}}</button>
 
 					<button v-if="statusNew" type="button" class="btn btn-primary" @click="sendMessage()">{{$p.t('ui', 'nachrichtSenden')}}</button>
 					<button v-else type="button" class="btn btn-primary" @click="replyMessage(formData.message_id)">{{$p.t('global', 'reply')}}</button>

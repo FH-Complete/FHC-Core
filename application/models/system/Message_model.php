@@ -234,12 +234,15 @@ class Message_model extends DB_Model
 	/**
 	 * Gets messages for a person for tableMessages.
 	 * @param $person_id
-	 * @param null $status message status. by default, latest status is returned
+	 * paginationInitialPage: 1,
+	 * @param $offset number to skip, calculated by tabulatorParam paginationInitialPage and 	paginationSize, refers to specified numer of skipped items
+	 * and page
+	 * @param $limit refers to tabulatorParam paginationSize
 	 * @return array|null
 	 */
-	public function getMessagesForTable($person_id, $status = null)
+	public function getMessagesForTable($person_id, $offset, $limit)
 	{
-		$sql = "
+		$sql_base = "
 			SELECT
 				m.message_id AS message_id,
 				m.subject AS subject,
@@ -275,20 +278,45 @@ class Message_model extends DB_Model
 				 JOIN public.tbl_msg_message m USING(message_id)
 			WHERE r.person_id = ?
 			GROUP BY m.message_id, m.subject, m.body, m.insertamum, m.relationmessage_id, sender, recipient, sender_id, recipient_id
-			ORDER BY insertamum DESC
+				 ";
+		$sql = "
+			SELECT COUNT(*) AS count FROM (
+				" . $sql_base . "
+			) a
 				 ";
 
 		$parametersArray = array($person_id, $person_id);
 
-		return $this->execQuery($sql, $parametersArray);
+		$count = $this->execQuery($sql, $parametersArray);
+
+		if (isError($count))
+			return $count;
+
+		$count = floor(current(getData($count))->count/$limit);
+		$sql = "
+			SELECT * FROM (
+				" . $sql_base . "
+			) a
+			ORDER BY insertamum DESC
+			LIMIT ?
+			OFFSET ?
+				 ";
+
+		$parametersArray = array($person_id, $person_id, $limit, $offset);
+
+		$data = $this->execQuery($sql, $parametersArray);
+
+		if (isError($data))
+			return $data;
+
+		$data = getData($data);
+
+		return success(['data' => $data, 'count' => $count]);
 	}
 
 	/**
-	 * Deletes a messages from tableMessages and tbl_msg_recipient
-	 * TODO(MANU) CHECK IF NECESSARY
-	 * dependency with other tables
-	 * in case of reply... more messages?? delete all dependent ones?
-	 * maybe anonimize it
+	 * Deletes entry in dependency table tbl_msg_recipient
+	 *
 	 * @param $message_id
 	 * @return boolean success
 	 */
@@ -302,7 +330,12 @@ class Message_model extends DB_Model
 		return $this->execQuery($sql, array($message_id));
 	}
 
-
+	/**
+	 * Deletes entry in dependency table tbl_msg_status
+	 *
+	 * @param $message_id
+	 * @return boolean success
+	 */
 	public function deleteMessageStatus($message_id)
 	{
 		$sql = "
@@ -312,7 +345,12 @@ class Message_model extends DB_Model
 
 		return $this->execQuery($sql, array($message_id));
 	}
-
+	/**
+	 * Deletes entry in dependency table tbl_msg_message
+	 *
+	 * @param $message_id
+	 * @return boolean success
+	 */
 	public function deleteMessage($message_id)
 	{
 		$sql = "

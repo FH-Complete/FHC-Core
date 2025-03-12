@@ -1,6 +1,7 @@
 export default {
-	getMessages(url, config, params){
-		return this.$fhcApi.get('api/frontend/v1/messages/messages/getMessages/' + params.id + '/' + params.type);
+	getMessages(url, config, params) {
+		console.log('page ' + params.page + ' size ' + params.size);
+		return this.$fhcApi.get('api/frontend/v1/messages/messages/getMessages/' + params.id + '/' + params.type + '/' + params.size + '/' + params.page);
 	},
 	getVorlagen(){
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getVorlagen/');
@@ -8,8 +9,8 @@ export default {
 	getMsgVarsLoggedInUser(){
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getMsgVarsLoggedInUser/');
 	},
-	getMessageVarsPerson(){
-		return this.$fhcApi.get('api/frontend/v1/messages/messages/getMessageVarsPerson/');
+	getMessageVarsPerson(params){
+		return this.$fhcApi.get('api/frontend/v1/messages/messages/getMessageVarsPerson/' + params.id + '/' + params.type_id);
 	},
 	getMsgVarsPrestudent(params){
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getMsgVarsPrestudent/' + params.id + '/' + params.type_id);
@@ -34,9 +35,14 @@ export default {
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getReplyData/' + messageId);
 	},
 	sendMessage(form, id, data) {
+		console.log("id" + id);
 		return this.$fhcApi.post(form,'api/frontend/v1/messages/messages/sendMessage/' + id,
 			data);
 	},
+/*	sendMessage(id, data) {
+		return this.$fhcApi.post('api/frontend/v1/messages/messages/sendMessage/' + id,
+			data);
+	},*/
 	deleteMessage(messageId){
 		return this.$fhcApi.post('api/frontend/v1/messages/messages/deleteMessage/' + messageId);
 	}

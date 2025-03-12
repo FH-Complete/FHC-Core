@@ -15,30 +15,27 @@ export default {
 			type: String,
 			required: true
 		},
-		//for open in div and modal
-/*		typeId: String,
-		id: {
-			type: [Number, String],
-			required: true
-		},*/
 		openMode: String,
+		tempTypeId: String,
+		tempId: {
+			type: [Number, String],
+			required: false
+		},
+		tempMessageId: {
+			type: Number,
+			required: false,
+		}
 	},
 	computed: {
-		//params with routes for new tab and new window AND props
-/*		id(){
-			return this.$route.params.id || this.id;
-		},
-		typeId(){
-			return this.$route.params.typeId || this.typeId;
-		},*/
+		//params with routes for new tab and new window AND props for inSamePage
 		id(){
-			return this.$route.params.id || this.$props.id;
+			return this.$props.tempId || this.$route.params.id;
 		},
 		typeId(){
-			return this.$route.params.typeId || this.$props.id;
+			return this.$props.tempTypeId || this.$route.params.typeId;
 		},
 		messageId(){
-			return this.$route.params.messageId;
+			return this.$props.tempMessageId ||this.$route.params.messageId;
 		}
 	},
 	data(){
@@ -178,12 +175,15 @@ export default {
 		insertVariable(selectedItem){
 			if (this.editor) {
 				this.editor.insertContent(selectedItem.value + " ");
+			//	this.editor.insertContent(selectedItem.value + ". ");
 				//TODO(Manu) check: Laden von Variblen geht nicht wenn kein Zeichen danach kommt
 				// nicht mal mit Punkt adden gehts ohne eintrag nach vars
-				/*				this.editor.focus();
-								this.editor.setDirty(true);*/
+								//this.editor.focus();
+							//	this.editor.setDirty(true);
 
-				//this.editor.fire('change'); //forces
+				this.editor.setDirty(true);//seting dirty true if changes appear
+			//	console.log(tinyMCE.activeEditor.isDirty());//dirty output  = true
+
 
 				//this.editor.undoManager.add();
 
@@ -219,14 +219,12 @@ export default {
 			}
 		},
 		hideTemplate(){
-			if (this.openMode == "showDiv")
+			if (this.openMode == "inSamePage")
 				this.isVisible = false;
 		},
 		showTemplate(){
-			if (this.openMode == "showDiv")
+			if (this.openMode == "inSamePage")
 				this.isVisible = true;
-			//just for testing:
-			this.isVisible = true;
 		},
 		showPreview(id, typeId){
 			this.getPreviewText(id, typeId).then(() => {
@@ -267,23 +265,26 @@ export default {
 		},
 	},
 	created(){
-		if(this.typeId != 'uid')
-			this.getUid(this.id, this.typeId);
+		this.getUid(this.id, this.typeId);
 
-		if(this.typeId == 'person_id'){
-			this.$fhcApi.factory.messages.person.getMessageVarsPerson()
-				.then(result => {
-					this.fieldsPerson = result.data;
-					this.itemsPerson = Object.entries(this.fieldsPerson).map(([key, value]) => ({
-						label: value,
-						value: '{' + value + '}'
-					}));
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		}
+		if (['person_id', 'mitarbeiter_uid'].includes(this.typeId)){
+				const params = {
+					id: this.id,
+					type_id: this.typeId
+				};
+				this.$fhcApi.factory.messages.person.getMessageVarsPerson(params)
+					.then(result => {
+						this.fieldsPerson = result.data;
+						this.itemsPerson = Object.entries(this.fieldsPerson).map(([key, value]) => ({
+							label: value,
+							value: '{' + value + '}'
+						}));
+					})
+					.catch(this.$fhcAlert.handleSystemError);
+			}
 
-		if(this.typeId == 'uid' || this.typeId == 'prestudent_id') {
-			const params = {
+		if (['prestudent_id', 'uid'].includes(this.typeId)){
+				const params = {
 				id: this.id,
 				type_id: this.typeId
 			};
@@ -291,11 +292,7 @@ export default {
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
-					//Just for testing with inserting values
-					/*					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
-											label: key,
-											value: value
-										}));*/
+
 					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
 						label: key.toLowerCase(),
 						value: '{' + key.toLowerCase() + '}'
@@ -318,11 +315,11 @@ export default {
 		this.$fhcApi.factory.messages.person.getNameOfDefaultRecipient({
 			id: this.id,
 			type_id: this.typeId
-		})
-			.then(result => {
+		}).then(result => {
 				this.defaultRecipient = result.data;
-				this.recipientsArray.push({'uid': this.uid,
-											'details': this.defaultRecipient});
+				this.recipientsArray.push({
+					'uid': this.uid,
+					'details': this.defaultRecipient});
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
@@ -347,13 +344,13 @@ export default {
 	},
 	template: `
 
-	<div class="messages-detail-newmessage">
-			<!--passt für showdiv-->
+	<div class="messages-detail-newmessage-newdiv">
+			<!--passt für inSamePage-->
 <!--			<div class="overflow-auto" style="max-height: 500px; border: 1px solid #ccc;">-->
 
 			<!--new page-->
 			<div v-if="!messageSent" class="overflow-auto m-3">
-				<h4>New Message</h4>
+				<h4>{{ $p.t('messages', 'neueNachricht') }}</h4>
 
 				<div class="row">
 					<div class="col-sm-8">
@@ -411,7 +408,7 @@ export default {
 
 					<div class="col-sm-4">
 						<div v-if="this.fieldsPrestudent.length > 0"  class="mt-3">
-							<strong>Felder Prestudent</strong>
+							<strong>{{$p.t('ui', 'felder')}} {{$p.t('lehre', 'prestudent')}}</strong>
 							<div class="border p-3 overflow-auto" style="height: 250px;">
 
 								<list-box
@@ -453,7 +450,7 @@ export default {
 						</div>
 
 						<div>
-							<strong>Meine Felder</strong>
+							<strong>{{$p.t('messages', 'meineFelder')}}</strong>
 							<div class="border p-3 overflow-auto" style="height: 200px;">
 
 								<list-box
@@ -476,7 +473,7 @@ export default {
 
 						<div class="d-grid gap-2 d-md-flex justify-content-md-end">
 
-							<button class="btn btn-secondary" @click="resetForm">Reset All</button>
+							<button class="btn btn-secondary" @click="resetForm">{{$p.t('ui', 'reset')}}</button>
 
 							<button v-if="statusNew" type="button" class="btn btn-primary" @click="sendMessage()">{{$p.t('ui', 'nachrichtSenden')}}</button>
 							<button v-else type="button" class="btn btn-primary" @click="replyMessage(formData.message_id)">{{$p.t('global', 'reply')}}</button>
@@ -488,18 +485,19 @@ export default {
 
 				<div class="row mt-4">
 
-					<h4>Vorschau:</h4>
+					<h4>{{ $p.t('global', 'vorschau') }}:</h4>
 					<div>
+					
 						<form-form class="row g-3 mt-2" ref="formPreview">
 
-							<div class="col-sm-3 mb-3">
-							
+							<div class="col-sm-2 mb-3">
 								<form-input
 									type="select"
 									name="recipient"
 									:label="$p.t('messages/recipient')"
-									v-model="formData.recipient"
+									v-model="defaultRecipient"
 								>
+									<option :value="null">{{ $p.t('messages', 'recipient') }}...</option>
 									<option 
 										v-for="recipient in recipientsArray"
 										:key="recipient.uid" 
@@ -511,7 +509,7 @@ export default {
 
 							<div class="col-md-2 mt-4">
 								<br>
-								<button type="button" class="btn btn-secondary" @click="showPreview(formData.recipient,'uid')">Aktualisieren</button>
+								<button type="button" class="btn btn-secondary" @click="showPreview(id, typeId)">{{ $p.t('ui', 'btnAktualisieren') }}</button>
 							</div>
 						</form-form>
 
@@ -528,7 +526,7 @@ export default {
 		</div>
 		
 					
-		<div v-else class="container d-flex justify-content-center align-items-center m-3">
+		<div v-if="messageSent && openMode!='inSamePage'" class="container d-flex justify-content-center align-items-center m-3">
 			<div class="card" style="width: 80%">
 			  <div class="card-body alert alert-success text-dar p-5 rounded">
 						<div class="row">
