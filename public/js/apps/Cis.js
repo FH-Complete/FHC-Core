@@ -18,6 +18,7 @@ const app = Vue.createApp({
 				calcheightonly: true,
                 types: [
                     "mitarbeiter",
+					"student",
                     "raum",
                     "organisationunit"
                 ],
@@ -26,13 +27,23 @@ const app = Vue.createApp({
                         defaultaction: {
                             type: "link",
                             action: function(data) {
-                                return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
-                                "/Cis/Profil/View/"+data.uid; 
-                                
-                            }
-                        },
+									return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+										"/Cis/Profil/View/"+data.uid;
+							}
+						},
                         childactions: []
-                    },
+					},
+					student: {
+						defaultaction: {
+							type: "link",
+							action: function (data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									"/Cis/Profil/View/" + data.uid;
+
+							}
+						},
+						childactions: []
+					},
                     raum: {
                         defaultaction: {
                             type: "link",
@@ -103,9 +114,15 @@ const app = Vue.createApp({
     methods: {
         searchfunction: function(searchsettings) {
             return Vue.$fhcapi.search.search(searchsettings);
-        },
+        }
     }
 });
 app.use(FhcApi);
+app.use(primevue.config.default, {
+	zIndex: {
+		overlay: 9000,
+		tooltip: 8000
+	}
+})
 app.use(Phrasen);
 app.mount('#cis-header');

@@ -991,14 +991,17 @@ class DB_Model extends CI_Model
 
 						// Find and replace all the occurrences of the provided encrypted columns
 						// with the postgresql decryption function
-						$query = str_replace(
-							$encryptedColumn,
-							sprintf(
-								self::CRYPT_WHERE_TEMPLATE,
-								$encryptedColumn,
-								$decryptionPassword,
-								$definition[self::CRYPT_CAST]
-							),
+						$query = preg_replace_callback(
+							'/(?<! (as|AS) )\b(\w+\.)?(' . $encryptedColumn . ')\b/',
+							function($matches) use (&$decryptionPassword, &$definition) {
+							    $aliased_column = $matches[2] . $matches[3];
+								return sprintf(
+									self::CRYPT_WHERE_TEMPLATE,
+									$aliased_column,
+									$decryptionPassword,
+									$definition[self::CRYPT_CAST]
+								);
+							},
 							$query
 						);
 					}
@@ -1106,14 +1109,17 @@ class DB_Model extends CI_Model
 						{
 							// Find and replace all the occurrences of the provided encrypted columns
 							// with the postgresql decryption function
-							$where = str_replace(
-								$encryptedColumn,
-								sprintf(
-									self::CRYPT_WHERE_TEMPLATE,
-									$encryptedColumn,
-									$decryptionPassword,
-									$definition[self::CRYPT_CAST]
-								),
+							$where = preg_replace_callback(
+								'/(?<! (as|AS) )\b(\w+\.)?(' . $encryptedColumn . ')\b/',
+								function($matches) use (&$decryptionPassword, &$definition) {
+									$aliased_column = $matches[2] . $matches[3];
+									return sprintf(
+										self::CRYPT_WHERE_TEMPLATE,
+										$aliased_column,
+										$decryptionPassword,
+										$definition[self::CRYPT_CAST]
+									);
+								},
 								$where
 							);
 						}

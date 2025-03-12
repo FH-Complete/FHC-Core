@@ -88,7 +88,7 @@ class Profil extends FHCAPI_Controller
 				$res->data = $this->studentProfil();
 				$res->data->pid = $this->pid;
 			}
-
+			// editing your own profil - true
 			$editAllowed = true;
 		}
 		// UID is availabe when accessing Profil/View/:uid
@@ -495,12 +495,11 @@ class Profil extends FHCAPI_Controller
 	 */
 	private function getPersonInfo($uid, $geburtsInfo = null)
 	{
-		$selectClause = ["foto", "anrede", "titelpost as postnomen", "titelpre as titel", "vorname", "nachname"];
+		$selectClause = ["foto", "foto_sperre", "anrede", "titelpost as postnomen", "titelpre as titel", "vorname", "nachname"];
 		/** @param integer $geburtsInfo */
 		if ($geburtsInfo) {
 			array_push($selectClause, "gebort");
-			array_push($selectClause, "gebdatum");
-			array_push($selectClause, "foto_sperre");
+			array_push($selectClause, "TO_CHAR(gebdatum, 'DD.MM.YYYY') as gebdatum");
 		}
 		$this->BenutzerModel->addSelect($selectClause);
 		$this->BenutzerModel->addJoin("tbl_person", "person_id");
@@ -510,6 +509,12 @@ class Profil extends FHCAPI_Controller
 			show_error("was not able to query the table public.tbl_benutzer:" . getData($person_res));
 		} else {
 			$person_res = hasData($person_res) ? getData($person_res)[0] : null;
+		}
+
+		if( ($person_res->foto === null) || (($this->uid !== $uid) && ($person_res->foto_sperre !== false)) )
+		{
+			$dummy_foto = base64_encode(file_get_contents(DOC_ROOT.'skin/images/profilbild_dummy.jpg'));
+			$person_res->foto = $dummy_foto;
 		}
 
 		return $person_res;
@@ -562,7 +567,7 @@ class Profil extends FHCAPI_Controller
 	 */
 	private function getStudentInfo($uid)
 	{
-		$this->StudentModel->addSelect(['tbl_studiengang.bezeichnung as studiengang', 'tbl_student.semester', 'tbl_student.verband', 'tbl_student.gruppe', 'tbl_student.matrikelnr as personenkennzeichen']);
+		$this->StudentModel->addSelect(['tbl_studiengang.bezeichnung as studiengang', 'tbl_studiengang.studiengang_kz as studiengang_kz', 'tbl_student.semester', 'tbl_student.verband', 'tbl_student.gruppe', 'tbl_student.matrikelnr as personenkennzeichen']);
 		$this->StudentModel->addJoin('tbl_studiengang', "tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz");
 
 		$student_res = $this->StudentModel->load([$uid]);

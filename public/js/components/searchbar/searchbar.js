@@ -12,8 +12,8 @@ export default {
         searchtimer: null,
         hidetimer: null,
         searchsettings: {
-            searchstr: '',
-            types: [],
+            searchstr: this.getSearchStr(),
+            types: this.getSearchTypes(),
         },
         searchresult: [],
         showresult: false,  
@@ -32,12 +32,14 @@ export default {
     },
     template: /*html*/`
           <form ref="searchform" class="d-flex me-3" :class="searchoptions.cssclass" action="javascript:void(0);"
-            @focusin="this.searchfocusin" @focusout="this.searchfocusout">
-
-            <div ref="searchbox" class="h-100 input-group me-2 bg-white">
+		 	 @focusin="this.searchfocusin" @focusout="this.searchfocusout">
+			<div ref="searchbox" class="h-100 input-group me-2 bg-white">
+				<span style="background-color:inherit" class="input-group-text">
+					<i class="fa-solid fa-magnifying-glass"></i>
+				</span>
                 <input @keyup="this.search" @focus="this.showsearchresult"
                     v-model="this.searchsettings.searchstr" class="form-control"
-                    type="search" :placeholder="'Search: '+ searchsettings.types.join(' / ')" aria-label="Search">
+                    type="search" :placeholder="'Search: '+ search_types_string" aria-label="Search">
                 <button data-bs-toggle="collapse" data-bs-target="#searchSettings" aria-expanded="false" aria-controls="searchSettings" ref="settingsbutton"  class="btn btn-outline-secondary" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
             </div>
 
@@ -52,7 +54,7 @@ export default {
                   <div v-else-if="searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
                   <template v-else="" v-for="res in searchresult">
                     <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
-                    <student v-else-if="res.type === 'student'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
+                    <student v-else-if="res.type === 'student' || res.type === 'studentStv'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
                     <prestudent v-else-if="res.type === 'prestudent'" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
                     <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                     <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
@@ -81,12 +83,32 @@ export default {
           </form>
     `,
     watch:{
-        'searchsettings.types': function (newValue){
-            this.search();
-        },
+		'searchsettings.searchstr': function (newSearchValue, oldSearchValue) {
+			sessionStorage.setItem('searchstr',newSearchValue);
+		},
     },
+	computed:{
+		
+		search_types_string(){
+			if (Array.isArray(this.searchsettings.types) && this.searchsettings.types.length > 0){
+				return this.searchsettings.types.join(' / ');
+			}else{
+				return JSON.stringify(this.searchsettings.types);
+			}
+		},
+		
+	},
     beforeMount: function() {
-        this.updateSearchOptions();
+		this.$watch('searchsettings.types', (newValue, oldValue) => {
+			if (Array.isArray(newValue) && newValue.length === 0){
+				this.searchsettings.types = this.allSearchTypes();
+			}
+			// stores the search types in the localstorage, only if the newValue is also an array
+			if(Array.isArray(newValue)){
+				localStorage.setItem('searchtypes', JSON.stringify(newValue));
+			}
+			this.search();
+		});
     },
 	mounted(){
 		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {
@@ -101,6 +123,23 @@ export default {
 		}
 	},
     methods: {
+		getSearchTypes: function () {
+			let result = this.allSearchTypes();
+			if (localStorage.getItem('searchtypes')) {
+				result = JSON.parse(localStorage.getItem('searchtypes'));
+			}
+			return result;
+		},
+		allSearchTypes() {
+			let allTypes = [];
+			for (const idx in this.searchoptions.types) {
+				allTypes.push(this.searchoptions.types[idx]);
+			};
+			return allTypes;
+		},
+		getSearchStr: function(){
+			return sessionStorage.getItem('searchstr') ?? '';
+		},
 		checkSettingsVisibility: function(event) {
 			// hides the settings collapsible if the user clicks somewhere else
 			if (!this.$refs.settings.contains(event.target))
@@ -116,7 +155,7 @@ export default {
 			// removes the event listener checkSettingsVisibility when the collapsible is hidden
 			document.removeEventListener("click", this.checkSettingsVisibility);
 		},
-        updateSearchOptions: function() {
+        allSearchOptions: function() {
             this.searchsettings.types = [];
             for( const idx in this.searchoptions.types ) {
                 this.searchsettings.types.push(this.searchoptions.types[idx]);

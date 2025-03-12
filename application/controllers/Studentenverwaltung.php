@@ -30,7 +30,8 @@ class Studentenverwaltung extends Auth_Controller
 				'admin' => $this->permissionlib->isBerechtigt('admin'),
 				'assistenz_schreibrechte' => $this->permissionlib->isBerechtigt('assistenz','suid'),
 				'student/keine_studstatuspruefung' => $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung'),
-				'lehre/reihungstestAufsicht' => $this->permissionlib->isBerechtigt('lehre/reihungstestAufsicht')
+				'lehre/reihungstestAufsicht' => $this->permissionlib->isBerechtigt('lehre/reihungstestAufsicht'),
+				'system/change_outputformat' => $this->permissionlib->getOE_isEntitledFor('system/change_outputformat'),
 			],
 			'variables' => [
 				'semester_aktuell' => $this->variablelib->getVar('semester_aktuell')

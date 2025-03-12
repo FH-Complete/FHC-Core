@@ -162,36 +162,14 @@ export default {
 	created() {
 		this.$emit('setConfig', false);
 		this.loadEvents();
-		/* axios
-			.get(this.apiurl + '/components/Cis/Stundenplan/Stunden').then(res => {
-				res.data.retval.forEach(std => {
-					this.stunden[std.stunde] = std; // TODO(chris): geht besser
-				});
-				axios
-					.get(this.apiurl + '/components/Cis/Stundenplan')
-					.then(res => {
-						res.data.retval.forEach((el, i) => {
-							el.id = i;
-							el.color = '#' + (el.farbe || 'CCCCCC');
-							el.start = new Date(el.datum + ' ' + this.stunden[el.stunde].beginn);
-							el.end = new Date(el.datum + ' ' + this.stunden[el.stunde].ende);
-							el.title = el.lehrfach;
-							if (el.lehrform)
-								el.title += '-' + el.lehrform;
-						});
-						this.events = res.data.retval || [];
-					})
-					.catch(err => { console.log(err);console.error('ERROR: ', err.response.data) });
-			})
-			.catch(err => { console.error('ERROR: ', err.response.data) }); */
 	},
 	template: /*html*/`
 	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">
 		<lv-modal v-if="selectedEvent" ref="lvmodal" :event="selectedEvent"  />
 		<content-modal :content_id="roomInfoContentID" dialogClass="modal-lg" ref="contentModal"/>
 		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" :widget="true" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" >
-			<template #monthPage="{event,day,isSelected}">
-				<span class="fhc-entry" :class="{'selectedEvent':isSelected}" style="color:white" :style="{'background-color': event.color}">
+			<template #monthPage="{event,day}">
+				<span  >
 					{{event.topic}}
 				</span>
 			</template>
@@ -200,9 +178,9 @@ export default {
 					<div v-if="events === null" class="d-flex h-100 justify-content-center align-items-center">
 						<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 					</div>
-					<template ref="allWeek" v-else-if="allEventsGrouped.size" v-for="([key, value], index) in allEventsGrouped" :key="index" style="margin-top: 8px;">
+					<template v-else-if="allEventsGrouped.size" v-for="([key, value], index) in allEventsGrouped" :key="index" style="margin-top: 8px;">
 						<div class="card-header d-grid p-0">
-							<button class="btn btn-link link-secondary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"})}}</button>
+							<button class="btn btn-link link-secondary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"}, $p.user_locale.value)}}</button>
 						</div>
 						<div role="button" @click="showLvUebersicht(evt)" v-for="evt in value" :key="evt.id" class="list-group-item small" :style="getEventStyle(evt)">
 							<b>{{evt.topic}}</b>
@@ -214,11 +192,11 @@ export default {
 							</small>
 						</div>
 						<div v-if="!value.length" class="list-group-item small text-center">
-							{{ p.t('lehre/noLvFound') }}
+							{{ $p.t('lehre/noLvFound') }}
 						</div>
 					</template>
 					<div v-else class="d-flex h-100 justify-content-center align-items-center fst-italic text-center">
-						{{ p.t('lehre/noLvFound') }}
+						{{ $p.t('lehre/noLvFound') }}
 					</div>
 				</div>
 			</template>

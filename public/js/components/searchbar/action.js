@@ -15,7 +15,7 @@ export default {
     template: `
 		<template v-if="this.renderif()">
 			<a :class="this.cssclass" :href="this.getactionhref()"
-				@click="(this.action.type === 'function') ? this.execaction() : null">
+				@click="this.execaction()">
 				<slot>Action</slot>
 			</a>
 		</template>

@@ -79,6 +79,9 @@
 
 			// Tabulator 5 CSS
 			if ($tabulator5 === true) generateCSSsInclude('public/css/Tabulator5.css');
+			
+			// Tabulator 6 CSS
+			if ($tabulator6 === true) generateCSSsInclude('public/css/Tabulator6.css');
 
 			// Tinymce 5 CSS
 			if ($tinymce5 === true) generateCSSsInclude('public/css/TinyMCE5.css');
@@ -118,6 +121,9 @@
 
 			// CIS
 			if ($cis === true) generateCSSsInclude(defined('CIS4') ? 'public/css/cis4.css' : 'public/css/cis_bs5.css');
+
+			//Tags
+			if ($tags === true) generateCSSsInclude('public/css/tags.css');
 
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS
