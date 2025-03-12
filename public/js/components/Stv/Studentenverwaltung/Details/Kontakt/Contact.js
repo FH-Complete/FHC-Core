@@ -322,7 +322,7 @@ export default{
 						v-model="contactData.kontakttyp">
 					>
 						<option value="">keine Auswahl</option>
-						<option v-for="typ in kontakttypen" :key="typ.kontakttyp_kurzbz" :value="typ.kontakttyp" >{{typ.kontakttyp}}</option>
+						<option v-for="typ in kontakttypen" :key="typ.kontakttyp" :value="typ.kontakttyp">{{typ.beschreibung}}</option>
 					</form-input>
 				</div>
 				

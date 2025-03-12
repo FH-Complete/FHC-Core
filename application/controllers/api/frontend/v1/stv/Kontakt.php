@@ -439,6 +439,7 @@ class Kontakt extends FHCAPI_Controller
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 		$this->terminateWithSuccess((getData($result) ?: []));
+
 	}
 
 	public function getKontakttypen()
@@ -446,13 +447,13 @@ class Kontakt extends FHCAPI_Controller
 		$this->load->model('person/Kontakttyp_model', 'KontakttypModel');
 
 		$result = $this->KontakttypModel->load();
-		if (isError($result)) {
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		else
-		{
-			$this->terminateWithSuccess(getData($result) ?: []);
-		}
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$filteredData = array_filter($data, function ($item) {
+			return $item->kontakttyp !== "hidden";
+		});
+		$this->terminateWithSuccess($filteredData);
 	}
 
 	public function loadContact()
