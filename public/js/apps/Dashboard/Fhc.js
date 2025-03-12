@@ -11,6 +11,7 @@ import CmsNews from "../../components/Cis/Cms/News.js";
 import CmsContent from "../../components/Cis/Cms/Content.js";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
 import RoomInformation, { DEFAULT_MODE_RAUMINFO } from "../../components/Cis/Mylv/RoomInformation.js";
+import Abgabetool from "../../components/Cis/Abgabetool/Abgabetool";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -29,6 +30,12 @@ const router = VueRouter.createRouter({
 			component: Profil,
 			props: true
 		},
+		// {
+		// 	path: `/Cis/Abgabetool`,
+		// 	name: 'Abgabetool',
+		// 	component: Abgabetool,
+		// 	props: true
+		// },
 		{
 			path: `/Cis/Raumsuche`,
 			name: 'Raumsuche',
@@ -203,6 +210,8 @@ const router = VueRouter.createRouter({
 		},
 	]
 })
+
+
 
 const app = Vue.createApp({
 	name: 'FhcApp',

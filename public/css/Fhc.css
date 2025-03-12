@@ -131,8 +131,23 @@
   transition: all 0.2s ease-in-out;
 }
 
-fhcSkipLink:hover {
+.fhcSkipLink:hover {
   background-color: #ffcc00;
   color: #002b80;
   transform: scale(1.05);
+}
+
+.fhc-bullet::before {
+  content: "• ";
+  font-weight: bold;
+  display: inline-block;
+  transform: scale(2);
+}
+
+.fhc-bullet-red::before {
+  color: #ff001e;
+}
+
+.fhc-bullet-green::before {
+  color: #00ff26;
 }

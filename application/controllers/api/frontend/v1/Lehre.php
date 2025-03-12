@@ -31,10 +31,9 @@ class Lehre extends FHCAPI_Controller
 			'lvStudentenMail' => self::PERM_LOGGED,
 			'LV' => self::PERM_LOGGED,
 			'Pruefungen' => self::PERM_LOGGED,
+			'getStudentProjektarbeiten' => self::PERM_LOGGED, // TODO: abgabetool berechtigung?
+			'getStudentProjektabgaben' => self::PERM_LOGGED
 		]);
-
-		
-
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -94,10 +93,36 @@ class Lehre extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($result);
 	}
-	
 
-	
+	public function getStudentProjektabgaben() {
+		$projektarbeit_id = $this->input->get("projektarbeit_id",TRUE);
 
+		$this->load->model('education/Abgabe_model', 'AbgabeModel');
+		$ret = $this->AbgabeModel->getProjektarbeitAbgabetermine($projektarbeit_id);
+
+		
+		$this->terminateWithSuccess($ret);
+	}
+	
+	public function getStudentProjektarbeiten($uid)
+	{
+		$this->load->model('education/Abgabe_model', 'AbgabeModel');
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+		
+		$isZugeteilterBetreuer = count($this->AbgabeModel->checkZuordnung($uid, getAuthUID())->retval) > 0;
+		$ret = $this->AbgabeModel->getStudentProjektarbeitenLegacy($uid);
+		$this->addMeta('legacyQueryRetval', $ret);
+		$this->addMeta('isZugeteilterBetreuer', $isZugeteilterBetreuer);
+		
+		if ($this->MitarbeiterModel->isMitarbeiter(getAuthUID()) && ($isZugeteilterBetreuer)){
+			$projektarbeiten = $this->AbgabeModel->getStudentProjektarbeitenWithBetreuer($uid);
+		} else {
+			$projektarbeiten = $this->AbgabeModel->getStudentProjektarbeitenWithBetreuer(getAuthUID());
+		}
+		
+
+		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));	
+	}
 	
 }
 

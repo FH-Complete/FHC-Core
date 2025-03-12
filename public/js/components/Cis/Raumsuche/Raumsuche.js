@@ -1,7 +1,7 @@
 
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 
-export default {
+export const Raumsuche =  {
 	name: "Raumsuche",
 	props: {
 		
@@ -34,7 +34,7 @@ export default {
 			}),
 			raumsucheTableOptions: {
 				height: Vue.ref(400),
-				index: 'prestudent_id',
+				index: 'ort_kurzbz',
 				layout: 'fitColumns',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
@@ -243,3 +243,5 @@ export default {
 	 />
     `,
 };
+
+export default Raumsuche;

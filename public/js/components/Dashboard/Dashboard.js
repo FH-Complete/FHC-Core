@@ -3,6 +3,7 @@ import DashboardWidgetPicker from "./Widget/Picker.js";
 import ObjectUtils from "../../helpers/ObjectUtils.js";
 
 export default {
+	name: 'Dashboard',
 	components: {
 		DashboardSection,
 		DashboardWidgetPicker

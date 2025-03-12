@@ -18,5 +18,19 @@ export default {
 			`/api/frontend/v1/Lehre/Pruefungen/${lehrveranstaltung_id}`
 			, {}
 		);
+	},
+	getStudentProjektarbeiten(uid) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Lehre/getStudentProjektarbeiten/${uid}`
+			, {}
+		);
+	},
+	getStudentProjektabgaben(detail) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Lehre/getStudentProjektabgaben`
+			, {
+				projektarbeit_id: detail.projektarbeit_id
+			}
+		);
 	}
   }
