@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6143f37d65128b8247e79714204932e7",
+    "content-hash": "4d532e48e895cb864fb89170e18e2a3d",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -956,6 +956,15 @@
             "time": "2020-12-11T09:56:16+00:00"
         },
         {
+            "name": "highcharts/highcharts-dist",
+            "version": "7.1.2",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/highcharts/highcharts-dist/archive/v7.1.2.zip"
+            },
+            "type": "library"
+        },
+        {
             "name": "joeldbirch/superfish",
             "version": "1.7.9",
             "dist": {
@@ -1517,6 +1526,15 @@
             "dist": {
                 "type": "zip",
                 "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/5.5.2.zip"
+            },
+            "type": "library"
+        },
+        {
+            "name": "olifolkerd/tabulator6",
+            "version": "6.3.1",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/6.3.1.zip"
             },
             "type": "library"
         },

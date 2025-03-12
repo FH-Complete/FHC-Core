@@ -13,4 +13,10 @@ export default {
 			, {}
 		);
 	},
+	getStudentPruefungen(lehrveranstaltung_id){
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Lehre/Pruefungen/${lehrveranstaltung_id}`
+			, {}
+		);
+	}
   }

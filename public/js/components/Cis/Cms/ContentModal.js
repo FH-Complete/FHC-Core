@@ -1,5 +1,5 @@
-import BsModal from "../../Bootstrap/Modal";
-import RaumContent from "./Content_types/Raum_contentmittitel";
+import BsModal from "../../Bootstrap/Modal.js";
+import RaumContent from "./Content_types/Raum_contentmittitel.js";
 
 
 export default {

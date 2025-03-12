@@ -55,7 +55,7 @@ class Student extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui'
+			'ui', 'lehre'
 		]);
 	}
 
@@ -223,12 +223,10 @@ class Student extends FHCAPI_Controller
 
 		// Check PKs
 		if (count($update_lehrverband) + count($update_student) && $uid === null) {
-			// TODO(chris): phrase
-			$this->terminateWithValidationErrors(['' => "Kein/e StudentIn vorhanden!"]);
+			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_student')]);
 		}
 		if (count($update_person) && $person_id === null) {
-			// TODO(chris): phrase
-			$this->terminateWithValidationErrors(['' => "Keine Person vorhanden!"]);
+			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_person')]);
 		}
 
 		// Do Updates

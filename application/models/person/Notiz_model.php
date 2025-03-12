@@ -156,10 +156,10 @@ class Notiz_model extends DB_Model
 			$qry = "
 				SELECT 
 						n.*, count(dms_id) as countDoc, z.notizzuordnung_id,
-						TO_CHAR (CASE 
+						(CASE
 							WHEN n.updateamum >= n.insertamum THEN n.updateamum 
 							ELSE n.insertamum
-						END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate,
+						END) AS lastUpdate,
 						regexp_replace(n.text, '<[^>]*>', '', 'g') as text_stripped,
 						TO_CHAR(n.start::timestamp, 'DD.MM.YYYY') AS start_format,
 						TO_CHAR(n.ende::timestamp, 'DD.MM.YYYY') AS ende_format,

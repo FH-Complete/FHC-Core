@@ -106,7 +106,6 @@ class Cms extends FHCAPI_Controller
 		$this->terminateWithSuccess($content_id);
 	}
 
-	//todo: there is the method news and getNews but only one should exist
 	public function news()
 	{
 
@@ -125,25 +124,35 @@ class Cms extends FHCAPI_Controller
 
 		//get the data or terminate with error
 		$news = $this->getDataOrTerminateWithError($news);
-		
+		// array that keeps track of which news don't have a betreff and have to be removed from the news array
+		$newsToRemove = array();
 		// collect the content of the news
-		foreach($news as $news_element){
-			$this->addMeta("content_id",$news_element->content_id);
+		foreach($news as $index=>$news_element){
 			
-			//todo: quick fix, for query builder error when fetching content
 			$this->NewsModel->resetQuery();
 			$content = $this->cmslib->getContent($news_element->content_id);
-
-			$content = getData($content);
-			
-			$news_element->content_obj = $content;
+			if(isError($content))
+			{
+				// removes the news from the news array, so that the response does not include a invalid news
+				array_push($newsToRemove,$index);
+				//add the error to the api response? visual feedback
+				//$this->addError(print_r($content->retval,true));
+				continue;
+			}
+			$content = getData($content);		
+			$news_element->content_obj = $content; 
 		}
+
+		//removes all news that don't have a betreff
+		foreach($newsToRemove as $removeNewsIndex)
+		{
+			unset($news[$removeNewsIndex]);
+		}
+
 		$withContent = function($news) {
 			return $news->content_obj != null;
-		};
-		
+		}; 
 		$newsWithContent = array_filter($news, $withContent);
-
 		$this->terminateWithSuccess($newsWithContent);
         
 	}
@@ -176,15 +185,18 @@ class Cms extends FHCAPI_Controller
 		// getting the GET parameters
 		$page = intval($this->input->get('page', true));
 		$page_size = intval($this->input->get('page_size', true));
+		$sprache = $this->input->get('sprache', true);
+		if(!$sprache)
+		{
+			$sprache = getUserLanguage();
+		}
 
 		// default value for the page_size is 10
 		$page_size = $page_size ?? 10;
 		
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size);
-
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache);
 		$news = $this->getDataOrTerminateWithError($news);
 
-		$this->addMeta('test', $this->p->t('global', 'studiengangsleitung'));
 		$this->addMeta('phrases', json_decode($this->p->getJson()));
 		$this->terminateWithSuccess($news);
 
