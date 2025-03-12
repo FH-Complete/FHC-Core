@@ -241,7 +241,7 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 				<body>
 					$name hat neue Noten für die Lehrveranstaltung\n\n<br>
 					<b>" . $sg->kuerzel . ' ' . $lv->semester . '.Semester
-					' . $lv->bezeichnung . " " . $lv->orgform_kurzbz . " - " . $stsem . "</b>
+					' . $lv->bezeichnung . " - " .$lv->lehrform_kurzbz. " " . $lv->orgform_kurzbz . " - " . $stsem . "</b>
 					<br>eingetragen.\n<br><br>
 					Die Noten können jetzt ins Zeugnis übernommen werden.\n";
 
