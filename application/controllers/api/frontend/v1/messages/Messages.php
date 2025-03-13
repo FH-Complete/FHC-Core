@@ -54,11 +54,6 @@ class Messages extends FHCAPI_Controller
 
 		$data = $this->getDataOrTerminateWithError($result);
 
-		//return null if count == 0
-		if($data['count'] == 0){
-			$this->terminateWithSuccess([]);
-		}
-
 		$this->addMeta('count', $data['count']);
 
 		$this->terminateWithSuccess($data['data']);
