@@ -144,8 +144,8 @@ class StundenplanLib{
 	}
 
 
-	private function expand_object_information($data){
-
+	public function expand_object_information($data){
+		$this->_ci =& get_instance();
 		foreach ($data as $item)
 		{
 
