@@ -60,7 +60,7 @@ if (isset($_GET['uid']))
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($uid);
 
-	if ($rechte->isBerechtigt('admin') || (in_array($_GET['uid'], $untergebenen_arr)))
+	if ($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/zeitsperre') || (in_array($_GET['uid'], $untergebenen_arr)))
 	{
 		$uid = $_GET['uid'];
 	}
@@ -264,6 +264,7 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 				{
 					$phasetoadd = new stdClass();
 					$phasetoadd->bezeichnung = $ppitem->bezeichnung;
+					$phasetoadd->beschreibung = $ppitem->beschreibung;
 					$phasetoadd->stunden = 0;
 					$phasetoadd->alleZeiten = array();
 
@@ -276,8 +277,8 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 					$projektphasen[$ppitem->projektphase_id] = $phasetoadd;
 
 					//add new projektphase to array with unique projekt phase names
-					if (!in_array($ppitem->bezeichnung, $projektphasenames[$ztaufrow->projekt_kurzbz]))
-						$projektphasenames[$ztaufrow->projekt_kurzbz][] = $ppitem->bezeichnung;
+					if (!in_array($ppitem->beschreibung, $projektphasenames[$ztaufrow->projekt_kurzbz]))
+						$projektphasenames[$ztaufrow->projekt_kurzbz][] = $ppitem->beschreibung;
 				}
 			}
 
@@ -407,7 +408,7 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 				$projektmonthsums[$name]->sum += $projekthours;
 				foreach ($projekt->projektphasen as $projektphase)
 				{
-					$projektmonthsums[$name]->projektphasen[$projektphase->bezeichnung] += round($projektphase->stunden, 2, 0);
+					$projektmonthsums[$name]->projektphasen[$projektphase->beschreibung] += round($projektphase->stunden, 2, 0);
 				}
 			}
 			else
@@ -418,7 +419,7 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 
 				foreach ($projekt->projektphasen as $projektphase)
 				{
-					$monthsum->projektphasen[$projektphase->bezeichnung] = round($projektphase->stunden, 2, 0);
+					$monthsum->projektphasen[$projektphase->beschreibung] = round($projektphase->stunden, 2, 0);
 				}
 				$projektmonthsums[$name] = $monthsum;
 			}

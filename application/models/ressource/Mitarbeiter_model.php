@@ -144,10 +144,15 @@ class Mitarbeiter_model extends DB_Model
 	 * Checks if alias exists
 	 * @param $kurzbz
 	 */
-	public function kurzbzExists($kurzbz)
+	public function kurzbzExists($kurzbz, $uid=null)
 	{
 		$this->addSelect('1');
-		$result = $this->loadWhere(array('kurzbz' => $kurzbz));
+		$where = array('kurzbz' => $kurzbz);
+		if ($uid != null)
+		{
+			$where['mitarbeiter_uid<>'] = $uid;
+		}
+		$result = $this->loadWhere($where);
 
 		if (isSuccess($result))
 		{
@@ -171,7 +176,6 @@ class Mitarbeiter_model extends DB_Model
 	 */
 	public function generateKurzbz($uid)
 	{
-		$kurzbz = '';
 		$this->addLimit(1);
 		$this->addSelect('vorname, nachname');
 		$this->addJoin('public.tbl_benutzer', 'tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzer.uid');
@@ -181,25 +185,97 @@ class Mitarbeiter_model extends DB_Model
 		if (hasData($nameresult))
 		{
 			$kurzbzdata = getData($nameresult);
-			$nachname_clean = sanitizeProblemChars($kurzbzdata[0]->nachname);
-			$vorname_clean = sanitizeProblemChars($kurzbzdata[0]->vorname);
+			$genKurzbz = $this->generateKurzbzHelper($kurzbzdata[0]->vorname, $kurzbzdata[0]->nachname);
 
-			for ($nn = 6, $vn = 2; $nn != 0; $nn--, $vn++)
-			{
-				$kurzbz = mb_substr($nachname_clean, 0, $nn);
-				$kurzbz .= mb_substr($vorname_clean, 0, $vn);
+			return $genKurzbz;
+		}
+		return error('No Kurzbezeichnung could be generated');
+	}
 
-				$kurzbzexists = $this->kurzbzExists($kurzbz);
+	public function generateKurzbzHelper($vorname, $nachname)
+	{
+		$nachname_clean = sanitizeProblemChars($nachname);
+		$vorname_clean = sanitizeProblemChars($vorname);
+		$kurzbz = '';
 
-				if (hasData($kurzbzexists) && !getData($kurzbzexists)[0])
-					break;
-			}
+		for ($nn = 6, $vn = 2; $nn != 0; $nn--, $vn++)
+		{
+			$kurzbz = mb_substr($nachname_clean, 0, $nn);
+			$kurzbz .= mb_substr($vorname_clean, 0, $vn);
 
 			$kurzbzexists = $this->kurzbzExists($kurzbz);
 
-			if (hasData($kurzbzexists) && getData($kurzbzexists)[0])
-				return error('No Kurzbezeichnung could be generated');
+			if (hasData($kurzbzexists) && !getData($kurzbzexists)[0])
+				break;
 		}
+
+		$kurzbzexists = $this->kurzbzExists($kurzbz);
+
+		if (hasData($kurzbzexists) && getData($kurzbzexists)[0])
+			return error('No Kurzbezeichnung could be generated');
+	
 		return success($kurzbz);
+	}
+
+	/**
+	 * Search function for mitarbeiter
+	 * @param $filter searchstring: searches for nachname, vorname, mitarbeiter_uid
+	 * $param $mode gives the resultobject in different version:
+	 * 				null : "[mitarbeiter_uid], Nachname, Vorname, (mitarbeiter_uid)"
+	 * 				'mitAkadGrad': "[mitarbeiter_uid], Nachname, Vorname, Titelpre, Titelpost (mitarbeiter_uid)"
+	 *				'ohneMaUid' : "[mitarbeiter_uid], Nachname, Vorname, Titelpre, Titelpost"
+	 * @return object in 3 versions
+	 */
+	public function searchMitarbeiter($filter, $mode=null)
+	{
+		$filter = strtoLower($filter);
+
+		if ($mode == "mitAkadGrad")
+			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+		elseif ($mode == "ohneMaUid")
+			$returnwert = "p.person_id, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre) as mitarbeiter";
+		else
+			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+
+		$qry = "
+			SELECT " . $returnwert . "  
+			FROM 
+			    public.tbl_mitarbeiter ma 
+			JOIN 
+			    public.tbl_benutzer b on (ma.mitarbeiter_uid = b.uid)
+			JOIN 
+			    public.tbl_person p on (p.person_id = b.person_id)
+			WHERE 
+			    lower (p.nachname) LIKE '%". $this->db->escape_like_str($filter)."%'
+			OR
+				lower (p.vorname) LIKE '%". $this->db->escape_like_str($filter)."%'
+			OR
+				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'";
+
+		return $this->execQuery($qry);
+	}
+
+	/**
+	 * Gets Mitarbeiter for a certain Lehrveranstaltung.
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @return array with Mitarbeiter and their Lehreinheiten
+	 */
+	public function getMitarbeiterFromLV($lehrveranstaltung_id){
+	//TODO(manu) maybe filter that in pruefungslist.js ?
+	$qry = "SELECT DISTINCT
+    			lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid 
+			FROM 
+			    lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
+			WHERE 
+			    lehrveranstaltung_id= ?
+			AND 
+				mitarbeiter_uid=uid 
+			AND 
+				tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
+
+		$parametersArray = array($lehrveranstaltung_id);
+
+		return $this->execQuery($qry, $parametersArray);
 	}
 }

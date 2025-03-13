@@ -15,7 +15,7 @@ export default {
               <div class="searchbar_icon">
                 <action :res="this.res" :action="this.actions.defaultaction" @actionexecuted="$emit('actionexecuted')">
                   <img v-if="(typeof res.foto !== 'undefined') && (res.foto !== null)" :src="res.foto" 
-                    class="rounded-circle" height="100" />
+                    class="rounded" style="max-height: 120px; max-width: 90px;" />
                   <i v-else class="fas fa-user-circle fa-5x"></i>
                 </action>
               </div>
@@ -29,8 +29,8 @@ export default {
         
                 <div class="searchbar_table">
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">EMail</div>
-                    <div class="searchbar_tablecell">
+                    <div class="searchbar_tablecell searchbar_label">EMail</div>
+                    <div class="searchbar_tablecell searchbar_value">
                         <a :href="this.mailtourl">
                           {{ res.mail }}
                         </a>

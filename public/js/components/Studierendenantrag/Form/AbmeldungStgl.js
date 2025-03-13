@@ -1,10 +1,16 @@
 import {CoreFetchCmpt} from '../../Fetch.js';
+import CoreForm from '../../Form/Form.js';
+import FormValidation from '../../Form/Validation.js';
+import FormInput from '../../Form/Input.js';
 
 var _uuid = 0;
 
 export default {
 	components: {
-		CoreFetchCmpt
+		CoreFetchCmpt,
+		CoreForm,
+		FormValidation,
+		FormInput
 	},
 	emits: [
 		'setInfos',
@@ -18,10 +24,10 @@ export default {
 		return {
 			data: null,
 			saving: false,
-			errors: {
-				grund: [],
-				default: []
-			}
+			formData: {
+				grund: ''
+			},
+			unrulyInternal: false
 		}
 	},
 	computed: {
@@ -29,36 +35,32 @@ export default {
 			switch (this.data?.status)
 			{
 				case 'Erstellt': return 'info';
-				case 'Genehmigt': return 'success';
-				default: return 'info';
+				case 'Pause':
+				case 'Zurueckgezogen': return 'danger';
+				case 'EinspruchAbgelehnt':
+				case 'Abgemeldet': return 'success';
+				default: return 'warning';
 			}
-		},
-		loadUrl() {
-			if (this.studierendenantragId)
-				return '/components/Antrag/Abmeldung/getDetailsForAntrag/'+
-					this.studierendenantragId;
-			return '/components/Antrag/Abmeldung/getDetailsForNewAntrag/' +
-				this.prestudentId;
 		}
 	},
 	methods: {
 		load() {
-			return axios.get(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				this.loadUrl
-			).then(
-				result => {
-					this.data = result.data.retval;
+			return this.$fhcApi.factory
+				.studstatus.abmeldung.getDetails(this.studierendenantragId, this.prestudentId)
+				.then(result => {
+					this.data = result.data;
 					if (this.data.status) {
+						const msg = (this.data.status == 'Pause' && this.data.status_insertvon == "Studienabbruch") ? Vue.computed(() => {
+							let status = this.$p.t('studierendenantrag/status_stop');
+							return this.$p.t('studierendenantrag', 'status_x', {status});
+						}) : Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp}));
 						this.$emit("setStatus", {
-							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
+							msg,
 							severity: this.statusSeverity
 						});
 					}
 					return result;
-				}
-			);
+				});
 		},
 		createAntrag() {
 			bootstrap.Modal.getOrCreateInstance(this.$refs.modal).hide();
@@ -67,73 +69,70 @@ export default {
 				severity: 'warning'
 			});
 			this.saving = true;
-			for(var k in this.errors)
-				this.errors[k] = [];
-			axios.post(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Abmeldung/createAntrag/', {
-					studiensemester: this.data.studiensemester_kurzbz,
-					prestudent_id: this.data.prestudent_id,
-					grund: this.$refs.grund.value
-				}
-			).then(
-				result => {
-					if (result.data.error)
-					{
-						for (var k in result.data.retval)
-						{
-							if (this.errors[k] !== undefined)
-								this.errors[k].push(result.data.retval[k]);
-							else
-								this.errors.default.push(result.data.retval[k]);
-						}
-						this.$emit('setStatus', {
-							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
-							severity: 'danger'
-						});
-					}
-					else
-					{
-						if (result.data.retval === true)
-							document.location += "";
-						this.data = result.data.retval;
-						if (this.data.status) {
-							this.$emit("setStatus", {
-								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
-								severity: this.statusSeverity
-							});
-						}
-						else
-							this.$emit('setStatus', {
-								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_open')})),
-								severity:'success'
-							});
-					}
-					this.saving = false;
-				}
-			);
-		},
-		appendDropDownText(event){
-			let templateText = this.$refs.grund;
 
-			if(event.target.value)
-			{
-				let templateT= this.$p.t('studierendenantrag', event.target.value);
-				templateText.value = templateT;
-			}
-			else
-				templateText.value = '';
+			this.$refs.form.clearValidation();
+			this.$refs.form.factory
+				.studstatus.abmeldung.create(
+					this.data.studiensemester_kurzbz,
+					this.data.prestudent_id,
+					this.formData.grund
+				)
+				.then(result => {
+
+					if(this.unrulyInternal) {
+						this.$fhcApi.factory.checkperson.updatePersonUnrulyStatus(this.data.person_id, true).then(
+							(res)=> {
+								if(res?.meta?.status === "success") {
+									this.$fhcAlert.alertSuccess(this.$p.t('studierendenantrag', 'antrag_unruly_updated'))
+								}
+							})
+					}
+
+					if (result.data === true)
+						document.location += "";
+					
+					this.data = result.data;
+					if (this.data.status)
+						this.$emit("setStatus", {
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
+							severity: this.statusSeverity
+						});
+					else
+						this.$emit('setStatus', {
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_open')})),
+							severity:'success'
+						});
+					this.saving = false;
+				})
+				.catch(error => {
+					this.$emit('setStatus', {
+						msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
+						severity: 'danger'
+					});
+					this.saving = false;
+					this.$fhcAlert.handleSystemError(error);
+				});
 		},
+		appendDropDownText(event) {
+			this.formData.grund = event.target.value
+				? this.$p.t('studierendenantrag', event.target.value)
+				: '';
+		}
 	},
 	created() {
 		this.uuid = _uuid++;
 	},
+	watch: {
+		'formData.grund'(newVal) {
+			this.unrulyInternal = (newVal === this.$p.t('studierendenantrag', 'textLong_unruly'))
+		}
+	},
 	template: `
 	<div class="studierendenantrag-form-abmeldung">
 		<core-fetch-cmpt :api-function="load">
-			<div class="row">
+			<core-form ref="form" class="row">
 				<div class="col-12">
+					<form-validation></form-validation>
 					<table class="table">
 						<tr>
 							<th>{{$p.t('lehre', 'studiengang')}}</th>
@@ -174,8 +173,7 @@ export default {
 				<div v-else class="col-sm-6 mb-3">
 					<label :for="'studierendenantrag-form-abmeldung-' + uuid + '-grund'" class="form-label">Grund:</label>
 					<div class="mb-2">
-						<select name="grundAv" @change="appendDropDownText
-							($event)">
+						<select name="grundAv" class="form-select" @change="appendDropDownText">
 							<option value="" > --- bitte auswählen, sofern zutreffend ---- </option>
 							<option value="textLong_NichtantrittStudium">{{$p.t('studierendenantrag', 'dropdown_NichtantrittStudium')}}
 							</option>
@@ -190,21 +188,23 @@ export default {
 							<option value="textLong_plageat">{{$p.t('studierendenantrag', 'dropdown_plageat')}}
 							</option>					
 							<option value="textLong_MissingZgv">{{$p.t('studierendenantrag', 'dropdown_MissingZgv')}}
-							</option>						
+							</option>	
+<!--
+							<option value="textLong_unruly">{{$p.t('studierendenantrag', 'dropdown_unruly')}}
+							</option>
+-->
 						</select>	
-					</div>			
-					<textarea
-						class="form-control"
-						:class="{'is-invalid': errors.grund.length}"
+					</div>
+					<form-input
+						type="textarea"
+						v-model="formData.grund"
+						name="grund"
 						:id="'studierendenantrag-form-abmeldung-' + uuid + '-grund'"
 						rows="5"
 						:disabled="saving"
-						ref="grund"
 						required
-						></textarea>
-					<div v-if="errors.grund.length" class="invalid-feedback">
-						{{errors.grund.join(".")}}
-					</div>
+						>
+					</form-input>
 				</div>
 				
 				<div class="col-12 text-end">
@@ -250,7 +250,7 @@ export default {
 						</div>
 					</div>
 				</div>
-			</div>
+			</core-form>
 			
 			<template v-slot:error="{errorMessage}">
 				<div class="alert alert-danger m-0" role="alert">
@@ -258,6 +258,5 @@ export default {
 				</div>
 			</template>
 		</core-fetch-cmpt>
-	</div>
-	`
+	</div>`
 }

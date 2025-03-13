@@ -219,9 +219,17 @@
 		<!ENTITY menu-dokumente-antrag-abmeldung.label	"Abmeldung">
 		<!ENTITY menu-dokumente-antrag-abmeldung.accesskey	"A">
 
+		<!ENTITY menu-dokumente-antrag-abmeldungstgl.key		"S">
+		<!ENTITY menu-dokumente-antrag-abmeldungstgl.label	"Abmeldung durch Stgl">
+		<!ENTITY menu-dokumente-antrag-abmeldungstgl.accesskey	"S">
+
 		<!ENTITY menu-dokumente-antrag-unterbrechung.key		"U">
 		<!ENTITY menu-dokumente-antrag-unterbrechung.label	"Unterbrecher">
 		<!ENTITY menu-dokumente-antrag-unterbrechung.accesskey	"U">
+
+		<!ENTITY menu-dokumente-antrag-wiederholung.key		"W">
+		<!ENTITY menu-dokumente-antrag-wiederholung.label	"Abmeldung durch Ablauf der Wiederholungsfrist">
+		<!ENTITY menu-dokumente-antrag-wiederholung.accesskey	"W">
 
 		<!ENTITY menu-dokumente-ausbildungsvertrag.key		"A">
 		<!ENTITY menu-dokumente-ausbildungsvertrag.label	"Ausbildungsvertrag Deutsch">

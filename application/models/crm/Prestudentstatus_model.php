@@ -5,6 +5,15 @@ class Prestudentstatus_model extends DB_Model
 
 	const STATUS_ABBRECHER = 'Abbrecher';
 	const STATUS_UNTERBRECHER = 'Unterbrecher';
+	const STATUS_STUDENT = 'Student';
+	const STATUS_DIPLOMAND = 'Diplomand';
+	const STATUS_ABSOLVENT = 'Absolvent';
+	const STATUS_BEWERBER = 'Bewerber';
+	const STATUS_AUFGENOMMENER = 'Aufgenommener';
+	const STATUS_WARTENDER = 'Wartender';
+	const STATUS_ABGEWIESENER = 'Abgewiesener';
+	const STATUS_INTERESSENT = 'Interessent';
+	const STATUS_INCOMING = 'Incoming';
 
 	/**
 	 * Constructor
@@ -15,6 +24,77 @@ class Prestudentstatus_model extends DB_Model
 		$this->dbTable = 'public.tbl_prestudentstatus';
 		$this->pk = array('ausbildungssemester', 'studiensemester_kurzbz', 'status_kurzbz', 'prestudent_id');
 		$this->hasSequence = false;
+	}
+
+	/**
+	 * loadWhereUid
+	 * 
+	 * loads all rows for a student_uid
+	 * 
+	 * @param string			$uid
+	 * @param array 			$where Optional. Default empty array
+	 * @param boolean 			$withPrestudent Optional. Default true
+	 * 
+	 * @return stdClass
+	 */
+	public function loadWhereUid($uid, $where = null, $withPrestudent = false)
+	{
+		$this->addSelect($this->dbTable . '.*');
+		$this->addJoin('public.tbl_student', 'prestudent_id');
+
+		if ($withPrestudent) {
+			$this->addJoin('public.tbl_prestudent s', 'prestudent_id');
+			$this->addSelect('s.aufmerksamdurch_kurzbz');
+			$this->addSelect('s.person_id');
+			$this->addSelect('s.studiengang_kz');
+			$this->addSelect('s.berufstaetigkeit_code');
+			$this->addSelect('s.ausbildungcode');
+			$this->addSelect('s.zgv_code');
+			$this->addSelect('s.zgvort');
+			$this->addSelect('s.zgvdatum');
+			$this->addSelect('s.zgvmas_code');
+			$this->addSelect('s.zgvmaort');
+			$this->addSelect('s.zgvmadatum');
+			$this->addSelect('s.aufnahmeschluessel');
+			$this->addSelect('s.facheinschlberuf');
+			$this->addSelect('s.reihungstest_id');
+			$this->addSelect('s.anmeldungreihungstest');
+			$this->addSelect('s.reihungstestangetreten');
+			$this->addSelect('s.rt_gesamtpunkte');
+			$this->addSelect('s.bismelden');
+			$this->addSelect('s.dual');
+			$this->addSelect('s.rt_punkte1');
+			$this->addSelect('s.rt_punkte2');
+			$this->addSelect('s.ausstellungsstaat');
+			$this->addSelect('s.rt_punkte3');
+			$this->addSelect('s.zgvdoktor_code');
+			$this->addSelect('s.zgvdoktorort');
+			$this->addSelect('s.zgvdoktordatum');
+			$this->addSelect('s.mentor');
+			$this->addSelect('s.zgvnation');
+			$this->addSelect('s.zgvmanation');
+			$this->addSelect('s.zgvdoktornation');
+			$this->addSelect('s.gsstudientyp_kurzbz');
+			$this->addSelect('s.aufnahmegruppe_kurzbz');
+			$this->addSelect('s.udf_values');
+			$this->addSelect('s.priorisierung');
+			$this->addSelect('s.foerderrelevant');
+			$this->addSelect('s.standort_code');
+			$this->addSelect('s.zgv_erfuellt');
+			$this->addSelect('s.zgvmas_erfuellt');
+			$this->addSelect('s.zgvdoktor_erfuellt');
+		}
+
+
+		$this->addOrder('datum');
+		$this->addOrder('insertamum');
+
+		if (!$where)
+			$where = [];
+
+		$where['student_uid'] = $uid;
+
+		return $this->loadWhere($where);
 	}
 
 	/**
@@ -267,7 +347,7 @@ class Prestudentstatus_model extends DB_Model
 		return $this->loadWhere($where);
 	}
 
-	public function loadLastWithStgDetails($prestudent_id, $studiensemester_kurzbz = null)
+	public function loadLastWithStgDetails($prestudent_id, $studiensemester_kurzbz = null, $max_date = null)
 	{
 		$this->load->config('studierendenantrag');
 
@@ -280,6 +360,7 @@ class Prestudentstatus_model extends DB_Model
 		$this->addSelect('ss.studienjahr_kurzbz');
 		$this->addSelect('pers.vorname');
 		$this->addSelect('pers.nachname');
+		$this->addSelect('pers.unruly');
 		$this->addSelect('TRIM(CONCAT(pers.vorname, \' \', pers.nachname)) AS name');
 		$this->addSelect('pers.person_id');
 		$this->addSelect('g.studiengang_kz');
@@ -304,7 +385,8 @@ class Prestudentstatus_model extends DB_Model
 
 		$this->addLimit(1);
 
-		$this->db->where_in($this->dbTable . '.status_kurzbz', $this->config->item('antrag_prestudentstatus_whitelist'));
+		if ($max_date)
+			$this->db->where($this->dbTable . '.insertamum <', $max_date);
 
 		$whereArr = [
 			$this->dbTable . '.prestudent_id' => $prestudent_id,
@@ -329,13 +411,249 @@ class Prestudentstatus_model extends DB_Model
 	 */
 	public function withGrund($statusgrund_kurzbz)
 	{
-		if($statusgrund_kurzbz)
+		if ($statusgrund_kurzbz)
 			$this->db->set(
 				'statusgrund_id',
-				'(SELECT statusgrund_id FROM public.tbl_status_grund WHERE statusgrund_kurzbz =' . $this->db->escape($statusgrund_kurzbz) .')',
+				'(SELECT statusgrund_id FROM public.tbl_status_grund WHERE statusgrund_kurzbz=' . $this->db->escape($statusgrund_kurzbz) . ')',
 				false
 			);
 
 		return $this;
+	}
+
+	/**
+	 * Check if there is only one prestudentstatus left
+	 *
+	 * @param integer					$prestudent_id
+	 * @param string					$studiensemester_kurzbz
+	 *
+	 * @return stdClass
+	 */
+	public function checkIfLastStatusEntry($prestudent_id, $studiensemester_kurzbz = null)
+	{
+		$this->addSelect('COUNT(*) AS anzahl', false);
+
+		if ($studiensemester_kurzbz)
+			$this->db->where('studiensemester_kurzbz', $studiensemester_kurzbz);
+
+		$result = $this->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
+
+		if (isError($result))
+			return $result;
+
+		$resultObject = current($result->retval);
+
+		$anzahl = (int)$resultObject->anzahl;
+
+		if ($anzahl <= 1)
+			return success(true, $this->p->t('lehre', 'error_lastRole'));
+
+		return success(false, $this->p->t('lehre', 'anzahl_existingRoles', ['anzahl' => $anzahl]));
+	}
+
+	public function getAllPrestudentstatiWithStudiensemester($prestudent_id)
+	{
+		$qry = "
+				SELECT
+					tbl_prestudentstatus.status_kurzbz,
+					tbl_prestudentstatus.studiensemester_kurzbz,
+					tbl_prestudentstatus.ausbildungssemester,
+					tbl_prestudentstatus.datum,
+					s.start AS studiensemester_start,
+					pl.orgform_kurzbz AS studienplan_orgform_kurzbz,
+					stud.matrikelnr,
+					pers.vorname,
+					pers.nachname
+				FROM
+					public.tbl_prestudentstatus
+					JOIN public.tbl_studiensemester s USING (studiensemester_kurzbz)
+					JOIN public.tbl_prestudent USING (prestudent_id)
+					JOIN public.tbl_person pers USING (person_id)
+					LEFT JOIN public.tbl_student stud USING (prestudent_id)
+					LEFT JOIN lehre.tbl_studienplan pl USING (studienplan_id)
+				WHERE
+					prestudent_id = ?
+				ORDER BY
+					public.tbl_prestudentstatus.datum DESC,
+					public.tbl_prestudentstatus.insertamum DESC,
+					public.tbl_prestudentstatus.ext_id DESC
+		";
+
+		return $this->execQuery($qry, array($prestudent_id));
+	}
+
+	/**
+	 * Gets status history of a prestudent
+	 * This function uses the language of the logged in user to
+	 * translate the given statusgrund
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return stdClass
+	 */
+	public function getHistoryPrestudent($prestudent_id)
+	{
+		$lang= getUserLanguage();
+		$this->addSelect('tbl_prestudentstatus.prestudent_id');
+		$this->addSelect('tbl_prestudentstatus.status_kurzbz');
+		$this->addSelect('tbl_prestudentstatus.studiensemester_kurzbz');
+		$this->addSelect('tbl_prestudentstatus.ausbildungssemester');
+		$this->addSelect('tbl_prestudentstatus.datum');
+		$this->addSelect('tbl_prestudentstatus.insertamum');
+		$this->addSelect('tbl_prestudentstatus.insertvon');
+		$this->addSelect('tbl_prestudentstatus.updateamum');
+		$this->addSelect('tbl_prestudentstatus.updatevon');
+		$this->addSelect('tbl_prestudentstatus.orgform_kurzbz');
+		$this->addSelect('tbl_prestudentstatus.bestaetigtam');
+		$this->addSelect('tbl_prestudentstatus.bestaetigtvon');
+		$this->addSelect('tbl_prestudentstatus.bewerbung_abgeschicktamum');
+		$this->addSelect('tbl_prestudentstatus.anmerkung');
+		$this->addSelect('plan.studienplan_id');
+		$this->addSelect('plan.bezeichnung');
+
+		$this->addSelect('grund.beschreibung[(
+			SELECT index 
+			FROM public.tbl_sprache 
+			WHERE sprache=' . $this->escape($lang) . '
+		)] AS statusgrund_bezeichnung', false);
+		$this->addSelect("CASE 
+			WHEN s.student_uid IS NOT NULL 
+			AND tbl_prestudentstatus.status_kurzbz IN (" . implode(",", $this->escape([
+				'Student',
+				'Diplomand',
+				'Abbrecher',
+				'Absolvent',
+				'Ausserodentlicher',
+				'Incoming',
+				'Outgoing',
+				'Unterbrecher'
+			])) . ") 
+			THEN lv.semester || lv.verband || lv.gruppe 
+			ELSE '-'
+			END AS lehrverband", false);
+
+
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+		$this->addJoin('public.tbl_status_grund grund', 'statusgrund_id', 'LEFT');
+		$this->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
+		$this->addJoin(
+			'public.tbl_studentlehrverband lv',
+			's.student_uid IS NOT NULL AND s.student_uid=lv.student_uid AND tbl_prestudentstatus.studiensemester_kurzbz=lv.studiensemester_kurzbz',
+			'LEFT'
+		);
+
+		$this->addOrder('tbl_prestudentstatus.datum', 'DESC');
+		$this->addOrder('tbl_prestudentstatus.insertamum', 'DESC');
+		$this->addOrder('tbl_prestudentstatus.ext_id', 'DESC');
+
+		return $this->loadWhere([
+			'tbl_prestudentstatus.prestudent_id' => $prestudent_id
+		]);
+	}
+
+	/**
+	 * Gets status history of a prestudent for checking purposes.
+	 * This function adds the new state or replaces the edited.
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param DateTime				$new_date
+	 * @param string				$new_studiensemester_kurzbz
+	 * @param integer				$new_ausbildungssemester
+	 * @param string				$old_studiensemester_kurzbz
+	 * @param integer				$old_ausbildungssemester
+	 *
+	 * @return stdClass
+	 */
+	public function getHistoryWithNewOrEditedState(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester
+	) {
+		$new_date = $new_date->format('Y-m-d');
+
+		$this->addSelect('status_kurzbz');
+		$this->addSelect('studiensemester_kurzbz');
+		$this->addSelect('ausbildungssemester');
+		$this->addSelect('datum');
+		$this->addSelect('insertamum');
+		$this->addSelect('ext_id');
+
+		if ($old_studiensemester_kurzbz || $old_ausbildungssemester) {
+			$this->db->not_group_start();
+			$this->db->where('status_kurzbz', $status_kurzbz);
+			$this->db->where('studiensemester_kurzbz', $old_studiensemester_kurzbz);
+			$this->db->where('ausbildungssemester', $old_ausbildungssemester);
+			$this->db->group_end();
+		}
+
+		$this->db->where('prestudent_id', $prestudent_id);
+
+		$tmpTable = $this->db->get_compiled_select($this->dbTable);
+
+		$tmpTable .= "UNION
+			SELECT " .
+				$this->escape($status_kurzbz) . " AS status_kurzbz, " .
+				$this->escape($new_studiensemester_kurzbz) . " AS studiensemester_kurzbz, " .
+				$this->escape($new_ausbildungssemester) . " AS ausbildungssemester, " .
+				$this->escape($new_date) . "::date AS datum," .
+				$this->escape(date('c')) . "::date AS insertamum," .
+				"NULL AS ext_id";
+
+		$this->addJoin('public.tbl_studiensemester sem', 'studiensemester_kurzbz');
+
+		$this->addOrder('s.datum', 'DESC');
+		$this->addOrder('s.insertamum', 'DESC');
+		$this->addOrder('s.ext_id', 'DESC');
+
+		$dbTable = $this->dbTable;
+		$this->dbTable = "(" . $tmpTable . ") s";
+
+		$result = $this->load();
+
+		$this->dbTable = $dbTable;
+
+		return $result;
+	}
+
+	/**
+	 * For checks if Orgform of Student status and Bewerber status match.
+	 * Returns any Bewerber status that does not match the first Student
+	 * status' Orgform.
+	 *
+	 * @param integer				$prestudent_id
+	 *
+	 * @return stdClass
+	 */
+	public function getBewerberWhereOrgformNotStudent($prestudent_id)
+	{
+		$this->addSelect('plan.orgform_kurzbz');
+
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+
+		$this->addOrder('tbl_prestudentstatus.datum', 'DESC');
+		$this->addOrder('tbl_prestudentstatus.insertamum', 'DESC');
+		$this->addOrder('tbl_prestudentstatus.ext_id', 'DESC');
+
+		$this->addLimit(1);
+
+		$this->db->where('prestudent_id', $prestudent_id);
+		$this->db->where('status_kurzbz', self::STATUS_STUDENT);
+
+		$sql = $this->db->get_compiled_select($this->dbTable);
+
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+
+		$this->db->where('plan.orgform_kurzbz !=', '(' . $sql . ')', false);
+		return $this->loadWhere([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => self::STATUS_BEWERBER
+		]);
 	}
 }

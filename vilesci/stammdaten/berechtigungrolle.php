@@ -31,11 +31,12 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('basis/berechtigung'))
-	die('Sie habe keine Rechte um diese Seite anzuzeigen');
-
+	die($rechte->errormsg);
+//echo '<pre>', var_dump($_POST), '</pre>';exit();
 $rolle_kurzbz = filter_input(INPUT_GET, 'rolle_kurzbz');
 $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 $copy = filter_input(INPUT_POST, 'copy');
+$saveRecht = isset($_POST['action']) && $_POST['action'] == 'saveRechtAjax' ? true : false;
 $vergleich = filter_input(INPUT_GET, 'vergleich');
 ?>
 <html>
@@ -157,13 +158,135 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 				else
 					return true;
 			}
+
+			function saveRecht(rolle_kurzbz, recht, art)
+			{
+				data = {
+					action: 'saveRechtAjax',
+					rolle_ajax: rolle_kurzbz,
+					recht_ajax: recht,
+					art_ajax: art
+				};
+
+				$.ajax({
+					url: 'berechtigungrolle.php',
+					data: data,
+					type: 'POST',
+					dataType: 'json',
+					success: function(data)
+					{
+						if(data.status!='ok')
+						{
+							//error
+							console.log('error');
+						}
+						else
+						{
+							//location.reload(true);
+							window.location.reload(true)
+							// html = '<td style=""></td><td style="">'+recht+'</td><td style="text-align: right;">'+art+'</td>';
+							// console.log('#'+rolle_kurzbz+'_'+recht);
+							// $('#'+rolle_kurzbz+'_'+recht).html(html);
+						}
+					},
+					error: function(data)
+					{
+						//error
+						console.log('AJAX-Fehler in Error-Methode: ' + data.status + ' - ' + data.error);
+
+						location.reload(true);
+					},
+					stop: function (data)
+					{
+						location.reload(true);
+					}
+				});
+			}
 		</script>
+		<style>
+			button
+			{
+				line-height: 9pt;
+			}
+			table.tablesorter tr:hover td
+			{
+				/*pointer-events: none !important;*/
+			}
+			table.tablesorter tr.odd:hover td
+			{
+				background-color: #d3d3d3 !important;
+			}
+			table.tablesorter tr.even:hover td
+			{
+				background-color: #efefef !important;
+			}
+			table.tablesorter tr.odd:hover td.difference
+			{
+				background-color: #b2b2b2 !important;
+				/*border-top: 1px solid #aaa;*/
+				/*border-bottom: 1px solid #aaa;*/
+			}
+			table.tablesorter tr.even:hover td.difference
+			{
+				background-color: #b2b2b2 !important;
+				/*border-top: 1px solid #aaa;*/
+				/*border-bottom: 1px solid #aaa;*/
+			}
+			.difference
+			{
+				background-color: #b2b2b2 !important;
+				border-top: 1px solid #aaa;
+				border-bottom: 1px solid #aaa;
+			}
+			/*.difference:hover*/
+			/*{*/
+			/*	background-color: #b2b2b2 !important;*/
+			/*	border-top: 1px solid #aaa;*/
+			/*	border-bottom: 1px solid #aaa;*/
+			/*}*/
+			.tablesorter
+			{
+				border-collapse: collapse !important;
+			}
+		</style>
 	</head>
 
 	<body class="background_main">
 
 
 	<?php
+
+	if($saveRecht)
+	{
+		$rolle_kurzbz = filter_input(INPUT_POST, 'rolle_ajax');
+		$recht = filter_input(INPUT_POST, 'recht_ajax');
+		$art = filter_input(INPUT_POST, 'art_ajax');
+
+		$berechtigung = new berechtigung();
+		$berechtigung->rolle_kurzbz = $rolle_kurzbz;
+		$berechtigung->berechtigung_kurzbz = $recht;
+		$berechtigung->art = $art;
+		$berechtigung->insertamum = date('Y-m-d H:i:s');
+		$berechtigung->insertvon = $user;
+
+		if($berechtigung->saveRolleBerechtigung())
+		{
+			echo json_encode(array(
+						'status' => 'ok',
+						'msg' => ''
+					));
+			exit();
+		}
+		else
+		{
+			echo json_encode(array(
+						'status' => 'error',
+						'msg' => 'Fehler beim Speichern der Rolle'
+					));
+			exit();
+		}
+	}
+
 	if(isset($rolle_kurzbz))
 	{
 		echo '<h2>Berechtigungen der Rolle "'.$rolle_kurzbz.'"</h2>';
@@ -335,35 +458,46 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 											<tr>
 												<th>Kurzbz</th>
 												<th>Art</th>
+												<th>&nbsp;</th>
 											</tr>
 											</thead>
 											<tbody>';
 
 											foreach ($rollenGesamt AS $recht => $art)
 											{
-												if (array_key_exists($recht, $rollen1Arr))
+												if (array_key_exists($recht, $rollen1Arr) || !array_key_exists($recht, $rollen2Arr))
 												{
 													if ($art != $rollen1Arr[$recht])
 													{
-														echo '	<tr>
-																	<td style="border: 1px solid transparent">'.$recht.'</td>
-																	<td style="border: 1px solid black">'.$rollen1Arr[$recht].'</td>
+														echo '	<tr id="'.$rolle1.'_'.$recht.'">
+																	<td style="">'.$recht.'</td>
+																	<td class="difference">'.$rollen1Arr[$recht].'</td>
+																	<td style="text-align: right;"><button type="button" onclick="saveRecht(\''.$rolle2.'\', \''.$recht.'\', \''.$rollen1Arr[$recht].'\')"> -> </button></td>
+																</tr>';
+													}
+													elseif (!array_key_exists($recht, $rollen2Arr))
+													{
+														echo '	<tr id="'.$rolle1.'_'.$recht.'">
+																	<td style="">'.$recht.'</td>
+																	<td style="">'.$art.'</td>
+																	<td style="text-align: right;"><button type="button" onclick="saveRecht(\''.$rolle2.'\', \''.$recht.'\', \''.$rollen1Arr[$recht].'\')"> -> </button></td>
 																</tr>';
 													}
 													else
 													{
-														echo '	<tr>
-																	<td style="border: 1px solid transparent">'.$recht.'</td>
-																	<td style="border: 1px solid transparent">'.$art.'</td>
+														echo '	<tr id="'.$rolle1.'_'.$recht.'">
+																	<td style="">'.$recht.'</td>
+																	<td style="">'.$art.'</td>
+																	<td style="text-align: right;"></td>
 																</tr>';
 													}
-
 												}
 												else
 												{
-													echo '	<tr>
-																<td style="border: 1px solid black; border-right: 0">&nbsp;</td>
-																<td style="border: 1px solid black; border-left: 0">&nbsp;</td>
+													echo '	<tr id="'.$rolle1.'_'.$recht.'">
+																<td class="difference" style="">&nbsp;</td>
+																<td class="difference"style="">&nbsp;</td>
+																<td class="difference"style=" text-align: right;"></td>
 															</tr>';
 												}
 											}
@@ -395,6 +529,7 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 								echo '	<table id="t4" class="tablesorter">
 											<thead>
 											<tr>
+												<th>&nbsp;</th>
 												<th>Kurzbz</th>
 												<th>Art</th>
 											</tr>
@@ -402,28 +537,39 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 											<tbody>';
 								foreach ($rollenGesamt AS $recht => $art)
 								{
-									if (array_key_exists($recht, $rollen2Arr))
+									if (array_key_exists($recht, $rollen2Arr) || !array_key_exists($recht, $rollen1Arr))
 									{
 										if ($art != $rollen2Arr[$recht])
 										{
-											echo '	<tr>
-														<td style="border: 1px solid transparent">'.$recht.'</td>
-														<td style="border: 1px solid black">'.$rollen2Arr[$recht].'</td>
+											echo '	<tr id="'.$rolle2.'_'.$recht.'">
+														<td style="text-align: left;"><button type="button" onclick="saveRecht(\''.$rolle1.'\', \''.$recht.'\', \''.$rollen2Arr[$recht].'\')"> <- </button></td>
+														<td style="">'.$recht.'</td>
+														<td class="difference" style="">'.$rollen2Arr[$recht].'</td>
+													</tr>';
+										}
+										elseif (!array_key_exists($recht, $rollen1Arr))
+										{
+											echo '	<tr id="'.$rolle2.'_'.$recht.'">
+														<td style="text-align: left;"><button type="button" onclick="saveRecht(\''.$rolle1.'\', \''.$recht.'\', \''.$rollen2Arr[$recht].'\')"> <- </button></td>
+														<td style="">'.$recht.'</td>
+														<td style="">'.$art.'</td>														
 													</tr>';
 										}
 										else
 										{
-											echo '	<tr>
-														<td style="border: 1px solid transparent">'.$recht.'</td>
-														<td style="border: 1px solid transparent">'.$art.'</td>
+											echo '	<tr id="'.$rolle2.'_'.$recht.'">
+														<td style="">&nbsp;</td>
+														<td style="">'.$recht.'</td>
+														<td style="">'.$art.'</td>
 													</tr>';
 										}
 									}
 									else
 									{
-										echo '	<tr>
-													<td style="border: 1px solid black; border-right: 0">&nbsp;</td>
-													<td style="border: 1px solid black; border-left: 0">&nbsp;</td>
+										echo '	<tr id="'.$rolle2.'_'.$recht.'">
+													<td class="difference" style=""></td>
+													<td class="difference" style="">&nbsp;</td>
+													<td class="difference" style="">&nbsp;</td>
 												</tr>';
 									}
 								}

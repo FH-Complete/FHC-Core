@@ -1081,77 +1081,6 @@ if ($punkteUebertragen)
 						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Gesamtpunkte eingetragen.';
 					}
 				}
-
-				$zuBewerberMachen = filter_input(INPUT_POST, 'zuBewerberMachen', FILTER_VALIDATE_BOOLEAN);
-				// Wenn zuBewerberMachen true ist, wird der Prestudent auch zum Bewerber gemacht
-				if ($zuBewerberMachen)
-				{
-					$prestudent = new prestudent($array['prestudent_id']);
-
-					// Checken, ob schon Bewerberstatus vorhanden ist
-					if (!$prestudent->load_rolle($array['prestudent_id'], 'Bewerber', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
-					{
-						// Checken, ob Abgewiesener-Status vorhanden ist
-						if (!$prestudent->load_rolle($array['prestudent_id'], 'Abgewiesener', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
-						{
-							// Um einen Bewerberstatus zu setzen, muss "reihungstestangetreten" true sein
-							if ($prestudent->reihungstestangetreten == true)
-							{
-								// Um einen Bewerberstatus zu setzen, muss die ZGV ausgefüllt sein
-								if ($prestudent->zgv_code != '')
-								{
-									$studiengang = new studiengang($prestudent->studiengang_kz);
-									// Bei Mastern muss auch die ZGV-Master ausgefüllt sein
-									if ($studiengang->typ == 'm' && $prestudent->zgvmas_code == '')
-									{
-										$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es muss zuerst eine Master-ZGV eingetragen sein.';
-									}
-									else
-									{
-										$prestudent->new = true;
-										$prestudent->prestudent_id = $array['prestudent_id'];
-										$prestudent->status_kurzbz = 'Bewerber';
-										$prestudent->studiensemester_kurzbz = $prestudentrolle->studiensemester_kurzbz;
-										$prestudent->ausbildungssemester = $prestudentrolle->ausbildungssemester;
-										$prestudent->datum = date('Y-m-d');
-										$prestudent->insertamum = date('Y-m-d H:i:s');
-										$prestudent->insertvon = $user;
-										$prestudent->orgform_kurzbz = $prestudentrolle->orgform_kurzbz;
-										$prestudent->bestaetigtam = '';
-										$prestudent->bestaetigtvon = '';
-										$prestudent->bewerbung_abgeschicktamum = '';
-										$prestudent->studienplan_id = $prestudentrolle->studienplan_id;
-
-										if (!$prestudent->save_rolle())
-										{
-											$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].': '.$prestudent->errormsg;
-										}
-										else
-										{
-											$count_success_bewerber++;
-										}
-									}
-								}
-								else
-								{
-									$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es muss zuerst eine ZGV eingetragen sein.';
-								}
-							}
-							else
-							{
-								$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Zuerst muss "Reihungstestverfahren absolviert" gesetzt sein.';
-							}
-						}
-						else
-						{
-							$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es ist bereits ein Abgewiesener-Status vorhanden';
-						}
-					}
-					else
-					{
-						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits einen Bewerberstatus';
-					}
-				}
 			}
 		}
 
@@ -2440,30 +2369,7 @@ else
 		{
 			$("#uebertragenOptions").toggle(300);
 		});
-		
-		if($("#uebertragenOptionGesamtpunkte").not(":checked"))
-		{
-			$("#div_checkbox_bewerber").addClass("disabled");
-			$("#div_checkbox_bewerber").find("label").addClass("text-muted");
-			$("#div_checkbox_bewerber").find("label").prop("title", "Erst \"Gesamtpunkte\" und \"Reihungsverfahren absolviert\" setzen");
-			$("#uebertragenOptionBewerber").prop("disabled", true);
-		}
-		$("#uebertragenOptionGesamtpunkte").on("click", function(e) 
-		{
-			if($(this).is(":checked"))
-			{
-				$("#div_checkbox_bewerber").removeClass("disabled");
-				$("#div_checkbox_bewerber").find("label").removeClass("text-muted");
-				$("#uebertragenOptionBewerber").prop("disabled", false);
-			}
-			else
-			{
-				$("#div_checkbox_bewerber").addClass("disabled");
-				$("#div_checkbox_bewerber").find("label").addClass("text-muted");
-				$("#div_checkbox_bewerber").find("label").prop("title", "Erst \"Gesamtpunkte\" und \"Reihungsverfahren absolviert\" setzen");
-				$("#uebertragenOptionBewerber").prop("disabled", true);
-			}
-		});
+	
 	});
 	
 	function deleteResult(prestudent_id, gebiet_id, name, gebiet_bezeichnung)
@@ -2505,12 +2411,13 @@ else
 			});
 		}
 	}
-	function prueflingEntSperren(person_id, name, art)
+	function prueflingEntSperren(element)
 	{
-		if (art === true)
-			var text = "sperren";
-		else if (art === false)
-			var text = "entsperren";
+	 	var person_id = element.getAttribute("data-person-id");
+		var name = element.getAttribute("data-person-name");
+		var art = element.getAttribute("data-art") === "true";
+
+		let text = art ? "sperren" : "entsperren";
 
 		if (confirm("Wollen Sie den Studenten "+ name + " wirklich " + text + "?"))
 		{
@@ -2859,15 +2766,9 @@ else
 	{
 		var prestudentPunkteArr = [];
 		var gesamtpunkteSetzen = false;
-		var zuBewerberMachen = false;
 		if ($("input.prestudentCheckbox:checked").length === 0)
 		{
 			alert("Bitte wählen Sie mindestens einen Eintrag aus der Liste");
-			return false;
-		}
-		else if ($("#uebertragenOptionBewerber:checked").length === 1 && $("#uebertragenOptionGesamtpunkte:checked").length !== 1)
-		{
-			alert("Um den Bewerberstatus setzen zu können, muss \"Gesamtpunkte\" und \"Reihungsverfahren absolviert\" gesetzt sein");
 			return false;
 		}
 		else
@@ -2886,15 +2787,10 @@ else
 			{
 				gesamtpunkteSetzen = true;
 			}
-			if ($("#uebertragenOptionBewerber:checked").length === 1)
-			{
-				zuBewerberMachen = true;
-			}
 			
 			data = {
 				prestudentPunkteArr: prestudentPunkteArr,
 				gesamtpunkteSetzen: gesamtpunkteSetzen,
-				zuBewerberMachen: zuBewerberMachen,
 				punkteUebertragen: true
 			};
 	
@@ -3246,8 +3142,9 @@ else
 				<div class="checkbox">
 				  <label><input type="checkbox" id="uebertragenOptionGesamtpunkte" value="">"Gesamtpunkte" und "Reihungsverfahren absolviert" setzen</label>
 				</div>
+				<!---Deprecated: Bewerberstatus wird über einen Cronjob gesetzt-->
 				<div id="div_checkbox_bewerber" class="checkbox">
-				  <label class="checkbox_bewerber"><input type="checkbox" id="uebertragenOptionBewerber" value="">Zu Bewerber machen</label>
+				  <label class="checkbox_bewerber text-muted"><input type="checkbox" id="uebertragenOptionBewerber" disabled value="">Zu Bewerber machen</label>
 				</div>
 				<button type="button" class="btn btn-success" onclick="punkteUebertragen()" id="punkteUebertragenButton">Jetzt übertragen</button>
 			</div>
@@ -3383,10 +3280,18 @@ else
 
 
 				echo "<td class='textcentered ".$inaktiv ."'>
-						<a href='#' class='prueflingsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt === true) ? " hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->person_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", true)'>
+						<a href='#' class='prueflingsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt === true) ? " hidden" : "") ."' 
+							data-person-id='".$erg->person_id."' 
+							data-person-name='".htmlspecialchars($erg->vorname . " " . $erg->nachname, ENT_QUOTES, 'UTF-8')."' 
+							data-art='true' 
+							onclick='prueflingEntSperren(this)'>
 							<span class='glyphicon glyphicon-remove'></span>
 						</a>
-						<a href='#' class='prueflingentsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt !== true ? " hidden" : "")) . "' onclick='prueflingEntSperren(" . $erg->person_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", false);'>
+						<a href='#' class='prueflingentsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt !== true ? " hidden" : "")) . "' 
+							data-person-id='".$erg->person_id."' 
+							data-person-name='".htmlspecialchars($erg->vorname . " " . $erg->nachname, ENT_QUOTES, 'UTF-8')."' 
+							data-art='false' 
+							onclick='prueflingEntSperren(this)'>
 							<span class='glyphicon glyphicon-ok'></span>
 						</a>
 					</td>";

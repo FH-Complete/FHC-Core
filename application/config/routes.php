@@ -50,7 +50,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples: my-controller/index -> my_controller/index
 |   my-controller/my-method -> my_controller/my_method
 */
-$route['default_controller'] = 'Vilesci';
+$route['default_controller'] = defined('CIS4') && CIS4 ? 'Cis4' : 'Vilesci';
 $route['translate_uri_dashes'] = FALSE;
 
 // Class name conflicts
@@ -60,6 +60,8 @@ $route['api/v1/organisation/[G|g]eschaeftsjahr/(:any)'] = 'api/v1/organisation/g
 $route['api/v1/organisation/[O|o]rganisationseinheit/(:any)'] = 'api/v1/organisation/organisationseinheit2/$1';
 $route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
 $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
+
+$route['Cis/Stundenplan/.*'] = 'Cis/Stundenplan/index/$1';
 
 // load routes from extensions
 $subdir = 'application/config/extensions';
@@ -82,4 +84,3 @@ if ($dirlist)
 		}
 	}
 }
-

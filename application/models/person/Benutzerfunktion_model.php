@@ -51,6 +51,53 @@ class Benutzerfunktion_model extends DB_Model
 	}
 
 	/**
+	 * Lädt alle Benutzerfunktionen zu einer UID im Zeitraum eines Studiensemesters
+	 *
+	 * @param string						$uid
+	 * @param string						$stdsem
+	 * @param string						$funktion_kurzbz (optional)
+	 *
+	 * @return stdClass
+	 */
+	public function getBenutzerFunktionByUidInStdsem($uid, $stdsem, $funktion_kurzbz = null)
+	{
+		$stdsemEscaped = $this->escape($stdsem);
+		$this->addSelect($this->dbTable . ".*");
+		$this->addSelect("oe.bezeichnung AS organisationseinheit_bezeichnung");
+		$this->addSelect("oe.organisationseinheittyp_kurzbz");
+
+		$this->addJoin("public.tbl_organisationseinheit oe", "oe_kurzbz");
+
+		$this->db->where("uid", $uid);
+		
+		if ($funktion_kurzbz !== null)
+			$this->db->where("funktion_kurzbz", $funktion_kurzbz);
+
+		$this->db->group_start();
+		$this->db->where("datum_bis IS NULL");
+		$this->db->or_where("datum_bis >=", "(
+			SELECT start 
+			FROM public.tbl_studiensemester 
+			WHERE studiensemester_kurzbz = " . $stdsemEscaped . "
+		)", false);
+		$this->db->group_end();
+
+		$this->db->group_start();
+		$this->db->where("datum_von IS NULL");
+		$this->db->or_where("datum_von <=", "(
+			SELECT ende 
+			FROM public.tbl_studiensemester 
+			WHERE studiensemester_kurzbz = " . $stdsemEscaped . "
+		)", false);
+		$this->db->group_end();
+
+		$this->addOrder("datum_bis", "NULLS LAST");
+		$this->addOrder("datum_von", "NULLS LAST");
+
+		return $this->load();
+	}
+
+	/**
 	 * Get the Benutzerfunktion using the person_id
 	 */
 	public function getActiveFunctionsByPersonId($person_id)
@@ -147,6 +194,38 @@ class Benutzerfunktion_model extends DB_Model
 		return $this->execQuery($query, $parametersArray);
 	}
 
+	/**
+	 * Gets all Benutzer with details for a given Benutzerfunktion and optionally specified Oe and semester
+	 * 
+	 * @param string			$funktion_kurzbz
+	 * @param string			$oe_kurzbz
+	 * @param integer | null	$semester
+	 * @return array|null
+	 */
+	public function getBenutzerFunktionenDetailed($funktion_kurzbz, $oe_kurzbz = null, $semester = null)
+	{
+		$this->addSelect($this->dbTable . '.funktion_kurzbz, ' . $this->dbTable . '.oe_kurzbz, ' . $this->dbTable . '.semester, ' . $this->dbTable . '.bezeichnung, f.beschreibung, b.uid, b.alias, b.aktiv, p.vorname, p.nachname, p.titelpre, p.titelpost, m.telefonklappe, k.kontakt, o.planbezeichnung');
+		$this->addJoin('public.tbl_funktion f', 'funktion_kurzbz');
+		$this->addJoin('public.tbl_benutzer b', 'uid');
+		$this->addJoin('public.tbl_person p', 'person_id');
+		$this->addJoin('public.tbl_mitarbeiter m', 'mitarbeiter_uid=uid', 'LEFT');
+		$this->addJoin('public.tbl_kontakt k', 'k.standort_id=m.standort_id AND kontakttyp=\'telefon\'', 'LEFT');
+		$this->addJoin('public.tbl_ort o', 'ort_kurzbz', 'LEFT');
+
+		$this->addOrder('LOWER(uid)');
+
+		$where = [$this->dbTable . '.funktion_kurzbz' => $funktion_kurzbz];
+		if ($oe_kurzbz !== null)
+			$where[$this->dbTable . '.oe_kurzbz'] = $oe_kurzbz;
+		if ($semester !== null)
+			$where[$this->dbTable . '.semester'] = $semester;
+
+		$this->db->where('(' . $this->dbTable . '.datum_bis >= NOW() OR ' . $this->dbTable . '.datum_bis IS NULL)', NULL, FALSE);
+		$this->db->where('(' . $this->dbTable . '.datum_von <= NOW() OR ' . $this->dbTable . '.datum_von IS NULL)', NULL, FALSE);
+
+		return $this->loadWhere($where);
+	}
+
     /**
      * Get active Studiengangsleitung(en) of the user by UID.
      * @param $uid
@@ -180,4 +259,60 @@ class Benutzerfunktion_model extends DB_Model
 
         return $this->execQuery($query, $parameters_array);
     }
+
+
+	public function insertBenutzerfunktion($Json)
+	{
+		unset($Json['benutzerfunktion_id']);
+        unset($Json['updateamum']);
+        $Json['insertvon'] = getAuthUID();
+        $Json['insertamum'] = $this->escape('NOW()');
+
+		if ($Json['datum_bis']=='')
+		{
+			unset($Json['datum_bis']);
+		}
+
+        $result = $this->insert($Json);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        $record = $this->load($result->retval);
+
+        return $record;
+	}
+
+	function updateBenutzerfunktion($funktionJson)
+    {
+        $funktionJson['updatevon'] = getAuthUID();
+        $funktionJson['updateamum'] = $this->escape('NOW()');
+
+        $result = $this->update($funktionJson['benutzerfunktion_id'], $funktionJson);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        $result = $this->load($funktionJson['benutzerfunktion_id']);
+
+        return $result;
+    }
+	
+	function deleteBenutzerfunktion($funktionJson)
+    {
+        $result = $this->delete($funktionJson);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        return success($funktionJson);
+    }
+
+
 }

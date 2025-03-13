@@ -266,6 +266,8 @@ define('BIS_FUNKTIONSCODE_6_ARR', array(
 
 // bPk Abfrage
 define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);
+// bPk Typen in Form 'BEREICH' => 'kennzeichenTyp'
+define('VBPK_TYPES', array('AS' => 'vbpkAs', 'BF' => 'vbpkBf', 'ZP-TD' => 'vbpkTd'));
 
 // Docsbox configs
 define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
@@ -283,7 +285,7 @@ define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
 			'StudiengebuehrRestzahlung' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrRestzahlung'),
 			'OEH' => array('OEH')
 	))
-));
+);
 
 // Spezialnoten die am Zeunigs und Diplomasupplement ignoriert werden
 define('ZEUGNISNOTE_NICHT_ANZEIGEN',serialize(array('iar', 'nz')));
@@ -294,5 +296,18 @@ define ('DEFAULT_LEHRMODUS','regulaer');
 
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,110]);
+
+//Buchungstypen die fix auf eine bestimmte Kostenstelle gebucht werden sollen
+//Buchungstyp => Studiengang_kz
+define('FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE', serialize(
+	array(
+		'Test_1' => 0,
+		'Test_2' => 2
+	)
+));
+
+//Studierende mit diesen Noten werden von der AnzahlStudenten im Tempus abgezogen 
+define('NICHT_ZUGELASSENE',serialize(array(6)));
+
 
 ?>

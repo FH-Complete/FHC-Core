@@ -14,7 +14,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$id = $_GET['id'];
 
 		$where = " WHERE studierendenantrag_id = " . $db->db_add_param($id) . "
-					AND a.typ = 'AbmeldungStgl' AND campus.get_status_studierendenantrag(a.studierendenantrag_id) IN ('Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt');";
+					AND a.typ = 'AbmeldungStgl' AND campus.get_status_studierendenantrag(a.studierendenantrag_id) IN ('Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt', 'Abgemeldet');";
 		$not_found_error = 'Studierendenantrag not found'. $id;
 	} elseif(isset($_GET['uid']) && isset($_GET['prestudent_id'])) {
 		$uid = $_GET['uid'];
@@ -26,7 +26,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$prestudent_id  = (array_filter($prestudent_id, 'strlen'));
 
 		$where = " WHERE  a.prestudent_id in (" . $db->db_implode4SQL($prestudent_id) . ")
-					AND a.typ = 'AbmeldungStgl' AND campus.get_status_studierendenantrag(a.studierendenantrag_id) IN ('Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt');";
+					AND a.typ = 'AbmeldungStgl' AND campus.get_status_studierendenantrag(a.studierendenantrag_id) IN ('Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt', 'Abgemeldet');";
 		$not_found_error = 'Studierendenantrag not found for: ' . implode(',', $uid);
 	} else
 		die('<error>wrong parameters</error>');
@@ -36,7 +36,7 @@ else
 
 
 $query = "
-	SELECT stg.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, public.get_absem_prestudent(a.prestudent_id, NULL) AS semester, a.grund
+	SELECT stg.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, pss.ausbildungssemester AS semester, pss.bestaetigtam, a.grund
 	FROM
 	campus.tbl_studierendenantrag a
 	JOIN public.tbl_student USING (prestudent_id)
@@ -56,15 +56,17 @@ if (!$db->db_query($query) || !$db->db_num_rows())
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <antraege>
 	<?php while($row = $db->db_fetch_object()) { ?>
-        <antrag>
-            <name><![CDATA[<?= trim($row->vorname . ' ' . $row->nachname); ?>]]></name>
-            <studiengang><![CDATA[<?= $row->bezeichnung; ?>]]></studiengang>
-            <organisationsform><![CDATA[<?= $row->bezeichnung_mehrsprachig; ?>]]></organisationsform>
-            <personenkz><![CDATA[<?= $row->matrikelnr; ?>]]></personenkz>
-            <studienjahr><![CDATA[<?= $row->studienjahr_kurzbz; ?>]]></studienjahr>
-            <studiensemester><![CDATA[<?= $row->studiensemester_kurzbz; ?>]]></studiensemester>
-            <semester><![CDATA[<?= $row->semester; ?>]]></semester>
-            <grund><![CDATA[<?= $row->grund; ?>]]></grund>
+		<?php $abmeldedatum = new DateTime($row->bestaetigtam); ?>
+		<antrag>
+			<name><![CDATA[<?= trim($row->vorname . ' ' . $row->nachname); ?>]]></name>
+			<studiengang><![CDATA[<?= $row->bezeichnung; ?>]]></studiengang>
+			<organisationsform><![CDATA[<?= $row->bezeichnung_mehrsprachig; ?>]]></organisationsform>
+			<personenkz><![CDATA[<?= $row->matrikelnr; ?>]]></personenkz>
+			<studienjahr><![CDATA[<?= $row->studienjahr_kurzbz; ?>]]></studienjahr>
+			<studiensemester><![CDATA[<?= $row->studiensemester_kurzbz; ?>]]></studiensemester>
+			<semester><![CDATA[<?= $row->semester; ?>]]></semester>
+			<abmeldedatum><![CDATA[<?= $abmeldedatum->format('d.m.Y'); ?>]]></abmeldedatum>
+			<grund><![CDATA[<?= $row->grund; ?>]]></grund>
 	</antrag>
 	<?php } ?>
 </antraege>

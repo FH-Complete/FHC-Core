@@ -177,45 +177,63 @@ class Zeugnisnote_model extends DB_Model
 			$params[] = $studiensemester_kurzbz;
 		}
 
-		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid,
-					   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, punkte, uebernahmedatum, benotungsdatum,
-					   vw_student_lehrveranstaltung.ects, vw_student_lehrveranstaltung.semesterstunden,
-					   tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
-					   tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id,
-					   vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
-					   vw_student_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
-					   tbl_note.bezeichnung as note_bezeichnung,
-					   tbl_note.positiv as note_positiv,
-					   tbl_zeugnisnote.bemerkung as bemerkung,
-					   vw_student_lehrveranstaltung.sort,
-					   vw_student_lehrveranstaltung.zeugnis,
-					   vw_student_lehrveranstaltung.studiengang_kz,
-					   vw_student_lehrveranstaltung.lv_lehrform_kurzbz,
-					   tbl_lehrveranstaltung.sws
-				FROM
-				(
-					campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote
-						ON(uid=student_uid
-						   AND vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_zeugnisnote.studiensemester_kurzbz
-						   AND vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
-						  )
-				) LEFT JOIN lehre.tbl_note USING(note)
-				JOIN lehre.tbl_lehrveranstaltung ON(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
-				WHERE true $where
+		$qry = "SELECT
+			a.*,
+			lv.lehrform_kurzbz AS lehrveranstaltung_lehrform,
+			lv.kurzbz AS lehrveranstaltung_kurzbz,
+			UPPER(stg1.typ || stg1.kurzbz) AS studiengang,
+			s.studiengang_kz AS studiengang_kz,
+			UPPER(stg2.typ || stg2.kurzbz) AS studiengang_lv,
+			lv.studiengang_kz AS studiengang_kz_lv,
+			lv.semester AS semester_lv,
+			lv.ects AS ects_lv,
+			lv.zeugnis,
+			lv.bezeichnung_english AS lehrveranstaltung_bezeichnung_english
+		FROM (
+			SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid,
+				   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, punkte, uebernahmedatum, benotungsdatum,
+				   vw_student_lehrveranstaltung.ects, vw_student_lehrveranstaltung.semesterstunden,
+				   tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
+				   tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id,
+				   vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
+				   vw_student_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
+				   tbl_note.bezeichnung as note_bezeichnung,
+				   tbl_note.positiv as note_positiv,
+				   tbl_zeugnisnote.bemerkung as bemerkung,
+				   vw_student_lehrveranstaltung.sort,
+				   vw_student_lehrveranstaltung.zeugnis,
+				   vw_student_lehrveranstaltung.studiengang_kz,
+				   vw_student_lehrveranstaltung.lv_lehrform_kurzbz,
+				   tbl_lehrveranstaltung.sws
+			FROM
+			(
+				campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote
+					ON(uid=student_uid
+					   AND vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_zeugnisnote.studiensemester_kurzbz
+					   AND vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
+					  )
+			) LEFT JOIN lehre.tbl_note USING(note)
+			JOIN lehre.tbl_lehrveranstaltung ON(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
+			WHERE true $where
 
-				UNION
-				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note, punkte,
-					uebernahmedatum, benotungsdatum,lehre.tbl_lehrveranstaltung.ects,lehre.tbl_lehrveranstaltung.semesterstunden, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
-					tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, lehre.tbl_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
-					tbl_note.bezeichnung as note_bezeichnung, tbl_note.positiv as note_positiv, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.studiengang_kz,
-					tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.sws
-				FROM
-					lehre.tbl_zeugnisnote
-					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
-					JOIN lehre.tbl_note USING(note)
-				WHERE true $where2
+			UNION
+			SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note, punkte,
+				uebernahmedatum, benotungsdatum,lehre.tbl_lehrveranstaltung.ects,lehre.tbl_lehrveranstaltung.semesterstunden, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
+				tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, lehre.tbl_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
+				tbl_note.bezeichnung as note_bezeichnung, tbl_note.positiv as note_positiv, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.studiengang_kz,
+				tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.sws
+			FROM
+				lehre.tbl_zeugnisnote
+				JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+				JOIN lehre.tbl_note USING(note)
+			WHERE true $where2
 
-				ORDER BY sort";
+			ORDER BY sort
+		) a
+		LEFT JOIN public.tbl_student s ON (a.uid = s.student_uid)
+		LEFT JOIN public.tbl_studiengang stg1 ON (s.studiengang_kz = stg1.studiengang_kz)
+		LEFT JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
+		LEFT JOIN public.tbl_studiengang stg2 ON (lv.studiengang_kz = stg2.studiengang_kz)";
 
 		return $this->execQuery($qry, $params);
 	}
