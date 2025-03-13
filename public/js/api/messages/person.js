@@ -34,15 +34,14 @@ export default {
 	getReplyData(messageId){
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getReplyData/' + messageId);
 	},
-	sendMessage(form, id, data) {
-		console.log("id" + id);
+	sendMessageFromModalContext(form, id, data) {
 		return this.$fhcApi.post(form,'api/frontend/v1/messages/messages/sendMessage/' + id,
 			data);
 	},
-/*	sendMessage(id, data) {
+	sendMessage(id, data) {
 		return this.$fhcApi.post('api/frontend/v1/messages/messages/sendMessage/' + id,
 			data);
-	},*/
+	},
 	deleteMessage(messageId){
 		return this.$fhcApi.post('api/frontend/v1/messages/messages/deleteMessage/' + messageId);
 	}

@@ -23,11 +23,11 @@ export default {
 		}, */
 		isAdmin: {
 			type: Boolean,
-			required: true
+			required: false
 		},
 		useLoggedInUserOe: {
 			type: Boolean,
-			required: true
+			required: false
 		}
 	},
 	data() {

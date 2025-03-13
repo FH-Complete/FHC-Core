@@ -120,10 +120,8 @@ class Messages extends FHCAPI_Controller
 	public function getMessageVarsPerson($id, $typeId)
 	{
 		$person_id = ($typeId == 'mitarbeiter_uid') ? $this->_getPersonId($id, $typeId) : $id;
-		$result = $this->MessageModel->getMessageVarsPerson($person_id);
-
+		$result = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
 		$data = $this->getDataOrTerminateWithError($result);
-
 
 		$this->terminateWithSuccess($data);
 	}
@@ -131,9 +129,7 @@ class Messages extends FHCAPI_Controller
 	public function getMsgVarsPrestudent($id, $typeId)
 	{
 		$prestudent_id = ($typeId == 'uid') ? $this->_getPrestudentIdFromUid($id) : $id;
-
 		$result = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
-
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);

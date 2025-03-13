@@ -92,7 +92,6 @@ export default {
 			this.formData.body = value;
 		},
 		sendMessage() {
-			//TODO(Manu) check default recipient(s)
 			const data = new FormData();
 			const params = {
 				id: this.id,
@@ -104,13 +103,10 @@ export default {
 			};
 			data.append('data', JSON.stringify(merged));
 
-			return this.$fhcApi.factory.messages.person.sendMessage(
+			return this.$fhcApi.factory.messages.person.sendMessageFromModalContext(
 				this.$refs.formMessage,
 				this.uid,
 				data)
-/*			return this.$fhcApi.factory.messages.person.sendMessage(
-				this.uid,
-				data)*/
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideModal('modalNewMessage');
@@ -125,13 +121,8 @@ export default {
 				);
 		},
 		getVorlagentext(vorlage_kurzbz){
-			//console.log(typeof vorlage_kurzbz);
 			return this.$fhcApi.factory.messages.person.getVorlagentext(vorlage_kurzbz)
 				.then(response => {
-					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
-					//this.hideModal('modalNewMessage');
-					//this.resetForm();
-					//TODO(Manu) CHECK
 					this.formData.body = response.data;
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -234,8 +225,6 @@ export default {
 		},
 		'formData.vorlage_kurzbz': {
 			handler(newVal){
-				//	console.log("Vorlage: " + newVal);
-
 				if (newVal && newVal != null) {
 					this.formData.subject = newVal;
 					return this.getVorlagentext(newVal);
@@ -274,9 +263,10 @@ export default {
 			this.$fhcApi.factory.messages.person.getMessageVarsPerson(params)
 				.then(result => {
 					this.fieldsPerson = result.data;
-					this.itemsPerson = Object.entries(this.fieldsPerson).map(([key, value]) => ({
-						label: value,
-						value: '{' + value + '}'
+					const person = this.fieldsPerson[0];
+					this.itemsPerson = Object.entries(person).map(([key, value]) => ({
+						label: key.toLowerCase(),
+						value: '{' + key.toLowerCase() + '}'
 					}));
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -315,11 +305,9 @@ export default {
 			type_id: this.typeId})
 			.then(result => {
 				this.defaultRecipient = result.data;
-			//	console.log("check " + this.uid + "|" + this.defaultRecipient);
 				this.recipientsArray.push({
 					'uid': this.uid,
 					'details': this.defaultRecipient});
-			//	console.log(JSON.stringify(this.recipientsArray));
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
@@ -399,13 +387,13 @@ export default {
 							</div>
 
 							<div class="row">
-								<DropdownComponent
+								<dropdown-component
 									ref="dropdownComp"
 									:label="$p.t('global/vorlage')"
 									@change="handleSelectedVorlage"
 									useLoggedInUserOe
 								>
-								</DropdownComponent>
+								</dropdown-component>
 							</div>
 
 						</form-form>
@@ -528,7 +516,5 @@ export default {
 			</template>
 
 		</bs-modal>
-
-	</div>
 	`,
 }

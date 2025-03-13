@@ -1,18 +1,10 @@
 import TableMessages from "./Details/TableMessages.js";
-//import NewMessage from "./Details/NewMessage.js";
 import FormOnly from "./Details/NewMessage/NewDiv.js";
-import FhcApi from "../../../../public/js/plugin/FhcApi.js";
-import Phrasen from "../../../../public/js/plugin/Phrasen.js";
-
-//TODO(Manu) Only if openMode == modal
 import MessageModal from "../Messages/Details/NewMessage/Modal.js";
 export default {
 	components: {
 		TableMessages,
-	//	NewMessage,
 		FormOnly,
-		FhcApi,
-		Phrasen,
 		MessageModal
 	},
 	inject: {
@@ -145,7 +137,7 @@ export default {
 		</message-modal>
 		
 		<!--in same page-->
-		<div v-if="isVisibleDiv">
+		<div v-if="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
 			<form-only
 				ref="templateNewMessage"
 				:temp-type-id="typeId"

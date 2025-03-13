@@ -104,7 +104,6 @@ export default {
 			this.formData.body = value;
 		},
 		sendMessage() {
-			//TODO(Manu) check default recipient(s)
 			const data = new FormData();
 
 			const params = {
@@ -118,42 +117,34 @@ export default {
 			};
 			data.append('data', JSON.stringify(merged));
 
-			//this.uid is important for existing sendFunction
+			//this.uid is necessary for existing sendFunction
 			return this.$fhcApi.factory.messages.person.sendMessage(
-				this.$refs.formMessage,
 				this.uid,
 				data)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
-					//this.hideModal('messageModal');
 					this.hideTemplate();
 					this.resetForm();
+					this.messageSent = true;
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-						//this.resetForm();
-						//closeModal
-						//closewindwo
-					this.messageSent = true;
-					//TODO(Manu) hier route definieren? ist kein child sondern mit route aufgerufen
+					//TODO(Manu) hier route definieren für openmode in Tab, Page?
+					// ist kein child sondern mit route aufgerufen
 					//würde allerdings neues fenster aktualisiert öffnen, altes bleibt ohne reload gleich
 					//Reload vorheriges tab???
+					if(this.openMode == "inSamePage"){
 						this.$emit('reloadTable');
+						}
 					}
 				);
 		},
 		getVorlagentext(vorlage_kurzbz){
 			return this.$fhcApi.factory.messages.person.getVorlagentext(vorlage_kurzbz)
 				.then(response => {
-					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
-					//this.hideModal('messageModal');
-					//this.resetForm();
-					//TODO(Manu) CHECK
 					this.formData.body = response.data;
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					//this.resetForm();
-					//closeModal
-					//closewindwo
 				});
 		},
 		getPreviewText(id, typeId){
@@ -168,8 +159,6 @@ export default {
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					//this.resetForm();
-					//closeModal
-					//closewindwo
 				});
 		},
 		insertVariable(selectedItem){
@@ -275,9 +264,10 @@ export default {
 				this.$fhcApi.factory.messages.person.getMessageVarsPerson(params)
 					.then(result => {
 						this.fieldsPerson = result.data;
-						this.itemsPerson = Object.entries(this.fieldsPerson).map(([key, value]) => ({
-							label: value,
-							value: '{' + value + '}'
+						const person = this.fieldsPerson[0];
+						this.itemsPerson = Object.entries(person).map(([key, value]) => ({
+							label: key.toLowerCase(),
+							value: '{' + key.toLowerCase() + '}'
 						}));
 					})
 					.catch(this.$fhcAlert.handleSystemError);
@@ -345,9 +335,6 @@ export default {
 	template: `
 
 	<div class="messages-detail-newmessage-newdiv">
-			<!--passt für inSamePage-->
-<!--			<div class="overflow-auto" style="max-height: 500px; border: 1px solid #ccc;">-->
-
 			<!--new page-->
 			<div v-if="!messageSent" class="overflow-auto m-3">
 				<h4>{{ $p.t('messages', 'neueNachricht') }}</h4>
@@ -356,7 +343,6 @@ export default {
 					<div class="col-sm-8">
 						<form-form class="row g-3 mt-2" ref="formMessage">
 
-						<!--TODO(Manu) ist eigentlich ein Array, hier werden alle Einträge angegeben als String-->
 							<div class="row mb-3">
 
 								<form-input
