@@ -49,11 +49,13 @@ class ProjektarbeitJob extends JOB_Controller
 		$mailArray = array();
 		$arrayStg = array();
 		$countMissedAbgaben = 0;
+		$countNotCopied = 0;
 		$countTotal = 0;
 		$countMails = 0;
 		$projektarbeiten = [];
 
 		$this->logInfo('Start Job Projektarbeit');
+		//print_r( PHP_EOL . "Start Job Projektarbeit" . PHP_EOL);
 
 		//get all Projektarbeiten not Uploaded in Time
 		$resultNotUploaded = $this->ProjektarbeitModel->getAllProjektarbeitenNotUploadedInTime($startDate->format('c'));
@@ -84,14 +86,15 @@ class ProjektarbeitJob extends JOB_Controller
 
 		if (!hasData($resultNotUploaded) && !hasData($resultNegative
 			|| $resultNotUploaded) == [] && $resultNegative == [])
-			return $this->logInfo('End Job Projektarbeit Update: 0 Mails sent');
+			return print_r('End Job Projektarbeit Update: 0 Mails sent');
+		//	return $this->logInfo('End Job Projektarbeit Update: 0 Mails sent');
 
 		if (is_array($projektarbeitenNotUploaded) && is_array($projektarbeitenNegative))
 		{
 			$projektarbeiten = array_merge($projektarbeitenNotUploaded, $projektarbeitenNegative);
 		}
 
-		// (1) set mark to 5
+		// (1) set mark to 7
 		foreach ($projektarbeiten as $projekt)
 		{
 			$this->db->where('projektarbeit_id', $projekt->projektarbeit_id);
@@ -101,7 +104,7 @@ class ProjektarbeitJob extends JOB_Controller
 				$result = $this->ProjektarbeitModel->update([
 					'projektarbeit_id' => $projekt->projektarbeit_id
 				], [
-					'note' => 5
+					'note' => 7
 				]);
 				if (isError($result))
 				{
@@ -109,13 +112,9 @@ class ProjektarbeitJob extends JOB_Controller
 				}
 			}
 
-/*			else //log not necessary: always the case for negative marks
-			{
-				$this->logInfo('Note für Projektarbeit für projektarbeit_id ' .  $projekt->projektarbeit_id . 'bereits vorhanden');
-			}*/
-
 			// (2) copy Projektarbeit
 			//no more copying if count bakk >= 6 or count_diplom >= 3
+
 			$end_of_copy_bachelor = $this->config->item('projektarbeitjob_finishCopy_bachelor') ? $this->config->item('projektarbeitjob_finishCopy_bachelor') : 6;
 			$end_of_copy_master = $this->config->item('projektarbeitjob_finishCopy_diplom') ? $this->config->item('projektarbeitjob_finishCopy_diplom') : 3;
 
@@ -126,6 +125,31 @@ class ProjektarbeitJob extends JOB_Controller
 			);
 			if ($maxCountReached)
 			{
+				$countNotCopied++;
+				$result = $this->StudiengangModel->loadWhere([
+					'studiengang_kz' => $projekt->studiengang_kz
+				]);
+				if (isError($result))
+				{
+					$this->logError(getError($result));
+				}
+
+				if (!hasData($result))
+				{
+					//print_r('No Studiengang for studiengang_kz ' . $projekt->studiengang_kz . ' found');
+
+					$this->logInfo('No Studiengang for studiengang_kz ' . $projekt->studiengang_kz . ' found');
+				}
+				$studiengang = current(getData($result));
+				$email = $studiengang->email;
+
+				$arrayStg[$projekt->studiengang_kz] = array(
+					'countNotCopied' => $countNotCopied,
+					'email' => $email,
+					'countMissedAbgaben' => $countMissedAbgaben,
+				);
+/*				print_r("Max count of enduploads reached: " . $projekt->student_uid . ",id:" . $projekt->projektarbeit_id . " " . $projekt->studiengang_kz . PHP_EOL);
+				print_r("Count of not copied: " . $countNotCopied . PHP_EOL);*/
 				continue;
 			}
 
@@ -137,6 +161,7 @@ class ProjektarbeitJob extends JOB_Controller
 			}
 			if (!hasData($result2))
 			{
+				//print_r('No Projektarbeit found for projektarbeit_id ' .  $projekt->projektarbeit_id);
 				$this->logInfo('No Projektarbeit found for projektarbeit_id ' .  $projekt->projektarbeit_id);
 				continue;
 			}
@@ -190,6 +215,7 @@ class ProjektarbeitJob extends JOB_Controller
 			}
 			elseif (!hasData($result))
 			{
+				//print_r('No projektarbeit_id for studentId ' . $projektarbeit->student_uid . ' found');
 				$this->logInfo('No projektarbeit_id for studentId ' . $projektarbeit->student_uid . ' found');
 				continue;
 			}
@@ -209,22 +235,24 @@ class ProjektarbeitJob extends JOB_Controller
 						$this->logError(getError($result));
 					}
 
-					elseif (!hasData($result))
+					if (!hasData($result))
 					{
+						//print_r('No Studiengang for studiengang_kz ' . $projekt->studiengang_kz . ' found');
+
 						$this->logInfo('No Studiengang for studiengang_kz ' . $projekt->studiengang_kz . ' found');
 					}
-					else
-					{
-						$studiengang = current(getData($result));
-						$email = $studiengang->email;
+					$studiengang = current(getData($result));
+					$email = $studiengang->email;
 
-						$arrayStg[$projekt->studiengang_kz] = array(
-							'countMissedAbgaben' => $countMissedAbgaben,
-							'email' => $email
-						);
-					}
+					$arrayStg[$projekt->studiengang_kz] = array(
+						'countMissedAbgaben' => $countMissedAbgaben++,
+						'email' => $email,
+						'countNotCopied' => $countNotCopied,
+					);
 				}
-				$arrayStg[$projekt->studiengang_kz]['countMissedAbgaben'] = ($arrayStg[$projekt->studiengang_kz]['countMissedAbgaben'] + 1);
+				else {
+					$arrayStg[$projekt->studiengang_kz]['countMissedAbgaben'] = $countMissedAbgaben++;
+				}
 
 				//Mailarray
 				$reason = $projekt->reason ? $projekt->reason : null;
@@ -251,6 +279,8 @@ class ProjektarbeitJob extends JOB_Controller
 			}
 			elseif (!hasData($result))
 			{
+				//print_r('No Betreuung found for projektarbeit_id ' . $projekt->projektarbeit_id);
+
 				$this->logInfo('No Betreuung found for projektarbeit_id ' . $projekt->projektarbeit_id);
 			}
 			else
@@ -309,7 +339,11 @@ class ProjektarbeitJob extends JOB_Controller
 							</thead>
 							<tbody>";
 			$email = $item['email'];
+
+			//TODO(Manu) Total counts
+			//change to counts / STG or keep mailtext countfree
 			$anzahlMissedAbgaben = $item['countMissedAbgaben'];
+			$anzahlNichtKopierteProjektarbeiten = $item['countNotCopied'];
 
 			foreach ($mailArray as $m)
 			{
@@ -326,7 +360,8 @@ class ProjektarbeitJob extends JOB_Controller
 
 			$betreff = 'Kopierte Projektarbeiten / Project Work(s) copied';
 			$data = [
-				'anzahlMissedAbgaben' => $anzahlMissedAbgaben,
+/*				'anzahlMissedAbgaben' => $anzahlMissedAbgaben,
+				'anzahlNichtKopierteProjektarbeiten' => $anzahlNichtKopierteProjektarbeiten,*/
 				'link' =>  APP_ROOT. '/vilesci/lehre/abgabe_assistenz_frameset.php?stg_kz=' . $stg_kz,
 				'table' => $maildata
 			];
@@ -339,6 +374,9 @@ class ProjektarbeitJob extends JOB_Controller
 				$countMails++;
 			}
 		}
+
+/*		print_r( PHP_EOL.  $countTotal . ' projektarbeiten copied, ' . $countMails . ' sent mails.' . PHP_EOL);
+		print_r('End Job Projektarbeit' . PHP_EOL);*/
 
 		$this->logInfo($countTotal . ' projektarbeiten copied, ' . $countMails . ' sent mails.');
 		$this->logInfo('End Job Projektarbeit');

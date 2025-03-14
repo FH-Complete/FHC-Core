@@ -109,16 +109,18 @@ class Projektarbeit_model extends DB_Model
 
 		$this->db->where($this->dbTable. '.note', null);
 
+		//TODO(Manu) remove comments for testdata sg.studiengang_kz
 		$result =  $this->loadWhere([
+			'ben.aktiv' => 'true',
 			'pa.fixtermin' => 'true',
 			'pa.paabgabetyp_kurzbz' => 'end',
 			'pa.abgabedatum' => null,
 			'pa.datum < ' => $now->format('c'),
+/*			'sg.studiengang_kz' => 255*/
 		]);
 
-		$query = $this->db->last_query();
-		var_dump($query);
-		if ($result)
+		//Testausgaben
+/*		if ($result)
 		{
 			echo "(UPDATE lehre.tbl_projektarbeit pa
 					SET note = NULL
@@ -133,7 +135,8 @@ class Projektarbeit_model extends DB_Model
 
 				echo ")\n";
 			}
-		}
+		}*/
+
 		return $result;
 	}
 
@@ -176,10 +179,12 @@ class Projektarbeit_model extends DB_Model
 		$this->db->where('NOT EXISTS (SELECT 1 FROM lehre.tbl_projektarbeit AS sub WHERE sub.student_uid = lehre.tbl_projektarbeit.student_uid AND sub.note IN (1, 2, 3, 4))', null, false);
 
 		$this->db->where('ben.aktiv', true);
+		//TODO(Manu) 	remove comments for Testdata		'sg.studiengang_kz' => 331
 		$result =  $this->loadWhere([
 			'pa.fixtermin' => 'true',
 			'pa.paabgabetyp_kurzbz' => 'end',
 			'pa.datum < ' => $now->format('c'),
+/*			'sg.studiengang_kz' => 255*/
 		]);
 
 		return $result;
@@ -193,15 +198,19 @@ class Projektarbeit_model extends DB_Model
 	 */
 	public function checkifCountMaxProjektarbeiten($student_uid, $end_of_copy_bachelor, $end_of_copy_master)
 	{
-
 		$qry = "SELECT COUNT(*), projekttyp_kurzbz
-   				FROM lehre.tbl_projektarbeit AS sub
-    			WHERE sub.student_uid = ?
+   				FROM lehre.tbl_projektarbeit
+    			WHERE student_uid = ?
     			GROUP BY projekttyp_kurzbz";
 
 		$params = array($student_uid);
 
 		$result =  $this->execQuery($qry, $params);
+
+		//TODO(Manu) wait for final logic or adaptions quality gates
+		//meanwhile copying of all enduploads with fixed entries
+		//counting after each step: example for testdata with student_uid where 1 project is copied before hitting limit
+		//	if($student_uid == "mr21m015")
 
 		if (!empty($result->retval))
 		{
@@ -211,10 +220,16 @@ class Projektarbeit_model extends DB_Model
 				$projekttyp = $row->projekttyp_kurzbz;
 
 				if ($projekttyp === 'Bachelor' && $count > $end_of_copy_bachelor)
+				{
+					//TODO(Manu) remove comments testdata
+					//print_r(PHP_EOL . 'LIMIT REACHED Bakk: ' . $student_uid .' Anzahl Abgaben ' . $count . PHP_EOL);
 					return true;
+				}
 
 				if ($projekttyp === 'Diplom' && $count > $end_of_copy_master)
 				{
+					//TODO(Manu) remove comments testdata
+					//print_r(PHP_EOL . 'LIMIT REACHED Dipl: ' . $student_uid .' Anzahl Abgaben ' . $count .  PHP_EOL);
 					return true;
 				}
 			}
