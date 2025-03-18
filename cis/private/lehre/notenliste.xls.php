@@ -339,7 +339,7 @@ else
 					{
 						$worksheet->write($lines,8, trim($elem->matrikelnr), $format_highlight);
 						$pr = new Pruefung();
-						$pr->getPruefungen($elem->uid, "Termin2", $lvid, $sem);
+						$pr->getPruefungen($elem->uid, "Termin2", $lvid, $stsem);
 						$output2 = $pr->result;
 
 						if ($output2)
@@ -360,7 +360,7 @@ else
 					{
 						$worksheet->write($lines,12, trim($elem->matrikelnr), $format_highlight);
 						$pr = new Pruefung();
-						$pr->getPruefungen($elem->uid, "Termin3", $lvid, $sem);
+						$pr->getPruefungen($elem->uid, "Termin3", $lvid, $stsem);
 						$output3 = $pr->result;
 
 						if ($output3)
