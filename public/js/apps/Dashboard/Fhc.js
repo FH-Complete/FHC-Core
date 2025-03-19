@@ -30,12 +30,12 @@ const router = VueRouter.createRouter({
 			component: Profil,
 			props: true
 		},
-		// {
-		// 	path: `/Cis/Abgabetool`,
-		// 	name: 'Abgabetool',
-		// 	component: Abgabetool,
-		// 	props: true
-		// },
+		{
+			path: `/Cis/Abgabetool`,
+			name: 'Abgabetool',
+			component: Abgabetool,
+			props: true
+		},
 		{
 			path: `/Cis/Raumsuche`,
 			name: 'Raumsuche',

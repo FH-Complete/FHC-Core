@@ -21,17 +21,20 @@ export const Abgabetool = {
 	data() {
 		return {
 			domain: '',
+			student_uid: null,
 			detail: null,
+			projektarbeiten: null,
 			selectedProjektarbeit: null,
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
 			abgabeTableOptions: {
-				height: 200, // TODO: determine smallest necessary height
+				height: 300,
 				index: 'projektarbeit_id',
 				layout: 'fitColumns',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4details')), formatter: this.detailFormatter, field: 'details', widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4beurteilung')), formatter: this.beurteilungFormatter, field: 'beurteilung', widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'sem', formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg', formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4kontakt')), field: 'mail', formatter: this.mailFormatter, widthGrow: 1},
@@ -50,20 +53,23 @@ export const Abgabetool = {
 			{
 				event: "cellClick",
 				handler: async (e, cell) => {
-
+					
 					if(cell.getColumn().getField() === "details") {
 						const val = cell.getValue()
+						
 						if(val.mode === 'detailTermine') {
 							this.setDetailComponent(cell.getValue())
 						} else if (val.mode === 'beurteilungDownload') {
-							//demo.dev.technikum-wien.at/cis/private/lehre/projektbeurteilungDocumentExport.php?betreuerart_kurzbz=Begutachter&projektarbeit_id=39239&person_id=22117
 							const pdfExportLink = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+val.betreuerart_kurzbz+'&projektarbeit_id='+val.projektarbeit_id+'&person_id=' + val.betreuer_person_id
-							const pdfExportLink2 = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/lehre/projektbeurteilungDocumentExport.php?betreuerart_kurzbz='+val.betreuerart_kurzbz+'&projektarbeit_id='+val.projektarbeit_id+'&person_id=' + val.betreuer_person_id
+							// const pdfExportLink2 = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/lehre/projektbeurteilungDocumentExport.php?betreuerart_kurzbz='+val.betreuerart_kurzbz+'&projektarbeit_id='+val.projektarbeit_id+'&person_id=' + val.betreuer_person_id
 							window.open(pdfExportLink, '_blank')
 						}
 
-					}
-					console.log(cell.getData())
+					} else if (cell.getColumn().getField() === "beurteilung") {
+						const val = cell.getValue()
+						
+						if(val != '-') window.open(val, '_blank')
+					} 
 					e.stopPropagation()
 
 				}
@@ -71,13 +77,29 @@ export const Abgabetool = {
 			]};
 	},
 	methods: {
+		isPastDate(date) {
+			return new Date(date) < new Date(Date.now())	
+		},
 		setDetailComponent(details){
 			this.loadAbgaben(details).then((res)=> {
-				console.log(res)
-				const pa = this.data[0]?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
+				const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
 				pa.abgabetermine = res.data.retval
+				pa.abgabetermine.forEach(termin => {
+					termin.file = []
+					termin.allowedToUpload = true
+					
+					// TODO: fixtermin logic?
+					if(termin.bezeichnung == 'Endupload' && this.isPastDate(termin.datum)) {
+						
+						// termin.allowedToUpload = false
+					} else {
+						// termin.allowedToUpload = true
+					}
+
+				})
 				pa.betreuer = this.buildBetreuer(pa)
-				
+				pa.student_uid = this.student_uid
+
 				this.selectedProjektarbeit = pa
 			})
 			
@@ -104,6 +126,13 @@ export const Abgabetool = {
 				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
 					'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
 		},
+		beurteilungFormatter(cell) {
+			const val = cell.getValue()
+			if(val) {
+				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+					'<a><i class="fa fa-file-pdf" style="color:#00649C"></i></a></div>'
+			} else return '-'
+		},
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
 		},
@@ -111,28 +140,30 @@ export const Abgabetool = {
 			return 'mailto:' + abgabe.mitarbeiter_uid +'@'+ this.domain
 		},
 		buildBetreuer(abgabe) {
-			return abgabe.betreuerart_beschreibung + ': ' + (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ?? '')
+			return abgabe.betreuerart_beschreibung + ': ' + (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
 		},
 		setupData(data){
-			
-			this.data = data // TODO: better define what is needed from this for detail component
-			this.domain = data[1] // TODO do this in backend but this is a prototype anyway
+			this.projektarbeiten = data[0]
+			this.domain = data[1]
+			this.student_uid = data[2]
 			const d = data[0]?.retval?.map(projekt => {
-				console.log('projekt', projekt)
 				let mode = 'detailTermine'
 				
 				if (projekt.babgeschickt || projekt.zweitbetreuer_abgeschickt) {
-					mode = 'beurteilungDownload' // build dl link for both betreuer documents
+					// mode = 'beurteilungDownload' // build dl link for both betreuer documents
+					projekt.beurteilungLink = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+projekt.betreuerart_kurzbz+'&projektarbeit_id='+projekt.projektarbeit_id+'&person_id=' + projekt.bperson_id
+
 				}
 				
 				return {
 					details: {
-						student_uid: this.viewData?.uid,
+						student_uid: this.student_uid,
 						projektarbeit_id: projekt.projektarbeit_id,
 						betreuer_person_id: projekt.bperson_id,
 						betreuerart_kurzbz: projekt.betreuerart_kurzbz,
 						mode
 					},
+					beurteilung: projekt.beurteilungLink ?? null,
 					sem: projekt.studiensemester_kurzbz,
 					stg: projekt.kurzbzlang,
 					mail: this.buildMailToLink(projekt),

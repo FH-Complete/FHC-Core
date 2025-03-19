@@ -24,9 +24,11 @@ $includesArray = array(
 		'public/css/Cis4/Cms.css',
 	),
 	'customJSs' => array(
-		'vendor/npm-asset/primevue/accordion/accordion.js',
-		'vendor/npm-asset/primevue/accordiontab/accordiontab.js',
-		'vendor/npm-asset/primevue/inputnumber/inputnumber.js'
+		'vendor/npm-asset/primevue/accordion/accordion.min.js',
+		'vendor/npm-asset/primevue/accordiontab/accordiontab.min.js',
+		'vendor/npm-asset/primevue/inputnumber/inputnumber.min.js',
+		'vendor/npm-asset/primevue/textarea/textarea.min.js',
+		'vendor/npm-asset/primevue/checkbox/checkbox.min.js'
 	),
 	'customJSModules' => array(
 		'public/js/apps/Dashboard/Fhc.js'

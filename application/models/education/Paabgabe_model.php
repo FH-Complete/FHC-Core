@@ -30,4 +30,16 @@ class Paabgabe_model extends DB_Model
 
 		return $this->execQuery($qry, array($projektarbeit_id));
 	}
+	
+	public function updatePaabgabe($paabgabe_id) {
+		$qry="
+			UPDATE campus.tbl_paabgabe SET
+				abgabedatum = now(),
+				updatevon = ?,
+				updateamum = now()
+			WHERE paabgabe_id= ?";
+
+		return $this->execQuery($qry, array(getAuthUID(), $paabgabe_id));
+	}
+	
 }
