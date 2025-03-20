@@ -117,6 +117,12 @@ class Config extends FHCAPI_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Pruefung.js'
 		];
 
+		$result['exemptions'] = [
+			'title' => $this->p->t('lehre', 'anrechnungen'),
+			'component' => './Stv/Studentenverwaltung/Details/Anrechnungen.js',
+			'config' => $config['exemptions']
+		];
+
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
