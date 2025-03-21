@@ -359,7 +359,7 @@ export default {
 		@mouseleave="mouseLeave">
 		<TransitionGroup tag="div">
 			<grid-item
-				v-for="item in (mode == 0 && active ? placedItems_withPlaceholders : placedItems)"
+				v-for="(item,index) in (mode == 0 && active ? placedItems_withPlaceholders : placedItems)"
 				:key="item.data.id"
 				:item="item"
 				@start-move="startMove"
@@ -378,7 +378,7 @@ export default {
 					paddingRight: 'var(--fhc-dg-item-padding-horizontal)'
 				}">
 				<template v-slot="item">
-					<slot v-bind="{...item, ...item.data}" :x="item.x" :y="item.y" ></slot>
+					<slot v-bind="{...item, ...item.data, index:index}" :x="item.x" :y="item.y" ></slot>
 				</template>
 			</grid-item>
 		</TransitionGroup>

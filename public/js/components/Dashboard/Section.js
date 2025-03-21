@@ -199,6 +199,7 @@ export default {
 			<template #default="item">
 				
 				<dashboard-item v-if="!item.placeholder"
+					:index="item.index"
 					:id="item.widget"
 					:width="item.w"
 					:height="item.h"

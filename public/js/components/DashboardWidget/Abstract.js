@@ -4,7 +4,8 @@ export default {
 		"width",
 		"height",
 		"configMode",
-		"sharedData"
+		"sharedData",
+		"widgetInfo"
 	],
 	emits: [
 		"setConfig",
@@ -24,6 +25,9 @@ export default {
 			set(value) {
 				this.$emit('update:sharedData', value);
 			}
+		},
+		widget_action_css_identifier(){
+			return `#${this.widgetInfo.action_section_identifier}`;
 		}
 	},
 	methods: {
