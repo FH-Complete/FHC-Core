@@ -1,3 +1,9 @@
+:root{
+	--fhc-filtercomponent-primary: var(--fhc-primary);
+	--fhc-filtercomponent-bg:var(--fhc-background);
+	--fhc-filtercomponent-border:var(--fhc-border);
+}
+
 .filter-header-title {
 	text-align: right;
 }
@@ -26,9 +32,9 @@
 	margin-left: 7px;
 	padding: 11px;
 	display: inline-block;
-	background-color: white;
+	background-color: var(--fhc-filtercomponent-bg);
 	border-style: solid;
-	border-color: black;
+	border-color: var(--fhc-filtercomponent-border);
 	border-width: 1px;
 	border-radius: 7px;
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -47,7 +53,7 @@
         right: 100%;
         height: 100%;
         margin-right: 3px;
-        border-left: 2px solid #428bca;
+        border-left: 2px solid var(--fhc-filtercomponent-primary);
 }
 
 .selection-after::after {
@@ -57,7 +63,7 @@
         left: 100%;
         height: 100%;
         margin-left: 3px;
-        border-right: 2px solid #428bca;
+        border-right: 2px solid var(--fhc-filtercomponent-primary);
 }
 
 .filter-table-dataset {

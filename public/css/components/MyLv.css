@@ -1,4 +1,8 @@
+:root{
+	--myLv-disabled: var(--fhc-disabled);
+}
+
 .unavailable, .unavailable:hover{
-	color: #565e647f !important;
+	color: var(--myLv-disabled) !important;
 	cursor: default;
 }

@@ -172,6 +172,7 @@ class Stundenplan extends FHCAPI_Controller
      */
 	public function getRoomplan()
 	{
+		$this->load->library('StundenplanLib');
         // form validation
         $this->load->library('form_validation');
         $this->form_validation->set_data($_GET);
@@ -188,8 +189,7 @@ class Stundenplan extends FHCAPI_Controller
 		$roomplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getRoomQuery($ort_kurzbz, $start_date, $end_date));
 
         $roomplan_data = $this->getDataOrTerminateWithError($roomplan_data);
-
-		$this->expand_object_information($roomplan_data);
+		$this->stundenplanlib->expand_object_information($roomplan_data);
 
 		$this->terminateWithSuccess($roomplan_data);
 
@@ -198,6 +198,7 @@ class Stundenplan extends FHCAPI_Controller
 	// gets the reservierungen of a room if the ort_kurzbz parameter is supplied otherwise gets the reservierungen of the stundenplan of a student
     public function Reservierungen($ort_kurzbz = null)
 	{
+		$this->load->library('StundenplanLib');
 		//form validation
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_GET);
@@ -211,7 +212,6 @@ class Stundenplan extends FHCAPI_Controller
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
 
-		$this->load->library('StundenplanLib');
 		$result = $this->stundenplanlib->getReservierungen($start_date,$end_date,$ort_kurzbz);
 		$result = $this->getDataOrTerminateWithError($result);	
 		$this->terminateWithSuccess($result);

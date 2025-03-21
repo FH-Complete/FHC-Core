@@ -48,11 +48,11 @@ export default {
 			// returns a suitable color for the given grade
 			if (this.positiv)
 			{
-				return 'var(--fhc-cis-grade-positive)';
+				return 'var(--fhc-success)';
 			}
 			else
 			{
-				return 'var(--fhc-cis-grade-negative)';
+				return 'var(--fhc-danger)';
 			}
 		},
 		is_organisatorische_einheit(){
@@ -179,9 +179,9 @@ export default {
 								<i :class="[menuItem.c4_icon2 ? menuItem.c4_icon2 : 'fa-solid fa-pen-to-square', !menuItem.c4_link ? 'unavailable' : null ]"></i>
 							</div>
 							<a
-							class="text-decoration-none text-truncate"
+							class="fhc-body text-decoration-none text-truncate"
 							:id="'moodle_links_'+lehrveranstaltung_id"
-							:class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }"
+							:class="{ 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }"
 							:target="menuItem.c4_target"
 							:href="c4_link(menuItem) ? c4_link(menuItem) : null">
 								{{ menuItem.phrase ? $p.t(menuItem.phrase) : menuItem.name}}

@@ -248,7 +248,7 @@ export default {
                 this.profilUpdateStates["Pending"];
 
               let html = `<div class="d-flex justify-content-evenly align-items-center">
-                <button class="btn border-primary border-2" id="showButton"><i class="fa-solid fa-eye" style="color: #0d6efd;"></i></button>
+                <button class="btn border-primary border-2" id="showButton"><i class="fa-solid fa-eye fhc-primary-color"></i></button>
                 ${
                   STATUS_PENDING ?
                   `<button class="btn border-success border-2" id="acceptButton"><i class='fa fa-lg fa-circle-check text-success'></i></button>

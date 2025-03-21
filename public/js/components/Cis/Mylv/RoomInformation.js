@@ -219,25 +219,25 @@ const RoomInformation = {
 				</span>
 			</template>
 			<template #weekPage="{event,day}">
-				<div @click="showModal(event?.orig)" type="button" class=" border border-secondary border d-flex flex-column align-items-center justify-content-evenly h-100">
-					<span>{{event?.orig.topic}}</span>
-					<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
-					<span>{{event?.orig.ort_kurzbz}}</span>
+				<div @click="showModal(event)" type="button" class=" border border-secondary border d-flex flex-column align-items-center justify-content-evenly h-100">
+					<span>{{event?.topic}}</span>
+					<span v-for="lektor in event?.lektor">{{lektor.kurzbz}}</span>
+					<span>{{event?.ort_kurzbz}}</span>
 				</div>
 			</template>
 			<template #dayPage="{event,day,mobile}">
-				<div @click="mobile? showModal(event?.orig):null" type="button" class="fhc-entry border border-secondary border row h-100 justify-content-center align-items-center text-center">
+				<div @click="mobile? showModal(event):null" type="button" class="fhc-entry border border-secondary border row h-100 justify-content-center align-items-center text-center">
 					<div class="col ">
 						<p>{{ $p.t('lehre/lehrveranstaltung') }}:</p>
-						<p class="m-0">{{event?.orig.topic}}</p>
+						<p class="m-0">{{event?.topic}}</p>
 					</div>
 					<div class="col ">
 						<p>{{ $p.t('lehre/lektor') }}:</p>
-						<p class="m-0" v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
+						<p class="m-0" v-for="lektor in event?.lektor">{{lektor.kurzbz}}</p>
 					</div>
 					<div class="col ">
 						<p>{{ $p.t('profil/Ort') }}: </p>
-						<p class="m-0">{{event?.orig.ort_kurzbz}}</p>
+						<p class="m-0">{{event?.ort_kurzbz}}</p>
 					</div>
 				</div>
 			</template>

@@ -136,13 +136,7 @@ export default {
 		},
 		overlayStyle() {
 			return {
-				'background-color': '#F5E9D7',
-				'position': 'absolute',
-				'pointer-events': 'none',
-				'z-index': 2,
 				height:  this.getDayTimePercent + '%',
-				opacity: 0.5,
-				overflow: 'hidden'
 			}
 		},
 		pageHeaderStyle() {
@@ -178,7 +172,7 @@ export default {
 				'padding-left': '3.5rem',
 				'margin-top': '-1px',
 				'z-index': 2,
-				'border-color': '#00649C!important',
+				'border-color': 'var(--fhc-border)',
 				top: this.hourPosition + 'px',
 				left: 0,
 				right: 0,
@@ -190,14 +184,7 @@ export default {
 		},
 		curIndicatorStyle() {
 			return {
-				'pointer-events': 'none',
-				'padding-left': '7rem',
-				'margin-top': '-1px',
-				'z-index': 2,
-				'border-color': '#00649C!important',
 				top:  this.getDayTimePercent + '%',
-				left: 0,
-				right: 0,
 			}
 		},
 		noEventsCondition() {
@@ -280,8 +267,7 @@ export default {
 			}
 
 			if(this.date.compare(this.todayDate)) {
-				styleObj['backgroundImage'] = 'linear-gradient(to bottom, #F5E9D7 '+this.getDayTimePercent+'%, #FFFFFF '+this.getDayTimePercent+'%)'
-				styleObj['border-color'] = '#E8E8E8';
+				styleObj['backgroundImage'] = 'linear-gradient(to bottom, var(--calendar-past) '+this.getDayTimePercent+'%, transparent '+this.getDayTimePercent+'%)'
 				// styleObj.opacity = 0.5; // would opaque the whole column
 			}
 
@@ -390,7 +376,7 @@ export default {
 	<div class="fhc-calendar-day-page h-100">
 		<div class="row m-0 h-100">
 			<div style="overflow:auto" class="col-12 col-xl-6 p-0 h-100">
-				<div class="d-flex flex-column h-100">
+				<div class="d-flex flex-column h-100 border">
 					<div ref="header" class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle">
 						<div type="button" class="flex-grow-1" :title="dayText.heading" @click.prevent="changeToMonth(day)">
 							<div class="fw-bold">{{dayText.tag}}</div>
@@ -432,16 +418,16 @@ export default {
 
 
 							<div >
-								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">{{ $p.t('lehre/noLvFound') }}</h1>
+								<h1 v-if="noEventsCondition" class="m-0 bs-body" ref="noEventsText" :style="noLvStyle">{{ $p.t('lehre/noLvFound') }}</h1>
 								<div class="events position-relative" :class="{'fhc-calendar-no-events-overlay':noEventsCondition}" ref="events" @mousemove="calcHourPosition" @mouseleave="hourPosition = null">
 									<Transition>
 										<div v-if="hourPosition && !noEventsCondition" class="position-absolute border-top small"  :style="indicatorStyle">
-											<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
+											<span class="border border-top-0 px-2">{{hourPositionTime}}</span>
 										</div>
 									</Transition>
 									<Transition>
-										<div v-if="lookingAtToday && !noEventsCondition" class="position-absolute border-top small"  :style="curIndicatorStyle">
-											<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
+										<div v-if="lookingAtToday && !noEventsCondition" class="curTimeIndicator border-top small"  :style="curIndicatorStyle">
+											<span class="border border-top-0 px-2">{{curTime}}</span>
 										</div>
 									</Transition>
 									<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border" :style="hourGridStyle(hour)"></div>
@@ -450,7 +436,7 @@ export default {
 									</div>
 									<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
 										
-										<div v-if="lookingAtToday && !noEventsCondition" :style="overlayStyle"></div>
+										<div v-if="lookingAtToday && !noEventsCondition" class="overlay" :style="overlayStyle"></div>
 										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast 
 											:selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden" >
 											<!-- desktop version of the page template, parent receives slotProp mobile = false -->

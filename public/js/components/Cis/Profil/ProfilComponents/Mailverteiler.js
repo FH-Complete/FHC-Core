@@ -20,10 +20,10 @@ export default {
                 <div class="col-12 ">
                     <div class="row">  
                         <div class="col-1 ">
-                            <i class="fa-solid fa-envelope" style="color: #00649C;"></i>
+                            <i class="fa-solid fa-envelope fhc-link-color" ></i>
                         </div>
                         <div class="col">
-                            <a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a>
+                            <a class="fhc-link-color" :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a>
                         </div>
                     </div>
                 </div> 

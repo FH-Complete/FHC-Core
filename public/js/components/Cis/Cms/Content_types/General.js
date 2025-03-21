@@ -85,26 +85,36 @@ export default {
                 .then(() => {
                   Axios.get(el.href)
                     .then((res) => {
-                      // TODO(chris): check for success then show message and/or reload
-                      location = location;
+                    	// TODO(chris): check for success then show message and/or reload
+                    	location = location;
                     })
                     .catch((err) => console.error("ERROR:", err));
                 })
                 .catch(() => {});
             });
           });
-          document.querySelectorAll("#cms [data-href]").forEach((el) => {
+        document.querySelectorAll("#cms [data-href]").forEach((el) => {
             el.href = el.dataset.href.replace(
-              /^ROOT\//,
-              FHC_JS_DATA_STORAGE_OBJECT.app_root
+            	/^ROOT\//,
+            	FHC_JS_DATA_STORAGE_OBJECT.app_root
             );
-          });
+        });
 			
-			document.querySelectorAll("[href]").forEach((element) => {
-				let orignal_href = element.getAttribute("href");
-				let new_href = replaceRelativeLegacyLink(orignal_href);
-				element.href = new_href;
-			});
+		document.querySelectorAll("[href]").forEach((element) => {
+			let orignal_href = element.getAttribute("href");
+			let new_href = replaceRelativeLegacyLink(orignal_href);
+			element.href = new_href;
+		});
+
+		document.querySelectorAll("[style*=background-color]").forEach((element) => {
+			if (element.style.backgroundColor == "rgb(255, 255, 255)"){
+				element.style.backgroundColor = "var(--fhc-background)";
+			}
+			if(element.querySelector("*[style*=background-color]")){
+				element.style.backgroundColor = "var(--fhc-secondary)";
+			}
+		});
+
     },
     template: /*html*/ `
       <!-- div that contains the content -->

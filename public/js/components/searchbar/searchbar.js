@@ -33,14 +33,14 @@ export default {
     template: /*html*/`
           <form ref="searchform" class="d-flex me-3" :class="searchoptions.cssclass" action="javascript:void(0);"
 		 	 @focusin="this.searchfocusin" @focusout="this.searchfocusout">
-			<div ref="searchbox" class="h-100 input-group me-2 bg-white">
-				<span style="background-color:inherit" class="input-group-text">
+			<div ref="searchbox" class="h-100 input-group me-2">
+				<span class="input-group-text">
 					<i class="fa-solid fa-magnifying-glass"></i>
 				</span>
                 <input @keyup="this.search" @focus="this.showsearchresult"
                     v-model="this.searchsettings.searchstr" class="form-control"
                     type="search" :placeholder="'Search: '+ search_types_string" aria-label="Search">
-                <button data-bs-toggle="collapse" data-bs-target="#searchSettings" aria-expanded="false" aria-controls="searchSettings" ref="settingsbutton"  class="btn btn-outline-secondary" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
+                <span data-bs-toggle="collapse" data-bs-target="#searchSettings" aria-expanded="false" aria-controls="searchSettings" ref="settingsbutton"  class="input-group-text" type="button"><i class="fas fa-cog"></i></span>
             </div>
 
             <div v-show="this.showresult"

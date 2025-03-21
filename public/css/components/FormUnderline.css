@@ -8,11 +8,13 @@
   
   }
   
-  
+  a.form-underline-content{
+	color: var(--fhc-link);
+  }
   
   .form-underline .form-underline-content{
     border-width: 1px;
-    border-color: transparent transparent #dee2e6 transparent;
+    border-color: transparent transparent var(--fhc-border) transparent;
     border-style: solid;
     padding-bottom: 0.25rem;
     padding-left: 0.5rem;

@@ -174,9 +174,9 @@ export default {
                                         <div  class="align-middle text-center"><i role="button" @click="showEditProfilModal(item)" class="fa fa-eye"></i></div>
                                     </template>
                                     <template v-else >
-                                        <div class="align-middle text-center" ><i style="color:#00639c" @click="showEditProfilModal(item)" role="button" class="fa fa-edit"></i></div>
+                                        <div class="align-middle text-center" ><i  @click="showEditProfilModal(item)" role="button" class="fa fa-edit fhc-primary-color"></i></div>
                                     </template>
-                                    <div class="align-middle text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></div>
+                                    <div class="align-middle text-center"><i role="button" @click="deleteRequest(item)" class="text-danger fa fa-trash"></i></div>
                                 </div>
                             </td>
                         </template>          

@@ -114,7 +114,7 @@ export default {
 							<td>
 								<ul v-if="lektorNames.length" class="list-unstyled mb-0">
 									<li v-for="name in new Set(lektorNames)" :key="name">
-									<a :href="lektorNamesLinks[name]?lektorNamesLinks[name]:null"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
+									<a :href="lektorNamesLinks[name]?lektorNamesLinks[name]:null"><i class="fa fa-arrow-up-right-from-square me-1 fhc-primary-color" ></i></a>
 										{{name}}
 									</li>
 								</ul>
@@ -128,7 +128,7 @@ export default {
 							<td>
 								<ul class="list-unstyled mb-0">
 									<li v-for="name in lvLeitung" :key="name">
-										<a :href="lektorNamesLinks[name]?lektorNamesLinks[name]:null"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
+										<a :href="lektorNamesLinks[name]?lektorNamesLinks[name]:null"><i class="fa fa-arrow-up-right-from-square me-1 fhc-primary-color" ></i></a>
 										{{name}}
 									</li>
 								</ul>

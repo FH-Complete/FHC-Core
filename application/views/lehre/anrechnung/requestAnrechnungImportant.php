@@ -4,8 +4,8 @@
        <!--    Beantragung: Fristen panel -->
   <div class="accordion-item">
     <h2 class="accordion-header">
-        <div  class="bg-info-subtle accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#Beantragung" aria-expanded="true" aria-controls="Beantragung">
         <div class="d-flex">
+        <div  class="bg-info-subtle accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#Beantragung" aria-expanded="true" aria-controls="Beantragung">
         
         <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
 				<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoFristenTitle'); ?>
@@ -22,8 +22,8 @@
   <!--    Referenzbeispiele ECTS Berechnung panel -->
   <div class="accordion-item">
     <h2 class="accordion-header">
-        <div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#Referenzbeispiele" aria-expanded="false" aria-controls="Referenzbeispiele">
         <div class="d-flex">
+        <div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#Referenzbeispiele" aria-expanded="false" aria-controls="Referenzbeispiele">
         <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
 					<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoEctsBerechnungTitle'); ?>
         </div>
@@ -54,8 +54,8 @@
     <!--    Herkunft der Kenntnisse: Angaben panel -->
   <div class="accordion-item">
     <h2 class="accordion-header">
-        <div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#HerkunftKenntnisse" aria-expanded="false" aria-controls="HerkunftKenntnisse">
         <div class="d-flex">
+        <div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#HerkunftKenntnisse" aria-expanded="false" aria-controls="HerkunftKenntnisse">
         <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
 					<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoHerkunftKenntnisseTitle'); ?>
         </div>

@@ -88,7 +88,9 @@ export default {
 	},
 	template: /*html*/ `
     <!-- div that contains the content -->
-    <component ref="content" :is="computeContentType" v-if="content" :content="content" :content_id="content_id_internal" />
+	<div id="fhc-cms-content" v-if="content">
+    	<component ref="content" :is="computeContentType" :content="content" :content_id="content_id_internal" />
+	</div>
     <p v-else>No content is available to display</p>
     `,
 };

@@ -5,28 +5,35 @@
 
 @import url(./switches.css);
 
-#search-filter{
-    border: 1px solid #ced4da;
+:root{
+	--searchbar-shadow: var(--fhc-shadow-40);
 }
 
-
 .searchbar_settings {
-    position: absolute; 
+	position: absolute; 
     z-index: 9999; 
-    background-color: #343a40;
+    background-color: var(--fhc-dark);
 }
 
 .searchbar_results {
     position: absolute; 
     z-index: 9998; 
-    background-color: #fff; 
-    border: 1px solid lightgrey;
+    background-color: var(--fhc-background); 
+    border: 1px solid var(--fhc-border);
     padding: .5rem;
     top: 100%;
     width: 100%;
     left: 0;
     right: 0;
-	box-shadow: 2px 2px 4px rgba(0, 0, 0, .4);
+	box-shadow: 2px 2px 4px var(--searchbar-shadow);
+}
+
+.searchbar_results a{
+	color: var(--fhc-link);
+}
+
+.searchbar_results a:not(a~i) {
+	color: inherit;
 }
 
 .searchbar_results_scroller {
@@ -35,7 +42,7 @@
 }
 
 .searchbar_result {
-    border-bottom: 1px solid lightgrey;
+    border-bottom: 1px solid var(--fhc-border);
     margin-bottom: 1rem;
 }
 

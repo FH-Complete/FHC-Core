@@ -191,7 +191,7 @@ export default {
 					</div>
 				</div>
 				<div class="col">
-					<button class="btn btn-light w-100" @click="filter = ''">
+					<button class="btn fhc-tertiary w-100" @click="filter = ''">
 						<small :class="{'fw-bold':filter===''}">{{$p.t('ui','alle')}}: <b>{{ count.alle }}</b></small>
 					</button>
 				</div>

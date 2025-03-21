@@ -76,7 +76,7 @@ export default {
 			const val = cell.getValue()
 			if(val) {
 				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<a href="'+val+'"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a></div>'
+				'<a href="'+val+'"><i class="fa fa-arrow-up-right-from-square me-1 fhc-primary-color" ></i></a></div>'
 			} else {
 				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
 					'-</div>'

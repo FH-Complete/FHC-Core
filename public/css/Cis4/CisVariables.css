@@ -1,0 +1,265 @@
+/* css overrides for static cms content */
+@import './CisVariablesCms.css';
+
+/* colors */
+:root {
+
+	--fhc-black-10:black;
+	--fhc-black-20: #1d2024;
+	--fhc-black-30: #212529;
+	--fhc-black-40: #292b2a;
+	--fhc-black-50: #2B3035;
+	--fhc-black-60: #2c3136;
+	--fhc-black-70: #343a40;
+
+	--fhc-white-10: #FFFFFF;
+	--fhc-white-20:#f6f6f6;
+	--fhc-white-30:#eceff1;
+	--fhc-white-40:#e9ecef;
+	--fhc-white-50:#dee2e6;
+	--fhc-white-60:#d5dae0;
+	--fhc-white-70:#ced4da;
+	--fhc-white-80:#c7cbcf;
+	--fhc-white-90:#aeb3b8;
+
+	--fhc-gray-10: #858f97;
+	--fhc-gray-20: #72777A;
+	--fhc-gray-30: #616568;
+	--fhc-gray-40: #495057;
+
+	--fhc-blue-10: #0a57ca;
+	--fhc-blue-20: #79b7d8;
+	/*  --fhc-blue-20: #00649c;*/
+	--fhc-blue-30: #00598d;
+	/*--fhc-blue-40: #005585;*/
+	--fhc-blue-40: #61aed8;
+	--fhc-blue-50: #00507e;
+
+	--fhc-blue-primary: #00649c;
+	--fhc-blue-primary-highlight: #005585;
+
+	--fhc-red-10: #842029;
+	--fhc-red-20: #800000;
+	
+	--fhc-green-10: #008000;
+
+	--fhc-beige-10: rgba(245, 233, 215,0.5);
+	--fhc-beige-20: rgba(172, 153, 125,0.5);
+	
+	
+
+}
+
+:root.light{
+	
+
+	/* fhc base colors */
+	--fhc-primary: var(--fhc-blue-20);
+	--fhc-primary-highlight: var(--fhc-blue-40);
+
+	--fhc-tertiary: var(--fhc-white-20);
+	--fhc-tertiary-highlight: var(--fhc-white-40);
+
+	--fhc-secondary: var(--fhc-white-40);
+	--fhc-secondary-highlight: var(--fhc-white-60);
+
+	--fhc-fourth: var(--fhc-white-60);
+	--fhc-fourth-highlight: var(--fhc-white-80);
+
+	--fhc-fifth: var(--fhc-white-80);
+	--fhc-fifth-highlight: var(--fhc-white-90);
+
+	/*background*/
+	--fhc-background: var(--fhc-white-10);
+	--fhc-background-highlight: var(--fhc-white-60);
+	
+	/*text*/
+	--fhc-text: var(--fhc-black-30);
+	
+	/* shadows and borders */
+	--fhc-shadow-20: rgba(0, 0, 0, 0.2);
+	--fhc-shadow-40: rgba(0, 0, 0, 0.4);
+	--fhc-shadow-60: rgba(0, 0, 0, 0.6);
+	--fhc-shadow-80: rgba(0, 0, 0, 0.8);
+	--fhc-box-shadow: var(--fhc-white-50);
+	--fhc-border: var(--fhc-white-50);
+	--fhc-border-highlight: var(--fhc-gray-40);
+
+	/* links */
+	--fhc-link: var(--fhc-blue-10);
+
+	/* disabled */
+	--fhc-disabled: var(--fhc-gray-10);
+
+	/* status colors */
+	--fhc-danger: var(--fhc-red-10);
+	--fhc-success: var(--fhc-green-10);
+	--fhc-dark: var(--fhc-black-30);
+	--fhc-light: var(--fhc-white-50);
+
+
+}
+
+:root.dark{
+
+	/* fhc base colors */
+	--fhc-primary: var(--fhc-blue-primary-highlight);
+	--fhc-primary-highlight: var(--fhc-blue-primary);
+
+	--fhc-secondary: var(--fhc-black-70);
+	--fhc-secondary-highlight: var(--fhc-gray-40);
+
+	--fhc-tertiary: var(--fhc-black-50);
+	--fhc-tertiary-highlight: var(--fhc-black-70);
+
+	--fhc-danger: var(--fhc-red-10);
+
+	/*background*/
+	--fhc-background: var(--fhc-black-30);
+	--fhc-background-highlight: var(--fhc-black-20);
+
+	/*text*/
+	--fhc-text: var(--fhc-white-50);
+
+	/* shadows and borders */
+	--fhc-shadow-20: rgba(125, 125, 125, 0.2);
+	--fhc-shadow-40: rgba(125, 125, 125, 0.4);
+	--fhc-shadow-60: rgba(125, 125, 125, 0.6);
+	--fhc-shadow-80: rgba(125, 125, 125, 0.8);
+	--fhc-box-shadow: var(--fhc-gray-40);
+	--fhc-border: var(--fhc-gray-40);
+	--fhc-border-highlight: var(--fhc-white-90);
+
+	/* links */
+	--fhc-link: var(--fhc-white-70);
+
+	/* disabled */
+	--fhc-disabled: var(--fhc-gray-10);
+
+	/* status colors */
+	--fhc-danger: var(--fhc-red-10);
+	--fhc-success: var(--fhc-green-10);
+	--fhc-dark: var(--fhc-black-50);
+	--fhc-light: var(--fhc-white-70);
+
+}
+
+:root.purple {
+
+	--fhc-purple-primary: rgb(150, 120, 255);
+	--fhc-purple-primary-highlight: rgb(170, 140, 255);
+	--fhc-purple-5: rgb(245, 240, 255);
+	--fhc-purple-10: rgb(235, 225, 255);
+	--fhc-purple-20: rgb(220, 200, 255);
+	--fhc-purple-30: rgb(200, 170, 255);
+	--fhc-purple-40: rgb(180, 140, 240);
+	--fhc-purple-50: rgb(160, 110, 225);
+	--fhc-purple-60: rgb(140, 90, 210);
+	--fhc-purple-70: rgb(120, 70, 195);
+	--fhc-purple-80: rgb(100, 50, 180);
+	--fhc-purple-90: rgb(80, 30, 165);
+
+	/* fhc base colors */
+	--fhc-primary: var(--fhc-purple-primary-highlight);
+	--fhc-primary-highlight: var(--fhc-purple-primary);
+
+	--fhc-secondary: var(--fhc-purple-30);
+	--fhc-secondary-highlight: var(--fhc-purple-50);
+
+	--fhc-tertiary: var(--fhc-purple-20);
+	--fhc-tertiary-highlight: var(--fhc-purple-40);
+
+	/* background */
+	--fhc-background: var(--fhc-purple-5);
+	--fhc-background-highlight: var(--fhc-purple-10);
+
+	/* text */
+	--fhc-text: var(--fhc-black-20);
+
+	/* shadows and borders */
+	--fhc-shadow-20: rgba(150, 100, 200, 0.2);
+	--fhc-shadow-40: rgba(150, 100, 200, 0.4);
+	--fhc-shadow-60: rgba(150, 100, 200, 0.6);
+	--fhc-shadow-80: rgba(150, 100, 200, 0.8);
+	--fhc-box-shadow: var(--fhc-white-50);
+	--fhc-border: var(--fhc-white-50);
+	--fhc-border-highlight: var(--fhc-gray-40);
+
+	/* links */
+	--fhc-link: var(--fhc-black-50);
+
+	/* disabled */
+	--fhc-disabled: var(--fhc-purple-20);
+
+	/* status colors */
+	--fhc-danger: var(--fhc-red-10);
+	--fhc-success: var(--fhc-green-10);
+	--fhc-dark: var(--fhc-black-20);
+	--fhc-light: var(--fhc-white-70);
+
+}
+
+/* fhc primary*/
+html.dark .bg-primary,
+html.dark .btn-primary,
+html.dark .btn-outline-primary {
+	background-color: var(--fhc-primary) !important;
+	border-color: var(--fhc-primary) !important;
+	color: white;
+}
+
+html.dark .btn-outline-primary:hover,
+html.dark .btn-primary:hover {
+	filter: brightness(90%);
+}
+
+html.dark .text-primary {
+	color: var(--fhc-primary) !important;
+}
+
+html.dark .btn-outline-primary,
+html.dark .border-primary {
+	border-color: var(--fhc-primary) !important;
+}
+
+/* fhc danger*/
+html.dark .bg-danger,
+html.dark .btn-danger,
+html.dark .btn-outline-danger {
+	background-color: var(--fhc-danger) !important;
+	border-color: var(--fhc-danger) !important;
+	color: white;
+}
+
+html.dark .btn-outline-danger:hover,
+html.dark .btn-danger:hover {
+	filter: brightness(90%);
+}
+
+html.dark .text-danger {
+	color: var(--fhc-danger) !important;
+}
+
+html.dark .border-danger {
+	border-color: var(--fhc-danger) !important;
+}
+
+
+html.dark .tabulator,
+html.dark .tabulator .tabulator-header,
+html.dark .tabulator .tabulator-header .tabulator-col,
+html.dark .tabulator .tabulator-table,
+html.dark .tabulator .tabulator-row {
+	background-color: var(--fhc-tertiary) !important;
+	color: var(--fhc-text) !important;
+	border-color: var(--fhc-border) !important;
+}
+
+html.dark .tabulator .tabulator-cell {
+	background-color: var(--fhc-secondary) !important;
+	border-color: var(--fhc-border) !important;
+}
+
+html.dark .tabulator .tabulator-header .tabulator-col:hover {
+	background-color: var(--fhc-secondary) !important;
+}

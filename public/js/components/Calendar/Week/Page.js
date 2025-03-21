@@ -63,6 +63,11 @@ export default {
 			const now = new Date();
 			return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 		},
+		curIndicatorStyle() {
+			return {
+				top: this.getDayTimePercent + '%',
+			}
+		},
 		pageHeaderStyle(){
 			return {
 				'z-index': 4,
@@ -74,27 +79,11 @@ export default {
 		},
 		overlayStyle() {
 			return {
-				'background-color': '#F5E9D7',
-				'position': 'absolute',
-				'pointer-events': 'none',
-				'z-index': 2,
 				height:  this.getDayTimePercent + '%',
 				width: this.laneWidth + 'px',
-				opacity: 0.5
 			}
 		},
-		indicatorStyle() {
-			return {
-				'pointer-events': 'none',
-				'padding-left': '3.5rem',
-				'margin-top': '-1px',
-				'z-index': 2,
-				'border-color': '#00649C!important',
-				top: this.hourPosition + 'px',
-				left: 0,
-				right: 0,
-			}
-		},
+		
 		hours(){
 			// returns an array with elements starting at 7 and ending at 24
 			return [...Array(24).keys()].filter(hour => hour >= 7 && hour <= 24);
@@ -171,16 +160,16 @@ export default {
 				d.getDate() === this.todayDate.getDate()
 			)
 		},
-		curIndicatorStyle() {
-
+		indicatorStyle() {
 			return {
 				'pointer-events': 'none',
-				'padding-left': '1rem',
+				'padding-left': '3.5rem',
 				'margin-top': '-1px',
 				'z-index': 2,
-				'border-color': '#00649C!important',
-				top: this.getDayTimePercent + '%',
-				width: this.laneWidth + 'px'
+				'border-color': 'var(--fhc-border)',
+				top: this.hourPosition + 'px',
+				left: 0,
+				right: 0,
 			}
 		},
 		getDayTimePercent() {
@@ -211,14 +200,12 @@ export default {
 				'grid-template-rows': 'repeat(' + (this.hours.length * 60 / this.smallestTimeFrame) + ', 1fr)',
 			}
 			if(day.isPast) {
-				styleObj['background-color'] = '#F5E9D7'
-				styleObj['border-color'] = '#E8E8E8';
-				styleObj.opacity = 0.5;
+				//styleObj['background-color'] = 'var(--calendar-past)'
+				styleObj['border-color'] = 'var(--fhc-border)';
 			} else if (day.isToday) {
 				
-				styleObj['backgroundImage'] = 'linear-gradient(to bottom, #F5E9D7 '+this.getDayTimePercent+'%, #FFFFFF '+this.getDayTimePercent+'%)'
-				styleObj['border-color'] = '#E8E8E8';
-				styleObj.opacity = 0.5;
+				//styleObj['backgroundImage'] = 'linear-gradient(to bottom, var(--calendar-past) '+this.getDayTimePercent+'%, transparent '+this.getDayTimePercent+'%)'
+				styleObj['border-color'] = 'var(--fhc-border)';
 			}
 			
 			return styleObj
@@ -335,7 +322,7 @@ export default {
 	},
 	template: /*html*/`
 	<div ref="page" class="fhc-calendar-week-page" style="min-width: 700px;">
-		<div class="d-flex flex-column">
+	<div class="d-flex flex-column">
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
 				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="dayText[day]?.heading" @click.prevent="changeToDay(day)">
 					<div class="fw-bold">{{dayText[day]?.tag}}</div>
@@ -357,7 +344,7 @@ export default {
 								:style="{'background-color': event?.color, 'margin-bottom':'1px'}"
 								class="d-grid m-1 small rounded overflow-hidden fhc-entry"
 								v-contrast
-								>		
+								>
 								<slot class="p-1" name="weekPage" :event="event" :day="day">
 									<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
 								</slot>
@@ -366,22 +353,22 @@ export default {
 					</div>
 				</div>
 				<div class="events position-relative" :ref="'eventsRef'+week" @mousemove="calcHourPosition" @mouseleave="hourPosition = null">
-					<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border" :style="hourGridStyle(hour)"></div>
+					<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour" class="position-absolute box-shadow-border" :style="hourGridStyle(hour)"></div>
 					<Transition>
-						<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
-							<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
+						<div v-if="hourPosition" class="fhc-calendar-hour-indicator position-absolute small" :style="indicatorStyle" >
+							<span class=" border border-top-0 px-2 ">{{hourPositionTime}}</span>
 						</div>
 					</Transition>
 					<div class="hours">
 						<div v-for="hour in hours" :style="getGridStyle" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
-					<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start position-relative" :style="dayGridStyle(day)">
+					<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" :class="{'past':day.isPast}" class=" day border-start position-relative" :style="dayGridStyle(day)">
 						<Transition>
-							<div v-if="day.isToday" class="position-absolute border-top small"  :style="curIndicatorStyle">
-								<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
+							<div v-if="day.isToday" class="border-top small curTimeIndicator" :style="curIndicatorStyle">
+								<span class="fhc-body-bg border border-top-0 px-2">{{curTime}}</span>
 							</div>
 						</Transition>
-						<div v-if="day.isToday" :style="overlayStyle"></div>
+						<div v-if="day.isToday" class="overlay" :style="overlayStyle"></div>
 						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" 
 						:selected="event.orig == selectedEvent"
 						:style="eventGridStyle(day,event)"

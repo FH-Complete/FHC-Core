@@ -123,7 +123,7 @@ export default {
 			if(day.getDate() === this.todayDate.getDate() 
 				&& day.getMonth() === this.todayDate.getMonth() 
 				&& day.getFullYear() === this.todayDate.getFullYear()) {
-				styleObj['background-color'] = '#00649c'; // fh blau
+				styleObj['background-color'] = 'var(--fhc-primary)'; 
 				styleObj.color = 'white';
 			}
 			
@@ -137,8 +137,8 @@ export default {
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-month-page" :class="{'show-weeks': showWeeks}">
-		<div v-if="showWeeks" class=" bg-light fw-bold border-top border-bottom text-center"></div>
-		<div v-for="day in weeks[0].days" :key="day" class="bg-light fw-bold border-top border-bottom text-center">
+		<div v-if="showWeeks" class=" fw-bold border-top border-bottom text-center"></div>
+		<div v-for="day in weeks[0].days" :key="day" class=" fw-bold border-top border-bottom text-center">
 			{{dayText[day]}}
 		</div>
 		<template v-for="week in weeks"

@@ -1,11 +1,14 @@
 
-
+:root{
+	--profil-border: var(--fhc-border);
+	--profil-tabulator-shadow:var(--fhc-shadow-20);
+}
 
 
 .image-lock{
   height:22px; 
   width:21px; 
-  background-color:white; 
+  background-color:var(--profil-border); 
   position:absolute;
   /* top: 1px is important, otherwise it goes over the border of the thumbnail*/ 
   top:1px; 
@@ -18,7 +21,7 @@
 
 .tabulator-collapsed-row{
     padding:15px;
-    background-color: rgba(0,0,0,0.1);
+    background-color: var(--profil-tabulator-shadow);
 
 }
 
