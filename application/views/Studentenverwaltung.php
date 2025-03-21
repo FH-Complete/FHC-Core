@@ -20,6 +20,7 @@
 			'public/css/Studentenverwaltung.css'
 		],
 		'customJSs' => [
+			'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'
 			#'vendor/npm-asset/primevue/tree/tree.min.js',
 			#'vendor/npm-asset/primevue/toast/toast.min.js'
 		],
