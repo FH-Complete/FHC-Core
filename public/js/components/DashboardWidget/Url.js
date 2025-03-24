@@ -161,9 +161,11 @@ export default {
         <div class="d-flex flex-column justify-content-between">
 
 			<Teleport :to="widget_action_css_identifier">
-				<button v-show="!editModeIsActive" class="btn btn-outline-secondary btn-sm" @click="openCreateModal" type="button">
-					<i class="fa-solid fa-plus"></i>
-				</button>
+				<Transition>
+					<button v-if="!editModeIsActive" class="btn btn-outline-secondary btn-sm" @click="openCreateModal" type="button">
+						<i class="fa-solid fa-plus"></i>
+					</button>
+				</Transition>
 			</Teleport>
 
 			<template v-if="shared">
