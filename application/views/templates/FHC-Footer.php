@@ -13,6 +13,9 @@
 	$calledPath = $this->router->directory.$this->router->class;
 	$calledMethod = $this->router->method;
 
+	$this->load->config('javascript');
+	$use_vuejs_dev_version = $this->config->item('use_vuejs_dev_version');
+
 	// By default set the parameters to null
 	$customJSs = isset($customJSs) ? $customJSs : null;
 	$customJSModules = isset($customJSModules) ? $customJSModules : null;
@@ -27,7 +30,7 @@
 	// Generates the global object to pass phrases to javascripts
 	// NOTE: must be called before including the PhrasesLib.js
 	if ($phrases != null) generateJSPhrasesStorageObject($phrases);
-
+	
 	// --------------------------------------------------------------------------------------------------------
 	// From vendor folder
 
@@ -99,7 +102,10 @@
 
 	// Tabulator 5 JS
 	if ($tabulator5 === true) generateJSsInclude('vendor/olifolkerd/tabulator5/dist/js/tabulator.min.js');
-
+	// Tabulator 5 JQuery
+	if ($tabulator5JQuery === true) generateJSsInclude('public/js/tabulator/jquery_wrapper.js');
+	// Tabulator 6 JS
+	if ($tabulator6 === true) generateJSsInclude('vendor/olifolkerd/tabulator6/dist/js/tabulator.min.js');
 	// Tinymce 3 JS
 	if ($tinymce3 === true) generateJSsInclude('include/tiny_mce/tiny_mce.js');
 
@@ -109,8 +115,22 @@
 	// Vue 3 JS
 	if ($vue3 === true)
 	{
-		generateJSsInclude('vendor/vuejs/vuejs3/vue.global.prod.js');
+		if($use_vuejs_dev_version && $use_vuejs_dev_version === true)
+		{
+			generateJSsInclude('vendor/vuejs/vuejs3_dev/vue.global.js');
+		}
+		else
+		{
+			generateJSsInclude('vendor/vuejs/vuejs3/vue.global.prod.js');
+		}
 		generateJSsInclude('vendor/vuejs/vuerouter4/vue-router.global.js');
+	}
+	
+	// Highcharts
+	if (isset($highcharts) && $highcharts === true)
+	{
+		generateJSsInclude('vendor/highcharts/highcharts-dist/highcharts.js');
+		generateJSsInclude('vendor/highcharts/highcharts-dist/modules/current-date-indicator.js');
 	}
 
 	// PrimeVue
@@ -132,6 +152,7 @@
 		generateJSsInclude('vendor/npm-asset/primevue/toastservice/toastservice.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/confirmdialog/confirmdialog.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/confirmationservice/confirmationservice.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/tieredmenu/tieredmenu.min.js');
 	}
 
 	// --------------------------------------------------------------------------------------------------------
@@ -177,4 +198,3 @@
 </html>
 
 <!-- Footer end -->
-

@@ -307,13 +307,17 @@ if(isset($_REQUEST['AuswahlGebiet']))
 					echo '<tr><td style="border-right:1px solid;">'.$vor->nummer.'</td><td>&nbsp;'.$vorschlag->text.'</td></tr>';
 				}
 			}
-			if($vorschlag->bild!='')
+			if($vorschlag->bild != '')
 			{
 				// zeilenumbruch nach 4 bilder
 				if($anzahlBild%4==0)
 					echo "</tr>";
 				echo "<td>";
 				echo "<img class='testtoolvorschlag' src='../bild.php?src=vorschlag&amp;vorschlag_id=$vor->vorschlag_id&amp;sprache=".$sprache."' /><br/>";
+				if ($vorschlag->text != '')
+				{
+					echo "$vorschlag->text<br>";
+				}
 				if ($loesungen)
 				{
 					echo "<br>".$vor->punkte."</td>";

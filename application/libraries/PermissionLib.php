@@ -96,6 +96,33 @@ class PermissionLib
 	}
 
 	/**
+	 * Prueft ob die Berechtigung zumindest fuer eine der angegebenen OE vorhanden ist.
+	 * @param $berechtigung_kurzbz
+	 * @param $oe_kurzbz
+	 * @param $art
+	 * @param $kostenstelle_id
+	 * @return boolean
+	 */
+	public function isBerechtigtMultipleOe($berechtigung_kurzbz, $oe_kurzbz, $art=null, $kostenstelle_id=null)
+	{
+		$results = array();
+
+		foreach($oe_kurzbz as $value)
+		{
+			$results[] = $this->isBerechtigt($berechtigung_kurzbz, $value, $art, $kostenstelle_id);
+		}
+
+		if(!in_array(true, $results))
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	/**
 	 * Checks if the caller is allowed to access to this content with the given permissions
 	 * - if it's called from command line than it's trusted
 	 * - checks if the parameter $requiredPermissions is set, is an array and contains at least one element

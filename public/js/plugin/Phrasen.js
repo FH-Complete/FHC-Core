@@ -2,6 +2,11 @@ import FhcApi from './FhcApi.js';
 
 const categories = Vue.reactive({});
 const loadingModules = {};
+let user_language = Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
+export let user_locale = Vue.computed(()=>{
+	if(!user_language.value) return null;
+	return FHC_JS_DATA_STORAGE_OBJECT.server_languages.find(language => language.sprache == user_language.value).LC_Time;
+});
 
 function extractCategory(obj, category) {
 	return obj.filter(e => e.category == category).reduce((res, elem) => {
@@ -19,8 +24,22 @@ function getValueForLoadedPhrase(category, phrase, params) {
 	return result;
 }
 
-
 const phrasen = {
+	user_language,
+	user_locale,
+	setLanguage(language, api) {
+		const catArray = Object.keys(categories)
+		return api.factory.phrasen.setLanguage(catArray, language).then(res => {
+			res.data.forEach(row => {
+				categories[row.category][row.phrase] = row.text
+			})
+
+			// update the reactive data that holds the current active user_language
+			user_language.value = language;
+
+			return res
+		})
+	},
 	loadCategory(category) {
 		if (Array.isArray(category))
 			return Promise.all(category.map(this.config.globalProperties
@@ -67,8 +86,11 @@ export default {
 		app.config.globalProperties.$p = {
 			t: phrasen.t,
 			loadCategory: cat => phrasen.loadCategory.call(app, cat),
+			setLanguage: phrasen.setLanguage,
+			user_language: user_language,
+			user_locale,
 			t_ref: phrasen.t_ref
 		};
-                app.provide('$p', app.config.globalProperties.$p);
+		app.provide('$p', app.config.globalProperties.$p);
 	}
 }

@@ -4,6 +4,12 @@ import FhcApiFactory from '../api/fhcapifactory.js';
 
 export default {
 	install: (app, options) => {
+		if (app.config.globalProperties.$fhcApi) {
+			if (options?.factory) {
+				app.config.globalProperties.$fhcApi.factory.addEndpoints(options.factory);
+			}
+			return;
+		}
 		app.use(FhcAlert);
 
 		function _get_config(form, uri, data, config) {
@@ -46,9 +52,9 @@ export default {
 				result.meta.response = response;
 			return result;
 		}
-
+		const baseURL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/";
 		const fhcApiAxios = axios.create({
-			timeout: 5000,
+			timeout: 500000,
 			baseURL: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"
 		});
 
@@ -58,7 +64,7 @@ export default {
 
 			if (config.data instanceof FormData)
 				return config;
-			
+
 			if (!Object.values(config.data).every(item => {
 				if (item instanceof FileList)
 					return false;
@@ -96,7 +102,7 @@ export default {
 				|| response.config?.errorHandling === false
 				|| response.config?.errorHandling == 'fail')
 				return _clean_return_value(response);
-			
+
 			// NOTE(chris): loop through errors
 			if (response.data.errors)
 				response.data.errors = response.data.errors.filter(
@@ -107,7 +113,7 @@ export default {
 		}, error => {
 			if (error.code == 'ERR_CANCELED')
 				return Promise.reject({...{handled: true}, ...error});
-			
+
 			if (error.config?.errorHandling == 'off'
 				|| error.config?.errorHandling === false
 				|| error.config?.errorHandling == 'success')
@@ -118,7 +124,7 @@ export default {
 					app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL, true);
 					return Promise.reject({...{handled: true}, ...error});
 				}
-				
+
 				// NOTE(chris): loop through errors
 				error.response.data.errors = error.response.data.errors.filter(
 					err => (error.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, error.config)
@@ -132,7 +138,7 @@ export default {
 				app.config.globalProperties.$fhcAlert.alertError(error.message);
 				return Promise.reject({...{handled: true}, ...error});
 			}
-			
+
 			return Promise.reject(error);
 		});
 
@@ -293,29 +299,39 @@ export default {
 
 		class FhcApiFactoryWrapper {
 			constructor(factorypart, root) {
-				if (root === undefined)
+				if (root === undefined) {
 					this.$fhcApi = app.config.globalProperties.$fhcApi;
-				else
+					this.$fhcApi.factory = this;
+				} else {
 					Object.defineProperty(this, '$fhcApi', {
 						get() {
 							return (root || this).$fhcApi;
 						}
 					})
+				}
+
+				this.addEndpoints(factorypart)
+			}
+
+			addEndpoints(factorypart) {
 				Object.keys(factorypart).forEach(key => {
 					Object.defineProperty(this, key, {
 						get() {
 							if (typeof factorypart[key] == 'function')
 								return factorypart[key].bind(this);
-							return new FhcApiFactoryWrapper(factorypart[key], root || this);
+							return new FhcApiFactoryWrapper(factorypart[key], this.$fhcApi.factory);
 						}
 					});
 				});
 			}
 		}
 
-		const mergedFhcApiFactory = options?.factory ? {...FhcApiFactory, ...options.factory} : FhcApiFactory;
+		const factory = new FhcApiFactoryWrapper(FhcApiFactory);
+		if (options?.factory)
+			factory.addEndpoints(options.factory);
 
-		app.config.globalProperties.$fhcApi.factory = new FhcApiFactoryWrapper(mergedFhcApiFactory);
-                app.provide('$fhcApi', app.config.globalProperties.$fhcApi);
+		app.config.globalProperties.$fhcApi.factory = factory;
+
+		app.provide('$fhcApi', app.config.globalProperties.$fhcApi);
 	}
 };
