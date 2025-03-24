@@ -1,14 +1,14 @@
 import CisMenuEntry from "./Menu/Entry.js";
 import FhcSearchbar from "../searchbar/searchbar.js";
 import CisSprachen from "./Sprachen.js"
-import DarkTheme from "./DarkTheme.js";
+import ThemeSwitch from "./ThemeSwitch.js";
 
 export default {
     components: {
         CisMenuEntry,
         FhcSearchbar,
 		CisSprachen,
-		DarkTheme,
+		ThemeSwitch,
     },
     props: {
 		rootUrl: String,

@@ -1,10 +1,10 @@
 /* css overrides for static cms content */
-@import './CisVariablesCms.css';
+@import './default_cms_fixes.css';
 
 /* colors */
 :root {
 
-	--fhc-black-10:black;
+	--fhc-black-10: black;
 	--fhc-black-20: #1d2024;
 	--fhc-black-30: #212529;
 	--fhc-black-40: #292b2a;
@@ -13,14 +13,14 @@
 	--fhc-black-70: #343a40;
 
 	--fhc-white-10: #FFFFFF;
-	--fhc-white-20:#f6f6f6;
-	--fhc-white-30:#eceff1;
-	--fhc-white-40:#e9ecef;
-	--fhc-white-50:#dee2e6;
-	--fhc-white-60:#d5dae0;
-	--fhc-white-70:#ced4da;
-	--fhc-white-80:#c7cbcf;
-	--fhc-white-90:#aeb3b8;
+	--fhc-white-20: #f6f6f6;
+	--fhc-white-30: #eceff1;
+	--fhc-white-40: #e9ecef;
+	--fhc-white-50: #dee2e6;
+	--fhc-white-60: #d5dae0;
+	--fhc-white-70: #ced4da;
+	--fhc-white-80: #c7cbcf;
+	--fhc-white-90: #aeb3b8;
 
 	--fhc-gray-10: #858f97;
 	--fhc-gray-20: #72777A;
@@ -40,18 +40,18 @@
 
 	--fhc-red-10: #842029;
 	--fhc-red-20: #800000;
-	
+
 	--fhc-green-10: #008000;
 
-	--fhc-beige-10: rgba(245, 233, 215,0.5);
-	--fhc-beige-20: rgba(172, 153, 125,0.5);
-	
-	
+	--fhc-beige-10: rgba(245, 233, 215, 0.5);
+	--fhc-beige-20: rgba(172, 153, 125, 0.5);
+
+
 
 }
 
-:root.light{
-	
+:root.light {
+
 
 	/* fhc base colors */
 	--fhc-primary: var(--fhc-blue-20);
@@ -72,10 +72,10 @@
 	/*background*/
 	--fhc-background: var(--fhc-white-10);
 	--fhc-background-highlight: var(--fhc-white-60);
-	
+
 	/*text*/
 	--fhc-text: var(--fhc-black-30);
-	
+
 	/* shadows and borders */
 	--fhc-shadow-20: rgba(0, 0, 0, 0.2);
 	--fhc-shadow-40: rgba(0, 0, 0, 0.4);
@@ -100,7 +100,7 @@
 
 }
 
-:root.dark{
+:root.dark {
 
 	/* fhc base colors */
 	--fhc-primary: var(--fhc-blue-primary-highlight);

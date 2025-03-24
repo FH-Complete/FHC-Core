@@ -88,6 +88,7 @@ function generateCSSsInclude($CSSs)
 function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 {
 	$ci =& get_instance();
+	$ci->load->config('theme');
 	$ci->load->model('system/Sprache_model','SpracheModel');
 	$server_language = getData($ci->SpracheModel->loadWhere(['content' => true]));
 	$server_language = array_map(function($language){
@@ -103,6 +104,10 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 		'server_languages' => $server_language,
 		'user_language' => $user_language,
 		'timezone' => date_default_timezone_get(),
+		'theme' => [
+			'name'=>$ci->config->item('theme_name'),
+			'modes'=>$ci->config->item('theme_modes'),
+		]
 	);
 
 	$toPrint = "\n";

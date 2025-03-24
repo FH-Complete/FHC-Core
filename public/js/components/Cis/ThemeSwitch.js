@@ -1,8 +1,9 @@
 export default {
 	data:()=>{
 		return{
-			theme:'light',
-			themes:['light','dark','purple'],
+			theme: FHC_JS_DATA_STORAGE_OBJECT.theme.modes[0],
+			theme_name: FHC_JS_DATA_STORAGE_OBJECT.theme.name,
+			themes: FHC_JS_DATA_STORAGE_OBJECT.theme.modes,
 		}
 	},
 	methods:{
@@ -39,6 +40,9 @@ export default {
 		}
 		this.toggleTheme(this.theme);
 
+	},
+	created(){
+		document.documentElement.classList.add(this.theme_name);	
 	},
 	template:/*html*/`
 
