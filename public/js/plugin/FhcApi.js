@@ -1,3 +1,4 @@
+console.warn('plugin/FhcApi.js is DEPRECATED! Use plugins/Api.js instead.');
 import FhcAlert from './FhcAlert.js';
 import FhcApiFactory from '../api/fhcapifactory.js';
 
@@ -5,9 +6,12 @@ import FhcApiFactory from '../api/fhcapifactory.js';
 export default {
 	install: (app, options) => {
 		if (app.config.globalProperties.$fhcApi) {
+			/* Depricated Code start */
 			if (options?.factory) {
+				console.warn("$fhcApi is DEPRICATED!");
 				app.config.globalProperties.$fhcApi.factory.addEndpoints(options.factory);
 			}
+			/* Depricated Code end */
 			return;
 		}
 		app.use(FhcAlert);
@@ -297,11 +301,31 @@ export default {
 			}
 		};
 
+		/* Depricated Code start */
 		class FhcApiFactoryWrapper {
 			constructor(factorypart, root) {
 				if (root === undefined) {
-					this.$fhcApi = app.config.globalProperties.$fhcApi;
-					this.$fhcApi.factory = this;
+					this.$fhcApi = {
+						getUri(url) {
+							console.warn('$fhcApi.factory is DEPRICATED!');
+							return app.config.globalProperties.$fhcApi.getUri(url);
+						},
+						get(form, uri, params, config) {
+							console.warn('$fhcApi.factory is DEPRICATED!');
+							return app.config.globalProperties.$fhcApi.get(form, uri, params, config);
+						},
+						post(form, uri, data, config) {
+							console.warn('$fhcApi.factory is DEPRICATED!');
+							return app.config.globalProperties.$fhcApi.post(form, uri, data, config);
+						}
+					};
+					Object.defineProperty(this.$fhcApi, 'factory', {
+						get() {
+							console.warn('$fhcApi.factory is DEPRICATED!');
+							return app.config.globalProperties.$fhcApi.factory;
+						}
+					});
+					app.config.globalProperties.$fhcApi.factory = this;
 				} else {
 					Object.defineProperty(this, '$fhcApi', {
 						get() {
@@ -323,15 +347,19 @@ export default {
 						}
 					});
 				});
+				console.warn('$fhcApi.factory.addEndpoints() is DEPRICATED!');
 			}
 		}
 
 		const factory = new FhcApiFactoryWrapper(FhcApiFactory);
-		if (options?.factory)
+		if (options?.factory) {
+			console.warn("$fhcApi is DEPRICATED!");
 			factory.addEndpoints(options.factory);
+		}
 
 		app.config.globalProperties.$fhcApi.factory = factory;
-
+		/* Depricated Code end */
+		
 		app.provide('$fhcApi', app.config.globalProperties.$fhcApi);
 	}
 };

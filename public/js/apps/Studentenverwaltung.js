@@ -18,7 +18,7 @@
 import FhcStudentenverwaltung from "../components/Stv/Studentenverwaltung.js";
 import fhcapifactory from "./api/fhcapifactory.js";
 
-import Phrasen from "../plugin/Phrasen.js";
+import PluginsPhrasen from "../plugins/Phrasen.js";
 
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -43,5 +43,5 @@ app
 			overlay: 1100
 		}
 	})
-	.use(Phrasen)
+	.use(PluginsPhrasen)
 	.mount('#main');

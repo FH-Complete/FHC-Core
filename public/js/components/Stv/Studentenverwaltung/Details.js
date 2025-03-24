@@ -1,5 +1,7 @@
 import FhcTabs from "../../Tabs.js";
 
+import ApiStvApp from '../../../api/factory/stv/app.js';
+
 // TODO(chris): alt & title
 // TODO(chris): phrasen
 
@@ -39,14 +41,14 @@ export default {
 		}
 	},
 	created() {
-		this.$fhcApi
-			.factory.stv.configStudent()
+		this.$api
+			.call(ApiStvApp.configStudent())
 			.then(result => {
 				this.configStudent = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.factory.stv.configStudents()
+		this.$api
+			.call(ApiStvApp.configStudents())
 			.then(result => {
 				this.configStudents = result.data;
 			})

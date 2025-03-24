@@ -3,6 +3,8 @@ import AcceptDenyUpdate from "./AcceptDenyUpdate.js";
 import Alert from "../../../components/Bootstrap/Alert.js";
 import Loading from "../../../components/Loader.js";
 
+import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+
 const sortProfilUpdates = (ele1, ele2, thisPointer) => {
   let result = 0;
   if (ele1.status === thisPointer.profilUpdateStates["Pending"]) {
@@ -127,7 +129,8 @@ export default {
                   "acceptUpdate"
                 )}`,
                 action: (e, column) => {
-                  this.$fhcApi.factory.profilUpdate.acceptProfilRequest(column.getData())
+                  this.$api
+                    .call(ApiProfilUpdate.acceptProfilRequest(column.getData()))
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
@@ -143,7 +146,8 @@ export default {
                   "denyUpdate"
                 )}`,
                 action: (e, column) => {
-                  this.$fhcApi.factory.profilUpdate.denyProfilRequest(column.getData())
+                  this.$api
+                    .call(ApiProfilUpdate.denyProfilRequest(column.getData()))
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
@@ -296,7 +300,8 @@ export default {
   },
   methods: {
     denyProfilUpdate: function (data) {
-      this.$fhcApi.factory.profilUpdate.denyProfilRequest(data)
+      this.$api
+        .call(ApiProfilUpdate.denyProfilRequest(data))
         .then((res) => {
           // block when the request was successful
         })
@@ -306,7 +311,8 @@ export default {
         });
     },
     acceptProfilUpdate: function (data) {
-      this.$fhcApi.factory.profilUpdate.acceptProfilRequest(data)
+      this.$api
+        .call(ApiProfilUpdate.acceptProfilRequest(data))
         .then((res) => {
           // block when the request was successful
         })

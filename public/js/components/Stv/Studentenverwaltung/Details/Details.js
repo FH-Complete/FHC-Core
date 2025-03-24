@@ -4,6 +4,8 @@ import FormUploadImage from '../../../Form/Upload/Image.js';
 
 import CoreUdf from '../../../Udf/Udf.js';
 
+import ApiStvDetails from '../../../../api/factory/stv/details.js';
+
 
 export default {
 	components: {
@@ -93,7 +95,8 @@ export default {
 	},
 	methods: {
 		updateStudent(n) {
-			return this.$fhcApi.factory.stv.details.get(n.prestudent_id)
+			return this.$api
+				.call(ApiStvDetails.get(n.prestudent_id))
 				.then(result => {
 					this.data = result.data;
 					if (!this.data.familienstand)
@@ -107,7 +110,8 @@ export default {
 				return;
 
 			this.$refs.form.clearValidation();
-			return this.$fhcApi.factory.stv.details.save(this.$refs.form, this.modelValue.prestudent_id, this.changed)
+			return this.$refs.form
+				.call(ApiStvDetails.save(this.modelValue.prestudent_id, this.changed))
 				.then(result => {
 					this.original = {...this.data};
 					this.changed = {};

@@ -4,6 +4,8 @@ import TblHistory from "./Prestudent/History.js";
 
 import CoreUdf from '../../../Udf/Udf.js';
 
+import ApiStvPrestudent from '../../../../api/factory/stv/prestudent.js';
+
 export default {
 	components: {
 		FormForm,
@@ -88,7 +90,8 @@ export default {
 
 	methods: {
 		loadPrestudent() {
-			return this.$fhcApi.factory.stv.prestudent.get(this.modelValue.prestudent_id)
+			return this.$api
+				.call(ApiStvPrestudent.get(this.modelValue.prestudent_id))
 				.then(result => result.data)
 				.then(result => {
 					this.data = result;
@@ -100,8 +103,9 @@ export default {
 		udfsLoaded(udfs) {
 			this.initialFormData = {...(this.initialFormData || {}), ...udfs};
 		},
-		updatePrestudent(){
-			return this.$fhcApi.factory.stv.prestudent.updatePrestudent(this.$refs.form, this.modelValue.prestudent_id, this.deltaArray)
+		updatePrestudent() {
+			return this.$refs.form
+				.call(ApiStvPrestudent.updatePrestudent(this.modelValue.prestudent_id, this.deltaArray))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.initialFormData = {...this.data};
@@ -116,55 +120,64 @@ export default {
 	},
 	created() {
 		this.loadPrestudent();
-		this.$fhcApi.factory.stv.prestudent.getBezeichnungZGV()
+		this.$api
+			.call(ApiStvPrestudent.getBezeichnungZGV())
 			.then(result => result.data)
 			.then(result => {
 				this.listZgvs = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.prestudent.getBezeichnungMZgv()
+		this.$api
+			.call(ApiStvPrestudent.getBezeichnungMZgv())
 			.then(result => result.data)
 			.then(result => {
 				this.listZgvsmaster = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.prestudent.getBezeichnungDZgv()
+		this.$api
+			.call(ApiStvPrestudent.getBezeichnungDZgv())
 			.then(result => result.data)
 			.then(result => {
 				this.listZgvsdoktor = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.prestudent.getStgs()
+		this.$api
+			.call(ApiStvPrestudent.getStgs())
 			.then(result => result.data)
 			.then(result => {
 				this.listStgs = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.prestudent.getAusbildung()
+		this.$api
+			.call(ApiStvPrestudent.getAusbildung())
 			.then(result => result.data)
 			.then(result => {
 				this.listAusbildung = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.prestudent.getAufmerksamdurch()
+		this.$api
+			.call(ApiStvPrestudent.getAufmerksamdurch())
 			.then(result => result.data)
 			.then(result => {
 				this.listAufmerksamdurch = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.prestudent.getBerufstaetigkeit()
+		this.$api
+			.call(ApiStvPrestudent.getBerufstaetigkeit())
 			.then(result => result.data)
 			.then(result => {
 				this.listBerufe = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.prestudent.getTypenStg()
+		this.$api
+			.call(ApiStvPrestudent.getTypenStg())
 			.then(result => result.data)
 			.then(result => {
 				this.listStgTyp = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.prestudent.getBisstandort()
+		this.$api
+			.call(ApiStvPrestudent.getBisstandort())
 			.then(result => result.data)
 			.then(result => {
 				this.listBisStandort = result;

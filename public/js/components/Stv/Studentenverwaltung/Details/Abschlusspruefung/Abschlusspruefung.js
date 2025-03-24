@@ -5,6 +5,9 @@ import FormInput from '../../../../Form/Input.js';
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import AbschlusspruefungDropdown from "./AbschlusspruefungDropdown.js";
 
+import ApiStudiengang from '../../../../../api/factory/studiengang.js';
+import ApiStvAbschlusspruefung from '../../../../../api/factory/stv/abschlusspruefung.js';
+
 export default {
 	components: {
 		CoreFilterCmpt,
@@ -57,12 +60,7 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.abschlusspruefung.getAbschlusspruefung,
-				ajaxParams: () => {
-					return {
-						id: this.student.uid
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(ApiStvAbschlusspruefung.getAbschlusspruefung(this.student.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "vorsitz", field: "vorsitz_nachname"},
@@ -272,9 +270,10 @@ export default {
 	methods: {
 		getStudiengangByKz(){
 			this.stgInfo = { typ: '', oe_kurzbz: '' };
-			this.$fhcApi.factory.studiengang.getStudiengangByKz(this.stg_kz)
-					.then(result => this.stgInfo = result.data)
-					.catch(this.$fhcAlert.handleSystemError);
+			this.api
+				.call(ApiStudiengang.getStudiengangByKz(this.stg_kz))
+				.then(result => this.stgInfo = result.data)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		actionNewAbschlusspruefung() {
 			this.resetForm();
@@ -303,7 +302,8 @@ export default {
 				formData: this.formData
 			};
 
-			return this.$fhcApi.factory.stv.abschlusspruefung.addNewAbschlusspruefung(this.$refs.formFinalExam, dataToSend)
+			return this.$refs.formFinalExam
+				.call(ApiStvAbschlusspruefung.addNewAbschlusspruefung(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('finalexamModal');
@@ -321,7 +321,8 @@ export default {
 			this.$refs.table.reloadTable();
 		},
 		loadAbschlusspruefung(abschlusspruefung_id) {
-			return this.$fhcApi.factory.stv.abschlusspruefung.loadAbschlusspruefung(abschlusspruefung_id)
+			return this.$api
+				.call(ApiStvAbschlusspruefung.loadAbschlusspruefung(abschlusspruefung_id))
 				.then(result => {
 					this.formData = result.data;
 					//TODO(Manu) check if cisRoot is okay
@@ -335,7 +336,8 @@ export default {
 				id: abschlusspruefung_id,
 				formData: this.formData
 			};
-			return this.$fhcApi.factory.stv.abschlusspruefung.updateAbschlusspruefung(this.$refs.formFinalExam, dataToSend)
+			return this.$refs.formFinalExam
+				.call(ApiStvAbschlusspruefung.updateAbschlusspruefung(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('finalexamModal');
@@ -347,7 +349,8 @@ export default {
 				});
 		},
 		deleteAbschlusspruefung(abschlusspruefung_id) {
-			return this.$fhcApi.factory.stv.abschlusspruefung.deleteAbschlusspruefung(abschlusspruefung_id)
+			return this.$api
+				.call(ApiStvAbschlusspruefung.deleteAbschlusspruefung(abschlusspruefung_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				})
@@ -381,7 +384,8 @@ export default {
 			}
 			this.abortController.mitarbeiter = new AbortController();
 
-			return this.$fhcApi.factory.stv.abschlusspruefung.getMitarbeiter(event.query)
+			return this.$api
+				.call(ApiStvAbschlusspruefung.getMitarbeiter(event.query))
 				.then(result => {
 					this.filteredMitarbeiter = result.data.retval;
 				});
@@ -392,7 +396,8 @@ export default {
 			}
 			this.abortController.pruefer = new AbortController();
 
-			return this.$fhcApi.factory.stv.abschlusspruefung.getPruefer(event.query)
+			return this.$api
+				.call(ApiStvAbschlusspruefung.getPruefer(event.query))
 				.then(result => {
 					this.filteredPruefer = result.data.retval;
 				});
@@ -422,33 +427,43 @@ export default {
 		},
 	},
 	created() {
-		this.$fhcApi.factory.stv.abschlusspruefung.getTypenAbschlusspruefung()
+		this.$api
+			.call(ApiStvAbschlusspruefung.getTypenAbschlusspruefung())
 			.then(result => {
 				this.arrTypen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.abschlusspruefung.getTypenAntritte()
+
+		this.$api
+			.call(ApiStvAbschlusspruefung.getTypenAntritte())
 			.then(result => {
 				this.arrAntritte = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.abschlusspruefung.getBeurteilungen()
+
+		this.$api
+			.call(ApiStvAbschlusspruefung.getBeurteilungen())
 			.then(result => {
 				this.arrBeurteilungen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.abschlusspruefung.getNoten()
+
+		this.$api
+			.call(ApiStvAbschlusspruefung.getNoten())
 			.then(result => {
 				this.arrNoten = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.abschlusspruefung.getAkadGrade(this.student.studiengang_kz)
+
+		this.$api
+			.call(ApiStvAbschlusspruefung.getAkadGrade(this.student.studiengang_kz))
 			.then(result => {
 				this.arrAkadGrad = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		if (!this.student.length) {
-			this.$fhcApi.factory.studiengang.getStudiengangByKz(this.student.studiengang_kz)
+			this.$api
+				.call(ApiStudiengang.getStudiengangByKz(this.student.studiengang_kz))
 				.then(result => {
 					this.stgInfo = result.data;
 					this.setDefaultFormData();

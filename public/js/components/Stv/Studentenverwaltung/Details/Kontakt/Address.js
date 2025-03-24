@@ -5,6 +5,9 @@ import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 
+import ApiStvAddress from '../../../../../api/factory/stv/kontakt/address.js';
+import ApiStvCompany from '../../../../../api/factory/stv/kontakt/company.js';
+
 export default{
 	components: {
 		CoreFilterCmpt,
@@ -21,12 +24,7 @@ export default{
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.kontakt.getAdressen,
-				ajaxParams: () => {
-					return {
-						id: this.uid
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(ApiStvAddress.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
 				columns:[
@@ -230,7 +228,7 @@ export default{
 	},
 	watch: {
 		uid() {
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Kontakt/getAdressen/' + this.uid);
+			this.reload();
 		},
 	},
 	methods:{
@@ -262,22 +260,23 @@ export default{
 		},
 		addNewAddress(addressData) {
 			this.addressData.plz = this.addressData.address.plz;
-			return this.$fhcApi.factory.stv.kontakt.addNewAddress(this.$refs.addressData, this.uid, this.addressData)
+			return this.$refs.addressData
+				.call(ApiStvAddress.add(this.uid, this.addressData))
 				.then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('adressModal');
 					this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
-				this.reload();
-			});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(this.reload);
 		},
 		reload() {
 			this.$refs.table.reloadTable();
 		},
 		loadAdress(adresse_id) {
 			this.statusNew = false;
-			return this.$fhcApi.factory.stv.kontakt.loadAddress(adresse_id)
+			return this.$api
+				.call(ApiStvAddress.load(adresse_id))
 				.then(result => {
 					this.addressData = result.data;
 					this.addressData.address = {};
@@ -288,23 +287,24 @@ export default{
 		},
 		updateAddress(adresse_id) {
 			this.addressData.plz = this.addressData.address.plz;
-			return this.$fhcApi.factory.stv.kontakt.updateAddress(this.$refs.addressData, adresse_id,
-				this.addressData
-			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+			return this.$refs.addressData
+				.call(ApiStvAddress.update(adresse_id, this.addressData))
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('adressModal');
 					this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
-			.finally(() => {
-				this.reload();
-			});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(this.reload);
 		},
 		deleteAddress(adresse_id) {
-			return this.$fhcApi.factory.stv.kontakt.deleteAddress(adresse_id)
+			return this.$api
+				.call(ApiStvAddress.delete(adresse_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-				}).catch(this.$fhcAlert.handleSystemError)
-				.finally(()=> {
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
 				});
@@ -317,7 +317,8 @@ export default{
 
 			this.abortController.places = new AbortController();
 
-			return this.$fhcApi.factory.stv.kontakt.getPlaces(this.addressData.address.plz)
+			return this.$api
+				.call(ApiStvAddress.getPlaces(this.addressData.address.plz))
 				.then(result => {
 					this.places = result.data;
 				});
@@ -329,7 +330,8 @@ export default{
 
 			this.abortController.firmen = new AbortController();
 
-			return this.$fhcApi.factory.stv.kontakt.getFirmen(event.query)
+			return this.$api
+				.call(ApiStvCompany.get(event.query))
 				.then(result => {
 					this.filteredFirmen = result.data.retval;
 				});
@@ -356,13 +358,15 @@ export default{
 		},
 	},
 	created() {
-		this.$fhcApi.factory.stv.kontakt.getNations()
+		this.$api
+			.call(ApiStvAddress.getNations())
 			.then(result => {
 				this.nations = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi.factory.stv.kontakt.getAdressentypen()
+		this.$api
+			.call(ApiStvAddress.getTypes())
 			.then(result => {
 				this.adressentypen = result.data;
 			})

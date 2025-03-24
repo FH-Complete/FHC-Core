@@ -1,6 +1,8 @@
 import BsAlert from '../../Bootstrap/Alert.js';
 import {CoreFetchCmpt} from "../../Fetch.js";
 
+import ApiStudstatusWiederholung from '../../../api/factory/studstatus/wiederholung.js';
+
 export default {
 	components: {
 		CoreFetchCmpt
@@ -45,8 +47,8 @@ export default {
 		loadlvs() {
 			if (!this.antragId)
 				return new Promise(() => {});
-			return this.$fhcApi.factory
-				.studstatus.wiederholung.getLvs(this.antragId);
+			return this.$api
+				.call(ApiStudstatusWiederholung.getLvs(this.antragId));
 		},
 		submit(result) {
 			this.result = [result, this.check];

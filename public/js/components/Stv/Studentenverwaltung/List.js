@@ -107,6 +107,7 @@ export default {
 					}
 				},
 
+				ajaxRequestFunc: (url, params) => this.$api.call({url, params}),
 				ajaxResponse: (url, params, response) => response.data,
 
 				layout: 'fitDataStretch',
@@ -175,7 +176,7 @@ export default {
 				}
 			}
 		},
-		updateUrl(url, first) {
+		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
 
 			const params = {}, filter = {};
@@ -189,14 +190,14 @@ export default {
 
 			if (!this.$refs.table.tableBuilt) {
 				if (!this.$refs.table.tabulator) {
-					this.tabulatorOptions.ajaxURL = url;
+					this.tabulatorOptions.ajaxURL = endpoint.url;
 					this.tabulatorOptions.ajaxParams = params;
 				} else
 					this.$refs.table.tabulator.on("tableBuilt", () => {
-						this.$refs.table.tabulator.setData(url, params);
+						this.$refs.table.tabulator.setData(endpoint.url, params);
 					});
 			} else
-				this.$refs.table.tabulator.setData(url, params);
+				this.$refs.table.tabulator.setData(endpoint.url, params);
 		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
 			if (!this.focusObj)

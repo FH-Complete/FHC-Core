@@ -1,4 +1,8 @@
 import EditProfil from "../ProfilModal/EditProfil.js";
+
+import ApiProfil from '../../../../api/factory/profil.js';
+import ApiProfilUpdate from '../../../../api/factory/profilUpdate.js';
+
 //? EditProfil is the modal used to edit the profil updates
 export default {
 	components: {EditProfil},
@@ -52,11 +56,13 @@ export default {
 				};
 
 				const filesFromDatabase =
-					await this.$fhcApi.factory.profilUpdate.getProfilRequestFiles(
-						updateRequest.profil_update_id
-					).then((res) => {
-						return res.data;
-					});
+					await this.$api
+						.call(ApiProfilUpdate.getProfilRequestFiles(
+							updateRequest.profil_update_id
+						))
+						.then((res) => {
+							return res.data;
+						});
 
 				files = filesFromDatabase;
 				if (files) {
@@ -77,7 +83,7 @@ export default {
 
 			if (view === "EditAdresse") {
 
-				const isMitarbeiter = await this.$fhcApi.factory.profil.isMitarbeiter(updateRequest.uid).then((res) => res.data);
+				const isMitarbeiter = await this.$api.call(ApiProfil.isMitarbeiter(updateRequest.uid)).then((res) => res.data);
 
 				if (isMitarbeiter) {
 					content["isMitarbeiter"] = isMitarbeiter;
@@ -106,16 +112,16 @@ export default {
 		},
 
 		deleteRequest: function (item) {
-			this.$fhcApi.factory.profilUpdate.deleteProfilRequest(item.profil_update_id).then(
-				(res) => {
+			this.$api
+				.call(ApiProfil.deleteProfilRequest(item.profil_update_id))
+				.then((res) => {
 					if (res.data.error) {
 						//? open alert
 						console.error("error happened", res.data);
 					} else {
 						this.$emit("fetchUpdates");
 					}
-				}
-			);
+				});
 		},
 
 		getView: function (topic, status) {

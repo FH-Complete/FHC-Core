@@ -3,6 +3,9 @@ import FormInput from "../../../Form/Input.js";
 import KontoNew from "./Konto/New.js";
 import KontoEdit from "./Konto/Edit.js";
 
+import ApiStvFilter from '../../../../api/factory/stv/filter.js';
+import ApiStvKonto from '../../../../api/factory/stv/konto.js';
+
 const LOCAL_STORAGE_ID_FILTER = 'stv_details_konto_2024-01-11_filter';
 
 export default {
@@ -78,7 +81,7 @@ export default {
 					this.$fhcAlert
 						.confirmDelete()
 						.then(result => result ? cell.getData().buchungsnr : Promise.reject({handled:true}))
-						.then(this.$fhcApi.factory.stv.konto.delete)
+						.then(buchungsnr => this.$api.call(ApiStvKonto.delete(buchungsnr)))
 						.then(() => {
 							// TODO(chris): deleting a child also removes the siblings!
 							//cell.getRow().delete();
@@ -94,14 +97,21 @@ export default {
 			return Object.values(columns);
 		},
 		tabulatorOptions() {
-			return this.$fhcApi.factory.stv.konto.tabulatorConfig({
+			return {
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: () => this.$api.call(ApiStvKonto.get(
+					this.modelValue.person_id || this.modelValue.map(e => e.person_id),
+					this.filter,
+					this.studiengang_kz_intern ? this.stg_kz : ''
+				)),
+				ajaxResponse: (url, params, response) => response.data,
 				dataTree: true,
 				columns: this.tabulatorColumns,
 				selectable: true,
 				selectableRangeMode: 'click',
 				index: 'buchungsnr',
 				persistenceID: 'stv-details-konto'
-			}, this);
+			};
 		}
 	},
 	watch: {
@@ -124,11 +134,11 @@ export default {
 			this.$refs.new.open();
 		},
 		actionCounter(selected) {
-			this.$fhcApi
-				.factory.stv.konto.counter({
+			this.$api
+				.call(ApiStvKonto.counter({
 					buchungsnr: selected.map(e => e.buchungsnr),
 					buchungsdatum: this.counterdate
-				})
+				}))
 				.then(result => result.data)
 				.then(this.updateData)
 				.then(() => this.$p.t('ui/gespeichert'))
@@ -172,8 +182,8 @@ export default {
 			if (type == 'open')
 				window.localStorage.setItem(LOCAL_STORAGE_ID_FILTER, this.filter ? 1 : 0);
 			else if (type == 'current_stg')
-				this.$fhcApi.factory
-					.stv.filter.setStg(this.studiengang_kz)
+				this.$api
+					.call(ApiStvFilter.setStg(this.studiengang_kz))
 					.catch(this.$fhcAlert.handleSystemError);
 
 			this.$nextTick(this.$refs.table.reloadTable);
@@ -181,8 +191,8 @@ export default {
 	},
 	created() {
 		this.filter = window.localStorage.getItem(LOCAL_STORAGE_ID_FILTER) == 1;
-		this.$fhcApi.factory
-			.stv.filter.getStg()
+		this.$api
+			.call(ApiStvFilter.getStg())
 			.then(result => this.studiengang_kz = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
 	},
