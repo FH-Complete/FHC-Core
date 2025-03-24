@@ -6,7 +6,6 @@
 		'axios027' => true,
 		'bootstrap5' => true,
 		'fontawesome6' => true,
-		'phrases' => array(),
 		'primevue3' => true,
 		'customJSModules' => array('public/js/apps/Cis/BankData.js'),
 		'customCSSs' => array(

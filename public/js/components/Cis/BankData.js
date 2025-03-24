@@ -38,7 +38,7 @@ export default {
 			this.$refs.form.factory.bankData.postBankData(this.bankName, this.bic, this.iban)
 				.then(result => {
 					this.$emit('saved', result.data);
-					this.$fhcAlert.alertSuccess(this.$p.t('ui/gespeichert'));
+					this.$fhcAlert.alertSuccess(this.$p.t('global', 'aenderungGespeichert'));
 				})
 				.catch(error => {
 					this.$fhcAlert.handleSystemError(error);
