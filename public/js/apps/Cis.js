@@ -2,6 +2,7 @@ import FhcSearchbar from "../components/searchbar/searchbar.js";
 import CisMenu from "../components/Cis/Menu.js";
 import FhcApi from '../plugin/FhcApi.js';
 import Phrasen from '../plugin/Phrasen.js';
+import Theme from "../plugin/Theme.js";
 import fhcapifactory from "./api/fhcapifactory.js";
 Vue.$fhcapi = fhcapifactory;
 
@@ -124,4 +125,5 @@ app.use(primevue.config.default, {
 	}
 })
 app.use(Phrasen);
+app.use(Theme);
 app.mount('#cis-header');

@@ -111,7 +111,7 @@ export default {
 			<a :href="rootUrl">
 				<img :src="logoUrl" alt="Logo">
 			</a>
-			<dark-theme></dark-theme>
+			<theme-switch></theme-switch>
 		</div>
     </div>
 	<div id="nav-user">
