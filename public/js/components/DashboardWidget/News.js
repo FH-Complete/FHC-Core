@@ -195,7 +195,7 @@ export default {
 			</div>
 			<div :class="'col-'+(width == 2? 6 : 8) + ' h-100'" style="padding-left: 0px; padding-right: 0px;" ref="htmlContent">
 				<div class="container h-100" style="padding: 0px;"  ref="carocontainer">
-					<div id="FhcCarouselContainer" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel" data-bs-ride="carousel" data-bs-interval="false">
+					<div id="FhcCarouselContainer" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel" data-bs-interval="false">
 
 						<div class="carousel-inner" ref="carouselInner"  style="height: 100%; max-width: 100%;">
 							<div ref="carouselItems" v-for="(news, index) in newsList" class="carousel-item " style="overflow-y: auto; overflow-x: hidden; height: 100%;" :id="'card-'+news.news_id" v-html="news.content_obj.content"/>
