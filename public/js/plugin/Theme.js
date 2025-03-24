@@ -17,6 +17,10 @@ const toggleTheme = (theme)=>{
 	} else if (theme == "light") {
 		stylesheet.attributes.href.value = stylesheet.attributes.href.value.replace("bootstrap4-dark-blue", "bootstrap4-light-blue");
 	}
+	else{
+		if (stylesheet.attributes.href.value.includes("bootstrap4-dark-blue"))
+			stylesheet.attributes.href.value = stylesheet.attributes.href.value.replace("bootstrap4-dark-blue", "bootstrap4-light-blue");
+	}
 
 	localStorage.setItem("theme", theme);
 }
