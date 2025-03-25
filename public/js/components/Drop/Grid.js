@@ -260,7 +260,7 @@ export default {
 				return;
 			this._dragStart(evt);
 			this.mode = MODE_MOVE;
-			this.updateCursor(evt);
+			//this.updateCursor(evt);
 			this.draggedItem = item;
 			this.draggedOffset = [item.x - this.x, item.y - this.y];
 		},
@@ -274,6 +274,7 @@ export default {
 		dragOver(evt) {
 			if (!this.active)
 				return this.dragCancel();
+			
 			if (this.updateCursor(evt)) {
 				switch(this.mode) {
 					case MODE_MOVE: {
@@ -344,6 +345,10 @@ export default {
 		},
 		emptyTileClicked() {
 			this.$emit('newItem', this.x, this.y);
+		},
+		updateCursorOnMouseMove(evt){
+			if(this.mode == MODE_IDLE)
+				this.updateCursor(evt);
 		}
 	},
 	template: `
@@ -355,7 +360,7 @@ export default {
 		@touchend="dragCancel"
 		@dragover.prevent="dragOver"
 		@drop="dragEnd"
-		@mousemove="updateCursor"
+		@mousemove="updateCursorOnMouseMove"
 		@mouseleave="mouseLeave">
 		<TransitionGroup tag="div">
 			<grid-item
