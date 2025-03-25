@@ -1051,6 +1051,16 @@ function casDeletePrestudent($db, $prestudent_id, $trans=true)
 		}
 	}
 
+	/* Entries from testtool */
+	if(!$error)
+	{
+		$qry = 'DELETE FROM testtool.tbl_pruefling_frage WHERE pruefling_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).';
+				DELETE FROM testtool.tbl_antwort WHERE pruefling_id='.$db->db_add_param($pruefling->pruefling_id).';
+				DELETE FROM testtool.tbl_pruefling WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).';';
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+
 	/*
 	 * Delete the tbl_student entry
 	 */
