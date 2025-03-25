@@ -160,17 +160,11 @@ export default {
     <div class="widgets-url w-100 h-100 overflow-scroll" style="padding: 1rem 1rem;">
         <div class="d-flex flex-column justify-content-between">
 
-			<Teleport :to="widget_action_css_identifier">
-				<Transition>
-					<button v-if="!editModeIsActive" class="btn btn-outline-secondary btn-sm" @click="openCreateModal" type="button">
-						<i class="fa-solid fa-plus"></i>
-					</button>
-				</Transition>
-			</Teleport>
-
 			<template v-if="shared">
-
                 <template v-if="!emptyBookmarks">
+					<button class="btn btn-outline-secondary btn-sm" @click="openCreateModal" type="button">
+						{{$p.t('bookmark','newLink')}}
+					</button>
 					<div v-for="link in shared" :key="link.id" class="d-flex mt-2">
 						<a target="_blank" :href="link.url">
 							<i class="fa fa-solid fa-arrow-up-right-from-square me-1"></i>{{ link.title }}

@@ -26,9 +26,6 @@ export default {
 				this.$emit('update:sharedData', value);
 			}
 		},
-		widget_action_css_identifier(){
-			return `#${this.widgetInfo.action_section_identifier}`;
-		}
 	},
 	methods: {
 		formatDateTime: function(dateTime) {

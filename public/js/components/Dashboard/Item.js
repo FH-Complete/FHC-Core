@@ -45,15 +45,6 @@ export default {
 		ready() {
 			return this.component && this.arguments !== null;
 		},
-		widget_action_identifier(){
-			return `${this.widget.widget_kurzbz}-${this.index}-action-section`;
-		},
-		widgetInformation(){
-			return { 
-				action_section_identifier: this.widget_action_identifier,
-				widget_kurzbz: this.widget.widget_kurzbz,
-			}
-		}
 	},
 	methods: {
 		getWidgetC4Link(widget) {
@@ -138,10 +129,6 @@ export default {
 			<a v-if="widget.setup.cis4link" :href="getWidgetC4Link(widget)" class="col-auto ms-auto ">
           		<i class="fa fa-arrow-up-right-from-square me-1"></i>
           	</a>
-
-			<!-- container for widget specific actions -->
-			<div :id="widget_action_identifier"></div>
-
 			<a v-if="hasConfig" class="col-auto px-1" href="#" @click.prevent="openConfig"><i class="fa-solid fa-gear"></i></a>
 			<a v-if="custom && editMode" class="col-auto px-1" href="#" @click.prevent="$emit('remove')">
 				<i class="fa-solid fa-trash"></i>
@@ -153,7 +140,7 @@ export default {
 			</Transition>
 		</div>
 		<div v-if="ready" class="card-body overflow-hidden" style="padding: 0px;">
-			<component :is="component" v-model:shared-data="sharedData" :widgetInfo="widgetInformation" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
+			<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
 		</div>
 		<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
 		<bs-modal v-if="hasConfig" ref="config" @hideBsModal="handleHideBsModal" @showBsModal="handleShowBsModal">
@@ -161,7 +148,7 @@ export default {
 				{{ widget ? 'Config for ' + widget.setup.name : '' }}
 			</template>
 			<template v-slot:default>
-				<component v-if="ready && !isLoading" :is="component" v-model:shared-data="sharedData" :widgetInfo="widgetInformation" :config="tmpConfig" @change="changeConfig" :configMode="true"></component>
+				<component v-if="ready && !isLoading" :is="component" v-model:shared-data="sharedData" :config="tmpConfig" @change="changeConfig" :configMode="true"></component>
 				<div v-else class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
 			</template>
 			<template v-if="!widget?.setup?.hideFooter" v-slot:footer>
