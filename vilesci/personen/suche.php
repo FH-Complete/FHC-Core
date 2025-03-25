@@ -1054,8 +1054,8 @@ function casDeletePrestudent($db, $prestudent_id, $trans=true)
 	/* Entries from testtool */
 	if(!$error)
 	{
-		$qry = 'DELETE FROM testtool.tbl_pruefling_frage WHERE pruefling_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).';
-				DELETE FROM testtool.tbl_antwort WHERE pruefling_id='.$db->db_add_param($pruefling->pruefling_id).';
+		$qry = 'DELETE FROM testtool.tbl_pruefling_frage WHERE pruefling_id=(SELECT pruefling_id FROM testtool.tbl_pruefling WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).');
+				DELETE FROM testtool.tbl_antwort WHERE pruefling_id=(SELECT pruefling_id FROM testtool.tbl_pruefling WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).');
 				DELETE FROM testtool.tbl_pruefling WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).';';
 		if(!$db->db_query($qry))
 			$error = true;
@@ -1614,6 +1614,22 @@ function casDeletePerson($db, $person_id, $trans=true)
 				$error = true;
 			}
 		}
+	}
+
+	/* Entries from rt_person */
+	if(!$error)
+	{
+		$qry = 'DELETE FROM public.tbl_rt_person WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).';';
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+
+	/* Entries from UHSTAT */
+	if(!$error)
+	{
+		$qry = 'DELETE FROM bis.tbl_uhstat1daten WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).';';
+		if(!$db->db_query($qry))
+			$error = true;
 	}
 
 
