@@ -1,6 +1,5 @@
 console.warn('plugin/Phrasen.js is DEPRECATED! Use plugins/Phrasen.js instead.');
 import FhcApi from './FhcApi.js';
-import PluginsApi from '../plugins/Api.js';
 import ApiPhrasen from '../api/factory/phrasen.js';
 
 const categories = Vue.reactive({});
@@ -92,7 +91,6 @@ const phrasen = {
 export default {
 	install(app, options) {
 		app.use(FhcApi, options?.fhcApi || undefined);
-		app.use(PluginsApi);
 		app.config.globalProperties.$p = {
 			t: phrasen.t,
 			loadCategory: cat => phrasen.loadCategory.call(app, cat),

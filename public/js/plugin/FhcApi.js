@@ -1,5 +1,6 @@
 console.warn('plugin/FhcApi.js is DEPRECATED! Use plugins/Api.js instead.');
 import FhcAlert from './FhcAlert.js';
+import PluginsApi from '../plugins/Api.js';
 import FhcApiFactory from '../api/fhcapifactory.js';
 
 
@@ -15,6 +16,7 @@ export default {
 			return;
 		}
 		app.use(FhcAlert);
+		app.use(PluginsApi);
 
 		function _get_config(form, uri, data, config) {
 			if (typeof form == 'string' && config === undefined) {
