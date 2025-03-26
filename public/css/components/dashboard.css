@@ -23,6 +23,31 @@
 :root {
 	--fhc-dashboard-grid-size: 4;
 }
+
+@media(max-width: 1400px) {
+	:root {
+		--fhc-dashboard-grid-size: 4;
+	}
+}
+
+@media(max-width: 1200px) {
+	:root {
+		--fhc-dashboard-grid-size: 3;
+	}
+}
+
+@media(max-width: 992px) {
+	:root {
+		--fhc-dashboard-grid-size: 2;
+	}
+}
+
+@media(max-width: 768px) {
+	:root {
+		--fhc-dashboard-grid-size: 2;
+	}
+}
+
 @media(max-width: 577px) {
 	:root {
 		--fhc-dashboard-grid-size: 1;

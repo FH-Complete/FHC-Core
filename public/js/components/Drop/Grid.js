@@ -165,7 +165,8 @@ export default {
 			}
 		},
 		dragging(event){
-			this.toggleDraggedItemOverlay(true);
+			if(this.mode == MODE_MOVE)
+				this.toggleDraggedItemOverlay(true);
 			/*  use case: instead of showing the ghost widget when dragging, 
 				change the x and y position of the widget when dragging to drag the whole widget
 			event.target.style.top = `${this.clientY}px`;
@@ -271,7 +272,8 @@ export default {
 		},
 		_dragStart(evt) {
 			if (evt.dataTransfer) {
-				//evt.dataTransfer.setDragImage(evt.target, -99999, -99999);
+				if(this.mode == MODE_RESIZE)
+					evt.dataTransfer.setDragImage(evt.target, -99999, -99999);
 				evt.dataTransfer.dropEffect = 'move';
 				evt.dataTransfer.effectAllowed = 'move';
 			}
@@ -288,9 +290,9 @@ export default {
 		startResize(evt, item) {
 			if (!this.active)
 				return;
-			this._dragStart(evt);
 			this.mode = MODE_RESIZE;
 			this.draggedItem = item;
+			this._dragStart(evt);
 		},
 		dragOver(evt) {
 			if (!this.active)
@@ -338,7 +340,8 @@ export default {
 			this.draggedItem = null;
 		},
 		dragEnd() {
-			this.toggleDraggedItemOverlay(false);
+			if(this.mode == MODE_MOVE)
+				this.toggleDraggedItemOverlay(false);
 			if (this.mode == MODE_IDLE)
 				return;
 			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
