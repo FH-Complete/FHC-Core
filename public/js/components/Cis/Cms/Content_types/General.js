@@ -111,7 +111,7 @@ export default {
 				element.style.backgroundColor = "var(--fhc-background)";
 			}
 			if(element.querySelector("*[style*=background-color]")){
-				element.style.backgroundColor = "var(--fhc-secondary)";
+				element.style.backgroundColor = "var(--fhc-tertiary)";
 			}
 		});
 

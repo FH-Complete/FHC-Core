@@ -3,11 +3,11 @@
  */
 
  :root{
-	--nav-component-bg: var(--fhc-secondary);
+	--nav-component-bg: var(--fhc-tertiary);
 	--nav-component-border: var(--fhc-border);
 	--nav-component-color: var(--fhc-text);
 	--nav-left-component-border: var(--fhc-border);
-	--nav-left-component-bg: var(--fhc-secondary);
+	--nav-left-component-bg: var(--fhc-tertiary);
 	--nav-left-component-color: var(--fhc-primary);
 	--nav-left-component-hover: var(--fhc-secondary-highlight);
  }

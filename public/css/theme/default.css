@@ -57,11 +57,11 @@
 	--fhc-primary: var(--fhc-blue-20);
 	--fhc-primary-highlight: var(--fhc-blue-40);
 
-	--fhc-tertiary: var(--fhc-white-20);
-	--fhc-tertiary-highlight: var(--fhc-white-40);
-
-	--fhc-secondary: var(--fhc-white-40);
-	--fhc-secondary-highlight: var(--fhc-white-60);
+	--fhc-secondary: var(--fhc-white-20);
+	--fhc-secondary-highlight: var(--fhc-white-40);
+	
+	--fhc-tertiary: var(--fhc-white-40);
+	--fhc-tertiary-highlight: var(--fhc-white-60);
 
 	--fhc-fourth: var(--fhc-white-60);
 	--fhc-fourth-highlight: var(--fhc-white-80);
@@ -106,11 +106,11 @@
 	--fhc-primary: var(--fhc-blue-primary-highlight);
 	--fhc-primary-highlight: var(--fhc-blue-primary);
 
-	--fhc-secondary: var(--fhc-black-70);
-	--fhc-secondary-highlight: var(--fhc-gray-40);
+	--fhc-secondary: var(--fhc-black-50);
+	--fhc-secondary-highlight: var(--fhc-black-70);
 
-	--fhc-tertiary: var(--fhc-black-50);
-	--fhc-tertiary-highlight: var(--fhc-black-70);
+	--fhc-tertiary: var(--fhc-black-70);
+	--fhc-tertiary-highlight: var(--fhc-gray-40);
 
 	--fhc-danger: var(--fhc-red-10);
 
@@ -163,11 +163,11 @@
 	--fhc-primary: var(--fhc-purple-primary-highlight);
 	--fhc-primary-highlight: var(--fhc-purple-primary);
 
-	--fhc-secondary: var(--fhc-purple-30);
-	--fhc-secondary-highlight: var(--fhc-purple-50);
+	--fhc-secondary: var(--fhc-purple-20);
+	--fhc-secondary-highlight: var(--fhc-purple-40);
 
-	--fhc-tertiary: var(--fhc-purple-20);
-	--fhc-tertiary-highlight: var(--fhc-purple-40);
+	--fhc-tertiary: var(--fhc-purple-30);
+	--fhc-tertiary-highlight: var(--fhc-purple-50);
 
 	/* background */
 	--fhc-background: var(--fhc-purple-5);
@@ -256,10 +256,10 @@ html.dark .tabulator .tabulator-row {
 }
 
 html.dark .tabulator .tabulator-cell {
-	background-color: var(--fhc-secondary) !important;
+	background-color: var(--fhc-tertiary) !important;
 	border-color: var(--fhc-border) !important;
 }
 
 html.dark .tabulator .tabulator-header .tabulator-col:hover {
-	background-color: var(--fhc-secondary) !important;
+	background-color: var(--fhc-tertiary) !important;
 }

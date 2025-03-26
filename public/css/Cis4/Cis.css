@@ -40,19 +40,19 @@ html {
 }
 
 .fhc-secondary-bg{
-	background-color: var(--fhc-secondary) !important;
-}
-
-.fhc-secondary-color {
-	color: var(--fhc-secondary) !important;
-}
-
-.fhc-tertiary-bg{
 	background-color: var(--fhc-tertiary) !important;
 }
 
-.fhc-tertiary-color {
+.fhc-secondary-color {
 	color: var(--fhc-tertiary) !important;
+}
+
+.fhc-tertiary-bg{
+	background-color: var(--fhc-secondary) !important;
+}
+
+.fhc-tertiary-color {
+	color: var(--fhc-secondary) !important;
 }
 
 .fhc-fourth-bg {
@@ -79,13 +79,13 @@ html {
 
 .fhc-secondary {
 	color: var(--fhc-text);
-	background-color: var(--fhc-secondary);
+	background-color: var(--fhc-tertiary);
 	border-color: var(--fhc-border);
 }
 
 .fhc-tertiary{
 	color: var(--fhc-text);
-	background-color: var(--fhc-tertiary);
+	background-color: var(--fhc-secondary);
 	border-color:var(--fhc-border);
 }
 
@@ -99,8 +99,8 @@ html {
 
 :root{	
 	/* sidebar colors */
-	--fhc-cis-sidebar-bg: var(--fhc-tertiary);
-	--fhc-cis-menu-bg: var(--fhc-tertiary);
+	--fhc-cis-sidebar-bg: var(--fhc-secondary);
+	--fhc-cis-menu-bg: var(--fhc-secondary);
 
 	--fhc-cis-header-px: 1rem;
 	--fhc-cis-header-py: .5rem;
@@ -112,14 +112,14 @@ html {
 	--fhc-cis-menu-lvl-1-bg-hover: var(--fhc-primary-highlight);
 	--fhc-cis-menu-lvl-1-color-hover: var(--fhc-text);
 
-	--fhc-cis-menu-lvl-2-bg: var(--fhc-tertiary);
+	--fhc-cis-menu-lvl-2-bg: var(--fhc-secondary);
 	--fhc-cis-menu-lvl-2-color: var(--fhc-text);
-	--fhc-cis-menu-lvl-2-bg-hover: var(--fhc-tertiary-highlight);
+	--fhc-cis-menu-lvl-2-bg-hover: var(--fhc-secondary-highlight);
 	--fhc-cis-menu-lvl-2-color-hover: var(--fhc-text);
 
-	--fhc-cis-menu-lvl-3-bg: var(--fhc-secondary);
+	--fhc-cis-menu-lvl-3-bg: var(--fhc-tertiary);
 	--fhc-cis-menu-lvl-3-color: var(--fhc-text);
-	--fhc-cis-menu-lvl-3-bg-hover: var(--fhc-secondary-highlight);
+	--fhc-cis-menu-lvl-3-bg-hover: var(--fhc-tertiary-highlight);
 	--fhc-cis-menu-lvl-3-color-hover: var(--fhc-text);
 
 	--fhc-cis-menu-lvl-4-bg: var(--fhc-fourth);
@@ -582,7 +582,7 @@ html {
   }
 }
 .fhc-header > h1 > small {
-  color: var(--fhc-secondary);
+  color: var(--fhc-tertiary);
   font-size: 1rem;
 }
 .fhc-header > h1 > small:before {
