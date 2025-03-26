@@ -198,9 +198,10 @@ export default {
 		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item">
 				
-				<dashboard-item v-if="!item.placeholder"
-					:index="item.index"
+				<dashboard-item 
+					v-if="!item.placeholder"
 					:id="item.widget"
+					:widgetID="item.widgetid"
 					:width="item.w"
 					:height="item.h"
 					:loading="item.loading"

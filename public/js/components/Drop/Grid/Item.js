@@ -10,6 +10,7 @@ export default {
 	emits: [
 		"startMove",
 		"startResize",
+		"dragging",
 		"endDrag",
 		"dropDrag"
 	],
@@ -65,6 +66,7 @@ export default {
 		@touchstart="tryDragStart($event, item)"
 		@touchend="touchDragEnd"
 		@dragstart="tryDragStart($event, item)"
+		@drag="$emit('dragging',$event)"
 		@dragend="$emit('endDrag', $event)"
 		:draggable="active">
 		<slot v-bind="item"></slot>

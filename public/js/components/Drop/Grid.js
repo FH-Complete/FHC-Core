@@ -34,12 +34,14 @@ export default {
 	emits: [
 		"rearrangeItems",
 		"newItem",
-		"gridHeight"
+		"gridHeight",
 	],
 	data() {
 		return {
 			x: -1,
 			y: -1,
+			clientX:0,
+			clientY: 0,
 			mode: MODE_IDLE,
 			grid: null,
 			dragGrid: null,
@@ -48,7 +50,7 @@ export default {
 			fixedPositionUpdates: null,
 			draggedOffset: [0,0],
 			draggedItem: null,
-			additionalRow: null
+			additionalRow: null,
 		}
 	},
 	computed: {
@@ -154,6 +156,22 @@ export default {
 		}
 	},
 	methods: {
+		toggleDraggedItemOverlay(condition){
+			let draggedItemNode = document.getElementById(this.draggedItem.data.id);
+			if(condition){
+				draggedItemNode.classList.add("dashboard-item-overlay");
+			}else{
+				draggedItemNode.classList.remove("dashboard-item-overlay");
+			}
+		},
+		dragging(event){
+			this.toggleDraggedItemOverlay(true);
+			/*  use case: instead of showing the ghost widget when dragging, 
+				change the x and y position of the widget when dragging to drag the whole widget
+			event.target.style.top = `${this.clientY}px`;
+			event.target.style.left = `${this.clientX}px`;
+			*/
+		},
 		createNewGrid(items) {
 			this.grid = new GridLogic(this.cols);
 			const result = [];
@@ -228,6 +246,9 @@ export default {
 				evt.clientY = evt.touches[0].clientY;
 			}
 
+			this.clientX = (evt.clientX - rect.left);
+			this.clientY = (evt.clientY - rect.top);
+
 			const gridX = Math.floor(this.cols * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
 			const gridY = Math.floor((this.rows + addH) * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
 			if (this.x == gridX && this.y == gridY)
@@ -250,7 +271,7 @@ export default {
 		},
 		_dragStart(evt) {
 			if (evt.dataTransfer) {
-				evt.dataTransfer.setDragImage(evt.target, -99999, -99999);
+				//evt.dataTransfer.setDragImage(evt.target, -99999, -99999);
 				evt.dataTransfer.dropEffect = 'move';
 				evt.dataTransfer.effectAllowed = 'move';
 			}
@@ -258,9 +279,9 @@ export default {
 		startMove(evt, item) {
 			if (!this.active)
 				return;
+			
 			this._dragStart(evt);
 			this.mode = MODE_MOVE;
-			//this.updateCursor(evt);
 			this.draggedItem = item;
 			this.draggedOffset = [item.x - this.x, item.y - this.y];
 		},
@@ -317,6 +338,7 @@ export default {
 			this.draggedItem = null;
 		},
 		dragEnd() {
+			this.toggleDraggedItemOverlay(false);
 			if (this.mode == MODE_IDLE)
 				return;
 			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
@@ -369,6 +391,7 @@ export default {
 				:item="item"
 				@start-move="startMove"
 				@start-resize="startResize"
+				@dragging="dragging"
 				@end-drag="dragCancel"
 				@drop-drag="dragEnd"
 				class="position-absolute"
