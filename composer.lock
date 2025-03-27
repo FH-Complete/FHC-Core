@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d4e69e9dc73fdd90532ea5cc969a95ab",
+    "content-hash": "0e92ee76644e09d639a0d8d0c22f8b16",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -322,9 +322,6 @@
             "extra": {
                 "component": {
                     "name": "angularjs",
-                    "scripts": [
-                        "angular.js"
-                    ],
                     "files": [
                         "angular-animate.js",
                         "angular-animate.min.js",
@@ -597,6 +594,9 @@
                         "i18n/angular-locale_zh.js",
                         "i18n/angular-locale_zu-za.js",
                         "i18n/angular-locale_zu.js"
+                    ],
+                    "scripts": [
+                        "angular.js"
                     ]
                 }
             },
@@ -629,15 +629,15 @@
             "type": "component",
             "extra": {
                 "component": {
-                    "scripts": [
-                        "jquery.js"
-                    ],
                     "files": [
                         "jquery.min.js",
                         "jquery.min.map",
                         "jquery.slim.js",
                         "jquery.slim.min.js",
                         "jquery.slim.min.map"
+                    ],
+                    "scripts": [
+                        "jquery.js"
                     ]
                 }
             },
@@ -682,20 +682,20 @@
             "extra": {
                 "component": {
                     "name": "jquery-ui",
-                    "scripts": [
-                        "jquery-ui.js"
-                    ],
-                    "files": [
-                        "ui/**",
-                        "themes/**",
-                        "jquery-ui.min.js"
-                    ],
                     "shim": {
                         "deps": [
                             "jquery"
                         ],
                         "exports": "jQuery"
-                    }
+                    },
+                    "files": [
+                        "ui/**",
+                        "themes/**",
+                        "jquery-ui.min.js"
+                    ],
+                    "scripts": [
+                        "jquery-ui.js"
+                    ]
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -901,61 +901,6 @@
             "type": "library"
         },
         {
-            "name": "fzaninotto/faker",
-            "version": "v1.9.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "848d8125239d7dbf8ab25cb7f054f1a630e68c2e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/848d8125239d7dbf8ab25cb7f054f1a630e68c2e",
-                "reference": "848d8125239d7dbf8ab25cb7f054f1a630e68c2e",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.3.3 || ^7.0"
-            },
-            "require-dev": {
-                "ext-intl": "*",
-                "phpunit/phpunit": "^4.8.35 || ^5.7",
-                "squizlabs/php_codesniffer": "^2.9.2"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.9-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Faker\\": "src/Faker/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "François Zaninotto"
-                }
-            ],
-            "description": "Faker is a PHP library that generates fake data for you.",
-            "keywords": [
-                "data",
-                "faker",
-                "fixtures"
-            ],
-            "support": {
-                "issues": "https://github.com/fzaninotto/Faker/issues",
-                "source": "https://github.com/fzaninotto/Faker/tree/v1.9.2"
-            },
-            "abandoned": true,
-            "time": "2020-12-11T09:56:16+00:00"
-        },
-        {
             "name": "joeldbirch/superfish",
             "version": "1.7.9",
             "dist": {
@@ -1116,6 +1061,7 @@
                 "issues": "https://github.com/kingsquare/json-schema-form/issues",
                 "source": "https://github.com/kingsquare/json-schema-form/tree/master"
             },
+            "abandoned": true,
             "time": "2014-07-10T12:27:19+00:00"
         },
         {
@@ -1297,16 +1243,16 @@
         },
         {
             "name": "mottie/tablesorter",
-            "version": "v2.31.3",
+            "version": "v2.32.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Mottie/tablesorter.git",
-                "reference": "7202d5faf8105a5ecd1a2b7a653777618713ffe5"
+                "reference": "1423f5408982f58d5baa97648d2e5ee0b55fd3b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Mottie/tablesorter/zipball/7202d5faf8105a5ecd1a2b7a653777618713ffe5",
-                "reference": "7202d5faf8105a5ecd1a2b7a653777618713ffe5",
+                "url": "https://api.github.com/repos/Mottie/tablesorter/zipball/1423f5408982f58d5baa97648d2e5ee0b55fd3b6",
+                "reference": "1423f5408982f58d5baa97648d2e5ee0b55fd3b6",
                 "shasum": ""
             },
             "require": {
@@ -1315,10 +1261,10 @@
             "type": "component",
             "extra": {
                 "component": {
+                    "files": "dist/",
                     "scripts": [
                         "dist/js/jquery.tablesorter.combined.js"
-                    ],
-                    "files": "dist/"
+                    ]
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1331,7 +1277,8 @@
                 },
                 {
                     "name": "Rob Garrison",
-                    "email": "wowmotty@gmail.com"
+                    "email": "wowmotty@gmail.com",
+                    "homepage": "https://github.com/Mottie"
                 }
             ],
             "description": "tablesorter (FORK) is a jQuery plugin for turning a standard HTML table with THEAD and TBODY tags into a sortable table without page refreshes. tablesorter can successfully parse and sort many types of data including linked data in a cell.",
@@ -1352,7 +1299,7 @@
                 "source": "https://github.com/Mottie/tablesorter",
                 "wiki": "https://github.com/Mottie/tablesorter/wiki"
             },
-            "time": "2020-03-03T13:46:03+00:00"
+            "time": "2024-08-14T01:23:57+00:00"
         },
         {
             "name": "nategood/httpful",
@@ -1520,16 +1467,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.47",
+            "version": "2.0.48",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "b7d7d90ee7df7f33a664b4aea32d50a305d35adb"
+                "reference": "eaa7be704b8b93a6913b69eb7f645a59d7731b61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/b7d7d90ee7df7f33a664b4aea32d50a305d35adb",
-                "reference": "b7d7d90ee7df7f33a664b4aea32d50a305d35adb",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/eaa7be704b8b93a6913b69eb7f645a59d7731b61",
+                "reference": "eaa7be704b8b93a6913b69eb7f645a59d7731b61",
                 "shasum": ""
             },
             "require": {
@@ -1610,7 +1557,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.47"
+                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.48"
             },
             "funding": [
                 {
@@ -1626,7 +1573,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-02-26T04:55:38+00:00"
+            "time": "2024-12-14T21:03:54+00:00"
         },
         {
             "name": "rmariuzzo/jquery-checkboxes",
@@ -1668,12 +1615,12 @@
             },
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                },
                 "branch-alias": {
                     "dev-main": "1.19-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "autoload": {
@@ -1757,8 +1704,8 @@
             "version": "1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/tomazdragar/SimpleCropper.git",
-                "reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
+                "url": "https://github.com/deveshsinghal22/SimpleCropper.git",
+                "reference": "873e5e1ca57c370bedd07a512d0bf562930d4b89"
             },
             "type": "library"
         },
@@ -2398,16 +2345,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.10.1",
+            "version": "3.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "8f90f7a53ce271935282967f53d0894f8f1ff877"
+                "reference": "2d1b63db139c3c6ea0c927698e5160f8b3b8d630"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/8f90f7a53ce271935282967f53d0894f8f1ff877",
-                "reference": "8f90f7a53ce271935282967f53d0894f8f1ff877",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/2d1b63db139c3c6ea0c927698e5160f8b3b8d630",
+                "reference": "2d1b63db139c3c6ea0c927698e5160f8b3b8d630",
                 "shasum": ""
             },
             "require": {
@@ -2472,9 +2419,13 @@
                 {
                     "url": "https://opencollective.com/php_codesniffer",
                     "type": "open_collective"
+                },
+                {
+                    "url": "https://thanks.dev/u/gh/phpcsstandards",
+                    "type": "thanks_dev"
                 }
             ],
-            "time": "2024-05-22T21:24:41+00:00"
+            "time": "2025-03-18T05:04:51+00:00"
         },
         {
             "name": "symfony/config",
@@ -2719,12 +2670,12 @@
             },
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                },
                 "branch-alias": {
                     "dev-main": "1.19-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "autoload": {
