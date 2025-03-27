@@ -308,9 +308,9 @@
 			"type": "package",
 			"package": {
 				"name": "twbs/bootstrap5",
-				"version": "5.3",
+				"version": "5.3.3",
 				"dist": {
-					"url": "https://github.com/twbs/bootstrap/archive/refs/tags/v5.3.zip",
+					"url": "https://github.com/twbs/bootstrap/archive/refs/tags/v5.3.3.zip",
 					"type": "zip"
 				}
 			}
