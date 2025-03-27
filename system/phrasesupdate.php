@@ -30027,6 +30027,26 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'entschuldigungStatusUpdateAutoEmailBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung Status Update.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse note status update.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'entschuldigungAkzeptieren',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -31352,13 +31372,33 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Termine laut Stundenplan',
+				'text' => 'Unterricht laut Stundenplan',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => 'Lessons as per Timetable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'unterrichtDauer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht Dauer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson Duration',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31432,13 +31472,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine zugeteilten Studenten gefunden!',
+				'text' => 'Keine zugeteilten Studenten gefunden für den gewählten LV-Teil gefunden!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No assigned students found!',
+				'text' => 'No assigned students for the selected teaching unit found!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31739,6 +31779,66 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'No Authorization.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrollDauerUnterMindestwert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrolle muss für eine Unterrichtsdauer von mindestens {0} Minuten gelten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance check must apply for a lesson duration of at least {0} minutes.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'zeitAusStundenplan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeit wurde dem Stundenplan entnommen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Times have been loaded from timetable.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'datumAusStundenplan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datum wurde dem Stundenplan entnommen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date has been loaded from timetable.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
