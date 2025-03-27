@@ -178,7 +178,7 @@ function loadResource($path, $resources = null, $subdir = false)
  */
 function isEmptyString($string)
 {
-	return ($string == null) || ($string != null && ctype_space((string)$string) === true);
+	return ($string == null) || ($string != null && !is_string($string) || (is_string($string) && ctype_space((string)$string) === true));
 }
 
 /**
