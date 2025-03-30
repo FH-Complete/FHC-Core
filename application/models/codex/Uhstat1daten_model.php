@@ -21,6 +21,8 @@ class Uhstat1daten_model extends DB_Model
 	 */
 	public function getUHSTAT1PersonData($person_id_arr)
 	{
+		if (!isset($person_id_arr) || isEmptyArray($person_id_arr)) return success([]);
+		
 		$params = array($person_id_arr);
 
 		$prstQry = "SELECT
