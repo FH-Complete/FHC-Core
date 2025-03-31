@@ -49,8 +49,18 @@ export default {
 			return 'margin-bottom: 8px;';
 		},
 		items() {
+			
 			return this.widgets.map(item => {
-				return { ...item, ...(item.place[this.gridWidth] || {h: 1, w:1, x:0, y:0})};
+				let place;
+				if(!item.place[this.gridWidth]){
+					const nearestIndex = Object.keys(item.place).sort((a,b)=>Math.abs(a-this.gridWidth)-Math.abs(b-this.gridWidth)).pop();
+					if (nearestIndex === null){
+						place = {x:0,y:0,w:1,h:1};
+					}else{
+						place = item.place[nearestIndex];
+					}
+				}
+				return { ...item, ...(item.place[this.gridWidth] || place)};
 			});
 		},
 		items_hashmap() {
@@ -201,7 +211,7 @@ export default {
 				<dashboard-item 
 					v-if="!item.placeholder"
 					:id="item.widget"
-					:widgetID="item.widgetid"
+					:widgetID="item.id"
 					:width="item.w"
 					:height="item.h"
 					:loading="item.loading"

@@ -12,7 +12,8 @@ export default {
 		"startResize",
 		"dragging",
 		"endDrag",
-		"dropDrag"
+		"dropDrag",
+		"item"
 	],
 	data() {
 		return {
@@ -63,12 +64,12 @@ export default {
 	template: `
 	<div class="drop-grid-item"
 		@mousedown="registerDragAction"
-		@touchstart="tryDragStart($event, item)"
+		@touchstart.prevent="tryDragStart($event, item)"
 		@touchend="touchDragEnd"
 		@dragstart="tryDragStart($event, item)"
 		@drag="$emit('dragging',$event)"
 		@dragend="$emit('endDrag', $event)"
-		:draggable="active">
+		:draggable="active && !item.placeholder">
 		<slot v-bind="item"></slot>
 	</div>`
 }
