@@ -75,7 +75,7 @@
 
 .fhc-calendar-week-page .all-day-event{
 	max-height: 75px;
-	overflow:scroll;
+	overflow:auto;
 }
 
 .fhc-calendar-week-page .all-day-event-container{
@@ -106,7 +106,7 @@
 .fhc-calendar-day-page .all-day-event {
 	grid-column:2;
 	max-height: 75px;
-	overflow: scroll;
+	overflow: auto;
 }
 
 .fhc-calendar-day-page .all-day-event-container {
