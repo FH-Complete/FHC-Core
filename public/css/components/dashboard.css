@@ -77,3 +77,11 @@
 	z-index: 2;
 }
 
+.dragged-widget-icon{
+	position: absolute;
+	height: 250px;
+	width: 200px;
+	top: -999px;
+	left: -999px;
+	z-index: 3;
+}

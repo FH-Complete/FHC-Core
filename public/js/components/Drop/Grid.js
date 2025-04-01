@@ -2,6 +2,7 @@
 
 import GridItem from './Grid/Item.js';
 import GridLogic from '../../composables/GridLogic.js';
+import WidgetIcon from '../Dashboard/Widget/WidgetIcon.js';
 
 const MODE_IDLE = 0;
 const MODE_MOVE = 1;
@@ -10,10 +11,10 @@ const MODE_RESIZE = 2;
 export default {
 	name: 'Grid',
 	components: {
-		GridItem
+		GridItem,
+		WidgetIcon,
 	},
-	inject: {
-	},
+	inject: ["widgetsSetup"],
 	props: {
 		cols: Number,
 		items: Array,
@@ -50,6 +51,7 @@ export default {
 			fixedPositionUpdates: null,
 			draggedOffset: [0,0],
 			draggedItem: null,
+			draggedItemIcon: null,
 			additionalRow: null,
 		}
 	},
@@ -125,7 +127,15 @@ export default {
 			if (!this.active || !this.grid || this.mode != MODE_IDLE || this.x < 0 || this.y < 0 || this.x >= this.cols || this.y >= this.rows)
 				return false;
 			return this.grid.isFreeSlot(this.x, this.y);
-		}
+		},
+		widgetSetup(){
+			if (!this.widgetsSetup)
+				return;
+			return this.widgetsSetup.reduce((acc, ele) => { 
+				acc[ele.widget_id] =ele;
+				return acc;
+			} ,{});
+		},
 	},
 	watch: {
 		active(active) {
@@ -157,6 +167,8 @@ export default {
 	},
 	methods: {
 		toggleDraggedItemOverlay(condition){
+			if(!this.draggedItem)
+				return;
 			let draggedItemNode = document.getElementById(this.draggedItem.data.id);
 			if(condition){
 				draggedItemNode.classList.add("dashboard-item-overlay");
@@ -165,13 +177,11 @@ export default {
 			}
 		},
 		dragging(event){
-			if(this.mode == MODE_MOVE)
+			if(this.mode == MODE_MOVE){
 				this.toggleDraggedItemOverlay(true);
-			/*  use case: instead of showing the ghost widget when dragging, 
-				change the x and y position of the widget when dragging to drag the whole widget
-			event.target.style.top = `${this.clientY}px`;
-			event.target.style.left = `${this.clientX}px`;
-			*/
+			    this.draggedItemIcon.style.top = `${this.clientY}px`;
+			    this.draggedItemIcon.style.left = `${this.clientX}px`;
+			}
 		},
 		createNewGrid(items) {
 			this.grid = new GridLogic(this.cols);
@@ -270,10 +280,9 @@ export default {
 
 			return true;
 		},
-		_dragStart(evt) {
+		_dragStart(evt, item) {
 			if (evt.dataTransfer) {
-				if(this.mode == MODE_RESIZE)
-					evt.dataTransfer.setDragImage(evt.target, -99999, -99999);
+				evt.dataTransfer.setDragImage(evt.target, -99999, -99999);
 				evt.dataTransfer.dropEffect = 'move';
 				evt.dataTransfer.effectAllowed = 'move';
 			}
@@ -282,10 +291,11 @@ export default {
 			if (!this.active)
 				return;
 			
-			this._dragStart(evt);
 			this.mode = MODE_MOVE;
 			this.draggedItem = item;
+			this.draggedItemIcon = document.getElementById(`widget${this.draggedItem?.data.widget}`);
 			this.draggedOffset = [item.x - this.x, item.y - this.y];
+			this._dragStart(evt, item);
 		},
 		startResize(evt, item) {
 			if (!this.active)
@@ -334,14 +344,21 @@ export default {
 			}
 		},
 		dragCancel() {
+			
+			this.toggleDraggedItemOverlay(false);
 			this.mode = MODE_IDLE;
 			this.positionUpdates = null;
 			this.draggedOffset = [0,0],
 			this.draggedItem = null;
+			
+			if(this.draggedItemIcon){
+				this.draggedItemIcon.style.top = '-999px';
+				this.draggedItemIcon.style.left = '-999px';
+				this.draggedItemIcon = null;
+			}
+			
 		},
 		dragEnd() {
-			if(this.mode == MODE_MOVE)
-				this.toggleDraggedItemOverlay(false);
 			if (this.mode == MODE_IDLE)
 				return;
 			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
@@ -388,6 +405,11 @@ export default {
 		@mousemove="updateCursorOnMouseMove"
 		@mouseleave="mouseLeave">
 		<TransitionGroup tag="div">
+			<template v-for="(item,index) in placedItems">
+				<div class="dragged-widget-icon" :id="'widget'+item.data.widget" >
+					<widget-icon v-if="widgetsSetup" :widget="widgetSetup[item.data.widget]"></widget-icon>
+				</div>
+			</template>
 			<grid-item
 				v-for="(item,index) in (mode == 0 && active ? placedItems_withPlaceholders : placedItems)"
 				:key="item.data.id"
@@ -397,6 +419,7 @@ export default {
 				@dragging="dragging"
 				@end-drag="dragCancel"
 				@drop-drag="dragEnd"
+				@touchEvent="updateCursorOnMouseMove"
 				class="position-absolute"
 				:active="active"
 				:style="{

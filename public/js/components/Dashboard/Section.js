@@ -49,18 +49,23 @@ export default {
 			return 'margin-bottom: 8px;';
 		},
 		items() {
+
+			const computeNearestPlace = (item, gridWidth) =>{
+				let place;
+				if (Object.keys(item.place).length > 0) {
+					const nearestIndex = Object.keys(item.place)
+											   .sort((a, b) => Math.abs(a - gridWidth) - Math.abs(b - gridWidth))
+											   .pop();
+					place = item.place[nearestIndex];
+				}
+				else{
+					place = { x: 0, y: 0, w: 1, h: 1 };
+				}
+				return place;
+			}
 			
 			return this.widgets.map(item => {
-				let place;
-				if(!item.place[this.gridWidth]){
-					const nearestIndex = Object.keys(item.place).sort((a,b)=>Math.abs(a-this.gridWidth)-Math.abs(b-this.gridWidth)).pop();
-					if (nearestIndex === null){
-						place = {x:0,y:0,w:1,h:1};
-					}else{
-						place = item.place[nearestIndex];
-					}
-				}
-				return { ...item, ...(item.place[this.gridWidth] || place)};
+				return { ...item, ...(item.place[this.gridWidth] || computeNearestPlace(item, this.gridWidth))};
 			});
 		},
 		items_hashmap() {
@@ -73,10 +78,6 @@ export default {
 		items_placeholders(){
 			let placeholders = [];
 			let col_max = this.gridWidth;
-			// OLD way of calculating the max rows
-			//let max_row = Math.max(...this.items.map(item => item.y)) + 1;
-			//let max_row_max_height = Math.max(...this.items.filter(item => item.y == (max_row - 1)).map(item => item.h));
-			//max_row + max_row_max_height - 1;
 			let rows_max = this.gridHeight;
 
 			// occupied hashmap to keep track of the occupied cells

@@ -34,6 +34,7 @@ export default {
 	provide() {
 		return {
 			editMode: Vue.computed(()=>this.editMode),
+			widgetsSetup: Vue.computed(() => this.widgets),
 		}
 	},
 	computed: {
@@ -142,6 +143,19 @@ export default {
 		}
 	},
 	created() {
+
+		axios.get(this.apiurl + '/Widget/getWidgetsForDashboard', {
+			params: {
+				db: this.dashboard
+			}
+		}).then(res => {
+			res.data.retval.forEach(widget => {
+				widget.arguments = JSON.parse(widget.arguments);
+				widget.setup = JSON.parse(widget.setup);
+			});
+			this.widgets = res.data.retval;
+		}).catch(err => console.error('ERROR:', err));
+
 		axios.get(this.apiurl + '/Config', {params:{
 			db: this.dashboard
 		}}).then(res => {
