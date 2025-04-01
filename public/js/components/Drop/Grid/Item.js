@@ -69,7 +69,7 @@ export default {
 		@dragstart="tryDragStart($event, item)"
 		@drag="$emit('dragging',$event)"
 		@dragend="$emit('endDrag', $event)"
-		:draggable="active && !item.placeholder">
+		:draggable="active && !item.placeholder && dragAction != ''">
 		<slot v-bind="item"></slot>
 	</div>`
 }
