@@ -18,6 +18,13 @@ export default {
 			return [...Array(this.end - this.start).keys()].map(i => i + this.start);
 		}
 	},
+	mounted() {
+		const container = document.getElementById("calendarContainer")
+		if(container) {
+			container.style['overflow-y'] = 'scroll'
+			container.style['overflow-x'] = 'auto'
+		}
+	},
 	template: `
 	<div class="fhc-calendar-years-page d-flex flex-wrap">
 		<div v-for="year in years" :key="year" class="d-grid col-4">
