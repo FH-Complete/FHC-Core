@@ -100,7 +100,7 @@ export default {
 	},
 	watch: {
 		config() {
-			this.arguments = { ...this.widget.arguments, ...this.config };
+			this.arguments = { ...this.widget?.arguments, ...this.config };
 			this.tmpConfig = { ...this.arguments };
 			this.$refs.config && this.$refs.config.hide();
 			this.isLoading = false;

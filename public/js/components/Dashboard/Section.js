@@ -2,13 +2,20 @@ import BsConfirm from "../Bootstrap/Confirm.js";
 import DropGrid from '../Drop/Grid.js'
 import DashboardItem from "./Item.js";
 import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
+import WidgetIcon from "./Widget/WidgetIcon.js"
+
 export default {
 	name: 'Section',
 	components: {
 		DropGrid,
-		DashboardItem
+		DashboardItem,
+		WidgetIcon,
 	},
 	inject: {
+		widgetsSetup:{
+			type: Object,
+			default: {},
+		},
 		adminMode: {
 			type: Boolean,
 			default: false
@@ -38,7 +45,8 @@ export default {
 		return {
 			editModeIsActive: Vue.computed(() =>
 				this.editModeIsActive
-			),		
+			),	
+			sectionName: Vue.computed(() => this.name),	
 		}
 	},
 	computed: {
@@ -205,7 +213,12 @@ export default {
 		});
 	},
 	template: `
-	<div class="dashboard-section" ref="container" :style="getSectionStyle">
+	<div class="dashboard-section position-relative" ref="container" :style="getSectionStyle">
+		<template v-for="setup in widgetsSetup">
+			<div class="dragged-widget-icon" :id="'widget-'+name+'-'+setup.widget_id" >
+				<widget-icon v-if="widgetsSetup" :widget="setup"></widget-icon>
+			</div>
+		</template>
 		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item">
 				

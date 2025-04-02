@@ -19,7 +19,7 @@ export default {
 	},
 	emits:["select"],
 	template: /*html */`
-	<div class="card h-100" @click="$emit('select',widget.widget_id);  pick(widget.widget_id)">
+	<div class="card h-100" @click="$emit('select',widget.widget_id);">
 		<img class="card-img-top" :src="path(widget.setup.icon)" :alt="'pictogram for ' + (widget.setup.name || widget.widget_kurzbz)">
 		<div class="card-body">
 			<h5 class="card-title">{{ widget.setup.name || widget.widget_kurzbz }}</h5>

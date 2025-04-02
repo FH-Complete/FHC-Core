@@ -2,7 +2,6 @@
 
 import GridItem from './Grid/Item.js';
 import GridLogic from '../../composables/GridLogic.js';
-import WidgetIcon from '../Dashboard/Widget/WidgetIcon.js';
 
 const MODE_IDLE = 0;
 const MODE_MOVE = 1;
@@ -12,9 +11,7 @@ export default {
 	name: 'Grid',
 	components: {
 		GridItem,
-		WidgetIcon,
 	},
-	inject: ["widgetsSetup"],
 	props: {
 		cols: Number,
 		items: Array,
@@ -54,6 +51,12 @@ export default {
 			draggedItemIcon: null,
 			additionalRow: null,
 		}
+	},
+	inject:{
+		sectionName: {
+			type: String,
+			default: '',
+		},
 	},
 	computed: {
 		rows() {
@@ -293,7 +296,7 @@ export default {
 			
 			this.mode = MODE_MOVE;
 			this.draggedItem = item;
-			this.draggedItemIcon = document.getElementById(`widget${this.draggedItem?.data.widget}`);
+			this.draggedItemIcon = document.getElementById(`widget-${this.sectionName}-${this.draggedItem?.data.widget}`);
 			this.draggedOffset = [item.x - this.x, item.y - this.y];
 			this._dragStart(evt, item);
 		},
@@ -398,18 +401,13 @@ export default {
 		ref="container"
 		class="drop-grid position-relative h-0"
 		:style="gridStyle"
-		@touchmove="dragOver"
+		@touchmove.prevent="dragOver"
 		@touchend="dragCancel"
 		@dragover.prevent="dragOver"
 		@drop="dragEnd"
 		@mousemove="updateCursorOnMouseMove"
 		@mouseleave="mouseLeave">
 		<TransitionGroup tag="div">
-			<template v-for="(item,index) in placedItems">
-				<div class="dragged-widget-icon" :id="'widget'+item.data.widget" >
-					<widget-icon v-if="widgetsSetup" :widget="widgetSetup[item.data.widget]"></widget-icon>
-				</div>
-			</template>
 			<grid-item
 				v-for="(item,index) in (mode == 0 && active ? placedItems_withPlaceholders : placedItems)"
 				:key="item.data.id"
