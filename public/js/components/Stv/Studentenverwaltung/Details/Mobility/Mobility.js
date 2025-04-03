@@ -503,7 +503,6 @@ export default {
 						type="select"
 						container-class="col-6 stv-details-mobility-typ"
 						:label="$p.t('lehre', 'lehreinheit')"
-						type="select"
 						v-model="formData.lehreinheit_id"
 						name="lehreinheit_id"
 						:disabled="listLes.length > 0 ? false : true"

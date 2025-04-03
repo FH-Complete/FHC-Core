@@ -203,7 +203,7 @@ export default {
 								v-model="formData.aufenthaltfoerderung_code"
 								name="aufenthaltfoerderung_code"
 								>
-								<option :value=""> {{$p.t('ui', 'bitteWaehlen')}}</option>
+								<option value=""> {{$p.t('ui', 'bitteWaehlen')}}</option>
 								<option
 									v-for="entry in listSupports"
 									:key="entry.aufenthaltfoerderung_code"
