@@ -216,4 +216,66 @@ class Mitarbeiter_model extends DB_Model
 	
 		return success($kurzbz);
 	}
+
+	/**
+	 * Search function for mitarbeiter
+	 * @param $filter searchstring: searches for nachname, vorname, mitarbeiter_uid
+	 * $param $mode gives the resultobject in different version:
+	 * 				null : "[mitarbeiter_uid], Nachname, Vorname, (mitarbeiter_uid)"
+	 * 				'mitAkadGrad': "[mitarbeiter_uid], Nachname, Vorname, Titelpre, Titelpost (mitarbeiter_uid)"
+	 *				'ohneMaUid' : "[mitarbeiter_uid], Nachname, Vorname, Titelpre, Titelpost"
+	 * @return object in 3 versions
+	 */
+	public function searchMitarbeiter($filter, $mode=null)
+	{
+		$filter = strtoLower($filter);
+
+		if ($mode == "mitAkadGrad")
+			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+		elseif ($mode == "ohneMaUid")
+			$returnwert = "p.person_id, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre) as mitarbeiter";
+		else
+			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+
+		$qry = "
+			SELECT " . $returnwert . "  
+			FROM 
+			    public.tbl_mitarbeiter ma 
+			JOIN 
+			    public.tbl_benutzer b on (ma.mitarbeiter_uid = b.uid)
+			JOIN 
+			    public.tbl_person p on (p.person_id = b.person_id)
+			WHERE 
+			    lower (p.nachname) LIKE '%". $this->db->escape_like_str($filter)."%'
+			OR
+				lower (p.vorname) LIKE '%". $this->db->escape_like_str($filter)."%'
+			OR
+				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'";
+
+		return $this->execQuery($qry);
+	}
+
+	/**
+	 * Gets Mitarbeiter for a certain Lehrveranstaltung.
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @return array with Mitarbeiter and their Lehreinheiten
+	 */
+	public function getMitarbeiterFromLV($lehrveranstaltung_id){
+	//TODO(manu) maybe filter that in pruefungslist.js ?
+	$qry = "SELECT DISTINCT
+    			lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid 
+			FROM 
+			    lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
+			WHERE 
+			    lehrveranstaltung_id= ?
+			AND 
+				mitarbeiter_uid=uid 
+			AND 
+				tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
+
+		$parametersArray = array($lehrveranstaltung_id);
+
+		return $this->execQuery($qry, $parametersArray);
+	}
 }

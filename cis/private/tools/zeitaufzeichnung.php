@@ -1014,9 +1014,9 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		}
 
 		echo "	<a href='".$_SERVER['PHP_SELF']."?projektübersichtexport=1".($passuid ? '&uid='.$user : '')."' style='font-size: larger;'>Projektübersichtexport</a>";
-		      			if($anzprojekte > 0)
-		      				echo "<a style='font-size: larger; text-decoration: none; cursor: default'> | </a><a href='".$_SERVER['PHP_SELF']."?projektexport=1".($passuid ? '&uid='.$user : '')."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/projektexport")."</a>";
-				echo "</td>
+		//if($anzprojekte > 0)
+		echo "<a style='font-size: larger; text-decoration: none; cursor: default'> | </a><a href='".$_SERVER['PHP_SELF']."?projektexport=1".($passuid ? '&uid='.$user : '')."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/projektexport")."</a>";
+		echo "</td>
 		      		<td class='menubox' height='10px'>";
 		if ($p->t("dms_link/handbuchZeitaufzeichnung")!='')
 		{
@@ -1222,7 +1222,6 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				<td colspan="4"><SELECT name="projekt" id="projekt">
 					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
 
-			sort($projekt->result);
 			$projektfound = false;
 			foreach ($projekt->result as $row_projekt)
 			{
@@ -1432,9 +1431,9 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		echo '<hr>';
 		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
 		if ($alle===true)
-			echo '<a href="?normal" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)).'"></a>';
+			echo '<a href="?normal'. ($passuid ? '&uid='.$user : '').'" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)).'"></a>';
 		else
-			echo '<a href="?alle" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
+			echo '<a href="?alle'. ($passuid ? '&uid='.$user : '') .'" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
 
 
 
@@ -1976,7 +1975,6 @@ function getDataForProjectOverviewCSV($user)
 		}
 	}
 
-	sort($csvData);
 	//headers schreiben
 	$header = array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'PROJEKTPHASEN ID', 'START', 'PROJEKT ENDE');
 

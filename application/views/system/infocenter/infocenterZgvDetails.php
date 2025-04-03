@@ -52,7 +52,6 @@
 		)
 	);
 ?>
-<body>
 <div id="wrapper">
 
 	<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
@@ -241,6 +240,5 @@
 	</div> <!-- ./page-wrapper-->
 </div> <!-- ./wrapper -->
 <button id="scrollToTop" title="Go to top"><i class="fa fa-chevron-up"></i></button>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

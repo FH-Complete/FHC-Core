@@ -431,8 +431,8 @@ class ReihungstestJob extends JOB_Controller
 								$mailcontent_data_arr,
 								$applicant->email,
 								'Ihre Anmeldung zum Reihungstest - Reminder / Your registration for the placement test - Reminder',
-								DEFAULT_SANCHO_HEADER_IMG,
-								DEFAULT_SANCHO_FOOTER_IMG,
+								'',
+								'',
 								$from,
 								'',
 								$bcc);
@@ -821,7 +821,7 @@ class ReihungstestJob extends JOB_Controller
 						JOIN lehre.tbl_studienordnung USING (studienordnung_id)
 						JOIN PUBLIC.tbl_studiengang ON (tbl_studienordnung.studiengang_kz = tbl_studiengang.studiengang_kz)
 					WHERE get_rolle_prestudent (tbl_prestudent.prestudent_id, ?) IN ('Aufgenommener','Bewerber','Wartender','Abgewiesener')
-						AND studiensemester_kurzbz = ? 
+						AND studiensemester_kurzbz = ?
 						AND tbl_studiengang.typ IN ('b', 'm')
 				)
 				SELECT * FROM prst
@@ -861,7 +861,7 @@ class ReihungstestJob extends JOB_Controller
 			{
 				// Alle niedrigeren Prios laden
 				$qryNiedrPrios = "
-						SELECT DISTINCT
+						SELECT DISTINCT ON(prestudent_id)
 							get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') AS laststatus,
 							tbl_studienplan.orgform_kurzbz,
 							tbl_person.nachname,
@@ -876,11 +876,11 @@ class ReihungstestJob extends JOB_Controller
 							JOIN PUBLIC.tbl_studiengang ON (tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz)
 						WHERE tbl_prestudent.person_id = ".$row_ps->person_id."
 							AND tbl_prestudent.prestudent_id != ".$row_ps->prestudent_id."
-							AND get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') IN ('Aufgenommener','Bewerber','Wartender')
+							AND get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') IN ('Aufgenommener','Bewerber','Wartender', 'Student')
 							AND studiensemester_kurzbz = '".$row_ps->studiensemester_kurzbz."'
 							AND tbl_studiengang.typ IN ('b', 'm')
 							AND priorisierung > ".$row_ps->priorisierung."
-						ORDER BY studiengang_kz, laststatus
+						ORDER BY prestudent_id, studiengang_kz, laststatus, tbl_prestudentstatus.datum DESC
 					";
 
 				// Wenn der letzte Status "Aufgenommener" ist, alle niedrigeren Prios auf "Abgewiesen" setzen
@@ -894,12 +894,22 @@ class ReihungstestJob extends JOB_Controller
 					{
 						foreach ($resultNiedrPrios->retval as $rowNiedrPrios)
 						{
-							// nur Info wenn aufgenommen oder master
-							if ($rowNiedrPrios->laststatus == 'Aufgenommener' || $rowNiedrPrios->studiengang_typ == 'm')
+							// nur Info wenn aufgenommen/student oder master
+							if ($rowNiedrPrios->laststatus == 'Aufgenommener' || $rowNiedrPrios->laststatus == 'Student' || $rowNiedrPrios->studiengang_typ == 'm')
 							{
-								// Mail zur Info an Assistenz schicken, dass in höherer Prio aufgenommen wurde
-								$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
-									= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+
+								if ($rowNiedrPrios->laststatus == 'Aufgenommener')
+								{
+									// Mail zur Info an Assistenz schicken, dass in höherer Prio aufgenommen wurde
+									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
+										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+								}
+								else if ($rowNiedrPrios->laststatus == 'Student')
+								{
+									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['StudentHoeherePrio'][]
+										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+								}
+
 							}
 							elseif ($rowNiedrPrios->laststatus == 'Bewerber' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum)
 							{
@@ -966,7 +976,7 @@ class ReihungstestJob extends JOB_Controller
 						FROM public.tbl_konto
 						WHERE person_id = " . $row_ps->person_id . "
 							AND studiensemester_kurzbz = '" . $row_ps->studiensemester_kurzbz . "'
-							AND buchungstyp_kurzbz = 'StudiengebuehrAnzahlung'";
+							AND buchungstyp_kurzbz IN ('StudiengebuehrAnzahlung','KautionDrittStaat')";
 
 						$resultKautionExists = $db->execReadOnlyQuery($qryKautionExists);
 						if (hasdata($resultKautionExists))
@@ -1023,7 +1033,7 @@ class ReihungstestJob extends JOB_Controller
 			{
 				$studiengang = $this->StudiengangModel->load($stg);
 				$mailcontent = '';
-
+				$content = false;
 				foreach ($orgform AS $art=>$value)
 				{
 					// Orgform nur dazu schreiben, wenn es mehr als Eine gibt
@@ -1044,6 +1054,7 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table><br><br>';
+						$content = true;
 					}
 					if (isset($value['AufnahmeHoeherePrio']) && !isEmptyArray($value['AufnahmeHoeherePrio']))
 					{
@@ -1058,6 +1069,21 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table>';
+						$content = true;
+					}
+					if (isset($value['StudentHoeherePrio']) && !isEmptyArray($value['StudentHoeherePrio']))
+					{
+						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
+									Folgende Studenten wurden in einem höher priorisierten Studiengang aufgenommen:</p>';
+						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
+						$mailcontent .= '					<tbody>';
+						sort($value['StudentHoeherePrio']);
+						foreach ($value['StudentHoeherePrio'] AS $key=>$bewerber)
+						{
+							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
+						}
+						$mailcontent .= '</tbody></table>';
+						$content = true;
 					}
 					if (isset($value['AbgewiesenHoeherePrio']) && !isEmptyArray($value['AbgewiesenHoeherePrio']))
 					{
@@ -1071,6 +1097,7 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table>';
+						$content = true;
 					}
 					if ($bcc != '' && isset($value['AbgewiesenWeilBewerber']) && !isEmptyArray($value['AbgewiesenWeilBewerber']))
 					{
@@ -1085,13 +1112,14 @@ class ReihungstestJob extends JOB_Controller
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
 						$mailcontent .= '</tbody></table>';
+						$content = true;
 					}
 				}
 
 				$mailcontent_data_arr['table'] = $mailcontent;
 
 				// Send email in Sancho design
-				if (!isEmptyString($mailcontent))
+				if (!isEmptyString($mailcontent) && $content === true)
 				{
 					sendSanchoMail(
 						'Sancho_ReihungstestteilnehmerJob',

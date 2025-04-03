@@ -29,6 +29,10 @@ class AntragJob extends JOB_Controller
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$this->loadPhrases([
+			'lehre'
+		]);
 	}
 
 	/**
@@ -179,8 +183,8 @@ class AntragJob extends JOB_Controller
 				$data,
 				$to,
 				'Anträge - Aktion(en) erforderlich',
-				DEFAULT_SANCHO_HEADER_IMG,
-				DEFAULT_SANCHO_FOOTER_IMG,
+				'',
+				'',
 				'',
 				$cc
 			))
@@ -412,10 +416,12 @@ class AntragJob extends JOB_Controller
 		$this->StudierendenantragModel->addSelect('studiensemester_kurzbz');
 		$this->StudierendenantragModel->addSelect('s.insertamum');
 		$this->StudierendenantragModel->addSelect('s.insertvon');
+		$this->StudierendenantragModel->addJoin('public.tbl_student pts', 'prestudent_id');
+		$this->StudierendenantragModel->addSelect('pts.student_uid');
 
 		$this->StudierendenantragModel->db->where_in(
 			'public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)',
-			$this->config->item('antrag_prestudentstatus_whitelist')
+			$this->config->item('antrag_prestudentstatus_whitelist_abmeldung')
 		);
 
 		$result = $this->StudierendenantragModel->getWithLastStatusWhere([
@@ -449,11 +455,23 @@ class AntragJob extends JOB_Controller
 					if (isError($result))
 						$this->logError(getError($result));
 
+					$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+					$result = $this->StatusgrundModel->loadWhere(['statusgrund_kurzbz' => 'abbrecherStgl']);
+					if (isError($result)) {
+						$this->logError(getError($result));
+						continue;
+					} elseif (!hasData($result)) {
+						$this->logError($this->p->t('lehre', 'error_noStatusgrund', ['statusgrund_kurzbz' => 'abbrecherStgl']));
+						continue;
+					}
+					
+					$statusgrund = current(getData($result));
+
 					$result = $this->prestudentlib->setAbbrecher(
 	                    $antrag->prestudent_id,
 	                    $antrag->studiensemester_kurzbz,
 	                    'AntragJob',
-	                    'abbrecherStgl',
+	                    $statusgrund->statusgrund_id,
 	                    $antrag->insertamum,
 	                    null,
 	                    $antrag->insertvon ?: $insertvon
@@ -484,7 +502,7 @@ class AntragJob extends JOB_Controller
 						$person = current(getData($result));
 						$email = $studiengang->email;
 						$dataMail = array(
-							'prestudent' => $antrag->prestudent_id,
+							'prestudent' => 'UID: ' . $antrag->student_uid . ', PreStudentId: ' . $antrag->prestudent_id,
 							'studiensemester' => $antrag->studiensemester_kurzbz,
 							'name' => trim($person->vorname . ' '. $person->nachname),
 						);
