@@ -83,6 +83,10 @@ class Config extends FHCAPI_Controller
 			'title' => 'Status',
 			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js'
 		];
+		$result['documents'] = [
+			'title' => $this->p->t('stv', 'tab_dokumente'),
+			'component' => './Stv/Studentenverwaltung/Details/Dokumente.js'
+		];
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
 			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
