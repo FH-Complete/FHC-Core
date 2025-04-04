@@ -132,10 +132,10 @@ export default {
 	},
 	methods: {
 		async loadAndSetStudiensemester(){
-			const result = await this.$fhcApi
+			const result = await this.$api
 				.get('api/frontend/v1/organisation/Studiensemester/getAll', {start: STUDIENSEMESTER_DROPDOWN_STARTDATE})
 				.then(result => this.studiensemester = result.data )
-				.then(() => this.$fhcApi.get('api/frontend/v1/organisation/Studiensemester/getAktNext') ) // Get actual Studiensemester
+				.then(() => this.$api.get('api/frontend/v1/organisation/Studiensemester/getAktNext') ) // Get actual Studiensemester
 				.then(result =>  this.selectedStudiensemester = result.data[0].studiensemester_kurzbz ) // Preselect Studiensemester
 				.catch(error => this.$fhcAlert.handleSystemError(error) );
 		},
@@ -148,7 +148,7 @@ export default {
 
 			// Set table data
 			this.table.setData(
-				this.$fhcApi.getUri() +
+				this.$api.getUri() +
 				'/api/frontend/v1/education/Lehrveranstaltung/getTemplateLvTree' +
 				'?studiensemester_kurzbz=' + this.selectedStudiensemester
 			);
@@ -163,7 +163,7 @@ export default {
 		onChangeStudiensemester(){
 			// Reset table data
 			this.table.setData(
-				this.$fhcApi.getUri() +
+				this.$api.getUri() +
 				'/api/frontend/v1/education/Lehrveranstaltung/getTemplateLvTree' +
 				'?studiensemester_kurzbz=' + this.selectedStudiensemester
 			);
