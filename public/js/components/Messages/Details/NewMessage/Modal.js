@@ -5,6 +5,7 @@ import ListBox from "../../../../../../index.ci.php/public/js/components/primevu
 import DropdownComponent from "../../../VorlagenDropdown/VorlagenDropdown.js";
 
 export default {
+	name: "ModalNewMessages",
 	components: {
 		BsModal,
 		FormForm,

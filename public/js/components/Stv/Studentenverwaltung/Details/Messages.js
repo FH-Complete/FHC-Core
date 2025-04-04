@@ -1,6 +1,7 @@
 import CoreMessages from "../../../Messages/Messages.js";
 
 export default {
+	name: "TabMessages",
 	components: {
 		CoreMessages
 	},

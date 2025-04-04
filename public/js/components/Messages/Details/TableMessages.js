@@ -1,12 +1,11 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import FormForm from '../../Form/Form.js';
-//import NewMessage from "../Details/NewMessage.js";
 
 export default {
+	name: "TableMessages",
 	components: {
 		CoreFilterCmpt,
 		FormForm,
-	//	NewMessage,
 	},
 	inject: {
 		cisRoot: {

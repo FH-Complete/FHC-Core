@@ -2,6 +2,7 @@ import TableMessages from "./Details/TableMessages.js";
 import FormOnly from "./Details/NewMessage/NewDiv.js";
 import MessageModal from "../Messages/Details/NewMessage/Modal.js";
 export default {
+	name: "MessagesComponent",
 	components: {
 		TableMessages,
 		FormOnly,
