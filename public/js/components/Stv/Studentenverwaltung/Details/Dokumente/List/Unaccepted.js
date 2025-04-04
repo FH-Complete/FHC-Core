@@ -3,6 +3,7 @@ import ModalEdit from "../Modal/Edit.js";
 import ModalUpload from "../Modal/Upload.js";
 
 export default {
+	name: "UnacceptedDocuments",
 	components: {
 		CoreFilterCmpt,
 		ModalEdit,

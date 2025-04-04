@@ -4,6 +4,7 @@ import ModalUpload from "../Modal/Upload.js";
 
 export default {
 	components: {
+		name: "AcceptedDocuments",
 		CoreFilterCmpt,
 		ModalEdit,
 		ModalUpload

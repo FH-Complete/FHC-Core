@@ -4,6 +4,7 @@ import FormInput from "../../../../../Form/Input.js";
 import FormUploadDms from "../../../../../Form/Upload/Dms.js";
 
 export default {
+	name: "modalUploadDocuments",
 	components: {
 		BsModal,
 		FormForm,

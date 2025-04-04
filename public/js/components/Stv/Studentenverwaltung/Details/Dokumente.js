@@ -1,14 +1,10 @@
 import ViewDocuments from "./Dokumente/Dokumente.js";
 
 export default {
+	name:"TabDocuments",
 	components: {
 		ViewDocuments
 	},
-/*	provide() {
-		return {
-			config: this.config
-		};
-	},*/
 	props: {
 		modelValue: Object,
 	},
