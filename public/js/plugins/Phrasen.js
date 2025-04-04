@@ -1,3 +1,4 @@
+import OldFhcApi from '../plugin/OldFhcApi.js'; // TODO(chris): remove at some point
 import PluginsApi from './Api.js';
 import ApiPhrasen from '../api/factory/phrasen.js';
 
@@ -86,6 +87,7 @@ const phrasen = {
 
 export default {
 	install(app, options) {
+		app.use(OldFhcApi); // TODO(chris): remove at some point
 		app.use(PluginsApi);
 		app.config.globalProperties.$p = {
 			t: phrasen.t,
