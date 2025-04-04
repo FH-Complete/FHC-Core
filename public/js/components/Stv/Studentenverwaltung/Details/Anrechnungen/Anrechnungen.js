@@ -5,6 +5,7 @@ import FormInput from "../../../../Form/Input.js";
 import CoreNotiz from "../../../../Notiz/Notiz.js";
 
 export default {
+	name: "ExemptionComponent",
 	components: {
 		CoreFilterCmpt,
 		BsModal,

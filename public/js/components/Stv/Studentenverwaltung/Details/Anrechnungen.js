@@ -1,6 +1,7 @@
 import AnrechnungenList from './Anrechnungen/Anrechnungen.js';
 
 export default {
+	name: "TabExemptions",
 	components: {
 		AnrechnungenList
 	},
