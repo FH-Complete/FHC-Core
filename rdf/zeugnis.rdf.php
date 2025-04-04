@@ -414,6 +414,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						$xml .= "				<note><![CDATA[".$note2."]]></note>";
 						$xml .= "				<sws><![CDATA[".($row->semesterstunden==0?'':number_format(sprintf('%.1F',$row->semesterstunden/$wochen),1))."]]></sws>";
 						$xml .= "				<sws_lv><![CDATA[".($row->sws==0?'':number_format(sprintf('%.1F',$row->sws),1))."]]></sws_lv>";
+						$xml .= "				<lv_id><![CDATA[".$row->lehrveranstaltung_id."]]></lv_id>";
+
 						$ectspunkte='';
 
 						$anrechnung = new anrechnung();
