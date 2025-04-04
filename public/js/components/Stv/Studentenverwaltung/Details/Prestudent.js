@@ -5,6 +5,7 @@ import TblHistory from "./Prestudent/History.js";
 import CoreUdf from '../../../Udf/Udf.js';
 
 export default {
+	name: "TabPrestudent",
 	components: {
 		FormForm,
 		FormInput,

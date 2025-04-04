@@ -5,6 +5,7 @@ import CoreForm from '../../../../../Form/Form.js';
 import FormInput from '../../../../../Form/Input.js';
 
 export default {
+	name: "MobilityPurpose",
 	components: {
 		CoreFilterCmpt,
 		BsModal,

@@ -4,6 +4,7 @@ import FhcTabs from "../../Tabs.js";
 // TODO(chris): phrasen
 
 export default {
+	name: "DetailsPrestudent",
 	components: {
 		FhcTabs
 	},

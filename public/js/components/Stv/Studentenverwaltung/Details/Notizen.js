@@ -1,6 +1,7 @@
 import CoreNotiz from "../../../Notiz/Notiz.js";
 
 export default {
+	name: "TabNotes",
 	components: {
 		CoreNotiz
 	},

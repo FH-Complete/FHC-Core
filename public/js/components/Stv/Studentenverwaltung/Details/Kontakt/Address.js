@@ -6,6 +6,7 @@ import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 
 export default{
+	name: 'AddressComponent',
 	components: {
 		CoreFilterCmpt,
 		PvAutoComplete,

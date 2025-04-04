@@ -6,6 +6,7 @@ import KontoEdit from "./Konto/Edit.js";
 const LOCAL_STORAGE_ID_FILTER = 'stv_details_konto_2024-01-11_filter';
 
 export default {
+	name: "TabBanking",
 	components: {
 		CoreFilterCmpt,
 		FormInput,

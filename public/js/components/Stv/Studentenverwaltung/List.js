@@ -3,6 +3,7 @@ import ListNew from './List/New.js';
 
 
 export default {
+	name: "ListPrestudents",
 	components: {
 		CoreFilterCmpt,
 		ListNew

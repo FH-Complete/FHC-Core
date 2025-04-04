@@ -6,6 +6,7 @@ import CoreUdf from '../../../Udf/Udf.js';
 
 
 export default {
+	name: "TabDetails",
 	components: {
 		CoreForm,
 		FormInput,

@@ -24,6 +24,7 @@ import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
 
 
 export default {
+	name: 'Studentenverwaltung',
 	components: {
 		CoreSearchbar,
 		VerticalSplit,

@@ -1,6 +1,7 @@
 import CoreBetriebsmittel from "../../../Betriebsmittel/Betriebsmittel.js";
 
 export default {
+	name: "TabRessources",
 	components: {
 		CoreBetriebsmittel
 	},
