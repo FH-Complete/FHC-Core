@@ -1,6 +1,7 @@
 import GruppenList from './Gruppen/Gruppen.js';
 
 export default {
+	name: 'TabGroups',
 	components: {
 		GruppenList
 	},

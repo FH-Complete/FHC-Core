@@ -1,6 +1,7 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 
 export default {
+	name: 'TblGroups',
 	components: {
 		CoreFilterCmpt,
 	},
