@@ -3,6 +3,7 @@ import CoreBetriebsmittel from "../../../Betriebsmittel/Betriebsmittel.js";
 import ApiBetriebsmittelPerson from '../../../../api/factory/betriebsmittel/person.js';
 
 export default {
+	name: "TabRessources",
 	components: {
 		CoreBetriebsmittel
 	},

@@ -6,6 +6,7 @@ import FormInput from '../../../../Form/Input.js';
 import ApiStvBankaccount from '../../../../../api/factory/stv/kontakt/bankaccount.js';
 
 export default{
+	name: 'BankaccountComponent',
 	components: {
 		CoreFilterCmpt,
 		BsModal,

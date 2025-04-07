@@ -1,6 +1,7 @@
 import TableMobility from "./Mobility/Mobility.js";
 
 export default {
+	name: "TabMobility",
 	components: {
 		TableMobility
 	},

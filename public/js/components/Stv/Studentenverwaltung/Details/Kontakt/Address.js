@@ -9,6 +9,7 @@ import ApiStvAddress from '../../../../../api/factory/stv/kontakt/address.js';
 import ApiStvCompany from '../../../../../api/factory/stv/kontakt/company.js';
 
 export default{
+	name: 'AddressComponent',
 	components: {
 		CoreFilterCmpt,
 		PvAutoComplete,

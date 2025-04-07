@@ -9,6 +9,7 @@ import ApiStvKonto from '../../../../api/factory/stv/konto.js';
 const LOCAL_STORAGE_ID_FILTER = 'stv_details_konto_2024-01-11_filter';
 
 export default {
+	name: "TabBanking",
 	components: {
 		CoreFilterCmpt,
 		FormInput,

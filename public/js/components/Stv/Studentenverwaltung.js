@@ -27,6 +27,7 @@ import ApiStv from "../../api/factory/stv.js";
 
 
 export default {
+	name: 'Studentenverwaltung',
 	components: {
 		CoreSearchbar,
 		VerticalSplit,

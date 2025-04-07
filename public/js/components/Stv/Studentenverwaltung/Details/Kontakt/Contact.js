@@ -8,6 +8,7 @@ import ApiStvContact from '../../../../../api/factory/stv/kontakt/contact.js';
 import ApiStvCompany from '../../../../../api/factory/stv/kontakt/company.js';
 
 export default{
+	name: 'ContactComponent',
 	components: {
 		CoreFilterCmpt,
 		PvAutoComplete,

@@ -6,6 +6,7 @@ import ApiStvApp from '../../../api/factory/stv/app.js';
 // TODO(chris): phrasen
 
 export default {
+	name: "DetailsPrestudent",
 	components: {
 		FhcTabs
 	},

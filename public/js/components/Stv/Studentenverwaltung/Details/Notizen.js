@@ -3,6 +3,7 @@ import CoreNotiz from "../../../Notiz/Notiz.js";
 import ApiNotizPerson from '../../../../api/factory/notiz/person.js';
 
 export default {
+	name: "TabNotes",
 	components: {
 		CoreNotiz
 	},

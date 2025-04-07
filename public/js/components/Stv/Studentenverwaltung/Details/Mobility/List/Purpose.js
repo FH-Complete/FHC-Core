@@ -7,6 +7,7 @@ import FormInput from '../../../../../Form/Input.js';
 import ApiStvMobility from '../../../../../../api/factory/stv/mobility.js';
 
 export default {
+	name: "MobilityPurpose",
 	components: {
 		CoreFilterCmpt,
 		BsModal,

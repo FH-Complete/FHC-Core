@@ -8,6 +8,7 @@ import ApiStvDetails from '../../../../api/factory/stv/details.js';
 
 
 export default {
+	name: "TabDetails",
 	components: {
 		CoreForm,
 		FormInput,

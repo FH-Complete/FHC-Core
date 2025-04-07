@@ -7,6 +7,7 @@ import CoreUdf from '../../../Udf/Udf.js';
 import ApiStvPrestudent from '../../../../api/factory/stv/prestudent.js';
 
 export default {
+	name: "TabPrestudent",
 	components: {
 		FormForm,
 		FormInput,
