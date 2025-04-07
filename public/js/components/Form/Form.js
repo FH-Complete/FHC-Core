@@ -42,7 +42,7 @@ export default {
 				return a;
 			}, {});
 		},
-		/* Depricated Code start */
+		/* Deprecated Code start */
 		factory() {
 			console.warn('<form>.factory is deprecated! Use <form>.call() instead.');
 			const factory = Object.create(Object.getPrototypeOf(this.$fhcApi.factory), Object.getOwnPropertyDescriptors(this.$fhcApi.factory));
@@ -53,7 +53,7 @@ export default {
 			};
 			return factory;
 		}
-		/* Depricated Code end */
+		/* Deprecated Code end */
 	},
 	methods: {
 		get(...args) {
@@ -62,10 +62,10 @@ export default {
 			else
 				args.unshift(this);
 			
-			/* Depricated Code start */
+			/* Deprecated Code start */
 			if (!this.$api)
 				return this.$fhcApi.get(...args);
-			/* Depricated Code end */
+			/* Deprecated Code end */
 			
 			return this.$api.get(...args);
 		},
@@ -75,10 +75,10 @@ export default {
 			else
 				args.unshift(this);
 			
-			/* Depricated Code start */
+			/* Deprecated Code start */
 			if (!this.$api)
 				return this.$fhcApi.post(...args);
-			/* Depricated Code end */
+			/* Deprecated Code end */
 			
 			return this.$api.post(...args);
 		},

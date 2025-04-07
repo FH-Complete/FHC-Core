@@ -8,12 +8,12 @@ import FhcApiFactory from '../api/fhcapifactory.js';
 export default {
 	install: (app, options) => {
 		if (app.config.globalProperties.$fhcApi) {
-			/* Depricated Code start */
+			/* Deprecated Code start */
 			if (options?.factory) {
-				console.warn("$fhcApi is DEPRICATED!");
+				console.warn("$fhcApi is DEPRECATED!");
 				app.config.globalProperties.$fhcApi.factory.addEndpoints(options.factory);
 			}
-			/* Depricated Code end */
+			/* Deprecated Code end */
 			return;
 		}
 
@@ -149,11 +149,11 @@ export default {
 
 		app.config.globalProperties.$fhcApi = {
 			getUri(url) {
-				console.warn('$fhcApi.getUri is DEPRICATED! Use $api.getUri instead.');
+				console.warn('$fhcApi.getUri is DEPRECATED! Use $api.getUri instead.');
 				return fhcApiAxios.getUri({url});
 			},
 			get(form, uri, params, config) {
-				console.warn('$fhcApi.get is DEPRICATED! Use $api.get instead.');
+				console.warn('$fhcApi.get is DEPRECATED! Use $api.get instead.');
 				[uri, params, config] = _get_config(form, uri, params, config);
 				if (params) {
 					if (config)
@@ -164,7 +164,7 @@ export default {
 				return fhcApiAxios.get(uri, config);
 			},
 			post(form, uri, data, config) {
-				console.warn('$fhcApi.post is DEPRICATED! Use $api.post instead.');
+				console.warn('$fhcApi.post is DEPRECATED! Use $api.post instead.');
 				[uri, data, config] = _get_config(form, uri, data, config);
 				return fhcApiAxios.post(uri, data, config);
 			},
@@ -305,27 +305,27 @@ export default {
 			}
 		};
 
-		/* Depricated Code start */
+		/* Deprecated Code start */
 		class FhcApiFactoryWrapper {
 			constructor(factorypart, root) {
 				if (root === undefined) {
 					this.$fhcApi = {
 						getUri(url) {
-							console.warn('$fhcApi.factory is DEPRICATED!');
+							console.warn('$fhcApi.factory is DEPRECATED!');
 							return app.config.globalProperties.$fhcApi.getUri(url);
 						},
 						get(form, uri, params, config) {
-							console.warn('$fhcApi.factory is DEPRICATED!');
+							console.warn('$fhcApi.factory is DEPRECATED!');
 							return app.config.globalProperties.$fhcApi.get(form, uri, params, config);
 						},
 						post(form, uri, data, config) {
-							console.warn('$fhcApi.factory is DEPRICATED!');
+							console.warn('$fhcApi.factory is DEPRECATED!');
 							return app.config.globalProperties.$fhcApi.post(form, uri, data, config);
 						}
 					};
 					Object.defineProperty(this.$fhcApi, 'factory', {
 						get() {
-							console.warn('$fhcApi.factory is DEPRICATED!');
+							console.warn('$fhcApi.factory is DEPRECATED!');
 							return app.config.globalProperties.$fhcApi.factory;
 						}
 					});
@@ -351,18 +351,18 @@ export default {
 						}
 					});
 				});
-				if (!noWarn) console.warn('$fhcApi.factory.addEndpoints() is DEPRICATED!');
+				if (!noWarn) console.warn('$fhcApi.factory.addEndpoints() is DEPRECATED!');
 			}
 		}
 
 		const factory = new FhcApiFactoryWrapper(FhcApiFactory);
 		if (options?.factory) {
-			console.warn("$fhcApi is DEPRICATED!");
+			console.warn("$fhcApi is DEPRECATED!");
 			factory.addEndpoints(options.factory);
 		}
 
 		app.config.globalProperties.$fhcApi.factory = factory;
-		/* Depricated Code end */
+		/* Deprecated Code end */
 		
 		app.provide('$fhcApi', app.config.globalProperties.$fhcApi);
 	}
