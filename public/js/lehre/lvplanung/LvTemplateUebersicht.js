@@ -133,7 +133,7 @@ export default {
 	methods: {
 		async loadAndSetStudiensemester(){
 			const result = await this.$api
-				.get('api/frontend/v1/organisation/Studiensemester/getAll', {start: STUDIENSEMESTER_DROPDOWN_STARTDATE})
+				.get('api/frontend/v1/organisation/Studiensemester/getAll', {start: STUDIENSEMESTER_DROPDOWN_STARTDATE, order: 'desc'})
 				.then(result => this.studiensemester = result.data )
 				.then(() => this.$api.get('api/frontend/v1/organisation/Studiensemester/getAktNext') ) // Get actual Studiensemester
 				.then(result =>  this.selectedStudiensemester = result.data[0].studiensemester_kurzbz ) // Preselect Studiensemester
