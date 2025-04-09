@@ -15,6 +15,7 @@ import CalClick from '../../directives/Calendar/Click.js';
  * - check emits
  * - default title:click => back to previous view/mode
  * - event single view (default for click:event)
+ * - get focusDate/currentDate correct
  */
 
 export default {
