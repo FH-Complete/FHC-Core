@@ -1,4 +1,4 @@
-import CalendarDate from '../../../../../helpers/Calendar/Date.js';
+import CalendarDate from '../../../../helpers/Calendar/Date.js';
 
 export default {
 	name: "LabelTime",

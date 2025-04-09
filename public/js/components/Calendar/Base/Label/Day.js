@@ -1,6 +1,6 @@
-import CalendarDate from '../../../../../helpers/Calendar/Date.js';
+import CalendarDate from '../../../../helpers/Calendar/Date.js';
 
-import CalClick from '../../../../../directives/Calendar/Click.js';
+import CalClick from '../../../../directives/Calendar/Click.js';
 
 export default {
 	name: "LabelDay",
