@@ -24,7 +24,9 @@ export default {
 		"dragstart",
 		"resizestart",
 		"configOpened",
-		"configClosed"
+		"configClosed",
+		"pinItem",
+		"unPinItem"
 	],
 	props: [
 		"id",
@@ -36,8 +38,13 @@ export default {
 		"hidden",
 		"editMode",
 		"loading",
+		"item_data",
+		"place",
 	],
 	computed: {
+		isPinned(){
+			return this.place?.pinned ? true : false;
+		},
 		isResizeable() {
 			if (!this.widget) return false;
 			return this.widget.setup.width.max || this.widget.setup.height.max;
@@ -47,6 +54,17 @@ export default {
 		},
 	},
 	methods: {
+		unpin(){
+			// Unpinning is only possible in edit mode
+			if(!this.editMode)
+				return;
+			let result = { item: this.item_data, x: this.item_data.x, y: this.item_data.y };
+			this.$emit('unPinItem', [result]);
+		},
+		pinItem(){
+			let result = { item: this.item_data, x: this.item_data.x, y: this.item_data.y};
+			this.$emit('pinItem',[result]);
+		},
 		getWidgetC4Link(widget) {
 			return (FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router + widget.setup.cis4link)
@@ -120,12 +138,25 @@ export default {
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 	</div>
-	<div v-else-if="!hidden || editMode" :id="widgetID" class="dashboard-item card overflow-hidden h-100 position-relative" :class="arguments && arguments.className ? arguments.className : ''">
+	<div v-else-if="!hidden || editMode" class="dashboard-item card overflow-hidden h-100 position-relative" :class="arguments && arguments.className ? arguments.className : ''">
 		<div v-if="widget" class="card-header d-flex ps-0 pe-2 align-items-center">
 			<Transition>
-				<span v-if="editMode" drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
+				<span v-if="editMode && !isPinned" drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
 			</Transition>
 			<span class="col mx-2 px-2">{{ widget.setup.name }}</span>
+			<template v-if="isPinned">
+				<div v-if="editMode" pinned="true" @click="unpin" class="pin cursor-pointer col-auto me-2">
+					<i class="fa-solid fa-thumbtack "></i>
+				</div>
+				<div v-else class="col-auto me-2">
+					<i class="fa-solid fa-thumbtack "></i>
+				</div>
+			</template>
+			<template v-else>
+				<div v-if="editMode"  class="col-auto me-2 pin" @click="pinItem">
+					<i class="fa-solid fa-thumbtack" style="color:lightgray;"></i>
+				</div>
+			</template>
 			<a v-if="widget.setup.cis4link" :href="getWidgetC4Link(widget)" class="col-auto ms-auto ">
           		<i class="fa fa-arrow-up-right-from-square me-1"></i>
           	</a>
@@ -157,7 +188,7 @@ export default {
 			</template>
 		</bs-modal>
 		<height-transition>
-			<div v-if="editMode && isResizeable" class="card-footer d-flex justify-content-end p-0">
+			<div v-if="editMode && isResizeable && !isPinned" class="card-footer d-flex justify-content-end p-0">
 				<span drag-action="resize" class="col-auto px-1 cursor-nw-resize"><i class="fa-solid fa-up-right-and-down-left-from-center mirror-x"></i></span>
 			</div>
 		</height-transition>

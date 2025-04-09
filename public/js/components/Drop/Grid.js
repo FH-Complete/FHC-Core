@@ -24,10 +24,6 @@ export default {
 			type: Number,
 			default: 0
 		},
-		placeholders: {
-			type: Array,
-			default: () => []
-		}
 	},
 	emits: [
 		"rearrangeItems",
@@ -48,8 +44,11 @@ export default {
 			fixedPositionUpdates: null,
 			draggedOffset: [0,0],
 			draggedItem: null,
+			draggedNode: null,
 			draggedItemIcon: null,
 			additionalRow: null,
+			reorderedItems:[],
+			clonedWidget:null,
 		}
 	},
 	inject:{
@@ -59,6 +58,64 @@ export default {
 		},
 	},
 	computed: {
+		items_hashmap() {
+			let items = {};
+			this.items.forEach(item => {
+				if (this.reorderedItems.length > 0){
+					if(item.reorder){
+						let rearrangedPosition = this.reorderedItems.filter(widget => widget.data.widgetid == item.widgetid)?.pop();
+						if (rearrangedPosition) {			
+							item.x = rearrangedPosition.x;
+							item.y = rearrangedPosition.y;
+						}
+					}
+				}
+				items[`x${item.x}y${item.y}`] = item;
+			});	
+			return items
+		},
+		items_placeholders(){
+			let placeholders = [];
+			let col_max = this.cols;
+			let rows_max = this.rows;
+
+			// occupied hashmap to keep track of the occupied cells
+			let occupied = {};
+
+			for (let y = 0; y < rows_max; y++) {
+				for (let x = 0; x < col_max; x++) {
+					// skip current position if it was registered as occupied
+					if (Object.keys(occupied).length && occupied[`x${x}y${y}`]) {
+						continue;
+					}
+					let current_item = this.items_hashmap[`x${x}y${y}`];
+					if (current_item) {
+						//calculate the occupied cells from the width and the height from the items 
+						let width = current_item.w;
+						let height = current_item.h;
+						let max_x = x + width - 1;
+						let max_y = y + height - 1;
+						if(x != max_x || y != max_y){
+							for (let occupied_y = y; occupied_y <= max_y; occupied_y++) {
+								for (let occupied_x = x; occupied_x <= max_x; occupied_x++) {
+									if (occupied_x != x || occupied_y != y) {
+										occupied[`x${occupied_x}y${occupied_y}`]=true;
+									}
+								}
+							}
+						}
+					}
+					else {
+						placeholders.push({ x: x, y: y, w: 1, h: 1, placeholder: true, 
+							data: { id: 'placeholder_' + String(placeholders.length).padStart(4, "0") } });
+					}
+				}
+			}
+			return placeholders;
+		},
+		placedItems_withPlaceholders() {
+			return [...this.placedItems, ...this.items_placeholders];
+		},
 		rows() {
 			if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid)
 				return this.dragGrid.h;
@@ -83,6 +140,7 @@ export default {
 						y: item.y,
 						w: item.w,
 						h: item.h,
+						reorder: item.reorder,
 						weight: item.weight || 0,
 						data: item
 					}
@@ -110,7 +168,7 @@ export default {
 			if (!this.positionUpdates)
 				return this.prePlacedItems;
 			return this.prePlacedItems.map(item => {
-				if (!this.positionUpdates[item.index])
+				if (!this.positionUpdates[item.index] )
 					return item;
 				return {
 					index: item.index,
@@ -122,9 +180,6 @@ export default {
 					h: this.positionUpdates[item.index].h === undefined ? item.h : this.positionUpdates[item.index].h
 				};
 			});
-		},
-		placedItems_withPlaceholders(){
-			return [...this.placedItems,...this.placeholders];
 		},
 		showEmptyTileHover() {
 			if (!this.active || !this.grid || this.mode != MODE_IDLE || this.x < 0 || this.y < 0 || this.x >= this.cols || this.y >= this.rows)
@@ -169,27 +224,52 @@ export default {
 		}
 	},
 	methods: {
+		
 		toggleDraggedItemOverlay(condition){
-			if(!this.draggedItem)
+			if(!this.draggedNode)
 				return;
-			let draggedItemNode = document.getElementById(this.draggedItem.data.id);
 			if(condition){
-				draggedItemNode.classList.add("dashboard-item-overlay");
+				this.draggedNode.firstElementChild.classList.add("dashboard-item-overlay");
 			}else{
-				draggedItemNode.classList.remove("dashboard-item-overlay");
+				this.draggedNode.firstElementChild.classList.remove("dashboard-item-overlay");
 			}
 		},
 		dragging(event){
 			if(this.mode == MODE_MOVE){
 				this.toggleDraggedItemOverlay(true);
-			    this.draggedItemIcon.style.top = `${this.clientY}px`;
-			    this.draggedItemIcon.style.left = `${this.clientX}px`;
+				this.clonedWidget.style.top = `${this.clientY-20}px`;
+				this.clonedWidget.style.left = `${this.clientX-15}px`;
 			}
 		},
 		createNewGrid(items) {
 			this.grid = new GridLogic(this.cols);
 			const result = [];
-			[...items].sort((a, b) => a.weight > b.weight).forEach(item => {
+			let sortedItems = [...items].sort((a, b) => {
+				if (a.reorder){
+					return 999;
+				}
+				if (b.reorder){
+					return -999;
+				}
+				return a.weight > b.weight;
+			}); 
+			let reorderedItems = [];
+			sortedItems.forEach(item => {
+				let freeSlots = this.grid.getFreeSlots();
+				
+				if(item.reorder){
+					item.reorder=true;
+					let firstFreeSlot = freeSlots.shift();
+					if (!firstFreeSlot) {
+						item.x = 0;
+						item.y = this.grid.h;
+					}else{
+						item.x = firstFreeSlot.x;
+						item.y = firstFreeSlot.y;
+					}
+					reorderedItems.push(item);
+					
+				}
 				if (item.x + item.w > this.cols) {
 					let targetW = this.cols-item.x,
 						targetX = undefined;
@@ -214,10 +294,12 @@ export default {
 				item.frame = this.grid.getItemFrame(item);
 				this.convertGridResultToUpdate(this.grid.add(item), result, items);
 			});
+			this.reorderedItems = reorderedItems;
 			this.grid.clearWeights();
 			return result;
 		},
 		convertGridResultToUpdate(input, output, baseArray) {
+			
 			if (!input)
 				return;
 			if (!baseArray)
@@ -296,7 +378,14 @@ export default {
 			
 			this.mode = MODE_MOVE;
 			this.draggedItem = item;
-			this.draggedItemIcon = document.getElementById(`widget-${this.sectionName}-${this.draggedItem?.data.widget}`);
+			this.draggedNode = evt.target;
+			//clones the widget for the drag Image
+			let clone = evt.target.cloneNode(true);
+			clone.style.zIndex = 20;
+			clone.classList.add("widgetClone");
+			this.$refs.container.appendChild(clone);
+			this.clonedWidget = clone;
+			
 			this.draggedOffset = [item.x - this.x, item.y - this.y];
 			this._dragStart(evt, item);
 		},
@@ -353,6 +442,7 @@ export default {
 			this.positionUpdates = null;
 			this.draggedOffset = [0,0],
 			this.draggedItem = null;
+			this.draggedNode = null;
 			
 			if(this.draggedItemIcon){
 				this.draggedItemIcon.style.top = '-999px';
@@ -362,6 +452,10 @@ export default {
 			
 		},
 		dragEnd() {
+			let widgetClones = document.getElementsByClassName("widgetClone");
+			for(let widget of widgetClones){
+				this.$refs.container.removeChild(widget);
+			}
 			if (this.mode == MODE_IDLE)
 				return;
 			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)

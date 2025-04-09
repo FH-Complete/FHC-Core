@@ -57,71 +57,28 @@ export default {
 			return 'margin-bottom: 8px;';
 		},
 		items() {
-
-			const computeNearestPlace = (item, gridWidth) =>{
+			// reuses the nearest placement of the widget from another viewport 
+			/* const computeNearestPlace = (item, gridWidth) =>{
 				let place;
 				if (Object.keys(item.place).length > 0) {
 					const nearestIndex = Object.keys(item.place)
 											   .sort((a, b) => Math.abs(a - gridWidth) - Math.abs(b - gridWidth))
-											   .pop();
+											   .shift();
 					place = item.place[nearestIndex];
 				}
 				else{
 					place = { x: 0, y: 0, w: 1, h: 1 };
 				}
 				return place;
-			}
+			} */
 			
-			return this.widgets.map(item => {
-				return { ...item, ...(item.place[this.gridWidth] || computeNearestPlace(item, this.gridWidth))};
+			let placedItems = this.widgets.map(item => {
+				return { ...item, reorder: false, ...(item.place[this.gridWidth] || { reorder: true, ...{ x: 0, y: 0, w: 1, h: 1 } })};
 			});
+			return placedItems;
+			
 		},
-		items_hashmap() {
-			let items = {};
-			this.items.forEach(item => {
-				items[`x${item.x}y${item.y}`] = item;
-			});
-			return items
-		},
-		items_placeholders(){
-			let placeholders = [];
-			let col_max = this.gridWidth;
-			let rows_max = this.gridHeight;
-
-			// occupied hashmap to keep track of the occupied cells
-			let occupied = {};
-
-			for (let y = 0; y < rows_max; y++) {
-				for (let x = 0; x < col_max; x++) {
-					// skip current position if it was registered as occupied
-					if (Object.keys(occupied).length && occupied[`x${x}y${y}`]) {
-						continue;
-					}
-					let current_item = this.items_hashmap[`x${x}y${y}`];
-					if (current_item) {
-						//calculate the occupied cells from the width and the height from the items 
-						let width = current_item.w;
-						let height = current_item.h;
-						let max_x = x + width - 1;
-						let max_y = y + height - 1;
-						if(x != max_x || y != max_y){
-							for (let occupied_y = y; occupied_y <= max_y; occupied_y++) {
-								for (let occupied_x = x; occupied_x <= max_x; occupied_x++) {
-									if (occupied_x != x || occupied_y != y) {
-										occupied[`x${occupied_x}y${occupied_y}`]=true;
-									}
-								}
-							}
-						}
-					}
-					else {
-						placeholders.push({ x: x, y: y, w: 1, h: 1, placeholder: true, 
-							data: { id: 'placeholder_' + String(placeholders.length).padStart(4, "0") } });
-					}
-				}
-			}
-			return placeholders;
-		},
+		
 	},
 	methods: {
 		handleConfigOpened() {
@@ -140,7 +97,7 @@ export default {
 				else
 					minmaxW = {min:minmaxW,max:minmaxW};
 				if (w < minmaxW.min)
-					w = minmaxW.min;
+					w = minmaxW.min; 
 				if (w > minmaxW.max)
 					w = minmaxW.max;
 
@@ -170,7 +127,7 @@ export default {
 			payload[item.id] = { config };
 			this.updatePreset(payload);
 		},
-		updatePositions(updated) {
+		updatePositions(updated, pinned=false) {
 			let result = {};
 			updated.forEach(update => {
 				
@@ -182,6 +139,7 @@ export default {
 				delete item.y;
 				delete item.w;
 				delete item.h;
+				delete item.place[this.gridWidth].pinned;
 				if (update.x !== undefined)
 					item.place[this.gridWidth].x = update.x;
 				if (update.y !== undefined)
@@ -190,11 +148,13 @@ export default {
 					item.place[this.gridWidth].w = update.w;
 				if (update.h !== undefined)
 					item.place[this.gridWidth].h = update.h;
+				if (pinned){
+					item.place[this.gridWidth].pinned = true;
+				}
 
 				result[item.id] = item;
 				}
 			});
-			
 			this.updatePreset(result);
 		},
 		updatePreset(update) {
@@ -213,13 +173,8 @@ export default {
 		});
 	},
 	template: `
-	<div class="dashboard-section position-relative" ref="container" :style="getSectionStyle">
-		<template v-for="setup in widgetsSetup">
-			<div class="dragged-widget-icon" :id="'widget-'+name+'-'+setup.widget_id" >
-				<widget-icon v-if="widgetsSetup" :widget="setup"></widget-icon>
-			</div>
-		</template>
-		<drop-grid v-model:cols="gridWidth" :items="items" :placeholders="items_placeholders" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
+	<div class="dashboard-section position-relative pb-3 border-bottom" ref="container" :style="getSectionStyle">
+		<drop-grid v-model:cols="gridWidth" :items="items" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item">
 				
 				<dashboard-item 
@@ -228,15 +183,19 @@ export default {
 					:widgetID="item.id"
 					:width="item.w"
 					:height="item.h"
+					:item_data="{config:item.config, custom:item.custom, h:item.h, w:item.w,id:item.id,reorder:item.reorder,place:item.place,widget:item.widget,widgetid:item.widgetid,x:item.x,y:item.y}"
 					:loading="item.loading"
 					:config="item.config"
 					:custom="item.custom"
 					:hidden="item.hidden"
 					:editMode="editMode"
+					:place="item.place[gridWidth]"
 					@change="saveConfig($event, item)"
 					@remove="removeWidget(item, $event)"
 					@config-opened="handleConfigOpened"
-					@config-closed="handleConfigClosed">
+					@config-closed="handleConfigClosed"
+					@pinItem="updatePositions($event,true)"
+					@unPinItem="updatePositions">
 				</dashboard-item>
 				<div v-else class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
 				
