@@ -202,12 +202,15 @@ export default {
 
 			// defaults:
 			if (this.view == 'day') {
-				// switch from day to month
-				if (this.views.month)
+				if (this.views.month) {
+					// switch from day to month
 					this.view = 'month';
-				// switch from day to week
-				else if (this.views.week)
+					this.$emit('update:view', this.view);
+				} else if (this.views.week) {
+					// switch from day to week
 					this.view = 'week';
+					this.$emit('update:view', this.view);
+				}
 			} else if (this.$refs.view.showPicker) {
 				// open picker if available
 				this.$refs.view.showPicker();
@@ -221,6 +224,8 @@ export default {
 					evt.stopPropagation();
 					this.focusDate = evt.detail.value;
 					this.view = 'day';
+					this.$emit('update:currentDate', new Date(this.focusDate));
+					this.$emit('update:view', this.view);
 				}
 				break;
 			case 'week':
@@ -228,6 +233,8 @@ export default {
 					evt.stopPropagation();
 					this.focusDate = CalendarDate.UTC(CalendarDate.getDaysInWeek(evt.detail.value.number, evt.detail.value.year, this.locale)[0]);
 					this.view = 'week';
+					this.$emit('update:currentDate', new Date(this.focusDate));
+					this.$emit('update:view', this.view);
 				}
 				break;
 			}
@@ -239,6 +246,7 @@ export default {
 	created() {
 		// choose default view
 		this.view = this.availableViews.find(Boolean); // start with first entry as active view
+		this.$emit('update:view', this.view);
 	},
 	template: `
 	<div class="fhc-calendar-base h-100">
@@ -252,7 +260,8 @@ export default {
 		>
 			<base-header
 				class="card-header"
-				v-model:view="view"
+				:view="view"
+				@update:view="view = $event; $emit('update:view', view)"
 				:title="title"
 				@prev="clickPrev"
 				@next="clickNext"
