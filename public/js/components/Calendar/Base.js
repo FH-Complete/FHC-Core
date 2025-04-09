@@ -13,6 +13,8 @@ import CalClick from '../../directives/Calendar/Click.js';
  * - rename view to mode?
  * - make view/mode a v-model
  * - check emits
+ * - default title:click => back to previous view/mode
+ * - event single view (default for click:event)
  */
 
 export default {
