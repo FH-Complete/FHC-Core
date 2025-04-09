@@ -92,11 +92,13 @@ export default {
 			const newFocusDate = CalendarDate.addMonths(this.focusDate, offset);
 			this.focusDate = newFocusDate;
 			this.rangeOffset = 0;
+			this.$emit('update:currentDate', this.focusDate);
 			this.$emit('update:range', this.range);
 		},
 		setMonth(month) {
 			this.focusDate = month;
 			this.monthPicker = false;
+			this.$emit('update:currentDate', this.focusDate);
 			this.$emit('update:range', this.range);
 		},
 		viewAttrs(offset) {

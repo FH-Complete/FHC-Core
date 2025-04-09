@@ -87,11 +87,13 @@ export default {
 			const newFocusDate = CalendarDate.addDays(this.focusDate, offset * 7);
 			this.focusDate = newFocusDate;
 			this.rangeOffset = 0;
+			this.$emit('update:currentDate', this.focusDate);
 			this.$emit('update:range', this.range);
 		},
 		setWeek(week) {
 			this.focusDate = week;
 			this.weekPicker = false;
+			this.$emit('update:currentDate', this.focusDate);
 			this.$emit('update:range', this.range);
 		},
 		viewAttrs(offset) {

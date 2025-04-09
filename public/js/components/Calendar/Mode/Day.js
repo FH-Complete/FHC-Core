@@ -60,6 +60,7 @@ export default {
 			const newFocusDate = this.focusDate + offset * CalendarDate.msPerDay;
 			this.focusDate = newFocusDate;
 			this.rangeOffset = 0;
+			this.$emit('update:currentDate', new Date(this.focusDate));
 			this.$emit('update:range', this.range);
 		},
 		viewAttrs(offset) {
