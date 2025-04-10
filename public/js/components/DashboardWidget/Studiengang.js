@@ -2,6 +2,7 @@ import AbstractWidget from './Abstract.js';
 import StudiengangInformation from '../Cis/Cms/StudiengangInformation/StudiengangInformation.js';
 
 export default {
+	name: "WidgetsStudiengang",
 	data(){
 		return {};
 	},

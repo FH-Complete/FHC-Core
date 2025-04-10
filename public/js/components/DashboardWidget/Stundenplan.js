@@ -7,6 +7,7 @@ import CalendarDate from '../../composables/CalendarDate.js';
 import moodleSvg from "../../helpers/moodleSVG.js"
 
 export default {
+	name: "WidgetsStundenplan",
 	mixins: [
 		Phrasen,
 		AbstractWidget
