@@ -283,6 +283,7 @@ export default {
 				:is="viewComponent"
 				ref="view"
 				:current-date="focusDate"
+				@update:current-date="focusDate = $event"
 				@update:range="$emit('update:range', $event)"
 			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>
