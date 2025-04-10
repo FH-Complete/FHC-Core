@@ -195,7 +195,7 @@ export default {
 		</Transition>
 		<base-slider ref="slider" v-slot="slot">
 			<month-view v-bind="viewAttrs(slot.offset)">
-				<template v-slot="slot"><slot v-bind="slot" /></template>
+				<template v-slot="slot"><slot v-bind="slot" mode="month" /></template>
 			</month-view>
 		</base-slider>
 	</div>
