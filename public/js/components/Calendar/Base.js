@@ -265,8 +265,8 @@ export default {
 		>
 			<base-header
 				class="card-header"
-				:view="view"
-				@update:view="view = $event; $emit('update:view', view)"
+				:view="internalView"
+				@update:view="internalView = $event; $emit('update:view', internalView)"
 				:title="title"
 				@prev="clickPrev"
 				@next="clickNext"
