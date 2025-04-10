@@ -85,6 +85,7 @@ export default {
 			type: Object
 			// TODO(chris): verfication functiosn
 		},
+		view: String,
 		events: {
 			type: Array,
 			default: []
@@ -134,7 +135,7 @@ export default {
 	data() {
 		return {
 			titleStack: [],
-			view: '',
+			internalView: '',
 			internCurrentDate: null
 		};
 	},
@@ -161,8 +162,8 @@ export default {
 			return Object.keys(this.views);
 		},
 		viewComponent() {
-			if (this.views[this.view])
-				return this.views[this.view];
+			if (this.views[this.internalView])
+				return this.views[this.internalView];
 			return 'div';
 		},
 		focusDate: {
@@ -201,15 +202,15 @@ export default {
 				return;
 
 			// defaults:
-			if (this.view == 'day') {
+			if (this.internalView == 'day') {
 				if (this.views.month) {
 					// switch from day to month
-					this.view = 'month';
-					this.$emit('update:view', this.view);
+					this.internalView = 'month';
+					this.$emit('update:view', this.internalView);
 				} else if (this.views.week) {
 					// switch from day to week
-					this.view = 'week';
-					this.$emit('update:view', this.view);
+					this.internalView = 'week';
+					this.$emit('update:view', this.internalView);
 				}
 			} else if (this.$refs.view.showPicker) {
 				// open picker if available
@@ -220,21 +221,21 @@ export default {
 			// TODO(chris): implement
 			switch (evt.detail.source) {
 			case 'day':
-				if (this.view != 'day' && this.views['day']) {
+				if (this.internalView != 'day' && this.views['day']) {
 					evt.stopPropagation();
 					this.focusDate = evt.detail.value;
-					this.view = 'day';
+					this.internalView = 'day';
 					this.$emit('update:currentDate', new Date(this.focusDate));
-					this.$emit('update:view', this.view);
+					this.$emit('update:view', this.internalView);
 				}
 				break;
 			case 'week':
-				if (this.view != 'week' && this.views['week']) {
+				if (this.internalView != 'week' && this.views['week']) {
 					evt.stopPropagation();
 					this.focusDate = CalendarDate.UTC(CalendarDate.getDaysInWeek(evt.detail.value.number, evt.detail.value.year, this.locale)[0]);
-					this.view = 'week';
+					this.internalView = 'week';
 					this.$emit('update:currentDate', new Date(this.focusDate));
-					this.$emit('update:view', this.view);
+					this.$emit('update:view', this.internalView);
 				}
 				break;
 			}
@@ -245,8 +246,12 @@ export default {
 	},
 	created() {
 		// choose default view
-		this.view = this.availableViews.find(Boolean); // start with first entry as active view
-		this.$emit('update:view', this.view);
+		let view = this.view;
+		if (!view || !this.views[view])
+			view = this.availableViews.find(Boolean); // start with first entry as active view
+
+		this.internalView = view;
+		this.$emit('update:view', this.internalView);
 	},
 	template: `
 	<div class="fhc-calendar-base h-100">
