@@ -33,7 +33,7 @@ $includesArray = array(
 
 $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
-<div id="fhccontent" route=<?php echo $route ?>>
+<div id="fhccontent" class="h-100" route=<?php echo $route ?>>
 	<router-view 
 			:view-data='<?php echo json_encode($viewData) ?>'
 	></router-view>
