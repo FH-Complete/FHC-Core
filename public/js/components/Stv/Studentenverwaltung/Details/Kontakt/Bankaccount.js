@@ -182,7 +182,7 @@ export default{
 		},
 		loadBankverbindung(bankverbindung_id){
 			this.statusNew = false;
-			this.$api
+			return this.$api
 				.call(ApiStvBankaccount.load(bankverbindung_id))
 				.then(result => {
 					this.bankverbindungData = result.data;
