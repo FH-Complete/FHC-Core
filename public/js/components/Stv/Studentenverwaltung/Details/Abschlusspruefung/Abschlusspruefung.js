@@ -52,6 +52,9 @@ export default {
 		stg_kz(){
 			return this.studentKzs[0];
 		},
+		showAllFormats() {
+			return this.isBerechtigtDocAndOdt.includes(this.stgInfo.oe_kurzbz);
+		}
 	},
 	props: {
 		student: Object
@@ -270,7 +273,7 @@ export default {
 	methods: {
 		getStudiengangByKz(){
 			this.stgInfo = { typ: '', oe_kurzbz: '' };
-			this.api
+			this.$api
 				.call(ApiStudiengang.getStudiengangByKz(this.stg_kz))
 				.then(result => this.stgInfo = result.data)
 				.catch(this.$fhcAlert.handleSystemError);
@@ -478,7 +481,7 @@ export default {
 		
 		<div v-if="this.student.length">
 			<abschlusspruefung-dropdown
-				:showAllFormats="isBerechtigtDocAndOdt"
+				:showAllFormats="showAllFormats"
 				:studentUids="studentUids"
 				:showDropDownMulti="true"
 				:stgTyp="stgInfo.typ"
@@ -832,7 +835,7 @@ export default {
 
 		<Teleport v-for="data in tabulatorData" :key="data.abschlusspruefung_id" :to="data.actionDiv">
 			<abschlusspruefung-dropdown
-				:showAllFormats="isBerechtigtDocAndOdt"
+				:showAllFormats="showAllFormats"
 				:showDropDownMulti="false"
 				:abschlusspruefung_id="data.abschlusspruefung_id"
 				:studentUids="data.student_uid"
