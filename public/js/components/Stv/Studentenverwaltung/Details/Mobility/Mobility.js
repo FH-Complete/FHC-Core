@@ -294,7 +294,7 @@ export default {
 				});
 		},
 		deleteMobility(bisio_id) {
-			return this.api
+			return this.$api
 				.call(ApiStvMobility.deleteMobility(bisio_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
