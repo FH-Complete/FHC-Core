@@ -1,5 +1,5 @@
 console.warn('plugin/FhcApi.js is DEPRECATED! Use plugins/Api.js instead.');
-import FhcAlert from './FhcAlert.js';
+import FhcAlert from '../plugins/FhcAlert.js';
 import PluginsApi from '../plugins/Api.js';
 import FhcApiFactory from '../api/fhcapifactory.js';
 
