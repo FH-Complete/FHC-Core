@@ -172,7 +172,7 @@ export default{
 			if (old_id == prestudent.prestudent_id)
 				return Promise.resolve();
 
-			return thid.$api
+			return this.$api
 				.call(ApiStvStatus.getStudienplaene(prestudent.prestudent_id))
 				.then(result => this.studienplaene = result.data)
 				.then(() => this.$api.call(ApiStvStatus.getStudiengang(prestudent.prestudent_id)))
