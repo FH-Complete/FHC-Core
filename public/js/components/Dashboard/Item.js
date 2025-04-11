@@ -40,14 +40,29 @@ export default {
 		"loading",
 		"item_data",
 		"place",
+		"setup",
 	],
 	computed: {
+		maxHeight(){
+			return this.setup?.height?.max;
+		},
+		maxWidth(){
+			if (Object.prototype.toString.call(this.setup?.width) == "[object Number]"){
+				return this.setup?.width;
+			}
+			return this.setup?.width?.max;
+		},
+		minHeight() {
+			return this.setup?.height?.min;
+		},
+		minWidth() {
+			return this.setup?.width?.min;
+		},
+		isResizeable(){
+			return this.maxWidth >1 || this.maxHeight >1;
+		},
 		isPinned(){
 			return this.place?.pinned ? true : false;
-		},
-		isResizeable() {
-			if (!this.widget) return false;
-			return this.widget.setup.width.max || this.widget.setup.height.max;
 		},
 		ready() {
 			return this.component && this.arguments !== null;
@@ -138,7 +153,7 @@ export default {
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 	</div>
-	<div v-else-if="!hidden || editMode" class="dashboard-item card overflow-hidden h-100 position-relative" :class="arguments && arguments.className ? arguments.className : ''">
+	<div v-else-if="!hidden || editMode" :id="widgetID" class="dashboard-item card overflow-hidden h-100 position-relative" :class="arguments && arguments.className ? arguments.className : ''">
 		<div v-if="widget" class="card-header d-flex ps-0 pe-2 align-items-center">
 			<Transition>
 				<span v-if="editMode && !isPinned" drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
@@ -188,8 +203,22 @@ export default {
 			</template>
 		</bs-modal>
 		<height-transition>
-			<div v-if="editMode && isResizeable && !isPinned" class="card-footer d-flex justify-content-end p-0">
-				<span drag-action="resize" class="col-auto px-1 cursor-nw-resize"><i class="fa-solid fa-up-right-and-down-left-from-center mirror-x"></i></span>
+			<div v-if="editMode && isResizeable && !isPinned " class="card-footer d-flex justify-content-end p-0">
+				<template v-if="maxWidth < 2">
+					<span drag-action="resize" class="col-auto px-1 cursor-ns-resize">
+						<i  class="fa-solid fa-up-down pe-2"></i>
+					</span>
+				</template>
+				<template v-else-if="maxHeight < 2">
+					<span drag-action="resize" class="col-auto px-1 cursor-ew-resize">
+						<i class="fa-solid fa-left-right pe-2"></i>
+					</span>
+				</template>
+				<template v-else>
+					<span drag-action="resize" class="col-auto px-1 cursor-nw-resize">
+						<i  class="fa-solid fa-up-right-and-down-left-from-center mirror-x"></i>
+					</span>
+				</template>
 			</div>
 		</height-transition>
 	</div>`,

@@ -1,4 +1,5 @@
 export default {
+	name:'GridItem',
 	components: {
 	},
 	inject: {
@@ -8,6 +9,8 @@ export default {
 		active: Boolean
 	},
 	emits: [
+		"mouseDown",
+		"mouseUp",
 		"startMove",
 		"startResize",
 		"dragging",
@@ -26,6 +29,7 @@ export default {
 	},
 	methods: {
 		registerDragAction(evt) {
+			this.$emit('mouseDown', evt);
 			if (evt.target.hasAttribute('drag-action')) {
 				this.dragAction = evt.target.getAttribute('drag-action');
 			} else {
@@ -64,6 +68,7 @@ export default {
 	template: `
 	<div class="drop-grid-item"
 		@mousedown="registerDragAction"
+		@mouseup="$emit('mouseUp', $event)"
 		@touchstart.prevent="touchStart"
 		@touchend="touchDragEnd"
 		@dragstart="tryDragStart($event, item)"

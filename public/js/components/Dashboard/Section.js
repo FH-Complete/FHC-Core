@@ -1,4 +1,5 @@
 import BsConfirm from "../Bootstrap/Confirm.js";
+import SectionModal from "../Bootstrap/Alert.js";
 import DropGrid from '../Drop/Grid.js'
 import DashboardItem from "./Item.js";
 import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
@@ -39,6 +40,7 @@ export default {
 			configOpened: false,
 			gridWidth: 1,
 			gridHeight: null,
+			draggedItem:null,
 		}
 	},
 	provide() {
@@ -50,6 +52,13 @@ export default {
 		}
 	},
 	computed: {
+		computedWidgetsSetup(){
+			if(!this.widgetsSetup) return {};
+			return this.widgetsSetup.reduce((acc, setup)=>{
+				acc[setup.widget_id] = setup.setup;
+				return acc;
+			},{})
+		},
 		editModeIsActive() {
 			return (this.editMode || this.adminMode) && !this.configOpened	
 		},
@@ -81,6 +90,9 @@ export default {
 		
 	},
 	methods: {
+		showSectionInformation(){
+			SectionModal.popup(`this is the information for the section ${name}`);
+		},
 		handleConfigOpened() {
 			this.configOpened = true
 		},
@@ -173,12 +185,17 @@ export default {
 		});
 	},
 	template: `
+	<h4 v-if="items.length>0 && editMode" class=" mb-0">
+		<i @click="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
+		{{name}}:
+	</h4>
 	<div class="dashboard-section position-relative pb-3 border-bottom" ref="container" :style="getSectionStyle">
-		<drop-grid v-model:cols="gridWidth" :items="items" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
+		<drop-grid v-model:cols="gridWidth" :items="items" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @draggedItem="draggedItem=$event" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item">
-				
+				<div v-if="item.placeholder" class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
+				<div v-else-if="item.widgetid == draggedItem?.data.widgetid" class="draggedItem" ></div>
 				<dashboard-item 
-					v-if="!item.placeholder"
+					v-else
 					:id="item.widget"
 					:widgetID="item.id"
 					:width="item.w"
@@ -190,6 +207,7 @@ export default {
 					:hidden="item.hidden"
 					:editMode="editMode"
 					:place="item.place[gridWidth]"
+					:setup="computedWidgetsSetup[item.widget]"
 					@change="saveConfig($event, item)"
 					@remove="removeWidget(item, $event)"
 					@config-opened="handleConfigOpened"
@@ -197,7 +215,6 @@ export default {
 					@pinItem="updatePositions($event,true)"
 					@unPinItem="updatePositions">
 				</dashboard-item>
-				<div v-else class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
 				
 			</template>
 			

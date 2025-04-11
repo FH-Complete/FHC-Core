@@ -6,6 +6,7 @@ import GridLogic from '../../composables/GridLogic.js';
 const MODE_IDLE = 0;
 const MODE_MOVE = 1;
 const MODE_RESIZE = 2;
+const MODE_MOUSE_DOWN = 3;
 
 export default {
 	name: 'Grid',
@@ -29,6 +30,7 @@ export default {
 		"rearrangeItems",
 		"newItem",
 		"gridHeight",
+		"draggedItem",
 	],
 	data() {
 		return {
@@ -45,7 +47,6 @@ export default {
 			draggedOffset: [0,0],
 			draggedItem: null,
 			draggedNode: null,
-			draggedItemIcon: null,
 			additionalRow: null,
 			reorderedItems:[],
 			clonedWidget:null,
@@ -377,11 +378,13 @@ export default {
 				return;
 			
 			this.mode = MODE_MOVE;
+			
 			this.draggedItem = item;
+			this.$emit('draggedItem',item);
 			this.draggedNode = evt.target;
 			//clones the widget for the drag Image
 			let clone = evt.target.cloneNode(true);
-			clone.style.zIndex = 20;
+			clone.style.zIndex = 5;
 			clone.classList.add("widgetClone");
 			this.$refs.container.appendChild(clone);
 			this.clonedWidget = clone;
@@ -400,6 +403,7 @@ export default {
 			if (!this.active)
 				return this.dragCancel();
 			
+			this.checkPinnedWidgetAnimation();
 			if (this.updateCursor(evt)) {
 				switch(this.mode) {
 					case MODE_MOVE: {
@@ -442,13 +446,8 @@ export default {
 			this.positionUpdates = null;
 			this.draggedOffset = [0,0],
 			this.draggedItem = null;
+			this.$emit('draggedItem',null);
 			this.draggedNode = null;
-			
-			if(this.draggedItemIcon){
-				this.draggedItemIcon.style.top = '-999px';
-				this.draggedItemIcon.style.left = '-999px';
-				this.draggedItemIcon = null;
-			}
 			
 		},
 		dragEnd() {
@@ -486,11 +485,33 @@ export default {
 			this.$emit('newItem', this.x, this.y);
 		},
 		updateCursorOnMouseMove(evt){
-			if(this.mode == MODE_IDLE)
+			if(this.mode == MODE_IDLE){
 				this.updateCursor(evt);
-		}
+			}
+		},
+		checkPinnedWidgetAnimation(){
+			let itemAtPosition = this.items.filter(item => item.x == this.x && item.y == this.y).pop();
+			if (itemAtPosition && itemAtPosition.place[this.cols] && itemAtPosition.place[this.cols].pinned) {
+				let pinnedWidget = document.getElementById(itemAtPosition.widgetid);
+				let test = pinnedWidget.querySelector("[pinned='true']");
+				if (!test.classList.contains("denied-dragging-animation")) {
+					test.classList.add("denied-dragging-animation");
+				}
+			} else {
+				Array.from(document.getElementsByClassName("denied-dragging-animation"))?.forEach(ele => {
+					ele.classList.remove("denied-dragging-animation");
+				})
+			}
+		},
+		mouseDown(){
+			this.mode = MODE_MOUSE_DOWN;
+		},
+		mouseUp() {
+			this.mode = MODE_IDLE;
+		},
 	},
 	template: `
+	<p style="position:fixed; top:200px; left:300px; z-index:200;">{{x}}-{{y}}</p>
 	<div
 		ref="container"
 		class="drop-grid position-relative h-0"
@@ -503,10 +524,13 @@ export default {
 		@mouseleave="mouseLeave">
 		<TransitionGroup tag="div">
 			<grid-item
+				ref="gridItems"
 				v-for="(item,index) in (mode == 0 && active ? placedItems_withPlaceholders : placedItems)"
 				:key="item.data.id"
 				:item="item"
 				@start-move="startMove"
+				@mouse-down="mouseDown"
+				@mouse-up="mouseUp"
 				@start-resize="startResize"
 				@dragging="dragging"
 				@end-drag="dragCancel"

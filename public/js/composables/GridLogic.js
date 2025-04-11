@@ -96,7 +96,7 @@ class GridLogic {
 		}
 	}
 	move(item, x, y) {
-		if (item.data.place[this.w].pinned)
+		if (item.data.place[this.w]?.pinned)
 			return [];
 		if (item.x == x && item.y == y)
 			return [];
@@ -116,6 +116,8 @@ class GridLogic {
 				prefer = DIR_RIGHT;
 		}
 
+		const originalFrame = [...item.frame];
+
 		const currItem = {...item};
 		currItem.x = x;
 		currItem.y = y;
@@ -123,27 +125,27 @@ class GridLogic {
 		let occupiers = this.getItemsInFrame(currItem.frame);
 		
 		// does not update if the target conatins pinned widgets
-		if (occupiers.some(frame => this.data[frame]?.data.place[this.w].pinned)) {
+		if (occupiers.some(frame => this.data[frame]?.data.place[this.w]?.pinned)) {
 			return [];
 		}
 		
 		// checks if target contains widget with the same high and width
-		let replace = occupiers
-					.map(occupier => this.data[occupier])
-					.filter( occupier => {
-						return occupier.data.w == item.w && occupier.data.h == item.h
-					});
-		
-		// replaces positions of widget and target widget if they have same height and width
-		if(replace.length > 0){
-			let replaceUpdate =[];
-			replaceUpdate[replace[0].index] = { index: replace[0].index, x:item.x, y:item.y };
-			replaceUpdate[item.index] = { index: item.index, x: replace[0].x, y: replace[0].y};
-			//update Grid and dataGrid 
-			replace[0].frame.forEach(f => this.grid[f] = item.index)
-			item.frame.forEach(f => this.grid[f] = replace[0].index);
-			this.data[replace[0].index] = item;
-			this.data[item.index] = replace[0];
+		let occupiersData = occupiers.map(occupier => this.data[occupier]);
+		let occupiersFrame = occupiersData.map(occupier => occupier.frame).flat();
+		if (!occupiersFrame.some(frame => !currItem.frame.includes(frame)) && !occupiersFrame.some(frame => originalFrame.includes(frame))){
+			let replaceUpdate = [];
+			let newOccupierFrames = [];
+			for(let f of originalFrame){
+				if(newOccupierFrames.includes(f)){
+					continue;
+				}
+				let occ = occupiersData.shift();
+				if(occ){
+					newOccupierFrames = [...newOccupierFrames, ...this.getItemFrame({ ...occ, ...this.getSingleFramePosition(f) })];
+					replaceUpdate[occ.index] = { index: occ.index, ...this.getSingleFramePosition(f)}
+				}
+			}
+			replaceUpdate[item.index] = { index: item.index, x, y };
 			return replaceUpdate;
 		}
 		
@@ -256,6 +258,9 @@ class GridLogic {
 			for (let j = 0; j < item.h; j++)
 				frame.push(i + item.x + (j + item.y) * this.w);
 		return frame;
+	}
+	getSingleFramePosition(frame){
+		return { x: frame % this.w, y: Math.floor(frame / this.w)};
 	}
 	debug() {
 		return this.grid;
