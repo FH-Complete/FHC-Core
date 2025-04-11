@@ -34,7 +34,9 @@ const router = VueRouter.createRouter({
 	]
 });
 
-const app = Vue.createApp();
+const app = Vue.createApp({
+	name: 'StudentenverwaltungApp'
+});
 
 app
 	.use(router)
