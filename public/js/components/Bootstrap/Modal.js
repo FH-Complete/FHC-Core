@@ -1,4 +1,4 @@
-import Phrasen from '../../plugin/Phrasen.js';
+//import Phrasen from '../../plugin/Phrasen.js';
 
 export default {
 	data: () => ({
@@ -104,7 +104,7 @@ export default {
 				instance.use(primevue.config.default, {zIndex: {overlay: 9999}})
 			}
 				 
-			instance.use(Phrasen); // TODO(chris): find a more dynamic way
+			//instance.use(Phrasen); // TODO(chris): find a more dynamic way
 			instance.mount(wrapper);
 			document.body.appendChild(wrapper);
 		});
