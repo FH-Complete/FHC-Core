@@ -1,6 +1,7 @@
 <?php
 $this->phrasen['abgabetool/abgabeLektorenbereich']='Consegna portale lettori';
 $this->phrasen['abgabetool/aeltereParbeitBenoten']='Thesis handed in for older semester, please use word form for assessment!';
+$this->phrasen['abgabetool/aeltereParbeitBenotenQuickInfo']='Thesis handed in for older semester, please use word form for assessment!';
 $this->phrasen['abgabetool/abgabeStudentenbereich']='consegna portale studente';
 $this->phrasen['abgabetool/abgabetermine']='scadenze consegna';
 $this->phrasen['abgabetool/abgabetool']='Strumenti di consegna';
