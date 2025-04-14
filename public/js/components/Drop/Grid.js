@@ -118,8 +118,9 @@ export default {
 			return [...this.placedItems, ...this.items_placeholders];
 		},
 		rows() {
-			if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid)
+			if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid){
 				return this.dragGrid.h;
+			}
 			return this.grid ? this.grid.h : 1;
 		},
 		gridStyle() {
@@ -171,7 +172,6 @@ export default {
 			let mappedPlacedItems= this.prePlacedItems.map(item => {
 				if (!this.positionUpdates[item.index] )
 					return item;
-				
 				let height_diff = this.positionUpdates[item.index]?.h - item.h;
 				let width_diff = this.positionUpdates[item.index]?.w - item.w;
 				return {
@@ -345,7 +345,10 @@ export default {
 				this.x = -1;
 				this.y = -1;
 				if (this.additionalRow !== null) {
-					this.grid.h = this.additionalRow;
+					let gridHeight = this.grid.getMaxY() + 1;
+					if(this.grid.h>gridHeight){
+						this.grid.h = gridHeight;
+					}
 					this.additionalRow = null;
 				}
 			}
@@ -376,11 +379,13 @@ export default {
 					this.additionalRow = this.grid.h;
 					this.grid.h += 1;
 				} else if (this.additionalRow !== null && gridY != this.rows - 1) {
-					this.grid.h = this.additionalRow;
+					let gridHeight = this.grid.getMaxY() + 1;
+					if(this.grid.h > gridHeight){
+						this.grid.h = gridHeight;
+					}
 					this.additionalRow = null;
 				}
 			}
-			
 			this.x = gridX;
 			this.y = gridY;
 

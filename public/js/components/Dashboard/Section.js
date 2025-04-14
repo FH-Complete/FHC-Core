@@ -193,7 +193,7 @@ export default {
 		<drop-grid v-model:cols="gridWidth" :items="items" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @draggedItem="draggedItem=$event" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item">
 				<div v-if="item.placeholder" class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
-				<div v-else-if="item.blank || item.widgetid == draggedItem?.data.widgetid" :class="{'dashboard-item-overlay':item.resizeOverlay}" class="dashboard-item card overflow-hidden h-100 position-relative draggedItem" ></div>
+				<div v-else-if="item.blank || (item.widgetid && item.widgetid == draggedItem?.data.widgetid)" :class="{'dashboard-item-overlay':item.resizeOverlay}" class="dashboard-item card overflow-hidden h-100 position-relative draggedItem" ></div>
 				<dashboard-item 
 					v-else
 					:id="item.widget"
