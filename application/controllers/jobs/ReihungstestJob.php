@@ -821,7 +821,7 @@ class ReihungstestJob extends JOB_Controller
 						JOIN lehre.tbl_studienordnung USING (studienordnung_id)
 						JOIN PUBLIC.tbl_studiengang ON (tbl_studienordnung.studiengang_kz = tbl_studiengang.studiengang_kz)
 					WHERE get_rolle_prestudent (tbl_prestudent.prestudent_id, ?) IN ('Aufgenommener','Bewerber','Wartender','Abgewiesener')
-						AND studiensemester_kurzbz = ? 
+						AND studiensemester_kurzbz = ?
 						AND tbl_studiengang.typ IN ('b', 'm')
 				)
 				SELECT * FROM prst
@@ -861,7 +861,7 @@ class ReihungstestJob extends JOB_Controller
 			{
 				// Alle niedrigeren Prios laden
 				$qryNiedrPrios = "
-						SELECT DISTINCT
+						SELECT DISTINCT ON(prestudent_id)
 							get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') AS laststatus,
 							tbl_studienplan.orgform_kurzbz,
 							tbl_person.nachname,
@@ -880,7 +880,7 @@ class ReihungstestJob extends JOB_Controller
 							AND studiensemester_kurzbz = '".$row_ps->studiensemester_kurzbz."'
 							AND tbl_studiengang.typ IN ('b', 'm')
 							AND priorisierung > ".$row_ps->priorisierung."
-						ORDER BY studiengang_kz, laststatus
+						ORDER BY prestudent_id, studiengang_kz, laststatus, tbl_prestudentstatus.datum DESC
 					";
 
 				// Wenn der letzte Status "Aufgenommener" ist, alle niedrigeren Prios auf "Abgewiesen" setzen
@@ -976,7 +976,7 @@ class ReihungstestJob extends JOB_Controller
 						FROM public.tbl_konto
 						WHERE person_id = " . $row_ps->person_id . "
 							AND studiensemester_kurzbz = '" . $row_ps->studiensemester_kurzbz . "'
-							AND buchungstyp_kurzbz = 'StudiengebuehrAnzahlung'";
+							AND buchungstyp_kurzbz IN ('StudiengebuehrAnzahlung','KautionDrittStaat')";
 
 						$resultKautionExists = $db->execReadOnlyQuery($qryKautionExists);
 						if (hasdata($resultKautionExists))
