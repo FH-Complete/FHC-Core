@@ -530,7 +530,6 @@ export default {
 		},
 	},
 	template: `
-	<p style="position:fixed; top:200px; left:300px; z-index:200;">{{x}}-{{y}}</p>
 	<div
 		ref="container"
 		class="drop-grid position-relative h-0"
