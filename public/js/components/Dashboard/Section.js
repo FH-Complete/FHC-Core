@@ -82,6 +82,9 @@ export default {
 			} */
 			
 			let placedItems = this.widgets.map(item => {
+				if(!item?.widgetid && item?.id){
+					item.widgetid = item.id;
+				}
 				return { ...item, reorder: false, ...(item.place[this.gridWidth] || { reorder: true, ...{ x: 0, y: 0, w: 1, h: 1 } })};
 			});
 			return placedItems;
