@@ -168,19 +168,39 @@ export default {
 		placedItems() {
 			if (!this.positionUpdates)
 				return this.prePlacedItems;
-			return this.prePlacedItems.map(item => {
+			let mappedPlacedItems= this.prePlacedItems.map(item => {
 				if (!this.positionUpdates[item.index] )
 					return item;
+				
+				let height_diff = this.positionUpdates[item.index]?.h - item.h;
+				let width_diff = this.positionUpdates[item.index]?.w - item.w;
 				return {
+					resize: this.positionUpdates[item.index]?.resize,
 					index: item.index,
 					weight: item.weight,
 					data: item.data,
 					x: this.positionUpdates[item.index].x === undefined ? item.x : this.positionUpdates[item.index].x,
 					y: this.positionUpdates[item.index].y === undefined ? item.y : this.positionUpdates[item.index].y,
-					w: this.positionUpdates[item.index].w === undefined ? item.w : this.positionUpdates[item.index].w,
-					h: this.positionUpdates[item.index].h === undefined ? item.h : this.positionUpdates[item.index].h
+					w: width_diff>0?item.w:this.positionUpdates[item.index].w === undefined ? item.w : this.positionUpdates[item.index].w,
+					h: height_diff > 0 ?item.h:this.positionUpdates[item.index].h === undefined ? item.h : this.positionUpdates[item.index].h
+					
 				};
 			});
+
+			let temporaryResizeItems = [];
+			mappedPlacedItems.forEach(item=>{
+				if(item.resize){
+					let newItem = {
+						...item,
+						w:this.positionUpdates[item.index].w === undefined ? item.w : this.positionUpdates[item.index].w,
+						h:this.positionUpdates[item.index].h === undefined ? item.h : this.positionUpdates[item.index].h,
+						resizeOverlay:true,
+						blank:true,
+					};
+					temporaryResizeItems.push(newItem)
+				}
+			})
+			return [...mappedPlacedItems, ...temporaryResizeItems];
 		},
 		showEmptyTileHover() {
 			if (!this.active || !this.grid || this.mode != MODE_IDLE || this.x < 0 || this.y < 0 || this.x >= this.cols || this.y >= this.rows)
@@ -422,7 +442,6 @@ export default {
 							this.draggedOffset[1] -= y;
 							y = 0;
 						}
-
 						this.positionUpdates = this.dragGrid.move(this.draggedItem, x, y);
 						break;
 					}
@@ -539,6 +558,7 @@ export default {
 				class="position-absolute"
 				:active="active"
 				:style="{
+					zIndex: item.resizeOverlay ? -5 : 'auto',
 					top: 'calc(' + item.y + ' * var(--fhc-dg-row-height))',
 					left: 'calc(' + item.x + ' * var(--fhc-dg-col-width))',
 					width: 'calc(' + item.w + ' * var(--fhc-dg-col-width))',
