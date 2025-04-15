@@ -3,6 +3,8 @@ import FormInput from "../Form/Input.js";
 import BsModal from "../Bootstrap/Modal.js";
 import AbstractWidget from './Abstract.js';
 
+import ApiBookmark from '../../api/factory/widget/bookmark.js';
+
 export default {
 	name: "WidgetsUrl",
 	mixins: [AbstractWidget],
@@ -62,12 +64,12 @@ export default {
 			event.preventDefault();
 			if(!this.bookmark_id || !this.url_input || !this.title_input) return;
 			
-			this.$fhcApi.factory.bookmark
-				.update({
+			this.$api
+				.call(ApiBookmark.update({
 					bookmark_id: this.bookmark_id,
 					title: this.title_input,
 					url: this.url_input,
-				})
+				}))
 				.then((res) => res.data)
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkUpdated"));
@@ -92,12 +94,12 @@ export default {
 			// early return if validation failed
 			if (!this.isValidationSuccessfull()) return;
 
-			this.$fhcApi.factory.bookmark
-				.insert({
+			this.$api
+				.call(ApiBookmark.insert({
 					tag: this.config.tag,
 					title: this.title_input,
 					url: this.url_input,
-				})
+				}))
 				.then((res) => res.data)
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkAdded"));
@@ -124,8 +126,8 @@ export default {
 			return !Object.values(this.validation).some(value => value === true);
 		},
 		async fetchBookmarks() {
-			await this.$fhcApi.factory.bookmark
-				.getBookmarks()
+			await this.$api
+				.call(ApiBookmark.getBookmarks())
 				.then((res) => res.data)
 				.then((result) => {
 					this.shared = result;
@@ -138,8 +140,8 @@ export default {
 			// early return if the confirm dialog was not confirmed
 			if (!isConfirmed) return;
 
-			this.$fhcApi.factory.bookmark
-				.delete(bookmark_id)
+			this.$api
+				.call(ApiBookmark.delete(bookmark_id))
 				.then((res) => res.data)
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkDeleted"));

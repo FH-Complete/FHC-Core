@@ -3,6 +3,9 @@ import LvInfo from "./Lv/Info.js";
 import Phrasen from "../../../../../mixins/Phrasen.js";
 import LvUebersicht from "../../LvUebersicht.js";
 
+import ApiLehre from '../../../../../api/factory/lehre.js';
+import ApiAddons from '../../../../../api/factory/addons.js';
+
 // TODO(chris): L10n
 
 export default {
@@ -75,8 +78,9 @@ export default {
 	},
 	methods: {
 		
-		fetchMenu(lehrveranstaltung_id = this.lehrveranstaltung_id, studien_semester = this.studien_semester){
-			return this.$fhcApi.factory.addons.getLvMenu(lehrveranstaltung_id, studien_semester)
+		fetchMenu(lehrveranstaltung_id = this.lehrveranstaltung_id, studien_semester = this.studien_semester) {
+			return this.$api
+				.call(ApiAddons.getLvMenu(lehrveranstaltung_id, studien_semester))
 				.then(res => {
 					this.menu = res.data;
 				})
@@ -139,13 +143,13 @@ export default {
 			this.fetchMenu(this.lehrveranstaltung_id, newValue);
 		}
 	},
-	created(){
-		this.$fhcApi.factory.lehre.getStudentPruefungen(this.lehrveranstaltung_id)
-		.then(res => res.data)
-		.then(pruefungen =>{
-			this.pruefungenData = pruefungen;
-		}); 
-		
+	created() {
+		this.$api
+			.call(ApiLehre.getStudentPruefungen(this.lehrveranstaltung_id))
+			.then(res => res.data)
+			.then(pruefungen => {
+				this.pruefungenData = pruefungen;
+			}); 
 	},
 	mounted() {
 		this.fetchMenu(this.lehrveranstaltung_id, this.studien_semester);

@@ -3,6 +3,9 @@ import Alert from "../../Bootstrap/Alert.js";
 import LvMenu from "./LvMenu.js"
 import LvInfo from "./LvInfo.js"
 
+import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiAddons from '../../../api/factory/addons.js';
+
 export default {
 	components: {
 		BsModal,
@@ -47,17 +50,20 @@ export default {
 			if(!this.showMenu) return;
 
 			if (this.event.type == 'lehreinheit') {
-				this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(this.event.lehreinheit_id[0]).then(
-					res=>res.data
-				).then(
-					studiensemester_kurzbz =>{
-						this.$fhcApi.factory.addons.getLvMenu(this.event.lehrveranstaltung_id, studiensemester_kurzbz).then(res => {
-							if (res.data) {
-								this.menu = res.data;
-							}
-						});
-					}
-				)
+				this.$api
+					.call(ApiStundenplan.getLehreinheitStudiensemester(this.event.lehreinheit_id[0]))
+					.then(res => res.data)
+					.then(studiensemester_kurzbz => this.$api.call(
+						ApiAddons.getLvMenu(
+							this.event.lehrveranstaltung_id,
+							studiensemester_kurzbz
+						)
+					))
+					.then(res => {
+						if (res.data) {
+							this.menu = res.data;
+						}
+					});
 			}
 		},
 	},

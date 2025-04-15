@@ -3,6 +3,7 @@ import ContactList from "./Kontakt/Contact.js";
 import BankaccountList from "./Kontakt/Bankaccount.js";
 
 export default {
+	name: "TabContact",
 	components: {
 		AddressList,
 		ContactList,

@@ -1,6 +1,8 @@
 import CisMenuEntry from "./Menu/Entry.js";
 import FhcSearchbar from "../searchbar/searchbar.js";
-import CisSprachen from "./Sprachen.js"
+import CisSprachen from "./Sprachen.js";
+
+import ApiCisMenu from '../../api/factory/cis/menu.js';
 
 export default {
     components: {
@@ -50,12 +52,13 @@ export default {
 		}
 	},
 	methods: {
-		fetchMenu: function(){
-			return this.$fhcApi.factory.menu.getMenu()
-			.then(res => res.data)
-			.then(menu => {
-				this.entries = menu;
-			})	
+		fetchMenu() {
+			return this.$api
+				.call(ApiCisMenu.getMenu())
+				.then(res => res.data)
+				.then(menu => {
+					this.entries = menu;
+				});
 		},
 		checkSettingsVisibility: function (event) {
 			// hides the settings collapsible if the user clicks somewhere else
