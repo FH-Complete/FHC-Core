@@ -1,7 +1,7 @@
 import ProfilUpdateView from "../../components/Cis/ProfilUpdate/ProfilUpdateView.js";
 import PluginsPhrasen from "../../plugins/Phrasen.js";
 
-import ApiProfilUpdate from '../../api/factory/ProfilUpdate.js';
+import ApiProfilUpdate from '../../api/factory/profilUpdate.js';
 
 // TODO: sobald in verwendung den vue router pfad zu ProfilUpdateView definieren und diese app in component auslagern
 const app = Vue.createApp({

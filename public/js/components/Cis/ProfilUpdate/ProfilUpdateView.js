@@ -399,7 +399,7 @@ export default {
     <div  class="form-underline flex-fill ">
       <div class="form-underline-titel">{{$p.t('ui','anzeigen')}} </div>
       
-      <select class="mb-4 " v-model="filter" @change="updateData" class="form-select" aria-label="Profil updates display selection">
+      <select class="mb-4 form-select" v-model="filter" @change="updateData" aria-label="Profil updates display selection">
         <option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
         <option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
         <option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>

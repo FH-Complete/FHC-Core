@@ -113,7 +113,7 @@ export default {
 
 		deleteRequest: function (item) {
 			this.$api
-				.call(ApiProfil.deleteProfilRequest(item.profil_update_id))
+				.call(ApiProfilUpdate.deleteProfilRequest(item.profil_update_id))
 				.then((res) => {
 					if (res.data.error) {
 						//? open alert
