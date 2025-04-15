@@ -44,4 +44,27 @@ class Bisio_model extends DB_Model
 		else
 			return success("Bisio not found");
 	}
+
+	/**
+	 * checks, if an (extension) table exists to avoid later errors
+	 * @param String $schema like 'extension'
+	 * @param String $table like 'tbl_mo_bisiozuordnung'
+	 * @return boolean
+	 */
+	public function tableExists($schema, $table)
+	{
+		$params = array($schema, $table);
+
+		$qry = "SELECT
+				  1
+				FROM
+				  information_schema.role_table_grants
+				WHERE
+				    table_schema = ?
+				AND table_name = ?";
+
+		$result =  $this->execQuery($qry, $params);
+
+		return $result;
+	}
 }

@@ -18,8 +18,13 @@ export default{
 	data() {
 		return{
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Kontakt/getKontakte/' + this.uid,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.$fhcApi.factory.stv.kontakt.getKontakte,
+				ajaxParams: () => {
+					return {
+						id: this.uid
+					};
+				},
 				ajaxResponse: (url, params, response) => response.data,
 				columns:[
 					{title:"Typ", field:"kontakttyp"},
@@ -41,7 +46,26 @@ export default{
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Kontakt_id", field:"kontakt_id", visible:false},
 					{title:"Standort_id", field:"standort_id", visible:false},
-					{title:"letzte Änderung", field:"lastupdate", visible:false},
+					{
+						title:"letzte Änderung",
+						field:"lastupdate",
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
@@ -51,6 +75,7 @@ export default{
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = this.$p.t('person', 'kontakt_edit');
 							button.addEventListener('click', (event) =>
 								this.actionEditContact(cell.getData().kontakt_id)
 							);
@@ -59,6 +84,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.title = this.$p.t('person', 'kontakt_delete');
 							button.addEventListener('click', () =>
 								this.actionDeleteContact(cell.getData().kontakt_id)
 							);
@@ -96,7 +122,6 @@ export default{
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
 						});
-
 						cm.getColumnByField('lastupdate').component.updateDefinition({
 							title: this.$p.t('notiz', 'letzte_aenderung')
 						});
@@ -106,6 +131,21 @@ export default{
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
 							title: this.$p.t('person', 'standort')
 						});
+						cm.getColumnByField('firma_id').component.updateDefinition({
+							title: this.$p.t('ui', 'firma_id')
+						});
+						cm.getColumnByField('kontakt_id').component.updateDefinition({
+							title: this.$p.t('ui', 'kontakt_id')
+						});
+						cm.getColumnByField('person_id').component.updateDefinition({
+							title: this.$p.t('person', 'person_id')
+						});
+						cm.getColumnByField('standort_id').component.updateDefinition({
+							title: this.$p.t('ui', 'standort_id')
+						});
+/*						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
+						});*/
 				}}
 			],
 			lastSelected: null,
@@ -119,6 +159,10 @@ export default{
 			firmen: [],
 			filteredFirmen: [],
 			filteredOrte: null,
+			abortController: {
+				firmen: null,
+				standorte: null
+			},
 		}
 	},
 	watch: {
@@ -156,8 +200,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewContact(formData) {
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewContact/' + this.uid,
-				this.contactData)
+			return this.$fhcApi.factory.stv.kontakt.addNewContact(this.$refs.contactData, this.uid, this.contactData)
 				.then(response => {
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 						this.hideModal("contactModal");
@@ -168,11 +211,11 @@ export default{
 				this.reload();
 			});
 		},
-		loadContact(contact_id){
+		loadContact(kontakt_id){
 			this.statusNew = false;
 			if(this.contactData.firma_id)
 				this.loadStandorte(this.contactData.firma_id);
-			return this.$fhcApi.get('api/frontend/v1/stv/kontakt/loadContact/' + contact_id)
+			return this.$fhcApi.factory.stv.kontakt.loadContact(kontakt_id)
 				.then(
 					result => {
 						this.contactData = result.data;
@@ -181,7 +224,7 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		deleteContact(kontakt_id){
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/deleteContact/' + kontakt_id)
+			return this.$fhcApi.factory.stv.kontakt.deleteContact(kontakt_id)
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				})
@@ -193,9 +236,9 @@ export default{
 			});
 		},
 		updateContact(kontakt_id){
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateContact/' + kontakt_id,
-				this.contactData).
-			then(response => {
+			return this.$fhcApi.factory.stv.kontakt.updateContact(this.$refs.contactData, kontakt_id,
+				this.contactData)
+				.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 				this.hideModal('contactModal');
 				this.resetModal();
@@ -214,15 +257,25 @@ export default{
 			this.$refs.table.reloadTable();
 		},
 		searchFirma(event) {
-			return this.$fhcApi
-				.get('api/frontend/v1/stv/kontakt/getFirmen/' + event.query)
+			if (this.abortController.firmen) {
+				this.abortController.firmen.abort();
+			}
+
+			this.abortController.firmen = new AbortController();
+
+			return this.$fhcApi.factory.stv.kontakt.getFirmen(event.query)
 				.then(result => {
 					this.filteredFirmen = result.data.retval;
 				});
 		},
 		loadStandorte(firmen_id) {
-			return this.$fhcApi
-				.get('api/frontend/v1/stv/kontakt/getStandorteByFirma/' + firmen_id)
+			if (this.abortController.standorte) {
+				this.abortController.standorte.abort();
+			}
+
+			this.abortController.standorte = new AbortController();
+
+			return this.$fhcApi.factory.stv.kontakt.getStandorteByFirma(firmen_id)
 				.then(result => {
 					this.filteredOrte = result.data;
 				});
@@ -242,8 +295,7 @@ export default{
 		},
 	},
 	created(){
-		this.$fhcApi
-			.get('api/frontend/v1/stv/kontakt/getKontakttypen')
+		this.$fhcApi.factory.stv.kontakt.getKontakttypen()
 			.then(result => {
 				this.kontakttypen = result.data;
 			})
@@ -253,7 +305,7 @@ export default{
 		<div class="stv-details-kontakt-contact h-100 pt-3">
 
 		<!--Modal: contactModal-->
-		<BsModal ref="contactModal">
+		<bs-modal ref="contactModal">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('person', 'kontakt_new')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('person', 'kontakt_edit')}}</p>
@@ -279,8 +331,8 @@ export default{
 						type="text" 
 						name="kontakt" 
 						:label="$p.t('global/kontakt')+ ' *'"
-						v-model="contactData.kontakt">
-						required
+						v-model="contactData.kontakt"
+						required>
 						>
 					</form-input>
 				</div>
@@ -383,7 +435,7 @@ export default{
 				<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewContact()">OK</button>
 				<button v-else type="button" class="btn btn-primary" @click="updateContact(contactData.kontakt_id)">OK</button>
 			</template>
-		</BsModal>
+		</bs-modal>
 														
 		<core-filter-cmpt
 			ref="table"
@@ -393,7 +445,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Kontakt"
+			:new-btn-label="this.$p.t('global', 'kontakt')"
 			@click:new="actionNewContact"
 			>
 		</core-filter-cmpt>

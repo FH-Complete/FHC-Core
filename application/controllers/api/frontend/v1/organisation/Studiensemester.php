@@ -24,7 +24,8 @@ class Studiensemester extends FHCAPI_Controller
 		parent::__construct(
 			array(
 				'getAll' => self::PERM_LOGGED,
-				'getAktNext' => self::PERM_LOGGED
+				'getAktNext' => self::PERM_LOGGED,
+				'getStudienjahrByStudiensemester' => self::PERM_LOGGED
 			)
 		);
 		// Load model StudiensemesterModel
@@ -114,5 +115,41 @@ class Studiensemester extends FHCAPI_Controller
 		}
 
 		$this->terminateWithSuccess((getData($result) ?: ''));
+	}
+
+	/**
+	 * Get Studienjahr by Studiensemester.
+	 * input param semester: studiensemester_kurzbz
+	 */
+	public function getStudienjahrByStudiensemester()
+	{
+		$semester = $this->input->get('semester');
+
+		$studienjahrObj = null;
+
+		if (!is_numeric($semester))
+		{
+			$this->StudiensemesterModel->addSelect('studienjahr_kurzbz');
+			$result = $this->StudiensemesterModel->loadWhere(array('studiensemester_kurzbz =' => $semester));
+		}
+
+		if (hasData($result))
+		{
+			$studienjahr = getData($result)[0]->studienjahr_kurzbz;
+			$startstudienjahr = substr($studienjahr, 0, 4);
+			$endstudienjahr = substr($studienjahr, 0, 2) . substr($studienjahr, -2);
+
+			$studienjahrObj = new StdClass();
+
+			$studienjahrObj->studienjahr_kurzbz = $studienjahr;
+			$studienjahrObj->startstudienjahr = $startstudienjahr;
+			$studienjahrObj->endstudienjahr= $endstudienjahr;
+		}
+
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
+		}
+
+		$this->terminateWithSuccess((getData(success($studienjahrObj))));
 	}
 }
