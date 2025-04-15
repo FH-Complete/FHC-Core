@@ -399,10 +399,6 @@ export default{
 	},
 	template: `
 	<div class="stv-details-pruefung-pruefung-list 100 pt-3">
-
-	{{currentSemester}}
-
-	{{listLvsAndLes.gruppe}}
 	
 	  <div>	  
 		<div class="justify-content-end pb-3">
