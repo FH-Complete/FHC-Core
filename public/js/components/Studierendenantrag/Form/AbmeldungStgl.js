@@ -3,6 +3,9 @@ import CoreForm from '../../Form/Form.js';
 import FormValidation from '../../Form/Validation.js';
 import FormInput from '../../Form/Input.js';
 
+import ApiStudstatusAbmeldung from '../../../api/factory/studstatus/abmeldung.js';
+import ApiCheckperson from '../../../api/factory/checkperson.js';
+
 var _uuid = 0;
 
 export default {
@@ -45,8 +48,8 @@ export default {
 	},
 	methods: {
 		load() {
-			return this.$fhcApi.factory
-				.studstatus.abmeldung.getDetails(this.studierendenantragId, this.prestudentId)
+			return this.$api
+				.call(ApiStudstatusAbmeldung.getDetails(this.studierendenantragId, this.prestudentId))
 				.then(result => {
 					this.data = result.data;
 					if (this.data.status) {
@@ -71,21 +74,22 @@ export default {
 			this.saving = true;
 
 			this.$refs.form.clearValidation();
-			this.$refs.form.factory
-				.studstatus.abmeldung.create(
+			this.$refs.form
+				.call(ApiStudstatusAbmeldung.create(
 					this.data.studiensemester_kurzbz,
 					this.data.prestudent_id,
 					this.formData.grund
-				)
+				))
 				.then(result => {
 
-					if(this.unrulyInternal) {
-						this.$fhcApi.factory.checkperson.updatePersonUnrulyStatus(this.data.person_id, true).then(
-							(res)=> {
-								if(res?.meta?.status === "success") {
+					if (this.unrulyInternal) {
+						this.$api
+							.call(ApiCheckperson.updatePersonUnrulyStatus(this.data.person_id, true))
+							.then(res => {
+								if (res?.meta?.status === "success") {
 									this.$fhcAlert.alertSuccess(this.$p.t('studierendenantrag', 'antrag_unruly_updated'))
 								}
-							})
+							});
 					}
 
 					if (result.data === true)
