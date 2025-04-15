@@ -108,8 +108,16 @@ export default {
 					}
 				},
 
-				ajaxRequestFunc: (url, params) => this.$api.call({url, params}),
-				ajaxResponse: (url, params, response) => response.data,
+				ajaxRequestFunc: (url, params) => {
+					if( url === '' ) 
+					{
+						return Promise.resolve({ data: []});
+					}
+					return this.$api.call({url, params});
+				},
+				ajaxResponse: (url, params, response) => {
+					return response?.data;
+				},
 
 				layout: 'fitDataStretch',
 				layoutColumnsOnNewData: false,
@@ -179,6 +187,15 @@ export default {
 		},
 		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
+
+			if( endpoint === undefined ) 
+			{
+				endpoint = { url: '' };
+			} 
+			else if( endpoint.url === undefined ) 
+			{
+				endpoint.url = '';
+			}
 
 			const params = {}, filter = {};
 			if (this.filterKontoCount0)
