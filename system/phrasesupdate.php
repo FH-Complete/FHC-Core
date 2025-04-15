@@ -24893,26 +24893,6 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'studierendenantrag',
-		'phrase' => 'mark_person_as_unruly',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Person ist unerwünscht',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Person is unruly.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'error_fieldRequired',
 		'insertvon' => 'system',
@@ -30047,6 +30027,26 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'entschuldigungStatusUpdateAutoEmailBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung Status Update.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse note status update.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'entschuldigungAkzeptieren',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -31372,13 +31372,33 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Termine laut Stundenplan',
+				'text' => 'Unterricht laut Stundenplan',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => 'Lessons as per Timetable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'unterrichtDauer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht Dauer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson Duration',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31452,13 +31472,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine zugeteilten Studenten gefunden!',
+				'text' => 'Keine zugeteilten Studenten gefunden für den gewählten LV-Teil gefunden!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No assigned students found!',
+				'text' => 'No assigned students for the selected teaching unit found!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31767,6 +31787,86 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'kontrollDauerUnterMindestwert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrolle muss für eine Unterrichtsdauer von mindestens {0} Minuten gelten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance check must apply for a lesson duration of at least {0} minutes.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'zeitNichtAusStundenplanBeginn',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtbeginn wurde manuell überschrieben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lecture Begin Time has been overwritten',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'zeitNichtAusStundenplanEnde',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtende wurde manuell überschrieben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lecture End Time has been overwritten',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'datumNichtAusStundenplan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datum entspricht keinem Stundenplan Termin!.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date does not match a lesson as per timetable!.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'tooltipStudentEntschuldigung',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -31918,27 +32018,7 @@ array(
 				'description' => '',
 				'insertvon' => 'system'
 			)
-		),
-		array(
-			'app' => 'anwesenheiten',
-			'category' => 'global',
-			'phrase' => 'tooltipStudentTestphase',
-			'insertvon' => 'system',
-			'phrases' => array(
-				array(
-					'sprache' => 'German',
-					'text' => 'Hinweis: Es handelt sich um einen nicht repräsentativen Testbetrieb und die Ergebnisse werden nicht für die Benotung herangezogen.',
-					'description' => '',
-					'insertvon' => 'system'
-				),
-				array(
-					'sprache' => 'English',
-					'text' => 'Note: This is a non-representative test operation and the results are not used for grading.',
-					'description' => '',
-					'insertvon' => 'system'
-				)
-			)
-		),
+		)
 	),
 	array(
 		'app' => 'anwesenheiten',
@@ -31975,6 +32055,226 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Digital Attendances Evaluation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwTimeline',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Digitale Anwesenheiten Timeline',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Digital Attendances Timeline',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungEdit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse Note Edit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'excuseUploadNoFile',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung ohne Datei beantragen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Submit Excuse Note without file upload',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungEditieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Excuse Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'missingEntschuldigungFile',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehlendes Dokument!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Missing Document!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwKontrolleVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson from',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwKontrolleBis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht bis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson until',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'termineAusStundenplan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht Termine laut Stundenplan',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson dates according to timetable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipUnterrichtZeitCustom',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtszeiten werden aus dem Stundenplan geladen, überschreiben Sie diese nur falls Ihre tatsächliche Unterrichtszeiten davon abweichen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson times are loaded from the timetable, only overwrite them if your actual lesson times differ!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipUnterrichtDatumCustom',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtsdaten werden aus dem Stundenplan geladen, überschreiben Sie dieses nur falls Ihr tatsächliches Unterrichtsdatum abweicht!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Class dates are loaded from the timetable, only overwrite this if your actual class date differs!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'unterrichtzeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtszeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson Times',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -38020,46 +38320,6 @@ array(
 		)
 	),
 	array(
-		'app' => 'pep',
-		'category' => 'ui',
-		'phrase' => 'maprojohneoe',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Mitarbeiter und Projekt sind der Organisationseinheit nicht zugeordnet.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Employee and project are not assigned to the organizational unit.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'pep',
-		'category' => 'ui',
-		'phrase' => 'infoandepl/kfl',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Info an DepL/KFL',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Info to DepL/KFL:',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
 		'app' => 'softwarebereitstellung',
 		'category' => 'global',
 		'phrase' => 'userAnzahl',
@@ -38439,7 +38699,7 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	),
+	),	
 	array(
 		'app' => 'core',
 		'category' => 'betriebsmittel',
@@ -38459,7 +38719,7 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	),
+	),	
 	array(
 		'app' => 'core',
 		'category' => 'betriebsmittel',
@@ -39889,6 +40149,13 @@ array(
 			)
 		)
 	),
+<<<<<<<<< Temporary merge branch 1
+	// PROJEKTARBEITSBEURTEILUNG SS2025 PHRASEN ---------------------------------------------------------------------------
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'maxPunkte',
+=========
 // FHC4 Phrases CleanUpTasks End
 array(
 	'app' => 'core',
@@ -40456,336 +40723,586 @@ array(
 		'app' => 'core',
 		'category' => 'stv',
 		'phrase' => 'tab_mobility',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Max. Punkte',
+=========
 				'text' => 'Mobilität',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Max. points',
+=========
 				'text' => 'Mobility',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'bewertung',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'mobilitaetsprogramm',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Erfüllungsgrad (Prozent) zum Ausfüllen',
+=========
 				'text' => 'Mobilitätsprogramm',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Degree of Fulfilment (Percentage) to Fill In',
+=========
 				'text' => 'Mobility program',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'details',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'gastnation',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Details (angemessener und korrekter Einsatz von
+Werkzeugen und Technologien in jedem Schritt)',
+=========
 				'text' => 'Gastnation',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Details
+(appropriate and correct use of tools and technologies at each step)',
+=========
 				'text' => 'Host nation',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'problemstellungZieldefinition',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'herkunftsland',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Problemstellung und Zieldefinition',
+=========
 				'text' => 'Herkunftsland',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Problem Definition and Objective Setting',
+=========
 				'text' => 'Country of origin',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'problemstellungZieldefinitionText',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'universitaet',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Die Problemstellung ist klar und präzise definiert und in einen wissenschaftlichen Kontext eingebettet.
+Die Zielsetzung sowie eventuelle Messgrößen sind eindeutig formuliert.',
+=========
 				'text' => 'Universität',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'The problem is clearly and precisely defined and embedded in a scientific context.
+The objective, along with any potential metrics, is clearly formulated.',
+=========
 				'text' => 'University',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'methodikLoesungsansatz',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'ects_erworben',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Methodik und Lösungsansatz',
+=========
 				'text' => 'Erworbene ECTS',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Methodology and Approach',
+=========
 				'text' => 'ECTS acquired',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'methodikLoesungsansatzText',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'ects_angerechnet',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Das methodische Vorgehen ist logisch und nachvollziehbar strukturiert, passend zur Zielsetzung,
+und die angewandten Methoden sind korrekt und fundiert umgesetzt.
+Die Methodik ist fachspezifisch angemessen, literaturbasiert begründet und wissenschaftlich vertretbar.',
+=========
 				'text' => 'Angerechnete ECTS',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'The methodological approach is logically and comprehensively structured,
+aligned with the objective, and the applied methods are implemented correctly and soundly.
+The methodology is appropriate to the field, justified based on literature, and scientifically valid.',
+=========
 				'text' => 'ECTS credited',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'ergebnisseDiskussion',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'zweck',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Ergebnisse und Diskussion',
+=========
 				'text' => 'Zweck',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Results and Discussion',
+=========
 				'text' => 'Purpose',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'ergebnisseDiskussionText',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'aufenthalt',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Die Qualität der Lösung ist bezogen auf die Zielsetzung ausreichend.
+				Die Ergebnisse werden fundiert analysiert und in Bezug auf die Zielsetzung schlüssig interpretiert.
+				Die Diskussion reflektiert die Relevanz und Grenzen der Ergebnisse kritisch und ist logisch strukturiert.',
+=========
 				'text' => 'Aufenthalt Förderung',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'The quality of the solution sufficiently meets the objective.
+The results are thoroughly analyzed and coherently interpreted with respect to the objective.
+The discussion critically reflects on the relevance and limitations of the results and is logically structured.',
+=========
 				'text' => 'Residency funding',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'strukturAufbau',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'zweck_neu',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Struktur und Aufbau',
+=========
 				'text' => 'Mobilitätszweck anlegen',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Structure and Organization',
+=========
 				'text' => 'Create motivation for mobility',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'strukturAufbauText',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'foerderung_neu',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Die Arbeit folgt einer logischen, klaren Gliederung und einem konsistenten roten Faden.
+Verzeichnisse, Grafiken, Tabellen und der Text sind gemäß den aktuell gültigen wissenschaftlichen Richtlinien der FH Technikum Wien aufbereitet.',
+=========
 				'text' => 'Förderung für Aufenthalt anlegen',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'The work follows a logical and clear outline with a consistent narrative thread.
+Directories, graphics, tables, and text are prepared in accordance with the currently valid scientific guidelines of FH Technikum Wien.',
+=========
 				'text' => 'Create funding for mobility',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'stilAusdruck',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'kurzbz_program',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Stil und Ausdruck',
+=========
 				'text' => 'Programmkurzbezeichnung',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Style and Expression',
+=========
 				'text' => 'Program short description',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'stilAusdruckText',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'bisio_id',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Der sprachliche Ausdruck ist präzise,
+fachlich korrekt und erfüllt die Anforderungen an gendergerechte Sprache gemäß den geltenden Richtlinien der FH Technikum Wien.',
+=========
 				'text' => 'Bisio ID',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'The linguistic expression is precise, professionally accurate,
+and meets the requirements of gender-sensitive language as per the applicable guidelines of FH Technikum Wien.',
+=========
 				'text' => 'Bisio ID',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'zitierregelnQuellenangaben',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'kurzbz',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Zitierregeln und Quellenangaben',
+=========
 				'text' => 'Kurzbezeichnung',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Citation Rules and References',
+=========
 				'text' => 'Short Name',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'zitierregelnQuellenangabenText',
+=========
 		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'error_entryExisting',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Umfang, Qualität und Aktualität der verarbeiteten Quellen sind angemessen
+und repräsentieren den aktuellen Stand der Forschung zum Thema. Die Zitierregeln (IEEE oder Harvard) werden konsequent und korrekt angewendet.',
+=========
 				'text' => 'Eintrag bereits vorhanden',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'The scope, quality, and timeliness of the sources processed are appropriate
+and represent the current state of research on the topic. The prescribed citation rules are consistently and correctly applied.',
+=========
 				'text' => 'Entry already existing',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'notenschluesselHinweisGewichtungEinzeln',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'error_existingEntryInExtension',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Jedes Kriterium muss mit mind. 50% bewertet werden, sonst ist die gesamte Arbeit negativ.',
+=========
 				'text' => 'Dieser Datensatz wird von der Mobility Extension verwendet und muss zuerst dort gelöscht werden.',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Each criterion must receive a minimum score of 50%; otherwise, the entire work is rated negatively.',
+=========
 				'text' => 'This record is used by the Mobility Extension and must first be deleted there.',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'gesamtkommentar',
+=========
 		'app' => 'core',
 		'category' => 'mobility',
 		'phrase' => 'mobility_anlegen',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Gesamtkommentar',
+=========
 				'text' => 'Mobilität anlegen',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
+				'text' => 'Overall comment',
+=========
 				'text' => 'Create mobility',
 				'description' => '',
 				'insertvon' => 'system'
@@ -40828,444 +41345,71 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Change SW',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
-		'app' => 'softwarebereitstellung',
-		'category' => 'global',
-		'phrase' => 'quellkurs',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Quellkurs',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Source Course',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'softwarebereitstellung',
-		'category' => 'global',
-		'phrase' => 'softwareAbbestellt',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Software wurde abbestellt',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Software was cancelled',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	// PROJEKTARBEITSBEURTEILUNG SS2025 PHRASEN ---------------------------------------------------------------------------
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'maxPunkte',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Max. Punkte',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Max. points',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'bewertung',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Erfüllungsgrad (Prozent) zum Ausfüllen',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Degree of Fulfilment (Percentage) to Fill In',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'details',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Details (angemessener und korrekter Einsatz von
-Werkzeugen und Technologien in jedem Schritt)',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Details
-(appropriate and correct use of tools and technologies at each step)',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'problemstellungZieldefinition',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Problemstellung und Zieldefinition',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Problem Definition and Objective Setting',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'problemstellungZieldefinitionText',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Die Problemstellung ist klar und präzise definiert und in einen wissenschaftlichen Kontext eingebettet.
-Die Zielsetzung sowie eventuelle Messgrößen sind eindeutig formuliert.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'The problem is clearly and precisely defined and embedded in a scientific context.
-The objective, along with any potential metrics, is clearly formulated.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'methodikLoesungsansatz',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Methodik und Lösungsansatz',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Methodology and Approach',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'methodikLoesungsansatzText',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Das methodische Vorgehen ist logisch und nachvollziehbar strukturiert, passend zur Zielsetzung,
-und die angewandten Methoden sind korrekt und fundiert umgesetzt.
-Die Methodik ist fachspezifisch angemessen, literaturbasiert begründet und wissenschaftlich vertretbar.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'The methodological approach is logically and comprehensively structured,
-aligned with the objective, and the applied methods are implemented correctly and soundly.
-The methodology is appropriate to the field, justified based on literature, and scientifically valid.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'ergebnisseDiskussion',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Ergebnisse und Diskussion',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Results and Discussion',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'ergebnisseDiskussionText',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Die Qualität der Lösung ist bezogen auf die Zielsetzung ausreichend.
-				Die Ergebnisse werden fundiert analysiert und in Bezug auf die Zielsetzung schlüssig interpretiert.
-				Die Diskussion reflektiert die Relevanz und Grenzen der Ergebnisse kritisch und ist logisch strukturiert.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'The quality of the solution sufficiently meets the objective.
-The results are thoroughly analyzed and coherently interpreted with respect to the objective.
-The discussion critically reflects on the relevance and limitations of the results and is logically structured.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'strukturAufbau',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Struktur und Aufbau',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Structure and Organization',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'strukturAufbauText',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Die Arbeit folgt einer logischen, klaren Gliederung und einem konsistenten roten Faden.
-Verzeichnisse, Grafiken, Tabellen und der Text sind gemäß den aktuell gültigen wissenschaftlichen Richtlinien der FH Technikum Wien aufbereitet.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'The work follows a logical and clear outline with a consistent narrative thread.
-Directories, graphics, tables, and text are prepared in accordance with the currently valid scientific guidelines of FH Technikum Wien.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'stilAusdruck',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Stil und Ausdruck',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Style and Expression',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'stilAusdruckText',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Der sprachliche Ausdruck ist präzise,
-fachlich korrekt und erfüllt die Anforderungen an gendergerechte Sprache gemäß den geltenden Richtlinien der FH Technikum Wien.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'The linguistic expression is precise, professionally accurate,
-and meets the requirements of gender-sensitive language as per the applicable guidelines of FH Technikum Wien.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'zitierregelnQuellenangaben',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Zitierregeln und Quellenangaben',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Citation Rules and References',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'zitierregelnQuellenangabenText',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Umfang, Qualität und Aktualität der verarbeiteten Quellen sind angemessen
-und repräsentieren den aktuellen Stand der Forschung zum Thema. Die Zitierregeln (IEEE oder Harvard) werden konsequent und korrekt angewendet.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'The scope, quality, and timeliness of the sources processed are appropriate
-and represent the current state of research on the topic. The prescribed citation rules are consistently and correctly applied.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'notenschluesselHinweisGewichtungEinzeln',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Jedes Kriterium muss mit mind. 50% bewertet werden, sonst ist die gesamte Arbeit negativ.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Each criterion must receive a minimum score of 50%; otherwise, the entire work is rated negatively.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'gesamtkommentar',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Gesamtkommentar',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Overall comment',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
+<<<<<<<<< Temporary merge branch 1
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
 		'phrase' => 'gesamtkommentarVerpflichtend',
+=========
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'quellkurs',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
 				'text' => 'Gesamtkommentar verpflichtend auszufüllen',
+=========
+				'text' => 'Quellkurs',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
 				'text' => 'An overall comment is mandatory and must be completed',
+=========
+				'text' => 'Source Course',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
 	array(
+<<<<<<<<< Temporary merge branch 1
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
 		'phrase' => 'eingabefeld',
+=========
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareAbbestellt',
+>>>>>>>>> Temporary merge branch 2
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
+<<<<<<<<< Temporary merge branch 1
 				'text' => 'Eingabefeld',
+=========
+				'text' => 'Software wurde abbestellt',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
+<<<<<<<<< Temporary merge branch 1
 				'text' => 'Input field',
 				'description' => '',
 				'insertvon' => 'system'
@@ -41307,6 +41451,9 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'English',
 				'text' => 'Text inut field for assessment',
+=========
+				'text' => 'Software was cancelled',
+>>>>>>>>> Temporary merge branch 2
 				'description' => '',
 				'insertvon' => 'system'
 			)

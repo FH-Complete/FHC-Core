@@ -109,7 +109,7 @@ class PermissionLib
 
 		foreach($oe_kurzbz as $value)
 		{
-			$results[] = $this->isBerechtigt($berechtigung_kurzbz, $value, $art, $kostenstelle_id);
+			$results[] = $this->isBerechtigt($berechtigung_kurzbz, $art, $value, $kostenstelle_id);
 		}
 
 		if(!in_array(true, $results))

@@ -606,3 +606,20 @@ if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE colu
 			echo 'Spalte gehaltsbestandteil_bis wurde in hr.tbl_gehaltshistorie neu erstellt<br>';
 	}
 }
+
+if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE column_name='betrag' AND table_name='tbl_sachaufwand' AND table_schema='hr'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+		    ALTER TABLE 
+			hr.tbl_sachaufwand 
+		    ADD COLUMN
+			betrag numeric(9,2)
+		";
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte betrag wurde in hr.tbl_sachaufwand neu erstellt<br>';
+	}
+}
