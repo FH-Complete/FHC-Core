@@ -3,6 +3,8 @@ import AcceptDenyUpdate from "./AcceptDenyUpdate.js";
 import Alert from "../../../components/Bootstrap/Alert.js";
 import Loading from "../../../components/Loader.js";
 
+import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+
 const sortProfilUpdates = (ele1, ele2, thisPointer) => {
   let result = 0;
   if (ele1.status === thisPointer.profilUpdateStates["Pending"]) {
@@ -127,7 +129,8 @@ export default {
                   "acceptUpdate"
                 )}`,
                 action: (e, column) => {
-                  this.$fhcApi.factory.profilUpdate.acceptProfilRequest(column.getData())
+                  this.$api
+                    .call(ApiProfilUpdate.acceptProfilRequest(column.getData()))
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
@@ -143,7 +146,8 @@ export default {
                   "denyUpdate"
                 )}`,
                 action: (e, column) => {
-                  this.$fhcApi.factory.profilUpdate.denyProfilRequest(column.getData())
+                  this.$api
+                    .call(ApiProfilUpdate.denyProfilRequest(column.getData()))
                     .then((res) => {
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
@@ -296,7 +300,8 @@ export default {
   },
   methods: {
     denyProfilUpdate: function (data) {
-      this.$fhcApi.factory.profilUpdate.denyProfilRequest(data)
+      this.$api
+        .call(ApiProfilUpdate.denyProfilRequest(data))
         .then((res) => {
           // block when the request was successful
         })
@@ -306,7 +311,8 @@ export default {
         });
     },
     acceptProfilUpdate: function (data) {
-      this.$fhcApi.factory.profilUpdate.acceptProfilRequest(data)
+      this.$api
+        .call(ApiProfilUpdate.acceptProfilRequest(data))
         .then((res) => {
           // block when the request was successful
         })
@@ -393,7 +399,7 @@ export default {
     <div  class="form-underline flex-fill ">
       <div class="form-underline-titel">{{$p.t('ui','anzeigen')}} </div>
       
-      <select class="mb-4 " v-model="filter" @change="updateData" class="form-select" aria-label="Profil updates display selection">
+      <select class="mb-4 form-select" v-model="filter" @change="updateData" aria-label="Profil updates display selection">
         <option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
         <option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
         <option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>

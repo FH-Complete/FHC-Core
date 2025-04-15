@@ -1,3 +1,4 @@
+console.warn('plugin/FhcAlert.js is DEPRECATED! Use plugins/FhcAlert.js instead.');
 /**
  * Copyright (C) 2022 fhcomplete.org
  *

@@ -1,3 +1,5 @@
+import ApiStvAbschlusspruefung from '../../../../../api/factory/stv/abschlusspruefung.js';
+
 export default {
 	inject: {
 		$reloadList: {
@@ -76,7 +78,8 @@ export default {
 			return labels[documentKey] || documentKey;
 		},
 		checkUidsIfExistingFinalExams(uids) {
-			return this.$fhcApi.factory.stv.abschlusspruefung.checkForExistingExams(uids)
+			return this.$api
+				.call(ApiStvAbschlusspruefung.checkForExistingExams(uids))
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		printDocument(document, lang, format) {

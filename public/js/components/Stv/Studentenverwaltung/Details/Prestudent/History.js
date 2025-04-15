@@ -1,5 +1,7 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 
+import ApiStvPrestudent from '../../../../../api/factory/stv/prestudent.js';
+
 export default{
 	components: {
 		CoreFilterCmpt
@@ -12,12 +14,7 @@ export default{
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.prestudent.getHistoryPrestudents,
-				ajaxParams: () => {
-					return {
-						id: this.personId
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(ApiStvPrestudent.getHistoryPrestudents(this.personId)),
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
 				columns:[
@@ -68,11 +65,7 @@ export default{
 	},
 	watch: {
 		personId() {
-			this.$fhcApi.factory.stv.prestudent.getHistoryPrestudents(this.personId)
-				.then(result => {
-					this.$refs.table.tabulator.setData(result.data);
-				})
-				.catch(this.$fhcAlert.handleSystemError);  // Handle any errors
+			this.$refs.table.reloadTable();
 		},
 	},
 	template: `

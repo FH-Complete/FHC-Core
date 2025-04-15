@@ -5,6 +5,9 @@ import LvModal from '../Cis/Mylv/LvModal.js';
 import ContentModal from '../Cis/Cms/ContentModal.js'
 import CalendarDate from '../../composables/CalendarDate.js';
 
+import ApiStundenplan from '../../api/factory/stundenplan.js';
+import ApiOrt from '../../api/factory/ort.js';
+
 export default {
 	mixins: [
 		Phrasen,
@@ -80,20 +83,20 @@ export default {
 		},
 		showRoomInfoModal: function(ort_kurzbz){
 			// getting the content_id of the ort_kurzbz
-			this.$fhcApi.factory.ort.getContentID(ort_kurzbz).then(res =>{
-				this.roomInfoContentID = res.data;
-				this.ort_kurzbz = ort_kurzbz;
+			this.$api
+				.call(ApiOrt.getContentID(ort_kurzbz))
+				.then(res => {
+					this.roomInfoContentID = res.data;
+					this.ort_kurzbz = ort_kurzbz;
 
-				// only showing the modal after vue was able to set the reactive data
-				Vue.nextTick(()=>{this.$refs.contentModal.show();});
-				
-				
-			}).catch(err =>{
-				console.err(err);
-				this.ort_kurzbz = null;
-				this.roomInfoContentID = null;
-			});
-			
+					// only showing the modal after vue was able to set the reactive data
+					Vue.nextTick(() => { this.$refs.contentModal.show(); });
+				})
+				.catch(err => {
+					console.err(err);
+					this.ort_kurzbz = null;
+					this.roomInfoContentID = null;
+				});
 		},
 		showLvUebersicht: function (event){
 			this.selectedEvent= event;
@@ -122,8 +125,8 @@ export default {
 
 		loadEvents: function () {
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay),
-				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay)
+				this.$api.call(ApiStundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay)),
+				this.$api.call(ApiStundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay))
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {

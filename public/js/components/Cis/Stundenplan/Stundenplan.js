@@ -4,6 +4,9 @@ import LvModal from "../Mylv/LvModal.js";
 import LvInfo from "../Mylv/LvInfo.js"
 import LvMenu from "../Mylv/LvMenu.js"
 
+import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiAuthinfo from '../../../api/factory/authinfo.js';
+
 export const DEFAULT_MODE_STUNDENPLAN = 'Week'
 
 const Stundenplan = {
@@ -101,7 +104,7 @@ const Stundenplan = {
 	},
 	methods:{
 		fetchStudiensemesterDetails: async function (date) {
-			return this.$fhcApi.factory.stundenplan.studiensemesterDateInterval(date);
+			return this.$api.call(ApiStundenplan.studiensemesterDateInterval(date));
 		},
 		convertTime: function([hour,minute]){
 			let date = new Date();
@@ -199,8 +202,8 @@ const Stundenplan = {
 		},
 		loadEvents: function(){
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id),
-				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay)
+				this.$api.call(ApiStundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id)),
+				this.$api.call(ApiStundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay))
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {
@@ -232,12 +235,13 @@ const Stundenplan = {
 			});
 		},
 	},
-	created()
-	{
-		this.$fhcApi.factory.authinfo.getAuthUID().then((res) => res.data)
-		.then(data=>{
-			this.uid = data.uid;
-		})
+	created() {
+		this.$api
+			.call(ApiAuthinfo.getAuthUID())
+			.then(res => res.data)
+			.then(data => {
+				this.uid = data.uid;
+			});
 		this.loadEvents();
 	},
 	beforeUnmount() {

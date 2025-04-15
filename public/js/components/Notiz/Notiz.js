@@ -48,7 +48,7 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.endpoint.getNotizen,
+				ajaxRequestFunc: () => this.$api.call(this.endpoint.getNotizen(this.id, this.typeId)),
 				ajaxParams: () => {
 					return {
 						id: this.id,
@@ -338,7 +338,8 @@ export default {
 
 			this.$refs.formNotiz.clearValidation();
 
-			return this.endpoint.addNewNotiz(this.$refs.formNotiz, this.id, formData)
+			return this.$refs.formNotiz
+				.call(this.endpoint.addNewNotiz(this.id, formData))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetFormData();
@@ -353,7 +354,8 @@ export default {
 				});
 		},
 		deleteNotiz(notiz_id) {
-			return this.endpoint.deleteNotiz(notiz_id, this.typeId, this.id)
+			return this.$api
+				.call(this.endpoint.deleteNotiz(notiz_id, this.typeId, this.id))
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.reload();
@@ -365,7 +367,8 @@ export default {
 				});
 		},
 		loadNotiz(notiz_id) {
-			return this.endpoint.loadNotiz(notiz_id)
+			return this.$api
+				.call(this.endpoint.loadNotiz(notiz_id))
 				.then(result => {
 					this.notizData = result.data;
 					this.notizData.typeId = this.typeId;
@@ -375,7 +378,8 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		loadDocEntries(notiz_id) {
-			return this.endpoint.loadDokumente(notiz_id)
+			return this.$api
+				.call(this.endpoint.loadDokumente(notiz_id))
 				.then(
 					result => {
 						this.notizData.anhang = result.data;
@@ -389,7 +393,8 @@ export default {
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
 
 			this.$refs.formNotiz.clearValidation();
-			return this.endpoint.updateNotiz(this.$refs.formNotiz, notiz_id, formData)
+			return this.$refs.formNotiz
+				.call(this.endpoint.updateNotiz(notiz_id, formData))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetFormData();
@@ -426,14 +431,16 @@ export default {
 			};
 		},
 		getUid() {
-			return this.endpoint.getUid()
+			return this.$api
+				.call(this.endpoint.getUid())
 				.then(result => {
 					this.notizData.intVerfasser = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		search(event) {
-			return this.endpoint.getMitarbeiter(event.query)
+			return this.$api
+				.call(this.endpoint.getMitarbeiter(event.query))
 				.then(result => {
 					this.filteredMitarbeiter = result.data.retval;
 				});

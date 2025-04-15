@@ -5,6 +5,7 @@ import PvTree from "../../../../../index.ci.php/public/js/components/primevue/tr
 import PvTreetable from "../../../../../index.ci.php/public/js/components/primevue/treetable/treetable.esm.min.js";
 import PvColumn from "../../../../../index.ci.php/public/js/components/primevue/column/column.esm.min.js";
 
+import ApiStvVerband from '../../../api/factory/stv/verband.js';
 
 export default {
 	components: {
@@ -54,8 +55,8 @@ export default {
 					});
 					this.loading = true;
 					
-					this.$fhcApi
-						.get('api/frontend/v1/stv/verband/' + node.data.link)
+					this.$api
+						.call(ApiStvVerband.get(node.data.link))
 						.then(result => result.data)
 						.then(result => {
 							const subNodes = result.map(this.mapResultToTreeData);
@@ -106,8 +107,10 @@ export default {
 				this.favnodes = await this.loadNodes(this.favorites.list);
 			}
 			this.favorites.on = !this.favorites.on;
-			this.$fhcApi
-				.factory.stv.verband.favorites.set(JSON.stringify(this.favorites));
+			this.$api
+				.call(ApiStvVerband.favorites.set(
+					JSON.stringify(this.favorites)
+				));
 			this.loading = false;
 		},
 		async loadNodes(links) {
@@ -131,8 +134,8 @@ export default {
 			let promises = [];
 			for (let parent in sortedInParents)
 				promises.push(
-					this.$fhcApi
-						.get('api/frontend/v1/stv/verband/' + (parent == '_' ? '' : parent))
+					this.$api
+						.call(ApiStvVerband.get(parent == '_' ? '' : parent))
 						.then(res => res.data)
 						.then(res => res.filter(node => sortedInParents[parent].includes(node.link + '')))
 				);
@@ -158,8 +161,10 @@ export default {
 				this.favorites.list.push(key.data.link + '');
 			}
 			
-			this.$fhcApi
-				.factory.stv.verband.favorites.set(JSON.stringify(this.favorites));
+			this.$api
+				.call(ApiStvVerband.favorites.set(
+					JSON.stringify(this.favorites)
+				));
 		},
 		unsetFavFocus(e) {
 			if (e.target.dataset?.linkFavAdd !== undefined) {
@@ -179,16 +184,16 @@ export default {
 		}
 	},
 	mounted() {
-		this.$fhcApi
-			.factory.stv.verband.get()
+		this.$api
+			.call(ApiStvVerband.get())
 			.then(result => {
 				this.nodes = result.data.map(this.mapResultToTreeData);
 				this.loading = false;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi
-			.factory.stv.verband.favorites.get()
+		this.$api
+			.call(ApiStvVerband.favorites.get())
 			.then(result => {
 				if (result.data) {
 					let f = JSON.parse(result.data);
