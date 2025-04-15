@@ -4,6 +4,7 @@ import {CoreFetchCmpt} from "../../Fetch.js";
 import ApiStudstatusWiederholung from '../../../api/factory/studstatus/wiederholung.js';
 
 export default {
+	name: 'StudierendenantragLeitungLvPopup',
 	components: {
 		CoreFetchCmpt
 	},
