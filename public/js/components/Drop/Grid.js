@@ -427,7 +427,6 @@ export default {
 		dragOver(evt) {
 			if (!this.active)
 				return this.dragCancel();
-			
 			this.checkPinnedWidgetAnimation();
 			if (this.updateCursor(evt)) {
 				switch(this.mode) {
@@ -514,18 +513,37 @@ export default {
 			}
 		},
 		checkPinnedWidgetAnimation(){
-			let itemAtPosition = this.items.filter(item => item.x == this.x && item.y == this.y).pop();
-			if (itemAtPosition && itemAtPosition.place[this.cols] && itemAtPosition.place[this.cols].pinned) {
-				let pinnedWidget = document.getElementById(itemAtPosition.widgetid);
-				let test = pinnedWidget.querySelector("[pinned='true']");
-				if (!test.classList.contains("denied-dragging-animation")) {
-					test.classList.add("denied-dragging-animation");
-				}
-			} else {
-				Array.from(document.getElementsByClassName("denied-dragging-animation"))?.forEach(ele => {
-					ele.classList.remove("denied-dragging-animation");
-				})
+			let itemAtPosition=[];
+			switch(this.mode){
+				case MODE_RESIZE:
+					for (let x = this.draggedItem.x; x <= this.x; x++) {
+						for (let y = this.draggedItem.y; y <= this.y; y++) {
+							this.items.forEach(item => {
+								if (item.x == x && item.y == y) {
+									itemAtPosition.push(item);
+								}
+							});
+						}
+					}
+					break;
+				case MODE_MOVE:
+					itemAtPosition = this.items.filter(item=>item.x == this.x && item.y == this.y);
+					break;
 			}
+			
+			Array.from(document.getElementsByClassName("denied-dragging-animation"))?.forEach(ele => {
+				ele.classList.remove("denied-dragging-animation");
+			})
+			
+			itemAtPosition.forEach(item=>{
+				if (item.place[this.cols] && item.place[this.cols].pinned) {
+					let pinnedWidget = document.getElementById(item.widgetid);
+					let pinNode = pinnedWidget.querySelector("[pinned='true']");
+					if (!pinNode.classList.contains("denied-dragging-animation")) {
+						pinNode.classList.add("denied-dragging-animation");
+					}
+				}	
+			})
 		},
 		mouseDown(){
 			this.mode = MODE_MOUSE_DOWN;
