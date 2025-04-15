@@ -19610,8 +19610,8 @@ array(
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
-				'sprache' => 'Nur offene Massnahmen',
-				'text' => 'O',
+				'sprache' => 'German',
+				'text' => 'Nur offene Massnahmen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
