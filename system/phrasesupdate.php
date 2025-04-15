@@ -32280,6 +32280,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'statusLegende',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status Legende',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Status Legend',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//
 	// DIGITALE ANWESENHEITEN PHRASEN END
 	//
