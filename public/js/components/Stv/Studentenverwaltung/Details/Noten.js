@@ -5,6 +5,7 @@ import NotenRepeater from './Noten/Repeater.js';
 const LOCAL_STORAGE_ID = 'stv_details_noten_2024-11-25_stdsem_all';
 
 export default {
+	name: "TabGrades",
 	components: {
 		NotenZeugnis,
 		NotenTeacher,
@@ -42,8 +43,8 @@ export default {
 	<div class="stv-details-noten d-flex flex-column overflow-hidden">
 		<div class="mb-3">
 			<select class="form-select" v-model="stdsem" @input="saveStdsem">
-				<option value="">$p.t('ui/current_semester')</option>
-				<option value="true">$p.t('ui/all_semester')</option>
+				<option value="">{{ $p.t('ui/current_semester') }}</option>
+				<option value="true">{{ $p.t('ui/all_semester') }}</option>
 			</select>
 		</div>
 		<div class="row">

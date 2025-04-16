@@ -10,6 +10,8 @@ import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 import FetchProfilUpdates from "./ProfilComponents/FetchProfilUpdates.js";
 import EditProfil from "./ProfilModal/EditProfil.js";
 
+import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+
 export default {
 	components: {
 		CoreFilterCmpt,
@@ -24,7 +26,7 @@ export default {
 		FetchProfilUpdates,
 		EditProfil,
 	},
-	inject: ["sortProfilUpdates", "collapseFunction"],
+	inject: ["sortProfilUpdates", "collapseFunction", "language"],
 	data() {
 		return {
 			showModal: false,
@@ -33,18 +35,27 @@ export default {
 
 			// tabulator options
 			zutrittsgruppen_table_options: {
+				persistenceID: "filterTableStudentProfilZutrittsgruppen",
+				persistence: {
+					columns: false
+				},
 				height: 200,
 				layout: "fitColumns",
-				data: [{bezeichnung: ""}],
-				columns: [{title: "Zutritt", field: "bezeichnung"}],
+				columns: [{
+					title: Vue.computed(() => this.$p.t('profil/zutrittsGruppen')),
+					field: "bezeichnung"
+				}],
 			},
 			betriebsmittel_table_options: {
+				persistenceID: "filterTableStudentProfilBetriebsmittel",
+				persistence: {
+					columns: false
+				},
 				height: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
-				data: [{betriebsmittel: "", Nummer: "", Ausgegeben_am: ""}],
 				columns: [
 					{
 						title:
@@ -57,23 +68,26 @@ export default {
 						headerClick: this.collapseFunction,
 					},
 					{
-						title: "Betriebsmittel",
+						title:  Vue.computed(() => this.$p.t('profil/entlehnteBetriebsmittel')),
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
-						title: "Nummer",
+						title:  Vue.computed(() => this.$p.t('profil/inventarnummer')),
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
+						visible: true
 					},
 					{
-						title: "Ausgegeben_am",
+						title: Vue.computed(() => this.$p.t('profil/ausgabedatum')),
 						field: "Ausgegeben_am",
 						headerFilter: true,
 						minWidth: 200,
+						visible: true
 					},
 				],
 			},
@@ -84,30 +98,40 @@ export default {
 		data: Object,
 		editData: Object,
 	},
+	provide() {
+		return {
+			studiengang_kz: Vue.computed({ get: () => this.data.studiengang_kz }),
+		}
+	},
 	methods: {
 
 		betriebsmittelTableBuilt: function () {
+			this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
 		},
 		zutrittsgruppenTableBuilt: function () {
+			this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
 			this.$refs.zutrittsgruppenTable.tabulator.setData(
 				this.data.zuttritsgruppen
 			);
 		},
 		fetchProfilUpdates: function () {
-			this.$fhcApi.factory.profilUpdate.selectProfilRequest().then((res) => {
-				if (!res.error && res) {
-					this.data.profilUpdates = res.data?.length
-						? res.data.sort(this.sortProfilUpdates)
-						: null;
-				}
-			});
+			this.$api
+				.call(ApiProfilUpdate.selectProfilRequest())
+				.then((res) => {
+					if (!res.error && res) {
+						this.data.profilUpdates = res.data?.length
+							? res.data.sort(this.sortProfilUpdates)
+							: null;
+					}
+				});
 		},
 
 		hideEditProfilModal: function () {
 			//? checks the editModal component property result, if the user made a successful request or not
 			if (this.$refs.editModal.result) {
-				this.$fhcApi.factory.profilUpdate.selectProfilRequest()
+				this.$api
+					.call(ApiProfilUpdate.selectProfilRequest())
 					.then((request) => {
 						if (!request.error && res) {
 							this.data.profilUpdates = request.data;
@@ -172,19 +196,46 @@ export default {
 			}
 
 			return {
-				Geburtsdatum: this.data.gebdatum,
-				Geburtsort: this.data.gebort,
-				Personenkennzeichen: this.data.personenkennzeichen,
-				Studiengang: this.data.studiengang,
-				Semester: this.data.semester,
-				Verband: this.data.verband,
-				Gruppe: this.data.gruppe.trim(),
+				geburtsdatum: {
+					label: `${this.$p.t('profil','Geburtsdatum')}`,
+					value: this.data.gebdatum
+				},
+				geburtsort: {
+					label: `${this.$p.t('profil','Geburtsort')}`,
+					value: this.data.gebort
+				},
+				personenkennzeichen: {
+					label: `${this.$p.t('person','personenkennzeichen')}`,
+					value: this.data.personenkennzeichen
+				},
+				studiengang: {
+					label: `${this.$p.t('lehre','studiengang')}`,
+					value: this.data.studiengang
+				},
+				semester: {
+					label: `${this.$p.t('lehre','semester')}`,
+					value: this.data.semester
+				},
+				verband: {
+					label: `${this.$p.t('lehre','lehrverband')}`,
+					value: this.data.verband
+				},
+				gruppe: {
+					label: `${this.$p.t('lehre','gruppe')}`,
+					value: this.data.gruppe.trim()
+				}
 			};
 		},
 	},
 	created() {
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
+	},
+	watch: {
+		'language.value'(newVal) {
+			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
+			if(this.$refs.zutrittsgruppenTable) this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
+		}
 	},
 	template: /*html*/ `
 <div class="container-fluid text-break fhc-form">
@@ -194,11 +245,12 @@ export default {
     <div class="row">
         <!-- HIDDEN QUICK LINKS -->
         <div  class="d-md-none col-12 ">
-            <div class="row py-2">
+            <!--TODO: uncomment when implemented
+			<div class="row py-2">
                 <div class="col">
                     <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
                 </div>
-            </div>
+            </div>-->
             
 			<!-- Bearbeiten Button -->
 			<div v-if="editable" class="row ">
@@ -304,22 +356,35 @@ export default {
 			<!-- SECOND ROW UNDER THE PROFIL IMAGE AND INFORMATION WITH THE TABLES -->
 			<div class="row">
 				<div class="col-12 mb-4" >
-					<core-filter-cmpt @tableBuilt="betriebsmittelTableBuilt" :title="$p.t('profil','entlehnteBetriebsmittel')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
+					<core-filter-cmpt 
+					@tableBuilt="betriebsmittelTableBuilt" 
+					:title="$p.t('profil','entlehnteBetriebsmittel')"  
+					ref="betriebsmittelTable" 
+					:tabulator-options="betriebsmittel_table_options" 
+					tableOnly 
+					:sideMenu="false" />
 				</div> 
 				<div class="col-12 mb-4" >
-					<core-filter-cmpt @tableBuilt="zutrittsgruppenTableBuilt" :title="$p.t('profil','zutrittsGruppen')" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options"  tableOnly :sideMenu="false" noColumnFilter />
+					<core-filter-cmpt 
+					@tableBuilt="zutrittsgruppenTableBuilt" 
+					:title="$p.t('profil','zutrittsGruppen')" 
+					ref="zutrittsgruppenTable" 
+					:tabulator-options="zutrittsgruppen_table_options"  
+					tableOnly 
+					:sideMenu="false" 
+					noColumnFilter />
 				</div>
 			</div>
 		<!-- END OF MAIN CONTENT COL -->
 		</div>
 		<!-- START OF SIDE PANEL -->
 		<div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
+			<!--TODO: uncomment when implemented
 			<div  class="row d-none d-md-block mb-3">
 				<div class="col">
-					<!-- QUICK LINKS -->     
 					<quick-links :title="$p.t('profil','quickLinks')"></quick-links>
 				</div>
-			</div>
+			</div>-->
 			<!-- Bearbeiten Button -->
 			<div class="row d-none d-md-block">
 				<div class="col mb-3">

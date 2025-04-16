@@ -2,27 +2,39 @@ import DashboardSection from "./Section.js";
 import DashboardWidgetPicker from "./Widget/Picker.js";
 import ObjectUtils from "../../helpers/ObjectUtils.js";
 
+import ApiDashboard from '../../api/factory/cis/dashboard.js';
+
 export default {
 	components: {
 		DashboardSection,
 		DashboardWidgetPicker
 	},
-	props: [
-		"dashboard",
-		"viewDataString"
-	],
+	props: {
+		dashboard: {
+			type: String,
+			required: true,
+			default: 'CIS'
+		},
+		viewData: {
+			type: Object,
+			required: true,
+			default: () => ({name: '', uid: ''}),
+			validator(value) {
+				return value && value.name && value.uid
+			}
+		}
+	},
 	data() {
 		return {
 			sections: [],
 			widgets: null,
-			viewData: JSON.parse(this.viewDataString),
-			editMode: false
+			editMode: false,
+			viewDataInternal: this.viewData
 		}
 	},
 	provide() {
 		return {
 			editMode: Vue.computed(()=>this.editMode),
-			viewData: Vue.computed(()=>Vue.reactive(this.viewData)),
 		}
 	},
 	computed: {
@@ -45,6 +57,7 @@ export default {
 			}
 			this.$refs.widgetpicker.getWidget().then(widget_id => {
 				widget.widget = widget_id;
+				widget.id = 'loading_' + String((new Date()).valueOf());
 				let loading = {...widget};
 				loading.loading = true;
 				this.sections.forEach(section => {
@@ -151,10 +164,16 @@ export default {
 			}
 		}).catch(err => console.error('ERROR:', err));
 	},
+	async beforeMount() {
+		if (!this.viewData.name || !this.viewData.uid) {
+			const res = await this.$api.call(ApiDashboard.getViewData());
+			this.viewDataInternal = res.data
+		}	
+	},
 	template: `
 	<div class="core-dashboard">
-		<h3>
-			{{ $p.t('global/personalGreeting', [ viewData?.name ]) }}
+		<h3 v-show="viewDataInternal?.name">
+			{{ $p.t('global/personalGreeting', [ viewDataInternal?.name ]) }}
 			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
 		</h3>
 		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>

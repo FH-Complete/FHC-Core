@@ -44,16 +44,23 @@ class Config extends FHCAPI_Controller
 			'person',
 			'lehre',
 			'stv',
-			'konto'
+			'konto',
+			'abschlusspruefung'
 		]);
+
+		// Load Config
+		$this->load->config('stv');
 	}
 
 	public function student()
 	{
 		$result = [];
+		$config = $this->config->item('tabs');
+
 		$result['details'] = [
 			'title' => $this->p->t('stv', 'tab_details'),
-			'component' => './Stv/Studentenverwaltung/Details/Details.js'
+			'component' => './Stv/Studentenverwaltung/Details/Details.js',
+			'config' => $config['details']
 		];
 		$result['notes'] = [
 			'title' => $this->p->t('stv', 'tab_notes'),
@@ -69,7 +76,8 @@ class Config extends FHCAPI_Controller
 		];
 		$result['prestudent'] = [
 			'title' => $this->p->t('stv', 'tab_prestudent'),
-			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js'
+			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js',
+			'config' => $config['prestudent']
 		];
 		$result['status'] = [
 			'title' => 'Status',
@@ -91,12 +99,35 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_resources'),
 			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
 		];
-		/* TODO(chris): Ausgeblendet für Testing
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
-			'component' => './Stv/Studentenverwaltung/Details/Noten.js'
+			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
+			'showOnlyWithUid' => true,
+			'config' => [
+				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
+				'edit' => 'both', // Possible values: both|header|inline
+				'delete' => 'both', // Possible values: both|header|inline
+				'documents' => 'both', // Possible values: both|header|inline
+				'documentslist' => $this->gradesDocumentsList()
+			]
 		];
-		*/
+
+		$result['exam'] = [
+			'title' => $this->p->t('stv', 'tab_exam'),
+			'component' => './Stv/Studentenverwaltung/Details/Pruefung.js'
+		];
+
+		$result['finalexam'] = [
+			'title' => $this->p->t('stv', 'tab_finalexam'),
+			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'config' => $config['finalexam']
+		];
+
+		$result['mobility'] = [
+			'title' => $this->p->t('stv', 'tab_mobility'),
+			'component' => './Stv/Studentenverwaltung/Details/Mobility.js'
+		];
+
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
 			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
@@ -115,6 +146,7 @@ class Config extends FHCAPI_Controller
 	public function students()
 	{
 		$result = [];
+		$config = $this->config->item('tabs');
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
 			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
@@ -137,6 +169,11 @@ class Config extends FHCAPI_Controller
 				'changeStatusToDiplomand' => $this->permissionlib->isBerechtigt('admin'),
 				'changeStatusToAbsolvent' => $this->permissionlib->isBerechtigt('admin')
 			]
+		];
+		$result['finalexam'] = [
+			'title' =>  $this->p->t('stv', 'tab_finalexam'),
+			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'config' => $config['finalexam']
 		];
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),

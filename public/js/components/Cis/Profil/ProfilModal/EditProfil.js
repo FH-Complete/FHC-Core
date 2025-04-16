@@ -3,6 +3,8 @@ import Alert from "../../../Bootstrap/Alert.js";
 import EditProfilSelect from "./EditProfilSelect.js";
 import Loader from "../../../Loader.js";
 
+import ApiProfilUpdate from '../../../../api/factory/profilUpdate.js';
+
 export default {
 	components: {
 		BsModal,
@@ -96,12 +98,13 @@ export default {
 
 				//? if an updateID is present, updateProfilRequest is called, else insertProfilRequest is called
 				this.editData.updateID ?
-					this.$fhcApi.factory.profilUpdate.updateProfilRequest(
-						this.topic,
-						this.profilUpdate,
-						this.editData.updateID,
-						this.fileID ? this.fileID[0] : null
-					)
+					this.$api
+						.call(ApiProfilUpdate.updateProfilRequest(
+							this.topic,
+							this.profilUpdate,
+							this.editData.updateID,
+							this.fileID ? this.fileID[0] : null
+						))
 						.then((res) => {
 							handleApiResponse(res);
 						})
@@ -112,11 +115,12 @@ export default {
 							this.hide();
 						})
 					:
-					this.$fhcApi.factory.profilUpdate.insertProfilRequest(
-						this.topic,
-						this.profilUpdate,
-						this.fileID ? this.fileID[0] : null
-					)
+					this.$api
+						.call(ApiProfilUpdate.insertProfilRequest(
+							this.topic,
+							this.profilUpdate,
+							this.fileID ? this.fileID[0] : null
+						))
 						.then((res) => {
 							handleApiResponse(res);
 						})
@@ -136,16 +140,20 @@ export default {
 				const result = this.editData.updateID
 					? //? updating old attachment by replacing
 					  //* second parameter of api request insertFile checks if the file has to be replaced or not
-					await this.$fhcApi.factory.profilUpdate.insertFile(
-						formData,
-						this.editData.updateID
-					).then((res) => {
-						return res.data?.map((file) => file.dms_id);
-					})
+					await this.$api
+						.call(ApiProfilUpdate.insertFile(
+							formData,
+							this.editData.updateID
+						))
+						.then((res) => {
+							return res.data?.map((file) => file.dms_id);
+						})
 					: //? fresh insert of new attachment
-					await this.$fhcApi.factory.profilUpdate.insertFile(formData).then((res) => {
-						return res.data?.map((file) => file.dms_id);
-					});
+					await this.$api
+						.call(ApiProfilUpdate.insertFile(formData))
+						.then((res) => {
+							return res.data?.map((file) => file.dms_id);
+						});
 				return result;
 			} else {
 				//? attachment hasn't been replaced
@@ -181,7 +189,7 @@ export default {
 		return BsModal.popup(null, options);
 	},
 	template: /*html*/ `
-<bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false">
+<bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" :backdrop="false">
 	<template v-if="title" v-slot:title>{{title}}</template>
 	<template v-slot:default>
 		<div>

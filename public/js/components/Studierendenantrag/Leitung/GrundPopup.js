@@ -1,6 +1,7 @@
 import BsAlert from '../../Bootstrap/Alert.js';
 
 export default {
+	name: 'StudierendenantragLeitungGrundPopup',
 	mixins: [
 		BsAlert,
 	],
