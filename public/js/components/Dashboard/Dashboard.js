@@ -162,15 +162,16 @@ export default {
 			for (var name in res.data.retval.widgets) {
 				let widgets = [];
 				let remove = [];
-				for (var wid in res.data.retval.widgets[name]) {
-					res.data.retval.widgets[name][wid].id = wid;
-					if (res.data.retval.widgets[name][wid].custom || res.data.retval.widgets[name][wid].preset)
-						widgets.push(res.data.retval.widgets[name][wid]);
+				for (var wid in res.data.retval.widgets[name].widgets) {
+					res.data.retval.widgets[name].widgets[wid].id = wid;
+					if (res.data.retval.widgets[name].widgets[wid].custom || res.data.retval.widgets[name].widgets[wid].preset)
+						widgets.push(res.data.retval.widgets[name].widgets[wid]);
 					else
 						remove.push(wid);
 				}
 				this.sections.push({
 					name: name,
+					description:res.data.retval.widgets[name].description,
 					widgets: widgets
 				});
 				remove.forEach(wid => this.widgetRemove(name, wid));
@@ -189,7 +190,7 @@ export default {
 			{{ $p.t('global/personalGreeting', [ viewDataInternal?.name ]) }}
 			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
 		</h3>
-		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
+		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :description="section.description" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
 		<dashboard-widget-picker ref="widgetpicker" :widgets="widgets"></dashboard-widget-picker>
 	</div>`
 }

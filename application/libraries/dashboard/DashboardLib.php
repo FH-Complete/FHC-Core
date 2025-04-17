@@ -53,7 +53,6 @@ class DashboardLib
 		$userconfig = $this->getUserConfig($dashboard_id, $uid);
 		
 		$mergedconfig = array_replace_recursive($defaultconfig, $userconfig);
-		
 		return $mergedconfig;
 	}
 	
@@ -209,18 +208,19 @@ class DashboardLib
 		if (!isset($widgets[$section]) || !is_array($widgets[$section]))
 		{
 			$widgets[$section] = array();
+			$widgets[$section]["widgets"] = array();
 		}
 		
-		$widgets[$section][$widgetid] = $widget;
+		$widgets[$section]["widgets"][$widgetid] = $widget;
 	}
 	
 	public function removeWidgetFromWidgets(&$widgets, $section, $widgetid)
 	{
 		$section = ($section !== null) ? $section : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
-		if (isset($widgets[$section]) && isset($widgets[$section][$widgetid]))
+		if (isset($widgets[$section]["widgets"]) && isset($widgets[$section]["widgets"][$widgetid]))
 		{
-			unset($widgets[$section][$widgetid]);
-			if(empty($widgets[$section]) && $section !== self::USEROVERRIDE_SECTION) {
+			unset($widgets[$section]["widgets"][$widgetid]);
+			if(empty($widgets[$section]["widgets"]) && $section !== self::USEROVERRIDE_SECTION) {
 				unset($widgets[$section]);
 			}
 			return true;

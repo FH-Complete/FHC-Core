@@ -63,14 +63,12 @@ export default {
 		items_hashmap() {
 			let items = {};
 			this.items.forEach(item => {
-				if (this.reorderedItems.length > 0){
-					if(item.reorder){
+				if (this.reorderedItems.length > 0 && this.needsReordering(item)){
 						let rearrangedPosition = this.reorderedItems.filter(widget => widget.data.widgetid == item.widgetid)?.pop();
 						if (rearrangedPosition) {			
 							item.x = rearrangedPosition.x;
 							item.y = rearrangedPosition.y;
 						}
-					}
 				}
 				items[`x${item.x}y${item.y}`] = item;
 			});	
@@ -143,7 +141,6 @@ export default {
 						y: item.y,
 						w: item.w,
 						h: item.h,
-						reorder: item.reorder,
 						weight: item.weight || 0,
 						data: item
 					}
@@ -246,7 +243,12 @@ export default {
 		}
 	},
 	methods: {
-		
+		needsReordering(item){
+			if (!item?.data?.place[this.cols]){
+				return true;
+			}
+			return false;
+		},
 		toggleDraggedItemOverlay(condition){
 			if(!this.draggedNode)
 				return;
@@ -267,20 +269,23 @@ export default {
 			this.grid = new GridLogic(this.cols);
 			const result = [];
 			let sortedItems = [...items].sort((a, b) => {
-				if (a.reorder){
+				if(this.needsReordering(a) && this.needsReordering(b)){
+					return 0;
+				}
+				else if(this.needsReordering(a)){
 					return 999;
 				}
-				if (b.reorder){
+				else if(this.needsReordering(b)){
 					return -999;
 				}
+				
 				return a.weight > b.weight;
 			}); 
 			let reorderedItems = [];
 			sortedItems.forEach(item => {
 				let freeSlots = this.grid.getFreeSlots();
 				
-				if(item.reorder){
-					item.reorder=true;
+				if(this.needsReordering(item)){
 					let firstFreeSlot = freeSlots.shift();
 					if (!firstFreeSlot) {
 						item.x = 0;

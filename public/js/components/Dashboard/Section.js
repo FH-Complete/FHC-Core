@@ -28,7 +28,8 @@ export default {
 	},
 	props: [
 		"name",
-		"widgets"
+		"widgets",
+		"description"
 	],
 	emits: [
 		"widgetAdd",
@@ -85,7 +86,7 @@ export default {
 				if(!item?.widgetid && item?.id){
 					item.widgetid = item.id;
 				}
-				return { ...item, reorder: false, ...(item.place[this.gridWidth] || { reorder: true, ...{ x: 0, y: 0, w: 1, h: 1 } })};
+				return { ...item, ...(item.place[this.gridWidth] || { x: 0, y: 0, w: 1, h: 1 } )};
 			});
 			return placedItems;
 			
@@ -94,7 +95,7 @@ export default {
 	},
 	methods: {
 		showSectionInformation(){
-			SectionModal.popup(`this is the information for the section ${name}`);
+			SectionModal.popup(this.description);
 		},
 		handleConfigOpened() {
 			this.configOpened = true
@@ -188,11 +189,11 @@ export default {
 		});
 	},
 	template: `
-	<h4 v-if="items.length>0 && editMode" class=" mb-0">
+	<h4 v-if="items.length>0 && editMode" >
 		<i @click="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
 		{{name}}:
 	</h4>
-	<div class="dashboard-section position-relative pb-3 border-bottom" ref="container" :style="getSectionStyle">
+	<div class="dashboard-section position-relative pb-3 border-1" ref="container" :style="getSectionStyle">
 		<drop-grid v-model:cols="gridWidth" :items="items" :itemsSetup="computedWidgetsSetup" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @draggedItem="draggedItem=$event" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item">
 				<div v-if="item.placeholder" class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
@@ -203,7 +204,7 @@ export default {
 					:widgetID="item.id"
 					:width="item.w"
 					:height="item.h"
-					:item_data="{config:item.config, custom:item.custom, h:item.h, w:item.w,id:item.id,reorder:item.reorder,place:item.place,widget:item.widget,widgetid:item.widgetid,x:item.x,y:item.y}"
+					:item_data="{config:item.config, custom:item.custom, h:item.h, w:item.w,id:item.id,place:item.place,widget:item.widget,widgetid:item.widgetid,x:item.x,y:item.y}"
 					:loading="item.loading"
 					:config="item.config"
 					:custom="item.custom"
