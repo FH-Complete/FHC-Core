@@ -31812,13 +31812,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unterrichtbeginn wurde manuell überschrieben.',
+				'text' => 'Unterrichtbeginn entspricht keinem Unterrichtstermin laut Stundenplan.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Lecture Begin Time has been overwritten',
+				'text' => 'Lecture Begin Time does not match a lesson as per timetable.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31832,13 +31832,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unterrichtende wurde manuell überschrieben.',
+				'text' => 'Unterrichtende entspricht keinem Unterrichtstermin laut Stundenplan.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Lecture End Time has been overwritten',
+				'text' => 'Lecture End Time does not match a lesson as per timetable.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31852,13 +31852,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Datum entspricht keinem Stundenplan Termin!.',
+				'text' => 'Datum entspricht keinem Stundenplan Termin.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Date does not match a lesson as per timetable!.',
+				'text' => 'Date does not match a lesson as per timetable.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -32108,13 +32108,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Entschuldigung ohne Datei beantragen',
+				'text' => 'Dokument wird nachgereicht',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Submit Excuse Note without file upload',
+				'text' => 'Document will be submitted later',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -32295,6 +32295,66 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Status Legend',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'download',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Herunterladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Download',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'upload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hochladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Upload',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'providedDateTooOld',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angegebenes Datum ist älter als erlaubt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Provided date is older than allowed date',
 				'description' => '',
 				'insertvon' => 'system'
 			)
