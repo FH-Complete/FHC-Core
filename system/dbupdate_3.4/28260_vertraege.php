@@ -718,6 +718,8 @@ if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE colu
 					hr.tbl_vertragsbestandteil_freitext f ON g.vertragsbestandteil_id = f.vertragsbestandteil_id
 				WHERE
 					f.freitexttyp_kurzbz = 'allin'
+					AND 
+					g.gehaltstyp_kurzbz <> 'zulage_allin'
 			)
 			UPDATE 
 				hr.tbl_gehaltsbestandteil 
