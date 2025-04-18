@@ -84,21 +84,23 @@ export default {
 					<!--Upload Component-->
 					<FormUploadDms ref="upload" id="inhalt" v-model="data.datei"></FormUploadDms>
 				</div>
-				<form-input
-					container-class="form-check"
-					type="checkbox"
-					name="signiert"
-					:label="$p.t('stv/archiv_signiert')"
-					v-model="data.signiert"
-				>
-				</form-input>
-				<form-input
-					container-class="form-check"
-					type="checkbox"
-					name="stud_selfservice"
-					:label="'Selfservice'"
-					v-model="data.stud_selfservice"
-				>
+				<div class="mt-3">
+					<form-input
+						container-class="form-check"
+						type="checkbox"
+						name="signiert"
+						:label="$p.t('stv/archiv_signiert')"
+						v-model="data.signiert"
+					>
+					</form-input>
+						<form-input
+							container-class="form-check"
+							type="checkbox"
+							name="stud_selfservice"
+							:label="'Selfservice'"
+							v-model="data.stud_selfservice"
+					>
+				</div>
 				</form-input>
 			</fieldset>
 
