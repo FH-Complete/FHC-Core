@@ -1,5 +1,7 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 
+import ApiStvGroups from '../../../../../api/factory/stv/group.js';
+
 export default {
 	name: 'TblGroups',
 	components: {
@@ -17,12 +19,9 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.group.getGruppen,
-				ajaxParams: () => {
-					return {
-						id: this.student.uid
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					ApiStvGroups.getGruppen(this.student.uid)
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				initialFilter: [
 					{field: "uid", type: "=", value: this.student.uid},
@@ -130,7 +129,8 @@ export default {
 				gruppe_kurzbz: gruppe_kurzbz
 			};
 
-			return this.$fhcApi.factory.stv.group.deleteGroup(group_id)
+			return this.$api
+				.call(ApiStvGroups.deleteGroup(group_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				}).catch(this.$fhcAlert.handleSystemError)
