@@ -107,7 +107,7 @@ class DashboardLib
 		$emptyoverride = new stdClass();
 		$emptyoverride->dashboard_id = $dashboard->dashboard_id;
 		$emptyoverride->uid = $uid;
-		$emptyoverride->override = '{"widgets": {"' . self::USEROVERRIDE_SECTION . '": {}}}';
+		$emptyoverride->override = '{"' . self::USEROVERRIDE_SECTION . '": {"widgets":{}}}}';
 		
 		return $emptyoverride;
 	}
@@ -127,7 +127,7 @@ class DashboardLib
 		$emptypreset->dashboard_id = $dashboard->dashboard_id;
 		$emptypreset->funktion_kurzbz = $funktion_kurzbz;
 		$section = ($funktion_kurzbz !== null) ? $funktion_kurzbz : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
-		$emptypreset->preset = '{"widgets": {"' . $section . '": {}}}';
+		$emptypreset->preset = '{"' . $section . '": { "widgets" : {}}}';
 		
 		return $emptypreset;
 	}
@@ -206,21 +206,22 @@ class DashboardLib
 	public function addWidgetToWidgets(&$widgets, $section, $widget, $widgetid)
 	{
 		$section = ($section !== null) ? $section : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
-		if (!isset($widgets[$section]) || !is_array($widgets[$section]))
+		if (!isset($widgets[$section]) || !isset($widgets[$section]["widgets"]) || !is_array($widgets[$section]))
 		{
 			$widgets[$section] = array();
+			$widgets[$section]["widgets"] = array();
 		}
 		
-		$widgets[$section][$widgetid] = $widget;
+		$widgets[$section]["widgets"][$widgetid] = $widget;
 	}
 	
 	public function removeWidgetFromWidgets(&$widgets, $section, $widgetid)
 	{
 		$section = ($section !== null) ? $section : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
-		if (isset($widgets[$section]) && isset($widgets[$section][$widgetid]))
+		if (isset($widgets[$section]) && isset($widgets[$section]["widgets"][$widgetid]))
 		{
-			unset($widgets[$section][$widgetid]);
-			if(empty($widgets[$section]) && $section !== self::USEROVERRIDE_SECTION) {
+			unset($widgets[$section]["widgets"][$widgetid]);
+			if(empty($widgets[$section]["widgets"]) && $section !== self::USEROVERRIDE_SECTION) {
 				unset($widgets[$section]);
 			}
 			return true;

@@ -14,8 +14,8 @@ export default {
 	},
 	inject: {
 		widgetsSetup:{
-			type: Object,
-			default: {},
+			type: Array,
+			default: [],
 		},
 		adminMode: {
 			type: Boolean,
@@ -188,7 +188,7 @@ export default {
 		});
 	},
 	template: `
-	<h4 v-if="items.length>0 && editMode" class=" mb-0">
+	<h4 v-if="items.length>0 && editModeIsActive" class=" mb-0">
 		<i @click="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
 		{{name}}:
 	</h4>
@@ -208,7 +208,7 @@ export default {
 					:config="item.config"
 					:custom="item.custom"
 					:hidden="item.hidden"
-					:editMode="editMode"
+					:editMode="editModeIsActive"
 					:place="item.place[gridWidth]"
 					:setup="computedWidgetsSetup[item.widget]"
 					@change="saveConfig($event, item)"

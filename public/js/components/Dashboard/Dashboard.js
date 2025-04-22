@@ -70,7 +70,7 @@ export default {
 					funktion_kurzbz: section_name,
 					widgets: [widget]
 				}).then(result => {
-					let newId = Object.keys(result.data.retval.data.widgets[section_name]).pop();
+					let newId = Object.keys(result.data.retval.data[section_name].widgets).pop();
 					widget.id = newId;
 					this.sections.forEach(section => {
 						if (section.name == section_name) {
@@ -159,13 +159,13 @@ export default {
 		axios.get(this.apiurl + '/Config', {params:{
 			db: this.dashboard
 		}}).then(res => {
-			for (var name in res.data.retval.widgets) {
+			for (var name in res.data.retval) {
 				let widgets = [];
 				let remove = [];
-				for (var wid in res.data.retval.widgets[name]) {
-					res.data.retval.widgets[name][wid].id = wid;
-					if (res.data.retval.widgets[name][wid].custom || res.data.retval.widgets[name][wid].preset)
-						widgets.push(res.data.retval.widgets[name][wid]);
+				for (var wid in res.data.retval[name].widgets) {
+					res.data.retval[name].widgets[wid].id = wid;
+					if (res.data.retval[name].widgets[wid].custom || res.data.retval[name].widgets[wid].preset)
+						widgets.push(res.data.retval[name].widgets[wid]);
 					else
 						remove.push(wid);
 				}
