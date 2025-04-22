@@ -143,7 +143,7 @@ export default {
 		}
 	},
 	created() {
-
+		this.$p.loadCategory('dashboard');
 		axios.get(this.apiurl + '/Widget/getWidgetsForDashboard', {
 			params: {
 				db: this.dashboard
@@ -175,6 +175,7 @@ export default {
 				});
 				remove.forEach(wid => this.widgetRemove(name, wid));
 			}
+			this.sections = this.sections.sort((section1, section2) => section2.widgets.length - section1.widgets.length);
 		}).catch(err => console.error('ERROR:', err));
 	},
 	async beforeMount() {

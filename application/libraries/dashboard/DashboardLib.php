@@ -127,7 +127,7 @@ class DashboardLib
 		$emptypreset->dashboard_id = $dashboard->dashboard_id;
 		$emptypreset->funktion_kurzbz = $funktion_kurzbz;
 		$section = ($funktion_kurzbz !== null) ? $funktion_kurzbz : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
-		$emptypreset->preset = '{"' . $section . '": { "widgets" : {}}}';
+		$emptypreset->preset = '{"' . $section . '": { "widgets" : {}},"custom": { "widgets" : {}}}';
 		
 		return $emptypreset;
 	}

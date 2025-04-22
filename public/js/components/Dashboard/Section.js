@@ -93,8 +93,29 @@ export default {
 		
 	},
 	methods: {
+		sectionNameTranslation(){
+			switch(this.name){
+				case "general": 
+					return this.$p.t('dashboard',this.name); 
+					break;
+				case "custom":
+					return this.$p.t('dashboard',this.name);
+					break;
+				default:
+					return this.name;
+					break;
+			}
+		},
 		showSectionInformation(){
-			SectionModal.popup(`this is the information for the section ${name}`);
+			if (this.name == "general"){
+				SectionModal.popup(this.$p.t('dashboard', 'dashboardGeneralSectionDescription')); 
+			}
+			else if(this.name == "custom"){
+				SectionModal.popup(this.$p.t('dashboard', 'dashboardCustomSectionDescription'));
+			}
+			else{
+				SectionModal.popup(this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]));
+			}
 		},
 		handleConfigOpened() {
 			this.configOpened = true
@@ -188,9 +209,9 @@ export default {
 		});
 	},
 	template: `
-	<h4 v-if="items.length>0 && editModeIsActive" class=" mb-0">
+	<h4 v-if="editModeIsActive" class=" mb-0">
 		<i @click="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
-		{{name}}:
+		{{sectionNameTranslation()}}:
 	</h4>
 	<div class="dashboard-section position-relative pb-3 border-bottom" ref="container" :style="getSectionStyle">
 		<drop-grid v-model:cols="gridWidth" :items="items" :itemsSetup="computedWidgetsSetup" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @draggedItem="draggedItem=$event" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
