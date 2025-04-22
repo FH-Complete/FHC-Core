@@ -5,8 +5,8 @@ export default {
 	getUid(){
 		return this.$fhcApi.get('api/frontend/v1/notiz/notizPerson/getUid/');
 	},
-	addNewNotiz(id, formData) {
-		return this.$fhcApi.post('api/frontend/v1/notiz/notizPerson/addNewNotiz/' + id,
+	addNewNotiz(form, id, formData) {
+		return this.$fhcApi.post(form,'api/frontend/v1/notiz/notizPerson/addNewNotiz/' + id,
 			formData
 		);
 	},
@@ -27,8 +27,8 @@ export default {
 			id
 		});
 	},
-	updateNotiz(notiz_id, formData){
-		return this.$fhcApi.post('api/frontend/v1/notiz/notizPerson/updateNotiz/' + notiz_id,
+	updateNotiz(form, notiz_id, formData){
+		return this.$fhcApi.post(form,'api/frontend/v1/notiz/notizPerson/updateNotiz/' + notiz_id,
 			formData
 		);
 	},

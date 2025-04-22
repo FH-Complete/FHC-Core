@@ -4,6 +4,7 @@ import CoreForm from "../../../../Form/Form.js";
 import FormValidation from "../../../../Form/Validation.js";
 import FormInput from "../../../../Form/Input.js";
 
+import ApiKonto from '../../../../../api/factory/stv/konto.js';
 
 export default {
 	components: {
@@ -59,7 +60,7 @@ export default {
 			}, ...this.data};
 
 			this.$refs.form
-				.factory.stv.konto.checkDoubles(data)
+				.call(ApiKonto.checkDoubles(data))
 				.then(result => result.data
 					? Promise.all(
 						result.errors
@@ -68,7 +69,7 @@ export default {
 					)
 					: Promise.resolve())
 				.then(() => data)
-				.then(this.$refs.form.factory.stv.konto.insert)
+				.then(data => this.$refs.form.call(ApiKonto.insert(data)))
 				.then(result => {
 					this.$emit('saved', result.data);
 					this.loading = false;
@@ -124,7 +125,7 @@ export default {
 					type="select"
 					v-model="data.buchungstyp_kurzbz"
 					name="buchungstyp_kurzbz"
-					:label="$p.t('konto/buchungstyp')"
+					:label="$p.t('konto/buchungstyp') + ' *'"
 					@update:model-value="checkDefaultBetrag"
 					>
 					<option v-for="typ in activeBuchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz" :class="typ.aktiv ? '' : 'text-decoration-line-through text-muted'">
