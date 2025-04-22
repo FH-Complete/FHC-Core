@@ -35,11 +35,16 @@ import lehre from "./lehre.js";
 import addons from "./addons.js";
 import messages from "./messages.js";
 import vorlagen from "./vorlagen.js";
+import studiengang from "./studiengang.js";
+import menu from "./menu.js";
+import dashboard from "./dashboard.js";
+import authinfo from "./authinfo.js";
 
 export default {
     search,
     phrasen,
     navigation,
+    dashboard,
     filter,
     studstatus,
     profil,
@@ -56,5 +61,9 @@ export default {
     lehre,
     addons,
     messages,
-    vorlagen
+    vorlagen,
+    addons,
+	studiengang,
+	menu,
+	authinfo,
 };

@@ -31,6 +31,7 @@ define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN', true);
 
 // Wenn gesetzt, werden die Digitale Anwesenheit-Icons nur fuer diese Studiengaenge angezeigt, sonst für alle
 // define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG', serialize(array('257')));
+// define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_LVA', serialize(array('39455','39481','39480','41906','41905','41904','39459','39512','39454','39482','42230','42231','39458','41921','41922','39457','42896')));
 
 // Im CIS Menue Links bei Modulen anzeigen wenn Lehrauftrag
 define('CIS_LEHRVERANSTALTUNG_MODULE_LINK',true);

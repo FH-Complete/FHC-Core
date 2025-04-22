@@ -1,6 +1,9 @@
 import ProfilUpdateView from "../../components/Cis/ProfilUpdate/ProfilUpdateView.js";
-import Phrasen from "../../plugin/Phrasen.js";
+import PluginsPhrasen from "../../plugins/Phrasen.js";
 
+import ApiProfilUpdate from '../../api/factory/profilUpdate.js';
+
+// TODO: sobald in verwendung den vue router pfad zu ProfilUpdateView definieren und diese app in component auslagern
 const app = Vue.createApp({
   name: 'ProfilUpdateRequestsApp',
   components: {
@@ -21,7 +24,8 @@ const app = Vue.createApp({
   },
   methods: {},
   created() {
-    this.$fhcApi.factory.profilUpdate.getStatus()
+    this.$api
+      .call(ApiProfilUpdate.getStatus())
       .then((response) => {
         this.profilUpdateStates = response.data;
       })
@@ -30,4 +34,4 @@ const app = Vue.createApp({
       });
   },
 });
-app.use(Phrasen).mount("#content");
+app.use(PluginsPhrasen).mount("#content");

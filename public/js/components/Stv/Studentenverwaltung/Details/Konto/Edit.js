@@ -3,6 +3,7 @@ import CoreForm from "../../../../Form/Form.js";
 import FormValidation from "../../../../Form/Validation.js";
 import FormInput from "../../../../Form/Input.js";
 
+import ApiKonto from '../../../../../api/factory/stv/konto.js';
 
 export default {
 	components: {
@@ -34,7 +35,7 @@ export default {
 			this.loading = true;
 
 			this.$refs.form
-				.factory.stv.konto.edit(this.data)
+				.call(ApiKonto.edit(this.data))
 				.then(result => {
 					this.$emit('saved', result.data);
 					this.loading = false;

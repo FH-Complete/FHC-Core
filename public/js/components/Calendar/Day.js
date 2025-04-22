@@ -13,7 +13,7 @@ export default {
 	},
 	computed: {
 		title() {
-			return this.focusDate.format({ year: 'numeric' }) + ' KW ' + this.focusDate.w;
+			return this.focusDate.wYear + ' KW ' + this.focusDate.w;
 		}
 	},
 	methods: {
@@ -27,9 +27,11 @@ export default {
 		},
 		prev() {
 			this.$refs.pane.prev();
+			this.$emit('change:offset', { y: 0, m: 0, d: -1 });
 		},
 		next() {
 			this.$refs.pane.next();
+			this.$emit('change:offset', { y: 0, m: 0, d: 1 });
 		},
 		selectEvent(event) {
 			this.$emit('input', ['select:event', event]);
@@ -40,7 +42,11 @@ export default {
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-day">
-		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'week')"/>
+		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'week')">
+			<template #calendarDownloads>
+				<slot name="calendarDownloads"></slot>
+			</template>
+		</calendar-header>
 		<calendar-pane ref="pane" v-slot="slot" @slid="paneChanged">
 			<calendar-day-page :active="slot.active" :year="focusDate.y" :week="focusDate.w+slot.offset" @updateMode="$emit('updateMode', $event)" @page:back="prev" @page:forward="next" @input="selectEvent" >
 				<template #dayPage="{event,day,mobile}">
