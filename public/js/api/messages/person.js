@@ -3,7 +3,7 @@ export default {
 		console.log('page ' + params.page + ' size ' + params.size);
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getMessages/' + params.id + '/' + params.type + '/' + params.size + '/' + params.page);
 	},
-	getVorlagen(){
+/*	getVorlagen(){
 		return this.$fhcApi.get('api/frontend/v1/messages/messages/getVorlagen/');
 	},
 	getMsgVarsLoggedInUser(){
@@ -44,5 +44,5 @@ export default {
 	},
 	deleteMessage(messageId){
 		return this.$fhcApi.post('api/frontend/v1/messages/messages/deleteMessage/' + messageId);
-	}
+	}*/
 }

@@ -2,6 +2,7 @@ import FormForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
 import ListBox from "../../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
 import DropdownComponent from '../../../VorlagenDropdown/VorlagenDropdown.js';
+import ApiMessages from "../../../../api/factory/messages/messages";
 
 export default {
 	name: "ComponentNewMessages",
@@ -119,9 +120,11 @@ export default {
 			data.append('data', JSON.stringify(merged));
 
 			//this.uid is necessary for existing sendFunction
-			return this.$fhcApi.factory.messages.person.sendMessage(
+/*			return this.$fhcApi.factory.messages.person.sendMessage(
 				this.uid,
-				data)
+				data)*/
+			return this.$api
+				.call(ApiMessages.sendMessage(this.uid, data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideTemplate();
@@ -140,7 +143,9 @@ export default {
 				);
 		},
 		getVorlagentext(vorlage_kurzbz){
-			return this.$fhcApi.factory.messages.person.getVorlagentext(vorlage_kurzbz)
+		//	return this.$fhcApi.factory.messages.person.getVorlagentext(vorlage_kurzbz)
+			return this.$api
+				.call(ApiMessages.getVorlagentext(vorlage_kurzbz))
 				.then(response => {
 					this.formData.body = response.data;
 				}).catch(this.$fhcAlert.handleSystemError)
@@ -152,9 +157,13 @@ export default {
 			const data = new FormData();
 
 			data.append('data', JSON.stringify(this.formData.body));
-			return this.$fhcApi.factory.messages.person.getPreviewText({
+/*			return this.$fhcApi.factory.messages.person.getPreviewText({
 				id: id,
-				type_id: typeId}, data)
+				type_id: typeId}, data)*/
+			return this.$api
+				.call(ApiMessages.getPreviewText({
+					id: this.id,
+					type_id: this.typeId}, data))
 				.then(response => {
 					this.previewText = response.data;
 				}).catch(this.$fhcAlert.handleSystemError)
@@ -226,7 +235,8 @@ export default {
 				id: id,
 				type_id: typeId
 			};
-			this.$fhcApi.factory.messages.person.getUid(params)
+			this.$api
+				.call(ApiMessages.getUid(params))
 				.then(result => {
 					this.uid = result.data;
 				})
@@ -262,7 +272,9 @@ export default {
 					id: this.id,
 					type_id: this.typeId
 				};
-				this.$fhcApi.factory.messages.person.getMessageVarsPerson(params)
+			//	this.$fhcApi.factory.messages.person.getMessageVarsPerson(params)
+				this.$api
+				.call(ApiMessages.getMessageVarsPerson(params))
 					.then(result => {
 						this.fieldsPerson = result.data;
 						const person = this.fieldsPerson[0];
@@ -279,7 +291,9 @@ export default {
 				id: this.id,
 				type_id: this.typeId
 			};
-			this.$fhcApi.factory.messages.person.getMsgVarsPrestudent(params)
+			//this.$fhcApi.factory.messages.person.getMsgVarsPrestudent(params)
+			this.$api
+				.call(ApiMessages.getMsgVarsPrestudent(params))
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
@@ -292,7 +306,8 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		}
 
-		this.$fhcApi.factory.messages.person.getMsgVarsLoggedInUser()
+		this.$api
+			.call(ApiMessages.getMsgVarsLoggedInUser())
 			.then(result => {
 				this.fieldsUser = result.data;
 				const user = this.fieldsUser;
@@ -303,10 +318,11 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi.factory.messages.person.getNameOfDefaultRecipient({
-			id: this.id,
-			type_id: this.typeId
-		}).then(result => {
+		this.$api
+			.call(ApiMessages.getNameOfDefaultRecipient({
+				id: this.id,
+				type_id: this.typeId}))
+			.then(result => {
 				this.defaultRecipient = result.data;
 				this.recipientsArray.push({
 					'uid': this.uid,
@@ -316,7 +332,8 @@ export default {
 
 		//case of reply
 		if(this.messageId != null) {
-			this.$fhcApi.factory.messages.person.getReplyData(this.messageId)
+			this.$api
+				.call(ApiMessages.getReplyData(this.messageId))
 				.then(result => {
 					this.replyData = result.data;
 					this.formData.subject = this.replyData[0].replySubject;
