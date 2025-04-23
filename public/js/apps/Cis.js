@@ -1,9 +1,7 @@
 import FhcSearchbar from "../components/searchbar/searchbar.js";
 import CisMenu from "../components/Cis/Menu.js";
-import FhcApi from '../plugin/FhcApi.js';
-import Phrasen from '../plugin/Phrasen.js';
-import fhcapifactory from "./api/fhcapifactory.js";
-Vue.$fhcapi = fhcapifactory;
+import PluginsPhrasen from '../plugins/Phrasen.js';
+import ApiSearchbar from '../api/factory/searchbar.js';
 
 const app = Vue.createApp({
     name: 'CisApp',
@@ -113,16 +111,15 @@ const app = Vue.createApp({
     },
     methods: {
         searchfunction: function(searchsettings) {
-            return Vue.$fhcapi.search.search(searchsettings);
+        	return this.$api.call(ApiSearchbar.search(searchsettings));
         }
     }
 });
-app.use(FhcApi);
 app.use(primevue.config.default, {
 	zIndex: {
 		overlay: 9000,
 		tooltip: 8000
 	}
 })
-app.use(Phrasen);
+app.use(PluginsPhrasen);
 app.mount('#cis-header');

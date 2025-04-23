@@ -156,6 +156,8 @@ class Student extends FHCAPI_Controller
 
 		$uid = $student ? current($student)->student_uid : null;
 
+		$studiengang_kz = $student ? current($student)->studiengang_kz : null;
+
 		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
 		$person = $this->getDataOrTerminateWithError($result);
@@ -231,10 +233,27 @@ class Student extends FHCAPI_Controller
 
 		// Do Updates
 		if (count($update_lehrverband)) {
-			$result = $this->StudentlehrverbandModel->update([
+			$curstudlvb = $this->StudentlehrverbandModel->load([
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'student_uid' => $uid
-			], $update_lehrverband);
+			]);
+
+			if(hasData($curstudlvb) && count(getData($curstudlvb)) > 0 )
+			{
+				$result = $this->StudentlehrverbandModel->update([
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'student_uid' => $uid
+				], $update_lehrverband);
+			}
+			else
+			{
+				$result = $this->StudentlehrverbandModel->insert(array_merge([
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'student_uid' => $uid,
+					'studiengang_kz' => $studiengang_kz
+				], $update_lehrverband));
+			}
+
 			$this->getDataOrTerminateWithError($result);
 		}
 
