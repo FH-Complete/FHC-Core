@@ -4,6 +4,9 @@ import CoreForm from "../../../../Form/Form.js";
 import FormInput from "../../../../Form/Input.js";
 import CoreNotiz from "../../../../Notiz/Notiz.js";
 
+import ApiStvExemptions from "../../../../../api/factory/stv/exemptions.js";
+import ApiNotizPerson from '../../../../../api/factory/notiz/person.js';
+
 export default {
 	name: "ExemptionComponent",
 	components: {
@@ -30,12 +33,9 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.exemptions.getAnrechnungen,
-				ajaxParams: () => {
-					return {
-						id: this.student.prestudent_id
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					ApiStvExemptions.getAnrechnungen(this.student.prestudent_id)
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "anrechnung_id", field: "anrechnung_id", visible: false},
@@ -83,7 +83,7 @@ export default {
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('ui', 'loeschen');
 							button.addEventListener('click', () =>
-								this.deleteAnrechnung(cell.getData().anrechnung_id)
+								this.actionDeleteAnrechnung(cell.getData().anrechnung_id)
 							);
 							container.append(button);
 
@@ -158,7 +158,8 @@ export default {
 			listKompatibleLehrveranstaltungen: [],
 			statusNew: true,
 			showNotizen: false,
-			currentAnrechnung_id: null
+			currentAnrechnung_id: null,
+			endpoint: ApiNotizPerson
 		}
 	},
 	watch: {
@@ -188,7 +189,9 @@ export default {
 				prestudent_id: this.student.prestudent_id,
 				formData: this.formData
 			};
-			return this.$fhcApi.factory.stv.exemptions.addNewAnrechnung(this.$refs.formExemptions, dataToSend)
+
+			return this.$refs.formExemptions
+				.call(ApiStvExemptions.addNewAnrechnung(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.anrechnungsModal.hide();
@@ -204,7 +207,8 @@ export default {
 				anrechnung_id: anrechnung_id,
 				formData: this.formData
 			};
-			return this.$fhcApi.factory.stv.exemptions.editAnrechnung(this.$refs.formExemptions, dataToSend)
+			return this.$refs.formExemptions
+				.call(ApiStvExemptions.editAnrechnung(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.anrechnungsModal.hide();
@@ -215,22 +219,30 @@ export default {
 					this.reload();
 				});
 		},
-		deleteAnrechnung(anrechnung_id){
+		actionDeleteAnrechnung(anrechnung_id) {
 			this.$fhcAlert
 				.confirmDelete()
 				.then(result => result
 					? anrechnung_id
 					: Promise.reject({handled: true}))
-				.then(this.$fhcApi.factory.stv.exemptions.deleteAnrechnung)
-				.then(result => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-					this.reload();
-				})
+				.then(this.deleteAnrechnung)
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		deleteAnrechnung(anrechnung_id){
+			return this.$api
+				.call(ApiStvExemptions.deleteAnrechnung(anrechnung_id))
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.reload();
+				});
 		},
 		getLvsKompatibel(){
 			if(this.formData.lehrveranstaltung_id) {
-				this.$fhcApi.factory.stv.exemptions.getLvsKompatibel(this.formData.lehrveranstaltung_id)
+				this.$api
+					.call(ApiStvExemptions.getLvsKompatibel(this.formData.lehrveranstaltung_id))
 					.then(result => {
 						this.listKompatibleLehrveranstaltungen = result.data;
 					})
@@ -243,7 +255,8 @@ export default {
 			}
 		},
 		loadAnrechnung(anrechnung_id){
-			return this.$fhcApi.factory.stv.exemptions.loadAnrechnung(anrechnung_id)
+			return this.$api
+				.call(ApiStvExemptions.loadAnrechnung(anrechnung_id))
 				.then(result => {
 					this.formData = result.data;
 					this.getLvsKompatibel();
@@ -263,19 +276,22 @@ export default {
 		}
 	},
 	created() {
-		this.$fhcApi.factory.stv.exemptions.getLehrveranstaltungen(this.student.prestudent_id)
+		this.$api
+			.call(ApiStvExemptions.getLehrveranstaltungen(this.student.prestudent_id))
 			.then(result => {
 				this.listNewLehrveranstaltungen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi.factory.stv.exemptions.getBegruendungen()
+		this.$api
+			.call(ApiStvExemptions.getBegruendungen())
 			.then(result => {
 				this.listBegruendungen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi.factory.stv.exemptions.getLektoren(this.student.studiengang_kz)
+		this.$api
+			.call(ApiStvExemptions.getLektoren(this.student.studiengang_kz))
 			.then(result => {
 				this.listLektoren = result.data;
 			})
@@ -298,7 +314,7 @@ export default {
 								</form-input>
 							</div>
 						<core-notiz
-							:endpoint="$fhcApi.factory.notiz.person"
+							:endpoint="endpoint"
 							ref="formNotes"
 							notiz-layout="popupModal"
 							typeId="anrechnung_id"
