@@ -1,6 +1,7 @@
 <?php
 $this->phrasen['abgabetool/abgabetool']='Abgabetool';
 $this->phrasen['abgabetool/aeltereParbeitBenoten']='Projektarbeit für älteres Semester, bitte Word-Formular zur Benotung verwenden!';
+$this->phrasen['abgabetool/aeltereParbeitBenotenQuickInfo']='Projektarbeit für älteres Semester, bitte Word-Formular zur Benotung verwenden!';
 $this->phrasen['abgabetool/keinEnduploadErfolgt']='Endupload ist noch nicht erfolgt';
 $this->phrasen['abgabetool/typ']='Typ';
 $this->phrasen['abgabetool/titel']='Titel';
