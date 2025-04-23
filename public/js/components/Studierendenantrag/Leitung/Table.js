@@ -3,6 +3,8 @@ import {CoreFetchCmpt} from '../../Fetch.js';
 import LvPopup from './LvPopup.js';
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
+import ApiStudstatusLeitung from '../../../api/factory/studstatus/leitung.js';
+
 export default {
 	components: {
 		BsModal,
@@ -50,12 +52,12 @@ export default {
 		getHistory() {
 			if (this.lastHistoryClickedId === null)
 				return null;
-			return this.$fhcApi.factory
-				.studstatus.leitung.getHistory(this.lastHistoryClickedId)
+			return this.$api
+				.call(ApiStudstatusLeitung.getHistory(this.lastHistoryClickedId))
 				.then(res => {
 					this.historyData = res.data.sort((a, b) => a.insertamum > b.insertamum);
 				})
-				.catch(this.$fhcApi.handleSystemError);
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		getHistoryStatus(data, index) {
 			if (data.insertvon == 'Studienabbruch')
@@ -112,7 +114,8 @@ export default {
 			height: '65vh',
 			layout: "fitDataFill",
 			ajaxURL: '/' + (this.filter || ''),
-			ajaxRequestFunc: this.$fhcApi.factory.studstatus.leitung.getAntraege,
+			ajaxRequestFunc: url => this.$api.call(ApiStudstatusLeitung.getAntraege(url)),
+			ajaxResponse: (url, params, response) => response.data,
 			persistence: { // NOTE(chris): do not store column titles
 				sort: true, //persist column sorting
 				filter: true, //persist filters

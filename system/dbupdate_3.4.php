@@ -61,6 +61,7 @@ require_once('dbupdate_3.4/41134_C4_bookmark_dashboardWidget.php');
 require_once('dbupdate_3.4/28575_softwarebereitstellung.php');
 require_once('dbupdate_3.4/41150_oe-pfad_db_view.php');
 require_once('dbupdate_3.4/44031_stv_favorites.php');
+require_once('dbupdate_3.4/37620_reihungslisten.php');
 require_once('dbupdate_3.4/40896_kennzeichnung_unruly_person.php');
 require_once('dbupdate_3.4/39911_tabulator_in_contentmittitel.php');
 require_once('dbupdate_3.4/25999_C4_permission.php');
@@ -72,6 +73,7 @@ require_once('dbupdate_3.4/53903_valorisierung.php');
 require_once('dbupdate_3.4/55968_index_anrechnung.php');
 require_once('dbupdate_3.4/25999_locale_update.php');
 require_once('dbupdate_3.4/55289_pep_fine_tuning.php');
+require_once('dbupdate_3.4/55614_perm_verwaltetoe.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -190,7 +192,7 @@ $tabellen=array(
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"fue.tbl_scrumteam" => array("scrumteam_kurzbz","bezeichnung","punkteprosprint","tasksprosprint","gruppe_kurzbz"),
 	"fue.tbl_scrumsprint" => array("scrumsprint_id","scrumteam_kurzbz","sprint_kurzbz","sprintstart","sprintende","insertamum","insertvon","updateamum","updatevon"),
-	"hr.tbl_sachaufwand" => array("sachaufwand_id","mitarbeiter_uid","sachaufwandtyp_kurzbz","dienstverhaeltnis_id","beginn","ende","anmerkung","insertamum","insertvon","updateamum","updatevon"),
+	"hr.tbl_sachaufwand" => array("sachaufwand_id","mitarbeiter_uid","sachaufwandtyp_kurzbz","dienstverhaeltnis_id","beginn","ende","anmerkung","insertamum","insertvon","updateamum","updatevon","betrag"),
 	"hr.tbl_sachaufwandtyp" => array("sachaufwandtyp_kurzbz","bezeichnung","sort", "aktiv"),
 	"hr.tbl_stundensatz" => array("stundensatz_id","uid","stundensatztyp","stundensatz","oe_kurzbz","gueltig_von","gueltig_bis","insertamum","insertvon","updateamum","updatevon"),
 	"hr.tbl_stundensatztyp" => array("stundensatztyp","bezeichnung","aktiv","insertamum","insertvon","updateamum","updatevon"),
@@ -211,7 +213,7 @@ $tabellen=array(
 	"hr.tbl_teilzeittyp" => array("teilzeittyp_kurzbz","bezeichnung","aktiv"),
 	"hr.tbl_gehaltsbestandteil" => array("gehaltsbestandteil_id","dienstverhaeltnis_id","vertragsbestandteil_id","gehaltstyp_kurzbz","von","bis","anmerkung","grundbetrag","betrag_valorisiert","valorisierungssperre","insertamum", "insertvon","updateamum","updatevon","valorisierung","auszahlungen"),
 	"hr.tbl_gehaltshistorie" => array("gehaltshistorie_id", "datum","betrag","gehaltsbestandteil_id","mitarbeiter_uid","gehaltsbestandteil_von","gehaltsbestandteil_bis"),
-	"hr.tbl_gehaltstyp" => array("gehaltstyp_kurzbz","bezeichnung","valorisierung","sort","aktiv"),
+	"hr.tbl_gehaltstyp" => array("gehaltstyp_kurzbz","bezeichnung","valorisierung","sort","aktiv","lvexport","lvexport_sum"),
 	"hr.tbl_frist" => array("frist_id","mitarbeiter_uid","ereignis_kurzbz","bezeichnung","datum","status_kurzbz","parameter","insertvon","insertamum","updatevon","updateamum"),
 	"hr.tbl_frist_ereignis" => array("ereignis_kurzbz","bezeichnung","manuell","sort"),
 	"hr.tbl_frist_status" => array("status_kurzbz", "bezeichnung","sort"),
