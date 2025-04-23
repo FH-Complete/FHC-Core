@@ -70,7 +70,7 @@ export default {
 					funktion_kurzbz: section_name,
 					widgets: [widget]
 				}).then(result => {
-					let newId = Object.keys(result.data.retval.data.widgets[section_name]).pop();
+					let newId = Object.keys(result.data.retval.data[section_name].widgets).pop();
 					widget.id = newId;
 					this.sections.forEach(section => {
 						if (section.name == section_name) {
@@ -143,7 +143,7 @@ export default {
 		}
 	},
 	created() {
-
+		this.$p.loadCategory('dashboard');
 		axios.get(this.apiurl + '/Widget/getWidgetsForDashboard', {
 			params: {
 				db: this.dashboard
@@ -159,23 +159,23 @@ export default {
 		axios.get(this.apiurl + '/Config', {params:{
 			db: this.dashboard
 		}}).then(res => {
-			for (var name in res.data.retval.widgets) {
+			for (var name in res.data.retval) {
 				let widgets = [];
 				let remove = [];
-				for (var wid in res.data.retval.widgets[name].widgets) {
-					res.data.retval.widgets[name].widgets[wid].id = wid;
-					if (res.data.retval.widgets[name].widgets[wid].custom || res.data.retval.widgets[name].widgets[wid].preset)
-						widgets.push(res.data.retval.widgets[name].widgets[wid]);
+				for (var wid in res.data.retval[name].widgets) {
+					res.data.retval[name].widgets[wid].id = wid;
+					if (res.data.retval[name].widgets[wid].custom || res.data.retval[name].widgets[wid].preset)
+						widgets.push(res.data.retval[name].widgets[wid]);
 					else
 						remove.push(wid);
 				}
 				this.sections.push({
 					name: name,
-					description:res.data.retval.widgets[name].description,
 					widgets: widgets
 				});
 				remove.forEach(wid => this.widgetRemove(name, wid));
 			}
+			this.sections = this.sections.sort((section1, section2) => section2.widgets.length - section1.widgets.length);
 		}).catch(err => console.error('ERROR:', err));
 	},
 	async beforeMount() {
@@ -190,7 +190,7 @@ export default {
 			{{ $p.t('global/personalGreeting', [ viewDataInternal?.name ]) }}
 			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
 		</h3>
-		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :description="section.description" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
+		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
 		<dashboard-widget-picker ref="widgetpicker" :widgets="widgets"></dashboard-widget-picker>
 	</div>`
 }

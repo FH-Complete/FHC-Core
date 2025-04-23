@@ -14,8 +14,8 @@ export default {
 	},
 	inject: {
 		widgetsSetup:{
-			type: Object,
-			default: {},
+			type: Array,
+			default: [],
 		},
 		adminMode: {
 			type: Boolean,
@@ -28,8 +28,7 @@ export default {
 	},
 	props: [
 		"name",
-		"widgets",
-		"description"
+		"widgets"
 	],
 	emits: [
 		"widgetAdd",
@@ -86,7 +85,7 @@ export default {
 				if(!item?.widgetid && item?.id){
 					item.widgetid = item.id;
 				}
-				return { ...item, ...(item.place[this.gridWidth] || { x: 0, y: 0, w: 1, h: 1 } )};
+				return { ...item, reorder: false, ...(item.place[this.gridWidth] || { reorder: true, ...{ x: 0, y: 0, w: 1, h: 1 } })};
 			});
 			return placedItems;
 			
@@ -94,8 +93,29 @@ export default {
 		
 	},
 	methods: {
+		sectionNameTranslation(){
+			switch(this.name){
+				case "general": 
+					return this.$p.t('dashboard',this.name); 
+					break;
+				case "custom":
+					return this.$p.t('dashboard',this.name);
+					break;
+				default:
+					return this.name;
+					break;
+			}
+		},
 		showSectionInformation(){
-			SectionModal.popup(this.description);
+			if (this.name == "general"){
+				SectionModal.popup(this.$p.t('dashboard', 'dashboardGeneralSectionDescription')); 
+			}
+			else if(this.name == "custom"){
+				SectionModal.popup(this.$p.t('dashboard', 'dashboardCustomSectionDescription'));
+			}
+			else{
+				SectionModal.popup(this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]));
+			}
 		},
 		handleConfigOpened() {
 			this.configOpened = true
@@ -189,11 +209,11 @@ export default {
 		});
 	},
 	template: `
-	<h4 v-if="items.length>0 && editMode" >
+	<h4 v-if="editModeIsActive" class=" mb-0">
 		<i @click="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
-		{{name}}:
+		{{sectionNameTranslation()}}:
 	</h4>
-	<div class="dashboard-section position-relative pb-3 border-1" ref="container" :style="getSectionStyle">
+	<div class="dashboard-section position-relative pb-3 border-bottom" ref="container" :style="getSectionStyle">
 		<drop-grid v-model:cols="gridWidth" :items="items" :itemsSetup="computedWidgetsSetup" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @draggedItem="draggedItem=$event" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item">
 				<div v-if="item.placeholder" class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
@@ -204,12 +224,12 @@ export default {
 					:widgetID="item.id"
 					:width="item.w"
 					:height="item.h"
-					:item_data="{config:item.config, custom:item.custom, h:item.h, w:item.w,id:item.id,place:item.place,widget:item.widget,widgetid:item.widgetid,x:item.x,y:item.y}"
+					:item_data="{config:item.config, custom:item.custom, h:item.h, w:item.w,id:item.id,reorder:item.reorder,place:item.place,widget:item.widget,widgetid:item.widgetid,x:item.x,y:item.y}"
 					:loading="item.loading"
 					:config="item.config"
 					:custom="item.custom"
 					:hidden="item.hidden"
-					:editMode="editMode"
+					:editMode="editModeIsActive"
 					:place="item.place[gridWidth]"
 					:setup="computedWidgetsSetup[item.widget]"
 					@change="saveConfig($event, item)"

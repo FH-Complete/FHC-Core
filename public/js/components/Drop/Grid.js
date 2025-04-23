@@ -614,7 +614,7 @@ export default {
 		<TransitionGroup tag="div">
 			<grid-item
 				ref="gridItems"
-				v-for="(item,index) in (mode == 0 && active ? placedItems_withPlaceholders : placedItems)"
+				v-for="(item,index) in ((mode != 1 || mode != 2) && active ? placedItems_withPlaceholders : placedItems)"
 				:key="item.data.id"
 				:item="item"
 				@start-move="startMove"
