@@ -74,7 +74,11 @@ export const CoreFilterCmpt = {
 		// TODO soll im master kommen?
 		idField: String,
 		parentIdField: String,
-		countOnly: Boolean
+		countOnly: Boolean,
+		useSelectionSpan: {
+			type: Boolean,
+			default: true
+		}
 	},
 	data: function() {
 		return {
@@ -613,7 +617,7 @@ export const CoreFilterCmpt = {
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
 						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
 					</button>
-					<span v-if="$slots.actions && tabulatorHasSelector">
+					<span v-if="$slots.actions && tabulatorHasSelector && useSelectionSpan">
 						<span v-if="countOnly">{{ selectedData.length }} ausgewählt</span>
 						<span v-else> Mit {{ selectedData.length }} ausgewählten:</span>
 					</span>

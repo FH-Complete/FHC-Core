@@ -1,11 +1,9 @@
-import Upload from '../../../components/Form/Upload/Dms.js';
 import BsModal from '../../Bootstrap/Modal.js';
 
 const today = new Date()
-export const AbgabeDetail = {
-	name: "AbgabeDetail",
+export const AbgabeMitarbeiterDetail = {
+	name: "AbgabeMitarbeiterDetail",
 	components: {
-		Upload,
 		BsModal,
 		InputNumber: primevue.inputnumber,
 		Checkbox: primevue.checkbox,
@@ -35,6 +33,15 @@ export const AbgabeDetail = {
 		}
 	},
 	methods: {
+		openZusatzdatenModal(termin) {
+				
+		},
+		save(termin) {
+			// TODO: api speichern termin	
+		},
+		delete(termin) {
+			// TODO: api delete termin	
+		},
 		validate: function(termin) {
 			if(!termin.file.length) {
 				this.$fhcAlert.alertWarning(this.$p.t('global/warningChooseFile'));
@@ -43,79 +50,8 @@ export const AbgabeDetail = {
 
 			return true;
 		},
-		triggerEndupload() {
-			if (!this.validate(this.enduploadTermin))
-			{
-				return false;
-			}
-			
-			// post endabgabe
-			const formData = new FormData();
-			formData.append('paabgabetyp_kurzbz', this.enduploadTermin.paabgabetyp_kurzbz)
-			formData.append('projektarbeit_id', this.enduploadTermin.projektarbeit_id);
-			formData.append('paabgabe_id', this.enduploadTermin.paabgabe_id)
-			formData.append('student_uid', this.projektarbeit.student_uid)
-			formData.append('bperson_id', this.projektarbeit.bperson_id)
-			
-			// TODO: validate/check for null etc.
-			formData.append('sprache', this.form['sprache'].sprache)
-			formData.append('abstract', this.form['abstract'])
-			formData.append('abstract_en', this.form['abstract_en'])
-			formData.append('schlagwoerter', this.form['schlagwoerter'])
-			formData.append('schlagwoerter_en', this.form['schlagwoerter_en'])
-			formData.append('seitenanzahl', this.form['seitenanzahl'])
-			
-			for (let i = 0; i < this.enduploadTermin.file.length; i++) {
-				formData.append('file', this.enduploadTermin.file[i]);
-			}
-			this.$fhcApi.factory.lehre.postStudentProjektarbeitEndupload(formData)
-				.then(res => {
-					this.handleUploadRes(res)
-				})
-			
-			this.$refs.modalContainerEnduploadZusatzdaten.hide()
-		},
 		downloadAbgabe(termin) {
 			this.$fhcApi.factory.lehre.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid)
-		},
-		upload(termin) {
-
-			if (!this.validate(termin))
-			{
-				return false;
-			}
-			
-			if(termin.bezeichnung === 'Endupload') {
-				// open endupload form modal for further inputs
-				this.enduploadTermin = termin
-				this.$refs.modalContainerEnduploadZusatzdaten.show()
-			} else {
-				const formData = new FormData();
-				formData.append('paabgabetyp_kurzbz', termin.paabgabetyp_kurzbz)
-				formData.append('projektarbeit_id', this.projektarbeit.projektarbeit_id)
-				formData.append('paabgabe_id', termin.paabgabe_id)
-				formData.append('student_uid', this.projektarbeit.student_uid)
-				formData.append('bperson_id', this.projektarbeit.bperson_id)
-				
-				for (let i = 0; i < termin.file.length; i++) {
-					formData.append('file', termin.file[i]);
-				}
-				this.$fhcApi.factory.lehre.postStudentProjektarbeitZwischenabgabe(formData)
-					.then(res => {
-						this.handleUploadRes(res)
-					})
-			}
-		},
-		handleUploadRes(res) {
-			if(res.meta.status == "success") {
-				this.$fhcAlert.alertSuccess('File erfolgreich hochgeladen')
-			} else {
-				this.$fhcAlert.alertError('File upload error')
-			}
-			
-			if(res.meta.signaturInfo) {
-				this.$fhcAlert.alertInfo(res.meta.signaturInfo)
-			}
 		},
 		dateDiffInDays(datum, today){
 			const oneDayMs = 1000 * 60 * 60 * 24
@@ -124,7 +60,7 @@ export const AbgabeDetail = {
 		getDateStyle(termin) {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
-			
+
 			// todo: rework styling but keep the color pattern logic
 			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
 			let color = 'white'
@@ -142,7 +78,7 @@ export const AbgabeDetail = {
 			} else {
 				color = 'green'
 			}
-			
+
 			return 'font-color: ' + fontColor + '; background-color: ' + color
 		},
 		openBeurteilungLink(link) {
@@ -181,10 +117,11 @@ export const AbgabeDetail = {
 	template: `
 		<div v-if="projektarbeit">
 		
-			<h5>{{$p.t('abgabetool/c4abgabeStudentenbereich')}}</h5>
+			<h5>{{$p.t('abgabetool/c4abgabeMitarbeiterbereich')}}</h5>
 			<div class="row">
-				<p> {{projektarbeit?.betreuer}}</p>
+				<p> {{projektarbeit?.student}}</p>
 				<p> {{projektarbeit?.titel}}</p>
+				<p v-if="projektarbeit?.zweitbegutachter"> {{projektarbeit?.zweitbegutachter}}</p>
 			</div>
 			<div id="uploadWrapper">
 				<div class="row" style="margin-bottom: 12px;">
@@ -194,46 +131,60 @@ export const AbgabeDetail = {
 					<div class="col-2">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 					<div class="col-1">{{$p.t('abgabetool/c4abgabedatum')}}</div>
 					<div class="col">
-						{{$p.t('abgabetool/c4fileupload')}}
+						
 					</div>
 				</div>
+<!--			TODO: show some nothing found placeholder when abgabetermine are empty -->
 				<div class="row" v-for="termin in projektarbeit.abgabetermine">
 					<div style="width: 100px" class="d-flex justify-content-center align-items-center">
 						<p class="fhc-bullet" :class="{ 'fhc-bullet-red': termin.fixtermin, 'fhc-bullet-green': !termin.fixtermin }"></p>
 					</div>
 					<div class="col-1 d-flex justify-content-center align-items-center">
 						<div :style="getDateStyle(termin)">
+<!--							TODO: date input-->
 							{{ termin.datum?.split("-").reverse().join(".") }}
 						</div>				
 					</div>
-					<div class="col-1 d-flex justify-content-center align-items-center">{{ termin.bezeichnung }}</div>
-					<div class="col-2 d-flex justify-content-center align-items-center">{{ termin.kurzbz }}</div>
+					<div class="col-1 d-flex justify-content-center align-items-center">
+					<!-- TODO: type dropdown select -->
+							{{ termin.bezeichnung }}
+					</div>
+					<div class="col-2 d-flex justify-content-center align-items-center">
+						<!-- TODO: abgabe kurzbz input -->
+						{{ termin.kurzbz }}
+					</div>
 					<div class="col-1 d-flex justify-content-center align-items-center">
 						{{ termin.abgabedatum?.split("-").reverse().join(".") }}
-						<a v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" style="cursor: pointer;">
+						<a v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" style="margin-left:4px; cursor: pointer;">
 							<i class="fa-solid fa-file-pdf"></i>
 						</a>
 					</div>
 					<div class="col-6">
 						<div class="row">
-							<div class="col-6">
-								<Upload v-if="termin && termin.allowedToUpload" accept=".pdf" v-model="termin.file"></Upload>
+							<div class="col-3">
+								<button class="btn btn-primary border-0" @click="save(termin)" :disabled="!termin.allowedToUpload">
+									Speichern
+									<i style="margin-left: 8px" class="fa-solid fa-floppy-disk"></i>
+								</button>
 							</div>
-							<div class="col-6">
-								<button class="btn btn-primary border-0" @click="upload(termin)" :disabled="!termin.allowedToUpload">
-									Upload
-									<i style="margin-left: 8px" class="fa-solid fa-upload"></i>
+							<div class="col-3">
+								<button class="btn btn-primary border-0" @click="delete(termin)" :disabled="!termin.allowedToUpload">
+									Löschen
+									<i style="margin-left: 8px" class="fa-solid fa-trash"></i>
+								</button>
+							</div>
+							<div v-if="termin.endupload && hasFile" class="col-3">
+								<button class="btn btn-primary border-0" @click="openZusatzdatenModal(termin)" :disabled="!termin.allowedToUpload">
+									Löschen
+									<i style="margin-left: 8px" class="fa-solid fa-trash"></i>
 								</button>
 							</div>
 						</div>
-						
-						
 					</div>
 				</div>
 			</div>
 		 </div>
-	 	
-	 	<bs-modal ref="modalContainerEnduploadZusatzdaten" class="bootstrap-prompt" dialogClass="modal-lg">
+		 <bs-modal ref="modalContainerEnduploadZusatzdaten" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template v-slot:title>
 				<div>
 					{{$p.t('abgabetool/c4enduploadZusatzdaten')}}
@@ -262,15 +213,12 @@ export const AbgabeDetail = {
 					</div>
 				</div>
 				
-<!--				 lektor fills these out-->
-<!--				<div class="row mb-3 align-items-center">-->
-<!--					<div class="row">Kontrollierte Schlagwörter</div>-->
-<!--					<div class="row">-->
-<!--						<Textarea v-model="form.kontrollschlagwoerter"></Textarea>-->
-<!--					</div>-->
-<!--					-->
-<!--				-->
-<!--				</div>-->
+				<div class="row mb-3 align-items-center">
+					<div class="row">Kontrollierte Schlagwörter</div>
+					<div class="row">
+						<Textarea v-model="form.kontrollschlagwoerter"></Textarea>
+					</div>
+				</div>
 				<div class="row mb-3 align-items-center">
 					<div class="row">{{$p.t('abgabetool/c4schlagwoerterGer')}}</div>
 					<div class="row">
@@ -331,8 +279,8 @@ export const AbgabeDetail = {
 				<button class="btn btn-primary" :disabled="getEnduploadErlaubt" @click="triggerEndupload">{{$p.t('ui/hochladen')}}</button>
 			</template>
 		</bs-modal>
-	 	
-    `,
+
+`,
 };
 
-export default AbgabeDetail;
+export default AbgabeMitarbeiterDetail;

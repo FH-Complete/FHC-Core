@@ -11,7 +11,8 @@ import CmsNews from "../../components/Cis/Cms/News.js";
 import CmsContent from "../../components/Cis/Cms/Content.js";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
 import RoomInformation, { DEFAULT_MODE_RAUMINFO } from "../../components/Cis/Mylv/RoomInformation.js";
-import Abgabetool from "../../components/Cis/Abgabetool/Abgabetool";
+import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent.js";
+import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -31,9 +32,15 @@ const router = VueRouter.createRouter({
 			props: true
 		},
 		{
-			path: `/Cis/Abgabetool`,
-			name: 'Abgabetool',
-			component: Abgabetool,
+			path: `/Cis/Abgabetool/Student`,
+			name: 'AbgabetoolStudent',
+			component: AbgabetoolStudent,
+			props: true
+		},
+		{
+			path: `/Cis/Abgabetool/Mitarbeiter`,
+			name: 'AbgabetoolMitarbeiter',
+			component: AbgabetoolMitarbeiter,
 			props: true
 		},
 		{
@@ -210,8 +217,6 @@ const router = VueRouter.createRouter({
 		},
 	]
 })
-
-
 
 const app = Vue.createApp({
 	name: 'FhcApp',

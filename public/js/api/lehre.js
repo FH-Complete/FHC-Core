@@ -48,5 +48,11 @@ export default {
 		const url = `/Cis/Abgabetool/getStudentProjektarbeitAbgabeFile?paabgabe_id=${paabgabe_id}&student_uid=${student_uid}`;
 
 		window.location = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url
+	},
+	getMitarbeiterProjektarbeiten(uid, all) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Lehre/getMitarbeiterProjektarbeiten?showall=${all}`
+			, {}
+		);
 	}
   }

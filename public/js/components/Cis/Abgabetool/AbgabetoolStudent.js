@@ -1,8 +1,8 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
-import AbgabeDetail from "./AbgabeDetail";
+import AbgabeDetail from "./AbgabeStudentDetail.js";
 
-export const Abgabetool = {
-	name: "Abgabetool",
+export const AbgabetoolStudent = {
+	name: "AbgabetoolStudent",
 	components: {
 		VueDatePicker,
 		CoreFilterCmpt,
@@ -33,8 +33,8 @@ export const Abgabetool = {
 				layout: 'fitColumns',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4details')), formatter: this.detailFormatter, field: 'details', widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4beurteilung')), formatter: this.beurteilungFormatter, field: 'beurteilung', widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4details')), field: 'details', formatter: this.detailFormatter, widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4beurteilung')), field: 'beurteilung', formatter: this.beurteilungFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'sem', formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg', formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4kontakt')), field: 'mail', formatter: this.mailFormatter, widthGrow: 1},
@@ -233,4 +233,4 @@ export const Abgabetool = {
     `,
 };
 
-export default Abgabetool;
+export default AbgabetoolStudent;

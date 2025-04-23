@@ -13,8 +13,10 @@ class Abgabetool extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => ['basis/cis:r'],
-			'getStudentProjektarbeitAbgabeFile' => ['basis/cis:r']
+			'index' => self::PERM_LOGGED,
+			'getStudentProjektarbeitAbgabeFile' => self::PERM_LOGGED,
+			'Mitarbeiter' => self::PERM_LOGGED,
+			'Student' => self::PERM_LOGGED
 		]);
 	}
 
@@ -33,7 +35,28 @@ class Abgabetool extends Auth_Controller
 
 		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Abgabetool']);
 	}
-	
+
+	public function Student()
+	{
+
+		$viewData = array(
+			'uid'=>getAuthUID(),
+		);
+
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Abgabetool']);
+	}
+
+	public function Mitarbeiter()
+	{
+
+		$viewData = array(
+			'uid'=>getAuthUID(),
+		);
+
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Abgabetool']);
+	}
+
+
 	public function getStudentProjektarbeitAbgabeFile() 
 	{
 		$this->_ci =& get_instance();

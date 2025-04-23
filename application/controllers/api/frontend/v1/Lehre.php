@@ -42,7 +42,8 @@ class Lehre extends FHCAPI_Controller
 			'getStudentProjektarbeiten' => self::PERM_LOGGED, // TODO: abgabetool berechtigung?
 			'getStudentProjektabgaben' => self::PERM_LOGGED,
 			'postStudentProjektarbeitZwischenabgabe' => self::PERM_LOGGED,
-			'postStudentProjektarbeitEndupload' => self::PERM_LOGGED
+			'postStudentProjektarbeitEndupload' => self::PERM_LOGGED,
+			'getMitarbeiterProjektarbeiten' => self::PERM_LOGGED
 		]);
 
 		$this->load->library('PhrasesLib');
@@ -442,6 +443,35 @@ class Lehre extends FHCAPI_Controller
 				}
 			}
 		}
+	}
+
+	public function getMitarbeiterProjektarbeiten() {
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+
+//		if (!isset($uid) || isEmptyString($uid))
+//			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+
+		$boolParamStr = $this->input->get('showall');
+		$trueStrings = ['true', '1'];
+		$falseStrings = ['false', '0'];
+
+		// Handle missing or invalid parameter
+		if ($boolParamStr === null) {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+		$boolParamStrLower = strtolower($boolParamStr);
+
+		if (in_array($boolParamStrLower, $trueStrings, true)) {
+			$showAllBool = true;
+		} elseif (in_array($boolParamStrLower, $falseStrings, true)) {
+			$showAllBool = false;
+		} else {
+//			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+		
+		$projektarbeiten = $this->ProjektarbeitModel->getMitarbeiterProjektarbeiten(getAuthUID(), $showAllBool);
+		
+		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
 	}
 }
 

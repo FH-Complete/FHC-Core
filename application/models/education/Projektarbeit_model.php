@@ -211,4 +211,34 @@ class Projektarbeit_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, array($studentUID, $maUID));
 	}
+	
+	public function getMitarbeiterProjektarbeiten($uid, $showAll){
+		$qry = "SELECT
+					*
+				FROM
+					(SELECT tbl_person.vorname, tbl_person.nachname, tbl_studiengang.typ, tbl_studiengang.kurzbz,
+							tbl_projektarbeit.projekttyp_kurzbz, tbl_projekttyp.bezeichnung, tbl_projektarbeit.titel, tbl_projektarbeit.projektarbeit_id,
+							tbl_projektbetreuer.betreuerart_kurzbz, tbl_betreuerart.beschreibung AS betreuerart_beschreibung,
+							tbl_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz
+					 FROM lehre.tbl_projektarbeit
+							  LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id)
+							  LEFT JOIN lehre.tbl_betreuerart using(betreuerart_kurzbz)
+							  LEFT JOIN public.tbl_benutzer on(uid=student_uid)
+							  LEFT JOIN public.tbl_student on(public.tbl_benutzer.uid=public.tbl_student.student_uid)
+							  LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
+							  LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
+							  LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
+							  LEFT JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz=public.tbl_studiengang.studiengang_kz)
+							  LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
+					 WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
+					   AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer
+															 WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id
+															   AND public.tbl_benutzer.uid= ? )
+						 ".($showAll?'':' AND public.tbl_benutzer.aktiv AND lehre.tbl_projektarbeit.note IS NULL ')."
+							AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Zweitbegutachter', 'Erstbetreuer', 'Senatsvorsitz', 'Senatsmitglied')
+					 ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy
+				ORDER BY nachname;";
+
+		return $this->execReadOnlyQuery($qry, array($uid));
+	}
 }
