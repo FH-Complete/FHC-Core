@@ -3,6 +3,9 @@ import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from "../../../../Form/Form.js";
 import FormInput from "../../../../Form/Input.js";
 
+import ApiStvJointstudies from '../../../../../api/factory/stv/jointstudies.js';
+import ApiStvMobility from "../../../../../api/factory/stv/mobility";
+
 export default {
 	name: 'Tbl_JointStudies',
 	components: {
@@ -23,12 +26,9 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.jointstudies.getStudies,
-				ajaxParams: () => {
-					return {
-						id: this.student.prestudent_id
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					ApiStvJointstudies.getStudies(this.student.prestudent_id)
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "mobilitaet_id", field: "mobilitaet_id", visible: false},
@@ -217,7 +217,8 @@ export default {
 				prestudent_id: this.student.prestudent_id,
 				formData: this.formData
 			};
-			return this.$fhcApi.factory.stv.jointstudies.insertStudy(this.$refs.formJointStudies, data)
+			return this.$refs.formJointStudies
+				.call(ApiStvJointstudies.insertStudy(data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal("jointstudyModal");
@@ -233,7 +234,8 @@ export default {
 				prestudent_id: this.student.prestudent_id,
 				formData: this.formData
 			};
-			return this.$fhcApi.factory.stv.jointstudies.updateStudy(this.$refs.formJointStudies, data)
+			return this.$refs.formJointStudies
+				.call(ApiStvJointstudies.updateStudy(data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal("jointstudyModal");
@@ -245,14 +247,16 @@ export default {
 				});
 		},
 		loadJointStudy(mobilitaet_id) {
-			return this.$fhcApi.factory.stv.jointstudies.loadStudy(mobilitaet_id)
+			return this.$api
+				.call(ApiStvJointstudies.loadStudy(mobilitaet_id))
 				.then(result => {
 					this.formData = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		deleteJointStudy(mobilitaet_id) {
-			return this.$fhcApi.factory.stv.jointstudies.deleteStudy(mobilitaet_id)
+			return this.$api
+				.call(ApiStvJointstudies.deleteStudy(mobilitaet_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				})
@@ -276,32 +280,38 @@ export default {
 		}
 	},
 	created(){
-		this.$fhcApi.factory.stv.jointstudies.getTypenMobility()
+		this.$api
+			.call(ApiStvJointstudies.getTypenMobility())
 			.then(result => {
 				this.listTypenMobility = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.jointstudies.getStudiensemester()
+		this.$api
+			.call(ApiStvJointstudies.getStudiensemester())
 			.then(result => {
 				this.listStudiensemester = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.mobility.getProgramsMobility()
+		this.$api
+			.call(ApiStvMobility.getProgramsMobility())
 			.then(result => {
 				this.programsMobility = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.jointstudies.getStudyprograms()
+		this.$api
+			.call(ApiStvJointstudies.getStudyprograms())
 			.then(result => {
 				this.listStudienprogramme = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.jointstudies.getListPartner()
+		this.$api
+			.call(ApiStvJointstudies.getListPartner())
 			.then(result => {
 				this.listPartner = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.jointstudies.getStatiPrestudent()
+		this.$api
+			.call(ApiStvJointstudies.getStatiPrestudent())
 			.then(result => {
 				this.statiPrestudent = result.data;
 			})
