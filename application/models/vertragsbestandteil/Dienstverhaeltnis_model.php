@@ -59,7 +59,7 @@ class Dienstverhaeltnis_model extends DB_Model
 		}
 
 		$qry .="
-        ORDER BY dv.von desc
+        ORDER BY COALESCE(dv.bis, '2999-12-31'::date) DESC, dv.von DESC
         ";
 
         return $this->execQuery($qry, $data);
