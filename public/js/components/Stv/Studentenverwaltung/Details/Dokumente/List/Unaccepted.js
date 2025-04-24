@@ -2,6 +2,8 @@ import {CoreFilterCmpt} from "../../../../../filter/Filter.js";
 import ModalEdit from "../Modal/Edit.js";
 import ModalUpload from "../Modal/Upload.js";
 
+import ApiStvDocuments from "../../../../../../api/factory/stv/documents.js";
+
 export default {
 	name: "UnacceptedDocuments",
 	components: {
@@ -17,13 +19,11 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.documents.getDocumentsUnaccepted,
-				ajaxParams: () => {
-					return {
+				ajaxRequestFunc: () => this.$api.call(
+					ApiStvDocuments.getDocumentsUnaccepted({
 						id: this.prestudent_id,
-						studiengang_kz: this.studiengang_kz
-					};
-				},
+						studiengang_kz: this.studiengang_kz})
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Dokument", field: "bezeichnung"},
@@ -252,10 +252,12 @@ export default {
 			Promise
 				.allSettled(
 					selected.map(e =>
-						this.$fhcApi.factory.stv.documents.createZuordnung({
+						this.$api
+							.call(ApiStvDocuments.createZuordnung({
 								prestudent_id: this.prestudent_id,
-								dokument_kurzbz: e.dokument_kurzbz,
-							}).then(() => ({
+								dokument_kurzbz: e.dokument_kurzbz
+							}))
+							.then(() => ({
 							success: true,
 							dokument_bz: e.bezeichnung
 						}))

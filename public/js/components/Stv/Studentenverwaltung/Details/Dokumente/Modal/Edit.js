@@ -2,6 +2,8 @@ import BsModal from "../../../../../Bootstrap/Modal.js";
 import FormForm from "../../../../../Form/Form.js";
 import FormInput from "../../../../../Form/Input.js";
 
+import ApiStvDocuments from "../../../../../../api/factory/stv/documents.js";
+
 export default {
 	name: "modalEditDocuments",
 	components: {
@@ -17,10 +19,9 @@ export default {
 	},
 	methods: {
 		updateFile(akte_id){
-			console.log("in update" + akte_id);
-
-			this.$fhcApi.factory.stv.documents.updateFile(akte_id, this.formData).
-			then(response => {
+			this.$api
+				.call(ApiStvDocuments.updateFile(akte_id, this.formData))
+				.then(response => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 				this.$refs.modalEditDocument.hide();
 				this.$emit('reload');
@@ -32,7 +33,8 @@ export default {
 			this.$refs.modalEditDocument.show();
 		},
 		loadFormData(akte_id){
-			return this.$fhcApi.factory.stv.documents.loadAkte(akte_id)
+			return	this.$api
+				.call(ApiStvDocuments.loadAkte(akte_id))
 				.then(result => {
 					this.formData = result.data;
 					return result;
@@ -41,7 +43,8 @@ export default {
 		}
 	},
 	created(){
-		this.$fhcApi.factory.stv.documents.getDoktypen()
+		this.$api
+			.call(ApiStvDocuments.getDoktypen())
 			.then(result => {
 				this.listDokTypen = result.data;
 			})

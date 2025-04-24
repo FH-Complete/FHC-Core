@@ -3,6 +3,8 @@ import FormForm from "../../../../../Form/Form.js";
 import FormInput from "../../../../../Form/Input.js";
 import FormUploadDms from "../../../../../Form/Upload/Dms.js";
 
+import ApiStvDocuments from "../../../../../../api/factory/stv/documents.js";
+
 export default {
 	name: "modalUploadDocuments",
 	components: {
@@ -23,15 +25,14 @@ export default {
 	},
 	methods:{
 		open(prestudent_id, dokument_kurzbz){
-			console.log("ps: " + prestudent_id + 'dok: ' + dokument_kurzbz);
 			this.formData.dokument_kurzbz = dokument_kurzbz;
 			this.formData.prestudent_id = prestudent_id;
 			this.$refs.modalUploadFile.show();
 		},
 		uploadFile(){
-			console.log(this.formData.anhang[0]);
-
-			return this.$fhcApi.factory.stv.documents.uploadFile(this.formData.prestudent_id, this.formData)
+		//	console.log(this.formData.anhang[0]);
+			return this.$api
+				.call(ApiStvDocuments.uploadFile(this.formData.prestudent_id, this.formData))
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successUpload'));
 					this.resetModal();
@@ -48,7 +49,8 @@ export default {
 		}
 	},
 	created(){
-		this.$fhcApi.factory.stv.documents.getDoktypen()
+		this.$api
+			.call(ApiStvDocuments.getDoktypen())
 			.then(result => {
 				this.listDokTypen = result.data;
 			})
