@@ -10,6 +10,8 @@ import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 
+import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+
 export default {
 	components: {
 		CoreFilterCmpt,
@@ -162,7 +164,8 @@ export default {
 		hideEditProfilModal: function () {
 			//? checks the editModal component property result, if the user made a successful request or not
 			if (this.$refs.editModal.result) {
-				this.$fhcApi.factory.profilUpdate.selectProfilRequest()
+				this.$api
+					.call(ApiProfilUpdate.selectProfilRequest())
 					.then((request) => {
 						if (!request.error && request) {
 							this.data.profilUpdates = request.data;
@@ -195,13 +198,15 @@ export default {
 		},
 
 		fetchProfilUpdates: function () {
-			this.$fhcApi.factory.profilUpdate.selectProfilRequest().then((res) => {
-				if (!res.error && res) {
-					this.data.profilUpdates = res.data?.length
-						? res.data.sort(this.sortProfilUpdates)
-						: null;
-				}
-			});
+			this.$api
+				.call(ApiProfilUpdate.selectProfilRequest())
+				.then((res) => {
+					if (!res.error && res) {
+						this.data.profilUpdates = res.data?.length
+							? res.data.sort(this.sortProfilUpdates)
+							: null;
+					}
+				});
 		},
 		setTableColumnTitles() { // reevaluates computed phrasen
 			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
