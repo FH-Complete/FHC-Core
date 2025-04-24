@@ -118,11 +118,6 @@ export default {
 				...params
 			};
 			data.append('data', JSON.stringify(merged));
-
-			//this.uid is necessary for existing sendFunction
-/*			return this.$fhcApi.factory.messages.person.sendMessage(
-				this.uid,
-				data)*/
 			return this.$api
 				.call(ApiMessages.sendMessage(this.uid, data))
 				.then(response => {
@@ -143,7 +138,6 @@ export default {
 				);
 		},
 		getVorlagentext(vorlage_kurzbz){
-		//	return this.$fhcApi.factory.messages.person.getVorlagentext(vorlage_kurzbz)
 			return this.$api
 				.call(ApiMessages.getVorlagentext(vorlage_kurzbz))
 				.then(response => {
@@ -157,9 +151,6 @@ export default {
 			const data = new FormData();
 
 			data.append('data', JSON.stringify(this.formData.body));
-/*			return this.$fhcApi.factory.messages.person.getPreviewText({
-				id: id,
-				type_id: typeId}, data)*/
 			return this.$api
 				.call(ApiMessages.getPreviewText({
 					id: this.id,
@@ -174,7 +165,6 @@ export default {
 		insertVariable(selectedItem){
 			if (this.editor) {
 				this.editor.insertContent(selectedItem.value + " ");
-			//	this.editor.insertContent(selectedItem.value + ". ");
 				//TODO(Manu) check: Laden von Variblen geht nicht wenn kein Zeichen danach kommt
 				// nicht mal mit Punkt adden gehts ohne eintrag nach vars
 								//this.editor.focus();
@@ -272,7 +262,7 @@ export default {
 					id: this.id,
 					type_id: this.typeId
 				};
-			//	this.$fhcApi.factory.messages.person.getMessageVarsPerson(params)
+
 				this.$api
 				.call(ApiMessages.getMessageVarsPerson(params))
 					.then(result => {
@@ -291,7 +281,6 @@ export default {
 				id: this.id,
 				type_id: this.typeId
 			};
-			//this.$fhcApi.factory.messages.person.getMsgVarsPrestudent(params)
 			this.$api
 				.call(ApiMessages.getMsgVarsPrestudent(params))
 				.then(result => {

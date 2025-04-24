@@ -241,7 +241,6 @@ export default {
 				if (!newMessageId) return;
 
 				try {
-					//const result = await this.$fhcApi.factory.messages.person.getReplyData(newMessageId);
 					const result = await this.$api.call(ApiMessages.getReplyData(newMessageId));
 					this.replyData = result.data;
 
@@ -264,7 +263,6 @@ export default {
 				id: this.id,
 				type_id: this.typeId
 			};
-			//this.$fhcApi.factory.messages.person.getMessageVarsPerson(params)
 			this.$api
 				.call(ApiMessages.getMessageVarsPerson(params))
 				.then(result => {

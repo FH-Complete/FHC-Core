@@ -16,9 +16,7 @@
  */
 
 export default {
-	//TODO(manu) check how to get params size and page
 	getMessages(params) {
-		console.log('page ' + params.page + ' size ' + params.size);
 		return {
 			method: 'get',
 			url: 'api/frontend/v1/messages/messages/getMessages/'

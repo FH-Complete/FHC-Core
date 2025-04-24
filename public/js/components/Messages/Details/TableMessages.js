@@ -29,30 +29,17 @@ export default {
 	},
 	data(){
 		return {
-/*			paginationSize: 15,
-			paginationInitialPage: 1,*/
+			pageNo: 1,
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				//TODO(Manu) how to handle size and page?
-/*				ajaxRequestFunc: () => this.$api.call(
-					ApiMessages.getMessages({
-						id: this.id,
-						type: this.typeId,
-						size: this.paginationSize,
-						page: this.paginationInitialPage
-					})
-				),*/
-		//OLD WORKING VERSION
-				ajaxRequestFunc: this.$fhcApi.factory.messages.person.getMessages,
+				ajaxRequestFunc: this.loadAjaxCall,
 				ajaxParams: () => {
 					return {
 						id: this.id,
 						type: this.typeId
 					};
 				},
-
 				ajaxResponse: (url, params, response) => this.buildTreemap(response),
-				//ajaxResponse: (url, params, response) => this.buildTreemap(response.data),
 				columns: [
 					{title: "subject", field: "subject"},
 					{title: "body", field: "body", visible: false},
@@ -220,6 +207,12 @@ export default {
 							this.previewBody = body;
 					}
 				},
+				{
+					event: 'pageLoaded',
+					handler: (pageno) => {
+						this.pageNo = pageno+1;
+					}
+				}
 			],
 			previewBody: "",
 			open: false,
@@ -296,6 +289,16 @@ export default {
 			if (iteration > messages.length) break;
 			}
 		return {data: messageNested, last_page};
+		},
+		loadAjaxCall(params){
+			return this.$api.call(
+				ApiMessages.getMessages({
+					id: this.id,
+					type: this.typeId,
+					size: this.tabulatorOptions.paginationSize,
+					page: this.pageNo
+				})
+			);
 		}
 	},
 	computed: {
