@@ -2,6 +2,8 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import FormInput from "../../../../Form/Input.js";
 import FormForm from '../../../../Form/Form.js';
 
+import ApiStvCoursedates from "../../../../../api/factory/stv/coursedates.js";
+
 export default {
 	name: "TblCourseList",
 	components: {
@@ -46,16 +48,14 @@ export default {
 		initTabulatorOptions(){
 			this.tabulatorOptions = {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.courselist.getCourselist,
-				ajaxParams: () => {
-					return {
+				ajaxRequestFunc: () => this.$api.call(
+					ApiStvCoursedates.getCourselist({
 						student_uid: this.student.uid,
 						start_date: this.dataSem.start,
 						end_date: this.dataSem.ende,
 						group_consecutiveHours: true,
-						dbStundenplanTable: this.dbStundenplanTable
-					};
-				},
+						dbStundenplanTable: this.dbStundenplanTable})
+				),
 				ajaxResponse: (url, params, response) => {
 					return response.data;
 				},
@@ -153,7 +153,8 @@ export default {
 		},
 	},
 	created(){
-		this.$fhcApi.factory.stv.courselist.getStudiensemester()
+		this.$api
+			.call(ApiStvCoursedates.getStudiensemester())
 			.then(result => {
 				this.listStudiensemester = result.data;
 				this.getDatesOfSemester(this.currentSemester);
