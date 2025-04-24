@@ -27,12 +27,24 @@ export default {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
-					ApiStvAdmissionDates.getAufnahmetermin(this.student.prestudent_id)
+					ApiStvAdmissionDates.getAufnahmetermine(this.student.person_id)
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title: "aufnahmetermin_id", field: "aufnahmetermin_id"},
-					{title: "prestudent_id", field: "prestudent_id"},
+					{title: "rt_id", field: "rt_id"},
+					{title: "rt_person_id", field: "rt_person_id"},
+					{title: "person_id", field: "person_id"},
+					{title: "datum", field: "datum"},
+					{title: "stufe", field: "stufe"},
+					{title: "studiensemester", field: "studiensemester_kurzbz"},
+					{title: "anmerkung", field: "anmerkung", visible: false},
+					{title: "anmeldedatum", field: "anmeldedatum", visible: false},
+					{title: "punkte", field: "punkte"},
+					{title: "teilgenommen", field: "teilgenommen"},
+					{title: "ort", field: "ort", visible: false},
+					{title: "studienplan", field: "studienplan", visible: false},
+					{title: "studienplan_id", field: "studienplan_id", visible: false},
+					{title: "stg_kuerzel", field: "stg_kuerzel"},
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
@@ -52,6 +64,19 @@ export default {
 	template: `
 	<div class="stv-details-admission-dates-table h-100 pb-3">
 		<h4>Allgemein</h4>
+		
+		<core-filter-cmpt
+			ref="table"
+			:tabulator-options="tabulatorOptions"
+			:tabulator-events="tabulatorEvents"
+			table-only
+			:side-menu="false"
+			reload
+			new-btn-show
+			:new-btn-label="this.$p.t('lehre', 'reihungstest')"
+			@click:new="actionNewMobility"
+			>
+		</core-filter-cmpt>
 		
 	</div>
 	`

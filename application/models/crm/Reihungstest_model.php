@@ -511,4 +511,43 @@ class Reihungstest_model extends DB_Model
 
 		return $this->execQuery($query, array($date, $studiengang_kz));
 	}
+
+	/**
+	 * Loads all placement tests of a given person
+	 * @param integer $person_id
+	 * @return array Returns object array with data of placement tests
+	 */
+	public function getReihungstestPerson($person_id)
+	{
+		$query = ' 
+			SELECT 
+			  tbl_rt_person.*,
+			  tbl_reihungstest.studiengang_kz,
+			  tbl_reihungstest.anmerkung,
+			  tbl_reihungstest.datum,
+			  tbl_reihungstest.uhrzeit,
+			  tbl_reihungstest.ext_id,
+			  tbl_reihungstest.max_teilnehmer,
+			  tbl_reihungstest.oeffentlich,
+			  tbl_reihungstest.freigeschaltet,
+			  tbl_reihungstest.studiensemester_kurzbz,
+			  tbl_reihungstest.stufe,
+			  tbl_reihungstest.anmeldefrist,
+			  tbl_reihungstest.aufnahmegruppe_kurzbz,
+			  tbl_studiengang.typ,
+			  UPPER(typ::varchar(1) || kurzbz) AS stg_kuerzel,
+			  so.studiengangbezeichnung,
+				  so.studiengangbezeichnung_englisch
+			FROM
+			  public.tbl_rt_person
+			JOIN public.tbl_reihungstest ON (rt_id=reihungstest_id)
+			JOIN public.tbl_studiengang ON tbl_reihungstest.studiengang_kz = tbl_studiengang.studiengang_kz
+			JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+			JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
+			WHERE
+			  tbl_rt_person.person_id = ?
+			ORDER BY datum, uhrzeit ASC';
+
+		return $this->execQuery($query, array($person_id));
+	}
 }

@@ -41416,6 +41416,26 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'reihungstest',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstest',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Placement Test',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// FHC4 STUDIERENDENVERWALTUNG AUFNAHMETERMINE ENDE	 ---------------------------------------------------------------
 
 );

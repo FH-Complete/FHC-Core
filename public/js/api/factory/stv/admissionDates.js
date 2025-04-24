@@ -16,10 +16,10 @@
  */
 
 export default {
-	getAufnahmetermine(prestudent_id) {
+	getAufnahmetermine(person_id) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/aufnahmetermine/' + prestudent_id
+			url: 'api/frontend/v1/stv/aufnahmetermine/getAufnahmetermine/' + person_id,
 		};
 	},
 }
