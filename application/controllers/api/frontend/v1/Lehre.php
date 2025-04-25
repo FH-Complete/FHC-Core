@@ -130,13 +130,26 @@ class Lehre extends FHCAPI_Controller
 	public function getStudentProjektabgaben() {
 		$projektarbeit_id = $this->input->get("projektarbeit_id",TRUE);
 
+		// TODO: error messages
+		
 		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+
+		$projektarbeit_obj = new projektarbeit();
+		if($projektarbeit_id==-1)
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+
+		if(!$projektarbeit_obj->load($projektarbeit_id))
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+
+		$paIsCurrent = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
 		
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$ret = $this->ProjektarbeitModel->getProjektarbeitAbgabetermine($projektarbeit_id);
 		
-		$this->terminateWithSuccess($ret);
+		// TODO: fetch zweitbetreuer
+		
+		$this->terminateWithSuccess(array($ret, $paIsCurrent));
 	}
 
 	/**

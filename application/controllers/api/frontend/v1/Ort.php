@@ -100,8 +100,8 @@ class Ort extends FHCAPI_Controller
 			)
 		";
 		$params = array_merge($params, [$datum, $vonStunde, $bisStunde, $datum, $vonStunde, $bisStunde]);
-		$this->addMeta('qry', $qry);
-		$this->addMeta('params', $params);
+//		$this->addMeta('qry', $qry);
+//		$this->addMeta('params', $params);
 		$result = $this->OrtModel->execReadOnlyQuery($qry, $params);
 		
 		$this->terminateWithSuccess($result);

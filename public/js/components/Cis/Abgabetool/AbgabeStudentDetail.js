@@ -10,7 +10,8 @@ export const AbgabeStudentDetail = {
 		InputNumber: primevue.inputnumber,
 		Checkbox: primevue.checkbox,
 		Dropdown: primevue.dropdown,
-		Textarea: primevue.textarea
+		Textarea: primevue.textarea,
+		VueDatePicker
 	},
 	props: {
 		projektarbeit: {
@@ -82,6 +83,17 @@ export const AbgabeStudentDetail = {
 		downloadAbgabe(termin) {
 			this.$fhcApi.factory.lehre.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid)
 		},
+		formatDate(dateParam) {
+			const date = new Date(dateParam)
+			// handle missing leading 0
+			const padZero = (num) => String(num).padStart(2, '0');
+
+			const month = padZero(date.getMonth() + 1); // Months are zero-based
+			const day = padZero(date.getDate());
+			const year = date.getFullYear();
+
+			return `${day}.${month}.${year}`;
+		},
 		upload(termin) {
 
 			if (!this.validate(termin))
@@ -147,7 +159,7 @@ export const AbgabeStudentDetail = {
 				color = 'green'
 			}
 			
-			return 'font-color: ' + fontColor + '; background-color: ' + color
+			return `font-color: ${fontColor} ; background-color: ${color}; border-radius: 50%;`
 		},
 		openBeurteilungLink(link) {
 			window.open(link, '_blank')
@@ -193,9 +205,9 @@ export const AbgabeStudentDetail = {
 			<div id="uploadWrapper">
 				<div class="row" style="margin-bottom: 12px;">
 					<div style="width: 100px">{{$p.t('abgabetool/c4fixtermin')}}</div>
-					<div class="col-1">{{$p.t('abgabetool/c4zieldatum')}}</div>
-					<div class="col-1">{{$p.t('abgabetool/c4abgabetyp')}}</div>
-					<div class="col-2">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
+					<div class="col-2">{{$p.t('abgabetool/c4zieldatum')}}</div>
+					<div class="col-2">{{$p.t('abgabetool/c4abgabetyp')}}</div>
+					<div class="col-4">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 					<div class="col-1">{{$p.t('abgabetool/c4abgabedatum')}}</div>
 					<div class="col">
 						{{$p.t('abgabetool/c4fileupload')}}
@@ -205,33 +217,42 @@ export const AbgabeStudentDetail = {
 					<div style="width: 100px" class="d-flex justify-content-center align-items-center">
 						<p class="fhc-bullet" :class="{ 'fhc-bullet-red': termin.fixtermin, 'fhc-bullet-green': !termin.fixtermin }"></p>
 					</div>
-					<div class="col-1 d-flex justify-content-center align-items-center">
+					<div class="col-2 d-flex justify-content-center align-items-center">
 						<div :style="getDateStyle(termin)">
-							{{ termin.datum?.split("-").reverse().join(".") }}
+							<VueDatePicker
+								style="width: 95%;"
+								v-model="termin.datum"
+								:clearable="false"
+								:disabled="true"
+								:enable-time-picker="false"
+								:format="formatDate"
+								:text-input="true"
+								auto-apply>
+							</VueDatePicker>
 						</div>				
 					</div>
-					<div class="col-1 d-flex justify-content-center align-items-center">{{ termin.bezeichnung }}</div>
-					<div class="col-2 d-flex justify-content-center align-items-center">{{ termin.kurzbz }}</div>
+					<div class="col-2 d-flex justify-content-center align-items-center">{{ termin.bezeichnung }}</div>
+					<div class="col-4 d-flex justify-content-center align-items-center">
+						<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="3" cols="60" :disabled="true"></Textarea>
+					</div>
 					<div class="col-1 d-flex justify-content-center align-items-center">
 						{{ termin.abgabedatum?.split("-").reverse().join(".") }}
 						<a v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" style="margin-left:4px; cursor: pointer;">
 							<i class="fa-solid fa-file-pdf"></i>
 						</a>
 					</div>
-					<div class="col-6">
+					<div class="col-2" v-if="!viewMode">
 						<div class="row">
 							<div class="col-6">
-								<Upload v-if="termin && termin.allowedToUpload" :disabled="viewMode" accept=".pdf" v-model="termin.file"></Upload>
+								<Upload v-if="termin && termin.allowedToUpload" accept=".pdf" v-model="termin.file"></Upload>
 							</div>
 							<div class="col-6">
-								<button class="btn btn-primary border-0" @click="upload(termin)" :disabled="!termin.allowedToUpload || viewMode">
+								<button class="btn btn-primary border-0" @click="upload(termin)" :disabled="!termin.allowedToUpload">
 									Upload
 									<i style="margin-left: 8px" class="fa-solid fa-upload"></i>
 								</button>
 							</div>
 						</div>
-						
-						
 					</div>
 				</div>
 			</div>

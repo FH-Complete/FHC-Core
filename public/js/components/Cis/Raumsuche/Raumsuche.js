@@ -1,4 +1,3 @@
-
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 
 export const Raumsuche =  {

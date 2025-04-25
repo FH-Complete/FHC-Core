@@ -72,7 +72,6 @@ export const AbgabetoolMitarbeiter = {
 			{
 				event: "cellClick",
 				handler: async (e, cell) => {
-					debugger
 					if(cell.getColumn().getField() === "details") {
 						this.setDetailComponent(cell.getValue())
 					}
@@ -84,7 +83,6 @@ export const AbgabetoolMitarbeiter = {
 				event: "rowClick",
 				handler: async (e, row) => {
 
-					debugger
 					e.stopPropagation()
 
 				}
@@ -93,7 +91,6 @@ export const AbgabetoolMitarbeiter = {
 				event: "rowSelected",
 				handler: async (row) => {
 
-					debugger
 
 				}
 			},
@@ -123,7 +120,8 @@ export const AbgabetoolMitarbeiter = {
 		setDetailComponent(details){
 			this.loadAbgaben(details).then((res)=> {
 				const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
-				pa.abgabetermine = res.data.retval
+				pa.abgabetermine = res.data[0].retval
+				pa.isCurrent = res.data[1]
 				pa.abgabetermine.push({ // new abgatermin row
 
 					'paabgabe_id': -1,
@@ -153,9 +151,9 @@ export const AbgabetoolMitarbeiter = {
 				
 				this.selectedProjektarbeit = pa
 				
-				Vue.nextTick(()=>{
-					this.$refs.verticalsplit.showBoth()
-				})
+				
+				this.$refs.verticalsplit.showBoth()
+				
 			
 			})
 		},

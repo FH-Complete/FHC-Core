@@ -93,7 +93,6 @@ export const AbgabeMitarbeiterDetail = {
 			})
 		},
 		deleteTermin(termin) {
-			debugger
 			this.$fhcApi.factory.lehre.deleteProjektarbeitAbgabe(termin.paabgabe_id).then( (res) => {
 				if(res?.meta?.status == 'success') {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui/genericDeleted', [this.$p.t('abgabetool/abgabe')]))
@@ -144,7 +143,7 @@ export const AbgabeMitarbeiterDetail = {
 				color = 'green'
 			}
 
-			return 'font-color: ' + fontColor + '; background-color: ' + color
+			return `font-color: ${fontColor} ; background-color: ${color}; border-radius: 50%;`
 		},
 		openBeurteilungLink(link) {
 			window.open(link, '_blank')
@@ -167,7 +166,14 @@ export const AbgabeMitarbeiterDetail = {
 			return `${day}.${month}.${year}`;
 		},
 		openStudentPage() {
-			// TODO: do it
+			const link = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+ '/Cis/Abgabetool/Student/' + this.projektarbeit?.student_uid
+			window.open(link, '_blank')
+		},
+		openPlagiatcheck() {
+			// todo: hardcoded turnitin link pfui?
+			const link = "https://technikum-wien.turnitin.com/sso/sp/redwood/saml/5IyfmBr2OcSIaWQTKlFCGj/start"
+			window.open(link, '_blank')
 		}
 	},
 	watch: {
@@ -188,7 +194,14 @@ export const AbgabeMitarbeiterDetail = {
 		},
 		getEnduploadErlaubt() {
 			return !this.eidAkzeptiert
+		},
+		getSemesterBenotbar(){
+			return this.projektarbeit?.isCurrent ?? false
+		},
+		endUploadVorhanden(){
+			return this.projektarbeit?.abgabetermine.find(abgabe => abgabe.paabgabetyp_kurzbz === 'end' && abgabe.abgabedatum !== null)
 		}
+		
 	},
 	created() {
 
@@ -206,10 +219,20 @@ export const AbgabeMitarbeiterDetail = {
 					<p> {{projektarbeit?.titel}}</p>
 					<p v-if="projektarbeit?.zweitbegutachter"> {{projektarbeit?.zweitbegutachter}}</p>
 				</div>
-				<div>
-					<button class="btn btn-primary border-0" @click="openStudentPage">
-						Speichern
-						<i style="margin-left: 8px" class="fa-solid fa-floppy-disk"></i>
+				<div class="col-4 d-flex justify-content-end">
+					<div>
+						<button :disabled="!getSemesterBenotbar && endUploadVorhanden" class="btn btn-secondary border-0" @click="openPlagiatcheck" style="margin-right: 4px;">
+							benoten
+							<i style="margin-left: 8px" class="fa-solid fa-user-check"></i>
+						</button>
+					</div>
+					<button v-if="projektarbeit?.betreuerart_kurzbz !== 'Zweitbegutachter'" class="btn btn-secondary border-0" @click="openPlagiatcheck" style="margin-right: 4px;">
+						zur Plagiatsprüfung
+						<i style="margin-left: 8px" class="fa-solid fa-user-check"></i>
+					</button>
+					<button class="btn btn-secondary border-0" @click="openStudentPage">
+						Studentenansicht
+						<i style="margin-left: 8px" class="fa-solid fa-eye"></i>
 					</button>
 				</div>
 			</div>
@@ -232,6 +255,7 @@ export const AbgabeMitarbeiterDetail = {
 					<div class="col-2 d-flex justify-content-center align-items-center">
 						<div :style="getDateStyle(termin)">
 							<VueDatePicker
+								style="width: 95%;"
 								v-model="termin.datum"
 								:clearable="false"
 								:disabled="!termin.allowedToSave"

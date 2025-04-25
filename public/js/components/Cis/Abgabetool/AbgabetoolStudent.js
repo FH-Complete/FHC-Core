@@ -1,11 +1,13 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import AbgabeDetail from "./AbgabeStudentDetail.js";
+import VerticalSplit from "../../verticalsplit/verticalsplit.js";
 
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
 	components: {
 		CoreFilterCmpt,
-		AbgabeDetail
+		AbgabeDetail,
+		VerticalSplit
 	},
 	props: {
 		student_uid_prop: {
@@ -22,6 +24,7 @@ export const AbgabetoolStudent = {
 	},
 	data() {
 		return {
+			tabulatorUuid: Vue.ref(0),
 			domain: '',
 			student_uid: null,
 			detail: null,
@@ -30,7 +33,7 @@ export const AbgabetoolStudent = {
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
 			abgabeTableOptions: {
-				height: 300,
+				height: 700,
 				index: 'projektarbeit_id',
 				layout: 'fitColumns',
 				placeholder: this.$p.t('global/noDataAvailable'),
@@ -85,7 +88,7 @@ export const AbgabetoolStudent = {
 		setDetailComponent(details){
 			this.loadAbgaben(details).then((res)=> {
 				const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
-				pa.abgabetermine = res.data.retval
+				pa.abgabetermine = res.data[0].retval
 				pa.abgabetermine.forEach(termin => {
 					termin.file = []
 					termin.allowedToUpload = true
@@ -103,6 +106,10 @@ export const AbgabetoolStudent = {
 				pa.student_uid = this.student_uid
 
 				this.selectedProjektarbeit = pa
+
+				
+				this.$refs.verticalsplit.showBoth()
+				
 			})
 			
 		},
@@ -195,12 +202,23 @@ export const AbgabetoolStudent = {
 		handleUuidDefined(uuid) {
 			this.tabulatorUuid = uuid
 		},
+		calcMaxTableHeight() {
+			const tableID = this.tabulatorUuid ? ('-' + this.tabulatorUuid) : ''
+			const tableDataSet = document.getElementById('filterTableDataset' + tableID);
+			if(!tableDataSet) return
+			const rect = tableDataSet.getBoundingClientRect();
+
+			this.abgabeTableOptions.height = window.visualViewport.height - rect.top
+			this.$refs.abgabeTable.tabulator.setHeight(this.abgabeTableOptions.height)
+		},
 		async setupMounted() {
 			this.tableBuiltPromise = new Promise(this.tableResolve)
 			await this.tableBuiltPromise
 			
 			this.loadProjektarbeiten()
-			
+
+			this.$refs.verticalsplit.collapseBottom()
+			this.calcMaxTableHeight()
 		}
 	},
 	watch: {
@@ -218,22 +236,28 @@ export const AbgabetoolStudent = {
 		this.setupMounted()
 	},
 	template: `
-	<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
-	<hr>
-		
-     <core-filter-cmpt 
-		:title="''"  
-		ref="abgabeTable" 
-		:tabulator-options="abgabeTableOptions"  
-		:tabulator-events="abgabeTableEventHandlers"
-		tableOnly
-		:sideMenu="false"
-	 />
-	 
-	 <hr>
-	 <div v-show="selectedProjektarbeit"> 
-	 	<AbgabeDetail :viewMode="isViewMode" :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
-	 </div>
+	<vertical-split ref="verticalsplit">				
+		<template #top>
+			<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+			<hr>
+				
+			 <core-filter-cmpt
+			 	@uuidDefined="handleUuidDefined"
+				:title="''"  
+				ref="abgabeTable" 
+				:tabulator-options="abgabeTableOptions"  
+				:tabulator-events="abgabeTableEventHandlers"
+				tableOnly
+				:sideMenu="false"
+			 />
+			 
+		 </template>
+		<template #bottom>
+			<div v-show="selectedProjektarbeit"> 
+				<AbgabeDetail :viewMode="isViewMode" :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
+			 </div>
+		</template>
+	</vertical-split>
     `,
 };
 
