@@ -4,11 +4,13 @@ import AbgabeDetail from "./AbgabeStudentDetail.js";
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
 	components: {
-		VueDatePicker,
 		CoreFilterCmpt,
 		AbgabeDetail
 	},
 	props: {
+		student_uid_prop: {
+			default: null
+		},
 		viewData: {
 			type: Object,
 			required: true,
@@ -177,7 +179,7 @@ export const AbgabetoolStudent = {
 			this.$refs.abgabeTable.tabulator.setData(d);
 		},
 		loadProjektarbeiten() {
-			this.$fhcApi.factory.lehre.getStudentProjektarbeiten(this.viewData?.uid ?? null)
+			this.$fhcApi.factory.lehre.getStudentProjektarbeiten(this.student_uid_prop ?? this.viewData?.uid ?? null)
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				})
@@ -205,7 +207,9 @@ export const AbgabetoolStudent = {
 
 	},
 	computed: {
-
+		isViewMode() {
+			return this.student_uid !== null
+		}
 	},
 	created() {
 
@@ -228,7 +232,7 @@ export const AbgabetoolStudent = {
 	 
 	 <hr>
 	 <div v-show="selectedProjektarbeit"> 
-	 	<AbgabeDetail :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
+	 	<AbgabeDetail :viewMode="isViewMode" :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
 	 </div>
     `,
 };

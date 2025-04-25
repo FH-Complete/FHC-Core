@@ -1,7 +1,5 @@
 import FhcAlert from './FhcAlert.js';
 import FhcApiFactory from '../api/fhcapifactory.js';
-
-
 export default {
 	install: (app, options) => {
 		if (app.config.globalProperties.$fhcApi) {

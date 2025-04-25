@@ -32,7 +32,7 @@ const router = VueRouter.createRouter({
 			props: true
 		},
 		{
-			path: `/Cis/Abgabetool/Student`,
+			path: `/Cis/Abgabetool/Student/:student_uid_prop?`,
 			name: 'AbgabetoolStudent',
 			component: AbgabetoolStudent,
 			props: true

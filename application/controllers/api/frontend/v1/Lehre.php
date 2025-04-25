@@ -43,7 +43,9 @@ class Lehre extends FHCAPI_Controller
 			'getStudentProjektabgaben' => self::PERM_LOGGED,
 			'postStudentProjektarbeitZwischenabgabe' => self::PERM_LOGGED,
 			'postStudentProjektarbeitEndupload' => self::PERM_LOGGED,
-			'getMitarbeiterProjektarbeiten' => self::PERM_LOGGED
+			'getMitarbeiterProjektarbeiten' => self::PERM_LOGGED,
+			'postProjektarbeitAbgabe' => self::PERM_LOGGED,
+			'deleteProjektarbeitAbgabe' => self::PERM_LOGGED
 		]);
 
 		$this->load->library('PhrasesLib');
@@ -448,9 +450,6 @@ class Lehre extends FHCAPI_Controller
 	public function getMitarbeiterProjektarbeiten() {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
-//		if (!isset($uid) || isEmptyString($uid))
-//			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
-
 		$boolParamStr = $this->input->get('showall');
 		$trueStrings = ['true', '1'];
 		$falseStrings = ['false', '0'];
@@ -472,6 +471,77 @@ class Lehre extends FHCAPI_Controller
 		$projektarbeiten = $this->ProjektarbeitModel->getMitarbeiterProjektarbeiten(getAuthUID(), $showAllBool);
 		
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
+	}
+	
+	public function postProjektarbeitAbgabe() {
+		$projektarbeit_id = $_POST['projektarbeit_id'];
+		$paabgabe_id = $_POST['paabgabe_id'];
+		$paabgabetyp_kurzbz = $_POST['paabgabetyp_kurzbz'];
+		$datum = $_POST['datum'];
+		$fixtermin = $_POST['fixtermin'];
+		$kurzbz = $_POST['kurzbz'];
+
+		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id)
+			|| !isset($paabgabe_id) || isEmptyString($paabgabe_id)
+			|| !isset($datum) || isEmptyString($datum)
+			|| !isset($datum) || isEmptyString($datum)
+			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz))
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		
+		if($paabgabe_id == -1) {
+			$result = $this->PaabgabeModel->insert(
+				array(
+					'projektarbeit_id' => $projektarbeit_id,
+					'paabgabetyp_kurzbz' => $paabgabetyp_kurzbz,
+					'fixtermin' => $fixtermin,
+					'datum' => $datum,
+					'kurzbz' => $kurzbz,
+					'insertvon' => getAuthUID(),
+					'insertamum' => date('Y-m-d H:i:s')
+				)
+			);
+			
+			$this->terminateWithSuccess($result);
+		} else {
+			$result = $this->PaabgabeModel->update(
+				$paabgabe_id,
+				array(
+					'paabgabetyp_kurzbz' => $paabgabetyp_kurzbz,
+					'datum' => $datum,
+					'kurzbz' => $kurzbz,
+					'updatevon' => getAuthUID(),
+					'updateamum' => date('Y-m-d H:i:s')
+				)
+			);
+
+			$this->terminateWithSuccess($result);
+		}
+	}
+	
+	public function deleteProjektarbeitAbgabe() {
+		$paabgabe_id = $_POST['paabgabe_id'];
+		
+		if (!isset($paabgabe_id) || isEmptyString($paabgabe_id))
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+
+		$result = $this->PaabgabeModel->load($paabgabe_id);
+		$result = $this->getDataOrTerminateWithError($result);
+		
+		if(count($result) == 0) 
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+
+		// TODO: berechtigung?
+		if($result[0]->insertvon === getAuthUID()) {
+			$result = $this->PaabgabeModel->delete($paabgabe_id);
+			$result = $this->getDataOrTerminateWithError($result);
+			$this->terminateWithSuccess($result);
+		}
+
+		$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 	}
 }
 

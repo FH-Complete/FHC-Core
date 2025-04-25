@@ -7,7 +7,7 @@ export const AbgabetoolMitarbeiter = {
 	components: {
 		CoreFilterCmpt,
 		AbgabeDetail,
-		VerticalSplit
+		VerticalSplit,
 	},
 	props: {
 		viewData: {
@@ -33,7 +33,7 @@ export const AbgabetoolMitarbeiter = {
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
 			abgabeTableOptions: {
-				height: 300,
+				height: 700,
 				index: 'projektarbeit_id',
 				layout: 'fitDataStretch',
 				placeholder: this.$p.t('global/noDataAvailable'),
@@ -111,6 +111,7 @@ export const AbgabetoolMitarbeiter = {
 		},
 		toggleShowAll(showall) {
 			this.showAll = showall
+			// TODO: debug tabulator row render
 			this.loadProjektarbeiten(showall, () => { this.$refs.abgabeTable?.tabulator.redraw(true) })
 		},
 		addSeries() {
@@ -120,23 +121,31 @@ export const AbgabetoolMitarbeiter = {
 			return new Date(date) < new Date(Date.now())
 		},
 		setDetailComponent(details){
-			debugger
 			this.loadAbgaben(details).then((res)=> {
-				debugger
 				const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
 				pa.abgabetermine = res.data.retval
+				pa.abgabetermine.push({ // new abgatermin row
+
+					'paabgabe_id': -1,
+					'projektarbeit_id': pa.projektarbeit_id,
+					'fixtermin': false,
+					'kurzbz': '',
+					'datum': new Date().toISOString().split('T')[0],
+					'paabgabetyp_kurzbz': '',
+					'bezeichnung': '',
+					'abgabedatum': null,
+					'insertvon': this.viewData?.uid ?? ''
+					
+				})
 				pa.abgabetermine.forEach(termin => {
 					termin.file = []
-					termin.allowedToUpload = true
-
-					// TODO: fixtermin logic?
-					if(termin.bezeichnung == 'Endupload' && this.isPastDate(termin.datum)) {
-
-						// termin.allowedToUpload = false
-					} else {
-						// termin.allowedToUpload = true
+					termin.allowedToSave = termin.insertvon == this.viewData?.uid && pa.betreuerart_kurzbz != 'Zweitbegutachter'
+					termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum
+					
+					termin.bezeichnung = {
+						bezeichnung: termin.bezeichnung,
+						paabgabetyp_kurzbz: termin.paabgabetyp_kurzbz
 					}
-
 				})
 				pa.betreuer = this.buildBetreuer(pa)
 				pa.student_uid = details.student_uid
@@ -192,6 +201,7 @@ export const AbgabetoolMitarbeiter = {
 			return (projekt.typ + projekt.kurzbz)?.toUpperCase()	
 		},
 		buildBetreuer(abgabe) {
+			// TODO: preload and insert own titled name of betreuer somehow
 			return abgabe.betreuerart_beschreibung + ': ' + (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
 		},
 		setupData(data){
@@ -275,14 +285,14 @@ export const AbgabetoolMitarbeiter = {
 		this.setupMounted()
 	},
 	template: `
-	<div class="h-100">
-	
 
-		<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
-		<hr>
+
 		
-		<vertical-split ref="verticalsplit">
+		<vertical-split ref="verticalsplit">		
+			
 			<template #top>
+				<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+				<hr>
 				<core-filter-cmpt 
 					:title="''"  
 					@uuidDefined="handleUuidDefined"
@@ -310,6 +320,7 @@ export const AbgabetoolMitarbeiter = {
 						</button>
 					</template>
 				</core-filter-cmpt>
+
 			</template>
 			<template #bottom>
 				<div v-show="selectedProjektarbeit" ref="selProj"> 
@@ -318,7 +329,6 @@ export const AbgabetoolMitarbeiter = {
 			</template>
 		</vertical-split>
 
-	</div>
 	 
     `,
 };

@@ -54,5 +54,28 @@ export default {
 			`/api/frontend/v1/Lehre/getMitarbeiterProjektarbeiten?showall=${all}`
 			, {}
 		);
+	},
+	postProjektarbeitAbgabe(termin) {
+		const payload = {
+			paabgabe_id: termin.paabgabe_id,
+			paabgabetyp_kurzbz: termin.bezeichnung.paabgabetyp_kurzbz,
+			datum: termin.datum,
+			fixtermin: termin.fixtermin,
+			insertvon: termin.insertvon,
+			kurzbz: termin.kurzbz,
+			projektarbeit_id: termin.projektarbeit_id
+		}
+		const url = '/api/frontend/v1/Lehre/postProjektarbeitAbgabe';
+
+		return this.$fhcApi.post(url, payload, null)
+		
+	},
+	deleteProjektarbeitAbgabe(paabgabe_id) {
+		const payload = {
+			paabgabe_id
+		}
+		const url = '/api/frontend/v1/Lehre/deleteProjektarbeitAbgabe';
+
+		return this.$fhcApi.post(url, payload, null)
 	}
   }

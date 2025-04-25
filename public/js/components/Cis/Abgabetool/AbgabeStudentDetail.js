@@ -16,6 +16,10 @@ export const AbgabeStudentDetail = {
 		projektarbeit: {
 			type: Object,
 			default: null
+		},
+		viewMode: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
@@ -217,10 +221,10 @@ export const AbgabeStudentDetail = {
 					<div class="col-6">
 						<div class="row">
 							<div class="col-6">
-								<Upload v-if="termin && termin.allowedToUpload" accept=".pdf" v-model="termin.file"></Upload>
+								<Upload v-if="termin && termin.allowedToUpload" :disabled="viewMode" accept=".pdf" v-model="termin.file"></Upload>
 							</div>
 							<div class="col-6">
-								<button class="btn btn-primary border-0" @click="upload(termin)" :disabled="!termin.allowedToUpload">
+								<button class="btn btn-primary border-0" @click="upload(termin)" :disabled="!termin.allowedToUpload || viewMode">
 									Upload
 									<i style="margin-left: 8px" class="fa-solid fa-upload"></i>
 								</button>

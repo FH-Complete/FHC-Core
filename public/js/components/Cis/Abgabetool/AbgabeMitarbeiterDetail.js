@@ -8,7 +8,8 @@ export const AbgabeMitarbeiterDetail = {
 		InputNumber: primevue.inputnumber,
 		Checkbox: primevue.checkbox,
 		Dropdown: primevue.dropdown,
-		Textarea: primevue.textarea
+		Textarea: primevue.textarea,
+		VueDatePicker
 	},
 	props: {
 		projektarbeit: {
@@ -21,6 +22,29 @@ export const AbgabeMitarbeiterDetail = {
 			eidAkzeptiert: false,
 			enduploadTermin: null,
 			allActiveLanguages: FHC_JS_DATA_STORAGE_OBJECT.server_languages,
+			// TODO: fetch types
+			allAbgabeTypes: [
+				{
+					paabgabetyp_kurzbz: 'abstract',
+					bezeichnung: 'Entwurf'
+				},
+				{
+					paabgabetyp_kurzbz: 'zwischen',
+					bezeichnung: 'Zwischenabgabe'
+				},
+				{
+					paabgabetyp_kurzbz: 'note',
+					bezeichnung: 'Benotung'
+				},
+				{
+					paabgabetyp_kurzbz: 'end',
+					bezeichnung: 'Endupload'
+				},
+				{
+					paabgabetyp_kurzbz: 'enda',
+					bezeichnung: 'Endabgabe im Sekretariat'
+				}
+			],
 			form: Vue.reactive({
 				sprache: '',
 				abstract: '',
@@ -36,11 +60,52 @@ export const AbgabeMitarbeiterDetail = {
 		openZusatzdatenModal(termin) {
 				
 		},
-		save(termin) {
-			// TODO: api speichern termin	
+		saveTermin(termin) {
+			const paabgabe_id = termin.paabgabe_id
+			this.$fhcApi.factory.lehre.postProjektarbeitAbgabe(termin).then( (res) => {
+				if(res?.meta?.status == 'success') {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui/gespeichert'))
+
+					if(paabgabe_id === -1) { // new abgabe has been inserted
+						termin.paabgabe_id = res?.data?.retval
+
+						this.projektarbeit.abgabetermine.push({ // new abgatermin row
+
+							'paabgabe_id': -1,
+							'projektarbeit_id': this.projektarbeit.projektarbeit_id,
+							'fixtermin': false,
+							'kurzbz': '',
+							'datum': new Date().toISOString().split('T')[0],
+							'paabgabetyp_kurzbz': '',
+							'bezeichnung': '',
+							'abgabedatum': null,
+							'insertvon': this.viewData?.uid ?? '',
+							'allowedToSave': true,
+							'allowedToDelete': true
+						})
+					}
+					
+					
+				} else if(res?.meta?.status == 'error'){
+					this.$fhcAlert.alertError()
+				}
+				
+			})
 		},
-		delete(termin) {
-			// TODO: api delete termin	
+		deleteTermin(termin) {
+			debugger
+			this.$fhcApi.factory.lehre.deleteProjektarbeitAbgabe(termin.paabgabe_id).then( (res) => {
+				if(res?.meta?.status == 'success') {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui/genericDeleted', [this.$p.t('abgabetool/abgabe')]))
+					// this.$p.t('global/tooltipLektorDeleteKontrolle', [this.$entryParams.permissions.kontrolleDeleteMaxReach ])
+					const deletedTerminIndex = this.projektarbeit.abgabetermine.findIndex(t => t.paabgabe_id === termin.paabgabe_id)
+					this.projektarbeit.abgabetermine.splice(deletedTerminIndex, 1)
+
+
+				} else if(res?.meta?.status == 'error'){
+					this.$fhcAlert.alertError()
+				}
+			})
 		},
 		validate: function(termin) {
 			if(!termin.file.length) {
@@ -84,8 +149,25 @@ export const AbgabeMitarbeiterDetail = {
 		openBeurteilungLink(link) {
 			window.open(link, '_blank')
 		},
-		getOptionLabel(option) {
+		getOptionLabelSprache(option) {
 			return option.sprache
+		},
+		getOptionLabelAbgabetyp(option){
+			return option.bezeichnung
+		},
+		formatDate(dateParam) {
+			const date = new Date(dateParam)
+			// handle missing leading 0
+			const padZero = (num) => String(num).padStart(2, '0');
+
+			const month = padZero(date.getMonth() + 1); // Months are zero-based
+			const day = padZero(date.getDate());
+			const year = date.getFullYear();
+
+			return `${day}.${month}.${year}`;
+		},
+		openStudentPage() {
+			// TODO: do it
 		}
 	},
 	watch: {
@@ -119,39 +201,58 @@ export const AbgabeMitarbeiterDetail = {
 		
 			<h5>{{$p.t('abgabetool/c4abgabeMitarbeiterbereich')}}</h5>
 			<div class="row">
-				<p> {{projektarbeit?.student}}</p>
-				<p> {{projektarbeit?.titel}}</p>
-				<p v-if="projektarbeit?.zweitbegutachter"> {{projektarbeit?.zweitbegutachter}}</p>
+				<div class="col-8">
+					<p> {{projektarbeit?.student}}</p>
+					<p> {{projektarbeit?.titel}}</p>
+					<p v-if="projektarbeit?.zweitbegutachter"> {{projektarbeit?.zweitbegutachter}}</p>
+				</div>
+				<div>
+					<button class="btn btn-primary border-0" @click="openStudentPage">
+						Speichern
+						<i style="margin-left: 8px" class="fa-solid fa-floppy-disk"></i>
+					</button>
+				</div>
 			</div>
 			<div id="uploadWrapper">
 				<div class="row" style="margin-bottom: 12px;">
 					<div style="width: 100px">{{$p.t('abgabetool/c4fixtermin')}}</div>
-					<div class="col-1">{{$p.t('abgabetool/c4zieldatum')}}</div>
-					<div class="col-1">{{$p.t('abgabetool/c4abgabetyp')}}</div>
-					<div class="col-2">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
+					<div class="col-2">{{$p.t('abgabetool/c4zieldatum')}}</div>
+					<div class="col-2">{{$p.t('abgabetool/c4abgabetyp')}}</div>
+					<div class="col-4">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 					<div class="col-1">{{$p.t('abgabetool/c4abgabedatum')}}</div>
 					<div class="col">
 						
 					</div>
 				</div>
-<!--			TODO: show some nothing found placeholder when abgabetermine are empty -->
+				<div v-if="!projektarbeit?.abgabetermine?.length">keine Termine gefunden!</div>
 				<div class="row" v-for="termin in projektarbeit.abgabetermine">
 					<div style="width: 100px" class="d-flex justify-content-center align-items-center">
 						<p class="fhc-bullet" :class="{ 'fhc-bullet-red': termin.fixtermin, 'fhc-bullet-green': !termin.fixtermin }"></p>
 					</div>
-					<div class="col-1 d-flex justify-content-center align-items-center">
+					<div class="col-2 d-flex justify-content-center align-items-center">
 						<div :style="getDateStyle(termin)">
-<!--							TODO: date input-->
-							{{ termin.datum?.split("-").reverse().join(".") }}
+							<VueDatePicker
+								v-model="termin.datum"
+								:clearable="false"
+								:disabled="!termin.allowedToSave"
+								:enable-time-picker="false"
+								:format="formatDate"
+								:text-input="true"
+								auto-apply>
+							</VueDatePicker>
 						</div>				
 					</div>
-					<div class="col-1 d-flex justify-content-center align-items-center">
-					<!-- TODO: type dropdown select -->
-							{{ termin.bezeichnung }}
-					</div>
 					<div class="col-2 d-flex justify-content-center align-items-center">
-						<!-- TODO: abgabe kurzbz input -->
-						{{ termin.kurzbz }}
+						<Dropdown 
+							:style="{'width': '100%'}"
+							:disabled="!termin.allowedToSave"
+							v-model="termin.bezeichnung"
+							:options="allAbgabeTypes"
+							:optionLabel="getOptionLabelAbgabetyp">
+						</Dropdown>
+					</div>
+					<div class="col-4 d-flex justify-content-center align-items-center">
+						<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="3" cols="60" :disabled="!termin.allowedToSave"></Textarea>
 					</div>
 					<div class="col-1 d-flex justify-content-center align-items-center">
 						{{ termin.abgabedatum?.split("-").reverse().join(".") }}
@@ -159,22 +260,16 @@ export const AbgabeMitarbeiterDetail = {
 							<i class="fa-solid fa-file-pdf"></i>
 						</a>
 					</div>
-					<div class="col-6">
+					<div class="col-2 align-content-center">
 						<div class="row">
-							<div class="col-3">
-								<button class="btn btn-primary border-0" @click="save(termin)" :disabled="!termin.allowedToUpload">
+							<div class="col-6">
+								<button v-if="termin.allowedToSave" class="btn btn-primary border-0" @click="saveTermin(termin)">
 									Speichern
 									<i style="margin-left: 8px" class="fa-solid fa-floppy-disk"></i>
 								</button>
 							</div>
-							<div class="col-3">
-								<button class="btn btn-primary border-0" @click="delete(termin)" :disabled="!termin.allowedToUpload">
-									Löschen
-									<i style="margin-left: 8px" class="fa-solid fa-trash"></i>
-								</button>
-							</div>
-							<div v-if="termin.endupload && hasFile" class="col-3">
-								<button class="btn btn-primary border-0" @click="openZusatzdatenModal(termin)" :disabled="!termin.allowedToUpload">
+							<div class="col-6">
+								<button v-if="termin.allowedToDelete && termin.paabgabe_id > 0" class="btn btn-primary border-0" @click="deleteTermin(termin)">
 									Löschen
 									<i style="margin-left: 8px" class="fa-solid fa-trash"></i>
 								</button>
@@ -208,7 +303,7 @@ export const AbgabeMitarbeiterDetail = {
 							:style="{'width': '100%'}"
 							v-model="form.sprache"
 							:options="allActiveLanguages"
-							:optionLabel="getOptionLabel">
+							:optionLabel="getOptionLabelSprache">
 						</Dropdown>
 					</div>
 				</div>
