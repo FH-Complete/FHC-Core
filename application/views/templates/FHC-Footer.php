@@ -104,6 +104,8 @@
 	if ($tabulator5 === true) generateJSsInclude('vendor/olifolkerd/tabulator5/dist/js/tabulator.min.js');
 	// Tabulator 5 JQuery
 	if ($tabulator5JQuery === true) generateJSsInclude('public/js/tabulator/jquery_wrapper.js');
+	// Tabulator 6 JS
+	if ($tabulator6 === true) generateJSsInclude('vendor/olifolkerd/tabulator6/dist/js/tabulator.min.js');
 	// Tinymce 3 JS
 	if ($tinymce3 === true) generateJSsInclude('include/tiny_mce/tiny_mce.js');
 
@@ -150,6 +152,7 @@
 		generateJSsInclude('vendor/npm-asset/primevue/toastservice/toastservice.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/confirmdialog/confirmdialog.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/confirmationservice/confirmationservice.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/tieredmenu/tieredmenu.min.js');
 	}
 
 	if($vuedatepicker11) generateJSsInclude('vendor/vuejs/vuedatepicker_js11/vue-datepicker.iife.js');

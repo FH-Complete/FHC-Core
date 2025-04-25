@@ -3,6 +3,8 @@ import FormInput from "../Form/Input.js";
 import BsModal from "../Bootstrap/Modal.js";
 import AbstractWidget from './Abstract.js';
 
+import ApiBookmark from '../../api/factory/widget/bookmark.js';
+
 export default {
 	name: "WidgetsUrl",
 	mixins: [AbstractWidget],
@@ -62,12 +64,12 @@ export default {
 			event.preventDefault();
 			if(!this.bookmark_id || !this.url_input || !this.title_input) return;
 			
-			this.$fhcApi.factory.bookmark
-				.update({
+			this.$api
+				.call(ApiBookmark.update({
 					bookmark_id: this.bookmark_id,
 					title: this.title_input,
 					url: this.url_input,
-				})
+				}))
 				.then((res) => res.data)
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkUpdated"));
@@ -92,12 +94,12 @@ export default {
 			// early return if validation failed
 			if (!this.isValidationSuccessfull()) return;
 
-			this.$fhcApi.factory.bookmark
-				.insert({
+			this.$api
+				.call(ApiBookmark.insert({
 					tag: this.config.tag,
 					title: this.title_input,
 					url: this.url_input,
-				})
+				}))
 				.then((res) => res.data)
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkAdded"));
@@ -124,8 +126,8 @@ export default {
 			return !Object.values(this.validation).some(value => value === true);
 		},
 		async fetchBookmarks() {
-			await this.$fhcApi.factory.bookmark
-				.getBookmarks()
+			await this.$api
+				.call(ApiBookmark.getBookmarks())
 				.then((res) => res.data)
 				.then((result) => {
 					this.shared = result;
@@ -138,8 +140,8 @@ export default {
 			// early return if the confirm dialog was not confirmed
 			if (!isConfirmed) return;
 
-			this.$fhcApi.factory.bookmark
-				.delete(bookmark_id)
+			this.$api
+				.call(ApiBookmark.delete(bookmark_id))
 				.then((res) => res.data)
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkDeleted"));
@@ -157,14 +159,13 @@ export default {
 		// this.$emit('setConfig', true); -> use this to enable widget config mode if needed
 	},
 	template: /*html*/ `
-    <div class="widgets-url w-100 h-100 overflow-auto" style="padding: 1rem 1rem;">
+    <div class="widgets-url w-100 h-100 overflow-scroll" style="padding: 1rem 1rem;">
         <div class="d-flex flex-column justify-content-between">
+        	<button v-if="editModeIsActive" class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
 
-			<template v-if="shared">
+            <template v-if="shared">
+
                 <template v-if="!emptyBookmarks">
-					<button class="btn btn-outline-secondary btn-sm" @click="openCreateModal" type="button">
-						{{$p.t('bookmark','newLink')}}
-					</button>
 					<div v-for="link in shared" :key="link.id" class="d-flex mt-2">
 						<a target="_blank" :href="link.url">
 							<i class="fa fa-solid fa-arrow-up-right-from-square me-1"></i>{{ link.title }}
@@ -172,11 +173,11 @@ export default {
 
 						<div class="ms-auto">
 							<!--EDIT BOOKMARK-->
-							<a href="#" @click.prevent="openEditModal(link)" >
+							<a href="#" @click.prevent="openEditModal(link)" v-show="configMode || editModeIsActive">
 								<i class="fa fa-edit me-1"></i>
 							</a>
 							<!--DELETE BOOKMARK-->
-							<a href="#" @click.prevent="removeLink(link.bookmark_id)" >
+							<a href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode || editModeIsActive">
 								<i class="fa fa-regular fa-trash-can" style="color: #e01b24;"></i>
 							</a>
 						</div>
@@ -197,7 +198,7 @@ export default {
         </div>
     </div>
 	<!--EDIT MODAL-->
-	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag" ref="editForm">
+	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag" v-if="editModeIsActive " ref="editForm">
 		<bs-modal @[\`hide.bs.modal\`]="bookmark_id=null; clearInputs();" ref="editModal">
 			<template #title>
 				<h2>{{$p.t('bookmark','editLink')}}</h2>
@@ -215,7 +216,7 @@ export default {
 	</core-form>
 
 	<!--CREATE MODAL-->
-	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag" ref="createForm">
+	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag" v-if="editModeIsActive " ref="createForm">
 		<bs-modal @[\`hide.bs.modal\`]="clearInputs();" ref="createModal">
 			<template #title>
 				<h2>{{$p.t('bookmark','newLink')}}</h2>

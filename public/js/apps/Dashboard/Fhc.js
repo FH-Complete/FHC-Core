@@ -1,6 +1,5 @@
 import FhcDashboard from '../../components/Dashboard/Dashboard.js';
-import FhcApi from '../../plugin/FhcApi.js';
-import Phrasen from '../../plugin/Phrasen.js';
+import PluginsPhrasen from '../../plugins/Phrasen.js';
 import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import Stundenplan, {DEFAULT_MODE_STUNDENPLAN} from "../../components/Cis/Stundenplan/Stundenplan.js";
@@ -10,9 +9,11 @@ import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
 import CmsContent from "../../components/Cis/Cms/Content.js";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
-import RoomInformation, { DEFAULT_MODE_RAUMINFO } from "../../components/Cis/Mylv/RoomInformation.js";
+import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../../components/Cis/Mylv/RoomInformation.js";
 import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent.js";
 import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
+
+
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -286,6 +287,6 @@ app.use(primevue.config.default, {
 		tooltip: 8000
 	}
 })
-app.use(Phrasen);
+app.use(PluginsPhrasen);
 app.directive('contrast', contrast);
 app.mount('#fhccontent');

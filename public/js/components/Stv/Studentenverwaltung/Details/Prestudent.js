@@ -4,7 +4,10 @@ import TblHistory from "./Prestudent/History.js";
 
 import CoreUdf from '../../../Udf/Udf.js';
 
+import ApiStvPrestudent from '../../../../api/factory/stv/prestudent.js';
+
 export default {
+	name: "TabPrestudent",
 	components: {
 		FormForm,
 		FormInput,
@@ -14,14 +17,6 @@ export default {
 	inject: {
 		lists: {
 			from: 'lists'
-		},
-		showZgvErfuellt: {
-			from: 'configShowZgvErfuellt',
-			default: false
-		},
-		showZgvDoktor: {
-			from: 'configShowZgvDoktor',
-			default: false
 		},
 		hasPrestudentPermission: {
 			from: 'hasPrestudentPermission',
@@ -41,6 +36,10 @@ export default {
 	},
 	props: {
 		modelValue: Object,
+		config: {
+			type: Object,
+			default: {}
+		}
 	},
 	data() {
 		return {
@@ -58,6 +57,7 @@ export default {
 				{ text: 'Nein', value: false }
 			],
 			listStgTyp: [],
+			listBisStandort: [],
 			initialFormData: {},
 			deltaArray: {},
 			actionUpdate: false
@@ -91,8 +91,8 @@ export default {
 
 	methods: {
 		loadPrestudent() {
-			this.$fhcApi
-				.get('api/frontend/v1/stv/prestudent/get/' + this.modelValue.prestudent_id)
+			return this.$api
+				.call(ApiStvPrestudent.get(this.modelValue.prestudent_id))
 				.then(result => result.data)
 				.then(result => {
 					this.data = result;
@@ -104,11 +104,12 @@ export default {
 		udfsLoaded(udfs) {
 			this.initialFormData = {...(this.initialFormData || {}), ...udfs};
 		},
-		updatePrestudent(){
-			this.$refs.form
-				.post('api/frontend/v1/stv/prestudent/updatePrestudent/' + this.modelValue.prestudent_id, this.deltaArray)
+		updatePrestudent() {
+			return this.$refs.form
+				.call(ApiStvPrestudent.updatePrestudent(this.modelValue.prestudent_id, this.deltaArray))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.initialFormData = {...this.data};
 					this.deltaArray = [];
 					this.actionUpdate = false;
 				})
@@ -120,60 +121,67 @@ export default {
 	},
 	created() {
 		this.loadPrestudent();
-		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getBezeichnungZGV')
+		this.$api
+			.call(ApiStvPrestudent.getBezeichnungZGV())
 			.then(result => result.data)
 			.then(result => {
 				this.listZgvs = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getBezeichnungMZgv')
+		this.$api
+			.call(ApiStvPrestudent.getBezeichnungMZgv())
 			.then(result => result.data)
 			.then(result => {
 				this.listZgvsmaster = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getBezeichnungDZgv')
+		this.$api
+			.call(ApiStvPrestudent.getBezeichnungDZgv())
 			.then(result => result.data)
 			.then(result => {
 				this.listZgvsdoktor = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.get('api/frontend/v1/stv/lists/getStgs')
+		this.$api
+			.call(ApiStvPrestudent.getStgs())
 			.then(result => result.data)
 			.then(result => {
 				this.listStgs = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getAusbildung')
+		this.$api
+			.call(ApiStvPrestudent.getAusbildung())
 			.then(result => result.data)
 			.then(result => {
 				this.listAusbildung = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getAufmerksamdurch')
+		this.$api
+			.call(ApiStvPrestudent.getAufmerksamdurch())
 			.then(result => result.data)
 			.then(result => {
 				this.listAufmerksamdurch = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getBerufstaetigkeit')
+		this.$api
+			.call(ApiStvPrestudent.getBerufstaetigkeit())
 			.then(result => result.data)
 			.then(result => {
 				this.listBerufe = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.get('api/frontend/v1/stv/prestudent/getTypenStg')
+		this.$api
+			.call(ApiStvPrestudent.getTypenStg())
 			.then(result => result.data)
 			.then(result => {
 				this.listStgTyp = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		this.$api
+			.call(ApiStvPrestudent.getBisstandort())
+			.then(result => result.data)
+			.then(result => {
+				this.listBisStandort = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
@@ -187,7 +195,8 @@ export default {
 				<legend>{{$p.t('lehre', 'title_zgv')}} {{modelValue.nachname}} {{modelValue.vorname}}</legend>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-3"
+					v-if="!config.hiddenFields.includes('prestudent_id')"
+						container-class="col-3 stv-details-prestudent-prestudent_id"
 						label="Prestudent_id"
 						type="text"
 						v-model="data.prestudent_id"
@@ -196,7 +205,8 @@ export default {
 						>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('person_id')"
+						container-class="col-3 stv-details-prestudent-person_id"
 						label="Person_id"
 						type="text"
 						v-model="data.person_id"
@@ -207,7 +217,8 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgv_code')"
+						container-class="col-3 stv-details-prestudent-zgv_code"
 						label="ZGV"
 						type="select"
 						v-model="data.zgv_code"
@@ -216,7 +227,8 @@ export default {
 					<option v-for="zgv in listZgvs" :key="zgv.zgv_code" :value="zgv.zgv_code">{{zgv.zgv_bez}}</option>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvOrt')"
+						container-class="col-3 stv-details-prestudent-zgvOrt"
 						:label="$p.t('infocenter', 'zgvOrt')"
 						type="text"
 						v-model="data.zgvort"
@@ -224,7 +236,8 @@ export default {
 						>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvDatum')"
+						container-class="col-3 stv-details-prestudent-zgvDatum"
 						:label="$p.t('infocenter', 'zgvDatum')"
 						type="DatePicker"
 						v-model="data.zgvdatum"
@@ -238,7 +251,8 @@ export default {
 						>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvNation')"
+						container-class="col-3 stv-details-prestudent-zgvNation"
 						:label="$p.t('infocenter', 'zgvNation')"
 						type="select"
 						v-model="data.zgvnation"
@@ -250,7 +264,8 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvmas_code')"
+						container-class="col-3 stv-details-prestudent-zgvmas_code"
 						:label="$p.t('lehre', 'zgvMaster')"
 						type="select"
 						v-model="data.zgvmas_code"
@@ -259,7 +274,8 @@ export default {
 						<option v-for="mzgv in listZgvsmaster" :key="mzgv.zgvmas_code" :value="mzgv.zgvmas_code">{{mzgv.zgvmas_bez}}</option>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvmaort')"
+						container-class="col-3 stv-details-prestudent-zgvmaort"
 						:label="$p.t('lehre', 'zgvMasterOrt')"
 						type="text"
 						v-model="data.zgvmaort"
@@ -267,7 +283,8 @@ export default {
 						>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvmadatum')"
+						container-class="col-3 stv-details-prestudent-zgvmadatum"
 						:label="$p.t('lehre', 'zgvMasterDatum')"
 						type="DatePicker"
 						v-model="data.zgvmadatum"
@@ -281,7 +298,8 @@ export default {
 						>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvmanation')"
+						container-class="col-3 stv-details-prestudent-zgvmanation"
 						:label="$p.t('lehre', 'zgvMasterNation')"
 						type="select"
 						v-model="data.zgvmanation"
@@ -292,9 +310,10 @@ export default {
 					</form-input>
 				</div>
 				<!--ZGV Doktor-->
-				<div v-if="showZgvDoktor" class="row mb-3">
+				<div class="row mb-3">
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvdoktor_code')"
+						container-class="col-3 stv-details-prestudent-zgvdoktor_code"
 						:label="$p.t('lehre', 'zgvDoktor')"
 						type="select"
 						v-model="data.zgvdoktor_code"
@@ -303,7 +322,8 @@ export default {
 						<option v-for="zgv in listZgvsdoktor" :key="zgv.zgvdoktor_code" :value="zgv.zgvdoktor_code">{{zgv.zgvdoktor_bez}}</option>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvdoktorort')"
+						container-class="col-3 stv-details-prestudent-zgvdoktorort"
 						:label="$p.t('lehre', 'zgvDoktorOrt')"
 						type="text"
 						v-model="data.zgvdoktorort"
@@ -311,7 +331,8 @@ export default {
 						>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvdoktordatum')"
+						container-class="col-3 stv-details-prestudent-zgvdoktordatum"
 						:label="$p.t('lehre', 'zgvDoktorDatum')"
 						type="DatePicker"
 						v-model="data.zgvdoktordatum"
@@ -325,7 +346,8 @@ export default {
 						>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						v-if="!config.hiddenFields.includes('zgvdoktornation')"
+						container-class="col-3 stv-details-prestudent-zgvdoktornation"
 						:label="$p.t('lehre', 'zgvDoktorNation')"
 						type="select"
 						v-model="data.zgvdoktornation"
@@ -336,10 +358,11 @@ export default {
 					</form-input>
 				</div>
 																
-				<div v-if="showZgvErfuellt" class="row mb-3">
+				<div class="row mb-3">
 					<div class="col-3 pt-4 d-flex align-items-center">
 						<form-input
-							container-class="form-check"
+							v-if="!config.hiddenFields.includes('zgv_erfuellt')"
+							container-class="form-check stv-details-prestudent-zgv_erfuellt"
 							:label="$p.t('infocenter', 'zgvErfuellt')"
 							type="checkbox"
 							v-model="data.zgv_erfuellt"
@@ -349,18 +372,20 @@ export default {
 					</div>
 					<div class="col-3 pt-4 d-flex align-items-center">
 						<form-input
-							container-class="form-check"
-							:label="$p.t('infocenter', 'zgvMasterErfuellt')"
+							v-if="!config.hiddenFields.includes('zgvmas_erfuellt')"
+							container-class="form-check stv-details-prestudent-zgvmas_erfuellt"
+							:label="$p.t('lehre', 'zgvMasterErfuellt')"
 							type="checkbox"
 							v-model="data.zgvmas_erfuellt"
 							name="zgvmas_erfuellt"
 							>
 						</form-input>
 					</div>
-					<div v-if="showZgvDoktor" class="col-3 pt-4 d-flex align-items-center">
+					<div class="col-3 pt-4 d-flex align-items-center">
 						<form-input
-							container-class="form-check"
-							:label="$p.t('infocenter', 'zgvDoktorErfuellt')"
+							v-if="!config.hiddenFields.includes('zgvdoktor_erfuellt')"
+							container-class="form-check stv-details-prestudent-zgvdoktor_erfuellt"
+							:label="$p.t('lehre', 'zgvDoktorErfuellt')"
 							type="checkbox"
 							v-model="data.zgvdoktor_erfuellt"
 							name="zgvdoktor_erfuellt"
@@ -373,7 +398,8 @@ export default {
 				<legend>PrestudentIn</legend>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
+						v-if="!config.hiddenFields.includes('aufmerksamdurch_kurzbz')"
+						container-class="col-4 stv-details-prestudent-aufmerksamdurch_kurzbz"
 						:label="$p.t('person', 'aufmerksamDurch')"
 						type="select"
 						v-model="data.aufmerksamdurch_kurzbz"
@@ -382,7 +408,8 @@ export default {
 						<option v-for="adurch in listAufmerksamdurch" :key="adurch.aufmerksamdurch_kurzbz" :value="adurch.aufmerksamdurch_kurzbz">{{adurch.beschreibung}}</option>
 					</form-input>
 					<form-input
-						container-class="col-4"
+						v-if="!config.hiddenFields.includes('berufstaetigkeit_code')"
+						container-class="col-4 stv-details-prestudent-berufstaetigkeit_code"
 						:label="$p.t('person', 'berufstaetigkeit')"
 						type="select"
 						v-model="data.berufstaetigkeit_code"
@@ -391,7 +418,8 @@ export default {
 						<option v-for="beruf in listBerufe" :key="beruf.berufstaetigkeit_code" :value="beruf.berufstaetigkeit_code">{{beruf.berufstaetigkeit_bez}} </option>
 					</form-input>
 					<form-input
-						container-class="col-4"
+						v-if="!config.hiddenFields.includes('ausbildungcode')"
+						container-class="col-4 stv-details-prestudent-ausbildungcode"
 						:label="$p.t('person', 'ausbildung')"
 						type="select"
 						v-model="data.ausbildungcode"
@@ -401,21 +429,22 @@ export default {
 					</form-input>
 				</div>
 				
-				` + /* TODO(chris): Ausgeblendet für Testing
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
+						v-if="!config.hiddenFields.includes('aufnahmeschluessel')"
+						container-class="col-4 stv-details-prestudent-aufnahmeschluessel"
 						label="Aufnahmeschlüssel"
 						type="text"
 						v-model="data.aufnahmeschluessel"
 						name="aufnahmeschluessel"
-						disabled							
+						disabled			
 						>
 					</form-input>
 					
 					<div class="col-4 pt-4 d-flex align-items-center">
 						<form-input
-							container-class="form-check"
+							v-if="!config.hiddenFields.includes('facheinschlaegigBerufstaetig')"
+							container-class="form-check stv-details-prestudent-facheinschlaegigBerufstaetig"
 							:label="$p.t('person', 'facheinschlaegigBerufstaetig')"
 							type="checkbox"
 							v-model="data.facheinschlberuf"
@@ -424,45 +453,46 @@ export default {
 						</form-input>
 					</div>
 					
-					<!--Todo(manu) validierung Integer, liste hier null-->
 					<form-input
-						container-class="col-4"
+						v-if="!config.hiddenFields.includes('standort_code')"
+						container-class="col-4 stv-details-prestudent-standort_code"
 						:label="$p.t('person', 'bisstandort')"
-						type="text"
+						type="select"
 						v-model="data.standort_code"
 						name="standort_code"
-						disabled
 						>
-					</form-input>
-				 
+						<option v-for="standort in listBisStandort" :key="standort.standort_code" :value="standort.standort_code">{{standort.bezeichnung}}</option>
+					</form-input>		 
 				</div>
-				*/`
-				
+								
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
+						v-if="!config.hiddenFields.includes('studiengang_kz')"
+						container-class="col-4 stv-details-prestudent-studiengang_kz"
 						:label="$p.t('lehre', 'studiengang')"
 						type="select"
 						v-model="data.studiengang_kz"
 						name="studiengang_kz"
 						disabled
 						>
-						<option v-for="stg in listStgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">{{stg.kuerzel}} - {{stg.bezeichnung}} </option>
+						<option v-for="stg in listStgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">{{stg.kuerzel}} - {{stg.bezeichnung}}</option>
 					</form-input>
 					<form-input
-						container-class="col-4"
+						v-if="!config.hiddenFields.includes('gsstudientyp_kurzbz')"
+						container-class="col-4 stv-details-prestudent-gsstudientyp_kurzbz"
 						:label="$p.t('lehre', 'studientyp')"
 						type="select"
 						v-model="data.gsstudientyp_kurzbz"
 						name="gsstudientyp_kurzbz"
 						>
-						<option v-for="typ in listStgTyp" :key="typ.typ" :value="typ.typ">{{typ.bezeichnung}} </option>
+						<option v-for="typ in listStgTyp" :key="typ.typ" :value="typ.typ">{{typ.bezeichnung}}</option>
 					</form-input>
 				</div>
 				
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
+						v-if="!config.hiddenFields.includes('anmerkung')"
+						container-class="col-4 stv-details-prestudent-anmerkung"
 						:label="$p.t('global', 'anmerkung')"
 						type="text"
 						v-model="data.anmerkung"
@@ -471,7 +501,8 @@ export default {
 					</form-input>
 					<div class="col-2 pt-4 d-flex align-items-center">
 						<form-input
-							container-class="form-check"
+							v-if="!config.hiddenFields.includes('bismelden')"
+							container-class="form-check stv-details-prestudent-bismelden"
 							:label="$p.t('person', 'bismelden')"
 							type="checkbox"
 							v-model="data.bismelden"
@@ -481,7 +512,8 @@ export default {
 					</div>
 					<div class="col-2 pt-4 d-flex align-items-center">
 						<form-input
-							container-class="form-check"
+							v-if="!config.hiddenFields.includes('dual')"
+							container-class="form-check stv-details-prestudent-dual"
 							:label="$p.t('lehre', 'dual')"
 							type="checkbox"
 							v-model="data.dual"
@@ -489,7 +521,7 @@ export default {
 							>
 						</form-input>
 					</div>
-					` + /* TODO(chris): Ausgeblendet für Testing
+					
 					<form-input
 						container-class="col-3"
 						:label="$p.t('lehre', 'foerderrelevant')"
@@ -499,9 +531,9 @@ export default {
 						>
 						<option v-for="entry in listFoerderrelevant" :value="entry.value">{{entry.text}}</option>
 					</form-input>
-					*/`
 					
 					<form-input
+						v-if="!config.hiddenFields.includes('priorisierung')"
 						container-class="col-1"
 						:label="$p.t('lehre', 'prioritaet')"
 						type="text"
@@ -511,7 +543,15 @@ export default {
 						>
 					</form-input>
 				</div>
-				<core-udf @load="udfsLoaded" v-model="data" class="row-cols-3 g-3 mb-3" ci-model="crm/prestudent" :pk="{prestudent_id:modelValue.prestudent_id}"></core-udf>
+				<core-udf
+					v-if="!config.hideUDFs" 
+					@load="udfsLoaded" 
+					v-model="data" 
+					class="row-cols-3 g-3 mb-3" 
+					ci-model="crm/prestudent" 
+					:pk="{prestudent_id:modelValue.prestudent_id}"
+					>
+				</core-udf>
 			</fieldset>
 		</form-form>
 		<div>

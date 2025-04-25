@@ -5,6 +5,9 @@ import LvInfo from "../Mylv/LvInfo.js"
 import LvMenu from "../Mylv/LvMenu.js"
 import moodleSvg from "../../../helpers/moodleSVG.js"
 
+import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiAuthinfo from '../../../api/factory/authinfo.js';
+
 export const DEFAULT_MODE_STUNDENPLAN = 'Week'
 
 const Stundenplan = {
@@ -62,7 +65,6 @@ const Stundenplan = {
 			if(this.$refs.calendar) this.$refs.calendar.setMode(newVal)
 		},
 		'propsViewData.focus_date'(newVal) {
-			// todo: navigate around with date in current mode
 			this.currentDate = new Date(newVal)
 		}
 	},
@@ -104,7 +106,7 @@ const Stundenplan = {
 	},
 	methods:{
 		fetchStudiensemesterDetails: async function (date) {
-			return this.$fhcApi.factory.stundenplan.studiensemesterDateInterval(date);
+			return this.$api.call(ApiStundenplan.studiensemesterDateInterval(date));
 		},
 		convertTime: function([hour,minute]){
 			let date = new Date();
@@ -131,7 +133,7 @@ const Stundenplan = {
 					lv_id: this.propsViewData?.lv_id || null
 				}
 			})
-
+			
 			this.currentDay = day;
 		},
 		handleOffset: function(offset)  {
@@ -144,7 +146,7 @@ const Stundenplan = {
 			const date = this.currentDay.getFullYear() + "-" +
 				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
 				String(this.currentDay.getDate()).padStart(2, "0");
-			
+
 			this.$router.push({
 				name: "Stundenplan",
 				params: {
@@ -206,8 +208,8 @@ const Stundenplan = {
 		},
 		loadEvents: function(){
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.StundenplanEvents(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id),
-				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay),
+				this.$api.call(ApiStundenplan.StundenplanEvents(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id)),
+				this.$api.call(ApiStundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay))
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {
@@ -235,19 +237,18 @@ const Stundenplan = {
 						promise_events = promise_events.concat(data);
 					}
 				})
-			
 				this.events = promise_events;
 			});
 		},
 	},
-	created()
-	{
-		
-		this.$fhcApi.factory.authinfo.getAuthUID().then((res) => res.data)
-		.then(data=>{
-			this.uid = data.uid;
-		})
-		
+	created() {
+		this.$api
+			.call(ApiAuthinfo.getAuthUID())
+			.then(res => res.data)
+			.then(data => {
+				this.uid = data.uid;
+			});
+		// this.loadEvents();
 	},
 	beforeUnmount() {
 		if(this.$refs.lvmodal) this.$refs.lvmodal.hide()	

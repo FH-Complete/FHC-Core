@@ -1,14 +1,20 @@
-import FhcAlert from './FhcAlert.js';
+console.warn('plugin/FhcApi.js is DEPRECATED! Use plugins/Api.js instead.');
+import FhcAlert from '../plugins/FhcAlert.js';
+import PluginsApi from '../plugins/Api.js';
 import FhcApiFactory from '../api/fhcapifactory.js';
 export default {
 	install: (app, options) => {
 		if (app.config.globalProperties.$fhcApi) {
+			/* Deprecated Code start */
 			if (options?.factory) {
+				console.warn("$fhcApi is DEPRECATED!");
 				app.config.globalProperties.$fhcApi.factory.addEndpoints(options.factory);
 			}
+			/* Deprecated Code end */
 			return;
 		}
 		app.use(FhcAlert);
+		app.use(PluginsApi);
 
 		function _get_config(form, uri, data, config) {
 			if (typeof form == 'string' && config === undefined) {
@@ -295,11 +301,31 @@ export default {
 			}
 		};
 
+		/* Deprecated Code start */
 		class FhcApiFactoryWrapper {
 			constructor(factorypart, root) {
 				if (root === undefined) {
-					this.$fhcApi = app.config.globalProperties.$fhcApi;
-					this.$fhcApi.factory = this;
+					this.$fhcApi = {
+						getUri(url) {
+							console.warn('$fhcApi.factory is DEPRECATED!');
+							return app.config.globalProperties.$fhcApi.getUri(url);
+						},
+						get(form, uri, params, config) {
+							console.warn('$fhcApi.factory is DEPRECATED!');
+							return app.config.globalProperties.$fhcApi.get(form, uri, params, config);
+						},
+						post(form, uri, data, config) {
+							console.warn('$fhcApi.factory is DEPRECATED!');
+							return app.config.globalProperties.$fhcApi.post(form, uri, data, config);
+						}
+					};
+					Object.defineProperty(this.$fhcApi, 'factory', {
+						get() {
+							console.warn('$fhcApi.factory is DEPRECATED!');
+							return app.config.globalProperties.$fhcApi.factory;
+						}
+					});
+					app.config.globalProperties.$fhcApi.factory = this;
 				} else {
 					Object.defineProperty(this, '$fhcApi', {
 						get() {
@@ -321,15 +347,19 @@ export default {
 						}
 					});
 				});
+				console.warn('$fhcApi.factory.addEndpoints() is DEPRECATED!');
 			}
 		}
 
 		const factory = new FhcApiFactoryWrapper(FhcApiFactory);
-		if (options?.factory)
+		if (options?.factory) {
+			console.warn("$fhcApi is DEPRECATED!");
 			factory.addEndpoints(options.factory);
+		}
 
 		app.config.globalProperties.$fhcApi.factory = factory;
-
+		/* Deprecated Code end */
+		
 		app.provide('$fhcApi', app.config.globalProperties.$fhcApi);
 	}
 };

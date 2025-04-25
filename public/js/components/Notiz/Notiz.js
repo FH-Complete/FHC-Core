@@ -48,7 +48,7 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.endpoint.getNotizen,
+				ajaxRequestFunc: () => this.$api.call(this.endpoint.getNotizen(this.id, this.typeId)),
 				ajaxParams: () => {
 					return {
 						id: this.id,
@@ -116,7 +116,27 @@ export default {
 					{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: false},
 					{title: "type_id", field: "type_id", width: 164, visible: false},
 					{title: "extension_id", field: "id", width: 135, visible: false},
-					{title: "letzte Änderung", field: "lastupdate", width: 146, visible: false},
+					{
+						title: "letzte Änderung", 
+						field: "lastupdate",
+						width: 146,
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
+					},
 					{
 						title: 'Aktionen', field: 'actions',
 						width: 100,
@@ -126,6 +146,7 @@ export default {
 
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
+							button.title = this.$p.t('ui', 'notiz_edit');
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.addEventListener(
 								'click',
@@ -136,6 +157,7 @@ export default {
 
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
+							button.title = this.$p.t('notiz', 'notiz_delete');
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.addEventListener(
 								'click',
@@ -161,7 +183,7 @@ export default {
 					event: 'tableBuilt',
 					handler: async () => {
 
-						await this.$p.loadCategory(['notiz', 'global']);
+						await this.$p.loadCategory(['notiz', 'global', 'ui']);
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
@@ -202,18 +224,24 @@ export default {
 							visible: this.showVariables.showLastupdate
 						});
 						cm.getColumnByField('notiz_id').component.updateDefinition({
-							visible: this.showVariables.showNotiz_id
+							visible: this.showVariables.showNotiz_id,
+							title: this.$p.t('ui', 'notiz_id')
 						});
 						cm.getColumnByField('notizzuordnung_id').component.updateDefinition({
-							visible: this.showVariables.showNotizzuordnung_id
+							visible: this.showVariables.showNotizzuordnung_id,
+							title: this.$p.t('ui', 'notizzuordnung_id')
 						});
 						cm.getColumnByField('type_id').component.updateDefinition({
-							visible: this.showVariables.showType_id
+							visible: this.showVariables.showType_id,
+							title: this.$p.t('ui', 'type_id')
 						});
 						cm.getColumnByField('id').component.updateDefinition({
-							visible: this.showVariables.showId
+							visible: this.showVariables.showId,
+							title: this.$p.t('ui', 'extension_id')
 						});
-
+						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
+						});
 					}
 				}
 			],
@@ -257,9 +285,15 @@ export default {
 	},
 	methods: {
 		actionDeleteNotiz(notiz_id) {
-			this.loadNotiz(notiz_id).then(() => {
-				this.$refs.deleteNotizModal.show();
-			});
+			this.loadNotiz(notiz_id);
+
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? notiz_id
+					: Promise.reject({handled: true}))
+				.then(this.deleteNotiz)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		actionEditNotiz(notiz_id) {
 			this.loadNotiz(notiz_id).then(() => {
@@ -302,7 +336,10 @@ export default {
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
 
-			return this.endpoint.addNewNotiz(this.id, formData)
+			this.$refs.formNotiz.clearValidation();
+
+			return this.$refs.formNotiz
+				.call(this.endpoint.addNewNotiz(this.id, formData))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetFormData();
@@ -317,11 +354,10 @@ export default {
 				});
 		},
 		deleteNotiz(notiz_id) {
-			return this.endpoint.deleteNotiz(notiz_id, this.typeId, this.id)
-				//return this.$fhcApi.post(this.endpoint + 'deleteNotiz/', this.param)
+			return this.$api
+				.call(this.endpoint.deleteNotiz(notiz_id, this.typeId, this.id))
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-					this.$refs.deleteNotizModal.hide();
 					this.reload();
 					this.resetFormData();
 				})
@@ -331,7 +367,8 @@ export default {
 				});
 		},
 		loadNotiz(notiz_id) {
-			return this.endpoint.loadNotiz(notiz_id)
+			return this.$api
+				.call(this.endpoint.loadNotiz(notiz_id))
 				.then(result => {
 					this.notizData = result.data;
 					this.notizData.typeId = this.typeId;
@@ -341,7 +378,8 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		loadDocEntries(notiz_id) {
-			return this.endpoint.loadDokumente(notiz_id)
+			return this.$api
+				.call(this.endpoint.loadDokumente(notiz_id))
 				.then(
 					result => {
 						this.notizData.anhang = result.data;
@@ -354,7 +392,9 @@ export default {
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
 
-			return this.endpoint.updateNotiz(notiz_id, formData)
+			this.$refs.formNotiz.clearValidation();
+			return this.$refs.formNotiz
+				.call(this.endpoint.updateNotiz(notiz_id, formData))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.resetFormData();
@@ -372,7 +412,9 @@ export default {
 			this.$refs.table.reloadTable();
 		},
 		resetFormData() {
-			this.$refs.formc.reset();
+			//TODO(Manu) check ref, needed here?
+			//this.$refs.formNotiz.reset();
+			//this.$refs.formc.reset();
 			this.notizData = {
 				typeId: this.typeId,
 				titel: null,
@@ -389,14 +431,16 @@ export default {
 			};
 		},
 		getUid() {
-			return this.endpoint.getUid()
+			return this.$api
+				.call(this.endpoint.getUid())
 				.then(result => {
 					this.notizData.intVerfasser = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		search(event) {
-			return this.endpoint.getMitarbeiter(event.query)
+			return this.$api
+				.call(this.endpoint.getMitarbeiter(event.query))
 				.then(result => {
 					this.filteredMitarbeiter = result.data.retval;
 				});
@@ -405,7 +449,7 @@ export default {
 
 			const vm = this;
 			tinymce.init({
-				target: this.$refs.editor, //Important: not selector: to enable multiple import of component
+				target: this.$refs.editor.$refs.input, //Important: not selector: to enable multiple import of component
 				//height: 800,
 				//plugins: ['lists'],
 				//toolbar: " blocks | bold italic underline | alignleft aligncenter alignright alignjustify",
@@ -493,19 +537,9 @@ export default {
 	},
 	template: `
 	<div class="core-notiz">
+	
 		<div v-if="notizLayout=='classicFas'">
-			<!--Modal: deleteNotizModal-->
-			<BsModal ref="deleteNotizModal">
-				<template #title>Notiz löschen</template>
-				<template #default>
-					<p>Notiz wirklich löschen?</p>
-				</template>
-				<template #footer>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetFormData">Abbrechen</button>
-					<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizData.notiz_id)">OK</button>
-				</template>
-			</BsModal>
-			
+		
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"
@@ -514,14 +548,14 @@ export default {
 				:side-menu="false"
 				reload
 				new-btn-show
-				new-btn-label="Notiz"
+				:new-btn-label="this.$p.t('global', 'notiz')"
 				@click:new="actionNewNotiz"
 				>
 			</core-filter-cmpt>
 			
 			<br>
 		
-			<form ref="formc" @submit.prevent class="row pt-3">
+			<form-form ref="formNotiz" @submit.prevent class="row pt-3">
 				<br><br>
 				<div class="pt-2">
 					<div class="row mb-3">
@@ -538,28 +572,41 @@ export default {
 					</div>
 		
 					<div class="row mb-3">
-						<label for="titel" class="form-label col-sm-2">{{$p.t('global','titel')}} *</label>
-						<div class="col-sm-7">
-							<input type="text" v-model="notizData.titel" class="form-control">
-						</div>
+							<form-input
+								container-class="col-12"
+								:label="$p.t('global','titel')  + ' *'"
+								type="text"
+								v-model="notizData.titel"
+								name="titel"
+								>
+							</form-input>
 					</div>
 								
-					<div class="row mb-3">
-						<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
-							
+					<div class="row mb-3">	
 						<!-- TinyMce 5 -->
-						<div v-if="showTinyMce" class="col-sm-7">
-							<textarea
+						<div v-if="showTinyMce" class="col-sm-12">
+								<form-input
+									ref="editor"
+									:label="$p.t('global','text')  + ' *'"
+									type="textarea"
+									v-model="notizData.text"
+									name="text"
+									rows="5"
+									cols="75"
+									>
+								</form-input>
+							</div>
+						<div v-else class="col-sm-12">
+							<form-input
 								ref="editor"
+								:label="$p.t('global','text')  + ' *'"
+								type="textarea"
+								v-model="notizData.text"
+								name="text"
 								rows="5"
 								cols="75"
-								class="form-control"
-								:value="notizData.text"
-		     					@input="updateText">
-		     				</textarea>
-						</div>
-						<div v-else class="col-sm-7">
-							<textarea rows="5" cols="75" v-model="notizData.text" class="form-control"></textarea>
+								>
+							</form-input>
 						</div>
 					</div>
 				</div>
@@ -645,22 +692,10 @@ export default {
 				
 				<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
 				<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
-			</form>		
+			</form-form>
 		</div>
 
 		<div v-else-if="notizLayout=='twoColumnsFormRight'" class="notiz-notiz">
-
-			<!--Modal: deleteNotizModal-->
-			<BsModal ref="deleteNotizModal">
-				<template #title>Notiz löschen</template>
-				<template #default>
-					<p>Notiz wirklich löschen?</p>
-				</template>
-				<template #footer>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetFormData">Abbrechen</button>
-					<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizData.notiz_id)">OK</button>
-				</template>
-			</BsModal>
 			
 			<div class="row">
 				<div class="col-sm-6 pt-6">
@@ -673,19 +708,14 @@ export default {
 						:side-menu="false"
 						reload
 						new-btn-show
-						new-btn-label="Notiz"
+						:new-btn-label="this.$p.t('global', 'notiz')"
 						@click:new="actionNewNotiz"
 						>
 					</core-filter-cmpt>	
 				</div>
 			
 				<div class="col-sm-6">
-					<!--
-					<p v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}} <span> [{{notizData.typeId}}]</span></p>
-					<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}} <span> [{{notizData.typeId}}]</span></p>
-					-->
-
-					<form ref="formc" @submit.prevent class="row pt-3">
+					<form-form ref="formNotiz" @submit.prevent class="row pt-3">
 						<div class="col pt-3">
 							<p v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}} <span> [{{notizData.typeId}}]</span></p>
 							<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}} <span> [{{notizData.typeId}}]</span></p>
@@ -710,20 +740,29 @@ export default {
 						<div class="row mb-3">
 							<!-- TinyMce 5 -->
 							<div v-if="showTinyMce" class="col-sm-12">
-								<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
-								<textarea
+								<form-input
 									ref="editor"
+									:label="$p.t('global','text')  + ' *'"
+									type="textarea"
+									v-model="notizData.text"
+									name="text"
 									rows="5"
 									cols="75"
-									class="form-control"
-									:value="notizData.text"
-									@input="updateText">
-								</textarea>
+									>
+								</form-input>
 							</div>
 							
 							<div v-else class="col-sm-12">
-								<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
-								<textarea rows="5" cols="75" v-model="notizData.text" class="form-control"></textarea>
+								<form-input
+									ref="editor"
+									:label="$p.t('global','text')  + ' *'"
+									type="textarea"
+									v-model="notizData.text"
+									name="text"
+									rows="5"
+									cols="75"
+									>
+								</form-input>
 							</div>
 						</div>
 				
@@ -828,12 +867,6 @@ export default {
 										>
 									</form-input>
 								</div>
-								<!--
-								<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','erledigt')}}</label>
-								<div class="col-sm-1">
-									<input type="checkbox" v-model="notizData.erledigt">
-								</div>
-								-->
 							</div>
 						</div>
 						
@@ -843,27 +876,16 @@ export default {
 								<p class="small">{{notizData.lastupdate}}</p>
 							</div>
 						</div>
-					</form>		
+					</form-form>
 				</div>
 			</div> 
 		</div>
 		
 		<div v-else-if="notizLayout=='twoColumnsFormLeft'" class="notiz-notiz">
-			<!--Modal: deleteNotizModal-->
-			<BsModal ref="deleteNotizModal">
-				<template #title>Notiz löschen</template>
-				<template #default>
-					<p>Notiz wirklich löschen?</p>
-				</template>
-				<template #footer>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetFormData">Abbrechen</button>
-					<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizData.notiz_id)">OK</button>
-				</template>
-			</BsModal>
 			
 			<div class="row">
 				<div class="col-sm-6">
-				  	<form ref="formc" @submit.prevent class="row pt-3">
+				  	<form-form ref="formNotiz" @submit.prevent class="row pt-3">
 						<div class="col pt-3">
 							<p v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}} <span> [{{notizData.typeId}}]</span></p>
 							<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}} <span> [{{notizData.typeId}}]</span></p>
@@ -883,19 +905,29 @@ export default {
 						<div class="row mb-3">
 							<!-- TinyMce 5 -->
 							<div v-if="showTinyMce" class="col-sm-12">
-								<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
-								<textarea
-								ref="editor"
-								rows="5"
-								cols="75"
-								class="form-control"
-								:value="notizData.text"
-								@input="updateText"></textarea>
+								<form-input
+									ref="editor"
+									:label="$p.t('global', 'text') + ' *'"
+									type="textarea"
+									v-model="notizData.text"
+									name="text"
+									rows="5"
+									cols="75"
+									>
+								</form-input>
 							</div>
 							
 							<div v-else class="col-sm-12">
-								<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
-								<textarea rows="5" cols="75" v-model="notizData.text" class="form-control"></textarea>
+								<form-input
+									ref="editor"
+									:label="$p.t('global','text')  + ' *'"
+									type="textarea"
+									v-model="notizData.text"
+									name="text"
+									rows="5"
+									cols="75"
+									>
+								</form-input>
 							</div>
 						</div>
 				
@@ -1001,12 +1033,6 @@ export default {
 										>
 									</form-input>
 								</div>
-								<!--
-								<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','erledigt')}}</label>
-								<div class="col-sm-1">
-									<input type="checkbox" v-model="notizData.erledigt">
-								</div>
-								-->
 							</div>
 						</div>
 						
@@ -1021,7 +1047,7 @@ export default {
 							<button v-if="notizData.statusNew" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
 							<button v-else class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
 						</div>
-					</form>		
+					</form-form>
 				</div>
 				
 				<div class="col-sm-6 pt-6">
@@ -1034,7 +1060,7 @@ export default {
 						:side-menu="false"
 						reload
 						new-btn-show
-						new-btn-label="Notiz"
+						:new-btn-label="this.$p.t('global', 'notiz')"
 						@click:new="actionNewNotiz"
 						>
 					</core-filter-cmpt>	
@@ -1043,17 +1069,6 @@ export default {
 		</div>
 		
 		<div v-else-if="notizLayout=='popupModal'" class="notiz-notiz">
-			<!--Modal: deleteNotizModal-->
-			<BsModal ref="deleteNotizModal">
-				<template #title>Notiz löschen</template>
-				<template #default>
-					<p>Notiz wirklich löschen?</p>
-				</template>
-				<template #footer>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetFormData">Abbrechen</button>
-					<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizData.notiz_id)">OK</button>
-				</template>
-			</BsModal>
 			
 			<BsModal ref="NotizModal">
 				<template #title>
@@ -1062,7 +1077,7 @@ export default {
 				</template>
 				<template #default>
 					<div>
-				  	<form ref="formc" @submit.prevent class="row">
+				  	<form-form ref="formNotiz" @submit.prevent class="row">
 						<div class="row mb-3">
 							<form-input
 								container-class="col-12"
@@ -1077,19 +1092,29 @@ export default {
 						<div class="row mb-3">
 							<!-- TinyMce 5 -->
 							<div v-if="showTinyMce" class="col-sm-12">
-								<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
-								<textarea
-								ref="editor"
-								rows="5"
-								cols="75"
-								class="form-control"
-								:value="notizData.text"
-								@input="updateText"></textarea>
+								<form-input
+									ref="editor"
+									:label="$p.t('global','text')  + ' *'"
+									type="textarea"
+									v-model="notizData.text"
+									name="text"
+									rows="5"
+									cols="75"
+									>
+								</form-input>
 							</div>
 							
 							<div v-else class="col-sm-12">
-								<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}} *</label>
-								<textarea rows="5" cols="75" v-model="notizData.text" class="form-control"></textarea>
+								<form-input
+									ref="editor"
+									:label="$p.t('global','text')  + ' *'"
+									type="textarea"
+									v-model="notizData.text"
+									name="text"
+									rows="5"
+									cols="75"
+									>
+								</form-input>
 							</div>
 						</div>
 				
@@ -1209,7 +1234,7 @@ export default {
 							<button v-if="notizData.statusNew" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
 							<button v-else class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
 						</div>
-					</form>		
+					</form-form>
 				</div>
 				</template>
 			</BsModal>
@@ -1223,7 +1248,7 @@ export default {
 					:side-menu="false"
 					reload
 					new-btn-show
-					new-btn-label="Notiz"
+					:new-btn-label="this.$p.t('global', 'notiz')"
 					@click:new="actionNewNotiz"
 					>
 				</core-filter-cmpt>	

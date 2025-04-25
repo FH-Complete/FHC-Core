@@ -1,6 +1,9 @@
 import CalendarDate from '../../../composables/CalendarDate.js';
 import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 
+import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiAddons from '../../../api/factory/addons.js';
+
 function ggt(m, n) {
 	return n == 0 ? m : ggt(n, m % n);
 }
@@ -289,17 +292,20 @@ export default {
 		},
 		fetchLvMenu(event) {
 			if (event && event.type == 'lehreinheit') {
-				this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]).then(
-					res => res.data
-				).then(
-					studiensemester_kurzbz => {
-						this.$fhcApi.factory.addons.getLvMenu(event.lehrveranstaltung_id, studiensemester_kurzbz).then(res => {
-							if (res.data) {
-								this.lvMenu = res.data;
-							}
-						});
-					}
-				)
+				this.$api
+					.call(ApiStundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]))
+					.then(res => res.data)
+					.then(studiensemester_kurzbz => this.$api.call(
+						ApiAddons.getLvMenu(
+							event.lehreinheit_id,
+							studiensemester_kurzbz
+						)
+					))
+					.then(res => {
+						if (res.data) {
+							this.lvMenu = res.data;
+						}
+					});
 			}
 		},
 		hourGridIdentifier(hour) {

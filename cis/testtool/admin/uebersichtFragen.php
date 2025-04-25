@@ -177,6 +177,9 @@ if(isset($_REQUEST['AuswahlGebiet']))
 			WHERE gebiet_id=".$db->db_add_param($gebiet_id)."
 			ORDER BY studiengang";
 	$result = $db->db_query($qry);
+
+	$qry_anz_fragen = "SELECT count(*) FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($gebiet_id)." AND demo=false";
+	$result_anz_fragen = $db->db_fetch_object($db->db_query($qry_anz_fragen));
 	
 	if ($gebietdetails)
 	{
@@ -214,6 +217,10 @@ if(isset($_REQUEST['AuswahlGebiet']))
 		<tr>
 			<td align="right">Multipleresponse:</td>
 			<td>'.($gebietdetails->multipleresponse==true?'Ja':'Nein').'</td>
+		</tr>
+		<tr>
+			<td align="right">Fragen im Gebiet:</td>
+			<td>'.$result_anz_fragen->count.'</td>
 		</tr>
 		<tr>
 			<td align="right">Gestellte Fragen:</td>
@@ -307,13 +314,17 @@ if(isset($_REQUEST['AuswahlGebiet']))
 					echo '<tr><td style="border-right:1px solid;">'.$vor->nummer.'</td><td>&nbsp;'.$vorschlag->text.'</td></tr>';
 				}
 			}
-			if($vorschlag->bild!='')
+			if($vorschlag->bild != '')
 			{
 				// zeilenumbruch nach 4 bilder
 				if($anzahlBild%4==0)
 					echo "</tr>";
 				echo "<td>";
 				echo "<img class='testtoolvorschlag' src='../bild.php?src=vorschlag&amp;vorschlag_id=$vor->vorschlag_id&amp;sprache=".$sprache."' /><br/>";
+				if ($vorschlag->text != '')
+				{
+					echo "$vorschlag->text<br>";
+				}
 				if ($loesungen)
 				{
 					echo "<br>".$vor->punkte."</td>";

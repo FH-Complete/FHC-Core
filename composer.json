@@ -240,6 +240,17 @@
 		{
 			"type": "package",
 			"package": {
+				"name": "olifolkerd/tabulator6",
+				"version": "6.3.1",
+				"dist": {
+					"url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/6.3.1.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
 				"name": "rmariuzzo/jquery-checkboxes",
 				"version": "1.0.7",
 				"dist": {
@@ -287,9 +298,9 @@
 				"name": "tomazdragar/simplecropper",
 				"version": "1.0",
 				"source": {
-					"url": "https://github.com/tomazdragar/SimpleCropper.git",
+					"url": "https://github.com/deveshsinghal22/SimpleCropper.git",
 					"type": "git",
-					"reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
+					"reference": "873e5e1ca57c370bedd07a512d0bf562930d4b89"
 				}
 			}
 		},
@@ -462,6 +473,7 @@
 
 		"olifolkerd/tabulator4": "4.9.*",
 		"olifolkerd/tabulator5": "5.5.*",
+		"olifolkerd/tabulator6": "6.3.*",
 
 		"phpseclib/phpseclib": "2.0.*",
 

@@ -17,9 +17,7 @@
 
 import LvTemplateUebersicht from '../../../lehre/lvplanung/LvTemplateUebersicht.js';
 import {CoreNavigationCmpt} from '../../../components/navigation/Navigation.js';
-import FhcAlert from '../../../plugin/FhcAlert.js';
-import FhcApi from "../../../plugin/FhcApi.js";
-import Phrasen from "../../../plugin/Phrasen.js";
+import PluginsPhrasen from "../../../plugins/Phrasen.js";
 
 
 const lvTemplatesApp = Vue.createApp({
@@ -32,7 +30,5 @@ const lvTemplatesApp = Vue.createApp({
 
 lvTemplatesApp
 	.use(primevue.config.default,{zIndex: {overlay: 9999}})
-	.use(FhcAlert)
-	.use(FhcApi)
-	.use(Phrasen)
+	.use(PluginsPhrasen)
 	.mount('#main')
