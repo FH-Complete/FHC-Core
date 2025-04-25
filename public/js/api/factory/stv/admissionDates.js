@@ -22,4 +22,43 @@ export default {
 			url: 'api/frontend/v1/stv/aufnahmetermine/getAufnahmetermine/' + person_id,
 		};
 	},
+	getListPlacementTests(){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/aufnahmetermine/getListPlacementTests/',
+		};
+	},
+	getListStudyPlans(person_id){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/aufnahmetermine/getListStudyPlans/' + person_id,
+		};
+	},
+	addNewPlacementTest(params){
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/aufnahmetermine/insertAufnahmetermin/',
+			params
+		};
+	},
+	loadPlacementTest(rt_person_id){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/aufnahmetermine/loadAufnahmetermin/' + rt_person_id,
+		};
+	},
+	updatePlacementTest(params){
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/aufnahmetermine/updateAufnahmetermin/',
+			params
+		};
+	},
+	deletePlacementTest(rt_person_id){
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/aufnahmetermine/deleteAufnahmetermin/' + rt_person_id
+		};
+	}
+
 }

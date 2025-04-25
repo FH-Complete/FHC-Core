@@ -550,4 +550,37 @@ class Reihungstest_model extends DB_Model
 
 		return $this->execQuery($query, array($person_id));
 	}
+
+	/**
+	 * Loads all placement tests
+	 * @return array Returns object array with data of placement tests
+	 */
+	//TODO(Manu) finish Details
+	public function getAllReihungstests()
+	{
+		$query = '
+			SELECT * FROM public.tbl_reihungstest
+			JOIN public.tbl_studiengang ON tbl_reihungstest.studiengang_kz = tbl_studiengang.studiengang_kz
+		--	JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+		--	JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
+			ORDER BY datum DESC NULLS LAST, uhrzeit
+		';
+
+		return $this->execQuery($query);
+	}
+
+	public function getReihungstestsPs($prestudent_id)
+	{
+		$query = '
+			SELECT * FROM public.tbl_reihungstest
+			JOIN public.tbl_studiengang ON tbl_reihungstest.studiengang_kz = tbl_studiengang.studiengang_kz
+			JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+			JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
+			 ORDER BY datum DESC, uhrzeit
+		';
+
+		return $this->execQuery($query);
+	}
+
+
 }
