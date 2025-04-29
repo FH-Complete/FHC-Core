@@ -378,7 +378,7 @@ export const AbgabetoolMitarbeiter = {
 		dialogClass="modal-lg">
 			<template v-slot:title>
 				<div>
-					{{ $p.t('abgabetool/addSeries') }}
+					{{ $p.t('abgabetool/neueTerminserie') }}
 				</div>
 			</template>
 			<template v-slot:default>
@@ -422,7 +422,7 @@ export const AbgabetoolMitarbeiter = {
 				
 			</template>
 			<template v-slot:footer>
-				<button type="button" class="btn btn-primary" @click="addSeries">{{ $p.t('global/save') }}</button>
+				<button type="button" class="btn btn-primary" @click="addSeries">{{ $p.t('global/speichern') }}</button>
 			</template>
 		</bs-modal>	
 		

@@ -639,7 +639,7 @@ class Lehre extends FHCAPI_Controller
 			$email = $data[0]->uid."@".DOMAIN;
 			
 			sendSanchoMail(
-				'neuerTerminBachelorMasterbetreuung',
+				'neuerAbgabetermin',
 				$body_fields,
 				$email,
 				$this->p->t('abgabetool', 'neuerTerminBachelorMasterbetreuung')
