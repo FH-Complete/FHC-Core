@@ -63,4 +63,15 @@ export default {
 			url: `/api/frontend/v1/Stundenplan/studiensemesterDateInterval/${date}`
 		};
 	},
+	StundenplanEvents(start_date, end_date, lv_id) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Stundenplan/StundenplanEvents',
+			params: { 
+				start_date: start_date, 
+				end_date: end_date, 
+				lv_id: lv_id 
+			}
+		};
+	},
 };
