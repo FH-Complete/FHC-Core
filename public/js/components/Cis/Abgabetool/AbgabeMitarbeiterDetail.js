@@ -19,6 +19,7 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	data() {
 		return {
+			oldPaBeurteilungLink: 'https://moodle.technikum-wien.at/mod/page/view.php?id=1005052', // TODO: inject from app & app provide link from config
 			eidAkzeptiert: false,
 			enduploadTermin: null,
 			allActiveLanguages: FHC_JS_DATA_STORAGE_OBJECT.server_languages,
@@ -44,16 +45,7 @@ export const AbgabeMitarbeiterDetail = {
 					paabgabetyp_kurzbz: 'enda',
 					bezeichnung: 'Endabgabe im Sekretariat'
 				}
-			],
-			form: Vue.reactive({
-				sprache: '',
-				abstract: '',
-				abstract_en: '',
-				schlagwoerter: '',
-				schlagwoerter_en: '',
-				kontrollschlagwoerter: '',
-				seitenanzahl: 1,
-			})
+			]
 		}
 	},
 	methods: {
@@ -171,21 +163,14 @@ export const AbgabeMitarbeiterDetail = {
 			window.open(link, '_blank')
 		},
 		openPlagiatcheck() {
-			// todo: hardcoded turnitin link pfui?
+			// todo: hardcoded turnitin link?
 			const link = "https://technikum-wien.turnitin.com/sso/sp/redwood/saml/5IyfmBr2OcSIaWQTKlFCGj/start"
 			window.open(link, '_blank')
-		}
-	},
-	watch: {
-		projektarbeit(newVal) {
-			// default select german if projektarbeit sprache was null
-			this.form.sprache = newVal.sprache ? this.allActiveLanguages.find(lang => lang.sprache == newVal.sprache) : this.allActiveLanguages.find(lang => lang.sprache == 'German')
-			this.form.abstract = newVal.abstract
-			this.form.abstract_en = newVal.abstract_en
-			this.form.schlagwoerter = newVal.schlagwoerter
-			this.form.schlagwoerter_en = newVal.schlagwoerter_en
-			this.form.kontrollschlagwoerter = newVal.kontrollschlagwoerter
-			this.form.seitenanzahl = newVal.seitenanzahl
+		},
+		openBenotung() {
+			const path = this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter'
+			const link = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/' + path
+			window.open(link, '_blank')
 		}
 	},
 	computed: {
@@ -212,28 +197,47 @@ export const AbgabeMitarbeiterDetail = {
 	template: `
 		<div v-if="projektarbeit">
 		
+
 			<h5>{{$p.t('abgabetool/c4abgabeMitarbeiterbereich')}}</h5>
+
+
 			<div class="row">
 				<div class="col-8">
 					<p> {{projektarbeit?.student}}</p>
 					<p> {{projektarbeit?.titel}}</p>
 					<p v-if="projektarbeit?.zweitbegutachter"> {{projektarbeit?.zweitbegutachter}}</p>
 				</div>
-				<div class="col-4 d-flex justify-content-end">
-					<div>
-						<button :disabled="!getSemesterBenotbar && endUploadVorhanden" class="btn btn-secondary border-0" @click="openPlagiatcheck" style="margin-right: 4px;">
-							benoten
-							<i style="margin-left: 8px" class="fa-solid fa-user-check"></i>
-						</button>
+				<div class="col-4 d-flex">
+					<div class="col">
+						<div class="row">
+							<button :disabled="!getSemesterBenotbar || !endUploadVorhanden" class="btn btn-secondary border-0" @click="openBenotung" style="width: 80%;">
+								benoten
+								<i style="margin-left: 8px" class="fa-solid fa-user-check"></i>
+							</button>
+						</div>
+						<div class="row" style="width: 90%;">
+							<span v-if="!getSemesterBenotbar" v-html="$p.t('abgabetool/c4aeltereParbeitBenoten', oldPaBeurteilungLink)"></span>
+							<span v-else-if="!endUploadVorhanden">Kein Endupload vorhanden!</span>
+						</div>
 					</div>
-					<button v-if="projektarbeit?.betreuerart_kurzbz !== 'Zweitbegutachter'" class="btn btn-secondary border-0" @click="openPlagiatcheck" style="margin-right: 4px;">
-						zur Plagiatsprüfung
-						<i style="margin-left: 8px" class="fa-solid fa-user-check"></i>
-					</button>
-					<button class="btn btn-secondary border-0" @click="openStudentPage">
-						Studentenansicht
-						<i style="margin-left: 8px" class="fa-solid fa-eye"></i>
-					</button>
+					<div class="col">
+						<div class="row">
+							<button v-if="projektarbeit?.betreuerart_kurzbz !== 'Zweitbegutachter'" class="btn btn-secondary border-0" @click="openPlagiatcheck" style="width: 80%;">
+								zur Plagiatsprüfung
+								<i style="margin-left: 8px" class="fa-solid fa-user-check"></i>
+							</button>
+						</div>
+						
+					</div>
+					<div class="col">
+						<div class="row">
+							<button class="btn btn-secondary border-0" @click="openStudentPage" style="width: 80%;">
+								Studentenansicht
+								<i style="margin-left: 8px" class="fa-solid fa-eye"></i>
+							</button>
+						</div>
+						
+					</div>
 				</div>
 			</div>
 			<div id="uploadWrapper">
@@ -303,101 +307,6 @@ export const AbgabeMitarbeiterDetail = {
 				</div>
 			</div>
 		 </div>
-		 <bs-modal ref="modalContainerEnduploadZusatzdaten" class="bootstrap-prompt" dialogClass="modal-lg">
-			<template v-slot:title>
-				<div>
-					{{$p.t('abgabetool/c4enduploadZusatzdaten')}}
-				</div>
-				<div class="row mb-3 align-items-center">
-					
-					<p class="ml-4 mr-4">Student UID: {{ projektarbeit?.student_uid}}</p>
-				
-				</div>
-				<div class="row mb-3 align-items-center">
-					
-					<p class="ml-4 mr-4">Titel: {{ projektarbeit?.titel }}</p>
-				
-				</div>
-			</template>
-			<template v-slot:default>
-				<div class="row mb-3 align-items-center">
-					<div class="row">{{$p.t('abgabetool/c4Sprache')}}</div>
-					<div class="row">
-						<Dropdown 
-							:style="{'width': '100%'}"
-							v-model="form.sprache"
-							:options="allActiveLanguages"
-							:optionLabel="getOptionLabelSprache">
-						</Dropdown>
-					</div>
-				</div>
-				
-				<div class="row mb-3 align-items-center">
-					<div class="row">Kontrollierte Schlagwörter</div>
-					<div class="row">
-						<Textarea v-model="form.kontrollschlagwoerter"></Textarea>
-					</div>
-				</div>
-				<div class="row mb-3 align-items-center">
-					<div class="row">{{$p.t('abgabetool/c4schlagwoerterGer')}}</div>
-					<div class="row">
-						<Textarea v-model="form.schlagwoerter"></Textarea>
-					</div>
-				</div>
-				
-				<div class="row mb-3 align-items-center">
-					<div class="row">{{$p.t('abgabetool/c4schlagwoerterEng')}}</div>
-					<div class="row">
-						<Textarea v-model="form.schlagwoerter_en"></Textarea>
-					</div>
-				</div>
-				
-				<div class="row mb-3 align-items-center">
-					<div class="row">{{$p.t('abgabetool/c4abstractGer')}}</div>
-					<div class="row">
-						<Textarea v-model="form.abstract" rows="10"></Textarea>
-					</div>
-				</div>
-
-				<div class="row mb-3 align-items-center">
-					<div class="row">{{$p.t('abgabetool/c4abstractEng')}}</div>
-					<div class="row">
-						<Textarea v-model="form.abstract_en" rows="10"></Textarea>
-					</div>				
-				</div>
-				
-				<div class="row mb-3 align-items-center">
-					<div class="row">{{$p.t('abgabetool/c4seitenanzahl')}}</div>
-					<div class="row">
-						<InputNumber 
-							v-model="form.seitenanzahl"
-							inputId="seitenanzahlInput" :min="1" :max="100000">
-						</InputNumber>
-					</div>		
-				</div>
-				
-				<div v-if="projektarbeit">
-					<div v-html="getEid"></div>
-					<div class="row">
-						<div class="col-9"></div>
-						<div class="col-2"><p>{{ $p.t('abgabetool/c4gelesenUndAkzeptiert') }}</p></div>
-						<div class="col-1">
-							
-							<Checkbox 
-								v-model="eidAkzeptiert" 
-								:binary="true" 
-								:pt="{ root: { class: 'ml-auto' }}"
-							>
-							</Checkbox>
-						</div>
-					</div>
-				</div>
-				
-			</template>
-			<template v-slot:footer>
-				<button class="btn btn-primary" :disabled="getEnduploadErlaubt" @click="triggerEndupload">{{$p.t('ui/hochladen')}}</button>
-			</template>
-		</bs-modal>
 
 `,
 };

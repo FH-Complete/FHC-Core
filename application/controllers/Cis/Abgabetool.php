@@ -16,7 +16,8 @@ class Abgabetool extends Auth_Controller
 			'index' => self::PERM_LOGGED,
 			'getStudentProjektarbeitAbgabeFile' => self::PERM_LOGGED,
 			'Mitarbeiter' => self::PERM_LOGGED,
-			'Student' => self::PERM_LOGGED
+			'Student' => self::PERM_LOGGED,
+			'Deadlines' => self::PERM_LOGGED
 		]);
 	}
 
@@ -43,7 +44,7 @@ class Abgabetool extends Auth_Controller
 			'uid'=>getAuthUID(),
 		);
 
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Abgabetool']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'AbgabetoolStudent']);
 	}
 
 	public function Mitarbeiter()
@@ -53,7 +54,17 @@ class Abgabetool extends Auth_Controller
 			'uid'=>getAuthUID(),
 		);
 
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Abgabetool']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'AbgabetoolMitarbeiter']);
+	}
+
+	public function Deadlines()
+	{
+
+		$viewData = array(
+			'uid'=>getAuthUID(),
+		);
+
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'DeadlinesOverview']);
 	}
 
 
@@ -66,7 +77,7 @@ class Abgabetool extends Auth_Controller
 		$student_uid = $this->_ci->input->get('student_uid');
 
 		if (!isset($paabgabe_id) || isEmptyString($paabgabe_id) || !isset($student_uid) || isEmptyString($student_uid))
-			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+			$this->terminateWithJsonError($this->p->t('global', 'wrongParameters'), 'general');
 		
 		$this->_ci->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
@@ -88,10 +99,10 @@ class Abgabetool extends Auth_Controller
 				readfile($file_path); // read file content to output buffer
 				
 			} else {
-				$this->terminateWithError('File not found');
+				$this->terminateWithJsonError('File not found');
 			}
 		} else {
-			$this->terminateWithError('Keine Zuordnung!');
+			$this->terminateWithJsonError('Keine Zuordnung!');
 		}
 	}
 }

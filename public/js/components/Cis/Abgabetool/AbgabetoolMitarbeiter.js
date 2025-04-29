@@ -1,13 +1,18 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import AbgabeDetail from "./AbgabeMitarbeiterDetail.js";
 import VerticalSplit from "../../verticalsplit/verticalsplit.js"
+import BsModal from '../../Bootstrap/Modal.js';
 
 export const AbgabetoolMitarbeiter = {
 	name: "AbgabetoolMitarbeiter",
 	components: {
+		BsModal,
 		CoreFilterCmpt,
 		AbgabeDetail,
 		VerticalSplit,
+		Dropdown: primevue.dropdown,
+		Textarea: primevue.textarea,
+		VueDatePicker
 	},
 	props: {
 		viewData: {
@@ -21,6 +26,39 @@ export const AbgabetoolMitarbeiter = {
 	},
 	data() {
 		return {
+			saving: false,
+			loading: false,
+			// TODO: fetch types
+			allAbgabeTypes: [
+				{
+					paabgabetyp_kurzbz: 'abstract',
+					bezeichnung: 'Entwurf'
+				},
+				{
+					paabgabetyp_kurzbz: 'zwischen',
+					bezeichnung: 'Zwischenabgabe'
+				},
+				{
+					paabgabetyp_kurzbz: 'note',
+					bezeichnung: 'Benotung'
+				},
+				{
+					paabgabetyp_kurzbz: 'end',
+					bezeichnung: 'Endupload'
+				},
+				{
+					paabgabetyp_kurzbz: 'enda',
+					bezeichnung: 'Endabgabe im Sekretariat'
+				}
+			],
+			serienTermin: Vue.reactive({
+				datum: new Date(),
+				bezeichnung: {
+					paabgabetyp_kurzbz: 'zwischen',
+					bezeichnung: 'Zwischenabgabe'
+				},
+				kurzbz: ''
+			}),
 			showAll: false,
 			tabulatorUuid: Vue.ref(0),
 			selectedData: [],
@@ -38,6 +76,7 @@ export const AbgabetoolMitarbeiter = {
 				layout: 'fitDataStretch',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				selectable: true,
+				selectableCheck: this.selectionCheck,
 				columns: [
 					{
 						formatter: 'rowSelection',
@@ -59,7 +98,7 @@ export const AbgabetoolMitarbeiter = {
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg', formatter: this.centeredTextFormatter, widthGrow: 2},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'studiensemester_kurzbz', formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4titel')), field: 'titel', formatter: this.centeredTextFormatter, maxWidth: 500, widthGrow: 8},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4beteuerart')), field: 'betreuerart_beschreibung',formatter: this.centeredTextFormatter, widthGrow: 8}
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4betreuerart')), field: 'betreuerart_beschreibung',formatter: this.centeredTextFormatter, widthGrow: 8}
 				],
 				persistence: false,
 			},
@@ -74,24 +113,10 @@ export const AbgabetoolMitarbeiter = {
 				handler: async (e, cell) => {
 					if(cell.getColumn().getField() === "details") {
 						this.setDetailComponent(cell.getValue())
+						this.undoSelection(cell)
+					} else if (cell.getColumn().getField() === "mail") {
+						this.undoSelection(cell)
 					}
-					e.stopPropagation()
-
-				}
-			},
-			{
-				event: "rowClick",
-				handler: async (e, row) => {
-
-					e.stopPropagation()
-
-				}
-			},
-			{
-				event: "rowSelected",
-				handler: async (row) => {
-
-
 				}
 			},
 			{
@@ -103,16 +128,82 @@ export const AbgabetoolMitarbeiter = {
 			]};
 	},
 	methods: {
+		getOptionLabelAbgabetyp(option){
+			return option.bezeichnung
+		},
+		formatDate(dateParam) {
+			const date = new Date(dateParam)
+			// handle missing leading 0
+			const padZero = (num) => String(num).padStart(2, '0');
+
+			const month = padZero(date.getMonth() + 1); // Months are zero-based
+			const day = padZero(date.getDate());
+			const year = date.getFullYear();
+
+			return `${day}.${month}.${year}`;
+		},
+		undoSelection(cell) {
+			// checks if cells row is selected and unselects -> imitates columns which dont trigger row selection
+			// but actually just revert it after the fact
+
+			const row = cell.getRow()
+			if(row.isSelected()) {
+				row.deselect();
+			}
+		},
+		selectionCheck(row) {
+			const data = row.getData()
+			if(data?.betreuerart_kurzbz == 'Zweitbegutachter') return false
+			return true
+		},
 		showDeadlines(){
-			// TODO: open seperate view in new window containing all future deadlines for the employee
+			const link = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+ '/Cis/Abgabetool/Deadlines'
+			window.open(link, '_blank')
 		},
 		toggleShowAll(showall) {
 			this.showAll = showall
-			// TODO: debug tabulator row render
-			this.loadProjektarbeiten(showall, () => { this.$refs.abgabeTable?.tabulator.redraw(true) })
+			this.loading = true
+			this.loadProjektarbeiten(showall, () => {
+				this.$refs.abgabeTable?.tabulator.redraw(true)
+				this.$refs.abgabeTable?.tabulator.setSort([]);
+				this.loading = false
+			})
+		},
+		openAddSeriesModal() {
+			this.$refs.modalContainerAddSeries.show()
 		},
 		addSeries() {
+			this.saving = true
+			this.$fhcApi.factory.lehre.postSerientermin(
+				this.serienTermin.datum.toISOString(),
+				this.serienTermin.bezeichnung.paabgabetyp_kurzbz,
+				this.serienTermin.bezeichnung.bezeichnung,
+				this.serienTermin.kurzbz,
+				this.selectedData?.map(projekt => projekt.projektarbeit_id)
+			).then(res => {
+				if (res.meta.status === "success" && res.data) {
+					this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/serienTerminGespeichert'))
+					// TODO: sticky lifetime erhöhen um sinnvoll lesen zu können?
+					this.$fhcAlert.alertInfo(this.$p.t('abgabetool/serienTerminEmailSentInfo', [this.createInfoString(res.data)]));
+				} else {
+					this.$fhcAlert.alertError(this.$p.t('abgabetool/errorSerienterminSpeichern'))
+				}
+			}).finally(()=>{
+				this.saving = false
+			})
+
+			this.$refs.modalContainerAddSeries.hide()
+		},
+		createInfoString(data) {
+			let str = '';
 			
+			data.forEach(name => {
+				str += name
+				str += '; '
+			})
+			
+			return str
 		},
 		isPastDate(date) {
 			return new Date(date) < new Date(Date.now())
@@ -283,8 +374,57 @@ export const AbgabetoolMitarbeiter = {
 		this.setupMounted()
 	},
 	template: `
-
-
+		<bs-modal ref="modalContainerAddSeries" class="bootstrap-prompt"
+		dialogClass="modal-lg">
+			<template v-slot:title>
+				<div>
+					{{ $p.t('abgabetool/addSeries') }}
+				</div>
+			</template>
+			<template v-slot:default>
+				<div class="row">
+					<div class="col-3 d-flex justify-content-center align-items-center">
+						{{$p.t('abgabetool/c4zieldatum')}}
+					</div>
+					<div class="col-3 d-flex justify-content-center align-items-center">
+						{{$p.t('abgabetool/c4abgabetyp')}}
+					</div>
+					<div class="col-6 d-flex justify-content-center align-items-center">
+						{{$p.t('abgabetool/c4abgabekurzbz')}}
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-3 d-flex justify-content-center align-items-center">
+						<div>
+							<VueDatePicker
+								style="width: 95%;"
+								v-model="serienTermin.datum"
+								:clearable="false"
+								:enable-time-picker="false"
+								:format="formatDate"
+								:text-input="true"
+								auto-apply>
+							</VueDatePicker>
+						</div>				
+					</div>
+					<div class="col-3 d-flex justify-content-center align-items-center">
+						<Dropdown 
+							:style="{'width': '100%'}"
+							v-model="serienTermin.bezeichnung"
+							:options="allAbgabeTypes"
+							:optionLabel="getOptionLabelAbgabetyp">
+						</Dropdown>
+					</div>
+					<div class="col-6 d-flex justify-content-center align-items-center">
+						<Textarea style="margin-bottom: 4px;" v-model="serienTermin.kurzbz" rows="3" cols="40"></Textarea>
+					</div>
+				</div>
+				
+			</template>
+			<template v-slot:footer>
+				<button type="button" class="btn btn-primary" @click="addSeries">{{ $p.t('global/save') }}</button>
+			</template>
+		</bs-modal>	
 		
 		<vertical-split ref="verticalsplit">		
 			
@@ -296,9 +436,9 @@ export const AbgabetoolMitarbeiter = {
 					@uuidDefined="handleUuidDefined"
 					ref="abgabeTable"
 					:newBtnShow="true"
-					:newBtnLabel="$p.t('global/neueTerminserie')"
+					:newBtnLabel="$p.t('abgabetool/neueTerminserie')"
 					:newBtnDisabled="!selectedData.length"
-					@click:new=addSeries
+					@click:new=openAddSeriesModal
 					:tabulator-options="abgabeTableOptions"  
 					:tabulator-events="abgabeTableEventHandlers"
 					tableOnly
@@ -316,6 +456,14 @@ export const AbgabetoolMitarbeiter = {
 							<i class="fa fa-hourglass-end"></i>
 							{{ $p.t('abgabetool/showDeadlines') }}
 						</button>
+						
+						<div v-show="saving">
+							{{ $p.t('abgabetool/currentlySaving') }} <i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+						</div>
+						<div v-show="loading">
+							{{ $p.t('abgabetool/currentlyLoading') }} <i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+						</div>
+						
 					</template>
 				</core-filter-cmpt>
 

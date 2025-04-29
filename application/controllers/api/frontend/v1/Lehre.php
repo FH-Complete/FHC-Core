@@ -45,7 +45,9 @@ class Lehre extends FHCAPI_Controller
 			'postStudentProjektarbeitEndupload' => self::PERM_LOGGED,
 			'getMitarbeiterProjektarbeiten' => self::PERM_LOGGED,
 			'postProjektarbeitAbgabe' => self::PERM_LOGGED,
-			'deleteProjektarbeitAbgabe' => self::PERM_LOGGED
+			'deleteProjektarbeitAbgabe' => self::PERM_LOGGED,
+			'postSerientermin' => self::PERM_LOGGED,
+			'fetchDeadlines' => self::PERM_LOGGED // TODO: mitarbeiter recht prüfen
 		]);
 
 		$this->load->library('PhrasesLib');
@@ -555,6 +557,117 @@ class Lehre extends FHCAPI_Controller
 		}
 
 		$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+	}
+
+	/**
+	 * endpoint for adding the same paabgabe for multiple projektarbeiten
+	 * can be slow for large n since it queries twice per projektarbeit_id
+	 */
+	public function postSerientermin() {
+		$projektarbeit_ids = $_POST['projektarbeit_ids'];
+		$datum = $_POST['datum'];
+		$paabgabetyp_kurzbz = $_POST['paabgabetyp_kurzbz'];
+		$bezeichnung = $_POST['bezeichnung'];
+		$kurzbz = $_POST['kurzbz'];
+
+		if (!isset($projektarbeit_ids) || !is_array($projektarbeit_ids) || empty($projektarbeit_ids)
+			|| !isset($datum) || isEmptyString($datum)
+			|| !isset($kurzbz) || isEmptyString($kurzbz)
+			|| !isset($bezeichnung) || isEmptyString($bezeichnung)
+			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz))
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		
+		// old script checks if there already are tbl_paabgabe entries with exact date, type & kurzbz
+		// for each termin - good to check that in principle but should not matter in this place. if necessary
+		// duplicate abgabetermine can be easily deleted manually, also via cronjob@night.
+		
+		// since this entry includes the kurzbz string match, it should have only ever mattered when there were
+		// multiple users entering the exact same set of (date, type, kurzbz) - which is a much more narrow case than the
+		// general "saveMultiple" function should handle
+		
+		// old script afterwards again queries if user is not the zweitbetreuer of any id - this is blocked in the ui
+		// and should never unintentionally happen
+		
+		// TODO: check berechtigung &/|| zuordnung?
+		
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		
+		$res = [];
+		foreach ($projektarbeit_ids as $projektarbeit_id) {
+			
+			$result = $this->PaabgabeModel->insert(
+				array(
+					'projektarbeit_id' => $projektarbeit_id,
+					'paabgabetyp_kurzbz' => $paabgabetyp_kurzbz,
+					'fixtermin' => false,
+					'datum' => $datum,
+					'kurzbz' => $kurzbz,
+					'insertvon' => getAuthUID(),
+					'insertamum' => date('Y-m-d H:i:s')
+				)
+			);
+			
+			$data = $this->getDataOrTerminateWithError($result);
+			
+//			$res[] = $data;
+
+			// send mail to student
+			$result = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+			$data = $this->getDataOrTerminateWithError($result);
+
+//			$this->addMeta('emaildata'.$projektarbeit_id, $data);
+			
+			$datetime = new DateTime($datum);
+			$dateEmailFormatted = $datetime->format('d.m.Y');
+			
+			$anredeFillString = $data[0]->anrede=="Herr"?"r":"";
+			
+			$fullFormattedNameString = trim($data[0]->titelpre." ".$data[0]->vorname." ".$data[0]->nachname." ".$data[0]->titelpost);
+			$res[] = $fullFormattedNameString;
+			
+			// Prepare mail content
+			$body_fields = array(
+				'anrede' => $data[0]->anrede,
+				'anredeFillString' => $anredeFillString,
+				'datum' => $dateEmailFormatted,
+				'bezeichnung' => $bezeichnung,
+				'fullFormattedNameString' => $fullFormattedNameString,
+				'kurzbz' => $kurzbz
+			);
+
+			$email = $data[0]->uid."@".DOMAIN;
+			
+			sendSanchoMail(
+				'neuerTerminBachelorMasterbetreuung',
+				$body_fields,
+				$email,
+				$this->p->t('abgabetool', 'neuerTerminBachelorMasterbetreuung')
+			);
+		}
+		
+		$this->terminateWithSuccess($res);
+		
+	}
+	
+	public function fetchDeadlines() {
+		$person_id = $_POST['person_id'];
+		
+		if (!isset($person_id) || isEmptyString($person_id))
+			$person_id = getAuthPersonId();
+		
+		
+		if($person_id !== getAuthPersonId()) {
+			$this->load->library('PermissionLib');
+			$isAdmin = $this->permissionlib->isBerechtigt('admin');
+			if(!$isAdmin) $this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), 'general');
+		}
+
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		$result = $this->PaabgabeModel->getDeadlines($person_id);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 }
 

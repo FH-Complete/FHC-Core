@@ -12,6 +12,7 @@ import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
 import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../../components/Cis/Mylv/RoomInformation.js";
 import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent.js";
 import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
+import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 
 
 
@@ -42,6 +43,12 @@ const router = VueRouter.createRouter({
 			path: `/Cis/Abgabetool/Mitarbeiter`,
 			name: 'AbgabetoolMitarbeiter',
 			component: AbgabetoolMitarbeiter,
+			props: true
+		},
+		{
+			path: `/Cis/Abgabetool/Deadlines/:person_uid_prop?`,
+			name: 'DeadlineOverview',
+			component: DeadlineOverview,
 			props: true
 		},
 		{

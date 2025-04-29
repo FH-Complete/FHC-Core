@@ -212,7 +212,11 @@ class Projektarbeit_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, array($studentUID, $maUID));
 	}
-	
+
+	/**
+	 * Get a List of Projektarbeiten of a mitarbeiter with zuordnung
+	 * used by the mitarbeiter cis4 abgabetool.
+	 */
 	public function getMitarbeiterProjektarbeiten($uid, $showAll){
 		$qry = "SELECT
 					*
@@ -241,5 +245,20 @@ class Projektarbeit_model extends DB_Model
 				ORDER BY nachname;";
 
 		return $this->execReadOnlyQuery($qry, array($uid));
+	}
+
+	/**
+	 * Fetch Student info relevant to a projektarbeit_id
+	 */
+	public function getStudentInfoForProjektarbeitId($projektarbeit_id) {
+		
+		$qry = "SELECT *
+				FROM campus.vw_student 
+				WHERE uid IN(
+					SELECT student_uid 
+					FROM lehre.tbl_projektarbeit 
+					WHERE projektarbeit_id = ? )";
+		
+		return $this->execReadOnlyQuery($qry, array($projektarbeit_id));
 	}
 }

@@ -77,5 +77,21 @@ export default {
 		const url = '/api/frontend/v1/Lehre/deleteProjektarbeitAbgabe';
 
 		return this.$fhcApi.post(url, payload, null)
+	},
+	postSerientermin(datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, projektarbeit_ids) {
+		const payload = {
+			datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, projektarbeit_ids
+		}
+		const url = '/api/frontend/v1/Lehre/postSerientermin';
+
+		return this.$fhcApi.post(url, payload, null)
+	},
+	fetchDeadlines(person_id) {
+		const payload = {
+			person_id
+		}
+		const url = '/api/frontend/v1/Lehre/fetchDeadlines';
+
+		return this.$fhcApi.post(url, payload, null)
 	}
   }
