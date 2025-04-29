@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4d532e48e895cb864fb89170e18e2a3d",
+    "content-hash": "f97c6194d4d63e90a855add1cf7d0e86",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -1869,11 +1869,29 @@
             "type": "library"
         },
         {
+            "name": "vuejs/vuedatepicker_css11",
+            "version": "11.0.1",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/@vuepic/vue-datepicker@11.0.1/dist/main.css"
+            },
+            "type": "library"
+        },
+        {
             "name": "vuejs/vuedatepicker_js",
             "version": "7.2.0",
             "dist": {
                 "type": "file",
                 "url": "https://unpkg.com/@vuepic/vue-datepicker@7.2.0/dist/vue-datepicker.iife.js"
+            },
+            "type": "library"
+        },
+        {
+            "name": "vuejs/vuedatepicker_js11",
+            "version": "11.0.1",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/@vuepic/vue-datepicker@11.0.1/dist/vue-datepicker.iife.js"
             },
             "type": "library"
         },
