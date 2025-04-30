@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<phpunit bootstrap="index.ci.php">
+<phpunit bootstrap="index.phpunit.php">
     <testsuites>
-        <testsuite name="UnitTests">
-            <directory>system/UnitTests/vertragsbestandteil/gui</directory>
+        <testsuite name="BookmarkTest">
+            <directory>system/UnitTests/api/</directory>
         </testsuite>
     </testsuites>
     <php>
