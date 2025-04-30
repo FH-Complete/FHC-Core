@@ -1,0 +1,33 @@
+export default {
+
+	getStudiensemester: function () {
+		return this.$fhcApi.get(
+			'/components/Cis/Mylv/Studiensemester',
+			{}
+		);
+	},
+
+	getAllStudienSemester: function (studiensemester=undefined, studiengang=undefined, semester=undefined, studienplan=undefined) {
+		console.log(studiensemester, studiengang, semester, studienplan)
+		return this.$fhcApi.get(
+			'/api/frontend/v1/Studium/getStudienAllSemester',
+			{studiensemester, studiengang, semester, studienplan}
+		);
+	},
+
+	getStudiengaengeForStudienSemester: function (studiensemester) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Studium/getStudiengaengeForStudienSemester/${studiensemester}`,
+			{}
+		);
+	},
+	getStudienplaeneBySemester: function (studiengang, studiensemester) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Studium/getStudienplaeneBySemester`,
+			{
+				studiengang,
+				studiensemester,
+			}
+		);
+	},
+}

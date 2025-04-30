@@ -13,14 +13,19 @@ import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../../components/Cis/Mylv/
 import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent.js";
 import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
-
-
+import Studium from "../../components/Cis/Studium/Studium.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(`/${ciPath}`),
 	routes: [
+		{
+			path: `/Cis/Studium`,
+			name: 'Studium',
+			component: Studium,
+			props: true
+		},
 		{
 			path: `/Cis/Profil/View/:uid`,
 			name: 'ProfilView',
