@@ -1,3 +1,5 @@
+import LvModal from "../Mylv/LvModal.js";
+
 export default {
 	data(){
 		return {
@@ -9,7 +11,12 @@ export default {
 			selectedStudienordnung: null,
 			semester:[],
 			selectedSemester:null,
+			lehrveranstaltungen: [],
+			selectedLehrveranstaltung: null,
 		}
+	},
+	components:{
+		LvModal,
 	},
 	methods:{
 		changeSelectedStudienSemester(studiensemester) {
@@ -40,6 +47,16 @@ export default {
 					this.extractPropertyValues(res);
 				})
 		},
+		selectLehrveranstaltung(lehrveranstaltung) {
+			this.selectedLehrveranstaltung = lehrveranstaltung;
+			this.selectedLehrveranstaltung.type ="lehreinheit";
+			this.selectedLehrveranstaltung.lehreinheit_id = this.selectedLehrveranstaltung.lehrveranstaltung_id;
+			console.log(this.selectedLehrveranstaltung, "selected lehrveranstaltung")
+			Vue.nextTick(()=>{
+				this.$refs.modalContainer.show();
+			})
+			
+		},
 		/* loadStudienplan(studiengang, studiensemester){
 			this.$fhcApi.factory.studium.getStudienplaeneBySemester(studiengang, studiensemester)
 				.then(data => data.data)
@@ -63,7 +80,7 @@ export default {
 			location.hash = val;
 		},
 		extractPropertyValues(res){
-			let { studienSemester, studiengang, semester, studienplan } = res;
+			let { studienSemester, studiengang, semester, studienplan, lehrveranstaltungen } = res;
 			this.sortStudienSemester(studienSemester.all);
 			this.studienSemester = studienSemester.all;
 			this.selectedStudiensemester = studienSemester.preselected.studiensemester_kurzbz;
@@ -78,6 +95,8 @@ export default {
 			this.studienOrdnung = studienplan.all;
 			console.log(this.studienOrdnung,"studienordnung")
 			this.selectedStudienordnung = studienplan.preselected?.studienplan_id;
+
+			this.lehrveranstaltungen = lehrveranstaltungen;
 		},
 		studienordnungTitel(studienordnung){
 			if(!studienordnung) return "";
@@ -141,7 +160,9 @@ export default {
 		}
 	} */
 	template: `
-	<h2>this is a test titel</h2>
+	<div>
+	<h2>Studium</h2>
+	<hr>
 	<div class="input-group">
 		<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="prevSem">
 			<i class="fa fa-caret-left" aria-hidden="true"></i>
@@ -188,6 +209,22 @@ export default {
 		<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="nextSem">
 			<i class="fa fa-caret-right" aria-hidden="true"></i>
 		</button>
+	</div>
+
+	<hr>
+
+	<div class="d-grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+		<div class="card" v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
+			<div class="card-header">
+				<h5 class=" card-title">{{lehrveranstaltung.bezeichnung}}</h5>
+				<h6 class=" card-subtitle">{{lehrveranstaltung.lehrtyp_kurzbz}}</h6>
+			</div>
+			<div class="card-body">
+				<a class="d-block" href="#" v-for="lv in lehrveranstaltung.lehrveranstaltungen" @click="selectLehrveranstaltung(lv)">{{lv.bezeichnung}}</a>
+			</div>
+		</div>
+	</div>
+	<lv-modal v-if="selectedLehrveranstaltung" ref="modalContainer" :event="selectedLehrveranstaltung" title="test" >
 	</div>
 	
 	`

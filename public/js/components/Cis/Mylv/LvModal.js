@@ -51,7 +51,7 @@ export default {
 
 			if (this.event.type == 'lehreinheit') {
 				this.$api
-					.call(ApiStundenplan.getLehreinheitStudiensemester(this.event.lehreinheit_id[0]))
+					.call(ApiStundenplan.getLehreinheitStudiensemester(Array.isArray(this.event.lehreinheit_id) ? this.event.lehreinheit_id[0] : this.event.lehreinheit_id))
 					.then(res => res.data)
 					.then(studiensemester_kurzbz => this.$api.call(
 						ApiAddons.getLvMenu(

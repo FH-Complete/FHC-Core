@@ -132,6 +132,14 @@ class Studium extends FHCAPI_Controller
 			$aktuelles_studienplan = $parameter_studienplan ;
 		}
 
+		// fetch studienplan lehrveranstaltungen
+		if($aktuelles_studienplan){
+			$lehrveranstaltungen = $this->computeStudienplanLehrveranstaltungen($aktuelles_studienplan->studienplan_id, $aktuelles_semester);
+			$aktuelles_lehrveranstaltungen = $lehrveranstaltungen;
+		}else{
+			$aktuelles_lehrveranstaltungen = [];
+		}
+
 		// result object
 		$result = new stdClass();
 		$result->studienSemester = [];
@@ -142,7 +150,8 @@ class Studium extends FHCAPI_Controller
 		$result->semester["all"] =$semester;
 		$result->semester["preselected"] =$aktuelles_semester;
 		$result->studienplan["all"]=$semester_studienplan;
-		$result->studienplan["preselected"]=$aktuelles_studienplan;  
+		$result->studienplan["preselected"]=$aktuelles_studienplan; 
+		$result->lehrveranstaltungen=$aktuelles_lehrveranstaltungen;  
 		$result->test1=$test1;
 		$result->test2=$test2; 
 		$result->test3=$test3; 
@@ -199,6 +208,36 @@ class Studium extends FHCAPI_Controller
 			return $studienplan;
 		},$studienplaene);
 		return $studienplaene;
+	}
+
+	private function computeStudienplanLehrveranstaltungen($studienplan_id, $semester){
+		$lehrveranstaltungen = $this->StudienplanModel->getStudienplanLehrveranstaltung($studienplan_id, $semester);	
+		$lehrveranstaltungen = $this->getDataOrTerminateWithError($lehrveranstaltungen);
+		usort($lehrveranstaltungen, function($a, $b){
+			if($a->lehrtyp_kurzbz == "modul"){
+				return -1;
+			}
+			else if($b->lehrtyp_kurzbz == "modul"){
+				return 1;
+			}
+			return 0;
+		});
+		$lehrveranstaltungen= array_reduce($lehrveranstaltungen,function($carry, $lehrv){
+			if($lehrv->lehrtyp_kurzbz == "modul"){
+				array_push($carry, $lehrv);
+			}
+			else{
+				$parent =array_filter($carry, function($item)use($lehrv){
+					return $item->studienplan_lehrveranstaltung_id == $lehrv->studienplan_lehrveranstaltung_id_parent;
+				});
+				$parent = current($parent);
+				if($parent){
+					$parent->lehrveranstaltungen[] = $lehrv;
+				}
+			}
+			return $carry;
+		}, []);
+		return $lehrveranstaltungen;
 	}
 
 	private function computeStudiengaenge($studiensemester){
