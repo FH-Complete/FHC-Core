@@ -288,7 +288,7 @@ const Stundenplan = {
 			<div class="p-1" v-if="event.type=='moodle'" @click="showModal(event)">
 				<div class="d-flex small w-100" >
 					<moodle-svg></moodle-svg>
-					<span class="flex-grow-1 text-center ">{{event.topic}}</span>
+					<span class="flex-grow-1 text-center "><strong v-html="event.titel"></strong> - {{event.topic}}</span>
 				</div>
 			</div>
 			<div v-else @click="showModal(event)" class="p-1">
@@ -308,7 +308,7 @@ const Stundenplan = {
 				</div>
 				<div v-if="event.type=='moodle'" class="d-flex small w-100" >
 					<moodle-svg></moodle-svg>
-					<span class="flex-grow-1 text-center">{{event.topic}}</span>
+					<span class="flex-grow-1 text-center"><strong v-html="event.titel"></strong> - {{event.topic}}</span>
 				</div>
 				<div v-else class="d-flex flex-column flex-grow-1 align-items-center small">
 					<span>{{event.topic}}</span>
@@ -322,7 +322,7 @@ const Stundenplan = {
 				<template v-if="event.type=='moodle'">
 					<div class="d-flex small align-items-center w-100 p-1" >
 						<moodle-svg></moodle-svg>
-						<span class="flex-grow-1 text-center">{{event.topic}}</span>
+						<span class="flex-grow-1 text-center"><strong v-html="event.titel"></strong> - {{event.topic}}</span>
 					</div>
 				</template>
 				<template v-else>

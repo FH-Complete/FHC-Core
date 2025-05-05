@@ -178,7 +178,7 @@ export default {
 				<div  v-if="event.type=='moodle'">
 					<div class="d-flex small w-100" >
 						<moodle-svg></moodle-svg>
-						<span v-contrast class="flex-grow-1 text-center ">{{event.topic}}</span>
+						<span v-contrast class="flex-grow-1 text-center "><strong v-html="event.titel"></strong> - {{event.topic}}</span>
 					</div>
 				</div>
 				<span v-else class="small" >
@@ -198,7 +198,7 @@ export default {
 							<template v-if="evt.type=='moodle'">
 								<div class="d-flex align-items-center ">
 									<moodle-svg></moodle-svg>
-									<b v-contrast class="flex-grow-1 text-center">{{evt.topic}}</b>
+									<b v-contrast class="flex-grow-1 text-center"><strong v-html="evt.titel"></strong> - {{evt.topic}}</b>
 								</div>
 							</template>
 							<template v-else>

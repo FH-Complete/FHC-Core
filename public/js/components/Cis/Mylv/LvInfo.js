@@ -68,7 +68,7 @@ export default {
 					</tr>
 					<tr>
 						<th>{{$p.t('global','aktivitaet')}}:</th>
-						<td>{{event?.assignment}}</td>
+						<td v-html="event?.assignment"></td>
 					</tr>
 					<tr>
 						<th>{{$p.t('global','typ')}}:</th>
