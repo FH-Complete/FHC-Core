@@ -1,3 +1,4 @@
+console.warn('plugin/highchartsVue.js is DEPRECATED! Use plugins/highchartsVue.js instead.');
 function doCopy (copy, original, copyArray) {
     // Callback function to iterate on array or object elements
     function callback (value, key) {

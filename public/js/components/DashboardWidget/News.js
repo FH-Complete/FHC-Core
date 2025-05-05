@@ -1,6 +1,8 @@
 import AbstractWidget from './Abstract.js';
 import BsModal from '../Bootstrap/Modal.js';
 
+import ApiCms from '../../api/factory/cms.js';
+
 const MAX_LOADED_NEWS = 30;
 
 export default {
@@ -132,8 +134,8 @@ export default {
 	},
 	created() {
 		this.$emit("setConfig", false);
-		this.$fhcApi.factory.cms
-			.news(MAX_LOADED_NEWS)
+		this.$api
+			.call(ApiCms.news(MAX_LOADED_NEWS))
 			.then(res => res.data)
 			.then((news) => {
 				this.allNewsList = Array.from(Object.values(news));

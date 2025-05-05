@@ -1,5 +1,8 @@
 import BsModal from "../../Bootstrap/Modal.js";
 import LvMenu from "./LvMenu.js";
+
+import ApiAddons from '../../../api/factory/addons.js';
+
 export default  {
   
     props:{
@@ -34,13 +37,15 @@ export default  {
 			this.isMenuSelected = false;
         },
         showModal: function(){
-			if(!this.preselectedMenu){
-				this.$fhcApi.factory.addons.getLvMenu(this.event.lehrveranstaltung_id, this.event.studiensemester_kurzbz).then(res =>{
-					if(res.data){
-						this.menu = res.data;
-					}
-				});
-			}else{
+			if (!this.preselectedMenu) {
+                this.$api
+                    .call(ApiAddons.getLvMenu(this.event.lehrveranstaltung_id, this.event.studiensemester_kurzbz))
+                    .then(res => {
+    					if (res.data) {
+    						this.menu = res.data;
+    					}
+    				});
+			} else {
 				this.isMenuSelected = true;
 			}
         },
