@@ -128,7 +128,7 @@ export default {
 
 		loadEvents: function () {
 			Promise.allSettled([
-				this.$api.call(ApiStundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay)),
+				this.$api.call(ApiStundenplan.StundenplanEvents(this.monthFirstDay, this.monthLastDay)),
 				this.$api.call(ApiStundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay))
 			]).then((result) => {
 				let promise_events = [];
