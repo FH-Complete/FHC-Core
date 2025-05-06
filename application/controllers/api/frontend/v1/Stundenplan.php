@@ -91,47 +91,19 @@ class Stundenplan extends FHCAPI_Controller
 		}
 
 		// fetching moodle events
-		$moodle_start_date = new DateTime($start_date);
-		$moodle_start_date = $moodle_start_date->getTimestamp();
-		$moodle_end_date = new DateTime($end_date);
-		$moodle_end_date = $moodle_end_date->getTimestamp();
 		$moodle_events = [];
-		Events::trigger('moodleCalendarEvents',
-						function & () use (&$moodle_events) {
-							return $moodle_events;
-						},
-						['timestart'=>$moodle_start_date,'timeend'=>$moodle_end_date, 'username'=>getAuthUID()]
+		Events::trigger(
+			'moodleCalendarEvents',
+			function & () use (&$moodle_events)
+			{
+				return $moodle_events;
+			},
+			[
+				'start_date' => $start_date,
+				'end_date' => $end_date, 
+				'username' => getAuthUID()
+			]
 		);
-		$moodle_events = array_map(function($event){
-			$moodle_event_timestart = new DateTime($event->timestart);
-			$moodle_event_timeend = new DateTime($event->timeend);
-			$convertedEvent = new stdClass();
-			$convertedEvent->type = 'moodle';
-			$convertedEvent->beginn = $moodle_event_timestart->format('H:i:s');
-			$convertedEvent->ende = $moodle_event_timeend->format('H:i:s');
-			$convertedEvent->allDayEvent = true;
-			$convertedEvent->datum = $moodle_event_timestart->format('Y-n-j');
-			$convertedEvent->purpose = $event->purpose;
-			$convertedEvent->assignment = $event->activityname;
-			$convertedEvent->topic = $event->activitystr;
-			$convertedEvent->lektor = [];
-			$convertedEvent->gruppe = [];
-			$convertedEvent->ort_kurzbz = $event->location;
-			$convertedEvent->lehreinheit_id = $event->lehreinheitsNummber ?? null;
-			$convertedEvent->titel = isset($event->course->fullname)? $event->course->fullname:null;
-			$convertedEvent->lehrfach = '';
-			$convertedEvent->lehrform = '';
-			$convertedEvent->lehrfach_bez = '';
-			$convertedEvent->organisationseinheit = '';
-			$convertedEvent->farbe = '00689E';
-			$convertedEvent->lehrveranstaltung_id = 0;
-			$convertedEvent->ort_content_id = 0;
-			$convertedEvent->url = $event->url;
-			$convertedEvent->activityIcon = isset($event->icon->iconurl)? $event->icon->iconurl:null;
-			$convertedEvent->actionname = isset($event->action->name)?$event->action->name:null;
-			$convertedEvent->overdue = !empty($event->overdue);
-			return $convertedEvent;
-		},$moodle_events);
 		
 		$result = array_merge($stundenplan_events,$moodle_events);
 		// sort array with moodle events first
