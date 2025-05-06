@@ -21,6 +21,8 @@ class StundenplanLib{
 		$this->_ci->load->model('organisation/Studiensemester_model','StudiensemesterModel');
 		$this->_ci->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$this->_ci->load->model('person/Benutzergruppe_model','BenutzergruppeModel');
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		
 
 		$student_uid = getAuthUID();
 		if(is_null($student_uid))
@@ -55,7 +57,7 @@ class StundenplanLib{
 
 			// query lv itself in case its Stundenplan is being queried and it has no entries
 			$this->_ci->load->model('education/Lehrveranstaltung_model','LehrveranstaltungModel');
-			$lv_result = $this->LehrveranstaltungModel->load($lv_id);
+			$lv_result = $this->_ci->LehrveranstaltungModel->load($lv_id);
 			if(isError($lv_result))
 			{
 				return error(getData($lv_result));
@@ -143,6 +145,39 @@ class StundenplanLib{
 		return success($reservierungen);
 	}
 
+	public function getLektorenFromLehrveranstaltung($lehrveranstaltung_id, $semester, $studiengang_kz, $studiensemester_kurzbz){
+		$this->_ci =& get_instance();
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		$this->_ci->load->model('organisation/Studiensemester_model','StudiensemesterModel');
+		
+		$studiensemester = $this->_ci->StudiensemesterModel->loadWhere(["studiensemester_kurzbz"=>$studiensemester_kurzbz]);
+		if(isError($studiensemester))
+		{
+			return error(getData($studiensemester));
+		}
+		$studiensemester = current(getData($studiensemester));
+		$lektoren = $this->_ci->StundenplanModel->execReadOnlyQuery("
+		SELECT DISTINCT uid 
+		FROM campus.vw_stundenplan
+		WHERE lehrveranstaltung_id = ? AND
+		studiengang_kz = ? AND
+		semester = ? AND
+		(datum BETWEEN ? AND ?)
+		",[$lehrveranstaltung_id, $studiengang_kz, $semester, $studiensemester->start, $studiensemester->ende]);
+		
+		if(isError($lektoren))
+		{
+			return error(getData($lektoren));
+		}
+		$lektoren = getData($lektoren);
+		if(isset($lektoren)){
+			$lektoren = array_map(function($lektor){
+				return $lektor->uid;
+			},$lektoren);
+
+		}
+		return $lektoren;
+	}
 
 	public function expand_object_information($data){
 		$this->_ci =& get_instance();

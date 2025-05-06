@@ -1,4 +1,5 @@
-import LvModal from "../Mylv/LvModal.js";
+import LvUebersicht from "../Mylv/LvUebersicht.js";
+
 
 export default {
 	data(){
@@ -13,21 +14,84 @@ export default {
 			selectedSemester:null,
 			lehrveranstaltungen: [],
 			selectedLehrveranstaltung: null,
+			menu:null,
 		}
 	},
-	components:{
-		LvModal,
+	components: {
+		LvUebersicht,
+	},
+	watch:{
+		selectedStudiensemester: function(newVal, oldVal){
+			if(newVal != oldVal){
+				const studiensemester =this.getDataFromLocalStorage("sudiensemester");
+				if (!studiensemester || (studiensemester && studiensemester != newVal)){
+					this.storeDataToLocalStorage("sudiensemester", newVal);
+				}
+			}
+		},
+		selectedSemester: function (newVal, oldVal) {
+			if (newVal != oldVal) {
+				const semester = this.getDataFromLocalStorage("semester");
+				if (!semester || (semester && semester != newVal)) {
+					this.storeDataToLocalStorage("semester", newVal);
+				}
+			}
+		},
+		selectedStudiengang: function (newVal, oldVal) {
+			if (newVal != oldVal) {
+				const studiengang = this.getDataFromLocalStorage("studiengang");
+				if (!studiengang || (studiengang && studiengang != newVal)) {
+					this.storeDataToLocalStorage("studiengang", JSON.stringify(newVal));
+				}
+			}
+		},
+		selectedStudienordnung: function (newVal, oldVal) {
+			if (newVal != oldVal) {
+				const studienordnung = this.getDataFromLocalStorage("studienordnung");
+				if (!studienordnung || (studienordnung && studienordnung != newVal)) {
+					this.storeDataToLocalStorage("studienordnung", JSON.stringify(newVal));
+				}
+			}
+		},
 	},
 	methods:{
-		changeSelectedStudienSemester(studiensemester) {
-			this.$fhcApi.factory.studium.getAllStudienSemester(studiensemester.studiensemester_kurzbz, this.selectedStudiengang, this.selectedSemester, this.selectedStudienordnung)
+		changeStudiensemester(value){
+			let studiensemester = this.$refs.studiensemester;
+			studiensemester.selectedIndex = (studiensemester.selectedIndex + value + studiensemester.options.length) % studiensemester.options.length;
+			this.changeSelectedStudienSemester(studiensemester.value);
+		},
+		changeStudiengang(value) {
+			let studiengang = this.$refs.studiengaenge;
+			studiengang.selectedIndex = (studiengang.selectedIndex + value + studiengang.options.length) % studiengang.options.length;
+			this.changeSelectedStudienGang(studiengang.value);
+		},
+		changeSemester(value) {
+			let semester = this.$refs.semester;
+			semester.selectedIndex = (semester.selectedIndex + value + semester.options.length) % semester.options.length;
+			this.changeSelectedSemester(semester.value);
+		},
+		changeStudienordnung(value) {
+			let studienordnung = this.$refs.studienordnung;
+			studienordnung.selectedIndex = (studienordnung.selectedIndex + value + studienordnung.options.length) % studienordnung.options.length;
+			this.changeSelectedStudienPlan(studienordnung.value);
+		},
+		
+		storeDataToLocalStorage(key,value){
+			localStorage.setItem(key, value);
+		},
+		getDataFromLocalStorage(key){
+			const value = localStorage.getItem(key);
+			return value;
+		},
+		changeSelectedStudienSemester(studiensemester_kurzbz) {
+			this.$fhcApi.factory.studium.getAllStudienSemester(studiensemester_kurzbz, this.selectedStudiengang, this.selectedSemester, this.selectedStudienordnung)
 				.then(data => data.data)
 				.then(res => {
 					this.extractPropertyValues(res);
 				})
 		},
-		changeSelectedStudienGang(studiengang) {
-			this.$fhcApi.factory.studium.getAllStudienSemester(this.selectedStudiensemester, studiengang.studiengang_kz, this.selectedSemester, this.selectedStudienordnung)
+		changeSelectedStudienGang(studiengang_kz) {
+			this.$fhcApi.factory.studium.getAllStudienSemester(this.selectedStudiensemester, studiengang_kz, this.selectedSemester, this.selectedStudienordnung)
 				.then(data => data.data)
 				.then(res => {
 					this.extractPropertyValues(res);
@@ -40,30 +104,24 @@ export default {
 					this.extractPropertyValues(res);
 				})
 		},
-		changeSelectedStudienPlan(studienplan) {
-			this.$fhcApi.factory.studium.getAllStudienSemester(this.selectedStudiensemester, this.selectedStudiengang, this.selectedSemester, studienplan.studienplan_id)
+		changeSelectedStudienPlan(studienplan_id) {
+			this.$fhcApi.factory.studium.getAllStudienSemester(this.selectedStudiensemester, this.selectedStudiengang, this.selectedSemester, studienplan_id)
 				.then(data => data.data)
 				.then(res => {
 					this.extractPropertyValues(res);
 				})
 		},
-		selectLehrveranstaltung(lehrveranstaltung) {
+		openLvUebersicht(lehrveranstaltung) {
 			this.selectedLehrveranstaltung = lehrveranstaltung;
+			//convert lehrveranstaltung properties for compatibility with Stundenplan LvModal
 			this.selectedLehrveranstaltung.type ="lehreinheit";
 			this.selectedLehrveranstaltung.lehreinheit_id = this.selectedLehrveranstaltung.lehrveranstaltung_id;
-			console.log(this.selectedLehrveranstaltung, "selected lehrveranstaltung")
-			Vue.nextTick(()=>{
-				this.$refs.modalContainer.show();
-			})
+			if(this.selectedLehrveranstaltung)
+				Vue.nextTick(()=>{
+					this.$refs.lvUebersicht.show();
+				})
 			
 		},
-		/* loadStudienplan(studiengang, studiensemester){
-			this.$fhcApi.factory.studium.getStudienplaeneBySemester(studiengang, studiensemester)
-				.then(data => data.data)
-				.then(res => {
-					console.log("This is the result", res)
-				})
-		}, */
 		sortStudienSemester(studienSemester){
 			let regex = new RegExp(/^(WS|SS)([0-9]{4})/);
 			studienSemester.sort((sem1,sem2)=>{
@@ -91,9 +149,7 @@ export default {
 			this.semester = semester.all;
 			this.selectedSemester = semester?.preselected;
 
-			console.log(studienplan.all,"all studienplan")
 			this.studienOrdnung = studienplan.all;
-			console.log(this.studienOrdnung,"studienordnung")
 			this.selectedStudienordnung = studienplan.preselected?.studienplan_id;
 
 			this.lehrveranstaltungen = lehrveranstaltungen;
@@ -122,108 +178,123 @@ export default {
 	},
 
 	computed:{
-		
+		selectedLehrveranstaltungTitel(){
+			const studiengang = this.studiengaenge.find((studiengang) => studiengang.studiengang_kz == this.selectedStudiengang);
+			return `${this.selectedLehrveranstaltung?.bezeichnung} ${this.selectedLehrveranstaltung?.lehrform_kurzbz} / ${studiengang.kurzbzlang}-${this.selectedSemester} ${this.selectedLehrveranstaltung?.orgform_kurzbz} (${this.selectedStudiensemester})`;
+		},
 	},
 	
 	created(){
-		this.$fhcApi.factory.studium.getAllStudienSemester()
+
+		const studiensemester = this.getDataFromLocalStorage("sudiensemester") ?? undefined;
+		const studiengang = JSON.parse(this.getDataFromLocalStorage("studiengang")) ?? undefined;
+		const semester = this.getDataFromLocalStorage("semester") ?? undefined;
+		const studienordnung = JSON.parse(this.getDataFromLocalStorage("studienordnung")) ?? undefined;
+
+		// only fetch default data if no data is stored in the local storage
+		
+		this.$fhcApi.factory.studium.getAllStudienSemester(studiensemester, studiengang, semester, studienordnung)
 		.then(data => data.data)
 		.then(res => {
 			this.	extractPropertyValues(res);
 		})
+
 	},
-	/* selectedStudiensemester(newStudiensemester, oldStudiensemester) {
-		if (newStudiensemester !== oldStudiensemester) {
-			this.$fhcApi.factory.studium.getAllStudienSemester(newStudiensemester, this.selectedStudiengang, this.selectedSemester)
-				.then(data => data.data)
-				.then(res => {
-					this.extractPropertyValues(res);
-				})
-		}
-	},
-	selectedStudiengang(newStudiengang, oldStudiengang) {
-		if (newStudiengang !== oldStudiengang) {
-			this.$fhcApi.factory.studium.getAllStudienSemester(this.selectedStudiensemester, newStudiengang, this.selectedSemester)
-				.then(data => data.data)
-				.then(res => {
-					this.extractPropertyValues(res);
-				})
-		}
-	},
-	selectedSemester(newSemester, oldSemester) {
-		if (newSemester !== oldSemester) {
-			this.$fhcApi.factory.studium.getAllStudienSemester(this.selectedStudiensemester, this.selectedStudiengang, newSemester)
-				.then(data => data.data)
-				.then(res => {
-					this.extractPropertyValues(res);
-				})
-		}
-	} */
 	template: `
 	<div>
 	<h2>Studium</h2>
 	<hr>
-	<div class="input-group">
-		<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="prevSem">
-			<i class="fa fa-caret-left" aria-hidden="true"></i>
-		</button>
-		<select ref="studiensemester" v-model="selectedStudiensemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
-			<option v-for="semester in studienSemester" @click="changeSelectedStudienSemester(semester)" :key="semester" :value="semester.studiensemester_kurzbz">{{studiensemesterTitel(semester.studiensemester_kurzbz)	}}</option>
-		</select>
-		<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="nextSem">
-			<i class="fa fa-caret-right" aria-hidden="true"></i>
-		</button>
-	</div>
+	<lv-uebersicht ref="lvUebersicht" :titel="selectedLehrveranstaltungTitel" :event="selectedLehrveranstaltung" :studiensemester="selectedStudiensemester" v-if="selectedLehrveranstaltung">
+		<template #content>
+			<div v-if="Array.isArray(selectedLehrveranstaltung.lektoren) && selectedLehrveranstaltung.lektoren.length>0" class="mb-4">
+				<h4>Lektoren:</h4>
+				<a :href="'mailto:'+lektor?.email" class="mx-2" v-for="lektor in selectedLehrveranstaltung.lektoren">{{lektor.name}}</a>
+			</div>
+		</template>
+	</lv-uebersicht>
+	<div class="lvOptions">
+		<div>
+		<h6>Studiensemester:</h6>
+		<div class="input-group">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(-1)">
+				<i class="fa fa-caret-left" aria-hidden="true"></i>
+			</button>
+			<select ref="studiensemester" v-model="selectedStudiensemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
+				<option v-for="semester in studienSemester" @click="changeSelectedStudienSemester(semester.studiensemester_kurzbz)" :key="semester" :value="semester.studiensemester_kurzbz">{{studiensemesterTitel(semester.studiensemester_kurzbz)	}}</option>
+			</select>
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(1)">
+				<i class="fa fa-caret-right" aria-hidden="true"></i>
+			</button>
+		</div>
+		</div>
 
-	<div class="input-group">
-		<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="prevSem">
-			<i class="fa fa-caret-left" aria-hidden="true"></i>
-		</button>
-		<select ref="studiengaenge" v-model="selectedStudiengang" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
-			<option v-for="studiengang in studiengaenge" @click="changeSelectedStudienGang(studiengang)" :key="studiengang.studiengang_kz" :value="studiengang.studiengang_kz" >{{studiengangTitel(studiengang)}}</option>
-		</select>
-		<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="nextSem">
-			<i class="fa fa-caret-right" aria-hidden="true"></i>
-		</button>
-	</div>
+		<div>
+		<h6>Studiengang:</h6>
+		<div class="input-group">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(-1)">
+				<i class="fa fa-caret-left" aria-hidden="true"></i>
+			</button>
+			<select ref="studiengaenge" v-model="selectedStudiengang" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
+				<option v-for="studiengang in studiengaenge" @click="changeSelectedStudienGang(studiengang.studiengang_kz)" :key="studiengang.studiengang_kz" :value="studiengang.studiengang_kz" >{{studiengangTitel(studiengang)}}</option>
+			</select>
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(1)">
+				<i class="fa fa-caret-right" aria-hidden="true"></i>
+			</button>
+		</div>
+		</div>
 
-	<div class="input-group">
-		<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="prevSem">
-			<i class="fa fa-caret-left" aria-hidden="true"></i>
-		</button>
-		<select ref="semester" v-model="selectedSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
-			<option v-for="sem in semester" @click="changeSelectedSemester(sem)" :key="semester" :value="sem">{{sem}}. Semester</option>
-		</select>
-		<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="nextSem">
-			<i class="fa fa-caret-right" aria-hidden="true"></i>
-		</button>
-	</div>
+		<div>
+		<h6>Semester:</h6>
+		<div class="input-group">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(-1)">
+				<i class="fa fa-caret-left" aria-hidden="true"></i>
+			</button>
+			<select ref="semester" v-model="selectedSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
+				<option v-for="sem in semester" @click="changeSelectedSemester(sem)" :key="semester" :value="sem">{{sem}}. Semester</option>
+			</select>
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(1)">
+				<i class="fa fa-caret-right" aria-hidden="true"></i>
+			</button>
+		</div>
+		</div>
 
-	<div class="input-group">
-		<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="prevSem">
-			<i class="fa fa-caret-left" aria-hidden="true"></i>
-		</button>
-		<select ref="studienordnung" v-model="selectedStudienordnung" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
-			<option v-for="ordnung in studienOrdnung" @click="changeSelectedStudienPlan(ordnung)" :key="ordnung.bezeichnung	" :value="ordnung.studienplan_id">{{studienordnungTitel(ordnung)}}</option>
-		</select>
-		<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="nextSem">
-			<i class="fa fa-caret-right" aria-hidden="true"></i>
-		</button>
+		<div>
+		<h6>Studienordnung:</h6>
+		<div class="input-group">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(-1)">
+				<i class="fa fa-caret-left" aria-hidden="true"></i>
+			</button>
+			<select ref="studienordnung" v-model="selectedStudienordnung" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
+				<option v-for="ordnung in studienOrdnung" @click="changeSelectedStudienPlan(ordnung.studienplan_id)" :key="ordnung.bezeichnung	" :value="ordnung.studienplan_id">{{studienordnungTitel(ordnung)}}</option>
+			</select>
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(1)">
+				<i class="fa fa-caret-right" aria-hidden="true"></i>
+			</button>
+		</div>
+		</div>
 	</div>
 
 	<hr>
 
-	<div class="d-grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
-		<div class="card" v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
+	<div class="lvUebersicht" >
+	<template v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
+		<div  class="card" v-if="Array.isArray(lehrveranstaltung.lehrveranstaltungen) && lehrveranstaltung.lehrveranstaltungen.length >0" >
 			<div class="card-header">
 				<h5 class=" card-title">{{lehrveranstaltung.bezeichnung}}</h5>
 				<h6 class=" card-subtitle">{{lehrveranstaltung.lehrtyp_kurzbz}}</h6>
 			</div>
 			<div class="card-body">
-				<a class="d-block" href="#" v-for="lv in lehrveranstaltung.lehrveranstaltungen" @click="selectLehrveranstaltung(lv)">{{lv.bezeichnung}}</a>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item" v-for="lv in lehrveranstaltung.lehrveranstaltungen">
+						<a class="d-block" href="#" @click="openLvUebersicht(lv)">{{lv.bezeichnung}}</a>
+					</li>	
+				</ul>
 			</div>
 		</div>
+	</template>
 	</div>
+
+
 	<lv-modal v-if="selectedLehrveranstaltung" ref="modalContainer" :event="selectedLehrveranstaltung" title="test" >
 	</div>
 	

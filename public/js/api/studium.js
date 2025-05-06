@@ -8,7 +8,6 @@ export default {
 	},
 
 	getAllStudienSemester: function (studiensemester=undefined, studiengang=undefined, semester=undefined, studienplan=undefined) {
-		console.log(studiensemester, studiengang, semester, studienplan)
 		return this.$fhcApi.get(
 			'/api/frontend/v1/Studium/getStudienAllSemester',
 			{studiensemester, studiengang, semester, studienplan}

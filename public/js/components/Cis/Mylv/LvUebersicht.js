@@ -11,6 +11,16 @@ export default  {
             required:true,
             default:null,
         },
+		studiensemester: {
+			type: String,
+			required: false,
+			default: null,
+		},
+		titel: {
+			type: String,
+			required: false,
+			default: null,
+		},
 		// prop used to preselect a menu item and skip the grid overview
 		preselectedMenu: {
 			type: Object,
@@ -39,7 +49,7 @@ export default  {
         showModal: function(){
 			if (!this.preselectedMenu) {
                 this.$api
-                    .call(ApiAddons.getLvMenu(this.event.lehrveranstaltung_id, this.event.studiensemester_kurzbz))
+					.call(ApiAddons.getLvMenu(this.event.lehrveranstaltung_id, (this.studiensemester ?? this.event.studiensemester_kurzbz)))
                     .then(res => {
     					if (res.data) {
     						this.menu = res.data;
@@ -53,14 +63,24 @@ export default  {
     mounted(){
         this.modal = this.$refs.modalContainer;
     },
+	beforeUnmount(){
+		this.$refs.modalContainer.hide();
+	},
     template:/*html*/`
     <bs-modal :bodyClass="isMenuSelected ? '' : 'px-4 py-5'" @showBsModal="showModal" @hiddenBsModal="hiddenModal" ref="modalContainer" :dialogClass="{'modal-lg': !isMenuSelected, 'modal-fullscreen':isMenuSelected}">
-        <template #title>
-            <span v-if="event?.lehrfach_bez ">{{event?.lehrfach_bez + (event?.stg_kurzbzlang?' / ' + event?.stg_kurzbzlang:'')}}</span>
-            <span v-else>Lehrveranstaltungs Übersicht</span>
+        
+		<template #title>
+            <template v-if="titel">
+				<span>{{titel}}</span>
+			</template>
+			<template v-else>
+				<span v-if="event?.lehrfach_bez ">{{event?.lehrfach_bez + (event?.stg_kurzbzlang?' / ' + event?.stg_kurzbzlang:'')}}</span>
+				<span v-else>Lehrveranstaltungs Übersicht</span>
+			</template>
 
         </template>
         <template #default>
+			<slot name="content"></slot>
 			<lv-menu v-model:isMenuSelected="isMenuSelected" :preselectedMenu="preselectedMenu" :menu="menu" @hideModal="hide"></lv-menu>
         </template>
         
