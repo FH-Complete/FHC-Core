@@ -84,11 +84,10 @@ export default {
     `,
     watch:{
 		'searchsettings.searchstr': function (newSearchValue, oldSearchValue) {
-			sessionStorage.setItem('searchstr',newSearchValue);
+			sessionStorage.setItem(`${this.searchoptions.origin}_searchstr`,newSearchValue);
 		},
     },
 	computed:{
-		
 		search_types_string(){
 			if (Array.isArray(this.searchsettings.types) && this.searchsettings.types.length > 0){
 				return this.searchsettings.types.join(' / ');
@@ -105,7 +104,7 @@ export default {
 			}
 			// stores the search types in the localstorage, only if the newValue is also an array
 			if(Array.isArray(newValue)){
-				localStorage.setItem('searchtypes', JSON.stringify(newValue));
+				localStorage.setItem(`${this.searchoptions.origin}_searchtypes`, JSON.stringify(newValue));
 			}
 			this.search();
 		});
@@ -125,8 +124,8 @@ export default {
     methods: {
 		getSearchTypes: function () {
 			let result = this.allSearchTypes();
-			if (localStorage.getItem('searchtypes')) {
-				result = JSON.parse(localStorage.getItem('searchtypes'));
+			if (localStorage.getItem(`${this.searchoptions.origin}_searchtypes`)) {
+				result = JSON.parse(`${this.searchoptions.origin}_searchtypes`);
 			}
 			return result;
 		},
@@ -138,7 +137,7 @@ export default {
 			return allTypes;
 		},
 		getSearchStr: function(){
-			return sessionStorage.getItem('searchstr') ?? '';
+			return sessionStorage.getItem(`${this.searchoptions.origin}_searchstr`) ?? '';
 		},
 		checkSettingsVisibility: function(event) {
 			// hides the settings collapsible if the user clicks somewhere else
