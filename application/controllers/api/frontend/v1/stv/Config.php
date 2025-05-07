@@ -123,6 +123,11 @@ class Config extends FHCAPI_Controller
 			'config' => $config['finalexam']
 		];
 
+		$result['projektarbeit'] = [
+			'title' => $this->p->t('stv', 'tab_projektarbeit'),
+			'component' => './Stv/Studentenverwaltung/Details/Projektarbeit.js'
+		];
+
 		$result['mobility'] = [
 			'title' => $this->p->t('stv', 'tab_mobility'),
 			'component' => './Stv/Studentenverwaltung/Details/Mobility.js'

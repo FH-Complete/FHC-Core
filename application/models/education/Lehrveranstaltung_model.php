@@ -988,4 +988,61 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($qry, $params);
 	}
+
+	/**
+	 * Gets Lehrveranstaltungen for a student, as needed for a Projektarbeit.
+	 * @param student_uid
+	 * @param studiengang_kz optional, all Lvs of this Studiengang will be included 
+	 * @param additional_lehrveranstaltung_id optional, this lv will be added to result
+	 * @return object success or error
+	 */
+	public function getLvsForProjektarbeit($student_uid, $studiengang_kz = null, $additional_lehrveranstaltung_id = null)
+	{
+		$params = array($student_uid, $student_uid);
+
+		$qry = "
+			SELECT *
+			FROM
+				lehre.tbl_lehrveranstaltung
+			WHERE
+				(
+					lehrveranstaltung_id IN (
+
+						SELECT
+							lehrveranstaltung_id
+						FROM
+							campus.vw_student_lehrveranstaltung
+						WHERE
+							uid=?
+
+						UNION
+
+						SELECT
+							lehrveranstaltung_id
+						FROM
+							lehre.tbl_zeugnisnote
+						WHERE
+							student_uid=?
+					)";
+
+		if (isset($studiengang_kz))
+		{
+			$params[] = $studiengang_kz;
+			$qry .= " OR (studiengang_kz = ? AND semester IS NOT NULL)";
+		}
+
+		if (isset($additional_lehrveranstaltung_id))
+		{
+			$params[] = $additional_lehrveranstaltung_id;
+			$qry .= " OR lehrveranstaltung_id = ?";
+		}
+
+		$qry .= "
+				)
+				AND projektarbeit = TRUE
+			ORDER BY
+				semester, bezeichnung";
+
+		return $this->execQuery($qry, $params);
+	}
 }
