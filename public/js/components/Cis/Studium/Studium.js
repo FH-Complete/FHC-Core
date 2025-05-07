@@ -17,6 +17,15 @@ export default {
 			menu:null,
 		}
 	},
+	provide(){
+		return {
+			studium_studiengang : Vue.computed(()=> this.selectedStudiengang),
+			studium_studiensemester: Vue.computed(() => this.selectedStudiensemester),
+			studium_semester: Vue.computed(() => this.selectedSemester),
+			studium_studienordnung: Vue.computed(() => this.selectedStudienordnung),
+
+		}
+	},
 	components: {
 		LvUebersicht,
 	},
@@ -116,10 +125,11 @@ export default {
 			//convert lehrveranstaltung properties for compatibility with Stundenplan LvModal
 			this.selectedLehrveranstaltung.type ="lehreinheit";
 			this.selectedLehrveranstaltung.lehreinheit_id = this.selectedLehrveranstaltung.lehrveranstaltung_id;
-			if(this.selectedLehrveranstaltung)
+			if(this.selectedLehrveranstaltung){
 				Vue.nextTick(()=>{
 					this.$refs.lvUebersicht.show();
 				})
+			}
 			
 		},
 		sortStudienSemester(studienSemester){
@@ -196,7 +206,7 @@ export default {
 		this.$fhcApi.factory.studium.getAllStudienSemester(studiensemester, studiengang, semester, studienordnung)
 		.then(data => data.data)
 		.then(res => {
-			this.	extractPropertyValues(res);
+			this.extractPropertyValues(res);
 		})
 
 	},

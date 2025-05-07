@@ -17,6 +17,9 @@
  */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+use CI3_Events as Events;
+
 class Studium extends FHCAPI_Controller
 {
 	
@@ -29,6 +32,7 @@ class Studium extends FHCAPI_Controller
 			'getStudienAllSemester'=> self::PERM_LOGGED,
 			'getStudiengaengeForStudienSemester'=> self::PERM_LOGGED,
 			'getStudienplaeneBySemester'=> self::PERM_LOGGED,
+			'getLvEvaluierungInfo'=> self::PERM_LOGGED,
 		]);
 
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -173,6 +177,14 @@ class Studium extends FHCAPI_Controller
 		$this->terminateWithSuccess($result);
 	}
 
+	public function getLvEvaluierungInfo($studiensemester_kurzbz, $lehrveranstaltung_id){
+		$result = [];
+		Events::trigger('lvEvaluierungsInfo', function & () use (&$result) {
+			return $result;
+		},$lehrveranstaltung_id, $studiensemester_kurzbz);
+		$this->terminateWithSuccess($result);
+	}
+
 	public function getStudiengaengeForStudienSemester($studiensemester){
 		$studiengaenge = $this->computeStudiengaenge($studiensemester);
 		$this->terminateWithSuccess($studiengaenge);
@@ -259,6 +271,8 @@ class Studium extends FHCAPI_Controller
 		},$lektoren);
 		return $lektoren;
 	}
+
+	
 	
 }
 

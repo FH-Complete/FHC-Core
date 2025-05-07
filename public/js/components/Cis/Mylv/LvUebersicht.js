@@ -33,7 +33,8 @@ export default  {
             result: false,
             menu: [],
 			isMenuSelected:false,
-            
+			hasLvStundenplanEintraege: true,
+			lvEvaluierungMessage: "",
         }
     },
     mixins:[BsModal],
@@ -41,6 +42,7 @@ export default  {
         BsModal,
 		LvMenu,
     },
+	inject: ["studium_studiensemester"],
     methods:{
         
         hiddenModal: function(){
@@ -58,9 +60,32 @@ export default  {
 			} else {
 				this.isMenuSelected = true;
 			}
+
+			// check lv evaluierung info
+			if (this.studium_studiensemester) {
+				this.$fhcApi.factory.studium.getLvEvaluierungInfo(this.studium_studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id)
+					.then(data => data.data)
+					.then(res => {
+						this.lvEvaluierungMessage = res.message;
+					})
+			}
+
+			// check if the lv has stundenplan entries for this studiensemester
+			if (this.studiensemester && this.event) {
+				return this.$fhcApi.factory.studium.getLvStundenplanForStudiensemester(this.studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id)
+					.then(data => data.data)
+					.then(res => {
+						if (Array.isArray(res) && res.length > 0) {
+							this.hasLvStundenplanEintraege = true;
+						} else {
+							this.hasLvStundenplanEintraege = false;
+						}
+					});
+			}
+			
         },
     },
-    mounted(){
+	mounted(){
         this.modal = this.$refs.modalContainer;
     },
 	beforeUnmount(){
@@ -68,7 +93,7 @@ export default  {
 	},
     template:/*html*/`
     <bs-modal :bodyClass="isMenuSelected ? '' : 'px-4 py-5'" @showBsModal="showModal" @hiddenBsModal="hiddenModal" ref="modalContainer" :dialogClass="{'modal-lg': !isMenuSelected, 'modal-fullscreen':isMenuSelected}">
-        
+
 		<template #title>
             <template v-if="titel">
 				<span>{{titel}}</span>
@@ -80,8 +105,9 @@ export default  {
 
         </template>
         <template #default>
+			<div class="mb-4" v-if="lvEvaluierungMessage" v-html="lvEvaluierungMessage"></div>
 			<slot name="content"></slot>
-			<lv-menu v-model:isMenuSelected="isMenuSelected" :preselectedMenu="preselectedMenu" :menu="menu" @hideModal="hide"></lv-menu>
+			<lv-menu v-model:isMenuSelected="isMenuSelected" :hasLvStundenplanEintraege="hasLvStundenplanEintraege" :preselectedMenu="preselectedMenu" :menu="menu" @hideModal="hide"></lv-menu>
         </template>
         
     </bs-modal>

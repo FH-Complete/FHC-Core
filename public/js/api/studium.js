@@ -29,4 +29,19 @@ export default {
 			}
 		);
 	},
+	getLvStundenplanForStudiensemester: function (studiensemester, lvid) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Stundenplan/getLvStundenplanForStudiensemester/${studiensemester}/${lvid}`,
+			{
+			}
+		);
+	},
+	getLvEvaluierungInfo: function (studiensemester_kurzbz, lvid) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Studium/getLvEvaluierungInfo/${studiensemester_kurzbz}/${lvid}`,
+			{
+			}
+		);
+	},
+	
 }

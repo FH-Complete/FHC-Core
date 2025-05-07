@@ -36,6 +36,7 @@ class Stundenplan extends FHCAPI_Controller
 			'StundenplanEvents' => self::PERM_LOGGED,
 			'getLehreinheitStudiensemester' => self::PERM_LOGGED,
 			'studiensemesterDateInterval' => self::PERM_LOGGED,
+			'getLvStundenplanForStudiensemester' => self::PERM_LOGGED,
 		]);
 
         $this->load->library('LogLib');
@@ -85,11 +86,6 @@ class Stundenplan extends FHCAPI_Controller
 		{
 			$stundenplan_events = array();
 		}
-		else
-		{
-			$stundenplan_events = $this->getDataOrTerminateWithError($stundenplan_events);
-		}
-
 		// fetching moodle events
 		$moodle_start_date = new DateTime($start_date);
 		$moodle_start_date = $moodle_start_date->getTimestamp();
@@ -153,6 +149,19 @@ class Stundenplan extends FHCAPI_Controller
 		$studiensemester =$this->StudiensemesterModel->getByDate(date_format(date_create($date),'Y-m-d'));
 		$studiensemester =current($this->getDataOrTerminateWithError($studiensemester));
 		$this->terminateWithSuccess($studiensemester);
+	}
+
+	public function getLvStundenplanForStudiensemester($studiensemester,$lvid){
+		$this->load->library('StundenplanLib');
+		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
+		
+		$studiensemester_result = $this->StudiensemesterModel->loadWhere(["studiensemester_kurzbz"=>$studiensemester]);
+		$studiensemester_result = current($this->getDataOrTerminateWithError($studiensemester_result));
+		$timespan_start = new DateTime($studiensemester_result->start);
+		$timespan_ende = new DateTime($studiensemester_result->ende);
+		$stundenplan = $this->stundenplanlib->getStundenplan(date_format($timespan_start, 'Y-m-d'),date_format($timespan_ende, 'Y-m-d'), $lvid);
+		$this->terminateWithSuccess($stundenplan);
+		
 	}
 		
 
