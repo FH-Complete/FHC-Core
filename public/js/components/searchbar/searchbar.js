@@ -4,6 +4,7 @@ import employee from "./employee.js";
 import organisationunit from "./organisationunit.js";
 import student from "./student.js";
 import prestudent from "./prestudent.js";
+import uuid from "../../helpers/UUID.js";
 
 export default {
     props: [ "searchoptions", "searchfunction" ],
@@ -84,7 +85,7 @@ export default {
     `,
     watch:{
 		'searchsettings.searchstr': function (newSearchValue, oldSearchValue) {
-			sessionStorage.setItem(`${this.searchoptions.origin}_searchstr`,newSearchValue);
+			sessionStorage.setItem(`${this.searchoptions.origin}_searchstr_${uuid}`,newSearchValue);
 		},
     },
 	computed:{
@@ -104,7 +105,7 @@ export default {
 			}
 			// stores the search types in the localstorage, only if the newValue is also an array
 			if(Array.isArray(newValue)){
-				localStorage.setItem(`${this.searchoptions.origin}_searchtypes`, JSON.stringify(newValue));
+				localStorage.setItem(`${this.searchoptions.origin}_searchtypes_${uuid}`, JSON.stringify(newValue));
 			}
 			this.search();
 		});
@@ -113,6 +114,10 @@ export default {
 		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {
 			toggle: false
 		});
+
+		if (!this.searchoptions.origin){
+			console.warn("No origin defined in the searchoptions for the searchbar, please define the origin property in the searchbaroptions to allow reliable storage of searchstr and searchtypes accross applications.");
+		}
 	},
 	updated() {
 		if(this.showresult) {
@@ -122,10 +127,28 @@ export default {
 		}
 	},
     methods: {
+		getStorageValue: function (key, sessionStorage = false){
+			const regex = new RegExp(`${this.searchoptions.origin}_${key}`);
+			if(sessionStorage){
+				for (let i = 0; i < sessionStorage.length; i++) {
+					if (sessionStorage.key(i).match(regex)) {
+						return sessionStorage.getItem(sessionStorage.key(i));
+					}
+				}
+			}
+			else{
+				for (let i =0; i < localStorage.length; i++){
+					if (localStorage.key(i).match(regex)){
+						return localStorage.getItem(localStorage.key(i));
+					}
+				}
+			}
+		},
 		getSearchTypes: function () {
 			let result = this.allSearchTypes();
-			if (localStorage.getItem(`${this.searchoptions.origin}_searchtypes`)) {
-				result = JSON.parse(`${this.searchoptions.origin}_searchtypes`);
+			let localStorageValue = this.getStorageValue('searchtypes');
+			if (localStorageValue) {
+				result = JSON.parse(localStorageValue);
 			}
 			return result;
 		},
@@ -137,7 +160,7 @@ export default {
 			return allTypes;
 		},
 		getSearchStr: function(){
-			return sessionStorage.getItem(`${this.searchoptions.origin}_searchstr`) ?? '';
+			return this.getStorageValue("searchstr",true) ?? '';
 		},
 		checkSettingsVisibility: function(event) {
 			// hides the settings collapsible if the user clicks somewhere else
