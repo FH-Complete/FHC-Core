@@ -65,7 +65,10 @@ export default {
 			defaultSemester: this.defaultSemester,
 			$reloadList: () => {
 				this.$refs.stvList.reload();
-			}
+			},
+			configShowAufnahmegruppen: this.config.showAufnahmegruppen,
+			configAllowUebernahmePunkte: this.config.allowUebernahmePunkte,
+			configUseReihungstestPunkte: this.config.useReihungstestPunkte
 		}
 	},
 	data() {

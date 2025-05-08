@@ -22,10 +22,10 @@ export default {
 			url: 'api/frontend/v1/stv/aufnahmetermine/getAufnahmetermine/' + person_id,
 		};
 	},
-	getListPlacementTests(){
+	getListPlacementTests(prestudent_id){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/aufnahmetermine/getListPlacementTests/',
+			url: 'api/frontend/v1/stv/aufnahmetermine/getListPlacementTests/' + prestudent_id,
 		};
 	},
 	getListStudyPlans(person_id){
@@ -59,6 +59,41 @@ export default {
 			method: 'post',
 			url: 'api/frontend/v1/stv/aufnahmetermine/deleteAufnahmetermin/' + rt_person_id
 		};
-	}
+	},
+	loadDataRtPrestudent(prestudent_id){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/aufnahmetermine/loadDataRtPrestudent/' + prestudent_id,
+		};
+	},
+	saveDataRtPrestudent(params){
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/aufnahmetermine/insertOrUpdateDataRtPrestudent/',
+			params
+		};
+	},
+	loadAufnahmegruppen(params){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/aufnahmetermine/loadAufnahmegruppen/',
+			params
+		};
+	},
+	getResultReihungstest(params){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/aufnahmetermine/getResultReihungstest/',
+			params
+		};
+	},
+	loadFutureReihungstests(params){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/aufnahmetermine/getZukuenftigeReihungstestStg/',
+			params
+		};
+	},
+
 
 }

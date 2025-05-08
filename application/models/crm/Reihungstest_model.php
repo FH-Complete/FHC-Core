@@ -530,14 +530,15 @@ class Reihungstest_model extends DB_Model
 			  tbl_reihungstest.max_teilnehmer,
 			  tbl_reihungstest.oeffentlich,
 			  tbl_reihungstest.freigeschaltet,
-			  tbl_reihungstest.studiensemester_kurzbz,
+			  tbl_reihungstest.studiensemester_kurzbz as studiensemester,
 			  tbl_reihungstest.stufe,
 			  tbl_reihungstest.anmeldefrist,
 			  tbl_reihungstest.aufnahmegruppe_kurzbz,
 			  tbl_studiengang.typ,
 			  UPPER(typ::varchar(1) || kurzbz) AS stg_kuerzel,
 			  so.studiengangbezeichnung,
-				  so.studiengangbezeichnung_englisch
+			  so.studiengangbezeichnung_englisch,
+			  so.studiengangkurzbzlang
 			FROM
 			  public.tbl_rt_person
 			JOIN public.tbl_reihungstest ON (rt_id=reihungstest_id)
@@ -552,35 +553,208 @@ class Reihungstest_model extends DB_Model
 	}
 
 	/**
-	 * Loads all placement tests
-	 * @return array Returns object array with data of placement tests
+	 * Calculates Result of Placement Test for a given Person and given placementtest
+	 * and with taking account of weighting per area
+	 *
+	 * @param $person_id ID of Person
+	 * @param $punkte if true result is points else result is percentage of sum
+	 * @param $reihungstest_id ID of Placementtest
+	 * @param $weightedArray array of weighting per area (gewicht per gebiet_id)
+	 * @return float result
 	 */
-	//TODO(Manu) finish Details
-	public function getAllReihungstests()
+	public function getReihungstestErgebnisPerson($person_id, $punkte, $reihungstest_id, $weightedArray = null)
 	{
-		$query = '
-			SELECT * FROM public.tbl_reihungstest
-			JOIN public.tbl_studiengang ON tbl_reihungstest.studiengang_kz = tbl_studiengang.studiengang_kz
-		--	JOIN lehre.tbl_studienplan sp USING(studienplan_id)
-		--	JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
-			ORDER BY datum DESC NULLS LAST, uhrzeit
-		';
+		$parametersArray = array($reihungstest_id);
 
-		return $this->execQuery($query);
+		$qry =  "
+				SELECT DISTINCT ON (vw_auswertung_ablauf.gebiet_id) gebiet_id,
+					vw_auswertung_ablauf.*,
+					tbl_studiengang.typ
+				FROM
+					testtool.vw_auswertung_ablauf
+				JOIN
+					public.tbl_studiengang USING (studiengang_kz)
+				WHERE
+					reihungstest_id = ? ";
+
+		//using prestudent Status to avoid to get the sum of more than 1 placement tests
+		$qry .= "
+				AND prestudent_id = (
+					SELECT
+						prestudent_id
+					FROM
+						public.tbl_rt_person
+					JOIN
+						public.tbl_prestudent USING(person_id)
+					JOIN
+						public.tbl_prestudentstatus USING (prestudent_id, studienplan_id)
+					JOIN
+						tbl_reihungstest ON (
+							tbl_rt_person.rt_id = tbl_reihungstest.reihungstest_id
+						)
+					WHERE
+						tbl_rt_person.person_id = ?
+					AND
+						tbl_rt_person.rt_id = ?
+					AND
+						tbl_prestudentstatus.status_kurzbz = 'Interessent'
+					AND
+						tbl_prestudentstatus.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
+					ORDER BY tbl_reihungstest.datum DESC, tbl_prestudent.priorisierung ASC LIMIT 1
+				)
+		";
+		array_push($parametersArray, $person_id);
+		array_push($parametersArray, $reihungstest_id);
+
+		$resultRtPerson = $this->execQuery($qry, $parametersArray);
+
+		$ergebnis = 0;
+		$summeGewicht = 0;
+
+		foreach ($resultRtPerson->retval as $row)
+		{
+			$prozent = 0;
+			if($row->punkte>=$row->maxpunkte)
+			{
+				$prozent = 100;
+				$row->punkte = $row->maxpunkte;
+			}
+			else
+				$prozent = (($row->punkte + $row->offsetpunkte)/($row->maxpunkte + $row->offsetpunkte))*100;
+
+			if($punkte == 'true')
+			{
+				if($row->punkte)
+				{
+					$ergebnis += $row->punkte;
+				}
+			}
+			else
+			{
+				if ($row->punkte)
+				{
+					$gew = isset($weightedArray[$row->gebiet_id]) ? $weightedArray[$row->gebiet_id] : 1;
+					$ergebnis += $prozent * $gew;
+					$summeGewicht += $gew;
+				}
+			}
+		}
+		$return = $summeGewicht > 0
+					? number_format($ergebnis/$summeGewicht, 4, '.', '')
+					: number_format($ergebnis, 4, '.', '');
+
+		return $return;
 	}
 
-	public function getReihungstestsPs($prestudent_id)
+	/**
+	 * returns Reihungstests for given studyplans and include_ids
+	 *
+	 * @param Array $studienplan_arr array of studienplaene
+	 * @param Array $include_ids array of include_ids
+	 * @return Array List of Reihungstests
+	 */
+	public function getReihungstestByStudyPlanAndIds($studienplan_arr, $include_ids = null)
 	{
-		$query = '
-			SELECT * FROM public.tbl_reihungstest
-			JOIN public.tbl_studiengang ON tbl_reihungstest.studiengang_kz = tbl_studiengang.studiengang_kz
-			JOIN lehre.tbl_studienplan sp USING(studienplan_id)
-			JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
-			 ORDER BY datum DESC, uhrzeit
-		';
+		$studienplan_ids_string = implode(',', $studienplan_arr);
+		$studienplan_arr = explode(',', $studienplan_ids_string);
 
-		return $this->execQuery($query);
+		$parametersArray = array($studienplan_arr);
+
+		$qry = "
+				SELECT
+					distinct a.*,
+					CASE EXTRACT(DOW FROM a.datum)
+						WHEN 0 THEN 'So'
+						WHEN 1 THEN 'Mo'
+						WHEN 2 THEN 'Di'
+						WHEN 3 THEN 'Mi'
+						WHEN 4 THEN 'Do'
+						WHEN 5 THEN 'Fr'
+						WHEN 6 THEN 'Sa'
+					  END AS wochentag,
+				    sg.kurzbzlang as stg,
+					(
+						SELECT count(*) FROM public.tbl_rt_person
+						WHERE rt_id = a.reihungstest_id
+					) as angemeldete_teilnehmer
+				FROM
+					public.tbl_reihungstest a
+					JOIN public.tbl_rt_studienplan USING(reihungstest_id)
+					JOIN public.tbl_studiengang sg USING(studiengang_kz)
+				WHERE studienplan_id IN ?";
+
+		if($include_ids && is_array($include_ids) && count($include_ids) > 0)
+		{
+			$include_ids_string = implode(',', $include_ids);
+			$include_ids = explode(',', $include_ids_string);
+
+			array_push($parametersArray, $include_ids);
+
+			$qry .= "OR reihungstest_id in ?";
+		}
+		$qry .= "ORDER BY a.datum DESC";
+
+		return $this->execQuery($qry, $parametersArray);
 	}
+	/**
+	 * returns Reihungstests for given studyplans and include_ids
+	 *
+	 * @param Integer $studiengang_kz
+	 * @param $include_id optional (here null)
+	 * @return Array List of Reihungstests
+	 */
+	public function getZukuenftigeReihungstestStg($studiengang_kz, $include_id = null)
+	{
+		$parametersArray = array($studiengang_kz, $studiengang_kz, $include_id);
 
+		$qry = "
+					SELECT *,
+					CASE EXTRACT(DOW FROM a.datum)
+						WHEN 0 THEN 'So'
+						WHEN 1 THEN 'Mo'
+						WHEN 2 THEN 'Di'
+						WHEN 3 THEN 'Mi'
+						WHEN 4 THEN 'Do'
+						WHEN 5 THEN 'Fr'
+						WHEN 6 THEN 'Sa'
+					  END AS wochentag,
+			(
+				SELECT count(*) FROM public.tbl_prestudent
+				WHERE reihungstest_id=a.reihungstest_id
+			) as angemeldete_teilnehmer
+		FROM
+			(
+			SELECT *, '1' as sortierung,
+				(
+					SELECT upper(typ || kurzbz) FROM public.tbl_studiengang
+					WHERE studiengang_kz=tbl_reihungstest.studiengang_kz
+				) as stg
+			FROM
+				public.tbl_reihungstest
+			WHERE
+				datum>=now()-'1 days'::interval AND studiengang_kz=?
+			UNION
+			SELECT *, '2' as sortierung,
+				(
+					SELECT upper(typ || kurzbz) FROM public.tbl_studiengang
+					WHERE studiengang_kz=tbl_reihungstest.studiengang_kz
+				) as stg
+			FROM
+				public.tbl_reihungstest
+			WHERE datum>=now()-'1 days'::interval AND studiengang_kz!=?
+			UNION
+			SELECT *, '0' as sortierung,
+				(
+					SELECT upper(typ || kurzbz) FROM public.tbl_studiengang
+					WHERE studiengang_kz=tbl_reihungstest.studiengang_kz
+				) as stg
+			FROM
+				public.tbl_reihungstest
+			WHERE reihungstest_id=?
+			ORDER BY sortierung, stg, datum
+					) a
+			";
 
+		return $this->execQuery($qry, $parametersArray);
+	}
 }

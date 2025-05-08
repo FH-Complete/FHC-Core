@@ -20,7 +20,7 @@ export default {
 	},
 	template: `
 	<div class="stv-details-mobility h-30 d-flex flex-column">
-		<header-placement></header-placement>
+		<header-placement :student="modelValue"></header-placement>
 		<admission-dates ref="tbl_admission_dates" :student="modelValue"></admission-dates>
 	</div>`
 };

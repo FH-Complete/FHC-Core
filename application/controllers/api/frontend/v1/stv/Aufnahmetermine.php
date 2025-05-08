@@ -14,9 +14,13 @@ class Aufnahmetermine extends FHCAPI_Controller
 			'insertAufnahmetermin' => ['admin:rw', 'assistenz:rw'],
 			'updateAufnahmetermin' => ['admin:rw', 'assistenz:rw'],
 			'deleteAufnahmetermin' => ['admin:rw', 'assistenz:rw'],
-			'getListPlacementTests' => ['admin:rw', 'assistenz:rw'],
-			'getListStudyPlans' => ['admin:rw', 'assistenz:rw'],
-
+			'getListPlacementTests' => ['admin:r', 'assistenz:r'],
+			'getListStudyPlans' => ['admin:r', 'assistenz:r'],
+			'loadDataRtPrestudent' => ['admin:r', 'assistenz:r'],
+			'insertOrUpdateDataRtPrestudent' => ['admin:r', 'assistenz:r'],
+			'loadAufnahmegruppen' => ['admin:r', 'assistenz:r'],
+			'getResultReihungstest' => ['admin:r', 'assistenz:r'],
+			'getZukuenftigeReihungstestStg' => ['admin:r', 'assistenz:r'],
 		]);
 
 		// Load Libraries
@@ -169,7 +173,8 @@ class Aufnahmetermine extends FHCAPI_Controller
 				'punkte' => $_POST['punkte'],
 				'insertamum' => date('c'),
 				'insertvon' => $authUID,
-		]);
+			]
+		);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
@@ -186,9 +191,53 @@ class Aufnahmetermine extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	public function getListPlacementTests()
+	public function getListPlacementTests($prestudent_id)
 	{
-		$result = $this->ReihungstestModel->getAllReihungstests();
+		if(!$prestudent_id)
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Prestudent ID']), self::ERROR_TYPE_GENERAL);
+		}
+
+		//get studienplan array
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+
+		$this->PrestudentstatusModel->addSelect('*');
+		$this->PrestudentstatusModel->addSelect('sp.studienplan_id');
+
+		$this->PrestudentstatusModel->addJoin('lehre.tbl_studienplan sp', 'studienplan_id', 'LEFT');
+
+		$result = $this->PrestudentstatusModel->loadWhere(
+			array(
+				'prestudent_id' => $prestudent_id,
+				'status_kurzbz' => 'Interessent'
+			)
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$studienplan_arr = [];
+		$include_ids = [];
+		foreach ($data as $item)
+		{
+			if($item->studienplan_id != null)
+				$studienplan_arr[] = $item->studienplan_id;
+		}
+
+		//get Placementtests Person
+		$person_id = $this->_getPersonId($prestudent_id);
+		$resultRt = $this->ReihungstestModel->getReihungstestPerson($person_id);
+
+		$dataRt = $this->getDataOrTerminateWithError($resultRt);
+
+		foreach ($dataRt as $item)
+		{
+			if(!in_array($item->studienplan_id, $studienplan_arr))
+				$studienplan_arr[] = $item->studienplan_id;
+			if(!in_array($item->rt_id, $include_ids) && ($item->rt_id != null))
+				$include_ids[] = $item->rt_id;
+		}
+
+		$result = $this->ReihungstestModel->getReihungstestByStudyPlanAndIds($studienplan_arr, $include_ids);
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
@@ -196,12 +245,156 @@ class Aufnahmetermine extends FHCAPI_Controller
 
 	public function getListStudyPlans($person_id)
 	{
-		$this->load->model('organisation/Studienplan_model','StudienplanModel');
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 
-		$result = $this->StudienplanModel->getStudienplaeneForPerson($person_id);;
+		$result = $this->StudienplanModel->getStudienplaeneForPerson($person_id);
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
 	}
 
+	public function loadDataRtPrestudent($prestudent_id)
+	{
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$this->PrestudentModel->addSelect(["reihungstestangetreten"]);
+		$this->PrestudentModel->addSelect(["rt_gesamtpunkte"]);
+		$this->PrestudentModel->addSelect(["aufnahmegruppe_kurzbz"]);
+		$result = $this->PrestudentModel->loadWhere(
+			array('prestudent_id' => $prestudent_id)
+		);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess(current($data));
+	}
+
+	public function insertOrUpdateDataRtPrestudent()
+	{
+		$this->load->library('form_validation');
+		$authUID = getAuthUID();
+
+		$formData = $this->input->post('formData');
+		$prestudent_id = $this->input->post('prestudent_id');
+
+		if(!$prestudent_id)
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Prestudent ID']), self::ERROR_TYPE_GENERAL);
+		}
+		$_POST['rt_gesamtpunkte'] =
+			(isset($formData['rt_gesamtpunkte']) && !empty($formData['rt_gesamtpunkte']))
+				? $formData['rt_gesamtpunkte']
+				: null;
+		$_POST['reihungstestangetreten'] =
+			(isset($formData['reihungstestangetreten']) && !empty($formData['reihungstestangetreten']))
+				? $formData['reihungstestangetreten']
+				: null;
+		$_POST['aufnahmegruppe_kurzbz'] =
+			(isset($formData['aufnahmegruppe_kurzbz']) && !empty($formData['aufnahmegruppe_kurzbz']))
+				? $formData['aufnahmegruppe_kurzbz']
+				: null;
+
+		$this->form_validation->set_rules('rt_gesamtpunkte', 'Rt_gesamtpunkte', 'numeric', [
+			'required' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Rt_gesamtpunkte'])
+		]);
+
+		if ($this->form_validation->run() == false)
+		{
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
+
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$result = $this->PrestudentModel->update(
+			[
+				'prestudent_id' => $prestudent_id,
+			],
+			[
+				'reihungstestangetreten' => $_POST['reihungstestangetreten'],
+				'rt_gesamtpunkte' => $_POST['rt_gesamtpunkte'],
+				'aufnahmegruppe_kurzbz' => $_POST['aufnahmegruppe_kurzbz'],
+				'updateamum' => date('c'),
+				'updatevon' => $authUID,
+			]
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function loadAufnahmegruppen()
+	{
+		$uid = $this->input->get('uid');
+		$studiensemester_kurzbz = $this->input->get('studiensemester_kurzbz');
+
+		$this->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
+
+		$result = $this->BenutzergruppeModel->loadAufnahmegruppen($uid, $studiensemester_kurzbz);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess(($data));
+	}
+
+	public function getResultReihungstest()
+	{
+		$person_id = $this->input->get('person_id');
+		$punkte = $this->input->get('punkte');
+		$reihungstest_id = $this->input->get('reihungstest_id');
+
+		if(!$reihungstest_id)
+		{
+			$this->terminateWithSuccess(null);
+		}
+
+		//for gewichtung
+		$studiengang_kz = $this->input->get('studiengang_kz');
+
+		$this->load->model('testtool/Ablauf_model', 'AblaufModel');
+		$result = $this->AblaufModel->getAblaufGebieteAndGewichte($studiengang_kz);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$weightedArray = [];
+		foreach ($data as $abl)
+		{
+			$weightedArray[$abl->gebiet_id] = $abl->gewicht;
+		}
+
+		$result = $this->ReihungstestModel->getReihungstestErgebnisPerson($person_id, $punkte, $reihungstest_id, $weightedArray);
+
+/*		if (isError($result))
+		{
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}*/
+
+		$this->terminateWithSuccess($result);
+	}
+
+	public function getZukuenftigeReihungstestStg()
+	{
+		$studiengang_kz = $this->input->get('studiengang_kz');
+		if(!$studiengang_kz)
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Studiengang_kz']), self::ERROR_TYPE_GENERAL);
+		}
+
+		$result = $this->ReihungstestModel->getZukuenftigeReihungstestStg($studiengang_kz);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	private function _getPersonId($prestudent_id)
+	{
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$result = $this->PrestudentModel->loadWhere(
+			['prestudent_id' => $prestudent_id]
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+		$person = current($data);
+
+		return $person->person_id;
+	}
 }
