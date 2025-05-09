@@ -128,6 +128,11 @@ class Config extends FHCAPI_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Mobility.js'
 		];
 
+		$result['functions'] = [
+			'title' => $this->p->t('stv', 'tab_functions'),
+			'component' => './Stv/Studentenverwaltung/Details/Funktionen.js'
+		];
+
 		Events::trigger('stv_conf_student', function & () use (&$result) {
 			return $result;
 		});
