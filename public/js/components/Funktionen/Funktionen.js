@@ -23,6 +23,7 @@ export const Funktionen = {
 		personID: { type: Number, required: false },
 		personUID: { type: String, required: false },
 		writePermission: { type: Boolean, required: false },
+		showDvCompany: { tpye: Boolean, required: false, default: true }
 	},
 	emits: ['updateHeader'],
 	setup( props, { emit } ) {
@@ -197,7 +198,7 @@ export const Funktionen = {
 
 
 			const columnsDef = [
-				{ title: t('person','dv_unternehmen'), field: "dienstverhaeltnis_unternehmen", formatter: dvFormatter, sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+				{ title: t('person','dv_unternehmen'), field: "dienstverhaeltnis_unternehmen", formatter: dvFormatter, sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"}, visible: props.showDvCompany },
 				{ title: t('person','zuordnung_taetigkeit'), field: "funktion_beschreibung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
 				{ title: t('lehre','organisationseinheit'), field: "funktion_oebezeichnung", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
 				{ title: t('person','wochenstunden'), field: "wochenstunden", hozAlign: "right", width: 140, headerFilter:true },
@@ -511,8 +512,10 @@ export const Funktionen = {
             <form class="row g-3" ref="jobFunctionFrm">
                             
                 <div class="col-md-8">
-                    <label class="form-label">{{ t('core','unternehmen') }}</label><br>
-                    <org-chooser  @org-selected="unternehmenSelectedHandler" :oe="unternehmen" class="form-select form-select-sm"></org-chooser>
+					<template v-if="showDvCompany">
+						<label class="form-label">{{ t('core','unternehmen') }}</label><br>
+						<org-chooser  @org-selected="unternehmenSelectedHandler" :oe="unternehmen" class="form-select form-select-sm"></org-chooser>
+					</template>
                 </div>
                 <div class="col-md-4">
                 </div>
