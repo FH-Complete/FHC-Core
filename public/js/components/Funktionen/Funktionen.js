@@ -5,7 +5,7 @@ import {OrgChooser} from "./OrgChooser.js";
 import { usePhrasen } from '../../mixins/Phrasen.js';
 
 import ApiFunktion from '../../api/factory/funktionen/person.js';
-import ApiPerson from "../../../extensions/FHC-Core-Personalverwaltung/js/api/factory/person";
+import ApiPerson from "../../../extensions/FHC-Core-Personalverwaltung/js/api/factory/person.js";
 
 export const Funktionen = {
 	name: 'FunctionComponent',
