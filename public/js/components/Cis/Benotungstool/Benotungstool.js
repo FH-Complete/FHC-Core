@@ -48,14 +48,14 @@ export const Benotungstool = {
 			notenTableOptions: {
 				height: 700,
 				index: 'student_uid',
-				layout: 'fitColumns',
+				layout: 'fitDataStretch',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
 					{title: Vue.computed(() => this.$p.t('benotungstool/c4mail')), field: 'email', formatter: this.mailFormatter, tooltip: false, widthGrow: 1},
 					{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('benotungstool/c4vorname')), field: 'vorname',  tooltip: false, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('benotungstool/c4nachname')), field: 'nachname', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('benotungstool/c4teilnoten')), field: 'teilnoten', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('benotungstool/c4teilnoten')), field: 'teilnote', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('benotungstool/c4note')), field: 'note_vorschlag',
 						editor: 'list',
 						editorParams: {
@@ -74,14 +74,10 @@ export const Benotungstool = {
 						widthGrow: 1},
 					{title: '', width: 50, hozAlign: 'center', formatter: this.arrowFormatter, cellClick: this.saveNote},
 					{title: Vue.computed(() => this.$p.t('benotungstool/c4lvnote')), field: 'lv_note', 
-						formatter: (cell) => {
-							const value = cell.getValue()
-							const match = this.notenOptions.find(opt => opt.note === value)
-							return match ? match.bezeichnung : value
-						},
+						formatter: this.notenFormatter,
 						widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('benotungstool/c4freigabe')), field: 'freigegeben', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('benotungstool/c4zeugnisnote')), field: 'note', widthGrow: 1}
+					{title: Vue.computed(() => this.$p.t('benotungstool/c4zeugnisnote')), field: 'note', formatter: this.notenFormatter, widthGrow: 1}
 					// {title: Vue.computed(() => this.$p.t('benotungstool/c4termin1')), field: 'termin1', widthGrow: 1},
 					// {title: Vue.computed(() => this.$p.t('benotungstool/c4termin2')), field: 'termin2', widthGrow: 1},
 					// {title: Vue.computed(() => this.$p.t('benotungstool/c4termin3')), field: 'termin3', widthGrow: 1}
@@ -105,6 +101,11 @@ export const Benotungstool = {
 			]};
 	},
 	methods: {
+		notenFormatter(cell) {
+			const value = cell.getValue()
+			const match = this.notenOptions.find(opt => opt.note === value)
+			return match ? match.bezeichnung : value
+		},
 		handlePasswordChanged(pw) {
 			console.log('pw:', pw)	
 		},
@@ -133,6 +134,7 @@ export const Benotungstool = {
 			this.studenten = data[0]
 			this.pruefungen = data[1]
 			this.domain = data[2]
+			this.teilnoten = data[3]
 			
 			this.pruefungen.forEach(p => {
 				const student = this.studenten.find(s => s.uid === p.student_uid)
@@ -149,12 +151,15 @@ export const Benotungstool = {
 				// }
 				
 				// TODO: LE TEILNOTEN IN BACKEND LADEN, BERECHNEN UND VORSCHLAG PASTEN
-				// if(p.negativ) 
-				student.teilnoten = ''
+				// if(p.negativ)
 			})
 			
 			this.studenten.forEach(s => {
 				s.email = this.buildMailToLink(s)
+
+				const grades = this.teilnoten[s.uid].grades
+				s.teilnote = ''
+				grades.forEach(g => s.teilnote += g.text + ' ')
 			})
 
 			this.$refs.notenTable.tabulator.clearSort()

@@ -18,8 +18,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once(__DIR__.'/../../../../../include/lehreinheit.class.php');
-require_once(__DIR__.'/../../../../../include/legesamtnote.class.php');
+use CI3_Events as Events;
+
 class Noten extends FHCAPI_Controller
 {
 
@@ -46,7 +46,6 @@ class Noten extends FHCAPI_Controller
 	public function getStudentenNoten() {
 		$lv_id = $this->input->get("lv_id",TRUE);
 		$sem_kurzbz = $this->input->get("sem_kurzbz",TRUE);
-		$active = true; // todo: check this param
 
 		if (!isset($lv_id) || isEmptyString($lv_id)
 			|| !isset($sem_kurzbz) || isEmptyString($sem_kurzbz))
@@ -58,16 +57,37 @@ class Noten extends FHCAPI_Controller
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 
 		// get studenten for lva & sem with zeugnisnote if available
-		$studenten = $this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id, $active);
+		$studenten = $this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id);
 		$studentenData = $this->getDataOrTerminateWithError($studenten);
 		
+		$func = function ($value) {
+			return $value->uid;
+		};
+
+		$grades = array();
+		$student_uids = array_map($func, $studentenData);
+		foreach($student_uids as $uid) {
+			$grades[$uid]['grades'] = [];
+		}
 		
+		// send $grades reference to moodle addon
+		Events::trigger(
+			'moodleGrades',
+			function & () use (&$grades)
+			{
+				return $grades;
+			},
+			[
+				'lvid' => $lv_id,
+				'stsem' => $sem_kurzbz
+			]
+		);
 		
 		// get all prüfungen with noten held in that semester in that lva
 		$pruefungen = $this->PruefungModel->getPruefungenByLvStudiensemester($lv_id, $sem_kurzbz);
 		$pruefungenData = $this->getDataOrTerminateWithError($pruefungen);
 
-		$this->terminateWithSuccess(array($studentenData, $pruefungenData, DOMAIN));
+		$this->terminateWithSuccess(array($studentenData, $pruefungenData, DOMAIN, $grades));
 	}
 
 	public function getNoten() {
