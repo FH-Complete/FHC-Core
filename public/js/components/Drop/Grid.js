@@ -26,6 +26,10 @@ export default {
 			type: Number,
 			default: 0
 		},
+		additionalRow:{
+			type: Boolean,
+			default: false,
+		}
 	},
 	emits: [
 		"rearrangeItems",
@@ -48,7 +52,6 @@ export default {
 			draggedOffset: [0,0],
 			draggedItem: null,
 			draggedNode: null,
-			additionalRow: null,
 			reorderedItems:[],
 			clonedWidget:null,
 		}
@@ -60,6 +63,14 @@ export default {
 		},
 	},
 	computed: {
+		additionalRowComputed: {
+			get() {
+				return this.additionalRow;
+			},
+			set(value) {
+				this.$emit('update:additionalRow', value);
+			}
+		},
 		items_hashmap() {
 			let items = {};
 			this.items.forEach(item => {
@@ -119,6 +130,11 @@ export default {
 		rows() {
 			if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid){
 				return this.dragGrid.h;
+			}
+			if (this.mode == MODE_IDLE) {
+				if (this.additionalRowComputed) {
+					return this.grid ? (this.grid.h+1) : 1;
+				}
 			}
 			return this.grid ? this.grid.h : 1;
 		},
@@ -350,13 +366,8 @@ export default {
 			if (this.mode == MODE_IDLE) {
 				this.x = -1;
 				this.y = -1;
-				if (this.additionalRow !== null) {
-					let gridHeight = this.grid.getMaxY() + 1;
-					if(this.grid.h>gridHeight){
-						this.grid.h = gridHeight;
-					}
-					this.additionalRow = null;
-				}
+				this.additionalRowComputed = false;
+				
 			}
 		},
 		updateCursor(evt) {
@@ -380,18 +391,6 @@ export default {
 			if (this.x == gridX && this.y == gridY)
 				return false;
 			
-			if (this.mode == MODE_IDLE) {
-				if (this.additionalRow === null && this.y == this.rows-1 && gridY == this.rows) {
-					this.additionalRow = this.grid.h;
-					this.grid.h += 1;
-				} else if (this.additionalRow !== null && gridY != this.rows - 1) {
-					let gridHeight = this.grid.getMaxY() + 1;
-					if(this.grid.h > gridHeight){
-						this.grid.h = gridHeight;
-					}
-					this.additionalRow = null;
-				}
-			}
 			this.x = gridX;
 			this.y = gridY;
 
@@ -482,6 +481,7 @@ export default {
 			}
 		},
 		dragCancel() {
+			this.additionalRowComputed = false;
 			this.toggleDraggedItemOverlay(false);
 			this.mode = MODE_IDLE;
 			this.positionUpdates = null;
@@ -531,6 +531,7 @@ export default {
 			return updated;
 		},
 		emptyTileClicked() {
+			this.additionalRowComputed = false;
 			this.$emit('newItem', this.x, this.y);
 		},
 		updateCursorOnMouseMove(evt){

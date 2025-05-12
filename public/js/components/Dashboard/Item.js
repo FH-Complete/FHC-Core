@@ -42,7 +42,8 @@ export default {
 		"place",
 		"setup",
 		"dragstate",
-		"resizeOverlay"
+		"resizeOverlay",
+		"additionalRow"
 	],
 	computed: {
 		maxHeight(){
