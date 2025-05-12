@@ -59,7 +59,14 @@ class Dienstverhaeltnis_model extends DB_Model
 		}
 
 		$qry .="
-        ORDER BY dv.von desc
+        ORDER BY
+			CASE
+				WHEN (COALESCE(dv.bis, '2999-12-31'::date) - NOW()::date) < 0 THEN NULL
+			ELSE
+				(COALESCE(dv.bis, '2999-12-31'::date) - NOW()::date)
+			END ASC NULLS LAST,
+			COALESCE(dv.bis, '2999-12-31'::date) DESC,
+			dv.von DESC
         ";
 
         return $this->execQuery($qry, $data);

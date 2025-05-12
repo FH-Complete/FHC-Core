@@ -18431,6 +18431,26 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
+		'phrase' => 'studentstatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studentstatus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
 		'phrase' => 'alledurchgefuehrten',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -19331,13 +19351,33 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Maßnahmen - geplant',
+				'text' => 'Maßnahme - geplant',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Measures - planned',
+				'text' => 'Measure - planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'geplanteMassnahmenDesc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Maßhname wurde geplant.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The measure was planned.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19391,13 +19431,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Maßnahmen - durchgeführt',
+				'text' => 'Maßnahme - durchgeführt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Measures - performed',
+				'text' => 'Measure - performed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19431,13 +19471,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Maßnahmen - abgelehnt',
+				'text' => 'Maßnahme - abgelehnt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Measures - declined',
+				'text' => 'Measure - declined',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19531,13 +19571,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Anmerkung - Studiengangsleitung',
+				'text' => 'Begründung - Studiengangsleitung',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Note - Study course Director',
+				'text' => 'Reason - Study course Director',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19558,6 +19598,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => '>=5 international credits planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'stgtodo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur offene Massnahmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'only open measures',
 				'description' => '',
 				'insertvon' => 'system'
 			)
