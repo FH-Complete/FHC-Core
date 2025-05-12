@@ -405,6 +405,7 @@ export default {
 			}
 		},
 		startMove(evt, item) {
+			
 			if (!this.active)
 				return;
 			
@@ -413,14 +414,15 @@ export default {
 			this.grid.h += 1;
 			this.draggedItem = item;
 			this.$emit('draggedItem',item);
-			this.draggedNode = evt.target;
+			
+			this.draggedNode = evt.target.closest(".drop-grid-item");
 			//clones the widget for the drag Image
-			let clone = evt.target.cloneNode(true);
+			let clone = evt.target.closest(".drop-grid-item")?.cloneNode(true);
+			
 			clone.style.zIndex = 5;
 			clone.classList.add("widgetClone");
 			this.$refs.container.appendChild(clone);
 			this.clonedWidget = clone;
-			
 			this.draggedOffset = [item.x - this.x, item.y - this.y];
 			this._dragStart(evt, item);
 		},
@@ -498,9 +500,10 @@ export default {
 			Array.from(document.getElementsByClassName("denied-dragging-animation"))?.forEach(ele => {
 				ele.classList.remove("denied-dragging-animation");
 			})
+			
 			let widgetClones = document.getElementsByClassName("widgetClone");
-			for(let widget of widgetClones){
-				this.$refs.container.removeChild(widget);
+			for (let i=0; i <widgetClones.length; i++){ 
+				this.$refs.container.removeChild(widgetClones[i]);
 			}
 			
 			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
@@ -614,7 +617,7 @@ export default {
 		<TransitionGroup tag="div">
 			<grid-item
 				ref="gridItems"
-				v-for="(item,index) in ((mode != 1 || mode != 2) && active ? placedItems_withPlaceholders : placedItems)"
+				v-for="(item,index) in ((mode != 1 && mode != 2) && active ? placedItems_withPlaceholders : placedItems)"
 				:key="item.data.id"
 				:item="item"
 				@start-move="startMove"
@@ -623,8 +626,8 @@ export default {
 				@start-resize="startResize"
 				@dragging="dragging"
 				@end-drag="dragCancel"
-				@drop-drag="dragEnd"
-				@touchEvent="updateCursorOnMouseMove"
+				@touch-end="dragEnd();mouseUp();"
+				@touch-start="updateCursorOnMouseMove($event); mouseDown();"
 				class="position-absolute"
 				:active="active"
 				:style="{

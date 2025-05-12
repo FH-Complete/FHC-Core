@@ -41,6 +41,8 @@ export default {
 		"item_data",
 		"place",
 		"setup",
+		"dragstate",
+		"resizeOverlay"
 	],
 	computed: {
 		maxHeight(){
@@ -153,7 +155,8 @@ export default {
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 	</div>
-	<div v-else-if="!hidden || editMode" :id="widgetID" class="dashboard-item card overflow-hidden h-100 position-relative" :class="arguments && arguments.className ? arguments.className : ''">
+	<div v-else-if="!hidden || editMode" :id="widgetID" class="dashboard-item card overflow-hidden h-100 position-relative" :class="{'draggedItem':dragstate, 'dashboard-item-overlay':resizeOverlay, [arguments?.className]:arguments && arguments.className}">
+	<div v-show="!dragstate" class="h-100 card border-0">
 		<div v-if="widget" class="card-header d-flex ps-0 pe-2 align-items-center">
 			<Transition>
 				<span v-if="editMode && !isPinned" drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
@@ -221,5 +224,6 @@ export default {
 				</template>
 			</div>
 		</height-transition>
+		</div>
 	</div>`,
 };
