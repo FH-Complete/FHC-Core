@@ -9,6 +9,7 @@ import CmsNews from "../../components/Cis/Cms/News.js";
 import CmsContent from "../../components/Cis/Cms/Content.js";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
 import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../../components/Cis/Mylv/RoomInformation.js";
+import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -25,6 +26,12 @@ const router = VueRouter.createRouter({
 			path: `/Cis/Profil`,
 			name: 'Profil',
 			component: Profil,
+			props: true
+		},
+		{
+			path: `/Cis/Benotungstool/:lv_id/:sem_kurzbz`,
+			name: 'Benotungstool',
+			component: Benotungstool,
 			props: true
 		},
 		

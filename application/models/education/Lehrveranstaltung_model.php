@@ -988,4 +988,24 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($qry, $params);
 	}
+
+	public function getLvForLektorInSemester($sem_kurzbz, $uid) {
+		$qry = "SELECT DISTINCT (tbl_lehrveranstaltung.lehrveranstaltung_id),
+				UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz,
+				tbl_lehrveranstaltung.semester as lv_semester,
+				tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+				(SELECT kurzbz FROM public.tbl_mitarbeiter
+				 WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor
+			FROM
+				lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+									  JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+									  JOIN public.tbl_studiengang USING(studiengang_kz)
+									  JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+			WHERE
+				tbl_lehreinheit.studiensemester_kurzbz = ?
+			  AND mitarbeiter_uid = ?
+			ORDER BY stg_kurzbz,lv_semester,lv_bezeichnung";
+
+		return $this->execReadOnlyQuery($qry, array($sem_kurzbz, $uid));
+	}
 }

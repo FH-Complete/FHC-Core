@@ -62,6 +62,7 @@ $route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/b
 $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 
 $route['Cis/Stundenplan/.*'] = 'Cis/Stundenplan/index/$1';
+$route['Cis/Benotungstool/.*'] = 'Cis/Benotungstool/index/$1';
 
 // load routes from extensions
 $subdir = 'application/config/extensions';

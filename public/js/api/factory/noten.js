@@ -16,26 +16,6 @@
  */
 
 export default {
-	getStudentenMail(lehreinheit_id) {
-		// TODO(chris): seems to be called from nowhere?
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Lehre/lvStudentenMail',
-			params: { lehreinheit_id }
-		};
-	},
-	getLvInfo(studiensemester_kurzbz, lehrveranstaltung_id) {
-		return {
-			method: 'get',
-			url: `/api/frontend/v1/Lehre/LV/${studiensemester_kurzbz}/${lehrveranstaltung_id}`
-		};
-	},
-	getStudentPruefungen(lehrveranstaltung_id) {
-		return {
-			method: 'get',
-			url: `/api/frontend/v1/Lehre/Pruefungen/${lehrveranstaltung_id}`
-		};
-	},
 	getStudentenNoten(lv_id, sem_kurzbz) {
 		return {
 			method: 'get',
@@ -49,11 +29,11 @@ export default {
 			url: '/api/frontend/v1/Noten/getNoten'
 		};
 	},
-	getZugewieseneLv(uid, sem_kurzbz){
+	saveStudentenNoten(password) {
 		return {
-			method: 'get',
-			url: '/api/frontend/v1/Lehre/getZugewieseneLv',
-			params: { uid, sem_kurzbz}
+			method: 'post',
+			url: '/api/frontend/v1/Noten/saveStudentenNoten',
+			params: { password }
 		};
 	}
 };

@@ -306,4 +306,19 @@ class Pruefung_model extends DB_Model
 
 		return $this->loadWhereCommitteeExamsFailed();
 	}
+	
+	public function getPruefungenByLvStudiensemester($lv_id, $sem_kurzbz) {
+		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
+				   tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
+			FROM lehre.tbl_pruefung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_note, lehre.tbl_pruefungstyp
+			WHERE tbl_pruefung.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
+			  AND tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+			  AND tbl_pruefung.note = tbl_note.note
+			  AND tbl_pruefung.pruefungstyp_kurzbz=tbl_pruefungstyp.pruefungstyp_kurzbz
+			  AND tbl_lehrveranstaltung.lehrveranstaltung_id = ?
+			  AND tbl_lehreinheit.studiensemester_kurzbz = ?
+			ORDER BY datum DESC;";
+		
+		return $this->execReadOnlyQuery($qry, array($lv_id, $sem_kurzbz));
+	}
 }
