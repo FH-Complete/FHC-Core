@@ -85,7 +85,9 @@ export default {
     `,
     watch:{
 		'searchsettings.searchstr': function (newSearchValue, oldSearchValue) {
-			sessionStorage.setItem(`${this.searchoptions.origin}_searchstr_${uuid}`,newSearchValue);
+			if(this.searchoptions.origin){
+				sessionStorage.setItem(`${this.searchoptions.origin}_searchstr`,newSearchValue);
+			}
 		},
     },
 	computed:{
@@ -104,8 +106,8 @@ export default {
 				this.searchsettings.types = this.allSearchTypes();
 			}
 			// stores the search types in the localstorage, only if the newValue is also an array
-			if(Array.isArray(newValue)){
-				localStorage.setItem(`${this.searchoptions.origin}_searchtypes_${uuid}`, JSON.stringify(newValue));
+			if(Array.isArray(newValue), this.searchoptions.origin){
+				localStorage.setItem(`${this.searchoptions.origin}_searchtypes`, JSON.stringify(newValue));
 			}
 			this.search();
 		});
@@ -127,26 +129,9 @@ export default {
 		}
 	},
     methods: {
-		getStorageValue: function (key, sessionStorage = false){
-			const regex = new RegExp(`${this.searchoptions.origin}_${key}`);
-			if(sessionStorage){
-				for (let i = 0; i < sessionStorage.length; i++) {
-					if (sessionStorage.key(i).match(regex)) {
-						return sessionStorage.getItem(sessionStorage.key(i));
-					}
-				}
-			}
-			else{
-				for (let i =0; i < localStorage.length; i++){
-					if (localStorage.key(i).match(regex)){
-						return localStorage.getItem(localStorage.key(i));
-					}
-				}
-			}
-		},
 		getSearchTypes: function () {
 			let result = this.allSearchTypes();
-			let localStorageValue = this.getStorageValue('searchtypes');
+			let localStorageValue = localStorage.getItem('searchtypes');
 			if (localStorageValue) {
 				result = JSON.parse(localStorageValue);
 			}
@@ -160,7 +145,7 @@ export default {
 			return allTypes;
 		},
 		getSearchStr: function(){
-			return this.getStorageValue("searchstr",true) ?? '';
+			return sessionStorage.getItem("searchstr") ?? '';
 		},
 		checkSettingsVisibility: function(event) {
 			// hides the settings collapsible if the user clicks somewhere else
