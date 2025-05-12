@@ -2375,16 +2375,39 @@ class InfoCenter extends Auth_Controller
 		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
 			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
 
-		foreach($personen as $person)
+		if ($studiengang === 'all' && $abgeschickt !== 'all' ||
+			$abgeschickt === 'all' && $studiengang !== 'all')
+			$this->terminateWithJsonError("Absage für alle Studiengänge ist nur in Kombination mit abgeschickt 'Beide' möglich!");
+
+		if ($studiengang === 'all' && $abgeschickt === 'all')
 		{
-			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt);
+			foreach($personen as $person)
+			{
+				$prestudenten = $this->PrestudentModel->getByPersonWithoutLehrgang($person, $studienSemester);
 
-			if (!hasData($prestudent))
-				continue;
+				if (!hasData($prestudenten))
+					continue;
 
-			$prestudentData = getData($prestudent);
+				$prestudentenData = getData($prestudenten);
 
-			$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
+				foreach ($prestudentenData as $prestudent)
+				{
+					$this->saveAbsage($prestudent->prestudent_id, $statusgrund);
+				}
+			}
+		}
+		else
+		{
+			foreach($personen as $person)
+			{
+				$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt);
+
+				if (!hasData($prestudent))
+					continue;
+
+				$prestudentData = getData($prestudent);
+				$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
+			}
 		}
 
 		$this->outputJsonSuccess("Success");
