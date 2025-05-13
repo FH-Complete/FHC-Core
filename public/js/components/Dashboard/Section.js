@@ -1,5 +1,4 @@
 import BsConfirm from "../Bootstrap/Confirm.js";
-import SectionModal from "../Bootstrap/Alert.js";
 import DropGrid from '../Drop/Grid.js'
 import DashboardItem from "./Item.js";
 import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
@@ -109,13 +108,13 @@ export default {
 		},
 		showSectionInformation(){
 			if (this.name == "general"){
-				SectionModal.popup(this.$p.t('dashboard', 'dashboardGeneralSectionDescription')); 
+				return this.$p.t('dashboard', 'dashboardGeneralSectionDescription'); 
 			}
 			else if(this.name == "custom"){
-				SectionModal.popup(this.$p.t('dashboard', 'dashboardCustomSectionDescription'));
+				return this.$p.t('dashboard', 'dashboardCustomSectionDescription');
 			}
 			else{
-				SectionModal.popup(this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]));
+				return this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]);
 			}
 		},
 		handleConfigOpened() {
@@ -211,14 +210,14 @@ export default {
 	},
 	template: `
 	<h4 v-if="editModeIsActive" class=" mb-2">
-		<i @click="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
+		<i v-tooltip="{ value: showSectionInformation(name), hideDelay: 300 }" class="fa-solid fa-circle-info section-info" ></i>
 		{{sectionNameTranslation()}}:
 	</h4>
 	<div class="dashboard-section position-relative pb-3 border-bottom" ref="container" :style="getSectionStyle">
 		<button v-if="!additionalRow && editModeIsActive" @click="additionalRow=true" class="btn btn-outline-secondary rounded-circle newGridRow d-flex justify-content-center align-items-center">+</button>
 		<drop-grid v-model:cols="gridWidth" v-model:additionalRow="additionalRow" :items="items" :itemsSetup="computedWidgetsSetup" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @draggedItem="draggedItem=$event" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item">
-				<div v-if="item.placeholder" class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
+				<div v-if="item.placeholder" class="empty-tile-hover" @pointerdown="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
 				<dashboard-item 
 					v-else
 					:id="item.widget"

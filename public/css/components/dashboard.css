@@ -1,6 +1,19 @@
 @import './calendar.css';
 @import './dashboard/news.css';
 
+@media (max-width: 576px){
+	.widget-icon {
+		max-height: 250px;
+		object-fit: cover;
+	}
+	.widget-icon-container{
+		max-width: 250px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
+
+
 .empty-tile-hover {
 	height: 100%;
 	width: 100%;

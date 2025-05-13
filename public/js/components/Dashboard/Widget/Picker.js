@@ -40,7 +40,7 @@ export default {
 					<div v-if="!widgets.length">
 						No Widgets available
 					</div>
-					<div v-for="widget in widgets" :key="widget.widget_id" class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+					<div v-for="widget in widgets" :key="widget.widget_id" class="widget-icon-container col-sm-6 col-md-4 col-lg-3 col-xl-2">
 						<widget-icon @select="pick" :widget="widget" ></widget-icon>
 					</div>
 				</div>

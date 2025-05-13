@@ -177,7 +177,13 @@ export default {
 				});
 				remove.forEach(wid => this.widgetRemove(name, wid));
 			}
-			this.sections = this.sections.sort((section1, section2) => section2.widgets.length - section1.widgets.length);
+			this.sections = this.sections.sort((section1, section2) => {
+				if(section1.name == 'custom')
+					return 1;
+				if (section2.name == 'custom')
+					return -1;
+				return section2.widgets.length - section1.widgets.length;
+			});
 		}).catch(err => console.error('ERROR:', err));
 	},
 	async beforeMount() {
