@@ -677,7 +677,7 @@ class Prestudent_model extends DB_Model
 		));
 	}
 
-	public function getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt)
+	public function getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt, $ignoreAbgeschickt = false)
 	{
 		$query = "SELECT ps.prestudent_id
 					FROM public.tbl_prestudentstatus pss
@@ -687,18 +687,22 @@ class Prestudent_model extends DB_Model
 					JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 					WHERE ps.person_id = ?
 					AND UPPER(so.studiengangkurzbzlang || ':' || sp.orgform_kurzbz) = ?
-					AND pss.studiensemester_kurzbz = ?
-					AND";
+					AND pss.studiensemester_kurzbz = ?";
 
-		if ($abgeschickt === 'true')
-			$query .= " EXISTS";
-		else
-			$query .= " NOT EXISTS";
+		if (!$ignoreAbgeschickt)
+		{
+			$query .= "AND";
 
-		$query .= " (SELECT 1 FROM public.tbl_prestudentstatus spss
+			if ($abgeschickt === 'true')
+				$query .= " EXISTS";
+			else
+				$query .= " NOT EXISTS";
+
+			$query .= " (SELECT 1 FROM public.tbl_prestudentstatus spss
 					JOIN public.tbl_prestudent sps USING(prestudent_id)
 					WHERE sps.prestudent_id = ps.prestudent_id
 					AND spss.bewerbung_abgeschicktamum IS NOT NULL)";
+		}
 
 		return $this->execQuery($query, array($person, $studiengang, $studienSemester));
 	}
