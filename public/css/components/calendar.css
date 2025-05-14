@@ -73,9 +73,10 @@
 	box-shadow: 1px 1px 0 #dee2e6;
 }
 
-.fhc-calendar-week-page .all-day-event{
+.fhc-calendar-week-page .all-day-event {
 	max-height: 75px;
-	overflow:auto;
+	overflow: auto;
+	overscroll-behavior: none;
 }
 
 .fhc-calendar-week-page .all-day-event-container{
