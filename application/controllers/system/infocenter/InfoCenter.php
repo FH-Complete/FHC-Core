@@ -2375,10 +2375,6 @@ class InfoCenter extends Auth_Controller
 		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
 			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
 
-		if ($studiengang === 'all' && $abgeschickt !== 'all' ||
-			$abgeschickt === 'all' && $studiengang !== 'all')
-			$this->terminateWithJsonError("Absage für alle Studiengänge ist nur in Kombination mit abgeschickt 'Beide' möglich!");
-
 		if ($studiengang === 'all' && $abgeschickt === 'all')
 		{
 			foreach($personen as $person)
@@ -2398,16 +2394,31 @@ class InfoCenter extends Auth_Controller
 		}
 		else
 		{
-			foreach($personen as $person)
+			$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+
+			$this->StudienplanModel->addSelect('1');
+			$this->StudienplanModel->addJoin('lehre.tbl_studienordnung so', 'studienordnung_id');
+			$escaped = $this->StudienplanModel->db->escape(strtoupper($studiengang));
+			$this->StudienplanModel->db->where("UPPER(so.studiengangkurzbzlang || ':' || tbl_studienplan.orgform_kurzbz) = $escaped");
+			$this->StudienplanModel->addLimit(1);
+			$studiengangResult = $this->StudienplanModel->load();
+
+			if (hasData($studiengangResult))
 			{
-				$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt);
+				foreach($personen as $person)
+				{
+					$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt, $abgeschickt === 'all');
 
-				if (!hasData($prestudent))
-					continue;
+					if (!hasData($prestudent))
+						continue;
 
-				$prestudentData = getData($prestudent);
-				$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
+					$prestudentData = getData($prestudent);
+					$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
+				}
 			}
+			else
+				$this->terminateWithJsonError("Falschen Studiengang übergeben!");
+
 		}
 
 		$this->outputJsonSuccess("Success");
