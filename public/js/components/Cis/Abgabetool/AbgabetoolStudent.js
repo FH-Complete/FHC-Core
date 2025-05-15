@@ -16,9 +16,9 @@ export const AbgabetoolStudent = {
 		viewData: {
 			type: Object,
 			required: true,
-			default: () => ({name: '', uid: ''}),
+			default: () => ({uid: ''}),
 			validator(value) {
-				return value && value.name && value.uid
+				return value && value.uid
 			}
 		}
 	},
@@ -186,7 +186,7 @@ export const AbgabetoolStudent = {
 			this.$refs.abgabeTable.tabulator.setData(d);
 		},
 		loadProjektarbeiten() {
-			this.$fhcApi.factory.lehre.getStudentProjektarbeiten(this.student_uid_prop ?? this.viewData?.uid ?? null)
+			this.$fhcApi.factory.lehre.getStudentProjektarbeiten(this.student_uid_prop || this.viewData?.uid || null)
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				})
