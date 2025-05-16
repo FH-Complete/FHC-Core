@@ -160,8 +160,6 @@ export default {
 		},
 		getData(projektarbeit_id, studiensemester_kurzbz, projekttyp_kurzbz) {
 
-			console.log(projekttyp_kurzbz);
-
 			this.studiensemester_kurzbz = studiensemester_kurzbz;
 
 			this.defaultFormDataValues.stunden = '0.0';
@@ -298,7 +296,6 @@ export default {
 			let max = 0;
 
 			for (const betreuer of this.$refs.table.tabulator.getData()) {
-				console.log(typeof betreuer.betreuer_id);
 				if (betreuer.betreuer_id > max) max = betreuer.betreuer_id;
 			}
 
@@ -306,9 +303,6 @@ export default {
 		},
 		formDataModified() {
 			if (this.autocompleteSelectedBetreuer != null) return true;
-
-			console.log(this.formData);
-			console.log(this.initialFormData);
 
 			for (const prop in this.initialFormData) {
 				if (typeof this.formData[prop] == 'undefined') return true;
