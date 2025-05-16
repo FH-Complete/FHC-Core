@@ -125,7 +125,8 @@ class Config extends FHCAPI_Controller
 
 		$result['projektarbeit'] = [
 			'title' => $this->p->t('stv', 'tab_projektarbeit'),
-			'component' => './Stv/Studentenverwaltung/Details/Projektarbeit.js'
+			'component' => './Stv/Studentenverwaltung/Details/Projektarbeit.js',
+			'config' => $config['projektarbeit']
 		];
 
 		$result['mobility'] = [
@@ -323,7 +324,7 @@ class Config extends FHCAPI_Controller
 		$title_eng = $this->p->t("global", "englisch");
 		$title_ff = $this->p->t("stv", "document_certificate");
 		$title_lv = $this->p->t("stv", "document_coursecertificate");
-		
+
 		$link_ff = "documents/export/" .
 			"zertifikat.rdf.php/" .
 			"Zertifikat" .

@@ -17,7 +17,7 @@ class Projektarbeit extends FHCAPI_Controller
 			'getTypenProjektarbeit' => ['admin:r', 'assistenz:r'],
 			'getFirmen' => ['admin:r', 'assistenz:r'],
 			'getLehrveranstaltungen' => ['admin:r', 'assistenz:r'],
-			'getNoten' => ['admin:rw', 'assistenz:rw']
+			'getNoten' => ['admin:r', 'assistenz:r']
 		]);
 
 		// Load Libraries
@@ -91,7 +91,7 @@ class Projektarbeit extends FHCAPI_Controller
 		);
 		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
 		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
-		$this->ProjektarbeitModel->addJoin('public.tbl_firma fa', 'firma_id');
+		$this->ProjektarbeitModel->addJoin('public.tbl_firma fa', 'firma_id', 'LEFT');
 		$result = $this->ProjektarbeitModel->loadWhere(
 			array('projektarbeit_id' => $projektarbeit_id)
 		);
@@ -170,7 +170,7 @@ class Projektarbeit extends FHCAPI_Controller
 		if (isError($validate)) return $this->terminateWithError(getError($validate), self::ERROR_TYPE_GENERAL);
 
 		$result = $this->ProjektarbeitModel->delete(
-			array('projektarbeit_id' => $projektarbeit_id)
+			['projektarbeit_id' => $projektarbeit_id]
 		);
 
 		if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
@@ -273,10 +273,9 @@ class Projektarbeit extends FHCAPI_Controller
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Projekttyp'])
 		]);
 
-		$this->form_validation->set_rules('lehreinheit_id', 'Lehreinheit', 'required|numeric', [
+		$this->form_validation->set_rules('lehreinheit_id', 'Lehreinheit', 'required|is_natural', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Lehreinheit']),
-			//'matches' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Lehreinheit']),
-			'numeric' =>  $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Lehreinheit'])
+			'is_natural' =>  $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Lehreinheit'])
 		]);
 
 		$this->form_validation->set_rules('beginn', 'Beginn', 'is_valid_date', [

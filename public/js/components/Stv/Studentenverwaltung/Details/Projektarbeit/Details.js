@@ -1,4 +1,3 @@
-import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
@@ -7,7 +6,6 @@ import ApiStvProjektarbeit from '../../../../../api/factory/stv/projektarbeit.js
 
 export default {
 	components: {
-		CoreFilterCmpt,
 		FormForm,
 		FormInput,
 		PvAutoComplete
@@ -48,23 +46,12 @@ export default {
 			}
 
 			return lehreinheiten;
-		},
-		//~ preparedFormData() {
-			//~ console.log("FOR DATA CALLEd");
-			//~ if (this.formData.projektarbeit_id == null) delete(this.formData.projektarbeit_id);
-			//~ if (this.formData.firma) this.formData.firma_id = this.formData.firma.firma_id;
-			//~ delete(this.formData.firma);
-			//~ delete(this.formData.firma_name);
-			//~ delete(this.formData.lehrveranstaltung_id);
-			//~ // convert null value fields from string to null
-			//~ return this.formData;
-		//~ }
+		}
 	},
 	props: {
 		statusNew: Boolean,
 		student: Object,
-		projektarbeit: Object,
-		stg_kz: Number
+		projektarbeit: Object
 	},
 	data() {
 		return {
@@ -177,21 +164,13 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		setFormData(arrTypen, arrLvs, arrNoten, projektarbeitData) {
-			this.arrTypen = arrTypen;
-			this.arrLvs = arrLvs;
-			this.arrNoten = arrNoten;
-			if (projektarbeitData) {
-				projektarbeitData.firma = {firma_id: projektarbeitData.firma_id, name: projektarbeitData.firma_name};
-				this.formData = projektarbeitData;
-			}
-		},
 		loadProjektarbeit(projektarbeit_id) {
 
 			return this.$api
 				.call(ApiStvProjektarbeit.loadProjektarbeit(projektarbeit_id))
 				.then(result => {
 					this.formData = result.data;
+					if (this.formData.firma_id) this.formData.firma = {firma_id: this.formData.firma_id, name: this.formData.firma_name};
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError)

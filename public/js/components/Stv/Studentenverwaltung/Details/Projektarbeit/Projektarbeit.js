@@ -7,6 +7,7 @@ import PvAutoComplete from "../../../../../../../index.ci.php/public/js/componen
 
 import ApiStvProjektarbeit from '../../../../../api/factory/stv/projektarbeit.js';
 import ProjektarbeitDetails from "./Details.js";
+import Projektbetreuer from "./Projektbetreuer.js";
 
 export default {
 	components: {
@@ -15,7 +16,8 @@ export default {
 		FormForm,
 		FormInput,
 		PvAutoComplete,
-		ProjektarbeitDetails
+		ProjektarbeitDetails,
+		Projektbetreuer
 	},
 	inject: {
 		cisRoot: {
@@ -174,7 +176,9 @@ export default {
 							button.title = this.$p.t('ui', 'bearbeiten');
 							button.addEventListener('click', (event) => {
 								let data = cell.getData();
-								this.actionEditProjektarbeit(data.projektarbeit_id, data.studiensemester_kurzbz, data.lehrveranstaltung_id);
+								this.actionEditProjektarbeit(
+									data.projektarbeit_id, data.studiensemester_kurzbz, data.lehrveranstaltung_id, data.projekttyp_kurzbz
+								);
 							});
 							container.append(button);
 
@@ -195,7 +199,6 @@ export default {
 					},
 				],
 				layout: 'fitDataFill',
-				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '200',
 				selectable: 1,
@@ -240,25 +243,20 @@ export default {
 			lehrveranstaltung_id: null
 		}
 	},
-	//~ watch: {
-		//~ student(){
-			//~ if (this.$refs.table) {
-				//~ this.$refs.table.reloadTable();
-			//~ }
-			//~ this.getStudiengangByKz();
-		//~ }
-	//~ },
 	methods: {
 		actionNewProjektarbeit() {
 			this.statusNew = true;
 			this.$refs.projektarbeitDetails.resetForm();
 			this.$refs.projektarbeitDetails.getFormData();
+			this.$refs.projektbetreuer.getData();
 			this.$refs.projektarbeitModal.show();
 		},
-		actionEditProjektarbeit(projektarbeit_id, studiensemester_kurzbz, lehrveranstaltung_id) {
+		actionEditProjektarbeit(projektarbeit_id, studiensemester_kurzbz, lehrveranstaltung_id, projekttyp_kurzbz) {
 			this.statusNew = false;
 			this.$refs.projektarbeitDetails.getFormData(this.statusNew, studiensemester_kurzbz, lehrveranstaltung_id);
+			// TODO: maybe preload projektarbeit? not just on edit?
 			this.$refs.projektarbeitDetails.loadProjektarbeit(projektarbeit_id);
+			this.$refs.projektbetreuer.getData(projektarbeit_id, studiensemester_kurzbz, projekttyp_kurzbz);
 			this.$refs.projektarbeitModal.show();
 		},
 		actionDeleteProjektarbeit(projektarbeit_id) {
@@ -271,41 +269,41 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewProjektarbeit() {
-			Promise.allSettled([
-				this.$refs.projektarbeitDetails.addNewProjektarbeit()
-			]).then((results) => {
-				let hasError = false;
-				results.forEach((promise_result) => {
+			this.$refs.projektbetreuer.validateProjektbetreuer()
+				.then(() => {
+					return this.$refs.projektarbeitDetails.addNewProjektarbeit();
+				})
+				.then((result) => {
+					const projektarbeit_id = result.data;
+					console.log(projektarbeit_id);
 
-					if (!(promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success")) {
-
-						hasError = true;
+					if (!isNaN(projektarbeit_id)) {
+						return this.$refs.projektbetreuer.saveProjektbetreuer(projektarbeit_id);
 					}
-				});
-
-				if (!hasError) {
+				})
+				.then((result) => {
+					console.log(result);
 					this.projektarbeitSaved();
-				}
-			});
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateProjektarbeit() {
-			Promise.allSettled(
-			[
-				this.$refs.projektarbeitDetails.updateProjektarbeit()
-			]).then((results) => {
-				let hasError = false;
-				results.forEach((promise_result) => {
+			this.$refs.projektbetreuer.validateProjektbetreuer()
+				.then(() => {
+					return this.$refs.projektarbeitDetails.updateProjektarbeit();
+				})
+				.then((result) => {
+					const projektarbeit_id = result.data;
+					console.log(projektarbeit_id);
 
-					if (!(promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success")) {
-
-						hasError = true;
+					if (!isNaN(projektarbeit_id)) {
+						return this.$refs.projektbetreuer.saveProjektbetreuer(projektarbeit_id);
 					}
-				});
-
-				if (!hasError) {
+				})
+				.then((result) => {
 					this.projektarbeitSaved();
-				}
-			});
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		deleteProjektarbeit(projektarbeit_id) {
 			return this.$api
@@ -325,7 +323,6 @@ export default {
 			this.$refs.projektarbeitDetails.resetForm();
 		},
 		rowSelectionChanged(data) {
-			console.log("selection changed");
 			this.lastSelected = data.length > 0 ? data[0] : null;
 		},
 		hideModal(modalRef){
@@ -362,7 +359,14 @@ export default {
 				<p v-else class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitBearbeiten')}}</p>
 			</template>
 
-			<projektarbeit-details ref="projektarbeitDetails" :student="student" :stg_kz="stg_kz"></projektarbeit-details>
+			<div class="row">
+				<div class="col-6">
+					<projektarbeit-details ref="projektarbeitDetails" :student="student"></projektarbeit-details>
+				</div>
+				<div class="col-6">
+					<projektbetreuer ref="projektbetreuer" :config="config"></projektbetreuer>
+				</div>
+			</div>
 
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>

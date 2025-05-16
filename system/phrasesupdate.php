@@ -25025,7 +25025,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The Field {Field} must contain only numbers.',
+				'text' => 'The Field {field} must contain only numbers.',
 				'description' => '',
 				'insertvon' => 'system'
 			)

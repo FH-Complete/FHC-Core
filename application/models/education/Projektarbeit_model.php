@@ -29,12 +29,11 @@ class Projektarbeit_model extends DB_Model
 					tbl_firma.name AS firma_name
 				FROM
 					lehre.tbl_projektarbeit
-				JOIN
-					lehre.tbl_projekttyp USING (projekttyp_kurzbz), lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, public.tbl_firma
+					JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
+					JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+					LEFT JOIN public.tbl_firma USING (firma_id)
 				WHERE
-					tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-					tbl_projektarbeit.firma_id = tbl_firma.firma_id AND
 					tbl_projektarbeit.student_uid = ?";
 
 		$params = array($student_uid);
