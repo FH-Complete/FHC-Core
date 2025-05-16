@@ -31,6 +31,20 @@ export const Raumsuche =  {
 				hours: new Date().getHours() + 1,
 				minutes: new Date().getMinutes()
 			}),
+			datepickerTextInputOptions: {
+				enterSubmit: true,
+				tabSubmit: true,
+				selectOnFocus: true,
+				format: 'dd.MM.yyyy',
+				escClose: true
+			},
+			timepickerTextInputOptions: {
+				enterSubmit: true,
+				tabSubmit: true,
+				selectOnFocus: true,
+				format: 'HH:mm',
+				escClose: true
+			},
 			raumsucheTableOptions: {
 				height: Vue.ref(400),
 				index: 'ort_kurzbz',
@@ -135,8 +149,8 @@ export const Raumsuche =  {
 			// TODO: router push
 		},
 		dateFormat(date) {
-			const day = date.getDate();
-			const month = date.getMonth() + 1;
+			const day = String(date.getDate()).padStart(2, '0');
+			const month = String(date.getMonth() + 1).padStart(2, '0');
 			const year = date.getFullYear();
 			return `${day}.${month}.${year}`
 		},
@@ -187,7 +201,8 @@ export const Raumsuche =  {
 				date-picker
 				:enable-time-picker="false"
 				:format="dateFormat"
-				:text-input="true"
+				:text-input="datepickerTextInputOptions"
+				:min-date="new Date()"
 				auto-apply>
 			</VueDatePicker>
 		</div>
@@ -197,7 +212,8 @@ export const Raumsuche =  {
 				:clearable="false"
 				time-picker
 				:format="timeFormat"
-				:text-input="true"
+				:text-input="timepickerTextInputOptions"
+				:is-24="true"
 				auto-apply
 				>
 			</VueDatePicker>
@@ -208,7 +224,8 @@ export const Raumsuche =  {
 				:clearable="false"
 				time-picker
 				:format="timeFormat"
-				:text-input="true"
+				:text-input="timepickerTextInputOptions"
+				:is-24="true"
 				auto-apply>
 			</VueDatePicker>
 		</div>
