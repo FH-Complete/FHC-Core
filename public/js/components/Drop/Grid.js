@@ -363,12 +363,12 @@ export default {
 			});
 		},
 		mouseLeave() {
-			if (this.mode == MODE_IDLE) {
+			/* if (this.mode == MODE_IDLE) {
 				this.x = -1;
 				this.y = -1;
 				this.additionalRowComputed = false;
 				
-			}
+			} */
 		},
 		updateCursor(evt) {
 			if (!this.active) {
