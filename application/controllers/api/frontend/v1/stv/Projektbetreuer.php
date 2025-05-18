@@ -171,7 +171,7 @@ class Projektbetreuer extends FHCAPI_Controller
 		$betreuerart_kurzbz = $this->input->post('betreuerart_kurzbz');
 
 		if (!isset($projektarbeit_id) || !is_numeric($projektarbeit_id))
-			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Projektbetreuer ID'], self::ERROR_TYPE_GENERAL));
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Projektarbeit ID'], self::ERROR_TYPE_GENERAL));
 
 		if (!isset($person_id) || !is_numeric($person_id))
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Person ID'], self::ERROR_TYPE_GENERAL));

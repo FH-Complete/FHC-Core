@@ -15,6 +15,9 @@ export default {
 	inject: {
 	},
 	computed: {
+		betreuerFormOpened() {
+			return this.newMode || this.editMode;
+		}
 	},
 	props: {
 		config: {
@@ -93,6 +96,7 @@ export default {
 				stunden: null,
 				stundensatz: null
 			},
+			newMode: false,
 			editMode: false,
 			initialFormData: null,
 			defaultFormDataValues: {stunden: null, stundensatz: null},
@@ -112,7 +116,8 @@ export default {
 		actionNewProjektbetreuer() {
 			this.resetForm();
 			this.statusNew = true;
-			this.editMode = !this.editMode;
+			this.newMode = !this.newMode;
+			this.editMode = false;
 			this.captureFormData();
 		},
 		actionEditProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz) {
@@ -197,7 +202,7 @@ export default {
 			}
 		},
 		confirmProjektbetreuer() {
-			if (!this.editMode) return;
+			if (!this.betreuerFormOpened) return;
 
 			if (typeof this.formData.betreuer_id == 'undefined') {
 				this.formData.betreuer_id = this.getNewBetreuerId();
@@ -207,6 +212,7 @@ export default {
 				this.statusNew = true;
 			}
 
+			this.newMode = false;
 			this.editMode = false;
 		},
 		confirmProjektbetreuerAfterValidation() {
@@ -248,7 +254,7 @@ export default {
 		validateProjektbetreuer() {
 			let alleBetreuer = this.$refs.table.tabulator.getData();
 
-			if (this.editMode) {
+			if (this.betreuerFormOpened) {
 				alleBetreuer.push(this.addAutoCompleteBetreuerToFormData(this.formData));
 			}
 
@@ -347,7 +353,7 @@ export default {
 			>
 		</core-filter-cmpt>
 
-		<form-form ref="formProjektbetreuer" v-show="editMode" @submit.prevent>
+		<form-form ref="formProjektbetreuer" v-show="betreuerFormOpened" @submit.prevent>
 			<div class="row mb-3">
 				<form-input
 					container-class="stv-details-projektarbeit-betreuer"
@@ -423,7 +429,7 @@ export default {
 			</div>
 
 		</form-form>
-		<button class="btn btn-primary" v-show="editMode" @click="confirmProjektbetreuerAfterValidation">{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}</button>
+		<button class="btn btn-primary" v-show="betreuerFormOpened" @click="confirmProjektbetreuerAfterValidation">{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}</button>
 	</div>
 `
 }
