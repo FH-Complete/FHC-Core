@@ -10,7 +10,7 @@ export default {
 		FormInput,
 		PvAutoComplete
 	},
-	emits: ['details-saved'],
+	emits: ['projekttypChanged'],
 	inject: {
 		defaultSemester: {
 			from: 'defaultSemester'
@@ -80,6 +80,11 @@ export default {
 			abortController: {
 				firma: null
 			}
+		}
+	},
+	watch: {
+		'formData.projekttyp_kurzbz'(newValue, oldValue) {
+			this.$emit('projekttypChanged', newValue);
 		}
 	},
 	methods: {
@@ -284,15 +289,6 @@ export default {
 
 
 				<div class="row mb-3">
-					<!-- <form-input
-						v-if= "formData.firma_name"
-						container-class="col-6 stv-details-projektarbeit-firma"
-						type="text"
-						name="name"
-						:label="$p.t('projektarbeit', 'firma')"
-						v-model="formData.firma_name"
-						>
-					</form-input> -->
 					<form-input
 						container-class="stv-details-projektarbeit-firma"
 						:label="$p.t('projektarbeit', 'firma')"

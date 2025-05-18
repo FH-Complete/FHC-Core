@@ -247,7 +247,7 @@ export default {
 		actionNewProjektarbeit() {
 			this.statusNew = true;
 			this.$refs.projektarbeitDetails.resetForm();
-			this.$refs.projektarbeitDetails.getFormData();
+			this.$refs.projektarbeitDetails.getFormData(this.statusNew);
 			this.$refs.projektbetreuer.getData();
 			this.$refs.projektarbeitModal.show();
 		},
@@ -275,14 +275,12 @@ export default {
 				})
 				.then((result) => {
 					const projektarbeit_id = result.data;
-					console.log(projektarbeit_id);
 
 					if (!isNaN(projektarbeit_id)) {
 						return this.$refs.projektbetreuer.saveProjektbetreuer(projektarbeit_id);
 					}
 				})
 				.then((result) => {
-					console.log(result);
 					this.projektarbeitSaved();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -294,7 +292,6 @@ export default {
 				})
 				.then((result) => {
 					const projektarbeit_id = result.data;
-					console.log(projektarbeit_id);
 
 					if (!isNaN(projektarbeit_id)) {
 						return this.$refs.projektbetreuer.saveProjektbetreuer(projektarbeit_id);
@@ -324,6 +321,9 @@ export default {
 		},
 		rowSelectionChanged(data) {
 			this.lastSelected = data.length > 0 ? data[0] : null;
+		},
+		setDefaultStunden(projekttyp_kurzbz) {
+			this.$refs.projektbetreuer.setDefaultStunden(projekttyp_kurzbz);
 		},
 		hideModal(modalRef){
 			this.$refs[modalRef].hide();
@@ -361,7 +361,8 @@ export default {
 
 			<div class="row">
 				<div class="col-6">
-					<projektarbeit-details ref="projektarbeitDetails" :student="student"></projektarbeit-details>
+					<projektarbeit-details ref="projektarbeitDetails" :student="student" @projekttyp-changed="setDefaultStunden">
+					</projektarbeit-details>
 				</div>
 				<div class="col-6">
 					<projektbetreuer ref="projektbetreuer" :config="config"></projektbetreuer>

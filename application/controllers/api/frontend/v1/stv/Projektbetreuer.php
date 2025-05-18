@@ -48,7 +48,8 @@ class Projektbetreuer extends FHCAPI_Controller
 		if (!isset($projektarbeit_id)) $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Projektarbeit ID']), self::ERROR_TYPE_GENERAL);
 
 		$this->ProjektbetreuerModel->addSelect(
-			'projektarbeit_id, person_id, nachname, vorname, note, punkte, stunden, stundensatz, betreuerart_kurzbz, vertrag_id, titelpre, titelpost'
+			'projektarbeit_id, person_id, nachname, vorname, note, punkte, round(stunden, 1) AS stunden,
+			stundensatz, betreuerart_kurzbz, vertrag_id, titelpre, titelpost'
 		);
 		$this->ProjektbetreuerModel-> addSelect("CASE
 				WHEN EXISTS

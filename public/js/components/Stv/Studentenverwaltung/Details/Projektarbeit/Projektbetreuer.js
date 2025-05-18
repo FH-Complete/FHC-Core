@@ -93,6 +93,7 @@ export default {
 				stunden: null,
 				stundensatz: null
 			},
+			editMode: false,
 			initialFormData: null,
 			defaultFormDataValues: {stunden: null, stundensatz: null},
 			projektarbeit_id: null,
@@ -111,15 +112,17 @@ export default {
 		actionNewProjektbetreuer() {
 			this.resetForm();
 			this.statusNew = true;
+			this.editMode = !this.editMode;
 			this.captureFormData();
 		},
 		actionEditProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz) {
 
+			this.statusNew = false;
+			this.editMode = true;
 			this.$api
 				.call(ApiStvProjektbetreuer.getDefaultStundensaetze(person_id, this.studiensemester_kurzbz))
 				.then(result => {
 					this.resetForm();
-					this.statusNew = false;
 					let projektbetreuerListe = this.$refs.table.tabulator.getData();
 					const idx = projektbetreuerListe.findIndex(
 							betr =>
@@ -162,9 +165,7 @@ export default {
 
 			this.studiensemester_kurzbz = studiensemester_kurzbz;
 
-			this.defaultFormDataValues.stunden = '0.0';
-			if (projekttyp_kurzbz == 'Bachelor') this.defaultFormDataValues.stunden = this.config.defaultProjektbetreuerStunden;
-			if (projekttyp_kurzbz == 'Diplom') this.defaultFormDataValues.stunden = this.config.defaultProjektbetreuerStundenDiplom;
+			this.defaultFormDataValues.stunden = this.getDefaultStunden(projekttyp_kurzbz);
 			this.defaultFormDataValues.stundensatz = this.config.defaultProjektbetreuerStundensatz;
 
 			this.$api
@@ -196,18 +197,20 @@ export default {
 			}
 		},
 		confirmProjektbetreuer() {
-			if (!this.formDataModified()) return;
+			if (!this.editMode) return;
 
-			if (this.statusNew) {
+			if (typeof this.formData.betreuer_id == 'undefined') {
 				this.formData.betreuer_id = this.getNewBetreuerId();
 				this.$refs.table.tabulator.addData(this.addAutoCompleteBetreuerToFormData(this.formData));
 			} else {
 				this.$refs.table.tabulator.updateData([this.formData]);
 				this.statusNew = true;
 			}
+
+			this.editMode = false;
 		},
 		confirmProjektbetreuerAfterValidation() {
-			if (!this.formDataModified()) return;
+			//if (!this.formDataModified()) return;
 
 			this.validateProjektbetreuer()
 				.then(result => {
@@ -245,7 +248,7 @@ export default {
 		validateProjektbetreuer() {
 			let alleBetreuer = this.$refs.table.tabulator.getData();
 
-			if (this.formDataModified()) {
+			if (this.editMode) {
 				alleBetreuer.push(this.addAutoCompleteBetreuerToFormData(this.formData));
 			}
 
@@ -255,6 +258,7 @@ export default {
 			this.formData = this.getDefaultFormData();
 			this.autocompleteSelectedBetreuer = null;
 			this.initialFormData = null;
+			if (this.projekttyp_kurzbz) this.setDefaultStunden(this.projekttyp_kurzbz);
 		},
 		getDefaultFormData() {
 			let formData = {betreuerart_kurzbz : null, note: null};
@@ -291,6 +295,16 @@ export default {
 			}
 
 			return preparedFormData;
+		},
+		getDefaultStunden(projekttyp_kurzbz) {
+			let stunden = '0.0';
+			if (projekttyp_kurzbz == 'Bachelor') stunden = this.config.defaultProjektbetreuerStunden;
+			if (projekttyp_kurzbz == 'Diplom') stunden = this.config.defaultProjektbetreuerStundenDiplom;
+			return stunden;
+		},
+		setDefaultStunden(projekttyp_kurzbz) {
+			this.projekttyp_kurzbz = projekttyp_kurzbz;
+			if (!this.formDataModified()) this.formData.stunden = this.getDefaultStunden(projekttyp_kurzbz);
 		},
 		getNewBetreuerId() {
 			let max = 0;
@@ -333,7 +347,7 @@ export default {
 			>
 		</core-filter-cmpt>
 
-		<form-form ref="formProjektbetreuer" @submit.prevent>
+		<form-form ref="formProjektbetreuer" v-show="editMode" @submit.prevent>
 			<div class="row mb-3">
 				<form-input
 					container-class="stv-details-projektarbeit-betreuer"
@@ -409,7 +423,7 @@ export default {
 			</div>
 
 		</form-form>
-		<button class="btn btn-primary" @click="confirmProjektbetreuerAfterValidation">{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}</button>
+		<button class="btn btn-primary" v-show="editMode" @click="confirmProjektbetreuerAfterValidation">{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}</button>
 	</div>
 `
 }
