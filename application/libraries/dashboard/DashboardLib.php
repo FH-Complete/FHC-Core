@@ -107,7 +107,7 @@ class DashboardLib
 		$emptyoverride = new stdClass();
 		$emptyoverride->dashboard_id = $dashboard->dashboard_id;
 		$emptyoverride->uid = $uid;
-		$emptyoverride->override = '{"' . self::USEROVERRIDE_SECTION . '": {"widgets":{}}}}';
+		$emptyoverride->override = '{"' . self::USEROVERRIDE_SECTION . '": {"widgets":{}}, "custom": { "widgets" : {}}}';
 		
 		return $emptyoverride;
 	}

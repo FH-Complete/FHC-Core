@@ -128,7 +128,11 @@ export default {
 			return [...this.placedItems, ...this.items_placeholders];
 		},
 		rows() {
-			if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid){
+			if (this.additionalRowComputed) {
+					return this.grid ? (this.grid.h+1) : 1;
+			}
+			return this.grid ? this.grid.h : 1;
+			/* if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid){
 				return this.dragGrid.h;
 			}
 			if (this.mode == MODE_IDLE) {
@@ -136,7 +140,7 @@ export default {
 					return this.grid ? (this.grid.h+1) : 1;
 				}
 			}
-			return this.grid ? this.grid.h : 1;
+			return this.grid ? this.grid.h : 1; */
 		},
 		gridStyle() {
 			const addH = this.active ? this.marginForExtraRow : 0;
