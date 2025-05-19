@@ -163,6 +163,27 @@ export default {
 			this.selectedStudienordnung = studienplan.preselected?.studienplan_id;
 
 			this.lehrveranstaltungen = lehrveranstaltungen;
+			this.lehrveranstaltungen.sort((lv1, lv2) => {
+				if (lv1.bezeichnung.toLowerCase() > lv2.bezeichnung.toLowerCase()) {
+					return 1;
+				} else if (lv1.bezeichnung.toLowerCase() < lv2.bezeichnung.toLowerCase()) {
+					return -1;
+				} else {
+					return 0;
+				}
+			});
+
+			this.lehrveranstaltungen.forEach((lehrveranstaltung)=>{
+				lehrveranstaltung.lehrveranstaltungen.sort((lv1,lv2)=>{
+					if (lv1.bezeichnung.toLowerCase() > lv2.bezeichnung.toLowerCase()) {
+						return 1;
+					} else if (lv1.bezeichnung.toLowerCase() < lv2.bezeichnung.toLowerCase()) {
+						return -1;
+					} else {
+						return 0;
+					}
+				})
+			})
 		},
 		studienordnungTitel(studienordnung){
 			if(!studienordnung) return "";
@@ -191,6 +212,35 @@ export default {
 		selectedLehrveranstaltungTitel(){
 			const studiengang = this.studiengaenge.find((studiengang) => studiengang.studiengang_kz == this.selectedStudiengang);
 			return `${this.selectedLehrveranstaltung?.bezeichnung} ${this.selectedLehrveranstaltung?.lehrform_kurzbz} / ${studiengang.kurzbzlang}-${this.selectedSemester} ${this.selectedLehrveranstaltung?.orgform_kurzbz} (${this.selectedStudiensemester})`;
+		},
+		computedStudienOrdnung(){
+			if(!this.studienOrdnung) return null;
+			return Object.values(this.studienOrdnung).reduce((carry, item)=>{
+				if(!carry[item.bezeichnung]){
+					carry[item.bezeichnung] = [];
+				}
+				carry[item.bezeichnung].push(item);
+				return carry;
+			},{});
+		},
+		computedStudienOrdnungSelectValues() {
+			if (!this.computedStudienOrdnung) return null;
+			let result = [];
+			Object.entries(this.computedStudienOrdnung).forEach(([key,value])=>{
+				result.push({
+					bezeichnung: `Studienordnung: ${key}`,
+					disabled: true,
+				});
+				value.forEach((studienplan)=>{
+					result.push({
+						studienplan:studienplan,
+						diabled: false,
+						bezeichnung: `${studienplan?.bezeichnung}-${studienplan?.orgform_kurzbz} ( ${studienplan?.orgform_bezeichnung}, ${studienplan?.sprache} )`
+							
+					});
+				})
+			});
+			return result;
 		},
 	},
 	
@@ -275,7 +325,7 @@ export default {
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
 			<select ref="studienordnung" v-model="selectedStudienordnung" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
-				<option v-for="ordnung in studienOrdnung" @click="changeSelectedStudienPlan(ordnung.studienplan_id)" :key="ordnung.bezeichnung	" :value="ordnung.studienplan_id">{{studienordnungTitel(ordnung)}}</option>
+				<option v-for="ordnung in computedStudienOrdnungSelectValues" :disabled="ordnung.disabled" @click="changeSelectedStudienPlan(ordnung?.studienplan?.studienplan_id)" :key="ordnung?.studienplan?.bezeichnung	" :value="ordnung?.studienplan?.studienplan_id">{{ordnung.bezeichnung}}</option>
 			</select>
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(1)">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
@@ -291,7 +341,7 @@ export default {
 		<div  class="card" v-if="Array.isArray(lehrveranstaltung.lehrveranstaltungen) && lehrveranstaltung.lehrveranstaltungen.length >0" >
 			<div class="card-header">
 				<h5 class=" card-title">{{lehrveranstaltung.bezeichnung}}</h5>
-				<h6 class=" card-subtitle">{{lehrveranstaltung.lehrtyp_kurzbz}}</h6>
+				<h6 class=" card-subtitle">{{lehrveranstaltung.lehrform_kurzbz}}</h6>
 			</div>
 			<div class="card-body">
 				<ul class="list-group list-group-flush">
