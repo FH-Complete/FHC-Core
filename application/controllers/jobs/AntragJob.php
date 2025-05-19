@@ -183,8 +183,8 @@ class AntragJob extends JOB_Controller
 				$data,
 				$to,
 				'Anträge - Aktion(en) erforderlich',
-				DEFAULT_SANCHO_HEADER_IMG,
-				DEFAULT_SANCHO_FOOTER_IMG,
+				'',
+				'',
 				'',
 				$cc
 			))
@@ -421,7 +421,7 @@ class AntragJob extends JOB_Controller
 
 		$this->StudierendenantragModel->db->where_in(
 			'public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)',
-			$this->config->item('antrag_prestudentstatus_whitelist')
+			$this->config->item('antrag_prestudentstatus_whitelist_abmeldung')
 		);
 
 		$result = $this->StudierendenantragModel->getWithLastStatusWhere([

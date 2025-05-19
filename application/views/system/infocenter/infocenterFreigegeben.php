@@ -25,7 +25,6 @@
 	);
 ?>
 
-<body>
 	<div id="wrapper">
 
 		<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
@@ -46,6 +45,5 @@
 			</div>
 		</div>
 	</div>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

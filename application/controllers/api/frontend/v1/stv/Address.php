@@ -45,7 +45,7 @@ class Address extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	public function getPlaces($plz)
+	public function getPlaces($plz = null)
 	{
 		$this->load->model('codex/Gemeinde_model', 'GemeindeModel');
 
@@ -53,7 +53,7 @@ class Address extends FHCAPI_Controller
 		
 		$this->form_validation->set_data(['address.plz' => $plz]);
 
-		$this->form_validation->set_rules('address.plz', 'PLZ', 'numeric|less_than[10000]');
+		$this->form_validation->set_rules('address.plz', 'PLZ', 'required|numeric|less_than[10000]');
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
