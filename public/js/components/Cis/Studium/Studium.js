@@ -270,6 +270,7 @@ export default {
 				<h4>Lektoren:</h4>
 				<a :href="'mailto:'+lektor?.email" class="mx-2" v-for="lektor in selectedLehrveranstaltung.lektoren">{{lektor.name}}</a>
 			</div>
+			<h4>Menu:</h4>
 		</template>
 	</lv-uebersicht>
 	<div class="lvOptions">
@@ -336,7 +337,7 @@ export default {
 
 	<hr>
 
-	<div class="lvUebersicht" >
+	<div class="lvUebersicht align-items-start" >
 	<template v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
 		<div  class="card" v-if="Array.isArray(lehrveranstaltung.lehrveranstaltungen) && lehrveranstaltung.lehrveranstaltungen.length >0" >
 			<div class="card-header">
@@ -345,8 +346,9 @@ export default {
 			</div>
 			<div class="card-body">
 				<ul class="list-group list-group-flush">
-					<li class="list-group-item" v-for="lv in lehrveranstaltung.lehrveranstaltungen">
-						<a class="d-block" href="#" @click="openLvUebersicht(lv)">{{lv.bezeichnung}}</a>
+					<li class="d-flex list-group-item" v-for="lv in lehrveranstaltung.lehrveranstaltungen">
+						<a class="link-dark d-block me-auto" href="#" @click="openLvUebersicht(lv)">{{lv.bezeichnung}}</a>
+						<p>{{lv.lehrform_kurzbz}}</p>
 					</li>	
 				</ul>
 			</div>
@@ -355,7 +357,6 @@ export default {
 	</div>
 
 
-	<lv-modal v-if="selectedLehrveranstaltung" ref="modalContainer" :event="selectedLehrveranstaltung" title="test" >
 	</div>
 	
 	`
