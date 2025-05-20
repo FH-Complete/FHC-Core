@@ -335,7 +335,7 @@ $fehlerArr = array(
 	),
 	array(
 		'fehlercode' => 'CORE_PERSON_0006',
-		'fehler_kurzbz' => 'uhstatPersonkennungFehlt',
+		'fehler_kurzbz' => 'uhstatPersonkennungFehltCore',
 		'fehlercode_extern' => null,
 		'fehlertext' => 'Personkennung fehlt (vBpk AS, vBpk BF oder Ersatzkennzeichen fehlt)',
 		'fehlertyp_kurzbz' => 'error',
