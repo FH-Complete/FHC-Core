@@ -2,6 +2,7 @@ import verband from './stv/verband.js';
 import students from './stv/students.js';
 import filter from './stv/filter.js';
 import konto from './stv/konto.js';
+import group from './stv/group.js';
 import kontakt from './stv/kontakt.js';
 import prestudent from './stv/prestudent.js';
 import status from './stv/status.js';
@@ -17,6 +18,7 @@ export default {
 	students,
 	filter,
 	konto,
+	group,
 	kontakt,
 	prestudent,
 	status,

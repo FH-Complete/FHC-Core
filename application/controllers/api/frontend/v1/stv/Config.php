@@ -99,6 +99,11 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_resources'),
 			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
 		];
+		$result['groups'] = [
+			'title' => $this->p->t('stv', 'tab_groups'),
+			'component' => './Stv/Studentenverwaltung/Details/Gruppen.js'
+		];
+
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
@@ -318,7 +323,7 @@ class Config extends FHCAPI_Controller
 		$title_eng = $this->p->t("global", "englisch");
 		$title_ff = $this->p->t("stv", "document_certificate");
 		$title_lv = $this->p->t("stv", "document_coursecertificate");
-		
+
 		$link_ff = "documents/export/" .
 			"zertifikat.rdf.php/" .
 			"Zertifikat" .
