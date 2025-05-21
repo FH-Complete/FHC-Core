@@ -132,11 +132,6 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_functions'),
 			'component' => './Stv/Studentenverwaltung/Details/Funktionen.js'
 		];
-/*		TODO(Manu) REMOVE just for Testing*/
-		$result['functions_composition'] = [
-			'title' => 'F_PV21',
-			'component' => './Stv/Studentenverwaltung/Details/FunktionenOld.js'
-		];
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
 			return $result;

@@ -105,51 +105,6 @@ class Funktionen extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	//TODO(Manu) DELETE
-	public function DEPR_getCurrentFunctions($uid, $companyOrgetkurzbz)
-	{
-	$sql = "
-		SELECT
-			bf.benutzerfunktion_id, f.beschreibung || ', '
-			|| oe.bezeichnung || ' [' || oet.bezeichnung || '], '
-			|| COALESCE(to_char(bf.datum_von, 'dd.mm.YYYY'), 'n/a')
-			|| ' - ' || COALESCE(to_char(bf.datum_bis, 'dd.mm.YYYY'), 'n/a')
-			|| COALESCE(dvu.attachedtovb, '') AS label
-
-			FROM (
-			WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
-			(
-			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
-			WHERE oe_kurzbz = ?
-			UNION ALL
-			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
-			WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
-			)
-			SELECT oe_kurzbz
-			FROM oes
-			GROUP BY oe_kurzbz
-			) c
-			JOIN public.tbl_organisationseinheit oe ON oe.oe_kurzbz = c.oe_kurzbz
-			JOIN public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz
-			JOIN public.tbl_benutzerfunktion bf ON bf.oe_kurzbz = oe.oe_kurzbz
-			JOIN public.tbl_funktion f ON f.funktion_kurzbz = bf.funktion_kurzbz
-			LEFT JOIN (
-			SELECT
-			benutzerfunktion_id, ' [DV]' AS attachedtovb
-			FROM
-			hr.tbl_vertragsbestandteil_funktion
-			GROUP BY
-			benutzerfunktion_id
-			) dvu ON dvu.benutzerfunktion_id = bf.benutzerfunktion_id
-			WHERE bf.uid = ?
-			ORDER BY f.beschreibung ASC";
-
-		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array( $companyOrgetkurzbz,$uid));
-		$data = $this->getDataOrTerminateWithError($benutzerfunktionen);
-
-		$this->terminateWithSuccess($data);
-	}
-
 	/*
 	 * return list of child orgets for a given company orget_kurzbz
 	 * as key value list to be used in select or autocomplete
@@ -180,30 +135,6 @@ class Funktionen extends FHCAPI_Controller
 
 		$childorgets = $this->OrganisationseinheitModel->execReadOnlyQuery($sql, array($companyOrgetkurzbz));
 		$data = $this->getDataOrTerminateWithError($childorgets);
-
-		$this->terminateWithSuccess($data);
-	}
-
-	//TODO(Manu) DELETE
-	/*
-	 * List of Oes for autocomplete field organisation unit
-	 */
-	public function DEPR_loadAllOes($filterStudent=false, $aktiv=true)
-	{
-		$sql = "
-			SELECT
-			    oe_kurzbz,
-			    CONCAT('[', organisationseinheittyp_kurzbz, '] ', bezeichnung) as label
-			FROM public.tbl_organisationseinheit 
-			WHERE aktiv = ?";
-
-		if($filterStudent)
-			$sql .= " AND organisationseinheittyp_kurzbz in ('Studiengang','Lehrgang')";
-
-		$sql .= " ORDER BY organisationseinheittyp_kurzbz, bezeichnung";
-
-		$result = $this->OrganisationseinheitModel->execReadOnlyQuery($sql, array($aktiv));
-		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
 	}

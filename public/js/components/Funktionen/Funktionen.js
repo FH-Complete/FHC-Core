@@ -216,8 +216,6 @@ export default {
 			newBtnStyle: ''
 		}
 	},
-	computed: {
-	},
 	methods: {
 		onSwitchChange() {
 			if (this.isFilterSet) {
@@ -387,7 +385,7 @@ export default {
 					>
 				</form-input>
 			</div>
-			<div v-else>
+			<div v-else class="py-3">
 				<form-input
 					container-class="form-switch"
 					type="checkbox"
