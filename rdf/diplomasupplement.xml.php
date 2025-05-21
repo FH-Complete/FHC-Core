@@ -386,6 +386,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<titel_en>'.$titel_en.'</titel_en>';
 		$praktikum = false;
 		$auslandssemester = false;
+		$internationalskills = false;
 		$qry = "SELECT
 					projektarbeit_id
 				FROM
@@ -400,6 +401,56 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			{
 				echo "		<praktikum>Berufspraktikum/Internship: absolviert/completed</praktikum>";
 				$praktikum = true;
+			}
+		}
+
+		if ($row->typ === 'b')
+		{
+			//check if extension international skills is active
+			$qry = "SELECT 1
+					FROM information_schema.tables
+					WHERE table_schema = 'extension' AND table_name = 'tbl_internat_massnahme'";
+
+			if($result = $db->db_query($qry))
+			{
+				if ($db->db_num_rows($result) === 1)
+				{
+					$qry = "SELECT bezeichnung_mehrsprachig[1] as \"internationalskill_deutsch\",
+									bezeichnung_mehrsprachig[2] as \"internationalskill_english\"
+							FROM extension.tbl_internat_massnahme_zuordnung zuordnung
+									 JOIN extension.tbl_internat_massnahme massnahme ON zuordnung.massnahme_id = massnahme.massnahme_id
+									 JOIN extension.tbl_internat_massnahme_zuordnung_status zstatus ON zuordnung.massnahme_zuordnung_id = zstatus.massnahme_zuordnung_id
+									 JOIN tbl_prestudent ON zuordnung.prestudent_id = tbl_prestudent.prestudent_id
+									 JOIN tbl_student ON tbl_prestudent.prestudent_id = tbl_student.prestudent_id
+							WHERE zstatus.massnahme_status_kurzbz = 'confirmed'
+							  AND tbl_student.student_uid = ".$db->db_add_param($uid_arr[$i])."
+							  AND zstatus.massnahme_zuordnung_status_id = (
+								SELECT MAX(sub_zstatus.massnahme_zuordnung_status_id)
+								FROM extension.tbl_internat_massnahme_zuordnung_status sub_zstatus
+								WHERE sub_zstatus.massnahme_zuordnung_id = zuordnung.massnahme_zuordnung_id
+							)
+							GROUP BY zuordnung.massnahme_zuordnung_id, tbl_student.student_uid, tbl_prestudent.prestudent_id, tbl_prestudent.studiengang_kz, bezeichnung_mehrsprachig;";
+
+					if($db->db_query($qry))
+					{
+						if($db->db_num_rows() > 0)
+						{
+							$internationalskills = true;
+							echo "<internationalskills>";
+							while($row1 = $db->db_fetch_object())
+							{
+								echo "<internationalskillsdeutsch>";
+								echo "<internationalskilldeutsch><![CDATA[$row1->internationalskill_deutsch]]></internationalskilldeutsch>";
+								echo "</internationalskillsdeutsch>";
+
+								echo "<internationalskillsenglisch>";
+								echo "<internationalskillenglish><![CDATA[$row1->internationalskill_english]]></internationalskillenglish>";
+								echo "</internationalskillsenglisch>";
+							}
+							echo "</internationalskills>";
+						}
+					}
+				}
 			}
 		}
 
@@ -461,6 +512,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$abschlusspruefungsdatum = '';
 		$abschlussbeurteilung='';
 		$pruefungstyp_kurzbz='';
+		$abschlussbeurteilung_deutsch = '';
 
 		if($db->db_query($qry))
 		{
