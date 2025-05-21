@@ -15,6 +15,7 @@ import archiv from './stv/archiv.js';
 import documents from './stv/documents.js';
 import exemptions from './stv/exemptions.js';
 import jointstudies from "./stv/jointstudies.js";
+import courselist from './stv/courselist.js';
 
 export default {
 	verband,
@@ -34,6 +35,7 @@ export default {
 	documents,
 	exemptions,
 	jointstudies,
+	courselist,
 	configStudent() {
 		return this.$fhcApi.get('api/frontend/v1/stv/config/student');
 	},

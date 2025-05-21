@@ -160,6 +160,11 @@ class Config extends FHCAPI_Controller
 			'component' => './Stv/Studentenverwaltung/Details/JointStudies.js'
 		];
 
+		$result['coursedates'] = [
+			'title' => $this->p->t('stv', 'tab_courseDates'),
+			'component' => './Stv/Studentenverwaltung/Details/Lehrveranstaltungstermine.js'
+		];
+
 		Events::trigger('stv_conf_student', function & () use (&$result) {
 			return $result;
 		});

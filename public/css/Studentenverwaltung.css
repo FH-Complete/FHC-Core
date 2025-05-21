@@ -78,6 +78,10 @@ html {
 	overflow: visible !important;
 }
 
+.highlight-row {
+	background-color: #e5aeae !important;
+}
+
 @media (min-width: 768px) {
 	#sidebarMenu {
 		visibility: visible!important;
