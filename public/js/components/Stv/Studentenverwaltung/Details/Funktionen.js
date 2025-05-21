@@ -9,16 +9,17 @@ export default {
   },
   template: `
 	<div class="stv-details-functions h-100 d-flex flex-column">
-		<table-functions 
-			ref="tbl_functions" 
-			:student="modelValue">	
-		</table-functions>
+        <h4>{{ $p.t('person', 'funktionen') }}</h4>
 
 		<person-functions
 			:readonlyMode="false"
 			:personID="modelValue.person_id"
 			:personUID="modelValue.uid"
-			:showDvCompany="false"
+			:showDvCompany="true"
+			:saveFunctionAsCopy="true"
+			:filterOeStudent="true"
+			:oeDropdownAutocomplete="true"
+			:stylePv21="false"
 		>
 		</person-functions>
 
