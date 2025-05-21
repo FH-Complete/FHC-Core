@@ -43,7 +43,8 @@ class Documents extends FHCAPI_Controller
 		parent::__construct([
 			'permissionAlternativeFormat' => self::PERM_LOGGED,
 			'archive' => ['admin:rw', 'assistenz:rw'],
-			'archiveSigned' => ['admin:rw', 'assistenz:rw']
+			'archiveSigned' => ['admin:rw', 'assistenz:rw'],
+			'download' => ['admin:rw', 'assistenz:rw']
 		]);
 
 		// Load Phrases
@@ -66,7 +67,7 @@ class Documents extends FHCAPI_Controller
 	}
 
 	/**
-	 * Download a not signed document.
+	 * Archive a not signed document.
 	 *
 	 * @param string				$xml (optional)
 	 * @param string				$xsl (optional)
@@ -79,7 +80,7 @@ class Documents extends FHCAPI_Controller
 	}
 
 	/**
-	 * Download a signed document.
+	 * Archive a signed document.
 	 *
 	 * @param string				$xml (optional)
 	 * @param string				$xsl (optional)
@@ -92,6 +93,42 @@ class Documents extends FHCAPI_Controller
 	}
 
 	/**
+	 *
+	 * @return void
+	 */
+	public function download($xml, $xsl, $sign_user = null)
+	{
+		$akteExportData = $this->_getAkteExportData($xml, $xsl, $sign_user);
+
+		$akteData = $akteData['akteData'];
+		$exportData = $akteData['exportData'];
+
+		/**
+		 *				[
+					'vorlage' => $vorlage,
+					'xml_data' => $data,
+					'oe_kurzbz' => $xsl_oe_kurzbz,
+					'version' => $version,
+					'outputformat' => $outputformat,
+					'sign_user' => $sign_user
+				]
+		 */
+
+		// Output
+		$result = $this->documentexportlib->showContent(
+			$akteData['akteData']['inhalt'],
+			$exportData['vorlage'],
+			$exportData['xml_data'],
+			$exportData['oe_kurzbz'],
+			$exportData['version'],
+			$exportData['outputformat'],
+			$exportData['sign_user']
+		);
+
+		$this->terminateWithSuccess(true);
+	}
+
+	/**
 	 * Helper function for archive() and archiveSigned()
 	 *
 	 * @param string				$xml
@@ -100,16 +137,36 @@ class Documents extends FHCAPI_Controller
 	 *
 	 * @return void
 	 */
-	public function _archive($xml, $xsl, $sign_user = null)
+	private function _archive($xml, $xsl, $sign_user = null)
+	{
+		$akteData = $this->_getAkteExportData($xml, $xsl, $sign_user);
+
+		$this->load->model('crm/Akte_model', 'AkteModel');
+		$result = $this->AkteModel->insert($akteData['akteData']);
+		$this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess(true);
+	}
+
+	/**
+	 * @param string				$xml
+	 * @param string				$xsl
+	 * @param string				$sign_user (optional)
+	 * 
+	 * @return array with Akte data and export data
+	 */
+	private function _getAkteExportData($xml, $xsl, $sign_user = null)
 	{
 		if (!$xml || !$xsl) {
 			$this->load->library('form_validation');
 			if (!$xml) {
 				$xml = $this->input->post_get('xml');
+				$this->addMeta('xml', $xml);
 				$this->form_validation->set_rules('xml', 'xml', 'required');
 			}
 			if (!$xsl) {
 				$xsl = $this->input->post_get('xsl');
+				$this->addMeta('xsl', $xsl);
 				$this->form_validation->set_rules('xsl', 'xsl', 'required');
 			}
 
@@ -151,6 +208,7 @@ class Documents extends FHCAPI_Controller
 		$this->load->model('system/Vorlage_model', 'VorlageModel');
 
 		$result = $this->VorlageModel->load($xsl);
+		$this->addMeta("ress", $result);
 		$vorlage = current($this->getDataOrTerminateWithError($result));
 		if (!$vorlage)
 			show_404();
@@ -171,6 +229,7 @@ class Documents extends FHCAPI_Controller
 		$studiengang_kz = null;
 		if ($akteData['uid']) {
 			$this->load->model('crm/Student_model', 'StudentModel');
+			$this->StudentModel->addSelect('tbl_student.*, UPPER(typ || kurzbz) AS kuerzel');
 			$this->StudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz', 'LEFT');
 			$result = $this->StudentModel->load([$akteData['uid']]);
 			$student = current($this->getDataOrTerminateWithError($result));
@@ -318,6 +377,7 @@ class Documents extends FHCAPI_Controller
 
 			$result = $this->VorlagestudiengangModel->getCurrent($xsl, $xsl_oe_kurzbz, $version);
 			$access_rights = current($this->getDataOrTerminateWithError($result));
+			// TODO: was bedeutet wenn keine berechtigung?
 			if (!$access_rights || !$access_rights->berechtigung)
 				return show_404();
 			
@@ -413,10 +473,17 @@ class Documents extends FHCAPI_Controller
 		$akteData['titel'] .= '.pdf';
 		$akteData['inhalt'] = base64_encode($content);
 
-		$this->load->model('crm/Akte_model', 'AkteModel');
-		$result = $this->AkteModel->insert($akteData);
-		$this->getDataOrTerminateWithError($result);
-
-		$this->terminateWithSuccess(true);
+		return [
+			'akteData' => $akteData,
+			'exportData' =>
+				[
+					'vorlage' => $vorlage,
+					'xml_data' => $data,
+					'oe_kurzbz' => $xsl_oe_kurzbz,
+					'version' => $version,
+					'outputformat' => $outputformat,
+					'sign_user' => $sign_user
+				]
+		];
 	}
 }

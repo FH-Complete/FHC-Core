@@ -195,9 +195,9 @@ class Akte_model extends DB_Model
 	}
 
 	/**
-	 * Liefert die Archivdokumente einer Person
+	 * Liefert die Archivdokumente einer Person/mehrerer Personen
 	 *
-	 * @param integer				$person_id
+	 * @param integer/array				$person_id
 	 * @param boolean|null			$signiert			Wenn true werden nur Dokumente geliefert die digital signiert wurden.
 	 * @param boolean|null			$stud_selfservice	Wenn true werden nur Dokumente geliefert die Studierende selbst herunterladen duerfen.
 	 *
@@ -237,10 +237,14 @@ class Akte_model extends DB_Model
 		if ($stud_selfservice !== null)
 			$this->db->where('stud_selfservice', (boolean)$stud_selfservice);
 
+		if (is_array($person_id))
+			$this->db->where_in('person_id', $person_id);
+		else
+			$this->db->where('person_id', $person_id);
+
 		$this->addOrder('erstelltam', 'DESC');
 
 		return $this->loadWhere([
-			'person_id' => $person_id,
 			'archiv' => true
 		]);
 	}

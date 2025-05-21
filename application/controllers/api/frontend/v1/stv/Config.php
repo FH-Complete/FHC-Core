@@ -128,6 +128,14 @@ class Config extends FHCAPI_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Mobility.js'
 		];
 
+		$result['archive'] = [
+			'title' => $this->p->t('stv', 'tab_archive'),
+			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
+			'config' => [
+				'showEdit' => $this->permissionlib->isBerechtigt('admin')
+			]
+		];
+
 		Events::trigger('stv_conf_student', function & () use (&$result) {
 			return $result;
 		});
@@ -166,6 +174,13 @@ class Config extends FHCAPI_Controller
 			'title' =>  $this->p->t('stv', 'tab_finalexam'),
 			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
 			'config' => $config['finalexam']
+		];
+		$result['archive'] = [
+			'title' => $this->p->t('stv', 'tab_archive'),
+			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
+			'config' => [
+				'showEdit' => $this->permissionlib->isBerechtigt('admin')
+			]
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {
