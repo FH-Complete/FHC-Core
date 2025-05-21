@@ -324,6 +324,22 @@ $fehlerArr = array(
 		'fehlertext' => 'Es sind mehrere oder keine Zustelladressen eingetragen',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_PERSON_0005',
+		'fehler_kurzbz' => 'geburtsnationFehlt',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Geburtsnation nicht vorhanden',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_PERSON_0006',
+		'fehler_kurzbz' => 'uhstatPersonkennungFehltCore',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Personkennung fehlt (vBpk AS, vBpk BF oder Ersatzkennzeichen fehlt)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
 	)
 	/** Plausichecks end **/
 );

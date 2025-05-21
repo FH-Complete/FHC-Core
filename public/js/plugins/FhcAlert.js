@@ -109,7 +109,7 @@ const helperApp = Vue.createApp({
 	},
 	methods: {
 		mailToUrl(slotProps) {
-			let mailTo = 'noreply@technikum-wien.at'; // TODO domain anpassen
+			let mailTo = FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto;
 			let subject = 'Meldung%20Systemfehler';
 			let body = `
 				Danke, dass Sie uns den Fehler melden. %0D%0A %0D%0A
@@ -133,6 +133,11 @@ const helperApp = Vue.createApp({
 	unmounted() {
 		helperAppContainer.parentElement.removeChild(helperAppContainer);
 	},
+	computed: {
+		showmaillink: function() {
+			return FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto !== '';
+		}
+	},
 	template: `
 	<pv-toast ref="toast" class="fhc-alert" :base-z-index="99999"></pv-toast>
 	<pv-toast ref="alert" class="fhc-alert" :base-z-index="99999" position="center">
@@ -154,6 +159,7 @@ const helperApp = Vue.createApp({
 						Fehler anzeigen
 					</a>
 					<a
+						v-if="showmaillink"
 						class="btn btn-primary flex-fill"
 						target="_blank"
 						:href="mailToUrl(slotProps)"
