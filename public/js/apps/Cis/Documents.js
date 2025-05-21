@@ -1,4 +1,4 @@
-import Phrasen from '../../plugin/Phrasen.js';
+import PluginsPhrasen from '../../plugins/Phrasen.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 
 const app = Vue.createApp({
@@ -89,5 +89,5 @@ const app = Vue.createApp({
 
 setScrollbarWidth();
 
-app.use(Phrasen);
+app.use(PluginsPhrasen);
 app.mount('#content');

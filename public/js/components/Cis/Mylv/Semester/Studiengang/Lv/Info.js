@@ -1,4 +1,4 @@
-
+import ApiLehre from '../../../../../../api/factory/lehre.js';
 
 const infos = {};
 
@@ -57,7 +57,7 @@ export default {
 		}
 	},
 	created() {
-		this.$fhcApi.factory.lehre.getLvInfo(this.studien_semester, this.lehrveranstaltung_id)
+		this.$api.call(ApiLehre.getLvInfo(this.studien_semester, this.lehrveranstaltung_id))
 		.then(
 			res => res.data
 		).then(data =>{
