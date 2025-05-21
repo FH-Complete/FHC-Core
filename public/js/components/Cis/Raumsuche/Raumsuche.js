@@ -1,4 +1,5 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
+import VueDatePicker from '../../vueDatepicker.js.php';
 
 export const Raumsuche =  {
 	name: "Raumsuche",

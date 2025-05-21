@@ -2,6 +2,7 @@ import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import AbgabeDetail from "./AbgabeMitarbeiterDetail.js";
 import VerticalSplit from "../../verticalsplit/verticalsplit.js"
 import BsModal from '../../Bootstrap/Modal.js';
+import VueDatePicker from '../../vueDatepicker.js.php';
 
 export const AbgabetoolMitarbeiter = {
 	name: "AbgabetoolMitarbeiter",

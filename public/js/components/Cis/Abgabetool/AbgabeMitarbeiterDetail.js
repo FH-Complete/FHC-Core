@@ -1,4 +1,5 @@
 import BsModal from '../../Bootstrap/Modal.js';
+import VueDatePicker from '../../vueDatepicker.js.php';
 
 const today = new Date()
 export const AbgabeMitarbeiterDetail = {
