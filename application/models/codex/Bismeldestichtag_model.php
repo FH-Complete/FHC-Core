@@ -13,38 +13,41 @@ class Bismeldestichtag_model extends DB_Model
 
 	public function getLastReachedMeldestichtag($studiensemester_kurzbz = null)
 	{
-		$qry = "
-				SELECT
-					meldestichtag_id, meldestichtag, studiensemester_kurzbz, insertamum, insertvon, updateamum, updatevon
-				FROM
-					bis.tbl_bismeldestichtag
-				WHERE
-					meldestichtag < NOW()
-		";
+		$this->addSelect('meldestichtag_id');
+		$this->addSelect('meldestichtag');
+		$this->addSelect('studiensemester_kurzbz');
+		$this->addSelect('insertamum');
+		$this->addSelect('insertvon');
+		$this->addSelect('updateamum');
+		$this->addSelect('updatevon');
 
-		if (isset($studiensemester_kurzbz))
-		{
-			$qry .=	"
-				AND
-					studiensemester_kurzbz= ?";
+		if ($studiensemester_kurzbz) {
+			$this->db->where('studiensemester_kurzbz', $studiensemester_kurzbz);
 		}
 
-		$qry .= "
-				ORDER BY
-					meldestichtag DESC
-				LIMIT 1;";
+		$this->addOrder('meldestichtag', 'DESC');
+		$this->addLimit(1);
 
-		$result = $this->execQuery($qry, array($studiensemester_kurzbz));
+		return $this->loadWhere([
+			'meldestichtag < NOW()' => null
+		]);
+	}
 
-		if (isError($result))
-		{
-			return error($result);
-		}
-		if (!hasData($result)) {
-			return success("0",'Kein Meldestichtag vorhanden');
-		}
-		return $result;
+	/**
+	 * Liefert nächstliegenden Bismeldestichtag.
+	 * @return object success or error
+	 */
+	public function getNextMeldestichtag()
+	{
+		$this->addSelect('meldestichtag');
+		$this->addSelect('studiensemester_kurzbz');
 
+		$this->addOrder('meldestichtag', 'ASC');
+		$this->addLimit(1);
+
+		return $this->loadWhere([
+			'meldestichtag >= NOW()' => null
+		]);
 	}
 
 	/**
@@ -68,25 +71,26 @@ class Bismeldestichtag_model extends DB_Model
 			);
 			if(isError($result))
 			{
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson(getError($result));
+				return $result;
 			}
 			$result = current(getData($result));
 
-			$studiensemester_ende = $result->ende;
+			$studiensemester_ende = new DateTime($result->ende);
 		}
 
 		// letztes erreichtes Bismeldedatum holen
 		$result = $this->getLastReachedMeldestichtag();
 		if (isError($result))
 		{
-			return error($result);
+			return $result;
 		}
 		if (!hasData($result)) {
 			return success("0",'No Statusdata vorhanden');
 		}
 		$stichtag = current(getData($result));
-		$stichtag = $stichtag->meldestichtag;
+		$stichtag = new DateTime($stichtag->meldestichtag);
+
+		$statusDatum = new DateTime($status_datum);
 
 		// Prüfen, ob Studentstatusdatum oder Studiensemester vor dem Stichtagsdatum liegen
 		if (isset($statusDatum))
@@ -100,7 +104,7 @@ class Bismeldestichtag_model extends DB_Model
 			$erreicht = $erreicht || $studiensemester_ende < $stichtag;
 		}
 
-		if($erreicht)
+		if ($erreicht)
 			return success("1", "Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht hinzugefügt werden");
 
 		return success("0", "Meldestatus nicht erreicht");

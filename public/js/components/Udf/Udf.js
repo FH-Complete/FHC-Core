@@ -1,6 +1,7 @@
 import { CoreFetchCmpt } from '../Fetch.js';
 import FormInput from '../Form/Input.js';
 
+import ApiUdf from '../../api/udf.js';
 
 export default {
 	components: {
@@ -72,9 +73,7 @@ export default {
 	},
 	methods: {
 		loadF(params) {
-			// TODO(chris): move to fhcapi.factory
-			return this.$fhcApi
-				.post('/api/frontend/v1/udf/load/' + params.ciModel, params.pk);
+			return this.$api.call(ApiUdf.load(params));
 		},
 		init(result) {
 			const fields = result.map(el => {
@@ -131,7 +130,7 @@ export default {
 			@data-fetched="init"
 			>
 			<template #default>
-				<div v-for="field in filteredFields" :key="field.name" class="col">
+				<div v-for="field in filteredFields" :key="field.name" class="col" :class="field.type == 'checkbox' ? 'pt-4 d-flex align-items-center' : ''">
 					<form-input
 						v-model="internModelValue[field.name]"
 						:name="field.name"

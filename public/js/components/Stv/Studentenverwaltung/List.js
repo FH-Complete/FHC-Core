@@ -1,9 +1,9 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
-import {CoreRESTClient} from '../../../RESTClient.js';
 import ListNew from './List/New.js';
 
 
 export default {
+	name: "ListPrestudents",
 	components: {
 		CoreFilterCmpt,
 		ListNew
@@ -20,49 +20,104 @@ export default {
 		'update:selected'
 	],
 	data() {
+		function dateFormatter(cell)
+		{
+			let val = cell.getValue();
+			if (!val)
+				return '&nbsp;';
+			let date = new Date(val);
+			return date.toLocaleDateString('de-AT', {
+				"day": "2-digit",
+				"month": "2-digit",
+				"year": "numeric"
+			});
+		}
+
 		return {
 			tabulatorOptions: {
 				columns:[
-					{title:"UID", field:"uid"},
-					{title:"TitelPre", field:"titelpre"},
-					{title:"Nachname", field:"nachname"},
-					{title:"Vorname", field:"vorname"},
-					{title:"Wahlname", field:"wahlname", visible:false},
-					{title:"Vornamen", field:"vornamen", visible:false},
-					{title:"TitelPost", field:"titelpost"},
-					{title:"SVNR", field:"svnr"},
-					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen"},
-					{title:"Geburtsdatum", field:"geburtsdatum_iso"},
-					{title:"Geschlecht", field:"geschlecht"},
-					{title:"Sem.", field:"semester"},
-					{title:"Verb.", field:"verband"},
-					{title:"Grp.", field:"gruppe"},
-					{title:"Studiengang", field:"studiengang"},
-					{title:"Studiengang_kz", field:"studiengang_kz", visible:false},
-					{title:"Personenkennzeichen", field:"matrikelnummer"},
-					{title:"PersonID", field:"person_id"},
-					{title:"Status", field:"status"},
-					{title:"Status Datum", field:"status_datum_iso", visible:false},
-					{title:"Status Bestaetigung", field:"status_bestaetigung_iso", visible:false},
-					{title:"Status Datum ISO", field:"status_datum_iso", visible:false},
-					{title:"Status Bestaetigung ISO", field:"status_bestaetigung_iso", visible:false},
-					{title:"EMail (Privat)", field:"mail_privat", visible:false},
-					{title:"EMail (Intern)", field:"mail_intern", visible:false},
-					{title:"Anmerkungen", field:"anmerkungen", visible:false},
-					{title:"AnmerkungPre", field:"anmerkungpre", visible:false},
-					{title:"OrgForm", field:"orgform"},
-					{title:"Aufmerksamdurch", field:"orgform", visible:false},
+					{title:"UID", field:"uid", headerFilter: true},
+					{title:"TitelPre", field:"titelpre", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"Nachname", field:"nachname", headerFilter: true},
+					{title:"Vorname", field:"vorname", headerFilter: true},
+					{title:"Wahlname", field:"wahlname", visible:false, headerFilter: true},
+					{title:"Vornamen", field:"vornamen", visible:false, headerFilter: true},
+					{title:"TitelPost", field:"titelpost", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"SVNR", field:"svnr", headerFilter: true},
+					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen", headerFilter: true},
+					{title:"Geburtsdatum", field:"gebdatum", formatter:dateFormatter, 
+						headerFilter: true, headerFilterFunc: function(headerValue, rowValue, rowData, filterParams) {
+							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
+							let comparestr = headerValue;
+							if(matches !== null) {
+								const year = (matches[4] !== undefined) ? matches[4] : '';
+								const month = matches[3];
+								const day = (matches[2] !== undefined) ? matches[2] : '';
+								comparestr = year + '-' + month + '-' + day;
+							}
+							return rowValue.match(comparestr);
+						}
+					},
+					{title:"Geschlecht", field:"geschlecht", headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, listOnEmpty:true, autocomplete:true}},
+					{title:"Sem.", field:"semester", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"Verb.", field:"verband", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"Grp.", field:"gruppe", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"Studiengang", field:"studiengang", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"Studiengang_kz", field:"studiengang_kz", visible:false, headerFilter: true},
+					{title:"Personenkennzeichen", field:"matrikelnr", headerFilter: true},
+					{title:"PersonID", field:"person_id", headerFilter: true},
+					{title:"Status", field:"status", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"Status Datum", field:"status_datum", visible:false, formatter:dateFormatter},
+					{title:"Status Bestaetigung", field:"status_bestaetigung", visible:false, formatter:dateFormatter, headerFilter: true},
+					{title:"EMail (Privat)", field:"mail_privat", visible:false, headerFilter: true},
+					{title:"EMail (Intern)", field:"mail_intern", visible:false, headerFilter: true},
+					{title:"Anmerkungen", field:"anmerkungen", visible:false, headerFilter: true},
+					{title:"AnmerkungPre", field:"anmerkung", visible:false, headerFilter: true},
+					{title:"OrgForm", field:"orgform_kurzbz", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"Aufmerksamdurch", field:"aufmerksamdurch_kurzbz", visible:false},
 					{title:"Gesamtpunkte", field:"punkte", visible:false},
 					{title:"Aufnahmegruppe", field:"aufnahmegruppe_kurzbz", visible:false},
-					{title:"Dual", field:"dual_bezeichnung", visible:false},
-					{title:"Matrikelnummer", field:"matr_nr", visible:false},
-					{title:"Studienplan", field:"studienplan_bezeichnung"},
-					{title:"PreStudentInnenID", field:"prestudent_id"},
-					{title:"Priorität", field:"priorisierung_realtiv"},
+					{title:"Dual", field:"dual", visible:false, 
+						formatter:'tickCross', formatterParams: {
+							tickElement: '<i class="fas fa-check text-success"></i>',
+							crossElement: '<i class="fas fa-times text-danger"></i>'
+						},						
+						headerFilter:"tickCross", headerFilterParams: {
+							"tristate":true, elementAttributes:{"value":"true"}
+						}, headerFilterEmptyCheck:function(value){return value === null}
+					},
+					{title:"Matrikelnummer", field:"matr_nr", visible:false, headerFilter: true},
+					{title:"Studienplan", field:"studienplan_bezeichnung", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"PreStudentInnenID", field:"prestudent_id", headerFilter: true},
+					{title:"Priorität", field:"priorisierung_relativ"},
 					{title:"Mentor", field:"mentor", visible:false},
-					{title:"Aktiv", field:"aktiv", visible:false},
-					{title:"GeburtsdatumISO", field:"geburtsdatum_iso", visible:false},
+					{title:"Aktiv", field:"bnaktiv", visible:false, 
+						formatter:'tickCross', formatterParams: {
+							allowEmpty:true,
+							tickElement: '<i class="fas fa-check text-success"></i>',
+							crossElement: '<i class="fas fa-times text-danger"></i>'
+						},						
+						headerFilter:"tickCross", headerFilterParams: {
+							"tristate":true, elementAttributes:{"value":"true"}
+						}, headerFilterEmptyCheck:function(value){return value === null}
+					},
 				],
+				rowFormatter(row) {
+					if (row.getData().bnaktiv === false) {
+						row.getElement().classList.add('text-muted');
+					}
+				},
+
+				ajaxRequestFunc: (url, params) => {
+					if( url === '' ) 
+					{
+						return Promise.resolve({ data: []});
+					}
+					return this.$api.call({url, params});
+				},
+				ajaxResponse: (url, params, response) => {
+					return response?.data;
+				},
 
 				layout: 'fitDataStretch',
 				layoutColumnsOnNewData: false,
@@ -70,7 +125,7 @@ export default {
 				selectable: true,
 				selectableRangeMode: 'click',
 				index: 'prestudent_id',
-				persistence: true
+				persistenceID: 'stv-list'
 			},
 			tabulatorEvents: [
 				{
@@ -80,12 +135,26 @@ export default {
 				{
 					event: 'dataProcessed',
 					handler: this.autoSelectRows
+				},
+				{
+					event: 'dataLoaded',
+					handler: data => this.count = data.length
+				},
+				{
+					event: 'dataFiltered',
+					handler: (filters, rows) => this.filteredcount = rows.length
+				},
+				{
+					event: 'rowClick',
+					handler: this.handleRowClick // TODO(chris): this should be in the filter component
 				}
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
 			lastSelected: null,
 			filterKontoCount0: undefined,
-			filterKontoMissingCounter: undefined
+			filterKontoMissingCounter: undefined,
+			count: 0,
+			filteredcount: 0
 		}
 	},
 	methods: {
@@ -96,6 +165,7 @@ export default {
 			this.$refs.new.open();
 		},
 		rowSelectionChanged(data) {
+			this.lastSelected = this.selected;
 			this.$emit('update:selected', data);
 		},
 		autoSelectRows(data) {
@@ -106,8 +176,6 @@ export default {
 				// or maybe reselect only the last one?
 				selected = selected.filter(el => el);
 
-				this.lastSelected = null;
-
 				if (selected.length)
 					this.$refs.table.tabulator.selectRow(selected);
 			} else if(this.lastSelected === undefined) {
@@ -117,11 +185,17 @@ export default {
 				}
 			}
 		},
-		updateUrl(url, first) {
+		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
 
-			if (url)
-				url = CoreRESTClient._generateRouterURI(url);
+			if( endpoint === undefined ) 
+			{
+				endpoint = { url: '' };
+			} 
+			else if( endpoint.url === undefined ) 
+			{
+				endpoint.url = '';
+			}
 
 			const params = {}, filter = {};
 			if (this.filterKontoCount0)
@@ -134,14 +208,14 @@ export default {
 
 			if (!this.$refs.table.tableBuilt) {
 				if (!this.$refs.table.tabulator) {
-					this.tabulatorOptions.ajaxURL = url;
+					this.tabulatorOptions.ajaxURL = endpoint.url;
 					this.tabulatorOptions.ajaxParams = params;
 				} else
 					this.$refs.table.tabulator.on("tableBuilt", () => {
-						this.$refs.table.tabulator.setData(url, params);
+						this.$refs.table.tabulator.setData(endpoint.url, params);
 					});
 			} else
-				this.$refs.table.tabulator.setData(url, params);
+				this.$refs.table.tabulator.setData(endpoint.url, params);
 		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
 			if (!this.focusObj)
@@ -161,38 +235,47 @@ export default {
 					e.preventDefault();
 					var next = this.focusObj.previousElementSibling;
 					if (next)
-						this.focusObj = this.changeFocus(this.focusObj, next);
+						this.changeFocus(this.focusObj, next);
 					break;
 				case 'ArrowDown':
 					e.preventDefault();
 					var next = this.focusObj.nextElementSibling;
 					if (next)
-						this.focusObj = this.changeFocus(this.focusObj, next);
+						this.changeFocus(this.focusObj, next);
 					break;
 			}
 		},
 		changeFocus(a, b) { // TODO(chris): this should be in the filter component
-			a.tabIndex = -1;
 			if (b) {
 				b.tabIndex = 0;
+				this.focusObj = b;
 				b.focus();
-			}
-			return b;
-		},
-		onBlur(e) { // TODO(chris): this should be in the filter component
-			const tableholder = e.target.closest('.tabulator-tableholder');
-			if (tableholder && tableholder != e.target && !e.relatedTarget?.classList.contains('tabulator-row')) {
-				e.target.tabIndex = -1;
-				tableholder.tabIndex = 0;
+			} else {
 				this.focusObj = null;
 			}
+			a.tabIndex = -1;
+			return this.focusObj;
 		},
 		onFocus(e) { // TODO(chris): this should be in the filter component
-			if (e.target.classList.contains('tablulator-container')) {
-				this.focusObj = this.changeFocus(e.target, e.target.querySelector('.tabulator-row'));
+			if (!this.focusObj) {
+				var container, target;
+				if (e.target.classList.contains('tabulator-container')) {
+					container = e.target;
+					target = container.querySelector('.tabulator-row');
+				} else if (e.target.classList.contains('tabulator-row')) {
+					container = e.target.closest('.tabulator-container');
+					target = e.target;
+				}
+				if (container && target) {
+					this.changeFocus(container, target);
+				}
 			}
-			if (e.target.classList.contains('tabulator-tableholder')) {
-				this.focusObj = this.changeFocus(e.target, e.target.querySelector('.tabulator-row'));
+		},
+		handleRowClick(e, row) { // TODO(chris): this should be in the filter component
+			if (this.focusObj) {
+				let el = row.getElement();
+				if (el != this.focusObj)
+					this.changeFocus(this.focusObj, el);
 			}
 		}
 	},
@@ -200,15 +283,18 @@ export default {
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
-		<div class="tablulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @focusout="onBlur" @keydown="onKeydown">
+		<div class="tabulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @keydown="onKeydown">
 			<core-filter-cmpt
 				ref="table"
+				:description="$p.t('global/anzahl') + ': ' + (filteredcount || 0) + ' / ' + (count || 0)"
 				:tabulator-options="tabulatorOptions"
 				:tabulator-events="tabulatorEvents"
 				table-only
 				:side-menu="false"
 				reload
+				` + /* TODO(chris): Ausgeblendet für Testing
 				new-btn-show
+				*/`
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
 			>

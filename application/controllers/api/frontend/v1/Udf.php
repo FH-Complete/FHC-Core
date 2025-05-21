@@ -31,11 +31,10 @@ class Udf extends FHCAPI_Controller
 	 */
 	public function __construct()
 	{
-		// TODO(chris): permissions
 		// NOTE: UdfLib has its own permissions checks
 		parent::__construct([
-			'load' => 'admin:r',#self::PERM_LOGGED,
-			'save' => 'admin:r'#self::PERM_LOGGED
+			'load' => self::PERM_LOGGED,
+			'save' => self::PERM_LOGGED
 		]);
 
 		// Libraries
@@ -73,10 +72,7 @@ class Udf extends FHCAPI_Controller
 
 		$result = $this->udflib->getFieldArray($this->TargetModel, $id);
 
-		#$fields = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result));
-		$fields = $result->retval;
+		$fields = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($fields);
 	}
@@ -94,10 +90,7 @@ class Udf extends FHCAPI_Controller
 
 		$result = $this->udflib->getCiValidations($this->TargetModel, $this->input->post());
 		
-		#$fieldValidations = $this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result));
-		$fieldvalidations = $result->retval;
+		$fieldValidations = $this->getDataOrTerminateWithError($result);
 
 		$this->form_validation->set_rules($fieldvalidations);
 
@@ -117,9 +110,7 @@ class Udf extends FHCAPI_Controller
 
 		$result = $this->TargetModel->update($id, $fields);
 
-		#$this->getDataOrTerminateWithError($result);
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		$this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess(array_fill_keys(array_keys($fields), ''));
 	}

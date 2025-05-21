@@ -33,8 +33,8 @@ class Config extends FHCAPI_Controller
 	{
 		// TODO(chris): permissions
 		parent::__construct([
-			'student' => self::PERM_LOGGED,
-			'students' => self::PERM_LOGGED
+			'student' => ['admin:r', 'assistenz:r'],
+			'students' => ['admin:r', 'assistenz:r']
 		]);
 
 
@@ -44,16 +44,23 @@ class Config extends FHCAPI_Controller
 			'person',
 			'lehre',
 			'stv',
-			'konto'
+			'konto',
+			'abschlusspruefung'
 		]);
+
+		// Load Config
+		$this->load->config('stv');
 	}
 
 	public function student()
 	{
 		$result = [];
+		$config = $this->config->item('tabs');
+
 		$result['details'] = [
 			'title' => $this->p->t('stv', 'tab_details'),
-			'component' => './Stv/Studentenverwaltung/Details/Details.js'
+			'component' => './Stv/Studentenverwaltung/Details/Details.js',
+			'config' => $config['details']
 		];
 		$result['notes'] = [
 			'title' => $this->p->t('stv', 'tab_notes'),
@@ -61,13 +68,18 @@ class Config extends FHCAPI_Controller
 		];
 		$result['contact'] = [
 			'title' => $this->p->t('stv', 'tab_contact'),
-			'component' => './Stv/Studentenverwaltung/Details/Kontakt.js'
+			'component' => './Stv/Studentenverwaltung/Details/Kontakt.js',
+			'config' => [
+				'showBankaccount' => $this->permissionlib->isBerechtigt('mitarbeiter/bankdaten')
+					|| $this->permissionlib->isBerechtigt('student/bankdaten')
+			]
 		];
 		$result['prestudent'] = [
 			'title' => $this->p->t('stv', 'tab_prestudent'),
-			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js'
+			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js',
+			'config' => $config['prestudent']
 		];
-		$result['multistatus'] = [
+		$result['status'] = [
 			'title' => 'Status',
 			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js'
 		];
@@ -89,7 +101,31 @@ class Config extends FHCAPI_Controller
 		];
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
-			'component' => './Stv/Studentenverwaltung/Details/Noten.js'
+			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
+			'showOnlyWithUid' => true,
+			'config' => [
+				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
+				'edit' => 'both', // Possible values: both|header|inline
+				'delete' => 'both', // Possible values: both|header|inline
+				'documents' => 'both', // Possible values: both|header|inline
+				'documentslist' => $this->gradesDocumentsList()
+			]
+		];
+
+		$result['exam'] = [
+			'title' => $this->p->t('stv', 'tab_exam'),
+			'component' => './Stv/Studentenverwaltung/Details/Pruefung.js'
+		];
+
+		$result['finalexam'] = [
+			'title' => $this->p->t('stv', 'tab_finalexam'),
+			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'config' => $config['finalexam']
+		];
+
+		$result['mobility'] = [
+			'title' => $this->p->t('stv', 'tab_mobility'),
+			'component' => './Stv/Studentenverwaltung/Details/Mobility.js'
 		];
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
@@ -102,6 +138,7 @@ class Config extends FHCAPI_Controller
 	public function students()
 	{
 		$result = [];
+		$config = $this->config->item('tabs');
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
 			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
@@ -114,7 +151,7 @@ class Config extends FHCAPI_Controller
 				'additionalCols' => []
 			]
 		];
-		$result['multistatus'] = [
+		$result['status'] = [
 			'title' => 'Status',
 			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js',
 			'config' => [
@@ -124,6 +161,11 @@ class Config extends FHCAPI_Controller
 				'changeStatusToDiplomand' => $this->permissionlib->isBerechtigt('admin'),
 				'changeStatusToAbsolvent' => $this->permissionlib->isBerechtigt('admin')
 			]
+		];
+		$result['finalexam'] = [
+			'title' =>  $this->p->t('stv', 'tab_finalexam'),
+			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'config' => $config['finalexam']
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {
@@ -223,5 +265,187 @@ class Config extends FHCAPI_Controller
 				'title' => $this->p->t('person', 'nachname')
 			]
 		] + $this->kontoColumns();
+	}
+
+	/**
+	 * Helper function to generate the default documentslist config for the
+	 * grades tab.
+	 *
+	 * The resulting array consists of elements which are associative arrays
+	 * that can have the following entries:
+	 * title			(required) on the first level this can be HTML code.
+	 * permissioncheck	(optional) an URL to an FHCAPI endpoint which returns
+	 * 						true or false.
+	 * link				(optional) an URL that will be called if "action" and
+	 * 						"children" are not defined.
+	 * action			(optional) an associative array that describes an
+	 * 						POST action that will be called if "children" is
+	 * 						not defined.
+	 * 						It can have the following entries:
+	 * - url			(required) an URL to an FHCAPI endpoint.
+	 * - post			(optional) an associative array with the POST data to
+	 * 						be sent.
+	 * - response		(optional) a string that will be displayed on success.
+	 * children			(optional) an array of child elements
+	 *
+	 * All strings that start with { and end with } in the URLs and the
+	 * actions post parameter will be replaced with the corresponding
+	 * attribute of the current dataset (e.G: {uid} will be replaced with the
+	 * uid of the current dataset)
+	 *
+	 * @return array
+	 */
+	protected function gradesDocumentsList()
+	{
+		$permissioncheck = site_url("api/frontend/v1/documents/permissionAlternativeFormat/{studiengang_kz}");
+
+		$title_ger = $this->p->t("global", "deutsch");
+		$title_eng = $this->p->t("global", "englisch");
+		$title_ff = $this->p->t("stv", "document_certificate");
+		$title_lv = $this->p->t("stv", "document_coursecertificate");
+		
+		$link_ff = "documents/export/" .
+			"zertifikat.rdf.php/" .
+			"Zertifikat" .
+			"?stg_kz={studiengang_kz_lv}" .
+			"&uid={uid}" .
+			"&ss={studiensemester_kurzbz}" .
+			"&lvid={lehrveranstaltung_id}";
+		$link_lv_ger = "documents/export/" .
+			"lehrveranstaltungszeugnis.rdf.php/" .
+			"LVZeugnis" .
+			"?stg_kz={studiengang_kz}" .
+			"&uid={uid}" .
+			"&ss={studiensemester_kurzbz}" .
+			"&lvid={lehrveranstaltung_id}";
+		$link_lv_eng = "documents/export/" .
+			"lehrveranstaltungszeugnis.rdf.php/" .
+			"LVZeugnisEng" .
+			"?stg_kz={studiengang_kz}" .
+			"&uid={uid}" .
+			"&ss={studiensemester_kurzbz}" .
+			"&lvid={lehrveranstaltung_id}";
+
+		$archive_url = "api/frontend/v1/documents/archiveSigned";
+		$archive_response = $this->p->t("stv", "document_signed_and_archived");
+		$archive_post_ff = [
+			"xml" => "zertifikat.rdf.php",
+			"xsl" => "Zertifikat",
+			"stg_kz" => "{studiengang_kz_lv}",
+			"uid" => "{uid}",
+			"ss" => "{studiensemester_kurzbz}",
+			"lvid" => "{lehrveranstaltung_id}"
+		];
+		$archive_post_lv_ger = [
+			"xml" => "lehrveranstaltungszeugnis.rdf.php",
+			"xsl" => "LVZeugnis",
+			"stg_kz" => "{studiengang_kz}",
+			"uid" => "{uid}",
+			"ss" => "{studiensemester_kurzbz}",
+			"lvid" => "{lehrveranstaltung_id}"
+		];
+		$archive_post_lv_eng = [
+			"xml" => "lehrveranstaltungszeugnis.rdf.php",
+			"xsl" => "LVZeugnisEng",
+			"stg_kz" => "{studiengang_kz}",
+			"uid" => "{uid}",
+			"ss" => "{studiensemester_kurzbz}",
+			"lvid" => "{lehrveranstaltung_id}"
+		];
+
+		$list = [
+			[
+				'title' => '<i class="fa fa-download" title="' . $this->p->t("stv", "document_download") . '"></i>',
+				'children' => [
+					[
+						'title' => $title_ff,
+						'link' => site_url($link_ff)
+					],
+					[
+						'title' => $title_lv,
+						'children' => [
+							[
+								'title' => $title_ger,
+								'link' => site_url($link_lv_ger),
+								'children' => [
+									[
+										'title' => 'PDF',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_ger)
+									],
+									[
+										'title' => 'DOC',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_ger . "&output=doc")
+									],
+									[
+										'title' => 'ODT',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_ger . "&output=odt")
+									]
+								]
+							],
+							[
+								'title' => $title_eng,
+								'link' => site_url($link_lv_eng),
+								'children' => [
+									[
+										'title' => 'PDF',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_eng)
+									],
+									[
+										'title' => 'DOC',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_eng . "&output=doc")
+									],
+									[
+										'title' => 'ODT',
+										'permissioncheck' => $permissioncheck,
+										'link' => site_url($link_lv_eng . "&output=odt")
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				'title' => '<i class="fas fa-archive" title="' . $this->p->t("stv", "document_archive") . '"></i>',
+				'children' => [
+					[
+						'title' => $title_ff,
+						'action' => [
+							'url' => site_url($archive_url),
+							'post' => $archive_post_ff,
+							'response' => $archive_response
+						]
+					],
+					[
+						'title' => $title_lv,
+						'children' => [
+							[
+								'title' => $title_ger,
+								'action' => [
+									'url' => site_url($archive_url),
+									'post' => $archive_post_lv_ger,
+									'response' => $archive_response
+								]
+							],
+							[
+								'title' => $title_eng,
+								'action' => [
+									'url' => site_url($archive_url),
+									'post' => $archive_post_lv_eng,
+									'response' => $archive_response
+								]
+							]
+						]
+					]
+				]
+			]
+		];
+
+		return $list;
 	}
 }

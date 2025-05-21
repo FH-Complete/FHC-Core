@@ -15,6 +15,39 @@ class Prestudent_model extends DB_Model
 	}
 
 	/**
+	 * Update Data in DB-Table
+	 *
+	 * @param   string $id  PK for DB-Table
+	 * @param   array $data  DataArray for Insert
+	 * @return  array
+	 */
+	public function update($id, $data, $encryptedColumns = null)
+	{
+		if (isset($data['zgvmas_code'])
+			|| isset($data['zgvmanation'])
+			|| isset($data['zgv_code'])
+			|| isset($data['zgvnation'])
+		) {
+			/**
+			 * Falls ZGV vorhanden, setze Ausstellungsstaat (für BIS-Meldung)
+			 * auf Nation der höchsten angegebenen ZGV
+			 */
+			$case = '(CASE 
+				WHEN zgvmas_code IS NOT NULL AND zgvmanation IS NOT NULL THEN zgvmanation 
+				WHEN zgv_code IS NOT NULL AND zgvnation IS NOT NULL THEN zgvnation 
+				ELSE NULL END)';
+			
+			foreach (['zgvmas_code', 'zgvmanation', 'zgv_code', 'zgvnation'] as $key)
+				if (isset($data[$key]))
+					$case = str_replace($key, $this->escape($data[$key]), $case);
+			
+			$this->db->set('ausstellungsstaat', $case, false);
+		}
+
+		return parent::update($id, $data, $encryptedColumns);
+	}
+
+	/**
 	 * getLastStatuses
 	 */
 	public function getLastStatuses($person_id, $studiensemester_kurzbz = null, $studiengang_kz = null, $status_kurzbz = null)
@@ -707,9 +740,11 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getHistoryPrestudents($person_id)
 	{
+
 		$query = "
-			SELECT ps.studiensemester_kurzbz, p.priorisierung, p.studiengang_kz, sg.kurzbzlang, sg.orgform_kurzbz, ps.status_kurzbz, s.student_uid, sp.bezeichnung, ps.ausbildungssemester,
-			       CONCAT(ps.status_kurzbz, ' (', ps.ausbildungssemester, '. Semester)') as status
+			SELECT ps.studiensemester_kurzbz, p.priorisierung, p.studiengang_kz, sg.kurzbzlang, ps.orgform_kurzbz, 
+					ps.status_kurzbz, s.student_uid, sp.bezeichnung, ps.ausbildungssemester,
+			       CONCAT(ps.status_kurzbz, ' (', ps.ausbildungssemester, '. Semester)') as status, p.prestudent_id
 			FROM public.tbl_prestudent p
 			JOIN (
 					SELECT DISTINCT ON(prestudent_id) *
@@ -718,6 +753,7 @@ class Prestudent_model extends DB_Model
 					ORDER BY prestudent_id, datum desc, insertamum desc
 				) ps USING(prestudent_id)
 			JOIN public.tbl_status USING(status_kurzbz)
+			LEFT JOIN public.tbl_status_grund g USING (statusgrund_id)
 			JOIN public.tbl_studiengang sg USING(studiengang_kz)
 			LEFT JOIN lehre.tbl_studienplan sp USING (studienplan_id)
 			LEFT JOIN public.tbl_student s USING (prestudent_id)
@@ -725,62 +761,5 @@ class Prestudent_model extends DB_Model
 		";
 
 		return $this->execQuery($query, array($person_id));
-	}
-
-	/**
-	 * Gets history of prestudent, prestudent_id given
-	 * @param int $prestudent_id
-	 * @return object
-	 */
-	public function getHistoryPrestudent($prestudent_id)
-	{
-		$query = "
-					SELECT 
-					ps.status_kurzbz, 
-					ps.studiensemester_kurzbz, 
-					ps.ausbildungssemester,
-					CASE WHEN ps.status_kurzbz IN ('Student', 'Diplomand')
-					THEN CONCAT(lv.semester, lv.verband, lv.gruppe)
-					ELSE ''
-					END AS lehrverband, 
-					ps.datum, 
-					TO_CHAR(ps.datum::timestamp, 'DD.MM.YYYY') AS format_datum,
-					sp.bezeichnung, 
-					ps.bestaetigtam, 
-					TO_CHAR(ps.bestaetigtam::timestamp, 'DD.MM.YYYY') AS format_bestaetigtam,
-					ps.bewerbung_abgeschicktamum,
-					TO_CHAR(ps.bewerbung_abgeschicktamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_bewerbung_abgeschicktamum,
-					stg.statusgrund_kurzbz,
-					ps.orgform_kurzbz,
-					ps.prestudent_id,
-					sp.studienplan_id,
-					ps.anmerkung,
-					ps.bestaetigtvon,
-					ps.insertamum,
-					TO_CHAR(ps.insertamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_insertamum,
-					ps.insertvon,
-					ps.updateamum,
-					TO_CHAR(ps.updateamum::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS format_updateamum,
-					ps.updatevon 
-				FROM 
-					public.tbl_prestudentstatus ps
-				JOIN 
-					public.tbl_student st USING (prestudent_id)
-				JOIN 
-					public.tbl_studiengang sg ON (st.studiengang_kz = sg.studiengang_kz)
-				LEFT JOIN 
-					lehre.tbl_studienplan sp USING (studienplan_id) 
-				LEFT JOIN 
-					public.tbl_status_grund stg USING (statusgrund_id) 
-				LEFT JOIN 
-					public.tbl_studentlehrverband lv ON 
-						(st.student_uid = lv.student_uid 
-							 AND st.student_uid IS NOT NULL 
-							 AND lv.studiensemester_kurzbz = ps.studiensemester_kurzbz)
-				WHERE prestudent_id = ?
-				ORDER BY datum DESC
-		";
-
-		return $this->execQuery($query, array($prestudent_id));
 	}
 }

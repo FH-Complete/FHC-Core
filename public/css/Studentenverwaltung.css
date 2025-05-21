@@ -1,5 +1,5 @@
 @import './Fhc.css';
-@import './components/searchbar.css';
+@import './components/searchbar/searchbar.css';
 @import './components/verticalsplit.css';
 @import './components/FilterComponent.css';
 @import './components/Tabs.css';
@@ -45,6 +45,36 @@ html {
 }
 .tabulator-row.disabled.tabulator-row-even .tabulator-cell {
 	color: var(--gray-500);
+}
+
+/* Dropdown Toolbar Interessent, submenu */
+.dropend .dropdown-toggle.d-flex::after {
+	height: 0;
+}
+
+/* Dropdown AbschlusspruefungList.js */
+.tabulator-row {
+	overflow: visible !important;
+}
+
+.tabulator-cell {
+	overflow: visible !important;
+}
+
+.p-dropdown-item{
+	z-index: 1201 !important;
+}
+
+.l-dropdown-item{
+	z-index: 1301 !important;
+}
+
+.tabulator-row .dropdown-menu {
+	position: absolute;
+	z-index: 1204; /* Ensure it's above other elements */
+}
+.tabulator-table {
+	overflow: visible !important;
 }
 
 @media (min-width: 768px) {
@@ -107,4 +137,7 @@ html {
 
 .has-filter .fa-filter {
 	color: var(--bs-success);
+}
+.override_filtercmpt_actions_style div.d-flex.align-items-baseline {
+	align-items: end !important;
 }

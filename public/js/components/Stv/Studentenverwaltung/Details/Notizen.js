@@ -1,29 +1,35 @@
-import NotizComponent from "../../../Notiz/NotizComponent.js";
+import CoreNotiz from "../../../Notiz/Notiz.js";
+
+import ApiNotizPerson from '../../../../api/factory/notiz/person.js';
 
 export default {
+	name: "TabNotes",
 	components: {
-		NotizComponent
+		CoreNotiz
 	},
 	props: {
 		modelValue: Object
 	},
+	data() {
+		return {
+			endpoint: ApiNotizPerson
+		};
+	},
 	template: `
-	<div class="stv-details-details h-100 pb-3">
-		<h3>Notizen</h3>
-		
+	<div class="stv-details-notizen h-100 pb-3">
 <!--	mit factory als endpoint	-->
-		<NotizComponent
-			:endpoint="$fhcApi.factory.notiz.person"
+		<core-notiz
+			class="overflow-hidden"
+			:endpoint="endpoint"
 			ref="formc"
-			typeId="person_id"
+			notiz-layout="twoColumnsFormLeft"
+			type-id="person_id"
 			:id="modelValue.person_id"
-			notizLayout="twoColumnsFormLeft"
-			:showErweitert="false"
-			:showDocument="true"
-			:showTinyMCE="false"
-			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+			show-document
+			show-tiny-mce
+			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</NotizComponent>
+		</core-notiz>
 		
 	
 <!--		
@@ -38,10 +44,10 @@ for extensions: write own controller extending core NotizController
 
 ref="formc"
 
-typeId: id to which table the notizdata should be connected... eg. person_id, prestudent_id, uid (for mitarbeiter_uid), projekt_kurzbz, projektphase_id, projekttask_id,
+type-id: id to which table the notizdata should be connected... eg. person_id, prestudent_id, uid (for mitarbeiter_uid), projekt_kurzbz, projektphase_id, projekttask_id,
 	bestellung_id, lehreinheit_id, anrechnung_id
 
-notizLayout: "classicFas", "twoColumnsFormLeft", twoColumnsFormRight"
+notizLayout: "classicFas", "twoColumnsFormLeft", twoColumnsFormRight, popupModal"
 
 showErweitert: if true: section with following fields will be displayed:
 	'verfasser', 'bearbeiter', 'von', 'bis'
@@ -67,45 +73,45 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 ------------------------ SOME TESTDATA	-----------------------------------------------------	
 ---------------------------------------------------------------------------------------------
 
-
-		<NotizComponent
+		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.mitarbeiter"
 			ref="formc"
-			typeId="uid"
+			type-id="uid"
 			:id= "'ma0068'"
-			notizLayout="twoColumnsFormLeft"
-			:showErweitert="true"
-			:showDocument="true"
-			:showTinyMCE="false"
-			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+			notiz-layout="twoColumnsFormLeft"
+			show-document
+			show-tiny-mce
+			show-erweitert
+			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</NotizComponent>
+		</core-notiz>
 		
-		<NotizComponent
+		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.prestudent"
 			ref="formc"
-			typeId="prestudent_id"
+			type-id="prestudent_id"
 			:id="modelValue.prestudent_id"
-			notizLayout="twoColumnsFormLeft"
-			:showErweitert="true"
-			:showDocument="true"
+			notiz-layout="twoColumnsFormLeft"
+			:show-erweitert="true"
+			:show-document="true"
 			:showTinyMCE="true"
-			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</NotizComponent>
+		</core-notiz>
 				
-		<NotizComponent
+		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.projekt"
 			ref="formc"
-			typeId="projekt_kurzbz"
+			type-id="projekt_kurzbz"
 			:id="'EA74'" 
-			notizLayout="twoColumnsFormLeft"
-			:showErweitert="true"
-			:showDocument="true"
+			notiz-layout="twoColumnsFormLeft"
+			:show-erweitert="true"
+			:show-document="true"
 			:showTinyMCE="true"
-			:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</NotizComponent>-->
+		</core-notiz>
+-->
 		
 	</div>
 	`

@@ -1,6 +1,7 @@
 import BsModal from './Modal.js';
 
 export default {
+	name: 'BootstrapAlert',
 	components: {
 		BsModal
 	},

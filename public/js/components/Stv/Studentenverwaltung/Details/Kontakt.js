@@ -3,13 +3,15 @@ import ContactList from "./Kontakt/Contact.js";
 import BankaccountList from "./Kontakt/Bankaccount.js";
 
 export default {
+	name: "TabContact",
 	components: {
 		AddressList,
 		ContactList,
 		BankaccountList,
 	},
 	props: {
-		modelValue: Object
+		modelValue: Object,
+		config: Object
 	},
 	data() {
 		return {
@@ -19,7 +21,7 @@ export default {
 		}
 	},
 	template: `
-	<div class="stv-details-details h-100 pb-3">
+	<div class="stv-details-kontakt h-100 pb-3">
 		<fieldset class="overflow-hidden">
 			<legend>{{this.$p.t('person', 'adressen')}}</legend>
 			<address-list ref="adressList" :uid="modelValue.person_id"></address-list>
@@ -30,7 +32,7 @@ export default {
 			<contact-list ref="contactList" :uid="modelValue.person_id"></contact-list>
 		</fieldset>
 		<br>
-		<fieldset class="overflow-hidden">
+		<fieldset v-if="config.showBankaccount" class="overflow-hidden">
 			<legend>{{this.$p.t('person', 'bankverbindungen')}}</legend>
 			<bankaccount-list ref="bankaccountList" :uid="modelValue.person_id"></bankaccount-list>
 		</fieldset>

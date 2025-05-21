@@ -1,47 +1,89 @@
-import VueDatePicker from '../vueDatepicker.js.php';
 import {CoreFilterCmpt} from "../filter/Filter.js";
-import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 
-import BsModal from "../Bootstrap/Modal";
-import FormForm from '../Form/Form.js';
+import BsModal from "../Bootstrap/Modal.js";
+import CoreForm from '../Form/Form.js';
 import FormInput from '../Form/Input.js';
 
 export default {
 	components: {
 		CoreFilterCmpt,
-		VueDatePicker,
 		BsModal,
-		FormForm,
-		FormInput,
-		PvAutoComplete
+		CoreForm,
+		FormInput
 	},
 	inject: {
 		cisRoot: {
 			from: 'cisRoot'
 		},
 	},
-	props: [
-		'person_id',
-		'uid'
-		],
-	data(){
+	props: {
+		endpoint: {
+			type: Object,
+			required: true
+		},
+		typeId: String,
+		id: {
+			type: [Number, String],
+			required: true
+		},
+		uid: {
+			type: [Number, String],
+			required: true
+		}
+	},
+	data() {
 		return {
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Betriebsmittel/getAllBetriebsmittel/' + this.uid + '/' + this.person_id,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: () => this.$api.call(
+					this.endpoint.getAllBetriebsmittel(this.typeId, this.id)
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title: "Nummer", field: "nummer"},
+					{title: "Nummer", field: "nummer", width: 150},
 					{title: "PersonId", field: "person_id", visible: false},
-					{title: "Typ", field: "betriebsmitteltyp"},
+					{title: "Typ", field: "betriebsmitteltyp", width: 125},
 					{title: "Anmerkung", field: "anmerkung", visible: false},
-					{title: "Retourdatum", field: "format_retour", visible: false},
+					{
+						title: "Retourdatum",
+						field: "retouram",
+						width: 128,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}
+					},
 					{title: "Beschreibung", field: "beschreibung"},
-					{title: "Uid", field: "uid", visible: false},
+					{title: "UID", field: "uid", width: 87},
 					{title: "Kaution", field: "kaution", visible: false},
-					{title: "Ausgabedatum", field: "format_ausgabe"},
-					{title: "Betriebsmittel_id", field: "betriebsmittel_id", visible: false},
-					{title: "Betriebsmittelperson_id", field: "betriebsmittelperson_id", visible: false},
+					{
+						title: "Ausgabedatum",
+						field: "ausgegebenam",
+						width: 144,
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}
+					},
+					{title: "Betriebsmittel ID", field: "betriebsmittel_id", visible: false},
+					{title: "Betriebsmittelperson ID", field: "betriebsmittelperson_id", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -53,7 +95,7 @@ export default {
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-print"></i>';
-							button.title = 'Übernahmebestätigung drucken';
+							button.title = this.$p.t('betriebsmittel', 'btn_printUebernahmebestaetigung');
 							let cellData = cell.getData();
 							button.addEventListener(
 								'click',
@@ -69,7 +111,7 @@ export default {
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.title = 'Betriebsmittel bearbeiten';
+							button.title = this.$p.t('betriebsmittel', 'btn_editBetriebsmittel');
 							button.addEventListener(
 								'click',
 								(event) =>
@@ -80,7 +122,7 @@ export default {
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.title = 'Betriebsmittel löschen';
+							button.title = this.$p.t('betriebsmittel', 'btn_deleteBetriebsmittel');
 							button.addEventListener(
 								'click',
 								() =>
@@ -96,41 +138,57 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: '550',
 				selectableRangeMode: 'click',
-				selectable: true
+				selectable: true,
+				persistenceID: 'core-betriebsmittel'
 			},
 			tabulatorEvents: [
 				{
 					event: 'tableBuilt',
 					handler: async() => {
 
-						await this.$p.loadCategory(['wawi', 'global', 'infocenter']);
+						await this.$p.loadCategory(['wawi', 'global', 'infocenter', 'betriebsmittel', 'person']);
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('nummer').component.updateDefinition({
 							title: this.$p.t('wawi', 'nummer')
 						});
+						cm.getColumnByField('betriebsmitteltyp').component.updateDefinition({
+							title: this.$p.t('global', 'typ')
+						});
 						cm.getColumnByField('anmerkung').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
 						});
-						cm.getColumnByField('format_retour').component.updateDefinition({
+						cm.getColumnByField('retouram').component.updateDefinition({
 							title: this.$p.t('wawi', 'retourdatum')
+						});
+						cm.getColumnByField('beschreibung').component.updateDefinition({
+							title: this.$p.t('global', 'beschreibung')
 						});
 						cm.getColumnByField('kaution').component.updateDefinition({
 							title: this.$p.t('infocenter', 'kaution')
 						});
-						cm.getColumnByField('format_ausgabe').component.updateDefinition({
+						cm.getColumnByField('ausgegebenam').component.updateDefinition({
 							title: this.$p.t('wawi', 'ausgabedatum')
 						});
-
+						cm.getColumnByField('betriebsmittel_id').component.updateDefinition({
+							title: this.$p.t('ui', 'betriebsmittel_id')
+						});
+						cm.getColumnByField('betriebsmittelperson_id').component.updateDefinition({
+							title: this.$p.t('ui', 'betriebsmittelperson_id')
+						});
+						cm.getColumnByField('person_id').component.updateDefinition({
+							title: this.$p.t('person', 'person_id')
+						});
+						cm.getColumnByField('uid').component.updateDefinition({
+							title: this.$p.t('person', 'uid')
+						});
 					}
 				}
 			],
-			betriebsmittelData: {},
-			betriebsmittelperson_id : null,
 			listBetriebsmitteltyp: [],
 			formData: {
-				ausgegebenam : this.getDefaultDate(),
+				ausgegebenam : new Date(),
 				betriebsmitteltyp: 'Zutrittskarte'
 			},
 			statusNew: true,
@@ -138,108 +196,94 @@ export default {
 		}
 	},
 	watch: {
-		uid(){
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Betriebsmittel/getAllBetriebsmittel/' + this.uid + '/' + this.person_id);
+		id() {
+			this.$refs.table.reloadTable();
 		}
 	},
 	methods: {
-		actionEditBetriebsmittel(betriebsmittelperson_id){
+		actionEditBetriebsmittel(betriebsmittelperson_id) {
 			this.statusNew = false;
-			this.loadBetriebsmittel(betriebsmittelperson_id);
+			this
+				.loadBetriebsmittel(betriebsmittelperson_id)
+				.then(this.$refs.betriebsmittelModal.show);
 		},
-		actionNewBetriebsmittel(){
+		actionNewBetriebsmittel() {
 			this.resetModal();
-			this.statusNew = true;
-			this.formData.ausgegebenam = this.getDefaultDate();
-			this.reload();
+			this.$refs.betriebsmittelModal.show();
 		},
-		actionDeleteBetriebsmittel(betriebsmittelperson_id){
-			this.loadBetriebsmittel(betriebsmittelperson_id).then(() => {
-				this.$refs.deleteBetriebsmittelModal.show();
-			});
-		},
-		addNewBetriebsmittel(){
-			this.param = {
-				'uid':  this.uid,
-				'person_id': this.person_id,
-				...this.formData
-			};
-			this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/addNewBetriebsmittel/',
-				this.param
-			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
-					window.scrollTo(0, 0);
-					this.reload();
-				});
-		},
-		deleteBetriebsmittel(betriebsmittelperson_id){
-			this.param = {
-				'betriebsmittelperson_id': betriebsmittelperson_id
-			};
-			return this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/deleteBetriebsmittel/',
-				this.param)
-				.then(
-					result => {
-						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-						this.hideModal('deleteBetriebsmittelModal');
-						this.resetModal();
-					})
-				.catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
-					window.scrollTo(0, 0);
-					this.reload();
-				});
-		},
-		updateBetriebsmittel(){
-			this.param = {
-				'uid':  this.uid,
-				'person_id': this.person_id,
-				...this.formData
-			};
-			this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/updateBetriebsmittel/',
-				this.param
-			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
-					window.scrollTo(0, 0);
-					this.reload();
-				});
-		},
-		loadBetriebsmittel(betriebsmittelperson_id){
-			this.resetModal();
-			this.statusNew = false;
-			this.param = {
-				'betriebsmittelperson_id':  betriebsmittelperson_id
-			};
-			return this.$fhcApi.post('api/frontend/v1/stv/betriebsmittel/loadBetriebsmittel/',
-				this.param)
-				.then(result => result.data)
+		actionDeleteBetriebsmittel(betriebsmittelperson_id) {
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? betriebsmittelperson_id
+					: Promise.reject({handled: true}))
+				.then(betriebsmittelperson_id => this.$api.call(
+					this.endpoint.deleteBetriebsmittel(betriebsmittelperson_id))
+				)
 				.then(result => {
-					this.formData = result;
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+					window.scrollTo(0, 0);
+					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		searchInventar(event){
-			return this.$fhcApi
-				.get('api/frontend/v1/stv/betriebsmittel/loadInventarliste/' + event.query)
+		addNewBetriebsmittel() {
+			//just append uid to formdata
+			this.formData.uid = this.uid;
+			if (this.formData.betriebsmitteltyp == 'Inventar')
+				this.formData.betriebsmittel_id = this.formData.inventarData?.betriebsmittel_id;
+			return this.$refs.betriebsmittelData
+				.call(this.endpoint.addNewBetriebsmittel(this.id, this.formData))
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.$refs.betriebsmittelModal.hide();
+					this.resetModal();
+					window.scrollTo(0, 0);
+					this.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		updateBetriebsmittel(betriebsmittelperson_id) {
+			if (this.formData.betriebsmitteltyp == 'Inventar')
+				this.formData.betriebsmittel_id = this.formData.inventarData?.betriebsmittel_id;
+			return this.$refs.betriebsmittelData
+				.call(this.endpoint.updateBetriebsmittel(
+					betriebsmittelperson_id,
+					this.formData
+				))
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.$refs.betriebsmittelModal.hide();
+					this.resetModal();
+					window.scrollTo(0, 0);
+					this.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		loadBetriebsmittel(betriebsmittelperson_id) {
+			this.resetModal();
+			this.statusNew = false;
+			return this.$api
+				.call(this.endpoint.loadBetriebsmittel(betriebsmittelperson_id))
 				.then(result => {
-					this.filteredInventar = result.data.retval;
+					this.formData = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		searchInventar(event) {
+			const encodedQuery = encodeURIComponent(event.query);
+			return this.$api
+				.call(this.endpoint.loadInventarliste(encodedQuery))
+				.then(result => {
+					this.filteredInventar = result.data;
 				});
 		},
-		reload(){
+		reload() {
 			this.$refs.table.reloadTable();
 		},
-		hideModal(modalRef){
-			this.$refs[modalRef].hide();
-		},
-		resetModal(){
+		resetModal() {
 			this.formData = {};
-			this.formData.ausgegebenam = this.getDefaultDate();
+			this.formData.ausgegebenam = new Date();
 			this.formData.retouram = null;
 			this.formData.betriebsmitteltyp = null;
 			this.formData.nummer = null;
@@ -247,76 +291,46 @@ export default {
 			this.formData.kaution = null;
 			this.formData.anmerkung = null;
 			this.formData.beschreibung = null;
-			this.betriebsmittelperson_id = {};
 			this.statusNew = true;
-		},
-		getDefaultDate() {
-			const today = new Date();
-			return today;
 		}
 	},
-	created(){
-		this.$fhcApi
-			.get('api/frontend/v1/stv/betriebsmittel/getTypenBetriebsmittel')
-			.then(result => result.data)
+	created() {
+		return this.$api
+			.call(this.endpoint.getTypenBetriebsmittel())
 			.then(result => {
-				this.listBetriebsmitteltyp = result;
+				this.listBetriebsmitteltyp = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-	<div class="betriebsmittel-betriebsmittel">
-	
-	
-		<!--Modal: deleteBetriebsmittelModal-->
-		<BsModal ref="deleteBetriebsmittelModal">
-			<template #title>{{$p.t('ui', 'betriebsmittel_delete')}}</template>
-			<template #default>
-				<p>{{$p.t('ui', 'betriebsmittel_confirm_delete')}}</p>
-			</template>
-			<template #footer>
-<!--				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>-->
-				<button ref="Close" type="button" class="btn btn-primary" @click="deleteBetriebsmittel(formData.betriebsmittelperson_id)">OK</button>
-			</template>
-		</BsModal>
+	<div class="core-betriebsmittel h-100 d-flex flex-column">
+		<core-filter-cmpt
+			ref="table"
+			:tabulator-options="tabulatorOptions"
+			:tabulator-events="tabulatorEvents"
+			table-only
+			:side-menu="false"
+			reload
+			new-btn-show
+			:new-btn-label="this.$p.t('ui', 'betriebsmittel')"
+			@click:new="actionNewBetriebsmittel"
+			>
+		</core-filter-cmpt>		
 		
-		
-		<div class="row col-12">
-			<div class="col-6">
+		<!--Modal: betriebsmittelModal-->
+		<bs-modal ref="betriebsmittelModal">
+			<template #title>
+				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('ui', 'add_betriebsmittel')}}</p>
+				<p v-else class="fw-bold mt-3">{{$p.t('ui', 'edit_betriebsmittel')}}</p>
+			</template>
 			
-				<core-filter-cmpt
-					ref="table"
-					:tabulator-options="tabulatorOptions"
-					:tabulator-events="tabulatorEvents"
-					table-only
-					:side-menu="false"
-					reload
-					new-btn-show
-					new-btn-label="Betriebsmittel"
-					@click:new="actionNewBetriebsmittel"
-					>
-				</core-filter-cmpt>
-			
-			</div>
-			
-
-			
-			<form-form class="row g-3 col-6" ref="betriebsmittelData">
+			<core-form class="row g-3" ref="betriebsmittelData">		
 				<legend>Details</legend>
-				
 				<div class="row mb-3">
-					<div class="col-sm-7">
-						<p v-if="statusNew" class="fw-bold">{{$p.t('ui', 'add_betriebsmittel')}}</p>
-						<p v-else class="fw-bold">{{$p.t('ui', 'edit_betriebsmittel')}}</p>
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
-					<div class="col-sm-6">
-						<form-input
+					<form-input
 						type="select"
-						name="typ"
+						:label="$p.t('global/typ') + ' *'"
+						name="betriebsmitteltyp"
 						v-model="formData.betriebsmitteltyp"
 						:disabled="!statusNew"
 						>
@@ -327,138 +341,119 @@ export default {
 							>
 							{{entry.beschreibung}}
 						</option>
-						</form-input>
-					</div>
+					</form-input>
 				</div>
 			
 				<div v-if="formData.betriebsmitteltyp == 'Inventar'" class="row mb-3">
-					<label for="inventarnummer" class="form-label col-sm-4">{{$p.t('wawi', 'inventarnummer')}}</label>
-					<div class="col-sm-6">
-						<PvAutoComplete v-model="formData['inventarData']" optionLabel="dropdowntext" :suggestions="filteredInventar" @complete="searchInventar" minLength="3"/>
-					</div>
+					<form-input
+						type="autocomplete"
+						:label="$p.t('wawi/inventarnummer')"
+						name="betriebsmittel_id"
+						v-model="formData.inventarData"
+						option-label="dropdowntext" 
+						:suggestions="filteredInventar" 
+						@complete="searchInventar" 
+						:min-length="3"
+						>
+					</form-input>
 				</div>
 				<div v-else-if="formData.inventarnummer" class="row mb-3">
-				<label for="inventarnummer" class="form-label col-sm-4">{{$p.t('wawi', 'inventarnummer')}}</label>
-					<div class="col-sm-6">
-						<input type="text" :readonly="readonly" class="form-control" id="inventarnummer" v-model="formData.inventarnummer" :disabled="!statusNew">
-					</div>
+					<form-input
+						type="text"
+						:label="$p.t('wawi/inventarnummer')"
+						name="inventarnummer"
+						v-model="formData.inventarnummer"
+						:disabled="!statusNew"
+						>
+					</form-input>
 				</div>
 				
 				<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
-					<label for="nummer" class="form-label col-sm-4">{{$p.t('wawi', 'nummer')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="nummer"
-							v-model="formData['nummer']"
+					<form-input
+						type="text"
+						:label="$p.t('wawi/nummer')"
+						name="nummer"
+						v-model="formData.nummer"
 						>
-						</form-input>
-					</div>
+					</form-input>
 				</div>
 				
 				<div v-if="formData.betriebsmitteltyp!='Inventar' && !formData.inventarnummer" class="row mb-3">
-					<label for="nummer2" class="form-label col-sm-4">{{$p.t('wawi', 'nummer')}} 2</label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="nummer2"
-							v-model="formData['nummer2']"
+					<form-input
+						type="text"
+						:label="$p.t('wawi/nummer') + ' 2'"
+						name="nummer2"
+						v-model="formData.nummer2"
 						>
-						</form-input>
-					</div>
+					</form-input>
 				</div>
 			
 				<div v-if="formData.betriebsmitteltyp!='Inventar'" class="row mb-3">
-					<label for="beschreibung" class="form-label col-sm-4">{{$p.t('global', 'beschreibung')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="textarea"
-							name="beschreibung"
-							v-model="formData['beschreibung']"
-							:disabled="formData.inventarnummer"
+					<form-input
+						type="textarea"
+						:label="$p.t('global/beschreibung')"
+						name="beschreibung"
+						v-model="formData.beschreibung"
+						:disabled="formData.inventarnummer"
 						>
-						</form-input>
-					</div>
+					</form-input>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="kaution" class="form-label col-sm-4">{{$p.t('infocenter', 'kaution')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="text"
-							name="kaution"
-							v-model="formData['kaution']"
+					<form-input
+						type="text"
+						:label="$p.t('infocenter/kaution')"
+						name="kaution"
+						v-model="formData.kaution"
 						>
-						</form-input>
-					</div>
+					</form-input>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="anmerkung" class="form-label col-sm-4">{{$p.t('global', 'anmerkung')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="textarea"
-							name="anmerkung"
-							v-model="formData['anmerkung']"
+					<form-input
+						type="textarea"
+						:label="$p.t('global/anmerkung')"
+						name="anmerkung"
+						v-model="formData.anmerkung"
 						>
-						</form-input>
-					</div>
+					</form-input>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="ausgegebenam" class="form-label col-sm-4">{{$p.t('wawi', 'ausgegebenam')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="DatePicker"
-							:readonly="readonly"
-							name="datum"
-							v-model="formData['ausgegebenam']"
-							auto-apply
-							:enable-time-picker="false"
-							format="dd.MM.yyyy"
-							preview-format="dd.MM.yyyy"
-							:teleport="true"
-						></form-input>
-					</div>
+					<form-input
+						type="DatePicker"
+						:label="$p.t('wawi/ausgegebenam')"
+						name="ausgegebenam"
+						v-model="formData.ausgegebenam"
+						auto-apply
+						:enable-time-picker="false"
+						format="dd.MM.yyyy"
+						preview-format="dd.MM.yyyy"
+						:teleport="true"
+						>
+					</form-input>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="retouram" class="form-label col-sm-4">{{$p.t('wawi', 'retouram')}}</label>
-					<div class="col-sm-6">
-						<form-input
-							type="DatePicker"
-							:readonly="readonly"
-							name="datum"
-							v-model="formData['retouram']"
-							auto-apply
-							:enable-time-picker="false"
-							format="dd.MM.yyyy"
-							preview-format="dd.MM.yyyy"
-							:teleport="true"
-						></form-input>
-					</div>
+					<form-input
+						type="DatePicker"
+						:label="$p.t('wawi/retouram')"
+						name="retouram"
+						v-model="formData.retouram"
+						auto-apply
+						:enable-time-picker="false"
+						format="dd.MM.yyyy"
+						preview-format="dd.MM.yyyy"
+						:teleport="true"
+						>
+					</form-input>
 				</div>
-				
-
-				<div class="row mb-3">
-				<label class="form-label col-sm-8"></label>
-					<div v-if="statusNew" class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-primary" @click="addNewBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
-					</div>
-					<div v-else class="col-sm-4">
-						<button ref="Close" type="button" class="btn btn-primary" @click="updateBetriebsmittel()">{{$p.t('ui', 'speichern')}}</button>
-					</div>
-					
-				</div>
-		</form-form>
-		
-		</div>
-
-
-
-
-
-		
+			</core-form>
+			
+			<template #footer>
+				<button type="button" class="btn btn-primary" @click="statusNew ? addNewBetriebsmittel() : updateBetriebsmittel(formData.betriebsmittelperson_id)">{{$p.t('ui', 'speichern')}}</button>
+			</template>
+		</bs-modal>
 	</div>`
 }
 

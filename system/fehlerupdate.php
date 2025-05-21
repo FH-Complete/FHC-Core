@@ -286,6 +286,14 @@ $fehlerArr = array(
 		'app' => 'core'
 	),
 	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0016',
+		'fehler_kurzbz' => 'DualesStudiumOhneMarkierung',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'StudentIn in dualem Studiengang nicht als dual markiert (prestudent_id %s, Studienplan %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
 		'fehlercode' => 'CORE_PERSON_0001',
 		'fehler_kurzbz' => 'GbDatumWeitZurueck',
 		'fehlercode_extern' => null,
@@ -314,6 +322,22 @@ $fehlerArr = array(
 		'fehler_kurzbz' => 'FalscheAnzahlZustelladressen',
 		'fehlercode_extern' => null,
 		'fehlertext' => 'Es sind mehrere oder keine Zustelladressen eingetragen',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_PERSON_0005',
+		'fehler_kurzbz' => 'geburtsnationFehlt',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Geburtsnation nicht vorhanden',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_PERSON_0006',
+		'fehler_kurzbz' => 'uhstatPersonkennungFehltCore',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Personkennung fehlt (vBpk AS, vBpk BF oder Ersatzkennzeichen fehlt)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	)

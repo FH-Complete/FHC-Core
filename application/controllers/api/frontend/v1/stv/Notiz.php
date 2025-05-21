@@ -11,9 +11,9 @@ class Notiz extends Notiz_Controller
 		parent::__construct([
 			'getUid' => ['admin:r', 'assistenz:r'],
 			'getNotizen' => ['admin:r', 'assistenz:r'],
-			'loadNotiz' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'addNewNotiz' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
-			'updateNotiz' => 'assistenz:r', // TODO(manu): self::PERM_LOGGED
+			'loadNotiz' => ['admin:r', 'assistenz:r'], // TODO(manu): self::PERM_LOGGED
+			'addNewNotiz' => ['admin:rw', 'assistenz:rw'], // TODO(manu): self::PERM_LOGGED
+			'updateNotiz' => ['admin:rw', 'assistenz:rw'], // TODO(manu): self::PERM_LOGGED
 			'deleteNotiz' => ['admin:r', 'assistenz:r'],
 			'loadDokumente' => ['admin:r', 'assistenz:r'],
 			'getMitarbeiter' => ['admin:r', 'assistenz:r']

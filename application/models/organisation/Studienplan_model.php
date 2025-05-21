@@ -119,4 +119,19 @@ class Studienplan_model extends DB_Model
 			'lv.lehrveranstaltung_id' => $lehrveranstaltung_id
 		]);
 	}
+
+	public function getStudienplaeneByPrestudents($prestudent_id)
+	{
+		$this->addDistinct();
+		$this->addSelect($this->dbTable . '.*');
+		$this->addSelect('sem.start AS start_stsem');
+		$this->addJoin('lehre.tbl_studienordnung o', 'studienordnung_id');
+		$this->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+		$this->addJoin('public.tbl_studiensemester sem', 'sem.studiensemester_kurzbz = o.gueltigvon', 'LEFT');
+		$this->addOrder('sem.start');
+
+		return $this->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
+	}
 }

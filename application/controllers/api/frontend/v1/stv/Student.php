@@ -33,20 +33,29 @@ class Student extends FHCAPI_Controller
 	 */
 	public function __construct()
 	{
-		// TODO(chris): permissions
 		parent::__construct([
 			'get' => ['admin:r', 'assistenz:r'],
-			'save' => ['admin:w', 'assistenz:w'],
-			'check' => ['admin:w', 'assistenz:w'],
-			'add' => ['admin:w', 'assistenz:w']
+			'save' => ['admin:rw', 'assistenz:rw'],
+			'check' => ['admin:rw', 'assistenz:rw'],
+			'add' => ['admin:rw', 'assistenz:rw'] // TODO(chris): extra permissions
 		]);
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 
+		if ($this->router->method == 'get'
+			|| $this->router->method == 'save'
+		) {
+			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
+			if ($this->router->method == 'get')
+				$this->checkPermissionsForPrestudent($prestudent_id, ['admin:r', 'assistenz:r']);
+			else
+				$this->checkPermissionsForPrestudent($prestudent_id, ['admin:rw', 'assistenz:rw']);
+		}
+
 		// Load language phrases
 		$this->loadPhrases([
-			'ui'
+			'ui', 'lehre'
 		]);
 	}
 
@@ -133,9 +142,10 @@ class Student extends FHCAPI_Controller
 		
 		$result = $this->udflib->getCiValidations($this->PersonModel, $this->input->post());
 
-		$fieldValidations = $this->getDataOrTerminateWithError($result);
+		//TODO(Manu) check with Chris: input number not allowed
+		$udf_field_validations = $this->getDataOrTerminateWithError($result);
 
-		$this->form_validation->set_rules($fieldvalidations);
+		$this->form_validation->set_rules($udf_field_validations);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -145,6 +155,8 @@ class Student extends FHCAPI_Controller
 		$student = $this->getDataOrTerminateWithError($result);
 
 		$uid = $student ? current($student)->student_uid : null;
+
+		$studiengang_kz = $student ? current($student)->studiengang_kz : null;
 
 		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
@@ -213,20 +225,35 @@ class Student extends FHCAPI_Controller
 
 		// Check PKs
 		if (count($update_lehrverband) + count($update_student) && $uid === null) {
-			// TODO(chris): phrase
-			$this->terminateWithValidationErrors(['' => "Kein/e StudentIn vorhanden!"]);
+			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_student')]);
 		}
 		if (count($update_person) && $person_id === null) {
-			// TODO(chris): phrase
-			$this->terminateWithValidationErrors(['' => "Keine Person vorhanden!"]);
+			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_person')]);
 		}
 
 		// Do Updates
 		if (count($update_lehrverband)) {
-			$result = $this->StudentlehrverbandModel->update([
+			$curstudlvb = $this->StudentlehrverbandModel->load([
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'student_uid' => $uid
-			], $update_lehrverband);
+			]);
+
+			if(hasData($curstudlvb) && count(getData($curstudlvb)) > 0 )
+			{
+				$result = $this->StudentlehrverbandModel->update([
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'student_uid' => $uid
+				], $update_lehrverband);
+			}
+			else
+			{
+				$result = $this->StudentlehrverbandModel->insert(array_merge([
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'student_uid' => $uid,
+					'studiengang_kz' => $studiengang_kz
+				], $update_lehrverband));
+			}
+
 			$this->getDataOrTerminateWithError($result);
 		}
 
@@ -258,9 +285,7 @@ class Student extends FHCAPI_Controller
 	{
 		$this->load->library('form_validation');
 
-		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'callback_isValidDate', [
-			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
-		]);
+		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date');
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());

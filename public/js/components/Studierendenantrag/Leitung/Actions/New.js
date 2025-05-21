@@ -1,6 +1,8 @@
 import BsAlert from '../../../Bootstrap/Alert.js';
 import BsModal from '../../../Bootstrap/Modal.js';
 
+import ApiStudstatusLeitung from '../../../../api/factory/studstatus/leitung.js';
+
 export default {
 	components: {
 		BsModal,
@@ -35,16 +37,35 @@ export default {
 			});
 		},
 		loadData(evt) {
-			if (this.abortController)
-				this.abortController.abort();
+                        if( evt.query.length < 2 )
+                        {
+                            return false;
+                        }
+
+			if (this.abortController instanceof AbortController
+                            && this.abortController.signal.aborted === false)
+                        {
+                            this.abortController.abort();
+                        }
 			this.abortController = new AbortController();
 
-			this.$fhcApi.factory
-				.studstatus.leitung.getPrestudents(evt.query, this.abortController.signal)
+			this.$api
+				.call(ApiStudstatusLeitung.getPrestudents(evt.query), {
+					signal: this.abortController.signal,
+					timeout: 30000
+				})
 				.then(result => {
 					this.data = result.data;
+                                        this.abortController = null;
 				})
-				.catch(this.$fhcApi.handleSystemError);
+				.catch(error => {
+                                    if (this.abortController instanceof AbortController 
+                                        && this.abortController.signal.aborted === false)
+                                    {
+                                        this.abortController.abort();
+                                    }
+                                    this.$fhcAlert.handleSystemError(error);
+                                });
 		}
 	},
 	template: `

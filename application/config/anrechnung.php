@@ -1,6 +1,6 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 
 // Deadline for Application given as Time-Interval after Semesterstart.
@@ -21,3 +21,15 @@ $config['grades_blocking_application'] = array(
 $config['fbl'] = FALSE;
 //Enables Info Mails
 $config['send_mail'] = TRUE;
+
+// Display fields to explain equivalence of ECTS and LV-Inhalte
+$config['explain_equivalence'] = TRUE;
+
+// Displays infobox if set to true
+$config['display_infobox'] = [
+	'fristen' => TRUE,
+	'referenzbeispiele_ects' => TRUE,
+	'voraussetzungen' => TRUE,
+	'nachweisdokumente' => TRUE,
+	'herkunft_kenntnisse' => TRUE
+];

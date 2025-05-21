@@ -1,4 +1,9 @@
+import DmsItem from './Dms/Item.js';
+
 export default {
+	components: {
+		DmsItem
+	},
 	emits: [
 		'update:modelValue'
 	],
@@ -11,7 +16,15 @@ export default {
 		id: String,
 		name: String,
 		inputClass: [String, Array, Object],
-		noList: Boolean
+		noList: Boolean,
+		accept: {
+			type: String,
+			default: ''
+		},
+		disabled: {
+			type: Boolean,
+			default: false
+		}
 	},
 	methods: {
 		stringifyFile(file) {
@@ -79,15 +92,16 @@ export default {
 	},
 	template: `
 	<div class="form-upload-dms">
-		<input ref="upload" class="form-control" :class="inputClass" :id="id" :name="name" :multiple="multiple" type="file" @change="addFiles">
-		<ul v-if="modelValue.length && multiple && !noList" class="list-unstyled m-0">
-			<li v-for="(file, index) in modelValue" :key="index" class="d-flex mx-1 mt-1 align-items-start">
-				<span class="col-auto"><i class="fa fa-file me-1"></i></span>
-				<span class="col">{{ file.name }}</span>
-				<button class="col-auto btn btn-outline-secondary btn-p-0" @click="removeFile(index)">
-					<i class="fa fa-close"></i>
-				</button>
-			</li>
+		<input ref="upload" class="form-control" :disabled="disabled" :accept="accept" :class="inputClass" :id="id" :name="name" :multiple="multiple" type="file" @change="addFiles">
+		<ul v-if="modelValue.length && multiple && !noList" :accept="accept" class="list-unstyled m-0">
+			<dms-item
+				v-for="(file, index) in modelValue"
+				:key="index"
+				v-model="file"
+				class="d-flex mx-1 mt-1 align-items-start"
+				@delete="removeFile(index)"
+				>
+			</dms-item>
 		</ul>
 	</div>`
 }

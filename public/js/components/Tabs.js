@@ -61,7 +61,7 @@ export default {
 					.then(this.initConfig)
 					.catch(this.$fhcAlert.handleSystemError);
 			if (typeof config === 'string' || config instanceof String)
-				return this.$fhcApi
+				return this.$api
 					.get(config)
 					.then(result => result.data)
 					.then(this.initConfig)
@@ -75,7 +75,7 @@ export default {
 
 				tabs[key] = {
 					component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
-					title: item.title || key,
+					title: Vue.computed(() => item.title || key),
 					config: item.config,
 					key
 				}

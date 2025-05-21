@@ -3,6 +3,9 @@ import CoreForm from '../../Form/Form.js';
 import FormValidation from '../../Form/Validation.js';
 import FormInput from '../../Form/Input.js';
 
+import ApiStudstatusAbmeldung from '../../../api/factory/studstatus/abmeldung.js';
+import ApiCheckperson from '../../../api/factory/checkperson.js';
+
 var _uuid = 0;
 
 export default {
@@ -26,7 +29,8 @@ export default {
 			saving: false,
 			formData: {
 				grund: ''
-			}
+			},
+			unrulyInternal: false
 		}
 	},
 	computed: {
@@ -44,8 +48,8 @@ export default {
 	},
 	methods: {
 		load() {
-			return this.$fhcApi.factory
-				.studstatus.abmeldung.getDetails(this.studierendenantragId, this.prestudentId)
+			return this.$api
+				.call(ApiStudstatusAbmeldung.getDetails(this.studierendenantragId, this.prestudentId))
 				.then(result => {
 					this.data = result.data;
 					if (this.data.status) {
@@ -70,13 +74,24 @@ export default {
 			this.saving = true;
 
 			this.$refs.form.clearValidation();
-			this.$refs.form.factory
-				.studstatus.abmeldung.create(
+			this.$refs.form
+				.call(ApiStudstatusAbmeldung.create(
 					this.data.studiensemester_kurzbz,
 					this.data.prestudent_id,
 					this.formData.grund
-				)
+				))
 				.then(result => {
+
+					if (this.unrulyInternal) {
+						this.$api
+							.call(ApiCheckperson.updatePersonUnrulyStatus(this.data.person_id, true))
+							.then(res => {
+								if (res?.meta?.status === "success") {
+									this.$fhcAlert.alertSuccess(this.$p.t('studierendenantrag', 'antrag_unruly_updated'))
+								}
+							});
+					}
+
 					if (result.data === true)
 						document.location += "";
 					
@@ -106,10 +121,15 @@ export default {
 			this.formData.grund = event.target.value
 				? this.$p.t('studierendenantrag', event.target.value)
 				: '';
-		},
+		}
 	},
 	created() {
 		this.uuid = _uuid++;
+	},
+	watch: {
+		'formData.grund'(newVal) {
+			this.unrulyInternal = (newVal === this.$p.t('studierendenantrag', 'textLong_unruly'))
+		}
 	},
 	template: `
 	<div class="studierendenantrag-form-abmeldung">
@@ -172,7 +192,11 @@ export default {
 							<option value="textLong_plageat">{{$p.t('studierendenantrag', 'dropdown_plageat')}}
 							</option>					
 							<option value="textLong_MissingZgv">{{$p.t('studierendenantrag', 'dropdown_MissingZgv')}}
-							</option>						
+							</option>	
+<!--
+							<option value="textLong_unruly">{{$p.t('studierendenantrag', 'dropdown_unruly')}}
+							</option>
+-->
 						</select>	
 					</div>
 					<form-input

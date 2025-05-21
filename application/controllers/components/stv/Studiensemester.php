@@ -2,12 +2,16 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studiensemester extends FHC_Controller
+class Studiensemester extends Auth_Controller
 {
 	public function __construct()
 	{
 		// TODO(chris): access!
-		parent::__construct();
+		parent::__construct([
+			'index' => self::PERM_LOGGED,
+			'now' => self::PERM_LOGGED,
+			'set' => self::PERM_LOGGED
+		]);
 	}
 
 	public function index()
@@ -28,7 +32,7 @@ class Studiensemester extends FHC_Controller
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
-		$result = $this->StudiensemesterModel->getAkt();
+		$result = $this->StudiensemesterModel->getNearest();
 
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);

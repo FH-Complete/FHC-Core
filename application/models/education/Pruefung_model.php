@@ -37,6 +37,35 @@ class Pruefung_model extends DB_Model
 		return $this->execQuery($qry, array($person_id, $studiensemester_kurzbz));
 	}
 
+	/**
+	 * Gets Pruefungen of a student for a Lehrveranstaltung.
+	 * 
+	 * @param string		$uid
+	 * @param string		$lehrveranstaltung_id
+	 * @param string|null	$sprache
+	 * 
+	 * @return object
+	 */
+	public function getByStudentAndLv($uid, $lehrveranstaltung_id, $sprache = null)
+	{
+		// TODO(chris): Potentielle Anpassung "Eine UID"
+		$this->dbTable = 'lehre.tbl_pruefung';
+
+		if ($sprache) {
+			$sprache_qry = $this->db->compile_binds('SELECT index FROM public.tbl_sprache WHERE sprache = ?', [$sprache]);
+			$bezeichnung = 'bezeichnung_mehrsprachig[(' . $sprache_qry . ')]';
+		} else {
+			$bezeichnung = 'bezeichnung';
+		}
+
+		$this->addSelect($this->dbTable . '.pruefung_id, ' . $this->dbTable . '.pruefungstyp_kurzbz, ' . $this->dbTable . '.datum, COALESCE(n.' . $bezeichnung . ', n.note::text) AS note');
+
+		$this->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
+		$this->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
+		$this->addJoin('lehre.tbl_note n', 'note');
+
+		return $this->loadWhere(['lehrveranstaltung_id' => $lehrveranstaltung_id, 'student_uid' => $uid]);
+	}
 
     /**
      * NOTE(chris): not used
@@ -175,6 +204,8 @@ class Pruefung_model extends DB_Model
 		$this->addSelect('campus.get_status_studierendenantrag(a.studierendenantrag_id) status');
 		$this->addSelect('pss.ausbildungssemester');
 
+		$this->addJoin('(SELECT MAX(datum) AS datum, lehreinheit_id AS le_id, student_uid AS stud_uid FROM lehre.tbl_pruefung p WHERE pruefungstyp_kurzbz IN (\'kommPruef\', \'zusKommPruef\') GROUP BY lehreinheit_id, student_uid) lpd',
+			'p.datum = lpd.datum AND p.lehreinheit_id = lpd.le_id AND p.student_uid = lpd.stud_uid');
 		$this->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
 		$this->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
 		$this->addJoin('public.tbl_student s', 'student_uid');

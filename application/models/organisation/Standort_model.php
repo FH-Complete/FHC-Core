@@ -28,5 +28,12 @@ class Standort_model extends DB_Model
 
 		return $this->execQuery($qry);
 	}
+
+	public function getStandorteByFirma($firma_id)
+	{
+		$this->addSelect("DISTINCT ON (standort_id) bezeichnung, standort_id");
+
+		return $this->loadWhere(array("firma_id" => $firma_id));
+	}
 }
 

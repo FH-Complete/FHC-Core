@@ -5,6 +5,7 @@ import PvTree from "../../../../../index.ci.php/public/js/components/primevue/tr
 import PvTreetable from "../../../../../index.ci.php/public/js/components/primevue/treetable/treetable.esm.min.js";
 import PvColumn from "../../../../../index.ci.php/public/js/components/primevue/column/column.esm.min.js";
 
+import ApiStvVerband from '../../../api/factory/stv/verband.js';
 
 export default {
 	components: {
@@ -19,6 +20,7 @@ export default {
 		return {
 			loading: true,
 			nodes: [],
+			selectedKey: [],
 			filters: {}, // TODO(chris): filter only 1st level?
 			favnodes: [],
 			favorites: {on: false, list: []}
@@ -37,7 +39,7 @@ export default {
 			let res = arr.filter(n => n.key == key);
 			if (res.length)
 				return res.pop();
-			res = arr.map(n => n.children ? this.findNodeByKey(key, n.children) : null).filter();
+			res = arr.map(n => n.children ? this.findNodeByKey(key, n.children) : null).filter(a => a);
 			if (res.length)
 				return res.pop();
 			return null;
@@ -53,8 +55,8 @@ export default {
 					});
 					this.loading = true;
 					
-					this.$fhcApi
-						.get('api/frontend/v1/stv/verband/' + node.data.link)
+					this.$api
+						.call(ApiStvVerband.get(node.data.link))
 						.then(result => result.data)
 						.then(result => {
 							const subNodes = result.map(this.mapResultToTreeData);
@@ -83,7 +85,7 @@ export default {
 		},
 		onSelectTreeNode(node) {
 			if (node.data.link)
-				this.$emit('selectVerband', {link: 'components/stv/students/' + node.data.link, studiengang_kz: node.data.stg_kz});
+				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz});
 		},
 		mapResultToTreeData(el) {
 			const cp = {
@@ -105,7 +107,10 @@ export default {
 				this.favnodes = await this.loadNodes(this.favorites.list);
 			}
 			this.favorites.on = !this.favorites.on;
-			CoreRESTClient.post("components/stv/favorites/set", {favorites: JSON.stringify(this.favorites)});
+			this.$api
+				.call(ApiStvVerband.favorites.set(
+					JSON.stringify(this.favorites)
+				));
 			this.loading = false;
 		},
 		async loadNodes(links) {
@@ -129,8 +134,8 @@ export default {
 			let promises = [];
 			for (let parent in sortedInParents)
 				promises.push(
-					this.$fhcApi
-						.get('api/frontend/v1/stv/verband/' + (parent == '_' ? '' : parent))
+					this.$api
+						.call(ApiStvVerband.get(parent == '_' ? '' : parent))
 						.then(res => res.data)
 						.then(res => res.filter(node => sortedInParents[parent].includes(node.link + '')))
 				);
@@ -156,7 +161,10 @@ export default {
 				this.favorites.list.push(key.data.link + '');
 			}
 			
-			CoreRESTClient.post("components/stv/favorites/set", {favorites: JSON.stringify(this.favorites)});
+			this.$api
+				.call(ApiStvVerband.favorites.set(
+					JSON.stringify(this.favorites)
+				));
 		},
 		unsetFavFocus(e) {
 			if (e.target.dataset?.linkFavAdd !== undefined) {
@@ -176,20 +184,19 @@ export default {
 		}
 	},
 	mounted() {
-		this.$fhcApi
-			.get('api/frontend/v1/stv/verband')
-			.then(result => result.data)
+		this.$api
+			.call(ApiStvVerband.get())
 			.then(result => {
-				this.nodes = result.map(this.mapResultToTreeData);
+				this.nodes = result.data.map(this.mapResultToTreeData);
 				this.loading = false;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		CoreRESTClient
-			.get("components/stv/favorites")
-			.then(result => result.data)
+
+		this.$api
+			.call(ApiStvVerband.favorites.get())
 			.then(result => {
-				if (result) {
-					let f = JSON.parse(result);
+				if (result.data) {
+					let f = JSON.parse(result.data);
 					if (f.on) {
 						this.loading = true;
 						this.favorites = f;
@@ -211,6 +218,7 @@ export default {
 			:value="filteredNodes"
 			@node-expand="onExpandTreeNode"
 			selection-mode="single"
+			v-model:selection-keys="selectedKey"
 			@node-select="onSelectTreeNode"
 			scrollable
 			scroll-height="flex"

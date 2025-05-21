@@ -17,10 +17,17 @@ $sitesettings = array(
 	)
 );
 
-$this->load->view(
-	'templates/FHC-Header',
-	$sitesettings
-);
+if(defined('CIS4')){
+	$this->load->view(
+		'templates/CISVUE-Header',
+		$sitesettings
+	);
+}else{
+	$this->load->view(
+		'templates/FHC-Header',
+		$sitesettings
+	);
+}
 ?>
 
 <div id="wrapper">
@@ -150,8 +157,6 @@ $this->load->view(
 											break;
 										case Studierendenantrag_model::TYP_ABMELDUNG_STGL:
 											$allowed = [
-												Studierendenantragstatus_model::STATUS_APPROVED,
-												Studierendenantragstatus_model::STATUS_OBJECTED,
 												Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
 												Studierendenantragstatus_model::STATUS_DEREGISTERED
 											];
@@ -223,7 +228,14 @@ $this->load->view(
 </div>
 
 <?php
-$this->load->view(
-	'templates/FHC-Footer',
-	$sitesettings
-);
+if (defined('CIS4')) {
+	$this->load->view(
+		'templates/CISVUE-Footer',
+		$sitesettings
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Footer',
+		$sitesettings
+	);
+}

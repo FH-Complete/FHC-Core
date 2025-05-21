@@ -27,15 +27,15 @@ class Verband extends FHCAPI_Controller
 {
 	public function __construct()
 	{
-		// TODO(chris): permissions
 		$permissions = [];
 		$router = load_class('Router');
-		$permissions[$router->method] = self::PERM_LOGGED;
+		$permissions[$router->method] = ['admin:r', 'assistenz:r'];
 		parent::__construct($permissions);
 
 		// Load Models
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 	}
+	
 	/**
 	 * Remap calls:
 	 * /
@@ -56,6 +56,13 @@ class Verband extends FHCAPI_Controller
 		if ($method == '' || $method == 'index')
 			return $this->getBase();
 
+		// NOTE(chris): Test if access is allowed ($method is the Studiengang)
+		if (!$this->permissionlib->isBerechtigt('assistenz', 's', $method)
+			&& !$this->permissionlib->isBerechtigt('admin', 's', $method)
+		) {
+			return $this->_outputAuthError([$method => ['admin:r', 'assistenz:r']]);
+		}
+
 		$count = count($params);
 		if (!$count)
 			return $this->getStudiengang($method);
@@ -63,12 +70,16 @@ class Verband extends FHCAPI_Controller
 		if ($count == 1) {
 			if (is_numeric($params[0]))
 				return $this->getSemester($method, $params[0]);
+			elseif ($params[0] == 'prestudent')
+				return $this->terminateWithSuccess($this->getStdSem($method . '/prestudent/', $method));
 			else
 				return $this->getStudiengang($method, $params[0]);
 		}
 		if ($count == 2) {
 			if (is_numeric($params[0]))
 				return $this->getVerband($method, $params[0], $params[1]);
+			elseif ($params[1] == 'prestudent')
+				return $this->terminateWithSuccess($this->getStdSem($method . '/' . $params[0] . '/prestudent/', $method));
 			else
 				return $this->getSemester($method, $params[1], $params[0]);
 		}
@@ -87,7 +98,10 @@ class Verband extends FHCAPI_Controller
 		
 		$this->StudiengangModel->addDistinct();
 		$this->StudiengangModel->addSelect("v.studiengang_kz AS link");
-		$this->StudiengangModel->addSelect("CONCAT(kurzbzlang, ' (', UPPER(CONCAT(typ, kurzbz)), ') - ', tbl_studiengang.bezeichnung) AS name", false);
+		$this->StudiengangModel->addSelect(
+			"CONCAT(kurzbzlang, ' (', UPPER(CONCAT(typ, kurzbz)), ') - ', tbl_studiengang.bezeichnung) AS name",
+			false
+		);
 		$this->StudiengangModel->addSelect('erhalter_kz');
 		$this->StudiengangModel->addSelect('typ');
 		$this->StudiengangModel->addSelect('kurzbz');
@@ -98,31 +112,40 @@ class Verband extends FHCAPI_Controller
 		$this->StudiengangModel->addOrder('typ');
 		$this->StudiengangModel->addOrder('kurzbz');
 
+		$stgs = $this->permissionlib->getSTG_isEntitledFor('admin') ?: [];
+		$stgs = array_merge($stgs, $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: []);
+
+		if (!$stgs)
+			$this->terminateWithSuccess([]);
+
+		$this->StudiengangModel->db->where_in('studiengang_kz', $stgs);
+
 		$result = $this->StudiengangModel->loadWhere(['v.aktiv' => true]);
 
 		$list = $this->getDataOrTerminateWithError($result);
 
-		$list[] = [
-			'name' => 'International',
-			'link' => 'inout',
-			'children' => [
-				[
-					'name' => 'Incoming',
-					'link' => 'inout/incoming',
-					'leaf' => true
-				],
-				[
-					'name' => 'Outgoing',
-					'link' => 'inout/outgoing',
-					'leaf' => true
-				],
-				[
-					'name' => 'Gemeinsame Studien',
-					'link' => 'inout/gemeinsamestudien',
-					'leaf' => true
+		if ($this->permissionlib->isBerechtigt('inout/uebersicht'))
+			$list[] = [
+				'name' => 'International',
+				'link' => 'inout',
+				'children' => [
+					[
+						'name' => 'Incoming',
+						'link' => 'inout/incoming',
+						'leaf' => true
+					],
+					[
+						'name' => 'Outgoing',
+						'link' => 'inout/outgoing',
+						'leaf' => true
+					],
+					[
+						'name' => 'Gemeinsame Studien',
+						'link' => 'inout/gemeinsamestudien',
+						'leaf' => true
+					]
 				]
-			]
-		];
+			];
 		$this->terminateWithSuccess($list);
 	}
 
@@ -145,7 +168,7 @@ class Verband extends FHCAPI_Controller
 		$this->StudiengangModel->addSelect("CONCAT(UPPER(CONCAT(typ, kurzbz)), '-', semester, (SELECT CASE WHEN bezeichnung IS NULL OR bezeichnung='' THEN ''::TEXT ELSE CONCAT(' (', bezeichnung, ')') END FROM public.tbl_lehrverband WHERE studiengang_kz=v.studiengang_kz AND semester=v.semester ORDER BY verband, gruppe LIMIT 1)) AS name", false);
 
 		$this->StudiengangModel->addSelect('semester');
-		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . ' AS stg_kz', false);
+		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . '::integer AS stg_kz', false);
 		
 		$this->StudiengangModel->addOrder('semester');
 
@@ -179,8 +202,6 @@ class Verband extends FHCAPI_Controller
 					$this->StudienordnungModel->addDistinct();
 					$this->StudienordnungModel->addSelect("CONCAT(studiengang_kz, '/', p.orgform_kurzbz) AS link");
 					$this->StudienordnungModel->addSelect("p.orgform_kurzbz AS name");
-
-					// TODO(chris): semester for gruppe_kurzbz <- what did i mean by that?
 
 					$this->StudienordnungModel->addJoin('lehre.tbl_studienplan p', 'studienordnung_id');
 
@@ -223,7 +244,7 @@ class Verband extends FHCAPI_Controller
 
 		$this->GruppeModel->addSelect('sort');
 		$this->GruppeModel->addSelect('gruppe_kurzbz');
-		$this->GruppeModel->addSelect($this->GruppeModel->escape($studiengang_kz) . ' AS stg_kz', false);
+		$this->GruppeModel->addSelect($this->GruppeModel->escape($studiengang_kz) . '::integer AS stg_kz', false);
 
 		$this->GruppeModel->addOrder('sort');
 		$this->GruppeModel->addOrder('gruppe_kurzbz');
@@ -251,7 +272,7 @@ class Verband extends FHCAPI_Controller
 		$this->StudiengangModel->addSelect("CASE WHEN MAX(gruppe)='' OR MAX(gruppe)=' ' THEN TRUE ELSE FALSE END AS leaf");
 
 		$this->StudiengangModel->addSelect('verband');
-		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . ' AS stg_kz', false);
+		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . '::integer AS stg_kz', false);
 		
 		$this->StudiengangModel->addOrder('verband');
 
@@ -299,7 +320,7 @@ class Verband extends FHCAPI_Controller
 		$this->StudiengangModel->addSelect("TRUE AS leaf", false);
 
 		$this->StudiengangModel->addSelect('gruppe');
-		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . ' AS stg_kz', false);
+		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . '::integer AS stg_kz', false);
 		
 		$this->StudiengangModel->addOrder('gruppe');
 
@@ -331,17 +352,19 @@ class Verband extends FHCAPI_Controller
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
-		$this->StudiensemesterModel->addOrder('start');
+		$this->load->model('system/Variable_model', 'VariableModel');
+		$result = $this->VariableModel->getVariables(getAuthUID(), ['number_displayed_past_studiensemester']);
+		$data = $this->getDataOrTerminateWithError($result);
+		$number_displayed_past_studiensemester = $data['number_displayed_past_studiensemester'] ?? null;
 
-		/**
-		 * TODO(chris): filter with variable:
-		 * - $number_displayed_past_studiensemester from Variable
-		 * - then: $stsem_obj->getPlusMinus(NULL, $number_displayed_past_studiensemester, 'ende ASC');
-		 */
+		$this->StudiensemesterModel->addPlusMinus(null, $number_displayed_past_studiensemester);
+		$this->StudiensemesterModel->addOrder('ende');
 		$result = $this->StudiensemesterModel->load();
 
 		$studiensemester = $this->getDataOrTerminateWithError($result);
 		$result = [];
+
+		$studiengang_kz = (int)$studiengang_kz;
 
 		foreach ($studiensemester as $sem) {
 			$semlink = $link . $sem->studiensemester_kurzbz;
@@ -381,12 +404,12 @@ class Verband extends FHCAPI_Controller
 								'children' => [
 									[
 										'name' => 'Nicht zum Reihungstest angemeldet',
-										'link' => $intlink . '/statusbestaetigt/reihungstestnichtangemeldet',
+										'link' => $intlink . '/statusbestaetigtrtnichtangemeldet',
 										'leaf' => true
 									],
 									[
 										'name' => 'Reihungstest angemeldet',
-										'link' => $intlink . '/statusbestaetigt/reihungstestangemeldet',
+										'link' => $intlink . '/statusbestaetigtrtangemeldet',
 										'leaf' => true
 									]
 								]
@@ -409,7 +432,33 @@ class Verband extends FHCAPI_Controller
 						'name' => 'Bewerber',
 						'link' => $semlink . '/bewerber',
 						'stg_kz' => $studiengang_kz,
-						'leaf' => true
+						'children' => [
+							[
+								'name' => 'Nicht zum Reihungstest angemeldet',
+								'link' => $intlink . '/bewerberrtnichtangemeldet',
+								'stg_kz' => $studiengang_kz,
+								'leaf' => true
+							],
+							[
+								'name' => 'Reihungstest angemeldet',
+								'link' => $intlink . '/bewerberrtangemeldet',
+								'stg_kz' => $studiengang_kz,
+								'children' => [
+									[
+										'name' => 'Teilgenommen',
+										'link' => $intlink . '/bewerberrtangemeldetteilgenommen',
+										'stg_kz' => $studiengang_kz,
+										'leaf' => true
+									],
+									[
+										'name' => 'Nicht teilgenommen',
+										'link' => $intlink . '/bewerberrtangemeldetnichtteilgenommen',
+										'stg_kz' => $studiengang_kz,
+										'leaf' => true
+									]
+								]
+							]
+						]
 					],
 					[
 						'name' => 'Aufgenommen',

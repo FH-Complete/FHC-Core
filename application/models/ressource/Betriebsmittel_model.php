@@ -17,7 +17,7 @@ class Betriebsmittel_model extends DB_Model
 	 */
 	public function loadInventarliste($filter)
 	{
-		$filter = strtoLower($filter);
+		$filter = urldecode(strtoLower($filter));
 
 		$qry = "
 			SELECT 
