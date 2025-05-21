@@ -13,6 +13,7 @@ import grades from './stv/grades.js';
 import mobility from './stv/mobility.js';
 import archiv from './stv/archiv.js';
 import documents from './stv/documents.js';
+import exemptions from './stv/exemptions.js';
 
 export default {
 	verband,
@@ -30,6 +31,7 @@ export default {
 	mobility,
 	archiv,
 	documents,
+	exemptions,
 	configStudent() {
 		return this.$fhcApi.get('api/frontend/v1/stv/config/student');
 	},
