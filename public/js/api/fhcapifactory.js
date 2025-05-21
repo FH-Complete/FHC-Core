@@ -33,6 +33,8 @@ import ort from "./ort.js";
 import cms from "./cms.js";
 import lehre from "./lehre.js";
 import addons from "./addons.js";
+import messages from "./messages.js";
+import vorlagen from "./vorlagen.js";
 import studiengang from "./studiengang.js";
 import menu from "./menu.js";
 import dashboard from "./dashboard.js";
@@ -57,6 +59,9 @@ export default {
     ort,
     cms,
     lehre,
+    addons,
+    messages,
+    vorlagen,
     addons,
 	studiengang,
 	menu,

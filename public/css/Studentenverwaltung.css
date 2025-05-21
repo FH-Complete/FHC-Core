@@ -4,6 +4,7 @@
 @import './components/FilterComponent.css';
 @import './components/Tabs.css';
 @import './components/Notiz.css';
+@import './components/Messages.css';
 
 html {
   font-size: .875em;
