@@ -128,7 +128,7 @@ export default {
 				.call(ApiStvProjektbetreuer.getDefaultStundensaetze(person_id, this.studiensemester_kurzbz))
 				.then(result => {
 					this.resetForm();
-					let projektbetreuerListe = this.$refs.table.tabulator.getData();
+					let projektbetreuerListe = this.$refs.projektbetreuerTable.tabulator.getData();
 					const idx = projektbetreuerListe.findIndex(
 							betr =>
 								betr.person_id === person_id &&
@@ -162,7 +162,7 @@ export default {
 					return this.deleteProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz)
 				})
 				.then(result => {
-					this.$refs.table.tabulator.deleteRow(betreuer_id);
+					this.$refs.projektbetreuerTable.tabulator.deleteRow(betreuer_id);
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -192,12 +192,12 @@ export default {
 				this.$api
 					.call(ApiStvProjektbetreuer.getProjektbetreuer(projektarbeit_id))
 					.then(result => {
-						this.$refs.table.tabulator.setData(this.addIds(result.data));
+						this.$refs.projektbetreuerTable.tabulator.setData(this.addIds(result.data));
 						this.resetForm();
 					})
 					.catch(this.$fhcAlert.handleSystemError);
 			} else {
-				this.$refs.table.tabulator.setData([]);
+				this.$refs.projektbetreuerTable.tabulator.setData([]);
 				this.resetForm();
 			}
 		},
@@ -206,9 +206,9 @@ export default {
 
 			if (typeof this.formData.betreuer_id == 'undefined') {
 				this.formData.betreuer_id = this.getNewBetreuerId();
-				this.$refs.table.tabulator.addData(this.addAutoCompleteBetreuerToFormData(this.formData));
+				this.$refs.projektbetreuerTable.tabulator.addData(this.addAutoCompleteBetreuerToFormData(this.formData));
 			} else {
-				this.$refs.table.tabulator.updateData([this.formData]);
+				this.$refs.projektbetreuerTable.tabulator.updateData([this.formData]);
 				this.statusNew = true;
 			}
 
@@ -228,7 +228,7 @@ export default {
 		saveProjektbetreuer(projektarbeit_id) {
 			this.confirmProjektbetreuer();
 			return this.$refs.formProjektbetreuer.call(
-				ApiStvProjektbetreuer.saveProjektbetreuer(projektarbeit_id, this.$refs.table.tabulator.getData())
+				ApiStvProjektbetreuer.saveProjektbetreuer(projektarbeit_id, this.$refs.projektbetreuerTable.tabulator.getData())
 			);
 		},
 		deleteProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz) {
@@ -252,7 +252,7 @@ export default {
 				});
 		},
 		validateProjektbetreuer() {
-			let alleBetreuer = this.$refs.table.tabulator.getData();
+			let alleBetreuer = this.$refs.projektbetreuerTable.tabulator.getData();
 
 			if (this.betreuerFormOpened) {
 				alleBetreuer.push(this.addAutoCompleteBetreuerToFormData(this.formData));
@@ -315,7 +315,7 @@ export default {
 		getNewBetreuerId() {
 			let max = 0;
 
-			for (const betreuer of this.$refs.table.tabulator.getData()) {
+			for (const betreuer of this.$refs.projektbetreuerTable.tabulator.getData()) {
 				if (betreuer.betreuer_id > max) max = betreuer.betreuer_id;
 			}
 
@@ -332,23 +332,23 @@ export default {
 			return false;
 		},
 		reload() {
-			this.$refs.table.reloadTable();
+			this.$refs.projektbetreuerTable.reloadTable();
 		}
 	},
 	template: `
 	<div class="stv-details-projektbetreuer h-100 pb-3">
 
-		<legend>{{this.$p.t('stv','betreuer')}}</legend>
+		<legend>{{this.$p.t('projektarbeit','betreuer')}}</legend>
 		<!-- <p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p> -->
 
 		<core-filter-cmpt
-			ref="table"
+			ref="projektbetreuerTable"
 			:tabulator-options="tabulatorOptions"
 			:tabulator-events="tabulatorEvents"
 			table-only
 			:side-menu="false"
 			new-btn-show
-			:new-btn-label="this.$p.t('stv', 'betreuer')"
+			:new-btn-label="this.$p.t('projektarbeit', 'betreuer')"
 			@click:new="actionNewProjektbetreuer"
 			>
 		</core-filter-cmpt>
@@ -372,7 +372,7 @@ export default {
 			<div class="row mb-3">
 				<form-input
 					container-class="col-6 stv-details-projektbetreuer-betreuerart"
-					:label="$p.t('global', 'betreuer')"
+					:label="$p.t('projektarbeit', 'betreuer')"
 					type="select"
 					v-model="formData.betreuerart_kurzbz"
 					name="betreuerart_kurzbz"

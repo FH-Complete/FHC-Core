@@ -4,7 +4,6 @@ import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 
-
 import ApiStvProjektarbeit from '../../../../../api/factory/stv/projektarbeit.js';
 import ProjektarbeitDetails from "./Details.js";
 import Projektbetreuer from "./Projektbetreuer.js";
@@ -30,11 +29,11 @@ export default {
 		$reloadList: {
 			from: '$reloadList',
 			required: true
-		},
-		isBerechtigtDocAndOdt: {
-			from: 'hasPermissionOutputformat',
-			default: false
 		}
+		//~ isBerechtigtDocAndOdt: {
+			//~ from: 'hasPermissionOutputformat',
+			//~ default: false
+		//~ }
 	},
 	computed: {
 		//~ studentUids() {
@@ -44,16 +43,16 @@ export default {
 			//~ }
 			//~ return this.student.map(e => e.uid);
 		//~ },
-		studentKzs(){
-			if (this.student.uid)
-			{
-				return [this.student.studiengang_kz];
-			}
-			return this.student.map(e => e.studiengang_kz);
-		},
-		stg_kz(){
-			return this.studentKzs.length > 0 ? this.studentKzs.length[0] : null;
-		}
+		//~ studentKzs(){
+			//~ if (this.student.uid)
+			//~ {
+				//~ return [this.student.studiengang_kz];
+			//~ }
+			//~ return this.student.map(e => e.studiengang_kz);
+		//~ },
+		//~ stg_kz(){
+			//~ return this.studentKzs.length > 0 ? this.studentKzs.length[0] : null;
+		//~ }
 	},
 	props: {
 		student: Object
@@ -220,19 +219,38 @@ export default {
 				{
 					event: 'tableBuilt',
 					handler: async() => {
-						await this.$p.loadCategory(['global', 'person', 'stv', 'ui']);
+						await this.$p.loadCategory(['global', 'person', 'stv', 'ui', 'projektarbeit']);
 
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
-						//~ cm.getColumnByField('vorsitz_nachname').component.updateDefinition({
-							//~ title: this.$p.t('abschlusspruefung', 'vorsitz_header')
-						//~ });
-						/*
-						cm.getColumnByField('actions').component.updateDefinition({
-						title: this.$p.t('global', 'aktionen')
-												});
-						*/
+						cm.getColumnByField('projekttyp_kurzbz').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'typ')
+						});
+						cm.getColumnByField('titel').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'titel')
+						});
+						cm.getColumnByField('beginn').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'beginn')
+						});
+						cm.getColumnByField('ende').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'ende')
+						});
+						cm.getColumnByField('freigegeben').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'freigegeben')
+						});
+						cm.getColumnByField('gesperrtbis').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'gesperrtBis')
+						});
+						cm.getColumnByField('themenbereich').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'themenbereich')
+						});
+						cm.getColumnByField('anmerkung').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'anmerkung')
+						});
+						cm.getColumnByField('firma_id').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'firmaId')
+						});
 					}
 				},
 			],

@@ -45,7 +45,8 @@ class Config extends FHCAPI_Controller
 			'lehre',
 			'stv',
 			'konto',
-			'abschlusspruefung'
+			'abschlusspruefung',
+			'projektarbeit'
 		]);
 
 		// Load Config

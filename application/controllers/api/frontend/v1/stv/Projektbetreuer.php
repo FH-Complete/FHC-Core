@@ -45,7 +45,8 @@ class Projektbetreuer extends FHCAPI_Controller
 	{
 		$projektarbeit_id = $this->input->get('projektarbeit_id');
 
-		if (!isset($projektarbeit_id)) $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Projektarbeit ID']), self::ERROR_TYPE_GENERAL);
+		if (!isset($projektarbeit_id))
+			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Projektarbeit ID']), self::ERROR_TYPE_GENERAL);
 
 		$this->ProjektbetreuerModel->addSelect(
 			'projektarbeit_id, person_id, nachname, vorname, note, punkte, round(stunden, 1) AS stunden,
@@ -98,14 +99,8 @@ class Projektbetreuer extends FHCAPI_Controller
 
 		$projektbetreuer = $this->input->post('projektbetreuerListe');
 
-		//$this->addMeta('form', $projektbetreuer);
-
 		if (!is_array($projektbetreuer))
-		{
-			return $this->terminateWithError(
-				$this->p->t('projektarbeit', 'error_invalidProjektbetreuer'), self::ERROR_TYPE_GENERAL
-			);
-		}
+			return $this->terminateWithError($this->p->t('projektarbeit', 'error_invalidProjektbetreuer'), self::ERROR_TYPE_GENERAL);
 
 		foreach ($projektbetreuer as $pb)
 		{
@@ -120,17 +115,6 @@ class Projektbetreuer extends FHCAPI_Controller
 
 		foreach ($projektbetreuer as $pb)
 		{
-		//~ $this->addMeta('form', $pb);
-		//~ error_log(print_r($pb, true));
-		//die();
-
-			//~ $this->ProjektbetreuerModel->addSelect('1');
-			//~ $checkResult = $this->ProjektbetreuerModel->loadWhere(
-				//~ ['person_id' => $pb['person_id'], 'projektarbeit_id' => $projektarbeit_id, 'betreuerart_kurzbz' => $pb['betreuerart_kurzbz']]
-			//~ );
-
-			//~ if (isError($checkResult)) $this->terminateWithError(getError($checkResult), self::ERROR_TYPE_GENERAL);
-
 			$betreuer = [
 				'projektarbeit_id' => $projektarbeit_id,
 				'person_id' => $pb['person_id'],
@@ -236,7 +220,9 @@ class Projektbetreuer extends FHCAPI_Controller
 	{
 		$searchString = $this->input->get('searchString');
 
-		if (!isset($searchString)) $this->terminateWithError($this->p->t('projektarbeit', 'error_searchStringMissing', self::ERROR_TYPE_GENERAL));
+		if (!isset($searchString))
+			$this->terminateWithError($this->p->t('ui', 'error_fieldRequired', ['field' => 'Search term']), self::ERROR_TYPE_GENERAL);
+
 
 		$result = $this->PersonModel->searchPerson($searchString);
 

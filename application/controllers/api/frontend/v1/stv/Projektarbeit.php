@@ -112,15 +112,15 @@ class Projektarbeit extends FHCAPI_Controller
 
 		$formData = $this->input->post('formData');
 
-		$this->addMeta('form', $formData);
-
 		if ($this->_validate($formData) == false)
 		{
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
+		$projektarbeit = $this->_getProjektarbeitArr($formData);
+
 		$result = $this->ProjektarbeitModel->insert(
-			array_merge($formData, ['insertamum' => date('c'), 'insertvon' => getAuthUID(), 'student_uid' => $student_uid])
+			array_merge($projektarbeit, ['insertamum' => date('c'), 'insertvon' => getAuthUID(), 'student_uid' => $student_uid])
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
@@ -145,9 +145,11 @@ class Projektarbeit extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
+		$projektarbeit = $this->_getProjektarbeitArr($formData);
+
 		$result = $this->ProjektarbeitModel->update(
 			$projektarbeit_id,
-			array_merge($formData, ['updateamum' => date('c'), 'updatevon' => getAuthUID()])
+			array_merge($projektarbeit, ['updateamum' => date('c'), 'updatevon' => getAuthUID()])
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
@@ -196,7 +198,8 @@ class Projektarbeit extends FHCAPI_Controller
 	{
 		$searchString = $this->input->get('searchString');
 
-		if (!isset($searchString)) $this->terminateWithError($this->p->t('projektarbeit', 'error_searchStringMissing', self::ERROR_TYPE_GENERAL));
+		if (!isset($searchString))
+			$this->terminateWithError($this->p->t('ui', 'error_fieldRequired', ['field' => 'Search term']), self::ERROR_TYPE_GENERAL);
 
 		$result = $this->FirmaModel->searchFirmen($searchString, $aktiv = true);
 
@@ -283,6 +286,29 @@ class Projektarbeit extends FHCAPI_Controller
 		]);
 
 		return $this->form_validation->run();
+	}
+
+	/**
+	 * 
+	 * @param
+	 * @return object success or error
+	 */
+	private function _getProjektarbeitArr($formData)
+	{
+		return [
+			'titel' => $formData['titel'],
+			'titel_english' => $formData['titel_english'] ?? null,
+			'themenbereich' => $formData['themenbereich'] ?? null,
+			'projekttyp_kurzbz' => $formData['projekttyp_kurzbz'],
+			'firma_id' => $formData['firma_id'] ?? null,
+			'lehreinheit_id' => $formData['lehreinheit_id'],
+			'beginn' => $formData['beginn'] ?? null,
+			'note' => $formData['note'] ?? null,
+			'final' => $formData['final'] ?? null,
+			'freigegeben' => $formData['freigegeben'] ?? null,
+			'anmerkung' => $formData['anmerkung'] ?? null,
+			'gesperrtbis' => $formData['gesperrtbis'] ?? null
+		];
 	}
 
 	/**

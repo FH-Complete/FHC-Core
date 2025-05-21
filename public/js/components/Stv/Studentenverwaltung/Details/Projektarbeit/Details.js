@@ -217,23 +217,25 @@ export default {
 		getPreparedFormData() {
 			let preparedFormData = JSON.parse(JSON.stringify(this.formData)); // deep copy
 
+			// set firma Id
+			if (preparedFormData.firma)
+				preparedFormData.firma_id = preparedFormData.firma.firma_id;
+			else
+				preparedFormData.firma_id = null;
+
 			// delete "helper" fields
 			if (preparedFormData.projektarbeit_id == null) delete(preparedFormData.projektarbeit_id);
-			if (preparedFormData.firma) preparedFormData.firma_id = preparedFormData.firma.firma_id;
 			delete(preparedFormData.firma);
 			delete(preparedFormData.firma_name);
 			delete(preparedFormData.lehrveranstaltung_id);
 
 			return preparedFormData;
 		}
-		//~ setDefaultFormData() {
-			//~ this.resetForm();
-		//~ },
 	},
 	template: `
 			<form-form v-if="!this.student.length" ref="formDetails" @submit.prevent>
 
-				<legend>{{this.$p.t('global','details')}}</legend>
+				<legend>Details</legend>
 				<p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p>
 
 				<div class="row mb-3">
@@ -242,8 +244,7 @@ export default {
 						type="text"
 						name="titel"
 						:label="$p.t('projektarbeit', 'titel')"
-						v-model="formData.titel"
-						>
+						v-model="formData.titel">
 					</form-input>
 				</div>
 
@@ -272,7 +273,7 @@ export default {
 				<div class="row mb-3">
 					<form-input
 						container-class="stv-details-projektarbeit-typ"
-						:label="$p.t('global', 'typ')"
+						:label="$p.t('projektarbeit', 'typ')"
 						type="select"
 						v-model="formData.projekttyp_kurzbz"
 						name="projekttyp_kurzbz"
@@ -326,7 +327,7 @@ export default {
 				<div class="row mb-3">
 					<form-input
 						container-class="stv-details-projektarbeit-le"
-						:label="$p.t('global', 'lvTeil')"
+						:label="$p.t('projektarbeit', 'lvTeil')"
 						type="select"
 						v-model="formData.lehreinheit_id"
 						name="lehreinheit_id"
@@ -370,7 +371,7 @@ export default {
 				<div class="row mb-3 align-items-center">
 					<form-input
 						container-class="col-8 stv-details-projektarbeit-gesperrtbis"
-						:label="$p.t('projektarbeit', 'gesperrtbis')"
+						:label="$p.t('projektarbeit', 'gesperrtBis')"
 						type="DatePicker"
 						v-model="formData.gesperrtbis"
 						auto-apply
@@ -413,7 +414,7 @@ export default {
 							container-class="form-check stv-details-projektarbeit-final"
 							type="checkbox"
 							name="final"
-							:label="$p.t('projektarbeit','final')"
+							label="final"
 							v-model="formData.final"
 						>
 						</form-input>
