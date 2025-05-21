@@ -337,7 +337,7 @@ export default {
 
 	<hr>
 
-	<div class="lvUebersicht align-items-start" >
+	<div class="lvUebersicht " >
 	<template v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
 		<div  class="card" v-if="Array.isArray(lehrveranstaltung.lehrveranstaltungen) && lehrveranstaltung.lehrveranstaltungen.length >0" >
 			<div class="card-header">

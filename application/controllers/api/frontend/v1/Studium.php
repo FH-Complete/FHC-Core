@@ -58,6 +58,27 @@ class Studium extends FHCAPI_Controller
 		$parameter_semester = $this->input->get('semester',true);
 		$parameter_studienplan = $this->input->get('studienplan',true);
 
+		$aktuelles_studiensemester = current($this->getDataOrTerminateWithError($this->StudiensemesterModel->getAkt()));
+		
+		if($this->getDataOrTerminateWithError($this->StudentModel->isStudent(getAuthUID()))){
+			$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $aktuelles_studiensemester->studiensemester_kurzbz]);
+			$studentLehrverband = current($this->getDataOrTerminateWithError($studentLehrverband));
+			
+			$student_studiensemester = $studentLehrverband->studiensemester_kurzbz;
+			$student_studiengang = $studentLehrverband->studiengang_kz;
+			$student_semester = $studentLehrverband->semester;
+			$student_studienplan = $this->getStudienPlanFromPrestudentStatus(getAuthPersonId())->studienplan_id;
+			
+			if(!isset($parameter_studiensemester))
+			$parameter_studiensemester = $student_studiensemester;
+			if(!isset($parameter_studiengang))
+			$parameter_studiengang = $student_studiengang;
+			if(!isset($parameter_semester))
+			$parameter_semester = $student_semester;
+			if(!isset($parameter_studienplan))
+			$parameter_studienplan = $student_studienplan;
+		}  
+
 		if(isset($parameter_studiensemester)){
 			$parameter_studiensemester = current($this->getDataOrTerminateWithError($this->StudiensemesterModel->loadWhere(["studiensemester_kurzbz" => $parameter_studiensemester])));
 		}
@@ -76,7 +97,7 @@ class Studium extends FHCAPI_Controller
 		// fetch studiensemester
 		$allStudienSemester = $this->getDataOrTerminateWithError($this->StudiensemesterModel->load());
 		
-		$aktuelles_studiensemester = current($this->getDataOrTerminateWithError($this->StudiensemesterModel->getAkt()));
+		
 		if(isset($parameter_studiensemester) && !empty(array_filter($allStudienSemester, function($studiensemester) use($parameter_studiensemester){
 			return $studiensemester->studiensemester_kurzbz == $parameter_studiensemester->studiensemester_kurzbz;
 		}))){
@@ -156,24 +177,7 @@ class Studium extends FHCAPI_Controller
 		$result->studienplan["preselected"]=$aktuelles_studienplan; 
 		$result->lehrveranstaltungen=$aktuelles_lehrveranstaltungen;  
 		
-		/* if($this->getDataOrTerminateWithError($this->StudentModel->isStudent(getAuthUID()))){
-			$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $aktuelles_studiensemester_kz]);
-			$studentLehrverband = current($this->getDataOrTerminateWithError($studentLehrverband));
-			$result->studentLehrverband = $studentLehrverband;
-			//$currentStudienplan = $this->StudienplanModel->loadWhere(["studiengang_kz"=>$studentLehrverband->studiengang_kz,"semester"=>$studentLehrverband->semester, "verband"=>$studentLehrverband->verband, "gruppe"=>$studentLehrverband->gruppe]);
-			$studienplaene = $this->getDataOrTerminateWithError($this->computeStudienplaene($studentLehrverband->studiengang_kz, $studentLehrverband->studiensemester_kurzbz));
-			$result->studienPleane = $studienplaene;
-			
-			//get the studienplan for the user
-			$preselectedStudienplan = $this->getStudienPlanFromPrestudentStatus(getAuthPersonId());
-
-			//set the preselected semester
-			$preselectedSemester = $preselectedStudienplan->semester;
-			
-			//get the studienordnung for the studienplan
-			$preselectedStudienordnung = $this->getStudienOrdnungForStudienplan($preselectedStudienplan->studienplan_id);
-			
-		}  */
+		
 		$this->terminateWithSuccess($result);
 	}
 
@@ -271,6 +275,7 @@ class Studium extends FHCAPI_Controller
 		},$lektoren);
 		return $lektoren;
 	}
+
 
 	
 	
