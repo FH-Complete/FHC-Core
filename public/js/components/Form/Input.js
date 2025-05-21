@@ -318,7 +318,7 @@ export default {
 			>
 			<slot></slot>
 		</component>
-		<label v-if="label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'">{{label}}</label>
+		<label v-if="label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'" v-html="label"></label>
 		<div v-if="valid !== undefined && feedback.length && !noFeedback" :class="feedbackClass">
 			<template v-for="(msg, i) in feedback" :key="i">
 				<hr v-if="i" class="m-0">
