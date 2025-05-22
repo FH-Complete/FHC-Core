@@ -12,7 +12,7 @@ export default {
 		<div class="card-body">
 			<p v-for="vertretung in vertretungsList">
 				<a v-if="profilViewLink(vertretung.uid)" :href="profilViewLink(vertretung.uid)">
-					<i class="me-2 fa fa-arrow-up-right-from-square" style="color:#00649C"></i>
+					<i class="me-2 fa fa-arrow-up-right-from-square fhc-primary-color" ></i>
 				</a>
 				{{vertretungFormatedName(vertretung,false)}}
 			</p>

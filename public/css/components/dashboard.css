@@ -1,6 +1,21 @@
 @import './calendar.css';
 @import './dashboard/news.css';
 
+:root{
+	--dashboard-danger: var(--fhc-danger);
+	--fhc-dashboard-grid-size: 4;
+}
+
+@media(max-width: 577px) {
+	:root {
+		--fhc-dashboard-grid-size: 1;
+	}
+}
+
+.core-dashboard a{
+	color: var(--fhc-link);
+}
+
 .empty-tile-hover {
 	height: 100%;
 	width: 100%;
@@ -22,8 +37,8 @@
 }
 
 .alert-danger .form-check-input:checked {
-	border-color: #842029;
-	background-color: #842029;
+	border-color: var(--dashboard-danger);
+	background-color: var(--dashboard-danger);
 }
 
 :root {
@@ -95,6 +110,10 @@
 	border:4px dashed lightgray;
 	z-index: 2;
 	opacity: 0.5;
+}
+
+#deleteBookmark i{
+	color: var(--fhc-danger);
 }
 
 .pin:hover{

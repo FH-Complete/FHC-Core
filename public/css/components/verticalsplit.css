@@ -3,9 +3,9 @@
     Author     : bambi
 */
 :root {
-    --fhc-verticalsplit-vsplitter-bg-color: #eee;
-    --fhc-verticalsplit-vsplitter-border-color: #eee;
-    --fhc-verticalsplit-vsplitter-splitactions-color: #000;
+    --fhc-verticalsplit-vsplitter-bg-color: var(--fhc-background);
+    --fhc-verticalsplit-vsplitter-border-color: var(--fhc-border);
+    --fhc-verticalsplit-vsplitter-splitactions-color: var(--fhc-dark);
 }
 
 .verticalsplitted {

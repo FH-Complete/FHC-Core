@@ -22,7 +22,7 @@ export default {
             <div v-for="email in data" class="col-12 ">
                 <div class="row align-items-center">
                     <div class="col-1 text-center">
-                        <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i>
+                        <i class="fa-solid fa-envelope fhc-link-color" ></i>
                     </div>
                     <div class="col-11">
                         <div class="form-underline">

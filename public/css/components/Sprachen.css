@@ -1,9 +1,13 @@
 .sprachen-entry{
-	background-color: var(--fhc-cis-primary-hover);
+	background-color: var(--fhc-primary);
+}
+
+.sprachen-entry:hover {
+	background-color: var(--fhc-primary);
 }
 
 [selected="true"].sprachen-entry {
-	background-color: var(--fhc-cis-primary);
+	background-color: var(--fhc-primary-highlight);
 }
 
 .sprachen-entry.btn {

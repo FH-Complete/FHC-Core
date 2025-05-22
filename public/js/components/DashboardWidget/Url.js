@@ -177,8 +177,8 @@ export default {
 								<i class="fa fa-edit me-1"></i>
 							</a>
 							<!--DELETE BOOKMARK-->
-							<a href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode || editModeIsActive">
-								<i class="fa fa-regular fa-trash-can" style="color: #e01b24;"></i>
+							<a id="deleteBookmark" href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode || editModeIsActive">
+								<i class="fa fa-regular fa-trash-can"></i>
 							</a>
 						</div>
 					</div>

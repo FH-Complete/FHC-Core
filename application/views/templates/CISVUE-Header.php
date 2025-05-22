@@ -1,4 +1,5 @@
 <?php
+$this->load->config('theme');
 $includesArray = array(
 	'title' => $title ?? 'FH-Complete',
 	'vue3' => true,
@@ -10,7 +11,8 @@ $includesArray = array(
 		'public/js/apps/Cis.js'
 	], $customJSModules ?? []),
 	'customCSSs' => array_merge([
-		'public/css/Cis4/Cis.css'
+		'public/css/Cis4/Cis.css',
+		$this->config->item('theme_css'),
 	], $customCSSs ?? [])
 );
 

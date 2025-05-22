@@ -84,7 +84,7 @@ export default {
 	<hr/>
 	<pagination v-show="content?true:false" :page_size="page_size"  @page="page=$event.page; loadNewPageContent($event)" :maxPageCount="maxPageCount">
 	</pagination>
-	<div class="container-fluid">
+	<div class="container-fluid mt-4">
 		<div class="row">
 			<div class="col" v-html="content">
 			</div>

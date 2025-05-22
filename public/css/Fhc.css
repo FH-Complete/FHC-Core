@@ -10,7 +10,7 @@
   font-size: calc(1.325rem + .9vw);
 }
 .fhc-header > :first-child > small {
-  color: var(--bs-secondary);
+  color: var(--fhc-tertiary);
   font-size: .65em;
   padding-inline-start: 1em;
 }

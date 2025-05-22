@@ -115,7 +115,7 @@ export default {
 							:''
 						}}</th>
 						<td>
-							<a v-if="event.ort_content_id" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
+							<a v-if="event.ort_content_id" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1 fhc-primary-color" ></i></a>
 							{{event.ort_kurzbz}}
 						</td>
 					</tr>
@@ -135,7 +135,7 @@ export default {
 						}}</th>
 						<td>
 							<div v-for="lektor in event.lektor" class="d-block">
-								<a v-if="lektorenLinks[lektor.kurzbz]" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
+								<a v-if="lektorenLinks[lektor.kurzbz]" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1 fhc-primary-color" ></i></a>
 								{{lektor.kurzbz}}
 							</div>
 						</td>

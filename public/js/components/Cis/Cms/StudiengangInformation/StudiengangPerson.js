@@ -20,16 +20,16 @@ export default {
 			<img  :src="base64Image" alt="mitarbeiter_foto" style="width: 110px; height: auto; object-fir:scale-down;" class="card-img-top" >
 		</div>
 		<div class="card-body">
-			<h6 class="text-center card-title mb-0">{{fullname}} <a v-if="profilViewLink" :href="profilViewLink"><i class="ms-2 fa fa-arrow-up-right-from-square" style="color:#00649C"></i></a></h6>
+			<h6 class="text-center card-title mb-0">{{fullname}} <a v-if="profilViewLink" :href="profilViewLink"><i class="ms-2 fa fa-arrow-up-right-from-square fhc-primary-color" ></i></a></h6>
 		</div>
 		<hr class="my-0">
 		<div class="card-body">
-			
+
 			<div class="flex flex-column gap-3">
 			<div class="mb-3">
 				<span>
 					<i class="fa fa-phone me-2"></i>
-					<a :href="phone.link">{{phone.number}}</a>
+					<a class="fhc-link-color" :href="phone.link">{{phone.number}}</a>
 				</span>
 			</div>
 			<div class="mb-3">
@@ -41,7 +41,7 @@ export default {
 			<div>
 				<span>
 					<i class="fa-regular fa-envelope me-2"></i>
-					<a :href="email_link" v-html="formattedEmail"></a>
+					<a class="fhc-link-color" :href="email_link" v-html="formattedEmail"></a>
 				</span>
 			</div>
 			

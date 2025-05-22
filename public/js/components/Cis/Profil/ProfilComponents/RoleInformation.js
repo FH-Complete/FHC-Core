@@ -49,7 +49,7 @@ export default {
 						<span v-else-if="key == 'semester' && entry.value"  class="form-underline-content">
 							{{ entry.value }}
 							<a class="ms-auto mb-2" target="_blank" :href="getLinkSemesterListe">
-								<i class="fa fa-arrow-up-right-from-square me-1"></i>
+								<i class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
 							</a>
 						</span>
 						
@@ -57,7 +57,7 @@ export default {
 						<span v-else-if="key =='verband' && entry.value"  class="form-underline-content">
 							{{ entry.value }}
 							<a class="ms-auto mb-2" target="_blank" :href="getLinkVerbandListe">
-								<i class="fa fa-arrow-up-right-from-square me-1"></i>
+								<i class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
 							</a>
 						</span>
 						
@@ -65,7 +65,7 @@ export default {
 						<span v-else-if="key == 'gruppe' && entry.value"  class="form-underline-content">
 							{{ entry.value }}
 							<a class="ms-auto mb-2" target="_blank" :href="getLinkGruppeListe">
-								<i class="fa fa-arrow-up-right-from-square me-1"></i>
+								<i class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
 							</a>
 						</span>
 						

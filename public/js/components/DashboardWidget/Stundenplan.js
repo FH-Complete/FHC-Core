@@ -191,8 +191,8 @@ export default {
 						<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 					</div>
 					<template v-else-if="allEventsGrouped.size" v-for="([key, value], index) in allEventsGrouped" :key="index" style="margin-top: 8px;">
-						<div class="card-header d-grid p-0">
-							<button class="btn btn-link link-secondary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"}, $p.user_locale.value)}}</button>
+						<div class=" card-header d-grid p-0">
+							<button class="btn fhc-tertiary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"}, $p.user_locale.value)}}</button>
 						</div>
 						<div role="button" @click="showLvUebersicht(evt)" v-for="evt in value" :key="evt.id" class="list-group-item small" :style="getEventStyle(evt)">
 							<template v-if="evt.type=='moodle'">
