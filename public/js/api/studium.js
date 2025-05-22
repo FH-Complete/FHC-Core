@@ -8,7 +8,6 @@ export default {
 	},
 
 	getAllStudienSemester: function (studiensemester=undefined, studiengang=undefined, semester=undefined, studienplan=undefined) {
-		console.log(studiensemester, studiengang, semester, studienplan)
 		return this.$fhcApi.get(
 			'/api/frontend/v1/Studium/getStudienAllSemester',
 			{studiensemester, studiengang, semester, studienplan}
@@ -30,4 +29,19 @@ export default {
 			}
 		);
 	},
+	getLvStundenplanForStudiensemester: function (studiensemester, lvid) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Stundenplan/getLvStundenplanForStudiensemester/${studiensemester}/${lvid}`,
+			{
+			}
+		);
+	},
+	getLvEvaluierungInfo: function (studiensemester_kurzbz, lvid) {
+		return this.$fhcApi.get(
+			`/api/frontend/v1/Studium/getLvEvaluierungInfo/${studiensemester_kurzbz}/${lvid}`,
+			{
+			}
+		);
+	},
+	
 }

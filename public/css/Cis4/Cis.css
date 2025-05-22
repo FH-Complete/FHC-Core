@@ -178,6 +178,25 @@ html {
 	color:var(--fhc-light);
 }
 
+/* lvMenu entry disabled style */
+[disabled="true"].menu-entry {
+	pointer-events: none;
+	cursor: default;
+	background-color: #dadada !important;
+	color: black !important;
+	-webkit-touch-callout: none;
+	/* iOS Safari */
+	-webkit-user-select: none;
+	/* Safari */
+	-khtml-user-select: none;
+	/* Konqueror HTML */
+	-moz-user-select: none;
+	/* Old versions of Firefox */
+	-ms-user-select: none;
+	/* Internet Explorer/Edge */
+	user-select: none;
+}
+
 /* buttons */
 #cis-header .btn-level-1,
 #cis-header .btn-level-1 + .btn,

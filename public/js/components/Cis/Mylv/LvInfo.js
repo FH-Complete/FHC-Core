@@ -58,13 +58,13 @@ export default {
 		<table class="table table-hover mb-4">
 			<template v-if="event.type == LV_TYPES.moodle">
 				<tbody>
-					<tr>
+					<tr v-if="event?.datum">
 						<th>{{
 							$p.t('global','datum')?
 							$p.t('global','datum')+':'
 							:''
 						}}</th>
-						<td>{{methodFormatDate(event.datum)}}</td>
+						<td>{{methodFormatDate(event?.datum)}}</td>
 					</tr>
 					<tr>
 						<th>{{$p.t('global','aktivitaet')}}:</th>
@@ -100,7 +100,7 @@ export default {
 			</template>
 			<template v-else>
 				<tbody>
-					<tr>
+					<tr v-if="event?.datum">
 						<th>{{
 							$p.t('global','datum')?
 							$p.t('global','datum')+':'
