@@ -1,11 +1,21 @@
 <?php
 
 $PERSON_ID = getAuthPersonId();
+
 // all oe kurzbz for which logged user has a funktion
-$ALL_FUNKTIONEN_OE_KURZBZ = "('" . implode("','", array_keys($all_funktionen_oe_kurzbz)) . "')";
+$ALL_FUNKTIONEN_OE_KURZBZ = isEmptyArray($all_funktionen_oe_kurzbz) ? "(NULL)"
+	: "(" . implode(",", array_map(function($string) { return $this->db->escape($string); }, array_keys($all_funktionen_oe_kurzbz))) . ")";
+
 // all oes for which logged user has issues permissions, including permissions for "special" issue funktion
-$ALL_OE_KURZBZ_BERECHTIGT = "('" . implode("','", $all_oe_kurzbz_berechtigt) . "')";
-$RELEVANT_PRESTUDENT_STATUS = "('Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')";
+$ALL_OE_KURZBZ_BERECHTIGT = isEmptyArray($all_oe_kurzbz_berechtigt) ? "(NULL)"
+	: "(" . implode(",", array_map(function($string) { return $this->db->escape($string); }, $all_oe_kurzbz_berechtigt)) . ")";
+
+// app apps for which issues should be displayed
+$APPS = isEmptyArray($apps) ? "" : "(" . implode(",", array_map(function($string) { return $this->db->escape($string); }, $apps)) . ")";
+
+// all prestudent status for which issues should be displayed
+$RELEVANT_PRESTUDENT_STATUS = isEmptyArray($status) ? ""
+	: "(" . implode(",", array_map(function($string) { return $this->db->escape($string); }, $status)) . ")";
 
 // get issues for the oes of the logged user or for the persons (students, oe-zuordnung) of the oes
 $query = "WITH zustaendigkeiten AS (
@@ -37,8 +47,8 @@ $query .= "
 			SELECT
 				issue_id, fehlercode AS \"Fehlercode\", fehler_kurzbz AS \"Fehler Kurzbezeichnung\", iss.fehlercode_extern AS \"Fehlercode extern\", datum AS \"Datum\",
 				inhalt AS \"Inhalt\", inhalt_extern AS \"Inhalt extern\", iss.person_id AS \"PersonId\", iss.oe_kurzbz AS \"OE\",
-				ftyp.bezeichnung_mehrsprachig[".$language_index."] AS \"Fehlertyp\",
-				stat.bezeichnung_mehrsprachig[".$language_index."] AS \"Fehlerstatus\",
+				ftyp.bezeichnung_mehrsprachig[".$this->db->escape($language_index)."] AS \"Fehlertyp\",
+				stat.bezeichnung_mehrsprachig[".$this->db->escape($language_index)."] AS \"Fehlerstatus\",
 				verarbeitetvon AS \"Verarbeitet von\",verarbeitetamum AS \"Verarbeitet am\", fr.app AS \"Applikation\",
 				fr.fehlertyp_kurzbz AS \"Fehlertypcode\", iss.status_kurzbz AS \"Statuscode\",
 				pers.vorname AS \"Vorname\", pers.nachname AS \"Nachname\",
@@ -118,43 +128,47 @@ $query .= "
 				JOIN system.tbl_issue_status stat USING (status_kurzbz)
 				LEFT JOIN public.tbl_person pers ON iss.person_id = pers.person_id
 			WHERE
-				fr.app IN ('core', 'dvuh')
-				AND (
+				(
 					EXISTS ( /* if oe or person is specified in fehler_zustaendigkeiten */
 					SELECT 1 FROM zustaendigkeiten
 					WHERE fehlercode = iss.fehlercode
 					AND zustaendig = TRUE)";
 
 // show issue if it is assigend to oe of logged in user or to student of oe of logged in user
-if (!isEmptyArray($all_oe_kurzbz_berechtigt))
-{
-	$query .= " OR iss.oe_kurzbz IN $ALL_OE_KURZBZ_BERECHTIGT /* if issue is for oe */";
+$query .= " OR iss.oe_kurzbz IN $ALL_OE_KURZBZ_BERECHTIGT /* if issue is for oe */";
 
-	$query .= " OR (iss.oe_kurzbz IS NULL AND EXISTS ( /* if person_id of issue is a student of studiengang oe */
-						SELECT 1 FROM public.tbl_prestudent ps
-						JOIN public.tbl_prestudentstatus pss USING (prestudent_id)
-						JOIN public.tbl_studiengang stg USING (studiengang_kz)
-						WHERE person_id = iss.person_id
-						AND stg.oe_kurzbz IN $ALL_OE_KURZBZ_BERECHTIGT
-						AND pss.status_kurzbz IN $RELEVANT_PRESTUDENT_STATUS
-						AND NOT EXISTS (SELECT 1 /* irrelevant if already finished studies and studied a while ago */
-										FROM public.tbl_prestudentstatus ps_finished
-										JOIN public.tbl_studiensemester sem_finished USING (studiensemester_kurzbz)
-										WHERE prestudent_id = ps.prestudent_id
-										AND status_kurzbz IN ('Absolvent','Abbrecher','Abgewiesener')
-										AND datum::date + interval '2 months' < NOW()
-										AND EXISTS (SELECT 1 FROM public.tbl_prestudent /* if more recent prestudent exists, still display the issue */
-													JOIN public.tbl_prestudentstatus USING (prestudent_id)
-													JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
-													WHERE tbl_prestudentstatus.status_kurzbz IN $RELEVANT_PRESTUDENT_STATUS
-													AND person_id = ps.person_id
-													AND prestudent_id <> ps_finished.prestudent_id
-													AND tbl_studiensemester.start::date > sem_finished.start::date)
-						)
-					)
-				)";
-}
+$query .= " OR (iss.oe_kurzbz IS NULL AND EXISTS ( /* if person_id of issue is a student of studiengang oe */
+					SELECT 1 FROM public.tbl_prestudent ps
+					JOIN public.tbl_prestudentstatus pss USING (prestudent_id)
+					JOIN public.tbl_studiengang stg USING (studiengang_kz)
+					WHERE person_id = iss.person_id
+					AND stg.oe_kurzbz IN ".$ALL_OE_KURZBZ_BERECHTIGT;
+
+if (!isEmptyString($RELEVANT_PRESTUDENT_STATUS)) $query .= " AND pss.status_kurzbz IN ".$RELEVANT_PRESTUDENT_STATUS;
+					
+$query .= 		" AND NOT EXISTS (SELECT 1 /* irrelevant if already finished studies and studied a while ago */
+									FROM public.tbl_prestudentstatus ps_finished
+									JOIN public.tbl_studiensemester sem_finished USING (studiensemester_kurzbz)
+									WHERE prestudent_id = ps.prestudent_id
+									AND status_kurzbz IN ('Absolvent','Abbrecher','Abgewiesener')
+									AND datum::date + interval '2 months' < NOW()
+									AND EXISTS (SELECT 1 FROM public.tbl_prestudent /* if more recent prestudent exists, still display the issue */
+												JOIN public.tbl_prestudentstatus USING (prestudent_id)
+												JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
+												WHERE person_id = ps.person_id
+												AND prestudent_id <> ps_finished.prestudent_id
+												AND tbl_studiensemester.start::date > sem_finished.start::date";
+
+if (!isEmptyString($RELEVANT_PRESTUDENT_STATUS)) $query .= " AND tbl_prestudentstatus.status_kurzbz IN ".$RELEVANT_PRESTUDENT_STATUS;
+
+$query .= 							")
+								)
+							)
+						)";
+
 $query .= ") ";
+
+if (!isEmptyString($APPS)) $query .= " AND fr.app IN ".$APPS;
 
 $query .= " ORDER BY
 			CASE

@@ -28,6 +28,9 @@ class Issues extends Auth_Controller
 		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 		$this->load->model('system/Sprache_model', 'SpracheModel');
 
+		// load config
+		$this->load->config('issues');
+
 		$this->loadPhrases(
 			array(
 				'global',
@@ -47,10 +50,12 @@ class Issues extends Auth_Controller
 	{
 		$oes_for_issues = $this->_getOesForIssues();
 		$language_index = $this->_getLanguageIndex();
+		$apps = $this->config->item('issues_list_apps');
+		$status = $this->config->item('issues_list_status');
 
 		$this->load->view(
 			'system/issues/issues',
-			array_merge($oes_for_issues, array('language_index' => $language_index))
+			array_merge($oes_for_issues, array('language_index' => $language_index, 'apps' => $apps, 'status' => $status))
 		);
 	}
 
@@ -121,6 +126,8 @@ class Issues extends Auth_Controller
 		$oe_kurzbz_for_funktion = array();
 		$benutzerfunktionRes = $this->BenutzerfunktionModel->getBenutzerFunktionByUid($this->_uid, null, date('Y-m-d'), date('Y-m-d'));
 
+		$functions = $this->config->item('issues_list_functions');
+
 		if (isError($benutzerfunktionRes))
 			show_error(getError($benutzerfunktionRes));
 
@@ -130,8 +137,8 @@ class Issues extends Auth_Controller
 			{
 				$all_funktionen_oe_kurzbz[$benutzerfunktion->oe_kurzbz][] = $benutzerfunktion->funktion_kurzbz;
 
-				// separate oes for the additional funktion which enables displaying issues
-				if ($benutzerfunktion->funktion_kurzbz == self::FUNKTION_KURZBZ)
+				// separate oes for the additional functions which enables displaying issues
+				if (in_array($benutzerfunktion->funktion_kurzbz, $functions))
 				{
 					$oe_kurzbz_for_funktion[] = $benutzerfunktion->oe_kurzbz;
 
