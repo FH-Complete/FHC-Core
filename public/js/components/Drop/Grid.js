@@ -26,6 +26,10 @@ export default {
 			type: Number,
 			default: 0
 		},
+		additionalRow:{
+			type: Boolean,
+			default: false,
+		}
 	},
 	emits: [
 		"rearrangeItems",
@@ -48,7 +52,6 @@ export default {
 			draggedOffset: [0,0],
 			draggedItem: null,
 			draggedNode: null,
-			additionalRow: null,
 			reorderedItems:[],
 			clonedWidget:null,
 		}
@@ -60,6 +63,14 @@ export default {
 		},
 	},
 	computed: {
+		additionalRowComputed: {
+			get() {
+				return this.additionalRow;
+			},
+			set(value) {
+				this.$emit('update:additionalRow', value);
+			}
+		},
 		items_hashmap() {
 			let items = {};
 			this.items.forEach(item => {
@@ -117,10 +128,19 @@ export default {
 			return [...this.placedItems, ...this.items_placeholders];
 		},
 		rows() {
-			if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid){
-				return this.dragGrid.h;
+			if (this.additionalRowComputed) {
+					return this.grid ? (this.grid.h+1) : 1;
 			}
 			return this.grid ? this.grid.h : 1;
+			/* if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid){
+				return this.dragGrid.h;
+			}
+			if (this.mode == MODE_IDLE) {
+				if (this.additionalRowComputed) {
+					return this.grid ? (this.grid.h+1) : 1;
+				}
+			}
+			return this.grid ? this.grid.h : 1; */
 		},
 		gridStyle() {
 			const addH = this.active ? this.marginForExtraRow : 0;
@@ -347,17 +367,12 @@ export default {
 			});
 		},
 		mouseLeave() {
-			if (this.mode == MODE_IDLE) {
+			/* if (this.mode == MODE_IDLE) {
 				this.x = -1;
 				this.y = -1;
-				if (this.additionalRow !== null) {
-					let gridHeight = this.grid.getMaxY() + 1;
-					if(this.grid.h>gridHeight){
-						this.grid.h = gridHeight;
-					}
-					this.additionalRow = null;
-				}
-			}
+				this.additionalRowComputed = false;
+				
+			} */
 		},
 		updateCursor(evt) {
 			if (!this.active) {
@@ -380,18 +395,6 @@ export default {
 			if (this.x == gridX && this.y == gridY)
 				return false;
 			
-			if (this.mode == MODE_IDLE) {
-				if (this.additionalRow === null && this.y == this.rows-1 && gridY == this.rows) {
-					this.additionalRow = this.grid.h;
-					this.grid.h += 1;
-				} else if (this.additionalRow !== null && gridY != this.rows - 1) {
-					let gridHeight = this.grid.getMaxY() + 1;
-					if(this.grid.h > gridHeight){
-						this.grid.h = gridHeight;
-					}
-					this.additionalRow = null;
-				}
-			}
 			this.x = gridX;
 			this.y = gridY;
 
@@ -405,6 +408,7 @@ export default {
 			}
 		},
 		startMove(evt, item) {
+			
 			if (!this.active)
 				return;
 			
@@ -413,14 +417,15 @@ export default {
 			this.grid.h += 1;
 			this.draggedItem = item;
 			this.$emit('draggedItem',item);
-			this.draggedNode = evt.target;
+			
+			this.draggedNode = evt.target.closest(".drop-grid-item");
 			//clones the widget for the drag Image
-			let clone = evt.target.cloneNode(true);
+			let clone = evt.target.closest(".drop-grid-item")?.cloneNode(true);
+			
 			clone.style.zIndex = 5;
 			clone.classList.add("widgetClone");
 			this.$refs.container.appendChild(clone);
 			this.clonedWidget = clone;
-			
 			this.draggedOffset = [item.x - this.x, item.y - this.y];
 			this._dragStart(evt, item);
 		},
@@ -480,6 +485,7 @@ export default {
 			}
 		},
 		dragCancel() {
+			this.additionalRowComputed = false;
 			this.toggleDraggedItemOverlay(false);
 			this.mode = MODE_IDLE;
 			this.positionUpdates = null;
@@ -498,9 +504,10 @@ export default {
 			Array.from(document.getElementsByClassName("denied-dragging-animation"))?.forEach(ele => {
 				ele.classList.remove("denied-dragging-animation");
 			})
+			
 			let widgetClones = document.getElementsByClassName("widgetClone");
-			for(let widget of widgetClones){
-				this.$refs.container.removeChild(widget);
+			for (let i=0; i <widgetClones.length; i++){ 
+				this.$refs.container.removeChild(widgetClones[i]);
 			}
 			
 			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
@@ -528,6 +535,7 @@ export default {
 			return updated;
 		},
 		emptyTileClicked() {
+			this.additionalRowComputed = false;
 			this.$emit('newItem', this.x, this.y);
 		},
 		updateCursorOnMouseMove(evt){
@@ -614,7 +622,7 @@ export default {
 		<TransitionGroup tag="div">
 			<grid-item
 				ref="gridItems"
-				v-for="(item,index) in ((mode != 1 || mode != 2) && active ? placedItems_withPlaceholders : placedItems)"
+				v-for="(item,index) in ((mode != 1 && mode != 2) && active ? placedItems_withPlaceholders : placedItems)"
 				:key="item.data.id"
 				:item="item"
 				@start-move="startMove"
@@ -623,8 +631,8 @@ export default {
 				@start-resize="startResize"
 				@dragging="dragging"
 				@end-drag="dragCancel"
-				@drop-drag="dragEnd"
-				@touchEvent="updateCursorOnMouseMove"
+				@touch-end="dragEnd();mouseUp();"
+				@touch-start="updateCursorOnMouseMove($event); mouseDown();"
 				class="position-absolute"
 				:active="active"
 				:style="{

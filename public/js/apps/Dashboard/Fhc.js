@@ -300,6 +300,7 @@ app.use(primevue.config.default, {
 		tooltip: 8000
 	}
 })
+app.directive('tooltip', primevue.tooltip);
 app.use(PluginsPhrasen);
 app.use(Theme);
 app.directive('contrast', contrast);
