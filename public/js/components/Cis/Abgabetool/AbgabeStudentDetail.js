@@ -138,7 +138,7 @@ export const AbgabeStudentDetail = {
 			const oneDayMs = 1000 * 60 * 60 * 24
 			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
 		},
-		getDateStyle(termin) {
+		getDateStyle(termin, mode) {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
 			
@@ -146,21 +146,31 @@ export const AbgabeStudentDetail = {
 			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
 			let color = 'white'
 			let fontColor = 'black'
+			let icon = '';
 			if (termin.abgabedatum === null) {
 				if(datum < today) {
 					color = 'red'
 					fontColor = 'white'
+					icon = 'fa-triangle-exclamation'
 				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
 					color = 'yellow'
+					icon = 'fa-circle-exclamation'
 				}
 			} else if(abgabedatum > datum) {
 				color = 'pink' // aka "hellrot"
 				fontColor = 'white'
+				icon = 'fa-circle-question'
 			} else {
 				color = 'green'
+				icon = 'fa-square-check'
 			}
 			
-			return `font-color: ${fontColor} ; background-color: ${color}; border-radius: 50%;`
+			//return `font-color: ${fontColor} ; background-color: ${color}; border-radius: 50%;`
+			if(  typeof mode !== 'undefined' || mode === 'icon') {
+				return icon;
+			} else {
+				return 'abgabe-zieldatum-border-' + color;
+			}
 		},
 		openBeurteilungLink(link) {
 			window.open(link, '_blank')
@@ -205,23 +215,26 @@ export const AbgabeStudentDetail = {
 			</div>
 			<div id="uploadWrapper">
 				<div class="row" style="margin-bottom: 12px;">
-					<div style="width: 100px">{{$p.t('abgabetool/c4fixtermin')}}</div>
-					<div class="col-2">{{$p.t('abgabetool/c4zieldatum')}}</div>
-					<div class="col-2">{{$p.t('abgabetool/c4abgabetyp')}}</div>
-					<div class="col-4">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
-					<div class="col-1">{{$p.t('abgabetool/c4abgabedatum')}}</div>
-					<div class="col">
+					<div class="col-1 fw-bold text-center">{{$p.t('abgabetool/c4fixtermin')}}</div>
+					<div class="col-2 fw-bold">{{$p.t('abgabetool/c4zieldatum')}}</div>
+					<div class="col-2 fw-bold">{{$p.t('abgabetool/c4abgabetyp')}}</div>
+					<div class="col-3 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
+					<div class="col-1 fw-bold text-center">{{$p.t('abgabetool/c4abgabedatum')}}</div>
+					<div class="col-3 fw-bold">
 						{{$p.t('abgabetool/c4fileupload')}}
 					</div>
 				</div>
 				<div class="row" v-for="termin in projektarbeit.abgabetermine">
-					<div style="width: 100px" class="d-flex justify-content-center align-items-center">
+					<div class="col-1 d-flex justify-content-center align-items-start">
+						<i v-if="termin.fixtermin" class="fa-solid fa-2x fa-circle-check fhc-bullet-red"></i>
+						<i v-else="" class="fa-solid fa-2x fa-circle-xmark fhc-bullet-green"></i>
+<!--
 						<p class="fhc-bullet" :class="{ 'fhc-bullet-red': termin.fixtermin, 'fhc-bullet-green': !termin.fixtermin }"></p>
+-->
 					</div>
-					<div class="col-2 d-flex justify-content-center align-items-center">
-						<div :style="getDateStyle(termin)">
+					<div class="col-2 d-flex justify-content-start align-items-start">
+						<div class="position-relative" :class="getDateStyle(termin)">
 							<VueDatePicker
-								style="width: 95%;"
 								v-model="termin.datum"
 								:clearable="false"
 								:disabled="true"
@@ -230,24 +243,25 @@ export const AbgabeStudentDetail = {
 								:text-input="true"
 								auto-apply>
 							</VueDatePicker>
-						</div>				
+							<i class="position-absolute abgabe-zieldatum-overlay fa-solid fa-2x" :class="getDateStyle(termin, 'icon')"></i>
+						</div>
 					</div>
-					<div class="col-2 d-flex justify-content-center align-items-center">{{ termin.bezeichnung }}</div>
-					<div class="col-4 d-flex justify-content-center align-items-center">
-						<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="3" cols="60" :disabled="true"></Textarea>
+					<div class="col-2 d-flex justify-content-start align-items-start">{{ termin.bezeichnung }}</div>
+					<div class="col-3 d-flex justify-content-start align-items-start">
+						<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="3" cols="45" :disabled="true"></Textarea>
 					</div>
-					<div class="col-1 d-flex justify-content-center align-items-center">
+					<div class="col-1 d-flex flex-column justify-content-start align-items-center">
 						{{ termin.abgabedatum?.split("-").reverse().join(".") }}
 						<a v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" style="margin-left:4px; cursor: pointer;">
-							<i class="fa-solid fa-file-pdf"></i>
+							<i class="fa-solid fa-3x fa-file-pdf"></i>
 						</a>
 					</div>
-					<div class="col-2" v-if="!viewMode">
+					<div class="col-3" v-if="!viewMode">
 						<div class="row">
-							<div class="col-6">
+							<div class="col-8">
 								<Upload v-if="termin && termin.allowedToUpload" accept=".pdf" v-model="termin.file"></Upload>
 							</div>
-							<div class="col-6">
+							<div class="col-4">
 								<button class="btn btn-primary border-0" @click="upload(termin)" :disabled="!termin.allowedToUpload">
 									Upload
 									<i style="margin-left: 8px" class="fa-solid fa-upload"></i>
@@ -264,19 +278,19 @@ export const AbgabeStudentDetail = {
 				<div>
 					{{$p.t('abgabetool/c4enduploadZusatzdaten')}}
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3 align-items-start">
 					
 					<p class="ml-4 mr-4">Student UID: {{ projektarbeit?.student_uid}}</p>
 				
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3 align-items-start">
 					
 					<p class="ml-4 mr-4">Titel: {{ projektarbeit?.titel }}</p>
 				
 				</div>
 			</template>
 			<template v-slot:default>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3 align-items-start">
 					<div class="row">{{$p.t('abgabetool/c4Sprache')}}</div>
 					<div class="row">
 						<Dropdown 
@@ -289,7 +303,7 @@ export const AbgabeStudentDetail = {
 				</div>
 				
 <!--				 lektor fills these out-->
-<!--				<div class="row mb-3 align-items-center">-->
+<!--				<div class="row mb-3 align-items-start">-->
 <!--					<div class="row">Kontrollierte Schlagwörter</div>-->
 <!--					<div class="row">-->
 <!--						<Textarea v-model="form.kontrollschlagwoerter"></Textarea>-->
@@ -297,35 +311,35 @@ export const AbgabeStudentDetail = {
 <!--					-->
 <!--				-->
 <!--				</div>-->
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3 align-items-start">
 					<div class="row">{{$p.t('abgabetool/c4schlagwoerterGer')}}</div>
 					<div class="row">
 						<Textarea v-model="form.schlagwoerter"></Textarea>
 					</div>
 				</div>
 				
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3 align-items-start">
 					<div class="row">{{$p.t('abgabetool/c4schlagwoerterEng')}}</div>
 					<div class="row">
 						<Textarea v-model="form.schlagwoerter_en"></Textarea>
 					</div>
 				</div>
 				
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3 align-items-start">
 					<div class="row">{{$p.t('abgabetool/c4abstractGer')}}</div>
 					<div class="row">
 						<Textarea v-model="form.abstract" rows="10"></Textarea>
 					</div>
 				</div>
 
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3 align-items-start">
 					<div class="row">{{$p.t('abgabetool/c4abstractEng')}}</div>
 					<div class="row">
 						<Textarea v-model="form.abstract_en" rows="10"></Textarea>
 					</div>				
 				</div>
 				
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3 align-items-start">
 					<div class="row">{{$p.t('abgabetool/c4seitenanzahl')}}</div>
 					<div class="row">
 						<InputNumber 

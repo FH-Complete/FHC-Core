@@ -584,3 +584,47 @@ html {
 .dashboard-item {
 	overscroll-behavior: none;
 }
+
+.abgabe-zieldatum-border-red,
+.abgabe-zieldatum-border-yellow,
+.abgabe-zieldatum-border-pink,
+.abgabe-zieldatum-border-green {
+	border: solid 3px lightgrey;
+}
+
+.abgabe-zieldatum-border-red {
+	border-color: red;
+}
+
+.abgabe-zieldatum-border-yellow {
+	border-color: yellow;
+}
+
+.abgabe-zieldatum-border-pink {
+	border-color: pink;
+}
+
+.abgabe-zieldatum-border-green {
+	border-color: green;
+}
+
+.abgabe-zieldatum-overlay {
+	top: 3px;
+	right: 3px;
+}
+
+.abgabe-zieldatum-border-red .abgabe-zieldatum-overlay {
+	color: red;
+}
+
+.abgabe-zieldatum-border-yellow .abgabe-zieldatum-overlay {
+	color: yellow;
+}
+
+.abgabe-zieldatum-border-pink .abgabe-zieldatum-overlay {
+	color: pink;
+}
+
+.abgabe-zieldatum-border-green .abgabe-zieldatum-overlay {
+	color: green;
+}
