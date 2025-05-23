@@ -9,5 +9,3 @@ $config['issues_list_functions'] = array('ass');
 
 // functions which enable users to see issues
 $config['issues_list_status'] = array('Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent');
-
-
