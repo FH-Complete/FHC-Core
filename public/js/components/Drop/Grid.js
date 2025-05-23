@@ -132,15 +132,7 @@ export default {
 					return this.grid ? (this.grid.h+1) : 1;
 			}
 			return this.grid ? this.grid.h : 1;
-			/* if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid){
-				return this.dragGrid.h;
-			}
-			if (this.mode == MODE_IDLE) {
-				if (this.additionalRowComputed) {
-					return this.grid ? (this.grid.h+1) : 1;
-				}
-			}
-			return this.grid ? this.grid.h : 1; */
+			
 		},
 		gridStyle() {
 			const addH = this.active ? this.marginForExtraRow : 0;
@@ -370,9 +362,8 @@ export default {
 			/* if (this.mode == MODE_IDLE) {
 				this.x = -1;
 				this.y = -1;
-				this.additionalRowComputed = false;
 				
-			} */
+			}  */
 		},
 		updateCursor(evt) {
 			if (!this.active) {
@@ -381,17 +372,17 @@ export default {
 			}
 			const addH = this.active ? this.marginForExtraRow : 0;
 			const rect = this.$refs.container.getBoundingClientRect();
-
-			if (!evt.clientX && !evt.clientY && evt.touches) {
+			
+			if (!evt.clientX && !evt.clientY && evt.touches){
 				evt.clientX = evt.touches[0].clientX;
 				evt.clientY = evt.touches[0].clientY;
 			}
 
 			this.clientX = (evt.clientX - rect.left);
 			this.clientY = (evt.clientY - rect.top);
-
 			const gridX = Math.floor(this.cols * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
 			const gridY = Math.floor((this.rows + addH) * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
+			
 			if (this.x == gridX && this.y == gridY)
 				return false;
 			
@@ -414,8 +405,8 @@ export default {
 			
 			this.mode = MODE_MOVE;
 			
-			this.grid.h += 1;
 			this.draggedItem = item;
+			
 			this.$emit('draggedItem',item);
 			
 			this.draggedNode = evt.target.closest(".drop-grid-item");
@@ -437,13 +428,13 @@ export default {
 			this._dragStart(evt);
 		},
 		dragOver(evt) {
-			if ((this.y + 1) > this.grid?.h && this.mode == MODE_MOVE) {
-				this.positionUpdates = this.positionUpdates.filter(item => {
+			if ((this.y + 1) > this.rows && this.mode == MODE_MOVE) {
+				this.positionUpdates = this.positionUpdates?.filter(item => {
 					return item.widgetid == this.draggedItem.data.widgetid;
 				})
 				this.dragEnd();
 				this.dragCancel();
-			}
+			} 
 			if (!this.active)
 				return this.dragCancel();
 			this.checkPinnedWidgetAnimation();
@@ -613,7 +604,7 @@ export default {
 		ref="container"
 		class="drop-grid position-relative h-0"
 		:style="gridStyle"
-		@touchmove.prevent="dragOver"
+		@touchmove="dragOver"
 		@touchend="dragCancel"
 		@dragover.prevent="dragOver"
 		@drop="dragEnd"
