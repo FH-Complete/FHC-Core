@@ -191,7 +191,7 @@ class Organisationseinheit_model extends DB_Model
 
     /**
      * @param string $oe_kurzbz
-     * 
+     *
      * @return stdClass
      */
     public function getWithType($oe_kurzbz)
@@ -201,78 +201,6 @@ class Organisationseinheit_model extends DB_Model
 
     	return $this->load($oe_kurzbz);
     }
-
-	/**
-	 * Get OEs by eventQuery string. Use with autocomplete event queries.
-	 * @param $eventQuery String
-	 * @return array
-	 */
-	public function getAutocompleteSuggestions($eventQuery)
-	{
-		$this->addSelect('oe_kurzbz');
-		$this->addSelect('organisationseinheittyp_kurzbz, oe_kurzbz, bezeichnung, aktiv, lehre');
-		$this->addOrder('organisationseinheittyp_kurzbz, bezeichnung');
-
-		return $this->loadWhere("
-			oe_kurzbz ILIKE '%". $this->escapeLike($eventQuery). "%'
-		");
-	}
-
-	/**
-	 * Get OEs by eventQuery string and companyOrgetKurzbz
-	 * Use with autocomplete event queries in Function Component
-	 * @param $searchString String
-	 * @param $companyOrgetKurzbz String oe_kurzbz of the company (gst vs gmbh)
-	 * @return array
-	 */
-	public function getAutocompleteSuggestionsWithCompany($companyOrgetKurzbz, $searchString)
-	{
-		$sql = "
-        WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) AS (
-            SELECT oe_kurzbz, oe_parent_kurzbz
-            FROM public.tbl_organisationseinheit
-            WHERE oe_kurzbz = ?
-            UNION ALL
-            SELECT o.oe_kurzbz, o.oe_parent_kurzbz
-            FROM public.tbl_organisationseinheit o
-            INNER JOIN oes ON o.oe_parent_kurzbz = oes.oe_kurzbz
-        )
-        SELECT
-            oe.oe_kurzbz, oe.aktiv,
-            '[' || COALESCE(oet.bezeichnung, oet.organisationseinheittyp_kurzbz) ||
-            '] ' || COALESCE(oe.bezeichnung, oe.oe_kurzbz) AS label
-        FROM (
-            SELECT oe_kurzbz FROM oes GROUP BY oe_kurzbz
-        ) c
-        JOIN public.tbl_organisationseinheit oe ON oe.oe_kurzbz = c.oe_kurzbz
-        JOIN public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz
-    ";
-
-		$params = [$companyOrgetKurzbz];
-
-		if (!empty($searchString)) {
-			$escaped = $this->escapeLike($searchString);
-			$ilike = '%' . $escaped . '%';
-
-			$sql .= "
-            WHERE
-                oe.oe_kurzbz ILIKE ? OR
-                oe.bezeichnung ILIKE ? OR
-                oe.organisationseinheittyp_kurzbz ILIKE ?
-        ";
-
-			$params[] = $ilike;
-			$params[] = $ilike;
-			$params[] = $ilike;
-		}
-
-		$sql .= " ORDER BY oet.bezeichnung ASC, oe.bezeichnung ASC";
-
-		$result = $this->execQuery($sql, $params);
-
-		return $result;
-	}
-
 
 	/**
 	 * get highest organisation units

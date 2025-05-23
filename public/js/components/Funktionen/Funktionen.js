@@ -43,10 +43,8 @@ export default {
 					{
 						title: "dienstverhaeltnis_unternehmen",
 						field: "dienstverhaeltnis_unternehmen",
-						width: 50,
 						headerFilter: "list",
 						headerFilterParams: {valuesLookup: true, autocomplete: true, sort: "asc"},
-						formatter: this.companyLinkFormatter
 					},
 					{
 						title: "funktion_beschreibung", field: "funktion_beschreibung", headerFilter: "list",
@@ -99,7 +97,6 @@ export default {
 						formatter: (cell, formatterParams, onRendered) => {
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
-
 
 							if( cell.getRow().getData().dienstverhaeltnis_unternehmen === null ) {
 								let button = document.createElement('button');
@@ -160,18 +157,19 @@ export default {
 						const column = cm.getColumnByField('dienstverhaeltnis_unternehmen');
 						const companyDv = {
 							title: this.$p.t('person', 'dv_unternehmen'),
-							width: 100,
+							width: 140,
 							visible: this.showDvCompany,
+							formatter: this.companyLinkFormatter
 						};
 						column.component.updateDefinition(companyDv);
 
 						cm.getColumnByField('funktion_beschreibung').component.updateDefinition({
 							title: this.$p.t('person', 'zuordnung_taetigkeit'),
-							width: 100
+							width: 140
 						});
 						cm.getColumnByField('funktion_oebezeichnung').component.updateDefinition({
 							title: this.$p.t('lehre', 'organisationseinheit'),
-							width: 100
+							width: 140
 						});
 						cm.getColumnByField('wochenstunden').component.updateDefinition({
 							title: this.$p.t('person', 'wochenstunden')
@@ -192,18 +190,25 @@ export default {
 
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
 							title: this.$p.t('ui', 'bezeichnung'),
-							width: 100
+							width: 140
 						});
 
 					}
 				}
 			],
-			isFilterSet: false,
+			isFilterSet: true,
 			listOrgHeads: [],
-			listOrgUnits: [],
+			listOrgUnits: [], //Old
+			listAllOrgUnits: [],
+			listOrgUnits_GST: [],
+			listOrgUnits_GMBH: [],
 			formData: {
 				head: 'gst',
-				oe_kurzbz: ''
+				oe_kurzbz: '',
+				funktion_kurzbz: null,
+				label:'',
+				//funktion_label: '',
+				funktion: null,
 			},
 			statusNew: true,
 			listAllFunctions: [],
@@ -213,7 +218,17 @@ export default {
 			},
 			filteredOes: [],
 			filteredFunctions: [],
-			newBtnStyle: ''
+			newBtnStyle: '',
+			selectedFunction: null,
+			selectedOe: null
+		}
+	},
+	watch: {
+		selectedFunction(newVal) {
+			this.formData.funktion_kurzbz = newVal?.funktion_kurzbz || '';
+		},
+		selectedOe(newVal) {
+			this.formData.oe_kurzbz = newVal?.oe_kurzbz || '';
 		}
 	},
 	methods: {
@@ -229,6 +244,7 @@ export default {
 		actionNewFunction(){
 			this.resetModal();
 			this.statusNew = true;
+			this.formData.datum_von = new Date();
 			this.$refs.functionModal.show();
 		},
 		actionCopyFunction(benutzerfunktion_id) {
@@ -249,7 +265,15 @@ export default {
 		actionEditFunction(benutzerfunktion_id) {
 			this.resetModal();
 			this.statusNew = false;
-			this.loadFunction(benutzerfunktion_id);
+			this.loadFunction(benutzerfunktion_id).then(() => {
+				//set selectedFunction and selectedOd to enable viewing label in primevue autocomplete fields
+				this.selectedFunction = this.listAllFunctions.find(
+					item => item.funktion_kurzbz === this.formData.funktion_kurzbz
+				);
+				this.selectedOe = this.listAllOrgUnits.find(
+					item => item.oe_kurzbz === this.formData.oe_kurzbz
+				);
+			});
 			this.$refs.functionModal.show();
 		},
 		addFunction() {
@@ -304,14 +328,6 @@ export default {
 					this.reload();
 				});
 		},
-		getOrgetsForCompany(){
-			return this.$api
-				.call(ApiCoreFunktion.getOrgetsForCompany(this.formData.head))
-				.then(result => {
-					this.listOrgUnits = result.data;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
 		hideModal(modalRef) {
 			this.$refs[modalRef].hide();
 		},
@@ -324,32 +340,30 @@ export default {
 			this.formData.oe_kurzbz = '';
 			this.formData.funktion_kurzbz = '';
 		},
-		searchOe(event) {
-			if (this.abortController.oes) {
-				this.abortController.oes.abort();
-			}
-
-			this.abortController.oes = new AbortController();
-
-			return this.$api
-				.call(ApiCoreFunktion.getOes(this.formData.head, event.query))
-				.then(result => {
-					this.filteredOes = result.data.retval;
-				});
+		filterFunctions(event) {
+			const query = event.query.toLowerCase();
+			this.filteredFunctions = this.listAllFunctions.filter(item =>
+				item.label.toLowerCase().includes(query)
+			)
 		},
-		searchFunctions(event) {
-			if (this.abortController.functions) {
-				this.abortController.functions.abort();
+		filterOes(event) {
+			const query = event.query.toLowerCase();
+
+			if(!this.formData.head)
+				this.$fhcAlert.alertError(this.$p.t('ui', 'bitteUnternehmenWaehlen'));
+
+			if(this.formData.head == 'gst') {
+				this.filteredOes = this.listOrgUnits_GST.filter(item =>
+					item.label.toLowerCase().includes(query)
+				);
 			}
-
-			this.abortController.functions = new AbortController();
-
-			return this.$api
-				.call(ApiCoreFunktion.getFunctions(event.query))
-				.then(result => {
-					this.filteredFunctions = result.data.retval;
-				});
+			if(this.formData.head == 'gmbh') {
+				this.filteredOes = this.listOrgUnits_GMBH.filter(item =>
+					item.label.toLowerCase().includes(query)
+				);
+			}
 		},
+
 		styleNewButton(){
 			if(this.stylePv21) {
 				this.newBtnStyle = "btn-sm";
@@ -370,12 +384,38 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
+		this.$api
+			.call(ApiCoreFunktion.getAllFunctions())
+			.then(result => {
+				this.listAllFunctions = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		this.$api
+			.call(ApiCoreFunktion.getAllOrgUnits())
+			.then(result => {
+				this.listAllOrgUnits = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		this.$api
+			.call(ApiCoreFunktion.getOrgetsForCompany('gst'))
+			.then(result => {
+				this.listOrgUnits_GST = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		this.$api
+			.call(ApiCoreFunktion.getOrgetsForCompany('gmbh'))
+			.then(result => {
+				this.listOrgUnits_GMBH = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+
 		this.styleNewButton();
+
 	},
 	template: `
 		<div class="core-functions h-100 pb-3">
-
-			<div class="d-flex justify-content-end pb-3" v-if="stylePv21">
+		
+			<div class="d-flex justify-content-end" v-if="stylePv21">
 				<form-input
 					container-class="form-check"
 					type="checkbox"
@@ -418,35 +458,37 @@ export default {
 				</template>
 
 				<form-form class="row pt-3" ref="functionData">
+
 					<form-input
 						container-class="mb-3 col-8"
 						type="select"
 						name="companies"
 						:label="$p.t('core/unternehmen')"
 						v-model="formData.head"
-						@change="getOrgetsForCompany"
+						@change="getOrgetsForCompanyOld"
 						>
 						<option
 							v-for="org in listOrgHeads"
 							:key="org.head"
 							:value="org.head"
-							@change="handleChange"
 							>
 							{{ org.bezeichnung }}
 						</option>
-					</form-input>
+					</form-input>			
 
-					<!--DropDown Autocomplete Funktion-->
+					<!--DropDown Autocomplete Funktion -->
 					<form-input
 						container-class="mb-3 col-8"
 						type="autocomplete"
 						:label="$p.t('person/funktion') + ' *' "
 						name="funktion_kurzbz"
-						v-model="formData.funktion_kurzbz"
+						v-model="selectedFunction"
+						forceSelection
 						optionLabel="label"
+						optionValue="funktion_kurzbz"
 						:suggestions="filteredFunctions"
 						dropdown
-						@complete="searchFunctions"
+						@complete="filterFunctions"
 						>
 							<template #option="slotProps">
 								<div
@@ -454,7 +496,7 @@ export default {
 									? 'item-inactive'
 									: ''"
 									>
-										{{slotProps.option.label}}
+										 {{ slotProps.option.label}}
 								</div>
 							</template>
 					</form-input>
@@ -465,11 +507,13 @@ export default {
 						type="autocomplete"
 						:label="$p.t('lehre/organisationseinheit') + ' *'"
 						name="oe_kurzbz"
-						v-model="formData.oe_kurzbz"
+						v-model="selectedOe"
+						forceSelection
 						optionLabel="label"
+						optionValue="oe_kurzbz"
 						:suggestions="filteredOes"
 						dropdown
-						@complete="searchOe"
+						@complete="filterOes"
 						>
 							<template #option="slotProps">
 								<div
@@ -482,7 +526,6 @@ export default {
 							</template>
 					</form-input>
 
-					<!--DropDown Bezeichnung-->
 					<form-input
 						container-class="mb-3 col-8"
 						type="text"
@@ -531,7 +574,7 @@ export default {
 							>
 						</form-input>
 					</div>
-						<input type="hidden" class="form-control" id="oe_kurzbz" v-model="formData.oe_kurzbz">
+
 
 				</form-form>
 

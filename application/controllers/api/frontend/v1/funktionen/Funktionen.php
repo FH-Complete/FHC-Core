@@ -11,14 +11,10 @@ class Funktionen extends FHCAPI_Controller
 		//TODO(Manu) check permissions
 		parent::__construct(array(
 				'getAllFunctions' =>  ['admin:r', 'assistenz:r'],
-				'getContractFunctions' =>  ['admin:r', 'assistenz:r'],
-				'getCurrentFunctions' =>  ['admin:r', 'assistenz:r'],
 				'getAllUserFunctions' =>  ['admin:r', 'assistenz:r'],
 				'getOrgHeads' =>  ['admin:r', 'assistenz:r'],
 				'getOrgetsForCompany' => ['admin:r', 'assistenz:r'],
-				'loadAllOes' => ['admin:r', 'assistenz:r'],
-				'searchOes' => ['admin:r', 'assistenz:r'],
-				'searchFunctions' => ['admin:r', 'assistenz:r'],
+				'getAllOrgUnits' => ['admin:r', 'assistenz:r'],
 				'loadFunction' => ['admin:r', 'assistenz:r'],
 				'insertFunction' => ['admin:rw', 'assistenz:rw'],
 				'updateFunction' => ['admin:rw', 'assistenz:rw'],
@@ -41,6 +37,20 @@ class Funktionen extends FHCAPI_Controller
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 
 		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+	}
+
+	public function getAllFunctions()
+	{
+		$this->FunktionModel->addSelect("funktion_kurzbz");
+		$this->FunktionModel->addSelect("beschreibung");
+		$this->FunktionModel->addSelect("aktiv");
+		$this->FunktionModel->addSelect("beschreibung AS label");
+		$this->FunktionModel->addOrder("beschreibung");
+		$result = $this->FunktionModel->load();
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
 	public function getOrgHeads()
@@ -97,7 +107,7 @@ class Funktionen extends FHCAPI_Controller
             WHERE
 				bf.uid = ?
             ORDER BY
-				f.beschreibung, bf.datum_von ASC";
+				bf.datum_von, bf.datum_von ASC";
 
 		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($uid));
 		$data = $this->getDataOrTerminateWithError($benutzerfunktionen);
@@ -106,14 +116,35 @@ class Funktionen extends FHCAPI_Controller
 	}
 
 	/*
-	 * return list of child orgets for a given company orget_kurzbz
+	 * returns list of all organisation units
 	 * as key value list to be used in select or autocomplete
 	 */
-	public function getOrgetsForCompany($companyOrgetkurzbz=null)
+	public function getAllOrgUnits()
 	{
 		$sql = "
 			SELECT
-				oe.oe_kurzbz,
+				oe.oe_kurzbz, oe.aktiv,
+				'[' || COALESCE(oet.bezeichnung, oet.organisationseinheittyp_kurzbz) ||
+				'] ' || COALESCE(oe.bezeichnung, oe.oe_kurzbz) AS label
+			FROM public.tbl_organisationseinheit oe
+			JOIN public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz
+			ORDER BY oet.bezeichnung ASC, oe.bezeichnung ASC";
+
+		$result = $this->OrganisationseinheitModel->execReadOnlyQuery($sql);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	/*
+	 * return list of child orgets for a given company orget_kurzbz
+	 * as key value list to be used in select or autocomplete
+	 */
+	public function getOrgetsForCompany($companyOrgetkurzbz = null)
+	{
+		$sql = "
+			SELECT
+				oe.oe_kurzbz, oe.aktiv,
 				'[' || COALESCE(oet.bezeichnung, oet.organisationseinheittyp_kurzbz) ||
 				'] ' || COALESCE(oe.bezeichnung, oe.oe_kurzbz) AS label
 			FROM (
@@ -137,25 +168,6 @@ class Funktionen extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($childorgets);
 
 		$this->terminateWithSuccess($data);
-	}
-
-	public function searchOes($companyOrgetKurzbz, $searchString = null)
-	{
-		$result = $this->OrganisationseinheitModel->getAutocompleteSuggestionsWithCompany($companyOrgetKurzbz, $searchString);
-		if (isError($result)) {
-			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		$this->terminateWithSuccess($result ?: []);
-	}
-
-	public function searchFunctions($searchString = null)
-	{
-
-		$result = $this->FunktionModel->getAutocompleteSuggestions($searchString);
-		if (isError($result)) {
-			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-		$this->terminateWithSuccess($result ?: []);
 	}
 
 	public function loadFunction($benutzerfunktion_id)

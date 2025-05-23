@@ -15,17 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 export default {
-	getContractFunctions(filter) {
-		var url = 'api/frontend/v1/funktionen/Funktionen/getContractFunctions';
-		if( typeof filter !== 'undefined' && filter !== null ) {
-			url = url + '/' + filter;
-		}
-		return {
-			method: 'get',
-			url,
-		};
-
-	},
 	getOrgHeads() {
 		var url = 'api/frontend/v1/funktionen/Funktionen/getOrgHeads';
 		return {
@@ -41,30 +30,13 @@ export default {
 			url,
 		};
 	},
-	loadAllOes(filterStudent) {
-		var url = 'api/frontend/v1/funktionen/Funktionen/loadAllOes'
-			+ '/' + filterStudent;
+	getAllOrgUnits(filterStudent) {
+		var url = 'api/frontend/v1/funktionen/Funktionen/getAllOrgUnits';
 		return {
 			method: 'get',
 			url,
 		};
 	},
-	getCompanyByOrget(orget) {
-		var url = 'api/frontend/v1/funktionen/Funktionen/getCompanyByOrget'
-			+ '/' + orget;
-		return {
-			method: 'get',
-			url,
-		};
-	},
-	getCurrentFunctions(mitarbeiter_uid, unternehmen) {
-		var url = 'api/frontend/v1/funktionen/Funktionen/getCurrentFunctions'
-			+ '/' + mitarbeiter_uid + '/' + unternehmen;
-		return {
-			method: 'get',
-			url,
-		};
-	}  ,
 	getAllUserFunctions(mitarbeiter_uid) {
 		var url = 'api/frontend/v1/funktionen/Funktionen/getAllUserFunctions'
 			+ '/' + mitarbeiter_uid;
@@ -114,11 +86,4 @@ export default {
 			url: 'api/frontend/v1/funktionen/Funktionen/searchOes/' + head + '/' + searchString
 		};
 	},
-	getFunctions(searchString) {
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/funktionen/Funktionen/searchFunctions/' + searchString
-		};
-	}
-
 };
