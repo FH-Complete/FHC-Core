@@ -93,15 +93,14 @@ export default {
 						v-model="data.signiert"
 					>
 					</form-input>
-						<form-input
-							container-class="form-check"
-							type="checkbox"
-							name="stud_selfservice"
-							:label="'Selfservice'"
-							v-model="data.stud_selfservice"
-					>
+					<form-input
+						container-class="form-check"
+						type="checkbox"
+						name="stud_selfservice"
+						:label="'Selfservice'"
+						v-model="data.stud_selfservice">
+					</form-input>
 				</div>
-				</form-input>
 			</fieldset>
 
 			<template #title>
