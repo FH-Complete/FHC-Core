@@ -119,6 +119,7 @@ export default {
 			<div class="modal-content">
 				<div v-if="$slots.title" class="modal-header">
 					<h5 class="modal-title"><slot name="title"/></h5>
+					<slot name="popoutButton"></slot>
 					<button v-if="!noCloseBtn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body" :class="bodyClass">
