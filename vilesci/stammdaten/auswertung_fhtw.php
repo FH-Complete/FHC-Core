@@ -667,6 +667,45 @@ if ($rtFreischalten)
 	}
 }
 
+$personenEntsperren = filter_input(INPUT_POST, 'personenEntsperren', FILTER_VALIDATE_BOOLEAN);
+if ($personenEntsperren)
+{
+	if (!$rechte->isBerechtigt('lehre/reihungstestAufsicht', null, 'su'))
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => $rechte->errormsg
+		));
+		exit();
+	}
+
+	if (isset($_POST['personen']))
+	{
+		$personen_ids = (array_keys($_POST['personen']));
+
+		$qry = "UPDATE testtool.tbl_pruefling
+				SET gesperrt = false
+				WHERE prestudent_id IN (SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id IN (". $db->implode4SQL($personen_ids) ."))";
+
+		if ($result = $db->db_query($qry))
+		{
+			$msg = 'Alle Teilnehmer wurden freigeschaltet';
+			echo json_encode(array(
+				'status' => 'ok',
+				'msg' => $msg));
+			exit();
+		}
+		else
+		{
+			echo json_encode(array(
+				'status' => 'fehler',
+				'msg' => 'Fehler beim speichern der Daten'
+			));
+			exit();
+		}
+	}
+}
+
 // Informiert die Studiengangsassistenz über das Ende des Tests
 $testende = filter_input(INPUT_POST, 'testende', FILTER_VALIDATE_BOOLEAN);
 if ($testende)
@@ -1539,7 +1578,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			tbl_gebiet.bezeichnung AS gebiet,
 			tbl_pruefling.idnachweis,
 			tbl_pruefling.registriert,
-			tbl_pruefling.gesperrt,
+			(SELECT gesperrt FROM testtool.tbl_pruefling WHERE prestudent_id IN (SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id = tbl_person.person_id) ORDER BY gesperrt DESC LIMIT 1) gesperrt, 
 			tbl_pruefling.pruefling_id,
 			get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) AS letzter_status
 		FROM PUBLIC.tbl_rt_person
@@ -2420,17 +2459,46 @@ else
 			});
 		}
 	}
+	function sperrWarning(change)
+	{
+		let sperrCountSpan = $(".sperrcount");
+		let sperrTextSpan = $(".sperrtext");
+		let count = parseInt(sperrCountSpan.text());
+
+		if (isNaN(count)) count = 0;
+
+		let newCount = count + change;
+
+		if (newCount < 0) newCount = 0;
+
+		sperrCountSpan.text(newCount);
+
+		let warningBox = $("#gesperrtWarning");
+
+		if (newCount === 0)
+		{
+			warningBox.hide();
+		}
+		else
+		{
+			if (newCount === 1)
+				sperrTextSpan.text("ist");
+			else
+				sperrTextSpan.text("sind");
+			warningBox.show();
+		}
+	}
 	function prueflingEntSperren(element)
 	{
-	 	var person_id = element.getAttribute("data-person-id");
-		var name = element.getAttribute("data-person-name");
-		var art = element.getAttribute("data-art") === "true";
+	 	let person_id = element.getAttribute("data-person-id");
+		let name = element.getAttribute("data-person-name");
+		let art = element.getAttribute("data-art") === "true";
 
 		let text = art ? "sperren" : "entsperren";
 
 		if (confirm("Wollen Sie den Studenten "+ name + " wirklich " + text + "?"))
 		{
-			data = {
+			let data = {
 				person_id: person_id,
 				art: art,
 				rtprueflingEntSperren: true
@@ -2463,11 +2531,13 @@ else
 					{
 						if (art === true)
 						{
+							sperrWarning(+1)
 							$(".prueflingentsperren_" + person_id).removeClass("hidden");
 							$(".prueflingsperren_" + person_id).addClass("hidden");
 						}
 						else if (art === false)
 						{
+							sperrWarning(-1)
 							$(".prueflingsperren_" + person_id).removeClass("hidden");
 							$(".prueflingentsperren_" + person_id).addClass("hidden");
 						}
@@ -2564,6 +2634,47 @@ else
 		}
 	}
 	
+	function alleentsperren(element)
+	{
+		let personenJson = element.getAttribute("data-gesperrte-personen");
+		let personen = JSON.parse(personenJson);
+		let data = {
+			personen: personen,
+			personenEntsperren: true,
+		};
+
+		$.ajax({
+			url: "auswertung_fhtw.php",
+			data: data,
+			type: "POST",
+			dataType: "json",
+			success: function(data)
+			{
+				if(data.status !== "ok")
+				{
+					$("#msgbox").attr("class","alert alert-danger");
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+				}
+				else
+				{
+					$("#gesperrtWarning").hide();
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
+					$("[class^=\'prueflingentsperren_\']").addClass("hidden");
+					$("[class^=\'prueflingsperren_\']").removeClass("hidden");
+					$(".sperrcount").text(0);
+				}
+			},
+			error: function(data)
+			{
+				$("#msgbox").attr("class","alert alert-danger");
+				$("#msgbox").show();
+				$("#msgbox").html(data["msg"]);
+			}
+		});
+	}
+
 	function freischalten(reihungstest, art)
 	{
 		data = {
@@ -3193,6 +3304,33 @@ else
 			</div>';
 	echo '	<div id="freischaltenInfo" class="alert alert-info'.($displayInfo ? '' : ' hiddenEl').'">Dieser Reihungstest ist freigeschaltet. Bitte sperren Sie ihn nach dem Test 
 				<button class="btn btn-info" onclick="freischalten('.$frsch_rt_id.', false)">Jetzt sperren</button>
+			</div>';
+
+	$countGesperrt = 0;
+	$gesperrtWarning = false;
+	$gesperrtText = 'sind';
+	if (isset($gesperrt_arr))
+	{
+		array_filter($gesperrt_arr, function($element) use (&$countGesperrt) {
+			if ($element->gesperrt)
+			{
+				$countGesperrt++;
+			}
+			return true;
+		});
+
+		if ($countGesperrt > 0)
+		{
+			if ($countGesperrt === 1)
+				$gesperrtText = 'ist';
+			$gesperrtWarning = true;
+		}
+	}
+	echo '	<div id="gesperrtWarning" class="alert alert-warning'.($gesperrtWarning ? '' : ' hiddenEl').'">Achtung  <span class="sperrcount">'. $countGesperrt . '</span> Teilnehmer <span class="sperrtext">'. $gesperrtText . '</span> gesperrt!
+				<button class="btn btn-warning" 
+					data-gesperrte-personen="'.htmlspecialchars(json_encode($gesperrt_arr), ENT_QUOTES, 'UTF-8').'"
+					onclick="alleentsperren(this)">Jetzt alle entsperren
+				</button>
 			</div>';
 	if ($messageSuccess != '' || $messageError != '')
 	{
