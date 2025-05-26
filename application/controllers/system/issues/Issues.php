@@ -28,7 +28,7 @@ class Issues extends Auth_Controller
 		$this->load->model('system/Sprache_model', 'SpracheModel');
 
 		// load config
-		$this->load->config('issues');
+		$this->load->config('issueList');
 
 		$this->loadPhrases(
 			array(
