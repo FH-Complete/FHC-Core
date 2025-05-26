@@ -145,7 +145,7 @@ $query .= " OR (iss.oe_kurzbz IS NULL AND EXISTS ( /* if person_id of issue is a
 					AND stg.oe_kurzbz IN ".$ALL_OE_KURZBZ_BERECHTIGT;
 
 if (!isEmptyString($RELEVANT_PRESTUDENT_STATUS)) $query .= " AND pss.status_kurzbz IN ".$RELEVANT_PRESTUDENT_STATUS;
-					
+
 $query .= 		" AND NOT EXISTS (SELECT 1 /* irrelevant if already finished studies and studied a while ago */
 									FROM public.tbl_prestudentstatus ps_finished
 									JOIN public.tbl_studiensemester sem_finished USING (studiensemester_kurzbz)
