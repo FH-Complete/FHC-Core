@@ -4,7 +4,7 @@ import FormForm from "../../../../Form/Form.js";
 import FormInput from "../../../../Form/Input.js";
 
 import ApiStvJointstudies from '../../../../../api/factory/stv/jointstudies.js';
-import ApiStvMobility from "../../../../../api/factory/stv/mobility";
+import ApiStvMobility from "../../../../../api/factory/stv/mobility.js";
 
 export default {
 	name: 'Tbl_JointStudies',

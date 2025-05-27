@@ -3,7 +3,7 @@ import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 
-import ApiStvAdmissionDates from '../../../../../api/factory/stv/admissionDates';
+import ApiStvAdmissionDates from '../../../../../api/factory/stv/admissionDates.js';
 
 export default {
 	name: 'ListAdmissionDates',
