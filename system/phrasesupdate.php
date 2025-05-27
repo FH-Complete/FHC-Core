@@ -31432,7 +31432,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unterricht laut Stundenplan',
+				'text' => 'Termine laut Stundenplan',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -31532,13 +31532,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine zugeteilten Studenten gefunden für den gewählten LV-Teil gefunden!',
+				'text' => 'Keine zugeteilten Studenten gefunden!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No assigned students for the selected teaching unit found!',
+				'text' => 'No assigned students found!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -40369,11 +40369,9 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
 	//////////// FHC4 Phrases Gruppen End ////////////
 
-	),
-// FHC4 Phrases CleanUpTasks End
 array(
 	'app' => 'core',
 	'category' => 'person',
@@ -42217,9 +42215,8 @@ and represent the current state of research on the topic. The prescribed citatio
 				'insertvon' => 'system'
 			)
 		)
-	)
-	// PROJEKTARBEITSBEURTEILUNG SS2025 ENDE ---------------------------------------------------------------------------
 	),
+	// PROJEKTARBEITSBEURTEILUNG SS2025 ENDE ---------------------------------------------------------------------------
 	/////////// FHC4 Phrases Messages START ///////////
 	array(
 		'app' => 'core',
