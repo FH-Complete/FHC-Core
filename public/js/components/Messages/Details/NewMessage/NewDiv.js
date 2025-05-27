@@ -2,7 +2,7 @@ import FormForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
 import ListBox from "../../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
 import DropdownComponent from '../../../VorlagenDropdown/VorlagenDropdown.js';
-import ApiMessages from "../../../../api/factory/messages/messages";
+import ApiMessages from "../../../../api/factory/messages/messages.js";
 
 export default {
 	name: "ComponentNewMessages",
