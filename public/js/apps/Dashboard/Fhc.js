@@ -15,6 +15,8 @@ import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMit
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../../components/Cis/Studium/Studium.js";
 
+import ApiRenderers from '../../api/factory/renderers.js';
+
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 const router = VueRouter.createRouter({
@@ -234,7 +236,8 @@ const router = VueRouter.createRouter({
 const app = Vue.createApp({
 	name: 'FhcApp',
 	data: () => ({
-		appSideMenuEntries: {}
+		appSideMenuEntries: {},
+		renderers: {},
 	}),
 	components: {},
 	computed: {
@@ -244,7 +247,8 @@ const app = Vue.createApp({
 	},
 	provide() {
 		return { // provide injectable & watchable language property
-			language: Vue.computed(() => this.$p.user_language)
+			language: Vue.computed(() => this.$p.user_language),
+			renderers: Vue.computed(() => this.renderers),
 		}	
 	},
 	methods: {
@@ -281,6 +285,14 @@ const app = Vue.createApp({
 				
 			}
 		}
+	},
+	async created(){
+		await this.$api
+			.call(ApiRenderers.loadRenderers())
+			.then(res => res.data)
+			.then(data => {
+				this.renderers = data;
+			});
 	},
 	mounted() {
 		document.addEventListener('click', this.handleClick);

@@ -3,10 +3,11 @@ import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
 import LvInfo from "../Mylv/LvInfo.js"
 import LvMenu from "../Mylv/LvMenu.js"
-import moodleSvg from "../../../helpers/moodleSVG.js"
+import lehreinheitEvent from "./EventTypes/lehreinheitEvent.js"
 
 import ApiStundenplan from '../../../api/factory/stundenplan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
+
 
 export const DEFAULT_MODE_STUNDENPLAN = 'Week'
 
@@ -46,6 +47,7 @@ const Stundenplan = {
 			eventMaxHeight: this.eventMaxHeight
 		}	
 	},
+	inject:["renderers"],
 	watch: {
 		weekFirstDay: {
 			handler: async function (newValue) {
@@ -69,7 +71,7 @@ const Stundenplan = {
 		}
 	},
 	components: {
-		FhcCalendar, LvModal, LvMenu, LvInfo, moodleSvg
+		FhcCalendar, LvModal, LvMenu, LvInfo, lehreinheitEvent, 
 	},
 	computed:{
 		downloadLinks: function(){
@@ -105,17 +107,16 @@ const Stundenplan = {
 		},
 	},
 	methods:{
+		renderComponent(name){
+			switch(name){
+				case 'lehreinheitEvent': return lehreinheitEvent;
+				default: return !this.renderers? null : Vue.defineAsyncComponent(() => import(this.renderers[name]))
+			}
+		},
 		fetchStudiensemesterDetails: async function (date) {
 			return this.$api.call(ApiStundenplan.studiensemesterDateInterval(date));
 		},
-		convertTime: function([hour,minute]){
-			let date = new Date();
-			date.setHours(hour);
-			date.setMinutes(minute);
-			// returns date string as hh:mm
-			return date.toLocaleTimeString(this.$p.user_locale, { hour: '2-digit', minute: '2-digit', hour12:false}); 
-
-		},
+		
 		setSelectedEvent: function (event) {
 			this.currentlySelectedEvent = event;
 		},
@@ -248,6 +249,7 @@ const Stundenplan = {
 			.then(data => {
 				this.uid = data.uid;
 			});
+		
 		// this.loadEvents();
 	},
 	beforeUnmount() {
@@ -285,68 +287,23 @@ const Stundenplan = {
 			</div>
 		</template>
 		<template #monthPage="{event,day}">
-			<div class="p-1" v-if="event.type=='moodle'" @click="showModal(event)">
-				<div class="d-flex small w-100" >
-					<moodle-svg></moodle-svg>
-					<span class="flex-grow-1 text-center "><strong v-html="event.titel"></strong> - {{event.topic}}</span>
-				</div>
-			</div>
-			<div v-else @click="showModal(event)" class="p-1">
-				<span>{{event.topic}}</span>
+			<div @click="showModal(event)" class="p-1">
+				<component :event="event" :is="renderComponent(event.type+'Event')"></component>
 			</div>
 		</template>
 		<template #weekPage="{event,day}">
-			<div @click="showModal(event)" type="button"
-			class=" position-relative border border-secondary border d-flex flex-col align-items-center justify-content-evenly h-100"
-			:class="{'p-1':event.allDayEvent}"
-			style="overflow: auto;">
-				<div v-if="!event.allDayEvent && event?.beginn && event?.ende" class="d-none d-xl-block" >
-					<div class="d-flex flex-column p-4 p-xl-2 border-end border-secondary">
-						<span class="small">{{convertTime(event.beginn.split(":"))}}</span>
-						<span class="small">{{convertTime(event.ende.split(":"))}}</span>
-					</div>
-				</div>
-				<div v-if="event.type=='moodle'" class="d-flex small w-100" >
-					<moodle-svg></moodle-svg>
-					<span class="flex-grow-1 text-center"><strong v-html="event.titel"></strong> - {{event.topic}}</span>
-				</div>
-				<div v-else class="d-flex flex-column flex-grow-1 align-items-center small">
-					<span>{{event.topic}}</span>
-					<span v-for="lektor in event.lektor">{{lektor.kurzbz}}</span>
-					<span>{{event.ort_kurzbz}}</span>
-				</div>
+			<div @click="showModal(event)" type = "button"
+				class="weekPageContainer position-relative border border-secondary border d-flex flex-col align-items-center justify-content-evenly h-100"
+				:class="{'p-1':event.allDayEvent}"
+				style = "overflow: auto;" >
+				<component :event="event" :is="renderComponent(event.type+'Event')"></component>
 			</div>
 		</template>
 		<template #dayPage="{event,day,mobile}">
-			<div @click="mobile? showModal(event):null" type="button" class="fhc-entry border border-secondary border m-0 h-100  text-center">
-				<template v-if="event.type=='moodle'">
-					<div class="d-flex small align-items-center w-100 p-1" >
-						<moodle-svg></moodle-svg>
-						<span class="flex-grow-1 text-center"><strong v-html="event.titel"></strong> - {{event.topic}}</span>
-					</div>
-				</template>
-				<template v-else>
-					<div class="row justify-content-center align-items-center">
-						<div class="col-auto" v-if="!event.allDayEvent && event?.beginn && event?.ende" >
-							<div class="d-flex flex-column p-4 border-end border-secondary">
-								<span class="small">{{convertTime(event.beginn.split(":"))}}</span>
-								<span class="small">{{convertTime(event.ende.split(":"))}}</span>
-							</div>
-						</div>
-						<div class="col">
-							<p>{{ $p.t('lehre/lehrveranstaltung') }}:</p>
-							<p class="m-0">{{event?.topic}}</p>
-						</div>
-						<div class="col" :style="'max-height: ' + eventMaxHeight + '; overflow: auto;'">
-							<p>{{ $p.t('lehre/lektor') }}:</p>
-							<p class="m-0" v-for="lektor in event?.lektor">{{lektor.kurzbz}}</p>
-						</div>
-						<div class="col">
-							<p>{{ $p.t('profil/Ort') }}: </p>
-							<p class="m-0">{{event?.ort_kurzbz}}</p>
-						</div>
-					</div>
-				</template>
+			<div @click="mobile? showModal(event):null" type="button" class="dayPageContainer fhc-entry border border-secondary border m-0 h-100  text-center">
+				<div class="h-100 d-flex flex-col justify-content-evenly align-items-center">
+					<component :is="renderComponent(event.type+'Event')" :event="event"></component>
+				</div>
 			</div>
 		</template>
 		<template #pageMobilContent="{lvMenu, event}">
