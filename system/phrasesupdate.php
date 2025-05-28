@@ -44130,6 +44130,68 @@ and represent the current state of research on the topic. The prescribed citatio
 		)
 	),
 	// FHC4 STUDIERENDENVERWALTUNG AUFNAHMETERMINE ENDE	 ---------------------------------------------------------------
+	// FHC4 STUDIERENDENVERWALTUNG ANZAHL START	 ---------------------------------------------------------------
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'ausgewaehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ausgewählt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'selected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'gefiltert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'gefiltert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'filtered',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'gesamt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'gesamt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'total',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC4 STUDIERENDENVERWALTUNG ANZAHL ENDE	 ---------------------------------------------------------------
 );
 
 
