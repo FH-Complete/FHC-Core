@@ -203,19 +203,6 @@ export default {
 			]
 		}
 	},
-	computed: {
-		tabulatorEvents() {
-			const events = [
-				{
-					event: "rowDblClick",
-					handler: (e, row) => {
-						this.actionDownloadFile(row.getData().akte_id);
-					}
-				}
-			];
-			return events;
-		}
-	},
 	methods: {
 		actionDownloadFile(akte_id){
 			window.open(

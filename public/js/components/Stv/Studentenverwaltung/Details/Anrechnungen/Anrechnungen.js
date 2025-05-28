@@ -299,7 +299,7 @@ export default {
 
 	},
 	template: `
-					<div class="stv-details-tab_exemptions h-100 pb-3">
+				<div class="stv-details-tab_exemptions h-100 pb-3">
 					<h5>{{$p.t('lehre', 'anrechnungen')}}</h5>
 					
 					<div v-if="showNotizen" class="border p-3 overflow-auto" style="height: 200px;">
@@ -438,5 +438,6 @@ export default {
 						</template>
 								
 					</bs-modal>
+				</div>
 	`
 }
