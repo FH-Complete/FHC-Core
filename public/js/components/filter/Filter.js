@@ -664,7 +664,7 @@ export const CoreFilterCmpt = {
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
-					<span v-else-if="description">{{ description }}</span>
+					<span v-else-if="description" v-html="description"></span>
 					<a v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
 						<span class="fa-solid fa-xl fa-filter"></span>
 					</a>
