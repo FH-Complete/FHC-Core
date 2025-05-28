@@ -223,6 +223,39 @@ class FHCAPI_Controller extends Auth_Controller
 		return $result->retval;
 	}
 
+	protected function terminateWithFileOutput($contenttype, $content, $filename=null)
+	{
+		$this->clearOutputBuffering();
+		$this->output->set_status_header(200)
+			->set_content_type($contenttype)
+			->set_header('Expires: 0')
+			->set_header('Cache-Control: no-store, no-cache, must-revalidate')
+			->set_header('Pragma: public')
+			->set_header('Content-Length: ' . strlen($content));
+
+		if($filename)
+		{
+			$cleanedfilename = preg_replace('/[^a-zA-Z0-9\-_.]/', '_', $filename);
+			$this->output->set_header('Content-Disposition: attachment; filename="'
+				. $cleanedfilename . '"');
+		}
+		else
+		{
+			$this->output->set_header('Content-Disposition: inline');
+		}
+
+		$this->output->set_output($content)
+			->_display();
+		exit();
+	}
+
+	private function clearOutputBuffering()
+	{
+		while(ob_get_level() > 0)
+		{
+			ob_end_clean();
+		}
+	}
 
 	// ---------------------------------------------------------------
 	// Security
