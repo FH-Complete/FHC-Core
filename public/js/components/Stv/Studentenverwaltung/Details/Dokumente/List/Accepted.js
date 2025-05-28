@@ -101,13 +101,13 @@ export default {
 							container.className = "d-flex gap-2";
 
 							if(cell.getData().vorhanden){
-								let button = document.createElement('button');
+								let button = document.createElement('a');
 								button.className = 'btn btn-outline-secondary btn-action';
 								button.innerHTML = '<i class="fa fa-download"></i>';
 								button.title = this.$p.t('ui', 'downloadDok');
-								button.addEventListener('click', (event) =>
-									this.actionDownloadFile(cell.getData().akte_id)
-								);
+								button.href = this.actionDownloadFile(cell.getData().akte_id);
+								button.role = 'button';
+								button.target = '_blank';
 								container.append(button);
 
 								button = document.createElement('button');
@@ -205,11 +205,10 @@ export default {
 	},
 	methods: {
 		actionDownloadFile(akte_id){
-			window.open(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root
-				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/stv/dokumente/download?akte_id=' + encodeURIComponent(akte_id),
-				'_blank'
-			);
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+				+ '/api/frontend/v1/stv/dokumente/download?akte_id=' 
+				+ encodeURIComponent(akte_id);
 		},
 		actionUploadFile(dokument_kurzbz){
 			this.$refs.modalUpload.open(this.prestudent_id, dokument_kurzbz);

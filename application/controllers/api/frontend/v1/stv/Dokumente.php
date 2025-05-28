@@ -24,6 +24,7 @@ class Dokumente extends FHCAPI_Controller
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 		$this->load->library('form_validation');
+		$this->load->library('DmsLib', array('who' => getAuthUID()));
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -417,26 +418,35 @@ class Dokumente extends FHCAPI_Controller
 
 
 		$result = $this->AkteModel->load($akte_id);
-
 		if (!hasData($result)) $this->terminateWithError('Akte not found');
-
 		$data = getData($result)[0];
 
-		header('Content-Description: File Transfer');
-		header('Content-Type: '. $data->mimetype);
-		header('Content-Disposition: attachment; filename="'.$data->titel.'"');
-		header('Expires: 0');
-		header('Cache-Control: must-revalidate');
-		header('Pragma: public');
-		if (isset($data->inhalt) && !empty($data->inhalt)) {
-			$decodedContent = base64_decode($data->inhalt, true);
+		$mimetype = $data->mimetype;
+		$filecontentbase64 = $data->inhalt;
+		$filename = $data->titel;
 
-			if ($decodedContent === false) {
-				die('Error: Base64-Dekodierung failed.');
-			}
-			echo $decodedContent;
+		if(intval($data->dms_id) > 0)
+		{
+			$dmsdokres = $this->dmslib->read($data->dms_id);
+			if (!hasData($dmsdokres)) $this->terminateWithError('DMS File not found');
+			$dmsdok = getData($dmsdokres)[0];
+
+			$mimetype = $dmsdok->mimetype;
+			$filecontentbase64 = $dmsdok->file_content;
+			$filename = $dmsdok->name;
 		}
-		die();
+
+		$filecontent = '';
+
+		if (!empty($filecontentbase64)) {
+			$filecontent = base64_decode($filecontentbase64, true);
+
+			if ($filecontent === false) {
+				$this->terminateWithError('Base64-Dekodierung failed.');
+			}
+		}
+
+		$this->terminateWithFileOutput($mimetype, $filecontent, $filename);
 	}
 
 	private function _getMissingDocuments($studiengang_kz, $prestudent_id)
