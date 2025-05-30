@@ -221,7 +221,6 @@ export default {
 					handler: async() => {
 						await this.$p.loadCategory(['global', 'person', 'stv', 'ui', 'projektarbeit']);
 
-
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('projekttyp_kurzbz').component.updateDefinition({

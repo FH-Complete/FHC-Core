@@ -41789,7 +41789,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Title',
+				'text' => 'title',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41809,7 +41809,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Title English',
+				'text' => 'title English',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41829,7 +41829,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Topic area',
+				'text' => 'topic area',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41849,7 +41849,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Type',
+				'text' => 'type',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41869,7 +41869,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Company',
+				'text' => 'company',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41889,7 +41889,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Course',
+				'text' => 'course',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41909,7 +41909,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Teaching unit',
+				'text' => 'teaching unit',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41929,7 +41929,47 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
+				'text' => 'assessor',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'projektarbeit',
+		'phrase' => 'betreuerGross',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betreuer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
 				'text' => 'Assessor',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'projektarbeit',
+		'phrase' => 'betreuerart',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betreuerart',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'assessor type',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41949,7 +41989,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Grade',
+				'text' => 'grade',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41969,7 +42009,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Hours',
+				'text' => 'hours',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41989,7 +42029,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Hourly rate',
+				'text' => 'hourly rate',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -42029,7 +42069,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Start',
+				'text' => 'start',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -42049,7 +42089,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'End',
+				'text' => 'end',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -42089,7 +42129,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Locked until',
+				'text' => 'locked until',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -42109,7 +42149,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Annotation',
+				'text' => 'annotation',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -42129,7 +42169,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Company Id',
+				'text' => 'company Id',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -42210,6 +42250,326 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'English',
 				'text' => 'Deleting not possible, project assessor has a contract already',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'projektarbeit',
+		'phrase' => 'neuePersonAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Person anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create new person',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'titelPre',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Titel (Pre)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'title (Pre)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'titelPost',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Titel (Post)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'title (Post)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'weitereVornamen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Weitere Vornamen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'other first names',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bestehendeAdresseUeberschreiben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestehende Adresse überschreiben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Replace existing address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'adresseHinzufuegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adresse hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add new address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'adresseNichtAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adresse nicht anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do not create address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'land',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Land',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'nation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'mobil',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobil',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'mobile phone',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'letzeAusbildung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Letzte Ausbildung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'most recent education',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'ausbildungsart',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausbildungsart',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'education type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'anmerkungen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anmerkungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'notes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'personAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Person anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create person',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'interessentAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'InteressentIn anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create candidate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'personExistiertPruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung ob Person bereits existiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Check if a person already exists',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'zurueck',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zurück',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Back',
 				'description' => '',
 				'insertvon' => 'system'
 			)

@@ -16,6 +16,7 @@ class Projektbetreuer extends FHCAPI_Controller
 			'getNoten' => ['admin:r', 'assistenz:r'],
 			'getDefaultStundensaetze' => ['admin:r', 'assistenz:r'],
 			'getProjektbetreuerBySearchQuery' => ['admin:r', 'assistenz:r'],
+			'getPerson' => ['admin:r', 'assistenz:r'],
 			'validateProjektbetreuer' => ['admin:r', 'assistenz:r']
 		]);
 
@@ -52,7 +53,7 @@ class Projektbetreuer extends FHCAPI_Controller
 			'projektarbeit_id, person_id, nachname, vorname, note, punkte, round(stunden, 1) AS stunden,
 			stundensatz, betreuerart_kurzbz, vertrag_id, titelpre, titelpost'
 		);
-		$this->ProjektbetreuerModel-> addSelect("CASE
+		$this->ProjektbetreuerModel->addSelect("CASE
 				WHEN EXISTS
 					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=pers.person_id)
 				THEN 'Mitarbeiter'
@@ -223,14 +224,35 @@ class Projektbetreuer extends FHCAPI_Controller
 		if (!isset($searchString))
 			$this->terminateWithError($this->p->t('ui', 'error_fieldRequired', ['field' => 'Search term']), self::ERROR_TYPE_GENERAL);
 
-
 		$result = $this->PersonModel->searchPerson($searchString);
-
-		$this->addMeta('met', $result);
 
 		if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
 		return $this->terminateWithSuccess(hasData($result) ? $this->_addFullNameToBetreuer(getData($result)) : []);
+	}
+
+	public function getPerson()
+	{
+		$person_id = $this->input->get('person_id');
+
+		if (!isset($person_id))
+			$this->terminateWithError($this->p->t('ui', 'error_fieldRequired', ['field' => 'Person']), self::ERROR_TYPE_GENERAL);
+
+		$this->PersonModel->addSelect("CASE
+				WHEN EXISTS
+					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id)
+				THEN 'Mitarbeiter'
+				WHEN EXISTS
+					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=tbl_person.person_id)
+				THEN 'Student'
+				ELSE 'Person'
+			END AS status");
+		$result = $this->PersonModel->addSelect('titelpre, titelpost, vorname, nachname, person_id');
+		$result = $this->PersonModel->load($person_id);
+
+		if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+
+		return $this->terminateWithSuccess(hasData($result) ? $this->_addFullNameToBetreuer(getData($result))[0] : []);
 	}
 
 	/**

@@ -2,6 +2,7 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
+import NewPerson from "../../List/New.js";
 
 import ApiStvProjektbetreuer from '../../../../../api/factory/stv/projektbetreuer.js';
 
@@ -10,7 +11,8 @@ export default {
 		CoreFilterCmpt,
 		FormForm,
 		FormInput,
-		PvAutoComplete
+		PvAutoComplete,
+		NewPerson
 	},
 	inject: {
 	},
@@ -333,12 +335,24 @@ export default {
 		},
 		reload() {
 			this.$refs.projektbetreuerTable.reloadTable();
+		},
+		actionNewPerson() {
+			this.$refs.newPersonModal.reset();
+			this.$refs.newPersonModal.open();
+		},
+		personSaved(result) {
+			this.$api
+				.call(ApiStvProjektbetreuer.getPerson(result.person_id))
+				.then(response => {
+					this.autocompleteSelectedBetreuer = response.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError)
 		}
 	},
 	template: `
 	<div class="stv-details-projektbetreuer h-100 pb-3">
 
-		<legend>{{this.$p.t('projektarbeit','betreuer')}}</legend>
+		<legend>{{this.$p.t('projektarbeit','betreuerGross')}}</legend>
 		<!-- <p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p> -->
 
 		<core-filter-cmpt
@@ -348,7 +362,7 @@ export default {
 			table-only
 			:side-menu="false"
 			new-btn-show
-			:new-btn-label="this.$p.t('projektarbeit', 'betreuer')"
+			:new-btn-label="this.$p.t('projektarbeit', 'betreuerGross')"
 			@click:new="actionNewProjektbetreuer"
 			>
 		</core-filter-cmpt>
@@ -370,9 +384,15 @@ export default {
 			</div>
 
 			<div class="row mb-3">
+				<div class="col-12">
+					<button class="btn btn-primary" @click="actionNewPerson">{{ $p.t('projektarbeit', 'neuePersonAnlegen') }}</button>
+				</div>
+			</div>
+
+			<div class="row mb-3">
 				<form-input
 					container-class="col-6 stv-details-projektbetreuer-betreuerart"
-					:label="$p.t('projektarbeit', 'betreuer')"
+					:label="$p.t('projektarbeit', 'betreuerart')"
 					type="select"
 					v-model="formData.betreuerart_kurzbz"
 					name="betreuerart_kurzbz"
@@ -388,22 +408,22 @@ export default {
 			</div>
 
 			<div class="row mb-3">
-					<form-input
-						container-class="col-8 stv-details-projektbetreuer-note"
-						:label="$p.t('projektarbeit', 'note')"
-						type="select"
-						v-model="formData.note"
-						name="note"
+				<form-input
+					container-class="col-8 stv-details-projektbetreuer-note"
+					:label="$p.t('projektarbeit', 'note')"
+					type="select"
+					v-model="formData.note"
+					name="note"
+					>
+					<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
+					<option
+						v-for="note in arrNoten"
+						:key="note.note"
+						:value="note.note"
 						>
-						<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
-						<option
-							v-for="note in arrNoten"
-							:key="note.note"
-							:value="note.note"
-							>
-							{{note.bezeichnung}}
-						</option>
-					</form-input>
+						{{note.bezeichnung}}
+					</option>
+				</form-input>
 			</div>
 
 			<div class="row mb-3">
@@ -429,7 +449,12 @@ export default {
 			</div>
 
 		</form-form>
-		<button class="btn btn-primary" v-show="betreuerFormOpened" @click="confirmProjektbetreuerAfterValidation">{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}</button>
+
+		<button class="btn btn-primary" v-show="betreuerFormOpened" @click="confirmProjektbetreuerAfterValidation">
+			{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}
+		</button>
+
+		<new-person ref="newPersonModal" :personOnly="true" @saved="personSaved"></new-person>
 	</div>
 `
 }

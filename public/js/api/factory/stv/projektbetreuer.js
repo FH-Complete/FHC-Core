@@ -63,6 +63,13 @@ export default {
 			params: { searchString }
 		};
 	},
+	getPerson(person_id) {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/projektbetreuer/getPerson',
+			params: { person_id }
+		};
+	},
 	validateProjektbetreuer(projektbetreuer) {
 		return {
 			method: 'post',

@@ -46,5 +46,12 @@ export default {
 			url: 'api/frontend/v1/stv/student/check',
 			params
 		};
+	},
+	add(params) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/student/add',
+			params
+		};
 	}
 };
