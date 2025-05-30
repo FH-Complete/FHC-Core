@@ -13,14 +13,6 @@ export default {
 			type: String,
 			required: true
 		},
-		modelValue: {
-			type: String,
-			required: true
-		},
-/*		oe: {
-			type: Array,
-			required: false
-		}, */
 		isAdmin: {
 			type: Boolean,
 			required: false

@@ -402,21 +402,19 @@ export default {
 					<div class="col-sm-4">
 						<div v-if="this.fieldsPrestudent.length > 0"  class="mt-3">
 							<strong>{{$p.t('ui', 'felder')}} {{$p.t('lehre', 'prestudent')}}</strong>
-							<div class="border p-3 overflow-auto" style="height: 250px;">
 
-								<list-box
-									v-model="selectedFieldPrestudent"
-									:options="itemsPrestudent"
-									optionLabel="label"
-								>
-								  <template #option="slotProps">
-									<div @dblclick="insertVariable(slotProps.option)">
-									  {{ slotProps.option.label }}
-									</div>
-								  </template>
-								</list-box>
-
-							</div>
+							<list-box
+								v-model="selectedFieldPrestudent"
+								:options="itemsPrestudent"
+								optionLabel="label"
+								listStyle="max-height:250px"
+							>
+							  <template #option="slotProps">
+								<div @dblclick="insertVariable(slotProps.option)">
+								  {{ slotProps.option.label }}
+								</div>
+							  </template>
+							</list-box>
 
 						</div>
 
@@ -424,41 +422,37 @@ export default {
 
 						<div v-if="this.fieldsPerson.length > 0" class="mt-3">
 							<strong>Felder Person</strong>
-							<div class="border p-3 overflow-auto" style="height: 250px;">
 
-								<list-box
-									v-model="selectedFieldPerson"
-									:options="itemsPerson"
-									optionLabel="label"
-								>
-									<template #option="slotProps">
-										<div @dblclick="insertVariable(slotProps.option)">
-										  {{ slotProps.option.label }}
-										</div>
-								  </template>
-								</list-box>
-
-							</div>
+							<list-box
+								v-model="selectedFieldPerson"
+								:options="itemsPerson"
+								optionLabel="label"
+								listStyle="max-height:250px"
+							>
+								<template #option="slotProps">
+									<div @dblclick="insertVariable(slotProps.option)">
+									  {{ slotProps.option.label }}
+									</div>
+							  </template>
+							</list-box>
 
 						</div>
 
 						<div>
 							<strong>{{$p.t('messages', 'meineFelder')}}</strong>
-							<div class="border p-3 overflow-auto" style="height: 200px;">
 
-								<list-box
-									v-model="selectedFieldUser"
-									:options="itemsUser"
-									optionLabel="label"
-								>
-									<template #option="slotProps">
-										<div @dblclick="insertVariable(slotProps.option)">
-										  {{ slotProps.option.label }}
-										</div>
-								  </template>
-								</list-box>
-
-							</div>
+							<list-box
+								v-model="selectedFieldUser"
+								:options="itemsUser"
+								optionLabel="label"
+								listStyle="max-height:200px"
+							>
+								<template #option="slotProps">
+									<div @dblclick="insertVariable(slotProps.option)">
+									  {{ slotProps.option.label }}
+									</div>
+							  </template>
+							</list-box>
 
 						</div>
 

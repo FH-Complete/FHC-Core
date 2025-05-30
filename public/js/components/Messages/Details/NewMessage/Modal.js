@@ -341,7 +341,8 @@ export default {
 		<bs-modal
 			class="messages-detail-newmessage-modal"
 			ref="modalNewMessage" 
-			dialog-class="modal-xl"
+			dialog-class=" modal-dialog-scrollable modal-xl"
+			body-class="px-3 py-2"
 			@hidden.bs.modal="resetForm"
 			>
 
@@ -350,10 +351,6 @@ export default {
 			</template>
 
 			<form-form ref="formNewMassage">
-
-				<div class="overflow-auto" style="max-height: 500px; border: 1px solid #ccc;">
-
-
 				<div class="row">
 					<div class="col-sm-8">
 						<form-form class="row g-3 mt-2" ref="formMessage">
@@ -410,60 +407,56 @@ export default {
 					<div class="col-sm-4">
 						<div v-if="this.fieldsPrestudent.length > 0">
 							<strong>{{$p.t('ui', 'felder')}} {{$p.t('lehre', 'prestudent')}}</strong>
-							<div class="border p-3 overflow-auto" style="height: 200px;">
 
-								<list-box
-									v-model="selectedFieldPrestudent"
-									:options="itemsPrestudent"
-									optionLabel="label"
-								>
-								  <template #option="slotProps">
-									<div @dblclick="insertVariable(slotProps.option)">
-									  {{ slotProps.option.label }}
-									</div>
-								  </template>
-								</list-box>
-
-							</div>
+							<list-box
+								v-model="selectedFieldPrestudent"
+								:options="itemsPrestudent"
+								optionLabel="label"
+								listStyle="max-height:200px"
+							>
+							  <template #option="slotProps">
+								<div @dblclick="insertVariable(slotProps.option)">
+								  {{ slotProps.option.label }}
+								</div>
+							  </template>
+							</list-box>
 
 						</div>
 
 						<div v-if="this.fieldsPerson.length > 0">
 							<strong>Felder Person</strong>
-							<div class="border p-3 overflow-auto" style="height: 200px;">
 
-								<list-box
-									v-model="selectedFieldPerson"
-									:options="itemsPerson"
-									optionLabel="label"
-								>
-									<template #option="slotProps">
-										<div @dblclick="insertVariable(slotProps.option)">
-										  {{ slotProps.option.label }}
-										</div>
-								  </template>
-								</list-box>
+							<list-box
+								v-model="selectedFieldPerson"
+								:options="itemsPerson"
+								optionLabel="label"
+								listStyle="max-height:200px"
+							>
+								<template #option="slotProps">
+									<div @dblclick="insertVariable(slotProps.option)">
+									  {{ slotProps.option.label }}
+									</div>
+							  </template>
+							</list-box>
 
-							</div>
 						</div>
 
 						<div>
 							<strong>{{$p.t('messages', 'meineFelder')}}</strong>
-							<div class="border p-3 overflow-auto" style="height: 200px;">
 
-								<list-box
-									v-model="selectedFieldUser"
-									:options="itemsUser"
-									optionLabel="label"
-								>
-									<template #option="slotProps">
-										<div @dblclick="insertVariable(slotProps.option)">
-										  {{ slotProps.option.label }}
-										</div>
-								  </template>
-								</list-box>
+							<list-box
+								v-model="selectedFieldUser"
+								:options="itemsUser"
+								optionLabel="label"
+								listStyle="max-height:200px"
+							>
+								<template #option="slotProps">
+									<div @dblclick="insertVariable(slotProps.option)">
+									  {{ slotProps.option.label }}
+									</div>
+							  </template>
+							</list-box>
 
-							</div>
 						</div>
 
 					</div>
@@ -508,9 +501,6 @@ export default {
 					</div>
 
 				</div>
-
-			</div>
-
 			</form-form>
 
 			<template #footer>

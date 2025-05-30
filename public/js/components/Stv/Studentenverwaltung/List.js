@@ -283,19 +283,15 @@ export default {
 	},
 	computed: {
 		countsToHTML: function() {
-			return this.$p.t('global/anzahl')
-				+ ' ('
-				+ this.$p.t('global/ausgewaehlt')
-				+ ' / '
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
+				+ ' | '
 				+ this.$p.t('global/gefiltert')
-				+ ' / '
-				+ this.$p.t('global/gesamt')
-				+ '): '
-				+ '<strong>' + (this.selectedcount || 0) + '</strong>'
-				+ ' / '
+				+ ': '
 				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
-				+ ' / '
-				+ '<strong>' + (this.count || 0) + '</strong>';
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.count || 0) + '</strong>';
 		}
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component

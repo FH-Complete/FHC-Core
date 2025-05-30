@@ -11,42 +11,6 @@ export default {
 	template: `
 	<div class="stv-details-messages h-100 pb-3 overflow-hidden">
 	
-	<!--TODO(Manu) Delete Testdata-->
-	
-<!--		<h3>Test Dominik Schneider</h3>
-		<core-messages
-			ref="formc"
-			endpoint="$fhcApi.factory.messages.person"
-			type-id="mitarbeiter_uid"
-			id="ma0130"
-			messageLayout="twoColumnsTableLeft"
-			show-table
-			open-mode="modal"
-			>
-		</core-messages>-->
-		
-<!--		<h3>Test Person fields</h3>
-		<core-messages
-			ref="formc"
-			endpoint="$fhcApi.factory.messages.person"
-			type-id="mitarbeiter_uid"
-			id="ma0158"
-			messageLayout="twoColumnsTableLeft"
-			show-table
-			open-mode="newTab"
-			>
-		</core-messages>-->
-		
-<!--		<h3>Test no table</h3>
-		<core-messages
-			ref="form2"
-			endpoint="$fhcApi.factory.messages.person"
-			type-id="prestudent_id"
-			:id="modelValue.prestudent_id"
-			open-mode="modal"
-			>
-		</core-messages>-->
-		
 	<template v-if="modelValue.prestudent_id">
 		<core-messages
 			ref="formc"
@@ -63,7 +27,6 @@ export default {
 		 <h3><strong>No valid prestudent_id!</strong></h3>
 		 <p>{{modelValue.anmerkungen}}</p>
 	</template>
-	
 
 	</div>
 	`
