@@ -113,6 +113,12 @@ const Stundenplan = {
 				default: return !this.renderers? null : Vue.defineAsyncComponent(() => import(this.renderers[name]))
 			}
 		},
+		renderComponentInfo(name) {
+			switch (name) {
+				case 'moodleEvent': return !this.renderers? null: Vue.defineAsyncComponent(() => import(this.renderers[name]));
+				default: return LvInfo;
+			}
+		},
 		fetchStudiensemesterDetails: async function (date) {
 			return this.$api.call(ApiStundenplan.studiensemesterDateInterval(date));
 		},
@@ -262,7 +268,11 @@ const Stundenplan = {
 		<span style="padding-left: 0.5em;" v-show="propsViewData?.lv_id && lv"> {{ $p.user_language.value === 'German' ? lv?.bezeichnung : lv?.bezeichnung_english}}</span>
 	</h2>
 	<hr>
-	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
+	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" >
+		<template #info>
+			<component :is="renderComponentInfo(currentlySelectedEvent.type+'Event')" :event="currentlySelectedEvent" ></component>
+		</template>
+	</lv-modal>
 	<fhc-calendar
 		ref="calendar"
 		@selectedEvent="setSelectedEvent"

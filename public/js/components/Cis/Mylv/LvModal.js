@@ -89,7 +89,7 @@ export default {
 					{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}
 				</template>
 			</h3>
-			<lv-info :event="event"></lv-info>
+			<slot name="info"></slot>
 			<template v-if="showMenu && this.menu">
 				<h3>{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
 				<lv-menu :menu="menu"></lv-menu>

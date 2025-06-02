@@ -10,13 +10,6 @@ export default {
 		}
 	},
 	computed: {
-		LV_TYPES: function () {
-			return {
-				lehreinheit: "lehreinheit",
-				reservierung: "reservierung",
-				moodle: "moodle",
-			};
-		},
 		lektorenLinks: function () {
 			if (!this.event || !Array.isArray(this.event.lektor) || !this.event.lektor.length) return "a";
 
@@ -56,49 +49,6 @@ export default {
 	},
 	template:/*html*/`
 		<table class="table table-hover mb-4">
-			<template v-if="event.type == LV_TYPES.moodle">
-				<tbody>
-					<tr>
-						<th>{{
-							$p.t('global','datum')?
-							$p.t('global','datum')+':'
-							:''
-						}}</th>
-						<td>{{methodFormatDate(event.datum)}}</td>
-					</tr>
-					<tr>
-						<th>{{$p.t('global','aktivitaet')}}:</th>
-						<td v-html="event?.assignment"></td>
-					</tr>
-					<tr>
-						<th>{{$p.t('global','typ')}}:</th>
-						<td><img v-if="event?.activityIcon" class="me-1" :src="event?.activityIcon" />{{event?.purpose}}</td>
-					</tr>
-					<tr>
-						<th>{{$p.t('fristenmanagement','frist')}}:</th>
-						<td>{{start_time}}</td>
-					</tr>
-					<tr v-if="event?.actionname">
-						<th>{{$p.t('lvinfo','actionname')}}:</th>
-						<td>
-							{{event?.actionname}}
-						</td>
-					</tr>
-					<tr v-if="event?.overdue">
-						<th>{{$p.t('lvinfo','overdue')}}:</th>
-						<td>
-							{{$p.t('lvinfo','overdueEvent')}}
-						</td>
-					</tr>
-					<tr >
-				    	<th>{{$p.t('lvinfo','moodleLink')}}</th>
-						<td>
-							<a :href="event?.url" target="_blank"><i class="fa fa-arrow-up-right-from-square me-1"></i></a>
-						</td>
-					</tr>
-				</tbody>
-			</template>
-			<template v-else>
 				<tbody>
 					<tr>
 						<th>{{
@@ -157,7 +107,6 @@ export default {
 						<td>{{event.organisationseinheit}}</td>
 					</tr>
 				</tbody>
-			</template>
 		</table>
 	`
 }
