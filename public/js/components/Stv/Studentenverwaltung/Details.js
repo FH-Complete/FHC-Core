@@ -63,11 +63,53 @@ export default {
 		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100 pb-3">
 			<div class="d-flex justify-content-start align-items-center w-100 pb-3 gap-3" style="max-height:8rem">
 				<img v-for="student in students" :key="student.person_id" class="d-block h-100 rounded" alt="profilbild" :src="appRoot + 'cis/public/bild.php?src=person&person_id=' + student.person_id">
+	
+
+					
 				<div v-if="students.length == 1">
-					<h2 class="h4">{{students[0].titlepre}} {{students[0].vorname}} {{students[0].nachname}} {{students[0].titlepost}}</h2>
+					<h2 class="h4">
+						{{students[0].titelpre}}
+						{{students[0].vorname}}
+						{{students[0].nachname}}
+						{{students[0].titelpost}}
+					</h2>
+					<h5 class="h6">
+						<strong class="text-muted">Studiengang </strong>
+						 {{students[0].studiengang}}
+						<strong v-if="students[0].semester" class="text-muted"> | Semester </strong>
+						  {{students[0].semester}}
+						<strong v-if="students[0].verband" class="text-muted"> | Verband </strong>
+						{{students[0].verband}}
+						<strong v-if="students[0].gruppe" class="text-muted"> | Gruppe </strong>
+						{{students[0].gruppe}}
+					  </h5>
+					  <h5 class="h6">
+						<strong class="text-muted">Email </strong>
+						<span>
+							<a :href="'mailto:'+students[0]?.mail_intern">{{students[0].mail_intern}}</a>
+						</span>
+						<strong class="text-muted"> | Status </strong>
+						 {{students[0].status}}
+						<strong class="text-muted"> | MatrNr </strong>
+						  {{students[0].matr_nr}}
+						<strong class="text-muted"> | UID </strong>
+						{{students[0].uid}}
+						<strong class="text-muted"> | Person ID </strong>
+						{{students[0].person_id}}
+					  </h5>
+
 				</div>
 			</div>
-			<fhc-tabs v-if="students.length == 1" ref="tabs" :modelValue="students[0]" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
+			<fhc-tabs
+				v-if="students.length == 1"
+				ref="tabs"
+				:modelValue="students[0]"
+				:config="config"
+				:default="$route.params.tab"
+				style="flex: 1 1 0%; height: 0%"
+				@changed="reload"
+				>
+				</fhc-tabs>
 			<fhc-tabs v-else ref="tabs" :modelValue="students" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
 		</div>
 		<div v-else>
