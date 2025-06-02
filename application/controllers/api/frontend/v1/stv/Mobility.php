@@ -3,6 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use \DateTime as DateTime;
+use CI3_Events as Events;
 
 class Mobility extends FHCAPI_Controller
 {
@@ -315,28 +316,8 @@ class Mobility extends FHCAPI_Controller
 	{
 		$bisio_id = $this->input->post('bisio_id');
 
-		$result =  $this->BisioModel->tableExists('extension', 'tbl_mo_bisioidzuordnung');
-		$data = $this->getDataOrTerminateWithError($result);
-
-
-		//if table exists check if existing entry
-		if(!empty($data))
-		{
-			$this->BisioModel->addSelect("count(*)");
-			$this->BisioModel->addJoin('extension.tbl_mo_bisioidzuordnung mo', 'ON (mo.bisio_id = bis.tbl_bisio.bisio_id)', 'LEFT');
-
-			$resultCheckMo = $this->BisioModel->loadWhere(
-				array('mo.bisio_id' => $bisio_id)
-			);
-
-			$resultCheckMo = $this->getDataOrTerminateWithError($resultCheckMo);
-			$count = current($resultCheckMo)->count;
-
-			$existsInExtension = $count > 0 ? true : false;
-
-			if($existsInExtension)
-				$this->terminateWithError($this->p->t('mobility', 'error_existingEntryInExtension'), self::ERROR_TYPE_GENERAL);
-		}
+		//check if entry in MobilityOnline extension exists
+		Events::trigger('mobility_delete', $bisio_id);
 
 		$result = $this->BisioModel->delete(
 			array('bisio_id' => $bisio_id)
@@ -344,6 +325,7 @@ class Mobility extends FHCAPI_Controller
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->terminateWithSuccess($data);
+
 	}
 
 	public function getLVList($studiengang_kz)
