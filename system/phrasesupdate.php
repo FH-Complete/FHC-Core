@@ -42575,6 +42575,26 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'projektarbeit',
+		'phrase' => 'kontaktdatenBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontaktdaten bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit contact data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 

@@ -1,18 +1,22 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
+import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import NewPerson from "../../List/New.js";
+import Contact from "../Kontakt/Contact.js";
 
 import ApiStvProjektbetreuer from '../../../../../api/factory/stv/projektbetreuer.js';
 
 export default {
 	components: {
 		CoreFilterCmpt,
+		BsModal,
 		FormForm,
 		FormInput,
 		PvAutoComplete,
-		NewPerson
+		NewPerson,
+		Contact
 	},
 	inject: {
 	},
@@ -340,6 +344,10 @@ export default {
 			this.$refs.newPersonModal.reset();
 			this.$refs.newPersonModal.open();
 		},
+		actionKontaktdatenBearbeiten() {
+			if (!this.autocompleteSelectedBetreuer) return;
+			this.$refs.kontaktdatenModal.show();
+		},
 		personSaved(result) {
 			this.$api
 				.call(ApiStvProjektbetreuer.getPerson(result.person_id))
@@ -384,8 +392,11 @@ export default {
 			</div>
 
 			<div class="row mb-3">
-				<div class="col-12">
+				<div class="col-6">
 					<button class="btn btn-primary" @click="actionNewPerson">{{ $p.t('projektarbeit', 'neuePersonAnlegen') }}</button>
+				</div>
+				<div class="col-6">
+					<button class="btn btn-primary float-end" @click="actionKontaktdatenBearbeiten">{{ $p.t('projektarbeit', 'kontaktdatenBearbeiten') }}</button>
 				</div>
 			</div>
 
@@ -455,6 +466,22 @@ export default {
 		</button>
 
 		<new-person ref="newPersonModal" :personOnly="true" @saved="personSaved"></new-person>
+
+		<!--Modal: KontaktdatenModal -->
+		<bs-modal ref="kontaktdatenModal" dialog-class="modal-xl modal-dialog-scrollable" v-if="autocompleteSelectedBetreuer">
+
+			<template #title>
+				<p class="fw-bold mt-3">{{$p.t('projektarbeit', 'kontaktdatenBearbeiten')}}</p>
+			</template>
+
+			<div class="row">
+				<div class="col-12">
+					<contact ref="contact" :uid="autocompleteSelectedBetreuer.person_id">
+					</contact>
+				</div>
+			</div>
+
+		</bs-modal>
 	</div>
 `
 }
