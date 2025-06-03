@@ -57,7 +57,7 @@ export default {
 	},
 template: `
 	<div class="core-vorlagen-dropdown">
-		<div v-if="isAdmin" class="col-sm-8 pt-3">
+		<div v-if="isAdmin" class="col-sm-12 pt-2">
 			<form-input
 				ref="dropdown"
 				type="select"
@@ -75,7 +75,7 @@ template: `
 			</form-input>
 		</div>
 		
-		<div v-if="useLoggedInUserOe" class="col-sm-8 pt-3">
+		<div v-if="useLoggedInUserOe" class="col-sm-12 pt-2">
 			<form-input
 				ref="dropdown"
 				type="select"

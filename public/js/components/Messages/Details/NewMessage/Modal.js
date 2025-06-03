@@ -341,7 +341,7 @@ export default {
 		<bs-modal
 			class="messages-detail-newmessage-modal"
 			ref="modalNewMessage" 
-			dialog-class=" modal-dialog-scrollable modal-xl"
+			dialog-class=" modal-dialog-scrollable modal-xl modal-msg"
 			body-class="px-3 py-2"
 			@hidden.bs.modal="resetForm"
 			>
@@ -350,7 +350,20 @@ export default {
 				{{ $p.t('messages', 'neueNachricht') }}
 			</template>
 
+			<ul class="nav nav-tabs" id="msg_preview" role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link active" id="msg-tab" data-bs-toggle="tab" data-bs-target="#msg" type="button" role="tab" aria-controls="msg" aria-selected="true">Nachricht</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview" type="button" role="tab" aria-controls="preview" aria-selected="false">Vorschau</button>
+				</li>
+			</ul>
+
 			<form-form ref="formNewMassage">
+
+			<div class="tab-content" id="msg_preview_content">
+				<div class="tab-pane fade show active" id="msg" role="tabpanel" aria-labelledby="msg-tab">
+
 				<div class="row">
 					<div class="col-sm-8">
 						<form-form class="row g-3 mt-2" ref="formMessage">
@@ -385,34 +398,35 @@ export default {
 									type="textarea"
 									v-model="formData.body"
 									name="body"
-									rows="15"
+									rows="35"
 									cols="75"
 									>
 								</form-input>
-							</div>
-
-							<div class="row">
-								<dropdown-component
-									ref="dropdownComp"
-									:label="$p.t('global/vorlage')"
-									@change="handleSelectedVorlage"
-									useLoggedInUserOe
-								>
-								</dropdown-component>
 							</div>
 
 						</form-form>
 					</div>
 
 					<div class="col-sm-4">
+
+						<div class="row">
+							<dropdown-component
+								ref="dropdownComp"
+								:label="$p.t('global/vorlage')"
+								@change="handleSelectedVorlage"
+								useLoggedInUserOe
+							>
+							</dropdown-component>
+						</div>
+
 						<div v-if="this.fieldsPrestudent.length > 0">
-							<strong>{{$p.t('ui', 'felder')}} {{$p.t('lehre', 'prestudent')}}</strong>
+							<div class="mt-2"><strong>{{$p.t('ui', 'felder')}} {{$p.t('lehre', 'prestudent')}}</strong></div>
 
 							<list-box
 								v-model="selectedFieldPrestudent"
 								:options="itemsPrestudent"
 								optionLabel="label"
-								listStyle="max-height:200px"
+								listStyle="max-height:200px; overscroll-behavior: none;"
 							>
 							  <template #option="slotProps">
 								<div @dblclick="insertVariable(slotProps.option)">
@@ -424,13 +438,13 @@ export default {
 						</div>
 
 						<div v-if="this.fieldsPerson.length > 0">
-							<strong>Felder Person</strong>
+							<div class="mt-2"><strong>Felder Person</strong></div>
 
 							<list-box
 								v-model="selectedFieldPerson"
 								:options="itemsPerson"
 								optionLabel="label"
-								listStyle="max-height:200px"
+								listStyle="max-height:200px; overscroll-behavior: none;"
 							>
 								<template #option="slotProps">
 									<div @dblclick="insertVariable(slotProps.option)">
@@ -442,13 +456,13 @@ export default {
 						</div>
 
 						<div>
-							<strong>{{$p.t('messages', 'meineFelder')}}</strong>
+							<div class="mt-2"><strong>{{$p.t('messages', 'meineFelder')}}</strong></div>
 
 							<list-box
 								v-model="selectedFieldUser"
 								:options="itemsUser"
 								optionLabel="label"
-								listStyle="max-height:200px"
+								listStyle="max-height:200px; overscroll-behavior: none;"
 							>
 								<template #option="slotProps">
 									<div @dblclick="insertVariable(slotProps.option)">
@@ -462,6 +476,9 @@ export default {
 					</div>
 
 				</div>
+
+				</div>
+				<div class="tab-pane fade" id="preview" role="tabpanel" aria-labelledby="preview-tab">
 
 				<div class="row mt-4">
 
@@ -501,6 +518,10 @@ export default {
 					</div>
 
 				</div>
+
+				</div>
+			</div>
+
 			</form-form>
 
 			<template #footer>
