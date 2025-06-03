@@ -145,9 +145,9 @@
 }
 
 .fhc-bullet-red::before {
-  color: #ff001e;
+  color: green;
 }
 
 .fhc-bullet-green::before {
-  color: #00ff26;
+  color: red;
 }
