@@ -237,7 +237,7 @@ const app = Vue.createApp({
 	name: 'FhcApp',
 	data: () => ({
 		appSideMenuEntries: {},
-		renderers: {},
+		renderers: null,
 	}),
 	components: {},
 	computed: {
@@ -291,7 +291,21 @@ const app = Vue.createApp({
 			.call(ApiRenderers.loadRenderers())
 			.then(res => res.data)
 			.then(data => {
-				this.renderers = data;
+				for (let rendertype of Object.keys(data)) {
+					
+					let modalTitel = Vue.defineAsyncComponent(() => import(data[rendertype].modalTitel));
+					let modalContent = Vue.defineAsyncComponent(() => import(data[rendertype].modalContent));
+					let calendarEvent = Vue.defineAsyncComponent(() => import(data[rendertype].calendarEvent));
+					if(this.renderers === null) {
+						this.renderers = {};
+					}
+					if (!this.renderers[rendertype]) {
+						this.renderers[rendertype] = {}
+					}
+					this.renderers[rendertype].modalTitel = modalTitel;
+					this.renderers[rendertype].modalContent = modalContent;
+					this.renderers[rendertype].calendarEvent = calendarEvent;
+				}
 			});
 	},
 	mounted() {

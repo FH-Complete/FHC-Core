@@ -1,9 +1,8 @@
 import FhcCalendar from "../../Calendar/Calendar.js";
 import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
-import LvInfo from "../Mylv/LvInfo.js"
 import LvMenu from "../Mylv/LvMenu.js"
-import lehreinheitEvent from "./EventTypes/lehreinheitEvent.js"
+import lehreinheitEvent from "./EventTypes/calendarEvent.js"
 
 import ApiStundenplan from '../../../api/factory/stundenplan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
@@ -26,7 +25,8 @@ const Stundenplan = {
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
 			studiensemester_ende: null,
-			uid: null
+			uid: null,
+			renderComponents: {}
 		}
 	},
 	props: {
@@ -49,6 +49,7 @@ const Stundenplan = {
 	},
 	inject:["renderers"],
 	watch: {
+		
 		weekFirstDay: {
 			handler: async function (newValue) {
 				let data = await this.fetchStudiensemesterDetails(newValue);
@@ -71,9 +72,10 @@ const Stundenplan = {
 		}
 	},
 	components: {
-		FhcCalendar, LvModal, LvMenu, LvInfo, lehreinheitEvent, 
+		FhcCalendar, LvModal, LvMenu, lehreinheitEvent, 
 	},
 	computed:{
+		
 		downloadLinks: function(){
 			if(!this.studiensemester_start || !this.studiensemester_ende || !this.uid )return;
 			let start = new Date(this.studiensemester_start);
@@ -107,18 +109,18 @@ const Stundenplan = {
 		},
 	},
 	methods:{
-		renderComponent(name){
-			switch(name){
-				case 'lehreinheitEvent': return lehreinheitEvent;
-				default: return !this.renderers? null : Vue.defineAsyncComponent(() => import(this.renderers[name]))
-			}
+		// component renderers fetches from different addons
+		modalTitleComponent(type){
+			return this.renderers[type].modalTitel;
 		},
-		renderComponentInfo(name) {
-			switch (name) {
-				case 'moodleEvent': return !this.renderers? null: Vue.defineAsyncComponent(() => import(this.renderers[name]));
-				default: return LvInfo;
-			}
+		modalContentComponent(type) {
+			return this.renderers[type].modalContent;
 		},
+		calendarEventComponent(type){
+			return this.renderers[type].calendarEvent;
+		},
+		
+
 		fetchStudiensemesterDetails: async function (date) {
 			return this.$api.call(ApiStundenplan.studiensemesterDateInterval(date));
 		},
@@ -249,6 +251,8 @@ const Stundenplan = {
 		},
 	},
 	created() {
+		
+
 		this.$api
 			.call(ApiAuthinfo.getAuthUID())
 			.then(res => res.data)
@@ -262,6 +266,7 @@ const Stundenplan = {
 		if(this.$refs.lvmodal) this.$refs.lvmodal.hide()	
 	},
 	template:/*html*/`
+	<template v-if="renderers">
 	<h2>
 		{{$p.t('lehre/stundenplan')}}
 		<span style="padding-left: 0.4em;" v-show="studiensemester_kurzbz">{{studiensemester_kurzbz}}</span>
@@ -269,10 +274,18 @@ const Stundenplan = {
 	</h2>
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" >
-		<template #info>
-			<component :is="renderComponentInfo(currentlySelectedEvent.type+'Event')" :event="currentlySelectedEvent" ></component>
+		<template #modalTitle>
+			<Suspense>
+				<component :is="modalTitleComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
+			</Suspense>
+			</template>
+		<template #modalContent>
+			<Suspense>
+				<component :is="modalContentComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
+			</Suspense>
 		</template>
 	</lv-modal>
+
 	<fhc-calendar
 		ref="calendar"
 		@selectedEvent="setSelectedEvent"
@@ -298,7 +311,7 @@ const Stundenplan = {
 		</template>
 		<template #monthPage="{event,day}">
 			<div @click="showModal(event)" class="p-1">
-				<component :event="event" :is="renderComponent(event.type+'Event')"></component>
+				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
 			</div>
 		</template>
 		<template #weekPage="{event,day}">
@@ -306,13 +319,13 @@ const Stundenplan = {
 				class="weekPageContainer position-relative border border-secondary border d-flex flex-col align-items-center justify-content-evenly h-100"
 				:class="{'p-1':event.allDayEvent}"
 				style = "overflow: auto;" >
-				<component :event="event" :is="renderComponent(event.type+'Event')"></component>
+				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
 			</div>
 		</template>
 		<template #dayPage="{event,day,mobile}">
 			<div @click="mobile? showModal(event):null" type="button" class="dayPageContainer fhc-entry border border-secondary border m-0 h-100  text-center">
 				<div class="h-100 d-flex flex-col justify-content-evenly align-items-center">
-					<component :is="renderComponent(event.type+'Event')" :event="event"></component>
+					<component :is="calendarEventComponent(event.type)" :event="event"></component>
 				</div>
 			</div>
 		</template>
@@ -329,7 +342,8 @@ const Stundenplan = {
 		<template #pageMobilContentEmpty >
 			<h3>{{ $p.t('lehre/noLvFound') }}</h3>
 		</template>
-	</fhc-calendar>`
+	</fhc-calendar>
+	</template>`
 }
 
 export default Stundenplan

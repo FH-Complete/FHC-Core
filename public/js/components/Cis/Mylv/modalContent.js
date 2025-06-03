@@ -1,12 +1,11 @@
 import { numberPadding, formatDate } from "../../../helpers/DateHelpers.js"
 
-export default {
-	props: {
-		event: Object,
-	},
-	data() {
-		return {
 
+export default {
+	props:{
+		event: {
+			type: Object,
+			required: true,
 		}
 	},
 	computed: {
@@ -47,7 +46,10 @@ export default {
 			return formatDate(d);
 		},
 	},
-	template:/*html*/`
+	template: `
+		<h3>
+			{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}
+		</h3>
 		<table class="table table-hover mb-4">
 				<tbody>
 					<tr>
@@ -107,7 +109,5 @@ export default {
 						<td>{{event.organisationseinheit}}</td>
 					</tr>
 				</tbody>
-		</table>
-	`
+		</table>`,
 }
-
