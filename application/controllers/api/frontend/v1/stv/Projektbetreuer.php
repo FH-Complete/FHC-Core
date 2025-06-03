@@ -3,6 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use \DateTime as DateTime;
+use CI3_Events as Events;
 
 class Projektbetreuer extends FHCAPI_Controller
 {
@@ -85,6 +86,21 @@ class Projektbetreuer extends FHCAPI_Controller
 			//~ }
 		//~ }
 
+		foreach ($projektbetreuer as $pb)
+		{
+			$downloadLink = null;
+			Events::trigger(
+				'projektbeurteilung_download_link',
+				$pb->projektarbeit_id,
+				$pb->betreuerart_kurzbz,
+				$pb->person_id,
+				function ($value) use (&$downloadLink) {
+					$downloadLink = $value;
+				}
+			);
+			$pb->projektarbeitDownload = $downloadLink;
+		}
+
 		$this->terminateWithSuccess($this->_addFullNameToBetreuer($projektbetreuer));
 	}
 
@@ -105,11 +121,7 @@ class Projektbetreuer extends FHCAPI_Controller
 
 		foreach ($projektbetreuer as $pb)
 		{
-			if ($this->_validate($pb) == false)
-			{
-				$this->addMeta('test', 'foisch');
-				$this->terminateWithValidationErrors($this->form_validation->error_array());
-			}
+			if ($this->_validate($pb) == false) $this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
 		$result = null;
@@ -209,10 +221,6 @@ class Projektbetreuer extends FHCAPI_Controller
 		$studiensemester_kurzbz = $this->input->get('studiensemester_kurzbz');
 
 		$result = $this->StundensatzModel->getStundensatzForMitarbeiter($person_id, $studiensemester_kurzbz);
-
-		$this->addMeta('res', $result);
-
-		//if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
 		return $this->terminateWithSuccess($result);
 	}

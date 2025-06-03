@@ -113,6 +113,7 @@ export default {
 			arrNoten: [],
 			filteredBetreuer: [],
 			autocompleteSelectedBetreuer: null,
+			projektarbeitDownload: null,
 			abortController: {
 				betreuer: null
 			}
@@ -146,6 +147,7 @@ export default {
 					if (idx >= 0) {
 						betreuer = projektbetreuerListe[idx];
 						this.formData = betreuer;
+						if (betreuer.projektarbeitDownload) this.projektarbeitDownload = betreuer.projektarbeitDownload
 						this.autocompleteSelectedBetreuer = {
 							person_id: this.formData.person_id,
 							name: this.formData.name,
@@ -268,6 +270,7 @@ export default {
 		},
 		resetForm() {
 			this.formData = this.getDefaultFormData();
+			this.projektarbeitDownload = null;
 			this.autocompleteSelectedBetreuer = null;
 			this.initialFormData = null;
 			if (this.projekttyp_kurzbz) this.setDefaultStunden(this.projekttyp_kurzbz);
@@ -358,130 +361,144 @@ export default {
 		}
 	},
 	template: `
-	<div class="stv-details-projektbetreuer h-100 pb-3">
+	<div class="stv-details-projektbetreuer h-100 pb-3 row">
 
-		<legend>{{this.$p.t('projektarbeit','betreuerGross')}}</legend>
-		<!-- <p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p> -->
+		<div class="col-8">
 
-		<core-filter-cmpt
-			ref="projektbetreuerTable"
-			:tabulator-options="tabulatorOptions"
-			:tabulator-events="tabulatorEvents"
-			table-only
-			:side-menu="false"
-			new-btn-show
-			:new-btn-label="this.$p.t('projektarbeit', 'betreuerGross')"
-			@click:new="actionNewProjektbetreuer"
-			>
-		</core-filter-cmpt>
+			<legend>{{this.$p.t('projektarbeit','betreuerGross')}}</legend>
+			<!-- <p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p> -->
 
-		<form-form ref="formProjektbetreuer" v-show="betreuerFormOpened" @submit.prevent>
-			<div class="row mb-3">
-				<form-input
-					container-class="stv-details-projektarbeit-betreuer"
-					:label="$p.t('projektarbeit', 'betreuer')"
-					type="autocomplete"
-					optionLabel="name"
-					v-model="autocompleteSelectedBetreuer"
-					name="betreuer"
-					:suggestions="filteredBetreuer"
-					@complete="searchBetreuer"
-					:min-length="3"
-					>
-				</form-input>
-			</div>
+			<core-filter-cmpt
+				ref="projektbetreuerTable"
+				:tabulator-options="tabulatorOptions"
+				:tabulator-events="tabulatorEvents"
+				table-only
+				:side-menu="false"
+				new-btn-show
+				:new-btn-label="this.$p.t('projektarbeit', 'betreuerGross')"
+				@click:new="actionNewProjektbetreuer"
+				>
+			</core-filter-cmpt>
 
-			<div class="row mb-3">
-				<div class="col-6">
-					<button class="btn btn-primary" @click="actionNewPerson">{{ $p.t('projektarbeit', 'neuePersonAnlegen') }}</button>
-				</div>
-				<div class="col-6">
-					<button class="btn btn-primary float-end" @click="actionKontaktdatenBearbeiten">{{ $p.t('projektarbeit', 'kontaktdatenBearbeiten') }}</button>
-				</div>
-			</div>
-
-			<div class="row mb-3">
-				<form-input
-					container-class="col-6 stv-details-projektbetreuer-betreuerart"
-					:label="$p.t('projektarbeit', 'betreuerart')"
-					type="select"
-					v-model="formData.betreuerart_kurzbz"
-					name="betreuerart_kurzbz"
-					>
-					<option
-						v-for="art in arrBetreuerart"
-						:key="art.betreuerart_kurzbz"
-						:value="art.betreuerart_kurzbz"
+			<form-form ref="formProjektbetreuer" v-show="betreuerFormOpened" @submit.prevent>
+				<div class="row mb-3">
+					<form-input
+						container-class="stv-details-projektarbeit-betreuer"
+						:label="$p.t('projektarbeit', 'betreuer')"
+						type="autocomplete"
+						optionLabel="name"
+						v-model="autocompleteSelectedBetreuer"
+						name="betreuer"
+						:suggestions="filteredBetreuer"
+						@complete="searchBetreuer"
+						:min-length="3"
 						>
-						{{art.beschreibung}}
-					</option>
-				</form-input>
-			</div>
-
-			<div class="row mb-3">
-				<form-input
-					container-class="col-8 stv-details-projektbetreuer-note"
-					:label="$p.t('projektarbeit', 'note')"
-					type="select"
-					v-model="formData.note"
-					name="note"
-					>
-					<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
-					<option
-						v-for="note in arrNoten"
-						:key="note.note"
-						:value="note.note"
-						>
-						{{note.bezeichnung}}
-					</option>
-				</form-input>
-			</div>
-
-			<div class="row mb-3">
-				<form-input
-					container-class="stv-details-projektarbeit-stunden"
-					type="text"
-					name="stunden"
-					:label="$p.t('projektarbeit', 'stunden')"
-					v-model="formData.stunden"
-					>
-				</form-input>
-			</div>
-
-			<div class="row mb-3">
-				<form-input
-					container-class="stv-details-projektarbeit-stundensatz"
-					type="text"
-					name="stundensatz"
-					:label="$p.t('projektarbeit', 'stundensatz')"
-					v-model="formData.stundensatz"
-					>
-				</form-input>
-			</div>
-
-		</form-form>
-
-		<button class="btn btn-primary" v-show="betreuerFormOpened" @click="confirmProjektbetreuerAfterValidation">
-			{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}
-		</button>
-
-		<new-person ref="newPersonModal" :personOnly="true" @saved="personSaved"></new-person>
-
-		<!--Modal: KontaktdatenModal -->
-		<bs-modal ref="kontaktdatenModal" dialog-class="modal-xl modal-dialog-scrollable" v-if="autocompleteSelectedBetreuer">
-
-			<template #title>
-				<p class="fw-bold mt-3">{{$p.t('projektarbeit', 'kontaktdatenBearbeiten')}}</p>
-			</template>
-
-			<div class="row">
-				<div class="col-12">
-					<contact ref="contact" :uid="autocompleteSelectedBetreuer.person_id">
-					</contact>
+					</form-input>
 				</div>
-			</div>
 
-		</bs-modal>
+				<div class="row mb-3">
+					<div class="col-6">
+						<button class="btn btn-primary" @click="actionNewPerson">{{ $p.t('projektarbeit', 'neuePersonAnlegen') }}</button>
+					</div>
+					<div class="col-6">
+						<button class="btn btn-primary float-end" @click="actionKontaktdatenBearbeiten">{{ $p.t('projektarbeit', 'kontaktdatenBearbeiten') }}</button>
+					</div>
+				</div>
+
+				<div class="row mb-3">
+					<form-input
+						container-class="stv-details-projektbetreuer-betreuerart"
+						:label="$p.t('projektarbeit', 'betreuerart')"
+						type="select"
+						v-model="formData.betreuerart_kurzbz"
+						name="betreuerart_kurzbz"
+						>
+						<option
+							v-for="art in arrBetreuerart"
+							:key="art.betreuerart_kurzbz"
+							:value="art.betreuerart_kurzbz"
+							>
+							{{art.beschreibung}}
+						</option>
+					</form-input>
+				</div>
+
+				<div class="row mb-3">
+					<form-input
+						container-class="stv-details-projektbetreuer-note"
+						:label="$p.t('projektarbeit', 'note')"
+						type="select"
+						v-model="formData.note"
+						name="note"
+						>
+						<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
+						<option
+							v-for="note in arrNoten"
+							:key="note.note"
+							:value="note.note"
+							>
+							{{note.bezeichnung}}
+						</option>
+					</form-input>
+				</div>
+
+				<div class="row mb-3">
+					<form-input
+						container-class="stv-details-projektarbeit-stunden"
+						type="text"
+						name="stunden"
+						:label="$p.t('projektarbeit', 'stunden')"
+						v-model="formData.stunden"
+						>
+					</form-input>
+				</div>
+
+				<div class="row mb-3">
+					<form-input
+						container-class="stv-details-projektarbeit-stundensatz"
+						type="text"
+						name="stundensatz"
+						:label="$p.t('projektarbeit', 'stundensatz')"
+						v-model="formData.stundensatz"
+						>
+					</form-input>
+				</div>
+
+			</form-form>
+
+			<button class="btn btn-primary" v-show="betreuerFormOpened" @click="confirmProjektbetreuerAfterValidation">
+				{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}
+			</button>
+
+		</div>
+
+		<div class="col-4" v-if="projektarbeitDownload && projektarbeitDownload != ''">
+			<a :href="projektarbeitDownload" class="btn btn-primary">{{ $p.t('projektarbeit', 'projektbeurteilungErstellen') }}</a>
+		</div>
+
 	</div>
+
+	<!--Modal: new Person modal -->
+	<new-person ref="newPersonModal" :personOnly="true" @saved="personSaved"></new-person>
+
+	<!--Modal: KontaktdatenModal -->
+	<bs-modal
+		ref="kontaktdatenModal"
+		dialog-class="modal-xl modal-dialog-scrollable"
+		v-if="autocompleteSelectedBetreuer && autocompleteSelectedBetreuer.person_id"
+	>
+
+		<template #title>
+			<p class="fw-bold mt-3">{{$p.t('projektarbeit', 'kontaktdatenBearbeiten')}}</p>
+		</template>
+
+		<div class="row">
+			<div class="col-12">
+				<contact ref="contact" :uid="autocompleteSelectedBetreuer.person_id">
+				</contact>
+			</div>
+		</div>
+
+	</bs-modal>
 `
 }
