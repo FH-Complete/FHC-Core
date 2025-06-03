@@ -31,15 +31,15 @@ export default {
 	},
 	watch:{
 		selectedStudiensemester: function(newVal, oldVal){
-			if(newVal != oldVal){
+			if(newVal && newVal != oldVal){
 				const studiensemester =this.getDataFromLocalStorage("sudiensemester");
-				if (!studiensemester || (studiensemester && studiensemester != newVal)){
+				if (newVal && (!studiensemester || (studiensemester && studiensemester != newVal))){
 					this.storeDataToLocalStorage("sudiensemester", newVal);
 				}
 			}
 		},
 		selectedSemester: function (newVal, oldVal) {
-			if (newVal != oldVal) {
+			if (newVal && newVal != oldVal) {
 				const semester = this.getDataFromLocalStorage("semester");
 				if (!semester || (semester && semester != newVal)) {
 					this.storeDataToLocalStorage("semester", newVal);
@@ -47,7 +47,7 @@ export default {
 			}
 		},
 		selectedStudiengang: function (newVal, oldVal) {
-			if (newVal != oldVal) {
+			if (newVal && newVal != oldVal) {
 				const studiengang = this.getDataFromLocalStorage("studiengang");
 				if (!studiengang || (studiengang && studiengang != newVal)) {
 					this.storeDataToLocalStorage("studiengang", JSON.stringify(newVal));
@@ -55,7 +55,7 @@ export default {
 			}
 		},
 		selectedStudienordnung: function (newVal, oldVal) {
-			if (newVal != oldVal) {
+			if (newVal && newVal != oldVal) {
 				const studienordnung = this.getDataFromLocalStorage("studienordnung");
 				if (!studienordnung || (studienordnung && studienordnung != newVal)) {
 					this.storeDataToLocalStorage("studienordnung", JSON.stringify(newVal));
@@ -81,7 +81,11 @@ export default {
 		},
 		changeStudienordnung(value) {
 			let studienordnung = this.$refs.studienordnung;
-			studienordnung.selectedIndex = (studienordnung.selectedIndex + value + studienordnung.options.length) % studienordnung.options.length;
+			let newSelectIndex = (studienordnung.selectedIndex + value + studienordnung.options.length) % studienordnung.options.length;
+			if(studienordnung.options[newSelectIndex].disabled){
+				newSelectIndex = (newSelectIndex + value + studienordnung.options.length) % studienordnung.options.length;
+			}
+			studienordnung.selectedIndex = newSelectIndex;
 			this.changeSelectedStudienPlan(studienordnung.value);
 		},
 		
@@ -277,13 +281,13 @@ export default {
 		<div>
 		<h6>Studiensemester:</h6>
 		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(-1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(1)">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
 			<select ref="studiensemester" v-model="selectedStudiensemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
 				<option v-for="semester in studienSemester" @click="changeSelectedStudienSemester(semester.studiensemester_kurzbz)" :key="semester" :value="semester.studiensemester_kurzbz">{{studiensemesterTitel(semester.studiensemester_kurzbz)	}}</option>
 			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(-1)">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
 			</button>
 		</div>
@@ -292,13 +296,13 @@ export default {
 		<div>
 		<h6>Studiengang:</h6>
 		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(-1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(1)">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
 			<select ref="studiengaenge" v-model="selectedStudiengang" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
 				<option v-for="studiengang in studiengaenge" @click="changeSelectedStudienGang(studiengang.studiengang_kz)" :key="studiengang.studiengang_kz" :value="studiengang.studiengang_kz" >{{studiengangTitel(studiengang)}}</option>
 			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(-1)">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
 			</button>
 		</div>
@@ -307,13 +311,13 @@ export default {
 		<div>
 		<h6>Semester:</h6>
 		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(-1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(1)">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
 			<select ref="semester" v-model="selectedSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
 				<option v-for="sem in semester" @click="changeSelectedSemester(sem)" :key="semester" :value="sem">{{sem}}. Semester</option>
 			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(-1)">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
 			</button>
 		</div>
@@ -322,13 +326,13 @@ export default {
 		<div>
 		<h6>Studienordnung:</h6>
 		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(-1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(1)">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
 			<select ref="studienordnung" v-model="selectedStudienordnung" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
 				<option v-for="ordnung in computedStudienOrdnungSelectValues" :disabled="ordnung.disabled" @click="changeSelectedStudienPlan(ordnung?.studienplan?.studienplan_id)" :key="ordnung?.studienplan?.bezeichnung	" :value="ordnung?.studienplan?.studienplan_id">{{ordnung.bezeichnung}}</option>
 			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(-1)">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
 			</button>
 		</div>

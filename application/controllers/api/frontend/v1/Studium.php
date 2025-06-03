@@ -222,7 +222,51 @@ class Studium extends FHCAPI_Controller
 	}
 
 	private function computeStudienplanLehrveranstaltungen($studienplan_id, $semester){
-		$lehrveranstaltungen = $this->StudienplanModel->getStudienplanLehrveranstaltung($studienplan_id, $semester);	
+
+/* 
+SELECT tbl_lehrveranstaltung.*,
+            tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+            tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
+            tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
+            tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
+            tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
+            tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
+            tbl_studienplan_lehrveranstaltung.curriculum,
+            tbl_studienplan_lehrveranstaltung.export,
+            tbl_studienplan_lehrveranstaltung.genehmigung
+        FROM lehre.tbl_lehrveranstaltung
+        JOIN lehre.tbl_studienplan_lehrveranstaltung
+        USING(lehrveranstaltung_id)
+        WHERE tbl_studienplan_lehrveranstaltung.studienplan_id=" . $this->db_add_param($studienplan_id, FHC_INTEGER);
+        if (defined("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN") && CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN)
+            $qry .= " AND tbl_lehrveranstaltung.lehrtyp_kurzbz != 'modul'";
+        if (!is_null($semester))
+        {
+            $qry.=" AND tbl_studienplan_lehrveranstaltung.semester=" . $this->db_add_param($semester, FHC_INTEGER);
+        } */
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		
+		$query = "
+		SELECT tbl_lehrveranstaltung.*,
+            tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+            tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
+            tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
+            tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
+            tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
+            tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
+            tbl_studienplan_lehrveranstaltung.curriculum,
+            tbl_studienplan_lehrveranstaltung.export,
+            tbl_studienplan_lehrveranstaltung.genehmigung
+        FROM lehre.tbl_lehrveranstaltung
+        JOIN lehre.tbl_studienplan_lehrveranstaltung
+        USING(lehrveranstaltung_id)
+        WHERE tbl_studienplan_lehrveranstaltung.studienplan_id=? AND tbl_studienplan_lehrveranstaltung.semester=?";
+		
+        if (defined("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN") && CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN)
+			$query .= " AND tbl_lehrveranstaltung.lehrtyp_kurzbz != 'modul'";
+		
+		$lehrveranstaltungen = $this->LehrveranstaltungModel->execReadOnlyQuery($query,[$studienplan_id, $semester]);
+		
 		$lehrveranstaltungen = $this->getDataOrTerminateWithError($lehrveranstaltungen);
 		usort($lehrveranstaltungen, function($a, $b){
 			if($a->lehrtyp_kurzbz == "modul"){
