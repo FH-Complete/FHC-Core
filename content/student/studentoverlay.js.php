@@ -786,7 +786,6 @@ function StudentDetailReset()
 	document.getElementById('student-detail-textbox-geburtszeit').value='';
 	document.getElementById('student-detail-textbox-anmerkung').value='';
 	document.getElementById('student-detail-textbox-homepage').value='';
-	document.getElementById('student-detail-textbox-svnr').value='';
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').value='';
 	document.getElementById('student-detail-menulist-familienstand').value='l';
 	document.getElementById('student-detail-menulist-geschlecht').value='m';
@@ -819,7 +818,6 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-geburtszeit').disabled=val;
 	document.getElementById('student-detail-textbox-anmerkung').disabled=val;
 	document.getElementById('student-detail-textbox-homepage').disabled=val;
-	document.getElementById('student-detail-textbox-svnr').disabled=val;
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').disabled=val;
 	document.getElementById('student-detail-menulist-familienstand').disabled=val;
 	document.getElementById('student-detail-menulist-geschlecht').disabled=val;
@@ -860,7 +858,6 @@ function StudentDetailSave()
 	geburtszeit = document.getElementById('student-detail-textbox-geburtszeit').value;
 	anmerkung = document.getElementById('student-detail-textbox-anmerkung').value;
 	homepage = document.getElementById('student-detail-textbox-homepage').value;
-	svnr = document.getElementById('student-detail-textbox-svnr').value;
 	ersatzkennzeichen = document.getElementById('student-detail-textbox-ersatzkennzeichen').value;
 	familienstand = document.getElementById('student-detail-menulist-familienstand').value;
 	geschlecht = document.getElementById('student-detail-menulist-geschlecht').value;
@@ -919,7 +916,6 @@ function StudentDetailSave()
 	req.add('geburtszeit', geburtszeit);
 	req.add('anmerkung', anmerkung);
 	req.add('homepage', homepage);
-	req.add('svnr', svnr);
 	req.add('ersatzkennzeichen', ersatzkennzeichen);
 	req.add('familienstand', familienstand);
 	req.add('geschlecht', geschlecht);
@@ -1167,7 +1163,6 @@ function StudentAuswahl()
 	geburtszeit=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gebzeit" ));
 	anmerkung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkungen" ));
 	homepage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#homepage" ));
-	svnr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#svnr" ));
 	ersatzkennzeichen=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ersatzkennzeichen" ));
 	familienstand=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#familienstand" ));
 	geschlecht=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geschlecht" ));
@@ -1211,7 +1206,6 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-geburtszeit').value=geburtszeit;
 	document.getElementById('student-detail-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-detail-textbox-homepage').value=homepage;
-	document.getElementById('student-detail-textbox-svnr').value=svnr;
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').value=ersatzkennzeichen;
 	document.getElementById('student-detail-menulist-familienstand').value=familienstand;
 

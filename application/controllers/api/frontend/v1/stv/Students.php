@@ -618,7 +618,6 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('wahlname');
 		$this->PrestudentModel->addSelect('vornamen');
 		$this->PrestudentModel->addSelect('titelpost');
-		$this->PrestudentModel->addSelect('svnr');
 		$this->PrestudentModel->addSelect('ersatzkennzeichen');
 		$this->PrestudentModel->addSelect('gebdatum');
 		$this->PrestudentModel->addSelect('geschlecht');
