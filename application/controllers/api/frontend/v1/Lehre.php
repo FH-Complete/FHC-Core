@@ -206,7 +206,11 @@ class Lehre extends FHCAPI_Controller
 				exec('chmod 640 "'.PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf'.'"');
 
 				$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
-				$res = $this->PaabgabeModel->updatePaabgabe($paabgabe_id);
+				$res = $this->PaabgabeModel->update($paabgabe_id, array(
+					'abgabedatum' => date('Y-m-d'),
+					'updatevon' => getAuthUID(),
+					'updateamum' => date('Y-m-d H:i:s')
+				));
 				
 				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
 				$this->terminateWithSuccess($res);
@@ -287,7 +291,11 @@ class Lehre extends FHCAPI_Controller
 				
 				// update paabgabe datum
 				$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
-				$res = $this->PaabgabeModel->updatePaabgabe($paabgabe_id);
+				$res = $this->PaabgabeModel->update($paabgabe_id, array(
+					'abgabedatum' => date('Y-m-d'),
+					'updatevon' => getAuthUID(),
+					'updateamum' => date('Y-m-d H:i:s')
+				));
 				
 				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
 
@@ -345,7 +353,7 @@ class Lehre extends FHCAPI_Controller
 
 		$num_rows_sem = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
 
-		if(!is_numeric($num_rows_sem) || $num_rows_sem < 0)
+		if( null === $num_rows_sem || false === $num_rows_sem )
 		{
 			$this->terminateWithError($this->p->t('abgabetool','fehlerAktualitaetProjektarbeit'), 'general');
 		}

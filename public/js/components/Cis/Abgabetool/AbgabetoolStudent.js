@@ -33,7 +33,7 @@ export const AbgabetoolStudent = {
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
 			abgabeTableOptions: {
-				height: 700,
+				minHeight: 250,
 				index: 'projektarbeit_id',
 				layout: 'fitColumns',
 				placeholder: this.$p.t('global/noDataAvailable'),
@@ -218,7 +218,7 @@ export const AbgabetoolStudent = {
 			this.loadProjektarbeiten()
 
 			this.$refs.verticalsplit.collapseBottom()
-			this.calcMaxTableHeight()
+			//this.calcMaxTableHeight()
 		}
 	},
 	watch: {
@@ -226,7 +226,7 @@ export const AbgabetoolStudent = {
 	},
 	computed: {
 		isViewMode() {
-			return this.student_uid !== null
+			return this.student_uid !== this.viewData.uid
 		}
 	},
 	created() {
