@@ -622,6 +622,8 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('ersatzkennzeichen');
 		$this->PrestudentModel->addSelect('gebdatum');
 		$this->PrestudentModel->addSelect('geschlecht');
+		$this->PrestudentModel->addSelect('foto');
+		$this->PrestudentModel->addSelect('foto_sperre');
 
 		// semester
 		// verband
@@ -629,6 +631,7 @@ class Students extends FHCAPI_Controller
 
 		$this->PrestudentModel->addSelect('UPPER(stg.typ || stg.kurzbz) AS studiengang');
 		$this->PrestudentModel->addSelect('tbl_prestudent.studiengang_kz');
+		$this->PrestudentModel->addSelect('stg.bezeichnung AS stg_bezeichnung');
 		$this->PrestudentModel->addSelect("s.matrikelnr");
 		$this->PrestudentModel->addSelect('p.person_id');
 		$this->PrestudentModel->addSelect('pls.status_kurzbz AS status');
@@ -640,7 +643,7 @@ class Students extends FHCAPI_Controller
 		);
 		$this->PrestudentModel->addSelect("
 			CASE WHEN b.uid IS NOT NULL AND b.uid<>'' 
-			THEN b.uid || " . $this->PrestudentModel->escape(DOMAIN) . " 
+			THEN CONCAT(b.uid, '@', " . $this->PrestudentModel->escape(DOMAIN) . ")
 			ELSE '' END AS mail_intern", false);
 		$this->PrestudentModel->addSelect('p.anmerkung AS anmerkungen');
 		$this->PrestudentModel->addSelect('tbl_prestudent.anmerkung');
