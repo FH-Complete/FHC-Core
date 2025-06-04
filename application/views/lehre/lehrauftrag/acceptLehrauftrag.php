@@ -1,89 +1,101 @@
 <?php
-$this->load->view(
-	'templates/FHC-Header',
-	array(
-		'title' => 'Lehrauftrag annehmen',
-		'jquery3' => true,
-		'jqueryui1' => true,
-		'jquerycheckboxes1' => true,
-		'bootstrap5' => true,
-		'fontawesome6' => true,
-		'sbadmintemplate' => false,
-		'tabulator5' => true,
-        'tabulator5JQuery' => true,
-        'cis'=>true,
-		'momentjs2' => true,
-		'ajaxlib' => true,
-		'dialoglib' => true,
-		'tablewidget' => true,
-		'phrases' => array(
-			'global' => array(
-				'lehrauftraegeAnnehmen',
-                'dokumentePDF',
-                'PDFLehrauftraegeFH',
-                'PDFLehrauftraegeLehrgaenge'
-            ),
-			'ui' => array(
-				'anzeigen',
-				'alleAnzeigen',
-				'nurBestellteAnzeigen',
-				'nurErteilteAnzeigen',
-				'nurAngenommeneAnzeigen',
-				'nurStornierteAnzeigen',
-				'hilfeZuDieserSeite',
-				'alleAuswaehlen',
-				'alleAbwaehlen',
-				'ausgewaehlteZeilen',
-				'hilfe',
-				'tabelleneinstellungen',
-				'keineDatenVorhanden',
-				'spaltenEinstellen',
-				'bestelltVon',
-				'erteiltVon',
-				'angenommenVon',
-				'storniertVon',
-				'lehrauftragInBearbeitung',
-				'wartetAufErteilung',
-				'wartetAufErneuteErteilung',
-				'letzterStatusBestellt',
-				'letzterStatusErteilt',
-				'letzterStatusAngenommen',
-				'vertragWurdeStorniert',
-				),
-			'password' => array('password'),
-			'dms' => array('informationsblattExterneLehrende'),
-			'table' => array(
-				'spaltenEinAusblenden',
-                'spaltenEinAusblendenMitKlickOeffnen',
-                'spaltenEinAusblendenAufEinstellungenKlicken',
-                'spaltenEinAusblendenMitKlickAktivieren',
-                'spaltenEinAusblendenMitKlickSchliessen',
-                'spaltenbreiteVeraendern',
-                'spaltenbreiteVeraendernText',
-                'spaltenbreiteVeraendernInfotext',
-                'zeilenAuswaehlen',
-                'zeilenAuswaehlenEinzeln',
-                'zeilenAuswaehlenBereich',
-                'zeilenAuswaehlenAlle'
-			),
-             'lehre' => array(
-		        'lehrauftraegeAnnehmen',
-		        'lehrauftraegeAnnehmenText',
-		        'lehrauftraegeAnnehmenKlickStatusicon',
-		        'lehrauftraegeAnnehmenLehrauftraegeWaehlen',
-		        'lehrauftraegeAnnehmenMitKlickAnnehmen',
-		        'lehrauftraegeNichtAuswaehlbar',
-		        'lehrauftraegeNichtAuswaehlbarTextBeiAnnahme',
-		        'filterAlleBeiAnnahme',
-		        'filterErteiltBeiAnnahme',
-		        'filterAngenommen'
-            )
+
+$includesArray = array(
+	'title' => 'Lehrauftrag annehmen',
+	'jquery3' => true,
+	'jqueryui1' => true,
+	'jquerycheckboxes1' => true,
+	'bootstrap5' => true,
+	'fontawesome6' => true,
+	'sbadmintemplate' => false,
+	'tabulator5' => true,
+	'tabulator5JQuery' => true,
+	'cis'=>true,
+	'momentjs2' => true,
+	'ajaxlib' => true,
+	'dialoglib' => true,
+	'tablewidget' => true,
+	'phrases' => array(
+		'global' => array(
+			'lehrauftraegeAnnehmen',
+			'dokumentePDF',
+			'PDFLehrauftraegeFH',
+			'PDFLehrauftraegeLehrgaenge'
 		),
-		'customJSs' => array(
-				'public/js/bootstrapper.js',
-				'public/js/lehre/lehrauftrag/acceptLehrauftrag.js')
+		'ui' => array(
+			'anzeigen',
+			'alleAnzeigen',
+			'nurBestellteAnzeigen',
+			'nurErteilteAnzeigen',
+			'nurAngenommeneAnzeigen',
+			'nurStornierteAnzeigen',
+			'hilfeZuDieserSeite',
+			'alleAuswaehlen',
+			'alleAbwaehlen',
+			'ausgewaehlteZeilen',
+			'hilfe',
+			'tabelleneinstellungen',
+			'keineDatenVorhanden',
+			'spaltenEinstellen',
+			'bestelltVon',
+			'erteiltVon',
+			'angenommenVon',
+			'storniertVon',
+			'lehrauftragInBearbeitung',
+			'wartetAufErteilung',
+			'wartetAufErneuteErteilung',
+			'letzterStatusBestellt',
+			'letzterStatusErteilt',
+			'letzterStatusAngenommen',
+			'vertragWurdeStorniert',
+			),
+		'password' => array('password'),
+		'dms' => array('informationsblattExterneLehrende'),
+		'table' => array(
+			'spaltenEinAusblenden',
+			'spaltenEinAusblendenMitKlickOeffnen',
+			'spaltenEinAusblendenAufEinstellungenKlicken',
+			'spaltenEinAusblendenMitKlickAktivieren',
+			'spaltenEinAusblendenMitKlickSchliessen',
+			'spaltenbreiteVeraendern',
+			'spaltenbreiteVeraendernText',
+			'spaltenbreiteVeraendernInfotext',
+			'zeilenAuswaehlen',
+			'zeilenAuswaehlenEinzeln',
+			'zeilenAuswaehlenBereich',
+			'zeilenAuswaehlenAlle'
+		),
+			'lehre' => array(
+			'lehrauftraegeAnnehmen',
+			'lehrauftraegeAnnehmenText',
+			'lehrauftraegeAnnehmenKlickStatusicon',
+			'lehrauftraegeAnnehmenLehrauftraegeWaehlen',
+			'lehrauftraegeAnnehmenMitKlickAnnehmen',
+			'lehrauftraegeNichtAuswaehlbar',
+			'lehrauftraegeNichtAuswaehlbarTextBeiAnnahme',
+			'filterAlleBeiAnnahme',
+			'filterErteiltBeiAnnahme',
+			'filterAngenommen'
+		)
+	),
+	'customJSs' => array(
+			'public/js/bootstrapper.js',
+			'public/js/lehre/lehrauftrag/acceptLehrauftrag.js'
 	)
 );
+
+if (defined("CIS4")) {
+	$this->load->view(
+		'templates/CISVUE-Header',
+		$includesArray
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Header',
+		$includesArray
+	);
+}
+
 ?>
 
 
@@ -230,5 +242,17 @@ $this->load->view(
 </div><!-- end page-wrapper -->
 <br>
 
-<?php $this->load->view('templates/FHC-Footer'); ?>
+<?php 
+if (defined("CIS4")) {
+	$this->load->view(
+		'templates/CISVUE-Footer',
+		$includesArray
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Footer',
+		$includesArray
+	);
+}
+?>
 

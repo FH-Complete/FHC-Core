@@ -9,17 +9,12 @@ $includesArray = array(
 		'ajaxlib' => true,
 		'navigationwidget' => true,
 );
-if(defined('CIS4')){
-	$this->load->view(
-		'templates/CISVUE-Header',
-		$includesArray
-	);
-}else{
-	$this->load->view(
-		'templates/FHC-Header',
-		$includesArray
-	);
-}
+
+$this->load->view(
+	'templates/FHC-Header',
+	$includesArray
+);
+
 ?>
 
 <?php echo $this->widgetlib->widget('NavigationWidget'); ?>
@@ -44,15 +39,10 @@ if(defined('CIS4')){
 	</div>
 
 <?php 
-if(defined('CIS4')){
-	$this->load->view(
-		'templates/CISVUE-Footer',
-		$includesArray
-	);
-}else{
-	$this->load->view(
-		'templates/FHC-Footer',
-		$includesArray
-	);
-}
+
+$this->load->view(
+	'templates/FHC-Footer',
+	$includesArray
+);
+
 ?>
