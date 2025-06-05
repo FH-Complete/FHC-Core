@@ -20,6 +20,10 @@
 	--calendar-past: var(--fhc-beige-20);
 }
 
+.fhc-calendar-pane {
+	height: var(--calendar-pane-height);
+}
+
 .fhc-calendar-hour-indicator{
 	border-top: 1px solid var(--calendar-border);
 }
