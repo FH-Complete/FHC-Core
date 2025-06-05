@@ -146,3 +146,15 @@ html {
 .override_filtercmpt_actions_style div.d-flex.align-items-baseline {
 	align-items: end !important;
 }
+
+.stv-details-details-foto img {
+	max-width: 150px;
+}
+
+.msg_preview {
+	margin-bottom: -1px;
+}
+
+.tiny-90 div.tox.tox-tinymce {
+	height: 90% !important;
+}

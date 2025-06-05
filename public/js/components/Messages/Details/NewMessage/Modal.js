@@ -342,6 +342,7 @@ export default {
 			class="messages-detail-newmessage-modal"
 			ref="modalNewMessage" 
 			dialog-class=" modal-dialog-scrollable modal-xl modal-msg"
+			header-class="flex-wrap pb-0"
 			body-class="px-3 py-2"
 			@hidden.bs.modal="resetForm"
 			>
@@ -350,7 +351,8 @@ export default {
 				{{ $p.t('messages', 'neueNachricht') }}
 			</template>
 
-			<ul class="nav nav-tabs" id="msg_preview" role="tablist">
+			<template #modal-header-content>
+			<ul class="nav nav-tabs w-100 mt-3 msg_preview" id="msg_preview" role="tablist">
 				<li class="nav-item" role="presentation">
 					<button class="nav-link active" id="msg-tab" data-bs-toggle="tab" data-bs-target="#msg" type="button" role="tab" aria-controls="msg" aria-selected="true">Nachricht</button>
 				</li>
@@ -358,6 +360,7 @@ export default {
 					<button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview" type="button" role="tab" aria-controls="preview" aria-selected="false">Vorschau</button>
 				</li>
 			</ul>
+			</template>
 
 			<form-form ref="formNewMassage">
 
@@ -366,7 +369,7 @@ export default {
 
 				<div class="row">
 					<div class="col-sm-8">
-						<form-form class="row g-3 mt-2" ref="formMessage">
+						<form-form class="row g-3 mt-2 h-100" ref="formMessage">
 
 							<div class="row mb-3">
 
@@ -391,7 +394,7 @@ export default {
 							</div>
 
 							<!--Tiny MCE-->
-							<div class="row mb-3">
+							<div class="row mb-3 h-100 tiny-90">
 								<form-input
 									ref="editor"
 									:label="$p.t('global','nachricht')  + ' *'"

@@ -292,7 +292,7 @@ class Message_model extends DB_Model
 		if (isError($count))
 			return $count;
 
-		$count = floor(current(getData($count))->count/$limit);
+		$count = ceil(current(getData($count))->count/$limit);
 		$sql = "
 			SELECT * FROM (
 				" . $sql_base . "

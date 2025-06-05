@@ -207,12 +207,14 @@ export default {
 							this.previewBody = body;
 					}
 				},
+/*
 				{
 					event: 'pageLoaded',
 					handler: (pageno) => {
 						this.pageNo = pageno+1;
 					}
 				}
+*/
 			],
 			previewBody: "",
 			open: false,
@@ -288,16 +290,11 @@ export default {
 			// to avoid endless loop
 			if (iteration > messages.length) break;
 			}
-		return {data: messageNested, last_page};
+		return {data: messageNested, last_page: last_page};
 		},
-		loadAjaxCall(params){
+		loadAjaxCall(url, config, params){
 			return this.$api.call(
-				ApiMessages.getMessages({
-					id: this.id,
-					type: this.typeId,
-					size: this.tabulatorOptions.paginationSize,
-					page: this.pageNo
-				})
+				ApiMessages.getMessages(params)
 			);
 		}
 	},
