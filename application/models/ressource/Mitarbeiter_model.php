@@ -189,9 +189,9 @@ class Mitarbeiter_model extends DB_Model
 	{
 		$qry = "
             SELECT bf.benutzerfunktion_id,bf.fachbereich_kurzbz,bf.uid,bf.funktion_kurzbz,
-                   bf.updateamum,bf.updatevon,bf.insertamum,bf.insertvon,bf.ext_id,bf.semester,
-                   bf.oe_kurzbz,bf.datum_von,bf.datum_bis,bf.bezeichnung,bf.wochenstunden,
-                   p.person_id, p.vorname,p.nachname,p.titelpre,p.titelpost
+				bf.updateamum,bf.updatevon,bf.insertamum,bf.insertvon,bf.ext_id,bf.semester,
+				bf.oe_kurzbz,bf.datum_von,bf.datum_bis,bf.bezeichnung,bf.wochenstunden,
+				p.person_id, p.vorname,p.nachname,p.titelpre,p.titelpost
             FROM public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
             JOIN public.tbl_benutzer b USING (uid) JOIN public.tbl_mitarbeiter ma ON(b.uid=ma.mitarbeiter_uid)
             JOIN public.tbl_person p  USING(person_id)
@@ -215,11 +215,11 @@ class Mitarbeiter_model extends DB_Model
 			SELECT
 			  *
 			FROM
-			  public.tbl_person
-			  JOIN public.tbl_benutzer b USING(person_id)
-			  JOIN public.tbl_mitarbeiter ma ON (ma.mitarbeiter_uid = b.uid)
+				public.tbl_person
+				JOIN public.tbl_benutzer b USING(person_id)
+				JOIN public.tbl_mitarbeiter ma ON (ma.mitarbeiter_uid = b.uid)
 			WHERE
-			  person_id = ?
+				person_id = ?
         ";
 
 		return $this->execQuery($qry, array($person_id));
@@ -344,20 +344,36 @@ class Mitarbeiter_model extends DB_Model
 		return success($kurzbz);
 	}
 
-	public function searchMitarbeiter($filter)
+	/**
+	 * Search function for mitarbeiter
+	 * @param $filter searchstring: searches for nachname, vorname, mitarbeiter_uid
+	 * $param $mode gives the resultobject in different version:
+	 * 				null : "[mitarbeiter_uid], Nachname, Vorname, (mitarbeiter_uid)"
+	 * 				'mitAkadGrad': "[mitarbeiter_uid], Nachname, Vorname, Titelpre, Titelpost (mitarbeiter_uid)"
+	 *				'ohneMaUid' : "[mitarbeiter_uid], Nachname, Vorname, Titelpre, Titelpost"
+	 * @return object in 3 versions
+	 */
+	public function searchMitarbeiter($filter, $mode=null)
 	{
 		$filter = strtoLower($filter);
+
+		if ($mode == "mitAkadGrad")
+			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+		elseif ($mode == "ohneMaUid")
+			$returnwert = "p.person_id, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre) as mitarbeiter";
+		else
+			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+
 		$qry = "
-			SELECT 
-					ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter
+			SELECT " . $returnwert . "  
 			FROM 
-			    public.tbl_mitarbeiter ma 
+				public.tbl_mitarbeiter ma 
 			JOIN 
-			    public.tbl_benutzer b on (ma.mitarbeiter_uid = b.uid)
+				public.tbl_benutzer b on (ma.mitarbeiter_uid = b.uid)
 			JOIN 
-			    public.tbl_person p on (p.person_id = b.person_id)
+				public.tbl_person p on (p.person_id = b.person_id)
 			WHERE 
-			    lower (p.nachname) LIKE '%". $this->db->escape_like_str($filter)."%'
+				lower (p.nachname) LIKE '%". $this->db->escape_like_str($filter)."%'
 			OR
 				lower (p.vorname) LIKE '%". $this->db->escape_like_str($filter)."%'
 			OR
@@ -384,6 +400,29 @@ class Mitarbeiter_model extends DB_Model
 
 		$uid = isset($data[0]->uid) ? $data[0]->uid : null;
 		return $uid;
+	}
 
+	/**
+	 * Gets Mitarbeiter for a certain Lehrveranstaltung.
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @return array with Mitarbeiter and their Lehreinheiten
+	 */
+	public function getMitarbeiterFromLV($lehrveranstaltung_id)
+	{
+	$qry = "SELECT DISTINCT
+				lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid 
+			FROM 
+				lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
+			WHERE 
+				lehrveranstaltung_id= ?
+			AND 
+				mitarbeiter_uid=uid 
+			AND 
+				tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
+
+		$parametersArray = array($lehrveranstaltung_id);
+
+		return $this->execQuery($qry, $parametersArray);
 	}
 }

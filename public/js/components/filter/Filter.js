@@ -21,6 +21,10 @@ import FilterColumns from './Filter/Columns.js';
 import TableDownload from './Table/Download.js';
 import collapseAutoClose from '../../directives/collapseAutoClose.js';
 
+import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
+
+import ApiFilter from '../../api/factory/filter.js';
+
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
 const FILTER_COMPONENT_NEW_FILTER_TYPE = 'Filter Component New Filter Type';
@@ -42,11 +46,14 @@ export const CoreFilterCmpt = {
 	},
 	emits: [
 		'nwNewEntry',
-		'click:new'
+		'click:new',
+		'tableBuilt',
+		'uuidDefined'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
 		title: String,
+		description: String,
 		sideMenu: {
 			type: Boolean,
 			default: true
@@ -57,6 +64,7 @@ export const CoreFilterCmpt = {
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
 		tableOnly: Boolean,
+		noColumnFilter:Boolean,
 		reload: Boolean,
 		download: {
 			type: [Boolean, String, Function, Array, Object],
@@ -69,13 +77,15 @@ export const CoreFilterCmpt = {
 		uniqueId: String,
 		// TODO soll im master kommen?
 		idField: String,
-		parentIdField: String
+		parentIdField: String,
+		countOnly: Boolean
 	},
 	data: function() {
 		return {
 			uuid: 0,
 			// FilterCmpt properties
 			filterName: null,
+			filterActive: false,
 			fields: null,
 			dataset: null,
 			datasetMetadata: null,
@@ -95,7 +105,15 @@ export const CoreFilterCmpt = {
 			tabulator: null,
 			tableBuilt: false,
 			tabulatorHasSelector: false,
-			selectedData: []
+			selectedData: [],
+			persistence: {
+				sort: true,
+				columns: true,
+				filter: false,
+				headerFilter: false,
+				group: false,
+				page: false,
+			}
 		};
 	},
 	computed: {
@@ -157,7 +175,7 @@ export const CoreFilterCmpt = {
 				return [];
 			return this.tabulator.getColumns().filter(col => {
 				let def = col.getDefinition();
-				return !def.frozen && def.title;
+				return !def.frozen && def.title && def.formatter != "responsiveCollapse";
 			}).map(col => col.getField());
 		},
 		fieldNames() {
@@ -198,16 +216,16 @@ export const CoreFilterCmpt = {
 			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
-				height: 500,
-				layout: "fitDataStretch",
-				movableColumns: true,
-				columnDefaults:{
-					tooltip: true,
-				},
-				placeholder,
-				reactiveData: true,
-				persistence: true
-			}, ...(this.tabulatorOptions || {})};
+					height: 500,
+					layout: "fitDataStretchFrozen",
+					movableColumns: true,
+					columnDefaults:{
+						tooltip: true
+					},
+					placeholder,
+					reactiveData: true,
+					persistence: this.persistence,
+				}, ...(this.tabulatorOptions || {})};
 
 			if (!this.tableOnly) {
 				tabulatorOptions.data = this.filteredData;
@@ -236,7 +254,7 @@ export const CoreFilterCmpt = {
 				for (let evt of this.tabulatorEvents)
 					this.tabulator.on(evt.event, evt.handler);
 			}
-			this.tabulator.on('tableBuilt', () => this.tableBuilt = true);
+			this.tabulator.on('tableBuilt', () => {this.tableBuilt = true; this.$emit('tableBuilt');});
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
@@ -272,8 +290,15 @@ export const CoreFilterCmpt = {
 					const cols = this.tabulator.getColumns();
 					this.fields = cols.map(col => col.getField());
 					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+					if (this.tabulator.options.persistence.headerFilter)
+						this._setHeaderFilter();
 				});
+
 			}
+
+			this.tabulator.on("dataFiltered", filters => {
+				this.filterActive = filters.length > 0;
+			});
 		},
 		updateTabulator() {
 			if (this.tabulator) {
@@ -287,16 +312,37 @@ export const CoreFilterCmpt = {
 			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
+			this._setHeaderFilter()
+		},
+		clearFilters()
+		{
+			let existingFilters = this.tabulator.getHeaderFilters();
+			existingFilters.forEach(filter => {
+				this.tabulator.setHeaderFilterValue(filter.field, "");
+			});
+			this.tabulator.clearFilter();
+			this.filterActive = false;
+		},
+		_setHeaderFilter()
+		{
+			const existingFilters = this.tabulator.getHeaderFilters();
+			existingFilters.forEach(filter => {
+				this.tabulator.setHeaderFilterValue(filter.field, filter.value);
+			});
 		},
 		/**
 		 *
 		 */
 		getFilter() {
 			if (this.selectedFilter === null)
-				this.startFetchCmpt(this.$fhcApi.factory.filter.getFilter, null, this.render);
+				this.startFetchCmpt(
+					wsParams => this.$api.call(ApiFilter.getFilter(wsParams)),
+					null,
+					this.render
+				);
 			else
 				this.startFetchCmpt(
-					this.$fhcApi.factory.filter.getFilterById,
+					wsParams => this.$api.call(ApiFilter.getFilterById(wsParams)),
 					{
 						filterId: this.selectedFilter
 					},
@@ -469,7 +515,7 @@ export const CoreFilterCmpt = {
 			this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				this.$fhcApi.factory.filter.saveCustomFilter,
+				wsParams => this.$api.call(ApiFilter.saveCustomFilter(wsParams)),
 				{
 					customFilterName
 				},
@@ -485,7 +531,7 @@ export const CoreFilterCmpt = {
 				this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				this.$fhcApi.factory.filter.removeCustomFilter,
+				wsParams => this.$api.call(ApiFilter.removeCustomFilter(wsParams)),
 				{
 					filterId: filterId
 				},
@@ -522,7 +568,7 @@ export const CoreFilterCmpt = {
 		applyFilterConfig(filterFields) {
 			this.selectedFilter = null;
 			this.startFetchCmpt(
-				this.$fhcApi.factory.filter.applyFilterFields,
+				wsParams => this.$api.call(ApiFilter.applyFilterFields(wsParams)),
 				{
 					filterFields
 				},
@@ -568,16 +614,22 @@ export const CoreFilterCmpt = {
 		if (this.sideMenu && (!this.$props.onNwNewEntry || !(this.$props.onNwNewEntry instanceof Function)))
 			alert('"nwNewEntry" listener is mandatory when sideMenu is true');
 		this.uuid = _uuid++;
-		if (!this.tableOnly)
-			this.getFilter(); // get the filter data
+		this.$emit('uuidDefined', this.uuid)
 	},
 	mounted() {
-		this.initTabulator();
+
+		this.initTabulator().then(() => {
+			if (!this.tableOnly) {
+				this.selectedFilter = window.location.hash ? window.location.hash.slice(1) : null;
+				this.getFilter(); // get the filter data
+			}
+		});
+
 	},
 	template: `
 		<!-- Load filter data -->
 		<core-fetch-cmpt
-			v-if="!tableOnly"
+			v-if="!tableOnly && fetchCmptApiFunction"
 			v-bind:api-function="fetchCmptApiFunction"
 			v-bind:api-function-parameters="fetchCmptApiFunctionParams"
 			v-bind:refresh="fetchCmptRefresh"
@@ -603,14 +655,21 @@ export const CoreFilterCmpt = {
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
 						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
 					</button>
-					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten:</span>
+					<span v-if="$slots.actions && tabulatorHasSelector">
+						<span v-if="countOnly">{{ selectedData.length }} ausgewählt</span>
+						<span v-else> Mit {{ selectedData.length }} ausgewählten:</span>
+					</span>
 					<slot name="actions" v-bind="{selected: tabulatorHasSelector ? selectedData : []}"></slot>
 					<slot name="search"></slot>
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
+					<span v-else-if="description">{{ description }}</span>
 					<a v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
 						<span class="fa-solid fa-xl fa-filter"></span>
+					</a>
+					<a v-if="filterActive"  class="btn btn-link px-0 text-dark" :title="$p.t('ui','filterdelete')" @click="clearFilters">
+						<span class="fa-solid fa-xl fa-filter-circle-xmark"></span>
 					</a>
 					<a href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
 						<span class="fa-solid fa-xl fa-table-columns"></span>
@@ -659,4 +718,3 @@ export const CoreFilterCmpt = {
 		<div ref="table" :id="'filterTableDataset' + idExtra" class="filter-table-dataset"></div>
 	`
 };
-

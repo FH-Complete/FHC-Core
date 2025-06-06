@@ -20,4 +20,16 @@ class Ort_model extends DB_Model
 		
 		return $this->OrtModel->loadWhere(array("raumtyp_kurzbz" => $raumtyp_kurzbz));
 	}
+
+	public function getContentID($ort_kurzbz)
+	{
+	
+		return $this->execReadOnlyQuery("
+		SELECT content_id 
+		FROM public.tbl_ort 
+		WHERE ort_kurzbz = ?;
+		",[$ort_kurzbz]);
+		
+	}
+
 }

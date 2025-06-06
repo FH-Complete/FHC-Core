@@ -299,6 +299,91 @@ class Vertrag_model extends DB_Model
         }
     }
 
+    /**
+     * Prueft ob ein Mitarbeiter einen erteilten Vertrag zu einer Lehrveranstaltung besitzt.
+     * @param $lehrveranstaltung_id ID der Lehrveranstaltung
+     * @param $studiensemester_kurzbz Studiensemester das geprueft wird
+     * @param $mitarbeiter_uid UID des Mitarbeiters
+     */
+    public function isVertragErteiltLV($lehrveranstaltung_id, $studiensemester_kurzbz, $mitarbeiter_uid)
+    {
+	    if (defined('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON')
+	     && CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON != '')
+	    {
+		    // Liegt das Studiensemester vor dem Pruefdatum, wird die LV immer als Erteilt angezeigt
+		    $stsemquery = "
+			    SELECT
+				    tbl_studiensemester.start
+			    FROM
+				    public.tbl_studiensemester
+			    WHERE
+				    studiensemester_kurzbz = " . $this->escape($studiensemester_kurzbz)."
+				    AND tbl_studiensemester.start < (
+					    SELECT 
+						start
+					    FROM 
+						public.tbl_studiensemester stsem 
+					    WHERE
+						stsem.studiensemester_kurzbz = " . $this->escape(CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON)."
+					    )";
+
+		    if ($stsemresult = $this->execReadOnlyQuery($stsemquery))
+		    {
+			    $stsemdata = getData($stsemresult);
+			    if ($stsemdata && count($stsemdata) > 0)
+			    {
+				    // Wenn das Studiensemester vor dem Pruefdatum liegt, gilt der Vertrag immer als erteilt.
+				    return true;
+			    }
+		    }
+		    else
+		    {
+			    return false;
+		    }
+	    }
+
+	    $query = "
+		    SELECT
+			    1
+		    FROM
+			    lehre.tbl_lehreinheitmitarbeiter
+			    JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+			    JOIN lehre.tbl_vertrag USING(vertrag_id)
+			    JOIN lehre.tbl_vertrag_vertragsstatus USING(vertrag_id)
+		    WHERE
+			    tbl_lehreinheitmitarbeiter.mitarbeiter_uid = " . $this->escape($mitarbeiter_uid) . "
+			    AND tbl_lehreinheit.studiensemester_kurzbz = " . $this->escape($studiensemester_kurzbz) . "
+			    AND tbl_lehreinheit.lehrveranstaltung_id = " . $this->escape(intval($lehrveranstaltung_id)) . "
+			    AND tbl_vertrag_vertragsstatus.vertragsstatus_kurzbz='erteilt'
+			    AND NOT EXISTS(
+				    SELECT 
+					1 
+				    FROM 
+					lehre.tbl_vertrag_vertragsstatus vstatus
+				    WHERE 
+					vstatus.vertrag_id = tbl_vertrag.vertrag_id
+					AND vstatus.vertragsstatus_kurzbz = 'storno'
+			    )
+	    ";
+
+	    if ($result = $this->execReadOnlyQuery($query))
+	    {
+		    $data = getData($result);
+		    if ($data && count($data) > 0)
+		    {
+			    return true;
+		    }
+		    else
+		    {
+			    return false;
+		    }
+	    }
+	    else
+	    {
+		    return false;
+	    }
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     // Private methods
 

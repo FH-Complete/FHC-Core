@@ -47,11 +47,12 @@ class CI3_Events
  */
 require_once(APPPATH.'config/Events.php');
 
+$active_addons_array = explode(";", ACTIVE_ADDONS);
+
 foreach (scandir(APPPATH.'config/extensions') as $dir)
 	if ($dir[0] != '.' && file_exists(APPPATH.'config/extensions/'.$dir.'/Events.php'))
 		require_once APPPATH.'config/extensions/'.$dir.'/Events.php';
 
-$active_addons_array = explode(";", ACTIVE_ADDONS);
 foreach (scandir(FHCPATH.'addons') as $dir)
 	if ($dir[0] != '.' && file_exists(FHCPATH.'addons/'.$dir.'/Events.php'))
 	{
@@ -61,4 +62,4 @@ foreach (scandir(FHCPATH.'addons') as $dir)
 			require_once FHCPATH . 'addons/' . $dir . '/Events.php';
 		}
 	}
-
+		
