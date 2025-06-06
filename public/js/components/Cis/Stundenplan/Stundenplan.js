@@ -26,7 +26,9 @@ const Stundenplan = {
 			studiensemester_start: null,
 			studiensemester_ende: null,
 			uid: null,
-			renderComponents: {}
+			renderComponents: {},
+			isModalContentResolved: false,
+			isModalTitleResolved: false,
 		}
 	},
 	props: {
@@ -109,9 +111,25 @@ const Stundenplan = {
 		},
 	},
 	methods:{
+		modalTitleResolved: function () {
+			this.isModalTitleResolved = true;
+			if(this.isModalContentResolved && this.isModalTitleResolved)
+				Vue.nextTick(() => {
+					if(this.$refs.lvmodal) 
+						this.$refs.lvmodal.show();
+				});
+		},
+		modalContentResolved: function () {
+			this.isModalContentResolved = true;
+			if (this.isModalContentResolved && this.isModalTitleResolved)
+				Vue.nextTick(() => {
+					if (this.$refs.lvmodal)
+						this.$refs.lvmodal.show();
+				});
+		},
 		// component renderers fetches from different addons
 		modalTitleComponent(type){
-			return this.renderers[type].modalTitel;
+			return this.renderers[type].modalTitle;
 		},
 		modalContentComponent(type) {
 			return this.renderers[type].modalContent;
@@ -186,9 +204,8 @@ const Stundenplan = {
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
-			Vue.nextTick(() => {
-				this.$refs.lvmodal.show();
-			});
+			this.isModalTitleResolved = false;
+			this.isModalContentResolved = false;
 		},
 		updateRange: function ({start,end, mounted}) {
 			let checkDate = (date) => {
@@ -275,14 +292,14 @@ const Stundenplan = {
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" >
 		<template #modalTitle>
-			<Suspense>
-				<component :is="modalTitleComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
-			</Suspense>
-			</template>
+		<Suspense @resolve="modalTitleResolved">
+			<component :is="modalTitleComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
+		</Suspense>
+		</template>
 		<template #modalContent>
-			<Suspense>
-				<component :is="modalContentComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
-			</Suspense>
+		<Suspense @resolve="modalContentResolved">
+			<component :is="modalContentComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
+		</Suspense>
 		</template>
 	</lv-modal>
 
