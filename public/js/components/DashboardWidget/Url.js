@@ -161,7 +161,7 @@ export default {
 	template: /*html*/ `
     <div class="widgets-url w-100 h-100 overflow-scroll" style="padding: 1rem 1rem;">
         <div class="d-flex flex-column justify-content-between">
-        	<button v-if="editModeIsActive" class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
+        	<button class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
 
             <template v-if="shared">
 
@@ -173,11 +173,11 @@ export default {
 
 						<div class="ms-auto">
 							<!--EDIT BOOKMARK-->
-							<a href="#" @click.prevent="openEditModal(link)" v-show="configMode || editModeIsActive">
+							<a href="#" @click.prevent="openEditModal(link)" >
 								<i class="fa fa-edit me-1"></i>
 							</a>
 							<!--DELETE BOOKMARK-->
-							<a id="deleteBookmark" href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode || editModeIsActive">
+							<a id="deleteBookmark" href="#" @click.prevent="removeLink(link.bookmark_id)">
 								<i class="fa fa-regular fa-trash-can"></i>
 							</a>
 						</div>
@@ -198,7 +198,7 @@ export default {
         </div>
     </div>
 	<!--EDIT MODAL-->
-	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag" v-if="editModeIsActive " ref="editForm">
+	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag" ref="editForm">
 		<bs-modal @[\`hide.bs.modal\`]="bookmark_id=null; clearInputs();" ref="editModal">
 			<template #title>
 				<h2>{{$p.t('bookmark','editLink')}}</h2>
@@ -216,7 +216,7 @@ export default {
 	</core-form>
 
 	<!--CREATE MODAL-->
-	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag" v-if="editModeIsActive " ref="createForm">
+	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag"  ref="createForm">
 		<bs-modal @[\`hide.bs.modal\`]="clearInputs();" ref="createModal">
 			<template #title>
 				<h2>{{$p.t('bookmark','newLink')}}</h2>
