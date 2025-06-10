@@ -425,6 +425,7 @@ export default {
 				return;
 			this.mode = MODE_RESIZE;
 			this.draggedItem = item;
+			this.$emit('draggedItem', item);
 			this._dragStart(evt);
 		},
 		dragOver(evt) {
@@ -627,7 +628,7 @@ export default {
 				class="position-absolute"
 				:active="active"
 				:style="{
-					zIndex: item.resizeOverlay ? -5 : 'auto',
+					zIndex: item.resizeOverlay ? 1 : 2,
 					top: 'calc(' + item.y + ' * var(--fhc-dg-row-height))',
 					left: 'calc(' + item.x + ' * var(--fhc-dg-col-width))',
 					width: 'calc(' + item.w + ' * var(--fhc-dg-col-width))',

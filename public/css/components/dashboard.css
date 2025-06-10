@@ -38,13 +38,6 @@
 	cursor:pointer;
 }
 
-.draggedItem {
-	height: 100%;
-	width: 100%;
-	background-color:white;
-	position:relative;
-}
-
 .dashboard-section > .newGridRow{
 	position:absolute;
 	width:20px;
@@ -128,6 +121,13 @@
 	cursor: move;
 }
 
+.draggedItem {
+	height: 100%;
+	width: 100%;
+	background-color: white;
+	position: relative;
+}
+
 .dashboard-item-overlay::before{
 	position:absolute;
 	content:"";
@@ -137,7 +137,6 @@
 	bottom:0;
 	background-color:rgba(0, 100, 156);
 	border:4px dashed lightgray;
-	z-index: 2;
 	opacity: 0.5;
 }
 
