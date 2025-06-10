@@ -198,7 +198,7 @@ export default {
         </div>
     </div>
 	<!--EDIT MODAL-->
-	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag" ref="editForm">
+	<teleport to="body">
 		<bs-modal @[\`hide.bs.modal\`]="bookmark_id=null; clearInputs();" ref="editModal">
 			<template #title>
 				<h2>{{$p.t('bookmark','editLink')}}</h2>
@@ -213,10 +213,9 @@ export default {
 				<button @click="editBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
 			</template>
 		</bs-modal>
-	</core-form>
-
+	</teleport>
 	<!--CREATE MODAL-->
-	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag"  ref="createForm">
+	<teleport to="body">
 		<bs-modal @[\`hide.bs.modal\`]="clearInputs();" ref="createModal">
 			<template #title>
 				<h2>{{$p.t('bookmark','newLink')}}</h2>
@@ -231,7 +230,8 @@ export default {
 				<button @click="insertBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
 			</template>
 		</bs-modal>
-	</core-form>`,
+	</teleport>
+	`,
 };
 
 /*

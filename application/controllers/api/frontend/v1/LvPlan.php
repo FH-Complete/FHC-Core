@@ -81,7 +81,7 @@ class LvPlan extends FHCAPI_Controller
 		$end_date = $this->input->get('end_date', TRUE);
 		$lv_id = $this->input->get('lv_id', TRUE);
 
-		$lvplan_events = $this->lvplanlib->getLvPlan($start_date,$end_date,$lv_id);
+		$lvplan_events = $this->getDataOrTerminateWithError($this->lvplanlib->getLvPlan($start_date,$end_date,$lv_id));
 		if( is_null($lvplan_events) || isEmptyArray($lvplan_events) )
 		{
 			$lvplan_events = array();
