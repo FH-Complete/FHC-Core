@@ -20,17 +20,19 @@ export default {
         <!-- HIER SIND DIE EMAILS -->
         <div  class="gy-3 row justify-content-center ">
             <div v-for="email in data" class="col-12 ">
-                <div class="row align-items-center">
-                    <div class="col-1 text-center">
-                        <i class="fa-solid fa-envelope fhc-link-color" ></i>
-                    </div>
-                    <div class="col-11">
-                        <div class="form-underline">
-                            <div class="form-underline-titel">{{email.type}}</div>
-                            <a :href="'mailto:'+email.email" class="form-underline-content">{{email.email}} </a>
-                        </div>
-                    </div>
-                </div>
+				<template v-if="email.email">
+					<div class="row align-items-center">
+						<div class="col-1 text-center">
+							<i class="fa-solid fa-envelope fhc-link-color" ></i>
+						</div>
+						<div class="col-11">
+							<div class="form-underline">
+								<div class="form-underline-titel">{{email?.type}}</div>
+								<a :href="'mailto:'+email?.email" class="form-underline-content">{{email?.email}} </a>
+							</div>
+						</div>
+					</div>
+				</template>
             </div>
         </div>
     </div>

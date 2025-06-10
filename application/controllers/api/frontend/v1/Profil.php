@@ -232,7 +232,8 @@ class Profil extends FHCAPI_Controller
 		$intern_email["email"] = $uid . "@" . DOMAIN;
 		$extern_email = array();
 		$extern_email["type"] = "alias";
-		$extern_email["email"] = $benutzer_res->alias . "@" . DOMAIN;
+
+		$extern_email["email"] = $benutzer_res->alias? ($benutzer_res->alias. "@" . DOMAIN) : null;
 		$res->emails = array($intern_email, $extern_email);
 
 		$res->funktionen = $benutzer_funktion_res;
@@ -345,7 +346,7 @@ class Profil extends FHCAPI_Controller
 		$intern_email["email"] = $this->uid . "@" . DOMAIN;
 		$extern_email = array();
 		$extern_email["type"] = "alias";
-		$extern_email["email"] = $mitarbeiter_res->alias . "@" . DOMAIN;
+		$extern_email["email"] = $mitarbeiter_res->alias? ($mitarbeiter_res->alias . "@" . DOMAIN) :null;
 		$res->emails = [$intern_email, $extern_email];
 
 		$res->funktionen = $benutzer_funktion_res;
