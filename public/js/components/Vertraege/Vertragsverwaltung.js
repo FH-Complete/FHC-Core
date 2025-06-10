@@ -2,6 +2,8 @@ import MitarbeiterHeader from "./MitarbeiterHeader.js";
 import MitarbeiterDetails from "./MitarbeiterDetails.js";
 import VertraegeMitarbeiter from "./Vertraege.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
+import ApiCoreVertraege from '../../api/factory/vertraege/vertraege.js';
+
 
 export default {
 	components: {
@@ -23,6 +25,7 @@ export default {
 	data() {
 		return {
 			person_id: null,
+			endpoint: ApiCoreVertraege
 		}
 	},
 	methods: {
@@ -37,15 +40,15 @@ export default {
 				<vertical-split ref="vsplit">
 					<template #top>	
 						<div class="d-flex flex-column" style="height: 100%;">
-							<mitarbeiter-header :filterMa="filterMa" :vertragsarten="vertragsarten" @selectedPerson="selectPerson" />
+							<mitarbeiter-header  :endpoint="endpoint" @selectedPerson="selectPerson" />
 						</div>
 					</template>
 					<template #bottom>
 						<div class="col" v-if="person_id!=null">
 							<mitarbeiter-details :person_id="person_id"></mitarbeiter-details>
-							<vertraege-mitarbeiter :endpoint="$fhcApi.factory.vertraege.person" :person_id="this.person_id"/>
+							<vertraege-mitarbeiter :endpoint="endpoint" :person_id="this.person_id"/>
 						</div>
-					<template>
+					</template>
 				</vertical-split>
 			</main>	
 		</div>

@@ -29,18 +29,19 @@ export default {
 		formDataParent: {
 			type: Object,
 			required: true
-		}
+		},
+		endpoint: {
+			type: Object,
+			required: true
+		},
 	},
 	data() {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.vertraege.person.getStatiOfContract,
-				ajaxParams: () => {
-					return {
-						vertrag_id: this.vertrag_id
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					this.endpoint.getStatiOfContract(this.vertrag_id)
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Status", field: "bezeichnung"},

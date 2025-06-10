@@ -47,6 +47,7 @@ class Config extends FHCAPI_Controller
 			$params
 		);
 
+		//TODO(Manu) check warning
 		$this->terminateWithSuccess($menu[0]);
 	}
 }

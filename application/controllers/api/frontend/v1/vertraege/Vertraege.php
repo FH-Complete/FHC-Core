@@ -467,7 +467,7 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
-	public function insertContractStatus($vertrag_id)
+	public function insertContractStatus()
 	{
 		$this->load->library('form_validation');
 
@@ -486,7 +486,7 @@ class Vertraege extends FHCAPI_Controller
 
 		$result = $this->VertragvertragsstatusModel->loadWhere(
             array(
-                'vertrag_id' => $vertrag_id,
+                'vertrag_id' => $this->input->post('vertrag_id'),
                 'vertragsstatus_kurzbz' => $this->input->post('vertragsstatus_kurzbz')
             )
         );
@@ -497,7 +497,7 @@ class Vertraege extends FHCAPI_Controller
         }
 
 		$status_result = $this->VertragvertragsstatusModel->insert([
-			'vertrag_id' => $vertrag_id,
+			'vertrag_id' => $this->input->post('vertrag_id'),
 			'uid' => getAuthUID(),
 			'vertragsstatus_kurzbz' => $this->input->post('vertragsstatus_kurzbz'),
 			'insertamum' => date('c'),
@@ -512,9 +512,10 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($status_result)));
 	}
 
-	public function deleteContractStatus($vertrag_id)
+	public function deleteContractStatus()
 	{
 		$status = $this->input->post('vertragsstatus_kurzbz');
+		$vertrag_id = $this->input->post('vertrag_id');
 
 		$result = $this->VertragvertragsstatusModel->delete(
 			array(
@@ -534,9 +535,10 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
-	public function loadContractStatus($vertrag_id)
+	public function loadContractStatus()
 	{
-		$status = $this->input->post('vertragsstatus_kurzbz');
+		$status = $this->input->get('vertragsstatus_kurzbz');
+		$vertrag_id = $this->input->get('vertrag_id');
 
 		$result = $this->VertragvertragsstatusModel->loadWhere(
 			array(
@@ -550,7 +552,7 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
-	public function updateContractStatus($vertrag_id)
+	public function updateContractStatus()
 	{
 		$this->load->library('form_validation');
 
@@ -569,7 +571,7 @@ class Vertraege extends FHCAPI_Controller
 
 		$status_result = $this->VertragvertragsstatusModel->update(
 			[
-			'vertrag_id' => $vertrag_id,
+			'vertrag_id' => $this->input->post('vertrag_id'),
 			'vertragsstatus_kurzbz' => $this->input->post('vertragsstatus_kurzbz')],
 			[
 			'uid' => getAuthUID(),
@@ -586,10 +588,11 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($status_result)));
 	}
 
-	public function deleteLehrauftrag($vertrag_id)
+	public function deleteLehrauftrag()
 	{
 		$lehreinheit_id = $this->input->post('lehreinheit_id');
 		$mitarbeiter_uid = $this->input->post('mitarbeiter_uid');
+		$vertrag_id = $this->input->post('vertrag_id ');
 
 		$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
 
@@ -616,11 +619,12 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($result)));
 	}
 
-	public function deleteBetreuung($vertrag_id)
+	public function deleteBetreuung()
 	{
 		$person_id= $this->input->post('person_id');
 		$projektarbeit_id = $this->input->post('projektarbeit_id');
 		$betreuerart_kurzbz = $this->input->post('betreuerart_kurzbz');
+		$vertrag_id = $this->input->post('vertrag_id ');
 
 		$this->load->model('education/Projektbetreuer_model', 'Projektbetreuermodel');
 

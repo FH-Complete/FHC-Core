@@ -26,19 +26,19 @@ export default {
 			type: [Number],
 			required: true
 		},
+		endpoint: {
+			type: Object,
+			required: true
+		},
 	},
 	data() {
 		return {
 			//tableData: [],
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.vertraege.person.getAllContractsAssigned,
-				ajaxParams: () => {
-					return {
-						person_id: this.person_id,
-						vertrag_id: this.vertrag_id
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					this.endpoint.getAllContractsAssigned(this.person_id, this.vertrag_id)
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Typ", field: "type"},

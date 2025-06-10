@@ -25,12 +25,9 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.vertraege.person.getAllContractsNotAssigned,
-				ajaxParams: () => {
-					return {
-						person_id: this.person_id
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					this.endpoint.getAllContractsNotAssigned(this.person_id)
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Typ", field: "type", width: 100},

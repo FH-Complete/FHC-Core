@@ -6,15 +6,19 @@ export default {
 		CoreFilterCmpt,
 		FormInput
 	},
-	inject: {
+/*	inject: {
 		cisRoot: {
 			from: 'cisRoot'
 		},
-	},
+	},*/
 	emits: [
 		"selectedPerson"
 	],
 	props: {
+		endpoint: {
+			type: Object,
+			required: true
+		},
 		// maybe later nur fixe oder alle Mitarbeiter: gleich funktionsaufruf
 		//oder Mitarbeiter mit Verträgen
 /*		filterMa: {
@@ -41,12 +45,9 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.vertraege.person.getMitarbeiter,
-				ajaxParams: () => {
-					return {
-						fix: this.filterMa
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					this.endpoint.getMitarbeiter()
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "UID", field: "uid", headerFilter:"input"},
@@ -148,6 +149,7 @@ export default {
 	<div class="core-mitarbeiter-header">
 		<h4>{{$p.t('vertrag', 'vertragsverwaltung')}}</h4>
 		
+	
 <!--	filter: show only active employees-->
 		<div class="justify-content-end py-3">
 			<form-input

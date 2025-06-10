@@ -7,6 +7,7 @@ import ListUnassigned from './List/Unassigned.js';
 import ContractDetails from './List/Details.js';
 import ContractStati from './List/Status.js';
 
+
 export default {
 	components: {
 		CoreFilterCmpt,
@@ -18,9 +19,9 @@ export default {
 		ContractStati
 	},
 	inject: {
-		cisRoot: {
+/*		cisRoot: {
 			from: 'cisRoot'
-		},
+		},*/
 		hasSchreibrechte: {
 			from: 'hasSchreibrechte',
 			default: false
@@ -45,12 +46,9 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.vertraege.person.getAllVertraege,
-				ajaxParams: () => {
-					return {
-						person_id: this.person_id
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					this.endpoint.getAllVertraege(this.person_id)
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Bezeichnung", field: "bezeichnung", width: 150},
@@ -176,9 +174,9 @@ export default {
 						cm.getColumnByField('isabgerechnet').component.updateDefinition({
 							title: this.$p.t('vertrag', 'abgerechnet')
 						});
-						cm.getColumnByField('actions').component.updateDefinition({
+/*						cm.getColumnByField('actions').component.updateDefinition({
 							title: this.$p.t('global', 'aktionen')
-						});
+						});*/
 					}
 				},
 				{
@@ -242,7 +240,9 @@ export default {
 				.then(result => result
 					? vertrag_id
 					: Promise.reject({handled: true}))
-				.then(this.endpoint.deleteContract)
+				.then(vertrag_id => this.$api.call(
+					this.endpoint.deleteContract(vertrag_id))
+				)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					//window.scrollTo(0, 0);
@@ -258,9 +258,8 @@ export default {
 				formData: this.formData,
 				clickedRows: this.childData, //all data needed, maybe smaller array?
 			};
-
-			return this.endpoint
-				.addNewContract(this.$refs.contractData, dataToSend)
+			return this.$refs.contractData
+				.call(this.endpoint.addNewContract(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractModal.hide();
@@ -280,9 +279,8 @@ export default {
 				formData: this.formData,
 				clickedRows: this.childData,
 			};
-
-			return this.endpoint
-				.updateContract(this.$refs.contractData, dataToSend)
+			return this.$refs.contractData
+				.call(this.endpoint.updateContract(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractModal.hide();
@@ -296,8 +294,8 @@ export default {
 		loadContract(vertrag_id) {
 			this.resetModal();
 			this.statusNew = false;
-			return this.endpoint
-				.loadContract(vertrag_id)
+			return this.$api
+				.call(this.endpoint.loadContract(vertrag_id))
 				.then(result => {
 					this.formData = result.data;
 				})
@@ -322,8 +320,8 @@ export default {
 				datum: formattedDate
 			};
 
-			return this.endpoint
-				.insertContractStatus(this.$refs.contractstati.$refs.statusData, params)
+			return this.$refs.contractstati.$refs.statusData
+				.call(this.endpoint.insertContractStatus(params))
 				.then(response => {
 					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 
@@ -338,8 +336,8 @@ export default {
 				vertrag_id : vertrag_id,
 				vertragsstatus_kurzbz: status
 			};
-			return this.endpoint
-				.deleteContractStatus(params)
+			return this.$api
+				.call(this.endpoint.deleteContractStatus(params))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 
@@ -364,8 +362,8 @@ export default {
 				datum : formattedDate,
 				vertragsstatus_kurzbz: status
 			};
-			return this.endpoint
-				.updateContractStatus(this.$refs.contractstati.$refs.statusData, params)
+			return this.$refs.contractstati.$refs.statusData
+				.call(this.endpoint.updateContractStatus(params))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractstati.closeModal();
@@ -379,8 +377,8 @@ export default {
 				vertrag_id : vertrag_id,
 				vertragsstatus_kurzbz: status
 			};
-			return this.endpoint
-				.loadContractStatus(params)
+			return this.$api
+				.call(this.endpoint.loadContractStatus(params))
 				.then(response => {
 					this.contractFormData = response.data;
 					this.$refs.contractstati.openModal();
@@ -394,8 +392,8 @@ export default {
 				lehreinheit_id: lehreinheit_id,
 				mitarbeiter_uid: mitarbeiter_uid
 			};
-			return this.endpoint
-				.deleteLehrauftrag(params)
+			return this.$api
+				.call(this.endpoint.deleteLehrauftrag(params))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.resetModal();
@@ -411,8 +409,8 @@ export default {
 				projektarbeit_id: projektarbeit_id,
 				betreuerart_kurzbz: betreuerart_kurzbz
 			};
-			return this.endpoint
-				.deleteBetreuung(params)
+			return this.$api
+				.call(this.endpoint.deleteBetreuung(params))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.$refs.contractdetails.reload();
@@ -437,7 +435,7 @@ export default {
 			this.statusNew = true;
 
 			//this.childData = {};
-			//gefährlich, immer null??
+			//always null??
 			//TODO(Manu) check if this.childData = {},
 		},
 		updateBetrag(sumBetrag){
@@ -488,8 +486,8 @@ export default {
 				});
 		},
 		getMitarbeiterUid(){
-			return this.endpoint
-				.getMitarbeiterUid(this.person_id)
+			return this.$api
+				.call(this.endpoint.getMitarbeiterUid(this.person_id))
 				.then(response => {
 					this.ma_uid = response.data;
 				})
@@ -511,10 +509,10 @@ export default {
 	},
 	created() {
 		Promise.all([
-			this.endpoint.getAllContractTypes(),
-			this.endpoint.getAllContractsNotAssigned2(this.person_id),
-			this.endpoint.getAllContractStati(),
-			this.$fhcApi.factory.vertraege.configPrintDocument()
+			this.$api.call(this.endpoint.getAllContractTypes()),
+			this.$api.call(this.endpoint.getAllContractsNotAssigned(this.person_id)),
+			this.$api.call(this.endpoint.getAllContractStati()),
+			this.$api.call(this.endpoint.configPrintDocument())
 		])
 			.then(([result1, result2, result3, result4]) => {
 				this.listContractTypes = result1.data;
@@ -591,6 +589,7 @@ export default {
 					<contract-details
 						:person_id="person_id"
 						:vertrag_id="contractSelected.vertrag_id"
+						:endpoint="endpoint"
 						@deleteLehrauftrag="deleteLehrauftrag"
 						@deleteBetreuung="deleteBetreuung"
 						ref="contractdetails"
@@ -604,6 +603,7 @@ export default {
 						:vertrag_id="contractSelected.vertrag_id"
 						:listContractStati="listContractStati"
 						:formDataParent="contractFormData"
+						:endpoint="endpoint"
 						@setContractStatus="addNewContractStatus"
 						@deleteContractStatus="deleteContractStatus"
 						@updateContractStatus="updateContractStatus"
@@ -622,8 +622,8 @@ export default {
 				</template>
 				
 					<list-unassigned
-						:endpoint="$fhcApi.factory.vertraege.person"
 						:person_id="person_id"
+						:endpoint="endpoint"
 						ref="unassignedLehrauftraege"
 						@saveClickedRows="saveClickedRows"
 						@sum-updated="updateBetrag"
