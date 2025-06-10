@@ -133,4 +133,21 @@ class Stundensatz_model extends DB_Model
 
 		return $stundensatz;
 	}
+
+	public function getDefaultStundensatz($mitarbeiter_uid, $beginn, $ende = null, $typ = null)
+	{
+		$stundensatz_result = $this->getStundensatzByDatum($mitarbeiter_uid, $beginn, $ende, $typ);
+		$default_stundensatz = hasData($stundensatz_result) ? getData($stundensatz_result)[0]->stundensatz : null;
+		if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ') && !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
+		{
+			$this->load->model('vertragsbestandteil/Dienstverhaeltnis_model','DienstverhaeltnisModel');
+			$echterdv_result = $this->DienstverhaeltnisModel->existsDienstverhaeltnis($mitarbeiter_uid, $beginn, $ende, 'echterdv');
+			if (hasData($echterdv_result))
+			{
+				$default_stundensatz = null;
+			}
+		}
+		return $default_stundensatz;
+	}
 }
+==== BASE ====

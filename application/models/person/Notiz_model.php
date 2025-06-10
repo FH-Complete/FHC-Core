@@ -151,36 +151,36 @@ class Notiz_model extends DB_Model
 	 *         bestellung_id, lehreinheit_id, anrechnung_id, uid)
 	 * @param $id the corresponding id, part of public.tbl_notizzuordnung
 	 */
-	public function getNotizWithDocEntries($id, $type)
+	public function getNotizWithDocEntries($id, $type, $withoutTags = true)
 	{
-			$qry = "
-				SELECT 
-						n.*, count(dms_id) as countDoc, z.notizzuordnung_id,
-						(CASE
-							WHEN n.updateamum >= n.insertamum THEN n.updateamum 
-							ELSE n.insertamum
-						END) AS lastUpdate,
-						regexp_replace(n.text, '<[^>]*>', '', 'g') as text_stripped,
-						TO_CHAR(n.start::timestamp, 'DD.MM.YYYY') AS start_format,
-						TO_CHAR(n.ende::timestamp, 'DD.MM.YYYY') AS ende_format,
-						z.notiz_id, z.person_id as id, ? as type_id
-						
-				FROM
-						public.tbl_notiz n
-				JOIN 
-							public.tbl_notizzuordnung z USING (notiz_id)
-				LEFT JOIN 
-							public.tbl_notiz_dokument dok USING (notiz_id)
-				LEFT JOIN 
-							campus.tbl_dms_version USING (dms_id)
-				WHERE 
-				   z.$type  = ?
-				GROUP BY 
-					notiz_id, z.notizzuordnung_id
-			";
+		$this->addSelect("tbl_notiz.*, 
+			count(dms_id) as countDoc, 
+			z.notizzuordnung_id,
+			(CASE
+				WHEN tbl_notiz.updateamum >= tbl_notiz.insertamum THEN tbl_notiz.updateamum 
+				ELSE tbl_notiz.insertamum
+			END) AS lastUpdate,
+			regexp_replace(tbl_notiz.text, '<[^>]*>', '', 'g') as text_stripped,
+			TO_CHAR(tbl_notiz.start::timestamp, 'DD.MM.YYYY') AS start_format,
+			TO_CHAR(tbl_notiz.ende::timestamp, 'DD.MM.YYYY') AS ende_format,
+			z.notiz_id, 
+			z.person_id as id, 
+			{$type} as type_id
+		");
 
-		return $this->execQuery($qry, array($type, $id));
+		$this->addJoin('public.tbl_notizzuordnung z', 'notiz_id');
+		$this->addJoin('public.tbl_notiz_dokument dok', 'notiz_id', 'LEFT');
+		$this->addJoin('campus.tbl_dms_version', 'dms_id', 'LEFT');
 
+		$this->db->where("z.{$type}", $id);
+
+		if ($withoutTags)
+			$this->db->where('tbl_notiz.typ IS NULL');
+
+		$this->addGroupBy('notiz_id');
+		$this->addGroupBy('z.notizzuordnung_id');
+
+		return $this->load();
 	}
 
 

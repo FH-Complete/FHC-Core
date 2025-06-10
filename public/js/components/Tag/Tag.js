@@ -57,7 +57,7 @@ export default {
 		init() {
 			if (!this.endpoint)
 				return;
-			this.endpoint.getTags()
+			this.$api.call(this.endpoint.getTags())
 				.then(response => response.data)
 				.then(response => {
 					this.tags = response
@@ -71,7 +71,7 @@ export default {
 				'id': tag_id
 			};
 
-			this.endpoint.getTag(getData)
+			this.$api.call(this.endpoint.getTag(getData))
 				.then(result => result.data)
 				.then(result => this.openModal(result))
 		},
@@ -118,7 +118,7 @@ export default {
 			{
 				postData.id = this.selectedTagId;
 				this.tagData.id = this.selectedTagId;
-				this.endpoint.updateTag(postData);
+				this.$api.call(this.endpoint.updateTag(postData));
 				this.$emit("updated", this.tagData);
 				this.$refs.tagModal.hide();
 			}
@@ -130,7 +130,7 @@ export default {
 						return;
 				}
 
-				this.endpoint.addTag(postData)
+				this.$api.call(this.endpoint.addTag(postData))
 					.then(response => response.data)
 					.then(response => {
 						if (typeof response === 'number') {
@@ -156,7 +156,7 @@ export default {
 				id: this.selectedTagId,
 				done: !this.tagData.done
 			}
-			this.endpoint.doneTag(postData)
+			this.$api.call(this.endpoint.doneTag(postData))
 			this.$emit("updated", this.tagData);
 			this.$refs.tagModal.hide();
 		},
@@ -165,7 +165,7 @@ export default {
 			let postData = {
 				id: this.selectedTagId
 			}
-			this.endpoint.deleteTag(postData)
+			this.$api.call(this.endpoint.deleteTag(postData))
 			this.$emit("deleted", this.selectedTagId)
 			this.$refs.tagModal.hide();
 		},

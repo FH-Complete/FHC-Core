@@ -1,4 +1,6 @@
 <?php
+
+use \CI3_Events as Events;
 class Lehreinheit_model extends DB_Model
 {
 
@@ -15,6 +17,9 @@ class Lehreinheit_model extends DB_Model
 		$this->load->model('education/lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 		$this->load->model('education/lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
 		$this->load->model('organisation/studiengang_model', 'StudiengangModel');
+		$this->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
+		$this->load->model('ressource/stundenplan_model', 'StundenplanModel');
+		$this->load->model('system/Log_model', 'LogModel');
 	}
 
 	/**
@@ -302,5 +307,438 @@ EOSQL;
 		";
 
 		return $this->execQuery($query, $params);
+	}
+
+
+	public function getOes($lehreinheit_id)
+	{
+		$this->addSelect('tbl_lehrveranstaltung.studiengang_kz,
+								tbl_lehrveranstaltung.lehrveranstaltung_id');
+		$this->addJoin('lehre.tbl_lehrveranstaltung', 'tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id');
+		$result = $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+
+		if (isError($result)) return $result;
+
+		if (hasData($result))
+		{
+			$lehrveranstaltung = getData($result)[0];
+			$oe_result = $this->LehrveranstaltungModel->getAllOe($lehrveranstaltung->lehrveranstaltung_id, $lehrveranstaltung->studiengang_kz);
+			return success(hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array(''));
+		}
+	}
+
+	public function getLehrfachOe($lehreinheit_id)
+	{
+		$this->addSelect('lehrfach.oe_kurzbz');
+		$this->addJoin('lehre.tbl_lehrveranstaltung lehrfach', 'lehrfach.lehrveranstaltung_id = tbl_lehreinheit.lehrfach_id', 'LEFT');
+		return $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+	}
+
+
+	public function getByLvidStudiensemester($lv_id, $studiensemester_kurzbz)
+	{
+		$qry = "WITH lehreinheiten AS (
+				SELECT *
+				FROM lehre.tbl_lehreinheit
+				WHERE lehrveranstaltung_id = ?
+					AND studiensemester_kurzbz = ?
+			),
+			gruppen AS (
+				SELECT
+					COALESCE(
+						string_agg(
+							tbl_lehreinheitgruppe.gruppe_kurzbz, ' '
+						) FILTER (WHERE NOT direktinskription),
+							string_agg(
+								COALESCE(
+									upper(tbl_studiengang.typ::varchar(1) ||tbl_studiengang.kurzbz) ||
+									'-'||
+									COALESCE(tbl_lehreinheitgruppe.semester::varchar, '') ||
+									COALESCE(tbl_lehreinheitgruppe.verband::varchar, '')||
+									COALESCE(tbl_lehreinheitgruppe.gruppe, '')), ', '
+							)
+					) AS gruppe,
+					lehreinheit_id
+					FROM
+						lehre.tbl_lehreinheitgruppe
+							LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
+							LEFT JOIN public.tbl_gruppe USING(gruppe_kurzbz)
+					GROUP BY lehreinheit_id
+				),
+				mitarbeiter AS (
+					SELECT kurzbz, semesterstunden, planstunden, lehreinheit_id
+					FROM lehre.tbl_lehreinheitmitarbeiter
+						JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
+				),
+				fachbereich AS (
+					SELECT
+						tbl_organisationseinheit.bezeichnung,
+						tbl_organisationseinheit.organisationseinheittyp_kurzbz,
+						lehreinheit_id
+					FROM
+						public.tbl_organisationseinheit,
+						lehre.tbl_lehrveranstaltung as lehrfach,
+						lehre.tbl_lehreinheit
+					WHERE tbl_organisationseinheit.oe_kurzbz = lehrfach.oe_kurzbz
+						AND lehrfach.lehrveranstaltung_id = tbl_lehreinheit.lehrfach_id
+				),
+				tag_data_agg AS (
+					SELECT
+						lehreinheit_id,
+						COALESCE(json_agg(tag ORDER BY id), '[]'::json) AS tags
+					FROM (
+							SELECT DISTINCT ON (public.tbl_notiz.notiz_id)
+								tbl_notiz.notiz_id AS id,
+								typ_kurzbz,
+								array_to_json(tbl_notiz_typ.bezeichnung_mehrsprachig)->>0 AS beschreibung,
+								text AS notiz,
+								style,
+								erledigt AS done,
+								lehreinheit_id
+							FROM public.tbl_notizzuordnung
+								JOIN public.tbl_notiz ON tbl_notizzuordnung.notiz_id = tbl_notiz.notiz_id
+								JOIN public.tbl_notiz_typ ON tbl_notiz.typ = tbl_notiz_typ.typ_kurzbz
+							WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehreinheiten)
+						) AS tag
+					GROUP BY lehreinheit_id
+				)
+				SELECT lehreinheiten.*,
+						lehreinheiten.lehrform_kurzbz as lv_lehrform_kurzbz,
+						tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
+						tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+						COALESCE(tag_data_agg.tags, '[]'::json) AS tags,
+						(
+							SELECT string_agg(gr.gruppe, ' ')
+							FROM gruppen gr
+							WHERE gr.lehreinheit_id = lehreinheiten.lehreinheit_id
+						) AS gruppen,
+						(
+							SELECT string_agg(ma.kurzbz, ' ')
+							FROM mitarbeiter ma
+							WHERE ma.lehreinheit_id = lehreinheiten.lehreinheit_id
+						) AS lektoren,
+						(
+							SELECT string_agg(fachbereich.bezeichnung, ' ')
+							FROM fachbereich
+							WHERE fachbereich.lehreinheit_id = lehreinheiten.lehreinheit_id
+						) AS fachbereich
+				FROM lehreinheiten
+					LEFT JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id = lehreinheiten.lehrfach_id
+					LEFT JOIN tag_data_agg ON tag_data_agg.lehreinheit_id = lehreinheiten.lehreinheit_id";
+
+		return $this->execReadOnlyQuery($qry, array($lv_id, $studiensemester_kurzbz));
+	}
+
+	private function getLVTmp($stg_kz = null)
+	{
+		$qry = "SELECT DISTINCT ON(lehrveranstaltung_id) *, 
+						'' as studienplan_id, '' as studienplan_beeichnung, 
+						CONCAT(vw_lehreinheit.stg_typ, vw_lehreinheit.stg_kurzbz) as studiengang
+				FROM campus.vw_lehreinheit
+				WHERE mitarbeiter_uid = ?
+				  AND studiensemester_kurzbz = ?";
+
+		if (!is_null($stg_kz)) {
+			$qry .= " AND lv_studiengang_kz = ?";
+		}
+
+		return $qry;
+	}
+
+	public function getLvsByEmployee($mitarbeiter_uid, $studiensemester_kurzbz, $stg_kz = null)
+	{
+		$qry = "WITH lvs AS (" . $this->getLVTmp($stg_kz) . ")
+				SELECT lvs.*
+				FROM lvs
+				";
+
+		$params = array($mitarbeiter_uid, $studiensemester_kurzbz);
+		if (!is_null($stg_kz))
+		{
+			$params[] = $stg_kz;
+		}
+		return $this->execReadOnlyQuery($qry, $params);
+	}
+
+
+
+	public function getLEByLV($lv_id, $studiensemester_kurzbz, $mitarbeiter_uid = null, $fachbereich_kurzbz = null)
+	{
+		$qry = "
+				WITH gruppen AS (
+					SELECT
+						COALESCE(
+							string_agg(
+								tbl_lehreinheitgruppe.gruppe_kurzbz, ', '
+								) FILTER (WHERE NOT direktinskription),
+								string_agg(
+									COALESCE(
+										upper(tbl_studiengang.typ::varchar(1) ||tbl_studiengang.kurzbz) ||
+										'-'||
+										COALESCE(tbl_lehreinheitgruppe.semester::varchar, '') ||
+										COALESCE(tbl_lehreinheitgruppe.verband::varchar, '')||
+										COALESCE(tbl_lehreinheitgruppe.gruppe, '')), ', '
+									)
+						) AS gruppen,
+						lehreinheit_id
+					FROM
+						lehre.tbl_lehreinheitgruppe
+							LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
+							LEFT JOIN public.tbl_gruppe USING(gruppe_kurzbz)
+					GROUP BY lehreinheit_id
+				),
+				lektoren AS (
+					SELECT string_agg(kurzbz, ' ') as lektoren,
+						   string_agg(semesterstunden::text, ' ') as semesterstunden,
+						   string_agg(planstunden::text, ' ') as planstunden,
+						   lehreinheit_id
+					FROM lehre.tbl_lehreinheitmitarbeiter
+							 JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
+					GROUP BY lehreinheit_id
+				),
+				fachbereich AS (
+					SELECT
+						string_agg(CONCAT(tbl_organisationseinheit.bezeichnung, ' (', tbl_organisationseinheit.organisationseinheittyp_kurzbz, ')'),' ')  as fachbereich,
+						lehreinheit_id
+					FROM
+						public.tbl_organisationseinheit,
+						lehre.tbl_lehrveranstaltung as lehrfach,
+						lehre.tbl_lehreinheit
+					WHERE
+						tbl_organisationseinheit.oe_kurzbz = lehrfach.oe_kurzbz
+					  AND lehrfach.lehrveranstaltung_id = tbl_lehreinheit.lehrfach_id
+					GROUP BY lehreinheit_id
+				)
+				SELECT tbl_lehreinheit.*,
+						tbl_lehrveranstaltung.*,
+						tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
+						tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+						lektoren.lektoren,
+						lektoren.semesterstunden,
+						lektoren.planstunden,
+						fachbereich.fachbereich
+				FROM lehre.tbl_lehreinheit
+					LEFT JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrfach_id
+					LEFT JOIN gruppen ON tbl_lehreinheit.lehreinheit_id = gruppen.lehreinheit_id
+					LEFT JOIN lektoren ON tbl_lehreinheit.lehreinheit_id = lektoren.lehreinheit_id
+					LEFT JOIN fachbereich ON tbl_lehreinheit.lehreinheit_id = fachbereich.lehreinheit_id
+				WHERE tbl_lehreinheit.lehrveranstaltung_id = ?
+				AND studiensemester_kurzbz = ?
+				";
+
+		$params = array($lv_id, $studiensemester_kurzbz);
+		if ($mitarbeiter_uid !== null)
+		{
+			$qry .= " AND tbl_lehreinheit.lehreinheit_id IN ( SELECT lehreinheit_id FROM lehre.tbl_lehreinheitmitarbeiter WHERE mitarbeiter_uid = ?) ";
+			$params[] = $mitarbeiter_uid;
+		}
+
+		if($fachbereich_kurzbz !== null)
+		{
+			$qry .= " AND EXISTS ( SELECT 1 FROM lehre.tbl_lehrveranstaltung JOIN public.tbl_fachbereich USING(oe_kurzbz) WHERE fachbereich_kurzbz= ? AND lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id)";
+			$params[] = $fachbereich_kurzbz;
+		}
+		$qry .= " ORDER BY lehreinheit_id;";
+
+		return $this->execReadOnlyQuery($qry, $params);
+	}
+
+	public function deleteLehreinheit($lehreinheit_id)
+	{
+		$lehreinheit = $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+
+		if (isError($lehreinheit)) return $lehreinheit;
+
+		if (!hasData($lehreinheit))
+			return error("Lehreinheit not found!");
+
+		$errorReasons = [];
+		$addError = function ($reason = null) use (&$errorReasons)
+		{
+			if ($reason !== null)
+			{
+				$errorReasons[] = $reason;
+			}
+		};
+
+		$stundenplandev_result = $this->StundenplandevModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+		$stundenplan_result = $this->StundenplanModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+
+		if (hasData($stundenplan_result) || hasData($stundenplandev_result))
+			$addError('Dieser LV-Teil ist bereits im LV-Plan verplant und kann daher nicht geloescht werden!');
+
+		Events::trigger(
+			'lehreinheit_delete_check',
+			$addError,
+			$lehreinheit_id
+		);
+
+		if (!empty($errorReasons)) return error($errorReasons);
+
+		$this->db->trans_begin();
+
+		Events::trigger(
+			'lehreinheit_delete',
+			$addError,
+			$lehreinheit_id
+		);
+
+		$undosql = '';
+
+		$lehreinheit_gruppe_result = $this->LehreinheitgruppeModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+		if (hasData($lehreinheit_gruppe_result))
+		{
+			foreach (getData($lehreinheit_gruppe_result) as $row)
+			{
+				$values = [
+					$this->db->escape($row->lehreinheitgruppe_id),
+					$this->db->escape($row->lehreinheit_id),
+					$this->db->escape($row->studiengang_kz),
+					$this->db->escape($row->semester),
+					$this->db->escape($row->verband),
+					$this->db->escape($row->gruppe),
+					$this->db->escape($row->gruppe_kurzbz),
+					$this->db->escape($row->updateamum),
+					$this->db->escape($row->updatevon),
+					$this->db->escape($row->insertamum),
+					$this->db->escape($row->insertvon)
+				];
+
+				$undosql .= "INSERT INTO lehre.tbl_lehreinheitgruppe (
+						lehreinheitgruppe_id,
+						lehreinheit_id,
+						studiengang_kz,
+						semester,
+						verband,
+						gruppe,
+						gruppe_kurzbz,
+						updateamum,
+						updatevon,
+						insertamum,
+						insertvon
+					) VALUES (" . implode(', ', $values) . ");\n";
+			}
+
+			$lehreinheit_gruppe_delete_result = $this->LehreinheitgruppeModel->delete(array('lehreinheit_id' => $lehreinheit_id));
+
+			if (isError($lehreinheit_gruppe_delete_result))
+				$addError(getError($lehreinheit_gruppe_delete_result));
+		}
+
+		$lehreinheit_mitarbeiter_result = $this->LehreinheitmitarbeiterModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+		if (hasData($lehreinheit_mitarbeiter_result))
+		{
+			foreach (getData($lehreinheit_mitarbeiter_result) as $row)
+			{
+				$values = [
+					$this->db->escape($row->lehreinheit_id),
+					$this->db->escape($row->mitarbeiter_uid),
+					$this->db->escape($row->lehrfunktion_kurzbz),
+					$this->db->escape($row->planstunden),
+					$this->db->escape($row->stundensatz),
+					$this->db->escape($row->faktor),
+					$this->db->escape($row->anmerkung),
+					$this->db->escape($row->bismelden),
+					$this->db->escape($row->updateamum),
+					$this->db->escape($row->updatevon),
+					$this->db->escape($row->insertamum),
+					$this->db->escape($row->insertvon),
+					$this->db->escape($row->semesterstunden)
+				];
+
+				$undosql .= "INSERT INTO lehre.tbl_lehreinheitmitarbeiter (
+								lehreinheit_id,
+								mitarbeiter_uid,
+								lehrfunktion_kurzbz,
+								planstunden,
+								stundensatz,
+								faktor,
+								anmerkung,
+								bismelden,
+								updateamum,
+								updatevon,
+								insertamum,
+								insertvon,
+								semesterstunden
+							) VALUES (" . implode(', ', $values) . ");\n";
+			}
+
+			$lehreinheit_mitarbeiter_delete_result = $this->LehreinheitmitarbeiterModel->delete(array('lehreinheit_id' => $lehreinheit_id));
+			if (isError($lehreinheit_mitarbeiter_delete_result))
+				$addError(getError($lehreinheit_mitarbeiter_delete_result));
+		}
+
+		foreach (getData($lehreinheit) as $row)
+		{
+			$values = [
+				$this->db->escape($row->lehreinheit_id),
+				$this->db->escape($row->lehrveranstaltung_id),
+				$this->db->escape($row->studiensemester_kurzbz),
+				$this->db->escape($row->lehrfach_id),
+				$this->db->escape($row->lehrform_kurzbz),
+				$this->db->escape($row->stundenblockung),
+				$this->db->escape($row->wochenrythmus),
+				$this->db->escape($row->start_kw),
+				$this->db->escape($row->raumtyp),
+				$this->db->escape($row->raumtypalternativ),
+				$this->db->escape($row->sprache),
+				$this->db->escape($row->lehre),
+				$this->db->escape($row->anmerkung),
+				$this->db->escape($row->unr),
+				$this->db->escape($row->lvnr),
+				$this->db->escape($row->updateamum),
+				$this->db->escape($row->updatevon),
+				$this->db->escape($row->insertamum),
+				$this->db->escape($row->insertvon),
+			];
+
+			$undosql .= "INSERT INTO lehre.tbl_lehreinheit (
+						lehreinheit_id,
+						lehrveranstaltung_id,
+						studiensemester_kurzbz,
+						lehrfach_id,
+						lehrform_kurzbz,
+						stundenblockung,
+						wochenrythmus,
+						start_kw,
+						raumtyp,
+						raumtypalternativ,
+						sprache,
+						lehre,
+						anmerkung,
+						unr,
+						lvnr,
+						updateamum,
+						updatevon,
+						insertamum,
+						insertvon
+					) VALUES (" . implode(', ', $values) . ");\n";
+		}
+		$lehreinheit_result = $this->delete($lehreinheit_id);
+
+		$deleteSql = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id = " . $this->db->escape($lehreinheit_id) ."; \n
+						DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id = " . $this->db->escape($lehreinheit_id) ."; \n
+						DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id = " . $this->db->escape($lehreinheit_id) .";";
+		if (isError($lehreinheit_result))
+			$addError($lehreinheit_result);
+
+		$log_result = $this->LogModel->insert([
+			'sql' => $deleteSql,
+			'sqlundo' => $undosql,
+			'beschreibung' => 'Lehreinheit loeschen - ' . $lehreinheit_id,
+			'mitarbeiter_uid' => getAuthUID(),
+		]);
+
+		if (isError($log_result))
+			$addError($log_result);
+
+		if (!empty($errorReasons))
+		{
+			$this->db->trans_rollback();
+			return error($errorReasons);
+		}
+
+		$this->db->trans_commit();
+		return success('Contract successfully updated.');
 	}
 }
