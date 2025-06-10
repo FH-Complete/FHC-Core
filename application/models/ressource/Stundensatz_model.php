@@ -150,4 +150,3 @@ class Stundensatz_model extends DB_Model
 		return $default_stundensatz;
 	}
 }
-==== BASE ====
