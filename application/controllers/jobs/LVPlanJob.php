@@ -39,7 +39,7 @@ class LVPlanJob extends JOB_Controller
 		$studiensemester_arr = array();
 
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-		$this->load->model('ressource/Stundenplandev_model', 'StundenplandevModel');
+		$this->load->model('ressource/Stundenplandev_model', 'LvPlandevModel');
 		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
 		$this->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 
@@ -70,7 +70,7 @@ class LVPlanJob extends JOB_Controller
 			$fail = 0;
 
 			// get all schedule entries where group is missing
-			$result = $this->StundenplandevModel->getMissingDirectGroups($studiensemester);
+			$result = $this->LvPlandevModel->getMissingDirectGroups($studiensemester);
 			if(hasData($result))
 			{
 				foreach($result->retval as $row)
@@ -112,7 +112,7 @@ class LVPlanJob extends JOB_Controller
 					}
 
 					// add group to schedule
-					$result = $this->StundenplandevModel->insert(
+					$result = $this->LvPlandevModel->insert(
 						array(
 							'lehreinheit_id' => $row->lehreinheit_id,
 							'unr' => $unr,
@@ -159,7 +159,7 @@ class LVPlanJob extends JOB_Controller
     public function mailUpdatedZeitwuensche()
     {
         // Load models
-        $this->load->model('ressource/Stundenplandev_model', 'StundenplandevModel');
+        $this->load->model('ressource/Stundenplandev_model', 'LvPlandevModel');
         $this->load->model('organisation/Studiensemester_model', 'StundiensemesterModel');
         $this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
         $this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');

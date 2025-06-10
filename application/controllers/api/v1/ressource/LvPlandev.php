@@ -14,16 +14,16 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Stundenplandev extends API_Controller
+class LvPlandev extends API_Controller
 {
 	/**
-	 * Stundenplandev API constructor.
+	 * LvPlandev API constructor.
 	 */
 	public function __construct()
 	{
 		parent::__construct(array('Stundenplandev' => 'basis/stundenplandev:rw'));
-		// Load model StundenplandevModel
-		$this->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
+		// Load model LvPlandevModel
+		$this->load->model('ressource/stundenplandev_model', 'LvPlandevModel');
 
 
 	}
@@ -31,13 +31,13 @@ class Stundenplandev extends API_Controller
 	/**
 	 * @return void
 	 */
-	public function getStundenplandev()
+	public function getLvPlandev()
 	{
-		$stundenplandevID = $this->get('stundenplandev_id');
+		$lvplandevID = $this->get('stundenplandev_id');
 
-		if (isset($stundenplandevID))
+		if (isset($lvplandevID))
 		{
-			$result = $this->StundenplandevModel->load($stundenplandevID);
+			$result = $this->LvPlandevModel->load($lvplandevID);
 
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -50,17 +50,17 @@ class Stundenplandev extends API_Controller
 	/**
 	 * @return void
 	 */
-	public function postStundenplandev()
+	public function postLvPlandev()
 	{
 		if ($this->_validate($this->post()))
 		{
 			if (isset($this->post()['stundenplandev_id']))
 			{
-				$result = $this->StundenplandevModel->update($this->post()['stundenplandev_id'], $this->post());
+				$result = $this->LvPlandevModel->update($this->post()['stundenplandev_id'], $this->post());
 			}
 			else
 			{
-				$result = $this->StundenplandevModel->insert($this->post());
+				$result = $this->LvPlandevModel->insert($this->post());
 			}
 
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -71,7 +71,7 @@ class Stundenplandev extends API_Controller
 		}
 	}
 
-	private function _validate($stundenplandev = NULL)
+	private function _validate($lvplandev = NULL)
 	{
 		return true;
 	}

@@ -7,7 +7,7 @@ export default {
 		},
 		containerStyles: Array,
 		rowStyles: Array,
-		hasLvStundenplanEintraege: {
+		hasLvPlanEintraege: {
 			required:false,
 			default:true,
 			type:Boolean,
@@ -23,7 +23,7 @@ export default {
 			if (!this.c4_link(menuItem) && !menuItem.c4_moodle_links?.length) {
 				return true;
 			}
-			if (menuItem.id == "addon_fhtw_menu_lvplan_lva" && !this.hasLvStundenplanEintraege){
+			if (menuItem.id == "addon_fhtw_menu_lvplan_lva" && !this.hasLvPlanEintraege){
 				return true;
 			}
 			return null;
