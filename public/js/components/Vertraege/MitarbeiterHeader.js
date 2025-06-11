@@ -2,15 +2,11 @@ import {CoreFilterCmpt} from "../filter/Filter.js";
 import FormInput from '../Form/Input.js';
 
 export default {
+	name: 'CoreListMitarbeiter',
 	components: {
 		CoreFilterCmpt,
 		FormInput
 	},
-/*	inject: {
-		cisRoot: {
-			from: 'cisRoot'
-		},
-	},*/
 	emits: [
 		"selectedPerson"
 	],
@@ -19,27 +15,6 @@ export default {
 			type: Object,
 			required: true
 		},
-		// maybe later nur fixe oder alle Mitarbeiter: gleich funktionsaufruf
-		//oder Mitarbeiter mit Verträgen
-/*		filterMa: {
-			type: Object,
-			required: true,
-			default: function () {
-				return {
-					active: true,
-					hasVertraege: false
-				};
-			},
-		},*/
-/*		vertragsarten: {
-			type: Array,
-			required: false,
-			default: function (){
-				return {
-					['echterdv']
-				}
-			}
-		}*/
 	},
 	data() {
 		return {

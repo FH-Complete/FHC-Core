@@ -1,15 +1,16 @@
 import MitarbeiterHeader from "./MitarbeiterHeader.js";
-import MitarbeiterDetails from "./MitarbeiterDetails.js";
+import FhcHeader from "../DetailHeader/DetailHeader.js";
 import VertraegeMitarbeiter from "./Vertraege.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import ApiCoreVertraege from '../../api/factory/vertraege/vertraege.js';
 
 
 export default {
+	name: 'Vertragsverwaltung',
 	components: {
 		VerticalSplit,
 		MitarbeiterHeader,
-		MitarbeiterDetails,
+		FhcHeader,
 		VertraegeMitarbeiter
 	},
 	props: {
@@ -26,11 +27,15 @@ export default {
 		return {
 			person_id: null,
 			endpoint: ApiCoreVertraege
+				//<mitarbeiter-details-old :person_id="person_id"></mitarbeiter-details-old>
 		}
 	},
 	methods: {
 		selectPerson(selected){
 			this.person_id = selected;
+		},
+		redirectToLeitung(leitung){
+			this.person_id = leitung.person_id;
 		}
 	},
 	template: `
@@ -40,12 +45,18 @@ export default {
 				<vertical-split ref="vsplit">
 					<template #top>	
 						<div class="d-flex flex-column" style="height: 100%;">
-							<mitarbeiter-header  :endpoint="endpoint" @selectedPerson="selectPerson" />
+							<mitarbeiter-header
+								:endpoint="endpoint"
+								@selectedPerson="selectPerson"/>
 						</div>
 					</template>
 					<template #bottom>
 						<div class="col" v-if="person_id!=null">
-							<mitarbeiter-details :person_id="person_id"></mitarbeiter-details>
+							<fhc-header
+								:person_id="person_id"
+								typeHeader="mitarbeiter"
+								@redirectToLeitung="redirectToLeitung"
+							></fhc-header>
 							<vertraege-mitarbeiter :endpoint="endpoint" :person_id="this.person_id"/>
 						</div>
 					</template>

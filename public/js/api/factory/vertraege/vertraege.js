@@ -22,12 +22,6 @@ export default {
 			url: 'api/frontend/v1/vertraege/Vertraege/getAllVertraege/' + person_id
 		};
 	},
-/*	getAllContractsNotAssigned2(person_id) {
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/vertraege/Vertraege/getAllContractsNotAssigned/' + person_id
-		};
-	},*/
 	getAllContractsNotAssigned(person_id) {
 		return {
 			method: 'get',
@@ -134,25 +128,32 @@ export default {
 	},
 	getMitarbeiter(){
 		return {
-			method: 'post',
+			method: 'get',
 			url: 'api/frontend/v1/vertraege/vertraege/getMitarbeiter/',
 		};
-		//return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/getMitarbeiter/');
 	},
 	getHeader(person_id){
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/getHeader/' + person_id);
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/vertraege/vertraege/getHeader/' + person_id,
+		};
 	},
 	getPersonAbteilung(person_id){
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/getPersonAbteilung/' + person_id);
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/vertraege/vertraege/getPersonAbteilung/' + person_id,
+		};
 	},
 	getLeitungOrg(oekurzbz){
-		return this.$fhcApi.post('api/frontend/v1/vertraege/vertraege/getLeitungOrg/' + oekurzbz);
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/vertraege/vertraege/getLeitungOrg/' + oekurzbz,
+		};
 	},
 	getMitarbeiterUid(person_id){
 		return {
 			method: 'get',
 			url: 'api/frontend/v1/vertraege/vertraege/getMitarbeiterUid/' + person_id
 		};
-	//	return this.$fhcApi.get('api/frontend/v1/vertraege/vertraege/getMitarbeiterUid/' + person_id);
 	},
 };

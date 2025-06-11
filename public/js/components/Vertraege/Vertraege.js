@@ -9,6 +9,7 @@ import ContractStati from './List/Status.js';
 
 
 export default {
+	name:'CoreVertraege',
 	components: {
 		CoreFilterCmpt,
 		BsModal,

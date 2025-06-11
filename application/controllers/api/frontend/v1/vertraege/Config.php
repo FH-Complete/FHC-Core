@@ -37,6 +37,7 @@ class Config extends FHCAPI_Controller
 	public function printDocument()
 	{
 		$params = [];
+		$menu = [];
 
 		Events::trigger(
 			'multiActionPrintHonorarvertrag',
@@ -47,7 +48,15 @@ class Config extends FHCAPI_Controller
 			$params
 		);
 
-		//TODO(Manu) check warning
-		$this->terminateWithSuccess($menu[0]);
+		if (is_array($menu) && isset($menu[0]))
+		{
+			$this->terminateWithSuccess($menu[0]);
+		}
+		else
+		{
+		//	$this->terminateWithError('Error with Event 'multiActionPrintHonorarvertrag');
+			$this->terminateWithSuccess();
+
+		}
 	}
 }
