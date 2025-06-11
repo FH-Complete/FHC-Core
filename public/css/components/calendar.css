@@ -412,3 +412,78 @@
 	z-index: 2;
 	opacity: 0.5;
 }
+
+
+.dayPageContainer, .weekPageContainer{
+	container-type: inline-size;
+}
+
+.dayPageContainer .lehreinheitEventContent,
+.weekPageContainer .lehreinheitEventContent {
+	display: flex;
+	flex-direction: column;
+}
+
+.dayPageContainer .moodleEventContent,
+.weekPageContainer .moodleEventContent{
+	display: flex;
+	flex-direction: row;
+}
+
+.dayPageContainer .lehreinheitEventContent{
+	flex-grow:1;
+	align-items: center;
+	font-size: 0.875rem;
+	font-weight: 400;
+	line-height:1.25;
+}
+
+.dayPageContainer .lehreinheitEventHeader {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+	border-right: 1px solid gray;
+}
+
+.dayPageContainer .moodleEventContent {
+	align-items: center;
+	font-size: 0.875rem;
+	font-weight: 400;
+	line-height: 1.25;
+	width:100%;
+}
+
+.weekPageContainer .moodleEventContent {
+	align-items: center;
+	font-size: 0.875rem;
+	font-weight: 400;
+	line-height: 1.25;
+	width: 100%;
+}
+
+.weekPageContainer .lehreinheitEventHeader {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+	border-right: 1px solid gray;
+}
+
+.weekPageContainer .lehreinheitEventContent {
+	flex-grow: 1;
+	align-items: center;
+	font-size: 0.875rem;
+	font-weight: 400;
+	line-height: 1.25;
+}
+
+
+@container( min-width: 500px){
+	.dayPageContainer .lehreinheitEventContent,
+	.weekPageContainer .lehreinheitEventContent {
+		flex-direction: row;
+	}
+
+	.dayPageContainer .lehreinheitEventContent{
+		justify-content: space-evenly;
+	}
+}

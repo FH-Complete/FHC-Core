@@ -20,7 +20,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use CI3_Events as Events;
 
-class Stundenplan extends FHCAPI_Controller
+class LvPlan extends FHCAPI_Controller
 {
 
 	/**
@@ -33,10 +33,10 @@ class Stundenplan extends FHCAPI_Controller
 			'getRoomplan' => self::PERM_LOGGED,
             'Stunden' => self::PERM_LOGGED,
             'Reservierungen' => self::PERM_LOGGED,
-			'StundenplanEvents' => self::PERM_LOGGED,
+			'LvPlanEvents' => self::PERM_LOGGED,
 			'getLehreinheitStudiensemester' => self::PERM_LOGGED,
 			'studiensemesterDateInterval' => self::PERM_LOGGED,
-			'getLvStundenplanForStudiensemester' => self::PERM_LOGGED,
+			'getLvPlanForStudiensemester' => self::PERM_LOGGED,
 		]);
 
         $this->load->library('LogLib');
@@ -51,7 +51,7 @@ class Stundenplan extends FHCAPI_Controller
         $this->load->library('form_validation');
 
 		//load models
-		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		$this->load->model('ressource/Stundenplan_model', 'LvPlanModel');
 		$this->load->model('ressource/Reservierung_model', 'ReservierungModel');
 
 
@@ -61,12 +61,12 @@ class Stundenplan extends FHCAPI_Controller
 	// Public methods
 
 	 /**
-     * fetches Stundenplan and Moodle events together
+     * fetches LvPlan and Moodle events together
      * @access public
      *
      */
-	public function StundenplanEvents(){
-		$this->load->library('StundenplanLib');
+	public function LvPlanEvents(){
+		$this->load->library('LvPlanLib');
 
 		// form validation
 		$this->load->library('form_validation');
@@ -81,11 +81,12 @@ class Stundenplan extends FHCAPI_Controller
 		$end_date = $this->input->get('end_date', TRUE);
 		$lv_id = $this->input->get('lv_id', TRUE);
 
-		$stundenplan_events = $this->stundenplanlib->getStundenplan($start_date,$end_date,$lv_id);
-		if( is_null($stundenplan_events) || isEmptyArray($stundenplan_events) )
+		$lvplan_events = $this->getDataOrTerminateWithError($this->lvplanlib->getLvPlan($start_date,$end_date,$lv_id));
+		if( is_null($lvplan_events) || isEmptyArray($lvplan_events) )
 		{
-			$stundenplan_events = array();
+			$lvplan_events = array();
 		}
+
 		// fetching moodle events
 		$moodle_events = [];
 		Events::trigger(
@@ -101,7 +102,7 @@ class Stundenplan extends FHCAPI_Controller
 			]
 		);
 		
-		$result = array_merge($stundenplan_events,$moodle_events);
+		$result = array_merge($lvplan_events,$moodle_events);
 		// sort array with moodle events first
 		usort($result, function($a, $b){
 			if ($a->type === 'moodle' && $b->type !== 'moodle') {
@@ -123,16 +124,16 @@ class Stundenplan extends FHCAPI_Controller
 		$this->terminateWithSuccess($studiensemester);
 	}
 
-	public function getLvStundenplanForStudiensemester($studiensemester,$lvid){
-		$this->load->library('StundenplanLib');
+	public function getLvPlanForStudiensemester($studiensemester,$lvid){
+		$this->load->library('LvPlanLib');
 		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
 		
 		$studiensemester_result = $this->StudiensemesterModel->loadWhere(["studiensemester_kurzbz"=>$studiensemester]);
 		$studiensemester_result = current($this->getDataOrTerminateWithError($studiensemester_result));
 		$timespan_start = new DateTime($studiensemester_result->start);
 		$timespan_ende = new DateTime($studiensemester_result->ende);
-		$stundenplan = $this->stundenplanlib->getStundenplan(date_format($timespan_start, 'Y-m-d'),date_format($timespan_ende, 'Y-m-d'), $lvid);
-		$this->terminateWithSuccess($stundenplan);
+		$lvplan = $this->lvplanlib->getLvPlan(date_format($timespan_start, 'Y-m-d'),date_format($timespan_ende, 'Y-m-d'), $lvid);
+		$this->terminateWithSuccess($lvplan);
 		
 	}
 		
@@ -160,7 +161,7 @@ class Stundenplan extends FHCAPI_Controller
      */
 	public function getRoomplan()
 	{
-		$this->load->library('StundenplanLib');
+		$this->load->library('LvPlanLib');
         // form validation
         $this->load->library('form_validation');
         $this->form_validation->set_data($_GET);
@@ -174,19 +175,19 @@ class Stundenplan extends FHCAPI_Controller
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
 
-		$roomplan_data = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getRoomQuery($ort_kurzbz, $start_date, $end_date));
+		$roomplan_data = $this->LvPlan->lvPlanGruppierung($this->LvPlan->getRoomQuery($ort_kurzbz, $start_date, $end_date));
 
         $roomplan_data = $this->getDataOrTerminateWithError($roomplan_data);
-		$this->stundenplanlib->expand_object_information($roomplan_data);
+		$this->lvplanlib->expand_object_information($roomplan_data);
 
 		$this->terminateWithSuccess($roomplan_data);
 
 	}
 	
-	// gets the reservierungen of a room if the ort_kurzbz parameter is supplied otherwise gets the reservierungen of the stundenplan of a student
+	// gets the reservierungen of a room if the ort_kurzbz parameter is supplied otherwise gets the reservierungen of the lvplan of a student
     public function Reservierungen($ort_kurzbz = null)
 	{
-		$this->load->library('StundenplanLib');
+		$this->load->library('LvPlanLib');
 		//form validation
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_GET);
@@ -200,7 +201,7 @@ class Stundenplan extends FHCAPI_Controller
         $start_date = $this->input->get('start_date', TRUE);
         $end_date = $this->input->get('end_date', TRUE);
 
-		$result = $this->stundenplanlib->getReservierungen($start_date,$end_date,$ort_kurzbz);
+		$result = $this->lvplanlib->getReservierungen($start_date,$end_date,$ort_kurzbz);
 		$result = $this->getDataOrTerminateWithError($result);	
 		$this->terminateWithSuccess($result);
 	}

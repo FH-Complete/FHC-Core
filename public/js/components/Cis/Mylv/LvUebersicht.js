@@ -33,7 +33,7 @@ export default  {
             result: false,
             menu: [],
 			isMenuSelected:false,
-			hasLvStundenplanEintraege: true,
+			hasLvPlanEintraege: true,
 			lvEvaluierungMessage: "",
         }
     },
@@ -70,15 +70,15 @@ export default  {
 					})
 			}
 
-			// check if the lv has stundenplan entries for this studiensemester
+			// check if the lv has lvplan entries for this studiensemester
 			if (this.studiensemester && this.event) {
-				return this.$fhcApi.factory.studium.getLvStundenplanForStudiensemester(this.studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id)
+				return this.$fhcApi.factory.studium.getLvPlanForStudiensemester(this.studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id)
 					.then(data => data.data)
 					.then(res => {
 						if (Array.isArray(res) && res.length > 0) {
-							this.hasLvStundenplanEintraege = true;
+							this.hasLvPlanEintraege = true;
 						} else {
-							this.hasLvStundenplanEintraege = false;
+							this.hasLvPlanEintraege = false;
 						}
 					});
 			}
@@ -107,7 +107,7 @@ export default  {
         <template #default>
 			<div class="mb-4" v-if="lvEvaluierungMessage" v-html="lvEvaluierungMessage"></div>
 			<slot name="content"></slot>
-			<lv-menu v-model:isMenuSelected="isMenuSelected" :hasLvStundenplanEintraege="hasLvStundenplanEintraege" :preselectedMenu="preselectedMenu" :menu="menu" @hideModal="hide"></lv-menu>
+			<lv-menu v-model:isMenuSelected="isMenuSelected" :hasLvPlanEintraege="hasLvPlanEintraege" :preselectedMenu="preselectedMenu" :menu="menu" @hideModal="hide"></lv-menu>
         </template>
         
     </bs-modal>

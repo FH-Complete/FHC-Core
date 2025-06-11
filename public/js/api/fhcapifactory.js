@@ -22,7 +22,7 @@ import filter from "./filter.js";
 import studstatus from "./studstatus.js";
 import profil from "./profil.js";
 import profilUpdate from "./profilUpdate.js";
-import stundenplan from "./stundenplan.js";
+import lvPlan from "./lvPlan.js";
 import bookmark from "./bookmark.js";
 import stv from "./stv.js";
 import notiz from "./notiz.js";
@@ -48,7 +48,7 @@ export default {
     studstatus,
     profil,
     profilUpdate,
-    stundenplan,
+    lvPlan,
     bookmark,
     stv,
     notiz,

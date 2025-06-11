@@ -1,7 +1,7 @@
 import CalendarDate from '../../../composables/CalendarDate.js';
 import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 
-import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAddons from '../../../api/factory/addons.js';
 
 function ggt(m, n) {
@@ -279,7 +279,7 @@ export default {
 		fetchLvMenu(event) {
 			if (event && event.type == 'lehreinheit') {
 				this.$api
-					.call(ApiStundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]))
+					.call(ApiLvPlan.getLehreinheitStudiensemester(event.lehreinheit_id[0]))
 					.then(res => res.data)
 					.then(studiensemester_kurzbz => this.$api.call(
 						ApiAddons.getLvMenu(

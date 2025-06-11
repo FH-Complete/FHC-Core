@@ -1,12 +1,11 @@
 import { numberPadding, formatDate } from "../../../helpers/DateHelpers.js"
 
-export default {
-	props: {
-		event: Object,
-	},
-	data() {
-		return {
 
+export default {
+	props:{
+		event: {
+			type: Object,
+			required: true,
 		}
 	},
 	computed: {
@@ -47,10 +46,13 @@ export default {
 			return formatDate(d);
 		},
 	},
-	template:/*html*/`
+	template: `
+		<h3>
+			{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}
+		</h3>
 		<table class="table table-hover mb-4">
 				<tbody>
-					<tr v-if="event?.datum">
+					<tr>
 						<th>{{
 							$p.t('global','datum')?
 							$p.t('global','datum')+':'
@@ -65,7 +67,7 @@ export default {
 							:''
 						}}</th>
 						<td>
-							<a v-if="event.ort_content_id" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1 fhc-primary-color" ></i></a>
+							<a v-if="event.ort_content_id" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
 							{{event.ort_kurzbz}}
 						</td>
 					</tr>
@@ -85,7 +87,7 @@ export default {
 						}}</th>
 						<td>
 							<div v-for="lektor in event.lektor" class="d-block">
-								<a v-if="lektorenLinks[lektor.kurzbz]" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1 fhc-primary-color" ></i></a>
+								<a v-if="lektorenLinks[lektor.kurzbz]" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
 								{{lektor.kurzbz}}
 							</div>
 						</td>
@@ -107,7 +109,5 @@ export default {
 						<td>{{event.organisationseinheit}}</td>
 					</tr>
 				</tbody>
-		</table>
-	`
+		</table>`,
 }
-

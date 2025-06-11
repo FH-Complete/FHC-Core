@@ -126,7 +126,7 @@ export default {
 		},
 		openLvUebersicht(lehrveranstaltung) {
 			this.selectedLehrveranstaltung = lehrveranstaltung;
-			//convert lehrveranstaltung properties for compatibility with Stundenplan LvModal
+			//convert lehrveranstaltung properties for compatibility with LvPlan LvModal
 			this.selectedLehrveranstaltung.type ="lehreinheit";
 			this.selectedLehrveranstaltung.lehreinheit_id = this.selectedLehrveranstaltung.lehrveranstaltung_id;
 			if(this.selectedLehrveranstaltung){

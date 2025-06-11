@@ -12,6 +12,7 @@ export default{
 
     }, 
     template:/*html*/`
+	<template v-if="data.kontakt">
     <div class="gy-2 row align-items-center justify-content-center">
         <div class="col-1 text-center" >
             <i class="fa-solid fhc-link-color" :class="{...(data.kontakt.includes('@')?{'fa-envelope':true}:{'fa-phone':true})}" ></i>
@@ -35,5 +36,6 @@ export default{
             <i v-else="data.zustellung" class="fa-solid fa-xmark"></i>
         </div>
     </div>
+	</template>
 `,
 };

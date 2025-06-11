@@ -3,17 +3,17 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class StundenplanLib{
+class LvPlanLib{
 
 	private $_ci; // Code igniter instance
 	
 
 	/**
-	 * fetches stundenplan events from a UID and start/end date
+	 * fetches LvPlan events from a UID and start/end date
 	 * @access public
 	 *
 	 */
-	public function getStundenplan($start_date, $end_date, $lv_id = null){
+	public function getLvPlan($start_date, $end_date, $lv_id = null){
 		
 		$this->_ci =& get_instance();
 
@@ -21,7 +21,7 @@ class StundenplanLib{
 		$this->_ci->load->model('organisation/Studiensemester_model','StudiensemesterModel');
 		$this->_ci->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$this->_ci->load->model('person/Benutzergruppe_model','BenutzergruppeModel');
-		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		$this->_ci->load->model('ressource/Stundenplan_model', 'LvPlanModel');
 		
 
 		$student_uid = getAuthUID();
@@ -42,20 +42,20 @@ class StundenplanLib{
 			return $function_error;
 		}
 		
-		if($lv_id) { // fetch Stundenplan for lva, irrelevant of who is requesting it (for now)
+		if($lv_id) { // fetch LvPlan for lva, irrelevant of who is requesting it (for now)
 
-			$stundenplan_data = $this->_ci->StundenplanModel->getStundenplanLVA($start_date, $end_date, $lv_id);
-			if(isError($stundenplan_data))
+			$lvplan_data = $this->_ci->LvPlanModel->getLvPlanLVA($start_date, $end_date, $lv_id);
+			if(isError($lvplan_data))
 			{
-				return error(getData($stundenplan_data));
+				return error(getData($lvplan_data));
 			}
-			$stundenplan_data = getData($stundenplan_data) ?? [];
-			$function_error = $this->expand_object_information($stundenplan_data);
+			$lvplan_data = getData($lvplan_data) ?? [];
+			$function_error = $this->expand_object_information($lvplan_data);
 			if(!is_null($function_error)){
 				return $function_error;
 			}
 
-			// query lv itself in case its Stundenplan is being queried and it has no entries
+			// query lv itself in case its LvPlan is being queried and it has no entries
 			$this->_ci->load->model('education/Lehrveranstaltung_model','LehrveranstaltungModel');
 			$lv_result = $this->_ci->LehrveranstaltungModel->load($lv_id);
 			if(isError($lv_result))
@@ -63,7 +63,7 @@ class StundenplanLib{
 				return error(getData($lv_result));
 			}
 			$lv = getData($lv_result)[0];
-			return $stundenplan_data;
+			return $lvplan_data;
 			
 		}
 		
@@ -71,17 +71,17 @@ class StundenplanLib{
 		if($is_mitarbeiter)
 		{
 			
-			$stundenplan_data = $this->_ci->StundenplanModel->getStundenplanMitarbeiter($start_date, $end_date, $student_uid);
-			if(isError($stundenplan_data))
+			$lvplan_data = $this->_ci->LvPlanModel->getLvPlanMitarbeiter($start_date, $end_date, $student_uid);
+			if(isError($lvplan_data))
 			{
-				return error(getData($stundenplan_data));
+				return error(getData($lvplan_data));
 			}
-			$stundenplan_data = getData($stundenplan_data) ?? [];
-			$function_error = $this->expand_object_information($stundenplan_data);
+			$lvplan_data = getData($lvplan_data) ?? [];
+			$function_error = $this->expand_object_information($lvplan_data);
 			if(!is_null($function_error)){
 				return $function_error;
 			}
-			return $stundenplan_data;
+			return $lvplan_data;
 		} else {
 			// getting the gruppen_kurzbz of the student in the different studiensemester
 			$benutzer_gruppen = $this->fetchBenutzerGruppenFromStudiensemester($semester_range);
@@ -99,26 +99,26 @@ class StundenplanLib{
 			}
 			$student_lehrverband = getData($student_lehrverband);
 			
-			$stundenplan_query = $this->_ci->StundenplanModel->getStundenplanQuery($start_date, $end_date, $semester_range, $benutzer_gruppen, $student_lehrverband);
-			if(!$stundenplan_query)
+			$lvplan_query = $this->_ci->LvPlanModel->getLvPlanQuery($start_date, $end_date, $semester_range, $benutzer_gruppen, $student_lehrverband);
+			if(!$lvplan_query)
 			{
 				return [];
 			}
 			
 			
-			$stundenplan_data = $this->_ci->StundenplanModel->stundenplanGruppierung($stundenplan_query);
-			if(isError($stundenplan_data))
+			$lvplan_data = $this->_ci->LvPlanModel->lvPlanGruppierung($lvplan_query);
+			if(isError($lvplan_data))
 			{
-				return error(getData($stundenplan_data));
+				return error(getData($lvplan_data));
 			}
-			$stundenplan_data = getData($stundenplan_data) ?? [];
+			$lvplan_data = getData($lvplan_data) ?? [];
 
-			$function_error = $this->expand_object_information($stundenplan_data);
+			$function_error = $this->expand_object_information($lvplan_data);
 			if(!is_null($function_error)){
 				return $function_error;
 			}
 			
-			return success($stundenplan_data);
+			return success($lvplan_data);
 		}
 		
 	}
@@ -147,7 +147,7 @@ class StundenplanLib{
 
 	public function getLektorenFromLehrveranstaltung($lehrveranstaltung_id, $semester, $studiengang_kz, $studiensemester_kurzbz){
 		$this->_ci =& get_instance();
-		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		$this->_ci->load->model('ressource/Stundenplan_model', 'LvPlanModel');
 		$this->_ci->load->model('organisation/Studiensemester_model','StudiensemesterModel');
 		
 		$studiensemester = $this->_ci->StudiensemesterModel->loadWhere(["studiensemester_kurzbz"=>$studiensemester_kurzbz]);
@@ -156,7 +156,7 @@ class StundenplanLib{
 			return error(getData($studiensemester));
 		}
 		$studiensemester = current(getData($studiensemester));
-		$lektoren = $this->_ci->StundenplanModel->execReadOnlyQuery("
+		$lektoren = $this->_ci->LvPlanModel->execReadOnlyQuery("
 		SELECT DISTINCT uid 
 		FROM campus.vw_stundenplan
 		WHERE lehrveranstaltung_id = ? AND
@@ -190,8 +190,8 @@ class StundenplanLib{
 			// load lektor object
 			foreach ($item->lektor as $lv_lektor)
 			{
-				$this->_ci->StundenplanModel->addLimit(1);
-				$lektor_object = $this->_ci->StundenplanModel->execReadOnlyQuery("
+				$this->_ci->LvPlanModel->addLimit(1);
+				$lektor_object = $this->_ci->LvPlanModel->execReadOnlyQuery("
 				SELECT mitarbeiter_uid, vorname, nachname, kurzbz
 				FROM public.tbl_mitarbeiter
 				JOIN public.tbl_benutzer benutzer ON benutzer.uid = mitarbeiter_uid
@@ -233,7 +233,7 @@ class StundenplanLib{
 			
 			if($item->ort_kurzbz) {
 
-				$ort_content_object = $this->_ci->StundenplanModel->execReadOnlyQuery("
+				$ort_content_object = $this->_ci->LvPlanModel->execReadOnlyQuery("
 				SELECT content_id
 				FROM public.tbl_ort
 				WHERE ort_kurzbz = ?", [$item->ort_kurzbz]);

@@ -75,10 +75,7 @@ class Profil extends FHCAPI_Controller
 		// if parsing the URL did not found a UID then the UID of the logged in user is used
 		if ($uid == "Profil" || $uid == $this->uid) {
 			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($this->uid);
-			if (isError($isMitarbeiter)) {
-				show_error("error while checking if UID: " . $this->uid . " is a mitarbeiter");
-			}
-			$isMitarbeiter = getData($isMitarbeiter);
+			$isMitarbeiter = $this->getDataOrTerminateWithError($isMitarbeiter);
 			if ($isMitarbeiter) {
 				$res->view = "MitarbeiterProfil";
 				$res->data = $this->mitarbeiterProfil();
@@ -95,18 +92,13 @@ class Profil extends FHCAPI_Controller
 		else {
 			$this->PersonModel->addSelect(["person_id"]);
 			$pid = $this->PersonModel->getByUid($uid);
-			if (isError($pid)) {
-				show_error("error while trying to update table public.tbl_person while searching for a person with UID: " . $uid);
-			}
-			$pid = hasData($pid) ? getData($pid)[0] : null;
+			$pid = $this->getDataOrTerminateWithError($pid);
+			$pid = $pid ? $pid[0] : null;
 			if (!$pid) {
-				show_error("Person with UID: " . $uid . " does not exist");
+				$this->terminateWithError("Person with UID: " . $uid . " does not exist");
 			}
 			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
-			if (isError($isMitarbeiter)) {
-				show_error("error while checking if UID: " . $uid . " is a mitarbeiter");
-			}
-			$isMitarbeiter = getData($isMitarbeiter);
+			$isMitarbeiter = $this->getDataOrTerminateWithError($isMitarbeiter);
 			if ($isMitarbeiter) {
 				$res->view = "ViewMitarbeiterProfil";
 				$res->data = $this->viewMitarbeiterProfil($uid);
@@ -134,14 +126,11 @@ class Profil extends FHCAPI_Controller
 
 		$res = $this->PersonModel->update($this->pid, ["foto_sperre" => $value]);
 		if (isError($res)) {
-			show_error("error while trying to update table public.tbl_person");
+			$this->terminateWithError("error while trying to update table public.tbl_person");
 		}
 		$this->PersonModel->addSelect("foto_sperre");
 		$res = $this->PersonModel->load($this->pid);
-		if (isError($res)) {
-			show_error("error while trying to query table public.tbl_person");
-		}
-
+		
         $res = $this->getDataOrTerminateWithError($res);
 		
         $this->terminateWithSuccess(current($res));
@@ -232,8 +221,9 @@ class Profil extends FHCAPI_Controller
 		$intern_email["email"] = $uid . "@" . DOMAIN;
 		$extern_email = array();
 		$extern_email["type"] = "alias";
-		$extern_email["email"] = $benutzer_res->alias . "@" . DOMAIN;
-		$res->emails = array($intern_email, $extern_email);
+		
+		$extern_email["email"] = $benutzer_res->alias ? ($benutzer_res->alias . "@" . DOMAIN) : null;
+		$res->emails = $extern_email?[$intern_email, $extern_email]:[$intern_email];
 
 		$res->funktionen = $benutzer_funktion_res;
 		$res->mailverteiler = $mailverteiler_res;
@@ -345,8 +335,9 @@ class Profil extends FHCAPI_Controller
 		$intern_email["email"] = $this->uid . "@" . DOMAIN;
 		$extern_email = array();
 		$extern_email["type"] = "alias";
-		$extern_email["email"] = $mitarbeiter_res->alias . "@" . DOMAIN;
-		$res->emails = [$intern_email, $extern_email];
+		
+		$extern_email["email"] = $mitarbeiter_res->alias? ($mitarbeiter_res->alias . "@" . DOMAIN) : null;
+		$res->emails = $extern_email["email"]?[$intern_email, $extern_email]:[$intern_email];
 
 		$res->funktionen = $benutzer_funktion_res;
 		$res->standort_telefon = $telefon_res;
@@ -418,10 +409,8 @@ class Profil extends FHCAPI_Controller
 		$this->PersonModel->addJoin('tbl_gruppe', 'gruppe_kurzbz');
 
 		$mailverteiler_res = $this->PersonModel->loadWhere(array('mailgrp' => true, 'uid' => $uid));
-		if (isError($mailverteiler_res)) {
-			show_error("was not able to query the table public.tbl_benutzer:" . getData($mailverteiler_res));
-		}
-		$mailverteiler_res = hasData($mailverteiler_res) ? getData($mailverteiler_res) : null;
+		$mailverteiler_res = $this->getDataOrTerminateWithError($mailverteiler_res);
+		$mailverteiler_res = gettype($mailverteiler_res) === 'array' ? $mailverteiler_res : [];
 		$mailverteiler_res = array_map(function ($element) {
 			$element->mailto = "mailto:" . $element->gruppe_kurzbz . "@" . DOMAIN;
 			return $element;
@@ -441,10 +430,7 @@ class Profil extends FHCAPI_Controller
 		$this->BenutzerfunktionModel->addJoin("tbl_organisationseinheit", "oe_kurzbz");
 
 		$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere(array('uid' => $uid));
-		if (isError($benutzer_funktion_res)) {
-			show_error("was not able to query the table public.tbl_benutzerfunktion:" . getData($benutzer_funktion_res));
-		}
-		$benutzer_funktion_res = hasData($benutzer_funktion_res) ? getData($benutzer_funktion_res) : null;
+		$benutzer_funktion_res = $this->getDataOrTerminateWithError($benutzer_funktion_res);
 		return $benutzer_funktion_res;
 	}
 
@@ -460,10 +446,7 @@ class Profil extends FHCAPI_Controller
 
 		//? betriebsmittel are not needed in a view
 		$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel($pid);
-		if (isError($betriebsmittelperson_res)) {
-			show_error("was not able to query the table public.tbl_betriebsmittelperson:" . getData($betriebsmittelperson_res));
-		}
-		$betriebsmittelperson_res = hasData($betriebsmittelperson_res) ? getData($betriebsmittelperson_res) : null;
+		$betriebsmittelperson_res = $this->getDataOrTerminateWithError($betriebsmittelperson_res);
 		return $betriebsmittelperson_res;
 	}
 
@@ -477,12 +460,9 @@ class Profil extends FHCAPI_Controller
 	{
 		$this->BenutzerModel->addSelect(["alias"]);
 		$benutzer_res = $this->BenutzerModel->load([$uid]);
-		if (isError($benutzer_res)) {
-			show_error("was not able to query the table public.tbl_benutzer:" . getData($benutzer_res));
-		} else {
-			$benutzer_res = hasData($benutzer_res) ? getData($benutzer_res)[0] : null;
-		}
-
+		$benutzer_res = $this->getDataOrTerminateWithError($benutzer_res);
+		$benutzer_res = $benutzer_res ? current($benutzer_res) : null;
+			
 		return $benutzer_res;
 	}
 
@@ -505,11 +485,8 @@ class Profil extends FHCAPI_Controller
 		$this->BenutzerModel->addJoin("tbl_person", "person_id");
 
 		$person_res = $this->BenutzerModel->load([$uid]);
-		if (isError($person_res)) {
-			show_error("was not able to query the table public.tbl_benutzer:" . getData($person_res));
-		} else {
-			$person_res = hasData($person_res) ? getData($person_res)[0] : null;
-		}
+		$person_res = $this->getDataOrTerminateWithError($person_res);
+		$person_res = $person_res ? current($person_res) : null;
 
 		if( ($person_res->foto === null) || (($this->uid !== $uid) && ($person_res->foto_sperre !== false)) )
 		{
@@ -531,11 +508,8 @@ class Profil extends FHCAPI_Controller
 		$this->MitarbeiterModel->addSelect(["kurzbz", "telefonklappe", "alias", "ort_kurzbz"]);
 		$this->MitarbeiterModel->addJoin("tbl_benutzer", "tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid");
 		$mitarbeiter_res = $this->MitarbeiterModel->load($uid);
-		if (isError($mitarbeiter_res)) {
-			show_error("was not able to query the table public.tbl_mitarbeiter:" . getData($mitarbeiter_res));
-		} else {
-			$mitarbeiter_res = hasData($mitarbeiter_res) ? getData($mitarbeiter_res)[0] : null;
-		}
+		$mitarbeiter_res = $this->getDataOrTerminateWithError($mitarbeiter_res);
+		$mitarbeiter_res = $mitarbeiter_res ? current($mitarbeiter_res) : null;
 
 		return $mitarbeiter_res;
 	}
@@ -552,10 +526,8 @@ class Profil extends FHCAPI_Controller
 		$this->MitarbeiterModel->addJoin("tbl_kontakt", "tbl_mitarbeiter.standort_id = tbl_kontakt.standort_id");
 		$this->MitarbeiterModel->addLimit(1);
 		$telefon_res = $this->MitarbeiterModel->loadWhere(["mitarbeiter_uid" => $uid, "kontakttyp" => "telefon"]);
-		if (isError($telefon_res)) {
-			show_error("was not able to query the table public.tbl_mitarbeiter:" . getData($telefon_res));
-		}
-		$telefon_res = hasData($telefon_res) ? getData($telefon_res)[0] : null;
+		$telefon_res = $this->getDataOrTerminateWithError($telefon_res);
+		$telefon_res = $telefon_res ? current($telefon_res) : null;
 		return $telefon_res;
 	}
 
@@ -571,10 +543,9 @@ class Profil extends FHCAPI_Controller
 		$this->StudentModel->addJoin('tbl_studiengang', "tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz");
 
 		$student_res = $this->StudentModel->load([$uid]);
-		if (isError($student_res)) {
-			show_error("was not able to query the table public.tbl_student:" . getData($student_res));
-		}
-		$student_res = hasData($student_res) ? getData($student_res)[0] : null;
+		
+		$student_res = $this->getDataOrTerminateWithError($student_res);
+		$student_res = $student_res ? current($student_res) : null;
 		return $student_res;
 	}
 
@@ -587,10 +558,7 @@ class Profil extends FHCAPI_Controller
 	private function getProfilUpdates($uid)
 	{
 		$profilUpdates = $this->ProfilUpdateModel->getProfilUpdatesWhere(['uid' => $uid]);
-		if (isError($profilUpdates)) {
-			show_error("was not able to query the table public.tbl_profil_update:" . getData($profilUpdates));
-		}
-		$profilUpdates = hasData($profilUpdates) ? getData($profilUpdates) : null;
+		$profilUpdates = $this->getDataOrTerminateWithError($profilUpdates);
 		return $profilUpdates;
 	}
 
@@ -606,10 +574,9 @@ class Profil extends FHCAPI_Controller
 		$this->BenutzerModel->addJoin("tbl_person", "person_id");
 
 		$matr_res = $this->BenutzerModel->load([$uid]);
-		if (isError($matr_res)) {
-			show_error("was not able to query the table public.tbl_benutzer:" . getData($matr_res));
-		}
-		$matr_res = hasData($matr_res) ? getData($matr_res)[0] : [];
+		
+		$matr_res = $this->getDataOrTerminateWithError($matr_res);
+		$matr_res = $matr_res ? current($matr_res) : [];
 		return $matr_res;
 	}
 
@@ -625,10 +592,7 @@ class Profil extends FHCAPI_Controller
 		$this->BenutzergruppeModel->addJoin('tbl_gruppe', 'gruppe_kurzbz');
 
 		$zutrittsgruppe_res = $this->BenutzergruppeModel->loadWhere(array("uid" => $uid, "zutrittssystem" => true));
-		if (isError($zutrittsgruppe_res)) {
-			show_error("was not able to query the table public.tbl_benutzergruppe:" . getData($zutrittsgruppe_res));
-		}
-		$zutrittsgruppe_res = hasData($zutrittsgruppe_res) ? getData($zutrittsgruppe_res) : null;
+		$zutrittsgruppe_res = $this->getDataOrTerminateWithError($zutrittsgruppe_res);
 		return $zutrittsgruppe_res;
 	}
 
@@ -645,10 +609,7 @@ class Profil extends FHCAPI_Controller
 		$adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz");
 
 		$adresse_res = $this->AdresseModel->loadWhere(["person_id" => $pid]);
-		if (isError($adresse_res)) {
-			show_error("was not able to query the table public.tbl_adresse:" . getData($adresse_res));
-		}
-		$adresse_res = hasData($adresse_res) ? getData($adresse_res) : null;
+		$adresse_res = $this->getDataOrTerminateWithError($adresse_res);
 		return $adresse_res;
 	}
 
@@ -666,10 +627,7 @@ class Profil extends FHCAPI_Controller
 		$this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum');
 
 		$kontakte_res = $this->KontaktModel->loadWhere(['person_id' => $pid]);
-		if (isError($kontakte_res)) {
-			show_error("was not able to query the table public.tbl_kontakt:" . getData($kontakte_res));
-		}
-		$kontakte_res = hasData($kontakte_res) ? getData($kontakte_res) : null;
+		$kontakte_res = $this->getDataOrTerminateWithError($kontakte_res);
 		return $kontakte_res;
 	}
 
@@ -682,11 +640,10 @@ class Profil extends FHCAPI_Controller
 	private function getZutrittskarteDatum($uid)
 	{
 		$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittelByUid($uid, "Zutrittskarte");
-		if (isError($zutrittskarte_ausgegebenam)) {
-			show_error("was not able to query the table wavi.tbl_bentriebsmittelperson:" . getData($zutrittskarte_ausgegebenam));
-		}
-		$zutrittskarte_ausgegebenam = hasData($zutrittskarte_ausgegebenam) ? getData($zutrittskarte_ausgegebenam)[0]->ausgegebenam : null;
-
+		
+		$zutrittskarte_ausgegebenam = $this->getDataOrTerminateWithError($zutrittskarte_ausgegebenam);
+		$zutrittskarte_ausgegebenam = $zutrittskarte_ausgegebenam ? current($zutrittskarte_ausgegebenam)->ausgegebenam : null;
+		
 		//? formats date from 01-01-2000 to 01.01.2000
 		$zutrittskarte_ausgegebenam = str_replace("-", ".", $zutrittskarte_ausgegebenam);
 		return $zutrittskarte_ausgegebenam;

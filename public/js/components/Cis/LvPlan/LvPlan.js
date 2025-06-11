@@ -1,21 +1,20 @@
 import FhcCalendar from "../../Calendar/Calendar.js";
 import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
-import LvInfo from "../Mylv/LvInfo.js"
 import LvMenu from "../Mylv/LvMenu.js"
-import moodleSvg from "../../../helpers/moodleSVG.js"
+import lehreinheitEvent from "./EventTypes/calendarEvent.js"
 
-import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
-export const DEFAULT_MODE_STUNDENPLAN = 'Week'
+export const DEFAULT_MODE_LVPLAN = 'Week'
 
-const Stundenplan = {
-	name: 'Stundenplan',
+const LvPlan = {
+	name: 'LvPlan',
 	data() {
 		return {
 			events: null,
-			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_STUNDENPLAN,
+			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_LVPLAN,
 			calendarDate: new CalendarDate(new Date()),
 			eventCalendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
@@ -25,7 +24,10 @@ const Stundenplan = {
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
 			studiensemester_ende: null,
-			uid: null
+			uid: null,
+			renderComponents: {},
+			isModalContentResolved: false,
+			isModalTitleResolved: false,
 		}
 	},
 	props: {
@@ -46,7 +48,9 @@ const Stundenplan = {
 			eventMaxHeight: this.eventMaxHeight
 		}	
 	},
+	inject:["renderers"],
 	watch: {
+		
 		weekFirstDay: {
 			handler: async function (newValue) {
 				let data = await this.fetchStudiensemesterDetails(newValue);
@@ -57,7 +61,7 @@ const Stundenplan = {
 			},
 			immediate: true,
 		},
-		// forward/backward on history entries happening in stundenplan
+		// forward/backward on history entries happening in lvplan
 		'propsViewData.lv_id'(newVal) {
 			// relevant if lv_id can be changed from within this component
 		},
@@ -69,9 +73,10 @@ const Stundenplan = {
 		}
 	},
 	components: {
-		FhcCalendar, LvModal, LvMenu, LvInfo, moodleSvg
+		FhcCalendar, LvModal, LvMenu, lehreinheitEvent, 
 	},
 	computed:{
+		
 		downloadLinks: function(){
 			if(!this.studiensemester_start || !this.studiensemester_ende || !this.uid )return;
 			let start = new Date(this.studiensemester_start);
@@ -105,17 +110,38 @@ const Stundenplan = {
 		},
 	},
 	methods:{
-		fetchStudiensemesterDetails: async function (date) {
-			return this.$api.call(ApiStundenplan.studiensemesterDateInterval(date));
+		modalTitleResolved: function () {
+			this.isModalTitleResolved = true;
+			if(this.isModalContentResolved && this.isModalTitleResolved)
+				Vue.nextTick(() => {
+					if(this.$refs.lvmodal) 
+						this.$refs.lvmodal.show();
+				});
 		},
-		convertTime: function([hour,minute]){
-			let date = new Date();
-			date.setHours(hour);
-			date.setMinutes(minute);
-			// returns date string as hh:mm
-			return date.toLocaleTimeString(this.$p.user_locale, { hour: '2-digit', minute: '2-digit', hour12:false}); 
+		modalContentResolved: function () {
+			this.isModalContentResolved = true;
+			if (this.isModalContentResolved && this.isModalTitleResolved)
+				Vue.nextTick(() => {
+					if (this.$refs.lvmodal)
+						this.$refs.lvmodal.show();
+				});
+		},
+		// component renderers fetches from different addons
+		modalTitleComponent(type){
+			return this.renderers[type].modalTitle;
+		},
+		modalContentComponent(type) {
+			return this.renderers[type].modalContent;
+		},
+		calendarEventComponent(type){
+			return this.renderers[type].calendarEvent;
+		},
+		
 
+		fetchStudiensemesterDetails: async function (date) {
+			return this.$api.call(ApiLvPlan.studiensemesterDateInterval(date));
 		},
+		
 		setSelectedEvent: function (event) {
 			this.currentlySelectedEvent = event;
 		},
@@ -126,7 +152,7 @@ const Stundenplan = {
 			const capitalizedMode = this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1);
 
 			this.$router.push({
-				name: "Stundenplan",
+				name: "LvPlan",
 				params: {
 					mode: capitalizedMode,
 					focus_date: date,
@@ -148,7 +174,7 @@ const Stundenplan = {
 				String(this.currentDay.getDate()).padStart(2, "0");
 
 			this.$router.push({
-				name: "Stundenplan",
+				name: "LvPlan",
 				params: {
 					mode: this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1),
 					focus_date: date,
@@ -166,7 +192,7 @@ const Stundenplan = {
 			if (m == 'Weeks' || m == 'Years' || m == 'Months') return;
 			
 			this.$router.push({
-				name: "Stundenplan",
+				name: "LvPlan",
 				params: {
 					mode: m,
 					focus_date: date,
@@ -177,9 +203,8 @@ const Stundenplan = {
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
-			Vue.nextTick(() => {
-				this.$refs.lvmodal.show();
-			});
+			this.isModalTitleResolved = false;
+			this.isModalContentResolved = false;
 		},
 		updateRange: function ({start,end, mounted}) {
 			let checkDate = (date) => {
@@ -208,8 +233,8 @@ const Stundenplan = {
 		},
 		loadEvents: function(){
 			Promise.allSettled([
-				this.$api.call(ApiStundenplan.StundenplanEvents(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id)),
-				this.$api.call(ApiStundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay))
+				this.$api.call(ApiLvPlan.LvPlanEvents(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id)),
+				this.$api.call(ApiLvPlan.getLvPlanReservierungen(this.monthFirstDay, this.monthLastDay))
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {
@@ -242,25 +267,41 @@ const Stundenplan = {
 		},
 	},
 	created() {
+		
+
 		this.$api
 			.call(ApiAuthinfo.getAuthUID())
 			.then(res => res.data)
 			.then(data => {
 				this.uid = data.uid;
 			});
+		
 		// this.loadEvents();
 	},
 	beforeUnmount() {
 		if(this.$refs.lvmodal) this.$refs.lvmodal.hide()	
 	},
 	template:/*html*/`
+	<template v-if="renderers">
 	<h2>
 		{{$p.t('lehre/stundenplan')}}
 		<span style="padding-left: 0.4em;" v-show="studiensemester_kurzbz">{{studiensemester_kurzbz}}</span>
 		<span style="padding-left: 0.5em;" v-show="propsViewData?.lv_id && lv"> {{ $p.user_language.value === 'German' ? lv?.bezeichnung : lv?.bezeichnung_english}}</span>
 	</h2>
 	<hr>
-	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" />
+	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" >
+		<template #modalTitle>
+		<Suspense @resolve="modalTitleResolved">
+			<component :is="modalTitleComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
+		</Suspense>
+		</template>
+		<template #modalContent>
+		<Suspense @resolve="modalContentResolved">
+			<component :is="modalContentComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
+		</Suspense>
+		</template>
+	</lv-modal>
+
 	<fhc-calendar
 		ref="calendar"
 		@selectedEvent="setSelectedEvent"
@@ -285,68 +326,23 @@ const Stundenplan = {
 			</div>
 		</template>
 		<template #monthPage="{event,day}">
-			<div class="p-1" v-if="event.type=='moodle'" @click="showModal(event)">
-				<div class="d-flex small w-100" >
-					<moodle-svg></moodle-svg>
-					<span class="flex-grow-1 text-center "><strong v-html="event.titel"></strong> - {{event.topic}}</span>
-				</div>
-			</div>
-			<div v-else @click="showModal(event)" class="p-1">
-				<span>{{event.topic}}</span>
+			<div @click="showModal(event)" class="p-1">
+				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
 			</div>
 		</template>
 		<template #weekPage="{event,day}">
-			<div @click="showModal(event)" type="button"
-			class=" position-relative border border-secondary border d-flex flex-col align-items-center justify-content-evenly h-100"
-			:class="{'p-1':event.allDayEvent}"
-			style="overflow: auto;">
-				<div v-if="!event.allDayEvent && event?.beginn && event?.ende" class="d-none d-xl-block" >
-					<div class="d-flex flex-column p-4 p-xl-2 border-end border-secondary">
-						<span class="small">{{convertTime(event.beginn.split(":"))}}</span>
-						<span class="small">{{convertTime(event.ende.split(":"))}}</span>
-					</div>
-				</div>
-				<div v-if="event.type=='moodle'" class="d-flex small w-100" >
-					<moodle-svg></moodle-svg>
-					<span class="flex-grow-1 text-center"><strong v-html="event.titel"></strong> - {{event.topic}}</span>
-				</div>
-				<div v-else class="d-flex flex-column flex-grow-1 align-items-center small">
-					<span>{{event.topic}}</span>
-					<span v-for="lektor in event.lektor">{{lektor.kurzbz}}</span>
-					<span>{{event.ort_kurzbz}}</span>
-				</div>
+			<div @click="showModal(event)" type = "button"
+				class="weekPageContainer position-relative border border-secondary border d-flex flex-col align-items-center justify-content-evenly h-100"
+				:class="{'p-1':event.allDayEvent}"
+				style = "overflow: auto;" >
+				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
 			</div>
 		</template>
 		<template #dayPage="{event,day,mobile}">
-			<div @click="mobile? showModal(event):null" type="button" class="fhc-entry border border-secondary border m-0 h-100  text-center">
-				<template v-if="event.type=='moodle'">
-					<div class="d-flex small align-items-center w-100 p-1" >
-						<moodle-svg></moodle-svg>
-						<span class="flex-grow-1 text-center"><strong v-html="event.titel"></strong> - {{event.topic}}</span>
-					</div>
-				</template>
-				<template v-else>
-					<div class="row justify-content-center align-items-center">
-						<div class="col-auto" v-if="!event.allDayEvent && event?.beginn && event?.ende" >
-							<div class="d-flex flex-column p-4 border-end border-secondary">
-								<span class="small">{{convertTime(event.beginn.split(":"))}}</span>
-								<span class="small">{{convertTime(event.ende.split(":"))}}</span>
-							</div>
-						</div>
-						<div class="col">
-							<p>{{ $p.t('lehre/lehrveranstaltung') }}:</p>
-							<p class="m-0">{{event?.topic}}</p>
-						</div>
-						<div class="col" :style="'max-height: ' + eventMaxHeight + '; overflow: auto;'">
-							<p>{{ $p.t('lehre/lektor') }}:</p>
-							<p class="m-0" v-for="lektor in event?.lektor">{{lektor.kurzbz}}</p>
-						</div>
-						<div class="col">
-							<p>{{ $p.t('profil/Ort') }}: </p>
-							<p class="m-0">{{event?.ort_kurzbz}}</p>
-						</div>
-					</div>
-				</template>
+			<div @click="mobile? showModal(event):null" type="button" class="dayPageContainer fhc-entry border border-secondary border m-0 h-100  text-center">
+				<div class="h-100 d-flex flex-col justify-content-evenly align-items-center">
+					<component :is="calendarEventComponent(event.type)" :event="event"></component>
+				</div>
 			</div>
 		</template>
 		<template #pageMobilContent="{lvMenu, event}">
@@ -362,7 +358,8 @@ const Stundenplan = {
 		<template #pageMobilContentEmpty >
 			<h3>{{ $p.t('lehre/noLvFound') }}</h3>
 		</template>
-	</fhc-calendar>`
+	</fhc-calendar>
+	</template>`
 }
 
-export default Stundenplan
+export default LvPlan;

@@ -1,9 +1,8 @@
 import BsModal from "../../Bootstrap/Modal.js";
 import Alert from "../../Bootstrap/Alert.js";
 import LvMenu from "./LvMenu.js"
-import LvInfo from "./LvInfo.js"
 
-import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAddons from '../../../api/factory/addons.js';
 
 export default {
@@ -11,7 +10,6 @@ export default {
 		BsModal,
 		Alert,
 		LvMenu,
-		LvInfo,
 	},
 	mixins: [BsModal],
 	props: {
@@ -44,6 +42,9 @@ export default {
 		};
 	},
 	methods:{
+		onHideModal: function(){
+			this.menu = null;
+		},
 		onModalShow: function()
 		{
 			// do not load the menu if the menu is not getting rendered
@@ -51,7 +52,7 @@ export default {
 
 			if (this.event.type == 'lehreinheit') {
 				this.$api
-					.call(ApiStundenplan.getLehreinheitStudiensemester(Array.isArray(this.event.lehreinheit_id) ? this.event.lehreinheit_id[0] : this.event.lehreinheit_id))
+					.call(ApiLvPlan.getLehreinheitStudiensemester(Array.isArray(this.event.lehreinheit_id) ? this.event.lehreinheit_id[0] : this.event.lehreinheit_id))
 					.then(res => res.data)
 					.then(studiensemester_kurzbz => this.$api.call(
 						ApiAddons.getLvMenu(
@@ -74,22 +75,13 @@ export default {
 		return BsModal.popup.bind(this)(null, options);
 	},
 	template: /*html*/ `
-	<bs-modal ref="modalContainer" @showBsModal="onModalShow" v-bind="$props" :bodyClass="''" dialogClass='modal-lg' class="bootstrap-alert" :backdrop="false" >
+	<bs-modal ref="modalContainer" @showBsModal="onModalShow" @hideBsModal="onHideModal" v-bind="$props" :bodyClass="''" dialogClass='modal-lg' class="bootstrap-alert" :backdrop="false" >
 		<template v-slot:title>
-			<template v-if="event?.type=='moodle'"><strong v-html="event.titel"></strong></template>
-			<template v-else-if="event.titel">{{ event.titel + ' - ' + event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
-			<template v-else>{{ event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</template>
+			<slot name="modalTitle"></slot>
 		</template>
 		<template v-slot:default>
-			<h3>
-				<template v-if="event?.type =='moodle'">
-					{{$p.t('lvinfo','Moodleinformationen')}}
-				</template>
-				<template v-else>
-					{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}
-				</template>
-			</h3>
-			<lv-info :event="event"></lv-info>
+			<slot name="modalContent"></slot>
+			
 			<template v-if="showMenu && this.menu">
 				<h3>{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
 				<lv-menu :menu="menu"></lv-menu>

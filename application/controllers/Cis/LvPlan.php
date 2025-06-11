@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class Stundenplan extends Auth_Controller
+class LvPlan extends Auth_Controller
 {
 	/**
 	 * Constructor
@@ -30,6 +30,6 @@ class Stundenplan extends Auth_Controller
 			'uid'=>getAuthUID(),
 		);
 		
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Stundenplan']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'LvPlan']);
 	}
 }

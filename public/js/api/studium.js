@@ -29,9 +29,9 @@ export default {
 			}
 		);
 	},
-	getLvStundenplanForStudiensemester: function (studiensemester, lvid) {
+	getLvPlanForStudiensemester: function (studiensemester, lvid) {
 		return this.$fhcApi.get(
-			`/api/frontend/v1/Stundenplan/getLvStundenplanForStudiensemester/${studiensemester}/${lvid}`,
+			`/api/frontend/v1/LvPlan/getLvPlanForStudiensemester/${studiensemester}/${lvid}`,
 			{
 			}
 		);
