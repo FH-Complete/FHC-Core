@@ -2,7 +2,7 @@ import BsModal from "../../Bootstrap/Modal.js";
 import Alert from "../../Bootstrap/Alert.js";
 import LvMenu from "./LvMenu.js"
 
-import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAddons from '../../../api/factory/addons.js';
 
 export default {
@@ -52,7 +52,7 @@ export default {
 
 			if (this.event.type == 'lehreinheit') {
 				this.$api
-					.call(ApiStundenplan.getLehreinheitStudiensemester(Array.isArray(this.event.lehreinheit_id) ? this.event.lehreinheit_id[0] : this.event.lehreinheit_id))
+					.call(ApiLvPlan.getLehreinheitStudiensemester(Array.isArray(this.event.lehreinheit_id) ? this.event.lehreinheit_id[0] : this.event.lehreinheit_id))
 					.then(res => res.data)
 					.then(studiensemester_kurzbz => this.$api.call(
 						ApiAddons.getLvMenu(

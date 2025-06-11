@@ -6,11 +6,11 @@ import ContentModal from '../Cis/Cms/ContentModal.js'
 import CalendarDate from '../../composables/CalendarDate.js';
 import moodleSvg from "../../helpers/moodleSVG.js"
 
-import ApiStundenplan from '../../api/factory/stundenplan.js';
+import ApiLvPlan from '../../api/factory/lvPlan.js';
 import ApiOrt from '../../api/factory/ort.js';
 
 export default {
-	name: "WidgetsStundenplan",
+	name: "LvPlanWidget",
 	mixins: [
 		Phrasen,
 		AbstractWidget
@@ -128,8 +128,8 @@ export default {
 
 		loadEvents: function () {
 			Promise.allSettled([
-				this.$api.call(ApiStundenplan.StundenplanEvents(this.monthFirstDay, this.monthLastDay)),
-				this.$api.call(ApiStundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay))
+				this.$api.call(ApiLvPlan.LvPlanEvents(this.monthFirstDay, this.monthLastDay)),
+				this.$api.call(ApiLvPlan.getLvPlanReservierungen(this.monthFirstDay, this.monthLastDay))
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {
@@ -170,7 +170,7 @@ export default {
 		this.loadEvents();
 	},
 	template: /*html*/`
-	<div class="dashboard-widget-stundenplan d-flex flex-column h-100">
+	<div class="dashboard-widget-lvplan d-flex flex-column h-100">
 		<lv-modal v-if="selectedEvent" ref="lvmodal" :event="selectedEvent"  />
 		<content-modal :content_id="roomInfoContentID" dialogClass="modal-lg" ref="contentModal"/>
 		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" :widget="true" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" >

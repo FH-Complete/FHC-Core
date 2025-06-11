@@ -429,7 +429,7 @@ export default {
 			this._dragStart(evt);
 		},
 		dragOver(evt) {
-			if ((this.y + 1) > this.rows && this.mode == MODE_MOVE) {
+			if ((this.y + 1) > this.rows && (this.mode == MODE_MOVE || this.mode == MODE_RESIZE)) {
 				this.positionUpdates = this.positionUpdates?.filter(item => {
 					return item.widgetid == this.draggedItem.data.widgetid;
 				})
@@ -628,7 +628,7 @@ export default {
 				class="position-absolute"
 				:active="active"
 				:style="{
-					zIndex: item.resizeOverlay ? 1 : 2,
+					zIndex: item.resizeOverlay ? 1 : 'auto',
 					top: 'calc(' + item.y + ' * var(--fhc-dg-row-height))',
 					left: 'calc(' + item.x + ' * var(--fhc-dg-col-width))',
 					width: 'calc(' + item.w + ' * var(--fhc-dg-col-width))',

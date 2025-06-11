@@ -33,12 +33,12 @@ class Stundenplan_model extends DB_Model
 		*/
 
 
-		$raum_stundenplan= $this->execReadOnlyQuery("
+		$raum_lvplan= $this->execReadOnlyQuery("
 		SELECT CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/')) AS stg, CONCAT(lehrfach,'-',lehrform) AS lv_info, * FROM lehre.vw_stundenplan sp
 		WHERE ort_kurzbz = ? AND datum >= ? AND datum <= ?
 		", [$ort_kurzbz, $start_date, $end_date]);
 
-		return $raum_stundenplan;
+		return $raum_lvplan;
 	}
 
 	/**
@@ -136,11 +136,11 @@ class Stundenplan_model extends DB_Model
 
 	/**
 	 * groups rows of a subquery that fetches data from the lehre.vw_stundenplan table
-	 * @param string $stundenplanViewQuery the subquery used to group the result
+	 * @param string $lvplanViewQuery the subquery used to group the result
 	 *
 	 * @return stdClass
 	 */
-	public function stundenplanGruppierung($stundenplanViewQuery)
+	public function lvPlanGruppierung($lvplanViewQuery)
 	{
 		$query_result = $this->execReadOnlyQuery("
 		SELECT
@@ -173,7 +173,7 @@ class Stundenplan_model extends DB_Model
 			)) as organisationseinheit,
 			ort_kurzbz, studiengang_kz, titel,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit,gruppe, verband, semester,stg_kurzbz
 
-			FROM (".$stundenplanViewQuery.") sp
+			FROM (".$lvplanViewQuery.") sp
 			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = sp.stunde
 
 		) as subquery
@@ -187,11 +187,11 @@ class Stundenplan_model extends DB_Model
 	}
 
 	/**
-	 * queries Stundenplan but for a whole lva, irrespective of who is requesting it
+	 * queries LvPlan but for a whole lva, irrespective of who is requesting it
 	 * 
 	 * @return void
 	 */
-	public function getStundenplanLVA($start_date, $end_date, $lv_id) {
+	public function getLvPlanLVA($start_date, $end_date, $lv_id) {
 		return $this->execReadOnlyQuery("
 	
 		SELECT
@@ -242,11 +242,11 @@ class Stundenplan_model extends DB_Model
 	}
 
 	/**
-	 * queries Stundenplan and filters by assigned ma_kurzbz, very similar to get by LVA
+	 * queries LvPlan and filters by assigned ma_kurzbz, very similar to get by LVA
 	 *
 	 * @return void
 	 */
-	public function getStundenplanMitarbeiter($start_date, $end_date, $ma_uid) {
+	public function getLvPlanMitarbeiter($start_date, $end_date, $ma_uid) {
 		return $this->execReadOnlyQuery("
 	
 		SELECT
@@ -302,7 +302,7 @@ class Stundenplan_model extends DB_Model
 	 *
 	 * @return mixed
 	 */
-	public function getStundenplanQuery($start_date, $end_date,$semester,$gruppen,$studentlehrverbaende){
+	public function getLvPlanQuery($start_date, $end_date,$semester,$gruppen,$studentlehrverbaende){
 		
 		// helper function to check if either $gruppen or $studentlehrverbaende are empty for each semester
 		$emptyCheck = function($toBeCheckedArray) use ($semester){

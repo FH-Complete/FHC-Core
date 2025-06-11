@@ -4,18 +4,17 @@ import LvModal from "../Mylv/LvModal.js";
 import LvMenu from "../Mylv/LvMenu.js"
 import lehreinheitEvent from "./EventTypes/calendarEvent.js"
 
-import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
+export const DEFAULT_MODE_LVPLAN = 'Week'
 
-export const DEFAULT_MODE_STUNDENPLAN = 'Week'
-
-const Stundenplan = {
-	name: 'Stundenplan',
+const LvPlan = {
+	name: 'LvPlan',
 	data() {
 		return {
 			events: null,
-			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_STUNDENPLAN,
+			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_LVPLAN,
 			calendarDate: new CalendarDate(new Date()),
 			eventCalendarDate: new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
@@ -62,7 +61,7 @@ const Stundenplan = {
 			},
 			immediate: true,
 		},
-		// forward/backward on history entries happening in stundenplan
+		// forward/backward on history entries happening in lvplan
 		'propsViewData.lv_id'(newVal) {
 			// relevant if lv_id can be changed from within this component
 		},
@@ -140,7 +139,7 @@ const Stundenplan = {
 		
 
 		fetchStudiensemesterDetails: async function (date) {
-			return this.$api.call(ApiStundenplan.studiensemesterDateInterval(date));
+			return this.$api.call(ApiLvPlan.studiensemesterDateInterval(date));
 		},
 		
 		setSelectedEvent: function (event) {
@@ -153,7 +152,7 @@ const Stundenplan = {
 			const capitalizedMode = this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1);
 
 			this.$router.push({
-				name: "Stundenplan",
+				name: "LvPlan",
 				params: {
 					mode: capitalizedMode,
 					focus_date: date,
@@ -175,7 +174,7 @@ const Stundenplan = {
 				String(this.currentDay.getDate()).padStart(2, "0");
 
 			this.$router.push({
-				name: "Stundenplan",
+				name: "LvPlan",
 				params: {
 					mode: this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1),
 					focus_date: date,
@@ -193,7 +192,7 @@ const Stundenplan = {
 			if (m == 'Weeks' || m == 'Years' || m == 'Months') return;
 			
 			this.$router.push({
-				name: "Stundenplan",
+				name: "LvPlan",
 				params: {
 					mode: m,
 					focus_date: date,
@@ -234,8 +233,8 @@ const Stundenplan = {
 		},
 		loadEvents: function(){
 			Promise.allSettled([
-				this.$api.call(ApiStundenplan.StundenplanEvents(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id)),
-				this.$api.call(ApiStundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay))
+				this.$api.call(ApiLvPlan.LvPlanEvents(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id)),
+				this.$api.call(ApiLvPlan.getLvPlanReservierungen(this.monthFirstDay, this.monthLastDay))
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {
@@ -363,4 +362,4 @@ const Stundenplan = {
 	</template>`
 }
 
-export default Stundenplan
+export default LvPlan;

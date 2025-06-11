@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * 
  */
-class Stundenplan extends Auth_Controller
+class LvPlan extends Auth_Controller
 {
 
 	/**
@@ -27,14 +27,14 @@ class Stundenplan extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		$this->load->model('ressource/Stundenplan_model', 'LvPlanModel');
 
-		/* $result = $this->StundenplanModel->loadForUid(getAuthUID());
+		/* $result = $this->LvPlanModel->loadForUid(getAuthUID());
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
  		*/
-		$res = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(getAuthUID())); 
+		$res = $this->LvPlanModel->lvPlanGruppierung($this->LvPlanModel->getLvPlanQuery(getAuthUID())); 
 		
 		$res = getData($res);
 		

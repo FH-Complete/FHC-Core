@@ -78,7 +78,7 @@ export default {
 			if (newValue?.scrollTime == oldValue?.scrollTime && newValue?.focusDate.d==oldValue?.focusDate.d) {
 				return;
 			}
-			// scroll the Stundenplan to the closest event
+			// scroll the LvPlan to the closest event
 			let previousScrollAnchor = document.getElementById('scroll' + (newValue.scrollTime - 1) + this.focusDate.d + this.focusDate.w)
 			let scrollAnchor = document.getElementById('scroll' + newValue.scrollTime + this.focusDate.d + this.focusDate.w);
 			if (previousScrollAnchor) {

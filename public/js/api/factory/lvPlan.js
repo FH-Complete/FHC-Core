@@ -19,14 +19,14 @@ export default {
 	getRoomInfo(ort_kurzbz, start_date, end_date) {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Stundenplan/getRoomplan',
+			url: '/api/frontend/v1/LvPlan/getRoomplan',
 			params: { ort_kurzbz, start_date, end_date }
 		};
 	},
-	getStundenplan(start_date, end_date, lv_id) {
+	getLvPlan(start_date, end_date, lv_id) {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Stundenplan/getStundenplan',
+			url: '/api/frontend/v1/LvPlan/getLvPlan',
 			params: { start_date, end_date, lv_id }
 		};
 	},
@@ -34,39 +34,39 @@ export default {
 		// TODO(chris): seems to be called from nowhere?
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Stundenplan/Stunden'
+			url: '/api/frontend/v1/LvPlan/Stunden'
 		};
 	},
 	getOrtReservierungen(ort_kurzbz, start_date, end_date) {
 		return {
 			method: 'get',
-			url: `/api/frontend/v1/Stundenplan/Reservierungen/${ort_kurzbz}`,
+			url: `/api/frontend/v1/LvPlan/Reservierungen/${ort_kurzbz}`,
 			params: { start_date, end_date }
 		};
 	},
-	getStundenplanReservierungen(start_date, end_date) {
+	getLvPlanReservierungen(start_date, end_date) {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Stundenplan/Reservierungen',
+			url: '/api/frontend/v1/LvPlan/Reservierungen',
 			params: { start_date, end_date }
 		};
 	},
 	getLehreinheitStudiensemester(lehreinheit_id) {
 		return {
 			method: 'get',
-			url: `/api/frontend/v1/Stundenplan/getLehreinheitStudiensemester/${lehreinheit_id}`
+			url: `/api/frontend/v1/LvPlan/getLehreinheitStudiensemester/${lehreinheit_id}`
 		};
 	},
 	studiensemesterDateInterval(date) {
 		return {
 			method: 'get',
-			url: `/api/frontend/v1/Stundenplan/studiensemesterDateInterval/${date}`
+			url: `/api/frontend/v1/LvPlan/studiensemesterDateInterval/${date}`
 		};
 	},
-	StundenplanEvents(start_date, end_date, lv_id) {
+	LvPlanEvents(start_date, end_date, lv_id) {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Stundenplan/StundenplanEvents',
+			url: '/api/frontend/v1/LvPlan/LvPlanEvents',
 			params: { 
 				start_date: start_date, 
 				end_date: end_date, 

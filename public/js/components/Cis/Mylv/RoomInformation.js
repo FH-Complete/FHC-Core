@@ -3,7 +3,7 @@ import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
 
-import ApiStudenplan from '../../../api/factory/stundenplan.js';
+import ApiStudenplan from '../../../api/factory/lvPlan.js';
 
 export const DEFAULT_MODE_RAUMINFO = 'Week'
 
@@ -107,7 +107,7 @@ const RoomInformation = {
 				String(this.currentDay.getDate()).padStart(2, "0");
 
 			this.$router.push({
-				name: "Stundenplan",
+				name: "LvPlan",
 				params: {
 					mode: this.calendarMode,
 					focus_date: date,
