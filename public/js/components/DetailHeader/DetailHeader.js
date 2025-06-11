@@ -1,4 +1,4 @@
-import ApiCoreVertraege from "../../api/factory/vertraege/vertraege.js";
+import ApiDetailHeader from "../../api/factory/detailHeader.js";
 
 export default {
 	name: 'DetailHeader',
@@ -76,7 +76,7 @@ export default {
 	methods: {
 		getHeader(person_id) {
 			return this.$api
-				.call(ApiCoreVertraege.getHeader(person_id))
+				.call(ApiDetailHeader.getHeader(person_id))
 				.then(result => {
 					this.headerDataMa = result.data;
 
@@ -85,7 +85,7 @@ export default {
 		},
 		loadDepartmentData(person_id) {
 			return this.$api
-				.call(ApiCoreVertraege.getPersonAbteilung(person_id))
+				.call(ApiDetailHeader.getPersonAbteilung(person_id))
 				.then(result => {
 					this.departmentData = result.data;
 				})
@@ -93,7 +93,7 @@ export default {
 		},
 		getLeitungOrg(oekurzbz){
 			return this.$api
-				.call(ApiCoreVertraege.getLeitungOrg(oekurzbz))
+				.call(ApiDetailHeader.getLeitungOrg(oekurzbz))
 				.then(result => {
 					this.leitungData = result.data;
 				})

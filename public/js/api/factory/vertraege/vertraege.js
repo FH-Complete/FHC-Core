@@ -132,24 +132,6 @@ export default {
 			url: 'api/frontend/v1/vertraege/vertraege/getMitarbeiter/',
 		};
 	},
-	getHeader(person_id){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/vertraege/vertraege/getHeader/' + person_id,
-		};
-	},
-	getPersonAbteilung(person_id){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/vertraege/vertraege/getPersonAbteilung/' + person_id,
-		};
-	},
-	getLeitungOrg(oekurzbz){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/vertraege/vertraege/getLeitungOrg/' + oekurzbz,
-		};
-	},
 	getMitarbeiterUid(person_id){
 		return {
 			method: 'get',
