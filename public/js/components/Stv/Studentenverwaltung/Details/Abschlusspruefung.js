@@ -1,6 +1,7 @@
 import AbschlussPruefung from "./Abschlusspruefung/Abschlusspruefung.js";
 
 export default {
+	name: "TabFinalExam",
 	components: {
 		AbschlussPruefung
 	},

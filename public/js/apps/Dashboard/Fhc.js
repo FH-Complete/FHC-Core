@@ -1,6 +1,5 @@
 import FhcDashboard from '../../components/Dashboard/Dashboard.js';
-import FhcApi from '../../plugin/FhcApi.js';
-import Phrasen from '../../plugin/Phrasen.js';
+import PluginsPhrasen from '../../plugins/Phrasen.js';
 import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import Stundenplan, {DEFAULT_MODE_STUNDENPLAN} from "../../components/Cis/Stundenplan/Stundenplan.js";
@@ -259,13 +258,12 @@ const app = Vue.createApp({
 // kind of a bandaid for bad css on some pages to avoid horizontal scroll
 setScrollbarWidth();
 app.use(router);
-app.use(FhcApi);
 app.use(primevue.config.default, {
 	zIndex: {
 		overlay: 9000,
 		tooltip: 8000
 	}
 })
-app.use(Phrasen);
+app.use(PluginsPhrasen);
 app.directive('contrast', contrast);
 app.mount('#fhccontent');

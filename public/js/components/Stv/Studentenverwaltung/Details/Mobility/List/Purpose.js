@@ -4,7 +4,10 @@ import BsModal from "../../../../../Bootstrap/Modal.js";
 import CoreForm from '../../../../../Form/Form.js';
 import FormInput from '../../../../../Form/Input.js';
 
+import ApiStvMobility from '../../../../../../api/factory/stv/mobility.js';
+
 export default {
+	name: "MobilityPurpose",
 	components: {
 		CoreFilterCmpt,
 		BsModal,
@@ -27,28 +30,14 @@ export default {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: (url, config, params) => {
 					if (this.bisio_id) {
-						//fake params for getting api call with tabulator to run
-						const config = {
-							method: "get",
-						};
-						const params = {
-							id: this.bisio_id,
-						};
-						return this.$fhcApi.factory.stv.mobility.getPurposes('dummy', config, params)
-					}
-					else
-					{
+						return this.$api.call(ApiStvMobility.getPurposes(this.bisio_id));
+					} else {
 						// use local data
 						return new Promise((resolve) => {
 							const localData = this.localData;
 							resolve(localData);
 						});
 					}
-				},
-				ajaxParams: () => {
-					return {
-						id: this.bisio_id || "local"
-					};
 				},
 				ajaxResponse: (url, params, response) => response.data || this.localData,
 
