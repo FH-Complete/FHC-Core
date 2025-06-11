@@ -203,6 +203,8 @@ export default {
 						<span v-if="headerDataMa?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW </strong>{{headerDataMa?.telefonklappe}}</span>
 					</p>
 				</div>
+			</div>
 		</template>
+	</div>
 	`
 }

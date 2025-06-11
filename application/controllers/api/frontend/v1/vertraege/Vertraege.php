@@ -117,22 +117,15 @@ class Vertraege extends FHCAPI_Controller
 		}
 
 		$formData = $this->input->post('formData');
+		$vertragstyp_kurzbz = $formData['vertragstyp_kurzbz'] ?? null;
+		$vertragsdatum = $formData['vertragsdatum'] ?? null;
+		$bezeichnung = $formData['bezeichnung'] ?? null;
+		$betrag = $formData['betrag'] ?? null;
+		$vertragsstunden = $formData['vertragsstunden'] ?? null;
+		$vertragsstunden_studiensemester_kurzbz = $formData['vertragsstunden_studiensemester_kurzbz'] ?? null;
+		$anmerkung = $formData['anmerkung'] ?? null;
 
-		//Manually rewrite to postparameter for form validation
-		$_POST['vertragstyp_kurzbz'] = $formData['vertragstyp_kurzbz'];
-		$_POST['vertragsdatum']= $formData['vertragsdatum'];
-		$_POST['bezeichnung']= $formData['bezeichnung'];
-		$_POST['betrag'] = $formData['betrag'];
-		$_POST['vertragsstunden'] =
-			isset($formData['vertragsstunden'])
-			? $formData['vertragsstunden']
-			: null;
-		$_POST['vertragsstunden_studiensemester_kurzbz'] =
-			isset($formData['vertragsstunden_studiensemester_kurzbz'])
-				? $formData['vertragsstunden_studiensemester_kurzbz']
-				: null;
-		$_POST['anmerkung'] = isset($formData['anmerkung']) ? $formData['anmerkung'] : null;
-
+		$this->form_validation->set_data($formData);
 		$this->form_validation->set_rules('bezeichnung', 'Bezeichnung', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Bezeichnung'])
 		]);
@@ -163,13 +156,13 @@ class Vertraege extends FHCAPI_Controller
 
 		$result = $this->VertragModel->insert([
 			'person_id' => $person_id,
-			'vertragsdatum' => $this->input->post('vertragsdatum'),
-			'bezeichnung' => $this->input->post('bezeichnung'),
-			'vertragstyp_kurzbz' => $this->input->post('vertragstyp_kurzbz'),
-			'betrag' => $this->input->post('betrag'),
-			'vertragsstunden' => $this->input->post('vertragsstunden'),
-			'vertragsstunden_studiensemester_kurzbz' => $this->input->post('vertragsstunden_studiensemester_kurzbz'),
-			'anmerkung' => $this->input->post('anmerkung'),
+			'vertragsdatum' => $vertragsdatum,
+			'bezeichnung' => $bezeichnung,
+			'vertragstyp_kurzbz' => $vertragstyp_kurzbz,
+			'betrag' => $betrag,
+			'vertragsstunden' => $vertragsstunden,
+			'vertragsstunden_studiensemester_kurzbz' => $vertragsstunden_studiensemester_kurzbz,
+			'anmerkung' => $anmerkung,
 			'insertamum' => date('c'),
 			'insertvon' => getAuthUID()
 		]);
@@ -236,7 +229,6 @@ class Vertraege extends FHCAPI_Controller
 				}
 			}
 		}
-
 		$this->db->trans_complete();
 		$this->terminateWithSuccess(true);
 	}
@@ -250,21 +242,16 @@ class Vertraege extends FHCAPI_Controller
 		$formData = $this->input->post('formData');
 		$lehrauftraege = $this->input->post('clickedRows');
 
-		//Manually rewrite to postparameter for form validation
-		$_POST['vertragstyp_kurzbz'] = $formData['vertragstyp_kurzbz'];
-		$_POST['vertragsdatum']= $formData['vertragsdatum'];
-		$_POST['bezeichnung']= $formData['bezeichnung'];
-		$_POST['betrag'] = $formData['betrag'];
-		$_POST['vertragsstunden'] =
-			isset($formData['vertragsstunden'])
-				? $formData['vertragsstunden']
-				: null;
-		$_POST['vertragsstunden_studiensemester_kurzbz']=
-			isset($formData['vertragsstunden_studiensemester_kurzbz'])
-				? $formData['vertragsstunden_studiensemester_kurzbz']
-				: null;
-		$_POST['anmerkung']= isset($formData['anmerkung']) ? $formData['anmerkung'] : null;
+		$vertragstyp_kurzbz = $formData['vertragstyp_kurzbz'] ?? null;
+		$vertragsdatum = $formData['vertragsdatum'] ?? null;
+		$bezeichnung = $formData['bezeichnung'] ?? null;
+		$betrag = $formData['betrag'] ?? null;
+		$vertragsstunden = $formData['vertragsstunden'] ?? null;
+		$vertragsstunden_studiensemester_kurzbz = $formData['vertragsstunden_studiensemester_kurzbz'] ?? null;
+		$anmerkung = $formData['anmerkung'] ?? null;
 
+
+		$this->form_validation->set_data($formData);
 		$this->form_validation->set_rules('bezeichnung', 'Bezeichnung', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Bezeichnung'])
 		]);
@@ -295,13 +282,13 @@ class Vertraege extends FHCAPI_Controller
 			$vertrag_id,
 			[
 				'person_id' => $person_id,
-				'vertragsdatum' => $this->input->post('vertragsdatum'),
-				'bezeichnung' => $this->input->post('bezeichnung'),
-				'vertragstyp_kurzbz' => $this->input->post('vertragstyp_kurzbz'),
-				'betrag' => $this->input->post('betrag'),
-				'vertragsstunden' => $this->input->post('vertragsstunden'),
-				'vertragsstunden_studiensemester_kurzbz' => $this->input->post('vertragsstunden_studiensemester_kurzbz'),
-				'anmerkung' => $this->input->post('anmerkung'),
+				'vertragsdatum' => $vertragsdatum,
+				'bezeichnung' => $bezeichnung,
+				'vertragstyp_kurzbz' => $vertragstyp_kurzbz,
+				'betrag' => $betrag,
+				'vertragsstunden' => $vertragsstunden,
+				'vertragsstunden_studiensemester_kurzbz' => $vertragsstunden_studiensemester_kurzbz,
+				'anmerkung' => $anmerkung,
 				'updateamum' => date('c'),
 				'updatevon' => getAuthUID()
 			]

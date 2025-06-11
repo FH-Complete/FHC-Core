@@ -27,7 +27,6 @@ export default {
 		return {
 			person_id: null,
 			endpoint: ApiCoreVertraege
-				//<mitarbeiter-details-old :person_id="person_id"></mitarbeiter-details-old>
 		}
 	},
 	methods: {

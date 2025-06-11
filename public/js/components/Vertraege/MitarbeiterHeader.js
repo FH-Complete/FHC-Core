@@ -116,7 +116,7 @@ export default {
 				this.$refs.table.tabulator.setFilter("aktiv", "=", true);
 			}
 			else {
-				this.$refs.table.tabulator.clearFilter("aktiv");
+				this.$refs.table.tabulator.clearFilter();
 			}
 		},
 	},

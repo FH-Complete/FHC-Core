@@ -282,7 +282,8 @@ export default {
 		<div >
 			<bs-modal ref="contractStatus">
 				<template #title>
-					<p class="fw-bold mt-3">{{$p.t('vertrag', 'addStatus')}}</p>
+					<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('vertrag', 'addStatus')}}</p>
+					<p v-else class="fw-bold mt-3">{{$p.t('vertrag', 'editStatus')}}</p>
 
 				</template>
 
