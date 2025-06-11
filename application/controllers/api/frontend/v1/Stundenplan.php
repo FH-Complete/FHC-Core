@@ -82,10 +82,12 @@ class Stundenplan extends FHCAPI_Controller
 		$lv_id = $this->input->get('lv_id', TRUE);
 
 		$stundenplan_events = $this->stundenplanlib->getStundenplan($start_date,$end_date,$lv_id);
+		$stundenplan_events = $this->getDataOrTerminateWithError($stundenplan_events);
 		if( is_null($stundenplan_events) || isEmptyArray($stundenplan_events) )
 		{
 			$stundenplan_events = array();
 		}
+
 		// fetching moodle events
 		$moodle_events = [];
 		Events::trigger(

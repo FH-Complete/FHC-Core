@@ -16,6 +16,8 @@ import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMit
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../../components/Cis/Studium/Studium.js";
 
+import ApiRenderers from '../../api/factory/renderers.js';
+
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 const router = VueRouter.createRouter({
@@ -235,7 +237,8 @@ const router = VueRouter.createRouter({
 const app = Vue.createApp({
 	name: 'FhcApp',
 	data: () => ({
-		appSideMenuEntries: {}
+		appSideMenuEntries: {},
+		renderers: null,
 	}),
 	components: {},
 	computed: {
@@ -245,7 +248,8 @@ const app = Vue.createApp({
 	},
 	provide() {
 		return { // provide injectable & watchable language property
-			language: Vue.computed(() => this.$p.user_language)
+			language: Vue.computed(() => this.$p.user_language),
+			renderers: Vue.computed(() => this.renderers),
 		}	
 	},
 	methods: {
@@ -282,6 +286,28 @@ const app = Vue.createApp({
 				
 			}
 		}
+	},
+	async created(){
+		await this.$api
+			.call(ApiRenderers.loadRenderers())
+			.then(res => res.data)
+			.then(data => {
+				for (let rendertype of Object.keys(data)) {
+					
+					let modalTitle = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalTitle)));
+					let modalContent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalContent)));
+					let calendarEvent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].calendarEvent)));
+					if(this.renderers === null) {
+						this.renderers = {};
+					}
+					if (!this.renderers[rendertype]) {
+						this.renderers[rendertype] = {}
+					}
+					this.renderers[rendertype].modalTitle = modalTitle;
+					this.renderers[rendertype].modalContent = modalContent;
+					this.renderers[rendertype].calendarEvent = calendarEvent;
+				}
+			});
 	},
 	mounted() {
 		document.addEventListener('click', this.handleClick);

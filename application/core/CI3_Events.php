@@ -49,6 +49,9 @@ require_once(APPPATH.'config/Events.php');
 
 $active_addons_array = explode(";", ACTIVE_ADDONS);
 
+// Load Events from FHC core
+require_once APPPATH.'core/Events.php';
+
 foreach (scandir(APPPATH.'config/extensions') as $dir)
 	if ($dir[0] != '.' && file_exists(APPPATH.'config/extensions/'.$dir.'/Events.php'))
 		require_once APPPATH.'config/extensions/'.$dir.'/Events.php';
