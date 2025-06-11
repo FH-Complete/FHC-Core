@@ -67,8 +67,8 @@ export default {
 					<h2 class="h4">{{students[0].titlepre}} {{students[0].vorname}} {{students[0].nachname}} {{students[0].titlepost}}</h2>
 				</div>
 			</div>
-			<fhc-tabs v-if="students.length == 1" ref="tabs" :modelValue="students[0]" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
-			<fhc-tabs v-else ref="tabs" :modelValue="students" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
+			<fhc-tabs v-if="students.length == 1" ref="tabs" :useprimevue="true" :modelValue="students[0]" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
+			<fhc-tabs v-else ref="tabs" :useprimevue="true" :modelValue="students" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
 		</div>
 		<div v-else>
 			Loading...

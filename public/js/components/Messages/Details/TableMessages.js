@@ -145,7 +145,27 @@ export default {
 				dataTreeCollapseElement:"<i class='fas fa-minus-square'></i>",
 				dataTreeChildIndent: 15,
 				dataTreeStartExpanded: false,
-				persistenceID: 'core-message'
+				persistenceID: 'core-message',
+				locale: 'de',
+				"langs": {
+					"de":{ //German language definition
+						"data":{
+							"loading":"Lädt", //data loader text
+							"error":"Fehler", //data error text
+						},
+						"pagination":{
+							"first":"Erste",
+							"first_title":"Erste Seite",
+							"last":"Letzte",
+							"last_title":"Letzte Seite",
+							"prev":"Vorige",
+							"prev_title":"Vorige Seite",
+							"next":"Nächste",
+							"next_title":"Nächste Seite",
+							"all":"Alle"
+						},
+					},
+				}
 			},
 			tabulatorEvents: [
 				{
