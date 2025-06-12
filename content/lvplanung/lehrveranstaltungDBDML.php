@@ -634,6 +634,7 @@ if(!$error)
 								JOIN public.tbl_studiengang USING(studiengang_kz)
 							WHERE
 								mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
+								lower(mitarbeiter_uid) NOT LIKE '_dummy%' AND
 								studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
 								bismelden";
 
