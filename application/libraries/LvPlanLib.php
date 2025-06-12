@@ -79,9 +79,9 @@ class LvPlanLib{
 			$lvplan_data = getData($lvplan_data) ?? [];
 			$function_error = $this->expand_object_information($lvplan_data);
 			if(!is_null($function_error)){
-				return $function_error;
+				return error($function_error);
 			}
-			return $lvplan_data;
+			return success($lvplan_data);
 		} else {
 			// getting the gruppen_kurzbz of the student in the different studiensemester
 			$benutzer_gruppen = $this->fetchBenutzerGruppenFromStudiensemester($semester_range);
@@ -102,7 +102,7 @@ class LvPlanLib{
 			$lvplan_query = $this->_ci->LvPlanModel->getLvPlanQuery($start_date, $end_date, $semester_range, $benutzer_gruppen, $student_lehrverband);
 			if(!$lvplan_query)
 			{
-				return [];
+				return error([]);
 			}
 			
 			
