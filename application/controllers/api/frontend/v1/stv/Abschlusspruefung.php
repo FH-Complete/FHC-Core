@@ -224,19 +224,12 @@ class Abschlusspruefung extends FHCAPI_Controller
 
 		$formData = $this->input->post('formData');
 
-		$_POST['pruefungstyp_kurzbz'] = $formData['pruefungstyp_kurzbz'];
-		$_POST['akadgrad_id']= $formData['akadgrad_id'];
-		$_POST['vorsitz'] = isset($formData['vorsitz']['mitarbeiter_uid']) ? $formData['vorsitz']['mitarbeiter_uid'] :  $formData['vorsitz'];
-		$_POST['pruefer1'] = isset($formData['pruefer1']['person_id']) ? $formData['pruefer1']['person_id'] : $formData['pruefer1'];
-		$_POST['pruefer2'] = isset($formData['pruefer2']['person_id']) ? $formData['pruefer2']['person_id'] : $formData['pruefer2'];
-		$_POST['pruefer3'] = isset($formData['pruefer3']['person_id']) ? $formData['pruefer3']['person_id'] : $formData['pruefer3'];
-		$_POST['pruefungsantritt_kurzbz'] = $formData['pruefungsantritt_kurzbz'];
-		$_POST['abschlussbeurteilung_kurzbz'] = $formData['abschlussbeurteilung_kurzbz'];
-		$_POST['datum']= $formData['datum'];
-		$_POST['sponsion']= $formData['sponsion'];
-		$_POST['anmerkung'] = $formData['anmerkung'];
-		$_POST['protokoll']= $formData['protokoll'];
-		$_POST['note'] = $formData['note'];
+		$vorsitz = isset($formData['vorsitz']['mitarbeiter_uid']) ? $formData['vorsitz']['mitarbeiter_uid'] :  $formData['vorsitz'];
+		$pruefer1 = isset($formData['pruefer1']['person_id']) ? $formData['pruefer1']['person_id'] : $formData['pruefer1'];
+		$pruefer2 = isset($formData['pruefer2']['person_id']) ? $formData['pruefer2']['person_id'] : $formData['pruefer2'];
+		$pruefer3 = isset($formData['pruefer3']['person_id']) ? $formData['pruefer3']['person_id'] : $formData['pruefer3'];
+
+		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('pruefungstyp_kurzbz', 'Typ', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
@@ -261,19 +254,19 @@ class Abschlusspruefung extends FHCAPI_Controller
 
 		$result = $this->AbschlusspruefungModel->insert([
 			'student_uid' => $student_uid,
-			'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
-			'akadgrad_id' => $this->input->post('akadgrad_id'),
-			'vorsitz' => $this->input->post('vorsitz'),
-			'pruefungsantritt_kurzbz' => $this->input->post('pruefungsantritt_kurzbz'),
-			'abschlussbeurteilung_kurzbz' => $this->input->post('abschlussbeurteilung_kurzbz'),
-			'datum' => $this->input->post('datum'), //TODO(Manu) check if minute format like FAS
-			'sponsion' => $this->input->post('sponsion'),
-			'pruefer1' => $this->input->post('pruefer1'),
-			'pruefer2' => $this->input->post('pruefer2'),
-			'pruefer3' => $this->input->post('pruefer3'),
-			'protokoll' => $this->input->post('protokoll'),
-			'note' => $this->input->post('note'),
-			'anmerkung' => $this->input->post('anmerkung'),
+			'pruefungstyp_kurzbz' => $formData['pruefungstyp_kurzbz'],
+			'akadgrad_id' => $formData['akadgrad_id'],
+			'vorsitz' => $vorsitz,
+			'pruefungsantritt_kurzbz' => $formData['pruefungsantritt_kurzbz'],
+			'abschlussbeurteilung_kurzbz' => $formData['abschlussbeurteilung_kurzbz'],
+			'datum' => $formData['datum'], //TODO(Manu) check if minute format like FAS
+			'sponsion' => $formData['sponsion'],
+			'pruefer1' => $pruefer1,
+			'pruefer2' => $pruefer2,
+			'pruefer3' => $pruefer3,
+			'protokoll' => $formData['protokoll'],
+			'note' => $formData['note'],
+			'anmerkung' => $formData['anmerkung'],
 			'insertamum' => date('c'),
 			'insertvon' => getAuthUID()
 		]);
@@ -295,20 +288,12 @@ class Abschlusspruefung extends FHCAPI_Controller
 		}
 
 		$formData = $this->input->post('formData');
-		$_POST['student_uid'] = $formData['student_uid'];
-		$_POST['pruefungstyp_kurzbz'] = $formData['pruefungstyp_kurzbz'];
-		$_POST['akadgrad_id']= $formData['akadgrad_id'];
-		$_POST['vorsitz'] =  isset($formData['vorsitz']['mitarbeiter_uid']) ? $formData['vorsitz']['mitarbeiter_uid'] :  $formData['vorsitz'];
-		$_POST['pruefer1'] = isset($formData['pruefer1']['person_id']) ? $formData['pruefer1']['person_id'] : $formData['pruefer1'];
-		$_POST['pruefer2'] = isset($formData['pruefer2']['person_id']) ? $formData['pruefer2']['person_id'] : $formData['pruefer2'];
-		$_POST['pruefer3'] = isset($formData['pruefer3']['person_id']) ? $formData['pruefer3']['person_id'] : $formData['pruefer3'];
-		$_POST['pruefungsantritt_kurzbz'] = $formData['pruefungsantritt_kurzbz'];
-		$_POST['abschlussbeurteilung_kurzbz'] = $formData['abschlussbeurteilung_kurzbz'];
-		$_POST['datum']= $formData['datum'];
-		$_POST['sponsion']= $formData['sponsion'];
-		$_POST['anmerkung'] = $formData['anmerkung'];
-		$_POST['protokoll']= $formData['protokoll'];
-		$_POST['note'] = $formData['note'];
+		$vorsitz = isset($formData['vorsitz']['mitarbeiter_uid']) ? $formData['vorsitz']['mitarbeiter_uid'] :  $formData['vorsitz'];
+		$pruefer1 = isset($formData['pruefer1']['person_id']) ? $formData['pruefer1']['person_id'] : $formData['pruefer1'];
+		$pruefer2 = isset($formData['pruefer2']['person_id']) ? $formData['pruefer2']['person_id'] : $formData['pruefer2'];
+		$pruefer3 = isset($formData['pruefer3']['person_id']) ? $formData['pruefer3']['person_id'] : $formData['pruefer3'];
+
+		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('pruefungstyp_kurzbz', 'Typ', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
@@ -337,20 +322,20 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'abschlusspruefung_id' => $abschlusspruefung_id
 			],
 			[
-			'student_uid' => $this->input->post('student_uid'),
-			'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
-			'akadgrad_id' => $this->input->post('akadgrad_id'),
-			'vorsitz' => $this->input->post('vorsitz'),
-			'pruefungsantritt_kurzbz' => $this->input->post('pruefungsantritt_kurzbz'),
-			'abschlussbeurteilung_kurzbz' => $this->input->post('abschlussbeurteilung_kurzbz'),
-			'datum' => $this->input->post('datum'),
-			'sponsion' => $this->input->post('sponsion'),
-			'pruefer1' => $this->input->post('pruefer1'),
-			'pruefer2' => $this->input->post('pruefer2'),
-			'pruefer3' => $this->input->post('pruefer3'),
-			'protokoll' => $this->input->post('protokoll'),
-			'note' => $this->input->post('note'),
-			'anmerkung' => $this->input->post('anmerkung'),
+			'student_uid' => $formData['student_uid'],
+			'pruefungstyp_kurzbz' => $formData['pruefungstyp_kurzbz'],
+			'akadgrad_id' => $formData['akadgrad_id'],
+			'vorsitz' => $vorsitz,
+			'pruefungsantritt_kurzbz' => $formData['pruefungsantritt_kurzbz'],
+			'abschlussbeurteilung_kurzbz' => $formData['abschlussbeurteilung_kurzbz'],
+			'datum' => $formData['datum'],
+			'sponsion' => $formData['sponsion'],
+			'pruefer1' => $pruefer1,
+			'pruefer2' => $pruefer2,
+			'pruefer3' => $pruefer3,
+			'protokoll' => $formData['protokoll'],
+			'note' => $formData['note'],
+			'anmerkung' => $formData['anmerkung'],
 			'insertamum' => date('c'),
 			'insertvon' => getAuthUID()
 			]

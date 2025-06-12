@@ -137,14 +137,16 @@ class GemeinsameStudien extends FHCAPI_Controller
 		}
 
 		$formData = $this->input->post('formData');
-		$_POST['ausbildungssemester'] = (isset($formData['ausbildungssemester']) && !empty($formData['ausbildungssemester']))
+		$ausbildungssemester = (isset($formData['ausbildungssemester']) && !empty($formData['ausbildungssemester']))
 			? $formData['ausbildungssemester']
 			: null;
-		$_POST['mobilitaetstyp_kurzbz'] = (isset($formData['mobilitaetstyp_kurzbz']) && !empty($formData['mobilitaetstyp_kurzbz']))
+		$mobilitaetstyp_kurzbz = (isset($formData['mobilitaetstyp_kurzbz']) && !empty($formData['mobilitaetstyp_kurzbz']))
 			? $formData['mobilitaetstyp_kurzbz']
 			: null;
-		$_POST['studiensemester_kurzbz'] = (isset($formData['studiensemester_kurzbz']) && !empty($formData['studiensemester_kurzbz']))
+		$studiensemester_kurzbz = (isset($formData['studiensemester_kurzbz']) && !empty($formData['studiensemester_kurzbz']))
 			? $formData['studiensemester_kurzbz'] : null;
+
+		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('mobilitaetstyp_kurzbz', 'Typ', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
@@ -177,13 +179,13 @@ class GemeinsameStudien extends FHCAPI_Controller
 
 		$result = $this->MobilitaetModel->insert([
 			'prestudent_id' => $prestudent_id,
-			'mobilitaetstyp_kurzbz' => $_POST['mobilitaetstyp_kurzbz'],
+			'mobilitaetstyp_kurzbz' =>$mobilitaetstyp_kurzbz,
 			'status_kurzbz' => $status_kurzbz,
-			'studiensemester_kurzbz' => $_POST['studiensemester_kurzbz'],
+			'studiensemester_kurzbz' =>$studiensemester_kurzbz,
 			'mobilitaetsprogramm_code' => $mobilitaetsprogramm_code,
 			'gsprogramm_id' => $gsprogramm_id,
 			'firma_id' => $firma_id,
-			'ausbildungssemester' => $_POST['ausbildungssemester'],
+			'ausbildungssemester' =>$ausbildungssemester,
 			'insertvon' => $authUID,
 			'insertamum' => date('c'),
 		]);
@@ -205,18 +207,20 @@ class GemeinsameStudien extends FHCAPI_Controller
 
 		$formData = $this->input->post('formData');
 
-		$_POST['mobilitaet_id'] = (isset($formData['mobilitaet_id']) && !empty($formData['mobilitaet_id']))
+		$mobilitaet_id = (isset($formData['mobilitaet_id']) && !empty($formData['mobilitaet_id']))
 			? $formData['mobilitaet_id'] :
 			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Mobilitaet ID']), self::ERROR_TYPE_GENERAL);
-		$_POST['ausbildungssemester'] = (isset($formData['ausbildungssemester']) && !empty($formData['ausbildungssemester']))
+		$ausbildungssemester = (isset($formData['ausbildungssemester']) && !empty($formData['ausbildungssemester']))
 			? $formData['ausbildungssemester']
 			: null;
-		$_POST['mobilitaetstyp_kurzbz'] = (isset($formData['mobilitaetstyp_kurzbz']) && !empty($formData['mobilitaetstyp_kurzbz']))
+		$mobilitaetstyp_kurzbz = (isset($formData['mobilitaetstyp_kurzbz']) && !empty($formData['mobilitaetstyp_kurzbz']))
 			? $formData['mobilitaetstyp_kurzbz']
 			: null;
-		$_POST['studiensemester_kurzbz'] = (isset($formData['studiensemester_kurzbz']) && !empty($formData['studiensemester_kurzbz']))
+		$studiensemester_kurzbz = (isset($formData['studiensemester_kurzbz']) && !empty($formData['studiensemester_kurzbz']))
 			? $formData['studiensemester_kurzbz']
 			: null;
+
+		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('mobilitaetstyp_kurzbz', 'Typ', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
@@ -247,17 +251,17 @@ class GemeinsameStudien extends FHCAPI_Controller
 
 		$result = $this->MobilitaetModel->update(
 			[
-				'mobilitaet_id' => $_POST['mobilitaet_id'],
+				'mobilitaet_id' => $mobilitaet_id,
 			],
 			[
 				'prestudent_id' => $prestudent_id,
-				'mobilitaetstyp_kurzbz' => $_POST['mobilitaetstyp_kurzbz'],
+				'mobilitaetstyp_kurzbz' => $mobilitaetstyp_kurzbz,
 				'status_kurzbz' => $status_kurzbz,
-				'studiensemester_kurzbz' => $_POST['studiensemester_kurzbz'],
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'mobilitaetsprogramm_code' => $mobilitaetsprogramm_code,
 				'gsprogramm_id' => $gsprogramm_id,
 				'firma_id' => $firma_id,
-				'ausbildungssemester' => $_POST['ausbildungssemester'],
+				'ausbildungssemester' => $ausbildungssemester,
 				'updatevon' => $authUID,
 				'updateamum' => date('c'),
 			]

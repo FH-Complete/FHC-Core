@@ -61,12 +61,13 @@ class Aufnahmetermine extends FHCAPI_Controller
 		}
 
 
+		$rt_id =	(isset($formData['rt_id']) && !empty($formData['rt_id'])) ? $formData['rt_id'] : null;
+		$anmeldedatum =	(isset($formData['anmeldedatum']) && !empty($formData['anmeldedatum'])) ? $formData['anmeldedatum'] : null;
+		$teilgenommen =	(isset($formData['teilgenommen']) && !empty($formData['teilgenommen'])) ? $formData['teilgenommen'] : false;
+		$studienplan_id = (isset($formData['studienplan_id']) && !empty($formData['studienplan_id'])) ? $formData['studienplan_id'] : null;
+		$punkte = (isset($formData['punkte']) && !empty($formData['punkte'])) ? $formData['punkte'] : null;
 
-		$_POST['rt_id'] =	(isset($formData['rt_id']) && !empty($formData['rt_id'])) ? $formData['rt_id'] : null;
-		$_POST['anmeldedatum'] =	(isset($formData['anmeldedatum']) && !empty($formData['anmeldedatum'])) ? $formData['anmeldedatum'] : null;
-		$_POST['teilgenommen'] =	(isset($formData['teilgenommen']) && !empty($formData['teilgenommen'])) ? $formData['teilgenommen'] : false;
-		$_POST['studienplan_id'] = (isset($formData['studienplan_id']) && !empty($formData['studienplan_id'])) ? $formData['studienplan_id'] : null;
-		$_POST['punkte'] = (isset($formData['punkte']) && !empty($formData['punkte'])) ? $formData['punkte'] : null;
+		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('punkte', 'Punkte', 'numeric', [
 			'required' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Punkte'])
@@ -90,11 +91,11 @@ class Aufnahmetermine extends FHCAPI_Controller
 
 		$result = $this->RtPersonModel->insert([
 			'person_id' => $person_id,
-			'rt_id' => $_POST['rt_id'],
-			'anmeldedatum' => $_POST['anmeldedatum'],
-			'teilgenommen' => $_POST['teilgenommen'],
-			'studienplan_id' => $_POST['studienplan_id'],
-			'punkte' => $_POST['punkte'],
+			'rt_id' => $rt_id,
+			'anmeldedatum' => $anmeldedatum,
+			'teilgenommen' => $teilgenommen,
+			'studienplan_id' => $studienplan_id,
+			'punkte' => $punkte,
 			'insertamum' => date('c'),
 			'insertvon' => $authUID,
 		]);
@@ -133,12 +134,13 @@ class Aufnahmetermine extends FHCAPI_Controller
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'RT_Person ID']), self::ERROR_TYPE_GENERAL);
 		}
 
+		$rt_id =	(isset($formData['rt_id']) && !empty($formData['rt_id'])) ? $formData['rt_id'] : null;
+		$anmeldedatum =	(isset($formData['anmeldedatum']) && !empty($formData['anmeldedatum'])) ? $formData['anmeldedatum'] : null;
+		$teilgenommen =	(isset($formData['teilgenommen']) && !empty($formData['teilgenommen'])) ? $formData['teilgenommen'] : false;
+		$studienplan_id = (isset($formData['studienplan_id']) && !empty($formData['studienplan_id'])) ? $formData['studienplan_id'] : null;
+		$punkte = (isset($formData['punkte']) && !empty($formData['punkte'])) ? $formData['punkte'] : null;
 
-		$_POST['rt_id'] =	(isset($formData['rt_id']) && !empty($formData['rt_id'])) ? $formData['rt_id'] : null;
-		$_POST['anmeldedatum'] =	(isset($formData['anmeldedatum']) && !empty($formData['anmeldedatum'])) ? $formData['anmeldedatum'] : null;
-		$_POST['teilgenommen'] =	(isset($formData['teilgenommen']) && !empty($formData['teilgenommen'])) ? $formData['teilgenommen'] : false;
-		$_POST['studienplan_id'] = (isset($formData['studienplan_id']) && !empty($formData['studienplan_id'])) ? $formData['studienplan_id'] : null;
-		$_POST['punkte'] = (isset($formData['punkte']) && !empty($formData['punkte'])) ? $formData['punkte'] : null;
+		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('punkte', 'Punkte', 'numeric', [
 			'required' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Punkte'])
@@ -166,11 +168,11 @@ class Aufnahmetermine extends FHCAPI_Controller
 				'person_id' => $person_id,
 			],
 			[
-				'rt_id' => $_POST['rt_id'],
-				'anmeldedatum' => $_POST['anmeldedatum'],
-				'teilgenommen' => $_POST['teilgenommen'],
-				'studienplan_id' => $_POST['studienplan_id'],
-				'punkte' => $_POST['punkte'],
+				'rt_id' => $rt_id,
+				'anmeldedatum' => $anmeldedatum,
+				'teilgenommen' => $teilgenommen,
+				'studienplan_id' => $studienplan_id,
+				'punkte' => $punkte,
 				'insertamum' => date('c'),
 				'insertvon' => $authUID,
 			]
@@ -280,18 +282,20 @@ class Aufnahmetermine extends FHCAPI_Controller
 		{
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Prestudent ID']), self::ERROR_TYPE_GENERAL);
 		}
-		$_POST['rt_gesamtpunkte'] =
+		$rt_gesamtpunkte =
 			(isset($formData['rt_gesamtpunkte']) && !empty($formData['rt_gesamtpunkte']))
 				? $formData['rt_gesamtpunkte']
 				: null;
-		$_POST['reihungstestangetreten'] =
+		$reihungstestangetreten =
 			(isset($formData['reihungstestangetreten']) && !empty($formData['reihungstestangetreten']))
 				? $formData['reihungstestangetreten']
 				: null;
-		$_POST['aufnahmegruppe_kurzbz'] =
+		$aufnahmegruppe_kurzbz =
 			(isset($formData['aufnahmegruppe_kurzbz']) && !empty($formData['aufnahmegruppe_kurzbz']))
 				? $formData['aufnahmegruppe_kurzbz']
 				: null;
+
+		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('rt_gesamtpunkte', 'Rt_gesamtpunkte', 'numeric', [
 			'required' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Rt_gesamtpunkte'])
@@ -309,9 +313,9 @@ class Aufnahmetermine extends FHCAPI_Controller
 				'prestudent_id' => $prestudent_id,
 			],
 			[
-				'reihungstestangetreten' => $_POST['reihungstestangetreten'],
-				'rt_gesamtpunkte' => $_POST['rt_gesamtpunkte'],
-				'aufnahmegruppe_kurzbz' => $_POST['aufnahmegruppe_kurzbz'],
+				'reihungstestangetreten' => $reihungstestangetreten,
+				'rt_gesamtpunkte' => $rt_gesamtpunkte,
+				'aufnahmegruppe_kurzbz' => $aufnahmegruppe_kurzbz,
 				'updateamum' => date('c'),
 				'updatevon' => $authUID,
 			]
