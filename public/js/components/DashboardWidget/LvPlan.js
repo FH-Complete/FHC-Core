@@ -4,7 +4,6 @@ import FhcCalendar from '../Calendar/Calendar.js';
 import LvModal from '../Cis/Mylv/LvModal.js';
 import ContentModal from '../Cis/Cms/ContentModal.js'
 import CalendarDate from '../../composables/CalendarDate.js';
-import moodleSvg from "../../helpers/moodleSVG.js"
 
 import ApiLvPlan from '../../api/factory/lvPlan.js';
 import ApiOrt from '../../api/factory/ort.js';
@@ -18,8 +17,7 @@ export default {
 	components: {
 		FhcCalendar,
 		LvModal,
-		ContentModal,
-		moodleSvg
+		ContentModal
 	},
 	
 	data() {
