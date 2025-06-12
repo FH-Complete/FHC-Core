@@ -193,6 +193,9 @@ export default {
 							title: this.$p.t('notiz', 'verfasser'),
 							visible: this.showVariables.showVerfasser
 						});
+						cm.getColumnByField('verfasser_uid').component.updateDefinition({
+							title: this.$p.t('ui', 'verfasser_uid'),
+						});
 						cm.getColumnByField('titel').component.updateDefinition({
 							title: this.$p.t('global', 'titel'),
 							//visible: this.showVariables.showTitel
@@ -204,6 +207,9 @@ export default {
 						cm.getColumnByField('bearbeiter').component.updateDefinition({
 							title: this.$p.t('notiz', 'bearbeiter'),
 							visible: this.showVariables.showBearbeiter
+						});
+						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
+							title: this.$p.t('ui', 'bearbeiter_uid'),
 						});
 						cm.getColumnByField('start_format').component.updateDefinition({
 							title: this.$p.t('global', 'gueltigVon'),
