@@ -716,14 +716,14 @@ class Studiengang_model extends DB_Model
 			return $gf_ltg;
 		$gf_ltg = getData($gf_ltg) ?: [];
 		$addEmailProperty($gf_ltg);
-		$addFotoProperty($stg_ltg);
+		$addFotoProperty($gf_ltg);
 
 		$stv_ltg = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('stvLtg', $stg_obj->oe_kurzbz);
 		if (isError($stv_ltg))
 			return $stv_ltg;
 		$stv_ltg = getData($stv_ltg) ?: [];
 		$addEmailProperty($stv_ltg);
-		$addFotoProperty($stg_ltg);
+		$addFotoProperty($stv_ltg);
 
 		$ass = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('ass', $stg_obj->oe_kurzbz);
 		if (isError($ass))
