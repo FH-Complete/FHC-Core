@@ -283,7 +283,7 @@ export default {
 					.then(res => res.data)
 					.then(studiensemester_kurzbz => this.$api.call(
 						ApiAddons.getLvMenu(
-							event.lehreinheit_id,
+							event.lehrveranstaltung_id,
 							studiensemester_kurzbz
 						)
 					))

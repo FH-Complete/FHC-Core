@@ -294,7 +294,6 @@ const LvPlan = {
 	template:/*html*/`
 	<template v-if="renderers">
 	<h2>
-		{{JSON.stringify(isShowModal,null,2)}}
 		{{$p.t('lehre/stundenplan')}}
 		<span style="padding-left: 0.4em;" v-show="studiensemester_kurzbz">{{studiensemester_kurzbz}}</span>
 		<span style="padding-left: 0.5em;" v-show="propsViewData?.lv_id && lv"> {{ $p.user_language.value === 'German' ? lv?.bezeichnung : lv?.bezeichnung_english}}</span>
