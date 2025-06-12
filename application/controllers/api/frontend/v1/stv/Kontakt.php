@@ -46,6 +46,7 @@ class Kontakt extends FHCAPI_Controller
 		$this->load->model('organisation/standort_model', 'StandortModel');
 		$this->load->model('ressource/firma_model', 'FirmaModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
+		$this->load->model('person/Kontakttyp_model', 'KontakttypModel');
 
 		// Extra Permissionchecks
 		$permsMa = [];
@@ -443,8 +444,10 @@ class Kontakt extends FHCAPI_Controller
 				THEN public.tbl_kontakt.updateamum
 				ELSE public.tbl_kontakt.insertamum
 			END) AS lastUpdate, st.bezeichnung, f.name");
+		$this->KontakttypModel->addSelect("kt.beschreibung as kontakttypbeschreibung");
 		$this->StandortModel->addJoin('public.tbl_standort st', 'ON (public.tbl_kontakt.standort_id = st.standort_id)', 'LEFT');
 		$this->FirmaModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = st.firma_id)', 'LEFT');
+		$this->KontakttypModel->addJoin('public.tbl_kontakttyp kt', 'ON (public.tbl_kontakt.kontakttyp = kt.kontakttyp)');
 		$result = $this->KontaktModel->loadWhere(
 			array('person_id' => $person_id)
 		);
@@ -594,8 +597,8 @@ class Kontakt extends FHCAPI_Controller
 				'anmerkung' => $anmerkung,
 				'kontakt' => $kontakt,
 				'zustellung' => $_POST['zustellung'],
-				'insertvon' => 	$uid,
-				'insertamum' => date('c'),
+				'updatevon' => $uid,
+				'updateamum' => date('c'),
 				'standort_id' => $standort_id,
 				'ext_id' => $ext_id
 			]
