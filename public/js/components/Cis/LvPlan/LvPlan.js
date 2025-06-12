@@ -3,7 +3,7 @@ import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
 import LvMenu from "../Mylv/LvMenu.js"
 import lehreinheitEvent from "./EventTypes/calendarEvent.js"
-
+import LvInfo from '../Mylv/LvInfo.js';
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
@@ -73,7 +73,7 @@ const LvPlan = {
 		}
 	},
 	components: {
-		FhcCalendar, LvModal, LvMenu, lehreinheitEvent, 
+		FhcCalendar, LvModal, LvMenu, lehreinheitEvent, LvInfo
 	},
 	computed:{
 		
