@@ -39,7 +39,7 @@ class Studium extends FHCAPI_Controller
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->load->model('organisation/Studienordnung_model','StudienordnungModel');
 		$this->load->model('organisation/Studiensemester_model',"StudiensemesterModel");
-		$this->load->model('organisation/Studienplan_model', 'LvPlanModel');
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 		$this->load->model('codex/Orgform_model','OrgformModel');
@@ -143,8 +143,8 @@ class Studium extends FHCAPI_Controller
 		if(!$aktuelles_studienplan){
 			$aktuelles_studienplan = null;
 		}
-		if(isset($parameter_studienplan) && !empty(array_filter( $semester_studienplan, function($lvplan) use($parameter_studienplan){
-			return $lvplan->studienplan_id == $parameter_studienplan->studienplan_id;
+		if(isset($parameter_studienplan) && !empty(array_filter( $semester_studienplan, function($studienplan) use($parameter_studienplan){
+			return $studienplan->studienplan_id == $parameter_studienplan->studienplan_id;
 		}))){
 			$aktuelles_studienplan = $parameter_studienplan ;
 		}
