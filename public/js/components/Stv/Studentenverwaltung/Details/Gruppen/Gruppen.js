@@ -23,13 +23,19 @@ export default {
 					ApiStvGroups.getGruppen(this.student.uid)
 				),
 				ajaxResponse: (url, params, response) => response.data,
-				initialFilter: [
-					{field: "uid", type: "=", value: this.student.uid},
-					[
-						{field: "studiensemester_kurzbz", type: "=", value: this.currentSemester},
-						{field: "studiensemester_kurzbz", type: "=", value: null}
+				initialFilter: {
+					logic: "and",
+					filters: [
+						{ field: "uid", operator: "eq", value: this.student.uid },
+						{
+							logic: "or",
+							filters: [
+								{ field: "studiensemester_kurzbz", operator: "eq", value: null },
+								{ field: "studiensemester_kurzbz", operator: "eq", value: this.currentSemester }
+							]
+						}
 					]
-				],
+				},
 				columns: [
 					{title: "Gruppe", field: "gruppe_kurzbz"},
 					{title: "Bezeichnung", field: "bezeichnung"},
@@ -146,18 +152,17 @@ export default {
 	watch: {
 		currentSemester(newVal) {
 			if (newVal) {
-
 				this.$refs.table.tabulator.clearFilter(); // Clear old filters
 
-				this.$refs.table.tabulator.setFilter([
-					{field: "uid", type: "=", value: this.student.uid},
-					[
-						{field: "studiensemester_kurzbz", type: "=", value: newVal},
-						{field: "studiensemester_kurzbz", type: "=", value: null}
-					]
-				]);
-
-
+				this.$refs.table.tabulator.setFilter((data) => {
+					return (
+						data.uid === this.student.uid &&
+						(
+							data.studiensemester_kurzbz === newVal ||
+							data.studiensemester_kurzbz === null
+						)
+					);
+				});
 			}
 		},
 		student() {
