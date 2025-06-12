@@ -775,3 +775,9 @@ html {
 .abgabe-zieldatum-border-green .abgabe-zieldatum-overlay {
 	color: green;
 }
+
+.stgkontaktinfo {
+	display: grid;
+	grid-template-columns: 25px auto;
+	word-wrap: anywhere;
+}

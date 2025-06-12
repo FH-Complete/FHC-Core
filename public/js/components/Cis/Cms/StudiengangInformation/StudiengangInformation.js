@@ -30,7 +30,7 @@ components:{
 template:/*html*/`
 		<div id="fhc-studiengang-informationen">
 		<template v-if="studiengang?.bezeichnung && semester">
-			<div class="card card-body mb-3">
+			<div class="card card-body mb-3 border-0">
 				<div class="mb-1">
 					<h2 class="h4 mb-1 pb-0">{{$p.t('lehre','studiengang')}}:</h2>
 					<span class="mb-1">{{studiengang?.bezeichnung}}</span>

@@ -5,7 +5,7 @@ export default {
 		showBezeichnung:Boolean,
 	},
 	template:/*html*/`
-	<div class="card mb-3">
+	<div class="card mb-3 border-0">
 		<div class="card-header">
 			<span>{{title}}</span>
 		</div>
