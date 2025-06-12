@@ -28,7 +28,7 @@ $this->load->view('templates/FHC-Header', $includesArray);
 <header id="cis-header" class="navbar-dark">
 	<cis-menu 
 		root-url="<?= site_url(''); ?>" 
-		logo-url="<?= base_url('/public/images/logo-300x160.png'); ?>" 
+		logo-url="<?= base_url($this->config->item('theme_logo')); ?>" 
 		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" 
 		logout-url="<?= site_url('Cis/Auth/logout'); ?>"
 		:searchbaroptions="searchbaroptions" 

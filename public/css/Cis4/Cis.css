@@ -781,3 +781,7 @@ html {
 	grid-template-columns: 25px auto;
 	word-wrap: anywhere;
 }
+
+.mylv-semester-studiengang-lv .card-header {
+	min-height: 55px;
+}

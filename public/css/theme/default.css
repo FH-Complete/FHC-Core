@@ -35,8 +35,8 @@
 	--fhc-blue-40: #61aed8;
 	--fhc-blue-50: #00507e;
 
-	--fhc-blue-primary: #00649c;
-	--fhc-blue-primary-highlight: #005585;
+	--fhc-blue-primary: #006095;
+	--fhc-blue-primary-highlight: #0086CB;
 
 	--fhc-red-10: #842029;
 	--fhc-red-20: #800000;
@@ -54,8 +54,8 @@
 
 
 	/* fhc base colors */
-	--fhc-primary: var(--fhc-blue-20);
-	--fhc-primary-highlight: var(--fhc-blue-40);
+	--fhc-primary: var(--fhc-blue-primary);
+	--fhc-primary-highlight: var(--fhc-blue-primary-highlight);
 
 	--fhc-secondary: var(--fhc-white-20);
 	--fhc-secondary-highlight: var(--fhc-white-40);
@@ -97,14 +97,14 @@
 	--fhc-dark: var(--fhc-black-30);
 	--fhc-light: var(--fhc-white-50);
 
-
+	--fhc-cis-menu-lvl-1-color: var(--fhc-white-50);
 }
 
 :root.dark {
 
 	/* fhc base colors */
-	--fhc-primary: var(--fhc-blue-primary-highlight);
-	--fhc-primary-highlight: var(--fhc-blue-primary);
+	--fhc-primary: var(--fhc-blue-primary);
+	--fhc-primary-highlight: var(--fhc-blue-primary-highlight);
 
 	--fhc-secondary: var(--fhc-black-50);
 	--fhc-secondary-highlight: var(--fhc-black-70);
