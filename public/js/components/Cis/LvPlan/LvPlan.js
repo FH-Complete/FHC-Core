@@ -28,6 +28,7 @@ const LvPlan = {
 			renderComponents: {},
 			isModalContentResolved: false,
 			isModalTitleResolved: false,
+			isShowModal: false,
 		}
 	},
 	props: {
@@ -50,7 +51,17 @@ const LvPlan = {
 	},
 	inject:["renderers"],
 	watch: {
-		
+		modalLoaded:{
+			handler: function (newValue) {
+				if (this.isShowModal && newValue.isModalContentResolved && newValue.isModalTitleResolved) {
+					this.$nextTick(() => {
+						if(this.$refs.lvmodal) this.$refs.lvmodal.show();
+						this.isShowModal = false;
+					});
+				}
+			}, 
+			immediate: true
+		},
 		weekFirstDay: {
 			handler: async function (newValue) {
 				let data = await this.fetchStudiensemesterDetails(newValue);
@@ -76,6 +87,9 @@ const LvPlan = {
 		FhcCalendar, LvModal, LvMenu, lehreinheitEvent, LvInfo
 	},
 	computed:{
+		modalLoaded: function(){
+			return { isModalContentResolved: this.isModalContentResolved, isModalTitleResolved:this.isModalTitleResolved};
+		},
 		
 		downloadLinks: function(){
 			if(!this.studiensemester_start || !this.studiensemester_ende || !this.uid )return;
@@ -112,19 +126,11 @@ const LvPlan = {
 	methods:{
 		modalTitleResolved: function () {
 			this.isModalTitleResolved = true;
-			if(this.isModalContentResolved && this.isModalTitleResolved)
-				Vue.nextTick(() => {
-					if(this.$refs.lvmodal) 
-						this.$refs.lvmodal.show();
-				});
+			
 		},
 		modalContentResolved: function () {
 			this.isModalContentResolved = true;
-			if (this.isModalContentResolved && this.isModalTitleResolved)
-				Vue.nextTick(() => {
-					if (this.$refs.lvmodal)
-						this.$refs.lvmodal.show();
-				});
+			
 		},
 		// component renderers fetches from different addons
 		modalTitleComponent(type){
@@ -203,8 +209,12 @@ const LvPlan = {
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
-			this.isModalTitleResolved = false;
-			this.isModalContentResolved = false;
+			if(this.isModalContentResolved && this.isModalTitleResolved){
+				if(this.$refs.lvmodal) this.$refs.lvmodal.show();
+			} 
+			else{
+				this.isShowModal = true;
+			} 
 		},
 		updateRange: function ({start,end, mounted}) {
 			let checkDate = (date) => {
@@ -284,6 +294,7 @@ const LvPlan = {
 	template:/*html*/`
 	<template v-if="renderers">
 	<h2>
+		{{JSON.stringify(isShowModal,null,2)}}
 		{{$p.t('lehre/stundenplan')}}
 		<span style="padding-left: 0.4em;" v-show="studiensemester_kurzbz">{{studiensemester_kurzbz}}</span>
 		<span style="padding-left: 0.5em;" v-show="propsViewData?.lv_id && lv"> {{ $p.user_language.value === 'German' ? lv?.bezeichnung : lv?.bezeichnung_english}}</span>
@@ -291,12 +302,12 @@ const LvPlan = {
 	<hr>
 	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" >
 		<template #modalTitle>
-		<Suspense @resolve="modalTitleResolved">
+		<Suspense @pending="isModalTitleResolved=false" @resolve="modalTitleResolved">
 			<component :is="modalTitleComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
 		</Suspense>
 		</template>
 		<template #modalContent>
-		<Suspense @resolve="modalContentResolved">
+		<Suspense @pending="isModalContentResolved=false" @resolve="modalContentResolved">
 			<component :is="modalContentComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
 		</Suspense>
 		</template>
