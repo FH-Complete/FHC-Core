@@ -15,15 +15,13 @@ export default {
 		defaultSemester: {
 			from: 'defaultSemester'
 		}
-		//~ cisRoot: {
-			//~ from: 'cisRoot'
-		//~ },
 		//~ config: {
 			//~ from: 'config',
 			//~ required: true
 		//~ }
 	},
 	computed: {
+		// prepared Lehreinheiten (with compound Bezeichnung)
 		arrLes() {
 			let lehreinheiten = [];
 			if (this.formData.lehrveranstaltung_id) {
@@ -133,7 +131,6 @@ export default {
 						//~ //this.$fhcAlert.handleSystemError(promise_result);
 					//~ }
 					//~ //let data = promise_result.value.data;
-					//~ console.log(promise_result.status);
 				//~ });
 
 				//~ if (!hasError) {
@@ -214,6 +211,7 @@ export default {
 		lvChanged(event) {
 			this.formData.lehreinheit_id = null;
 		},
+		// enrich and modify data before sending
 		getPreparedFormData() {
 			let preparedFormData = JSON.parse(JSON.stringify(this.formData)); // deep copy
 

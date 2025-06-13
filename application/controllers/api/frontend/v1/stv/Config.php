@@ -127,7 +127,11 @@ class Config extends FHCAPI_Controller
 		$result['projektarbeit'] = [
 			'title' => $this->p->t('stv', 'tab_projektarbeit'),
 			'component' => './Stv/Studentenverwaltung/Details/Projektarbeit.js',
-			'config' => $config['projektarbeit']
+			'config' => array_merge(
+				$config['projektarbeit'],
+				['showVertragsdetails' =>
+					defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN]
+			)
 		];
 
 		$result['mobility'] = [

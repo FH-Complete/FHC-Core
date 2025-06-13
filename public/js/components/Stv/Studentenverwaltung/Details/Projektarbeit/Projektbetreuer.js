@@ -5,6 +5,7 @@ import FormInput from '../../../../Form/Input.js';
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import NewPerson from "../../List/New.js";
 import Contact from "../Kontakt/Contact.js";
+import Vertrag from "./Vertrag.js";
 
 import ApiStvProjektbetreuer from '../../../../../api/factory/stv/projektbetreuer.js';
 
@@ -16,9 +17,13 @@ export default {
 		FormInput,
 		PvAutoComplete,
 		NewPerson,
-		Contact
+		Contact,
+		Vertrag
 	},
-	inject: {
+	provide() {
+		return {
+			configShowVertragsdetails: this.config.showVertragsdetails
+		}
 	},
 	computed: {
 		betreuerFormOpened() {
@@ -107,13 +112,13 @@ export default {
 			initialFormData: null,
 			defaultFormDataValues: {stunden: null, stundensatz: null},
 			projektarbeit_id: null,
-			statusNew: true,
 			editedBetreuerIdx: -1,
 			arrBetreuerart: [],
 			arrNoten: [],
 			filteredBetreuer: [],
 			autocompleteSelectedBetreuer: null,
-			projektarbeitDownload: null,
+			beurteilungDownloadLink: null,
+			vertragFieldsDisabled: false,
 			abortController: {
 				betreuer: null
 			}
@@ -122,19 +127,19 @@ export default {
 	methods: {
 		actionNewProjektbetreuer() {
 			this.resetForm();
-			this.statusNew = true;
 			this.newMode = !this.newMode;
 			this.editMode = false;
 			this.captureFormData();
 		},
 		actionEditProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz) {
-
-			this.statusNew = false;
 			this.editMode = true;
+			this.newMode = false;
 			this.$api
 				.call(ApiStvProjektbetreuer.getDefaultStundensaetze(person_id, this.studiensemester_kurzbz))
 				.then(result => {
 					this.resetForm();
+
+					// get betreuer from tabulator list
 					let projektbetreuerListe = this.$refs.projektbetreuerTable.tabulator.getData();
 					const idx = projektbetreuerListe.findIndex(
 							betr =>
@@ -144,18 +149,29 @@ export default {
 						);
 
 					let betreuer = [];
-					if (idx >= 0) {
+					if (idx >= 0) { // if betreuer found
 						betreuer = projektbetreuerListe[idx];
+
+						// set currently edited betreuera
 						this.formData = betreuer;
-						if (betreuer.projektarbeitDownload) this.projektarbeitDownload = betreuer.projektarbeitDownload
+
+						// set download link
+						if (betreuer.beurteilungDownloadLink) this.beurteilungDownloadLink = betreuer.beurteilungDownloadLink
+
+						// set betreuer for autocomplete field
 						this.autocompleteSelectedBetreuer = {
 							person_id: this.formData.person_id,
 							name: this.formData.name,
 							vorname: this.formData.vorname,
-							nachname: this.formData.nachname
+							nachname: this.formData.nachname,
+							vertrag_id: this.formData.vertrag_id
 						};
 					}
+
+					// set default stundensatz (if no other is set yet)
 					if (this.formData.stundensatz == null) this.formData.stundensatz = result.data;
+
+					// capture initial form data for detecting changes
 					this.captureFormData();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -167,10 +183,12 @@ export default {
 					? {projektarbeit_id, person_id, betreuerart_kurzbz}
 					: Promise.reject({handled: true}))
 				.then(result => {
-					return this.deleteProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz)
+					return this.$api
+						.call(ApiStvProjektbetreuer.deleteProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz))
 				})
 				.then(result => {
 					this.$refs.projektbetreuerTable.tabulator.deleteRow(betreuer_id);
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -178,9 +196,12 @@ export default {
 
 			this.studiensemester_kurzbz = studiensemester_kurzbz;
 
+			// default Stundensätze from config
 			this.defaultFormDataValues.stunden = this.getDefaultStunden(projekttyp_kurzbz);
 			this.defaultFormDataValues.stundensatz = this.config.defaultProjektbetreuerStundensatz;
+			this.resetModes();
 
+			// get other initial data
 			this.$api
 				.call(ApiStvProjektbetreuer.getBetreuerarten())
 				.then(result => {
@@ -209,6 +230,7 @@ export default {
 				this.resetForm();
 			}
 		},
+		// confirming Betreuer means adding/updating him in list (but not yet saving in db)
 		confirmProjektbetreuer() {
 			if (!this.betreuerFormOpened) return;
 
@@ -217,11 +239,9 @@ export default {
 				this.$refs.projektbetreuerTable.tabulator.addData(this.addAutoCompleteBetreuerToFormData(this.formData));
 			} else {
 				this.$refs.projektbetreuerTable.tabulator.updateData([this.formData]);
-				this.statusNew = true;
 			}
 
-			this.newMode = false;
-			this.editMode = false;
+			this.resetModes();
 		},
 		confirmProjektbetreuerAfterValidation() {
 			//if (!this.formDataModified()) return;
@@ -239,14 +259,6 @@ export default {
 				ApiStvProjektbetreuer.saveProjektbetreuer(projektarbeit_id, this.$refs.projektbetreuerTable.tabulator.getData())
 			);
 		},
-		deleteProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz) {
-			return this.$api
-				.call(ApiStvProjektbetreuer.deleteProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz))
-				.then(response => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-				})
-				.catch(this.$fhcAlert.handleSystemError)
-		},
 		searchBetreuer(event) {
 			if (this.abortController.betreuer) {
 				this.abortController.betreuer.abort();
@@ -259,6 +271,7 @@ export default {
 					this.filteredBetreuer = result.data;
 				});
 		},
+		// validate betreuer for data
 		validateProjektbetreuer() {
 			let alleBetreuer = this.$refs.projektbetreuerTable.tabulator.getData();
 
@@ -270,10 +283,15 @@ export default {
 		},
 		resetForm() {
 			this.formData = this.getDefaultFormData();
-			this.projektarbeitDownload = null;
+			this.beurteilungDownloadLink = null;
 			this.autocompleteSelectedBetreuer = null;
 			this.initialFormData = null;
 			if (this.projekttyp_kurzbz) this.setDefaultStunden(this.projekttyp_kurzbz);
+			this.disableVertragFields(false);
+		},
+		resetModes() {
+			this.newMode = false;
+			this.editMode = false;
 		},
 		getDefaultFormData() {
 			let formData = {betreuerart_kurzbz : null, note: null};
@@ -287,6 +305,7 @@ export default {
 		captureFormData() {
 			this.initialFormData = JSON.parse(JSON.stringify(this.formData)); // deep copy
 		},
+		// add own betreuer ids to betreuer liste
 		addIds(betreuerListe) {
 
 			for (const idx in betreuerListe) {
@@ -298,6 +317,7 @@ export default {
 			}
 			return betreuerListe;
 		},
+		// add the betreuer selected in automomplete to betreuer liste
 		addAutoCompleteBetreuerToFormData() {
 			let preparedFormData = this.formData;
 
@@ -311,6 +331,7 @@ export default {
 
 			return preparedFormData;
 		},
+		// get default values for stunden
 		getDefaultStunden(projekttyp_kurzbz) {
 			let stunden = '0.0';
 			if (projekttyp_kurzbz == 'Bachelor') stunden = this.config.defaultProjektbetreuerStunden;
@@ -319,8 +340,10 @@ export default {
 		},
 		setDefaultStunden(projekttyp_kurzbz) {
 			this.projekttyp_kurzbz = projekttyp_kurzbz;
+			// if form data has not already been modified by user, set the default stunden
 			if (!this.formDataModified()) this.formData.stunden = this.getDefaultStunden(projekttyp_kurzbz);
 		},
+		// get a new betreuer id (max + 1) 
 		getNewBetreuerId() {
 			let max = 0;
 
@@ -330,6 +353,7 @@ export default {
 
 			return max + 1;
 		},
+		// check if form data has been modified since initial data has been captured
 		formDataModified() {
 			if (this.autocompleteSelectedBetreuer != null) return true;
 
@@ -351,22 +375,27 @@ export default {
 			if (!this.autocompleteSelectedBetreuer) return;
 			this.$refs.kontaktdatenModal.show();
 		},
+		// stuff to do after new person has been saved
 		personSaved(result) {
 			this.$api
 				.call(ApiStvProjektbetreuer.getPerson(result.person_id))
 				.then(response => {
+					// set the new person in autocomplete field
 					this.autocompleteSelectedBetreuer = response.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError)
+		},
+		// disable fields which are dependent on Vertrag status
+		disableVertragFields(disabled) {
+			this.vertragFieldsDisabled = disabled;
 		}
 	},
 	template: `
 	<div class="stv-details-projektbetreuer h-100 pb-3 row">
 
-		<div class="col-8">
+		<div :class="this.config.showVertragsdetails ? 'col-8' : 'col-12'">
 
 			<legend>{{this.$p.t('projektarbeit','betreuerGross')}}</legend>
-			<!-- <p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p> -->
 
 			<core-filter-cmpt
 				ref="projektbetreuerTable"
@@ -392,6 +421,7 @@ export default {
 						:suggestions="filteredBetreuer"
 						@complete="searchBetreuer"
 						:min-length="3"
+						:disabled="vertragFieldsDisabled"
 						>
 					</form-input>
 				</div>
@@ -448,6 +478,7 @@ export default {
 						type="text"
 						name="stunden"
 						:label="$p.t('projektarbeit', 'stunden')"
+						:disabled="vertragFieldsDisabled"
 						v-model="formData.stunden"
 						>
 					</form-input>
@@ -459,6 +490,7 @@ export default {
 						type="text"
 						name="stundensatz"
 						:label="$p.t('projektarbeit', 'stundensatz')"
+						:disabled="vertragFieldsDisabled"
 						v-model="formData.stundensatz"
 						>
 					</form-input>
@@ -469,11 +501,23 @@ export default {
 			<button class="btn btn-primary" v-show="betreuerFormOpened" @click="confirmProjektbetreuerAfterValidation">
 				{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}
 			</button>
-
+			<div class = "mt-5">
+				<div class="mb-1">
+					<a :href="beurteilungDownloadLink" class="btn btn-primary d-block" :class="{ 'disabled' : !beurteilungDownloadLink || beurteilungDownloadLink == ''}">
+						{{ $p.t('projektarbeit', 'projektbeurteilungErstellen') }}
+					</a>
+				</div>
+				{{ autocompleteSelectedBetreuer?.person_id && (!beurteilungDownloadLink || beurteilungDownloadLink == '') ? $p.t('projektarbeit', 'projektarbeitNochNichtBeurteilt') : ''}}
+			</div>
 		</div>
 
-		<div class="col-4" v-if="projektarbeitDownload && projektarbeitDownload != ''">
-			<a :href="projektarbeitDownload" class="btn btn-primary">{{ $p.t('projektarbeit', 'projektbeurteilungErstellen') }}</a>
+		<div class="col-4">
+			<vertrag ref="vertrag"
+				:vertrag_id="autocompleteSelectedBetreuer?.vertrag_id"
+				:person_id="autocompleteSelectedBetreuer?.person_id"
+				:betreuerProjektarbeit="initialFormData"
+				@vertragsstatusChanged="disableVertragFields">
+			</vertrag>
 		</div>
 
 	</div>
@@ -485,8 +529,7 @@ export default {
 	<bs-modal
 		ref="kontaktdatenModal"
 		dialog-class="modal-xl modal-dialog-scrollable"
-		v-if="autocompleteSelectedBetreuer && autocompleteSelectedBetreuer.person_id"
-	>
+		v-if="autocompleteSelectedBetreuer && autocompleteSelectedBetreuer.person_id">
 
 		<template #title>
 			<p class="fw-bold mt-3">{{$p.t('projektarbeit', 'kontaktdatenBearbeiten')}}</p>

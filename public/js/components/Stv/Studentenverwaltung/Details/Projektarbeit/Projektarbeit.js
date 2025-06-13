@@ -30,29 +30,6 @@ export default {
 			from: '$reloadList',
 			required: true
 		}
-		//~ isBerechtigtDocAndOdt: {
-			//~ from: 'hasPermissionOutputformat',
-			//~ default: false
-		//~ }
-	},
-	computed: {
-		//~ studentUids() {
-			//~ if (this.student.uid)
-			//~ {
-				//~ return [this.student.uid];
-			//~ }
-			//~ return this.student.map(e => e.uid);
-		//~ },
-		//~ studentKzs(){
-			//~ if (this.student.uid)
-			//~ {
-				//~ return [this.student.studiengang_kz];
-			//~ }
-			//~ return this.student.map(e => e.studiengang_kz);
-		//~ },
-		//~ stg_kz(){
-			//~ return this.studentKzs.length > 0 ? this.studentKzs.length[0] : null;
-		//~ }
 	},
 	props: {
 		student: Object
@@ -271,7 +248,6 @@ export default {
 		actionEditProjektarbeit(projektarbeit_id, studiensemester_kurzbz, lehrveranstaltung_id, projekttyp_kurzbz) {
 			this.statusNew = false;
 			this.$refs.projektarbeitDetails.getFormData(this.statusNew, studiensemester_kurzbz, lehrveranstaltung_id);
-			// TODO: maybe preload projektarbeit? not just on edit?
 			this.$refs.projektarbeitDetails.loadProjektarbeit(projektarbeit_id);
 			this.$refs.projektbetreuer.getData(projektarbeit_id, studiensemester_kurzbz, projekttyp_kurzbz);
 			this.$refs.projektarbeitModal.show();

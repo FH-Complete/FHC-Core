@@ -98,7 +98,7 @@ class Projektbetreuer extends FHCAPI_Controller
 					$downloadLink = $value;
 				}
 			);
-			$pb->projektarbeitDownload = $downloadLink;
+			$pb->beurteilungDownloadLink = $downloadLink;
 		}
 
 		$this->terminateWithSuccess($this->_addFullNameToBetreuer($projektbetreuer));
