@@ -28,7 +28,8 @@ class Kontakt extends FHCAPI_Controller
 			'getStandorte' => ['admin:r', 'assistenz:r'],
 			'getStandorteByFirma' => ['admin:r', 'assistenz:r'],
 			'getKontakte' => ['admin:r', 'assistenz:r'],
-			'getBankverbindung' => ['mitarbeiter/bankdaten:r', 'student/bankdaten:r']
+			'getBankverbindung' => ['mitarbeiter/bankdaten:r', 'student/bankdaten:r'],
+			'getAllFirmen' => ['admin:r', 'assistenz:r']
 		]);
 
 		// Load Libraries
@@ -673,6 +674,7 @@ class Kontakt extends FHCAPI_Controller
 		$iban = $this->input->post('iban');
 		$typ = $this->input->post('typ');
 		$verrechnung = $this->input->post('verrechnung');
+		$uid = getAuthUID();
 
 		$result = $this->BankverbindungModel->insert(
 			[
@@ -683,7 +685,7 @@ class Kontakt extends FHCAPI_Controller
 				'iban' => $iban,
 				'blz' => $blz,
 				'kontonr' => $kontonr,
-				'insertvon' => 'uid',
+				'insertvon' =>  $uid,
 				'insertamum' => date('c'),
 				'typ' => $typ,
 				'verrechnung' => $verrechnung,
@@ -800,4 +802,25 @@ class Kontakt extends FHCAPI_Controller
 
 		return $this->GemeindeModel->checkLocation($_POST['plz'], $_POST['gemeinde'], $_POST['ort']);
 	}
+
+	/*
+	* returns list of all companies
+	* as key value list to be used in select or autocomplete
+	*/
+	public function getAllFirmen()
+	{
+		$sql = "
+			SELECT
+				f.firma_id, f.name,
+				f.name AS label
+			FROM public.tbl_firma f
+			ORDER BY f.name ASC";
+
+		$result = $this->FirmaModel->execReadOnlyQuery($sql);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+
 }
