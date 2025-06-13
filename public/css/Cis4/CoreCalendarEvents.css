@@ -1,0 +1,75 @@
+/* Moodle Events in Month Page */
+.monthPageContainer .lehreinheitEventContent{
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: 1fr;
+	border-bottom: 1px solid var(--bs-border-color);
+	
+}
+
+.monthPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
+	display:grid;
+	padding: .25rem .5rem .25rem .25rem;
+	margin-right: .25rem;
+	align-content: center;
+}
+
+
+.monthPageContainer .lehreinheitEventContent #lehreinheitEventText {
+	display: flex;
+	flex-wrap: wrap;
+	column-gap: 5px;
+	font-size: .875em;
+	align-items:center;
+	justify-content: space-evenly;
+	
+}
+
+/* Moodle Events in Week Page */
+.weekPageContainer .lehreinheitEventContent {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: 1fr;
+
+}
+
+.weekPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
+	display: grid;
+	padding: .25rem .5rem .25rem .25rem;
+	margin-right: .25rem;
+	align-content: center;
+}
+
+
+.weekPageContainer .lehreinheitEventContent #lehreinheitEventText {
+	display: flex;
+	flex-wrap: wrap;
+	column-gap: 5px;
+	align-items: center;
+	justify-content: space-evenly;
+
+}
+
+/* Moodle Events in Day Page */
+.dayPageContainer .lehreinheitEventContent {
+	display: flex;
+	padding-left:4rem;
+	justify-content: space-evenly;
+	align-items: center;
+
+}
+
+.dayPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
+	display:grid;
+	align-content: center;
+	border-right: 1px solid var(--bs-border-color);
+}
+
+.dayPageContainer .lehreinheitEventContent #lehreinheitEventText {
+	display: contents;
+}
+
+.dayPageContainer .lehreinheitEventContent #lehreinheitEventText *{
+	font-weight: 500;
+}
+

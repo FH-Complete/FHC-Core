@@ -336,13 +336,13 @@ const LvPlan = {
 			</div>
 		</template>
 		<template #monthPage="{event,day}">
-			<div @click="showModal(event)" class="p-1">
+			<div @click="showModal(event)" class="monthPageContainer " >
 				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
 			</div>
 		</template>
 		<template #weekPage="{event,day}">
 			<div @click="showModal(event)" type = "button"
-				class="weekPageContainer position-relative border border-secondary border d-flex flex-col align-items-center justify-content-evenly h-100"
+				class="weekPageContainer position-relative border border-secondary border  h-100"
 				:class="{'p-1':event.allDayEvent}"
 				style = "overflow: auto;" >
 				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
@@ -350,9 +350,7 @@ const LvPlan = {
 		</template>
 		<template #dayPage="{event,day,mobile}">
 			<div @click="mobile? showModal(event):null" type="button" class="dayPageContainer fhc-entry border border-secondary border m-0 h-100  text-center">
-				<div class="h-100 d-flex flex-col justify-content-evenly align-items-center">
-					<component :is="calendarEventComponent(event.type)" :event="event"></component>
-				</div>
+				<component :is="calendarEventComponent(event.type)" :event="event"></component>
 			</div>
 		</template>
 		<template #pageMobilContent="{lvMenu, event}">

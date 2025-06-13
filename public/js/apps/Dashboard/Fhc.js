@@ -293,10 +293,26 @@ const app = Vue.createApp({
 			.then(res => res.data)
 			.then(data => {
 				for (let rendertype of Object.keys(data)) {
-					
-					let modalTitle = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalTitle)));
-					let modalContent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalContent)));
-					let calendarEvent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].calendarEvent)));
+					let modalTitle = null;
+					let modalContent = null;
+					let calendarEvent = null;
+					if (data[rendertype].modalTitle)
+						modalTitle = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalTitle)));
+					if (data[rendertype].modalContent) 	
+						modalContent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalContent)));
+					if (data[rendertype].calendarEvent) 	
+						calendarEvent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].calendarEvent)));
+
+					if (data[rendertype].calendarEventStyles){
+						console.log(data[rendertype].calendarEventStyles)
+						var head = document.head;
+						var link = document.createElement("link");
+						link.type = "text/css";
+						link.rel = "stylesheet";
+						link.href = data[rendertype].calendarEventStyles;
+						head.appendChild(link);
+					}
+
 					if(this.renderers === null) {
 						this.renderers = {};
 					}
