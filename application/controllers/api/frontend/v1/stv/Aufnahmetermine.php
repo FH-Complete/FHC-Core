@@ -61,11 +61,23 @@ class Aufnahmetermine extends FHCAPI_Controller
 		}
 
 
-		$rt_id =	(isset($formData['rt_id']) && !empty($formData['rt_id'])) ? $formData['rt_id'] : null;
+		$rt_id = (isset($formData['rt_id']) && !empty($formData['rt_id'])) ? $formData['rt_id'] : null;
 		$anmeldedatum =	(isset($formData['anmeldedatum']) && !empty($formData['anmeldedatum'])) ? $formData['anmeldedatum'] : null;
 		$teilgenommen =	(isset($formData['teilgenommen']) && !empty($formData['teilgenommen'])) ? $formData['teilgenommen'] : false;
 		$studienplan_id = (isset($formData['studienplan_id']) && !empty($formData['studienplan_id'])) ? $formData['studienplan_id'] : null;
 		$punkte = (isset($formData['punkte']) && !empty($formData['punkte'])) ? $formData['punkte'] : null;
+
+		//validation if there is already an RT with chosen data existing
+		$result = $this->RtPersonModel->loadWhere(
+			array(
+				'rt_id' => $rt_id,
+				'person_id' => $person_id,
+				'studienplan_id' => $studienplan_id,
+				)
+		);
+		$data = getData($result);
+		if($data)
+			return $this->terminateWithError("Error", self::ERROR_TYPE_GENERAL);
 
 		$this->form_validation->set_data($formData);
 
@@ -78,11 +90,9 @@ class Aufnahmetermine extends FHCAPI_Controller
 		$this->form_validation->set_rules('rt_id', 'Reihungstest_id', 'required', [
 			'is_valid_date' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Reihungstest'])
 		]);
-
 		$this->form_validation->set_rules('anmeldedatum', 'AnmeldeDatum', 'is_valid_date', [
 			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Anmeldedatum'])
 		]);
-
 
 		if ($this->form_validation->run() == false)
 		{
