@@ -7,19 +7,24 @@
 
 :root{
 	--fhc-searchbar-shadow: var(--fhc-shadow-40, #ced4da);
+	--fhc-searchbar-settings-background-color: var(--fhc-dark, #343a40);
+	--fhc-searchbar-results-background-color: var(--fhc-background, #fff);
+	--fhc-searchbar-results-border-color: var(--fhc-border, lightgrey);
+	--fhc-searchbar-results-link-color: var(--fhc-link, #0d6efd);
+	--fhc-searchbar-results-btn-color: var(--bs-btn-color, white);
 }
 
 .searchbar_settings {
 	position: absolute; 
     z-index: 9999; 
-    background-color: var(--fhc-dark, #343a40);
+    background-color: var(--fhc-searchbar-settings-background-color);
 }
 
 .searchbar_results {
     position: absolute; 
     z-index: 9998; 
-    background-color: var(--fhc-background, #fff); 
-    border: 1px solid var(--fhc-border, lightgrey);
+    background-color: var(--fhc-searchbar-results-background-color);
+    border: 1px solid var(--fhc-searchbar-results-border-color);
     padding: .5rem;
     top: 100%;
     width: 100%;
@@ -29,7 +34,7 @@
 }
 
 .searchbar_results a{
-	color: var(--fhc-link, #0d6efd);
+	color: var(--fhc-searchbar-results-link-color);
 }
 /*
 .searchbar_results a:not(a~i) {
@@ -37,7 +42,7 @@
 }
 */
 .searchbar_results a.btn {
-	color: var(--bs-btn-color, white);
+	color: var(--fhc-searchbar-results-btn-color);
 }
 
 .searchbar_results_scroller {
@@ -46,7 +51,7 @@
 }
 
 .searchbar_result {
-    border-bottom: 1px solid var(--fhc-border, lightgrey);
+    border-bottom: 1px solid var(--fhc-searchbar-results-border-color);
     margin-bottom: 1rem;
 }
 
