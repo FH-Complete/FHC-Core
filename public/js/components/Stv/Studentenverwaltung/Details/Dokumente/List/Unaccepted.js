@@ -234,6 +234,27 @@ export default {
 			this.$refs.modalEdit.open(akte_id);
 		},
 		acceptDocuments(selected){
+
+			//Check if more than one document per dokument_kurzbz should be accepted
+			const counts = {};
+			for (const item of selected)
+			{
+				const value = item.dokument_kurzbz;
+				if (!counts[value]) {
+					counts[value] = 1;
+				}
+				else {
+					counts[value]++;
+				}
+
+				if (counts[value] > 1) {
+					{
+						this.$fhcAlert.alertError(this.$p.t('dokumente', 'error_duplicateDokument_kurzbz'));
+						return;
+					}
+				}
+			}
+
 			Promise
 				.allSettled(
 					selected.map(e =>
@@ -318,6 +339,8 @@ export default {
 			@click:new="actionUploadFile"
 		>
 			<template #actions="{selected}">
+			<p v-for="name in selected">
+			{{name.dokument_kurzbz}}</p>
 				<button
 					class="btn btn-primary"
 					@click="acceptDocuments(selected)"

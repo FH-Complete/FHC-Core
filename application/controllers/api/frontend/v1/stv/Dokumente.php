@@ -94,33 +94,29 @@ class Dokumente extends FHCAPI_Controller
 			if (hasData($result))
 			{
 				$data = getData($result);
-				array_push($arrayAccepted, current($data));
+				foreach ($data as $value)
+				{
+					array_push($arrayAccepted, $value);
+				}
 			}
 		}
 
-		//Merge with Data of Akte
+		//Array for total list of accepted documents
 		$newDataMap = [];
-		//helper, lookupArray
 		foreach ($arrayAccepted as $item) {
-			$newDataMap[$item->dokument_kurzbz] = $item;
+			$newDataMap[] = (array)$item;
 		}
 
-		//add Data of Akte to PrestudentData
-		foreach ($resultPreDoc as $obj) {
-			if (isset($newDataMap[$obj->dokument_kurzbz])) {
-				$obj->akte_id = $newDataMap[$obj->dokument_kurzbz]->akte_id;
-				$obj->hochgeladenamum = $newDataMap[$obj->dokument_kurzbz]->hochgeladenamum;
-				$obj->titel_intern = $newDataMap[$obj->dokument_kurzbz]->titel_intern;
-				$obj->nachgereicht = $newDataMap[$obj->dokument_kurzbz]->nachgereicht;
-				$obj->akzeptiertamum = $newDataMap[$obj->dokument_kurzbz]->akzeptiertamum;
-				$obj->dms_id = $newDataMap[$obj->dokument_kurzbz]->dms_id;
-				$obj->infotext = $newDataMap[$obj->dokument_kurzbz]->infotext;
-				$obj->anmerkung_intern = $newDataMap[$obj->dokument_kurzbz]->anmerkung_intern;
-				$obj->nachgereicht_am = $newDataMap[$obj->dokument_kurzbz]->nachgereicht_am;
-				$obj->vorhanden = $newDataMap[$obj->dokument_kurzbz]->vorhanden;
+		$listExistingKurzbz = array_column($newDataMap, 'dokument_kurzbz');
+
+		foreach ($resultPreDoc as $item)
+		{
+			if (!in_array($item->dokument_kurzbz, $listExistingKurzbz))
+			{
+				$newDataMap[] = (array)$item;
 			}
 		}
-		$this->terminateWithSuccess($resultPreDoc);
+		$this->terminateWithSuccess($newDataMap);
 	}
 
 	public function deleteZuordnung($prestudent_id, $dokument_kurzbz)
@@ -214,6 +210,9 @@ class Dokumente extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Dokument_kurzbz']), self::ERROR_TYPE_GENERAL);
 
 		$uid = getAuthUid();
+
+		//check if more than 1 dokumentkurzbz
+		//if()
 
 		$result = $this->DokumentprestudentModel->insert(
 			[

@@ -237,6 +237,27 @@ export default {
 				});
 		},
 		deleteZuordnung(selected) {
+
+			//Check if more than one document per dokument_kurzbz should be unaccepted
+			const counts = {};
+			for (const item of selected)
+			{
+				const value = item.dokument_kurzbz;
+				if (!counts[value]) {
+					counts[value] = 1;
+				}
+				else {
+					counts[value]++;
+				}
+
+				if (counts[value] > 1) {
+					{
+						this.$fhcAlert.alertError(this.$p.t('dokumente', 'error_duplicateDokument_kurzbz'));
+						return;
+					}
+				}
+			}
+
 			Promise.allSettled(
 				selected.map(e =>
 					this.$api

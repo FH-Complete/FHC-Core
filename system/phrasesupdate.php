@@ -43261,6 +43261,26 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'error_duplicateDokument_kurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akzeptieren / Entakzeptieren von mehr als einem Dokument pro Dokumenttyp nicht zulässig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accepting / unaccepting more than one document per document type is not permitted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// FHC4 Studierendenverwaltung Dokumente END
 	// FHC4 Phrases Anrechnungen Start
 	array(
