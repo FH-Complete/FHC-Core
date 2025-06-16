@@ -9,7 +9,8 @@ export default {
 	],
 	inject: [
 		'size',
-		'focusDate'
+		'focusDate',
+		'mode',
 	],
 	props: {
 		header: {
@@ -30,6 +31,20 @@ export default {
 			// TODO(chris): test is there a week jump on year select? => yes there is if the same month/day are in different weeks ... should we prevent that?
 			this.focusDate.w = week;
 			this.$emit('updateMode', 'week');
+			Vue.nextTick(()=>{
+				let date = new Date(this.focusDate.y, this.focusDate.m, this.focusDate.d);
+				date = date.getFullYear() + "-" +
+					String(date.getMonth() + 1).padStart(2, "0") + "-" +
+					String(date.getDate()).padStart(2, "0");
+				this.$router.push({
+					name: "LvPlan",
+					params: {
+						mode: this.mode[0].toUpperCase() + this.mode.slice(1),
+						focus_date: date,
+						lv_id: this.$route.params.lv_id || null
+					}
+				})
+			})
 		},
 		prev(){
 			this.focusDate.y--;
