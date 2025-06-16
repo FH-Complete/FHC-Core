@@ -1747,7 +1747,7 @@
 }
 .p-button.p-button-icon-only {
   width: 2.357rem;
-  padding: 0.5rem 0;
+  padding: 0.375rem 0; /* NOTE(chris): button padding-y from BS */
 }
 .p-button.p-button-icon-only .p-button-icon-left,
 .p-button.p-button-icon-only .p-button-icon-right {

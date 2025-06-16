@@ -19,6 +19,7 @@ class Prestudent extends FHCAPI_Controller
 			'getAufmerksamdurch' => ['admin:r', 'assistenz:r'],
 			'getBerufstaetigkeit' => ['admin:r', 'assistenz:r'],
 			'getTypenStg' => ['admin:r', 'assistenz:r'],
+			'getBisstandort' => ['admin:r', 'assistenz:r'],
 			'getStudienplaene' => ['admin:r', 'assistenz:r'],
 			'getStudiengang' => ['admin:r', 'assistenz:r']
 		]);
@@ -259,6 +260,17 @@ class Prestudent extends FHCAPI_Controller
 		$this->GsstudientypModel->addOrder('gsstudientyp_kurzbz');
 
 		$result = $this->GsstudientypModel->load();
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+		return $this->terminateWithSuccess(getData($result) ?: []);
+	}
+
+	public function getBisstandort()
+	{
+		$this->load->model('codex/Bisstandort_model', 'BisstandortModel');
+
+		$result = $this->BisstandortModel->load();
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}

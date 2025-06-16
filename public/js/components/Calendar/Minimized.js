@@ -8,7 +8,6 @@ export default {
 		'size',
 		'minimized',
 		'date',
-		'classHeader'
 	],
 	data() {
 		return {

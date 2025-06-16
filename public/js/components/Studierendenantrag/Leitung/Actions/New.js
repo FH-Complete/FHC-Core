@@ -1,6 +1,8 @@
 import BsAlert from '../../../Bootstrap/Alert.js';
 import BsModal from '../../../Bootstrap/Modal.js';
 
+import ApiStudstatusLeitung from '../../../../api/factory/studstatus/leitung.js';
+
 export default {
 	components: {
 		BsModal,
@@ -47,8 +49,11 @@ export default {
                         }
 			this.abortController = new AbortController();
 
-			this.$fhcApi.factory
-				.studstatus.leitung.getPrestudents(evt.query, this.abortController.signal)
+			this.$api
+				.call(ApiStudstatusLeitung.getPrestudents(evt.query), {
+					signal: this.abortController.signal,
+					timeout: 30000
+				})
 				.then(result => {
 					this.data = result.data;
                                         this.abortController = null;

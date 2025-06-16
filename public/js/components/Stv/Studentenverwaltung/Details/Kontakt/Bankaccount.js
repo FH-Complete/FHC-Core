@@ -3,7 +3,10 @@ import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 
+import ApiStvBankaccount from '../../../../../api/factory/stv/kontakt/bankaccount.js';
+
 export default{
+	name: 'BankaccountComponent',
 	components: {
 		CoreFilterCmpt,
 		BsModal,
@@ -16,8 +19,8 @@ export default{
 	data() {
 		return{
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Kontakt/getBankverbindung/' + this.uid,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: () => this.$api.call(ApiStvBankaccount.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				columns:[
 					{title:"Name", field:"name"},
@@ -31,10 +34,10 @@ export default{
 							let output;
 							switch(cell.getValue()){
 								case "p":
-									output = "Privatkonto";
+									output = this.$p.t('person', 'privatkonto');
 									break;
 								case "f":
-									output = "Firmenkonto";
+									output = this.$p.t('person', 'firmenkonto');
 									break;
 								default:
 									output = cell.getValue();
@@ -63,6 +66,7 @@ export default{
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = this.$p.t('person', 'bankvb_edit');
 							button.addEventListener('click', (event) =>
 								this.actionEditBankverbindung(cell.getData().bankverbindung_id)
 							);
@@ -71,6 +75,7 @@ export default{
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.title = this.$p.t('person', 'bankvb_delete');
 							button.addEventListener('click', () =>
 								this.actionDeleteBankverbindung(cell.getData().bankverbindung_id)
 							);
@@ -96,6 +101,13 @@ export default{
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
+						cm.getColumnByField('name').component.updateDefinition({
+							title: this.$p.t('global', 'name')
+						});
+
+						cm.getColumnByField('typ').component.updateDefinition({
+							title: this.$p.t('global', 'typ')
+						});
 						cm.getColumnByField('anschrift').component.updateDefinition({
 							title: this.$p.t('person', 'anschrift')
 						});
@@ -105,12 +117,18 @@ export default{
 						cm.getColumnByField('blz').component.updateDefinition({
 							title: this.$p.t('person', 'blz')
 						});
-						cm.getColumnByField('typ').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
 						cm.getColumnByField('verrechnung').component.updateDefinition({
 							title: this.$p.t('person', 'verrechnung')
 						});
+						cm.getColumnByField('person_id').component.updateDefinition({
+							title: this.$p.t('person', 'person_id')
+						});
+						cm.getColumnByField('bankverbindung_id').component.updateDefinition({
+							title: this.$p.t('ui', 'bankverbindung_id')
+						});
+/*						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
+						});*/
 					}
 				}
 			],
@@ -123,8 +141,8 @@ export default{
 		}
 	},
 	watch: {
-		uid(){
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Kontakt/getBankverbindung/' + this.uid);
+		uid() {
+			this.reload();
 		}
 	},
 	methods:{
@@ -140,62 +158,67 @@ export default{
 			});
 		},
 		actionDeleteBankverbindung(bankverbindung_id){
-			this.loadBankverbindung(bankverbindung_id).then(() => {
-				this.$fhcAlert
-					.confirmDelete()
-					.then(result => result
-						? bankverbindung_id
-						: Promise.reject({handled: true}))
-					.then(this.deleteBankverbindung)
-					.catch(this.$fhcAlert.handleSystemError);
-			});
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? bankverbindung_id
+					: Promise.reject({handled: true}))
+				.then(this.deleteBankverbindung)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewBankverbindung(bankverbindungData) {
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/addNewBankverbindung/' + this.uid,
-				this.bankverbindungData
-			).then(response => {
+			return this.$refs.bankverbindungData
+				.call(ApiStvBankaccount.add(this.uid, this.bankverbindungData))
+				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('bankverbindungModal');
 					this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
+				})
+				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-				window.scrollTo(0, 0);
-				this.reload();
-			});
+					window.scrollTo(0, 0);
+					this.reload();
+				});
 		},
 		loadBankverbindung(bankverbindung_id){
 			this.statusNew = false;
-			return this.$fhcApi.get('api/frontend/v1/stv/kontakt/loadBankverbindung/' + bankverbindung_id)
-				.then(
-				result => {
+			return this.$api
+				.call(ApiStvBankaccount.load(bankverbindung_id))
+				.then(result => {
 					this.bankverbindungData = result.data;
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		updateBankverbindung(bankverbindung_id){
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/updateBankverbindung/' + bankverbindung_id,
-				this.bankverbindungData)
+		updateBankverbindung(bankverbindung_id) {
+			return this.$refs.bankverbindungData
+				.call(ApiStvBankaccount.update(
+					bankverbindung_id,
+					this.bankverbindungData
+				))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('bankverbindungModal');
 					this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
-			.finally(() => {
-				window.scrollTo(0, 0);
-				this.reload();
-			});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
 		},
-		deleteBankverbindung(bankverbindung_id){
-			this.$fhcApi.post('api/frontend/v1/stv/kontakt/deleteBankverbindung/' + bankverbindung_id)
+		deleteBankverbindung(bankverbindung_id) {
+			return this.$api
+				.call(ApiStvBankaccount.delete(bankverbindung_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-				}).catch(this.$fhcAlert.handleSystemError)
-			.finally(()=> {
-				window.scrollTo(0, 0);
-				this.resetModal();
-				this.reload();
-			});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
+					window.scrollTo(0, 0);
+					this.resetModal();
+					this.reload();
+				});
 		},
 		hideModal(modalRef){
 			this.$refs[modalRef].hide();
@@ -222,7 +245,7 @@ export default{
 		<div class="stv-details-kontakt-bankaccount h-100 pt-3">
 		
 		<!--Modal: Bankverbindung-->
-		<BsModal title="Bankverbindung anlegen" ref="bankverbindungModal">
+		<bs-modal ref="bankverbindungModal">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('person', 'bankvb_new')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('person', 'bankvb_edit')}}</p>
@@ -234,7 +257,7 @@ export default{
 					<form-input 
 						type="text"
 						name="name"
-						label="Name"
+						:label="$p.t('global/name')"
 						v-model="bankverbindungData.name"
 					>
 					</form-input>
@@ -318,7 +341,7 @@ export default{
 				<button v-else type="button" class="btn btn-primary" @click="updateBankverbindung(bankverbindungData.bankverbindung_id)">OK</button>
 			</template>
 			
-		</BsModal>
+		</bs-modal>
 				
 		<core-filter-cmpt
 			ref="table"
@@ -328,7 +351,7 @@ export default{
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Bankverbindung"
+			:new-btn-label="this.$p.t('person', 'bankverbindung')"
 			@click:new="actionNewBankverbindung"
 		>
 		</core-filter-cmpt>

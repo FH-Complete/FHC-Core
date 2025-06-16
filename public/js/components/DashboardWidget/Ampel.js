@@ -1,5 +1,7 @@
-import AbstractWidget from './Abstract';
-import BaseOffcanvas from '../Base/Offcanvas';
+import AbstractWidget from './Abstract.js';
+import BaseOffcanvas from '../Base/Offcanvas.js';
+
+import ApiAmpeln from '../../api/factory/widget/ampeln.js';
 
 let _idcounter = 0;
 
@@ -76,16 +78,16 @@ export default {
 			// maybe we also want to reset the source (open/alle) of the displayed ampeln
 		},
 		fetchNonConfirmedActiveAmpeln() {
-			this.$fhcApi.factory
-				.ampeln.open()
+			this.$api
+				.call(ApiAmpeln.open())
 				.then(res => {
 					this.activeAmpeln = res.data;
 				})
 				.catch(error => this.$fhcAlert.handleSystemError);
 		},
 		fetchAllActiveAmpeln() {
-			this.$fhcApi.factory
-				.ampeln.all()
+			this.$api
+				.call(ApiAmpeln.all())
 				.then(res => {
 					this.allAmpeln = res.data;
 				})
@@ -93,8 +95,8 @@ export default {
 
 		},
 		async confirm(ampelId) {
-			this.$fhcApi.factory
-				.ampeln.confirm(ampelId)
+			this.$api
+				.call(ApiAmpeln.confirm(ampelId))
 				.then(() => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ampeln', 'ampelBestaetigt'));
 					// update the ampeln by refetching them

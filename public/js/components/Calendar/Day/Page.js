@@ -1,21 +1,33 @@
 import CalendarDate from '../../../composables/CalendarDate.js';
 import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 
-function ggt(m, n) { return n == 0 ? m : ggt(n, m % n); }
-function kgv(m, n) { return (m * n) / ggt(m, n); }
+import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiAddons from '../../../api/factory/addons.js';
+
+function ggt(m, n) {
+	return n == 0 ? m : ggt(n, m % n);
+}
+
+function kgv(m, n) {
+	return (m * n) / ggt(m, n);
+}
 
 export default {
-	components:{
+	name: 'DayPage',
+	components: {
 		LvModal,
 	},
 	data() {
 		return {
 			hourPosition: null,
+			curHourPosition: null,
 			hourPositionTime: null,
-			lvMenu:null,
+			lvMenu: null,
 		}
 	},
 	inject: [
+		'today',
+		'todayDate',
 		'date',
 		'focusDate',
 		'size',
@@ -27,6 +39,7 @@ export default {
 		'calendarClientHeight',
 		'setSelectedEvent',
 		'selectedEvent',
+		'rowMinHeight'
 	],
 	props: {
 		year: Number,
@@ -39,20 +52,20 @@ export default {
 		'page:forward',
 		'input'
 	],
-	watch:{
+	watch: {
 		//TODO: on first render non of the day-page components are active and the watcher on selectedEvent does not fetch the lvMenu
 		//TODO: workaround is to watch the active state and refetch in case the lvMenu is empty
-		active:{
-			handler(value){
-				if(value){
-					if(!this.lvMenu){
+		active: {
+			handler(value) {
+				if (value) {
+					if (!this.lvMenu) {
 						this.fetchLvMenu(this.selectedEvent);
 					}
 				}
 			},
-			immediate:true,
+			immediate: true,
 		},
-		eventsPerDayAndHour:{
+		eventsPerDayAndHour: {
 			handler(newEvents) {
 				// if no event is selected, select the first event of the day
 				if (this.selectedEvent == null && newEvents[this.day.toDateString()]?.events.length > 0) {
@@ -64,29 +77,38 @@ export default {
 			},
 			immediate: true
 		},
-		selectedEvent:{
+		selectedEvent: {
 			handler(event) {
 				// return early if the day-page component is not the active carousel item
-				if(!this.active)
-				{
+				if (!this.active) {
 					return;
 				}
 				this.lvMenu = null;
 				this.fetchLvMenu(event);
 			},
-			immediate:true,
+			immediate: true,
 		},
-		isSliding:{
-			handler(value){
-				if(value)
-				{
+		isSliding: {
+			handler(value) {
+				if (value) {
 					this.setSelectedEvent(null);
 				}
 			}
 		}
 	},
 	computed: {
-		pageHeaderStyle(){
+		overlayStyle() {
+			return {
+				'background-color': '#F5E9D7',
+				'position': 'absolute',
+				'pointer-events': 'none',
+				'z-index': 2,
+				height:  this.getDayTimePercent + '%',
+				opacity: 0.5,
+				overflow: 'hidden'
+			}
+		},
+		pageHeaderStyle() {
 			return {
 				'z-index': 4,
 				'grid-template-columns': 'repeat(' + this.day.length + ', 1fr)',
@@ -95,13 +117,15 @@ export default {
 				top: 0,
 			}
 		},
-		dayGridStyle(){
+		dayText(){
+			if(!this.day)return {};
 			return {
-				'grid-template-columns': '1 1fr',
-				'grid-template-rows': 'repeat(' + (this.hours.length * 60 / this.smallestTimeFrame) + ', 1fr)',
+				heading: this.day.toLocaleString(this.$p.user_locale.value, { dateStyle: 'short' }),
+				tag: this.day.toLocaleString(this.$p.user_locale.value, { weekday: this.size < 2 ? 'narrow' : (this.size < 3 ? 'short' : 'long') }),
+				datum: this.day.toLocaleString(this.$p.user_locale.value, [{ day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { day: 'numeric', month: 'numeric' }, { dateStyle: 'short' }][this.size]),
 			}
 		},
-		noLvStyle(){
+		noLvStyle() {
 			return {
 				top: (this.calendarScrollTop + 100) + 'px',
 				position: 'absolute',
@@ -111,20 +135,36 @@ export default {
 				'z-index': 1,
 			}
 		},
-		indicatorStyle(){
+		indicatorStyle() {
 			return {
 				'pointer-events': 'none',
 				'padding-left': '3.5rem',
 				'margin-top': '-1px',
 				'z-index': 2,
-				'border-color':'#00649C!important',
+				'border-color': '#00649C!important',
 				top: this.hourPosition + 'px',
 				left: 0,
 				right: 0,
-			}    
+			}
 		},
-		noEventsCondition(){
-			return !this.isSliding && this.filteredEvents?.length === 0;
+		curTime() {
+			const now = new Date();
+			return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+		},
+		curIndicatorStyle() {
+			return {
+				'pointer-events': 'none',
+				'padding-left': '7rem',
+				'margin-top': '-1px',
+				'z-index': 2,
+				'border-color': '#00649C!important',
+				top:  this.getDayTimePercent + '%',
+				left: 0,
+				right: 0,
+			}
+		},
+		noEventsCondition() {
+			return !this.isSliding && (this.filteredEvents?.length === 0 || !this.filteredEvents);
 		},
 		hours() {
 			// returns an array with elements starting at 7 and ending at 24
@@ -138,17 +178,23 @@ export default {
 			if (this.isSliding) return {};
 
 			const res = {};
-			
+
 			let key = this.day.toDateString();
 
 			let nextDay = new Date(this.day);
 			nextDay.setDate(nextDay.getDate() + 1);
 			nextDay.setMilliseconds(nextDay.getMilliseconds() - 1);
-			let d = { events: [], lanes: 1 };
+			let d = {events: [], lanes: 1};
 			if (this.events[key]) {
 				this.events[key].forEach(evt => {
 					let event = {
-						orig: evt, lane: 1, maxLane: 1, start: evt.start < this.day ? this.day : evt.start, end: evt.end > nextDay ? nextDay : evt.end, shared: [], setSharedMaxRecursive(doneItems) {
+						orig: evt,
+						lane: 1,
+						maxLane: 1,
+						start: evt.start < this.day ? this.day : evt.start,
+						end: evt.end > nextDay ? nextDay : evt.end,
+						shared: [],
+						setSharedMaxRecursive(doneItems) {
 							this.maxLane = Math.max(doneItems[0].maxLane, this.maxLane);
 							doneItems.push(this);
 							this.shared.filter(other => !doneItems.includes(other)).forEach(i => i.setSharedMaxRecursive(doneItems));
@@ -168,41 +214,68 @@ export default {
 				d.lanes = d.events.map(e => e.maxLane).reduce((res, i) => kgv(res, i), 1);
 			}
 			res[key] = d;
-			
+
 			return res;
 		},
 		smallestTimeFrame() {
 			return [30, 15, 10, 5][this.size];
 		},
+		lookingAtToday() {
+			return this.date.compare(this.todayDate)
+		},
+		getDayTimePercent() {
+			const now = new Date(Date.now())
+			const currentMinutes = now.getMinutes() + now.getHours() * 60
+			let timePercentage = ((currentMinutes - (this.hours[0] * 60)) / (this.hours.length * 60)) * 100;
+
+			return timePercentage
+		}
 	},
 	methods: {
-		fetchLvMenu(event){
+		dayGridStyle(day) {
+			const styleObj = {
+				'grid-template-columns': '1 1fr',
+				'grid-template-rows': 'repeat(' + (this.hours.length * 60 / this.smallestTimeFrame) + ', 1fr)',
+			}
+
+			if(this.date.compare(this.todayDate)) {
+				styleObj['backgroundImage'] = 'linear-gradient(to bottom, #F5E9D7 '+this.getDayTimePercent+'%, #FFFFFF '+this.getDayTimePercent+'%)'
+				styleObj['border-color'] = '#E8E8E8';
+				// styleObj.opacity = 0.5; // would opaque the whole column
+			}
+
+			return styleObj
+		},
+		fetchLvMenu(event) {
 			if (event && event.type == 'lehreinheit') {
-				this.$fhcApi.factory.stundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]).then(
-					res => res.data
-				).then(
-					studiensemester_kurzbz => {
-						this.$fhcApi.factory.addons.getLvMenu(event.lehrveranstaltung_id, studiensemester_kurzbz).then(res => {
-							if (res.data) {
-								this.lvMenu = res.data;
-							}
-						});
-					}
-				)
+				this.$api
+					.call(ApiStundenplan.getLehreinheitStudiensemester(event.lehreinheit_id[0]))
+					.then(res => res.data)
+					.then(studiensemester_kurzbz => this.$api.call(
+						ApiAddons.getLvMenu(
+							event.lehreinheit_id,
+							studiensemester_kurzbz
+						)
+					))
+					.then(res => {
+						if (res.data) {
+							this.lvMenu = res.data;
+						}
+					});
 			}
 		},
 		hourGridIdentifier(hour) {
 			// this is the id attribute that is responsible to scroll the calender to the first event
 			return 'scroll' + hour + this.focusDate.d + this.week;
 		},
-		hourGridStyle(hour){
+		hourGridStyle(hour) {
 			return {
 				'pointer-events': 'none',
 				top: this.getAbsolutePositionForHour(hour),
 				left: 0,
 				right: 0,
 				'z-index': 0,
-			}  
+			}
 		},
 		eventGridStyle(day, event) {
 			return {
@@ -237,26 +310,24 @@ export default {
 			// calculate minutes from float part of time
 			let minute = Math.round(60 * minutePercentage);
 			// convert minutes to 5 minute interval
-			if (minute % 5 != 0) 
-			{
+			if (minute % 5 != 0) {
 				minute = Math.round(minute / 5) * 5;
 			}
 			// in case the rounding made the minutes 60, increase the hour and reset the minutes
-			if (minute == 60) 
-			{
+			if (minute == 60) {
 				currentHour++;
 				minute = 0;
 			}
-			
+
 			// ## after rounding the time to the nearest 5 Minute interval, we have to convert the time back to the relative position
 			// convert current time in minutes
 			currentMinutes = currentHour * 60 + minute;
 			// calculate the minutes percentage of the total minutes 
-			timePercentage = ((currentMinutes - ( this.hours[0] * 60 ) ) / ( this.hours.length * 60 ) ) * 100;
+			timePercentage = ((currentMinutes - (this.hours[0] * 60)) / (this.hours.length * 60)) * 100;
 			// calculate the relative position of the time percentage
 			position = height * (timePercentage / 100);
 			this.hourPosition = position;
-			
+
 			// add padding to minutes that consist of only one digit
 			minute.toString().length == 1 ? minute = "0" + minute : minute;
 			this.hourPositionTime = currentHour + ":" + minute;
@@ -274,59 +345,70 @@ export default {
 		},
 		dateToMinutesOfDay(day) {
 			return Math.floor(((day.getHours() - 7) * 60 + day.getMinutes()) / this.smallestTimeFrame) + 1;
-		},
-		
+		}
+
 	},
 	template: /*html*/`
-	<div class="fhc-calendar-day-page ">
-		<div class="row m-0">
-			<div class="col-12 col-xl-6 p-0">
-				<div class="d-flex flex-column">
-				<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
-					<div type="button" class="flex-grow-1" :title="day.toLocaleString(undefined, {dateStyle:'short'})" @click.prevent="changeToMonth(day)">
-						<div class="fw-bold">{{day.toLocaleString(undefined, {weekday: size < 2 ? 'narrow' : (size < 3 ? 'short' : 'long')})}}</div>
-						<a href="#" class="small text-secondary text-decoration-none" >{{day.toLocaleString(undefined, [{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{day:'numeric',month:'numeric'},{dateStyle:'short'}][this.size])}}</a>
-					</div>
-				</div>
-				<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
-					<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
-					<Transition>
-						<div v-if="hourPosition" class="position-absolute border-top small"  :style="indicatorStyle">
-							<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
+	<div class="fhc-calendar-day-page h-100">
+		<div class="row m-0 h-100">
+			<div class="col-12 col-xl-6 p-0 h-100">
+				<div class="d-flex flex-column h-100">
+					<div ref="header" class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle">
+						<div type="button" class="flex-grow-1" :title="dayText.heading" @click.prevent="changeToMonth(day)">
+							<div class="fw-bold">{{dayText.tag}}</div>
+							<a href="#" class="small text-secondary text-decoration-none" >{{dayText.datum}}</a>
 						</div>
-					</Transition>
-					<div>
-						<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">Keine Lehrveranstaltungen</h1>
-						<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
+					</div>
+					<div id="scroll g-0" style="height: 100%; overflow-y: scroll;">
 
-							<div class="hours">
-								<div v-for="hour in hours" style="min-height:100px" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
-							</div>
-							<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle">
-								<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" :class="{'selectedEvent':event.orig == selectedEvent}" class="mx-2 small rounded overflow-hidden " >
-									<!-- desktop version of the page template, parent receives slotProp mobile = false -->
-									<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
-										<slot  name="dayPage" :event="event" :day="day" :mobile="false">
-											<p>this is a slot placeholder</p>
-										</slot>
-									</div>
-									<!-- mobile version of the page template, parent receives slotProp mobile = true -->
-									<div class="d-block d-xl-none h-100" @click.prevent="eventClick(event)">
-										<slot  name="dayPage" :event="event" :day="day" :mobile="true">
-											<p>this is a slot placeholder</p>
-										</slot>
-									</div>
+						<div ref="eventcontainer" class="position-relative flex-grow-1" @mousemove="calcHourPosition" @mouseleave="hourPosition = null" >
+							<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border-top" :style="hourGridStyle(hour)"></div>
 
+							<Transition>
+								<div v-if="hourPosition && !noEventsCondition" class="position-absolute border-top small"  :style="indicatorStyle">
+									<span class="border border-top-0 px-2 bg-white">{{hourPositionTime}}</span>
+								</div>
+							</Transition>
+							<Transition>
+								<div v-if="lookingAtToday && !noEventsCondition" class="position-absolute border-top small"  :style="curIndicatorStyle">
+									<span class="border border-top-0 px-2 bg-white">{{curTime}}</span>
+								</div>
+							</Transition>
+							<div>
+								<h1 v-if="noEventsCondition" class="m-0 text-secondary" ref="noEventsText" :style="noLvStyle">{{ $p.t('lehre/noLvFound') }}</h1>
+								<div :class="{'fhc-calendar-no-events-overlay':noEventsCondition, 'events':true}">
+
+									<div class="hours">
+										<div v-for="hour in hours" :style="'min-height:' + rowMinHeight " :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
+									</div>
+									<div v-for="day in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
+										<div v-if="lookingAtToday && !noEventsCondition" :style="overlayStyle"></div>
+										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast 
+											:selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden" >
+											<!-- desktop version of the page template, parent receives slotProp mobile = false -->
+											<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
+												<slot  name="dayPage" :event="event" :day="day" :mobile="false">
+													<p>this is a slot placeholder</p>
+												</slot>
+											</div>
+											<!-- mobile version of the page template, parent receives slotProp mobile = true -->
+											<div class="d-block d-xl-none h-100" @click.prevent="eventClick(event)">
+												<slot  name="dayPage" :event="event" :day="day" :mobile="true">
+													<p>this is a slot placeholder</p>
+												</slot>
+											</div>
+		
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			</div>
-			<div class="d-none d-xl-block col-xl-6 p-0">
-				<div style="z-index:0" class="p-5 sticky-top d-flex justify-content-center align-items-center flex-column">
-					<div style="max-height: calc(var(--fhc-calendar-pane-height) - 100px); overflow-y:auto;" class="w-100">
+			<div class="d-xl-block col-xl-6 p-4 d-none" style="max-height: 100%">
+				<div style="z-index:0; max-height: 100%" class="sticky-top d-flex justify-content-center align-items-center flex-column">
+					<div style="max-height: 100%; overflow-y:auto;" class="w-100">
 						<template v-if="selectedEvent && lvMenu">
 							<slot name="pageMobilContent" :lvMenu="lvMenu" >
 								<p>this is a slot placeholder</p>
@@ -345,7 +427,8 @@ export default {
 					</div>
 				</div>
 			</div>
-		</div>
-		
-	</div>`
+		</div>	
+	</div>
+
+`
 }
