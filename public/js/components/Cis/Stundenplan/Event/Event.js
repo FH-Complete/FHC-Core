@@ -32,7 +32,6 @@ export default {
 							.then(res => {
 								if (res.data) {
 									this.lvMenu = res.data;
-									console.log(res.data);
 								}
 							});
 					});
