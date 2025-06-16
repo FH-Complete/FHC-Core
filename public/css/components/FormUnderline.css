@@ -1,5 +1,10 @@
 /* FORM UNDERLINE
 */
+:root {
+	--fhc-formunderline-border: var(--fhc-border, #dee2e6);
+	--fhc-formunderline-link: var(--fhc-link, initial);
+}
+
 .form-underline{
     display: flex;
     flex-direction: column;
@@ -9,12 +14,12 @@
   }
   
   a.form-underline-content{
-	color: var(--fhc-link);
+	color: var(--fhc-formunderline-link);
   }
   
   .form-underline .form-underline-content{
     border-width: 1px;
-    border-color: transparent transparent var(--fhc-border) transparent;
+    border-color: transparent transparent var(--fhc-formunderline-border) transparent;
     border-style: solid;
     padding-bottom: 0.25rem;
     padding-left: 0.5rem;

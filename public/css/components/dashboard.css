@@ -2,8 +2,18 @@
 @import './dashboard/news.css';
 
 :root{
-	--dashboard-danger: var(--fhc-danger);
+	--fhc-dashboard-danger: var(--fhc-danger, #842029);
 	--fhc-dashboard-grid-size: 4;
+	--fhc-dashboard-link: var(--fhc-link, #0a57ca);
+	--fhc-dashboard-gridrow-background: var(--fhc-background, white);
+	--fhc-dashboard-gridrow-background-highlight: var(--fhc-background-highlight, #6c757d);
+	--fhc-dashboard-draggeditem-background: var(--fhc-background, white);
+	--fhc-dashboard-item-overlay-background: var(--fhc-background-highlight, rgba(0, 100, 156, 1));
+	--fhc-dashboard-item-overly-border-color: var(--fhc-border, lightgray);
+	--fhc-dashboard-denied-dragging-animation-color: var(--fhc-danger, red);
+	--fhc-dashboard-pin-pinned-hover-color: var(--fhc-fifth-highlight, rgb(153, 116, 116));
+	--fhc-dashboard-section-info-color: var(--fhc-primary, #00649c);
+	--fhc-dashboard-section-info-color-hover: var(--fhc-primary-highlight, #005585);
 }
 
 @media(max-width: 577px) {
@@ -13,7 +23,7 @@
 }
 
 .core-dashboard a{
-	color: var(--fhc-link);
+	color: var(--fhc-dashboard-link);
 }
 
 @media (max-width: 576px){
@@ -46,12 +56,12 @@
 	bottom:0;
 	left:50%;
 	transform:translate(-50%, 50%);
-	background-color:white;
+	background-color: var(--fhc-dashboard-gridrow-background);
 }
 
 .newGridRow:hover {
 	color:white;
-	background-color:#6c757d;
+	background-color: var(--fhc-dashboard-gridrow-background-highlight);
 }
 
 .empty-tile-hover:hover {
@@ -59,8 +69,8 @@
 }
 
 .alert-danger .form-check-input:checked {
-	border-color: var(--dashboard-danger);
-	background-color: var(--dashboard-danger);
+	border-color: var(--fhc-dashboard-danger);
+	background-color: var(--fhc-dashboard-danger);
 }
 
 :root {
@@ -124,7 +134,7 @@
 .draggedItem {
 	height: 100%;
 	width: 100%;
-	background-color: white;
+	background-color: var(--fhc-dashboard-draggeditem-background);
 	position: relative;
 }
 
@@ -135,13 +145,13 @@
 	left:0;
 	right:0;
 	bottom:0;
-	background-color:rgba(0, 100, 156);
-	border:4px dashed lightgray;
+	background-color:var(--fhc-dashboard-item-overlay-background);
+	border:4px dashed var(--fhc-dashboard-item-overly-border-color);
 	opacity: 0.5;
 }
 
 #deleteBookmark i{
-	color: var(--fhc-danger);
+	color: var(--fhc-dashboard-danger);
 }
 
 .pin:hover{
@@ -149,21 +159,21 @@
 }
 
 .pin[pinned]:hover{
-	color:rgb(153, 116, 116);
+	color: var(--fhc-dashboard-pin-pinned-hover-color);
 }
 
 .section-info{
-	color: #00649c;
+	color: var(--fhc-dashboard-section-info-color);
 	cursor:pointer;
 }
 
 .section-info:hover {
-	color: #005585;
+	color: var(--fhc-dashboard-section-info-color-hover);
 }
 
 .denied-dragging-animation {
 	animation: wiggle 0.5s linear;
-	color:red !important;
+	color: var(--fhc-dashboard-denied-dragging-animation-color) !important;
 }
 
 @keyframes wiggle {

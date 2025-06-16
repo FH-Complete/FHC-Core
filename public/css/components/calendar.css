@@ -1,48 +1,50 @@
 :root{
-	--calendar-pane-height: calc(100vh - 220px);
+	--fhc-calendar-pane-height: calc(100vh - 220px);
 	
-	--calendar-primary: var(--fhc-primary);
-	--calendar-border: var(--fhc-border);
-	--calendar-border-highlight: var(--fhc-border-highlight);
-	--calendar-text: var(--fhc-text);
-	--calendar-text-light: var(--fhc-text);
-	--calendar-bg: var(--fhc-background);
-	--calendar-hour-indicator-bg: var(--fhc-background);
-	--calendar-week-page-header-background: var(--fhc-background);
-	--calendar-week-page-header-color: var(--fhc-text);
-	--calendar-week-page-header-border: var(--fhc-border);
-	--calendar-week-page-header-hover-background: var(--fhc-background-highlight);
-	--calendar-all-day-event-background: var(--fhc-background);
-	--calendar-past: var(--fhc-beige-10);
+	--fhc-calendar-primary: var(--fhc-primary, #006095);
+	--fhc-calendar-border: var(--fhc-border, #dee2e6);
+	--fhc-calendar-border-highlight: var(--fhc-border-highlight, #495057);
+	--fhc-calendar-text: var(--fhc-text, #212529);
+	--fhc-calendar-text-light: var(--fhc-text, #212529);
+	--fhc-calendar-background: var(--fhc-background, #fff);
+	--fhc-calendar-dark: var(--fhc-dark, #212529);
+	--fhc-calendar-hour-indicator-bg: var(--fhc-background, #fff);
+	--fhc-calendar-week-page-header-background: var(--fhc-background, #fff);
+	--fhc-calendar-week-page-header-color: var(--fhc-text, #212529);
+	--fhc-calendar-week-page-header-border: var(--fhc-border, #dee2e6);
+	--fhc-calendar-week-page-header-hover-background: var(--fhc-background-highlight, #d5dae0);
+	--fhc-calendar-all-day-event-background: var(--fhc-background, #fff);
+	--fhc-calendar-past: var(--fhc-beige-10, rgba(245, 233, 215, 0.5));
+	--fhc-calendar-box-shadow: var(--fhc-box-shadow, #dee2e6);
 }
 
 :root.dark{
-	--calendar-past: var(--fhc-beige-20);
+	--fhc-calendar-past: var(--fhc-beige-20, rgba(172, 153, 125, 0.5));
 }
 
 .fhc-calendar-pane {
-	height: var(--calendar-pane-height);
+	height: var(--fhc-calendar-pane-height);
 }
 
 .fhc-calendar-hour-indicator{
-	border-top: 1px solid var(--calendar-border);
+	border-top: 1px solid var(--fhc-calendar-border);
 }
 
 .fhc-calendar-hour-indicator span{
-	background-color: var(--calendar-hour-indicator-bg) !important;
+	background-color: var(--fhc-calendar-hour-indicator-bg) !important;
 }
 
 .fhc-calendar-week-page-header{
-	color: var(--calendar-text);
-	background-color: var(--calendar-week-page-header-background);
+	color: var(--fhc-calendar-text);
+	background-color: var(--fhc-calendar-week-page-header-background);
 }
 
 .fhc-calendar-week-page-header > div {
-	border-right: 1px solid var(--calendar-border);
+	border-right: 1px solid var(--fhc-calendar-border);
 }
 
 .fhc-calendar-week-page-header > div:hover{
-	background-color: var(--calendar-week-page-header-hover-background);
+	background-color: var(--fhc-calendar-week-page-header-hover-background);
 }
 
 .fhc-calendar-months .col-4,
@@ -104,7 +106,7 @@
 }
 
 .fhc-calendar-week-page .all-day-event-border{
-	box-shadow: 1px 1px 0 var(--fhc-box-shadow);
+	box-shadow: 1px 1px 0 var(--fhc-calendar-box-shadow);
 }
 
 .fhc-calendar-week-page .all-day-event {
@@ -120,7 +122,7 @@
 	grid-template-columns:repeat(7,1fr);
 	width:100%;
 	z-index:3;
-	background-color:var(--calendar-all-day-event-background);
+	background-color:var(--fhc-calendar-all-day-event-background);
 }
 
 .fhc-calendar-week-page .all-day-event-container::before {
@@ -130,12 +132,12 @@
 	bottom: 0;
 	left: -3em;
 	right: 100%;
-	background-color: var(--calendar-all-day-event-background);
-	box-shadow: 1px 1px 0 var(--fhc-box-shadow);
+	background-color: var(--fhc-calendar-all-day-event-background);
+	box-shadow: 1px 1px 0 var(--fhc-calendar-box-shadow);
 }
 
 .fhc-calendar-day-page .all-day-event-border {
-	box-shadow: 0 0 0 1px var(--fhc-box-shadow);
+	box-shadow: 0 0 0 1px var(--fhc-calendar-box-shadow);
 }
 
 .fhc-calendar-day-page .all-day-event {
@@ -151,13 +153,13 @@
 	grid-template-columns: 3em 1fr;
 	width: 100%;
 	z-index: 3;
-	background-color:var(--calendar-all-day-event-background);
-	box-shadow: 1px 1px 0 var(--fhc-box-shadow);
+	background-color:var(--fhc-calendar-all-day-event-background);
+	box-shadow: 1px 1px 0 var(--fhc-calendar-box-shadow);
 }
 
 /* grid hour lines of the Stundenplan use box-shadow instead of border because box-shadow renders consistently on different viewports*/
 .box-shadow-border{
-	box-shadow: 0 0 0 1px var(--calendar-border) !important;
+	box-shadow: 0 0 0 1px var(--fhc-calendar-border) !important;
 }
 
 .fhc-calendar-no-events-overlay{
@@ -172,7 +174,7 @@
 	margin:auto;
 	width: 100%;
 	height: 100%;
-	background-image: linear-gradient(120deg, var(--fhc-background), var(--fhc-dark) );
+	background-image: linear-gradient(120deg, var(--fhc-calendar-background), var(--fhc-calendar-dark) );
 	opacity: .7;
 }
 .fhc-calendar-day-page {
@@ -198,18 +200,18 @@
 }
 
 .fhc-calendar-month-page-day{
-	color: var(--calendar-text) !important;
+	color: var(--fhc-calendar-text) !important;
 }
 
 .fhc-calendar-month-page-day.fhc-calendar-past:not(.fhc-calendar-month-page-day-focusday) {
-	color: var(--fhc-text) !important;
+	color: var(--fhc-calendar-text) !important;
 }
 
 .fhc-calendar-lg .fhc-calendar-month-page-day,
 .fhc-calendar-lg .fhc-calendar-month-page-weekday,
 .fhc-calendar-md .fhc-calendar-month-page-day,
 .fhc-calendar-md .fhc-calendar-month-page-weekday {
-  border: solid 1px var(--calendar-border);
+  border: solid 1px var(--fhc-calendar-border);
 }
 .fhc-calendar-lg .fhc-calendar-month-page-day,
 .fhc-calendar-md .fhc-calendar-month-page-day {
@@ -219,7 +221,7 @@
 }
 .fhc-calendar-lg .fhc-calendar-month-page-day.active,
 .fhc-calendar-md .fhc-calendar-month-page-day.active {
-  border-color: var(--calendar-border-highlight);
+  border-color: var(--fhc-calendar-border-highlight);
 }
 /*.fhc-calendar-lg .fhc-calendar-month-page-day .events,*/
 /*.fhc-calendar-md .fhc-calendar-month-page-day .events {*/
@@ -264,8 +266,8 @@
 }
 
 .fhc-calendar-month-page-weekday:hover {
-	background-color:var(--calendar-primary);
-	color:var(--calendar-text-light);
+	background-color:var(--fhc-calendar-primary);
+	color:var(--fhc-calendar-text-light);
 	
 }
 
@@ -278,14 +280,14 @@
 
 
 .fhc-calendar-past {
-	background-color: var(--calendar-past);
-	border-color: var(--calendar-border);
+	background-color: var(--fhc-calendar-past);
+	border-color: var(--fhc-calendar-border);
 	opacity: 0.5;
 }
 
 .fhc-calendar-month-page-day-focusday {
-	border-color: var(--calendar-border-highlight) !important;
-	background-color: var(--calendar-bg);
+	border-color: var(--fhc-calendar-border-highlight) !important;
+	background-color: var(--fhc-calendar-background);
 	position: relative;
 	animation: dash-animation 2.5s linear infinite;
 }
@@ -317,20 +319,20 @@
 	bottom:0;
 	left:0;
 	right:0;
-	box-shadow: inset 0 0 0 2px var(--calendar-border) !important;
+	box-shadow: inset 0 0 0 2px var(--fhc-calendar-border) !important;
 	pointer-events: none;
 	z-index: 2;
 }
 
 .fhc-calendar-sm .fhc-calendar-month-page-day.active .no,
 .fhc-calendar-xs .fhc-calendar-month-page-day.active .no {
-  background-color: var(--calendar-primary);
+  background-color: var(--fhc-calendar-primary);
   border-radius: 50%;
   font-weight: bold;
 }
 .fhc-calendar-sm .fhc-calendar-month-page-day:not(.active):hover .no,
 .fhc-calendar-xs .fhc-calendar-month-page-day:not(.active):hover .no {
-  background-color: var(--calendar-primary);
+  background-color: var(--fhc-calendar-primary);
   border-radius: 50%;
 }
 /*.fhc-calendar-sm .fhc-calendar-month-page-day .no,*/
@@ -358,8 +360,8 @@
 }
 
 .selectedEvent {
-	background-color: var(--calendar-primary) !important;
-	color: var(--calendar-text-light);
+	background-color: var(--fhc-calendar-primary) !important;
+	color: var(--fhc-calendar-text-light);
 }
 
 .fhc-calendar-day-page .curTimeIndicator{
@@ -370,7 +372,7 @@
 	padding-left: 7rem;
 	margin-top: -1px;
 	z-index: 2;
-	border-color: var(--calendar-border)!important;
+	border-color: var(--fhc-calendar-border)!important;
 }
 
 .fhc-calendar-week-page .curTimeIndicator {
@@ -381,12 +383,12 @@
 	padding-left: 1rem;
 	margin-top: -1px;
 	z-index: 2;
-	border-color: var(--calendar-border) !important;
+	border-color: var(--fhc-calendar-border) !important;
 }
 
 .fhc-calendar-week-page .past::before{
 	content:"";
-	background-color: var(--calendar-past);
+	background-color: var(--fhc-calendar-past);
 	position: absolute;
 	pointer-events: none;
 	z-index: 2;
@@ -398,7 +400,7 @@
 }
 
 .fhc-calendar-week-page .overlay {
-	background-color: var(--calendar-past);
+	background-color: var(--fhc-calendar-past);
 	position: absolute;
 	pointer-events: none;
 	z-index: 2;
@@ -406,7 +408,7 @@
 }
 
 .fhc-calendar-day-page .overlay {
-	background-color: var(--calendar-past);
+	background-color: var(--fhc-calendar-past);
 	position: absolute;
 	pointer-events: none;
 	z-index: 2;

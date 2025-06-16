@@ -6,20 +6,20 @@
 @import url(./switches.css);
 
 :root{
-	--searchbar-shadow: var(--fhc-shadow-40);
+	--searchbar-shadow: var(--fhc-shadow-40, #ced4da);
 }
 
 .searchbar_settings {
 	position: absolute; 
     z-index: 9999; 
-    background-color: var(--fhc-dark);
+    background-color: var(--fhc-dark, #343a40);
 }
 
 .searchbar_results {
     position: absolute; 
     z-index: 9998; 
-    background-color: var(--fhc-background); 
-    border: 1px solid var(--fhc-border);
+    background-color: var(--fhc-background, #fff); 
+    border: 1px solid var(--fhc-border, lightgrey);
     padding: .5rem;
     top: 100%;
     width: 100%;
@@ -29,11 +29,15 @@
 }
 
 .searchbar_results a{
-	color: var(--fhc-link);
+	color: var(--fhc-link, #0d6efd);
 }
-
+/*
 .searchbar_results a:not(a~i) {
 	color: inherit;
+}
+*/
+.searchbar_results a.btn {
+	color: var(--bs-btn-color, white);
 }
 
 .searchbar_results_scroller {
@@ -42,7 +46,7 @@
 }
 
 .searchbar_result {
-    border-bottom: 1px solid var(--fhc-border);
+    border-bottom: 1px solid var(--fhc-border, lightgrey);
     margin-bottom: 1rem;
 }
 

@@ -1,10 +1,10 @@
 :root{
-    --news-widget-height: 1;
-	--news-widget-bg: var(--fhc-primary);
-	--news-widget-highlight-color: var(--fhc-primary-highlight);
-	--news-widget-border: var(--fhc-border);
-	--news-widget-border-highlight: var(--fhc-border-highlight);
-	--news-widget-text-light: var(--fhc-text);
+    --fhc-news-widget-height: 1;
+	--fhc-news-widget-bg: var(--fhc-primary);
+	--fhc-news-widget-highlight-color: var(--fhc-primary-highlight);
+	--fhc-news-widget-border: var(--fhc-border);
+	--fhc-news-widget-border-highlight: var(--fhc-border-highlight);
+	--fhc-news-widget-text-light: var(--fhc-text);
 }
 
 
@@ -53,26 +53,26 @@
 
 .fhc-news-menu-item {
     padding: 0.375rem;
-    color: var(--news-widget-text-light);
+    color: var(--fhc-news-widget-text-light);
     min-height: 5%;
     max-height: 30%;
     width: 100%;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--news-widget-bg);
-    border: 1px solid var(--news-widget-border);
+    background-color: var(--fhc-news-widget-bg);
+    border: 1px solid var(--fhc-news-widget-border);
     cursor: pointer;
     transition: background-color 0.2s ease, border-color 0.2s ease; /* Smooth transition */
 }
 
 .fhc-news-menu-item:hover {
-    background-color: var(--news-widget-highlight-color);
-    border-color: var(--news-widget-border-highlight);
+    background-color: var(--fhc-news-widget-highlight-color);
+    border-color: var(--fhc-news-widget-border-highlight);
 }
 
 .fhc-news-menu-item.selected {
-    background-color: var(--news-widget-highlight-color);
-    border: 2px solid var(--news-widget-border-highlight);
+    background-color: var(--fhc-news-widget-highlight-color);
+    border: 2px solid var(--fhc-news-widget-border-highlight);
     
 }
 

@@ -1,7 +1,7 @@
 :root{
-	--fhc-filtercomponent-primary: var(--fhc-primary);
-	--fhc-filtercomponent-bg:var(--fhc-background);
-	--fhc-filtercomponent-border:var(--fhc-border);
+	--fhc-filtercomponent-primary: var(--fhc-primary, #428bca);
+	--fhc-filtercomponent-bg:var(--fhc-background, white);
+	--fhc-filtercomponent-border:var(--fhc-border, black);
 }
 
 .filter-header-title {
