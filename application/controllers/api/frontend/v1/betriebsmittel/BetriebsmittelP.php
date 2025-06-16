@@ -158,6 +158,11 @@ class BetriebsmittelP extends FHCAPI_Controller
 		], [
 			'uid_in_person' => $this->p->t('person', 'error_uidNotInPerson')
 		]);
+
+		$this->form_validation->set_rules('kaution', 'Kaution', 'numeric', [
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Kaution'])
+		]);
+
 		$this->validateNewOrUpdate();
 
 		$betriebsmitteltyp = $this->input->post('betriebsmitteltyp');
@@ -241,6 +246,10 @@ class BetriebsmittelP extends FHCAPI_Controller
 
 	public function updateBetriebsmittel($betriebsmittelperson_id)
 	{
+		$this->form_validation->set_rules('kaution', 'Kaution', 'numeric', [
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Kaution'])
+		]);
+
 		$this->validateNewOrUpdate();
 
 		$betriebsmitteltyp = $this->input->post('betriebsmitteltyp');
