@@ -42,7 +42,8 @@ const Stundenplan = {
 				month: Vue.markRaw(CalendarViewMonth),
 				day: Vue.markRaw(CalendarViewDay)
 			},
-			events: null,
+			eventsLoaded: [],
+			events: [],
 			calendarMode: DEFAULT_MODE_STUNDENPLAN,
 			calendarDate: new CalendarDateObj(new Date()),
 			eventCalendarDate: new CalendarDateObj(new Date()),
@@ -116,13 +117,111 @@ const Stundenplan = {
 			const b = Number('0x' + hex.substr(4, 2));
 			return r + ', ' + g + ', ' + b;
 		},
+		dateToString(date) {
+			return date.getFullYear() +
+				'-' +
+				CalendarDate.format(date, { month: '2-digit' }, this.$p.user_locale.value) +
+				'-' +
+				CalendarDate.format(date, { day: '2-digit' }, this.$p.user_locale.value);
+		},
+		loadEvents(start, end) {
+			let tsStart = CalendarDate.UTC(start, true);
+			let tsEnd = CalendarDate.UTC(end, true);
+			let index = this.eventsLoaded.findIndex(e => e + CalendarDate.msPerDay >= tsStart);
+			if (index == -1) {
+				// add new chunk
+				this.eventsLoaded.push(tsStart);
+				this.eventsLoaded.push(tsEnd);
+			} else if (index == this.eventsLoaded.length-1) {
+				// add to the end of last chunk
+				tsStart = this.eventsLoaded[index] + CalendarDate.msPerDay;
+				this.eventsLoaded[index] = tsEnd;
+			} else {
+				if (index%2) {
+					// starts between a chunk
+					if (this.eventsLoaded[index] >= tsEnd) {
+						return; // Already loaded
+					}
+					if (index == this.eventsLoaded.length) {
+						// add to the end of a chunk
+						tsStart = this.eventsLoaded[index] + CalendarDate.msPerDay;
+						this.eventsLoaded[index] = tsEnd;
+					} else {
+						if (this.eventsLoaded[index+1] > tsEnd) {
+							// add to the end of a chunk
+							tsStart = this.eventsLoaded[index] + CalendarDate.msPerDay;
+							this.eventsLoaded[index] = tsEnd;
+							// merge chunks if necessary
+							if (this.eventsLoaded[index] == this.eventsLoaded[index+1])
+								this.eventsLoaded.splice(index, 2);
+						} else {
+							// fill between chunk and repeat for rest
+							let originalEnd = tsEnd;
+							tsStart = this.eventsLoaded[index] + CalendarDate.msPerDay;
+							tsEnd = this.eventsLoaded[index+1] - CalendarDate.msPerDay;
+							this.eventsLoaded.splice(index, 2);
+							if (this.eventsLoaded[index] < originalEnd) {
+								this.loadEvents(new Date(this.eventsLoaded[index]), end);
+							}
+						}
+					}
+				} else {
+					// starts between two chunks
+					if (this.eventsLoaded[index] == tsStart) {
+						if (this.eventsLoaded[index+1] >= tsEnd)
+							return // Already loaded
+						return this.loadEvents(new Date(this.eventsLoaded[index+1]), end);
+					}
+					if (this.eventsLoaded[index] == tsEnd) {
+						// add to the start of a chunk
+						this.eventsLoaded[index] = tsStart;
+						tsEnd -= CalendarDate.msPerDay;
+					} else if (this.eventsLoaded[index] == tsEnd + CalendarDate.msPerDay) {
+						// add to the start of a chunk
+						this.eventsLoaded[index] = tsStart;
+					} else if (this.eventsLoaded[index] > tsEnd) {
+						// add chunk between chunks
+						// TODO(chris): check possible previous chunk to merge
+						this.eventsLoaded.splice(index, 0, tsStart, tsEnd);
+					} else {
+						//[<s, <s, i>=s, ...]
+						if (this.eventsLoaded[index+1] >= tsEnd) {
+							tsEnd = this.eventsLoaded[index];
+							this.eventsLoaded[index] = tsStart;
+						} else {
+							//[<s, <s, >=s, <e, ...]
+							let newStart = new Date(this.eventsLoaded[index+1]);
+							tsEnd = this.eventsLoaded[index];
+							this.eventsLoaded[index] = tsStart;
+							this.loadEvents(newStart, end);
+						}
+					}
+				}
+			}
+			if (tsStart >= tsEnd)
+				return;
+			start = this.dateToString(new Date(tsStart));
+			end = this.dateToString(new Date(tsEnd));
+			Promise.allSettled([
+				this.$fhcApi.factory.stundenplan.getStundenplan(start, end, this.propsViewData.lv_id),
+				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(start, end)
+			]).then(results => {
+				results.forEach(promise_result => {
+					if (
+						promise_result.status === 'fulfilled'
+						&& promise_result.value.meta.status === "success"
+					) {
+						if (promise_result.value.meta.lv)
+							this.lv = promise_result.value.meta.lv;
+						
+						this.events = this.events.concat(promise_result.value.data);
+					}
+				})
+			});
+		},
 		sendRouterParams(day, mode) {
 			// TODO(chris): move into a CalendarDate.format... function
-			const focus_date = day.getFullYear() +
-				'-' +
-				CalendarDate.format(day, { month: '2-digit' }, this.$p.user_locale) +
-				'-' +
-				CalendarDate.format(day, { day: '2-digit' }, this.$p.user_locale);
+			const focus_date = this.dateToString(day);
 
 			this.$router.push({
 				name: "Stundenplan",
@@ -144,9 +243,9 @@ const Stundenplan = {
 		},
 
 		updateRange({ first, last }) {
+			this.loadEvents(first, last)
 			// TODO(chris): remove CalendarObj
-			const checkDate = date => {
-				console.log(date);
+			/*const checkDate = date => {
 				return date.getMonth() + 1 != this.eventCalendarDate.m || date.getFullYear() != this.eventCalendarDate.y;
 			}
 			this.calendarDate = new CalendarDateObj(last);
@@ -159,7 +258,7 @@ const Stundenplan = {
 				Vue.nextTick(() => {
 					this.loadEvents();
 				});
-			}
+			}*/
 		},
 		showModal(e, event) {
 			this.currentlySelectedEvent = event;
@@ -208,35 +307,21 @@ const Stundenplan = {
 				null;
 
 		},
-		loadEvents: function(){
+		loadEventsOld() {
 			Promise.allSettled([
 				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id),
 				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay)
-			]).then((result) => {
+			]).then(results => {
 				let promise_events = [];
-				result.forEach((promise_result) => {
-					if (promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success") {
+				results.forEach(promise_result => {
+					if (
+						promise_result.status === 'fulfilled'
+						&& promise_result.value.meta.status === "success"
+					) {
+						if (promise_result.value.meta.lv)
+							this.lv = promise_result.value.meta.lv;
 						
-						if(promise_result.value.meta?.lv) this.lv = promise_result.value.meta.lv
-						
-						let data = promise_result.value.data;
-						// adding additional information to the events 
-						if (data && data.forEach) {
-
-							data.forEach((el, i) => {
-								el.id = i;
-								if (el.type === 'reservierung') {
-									el.color = '#' + (el.farbe || 'FFFFFF');
-								} else {
-									el.color = '#' + (el.farbe || 'CCCCCC');
-								}
-
-								el.start = new Date(el.datum + ' ' + el.beginn);
-								el.end = new Date(el.datum + ' ' + el.ende);
-
-							});
-						}
-						promise_events = promise_events.concat(data);
+						promise_events = promise_events.concat(promise_result.value.data);
 					}
 				})
 				this.events = promise_events;
@@ -247,7 +332,7 @@ const Stundenplan = {
 		this.$fhcApi
 			.factory.authinfo.getAuthUID()
 			.then(data => this.uid = data.data.uid);
-		this.loadEvents();
+		//this.loadEvents();
 	},
 	beforeUnmount() {
 		if (this.$refs.lvmodal)
@@ -264,7 +349,7 @@ const Stundenplan = {
 			<span v-show="propsViewData?.lv_id && lv" style="padding-left: 0.5em;">
 				{{ $p.user_language.value === 'German' ? lv?.bezeichnung : lv?.bezeichnung_english }}
 			</span>
-		</h2>
+		</h2>{{eventsLoaded}}
 		<hr>
 		<lv-modal
 			v-if="currentlySelectedEvent"
@@ -303,7 +388,7 @@ const Stundenplan = {
 				<template v-if="mode == 'month'">
 					<div
 						class="event-colored"
-		 				:style="'--event-color-rgb:' + makeRGB(event.farbe || 'cccccc')"
+		 				:style="'--event-color-rgb:' + makeRGB(event.farbe || (event.type == 'reservierung' ? 'ffffff' : 'cccccc'))"
 						@click.stop="showModal($event, event)"
 					>
 						<span class="fhc-entry">
@@ -317,7 +402,7 @@ const Stundenplan = {
 						type="button"
 						class="border border-secondary d-flex justify-content-evenly event-colored h-100 overflow-hidden"
 						style="overflow:auto"
-		 				:style="'--event-color-rgb:' + makeRGB(event.farbe || 'cccccc')"
+		 				:style="'--event-color-rgb:' + makeRGB(event.farbe || (event.type == 'reservierung' ? 'ffffff' : 'cccccc'))"
 					>
 						<div
 							v-if="event.beginn && event.ende"
@@ -347,7 +432,7 @@ const Stundenplan = {
 						@click="mobile ? showModal($event, event) :null"
 						type="button"
 						class="fhc-entry border border-secondary d-flex justify-content-evenly event-colored h-100 overflow-hidden"
-		 				:style="'--event-color-rgb:' + makeRGB(event.farbe || 'cccccc')"
+		 				:style="'--event-color-rgb:' + makeRGB(event.farbe || (event.type == 'reservierung' ? 'ffffff' : 'cccccc'))"
 					>
 						<div
 							v-if="event.beginn && event.ende"
