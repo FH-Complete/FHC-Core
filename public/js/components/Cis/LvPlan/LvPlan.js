@@ -3,7 +3,6 @@ import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
 import LvMenu from "../Mylv/LvMenu.js"
 import lehreinheitEvent from "./EventTypes/calendarEvent.js"
-import LvInfo from '../Mylv/LvInfo.js';
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
@@ -51,6 +50,17 @@ const LvPlan = {
 	},
 	inject:["renderers"],
 	watch: {
+		/* events:{
+			handler: function(newValue){
+				if(newValue == null)
+					setTimeout(()=>{
+						if(this.events == null){
+							this.loadEvents();
+						}
+					},500);
+			},
+			immediate: true,
+		}, */
 		modalLoaded:{
 			handler: function (newValue) {
 				if (this.isShowModal && newValue.isModalContentResolved && newValue.isModalTitleResolved) {
@@ -84,7 +94,7 @@ const LvPlan = {
 		}
 	},
 	components: {
-		FhcCalendar, LvModal, LvMenu, lehreinheitEvent, LvInfo
+		FhcCalendar, LvModal, LvMenu, lehreinheitEvent
 	},
 	computed:{
 		modalLoaded: function(){
@@ -134,13 +144,13 @@ const LvPlan = {
 		},
 		// component renderers fetches from different addons
 		modalTitleComponent(type){
-			return this.renderers[type].modalTitle;
+			return this.renderers[type]?.modalTitle;
 		},
 		modalContentComponent(type) {
-			return this.renderers[type].modalContent;
+			return this.renderers[type]?.modalContent;
 		},
 		calendarEventComponent(type){
-			return this.renderers[type].calendarEvent;
+			return this.renderers[type]?.calendarEvent;
 		},
 		
 
@@ -354,14 +364,7 @@ const LvPlan = {
 			</div>
 		</template>
 		<template #pageMobilContent="{lvMenu, event}">
-			<h3 >{{event.type=='moodle'?$p.t('lvinfo','Moodleinformationen'):$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
-			<div class="w-100">
-				<lv-info  :event="event" />
-			</div>
-			<template v-if="event.type != 'moodle'">
-				<h3 >{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
-				<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-show="lvMenu" :menu="lvMenu" />
-			</template>
+			<component :is="modalContentComponent(currentlySelectedEvent.type)" v-if="event" :event="event" :lvMenu="lvMenu" ></component>
 		</template>
 		<template #pageMobilContentEmpty >
 			<h3>{{ $p.t('lehre/noLvFound') }}</h3>

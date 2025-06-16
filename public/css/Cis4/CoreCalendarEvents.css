@@ -63,7 +63,6 @@
 .dayPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
 	display:grid;
 	align-content: center;
-	border-right: 1px solid var(--bs-border-color);
 }
 
 .dayPageContainer .lehreinheitEventContent #lehreinheitEventText {

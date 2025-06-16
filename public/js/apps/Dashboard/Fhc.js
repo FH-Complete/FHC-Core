@@ -304,7 +304,6 @@ const app = Vue.createApp({
 						calendarEvent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].calendarEvent)));
 
 					if (data[rendertype].calendarEventStyles){
-						console.log(data[rendertype].calendarEventStyles)
 						var head = document.head;
 						var link = document.createElement("link");
 						link.type = "text/css";

@@ -6,7 +6,7 @@
 @import url(./switches.css);
 
 :root{
-	--searchbar-shadow: var(--fhc-shadow-40, #ced4da);
+	--fhc-searchbar-shadow: var(--fhc-shadow-40, #ced4da);
 }
 
 .searchbar_settings {
@@ -25,7 +25,7 @@
     width: 100%;
     left: 0;
     right: 0;
-	box-shadow: 2px 2px 4px var(--searchbar-shadow);
+	box-shadow: 2px 2px 4px var(--fhc-searchbar-shadow);
 }
 
 .searchbar_results a{
