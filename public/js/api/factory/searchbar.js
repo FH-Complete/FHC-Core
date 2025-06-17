@@ -22,5 +22,12 @@ export default {
 			url: '/api/frontend/v1/searchbar/search',
 			params
 		};
+	},
+	searchAdvanced(params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/searchbar/searchAdvanced',
+			params
+		};
 	}
 };
