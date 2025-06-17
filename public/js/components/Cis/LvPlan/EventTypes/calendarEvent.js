@@ -16,15 +16,16 @@ export default {
 		},
 	},
 	template: `
-	<div class="lehreinheitEventHeader" v-if="!event.allDayEvent && event?.beginn && event?.ende" >
-		<span class="small">{{convertTime(event.beginn.split(":"))}}</span>
-		<span class="small">{{convertTime(event.ende.split(":"))}}</span>
+	<div class="lehreinheitEventContent h-100 w-100 p-1" >
+		<div id="lehreinheitEventHeader" class="h-100 " v-if="!event.allDayEvent && event?.beginn && event?.ende" >
+			<span class="small">{{convertTime(event.beginn.split(":"))}}</span>
+			<span class="small">{{convertTime(event.ende.split(":"))}}</span>
+		</div>
+		<div id="lehreinheitEventText">
+			<span>{{event.topic}}</span>
+			<span v-for="lektor in event.lektor">{{lektor.kurzbz}}</span>
+			<span>{{event.ort_kurzbz}}</span>
+		</div>
 	</div>
-	<div class="lehreinheitEventContent">
-		<span>{{event.topic}}</span>
-		<span v-for="lektor in event.lektor">{{lektor.kurzbz}}</span>
-		<span>{{event.ort_kurzbz}}</span>
-	</div>
-	
 	`,
 }

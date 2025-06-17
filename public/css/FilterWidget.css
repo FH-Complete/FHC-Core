@@ -1,8 +1,8 @@
 :root{
-	--filter-widget-border: var(--fhc-dark);
-	--filter-widget-color: var(--fhc-dark);
-	--filter-widget-primary: var(--fhc-primary);
-	--filter-widget-border-light: var(--fhc-border);
+	--filter-widget-border: var(--fhc-dark, black);
+	--filter-widget-color: var(--fhc-dark, black);
+	--filter-widget-primary: var(--fhc-primary, #428bca);
+	--filter-widget-border-light: var(--fhc-border, #ddd);
 }
 
 .filter-name-title {

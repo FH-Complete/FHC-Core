@@ -1,12 +1,20 @@
 import { numberPadding, formatDate } from "../../../helpers/DateHelpers.js"
-
+import LvMenu from "./LvMenu.js";
 
 export default {
 	props:{
 		event: {
 			type: Object,
 			required: true,
-		}
+		},
+		lvMenu:{
+			type: Object,
+			required: false,
+			default: null,
+		},
+	},
+	components:{
+		LvMenu,
 	},
 	computed: {
 		lektorenLinks: function () {
@@ -47,6 +55,7 @@ export default {
 		},
 	},
 	template: `
+	<div>
 		<h3>
 			{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}
 		</h3>
@@ -109,5 +118,9 @@ export default {
 						<td>{{event.organisationseinheit}}</td>
 					</tr>
 				</tbody>
-		</table>`,
+		</table>
+		
+		<h3>{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
+		<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-if="lvMenu" :menu="lvMenu" />
+	</div>`,
 }

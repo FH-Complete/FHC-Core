@@ -1,7 +1,7 @@
 :root{
-	--fhc-switches-checked-bg: var(--fhc-light);
-	--fhc-switches-unchecked-bg: var(--fhc-disabled);
-	--fhc-switches-shadow: var(--fhc-shadow-20);
+	--fhc-switches-checked-bg: var(--fhc-light, white);
+	--fhc-switches-unchecked-bg: var(--fhc-disabled, var(--bs-gray-600));
+	--fhc-switches-shadow: var(--fhc-shadow-20, rgba(108, 117, 125,.25));
 }
 
 .fhc-switches:checked  {
@@ -15,7 +15,7 @@
     background-color: var(--fhc-switches-unchecked-bg) !important;
     border-color: transparent;
     background-position: left center !important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%236b747a'/%3e%3c/svg%3e") !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%238e99a3'/%3e%3c/svg%3e") !important;
 }
 
 .fhc-switches:focus  {

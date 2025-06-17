@@ -3,22 +3,22 @@
  */
 
  :root{
-	--nav-component-bg: var(--fhc-tertiary);
-	--nav-component-border: var(--fhc-border);
-	--nav-component-color: var(--fhc-text);
-	--nav-left-component-border: var(--fhc-border);
-	--nav-left-component-bg: var(--fhc-tertiary);
-	--nav-left-component-color: var(--fhc-primary);
-	--nav-left-component-hover: var(--fhc-secondary-highlight);
+	--fhc-nav-component-bg: var(--fhc-tertiary, #f8f8f8);
+	--fhc-nav-component-border: var(--fhc-border, #5e5e5e);
+	--fhc-nav-component-color: var(--fhc-text, #5e5e5e);
+	--fhc-nav-left-component-border: var(--fhc-border, #e7e7e7);
+	--fhc-nav-left-component-bg: var(--fhc-tertiary, #f8f8f8);
+	--fhc-nav-left-component-color: var(--fhc-primary, #23527c);
+	--fhc-nav-left-component-hover: var(--fhc-secondary-highlight, #eee);
  }
 
 .navbar-header {
-	background-color: var(--nav-component-bg);
+	background-color: var(--fhc-nav-component-bg);
 	padding-top: 0px;
 	padding-bottom: 0px;
 	padding-left: 10px;
 	border-style: solid;
-	border-color: var(--nav-component-border);
+	border-color: var(--fhc-nav-component-border);
 	border-width: 0 0 1px;
 }
 
@@ -26,7 +26,7 @@
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 18px;
 	line-height: 1.42857143;
-	color: var(--nav-component-color) !important;
+	color: var(--fhc-nav-component-color) !important;
 	padding-top: 15px !important;
 	padding-right: 7px !important;
 	padding-left: 7px !important;
@@ -45,8 +45,8 @@
 	z-index: 1;
 	position: absolute;
 	width: 250px;
-	border-right: 1px solid ;
-	background-color:var(--nav-left-component-bg);
+	border-right: 1px solid var(--fhc-nav-left-component-border);
+	background-color:var(--fhc-nav-left-component-bg);
 }
 
 .navbar-left-side ul {
@@ -54,7 +54,7 @@
 }
 
 .navbar-left-side ul li {
-	border-bottom: 1px solid var(--nav-left-component-border);
+	border-bottom: 1px solid var(--fhc-nav-left-component-border);
 }
 
 .left-side-menu-second-level {
@@ -78,7 +78,7 @@
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
 	line-height: 1.42857143;
-	color: var(--nav-left-component-color);
+	color: var(--fhc-nav-left-component-color);
 	padding-top: 10px !important;
 	padding-bottom: 10px !important;
 	padding-left: 7px !important;
@@ -87,7 +87,7 @@
 }
 
 .left-side-menu-link-entry:hover {
-	background-color: var(--nav-left-component-hover);
+	background-color: var(--fhc-nav-left-component-hover);
 }
 
 /*

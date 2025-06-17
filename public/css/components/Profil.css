@@ -1,14 +1,13 @@
 
 :root{
-	--profil-border: var(--fhc-border);
-	--profil-tabulator-shadow:var(--fhc-shadow-20);
+	--fhc-profil-border: var(--fhc-border, white);
+	--fhc-profil-tabulator-shadow: var(--fhc-shadow-20, rgba(0,0,0,0.1));
 }
-
 
 .image-lock{
   height:22px; 
   width:21px; 
-  background-color:var(--profil-border); 
+  background-color:var(--fhc-profil-border); 
   position:absolute;
   /* top: 1px is important, otherwise it goes over the border of the thumbnail*/ 
   top:1px; 
@@ -21,7 +20,7 @@
 
 .tabulator-collapsed-row{
     padding:15px;
-    background-color: var(--profil-tabulator-shadow);
+    background-color: var(--fhc-profil-tabulator-shadow);
 
 }
 
@@ -33,9 +32,6 @@
   padding:0 !important;
 }
 
-
-
-
 .btn-circle {
   width: 30px;
   height: 30px;
@@ -45,7 +41,3 @@
   font-size: 12px;
   line-height: 1.42857;
 }
-
-
-
-

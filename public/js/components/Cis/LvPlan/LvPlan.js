@@ -3,7 +3,6 @@ import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
 import LvMenu from "../Mylv/LvMenu.js"
 import lehreinheitEvent from "./EventTypes/calendarEvent.js"
-import LvInfo from '../Mylv/LvInfo.js';
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
@@ -51,6 +50,17 @@ const LvPlan = {
 	},
 	inject:["renderers"],
 	watch: {
+		/* events:{
+			handler: function(newValue){
+				if(newValue == null)
+					setTimeout(()=>{
+						if(this.events == null){
+							this.loadEvents();
+						}
+					},500);
+			},
+			immediate: true,
+		}, */
 		modalLoaded:{
 			handler: function (newValue) {
 				if (this.isShowModal && newValue.isModalContentResolved && newValue.isModalTitleResolved) {
@@ -84,7 +94,7 @@ const LvPlan = {
 		}
 	},
 	components: {
-		FhcCalendar, LvModal, LvMenu, lehreinheitEvent, LvInfo
+		FhcCalendar, LvModal, LvMenu, lehreinheitEvent
 	},
 	computed:{
 		modalLoaded: function(){
@@ -134,13 +144,13 @@ const LvPlan = {
 		},
 		// component renderers fetches from different addons
 		modalTitleComponent(type){
-			return this.renderers[type].modalTitle;
+			return this.renderers[type]?.modalTitle;
 		},
 		modalContentComponent(type) {
-			return this.renderers[type].modalContent;
+			return this.renderers[type]?.modalContent;
 		},
 		calendarEventComponent(type){
-			return this.renderers[type].calendarEvent;
+			return this.renderers[type]?.calendarEvent;
 		},
 		
 
@@ -336,13 +346,13 @@ const LvPlan = {
 			</div>
 		</template>
 		<template #monthPage="{event,day}">
-			<div @click="showModal(event)" class="p-1">
+			<div @click="showModal(event)" class="monthPageContainer " >
 				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
 			</div>
 		</template>
 		<template #weekPage="{event,day}">
 			<div @click="showModal(event)" type = "button"
-				class="weekPageContainer position-relative border border-secondary border d-flex flex-col align-items-center justify-content-evenly h-100"
+				class="weekPageContainer position-relative border border-secondary border  h-100"
 				:class="{'p-1':event.allDayEvent}"
 				style = "overflow: auto;" >
 				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
@@ -350,20 +360,11 @@ const LvPlan = {
 		</template>
 		<template #dayPage="{event,day,mobile}">
 			<div @click="mobile? showModal(event):null" type="button" class="dayPageContainer fhc-entry border border-secondary border m-0 h-100  text-center">
-				<div class="h-100 d-flex flex-col justify-content-evenly align-items-center">
-					<component :is="calendarEventComponent(event.type)" :event="event"></component>
-				</div>
+				<component :is="calendarEventComponent(event.type)" :event="event"></component>
 			</div>
 		</template>
 		<template #pageMobilContent="{lvMenu, event}">
-			<h3 >{{event.type=='moodle'?$p.t('lvinfo','Moodleinformationen'):$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
-			<div class="w-100">
-				<lv-info  :event="event" />
-			</div>
-			<template v-if="event.type != 'moodle'">
-				<h3 >{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
-				<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-show="lvMenu" :menu="lvMenu" />
-			</template>
+			<component :is="modalContentComponent(currentlySelectedEvent.type)" v-if="event" :event="event" :lvMenu="lvMenu" ></component>
 		</template>
 		<template #pageMobilContentEmpty >
 			<h3>{{ $p.t('lehre/noLvFound') }}</h3>

@@ -272,7 +272,7 @@ export default {
 		<template #content>
 			<div v-if="Array.isArray(selectedLehrveranstaltung.lektoren) && selectedLehrveranstaltung.lektoren.length>0" class="mb-4">
 				<h4>Lektoren:</h4>
-				<a :href="'mailto:'+lektor?.email" class="mx-2" v-for="lektor in selectedLehrveranstaltung.lektoren">{{lektor.name}}</a>
+				<a :href="'mailto:'+lektor?.email" class="fhc-link-color mx-2" v-for="lektor in selectedLehrveranstaltung.lektoren">{{lektor.name}}</a>
 			</div>
 			<h4>Menu:</h4>
 		</template>
@@ -296,13 +296,13 @@ export default {
 		<div>
 		<h6>Studiengang:</h6>
 		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(-1)">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
 			<select ref="studiengaenge" v-model="selectedStudiengang" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
 				<option v-for="studiengang in studiengaenge" @click="changeSelectedStudienGang(studiengang.studiengang_kz)" :key="studiengang.studiengang_kz" :value="studiengang.studiengang_kz" >{{studiengangTitel(studiengang)}}</option>
 			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(-1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(1)">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
 			</button>
 		</div>
@@ -311,13 +311,13 @@ export default {
 		<div>
 		<h6>Semester:</h6>
 		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(-1)">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
 			<select ref="semester" v-model="selectedSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
 				<option v-for="sem in semester" @click="changeSelectedSemester(sem)" :key="semester" :value="sem">{{sem}}. Semester</option>
 			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(-1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(1)">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
 			</button>
 		</div>
@@ -326,13 +326,13 @@ export default {
 		<div>
 		<h6>Studienordnung:</h6>
 		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(-1)">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
 			<select ref="studienordnung" v-model="selectedStudienordnung" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
 				<option v-for="ordnung in computedStudienOrdnungSelectValues" :disabled="ordnung.disabled" @click="changeSelectedStudienPlan(ordnung?.studienplan?.studienplan_id)" :key="ordnung?.studienplan?.bezeichnung	" :value="ordnung?.studienplan?.studienplan_id">{{ordnung.bezeichnung}}</option>
 			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(-1)">
+			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(1)">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
 			</button>
 		</div>
@@ -351,7 +351,7 @@ export default {
 			<div class="card-body">
 				<ul class="list-group list-group-flush">
 					<li class="d-flex list-group-item" v-for="lv in lehrveranstaltung.lehrveranstaltungen">
-						<a class="link-dark d-block me-auto" href="#" @click="openLvUebersicht(lv)">{{lv.bezeichnung}}</a>
+						<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lv)">{{lv.bezeichnung}}</a>
 						<p>{{lv.lehrform_kurzbz}}</p>
 					</li>	
 				</ul>
