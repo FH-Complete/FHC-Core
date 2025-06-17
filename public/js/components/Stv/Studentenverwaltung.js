@@ -137,8 +137,8 @@ export default {
 		reloadList() {
 			this.$refs.stvList.reload();
 		},
-		searchfunction(params) {
-			return this.$api.call(ApiSearchbar.search(params));
+		searchfunction(params, config) {
+			return this.$api.call(ApiSearchbar.search(params), config);
 		}
 	},
 	created() {

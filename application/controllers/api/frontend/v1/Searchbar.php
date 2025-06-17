@@ -62,7 +62,7 @@ class Searchbar extends FHCAPI_Controller
 		$result = $this->searchbarlib->search($this->input->post(self::SEARCHSTR_PARAM), $this->input->post(self::TYPES_PARAM));
 		if (property_exists($result, 'error'))
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$this->terminateWithSuccess($result);
+		$this->terminateWithSuccess($result->data);
 	}
 
 	/**

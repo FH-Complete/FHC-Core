@@ -19,7 +19,8 @@ export default {
         showresult: false,  
         searching: false,
         error: null,
-		settingsDropdown:null,
+            abortController: null,
+        settingsDropdown:null,
       };
     },
     components: {
@@ -201,27 +202,80 @@ export default {
             this.searchresult.splice(0, this.searchresult.length);
             this.searching = true;
             this.showsearchresult();
-			if(this.searchsettings.types.length === 0) {
-				this.error = 'Kein Ergebnistyp ausgewählt. Bitte mindestens einen Ergebnistyp auswählen.';
-				this.searching = false;
-				return;
-			}
-            this.searchfunction(this.searchsettings)
+            if(this.searchsettings.types.length === 0) {
+                this.error = 'Kein Ergebnistyp ausgewählt. Bitte mindestens einen Ergebnistyp auswählen.';
+                this.searching = false;
+                return;
+            }
+
+            if (this.abortController)
+                this.abortController.abort();
+            this.abortController = new AbortController();
+
+            this.searchfunction(this.searchsettings, { timeout: 50000, signal: this.abortController.signal })
             .then(response=>{
-                if( response.data?.error === 1 ) {
-                    this.error = 'Bei der Suche ist ein Fehler aufgetreten.';
+                if (!response.data) {
+                    this.error = this.$p.t('search/error_general');
                 } else {
-                    for(let element of response.data.data){
-                        this.searchresult.push(element);
+                    let res = response.data.map(el => el.data ? {...el, ...JSON.parse(el.data)} : el);
+                    this.lastQuery = response.meta.searchstring;
+                    if (this.searchoptions.mergeResults) {
+                        let counter = 0;
+                        let mergeTypes = [];
+                        let mergedType = 'merged';
+                        let mergeKey = '';
+
+                        switch (this.searchoptions.mergeResults) {
+                        case 'student':
+                            mergeTypes = ['student', 'prestudent'];
+                            mergedType += this.searchoptions.mergeResults;
+                            mergeKey = 'uid';
+                            break;
+                        case 'person':
+                            mergeTypes = ['person', 'employee', 'unassigned_employee', 'mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'student', 'prestudent'];
+                            mergedType += this.searchoptions.mergeResults;
+                            mergeKey = 'person_id';
+                            break;
+                        }
+
+                        if (mergeTypes.length) {
+                            res = Object.values(res.reduce((a, c) => {
+                                if (!mergeTypes.includes(c.type)) {
+                                    a['nomerge' + counter++] = c;
+                                } else if (c[mergeKey] === null) {
+                                    a['nomerge' + counter++] = c;
+                                } else if (a[c[mergeKey]] === undefined) {
+                                    a[c[mergeKey]] = {
+                                        rank: c.rank,
+                                        type: mergedType,
+                                        list: [c]
+                                    };
+                                } else {
+                                    a[c[mergeKey]].list.push(c);
+                                    if (c.rank > a[c[mergeKey]].rank)
+                                        a[c[mergeKey]].rank = c.rank;
+                                }
+                                return a;
+                            }, {})).sort((a, b) => b.rank - a.rank);
+                        }
                     }
+                    this.searchresult = res;
                 }
+                this.searching = false;
+                this.retry = 0;
             })
             .catch(error=> {
-                this.error = 'Bei der Suche ist ein Fehler aufgetreten.' 
-                    + ' ' + error.message;
-            })
-            .finally(()=> {
+                if (error.code == "ERR_CANCELED") {
+                    return this.retry = 0;
+                }
+                if (error.code == "ECONNABORTED" && this.retry) {
+                    this.retry--;
+                    return this.callsearchapi();
+                }
+
+                this.error = this.$p.t('search/error_general', error);
                 this.searching = false;
+                this.retry = 0;
             });
         },
         refreshsearch: function() {
