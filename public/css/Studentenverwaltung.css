@@ -4,6 +4,7 @@
 @import './components/FilterComponent.css';
 @import './components/Tabs.css';
 @import './components/Notiz.css';
+@import './components/Messages.css';
 
 html {
   font-size: .875em;
@@ -77,6 +78,10 @@ html {
 	overflow: visible !important;
 }
 
+.highlight-row {
+	background-color: #e5aeae !important;
+}
+
 @media (min-width: 768px) {
 	#sidebarMenu {
 		visibility: visible!important;
@@ -140,4 +145,16 @@ html {
 }
 .override_filtercmpt_actions_style div.d-flex.align-items-baseline {
 	align-items: end !important;
+}
+
+.stv-details-details-foto img {
+	max-width: 150px;
+}
+
+.msg_preview {
+	margin-bottom: -1px;
+}
+
+.tiny-90 div.tox.tox-tinymce {
+	height: 90% !important;
 }

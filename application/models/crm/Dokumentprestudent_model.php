@@ -69,4 +69,39 @@ class Dokumentprestudent_model extends DB_Model
 
 		return $result;
 	}
+
+	/**
+	 * Loads all Documents of Prestudent, already submitted
+	 * @param integer prestudent_id
+	 * @param boolean archivdokumente Default true. if false, archivable Documents (tbl_vorlage.archivierbar zB Zeugnis, Bescheid, ...) not retrieved
+	 * @return Array of Documents || error
+	 */
+	public function getPrestudentDokumente($prestudent_id, $archivdokumente = true)
+	{
+		$parametersArray = array($prestudent_id);
+
+		$qry = "SELECT
+				  d.bezeichnung,
+				  d.dokument_kurzbz,
+				  dp.datum as Docdatum,
+				  dp.mitarbeiter_uid as DocMitarbeiter_uid,
+				  dp.insertamum as Docinsertamum,
+				  dp.prestudent_id,
+				  CONCAT(p.vorname, ' ', p.nachname) as insertvonma
+				FROM
+				  public.tbl_dokumentprestudent dp
+				  JOIN public.tbl_dokument d USING(dokument_kurzbz)
+				  LEFT JOIN public.tbl_vorlage v ON (d.dokument_kurzbz = v.vorlage_kurzbz)
+				  LEFT JOIN public.tbl_benutzer bn ON (bn.uid = dp.mitarbeiter_uid)
+				  LEFT JOIN public.tbl_person p ON (p.person_id = bn.person_id)
+				WHERE
+				  prestudent_id = ?";
+
+		if(!$archivdokumente)
+		{
+			$qry.="	AND (v.archivierbar = FALSE OR v.archivierbar IS NULL)";
+		}
+
+		return $this->execQuery($qry, $parametersArray);
+	}
 }

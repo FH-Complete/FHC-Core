@@ -117,6 +117,19 @@ class Student extends FHCAPI_Controller
 		$this->terminateWithSuccess(current($student));
 	}
 
+	protected function isLaufendesSemester($selectedSemester)
+	{
+		$laufendesStudiensemester = '';
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$result = $this->StudiensemesterModel->getNearest();
+		if(hasData($result)) {
+			$laufendesStudiensemester = (getData($result))[0]->studiensemester_kurzbz;
+		}
+
+		$islaufendesSemester = $selectedSemester === $laufendesStudiensemester;
+		return $islaufendesSemester;
+	}
+
 	/**
 	 * Saves data to a prestudent
 	 *
@@ -125,14 +138,17 @@ class Student extends FHCAPI_Controller
 	 */
 	public function save($prestudent_id)
 	{
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
-
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 
 		$this->load->library('form_validation');
+
+		$authuid = getAuthUID();
+		$now = date('c');
+
+		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
 
 		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date');
 
@@ -215,6 +231,12 @@ class Student extends FHCAPI_Controller
 		}
 
 		$array_allowed_props_student = ['matrikelnr'];
+		$this->addMeta('bhtest1', $this->isLaufendesSemester($studiensemester_kurzbz));
+		if($this->isLaufendesSemester($studiensemester_kurzbz)) 
+		{
+			$array_allowed_props_student = ['matrikelnr', 'verband', 'semester', 'gruppe'];
+			$this->addMeta('bhtest2', $array_allowed_props_student);
+		}
 		$update_student = array();
 		foreach ($array_allowed_props_student as $prop) {
 			$val = $this->input->post($prop);
@@ -240,6 +262,8 @@ class Student extends FHCAPI_Controller
 
 			if(hasData($curstudlvb) && count(getData($curstudlvb)) > 0 )
 			{
+				$update_lehrverband['updatevon'] = $authuid;
+				$update_lehrverband['updateamum'] = $now;
 				$result = $this->StudentlehrverbandModel->update([
 					'studiensemester_kurzbz' => $studiensemester_kurzbz,
 					'student_uid' => $uid
@@ -247,6 +271,8 @@ class Student extends FHCAPI_Controller
 			}
 			else
 			{
+				$update_lehrverband['insertvon'] = $authuid;
+				$update_lehrverband['insertamum'] = $now;
 				$result = $this->StudentlehrverbandModel->insert(array_merge([
 					'studiensemester_kurzbz' => $studiensemester_kurzbz,
 					'student_uid' => $uid,
@@ -258,6 +284,8 @@ class Student extends FHCAPI_Controller
 		}
 
 		if (count($update_person)) {
+			$update_person['updatevon'] = $authuid;
+			$update_person['updateamum'] = $now;
 			$result = $this->PersonModel->update(
 				$person_id,
 				$update_person
@@ -267,6 +295,8 @@ class Student extends FHCAPI_Controller
 
 
 		if (count($update_student)) {
+			$update_student['updatevon'] = $authuid;
+			$update_student['updateamum'] = $now;
 			$result = $this->StudentModel->update(
 				[$uid],
 				$update_student

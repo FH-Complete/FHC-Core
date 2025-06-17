@@ -99,7 +99,6 @@
   background-image: none;
 }
 
-
 .fhcSkipLink {
   position: absolute;
   left: -10px;
@@ -150,4 +149,11 @@
 
 .fhc-bullet-green::before {
   color: red;
+}
+
+.modal-msg {
+	max-width: 1378px;
+}
+.modal-msg .modal-content {
+	height: 95vh;
 }

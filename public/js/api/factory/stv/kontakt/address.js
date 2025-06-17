@@ -67,5 +67,11 @@ export default {
 			method: 'get',
 			url: 'api/frontend/v1/stv/address/getNations/'
 		};
+	},
+	getAllFirmen(){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/kontakt/getAllFirmen/'
+		}
 	}
 };

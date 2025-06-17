@@ -208,11 +208,12 @@ export default{
 			nations: [],
 			adressentypen: [],
 			firmen: [],
+			listFirmen: [],
 			filteredFirmen: [],
+			selectedFirma: null,
 			abortController: {
 				suggestions: null,
-				places: null,
-				firmen: null
+				places: null
 			},
 		}
 	},
@@ -231,6 +232,9 @@ export default{
 		uid() {
 			this.reload();
 		},
+		selectedFirma(newVal) {
+			this.addressData.firma_id = newVal?.firma_id || '';
+		}
 	},
 	methods:{
 		actionNewAdress() {
@@ -243,7 +247,7 @@ export default{
 				if(this.addressData.adresse_id)
 				{
 					this.addressData.address.plz = this.addressData.plz;
-				//	delete this.addressData.plz;
+					//	delete this.addressData.plz;
 					this.loadPlaces(this.addressData.address.plz);
 					this.$refs.adressModal.show();
 
@@ -324,18 +328,13 @@ export default{
 					this.places = result.data;
 				});
 		},
-		search(event) {
-			if (this.abortController.firmen) {
-				this.abortController.firmen.abort();
-			}
+		filterFirmen(event) {
+			const query = event?.query?.toLowerCase()?.trim() || "";
 
-			this.abortController.firmen = new AbortController();
-
-			return this.$api
-				.call(ApiStvCompany.get(event.query))
-				.then(result => {
-					this.filteredFirmen = result.data.retval;
-				});
+			this.filteredFirmen = this.listFirmen.filter(item => {
+				const label = (item.label || "").toLowerCase();
+				return label.includes(query);
+			});
 		},
 		hideModal(modalRef) {
 			this.$refs[modalRef].hide();
@@ -372,10 +371,17 @@ export default{
 				this.adressentypen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+
+		this.$api
+			.call(ApiStvAddress.getAllFirmen())
+			.then(result => {
+				this.listFirmen = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-details-kontakt-address h-100 pt-3">
-		
+
 		<!--Modal: AddressModal-->
 		<bs-modal ref="adressModal" dialog-class="modal-dialog-scrollable">
 			<template #title>
@@ -400,7 +406,7 @@ export default{
 						</option>
 						</form-input>
 					</div>
-					
+
 					<div class="row mb-3">
 						<form-input
 							type="text"
@@ -410,7 +416,7 @@ export default{
 						>
 						</form-input>					
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						type="select"
@@ -428,7 +434,7 @@ export default{
 						</option>
 						</form-input>
 				</div>
-													
+							
 				<div class="row mb-3">
 					<form-input
 						type="text"
@@ -440,7 +446,7 @@ export default{
 					>
 					</form-input>					
 				</div>
-											
+
 				<div class="row mb-3">
 					<form-input
 						v-if="addressData.nation == 'A'"
@@ -457,17 +463,17 @@ export default{
 							>
 							{{gemeinde.name}}
 						</option>
-						</form-input>
-						<form-input
+					</form-input>
+					<form-input
 							v-else
 							type="text"
 							:label="$p.t('person/gemeinde')"
 							name="addressData.gemeinde"
 							v-model="addressData.gemeinde"
 						>	
-						</form-input>
-					</div>
-				
+					</form-input>
+				</div>
+
 				<div class="row mb-3">
 					<form-input
 						v-if="addressData.nation == 'A'" 
@@ -494,7 +500,7 @@ export default{
 						>	
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<div class="col-sm-4">
 						<form-input
@@ -507,7 +513,7 @@ export default{
 						</form-input>
 					</div>
 				</div>
-				
+
 				<div class="row mb-3">
 					<div class="col-sm-4">
 						<form-input
@@ -520,7 +526,7 @@ export default{
 						</form-input>
 					</div>
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						type="text"
@@ -530,7 +536,7 @@ export default{
 					>
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<div class="col-sm-4">
 						<form-input
@@ -543,58 +549,38 @@ export default{
 						</form-input>
 					</div>
 				</div>
-					
-				<div v-if="statusNew" class="row mb-3">
+
+				<div class="row mb-3">
 					<form-input
 						type="autocomplete"
 						:label="$p.t('person/firma')"
 						name="firma_name"
-						v-model="addressData.firma"  
-						optionLabel="name" 
+						v-model="selectedFirma"
+						optionLabel="label"
+						optionValue="firma_id"
+						dropdown
+						forceSelection
 						:suggestions="filteredFirmen" 
-						@complete="search" 
-						:min-length="3"
-					>
-					</form-input>
-				</div>				
-					
-				<div v-else class="row mb-3">
-					<form-input
-						v-if="addressData.firmenname" 
-						type="text"
-						name="name"
-						:label="$p.t('person/firma')"
-						v-model="addressData.firmenname"
-					>
-					</form-input>
-					<form-input
-						v-else 
-						type="autocomplete"
-						:label="$p.t('person/firma')"
-						name="firma_name"
-						v-model="addressData.firma"  
-						optionLabel="name" 
-						:suggestions="filteredFirmen" 
-						@complete="search" 
+						@complete="filterFirmen"
 						:min-length="3"
 					>
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<input type="hidden" class="form-control" id="firma_id" v-model="addressData.firma_id">
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						type="text"
 						name="firma_zusatz"
-						:label="$p.t('person/firma_zusatz')"
+						:label="$p.t('global/name')"
 						v-model="addressData.name"
 					>
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 							type="text"
@@ -604,16 +590,16 @@ export default{
 						>
 					</form-input>
 				</div>
-			
+
 			</form-form>
-			
+
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="reload()">{{$p.t('ui', 'abbrechen')}}</button>
 				<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewAddress()">OK</button>
 				<button v-else type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>
             </template>
 		</bs-modal>
-			
+
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
@@ -628,4 +614,6 @@ export default{
 		</core-filter-cmpt>
 	</div>`
 };
+
+
 

@@ -261,9 +261,9 @@ class Mitarbeiter_model extends DB_Model
 	 * @param $lehrveranstaltung_id
 	 * @return array with Mitarbeiter and their Lehreinheiten
 	 */
-	public function getMitarbeiterFromLV($lehrveranstaltung_id){
-	//TODO(manu) maybe filter that in pruefungslist.js ?
-	$qry = "SELECT DISTINCT
+	public function getMitarbeiterFromLV($lehrveranstaltung_id)
+	{
+		$qry = "SELECT DISTINCT
     			lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid 
 			FROM 
 			    lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
@@ -275,6 +275,35 @@ class Mitarbeiter_model extends DB_Model
 				tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
 
 		$parametersArray = array($lehrveranstaltung_id);
+
+		return $this->execQuery($qry, $parametersArray);
+	}
+
+	/**
+	 * Get Lektoren by studiengang_kz
+	 *
+	 * @param $studiengang_kz
+	 * @return array with Mitarbeiter
+	 */
+	public function getLektoren($studiengang_kz)
+	{
+		$qry = "
+			SELECT DISTINCT
+			    campus.vw_mitarbeiter.uid,
+				campus.vw_mitarbeiter.vorname,
+				campus.vw_mitarbeiter.nachname,
+				studiengang_kz,
+				tbl_studiengang.typ,
+				tbl_studiengang.kurzbz AS stg_kurzbz
+			FROM
+			  campus.vw_mitarbeiter
+			  JOIN public.tbl_benutzerfunktion USING (uid)
+			  JOIN public.tbl_studiengang USING(oe_kurzbz)
+				WHERE studiengang_kz = ?
+				AND lektor is true
+			ORDER BY campus.vw_mitarbeiter.nachname";
+
+		$parametersArray = array($studiengang_kz);
 
 		return $this->execQuery($qry, $parametersArray);
 	}

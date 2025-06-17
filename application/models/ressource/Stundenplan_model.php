@@ -50,7 +50,6 @@ class Stundenplan_model extends DB_Model
 	 */
 	public function groupedCalendarEvents($ort_kurzbz,$start_date,$end_date){
 
-
 		$gruppierteEvents= $this->execReadOnlyQuery("
 		SELECT
 
@@ -187,6 +186,99 @@ class Stundenplan_model extends DB_Model
 	}
 
 	/**
+	 * groups rows of a subquery that fetches data from the lehre.vw_stundenplan table or lehre.vw_stundenplandev
+	 * @param string $stundenplanViewQuery the subquery used to group the result regarding consecutive hours (Tab LV Termine)
+	 *
+	 * @return stdClass
+	 */
+	public function stundenplanGruppierungConsecutive($stundenplanViewQuery)
+	{
+		$query_result = $this->execReadOnlyQuery("
+			SELECT
+			  distinct lehrveranstaltung_id,
+			  datum,
+			  MIN(beginn) as beginn,
+			  MAX(ende) as ende,
+			  type,
+			  topic,
+			  gruppe,
+			  ort_kurzbz,
+			  lehreinheit_id,
+			  lehrfach_bez,
+			  lektor,
+			  lektorname,
+			  gruppen_kuerzel,
+			  farbe
+			FROM
+			  (
+				SELECT
+				'lehreinheit' as type, beginn, ende, datum,
+				CONCAT(lehrfach,'-',lehrform) as topic,
+				array_agg(DISTINCT lektor) as lektor,
+				array_agg(DISTINCT lektorname) as lektorname,
+				array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
+				array_agg(DISTINCT (gruppen_kuerzel)) as gruppen_kuerzel,
+				string_agg(DISTINCT ort_kurzbz, '/') as ort_kurzbz,
+				array_agg(DISTINCT lehreinheit_id) as lehreinheit_id,
+				titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+
+				FROM
+				(
+					SELECT unr,datum,beginn, ende,
+					CASE
+						WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
+						ELSE lektor
+					END as lektor,
+					CASE
+						WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz
+						ELSE (SELECT UPPER(typ || kurzbz) 
+						      FROM public.tbl_studiengang 
+							  WHERE studiengang_kz=sp.studiengang_kz) || COALESCE(sp.semester,'0') || COALESCE(sp.verband,'') || COALESCE(sp.gruppe,'')
+					END as gruppen_kuerzel,
+					(SELECT bezeichnung
+					FROM public.tbl_organisationseinheit
+					WHERE oe_kurzbz IN(
+						SELECT oe_kurzbz
+						FROM lehre.tbl_lehrveranstaltung
+						WHERE lehrveranstaltung_id = sp.lehrveranstaltung_id
+					)) as organisationseinheit,
+					ort_kurzbz, studiengang_kz, titel,lehreinheit_id,lehrfach_id,sp.anmerkung,fix,lehrveranstaltung_id,
+					stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,
+					anmerkung_lehreinheit,gruppe, verband, semester,stg_kurzbz,
+					  CONCAT(p.nachname, ' ', p.vorname) as lektorname
+
+					FROM (".$stundenplanViewQuery.") sp
+					JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = sp.stunde
+					LEFT JOIN public.tbl_benutzer bn ON bn.uid = sp.uid
+					LEFT JOIN public.tbl_person p ON p.person_id = bn.person_id
+				) as subquery
+
+			GROUP BY unr, datum, beginn, ende, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, 
+			farbe, lehrveranstaltung_id
+
+			ORDER BY datum, beginn) t
+
+			GROUP BY
+			  lehrveranstaltung_id,
+			  type,
+			  datum,
+			  topic,
+			  lektor,
+			  lehrfach_bez,
+			  gruppe,
+			  ort_kurzbz,
+			  lehreinheit_id,
+			  lektorname,
+			  gruppen_kuerzel,
+			  farbe
+			ORDER BY
+			  datum, beginn
+			"
+		);
+		return $query_result;
+	}
+
+	/**
 	 * queries Stundenplan but for a whole lva, irrespective of who is requesting it
 	 * 
 	 * @return void
@@ -300,10 +392,13 @@ class Stundenplan_model extends DB_Model
 	/**
 	 * NO STANDALONE FUNCTION - Generates a SQL query string to fetch 'stundenplan' events for a specific student within the current semester.
 	 *
+	 * @param isLvList if condition needed for Tab LV Termine is given
+	 * @param db_stpl_table enables switch to db 'stundenplandev'
+	 *
 	 * @return mixed
 	 */
-	public function getStundenplanQuery($start_date, $end_date,$semester,$gruppen,$studentlehrverbaende){
-		
+	public function getStundenplanQuery($start_date, $end_date, $semester, $gruppen, $studentlehrverbaende, $isLvList=false, $db_stpl_table='stundenplan'){
+
 		// helper function to check if either $gruppen or $studentlehrverbaende are empty for each semester
 		$emptyCheck = function($toBeCheckedArray) use ($semester){
 			$result = true;
@@ -325,7 +420,7 @@ class Stundenplan_model extends DB_Model
 
 		$query =
 		"select sp.*
-		from lehre.vw_stundenplan sp
+		from lehre.vw_".$db_stpl_table." sp
 		WHERE
 		sp.datum >= ".$this->escape($start_date)."
 		AND sp.datum <= ".$this->escape($end_date);
@@ -335,10 +430,10 @@ class Stundenplan_model extends DB_Model
 		{
 			$query .= " AND ( ";
 		} 
-		
+
 		foreach($semester as $sem => $semester_date_range)
 		{
-			
+
 			foreach($semester_date_range as $sem_date => $sem_date_range)
 			{
 				// if there are not groups for the semester skip the iteration step
@@ -358,7 +453,13 @@ class Stundenplan_model extends DB_Model
 		{
 			$query = substr($query, 0, -2);
 		}
-		
+
+		//Condition for showLVList FHC4
+		if(!$isLvList)
+			$stringGroupLv =  "AND gruppe_kurzbz is null";
+		else
+			$stringGroupLv ="";
+
 		foreach($semester as $sem=>$semester_date_range)
 		{
 			foreach($semester_date_range as $sem_date => $sem_date_range)
@@ -373,10 +474,10 @@ class Stundenplan_model extends DB_Model
 					// Eintraege fuer den ganzen Verband
 					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND (sp.gruppe is null OR sp.gruppe='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
 					// Eintraege fuer das ganze Semester
-					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).") AND gruppe_kurzbz is null)";
-					
+					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)
+						." AND ".$this->escape($sem_date_range->ende).")". $stringGroupLv. ")";
+
 					$query .="OR";
-					 
 				}
 			}	
 		}
@@ -434,5 +535,4 @@ class Stundenplan_model extends DB_Model
 
 		return $this->execQuery($query, [$uid, $uid]);
 	}
-
 }

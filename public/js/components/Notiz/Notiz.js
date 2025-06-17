@@ -95,8 +95,10 @@ export default {
 							return el;
 						},
 					},
-					{title: "VerfasserIn", field: "verfasser_uid", width: 124, visible: false},
-					{title: "BearbeiterIn", field: "bearbeiter_uid", width: 126, visible: false},
+					{title: "VerfasserIn", field: "verfasser", width: 124},
+					{title: "BearbeiterIn", field: "bearbeiter", width: 126},
+					{title: "Verfasser UID", field: "verfasser_uid", width: 124, visible: false},
+					{title: "Bearbeiter UID", field: "bearbeiter_uid", width: 126, visible: false},
 					{title: "Start", field: "start_format", width: 86, visible: false},
 					{title: "Ende", field: "ende_format", width: 86, visible: false},
 					{title: "Dokumente", field: "countdoc", width: 100, visible: false},
@@ -187,9 +189,12 @@ export default {
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('verfasser_uid').component.updateDefinition({
+						cm.getColumnByField('verfasser').component.updateDefinition({
 							title: this.$p.t('notiz', 'verfasser'),
 							visible: this.showVariables.showVerfasser
+						});
+						cm.getColumnByField('verfasser_uid').component.updateDefinition({
+							title: this.$p.t('ui', 'verfasser_uid'),
 						});
 						cm.getColumnByField('titel').component.updateDefinition({
 							title: this.$p.t('global', 'titel'),
@@ -199,9 +204,12 @@ export default {
 							title: this.$p.t('global', 'text'),
 							//visible: this.showVariables.showText
 						});
-						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
+						cm.getColumnByField('bearbeiter').component.updateDefinition({
 							title: this.$p.t('notiz', 'bearbeiter'),
 							visible: this.showVariables.showBearbeiter
+						});
+						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
+							title: this.$p.t('ui', 'bearbeiter_uid'),
 						});
 						cm.getColumnByField('start_format').component.updateDefinition({
 							title: this.$p.t('global', 'gueltigVon'),
