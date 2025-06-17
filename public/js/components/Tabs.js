@@ -60,7 +60,7 @@ export default {
 	methods: {
 		handleTabClick: function(index) {
 			let keys = Object.keys(this.tabs);
-			this.change(key[index]);
+			this.change(keys[index]);
 		},
 		change(key) {
 			this.$emit("change", key)
