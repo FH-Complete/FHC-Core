@@ -4,7 +4,6 @@ import employee from "./employee.js";
 import organisationunit from "./organisationunit.js";
 import student from "./student.js";
 import prestudent from "./prestudent.js";
-import uuid from "../../helpers/UUID.js";
 
 export default {
     props: [ "searchoptions", "searchfunction" ],
