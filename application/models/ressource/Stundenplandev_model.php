@@ -65,7 +65,7 @@ class Stundenplandev_model extends DB_Model
 	}
 
     /**
-     * Get LvPlan data.
+     * Get Stundenplan data.
      *
      * @param null $lehrveranstaltung_id
      * @param null $studiensemester_kurzbz
@@ -75,7 +75,7 @@ class Stundenplandev_model extends DB_Model
      * @param false $nurBevorstehende If true, only future data is retrieved.
      * @return array|false|stdClass|null
      */
-    public function getLvPlanData($lehrveranstaltung_id=null, $studiensemester_kurzbz=null, $lehreinheit_id=null, $mitarbeiter_uid=null, $student_uid=null, $nurBevorstehende = false)
+    public function getStundenplanData($lehrveranstaltung_id=null, $studiensemester_kurzbz=null, $lehreinheit_id=null, $mitarbeiter_uid=null, $student_uid=null, $nurBevorstehende = false)
     {
         $params = array();
 
