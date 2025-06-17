@@ -309,8 +309,8 @@ SELECT tbl_lehrveranstaltung.*,
 	}
 
 	private function computeLektorenFromLehrveranstaltung($lehreinheit_id, $semester, $studiengang, $studiensemester){
-		$this->load->library('LvPlanLib');
-		$lektoren = $this->lvplanlib->getLektorenFromLehrveranstaltung($lehreinheit_id,$semester, $studiengang,$studiensemester);
+		$this->load->library('StundenplanLib');
+		$lektoren = $this->stundenplanlib->getLektorenFromLehrveranstaltung($lehreinheit_id,$semester, $studiengang,$studiensemester);
 		if(!$lektoren){
 			return [];
 		}
