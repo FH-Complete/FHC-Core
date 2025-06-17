@@ -84,11 +84,12 @@ export default {
     `,
     watch:{
 		'searchsettings.searchstr': function (newSearchValue, oldSearchValue) {
-			sessionStorage.setItem('searchstr',newSearchValue);
+			if(this.searchoptions.origin){
+				sessionStorage.setItem(`${this.searchoptions.origin}_searchstr`,newSearchValue);
+			}
 		},
     },
 	computed:{
-		
 		search_types_string(){
 			if (Array.isArray(this.searchsettings.types) && this.searchsettings.types.length > 0){
 				return this.searchsettings.types.join(' / ');
@@ -104,8 +105,8 @@ export default {
 				this.searchsettings.types = this.allSearchTypes();
 			}
 			// stores the search types in the localstorage, only if the newValue is also an array
-			if(Array.isArray(newValue)){
-				localStorage.setItem('searchtypes', JSON.stringify(newValue));
+			if(Array.isArray(newValue), this.searchoptions.origin){
+				localStorage.setItem(`${this.searchoptions.origin}_searchtypes`, JSON.stringify(newValue));
 			}
 			this.search();
 		});
@@ -114,6 +115,10 @@ export default {
 		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {
 			toggle: false
 		});
+
+		if (!this.searchoptions.origin){
+			console.warn("No origin defined in the searchoptions for the searchbar, please define the origin property in the searchbaroptions to allow reliable storage of searchstr and searchtypes accross applications.");
+		}
 	},
 	updated() {
 		if(this.showresult) {
@@ -125,8 +130,9 @@ export default {
     methods: {
 		getSearchTypes: function () {
 			let result = this.allSearchTypes();
-			if (localStorage.getItem('searchtypes')) {
-				result = JSON.parse(localStorage.getItem('searchtypes'));
+			let localStorageValue = localStorage.getItem('searchtypes');
+			if (localStorageValue) {
+				result = JSON.parse(localStorageValue);
 			}
 			return result;
 		},
@@ -138,7 +144,7 @@ export default {
 			return allTypes;
 		},
 		getSearchStr: function(){
-			return sessionStorage.getItem('searchstr') ?? '';
+			return sessionStorage.getItem("searchstr") ?? '';
 		},
 		checkSettingsVisibility: function(event) {
 			// hides the settings collapsible if the user clicks somewhere else
