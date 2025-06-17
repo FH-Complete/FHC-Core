@@ -27,14 +27,14 @@ class LvPlan extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->model('ressource/Stundenplan_model', 'LvPlanModel');
+		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 
-		/* $result = $this->LvPlanModel->loadForUid(getAuthUID());
+		/* $result = $this->StundenplanModel->loadForUid(getAuthUID());
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
  		*/
-		$res = $this->LvPlanModel->lvPlanGruppierung($this->LvPlanModel->getLvPlanQuery(getAuthUID())); 
+		$res = $this->StundenplanModel->stundenplanGruppierung($this->StundenplanModel->getStundenplanQuery(getAuthUID())); 
 		
 		$res = getData($res);
 		
