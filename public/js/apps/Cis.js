@@ -13,6 +13,7 @@ const app = Vue.createApp({
     data: function() {
         return {
             searchbaroptions: {
+				origin: "cis",
 				cssclass: "",
 				calcheightonly: true,
                 types: [
