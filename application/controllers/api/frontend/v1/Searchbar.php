@@ -35,7 +35,8 @@ class Searchbar extends FHCAPI_Controller
 	{
 		// NOTE(chris): additional permission checks will be done in SearchBarLib
 		parent::__construct([
-			'search' => self::PERM_LOGGED
+			'search' => self::PERM_LOGGED,
+			'searchAdvanced' => self::PERM_LOGGED
 		]);
 	}
 
