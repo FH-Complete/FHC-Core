@@ -1,7 +1,7 @@
-
 import BsAlert from './Alert.js';
 
 export default {
+	name: 'BootstrapPrompt',
 	mixins: [
 		BsAlert
 	],

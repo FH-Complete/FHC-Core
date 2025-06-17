@@ -152,6 +152,19 @@ class FHCAPI_Controller extends Auth_Controller
 	}
 
 	/**
+	 * @param string				$key
+	 * @return mixed
+	 */
+	public function getMeta($key)
+	{
+		if (!isset($this->returnObj['meta']))
+			return null;
+		if (!isset($this->returnObj['meta'][$key]))
+			return null;
+		return $this->returnObj['meta'][$key];
+	}
+
+	/**
 	 * @param string				$status
 	 * @return void
 	 */
@@ -189,7 +202,7 @@ class FHCAPI_Controller extends Auth_Controller
 	}
 
 	/**
-	 * @param array					$error
+	 * @param string|array|object					$error
 	 * @param string				$type (optional)
 	 * @param integer				$status (optional)
 	 * @return void
@@ -205,7 +218,7 @@ class FHCAPI_Controller extends Auth_Controller
 	/**
 	 * @param stdclass				$result
 	 * @param string				$errortype
-	 * @return void
+	 * @return mixed
 	 */
 	protected function getDataOrTerminateWithError($result, $errortype = self::ERROR_TYPE_GENERAL)
 	{

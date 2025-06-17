@@ -25,11 +25,11 @@ $this->phrasen['testtool/klickenSieAufEinTeilgebiet']='Zum Starten klicken Sie b
 $this->phrasen['testtool/gebietStarten']='Gebiet starten';
 $this->phrasen['testtool/startseite']='Startseite';
 $this->phrasen['testtool/zurueckZurStartseite']='Zurück zur Startseite';
-$this->phrasen['testtool/begruessungstext']="Willkommen zum Reihungstest der Fachhochschule Technikum Wien!";
+$this->phrasen['testtool/begruessungstext']="Willkommen zum Reihungstest der Fachhochschule Technikum Wien";
 $this->phrasen['testtool/anmeldedaten']= "Sie sind mit folgenden Daten angemeldet:";
 $this->phrasen['testtool/keineAntwort']='Keine Antwort';
 $this->phrasen['testtool/speichernUndWeiter']='Speichern und weiter';
-$this->phrasen['testtool/alleFragenBeantwortet']='GLÜCKWUNSCH! \n\nSie haben alle Fragen in der zur Verfügung stehenden Zeit beantwortet. \nNutzen Sie die verbleibende Zeit, um Ihre Antworten zu kontrollieren oder fahren Sie mit dem nächsten Teilgebiet fort';
+$this->phrasen['testtool/alleFragenBeantwortet']='GLÜCKWUNSCH! \n\nSie haben alle Fragen in der zur Verfügung stehenden Zeit beantwortet. \nNutzen Sie die verbleibende Zeit, um Ihre Antworten zu kontrollieren oder fahren Sie mit dem nächsten Teilgebiet fort.';
 $this->phrasen['testtool/zeitAbgelaufen']='Die Maximalzeit für dieses Gebiet ist abgelaufen, oder alle Fragen wurden beantwortet';
 $this->phrasen['testtool/spracheDerTestfragen']='Gewünschte Sprache der Testfragen';
 $this->phrasen['testtool/einleitung']='Einleitung';
@@ -62,8 +62,8 @@ $this->phrasen['testtool/einfuehrungsText']='
 					<h1 style="white-space: normal">Herzlich Willkommen zum Reihungstest</h1>
 					<a href="'.APP_ROOT.'cms/dms.php?id=142964" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=142976" alt="Einfuehrungsvideo" style="border: 1px solid lightgray; border-radius: 10px; width:350px;"></a>
 					<br><br>
-					<a href="'.APP_ROOT.'cms/dms.php?id=207694" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Bachelor</b>-Leitfaden zum Ablauf des Reihungstests</a><br>
-					<a href="'.APP_ROOT.'cms/dms.php?id=143928" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Master</b>-Leitfaden zum Ablauf des Reihungstests</a>
+					<a href="'.APP_ROOT.'cms/dms.php?id=330348" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Bachelor</b>-Leitfaden zum Ablauf des Reihungstests</a><br>
+					<a href="'.APP_ROOT.'cms/dms.php?id=275533" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Master</b>-Leitfaden zum Ablauf des Reihungstests</a>
 					<br><br>
 					Unter dem folgenden Link können Sie die korrekte Darstellung des Reihungstests testen:<br><br>
 					<a href="../public/testtool_test/testseite.php" target="_blank" class="btn btn-default">Zum Darstellungstest</a>

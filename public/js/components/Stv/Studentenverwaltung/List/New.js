@@ -5,6 +5,8 @@ import FormValidation from '../../../Form/Validation.js';
 import FormInput from '../../../Form/Input.js';
 import accessibility from '../../../../directives/accessibility.js';
 
+import ApiStvStudents from '../../../../api/factory/stv/students.js';
+
 var _uuid = 0;
 const FORMDATA_DEFAULT = {
 	address: {
@@ -99,20 +101,20 @@ export default {
 			this.suggestions = [];
 			this.$refs.form.clearValidation();
 		},
-		loadSuggestions() {console.log('loadSuggestions');
+		loadSuggestions() {
 			if (this.abortController.suggestions)
 				this.abortController.suggestions.abort();
 			if (this.person !== null)
 				return;
 
 			this.abortController.suggestions = new AbortController();
-			// TODO(chris): move to fhcapi.factory
-			this.$fhcApi
-				.post('api/frontend/v1/stv/student/check', {
+			
+			this.$api
+				.call(ApiStvStudents.check({
 					vorname: this.formData.vorname,
 					nachname: this.formData.nachname,
 					gebdatum: this.formData.gebdatum
-				}, {
+				}), {
 					signal: this.abortController.suggestions.signal
 				})
 				.then(result => this.suggestions = result.data)
