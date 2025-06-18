@@ -1,28 +1,27 @@
 /* Moodle Events in Month Page */
 .monthPageContainer .lehreinheitEventContent{
-	display: grid;
-	grid-template-columns: auto 1fr;
-	grid-template-rows: 1fr;
-	border-bottom: 1px solid var(--bs-border-color);
-	
+	display: flex;
+	border-bottom: 1px solid var(--bs-border-color);	
 }
 
 .monthPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
-	display:grid;
-	padding: .25rem .5rem .25rem .25rem;
-	margin-right: .25rem;
-	align-content: center;
+	display:none;
 }
 
 
 .monthPageContainer .lehreinheitEventContent #lehreinheitEventText {
-	display: flex;
-	flex-wrap: wrap;
-	column-gap: 5px;
+	width: 100%;
 	font-size: .875em;
-	align-items:center;
-	justify-content: space-evenly;
+	overflow:hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display:flex;
+	place-content: center space-evenly;
 	
+}
+
+.monthPageContainer .lehreinheitEventContent #lehreinheitEventText #lehreinheitLektoren{
+	display:none;
 }
 
 /* Moodle Events in Week Page */
@@ -44,10 +43,10 @@
 
 .weekPageContainer .lehreinheitEventContent #lehreinheitEventText {
 	display: flex;
+	flex-direction: column;
+	place-content: center space-evenly;
 	flex-wrap: wrap;
 	column-gap: 5px;
-	align-items: center;
-	justify-content: space-evenly;
 
 }
 

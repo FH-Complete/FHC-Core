@@ -2,7 +2,7 @@ import FhcCalendar from "../../Calendar/Calendar.js";
 import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
 import LvMenu from "../Mylv/LvMenu.js"
-import lehreinheitEvent from "./EventTypes/calendarEvent.js"
+import lehreinheitEvent from "../Renderer/Lehreinheit/calendarEvent.js"
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
@@ -352,14 +352,14 @@ const LvPlan = {
 		</template>
 		<template #weekPage="{event,day}">
 			<div @click="showModal(event)" type = "button"
-				class="weekPageContainer position-relative border border-secondary border  h-100"
+				class="weekPageContainer position-relative h-100"
 				:class="{'p-1':event.allDayEvent}"
 				style = "overflow: auto;" >
 				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
 			</div>
 		</template>
 		<template #dayPage="{event,day,mobile}">
-			<div @click="mobile? showModal(event):null" type="button" class="dayPageContainer fhc-entry border border-secondary border m-0 h-100  text-center">
+			<div @click="mobile? showModal(event):null" type="button" class="dayPageContainer fhc-entry m-0 h-100  text-center">
 				<component :is="calendarEventComponent(event.type)" :event="event"></component>
 			</div>
 		</template>

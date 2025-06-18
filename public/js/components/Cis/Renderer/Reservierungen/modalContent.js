@@ -1,5 +1,5 @@
-import { numberPadding, formatDate } from "../../../helpers/DateHelpers.js"
-import LvMenu from "./LvMenu.js";
+import { numberPadding, formatDate } from "../../../../helpers/DateHelpers.js"
+import LvMenu from "../../Mylv/LvMenu.js";
 
 export default {
 	props:{
@@ -82,14 +82,6 @@ export default {
 					</tr>
 					<tr>
 						<th>{{
-							$p.t('lehre','lehrveranstaltung')?
-							$p.t('lehre','lehrveranstaltung')+':'
-							:''
-						}}</th>
-						<td>{{'('+event.lehrform+') ' + event.lehrfach_bez}}</td>
-					</tr>
-					<tr>
-						<th>{{
 							$p.t('lehre','lektor')?
 							$p.t('lehre','lektor')+':'
 							:''
@@ -109,18 +101,9 @@ export default {
 							}}</th>
 						<td>{{start_time + ' - ' + end_time}}</td>
 					</tr>
-					<tr>
-						<th>{{
-							$p.t('lehre','organisationseinheit')?
-							$p.t('lehre','organisationseinheit')+':'
-							:''
-						}}</th>
-						<td>{{event.organisationseinheit}}</td>
-					</tr>
+					
 				</tbody>
 		</table>
 		
-		<h3>{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
-		<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-if="lvMenu" :menu="lvMenu" />
 	</div>`,
 }
