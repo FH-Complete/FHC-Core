@@ -617,7 +617,7 @@ export default {
 					<form-input
 						type="autocomplete"
 						container-class="col-6 stv-details-abschlusspruefung-vorsitz"
-						label="VORSITZ"
+						:label="$p.t('abschlusspruefung', 'vorsitz')"
 						name="vorsitz"
 						v-model="selectedVorsitz"
 						optionLabel="label"
@@ -637,7 +637,6 @@ export default {
 						v-model="selectedPruefer1"
 						optionLabel="label"
 						optionValue="person_id"
-						dropdown
 						forceSelection
 						:suggestions="listeFilteredPersons"
 						@complete="filterPersons"
@@ -671,7 +670,6 @@ export default {
 						v-model="selectedPruefer2"
 						optionLabel="label"
 						optionValue="person_id"
-						dropdown
 						forceSelection
 						:suggestions="listeFilteredPersons" 
 						@complete="filterPersons"
@@ -704,7 +702,6 @@ export default {
 						v-model="selectedPruefer3"
 						optionLabel="label"
 						optionValue="person_id"
-						dropdown
 						forceSelection
 						:suggestions="listeFilteredPersons" 
 						@complete="filterPersons"
