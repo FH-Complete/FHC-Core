@@ -7,7 +7,7 @@ import AbschlusspruefungDropdown from "./AbschlusspruefungDropdown.js";
 
 import ApiStudiengang from '../../../../../api/factory/studiengang.js';
 import ApiStvAbschlusspruefung from '../../../../../api/factory/stv/abschlusspruefung.js';
-import ApiStvAddress from "../../../../../api/factory/stv/kontakt/address";
+import ApiStvAddress from "../../../../../api/factory/stv/kontakt/address.js";
 
 export default {
 	components: {
