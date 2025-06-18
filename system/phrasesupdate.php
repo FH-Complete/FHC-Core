@@ -30027,6 +30027,26 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'offen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Offen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'endAnwKontrolle',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -31979,6 +31999,66 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Date does not match a lesson as per timetable.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolleTimeOverlap',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrollzeiten überlappen mit Kontrolle von {0} bis {1}.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Times overlap with attendance check from {0} to {1}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'keineKontrollenAnDatumFallback',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Kontrollen an {0} gefunden, es werden alle Kontrollen angezeigt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No attendance checks found on {0}, all attendance checks are being shown.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'noLePreselectTermineTooOld',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine intelligente LV-Teil Vorauswahl möglich, da sämtliche Termine außerhalb des erlaubten Kontrollzeitraums liegen. Bitte wählen Sie sorgfältig den gewünschten LV-Teil aus.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No intelligent pre-selection of teaching unit is possible, as all dates fall outside the permitted control period. Please carefully select the desired teaching unit.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
