@@ -42,7 +42,9 @@ export default {
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-day">
-		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'week')">
+		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="$emit('updateMode', 'week')"
+			@updateSelectedDate="$emit('updateSelectedDate', $event)"
+		>
 			<template #calendarDownloads>
 				<slot name="calendarDownloads"></slot>
 			</template>

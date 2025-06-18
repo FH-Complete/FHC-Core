@@ -80,7 +80,9 @@ export default {
 	},
 	template: `
 	<div class="fhc-calendar-month">
-		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="handleHeaderClickMonth">
+		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="handleHeaderClickMonth"
+			@updateSelectedDate="$emit('updateSelectedDate', $event)"
+		>
 			<template #calendarDownloads>
 				<slot name="calendarDownloads"></slot>
 			</template>

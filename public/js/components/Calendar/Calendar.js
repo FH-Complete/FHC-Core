@@ -62,6 +62,20 @@ export default {
 		noMonthView: Boolean
 	},
 	watch:{
+		initialDate: function(newVal, oldVal) {
+			let newValIsoDate = newVal.getFullYear() + "-" +
+				String(newVal.getMonth() + 1).padStart(2, "0") + "-" +
+				String(newVal.getDate()).padStart(2, "0");
+			
+			let oldValIsoDate = oldVal.getFullYear() + "-" +
+				String(oldVal.getMonth() + 1).padStart(2, "0") + "-" +
+				String(oldVal.getDate()).padStart(2, "0");
+			
+			if(newValIsoDate !== oldValIsoDate) {
+				this.date.set(new Date(this.initialDate));
+				this.focusDate.set(this.date);
+			}
+		},
 		mode(newVal) {
 			this.$emit('change:mode', newVal)
 		},
@@ -99,7 +113,8 @@ export default {
 		'change:mode',
 		'update:minimized',
 		'selectedEvent',
-		'change:offset'
+		'change:offset',
+		'change:selectedDate'
 	],
 	data() {
 		return {
@@ -208,6 +223,10 @@ export default {
 		handleInput(day) {
 			this.$emit(day[0], day[1]);
 		},
+		test(payload) {
+			console.log(payload);
+			this.$emit('change:selectedDate', payload);
+		}
 	},
 	created() {
 		const initMode = this.initialMode.toLowerCase()
@@ -253,7 +272,9 @@ export default {
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card h-100" :class="sizeClass">
 		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)"
-		 @input="handleInput" @change:offset="$emit('change:offset', $event)">
+		 @input="handleInput" @change:offset="$emit('change:offset', $event)"
+		 @updateSelectedDate="test"
+		>
 			<template #calendarDownloads>
 				<slot name="calendarDownloads" ></slot>
 			</template>

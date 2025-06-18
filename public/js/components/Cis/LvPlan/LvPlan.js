@@ -90,7 +90,7 @@ const LvPlan = {
 			if(this.$refs.calendar) this.$refs.calendar.setMode(newVal)
 		},
 		'propsViewData.focus_date'(newVal) {
-			this.currentDate = new Date(newVal)
+			this.currentDay = new Date(newVal)
 		}
 	},
 	components: {
@@ -160,6 +160,10 @@ const LvPlan = {
 		
 		setSelectedEvent: function (event) {
 			this.currentlySelectedEvent = event;
+		},
+		handleChangeSelectedDate(isodatestr) {
+			let day = new Date(isodatestr);
+			this.selectDay(day);
 		},
 		selectDay: function(day){
 			const date = day.getFullYear() + "-" +
@@ -333,6 +337,7 @@ const LvPlan = {
 		show-weeks
 		@select:day="selectDay"
 		@change:mode="handleChangeMode"
+		@change:selectedDate="handleChangeSelectedDate"
 		v-model:minimized="minimized"
 	>
 		<template #calendarDownloads>

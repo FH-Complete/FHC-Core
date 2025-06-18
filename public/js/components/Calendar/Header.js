@@ -1,4 +1,8 @@
 export default {
+	name: 'Fhc-Calendar-Header',
+	components: {
+		vuedatepicker: VueDatePicker
+	},
 	data(){
 		return{
 			selected: this.mode,
@@ -8,6 +12,7 @@ export default {
 				month: { mode_bezeichnung: "month", icon: "fa-calendar-days", condition: !this.noMonthView }, 
 			},
 			headerPadding:null,
+			selectedDate: null
 		}
 	},
 	inject: [
@@ -25,7 +30,8 @@ export default {
 		'updateMode',
 		'prev',
 		'next',
-		'click'
+		'click',
+		'updateSelectedDate'
 	],
 	computed: {
 		getHeaderClassSide() {
@@ -35,6 +41,21 @@ export default {
 			return this.containerWidth > 780 ? 'col-6' : 'col-12'
 		}
 	},
+	methods: {
+		selectedDateChanged: function() {
+			console.log('selectedDateChanged: ' + this.selectedDate);
+			let isodatestr = '';
+			if( Array.isArray(this.selectedDate)) {
+				let tmpdate = this.selectedDate[0];
+				isodatestr = tmpdate.getFullYear() + "-" +
+				String(tmpdate.getMonth() + 1).padStart(2, "0") + "-" +
+				String(tmpdate.getDate()).padStart(2, "0");
+			} else {
+				isodatestr = this.selectedDate;
+			}
+			this.$emit('updateSelectedDate', isodatestr);
+		}
+	},
 	template: /*html*/`
 	<div class="calendar-header card-header w-100">
 		<div class="row align-items-center ">
@@ -42,6 +63,67 @@ export default {
 				<slot name="calendarDownloads"></slot>
 			</div>
 			<div :class="getHeaderClassMiddle" :style="{'padding-left':headerPadding}">
+
+				<div class="fhc-calendar-datepicker row align-items-center justify-content-center">
+					<div style="max-width: 180px;">
+					<vuedatepicker
+						v-if="selected === 'month'"
+						v-model="selectedDate"
+						:month-picker="true"
+						:action-row="{ showSelect: false, showCancel: false, showNow: false, showPreview: false }"
+						:config="{keepActionRow: true}"
+						:enable-time-picker="false"
+						:teleport="true"
+						:clearable="false"
+						six-weeks
+						auto-apply 
+						text-input 
+						locale="de"
+						format="MMMM yyyy"
+						model-type="yyyy-MM-dd"
+						@update:model-value="selectedDateChanged"
+					></vuedatepicker>
+		
+					<vuedatepicker
+						v-else-if="selected === 'week'"
+						v-model="selectedDate"
+						:week-picker="true"
+						:week-numbers="{ type: 'iso' }"
+						:action-row="{ showSelect: false, showCancel: false, showNow: true, showPreview: false }"
+						:config="{keepActionRow: true}"
+						:enable-time-picker="false"
+						:teleport="true"
+						:clearable="false"
+						six-weeks
+						auto-apply 
+						text-input 
+						locale="de"
+						format="yyyy 'KW' ww"
+						model-type="yyyy-MM-dd"
+						@update:model-value="selectedDateChanged"
+					></vuedatepicker>
+		
+					<vuedatepicker
+						v-else=""
+						v-model="selectedDate"
+						:enable-time-picker="false"
+						:teleport="true"
+						:week-numbers="{ type: 'iso' }"
+						:action-row="{ showSelect: false, showCancel: false, showNow: true, showPreview: false }"
+						:config="{keepActionRow: true}"
+						:clearable="false"
+						six-weeks
+						auto-apply 
+						text-input 
+						locale="de"
+						format="dd.MM.yyyy"
+						model-type="yyyy-MM-dd"
+						@update:model-value="selectedDateChanged"
+					></vuedatepicker>
+					</div>
+				</div>
+
+<!--
 				<div class="row align-items-center justify-content-center">
 					<div class="col-auto p-2">
 						<button class="btn btn-outline-secondary border-0" :class="{'btn-sm':!this.size}" @click="$emit('prev')"><i class="fa fa-chevron-left"></i></button>
@@ -58,6 +140,7 @@ export default {
 						<button class="btn btn-outline-secondary border-0" :class="{'btn-sm': !this.size}" @click="$emit('next')"><i class="fa fa-chevron-right"></i></button>
 					</div>
 				</div>
+-->
 			</div>
 			<div ref="viewButtons" v-if="!noWeekView && !noMonthView" :class="getHeaderClassSide" class="d-flex justify-content-center justify-content-md-end align-items-center" style="pointer-events: none;">
 				<div  style="pointer-events: all;">

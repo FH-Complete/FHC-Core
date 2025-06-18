@@ -12,6 +12,7 @@ export default {
 	emits: [
 		'updateMode',
 		'change:range',
-		'input'
+		'input',
+		'updateSelectedDate'
 	]
 }

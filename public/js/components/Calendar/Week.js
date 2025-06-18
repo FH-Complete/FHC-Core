@@ -15,7 +15,8 @@ export default {
 		Weeks
 	},
 	emits: [
-		"change:offset"
+		"change:offset",
+		"updateSelectedDate"
 	],
 	computed: {
 		title() {
@@ -60,7 +61,9 @@ export default {
 	},
 	template: /*html*/`
 	<div class="fhc-calendar-week">
-		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="handleHeaderClickWeek">
+		<calendar-header :title="title" @prev="prev" @next="next" @updateMode="$emit('updateMode', $event)" @click="handleHeaderClickWeek"
+			@updateSelectedDate="$emit('updateSelectedDate', $event)"
+		>
 			<template #calendarDownloads>
 				<slot name="calendarDownloads"></slot>
 			</template>
