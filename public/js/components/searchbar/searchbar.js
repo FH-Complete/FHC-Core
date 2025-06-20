@@ -34,14 +34,14 @@ export default {
     template: /*html*/`
           <form ref="searchform" class="d-flex me-3" :class="searchoptions.cssclass" action="javascript:void(0);"
 		 	 @focusin="this.searchfocusin" @focusout="this.searchfocusout">
-			<div ref="searchbox" class="h-100 input-group me-2 bg-white">
-				<span style="background-color:inherit" class="input-group-text">
+			<div ref="searchbox" class="h-100 input-group me-2">
+				<span class="input-group-text">
 					<i class="fa-solid fa-magnifying-glass"></i>
 				</span>
                 <input @keyup="this.search" @focus="this.showsearchresult"
                     v-model="this.searchsettings.searchstr" class="form-control"
                     type="search" :placeholder="'Search: '+ search_types_string" aria-label="Search">
-                <button data-bs-toggle="collapse" data-bs-target="#searchSettings" aria-expanded="false" aria-controls="searchSettings" ref="settingsbutton"  class="btn btn-outline-secondary" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
+                <span data-bs-toggle="collapse" data-bs-target="#searchSettings" aria-expanded="false" aria-controls="searchSettings" ref="settingsbutton"  class="input-group-text" type="button"><i class="fas fa-cog"></i></span>
             </div>
 
             <div v-show="this.showresult"
@@ -85,11 +85,12 @@ export default {
     `,
     watch:{
 		'searchsettings.searchstr': function (newSearchValue, oldSearchValue) {
-			sessionStorage.setItem('searchstr',newSearchValue);
+			if(this.searchoptions.origin){
+				sessionStorage.setItem(`${this.searchoptions.origin}_searchstr`,newSearchValue);
+			}
 		},
     },
 	computed:{
-		
 		search_types_string(){
 			if (Array.isArray(this.searchsettings.types) && this.searchsettings.types.length > 0){
 				return this.searchsettings.types.join(' / ');
@@ -105,8 +106,8 @@ export default {
 				this.searchsettings.types = this.allSearchTypes();
 			}
 			// stores the search types in the localstorage, only if the newValue is also an array
-			if(Array.isArray(newValue)){
-				localStorage.setItem('searchtypes', JSON.stringify(newValue));
+			if(Array.isArray(newValue) && this.searchoptions.origin){
+				localStorage.setItem(`${this.searchoptions.origin}_searchtypes`, JSON.stringify(newValue));
 			}
 			this.search();
 		});
@@ -115,6 +116,10 @@ export default {
 		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {
 			toggle: false
 		});
+
+		if (!this.searchoptions.origin){
+			console.warn("No origin defined in the searchoptions for the searchbar, please define the origin property in the searchbaroptions to allow reliable storage of searchstr and searchtypes accross applications.");
+		}
 	},
 	updated() {
 		if(this.showresult) {
@@ -126,8 +131,11 @@ export default {
     methods: {
 		getSearchTypes: function () {
 			let result = this.allSearchTypes();
-			if (localStorage.getItem('searchtypes')) {
-				result = JSON.parse(localStorage.getItem('searchtypes'));
+			if (this.searchoptions.origin) {
+				let localStorageValue = localStorage.getItem(`${this.searchoptions.origin}_searchtypes`);
+				if (localStorageValue) {
+					result = JSON.parse(localStorageValue);
+				}
 			}
 			return result;
 		},
@@ -139,7 +147,9 @@ export default {
 			return allTypes;
 		},
 		getSearchStr: function(){
-			return sessionStorage.getItem('searchstr') ?? '';
+			if (!this.searchoptions.origin)
+				return '';
+			return sessionStorage.getItem(`${this.searchoptions.origin}_searchstr`) ?? '';
 		},
 		checkSettingsVisibility: function(event) {
 			// hides the settings collapsible if the user clicks somewhere else
