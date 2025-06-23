@@ -83,7 +83,7 @@ export default {
 			<slot name="modalContent"></slot>
 			
 			<template v-if="showMenu && this.menu">
-				<h3>{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
+				<!-- <h3>{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3> -->
 				<lv-menu :menu="menu"></lv-menu>
 			</template>
 		</template>
