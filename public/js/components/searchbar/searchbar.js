@@ -5,6 +5,7 @@ import organisationunit from "./organisationunit.js";
 import student from "./result/student.js";
 import prestudent from "./result/prestudent.js";
 import mergedStudent from "./result/mergedstudent.js";
+import mergedPerson from "./result/mergedperson.js";
 
 export default {
     props: [ "searchoptions", "searchfunction" ],
@@ -32,7 +33,8 @@ export default {
       organisationunit: organisationunit,
       student: student,
       prestudent: prestudent,
-      mergedStudent
+      mergedStudent,
+      mergedPerson
     },
     template: /*html*/`
           <form ref="searchform" class="d-flex me-3" :class="searchoptions.cssclass" action="javascript:void(0);"
@@ -61,6 +63,7 @@ export default {
                     <student v-else-if="res.type === 'student' || res.type === 'studentStv'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
                     <prestudent v-else-if="res.type === 'prestudent'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
                     <merged-student v-else-if="res.type === 'mergedstudent'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.mergedstudent" @actionexecuted="this.hideresult"></merged-student>
+                    <merged-person v-else-if="res.type === 'mergedperson'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.mergedperson" @actionexecuted="this.hideresult"></merged-person>
                     <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                     <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
                     <raum v-else-if="res.type === 'raum'" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>

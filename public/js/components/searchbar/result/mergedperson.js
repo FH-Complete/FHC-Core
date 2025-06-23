@@ -8,6 +8,7 @@ export default {
 	},
 	emits: [ 'actionexecuted' ],
 	props: {
+		mode: String,
 		res: Object,
 		actions: Object
 	},
@@ -24,14 +25,23 @@ export default {
 			 // Those properties should be the same in all entries
 			const { person_id, name } = this.res.list[0];
 			 // Get first photo (prefer student photo if available)
-			const photo_url = ((this.students ? this.students.find(el => el.photo_url) : null) || this.employee)?.photo_url;
+			let photo_url;
+			if (this.mode == 'simple') {
+				let foto = (this.students ? this.students.find(el => el.foto) : null)?.foto;
+				if (foto)
+					foto = 'data:image/jpeg;base64,' + foto;
+				photo_url = foto || this.employee?.photo_url;
+			} else
+				photo_url = ((this.students ? this.students.find(el => el.photo_url) : null) || this.employee)?.photo_url;
 
 			return { person_id, name, photo_url, email };
 		},
 		employee() {
 			return this.res.list.find(item => [
 				'employee',
-				'unassigned_employee'
+				'unassigned_employee',
+				'mitarbeiter',
+				'mitarbeiter_ohne_zuordnung'
 			].includes(item.type)) || null;
 		},
 		students() {
@@ -132,7 +142,12 @@ export default {
 								:action="actions.defaultactionstudent || actions.defaultaction"
 								@actionexecuted="$emit('actionexecuted')"
 								>
-								{{ student.status }} ({{ student.stg_kuerzel }})
+								<template v-if="mode == 'simple'">
+									{{ student.studiengang_kz }}
+								</template>
+								<template v-else>
+									{{ student.status }} ({{ student.stg_kuerzel }})
+								</template>
 							</template-action>
 						</div>
 					</div>
