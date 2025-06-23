@@ -202,7 +202,7 @@ export default {
 		},
 	},
 	methods: {
-		handleChangeOffset(offset){
+		handleRangeOffset(event){
 			
 			let date = new Date(
 				this.focusDate.y,
@@ -222,7 +222,9 @@ export default {
 					focus_date: date,
 					lv_id: this.$route.params.lv_id || null
 				}
-			})
+			});
+
+			this.$emit('change:range',event);
 		},
 		setMode(mode) {
 			this.mode = mode
@@ -274,8 +276,8 @@ export default {
 	},
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card h-100" :class="sizeClass">
-		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)"
-		 @input="handleInput" @change:offset="handleChangeOffset">
+		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="handleRangeOffset"
+		 @input="handleInput" >
 			<template #calendarDownloads>
 				<slot name="calendarDownloads" ></slot>
 			</template>

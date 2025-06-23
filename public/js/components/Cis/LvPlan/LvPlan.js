@@ -221,10 +221,7 @@ const LvPlan = {
 				// reset the events before querying the new events to activate the loading spinner
 				this.events = null;
 				this.eventCalendarDate = new CalendarDate(end);
-				Vue.nextTick(() => {
-					this.loadEvents();
-					
-				});
+				this.loadEvents();
 			}
 		},
 		calendarDateToString: function (calendarDate) {
