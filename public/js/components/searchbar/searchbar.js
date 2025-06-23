@@ -4,6 +4,7 @@ import employee from "./result/employee.js";
 import organisationunit from "./result/organisationunit.js";
 import student from "./result/student.js";
 import prestudent from "./result/prestudent.js";
+import dms from "./result/dms.js";
 import mergedStudent from "./result/mergedstudent.js";
 import mergedPerson from "./result/mergedperson.js";
 
@@ -33,6 +34,7 @@ export default {
       organisationunit: organisationunit,
       student: student,
       prestudent: prestudent,
+      dms,
       mergedStudent,
       mergedPerson
     },
@@ -67,6 +69,7 @@ export default {
                     <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung' || res.type === 'employee'  || res.type === 'unassigned_employee'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                     <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
                     <raum v-else-if="res.type === 'raum' || res.type === 'room'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
+                    <dms v-else-if="res.type === 'dms'" :res="res" :actions="searchoptions.actions.dms" @actionexecuted="hideresult"></dms>
                     <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
                   </template>
                 </div>
