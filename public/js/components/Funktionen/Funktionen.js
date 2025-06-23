@@ -94,6 +94,7 @@ export default {
 					{
 						//title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
+						headerSort:false,
 						formatter: (cell, formatterParams, onRendered) => {
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
