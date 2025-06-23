@@ -441,10 +441,10 @@ export default {
 										<div v-for="hour in hours" :style="'min-height:' + rowMinHeight " :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 									</div>
 									<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
-										
+
 										<div v-if="lookingAtToday && !noEventsCondition" class="overlay" :style="overlayStyle"></div>
-										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast 
-											:selected="event.orig == selectedEvent" class="fhc-entry mx-2 small rounded overflow-hidden" >
+										<div v-for="event in day.events" :key="event" :style="eventGridStyle(day,event)" v-contrast
+											:selected="event.orig == selectedEvent" class="fhc-entry mx-2 small border border-secondary rounded overflow-hidden" >
 											<!-- desktop version of the page template, parent receives slotProp mobile = false -->
 											<div class="d-none d-xl-block h-100 "  @click.prevent="eventClick(event)">
 												<slot  name="dayPage" :event="event.orig" :day="day" :mobile="false">
@@ -452,7 +452,7 @@ export default {
 												</slot>
 											</div>
 											<!-- mobile version of the page template, parent receives slotProp mobile = true -->
-											<div class="d-block d-xl-none h-100" @click.prevent="eventClick(event)">
+											<div class="d-block d-xl-none h-100 " @click.prevent="eventClick(event)">
 												<slot  name="dayPage" :event="event.orig" :day="day" :mobile="true">
 													<p>this is a slot placeholder</p>
 												</slot>

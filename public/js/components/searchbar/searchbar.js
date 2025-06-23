@@ -105,7 +105,7 @@ export default {
 				this.searchsettings.types = this.allSearchTypes();
 			}
 			// stores the search types in the localstorage, only if the newValue is also an array
-			if(Array.isArray(newValue), this.searchoptions.origin){
+			if(Array.isArray(newValue) && this.searchoptions.origin){
 				localStorage.setItem(`${this.searchoptions.origin}_searchtypes`, JSON.stringify(newValue));
 			}
 			this.search();
@@ -130,9 +130,11 @@ export default {
     methods: {
 		getSearchTypes: function () {
 			let result = this.allSearchTypes();
-			let localStorageValue = localStorage.getItem('searchtypes');
-			if (localStorageValue) {
-				result = JSON.parse(localStorageValue);
+			if (this.searchoptions.origin) {
+				let localStorageValue = localStorage.getItem(`${this.searchoptions.origin}_searchtypes`);
+				if (localStorageValue) {
+					result = JSON.parse(localStorageValue);
+				}
 			}
 			return result;
 		},
@@ -144,7 +146,9 @@ export default {
 			return allTypes;
 		},
 		getSearchStr: function(){
-			return sessionStorage.getItem("searchstr") ?? '';
+			if (!this.searchoptions.origin)
+				return '';
+			return sessionStorage.getItem(`${this.searchoptions.origin}_searchstr`) ?? '';
 		},
 		checkSettingsVisibility: function(event) {
 			// hides the settings collapsible if the user clicks somewhere else

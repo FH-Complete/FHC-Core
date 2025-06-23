@@ -305,11 +305,13 @@ const app = Vue.createApp({
 
 					if (data[rendertype].calendarEventStyles){
 						var head = document.head;
-						var link = document.createElement("link");
-						link.type = "text/css";
-						link.rel = "stylesheet";
-						link.href = data[rendertype].calendarEventStyles;
-						head.appendChild(link);
+						if(!head.querySelector(`link[href="${data[rendertype].calendarEventStyles}"]`)){
+							var link = document.createElement("link");
+							link.type = "text/css";
+							link.rel = "stylesheet";
+							link.href = data[rendertype].calendarEventStyles;
+							head.appendChild(link);
+						}
 					}
 
 					if(this.renderers === null) {

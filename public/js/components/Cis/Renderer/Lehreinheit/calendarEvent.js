@@ -22,9 +22,9 @@ export default {
 			<span class="small">{{convertTime(event.ende.split(":"))}}</span>
 		</div>
 		<div id="lehreinheitEventText">
-			<span>{{event.topic}}</span>
-			<span v-for="lektor in event.lektor">{{lektor.kurzbz}}</span>
-			<span>{{event.ort_kurzbz}}</span>
+			<span id="lehreinheitTopic">{{event.topic}}</span>
+			<span id="lehreinheitLektoren" v-for="lektor in event.lektor">{{lektor.kurzbz}}</span>
+			<span id="lehreinheitOrt">{{event.ort_kurzbz}}</span>
 		</div>
 	</div>
 	`,

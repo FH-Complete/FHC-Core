@@ -369,10 +369,10 @@ export default {
 							</div>
 						</Transition>
 						<div v-if="day.isToday" class="overlay" :style="overlayStyle"></div>
-						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)" 
+						<div v-for="event in day.events" :key="event" @click.prevent="weekPageClick(event.orig, day)"
 						:selected="event.orig == selectedEvent"
 						:style="eventGridStyle(day,event)"
-						class="mx-2 small rounded overflow-hidden fhc-entry "
+						class="mx-2 small rounded overflow-hidden fhc-entry border border-secondary"
 						v-contrast >
 							<slot name="weekPage" :event="event.orig" :day="day">
 								<p>this is a placeholder which means that no template was passed to the Calendar Page slot</p>
