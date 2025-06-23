@@ -18,7 +18,7 @@ export default {
 		},
 		photo_url() {
 			if (this.mode != 'simple')
-				return this.photo_url;
+				return this.res.photo_url;
 			if (this.res.foto)
 				return 'data:image/jpeg;base64,' + this.res.foto;
 			return null;
