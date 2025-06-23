@@ -29,8 +29,6 @@ class Config extends FHCAPI_Controller
 {
 
 
-	private $arr;
-
 	public function __construct()
 	{
 		// TODO(chris): permissions
@@ -164,12 +162,11 @@ class Config extends FHCAPI_Controller
 				'changeStatusToAbsolvent' => $this->permissionlib->isBerechtigt('admin')
 			]
 		];
-		$this->arr = [
+		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
 			'config' => $config['finalexam']
 		];
-		$result['finalexam'] = $this->arr;
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {
 			return $result;
