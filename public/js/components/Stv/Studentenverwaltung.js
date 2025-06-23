@@ -72,6 +72,7 @@ export default {
 		return {
 			selected: [],
 			searchbaroptions: {
+				origin: 'stv',
 				cssclass: "position-relative",
 				calcheightonly: true,
 				types: [
