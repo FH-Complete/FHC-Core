@@ -1,5 +1,5 @@
 import person from "./result/person.js";
-import raum from "./raum.js";
+import raum from "./result/room.js";
 import employee from "./result/employee.js";
 import organisationunit from "./organisationunit.js";
 import student from "./result/student.js";
@@ -66,7 +66,7 @@ export default {
                     <merged-person v-else-if="res.type === 'mergedperson'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.mergedperson" @actionexecuted="this.hideresult"></merged-person>
                     <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung' || res.type === 'employee'  || res.type === 'unassigned_employee'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                     <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
-                    <raum v-else-if="res.type === 'raum'" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
+                    <raum v-else-if="res.type === 'raum' || res.type === 'room'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
                     <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
                   </template>
                 </div>

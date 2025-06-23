@@ -6,6 +6,7 @@ export default {
 	},
 	emits: [ 'actionexecuted' ],
 	props: {
+		mode: String,
 		res: Object,
 		actions: Object
 	},
@@ -46,7 +47,10 @@ export default {
 
 			<div class="searchbar_tablerow">
 				<div class="searchbar_tablecell">{{ $p.t('search/result_workplaces') }}</div>
-				<div class="searchbar_tablecell">
+				<div v-if="mode == 'simple'" class="searchbar_tablecell">
+					{{ res.sitzplaetze }}
+				</div>
+				<div v-else class="searchbar_tablecell">
 					<template v-if="res.max_person !== null && res.workplaces !== null">
 						{{ $p.t('search/result_workplaces_pc', res) }}
 					</template>
@@ -66,7 +70,8 @@ export default {
 			<div class="searchbar_tablerow">
 				<div class="searchbar_tablecell">{{ $p.t('search/result_equipment') }}</div>
 				<div class="searchbar_tablecell">
-					<div class="no-margin-paragraphs" v-html="equipment"></div>
+					<div v-if="mode == 'simple'" class="no-margin-paragraphs" v-html="res.austattung.replace('<br />','')"></div>
+					<div v-else class="no-margin-paragraphs" v-html="equipment"></div>
 				</div>
 			</div>
 		</div>
