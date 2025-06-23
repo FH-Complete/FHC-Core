@@ -202,6 +202,28 @@ export default {
 		},
 	},
 	methods: {
+		handleChangeOffset(offset){
+			
+			let date = new Date(
+				this.focusDate.y,
+				this.focusDate.m,
+				this.focusDate.d
+			);
+			
+			date = date.getFullYear() + "-" +
+				String(date.getMonth() + 1).padStart(2, "0") + "-" +
+				String(date.getDate()).padStart(2, "0");
+
+			
+			this.$router.push({
+				name: "LvPlan",
+				params: {
+					mode: this.mode[0].toUpperCase() + this.mode.slice(1),
+					focus_date: date,
+					lv_id: this.$route.params.lv_id || null
+				}
+			})
+		},
 		setMode(mode) {
 			this.mode = mode
 		},
@@ -253,7 +275,7 @@ export default {
 	template: /*html*/`
 	<div ref="container" class="fhc-calendar card h-100" :class="sizeClass">
 		<component :is="'calendar-' + mode" @updateMode="mode = $event" @change:range="$emit('change:range',$event)"
-		 @input="handleInput" @change:offset="$emit('change:offset', $event)">
+		 @input="handleInput" @change:offset="handleChangeOffset">
 			<template #calendarDownloads>
 				<slot name="calendarDownloads" ></slot>
 			</template>
