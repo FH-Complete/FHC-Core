@@ -29,9 +29,10 @@ export default {
 			<div class="searchbar_tablerow">
 				<div class="searchbar_tablecell">{{ $p.t('search/result_group_emails') }}</div>
 				<div class="searchbar_tablecell">
-					<a :href="'mailto:' + res.mailgroup">
+					<a v-if="res.mailgroup" :href="'mailto:' + res.mailgroup">
 						{{ res.mailgroup }}
 					</a>
+					<template v-else>-</template>
 				</div>
 			</div>
 
