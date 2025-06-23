@@ -198,13 +198,7 @@ class Kontakt extends FHCAPI_Controller
 		$name = isset($_POST['name']) ? $_POST['name'] : null;
 		$typ = isset($_POST['typ']) ? $_POST['typ'] : null;
 		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
-
-		if(isset($_POST['firma']))
-		{
-			$firma_id = $_POST['firma']['firma_id'];
-		}
-		else
-			$firma_id = null;
+		$firma_id = isset($_POST['firma_id']) ? $_POST['firma_id'] : null;
 
 		$result = $this->AdresseModel->insert(
 			[
@@ -271,17 +265,6 @@ class Kontakt extends FHCAPI_Controller
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Adresse_id']), self::ERROR_TYPE_GENERAL);
 		}
 
-		if(isset($_POST['firma']))
-		{
-			$firma_id = $_POST['firma']['firma_id'];
-		}
-		elseif(isset($_POST['firma_id']))
-		{
-			$firma_id = $_POST['firma_id'];
-		}
-		else
-			$firma_id = null;
-
 		$person_id = isset($_POST['person_id']) ? $_POST['person_id'] : null;
 		$co_name = isset($_POST['co_name']) ? $_POST['co_name'] : null;
 		$strasse = isset($_POST['strasse']) ? $_POST['strasse'] : null;
@@ -291,6 +274,7 @@ class Kontakt extends FHCAPI_Controller
 		$name = isset($_POST['name']) ? $_POST['name'] : null;
 		$typ = isset($_POST['typ']) ? $_POST['typ'] : null;
 		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
+		$firma_id = isset($_POST['firma_id']) ? $_POST['firma_id'] : null;
 
 		$result = $this->AdresseModel->update(
 			[

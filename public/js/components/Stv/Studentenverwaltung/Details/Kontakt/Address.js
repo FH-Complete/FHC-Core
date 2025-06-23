@@ -188,8 +188,8 @@ export default{
 							title: this.$p.t('person', 'person_id')
 						});
 /*						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});*/
+													title: this.$p.t('global', 'aktionen')
+												});*/
 					}
 				}
 			],
@@ -200,7 +200,7 @@ export default{
 				typ: 'h',
 				nation: 'A',
 				address: {plz: null},
-				plz: null
+				plz: null,
 			},
 			statusNew: true,
 			places: [],
@@ -246,6 +246,10 @@ export default{
 			this.loadAdress(adresse_id).then(() => {
 				if(this.addressData.adresse_id)
 				{
+					this.selectedFirma = this.listFirmen.find(
+						item => item.firma_id === this.addressData.firma_id
+					);
+
 					this.addressData.address.plz = this.addressData.plz;
 					//	delete this.addressData.plz;
 					this.loadPlaces(this.addressData.address.plz);
@@ -353,6 +357,7 @@ export default{
 			this.addressData.typ = 'h';
 			this.addressData.nation = 'A';
 			this.addressData.address = {plz: null};
+			this.selectedFirma = null;
 
 			this.statusNew = true;
 		},
