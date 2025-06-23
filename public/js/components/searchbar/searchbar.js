@@ -16,6 +16,7 @@ export default {
             types: this.getSearchTypes(),
         },
         searchresult: [],
+        searchmode: '',
         showresult: false,  
         searching: false,
         error: null,
@@ -270,6 +271,7 @@ export default {
                         }
                     }
                     this.searchresult = res;
+                    this.searchmode = response.meta.mode;
                 }
                 this.searching = false;
                 this.retry = 0;

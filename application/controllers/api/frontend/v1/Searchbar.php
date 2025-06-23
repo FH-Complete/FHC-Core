@@ -62,6 +62,9 @@ class Searchbar extends FHCAPI_Controller
 		$result = $this->searchbarlib->search($this->input->post(self::SEARCHSTR_PARAM), $this->input->post(self::TYPES_PARAM));
 		if (property_exists($result, 'error'))
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		
+		$this->addMeta('mode', 'simple');
+		
 		$this->terminateWithSuccess($result->data);
 	}
 
@@ -87,6 +90,7 @@ class Searchbar extends FHCAPI_Controller
 
 		$this->addMeta('time', $result->meta['time']);
 		$this->addMeta('searchstring', $result->meta['searchstring']);
+		$this->addMeta('mode', 'advanced');
 		
 		$this->terminateWithSuccess($data);
 	}
