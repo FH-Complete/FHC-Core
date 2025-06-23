@@ -8,6 +8,7 @@ export default {
 	},
 	emits: [ 'actionexecuted' ],
 	props: {
+		mode: String,
 		res: Object,
 		actions: Object
 	},
@@ -20,6 +21,7 @@ export default {
 	template: `
 	<result-prestudent
 		v-if="prestudent"
+		:mode="mode"
 		:res="prestudent"
 		:actions="actions"
 		@actionexecuted="$emit('actionexecuted')"
@@ -27,6 +29,7 @@ export default {
 	></result-prestudent>
 	<result-student
 		v-else
+		:mode="mode"
 		:res="res.list[0]"
 		:actions="actions"
 		@actionexecuted="$emit('actionexecuted')"
