@@ -6,11 +6,26 @@ export default {
 	},
 	emits: [ 'actionexecuted' ],
 	props: {
+		mode: String,
 		res: Object,
 		actions: Object
 	},
 	computed: {
+		title() {
+			if (this.mode == 'simple')
+				return this.res.name;
+			return this.res.name + ' (' + this.res.status + ' ' + this.res.stg_kuerzel + ')';
+		},
+		photo_url() {
+			if (this.mode != 'simple')
+				return this.photo_url;
+			if (this.res.foto)
+				return 'data:image/jpeg;base64,' + this.res.foto;
+			return null;
+		},
 		emails() {
+			if (this.mode == 'simple')
+				return new Set([this.res.email]);
 			return new Set(this.res.email);
 		}
 	},
@@ -19,8 +34,8 @@ export default {
 		class="searchbar-result-prestudent"
 		:res="res"
 		:actions="actions"
-		:title="res.name + ' (' + res.status + ' ' + res.stg_kuerzel + ')'"
-		:image="res.photo_url"
+		:title="title"
+		:image="photo_url"
 		image-fallback="fas fa-user fa-4x"
 		@actionexecuted="$emit('actionexecuted')"
 		>

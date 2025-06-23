@@ -3,7 +3,7 @@ import raum from "./raum.js";
 import employee from "./employee.js";
 import organisationunit from "./organisationunit.js";
 import student from "./student.js";
-import prestudent from "./prestudent.js";
+import prestudent from "./result/prestudent.js";
 
 export default {
     props: [ "searchoptions", "searchfunction" ],
@@ -57,7 +57,7 @@ export default {
                   <template v-else="" v-for="res in searchresult">
                     <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
                     <student v-else-if="res.type === 'student' || res.type === 'studentStv'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
-                    <prestudent v-else-if="res.type === 'prestudent'" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
+                    <prestudent v-else-if="res.type === 'prestudent'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
                     <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
                     <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
                     <raum v-else-if="res.type === 'raum'" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
