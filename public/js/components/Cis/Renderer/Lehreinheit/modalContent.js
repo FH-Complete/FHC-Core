@@ -120,7 +120,6 @@ export default {
 				</tbody>
 		</table>
 		
-		<h3>{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
 		<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-if="lvMenu" :menu="lvMenu" />
 	</div>`,
 }

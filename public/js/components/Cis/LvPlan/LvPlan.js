@@ -199,12 +199,14 @@ const LvPlan = {
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
-			if(this.isModalContentResolved && this.isModalTitleResolved){
-				if(this.$refs.lvmodal) this.$refs.lvmodal.show();
-			} 
-			else{
-				this.isShowModal = true;
-			} 
+			Vue.nextTick(()=>{
+				if(this.isModalContentResolved && this.isModalTitleResolved){
+					if(this.$refs.lvmodal) this.$refs.lvmodal.show();
+				} 
+				else{
+					this.isShowModal = true;
+				}
+			})
 		},
 		updateRange: function ({start,end, mounted}) {
 			let checkDate = (date) => {
