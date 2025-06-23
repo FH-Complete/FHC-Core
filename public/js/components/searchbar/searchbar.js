@@ -1,4 +1,4 @@
-import person from "./person.js";
+import person from "./result/person.js";
 import raum from "./raum.js";
 import employee from "./result/employee.js";
 import organisationunit from "./organisationunit.js";
