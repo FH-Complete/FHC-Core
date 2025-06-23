@@ -5,11 +5,20 @@ import organisationunit from "./result/organisationunit.js";
 import student from "./result/student.js";
 import prestudent from "./result/prestudent.js";
 import dms from "./result/dms.js";
+import cms from "./result/cms.js";
 import mergedStudent from "./result/mergedstudent.js";
 import mergedPerson from "./result/mergedperson.js";
 
+import ApiLanguage from "../../api/factory/language.js"
+
 export default {
     props: [ "searchoptions", "searchfunction" ],
+    provide() {
+        return {
+            languages: Vue.computed(() => this.languages),
+            query: Vue.computed(() => this.lastQuery)
+        };
+    },
     data: function() {
       return {
         searchtimer: null,
@@ -25,6 +34,8 @@ export default {
         error: null,
             abortController: null,
         settingsDropdown:null,
+            languages: null,
+            lastQuery: ''
       };
     },
     components: {
@@ -35,6 +46,7 @@ export default {
       student: student,
       prestudent: prestudent,
       dms,
+      cms,
       mergedStudent,
       mergedPerson
     },
@@ -70,6 +82,7 @@ export default {
                     <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
                     <raum v-else-if="res.type === 'raum' || res.type === 'room'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
                     <dms v-else-if="res.type === 'dms'" :res="res" :actions="searchoptions.actions.dms" @actionexecuted="hideresult"></dms>
+                    <cms v-else-if="res.type === 'cms'" :res="res" :actions="searchoptions.actions.cms" @actionexecuted="hideresult"></cms>
                     <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
                   </template>
                 </div>
@@ -110,6 +123,17 @@ export default {
 		},
 		
 	},
+    created() {
+        this.$api
+            .call(ApiLanguage.getAll())
+            .then(result => {
+                this.languages = result.data.reduce((a, c) => {
+                    a[c.sprache] = c;
+                    return a;
+                }, {});
+            })
+            .catch(this.$fhcAlert.handleSystemError);
+    },
     beforeMount: function() {
 		this.$watch('searchsettings.types', (newValue, oldValue) => {
 			if (Array.isArray(newValue) && newValue.length === 0){
