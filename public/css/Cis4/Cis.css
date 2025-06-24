@@ -154,11 +154,30 @@ html {
 	color: var(--fhc-text);
 }
 
+#cis-menu .menu-entry .submenu{
+	background-color: var(--fhc-background-highlight);
+	color: inherit;
+}
+
+#cis-menu .menu-entry:hover .submenu{
+	background-color: var(--fhc-primary-highlight);
+	color: inherit;
+}
+
+#cis-menu .menu-entry:hover .submenu:hover{
+	color: var(--fhc-dark);
+}
+
+#cis-menu [disabled="true"].menu-entry .submenu{
+	opacity: 0.5;
+	background-color: var(--fhc-secondary)
+}
+
 [disabled="true"].menu-entry {
 	pointer-events: none;
 	cursor: default;
 	background-color: var(--fhc-disabled) !important;
-	color: black !important;
+	color: var(--fhc-dark) !important;
 	opacity: 0.75;
 	-webkit-touch-callout: none;
 	/* iOS Safari */
