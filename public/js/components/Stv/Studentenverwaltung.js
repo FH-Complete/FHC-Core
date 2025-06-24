@@ -76,7 +76,7 @@ export default {
 				cssclass: "position-relative",
 				calcheightonly: true,
 				types: [
-					"studentStv",
+					"student",
 					"prestudent"
 				],
 				actions: {
@@ -139,7 +139,7 @@ export default {
 			this.$refs.stvList.reload();
 		},
 		searchfunction(params, config) {
-			return this.$api.call(ApiSearchbar.search(params), config);
+			return this.$api.call(ApiSearchbar.searchAdvanced(params), config);
 		}
 	},
 	created() {
