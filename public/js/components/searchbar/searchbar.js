@@ -51,39 +51,63 @@ export default {
       mergedPerson
     },
     template: /*html*/`
-          <form ref="searchform" class="d-flex me-3" :class="searchoptions.cssclass" action="javascript:void(0);"
-		 	 @focusin="this.searchfocusin" @focusout="this.searchfocusout">
+        <form
+            ref="searchform"
+            class="d-flex me-3"
+            :class="searchoptions.cssclass"
+            action="javascript:void(0);"
+		 	@focusin="searchfocusin"
+            @focusout="searchfocusout"
+        >
 			<div ref="searchbox" class="h-100 input-group me-2">
 				<span class="input-group-text">
 					<i class="fa-solid fa-magnifying-glass"></i>
 				</span>
-                <input @keyup="this.search" @focus="this.showsearchresult"
-                    v-model="this.searchsettings.searchstr" class="form-control"
-                    type="search" :placeholder="'Search: '+ search_types_string" aria-label="Search">
-                <span data-bs-toggle="collapse" data-bs-target="#searchSettings" aria-expanded="false" aria-controls="searchSettings" ref="settingsbutton"  class="input-group-text" type="button"><i class="fas fa-cog"></i></span>
+                <input
+                    @keyup="search"
+                    @focus="showsearchresult"
+                    v-model="searchsettings.searchstr"
+                    class="form-control"
+                    type="search"
+                    :placeholder="$p.t('search/input_search_label', {types:search_types_string})"
+                    :aria-label="$p.t('search/input_search_label', {types:search_types_string})"
+                >
+                <span
+                    data-bs-toggle="collapse"
+                    data-bs-target="#searchSettings"
+                    aria-expanded="false"
+                    aria-controls="searchSettings"
+                    ref="settingsbutton"
+                    class="input-group-text"
+                    type="button"
+                    :title="$p.t('search/button_filter_label')"
+                    :aria-label="$p.t('search/button_filter_label')"
+                >
+                    <i class="fas fa-cog"></i>
+                </span>
             </div>
 
-            <div v-show="this.showresult"
+            <div v-show="showresult"
                  class="searchbar_results" tabindex="-1">
               <div class="searchbar_results_scroller" ref="result">
                 <div class="searchbar_results_wrapper" ref="results">
-                  <div v-if="this.searching">
+                  <div v-if="searching">
                     <i class="fas fa-spinner fa-spin fa-2x"></i>
                   </div>
-                  <div v-else-if="this.error !== null">{{ this.error }}</div>
-                  <div v-else-if="searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
+                  <div v-else-if="this.error !== null">{{ error }}</div>
+                  <div v-else-if="searchresult.length < 1">{{  $p.t('search/error_no_results') }}</div>
                   <template v-else="" v-for="res in searchresult">
-                    <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
-                    <student v-else-if="res.type === 'student' || res.type === 'studentStv'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
-                    <prestudent v-else-if="res.type === 'prestudent'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
-                    <merged-student v-else-if="res.type === 'mergedstudent'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.mergedstudent" @actionexecuted="this.hideresult"></merged-student>
-                    <merged-person v-else-if="res.type === 'mergedperson'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.mergedperson" @actionexecuted="this.hideresult"></merged-person>
-                    <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung' || res.type === 'employee'  || res.type === 'unassigned_employee'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
-                    <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
-                    <raum v-else-if="res.type === 'raum' || res.type === 'room'" :mode="searchmode" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
+                    <person v-if="res.type === 'person'" :res="res" :actions="searchoptions.actions.person" @actionexecuted="hideresult"></person>
+                    <student v-else-if="res.type === 'student' || res.type === 'studentStv'" :mode="searchmode" :res="res" :actions="searchoptions.actions.student" @actionexecuted="hideresult"></student>
+                    <prestudent v-else-if="res.type === 'prestudent'" :mode="searchmode" :res="res" :actions="searchoptions.actions.prestudent" @actionexecuted="hideresult"></prestudent>
+                    <merged-student v-else-if="res.type === 'mergedstudent'" :mode="searchmode" :res="res" :actions="searchoptions.actions.mergedstudent" @actionexecuted="hideresult"></merged-student>
+                    <merged-person v-else-if="res.type === 'mergedperson'" :mode="searchmode" :res="res" :actions="searchoptions.actions.mergedperson" @actionexecuted="hideresult"></merged-person>
+                    <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung' || res.type === 'employee'  || res.type === 'unassigned_employee'" :res="res" :actions="searchoptions.actions.employee" @actionexecuted="hideresult"></employee>
+                    <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="searchoptions.actions.organisationunit" @actionexecuted="hideresult"></organisationunit>
+                    <raum v-else-if="res.type === 'raum' || res.type === 'room'" :mode="searchmode" :res="res" :actions="searchoptions.actions.raum" @actionexecuted="hideresult"></raum>
                     <dms v-else-if="res.type === 'dms'" :res="res" :actions="searchoptions.actions.dms" @actionexecuted="hideresult"></dms>
                     <cms v-else-if="res.type === 'cms'" :res="res" :actions="searchoptions.actions.cms" @actionexecuted="hideresult"></cms>
-                    <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
+                    <div v-else class="searchbar-result text-danger fw-bold">{{ $p.t('search/error_unknown_type', res) }}</div>
                   </template>
                 </div>
               </div>
@@ -93,12 +117,12 @@ export default {
 				@[\`shown.bs.collapse\`]="handleShowSettings"
 				@[\`hide.bs.collapse\`]="handleHideSettings"
                 class="top-100 end-0 searchbar_settings text-white collapse" tabindex="-1">
-              <div class="d-flex flex-column m-3" v-if="this.searchoptions.types.length > 0">
-              <span class="fw-light mb-2">Suche filtern nach:</span>  
-              <template v-for="(type, index) in this.searchoptions.types" :key="type">
+              <div class="d-flex flex-column m-3" v-if="searchoptions.types.length > 0">
+              <span class="fw-light mb-2">{{ $p.t('search/applyfilter_label') }}</span>  
+              <template v-for="(type, index) in searchoptions.types" :key="type">
                     <div class="form-check form-switch">
-                        <input class="fhc-switches form-check-input" type="checkbox" role="switch" :id="this.$.uid + 'search_type_' + index" :value="type" v-model="searchsettings.types"  />
-                        <label class="ps-2 form-check-label non-selectable" :for="this.$.uid + 'search_type_' + index">{{ type }}</label>
+                        <input class="fhc-switches form-check-input" type="checkbox" role="switch" :id="$.uid + 'search_type_' + index" :value="type" v-model="searchsettings.types">
+                        <label class="ps-2 form-check-label non-selectable" :for="$.uid + 'search_type_' + index">{{ type }}</label>
                     </div>
                 </template>
               </div>
@@ -231,6 +255,10 @@ export default {
             if( this.searchtimer !== null ) {
                 clearTimeout(this.searchtimer);
             }
+            if (this.abortController) {
+                this.abortController.abort();
+                this.abortController = null;
+            }
             if( this.searchsettings.searchstr.length >= 2 ) {
                 this.calcSearchResultExtent();
                 this.searchtimer = setTimeout(
@@ -247,7 +275,7 @@ export default {
             this.searching = true;
             this.showsearchresult();
             if(this.searchsettings.types.length === 0) {
-                this.error = 'Kein Ergebnistyp ausgewählt. Bitte mindestens einen Ergebnistyp auswählen.';
+                this.error = this.$p.t('search/error_missing_type');
                 this.searching = false;
                 return;
             }

@@ -41885,13 +41885,13 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Suche...',
+				'text' => 'Suche: {types}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Search...',
+				'text' => 'Search: {types}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41920,18 +41920,18 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'search',
-		'phrase' => 'button_applyfilter_label',
+		'phrase' => 'applyfilter_label',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Übernehmen',
+				'text' => 'Suche filtern nach:',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Apply',
+				'text' => 'Filter search for:',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -42432,6 +42432,26 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'English',
 				'text' => 'No Content',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'error_missing_type',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Ergebnistyp ausgewählt. Bitte mindestens einen Ergebnistyp auswählen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No result type selected. Please select at least one result type.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
