@@ -37,9 +37,15 @@ if (!$db->db_num_rows(@$db->db_query("SELECT 1 FROM pg_proc WHERE proname = 'tr_
 		$$
 		BEGIN
 			IF TG_TABLE_NAME = 'tbl_organisationseinheit' THEN
-				NEW.fts_bezeichnung := to_tsvector('simple', COALESCE((SELECT bezeichnung FROM public.tbl_organisationseinheittyp WHERE organisationseinheittyp_kurzbz = NEW.organisationseinheittyp_kurzbz), '') || ' ' || COALESCE(NEW.bezeichnung, ''));
+				NEW.fts_bezeichnung := to_tsvector('simple', COALESCE((
+					SELECT bezeichnung 
+					FROM public.tbl_organisationseinheittyp 
+					WHERE organisationseinheittyp_kurzbz = NEW.organisationseinheittyp_kurzbz
+				), '') || ' ' || COALESCE(NEW.bezeichnung, ''));
 			ELSIF TG_TABLE_NAME = 'tbl_organisationseinheittyp' THEN
-				UPDATE public.tbl_organisationseinheit SET fts_bezeichnung = to_tsvector('simple', COALESCE(NEW.bezeichnung, '') || ' ' || COALESCE(bezeichnung, '')) WHERE organisationseinheittyp_kurzbz = NEW.organisationseinheittyp_kurzbz;
+				UPDATE public.tbl_organisationseinheit 
+					SET fts_bezeichnung = to_tsvector('simple', COALESCE(NEW.bezeichnung, '') || ' ' || COALESCE(bezeichnung, '')) 
+					WHERE organisationseinheittyp_kurzbz = NEW.organisationseinheittyp_kurzbz;
 			END IF;
 			RETURN NEW;
 		END;
@@ -53,7 +59,13 @@ if (!$db->db_num_rows(@$db->db_query("SELECT 1 FROM pg_proc WHERE proname = 'tr_
 
 $update_column = false;
 // Add trigger tr_organisationseinheit_update_organisationseinheittyp_kurzbz to public.tbl_organisationseinheit
-if (!$db->db_num_rows(@$db->db_query("SELECT 1 FROM information_schema.triggers WHERE event_object_table ='tbl_organisationseinheit' AND trigger_name = 'tr_organisationseinheit_update_organisationseinheittyp_kurzbz' LIMIT 1;")))
+if (!$db->db_num_rows(@$db->db_query("
+	SELECT 1 
+	FROM information_schema.triggers 
+	WHERE event_object_table ='tbl_organisationseinheit' 
+	AND trigger_name = 'tr_organisationseinheit_update_organisationseinheittyp_kurzbz' 
+	LIMIT 1;
+")))
 {
 	$qry = "CREATE TRIGGER tr_organisationseinheit_update_organisationseinheittyp_kurzbz
 		BEFORE UPDATE OF organisationseinheittyp_kurzbz OR INSERT
@@ -70,7 +82,13 @@ if (!$db->db_num_rows(@$db->db_query("SELECT 1 FROM information_schema.triggers 
 }
 
 // Add trigger tr_organisationseinheittyp_update_bezeichnung to public.tbl_organisationseinheittyp
-if (!$db->db_num_rows(@$db->db_query("SELECT 1 FROM information_schema.triggers WHERE event_object_table ='tbl_organisationseinheittyp' AND trigger_name = 'tr_organisationseinheittyp_update_bezeichnung' LIMIT 1;")))
+if (!$db->db_num_rows(@$db->db_query("
+	SELECT 1 
+	FROM information_schema.triggers 
+	WHERE event_object_table ='tbl_organisationseinheittyp' 
+	AND trigger_name = 'tr_organisationseinheittyp_update_bezeichnung' 
+	LIMIT 1;
+")))
 {
 	$qry = "CREATE TRIGGER tr_organisationseinheittyp_update_bezeichnung
 		BEFORE UPDATE OF bezeichnung
@@ -176,7 +194,10 @@ FROM pg_indexes WHERE indexname = 'idx_tbl_contentsprache_fts_titel_content_vect
 	$qry = "
 		CREATE INDEX idx_tbl_contentsprache_fts_titel_content_vector 
 		ON campus.tbl_contentsprache 
-		USING GIN ((setweight(to_tsvector('simple', COALESCE(titel, '')), 'A') || setweight(to_tsvector('simple', COALESCE(content, '')::text), 'B')));
+		USING GIN ((
+			setweight(to_tsvector('simple', COALESCE(titel, '')), 'A') 
+			|| setweight(to_tsvector('simple', COALESCE(content, '')::text), 'B')
+		));
 	";
 
 	if (!$db->db_query($qry))

@@ -131,7 +131,7 @@ export default {
           </form>
     `,
     watch:{
-		'searchsettings.searchstr': function (newSearchValue, oldSearchValue) {
+		'searchsettings.searchstr': function (newSearchValue) {
 			if(this.searchoptions.origin){
 				sessionStorage.setItem(`${this.searchoptions.origin}_searchstr`,newSearchValue);
 			}
@@ -159,7 +159,7 @@ export default {
             .catch(this.$fhcAlert.handleSystemError);
     },
     beforeMount: function() {
-		this.$watch('searchsettings.types', (newValue, oldValue) => {
+		this.$watch('searchsettings.types', newValue => {
 			if (Array.isArray(newValue) && newValue.length === 0){
 				this.searchsettings.types = this.allSearchTypes();
 			}

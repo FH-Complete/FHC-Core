@@ -42565,7 +42565,9 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Such-Konfiguration $config["{type}"]["searchfields"]["{searchfield}"] ist ungültig: Feld "{field}" fehlt oder ist unglültig.',
+				'text' => 'Such-Konfiguration ' .
+					'$config["{type}"]["searchfields"]["{searchfield}"] ' .
+					'ist ungültig: Feld "{field}" fehlt oder ist unglültig.',
 				'description' => '',
 				'insertvon' => 'system'
 			),

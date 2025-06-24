@@ -516,7 +516,10 @@ $config['unassigned_employee']['prepare'] = "unassigned_employee AS (
 	WHERE tbl_benutzerfunktion.bezeichnung IS NULL
 )";
 $config['unassigned_employee']['table'] = "unassigned_employee";
-$config['unassigned_employee']['searchfields']['tel']['join']['on'] = "kontakttyp = 'telefon' AND tbl_kontakt.standort_id = unassigned_employee.standort_id";
+$config['unassigned_employee']['searchfields']['tel']['join']['on'] = "
+	kontakttyp = 'telefon' 
+	AND tbl_kontakt.standort_id = unassigned_employee.standort_id
+";
 
 $config['organisationunit'] = [
 	'alias' => ['ou', 'organisationseinheit', 'oe'],
@@ -722,7 +725,11 @@ $config['cms'] = [
 		'content' => [
 			'alias' => ['inhalt'],
 			'comparison' => "vector",
-			'field' => "(setweight(to_tsvector('simple', COALESCE(titel, '')), 'A') || setweight(to_tsvector('simple', COALESCE(content, '')::text), 'B'))"
+			'field' => "(
+				setweight(to_tsvector('simple', COALESCE(titel, '')), 'A') 
+				|| 
+				setweight(to_tsvector('simple', COALESCE(content, '')::text), 'B')
+			)"
 		],
 		'content_id' => [
 			'alias' => ['id'],
