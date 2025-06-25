@@ -20,6 +20,8 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'getBeurteilungen' => ['admin:rw', 'assistenz:rw'],
 			'getAkadGrade' => ['admin:rw', 'assistenz:rw'],
 			'getMitarbeiter' => ['admin:rw', 'assistenz:rw'],
+			'getAllMitarbeiter' => ['admin:rw', 'assistenz:rw'],
+			'getAllPersons' => ['admin:rw', 'assistenz:rw'],
 			'getPruefer' => ['admin:rw', 'assistenz:rw'],
 			'getTypStudiengang' => ['admin:rw', 'assistenz:rw'],
 			'checkForExistingExams' => ['admin:rw', 'assistenz:rw'],
@@ -149,16 +151,16 @@ class Abschlusspruefung extends FHCAPI_Controller
 	{
 		$studiengang_kz= $this->input->post('studiengang_kz');
 
-/*		if (!$studiengang_kzs || !is_array($studiengang_kzs)) {
-			$this->load->library('form_validation');
+		/*		if (!$studiengang_kzs || !is_array($studiengang_kzs)) {
+					$this->load->library('form_validation');
 
-			$this->form_validation->set_rules('studiengang_kzs', '', 'required|is_null', [
-				'is_null' => $this->p->t('ui', 'error_fieldMustBeArray')
-			]);
+					$this->form_validation->set_rules('studiengang_kzs', '', 'required|is_null', [
+						'is_null' => $this->p->t('ui', 'error_fieldMustBeArray')
+					]);
 
-			if (!$this->form_validation->run())
-				$this->terminateWithValidationErrors($this->form_validation->error_array());
-		}*/
+					if (!$this->form_validation->run())
+						$this->terminateWithValidationErrors($this->form_validation->error_array());
+				}*/
 
 
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
@@ -224,11 +226,6 @@ class Abschlusspruefung extends FHCAPI_Controller
 
 		$formData = $this->input->post('formData');
 
-		$vorsitz = isset($formData['vorsitz']['mitarbeiter_uid']) ? $formData['vorsitz']['mitarbeiter_uid'] :  $formData['vorsitz'];
-		$pruefer1 = isset($formData['pruefer1']['person_id']) ? $formData['pruefer1']['person_id'] : $formData['pruefer1'];
-		$pruefer2 = isset($formData['pruefer2']['person_id']) ? $formData['pruefer2']['person_id'] : $formData['pruefer2'];
-		$pruefer3 = isset($formData['pruefer3']['person_id']) ? $formData['pruefer3']['person_id'] : $formData['pruefer3'];
-
 		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('pruefungstyp_kurzbz', 'Typ', 'required', [
@@ -256,14 +253,14 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'student_uid' => $student_uid,
 			'pruefungstyp_kurzbz' => $formData['pruefungstyp_kurzbz'],
 			'akadgrad_id' => $formData['akadgrad_id'],
-			'vorsitz' => $vorsitz,
+			'vorsitz' => $formData['vorsitz'],
 			'pruefungsantritt_kurzbz' => $formData['pruefungsantritt_kurzbz'],
 			'abschlussbeurteilung_kurzbz' => $formData['abschlussbeurteilung_kurzbz'],
 			'datum' => $formData['datum'], //TODO(Manu) check if minute format like FAS
 			'sponsion' => $formData['sponsion'],
-			'pruefer1' => $pruefer1,
-			'pruefer2' => $pruefer2,
-			'pruefer3' => $pruefer3,
+			'pruefer1' => $formData['pruefer1'],
+			'pruefer2' => $formData['pruefer2'],
+			'pruefer3' => $formData['pruefer3'],
 			'protokoll' => $formData['protokoll'],
 			'note' => $formData['note'],
 			'anmerkung' => $formData['anmerkung'],
@@ -298,7 +295,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 		$this->form_validation->set_rules('pruefungstyp_kurzbz', 'Typ', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
 		]);
-		
+
 		$this->form_validation->set_rules('akadgrad_id', 'AkadGrad', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'AkadGrad'])
 		]);
@@ -319,25 +316,25 @@ class Abschlusspruefung extends FHCAPI_Controller
 
 		$result = $this->AbschlusspruefungModel->update(
 			[
-			'abschlusspruefung_id' => $abschlusspruefung_id
+				'abschlusspruefung_id' => $abschlusspruefung_id
 			],
 			[
-			'student_uid' => $formData['student_uid'],
-			'pruefungstyp_kurzbz' => $formData['pruefungstyp_kurzbz'],
-			'akadgrad_id' => $formData['akadgrad_id'],
-			'vorsitz' => $vorsitz,
-			'pruefungsantritt_kurzbz' => $formData['pruefungsantritt_kurzbz'],
-			'abschlussbeurteilung_kurzbz' => $formData['abschlussbeurteilung_kurzbz'],
-			'datum' => $formData['datum'],
-			'sponsion' => $formData['sponsion'],
-			'pruefer1' => $pruefer1,
-			'pruefer2' => $pruefer2,
-			'pruefer3' => $pruefer3,
-			'protokoll' => $formData['protokoll'],
-			'note' => $formData['note'],
-			'anmerkung' => $formData['anmerkung'],
-			'insertamum' => date('c'),
-			'insertvon' => getAuthUID()
+				'student_uid' => $formData['student_uid'],
+				'pruefungstyp_kurzbz' => $formData['pruefungstyp_kurzbz'],
+				'akadgrad_id' => $formData['akadgrad_id'],
+				'vorsitz' => $vorsitz,
+				'pruefungsantritt_kurzbz' => $formData['pruefungsantritt_kurzbz'],
+				'abschlussbeurteilung_kurzbz' => $formData['abschlussbeurteilung_kurzbz'],
+				'datum' => $formData['datum'],
+				'sponsion' => $formData['sponsion'],
+				'pruefer1' => $pruefer1,
+				'pruefer2' => $pruefer2,
+				'pruefer3' => $pruefer3,
+				'protokoll' => $formData['protokoll'],
+				'note' => $formData['note'],
+				'anmerkung' => $formData['anmerkung'],
+				'insertamum' => date('c'),
+				'insertvon' => getAuthUID()
 			]
 		);
 
@@ -401,5 +398,59 @@ class Abschlusspruefung extends FHCAPI_Controller
 			return $this->terminateWithError($this->p->t('abschlusspruefung', 'error_studentOhneFinalExam', ['id'=> $uids]), self::ERROR_TYPE_GENERAL);
 		}
 		$this->terminateWithSuccess('step3');
+	}
+
+	/*
+	* returns list of all Mitarbeiter
+	* as key value list to be used in select or autocomplete
+	*/
+	public function getAllMitarbeiter()
+	{
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+
+		$sql = "
+			SELECT
+			    ma.mitarbeiter_uid as mitarbeiter_uid,
+				CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid, ')') as label
+			FROM
+			  public.tbl_mitarbeiter ma
+			  JOIN public.tbl_benutzer bn ON (bn.uid = ma.mitarbeiter_uid)
+			  JOIN public.tbl_person p ON (p.person_id = bn.person_id)
+			ORDER BY
+			p.nachname ASC
+			";
+
+		$result = $this->MitarbeiterModel->execReadOnlyQuery($sql);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	/*
+	* returns list of all Persons
+	* as key value list to be used in select or autocomplete
+	*/
+	public function getAllPersons()
+	{
+		$this->load->model('person/Person_model', 'PersonModel');
+
+		$sql = "
+			SELECT
+			    p.vorname, p.nachname, p.person_id,
+				CONCAT(p.nachname, ' ', p.vorname) as label
+			FROM
+			  public.tbl_person p
+			 -- JOIN public.tbl_benutzer bn ON (p.person_id = bn.person_id)
+			  -- and bn.aktiv = 'true'
+			ORDER BY
+			p.nachname ASC
+			";
+
+		//TODO(manu) check if filter active benutzer
+
+		$result = $this->PersonModel->execReadOnlyQuery($sql);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 }
