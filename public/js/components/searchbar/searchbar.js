@@ -56,7 +56,7 @@ export default {
             class="d-flex me-3"
             :class="searchoptions.cssclass"
             action="javascript:void(0);"
-		 	@focusin="searchfocusin"
+            @focusin="searchfocusin"
             @focusout="searchfocusout"
         >
 			<div ref="searchbox" class="h-100 input-group me-2">
