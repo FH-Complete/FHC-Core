@@ -218,6 +218,9 @@ export default {
 		editable() {
 			return this.data?.editAllowed ?? false;
 		},
+		fotoStatus() {
+			return this.data?.fotoStatus ?? false;
+		},
 		getTelefonValue() {
 			if(this.data.standort_telefon?.kontakt) {
 				return this.data.standort_telefon.kontakt + " " + this.data.telefonklappe
@@ -337,7 +340,7 @@ export default {
                     <div class="row mb-4">
                         <div class="col">
                             <!-- PROFIL INFORMATION -->
-                            <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :editable="editable"></profil-information>
+                            <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :editable="editable" :fotoStatus="fotoStatus"></profil-information>
                         </div>
                     </div>
                     <div class="row mb-4">

@@ -11,6 +11,10 @@ export default {
 		editable: {
 			type: Boolean,
 			default: false
+		},
+		fotoStatus:{
+			type: Boolean,
+			default: true
 		}
 	},
 	data() {
@@ -83,6 +87,9 @@ export default {
                         <!-- LOCKING IMAGE FUNCTIONALITY -->
                         <div v-if="editable" role="button" @click.prevent="sperre_foto_function" class="image-lock">
                             <i :class="{'fa':true, ...(FotoSperre?{'fa-lock':true}:{'fa-lock-open':true})} "></i>
+                        </div>
+						<div v-if="!fotoStatus" role="button" @click.prevent="" class="image-upload">
+                            <i class="fa fa-upload"></i>
                         </div>
                     </div>
                 </div>
