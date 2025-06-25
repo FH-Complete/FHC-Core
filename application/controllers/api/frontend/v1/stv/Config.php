@@ -210,7 +210,7 @@ class Config extends FHCAPI_Controller
 			]
 		];
 		$result['finalexam'] = [
-			'title' =>  $this->p->t('stv', 'tab_finalexam'),
+			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
 			'config' => $config['finalexam']
 		];
