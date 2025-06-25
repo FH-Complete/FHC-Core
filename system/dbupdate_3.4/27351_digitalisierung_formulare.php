@@ -92,7 +92,22 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag LIMIT 
 			datum_wiedereinstieg						TIMESTAMP NULL,
 			grund										TEXT NULL,
 			dms_id										INTEGER NULL,
-			CONSTRAINT tbl_studierendenantrag_pk PRIMARY KEY(studierendenantrag_id)
+			CONSTRAINT tbl_studierendenantrag_pk PRIMARY KEY(studierendenantrag_id),
+			CONSTRAINT fk_tbl_studierendenantrag_prestudent_id
+				FOREIGN KEY (prestudent_id)
+				REFERENCES public.tbl_prestudent(prestudent_id)
+				ON UPDATE CASCADE
+				ON DELETE RESTRICT,
+			CONSTRAINT fk_tbl_studierendenantrag_studiensemester_kurzbz
+				FOREIGN KEY (studiensemester_kurzbz)
+				REFERENCES public.tbl_studiensemester(studiensemester_kurzbz)
+				ON UPDATE CASCADE
+				ON DELETE RESTRICT,
+			CONSTRAINT fk_tbl_studierendenantrag_dms_id
+				FOREIGN KEY (dms_id)
+				REFERENCES campus.tbl_dms(dms_id)
+				ON UPDATE CASCADE
+				ON DELETE RESTRICT
 		);
 		CREATE SEQUENCE campus.tbl_studierendenantrag_studierendenantrag_id_seq
 			 INCREMENT BY 1
@@ -112,6 +127,44 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag LIMIT 
 		echo '<strong>campus.tbl_studierendenantrag: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>campus.tbl_studierendenantrag: table created';
+}
+
+if ($result = @$db->db_query("
+	SELECT 1 
+	FROM information_schema.table_constraints 
+	WHERE constraint_name='fk_tbl_studierendenantrag_prestudent_id' 
+	LIMIT 1
+")) {
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			ALTER TABLE campus.tbl_studierendenantrag
+				ADD CONSTRAINT fk_tbl_studierendenantrag_prestudent_id
+				FOREIGN KEY (prestudent_id)
+				REFERENCES public.tbl_prestudent(prestudent_id)
+				ON UPDATE CASCADE
+				ON DELETE RESTRICT;
+
+			ALTER TABLE campus.tbl_studierendenantrag
+				ADD CONSTRAINT fk_tbl_studierendenantrag_studiensemester_kurzbz
+				FOREIGN KEY (studiensemester_kurzbz)
+				REFERENCES public.tbl_studiensemester(studiensemester_kurzbz)
+				ON UPDATE CASCADE
+				ON DELETE RESTRICT;
+
+			ALTER TABLE campus.tbl_studierendenantrag
+				ADD CONSTRAINT fk_tbl_studierendenantrag_dms_id
+				FOREIGN KEY (dms_id)
+				REFERENCES campus.tbl_dms(dms_id)
+				ON UPDATE CASCADE
+				ON DELETE RESTRICT;
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_studierendenantrag: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>campus.tbl_studierendenantrag: fks added';
+	}
 }
 
 if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_status LIMIT 1"))
@@ -183,6 +236,11 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_lehrve
 				FOREIGN KEY (studierendenantrag_id)
 				REFERENCES campus.tbl_studierendenantrag(studierendenantrag_id)
 				ON UPDATE CASCADE
+				ON DELETE RESTRICT,
+			CONSTRAINT fk_tbl_lehrveranstaltung_lehrveranstaltung_id
+				FOREIGN KEY (lehrveranstaltung_id)
+				REFERENCES lehre.tbl_lehrveranstaltung(lehrveranstaltung_id)
+				ON UPDATE CASCADE
 				ON DELETE RESTRICT
 		);
 		CREATE SEQUENCE campus.tbl_studierendenantrag_lehrveranstaltung_studierendenantrag_lehrveranstaltung_id_seq
@@ -203,6 +261,30 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_lehrve
 		echo '<strong>campus.tbl_studierendenantrag_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>campus.tbl_studierendenantrag_lehrveranstaltung: table created';
+}
+
+if ($result = @$db->db_query("
+	SELECT 1 
+	FROM information_schema.table_constraints 
+	WHERE constraint_name='fk_tbl_lehrveranstaltung_lehrveranstaltung_id' 
+	LIMIT 1
+")) {
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			ALTER TABLE campus.tbl_studierendenantrag_lehrveranstaltung
+				ADD CONSTRAINT fk_tbl_lehrveranstaltung_lehrveranstaltung_id
+				FOREIGN KEY (lehrveranstaltung_id)
+				REFERENCES lehre.tbl_lehrveranstaltung(lehrveranstaltung_id)
+				ON UPDATE CASCADE 
+				ON DELETE RESTRICT;
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_studierendenantrag_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>campus.tbl_studierendenantrag_lehrveranstaltung: fks added';
+	}
 }
 
 if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'student/studierendenantrag';"))
