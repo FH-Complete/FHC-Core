@@ -575,5 +575,47 @@ class ampel extends basis_db
 		}
 		
 	}
+
+	/**
+	 * Zählt die Anzahl der UIDs, welche mit einer Ampel adressiert werden
+	 * @param $ampel_id integer ID der Ampel, die geladen werden soll
+	 */
+	public function getAnzahlUserAmpel($ampel_id)
+	{
+		// Ampel laden
+		$qry_ampel = "SELECT benutzer_select FROM public.tbl_ampel WHERE ampel_id=".$this->db_add_param($ampel_id, FHC_INTEGER);
+
+		if($result_ampel = $this->db_query($qry_ampel))
+		{
+			// Anzahl User laden
+			if ($row_ampel = $this->db_fetch_object($result_ampel))
+			{
+				$qry_user = "SELECT count(*) AS anzahl FROM (SELECT uid FROM public.tbl_benutzer WHERE uid IN (".$row_ampel->benutzer_select."))subquery";
+			}
+
+			if ($result = $this->db_query($qry_user))
+			{
+				if ($row = $this->db_fetch_object($result))
+				{
+					return $row->anzahl;
+				}
+				else
+				{
+					$this->errormsg = 'Anzahl UIDs konnte nicht geladen werden';
+					return false;
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Anzahl UIDs konnte nicht geladen werden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Ampel';
+			return false;
+		}
+	}
 }
 ?>

@@ -4,6 +4,9 @@ import ViewStudentProfil from "./StudentViewProfil.js";
 import ViewMitarbeiterProfil from "./MitarbeiterViewProfil.js";
 import Loading from "../../Loader.js";
 
+import ApiProfil from '../../../api/factory/profil.js';
+import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+
 Vue.$collapseFormatter = function (data) {
 	//data - an array of objects containing the column title and value for each cell
 	var container = document.createElement("div");
@@ -132,7 +135,8 @@ export const Profil = {
 	methods: {
 		async load() {
 			// fetch profilUpdateStates to provide them to children components
-			await this.$fhcApi.factory.profilUpdate.getStatus()
+			await this.$api
+				.call(ApiProfilUpdate.getStatus())
 				.then((response) => {
 					this.profilUpdateStates = response.data;
 				})
@@ -140,7 +144,8 @@ export const Profil = {
 					console.error(error);
 				});
 
-			this.$fhcApi.factory.profilUpdate.getTopic()
+			this.$api
+				.call(ApiProfilUpdate.getTopic())
 				.then((response) => {
 					this.profilUpdateTopic = response.data;
 				})
@@ -150,14 +155,16 @@ export const Profil = {
 			
 			let uid = this.uid ?? location.pathname.split("/").pop();
 
-			this.$fhcApi.factory.profil.getView(uid).then((res) => {
-				if (!res.data) {
-					this.notFoundUID = uid;
-				} else {
-					this.view = res.data?.view;
-					this.data = res.data?.data;
-				}
-			});	
+			this.$api
+				.call(ApiProfil.getView(uid))
+				.then((res) => {
+					if (!res.data) {
+						this.notFoundUID = uid;
+					} else {
+						this.view = res.data?.view;
+						this.data = res.data?.data;
+					}
+				});	
 		},
 		zustellAdressenCount() {
 			if (!this.data || !this.data.adressen) {
