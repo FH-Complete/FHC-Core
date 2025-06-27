@@ -188,7 +188,7 @@
 			</div>
 			<?php if (isset($stammdaten->zugangscode)): ?>
 				<div class="col-xs-6 text-right">
-					<a href="<?php echo CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode).'&emailAdresse='.$lastMailAdress ?>"
+					<a href="<?php echo CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode).'&emailAdresse='.$lastMailAdress.'&keepEmailUnverified=true' ?>"
 					   target='_blank'><i class="glyphicon glyphicon-new-window"></i>&nbsp;<?php echo  $this->p->t('infocenter','zugangBewerbung') ?></a>
 				</div>
 			<?php endif; ?>
