@@ -86,8 +86,6 @@ export default{
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData:	false,
 				height:	'auto',
 				selectable:	true,
 				index: 'bankverbindung_id',
