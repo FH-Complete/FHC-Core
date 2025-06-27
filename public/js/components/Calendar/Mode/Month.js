@@ -68,6 +68,8 @@ export default {
 		currentDate: function(newVal, oldVal) {
 			if(newVal !== oldVal) {
 				this.focusDate = new Date(newVal);
+				this.$emit('update:currentDate', this.focusDate);
+				this.$emit('update:range', this.range);
 			}
 		}
 	},
