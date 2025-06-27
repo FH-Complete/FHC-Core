@@ -22,8 +22,8 @@ const CalendarEvent = {
 		// TODO(chris): wrong type
 		return {
 			id: 'lehreinheit' + orig.lehreinheit_id,
-			start: CalendarDate.UTC(new Date(orig.datum + ' ' + orig.beginn)),
-			end: CalendarDate.UTC(new Date(orig.datum + ' ' + orig.ende)),
+			start: CalendarDate.UTC(new Date(orig.isobeginn)),
+			end: CalendarDate.UTC(new Date(orig.isoende)),
 			orig
 		};
 	},
@@ -32,6 +32,14 @@ const CalendarEvent = {
 			id: 'vevent' + orig.uid,
 			start: CalendarDate.UTC(new Date(orig.dtstart)),
 			end: CalendarDate.UTC(new Date(orig.dtend)),
+			orig
+		};
+	},
+	fromReservierung(orig) {
+		return {
+			id: 'reservierung' + orig.id,
+			start: CalendarDate.UTC(new Date(orig.isobeginn)),
+			end: CalendarDate.UTC(new Date(orig.isoende)),
 			orig
 		};
 	}

@@ -28,6 +28,13 @@ export default {
 			rangeOffset: 0
 		};
 	},
+	watch: {
+		currentDate: function(newVal, oldVal) {
+			if(newVal !== oldVal) {
+				this.focusDate = newVal;
+			}
+		}
+	},
 	computed: {
 		range() {
 			const range = {};

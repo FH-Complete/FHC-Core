@@ -171,7 +171,11 @@ export default {
 				return this.internCurrentDate || (new Date(this.currentDate)).getTime();
 			},
 			set(v) {
-				this.internCurrentDate = v;
+				if(v instanceof Date) {
+					this.internCurrentDate = v.getTime();
+				} else {
+					this.internCurrentDate = v;
+				}
 				this.$emit('update:currentDate', new Date(this.internCurrentDate));
 			}
 		}
@@ -268,6 +272,7 @@ export default {
 				:view="internalView"
 				@update:view="internalView = $event; $emit('update:view', internalView)"
 				:title="title"
+				v-model:current-date="internCurrentDate"
 				@prev="clickPrev"
 				@next="clickNext"
 				@click:title="clickTitle"

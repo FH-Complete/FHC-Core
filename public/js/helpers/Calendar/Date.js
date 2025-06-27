@@ -2,7 +2,7 @@ const CalendarDate = {
 	msPerDay: 86400000, // = 1000*60*60*24
 
 	/**
-	 * Returns UTC timestam for a date
+	 * Returns UTC timestamp for a date
 	 *
 	 * @param Date			date
 	 * @param boolean		stripTime
@@ -11,8 +11,8 @@ const CalendarDate = {
 	 */
 	UTC(date, stripTime) {
 		if (stripTime)
-			return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-		return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes());
+			return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+		return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes());
 	},
 	/**
 	 * Get a date as string, using locale conventions.
@@ -90,12 +90,12 @@ const CalendarDate = {
 	countWeeksOfYear(year, locale) {
 		const weekStart = this.getWeekStart(locale);
 		if (weekStart == 1) {
-			const weekStartOfTheYear = this.getFirstDayOfWeek(new Date(year, 0, 4), locale);
-			const weekStartOfTheNextYear = this.getFirstDayOfWeek(new Date(year+1, 0, 4), locale);
+			const weekStartOfTheYear = this.getFirstDayOfWeek(new Date(Date.UTC(year, 0, 4)), locale);
+			const weekStartOfTheNextYear = this.getFirstDayOfWeek(new Date(Date.UTC(year+1, 0, 4)), locale);
 			return this.getWeekNumber(weekStartOfTheYear, weekStartOfTheNextYear) - 1;
 		} else {
-			const weekStartOfTheYear = this.getFirstDayOfWeek(new Date(year, 0, 1), locale);
-			return this.getWeekNumber(weekStartOfTheYear, new Date(year, 11, 31));
+			const weekStartOfTheYear = this.getFirstDayOfWeek(new Date(Date.UTC(year, 0, 1)), locale);
+			return this.getWeekNumber(weekStartOfTheYear, new Date(Date.UTC(year, 11, 31)));
 		}
 	},
 	/**
@@ -110,12 +110,12 @@ const CalendarDate = {
 	 */
 	getWeek(date, locale) {
 		const weekStart = this.getWeekStart(locale);
-		let year = date.getFullYear();
+		let year = date.getUTCFullYear();
 
 		if (weekStart == 1) { // Use ISO rules
-			const month = date.getMonth();
-			const day = date.getDate();
-			const weekday = date.getDay();
+			const month = date.getUTCMonth();
+			const day = date.getUTCDate();
+			const weekday = date.getUTCDay();
 
 			if (month == 11 && day > 28 && weekday && weekday <= day-28) {
 				return {number: 1, year: year + 1};
@@ -124,13 +124,13 @@ const CalendarDate = {
 				year -= 1;
 			}
 
-			const dayThatMustBeInFirstWeek = new Date(year, 0, 4);
+			const dayThatMustBeInFirstWeek = new Date(Date.UTC(year, 0, 4));
 			const weekStartOfTheYear = this.getFirstDayOfWeek(dayThatMustBeInFirstWeek, locale);
 			const number = this.getWeekNumber(weekStartOfTheYear, date);
 
 			return { number, year };
 		} else { // Either Northamerican or Arabic rules
-			const dayThatMustBeInFirstWeek = new Date(year, 0, 1);
+			const dayThatMustBeInFirstWeek = new Date(Date(year, 0, 1));
 			const weekStartOfTheYear = this.getFirstDayOfWeek(dayThatMustBeInFirstWeek, locale);
 			const number = this.getWeekNumber(weekStartOfTheYear, date);
 
@@ -150,9 +150,9 @@ const CalendarDate = {
 		const weekStart = this.getWeekStart(locale);
 		let dayThatMustBeInFirstWeek;
 		if (weekStart == 1) { // Use ISO rules
-			dayThatMustBeInFirstWeek = new Date(year, 0, 4);
+			dayThatMustBeInFirstWeek = new Date(Date.UTC(year, 0, 4));
 		} else { // Either Northamerican or Arabic rules
-			dayThatMustBeInFirstWeek = new Date(year, 0, 1);
+			dayThatMustBeInFirstWeek = new Date(Date.UTC(year, 0, 1));
 		}
 		const weekStartOfTheYear = this.getFirstDayOfWeek(dayThatMustBeInFirstWeek, locale);
 		const firstDayInWeek = this.addDays(weekStartOfTheYear, (number-1) * 7);
@@ -177,8 +177,8 @@ const CalendarDate = {
 		// NOTE(chris): use UTC time for difference because there is a
 		// possibility one of the dates is in daylightsaving time while the
 		// other is not
-		const start = Date.UTC(target.getFullYear(), target.getMonth(), target.getDate(), 0, 0, 0);
-		const end = Date.UTC(weekStartOfTheYear.getFullYear(), weekStartOfTheYear.getMonth(), weekStartOfTheYear.getDate(), 0, 0, 0);
+		const start = Date.UTC(target.getUTCFullYear(), target.getUTCMonth(), target.getUTCDate(), 0, 0, 0);
+		const end = Date.UTC(weekStartOfTheYear.getUTCFullYear(), weekStartOfTheYear.getUTCMonth(), weekStartOfTheYear.getUTCDate(), 0, 0, 0);
 		const diffInMillisec = start - end;
 
 		const fullDays = Math.floor(diffInMillisec / this.msPerDay);
@@ -196,14 +196,14 @@ const CalendarDate = {
 	 * @return Date
 	 */
 	addYears(date, years) {
-		const oldYear = date.getFullYear();
-		const oldMonth = date.getMonth();
-		const oldDay = date.getDate();
+		const oldYear = date.getUTCFullYear();
+		const oldMonth = date.getUTCMonth();
+		const oldDay = date.getUTCDate();
 		
 		if (oldMonth == 1 && oldDay == 29)
-			return new Date(oldYear + years, 2, 0);
+			return new Date(Date.UTC(oldYear + years, 2, 0));
 		
-		return new Date(oldYear + years, oldMonth, oldDay);
+		return new Date(Date.UTC(oldYear + years, oldMonth, oldDay));
 	},
 	/**
 	 * Adds or substracts months from a given date and returns the result.
@@ -216,9 +216,9 @@ const CalendarDate = {
 	 * @return Date
 	 */
 	addMonths(date, months) {
-		const oldYear = date.getFullYear();
-		const oldMonth = date.getMonth();
-		const oldDay = date.getDate();
+		const oldYear = date.getUTCFullYear();
+		const oldMonth = date.getUTCMonth();
+		const oldDay = date.getUTCDate();
 		let years = 0;
 		
 		if (oldMonth + months < 0) {
@@ -232,13 +232,13 @@ const CalendarDate = {
 		const newYear = oldYear + years;
 		
 		if (oldDay > 28) {
-			const test = new Date(newYear, newMonth+1, 0);
+			const test = new Date(Date.UTC(newYear, newMonth+1, 0));
 
-			if (test.getDate() <= oldDay)
+			if (test.getUTCDate() <= oldDay)
 				return test;
 		}
 
-		return new Date(newYear, newMonth, oldDay);
+		return new Date(Date.UTC(newYear, newMonth, oldDay));
 	},
 	/**
 	 * Adds or substracts days from a given date and returns the result.
@@ -249,7 +249,7 @@ const CalendarDate = {
 	 * @return Date
 	 */
 	addDays(date, days) {
-		return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+		return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + days));
 	}
 };
 

@@ -231,8 +231,8 @@ const Stundenplan = {
 									el.color = '#' + (el.farbe || 'CCCCCC');
 								}
 
-								el.start = new Date(el.datum + ' ' + el.beginn);
-								el.end = new Date(el.datum + ' ' + el.ende);
+								el.start = new Date(el.isobeginn);
+								el.end = new Date(el.isoende);
 
 							});
 						}

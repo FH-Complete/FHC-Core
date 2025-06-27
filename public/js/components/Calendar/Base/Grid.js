@@ -142,6 +142,10 @@ export default {
 			const result = Array.from({length: this.axisMain.length}, e => Array());
 			
 			target.forEach(event => {
+				if(!event) {
+					console.log(JSON.stringify(event));
+					return;
+				}
 				// NOTE(chris): make new Date object to reset the time
 				const startTime = event.start || this.axisMainBorders[0] - 1;
 				const endTime = event.end || this.axisMainBorders[this.axisMainBorders.length-1] + 1;
@@ -220,7 +224,7 @@ export default {
 				class="part-header"
 				:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': part_' + (index+1)"
 			>
-				<slot name="part-header" v-bind="{ index, part }" />
+				<slot name="part-header" v-bind="{ index, part, axisMain }" />
 			</div>
 
 			<div

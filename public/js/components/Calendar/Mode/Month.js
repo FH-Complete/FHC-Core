@@ -64,6 +64,11 @@ export default {
 	watch: {
 		locale() {
 			this.$emit('update:range', this.range);
+		},
+		currentDate: function(newVal, oldVal) {
+			if(newVal !== oldVal) {
+				this.focusDate = new Date(newVal);
+			}
 		}
 	},
 	methods: {

@@ -6,7 +6,8 @@ export default {
 		locale: "locale"
 	},
 	props: {
-		part: [Number, Object]
+		part: [Number, Object],
+		axisMain: Array
 	},
 	computed: {
 		sanitizedTimestamps() {
@@ -15,19 +16,19 @@ export default {
 		start() {
 			if (!this.sanitizedTimestamps.start)
 				return null;
-			return this.formatTime(new Date(this.sanitizedTimestamps.start));
+			return this.formatTime(new Date(this.axisMain[0] + this.sanitizedTimestamps.start));
 		},
 		end() {
 			if (!this.sanitizedTimestamps.end)
 				return null;
-			return this.formatTime(new Date(this.sanitizedTimestamps.end));
+			return this.formatTime(new Date(this.axisMain[0] + this.sanitizedTimestamps.end));
 		}
 	},
 	methods: {
 		formatTime(date) {
 			return CalendarDate.format(
 				date,
-				{ timeZone: 'UTC', hour: '2-digit', minute: '2-digit' },
+				{ timeZone: 'Europe/Vienna', hour: '2-digit', minute: '2-digit' },
 				this.locale
 			);
 		}

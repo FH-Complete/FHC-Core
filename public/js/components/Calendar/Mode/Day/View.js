@@ -31,7 +31,10 @@ export default {
 			return [this.day];
 		},
 		axisParts() {
-			const referenceDate = new Date("2000-01-01 00:00:00");
+			//const referenceDate = new Date("2000-01-01 00:00:00");
+			const referenceDate = new Date(this.day);
+			
+			const tzoffset = parseInt((referenceDate.toLocaleTimeString("de-AT", {timeZone: 'Europe/Vienna', timeZoneName: 'shortOffset'})).replace(/.*GMT\+/, '')) - 1;
 			
 			if (this.timeGrid) {
 				// create {start, end} array
@@ -46,8 +49,12 @@ export default {
 			} else {
 				// create 07:00-23:00
 				return [...Array(17).keys()].map(i => {
-					const time = ('0' + (i + 7)).slice(-2) + ':00:00';
-					const date = new Date("2000-01-01 " + time);
+					const time = ('0' + (i + 6 - tzoffset)).slice(-2) + ':00:00';
+					const hour = ('0' + (i + 6 - tzoffset)).slice(-2);
+					//const date = new Date("2000-01-01 " + time);
+					const date = new Date(Date.UTC(referenceDate.getUTCFullYear(), 
+						referenceDate.getUTCMonth(), referenceDate.getUTCDate(),
+						hour, 0, 0));
 					return date - referenceDate;
 				});
 			}
@@ -91,8 +98,8 @@ export default {
 					v-bind="{ timestamp }"
 				/>
 			</template>
-			<template #part-header="{ part }">
-				<label-time v-bind="{ part }" />
+			<template #part-header="{ part, axisMain }">
+				<label-time v-bind="{ part, axisMain }" />
 			</template>
 			<template #event="slot">
 				<slot v-bind="slot" mode="day" />

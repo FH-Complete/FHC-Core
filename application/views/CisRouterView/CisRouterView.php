@@ -19,11 +19,13 @@ $includesArray = array(
 		'public/css/components/FilterComponent.css',
 		'public/css/components/Profil.css',
 		'public/css/components/FormUnderline.css',
+		'vendor/vuejs/vuedatepicker_css/main.css',
 		'public/css/Cis4/Cms.css',
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.js',
-		'vendor/npm-asset/primevue/accordiontab/accordiontab.js'
+		'vendor/npm-asset/primevue/accordiontab/accordiontab.js',
+		'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'
 	),
 	'customJSModules' => array(
 		'public/js/apps/Dashboard/Fhc.js'
