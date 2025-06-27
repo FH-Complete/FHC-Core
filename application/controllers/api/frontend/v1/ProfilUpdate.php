@@ -515,68 +515,58 @@ class ProfilUpdate extends FHCAPI_Controller
 			$this->terminateWithError("No file available for upload");
 		}
 
-		//? if replace is set it contains the profil_update_id in which the attachment_id has to be replaced
 		$files = $_FILES['files'];
-		$file_count = count($files['name']);
-		$count = 0;
-		for ($i = 0; $i < $file_count; $i++) {
-			$count++;
-			$_FILES['files']['name'] = $files['name'][$i];
-			$_FILES['files']['type'] = $files['type'][$i];
-			$_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
-			$_FILES['files']['error'] = $files['error'][$i];
-			$_FILES['files']['size'] = $files['size'][$i];
-			$_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
+		
+		$_FILES['files']['name'] = current($files['name']);
+		$_FILES['files']['type'] = current($files['type']);
+		$_FILES['files']['tmp_name'] = current($files['tmp_name']);
+		$_FILES['files']['error'] = current($files['error']);
+		$_FILES['files']['size'] = current($files['size']);
+		$_FILES['files']['tmp_name'] = current($files['tmp_name']);
 
-			$filename = $_FILES['files']['tmp_name'];
+		$filename = $_FILES['files']['tmp_name'];
 
-			$ext = substr($files['name'][$i], strrpos($files['name'][$i], '.') + 1);
-			if($ext!='jpg' && $ext!='jpeg'){
-				$this->terminateWithError("Only jpg and jpeg files are allowed for profilbild upload");
-			}
-			
-			$width = 827;
-			$height = 1063;
-			// resize
-			$resize($filename, $width, $height);
-
-
-			//akte
-			$fp = fopen($filename,'r');
-			//auslesen
-			$content = fread($fp, filesize($filename));
-			$base64_content = base64_encode($content);
-			$this->load->library('AkteLib');
-			$aktenInsertResult = $this->aktelib->add($this->pid,'Lichtbil',"Lichtbild_".$this->pid.".jpg","image/jpg",$fp,"Lichtbild gross");
-			fclose($fp);
-			if (isError($aktenInsertResult)) {
-				$this->terminateWithError(getError($aktenInsertResult));
-			}
-
-			// in person abspeichern
-			$resize($filename, 101, 130);
-			$fp = fopen($filename,'r');
-			$content = fread($fp, filesize($filename));
-			fclose($fp);
-			$base64_content = base64_encode($content);
-			$this->load->model('person/Person_model','PersonModel');
-			$personUpdate = $this->PersonModel->update($this->pid, ["foto"=>$base64_content]);
-			if(isError($personUpdate)){
-				$this->terminateWithError(getError($personUpdate));
-			}
-			// update foto status
-			$this->load->model('person/Fotostatusperson_model','FotostatusModel');
-			$fotoInsert = $this->FotostatusModel->insert(["person_id"=>$this->pid,"fotostatus_kurzbz"=>"hochgeladen","datum"=>date('Y-m-d'),"insertamum"=>date('Y-m-d H:i:s'),"insertvon"=>$this->uid,"updateamum"=>date('Y-m-d H:i:s'),"updatevon"=>$this->uid]);
-			if(isError($fotoInsert)){
-				$this->terminateWithError(getError($fotoInsert));
-			}
-
+		$ext = substr(current($files['name']), strrpos(current($files['name']), '.') + 1);
+		if($ext!='jpg' && $ext!='jpeg'){
+			$this->terminateWithError("Only jpg and jpeg files are allowed for profilbild upload");
 		}
 		
+		// resize
+		$resize($filename, 827, 1063);
+
+		//akte
+		$fp = fopen($filename,'r');
+		//auslesen
+		$content = fread($fp, filesize($filename));
+		$base64_content = base64_encode($content);
+		$this->load->library('AkteLib');
+		$aktenInsertResult = $this->aktelib->add($this->pid,'Lichtbil',"Lichtbild_".$this->pid.".jpg","image/jpg",$fp,"Lichtbild gross");
+		fclose($fp);
+		if (isError($aktenInsertResult)) {
+			$this->terminateWithError(getError($aktenInsertResult));
+		}
+
+		// in person abspeichern
+		$resize($filename, 101, 130);
+		$fp = fopen($filename,'r');
+		$content = fread($fp, filesize($filename));
+		fclose($fp);
+		$base64_content = base64_encode($content);
+		$this->load->model('person/Person_model','PersonModel');
+		$personUpdate = $this->PersonModel->update($this->pid, ["foto"=>$base64_content]);
+		if(isError($personUpdate)){
+			$this->terminateWithError(getError($personUpdate));
+		}
+
+
+		// update foto status
+		$this->load->model('person/Fotostatusperson_model','FotostatusModel');
+		$fotoInsert = $this->FotostatusModel->insert(["person_id"=>$this->pid,"fotostatus_kurzbz"=>"hochgeladen","datum"=>date('Y-m-d'),"insertamum"=>date('Y-m-d H:i:s'),"insertvon"=>$this->uid,"updateamum"=>date('Y-m-d H:i:s'),"updatevon"=>$this->uid]);
+		if(isError($fotoInsert)){
+			$this->terminateWithError(getError($fotoInsert));
+		}
 		
-		$this->terminateWithSuccess(["fotoStatus"=>getData($fotoInsert),"personUpdate"=>getData($personUpdate),"akteInsert"=>getData($aktenInsertResult)]);
-
-
+		$this->terminateWithSuccess();
 	}
 
 	public function getProfilUpdateWithPermission($status = null)

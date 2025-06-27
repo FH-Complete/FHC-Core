@@ -138,14 +138,17 @@
 	position: relative;
 }
 
+.dashboard-item-overlay{
+	background-color: var(--fhc-dashboard-item-overlay-background);
+}
+
 .dashboard-item-overlay::before{
 	position:absolute;
 	content:"";
-	top:0;
-	left:0;
-	right:0;
-	bottom:0;
-	background-color:var(--fhc-dashboard-item-overlay-background);
+	top:0.25rem;
+	left:0.25rem;
+	right:0.25rem;
+	bottom:0.25rem;
 	border:4px dashed var(--fhc-dashboard-item-overly-border-color);
 	opacity: 0.5;
 }

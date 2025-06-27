@@ -73,7 +73,7 @@ export default {
 	template: /*html*/ `
 
 <div class="card h-100">
-	<image-upload ref="imageUpload" titel="test"></image-upload>
+	<image-upload ref="imageUpload" :titel="$p.t('profilUpdate','profilBild')"></image-upload>
     <div class="card-header">
         <div class="row">
             <div v-if="editable" @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button">
