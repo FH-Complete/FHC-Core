@@ -110,6 +110,7 @@ export default {
 						format="MMMM yyyy"
 						model-type="yyyy-MM-dd"
 						@update:model-value="selectedMonthChanged"
+						:timezone="{ convertModel: false, timezone: 'UTC' }"
 					></vuedatepicker>
 		
 					<vuedatepicker
@@ -129,6 +130,7 @@ export default {
 						format="yyyy 'KW' ww"
 						model-type="yyyy-MM-dd"
 						@update:model-value="selectedWeekChanged"
+						:timezone="{ convertModel: false, timezone: 'UTC' }"
 					></vuedatepicker>
 		
 					<vuedatepicker
@@ -147,6 +149,7 @@ export default {
 						format="dd.MM.yyyy"
 						model-type="yyyy-MM-dd"
 						@update:model-value="selectedDayChanged"
+						:timezone="{ convertModel: false, timezone: 'UTC' }"
 					></vuedatepicker>
 					</div>
 				</div>
