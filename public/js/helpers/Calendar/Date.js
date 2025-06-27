@@ -76,7 +76,7 @@ const CalendarDate = {
 	 */
 	getFirstDayOfWeek(someDayInWeek, locale) {
 		const weekStart = this.getWeekStart(locale);
-		const offsetFromFirstDayOfWeek = (someDayInWeek.getDay() + 7 - weekStart)%7;
+		const offsetFromFirstDayOfWeek = (someDayInWeek.getUTCDay() + 7 - weekStart)%7;
 		return this.addDays(someDayInWeek, -offsetFromFirstDayOfWeek);
 	},
 	/**
@@ -130,7 +130,7 @@ const CalendarDate = {
 
 			return { number, year };
 		} else { // Either Northamerican or Arabic rules
-			const dayThatMustBeInFirstWeek = new Date(Date(year, 0, 1));
+			const dayThatMustBeInFirstWeek = new Date(Date.UTC(year, 0, 1));
 			const weekStartOfTheYear = this.getFirstDayOfWeek(dayThatMustBeInFirstWeek, locale);
 			const number = this.getWeekNumber(weekStartOfTheYear, date);
 
