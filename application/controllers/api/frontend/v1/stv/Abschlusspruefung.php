@@ -40,6 +40,51 @@ class Abschlusspruefung extends FHCAPI_Controller
 
 		// Load models
 		$this->load->model('education/Abschlusspruefung_model', 'AbschlusspruefungModel');
+
+
+		//Permission checks for Studiengangsarray
+		$allowedStgs = $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: [];
+
+		if ($this->router->method == 'insertAbschlusspruefung' || $this->router->method == 'updateAbschlusspruefung')
+		{
+			$student_uid = $this->input->post('uid') ?: ($this->input->post('formData')['student_uid'] ?? null);
+
+			if(!$student_uid)
+			{
+				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Student UID']), self::ERROR_TYPE_GENERAL);
+			}
+			$this->_checkAllowedStgsFromUid($student_uid, $allowedStgs);
+		}
+
+		if ($this->router->method == 'deleteAbschlusspruefung')
+		{
+			$abschlusspruefung_id = $this->input->post('id');
+
+			if(!$abschlusspruefung_id)
+			{
+				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Abschlusspruefung ID']), self::ERROR_TYPE_GENERAL);
+			}
+			$result = $this->AbschlusspruefungModel->load(
+				array('abschlusspruefung_id' => $abschlusspruefung_id)
+			);
+			$data = $this->getDataOrTerminateWithError($result);
+			$student_uid = current($data)->student_uid;
+
+			$this->_checkAllowedStgsFromUid($student_uid, $allowedStgs);
+		}
+	}
+
+	private function _checkAllowedStgsFromUid($student_uid, $allowedStgs)
+	{
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$result = $this->StudentModel->loadWhere(['student_uid' => $student_uid]);
+		$data = $this->getDataOrTerminateWithError($result);
+		$studiengang_kz = current($data)->studiengang_kz;
+
+		if (!in_array($studiengang_kz, $allowedStgs))
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_keineBerechtigungStg'), self::ERROR_TYPE_GENERAL);
+		}
 	}
 
 	public function getAbschlusspruefung($student_uid)
