@@ -44394,6 +44394,26 @@ and represent the current state of research on the topic. The prescribed citatio
 		)
 	),
 	// FHC-4 Studierendenverwaltung FUNCTIONS END
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_keineBerechtigungStg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie haben keine Berechtigung, für diesen Studiengang Daten zu ändern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You do not have permission to change data for this study program',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
