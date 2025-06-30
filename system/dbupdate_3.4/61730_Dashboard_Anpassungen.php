@@ -1,7 +1,9 @@
 <?php
 
+$rowcount = 0;
 $result = @$db->db_query("SELECT preset_id FROM dashboard.tbl_dashboard_preset WHERE preset ? 'widgets'");
 $result_num_rows = $db->db_num_rows($result);
+$rowcount += $result_num_rows;
 $errorList = array();
 for($i = 0; $i < $result_num_rows; $i++)
 {
@@ -26,6 +28,7 @@ for($i = 0; $i < $result_num_rows; $i++)
 
 $result = @$db->db_query("SELECT override_id FROM dashboard.tbl_dashboard_benutzer_override WHERE override ? 'widgets'");
 $result_num_rows = $db->db_num_rows($result);
+$rowcount += $result_num_rows;
 for($i = 0; $i < $result_num_rows; $i++)
 {
 	$row = $db->db_fetch_object($result, $i);
@@ -48,7 +51,9 @@ for($i = 0; $i < $result_num_rows; $i++)
 }
 
 if(empty($errorList)){
-	echo '<br>successfully updated dashboard.tbl_dashboard_preset and dashboard.tbl_dashboard_benutzer_override';
+	if($rowcount > 0) {
+		echo '<br>successfully updated dashboard.tbl_dashboard_preset and dashboard.tbl_dashboard_benutzer_override';
+	}
 }
 else{
 	foreach($errorList as $error){
