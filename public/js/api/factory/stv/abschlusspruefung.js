@@ -105,7 +105,7 @@ export default {
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/abschlusspruefung/checkForExistingExams/',
-			params: { uid }
+			params: { uids }
 		};
 	},
 	getAllMitarbeiter(){
