@@ -1,4 +1,4 @@
-/* Moodle Events in Month Page */
+/* Lehreinheits Events in Month Page */
 .monthPageContainer .lehreinheitEventContent{
 	display: flex;
 	border-bottom: 1px solid var(--bs-border-color);	
@@ -24,7 +24,7 @@
 	display:none;
 }
 
-/* Moodle Events in Week Page */
+/* Lehreinheits Events in Week Page */
 .weekPageContainer .lehreinheitEventContent {
 	display: grid;
 	grid-template-columns: auto 1fr;
@@ -50,7 +50,7 @@
 
 }
 
-/* Moodle Events in Day Page */
+/* Lehreinheits Events in Day Page */
 .dayPageContainer .lehreinheitEventContent {
 	display: flex;
 	padding-left:4rem;
@@ -72,3 +72,51 @@
 	font-weight: 500;
 }
 
+/* Ferientage Events in Month Page */
+.monthPageContainer .feiertagEventContent {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	justify-items: center;
+	align-items:center;
+	color: var(--fhc-light);
+}
+
+.monthPageContainer .feiertagEventContent #ferienEventIcon{
+	margin: 0.5rem;
+}
+
+.monthPageContainer .feiertagEventContent #ferienEventTitle {
+
+}
+
+/* Ferientage Events in Week Page */
+.weekPageContainer .feiertagEventContent {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	justify-items: center;
+	align-items:center;
+	color: var(--fhc-light);
+}
+
+.weekPageContainer .feiertagEventContent #ferienEventIcon {
+	margin: 0.25rem;
+}
+
+.weekPageContainer .feiertagEventContent #ferienEventTitle {
+	
+}
+
+/* Ferientage Events in Day Page */
+.dayPageContainer .feiertagEventContent {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	justify-items: center;
+	align-items: center;
+	color: var(--fhc-light);
+}
+
+.dayPageContainer .feiertagEventContent #ferienEventIcon {
+	margin: 0.5rem;
+}
+
+.dayPageContainer .feiertagEventContent #ferienEventTitle {}

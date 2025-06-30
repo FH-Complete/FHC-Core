@@ -23,4 +23,14 @@ Events::on('loadRenderers', function ($renderers) {
 	);
 });
 
+Events::on('loadRenderers', function ($renderers) {
+	$fhc_core_renderers =& $renderers();
+	$fhc_core_renderers["ferien"] = array(
+		'calendarEvent' => APP_ROOT.'public/js/components/Cis/Renderer/Feiertage/calendarEvent.js',
+		'modalTitle' => APP_ROOT.'public/js/components/Cis/Renderer/Feiertage/modalTitle.js',
+		'modalContent' => APP_ROOT.'public/js/components/Cis/Renderer/Feiertage/modalContent.js',
+		'calendarEventStyles' => APP_ROOT.'public/css/Cis4/CoreCalendarEvents.css'
+	);
+});
+
 

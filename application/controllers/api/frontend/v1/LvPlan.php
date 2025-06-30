@@ -102,19 +102,37 @@ class LvPlan extends FHCAPI_Controller
 				'username' => getAuthUID()
 			]
 		);
+
+		$lvAndMoodleEvents = array_merge($lvplan_events,$moodle_events);
+
+		$this->load->model('education/Studentlehrverband_model','StudentLehrverbandModel');
+		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
+		$current_Studiensemester = $this->StudiensemesterModel->getAkt();
+		$current_Studiensemester = $this->getDataOrTerminateWithError($current_Studiensemester);
+		$current_Studiensemester = current($current_Studiensemester)->studiensemester_kurzbz;
+		$studiengang = $this->StudentLehrverbandModel->loadWhere(["student_uid"=>getAuthUID(),"studiensemester_kurzbz"=>$current_Studiensemester]);
+		$studiengang = $this->getDataOrTerminateWithError($studiengang);
+		$studiengang = current($studiengang)->studiengang_kz;
+
+		$ferienEvents = $this->stundenplanlib->fetchFerienTageEvents($start_date, $end_date, $studiengang);
 		
-		$result = array_merge($lvplan_events,$moodle_events);
+		$allEvents = array_merge($lvAndMoodleEvents,$ferienEvents);
 		// sort array with moodle events first
-		usort($result, function($a, $b){
+		usort($lvAndMoodleEvents, function($a, $b){
 			if ($a->type === 'moodle' && $b->type !== 'moodle') {
 				return -1;
 			} elseif ($a->type !== 'moodle' && $b->type === 'moodle') {
+				return 1;
+			} elseif ($a->type === 'ferien' && ($b->type !== 'moodle' && $b->type !== 'ferien')) {
+				return -1;
+			} elseif (($a->type !== 'ferien' && $a->type !== 'moodle') && $b->type === 'ferien') {
 				return 1;
 			} else {
 				return 0;
 			}
 		});
-		$this->terminateWithSuccess($result);
+
+		$this->terminateWithSuccess($allEvents);
 	}
 
 	//TODO: delete this function if we don't use the old calendar export endpoints anymore
