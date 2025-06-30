@@ -65,7 +65,7 @@ export default {
 			<div :class="getHeaderClassMiddle" :style="{'padding-left':headerPadding}">
 
 				<div class="fhc-calendar-datepicker row align-items-center justify-content-center">
-					<div style="max-width: 180px;">
+					<div style="max-width: 200px;">
 					<vuedatepicker
 						v-if="selected === 'month'"
 						v-model="selectedDate"
@@ -77,7 +77,7 @@ export default {
 						:clearable="false"
 						six-weeks
 						auto-apply 
-						text-input 
+						:text-input="false"
 						locale="de"
 						format="MMMM yyyy"
 						model-type="yyyy-MM-dd"
@@ -96,7 +96,7 @@ export default {
 						:clearable="false"
 						six-weeks
 						auto-apply 
-						text-input 
+						:text-input="false" 
 						locale="de"
 						format="yyyy 'KW' ww"
 						model-type="yyyy-MM-dd"
@@ -114,7 +114,7 @@ export default {
 						:clearable="false"
 						six-weeks
 						auto-apply 
-						text-input 
+						:text-input="true"
 						locale="de"
 						format="dd.MM.yyyy"
 						model-type="yyyy-MM-dd"
