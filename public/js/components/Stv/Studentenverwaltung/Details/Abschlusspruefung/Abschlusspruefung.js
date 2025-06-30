@@ -279,17 +279,16 @@ export default {
 			this.getStudiengangByKz();
 		},
 		selectedVorsitz(newVal) {
-			this.formData.vorsitz = newVal?.mitarbeiter_uid || '';
-			console.log("newVal: " + newVal.mitarbeiter_uid);
+			this.formData.vorsitz = newVal?.mitarbeiter_uid || null;
 		},
 		selectedPruefer1(newVal) {
-			this.formData.pruefer1 = newVal?.person_id || '';
+			this.formData.pruefer1 = newVal?.person_id || null;
 		},
 		selectedPruefer2(newVal) {
-			this.formData.pruefer2 = newVal?.person_id || '';
+			this.formData.pruefer2 = newVal?.person_id || null;
 		},
 		selectedPruefer3(newVal) {
-			this.formData.pruefer3 = newVal?.person_id || '';
+			this.formData.pruefer3 = newVal?.person_id || null;
 		}
 	},
 	methods: {
@@ -753,6 +752,7 @@ export default {
 						v-model="formData.protokoll"
 						name="protokoll"
 						:rows= 10
+						readonly
 						>
 					</form-input>
 				</div>

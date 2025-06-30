@@ -333,8 +333,8 @@ class Abschlusspruefung extends FHCAPI_Controller
 				'protokoll' => $formData['protokoll'],
 				'note' => $formData['note'],
 				'anmerkung' => $formData['anmerkung'],
-				'insertamum' => date('c'),
-				'insertvon' => getAuthUID()
+				'updateamum' => date('c'),
+				'updatevon' => getAuthUID()
 			]
 		);
 
