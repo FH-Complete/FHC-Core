@@ -44,9 +44,9 @@
 .weekPageContainer .lehreinheitEventContent #lehreinheitEventText {
 	display: flex;
 	flex-direction: column;
-	place-content: center space-evenly;
-	flex-wrap: wrap;
 	column-gap: 5px;
+	overflow-y: scroll;
+	min-height:0;
 
 }
 
