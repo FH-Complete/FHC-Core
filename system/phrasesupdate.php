@@ -31692,7 +31692,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine zugeteilten Studenten gefunden für den gewählten LV-Teil gefunden!',
+				'text' => 'Keine zugeteilten Studenten für den gewählten LV-Teil gefunden!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -32371,6 +32371,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Digital Attendances Timeline',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'studentenInLVTeil',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studenten in LV-Teil',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Students in teaching unit',
 				'description' => '',
 				'insertvon' => 'system'
 			)
