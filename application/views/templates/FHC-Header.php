@@ -16,8 +16,7 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<?php if($skipID) generateSkipLink($skipID); ?>
-		
+
 		<title><?php printPageTitle($title); ?></title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -138,6 +137,8 @@
 		?>
 	</head>
 	<body>
+
+		<?php if($skipID) generateSkipLink($skipID); ?>
 
 <!-- Header end -->
 
