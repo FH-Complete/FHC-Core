@@ -177,7 +177,7 @@ class Stundenplan_model extends DB_Model
 
 		) as subquery
 
-		GROUP BY unr, datum, beginn, ende, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+		GROUP BY unr, datum, beginn, ende, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
 
 		ORDER BY datum, beginn
 		");
@@ -327,7 +327,7 @@ class Stundenplan_model extends DB_Model
 			
 		) as subquery
 
-		GROUP BY unr, datum, beginn, ende, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+		GROUP BY unr, datum, beginn, ende, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
 
 		ORDER BY datum, beginn
 		", [$start_date, $end_date, $lv_id]);
@@ -384,7 +384,7 @@ class Stundenplan_model extends DB_Model
 		
 			) as subquery
 		
-		GROUP BY unr, datum, beginn, ende, ort_kurzbz,  titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+		GROUP BY unr, datum, beginn, ende,  titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
 		
 		ORDER BY datum, beginn", [$start_date, $end_date, $ma_uid]);
 	}

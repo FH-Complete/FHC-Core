@@ -108,6 +108,7 @@ class Profil extends FHCAPI_Controller
 				$res->data = $this->viewStudentProfil($uid);
 			}
 		}
+		$res->data->fotoStatus=$this->isFotoAkzeptiert($this->pid);
 		$res->data->editAllowed = $editAllowed;
 		$this->terminateWithSuccess($res);
 	}
@@ -647,6 +648,29 @@ class Profil extends FHCAPI_Controller
 		//? formats date from 01-01-2000 to 01.01.2000
 		$zutrittskarte_ausgegebenam = str_replace("-", ".", $zutrittskarte_ausgegebenam);
 		return $zutrittskarte_ausgegebenam;
+	}
+
+	/**
+	 * checks whether the foto of a user is accepted or not
+	 * @access private
+	 * @param  integer $pid the personId of the student or mitarbeiter
+	 * @return bool whether the foto is accepted or not
+	 */
+	private function isFotoAkzeptiert($pid)
+	{
+		$this->load->model('person/Fotostatusperson_model','FotostatusModel');
+		$fotostatus = $this->FotostatusModel->execReadOnlyQuery("
+		select distinct on (person_id) person_id, insertamum, fotostatus_kurzbz
+		from public.tbl_person_fotostatus
+		where person_id = ? 
+		order by person_id, insertamum desc",[$pid]);
+		$fotostatus = $this->getDataOrTerminateWithError($fotostatus);
+		if(is_array($fotostatus) && count($fotostatus) > 0){
+			$fotostatus = current($fotostatus)->fotostatus_kurzbz == 'akzeptiert';
+		}
+		else
+			$fotostatus = false;
+		return $fotostatus;
 	}
 }
 

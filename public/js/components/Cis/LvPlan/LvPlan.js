@@ -178,26 +178,6 @@ const LvPlan = {
 			
 			this.currentDay = day;
 		},
-		handleOffset: function(offset)  {
-			this.currentDay = new Date(
-				this.currentDay.getFullYear() + offset.y, 
-				this.currentDay.getMonth() + offset.m,
-				this.currentDay.getDate() + offset.d
-			)
-
-			const date = this.currentDay.getFullYear() + "-" +
-				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
-				String(this.currentDay.getDate()).padStart(2, "0");
-
-			this.$router.push({
-				name: "LvPlan",
-				params: {
-					mode: this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1),
-					focus_date: date,
-					lv_id: this.propsViewData?.lv_id || null
-				}
-			})
-		},
 		handleChangeMode(mode) {
 			let m = mode[0].toUpperCase() + mode.slice(1)
 			if(m === this.calendarMode) return; // TODO(chris): check for date and lv_id too!
@@ -219,12 +199,14 @@ const LvPlan = {
 		},
 		showModal: function(event){
 			this.currentlySelectedEvent = event;
-			if(this.isModalContentResolved && this.isModalTitleResolved){
-				if(this.$refs.lvmodal) this.$refs.lvmodal.show();
-			} 
-			else{
-				this.isShowModal = true;
-			} 
+			Vue.nextTick(()=>{
+				if(this.isModalContentResolved && this.isModalTitleResolved){
+					if(this.$refs.lvmodal) this.$refs.lvmodal.show();
+				} 
+				else{
+					this.isShowModal = true;
+				}
+			})
 		},
 		updateRange: function ({start,end, mounted}) {
 			let checkDate = (date) => {
@@ -239,10 +221,7 @@ const LvPlan = {
 				// reset the events before querying the new events to activate the loading spinner
 				this.events = null;
 				this.eventCalendarDate = new CalendarDate(end);
-				Vue.nextTick(() => {
-					this.loadEvents();
-					
-				});
+				this.loadEvents();
 			}
 		},
 		calendarDateToString: function (calendarDate) {

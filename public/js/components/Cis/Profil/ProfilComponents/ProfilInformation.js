@@ -1,4 +1,5 @@
 import ApiProfil from '../../../../api/factory/profil.js';
+import ImageUpload from '../../Profil/ProfilModal/EditProfilComponents/ImageUpload.js';
 
 export default {
 	props: {
@@ -11,7 +12,14 @@ export default {
 		editable: {
 			type: Boolean,
 			default: false
+		},
+		fotoStatus:{
+			type: Boolean,
+			default: true
 		}
+	},
+	components:{
+		ImageUpload,
 	},
 	data() {
 		return {
@@ -21,6 +29,9 @@ export default {
 	emits: ["showEditProfilModal"],
 
 	methods: {
+		showModal(){
+			this.$refs.imageUpload.show();
+		},
 		sperre_foto_function() {
 			//TODO: refactor
 			if (!this.data) {
@@ -62,6 +73,7 @@ export default {
 	template: /*html*/ `
 
 <div class="card h-100">
+	<image-upload ref="imageUpload" :titel="$p.t('profilUpdate','profilBild')"></image-upload>
     <div class="card-header">
         <div class="row">
             <div v-if="editable" @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button">
@@ -83,6 +95,9 @@ export default {
                         <!-- LOCKING IMAGE FUNCTIONALITY -->
                         <div v-if="editable" role="button" @click.prevent="sperre_foto_function" class="image-lock">
                             <i :class="{'fa':true, ...(FotoSperre?{'fa-lock':true}:{'fa-lock-open':true})} "></i>
+                        </div>
+						<div v-if="!fotoStatus" role="button" @click.prevent="showModal" class="image-upload">
+                            <i class="fa fa-upload"></i>
                         </div>
                     </div>
                 </div>

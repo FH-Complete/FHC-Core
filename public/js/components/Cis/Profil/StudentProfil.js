@@ -166,6 +166,9 @@ export default {
 		editable() {
 			return this.data?.editAllowed ?? false;
 		},
+		fotoStatus() {
+			return this.data?.fotoStatus ?? false;
+		},
 
 		filteredEditData() {
 			return this.editDataFilter
@@ -239,9 +242,9 @@ export default {
 	},
 	template: /*html*/ `
 <div class="container-fluid text-break fhc-form">
-    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" 
+    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal"
     :value="JSON.parse(JSON.stringify(filteredEditData))" :title="$p.t('profil','profilBearbeiten')"></edit-profil>
-    <!-- ROW --> 
+    <!-- ROW -->
     <div class="row">
         <!-- HIDDEN QUICK LINKS -->
         <div  class="d-md-none col-12 ">
@@ -251,7 +254,7 @@ export default {
                     <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
                 </div>
             </div>-->
-            
+
 			<!-- Bearbeiten Button -->
 			<div v-if="editable" class="row ">
 				<div class="col mb-3">
@@ -267,24 +270,24 @@ export default {
 			</div>
 				<div v-if="data.profilUpdates" class="row mb-3">
 					<div class="col">
-						<!-- MOBILE PROFIL UPDATES -->  
+						<!-- MOBILE PROFIL UPDATES -->
 						<fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates"></fetch-profil-updates>
 					</div>
 				</div>
 			</div>
 			<!-- END OF HIDDEN QUCK LINKS -->
-			
+
 			<!-- MAIN PANNEL -->
 			<div class="col-sm-12 col-md-8 col-xxl-9 ">
 				<!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
 				<!-- INFORMATION CONTENT START -->
-				<!-- ROW WITH THE PROFIL INFORMATION --> 
+				<!-- ROW WITH THE PROFIL INFORMATION -->
 				<div class="row mb-4 ">
 					<div  class="col-lg-12 col-xl-6 ">
 						<div class="row mb-4">
 							<div class="col">
 								<!-- PROFIL INFORMATION -->
-								<profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation" :editable="editable"></profil-information>
+								<profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation" :editable="editable" :fotoStatus="fotoStatus"></profil-information>
 							</div>
 						</div>
 						<div class="row mb-4">
