@@ -115,6 +115,16 @@ export default {
 						let container = document.createElement('div');
 						container.className = "d-flex gap-2";
 
+						let downloadButton = document.createElement('button');
+						downloadButton.className = 'btn btn-outline-secondary';
+						downloadButton.innerHTML = '<i class="fa fa-download"></i>';
+						downloadButton.title = this.$p.t('ui', 'downloadDok');
+						downloadButton.addEventListener('click', evt => {
+							evt.stopPropagation();
+							this.actionDownload(cell.getData().akte_id);
+						});
+						container.append(downloadButton);
+
 						if (this.config.showEdit)
 						{
 							let editButton = document.createElement('button');

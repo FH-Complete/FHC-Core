@@ -50,6 +50,15 @@ export default {
 			set(v) {
 				this.$emit('update:modelValue', v);
 			}
+		},
+		calcActiveIndex: function() {
+			let keys = Object.keys(this.tabs);
+			let index = keys.indexOf(this.default);
+			if( index === -1 ) {
+				return 0;
+			} else {
+				return index;
+			}
 		}
 	},
 	watch: {
@@ -120,6 +129,7 @@ export default {
 	<tabview 
 		:scrollable="true" 
 		:lazy="true"
+		:activeIndex="calcActiveIndex"
 		@tab-click="handleTabClick"
 	>
 		<tabpanel 

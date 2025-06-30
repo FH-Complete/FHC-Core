@@ -199,6 +199,16 @@ export default {
 							title: this.$p.t('global', 'dokument')
 						});
 					}
+				},
+				{
+					event: "rowDblClick",
+					handler: (e, row) => {
+						if (row.getData().vorhanden) {
+							window.open(
+								this.actionDownloadFile(row.getData().akte_id)
+							);
+						}
+					}
 				}
 			]
 		}
