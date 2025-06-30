@@ -43,6 +43,7 @@ export default {
 				}
 			}),
 			locale: Vue.computed(() => this.locale),
+			timezone: Vue.computed(() => this.timezone),
 			hideWeeks: Vue.computed(() => this.hideWeeks),
 			timeGrid: Vue.computed(() => this.timeGrid),
 			collapseEmptyDays: Vue.computed(() => this.collapseEmptyDays),
@@ -77,7 +78,11 @@ export default {
 			type: String,
 			default: 'de'
 		},
-		currentDate: {
+		timezone: {
+			type: String,
+			default: 'Asia/Dhaka'//'local'
+		},
+		date: {
 			type: [Date, String, Number],
 			default: new Date()
 		},
@@ -122,12 +127,11 @@ export default {
 	emits: [
 		"click:next",
 		"click:prev",
-		"click:title",
 		"click:view",
 		"click:event",
 		"click:day",
 		"click:week",
-		"update:currentDate",
+		"update:date",
 		"update:view",
 		"update:range",
 		"drop"
@@ -166,13 +170,21 @@ export default {
 				return this.views[this.internalView];
 			return 'div';
 		},
+		cDate: {
+			get() {
+				return luxon.DateTime.fromJSDate(new Date(this.focusDate));
+			},
+			set(value) {
+				this.focusDate = value.toMillis();
+			}
+		},
 		focusDate: {
 			get() {
-				return this.internCurrentDate || (new Date(this.currentDate)).getTime();
+				return this.internCurrentDate || (new Date(this.date)).getTime();
 			},
 			set(v) {
 				this.internCurrentDate = v;
-				this.$emit('update:currentDate', new Date(this.internCurrentDate));
+				this.$emit('update:date', new Date(this.internCurrentDate));
 			}
 		}
 	},
@@ -195,28 +207,6 @@ export default {
 			// default: switch picker/view page
 			this.$refs.view.nextPage();
 		},
-		clickTitle() {
-			const evt = new Event('click:title', {cancelable: true});
-			this.$emit('click:title', evt);
-			if (evt.defaultPrevented)
-				return;
-
-			// defaults:
-			if (this.internalView == 'day') {
-				if (this.views.month) {
-					// switch from day to month
-					this.internalView = 'month';
-					this.$emit('update:view', this.internalView);
-				} else if (this.views.week) {
-					// switch from day to week
-					this.internalView = 'week';
-					this.$emit('update:view', this.internalView);
-				}
-			} else if (this.$refs.view.showPicker) {
-				// open picker if available
-				this.$refs.view.showPicker();
-			}
-		},
 		handleClickDefaults(evt) {
 			// TODO(chris): implement
 			switch (evt.detail.source) {
@@ -225,7 +215,7 @@ export default {
 					evt.stopPropagation();
 					this.focusDate = evt.detail.value;
 					this.internalView = 'day';
-					this.$emit('update:currentDate', new Date(this.focusDate));
+					this.$emit('update:date', new Date(this.focusDate));
 					this.$emit('update:view', this.internalView);
 				}
 				break;
@@ -234,7 +224,7 @@ export default {
 					evt.stopPropagation();
 					this.focusDate = CalendarDate.UTC(CalendarDate.getDaysInWeek(evt.detail.value.number, evt.detail.value.year, this.locale)[0]);
 					this.internalView = 'week';
-					this.$emit('update:currentDate', new Date(this.focusDate));
+					this.$emit('update:date', new Date(this.focusDate));
 					this.$emit('update:view', this.internalView);
 				}
 				break;
@@ -265,12 +255,11 @@ export default {
 		>
 			<base-header
 				class="card-header"
+				v-model:date="cDate"
 				:view="internalView"
 				@update:view="internalView = $event; $emit('update:view', internalView)"
-				:title="title"
 				@prev="clickPrev"
 				@next="clickNext"
-				@click:title="clickTitle"
 				@click:view="$emit('click:view', $event)"
 				:btn-day="!!views['day'] && (btnDay || (showBtns && btnDay !== false))"
 				:btn-week="!!views['week'] && (btnWeek || (showBtns && btnWeek !== false))"

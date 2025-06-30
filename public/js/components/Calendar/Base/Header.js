@@ -1,11 +1,15 @@
 /**
  * TODO(chris): use click-directive
  */
+import DatePicker from './Header/Datepicker.js';
 
 export default {
 	name: "CalendarHeader",
+	components: {
+		DatePicker
+	},
 	props: {
-		title: String,
+		date: luxon.DateTime,
 		view: String,
 		btnMonth: Boolean,
 		btnWeek: Boolean,
@@ -15,10 +19,15 @@ export default {
 	emits: [
 		"next",
 		"prev",
-		"click:title",
 		"click:view",
+		"update:date",
 		"update:view"
 	],
+	data() {
+		return {
+			open: false
+		};
+	},
 	methods: {
 		clickView(evt, view) {
 			this.$emit('click:view', evt);
@@ -34,13 +43,25 @@ export default {
 			</div>
 			<div class="col-auto d-flex justify-content-center">
 				<div class="btn-group" role="group">
-					<button class="btn btn-outline-secondary border-0" @click="$emit('prev')">
+					<button
+						class="btn btn-outline-secondary border-0"
+						@click="$emit('prev')"
+						:disabled="open"
+					>
 						<i class="fa fa-chevron-left"></i>
 					</button>
-					<button class="btn btn-outline-secondary border-0 title" @click="$emit('click:title')">
-						{{ title }}
-					</button>
-					<button class="btn btn-outline-secondary border-0" @click="$emit('next')">
+					<date-picker
+						:view="view"
+						:date="date"
+						@update:date="$emit('update:date', $event)"
+						@open="open = true"
+						@closed="open = false"
+					/>
+					<button
+						class="btn btn-outline-secondary border-0"
+						@click="$emit('next')"
+						:disabled="open"
+					>
 						<i class="fa fa-chevron-right"></i>
 					</button>
 				</div>

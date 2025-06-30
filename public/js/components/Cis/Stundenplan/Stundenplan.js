@@ -361,12 +361,12 @@ const Stundenplan = {
 			:locale="$p.user_locale.value"
 			:views="calendarViews"
 			:view="propsViewData.mode.toLowerCase()"
-			:current-date="currentDay"
+			:date="currentDay"
 			:events="events || []"
 			show-btns
 			@update:range="updateRange"
 			@update:view="handleChangeMode"
-			@update:current-date="selectDay"
+			@update:date="selectDay"
 		>
 			<template #actions>
 				<div class="d-flex justify-content-center justify-content-md-start align-items-center">
