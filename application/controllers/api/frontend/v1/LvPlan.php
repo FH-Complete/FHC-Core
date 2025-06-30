@@ -112,7 +112,11 @@ class LvPlan extends FHCAPI_Controller
 		$current_Studiensemester = current($current_Studiensemester)->studiensemester_kurzbz;
 		$studiengang = $this->StudentLehrverbandModel->loadWhere(["student_uid"=>getAuthUID(),"studiensemester_kurzbz"=>$current_Studiensemester]);
 		$studiengang = $this->getDataOrTerminateWithError($studiengang);
-		$studiengang = current($studiengang)->studiengang_kz;
+		if(!empty($studiengang)){
+			$studiengang = current($studiengang)->studiengang_kz;
+		}else{
+			$studiengang = 0;
+		}
 
 		$ferienEvents = $this->stundenplanlib->fetchFerienTageEvents($start_date, $end_date, $studiengang);
 		
