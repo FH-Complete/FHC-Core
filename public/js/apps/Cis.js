@@ -17,9 +17,9 @@ const app = Vue.createApp({
 				cssclass: "",
 				calcheightonly: true,
                 types: [
-                    "mitarbeiter",
+                    "employee",
 					"student",
-                    "raum",
+                    "room",
                     "organisationunit"
                 ],
                 actions: {
@@ -113,7 +113,7 @@ const app = Vue.createApp({
     },
     methods: {
         searchfunction: function(searchsettings) {
-        	return this.$api.call(ApiSearchbar.search(searchsettings));
+        	return this.$api.call(ApiSearchbar.searchAdvanced(searchsettings));
         }
     }
 });

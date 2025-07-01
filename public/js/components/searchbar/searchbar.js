@@ -1,12 +1,24 @@
-import person from "./person.js";
-import raum from "./raum.js";
-import employee from "./employee.js";
-import organisationunit from "./organisationunit.js";
-import student from "./student.js";
-import prestudent from "./prestudent.js";
+import person from "./result/person.js";
+import raum from "./result/room.js";
+import employee from "./result/employee.js";
+import organisationunit from "./result/organisationunit.js";
+import student from "./result/student.js";
+import prestudent from "./result/prestudent.js";
+import dms from "./result/dms.js";
+import cms from "./result/cms.js";
+import mergedStudent from "./result/mergedstudent.js";
+import mergedPerson from "./result/mergedperson.js";
+
+import ApiLanguage from "../../api/factory/language.js"
 
 export default {
     props: [ "searchoptions", "searchfunction" ],
+    provide() {
+        return {
+            languages: Vue.computed(() => this.languages),
+            query: Vue.computed(() => this.lastQuery)
+        };
+    },
     data: function() {
       return {
         searchtimer: null,
@@ -16,10 +28,14 @@ export default {
             types: this.getSearchTypes(),
         },
         searchresult: [],
+        searchmode: '',
         showresult: false,  
         searching: false,
         error: null,
-		settingsDropdown:null,
+            abortController: null,
+        settingsDropdown:null,
+            languages: null,
+            lastQuery: ''
       };
     },
     components: {
@@ -28,7 +44,11 @@ export default {
       employee: employee,
       organisationunit: organisationunit,
       student: student,
-      prestudent: prestudent
+      prestudent: prestudent,
+      dms,
+      cms,
+      mergedStudent,
+      mergedPerson
     },
     template: /*html*/`
         <form
@@ -49,8 +69,8 @@ export default {
                     v-model="searchsettings.searchstr"
                     class="form-control"
                     type="search"
-                    :placeholder="'Search: '+ search_types_string"
-                    aria-label="Search"
+                    :placeholder="$p.t('search/input_search_label', {types:search_types_string})"
+                    :aria-label="$p.t('search/input_search_label', {types:search_types_string})"
                 >
                 <span
                     data-bs-toggle="collapse"
@@ -60,28 +80,34 @@ export default {
                     ref="settingsbutton"
                     class="input-group-text"
                     type="button"
+                    :title="$p.t('search/button_filter_label')"
+                    :aria-label="$p.t('search/button_filter_label')"
                 >
                     <i class="fas fa-cog"></i>
                 </span>
             </div>
 
-            <div v-show="this.showresult"
+            <div v-show="showresult"
                  class="searchbar_results" tabindex="-1">
               <div class="searchbar_results_scroller" ref="result">
                 <div class="searchbar_results_wrapper" ref="results">
-                  <div v-if="this.searching">
+                  <div v-if="searching">
                     <i class="fas fa-spinner fa-spin fa-2x"></i>
                   </div>
-                  <div v-else-if="this.error !== null">{{ this.error }}</div>
-                  <div v-else-if="searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
+                  <div v-else-if="this.error !== null">{{ error }}</div>
+                  <div v-else-if="searchresult.length < 1">{{  $p.t('search/error_no_results') }}</div>
                   <template v-else="" v-for="res in searchresult">
-                    <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
-                    <student v-else-if="res.type === 'student' || res.type === 'studentStv'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
-                    <prestudent v-else-if="res.type === 'prestudent'" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
-                    <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
-                    <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
-                    <raum v-else-if="res.type === 'raum'" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
-                    <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
+                    <person v-if="res.type === 'person'" :res="res" :actions="searchoptions.actions.person" @actionexecuted="hideresult"></person>
+                    <student v-else-if="res.type === 'student' || res.type === 'studentStv'" :mode="searchmode" :res="res" :actions="searchoptions.actions.student" @actionexecuted="hideresult"></student>
+                    <prestudent v-else-if="res.type === 'prestudent'" :mode="searchmode" :res="res" :actions="searchoptions.actions.prestudent" @actionexecuted="hideresult"></prestudent>
+                    <merged-student v-else-if="res.type === 'mergedstudent'" :mode="searchmode" :res="res" :actions="searchoptions.actions.mergedstudent" @actionexecuted="hideresult"></merged-student>
+                    <merged-person v-else-if="res.type === 'mergedperson'" :mode="searchmode" :res="res" :actions="searchoptions.actions.mergedperson" @actionexecuted="hideresult"></merged-person>
+                    <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung' || res.type === 'employee'  || res.type === 'unassigned_employee'" :res="res" :actions="searchoptions.actions.employee" @actionexecuted="hideresult"></employee>
+                    <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="searchoptions.actions.organisationunit" @actionexecuted="hideresult"></organisationunit>
+                    <raum v-else-if="res.type === 'raum' || res.type === 'room'" :mode="searchmode" :res="res" :actions="searchoptions.actions.raum || searchoptions.actions.room" @actionexecuted="hideresult"></raum>
+                    <dms v-else-if="res.type === 'dms'" :res="res" :actions="searchoptions.actions.dms" @actionexecuted="hideresult"></dms>
+                    <cms v-else-if="res.type === 'cms'" :res="res" :actions="searchoptions.actions.cms" @actionexecuted="hideresult"></cms>
+                    <div v-else class="searchbar-result text-danger fw-bold">{{ $p.t('search/error_unknown_type', res) }}</div>
                   </template>
                 </div>
               </div>
@@ -91,12 +117,12 @@ export default {
 				@[\`shown.bs.collapse\`]="handleShowSettings"
 				@[\`hide.bs.collapse\`]="handleHideSettings"
                 class="top-100 end-0 searchbar_settings text-white collapse" tabindex="-1">
-              <div class="d-flex flex-column m-3" v-if="this.searchoptions.types.length > 0">
-              <span class="fw-light mb-2">Suche filtern nach:</span>  
-              <template v-for="(type, index) in this.searchoptions.types" :key="type">
+              <div class="d-flex flex-column m-3" v-if="searchoptions.types.length > 0">
+              <span class="fw-light mb-2">{{ $p.t('search/applyfilter_label') }}</span>  
+              <template v-for="(type, index) in searchoptions.types" :key="type">
                     <div class="form-check form-switch">
-                        <input class="fhc-switches form-check-input" type="checkbox" role="switch" :id="this.$.uid + 'search_type_' + index" :value="type" v-model="searchsettings.types"  />
-                        <label class="ps-2 form-check-label non-selectable" :for="this.$.uid + 'search_type_' + index">{{ type }}</label>
+                        <input class="fhc-switches form-check-input" type="checkbox" role="switch" :id="$.uid + 'search_type_' + index" :value="type" v-model="searchsettings.types">
+                        <label class="ps-2 form-check-label non-selectable" :for="$.uid + 'search_type_' + index">{{ type }}</label>
                     </div>
                 </template>
               </div>
@@ -105,7 +131,7 @@ export default {
           </form>
     `,
     watch:{
-		'searchsettings.searchstr': function (newSearchValue, oldSearchValue) {
+		'searchsettings.searchstr': function (newSearchValue) {
 			if(this.searchoptions.origin){
 				sessionStorage.setItem(`${this.searchoptions.origin}_searchstr`,newSearchValue);
 			}
@@ -121,8 +147,19 @@ export default {
 		},
 		
 	},
+    created() {
+        this.$api
+            .call(ApiLanguage.getAll())
+            .then(result => {
+                this.languages = result.data.reduce((a, c) => {
+                    a[c.sprache] = c;
+                    return a;
+                }, {});
+            })
+            .catch(this.$fhcAlert.handleSystemError);
+    },
     beforeMount: function() {
-		this.$watch('searchsettings.types', (newValue, oldValue) => {
+		this.$watch('searchsettings.types', newValue => {
 			if (Array.isArray(newValue) && newValue.length === 0){
 				this.searchsettings.types = this.allSearchTypes();
 			}
@@ -218,6 +255,10 @@ export default {
             if( this.searchtimer !== null ) {
                 clearTimeout(this.searchtimer);
             }
+            if (this.abortController) {
+                this.abortController.abort();
+                this.abortController = null;
+            }
             if( this.searchsettings.searchstr.length >= 2 ) {
                 this.calcSearchResultExtent();
                 this.searchtimer = setTimeout(
@@ -233,27 +274,81 @@ export default {
             this.searchresult.splice(0, this.searchresult.length);
             this.searching = true;
             this.showsearchresult();
-			if(this.searchsettings.types.length === 0) {
-				this.error = 'Kein Ergebnistyp ausgewählt. Bitte mindestens einen Ergebnistyp auswählen.';
-				this.searching = false;
-				return;
-			}
-            this.searchfunction(this.searchsettings)
+            if(this.searchsettings.types.length === 0) {
+                this.error = this.$p.t('search/error_missing_type');
+                this.searching = false;
+                return;
+            }
+
+            if (this.abortController)
+                this.abortController.abort();
+            this.abortController = new AbortController();
+
+            this.searchfunction(this.searchsettings, { timeout: 50000, signal: this.abortController.signal })
             .then(response=>{
-                if( response.data?.error === 1 ) {
-                    this.error = 'Bei der Suche ist ein Fehler aufgetreten.';
+                if (!response.data) {
+                    this.error = this.$p.t('search/error_general');
                 } else {
-                    for(let element of response.data.data){
-                        this.searchresult.push(element);
+                    let res = response.data.map(el => el.data ? {...el, ...JSON.parse(el.data)} : el);
+                    this.lastQuery = response.meta.searchstring;
+                    if (this.searchoptions.mergeResults) {
+                        let counter = 0;
+                        let mergeTypes = [];
+                        let mergedType = 'merged';
+                        let mergeKey = '';
+
+                        switch (this.searchoptions.mergeResults) {
+                        case 'student':
+                            mergeTypes = ['student', 'studentStv', 'prestudent'];
+                            mergedType += this.searchoptions.mergeResults;
+                            mergeKey = 'uid';
+                            break;
+                        case 'person':
+                            mergeTypes = ['person', 'employee', 'unassigned_employee', 'mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'student', 'studentStv', 'prestudent'];
+                            mergedType += this.searchoptions.mergeResults;
+                            mergeKey = 'person_id';
+                            break;
+                        }
+
+                        if (mergeTypes.length) {
+                            res = Object.values(res.reduce((a, c) => {
+                                if (!mergeTypes.includes(c.type)) {
+                                    a['nomerge' + counter++] = c;
+                                } else if (c[mergeKey] === null) {
+                                    a['nomerge' + counter++] = c;
+                                } else if (a[c[mergeKey]] === undefined) {
+                                    a[c[mergeKey]] = {
+                                        rank: c.rank,
+                                        type: mergedType,
+                                        list: [c]
+                                    };
+                                } else {
+                                    a[c[mergeKey]].list.push(c);
+                                    if (c.rank > a[c[mergeKey]].rank)
+                                        a[c[mergeKey]].rank = c.rank;
+                                }
+                                return a;
+                            }, {})).sort((a, b) => b.rank - a.rank);
+                        }
                     }
+                    this.searchresult = res;
+                    this.searchmode = response.meta.mode;
                 }
+                this.searching = false;
+                this.retry = 0;
             })
             .catch(error=> {
-                this.error = 'Bei der Suche ist ein Fehler aufgetreten.' 
-                    + ' ' + error.message;
-            })
-            .finally(()=> {
+                if (error.code == "ERR_CANCELED") {
+                    return this.retry = 0;
+                }
+                if (error.code == "ECONNABORTED" && this.retry) {
+                    this.retry--;
+                    return this.callsearchapi();
+                }
+
+                this.error = this.$p.t('search/error_general', error);
                 this.searching = false;
+                this.retry = 0;
             });
         },
         refreshsearch: function() {

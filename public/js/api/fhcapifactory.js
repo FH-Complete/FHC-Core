@@ -40,6 +40,7 @@ import menu from "./menu.js";
 import dashboard from "./dashboard.js";
 import authinfo from "./authinfo.js";
 import studium from "./studium.js";
+import language from "./language.js";
 
 export default {
     search,
@@ -68,4 +69,5 @@ export default {
 	menu,
 	authinfo,
 	studium,
+    language
 };

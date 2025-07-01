@@ -35,11 +35,9 @@ class Searchbar extends FHCAPI_Controller
 	{
 		// NOTE(chris): additional permission checks will be done in SearchBarLib
 		parent::__construct([
-			'search' => self::PERM_LOGGED
+			'search' => self::PERM_LOGGED,
+			'searchAdvanced' => self::PERM_LOGGED
 		]);
-
-		// Load the library SearchBarLib
-		$this->load->library('SearchBarLib');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -50,6 +48,7 @@ class Searchbar extends FHCAPI_Controller
 	 */
 	public function search()
 	{
+		$this->load->library('SearchBarLib');
 		$this->load->library('form_validation');
 
 		// Checks if the searchstr and the types parameters are in the POSTed JSON
@@ -63,7 +62,37 @@ class Searchbar extends FHCAPI_Controller
 		$result = $this->searchbarlib->search($this->input->post(self::SEARCHSTR_PARAM), $this->input->post(self::TYPES_PARAM));
 		if (property_exists($result, 'error'))
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$this->terminateWithSuccess($result);
+		
+		$this->addMeta('mode', 'simple');
+		
+		$this->terminateWithSuccess($result->data);
+	}
+
+	/**
+	 * Gets a JSON body via HTTP POST and provides the parameters
+	 */
+	public function searchAdvanced()
+	{
+		$this->load->library('SearchLib');
+		$this->load->library('form_validation');
+
+		// Checks if the searchstr and the types parameters are in the POSTed JSON
+		$this->form_validation->set_rules(self::SEARCHSTR_PARAM, null, 'required');
+		$this->form_validation->set_rules(self::TYPES_PARAM . '[]', null, 'required');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		// Convert to json the result from searchlib->search
+		$result = $this->searchlib->search($this->input->post(self::SEARCHSTR_PARAM), $this->input->post(self::TYPES_PARAM));
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->addMeta('time', $result->meta['time']);
+		$this->addMeta('searchstring', $result->meta['searchstring']);
+		$this->addMeta('mode', 'advanced');
+		
+		$this->terminateWithSuccess($data);
 	}
 }
 
