@@ -99,11 +99,12 @@ class PlausicheckResolverLib
 					$issueResolved = getData($issueResolvedRes) === true;
 				}
 			}
-			elseif (isset($this->_codeProducerLibMappings[$issue->fehlercode])) // check if it is an issue without explicit resolver, "self-resolving"
+			// mappings for issues that are resolved the same way as they are produced
+			elseif (isset($this->_codeProducerLibMappings[$issue->fehlercode]))
 			{
 				$libName = $this->_codeProducerLibMappings[$issue->fehlercode];
 
-				// execute same check as used for issue production 
+				// call produce plausicheck method of producer lib
 				$issueResolvedRes = $this->_ci->plausicheckproducerlib->producePlausicheckIssue(
 					$libName,
 					$issue->fehler_kurzbz,
@@ -114,7 +115,7 @@ class PlausicheckResolverLib
 				{
 					$result->errors[] = getError($issueResolvedRes);
 				}
-				else
+				else // resolved if no issue found
 				{
 					$issueResolved = !hasData($issueResolvedRes);
 				}

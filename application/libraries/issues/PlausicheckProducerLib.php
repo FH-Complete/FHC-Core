@@ -71,22 +71,31 @@ class PlausicheckProducerLib
 			{
 				$plausicheckData = getData($plausicheckRes);
 
-				foreach ($plausicheckData as $plausiData)
+				if (is_array($plausicheckData))
 				{
-					// get the data needed for issue production
-					$person_id = isset($plausiData['person_id']) ? $plausiData['person_id'] : null;
-					$oe_kurzbz = isset($plausiData['oe_kurzbz']) ? $plausiData['oe_kurzbz'] : null;
-					$fehlertext_params = isset($plausiData['fehlertext_params']) ? $plausiData['fehlertext_params'] : null;
-					$resolution_params = isset($plausiData['resolution_params']) ? $plausiData['resolution_params'] : null;
+					foreach ($plausicheckData as $plausiData)
+					{
+						// get the data needed for issue production
+						$person_id = isset($plausiData['person_id']) ? $plausiData['person_id'] : null;
+						$oe_kurzbz = isset($plausiData['oe_kurzbz']) ? $plausiData['oe_kurzbz'] : null;
+						$fehlertext_params = isset($plausiData['fehlertext_params']) ? $plausiData['fehlertext_params'] : null;
+						$resolution_params = isset($plausiData['resolution_params']) ? $plausiData['resolution_params'] : null;
 
-					// write the issue
-					$addIssueRes = $this->_ci->issueslib->addFhcIssue($fehler_kurzbz, $person_id, $oe_kurzbz, $fehlertext_params, $resolution_params);
+						// write the issue
+						$addIssueRes = $this->_ci->issueslib->addFhcIssue(
+							$fehler_kurzbz,
+							$person_id,
+							$oe_kurzbz,
+							$fehlertext_params,
+							$resolution_params
+						);
 
-					// log if error, or log info if inserted new issue
-					if (isError($addIssueRes))
-						$result->errors[] = getError($addIssueRes);
-					elseif (hasData($addIssueRes) && is_integer(getData($addIssueRes)))
-						$result->infos[] = "Plausicheck issue " . $fehler_kurzbz . " successfully produced, person_id: " . $person_id;
+						// log if error, or log info if inserted new issue
+						if (isError($addIssueRes))
+							$result->errors[] = getError($addIssueRes);
+						elseif (hasData($addIssueRes) && is_integer(getData($addIssueRes)))
+							$result->infos[] = "Plausicheck issue " . $fehler_kurzbz . " successfully produced, person_id: " . $person_id;
+					}
 				}
 			}
 		}
