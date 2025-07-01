@@ -98,7 +98,7 @@ export default {
 		this.fetchMenu();
 	},
 	mounted(){
-		this.$p.loadCategory(['ui', 'global'])
+		this.$p.loadCategory(['ui', 'global', 'profilUpdate'])
 		this.navUserDropdown = new bootstrap.Collapse(this.$refs.navUserDropdown,{
 			toggle: false
 		});
@@ -118,7 +118,7 @@ export default {
     </div>
 	<div id="nav-user">
 		<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
-			<img :src="avatarUrl" class="bg-dark avatar rounded-circle border border-dark"/>
+			<img :src="avatarUrl" :alt="$p.t('profilUpdate/profilBild')" class="bg-dark avatar rounded-circle border border-dark"/>
 		</button>
 		<ul ref="navUserDropdown"
 		@[\`shown.bs.collapse\`]="handleShowNavUser"

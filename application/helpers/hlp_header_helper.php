@@ -243,6 +243,6 @@ function generateSkipLink($skipID)
 {
 	$toPrint = '<a id="skiplink" href="';
 	$toPrint.=$skipID;
-	$toPrint.='" class="fhcSkipLink"></a>';
+	$toPrint.='" class="fhcSkipLink" aria-label="Skip to main content"></a>';
 	echo $toPrint;
 }

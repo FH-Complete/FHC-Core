@@ -56,7 +56,7 @@ export const Raumsuche =  {
 					{title: Vue.computed(() => this.$p.t('global/bezeichnung')), field: 'bezeichnung', widthGrow: 2},
 					{title: Vue.computed(() => this.$p.t('global/nummer')), field: 'nummer', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('global/personen')), field: 'personen', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('rauminfo/raumInfo')),
+					{title: Vue.computed(() => this.$p.t('rauminfo/rauminfo')),
 						field: 'linkInfo', formatter: this.linkFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('rauminfo/roomReservations')), 
 						field: 'linkRes', formatter: this.linkFormatter, widthGrow: 1}
@@ -87,10 +87,16 @@ export const Raumsuche =  {
 			this.tableBuiltResolve = resolve
 		},
 		linkFormatter(cell) {
-			const val = cell.getValue()
+			const val = cell.getValue();
+			const field = cell.getField();
+			const arialabel = (field === 'linkInfo') 
+							? this.$p.t('rauminfo/rauminfo') 
+							: this.$p.t('rauminfo/roomReservations');
 			if(val) {
 				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<a href="'+val+'"><i class="fa fa-arrow-up-right-from-square me-1 fhc-primary-color" ></i></a></div>'
+				'<a href="'+val+'" aria-label="' + arialabel + '">' +
+				'<i class="fa fa-arrow-up-right-from-square me-1 fhc-primary-color" ></i>' +
+				'</a></div>'
 			} else {
 				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
 					'-</div>'
@@ -192,7 +198,7 @@ export const Raumsuche =  {
 		this.setupMounted()
 	},
 	template: `
-	<h2>{{$p.t('lvplan/raumsuche')}}</h2>
+	<h1 class="h3">{{$p.t('lvplan/raumsuche')}}</h1>
 	<hr>
 	<div class="row">
 		<div class="col-12 col-lg-2">
