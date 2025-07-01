@@ -46,26 +46,26 @@ export default {
 		>
 		<div class="searchbar_table">
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_dms_id') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_dms_id') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ res.dms_id }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_version') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_version') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ res.version }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_keywords') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_keywords') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ res.keywords }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('global/beschreibung') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('global/beschreibung') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ res.description }}
 				</div>
 			</div>

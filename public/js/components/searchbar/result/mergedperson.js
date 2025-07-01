@@ -68,14 +68,14 @@ export default {
 		>
 		<div class="searchbar_table">
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('person/person_id') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('person/person_id') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ person.person_id }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_emails') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_emails') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					<a v-for="email in emails" :key="email" :href="'mailto:' + email" class="d-block">
 						{{ email }}
 					</a>
@@ -95,8 +95,8 @@ export default {
 					</div>
 				</div>
 				<div class="searchbar_tablerow">
-					<div class="searchbar_tablecell ps-3">{{ $p.t('search/result_stdkst') }}</div>
-					<div class="searchbar_tablecell">
+					<div class="searchbar_tablecell searchbar_label ps-3">{{ $p.t('search/result_stdkst') }}</div>
+					<div class="searchbar_tablecell searchbar_value">
 						<ul class="searchbar_inline_ul" v-if="employee.standardkostenstelle.length > 0">
 							<li
 								v-for="(stdkst, idx) in employee.standardkostenstelle"
@@ -109,8 +109,8 @@ export default {
 					</div>
 				</div>
 				<div class="searchbar_tablerow">
-					<div class="searchbar_tablecell ps-3">{{ $p.t('lehre/organisationseinheit') }}</div>
-					<div class="searchbar_tablecell">
+					<div class="searchbar_tablecell searchbar_label ps-3">{{ $p.t('lehre/organisationseinheit') }}</div>
+					<div class="searchbar_tablecell searchbar_value">
 						<ul class="searchbar_inline_ul" v-if="employee.organisationunit_name.length > 0">
 							<li
 								v-for="(oe, idx) in employee.organisationunit_name"
@@ -123,8 +123,8 @@ export default {
 					</div>
 				</div>
 				<div class="searchbar_tablerow">
-					<div class="searchbar_tablecell ps-3">{{ $p.t('person/telefon') }}</div>
-					<div class="searchbar_tablecell">
+					<div class="searchbar_tablecell searchbar_label ps-3">{{ $p.t('person/telefon') }}</div>
+					<div class="searchbar_tablecell searchbar_value">
 						<a :href="telurl">
 							{{ employee.phone }}
 						</a>
@@ -152,26 +152,26 @@ export default {
 						</div>
 					</div>
 					<div class="searchbar_tablerow">
-						<div class="searchbar_tablecell ps-3">{{ $p.t('lehre/studiengang') }}</div>
-						<div class="searchbar_tablecell">
+						<div class="searchbar_tablecell searchbar_label ps-3">{{ $p.t('lehre/studiengang') }}</div>
+						<div class="searchbar_tablecell searchbar_value">
 							{{ student.bezeichnung }} {{ student.orgform ? '(' + student.orgform + ')' : '' }}
 						</div>
 					</div>
 					<div class="searchbar_tablerow">
-						<div class="searchbar_tablecell ps-3">{{ $p.t('search/result_prestudent_id') }}</div>
-						<div class="searchbar_tablecell">
+						<div class="searchbar_tablecell searchbar_label ps-3">{{ $p.t('search/result_prestudent_id') }}</div>
+						<div class="searchbar_tablecell searchbar_value">
 							{{ student.prestudent_id }}
 						</div>
 					</div>
 					<div v-if="student.uid" class="searchbar_tablerow">
-						<div class="searchbar_tablecell ps-3">{{ $p.t('search/result_student_uid') }}</div>
-						<div class="searchbar_tablecell">
+						<div class="searchbar_tablecell searchbar_label ps-3">{{ $p.t('search/result_student_uid') }}</div>
+						<div class="searchbar_tablecell searchbar_value">
 							{{ student.uid }}
 						</div>
 					</div>
 					<div v-if="student.matrikelnr" class="searchbar_tablerow">
-						<div class="searchbar_tablecell ps-3">{{ $p.t('person/matrikelnummer') }}</div>
-						<div class="searchbar_tablecell">
+						<div class="searchbar_tablecell searchbar_label ps-3">{{ $p.t('person/matrikelnummer') }}</div>
+						<div class="searchbar_tablecell searchbar_value">
 							{{ student.matrikelnr }}
 						</div>
 					</div>
