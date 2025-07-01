@@ -182,6 +182,7 @@ export default {
 		},
 		addNote(anrechnung_id){
 			this.currentAnrechnung_id = anrechnung_id;
+			this.loadAnrechnung(this.currentAnrechnung_id);
 			this.showNotizen = true;
 		},
 		addNewAnrechnung(){
@@ -266,6 +267,9 @@ export default {
 		reload() {
 			this.$refs.table.reloadTable();
 		},
+		handleReload(){
+			this.reload();
+		},
 		resetForm(){
 			this.formData = {};
 			this.statusNew = true;
@@ -303,7 +307,7 @@ export default {
 					<h5>{{$p.t('lehre', 'anrechnungen')}}</h5>
 					
 					<div v-if="showNotizen" class="border p-3 overflow-auto" style="height: 200px;">
-							<div class="justify-content-end pb-3">
+							<!-- <div class="justify-content-end pb-3">
 								<form-input
 									container-class="form-switch"
 									type="checkbox"
@@ -312,7 +316,10 @@ export default {
 									@change="onSwitchHide"
 									>
 								</form-input>
-							</div>
+							</div> -->
+						<h6><strong>LV {{formData.lehrveranstaltung_id}}:
+							{{formData.bezeichnung}} | {{formData.bezeichnung_english}}</strong></h6>
+
 						<core-notiz
 							:endpoint="endpoint"
 							ref="formNotes"
@@ -322,6 +329,7 @@ export default {
 							show-document
 							show-tiny-mce
 							:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+							@reload="handleReload"
 							>
 						</core-notiz>
 					

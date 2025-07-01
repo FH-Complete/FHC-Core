@@ -58,7 +58,8 @@ html {
 	overflow: visible !important;
 }
 
-.tabulator-cell {
+/* to avoid interference with Notiz.css and overflow for textfield */
+.stv-details-abschlusspruefung .tabulator-cell {
 	overflow: visible !important;
 }
 

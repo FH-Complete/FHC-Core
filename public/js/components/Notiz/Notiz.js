@@ -81,6 +81,7 @@ export default {
 						title: "Text",
 						field: "text_stripped",
 						width: 250,
+						clipContents: true,
 						tooltip:function(e, cell, onRendered){
 							var el = document.createElement("div");
 							el.style.backgroundColor = "white";
@@ -174,6 +175,7 @@ export default {
 					}],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
+				responsiveLayout: "collapse",
 				height: '250',
 				selectableRangeMode: 'click',
 				selectable: true,
@@ -199,10 +201,6 @@ export default {
 						cm.getColumnByField('titel').component.updateDefinition({
 							title: this.$p.t('global', 'titel'),
 							//visible: this.showVariables.showTitel
-						});
-						cm.getColumnByField('text_stripped').component.updateDefinition({
-							title: this.$p.t('global', 'text'),
-							//visible: this.showVariables.showText
 						});
 						cm.getColumnByField('bearbeiter').component.updateDefinition({
 							title: this.$p.t('notiz', 'bearbeiter'),
@@ -250,6 +248,16 @@ export default {
 						cm.getColumnByField('actions').component.updateDefinition({
 							title: this.$p.t('global', 'aktionen')
 						});
+
+						cm.getColumnByField('text_stripped').component.updateDefinition({
+							title: this.$p.t('global', 'text'),
+							width: 250,
+							tooltip: true,
+							clipContents: true,
+						});
+
+						// Force layout recalculation for handling overflow text
+						this.$refs.table.tabulator.redraw(true);
 					}
 				}
 			],
@@ -355,6 +363,7 @@ export default {
 						this.$refs.NotizModal.hide();
 					}
 					this.reload();
+					this.$emit('reload');
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -367,6 +376,7 @@ export default {
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.reload();
+					this.$emit('reload');
 					this.resetFormData();
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -410,6 +420,7 @@ export default {
 						this.$refs.NotizModal.hide();
 					}
 					this.reload();
+					this.$emit('reload');
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
