@@ -25,7 +25,8 @@ $includesArray = array(
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.js',
 		'vendor/npm-asset/primevue/accordiontab/accordiontab.js',
-		'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'
+		'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js',
+		'vendor/moment/luxon_js/luxon.min.js'
 	),
 	'customJSModules' => array(
 		'public/js/apps/Dashboard/Fhc.js'
