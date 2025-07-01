@@ -39,18 +39,18 @@ export default {
 		>
 		<div class="searchbar_table">
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_room_address') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_room_address') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ address }}
 				</div>
 			</div>
 
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_workplaces') }}</div>
-				<div v-if="mode == 'simple'" class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_workplaces') }}</div>
+				<div v-if="mode == 'simple'" class="searchbar_tablecell searchbar_value">
 					{{ res.sitzplaetze }}
 				</div>
-				<div v-else class="searchbar_tablecell">
+				<div v-else class="searchbar_tablecell searchbar_value">
 					<template v-if="res.max_person !== null && res.workplaces !== null">
 						{{ $p.t('search/result_workplaces_pc', res) }}
 					</template>
@@ -61,15 +61,15 @@ export default {
 			</div>
 
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_building') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_building') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ res.building }}
 				</div>
 			</div>
 
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_equipment') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_equipment') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					<div v-if="mode == 'simple'" class="no-margin-paragraphs" v-html="res.austattung.replace('<br />','')"></div>
 					<div v-else class="no-margin-paragraphs" v-html="equipment"></div>
 				</div>

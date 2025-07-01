@@ -41,40 +41,40 @@ export default {
 		>
 		<div class="searchbar_table">
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('person/person_id') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('person/person_id') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ res.person_id }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_emails') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_emails') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					<a v-for="email in emails" :key="email" :href="'mailto:' + email" class="d-block">
 						{{ email }}
 					</a>
 				</div>
 			</div>
 			<div v-if="res.uid" class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_student_uid') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_student_uid') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ res.uid }}
 				</div>
 			</div>
 			<div v-if="res.matrikelnr" class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('person/matrikelnummer') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('person/matrikelnummer') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ res.matrikelnr }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('search/result_prestudent_id') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('search/result_prestudent_id') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ res.prestudent_id }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
-				<div class="searchbar_tablecell">{{ $p.t('lehre/studiengang') }}</div>
-				<div class="searchbar_tablecell">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('lehre/studiengang') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
 					{{ res.bezeichnung }} {{ res.orgform ? '(' + res.orgform + ')' : '' }}
 				</div>
 			</div>
