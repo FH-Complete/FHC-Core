@@ -10,6 +10,7 @@ class UHSTAT1 extends FHC_Controller
 	const CODEX_OESTERREICH = 'A';
 	const CODEX_UNKNOWN_YEAR = 9999;
 	const CODEX_UNKNOWN_NATION = 'XXX';
+	const CODEX_EXCLUDED_NATIONS = ['ZZZ'];
 	const CODEX_UNKNOWN_BILDUNGMAX = 999;
 	const LOWER_BOUNDARY_YEARS = 160;
 	const UPPER_BOUNDARY_YEARS = 20;
@@ -339,15 +340,19 @@ class UHSTAT1 extends FHC_Controller
 
 		if (hasData($nationRes))
 		{
+			$dropdownNations = [];
 			$nations = getData($nationRes);
 
-			// put austria in beginning of selection
 			foreach ($nations as $nation)
 			{
-				if ($nation->nation_code == self::CODEX_OESTERREICH) array_unshift($nations, $nation);
+				// put austria in beginning of selection
+				if ($nation->nation_code == self::CODEX_OESTERREICH)
+					array_unshift($dropdownNations, $nation);
+				elseif (!in_array($nation->nation_code, self::CODEX_EXCLUDED_NATIONS)) // add nation if not excluded
+					$dropdownNations[] = $nation;
 			}
 
-			$formMetaData['nation'] = $nations;
+			$formMetaData['nation'] = $dropdownNations;
 		}
 
 		// get abschluss list
