@@ -41915,6 +41915,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	// LVEVALUIERUNG ---------------------------------------------------------------------------------------------------
 	array(
 		'app' => 'lvevaluierung',
 		'category' => 'global',
@@ -42296,6 +42297,26 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'English',
 				'text' => 'Evaluation is not active',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'lvevaluierung',
+		'category' => 'fragebogen',
+		'phrase' => 'zeitLaeuftAb',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeit läuft bald ab – zum Speichern bitte ‚Abschicken‘ klicken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Time is running out — please click ‘Submit’ to save your answers',
 				'description' => '',
 				'insertvon' => 'system'
 			)
