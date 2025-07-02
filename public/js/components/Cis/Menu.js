@@ -27,6 +27,7 @@ export default {
 			url:null,
 			urlMatchRankings:[],
 			navUserDropdown:null,
+			menuOpen:true,
         };
     },
 	provide(){
@@ -37,6 +38,13 @@ export default {
 		}
 	},
 	computed:{
+		menuCollapseAriaLabel(){
+			if(this.menuOpen){
+				return this.$p.t('global', 'collapseMenu');
+			}else{
+				return this.$p.t('global', 'extendMenu');
+			}
+		},
 		highestMatchingUrlCount(){
 			// gets the hightest ranking inside the array
 			let highestMatch = Math.max(...this.urlMatchRankings);
@@ -111,7 +119,7 @@ export default {
     <div id="nav-logo" class="d-none d-lg-block">
 		<div class="d-flex h-100">
 			<a :href="rootUrl">
-				<img :src="logoUrl" alt="Logo">
+				<img :src="logoUrl" alt="Corporate Identity Logo">
 			</a>
 			<theme-switch></theme-switch>
 		</div>
@@ -135,8 +143,8 @@ export default {
     <nav id="nav-main" class="offcanvas offcanvas-start" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
 			<div id="nav-main-toggle" class="position-static d-none d-lg-block ">
-				<button type="button" class="btn text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target=".nav-menu-collapse" aria-expanded="true" aria-controls="nav-sprachen nav-main-menu">
-					<i class="fa fa-arrow-circle-left fhc-text"></i>
+				<button :aria-label="menuCollapseAriaLabel"  type="button" @click="menuOpen = !menuOpen"  class="btn text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target=".nav-menu-collapse" aria-expanded="true" aria-controls="nav-sprachen nav-main-menu">
+					<i aria-hidden="true" class="fa fa-arrow-circle-left fhc-text"></i>
 				</button>
 			</div>
 			<div class="offcanvas-body p-0">

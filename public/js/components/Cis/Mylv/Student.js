@@ -101,13 +101,13 @@ export default {
 			</div>
 			<div class="col-auto">
 				<div class="input-group">
-					<button class="btn btn-outline-secondary" type="button" :disabled="currentIsFirst" @click="prevSem">
+					<button :aria-label="$p.t('lehre','previousStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','previousStudSemester')}" class="btn btn-outline-secondary" type="button" :disabled="currentIsFirst" @click="prevSem">
 						<i class="fa fa-caret-left" aria-hidden="true"></i>
 					</button>
 					<select ref="studiensemester" v-model="currentSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
 						<option v-for="semester in studiensemester" :key="semester.studiensemester_kurzbz">{{semester.studiensemester_kurzbz}}</option>
 					</select>
-					<button class="btn btn-outline-secondary" type="button" :disabled="currentIsLast" @click="nextSem">
+					<button class="btn btn-outline-secondary" :aria-label="$p.t('lehre','nextStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','nextStudSemester')}" type="button" :disabled="currentIsLast" @click="nextSem">
 						<i class="fa fa-caret-right" aria-hidden="true"></i>
 					</button>
 				</div>

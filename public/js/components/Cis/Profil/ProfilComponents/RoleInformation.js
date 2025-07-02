@@ -48,24 +48,24 @@ export default {
 						<!-- print semester link -->
 						<span v-else-if="key == 'semester' && entry.value"  class="form-underline-content">
 							{{ entry.value }}
-							<a class="ms-auto mb-2" target="_blank" :href="getLinkSemesterListe">
-								<i class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
+							<a :aria-label="$p.t('profil','semesterLink')" class="ms-auto mb-2" target="_blank" :href="getLinkSemesterListe">
+								<i aria-hidden="true" class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
 							</a>
 						</span>
 						
 						<!-- print verband link -->
 						<span v-else-if="key =='verband' && entry.value"  class="form-underline-content">
 							{{ entry.value }}
-							<a class="ms-auto mb-2" target="_blank" :href="getLinkVerbandListe">
-								<i class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
+							<a :aria-label="$p.t('profil','verbandLink')" class="ms-auto mb-2" target="_blank" :href="getLinkVerbandListe">
+								<i aria-hidden="true" class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
 							</a>
 						</span>
 						
 						<!-- print gruppe link -->
 						<span v-else-if="key == 'gruppe' && entry.value"  class="form-underline-content">
 							{{ entry.value }}
-							<a class="ms-auto mb-2" target="_blank" :href="getLinkGruppeListe">
-								<i class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
+							<a :aria-label="$p.t('profil','gruppenLink')" class="ms-auto mb-2" target="_blank" :href="getLinkGruppeListe">
+								<i aria-hidden="true" class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
 							</a>
 						</span>
 						

@@ -316,9 +316,9 @@ const LvPlan = {
 	>
 		<template #calendarDownloads>
 			<div v-for="{title,icon,link} in downloadLinks">
-				<a :href="link" :title="title" class="py-1 px-2 m-1 btn btn-outline-secondary">
+				<a :href="link" :aria-label="title" class="py-1 px-2 m-1 btn btn-outline-secondary">
 					<div class="d-flex flex-column">
-						<i :class="icon"></i>
+						<i aria-hidden="true" :class="icon"></i>
 						<span class="small">{{title}}</span>
 					</div>
 				</a>

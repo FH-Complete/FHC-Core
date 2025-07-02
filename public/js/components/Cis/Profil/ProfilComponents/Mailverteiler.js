@@ -16,7 +16,7 @@ export default {
             {{title}}
         </div>
         <div class="card-body">
-            <h6 class="card-title">{{$p.t('profil','mailverteilerMitglied')}}</h6>
+            <h4 class="card-title">{{$p.t('profil','mailverteilerMitglied')}}</h4>
             <div class="card-text row text-break mb-2" v-for="verteiler in data">
                 <div class="col-12 ">
                     <div class="row">
