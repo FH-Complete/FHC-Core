@@ -176,7 +176,7 @@ class StundenplanLib{
 			},$lektoren);
 
 		}
-		return $lektoren;
+		return success($lektoren);
 	}
 
 	public function expand_object_information($data){
@@ -267,49 +267,56 @@ class StundenplanLib{
 			return error(getData($ferienEvents));
 		}
 		$ferienEvents = getData($ferienEvents);
+		
+		if(is_array($ferienEvents) && count($ferienEvents) > 0){
+			
+			$ferienEvents = array_map(function($event){
+				$event_start = new DateTime($event->vondatum);
+				$event_end = new DateTime($event->bisdatum);
+				$event_end->modify('+1 day');
+	
+				$interval = new DateInterval('P1D');
+				$period = new DatePeriod($event_start, $interval, $event_end);
+				$event->dates = array_map(function($date){
+					return $date->format('Y-m-d');
+				}, iterator_to_array($period));
+				return $event;
+			}, $ferienEvents);
+	
+			$ferienEventsFlattened=[];
+			foreach($ferienEvents as $ferien_event){
+				foreach($ferien_event->dates as $date){
+					$event = new stdClass();
+					$event->bezeichnung = $ferien_event->bezeichnung;
+					$event->datum = $date;
+					$event->type = 'ferien';
+					$ferienEventsFlattened[] = $event;
+				}
+			};
+	
+			$today=new DateTime();
+			$ferienEventsFlattened = array_map(function($event) use($today){
+				$ferien_event = (object) array(
+					'type' => 'ferien',
+					'beginn' => $today->format('H:i:s'),
+					'ende' => $today->format('H:i:s'),
+					'allDayEvent' => true,
+					'datum' => $event->datum,
+					'topic' => $event->bezeichnung,
+					'titel' => $event->bezeichnung,
+					'farbe' => '00689E'
+					
+				);
+				return $ferien_event;
+			}, $ferienEventsFlattened);
+			
+			return success($ferienEventsFlattened);
+		}
+		else{
+			return success([]);
+		}
 
-		$ferienEvents = array_map(function($event){
-			$event_start = new DateTime($event->vondatum);
-			$event_end = new DateTime($event->bisdatum);
-			$event_end->modify('+1 day');
-
-			$interval = new DateInterval('P1D');
-			$period = new DatePeriod($event_start, $interval, $event_end);
-			$event->dates = array_map(function($date){
-				return $date->format('Y-m-d');
-			}, iterator_to_array($period));
-			return $event;
-		}, $ferienEvents);
-
-		$ferienEventsFlattened=[];
-		foreach($ferienEvents as $ferien_event){
-			foreach($ferien_event->dates as $date){
-				$event = new stdClass();
-				$event->bezeichnung = $ferien_event->bezeichnung;
-				$event->datum = $date;
-				$event->type = 'ferien';
-				$ferienEventsFlattened[] = $event;
-			}
-		};
-
-		$today=new DateTime();
-		$ferienEventsFlattened = array_map(function($event) use($today){
-			$ferien_event = (object) array(
-				'type' => 'ferien',
-				'beginn' => $today->format('H:i:s'),
-				'ende' => $today->format('H:i:s'),
-				'allDayEvent' => true,
-				'datum' => $event->datum,
-				'topic' => $event->bezeichnung,
-				'titel' => $event->bezeichnung,
-				'farbe' => '00689E'
-				
-			);
-			return $ferien_event;
-		}, $ferienEventsFlattened);
-		 
-
-		return $ferienEventsFlattened;
+		
 	}
 
 	// start of the private functions ########################################################################################################
