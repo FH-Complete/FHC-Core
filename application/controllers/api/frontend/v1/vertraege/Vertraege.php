@@ -321,7 +321,9 @@ class Vertraege extends FHCAPI_Controller
 						'mitarbeiter_uid' => $row['mitarbeiter_uid']
 					],
 					[
-						'vertrag_id' => $vertrag_id
+						'vertrag_id' => $vertrag_id,
+						'updateamum' => date('c'),
+						'updatevon' => getAuthUID()
 					]
 				);
 
@@ -342,7 +344,9 @@ class Vertraege extends FHCAPI_Controller
 						'betreuerart_kurzbz' => $row['betreuerart_kurzbz']
 					],
 					[
-						'vertrag_id' => $vertrag_id
+						'vertrag_id' => $vertrag_id,
+						'updateamum' => date('c'),
+						'updatevon' => getAuthUID()
 					]
 				);
 
@@ -394,7 +398,9 @@ class Vertraege extends FHCAPI_Controller
 						'vertrag_id' => $vertrag_id
 					],
 					[
-						'vertrag_id' => null
+						'vertrag_id' => null,
+						'updateamum' => date('c'),
+						'updatevon' => getAuthUID()
 					]
 				);
 
@@ -423,7 +429,10 @@ class Vertraege extends FHCAPI_Controller
 						'vertrag_id' => $vertrag_id
 					],
 					[
-						'vertrag_id' => null
+						'vertrag_id' => null,
+						'updateamum' => date('c'),
+						'updatevon' => getAuthUID()
+
 					]
 				);
 
@@ -570,13 +579,14 @@ class Vertraege extends FHCAPI_Controller
 
 		$status_result = $this->VertragvertragsstatusModel->update(
 			[
-			'vertrag_id' => $this->input->post('vertrag_id'),
-			'vertragsstatus_kurzbz' => $this->input->post('vertragsstatus_kurzbz')],
+				'vertrag_id' => $this->input->post('vertrag_id'),
+				'vertragsstatus_kurzbz' => $this->input->post('vertragsstatus_kurzbz')
+			],
 			[
-			'uid' => getAuthUID(),
-			'updateamum' => date('c'),
-			'updatevon' => getAuthUID(),
-			'datum' => $this->input->post('datum')
+				'uid' => getAuthUID(),
+				'updateamum' => date('c'),
+				'updatevon' => getAuthUID(),
+				'datum' => $this->input->post('datum')
 			]
 		);
 
@@ -591,7 +601,7 @@ class Vertraege extends FHCAPI_Controller
 	{
 		$lehreinheit_id = $this->input->post('lehreinheit_id');
 		$mitarbeiter_uid = $this->input->post('mitarbeiter_uid');
-		$vertrag_id = $this->input->post('vertrag_id ');
+		$vertrag_id = $this->input->post('vertrag_id');
 
 		$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
 
@@ -603,7 +613,9 @@ class Vertraege extends FHCAPI_Controller
 				'vertrag_id' => $vertrag_id
 			],
 			[
-				'vertrag_id' => null
+				'vertrag_id' => null,
+				'updateamum' => date('c'),
+				'updatevon' => getAuthUID()
 			]
 		);
 
