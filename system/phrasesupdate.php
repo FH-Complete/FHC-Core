@@ -29947,6 +29947,26 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'kontrolleOhneQR',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheiten ohne QR-Code einfügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Insert attendances without QR-Code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'eintragErfolgreich',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -29999,6 +30019,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Start a new attendance check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitskontrolle',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'attendance check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'offen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Offen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -30067,18 +30127,58 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'entschuldigungAutoEmailBetreff',
+		'phrase' => 'entFullEmailBetreff',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Entschuldigung zur Befreiung der Anwesenheitspflicht: Neues Dokument wurde hochgeladen.',
+				'text' => 'Neue Entschuldigung zur Befreiung der Anwesenheitspflicht: Neues Dokument wurde hochgeladen.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Excuse note for digital attendances - a new document has been uploaded.',
+				'text' => 'New Excuse note for digital attendances - a new document has been uploaded.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entNewEmailBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Entschuldigung zur Befreiung der Anwesenheitspflicht: Dokument wird nachgereicht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Excuse note for digital attendances - Document will be submitted later',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entEditEmailBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung zur Befreiung der Anwesenheitspflicht: Dokument wurde eingereicht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse note for digital attendances - Document has been submitted',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31367,18 +31467,78 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'studentConfig',
+		'phrase' => 'errorCodeTooOld',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Studenten auswählen.',
+				'text' => 'Der Zugangscode ist zeitlich abgelaufen.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Configure student profile.',
+				'text' => 'The access code has expired.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'profil',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Profil',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'profile',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'admin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigungsmanagement',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'excuse note management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'allowed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aktuell prüfbar',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'allowed to test',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31419,6 +31579,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Students',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'termine',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht laut Stundenplan',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson as per Timetable',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31532,7 +31712,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine zugeteilten Studenten gefunden für den gewählten LV-Teil gefunden!',
+				'text' => 'Keine zugeteilten Studenten für den gewählten LV-Teil gefunden!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -31559,6 +31739,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Attendance Check Date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrollen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrollen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance Checks',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -31927,6 +32127,66 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'kontrolleTimeOverlap',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrollzeiten überlappen mit Kontrolle von {0} bis {1}.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Times overlap with attendance check from {0} to {1}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'keineKontrollenAnDatumFallback',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Kontrollen an {0} gefunden, es werden alle Kontrollen angezeigt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No attendance checks found on {0}, all attendance checks are being shown.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'noLePreselectTermineTooOld',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine intelligente LV-Teil Vorauswahl möglich, da sämtliche Termine außerhalb des erlaubten Kontrollzeitraums liegen. Bitte wählen Sie sorgfältig den gewünschten LV-Teil aus.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No intelligent pre-selection of teaching unit is possible, as all dates fall outside the permitted control period. Please carefully select the desired teaching unit.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'tooltipStudentEntschuldigung',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -31984,17 +32244,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Im Entschuldigungsmanagement können Sie als Studiengangsassistenz beziehungsweise als Administrator die von Studenten hochgeladenen Entschuldigungsdokumente überprüfen und den Status entsprechend vergeben.
-
-				Bitte beachten Sie dass nur Entschuldigungen INNERHALB des angegebenen Zeitraumes angezeigt werden. Sollten Sie nach einer lang wirken Entschuldigung suchen, müssen Sie die Zeitspanne entsprechend weit setzen.',
+				'text' => 'Im Entschuldigungsmanagement können Sie als Studiengangsassistenz beziehungsweise als Administrator die von Studenten hochgeladenen Entschuldigungsdokumente überprüfen und den Status entsprechend vergeben.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'In the excuse management, you as a course assistant or administrator can check the excuse documents uploaded by students and assign the status accordingly.
-
-				Please note that only excuses WITHIN the specified time period are displayed. If you are looking for a long-lasting excuse, you must set the time period accordingly.',
+				'text' => 'In the excuse management, you as a course assistant or administrator can check the excuse documents uploaded by students and assign the status accordingly.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -32143,6 +32399,26 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'studentenInLVTeil',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studenten in LV-Teil',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Students in teaching unit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'entschuldigungEdit',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -32155,6 +32431,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Excuse Note Edit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'file',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -32415,6 +32711,126 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Provided date is older than allowed date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolleDatumOutOfRange',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datum liegt außerhalb der erlaubten Kontrollspanne!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date is outside the permitted control range!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'alertBetreuungSelected',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der ausgewählte LV-Teil hat die Lehrform Betreuung! Bitte überprüfen sie die korrekte Auswahl des LV-Teils um fehlerhafte Kontrollen zu vermeiden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The selected course component is taught in a supervised format! Please check that you have selected the correct course component to avoid incorrect assessments!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'editEntschuldigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Excuse note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwUserEntry',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitseintrag',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance Entry',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'highlightsettings',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datumsmarkierung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date Highlighting',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'editAnwKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitskontrolle bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Attendance Checks',
 				'description' => '',
 				'insertvon' => 'system'
 			)
