@@ -75,8 +75,20 @@ class Vertraege extends FHCAPI_Controller
 		$this->terminateWithSuccess((getData($result) ?: []));
 	}
 
-	public function getStatiOfContract($vertrag_id)
+	public function getStatiOfContract($person_id, $vertrag_id)
 	{
+		//check if vertrag_id corresponds with person_id and return null if not
+		$result = $this->VertragModel->loadWhere(
+			array(
+				'vertrag_id' => $vertrag_id,
+				'person_id' => $person_id
+			)
+		);
+		if(!hasData($result))
+		{
+			$this->terminateWithSuccess([]);
+		}
+
 		$result = $this->VertragModel->getStatiOfContract($vertrag_id);
 
 		if (isError($result)) {

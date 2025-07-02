@@ -40,10 +40,10 @@ export default {
 			url: 'api/frontend/v1/vertraege/Vertraege/getAllContractTypes/'
 		};
 	},
-	getStatiOfContract(vertrag_id){
+	getStatiOfContract(person_id, vertrag_id){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/vertraege/Vertraege/getStatiOfContract/' + vertrag_id
+			url: 'api/frontend/v1/vertraege/Vertraege/getStatiOfContract/' + person_id + '/' + vertrag_id
 		};
 	},
 	configPrintDocument() {

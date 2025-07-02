@@ -198,7 +198,7 @@ export default {
 <!--	<div class="core-contracts-details vv">-->
 	<br>		
 		<h5>{{$p.t('vertrag', 'vertragDetails')}}</h5>
-	
+
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"

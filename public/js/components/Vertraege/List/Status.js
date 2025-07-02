@@ -18,6 +18,10 @@ export default {
 		},
 	},
 	props: {
+		person_id: {
+			type: [Number],
+			required: true
+		},
 		vertrag_id: {
 			type: [Number],
 			required: true
@@ -40,7 +44,7 @@ export default {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
-					this.endpoint.getStatiOfContract(this.vertrag_id)
+					this.endpoint.getStatiOfContract(this.person_id, this.vertrag_id)
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
@@ -199,9 +203,11 @@ export default {
 		}
 	},
 	watch: {
+		person_id() {
+			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getStatiOfContract/' +  this.person_id + '/' + this.vertrag_id);
+		},
 		vertrag_id() {
-			//this.reloadTable();
-			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getStatiOfContract/' + this.vertrag_id);
+			this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getStatiOfContract/' +  this.person_id + '/' + this.vertrag_id);
 		},
 		formDataParent: {
 			handler(newVal, oldVal) {

@@ -601,6 +601,7 @@ export default {
 				<!-- ContractStati -->
 				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">      
 					<contract-stati
+						:person_id="person_id"
 						:vertrag_id="contractSelected.vertrag_id"
 						:listContractStati="listContractStati"
 						:formDataParent="contractFormData"
