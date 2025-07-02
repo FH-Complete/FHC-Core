@@ -176,7 +176,7 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				responsiveLayout: "collapse",
-				height: '250',
+				height: '200',
 				selectableRangeMode: 'click',
 				selectable: true,
 				index: 'notiz_id',
@@ -572,10 +572,9 @@ export default {
 				>
 			</core-filter-cmpt>
 			
-			<br>
 		
-			<form-form ref="formNotiz" @submit.prevent class="row pt-3">
-				<br><br>
+			<form-form ref="formNotiz" @submit.prevent class="row">
+
 				<div class="pt-2">
 					<div class="row mb-3">
 						<div class="col-sm-7">
@@ -708,9 +707,13 @@ export default {
 						<p class="small">{{notizData.lastupdate}}</p>
 					</div>
 				</div>
-				
-				<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
-				<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+				<div class="row">
+					<div class="text-end">
+						<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
+						<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+					</div>
+				</div>
+
 			</form-form>
 		</div>
 

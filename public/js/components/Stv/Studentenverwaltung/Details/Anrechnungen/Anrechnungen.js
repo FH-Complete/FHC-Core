@@ -184,6 +184,7 @@ export default {
 			this.currentAnrechnung_id = anrechnung_id;
 			this.loadAnrechnung(this.currentAnrechnung_id);
 			this.showNotizen = true;
+			this.$refs.anrechnungsnotizModal.show();
 		},
 		addNewAnrechnung(){
 			const dataToSend = {
@@ -304,36 +305,31 @@ export default {
 	},
 	template: `
 				<div class="stv-details-tab_exemptions h-100 pb-3">
-					<h5>{{$p.t('lehre', 'anrechnungen')}}</h5>
-					
-					<div v-if="showNotizen" class="border p-3 overflow-auto" style="height: 200px;">
-							<!-- <div class="justify-content-end pb-3">
-								<form-input
-									container-class="form-switch"
-									type="checkbox"
-									label="Notizen"
-									v-model="showNotizen"
-									@change="onSwitchHide"
-									>
-								</form-input>
-							</div> -->
-						<h6><strong>LV {{formData.lehrveranstaltung_id}}:
-							{{formData.bezeichnung}} | {{formData.bezeichnung_english}}</strong></h6>
 
-						<core-notiz
-							:endpoint="endpoint"
-							ref="formNotes"
-							notiz-layout="popupModal"
-							typeId="anrechnung_id"
-							:id="currentAnrechnung_id"
-							show-document
-							show-tiny-mce
-							:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
-							@reload="handleReload"
-							>
-						</core-notiz>
-					
-					</div>
+					<bs-modal ref="anrechnungsnotizModal" dialog-class="modal-dialog-scrollable modal-xl">
+
+						<template #title>
+							<h5>
+								<strong>LV {{formData.lehrveranstaltung_id}}: {{formData.bezeichnung}} | {{formData.bezeichnung_english}}
+								</strong>
+							</h5>
+						</template>
+
+						<div v-if="showNotizen" class="border p-3 overflow-auto" style="height: 800px;">
+							<core-notiz
+										:endpoint="endpoint"
+										ref="formNotes"
+										notiz-layout="classicFas"
+										typeId="anrechnung_id"
+										:id="currentAnrechnung_id"
+										show-document
+										show-tiny-mce
+										:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+										@reload="handleReload"
+										>
+								</core-notiz>
+							</bs-modal>
+						</div>
 					
 					<template v-if="config.editableAnrechnungen" >
 						<core-filter-cmpt
