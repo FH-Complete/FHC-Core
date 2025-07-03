@@ -18,7 +18,7 @@ export default {
 	data() {
 		return {
 			collapseIconFunktionen: true,
-
+			preloadedPhrasen:{},
 			funktionen_table_options: {
 				persistenceID: "filterTableMaViewProfilFunktionen",
 				persistence: {
@@ -166,6 +166,16 @@ export default {
 			};
 		},
 	},
+	created(){
+		this.$p.loadCategory(["ui", "lehre", "global", "profil"]).then(() => {
+			this.preloadedPhrasen.bezeichnungPhrase = this.$p.t('ui/bezeichnung');
+			this.preloadedPhrasen.organisationseinheitPhrase = this.$p.t('lehre/organisationseinheit');
+			this.preloadedPhrasen.gueltigVonPhrase = this.$p.t('global/gueltigVon');
+			this.preloadedPhrasen.gueltigBisPhrase = this.$p.t('global/gueltigBis');
+			this.preloadedPhrasen.wochenstundenPhrase = this.$p.t('profil/wochenstunden');
+			this.preloadedPhrasen.loaded = true;
+		});
+	},
 
 	template: /*html*/ `
 
@@ -175,9 +185,9 @@ export default {
         <!-- HIDDEN QUICK LINKS -->
         <!-- TODO: uncomment when implemented
             <div  class="d-md-none col-12 ">
-            
+
             <quick-links :title="$p.t('profil','quickLinks')" :mobile="true" ></quick-links>
-            
+
             </div>
             -->
         <!-- END OF HIDDEN QUCK LINKS -->
@@ -223,7 +233,7 @@ export default {
             <div class="row">
                 <!-- FIRST TABLE -->
                 <div class="col-12 mb-4" >
-                    <core-filter-cmpt @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt v-if="preloadedPhrasen.loaded" @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                 </div>
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
             </div>
