@@ -130,6 +130,11 @@ export default {
 				height: '250',
 				selectableRangeMode: 'click',
 				selectable: true,
+				persistence: {
+					sort: true,
+					page: true,
+					filter: false //to avoids js errors
+				},
 				persistenceID: 'core-contracts'
 			},
 			tabulatorEvents: [
@@ -214,7 +219,6 @@ export default {
 		person_id() {
 			this.$refs.table.reloadTable();
 			this.arraySelectedContracts = [];
-			//this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllVertraege/' + this.person_id);
 		},
 	},
 	methods: {
