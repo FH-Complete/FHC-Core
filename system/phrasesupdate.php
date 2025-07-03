@@ -31707,18 +31707,18 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'noStudentsFound',
+		'phrase' => 'noStudentsFoundV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine zugeteilten Studenten für den gewählten LV-Teil gefunden!',
+				'text' => 'Keine zugeteilten Studenten für Mitarbeiter {0} in dem gewählten LV-Teil {1} gefunden!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No assigned students for the selected teaching unit found!',
+				'text' => 'No assigned students for employee {0} in the selected teaching unit {1} found!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
