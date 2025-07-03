@@ -157,6 +157,7 @@ class Anrechnungen extends FHCAPI_Controller
 
 	public function loadAnrechnung($anrechnung_id)
 	{
+		$this->AnrechnungsModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'ON (lv.lehrveranstaltung_id = lehre.tbl_anrechnung.lehrveranstaltung_id)');
 		$result = $this->AnrechnungsModel->loadWhere(
 			array('anrechnung_id' => $anrechnung_id)
 		);
@@ -231,11 +232,25 @@ class Anrechnungen extends FHCAPI_Controller
 
 	public function deleteAnrechnung($anrechnung_id)
 	{
+		// Start DB transaction
+		$this->db->trans_begin();
+
+		//delete anrechnung_id of table tbl_anrechnung_anrechnungstatus
+		$this->load->model('education/Anrechnunganrechnungstatus_model','AnrechnungAnrechnungstatusModel');
+		$result = $this->AnrechnungAnrechnungstatusModel->delete(
+			array('anrechnung_id' => $anrechnung_id)
+		);
+		$this->getDataOrTerminateWithError($result);
+
+		//delete anrechnung_id of table tbl_anrechnung
 		$result = $this->AnrechnungsModel->delete(
 			array('anrechnung_id' => $anrechnung_id)
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->db->trans_commit();
+
 		$this->terminateWithSuccess($data);
 	}
 }

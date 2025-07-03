@@ -81,6 +81,7 @@ export default {
 						title: "Text",
 						field: "text_stripped",
 						width: 250,
+						clipContents: true,
 						tooltip:function(e, cell, onRendered){
 							var el = document.createElement("div");
 							el.style.backgroundColor = "white";
@@ -174,7 +175,8 @@ export default {
 					}],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
-				height: '250',
+				responsiveLayout: "collapse",
+				height: '200',
 				selectableRangeMode: 'click',
 				selectable: true,
 				index: 'notiz_id',
@@ -199,10 +201,6 @@ export default {
 						cm.getColumnByField('titel').component.updateDefinition({
 							title: this.$p.t('global', 'titel'),
 							//visible: this.showVariables.showTitel
-						});
-						cm.getColumnByField('text_stripped').component.updateDefinition({
-							title: this.$p.t('global', 'text'),
-							//visible: this.showVariables.showText
 						});
 						cm.getColumnByField('bearbeiter').component.updateDefinition({
 							title: this.$p.t('notiz', 'bearbeiter'),
@@ -250,6 +248,16 @@ export default {
 						cm.getColumnByField('actions').component.updateDefinition({
 							title: this.$p.t('global', 'aktionen')
 						});
+
+						cm.getColumnByField('text_stripped').component.updateDefinition({
+							title: this.$p.t('global', 'text'),
+							width: 250,
+							tooltip: true,
+							clipContents: true,
+						});
+
+						// Force layout recalculation for handling overflow text
+						this.$refs.table.tabulator.redraw(true);
 					}
 				}
 			],
@@ -355,6 +363,7 @@ export default {
 						this.$refs.NotizModal.hide();
 					}
 					this.reload();
+					this.$emit('reload');
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -367,6 +376,7 @@ export default {
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.reload();
+					this.$emit('reload');
 					this.resetFormData();
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -410,6 +420,7 @@ export default {
 						this.$refs.NotizModal.hide();
 					}
 					this.reload();
+					this.$emit('reload');
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -561,10 +572,9 @@ export default {
 				>
 			</core-filter-cmpt>
 			
-			<br>
 		
-			<form-form ref="formNotiz" @submit.prevent class="row pt-3">
-				<br><br>
+			<form-form ref="formNotiz" @submit.prevent class="row">
+
 				<div class="pt-2">
 					<div class="row mb-3">
 						<div class="col-sm-7">
@@ -697,9 +707,13 @@ export default {
 						<p class="small">{{notizData.lastupdate}}</p>
 					</div>
 				</div>
-				
-				<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
-				<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+				<div class="row">
+					<div class="text-end">
+						<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
+						<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+					</div>
+				</div>
+
 			</form-form>
 		</div>
 
