@@ -326,7 +326,7 @@ export default {
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
 				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="dayText[day]?.heading" @click.prevent="changeToDay(day)">
 					<div class="fw-bold">{{dayText[day]?.tag}}</div>
-					<a href="#" class="small text-secondary text-decoration-none" >{{dayText[day]?.datum}}</a>
+					<a href="#" class="small text-muted text-decoration-none" >{{dayText[day]?.datum}}</a>
 				</div>
 			</div>
 			<div ref="eventcontainer" class="position-relative flex-grow-1"  >

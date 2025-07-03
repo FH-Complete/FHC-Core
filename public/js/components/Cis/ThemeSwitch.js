@@ -8,7 +8,8 @@ export default {
 		switchTheme(nextTheme){
 			this.theme = nextTheme;
 			this.$theme.switchTheme(this.theme);
-		}
+		},
+		
 	},
 	computed:{
 		nextTheme(){
@@ -23,10 +24,10 @@ export default {
 	},
 	template:/*html*/`
 
-	<button @click="switchTheme(nextTheme)" class="fhc-primary-highlight-bg align-self-center btn btn-secondary rounded-5">
-		<i v-if="theme == 'light'" class="fa-solid fa-sun fhc-text"></i>
-		<i v-else-if="theme == 'dark'" class="fa-solid fa-moon fhc-text"></i>
-		<i v-else-if="theme == 'purple'" class="fa-solid fa-wine-bottle"></i>
+	<button :aria-label="$p.t('global','switchTheme',[nextTheme])" @click="switchTheme(nextTheme)" class="fhc-primary-highlight-bg align-self-center btn btn-secondary rounded-5">
+		<i v-if="theme == 'light'" class="fa-solid fa-sun fhc-text" aria-hidden="true"></i>
+		<i v-else-if="theme == 'dark'" class="fa-solid fa-moon fhc-text" aria-hidden="true"></i>
+		<i v-else-if="theme == 'purple'" class="fa-solid fa-wine-bottle" aria-hidden="true"></i>
 	</button>
 	`
 }

@@ -119,7 +119,7 @@ class LvPlan extends FHCAPI_Controller
 		}
 
 		$ferienEvents = $this->stundenplanlib->fetchFerienTageEvents($start_date, $end_date, $studiengang);
-		
+		$ferienEvents = $this->getDataOrTerminateWithError($ferienEvents);
 		$allEvents = array_merge($lvAndMoodleEvents,$ferienEvents);
 		// sort array with moodle events first
 		usort($lvAndMoodleEvents, function($a, $b){

@@ -40,8 +40,8 @@ export default {
 	template: /*html*/`
 	<div class="lehreinheitEventContent h-100 w-100 p-1" >
 		<div id="lehreinheitEventHeader" class="h-100 " v-if="!event.allDayEvent && event?.beginn && event?.ende" >
-			<span class="small">{{convertTime(event.beginn.split(":"))}}</span>
-			<span class="small">{{convertTime(event.ende.split(":"))}}</span>
+			<span >{{convertTime(event.beginn.split(":"))}}</span>
+			<span >{{convertTime(event.ende.split(":"))}}</span>
 		</div>
 		<div id="lehreinheitEventText" v-tooltip="calendarEventTooltip">
 			<span id="lehreinheitTopic">{{event.topic}}</span>

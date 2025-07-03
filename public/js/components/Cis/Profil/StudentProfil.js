@@ -32,7 +32,7 @@ export default {
 			showModal: false,
 			collapseIconBetriebsmittel: true,
 			editDataFilter: null,
-
+			preloadedPhrasen:{},
 			// tabulator options
 			zutrittsgruppen_table_options: {
 				persistenceID: "filterTableStudentProfilZutrittsgruppen",
@@ -42,7 +42,7 @@ export default {
 				height: 200,
 				layout: "fitColumns",
 				columns: [{
-					title: Vue.computed(() => this.$p.t('profil/zutrittsGruppen')),
+					title: Vue.computed(() => this.preloadedPhrasen.zutrittsGruppenPhrase),
 					field: "bezeichnung"
 				}],
 			},
@@ -68,14 +68,14 @@ export default {
 						headerClick: this.collapseFunction,
 					},
 					{
-						title:  Vue.computed(() => this.$p.t('profil/entlehnteBetriebsmittel')),
+						title: Vue.computed(()=>this.preloadedPhrasen.entlehnteBetriebsmittelPhrase),
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title:  Vue.computed(() => this.$p.t('profil/inventarnummer')),
+						title: Vue.computed(() =>this.preloadedPhrasen.inventarnummerPhrase) ,
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
@@ -83,7 +83,7 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('profil/ausgabedatum')),
+						title: Vue.computed(() =>this.preloadedPhrasen.ausgabedatum) ,
 						field: "Ausgegeben_am",
 						headerFilter: true,
 						minWidth: 200,
@@ -231,6 +231,14 @@ export default {
 		},
 	},
 	created() {
+		// preload phrasen
+		this.$p.loadCategory('profil').then(() => {
+			this.preloadedPhrasen.zutrittsGruppenPhrase = this.$p.t('profil/zutrittsGruppen');
+			this.preloadedPhrasen.entlehnteBetriebsmittelPhrase = this.$p.t('profil/entlehnteBetriebsmittel');
+			this.preloadedPhrasen.inventarnummerPhrase = this.$p.t('profil/inventarnummer');
+			this.preloadedPhrasen.ausgabedatum = this.$p.t('profil/ausgabedatum');
+			this.preloadedPhrasen.loaded = true;
+		});
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
 	},
@@ -294,7 +302,7 @@ export default {
 							<div  class=" col-lg-12">
 								<!-- STUDENT INFO -->
 								<role-information :title="$p.t('profil','studentInformation')" :data="roleInformation"></role-information>
-							</div> 
+							</div>
 						</div>
 					<!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
 					</div>
@@ -329,7 +337,7 @@ export default {
 							</div>
 						</div>
 					</div>
-			
+
 					<div class="row mb-4">
 						<div class="col">
 							<!-- PRIVATE ADRESSEN-->
@@ -347,7 +355,7 @@ export default {
 								<div class="card-body">
 									<div class="gy-3 row ">
 										<div v-for="element in data.adressen" class="col-12">
-											<Adresse :data="element"></Adresse> 
+											<Adresse :data="element"></Adresse>
 										</div>
 									</div>
 								</div>
@@ -359,16 +367,18 @@ export default {
 			<!-- SECOND ROW UNDER THE PROFIL IMAGE AND INFORMATION WITH THE TABLES -->
 			<div class="row">
 				<div class="col-12 mb-4" >
-					<core-filter-cmpt 
-					@tableBuilt="betriebsmittelTableBuilt" 
-					:title="$p.t('profil','entlehnteBetriebsmittel')"  
-					ref="betriebsmittelTable" 
-					:tabulator-options="betriebsmittel_table_options" 
-					tableOnly 
+					<core-filter-cmpt
+					v-if="preloadedPhrasen.loaded"
+					@tableBuilt="betriebsmittelTableBuilt"
+					:title="$p.t('profil','entlehnteBetriebsmittel')"
+					ref="betriebsmittelTable"
+					:tabulator-options="betriebsmittel_table_options"
+					tableOnly
 					:sideMenu="false" />
-				</div> 
+				</div>
 				<div class="col-12 mb-4" >
-					<core-filter-cmpt 
+					<core-filter-cmpt
+					v-if="preloadedPhrasen.loaded"
 					@tableBuilt="zutrittsgruppenTableBuilt" 
 					:title="$p.t('profil','zutrittsGruppen')" 
 					ref="zutrittsgruppenTable" 

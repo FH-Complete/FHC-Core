@@ -311,9 +311,7 @@ SELECT tbl_lehrveranstaltung.*,
 	private function computeLektorenFromLehrveranstaltung($lehreinheit_id, $semester, $studiengang, $studiensemester){
 		$this->load->library('StundenplanLib');
 		$lektoren = $this->stundenplanlib->getLektorenFromLehrveranstaltung($lehreinheit_id,$semester, $studiengang,$studiensemester);
-		if(!$lektoren){
-			return [];
-		}
+		$lektoren = $this->getDataOrTerminateWithError($lektoren);
 		$lektoren = array_map(function($lektor){
 			return ["name"=>$this->getDataOrTerminateWithError($this->PersonModel->getFullName($lektor)), "email"=>$lektor."@".DOMAIN];
 		},$lektoren);
