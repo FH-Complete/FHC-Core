@@ -183,6 +183,46 @@ EOSQL;
 		return $vbcount[0]->overlappingvbs;
 	}
 
+	public function getLastVertragsbestanteilStundenBeforeAltersteilzeit($dienstverhaeltnis_id)
+	{
+		$sql = <<<EOATZSQL
+			select 
+				* 
+			from
+				hr.tbl_vertragsbestandteil vb
+			join 
+				hr.tbl_vertragsbestandteil_stunden vbs USING(vertragsbestandteil_id)
+			where
+				vb.dienstverhaeltnis_id = ? 
+				and (
+					vbs.teilzeittyp_kurzbz != 'altersteilzeit'
+					or
+					vbs.teilzeittyp_kurzbz is NULL
+				)
+			order by 
+				vb.bis desc
+			limit 1
+EOATZSQL;
+		$query = $this->execReadOnlyQuery($sql, array($dienstverhaeltnis_id));
+		$data = getData($query);
+
+		if ($data == null)
+		{
+			return null;
+		}
+
+		$vertragsbestandteil = null;
+		try
+		{
+			$vertragsbestandteil = VertragsbestandteilFactory::getVertragsbestandteil($data[0], true);
+		}
+		catch (Exception $ex)
+		{
+			echo $ex->getMessage() . "\n";
+		}
+		return $vertragsbestandteil;
+	}
+
 	/**
 	 * Checks if sap sync table exists.
 	 * @return bool
