@@ -3,8 +3,6 @@ import LabelWeek from '../../Base/Label/Week.js';
 import LabelDow from '../../Base/Label/Dow.js';
 import LabelDay from '../../Base/Label/Day.js';
 
-import CalendarDate from '../../../../helpers/Calendar/Date.js';
-
 export default {
 	name: "MonthView",
 	components: {
@@ -19,8 +17,8 @@ export default {
 			events: Vue.computed(() => {
 				//const events = [];
 				const events = this.events.map(event => {
-					const start = Math.floor(event.start / CalendarDate.msPerDay) * CalendarDate.msPerDay;
-					const end = Math.floor(event.end / CalendarDate.msPerDay) * CalendarDate.msPerDay + CalendarDate.msPerDay;
+					const start = event.start.startOf('day');
+					const end = event.end.plus({ days: 1 }).startOf('day');
 					return {
 						...event,
 						start,
@@ -30,9 +28,10 @@ export default {
 				for (var w = 5; w > -1; w--) {
 					for (var d = 6; d > -1; d--) {
 						const start = this.axisMain[w] + this.axisParts[d];
+						const startdate = luxon.DateTime.fromMillis(start).setZone(this.timezone);
 						events.unshift({
-							start: start,
-							end: start + CalendarDate.msPerDay,
+							start: startdate,
+							end: startdate.plus({ days: 1 }),
 							orig: 'header'
 						});
 					}
@@ -43,6 +42,7 @@ export default {
 	},
 	inject: {
 		locale: "locale",
+		timezone: "timezone",
 		events: "events"
 	},
 	props: {
@@ -51,11 +51,15 @@ export default {
 	},
 	computed: {
 		axisMain() {
-			const start = CalendarDate.UTC(CalendarDate.getFirstDayOfWeek(new Date(this.year, this.month, 1), this.locale), true);
-			return Array.from({length: 6}, (e, i) => start + i * 7 * CalendarDate.msPerDay);
+			const start = luxon.DateTime
+				.fromObject({ month: this.month, year: this.year })
+				.startOf('week')
+				.setZone(this.timezone, { keepLocalTime: true });
+			return Array.from({ length: 6 }, (e, i) => start.plus({ weeks: i }).toMillis());
 		},
 		axisParts() {
-			return Array.from({length: 8}, (e, i) => i * CalendarDate.msPerDay);
+			const msPerDay = luxon.Duration.fromObject({ days: 1 }).toMillis();
+			return Array.from({ length: 8 }, (e, i) => i * msPerDay);
 		}
 	},
 	template: `
@@ -76,8 +80,8 @@ export default {
 			<template #event="slot">
 				<label-day
 					v-if="slot.event.orig == 'header'"
-					:timestamp="slot.event.start"
-					:class="(new Date(slot.event.start)).getMonth() == month ? '' : 'disabled'"
+					:timestamp="slot.event.start.ts"
+					:class="{ disabled: month != slot.event.start.month }"
 				/>
 				<slot v-else v-bind="slot" />
 			</template>

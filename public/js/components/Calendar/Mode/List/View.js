@@ -16,7 +16,7 @@ export default {
 		events: "events"
 	},
 	props: {
-		day: Number,
+		day: luxon.DateTime,
 		length: Number
 	},
 	data() {
@@ -26,19 +26,18 @@ export default {
 	},
 	computed: {
 		days() {
-			return Array.from({ length: this.length }, (e, i) => this.day + i * CalendarDate.msPerDay);
+			return Array.from({ length: this.length }, (e, days) => this.day.plus({ days }));
 		},
 		eventsPerDay() {
 			const eventsPerDay = this.days.map(day => {
 				return {
 					day,
 					events: this.events
-						.filter(event => event.start < day + CalendarDate.msPerDay && event.end > day)
-						.sort((a, b) => a.start - b.start)
+						.filter(event => event.start < day.plus({ days: 1 }) && event.end > day)
+						.sort((a, b) => a.start.ts - b.start.ts)
 				};
 			});
 			return eventsPerDay.filter(day => day.events.length);
-			return eventsPerDay;
 		}
 	},
 	template: `
@@ -49,7 +48,7 @@ export default {
 			<slot :event="undefined" mode="list" />
 		</div>
 		<div v-for="{ day, events } in eventsPerDay">
-			<label-dow :timestamp="day" />, <label-day :timestamp="day" />
+			<label-dow :timestamp="day.ts" class="d-inline" />, <label-day :timestamp="day.ts" class="d-inline" />
 			<div v-for="event in events">
 				<slot :event="event.orig" mode="list" />
 			</div>

@@ -9,7 +9,11 @@ export default {
 	],
 	props: {
 		date: luxon.DateTime,
-		view: String
+		view: String,
+		length: {
+			type: Number,
+			default: 7
+		}
 	},
 	emits: [
 		"update:date"
@@ -24,8 +28,9 @@ export default {
 			switch (this.view) {
 			case "month":
 				return {month: this.convertedDate.month-1, year: this.convertedDate.year};
+			case "list":
 			case "week":
-				return [this.convertedDate.startOf('week', true).toMillis(), this.convertedDate.endOf('week', true).toMillis()];
+				return [this.convertedDate.startOf('week', true).ts, this.convertedDate.endOf('week', true).ts];
 			case "day":
 				return this.convertedDate;
 			default:
@@ -35,11 +40,12 @@ export default {
 		format() {
 			switch (this.view) {
 			case "month":
-				return "MMMM yyyy"
+				return "MMMM yyyy";
 			case "week":
 				return "yyyy 'KW' ww";
+			case "list":
 			case "day":
-				return "dd.MM.yyyy"
+				return "dd.MM.yyyy";
 			default:
 				return "'View not Supported'";
 			}
@@ -53,6 +59,7 @@ export default {
 				value.month++;
 				date = luxon.DateTime.fromObject(value).setZone(this.timezone, { keepLocalTime: true });
 				break;
+			case "list":
 			case "week":
 				date = luxon.DateTime.fromJSDate(value[0]).setZone(this.timezone, { keepLocalTime: true });
 				break;
@@ -72,6 +79,7 @@ export default {
 		:format="format"
 		:month-picker="view == 'month'"
 		:week-picker="view == 'week'"
+		:range="view == 'list' ? { autoRange: length } : null"
 		:text-input="view == 'day'"
 		:week-numbers="{ type: 'iso' }"
 		:clearable="false"

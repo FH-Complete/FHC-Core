@@ -8,26 +8,27 @@ export default {
 		CalClick
 	},
 	inject: {
-		locale: "locale"
+		locale: "locale",
+		timezone: "timezone"
 	},
 	props: {
 		timestamp: Number
 	},
 	computed: {
 		day() {
-			return new Date(this.timestamp);
+			return luxon.DateTime.fromMillis(this.timestamp).setZone(this.timezone).setLocale(this.locale);
 		},
 		titleFull() {
-			return CalendarDate.format(this.day, {day: 'numeric', month: 'long', year: 'numeric'}, this.locale);
+			return this.day.toLocaleString({day: 'numeric', month: 'long', year: 'numeric'});
 		},
 		titleLong() {
-			return CalendarDate.format(this.day, {day: '2-digit', month: '2-digit', year: 'numeric'}, this.locale);
+			return this.day.toLocaleString({day: '2-digit', month: '2-digit', year: 'numeric'});
 		},
 		titleShort() {
-			return CalendarDate.format(this.day, {day: 'numeric', month: 'numeric'}, this.locale);
+			return this.day.toLocaleString({day: 'numeric', month: 'numeric'});
 		},
 		titleNarrow() {
-			return CalendarDate.format(this.day, {day: 'numeric'}, this.locale);
+			return this.day.toLocaleString({day: 'numeric'});
 		}
 	},
 	template: `

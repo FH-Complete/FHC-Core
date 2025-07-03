@@ -15,6 +15,7 @@ export default {
 	},
 	inject: {
 		locale: "locale",
+		timezone: "timezone",
 		timeGrid: "timeGrid",
 		collapseEmptyDays: "collapseEmptyDays"
 	},
@@ -23,29 +24,27 @@ export default {
 		week: Number
 	},
 	computed: {
+		start() {
+			return luxon.DateTime
+				.fromObject({ localWeekNumber: this.week, localWeekYear: this.year }, { locale: this.locale })
+				.startOf('week')
+				.setZone(this.timezone, { keepLocalTime: true });
+		},
 		axisMain() {
-			return CalendarDate.getDaysInWeek(this.week, this.year, this.locale).map(d => d.getTime());
+			return Array.from({ length: 7 }, (e, i) => this.start.plus({ days: i }).toMillis());
 		},
 		axisParts() {
-			const referenceDate = new Date("2000-01-01 00:00:00");
-			
 			if (this.timeGrid) {
 				// create {start, end} array
 				return this.timeGrid.map(tu => {
-					const startDate = new Date("2000-01-01 " + tu.start);
-					const endDate = new Date("2000-01-01 " + tu.end);
 					return {
-						start: startDate - referenceDate,
-						end: endDate - referenceDate
+						start: luxon.Duration.fromISOTime(tu.start).toMillis(),
+						end: luxon.Duration.fromISOTime(tu.end).toMillis()
 					};
 				});
 			} else {
 				// create 07:00-23:00
-				return [...Array(17).keys()].map(i => {
-					const time = ('0' + (i + 7)).slice(-2) + ':00:00';
-					const date = new Date("2000-01-01 " + time);
-					return date - referenceDate;
-				});
+				return Array.from({ length: 17 }, (e, i) => luxon.Duration.fromObject({ hours: i + 7 }).toMillis());
 			}
 		}
 	},

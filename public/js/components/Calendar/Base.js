@@ -172,10 +172,11 @@ export default {
 		},
 		cDate: {
 			get() {
-				return luxon.DateTime.fromJSDate(new Date(this.focusDate));
+				return this.internCurrentDate || luxon.DateTime.fromJSDate(new Date(this.date)).setZone(this.timezone);
 			},
 			set(value) {
-				this.focusDate = value.toMillis();
+				this.internCurrentDate = value;
+				this.$emit('update:date', value.toJSDate());
 			}
 		},
 		focusDate: {
@@ -243,7 +244,7 @@ export default {
 		this.internalView = view;
 		this.$emit('update:view', this.internalView);
 	},
-	template: `
+	template: /* html */`
 	<div class="fhc-calendar-base h-100">
 		<base-draganddrop
 			class="card h-100"
@@ -271,8 +272,7 @@ export default {
 			<component
 				:is="viewComponent"
 				ref="view"
-				:current-date="focusDate"
-				@update:current-date="focusDate = $event"
+				v-model:current-date="cDate"
 				@update:range="$emit('update:range', $event)"
 			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>

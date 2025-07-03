@@ -3,8 +3,6 @@ import LabelDay from '../../Base/Label/Day.js';
 import LabelDow from '../../Base/Label/Dow.js';
 import LabelTime from '../../Base/Label/Time.js';
 
-import CalendarDate from '../../../../helpers/Calendar/Date.js';
-
 export default {
 	name: "DayView",
 	components: {
@@ -15,11 +13,12 @@ export default {
 	},
 	inject: {
 		locale: "locale",
+		timezone: "timezone",
 		timeGrid: "timeGrid",
 		originalEvents: "events"
 	},
 	props: {
-		day: Number
+		day: luxon.DateTime
 	},
 	data() {
 		return {
@@ -28,32 +27,27 @@ export default {
 	},
 	computed: {
 		axisMain() {
-			return [this.day];
+			return [this.day.startOf('day').toMillis()];
 		},
 		axisParts() {
-			const referenceDate = new Date("2000-01-01 00:00:00");
-			
 			if (this.timeGrid) {
 				// create {start, end} array
 				return this.timeGrid.map(tu => {
-					const startDate = new Date("2000-01-01 " + tu.start);
-					const endDate = new Date("2000-01-01 " + tu.end);
 					return {
-						start: startDate - referenceDate,
-						end: endDate - referenceDate
+						start: luxon.Duration.fromISOTime(tu.start).toMillis(),
+						end: luxon.Duration.fromISOTime(tu.end).toMillis()
 					};
 				});
 			} else {
 				// create 07:00-23:00
-				return [...Array(17).keys()].map(i => {
-					const time = ('0' + (i + 7)).slice(-2) + ':00:00';
-					const date = new Date("2000-01-01 " + time);
-					return date - referenceDate;
-				});
+				return Array.from({ length: 17 }, (e, i) => luxon.Duration.fromObject({ hours: i + 7 }).toMillis());
 			}
 		},
 		events() {
-			return this.originalEvents.filter(event => event.start < this.day + CalendarDate.msPerDay && event.end > this.day).sort((a,b) => a.start-b.start).map(evt => evt.orig);
+			return this.originalEvents
+				.filter(event => event.start.ts < this.day.plus({ days: 1 }).ts && event.end.ts > this.day.ts)
+				.sort((a,b) => a.start.ts-b.start.ts)
+				.map(evt => evt.orig);
 		},
 		currentEvent() {
 			if (this.chosenEvent) {

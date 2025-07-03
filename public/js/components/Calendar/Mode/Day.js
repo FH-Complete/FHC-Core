@@ -11,10 +11,11 @@ export default {
 	},
 	inject: {
 		locale: "locale",
+		timezone: "timezone",
 		title: "title"
 	},
 	props: {
-		currentDate: Number
+		currentDate: luxon.DateTime
 	},
 	emits: [
 		"update:currentDate",
@@ -24,7 +25,7 @@ export default {
 	],
 	data() {
 		return {
-			focusDate: this.currentDate,
+			focusDate: luxon.DateTime.fromMillis(this.currentDate.ts).setZone(this.timezone),
 			rangeOffset: 0
 		};
 	},
@@ -32,18 +33,27 @@ export default {
 		range() {
 			const range = {};
 
-			range.first = new Date(this.focusDate);
-			range.last = CalendarDate.addDays(range.first, 1);
-
+			range.first = this.focusDate.startOf('day');
+			range.last = this.focusDate.endOf('day');
+			
 			if (this.rangeOffset != 0) {
 				if (this.rangeOffset < 0) {
-					range.first = CalendarDate.addDays(range.first, this.rangeOffset);
+					range.first = range.first.plus({ days: this.rangeOffset });
 				} else {
-					range.last = CalendarDate.addDays(range.last, this.rangeOffset);
+					range.last = range.last.plus({ days: this.rangeOffset });
 				}
 			}
 
 			return range;
+		}
+	},
+	watch: {
+		currentDate() {
+			this.rangeOffset = this.currentDate.startOf('day').diff(this.focusDate.startOf('day'), 'days').days;
+			if (this.rangeOffset) {
+				this.$emit('update:range', this.range);
+				this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
+			}
 		}
 	},
 	methods: {
@@ -57,15 +67,15 @@ export default {
 			this.$emit('update:range', this.range);
 			this.$refs.slider.nextPage().then(this.updatePage);
 		},
-		updatePage(offset) {
-			const newFocusDate = this.focusDate + offset * CalendarDate.msPerDay;
+		updatePage(days) {
+			const newFocusDate = this.focusDate.plus({ days });
 			this.focusDate = newFocusDate;
 			this.rangeOffset = 0;
 			this.$emit('update:currentDate', this.focusDate);
 			this.$emit('update:range', this.range);
 		},
-		viewAttrs(offset) {
-			const showDate = this.focusDate + offset * CalendarDate.msPerDay;
+		viewAttrs(days) {
+			const showDate = this.focusDate.plus({ days });
 			return {
 				day: showDate
 			}

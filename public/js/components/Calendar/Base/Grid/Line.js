@@ -27,12 +27,12 @@ export default {
 		stops() {
 			const stops = this.events.reduce((stops, event) => {
 				if (event.startsHere) {
-					if (stops.indexOf(event.start) < 0)
-						stops.push(event.start);
+					if (stops.indexOf(event.start.ts) < 0)
+						stops.push(event.start.ts);
 				}
 				if (event.endsHere) {
-					if (stops.indexOf(event.end) < 0)
-						stops.push(event.end);
+					if (stops.indexOf(event.end.ts) < 0)
+						stops.push(event.end.ts);
 				}
 				return stops;
 			}, []).sort((a,b) => a-b);
@@ -65,10 +65,10 @@ export default {
 			this.events.forEach(event => {
 				const rows = [1, -1];
 				if (event.startsHere) {
-					rows[0] = this.stops.indexOf(event.start) + 2;
+					rows[0] = this.stops.indexOf(event.start.ts) + 2;
 				}
 				if (event.endsHere) {
-					rows[1] = this.stops.indexOf(event.end) + 2;
+					rows[1] = this.stops.indexOf(event.end.ts) + 2;
 					if (rows[1] === 1)
 						rows[1] = -1;
 				}

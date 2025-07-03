@@ -14,7 +14,7 @@ export default {
 		title: "title"
 	},
 	props: {
-		currentDate: Number,
+		currentDate: luxon.DateTime,
 		length: {
 			type: Number,
 			default: 7
@@ -36,18 +36,27 @@ export default {
 		range() {
 			const range = {};
 
-			range.first = new Date(this.focusDate);
-			range.last = CalendarDate.addDays(range.first, this.length);
+			range.first = this.focusDate;
+			range.last = range.first.plus({ days: this.length });
 
 			if (this.rangeOffset != 0) {
 				if (this.rangeOffset < 0) {
-					range.first = CalendarDate.addDays(range.first, this.rangeOffset * this.length);
+					range.first = range.first.plus({ days: this.rangeOffset * this.length });
 				} else {
-					range.last = CalendarDate.addDays(range.last, this.rangeOffset * this.length);
+					range.last = range.last.plus({ days: this.rangeOffset * this.length });
 				}
 			}
 
 			return range;
+		}
+	},
+	watch: {
+		currentDate() {
+			this.rangeOffset = Math.floor(this.currentDate.startOf('day').diff(this.focusDate.startOf('day'), 'days').days / this.length);
+			if (this.rangeOffset) {
+				this.$emit('update:range', this.range);
+				this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
+			}
 		}
 	},
 	methods: {
@@ -62,14 +71,14 @@ export default {
 			this.$refs.slider.nextPage().then(this.updatePage);
 		},
 		updatePage(offset) {
-			const newFocusDate = this.focusDate + offset * this.length * CalendarDate.msPerDay;
+			const newFocusDate = this.focusDate.plus({ days: offset * this.length });
 			this.focusDate = newFocusDate;
 			this.rangeOffset = 0;
 			this.$emit('update:currentDate', this.focusDate);
 			this.$emit('update:range', this.range);
 		},
 		viewAttrs(offset) {
-			const showDate = this.focusDate + offset * this.length * CalendarDate.msPerDay;
+			const showDate = this.focusDate.plus({ days: offset * this.length });
 			return {
 				day: showDate,
 				length: this.length

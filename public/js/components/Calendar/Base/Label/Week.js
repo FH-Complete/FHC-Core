@@ -8,18 +8,20 @@ export default {
 		CalClick
 	},
 	inject: {
-		locale: "locale"
+		locale: "locale",
+		timezone: "timezone"
 	},
 	props: {
 		timestamp: Number
 	},
 	computed: {
 		weeks() {
-			const firstDay = new Date(this.timestamp);
-			const lastDay = CalendarDate.addDays(firstDay, 6);
+			const someDay = luxon.DateTime.fromMillis(this.timestamp).setZone(this.timezone).setLocale(this.locale);
+			const firstDay = someDay.startOf('week');
+			const lastDay = someDay.endOf('week');
 			const weeks = [
-				CalendarDate.getWeek(firstDay, this.locale),
-				CalendarDate.getWeek(lastDay, this.locale)
+				{ number: firstDay.localWeekNumber, year: firstDay.localWeekYear },
+				{ number: lastDay.localWeekNumber, year: lastDay.localWeekYear }
 			];
 			if (weeks[0].number == weeks[1].number)
 				weeks.pop();

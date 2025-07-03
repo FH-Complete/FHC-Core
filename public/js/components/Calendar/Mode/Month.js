@@ -1,5 +1,4 @@
 import BaseSlider from '../Base/Slider.js';
-import PickerMonth from '../Picker/Month.js';
 import MonthView from './Month/View.js';
 
 import CalendarDate from '../../../helpers/Calendar/Date.js';
@@ -12,15 +11,15 @@ export default {
 	name: "ModeMonth",
 	components: {
 		BaseSlider,
-		PickerMonth,
 		MonthView
 	},
 	inject: {
 		locale: "locale",
+		timezone: "timezone",
 		title: "title"
 	},
 	props: {
-		currentDate: Number
+		currentDate: luxon.DateTime
 	},
 	emits: [
 		"update:currentDate",
@@ -30,8 +29,7 @@ export default {
 	],
 	data() {
 		return {
-			monthPicker: false,
-			focusDate: new Date(this.currentDate),
+			focusDate: luxon.DateTime.fromMillis(this.currentDate.ts).setZone(this.timezone),
 			rangeOffset: 0
 		};
 	},
@@ -39,22 +37,16 @@ export default {
 		range() {
 			const range = {};
 
-			range.first = CalendarDate.getFirstDayOfWeek(
-				new Date(this.focusDate.getFullYear(), this.focusDate.getMonth(), 1),
-				this.locale
-			);
-			range.last = CalendarDate.addDays(range.first, 41);
+			range.first = this.focusDate.startOf('month').startOf('week');
+			range.last = range.first.plus({ days: 41 }).endOf('day'); // NOTE(chris): 6 weeks minus 1 day
 
 			if (this.rangeOffset != 0) {
-				const nextFocusDate = CalendarDate.addMonths(this.focusDate, this.rangeOffset);
-				const nextRangeStart = CalendarDate.getFirstDayOfWeek(
-					new Date(nextFocusDate.getFullYear(), nextFocusDate.getMonth(), 1),
-					this.locale
-				);
+				const nextFocusDate = this.focusDate.plus({ months: this.rangeOffset});
+				const nextRangeStart = nextFocusDate.startOf('month').startOf('week');
 				if (this.rangeOffset < 0) {
 					range.first = nextRangeStart;
 				} else {
-					range.last = CalendarDate.addDays(nextRangeStart, 41);
+					range.last = nextRangeStart.plus({ days: 41 }).endOf('day');
 				}
 			}
 
@@ -64,48 +56,38 @@ export default {
 	watch: {
 		locale() {
 			this.$emit('update:range', this.range);
+		},
+		currentDate() {
+			this.rangeOffset = this.currentDate.startOf('month').diff(this.focusDate.startOf('month'), 'months').months;
+			if (this.rangeOffset) {
+				this.$emit('update:range', this.range);
+				this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
+			}
 		}
 	},
 	methods: {
-		showPicker() {
-			if (this.monthPicker)
-				this.$refs.picker.toggleYearPicker();
-			this.monthPicker = true;
-		},
 		prevPage() {
-			if (this.monthPicker)
-				return this.$refs.picker.prevPage();
-
 			this.rangeOffset = this.$refs.slider.target - 1;
 			this.$emit('update:range', this.range);
 			this.$refs.slider.prevPage().then(this.updatePage);
 		},
 		nextPage() {
-			if (this.monthPicker)
-				return this.$refs.picker.nextPage();
-
 			this.rangeOffset = this.$refs.slider.target + 1;
 			this.$emit('update:range', this.range);
 			this.$refs.slider.nextPage().then(this.updatePage);
 		},
-		updatePage(offset) {
-			const newFocusDate = CalendarDate.addMonths(this.focusDate, offset);
+		updatePage(months) {
+			const newFocusDate = this.focusDate.plus({ months });
 			this.focusDate = newFocusDate;
 			this.rangeOffset = 0;
 			this.$emit('update:currentDate', this.focusDate);
 			this.$emit('update:range', this.range);
 		},
-		setMonth(month) {
-			this.focusDate = month;
-			this.monthPicker = false;
-			this.$emit('update:currentDate', this.focusDate);
-			this.$emit('update:range', this.range);
-		},
-		viewAttrs(offset) {
-			const showDate = CalendarDate.addMonths(this.focusDate, offset);
+		viewAttrs(months) {
+			const showDate = this.focusDate.plus({ months });
 			return {
-				month: showDate.getMonth(),
-				year: showDate.getFullYear()
+				month: showDate.month,
+				year: showDate.year
 			}
 		},
 		handleClickDefaults(evt) {
@@ -184,15 +166,6 @@ export default {
 		class="fhc-calendar-mode-month flex-grow-1 position-relative"
 		@cal-click-default.capture="handleClickDefaults"
 	>
-		<Transition name="picker">
-			<picker-month
-				v-if="monthPicker"
-				ref="picker"
-				:current-date="focusDate"
-				@update:current-date="setMonth"
-				class="position-absolute w-100 h-100"
-			/>
-		</Transition>
 		<base-slider ref="slider" v-slot="slot">
 			<month-view v-bind="viewAttrs(slot.offset)">
 				<template v-slot="slot"><slot v-bind="slot" mode="month" /></template>
