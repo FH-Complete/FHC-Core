@@ -200,7 +200,7 @@ export default {
 
 			data.personOnly = this.personOnly;
 
-			this.$api.call(
+			this.$refs.form.call(
 				ApiStvStudents.add(data)
 			)
 			.then(result => {
