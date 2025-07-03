@@ -29687,6 +29687,46 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'entschuldigtLegendeBlau',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student ist am gewählten Datum bestätigt entschuldigt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student is confirmed excused on the selected date.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigtLegendeTuerkis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student hat eine offene Entschuldigung am gewählten Datum.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student has an open excuse on the selected date.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'entschuldigungAbgelehnt',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -32239,7 +32279,7 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'tooltipAssistenz',
+		'phrase' => 'tooltipAssistenzV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -32283,7 +32323,7 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'tooltipLektorStartKontrolle',
+		'phrase' => 'tooltipLektorStartKontrolleV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -32292,7 +32332,7 @@ array(
 
 				Die Gültigkeitsdauer bestimmt die Gewichtung der Anwesenheit in Relation zum Gesamtausmaß, sie können diese aber nach eigenem Ermessen anpassen und müssen sich nicht streng an die Termine im Stundenplan halten.
 
-				Sie können pro Datum und Unterrichtsgruppe eine Anwesenheitskontrolle pro Tag eröffnen, welche jedoch beliebig oft aufgerufen und von Studenten eingecheckt werden kann. Es gelten dabei ihre zuletzt eingetragenen Zeiten. Ein Student muss nur einmal am Tag pro Gruppe einchecken um als anwesend registriert zu sein, egal wie oft Sie die Kontrolle starten.',
+				Sie können pro Datum und Unterrichtsgruppe mehrere Anwesenheitskontrollen am Tag durchführen, solange sich diese nicht in Ihren Zeiten überschneiden und eine Mindestlänge von {0} Minuten beträgt.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -32302,7 +32342,7 @@ array(
 
 				The validity period determines the weighting of attendance in relation to the overall extent, but you can adjust this at your own discretion and do not have to stick strictly to the dates in the timetable.
 
-				You can open one attendance check per day for each date and class group, which can be called up and checked in by students as often as you like. The times they last entered apply. A student only has to check in once a day per group to be registered as present, regardless of how often you start the check.',
+				You can conduct multiple attendance checks per day per date and lesson group, as long as they do not overlap in your times and are at least {0} minutes long.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
