@@ -260,7 +260,9 @@ SELECT tbl_lehrveranstaltung.*,
         FROM lehre.tbl_lehrveranstaltung
         JOIN lehre.tbl_studienplan_lehrveranstaltung
         USING(lehrveranstaltung_id)
-        WHERE tbl_studienplan_lehrveranstaltung.studienplan_id=? AND tbl_studienplan_lehrveranstaltung.semester=?";
+        WHERE 
+			tbl_lehrveranstaltung.lehre = true AND
+			tbl_studienplan_lehrveranstaltung.studienplan_id=? AND tbl_studienplan_lehrveranstaltung.semester=?";
 		
         if (defined("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN") && CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN)
 			$query .= " AND tbl_lehrveranstaltung.lehrtyp_kurzbz != 'modul'";
