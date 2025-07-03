@@ -131,6 +131,11 @@ class VertragsbestandteilLib
 		return $this->VertragsbestandteilModel->getVertragsbestandteil($vertragsbestandteil_id);
 	}
 
+	public function fetchLastVertragsbestandteilStundenBeforeAltersteilzeit($dienstverhaeltnis_id)
+	{
+		return $this->VertragsbestandteilModel->getLastVertragsbestanteilStundenBeforeAltersteilzeit($dienstverhaeltnis_id);
+	}
+
 	public function storeDienstverhaeltnis(Dienstverhaeltnis $dv)
 	{
 		if( intval($dv->getDienstverhaeltnis_id()) > 0 )
