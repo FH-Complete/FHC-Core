@@ -260,7 +260,7 @@ class StundenplanLib{
 		$ferienEvents = $this->_ci->FerienModel->execReadOnlyQuery("
 		SELECT * 
 		FROM lehre.tbl_ferien
-		WHERE (bisdatum BETWEEN ? AND ?) AND (studiengang_kz = 0 OR studiengang_kz = ?)
+		WHERE (bisdatum >= ? AND vondatum <= ?) AND (studiengang_kz = 0 OR studiengang_kz = ?)
 		",[$start_date, $end_date, $studiengang_kz]);
 
 		if (isError($ferienEvents)) {
