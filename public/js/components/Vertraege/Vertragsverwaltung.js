@@ -1,3 +1,4 @@
+import {CoreNavigationCmpt} from "../navigation/Navigation.js";
 import MitarbeiterHeader from "./MitarbeiterHeader.js";
 import FhcHeader from "../DetailHeader/DetailHeader.js";
 import VertraegeMitarbeiter from "./Vertraege.js";
@@ -8,6 +9,7 @@ import ApiCoreVertraege from '../../api/factory/vertraege/vertraege.js';
 export default {
 	name: 'Vertragsverwaltung',
 	components: {
+		CoreNavigationCmpt,
 		VerticalSplit,
 		MitarbeiterHeader,
 		FhcHeader,
@@ -38,9 +40,11 @@ export default {
 		}
 	},
 	template: `
-<div class="vv">
-	<div class="container-fluid overflow-hidden">
-			<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
+		<!-- Navigation component -->
+		<core-navigation-cmpt></core-navigation-cmpt>
+
+		<div class="vv">
+			<main>
 				<vertical-split ref="vsplit">
 					<template #top>	
 						<div class="d-flex flex-column" style="height: 100%;">
@@ -62,6 +66,5 @@ export default {
 				</vertical-split>
 			</main>	
 		</div>
-	</div>
-	`
+		`
 }

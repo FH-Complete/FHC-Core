@@ -6,7 +6,8 @@ $includesArray = array(
 	'fontawesome6' => true,
 	'vue3' => true,
 	'primevue3' => true,
-	#'filtercomponent' => true,
+	'filtercomponent' => true,
+	'navigationcomponent' => true,
 	'tabulator5' => true,
 	'tinymce5' => true,
 	'phrases' => array(
@@ -16,7 +17,7 @@ $includesArray = array(
 	'customCSSs' => [
 		'public/css/components/vue-datepicker.css',
 		'public/css/components/primevue.css',
-		'public/css/Vertragsverwaltung.css'
+		'public/css/Vertragsverwaltung.css',
 	],
 	'customJSs' => [
 		#'vendor/npm-asset/primevue/tree/tree.min.js',

@@ -53,7 +53,6 @@ export default {
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Bezeichnung", field: "bezeichnung", width: 150},
-					{title: "lehreinheit_id", field: "lehreinheit_id", visible: true},
 					{
 						title: "Betrag", field: "betrag", width: 150,
 						formatter: function (cell) {
@@ -144,9 +143,6 @@ export default {
 
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
 							title: this.$p.t('ui', 'bezeichnung')
-						});
-						cm.getColumnByField('lehreinheit_id').component.updateDefinition({
-							title: this.$p.t('ui', 'lehreinheit_id')
 						});
 						cm.getColumnByField('betrag').component.updateDefinition({
 							title: this.$p.t('ui', 'betrag')

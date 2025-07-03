@@ -14,3 +14,7 @@ html {
 .vv> div {
 	flex: 1 1 auto;
 }
+
+.vv {
+	margin-left: 0 !important;
+}

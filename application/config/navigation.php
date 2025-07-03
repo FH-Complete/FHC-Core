@@ -153,6 +153,13 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 50,
 					'requiredPermissions' => 'lehre/gruppenmanager:r'
+				),
+				'vertragsverwaltung' => array(
+					'link' => site_url('vertragsverwaltung'),
+					'description' => 'Vertragsverwaltung',
+					'expand' => true,
+					'sort' => 51,
+					'requiredPermissions' => 'vertrag/mitarbeiter:r'
 				)
 			)
 		),
