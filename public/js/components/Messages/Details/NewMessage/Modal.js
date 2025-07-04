@@ -153,17 +153,11 @@ export default {
 		insertVariable(selectedItem){
 			if (this.editor) {
 				this.editor.insertContent(selectedItem.value + " ");
-				//TODO(Manu) check: nicht mal mit Punkt adden gehts ohne eintrag nach vars
-				/*				this.editor.focus();
-								this.editor.setDirty(true);*/
 
-				//this.editor.fire('change'); //forces
-
-				//this.editor.undoManager.add();
-
-				//this.editor.insertContent(selectedItem.value + "\u00A0");
-				//this.editor.insertContent(`<span>${selectedItem.value}&nbsp;</span>`);
-				//this.editor.selection.setCursorLocation(this.editor.getBody(), 1);
+				this.editor.fire('input');
+				this.editor.fire('change');
+				this.editor.setDirty(true);
+				this.editor.save();
 
 			} else {
 				console.error("Editor instance is not available.");
