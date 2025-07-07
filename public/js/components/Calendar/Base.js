@@ -172,7 +172,7 @@ export default {
 		},
 		cDate: {
 			get() {
-				return this.internCurrentDate || luxon.DateTime.fromJSDate(new Date(this.date)).setZone(this.timezone);
+				return this.internCurrentDate || luxon.DateTime.fromJSDate(new Date(this.date)).setZone(this.timezone).setLocale(this.locale);
 			},
 			set(value) {
 				this.internCurrentDate = value;

@@ -1,12 +1,32 @@
-import CalendarDate from '../../../../helpers/Calendar/Date.js';
-
 export default {
 	name: "LabelTime",
-	inject: {
-		locale: "locale"
-	},
 	props: {
-		part: [Number, Object]
+		part: {
+			type: [luxon.Duration, Number, Object],
+			required: true,
+			validator(value) {
+				if (value instanceof Object) {
+					if (value instanceof luxon.Duration)
+						return true;
+					let start_ok = true;
+					let end_ok = true;
+					if (value.start) {
+						start_ok = (
+							value.start instanceof luxon.Duration
+							|| Number.isInteger(value.start)
+						);
+					}
+					if (value.end) {
+						end_ok = (
+							value.end instanceof luxon.Duration
+							|| Number.isInteger(value.end)
+						);
+					}
+					return start_ok && end_ok;
+				}
+				return true;
+			}
+		}
 	},
 	computed: {
 		sanitizedTimestamps() {
@@ -15,21 +35,17 @@ export default {
 		start() {
 			if (!this.sanitizedTimestamps.start)
 				return null;
-			return this.formatTime(new Date(this.sanitizedTimestamps.start));
+			return this.formatTime(this.sanitizedTimestamps.start);
 		},
 		end() {
 			if (!this.sanitizedTimestamps.end)
 				return null;
-			return this.formatTime(new Date(this.sanitizedTimestamps.end));
+			return this.formatTime(this.sanitizedTimestamps.end);
 		}
 	},
 	methods: {
 		formatTime(date) {
-			return CalendarDate.format(
-				date,
-				{ timeZone: 'UTC', hour: '2-digit', minute: '2-digit' },
-				this.locale
-			);
+			return date.toISOTime({ suppressSeconds: true });
 		}
 	},
 	template: `

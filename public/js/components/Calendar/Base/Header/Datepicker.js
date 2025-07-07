@@ -57,14 +57,14 @@ export default {
 			switch (this.view) {
 			case "month":
 				value.month++;
-				date = luxon.DateTime.fromObject(value).setZone(this.timezone, { keepLocalTime: true });
+				date = luxon.DateTime.fromObject(value).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
 				break;
 			case "list":
 			case "week":
-				date = luxon.DateTime.fromJSDate(value[0]).setZone(this.timezone, { keepLocalTime: true });
+				date = luxon.DateTime.fromJSDate(value[0]).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
 				break;
 			case "day":
-				date = luxon.DateTime.fromJSDate(value).setZone(this.timezone, { keepLocalTime: true });
+				date = luxon.DateTime.fromJSDate(value).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
 				break;
 			default:
 				return; // Don't update if the value is invalid!
@@ -79,7 +79,7 @@ export default {
 		:format="format"
 		:month-picker="view == 'month'"
 		:week-picker="view == 'week'"
-		:range="view == 'list' ? { autoRange: length } : null"
+		:range="view == 'list' ? { autoRange: length } : false"
 		:text-input="view == 'day'"
 		:week-numbers="{ type: 'iso' }"
 		:clearable="false"

@@ -22,8 +22,32 @@ export default {
 		};
 	},
 	props: {
-		axisMain: Array, // timestamps
-		axisParts: Array, // offset-timestamp or objects with start-offset-timestamp and optional end-offset-timestamp
+		axisMain: {
+			type: Array,
+			required: true,
+			validator(value) {
+				return value.every(item => item instanceof luxon.DateTime);
+			}
+		},
+		axisParts: {
+			type: Array,
+			required: true,
+			validator(value) {
+				return value.every(item => 
+					item instanceof luxon.Duration
+					|| Number.isInteger(item)
+					|| (
+						(
+							item.start instanceof luxon.Duration
+							|| Number.isInteger(item.start)
+						) && (
+							item.end instanceof luxon.Duration
+							|| Number.isInteger(item.end)
+						)
+					)
+				);
+			}
+		},
 		flipAxis: Boolean,
 		axisMainCollapsible: Boolean,
 		snapToGrid: Boolean
@@ -63,7 +87,7 @@ export default {
 				}
 
 				if (!end) {
-					res.push([start,index]);
+					res.push([start, index]);
 				} else {
 					res.push({
 						start,

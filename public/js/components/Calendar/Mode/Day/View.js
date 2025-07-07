@@ -27,26 +27,26 @@ export default {
 	},
 	computed: {
 		axisMain() {
-			return [this.day.startOf('day').toMillis()];
+			return [this.day.startOf('day')];
 		},
 		axisParts() {
 			if (this.timeGrid) {
 				// create {start, end} array
 				return this.timeGrid.map(tu => {
 					return {
-						start: luxon.Duration.fromISOTime(tu.start).toMillis(),
-						end: luxon.Duration.fromISOTime(tu.end).toMillis()
+						start: luxon.Duration.fromISOTime(tu.start),
+						end: luxon.Duration.fromISOTime(tu.end)
 					};
 				});
 			} else {
 				// create 07:00-23:00
-				return Array.from({ length: 17 }, (e, i) => luxon.Duration.fromObject({ hours: i + 7 }).toMillis());
+				return Array.from({ length: 17 }, (e, i) => luxon.Duration.fromObject({ hours: i + 7 }));
 			}
 		},
 		events() {
 			return this.originalEvents
-				.filter(event => event.start.ts < this.day.plus({ days: 1 }).ts && event.end.ts > this.day.ts)
-				.sort((a,b) => a.start.ts-b.start.ts)
+				.filter(event => event.start < this.day.plus({ days: 1 }) && event.end > this.day)
+				.sort((a, b) => a.start.ts - b.start.ts)
 				.map(evt => evt.orig);
 		},
 		currentEvent() {
@@ -76,13 +76,13 @@ export default {
 			:axis-parts="axisParts"
 			:snap-to-grid="!!timeGrid"
 		>
-			<template #main-header="{ timestamp }">
+			<template #main-header="{ date }">
 				<label-dow
 					@cal-click="evt => evt.detail.source = 'day'"
-					v-bind="{ timestamp }"
+					v-bind="{ date }"
 				/>
 				<label-day
-					v-bind="{ timestamp }"
+					v-bind="{ date }"
 				/>
 			</template>
 			<template #part-header="{ part }">

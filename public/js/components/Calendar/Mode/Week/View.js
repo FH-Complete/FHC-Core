@@ -3,8 +3,6 @@ import LabelDay from '../../Base/Label/Day.js';
 import LabelDow from '../../Base/Label/Dow.js';
 import LabelTime from '../../Base/Label/Time.js';
 
-import CalendarDate from '../../../../helpers/Calendar/Date.js';
-
 export default {
 	name: "WeekView",
 	components: {
@@ -31,20 +29,20 @@ export default {
 				.setZone(this.timezone, { keepLocalTime: true });
 		},
 		axisMain() {
-			return Array.from({ length: 7 }, (e, i) => this.start.plus({ days: i }).toMillis());
+			return Array.from({ length: 7 }, (e, i) => this.start.plus({ days: i }));
 		},
 		axisParts() {
 			if (this.timeGrid) {
 				// create {start, end} array
 				return this.timeGrid.map(tu => {
 					return {
-						start: luxon.Duration.fromISOTime(tu.start).toMillis(),
-						end: luxon.Duration.fromISOTime(tu.end).toMillis()
+						start: luxon.Duration.fromISOTime(tu.start),
+						end: luxon.Duration.fromISOTime(tu.end)
 					};
 				});
 			} else {
 				// create 07:00-23:00
-				return Array.from({ length: 17 }, (e, i) => luxon.Duration.fromObject({ hours: i + 7 }).toMillis());
+				return Array.from({ length: 17 }, (e, i) => luxon.Duration.fromObject({ hours: i + 7 }));
 			}
 		}
 	},
@@ -57,13 +55,15 @@ export default {
 
 			:snap-to-grid="!!timeGrid"
 		>
-			<template #main-header="{ timestamp }">
+			<template #main-header="{ date }">
 				<label-dow
-					v-bind="{ timestamp }"
+					v-bind="{ date }"
 					@cal-click="evt => evt.detail.source = 'day'"
+					class="text-center"
 				/>
 				<label-day
-					v-bind="{ timestamp }"
+					v-bind="{ date }"
+					class="text-center"
 				/>
 			</template>
 			<template #part-header="{ part }">

@@ -12,7 +12,13 @@ export default {
 		mode: "mode"
 	},
 	props: {
-		event: Object
+		event: {
+			type: Object,
+			required: true,
+			validator(value) {
+				return (value.start && value.end && value.orig);
+			}
+		}
 	},
 	computed: {
 		isHeaderOrFooter() {

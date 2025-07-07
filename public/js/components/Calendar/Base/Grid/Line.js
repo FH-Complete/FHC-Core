@@ -13,13 +13,12 @@ export default {
 		LineBackground
 	},
 	inject: {
-		locale: "locale",
 		axisRow: "axisRow"
 	},
 	props: {
-		start: Number,
-		end: Number,
-		timestamp: Number,
+		start: luxon.DateTime,
+		end: luxon.DateTime,
+		date: luxon.DateTime,
 		events: Array,
 		backgrounds: Array
 	},
@@ -45,19 +44,20 @@ export default {
 			return stops;
 		},
 		eventGrid() {
-			const perc = (this.end - this.start) / 100;
+			const perc = (this.end.ts - this.start.ts) / 100;
 
-			let last = this.start;
+			let last = this.start.ts;
 			const grid = this.stops.map(stop => {
 				let length = stop - last;
 				last = stop;
 				return length / perc + '%';
 			});
 
-			if (grid.filter((e, i, a) => a.indexOf(e) == i).length == 1) {
+			/*if (grid.filter((e, i, a) => a.indexOf(e) == i).length == 1) {
 				return Array.from({length: grid.length + 1}, () => '1fr').join(' ');
-			}
-
+			}*/
+			//return grid.join(' ') + ' ' + (this.end - last) / perc + '%';
+			
 			return grid.join(' ') + ' 1fr';
 		},
 		eventsWithRowInfo() {

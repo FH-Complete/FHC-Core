@@ -1,5 +1,3 @@
-import CalendarDate from '../../../../helpers/Calendar/Date.js';
-
 import CalClick from '../../../../directives/Calendar/Click.js';
 
 export default {
@@ -7,18 +5,16 @@ export default {
 	directives: {
 		CalClick
 	},
-	inject: {
-		locale: "locale",
-		timezone: "timezone"
-	},
 	props: {
-		timestamp: Number
+		date: {
+			type: luxon.DateTime,
+			required: true
+		}
 	},
 	computed: {
 		weeks() {
-			const someDay = luxon.DateTime.fromMillis(this.timestamp).setZone(this.timezone).setLocale(this.locale);
-			const firstDay = someDay.startOf('week');
-			const lastDay = someDay.endOf('week');
+			const firstDay = this.date.startOf('week');
+			const lastDay = this.date.endOf('week');
 			const weeks = [
 				{ number: firstDay.localWeekNumber, year: firstDay.localWeekYear },
 				{ number: lastDay.localWeekNumber, year: lastDay.localWeekYear }

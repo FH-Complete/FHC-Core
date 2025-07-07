@@ -1,8 +1,6 @@
 import LabelDay from '../../Base/Label/Day.js';
 import LabelDow from '../../Base/Label/Dow.js';
 
-import CalendarDate from '../../../../helpers/Calendar/Date.js';
-
 // TODO(chris): drag and drop
 
 export default {
@@ -47,8 +45,8 @@ export default {
 		<div v-if="!eventsPerDay.length">
 			<slot :event="undefined" mode="list" />
 		</div>
-		<div v-for="{ day, events } in eventsPerDay">
-			<label-dow :timestamp="day.ts" class="d-inline" />, <label-day :timestamp="day.ts" class="d-inline" />
+		<div v-for="{ day, events } in eventsPerDay" class="text-center">
+			<label-dow :date="day" class="d-inline" />, <label-day :date="day" class="d-inline" />
 			<div v-for="event in events">
 				<slot :event="event.orig" mode="list" />
 			</div>

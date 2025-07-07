@@ -52,14 +52,12 @@ export default {
 	computed: {
 		axisMain() {
 			const start = luxon.DateTime
-				.fromObject({ month: this.month, year: this.year })
-				.startOf('week')
-				.setZone(this.timezone, { keepLocalTime: true });
-			return Array.from({ length: 6 }, (e, i) => start.plus({ weeks: i }).toMillis());
+				.fromObject({ month: this.month, year: this.year }, { zone: this.timezone, locale: this.locale })
+				.startOf('week');
+			return Array.from({ length: 6 }, (e, i) => start.plus({ weeks: i }));
 		},
 		axisParts() {
-			const msPerDay = luxon.Duration.fromObject({ days: 1 }).toMillis();
-			return Array.from({ length: 8 }, (e, i) => i * msPerDay);
+			return Array.from({ length: 8 }, (e, i) => luxon.Duration.fromObject({ days: i }));
 		}
 	},
 	template: `
@@ -71,16 +69,17 @@ export default {
 
 			snap-to-grid
 		>
-			<template #main-header="{ timestamp }">
-				<label-week v-bind="{ timestamp }" />
+			<template #main-header="{ date }">
+				<label-week v-bind="{ date }" />
 			</template>
 			<template #part-header="{ part }">
-				<label-dow :timestamp="axisMain[0] + part" />
+				<label-dow :date="axisMain[0].plus(part)" class="text-center" />
 			</template>
 			<template #event="slot">
 				<label-day
 					v-if="slot.event.orig == 'header'"
-					:timestamp="slot.event.start.ts"
+					:date="slot.event.start"
+					class="text-center"
 					:class="{ disabled: month != slot.event.start.month }"
 				/>
 				<slot v-else v-bind="slot" />

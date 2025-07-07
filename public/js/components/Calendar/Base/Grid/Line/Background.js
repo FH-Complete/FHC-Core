@@ -4,22 +4,40 @@ export default {
 		flipAxis: "flipAxis"
 	},
 	props: {
-		start: Number,
-		end: Number,
-		background: Object
+		start: {
+			type: luxon.DateTime,
+			required: true
+		},
+		end: {
+			type: luxon.DateTime,
+			required: true
+		},
+		background: {
+			type: Object,
+			required: true,
+			validator(value) {
+				if (!value.start && !value.end)
+					return false;
+				if (value.start && !(value.start instanceof luxon.DateTime))
+					return false;
+				if (value.end && !(value.end instanceof luxon.DateTime))
+					return false;
+				return true;
+			}
+		}
 	},
 	computed: {
 		styles() {
 			if (!this.background.endsHere && !this.background.startsHere)
 				return this.background.style;
 
-			const perc = (this.end - this.start) / 100;
+			const perc = (this.end.ts - this.start.ts) / 100;
 			
 			let border = {};
 			if (this.background.startsHere)
-				border[this.flipAxis ? 'left' : 'top'] = (this.background.start - this.start) / perc + '%';
+				border[this.flipAxis ? 'left' : 'top'] = (this.background.start.diff(this.start)) / perc + '%';
 			if (this.background.endsHere)
-				border[this.flipAxis ? 'right' : 'bottom'] = (this.end - this.background.end) / perc + '%';
+				border[this.flipAxis ? 'right' : 'bottom'] = (this.end.diff(this.background.end)) / perc + '%';
 
 			if (!this.background.style)
 				return border;
