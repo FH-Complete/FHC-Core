@@ -607,6 +607,9 @@ export default {
 				this.expanded.includes(row.getData().uniqueindex)
 			);
 
+			if (matchingRows.length === 0)
+				this.currentTreeLevel = 0;
+
 			matchingRows.forEach((row, index) => {
 				row._row.modules.dataTree.open = true;
 
