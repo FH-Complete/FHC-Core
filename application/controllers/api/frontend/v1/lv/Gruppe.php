@@ -19,6 +19,13 @@ class Gruppe extends FHCAPI_Controller
 
 		$this->_ci = &get_instance();
 		$this->_setAuthUID();
+		$this->_ci->load->library('PhrasesLib');
+		$this->loadPhrases(
+			array(
+				'ui'
+			)
+		);
+
 		$this->_ci->load->model('organisation/Gruppe_model', 'GruppeModel');
 		$this->_ci->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
@@ -55,10 +62,6 @@ class Gruppe extends FHCAPI_Controller
 		$lehrverband = $this->input->post('lehrverband');
 
 		if (is_null($lehreinheit_id) || !ctype_digit((string)$lehreinheit_id) || is_null($gid) || !ctype_digit((string)$gid) || is_null($lehrverband))
-			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
-
-		$gruppe_result = $this->_ci->GruppeModel->loadWhere(array('gid' => $gid));
-		if (!hasData($gruppe_result) || isError($gruppe_result))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
 		$this->checkPermission($lehreinheit_id);

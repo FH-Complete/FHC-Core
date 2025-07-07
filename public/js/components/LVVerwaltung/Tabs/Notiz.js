@@ -19,7 +19,7 @@ export default {
 			class="overflow-hidden"
 			:endpoint="endpoint"
 			ref="formc"
-			notiz-layout="twoColumnsFormLeft"
+			notiz-layout="popupModal"
 			type-id="lehreinheit_id"
 			:id="modelValue.lehreinheit_id"
 			show-document

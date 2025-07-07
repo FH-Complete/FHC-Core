@@ -14,14 +14,17 @@ textarea[name="anmerkung"] {
 .lv_table_icon.icon-modul::before
 {
 	content: '\f468';
+	color: #4e4ed2;
 }
 
 .lv_table_icon.icon-lv::before
 {
 	content: '\f466';
+	color: black;
 }
 
 .lv_table_icon.icon-::before
 {
 	content: '\f073';
+	color: #f3c541;
 }

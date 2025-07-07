@@ -304,7 +304,7 @@ class Lehreinheitgruppe_model extends DB_Model
 		}
 		else if ($verband === true)
 		{
-			$gruppen_result = $this->_ci->LehrverbandModel->loadWhere(array('gid' => $gid));
+			$gruppen_result = $this->LehrverbandModel->loadWhere(array('gid' => $gid));
 
 			if (!hasData($gruppen_result))
 				return error('No group found for gid ' . $gid);
@@ -470,6 +470,6 @@ class Lehreinheitgruppe_model extends DB_Model
 								END AS verplant");
 		$this->addJoin('tbl_studiengang', 'studiengang_kz', 'LEFT');
 		$this->addJoin('public.tbl_gruppe', 'gruppe_kurzbz', 'LEFT');
-		return $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'tbl_gruppe.direktinskription' => false));
+		return $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
 	}
 }

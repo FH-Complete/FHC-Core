@@ -100,7 +100,6 @@ export default {
 			expanded: [],
 			selectedColumnValues: [],
 			tagEndpoint: ApiTag,
-			iconPath: FHC_JS_DATA_STORAGE_OBJECT.app_root + '/skin/images/lehrtyp_',
 			tabulatorEvents: [
 				{
 					event: 'rowSelectionChanged',
@@ -119,7 +118,8 @@ export default {
 					handler: (data) => {
 						this.getExpandedRows()
 					}
-				},{
+				},
+				{
 					event: 'dataTreeRowCollapsed',
 					handler: (data) => {
 						this.getExpandedRows()
@@ -157,19 +157,18 @@ export default {
 				initialSort:[
 					{column: 'lv_bezeichnung', dir: 'desc'},
 				],
+				dataTreeChildIndent: 20,
 				dataTreeElementColumn: "lv_kurzbz",
-				dataTreeFilter: true,
 				dataTreeStartExpanded: false,
 				dataTreeCollapseElement: '<i class="fa-solid fa-caret-down"></i>',
 				dataTreeExpandElement: '<i class="fa-solid fa-caret-right"></i>',
 				columnDefaults: {
 					tooltip: true,
 					headerFilter: "input",
-					headerFilterFunc: extendedHeaderFilter
+					headerFilterFunc: extendedHeaderFilter,
 				},
 				layout: 'fitDataStretch',
-				layoutColumnsOnNewData: false,
-				height: '100%',
+				persistenceID: 'lehrveranstaltungen_2025_07_07_v1',
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
 				rowContextMenu: (component, e) => {
@@ -217,7 +216,6 @@ export default {
 					];
 				},
 
-				persistenceID: 'lehrveranstaltungen_2025_05_27_v1',
 				columns: [
 					{
 						title: this.$p.t('lehre', 'kurzbz'),
@@ -303,44 +301,54 @@ export default {
 						width: 150,
 					},
 					{
+						title: this.$p.t('lehre', 'kurzbz'),
+						field: "lv_kurzbz_anzeige",
+						headerFilterFuncParams: {field: 'lv_kurzbz_anzeige'},
+						formatter: (cell, formatterParams) => {
+							let rowData = cell.getRow().getData();
+							return rowData?.lv_kurzbz?.toUpperCase();
+						},
+						headerFilter: true
+					},
+					{
 						title: this.$p.t('lehre', 'lehrveranstaltung_id'),
 						field: "lehrveranstaltung_id",
 						headerFilterFuncParams: {field: 'lehrveranstaltung_id'},
-						headerFilter: true
+						headerFilter: true,
+						visible: false
 					},
 					{title: this.$p.t('ui', 'bezeichnung'), field: "lv_bezeichnung", headerFilter: true, headerFilterFuncParams: {field: 'lv_bezeichnung'}},
-					{title: this.$p.t('lehre', 'bezeichnungeng'), field: "lv_bezeichnung_english", headerFilter: true, headerFilterFuncParams: {field: 'lv_bezeichnung_english'}},
+					{title: this.$p.t('lehre', 'bezeichnungeng'), field: "lv_bezeichnung_english", headerFilter: true, headerFilterFuncParams: {field: 'lv_bezeichnung_english'}, visible: false},
 					{
 						title: this.$p.t('lehre', 'studiengangskennzahlLehre'),
 						field: "lv_studiengang_kz",
 						headerFilter: true,
-						headerFilterFuncParams: {field: 'lv_studiengang_kz'}
+						headerFilterFuncParams: {field: 'lv_studiengang_kz'},
+						visible: false
 					},
-					{title: this.$p.t('lehre', 'studiengang'), field: "studiengang", headerFilter: true, headerFilterFuncParams: {field: 'studiengang'}},
+					{title: this.$p.t('lehre', 'studiengang'), field: "studiengang", headerFilter: true, headerFilterFuncParams: {field: 'studiengang'}, visible: false},
 					{title: this.$p.t('lehre', 'semester'), field: "semester", headerFilter: true, headerFilterFuncParams: {field: 'semester'}},
-					{title: this.$p.t('global', 'sprache'), field: "sprache", headerFilter: true, headerFilterFuncParams: {field: 'sprache'}},
-					{title: this.$p.t('lehre', 'ects'), field: "lv_ects", headerFilter: true, headerFilterFuncParams: {field: 'lv_ects'}},
-					{title: this.$p.t('lehre', 'semesterstunden'), field: "semesterstunden", headerFilter: true, headerFilterFuncParams: {field: 'semesterstunden'}},
-					{title: this.$p.t('global', 'anmerkung'), field: "anmerkung", headerFilter: true, headerFilterFuncParams: {field: 'anmerkung'}},
-					{title: this.$p.t('lehre', 'lehre'), field: "lehre", headerFilter: true, headerFilterFuncParams: {field: 'lehre'}},
-					{title: "Lehreverzeichnis", field: "lehreverzeichnis", headerFilter: true, headerFilterFuncParams: {field: 'lehreverzeichnis'}},
-					{title: this.$p.t('person', 'aktiv'), field: "aktiv", headerFilter: true, headerFilterFuncParams: {field: 'aktiv'}},
-					{title: "Planfaktor", field: "planfaktor", headerFilter: true, headerFilterFuncParams: {field: 'planfaktor'}},
-					{title: "Planlektoren", field: "planlektoren", headerFilter: true, headerFilterFuncParams: {field: 'planlektoren'}},
-					{title: "planpersonalkosten", field: "planpersonalkosten", headerFilter: true, headerFilterFuncParams: {field: 'planpersonalkosten'}},
-					{title: "plankostenprolektor", field: "plankostenprolektor", headerFilter: true, headerFilterFuncParams: {field: 'plankostenprolektor'}},
-					{title: this.$p.t('ui', 'organisationsform'), field: "orgform_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'orgform_kurzbz'}},
-					{title: this.$p.t('ui', 'studienplan_id'), field: "studienplan_id", headerFilter: true, headerFilterFuncParams: {field: 'studienplan_id'}},
-					{title: "studienplan_bezeichnung", field: "studienplan_bezeichnung", headerFilter: true, headerFilterFuncParams: {field: 'studienplan_bezeichnung'}},
-					{title: "lehrtyp_kurzbz", field: "lehrtyp_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'lehrtyp_kurzbz'}},
+					{title: this.$p.t('global', 'sprache'), field: "sprache", headerFilter: true, headerFilterFuncParams: {field: 'sprache'}, visible: false},
+					{title: this.$p.t('lehre', 'ects'), field: "lv_ects", headerFilter: true, headerFilterFuncParams: {field: 'lv_ects'}, visible: false},
+					{title: this.$p.t('lehre', 'semesterstunden'), field: "semesterstunden", headerFilter: true, headerFilterFuncParams: {field: 'semesterstunden'}, visible: false},
+					{title: this.$p.t('global', 'anmerkung'), field: "anmerkung", headerFilter: true, headerFilterFuncParams: {field: 'anmerkung'}, visible: false},
+					{title: this.$p.t('lehre', 'lehre'), field: "lehre", headerFilter: true, headerFilterFuncParams: {field: 'lehre'}, formatter: (cell) => cell.getValue() ? this.toUpperCase(this.$p.t('ui', 'ja')) : this.toUpperCase(this.$p.t('ui', 'nein')), visible: false},
+					{title: this.$p.t('person', 'aktiv'), field: "aktiv", headerFilter: true, headerFilterFuncParams: {field: 'aktiv'}, formatter: (cell) => cell.getValue() ? this.toUpperCase(this.$p.t('ui', 'ja')) : this.toUpperCase(this.$p.t('ui', 'nein')), visible: false},
+					{title: this.$p.t('lehre', 'organisationsform'), field: "orgform_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'orgform_kurzbz'}},
+					{title: this.$p.t('ui', 'studienplan_id'), field: "studienplan_id", headerFilter: true, headerFilterFuncParams: {field: 'studienplan_id'}, visible: false},
+					{title: this.$p.t('lehre', 'studienplan'), field: "studienplan_bezeichnung", headerFilter: true, headerFilterFuncParams: {field: 'studienplan_bezeichnung'}, visible: false},
+					{title: this.$p.t('lehre', 'lehrtyp'), field: "lehrtyp_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'lehrtyp_kurzbz'}, visible: false},
 					{title: this.$p.t('lehre', 'lehrform'), field: "lehrform_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'lehrform_kurzbz'}},
-					{title: this.$p.t('lehre', 'leplanstunden'), field: "le_planstunden", headerFilter: true, headerFilterFuncParams: {field: 'le_planstunden'}},
-					{title: this.$p.t('lehre', 'lehreinheit_id'), field: "lehreinheit_id", headerFilter: true, headerFilterFuncParams: {field: 'lehreinheit_id'}},
-					{title: this.$p.t('lehre', 'stundenblockung'), field: "stundenblockung", headerFilter: true, headerFilterFuncParams: {field: 'stundenblockung'}},
-					{title: this.$p.t('lehre', 'wochenrhytmus'), field: "wochenrythmus", headerFilter: true, headerFilterFuncParams: {field: 'wochenrythmus'}},
-					{title: this.$p.t('lehre', 'startkw'), field: "startkw", headerFilter: true, headerFilterFuncParams: {field: 'startkw'}},
-					{title: this.$p.t('lehre', 'raumtyp'), field: "raumtyp", headerFilter: true, headerFilterFuncParams: {field: 'raumtyp'}},
-					{title: this.$p.t('lehre', 'raumtypalternativ'), field: "raumtypalternativ", headerFilter: true, headerFilterFuncParams: {field: 'raumtypalternativ'}},
+					{title: this.$p.t('lehre', 'leplanstunden'), field: "le_planstunden", headerFilter: true, headerFilterFuncParams: {field: 'le_planstunden'}, visible: false},
+					{title: this.$p.t('lehre', 'lehreinheit_id'), field: "lehreinheit_id", headerFilter: true, headerFilterFuncParams: {field: 'lehreinheit_id'}, visible: false},
+					{title: this.$p.t('lehre', 'studiensemester'), field: "studiensemester_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'studiensemester_kurzbz'}, visible: false},
+					{title: this.$p.t('lehre', 'unr'), field: "unr", headerFilter: true, headerFilterFuncParams: {field: 'unr'}, visible: false},
+					{title: this.$p.t('lehre', 'fachbereich'), field: "fachbereich", headerFilter: true, headerFilterFuncParams: {field: 'fachbereich'}, visible: false},
+					{title: this.$p.t('lehre', 'stundenblockung'), field: "stundenblockung", headerFilter: true, headerFilterFuncParams: {field: 'stundenblockung'}, visible: false},
+					{title: this.$p.t('lehre', 'wochenrhythmus'), field: "wochenrythmus", headerFilter: true, headerFilterFuncParams: {field: 'wochenrythmus'}, visible: false},
+					{title: this.$p.t('lehre', 'startkw'), field: "start_kw", headerFilter: true, headerFilterFuncParams: {field: 'startkw'}, visible: false},
+					{title: this.$p.t('lehre', 'raumtyp'), field: "raumtyp", headerFilter: true, headerFilterFuncParams: {field: 'raumtyp'}, visible: false},
+					{title: this.$p.t('lehre', 'raumtypalternativ'), field: "raumtypalternativ", headerFilter: true, headerFilterFuncParams: {field: 'raumtypalternativ'}, visible: false},
 					{title: this.$p.t('lehre', 'gruppen'), field: "gruppen", headerFilter: true, headerFilterFuncParams: {field: 'gruppen'}},
 					{title: this.$p.t('lehre', 'lehrende'), field: "lektoren", headerFilter: true, headerFilterFuncParams: {field: 'lektoren'}},
 				],
@@ -359,6 +367,11 @@ export default {
 		shouldAutoLoad() {
 			return this.filter && this.filter.activeFilter;
 		},
+		toUpperCase(str) {
+			if (!str)
+				return '';
+			return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+		},
 		async reload()
 		{
 
@@ -369,7 +382,7 @@ export default {
 		},
 		rowSelectionChanged(data) {
 			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
-			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().lehreinheit_id !== undefined).map(row => row.getData().lehreinheit_id);
+			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().lehreinheit_id !== undefined && row.getData().lehreinheit_id).map(row => row.getData().lehreinheit_id);
 
 			if (data[0]?.lehreinheit_id !== undefined && this.selectedColumnValues.length === 1)
 			{
@@ -471,9 +484,7 @@ export default {
 				if (Array.isArray(addedTag.response))
 				{
 					addedTag.response.forEach(tag => {
-
-						const all = this.getAllRows(table.getRows());
-						const targetRow = all.find(row => row.getData().lehreinheit_id === tag.lehreinheit_id);
+						const targetRow = this.allRows.find(row => row.getData().lehreinheit_id === tag.lehreinheit_id);
 						if (targetRow)
 						{
 							const rowData = targetRow.getData();
@@ -496,10 +507,7 @@ export default {
 			});
 		},
 		deletedTag(deletedTag) {
-			const table = this.$refs.table.tabulator;
-			const all = this.getAllRows(table.getRows());
-
-			const targetRow = all.find(row => {
+			const targetRow = this.allRows.find(row => {
 				const rowData = row.getData();
 
 				let tags = [];
@@ -532,10 +540,7 @@ export default {
 		},
 
 		updatedTag(updatedTag) {
-			const table = this.$refs.table.tabulator;
-			const all = this.getAllRows(table.getRows());
-
-			const targetRow = all.find(row => {
+			const targetRow = this.allRows.find(row => {
 				const rowData = row.getData();
 				let tags = [];
 
@@ -587,9 +592,8 @@ export default {
 
 		async getExpandedRows() {
 			this.expanded = [];
-			let rows = this.$refs.table.tabulator.getRows();
-			let allRows = this.getAllRows(rows);
-			allRows.forEach(row => {
+
+			this.allRows.forEach(row => {
 				if (row.getTreeChildren().length > 0 && row.isTreeExpanded())
 				{
 					this.expanded.push(row.getData().uniqueindex);
@@ -597,9 +601,9 @@ export default {
 			});
 		},
 		reexpandRows() {
-			const all = this.getAllRows(this.$refs.table.tabulator.getRows());
+			this.allRows = this.getAllRows(this.$refs.table.tabulator.getRows());
 
-			const matchingRows = all.filter(row =>
+			const matchingRows = this.allRows.filter(row =>
 				this.expanded.includes(row.getData().uniqueindex)
 			);
 
@@ -637,6 +641,39 @@ export default {
 			});
 			return result;
 		},
+		resetTree() {
+			this.allRows.forEach(row => {
+				row._row.modules.dataTree.open = false;
+			});
+
+			let rootRows = this.$refs.table.tabulator.getRows(true);
+			var lastRow = rootRows[rootRows.length - 1];
+			lastRow.treeCollapse(true)
+
+			this.currentTreeLevel = 0;
+		},
+		expandTree()
+		{
+			this.currentTreeLevel = (this.currentTreeLevel || 0) + 1;
+
+			let lastMatchingRow = null;
+
+			this.allRows.forEach(row => {
+				const level = row._row.modules.dataTree?.index ?? 0;
+
+				if (level === this.currentTreeLevel - 1 )
+				{
+					row._row.modules.dataTree.open = true;
+					lastMatchingRow = row;
+				}
+			});
+
+			if (lastMatchingRow)
+			{
+				lastMatchingRow.treeExpand();
+			}
+			this.$refs.table.tabulator.redraw();
+		},
 	},
 	template: `
 	<core-filter-cmpt
@@ -660,6 +697,8 @@ export default {
 				@updated="updatedTag"
 				zuordnung_typ="lehreinheit_id"
 			></core-tag>
+			<button @click="expandTree" class="btn btn-outline-secondary" type="button"><i class="fa-solid fa-maximize"></i></button>
+			<button @click="resetTree" class="btn btn-outline-secondary" type="button"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
 		</template>
 		<template #search>
 			<slot name="filterzuruecksetzen"></slot>

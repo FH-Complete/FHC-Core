@@ -186,7 +186,7 @@ export default {
 				: this.$route.params.stg;
 		}
 
-		this.$p.loadCategory(['lehre', 'person'])
+		this.$p.loadCategory(['lehre', 'person', 'global'])
 
 		this.$api.call(ApiDetails.getStudiensemester())
 			.then(result => {

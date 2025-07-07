@@ -164,7 +164,6 @@ class Lehreinheit extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
-
 		$updateData = array();
 		foreach ($updatableFields as $field)
 		{
@@ -182,6 +181,12 @@ class Lehreinheit extends FHCAPI_Controller
 		$result = $this->_ci->LehreinheitModel->insert(
 			$updateData
 		);
+
+		if (!isset($updateData['unr']))
+		{
+			$unr = getData($result);
+			$this->_ci->LehreinheitModel->update($unr, array('unr' => $unr));
+		}
 
 		$this->terminateWithSuccess($result);
 	}
