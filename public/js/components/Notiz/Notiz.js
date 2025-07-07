@@ -173,12 +173,12 @@ export default {
 						},
 						frozen: true
 					}],
-				layout: 'fitColumns',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
-				responsiveLayout: "collapse",
-				height: '200',
-				selectableRangeMode: 'click',
-				selectable: true,
+				//responsiveLayout: "collapse",
+				maxHeight: '200px',
+				//selectableRangeMode: 'click',
+				//selectable: true,
 				index: 'notiz_id',
 				persistenceID: 'core-notiz'
 			},
@@ -576,16 +576,14 @@ export default {
 			<form-form ref="formNotiz" @submit.prevent class="row">
 
 				<div class="pt-2">
-					<div class="row mb-3">
-						<div class="col-sm-7">
-							<span class="small">[{{notizData.typeId}}]</span>
-						</div>
-					</div>
 					
-					<div class="row mb-3">
+					<div class="row mt-4 mb-1">
 						<div class="col-sm-7">
-							<p v-if="notizData.statusNew" class="fw-bold"> {{$p.t('notiz','notiz_new')}}</p>
-							<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}}</p>
+							<p>
+								<span v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}}</span>
+								<span v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}}</span>
+								<span class="small"> [{{notizData.typeId}}]</span>
+							</p>
 						</div>
 					</div>
 		

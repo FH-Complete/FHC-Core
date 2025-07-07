@@ -162,7 +162,7 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitColumns',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 300,
 				selectable: true,
