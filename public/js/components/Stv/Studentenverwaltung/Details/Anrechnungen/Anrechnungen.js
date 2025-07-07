@@ -306,7 +306,7 @@ export default {
 	template: `
 				<div class="stv-details-tab_exemptions h-100 pb-3">
 
-					<bs-modal ref="anrechnungsnotizModal" dialog-class="modal-dialog-scrollable modal-xl">
+					<bs-modal ref="anrechnungsnotizModal" dialog-class="modal-dialog-scrollable modal-xl" body-class="p-0">
 
 						<template #title>
 							<h5>
@@ -315,7 +315,7 @@ export default {
 							</h5>
 						</template>
 
-						<div v-if="showNotizen" class="border p-3 overflow-auto" style="height: 800px;">
+						<div v-if="showNotizen" class="border p-3 overflow-auto" style="height: 825px;">
 							<core-notiz
 										:endpoint="endpoint"
 										ref="formNotes"
@@ -327,9 +327,9 @@ export default {
 										:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
 										@reload="handleReload"
 										>
-								</core-notiz>
-							</bs-modal>
+							</core-notiz>
 						</div>
+					</bs-modal>
 					
 					<template v-if="config.editableAnrechnungen" >
 						<core-filter-cmpt

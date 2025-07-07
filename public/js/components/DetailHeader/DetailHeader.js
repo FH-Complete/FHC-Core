@@ -110,8 +110,7 @@ export default {
 					<div
 						v-for="person in headerData"
 						:key="person.person_id"
-						class="d-flex flex-column align-items-center h-100"
-						class="position-relative d-inline-block"
+						class="d-flex flex-column align-items-center h-100 position-relative d-inline-block"
 					>
 						<img
 						  class="d-block h-100 rounded"
@@ -162,7 +161,6 @@ export default {
 					  </h5>
 
 					</div>
-				</div>
 		</template>
 
 		<template v-if="typeHeader==='mitarbeiter'">
