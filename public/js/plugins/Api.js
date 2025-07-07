@@ -6,7 +6,9 @@ export default {
 		if (app.config.globalProperties.$api) {
 			return;
 		}
-		app.use(FhcAlert);
+
+		if (!app.config.globalProperties.$fhcAlert)
+			app.use(FhcAlert);
 
 		function _get_config(form, uri, data, config) {
 			if (typeof form == 'string' && config === undefined) {
