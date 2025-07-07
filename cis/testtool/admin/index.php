@@ -65,7 +65,7 @@ if (isset($_GET['nummer']))
 }
 else
 {
-	$nummer = '';
+	$nummer = '0';
 }
 
 if (isset($_GET['frage_id']))
@@ -944,44 +944,83 @@ if (($anzahl !== 0) || ($stg_kz == '-1') && ($stg_kz !== ''))
 					<a href="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=aktiv">
 					<input type="checkbox" name="inaktiv" '.$inaktivchecked.' onclick="window.location.assign(\''.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=aktiv\');"/>inaktiv</a>';
 		}
-		echo '<br/><table class="nummern" style="display: inline-table;"><tbody><tr>
-				<td>Nummer:</td>';
-		foreach ($resultArray AS $key=>$value)
-		{
-			if ($nummer == '')
-				$nummer = $value['nummer'];
+		echo '<br/>';
 
-			$style = '';
-			if ($db->db_parse_bool($value['aktiv']) == false)
-				$style = 'style="color: lightgrey"';
+		$counter = 0;
+		$maxPerTable = 50;
+		$totalItems = count($resultArray);
 
-			$styleSelected = '';
-			if ($nummer == $value['nummer'])
-			{
-				$styleSelected = 'style="background-color: lightblue"';
-			}
+		// Erste Tabelle öffnen
+		echo '<table class="nummern" style="display: inline-table; margin-bottom: 10px;"><tbody><tr>
+		            <td>Nummer:</td>';
 
-			echo '<td class="nummern" '.$styleSelected.'><a href="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$value['nummer'].'&amp;filter='.$filter.'" '.$style.'>'.$value['nummer'].'</a></td>';
+		foreach ($resultArray AS $key=>$value) {
+		    // Neue Tabelle starten, wenn 50 Einträge erreicht sind
+		    if ($counter > 0 && $counter % $maxPerTable == 0) {
+		        // Aktuelle Tabelle schließen
+		        echo '</tr><tr><td>Level:</td>';
+
+		        // Level-Zeile für die vorherigen Einträge
+		        $startIndex = $counter - $maxPerTable;
+		        $endIndex = $counter;
+		        $tempArray = array_slice($resultArray, $startIndex, $maxPerTable, true);
+
+		        foreach ($tempArray AS $tempKey=>$tempValue) {
+		            $leveltext = '';
+		            if ($tempValue['level'] == '') {
+		                $leveltext = '-';
+		            } else {
+		                $leveltext = $tempValue['level'];
+		                if ($tempValue['demo'] == 't') {
+		                    $leveltext .= '*';
+		                }
+		            }
+		            echo '<td class="nummern" style="color: grey">'.$leveltext.'</td>';
+		        }
+
+		        echo '</tr></tbody></table><br/>';
+
+		        // Neue Tabelle starten
+		        echo '<table class="nummern" style="display: inline-table; margin-bottom: 10px;"><tbody><tr>
+		                    <td>Nummer:</td>';
+		    }
+
+		    if ($nummer == '')
+		        $nummer = $value['nummer'];
+		    $style = '';
+		    if ($db->db_parse_bool($value['aktiv']) == false)
+		        $style = 'style="color: lightgrey"';
+		    $styleSelected = '';
+		    if ($nummer == $value['nummer']) {
+		        $styleSelected = 'style="background-color: lightblue"';
+		    }
+		    echo '<td class="nummern" '.$styleSelected.'><a href="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$value['nummer'].'&amp;filter='.$filter.'" '.$style.'>'.$value['nummer'].'</a></td>';
+
+		    $counter++;
 		}
-		echo '</tr><tr>
-				<td>Level:</td>';
-		$leveltext = '';
-		foreach ($resultArray AS $key=>$value)
-		{
-			if ($value['level'] == '')
-			{
-				$leveltext = '-';
-			}
-			else
-			{
-				$leveltext = $value['level'];
-				if ($value['demo'] == 't')
-				{
-					$leveltext .= '*';
-				}
-			}
-			echo '<td class="nummern" style="color: grey">'.$leveltext.'</td>';
+
+		// Letzte Tabelle schließen
+		echo '</tr><tr><td>Level:</td>';
+
+		// Level-Zeile für die letzten Einträge
+		$remainingItems = $counter % $maxPerTable;
+		if ($remainingItems == 0) $remainingItems = $maxPerTable;
+		$startIndex = $counter - $remainingItems;
+		$tempArray = array_slice($resultArray, $startIndex, $remainingItems, true);
+
+		foreach ($tempArray AS $tempKey=>$tempValue) {
+		    $leveltext = '';
+		    if ($tempValue['level'] == '') {
+		        $leveltext = '-';
+		    } else {
+		        $leveltext = $tempValue['level'];
+		        if ($tempValue['demo'] == 't') {
+		            $leveltext .= '*';
+		        }
+		    }
+		    echo '<td class="nummern" style="color: grey">'.$leveltext.'</td>';
 		}
+
 		echo '</tr></tbody></table>';
 		echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;type=neuefrage&amp;filter=$filter' class='Item'>neue Frage hinzufuegen</a>";
 		$frage_obj = new frage();
