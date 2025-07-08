@@ -12,21 +12,18 @@ export default {
 		LabelTime
 	},
 	inject: {
-		locale: "locale",
-		timezone: "timezone",
 		timeGrid: "timeGrid",
 		collapseEmptyDays: "collapseEmptyDays"
 	},
 	props: {
-		year: Number,
-		week: Number
+		day: {
+			type: luxon.DateTime,
+			required: true
+		}
 	},
 	computed: {
 		start() {
-			return luxon.DateTime
-				.fromObject({ localWeekNumber: this.week, localWeekYear: this.year }, { locale: this.locale })
-				.startOf('week')
-				.setZone(this.timezone, { keepLocalTime: true });
+			return this.day.startOf('week');
 		},
 		axisMain() {
 			return Array.from({ length: 7 }, (e, i) => this.start.plus({ days: i }));

@@ -1,5 +1,4 @@
 import BaseSlider from '../Base/Slider.js';
-//import PickerWeek from '../Picker/Week.js';
 import WeekView from './Week/View.js';
 
 import CalendarDate from '../../../helpers/Calendar/Date.js';
@@ -12,12 +11,10 @@ export default {
 	name: "ModeWeek",
 	components: {
 		BaseSlider,
-		//PickerWeek,
 		WeekView
 	},
 	inject: {
 		locale: "locale",
-		timezone: "timezone",
 		title: "title"
 	},
 	props: {
@@ -34,7 +31,7 @@ export default {
 	],
 	data() {
 		return {
-			focusDate: luxon.DateTime.fromMillis(this.currentDate.ts).setZone(this.timezone),
+			focusDate: this.currentDate,
 			rangeOffset: 0
 		};
 	},
@@ -87,11 +84,8 @@ export default {
 			this.$emit('update:range', this.range);
 		},
 		viewAttrs(weeks) {
-			const showDate = this.focusDate.plus({ weeks });
-			return {
-				week: showDate.localWeekNumber,
-				year: showDate.localWeekYear
-			}
+			const day = this.focusDate.plus({ weeks });
+			return { day };
 		},
 		handleClickDefaults(evt) {
 			switch (evt.detail.source) {

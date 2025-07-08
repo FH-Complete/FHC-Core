@@ -15,7 +15,6 @@ export default {
 	},
 	inject: {
 		locale: "locale",
-		timezone: "timezone",
 		title: "title"
 	},
 	props: {
@@ -32,7 +31,7 @@ export default {
 	],
 	data() {
 		return {
-			focusDate: luxon.DateTime.fromMillis(this.currentDate.ts).setZone(this.timezone),
+			focusDate: this.currentDate,
 			rangeOffset: 0
 		};
 	},
@@ -87,11 +86,8 @@ export default {
 			this.$emit('update:range', this.range);
 		},
 		viewAttrs(months) {
-			const showDate = this.focusDate.plus({ months });
-			return {
-				month: showDate.month,
-				year: showDate.year
-			}
+			const day = this.focusDate.plus({ months });
+			return { day };
 		},
 		handleClickDefaults(evt) {
 			switch (evt.detail.source) {

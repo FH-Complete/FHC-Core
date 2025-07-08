@@ -27,8 +27,7 @@ export default {
 				});
 				for (var w = 5; w > -1; w--) {
 					for (var d = 6; d > -1; d--) {
-						const start = this.axisMain[w] + this.axisParts[d];
-						const startdate = luxon.DateTime.fromMillis(start).setZone(this.timezone);
+						const startdate = this.axisMain[w].plus(this.axisParts[d]);
 						events.unshift({
 							start: startdate,
 							end: startdate.plus({ days: 1 }),
@@ -41,19 +40,17 @@ export default {
 		};
 	},
 	inject: {
-		locale: "locale",
-		timezone: "timezone",
 		events: "events"
 	},
 	props: {
-		year: Number,
-		month: Number
+		day: {
+			type: luxon.DateTime,
+			required: true
+		}
 	},
 	computed: {
 		axisMain() {
-			const start = luxon.DateTime
-				.fromObject({ month: this.month, year: this.year }, { zone: this.timezone, locale: this.locale })
-				.startOf('week');
+			const start = this.day.startOf('month').startOf('week');
 			return Array.from({ length: 6 }, (e, i) => start.plus({ weeks: i }));
 		},
 		axisParts() {
@@ -80,7 +77,7 @@ export default {
 					v-if="slot.event.orig == 'header'"
 					:date="slot.event.start"
 					class="text-center"
-					:class="{ disabled: month != slot.event.start.month }"
+					:class="{ disabled: day.month != slot.event.start.month }"
 				/>
 				<slot v-else v-bind="slot" />
 			</template>

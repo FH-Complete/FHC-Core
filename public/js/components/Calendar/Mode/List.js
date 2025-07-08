@@ -81,11 +81,8 @@ export default {
 			this.$emit('update:range', this.range);
 		},
 		viewAttrs(offset) {
-			const showDate = this.focusDate.plus({ days: offset * this.length });
-			return {
-				day: showDate,
-				length: this.length
-			}
+			const day = this.focusDate.plus({ days: offset * this.length });
+			return { day, length: this.length };
 		}
 	},
 	created() {
