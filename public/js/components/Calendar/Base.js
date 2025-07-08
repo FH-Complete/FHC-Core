@@ -145,7 +145,12 @@ export default {
 	},
 	computed: {
 		convertedEvents() {
-			return this.events.map(CalendarEvent.smartConvert);
+			return this.events.map(orig => ({
+				id: orig.type + orig[orig.type + '_id'],
+				start: luxon.DateTime.fromISO(orig.isostart).setZone(this.timezone),
+				end: luxon.DateTime.fromISO(orig.isoend).setZone(this.timezone),
+				orig
+			}));
 		},
 		convertedBackgrounds() {
 			return this.backgrounds.map(bg => {

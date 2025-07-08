@@ -240,6 +240,12 @@ class Stundenplan extends FHCAPI_Controller
 
 		foreach ($data as $item)
 		{
+			$tz = new DateTimeZone('Europe/Vienna');
+			$isostart = new DateTime($item->datum . ' ' . $item->beginn, $tz);
+			$item->isostart = $isostart->format(DateTime::ATOM);
+
+			$isoend = new DateTime($item->datum . ' ' . $item->ende, $tz);
+			$item->isoend = $isoend->format(DateTime::ATOM);
 
 			$lektor_obj_array = array();
 			$gruppe_obj_array = array();
