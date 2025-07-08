@@ -42,7 +42,8 @@ export default {
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Projektarbeit ID", field: "projektarbeit_id", visible: false},
-					{title: "Typ", field: "projekttyp_kurzbz"},
+					{title: "Typ", field: "bezeichnung"},
+					{title: "Typ Kurzbz", field: "projekttyp_kurzbz", visible: false},
 					{title: "Studiensemester", field: "studiensemester_kurzbz"},
 					{title: "Titel", field: "titel"},
 					{
@@ -179,6 +180,10 @@ export default {
 				minHeight: '200',
 				selectable: 1,
 				index: 'projektarbeit_id',
+				//persistenceMode:"cookie",
+				//~ persistence:{
+					//~ columns: true, //persist column layout
+				//~ },
 				persistenceID: 'stv-details-projektarbeit'
 			},
 			tabulatorEvents: [
@@ -324,8 +329,6 @@ export default {
 		reload() {
 			this.$refs.table.reloadTable();
 		}
-	},
-	created() {
 	},
 	template: `
 	<div class="stv-details-projektarbeit h-100 pb-3">

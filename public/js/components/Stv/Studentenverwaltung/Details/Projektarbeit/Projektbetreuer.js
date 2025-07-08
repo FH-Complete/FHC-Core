@@ -386,8 +386,8 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 		},
 		// disable fields which are dependent on Vertrag status
-		disableVertragFields(disabled) {
-			this.vertragFieldsDisabled = disabled;
+		disableVertragFields(statusAkzeptiert) {
+			this.vertragFieldsDisabled = statusAkzeptiert;
 		}
 	},
 	template: `
@@ -428,10 +428,10 @@ export default {
 
 				<div class="row mb-3">
 					<div class="col-6">
-						<button class="btn btn-primary" @click="actionNewPerson">{{ $p.t('projektarbeit', 'neuePersonAnlegen') }}</button>
+						<button class="btn btn-outline-secondary" @click="actionNewPerson">{{ $p.t('projektarbeit', 'neuePersonAnlegen') }}</button>
 					</div>
 					<div class="col-6">
-						<button class="btn btn-primary float-end" @click="actionKontaktdatenBearbeiten">{{ $p.t('projektarbeit', 'kontaktdatenBearbeiten') }}</button>
+						<button class="btn btn-outline-secondary float-end" @click="actionKontaktdatenBearbeiten">{{ $p.t('projektarbeit', 'kontaktdatenBearbeiten') }}</button>
 					</div>
 				</div>
 

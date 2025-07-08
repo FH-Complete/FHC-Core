@@ -86,8 +86,8 @@ class Projektarbeit extends FHCAPI_Controller
 		if (!isset($projektarbeit_id) || !is_numeric($projektarbeit_id)) return $this->terminateWithError('Projektarbeit Id missing', self::ERROR_TYPE_GENERAL);
 
 		$this->ProjektarbeitModel->addSelect(
-			'lehre.tbl_projektarbeit.projektarbeit_id, titel, titel_english, themenbereich, projekttyp_kurzbz, firma_id,
-			lehrveranstaltung_id, lehreinheit_id, beginn, note, final, freigegeben, tbl_projektarbeit.anmerkung, fa.name AS firma_name'
+			'lehre.tbl_projektarbeit.projektarbeit_id, titel, titel_english, themenbereich, projekttyp_kurzbz, lehrveranstaltung_id, lehreinheit_id, 
+			firma_id, beginn, ende, gesperrtbis, note, final, freigegeben, tbl_projektarbeit.anmerkung, fa.name AS firma_name'
 		);
 		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
 		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
@@ -285,6 +285,14 @@ class Projektarbeit extends FHCAPI_Controller
 			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Beginn'])
 		]);
 
+		$this->form_validation->set_rules('ende', 'Ende', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Ende'])
+		]);
+
+		$this->form_validation->set_rules('gesperrtbis', 'Ende', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_notValidDate', ['field' => 'Gesperrt bis'])
+		]);
+
 		return $this->form_validation->run();
 	}
 
@@ -303,6 +311,7 @@ class Projektarbeit extends FHCAPI_Controller
 			'firma_id' => $formData['firma_id'] ?? null,
 			'lehreinheit_id' => $formData['lehreinheit_id'],
 			'beginn' => $formData['beginn'] ?? null,
+			'ende' => $formData['ende'] ?? null,
 			'note' => $formData['note'] ?? null,
 			'final' => $formData['final'] ?? null,
 			'freigegeben' => $formData['freigegeben'] ?? null,

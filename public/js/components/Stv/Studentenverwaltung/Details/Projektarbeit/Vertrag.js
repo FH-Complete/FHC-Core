@@ -35,7 +35,7 @@ export default{
 			// status names for stages of Vertrag ("constants")
 			vertragsstatus_akzeptiert: 'Akzeptiert',
 			vertragsstatus_geaendert:'Geändert',
-			vertragsstatus_storniert: 'Storniert',
+			vertragsstatus_storniert: 'Storno'
 		}
 	},
 	watch: {
@@ -43,7 +43,7 @@ export default{
 		{
 			//deep: true,
 			handler(newVal, oldVal) {
-				this.setDefaultData();
+				this.resetForm();
 				if (newVal !== null && newVal !== undefined) this.getVertrag();
 			}
 		},
@@ -82,7 +82,9 @@ export default{
 
 			this.$api.call(ApiVertrag.getVertrag(this.vertrag_id))
 				.then(result => {
-					this.data = result.data;
+					if (result.data.vertragsstatus != this.vertragsstatus_storniert) {
+						this.data = result.data;
+					}
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -97,17 +99,21 @@ export default{
 					this.$api.call(ApiVertrag.cancelVertrag({vertrag_id: this.vertrag_id, person_id: this.person_id}))
 				})
 				.then(result => {
-					this.setDefaultData();
+					this.resetForm();
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.$emit('canceledVertrag');
-					// vertragsstatus not  "akzeptiert" anymore
+					// vertragsstatus not "akzeptiert" anymore
 					this.$emit('vertragsstatusChanged', false);
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		setDefaultData() {
-			this.data.vertragsstatus = null;
-			this.data.vertragsstunden = null;
-			this.data.vertragsstunden_studiensemester_kurzbz = null;
+		resetForm() {
+			this.data = {
+				vertrag_id: null,
+				vertragsstatus: null,
+				vertragsstunden: null,
+				vertragsstunden_studiensemester_kurzbz: null
+			}
 		}
 	},
 	template: `
