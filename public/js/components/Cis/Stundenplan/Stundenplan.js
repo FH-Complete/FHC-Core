@@ -44,6 +44,11 @@ const Stundenplan = {
 			},
 			eventsLoaded: [],
 			events: [],
+			backgrounds: [{
+				end: luxon.DateTime.local().ts,
+				class: "background-past",
+				label: luxon.DateTime.local().startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
+			}],
 			calendarMode: DEFAULT_MODE_STUNDENPLAN,
 			calendarDate: new CalendarDateObj(new Date()),
 			eventCalendarDate: new CalendarDateObj(new Date()),
@@ -118,6 +123,8 @@ const Stundenplan = {
 			return r + ', ' + g + ', ' + b;
 		},
 		dateToString(date) {
+			if (date instanceof luxon.DateTime)
+				return date.toISODate();
 			return date.getFullYear() +
 				'-' +
 				CalendarDate.format(date, { month: '2-digit' }, this.$p.user_locale.value) +
@@ -363,6 +370,7 @@ const Stundenplan = {
 			:view="propsViewData.mode.toLowerCase()"
 			:date="currentDay"
 			:events="events || []"
+			:backgrounds="backgrounds"
 			show-btns
 			@update:range="updateRange"
 			@update:view="handleChangeMode"
