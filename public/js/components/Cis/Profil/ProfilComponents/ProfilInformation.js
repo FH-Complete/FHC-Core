@@ -9,10 +9,6 @@ export default {
 		data: {
 			type: Object,
 		},
-		editable: {
-			type: Boolean,
-			default: false
-		},
 		fotoStatus:{
 			type: Boolean,
 			default: true
@@ -27,6 +23,7 @@ export default {
 		};
 	},
 	emits: ["showEditProfilModal"],
+	inject:["isEditable"],
 
 	methods: {
 		showModal(){
@@ -76,7 +73,7 @@ export default {
 	<image-upload ref="imageUpload" :titel="$p.t('profilUpdate','profilBild')"></image-upload>
     <div class="card-header">
         <div class="row">
-            <div v-if="editable" @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button">
+            <div v-if="isEditable" @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button">
                 <i class="fa fa-edit"></i>
             </div>
             <div class="col">
@@ -93,7 +90,7 @@ export default {
                     <div class="col-auto " style="position:relative">
                         <img alt="profile picture" class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"/>
                         <!-- LOCKING IMAGE FUNCTIONALITY -->
-                        <div v-if="editable" role="button" @click.prevent="sperre_foto_function" class="image-lock">
+                        <div v-if="isEditable" role="button" @click.prevent="sperre_foto_function" class="image-lock">
                             <i :class="{'fa':true, ...(FotoSperre?{'fa-lock':true}:{'fa-lock-open':true})} "></i>
                         </div>
 						<div v-if="!fotoStatus" role="button" @click.prevent="showModal" class="image-upload">

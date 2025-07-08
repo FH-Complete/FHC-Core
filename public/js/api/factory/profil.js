@@ -22,6 +22,12 @@ export default {
 			url: `/api/frontend/v1/Profil/getView/${uid}`
 		};
 	},
+	profilViewData(uid) {
+		return {
+			method: 'get',
+			url: `/api/frontend/v1/Profil/profilViewData/${uid}`
+		};
+	},
 	fotoSperre(value) {
 		return {
 			method: 'get',
@@ -69,5 +75,5 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/Profil/getAllNationen'
 		};
-	}
+	},
 };

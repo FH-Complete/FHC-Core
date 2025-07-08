@@ -27,7 +27,7 @@ export default {
 		ProfilInformation,
 	},
 
-	inject: ["sortProfilUpdates", "collapseFunction", "language"],
+	inject: ["sortProfilUpdates", "collapseFunction", "language","isEditable"],
 
 	data() {
 		return {
@@ -215,9 +215,6 @@ export default {
 	},
 
 	computed: {
-		editable() {
-			return this.data?.editAllowed ?? false;
-		},
 		fotoStatus() {
 			return this.data?.fotoStatus ?? false;
 		},
@@ -322,7 +319,7 @@ export default {
                            </div>
                          </div>-->
             <!-- Bearbeiten Button -->
-            <div class="row mb-3 ">
+            <div v-if="isEditable" class="row mb-3 ">
                 <div class="col">
                     <button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
                         <div class="row">
@@ -352,7 +349,7 @@ export default {
                     <div class="row mb-4">
                         <div class="col">
                             <!-- PROFIL INFORMATION -->
-                            <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :editable="editable" :fotoStatus="fotoStatus"></profil-information>
+                            <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :fotoStatus="fotoStatus"></profil-information>
                         </div>
                     </div>
                     <div class="row mb-4">

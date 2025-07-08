@@ -110,9 +110,6 @@ export default {
 				return this.data.telefonklappe
 			}
 		},
-		editable() {
-			return this.data?.editAllowed ?? false;
-		},
 		fotoStatus() {
 			return this.data?.fotoStatus ?? false;
 		},
@@ -202,7 +199,7 @@ export default {
                     <div class="row mb-4">
                         <div class="col">
                             <!-- Profil Informationen -->
-                            <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :editable="editable" :fotoStatus="fotoStatus"></profil-information>
+                            <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :fotoStatus="fotoStatus"></profil-information>
                         </div>
                     </div>
                     <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
