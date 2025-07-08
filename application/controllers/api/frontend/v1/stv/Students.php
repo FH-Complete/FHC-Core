@@ -712,7 +712,12 @@ class Students extends FHCAPI_Controller
 	 */
 	protected function addFilter($studiensemester_kurzbz)
 	{
-		$filter = $this->input->get('filter');
+		$filter = json_decode($this->input->get('filter'), true);
+		if (!is_array($filter))
+		{
+			$this->addMeta('addfilter', 'invalid filter: ' . $this->input->get('filter'));
+			return;
+		}
 		if (isset($filter['konto_count_0'])) {
 			$bt = $this->PrestudentModel->escape($filter['konto_count_0']);
 			$stdsem = $this->PrestudentModel->escape($studiensemester_kurzbz);
