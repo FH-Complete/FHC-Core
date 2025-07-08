@@ -23,7 +23,7 @@ export default {
 	},
 	computed: {
 		start() {
-			return this.day.startOf('week');
+			return this.day.startOf('week', { useLocaleWeeks: true });
 		},
 		axisMain() {
 			return Array.from({ length: 7 }, (e, i) => this.start.plus({ days: i }));

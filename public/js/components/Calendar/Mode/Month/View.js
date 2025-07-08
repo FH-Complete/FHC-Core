@@ -50,7 +50,7 @@ export default {
 	},
 	computed: {
 		axisMain() {
-			const start = this.day.startOf('month').startOf('week');
+			const start = this.day.startOf('month').startOf('week', { useLocaleWeeks: true });
 			return Array.from({ length: 6 }, (e, i) => start.plus({ weeks: i }));
 		},
 		axisParts() {

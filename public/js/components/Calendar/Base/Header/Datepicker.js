@@ -1,3 +1,5 @@
+// TODO(chris): translate aria-labels
+
 export default {
 	name: "CalendarHeaderDatepicker",
 	components: {
@@ -35,32 +37,36 @@ export default {
 			case "month":
 				return {month: this.convertedDate.month-1, year: this.convertedDate.year};
 			case "list":
-				return [this.convertedDate.startOf('day', true).ts, this.convertedDate.startOf('day', true).plus({ days: this.listLength }).ts - 1];
+				return [this.convertedDate.startOf('day').ts, this.convertedDate.startOf('day').plus({ days: this.listLength }).ts - 1];
 			case "week":
-				return [this.convertedDate.startOf('week', true).ts, this.convertedDate.endOf('week', true).ts];
+				return [this.convertedDate.startOf('week', { useLocaleWeeks: true }).ts, this.convertedDate.endOf('week', { useLocaleWeeks: true }).ts];
 			case "day":
 				return this.convertedDate;
 			default:
 				return null;
 			}
 		},
-		format() {
+		title() {
 			switch (this.view) {
 			case "month":
-				return () => {
-					return this.date.toLocaleString({ month: 'long', year: 'numeric' });
-				};
+				return this.date.toLocaleString({ month: 'long', year: 'numeric' });
 			case "week":
-				// TODO(chris): phrase? KW übersetzen!
-				return "yyyy 'KW' ww";
+				const year = this.date.localWeekYear;
+				const week = this.date.toFormat('nn');
+				return this.$p.t('calendar/year_kw', { year, week });
 			case "list":
 			case "day":
-				return () => {
-					return this.date.toLocaleString(luxon.DateTime.DATE_FULL);
-				};
+				return this.date.toLocaleString(luxon.DateTime.DATE_FULL);
 			default:
-				return "'View not Supported'";
+				return 'View not Supported';
 			}
+		},
+		format() {
+			const title = this.title;
+			return `'${title}'`;
+		},
+		weekStart() {
+			return luxon.Info.getStartOfWeek(this.date)%7;
 		}
 	},
 	methods: {
@@ -82,6 +88,9 @@ export default {
 				return; // Don't update if the value is invalid!
 			}
 			this.$emit("update:date", date);
+		},
+		weekNumbers(date) {
+			return luxon.DateTime.fromJSDate(date, { locale: this.locale }).localWeekNumber;
 		}
 	},
 	template: /* html */`
@@ -93,7 +102,8 @@ export default {
 		:week-picker="view == 'week'"
 		:range="view == 'list' ? { autoRange: listLength } : false"
 		:text-input="view == 'day'"
-		:week-numbers="{ type: 'iso' }"
+		:week-start="weekStart"
+		:week-numbers="{ type: weekNumbers }"
 		:clearable="false"
 		:enable-time-picker="false"
 		:config="{ keepActionRow: view != 'month' }"
@@ -102,6 +112,8 @@ export default {
 		six-weeks
 		teleport
 		:locale="locale"
+		:now-button-label="$p.t('calendar/today')"
+		:week-num-name="$p.t('calendar/kw')"
 	/>
 	`
 }

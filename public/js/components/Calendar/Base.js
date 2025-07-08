@@ -71,8 +71,8 @@ export default {
 			default: 'Asia/Dhaka'//'local'
 		},
 		date: {
-			type: [Date, String, Number],
-			default: new Date()
+			type: [Date, String, Number, luxon.DateTime],
+			default: luxon.DateTime.local()
 		},
 		views: {
 			type: Object
@@ -173,20 +173,14 @@ export default {
 		},
 		cDate: {
 			get() {
-				return this.internCurrentDate || luxon.DateTime.fromJSDate(new Date(this.date)).setZone(this.timezone).setLocale(this.locale);
+				if (this.internCurrentDate) {
+					return this.internCurrentDate.setLocale(this.locale);
+				}
+				return luxon.DateTime.fromJSDate(new Date(this.date)).setZone(this.timezone).setLocale(this.locale);
 			},
 			set(value) {
 				this.internCurrentDate = value;
-				this.$emit('update:date', value.toJSDate());
-			}
-		},
-		focusDate: {
-			get() {
-				return this.internCurrentDate || (new Date(this.date)).getTime();
-			},
-			set(v) {
-				this.internCurrentDate = v;
-				this.$emit('update:date', new Date(this.internCurrentDate));
+				this.$emit('update:date', value);
 			}
 		}
 	},
@@ -215,18 +209,22 @@ export default {
 			case 'day':
 				if (this.internalView != 'day' && this.views['day']) {
 					evt.stopPropagation();
-					this.focusDate = evt.detail.value;
+					this.cDate = evt.detail.value;
 					this.internalView = 'day';
-					this.$emit('update:date', new Date(this.focusDate));
 					this.$emit('update:view', this.internalView);
 				}
 				break;
 			case 'week':
 				if (this.internalView != 'week' && this.views['week']) {
 					evt.stopPropagation();
-					this.focusDate = CalendarDate.UTC(CalendarDate.getDaysInWeek(evt.detail.value.number, evt.detail.value.year, this.locale)[0]);
+					this.cDate = luxon.DateTime.fromObject({
+						localWeekNumber: evt.detail.value.number,
+						localWeekYear: evt.detail.value.year
+					}, {
+						zone: this.cDate.zoneName,
+						locale: this.cDate.locale
+					});
 					this.internalView = 'week';
-					this.$emit('update:date', new Date(this.focusDate));
 					this.$emit('update:view', this.internalView);
 				}
 				break;

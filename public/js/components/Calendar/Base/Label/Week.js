@@ -13,8 +13,9 @@ export default {
 	},
 	computed: {
 		weeks() {
-			const firstDay = this.date.startOf('week');
-			const lastDay = this.date.endOf('week');
+			const firstDay = this.date.startOf('week', { useLocaleWeeks: true });
+			const lastDay = this.date.endOf('week', { useLocaleWeeks: true });
+
 			const weeks = [
 				{ number: firstDay.localWeekNumber, year: firstDay.localWeekYear },
 				{ number: lastDay.localWeekNumber, year: lastDay.localWeekYear }

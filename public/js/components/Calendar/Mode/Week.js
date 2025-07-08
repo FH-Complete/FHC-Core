@@ -9,9 +9,6 @@ export default {
 		BaseSlider,
 		WeekView
 	},
-	inject: {
-		locale: "locale"
-	},
 	props: {
 		currentDate: {
 			type: luxon.DateTime,
@@ -34,8 +31,8 @@ export default {
 		range() {
 			const range = {};
 
-			range.first = this.focusDate.startOf('week');
-			range.last = this.focusDate.endOf('week');
+			range.first = this.focusDate.startOf('week', { useLocaleWeeks: true });
+			range.last = this.focusDate.endOf('week', { useLocaleWeeks: true });
 
 			if (this.rangeOffset != 0) {
 				if (this.rangeOffset < 0) {
@@ -49,14 +46,17 @@ export default {
 		}
 	},
 	watch: {
-		locale() {
-			this.$emit('update:range', this.range);
-		},
 		currentDate() {
-			this.rangeOffset = this.currentDate.startOf('week').diff(this.focusDate.startOf('week'), 'weeks').weeks;
-			if (this.rangeOffset) {
+			if (this.currentDate.locale != this.focusDate.locale) {
+				console.log(this.focusDate.toISODate(), this.currentDate.toISODate());
+				this.focusDate = this.currentDate;
 				this.$emit('update:range', this.range);
-				this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
+			} else {
+				this.rangeOffset = this.currentDate.startOf('week', { useLocaleWeeks: true }).diff(this.focusDate.startOf('week', { useLocaleWeeks: true }), 'weeks').weeks;
+				if (this.rangeOffset) {
+					this.$emit('update:range', this.range);
+					this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
+				}
 			}
 		}
 	},
@@ -86,8 +86,7 @@ export default {
 			switch (evt.detail.source) {
 			case 'day':
 				// default: Set current-date
-				this.focusDate = new Date(evt.detail.value);
-				this.$emit('update:currentDate', this.focusDate.getTime());
+				this.$emit('update:currentDate', evt.detail.value);
 				break;
 			case 'event':
 				// TODO(chris): IMPLEMENT!

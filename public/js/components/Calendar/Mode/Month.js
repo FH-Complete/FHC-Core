@@ -9,9 +9,6 @@ export default {
 		BaseSlider,
 		MonthView
 	},
-	inject: {
-		locale: "locale"
-	},
 	props: {
 		currentDate: {
 			type: luxon.DateTime,
@@ -34,12 +31,12 @@ export default {
 		range() {
 			const range = {};
 
-			range.first = this.focusDate.startOf('month').startOf('week');
+			range.first = this.focusDate.startOf('month').startOf('week', { useLocaleWeeks: true });
 			range.last = range.first.plus({ days: 41 }).endOf('day'); // NOTE(chris): 6 weeks minus 1 day
 
 			if (this.rangeOffset != 0) {
 				const nextFocusDate = this.focusDate.plus({ months: this.rangeOffset});
-				const nextRangeStart = nextFocusDate.startOf('month').startOf('week');
+				const nextRangeStart = nextFocusDate.startOf('month').startOf('week', { useLocaleWeeks: true });
 				if (this.rangeOffset < 0) {
 					range.first = nextRangeStart;
 				} else {
@@ -51,14 +48,16 @@ export default {
 		}
 	},
 	watch: {
-		locale() {
-			this.$emit('update:range', this.range);
-		},
 		currentDate() {
-			this.rangeOffset = this.currentDate.startOf('month').diff(this.focusDate.startOf('month'), 'months').months;
-			if (this.rangeOffset) {
+			if (this.currentDate.locale != this.focusDate.locale) {
+				this.focusDate = this.currentDate;
 				this.$emit('update:range', this.range);
-				this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
+			} else {
+				this.rangeOffset = this.currentDate.startOf('month').diff(this.focusDate.startOf('month'), 'months').months;
+				if (this.rangeOffset) {
+					this.$emit('update:range', this.range);
+					this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
+				}
 			}
 		}
 	},
@@ -88,61 +87,28 @@ export default {
 			switch (evt.detail.source) {
 			case 'week':
 				// default: Move to week if not in month
-				console.log('week default');
-				return this.clickDefaultWeek(evt.detail.value);
+				let dayInWeek = luxon.DateTime.fromObject({
+					localWeekNumber: evt.detail.value.number,
+					localWeekYear: evt.detail.value.year
+				}, {
+					zone: this.currentDate.zoneName,
+					locale: this.currentDate.locale
+				});
+
+				if (!this.focusDate.hasSame(dayInWeek.startOf('week', { useLocaleWeeks: true }), 'month')) {
+					this.$emit('update:currentDate', dayInWeek.startOf('week', { useLocaleWeeks: true }));
+				} else if (!this.focusDate.hasSame(dayInWeek.endOf('week', { useLocaleWeeks: true }), 'month')) {
+					this.$emit('update:currentDate', dayInWeek.endOf('week', { useLocaleWeeks: true }));
+				}
+				break;
 			case 'day':
-				// default: Move to day and set current-date
-				return this.clickDefaultDay(new Date(evt.detail.value));
+				// default: Set current-date
+				this.$emit('update:currentDate', evt.detail.value);
+				break;
 			case 'event':
 				// TODO(chris): IMPLEMENT!
 				// default: ???
 				break;
-			}
-		},
-		clickDefaultWeek(week) {
-			const weekdays = CalendarDate.getDaysInWeek(week.number, week.year, this.locale);
-			let day = null;
-			
-			if (weekdays[0].getMonth() != this.focusDate.getMonth()) {
-				day = weekdays[0];
-			} else if (weekdays[6].getMonth() != this.focusDate.getMonth()) {
-				day = weekdays[6];
-			}
-			
-			if (day) {
-				const monthsFocus = this.focusDate.getFullYear() * 12 + this.focusDate.getMonth();
-				const monthsTarget = day.getFullYear() * 12 + day.getMonth();
-
-				const diffMonths = monthsTarget - monthsFocus;
-
-				this.rangeOffset = this.$refs.slider.target + monthsTarget - monthsFocus;
-				this.$emit('update:range', this.range);
-				this.$refs.slider.slidePages(monthsTarget - monthsFocus).then(offset => {
-					this.focusDate = day;
-					this.rangeOffset = 0;
-					this.$emit('update:currentDate', day.getTime());
-					this.$emit('update:range', this.range);
-				});
-			}
-		},
-		clickDefaultDay(day) {
-			const monthsFocus = this.focusDate.getFullYear() * 12 + this.focusDate.getMonth();
-			const monthsTarget = day.getFullYear() * 12 + day.getMonth();
-
-			const diffMonths = monthsTarget - monthsFocus;
-
-			if (diffMonths) {
-				this.rangeOffset = this.$refs.slider.target + monthsTarget - monthsFocus;
-				this.$emit('update:range', this.range);
-				this.$refs.slider.slidePages(monthsTarget - monthsFocus).then(offset => {
-					this.focusDate = day;
-					this.rangeOffset = 0;
-					this.$emit('update:currentDate', day.getTime());
-					this.$emit('update:range', this.range);
-				});
-			} else {
-				this.focusDate = day;
-				this.$emit('update:currentDate', day.getTime());
 			}
 		}
 	},
