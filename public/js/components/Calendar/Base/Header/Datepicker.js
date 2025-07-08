@@ -10,7 +10,7 @@ export default {
 	props: {
 		date: luxon.DateTime,
 		view: String,
-		length: {
+		listLength: {
 			type: Number,
 			default: 7
 		}
@@ -29,6 +29,7 @@ export default {
 			case "month":
 				return {month: this.convertedDate.month-1, year: this.convertedDate.year};
 			case "list":
+				return [this.convertedDate.startOf('day', true).ts, this.convertedDate.startOf('day', true).plus({ days: this.listLength }).ts - 1];
 			case "week":
 				return [this.convertedDate.startOf('week', true).ts, this.convertedDate.endOf('week', true).ts];
 			case "day":
@@ -40,12 +41,17 @@ export default {
 		format() {
 			switch (this.view) {
 			case "month":
-				return "MMMM yyyy";
+				return () => {
+					return this.date.toLocaleString({ month: 'long', year: 'numeric' });
+				};
 			case "week":
+				// TODO(chris): phrase? KW übersetzen!
 				return "yyyy 'KW' ww";
 			case "list":
 			case "day":
-				return "dd.MM.yyyy";
+				return () => {
+					return this.date.toLocaleString(luxon.DateTime.DATE_FULL);
+				};
 			default:
 				return "'View not Supported'";
 			}
@@ -79,7 +85,7 @@ export default {
 		:format="format"
 		:month-picker="view == 'month'"
 		:week-picker="view == 'week'"
-		:range="view == 'list' ? { autoRange: length } : false"
+		:range="view == 'list' ? { autoRange: listLength } : false"
 		:text-input="view == 'day'"
 		:week-numbers="{ type: 'iso' }"
 		:clearable="false"
