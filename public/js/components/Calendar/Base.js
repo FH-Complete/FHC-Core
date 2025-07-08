@@ -150,10 +150,24 @@ export default {
 		convertedBackgrounds() {
 			return this.backgrounds.map(bg => {
 				const res = { ...bg };
-				if (res.start)
-					res.start = CalendarDate.UTC(new Date(res.start));
-				if (res.end)
-					res.end = CalendarDate.UTC(new Date(res.end));
+				if (res.start) {
+					if (Number.isInteger(res.start))
+						res.start = luxon.DateTime.fromMillis(res.start, { zone: this.timezone, locale: this.locale });
+					else if (res.start instanceof Date)
+						res.start = luxon.DateTime.fromJSDate(res.start, { zone: this.timezone, locale: this.locale });
+					else if (typeof res.start === 
+						string || res.start instanceof String)
+						res.start = luxon.DateTime.fromISO(res.start, { zone: this.timezone, locale: this.locale });
+				}
+				if (res.end) {
+					if (Number.isInteger(res.end))
+						res.end = luxon.DateTime.fromMillis(res.end, { zone: this.timezone, locale: this.locale });
+					else if (res.end instanceof Date)
+						res.end = luxon.DateTime.fromJSDate(res.end, { zone: this.timezone, locale: this.locale });
+					else if (typeof res.end === 
+						string || res.end instanceof String)
+						res.end = luxon.DateTime.fromISO(res.end, { zone: this.timezone, locale: this.locale });
+				}
 				return res;
 			});
 		},
