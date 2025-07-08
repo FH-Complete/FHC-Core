@@ -8,8 +8,14 @@ export default {
 		"timezone"
 	],
 	props: {
-		date: luxon.DateTime,
-		view: String,
+		date: {
+			type: luxon.DateTime,
+			required: true
+		},
+		view: {
+			type: String,
+			required: true
+		},
 		listLength: {
 			type: Number,
 			default: 7

@@ -46,7 +46,7 @@ export default {
 			}
 		}
 	},
-	template: `
+	template: /* html */`
 	<div class="fhc-calendar-mode-week-view h-100">
 		<calendar-grid
 			:axis-main="axisMain"

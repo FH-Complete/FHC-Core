@@ -60,7 +60,7 @@ export default {
 			return Array.from({ length: 8 }, (e, i) => luxon.Duration.fromObject({ days: i }));
 		}
 	},
-	template: `
+	template: /* html */`
 	<div class="fhc-calendar-mode-month-view h-100">
 		<calendar-grid
 			flip-axis

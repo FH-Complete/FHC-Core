@@ -12,13 +12,14 @@ export default {
 		LabelTime
 	},
 	inject: {
-		locale: "locale",
-		timezone: "timezone",
 		timeGrid: "timeGrid",
 		originalEvents: "events"
 	},
 	props: {
-		day: luxon.DateTime
+		day: {
+			type: luxon.DateTime,
+			required: true
+		}
 	},
 	data() {
 		return {
@@ -66,7 +67,7 @@ export default {
 			}
 		}
 	},
-	template: `
+	template: /* html */`
 	<div
 		class="fhc-calendar-mode-day-view d-flex h-100"
 		@cal-click-default.capture="handleClickDefaults"

@@ -15,7 +15,10 @@ export default {
 		title: "title"
 	},
 	props: {
-		currentDate: luxon.DateTime
+		currentDate: {
+			type: luxon.DateTime,
+			required: true
+		}
 	},
 	emits: [
 		"update:currentDate",

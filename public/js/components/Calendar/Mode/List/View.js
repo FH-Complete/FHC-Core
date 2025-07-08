@@ -10,12 +10,17 @@ export default {
 		LabelDow
 	},
 	inject: {
-		locale: "locale",
 		events: "events"
 	},
 	props: {
-		day: luxon.DateTime,
-		length: Number
+		day: {
+			type: luxon.DateTime,
+			required: true
+		},
+		length: {
+			type: Number,
+			required: true
+		}
 	},
 	data() {
 		return {
@@ -38,7 +43,7 @@ export default {
 			return eventsPerDay.filter(day => day.events.length);
 		}
 	},
-	template: `
+	template: /* html */`
 	<div
 		class="fhc-calendar-mode-list-view h-100"
 	>

@@ -9,8 +9,14 @@ export default {
 		DatePicker
 	},
 	props: {
-		date: luxon.DateTime,
-		view: String,
+		date: {
+			type: luxon.DateTime,
+			required: true
+		},
+		view: {
+			type: String,
+			required: true
+		},
 		btnMonth: Boolean,
 		btnWeek: Boolean,
 		btnDay: Boolean,

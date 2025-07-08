@@ -16,10 +16,22 @@ export default {
 		axisRow: "axisRow"
 	},
 	props: {
-		start: luxon.DateTime,
-		end: luxon.DateTime,
-		events: Array,
-		backgrounds: Array
+		start: {
+			type: luxon.DateTime,
+			required: true
+		},
+		end: {
+			type: luxon.DateTime,
+			required: true
+		},
+		events: {
+			type: Array,
+			default: []
+		},
+		backgrounds: {
+			type: Array,
+			default: []
+		}
 	},
 	computed: {
 		stops() {
