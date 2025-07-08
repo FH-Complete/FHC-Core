@@ -93,7 +93,7 @@ export default {
 			this.extrasAfter = this.extrasBefore = 0;
 		}
 	},
-	template: `
+	template: /* html */`
 	<div
 		class="fhc-calendar-base-slider h-100"
 		style="position:relative;overflow:hidden"

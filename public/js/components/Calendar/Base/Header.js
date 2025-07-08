@@ -35,7 +35,7 @@ export default {
 				this.$emit('update:view', view);
 		}
 	},
-	template: `
+	template: /* html */`
 	<div class="fhc-calendar-base-header">
 		<div class="row">
 			<div class="col">
