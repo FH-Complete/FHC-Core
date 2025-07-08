@@ -108,7 +108,7 @@ export default {
 					}
 				},
 
-				ajaxRequestFunc: (url, params) => {
+				ajaxRequestFunc: (url, config, params) => {
 					if( url === '' ) 
 					{
 						return Promise.resolve({ data: []});
