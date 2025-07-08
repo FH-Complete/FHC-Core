@@ -28,12 +28,14 @@ export default {
 	data() {
 		return {
 			person_id: null,
+			mitarbeiter_uid: null,
 			endpoint: ApiCoreVertraege
 		}
 	},
 	methods: {
-		selectPerson(selected){
-			this.person_id = selected;
+		handleSelection(selection) {
+			this.mitarbeiter_uid = selection.uid;
+			this.person_id = selection.person_id;
 		},
 		redirectToLeitung(leitung){
 			this.person_id = leitung.person_id;
@@ -41,7 +43,7 @@ export default {
 	},
 	template: `
 		<!-- Navigation component -->
-		<core-navigation-cmpt></core-navigation-cmpt>
+		<core-navigation-cmpt/>
 
 		<div class="vv">
 			<main>
@@ -50,7 +52,8 @@ export default {
 						<div class="d-flex flex-column" style="height: 100%;">
 							<mitarbeiter-header
 								:endpoint="endpoint"
-								@selectedPerson="selectPerson"/>
+								@selectionChanged="handleSelection"
+								/>
 						</div>
 					</template>
 					<template #bottom>
@@ -60,7 +63,11 @@ export default {
 								typeHeader="mitarbeiter"
 								@redirectToLeitung="redirectToLeitung"
 							></fhc-header>
-							<vertraege-mitarbeiter :endpoint="endpoint" :person_id="this.person_id"/>
+							<vertraege-mitarbeiter
+								:endpoint="endpoint"
+								:person_id="this.person_id"
+								:mitarbeiter_uid="this.mitarbeiter_uid"
+								/>
 						</div>
 					</template>
 				</vertical-split>

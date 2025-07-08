@@ -29,7 +29,6 @@ class Vertraege extends FHCAPI_Controller
 			'getHeader' => ['vertrag/mitarbeiter:r'],
 			'getPersonAbteilung' => ['vertrag/mitarbeiter:r'],
 			'getLeitungOrg' => ['vertrag/mitarbeiter:r'],
-			'getMitarbeiterUid' => ['vertrag/mitarbeiter:r'],
 			]);
 
 		//Load Models and Libraries
@@ -684,11 +683,11 @@ class Vertraege extends FHCAPI_Controller
 		return $this->terminateWithSuccess(getData($result));
 	}
 
-	public function getPersonAbteilung($person_id)
+	public function getPersonAbteilung($mitarbeiter_uid)
 	{
 		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
 
-		$result = $this->Mitarbeitermodel->getPersonAbteilung($person_id);
+		$result = $this->Mitarbeitermodel->getPersonAbteilung($mitarbeiter_uid);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
@@ -715,16 +714,5 @@ class Vertraege extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess(current($data));
-	}
-
-
-	public function getMitarbeiterUid($person_id)
-	{
-		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
-
-		$result = $this->Mitarbeitermodel->getMitarbeiterUid($person_id);
-
-		//no error here: ma_uid | null as result
-		$this->terminateWithSuccess($result);
 	}
 }

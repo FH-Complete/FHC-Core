@@ -151,12 +151,8 @@ class Mitarbeiter_model extends DB_Model
 	 *
 	 * @return Array benutzerfunktionsdata
 	 */
-	public function getPersonAbteilung($person_id)
+	public function getPersonAbteilung($uid)
 	{
-		$uid = $this->getMitarbeiterUid($person_id);
-		if (!$uid) {
-			return null;
-		}
 		$qry = "
 			SELECT
 				bf.benutzerfunktion_id, bf.fachbereich_kurzbz, bf.uid, bf.funktion_kurzbz, bf.updateamum,
@@ -213,7 +209,7 @@ class Mitarbeiter_model extends DB_Model
 	{
 		$qry = "
 			SELECT
-			  *
+			  titelpre, vorname, nachname, titelpost, foto, foto_sperre, person_id, alias, telefonklappe
 			FROM
 				public.tbl_person
 				JOIN public.tbl_benutzer b USING(person_id)
@@ -380,26 +376,6 @@ class Mitarbeiter_model extends DB_Model
 				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'";
 
 		return $this->execQuery($qry);
-	}
-
-	public function getMitarbeiterUid($person_id)
-	{
-		$qry = "
-        SELECT tbl_benutzer.uid
-        FROM tbl_mitarbeiter
-            JOIN tbl_benutzer ON CAST(tbl_mitarbeiter.mitarbeiter_uid AS TEXT) = CAST(tbl_benutzer.uid AS TEXT)
-            JOIN tbl_person USING (person_id)
-        WHERE tbl_person.person_id = ?
-    ";
-		$result = $this->execQuery($qry, [$person_id]);
-
-		$data = getData($result);
-		if (empty($data)) {
-			return null; // No UID found
-		}
-
-		$uid = isset($data[0]->uid) ? $data[0]->uid : null;
-		return $uid;
 	}
 
 	/**

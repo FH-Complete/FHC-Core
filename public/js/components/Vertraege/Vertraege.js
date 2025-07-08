@@ -37,6 +37,10 @@ export default {
 			type: [Number],
 			required: true
 		},
+		mitarbeiter_uid: {
+			type: [String],
+			required: true
+		},
 	},
 	computed: {
 		appRoot() {
@@ -210,7 +214,6 @@ export default {
 			triggeredData: [],
 			childData: {},
 			isFilterSet: false,
-			ma_uid: null,
 			clickedRows: [],
 			arraySelectedContracts: [],
 		}
@@ -460,39 +463,29 @@ export default {
 		},
 		//methods for functionality ADDON KU
 		printContract(){
-			this.getMitarbeiterUid().then(()=> {
-				//check if at least 2 contracts chosen
-				if(this.arraySelectedContracts.length < 2) {
-					this.$fhcAlert.alertError(this.$p.t('vertrag', 'alertMindestensZweiVertraege'));
-					return;
-				}
+			//check if at least 2 contracts chosen
+			if(this.arraySelectedContracts.length < 2) {
+				this.$fhcAlert.alertError(this.$p.t('vertrag', 'alertMindestensZweiVertraege'));
+				return;
+			}
 
-				//check if status=="Genehmigt"
-				const statusNotGenehmigtExists = this.arraySelectedContracts.some(([_, status]) => status !== 'Genehmigt');
-				if(statusNotGenehmigtExists) {
-					this.$fhcAlert.alertError(this.$p.t('vertrag', 'alertOnlyApprovedContracts'));
-					return;
-				}
+			//check if status=="Genehmigt"
+			const statusNotGenehmigtExists = this.arraySelectedContracts.some(([_, status]) => status !== 'Genehmigt');
+			if(statusNotGenehmigtExists) {
+				this.$fhcAlert.alertError(this.$p.t('vertrag', 'alertOnlyApprovedContracts'));
+				return;
+			}
 
-				//build String to Print PDF
-				let vertragString = '';
+			//build String to Print PDF
+			let vertragString = '';
 
-				this.arraySelectedContracts.forEach(element => {
-					vertragString += '&vertrag_id[]=' + element[0].toString();
-				});
+			this.arraySelectedContracts.forEach(element => {
+				vertragString += '&vertrag_id[]=' + element[0].toString();
+			});
 
-				let linkToPdf = this.dataPrintHonorar.link +
-						'content/pdfExport.php?xml=' + this.dataPrintHonorar.xml + '&xsl=' + this.dataPrintHonorar.xsl + '&mitarbeiter_uid=' + this.ma_uid + vertragString + '&output=pdf&uid=' + this.ma_uid;
-				window.open(linkToPdf, '_blank');
-				});
-		},
-		getMitarbeiterUid(){
-			return this.$api
-				.call(this.endpoint.getMitarbeiterUid(this.person_id))
-				.then(response => {
-					this.ma_uid = response.data;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
+			let linkToPdf = this.dataPrintHonorar.link +
+					'content/pdfExport.php?xml=' + this.dataPrintHonorar.xml + '&xsl=' + this.dataPrintHonorar.xsl + '&mitarbeiter_uid=' + this.mitarbeiter_uid + vertragString + '&output=pdf&uid=' + this.mitarbeiter_uid;
+			window.open(linkToPdf, '_blank');
 		},
 		toggleRowClick(contractId, status, bezeichnung) {
 			const index = this.arraySelectedContracts.findIndex(

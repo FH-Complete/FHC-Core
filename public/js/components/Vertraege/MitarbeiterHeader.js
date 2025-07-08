@@ -8,7 +8,7 @@ export default {
 		FormInput
 	},
 	emits: [
-		"selectedPerson"
+		"selectionChanged"
 	],
 	props: {
 		endpoint: {
@@ -66,7 +66,7 @@ export default {
 					event: 'rowSelectionChanged',
 					handler: this.rowSelectionChanged
 				},
-		{
+				{
 					event: 'tableBuilt',
 					handler: async() => {
 
@@ -103,13 +103,19 @@ export default {
 				}
 			],
 			selectedPerson: null,
+			selectedUid: null,
 			isFilterSet: false,
 		}
 	},
 	methods: {
 		rowSelectionChanged(data) {
 			this.selectedPerson = data[0].person_id;
-			this.$emit('selectedPerson', this.selectedPerson);
+			this.selectedUid = data[0].uid;
+
+			this.$emit('selectionChanged', {
+				person_id: this.selectedPerson,
+				uid: this.selectedUid
+			});
 		},
 		onSwitchChange() {
 			if (this.isFilterSet) {
