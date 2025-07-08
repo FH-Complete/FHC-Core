@@ -3,10 +3,6 @@ import MonthView from './Month/View.js';
 
 import CalendarDate from '../../../helpers/Calendar/Date.js';
 
-/**
- * TODO(chris): use timestamps instead of dates?
- */
-
 export default {
 	name: "ModeMonth",
 	components: {
@@ -14,8 +10,7 @@ export default {
 		MonthView
 	},
 	inject: {
-		locale: "locale",
-		title: "title"
+		locale: "locale"
 	},
 	props: {
 		currentDate: {
@@ -151,14 +146,8 @@ export default {
 			}
 		}
 	},
-	created() {
-		this.title = Vue.computed(() => CalendarDate.format(this.focusDate, {month: 'long', year: 'numeric'}, this.locale));
-	},
 	mounted() {
 		this.$emit('update:range', this.range);
-	},
-	beforeUnmount() {
-		this.title = null;
 	},
 	template: `
 	<div

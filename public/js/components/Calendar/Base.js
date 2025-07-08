@@ -13,7 +13,6 @@ import CalClick from '../../directives/Calendar/Click.js';
  * - rename view to mode?
  * - make view/mode a v-model
  * - check emits
- * - default title:click => back to previous view/mode
  * - event single view (default for click:event)
  * - get focusDate/currentDate correct
  */
@@ -31,17 +30,6 @@ export default {
 	provide() {
 		const self = this;
 		return {
-			title: Vue.computed({
-				get() {
-					return self.title;
-				},
-				set(n) {
-					if (n)
-						self.titleStack.unshift(n);
-					else
-						self.titleStack.shift();
-				}
-			}),
 			locale: Vue.computed(() => this.locale),
 			timezone: Vue.computed(() => this.timezone),
 			hideWeeks: Vue.computed(() => this.hideWeeks),
@@ -138,7 +126,6 @@ export default {
 	],
 	data() {
 		return {
-			titleStack: [],
 			internalView: '',
 			internCurrentDate: null
 		};
@@ -175,11 +162,6 @@ export default {
 				}
 				return res;
 			});
-		},
-		title() {
-			if (this.titleStack.length)
-				return this.titleStack.find(Boolean).value;
-			return '...';
 		},
 		availableViews() {
 			return Object.keys(this.views);

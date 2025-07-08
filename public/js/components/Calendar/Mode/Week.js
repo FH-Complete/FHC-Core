@@ -3,10 +3,6 @@ import WeekView from './Week/View.js';
 
 import CalendarDate from '../../../helpers/Calendar/Date.js';
 
-/**
- * TODO(chris): use timestamps instead of dates?
- */
-
 export default {
 	name: "ModeWeek",
 	components: {
@@ -14,8 +10,7 @@ export default {
 		WeekView
 	},
 	inject: {
-		locale: "locale",
-		title: "title"
+		locale: "locale"
 	},
 	props: {
 		currentDate: {
@@ -101,18 +96,8 @@ export default {
 			}
 		}
 	},
-	created() {
-		this.title = Vue.computed(() => {
-			const week = CalendarDate.getWeek(this.focusDate, this.locale)
-			// TODO(chris): return this.$p.t('core/year_kw', week);
-			return `${week.year} KW ${week.number}`;
-		});
-	},
 	mounted() {
 		this.$emit('update:range', this.range);
-	},
-	beforeUnmount() {
-		this.title = null;
 	},
 	template: `
 	<div

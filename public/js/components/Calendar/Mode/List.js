@@ -9,10 +9,6 @@ export default {
 		BaseSlider,
 		ListView
 	},
-	inject: {
-		locale: "locale",
-		title: "title"
-	},
 	props: {
 		currentDate: {
 			type: luxon.DateTime,
@@ -85,72 +81,8 @@ export default {
 			return { day, length: this.length };
 		}
 	},
-	created() {
-		this.title = Vue.computed(() => {
-			// TODO(chris): move into a CalendarDate.format... function
-			if (this.range.first.getFullYear() != this.range.last.getFullYear()) {
-				return CalendarDate.format(
-					this.range.first,
-					{ day: "numeric", month: "short", year: "numeric" },
-					this.locale
-				) + ' - ' +
-				CalendarDate.format(
-					this.range.last,
-					{ day: "numeric", month: "short", year: "numeric" },
-					this.locale
-				);
-			}
-			if (this.range.first.getMonth() != this.range.last.getMonth()) {
-				const helperdate = new Date(this.range.first.getFullYear() + "-02-01 00:00");
-				const templateAll = CalendarDate.format(
-					helperdate,
-					{ day: "numeric", month: "short", year: "numeric" },
-					this.locale
-				);
-				const templatePart = CalendarDate.format(
-					helperdate,
-					{ day: "numeric", month: "short" },
-					this.locale
-				);
-				return templateAll.replace(
-					templatePart,
-					CalendarDate.format(
-						this.range.first,
-						{ day: "numeric", month: "short" },
-						this.locale
-					) + ' - ' +
-					CalendarDate.format(
-						this.range.last,
-						{ day: "numeric", month: "short" },
-						this.locale
-					)
-				);
-			}
-			const template = CalendarDate.format(
-				new Date("2000-" + (this.range.first.getMonth()+1) + "-01 00:00:00"),
-				{ day: "numeric", month: "short", year: "numeric" },
-				this.locale
-			);
-			return template.replace(
-				'1',
-				CalendarDate.format(
-					this.range.first,
-					{ day: "numeric" },
-					this.locale
-				) + ' - ' +
-				CalendarDate.format(
-					this.range.last,
-					{ day: "numeric" },
-					this.locale
-				)
-			).replace('2000', this.range.first.getFullYear());
-		});
-	},
 	mounted() {
 		this.$emit('update:range', this.range);
-	},
-	beforeUnmount() {
-		this.title = null;
 	},
 	template: `
 	<div

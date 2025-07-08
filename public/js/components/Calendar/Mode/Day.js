@@ -9,10 +9,6 @@ export default {
 		BaseSlider,
 		DayView
 	},
-	inject: {
-		locale: "locale",
-		title: "title"
-	},
 	props: {
 		currentDate: {
 			type: luxon.DateTime,
@@ -81,16 +77,8 @@ export default {
 			return { day };
 		}
 	},
-	created() {
-		this.title = Vue.computed(() => {
-			return CalendarDate.format(new Date(this.focusDate), {day: "2-digit", month: "2-digit", year: "numeric"}, this.locale);
-		});
-	},
 	mounted() {
 		this.$emit('update:range', this.range);
-	},
-	beforeUnmount() {
-		this.title = null;
 	},
 	template: `
 	<div
