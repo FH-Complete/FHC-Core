@@ -58,7 +58,7 @@ export default {
 			return result;
 		}
 	},
-	template: `
+	template: /* html */`
 	<div
 		class="fhc-calendar-base-grid-line-background"
 		:class="classes"

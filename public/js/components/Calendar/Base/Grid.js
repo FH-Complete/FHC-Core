@@ -128,8 +128,7 @@ export default {
 			return [...this.axisMain, lastInMainAxis.plus(extraLength)];
 		},
 		events() {
-			let events = this.originalEvents;
-			return this.mapIntoMainAxis(events);
+			return this.mapIntoMainAxis(this.originalEvents);
 		},
 		backgrounds() {
 			return this.mapIntoMainAxis(this.originalBackgrounds);
@@ -159,7 +158,7 @@ export default {
 			return this.axisPartsWithBreaks.map((part, i) => 
 				part.index !== undefined
 					? '[part_' + (part.index + 1) + '] ' + (part.end.toMillis() - part.start.toMillis()) / msPerHr + 'fr'
-					: (part.end.toMillis() - part.start.toMillis()) / msPerHr + 'fr'
+					: (part.end.toMillis() - part.start.toMillis()) / onePercOfAllPartsInMs + '%'
 			).join(' ') + ' [end]';
 		}
 	},

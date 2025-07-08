@@ -40,7 +40,7 @@ export default {
 			return classes
 		}
 	},
-	template: `
+	template: /* html */`
 	<div
 		class="fhc-calendar-base-grid-line-event"
 		:class="classes"

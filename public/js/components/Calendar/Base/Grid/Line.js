@@ -18,7 +18,6 @@ export default {
 	props: {
 		start: luxon.DateTime,
 		end: luxon.DateTime,
-		date: luxon.DateTime,
 		events: Array,
 		backgrounds: Array
 	},
@@ -81,7 +80,7 @@ export default {
 			return events;
 		}
 	},
-	template: `
+	template: /* html */`
 	<div
 		class="fhc-calendar-base-grid-line"
 		style="position:relative;display:grid;grid-auto-flow:dense"
