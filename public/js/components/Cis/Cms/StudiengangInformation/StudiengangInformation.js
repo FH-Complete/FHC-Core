@@ -1,6 +1,8 @@
 import StudiengangPerson from "./StudiengangPerson.js";
 import StudiengangVertretung from "./StudiengangVertretung.js";
 
+import ApiStudiengang from '../../../../api/factory/studiengang.js';
+
 export default {
 data(){
 	return{
@@ -108,13 +110,12 @@ computed:{
 		return `https://moodle.technikum-wien.at/course/view.php?idnumber=dl` + this.studiengang.studiengang_kz;
 	},
 },
-mounted(){
-	this.$fhcApi.factory.studiengang.studiengangInformation()
-	.then(res => res.data)
-	.then(studiengangInformationen => {
-		Object.assign(this, studiengangInformationen);
-	});
-
-},
-
+	mounted() {
+		this.$api
+			.call(ApiStudiengang.studiengangInformation())
+			.then(res => res.data)
+			.then(studiengangInformationen => {
+				Object.assign(this, studiengangInformationen);
+			});
+	}
 };

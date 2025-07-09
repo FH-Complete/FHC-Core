@@ -192,6 +192,15 @@ $datum_obj = new datum();
 			die('Invalid Action');
 			break;
 	}
+	if(isset($ampel_id) && $ampel->benutzer_select != '')
+	{
+		$anzahlUser = $ampel->getAnzahlUserAmpel($ampel_id);
+	}
+	else
+	{
+		$anzahlUser = 0;
+	}
+
 
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?action=save" method="POST">
 		<input type="hidden" name="new" value="'.htmlspecialchars($new).'">
@@ -207,8 +216,11 @@ $datum_obj = new datum();
 				<td><input type="text" class="datepicker_datum" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'Y-m-d')).'" required></td>
 			</tr>
 			<tr valign="top">
-				<td rowspan="3">Benutzer Select</td>
-				<td rowspan="3"><textarea name="benutzer_select" cols="60" rows="5" required>'.htmlspecialchars($ampel->benutzer_select).'</textarea></td>
+				<td rowspan="3">Benutzer*innen Select</td>
+				<td rowspan="3">
+					<textarea name="benutzer_select" cols="60" rows="5" required>'.htmlspecialchars($ampel->benutzer_select).'</textarea>
+					<br>Anzahl Benutzer*innen: '.$anzahlUser.'
+				</td>
 				<td></td>
 				<td valign="middle">Vorlaufzeit (in Tagen)&nbsp
 					<i class="fa fa-info-circle fa-lg" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Anzahl der Tage VOR der Deadline, an denen die Ampel gezeigt werden soll.&#013Wenn keine Angabe, dann wird die Ampel gleich nach ihrer Erstellung angezeigt."></i>

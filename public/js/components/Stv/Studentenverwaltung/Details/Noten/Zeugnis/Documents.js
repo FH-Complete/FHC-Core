@@ -1,8 +1,8 @@
 // NOTE(chris): cache calls globally to prevent multiple calls on the same source
 const calledPermissionUrls = {};
-async function callPermissionUrl($fhcApi, url) {
+async function callPermissionUrl($api, url) {
 	if (!calledPermissionUrls[url]) {
-		calledPermissionUrls[url] = $fhcApi.get(url);
+		calledPermissionUrls[url] = $api.get(url);
 	}
 	return (await calledPermissionUrls[url]).data;
 }
@@ -42,7 +42,7 @@ export default {
 					for (const k in this.data) {
 						permissioncheckUrl = permissioncheckUrl.replace("{" + k + "}", this.data[k]);
 					}
-					if (!await callPermissionUrl(this.$fhcApi, permissioncheckUrl))
+					if (!await callPermissionUrl(this.$api, permissioncheckUrl))
 						continue;
 				}
 				const item = {label: part.title};
@@ -60,7 +60,7 @@ export default {
 												? this.data[value.slice(1,-1)] 
 												: value
 									);
-							this.$fhcApi
+							this.$api
 								.post(this.addParamsToString(part.action.url), post)
 								.then(() => part.action.response || this.$p.t('ui/successSave'))
 								.then(this.$fhcAlert.alertSuccess)

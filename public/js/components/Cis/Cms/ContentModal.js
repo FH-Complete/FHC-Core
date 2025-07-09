@@ -1,6 +1,7 @@
 import BsModal from "../../Bootstrap/Modal.js";
 import RaumContent from "./Content_types/Raum_contentmittitel.js";
 
+import ApiCms from '../../../api/factory/cms.js';
 
 export default {
 
@@ -34,12 +35,13 @@ export default {
         // this method is always called when the modal is shown
         modalShown: function(){
             
-            if(this.content_id){
-                this.$fhcApi.factory.cms.content(this.content_id).then(res =>{
-                this.content = res.data.content;
-                this.type = res.data.type;
-                
-                })
+            if (this.content_id) {
+                this.$api
+                    .call(ApiCms.content(this.content_id))
+                    .then(res => {
+                        this.content = res.data.content;
+                        this.type = res.data.type;
+                    });
             } 
         },
     },

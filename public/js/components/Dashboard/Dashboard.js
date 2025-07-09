@@ -2,6 +2,8 @@ import DashboardSection from "./Section.js";
 import DashboardWidgetPicker from "./Widget/Picker.js";
 import ObjectUtils from "../../helpers/ObjectUtils.js";
 
+import ApiDashboard from '../../api/factory/cis/dashboard.js';
+
 export default {
 	components: {
 		DashboardSection,
@@ -163,8 +165,8 @@ export default {
 		}).catch(err => console.error('ERROR:', err));
 	},
 	async beforeMount() {
-		if(!this.viewData.name || !this.viewData.uid) {
-			const res = await this.$fhcApi.factory.dashboard.getViewData()
+		if (!this.viewData.name || !this.viewData.uid) {
+			const res = await this.$api.call(ApiDashboard.getViewData());
 			this.viewDataInternal = res.data
 		}	
 	},

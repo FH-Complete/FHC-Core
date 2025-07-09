@@ -1,6 +1,7 @@
-import Phrasen from '../../plugin/Phrasen.js';
+//import Phrasen from '../../plugin/Phrasen.js';
 
 export default {
+	name: 'BootstrapModal',
 	data: () => ({
 		modal: null
 	}),
@@ -77,6 +78,7 @@ export default {
 
 		return new Promise((resolve,reject) => {
 			const instance = Vue.createApp({
+				name: 'ModalTmpApp',
 				setup() {
 					return () => Vue.h(BsModal, {...{
 						class: 'fade'
@@ -104,9 +106,12 @@ export default {
 				instance.use(primevue.config.default, {zIndex: {overlay: 9999}})
 			}
 				 
-			instance.use(Phrasen); // TODO(chris): find a more dynamic way
-			instance.mount(wrapper);
-			document.body.appendChild(wrapper);
+			//instance.use(Phrasen); // TODO(chris): find a more dynamic way
+			import('../../plugins/Phrasen.js').then((Phrasen) => {
+				instance.use(Phrasen.default);
+				instance.mount(wrapper);
+				document.body.appendChild(wrapper);
+			});
 		});
 	},
 	template: `<div ref="modal" class="bootstrap-modal modal" tabindex="-1" @[\`hide.bs.modal\`]="$emit('hideBsModal')" @[\`hidden.bs.modal\`]="$emit('hiddenBsModal')" @[\`hidePrevented.bs.modal\`]="$emit('hidePreventedBsModal')" @[\`show.bs.modal\`]="$emit('showBsModal')" >
@@ -114,6 +119,7 @@ export default {
 			<div class="modal-content">
 				<div v-if="$slots.title" class="modal-header">
 					<h5 class="modal-title"><slot name="title"/></h5>
+					<slot name="popoutButton"></slot>
 					<button v-if="!noCloseBtn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body" :class="bodyClass">

@@ -4,6 +4,7 @@ import CoreForm from "../../../../Form/Form.js";
 import FormValidation from "../../../../Form/Validation.js";
 import FormInput from "../../../../Form/Input.js";
 
+import ApiKonto from '../../../../../api/factory/stv/konto.js';
 
 export default {
 	components: {
@@ -58,8 +59,8 @@ export default {
 				studiengang_kz: this.stgKz
 			}, ...this.data};
 
-			this.$fhcApi
-				.factory.stv.konto.checkDoubles(this.$refs.form, data)
+			this.$refs.form
+				.call(ApiKonto.checkDoubles(data))
 				.then(result => result.data
 					? Promise.all(
 						result.errors
@@ -68,7 +69,7 @@ export default {
 					)
 					: Promise.resolve())
 				.then(() => data)
-				.then((data) => this.$fhcApi.factory.stv.konto.insert(this.$refs.form, data))
+				.then(data => this.$refs.form.call(ApiKonto.insert(data)))
 				.then(result => {
 					this.$emit('saved', result.data);
 					this.loading = false;

@@ -3,6 +3,8 @@ import BsConfirm from "../../../../Bootstrap/Confirm.js";
 import BsPrompt from "../../../../Bootstrap/Prompt.js";
 import FormInput from '../../../../Form/Input.js';
 
+import ApiStvStatus from '../../../../../api/factory/stv/status.js';
+
 export default {
 	components: {
 		BsModal,
@@ -142,7 +144,11 @@ export default {
 		addStudent(data) {
 			Promise
 				.allSettled(
-					this.prestudentIds.map(prestudent_id => this.$fhcApi.factory.stv.status.addStudent(prestudent_id, data)))
+					this.prestudentIds.map(prestudent_id => this.$api.call(
+						ApiStvStatus.addStudent(prestudent_id, data),
+						{ errorHeader: prestudent_id }
+					))
+				)
 				.then(res => this.showFeedback(res, data.status_kurzbz));
 		},
 		changeStatusToAbbrecher(statusgrund_id) {
@@ -238,7 +244,11 @@ export default {
 		changeStatus(data) {
 			Promise
 				.allSettled(
-					this.prestudentIds.map(prestudent_id => this.$fhcApi.factory.stv.status.changeStatus(prestudent_id, data)))
+					this.prestudentIds.map(prestudent_id => this.$api.call(
+						ApiStvStatus.changeStatus(prestudent_id, data),
+						{ errorHeader: prestudent_id }
+					))
+				)
 				.then(res => this.showFeedback(res, data.status_kurzbz));
 		},
 		showFeedback(results, status_kurzbz) {
@@ -259,7 +269,8 @@ export default {
 		}
 	},
 	created() {
-		this.$fhcApi.factory.stv.status.getStatusarray()
+		this.$api
+			.call(ApiStvStatus.getStatusarray())
 			.then(result => result.data)
 			.then(result => {
 				this.listDataToolbar = result;

@@ -1,6 +1,8 @@
 import Adresse from "../../ProfilComponents/Adresse.js";
 import Kontakt from "../../ProfilComponents/Kontakt.js";
 
+import ApiProfilUpdate from '../../../../../api/factory/profilUpdate.js';
+
 export default {
   components: {
     Adresse,
@@ -65,11 +67,11 @@ export default {
     topic: { type: String },
   },
   created() {
-    this.$fhcApi.factory.profilUpdate.getProfilRequestFiles(this.updateID).then(
-      (res) => {
+    this.$api
+      .call(ApiProfilUpdate.getProfilRequestFiles(this.updateID))
+      .then((res) => {
         this.files = res.data;
-      }
-    );
+      });
   },
   template: /*html*/ `
     <div class="row">

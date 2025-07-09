@@ -148,7 +148,7 @@ echo '
 		alert(<?php echo "'".$p->t("testtool/alleFragenBeantwortet")."'"?>);
 		return true;
 	}
-	
+
 	$(document).ready(function () {
 		$(document).bind('cut copy paste', function(e)
 		{
@@ -717,7 +717,7 @@ if($frage->frage_id!='')
 
 	if(!$demo)
 	{
-		echo '<input style="width:180px; white-space:normal" class="btn btn-default btn-testtool" type="submit" name="submitantwort" value="'.$p->t('testtool/speichernUndWeiter').'" />';
+		echo '<input style="width:180px; white-space:normal; margin-bottom: 130px;" class="btn btn-default btn-testtool" type="submit" name="submitantwort" value="'.$p->t('testtool/speichernUndWeiter').'" />';
 	}
 	else
 	{

@@ -1,18 +1,26 @@
 import CoreNotiz from "../../../Notiz/Notiz.js";
 
+import ApiNotizPerson from '../../../../api/factory/notiz/person.js';
+
 export default {
+	name: "TabNotes",
 	components: {
 		CoreNotiz
 	},
 	props: {
 		modelValue: Object
 	},
+	data() {
+		return {
+			endpoint: ApiNotizPerson
+		};
+	},
 	template: `
 	<div class="stv-details-notizen h-100 pb-3">
 <!--	mit factory als endpoint	-->
 		<core-notiz
 			class="overflow-hidden"
-			:endpoint="$fhcApi.factory.notiz.person"
+			:endpoint="endpoint"
 			ref="formc"
 			notiz-layout="twoColumnsFormLeft"
 			type-id="person_id"

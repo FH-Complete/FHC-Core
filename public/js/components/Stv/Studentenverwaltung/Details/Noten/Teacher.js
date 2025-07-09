@@ -1,5 +1,7 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 
+import ApiStvGrades from '../../../../../api/factory/stv/grades.js';
+
 export default {
 	components: {
 		CoreFilterCmpt
@@ -20,15 +22,10 @@ export default {
 		tabulatorOptions() {
 			return {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: (url, config, params) => {
-					return this.$fhcApi.factory.stv.grades.getTeacherProposal(params.prestudent_id, params.stdsem);
-				},
-				ajaxParams: () => {
-					return {
-						prestudent_id: this.student.prestudent_id,
-						stdsem: this.allSemester
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getTeacherProposal(
+					this.student.prestudent_id,
+					this.allSemester
+				)),
 				ajaxResponse: (url, params, response) => {
 					return response.data || [];
 				},
@@ -63,8 +60,10 @@ export default {
 	methods: {
 		copyGrades(selected) {
 			const promises = selected.map(
-				grade => this.$fhcApi.factory
-					.stv.grades.copyTeacherProposalToCertificate(grade)
+				grade => this.$api
+					.call(ApiStvGrades.copyTeacherProposalToCertificate(grade), {
+						errorHeader: grade.lehrveranstaltung_bezeichnung
+					})
 					.then(() => {
 						this.$refs.table.tabulator.deselectRow(this.$refs.table.tabulator.getRows().find(el => el.getData() == grade).getElement());
 					})

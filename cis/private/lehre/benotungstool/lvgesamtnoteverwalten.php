@@ -1090,7 +1090,10 @@ foreach ($stsem_obj->studiensemester as $studiensemester)
 }
 $stsem_content .= "</SELECT>\n";
 
-if (! $rechte->isBerechtigt('admin', 0) && ! $rechte->isBerechtigt('admin', $lv_obj->studiengang_kz) && ! $rechte->isBerechtigt('lehre', $lv_obj->studiengang_kz))
+if (! $rechte->isBerechtigt('admin', 0)
+	&& ! $rechte->isBerechtigt('admin', $lv_obj->studiengang_kz)
+	&& ! $rechte->isBerechtigt('lehre', $lv_obj->studiengang_kz)
+	&& ! $rechte->isBerechtigt('lehre', $lv_obj->oe_kurzbz))
 {
 	$qry = "SELECT
 				lehreinheit_id

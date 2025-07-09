@@ -1,3 +1,5 @@
+import ApiProfil from '../../../../api/factory/profil.js';
+
 export default {
 	props: {
 		title: {
@@ -24,10 +26,12 @@ export default {
 			if (!this.data) {
 				return;
 			}
-			this.$fhcApi.factory.profil.fotoSperre(!this.FotoSperre).then(res => {
-				this.FotoSperre = res.data.foto_sperre;
-			})
-		},
+			this.$api
+				.call(ApiProfil.fotoSperre(!this.FotoSperre))
+				.then(res => {
+					this.FotoSperre = res.data.foto_sperre;
+				});
+		}
 	},
 	computed: {
 		get_image_base64_src: function () {

@@ -13,7 +13,7 @@ class PlausicheckResolverLib
 	private $_ci; // ci instance
 	private $_extensionName; // name of extension
 	private $_codeLibMappings = []; // mappings for issues which explicitly defined resolver
-	private $_codeProducerLibMappings = []; // mappings for issues which are resolved as produced
+	private $_codeProducerLibMappings = []; // mappings for issues which are resolved with the same check as they are produced
 
 	public function __construct($params = null)
 	{
@@ -99,10 +99,11 @@ class PlausicheckResolverLib
 					$issueResolved = getData($issueResolvedRes) === true;
 				}
 			}
-			elseif (isset($this->_codeProducerLibMappings[$issue->fehlercode]))
+			elseif (isset($this->_codeProducerLibMappings[$issue->fehlercode])) // check if it is an issue without explicit resolver, "self-resolving"
 			{
 				$libName = $this->_codeProducerLibMappings[$issue->fehlercode];
 
+				// execute same check as used for issue production 
 				$issueResolvedRes = $this->_ci->plausicheckproducerlib->producePlausicheckIssue(
 					$libName,
 					$issue->fehler_kurzbz,

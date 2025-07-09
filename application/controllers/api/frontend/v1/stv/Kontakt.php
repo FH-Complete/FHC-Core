@@ -85,7 +85,10 @@ class Kontakt extends FHCAPI_Controller
 			|| $this->router->method == 'addNewBankverbindung'
 		) {
 			$person_id = current(array_slice($this->uri->rsegments, 2));
-			
+
+			if (is_null($person_id) || !ctype_digit((string)$person_id))
+				$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
 			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud);
 		} elseif ($this->router->method == 'loadAddress'
 			|| $this->router->method == 'loadContact'
@@ -118,6 +121,9 @@ class Kontakt extends FHCAPI_Controller
 			) {
 				$model = 'person/Bankverbindung_model';
 			}
+
+			if (!isset($id) || !ctype_digit((string)$id))
+				$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
 			$this->load->model($model, 'TempModel');
 			$result = $this->TempModel->load($id);
@@ -387,8 +393,11 @@ class Kontakt extends FHCAPI_Controller
 		$this->terminateWithSuccess(getData($result) ?: []);
 	}
 
-	public function getFirmen($searchString)
+	public function getFirmen($searchString = null)
 	{
+		if (is_null($searchString))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
 		$this->load->model('ressource/firma_model', 'FirmaModel');
 
 		$result = $this->FirmaModel->searchFirmen($searchString);
@@ -398,8 +407,11 @@ class Kontakt extends FHCAPI_Controller
 		$this->terminateWithSuccess($result ?: []);
 	}
 
-	public function getStandorte($searchString)
+	public function getStandorte($searchString = null)
 	{
+		if (is_null($searchString))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
 		$this->load->model('organisation/standort_model', 'StandortModel');
 
 		$result = $this->StandortModel->searchStandorte($searchString);
@@ -409,8 +421,11 @@ class Kontakt extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	public function getStandorteByFirma($firma_id)
+	public function getStandorteByFirma($firma_id = null)
 	{
+		if (is_null($firma_id) || !ctype_digit((string)$firma_id))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
 		$this->load->model('organisation/standort_model', 'StandortModel');
 
 		$result = $this->StandortModel->getStandorteByFirma($firma_id);
@@ -652,6 +667,9 @@ class Kontakt extends FHCAPI_Controller
 		$bic = $this->input->post('bic');
 		$blz  = $this->input->post('blz');
 		$kontonr = $this->input->post('kontonr');
+		$iban = $this->input->post('iban');
+		$typ = $this->input->post('typ');
+		$verrechnung = $this->input->post('verrechnung');
 
 		$result = $this->BankverbindungModel->insert(
 			[
@@ -659,13 +677,13 @@ class Kontakt extends FHCAPI_Controller
 				'name' => $name,
 				'anschrift' => $anschrift,
 				'bic' => $bic,
-				'iban' => $_POST['iban'],
+				'iban' => $iban,
 				'blz' => $blz,
 				'kontonr' => $kontonr,
 				'insertvon' => 'uid',
 				'insertamum' => date('c'),
-				'typ' => $_POST['typ'],
-				'verrechnung' => $_POST['verrechnung'],
+				'typ' => $typ,
+				'verrechnung' => $verrechnung,
 				'ext_id' => $ext_id,
 				'oe_kurzbz' => $oe_kurzbz,
 				'orgform_kurzbz' => $orgform_kurzbz

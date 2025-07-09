@@ -10,7 +10,7 @@ export default {
 			if(this.allActiveLanguages.some(l => l.sprache === lang))
 			{
 				const isReload = document.querySelector('[cis4Reload]')
-				this.$p.setLanguage(lang, this.$fhcApi)
+				this.$p.setLanguage(lang)
 				.then(res => res.data)
 				.then(data =>
 				{

@@ -95,6 +95,9 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 	}, $server_language);
 	$user_language = getUserLanguage();
 
+	$ci->load->config('javascript');
+	$systemerror_mailto = $ci->config->item('systemerror_mailto');
+
 	$FHC_JS_DATA_STORAGE_OBJECT = array(
 		'app_root' => APP_ROOT,
 		'ci_router' => $indexPage,
@@ -103,6 +106,7 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 		'server_languages' => $server_language,
 		'user_language' => $user_language,
 		'timezone' => date_default_timezone_get(),
+		'systemerror_mailto' => $systemerror_mailto,
 	);
 
 	$toPrint = "\n";

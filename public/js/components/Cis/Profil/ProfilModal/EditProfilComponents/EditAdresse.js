@@ -1,3 +1,5 @@
+import ApiProfil from '../../../../../api/factory/profil.js';
+
 export default {
   components: {
     AutoComplete: primevue.autocomplete,
@@ -52,8 +54,8 @@ export default {
         this.data.plz > 999 &&
         this.data.plz < 32000
       ) {
-        this.$fhcApi.factory.profil
-          .getGemeinden(this.data.nation, this.data.plz)
+        this.$api
+          .call(ApiProfil.getGemeinden(this.data.nation, this.data.plz))
           .then((res) => {
             if (res.data.length) {
               this.gemeinden = [
@@ -120,10 +122,12 @@ export default {
 
   created() {
     // get all available nationen
-    this.$fhcApi.factory.profil.getAllNationen().then((res)=>{
-      this.nationenList = res.data;
-      this.getGemeinde();
-    })
+    this.$api
+      .call(ApiProfil.getAllNationen())
+      .then(res => {
+        this.nationenList = res.data;
+        this.getGemeinde();
+      });
    
     this.originalValue = JSON.stringify(this.data);
     this.zustellAdressenCount = this.getZustelladressenCount();

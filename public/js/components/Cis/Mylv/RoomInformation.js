@@ -3,6 +3,8 @@ import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
 
+import ApiStudenplan from '../../../api/factory/stundenplan.js';
+
 export const DEFAULT_MODE_RAUMINFO = 'Week'
 
 const RoomInformation = {
@@ -163,8 +165,8 @@ const RoomInformation = {
 
 			// bundles the room_events and the reservierungen together into the this.events array
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getRoomInfo(this.propsViewData.ort_kurzbz, this.monthFirstDay, this.monthLastDay),
-				this.$fhcApi.factory.stundenplan.getOrtReservierungen(this.propsViewData.ort_kurzbz, this.monthFirstDay, this.monthLastDay)
+				this.$api.call(ApiStudenplan.getRoomInfo(this.propsViewData.ort_kurzbz, this.monthFirstDay, this.monthLastDay)),
+				this.$api.call(ApiStudenplan.getOrtReservierungen(this.propsViewData.ort_kurzbz, this.monthFirstDay, this.monthLastDay))
 			]).then((result) => {
 				let promise_events = [];
 				result.forEach((promise_result) => {

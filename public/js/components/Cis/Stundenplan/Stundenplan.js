@@ -10,6 +10,9 @@ import { useEventLoader } from '../../../composables/EventLoader.js'
 import CalendarDateObj from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
 
+import ApiStundenplan from '../../../api/factory/stundenplan.js';
+import ApiAuthinfo from '../../../api/factory/authinfo.js';
+
 export const DEFAULT_MODE_STUNDENPLAN = 'Week'
 
 const Stundenplan = {
@@ -259,7 +262,7 @@ const Stundenplan = {
 		},
 
 		fetchStudiensemesterDetails: async function (date) {
-			return this.$fhcApi.factory.stundenplan.studiensemesterDateInterval(date);
+			return this.$api.call(ApiStundenplan.studiensemesterDateInterval(date));
 		},
 		convertTime: function([hour,minute]){
 			let date = new Date();
@@ -300,9 +303,9 @@ const Stundenplan = {
 		},
 		loadEventsOld() {
 			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id),
-				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay)
-			]).then(results => {
+				this.$api.call(ApiStundenplan.getStundenplan(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id)),
+				this.$api.call(ApiStundenplan.getStundenplanReservierungen(this.monthFirstDay, this.monthLastDay))
+			]).then((result) => {
 				let promise_events = [];
 				results.forEach(promise_result => {
 					if (
@@ -334,12 +337,13 @@ const Stundenplan = {
 			lv,
 			eventRangeInterval
 		};
-	},
-	created() {
-		this.$fhcApi
-			.factory.authinfo.getAuthUID()
-			.then(data => this.uid = data.data.uid);
-		//this.loadEvents();
+	},created() {
+		this.$api
+			.call(ApiAuthinfo.getAuthUID())
+			.then(res => res.data)
+			.then(data => {
+				this.uid = data.uid;
+			});
 	},
 	beforeUnmount() {
 		if (this.$refs.lvmodal)
