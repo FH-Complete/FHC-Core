@@ -2,6 +2,8 @@ import GridLine from './Grid/Line.js';
 
 import CalDnd from '../../../directives/Calendar/DragAndDrop.js';
 
+// TODO(chris): grid-gap && break-height
+
 export default {
 	name: "CalendarGrid",
 	components: {
