@@ -83,13 +83,13 @@ export default {
 			<slot name="modalContent"></slot>
 			
 			<template v-if="showMenu && this.menu">
-				<h3>{{$p.t('lehre','lehrveranstaltungsmenue')}}</h3>
+				<h5>{{$p.t('lehre','lehrveranstaltungsmenue')}}</h5>
 				<lv-menu :menu="menu"></lv-menu>
 			</template>
 		</template>
 		<!-- optional footer -->
 		<template  v-slot:footer >
-			<button class="btn btn-outline-secondary " @click="hide">{{$p.t('ui','cancel')}}</button>    
+			<button class="btn btn-outline-secondary card" @click="hide">{{$p.t('ui','cancel')}}</button>    
 		</template>
 		<!-- end of optional footer --> 
 	</bs-modal>`,

@@ -108,9 +108,9 @@ html {
 	--fhc-cis-main-py: 1.5rem;
 
 	--fhc-cis-menu-lvl-1-bg: var(--fhc-primary);
-	--fhc-cis-menu-lvl-1-color: var(--fhc-text);
+	--fhc-cis-menu-lvl-1-color: var(--fhc-light);
 	--fhc-cis-menu-lvl-1-bg-hover: var(--fhc-primary-highlight);
-	--fhc-cis-menu-lvl-1-color-hover: var(--fhc-text);
+	--fhc-cis-menu-lvl-1-color-hover: var(--fhc-light);
 
 	--fhc-cis-menu-lvl-2-bg: var(--fhc-secondary);
 	--fhc-cis-menu-lvl-2-color: var(--fhc-text);
@@ -133,6 +133,10 @@ html {
 	--fhc-cis-menu-lvl-5-color-hover: var(--fhc-text);
 	--fhc-cis-grade-positive: var(--fhc-success);
 	--fhc-cis-grade-negative: var(--fhc-danger);
+}
+
+#themeSwitch i{
+	color: var(fhc-light) !important;
 }
 
 @media (min-width: 992px) {

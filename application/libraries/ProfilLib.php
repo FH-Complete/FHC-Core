@@ -25,7 +25,6 @@ class ProfilLib{
 				return error(getData($isMitarbeiter));
 			}
 			$isMitarbeiter = getData($isMitarbeiter);
-			$isMitarbeiter = $isMitarbeiter ? current($isMitarbeiter) : false;
 			if ($isMitarbeiter) {
 				$res->view = "MitarbeiterProfil";
 				$res->data = $this->mitarbeiterProfil();

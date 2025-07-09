@@ -264,7 +264,7 @@ export default {
 			<!-- Bearbeiten Button -->
 			<div v-if="isEditable" class="row ">
 				<div class="col mb-3">
-					<button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+					<button @click="showEditProfilModal" type="button" class="card text-start  w-100 btn btn-outline-secondary" >
 						<div class="row">
 							<div class="col-2">
 								<i class="fa fa-edit"></i>
@@ -399,7 +399,7 @@ export default {
 			<!-- Bearbeiten Button -->
 			<div class="row d-none d-md-block">
 				<div class="col mb-3">
-					<button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+					<button @click="()=>showEditProfilModal()" type="button" class="card text-start  w-100 btn btn-outline-secondary" >
 						<div class="row">
 							<div class="col-2">
 								<i class="fa fa-edit"></i>

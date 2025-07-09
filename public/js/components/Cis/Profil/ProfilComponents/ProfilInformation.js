@@ -87,7 +87,7 @@ export default {
             <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
             <div class="col-12 col-sm-6 mb-2">
                 <div class="row justify-content-center">
-                    <div class="col-auto " style="position:relative">
+                    <div class="col-auto profil-image" style="position:relative">
                         <img alt="profile picture" class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"/>
                         <!-- LOCKING IMAGE FUNCTIONALITY -->
                         <div v-if="isEditable" role="button" @click.prevent="sperre_foto_function" class="image-lock">
