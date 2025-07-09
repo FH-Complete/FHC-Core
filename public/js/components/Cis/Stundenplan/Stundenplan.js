@@ -6,6 +6,7 @@ import EventEvent from "./Event/Event.js";
 
 import CalendarDate from "../../../helpers/Calendar/Date.js";
 
+import { useEventLoader } from '../../../composables/EventLoader.js'
 import CalendarDateObj from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
 
@@ -43,7 +44,6 @@ const Stundenplan = {
 				day: Vue.markRaw(CalendarViewDay)
 			},
 			eventsLoaded: [],
-			events: [],
 			backgrounds: [{
 				end: luxon.DateTime.local().ts,
 				class: "background-past",
@@ -54,7 +54,6 @@ const Stundenplan = {
 			eventCalendarDate: new CalendarDateObj(new Date()),
 			currentlySelectedEvent: null,
 			currentDay: this.propsViewData?.focus_date ? new Date(this.propsViewData.focus_date) : new Date(),
-			lv: null,
 			minimized: false,
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
@@ -248,24 +247,8 @@ const Stundenplan = {
 			this.sendRouterParams(this.currentDay, modeCapitalized);
 			this.calendarMode = modeCapitalized;
 		},
-
 		updateRange({ first, last }) {
-			this.loadEvents(first, last)
-			// TODO(chris): remove CalendarObj
-			/*const checkDate = date => {
-				return date.getMonth() + 1 != this.eventCalendarDate.m || date.getFullYear() != this.eventCalendarDate.y;
-			}
-			this.calendarDate = new CalendarDateObj(last);
-
-			// only load month data if the month or year has changed
-			if (checkDate(first) && checkDate(last)){
-				// reset the events before querying the new events to activate the loading spinner
-				this.events = null;
-				this.eventCalendarDate = new CalendarDateObj(last);
-				Vue.nextTick(() => {
-					this.loadEvents();
-				});
-			}*/
+			this.eventRangeInterval = luxon.Interval.fromDateTimes(first, last);
 		},
 		showModal(e, event) {
 			this.currentlySelectedEvent = event;
@@ -334,6 +317,22 @@ const Stundenplan = {
 				this.events = promise_events;
 			});
 		},
+	},
+	setup(props, a) {
+		const $fhcApi = Vue.inject('$fhcApi');
+		const eventRangeInterval = Vue.ref(null);
+		const { events, lv } = useEventLoader(eventRangeInterval, (start, end) => {
+			return [
+				$fhcApi.factory.stundenplan.getStundenplan(start.toISODate(), end.toISODate(), lv.value),
+				$fhcApi.factory.stundenplan.getStundenplanReservierungen(start.toISODate(), end.toISODate())
+			];
+		});
+
+		return {
+			events,
+			lv,
+			eventRangeInterval
+		};
 	},
 	created() {
 		this.$fhcApi
