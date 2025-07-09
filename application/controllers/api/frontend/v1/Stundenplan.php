@@ -18,6 +18,9 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DateTime as DateTime;
+use \DateTimeZone as DateTimeZone;
+
 class Stundenplan extends FHCAPI_Controller
 {
 
@@ -51,7 +54,8 @@ class Stundenplan extends FHCAPI_Controller
 		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 		$this->load->model('ressource/Reservierung_model', 'ReservierungModel');
 
-
+		// Load Config
+		$this->load->config('calendar');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -237,10 +241,9 @@ class Stundenplan extends FHCAPI_Controller
 	// ################# Private Functions
 
 	private function expand_object_information($data){
-
 		foreach ($data as $item)
 		{
-			$tz = new DateTimeZone('Europe/Vienna');
+			$tz = new DateTimeZone($this->config->item('timezone'));
 			$isostart = new DateTime($item->datum . ' ' . $item->beginn, $tz);
 			$item->isostart = $isostart->format(DateTime::ATOM);
 

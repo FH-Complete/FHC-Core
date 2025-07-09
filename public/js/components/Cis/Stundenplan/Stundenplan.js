@@ -26,6 +26,7 @@ const Stundenplan = {
 		};
 	},
 	props: {
+		viewData: Object,
 		propsViewData: Object,
 		rowMinHeight: {
 			type: String,
@@ -365,6 +366,7 @@ const Stundenplan = {
 		<fhc-calendar 
 			ref="calendar"
 			:locale="$p.user_locale.value"
+			:timezone="viewData.timezone"
 			:views="calendarViews"
 			:view="propsViewData.mode.toLowerCase()"
 			:date="currentDay"

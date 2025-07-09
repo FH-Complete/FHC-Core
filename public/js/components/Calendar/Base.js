@@ -68,7 +68,7 @@ export default {
 		},
 		timezone: {
 			type: String,
-			default: 'Asia/Dhaka'//'local'
+			required: true
 		},
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
