@@ -1,8 +1,6 @@
 import BaseSlider from '../Base/Slider.js';
 import DayView from './Day/View.js';
 
-import CalendarDate from '../../../helpers/Calendar/Date.js';
-
 export default {
 	name: "ModeDay",
 	components: {

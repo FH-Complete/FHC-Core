@@ -157,7 +157,7 @@ export default {
 
 			const onePercOfAllPartsInMs = msOfAllParts / 100 || 1; // NOTE(chris): prevent 0 division
 
-			return this.axisPartsWithBreaks.map((part, i) => 
+			return this.axisPartsWithBreaks.map(part => 
 				part.index !== undefined
 					? '[part_' + (part.index + 1) + '] ' + (part.end.toMillis() - part.start.toMillis()) / msPerHr + 'fr'
 					: (part.end.toMillis() - part.start.toMillis()) / onePercOfAllPartsInMs + '%'
@@ -166,7 +166,7 @@ export default {
 	},
 	methods: {
 		mapIntoMainAxis(target) {
-			const result = Array.from({length: this.axisMain.length}, e => Array());
+			const result = Array.from({length: this.axisMain.length}, () => Array());
 			
 			target.forEach(event => {
 				// NOTE(chris): make new Date object to reset the time

@@ -2,7 +2,6 @@ import BaseDraganddrop from './Base/DragAndDrop.js';
 import BaseHeader from './Base/Header.js';
 import BaseSlider from './Base/Slider.js';
 
-import CalendarDate from '../../helpers/Calendar/Date.js';
 import CalendarEvent from '../../helpers/Calendar/Event.js';
 
 import CalClick from '../../directives/Calendar/Click.js';
@@ -28,7 +27,6 @@ export default {
 		CalClick
 	},
 	provide() {
-		const self = this;
 		return {
 			locale: Vue.computed(() => this.locale),
 			timezone: Vue.computed(() => this.timezone),
@@ -148,7 +146,7 @@ export default {
 					else if (res.start instanceof Date)
 						res.start = luxon.DateTime.fromJSDate(res.start, { zone: this.timezone, locale: this.locale });
 					else if (typeof res.start === 
-						string || res.start instanceof String)
+						'string' || res.start instanceof String)
 						res.start = luxon.DateTime.fromISO(res.start, { zone: this.timezone, locale: this.locale });
 				}
 				if (res.end) {
@@ -157,7 +155,7 @@ export default {
 					else if (res.end instanceof Date)
 						res.end = luxon.DateTime.fromJSDate(res.end, { zone: this.timezone, locale: this.locale });
 					else if (typeof res.end === 
-						string || res.end instanceof String)
+						'string' || res.end instanceof String)
 						res.end = luxon.DateTime.fromISO(res.end, { zone: this.timezone, locale: this.locale });
 				}
 				return res;

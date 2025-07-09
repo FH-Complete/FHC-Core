@@ -97,10 +97,10 @@ export default {
 	},
 	methods: {
 		onDragstart(evt) {
-			let test = DragAndDrop.setTransferData(evt.detail.originalEvent, evt.detail.item.orig);
+			DragAndDrop.setTransferData(evt.detail.originalEvent, evt.detail.item.orig);
 			this.draggedInternalEvent = evt.detail.item;
 		},
-		onDragend(evt) {
+		onDragend() {
 			this.draggedInternalEvent = null;
 			this.dragging = false;
 		},
@@ -115,7 +115,7 @@ export default {
 				this.dropAllowed = this.dropableEvents(this.draggedInternalEvent, this.mode);
 			}
 		},
-		onDragleave(evt) {
+		onDragleave() {
 			this.dragging = false;
 		},
 		onDragchange(evt) {

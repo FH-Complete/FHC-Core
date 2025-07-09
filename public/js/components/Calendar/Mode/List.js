@@ -1,8 +1,6 @@
 import BaseSlider from '../Base/Slider.js';
 import ListView from './List/View.js';
 
-import CalendarDate from '../../../helpers/Calendar/Date.js';
-
 export default {
 	name: "ModeList",
 	components: {

@@ -1,8 +1,6 @@
 import BaseSlider from '../Base/Slider.js';
 import WeekView from './Week/View.js';
 
-import CalendarDate from '../../../helpers/Calendar/Date.js';
-
 export default {
 	name: "ModeWeek",
 	components: {
