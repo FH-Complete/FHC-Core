@@ -1,6 +1,6 @@
 
 :root{
-	--fhc-profil-border: var(--fhc-border, white);
+	--fhc-profil-border: var(--fhc-background-highlight, gray);
 	--fhc-profil-tabulator-shadow: var(--fhc-shadow-20, rgba(0,0,0,0.1));
 }
 

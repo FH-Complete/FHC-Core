@@ -32,7 +32,7 @@ class Profil extends FHCAPI_Controller
 			'getGemeinden' => self::PERM_LOGGED,
 			'getAllNationen' => self::PERM_LOGGED,
 			'isMitarbeiter' => self::PERM_LOGGED,
-			
+			'profilViewData' => self::PERM_LOGGED,
 		]);
 		
 		$this->load->library('PermissionLib');
@@ -58,7 +58,28 @@ class Profil extends FHCAPI_Controller
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
-
+	public function profilViewData($uid){
+		$uid = json_decode($uid);
+		$this->load->library('ProfilLib');
+		$editable = false;
+		if(isset($uid) && $uid != null){
+			$profil_data = $this->profillib->getView($uid);
+			if($uid == getAuthUID()){
+				$editable = true;
+			}
+		}else{
+			$editable = true;
+			$profil_data = $this->profillib->getView(getAuthUID());
+		}
+		
+		$profil_data = hasData($profil_data) ? getData($profil_data) : null;
+		$viewData = array(
+			'editable'=>$editable,
+			'profil_data' => $profil_data,
+		);
+		$this->terminateWithSuccess($viewData);
+	}
+	
 	
     /**
 	 * function that returns the data used for the corresponding view
@@ -70,7 +91,6 @@ class Profil extends FHCAPI_Controller
 	public function getView($uid)
 	{
 		$res = new stdClass();
-		$editAllowed = getAuthUID() == $uid || $this->permissionlib->isBerechtigt('admin');
 
 		// if parsing the URL did not found a UID then the UID of the logged in user is used
 		if ($uid == "Profil" || $uid == $this->uid) {
@@ -85,8 +105,6 @@ class Profil extends FHCAPI_Controller
 				$res->data = $this->studentProfil();
 				$res->data->pid = $this->pid;
 			}
-			// editing your own profil - true
-			$editAllowed = true;
 		}
 		// UID is availabe when accessing Profil/View/:uid
 		else {
@@ -109,7 +127,6 @@ class Profil extends FHCAPI_Controller
 			}
 		}
 		$res->data->fotoStatus=$this->isFotoAkzeptiert($this->pid);
-		$res->data->editAllowed = $editAllowed;
 		$this->terminateWithSuccess($res);
 	}
 
