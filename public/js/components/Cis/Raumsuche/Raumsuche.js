@@ -185,11 +185,10 @@ export const Raumsuche =  {
 
 		}
 	},
-	watch: {
-
-	},
 	computed: {
-
+		isDarkMode(){
+			return this.$theme.theme_name.value == 'dark';
+		}
 	},
 	created() {
 		
@@ -203,6 +202,7 @@ export const Raumsuche =  {
 	<div class="row">
 		<div class="col-12 col-lg-2">
 			<VueDatePicker
+				:dark="isDarkMode"
 				v-model="datum"
 				:clearable="false"
 				date-picker
@@ -215,6 +215,7 @@ export const Raumsuche =  {
 		</div>
 		<div class="col-12 col-lg-1">
 			<VueDatePicker
+				:dark="isDarkMode"
 				v-model="von"
 				:clearable="false"
 				time-picker
@@ -227,6 +228,7 @@ export const Raumsuche =  {
 		</div>
 		<div class="col-12 col-lg-1">
 			<VueDatePicker
+				:dark="isDarkMode"
 				v-model="bis"
 				:clearable="false"
 				time-picker

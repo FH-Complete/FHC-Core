@@ -1,4 +1,4 @@
-const theme_name= FHC_JS_DATA_STORAGE_OBJECT.theme.name;
+let theme_name = Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.theme.name);
 const theme_modes = FHC_JS_DATA_STORAGE_OBJECT.theme.modes;
 
 const toggleTheme = (theme)=>{
@@ -7,6 +7,7 @@ const toggleTheme = (theme)=>{
 	for (const theme of theme_modes) {
 		document.documentElement.classList.remove(theme);
 	}
+	theme_name.value = theme;
 	document.documentElement.classList.add(theme);
 
 	document.body.setAttribute("data-bs-theme", theme);
@@ -40,7 +41,7 @@ const initializeTheme = ()=>{
 export default {
 	install: (app,options)=>{
 		
-		document.documentElement.classList.add(theme_name);
+		document.documentElement.classList.add(theme_name.value);
 
 		initializeTheme();
 
