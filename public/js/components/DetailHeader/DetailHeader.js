@@ -108,47 +108,46 @@ export default {
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-3 gap-3" style="max-height:9rem; min-width: 37.5rem;">
 
 			<template v-if="typeHeader==='student'">
-					<div
-						v-for="person in headerData"
-						:key="person.person_id"
-						class="d-flex flex-column align-items-center h-100"
-						class="position-relative d-inline-block"
-					>
-						<img
-						  class="d-block h-100 rounded"
-						  alt="Profilbild"
-						  :src="'data:image/jpeg;base64,' + person.foto"
-						/>
+				<div
+					v-for="person in headerData"
+					:key="person.person_id"
+					class="d-flex flex-column align-items-center h-100 position-relative d-inline-block"
+				>
+					<img
+					  class="d-block h-100 rounded"
+					  alt="Profilbild"
+					  :src="'data:image/jpeg;base64,' + person.foto"
+					/>
 
-						<template v-if="person.foto_sperre">
-							<i
-							  class=" fa fa-lock text-secondary bg-light rounded d-flex justify-content-center align-items-center position-absolute top-0 end-0"
-							  style="z-index: 1; font-size: 1rem; width: 1.25rem; height: 1.25rem;"
-							></i>
-						</template>
+					<template v-if="person.foto_sperre">
+						<i
+						  class=" fa fa-lock text-secondary bg-light rounded d-flex justify-content-center align-items-center position-absolute top-0 end-0"
+						  style="z-index: 1; font-size: 1rem; width: 1.25rem; height: 1.25rem;"
+						></i>
+					</template>
 					<small class="text-muted">{{person.uid}}</small>
-					</div>
+				</div>
 
-					<div v-if="headerData.length == 1">
-						<h2 class="h4">
-							{{headerData[0].titelpre}}
-							{{headerData[0].vorname}}
-							{{headerData[0].nachname}},
-							{{headerData[0].titelpost}}
-						</h2>
+				<div v-if="headerData.length == 1">
+					<h2 class="h4">
+						{{headerData[0].titelpre}}
+						{{headerData[0].vorname}}
+						{{headerData[0].nachname}},
+						{{headerData[0].titelpost}}
+					</h2>
 
-						<h5 class="h6">
-						 <strong class="text-muted">Person ID </strong>
-							{{headerData[0].person_id}}
-							<strong class="text-muted">| {{$p.t('lehre', 'studiengang')}} </strong>
-							 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
-							<strong v-if="headerData[0].semester" class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
-							  {{headerData[0].semester}}
-							<strong v-if="headerData[0].verband" class="text-muted"> | {{$p.t('lehre', 'verband')}}</strong>
-							{{headerData[0].verband}}
-							<strong v-if="headerData[0].gruppe" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
-							{{headerData[0].gruppe}}
-						 </h5>
+					<h5 class="h6">
+					 <strong class="text-muted">Person ID </strong>
+						{{headerData[0].person_id}}
+						<strong class="text-muted">| {{$p.t('lehre', 'studiengang')}} </strong>
+						 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
+						<strong v-if="headerData[0].semester" class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
+						  {{headerData[0].semester}}
+						<strong v-if="headerData[0].verband" class="text-muted"> | {{$p.t('lehre', 'verband')}}</strong>
+						{{headerData[0].verband}}
+						<strong v-if="headerData[0].gruppe" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
+						{{headerData[0].gruppe}}
+					 </h5>
 
 					  <h5 class="h6">
 						<strong class="text-muted">Email </strong>
@@ -161,7 +160,6 @@ export default {
 						  {{headerData[0].matr_nr}}
 					  </h5>
 
-					</div>
 				</div>
 		</template>
 

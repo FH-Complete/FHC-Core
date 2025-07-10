@@ -39,8 +39,6 @@ $configArray = [
 
 <div id="main">
 	<router-view
-		stv-root="<?= site_url('Vertragsverwaltung'); ?>"
-		cis-root="<?= CIS_ROOT; ?>"
 		:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
 		:config="<?=  htmlspecialchars(json_encode($configArray)); ?>"
 	>

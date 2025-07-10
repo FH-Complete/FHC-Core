@@ -698,14 +698,14 @@ export default {
 								>
 							</form-input>
 						</div>
-				</core-form>
+					</core-form>
 				
 				<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="reload()">{{$p.t('ui', 'abbrechen')}}</button>
 					<button type="button" class="btn btn-primary" :disabled="!this.hasSchreibrechte" @click="statusNew ? addNewContract() : updateContract(formData.vertrag_id)">{{$p.t('vertrag', 'vertragErstellen')}}</button>
 				</template>
 			</bs-modal>
-		</core-form>
+
 	</div>`
 }
 
