@@ -43778,7 +43778,7 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
-		'phrase' => 'stornieren',
+		'phrase' => 'vertragStornieren',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -43789,7 +43789,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Cancel',
+				'text' => 'Cancel contract',
 				'description' => '',
 				'insertvon' => 'system'
 			)

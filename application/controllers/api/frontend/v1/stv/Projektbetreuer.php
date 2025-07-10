@@ -168,13 +168,13 @@ class Projektbetreuer extends FHCAPI_Controller
 		$betreuerart_kurzbz = $this->input->post('betreuerart_kurzbz');
 
 		if (!isset($projektarbeit_id) || !is_numeric($projektarbeit_id))
-			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Projektarbeit ID'], self::ERROR_TYPE_GENERAL));
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> $this->p->t('projektarbeit', 'projektarbeit').' ID'], self::ERROR_TYPE_GENERAL));
 
 		if (!isset($person_id) || !is_numeric($person_id))
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Person ID'], self::ERROR_TYPE_GENERAL));
 
 		if (!isset($betreuerart_kurzbz))
-			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Betreuerart'], self::ERROR_TYPE_GENERAL));
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> $this->p->t('projektarbeit', 'betreuerart')], self::ERROR_TYPE_GENERAL));
 
 		if (!$this->ProjektarbeitModel->hasBerechtigungForProjektarbeit($projektarbeit_id))
 			return $this->_outputAuthError([$this->router->method => ['admin:rw', 'assistenz:rw']]);
@@ -295,19 +295,19 @@ class Projektbetreuer extends FHCAPI_Controller
 		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('betreuerart_kurzbz', 'Betreuerart', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Betreuerart'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('projektarbeit', 'betreuerart')])
 		]);
 
 		$this->form_validation->set_rules('person_id', 'Person', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Person ID'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('projektarbeit', 'betreuer')])
 		]);
 
 		$this->form_validation->set_rules('stunden', 'Stunden', 'numeric', [
-			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Stunden'])
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => $this->p->t('projektarbeit', 'stunden')])
 		]);
 
 		$this->form_validation->set_rules('stundensatz', 'Stundensatz', 'numeric', [
-			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Stundensatz'])
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' =>  $this->p->t('projektarbeit', 'stundensatz')])
 		]);
 
 

@@ -102,6 +102,7 @@ export default {
 			this.formData.note = null;
 			this.formData.final = true;
 			this.formData.anmerkung = null;
+			this.$refs.formDetails.clearValidation();
 		},
 		getFormData(statusNew, studiensemester_kurzbz, additional_lehrveranstaltung_id/*, successCallback*/) {
 

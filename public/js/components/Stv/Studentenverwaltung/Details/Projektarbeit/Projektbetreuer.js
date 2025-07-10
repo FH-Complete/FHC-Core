@@ -84,13 +84,16 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
+				//layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '100',
 				selectable: true,
 				selectable: 1,
 				index: 'betreuer_id',
+				persistence:{
+					columns: true, //persist column layout
+				},
 				persistenceID: 'stv-details-projektbetreuer'
 			},
 			tabulatorEvents: [
@@ -98,6 +101,13 @@ export default {
 					event: 'tableBuilt',
 					handler: async() => {
 						await this.$p.loadCategory(['global', 'person', 'stv', 'projektarbeit', 'ui']);
+					}
+				},
+				{
+					event: 'rowSelected',
+					handler: row => {
+						let data = row.getData();
+						this.actionEditProjektbetreuer(data.projektarbeit_id, data.person_id, data.betreuerart_kurzbz);
 					}
 				}
 			],
@@ -156,7 +166,7 @@ export default {
 						this.formData = betreuer;
 
 						// set download link
-						if (betreuer.beurteilungDownloadLink) this.beurteilungDownloadLink = betreuer.beurteilungDownloadLink
+						if (betreuer.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = betreuer.beurteilungDownloadLink;
 
 						// set betreuer for autocomplete field
 						this.autocompleteSelectedBetreuer = {
@@ -279,15 +289,16 @@ export default {
 				alleBetreuer.push(this.addAutoCompleteBetreuerToFormData(this.formData));
 			}
 
-			return this.$api.call(ApiStvProjektbetreuer.validateProjektbetreuer(alleBetreuer));
+			return this.$refs.formProjektbetreuer.call(ApiStvProjektbetreuer.validateProjektbetreuer(alleBetreuer));
 		},
 		resetForm() {
 			this.formData = this.getDefaultFormData();
-			this.beurteilungDownloadLink = null;
+			if (this.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = '';
 			this.autocompleteSelectedBetreuer = null;
 			this.initialFormData = null;
 			if (this.projekttyp_kurzbz) this.setDefaultStunden(this.projekttyp_kurzbz);
 			this.disableVertragFields(false);
+			this.$refs.formProjektbetreuer.clearValidation();
 		},
 		resetModes() {
 			this.newMode = false;
@@ -417,7 +428,7 @@ export default {
 						type="autocomplete"
 						optionLabel="name"
 						v-model="autocompleteSelectedBetreuer"
-						name="betreuer"
+						name="person_id"
 						:suggestions="filteredBetreuer"
 						@complete="searchBetreuer"
 						:min-length="3"
@@ -501,13 +512,13 @@ export default {
 			<button class="btn btn-primary" v-show="betreuerFormOpened" @click="confirmProjektbetreuerAfterValidation">
 				{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}
 			</button>
-			<div class = "mt-5">
+			<div class = "mt-5" v-if="beurteilungDownloadLink !== null">
 				<div class="mb-1">
-					<a :href="beurteilungDownloadLink" class="btn btn-primary d-block" :class="{ 'disabled' : !beurteilungDownloadLink || beurteilungDownloadLink == ''}">
+					<a :href="beurteilungDownloadLink" class="btn btn-primary d-block" :class="{ 'disabled' : beurteilungDownloadLink === ''}">
 						{{ $p.t('projektarbeit', 'projektbeurteilungErstellen') }}
 					</a>
 				</div>
-				{{ autocompleteSelectedBetreuer?.person_id && (!beurteilungDownloadLink || beurteilungDownloadLink == '') ? $p.t('projektarbeit', 'projektarbeitNochNichtBeurteilt') : ''}}
+				{{ autocompleteSelectedBetreuer?.person_id && beurteilungDownloadLink === '' ? $p.t('projektarbeit', 'projektarbeitNochNichtBeurteilt') : ''}}
 			</div>
 		</div>
 

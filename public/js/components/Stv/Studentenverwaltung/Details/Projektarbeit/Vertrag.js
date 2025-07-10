@@ -125,36 +125,22 @@ export default{
 				<div class="mb-3">
 					{{ betreuerProjektarbeit?.betreuerart_kurzbz && betreuerProjektarbeit?.vertrag_id == null ? ' – '+$p.t('lehre', 'nochKeinVertrag') : '' }}
 				</div>
-				<div class="row align-items-end mb-3">
-					<form-input
-						:label="$p.t('lehre', 'vertragsstatus')"
-						type="text"
-						readonly
-						v-model="vertragsstatus"
-						:style="{fontWeight: vertragsstatus === this.vertragsstatus_geaendert ? 'bold' : 'normal'}"
-						name="vertragsstatus"
-					/>
-				</div>
-				{{$p.t('lehre', 'vertragurfassung')}}
 				<div class="row mb-3">
-					<form-input
-						:label="$p.t('lehre', 'semesterstunden')"
-						type="text"
-						readonly
-						v-model="data.vertragsstunden"
-						name="vertragsstunden"
-						>
-					</form-input>
+					<div class="col-12">
+						{{ $p.t('lehre', 'vertragsstatus') }}: {{ vertragsstatus }}
+					</div>
 				</div>
 				<div class="row mb-3">
-					<form-input
-						:label="$p.t('lehre', 'studiensemester')"
-						type="text"
-						readonly
-						v-model="data.vertragsstunden_studiensemester_kurzbz"
-						name="vertragsstunden_studiensemester_kurzbz"
-						>
-					</form-input>
+					<div class="col-12">
+						{{$p.t('lehre', 'vertragurfassung')}}
+					</div>
+				</div>
+				<div class="row mb-3">
+					<div class="col-12">
+						{{ $p.t('lehre', 'semesterstunden') }}: {{ data.vertragsstunden }}
+						<br>
+						<span class="text-capitalize">{{ $p.t('lehre', 'studiensemester') }}</span>: {{ data.vertragsstunden_studiensemester_kurzbz }}
+					</div>
 				</div>
 				<div class="row mb-3" v-if="data?.vertragsstatus">
 					<div class="col-12">
@@ -164,7 +150,7 @@ export default{
 							:disabled="vertragsstatus == vertragsstatus_storniert"
 							@click="cancelVertrag"
 						>
-							{{ $p.t('lehre', 'stornieren') }}
+							{{ $p.t('lehre', 'vertragStornieren') }}
 						</button>
 					</div>
 				</div>

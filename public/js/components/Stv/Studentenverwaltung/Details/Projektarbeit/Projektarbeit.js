@@ -175,15 +175,14 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
+				//layout: 'fitDataFill',
 				height: 'auto',
 				minHeight: '200',
 				selectable: 1,
 				index: 'projektarbeit_id',
-				//persistenceMode:"cookie",
-				//~ persistence:{
-					//~ columns: true, //persist column layout
-				//~ },
+				persistence:{
+					columns: true, //persist column layout
+				},
 				persistenceID: 'stv-details-projektarbeit'
 			},
 			tabulatorEvents: [
@@ -356,11 +355,11 @@ export default {
 			</template>
 
 			<div class="row">
-				<div class="col-6">
+				<div class="col-5">
 					<projektarbeit-details ref="projektarbeitDetails" :student="student" @projekttyp-changed="setDefaultStunden">
 					</projektarbeit-details>
 				</div>
-				<div class="col-6">
+				<div class="col-7">
 					<projektbetreuer ref="projektbetreuer" :config="config"></projektbetreuer>
 				</div>
 			</div>
