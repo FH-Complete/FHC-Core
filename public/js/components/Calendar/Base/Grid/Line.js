@@ -3,7 +3,7 @@ import LineBackground from './Line/Background.js';
 
 /**
  * TODO(chris):
- * Event overflow for Month view (more-button)
+ * Event overflow for Month mode (more-button)
  */
 
 export default {

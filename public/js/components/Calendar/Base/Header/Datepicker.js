@@ -14,7 +14,7 @@ export default {
 			type: luxon.DateTime,
 			required: true
 		},
-		view: {
+		mode: {
 			type: String,
 			required: true
 		},
@@ -33,7 +33,7 @@ export default {
 			return this.date.setZone(this.timezone).setZone('local', { keepLocalTime: true });
 		},
 		current() {
-			switch (this.view) {
+			switch (this.mode) {
 			case "month":
 				return {month: this.convertedDate.month-1, year: this.convertedDate.year};
 			case "list":
@@ -47,7 +47,7 @@ export default {
 			}
 		},
 		title() {
-			switch (this.view) {
+			switch (this.mode) {
 			case "month":
 				return this.date.toLocaleString({ month: 'long', year: 'numeric' });
 			case "week":
@@ -72,7 +72,7 @@ export default {
 	methods: {
 		update(value) {
 			let date;
-			switch (this.view) {
+			switch (this.mode) {
 			case "month":
 				value.month++;
 				date = luxon.DateTime.fromObject(value).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
@@ -98,16 +98,16 @@ export default {
 		:model-value="current"
 		@update:model-value="update"
 		:format="format"
-		:month-picker="view == 'month'"
-		:week-picker="view == 'week'"
-		:range="view == 'list' ? { autoRange: listLength } : false"
-		:text-input="view == 'day'"
+		:month-picker="mode == 'month'"
+		:week-picker="mode == 'week'"
+		:range="mode == 'list' ? { autoRange: listLength } : false"
+		:text-input="mode == 'day'"
 		:week-start="weekStart"
 		:week-numbers="{ type: weekNumbers }"
 		:clearable="false"
 		:enable-time-picker="false"
-		:config="{ keepActionRow: view != 'month' }"
-		:action-row="{ showSelect: false, showCancel: false, showNow: view != 'month', showPreview: false }"
+		:config="{ keepActionRow: mode != 'month' }"
+		:action-row="{ showSelect: false, showCancel: false, showNow: mode != 'month', showPreview: false }"
 		auto-apply
 		six-weeks
 		teleport

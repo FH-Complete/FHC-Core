@@ -13,7 +13,7 @@ export default {
 			type: luxon.DateTime,
 			required: true
 		},
-		view: {
+		mode: {
 			type: String,
 			required: true
 		},
@@ -25,9 +25,9 @@ export default {
 	emits: [
 		"next",
 		"prev",
-		"click:view",
+		"click:mode",
 		"update:date",
-		"update:view"
+		"update:mode"
 	],
 	data() {
 		return {
@@ -35,10 +35,10 @@ export default {
 		};
 	},
 	methods: {
-		clickView(evt, view) {
-			this.$emit('click:view', evt);
+		clickMode(evt, mode) {
+			this.$emit('click:mode', evt);
 			if (!evt.defaultPrevented)
-				this.$emit('update:view', view);
+				this.$emit('update:mode', mode);
 		}
 	},
 	template: /* html */`
@@ -57,7 +57,7 @@ export default {
 						<i class="fa fa-chevron-left"></i>
 					</button>
 					<date-picker
-						:view="view"
+						:mode="mode"
 						:date="date"
 						@update:date="$emit('update:date', $event)"
 						@open="open = true"
@@ -78,8 +78,8 @@ export default {
 						v-if="btnMonth"
 						type="button"
 						class="btn btn-outline-secondary"
-						:class="{active: view === 'month'}"
-						@click="clickView($event, 'month')"
+						:class="{active: mode === 'month'}"
+						@click="clickMode($event, 'month')"
 					>
 						<i class="fa fa-calendar-days"></i>
 					</button>
@@ -87,8 +87,8 @@ export default {
 						v-if="btnWeek"
 						type="button"
 						class="btn btn-outline-secondary"
-						:class="{active: view === 'week'}"
-						@click="clickView($event, 'week')"
+						:class="{active: mode === 'week'}"
+						@click="clickMode($event, 'week')"
 					>
 						<i class="fa fa-calendar-week"></i>
 					</button>
@@ -96,8 +96,8 @@ export default {
 						v-if="btnDay"
 						type="button"
 						class="btn btn-outline-secondary"
-						:class="{active: view === 'day'}"
-						@click="clickView($event, 'day')"
+						:class="{active: mode === 'day'}"
+						@click="clickMode($event, 'day')"
 					>
 						<i class="fa fa-calendar-day"></i>
 					</button>
@@ -105,8 +105,8 @@ export default {
 						v-if="btnList"
 						type="button"
 						class="btn btn-outline-secondary"
-						:class="{active: view === 'list'}"
-						@click="clickView($event, 'list')"
+						:class="{active: mode === 'list'}"
+						@click="clickMode($event, 'list')"
 					>
 						<i class="fa fa-table-list"></i>
 					</button>

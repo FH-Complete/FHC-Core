@@ -19,7 +19,6 @@ export default {
 	},
 	emits: [
 		"update:currentDate",
-		"update:view",
 		"update:range",
 		"click"
 	],

@@ -9,9 +9,8 @@ import CalClick from '../../directives/Calendar/Click.js';
 /**
  * TODO(chris):
  * - Better Interface (maybe config object for modes/header/slider; timeGrid, collapseEmptyDays, buttons)
- * - rename view to mode?
  * - check emits
- * - event single view (default for click:event)
+ * - event single mode (default for click:event)
  * - get focusDate/currentDate correct
  */
 
@@ -54,7 +53,7 @@ export default {
 				return () => true;
 			}),
 			hasDragoverFunc: Vue.computed(() => this.onDragover),
-			mode: Vue.computed(() => this.view)
+			mode: Vue.computed(() => this.mode)
 		};
 	},
 	props: {
@@ -70,12 +69,14 @@ export default {
 			type: [Date, String, Number, luxon.DateTime],
 			default: luxon.DateTime.local()
 		},
-		views: {
-			type: Object
+		modes: {
+			type: Object,
+			required: true,
+			default: {}
 			// TODO(chris): verfication functions
 		},
-		view: String,
-		viewOptions: Object,
+		mode: String,
+		modeOptions: Object,
 		events: {
 			type: Array,
 			default: []
@@ -111,12 +112,12 @@ export default {
 	emits: [
 		"click:next",
 		"click:prev",
-		"click:view",
+		"click:mode",
 		"click:event",
 		"click:day",
 		"click:week",
 		"update:date",
-		"update:view",
+		"update:mode",
 		"update:range",
 		"drop"
 	],
@@ -174,17 +175,17 @@ export default {
 		cMode: {
 			get() {
 				if (!this.internalView) {
-					// choose default view
-					let view = this.view;
-					if (!view || !this.views[view])
-						return Object.keys(this.views).find(Boolean); // start with first entry as active view
-					return view;
+					// choose default mode
+					let mode = this.mode;
+					if (!mode || !this.modes[mode])
+						mode = Object.keys(this.modes).find(Boolean); // start with first entry as active mode
+					return mode || '';
 				}
 				return this.internalView;
 			},
 			set(value) {
 				this.internalView = value;
-				this.$emit('update:view', value);
+				this.$emit('update:mode', value);
 			}
 		}
 	},
@@ -195,8 +196,8 @@ export default {
 			if (evt.defaultPrevented)
 				return;
 
-			// default: switch picker/view page
-			this.$refs.view.prevPage();
+			// default: switch page
+			this.$refs.mode.prevPage();
 		},
 		clickNext() {
 			const evt = new Event('click:next', {cancelable: true});
@@ -204,21 +205,21 @@ export default {
 			if (evt.defaultPrevented)
 				return;
 
-			// default: switch picker/view page
-			this.$refs.view.nextPage();
+			// default: switch page
+			this.$refs.mode.nextPage();
 		},
 		handleClickDefaults(evt) {
 			// TODO(chris): implement
 			switch (evt.detail.source) {
 			case 'day':
-				if (this.cMode != 'day' && this.views['day']) {
+				if (this.cMode != 'day' && this.modes['day']) {
 					evt.stopPropagation();
 					this.cDate = evt.detail.value;
 					this.cMode = 'day';
 				}
 				break;
 			case 'week':
-				if (this.cMode != 'week' && this.views['week']) {
+				if (this.cMode != 'week' && this.modes['week']) {
 					evt.stopPropagation();
 					this.cDate = luxon.DateTime.fromObject({
 						localWeekNumber: evt.detail.value.number,
@@ -249,23 +250,23 @@ export default {
 			<base-header
 				class="card-header"
 				v-model:date="cDate"
-				v-model:view="cMode"
+				v-model:mode="cMode"
 				@prev="clickPrev"
 				@next="clickNext"
-				@click:view="$emit('click:view', $event)"
-				:btn-day="!!views['day'] && (btnDay || (showBtns && btnDay !== false))"
-				:btn-week="!!views['week'] && (btnWeek || (showBtns && btnWeek !== false))"
-				:btn-month="!!views['month'] && (btnMonth || (showBtns && btnMonth !== false))"
-				:btn-list="!!views['list'] && (btnList || (showBtns && btnList !== false))"
+				@click:mode="$emit('click:mode', $event)"
+				:btn-day="!!modes['day'] && (btnDay || (showBtns && btnDay !== false))"
+				:btn-week="!!modes['week'] && (btnWeek || (showBtns && btnWeek !== false))"
+				:btn-month="!!modes['month'] && (btnMonth || (showBtns && btnMonth !== false))"
+				:btn-list="!!modes['list'] && (btnList || (showBtns && btnList !== false))"
 			>
 				<slot name="actions" />
 			</base-header>
 			<component
-				:is="views[cMode] || 'div'"
-				ref="view"
+				:is="modes ? modes[cMode] : null || 'div'"
+				ref="mode"
 				v-model:current-date="cDate"
 				@update:range="$emit('update:range', $event)"
-				v-bind="viewOptions ? viewOptions[cMode] : null || {}"
+				v-bind="modeOptions ? modeOptions[cMode] : null || {}"
 			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>
 			</component>
