@@ -634,7 +634,7 @@ class Vertraege extends FHCAPI_Controller
 		$person_id= $this->input->post('person_id');
 		$projektarbeit_id = $this->input->post('projektarbeit_id');
 		$betreuerart_kurzbz = $this->input->post('betreuerart_kurzbz');
-		$vertrag_id = $this->input->post('vertrag_id ');
+		$vertrag_id = $this->input->post('vertrag_id');
 
 		$this->load->model('education/Projektbetreuer_model', 'Projektbetreuermodel');
 
@@ -646,7 +646,9 @@ class Vertraege extends FHCAPI_Controller
 				'vertrag_id' => $vertrag_id
 			],
 			[
-				'vertrag_id' => null
+				'vertrag_id' => null,
+				'updateamum' => date('c'),
+				'updatevon' => getAuthUID()
 			]
 		);
 
