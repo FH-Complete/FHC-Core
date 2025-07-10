@@ -68,7 +68,16 @@ export default {
 				target: this.$refs.editor.$refs.input, //Important: not selector: to enable multiple import of component
 				//height: 800,
 				//plugins: ['lists'],
-				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify',
+				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | link',
+				plugins: 'link linktitle',
+				link_context_toolbar: true,
+				automatic_uploads: true,
+				default_link_target: "_blank",
+				link_title: true,
+				target_list: [
+					{ title: 'New tab', value: '_blank' },
+					{ title: 'Same tab', value: '_self' }
+				],
 				style_formats: [
 					{title: 'Blocks', block: 'div'},
 					{title: 'Paragraph', block: 'p'},
@@ -88,7 +97,15 @@ export default {
 						const newContent = editor.getContent();
 						vm.formData.body = newContent;
 					});
+
+					// Prevent Bootstrap dialog from blocking focusin
+					document.addEventListener('focusin', (e) => {
+						if (e.target.closest(".tox-tinymce-aux, .moxman-window, .tam-assetmanager-root") !== null) {
+							e.stopImmediatePropagation();
+						}
+					});
 				},
+
 			});
 		},
 		updateText(value) {

@@ -54,7 +54,7 @@ html {
 }
 
 /* Dropdown AbschlusspruefungList.js */
-.tabulator-row {
+.stv-details-abschlusspruefung .tabulator-row {
 	overflow: visible !important;
 }
 
