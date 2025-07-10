@@ -8,9 +8,8 @@ import CalClick from '../../directives/Calendar/Click.js';
 
 /**
  * TODO(chris):
- * - Better Interface (maybe config object for modes/header/slider; hideWeeks, timeGrid, collapseEmptyDays, buttons)
+ * - Better Interface (maybe config object for modes/header/slider; timeGrid, collapseEmptyDays, buttons)
  * - rename view to mode?
- * - make view/mode a v-model
  * - check emits
  * - event single view (default for click:event)
  * - get focusDate/currentDate correct
@@ -30,7 +29,6 @@ export default {
 		return {
 			locale: Vue.computed(() => this.locale),
 			timezone: Vue.computed(() => this.timezone),
-			hideWeeks: Vue.computed(() => this.hideWeeks),
 			timeGrid: Vue.computed(() => this.timeGrid),
 			collapseEmptyDays: Vue.computed(() => this.collapseEmptyDays),
 			draggableEvents: Vue.computed(() => {
@@ -74,9 +72,10 @@ export default {
 		},
 		views: {
 			type: Object
-			// TODO(chris): verfication functiosn
+			// TODO(chris): verfication functions
 		},
 		view: String,
+		viewOptions: Object,
 		events: {
 			type: Array,
 			default: []
@@ -102,7 +101,6 @@ export default {
 			type: Boolean,
 			default: undefined
 		},
-		hideWeeks: Boolean,
 		timeGrid: Array,
 		collapseEmptyDays: Boolean,
 		draggableEvents: [Boolean, Array, Function],
@@ -124,8 +122,8 @@ export default {
 	],
 	data() {
 		return {
-			internalView: '',
-			internCurrentDate: null
+			internalView: null,
+			internalDate: null
 		};
 	},
 	computed: {
@@ -161,24 +159,32 @@ export default {
 				return res;
 			});
 		},
-		availableViews() {
-			return Object.keys(this.views);
-		},
-		viewComponent() {
-			if (this.views[this.internalView])
-				return this.views[this.internalView];
-			return 'div';
-		},
 		cDate: {
 			get() {
-				if (this.internCurrentDate) {
-					return this.internCurrentDate.setLocale(this.locale);
+				if (this.internalDate) {
+					return this.internalDate.setLocale(this.locale);
 				}
 				return luxon.DateTime.fromJSDate(new Date(this.date)).setZone(this.timezone).setLocale(this.locale);
 			},
 			set(value) {
-				this.internCurrentDate = value;
+				this.internalDate = value;
 				this.$emit('update:date', value);
+			}
+		},
+		cMode: {
+			get() {
+				if (!this.internalView) {
+					// choose default view
+					let view = this.view;
+					if (!view || !this.views[view])
+						return Object.keys(this.views).find(Boolean); // start with first entry as active view
+					return view;
+				}
+				return this.internalView;
+			},
+			set(value) {
+				this.internalView = value;
+				this.$emit('update:view', value);
 			}
 		}
 	},
@@ -205,15 +211,14 @@ export default {
 			// TODO(chris): implement
 			switch (evt.detail.source) {
 			case 'day':
-				if (this.internalView != 'day' && this.views['day']) {
+				if (this.cMode != 'day' && this.views['day']) {
 					evt.stopPropagation();
 					this.cDate = evt.detail.value;
-					this.internalView = 'day';
-					this.$emit('update:view', this.internalView);
+					this.cMode = 'day';
 				}
 				break;
 			case 'week':
-				if (this.internalView != 'week' && this.views['week']) {
+				if (this.cMode != 'week' && this.views['week']) {
 					evt.stopPropagation();
 					this.cDate = luxon.DateTime.fromObject({
 						localWeekNumber: evt.detail.value.number,
@@ -222,8 +227,7 @@ export default {
 						zone: this.cDate.zoneName,
 						locale: this.cDate.locale
 					});
-					this.internalView = 'week';
-					this.$emit('update:view', this.internalView);
+					this.cMode = 'week';
 				}
 				break;
 			}
@@ -231,15 +235,6 @@ export default {
 		onDropItem(evt, start, end) {
 			this.$emit('drop', evt, start, end);
 		}
-	},
-	created() {
-		// choose default view
-		let view = this.view;
-		if (!view || !this.views[view])
-			view = this.availableViews.find(Boolean); // start with first entry as active view
-
-		this.internalView = view;
-		this.$emit('update:view', this.internalView);
 	},
 	template: /* html */`
 	<div class="fhc-calendar-base h-100">
@@ -254,8 +249,7 @@ export default {
 			<base-header
 				class="card-header"
 				v-model:date="cDate"
-				:view="internalView"
-				@update:view="internalView = $event; $emit('update:view', internalView)"
+				v-model:view="cMode"
 				@prev="clickPrev"
 				@next="clickNext"
 				@click:view="$emit('click:view', $event)"
@@ -267,10 +261,11 @@ export default {
 				<slot name="actions" />
 			</base-header>
 			<component
-				:is="viewComponent"
+				:is="views[cMode] || 'div'"
 				ref="view"
 				v-model:current-date="cDate"
 				@update:range="$emit('update:range', $event)"
+				v-bind="viewOptions ? viewOptions[cMode] : null || {}"
 			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>
 			</component>

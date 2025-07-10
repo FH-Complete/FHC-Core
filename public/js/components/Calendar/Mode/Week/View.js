@@ -49,8 +49,8 @@ export default {
 			:axis-main="axisMain"
 			:axis-parts="axisParts"
 			:axis-main-collapsible="collapseEmptyDays"
-
 			:snap-to-grid="!!timeGrid"
+			all-day-events
 		>
 			<template #main-header="{ date }">
 				<label-dow

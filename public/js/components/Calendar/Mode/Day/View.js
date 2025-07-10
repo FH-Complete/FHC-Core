@@ -76,6 +76,7 @@ export default {
 			:axis-main="axisMain"
 			:axis-parts="axisParts"
 			:snap-to-grid="!!timeGrid"
+			all-day-events
 		>
 			<template #main-header="{ date }">
 				<label-dow

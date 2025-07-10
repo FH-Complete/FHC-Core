@@ -16,6 +16,10 @@ export default {
 		axisRow: "axisRow"
 	},
 	props: {
+		date: {
+			type: luxon.DateTime,
+			required: true
+		},
 		start: {
 			type: luxon.DateTime,
 			required: true
@@ -31,57 +35,24 @@ export default {
 		backgrounds: {
 			type: Array,
 			default: []
-		}
+		},
+		allDayEvents: Boolean
 	},
 	computed: {
-		stops() {
-			const stops = this.events.reduce((stops, event) => {
-				if (event.startsHere) {
-					if (stops.indexOf(event.start.ts) < 0)
-						stops.push(event.start.ts);
-				}
-				if (event.endsHere) {
-					if (stops.indexOf(event.end.ts) < 0)
-						stops.push(event.end.ts);
-				}
-				return stops;
-			}, []).sort((a,b) => a-b);
-
-			if (stops[0] == this.start)
-				stops.shift();
-			if (stops[stops.length-1] == this.end)
-				stops.pop();
-
-			return stops;
-		},
-		eventGrid() {
-			const perc = (this.end.ts - this.start.ts) / 100;
-
-			let last = this.start.ts;
-			const grid = this.stops.map(stop => {
-				let length = stop - last;
-				last = stop;
-				return length / perc + '%';
-			});
-
-			/*if (grid.filter((e, i, a) => a.indexOf(e) == i).length == 1) {
-				return Array.from({length: grid.length + 1}, () => '1fr').join(' ');
-			}*/
-			//return grid.join(' ') + ' ' + (this.end - last) / perc + '%';
-			
-			return grid.join(' ') + ' 1fr';
-		},
 		eventsWithRowInfo() {
 			const events = [];
 			this.events.forEach(event => {
-				const rows = [1, -1];
-				if (event.startsHere) {
-					rows[0] = this.stops.indexOf(event.start.ts) + 2;
-				}
-				if (event.endsHere) {
-					rows[1] = this.stops.indexOf(event.end.ts) + 2;
-					if (rows[1] === 1)
-						rows[1] = -1;
+				const rows = [2, -1];
+				if (this.allDayEvents && event.orig.allDayEvent) {
+					rows[0] = 1;
+					rows[1] = 2;
+				} else {
+					if (event.startsHere) {
+						rows[0] = 't_' + event.start.diff(this.date).toMillis();
+					}
+					if (event.endsHere) {
+						rows[1] = 't_' + event.end.diff(this.date).toMillis();
+					}
 				}
 
 				events.push({
@@ -96,7 +67,7 @@ export default {
 	<div
 		class="fhc-calendar-base-grid-line"
 		style="position:relative;display:grid;grid-auto-flow:dense"
-		:style="'grid-template-' + axisRow + 's:' + eventGrid"
+		:style="'grid-template-' + axisRow + 's:subgrid'"
 	>
 		<line-background
 			v-for="bg in backgrounds"

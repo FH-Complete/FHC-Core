@@ -2,8 +2,6 @@ import GridLine from './Grid/Line.js';
 
 import CalDnd from '../../../directives/Calendar/DragAndDrop.js';
 
-// TODO(chris): grid-gap && break-height
-
 export default {
 	name: "CalendarGrid",
 	components: {
@@ -51,6 +49,7 @@ export default {
 			}
 		},
 		flipAxis: Boolean,
+		allDayEvents: Boolean,
 		axisMainCollapsible: Boolean,
 		snapToGrid: Boolean
 	},
@@ -151,17 +150,43 @@ export default {
 			return cols;
 		},
 		styleGridRows() {
-			const msPerHr = 3600000; // 1000 * 60 * 60
-			
-			const msOfAllParts = this.end.toMillis() - this.start.toMillis();
+			const gridlines = {};
 
-			const onePercOfAllPartsInMs = msOfAllParts / 100 || 1; // NOTE(chris): prevent 0 division
+			this.axisPartsWithBreaks.forEach(part => {
+				let ts = part.start.toMillis();
+				if (!gridlines[ts])
+					gridlines[ts] = ['t_' + ts];
+				if (part.index !== undefined)
+					gridlines[ts].push('ps_' + part.index);
+				ts = part.end.toMillis();
+				if (!gridlines[ts])
+					gridlines[ts] = ['t_' + ts];
+				if (part.index !== undefined)
+					gridlines[ts].push('pe_' + part.index);
+			});
 
-			return this.axisPartsWithBreaks.map(part => 
-				part.index !== undefined
-					? '[part_' + (part.index + 1) + '] ' + (part.end.toMillis() - part.start.toMillis()) / msPerHr + 'fr'
-					: (part.end.toMillis() - part.start.toMillis()) / onePercOfAllPartsInMs + '%'
-			).join(' ') + ' [end]';
+			this.events.forEach((events, mainIndex) => {
+				let day = this.axisMain[mainIndex];
+				events.forEach(event => {
+					if (!event.startsHere && !event.endsHere)
+						return;
+					let ts = event.start.diff(day).toMillis();
+					if (!gridlines[ts])
+						gridlines[ts] = ['t_' + ts, 'e_' + ts];
+					ts = event.end.diff(day).toMillis();
+					if (!gridlines[ts])
+						gridlines[ts] = ['t_' + ts, 'e_' + ts];
+				});
+			});
+
+			return '[full] auto ' + Object.keys(gridlines).sort((a,b) => parseInt(a)-parseInt(b)).map((start, i, keys) => {
+				let end = keys[i + 1];
+				if (!end) {
+					gridlines[start].push('end');
+					return '[' + gridlines[start].join(' ') + ']';
+				}
+				return '[' + gridlines[start].join(' ') + '] ' + (end - start) + 'fr';
+			}).join(' ');
 		}
 	},
 	methods: {
@@ -223,7 +248,8 @@ export default {
 	>
 		<div
 			class="grid-header"
-			:style="'display:grid;grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1'"
+			style="display:grid"
+			:style="'grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1'"
 		>
 			<div
 				v-for="(date, index) in axisMain"
@@ -236,69 +262,75 @@ export default {
 			</div>
 		</div>
 		<div
-			ref="main"
-			class="grid-main"
 			style="display:grid;overflow:auto"
-			:style="'grid-' + axisCol + ':1/-1;grid-template-' + axisCol + 's:subgrid;grid-template-' + axisRow + 's:' + styleGridRows"
+			:style="'grid-' + axisCol + ':1/-1;grid-template-' + axisCol + 's:subgrid'"
 		>
 			<div
-				v-for="(part, index) in axisPartsSave"
-				:key="index"
-				class="part-header"
-				:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': part_' + (index+1)"
+				ref="main"
+				class="grid-main"
+				style="grid-column:1/-1;grid-row:1/-1;display:grid"
+				:style="'grid-template-' + axisCol + 's:subgrid;grid-template-' + axisRow + 's:' + styleGridRows"
 			>
-				<slot name="part-header" v-bind="{ index, part }" />
-			</div>
-
-			<div
-				ref="body"
-				class="grid-body"
-				style="display:grid;grid-template-rows:subgrid;grid-template-columns:subgrid"
-				:style="'grid-' + axisCol + ':2/-1;grid-' + axisRow + ':1/-1'"
-				v-cal-dnd:dropcage
-				@calendar-dragenter="dragging = true"
-				@calendar-dragleave="dragging = false"
-				@dragover="dropAllowed ? $event.preventDefault() : null"
-			>
-				<template
-					v-for="(date, index) in axisMain"
+				<div
+					v-for="(part, index) in axisPartsSave"
 					:key="index"
+					class="part-header"
+					:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': ps_' + index + '/pe_' + index"
 				>
-					<div
-						v-for="(part, i) in axisPartsSave"
-						:key="i"
-						class="part-body"
-						style="position:relative"
-						:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':part_' + (1+i)"
+					<slot name="part-header" v-bind="{ index, part }" />
+				</div>
+
+				<div
+					ref="body"
+					class="grid-body"
+					style="display:grid;grid-template-rows:subgrid;grid-template-columns:subgrid"
+					:style="'grid-' + axisCol + ':2/-1;grid-' + axisRow + ':1/-1'"
+					v-cal-dnd:dropcage
+					@calendar-dragenter="dragging = true"
+					@calendar-dragleave="dragging = false"
+					@dragover="dropAllowed ? $event.preventDefault() : null"
+				>
+					<template
+						v-for="(date, index) in axisMain"
+						:key="index"
 					>
-						<slot name="part-body" v-bind="{ index, part }" />
 						<div
-							v-if="snapToGrid && dragging"
-							style="position:absolute;inset:0;z-index:1"
-							v-cal-dnd:dropzone.once="{date: date.plus(part.start || part), ends: ends.slice(ends.findIndex(end => end > date))}"
-						></div>
-					</div>
-					<grid-line
-						:start="date.plus(start)"
-						:end="date.plus(end)"
-						:date="date"
-						:events="events[index]"
-						:backgrounds="backgrounds[index]"
-						style="position:relative"
-						:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"
-					>
-						<template #event="slot">
-							<slot name="event" v-bind="slot" />
-						</template>
-						<template #dropzone>
+							v-for="(part, i) in axisPartsSave"
+							:key="i"
+							class="part-body"
+							style="position:relative"
+							:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
+						>
+							<slot name="part-body" v-bind="{ index, part }" />
 							<div
-								v-if="!snapToGrid && dragging"
+								v-if="snapToGrid && dragging"
 								style="position:absolute;inset:0;z-index:1"
-								v-cal-dnd:dropzone="evt => getTimestampFromMouse(evt, date)"
+								v-cal-dnd:dropzone.once="{date: date.plus(part.start || part), ends: ends.slice(ends.findIndex(end => end > date))}"
 							></div>
-						</template>
-					</grid-line>
-				</template>
+						</div>
+						<grid-line
+							:start="date.plus(start)"
+							:end="date.plus(end)"
+							:date="date"
+							:events="events[index]"
+							:backgrounds="backgrounds[index]"
+							style="position:relative"
+							:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"
+							:all-day-events="allDayEvents"
+						>
+							<template #event="slot">
+								<slot name="event" v-bind="slot" />
+							</template>
+							<template #dropzone>
+								<div
+									v-if="!snapToGrid && dragging"
+									style="position:absolute;inset:0;z-index:1"
+									v-cal-dnd:dropzone="evt => getTimestampFromMouse(evt, date)"
+								></div>
+							</template>
+						</grid-line>
+					</template>
+				</div>
 			</div>
 		</div>
 	</div>
