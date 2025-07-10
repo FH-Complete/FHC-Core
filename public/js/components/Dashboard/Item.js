@@ -160,32 +160,32 @@ export default {
 	<div v-show="!dragstate" class="h-100 card border-0">
 		<div v-if="widget" class="card-header d-flex ps-0 pe-2 align-items-center">
 			<Transition>
-				<span v-if="editMode && !isPinned" drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
+				<span type="button" v-if="editMode && !isPinned" drag-action="move" class="col-auto mx-2 px-2 cursor-move" aria-label="move widget" v-tooltip="{showDelay:1000, value:'move widget'}"><i class="fa-solid fa-grip-vertical" aria-hidden="true"></i></span>
 			</Transition>
 			<span class="col mx-2 px-2">{{ widget.setup.name }}</span>
 			<template v-if="isPinned">
-				<div v-if="editMode" pinned="true" @click="unpin" class="pin cursor-pointer col-auto me-2">
-					<i class="fa-solid fa-thumbtack "></i>
+				<div type="button" v-if="editMode" pinned="true" @click="unpin" v-tooltip="{showDelay:1000, value: 'unpin item'}" aria-label="unpin item" class="pin cursor-pointer col-auto me-2">
+					<i class="fa-solid fa-thumbtack " aria-hidden="true"></i>
 				</div>
 				<div v-else class="col-auto me-2">
 					<i class="fa-solid fa-thumbtack "></i>
 				</div>
 			</template>
 			<template v-else>
-				<div v-if="editMode"  class="col-auto me-2 pin" @click="pinItem">
-					<i class="fa-solid fa-thumbtack" style="color:lightgray;"></i>
+				<div type="button" v-if="editMode"  class="col-auto me-2 pin" @click="pinItem" aria-label="pin item" v-tooltip="{showDelay:1000, value: 'pin item'}">
+					<i class="fa-solid fa-thumbtack" aria-hidden="true" style="color:lightgray;"></i>
 				</div>
 			</template>
-			<a v-if="widget.setup.cis4link" :href="getWidgetC4Link(widget)" class="col-auto ms-auto ">
-          		<i class="fa fa-arrow-up-right-from-square me-1"></i>
+			<a type="button" v-if="widget.setup.cis4link" :href="getWidgetC4Link(widget)" aria-label="widget link" v-tooltip="{showDelay:1000, value:'widget link'}" class="col-auto ms-auto ">
+          		<i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i>
           	</a>
-			<a v-if="hasConfig" class="col-auto px-1" href="#" @click.prevent="openConfig"><i class="fa-solid fa-gear"></i></a>
-			<a v-if="custom && editMode" class="col-auto px-1" href="#" @click.prevent="$emit('remove')">
-				<i class="fa-solid fa-trash"></i>
+			<a type="button" v-if="hasConfig" class="col-auto px-1" href="#" @click.prevent="openConfig" aria-label="configure widget" v-tooltip="{showDelay:1000,value:'configure widget'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></a>
+			<a type="button" v-if="custom && editMode" class="col-auto px-1" aria-label="delete widget" v-tooltip="{showDelay:1000,value:'delete widget'}" href="#" @click.prevent="$emit('remove')">
+				<i class="fa-solid fa-trash" aria-hidden="true"></i>
 			</a>
 			<Transition>
 				<div v-if="!custom && editMode" class="col-auto px-1 form-switch">
-					<input class="form-check-input ms-0" type="checkbox" role="switch" id="flexSwitchCheckChecked" :checked="!hidden" @input="$emit('remove', hidden)">
+					<input class="form-check-input ms-0" type="checkbox" role="switch" aria-label="toggle widget" id="flexSwitchCheckChecked" :checked="!hidden" @input="$emit('remove', hidden)">
 				</div>
 			</Transition>
 		</div>
@@ -209,18 +209,18 @@ export default {
 		<height-transition>
 			<div v-if="editMode && isResizeable && !isPinned " class="card-footer d-flex justify-content-end p-0">
 				<template v-if="maxWidth < 2">
-					<span drag-action="resize" class="col-auto px-1 cursor-ns-resize">
-						<i  class="fa-solid fa-up-down pe-2"></i>
+					<span type="button" drag-action="resize" class="col-auto px-1 cursor-ns-resize" aria-label="resize widget" v-tooltip="{showDelay:1000, value:'resize widget'}">
+						<i  class="fa-solid fa-up-down pe-2" aria-hidden="true"></i>
 					</span>
 				</template>
 				<template v-else-if="maxHeight < 2">
-					<span drag-action="resize" class="col-auto px-1 cursor-ew-resize">
-						<i class="fa-solid fa-left-right pe-2"></i>
+					<span type="button" drag-action="resize" class="col-auto px-1 cursor-ew-resize" aria-label="resize widget" v-tooltip="{showDelay:1000, value:'resize widget'}">
+						<i class="fa-solid fa-left-right pe-2" aria-hidden="true"></i>
 					</span>
 				</template>
 				<template v-else>
-					<span drag-action="resize" class="col-auto px-1 cursor-nw-resize">
-						<i  class="fa-solid fa-up-right-and-down-left-from-center mirror-x"></i>
+					<span type="button" drag-action="resize" class="col-auto px-1 cursor-nw-resize" aria-label="resize widget" v-tooltip="{showDelay:1000, value:'resize widget'}">
+						<i  class="fa-solid fa-up-right-and-down-left-from-center mirror-x" aria-hidden="true"></i>
 					</span>
 				</template>
 			</div>

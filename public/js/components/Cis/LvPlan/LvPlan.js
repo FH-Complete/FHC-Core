@@ -2,7 +2,6 @@ import FhcCalendar from "../../Calendar/Calendar.js";
 import CalendarDate from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
 import LvMenu from "../Mylv/LvMenu.js"
-import lehreinheitEvent from "../Renderer/Lehreinheit/calendarEvent.js"
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
@@ -24,7 +23,6 @@ const LvPlan = {
 			studiensemester_start: null,
 			studiensemester_ende: null,
 			uid: null,
-			renderComponents: {},
 			isModalContentResolved: false,
 			isModalTitleResolved: false,
 			isShowModal: false,
@@ -94,7 +92,7 @@ const LvPlan = {
 		}
 	},
 	components: {
-		FhcCalendar, LvModal, LvMenu, lehreinheitEvent
+		FhcCalendar, LvModal, LvMenu
 	},
 	computed:{
 		modalLoaded: function(){
