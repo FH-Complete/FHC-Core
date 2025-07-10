@@ -510,7 +510,7 @@ SELECT
 	 * @param $person_id, $vertrag_id
 	 * @return array of objects
 	 */
-	//TODO(Manu) vereinfachen!
+
 	public function loadContractsOfPersonAssigned($person_id, $vertrag_id)
 	{
 		$query = "
@@ -584,6 +584,4 @@ SELECT
 
 		return $this->execQuery($query, array($vertrag_id));
 	}
-
-
 }

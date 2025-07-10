@@ -108,7 +108,6 @@ export default {
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-3 gap-3" style="max-height:9rem; min-width: 37.5rem;">
 
 			<template v-if="typeHeader==='student'">
-			{{headerData}}
 					<div
 						v-for="person in headerData"
 						:key="person.person_id"

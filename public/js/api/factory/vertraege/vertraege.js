@@ -132,10 +132,4 @@ export default {
 			url: 'api/frontend/v1/vertraege/vertraege/getMitarbeiter/',
 		};
 	},
-	getMitarbeiterUid(person_id){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/vertraege/vertraege/getMitarbeiterUid/' + person_id
-		};
-	},
 };

@@ -233,7 +233,6 @@ export default {
 		actionEditContract(vertrag_id) {
 			this.resetModal();
 			this.statusNew = false;
-			//TODO(Manu) reload Assigned!!
 			this.$refs.unassignedLehrauftraege.reloadUnassigned();
 			this.loadContract(vertrag_id)
 				.then(this.$refs.contractModal.show);
@@ -437,10 +436,6 @@ export default {
 			this.formData.bezeichnung = this.getFormattedDate();
 			this.formData.vertragstyp_kurzbz = null;
 			this.statusNew = true;
-
-			//this.childData = {};
-			//always null??
-			//TODO(Manu) check if this.childData = {},
 		},
 		updateBetrag(sumBetrag){
 			this.formData.betrag = sumBetrag;
