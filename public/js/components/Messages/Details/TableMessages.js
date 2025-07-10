@@ -29,7 +29,6 @@ export default {
 	},
 	data(){
 		return {
-			pageNo: 1,
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: this.loadAjaxCall,
@@ -102,8 +101,12 @@ export default {
 							container.className = "d-flex gap-2";
 
 							let button = document.createElement('button');
-							if (this.personId != cell.getData().sender_id)
+							if (this.personId != cell.getData().sender_id) {
 								button.disabled = true;
+								button.style = "visibility: hidden";
+								button.ariaHidden = true;
+							}
+
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.title = this.$p.t('global', 'reply');
 							button.innerHTML = '<i class="fa fa-reply"></i>';
@@ -112,6 +115,7 @@ export default {
 								(event) =>
 									this.actionReplyToMessage(cell.getData().message_id)
 							);
+
 							container.append(button);
 
 							button = document.createElement('button');
