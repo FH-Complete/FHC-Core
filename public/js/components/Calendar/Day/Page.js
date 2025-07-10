@@ -385,8 +385,8 @@ export default {
 				<div class="d-flex flex-column h-100 border">
 					<div ref="header" class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle">
 						<div type="button" class="flex-grow-1" :title="dayText.heading" @click.prevent="changeToMonth(day)">
-							<div class="fw-bold">{{dayText.tag}}</div>
-							<a href="#" class="small text-secondary text-decoration-none" >{{dayText.datum}}</a>
+							<div class="day fw-bold">{{dayText.tag}}</div>
+							<a href="#" class="small date text-decoration-none" >{{dayText.datum}}</a>
 						</div>
 					</div>
 					<div @wheel.prevent="dayScrollBehavior" id="scrollContainer" ref="dayScrollContainer" style="height: 100%; overflow-y: scroll;">
@@ -438,7 +438,7 @@ export default {
 									</Transition>
 									<div :id="hourGridIdentifier(hour)" v-for="hour in hours" :key="hour"  class="position-absolute box-shadow-border" :style="hourGridStyle(hour)"></div>
 									<div class="hours">
-										<div v-for="hour in hours" :style="'min-height:' + rowMinHeight " :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
+										<div v-for="hour in hours" :style="'min-height:' + rowMinHeight " :key="hour" class="text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 									</div>
 									<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" class=" day border-start" :style="dayGridStyle(day)">
 
