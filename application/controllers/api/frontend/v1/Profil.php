@@ -59,10 +59,10 @@ class Profil extends FHCAPI_Controller
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 	public function profilViewData($uid){
-		$uid = json_decode($uid);
+		$uid = $uid;
 		$this->load->library('ProfilLib');
 		$editable = false;
-		if(isset($uid) && $uid != null){
+		if(isset($uid) && $uid != "null"){
 			$profil_data = $this->profillib->getView($uid);
 			if($uid == getAuthUID()){
 				$editable = true;
