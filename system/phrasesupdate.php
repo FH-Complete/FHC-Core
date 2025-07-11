@@ -31624,26 +31624,7 @@ array(
 			)
 		)
 	),
-	array(
-		'app' => 'anwesenheiten',
-		'category' => 'global',
-		'phrase' => 'termine',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Unterricht laut Stundenplan',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Lesson as per Timetable',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
+
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
@@ -32903,26 +32884,6 @@ array(
 					Scrolling within the timeline changes the visual spacing between individual days.
 					
 					Clicking on a rendered date range in the timeline displays a list of associated attributes in the upper right corner. These attributes are intended to help administrators and developers understand the status of digital attendance in the context of a student in case of errors.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'anwesenheiten',
-		'category' => 'global',
-		'phrase' => 'lehreinheit_id',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'LV-Teil ID',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Teaching unit ID',
 				'description' => '',
 				'insertvon' => 'system'
 			)
