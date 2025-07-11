@@ -1,4 +1,3 @@
-import CalendarEvent from '../../../helpers/Calendar/Event.js';
 import DragAndDrop from '../../../helpers/DragAndDrop.js';
 
 import CalDnd from '../../../directives/Calendar/DragAndDrop.js';
@@ -109,7 +108,21 @@ export default {
 
 			if (!this.draggedInternalEvent) {
 				const event = DragAndDrop.getValidTransferData(evt.detail.originalEvent);
-				this.draggedExternalEvent = event ? CalendarEvent.smartConvert(event) : null;
+				if (event) {
+					this.draggedExternalEvent = {
+						id: event.id,
+						type: event.type,
+						start: event.isostart
+							? luxon.DateTime.fromISO(event.isostart).setZone(this.timezone)
+							: luxon.DateTime.local().setZone(this.timezone),
+						end: event.isoend
+							? luxon.DateTime.fromISO(event.isoend).setZone(this.timezone)
+							: luxon.DateTime.local().setZone(this.timezone),
+						orig: event
+					};
+				} else {
+					this.draggedExternalEvent = null;
+				}
 				this.dropAllowed = this.dropableEvents(event, this.mode);
 			} else {
 				this.dropAllowed = this.dropableEvents(this.draggedInternalEvent, this.mode);

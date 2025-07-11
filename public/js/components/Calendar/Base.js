@@ -2,8 +2,6 @@ import BaseDraganddrop from './Base/DragAndDrop.js';
 import BaseHeader from './Base/Header.js';
 import BaseSlider from './Base/Slider.js';
 
-import CalendarEvent from '../../helpers/Calendar/Event.js';
-
 import CalClick from '../../directives/Calendar/Click.js';
 
 /**
@@ -35,7 +33,7 @@ export default {
 					return () => false;
 
 				if (Array.isArray(this.draggableEvents))
-					return event => this.draggableEvents.includes(CalendarEvent.getType(event));
+					return event => this.draggableEvents.includes(event.type);
 				if (this.draggableEvents instanceof Function)
 					return this.draggableEvents;
 				
@@ -131,6 +129,7 @@ export default {
 		convertedEvents() {
 			return this.events.map(orig => ({
 				id: orig.type + orig[orig.type + '_id'],
+				type: orig.type,
 				start: luxon.DateTime.fromISO(orig.isostart).setZone(this.timezone),
 				end: luxon.DateTime.fromISO(orig.isoend).setZone(this.timezone),
 				orig
