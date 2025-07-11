@@ -34,6 +34,7 @@ class ProfilLib{
 				$res->data = $this->studentProfil();
 				$res->data->pid = getAuthPersonId();
 			}
+			$res->data->fotoStatus=$this->isFotoAkzeptiert(getAuthPersonId());
 		}
 		// UID is availabe when accessing Profil/View/:uid
 		else {
@@ -53,7 +54,7 @@ class ProfilLib{
 				$res->data = $this->viewStudentProfil($uid);
 			}
 		}
-		$res->data->fotoStatus=$this->isFotoAkzeptiert(getAuthPersonId());
+		
 		return success($res);
 	}
 

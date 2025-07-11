@@ -93,7 +93,7 @@ export default {
                         <div v-if="isEditable" role="button" @click.prevent="sperre_foto_function" class="image-lock">
                             <i :class="{'fa':true, ...(FotoSperre?{'fa-lock':true}:{'fa-lock-open':true})} "></i>
                         </div>
-						<div v-if="!fotoStatus" role="button" @click.prevent="showModal" class="image-upload">
+						<div v-if="fotoStatus != null && !fotostatus" role="button" @click.prevent="showModal" class="image-upload">
                             <i class="fa fa-upload"></i>
                         </div>
                     </div>
