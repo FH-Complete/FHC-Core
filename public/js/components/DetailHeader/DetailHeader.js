@@ -42,7 +42,7 @@ export default {
 		if(this.person_id) {
 			this.getHeader(this.person_id);
 
-			this.loadDepartmentData(this.person_id)
+			this.loadDepartmentData(this.mitarbeiter_uid)
 				.then(() => {
 					// Call getLeitungOrg only after departmentData is loaded
 					this.getLeitungOrg(this.departmentData.oe_kurzbz);
@@ -83,9 +83,9 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		loadDepartmentData(person_id) {
+		loadDepartmentData(mitarbeiter_uid) {
 			return this.$api
-				.call(ApiDetailHeader.getPersonAbteilung(person_id))
+				.call(ApiDetailHeader.getPersonAbteilung(mitarbeiter_uid))
 				.then(result => {
 					this.departmentData = result.data;
 				})
@@ -106,6 +106,7 @@ export default {
 	},
 	template: `
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-3 gap-3" style="max-height:9rem; min-width: 37.5rem;">
+
 			<template v-if="typeHeader==='student'">
 					<div
 						v-for="person in headerData"

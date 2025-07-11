@@ -22,10 +22,10 @@ export default {
 			url: 'api/frontend/v1/vertraege/vertraege/getHeader/' + person_id,
 		};
 	},
-	getPersonAbteilung(person_id){
+	getPersonAbteilung(mitarbeiter_uid){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/vertraege/vertraege/getPersonAbteilung/' + person_id,
+			url: 'api/frontend/v1/vertraege/vertraege/getPersonAbteilung/' + mitarbeiter_uid,
 		};
 	},
 	getLeitungOrg(oekurzbz){
