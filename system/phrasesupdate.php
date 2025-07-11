@@ -37817,7 +37817,7 @@ array(
 		)
 	),
 
-	//****************************	 CORE/stv
+	//****************************	 CORE/calendar
 	array(
 		'app' => 'core',
 		'category' => 'calendar',
