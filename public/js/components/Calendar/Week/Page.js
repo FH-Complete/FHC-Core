@@ -325,8 +325,8 @@ export default {
 	<div class="d-flex flex-column">
 			<div class="fhc-calendar-week-page-header d-grid border-2 border-bottom text-center" :style="pageHeaderStyle" >
 				<div type="button" v-for="day in days" :key="day" class="flex-grow-1" :title="dayText[day]?.heading" @click.prevent="changeToDay(day)">
-					<div class="fw-bold">{{dayText[day]?.tag}}</div>
-					<a href="#" class="small text-muted text-decoration-none" >{{dayText[day]?.datum}}</a>
+					<div class="day fw-bold">{{dayText[day]?.tag}}</div>
+					<a href="#" class="date small text-decoration-none" >{{dayText[day]?.datum}}</a>
 				</div>
 			</div>
 			<div ref="eventcontainer" class="position-relative flex-grow-1"  >
@@ -360,7 +360,7 @@ export default {
 						</div>
 					</Transition>
 					<div class="hours">
-						<div v-for="hour in hours" :style="getGridStyle" :key="hour" class="text-muted text-end small" :ref="'hour' + hour">{{hour}}:00</div>
+						<div v-for="hour in hours" :style="getGridStyle" :key="hour" class="text-end small" :ref="'hour' + hour">{{hour}}:00</div>
 					</div>
 					<div v-for="(day,dayindex) in eventsPerDayAndHour" :key="day" :class="{'past':day.isPast}" class=" day border-start position-relative" :style="dayGridStyle(day)">
 						<Transition>

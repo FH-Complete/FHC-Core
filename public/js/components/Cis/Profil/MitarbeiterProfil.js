@@ -216,7 +216,7 @@ export default {
 
 	computed: {
 		fotoStatus() {
-			return this.data?.fotoStatus ?? false;
+			return this.data?.fotoStatus ?? null;
 		},
 		getTelefonValue() {
 			if(this.data.standort_telefon?.kontakt) {

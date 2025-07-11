@@ -161,7 +161,7 @@ export default {
 	template: /*html*/ `
     <div class="widgets-url w-100 h-100 overflow-scroll" style="padding: 1rem 1rem;">
         <div class="d-flex flex-column justify-content-between">
-        	<button class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
+        	<button class="btn btn-outline-secondary btn-sm w-100 mt-2 card" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
 
             <template v-if="shared">
 
@@ -173,12 +173,12 @@ export default {
 
 						<div class="ms-auto">
 							<!--EDIT BOOKMARK-->
-							<a href="#" @click.prevent="openEditModal(link)" >
-								<i class="fa fa-edit me-1"></i>
+							<a type="button" href="#" @click.prevent="openEditModal(link)" aria-label="edit bookmark" v-tooltip="{showDelay:1000,value:'edit bookmark'}">
+								<i class="fa fa-edit me-1" aria-hidden="true"></i>
 							</a>
 							<!--DELETE BOOKMARK-->
-							<a id="deleteBookmark" href="#" @click.prevent="removeLink(link.bookmark_id)">
-								<i class="fa fa-regular fa-trash-can"></i>
+							<a type="button" id="deleteBookmark" href="#" aria-label="delete bookmark" v-tooltip="{showDelay:1000,value:'delete bookmark'}" @click.prevent="removeLink(link.bookmark_id)">
+								<i class="fa fa-regular fa-trash-can" aria-hidden="true"></i>
 							</a>
 						</div>
 					</div>

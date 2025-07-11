@@ -30,9 +30,29 @@ export default {
 			roomInfoContentID: null,
 			ort_kurzbz: null,
 			selectedEvent: null,
+			isModalContentResolved: false,
+			isModalTitleResolved: false,
+			isShowModal: false,
 		}
 	},
+	inject: ["renderers"],
+	watch:{
+		modalLoaded: {
+			handler: function (newValue) {
+				if (this.isShowModal && newValue.isModalContentResolved && newValue.isModalTitleResolved) {
+					this.$nextTick(() => {
+						if (this.$refs.lvmodal) this.$refs.lvmodal.show();
+						this.isShowModal = false;
+					});
+				}
+			},
+			immediate: true
+		},
+	},
 	computed: {
+		modalLoaded: function () {
+			return { isModalContentResolved: this.isModalContentResolved, isModalTitleResolved: this.isModalTitleResolved };
+		},
 		allEventsGrouped() {
 			// groups all events of the next 7 days together
 			const currentCalendarDate = new CalendarDate(this.currentDay)
@@ -46,7 +66,7 @@ export default {
 				arr[1].push(cur)
 				
 				return acc
-			}, mapArr))
+			}, mapArr));
 		},
 		currentEvents() {
 			return (this.events || []).filter(evt => evt.end < this.dayAfterCurrentDay && evt.start >= this.currentDay);
@@ -64,6 +84,34 @@ export default {
 		},
 	},
 	methods: {
+		showModal: function (event) {
+			this.currentlySelectedEvent = event;
+			Vue.nextTick(() => {
+				if (this.isModalContentResolved && this.isModalTitleResolved) {
+					if (this.$refs.lvmodal) this.$refs.lvmodal.show();
+				}
+				else {
+					this.isShowModal = true;
+				}
+			})
+		},
+		modalTitleResolved: function () {
+			this.isModalTitleResolved = true;
+
+		},
+		modalContentResolved: function () {
+			this.isModalContentResolved = true;
+
+		},
+		modalTitleComponent(type) {
+			return this.renderers[type]?.modalTitle;
+		},
+		modalContentComponent(type) {
+			return this.renderers[type]?.modalContent;
+		},
+		calendarEventComponent(type) {
+			return this.renderers[type]?.calendarEvent;
+		},
 		getEventStyle: function(evt) {
 			const styles = {'background-color': evt.color};
 			if(evt.start.getTime() < Date.now()) styles.opacity = 0.5;
@@ -169,7 +217,18 @@ export default {
 	},
 	template: /*html*/`
 	<div class="dashboard-widget-lvplan d-flex flex-column h-100">
-		<lv-modal v-if="selectedEvent" ref="lvmodal" :event="selectedEvent"  />
+		<lv-modal v-if="selectedEvent" ref="lvmodal" :event="selectedEvent"  >
+			<template #modalTitle>
+				<Suspense @pending="isModalTitleResolved=false" @resolve="modalTitleResolved">
+					<component :is="modalTitleComponent(selectedEvent.type)" v-if="selectedEvent" :event="selectedEvent" ></component>
+				</Suspense>
+			</template>
+			<template #modalContent>
+				<Suspense @pending="isModalContentResolved=false" @resolve="modalContentResolved">
+					<component :is="modalContentComponent(selectedEvent.type)" v-if="selectedEvent" :event="selectedEvent" ></component>
+				</Suspense>
+			</template>
+		</lv-modal>
 		<content-modal :content_id="roomInfoContentID" dialogClass="modal-lg" ref="contentModal"/>
 		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" :widget="true" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" >
 			<template #monthPage="{event,day}">
@@ -184,7 +243,7 @@ export default {
 				</span>
 			</template>
 			<template #minimizedPage >
-				<div class="flex-grow-1" style="overflow-y: auto; overflow-x: hidden">
+				<div class="minimizedContainer flex-grow-1" style="overflow-y: auto; overflow-x: hidden">
 					<div v-if="events === null" class="d-flex h-100 justify-content-center align-items-center">
 						<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 					</div>
@@ -193,22 +252,7 @@ export default {
 							<button class="btn fhc-tertiary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"}, $p.user_locale.value)}}</button>
 						</div>
 						<div role="button" @click="showLvUebersicht(evt)" v-for="evt in value" :key="evt.id" class="list-group-item small" :style="getEventStyle(evt)">
-							<template v-if="evt.type=='moodle'">
-								<div class="d-flex align-items-center ">
-									<moodle-svg></moodle-svg>
-									<b v-contrast class="flex-grow-1 text-center"><strong v-html="evt.titel"></strong> - {{evt.topic}}</b>
-								</div>
-							</template>
-							<template v-else>
-								<b>{{evt.topic}}</b>
-								<br>
-								<small v-if="evt.ort_kurzbz" class="d-flex w-100 justify-content-between">
-									<!-- event modifier stop to prevent opening the modal for the lv Uebersicht when clicking on the ort_kurzbz -->
-									<span @click.stop="showRoomInfoModal(evt.ort_kurzbz)" style="text-decoration:underline" type="button">{{evt.ort_kurzbz}}</span>
-									<span>{{evt.start.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}-{{evt.end.toLocaleTimeString(undefined, {hour:'numeric',minute:'numeric'})}}</span>
-								</small>
-							</template>
-							
+							<component :is="calendarEventComponent(evt.type)" :event="evt" ></component>
 						</div>
 						<div v-if="!value.length" class="list-group-item small text-center">
 							{{ $p.t('lehre/noLvFound') }}

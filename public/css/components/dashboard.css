@@ -112,23 +112,23 @@
 }
 
 .cursor-nw-resize {
-	cursor: nw-resize;
+	cursor: nw-resize !important;
 }
 
 .cursor-ew-resize {
-	cursor: ew-resize;
+	cursor: ew-resize !important;
 }
 
 .cursor-ns-resize {
-	cursor: ns-resize;
+	cursor: ns-resize !important;
 }
 
 .no-drag-drop {
-	cursor: not-allowed;
+	cursor: not-allowed !important;
 }
 
 .cursor-move {
-	cursor: move;
+	cursor: move !important;
 }
 
 .draggedItem {

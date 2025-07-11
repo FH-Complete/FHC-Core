@@ -60,7 +60,7 @@ export default {
 		<calendar-header v-if="header" :title="title" @prev="prev" @next="next" @click="$emit('updateMode', 'years')" @updateMode="$emit('updateMode', $event)" />
 		<div class="d-flex flex-wrap">
 			<div v-for="(week, key) in weeks" :key="key" class="d-grid col-2">
-				<button @click="setWeek(week)" class="btn btn-outline-secondary" :class="{'border-0': week != focusDate.w}">
+				<button @click="setWeek(week)" class="btn btn-outline-secondary card" :class="{'border-0': week != focusDate.w}">
 					{{week}}
 				</button>
 			</div>

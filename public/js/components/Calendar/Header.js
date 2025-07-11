@@ -74,7 +74,7 @@ export default {
 					</div>
 					<div class="justify-content-center text-center col-auto">
 						<div class="d-flex justify-content-center align-items-center">
-							<button class="btn btn-link link-secondary text-decoration-none" :class="{'btn-sm': !this.size}" @click="$emit('click')">
+							<button id="calendarHeaderTitle" class="btn btn-link text-decoration-none" :class="{'btn-sm': !this.size}" @click="$emit('click')">
 								{{ title }}
 								<i v-if="eventsAreNull" class="fa fa-spinner fa-pulse"></i>
 							</button>
@@ -88,7 +88,7 @@ export default {
 			<div ref="viewButtons" v-if="!noWeekView && !noMonthView" :class="getHeaderClassSide" class="d-flex justify-content-center justify-content-md-end align-items-center" style="pointer-events: none;">
 				<div  style="pointer-events: all;">
 					<div  role="group" aria-label="Kalender Modus">
-						<button :aria-label="modeAriaLabelText(mode_bezeichnung)" v-tooltip.top="{value:modeAriaLabelText(mode_bezeichnung), showDelay:1000}" type="button" :class="{'active':mode_kurzbz.toLowerCase() === mode.toLowerCase()}" style="margin-right: 4px;" @click.prevent="$emit('updateMode',mode_kurzbz)" class="btn btn-outline-secondary" v-for="({mode_bezeichnung,icon,condition},mode_kurzbz) in modes">
+						<button :aria-label="modeAriaLabelText(mode_bezeichnung)" v-tooltip.top="{value:modeAriaLabelText(mode_bezeichnung), showDelay:1000}" type="button" :class="{'active':mode_kurzbz.toLowerCase() === mode.toLowerCase()}" style="margin-right: 4px;" @click.prevent="$emit('updateMode',mode_kurzbz)" class="btn btn-outline-secondary card d-inline-block" v-for="({mode_bezeichnung,icon,condition},mode_kurzbz) in modes">
 							<i aria-hidden="true" v-if="condition" class="fa" :class="icon" ></i>
 						</button>
 					</div>

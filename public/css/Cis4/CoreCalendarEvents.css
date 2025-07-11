@@ -123,3 +123,44 @@
 }
 
 .dayPageContainer .feiertagEventContent #ferienEventTitle {}
+
+/* Minimized Container Styles */
+
+/* Ferientage Events for Minimized */
+
+.minimizedContainer .feiertagEventContent{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: var(--fhc-light);
+}
+
+.minimizedContainer .feiertagEventContent #ferienEventIcon{
+	margin: 0.5rem;
+}
+
+.minimizedContainer .feiertagEventContent #ferienEventTitle{
+	flex-grow: 1;
+}
+
+/* Lehreinheits Events in Minimized */
+.dayPageContainer .lehreinheitEventContent {
+	display: flex;
+	padding-left: 4rem;
+	justify-content: space-evenly;
+	align-items: center;
+
+}
+
+.dayPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
+	display: grid;
+	align-content: center;
+}
+
+.dayPageContainer .lehreinheitEventContent #lehreinheitEventText {
+	display: contents;
+}
+
+.dayPageContainer .lehreinheitEventContent #lehreinheitEventText * {
+	font-weight: 500;
+}

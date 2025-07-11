@@ -143,7 +143,7 @@ export default {
 		</div>
 		<template v-for="week in weeks"
 		:key="week.no">
-			<a href="#" v-if="showWeeks" class="fhc-calendar-month-page-weekday text-decoration-none text-end opacity-25"
+			<a href="#" v-if="showWeeks" class="fhc-calendar-month-page-weekday text-decoration-none text-end "
 			@click.prevent="changeToWeek(week)">{{week.no}}</a>
 			<a href="#"
 			@click.prevent="clickEvent(day,week)"

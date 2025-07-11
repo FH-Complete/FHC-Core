@@ -15,6 +15,7 @@ class ProfilLib{
 		// loading required models
 		$this->ci->load->model("ressource/Mitarbeiter_model","MitarbeiterModel");
 		$this->ci->load->model("person/Person_model","PersonModel");
+
 		$res = new stdClass();
 
 		// checking the uid
@@ -34,6 +35,7 @@ class ProfilLib{
 				$res->data = $this->studentProfil();
 				$res->data->pid = getAuthPersonId();
 			}
+			$res->data->fotoStatus=$this->isFotoAkzeptiert(getAuthPersonId());
 		}
 		// UID is availabe when accessing Profil/View/:uid
 		else {
@@ -43,7 +45,6 @@ class ProfilLib{
 				return error(getData($isMitarbeiter));
 			}
 			$isMitarbeiter = getData($isMitarbeiter);
-			$isMitarbeiter = $isMitarbeiter ? current($isMitarbeiter) : false;
 			if ($isMitarbeiter) {
 				$res->view = "ViewMitarbeiterProfil";
 				$res->data = $this->viewMitarbeiterProfil($uid);
@@ -53,7 +54,7 @@ class ProfilLib{
 				$res->data = $this->viewStudentProfil($uid);
 			}
 		}
-		$res->data->fotoStatus=$this->isFotoAkzeptiert(getAuthPersonId());
+		
 		return success($res);
 	}
 
@@ -535,9 +536,14 @@ class ProfilLib{
 	 */
 	private function getBenutzerAlias($uid)
 	{
-		$this->BenutzerModel->addSelect(["alias"]);
-		$benutzer_res = $this->BenutzerModel->load([$uid]);
-		$benutzer_res = $this->getDataOrTerminateWithError($benutzer_res);
+		$this->ci->load->model("person/Benutzer_model","BenutzerModel");
+		$this->ci->BenutzerModel->addSelect(["alias"]);
+		$benutzer_res = $this->ci->BenutzerModel->load([$uid]);
+		if(isError($benutzer_res)){
+			return error(getData($benutzer_res));
+		}
+
+		$benutzer_res = getData($benutzer_res);
 		$benutzer_res = $benutzer_res ? current($benutzer_res) : null;
 			
 		return $benutzer_res;
