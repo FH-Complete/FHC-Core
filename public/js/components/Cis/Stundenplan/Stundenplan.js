@@ -4,8 +4,6 @@ import CalendarViewWeek from "../../Calendar/Mode/Week.js";
 import CalendarViewMonth from "../../Calendar/Mode/Month.js";
 import EventEvent from "./Event/Event.js";
 
-import CalendarDate from "../../../helpers/Calendar/Date.js";
-
 import { useEventLoader } from '../../../composables/EventLoader.js'
 import CalendarDateObj from "../../../composables/CalendarDate.js";
 import LvModal from "../Mylv/LvModal.js";
@@ -128,109 +126,10 @@ const Stundenplan = {
 		dateToString(date) {
 			if (date instanceof luxon.DateTime)
 				return date.toISODate();
-			return date.getFullYear() +
-				'-' +
-				CalendarDate.format(date, { month: '2-digit' }, this.$p.user_locale.value) +
-				'-' +
-				CalendarDate.format(date, { day: '2-digit' }, this.$p.user_locale.value);
-		},
-		loadEvents(start, end) {
-			let tsStart = CalendarDate.UTC(start, true);
-			let tsEnd = CalendarDate.UTC(end, true);
-			let index = this.eventsLoaded.findIndex(e => e + CalendarDate.msPerDay >= tsStart);
-			if (index == -1) {
-				// add new chunk
-				this.eventsLoaded.push(tsStart);
-				this.eventsLoaded.push(tsEnd);
-			} else if (index == this.eventsLoaded.length-1) {
-				// add to the end of last chunk
-				tsStart = this.eventsLoaded[index] + CalendarDate.msPerDay;
-				this.eventsLoaded[index] = tsEnd;
-			} else {
-				if (index%2) {
-					// starts between a chunk
-					if (this.eventsLoaded[index] >= tsEnd) {
-						return; // Already loaded
-					}
-					if (index == this.eventsLoaded.length) {
-						// add to the end of a chunk
-						tsStart = this.eventsLoaded[index] + CalendarDate.msPerDay;
-						this.eventsLoaded[index] = tsEnd;
-					} else {
-						if (this.eventsLoaded[index+1] > tsEnd) {
-							// add to the end of a chunk
-							tsStart = this.eventsLoaded[index] + CalendarDate.msPerDay;
-							this.eventsLoaded[index] = tsEnd;
-							// merge chunks if necessary
-							if (this.eventsLoaded[index] == this.eventsLoaded[index+1])
-								this.eventsLoaded.splice(index, 2);
-						} else {
-							// fill between chunk and repeat for rest
-							let originalEnd = tsEnd;
-							tsStart = this.eventsLoaded[index] + CalendarDate.msPerDay;
-							tsEnd = this.eventsLoaded[index+1] - CalendarDate.msPerDay;
-							this.eventsLoaded.splice(index, 2);
-							if (this.eventsLoaded[index] < originalEnd) {
-								this.loadEvents(new Date(this.eventsLoaded[index]), end);
-							}
-						}
-					}
-				} else {
-					// starts between two chunks
-					if (this.eventsLoaded[index] == tsStart) {
-						if (this.eventsLoaded[index+1] >= tsEnd)
-							return // Already loaded
-						return this.loadEvents(new Date(this.eventsLoaded[index+1]), end);
-					}
-					if (this.eventsLoaded[index] == tsEnd) {
-						// add to the start of a chunk
-						this.eventsLoaded[index] = tsStart;
-						tsEnd -= CalendarDate.msPerDay;
-					} else if (this.eventsLoaded[index] == tsEnd + CalendarDate.msPerDay) {
-						// add to the start of a chunk
-						this.eventsLoaded[index] = tsStart;
-					} else if (this.eventsLoaded[index] > tsEnd) {
-						// add chunk between chunks
-						// TODO(chris): check possible previous chunk to merge
-						this.eventsLoaded.splice(index, 0, tsStart, tsEnd);
-					} else {
-						//[<s, <s, i>=s, ...]
-						if (this.eventsLoaded[index+1] >= tsEnd) {
-							tsEnd = this.eventsLoaded[index];
-							this.eventsLoaded[index] = tsStart;
-						} else {
-							//[<s, <s, >=s, <e, ...]
-							let newStart = new Date(this.eventsLoaded[index+1]);
-							tsEnd = this.eventsLoaded[index];
-							this.eventsLoaded[index] = tsStart;
-							this.loadEvents(newStart, end);
-						}
-					}
-				}
-			}
-			if (tsStart >= tsEnd)
-				return;
-			start = this.dateToString(new Date(tsStart));
-			end = this.dateToString(new Date(tsEnd));
-			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getStundenplan(start, end, this.propsViewData.lv_id),
-				this.$fhcApi.factory.stundenplan.getStundenplanReservierungen(start, end)
-			]).then(results => {
-				results.forEach(promise_result => {
-					if (
-						promise_result.status === 'fulfilled'
-						&& promise_result.value.meta.status === "success"
-					) {
-						if (promise_result.value.meta.lv)
-							this.lv = promise_result.value.meta.lv;
-						
-						this.events = this.events.concat(promise_result.value.data);
-					}
-				})
-			});
+
+			return luxon.DateTime.fromJSDate(date).toISODate();
 		},
 		sendRouterParams(day, mode) {
-			// TODO(chris): move into a CalendarDate.format... function
 			const focus_date = this.dateToString(day);
 
 			this.$router.push({
