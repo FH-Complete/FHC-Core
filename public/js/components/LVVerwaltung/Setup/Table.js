@@ -168,7 +168,7 @@ export default {
 					headerFilterFunc: extendedHeaderFilter,
 				},
 				layout: 'fitDataStretch',
-				persistenceID: 'lehrveranstaltungen_2025_07_07_v1',
+				persistenceID: 'lehrveranstaltungen_2025_07_11_v1',
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
 				rowContextMenu: (component, e) => {
@@ -225,11 +225,19 @@ export default {
 						formatter: (cell, formatterParams) => {
 							const rowData = cell.getRow().getData();
 							const iconKey = (rowData.lehrtyp_kurzbz || '').toLowerCase();
+							const lvkurzbz = (cell.getValue()).toUpperCase();
 
+							const parentspan = document.createElement('span');
 							const span = document.createElement('span');
+
+
 							span.classList.add('lv_table_icon', `icon-${iconKey}`);
 							span.title = iconKey || 'LV-Teil';
-							return span;
+
+							parentspan.appendChild(span);
+							parentspan.appendChild(document.createTextNode(` ${lvkurzbz}`));
+
+							return parentspan
 						},
 
 						cellClick: (e, cell) => {
@@ -299,16 +307,6 @@ export default {
 							return container;
 						},
 						width: 150,
-					},
-					{
-						title: this.$p.t('lehre', 'kurzbz'),
-						field: "lv_kurzbz_anzeige",
-						headerFilterFuncParams: {field: 'lv_kurzbz_anzeige'},
-						formatter: (cell, formatterParams) => {
-							let rowData = cell.getRow().getData();
-							return rowData?.lv_kurzbz?.toUpperCase();
-						},
-						headerFilter: true
 					},
 					{
 						title: this.$p.t('lehre', 'lehrveranstaltung_id'),
@@ -667,7 +665,11 @@ export default {
 				if (level === this.currentTreeLevel - 1 )
 				{
 					row._row.modules.dataTree.open = true;
-					lastMatchingRow = row;
+
+					if (row._row.data._children?.length > 0)
+					{
+						lastMatchingRow = row;
+					}
 				}
 			});
 

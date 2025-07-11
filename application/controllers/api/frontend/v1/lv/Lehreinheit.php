@@ -215,6 +215,7 @@ class Lehreinheit extends FHCAPI_Controller
 
 		$lehreinheit_id_new = getData($insert_result);
 
+		$this->_ci->LehreinheitModel->update(array('lehreinheit_id' => $lehreinheit_id_new), array('unr' => $lehreinheit_id_new));
 		if (in_array($art, array('gruppen', 'alle')))
 		{
 			$gruppen_result = $this->_ci->LehreinheitgruppeModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id));

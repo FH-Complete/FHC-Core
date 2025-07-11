@@ -470,6 +470,12 @@ class Lehreinheitgruppe_model extends DB_Model
 								END AS verplant");
 		$this->addJoin('tbl_studiengang', 'studiengang_kz', 'LEFT');
 		$this->addJoin('public.tbl_gruppe', 'gruppe_kurzbz', 'LEFT');
-		return $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+
+		$this->db->where('lehreinheit_id', $lehreinheit_id);
+		$this->db->group_start()
+			->where('tbl_gruppe.direktinskription !=', true)
+			->or_where('tbl_gruppe.direktinskription IS NULL')
+			->group_end();
+		return $this->load();
 	}
 }
