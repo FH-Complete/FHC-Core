@@ -988,4 +988,232 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($qry, $params);
 	}
+
+	public function getLvsByOrganization($oe_kurzbz)
+	{
+		$qry="
+			SELECT
+				distinct on (lehrveranstaltung_id)
+				tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz, tbl_lehrveranstaltung.semester as lv_semester,
+				tbl_lehrveranstaltung.kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, tbl_lehrveranstaltung.ects as lv_ects,
+				tbl_lehrveranstaltung.lehreverzeichnis as lv_lehreverzeichnis, tbl_lehrveranstaltung.planfaktor as lv_planfaktor,
+				tbl_lehrveranstaltung.planlektoren as lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten as lv_planpersonalkosten,
+				tbl_lehrveranstaltung.plankostenprolektor as lv_plankostenprolektor, tbl_lehrveranstaltung.orgform_kurzbz as lv_orgform_kurzbz,
+				tbl_lehrveranstaltung.lehrveranstaltung_id,
+				tbl_lehrveranstaltung.lehrform_kurzbz as lehrform_kurzbz,
+				tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz,
+				tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
+				tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.semesterstunden,
+				tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.aktiv,
+				'' as studienplan_id, '' as studienplan_bezeichnung, tbl_lehrveranstaltung.lehrtyp_kurzbz
+			FROM
+				lehre.tbl_lehrveranstaltung
+			WHERE
+				tbl_lehrveranstaltung.oe_kurzbz= ?
+				AND tbl_lehrveranstaltung.aktiv
+		";
+
+		return $this->execReadOnlyQuery($qry, array($oe_kurzbz));
+	}
+
+	public function getLvsByFachbereich($fachbereich, $studiensemester_kurbz, $mitarbeiter_uid = null)
+	{
+		$qry = "";
+		if (!is_null($mitarbeiter_uid))
+		{
+			$qry = $this->getLvsFromStudienplanByEmp();
+			$params = array($fachbereich, $studiensemester_kurbz);
+		}
+
+		$qry .= "SELECT
+					distinct on(lehrveranstaltung_id)
+					lv_studiengang_kz, lv_semester, lv_kurzbz, lv_bezeichnung, lv_ects,
+					lv_lehreverzeichnis, lv_planfaktor, lv_planlektoren, lv_planpersonalkosten,
+					lv_plankostenprolektor, lv_orgform_kurzbz, lehrveranstaltung_id,
+					lehrform_kurzbz, lv_lehrform_kurzbz, lv_bezeichnung_english, studiengang_kz, semester, anmerkung, sprache, semesterstunden,
+					lehre, aktiv,
+					'' as studienplan_id, '' as studienplan_bezeichnung,
+					(SELECT lehrtyp_kurzbz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=vw_lehreinheit.lehrveranstaltung_id) as lehrtyp_kurzbz
+				FROM
+					campus.vw_lehreinheit
+				WHERE studiensemester_kurzbz = ?
+				AND fachbereich_kurzbz = ?";
+
+		$params[] = array($studiensemester_kurbz, $fachbereich);
+
+		if (!is_null($mitarbeiter_uid))
+		{
+			$qry .= " AND mitarbeiter_uid = ?";
+			$params[] = $mitarbeiter_uid;
+		}
+		else
+		{
+			$qry.=" AND lehrveranstaltung_id NOT IN (SELECT lehrveranstaltung_id
+					FROM
+						lehre.tbl_lehrveranstaltung
+						JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+						JOIN lehre.tbl_studienplan USING(studienplan_id)
+						JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+						JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
+					WHERE
+						tbl_lehrveranstaltung.oe_kurzbz=(Select oe_kurzbz from public.tbl_fachbereich where fachbereich_kurzbz= ?)
+						AND tbl_studienplan_semester.studiensemester_kurzbz= ?";
+
+			$params[] = array($fachbereich, $studiensemester_kurbz);
+		}
+
+		return $this->execReadOnlyQuery($qry, $params);
+	}
+
+	private function getLvsFromStudienplanByEmp()
+	{
+		return "
+		SELECT
+				distinct on (lehrveranstaltung_id)
+				tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz, 
+				tbl_lehrveranstaltung.semester as lv_semester,
+				tbl_lehrveranstaltung.kurzbz as lv_kurzbz, 
+				tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+				tbl_lehrveranstaltung.ects as lv_ects,
+				tbl_lehrveranstaltung.lehreverzeichnis as lv_lehreverzeichnis,
+				tbl_lehrveranstaltung.planfaktor as lv_planfaktor,
+				tbl_lehrveranstaltung.planlektoren as lv_planlektoren,
+				tbl_lehrveranstaltung.planpersonalkosten as lv_planpersonalkosten,
+				tbl_lehrveranstaltung.plankostenprolektor as lv_plankostenprolektor,
+				tbl_lehrveranstaltung.orgform_kurzbz as lv_orgform_kurzbz,
+				tbl_lehrveranstaltung.lehrveranstaltung_id,
+				tbl_lehrveranstaltung.lehrform_kurzbz as lehrform_kurzbz,
+				tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz,
+				tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
+				tbl_lehrveranstaltung.studiengang_kz,
+				tbl_studienplan_lehrveranstaltung.semester,
+				tbl_lehrveranstaltung.anmerkung,
+				tbl_lehrveranstaltung.sprache,
+				tbl_lehrveranstaltung.semesterstunden,
+				tbl_lehrveranstaltung.lehre,
+				tbl_lehrveranstaltung.aktiv,
+				tbl_studienplan.studienplan_id::text,
+				tbl_studienplan.bezeichnung as studienplan_bezeichnung,
+				tbl_lehrveranstaltung.lehrtyp_kurzbz
+			FROM
+				lehre.tbl_lehrveranstaltung
+				JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+				JOIN lehre.tbl_studienplan USING(studienplan_id)
+				JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
+			WHERE
+				tbl_lehrveranstaltung.oe_kurzbz=(Select oe_kurzbz from public.tbl_fachbereich where fachbereich_kurzbz= ?)
+				AND tbl_studienplan_semester.studiensemester_kurzbz = ?
+				AND tbl_lehrveranstaltung.aktiv
+			UNION
+		";
+	}
+
+	public function getLvsByStudiengang($studienplan_ids, $placeholders, $only_ids, $studiengang_kz, $studiensemester_kurzbz, $semester = null, $verband = null)
+	{
+		$qry = "";
+		$params = array();
+
+		if (!empty($studienplan_ids))
+		{
+			$qry = $this->getLvsFromStudienplanByStudienplanID($placeholders);
+			$params = $studienplan_ids;
+		}
+
+		$qry .= "
+			SELECT DISTINCT on(lehrveranstaltung_id) lehrveranstaltung_id, 
+				tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
+				tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+				tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
+				studiengang_kz,
+				semester,
+				tbl_lehrveranstaltung.sprache,
+				ects as lv_ects,
+				semesterstunden,
+				tbl_lehrveranstaltung.anmerkung,
+				tbl_lehrveranstaltung.lehre,
+				lehreverzeichnis as lv_lehreverzeichnis,
+				tbl_lehrveranstaltung.aktiv,
+				planfaktor as lv_planfaktor,
+				planlektoren as lv_planlektoren,
+				planpersonalkosten as lv_planpersonalkosten,
+				plankostenprolektor as lv_plankostenprolektor,
+				tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz,
+				tbl_lehrveranstaltung.orgform_kurzbz,
+				''::text as studienplan_id,
+				'' as studienplan_bezeichnung,
+				'' as studienplan_lehrveranstaltung_id_parent,
+				tbl_lehrveranstaltung.lehrtyp_kurzbz,
+				UPPER(CONCAT(tbl_studiengang.typ,tbl_studiengang.kurzbz)) as studiengang
+			FROM lehre.tbl_lehrveranstaltung 
+				JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
+				JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE studiengang_kz = ?
+					AND studiensemester_kurzbz = ?
+		";
+
+		$params[] = $studiengang_kz;
+		$params[] = $studiensemester_kurzbz;
+		if (!is_null($semester))
+		{
+			$qry .= ' AND semester = ?';
+			$params[] = $semester;
+		}
+		if (!is_null($verband))
+		{
+			$qry .= ' AND (orgform_kurzbz = ? OR orgform_kurzbz IS NULL)';
+			$params[] = $verband;
+		}
+
+		if (!empty($only_ids))
+		{
+
+			$qry .= ' AND NOT EXISTS (SELECT 1 FROM lehre.tbl_studienplan_lehrveranstaltung where studienplan_id IN ?
+						AND lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND tbl_lehrveranstaltung.aktiv)';
+
+			$params[] = $only_ids;
+		}
+
+		return $this->execReadOnlyQuery($qry, $params);
+	}
+	private function getLvsFromStudienplanByStudienplanID($placeholders)
+	{
+		return "
+		SELECT
+				lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz,
+				tbl_studienplan_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
+				ects as lv_ects, semesterstunden, anmerkung, lehre, lehreverzeichnis as lv_lehreverzeichnis, tbl_lehrveranstaltung.aktiv,
+				planfaktor as lv_planfaktor, planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
+				plankostenprolektor as lv_plankostenprolektor, lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.orgform_kurzbz,
+				tbl_studienplan_lehrveranstaltung.studienplan_id::text as studienplan_id, tbl_studienplan.bezeichnung as studienplan_bezeichnung, tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent::text,
+				tbl_lehrveranstaltung.lehrtyp_kurzbz, UPPER(CONCAT(tbl_studiengang.typ,tbl_studiengang.kurzbz)) as studiengang
+			FROM
+			    lehre.tbl_lehrveranstaltung
+				JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+				JOIN lehre.tbl_studienplan USING(studienplan_id)
+				JOIN tbl_studiengang USING(studiengang_kz)
+			WHERE
+				tbl_lehrveranstaltung.aktiv AND ((studienplan_id, tbl_studienplan_lehrveranstaltung.semester) IN ( " . implode(',', $placeholders) . "))
+			UNION
+		";
+	}
+
+	public function getAllOe($lv_id, $stg_kz = null)
+	{
+		$qry = "SELECT DISTINCT oe_kurzbz
+			FROM lehre.tbl_studienplan_lehrveranstaltung
+			JOIN lehre.tbl_studienplan USING(studienplan_id)
+			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+			JOIN public.tbl_studiengang USING(studiengang_kz)
+			WHERE lehrveranstaltung_id = ? ";
+
+		$params = array($lv_id);
+		if (!is_null($stg_kz))
+		{
+			$qry .= ' OR studiengang_kz = ?';
+			$params[] = $stg_kz;
+		}
+
+		return $this->execReadOnlyQuery($qry, $params);
+	}
 }

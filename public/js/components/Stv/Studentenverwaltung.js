@@ -24,6 +24,7 @@ import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
 
 import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiStv from "../../api/factory/stv.js";
+import ApiStvVerband from '../../api/factory/stv/verband.js';
 
 
 export default {
@@ -70,6 +71,7 @@ export default {
 	},
 	data() {
 		return {
+			endpoint: ApiStvVerband,
 			selected: [],
 			searchbaroptions: {
 				cssclass: "position-relative",
@@ -220,7 +222,7 @@ export default {
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
-					<stv-verband @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
+					<stv-verband @select-verband="onSelectVerband" class="col" style="height:0%" :endpoint="endpoint"></stv-verband>
 					<stv-studiensemester :default="defaultSemester" @changed="studiensemesterChanged"></stv-studiensemester>
 				</nav>
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
