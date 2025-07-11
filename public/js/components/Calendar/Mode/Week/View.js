@@ -12,14 +12,14 @@ export default {
 		LabelTime
 	},
 	inject: {
-		timeGrid: "timeGrid",
-		collapseEmptyDays: "collapseEmptyDays"
+		timeGrid: "timeGrid"
 	},
 	props: {
 		day: {
 			type: luxon.DateTime,
 			required: true
-		}
+		},
+		collapseEmptyDays: Boolean
 	},
 	computed: {
 		start() {

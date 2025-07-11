@@ -6,7 +6,6 @@ import CalClick from '../../directives/Calendar/Click.js';
 
 /**
  * TODO(chris):
- * - Better Interface (maybe config object for modes/header/slider; timeGrid, collapseEmptyDays, buttons)
  * - check emits
  * - event single mode (default for click:event)
  * - get focusDate/currentDate correct
@@ -27,7 +26,6 @@ export default {
 			locale: Vue.computed(() => this.locale),
 			timezone: Vue.computed(() => this.timezone),
 			timeGrid: Vue.computed(() => this.timeGrid),
-			collapseEmptyDays: Vue.computed(() => this.collapseEmptyDays),
 			draggableEvents: Vue.computed(() => {
 				if (!this.draggableEvents)
 					return () => false;
@@ -101,7 +99,6 @@ export default {
 			default: undefined
 		},
 		timeGrid: Array,
-		collapseEmptyDays: Boolean,
 		draggableEvents: [Boolean, Array, Function],
 		dropableEvents: [Boolean, Array, Function],
 		onDragover: Function,

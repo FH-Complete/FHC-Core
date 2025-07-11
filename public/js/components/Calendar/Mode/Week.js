@@ -77,7 +77,7 @@ export default {
 		},
 		viewAttrs(weeks) {
 			const day = this.focusDate.plus({ weeks });
-			return { day };
+			return { ...this.$attrs, day };
 		},
 		handleClickDefaults(evt) {
 			switch (evt.detail.source) {
