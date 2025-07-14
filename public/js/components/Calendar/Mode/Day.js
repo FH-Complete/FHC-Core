@@ -37,7 +37,7 @@ export default {
 				}
 			}
 
-			return luxon.Inteval.fromDateTimes(first, last);
+			return luxon.Interval.fromDateTimes(first, last);
 		}
 	},
 	watch: {
