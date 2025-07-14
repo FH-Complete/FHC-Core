@@ -26,22 +26,20 @@ export default {
 	},
 	computed: {
 		range() {
-			const range = {};
-
-			range.first = this.focusDate.startOf('month').startOf('week', { useLocaleWeeks: true });
-			range.last = range.first.plus({ days: 41 }).endOf('day'); // NOTE(chris): 6 weeks minus 1 day
+			let first = this.focusDate.startOf('month').startOf('week', { useLocaleWeeks: true });
+			let last = first.plus({ days: 41 }).endOf('day'); // NOTE(chris): 6 weeks minus 1 day
 
 			if (this.rangeOffset != 0) {
 				const nextFocusDate = this.focusDate.plus({ months: this.rangeOffset});
 				const nextRangeStart = nextFocusDate.startOf('month').startOf('week', { useLocaleWeeks: true });
 				if (this.rangeOffset < 0) {
-					range.first = nextRangeStart;
+					first = nextRangeStart;
 				} else {
-					range.last = nextRangeStart.plus({ days: 41 }).endOf('day');
+					last = nextRangeStart.plus({ days: 41 }).endOf('day');
 				}
 			}
 
-			return range;
+			return luxon.Interval.fromDateTimes(first, last);
 		}
 	},
 	watch: {

@@ -30,20 +30,18 @@ export default {
 	},
 	computed: {
 		range() {
-			const range = {};
-
-			range.first = this.focusDate;
-			range.last = range.first.plus({ days: this.length });
+			let first = this.focusDate;
+			let last = first.plus({ days: this.length });
 
 			if (this.rangeOffset != 0) {
 				if (this.rangeOffset < 0) {
-					range.first = range.first.plus({ days: this.rangeOffset * this.length });
+					first = first.plus({ days: this.rangeOffset * this.length });
 				} else {
-					range.last = range.last.plus({ days: this.rangeOffset * this.length });
+					last = last.plus({ days: this.rangeOffset * this.length });
 				}
 			}
 
-			return range;
+			return luxon.Interval.fromDateTimes(first, last);
 		}
 	},
 	watch: {

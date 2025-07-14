@@ -26,20 +26,18 @@ export default {
 	},
 	computed: {
 		range() {
-			const range = {};
-
-			range.first = this.focusDate.startOf('day');
-			range.last = this.focusDate.endOf('day');
+			let first = this.focusDate.startOf('day');
+			let last = this.focusDate.endOf('day');
 			
 			if (this.rangeOffset != 0) {
 				if (this.rangeOffset < 0) {
-					range.first = range.first.plus({ days: this.rangeOffset });
+					first = first.plus({ days: this.rangeOffset });
 				} else {
-					range.last = range.last.plus({ days: this.rangeOffset });
+					last = last.plus({ days: this.rangeOffset });
 				}
 			}
 
-			return range;
+			return luxon.Inteval.fromDateTimes(first, last);
 		}
 	},
 	watch: {
