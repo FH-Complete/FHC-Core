@@ -151,6 +151,7 @@ class Student extends FHCAPI_Controller
 	public function save($prestudent_id)
 	{
 		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
@@ -170,7 +171,6 @@ class Student extends FHCAPI_Controller
 		
 		$result = $this->udflib->getCiValidations($this->PersonModel, $this->input->post());
 
-		//TODO(Manu) check with Chris: input number not allowed
 		$udf_field_validations = $this->getDataOrTerminateWithError($result);
 
 		$this->form_validation->set_rules($udf_field_validations);
@@ -225,7 +225,7 @@ class Student extends FHCAPI_Controller
 			'anmerkung',
 			'homepage'
 		];
-		
+
 		// add UDFs
 		$result = $this->udflib->getDefinitionForModel($this->PersonModel);
 
@@ -257,12 +257,24 @@ class Student extends FHCAPI_Controller
 			}
 		}
 
+		$array_allowed_props_benutzer = ['aktiv', 'alias'];
+		$update_benutzer = array();
+		foreach ($array_allowed_props_benutzer as $prop) {
+			$val = $this->input->post($prop);
+			if ($val !== null) {
+				$update_benutzer[$prop] = $val;
+			}
+		}
+
 		// Check PKs
 		if (count($update_lehrverband) + count($update_student) && $uid === null) {
 			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_student')]);
 		}
 		if (count($update_person) && $person_id === null) {
 			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_person')]);
+		}
+		if (count($update_benutzer) && $uid === null) {
+			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_student')]);
 		}
 
 		// Do Updates
@@ -316,10 +328,26 @@ class Student extends FHCAPI_Controller
 			$this->getDataOrTerminateWithError($result);
 		}
 
+		if (count($update_benutzer)) {
+			$update_benutzer['updatevon'] = $authuid;
+			$update_benutzer['updateamum'] = $now;
+			if (array_key_exists("aktiv", $update_benutzer))
+			{
+				$update_benutzer['updateaktivvon'] = $authuid;
+				$update_benutzer['updateaktivam'] = $now;
+			}
+			$result = $this->BenutzerModel->update(
+				[$uid],
+				$update_benutzer
+			);
+			$this->getDataOrTerminateWithError($result);
+		}
+
 		$this->terminateWithSuccess(array_fill_keys(array_merge(
 			array_keys($update_lehrverband),
 			array_keys($update_person),
-			array_keys($update_student)
+			array_keys($update_student),
+			array_keys($update_benutzer)
 		), ''));
 	}
 
