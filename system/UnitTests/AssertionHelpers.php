@@ -1,10 +1,12 @@
 <?php
 
-function lineBreak() {
+function lineBreak()
+{
 	return IS_CLI ? PHP_EOL : '<br>';
 }
 
-function preFormat($text) {
+function preFormat($text)
+{
 	if (IS_CLI) {
 		return $text; // Plain text in CLI
 	} else {
@@ -12,7 +14,8 @@ function preFormat($text) {
 	}
 }
 
-function colorText($text, $color) {
+function colorText($text, $color)
+{
 	if (IS_CLI) {
 		// ANSI color codes
 		$colors = [
@@ -31,7 +34,8 @@ function colorText($text, $color) {
 	}
 }
 
-function assertEqual($expected, $actual, $message = '') {
+function assertEqual($expected, $actual, $message = '')
+{
 	if ($expected !== $actual) {
 		echo colorText('❌ Assertion failed:', 'red') . ' ' . $message . lineBreak();
 		echo "Expected: " . preFormat(var_export($expected, true)) . lineBreak();
@@ -44,19 +48,23 @@ function assertEqual($expected, $actual, $message = '') {
 }
 
 
-function assertTrue($condition, $message = '') {
+function assertTrue($condition, $message = '')
+{
 	return assertEqual(true, $condition, $message ?: 'Expected condition to be true');
 }
 
-function assertFalse($condition, $message = '') {
+function assertFalse($condition, $message = '')
+{
 	return assertEqual(false, $condition, $message ?: 'Expected condition to be false');
 }
 
-function assertNull($value, $message = '') {
+function assertNull($value, $message = '')
+{
 	return assertEqual(null, $value, $message ?: 'Expected value to be null');
 }
 
-function assertNotNull($value, $message = '') {
+function assertNotNull($value, $message = '')
+{
 	if ($value === null) {
 		echo colorText('❌ Assertion failed:', 'red') . ' ' . $message . lineBreak();
 		echo 'Value is null' . lineBreak();
@@ -68,39 +76,48 @@ function assertNotNull($value, $message = '') {
 }
 
 
-function assertIsArray($value, $message = '') {
+function assertIsArray($value, $message = '')
+{
 	return assertEqual(true, is_array($value), $message ?: 'Expected value to be an array');
 }
 
-function assertIsObject($value, $message = '') {
+function assertIsObject($value, $message = '')
+{
 	return assertEqual(true, is_object($value), $message ?: 'Expected value to be an object');
 }
 
-function assertIsString($value, $message = '') {
+function assertIsString($value, $message = '')
+{
 	return assertEqual(true, is_string($value), $message ?: 'Expected value to be a string');
 }
 
-function assertIsInt($value, $message = '') {
+function assertIsInt($value, $message = '')
+{
 	return assertEqual(true, is_int($value), $message ?: 'Expected value to be an integer');
 }
 
-function assertIsFloat($value, $message = '') {
+function assertIsFloat($value, $message = '')
+{
 	return assertEqual(true, is_float($value), $message ?: 'Expected value to be a float');
 }
 
-function assertIsBool($value, $message = '') {
+function assertIsBool($value, $message = '')
+{
 	return assertEqual(true, is_bool($value), $message ?: 'Expected value to be a boolean');
 }
 
 
-function assertArrayHasKey($key, $array, $message = '') {
+function assertArrayHasKey($key, $array, $message = '')
+{
 	return assertEqual(true, array_key_exists($key, $array), $message ?: "Expected key '$key' in array");
 }
 
-function assertObjectHasProperty($property, $object, $message = '') {
+function assertObjectHasProperty($property, $object, $message = '')
+{
 	return assertEqual(true, property_exists($object, $property), $message ?: "Expected property '$property' in object");
 }
 
-function assertCount($expectedCount, $arrayOrCountable, $message = '') {
+function assertCount($expectedCount, $arrayOrCountable, $message = '')
+{
 	return assertEqual($expectedCount, count($arrayOrCountable), $message ?: "Expected count of $expectedCount");
 }

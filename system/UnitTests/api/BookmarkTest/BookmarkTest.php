@@ -3,7 +3,8 @@
 function getParam($name, $default = null)
 {
 	if (php_sapi_name() === 'cli') { // Parse CLI args for --key=value style
-		// php ./system/UnitTests/api/BookmarkTest/BookmarkTest.php --server=https://cis40.dev.technikum-wien.at --user=if23b236 --pw=FHCompleteDemo42!
+		// php ./system/UnitTests/api/BookmarkTest/BookmarkTest.php
+		// --server=https://cis40.dev.technikum-wien.at --user=if23b236 --pw=FHCompleteDemo42!
 
 		global $argv;
 		foreach ($argv as $arg) {
@@ -39,15 +40,16 @@ echo $TEST_PW.LINE_BREAK;
 
 // "Unit Test" Script to Test API Controller frontend/v1/Bookmark.php by calling methods with curated inputs and checking
 // for the expected output
-$URL = $server.'/cis.php/api/frontend/v1/Bookmark/'; 
+$URL = $server.'/cis.php/api/frontend/v1/Bookmark/';
 
 testGetBookmarks($URL, 'getBookmarks', $TEST_USER, $TEST_PW);
-$id = testInsertBookmark($URL, 'insert',  $TEST_USER, $TEST_PW);
-$id = testUpdateBookmark($URL, 'update',  $TEST_USER, $TEST_PW, $id);
-testDeleteBookmark($URL, 'delete',  $TEST_USER, $TEST_PW, $id);
+$id = testInsertBookmark($URL, 'insert', $TEST_USER, $TEST_PW);
+$id = testUpdateBookmark($URL, 'update', $TEST_USER, $TEST_PW, $id);
+testDeleteBookmark($URL, 'delete', $TEST_USER, $TEST_PW, $id);
 if (!IS_CLI) echo "<pre>";
 
-function testGetBookmarks($url, $method, $user, $pw) {
+function testGetBookmarks($url, $method, $user, $pw)
+{
 	echo LINE_BREAK.LINE_BREAK."Test '".$method."' start ".LINE_BREAK;
 
 	try {
@@ -78,7 +80,8 @@ function testGetBookmarks($url, $method, $user, $pw) {
 	}
 }
 
-function testInsertBookmark($url, $method, $user, $pw) {
+function testInsertBookmark($url, $method, $user, $pw)
+{
 	echo LINE_BREAK.LINE_BREAK."Test '".$method."' start ".LINE_BREAK;
 	echo LINE_BREAK;
 	try {
@@ -102,9 +105,8 @@ function testInsertBookmark($url, $method, $user, $pw) {
 
 	$assertions = [];
 	$assertions[] = assertIsInt($resultPost->body->data);
-
 	$assertions[] = assertIsString($resultPost->body->meta->status);
-	$assertions[] = assertEqual("success",$resultPost->body->meta->status, "Response Status Success");
+	$assertions[] = assertEqual("success", $resultPost->body->meta->status, "Response Status Success");
 	if(allTrue($assertions)) {
 		echo "Test '".$method."' finished SUCCESS".LINE_BREAK;
 	} else {
@@ -115,7 +117,8 @@ function testInsertBookmark($url, $method, $user, $pw) {
 	return $resultPost->body->data;
 }
 
-function testDeleteBookmark($url, $method, $user, $pw, $id) {
+function testDeleteBookmark($url, $method, $user, $pw, $id)
+{
 	echo LINE_BREAK.LINE_BREAK."Test '".$method."' start \n".LINE_BREAK;
 	
 	try {
@@ -136,7 +139,7 @@ function testDeleteBookmark($url, $method, $user, $pw, $id) {
 	$assertions = [];
 	$assertions[] = assertIsString($resultPost->body->data);
 	$assertions[] = assertIsString($resultPost->body->meta->status);
-	$assertions[] = assertEqual("success",$resultPost->body->meta->status, "Response Status Success");
+	$assertions[] = assertEqual("success", $resultPost->body->meta->status, "Response Status Success");
 	if(allTrue($assertions)) {
 		echo "Test '".$method."' finished SUCCESS".LINE_BREAK;
 	} else {
@@ -145,7 +148,8 @@ function testDeleteBookmark($url, $method, $user, $pw, $id) {
 	}
 }
 
-function testUpdateBookmark($url, $method, $user, $pw, $id) {
+function testUpdateBookmark($url, $method, $user, $pw, $id)
+{
 	echo LINE_BREAK.LINE_BREAK."Test '".$method."' start ".LINE_BREAK;
 
 	try {
@@ -170,7 +174,7 @@ function testUpdateBookmark($url, $method, $user, $pw, $id) {
 	$assertions = [];
 	$assertions[] = assertIsString($resultPost->body->data);
 	$assertions[] = assertIsString($resultPost->body->meta->status);
-	$assertions[] = assertEqual("success",$resultPost->body->meta->status, "Response Status Success");
+	$assertions[] = assertEqual("success", $resultPost->body->meta->status, "Response Status Success");
 	if(allTrue($assertions)) {
 		echo "Test '".$method."' finished SUCCESS".LINE_BREAK;
 	} else {
@@ -181,26 +185,28 @@ function testUpdateBookmark($url, $method, $user, $pw, $id) {
 	return $resultPost->body->data;
 }
 
-function printResponse($resultPost) {
+function printResponse($resultPost)
+{
 	echo LINE_BREAK;
 	echo "Response Body:";
-	print_r($resultPost->body);
+	echo preFormat(var_export($resultPost->body, true));
 	echo LINE_BREAK;
 	echo "Raw Response:";
-	print_r($resultPost->raw_body);
+	echo preFormat(var_export($resultPost->raw_body, true));
 	echo LINE_BREAK;
 	echo "Status Code:";
-	print_r($resultPost->code);
+	echo preFormat(var_export($resultPost->code, true));
 	echo LINE_BREAK;
 	echo "Headers:";
-	print_r($resultPost->headers);
+	echo preFormat(var_export($resultPost->headers, true));
 	echo LINE_BREAK;
 }
 
-function allTrue($arr) {
-	return count(array_filter($arr, function($v) {
-			return $v === true;
-		})) === count($arr);
+function allTrue($arr)
+{
+	return count(array_filter($arr, function ($v) {
+		return $v === true;
+	})) === count($arr);
 }
 
 
