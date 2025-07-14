@@ -3067,6 +3067,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
+		'phrase' => 'weitereLektoren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '...und {0} weitere Lektoren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'group',
+				'description' => '...and {0} more lecturers',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
 		'phrase' => 'studiengang',
 		'insertvon' => 'system',
 		'phrases' => array(

@@ -95,9 +95,11 @@ export default {
 							:''
 						}}</th>
 						<td>
-							<div v-for="lektor in event.lektor" class="d-block">
-								<a v-if="lektorenLinks[lektor.kurzbz]" :aria-label="$p.t('lehre','lektor')" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
-								{{lektor.kurzbz}}
+							<div id="lektorenContainer">
+								<div v-for="lektor in event.lektor" class="d-block">
+									<a v-if="lektorenLinks[lektor.kurzbz]" :aria-label="$p.t('lehre','lektor')" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C"></i></a>
+									{{lektor.kurzbz}}
+								</div>
 							</div>
 						</td>
 					</tr>

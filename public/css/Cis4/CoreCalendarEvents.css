@@ -16,12 +16,17 @@
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	display:flex;
-	place-content: center space-evenly;
+	justify-content: space-evenly;
+	align-items:center;
 	
 }
 
 .monthPageContainer .lehreinheitEventContent #lehreinheitEventText #lehreinheitLektoren{
 	display:none;
+}
+
+.monthPageContainer .lehreinheitEventContent #lektorEllipsis {
+	display: none;
 }
 
 /* Lehreinheits Events in Week Page */
@@ -31,6 +36,13 @@
 	grid-template-rows: 1fr;
 
 }
+
+@media(max-width: 1199px){
+	.weekPageContainer .lehreinheitEventContent {
+			grid-template-columns: 1fr;
+		}
+}
+
 
 .weekPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
 	display: grid;
@@ -98,6 +110,13 @@
 	grid-template-columns: auto 1fr;
 	justify-items: center;
 	align-items:center;
+	color: var(--fhc-light);
+}
+.weekPageContainer .feiertagEventContent {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	justify-items: center;
+	align-items: center;
 	color: var(--fhc-light);
 }
 
