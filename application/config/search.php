@@ -705,7 +705,7 @@ $config['room'] = [
 		LEFT JOIN public.tbl_adresse address
 			USING (adresse_id)"
 ];
-
+$sprache = getUserLanguage();
 $config['cms'] = [
 	'primarykey' => 'contentsprache_id',
 	'table' => 'campus.tbl_contentsprache',
@@ -785,7 +785,8 @@ $config['cms'] = [
 			SELECT content_id 
 			FROM cms_active_others
 		)
-		AND version = campus.get_highest_content_version(content_id)"
+		AND version = campus.get_highest_content_version(content_id)
+		AND contentsprache.sprache = '{$sprache}'"
 ];
 
 $config['dms'] = [

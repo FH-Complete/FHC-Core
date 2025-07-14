@@ -19,7 +19,9 @@ const app = Vue.createApp({
                     "employee",
 					"studentcis",
                     "room",
-                    "active_organisationunit"
+                    "active_organisationunit",
+					"cms",
+					"dms"
                 ],
                 actions: {
                     employee: {
@@ -105,7 +107,30 @@ const app = Vue.createApp({
                             }
                         },
                         childactions: []
-                    }
+                    },
+					cms: {
+						defaultaction: {
+							type: "link",
+							action: function (data) {
+								const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									'/CisVue/Cms/content/' + data.content_id;
+								return link;
+							}
+						},
+						childactions: []
+					},
+					dms: {
+						defaultaction: {
+							type: "link",
+							action: function (data) {
+								const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									'cms/dms.php?id=' + data.dms_id;
+								return link;
+							}
+						},
+						childactions: []
+					}
                 }
             }
         };

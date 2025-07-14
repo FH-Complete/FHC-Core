@@ -10,7 +10,6 @@ export default {
 		actions: Object
 	},
 	inject: [
-		'languages',
 		'query'
 	],
 	computed: {
@@ -56,11 +55,6 @@ export default {
 			else if (url.substr(0, 3) == '../')
 				url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/\/+$/, '') + url.substr(2);
 			return '<a href="' + url + '">' + url + '</a>';
-		},
-		flag() {
-			if (!this.languages || !this.languages[this.res.language])
-				return "";
-			return "data:image/jpeg;base64," + this.languages[this.res.language].flagge;
 		}
 	},
 	template: `
@@ -72,7 +66,6 @@ export default {
 		image-fallback="fas fa-newspaper fa-4x"
 		@actionexecuted="$emit('actionexecuted')"
 		>
-		<img v-if="flag" :src="flag" class="ms-2">
 		<div v-if="preview" class="searchbar_table" v-html="preview"></div>
 		<div v-else class="searchbar_table text-muted">
 			{{ $p.t('search/result_content_none') }}
