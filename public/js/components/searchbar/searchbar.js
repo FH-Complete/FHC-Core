@@ -9,13 +9,10 @@ import cms from "./result/cms.js";
 import mergedStudent from "./result/mergedstudent.js";
 import mergedPerson from "./result/mergedperson.js";
 
-import ApiLanguage from "../../api/factory/language.js"
-
 export default {
     props: [ "searchoptions", "searchfunction" ],
     provide() {
         return {
-            languages: Vue.computed(() => this.languages),
             query: Vue.computed(() => this.lastQuery)
         };
     },
@@ -33,8 +30,7 @@ export default {
         searching: false,
         error: null,
             abortController: null,
-        settingsDropdown:null,
-            languages: null,
+			settingsDropdown: null,
             lastQuery: ''
       };
     },
@@ -147,17 +143,6 @@ export default {
 		},
 		
 	},
-    created() {
-        this.$api
-            .call(ApiLanguage.getAll())
-            .then(result => {
-                this.languages = result.data.reduce((a, c) => {
-                    a[c.sprache] = c;
-                    return a;
-                }, {});
-            })
-            .catch(this.$fhcAlert.handleSystemError);
-    },
     beforeMount: function() {
 		this.$watch('searchsettings.types', newValue => {
 			if (Array.isArray(newValue) && newValue.length === 0){
