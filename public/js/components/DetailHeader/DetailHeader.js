@@ -128,13 +128,14 @@ export default {
 					<small class="text-muted">{{person.uid}}</small>
 				</div>
 
-				<div v-if="headerData.length == 1">
-					<h2 class="h4">
-						{{headerData[0].titelpre}}
-						{{headerData[0].vorname}}
-						{{headerData[0].nachname}},
-						{{headerData[0].titelpost}}
-					</h2>
+					<div v-if="headerData.length == 1">
+						<h2 class="h4">
+							{{headerData[0].titelpre}}
+							{{headerData[0].vorname}}
+							{{headerData[0].nachname}}
+							<span v-if="headerData[0].titelpost">, </span>
+							{{headerData[0].titelpost}}
+						</h2>
 
 					<h5 class="h6">
 					 <strong class="text-muted">Person ID </strong>
