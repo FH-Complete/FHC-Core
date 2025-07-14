@@ -231,7 +231,7 @@ export default{
 			this.reload();
 		},
 		selectedFirma(newVal) {
-			this.addressData.firma_id = newVal?.firma_id || '';
+			this.addressData.firma_id = newVal?.firma_id || null;
 		}
 	},
 	methods:{
