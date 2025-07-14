@@ -12,34 +12,34 @@ class Mitarbeiter_model extends DB_Model
 		$this->pk = 'mitarbeiter_uid';
 	}
 
-    /**
-     * Checks if the user is a Mitarbeiter.
-     * @param string $uid
-     * @param boolean null $fixangestellt
-     * @return array
-     */
-    public function isMitarbeiter($uid, $fixangestellt = null)
-    {
-        $this->addSelect('1');
+	/**
+	 * Checks if the user is a Mitarbeiter.
+	 * @param string $uid
+	 * @param boolean null $fixangestellt
+	 * @return array
+	 */
+	public function isMitarbeiter($uid, $fixangestellt = null)
+	{
+		$this->addSelect('1');
 
-        if (is_bool($fixangestellt))
-        {
-            $result = $this->loadWhere(array('mitarbeiter_uid' => $uid, 'fixangestellt' => $fixangestellt));
-        }
-        else    // default
-        {
-            $result = $this->loadWhere(array('mitarbeiter_uid' => $uid));
-        }
+		if (is_bool($fixangestellt))
+		{
+			$result = $this->loadWhere(array('mitarbeiter_uid' => $uid, 'fixangestellt' => $fixangestellt));
+		}
+		else    // default
+		{
+			$result = $this->loadWhere(array('mitarbeiter_uid' => $uid));
+		}
 
-        if(hasData($result))
-        {
-            return success(true);
-        }
-        else
-        {
-            return success(false);
-        }
-    }
+		if(hasData($result))
+		{
+			return success(true);
+		}
+		else
+		{
+			return success(false);
+		}
+	}
 
 	/**
 	 * Laedt das Personal
@@ -96,6 +96,129 @@ class Mitarbeiter_model extends DB_Model
 		}
 
 		return $this->execQuery($qry, $params);
+	}
+
+	/**
+	 * gibt Personen mit Übersicht von Vertragsdaten aus
+	 *
+	 * @return array
+	 */
+	public function getPersonenWithContractDetails($person_id = null)
+	{
+		$qry = "
+			SELECT
+				b.uid , p.person_id,
+				p.vorname, p.nachname,
+				gebdatum,
+				COALESCE(b.alias, b.uid) AS email,
+				STRING_AGG(DISTINCT va.bezeichnung, ', ') AS Vertragsarten,
+				STRING_AGG(DISTINCT u.bezeichnung, ', ') AS Unternehmen,
+				STRING_AGG(d.dienstverhaeltnis_id::TEXT, ', ') AS ids,
+				b.aktiv
+				FROM
+					hr.tbl_dienstverhaeltnis d
+				JOIN
+					public.tbl_benutzer b ON d.mitarbeiter_uid = b.uid
+				JOIN
+					public.tbl_person p ON p.person_id = b.person_id
+				JOIN
+					public.tbl_organisationseinheit u ON d.oe_kurzbz = u.oe_kurzbz
+				JOIN
+					hr.tbl_vertragsart va ON d.vertragsart_kurzbz = va.vertragsart_kurzbz
+			";
+
+		if($person_id)
+		{
+			$qry .= " WHERE p.person_id = ?";
+		}
+
+		$qry.= "
+			GROUP BY
+				b.uid, p.person_id, p.vorname, p.nachname, b.alias
+			ORDER BY
+					p.nachname, p.vorname;
+			";
+
+		$params = array($person_id);
+
+		return $this->execQuery($qry, $params);
+	}
+
+	/**
+	 * get current disciplinary Abteilung of person
+	 *
+	 * @param $person_id
+	 *
+	 * @return Array benutzerfunktionsdata
+	 */
+	public function getPersonAbteilung($uid)
+	{
+		$qry = "
+			SELECT
+				bf.benutzerfunktion_id, bf.fachbereich_kurzbz, bf.uid, bf.funktion_kurzbz, bf.updateamum,
+				bf.updatevon, bf.insertamum, bf.insertvon, bf.ext_id, bf.semester, bf.oe_kurzbz,
+				bf.datum_von, bf.datum_bis, bf.bezeichnung, bf.wochenstunden,
+				oe.oe_kurzbz, oe.oe_parent_kurzbz, oe.bezeichnung,
+				oe.organisationseinheittyp_kurzbz, oe.aktiv, oe.mailverteiler,
+				oe.freigabegrenze, oe.kurzzeichen, oe.lehre, oe.standort,
+				oe.warn_semesterstunden_frei, oe.warn_semesterstunden_fix, oe.standort_id
+			FROM tbl_benutzerfunktion bf
+			JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
+			WHERE uid = ?
+				AND funktion_kurzbz = 'oezuordnung'
+				AND datum_von <= NOW()
+				AND (datum_bis IS NULL OR datum_bis >= NOW())
+		";
+		$result = $this->execQuery($qry, [$uid]);
+
+		return $result;
+	}
+
+	/**
+	 * get Leitung / Vorgesetzten of current OE
+	 *
+	 * @param $oe_kurzbz
+	 *
+	 * @return Array persondata / benutzerfunktionsdata
+	 */
+	public function getLeitungOrg($oe_kurzbz)
+	{
+		$qry = "
+            SELECT bf.benutzerfunktion_id,bf.fachbereich_kurzbz,bf.uid,bf.funktion_kurzbz,
+				bf.updateamum,bf.updatevon,bf.insertamum,bf.insertvon,bf.ext_id,bf.semester,
+				bf.oe_kurzbz,bf.datum_von,bf.datum_bis,bf.bezeichnung,bf.wochenstunden,
+				p.person_id, p.vorname,p.nachname,p.titelpre,p.titelpost
+            FROM public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
+            JOIN public.tbl_benutzer b USING (uid) JOIN public.tbl_mitarbeiter ma ON(b.uid=ma.mitarbeiter_uid)
+            JOIN public.tbl_person p  USING(person_id)
+            WHERE funktion_kurzbz='Leitung' AND oe.oe_kurzbz = ?
+                AND datum_von<=now() AND (datum_bis is null OR datum_bis>=now());
+        ";
+
+		return $this->execQuery($qry, array($oe_kurzbz));
+	}
+
+	/**
+	 * get persondata for person_id
+	 *
+	 * @param $oe_kurzbz
+	 *
+	 * @return Array persondata
+	 */
+	public function getHeader($person_id)
+	{
+		$qry = "
+			SELECT
+			  titelpre, vorname, nachname, titelpost, foto, foto_sperre, person_id, alias, telefonklappe
+			FROM
+				public.tbl_person
+				JOIN public.tbl_benutzer b USING(person_id)
+				JOIN public.tbl_mitarbeiter ma ON (ma.mitarbeiter_uid = b.uid)
+			WHERE
+				person_id = ?
+        ";
+
+		return $this->execQuery($qry, array($person_id));
 	}
 
 	/**
@@ -213,7 +336,7 @@ class Mitarbeiter_model extends DB_Model
 
 		if (hasData($kurzbzexists) && getData($kurzbzexists)[0])
 			return error('No Kurzbezeichnung could be generated');
-	
+
 		return success($kurzbz);
 	}
 
@@ -240,13 +363,13 @@ class Mitarbeiter_model extends DB_Model
 		$qry = "
 			SELECT " . $returnwert . "  
 			FROM 
-			    public.tbl_mitarbeiter ma 
+				public.tbl_mitarbeiter ma
 			JOIN 
-			    public.tbl_benutzer b on (ma.mitarbeiter_uid = b.uid)
+				public.tbl_benutzer b on (ma.mitarbeiter_uid = b.uid)
 			JOIN 
-			    public.tbl_person p on (p.person_id = b.person_id)
+				public.tbl_person p on (p.person_id = b.person_id)
 			WHERE 
-			    lower (p.nachname) LIKE '%". $this->db->escape_like_str($filter)."%'
+				lower (p.nachname) LIKE '%". $this->db->escape_like_str($filter)."%'
 			OR
 				lower (p.vorname) LIKE '%". $this->db->escape_like_str($filter)."%'
 			OR
@@ -264,11 +387,11 @@ class Mitarbeiter_model extends DB_Model
 	public function getMitarbeiterFromLV($lehrveranstaltung_id)
 	{
 		$qry = "SELECT DISTINCT
-    			lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid 
+				lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid 
 			FROM 
-			    lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
+				lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
 			WHERE 
-			    lehrveranstaltung_id= ?
+				lehrveranstaltung_id= ?
 			AND 
 				mitarbeiter_uid=uid 
 			AND 

@@ -74,7 +74,19 @@ class Student extends FHCAPI_Controller
 
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
-		$this->PrestudentModel->addSelect('p.*');
+		$this->PrestudentModel->addSelect('p.person_id');
+		$this->PrestudentModel->addSelect('p.titelpre');
+		$this->PrestudentModel->addSelect('p.nachname');
+		$this->PrestudentModel->addSelect('p.vorname');
+		$this->PrestudentModel->addSelect('p.wahlname');
+		$this->PrestudentModel->addSelect('p.vornamen');
+		$this->PrestudentModel->addSelect('p.titelpost');
+		$this->PrestudentModel->addSelect('p.svnr');
+		$this->PrestudentModel->addSelect('p.ersatzkennzeichen');
+		$this->PrestudentModel->addSelect('p.gebdatum');
+		$this->PrestudentModel->addSelect('p.geschlecht');
+		$this->PrestudentModel->addSelect('p.foto');
+		$this->PrestudentModel->addSelect('p.foto_sperre');
 		$this->PrestudentModel->addSelect('s.student_uid');
 		$this->PrestudentModel->addSelect('matrikelnr');
 		$this->PrestudentModel->addSelect('b.aktiv');
