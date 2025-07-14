@@ -98,12 +98,12 @@ export default {
                   <div v-else-if="searchresult.length < 1">{{  $p.t('search/error_no_results') }}</div>
                   <template v-else="" v-for="res in searchresult">
                     <person v-if="res.type === 'person'" :res="res" :actions="searchoptions.actions.person" @actionexecuted="hideresult"></person>
-                    <student v-else-if="res.type === 'student' || res.type === 'studentStv'" :mode="searchmode" :res="res" :actions="searchoptions.actions.student" @actionexecuted="hideresult"></student>
+                    <student v-else-if="res.type === 'student' || res.type === 'studentStv' || res.type === 'studentcis'" :mode="searchmode" :res="res" :actions="searchoptions.actions.student" @actionexecuted="hideresult"></student>
                     <prestudent v-else-if="res.type === 'prestudent'" :mode="searchmode" :res="res" :actions="searchoptions.actions.prestudent" @actionexecuted="hideresult"></prestudent>
                     <merged-student v-else-if="res.type === 'mergedstudent'" :mode="searchmode" :res="res" :actions="searchoptions.actions.mergedstudent" @actionexecuted="hideresult"></merged-student>
                     <merged-person v-else-if="res.type === 'mergedperson'" :mode="searchmode" :res="res" :actions="searchoptions.actions.mergedperson" @actionexecuted="hideresult"></merged-person>
                     <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung' || res.type === 'employee'  || res.type === 'unassigned_employee'" :res="res" :actions="searchoptions.actions.employee" @actionexecuted="hideresult"></employee>
-                    <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="searchoptions.actions.organisationunit" @actionexecuted="hideresult"></organisationunit>
+                    <organisationunit v-else-if="res.type === 'organisationunit' || res.type === 'active_organisationunit'" :res="res" :actions="searchoptions.actions.organisationunit" @actionexecuted="hideresult"></organisationunit>
                     <raum v-else-if="res.type === 'raum' || res.type === 'room'" :mode="searchmode" :res="res" :actions="searchoptions.actions.raum || searchoptions.actions.room" @actionexecuted="hideresult"></raum>
                     <dms v-else-if="res.type === 'dms'" :res="res" :actions="searchoptions.actions.dms" @actionexecuted="hideresult"></dms>
                     <cms v-else-if="res.type === 'cms'" :res="res" :actions="searchoptions.actions.cms" @actionexecuted="hideresult"></cms>
