@@ -17,9 +17,9 @@ const app = Vue.createApp({
 				calcheightonly: true,
                 types: [
                     "employee",
-					"student",
+					"studentcis",
                     "room",
-                    "organisationunit"
+                    "active_organisationunit"
                 ],
                 actions: {
                     employee: {

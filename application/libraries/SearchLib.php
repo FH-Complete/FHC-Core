@@ -668,8 +668,9 @@ class SearchLib
 					SELECT " . $this->_formatPrimarykeys($table_config['primarykey']) . ", rank / " . $count . " AS rank FROM " . $current_select;
 			}
 
-			if ($or_with[0] === "RECURSIVE") {
-				if ($sqlWith[0] !== "RECURSIVE")
+			if ($or_with[0] === "RECURSIVE")
+			{
+				if (empty($sqlWith) || $sqlWith[0] !== "RECURSIVE")
 					array_unshift($sqlWith, "RECURSIVE");
 				array_shift($or_with);
 			}
