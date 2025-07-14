@@ -45,7 +45,26 @@ export default {
 			].includes(item.type)) || null;
 		},
 		students() {
-			const students = this.res.list.filter(item => item.type == 'prestudent');
+			const students = this.res.list.filter(item => [
+					'student',
+					'prestudent',
+					'studentcis',
+					'studentStv'
+				].includes(item.type))
+				.filter((item, idx, arr) => {
+					if (item.type === 'prestudent') {
+						return true;
+					}
+
+					let prestudentwithsameuidexists = arr.some(tmpitem => {
+						return tmpitem.uid === item.uid && tmpitem.type === 'prestudent';
+					});
+
+					if (prestudentwithsameuidexists) {
+						return false;
+					}
+					return true;
+				});
 			return students.length ? students : null;
 		},
 		emails() {
@@ -54,11 +73,15 @@ export default {
 		},
 		telurl() {
 			return 'tel:' + this.employee?.phone;
+		},
+		inaktiv() {
+			return this.res.list.some(item => item?.aktiv === false);
 		}
 	},
 	template: `
 	<template-frame
 		class="searchbar-result-mergedperson"
+		:class="(inaktiv) ? 'searchbar_inaktiv' : ''"
 		:res="person"
 		:actions="actions"
 		:title="person.name"
@@ -145,19 +168,22 @@ export default {
 								<template v-if="mode == 'simple'">
 									{{ student.studiengang_kz }}
 								</template>
-								<template v-else>
+								<template v-else-if="student.status && student.stg_kuerzel">
 									{{ student.status }} ({{ student.stg_kuerzel }})
+								</template>
+								<template v-else>
+									{{ $p.t('person/student') }}
 								</template>
 							</template-action>
 						</div>
 					</div>
-					<div class="searchbar_tablerow">
+					<div v-if="student.bezeichnung" class="searchbar_tablerow">
 						<div class="searchbar_tablecell searchbar_label ps-3">{{ $p.t('lehre/studiengang') }}</div>
 						<div class="searchbar_tablecell searchbar_value">
 							{{ student.bezeichnung }} {{ student.orgform ? '(' + student.orgform + ')' : '' }}
 						</div>
 					</div>
-					<div class="searchbar_tablerow">
+					<div v-if="student.prestudent_id" class="searchbar_tablerow">
 						<div class="searchbar_tablecell searchbar_label ps-3">{{ $p.t('search/result_prestudent_id') }}</div>
 						<div class="searchbar_tablecell searchbar_value">
 							{{ student.prestudent_id }}

@@ -107,7 +107,15 @@ export default {
 						},
 						defaultactionstudent: {
 							type: "link",
-							action: data => this.$fhcApi.getUri('/studentenverwaltung/prestudent/' + data.prestudent_id)
+							action: data => {
+								if (data.prestudent_id) {
+									return this.$fhcApi.getUri('/studentenverwaltung/prestudent/' + data.prestudent_id);
+								} else if (data.uid) {
+									return this.$fhcApi.getUri('/studentenverwaltung/student/' + data.uid);
+								} else {
+									return this.$fhcApi.getUri('/studentenverwaltung/person/' + data.person_id);
+								}
+							}
 						},
 						childactions: []
 					}

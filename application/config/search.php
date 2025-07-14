@@ -197,11 +197,12 @@ $config['student'] = [
 		"s.matrikelnr",
 		"p.person_id",
 		"(p.vorname || ' ' || p.nachname) AS name",
-		"ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
+		"(s.student_uid || '@" . DOMAIN . "') || ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
 		"CASE
 			WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
 			ELSE NULL END
-			AS photo_url"
+			AS photo_url",
+		"b.aktiv"
 	],
 	'resultjoin' => "
 		JOIN public.tbl_student s USING (student_uid)
@@ -220,7 +221,8 @@ $config['studentcis']['resultfields'] = [
 	"CASE
 		WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
 		ELSE NULL END
-		AS photo_url"
+		AS photo_url",
+	"b.aktiv"
 ];
 
 $config['prestudent'] = [
@@ -311,7 +313,7 @@ $config['prestudent'] = [
 		"p.person_id",
 		"b.uid",
 		"(p.vorname || ' ' || p.nachname) AS name",
-		"ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
+		"(b.uid || '@" . DOMAIN . "') || ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
 		"CASE
 			WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
 			ELSE NULL END
@@ -334,7 +336,8 @@ $config['prestudent'] = [
 				LIMIT 1
 			),
 			sg.orgform_kurzbz
-		) AS orgform"
+		) AS orgform",
+		"b.aktiv"
 	],
 	'resultjoin' => "
 		LEFT JOIN public.tbl_prestudent ps USING (prestudent_id)
