@@ -1,16 +1,48 @@
 <?php
 
+function lineBreak() {
+	return IS_CLI ? PHP_EOL : '<br>';
+}
+
+function preFormat($text) {
+	if (IS_CLI) {
+		return $text; // Plain text in CLI
+	} else {
+		return "<pre>$text</pre>"; // HTML preformatted in browser
+	}
+}
+
+function colorText($text, $color) {
+	if (IS_CLI) {
+		// ANSI color codes
+		$colors = [
+			'red' => "\033[31m",
+			'green' => "\033[32m",
+			'reset' => "\033[0m",
+		];
+		return $colors[$color] . $text . $colors['reset'];
+	} else {
+		// HTML styles
+		$styles = [
+			'red' => "<b style='color:red;'>$text</b>",
+			'green' => "<b style='color:green;'>$text</b>",
+		];
+		return $styles[$color];
+	}
+}
+
 function assertEqual($expected, $actual, $message = '') {
 	if ($expected !== $actual) {
-		echo "<b style='color:red;'>❌ Assertion failed:</b> $message<br>";
-		echo "Expected: <pre>" . var_export($expected, true) . "</pre>";
-		echo "Actual: <pre>" . var_export($actual, true) . "</pre>";
+		echo colorText('❌ Assertion failed:', 'red') . ' ' . $message . lineBreak();
+		echo "Expected: " . preFormat(var_export($expected, true)) . lineBreak();
+		echo "Actual: " . preFormat(var_export($actual, true)) . lineBreak();
 		return false;
 	} else {
-		echo "<b style='color:green;'>✅ Passed:</b> $message<br>";
+		echo colorText('✅ Passed:', 'green') . ' ' . $message . lineBreak();
 		return true;
 	}
 }
+
 
 function assertTrue($condition, $message = '') {
 	return assertEqual(true, $condition, $message ?: 'Expected condition to be true');
@@ -26,14 +58,15 @@ function assertNull($value, $message = '') {
 
 function assertNotNull($value, $message = '') {
 	if ($value === null) {
-		echo "<b style='color:red;'>❌ Assertion failed:</b> $message<br>";
-		echo "Value is null<br>";
+		echo colorText('❌ Assertion failed:', 'red') . ' ' . $message . lineBreak();
+		echo 'Value is null' . lineBreak();
 		return false;
 	} else {
-		echo "<b style='color:green;'>✅ Passed:</b> $message<br>";
+		echo colorText('✅ Passed:', 'green') . ' ' . $message . lineBreak();
 		return true;
 	}
 }
+
 
 function assertIsArray($value, $message = '') {
 	return assertEqual(true, is_array($value), $message ?: 'Expected value to be an array');

@@ -1,34 +1,55 @@
 <?php
 
-echo "Test Suite Bookmark start \r\n";
-echo "<br>";
+function getParam($name, $default = null)
+{
+	if (php_sapi_name() === 'cli') { // Parse CLI args for --key=value style
+		// php ./system/UnitTests/api/BookmarkTest/BookmarkTest.php --server=https://cis40.dev.technikum-wien.at --user=if23b236 --pw=FHCompleteDemo42!
 
-require_once(dirname(__FILE__).'/../../../../config/cis.config.inc.php');
-require_once(dirname(__FILE__).'/../../../../vendor/nategood/httpful/bootstrap.php');
-require_once(dirname(__FILE__).'/../../AssertionHelpers.php');
+		global $argv;
+		foreach ($argv as $arg) {
+			if (strpos($arg, '--' . $name . '=') === 0) {
+				return substr($arg, strlen($name) + 3);
+			}
+		}
+		return $default;
+	} else {// Browser: use $_GET
+		// https://c3p0.ma0646.technikum-wien.at/fhcompletecis4/system/UnitTests/api/BookmarkTest
+		// /BookmarkTest.php?server=https://c3p0.ma0646.technikum-wien.at&user=if23b236&pw=FHCompleteDemo42!
+		return isset($_GET[$name]) ? $_GET[$name] : $default;
+	}
+}
 
-echo "Requirements loaded \r\n";
-echo "<br>";
+define('IS_CLI', php_sapi_name() === 'cli');
+define('LINE_BREAK', IS_CLI ? PHP_EOL : '<br>');
+define('PROJECT_ROOT', realpath(__DIR__ . '/../../../../'));
 
-// TODO: parameterize for different user setups
-$TEST_USER = 'if23b236';
-$TEST_PW = 'FHCompleteDemo42!';
+echo "Test Suite Bookmark start".LINE_BREAK;
+if (!IS_CLI) echo "<pre>";
+require_once(PROJECT_ROOT . '/config/cis.config.inc.php');
+require_once(PROJECT_ROOT . '/vendor/nategood/httpful/bootstrap.php');
+require_once(PROJECT_ROOT . '/system/UnitTests/AssertionHelpers.php');
+echo "Requirements loaded".LINE_BREAK;
+
+$server = getParam('server', APP_ROOT);
+echo $server.LINE_BREAK;
+$TEST_USER = getParam('user', 'defaultuser'); //if23b236
+echo $TEST_USER.LINE_BREAK;
+$TEST_PW = getParam('pw', 'defaultpass'); //FHCompleteDemo42!
+echo $TEST_PW.LINE_BREAK;
 
 // "Unit Test" Script to Test API Controller frontend/v1/Bookmark.php by calling methods with curated inputs and checking
 // for the expected output
-$ROOT = APP_ROOT; // calls itself -> TODO: switch for other machines
-//$ROOT = 'https://ci.dev.technikum-wien.at/';
-//$ROOT = 'https://cis40.dev.technikum-wien.at/';
-$URL = $ROOT.'cis.php/api/frontend/v1/Bookmark/'; 
+$URL = $server.'/cis.php/api/frontend/v1/Bookmark/'; 
 
 testGetBookmarks($URL, 'getBookmarks', $TEST_USER, $TEST_PW);
 $id = testInsertBookmark($URL, 'insert',  $TEST_USER, $TEST_PW);
 $id = testUpdateBookmark($URL, 'update',  $TEST_USER, $TEST_PW, $id);
 testDeleteBookmark($URL, 'delete',  $TEST_USER, $TEST_PW, $id);
+if (!IS_CLI) echo "<pre>";
 
 function testGetBookmarks($url, $method, $user, $pw) {
-	echo "<br><br>Test '".$method."' start \r\n";
-	echo "<br>";
+	echo LINE_BREAK.LINE_BREAK."Test '".$method."' start ".LINE_BREAK;
+
 	try {
 		$resultPost = \Httpful\Request::get($url.$method)
 			->expectsJson()
@@ -50,16 +71,16 @@ function testGetBookmarks($url, $method, $user, $pw) {
 	$assertions[] = assertEqual($resultPost->body->meta->status, "success", "Response Status Success");
 
 	if(allTrue($assertions)) {
-		echo "Test '".$method."' finished SUCCESS<br>";
+		echo "Test '".$method."' finished SUCCESS".LINE_BREAK;
 	} else {
-		echo "Test '".$method."' finished FAIL<br>";
+		echo "Test '".$method."' finished FAIL".LINE_BREAK;
 		printResponse($resultPost);
 	}
 }
 
 function testInsertBookmark($url, $method, $user, $pw) {
-	echo "<br><br>Test '".$method."' start \r\n";
-	echo "<br>";
+	echo LINE_BREAK.LINE_BREAK."Test '".$method."' start ".LINE_BREAK;
+	echo LINE_BREAK;
 	try {
 		$bodyTitle = 'orf';
 		$bodyUrl = 'https://orf.at';
@@ -85,9 +106,9 @@ function testInsertBookmark($url, $method, $user, $pw) {
 	$assertions[] = assertIsString($resultPost->body->meta->status);
 	$assertions[] = assertEqual("success",$resultPost->body->meta->status, "Response Status Success");
 	if(allTrue($assertions)) {
-		echo "Test '".$method."' finished SUCCESS<br>";
+		echo "Test '".$method."' finished SUCCESS".LINE_BREAK;
 	} else {
-		echo "Test '".$method."' finished FAIL<br>";
+		echo "Test '".$method."' finished FAIL".LINE_BREAK;
 		printResponse($resultPost);
 	}
 
@@ -95,8 +116,7 @@ function testInsertBookmark($url, $method, $user, $pw) {
 }
 
 function testDeleteBookmark($url, $method, $user, $pw, $id) {
-	echo "<br><br>Test '".$method."' start \r\n";
-	echo "<br>";
+	echo LINE_BREAK.LINE_BREAK."Test '".$method."' start \n".LINE_BREAK;
 	
 	try {
 		$resultPost = \Httpful\Request::post($url.$method.'/'.$id)
@@ -118,16 +138,15 @@ function testDeleteBookmark($url, $method, $user, $pw, $id) {
 	$assertions[] = assertIsString($resultPost->body->meta->status);
 	$assertions[] = assertEqual("success",$resultPost->body->meta->status, "Response Status Success");
 	if(allTrue($assertions)) {
-		echo "Test '".$method."' finished SUCCESS<br>";
+		echo "Test '".$method."' finished SUCCESS".LINE_BREAK;
 	} else {
-		echo "Test '".$method."' finished FAIL<br>";
+		echo "Test '".$method."' finished FAIL".LINE_BREAK;
 		printResponse($resultPost);
 	}
 }
 
 function testUpdateBookmark($url, $method, $user, $pw, $id) {
-	echo "<br><br>Test '".$method."' start \r\n";
-	echo "<br>";
+	echo LINE_BREAK.LINE_BREAK."Test '".$method."' start ".LINE_BREAK;
 
 	try {
 		$bodyTitle = 'orf title updated';
@@ -153,9 +172,9 @@ function testUpdateBookmark($url, $method, $user, $pw, $id) {
 	$assertions[] = assertIsString($resultPost->body->meta->status);
 	$assertions[] = assertEqual("success",$resultPost->body->meta->status, "Response Status Success");
 	if(allTrue($assertions)) {
-		echo "Test '".$method."' finished SUCCESS<br>";
+		echo "Test '".$method."' finished SUCCESS".LINE_BREAK;
 	} else {
-		echo "Test '".$method."' finished FAIL<br>";
+		echo "Test '".$method."' finished FAIL".LINE_BREAK;
 		printResponse($resultPost);
 	}
 	
@@ -163,19 +182,19 @@ function testUpdateBookmark($url, $method, $user, $pw, $id) {
 }
 
 function printResponse($resultPost) {
-	echo "<br>";
-	echo "Response Body:\n";
+	echo LINE_BREAK;
+	echo "Response Body:";
 	print_r($resultPost->body);
-	echo "<br>";
-	echo "Raw Response:\n";
+	echo LINE_BREAK;
+	echo "Raw Response:";
 	print_r($resultPost->raw_body);
-	echo "<br>";
-	echo "Status Code:\n";
+	echo LINE_BREAK;
+	echo "Status Code:";
 	print_r($resultPost->code);
-	echo "<br>";
-	echo "Headers:\n";
+	echo LINE_BREAK;
+	echo "Headers:";
 	print_r($resultPost->headers);
-	echo "<br>";
+	echo LINE_BREAK;
 }
 
 function allTrue($arr) {
