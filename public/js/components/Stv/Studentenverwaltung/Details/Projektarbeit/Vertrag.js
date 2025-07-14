@@ -96,7 +96,7 @@ export default{
 					? {vertrag_id: this.vertrag_id, person_id: this.person_id}
 					: Promise.reject({handled: true}))
 				.then(result => {
-					this.$api.call(ApiVertrag.cancelVertrag({vertrag_id: this.vertrag_id, person_id: this.person_id}))
+					return this.$api.call(ApiVertrag.cancelVertrag({vertrag_id: this.vertrag_id, person_id: this.person_id}))
 				})
 				.then(result => {
 					this.resetForm();
