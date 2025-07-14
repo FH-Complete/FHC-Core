@@ -272,23 +272,5 @@ class Bookmark extends FHCAPI_Controller
         $this->terminateWithSuccess($update_result);
 
     }
-
-	/**
-	 * @SWG\Get(
-	 *     path="/test_true",
-	 *     security={{"basicAuth":{}}},
-	 *     tags={"bookmarks"},
-	 *     summary="Test endpoint",
-	 *     description="Simple test endpoint that returns 'expected response'.",
-	 *     @SWG\Response(
-	 *         response=200,
-	 *         description="Expected response"
-	 *     )
-	 * )
-	 */
-	public function test_true()
-	{
-		echo "expected response";
-	}
 }
 
