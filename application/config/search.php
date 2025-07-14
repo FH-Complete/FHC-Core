@@ -211,7 +211,8 @@ $config['student'] = [
 ];
 
 $config['studentcis'] = $config['student'];
-unset($config['studentcis']['fields']['email']);
+unset($config['studentcis']['searchfields']['email']);
+unset($config['studentcis']['searchfields']['tel']);
 $config['studentcis']['resultfields'] = [
 	"s.student_uid AS uid",
 	"s.matrikelnr",
