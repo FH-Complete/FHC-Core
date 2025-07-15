@@ -51,7 +51,8 @@ export default {
 					{title: "Vertrag ID", field: "vertrag_id", visible: false},
 					{title: "Projektarbeit ID", field: "projektarbeit_id", visible: false},
 					{
-						title: 'Aktionen', field: 'actions',
+						title: 'Aktionen',
+						field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
 							let container = document.createElement('div');
@@ -62,6 +63,8 @@ export default {
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.title = this.$p.t('ui', 'bearbeiten');
 							button.addEventListener('click', (event) => {
+								event.stopPropagation();
+								event.preventDefault();
 								let data = cell.getData();
 								this.actionEditProjektbetreuer(data.projektarbeit_id, data.person_id, data.betreuerart_kurzbz);
 							});
@@ -71,13 +74,41 @@ export default {
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('ui', 'loeschen');
-							button.addEventListener('click', () => {
+							button.addEventListener('click', (event) => {
+								event.stopPropagation();
+								event.preventDefault();
 								const data = cell.getData();
 								this.actionDeleteProjektbetreuer(data.betreuer_id, data.projektarbeit_id, data.person_id, data.betreuerart_kurzbz)
 							});
 							container.append(button);
 
-							//container.append(cell.getData().actionDiv);
+							let data = cell.getData();
+							if (data.beurteilungDownloadLink !== null) {
+								if (data.beurteilungDownloadLink == '') {
+									button = document.createElement('span');
+									button.title = this.$p.t('projektarbeit', 'projektarbeitNochNichtBeurteilt')
+									button.innerHTML = '<button class="btn btn-outline-secondary btn-action" disabled>'+
+										'<i class="fa-regular fa-file-pdf"></i></button>';
+									button.addEventListener('click', (event) => {
+										event.stopPropagation();
+										event.preventDefault();
+									});
+								}
+								else {
+									button = document.createElement('a');
+									button.setAttribute('href', data.beurteilungDownloadLink);
+									button.setAttribute('role', 'button');
+									button.innerHTML = '<i class="fa fa-file-pdf"></i>';
+									button.title = this.$p.t('projektarbeit', 'projektbeurteilungErstellen');
+									button.className = 'btn btn-outline-secondary btn-action';
+									button.addEventListener('click', (event) => {
+										event.stopPropagation();
+										event.preventDefault();
+										window.location.href = data.beurteilungDownloadLink;
+									});
+								}
+								container.append(button);
+							}
 
 							return container;
 						},
@@ -404,7 +435,7 @@ export default {
 	template: `
 	<div class="stv-details-projektbetreuer h-100 pb-3 row">
 
-		<div :class="this.config.showVertragsdetails ? 'col-8' : 'col-12'">
+		<div :class="this.config.showVertragsdetails ? 'col-9' : 'col-12'">
 
 			<legend>{{this.$p.t('projektarbeit','betreuerGross')}}</legend>
 
@@ -484,27 +515,28 @@ export default {
 				</div>
 
 				<div class="row mb-3">
-					<form-input
-						container-class="stv-details-projektarbeit-stunden"
-						type="text"
-						name="stunden"
-						:label="$p.t('projektarbeit', 'stunden')"
-						:disabled="vertragFieldsDisabled"
-						v-model="formData.stunden"
-						>
-					</form-input>
-				</div>
-
-				<div class="row mb-3">
-					<form-input
-						container-class="stv-details-projektarbeit-stundensatz"
-						type="text"
-						name="stundensatz"
-						:label="$p.t('projektarbeit', 'stundensatz')"
-						:disabled="vertragFieldsDisabled"
-						v-model="formData.stundensatz"
-						>
-					</form-input>
+					<div class="col-6">
+						<form-input
+							container-class="stv-details-projektarbeit-stunden"
+							type="text"
+							name="stunden"
+							:label="$p.t('projektarbeit', 'stunden')"
+							:disabled="vertragFieldsDisabled"
+							v-model="formData.stunden"
+							>
+						</form-input>
+					</div>
+					<div class="col-6">
+						<form-input
+							container-class="stv-details-projektarbeit-stundensatz"
+							type="text"
+							name="stundensatz"
+							:label="$p.t('projektarbeit', 'stundensatz')"
+							:disabled="vertragFieldsDisabled"
+							v-model="formData.stundensatz"
+							>
+						</form-input>
+					</div>
 				</div>
 
 			</form-form>
@@ -512,17 +544,17 @@ export default {
 			<button class="btn btn-primary" v-show="betreuerFormOpened" @click="confirmProjektbetreuerAfterValidation">
 				{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}
 			</button>
-			<div class = "mt-5" v-if="beurteilungDownloadLink !== null">
+			<!-- <div class = "mt-5" v-if="beurteilungDownloadLink !== null">
 				<div class="mb-1">
 					<a :href="beurteilungDownloadLink" class="btn btn-primary d-block" :class="{ 'disabled' : beurteilungDownloadLink === ''}">
 						{{ $p.t('projektarbeit', 'projektbeurteilungErstellen') }}
 					</a>
 				</div>
 				{{ autocompleteSelectedBetreuer?.person_id && beurteilungDownloadLink === '' ? $p.t('projektarbeit', 'projektarbeitNochNichtBeurteilt') : ''}}
-			</div>
+			</div> -->
 		</div>
 
-		<div class="col-4">
+		<div class="col-3">
 			<vertrag ref="vertrag"
 				:vertrag_id="autocompleteSelectedBetreuer?.vertrag_id"
 				:person_id="autocompleteSelectedBetreuer?.person_id"

@@ -348,19 +348,39 @@ export default {
 		</core-filter-cmpt>
 
 		<!--Modal: projektarbeitModal-->
-		<bs-modal ref="projektarbeitModal" dialog-class="modal-xl modal-dialog-scrollable">
+		<bs-modal ref="projektarbeitModal" dialog-class="modal-xl modal-dialog-scrollable" header-class="flex-wrap pb-0">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitAnlegen')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitBearbeiten')}}</p>
 			</template>
 
-			<div class="row">
-				<div class="col-5">
-					<projektarbeit-details ref="projektarbeitDetails" :student="student" @projekttyp-changed="setDefaultStunden">
-					</projektarbeit-details>
+			<template #modal-header-content>
+				<ul class="nav nav-tabs w-100 mt-3 msg_preview" id="pa_tabs" role="tablist">
+					<li class="nav-item" role="presentation">
+						<button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">Details</button>
+					</li>
+					<li class="nav-item" role="presentation">
+						<button class="nav-link" id="betreuer-tab" data-bs-toggle="tab" data-bs-target="#betreuer" type="button" role="tab" aria-controls="betreuer" aria-selected="false">{{$p.t('projektarbeit', 'betreuerGross')}}</button>
+					</li>
+				</ul>
+			</template>
+
+			<div class="tab-content" id="pa_content">
+				<div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+					<div class="row">
+						<div class="col-12">
+							<projektarbeit-details ref="projektarbeitDetails" :student="student" @projekttyp-changed="setDefaultStunden">
+							</projektarbeit-details>
+						</div>
+					</div>
 				</div>
-				<div class="col-7">
-					<projektbetreuer ref="projektbetreuer" :config="config"></projektbetreuer>
+
+				<div class="tab-pane fade show" id="betreuer" role="tabpanel" aria-labelledby="betreuer-tab">
+					<div class="row">
+						<div class="col-12">
+							<projektbetreuer ref="projektbetreuer" :config="config"></projektbetreuer>
+						</div>
+					</div>
 				</div>
 			</div>
 
