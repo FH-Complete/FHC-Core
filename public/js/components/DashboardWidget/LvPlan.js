@@ -251,7 +251,7 @@ export default {
 						<div class=" card-header d-grid p-0">
 							<button class="btn fhc-tertiary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"}, $p.user_locale.value)}}</button>
 						</div>
-						<div role="button" @click="showLvUebersicht(evt)" v-for="evt in value" :key="evt.id" class="list-group-item small" :style="getEventStyle(evt)">
+						<div role="button" @click="showLvUebersicht(evt)" v-for="evt in value" :key="evt.id" class="mx-1 list-group-item small" :style="getEventStyle(evt)">
 							<component :is="calendarEventComponent(evt.type)" :event="evt" ></component>
 						</div>
 						<div v-if="!value.length" class="list-group-item small text-center">
