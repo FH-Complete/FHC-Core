@@ -170,12 +170,18 @@ export default {
 				events.forEach(event => {
 					if (!event.startsHere && !event.endsHere)
 						return;
-					let ts = event.start.diff(day).toMillis();
-					if (!gridlines[ts])
-						gridlines[ts] = ['t_' + ts, 'e_' + ts];
-					ts = event.end.diff(day).toMillis();
-					if (!gridlines[ts])
-						gridlines[ts] = ['t_' + ts, 'e_' + ts];
+					if (this.allDayEvents && event.orig.allDayEvent)
+						return;
+					if (event.startsHere) {
+						let ts = event.start.diff(day).toMillis();
+						if (!gridlines[ts])
+							gridlines[ts] = ['t_' + ts, 'e_' + ts];
+					}
+					if (event.endsHere) {
+						let ts = event.end.diff(day).toMillis();
+						if (!gridlines[ts])
+							gridlines[ts] = ['t_' + ts, 'e_' + ts];
+					}
 				});
 			});
 
