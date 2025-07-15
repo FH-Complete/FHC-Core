@@ -28623,6 +28623,46 @@ array(
 		array(
 			'app' => 'core',
 			'category' => 'profilUpdate',
+			'phrase' => 'deleteAttachment',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Anhang löschen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Delete attachment',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'documentUpload',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Dokument hochladen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Upload document',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
 			'phrase' => 'profilUpdates',
 			'insertvon' => 'system',
 			'phrases' => array(
@@ -29256,6 +29296,46 @@ array(
 				array(
 					'sprache' => 'English',
 					'text' => 'Delete contact',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'deleteItem',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Item löschen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Delete item',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'addItem',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Item hinzufügen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Add item',
 					'description' => '',
 					'insertvon' => 'system'
 				)
