@@ -179,7 +179,7 @@ export default {
 				});
 			});
 
-			return '[full] auto ' + Object.keys(gridlines).sort((a,b) => parseInt(a)-parseInt(b)).map((start, i, keys) => {
+			return '[allday] auto ' + Object.keys(gridlines).sort((a,b) => parseInt(a)-parseInt(b)).map((start, i, keys) => {
 				let end = keys[i + 1];
 				if (!end) {
 					gridlines[start].push('end');
