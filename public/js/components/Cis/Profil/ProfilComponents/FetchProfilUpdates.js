@@ -155,7 +155,7 @@ export default {
 
 	template: /*html*/ `
 <div class="card">
-    <edit-profil v-if="showUpdateModal" ref="updateEditModal" @hideBsModal="hideEditProfilModal" :value="content" :title="editProfilTitle"></edit-profil>
+    <edit-profil v-if="showUpdateModal" ref="updateEditModal" @hideBsModal="hideEditProfilModal" :value="content" :titel="editProfilTitle"></edit-profil>
     <div class="card-header">{{$p.t('profilUpdate','profilUpdates')}}</div>
     <div class="card-body">
         <div class="table-responsive text-nowrap">

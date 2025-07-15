@@ -15,7 +15,7 @@ export default {
 	mixins: [BsModal],
 	props: {
 		value: Object,
-		title: String,
+		titel: String,
 		zustelladressenCount: Function,
 		zustellkontakteCount: Function,
 		/*
@@ -189,8 +189,8 @@ export default {
 		return BsModal.popup(null, options);
 	},
 	template: /*html*/ `
-<bs-modal v-show="!loading" ref="modalContainer" body-class="" dialog-class="modal-lg" class="bootstrap-alert" :backdrop="false">
-	<template v-if="title" v-slot:title>{{title}}</template>
+<bs-modal v-show="!loading" ref="modalContainer" body-class="" v-bind="$props" dialog-class="modal-lg" class="bootstrap-alert" :backdrop="false">
+	<template v-if="titel" v-slot:title>{{titel}}</template>
 	<template v-slot:default>
 		<div>
 			<nav aria-label="breadcrumb" class="ps-2">
