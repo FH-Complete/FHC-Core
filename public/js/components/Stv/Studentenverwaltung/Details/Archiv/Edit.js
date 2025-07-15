@@ -98,7 +98,8 @@ export default {
 						type="checkbox"
 						name="stud_selfservice"
 						:label="'Selfservice'"
-						v-model="data.stud_selfservice">
+						v-model="data.stud_selfservice"
+					>
 					</form-input>
 				</div>
 			</fieldset>

@@ -739,8 +739,12 @@ class Status extends FHCAPI_Controller
 		// Start DB transaction
 		$this->db->trans_begin();
 
+		//Delete Studentlehrverband if no Status left in this semester
+		$cilsresult = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id, $studiensemester_kurzbz);
+		$isLastPrestudentStatusForSemester = $this->getDataOrTerminateWithError($cilsresult);
+
 		//Delete Status
-		$result = $this->PrestudentstatusModel->delete(
+		$delpsresult = $this->PrestudentstatusModel->delete(
 			[
 				'prestudent_id' => $prestudent_id,
 				'status_kurzbz' => $status_kurzbz,
@@ -748,14 +752,9 @@ class Status extends FHCAPI_Controller
 				'studiensemester_kurzbz' => $studiensemester_kurzbz
 			]
 		);
+		$this->getDataOrTerminateWithError($delpsresult);
 
-		$this->getDataOrTerminateWithError($result);
-
-		//Delete Studentlehrverband if no Status left in this semester
-		$result = $this->PrestudentstatusModel->checkIfLastStatusEntry($prestudent_id, $studiensemester_kurzbz);
-
-		$result = $this->getDataOrTerminateWithError($result);
-		if ($result)
+		if ($isLastPrestudentStatusForSemester)
 		{
 			//get student_uid
 			$this->load->model('crm/Student_model', 'StudentModel');
@@ -1529,9 +1528,32 @@ class Status extends FHCAPI_Controller
 			$newStudentlvb['semester'] = $ausbildungssemester;
 		} // If there is no lehrverband just use the same as in the previous studiensemester
 
-
-		//add studentlehrverband
-		$result = $this->StudentlehrverbandModel->insert($newStudentlvb);
+		$checkres = $this->StudentlehrverbandModel->load(array(
+			'student_uid' => $studentlvb->student_uid,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		));
+		if(hasData($checkres)) 
+		{
+			$result = $this->StudentlehrverbandModel->update(
+				array(
+					'student_uid' => $studentlvb->student_uid,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz
+				),
+				array(
+					'studiengang_kz' => $studentlvb->studiengang_kz,
+					'semester' => $studentlvb->semester,
+					'verband' => $studentlvb->verband,
+					'gruppe' => $studentlvb->gruppe,
+					'updateamum' => $now,
+					'updatevon' => $authUID
+				)
+			);
+		}
+		else
+		{
+			//add studentlehrverband
+			$result = $this->StudentlehrverbandModel->insert($newStudentlvb);
+		}
 
 		$this->getDataOrTerminateWithError($result);
 

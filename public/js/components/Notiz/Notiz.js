@@ -81,6 +81,7 @@ export default {
 						title: "Text",
 						field: "text_stripped",
 						width: 250,
+						clipContents: true,
 						tooltip:function(e, cell, onRendered){
 							var el = document.createElement("div");
 							el.style.backgroundColor = "white";
@@ -95,8 +96,10 @@ export default {
 							return el;
 						},
 					},
-					{title: "VerfasserIn", field: "verfasser_uid", width: 124, visible: false},
-					{title: "BearbeiterIn", field: "bearbeiter_uid", width: 126, visible: false},
+					{title: "VerfasserIn", field: "verfasser", width: 124},
+					{title: "BearbeiterIn", field: "bearbeiter", width: 126},
+					{title: "Verfasser UID", field: "verfasser_uid", width: 124, visible: false},
+					{title: "Bearbeiter UID", field: "bearbeiter_uid", width: 126, visible: false},
 					{title: "Start", field: "start_format", width: 86, visible: false},
 					{title: "Ende", field: "ende_format", width: 86, visible: false},
 					{title: "Dokumente", field: "countdoc", width: 100, visible: false},
@@ -170,11 +173,12 @@ export default {
 						},
 						frozen: true
 					}],
-				layout: 'fitColumns',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
-				height: '250',
-				selectableRangeMode: 'click',
-				selectable: true,
+				//responsiveLayout: "collapse",
+				maxHeight: '200px',
+				//selectableRangeMode: 'click',
+				//selectable: true,
 				index: 'notiz_id',
 				persistenceID: 'core-notiz'
 			},
@@ -187,21 +191,23 @@ export default {
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('verfasser_uid').component.updateDefinition({
+						cm.getColumnByField('verfasser').component.updateDefinition({
 							title: this.$p.t('notiz', 'verfasser'),
 							visible: this.showVariables.showVerfasser
+						});
+						cm.getColumnByField('verfasser_uid').component.updateDefinition({
+							title: this.$p.t('ui', 'verfasser_uid'),
 						});
 						cm.getColumnByField('titel').component.updateDefinition({
 							title: this.$p.t('global', 'titel'),
 							//visible: this.showVariables.showTitel
 						});
-						cm.getColumnByField('text_stripped').component.updateDefinition({
-							title: this.$p.t('global', 'text'),
-							//visible: this.showVariables.showText
-						});
-						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
+						cm.getColumnByField('bearbeiter').component.updateDefinition({
 							title: this.$p.t('notiz', 'bearbeiter'),
 							visible: this.showVariables.showBearbeiter
+						});
+						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
+							title: this.$p.t('ui', 'bearbeiter_uid'),
 						});
 						cm.getColumnByField('start_format').component.updateDefinition({
 							title: this.$p.t('global', 'gueltigVon'),
@@ -242,6 +248,16 @@ export default {
 						cm.getColumnByField('actions').component.updateDefinition({
 							title: this.$p.t('global', 'aktionen')
 						});
+
+						cm.getColumnByField('text_stripped').component.updateDefinition({
+							title: this.$p.t('global', 'text'),
+							width: 250,
+							tooltip: true,
+							clipContents: true,
+						});
+
+						// Force layout recalculation for handling overflow text
+						this.$refs.table.tabulator.redraw(true);
 					}
 				}
 			],
@@ -347,6 +363,7 @@ export default {
 						this.$refs.NotizModal.hide();
 					}
 					this.reload();
+					this.$emit('reload');
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -359,6 +376,7 @@ export default {
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.reload();
+					this.$emit('reload');
 					this.resetFormData();
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -402,6 +420,7 @@ export default {
 						this.$refs.NotizModal.hide();
 					}
 					this.reload();
+					this.$emit('reload');
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -553,21 +572,18 @@ export default {
 				>
 			</core-filter-cmpt>
 			
-			<br>
 		
-			<form-form ref="formNotiz" @submit.prevent class="row pt-3">
-				<br><br>
+			<form-form ref="formNotiz" @submit.prevent class="row">
+
 				<div class="pt-2">
-					<div class="row mb-3">
-						<div class="col-sm-7">
-							<span class="small">[{{notizData.typeId}}]</span>
-						</div>
-					</div>
 					
-					<div class="row mb-3">
+					<div class="row mt-4 mb-1">
 						<div class="col-sm-7">
-							<p v-if="notizData.statusNew" class="fw-bold"> {{$p.t('notiz','notiz_new')}}</p>
-							<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}}</p>
+							<p>
+								<span v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}}</span>
+								<span v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}}</span>
+								<span class="small"> [{{notizData.typeId}}]</span>
+							</p>
 						</div>
 					</div>
 		
@@ -689,9 +705,13 @@ export default {
 						<p class="small">{{notizData.lastupdate}}</p>
 					</div>
 				</div>
-				
-				<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
-				<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+				<div class="row">
+					<div class="text-end">
+						<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
+						<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+					</div>
+				</div>
+
 			</form-form>
 		</div>
 

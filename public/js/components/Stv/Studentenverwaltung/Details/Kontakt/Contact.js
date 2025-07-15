@@ -26,7 +26,7 @@ export default{
 				ajaxRequestFunc: () => this.$api.call(ApiStvContact.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				columns:[
-					{title:"Typ", field:"kontakttyp"},
+					{title:"Typ", field:"kontakttypbeschreibung"},
 					{title:"Kontakt", field:"kontakt"},
 					{
 						title:"Zustellung",
@@ -94,8 +94,6 @@ export default{
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData:	false,
 				height:	'auto',
 				selectable:	true,
 				index: 'kontakt_id',
@@ -109,7 +107,7 @@ export default{
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('kontakttyp').component.updateDefinition({
+						cm.getColumnByField('kontakttypbeschreibung').component.updateDefinition({
 							title: this.$p.t('global', 'typ')
 						});
 						cm.getColumnByField('kontakt').component.updateDefinition({
@@ -303,7 +301,8 @@ export default{
 		this.$api
 			.call(ApiStvContact.getTypes())
 			.then(result => {
-				this.kontakttypen = result.data;
+				//this.kontakttypen = result.data;
+				this.kontakttypen = result.data.filter(item => item.kontakttyp !== 'hidden');
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
@@ -328,7 +327,7 @@ export default{
 						v-model="contactData.kontakttyp">
 					>
 						<option value="">keine Auswahl</option>
-						<option v-for="typ in kontakttypen" :key="typ.kontakttyp_kurzbz" :value="typ.kontakttyp" >{{typ.kontakttyp}}</option>
+						<option v-for="typ in kontakttypen" :key="typ.kontakttyp_kurzbz" :value="typ.kontakttyp" >{{typ.beschreibung}}</option>
 					</form-input>
 				</div>
 				

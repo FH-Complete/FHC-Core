@@ -75,7 +75,7 @@ export const CoreFilterCmpt = {
 		newBtnDisabled: Boolean,
 		newBtnLabel: String,
 		uniqueId: String,
-		// TODO soll im master kommen?
+
 		idField: String,
 		parentIdField: String,
 		countOnly: Boolean
@@ -216,16 +216,21 @@ export const CoreFilterCmpt = {
 			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
-					height: 500,
 					layout: "fitDataStretchFrozen",
 					movableColumns: true,
 					columnDefaults:{
 						tooltip: true
 					},
 					placeholder,
-					reactiveData: true,
 					persistence: this.persistence,
 				}, ...(this.tabulatorOptions || {})};
+
+			// set default height if no height property is set
+			if (tabulatorOptions.height === undefined &&
+				tabulatorOptions.minHeight === undefined &&
+				tabulatorOptions.maxHeight === undefined) {
+				tabulatorOptions.height = 500;
+			}
 
 			if (!this.tableOnly) {
 				tabulatorOptions.data = this.filteredData;
@@ -234,7 +239,7 @@ export const CoreFilterCmpt = {
 
 			if (tabulatorOptions.selectable || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
 				this.tabulatorHasSelector = true;
-			// TODO check ob im core bleiben soll
+
 			if (this.idField) {
 				// enable nested tabulator if parent Id given
 				if (this.parentIdField) tabulatorOptions.dataTree = true;
@@ -258,7 +263,7 @@ export const CoreFilterCmpt = {
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
-			// TODO check ob im core so bleiben soll
+
 			// if nested tabulator, restructure data
 			if (this.parentIdField && this.idField) {
 				this.tabulator.on("dataLoading", data => {
@@ -575,7 +580,7 @@ export const CoreFilterCmpt = {
 				this.getFilter
 			);
 		},
-		// TODO check ob im core so bleiben soll
+
 		// append child to it's parent
 		appendChild(data, child) {
 			// get parent id
@@ -664,7 +669,7 @@ export const CoreFilterCmpt = {
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
-					<span v-else-if="description">{{ description }}</span>
+					<span v-else-if="description" v-html="description"></span>
 					<a v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
 						<span class="fa-solid fa-xl fa-filter"></span>
 					</a>

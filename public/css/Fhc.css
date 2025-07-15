@@ -98,3 +98,10 @@
   padding-right: .375rem;
   background-image: none;
 }
+
+.modal-msg {
+	max-width: 1378px;
+}
+.modal-msg .modal-content {
+	height: 95vh;
+}

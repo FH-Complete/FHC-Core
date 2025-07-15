@@ -52,7 +52,11 @@ $config['tabs'] =
 					],
 				],
 			],
-		]
+		],
+		'exemptions' => [
+			//if true, Anrechnungen can be added and edited in tab Anrechnungen
+			'editableAnrechnungen' => false,
+		],
 	];
 
 // List of fields to show when ZGV_DOKTOR_ANZEIGEN is defined

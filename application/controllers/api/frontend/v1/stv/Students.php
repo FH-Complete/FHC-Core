@@ -223,25 +223,25 @@ class Students extends FHCAPI_Controller
 				break;
 			case "bewerbungnichtabgeschickt":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bewerbung_abgeschicktamum'] = null;
+				$where['ps.bewerbung_abgeschicktamum'] = null;
 				break;
 			case "bewerbungabgeschickt":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bewerbung_abgeschicktamum IS NOT NULL'] = null;
-				$where['bestaetigtam'] = null;
+				$where['ps.bewerbung_abgeschicktamum IS NOT NULL'] = null;
+				$where['ps.bestaetigtam'] = null;
 				break;
 			case "statusbestaetigt":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bestaetigtam IS NOT NULL'] = null;
+				$where['ps.bestaetigtam IS NOT NULL'] = null;
 				break;
 			case "statusbestaetigtrtnichtangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bestaetigtam IS NOT NULL'] = null;
+				$where['ps.bestaetigtam IS NOT NULL'] = null;
 				$this->PrestudentModel->db->where('NOT EXISTS(' . $selectRT . ')', null, false);
 				break;
 			case "statusbestaetigtrtangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bestaetigtam IS NOT NULL'] = null;
+				$where['ps.bestaetigtam IS NOT NULL'] = null;
 				$this->PrestudentModel->db->where('EXISTS(' . $selectRT . ')', null, false);
 				break;
 			case "zgv":
@@ -622,6 +622,8 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('ersatzkennzeichen');
 		$this->PrestudentModel->addSelect('gebdatum');
 		$this->PrestudentModel->addSelect('geschlecht');
+		$this->PrestudentModel->addSelect('foto');
+		$this->PrestudentModel->addSelect('foto_sperre');
 
 		// semester
 		// verband
@@ -629,6 +631,7 @@ class Students extends FHCAPI_Controller
 
 		$this->PrestudentModel->addSelect('UPPER(stg.typ || stg.kurzbz) AS studiengang');
 		$this->PrestudentModel->addSelect('tbl_prestudent.studiengang_kz');
+		$this->PrestudentModel->addSelect('stg.bezeichnung AS stg_bezeichnung');
 		$this->PrestudentModel->addSelect("s.matrikelnr");
 		$this->PrestudentModel->addSelect('p.person_id');
 		$this->PrestudentModel->addSelect('pls.status_kurzbz AS status');
@@ -640,7 +643,7 @@ class Students extends FHCAPI_Controller
 		);
 		$this->PrestudentModel->addSelect("
 			CASE WHEN b.uid IS NOT NULL AND b.uid<>'' 
-			THEN b.uid || " . $this->PrestudentModel->escape(DOMAIN) . " 
+			THEN CONCAT(b.uid, '@', " . $this->PrestudentModel->escape(DOMAIN) . ")
 			ELSE '' END AS mail_intern", false);
 		$this->PrestudentModel->addSelect('p.anmerkung AS anmerkungen');
 		$this->PrestudentModel->addSelect('tbl_prestudent.anmerkung');
@@ -709,7 +712,12 @@ class Students extends FHCAPI_Controller
 	 */
 	protected function addFilter($studiensemester_kurzbz)
 	{
-		$filter = $this->input->get('filter');
+		$filter = json_decode($this->input->get('filter'), true);
+		if (!is_array($filter))
+		{
+			$this->addMeta('addfilter', 'invalid filter: ' . $this->input->get('filter'));
+			return;
+		}
 		if (isset($filter['konto_count_0'])) {
 			$bt = $this->PrestudentModel->escape($filter['konto_count_0']);
 			$stdsem = $this->PrestudentModel->escape($studiensemester_kurzbz);

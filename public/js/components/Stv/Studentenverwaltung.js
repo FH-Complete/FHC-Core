@@ -66,7 +66,10 @@ export default {
 			defaultSemester: this.defaultSemester,
 			$reloadList: () => {
 				this.$refs.stvList.reload();
-			}
+			},
+			configShowAufnahmegruppen: this.config.showAufnahmegruppen,
+			configAllowUebernahmePunkte: this.config.allowUebernahmePunkte,
+			configUseReihungstestPunkte: this.config.useReihungstestPunkte
 		}
 	},
 	data() {
@@ -191,6 +194,8 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	mounted() {
+		//Test manu Systemerror
+		//FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto = 'ma0068@technikum-wien.at';this.$fhcAlert.handleSystemError(1);
 		if (this.$route.params.id) {
 			this.$refs.stvList.updateUrl(
 				ApiStv.students.uid(this.$route.params.id),

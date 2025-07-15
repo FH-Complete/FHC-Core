@@ -63,15 +63,113 @@ export default {
 				'abschlussdokument_lehrgaenge.xml.php': [
 						'AbschlussdokumentLehrgaenge'
 				]
-			},
-			tabulatorOptions: {
+			}
+		};
+	},
+	computed: {
+		tabulatorColumns() {
+			const columns = [
+				{title: "Akte Id", field: "akte_id", visible: false},
+				{title: this.$p.t('stv', 'archiv_title'), field: "titel"},
+				{title: this.$p.t('stv', 'archiv_description'), field: "bezeichnung"},
+				{title: this.$p.t('stv', 'archiv_creation_date'), field: "erstelltam"},
+				{
+					title: this.$p.t('stv', 'archiv_signiert'),
+					field: "signiert",
+					formatter:"tickCross",
+					hozAlign:"center",
+					formatterParams: {
+						tickElement: '<i class="fa fa-check text-success"></i>',
+						crossElement: '<i class="fa fa-xmark text-danger"></i>'
+					}
+				},
+				{
+					title: "Selfservice",
+					field: "stud_selfservice",
+					formatter:"tickCross",
+					hozAlign:"center",
+					formatterParams: {
+						tickElement: '<i class="fa fa-check text-success"></i>',
+						crossElement: '<i class="fa fa-xmark text-danger"></i>'
+					},
+				},
+				{title: this.$p.t('stv', 'archiv_accepted_on_at'), field: "akzeptiertamum"},
+				{
+					title: this.$p.t('stv', 'archiv_gedruckt'),
+					field: "gedruckt",
+					visible: false,
+					formatter:"tickCross",
+					hozAlign:"center",
+					formatterParams: {
+						tickElement: '<i class="fa fa-check text-success"></i>',
+						crossElement: '<i class="fa fa-xmark text-danger"></i>'
+					}
+				},
+				{
+					title: 'Aktionen', field: 'actions',
+					formatter: (cell, formatterParams, onRendered) => {
+						let container = document.createElement('div');
+						container.className = "d-flex gap-2";
+
+						let downloadButton = document.createElement('button');
+						downloadButton.className = 'btn btn-outline-secondary';
+						downloadButton.innerHTML = '<i class="fa fa-download"></i>';
+						downloadButton.title = this.$p.t('ui', 'downloadDok');
+						downloadButton.addEventListener('click', evt => {
+							evt.stopPropagation();
+							this.actionDownload(cell.getData().akte_id);
+						});
+						container.append(downloadButton);
+
+						if (this.config.showEdit)
+						{
+							let editButton = document.createElement('button');
+							editButton.className = 'btn btn-outline-secondary';
+							editButton.innerHTML = '<i class="fa fa-edit"></i>';
+							editButton.addEventListener('click', () =>
+								this.$refs.edit.open(cell.getData())
+							);
+							container.append(editButton);
+						}
+
+						let deleteButton = document.createElement('button');
+						deleteButton.className = 'btn btn-outline-secondary';
+						deleteButton.innerHTML = '<i class="fa fa-trash"></i>';
+						deleteButton.addEventListener('click', evt => {
+							evt.stopPropagation();
+							this.$fhcAlert
+								.confirmDelete()
+								.then(result => result ? {akte_id: cell.getData().akte_id, studiengang_kz: this.modelValue.studiengang_kz} : Promise.reject({handled:true}))
+								.then(this.$fhcApi.factory.stv.archiv.delete)
+								.then(() => {
+									//cell.getRow().delete();
+									this.reload();
+								})
+								.catch(this.$fhcAlert.handleSystemError);
+						});
+						container.append(deleteButton);
+
+						return container;
+					},
+					minWidth: 150, // Ensures Action-buttons will be always fully displayed
+					maxWidth: 150,
+					frozen: true
+				}
+			];
+			return columns;
+		},
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
-						ApiStvArchiv.getArchiv(
-							this.modelValue.person_id ? [this.modelValue.person_id] : null || this.modelValue.map(e => e.person_id)
-						)
-					),
+					ApiStvArchiv.getArchiv(
+						this.modelValue.person_id ? [this.modelValue.person_id] : null || this.modelValue.map(e => e.person_id)
+					)
+				),
 				ajaxResponse: (url, params, response) => response.data,
+				layout:"fitDataTable",
+				index: 'akte_id',
+				persistenceID: 'stv-details-archiv',
 				columns: [
 					{title: "Akte Id", field: "akte_id", visible: false},
 					{title: this.$p.t('stv', 'archiv_title'), field: "titel"},
@@ -115,6 +213,16 @@ export default {
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
 
+							let downloadButton = document.createElement('button');
+							downloadButton.className = 'btn btn-outline-secondary';
+							downloadButton.innerHTML = '<i class="fa fa-download"></i>';
+							downloadButton.title = this.$p.t('ui', 'downloadDok');
+							downloadButton.addEventListener('click', evt => {
+								evt.stopPropagation();
+								this.actionDownload(cell.getData().akte_id);
+							});
+							container.append(downloadButton);
+
 							if (this.config.showEdit)
 							{
 								let editButton = document.createElement('button');
@@ -133,8 +241,8 @@ export default {
 								evt.stopPropagation();
 								this.$fhcAlert
 									.confirmDelete()
-									.then(result => result ? {akte_id: cell.getData().akte_id, studiengang_kz : this.modelValue.studiengang_kz} : Promise.reject({handled:true}))
-									.then(params => this.$api.call(ApiStvArchiv.delete(params.akte_id, params.studiengang_kz)))
+									.then(result => result ? {akte_id: cell.getData().akte_id, studiengang_kz: this.modelValue.studiengang_kz} : Promise.reject({handled:true}))
+									.then(this.$fhcApi.factory.stv.archiv.delete)
 									.then(() => {
 										//cell.getRow().delete();
 										this.reload();
@@ -149,22 +257,22 @@ export default {
 						maxWidth: 150,
 						frozen: true
 					}
-				],
-				layout:"fitDataTable",
-				index: 'akte_id',
-				persistenceID: 'stv-details-archiv'
-			},
-			tabulatorEvents: [
+				]
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: "rowDblClick",
 					handler: (e, row) => {
 						this.actionDownload(row.getData().akte_id);
 					}
 				}
-			]
-		};
-	},
-	computed: {
+			];
+
+			return events;
+		}
 	},
 	watch: {
 		modelValue() {
