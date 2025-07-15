@@ -223,25 +223,25 @@ class Students extends FHCAPI_Controller
 				break;
 			case "bewerbungnichtabgeschickt":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bewerbung_abgeschicktamum'] = null;
+				$where['ps.bewerbung_abgeschicktamum'] = null;
 				break;
 			case "bewerbungabgeschickt":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bewerbung_abgeschicktamum IS NOT NULL'] = null;
-				$where['bestaetigtam'] = null;
+				$where['ps.bewerbung_abgeschicktamum IS NOT NULL'] = null;
+				$where['ps.bestaetigtam'] = null;
 				break;
 			case "statusbestaetigt":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bestaetigtam IS NOT NULL'] = null;
+				$where['ps.bestaetigtam IS NOT NULL'] = null;
 				break;
 			case "statusbestaetigtrtnichtangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bestaetigtam IS NOT NULL'] = null;
+				$where['ps.bestaetigtam IS NOT NULL'] = null;
 				$this->PrestudentModel->db->where('NOT EXISTS(' . $selectRT . ')', null, false);
 				break;
 			case "statusbestaetigtrtangemeldet":
 				$where['ps.status_kurzbz'] = 'Interessent';
-				$where['bestaetigtam IS NOT NULL'] = null;
+				$where['ps.bestaetigtam IS NOT NULL'] = null;
 				$this->PrestudentModel->db->where('EXISTS(' . $selectRT . ')', null, false);
 				break;
 			case "zgv":
