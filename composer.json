@@ -415,6 +415,17 @@
 			}
 		},
 		{
+			"type": "package",
+			"package": {
+				"name": "moment/luxonjs",
+				"version": "3.6.1",
+				"dist": {
+					"url": "https://unpkg.com/luxon@3.6.1/build/global/luxon.min.js",
+					"type": "file"
+				}
+			}
+		},
+		{
 			"type": "composer",
 			"url": "https://asset-packagist.org"
 		}
@@ -462,6 +473,7 @@
 
 		"michelf/php-markdown": "1.5.0",
 		"ml/json-ld": "1.*",
+		"moment/luxonjs": "3.6.1",
 		"moment/momentjs": "2.24.0",
 		"mottie/tablesorter": "2.*",
 
