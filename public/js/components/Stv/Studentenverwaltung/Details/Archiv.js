@@ -63,8 +63,12 @@ export default {
 				'abschlussdokument_lehrgaenge.xml.php': [
 						'AbschlussdokumentLehrgaenge'
 				]
-			},
-			tabulatorOptions: {
+			}
+		};
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 						ApiStvArchiv.getArchiv(
