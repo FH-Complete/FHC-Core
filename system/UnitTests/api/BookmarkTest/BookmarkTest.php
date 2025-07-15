@@ -119,7 +119,7 @@ function testInsertBookmark($url, $method, $user, $pw)
 
 function testDeleteBookmark($url, $method, $user, $pw, $id)
 {
-	echo LINE_BREAK.LINE_BREAK."Test '".$method."' start \n".LINE_BREAK;
+	echo LINE_BREAK.LINE_BREAK."Test '".$method."' start ".LINE_BREAK;
 	
 	try {
 		$resultPost = \Httpful\Request::post($url.$method.'/'.$id)
