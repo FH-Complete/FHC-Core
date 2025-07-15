@@ -243,11 +243,9 @@ class Student extends FHCAPI_Controller
 		}
 
 		$array_allowed_props_student = ['matrikelnr'];
-		$this->addMeta('bhtest1', $this->isLaufendesSemester($studiensemester_kurzbz));
 		if($this->isLaufendesSemester($studiensemester_kurzbz)) 
 		{
 			$array_allowed_props_student = ['matrikelnr', 'verband', 'semester', 'gruppe'];
-			$this->addMeta('bhtest2', $array_allowed_props_student);
 		}
 		$update_student = array();
 		foreach ($array_allowed_props_student as $prop) {
