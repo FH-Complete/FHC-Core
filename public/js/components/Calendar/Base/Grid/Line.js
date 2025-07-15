@@ -35,23 +35,12 @@ export default {
 		backgrounds: {
 			type: Array,
 			default: []
-		},
-		allDayEvents: Boolean
+		}
 	},
 	computed: {
-		eventsAllDay() {
-			if (!this.allDayEvents)
-				return [];
-			return this.events.filter(event => event.orig.allDayEvent);
-		},
-		eventsNormal() {
-			if (!this.allDayEvents)
-				return this.events;
-			return this.events.filter(event => !event.orig.allDayEvent);
-		},
 		eventsWithRowInfo() {
 			const events = [];
-			this.eventsNormal.forEach(event => {
+			this.events.forEach(event => {
 				const rows = [2, -1];
 				if (event.startsHere) {
 					rows[0] = 't_' + event.start.diff(this.date).toMillis();
@@ -80,21 +69,6 @@ export default {
 			:end="end"
 			:background="bg"
 		></line-background>
-		<div
-			v-if="eventsAllDay.length"
-			:style="'grid-' + axisRow + ': allday'"
-			class="all-day-events"
-		>
-			<line-event
-				v-for="(event, i) in eventsAllDay"
-				:key="i"
-				:event="event"
-			>
-				<template v-slot="slot">
-					<slot name="event" v-bind="slot" />
-				</template>
-			</line-event>
-		</div>
 		<line-event
 			v-for="(event, i) in eventsWithRowInfo"
 			:key="i"

@@ -1,11 +1,13 @@
 import GridLine from './Grid/Line.js';
+import GridLineEvent from './Grid/Line/Event.js';
 
 import CalDnd from '../../../directives/Calendar/DragAndDrop.js';
 
 export default {
 	name: "CalendarGrid",
 	components: {
-		GridLine
+		GridLine,
+		GridLineEvent
 	},
 	directives: {
 		CalDnd
@@ -128,6 +130,16 @@ export default {
 
 			return [...this.axisMain, lastInMainAxis.plus(extraLength)];
 		},
+		eventsAllDay() {
+			if (!this.allDayEvents)
+				return [];
+			return this.mapIntoMainAxis(this.originalEvents.filter(event => event.orig.allDayEvent));
+		},
+		eventsNormal() {
+			if (!this.allDayEvents)
+				return this.events;
+			return this.mapIntoMainAxis(this.originalEvents.filter(event => !event.orig.allDayEvent));
+		},
 		events() {
 			return this.mapIntoMainAxis(this.originalEvents);
 		},
@@ -165,13 +177,12 @@ export default {
 					gridlines[ts].push('pe_' + part.index);
 			});
 
-			this.events.forEach((events, mainIndex) => {
+			this.eventsNormal.forEach((events, mainIndex) => {
 				let day = this.axisMain[mainIndex];
 				events.forEach(event => {
 					if (!event.startsHere && !event.endsHere)
 						return;
-					if (this.allDayEvents && event.orig.allDayEvent)
-						return;
+
 					if (event.startsHere) {
 						let ts = event.start.diff(day).toMillis();
 						if (!gridlines[ts])
@@ -185,7 +196,7 @@ export default {
 				});
 			});
 
-			return '[allday] auto ' + Object.keys(gridlines).sort((a,b) => parseInt(a)-parseInt(b)).map((start, i, keys) => {
+			return Object.keys(gridlines).sort((a,b) => parseInt(a)-parseInt(b)).map((start, i, keys) => {
 				let end = keys[i + 1];
 				if (!end) {
 					gridlines[start].push('end');
@@ -250,7 +261,7 @@ export default {
 	<div
 		class="fhc-calendar-base-grid"
 		style="display:grid;width:100%;height:100%"
-		:style="'grid-template-' + axisRow + 's:auto 1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
+		:style="'grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
 	>
 		<div
 			class="grid-header"
@@ -265,6 +276,29 @@ export default {
 				:style="'grid-' + axisCol + ':' + (2+index)"
 			>
 				<slot name="main-header" v-bind="{ index, date }" />
+			</div>
+		</div>
+		<div
+			v-if="allDayEvents"
+			class="grid-allday"
+			style="display:grid"
+			:style="'grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1'"
+		>
+			<div
+				v-for="(events, index) in eventsAllDay"
+				:key="index"
+				class="all-day-events"
+				:style="'grid-' + axisCol + ':' + (2+index)"
+			>
+				<grid-line-event
+					v-for="(event, i) in events"
+					:key="i"
+					:event="event"
+				>
+					<template v-slot="slot">
+						<slot name="event" v-bind="slot" />
+					</template>
+				</grid-line-event>
 			</div>
 		</div>
 		<div
@@ -318,11 +352,10 @@ export default {
 							:start="date.plus(start)"
 							:end="date.plus(end)"
 							:date="date"
-							:events="events[index]"
+							:events="eventsNormal[index]"
 							:backgrounds="backgrounds[index]"
 							style="position:relative"
 							:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"
-							:all-day-events="allDayEvents"
 						>
 							<template #event="slot">
 								<slot name="event" v-bind="slot" />
