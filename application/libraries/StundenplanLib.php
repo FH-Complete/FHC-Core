@@ -3,6 +3,11 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DateTime as DateTime;
+use \DateTimeZone as DateTimeZone;
+use \DateInterval as DateInterval;
+use \DatePeriod as DatePeriod;
+
 class StundenplanLib{
 
 	private $_ci; // Code igniter instance
@@ -14,8 +19,10 @@ class StundenplanLib{
 	 *
 	 */
 	public function getStundenplan($start_date, $end_date, $lv_id = null){
-		
 		$this->_ci =& get_instance();
+
+		// Load Config
+		$this->_ci->load->config('calendar');
 
 		$this->_ci->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
 		$this->_ci->load->model('organisation/Studiensemester_model','StudiensemesterModel');
@@ -125,6 +132,10 @@ class StundenplanLib{
 
 	public function getReservierungen($start_date, $end_date, $ort_kurzbz){
 		$this->_ci =& get_instance();
+
+		// Load Config
+		$this->_ci->load->config('calendar');
+
 		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter(getAuthUID()));
 		if($is_mitarbeiter)
 		{
@@ -181,8 +192,15 @@ class StundenplanLib{
 
 	public function expand_object_information($data){
 		$this->_ci =& get_instance();
+		
 		foreach ($data as $item)
 		{
+			$tz = new DateTimeZone($this->_ci->config->item('timezone'));
+			$isostart = new DateTime($item->datum . ' ' . $item->beginn, $tz);
+			$item->isostart = $isostart->format(DateTime::ATOM);
+
+			$isoend = new DateTime($item->datum . ' ' . $item->ende, $tz);
+			$item->isoend = $isoend->format(DateTime::ATOM);
 
 			$lektor_obj_array = array();
 			$gruppe_obj_array = array();
@@ -254,9 +272,17 @@ class StundenplanLib{
 		}
 	}
 
-	public function fetchFerienTageEvents($start_date, $end_date, $studiengang_kz){
+	public function fetchFerienTageEvents($start_date, $end_date, $studiengang_kz)
+	{
 		$this->_ci =& get_instance();
-		$this->_ci->load->model('organisation/Ferien_model','FerienModel');
+
+		// Load Config
+		$this->_ci->load->config('calendar');
+
+		$this->_ci->load->model('organisation/Ferien_model', 'FerienModel');
+
+		$tz = new DateTimeZone($this->_ci->config->item('timezone'));
+
 		$ferienEvents = $this->_ci->FerienModel->execReadOnlyQuery("
 		SELECT * 
 		FROM lehre.tbl_ferien
@@ -277,35 +303,41 @@ class StundenplanLib{
 	
 				$interval = new DateInterval('P1D');
 				$period = new DatePeriod($event_start, $interval, $event_end);
-				$event->dates = array_map(function($date){
-					return $date->format('Y-m-d');
-				}, iterator_to_array($period));
+				$event->dates = iterator_to_array($period);
 				return $event;
 			}, $ferienEvents);
 	
+			$start_date = new DateTime($start_date);
+			$start_date->setTime(0, 0, 0);
+			$end_date = new DateTime($end_date);
+			$end_date->setTime(23, 59, 59);
+
 			$ferienEventsFlattened=[];
 			foreach($ferienEvents as $ferien_event){
 				foreach($ferien_event->dates as $date){
+					if ($date < $start_date || $date > $end_date)
+						continue;
 					$event = new stdClass();
 					$event->bezeichnung = $ferien_event->bezeichnung;
-					$event->datum = $date;
+					$event->datum = $date->format('Y-m-d');
 					$event->type = 'ferien';
 					$ferienEventsFlattened[] = $event;
 				}
 			};
 	
 			$today=new DateTime();
-			$ferienEventsFlattened = array_map(function($event) use($today){
+			$ferienEventsFlattened = array_map(function($event) use($today, $tz){
 				$ferien_event = (object) array(
 					'type' => 'ferien',
 					'beginn' => $today->format('H:i:s'),
 					'ende' => $today->format('H:i:s'),
+					'isostart' => (new DateTime($event->datum . ' 00:00:00', $tz))->format('c'),
+					'isoend' => (new DateTime($event->datum . ' 23:59:59', $tz))->format('c'),
 					'allDayEvent' => true,
 					'datum' => $event->datum,
 					'topic' => $event->bezeichnung,
 					'titel' => $event->bezeichnung,
 					'farbe' => '00689E'
-					
 				);
 				return $ferien_event;
 			}, $ferienEventsFlattened);
@@ -635,7 +667,7 @@ class StundenplanLib{
 			{
 				return $sem->studiensemester_kurzbz;
 			},
-			getData($semester_range)
+			getData($semester_range) ?: []
 		);
 
 		// if no studiensemester is found for the given timespan, get the nearest studiensemester
