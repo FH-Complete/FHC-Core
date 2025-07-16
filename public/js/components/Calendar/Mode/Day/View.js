@@ -19,11 +19,14 @@ export default {
 		day: {
 			type: luxon.DateTime,
 			required: true
-		}
+		},
+		emptyMessage: String,
+		emptyMessageDetails: String
 	},
 	data() {
 		return {
-			chosenEvent: null
+			chosenEvent: null,
+			gridMainRef: null
 		};
 	},
 	computed: {
@@ -67,12 +70,16 @@ export default {
 			}
 		}
 	},
+	mounted() {
+		this.gridMainRef = this.$refs.grid.$refs.main;
+	},
 	template: /* html */`
 	<div
 		class="fhc-calendar-mode-day-view d-flex h-100"
 		@cal-click-default.capture="handleClickDefaults"
 	>
 		<calendar-grid
+			ref="grid"
 			:axis-main="axisMain"
 			:axis-parts="axisParts"
 			:snap-to-grid="!!timeGrid"
@@ -94,8 +101,23 @@ export default {
 				<slot v-bind="slot" mode="day" />
 			</template>
 		</calendar-grid>
-		<div class="w-100">
-			<div v-if="currentEvent === null">loading...</div>
+		<Teleport :disabled="!gridMainRef" :to="gridMainRef">
+			<div
+				v-if="emptyMessage && currentEvent !== null && !currentEvent"
+				class="fhc-calendar-no-events-overlay"
+				style="position:absolute;inset:0"
+			>
+				{{ emptyMessage }}
+			</div>
+		</Teleport>
+		<div class="event-details">
+			<div
+				v-if="currentEvent === null"
+				class="p-4 d-flex w-100 justify-content-center align-items-center"
+			>
+				<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+			</div>
+			<h3 v-else-if="!currentEvent">{{ emptyMessageDetails }}</h3>
 			<slot v-else :event="currentEvent" mode="event" />
 		</div>
 	</div>

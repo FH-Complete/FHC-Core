@@ -69,7 +69,7 @@ export default {
 		},
 		viewAttrs(days) {
 			const day = this.focusDate.plus({ days });
-			return { day };
+			return { ...this.$attrs, day };
 		}
 	},
 	mounted() {

@@ -308,7 +308,7 @@ export default {
 			<div
 				ref="main"
 				class="grid-main"
-				style="grid-column:1/-1;grid-row:1/-1;display:grid"
+				style="position:relative;grid-column:1/-1;grid-row:1/-1;display:grid"
 				:style="'grid-template-' + axisCol + 's:subgrid;grid-template-' + axisRow + 's:' + styleGridRows"
 			>
 				<div
