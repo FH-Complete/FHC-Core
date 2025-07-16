@@ -16,7 +16,8 @@ export default {
 	emits: [
 		"update:currentDate",
 		"update:range",
-		"click"
+		"click",
+		"requestModalOpen"
 	],
 	data() {
 		return {
@@ -101,8 +102,8 @@ export default {
 				this.$emit('update:currentDate', evt.detail.value);
 				break;
 			case 'event':
-				// TODO(chris): IMPLEMENT!
-				// default: ???
+				// default: Request Modal
+				this.$emit('requestModalOpen', { event: evt.detail.value });
 				break;
 			}
 		}

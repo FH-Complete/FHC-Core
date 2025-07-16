@@ -16,7 +16,9 @@ export default {
 	emits: [
 		"update:currentDate",
 		"update:range",
-		"click"
+		"click",
+		"requestModalOpen",
+		"requestModalClose"
 	],
 	data() {
 		return {
@@ -80,7 +82,11 @@ export default {
 		class="fhc-calendar-mode-day flex-grow-1 position-relative"
 	>
 		<base-slider ref="slider" v-slot="slot">
-			<day-view v-bind="viewAttrs(slot.offset)">
+			<day-view
+				v-bind="viewAttrs(slot.offset)"
+				@request-modal-open="$emit('requestModalOpen', $event)"
+				@request-modal-close="$emit('requestModalClose', $event)"
+			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>
 			</day-view>
 		</base-slider>

@@ -1,6 +1,7 @@
 import BaseDraganddrop from './Base/DragAndDrop.js';
 import BaseHeader from './Base/Header.js';
 import BaseSlider from './Base/Slider.js';
+import BsModal from '../Bootstrap/Modal.js';
 
 import CalClick from '../../directives/Calendar/Click.js';
 
@@ -16,7 +17,8 @@ export default {
 	components: {
 		BaseDraganddrop,
 		BaseHeader,
-		BaseSlider
+		BaseSlider,
+		BsModal
 	},
 	directives: {
 		CalClick
@@ -119,7 +121,8 @@ export default {
 	data() {
 		return {
 			internalView: null,
-			internalDate: null
+			internalDate: null,
+			modalEvent: null
 		};
 	},
 	computed: {
@@ -231,6 +234,20 @@ export default {
 		},
 		onDropItem(evt, start, end) {
 			this.$emit('drop', evt, start, end);
+		},
+		showEventModal(eventObj) {
+			this.modalEvent = eventObj;
+			this.$refs.modal.show();
+		},
+		hideEventModal() {
+			if (this.modalEvent)
+				this.modalEvent.closeFn = undefined;
+			this.$refs.modal.hide();
+			this.modalEvent = null;
+		},
+		onModalHidden() {
+			if (this.modalEvent.closeFn)
+				this.modalEvent.closeFn();
 		}
 	},
 	template: /* html */`
@@ -262,11 +279,21 @@ export default {
 				ref="mode"
 				v-model:current-date="cDate"
 				@update:range="$emit('update:range', $event)"
+				@request-modal-open="showEventModal"
+				@request-modal-close="hideEventModal"
 				v-bind="modeOptions ? modeOptions[cMode] : null || {}"
 			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>
 			</component>
 		</base-draganddrop>
+		<bs-modal ref="modal" dialog-class="modal-lg" body-class="" @hidden-bs-modal="onModalHidden">
+			<template #title>
+				<slot v-if="modalEvent" v-bind="{mode: 'eventheader', event: modalEvent.event}" />
+			</template>
+			<template #default>
+				<slot v-if="modalEvent" v-bind="{mode: 'event', event: modalEvent.event}" />
+			</template>
+		</bs-modal>
 	</div>
 	`
 }

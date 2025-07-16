@@ -21,8 +21,13 @@ export default {
 			required: true
 		},
 		emptyMessage: String,
-		emptyMessageDetails: String
+		emptyMessageDetails: String,
+		compact: Boolean
 	},
+	emits: [
+		"requestModalOpen",
+		"requestModalClose"
+	],
 	data() {
 		return {
 			chosenEvent: null,
@@ -63,10 +68,30 @@ export default {
 			return null; // null => loading
 		}
 	},
+	watch: {
+		compact() {
+			if (this.compact) {
+				if (this.chosenEvent) {
+					this.$emit('requestModalOpen', {
+						event: this.chosenEvent,
+						closeFn: () => { this.chosenEvent = null; }
+					});
+				}
+			} else {
+				this.$emit('requestModalClose');
+			}
+		}
+	},
 	methods: {
 		handleClickDefaults(evt) {
 			if (evt.detail.source == 'event') {
 				this.chosenEvent = evt.detail.value;
+				if (this.compact) {
+					this.$emit('requestModalOpen', {
+						event: this.chosenEvent,
+						closeFn: () => { this.chosenEvent = null; }
+					});
+				}
 			}
 		}
 	},
@@ -110,7 +135,7 @@ export default {
 				{{ emptyMessage }}
 			</div>
 		</Teleport>
-		<div class="event-details">
+		<div class="event-details" v-if="!compact">
 			<div
 				v-if="currentEvent === null"
 				class="p-4 d-flex w-100 justify-content-center align-items-center"
