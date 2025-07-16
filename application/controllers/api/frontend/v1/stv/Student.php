@@ -72,6 +72,7 @@ class Student extends FHCAPI_Controller
 	{
 		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
 
+
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
 		$this->PrestudentModel->addSelect('p.person_id');
@@ -109,6 +110,16 @@ class Student extends FHCAPI_Controller
 				false
 			);
 		}
+		$this->PrestudentModel->addSelect(
+			"(
+				SELECT status_kurzbz
+				FROM public.tbl_prestudentstatus pss
+				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
+				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
+				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
+				LIMIT 1
+				) AS statusofsemester"
+		);
 
 		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
 		$this->PrestudentModel->addJoin('public.tbl_benutzer b', 'student_uid = uid', 'LEFT');
@@ -118,13 +129,17 @@ class Student extends FHCAPI_Controller
 			'LEFT'
 		);
 		$this->PrestudentModel->addJoin('public.tbl_person p', 'p.person_id = tbl_prestudent.person_id');
+/*		$this->PrestudentModel->addJoin('public.tbl_prestudentstatus pss', 'pss.prestudent_id = tbl_prestudent.prestudent_id
+										AND pss.studiensemester_kurzbz = ' . $this->PrestudentModel->escape($studiensemester_kurzbz),
+										'LEFT');*/
 
-		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+		$result = $this->PrestudentModel->loadWhere(['tbl_prestudent.prestudent_id' => $prestudent_id]);
 		
 		$student = $this->getDataOrTerminateWithError($result);
 		
 		if (!$student)
 			return show_404();
+
 
 		$this->terminateWithSuccess(current($student));
 	}
