@@ -142,8 +142,12 @@
 	background: linear-gradient(120deg, var(--fhc-calendar-bg-overlay1), var(--fhc-calendar-bg-overlay2));
 	opacity: .7;
 	text-align: center;
-	padding-top: 100px;
 	font-size: 2.5rem;
 	font-weight: 500;
 	line-height: 1.2;
+}
+.fhc-calendar-no-events-overlay:before {
+	content: "";
+	display: block;
+	height: 100px;
 }
