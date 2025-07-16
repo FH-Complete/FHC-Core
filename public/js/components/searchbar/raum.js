@@ -13,7 +13,7 @@ export default {
           <div class="searchbar_grid">
             <div class="searchbar_icon">
               <action :res="this.res" :action="this.actions.defaultaction" @actionexecuted="$emit('actionexecuted')">
-                <i class="fas fa-door-open fa-4x"></i>
+                <i class="fas fa-door-open fa-4x" aria-hidden="true"></i>
               </action>
             </div>
             <div class="searchbar_data">
