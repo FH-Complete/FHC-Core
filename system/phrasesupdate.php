@@ -42322,6 +42322,86 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	array(
+		'app' => 'lvevaluierung',
+		'category' => 'fragebogen',
+		'phrase' => 'spracheAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sprache auswählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select language',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'lvevaluierung',
+		'category' => 'fragebogen',
+		'phrase' => 'fhtwLogo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'FH Technikum Wien Logo',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'UAS Technikum Wien Logo',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'lvevaluierung',
+		'category' => 'fragebogen',
+		'phrase' => 'evaluierungscodeEingeben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Evaluierungscode eingeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Enter Evaluation code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'lvevaluierung',
+		'category' => 'fragebogen',
+		'phrase' => 'fragebogen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fragebogen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Questionnaire',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
