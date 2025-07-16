@@ -56,11 +56,9 @@ export default {
 				<label-dow
 					v-bind="{ date }"
 					@cal-click="evt => evt.detail.source = 'day'"
-					class="text-center"
 				/>
 				<label-day
 					v-bind="{ date }"
-					class="text-center"
 				/>
 			</template>
 			<template #part-header="{ part }">

@@ -15,7 +15,7 @@ $includesArray = array(
 		'public/css/components/searchbar/searchbar.css',
 		'public/css/Fhc.css',
 		'public/css/components/dashboard.css',
-		'public/css/components/calendar.css',
+		//'public/css/components/calendar.css', <= imported in dashboard.css
 		'public/css/components/Sprachen.css',
 		'public/css/components/MyLv.css',
 		'public/css/components/FilterComponent.css',
@@ -40,7 +40,7 @@ $includesArray = array(
 
 $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
-<div id="fhccontent" route=<?php echo $route ?>>
+<div id="fhccontent" class="h-100" route=<?php echo $route ?>>
 	<router-view 
 			:view-data='<?php echo json_encode($viewData) ?>'
 	></router-view>

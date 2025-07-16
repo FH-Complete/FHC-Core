@@ -76,7 +76,6 @@ export default {
 				<label-day
 					v-if="slot.event.orig == 'header'"
 					:date="slot.event.start"
-					class="text-center"
 					:class="{ disabled: day.month != slot.event.start.month }"
 				/>
 				<slot v-else v-bind="slot" />
