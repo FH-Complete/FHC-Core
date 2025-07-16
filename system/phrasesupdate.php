@@ -27419,6 +27419,26 @@ array(
 		array(
 			'app' => 'core',
 			'category' => 'profil',
+			'phrase' => 'profil',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profil',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Profile',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
 			'phrase' => 'gruppenLink',
 			'insertvon' => 'system',
 			'phrases' => array(
