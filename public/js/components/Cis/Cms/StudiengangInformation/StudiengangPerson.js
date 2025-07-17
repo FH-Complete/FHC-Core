@@ -20,7 +20,7 @@ export default {
 			<img  :src="base64Image" alt="mitarbeiter_foto" style="width: 110px; height: auto; object-fir:scale-down;" class="card-img-top" >
 		</div>
 		<div class="card-body p-2 flex-grow-0" style="min-height: 50px;">
-			<h6 class="text-center card-title mb-0">{{fullname}} <a v-if="profilViewLink" :href="profilViewLink"><i class="ms-2 fa fa-arrow-up-right-from-square fhc-primary-color" ></i></a></h6>
+			<h6 class="text-center card-title mb-0">{{fullname}} <a v-if="profilViewLink" :href="profilViewLink" :aria-label="$p.t('profil','profil')" :title="$p.t('profil','profil')"><i class="ms-2 fa fa-arrow-up-right-from-square fhc-primary-color" aria-hidden="true"></i></a></h6>
 		</div>
 		<hr class="my-0">
 		<div class="card-body p-2">

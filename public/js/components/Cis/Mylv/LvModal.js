@@ -75,7 +75,7 @@ export default {
 		return BsModal.popup.bind(this)(null, options);
 	},
 	template: /*html*/ `
-	<bs-modal ref="modalContainer" @showBsModal="onModalShow" @hideBsModal="onHideModal" v-bind="$props" :bodyClass="''" dialogClass='modal-lg' class="bootstrap-alert" :backdrop="false" >
+	<bs-modal ref="modalContainer" @showBsModal="onModalShow" @hideBsModal="onHideModal" :bodyClass="''" dialogClass='modal-lg' class="bootstrap-alert" :backdrop="false" >
 		<template v-slot:title>
 			<slot name="modalTitle"></slot>
 		</template>

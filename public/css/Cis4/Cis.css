@@ -808,3 +808,21 @@ html {
 .mylv-semester-studiengang-lv .card-header {
 	min-height: 55px;
 }
+
+#lektorenContainer{
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+
+}
+
+@media(max-width: 990px) {
+	#lektorenContainer{
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+}
+
+@media(max-width: 575px) {
+	#lektorenContainer {
+		grid-template-columns: 1fr 1fr;
+	}
+}

@@ -15,6 +15,7 @@ export default {
 				<div class="searchbar_icon">
 					<action :res="this.res" :action="this.actions.defaultaction" @actionexecuted="$emit('actionexecuted')">
 						<img v-if="(typeof res.foto !== 'undefined') && (res.foto !== null)"
+							 :alt="$p.t('profilUpdate','profilBild')"
 							 :src="'data:image/jpeg;base64,' + res.foto"
 							 class="rounded-circle" height="100"/>
 						<i v-else class="fas fa-user-circle fa-5x"></i>

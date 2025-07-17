@@ -287,7 +287,7 @@
 .fhc-calendar-past {
 	background-color: var(--fhc-calendar-past);
 	border-color: var(--fhc-calendar-border);
-	opacity: 0.5;
+	opacity: 0.75;
 }
 
 .fhc-calendar-month-page-day-focusday {

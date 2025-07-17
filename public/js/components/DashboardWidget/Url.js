@@ -204,10 +204,8 @@ export default {
 				<h2>{{$p.t('bookmark','editLink')}}</h2>
 			</template>
 			<template #default>
-				<label class="form-label" for="editTitle">Title</label>
-				<form-input id="editTitle" v-model="title_input" name="title" class="mb-2"></form-input>
-				<label class="form-label" for="editUrl">Url</label>
-				<form-input id="editUrl" v-model="url_input" name="url"></form-input>
+				<form-input  :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="editTitle" v-model="title_input" name="title" class="mb-2"></form-input>
+				<form-input label="Url" title="Url" id="editUrl" v-model="url_input" name="url"></form-input>
 			</template>
 			<template #footer>
 				<button @click="editBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
@@ -221,10 +219,8 @@ export default {
 				<h2>{{$p.t('bookmark','newLink')}}</h2>
 			</template>
 			<template #default>
-				<label class="form-label" for="insertTitle">Title</label>
-				<form-input id="insertTitle" v-model="title_input" name="title" class="mb-2"></form-input>
-				<label class="form-label" for="insertUrl">Url</label>
-				<form-input id="insertUrl" v-model="url_input" name="url"></form-input>
+				<form-input :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="insertTitle" v-model="title_input" name="title" class="mb-2"></form-input>
+				<form-input label="Url" title="Url" id="insertUrl" v-model="url_input" name="url"></form-input>
 			</template>
 			<template #footer>
 				<button @click="insertBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>

@@ -93,20 +93,20 @@ export default {
     }
   },
   template: /*html*/`
-  
+
     <p style="opacity:0.8" class="ms-2" v-if="withFiles && !updateID">{{$p.t('profilUpdate','profilUpdateInformationMessage',[data.titel])}}</p>
 
     <div class="form-underline">
     <div class="form-underline-titel">{{data.titel?data.titel:$p.t('global','titel')}}</div>
-    
-    <input  class="mb-2 form-control" @input="emitChanges"  v-model="data.value" :placeholder="data.value">
-  
+
+    <input  class="mb-2 form-control" @input="emitChanges" :aria-label="data.titel" :tooltip="data.titel"  v-model="data.value" :placeholder="data.value">
+
     <div class="row gx-2">
     <div class="col">
     <dms ref="update" v-if="withFiles" id="files" name="files" :multiple="false" v-model="dmsData" @update:model-value="didFilesChange"  ></dms>
     </div>
     <div class="col-auto">
-    <button @click="dmsData=[]" class="btn btn-danger"><i style="color:white" class="fa fa-trash"></i></button>
+    <button @click="dmsData=[]" class="btn btn-danger" :aria-label="$p.t('profilUpdate','deleteAttachment')" :title="$p.t('profilUpdate','deleteAttachment')" ><i style="color:white" class="fa fa-trash" aria-hidden="true"></i></button>
     </div>
     </div>
     </div>
