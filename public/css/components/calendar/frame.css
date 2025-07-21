@@ -127,6 +127,9 @@
 	height: calc(var(--fhc-calendar-fontsize-event, .875rem) + 2 * var(--fhc-calendar-margin-event-icon, .5rem));
 	overflow: hidden;
 }
+.fhc-calendar-mode-month .fhc-calendar-base-grid-line-event .placeholder-glow {
+	text-indent: 0;
+}
 .fhc-calendar-mode-month .fhc-calendar-base-grid-line-event * {
 	max-height: 100%;
 	max-width: 100%;

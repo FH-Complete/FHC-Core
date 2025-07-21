@@ -1,5 +1,8 @@
 export function useEventLoader(rangeInterval, getPromiseFunc) {
+	let loading_id = 0;
 	const events = Vue.ref([]);
+	const loadingEvents = Vue.ref([]);
+	const allEvents = Vue.computed(() => events.value.concat(loadingEvents.value));
 	const lv = Vue.ref(null);
 	const eventsLoaded = [];
 
@@ -93,8 +96,15 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 			}
 		}
 
-		if (start.ts > end.ts)
+		if (start.ts >= end.ts)
 			return result;
+
+		loadingEvents.value.push({
+			loading_id: loading_id++,
+			type: "loading",
+			isostart: start.toISODate() + 'T' + start.toISOTime(),
+			isoend: end.toISODate() + 'T' + end.toISOTime()
+		});
 
 		return mergePromiseArr(getPromiseFunc(start, end), result);
 	};
@@ -116,10 +126,11 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 							lv.value = res.value.meta.lv;
 
 						events.value = events.value.concat(res.value.data);
+						loadingEvents.value = [];
 					}
 				})
 			});
 	})
 
-	return { events, lv }
+	return { events: allEvents, lv }
 }

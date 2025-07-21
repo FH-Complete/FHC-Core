@@ -63,9 +63,14 @@ export default {
 				if (this.events.find(e => e == this.chosenEvent))
 					return this.chosenEvent;
 			}
+			let first = null;
 			if (this.events)
-				return this.events.find(Boolean); // undefined => none found
-			return null; // null => loading
+				first = this.events.find(Boolean); // undefined => none found
+
+			if (first && first.type == 'loading')
+				return null; // null => loading
+
+			return first;
 		}
 	},
 	watch: {
@@ -123,7 +128,10 @@ export default {
 				<label-time v-bind="{ part }" />
 			</template>
 			<template #event="slot">
-				<slot v-bind="slot" mode="day" />
+				<div v-if="slot.event.type == 'loading'" class="placeholder-glow h-100 opacity-50">
+					<span class="placeholder w-100 h-100" />
+				</div>
+				<slot v-else v-bind="slot" mode="day" />
 			</template>
 		</calendar-grid>
 		<Teleport :disabled="!gridMainRef" :to="gridMainRef">

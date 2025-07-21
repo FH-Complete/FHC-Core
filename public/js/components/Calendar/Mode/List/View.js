@@ -53,7 +53,10 @@ export default {
 		<div v-for="{ day, events } in eventsPerDay" class="text-center">
 			<label-dow :date="day" class="d-inline" />, <label-day :date="day" class="d-inline" />
 			<div v-for="event in events">
-				<slot :event="event.orig" mode="list" />
+ 				<div v-if="slot.event.type == 'loading'" class="placeholder-glow opacity-50">
+					<span class="placeholder w-100" />
+				</div>
+				<slot v-else :event="event.orig" mode="list" />
 			</div>
 		</div>
 	</div>

@@ -78,6 +78,9 @@ export default {
 					:date="slot.event.start"
 					:class="{ disabled: day.month != slot.event.start.month }"
 				/>
+				<div v-else-if="slot.event.type == 'loading'" class="placeholder-glow opacity-50">
+					<span class="placeholder w-100 fs-1" />
+				</div>
 				<slot v-else v-bind="slot" />
 			</template>
 		</calendar-grid>

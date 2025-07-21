@@ -66,7 +66,10 @@ export default {
 				<label-time v-bind="{ part }" />
 			</template>
 			<template #event="slot">
-				<slot v-bind="slot" />
+				<div v-if="slot.event.type == 'loading'" class="placeholder-glow h-100 opacity-50">
+					<span class="placeholder w-100 h-100" />
+				</div>
+				<slot v-else v-bind="slot" />
 			</template>
 		</calendar-grid>
 	</div>
