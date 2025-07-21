@@ -268,7 +268,7 @@ export default {
 			
 			if (!this.mutationObserver)
 				this.mutationObserver = new MutationObserver(mutations => {
-					if (mutations.some(m => [].some.call(m.addedNodes, el => el.matches('.fhc-calendar-base-grid-line-event'))))
+					if (mutations.some(m => m.addedNodes.length && [].some.call(m.addedNodes, el => el.matches && el.matches('.fhc-calendar-base-grid-line-event'))))
 						this.scrollToEarliestEvent();
 				});
 			this.mutationObserver.observe(this.$refs.body, {
