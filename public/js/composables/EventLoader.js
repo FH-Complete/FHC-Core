@@ -75,7 +75,7 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 						// starts at the same position as an existing chunk
 						if (eventsLoaded[index + 1] >= end.ts)
 							return []; // Already loaded
-						// load this rest
+						// load the rest
 						let rStart = eventsLoaded[index + 1] + 1;
 						result = mergePromiseArr(markEventsLoaded(start.plus(rStart - start.ts), end), result);
 					} else {
@@ -94,7 +94,7 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 		}
 
 		if (start.ts > end.ts)
-			return [];
+			return result;
 
 		return mergePromiseArr(getPromiseFunc(start, end), result);
 	};
