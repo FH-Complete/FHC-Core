@@ -41,7 +41,7 @@ export default {
 		eventsWithRowInfo() {
 			const events = [];
 			this.events.forEach(event => {
-				const rows = [2, -1];
+				const rows = [1, -1];
 				if (event.startsHere) {
 					rows[0] = 't_' + event.start.diff(this.date).toMillis();
 				}

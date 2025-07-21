@@ -214,7 +214,6 @@ export default {
 			const result = Array.from({length: this.axisMain.length}, () => Array());
 			
 			target.forEach(event => {
-				// NOTE(chris): make new Date object to reset the time
 				const start = event.start || this.axisMainBorders[0].plus(-1);
 				const end = event.end || this.axisMainBorders[this.axisMainBorders.length - 1].plus(1);
 
