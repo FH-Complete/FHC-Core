@@ -128,10 +128,10 @@ export default {
 			return ends;
 		},
 		axisMainBorders() {
-			const lastInMainAxis = this.axisMain[this.axisMain.length - 1];
-			const extraLength = this.end;
-
-			return [...this.axisMain, lastInMainAxis.plus(extraLength)];
+			return this.axisMain.reduce(
+				(res, curr) => res.concat([curr.plus(this.start), curr.plus(this.end)]),
+				[]
+			);
 		},
 		eventsAllDay() {
 			if (!this.allDayEvents)
@@ -218,9 +218,9 @@ export default {
 				const end = event.end || this.axisMainBorders[this.axisMainBorders.length - 1].plus(1);
 
 				for (var i = 0; i < this.axisMain.length; i++) {
-					if (start < this.axisMainBorders[i + 1] && end > this.axisMainBorders[i]) {
-						const startsHere = start >= this.axisMainBorders[i];
-						const endsHere = end <= this.axisMainBorders[i+1];
+					if (start < this.axisMainBorders[i * 2 + 1] && end > this.axisMainBorders[i * 2]) {
+						const startsHere = start >= this.axisMainBorders[i * 2];
+						const endsHere = end <= this.axisMainBorders[i * 2 + 1];
 						result[i].push({
 							...event,
 							startsHere,
