@@ -350,7 +350,10 @@ export default {
 						v-model="formData.beginn"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
+						locale="de"
 						format="dd.MM.yyyy"
+						model-type="yyyy-MM-dd"
 						name="beginn"
 						>
 					</form-input>
@@ -361,7 +364,10 @@ export default {
 						v-model="formData.ende"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
+						locale="de"
 						format="dd.MM.yyyy"
+						model-type="yyyy-MM-dd"
 						name="ende"
 						>
 					</form-input>
@@ -375,7 +381,10 @@ export default {
 						v-model="formData.gesperrtbis"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
+						locale="de"
 						format="dd.MM.yyyy"
+						model-type="yyyy-MM-dd"
 						name="gesperrtbis"
 						>
 					</form-input>
