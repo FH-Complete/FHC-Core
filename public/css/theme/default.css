@@ -263,3 +263,7 @@ html.dark .tabulator .tabulator-cell {
 html.dark .tabulator .tabulator-header .tabulator-col:hover {
 	background-color: var(--fhc-tertiary) !important;
 }
+
+.p-paginator{
+	background-color: var(--fhc-background) !important;
+}
