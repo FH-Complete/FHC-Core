@@ -42,7 +42,6 @@ export default {
 								hour12: false
 							});
 						}},
-					{title: "Akzeptiertvon", field: "insertvonma"},
 					{
 						title: "UploadDatum", field: "hochgeladenamum",
 						formatter: function (cell) {
@@ -57,6 +56,7 @@ export default {
 								hour12: false
 							});
 						}},
+					{title: "Akzeptiertvon", field: "insertvonma"},
 					{title: "Kurzbz", field: "dokument_kurzbz", visible: false},
 					{title: "Prestudent ID", field: "prestudent_id", visible: false},
 					{title: "nachgereicht", field: "nachgereicht", visible: false,
@@ -69,7 +69,7 @@ export default {
 					{title: "infotext", field: "infotext"},
 					{title: "akte_id", field: "akte_id"},
 					{title: "dms_id", field: "dms_id", visible: false},
-					{title: "titel", field: "titel_intern"},
+					{title: "titel", field: "titel_intern", visible: false},
 					{title: "vorhanden", field: "vorhanden",
 						formatter:"tickCross",
 						hozAlign:"center",
@@ -196,7 +196,7 @@ export default {
 							title: this.$p.t('global', 'akte_id')
 						});
 						cm.getColumnByField('nachgereicht_am').component.updateDefinition({
-							title: this.$p.t('global', 'dokument')
+							title: this.$p.t('dokumente', 'nachreichungAm')
 						});
 					}
 				},

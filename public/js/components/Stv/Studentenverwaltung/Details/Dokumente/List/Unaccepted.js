@@ -349,8 +349,6 @@ export default {
 			@click:new="actionUploadFile"
 		>
 			<template #actions="{selected}">
-			<p v-for="name in selected">
-			{{name.dokument_kurzbz}}</p>
 				<button
 					class="btn btn-primary"
 					@click="acceptDocuments(selected)"
