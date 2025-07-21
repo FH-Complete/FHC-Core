@@ -22,7 +22,7 @@ export default {
 			class="overflow-hidden"
 			:endpoint="endpoint"
 			ref="formc"
-			notiz-layout="twoColumnsFormLeft"
+			notiz-layout="popupModal"
 			type-id="person_id"
 			:id="modelValue.person_id"
 			show-document

@@ -29,15 +29,15 @@ class NotizBestellung extends Notiz_Controller
 	{
 		if($typeId != "bestellung_id")
 		{
-			return $this->terminateWithError($this->p->t('ui','error_typeNotizIdIncorrect'), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('ui','error_typeNotizIdIncorrect'), self::ERROR_TYPE_GENERAL);
 		}
 		//TODO define permission
 		if(!$this->permissionlib->isBerechtigt('admin', 'suid') && !$this->permissionlib->isBerechtigt('assistenz', 'suid'))
 		{
 			$result =  $this->p->t('lehre','error_keineSchreibrechte');
 
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		return $this->terminateWithSuccess("berechtigt in überschreibender Funktion");
+		$this->terminateWithSuccess("berechtigt in überschreibender Funktion");
 	}
 }

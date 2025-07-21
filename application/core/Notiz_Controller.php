@@ -96,13 +96,13 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
-		return $this->terminateWithSuccess(getData($result) ?: []);
+		$this->terminateWithSuccess(getData($result) ?: []);
 	}
 
 
 	//Override function
 	protected function isBerechtigt($id, $typeId){
-		return $this->terminateWithError("in abstract function: define right in extension", self::ERROR_TYPE_GENERAL);
+		$this->terminateWithError("in abstract function: define right in extension", self::ERROR_TYPE_GENERAL);
 	}
 
 	public function loadNotiz()
@@ -142,14 +142,9 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 		$uid = getAuthUID();
 
-		if (isset($_POST['data']))
-		{
-			$data = json_decode($_POST['data']);
-			unset($_POST['data']);
-			foreach ($data as $k => $v) {
-				$_POST[$k] = $v;
-			}
-		}
+		$json = $this->input->post('data');
+		$post_data = json_decode($json, true);
+		$this->form_validation->set_data($post_data);
 
 		//Form Validation
 		$this->form_validation->set_rules('titel', 'Titel', 'required', [
@@ -165,26 +160,25 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
-		$titel = $this->input->post('titel');
-		$text = $this->input->post('text');
-		$erledigt = $this->input->post('erledigt');
-		$verfasser_uid = isset($_POST['verfasser']) ? $_POST['verfasser'] : $uid;
-		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : null;
-		$type = $this->input->post('typeId');
-		$start = $this->input->post('start');
-		$ende = $this->input->post('ende');
+		$titel =  $post_data['titel'];
+		$text = $post_data['text'];
+		$erledigt = $post_data['erledigt'];
+		$bearbeiter_uid = isset($post_data['bearbeiter']) ? $post_data['bearbeiter'] : null;
+		$type = $post_data['typeId'];
+		$start = isset($post_data['start']) ? $post_data['start'] : null;
+		$ende = isset($post_data['ende']) ? $post_data['ende'] : null;
 
 		// Start DB transaction
 		$this->db->trans_start();
 
 		//Save note
-		$result = $this->NotizModel->insert(array('titel' => $titel, 'text' => $text, 'erledigt' => $erledigt, 'verfasser_uid' => $verfasser_uid,
-			"insertvon" => $verfasser_uid, 'start' => $start, 'ende' => $ende, 'bearbeiter_uid' => $bearbeiter_uid));
+		$result = $this->NotizModel->insert(array('titel' => $titel, 'text' => $text, 'erledigt' => $erledigt, 'verfasser_uid' => $uid,
+			"insertvon" => $uid, 'start' => $start, 'ende' => $ende, 'bearbeiter_uid' => $bearbeiter_uid));
 
 		if (isError($result))
 		{
 			$this->db->trans_rollback();
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 
 		$notiz_id = $result->retval;
@@ -219,7 +213,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			if (isError($result))
 			{
 				$this->db->trans_rollback();
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 			}
 			$dms_id_arr[] = $result->retval['dms_id'];
 		}
@@ -234,12 +228,12 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 				if (isError($result))
 				{
 					$this->db->trans_rollback();
-					return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+					$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 				}
 			}
 		}
 		$this->db->trans_commit();
-		return $this->terminateWithSuccess($result);
+		$this->terminateWithSuccess($result);
 	}
 
 	public function updateNotiz()
@@ -247,21 +241,14 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$this->load->library('form_validation');
 		$this->load->library('DmsLib');
 
-		if (isset($_POST['data']))
-		{
-			$data = json_decode($_POST['data']);
-			unset($_POST['data']);
-			foreach ($data as $k => $v) {
-				$_POST[$k] = $v;
-			}
-		}
+		$json = $this->input->post('data');
+		$post_data = json_decode($json, true);
 
-		$notiz_id = $this->input->post('notiz_id');
+		$this->form_validation->set_data($post_data);
 
-		if(!$notiz_id)
-		{
-			$this->terminateWithError($this->p->t('ui','error_missingId',['id'=>'Notiz_id']), self::ERROR_TYPE_GENERAL);
-		}
+		$this->form_validation->set_rules('notiz_id', 'Notiz ID', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'notiz_id'])
+		]);
 
 		//Form Validation
 		$this->form_validation->set_rules('titel', 'Titel', 'required', [
@@ -279,25 +266,23 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 		//update Notiz
 		$uid = getAuthUID();
-		$titel = $this->input->post('titel');
-		$text = $this->input->post('text');
-		$verfasser_uid = isset($_POST['verfasser']) ? $_POST['verfasser'] : $uid;
-		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : $uid;
-		$erledigt = $this->input->post('erledigt');
-		$start = $this->input->post('start');
-		$ende = $this->input->post('ende');
+		$titel = $post_data['titel'];
+		$text = $post_data['text'];
+		$bearbeiter_uid = isset($post_data['bearbeiter']) ? $post_data['bearbeiter'] : $post_data['bearbeiter_uid'];
+		$erledigt = $post_data['erledigt'];
+		$start = $post_data['start'];
+		$ende = $post_data['ende'];
 
 		$result = $this->NotizModel->update(
 			[
-				'notiz_id' => $notiz_id
+				'notiz_id' => $post_data['notiz_id'],
 			],
 			[
 				'titel' =>  $titel,
 				'updatevon' => $uid,
 				'updateamum' => date('c'),
 				'text' => $text,
-				'verfasser_uid' => $verfasser_uid,
-				'bearbeiter_uid' => $bearbeiter_uid,
+				'bearbeiter_uid' => isEmptyString($bearbeiter_uid) ? null : $bearbeiter_uid,
 				'start' => $start,
 				'ende' => $ende,
 				'erledigt' => $erledigt
@@ -305,7 +290,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		);
 		if (isError($result))
 		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 
 		//update(1) loading all dms-entries with this notiz_id
@@ -313,7 +298,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 		$this->NotizdokumentModel->addJoin('campus.tbl_dms_version', 'dms_id');
 
-		$result = $this->NotizdokumentModel->loadWhere(array('notiz_id' => $notiz_id));
+		$result = $this->NotizdokumentModel->loadWhere(array('notiz_id' => $post_data['notiz_id']));
 		$result = $this->getDataOrTerminateWithError($result);
 		foreach ($result as $doc) {
 			$dms_id_arr[$doc->dms_id] = array(
@@ -350,7 +335,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 				$result = $this->getDataOrTerminateWithError($result);
 				$dms_id = $result['dms_id'];
 
-				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
+				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $post_data['notiz_id'], 'dms_id' => $dms_id));
 
 				$this->getDataOrTerminateWithError($result);
 			}
@@ -364,7 +349,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			$this->getDataOrTerminateWithError($result);
 		}
 
-		return $this->terminateWithSuccess($result);
+		$this->terminateWithSuccess($result);
 	}
 
 	public function deleteNotiz()
@@ -415,15 +400,15 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		if (isError($result))
 		{
 			$this->db->trans_rollback();
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 		if(!hasData($result))
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId', ['id'=> 'Notiz_id']), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('ui','error_missingId', ['id'=> 'Notiz_id']), self::ERROR_TYPE_GENERAL);
 		}
 
 		$this->db->trans_complete();
-		return $this->terminateWithSuccess(getData($result));
+		$this->terminateWithSuccess(getData($result));
 	}
 
 	public function loadDokumente()
@@ -439,14 +424,14 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			array('public.tbl_notiz.notiz_id' => $notiz_id)
 		);
 		if (isError($result)) {
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 
 		if(!hasData($result))
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId', ['id'=> 'Notiz_id']), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('ui','error_missingId', ['id'=> 'Notiz_id']), self::ERROR_TYPE_GENERAL);
 		}
-		return $this->terminateWithSuccess(getData($result));
+		$this->terminateWithSuccess(getData($result));
 	}
 
 	public function getMitarbeiter($searchString)
@@ -456,7 +441,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		if (isError($result)) {
 			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		return $this->terminateWithSuccess($result);
+		$this->terminateWithSuccess($result);
 	}
 
 }

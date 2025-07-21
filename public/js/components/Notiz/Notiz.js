@@ -1,5 +1,4 @@
 import VueDatePicker from '../vueDatepicker.js.php';
-import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import FormUploadDms from '../Form/Upload/Dms.js';
 import {CoreFilterCmpt} from "../filter/Filter.js";
 import BsModal from "../Bootstrap/Modal.js";
@@ -11,7 +10,6 @@ export default {
 	components: {
 		CoreFilterCmpt,
 		VueDatePicker,
-		PvAutoComplete,
 		FormUploadDms,
 		FormForm,
 		FormInput,
@@ -281,6 +279,7 @@ export default {
 				showId: false,
 				showLastupdate: false
 			},
+			currentVerfasserUid: null
 		}
 	},
 	methods: {
@@ -308,8 +307,6 @@ export default {
 					this.notizData.bis = this.notizen.ende;
 					this.notizData.document = this.notizen.dms_id;
 					this.notizData.erledigt = this.notizen.erledigt;
-					this.notizData.verfasser = this.notizen.verfasser_uid;
-					this.notizData.intVerfasser = this.notizen.verfasser_uid;
 					this.notizData.intBearbeiter = this.notizen.bearbeiter_uid;
 					this.notizData.bearbeiter = this.notizen.bearbeiter_uid;
 				}
@@ -373,6 +370,7 @@ export default {
 					this.notizData = result.data;
 					this.notizData.typeId = this.typeId;
 					this.notizData.anhang = [];
+					this.currentVerfasserUid = result.data.verfasser_uid;
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -425,16 +423,17 @@ export default {
 				bis: null,
 				document: null,
 				erledigt: false,
-				verfasser: this.uid,
 				bearbeiter: null,
-				anhang: []
+				anhang: [],
 			};
+			this.currentVerfasserUid = this.uid
 		},
 		getUid() {
 			return this.$api
 				.call(this.endpoint.getUid())
 				.then(result => {
-					this.notizData.intVerfasser = result.data;
+					this.currentVerfasserUid = result.data;
+					this.uid = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -518,14 +517,7 @@ export default {
 			},
 			deep: true
 		},
-		'notizData.intVerfasser': {
-			handler(newVal) {
-				if (typeof newVal === 'object') {
-					this.notizData.verfasser = newVal.mitarbeiter_uid;
-				}
-			},
-			deep: true
-		},
+
 		id() {
 			this.reload();
 		}
@@ -627,24 +619,23 @@ export default {
 					<div class="row mb-3">
 						<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','verfasser')}}</label>
 											
-						<div v-if="notizData.verfasser_uid" class="col-sm-3">
-							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="notizData.verfasser_uid">
-						</div>
-						<div v-else class="col-sm-3">
-							<PvAutoComplete v-model="notizData.intVerfasser" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
+						<div class="col-sm-3">
+							<input type="text" readonly="readonly" class="form-control" id="name" v-model="currentVerfasserUid">
 						</div>
 						
 						<label for="von" class="form-label col-sm-1">{{$p.t('global','gueltigVon')}}</label>
 						<div class="col-sm-3">
-							<vue-date-picker
-								id="von"
-								v-model="notizData.start"
-								clearable="false"
+							<form-input
+								type="DatePicker"
+								v-model="notizData['start']"
+								name="von"
 								auto-apply
 								:enable-time-picker="false"
 								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
 								:teleport="true"
-								preview-format="dd.MM.yyyy"></vue-date-picker>
+								>
+							</form-input>
 						</div>
 					</div>
 					
@@ -652,26 +643,35 @@ export default {
 						<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','bearbeiter')}}</label>
 						
 						<div v-if="notizData.bearbeiter_uid" class="col-sm-3">
-							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="notizData.bearbeiter_uid">
+							<input type="text" class="form-control" id="name" v-model="notizData.bearbeiter_uid">
 						</div>
 						
 						<div v-else class="col-sm-3">
-							<PvAutoComplete v-model="notizData.intBearbeiter" optionLabel="mitarbeiter" :suggestions="filteredMitarbeiter" @complete="search" minlength="3"/>
+							<form-input
+								type="autocomplete"
+								v-model="notizData.intBearbeiter"
+								:suggestions="filteredMitarbeiter" 
+								@complete="search" 
+								optionLabel="mitarbeiter"
+								minlength="3"
+							>
+							</form-input>
 						</div>
 						
 						
 						<label for="bis" class="form-label col-sm-1">{{$p.t('global','gueltigBis')}}</label>
 						<div class="col-sm-3">
-							<vue-date-picker
-								id="bis"
+							<form-input
+								type="DatePicker"
 								v-model="notizData.ende"
-								clearable="false"
+								name="bis"
 								auto-apply
 								:enable-time-picker="false"
 								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
 								:teleport="true"
-								preview-format="dd.MM.yyyy">
-							</vue-date-picker>
+								>
+							</form-input>
 						</div>
 					</div>
 										
@@ -811,28 +811,15 @@ export default {
 							
 							<div class="row mb-3">
 								<form-input 
-									v-if="notizData.verfasser_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
 									type="text"
-									v-model="notizData.verfasser_uid"
-									name="titel"
+									readonly="readonly"
+									v-model="currentVerfasserUid"
+									name="verfasser"
 									>
 								</form-input>
-						
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'verfasser')"
-									type="autocomplete"
-									v-model="notizData.intVerfasser"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minLength="3"
-									>
-								</form-input>
-								
+
 								<form-input
 									v-if="notizData.bearbeiter_uid"
 									container-class="col-6"
@@ -977,25 +964,12 @@ export default {
 					
 							<div class="row mb-3">
 								<form-input 
-									v-if="notizData.verfasser_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
 									type="text"
-									v-model="notizData.verfasser_uid"
-									name="titel"
-									>
-								</form-input>
-						
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'verfasser')"
-									type="autocomplete"
-									v-model="notizData.intVerfasser"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minLength="3"
+									readonly="readonly"
+									v-model="currentVerfasserUid"
+									name="verfasser"
 									>
 								</form-input>
 								
@@ -1164,28 +1138,15 @@ export default {
 					
 							<div class="row mb-3">
 								<form-input 
-									v-if="notizData.verfasser_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
 									type="text"
-									v-model="notizData.verfasser_uid"
-									name="titel"
+									readonly="readonly"
+									v-model="currentVerfasserUid"
+									name="verfasser"
 									>
 								</form-input>
-						
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'verfasser')"
-									type="autocomplete"
-									v-model="notizData.intVerfasser"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minLength="3"
-									>
-								</form-input>
-								
+					
 								<form-input
 									v-if="notizData.bearbeiter_uid"
 									container-class="col-6"

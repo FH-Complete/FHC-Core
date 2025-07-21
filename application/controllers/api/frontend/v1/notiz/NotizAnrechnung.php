@@ -29,7 +29,7 @@ class NotizAnrechnung extends Notiz_Controller
 	{
 		if($typeId != "anrechnung_id")
 		{
-			return $this->terminateWithError($this->p->t('ui','error_typeNotizIdIncorrect'), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('ui','error_typeNotizIdIncorrect'), self::ERROR_TYPE_GENERAL);
 		}
 
 		//TODO define permission
@@ -37,8 +37,8 @@ class NotizAnrechnung extends Notiz_Controller
 		{
 			$result =  $this->p->t('lehre','error_keineSchreibrechte');
 
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		return $this->terminateWithSuccess("berechtigt in überschreibender Funktion");
+		$this->terminateWithSuccess("berechtigt in überschreibender Funktion");
 	}
 }
