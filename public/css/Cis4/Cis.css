@@ -19,6 +19,11 @@ html {
 	filter: brightness(120%);
 }
 
+.fhc-primary{
+	background-color: var(--fhc-primary) !important;
+	color: var(--fhc-light) !important;
+}
+
 .fhc-primary-color{
 	color: var(--fhc-primary) !important;
 }
@@ -29,6 +34,10 @@ html {
 
 .fhc-primary-highlight-bg {
 	background-color: var(--fhc-primary-highlight) !important;
+}
+
+.fhc-primary-highlight-color {
+	color: var(--fhc-primary-highlight) !important;
 }
 
 .fhc-body-bg{
@@ -95,6 +104,10 @@ html {
 
 .fhc-text{
 	color: var(--fhc-text) !important;
+}
+
+.fhc-text-light{
+	color: var(--fhc-light) !important;
 }
 
 :root{	
