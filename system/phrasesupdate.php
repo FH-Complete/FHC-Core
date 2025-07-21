@@ -46373,6 +46373,26 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'chooseStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte StudentIn auswählen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select a student!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// FHC-4 Studierendenverwaltung FHC-ALERTS END
 	
 	//****************************	 CORE/search

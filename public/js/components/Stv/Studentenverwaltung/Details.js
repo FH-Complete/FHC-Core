@@ -60,7 +60,7 @@ export default {
 	template: `
 	<div class="stv-details h-100 pb-3 d-flex flex-column">
 		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
-			Bitte StudentIn auswählen!
+			{{$p.t('ui', 'chooseStudent')}}
 		</div>
 		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100 pb-3">
 			<fhc-header
