@@ -46,6 +46,7 @@ export default {
 	template: /* html */`
 	<div class="fhc-calendar-mode-week-view h-100">
 		<calendar-grid
+			ref="grid"
 			:axis-main="axisMain"
 			:axis-parts="axisParts"
 			:axis-main-collapsible="collapseEmptyDays"
