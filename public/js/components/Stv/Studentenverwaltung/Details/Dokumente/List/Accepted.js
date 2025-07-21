@@ -172,7 +172,7 @@ export default {
 							title: this.$p.t('mobility', 'kurzbz')
 						});
 						cm.getColumnByField('insertvonma').component.updateDefinition({
-							title: this.$p.t('global', 'uploaddatum')
+							title: this.$p.t('dokumente', 'akzeptiertVon')
 						});
 						cm.getColumnByField('hochgeladenamum').component.updateDefinition({
 							title: this.$p.t('global', 'uploaddatum')
