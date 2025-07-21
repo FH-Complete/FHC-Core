@@ -57,7 +57,10 @@ export default {
 	},
 	data() {
 		return {
-			dragging: false
+			dragging: false,
+			resizeObserver: null,
+			mutationObserver: null,
+			userScroll: true
 		};
 	},
 	computed: {
@@ -255,7 +258,55 @@ export default {
 			}
 
 			return dayTimestamp + this.start + Math.floor((this.end - this.start) * mouseFrac);
+		},
+		
+		/* SCROLLING */
+		enableAutoScroll() {
+			if (!this.resizeObserver)
+				this.resizeObserver = new ResizeObserver(this.scrollToEarliestEvent);
+			this.resizeObserver.observe(this.$refs.body);
+			
+			if (!this.mutationObserver)
+				this.mutationObserver = new MutationObserver(mutations => {
+					if (mutations.some(m => [].some.call(m.addedNodes, el => el.matches('.fhc-calendar-base-grid-line-event'))))
+						this.scrollToEarliestEvent();
+				});
+			this.mutationObserver.observe(this.$refs.body, {
+				subtree: true,
+				childList: true
+			});
+
+			this.scrollToEarliestEvent();
+		},
+		disableAutoScroll() {
+			if (this.resizeObserver)
+				this.resizeObserver.disconnect();
+			this.resizeObserver = null;
+
+			if (this.mutationObserver)
+				this.mutationObserver.disconnect();
+			this.mutationObserver = null;
+		},
+		scrollToEarliestEvent() {
+			const eventElements = this.$refs.scroller.querySelectorAll('.fhc-calendar-base-grid-line-event');
+			const earliestEventOffset = eventElements.values()
+				.reduce((res, el) => {
+					const top = el.offsetTop;
+					if (!res[1] || top < res[0])
+						return [top, el];
+					return res;
+				}, [0, null]);
+			
+			this.userScroll = false;
+			if (earliestEventOffset[1]) {
+				earliestEventOffset[1].scrollIntoView({ behavior: "smooth" });
+			} else {
+				this.$refs.scroller.scrollTo(0, 0);
+			}
 		}
+	},
+	beforeUnmount() {
+		this.disableAutoScroll();
 	},
 	template: /* html */`
 	<div
@@ -302,6 +353,8 @@ export default {
 			</div>
 		</div>
 		<div
+			ref="scroller"
+			@scrollend="userScroll ? disableAutoScroll() : userScroll = true"
 			style="display:grid;overflow:auto"
 			:style="'grid-' + axisCol + ':1/-1;grid-template-' + axisCol + 's:subgrid'"
 		>

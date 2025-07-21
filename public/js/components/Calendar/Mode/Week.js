@@ -44,12 +44,12 @@ export default {
 	watch: {
 		currentDate() {
 			if (this.currentDate.locale != this.focusDate.locale) {
-				console.log(this.focusDate.toISODate(), this.currentDate.toISODate());
 				this.focusDate = this.currentDate;
 				this.$emit('update:range', this.range);
 			} else {
 				this.rangeOffset = this.currentDate.startOf('week', { useLocaleWeeks: true }).diff(this.focusDate.startOf('week', { useLocaleWeeks: true }), 'weeks').weeks;
 				if (this.rangeOffset) {
+					this.$refs.view.$refs.grid.disableAutoScroll();
 					this.$emit('update:range', this.range);
 					this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
 				}
@@ -59,11 +59,13 @@ export default {
 	methods: {
 		prevPage() {
 			this.rangeOffset = this.$refs.slider.target - 1;
+			this.$refs.view.$refs.grid.disableAutoScroll();
 			this.$emit('update:range', this.range);
 			this.$refs.slider.prevPage().then(this.updatePage);
 		},
 		nextPage() {
 			this.rangeOffset = this.$refs.slider.target + 1;
+			this.$refs.view.$refs.grid.disableAutoScroll();
 			this.$emit('update:range', this.range);
 			this.$refs.slider.nextPage().then(this.updatePage);
 		},
@@ -73,6 +75,7 @@ export default {
 			this.rangeOffset = 0;
 			this.$emit('update:currentDate', this.focusDate);
 			this.$emit('update:range', this.range);
+			this.$refs.view.$refs.grid.enableAutoScroll();
 		},
 		viewAttrs(weeks) {
 			const day = this.focusDate.plus({ weeks });
@@ -93,6 +96,7 @@ export default {
 	},
 	mounted() {
 		this.$emit('update:range', this.range);
+		this.$refs.view.$refs.grid.enableAutoScroll();
 	},
 	template: `
 	<div
@@ -100,7 +104,7 @@ export default {
 		@cal-click-default.capture="handleClickDefaults"
 	>
 		<base-slider ref="slider" v-slot="slot">
-			<week-view v-bind="viewAttrs(slot.offset)">
+			<week-view ref="view" v-bind="viewAttrs(slot.offset)">
 				<template v-slot="slot"><slot v-bind="slot" mode="week" /></template>
 			</week-view>
 		</base-slider>

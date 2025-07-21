@@ -46,6 +46,7 @@ export default {
 		currentDate() {
 			this.rangeOffset = this.currentDate.startOf('day').diff(this.focusDate.startOf('day'), 'days').days;
 			if (this.rangeOffset) {
+				this.$refs.view.$refs.grid.disableAutoScroll();
 				this.$emit('update:range', this.range);
 				this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
 			}
@@ -54,11 +55,13 @@ export default {
 	methods: {
 		prevPage() {
 			this.rangeOffset = this.$refs.slider.target - 1;
+			this.$refs.view.$refs.grid.disableAutoScroll();
 			this.$emit('update:range', this.range);
 			this.$refs.slider.prevPage().then(this.updatePage);
 		},
 		nextPage() {
 			this.rangeOffset = this.$refs.slider.target + 1;
+			this.$refs.view.$refs.grid.disableAutoScroll();
 			this.$emit('update:range', this.range);
 			this.$refs.slider.nextPage().then(this.updatePage);
 		},
@@ -68,6 +71,7 @@ export default {
 			this.rangeOffset = 0;
 			this.$emit('update:currentDate', this.focusDate);
 			this.$emit('update:range', this.range);
+			this.$refs.view.$refs.grid.enableAutoScroll();
 		},
 		viewAttrs(days) {
 			const day = this.focusDate.plus({ days });
@@ -76,6 +80,7 @@ export default {
 	},
 	mounted() {
 		this.$emit('update:range', this.range);
+		this.$refs.view.$refs.grid.enableAutoScroll();
 	},
 	template: `
 	<div
@@ -83,6 +88,7 @@ export default {
 	>
 		<base-slider ref="slider" v-slot="slot">
 			<day-view
+				ref="view"
 				v-bind="viewAttrs(slot.offset)"
 				@request-modal-open="$emit('requestModalOpen', $event)"
 				@request-modal-close="$emit('requestModalClose', $event)"
