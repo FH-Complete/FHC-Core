@@ -5,13 +5,6 @@ import BsModal from '../Bootstrap/Modal.js';
 
 import CalClick from '../../directives/Calendar/Click.js';
 
-/**
- * TODO(chris):
- * - check emits
- * - event single mode (default for click:event)
- * - get focusDate/currentDate correct
- */
-
 export default {
 	name: "CalendarBase",
 	components: {

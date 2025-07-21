@@ -1,3 +1,5 @@
+// TODO(chris): load events that are longer than the interval without doubling it
+
 export function useEventLoader(rangeInterval, getPromiseFunc) {
 	let loading_id = 0;
 	const events = Vue.ref([]);
