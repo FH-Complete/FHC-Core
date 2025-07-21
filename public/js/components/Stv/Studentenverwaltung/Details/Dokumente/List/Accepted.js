@@ -151,7 +151,7 @@ export default {
 				height: 300,
 				selectable: true,
 				selectableRangeMode: 'click',
-				persistenceID: 'core-details-documents-accepted',
+				persistenceID: 'core-details-documents-accepted-2025072101',
 				listDocuments: [],
 			},
 			tabulatorEvents: [
