@@ -37,6 +37,10 @@ export default {
 		},
 		lists: {
 			from: 'lists'
+		},
+		$reloadList: {
+			from: '$reloadList',
+			required: true
 		}
 	},
 	props: {
@@ -136,6 +140,8 @@ export default {
 						this.$refs.form.setFeedback(true, cleanedFeedback);
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					}
+
+					this.$reloadList();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
