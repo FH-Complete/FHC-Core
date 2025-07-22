@@ -63,6 +63,14 @@ export default {
 					if (!el.classList.contains("fhc-primary")) {
 						el.classList.add("fhc-primary");
 					}
+					if (!el.classList.contains("position-sticky")) {
+						el.classList.add("position-sticky");
+					}
+					if (!el.classList.contains("top-0")) {
+						el.classList.add("top-0");
+					}
+					
+					
 				});
 				document.querySelectorAll(".fhc-news-card-item .card-header .row").forEach((el) => {
 					if (!el.classList.contains("w-100")) {
