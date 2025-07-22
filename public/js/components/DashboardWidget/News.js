@@ -52,6 +52,36 @@ export default {
 		}
 	},
 	methods: {
+		updateNewsContentClasses:function(){
+			Vue.nextTick(() => {
+				document.querySelectorAll(".fhc-news-card-item .card-body, .fhc-news-card-item .card, .fhc-news-card-item .card-header").forEach((el) => {
+					if (!el.classList.contains("border-0")) {
+						el.classList.add("border-0");
+					}
+				});
+				document.querySelectorAll(".fhc-news-card-item .card-header").forEach((el) => {
+					if (!el.classList.contains("px-5")) {
+						el.classList.add("px-5");
+					}
+					if (!el.classList.contains("fhc-primary")) {
+						el.classList.add("fhc-primary");
+					}
+				});
+				document.querySelectorAll(".fhc-news-card-item .card-header .row").forEach((el) => {
+					if (!el.classList.contains("w-100")) {
+						el.classList.add("w-100");
+					}
+					if (!el.classList.contains("align-items-center")) {
+						el.classList.add("align-items-center");
+					}
+				});
+				document.querySelectorAll(".fhc-news-card-item .card-header .row h2").forEach((el) => {
+					if (!el.classList.contains("mb-0")) {
+						el.classList.add("mb-0");
+					}
+				});
+			})
+		},
 		formatDate: function (dateTime) {
 			const dt = new Date(dateTime);
 			return dt.getDate() + '.' + (dt.getMonth() + 1) + '.' + dt.getFullYear();				
@@ -68,12 +98,15 @@ export default {
 			const nextIndex = thisIndex == (this.allNewsList.length - 1) ? 0 : thisIndex + 1
 
 			this.setSelected(this.allNewsList[nextIndex])
+			this.updateNewsContentClasses();
+			
 		},
 		setPrev() {
 			const thisIndex = this.allNewsList.findIndex(n=>n.news_id == this.selected.news_id)
 			const prevIndex = thisIndex ? thisIndex - 1 : this.allNewsList.length - 1
 			
 			this.setSelected(this.allNewsList[prevIndex])
+			this.updateNewsContentClasses();
 		},
 		getMenuItemClass(news) {
 			let classString = ''
@@ -155,24 +188,7 @@ export default {
 				this.selected = this.allNewsList.length ? this.allNewsList[0] : null
 				this.initActiveItem()
 
-				Vue.nextTick(() => {
-					document.querySelectorAll(".fhc-news-card-item .card-body, .fhc-news-card-item .card, .fhc-news-card-item .card-header").forEach((el) => {
-						el.classList.add("border-0");
-					});
-
-					document.querySelectorAll(".fhc-news-card-item .card-header").forEach((el) => {
-						el.classList.add("px-5");
-						el.classList.add("fhc-primary");
-					});
-					document.querySelectorAll(".fhc-news-card-item .card-header .row").forEach((el) => {
-						el.classList.add("w-100");
-						el.classList.add("align-items-center");
-
-					});
-					document.querySelectorAll(".fhc-news-card-item .card-header .row h2").forEach((el) => {
-						el.classList.add("mb-0");
-					});
-				})
+				this.updateNewsContentClasses();
 				
 			})
 			.catch((err) => {
@@ -208,7 +224,7 @@ export default {
         <div class="h-100 fhc-news-items-sm" style="overflow-y: auto" v-show="width == 1" >
             <div  v-for="(news, index) in newsList" :key="news.news_id" class="py-2">
 				<div class="row m-0">
-					<div class="col-3 d-flex">
+					<div class="col-12 col-md-3 d-flex">
 						<span class="small">{{ formatDate(news.insertamum) }} </span>
 						<span class="ms-auto small">{{ formatTime(news.insertamum) }} </span>
 					</div>
@@ -219,20 +235,20 @@ export default {
 			</div>
 		</div>
         <div v-show="width >1" class="row h-100 g-0">
-        	<div :class="'col-'+(width == 2? 6 : 4) + ' h-100 g-0'" style="overflow: auto;" class="fhc-news-items-lg border-end" >
+        	<div style="overflow: auto;" class="fhc-news-items-lg border-end h-100 g-0 col-12 col-sm-3 col-md-4 col-lg-5" >
         		<template v-for="news in newsList" :key="'menu-'+news.news_id" >
 				<div class="row m-0 py-2" @click="setSelected(news)">
-					<div class="col-3 d-flex">
+					<div class="col-md-12 d-flex">
 						<span class="small">{{ formatDate(news.insertamum) }} </span>
 						<span class="ms-auto small">{{ formatTime(news.insertamum) }} </span>
 					</div>
-					<div class="col">
+					<div class="col-md-12">
 						<span >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</span>
 					</div>
 				</div>
 				</template>
 			</div>
-			<div :class="'col-'+(width == 2? 6 : 8) + ' h-100'" style="padding-left: 0px; padding-right: 0px;" ref="htmlContent">
+			<div style="padding-left: 0px; padding-right: 0px;" ref="htmlContent" class="h-100 col-12 col-sm-9 col-md-8 col-lg-7">
 				<div class="container h-100" style="padding: 0px;"  ref="carocontainer">
 					<div id="FhcCarouselContainer" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel" data-bs-interval="false">
 
