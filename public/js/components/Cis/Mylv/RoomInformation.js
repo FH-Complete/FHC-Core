@@ -1,259 +1,194 @@
-import FhcCalendar from "../../Calendar/Calendar.js";
+import FhcCalendar from "../../Calendar/Base.js";
 import CalendarDate from "../../../composables/CalendarDate.js";
-import LvModal from "../../../components/Cis/Mylv/LvModal.js";
 import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
 
 import ApiStudenplan from '../../../api/factory/lvPlan.js';
 
+import { useEventLoader } from '../../../composables/EventLoader.js';
+
+import ModeDay from '../../Calendar/Mode/Day.js';
+import ModeWeek from '../../Calendar/Mode/Week.js';
+import ModeMonth from '../../Calendar/Mode/Month.js';
+
 export const DEFAULT_MODE_RAUMINFO = 'Week'
 
-const RoomInformation = {
+export default {
 	name: "RoomInformation",
-    props:{
-		propsViewData: {
-			type: Object
-		},
-		rowMinHeight: {
-			type: String,
-			default: '100px'
-		},
-		eventMaxHeight: {
-			type: String,
-			default: '125px'
-		}
-    },
 	components: {
 		FhcCalendar,
-		LvModal,
-		LvInfo,
+		LvInfo
 	},
-	provide() {
-		return {
-			rowMinHeight: this.rowMinHeight,
-			eventMaxHeight: this.eventMaxHeight
-		}
+	inject: [
+		"renderers"
+	],
+	props:{
+		viewData: Object, // NOTE(chris): this is inherited from router-view
+		propsViewData: Object
 	},
 	data() {
+		const now = luxon.DateTime.now().setZone(this.viewData.timezone);
 		return {
-			events: null,
-			calendarMode: DEFAULT_MODE_RAUMINFO,
-			calendarDate: new CalendarDate(new Date()),
-			currentlySelectedEvent: null,
-			currentDay: this.propsViewData?.focus_date ? new Date(this.propsViewData.focus_date) : new Date(),
-			minimized: false,
-            
-        }
+			modes: {
+				day: Vue.markRaw(ModeDay),
+				week: Vue.markRaw(ModeWeek),
+				month: Vue.markRaw(ModeMonth)
+			},
+			modeOptions: {
+				day: {
+					emptyMessage: Vue.computed(() => this.$p.t('rauminfo/keineRaumReservierung')),
+					emptyMessageDetails: Vue.computed(() => this.$p.t('rauminfo/keineRaumReservierung')),
+					compact: false
+				},
+				week: {
+					collapseEmptyDays: false
+				}
+			},
+			currentDay: this.propsViewData?.focus_date,
+			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_RAUMINFO,
+			backgrounds: [
+				{
+					class: 'background-past',
+					end: now,
+					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
+				}
+			]
+		}
 	},
-    computed:{
-        currentDate: function(){
-            return new Date(this.calendarWeek.y, this.calendarWeek.m, this.calendarWeek.d);
-        },
-		weekFirstDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdFirstDayOfWeek);
+	methods:{
+		eventStyle(event) {
+			if (!event.farbe)
+				return undefined;
+			return '--event-bg:#' + event.farbe;
 		},
-		weekLastDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdLastDayOfWeek);
-		},
-		monthFirstDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdFirstDayOfCalendarMonth);
-		},
-		monthLastDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdLastDayOfCalendarMonth);
-		},
-    },
-	watch: {
-		'propsViewData.ort_kurzbz'(newVal) {
-			// relevant if ort_kurzbz can be changed from within this component
-		},
-		'propsViewData.mode'(newVal) {
-			if(this.$refs.calendar) this.$refs.calendar.setMode(newVal)
-		},
-		'propsViewData.focus_date'(newVal) {
-			this.currentDate = new Date(newVal)
-		}	
-	},
-    methods:{
-		setSelectedEvent: function(event){
-			this.currentlySelectedEvent = event;
-		},
-		getLvID: function () {
-			this.lv_id = window.location.pathname
-		},
-		selectDay: function(day){
-			const date = day.getFullYear() + "-" +
-				String(day.getMonth() + 1).padStart(2, "0") + "-" +
-				String(day.getDate()).padStart(2, "0");
+		handleChangeDate(day) {
+			const focus_date = day.toISODate();
+			const mode = this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1);
 
 			this.$router.push({
 				name: "RoomInformation",
 				params: {
-					mode: this.calendarMode,
-					focus_date: date,
+					mode,
+					focus_date,
 					ort_kurzbz: this.propsViewData.ort_kurzbz
 				}
 			})
-
+			
 			this.currentDay = day;
 		},
-		handleOffset: function(offset)  {
-			this.currentDay = new Date(
-				this.currentDay.getFullYear() + offset.y,
-				this.currentDay.getMonth() + offset.m,
-				this.currentDay.getDate() + offset.d
-			)
+		handleChangeMode(newMode) {
+			const mode = newMode[0].toUpperCase() + newMode.slice(1)
+			const focus_date = (this.currentDay instanceof luxon.DateTime)
+				? this.currentDay.toISODate()
+				: this.currentDay;
 
-			const date = this.currentDay.getFullYear() + "-" +
-				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
-				String(this.currentDay.getDate()).padStart(2, "0");
-
-			this.$router.push({
-				name: "LvPlan",
-				params: {
-					mode: this.calendarMode,
-					focus_date: date,
-					lv_id: this.propsViewData?.lv_id || null
-				}
-			})
-		},
-		handleChangeMode(mode) {
-			const modeCapitalized = mode.charAt(0).toUpperCase() + mode.slice(1)
-			const date = this.currentDay.getFullYear() + "-" +
-				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
-				String(this.currentDay.getDate()).padStart(2, "0");
-			
 			this.$router.push({
 				name: "RoomInformation",
 				params: {
-					mode: modeCapitalized,
-					focus_date: date,
+					mode,
+					focus_date,
 					ort_kurzbz: this.propsViewData.ort_kurzbz
 				}
 			})
 
 			this.calendarMode = mode
 		},
-		showModal: function (event) {
-			this.currentlySelectedEvent = event;
-			Vue.nextTick(() => {
-				this.$refs.lvmodal.show();
-			});
-			
-		},
-		updateRange: function ({ start, end }) {
-
-			let checkDate = (date) => {
-				return date.m != this.calendarDate.m || date.y != this.calendarDate.y;
-			}
-
-			// only load month data if the month or year has changed
-			if (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end))) {
-				// reset the events before querying the new events to activate the loading spinner
-				this.events = null;
-				this.calendarDate = new CalendarDate(end);
-				Vue.nextTick(() => {
-					this.loadEvents();
-				});
-			}
-		},
-		calendarDateToString: function (calendarDate) {
-			return calendarDate instanceof CalendarDate ?
-				[calendarDate.y, calendarDate.m + 1, calendarDate.d].join('-') :
-				null;
-
-		},
-		loadEvents: function(){
-
-			// bundles the room_events and the reservierungen together into the this.events array
-			Promise.allSettled([
-				this.$api.call(ApiStudenplan.getRoomInfo(this.propsViewData.ort_kurzbz, this.monthFirstDay, this.monthLastDay)),
-				this.$api.call(ApiStudenplan.getOrtReservierungen(this.propsViewData.ort_kurzbz, this.monthFirstDay, this.monthLastDay))
-			]).then((result) => {
-				let promise_events = [];
-				result.forEach((promise_result) => {
-					if(promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success"){
-						
-						let data = promise_result.value.data;
-						// adding additional information to the events 
-						if (data && data.forEach) {
-							data.forEach((el, i) => {
-								el.id = i;
-								if (el.type === 'reservierung') {
-									el.color = '#' + (el.farbe || 'FFFFFF');
-								} else {
-									el.color = '#' + (el.farbe || 'CCCCCC');
-								}
-
-								el.start = new Date(el.datum + ' ' + el.beginn);
-								el.end = new Date(el.datum + ' ' + el.ende);
-								
-							});
-						}
-						promise_events = promise_events.concat(data);
-					}
-				})
-				this.events = promise_events;
-			})
-		},
-    },
-	created() {
-		this.loadEvents();
+		updateRange(rangeInterval) {
+			this.rangeInterval = rangeInterval;
+		}
 	},
-    template: /*html*/`
+	setup(props) {
+		const $api = Vue.inject('$api');
+
+		const rangeInterval = Vue.ref(null);
+		
+		const { events } = useEventLoader(rangeInterval, (start, end) => {
+			return [
+				$api.call(ApiStudenplan.getRoomInfo(props.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate())),
+				$api.call(ApiStudenplan.getOrtReservierungen(props.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate()))
+			];
+		});
+
+		return {
+			rangeInterval,
+			events
+		};
+	},
+	template: /*html*/`
+	<div class="fhc-roominformation d-flex flex-column h-100">
 		<h2>{{ $p.t('rauminfo/rauminfo') }} {{ propsViewData.ort_kurzbz }}</h2>
 		<hr>
-		<lv-modal v-if="currentlySelectedEvent" :showMenu="false" :event="currentlySelectedEvent" ref="lvmodal" />
 		<fhc-calendar 
 			ref="calendar"
-			@selectedEvent="setSelectedEvent" 
-			:initial-date="currentDay"
-			@change:range="updateRange"
-			@change:offset="handleOffset"
-			:events="events" 
-			:initial-mode="propsViewData.mode"
-			show-weeks 
-			@select:day="selectDay"
-			@change:mode="handleChangeMode"
-			v-model:minimized="minimized"
+			:date="currentDay"
+			:modes="modes"
+			:mode-options="modeOptions"
+			:mode="propsViewData.mode.toLowerCase()"
+			@update:date="handleChangeDate"
+			@update:mode="handleChangeMode"
+			@update:range="updateRange"
+			:timezone="viewData.timezone"
+			:locale="$p.user_locale.value"
+			show-btns
+			:events="events || []"
+			:backgrounds="backgrounds"
 		>
-            <template #monthPage="{event,day}">
-				<span >
-					{{event.topic}}
-				</span>
-			</template>
-			<template #weekPage="{event,day}">
-				<div @click="showModal(event)" type="button" class=" border border-secondary border d-flex flex-column align-items-center justify-content-evenly h-100">
-					<span>{{event?.topic}}</span>
-					<span v-for="lektor in event?.lektor">{{lektor.kurzbz}}</span>
-					<span>{{event?.ort_kurzbz}}</span>
+			<template v-slot="{ event, mode }">
+				<component
+					v-if="mode == 'event'"
+					:is="renderers[event.type]?.modalContent"
+					:event="event"
+				></component>
+				<component
+					v-else-if="mode == 'eventheader'"
+					:is="renderers[event.type]?.modalTitle"
+					:event="event"
+				></component>
+				<div
+					v-else-if="mode == 'month'"
+					:class="'event-type-' + event.type"
+	 				:style="eventStyle(event)"
+					class="d-flex flex-column align-items-center justify-content-evenly h-100"
+				>
+					<span>{{ event?.topic }}</span>
 				</div>
-			</template>
-			<template #dayPage="{event,day,mobile}">
-				<div @click="mobile? showModal(event):null" type="button" class="fhc-entry border border-secondary border row h-100 justify-content-center align-items-center text-center">
+				<div
+					v-else-if="mode == 'week'"
+					:class="'event-type-' + event.type"
+	 				:style="eventStyle(event)"
+					class="border border-secondary d-flex flex-column align-items-center justify-content-evenly h-100"
+					type="button"
+				>
+					<span>{{ event?.topic }}</span>
+					<span v-for="lektor in event?.lektor">{{ lektor.kurzbz }}</span>
+					<span>{{ event?.ort_kurzbz }}</span>
+				</div>
+				<div
+					v-else-if="mode == 'day'"
+					:class="'event-type-' + event.type"
+	 				:style="eventStyle(event)"
+					type="button"
+					class="border border-secondary d-flex align-items-center justify-content-center text-center h-100"
+				>
 					<div class="col ">
 						<p>{{ $p.t('lehre/lehrveranstaltung') }}:</p>
-						<p class="m-0">{{event?.topic}}</p>
+						<p class="m-0">
+							{{ event?.topic }}
+						</p>
 					</div>
 					<div class="col ">
 						<p>{{ $p.t('lehre/lektor') }}:</p>
-						<p class="m-0" v-for="lektor in event?.lektor">{{lektor.kurzbz}}</p>
+						<p class="m-0" v-for="lektor in event?.lektor">
+							{{ lektor.kurzbz }}
+						</p>
 					</div>
 					<div class="col ">
 						<p>{{ $p.t('profil/Ort') }}: </p>
-						<p class="m-0">{{event?.ort_kurzbz}}</p>
+						<p class="m-0">
+							{{ event?.ort_kurzbz }}
+						</p>
 					</div>
 				</div>
 			</template>
-			<template #pageMobilContent>
-				<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
-				<div class="w-100">
-					<lv-info :event="currentlySelectedEvent" />
-				</div>
-			</template>
-			<template #pageMobilContentEmpty >
-				<h3>{{$p.t('rauminfo','keineRaumReservierung')}}</h3>
-			</template>
-        </fhc-calendar>
-    `,
+		</fhc-calendar>
+	</div>`
 };
-
-export default RoomInformation
