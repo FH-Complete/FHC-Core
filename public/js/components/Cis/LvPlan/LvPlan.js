@@ -161,7 +161,7 @@ export default {
 			});
 	},
 	template:/*html*/`
-	<div class="d-flex flex-column h-100" v-if="renderers">
+	<div class="fhc-lvplan d-flex flex-column h-100" v-if="renderers">
 		<h2 @click="modeOptions.week.collapseEmptyDays = !modeOptions.week.collapseEmptyDays">
 			{{ $p.t('lehre/stundenplan') }}
 			<span style="padding-left: 0.4em;" v-show="studiensemester_kurzbz">
