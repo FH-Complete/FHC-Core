@@ -36,7 +36,12 @@ export default {
 				quantity = this.height === 1 ? 4 : MAX_LOADED_NEWS;
 			}
 
-			return this.allNewsList.slice(0, quantity);
+			let slicedNews= this.allNewsList.slice(0, quantity);
+			slicedNews.sort((a,b)=>{
+				return new Date(b.insertamum) - new Date(a.insertamum);
+			});
+			
+			return slicedNews;
 		},
 		carouselItems() {
 			return this.allNewsList.reduce((acc, cur) => {
@@ -47,6 +52,14 @@ export default {
 		}
 	},
 	methods: {
+		formatDate: function (dateTime) {
+			const dt = new Date(dateTime);
+			return dt.getDate() + '.' + (dt.getMonth() + 1) + '.' + dt.getFullYear();				
+		},
+		formatTime: function (dateTime) {
+			const dt = new Date(dateTime);
+			return dt.getHours() + ':' + dt.getMinutes();
+		},
 		isString(value){
 			return Object.prototype.toString.call(value) === '[object String]';
 		},
@@ -141,6 +154,25 @@ export default {
 				this.allNewsList = Array.from(Object.values(news));
 				this.selected = this.allNewsList.length ? this.allNewsList[0] : null
 				this.initActiveItem()
+
+				Vue.nextTick(() => {
+					document.querySelectorAll(".fhc-news-card-item .card-body, .fhc-news-card-item .card, .fhc-news-card-item .card-header").forEach((el) => {
+						el.classList.add("border-0");
+					});
+
+					document.querySelectorAll(".fhc-news-card-item .card-header").forEach((el) => {
+						el.classList.add("px-5");
+						el.classList.add("fhc-primary");
+					});
+					document.querySelectorAll(".fhc-news-card-item .card-header .row").forEach((el) => {
+						el.classList.add("w-100");
+						el.classList.add("align-items-center");
+
+					});
+					document.querySelectorAll(".fhc-news-card-item .card-header .row h2").forEach((el) => {
+						el.classList.add("mb-0");
+					});
+				})
 				
 			})
 			.catch((err) => {
@@ -167,32 +199,37 @@ export default {
 		}
 		
 		this.initCarouselInstance()
+
+	
 	},
 	template: /*html*/ `
 <div ref="container" class="widgets-news h-100" :class="sizeClass" :style="getNewsWidgetStyle">
     <div class="d-flex flex-column h-100">
-        <div class="h-100" style="overflow-y: auto" v-show="width == 1">
-            <div  v-for="(news, index) in newsList" :key="news.news_id" class="mt-2">
-                <div v-if="index > 0 " class="fhc-seperator"></div>
-                <a :href="contentURI(news.content_id)" >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</a><br>
-                <span class="small text-muted">{{ formatDateTime(news.insertamum) }}</span>
+        <div class="h-100 fhc-news-items-sm" style="overflow-y: auto" v-show="width == 1" >
+            <div  v-for="(news, index) in newsList" :key="news.news_id" class="py-2">
+				<div class="row m-0">
+					<div class="col-3 d-flex">
+						<span class="small">{{ formatDate(news.insertamum) }} </span>
+						<span class="ms-auto small">{{ formatTime(news.insertamum) }} </span>
+					</div>
+					<div class="col">
+						<a :href="contentURI(news.content_id)" >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</a>
+					</div>
+				</div>
 			</div>
 		</div>
         <div v-show="width >1" class="row h-100 g-0">
-        	<div :class="'col-'+(width == 2? 6 : 4) + ' h-100 g-0'" style="overflow: auto;">
-        		<template v-for="news in newsList" :key="'menu-'+news.news_id">
-					<div class="position-relative">
-						<div class="row fhc-news-menu-item " @click="setSelected(news)" :class="getMenuItemClass(news)" style="margin-right: 0px; margin-left: 0px; overflow-y: hidden;">
-							<div class="col-8 fhc-news-menu-item-betreff">
-								<p class="fhc-news-text mb-0">
-									{{news.content_obj.betreff ?? ''}}
-								</p>
-							</div>
-							<span style="top:2px; right:0" class=" position-absolute d-none d-xl-block fhc-news-text fhc-news-menu-item-date fw-bold">
-								{{ news.datumformatted ?? ''}}
-							</span>
-						</div>
+        	<div :class="'col-'+(width == 2? 6 : 4) + ' h-100 g-0'" style="overflow: auto;" class="fhc-news-items-lg border-end" >
+        		<template v-for="news in newsList" :key="'menu-'+news.news_id" >
+				<div class="row m-0 py-2" @click="setSelected(news)">
+					<div class="col-3 d-flex">
+						<span class="small">{{ formatDate(news.insertamum) }} </span>
+						<span class="ms-auto small">{{ formatTime(news.insertamum) }} </span>
 					</div>
+					<div class="col">
+						<span >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</span>
+					</div>
+				</div>
 				</template>
 			</div>
 			<div :class="'col-'+(width == 2? 6 : 8) + ' h-100'" style="padding-left: 0px; padding-right: 0px;" ref="htmlContent">
@@ -200,16 +237,16 @@ export default {
 					<div id="FhcCarouselContainer" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel" data-bs-interval="false">
 
 						<div class="carousel-inner" ref="carouselInner"  style="height: 100%; max-width: 100%;">
-							<div ref="carouselItems" v-for="(news, index) in newsList" class="carousel-item " style="overflow-y: auto; overflow-x: hidden; height: 100%;" :id="'card-'+news.news_id" v-html="news.content_obj.content"/>
+							<div ref="carouselItems" v-for="(news, index) in newsList" class="carousel-item fhc-news-card-item" style="overflow-y: auto; overflow-x: hidden; height: 100%;" :id="'card-'+news.news_id" v-html="news.content_obj.content"/>
 						</div>
-						<button @click="setPrev" @focus="$event.target.blur()" style="z-index: 100; color: black; overflow: hidden; margin-left: 10px; width:35px;" data-bs-target="#FhcCarouselContainer" class="carousel-control-prev" type="button">
-							<div class="border rounded-circle" style="padding-left: 0.4rem; padding-right: 0.4rem; background-color:rgba(138,138,138,0.4)">
-								<i class="fa fa-chevron-left"></i>
+						<button @click="setPrev" style="z-index: 100; overflow: hidden; margin-left: 4px; width:35px;" data-bs-target="#FhcCarouselContainer" class="carousel-control-prev" type="button">
+							<div style="padding-left: 0.4rem; padding-right: 0.4rem;">
+								<i class="fa fa-chevron-left fhc-text-light"></i>
 							</div>
 						</button>
-						<button @click="setNext" @focus="$event.target.blur()" style="z-index: 100; color: black; overflow: hidden; margin-right: 10px; width:35px;" data-bs-target="#FhcCarouselContainer" class="carousel-control-next"  type="button">
-							<div class="border rounded-circle" style="padding-left: 0.4rem; padding-right: 0.4rem; background-color:rgba(138,138,138,0.4)">
-								<i class="fa fa-chevron-right"></i>
+						<button @click="setNext" style="z-index: 100;  overflow: hidden; margin-right: 4px; width:35px;" data-bs-target="#FhcCarouselContainer" class="carousel-control-next"  type="button">
+							<div style="padding-left: 0.4rem; padding-right: 0.4rem;">
+								<i class="fa fa-chevron-right fhc-text-light"></i>
 							</div>
 						</button>
 					</div>

@@ -158,32 +158,17 @@
 
 .carousel-control-prev,
 .carousel-control-next {
-    opacity: 0;
-    transition: opacity 0.3s ease;
+	top: 0.5rem !important;
+	bottom: auto !important;
+	opacity: 1 !important;
 }
 
-/* Show the buttons when the carousel is hovered */
-.carousel:hover .carousel-control-prev,
-.carousel:hover .carousel-control-next {
-    opacity: 1;
+.fhc-news-items-lg .row:hover{
+	background-color: var(--fhc-primary);
+	color: var(--fhc-light);
+	cursor: pointer;
 }
 
-.fhc-news-text{
-	font-size: 0.75em;
-}
+.fhc-news-items-sm{
 
-.fhc-news-xs {
-	font-size: 0.6em;
-}
-
-.fhc-news-sm {
-	font-size: 0.7em;
-}
-
-.fhc-news-md {
-	font-size: 1.1em;
-}
-
-.fhc-news-lg {
-	font-size: 1.4em;
 }
