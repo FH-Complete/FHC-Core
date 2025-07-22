@@ -1,6 +1,4 @@
 import FhcCalendar from "../../Calendar/Base.js";
-import LvModal from "../Mylv/LvModal.js";
-import LvMenu from "../Mylv/LvMenu.js"
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
@@ -15,9 +13,7 @@ export const DEFAULT_MODE_LVPLAN = 'Week'
 export default {
 	name: 'LvPlan',
 	components: {
-		FhcCalendar,
-		LvModal,
-		LvMenu
+		FhcCalendar
 	},
 	inject: [
 		"renderers"
