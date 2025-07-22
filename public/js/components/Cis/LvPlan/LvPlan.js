@@ -1,4 +1,5 @@
 import FhcCalendar from "../../Calendar/Base.js";
+
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
@@ -23,6 +24,7 @@ export default {
 		propsViewData: Object
 	},
 	data() {
+		const now = luxon.DateTime.now().setZone(this.viewData.timezone);
 		return {
 			modes: {
 				day: Vue.markRaw(ModeDay),
@@ -41,11 +43,17 @@ export default {
 			},
 			currentDay: this.propsViewData?.focus_date,
 			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_LVPLAN,
-
+			backgrounds: [
+				{
+					class: 'background-past',
+					end: now,
+					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
+				}
+			],
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
 			studiensemester_ende: null,
-			uid: null,
+			uid: null
 		};
 	},
 	computed:{
@@ -151,9 +159,6 @@ export default {
 			.then(res => {
 				this.uid = res.data.uid;
 			});
-		/*window.addEventListener("resize", () => {
-			this.modeOptions.day.compact = document.body.offsetWidth < 1200;
-		});*/
 	},
 	template:/*html*/`
 	<div class="d-flex flex-column h-100" v-if="renderers">
@@ -171,7 +176,7 @@ export default {
 			ref="calendar"
 			:date="currentDay"
 			:modes="modes"
-			:modeOptions="modeOptions"
+			:mode-options="modeOptions"
 			:mode="propsViewData.mode.toLowerCase()"
 			@update:date="handleChangeDate"
 			@update:mode="handleChangeMode"
@@ -180,7 +185,7 @@ export default {
 			:locale="$p.user_locale.value"
 			show-btns
 			:events="events || []"
-			:backgrounds="[]"
+			:backgrounds="backgrounds"
 		>
 			<template v-slot="{ event, mode }">
 				<div
