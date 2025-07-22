@@ -839,3 +839,17 @@ html {
 		grid-template-columns: 1fr 1fr;
 	}
 }
+
+#cis-main .modal-header{
+	background-color: var(--fhc-primary);
+	color: var(--fhc-light);
+}
+
+#cis-main .modal-header .btn-close{
+	filter: invert(1);
+}
+
+#cis-main .modal-footer {
+	background-color: var(--fhc-secondary);
+	
+}

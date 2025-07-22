@@ -16,7 +16,7 @@ export default {
         :class="this.cModalClass"
         :id="this.id"
         :aria-labelledby="this.id + '_label'" aria-hidden="true" tabindex="-1">       
-            <div class="modal-dialog" :class="this.cModalDialogClass">
+            <div class="modal-dialog modal-dialog-scrollable" :class="this.cModalDialogClass">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" :id="this.id + '_label'">
