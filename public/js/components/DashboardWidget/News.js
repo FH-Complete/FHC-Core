@@ -23,9 +23,6 @@ export default {
 		sizeClass() {
 			return 'fhc-news-' + ['xs', 'sm', 'md', 'lg'][this.size];
 		},
-		getNewsWidgetStyle() {
-			return this.width == 1 ? "padding: 1rem 1rem;" : "padding: 0px;"
-		},
 		newsList() {
 			//Return news amount depending on widget width and size
 			// let quantity = this.width;
@@ -219,7 +216,7 @@ export default {
 	
 	},
 	template: /*html*/ `
-<div ref="container" class="widgets-news h-100" :class="sizeClass" :style="getNewsWidgetStyle">
+<div ref="container" class="widgets-news h-100" :class="sizeClass" >
     <div class="d-flex flex-column h-100">
         <div class="h-100 fhc-news-items-sm" style="overflow-y: auto" v-show="width == 1" >
             <div  v-for="(news, index) in newsList" :key="news.news_id" class="py-2">
@@ -239,8 +236,8 @@ export default {
         		<template v-for="news in newsList" :key="'menu-'+news.news_id" >
 				<div class="row m-0 py-2" @click="setSelected(news)">
 					<div class="col-md-12 d-flex mb-2">
-						<span class="small">{{ formatDate(news.insertamum) }} </span>
-						<span class="ms-auto small">{{ formatTime(news.insertamum) }} </span>
+						<span class="small ">{{ formatDate(news.insertamum) }} </span>
+						<span class="ms-auto small ">{{ formatTime(news.insertamum) }} </span>
 					</div>
 					<div class="col-md-12 news-truncate">
 						<span >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</span>

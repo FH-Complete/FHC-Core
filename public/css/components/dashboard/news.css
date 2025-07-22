@@ -96,6 +96,11 @@
 	}
 }
 
+.widgets-news{
+	padding: 0 .5rem;
+	overflow-y: auto;
+}
+
 .widgets-news img
 {
     max-width: 100%;
@@ -165,9 +170,21 @@
 
 .fhc-news-items-lg .row:hover{
 	background-color: var(--fhc-primary);
+	color: var(--fhc-light) !important;
+	cursor: pointer;
+}
+
+.fhc-news-items-lg .row .news-truncate span{
+	color: var(--fhc-primary);
+	cursor: pointer;
+}
+
+.fhc-news-items-lg .row:hover .news-truncate span {
 	color: var(--fhc-light);
 	cursor: pointer;
 }
+
+
 
 .news-truncate {
 	display: -webkit-box;
