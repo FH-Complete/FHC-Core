@@ -1,20 +1,23 @@
 import { numberPadding, formatDate } from "../../../../helpers/DateHelpers.js"
 import LvMenu from "../../Mylv/LvMenu.js";
 
+import ApiLvPlan from '../../../../api/factory/lvPlan.js';
+import ApiAddons from '../../../../api/factory/addons.js';
+
 export default {
+	components:{
+		LvMenu,
+	},
 	props:{
 		event: {
 			type: Object,
 			required: true,
-		},
-		lvMenu:{
-			type: Object,
-			required: false,
-			default: null,
-		},
+		}
 	},
-	components:{
-		LvMenu,
+	data() {
+		return {
+			lvMenu: []
+		};
 	},
 	computed: {
 		lektorenLinks: function () {
@@ -53,6 +56,22 @@ export default {
 		methodFormatDate: function (d) {
 			return formatDate(d);
 		},
+	},
+	created() {
+		if (this.event.type == 'lehreinheit') {
+			this.$api
+				.call(ApiLvPlan.getLehreinheitStudiensemester(Array.isArray(this.event.lehreinheit_id) ? this.event.lehreinheit_id[0] : this.event.lehreinheit_id))
+				.then(res => res.data)
+				.then(studiensemester_kurzbz => this.$api.call(
+					ApiAddons.getLvMenu(
+						this.event.lehrveranstaltung_id,
+						studiensemester_kurzbz
+					)
+				))
+				.then(res => {
+					this.lvMenu = res.data;
+				});
+		}
 	},
 	template: `
 	<div>
@@ -120,6 +139,6 @@ export default {
 				</tbody>
 		</table>
 		
-		<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-if="lvMenu" :menu="lvMenu" />
+		<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-if="lvMenu.length" :menu="lvMenu" />
 	</div>`,
 }
