@@ -175,7 +175,6 @@ class Aufnahmetermine extends FHCAPI_Controller
 		$result = $this->RtPersonModel->update(
 			[
 				'rt_person_id' => $rt_person_id,
-				'person_id' => $person_id,
 			],
 			[
 				'rt_id' => $rt_id,
