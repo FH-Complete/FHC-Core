@@ -181,8 +181,6 @@ export default {
 			show-btns
 			:events="events || []"
 			:backgrounds="[]"
-
-			show-weeks
 		>
 			<template v-slot="{ event, mode }">
 				<div
