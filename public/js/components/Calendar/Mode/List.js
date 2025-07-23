@@ -20,7 +20,8 @@ export default {
 	emits: [
 		"update:currentDate",
 		"update:range",
-		"click"
+		"click",
+		"requestModalOpen"
 	],
 	data() {
 		return {
@@ -35,9 +36,9 @@ export default {
 
 			if (this.rangeOffset != 0) {
 				if (this.rangeOffset < 0) {
-					first = first.plus({ days: this.rangeOffset * this.length });
+					first = first.plus({ days: this.rangeOffset });
 				} else {
-					last = last.plus({ days: this.rangeOffset * this.length });
+					last = first.plus({ days: this.rangeOffset + this.length });
 				}
 			}
 
@@ -46,7 +47,7 @@ export default {
 	},
 	watch: {
 		currentDate() {
-			this.rangeOffset = Math.floor(this.currentDate.startOf('day').diff(this.focusDate.startOf('day'), 'days').days / this.length);
+			this.rangeOffset = this.currentDate.startOf('day').diff(this.focusDate.startOf('day'), 'days').days;
 			if (this.rangeOffset) {
 				this.$emit('update:range', this.range);
 				this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
@@ -65,15 +66,23 @@ export default {
 			this.$refs.slider.nextPage().then(this.updatePage);
 		},
 		updatePage(offset) {
-			const newFocusDate = this.focusDate.plus({ days: offset * this.length });
+			const newFocusDate = this.focusDate.plus({ days: offset });
 			this.focusDate = newFocusDate;
 			this.rangeOffset = 0;
 			this.$emit('update:currentDate', this.focusDate);
 			this.$emit('update:range', this.range);
 		},
 		viewAttrs(offset) {
-			const day = this.focusDate.plus({ days: offset * this.length });
+			const day = this.focusDate.plus({ days: offset });
 			return { day, length: this.length };
+		},
+		handleClickDefaults(evt) {
+			switch (evt.detail.source) {
+			case 'event':
+				// default: Request Modal
+				this.$emit('requestModalOpen', { event: evt.detail.value });
+				break;
+			}
 		}
 	},
 	mounted() {
@@ -82,6 +91,7 @@ export default {
 	template: `
 	<div
 		class="fhc-calendar-mode-list flex-grow-1 position-relative"
+		@cal-click-default.capture="handleClickDefaults"
 	>
 		<base-slider ref="slider" v-slot="slot">
 			<list-view v-bind="viewAttrs(slot.offset)">

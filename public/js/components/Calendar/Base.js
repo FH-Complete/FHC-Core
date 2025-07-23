@@ -264,6 +264,7 @@ export default {
 				:btn-week="!!modes['week'] && (btnWeek || (showBtns && btnWeek !== false))"
 				:btn-month="!!modes['month'] && (btnMonth || (showBtns && btnMonth !== false))"
 				:btn-list="!!modes['list'] && (btnList || (showBtns && btnList !== false))"
+				:mode-options="modeOptions ? modeOptions[cMode] : undefined"
 			>
 				<slot name="actions" />
 			</base-header>

@@ -1,4 +1,4 @@
-.fhc-calendar-base-grid-line-event {
+.event {
 	cursor: pointer;
 }
 .fhc-calendar-mode-week .all-day-events .fhc-calendar-base-grid-line-event .weekPageContainer {
@@ -59,9 +59,9 @@
 .fhc-calendar-base-grid-line-event .event-type-reservierung {
 	--event-default-bg: var(--fhc-calendar-bg-reservierung, #fff);
 }
-.fhc-calendar-base-grid-line-event > * {
+.fhc-calendar-base .event > * {
 	background-color: var(--event-bg, var(--event-default-bg));
 }
-.fhc-calendar-base-grid-line-event > *:hover {
+.fhc-calendar-base .event > *:hover {
 	filter: brightness(120%);
 }

@@ -42,7 +42,7 @@ export default {
 	},
 	template: /* html */`
 	<div
-		class="fhc-calendar-base-grid-line-event"
+		class="fhc-calendar-base-grid-line-event event"
 		:class="classes"
 		style="z-index: 1"
 		:draggable="draggable"

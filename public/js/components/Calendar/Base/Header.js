@@ -17,6 +17,10 @@ export default {
 			type: String,
 			required: true
 		},
+		modeOptions: {
+			type: Object,
+			default: {}
+		},
 		btnMonth: Boolean,
 		btnWeek: Boolean,
 		btnDay: Boolean,
@@ -62,6 +66,7 @@ export default {
 						@update:date="$emit('update:date', $event)"
 						@open="open = true"
 						@closed="open = false"
+						:list-length="modeOptions.length"
 					/>
 					<button
 						class="btn btn-outline-secondary border-0"

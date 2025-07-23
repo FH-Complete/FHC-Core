@@ -1,6 +1,9 @@
 import LabelDay from '../../Base/Label/Day.js';
 import LabelDow from '../../Base/Label/Dow.js';
 
+import CalDnd from '../../../../directives/Calendar/DragAndDrop.js';
+import CalClick from '../../../../directives/Calendar/Click.js';
+
 // TODO(chris): drag and drop
 
 export default {
@@ -9,7 +12,12 @@ export default {
 		LabelDay,
 		LabelDow
 	},
+	directives: {
+		CalDnd,
+		CalClick
+	},
 	inject: {
+		draggableEvents: "draggableEvents",
 		events: "events"
 	},
 	props: {
@@ -43,20 +51,31 @@ export default {
 			return eventsPerDay.filter(day => day.events.length);
 		}
 	},
+	methods: {
+		draggable(event) {
+			return this.draggableEvents(event.orig, 'list');
+		},
+	},
 	template: /* html */`
-	<div
-		class="fhc-calendar-mode-list-view h-100"
-	>
-		<div v-if="!eventsPerDay.length">
+	<div class="fhc-calendar-mode-list-view h-100 overflow-auto">
+		<div v-if="!eventsPerDay.length" class="h-100">
 			<slot :event="undefined" mode="list" />
 		</div>
 		<div v-for="{ day, events } in eventsPerDay" class="text-center">
 			<label-dow :date="day" class="d-inline" />, <label-day :date="day" class="d-inline" />
 			<div v-for="event in events">
- 				<div v-if="slot.event.type == 'loading'" class="placeholder-glow opacity-50">
+ 				<div v-if="event.type == 'loading'" class="placeholder-glow opacity-50">
 					<span class="placeholder w-100" />
 				</div>
-				<slot v-else :event="event.orig" mode="list" />
+				<div
+					v-else
+					class="event"
+					:draggable="draggable(event)"
+					v-cal-dnd:draggable="event"
+					v-cal-click:event="event.orig"
+				>
+					<slot :event="event.orig" mode="list" />
+				</div>
 			</div>
 		</div>
 	</div>

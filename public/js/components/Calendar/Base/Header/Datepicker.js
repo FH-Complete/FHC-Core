@@ -51,19 +51,16 @@ export default {
 			case "month":
 				return this.date.toLocaleString({ month: 'long', year: 'numeric' });
 			case "week":
-				const year = this.date.localWeekYear;
-				const week = this.date.toFormat('nn');
+				var year = this.date.localWeekYear;
+				var week = this.date.toFormat('nn');
 				return this.$p.t('calendar/year_kw', { year, week });
 			case "list":
+				return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.listLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);
 			case "day":
 				return this.date.toLocaleString(luxon.DateTime.DATE_FULL);
 			default:
 				return 'View not Supported';
 			}
-		},
-		format() {
-			const title = this.title;
-			return `'${title}'`;
 		},
 		weekStart() {
 			return luxon.Info.getStartOfWeek(this.date)%7;
@@ -97,10 +94,10 @@ export default {
 	<vue-date-picker
 		:model-value="current"
 		@update:model-value="update"
-		:format="format"
+		:format="() => title"
 		:month-picker="mode == 'month'"
 		:week-picker="mode == 'week'"
-		:range="mode == 'list' ? { autoRange: listLength } : false"
+		:range="mode == 'list' ? { autoRange: listLength - 1 } : false"
 		:text-input="mode == 'day'"
 		:week-start="weekStart"
 		:week-numbers="{ type: weekNumbers }"
