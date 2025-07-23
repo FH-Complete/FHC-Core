@@ -1,6 +1,4 @@
 import FhcCalendar from "../../Calendar/Base.js";
-import CalendarDate from "../../../composables/CalendarDate.js";
-import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
 
 import ApiStudenplan from '../../../api/factory/lvPlan.js';
 
@@ -15,8 +13,7 @@ export const DEFAULT_MODE_RAUMINFO = 'Week'
 export default {
 	name: "RoomInformation",
 	components: {
-		FhcCalendar,
-		LvInfo
+		FhcCalendar
 	},
 	inject: [
 		"renderers"
