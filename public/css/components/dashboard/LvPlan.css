@@ -1,0 +1,24 @@
+.dashboard-widget-lvplan .fhc-calendar-base .card {
+	--bs-card-cap-padding-x: 0;
+	--bs-card-cap-padding-y: 0;
+	--bs-card-border-radius: 0;
+	--bs-card-border-width: 0;
+	--dp-input-padding: .375rem .75rem;
+	--dp-input-icon-padding: calc(1rem + 24px);
+}
+.dashboard-widget-lvplan .fhc-calendar-base .card-header {
+	border-bottom-width: var(--bs-border-width);
+}
+.dashboard-widget-lvplan .fhc-calendar-base .card-header > .row > .col-auto,
+.dashboard-widget-lvplan .fhc-calendar-base .card-header .btn-group {
+	width: 100%;
+}
+.dashboard-widget-lvplan .fhc-calendar-base .card-header input {
+	--dp-font-size: .7em;
+}
+.dashboard-widget-lvplan .fhc-calendar-base .card-header .btn {
+	--bs-btn-font-size: .7em;
+}
+.dashboard-widget-lvplan .fhc-calendar-base-label-day {
+	cursor: initial;
+}

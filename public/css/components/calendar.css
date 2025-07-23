@@ -4,23 +4,6 @@
 
 /* Themable Variables */
 :root {
-/*	--fhc-calendar-pane-height: calc(100vh - 220px);
-	
-	--fhc-calendar-primary: var(--fhc-primary, #006095);
-	--fhc-calendar-border-highlight: var(--fhc-border-highlight, #495057);
-	--fhc-calendar-text: var(--fhc-text, #212529);
-	--fhc-calendar-text-light: var(--fhc-text, #212529);
-	--fhc-calendar-background: var(--fhc-background, #fff);
-	--fhc-calendar-dark: var(--fhc-dark, #212529);
-	--fhc-calendar-hour-indicator-bg: var(--fhc-background, #fff);
-	--fhc-calendar-week-page-header-background: var(--fhc-background, #fff);
-	--fhc-calendar-week-page-header-color: var(--fhc-text, #212529);
-	--fhc-calendar-week-page-header-border: var(--fhc-border, #dee2e6);
-	--fhc-calendar-week-page-header-hover-background: var(--fhc-background-highlight, #d5dae0);
-	--fhc-calendar-all-day-event-background: var(--fhc-background, #fff);
-	--fhc-calendar-past: var(--fhc-beige-10, rgba(245, 233, 215, 0.5));
-	--fhc-calendar-box-shadow: var(--fhc-box-shadow, #dee2e6);*/
-	
 	--fhc-calendar-gap: var(--fhc-border, #dee2e6);
 	--fhc-calendar-bg: var(--fhc-background, #fff);
 	--fhc-calendar-border: var(--fhc-border, #dee2e6);
