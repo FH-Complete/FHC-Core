@@ -40,7 +40,8 @@ export default {
 		};
 	},
 	inject: {
-		events: "events"
+		events: "events",
+		timezone: "timezone"
 	},
 	props: {
 		day: {
@@ -55,6 +56,11 @@ export default {
 		},
 		axisParts() {
 			return Array.from({ length: 8 }, (e, i) => luxon.Duration.fromObject({ days: i }));
+		}
+	},
+	methods: {
+		isToday(date) {
+			return date.hasSame(luxon.DateTime.now().setZone(this.timezone), 'day');
 		}
 	},
 	template: /* html */`
@@ -76,7 +82,7 @@ export default {
 				<label-day
 					v-if="slot.event.orig == 'header'"
 					:date="slot.event.start"
-					:class="{ disabled: day.month != slot.event.start.month }"
+					:class="{ disabled: !day.hasSame(slot.event.start, 'month'), today: isToday(slot.event.start) }"
 				/>
 				<div v-else-if="slot.event.type == 'loading'" class="placeholder-glow opacity-50">
 					<span class="placeholder w-100 fs-1" />

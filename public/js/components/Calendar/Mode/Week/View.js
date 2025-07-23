@@ -12,7 +12,8 @@ export default {
 		LabelTime
 	},
 	inject: {
-		timeGrid: "timeGrid"
+		timeGrid: "timeGrid",
+		timezone: "timezone"
 	},
 	props: {
 		day: {
@@ -43,6 +44,11 @@ export default {
 			}
 		}
 	},
+	methods: {
+		isToday(date) {
+			return date.hasSame(luxon.DateTime.now().setZone(this.timezone), 'day');
+		}
+	},
 	template: /* html */`
 	<div class="fhc-calendar-mode-week-view h-100">
 		<calendar-grid
@@ -54,13 +60,15 @@ export default {
 			all-day-events
 		>
 			<template #main-header="{ date }">
-				<label-dow
-					v-bind="{ date }"
-					@cal-click="evt => evt.detail.source = 'day'"
-				/>
-				<label-day
-					v-bind="{ date }"
-				/>
+				<div :class="{ today: isToday(date) }">
+					<label-dow
+						v-bind="{ date }"
+						@cal-click="evt => evt.detail.source = 'day'"
+					/>
+					<label-day
+						v-bind="{ date }"
+					/>
+				</div>
 			</template>
 			<template #part-header="{ part }">
 				<label-time v-bind="{ part }" />

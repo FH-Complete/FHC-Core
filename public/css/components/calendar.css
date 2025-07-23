@@ -42,6 +42,9 @@
 	--fhc-calendar-bg-allday: var(--fhc-calendar-bg);
 	--fhc-calendar-bg-body: var(--fhc-calendar-bg);
 
+	--fhc-calendar-bg-month-today: var(--fhc-primary);
+	--fhc-calendar-color-month-today: var(--fhc-white-10);
+	
 	--fhc-calendar-bg-overlay1: var(--fhc-calendar-bg);
 	--fhc-calendar-bg-overlay2: var(--fhc-dark, #212529);
 	

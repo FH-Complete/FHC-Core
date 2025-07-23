@@ -13,7 +13,8 @@ export default {
 	},
 	inject: {
 		timeGrid: "timeGrid",
-		originalEvents: "events"
+		originalEvents: "events",
+		timezone: "timezone"
 	},
 	props: {
 		day: {
@@ -71,6 +72,9 @@ export default {
 				return null; // null => loading
 
 			return first;
+		},
+		isToday() {
+			return this.day.hasSame(luxon.DateTime.now().setZone(this.timezone), 'day');
 		}
 	},
 	watch: {
@@ -116,13 +120,15 @@ export default {
 			all-day-events
 		>
 			<template #main-header="{ date }">
-				<label-dow
-					@cal-click="evt => evt.detail.source = 'day'"
-					v-bind="{ date }"
-				/>
-				<label-day
-					v-bind="{ date }"
-				/>
+				<div :class="{ today: isToday }">
+					<label-dow
+						@cal-click="evt => evt.detail.source = 'day'"
+						v-bind="{ date }"
+					/>
+					<label-day
+						v-bind="{ date }"
+					/>
+				</div>
 			</template>
 			<template #part-header="{ part }">
 				<label-time v-bind="{ part }" />

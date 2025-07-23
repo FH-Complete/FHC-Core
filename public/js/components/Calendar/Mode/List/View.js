@@ -18,7 +18,8 @@ export default {
 	},
 	inject: {
 		draggableEvents: "draggableEvents",
-		events: "events"
+		events: "events",
+		timezone: "timezone"
 	},
 	props: {
 		day: {
@@ -55,20 +56,28 @@ export default {
 		draggable(event) {
 			return this.draggableEvents(event.orig, 'list');
 		},
+		isToday(date) {
+			return date.hasSame(luxon.DateTime.now().setZone(this.timezone), 'day');
+		}
 	},
 	template: /* html */`
 	<div class="fhc-calendar-mode-list-view h-100 overflow-auto">
 		<div v-if="!eventsPerDay.length" class="h-100">
 			<slot :event="undefined" mode="list" />
 		</div>
-		<div v-for="{ day, events } in eventsPerDay" class="text-center">
-			<label-dow
-				:date="day"
-				class="d-inline"
-				@cal-click="evt => evt.detail.source = 'day'"
-			/>
-			, 
-			<label-day :date="day" class="d-inline" />
+		<div v-for="{ day, events } in eventsPerDay">
+			<div
+				class="text-center"
+				:class="{ today: isToday(day) }"
+			>
+				<label-dow
+					:date="day"
+					class="d-inline"
+					@cal-click="evt => evt.detail.source = 'day'"
+				/>
+				, 
+				<label-day :date="day" class="d-inline" />
+			</div>
 			<div v-for="event in events">
  				<div v-if="event.type == 'loading'" class="placeholder-glow opacity-50">
 					<span class="placeholder w-100" />
