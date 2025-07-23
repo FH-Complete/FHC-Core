@@ -24979,7 +24979,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'letzte Änderung',
+				'text' => 'Letzte Änderung',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -44516,6 +44516,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		)
 	),
 	// FHC-4 Studierendenverwaltung FHC-ALERTS END
+	// FHC-4 Finetuning START
 	array(
 		'app' => 'core',
 		'category' => 'ui',
@@ -44536,6 +44537,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	// FHC-4 Finetuning END
 );
 
 

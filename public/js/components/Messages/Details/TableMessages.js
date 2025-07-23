@@ -63,9 +63,9 @@ export default {
 					{title: "recipient", field: "recipient"},
 					{title: "senderId", field: "sender_id"},
 					{title: "recipientId", field: "recipient_id"},
-					{title: "relationmessage_id", field: "relationmessage_id"},
+					{title: "Relationmessage ID", field: "relationmessage_id"},
 					{
-						title: "status",
+						title: "Status",
 						field: "status",
 						formatterParams: [
 							"unread",
