@@ -36,6 +36,7 @@ export default {
 		"newItem",
 		"gridHeight",
 		"draggedItem",
+		"update:additionalRow"
 	],
 	data() {
 		return {
