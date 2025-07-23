@@ -223,13 +223,14 @@ class Stundenplandev_model extends DB_Model
 
 	public function deleteLektorPlanning($lehreinheit_id, $mitarbeiter_uid)
 	{
-		$this->addDistinct('mitarbeiter_uid');
+		//TODO (david) prüfen ob der check notwendig ist
+		/*$this->addDistinct('mitarbeiter_uid');
 		$this->addSelect('mitarbeiter_uid');
 		$stundenplan_result = $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
 		$stundenplan_array = hasData($stundenplan_result) ? (getData($stundenplan_result)) : array();
 
 		if (sizeof($stundenplan_array) <= 1)
-			return error('Diese/r LektorIn kann nicht aus dem LVPlan entfernt werden da dies der/die letzte verplante LektorIn ist');
+			return error('Diese/r LektorIn kann nicht aus dem LVPlan entfernt werden da dies der/die letzte verplante LektorIn ist');*/
 
 		$this->addJoin('lehre.tbl_stundenplan_betriebsmittel', 'stundenplandev_id');
 		$betriebsmittel_result = $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'tbl_stundenplandev.mitarbeiter_uid' => $mitarbeiter_uid));

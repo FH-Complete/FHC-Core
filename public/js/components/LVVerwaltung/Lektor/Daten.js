@@ -253,6 +253,7 @@ export default{
 					<form-input
 						:label="$p.t('lehre', 'gesamtkosten')"
 						type="number"
+						name="gesamtkosten"
 						container-class="col-3"
 						readonly
 						v-model="berechneteGesamtkosten" 

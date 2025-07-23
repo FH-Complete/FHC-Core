@@ -284,7 +284,9 @@ class Lektor extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
-		$oe_array = $result;
+		$oe_array = [];
+		if (hasData($result))
+			$oe_array = getData($result);
 
 		return $this->checkPermissionGenerel($permissions, $oe_array);
 	}
