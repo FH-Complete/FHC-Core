@@ -101,22 +101,29 @@ class Dokumente extends FHCAPI_Controller
 			}
 		}
 
-		//Array for total list of accepted documents
-		$newDataMap = [];
-		foreach ($arrayAccepted as $item) {
-			$newDataMap[] = (array)$item;
+		//Mapping with document_kurzbz
+		$preDocMap = [];
+		foreach ($resultPreDoc as $pre) {
+			$preDocMap[$pre->dokument_kurzbz] = $pre;
 		}
 
-		$listExistingKurzbz = array_column($newDataMap, 'dokument_kurzbz');
+		$mergedArray = [];
+		foreach ($arrayAccepted as $doc) {
+			$merged = clone $doc;
 
-		foreach ($resultPreDoc as $item)
-		{
-			if (!in_array($item->dokument_kurzbz, $listExistingKurzbz))
-			{
-				$newDataMap[] = (array)$item;
+			if (isset($preDocMap[$doc->dokument_kurzbz])) {
+				$merged->docdatum = $preDocMap[$doc->dokument_kurzbz]->docdatum;
+				$merged->insertvonma = $preDocMap[$doc->dokument_kurzbz]->insertvonma;
+				$merged->bezeichnung = $preDocMap[$doc->dokument_kurzbz]->bezeichnung;
+			} else {
+				$merged->akzeptiertdatum = null;
+				$merged->akzeptiertvon = null;
 			}
+
+			$mergedArray[] = $merged;
 		}
-		$this->terminateWithSuccess($newDataMap);
+
+		$this->terminateWithSuccess($mergedArray);
 	}
 
 	public function deleteZuordnung($prestudent_id, $dokument_kurzbz)

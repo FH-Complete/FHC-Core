@@ -102,6 +102,8 @@ class Dokumentprestudent_model extends DB_Model
 			$qry.="	AND (v.archivierbar = FALSE OR v.archivierbar IS NULL)";
 		}
 
+		$qry.=" ORDER BY d.bezeichnung ASC";
+
 		return $this->execQuery($qry, $parametersArray);
 	}
 }

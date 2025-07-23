@@ -495,7 +495,7 @@ export default {
 		<template #footer>
 			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
 			<button v-if="statusNew" class="btn btn-primary" @click="addNewPlacementTest()"> {{$p.t('ui', 'speichern')}}</button>
-			<button v-else class="btn btn-primary" @click="updatePlacementTest(formData.rt_id)"> {{$p.t('ui', 'speichern')}}</button>
+			<button v-else class="btn btn-primary" @click="updatePlacementTest(formData.rt_person_id)"> {{$p.t('ui', 'speichern')}}</button>
 		</template>
 	    </bs-modal>
 
