@@ -44516,6 +44516,26 @@ and represent the current state of research on the topic. The prescribed citatio
 		)
 	),
 	// FHC-4 Studierendenverwaltung FHC-ALERTS END
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'notizHinzufuegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notiz hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
