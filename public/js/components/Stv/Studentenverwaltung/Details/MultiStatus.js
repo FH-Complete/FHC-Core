@@ -1,6 +1,7 @@
 import TblMultiStatus from "./Prestudent/MultiStatus.js";
 
 export default {
+	name: "TabStatus",
 	components: {
 		TblMultiStatus
 	},

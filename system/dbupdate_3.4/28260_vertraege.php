@@ -623,3 +623,115 @@ if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE colu
 			echo 'Spalte betrag wurde in hr.tbl_sachaufwand neu erstellt<br>';
 	}
 }
+
+if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE column_name='lvexport' AND table_name='tbl_gehaltstyp' AND table_schema='hr'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			ALTER TABLE 
+				hr.tbl_gehaltstyp 
+			ADD COLUMN 
+				lvexport boolean NOT NULL DEFAULT true;
+		";
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte lvexport wurde in hr.tbl_gehaltstyp neu erstellt<br>';
+
+		$qryatz = "
+			UPDATE 
+				hr.tbl_gehaltstyp 
+			SET 
+				lvexport = false 
+			WHERE 
+				gehaltstyp_kurzbz = 'lohnausgleichatz';
+		";
+		if (! $db->db_query($qryatz))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte lvexport wurde in hr.tbl_gehaltstyp fuer gehaltstyp lohnausgleichatz auf false gesetzt<br>';
+	}
+}
+
+if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE column_name='lvexport_sum' AND table_name='tbl_gehaltstyp' AND table_schema='hr'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			ALTER TABLE 
+				hr.tbl_gehaltstyp 
+			ADD COLUMN 
+				lvexport_sum VARCHAR(255) default null;
+		";
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte lvexport_sum wurde in hr.tbl_gehaltstyp neu erstellt<br>';
+
+		$qrysortorder = "
+			UPDATE 
+				hr.tbl_gehaltstyp 
+			SET 
+				sort = sort + 1
+			WHERE 
+				sort > 3;
+		";
+		if (! $db->db_query($qrysortorder))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte sort wurde in hr.tbl_gehaltstyp fuer sort > 3 erhoeht<br>';
+
+		$qryzulageallin = "
+			INSERT INTO 
+				hr.tbl_gehaltstyp
+				(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort,aktiv, lvexport) 
+			VALUES
+				('zulage_allin', 'Zulage (Allin)', true, 4, true, true);
+		";
+		if (! $db->db_query($qryzulageallin))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'gehaltstyp zulage_allin wurde in hr.tbl_gehaltstyp hinzugefuegt<br>';
+
+		$qrysetsum = "
+			UPDATE 
+				hr.tbl_gehaltstyp 
+			SET 
+				lvexport_sum = 'GRUNDGEHALT' 
+			WHERE 
+				gehaltstyp_kurzbz IN ('grundgehalt', 'zulage_allin');
+		";
+		if (! $db->db_query($qrysetsum))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte lvexprt_sum wurde in hr.tbl_gehaltstyp fuer grundgehalt '
+			. 'und zulage_allin auf GRUNDGEHALT gesetzt<br>';
+
+		$qrysetzulageallin = "
+			WITH gbsallin AS (
+				SELECT 
+					*
+				FROM
+					hr.tbl_gehaltsbestandteil g
+				JOIN
+					hr.tbl_vertragsbestandteil_freitext f ON g.vertragsbestandteil_id = f.vertragsbestandteil_id
+				WHERE
+					f.freitexttyp_kurzbz = 'allin'
+					AND 
+					g.gehaltstyp_kurzbz <> 'zulage_allin'
+			)
+			UPDATE 
+				hr.tbl_gehaltsbestandteil 
+			SET 
+				gehaltstyp_kurzbz = 'zulage_allin' 
+			WHERE 
+				gehaltsbestandteil_id IN (SELECT gehaltsbestandteil_id FROM gbsallin);
+		";
+		if (! $db->db_query($qrysetzulageallin))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'gehaltstyp_kurzbz wurde bei gehaltsbestandteilen an allin '
+			. 'freitext vertragsbestandteilen auf zulage_allin gesetzt<br>';
+	}
+}

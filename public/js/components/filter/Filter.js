@@ -23,6 +23,8 @@ import collapseAutoClose from '../../directives/collapseAutoClose.js';
 
 import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
 
+import ApiFilter from '../../api/factory/filter.js';
+
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
 const FILTER_COMPONENT_NEW_FILTER_TYPE = 'Filter Component New Filter Type';
@@ -73,7 +75,7 @@ export const CoreFilterCmpt = {
 		newBtnDisabled: Boolean,
 		newBtnLabel: String,
 		uniqueId: String,
-		// TODO soll im master kommen?
+
 		idField: String,
 		parentIdField: String,
 		countOnly: Boolean
@@ -214,16 +216,21 @@ export const CoreFilterCmpt = {
 			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
-					height: 500,
 					layout: "fitDataStretchFrozen",
 					movableColumns: true,
 					columnDefaults:{
 						tooltip: true
 					},
 					placeholder,
-					reactiveData: true,
 					persistence: this.persistence,
 				}, ...(this.tabulatorOptions || {})};
+
+			// set default height if no height property is set
+			if (tabulatorOptions.height === undefined &&
+				tabulatorOptions.minHeight === undefined &&
+				tabulatorOptions.maxHeight === undefined) {
+				tabulatorOptions.height = 500;
+			}
 
 			if (!this.tableOnly) {
 				tabulatorOptions.data = this.filteredData;
@@ -232,7 +239,7 @@ export const CoreFilterCmpt = {
 
 			if (tabulatorOptions.selectable || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
 				this.tabulatorHasSelector = true;
-			// TODO check ob im core bleiben soll
+
 			if (this.idField) {
 				// enable nested tabulator if parent Id given
 				if (this.parentIdField) tabulatorOptions.dataTree = true;
@@ -256,7 +263,7 @@ export const CoreFilterCmpt = {
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
-			// TODO check ob im core so bleiben soll
+
 			// if nested tabulator, restructure data
 			if (this.parentIdField && this.idField) {
 				this.tabulator.on("dataLoading", data => {
@@ -333,10 +340,14 @@ export const CoreFilterCmpt = {
 		 */
 		getFilter() {
 			if (this.selectedFilter === null)
-				this.startFetchCmpt(this.$fhcApi.factory.filter.getFilter, null, this.render);
+				this.startFetchCmpt(
+					wsParams => this.$api.call(ApiFilter.getFilter(wsParams)),
+					null,
+					this.render
+				);
 			else
 				this.startFetchCmpt(
-					this.$fhcApi.factory.filter.getFilterById,
+					wsParams => this.$api.call(ApiFilter.getFilterById(wsParams)),
 					{
 						filterId: this.selectedFilter
 					},
@@ -509,7 +520,7 @@ export const CoreFilterCmpt = {
 			this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				this.$fhcApi.factory.filter.saveCustomFilter,
+				wsParams => this.$api.call(ApiFilter.saveCustomFilter(wsParams)),
 				{
 					customFilterName
 				},
@@ -525,7 +536,7 @@ export const CoreFilterCmpt = {
 				this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				this.$fhcApi.factory.filter.removeCustomFilter,
+				wsParams => this.$api.call(ApiFilter.removeCustomFilter(wsParams)),
 				{
 					filterId: filterId
 				},
@@ -562,14 +573,14 @@ export const CoreFilterCmpt = {
 		applyFilterConfig(filterFields) {
 			this.selectedFilter = null;
 			this.startFetchCmpt(
-				this.$fhcApi.factory.filter.applyFilterFields,
+				wsParams => this.$api.call(ApiFilter.applyFilterFields(wsParams)),
 				{
 					filterFields
 				},
 				this.getFilter
 			);
 		},
-		// TODO check ob im core so bleiben soll
+
 		// append child to it's parent
 		appendChild(data, child) {
 			// get parent id
