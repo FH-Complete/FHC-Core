@@ -36,14 +36,14 @@ export default {
 		},
 		start_time: function () {
 			if (!this.event.start) return 'N/A';
-			if (!this.event.start instanceof Date) {
+			if (!(this.event.start instanceof Date)) {
 				return this.event.start;
 			}
 			return numberPadding(this.event.start.getHours()) + ":" + numberPadding(this.event.start.getMinutes());
 		},
 		end_time: function () {
 			if (!this.event.end) return 'N/A';
-			if (!this.event.end instanceof Date) {
+			if (!(this.event.end instanceof Date)) {
 				return this.event.end;
 			}
 			return numberPadding(this.event.end.getHours()) + ":" + numberPadding(this.event.end.getMinutes());
