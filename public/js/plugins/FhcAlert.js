@@ -217,9 +217,13 @@ export default {
 			alertSystemError(message) {
 				//TODO(Manu) for translation of content of template: restructure in data
 				//and update definitions with  translations
+
 				if (Array.isArray(message))
 					return message.forEach(this.alertSystemError);
-				helperAppInstance.$refs.alert.add({ severity: 'error', summary: 'Systemfehler', detail: message});
+				helperAppInstance.$refs.alert.add({
+					severity: 'error',
+					summary: Vue.computed(() => app.config.globalProperties.$p.t('alert/systemerror')),
+					detail: message});
 			},
 			confirmDelete() {
 				return new Promise((resolve, reject) => {
