@@ -267,3 +267,22 @@ html.dark .tabulator .tabulator-header .tabulator-col:hover {
 .p-paginator{
 	background-color: var(--fhc-background) !important;
 }
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight,
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+	background-color: var(--fhc-primary) !important;
+	border-color: var(--fhc-primary) !important;
+	color: var(--fhc-light) !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-last {
+	color: var(--fhc-primary) !important;
+}
+
+.p-link:focus {
+	box-shadow: 0 0 0 0.2rem rgba(var(--fhc-primary), 0.5) !important;
+}

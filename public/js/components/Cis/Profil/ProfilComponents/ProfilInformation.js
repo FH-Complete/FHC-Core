@@ -73,7 +73,7 @@ export default {
 	<image-upload ref="imageUpload" :titel="$p.t('profilUpdate','profilBild')"></image-upload>
     <div class="card-header">
         <div class="row">
-            <div v-if="isEditable" @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button">
+            <div v-if="isEditable" @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button" :title="$p.t('profilUpdate','profilBearbeiten')">
                 <i class="fa fa-edit"></i>
             </div>
             <div class="col">
@@ -90,10 +90,10 @@ export default {
                     <div class="col-auto profil-image" style="position:relative">
                         <img alt="profile picture" class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"/>
                         <!-- LOCKING IMAGE FUNCTIONALITY -->
-                        <div v-if="isEditable" role="button" @click.prevent="sperre_foto_function" class="image-lock">
+                        <div v-if="isEditable" role="button" type="button"  :title="FotoSperre?$p.t('profil','fotoSperren'):$p.t('profil','fotoEntsperren')" @click.prevent="sperre_foto_function" class="image-lock">
                             <i :class="{'fa':true, ...(FotoSperre?{'fa-lock':true}:{'fa-lock-open':true})} "></i>
                         </div>
-						<div v-if="fotoStatus != null && !fotostatus" role="button" @click.prevent="showModal" class="image-upload">
+						<div v-if="fotoStatus != null && !fotoStatus" role="button" type="button" :title="$p.t('profil','fotoHochladen')" @click.prevent="showModal" class="image-upload">
                             <i class="fa fa-upload"></i>
                         </div>
                     </div>

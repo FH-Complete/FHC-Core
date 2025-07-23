@@ -243,7 +243,7 @@ export default {
         	<div :class="'col-'+(width == 4? 3: width == 3? 4 :6)" style="overflow: auto;" class="fhc-news-items-lg border-end h-100 g-0 " >
         		<template v-for="news in newsList" :key="'menu-'+news.news_id" >
 				<div class="row m-0 py-2" @click="setSelected(news)">
-					<div class="col-md-12 d-flex mb-2">
+					<div class="col-md-12 d-flex mb-2 pe-3">
 						<span class="small ">{{ formatDate(news.insertamum) }} </span>
 						<span class="ms-auto small ">{{ formatTime(news.insertamum) }} </span>
 					</div>

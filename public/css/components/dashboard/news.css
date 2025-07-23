@@ -168,19 +168,14 @@
 	opacity: 1 !important;
 }
 
-.fhc-news-items-lg .row:hover{
-	background-color: var(--fhc-primary);
-	color: var(--fhc-light) !important;
-	cursor: pointer;
-}
 
 .fhc-news-items-lg .row .news-truncate span{
 	color: var(--fhc-primary);
 	cursor: pointer;
 }
 
-.fhc-news-items-lg .row:hover .news-truncate span {
-	color: var(--fhc-light);
+.fhc-news-items-lg .row:hover .news-truncate span{
+	text-decoration: underline;
 	cursor: pointer;
 }
 
