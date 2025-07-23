@@ -62,7 +62,13 @@ export default {
 			<slot :event="undefined" mode="list" />
 		</div>
 		<div v-for="{ day, events } in eventsPerDay" class="text-center">
-			<label-dow :date="day" class="d-inline" />, <label-day :date="day" class="d-inline" />
+			<label-dow
+				:date="day"
+				class="d-inline"
+				@cal-click="evt => evt.detail.source = 'day'"
+			/>
+			, 
+			<label-day :date="day" class="d-inline" />
 			<div v-for="event in events">
  				<div v-if="event.type == 'loading'" class="placeholder-glow opacity-50">
 					<span class="placeholder w-100" />
