@@ -23,7 +23,6 @@ export default {
 		propsViewData: Object
 	},
 	data() {
-		const now = luxon.DateTime.now().setZone(this.viewData.timezone);
 		return {
 			modes: {
 				day: Vue.markRaw(ModeDay),
@@ -41,14 +40,28 @@ export default {
 				}
 			},
 			currentDay: this.propsViewData?.focus_date,
-			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_RAUMINFO,
-			backgrounds: [
+			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_RAUMINFO
+		}
+	},
+	computed: {
+		backgrounds() {
+			let now = luxon.DateTime.now().setZone(this.viewData.timezone);
+
+			if (this.calendarMode == 'Month')
+				return [
+					{
+						class: 'background-past',
+						end: now.startOf('day')
+					}
+				];
+
+			return [
 				{
 					class: 'background-past',
 					end: now,
 					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
 				}
-			]
+			];
 		}
 	},
 	methods:{

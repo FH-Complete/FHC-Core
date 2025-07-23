@@ -43,13 +43,6 @@ export default {
 			},
 			currentDay: this.propsViewData?.focus_date,
 			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_LVPLAN,
-			backgrounds: [
-				{
-					class: 'background-past',
-					end: now,
-					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
-				}
-			],
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
 			studiensemester_ende: null,
@@ -57,6 +50,25 @@ export default {
 		};
 	},
 	computed:{
+		backgrounds() {
+			let now = luxon.DateTime.now().setZone(this.viewData.timezone);
+
+			if (this.calendarMode == 'Month')
+				return [
+					{
+						class: 'background-past',
+						end: now.startOf('day')
+					}
+				];
+
+			return [
+				{
+					class: 'background-past',
+					end: now,
+					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
+				}
+			];
+		},
 		downloadLinks() {
 			if (!this.studiensemester_start || !this.studiensemester_ende || !this.uid)
 				return false;
@@ -82,7 +94,7 @@ export default {
 				{ title: "ical1", icon: 'fa-regular fa-calendar', link: download_link + '&format=ical&version=1&target=ical' },
 				{ title: "ical2", icon: 'fa-regular fa-calendar', link: download_link + '&format=ical&version=2&target=ical' }
 			];
-		},
+		}
 	},
 	methods: {
 		eventStyle(event) {
