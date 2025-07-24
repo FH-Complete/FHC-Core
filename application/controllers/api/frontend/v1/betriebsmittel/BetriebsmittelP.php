@@ -60,7 +60,11 @@ class BetriebsmittelP extends FHCAPI_Controller
 
 	public function getAllBetriebsmittel($type_id, $id)
 	{
-		$result = $this->BetriebsmittelpersonModel->getBetriebsmittelData($id, $type_id);
+		$betriebsmitteltypes = null;
+		if ($this->input->get('betriebsmitteltypes') !== null && !isEmptyArray($this->input->get('betriebsmitteltypes')))
+			$betriebsmitteltypes = $this->input->get('betriebsmitteltypes');
+
+		$result = $this->BetriebsmittelpersonModel->getBetriebsmittelData($id, $type_id, $betriebsmitteltypes);
 
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
@@ -366,6 +370,12 @@ class BetriebsmittelP extends FHCAPI_Controller
 		$this->load->model('ressource/Betriebsmitteltyp_model', 'BetriebsmitteltypModel');
 
 		$this->BetriebsmitteltypModel->addOrder('beschreibung', 'ASC');
+
+		if ($this->input->get('betriebsmitteltypes') !== null && !isEmptyArray($this->input->get('betriebsmitteltypes')))
+		{
+			$this->BetriebsmitteltypModel->db->where_in('betriebsmitteltyp', $this->input->get('betriebsmitteltypes'));
+		}
+
 		$result = $this->BetriebsmitteltypModel->load(); // load All
 
 		if (isError($result)) {
