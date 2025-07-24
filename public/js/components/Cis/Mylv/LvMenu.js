@@ -55,7 +55,7 @@ export default {
 					class="menu-entry p-2 w-100 text-wrap border border-1 rounded-3 d-flex flex-column align-items-center justify-content-center text-center text-decoration-none link h-100">
 						<img :src="menuItem.c4_icon" :alt="menuItem.name" />
 						<p class="w-100 mt-2 mb-0">{{menuItem.name}}</p>
-						<a v-for="([text,link],index) in menuItem.c4_linkList" target="_blank" :href="link" class="my-1 w-100 submenu text-decoration-none" :index="index">{{text}}</p>
+						<a v-for="([text,link],index) in menuItem.c4_linkList" target="_blank" :href="link" class="my-1 w-100 submenu text-decoration-none" :index="index">{{text}}</a>
 					</a>
 					<ul v-if="menuItem.c4_moodle_links?.length" class="dropdown-menu p-0" :aria-labelledby="menuItem.name">
 						<li v-for="item in menuItem.c4_moodle_links"><a class="dropdown-item border-bottom" :href="item.url">{{item.lehrform}}</a></li>

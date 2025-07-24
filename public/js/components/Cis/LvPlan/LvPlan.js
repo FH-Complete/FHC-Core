@@ -1,353 +1,246 @@
-import FhcCalendar from "../../Calendar/Calendar.js";
-import CalendarDate from "../../../composables/CalendarDate.js";
-import LvModal from "../Mylv/LvModal.js";
-import LvMenu from "../Mylv/LvMenu.js"
+import FhcCalendar from "../../Calendar/Base.js";
+
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
+import { useEventLoader } from '../../../composables/EventLoader.js';
+
+import ModeDay from '../../Calendar/Mode/Day.js';
+import ModeWeek from '../../Calendar/Mode/Week.js';
+import ModeMonth from '../../Calendar/Mode/Month.js';
+
 export const DEFAULT_MODE_LVPLAN = 'Week'
 
-const LvPlan = {
+export default {
 	name: 'LvPlan',
+	components: {
+		FhcCalendar
+	},
+	inject: [
+		"renderers"
+	],
+	props: {
+		viewData: Object, // NOTE(chris): this is inherited from router-view
+		propsViewData: Object
+	},
 	data() {
+		const now = luxon.DateTime.now().setZone(this.viewData.timezone);
 		return {
-			events: null,
+			modes: {
+				day: Vue.markRaw(ModeDay),
+				week: Vue.markRaw(ModeWeek),
+				month: Vue.markRaw(ModeMonth)
+			},
+			modeOptions: {
+				day: {
+					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
+					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound')),
+					compact: false
+				},
+				week: {
+					collapseEmptyDays: false
+				}
+			},
+			currentDay: this.propsViewData?.focus_date,
 			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_LVPLAN,
-			calendarDate: new CalendarDate(new Date()),
-			eventCalendarDate: new CalendarDate(new Date()),
-			currentlySelectedEvent: null,
-			currentDay: this.propsViewData?.focus_date ? new Date(this.propsViewData.focus_date) : new Date(),
-			lv: null,
-			minimized: false,
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
 			studiensemester_ende: null,
-			uid: null,
-			isModalContentResolved: false,
-			isModalTitleResolved: false,
-			isShowModal: false,
-		}
-	},
-	props: {
-		viewData: Object, // NOTE(chris): this is inherited from router-view
-		propsViewData: Object,
-		rowMinHeight: {
-			type: String,
-			default: '100px'
-		},
-		eventMaxHeight: {
-			type: String,
-			default: '125px'
-		}
-	},
-	provide() {
-		return {
-			rowMinHeight: this.rowMinHeight,
-			eventMaxHeight: this.eventMaxHeight
-		}	
-	},
-	inject:["renderers"],
-	watch: {
-		/* events:{
-			handler: function(newValue){
-				if(newValue == null)
-					setTimeout(()=>{
-						if(this.events == null){
-							this.loadEvents();
-						}
-					},500);
-			},
-			immediate: true,
-		}, */
-		modalLoaded:{
-			handler: function (newValue) {
-				if (this.isShowModal && newValue.isModalContentResolved && newValue.isModalTitleResolved) {
-					this.$nextTick(() => {
-						if(this.$refs.lvmodal) this.$refs.lvmodal.show();
-						this.isShowModal = false;
-					});
-				}
-			}, 
-			immediate: true
-		},
-		weekFirstDay: {
-			handler: async function (newValue) {
-				let data = await this.fetchStudiensemesterDetails(newValue);
-				let { studiensemester_kurzbz, start, ende } = data.data;
-				this.studiensemester_kurzbz = studiensemester_kurzbz;
-				this.studiensemester_start = start;
-				this.studiensemester_ende = ende;
-			},
-			immediate: true,
-		},
-		// forward/backward on history entries happening in lvplan
-		'propsViewData.lv_id'(newVal) {
-			// relevant if lv_id can be changed from within this component
-		},
-		'propsViewData.mode'(newVal) {
-			if(this.$refs.calendar) this.$refs.calendar.setMode(newVal)
-		},
-		'propsViewData.focus_date'(newVal) {
-			this.currentDate = new Date(newVal)
-		}
-	},
-	components: {
-		FhcCalendar, LvModal, LvMenu
+			uid: null
+		};
 	},
 	computed:{
-		modalLoaded: function(){
-			return { isModalContentResolved: this.isModalContentResolved, isModalTitleResolved:this.isModalTitleResolved};
-		},
-		
-		downloadLinks: function(){
-			if(!this.studiensemester_start || !this.studiensemester_ende || !this.uid )return;
-			let start = new Date(this.studiensemester_start);
-			start = Math.floor(start.getTime()/1000);
-			let ende = new Date(this.studiensemester_ende);
-			ende = Math.floor(ende.getTime() / 1000);
+		backgrounds() {
+			let now = luxon.DateTime.now().setZone(this.viewData.timezone);
 
-			let download_link = 
-				(format, version = "", target = "") => 
-					`${FHC_JS_DATA_STORAGE_OBJECT.app_root}cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=
-					${this.uid}&begin=${start}&ende=${ende}&format=${format}
-					${version ? '&version=' + version : ''}${target ? '&target=' + target : ''}`;
+			if (this.calendarMode == 'Month')
+				return [
+					{
+						class: 'background-past',
+						end: now.startOf('day')
+					}
+				];
+
 			return [
-				{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link('excel') },
-				{ title: "csv", icon: 'fa-solid fa-file-csv', link: download_link('csv') },
-				{ title: "ical1", icon: 'fa-regular fa-calendar', link: download_link('ical', '1', 'ical') },
-				{ title: "ical2", icon: 'fa-regular fa-calendar', link: download_link('ical', '2', 'ical') }
+				{
+					class: 'background-past',
+					end: now,
+					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
+				}
 			];
 		},
-		weekFirstDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdFirstDayOfWeek);
-		},
-		weekLastDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdLastDayOfWeek);
-		},
-		monthFirstDay: function () {
-			return this.calendarDateToString(this.eventCalendarDate.cdFirstDayOfCalendarMonth);
-		},
-		monthLastDay: function () {
-			return this.calendarDateToString(this.eventCalendarDate.cdLastDayOfCalendarMonth);
-		},
-	},
-	methods:{
-		modalTitleResolved: function () {
-			this.isModalTitleResolved = true;
+		downloadLinks() {
+			if (!this.studiensemester_start || !this.studiensemester_ende || !this.uid)
+				return false;
 			
-		},
-		modalContentResolved: function () {
-			this.isModalContentResolved = true;
-			
-		},
-		// component renderers fetches from different addons
-		modalTitleComponent(type){
-			return this.renderers[type]?.modalTitle;
-		},
-		modalContentComponent(type) {
-			return this.renderers[type]?.modalContent;
-		},
-		calendarEventComponent(type){
-			return this.renderers[type]?.calendarEvent;
-		},
-		
+			const opts = { zone: this.viewData.timezone };
+			const start = luxon.DateTime
+				.fromISO(this.studiensemester_start, opts)
+				.toUnixInteger();
+			const ende = luxon.DateTime
+				.fromISO(this.studiensemester_ende, opts)
+				.toUnixInteger();
 
-		fetchStudiensemesterDetails: async function (date) {
-			return this.$api.call(ApiLvPlan.studiensemesterDateInterval(date));
+			const download_link = FHC_JS_DATA_STORAGE_OBJECT.app_root
+				+ 'cis/private/lvplan/stpl_kalender.php'
+				+ '?type=student'
+				+ '&pers_uid=' + this.uid
+				+ '&begin=' + start
+				+ '&ende=' + ende;
+
+			return [
+				{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link + '&format=excel' },
+				{ title: "csv", icon: 'fa-solid fa-file-csv', link: download_link + '&format=csv' },
+				{ title: "ical1", icon: 'fa-regular fa-calendar', link: download_link + '&format=ical&version=1&target=ical' },
+				{ title: "ical2", icon: 'fa-regular fa-calendar', link: download_link + '&format=ical&version=2&target=ical' }
+			];
+		}
+	},
+	methods: {
+		eventStyle(event) {
+			if (!event.farbe)
+				return undefined;
+			return '--event-bg:#' + event.farbe;
 		},
-		
-		setSelectedEvent: function (event) {
-			this.currentlySelectedEvent = event;
-		},
-		selectDay: function(day){
-			const date = day.getFullYear() + "-" +
-				String(day.getMonth() + 1).padStart(2, "0") + "-" +
-				String(day.getDate()).padStart(2, "0");
-			const capitalizedMode = this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1);
+		handleChangeDate(day) {
+			const focus_date = day.toISODate();
+			const mode = this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1);
 
 			this.$router.push({
 				name: "LvPlan",
 				params: {
-					mode: capitalizedMode,
-					focus_date: date,
+					mode,
+					focus_date,
 					lv_id: this.propsViewData?.lv_id || null
 				}
 			})
 			
 			this.currentDay = day;
 		},
-		handleChangeMode(mode) {
-			let m = mode[0].toUpperCase() + mode.slice(1)
-			if(m === this.calendarMode) return; // TODO(chris): check for date and lv_id too!
-			const date = this.currentDay.getFullYear() + "-" +
-				String(this.currentDay.getMonth() + 1).padStart(2, "0") + "-" +
-				String(this.currentDay.getDate()).padStart(2, "0");
-			
-			if (m == 'Weeks' || m == 'Years' || m == 'Months') return;
+		handleChangeMode(newMode) {
+			const mode = newMode[0].toUpperCase() + newMode.slice(1)
+			const focus_date = (this.currentDay instanceof luxon.DateTime)
+				? this.currentDay.toISODate()
+				: this.currentDay;
 			
 			this.$router.push({
 				name: "LvPlan",
 				params: {
-					mode: m,
-					focus_date: date,
+					mode,
+					focus_date,
 					lv_id: this.propsViewData?.lv_id ?? null
 				}
-			})
-			this.calendarMode = m
-		},
-		showModal: function(event){
-			this.currentlySelectedEvent = event;
-			Vue.nextTick(()=>{
-				if(this.isModalContentResolved && this.isModalTitleResolved){
-					if(this.$refs.lvmodal) this.$refs.lvmodal.show();
-				} 
-				else{
-					this.isShowModal = true;
-				}
-			})
-		},
-		updateRange: function ({start,end, mounted}) {
-			let checkDate = (date) => {
-				return date.m != this.eventCalendarDate.m || date.y != this.eventCalendarDate.y;
-			}
-			this.calendarDate = new CalendarDate(end);
-
-			// only load month data if the month or year has changed
-			// or we receive a reload flag from the mounted routine of the components
-			// or this handler is being called from the mounted lifecycle of a component
-			if (mounted || (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end)))){
-				// reset the events before querying the new events to activate the loading spinner
-				this.events = null;
-				this.eventCalendarDate = new CalendarDate(end);
-				this.loadEvents();
-			}
-		},
-		calendarDateToString: function (calendarDate) {
-			return calendarDate instanceof CalendarDate ?
-				[calendarDate.y, calendarDate.m + 1, calendarDate.d].join('-') :
-				null;
-
-		},
-		loadEvents: function(){
-			Promise.allSettled([
-				this.$api.call(ApiLvPlan.LvPlanEvents(this.monthFirstDay, this.monthLastDay, this.propsViewData.lv_id)),
-				this.$api.call(ApiLvPlan.getLvPlanReservierungen(this.monthFirstDay, this.monthLastDay))
-			]).then((result) => {
-				let promise_events = [];
-				result.forEach((promise_result) => {
-					if (promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success") {
-						
-						if(promise_result.value.meta?.lv) this.lv = promise_result.value.meta.lv
-						
-						let data = promise_result.value.data;
-						// adding additional information to the events 
-						if (data && data.forEach) {
-
-							data.forEach((el, i) => {
-								el.id = i;
-								if (el.type === 'reservierung') {
-									el.color = '#' + (el.farbe || 'FFFFFF');
-								} else {
-									el.color = '#' + (el.farbe || 'CCCCCC');
-								}
-
-								el.start = new Date(el.datum + ' ' + el.beginn);
-								el.end = new Date(el.datum + ' ' + el.ende);
-
-							});
-						}
-						promise_events = promise_events.concat(data);
-					}
-				})
-				this.events = promise_events;
 			});
+
+			this.calendarMode = mode;
 		},
+		updateRange(rangeInterval) {
+			this.rangeInterval = rangeInterval;
+			this.$api
+				.call(ApiLvPlan.studiensemesterDateInterval(
+					this.rangeInterval.end.startOf('week').toISODate()
+				))
+				.then(res => {
+					this.studiensemester_kurzbz = res.data.studiensemester_kurzbz;
+					this.studiensemester_start = res.data.start;
+					this.studiensemester_ende = res.data.ende;
+				});
+		}
+	},
+	setup(props) {
+		const $api = Vue.inject('$api');
+
+		const rangeInterval = Vue.ref(null);
+		
+		const { events, lv } = useEventLoader(rangeInterval, (start, end) => {
+			return [
+				$api.call(ApiLvPlan.LvPlanEvents(start.toISODate(), end.toISODate(), props.propsViewData.lv_id)),
+				$api.call(ApiLvPlan.getLvPlanReservierungen(start.toISODate(), end.toISODate()))
+			];
+		});
+
+		return {
+			rangeInterval,
+			events,
+			lv
+		};
 	},
 	created() {
-		
-
 		this.$api
 			.call(ApiAuthinfo.getAuthUID())
-			.then(res => res.data)
-			.then(data => {
-				this.uid = data.uid;
+			.then(res => {
+				this.uid = res.data.uid;
 			});
-		
-		// this.loadEvents();
-	},
-	beforeUnmount() {
-		if(this.$refs.lvmodal) this.$refs.lvmodal.hide()	
 	},
 	template:/*html*/`
-	<template v-if="renderers">
-	<h2>
-		{{$p.t('lehre/stundenplan')}}
-		<span style="padding-left: 0.4em;" v-show="studiensemester_kurzbz">{{studiensemester_kurzbz}}</span>
-		<span style="padding-left: 0.5em;" v-show="propsViewData?.lv_id && lv"> {{ $p.user_language.value === 'German' ? lv?.bezeichnung : lv?.bezeichnung_english}}</span>
-	</h2>
-	<hr>
-	<lv-modal v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ref="lvmodal" >
-		<template #modalTitle>
-		<Suspense @pending="isModalTitleResolved=false" @resolve="modalTitleResolved">
-			<component :is="modalTitleComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
-		</Suspense>
-		</template>
-		<template #modalContent>
-		<Suspense @pending="isModalContentResolved=false" @resolve="modalContentResolved">
-			<component :is="modalContentComponent(currentlySelectedEvent.type)" v-if="currentlySelectedEvent" :event="currentlySelectedEvent" ></component>
-		</Suspense>
-		</template>
-	</lv-modal>
-
-	<fhc-calendar
-		ref="calendar"
-		@selectedEvent="setSelectedEvent"
-		:initial-date="currentDay"
-		@change:range="updateRange"
-		@change:offset="handleOffset"
-		:events="events"
-		:initial-mode="propsViewData.mode"
-		show-weeks
-		@select:day="selectDay"
-		@change:mode="handleChangeMode"
-		v-model:minimized="minimized"
-	>
-		<template #calendarDownloads>
-			<div v-for="{title,icon,link} in downloadLinks">
-				<a :href="link" :aria-label="title" class="py-1 px-2 m-1 btn btn-outline-secondary card">
-					<div class="d-flex flex-column">
-						<i aria-hidden="true" :class="icon"></i>
-						<span class="small">{{title}}</span>
+	<div class="fhc-lvplan d-flex flex-column h-100" v-if="renderers">
+		<h2 @click="modeOptions.week.collapseEmptyDays = !modeOptions.week.collapseEmptyDays">
+			{{ $p.t('lehre/stundenplan') }}
+			<span style="padding-left: 0.4em;" v-show="studiensemester_kurzbz">
+				{{ studiensemester_kurzbz }}
+			</span>
+			<span style="padding-left: 0.5em;" v-show="propsViewData?.lv_id && lv">
+				{{ $p.user_language.value === 'German' ? lv?.bezeichnung : lv?.bezeichnung_english }}
+			</span>
+		</h2>
+		<hr>
+		<fhc-calendar
+			ref="calendar"
+			:date="currentDay"
+			:modes="modes"
+			:mode-options="modeOptions"
+			:mode="propsViewData.mode.toLowerCase()"
+			@update:date="handleChangeDate"
+			@update:mode="handleChangeMode"
+			@update:range="updateRange"
+			:timezone="viewData.timezone"
+			:locale="$p.user_locale.value"
+			show-btns
+			:events="events || []"
+			:backgrounds="backgrounds"
+		>
+			<template v-slot="{ event, mode }">
+				<div
+					:class="'event-type-' + event.type + ' ' + mode + 'PageContainer'"
+					:type="mode == 'day' ? 'button' : undefined"
+	 				:style="eventStyle(event)"
+				>
+					<component
+						v-if="mode == 'event'"
+						:is="renderers[event.type]?.modalContent"
+						:event="event"
+					></component>
+					<component
+						v-else-if="mode == 'eventheader'"
+						:is="renderers[event.type]?.modalTitle"
+						:event="event"
+					></component>
+					<component
+						v-else
+						:is="renderers[event.type]?.calendarEvent"
+						:event="event"
+					></component>
+				</div>
+			</template>
+			<template #actions>
+				<div
+					v-if="downloadLinks"
+					class="d-flex gap-1 justify-items-start"
+				>
+					<div v-for="{ title, icon, link } in downloadLinks">
+						<a
+							:href="link"
+							:aria-label="title"
+							class="py-1 px-2 m-1 btn btn-outline-secondary card"
+						>
+							<div class="d-flex flex-column">
+								<i aria-hidden="true" :class="icon"></i>
+								<span class="small">{{ title }}</span>
+							</div>
+						</a>
 					</div>
-				</a>
-			</div>
-		</template>
-		<template #monthPage="{event,day}">
-			<div @click="showModal(event)" class="monthPageContainer " >
-				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
-			</div>
-		</template>
-		<template #weekPage="{event,day}">
-			<div @click="showModal(event)" type = "button"
-				class="weekPageContainer position-relative h-100"
-				:class="{'p-1':event.allDayEvent}"
-				style = "overflow: auto;" >
-				<component :is="calendarEventComponent(event.type)" :event="event" ></component>
-			</div>
-		</template>
-		<template #dayPage="{event,day,mobile}">
-			<div @click="mobile? showModal(event):null" type="button" class="dayPageContainer fhc-entry m-0 h-100  text-center">
-				<component :is="calendarEventComponent(event.type)" :event="event"></component>
-			</div>
-		</template>
-		<template #pageMobilContent="{lvMenu, event}">
-			<component :is="modalContentComponent(currentlySelectedEvent.type)" v-if="event" :event="event" :lvMenu="lvMenu" ></component>
-		</template>
-		<template #pageMobilContentEmpty >
-			<h3>{{ $p.t('lehre/noLvFound') }}</h3>
-		</template>
-	</fhc-calendar>
-	</template>`
-}
-
-export default LvPlan;
+				</div>
+			</template>
+		</fhc-calendar>
+	</div>`
+};

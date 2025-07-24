@@ -1,7 +1,7 @@
 
 export default {
 	getRoomInfo(ort_kurzbz, start_date, end_date) {
-		return this.$fhcApi.get(
+		return this.$fhcApi.post(
 			'/api/frontend/v1/LvPlan/getRoomplan',
 			{  ort_kurzbz, start_date, end_date}
 		);
@@ -13,14 +13,14 @@ export default {
 		);
 	},
 	getOrtReservierungen(ort_kurzbz, start_date, end_date) {
-		return this.$fhcApi.get(
-			`/api/frontend/v1/LvPlan/Reservierungen/${ort_kurzbz}`,
+		return this.$fhcApi.post(
+			`/api/frontend/v1/LvPlan/getReservierungen/${ort_kurzbz}`,
 			{ start_date, end_date}
 		);
 	},
 	getLvPlanReservierungen(start_date, end_date) {
-		return this.$fhcApi.get(
-			'/api/frontend/v1/LvPlan/Reservierungen',
+		return this.$fhcApi.post(
+			'/api/frontend/v1/LvPlan/getReservierungen',
 			{ start_date, end_date }
 		);
 	},

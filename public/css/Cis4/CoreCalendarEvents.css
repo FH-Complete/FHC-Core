@@ -143,27 +143,27 @@
 
 .dayPageContainer .feiertagEventContent #ferienEventTitle {}
 
-/* Minimized Container Styles */
+/* List Page Container Styles */
 
-/* Ferientage Events for Minimized */
+/* Ferientage Events for List Page */
 
-.minimizedContainer .feiertagEventContent{
+.listPageContainer .feiertagEventContent{
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	color: var(--fhc-light);
 }
 
-.minimizedContainer .feiertagEventContent #ferienEventIcon{
+.listPageContainer .feiertagEventContent #ferienEventIcon{
 	margin: 0.5rem;
 }
 
-.minimizedContainer .feiertagEventContent #ferienEventTitle{
+.listPageContainer .feiertagEventContent #ferienEventTitle{
 	flex-grow: 1;
 }
 
-/* Lehreinheits Events in Minimized */
-.dayPageContainer .lehreinheitEventContent {
+/* Lehreinheits Events in List Page */
+.listPageContainer .lehreinheitEventContent {
 	display: flex;
 	padding-left: 4rem;
 	justify-content: space-evenly;
@@ -171,15 +171,15 @@
 
 }
 
-.dayPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
+.listPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
 	display: grid;
 	align-content: center;
 }
 
-.dayPageContainer .lehreinheitEventContent #lehreinheitEventText {
+.listPageContainer .lehreinheitEventContent #lehreinheitEventText {
 	display: contents;
 }
 
-.dayPageContainer .lehreinheitEventContent #lehreinheitEventText * {
+.listPageContainer .lehreinheitEventContent #lehreinheitEventText * {
 	font-weight: 500;
 }
