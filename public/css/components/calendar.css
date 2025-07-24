@@ -34,5 +34,5 @@
 	--fhc-calendar-radius-day-event: var(--fhc-calendar-radius-event);
 	--fhc-calendar-radius-week-event: var(--fhc-calendar-radius-event);
 	--fhc-calendar-radius-month-event: 0;
-	--fhc-calendar-radius-list-event: 0;
+	--fhc-calendar-radius-list-event: var(--fhc-calendar-radius-event);
 }

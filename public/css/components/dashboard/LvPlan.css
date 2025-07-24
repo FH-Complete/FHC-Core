@@ -22,3 +22,6 @@
 .dashboard-widget-lvplan .fhc-calendar-base-label-day {
 	cursor: initial;
 }
+.dashboard-widget-lvplan .fhc-calendar-mode-list-view {
+	padding: 0 1rem;
+}
