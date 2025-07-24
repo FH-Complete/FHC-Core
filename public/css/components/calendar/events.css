@@ -1,62 +1,65 @@
 .event {
 	cursor: pointer;
 }
-.fhc-calendar-mode-week .all-day-events .fhc-calendar-base-grid-line-event .weekPageContainer {
+.fhc-calendar-mode-week .all-day-events .event .weekPageContainer {
 	padding: .25rem;
 }
-.fhc-calendar-mode-day .fhc-calendar-base-grid-line-event,
-.fhc-calendar-mode-week .fhc-calendar-base-grid-line-event {
+.fhc-calendar-mode-day .event,
+.fhc-calendar-mode-week .event {
 	margin: 0 .5rem;
 	font-size: var(--fhc-calendar-fontsize-event, .875rem);
 }
-.fhc-calendar-mode-day .all-day-events .fhc-calendar-base-grid-line-event,
-.fhc-calendar-mode-week .all-day-events .fhc-calendar-base-grid-line-event {
+.fhc-calendar-mode-day .all-day-events .event,
+.fhc-calendar-mode-week .all-day-events .event {
 	margin: .25rem;
 }
 /* Border */
-.fhc-calendar-mode-day .grid-main .fhc-calendar-base-grid-line-event > *,
-.fhc-calendar-mode-week .grid-main .fhc-calendar-base-grid-line-event > * {
+.fhc-calendar-mode-day .grid-main .event > *,
+.fhc-calendar-mode-week .grid-main .event > * {
 	border: solid 1px var(--fhc-calendar-border-event);
 }
-.fhc-calendar-mode-day .fhc-calendar-base-grid-line-event {
+.fhc-calendar-mode-day .event {
 	--event-radius: var(--fhc-calendar-radius-day-event, 0);
 }
-.fhc-calendar-mode-week .fhc-calendar-base-grid-line-event {
+.fhc-calendar-mode-week .event {
 	--event-radius: var(--fhc-calendar-radius-week-event, 0);
 }
-.fhc-calendar-mode-month .fhc-calendar-base-grid-line-event {
+.fhc-calendar-mode-month .event {
 	--event-radius: var(--fhc-calendar-radius-month-event, 0);
 }
-.fhc-calendar-mode-list .fhc-calendar-base-grid-line-event {
+.fhc-calendar-mode-list .event {
 	--event-radius: var(--fhc-calendar-radius-list-event, 0);
 }
-.fhc-calendar-mode-day .all-day-events .fhc-calendar-base-grid-line-event > *,
-.fhc-calendar-mode-week .all-day-events .fhc-calendar-base-grid-line-event > *,
-.fhc-calendar-mode-day .fhc-calendar-base-grid-line-event.event-begin > *,
-.fhc-calendar-mode-week .fhc-calendar-base-grid-line-event.event-begin > * {
+.fhc-calendar-mode-day .all-day-events .event > *,
+.fhc-calendar-mode-week .all-day-events .event > *,
+.fhc-calendar-mode-day .event.event-begin > *,
+.fhc-calendar-mode-week .event.event-begin > * {
 	border-top-left-radius: var(--event-radius);
 	border-top-right-radius: var(--event-radius);
 }
-.fhc-calendar-mode-day .all-day-events .fhc-calendar-base-grid-line-event > *,
-.fhc-calendar-mode-week .all-day-events .fhc-calendar-base-grid-line-event > *,
-.fhc-calendar-mode-day .fhc-calendar-base-grid-line-event.event-end > *,
-.fhc-calendar-mode-week .fhc-calendar-base-grid-line-event.event-end > * {
+.fhc-calendar-mode-day .all-day-events .event > *,
+.fhc-calendar-mode-week .all-day-events .event > *,
+.fhc-calendar-mode-day .event.event-end > *,
+.fhc-calendar-mode-week .event.event-end > * {
 	border-bottom-left-radius: var(--event-radius);
 	border-bottom-right-radius: var(--event-radius);
 }
-.fhc-calendar-mode-month .fhc-calendar-base-grid-line-event.event-begin > * {
+.fhc-calendar-mode-month .event.event-begin > * {
 	border-top-left-radius: var(--event-radius);
 	border-bottom-left-radius: var(--event-radius);
 }
-.fhc-calendar-mode-month .fhc-calendar-base-grid-line-event.event-end > * {
+.fhc-calendar-mode-month .event.event-end > * {
 	border-top-right-radius: var(--event-radius);
 	border-bottom-right-radius: var(--event-radius);
+}
+.fhc-calendar-mode-list .event > * {
+	border-radius: var(--event-radius);
 }
 /* Colors */
-.fhc-calendar-base-grid-line-event {
+.fhc-calendar-base .event {
 	--event-default-bg: var(--fhc-calendar-bg-event, #ccc);
 }
-.fhc-calendar-base-grid-line-event .event-type-reservierung {
+.fhc-calendar-base .event .event-type-reservierung {
 	--event-default-bg: var(--fhc-calendar-bg-reservierung, #fff);
 }
 .fhc-calendar-base .event > * {
