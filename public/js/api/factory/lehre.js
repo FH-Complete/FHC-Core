@@ -36,24 +36,18 @@ export default {
 			url: `/api/frontend/v1/Lehre/Pruefungen/${lehrveranstaltung_id}`
 		};
 	},
-	getStudentenNoten(lv_id, sem_kurzbz) {
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Noten/getStudentenNoten',
-			params: { lv_id, sem_kurzbz }
-		};
-	},
-	getNoten(){
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Noten/getNoten'
-		};
-	},
 	getZugewieseneLv(uid, sem_kurzbz){
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Lehre/getZugewieseneLv',
 			params: { uid, sem_kurzbz}
+		};
+	},
+	getLeForLv(lv_id, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Lehre/getLeForLv',
+			params: { lv_id, sem_kurzbz }
 		};
 	}
 };

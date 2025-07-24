@@ -316,7 +316,8 @@ class Lehrveranstaltung_model extends DB_Model
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
 			tbl_zeugnisnote.note, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_benutzer.uid,
-			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel, tbl_studiengang.orgform_kurzbz, vw_student_lehrveranstaltung.semester, vw_student_lehrveranstaltung.studiensemester_kurzbz, vw_student_lehrveranstaltung.bezeichnung
+			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel, tbl_studiengang.orgform_kurzbz, vw_student_lehrveranstaltung.semester, vw_student_lehrveranstaltung.studiensemester_kurzbz, vw_student_lehrveranstaltung.bezeichnung,
+			campus.vw_student_lehrveranstaltung.lehreinheit_id
 
 		FROM
 			campus.vw_student_lehrveranstaltung
@@ -343,7 +344,7 @@ class Lehrveranstaltung_model extends DB_Model
 
 		$query .=
 		" ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC";
-
+		
 		return $this->execQuery($query, array($studiensemester_kurzbz, $lehrveranstaltung_id));
 	}
 

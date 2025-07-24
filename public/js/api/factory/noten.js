@@ -29,11 +29,25 @@ export default {
 			url: '/api/frontend/v1/Noten/getNoten'
 		};
 	},
-	saveStudentenNoten(password) {
+	saveStudentenNoten(password, noten, lv_id, sem_kurzbz) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/saveStudentenNoten',
-			params: { password }
+			params: { password, noten, lv_id, sem_kurzbz }
+		};
+	},
+	saveNotenvorschlag(lv_id, sem_kurzbz, student_uid, note) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/saveNotenvorschlag',
+			params: { lv_id, sem_kurzbz, student_uid, note }
+		};
+	},
+	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ){
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/saveStudentPruefung',
+			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ }
 		};
 	}
 };

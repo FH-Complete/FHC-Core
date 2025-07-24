@@ -12,9 +12,10 @@ class Note_model extends DB_Model
 		$this->pk = 'note';
 	}
 	
-	public function getAll() {
+	public function getAllActive() {
 		$qry ="SELECT *
-			FROM lehre.tbl_note";
+			FROM lehre.tbl_note
+			WHERE aktiv = true";
 		
 		return $this->execReadOnlyQuery($qry);
 	}

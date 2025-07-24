@@ -42159,7 +42159,7 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
-		'phrase' => 'c4termin3',
+		'phrase' => 'c4kommPruef',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -42295,7 +42295,147 @@ and represent the current state of research on the topic. The prescribed citatio
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'pruefungNr',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung Nr. {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Examination No. {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'noteneingabeSpeichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Noteneingabe speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Save note entry',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'noteneingabeSpeichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Noteneingabe speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Save note entry',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'noteneingabeBestätigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Noten bestätigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Confirm grades',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'createPruefungFor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung erstellen für',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create examination for',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'approveGrades',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Noten freigeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approve Grades',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4originalZnote',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ursprüngliche Zeugnisnote',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Original Transcript Grade',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	
 	// CIS4 GESAMTNOTENEINGABE ENDE ------------------------------------------------------------------------------------
 
