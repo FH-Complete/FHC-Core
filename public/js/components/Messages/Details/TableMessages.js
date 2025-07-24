@@ -41,7 +41,7 @@ export default {
 				ajaxResponse: (url, params, response) => this.buildTreemap(response),
 				columns: [
 					{title: "subject", field: "subject"},
-					{title: "body", field: "body", visible: false},
+					{title: "body", field: "body", formatter: "html", visible: false},
 					{title: "message_id", field: "message_id", visible: false},
 					{
 						title: "Datum",

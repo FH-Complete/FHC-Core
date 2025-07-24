@@ -81,6 +81,7 @@ export default {
 						title: "Text",
 						field: "text_stripped",
 						width: 250,
+						formatter: "html",
 						clipContents: true,
 						tooltip:function(e, cell, onRendered){
 							var el = document.createElement("div");

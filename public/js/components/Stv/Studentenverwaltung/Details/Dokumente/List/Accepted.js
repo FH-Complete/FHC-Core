@@ -66,7 +66,7 @@ export default {
 							tickElement: '<i class="fa fa-check text-secondary"></i>',
 							crossElement: '<i class="fa fa-xmark text-secondary"></i>'
 						}},
-					{title: "infotext", field: "infotext"},
+					{title: "Infotext", field: "infotext"},
 					{title: "akte_id", field: "akte_id"},
 					{title: "dms_id", field: "dms_id", visible: false},
 					{title: "titel", field: "titel_intern", visible: false},

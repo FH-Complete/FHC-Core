@@ -225,7 +225,7 @@ export default {
 							title: this.$p.t('global', 'typ')
 						});
 						cm.getColumnByField('abschlusspruefung_id').component.updateDefinition({
-							title: this.$p.t('ui', 'abschlusspruefung_id')
+							title: this.$p.t('abschlusspruefung', 'abschlusspruefung_id')
 						});
 						/*
 						cm.getColumnByField('actions').component.updateDefinition({

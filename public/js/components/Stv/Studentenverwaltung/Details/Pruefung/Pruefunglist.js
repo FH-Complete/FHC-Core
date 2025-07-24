@@ -92,7 +92,8 @@ export default{
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
-				persistenceID:'stv-details-pruefung-pruefung-list'
+				index: 'pruefung_id',
+				persistenceID: 'stv-details-pruefung-list'
 			},
 			tabulatorEvents: [
 				{
@@ -123,7 +124,7 @@ export default{
 							title: this.$p.t('ui', 'pruefung_id')
 						});
 						cm.getColumnByField('lehreinheit_id').component.updateDefinition({
-							title: this.$p.t('ui', 'lehreinheit_id')
+							title: this.$p.t('global', 'lehreinheit_id')
 						});
 						cm.getColumnByField('mitarbeiter_uid').component.updateDefinition({
 							title: this.$p.t('ui', 'mitarbeiter_uid')

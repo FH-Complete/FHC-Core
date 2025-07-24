@@ -197,7 +197,7 @@ export default {
 					<form-input
 					v-if="!config.hiddenFields.includes('prestudent_id')"
 						container-class="col-3 stv-details-prestudent-prestudent_id"
-						label="Prestudent_id"
+						:label="$p.t('ui', 'prestudent_id')"
 						type="text"
 						v-model="data.prestudent_id"
 						name="prestudent_id"
@@ -207,7 +207,7 @@ export default {
 					<form-input
 						v-if="!config.hiddenFields.includes('person_id')"
 						container-class="col-3 stv-details-prestudent-person_id"
-						label="Person_id"
+						:label="$p.t('person', 'person_id')"
 						type="text"
 						v-model="data.person_id"
 						name="person_id"

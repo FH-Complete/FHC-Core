@@ -40096,7 +40096,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Abschlusspruefung ID',
+				'text' => 'Abschlussprüfung ID',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -40660,13 +40660,13 @@ array(
 	'phrases' => array(
 		array(
 			'sprache' => 'German',
-			'text' => 'Firma Id',
+			'text' => 'Firma ID',
 			'description' => '',
 			'insertvon' => 'system'
 		),
 		array(
 			'sprache' => 'English',
-			'text' => 'Company Id',
+			'text' => 'Company ID',
 			'description' => '',
 			'insertvon' => 'system'
 		)
@@ -43209,13 +43209,13 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Dms ID',
+				'text' => 'DMS ID',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Dms ID',
+				'text' => 'DMS ID',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -44532,6 +44532,46 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'English',
 				'text' => 'Add note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'mitarbeiter_uid',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mitarbeiter UID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Employee UID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'pruefung_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Examination ID',
 				'description' => '',
 				'insertvon' => 'system'
 			)

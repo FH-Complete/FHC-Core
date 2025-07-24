@@ -77,7 +77,7 @@ export default {
 						},
 						hozAlign: "center"
 						},
-					{title: "infotext", field: "infotext"},
+					{title: "Infotext", field: "infotext"},
 					{title: "akte_id", field: "akte_id"},
 					{title: "titel_intern", field: "titel_intern"},
 					{title: "Anmerkung_intern", field: "anmerkung_intern", visible: false},
@@ -193,6 +193,9 @@ export default {
 						});
 						cm.getColumnByField('vorhanden').component.updateDefinition({
 							title: this.$p.t('dokumente', 'vorhanden')
+						});
+						cm.getColumnByField('titel_intern').component.updateDefinition({
+							title: this.$p.t('global', 'titel')
 						});
 						cm.getColumnByField('anmerkung_intern').component.updateDefinition({
 							title: this.$p.t('global', 'anmerkung')
