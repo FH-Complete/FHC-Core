@@ -1,7 +1,7 @@
 import raum_contentmittitel from './Content_types/Raum_contentmittitel.js'
 import general from './Content_types/General.js'
 import BsConfirm from "../../Bootstrap/Confirm.js";
-
+import news_content from './Content_types/News_content.js';
 import ApiCms from '../../../api/factory/cms.js';
 
 export default {
@@ -22,6 +22,7 @@ export default {
 	},
 	components: {
 		raum_contentmittitel,
+		news_content,
 		general,
 	},
 	data() {
@@ -80,6 +81,8 @@ export default {
 			switch (this.content_type) {
 				case "raum_contentmittitel":
 					return "raum_contentmittitel";
+				case "news":
+					return "news_content";
 				default:
 					return "general";
 			};

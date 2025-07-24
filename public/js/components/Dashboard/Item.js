@@ -164,7 +164,7 @@ export default {
 			</Transition>
 			<span class="col mx-2 px-2">{{ widget.setup.name }}</span>
 			<template v-if="isPinned">
-				<div type="button" v-if="editMode" pinned="true" @click="unpin" v-tooltip="{showDelay:1000, value: 'unpin item'}" aria-label="unpin item" class="pin cursor-pointer col-auto me-2">
+				<div type="button" role="button" v-if="editMode" pinned="true" @click="unpin" title="unpin item" aria-label="unpin item" class="pin cursor-pointer col-auto me-2">
 					<i class="fa-solid fa-thumbtack " aria-hidden="true"></i>
 				</div>
 				<div v-else class="col-auto me-2">
@@ -172,7 +172,7 @@ export default {
 				</div>
 			</template>
 			<template v-else>
-				<div type="button" v-if="editMode"  class="col-auto me-2 pin" @click="pinItem" aria-label="pin item" v-tooltip="{showDelay:1000, value: 'pin item'}">
+				<div type="button" role="button" v-if="editMode"  class="col-auto me-2 pin" @click="pinItem" aria-label="pin item" title="pin item">
 					<i class="fa-solid fa-thumbtack" aria-hidden="true" style="color:lightgray;"></i>
 				</div>
 			</template>
@@ -189,7 +189,7 @@ export default {
 				</div>
 			</Transition>
 		</div>
-		<div v-if="ready" class="card-body overflow-hidden" style="padding: 0px;">
+		<div v-if="ready" class="card-body overflow-hidden" style="padding: .5em 0;">
 			<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
 		</div>
 		<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
