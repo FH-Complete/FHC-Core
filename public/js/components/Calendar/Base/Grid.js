@@ -218,9 +218,15 @@ export default {
 				const end = event.end || this.axisMainBorders[this.axisMainBorders.length - 1].plus(1);
 
 				for (var i = 0; i < this.axisMain.length; i++) {
-					if (start < this.axisMainBorders[i * 2 + 1] && end > this.axisMainBorders[i * 2]) {
-						const startsHere = start >= this.axisMainBorders[i * 2];
-						const endsHere = end <= this.axisMainBorders[i * 2 + 1];
+					let laneStart = this.axisMainBorders[i * 2];
+					let laneEnd = this.axisMainBorders[i * 2 + 1];
+					if (event.orig?.allDayEvent) {
+						laneStart = laneStart.startOf('day');
+						laneEnd = laneEnd.endOf('day');
+					}
+					if (start < laneEnd && end > laneStart) {
+						const startsHere = start >= laneStart;
+						const endsHere = end <= laneEnd;
 						result[i].push({
 							...event,
 							startsHere,
