@@ -177,6 +177,7 @@
 .fhc-news-items-lg .row:hover .news-truncate span{
 	text-decoration: underline;
 	cursor: pointer;
+	font-weight: bold;
 }
 
 

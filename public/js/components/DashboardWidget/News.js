@@ -33,11 +33,8 @@ export default {
 				quantity = this.height === 1 ? 4 : MAX_LOADED_NEWS;
 			}
 
-			let slicedNews= this.allNewsList.slice(0, quantity);
-			slicedNews.sort((a,b)=>{
-				return new Date(b.insertamum) - new Date(a.insertamum);
-			});
-			
+			let slicedNews = this.allNewsList.slice(0, quantity);
+
 			return slicedNews;
 		},
 		carouselItems() {
@@ -190,6 +187,9 @@ export default {
 			.then(res => res.data)
 			.then((news) => {
 				this.allNewsList = Array.from(Object.values(news));
+				this.allNewsList.sort((a, b) => {
+					return new Date(b.datum) - new Date(a.datum);
+				});
 				this.selected = this.allNewsList.length ? this.allNewsList[0] : null
 				this.initActiveItem()
 
@@ -230,32 +230,30 @@ export default {
             <div  v-for="(news, index) in newsList" :key="news.news_id" class="py-2">
 				<div class="row m-0">
 					<div class="col-12 d-flex">
-						<span class="small">{{ formatDate(news.insertamum) }} </span>
-						<span class="ms-auto small">{{ formatTime(news.insertamum) }} </span>
+						<span class="small">{{ formatDate(news.datum) }} </span>
 					</div>
 					<div class="col">
-						<a :href="contentURI(news.content_id)" >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</a>
+						<a :href="contentURI(news.content_id)" >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.datum) }}</a>
 					</div>
 				</div>
 			</div>
 		</div>
         <div v-show="width >1" class="row h-100 g-0">
-        	<div :class="'col-'+(width == 4? 3: width == 3? 4 :6)" style="overflow: auto;" class="fhc-news-items-lg border-end h-100 g-0 " >
+		<div :class="'col-'+(width == 4? 3: width == 3? 4 :6)" style="overflow: auto; overscroll-behavior: none;" class="fhc-news-items-lg border-end h-100 g-0 " >
         		<template v-for="news in newsList" :key="'menu-'+news.news_id" >
 				<div class="row m-0 py-2" @click="setSelected(news)">
-					<div class="col-md-12 d-flex mb-2 pe-3">
-						<span class="small ">{{ formatDate(news.insertamum) }} </span>
-						<span class="ms-auto small ">{{ formatTime(news.insertamum) }} </span>
+					<div class="col-md-12 d-flex pe-3">
+						<span class="small ">{{ formatDate(news.datum) }} </span>
 					</div>
 					<div class="col-md-12 news-truncate">
-						<span >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.insertamum) }}</span>
+						<span >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.datum) }}</span>
 					</div>
 				</div>
 				</template>
 			</div>
 			<div style="padding-left: 0px; padding-right: 0px;" ref="htmlContent" class="h-100 col">
 				<div class="container h-100" style="padding: 0px;"  ref="carocontainer">
-					<div id="FhcCarouselContainer" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel" data-bs-interval="false">
+					<div id="FhcCarouselContainer" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel ms-2" data-bs-interval="false">
 
 						<div class="carousel-inner" ref="carouselInner"  style="height: 100%; max-width: 100%;">
 							<div ref="carouselItems" v-for="(news, index) in newsList" class="carousel-item fhc-news-card-item" style="overflow-y: auto; overflow-x: hidden; height: 100%;" :id="'card-'+news.news_id" v-html="news.content_obj.content"/>
