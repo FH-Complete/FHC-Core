@@ -34,8 +34,7 @@ export default {
 			modeOptions: {
 				day: {
 					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
-					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound')),
-					compact: false
+					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound'))
 				},
 				week: {
 					collapseEmptyDays: false

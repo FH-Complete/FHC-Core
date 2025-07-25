@@ -3,6 +3,8 @@ import LabelDay from '../../Base/Label/Day.js';
 import LabelDow from '../../Base/Label/Dow.js';
 import LabelTime from '../../Base/Label/Time.js';
 
+import { useResizeObserver } from '../../../../composables/Responsive.js';
+
 export default {
 	name: "DayView",
 	components: {
@@ -22,8 +24,7 @@ export default {
 			required: true
 		},
 		emptyMessage: String,
-		emptyMessageDetails: String,
-		compact: Boolean
+		emptyMessageDetails: String
 	},
 	emits: [
 		"requestModalOpen",
@@ -104,11 +105,21 @@ export default {
 			}
 		}
 	},
+	setup() {
+		const container = Vue.ref(null); // use useTemplateRef when updating to Vue 3.5
+		const { compact } = useResizeObserver(container, 750);
+
+		return {
+			container, // must be exposed or it won't be set in Vue < 3.5
+			compact
+		};
+	},
 	mounted() {
 		this.gridMainRef = this.$refs.grid.$refs.main;
 	},
 	template: /* html */`
 	<div
+		ref="container"
 		class="fhc-calendar-mode-day-view d-flex h-100"
 		@cal-click-default.capture="handleClickDefaults"
 	>

@@ -32,8 +32,7 @@ export default {
 			modeOptions: {
 				day: {
 					emptyMessage: Vue.computed(() => this.$p.t('rauminfo/keineRaumReservierung')),
-					emptyMessageDetails: Vue.computed(() => this.$p.t('rauminfo/keineRaumReservierung')),
-					compact: false
+					emptyMessageDetails: Vue.computed(() => this.$p.t('rauminfo/keineRaumReservierung'))
 				},
 				week: {
 					collapseEmptyDays: false
