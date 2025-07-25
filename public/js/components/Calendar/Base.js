@@ -152,33 +152,48 @@ export default {
 				return res;
 			});
 		},
+		sDate() {
+			if (this.date instanceof luxon.DateTime)
+				return this.date;
+			return luxon.DateTime.fromJSDate(new Date(this.date)).setZone(this.timezone);
+		},
 		cDate: {
 			get() {
-				if (this.internalDate) {
-					return this.internalDate.setLocale(this.locale);
-				}
-				return luxon.DateTime.fromJSDate(new Date(this.date)).setZone(this.timezone).setLocale(this.locale);
+				const date = this.internalDate ? this.internalDate : this.sDate;
+				return date.setLocale(this.locale);
 			},
 			set(value) {
 				this.internalDate = value;
 				this.$emit('update:date', value);
 			}
 		},
+		sMode() {
+			// choose default mode
+			let mode = this.mode;
+			if (mode)
+				mode = mode.toLowerCase();
+			if (!mode || !this.modes[mode])
+				mode = Object.keys(this.modes).find(Boolean); // start with first entry as active mode
+			return mode || '';
+		},
 		cMode: {
 			get() {
-				if (!this.internalView) {
-					// choose default mode
-					let mode = this.mode;
-					if (!mode || !this.modes[mode])
-						mode = Object.keys(this.modes).find(Boolean); // start with first entry as active mode
-					return mode || '';
-				}
-				return this.internalView;
+				return this.internalView ? this.internalView : this.sMode;
 			},
 			set(value) {
 				this.internalView = value;
 				this.$emit('update:mode', value);
 			}
+		}
+	},
+	watch: {
+		sDate(n, o) {
+			if (this.sDate.isValid && !this.sDate.hasSame(this.internalDate, 'day'))
+				this.internalDate = this.sDate;
+		},
+		sMode() {
+			if (this.sMode)
+				this.internalView = this.sMode;
 		}
 	},
 	methods: {

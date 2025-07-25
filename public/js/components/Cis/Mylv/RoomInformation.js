@@ -37,16 +37,20 @@ export default {
 				week: {
 					collapseEmptyDays: false
 				}
-			},
-			currentDay: this.propsViewData?.focus_date,
-			calendarMode: this.propsViewData?.mode ?? DEFAULT_MODE_RAUMINFO
+			}
 		}
 	},
 	computed: {
+		currentDay() {
+			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
+		},
+		currentMode() {
+			return this.propsViewData?.mode || DEFAULT_MODE_RAUMINFO;
+		},
 		backgrounds() {
 			let now = luxon.DateTime.now().setZone(this.viewData.timezone);
 
-			if (this.calendarMode == 'Month')
+			if (this.currentMode == 'Month')
 				return [
 					{
 						class: 'background-past',
@@ -71,7 +75,7 @@ export default {
 		},
 		handleChangeDate(day) {
 			const focus_date = day.toISODate();
-			const mode = this.calendarMode[0].toUpperCase() + this.calendarMode.slice(1);
+			const mode = this.currentMode;
 
 			this.$router.push({
 				name: "RoomInformation",
@@ -81,8 +85,6 @@ export default {
 					ort_kurzbz: this.propsViewData.ort_kurzbz
 				}
 			})
-			
-			this.currentDay = day;
 		},
 		handleChangeMode(newMode) {
 			const mode = newMode[0].toUpperCase() + newMode.slice(1)
@@ -98,8 +100,6 @@ export default {
 					ort_kurzbz: this.propsViewData.ort_kurzbz
 				}
 			})
-
-			this.calendarMode = mode
 		},
 		updateRange(rangeInterval) {
 			this.rangeInterval = rangeInterval;
@@ -131,7 +131,7 @@ export default {
 			:date="currentDay"
 			:modes="modes"
 			:mode-options="modeOptions"
-			:mode="propsViewData.mode.toLowerCase()"
+			:mode="currentMode"
 			@update:date="handleChangeDate"
 			@update:mode="handleChangeMode"
 			@update:range="updateRange"
