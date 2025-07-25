@@ -109,7 +109,7 @@ class StundenplanLib{
 			$stundenplan_query = $this->_ci->StundenplanModel->getStundenplanQuery($start_date, $end_date, $semester_range, $benutzer_gruppen, $student_lehrverband);
 			if(!$stundenplan_query)
 			{
-				return error([]);
+				return success([]);
 			}
 			
 			
