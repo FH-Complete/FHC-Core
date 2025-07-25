@@ -555,6 +555,7 @@ export default {
 							:label="$p.t('ui/from') + ' *'"
 							auto-apply
 							:enable-time-picker="false"
+							text-input
 							format="dd.MM.yyyy"
 							preview-format="dd.MM.yyyy"
 							:teleport="true"
@@ -569,6 +570,7 @@ export default {
 							:label="$p.t('global/bis')"
 							auto-apply
 							:enable-time-picker="false"
+							text-input
 							format="dd.MM.yyyy"
 							preview-format="dd.MM.yyyy"
 							:teleport="true"

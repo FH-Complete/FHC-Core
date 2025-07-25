@@ -294,6 +294,7 @@ export default{
 				:label="$p.t('global/datum')"
 				auto-apply
 				:enable-time-picker="false"
+				text-input
 				format="dd.MM.yyyy"
 				preview-format="dd.MM.yyyy"
 				:teleport="true"
@@ -308,6 +309,7 @@ export default{
 				:label="$p.t('lehre/bestaetigt_am')"
 				auto-apply
 				:enable-time-picker="false"
+				text-input
 				format="dd.MM.yyyy"
 				preview-format="dd.MM.yyyy"
 				:teleport="true"
@@ -323,6 +325,7 @@ export default{
 				auto-apply
 				:enable-time-picker="false"
 				format="dd.MM.yyyy"
+				text-input
 				preview-format="dd.MM.yyyy"
 				:teleport="true"
 				:disabled="bisLocked || !hasPrestudentstatusPermission"

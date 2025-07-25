@@ -434,6 +434,7 @@ export default {
 						v-model="formData.ausgegebenam"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
@@ -449,6 +450,7 @@ export default {
 						v-model="formData.retouram"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"

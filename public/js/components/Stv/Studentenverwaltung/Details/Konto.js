@@ -260,6 +260,7 @@ export default {
 						v-model="counterdate"
 						input-group
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						auto-apply
 						@cleared="counterdate = new Date()"

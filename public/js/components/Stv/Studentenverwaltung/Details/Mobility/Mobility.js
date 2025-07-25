@@ -464,6 +464,7 @@ export default {
 						v-model="formData.von"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="von"
 						:teleport="true"
@@ -497,6 +498,7 @@ export default {
 						v-model="formData.bis"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="bis"
 						:teleport="true"

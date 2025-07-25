@@ -429,6 +429,7 @@ export default {
 							v-model="formData.anmeldedatum"
 							auto-apply
 							:enable-time-picker="false"
+							text-input
 							format="dd.MM.yyyy"
 							name="anmeldedatum"
 							:teleport="true"

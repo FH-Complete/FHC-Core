@@ -717,6 +717,7 @@ export default {
 						v-model="formData.datum"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="datum"
 						:teleport="true"
@@ -740,6 +741,7 @@ export default {
 						v-model="formData.sponsion"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="sponsion"
 						:teleport="true"

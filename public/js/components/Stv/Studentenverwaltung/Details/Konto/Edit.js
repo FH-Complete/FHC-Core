@@ -82,6 +82,7 @@ export default {
 					name="buchungsdatum"
 					:label="$p.t('konto/buchungsdatum')"
 					:enable-time-picker="false"
+					text-input
 					format="dd.MM.yyyy"
 					auto-apply
 					>

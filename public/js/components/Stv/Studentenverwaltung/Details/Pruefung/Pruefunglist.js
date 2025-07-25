@@ -350,7 +350,7 @@ export default{
 			else {
 				this.$refs.table.tabulator.clearFilter("studiensemester_kurzbz");
 			}
-		},
+		}
 	},
 	watch: {
 		//adaption to go directly through different semesters
@@ -433,7 +433,7 @@ export default{
 				<p v-else class="fw-bold mt-3">{{ $p.t('exam', 'edit_pruefung') }}</p>
 			</template>
 	
-			<form-form class="row pt-3" ref="examData">
+			<form-form class="row pt-3" ref="examData" @submit.prevent>
 				<legend>Details</legend>
 				
 				<!--DropDown Lehrveranstaltung-->
@@ -537,6 +537,7 @@ export default{
 					:label="$p.t('global/datum')"
 					auto-apply
 					:enable-time-picker="false"
+					text-input
 					format="dd.MM.yyyy"
 					preview-format="dd.MM.yyyy"
 					:teleport="true"
