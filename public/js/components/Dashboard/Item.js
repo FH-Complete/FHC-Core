@@ -189,7 +189,7 @@ export default {
 				</div>
 			</Transition>
 		</div>
-		<div v-if="ready" class="card-body overflow-hidden" style="padding: .5em 0;">
+		<div v-if="ready" class="card-body overflow-hidden p-0">
 			<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
 		</div>
 		<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
