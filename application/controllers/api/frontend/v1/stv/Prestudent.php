@@ -174,7 +174,11 @@ class Prestudent extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Zgv_model', 'ZgvModel');
 
-		$this->ZgvModel->addOrder('zgv_code');
+		$this->ZgvModel->addSelect('zgv_code');
+		$this->ZgvModel->addSelect('zgv_bez');
+		$this->ZgvModel->addSelect('aktiv');
+		$this->ZgvModel->addSelect('zgv_bez as label');
+		$this->ZgvModel->addOrder('zgv_bez');
 
 		$result = $this->ZgvModel->load();
 		if (isError($result))
@@ -188,7 +192,11 @@ class Prestudent extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Zgvdoktor_model', 'ZgvdoktorModel');
 
-		$this->ZgvdoktorModel->addOrder('zgvdoktor_code');
+		$this->ZgvdoktorModel->addSelect('zgvdoktor_code');
+		$this->ZgvdoktorModel->addSelect('zgvdoktor_bez');
+		$this->ZgvdoktorModel->addSelect('aktiv');
+		$this->ZgvdoktorModel->addSelect('zgvdoktor_bez as label');
+		$this->ZgvdoktorModel->addOrder('zgvdoktor_bez');
 
 		$result = $this->ZgvdoktorModel->load();
 		if (isError($result))
@@ -202,7 +210,11 @@ class Prestudent extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Zgvmaster_model', 'ZgvmasterModel');
 
-		$this->ZgvmasterModel->addOrder('zgvmas_code');
+		$this->ZgvmasterModel->addSelect('zgvmas_code');
+		$this->ZgvmasterModel->addSelect('zgvmas_bez');
+		$this->ZgvmasterModel->addSelect('aktiv');
+		$this->ZgvmasterModel->addSelect('zgvmas_bez as label');
+		$this->ZgvmasterModel->addOrder('zgvmas_bez');
 
 		$result = $this->ZgvmasterModel->load();
 		if (isError($result))
