@@ -25,7 +25,8 @@ $includesArray = array(
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.js',
 		'vendor/npm-asset/primevue/accordiontab/accordiontab.js',
-		'vendor/npm-asset/primevue/password/password.js'
+		'vendor/npm-asset/primevue/password/password.js',
+		'vendor/npm-asset/primevue/multiselect/multiselect.js'
 	),
 	'customJSModules' => array(
 		'public/js/apps/Dashboard/Fhc.js'

@@ -12,7 +12,8 @@ export const Benotungstool = {
 		CoreFilterCmpt,
 		Dropdown: primevue.dropdown,
 		Password: primevue.password,
-		Datepicker: VueDatePicker
+		Datepicker: VueDatePicker,
+		Multiselect: primevue.multiselect
 	},
 	props: {
 		lv_id: {
@@ -34,6 +35,7 @@ export const Benotungstool = {
 	},
 	data() {
 		return {
+			selectedUids: [], // shared selection state
 			selectedLehreinheit: null,
 			lehreinheiten: null,
 			tabulatorCanBeBuilt: false,
@@ -72,6 +74,14 @@ export const Benotungstool = {
 				}
 			},
 			{
+				event: "rowSelectionChanged",
+				handler: async (data, rows) => {
+					console.log("Selected Data:", data);
+					console.log("Selected Rows:", rows);
+					this.selectedUids = data;
+				}
+			},
+		{
 				event: "cellEdited",
 				handler: async (cell) => {
 					const field = cell.getField()
@@ -103,7 +113,20 @@ export const Benotungstool = {
 				index: 'uid',
 				layout: 'fitDataStretch',
 				placeholder: this.$p.t('global/noDataAvailable'),
+				selectable: true,
+				selectableRangeMode: "click", // shift+click
+				selectablePersistence: false, // reset selection on table reload
 				columns: [
+				{
+					formatter: "rowSelection",
+					titleFormatter: "rowSelection", // Adds "select all" checkbox in header
+					hozAlign: "center",
+					headerSort: false,
+					cellClick: function (e, cell) {
+						cell.getRow().toggleSelect();
+					},
+					width: 50,
+				},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4mail')), field: 'email', formatter: this.mailFormatter, tooltip: false, widthGrow: 1},
 				{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4vorname')), field: 'vorname',  tooltip: false, widthGrow: 1},
@@ -153,9 +176,6 @@ export const Benotungstool = {
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4freigabe')), field: 'freigegeben', widthGrow: 1, formatter: this.freigabeFormatter},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4zeugnisnote')), field: 'note', formatter: this.notenFormatter, widthGrow: 1}, 
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4kommPruef')), field: 'kommPruef', widthGrow: 1, formatter: this.pruefungFormatter, hozAlign:"center", minWidth: 150}
-				// {title: Vue.computed(() => this.$p.t('benotungstool/c4termin1')), field: 'termin1', widthGrow: 1},
-				// {title: Vue.computed(() => this.$p.t('benotungstool/c4termin2')), field: 'termin2', widthGrow: 1},
-				// {title: Vue.computed(() => this.$p.t('benotungstool/c4termin3')), field: 'termin3', widthGrow: 1}
 			],
 				persistence: false,
 			}	
@@ -379,7 +399,10 @@ export const Benotungstool = {
 		},
 		setupData(data){
 			this.studenten = data[0] ?? []
-			this.studenten.forEach(s => s.pruefungen = [])
+			this.studenten.forEach(s => {
+				s.pruefungen = []
+				s.infoString = `${s.vorname} ${s.nachname}`// (${s.semester}${s.verband}${s.gruppe}) Mat.: ${s.matrikelnr}`// used for multiselect
+			})
 			this.pruefungen = data[1] ?? []
 			this.domain = data[2]
 			
@@ -395,6 +418,8 @@ export const Benotungstool = {
 				const student = this.studenten.find(s => s.uid === p.student_uid)
 				
 				if(!student) return
+				
+				// TODO: filter kommPruef here? or change kommProf ColDefinition
 				
 				if(!distinctPruefungsDates.includes(p.datum)) distinctPruefungsDates.push(p.datum)
 				
@@ -453,6 +478,9 @@ export const Benotungstool = {
 			})
 			distinctPruefungsDates.forEach((date, index)=>{
 				// TODO date format dd.mm.yyyy
+				
+				// const title = 
+				
 				cols.push({
 					title: date,//this.$p.t('benotungstool/pruefungNr', [index+1]),
 					field: date,
@@ -463,8 +491,9 @@ export const Benotungstool = {
 					minWidth: 150
 				})
 			})
-				
-			
+			console.log('distinctPruefungsDates', distinctPruefungsDates)
+			console.log('cols', cols)
+
 			cols.push(kommCol) // keep kommPruef Col as last
 
 			this.$refs.notenTable.tabulator.clearSort()
@@ -701,6 +730,9 @@ export const Benotungstool = {
 		openSaveModal() {
 			this.$refs.modalContainerNotenSpeichern.show()
 		},
+		openNewPruefungsdatumModal() {
+			this.$refs.modalContainerNeuesPruefungsdatum.show()
+		},
 		handleChangePruefungDatum(e) {
 			// console.log('handleChangePruefungDatum', e)
 		},
@@ -712,9 +744,30 @@ export const Benotungstool = {
 		},
 		leChanged(e) {
 			this.selectedLehreinheit = e.value
+		},
+		addPruefung(){
+			// TODO: save new pruefungs entry for all selected students on selected date with default note "noch nicht eingetragen" aka 9
 		}
 	},
 	watch: {
+		selectedUids(newVal, oldVal) {
+			const table = this.$refs.notenTable?.tabulator
+
+			if (!table) return;
+			console.log('selectedUids watcher newVal',newVal)
+			// Get all current rows
+			const allRows = table.getRows();
+			console.log('table allRows',allRows)
+			// allRows.forEach(row => {
+			// 	const rowData = row.getData();
+			//
+			// 	if (newVal.includes(rowData.uid)) {
+			// 		row.select(); // ensure row is selected
+			// 	} else {
+			// 		row.deselect(); // ensure row is deselected
+			// 	}
+			// });
+		},
 		selectedLehreinheit(newVal) {
 			if(!this.$refs.notenTable) return
 			this.$refs.notenTable.tabulator.clearFilter();
@@ -731,24 +784,31 @@ export const Benotungstool = {
 		}
 	},
 	computed: {
+		getStudentenOptions() {
+			return this.studenten ? this.studenten : []
+		},
 		getKommPruefCount(){
 			let counter = 0
 			this.studenten?.forEach(s => {if(s['kommPruef']){counter++}})	
 			return counter
 		},
 		getSaveBtnClass() {
+			// return "btn btn-primary ml-2"
+			return !this.changedNoten?.length ? "btn btn-primary ml-2" : "btn btn-secondary ml-2"
+		},
+		getNewBtnClass() {
 			return "btn btn-primary ml-2"
 			// return !this.changedData.length ? "btn btn-secondary ml-2" : "btn btn-primary ml-2"
 		},
 		changedNoten() {
 			const v = this.changedNotenCounter // hack to trigger computed
-			const cs = this.studenten.reduce((acc, cur) => {
+			const cs = this.studenten ? this.studenten.reduce((acc, cur) => {
 				const teilnote = this.teilnoten[cur.uid]
 				if(teilnote.note_lv && (cur.benotungsdatum > cur.freigabedatum)) {
 					acc.push(cur)
 				}
 				return acc
-			}, [])
+			}, []) : []
 			return cs
 		}
 	},
@@ -759,6 +819,48 @@ export const Benotungstool = {
 		this.setupMounted()
 	},
 	template: `
+
+		<bs-modal ref="modalContainerNeuesPruefungsdatum" class="bootstrap-prompt" dialogClass="modal-lg">
+			<template v-slot:title>{{$p.t('benotungstool/c4addNewPruefung')}}</template>
+			<template v-slot:default>
+				<div class="row justify-content-center">
+					<div class="col-auto">
+						<div class="col-1 text-center">{{$p.t('benotungstool/c4date')}}:</div>
+						<div class="col-6">
+							<datepicker
+								v-model="selectedPruefungDate"
+								@update:model-value="handleChangePruefungDatum"
+								:clearable="false"
+								:time-picker="false"
+								:text-input="true"
+								:auto-apply="true">
+							</datepicker>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row justify-content-center">
+					<div class="col-auto">
+						<div class="col-1 text-center">{{$p.t('benotungstool/prueflingSelection')}}:</div>
+						<div class="col-6">
+							<Multiselect 
+								v-model="selectedUids" 
+								:options="getStudentenOptions" 
+								optionLabel="infoString" 
+								placeholder="Studenten auswählen"
+								:maxSelectedLabels="3"
+								showToggleAll
+								class="w-full md:w-20rem" />
+						</div>
+					</div>
+				</div>
+				
+			</template>
+			<template v-slot:footer>
+				<button type="button" class="btn btn-primary" @click="addPruefung">{{ $p.t('benotungstool/c4addNewPruefung') }}</button>
+			</template>
+		 </bs-modal>
+
 		 <bs-modal ref="modalContainerNotenSpeichern" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template v-slot:title>{{ $p.t('benotungstool/noteneingabeSpeichern') }}</template>
 			<template v-slot:default>
@@ -862,6 +964,9 @@ export const Benotungstool = {
 			 <template #actions>
 				<button @click="openSaveModal" role="button" :class="getSaveBtnClass">
 					{{$p.t('benotungstool/approveGrades')}} <i class="fa fa-save"></i>
+				</button>
+				<button @click="openNewPruefungsdatumModal" role="button" :class="getNewBtnClass">
+					{{$p.t('benotungstool/c4addNewPruefung')}} <i class="fa fa-plus"></i>
 				</button>
 			 </template>
 		 </core-filter-cmpt>
