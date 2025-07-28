@@ -73,24 +73,12 @@ export default {
 				return undefined;
 			return '--event-bg:#' + event.farbe;
 		},
-		handleChangeDate(day) {
-			const focus_date = day.toISODate();
-			const mode = this.currentMode;
-
-			this.$router.push({
-				name: "RoomInformation",
-				params: {
-					mode,
-					focus_date,
-					ort_kurzbz: this.propsViewData.ort_kurzbz
-				}
-			})
+		handleChangeDate(day, newMode) {
+			return this.handleChangeMode(newMode, day);
 		},
-		handleChangeMode(newMode) {
+		handleChangeMode(newMode, day) {
 			const mode = newMode[0].toUpperCase() + newMode.slice(1)
-			const focus_date = (this.currentDay instanceof luxon.DateTime)
-				? this.currentDay.toISODate()
-				: this.currentDay;
+			const focus_date = day.toISODate();
 
 			this.$router.push({
 				name: "RoomInformation",
@@ -99,7 +87,7 @@ export default {
 					focus_date,
 					ort_kurzbz: this.propsViewData.ort_kurzbz
 				}
-			})
+			});
 		},
 		updateRange(rangeInterval) {
 			this.rangeInterval = rangeInterval;

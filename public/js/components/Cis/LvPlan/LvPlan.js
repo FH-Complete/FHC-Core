@@ -105,24 +105,12 @@ export default {
 				return undefined;
 			return '--event-bg:#' + event.farbe;
 		},
-		handleChangeDate(day) {
-			const focus_date = day.toISODate();
-			const mode = this.currentMode;
-
-			this.$router.push({
-				name: "LvPlan",
-				params: {
-					mode,
-					focus_date,
-					lv_id: this.propsViewData?.lv_id || null
-				}
-			})
+		handleChangeDate(day, newMode) {
+			return this.handleChangeMode(newMode, day);
 		},
-		handleChangeMode(newMode) {
+		handleChangeMode(newMode, day) {
 			const mode = newMode[0].toUpperCase() + newMode.slice(1)
-			const focus_date = (this.currentDay instanceof luxon.DateTime)
-				? this.currentDay.toISODate()
-				: this.currentDay;
+			const focus_date = day.toISODate();
 			
 			this.$router.push({
 				name: "LvPlan",

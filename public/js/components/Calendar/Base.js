@@ -164,7 +164,7 @@ export default {
 			},
 			set(value) {
 				this.internalDate = value;
-				this.$emit('update:date', value);
+				this.$emit('update:date', value, this.cMode);
 			}
 		},
 		sMode() {
@@ -182,7 +182,7 @@ export default {
 			},
 			set(value) {
 				this.internalView = value;
-				this.$emit('update:mode', value);
+				this.$emit('update:mode', value, this.cDate);
 			}
 		}
 	},
