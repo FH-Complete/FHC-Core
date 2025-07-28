@@ -140,6 +140,12 @@ class Prestudent extends FHCAPI_Controller
 			if ($val !== null || $prop == 'foerderrelevant') {
 				$update_prestudent[$prop] = $val;
 			}
+			if (($prop == 'zgvdatum' && $val == '')
+				|| ($prop == 'zgvmadatum' && $val == '')
+				|| ($prop == 'zgvdoktordatum' && $val == '')
+				) {
+				$update_prestudent[$prop] = null;
+			}
 		}
 
 		$update_prestudent['updateamum'] = date('c');

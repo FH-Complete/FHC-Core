@@ -426,6 +426,7 @@ export default {
 						name="zgvdoktordatum"
 						no-today
 						auto-apply
+						text-input
 						:enable-time-picker="false"
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
