@@ -15,7 +15,7 @@ export default {
 	},
 	props: {
 		endpoint: {
-			type: String,
+			type: Object,
 			required: true
 		},
 		typeId: {

@@ -2,6 +2,8 @@ import {CoreFilterCmpt} from "../filter/Filter.js";
 import FormForm from '../Form/Form.js';
 import FormInput from '../Form/Input.js';
 
+import ApiVorlage from '../../api/factory/vorlagen.js';
+
 export default {
 	components: {
 		FormForm,
@@ -39,7 +41,8 @@ export default {
 	},
 	created() {
 		if(this.isAdmin) {
-			this.$fhcApi.factory.vorlagen.getVorlagen()
+			this.$api
+				.call(ApiVorlage.getVorlagen())
 				.then(result => {
 					this.vorlagen = result.data;
 				})
@@ -47,7 +50,8 @@ export default {
 		}
 
 		if(this.useLoggedInUserOe){
-			this.$fhcApi.factory.vorlagen.getVorlagenByLoggedInUser()
+			this.$api
+				.call(ApiVorlage.getVorlagenByLoggedInUser())
 				.then(result => {
 					//console.log(this.vorlagenOe);
 					this.vorlagenOe = result.data;

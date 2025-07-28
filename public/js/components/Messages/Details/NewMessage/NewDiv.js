@@ -2,7 +2,6 @@ import FormForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
 import ListBox from "../../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
 import DropdownComponent from '../../../VorlagenDropdown/VorlagenDropdown.js';
-import ApiMessages from "../../../../api/factory/messages/messages.js";
 
 export default {
 	name: "ComponentNewMessages",
@@ -14,7 +13,7 @@ export default {
 	},
 	props: {
 		endpoint: {
-			type: String,
+			type: Object,
 			required: true
 		},
 		openMode: String,
@@ -119,7 +118,7 @@ export default {
 			};
 			data.append('data', JSON.stringify(merged));
 			return this.$api
-				.call(ApiMessages.sendMessage(this.uid, data))
+				.call(this.endpoint.sendMessage(this.uid, data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideTemplate();
@@ -139,7 +138,7 @@ export default {
 		},
 		getVorlagentext(vorlage_kurzbz){
 			return this.$api
-				.call(ApiMessages.getVorlagentext(vorlage_kurzbz))
+				.call(this.endpoint.getVorlagentext(vorlage_kurzbz))
 				.then(response => {
 					this.formData.body = response.data;
 				}).catch(this.$fhcAlert.handleSystemError)
@@ -152,7 +151,7 @@ export default {
 
 			data.append('data', JSON.stringify(this.formData.body));
 			return this.$api
-				.call(ApiMessages.getPreviewText({
+				.call(this.endpoint.getPreviewText({
 					id: this.id,
 					type_id: this.typeId}, data))
 				.then(response => {
@@ -226,7 +225,7 @@ export default {
 				type_id: typeId
 			};
 			this.$api
-				.call(ApiMessages.getUid(params))
+				.call(this.endpoint.getUid(params))
 				.then(result => {
 					this.uid = result.data;
 				})
@@ -264,7 +263,7 @@ export default {
 				};
 
 				this.$api
-				.call(ApiMessages.getMessageVarsPerson(params))
+				.call(this.endpoint.getMessageVarsPerson(params))
 					.then(result => {
 						this.fieldsPerson = result.data;
 						const person = this.fieldsPerson[0];
@@ -282,7 +281,7 @@ export default {
 				type_id: this.typeId
 			};
 			this.$api
-				.call(ApiMessages.getMsgVarsPrestudent(params))
+				.call(this.endpoint.getMsgVarsPrestudent(params))
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
@@ -296,7 +295,7 @@ export default {
 		}
 
 		this.$api
-			.call(ApiMessages.getMsgVarsLoggedInUser())
+			.call(this.endpoint.getMsgVarsLoggedInUser())
 			.then(result => {
 				this.fieldsUser = result.data;
 				const user = this.fieldsUser;
@@ -308,7 +307,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 		this.$api
-			.call(ApiMessages.getNameOfDefaultRecipient({
+			.call(this.endpoint.getNameOfDefaultRecipient({
 				id: this.id,
 				type_id: this.typeId}))
 			.then(result => {
@@ -322,7 +321,7 @@ export default {
 		//case of reply
 		if(this.messageId != null) {
 			this.$api
-				.call(ApiMessages.getReplyData(this.messageId))
+				.call(this.endpoint.getReplyData(this.messageId))
 				.then(result => {
 					this.replyData = result.data;
 					this.formData.subject = this.replyData[0].replySubject;

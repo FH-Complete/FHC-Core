@@ -1,4 +1,5 @@
 import CoreMessages from "../../../Messages/Messages.js";
+import ApiMessages from "../../../../api/factory/messages/messages.js";
 
 export default {
 	name: "TabMessages",
@@ -8,13 +9,18 @@ export default {
 	props: {
 		modelValue: Object
 	},
+	data(){
+		return {
+			endpoint: ApiMessages
+		};
+	},
 	template: `
 	<div class="stv-details-messages h-100 pb-3 overflow-hidden">
 	
 	<template v-if="modelValue.prestudent_id">
 		<core-messages
 			ref="formc"
-			endpoint="$fhcApi.factory.messages.person"
+			:endpoint="endpoint"
 			type-id="prestudent_id"
 			:id="modelValue.prestudent_id"
 			messageLayout="twoColumnsTableLeft"
