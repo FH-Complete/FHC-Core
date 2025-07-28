@@ -67,7 +67,7 @@ export default {
 				//height: 800,
 				//plugins: ['lists'],
 				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | link',
-				plugins: 'link linktitle',
+				plugins: 'link',
 				link_context_toolbar: true,
 				automatic_uploads: true,
 				default_link_target: "_blank",
