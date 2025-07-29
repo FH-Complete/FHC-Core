@@ -219,11 +219,11 @@ export default {
 						<a
 							:href="link"
 							:aria-label="title"
-							class="py-1 px-2 m-1 btn btn-outline-secondary card"
+							class="py-1 btn btn-outline-secondary"
 						>
 							<div class="d-flex flex-column">
 								<i aria-hidden="true" :class="icon"></i>
-								<span class="small">{{ title }}</span>
+								<span style="font-size:.5rem">{{ title }}</span>
 							</div>
 						</a>
 					</div>

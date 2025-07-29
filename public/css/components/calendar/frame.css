@@ -107,8 +107,44 @@
 	align-items: end;
 }
 /* Header */
-.fhc-calendar-base-header > .row {
+.fhc-calendar-base-header .header-picker {
+	display: flex;
+	justify-content: center;
+}
+.fhc-calendar-base-header .header-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
 	align-items: center;
+	margin-bottom: .5rem;
+	row-gap: .5rem;
+}
+.fhc-calendar-base-header .header-userdefined:empty {
+	display: none;
+}
+@media (min-width: 768px) {
+	.fhc-calendar-base-header {
+		display: grid;
+		grid-template-columns: [userdefined] 1fr [picker] max-content [modes] 1fr;
+		align-items: center;
+	}
+	.fhc-calendar-base-header .header-actions {
+		grid-column: 1 / -1;
+		grid-row: 1;
+		display: grid;
+		grid-template-columns: subgrid;
+		margin-bottom: 0;
+	}
+	.fhc-calendar-base-header .header-userdefined {
+		grid-column: userdefined;
+	}
+	.fhc-calendar-base-header .header-modes {
+		grid-column: modes;
+	}
+	.fhc-calendar-base-header .header-picker {
+		grid-column: picker;
+		grid-row: 1;
+	}
 }
 
 /* Modes */

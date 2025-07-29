@@ -47,37 +47,11 @@ export default {
 	},
 	template: /* html */`
 	<div class="fhc-calendar-base-header">
-		<div class="row">
-			<div class="col">
+		<div class="header-actions">
+			<div class="header-userdefined">
 				<slot />
 			</div>
-			<div class="col-auto d-flex justify-content-center">
-				<div class="btn-group" role="group">
-					<button
-						class="btn btn-outline-secondary border-0"
-						@click="$emit('prev')"
-						:disabled="open"
-					>
-						<i class="fa fa-chevron-left"></i>
-					</button>
-					<date-picker
-						:mode="mode"
-						:date="date"
-						@update:date="$emit('update:date', $event)"
-						@open="open = true"
-						@closed="open = false"
-						:list-length="modeOptions.length"
-					/>
-					<button
-						class="btn btn-outline-secondary border-0"
-						@click="$emit('next')"
-						:disabled="open"
-					>
-						<i class="fa fa-chevron-right"></i>
-					</button>
-				</div>
-			</div>
-			<div class="col">
+			<div class="header-modes">
 				<div class="d-flex gap-1 justify-content-end" role="group">
 					<button
 						v-if="btnMonth"
@@ -116,6 +90,32 @@ export default {
 						<i class="fa fa-table-list"></i>
 					</button>
 				</div>
+			</div>
+		</div>
+		<div class="header-picker">
+			<div class="btn-group" role="group">
+				<button
+					class="btn btn-outline-secondary border-0"
+					@click="$emit('prev')"
+					:disabled="open"
+				>
+					<i class="fa fa-chevron-left"></i>
+				</button>
+				<date-picker
+					:mode="mode"
+					:date="date"
+					@update:date="$emit('update:date', $event)"
+					@open="open = true"
+					@closed="open = false"
+					:list-length="modeOptions.length"
+				/>
+				<button
+					class="btn btn-outline-secondary border-0"
+					@click="$emit('next')"
+					:disabled="open"
+				>
+					<i class="fa fa-chevron-right"></i>
+				</button>
 			</div>
 		</div>
 	</div>
