@@ -92,3 +92,8 @@
 	flex: 0 0 100%;
 	text-align: center;
 }
+
+.fhc-roominformation .lehreinheitEventContent #lehreinheitOrt {
+	display: none;
+}
+
