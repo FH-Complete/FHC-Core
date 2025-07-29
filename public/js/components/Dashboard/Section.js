@@ -209,11 +209,11 @@ export default {
 		});
 	},
 	template: `
-	<h4 v-if="editModeIsActive" class=" mb-2">
-		<i v-tooltip="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
-		{{sectionNameTranslation()}}:
-	</h4>
 	<div class="dashboard-section position-relative pb-3 border-bottom" ref="container" :style="getSectionStyle">
+		<h4 v-if="editModeIsActive" class=" mb-2">
+			<i v-tooltip="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
+			{{sectionNameTranslation()}}:
+		</h4>
 		<button v-tooltip="$p.t('dashboard','addLine')" v-if="!additionalRow && editModeIsActive" @click="additionalRow=true" class="btn btn-outline-secondary rounded-circle newGridRow d-flex justify-content-center align-items-center">+</button>
 		<drop-grid v-model:cols="gridWidth" v-model:additionalRow="additionalRow" :items="items" :itemsSetup="computedWidgetsSetup" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @draggedItem="draggedItem=$event" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item">

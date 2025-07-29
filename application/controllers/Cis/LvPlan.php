@@ -15,6 +15,9 @@ class LvPlan extends Auth_Controller
 		parent::__construct([
 			'index' => ['basis/cis:r']
 		]);
+
+		// Load Config
+		$this->load->config('calendar');
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -28,6 +31,7 @@ class LvPlan extends Auth_Controller
 		
 		$viewData = array(
 			'uid'=>getAuthUID(),
+			'timezone' => $this->config->item('timezone')
 		);
 		
 		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'LvPlan']);

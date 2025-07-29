@@ -19,9 +19,8 @@ export default {
 		viewData: {
 			type: Object,
 			required: true,
-			default: () => ({name: '', uid: ''}),
 			validator(value) {
-				return value && value.name && value.uid
+				return value && value.name && value.uid && value.timezone
 			}
 		}
 	},
@@ -37,6 +36,7 @@ export default {
 		return {
 			editMode: Vue.computed(()=>this.editMode),
 			widgetsSetup: Vue.computed(() => this.widgets),
+			timezone: Vue.computed(() => this.viewData.timezone)
 		}
 	},
 	computed: {

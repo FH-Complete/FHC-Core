@@ -1,266 +1,115 @@
-import Phrasen from '../../mixins/Phrasen.js';
 import AbstractWidget from './Abstract.js';
-import FhcCalendar from '../Calendar/Calendar.js';
-import LvModal from '../Cis/Mylv/LvModal.js';
-import ContentModal from '../Cis/Cms/ContentModal.js'
-import CalendarDate from '../../composables/CalendarDate.js';
+import FhcCalendar from '../Calendar/Base.js';
 
 import ApiLvPlan from '../../api/factory/lvPlan.js';
-import ApiOrt from '../../api/factory/ort.js';
+
+import { useEventLoader } from '../../composables/EventLoader.js';
+
+import ModeList from '../Calendar/Mode/List.js';
 
 export default {
 	name: "LvPlanWidget",
+	components: {
+		FhcCalendar
+	},
 	mixins: [
-		Phrasen,
 		AbstractWidget
 	],
-	components: {
-		FhcCalendar,
-		LvModal,
-		ContentModal
-	},
-	
+	inject: [
+		"renderers",
+		"timezone"
+	],
 	data() {
 		return {
-			stunden: [],
-			minimized: true,
-			events: null,
-			currentDay: this.getCurrentDate(),
-			calendarDate: new CalendarDate(new Date()),
-			roomInfoContentID: null,
-			ort_kurzbz: null,
-			selectedEvent: null,
-			isModalContentResolved: false,
-			isModalTitleResolved: false,
-			isShowModal: false,
-		}
-	},
-	inject: ["renderers"],
-	watch:{
-		modalLoaded: {
-			handler: function (newValue) {
-				if (this.isShowModal && newValue.isModalContentResolved && newValue.isModalTitleResolved) {
-					this.$nextTick(() => {
-						if (this.$refs.lvmodal) this.$refs.lvmodal.show();
-						this.isShowModal = false;
-					});
+			now: luxon.DateTime.now().setZone(this.timezone),
+			modes: {
+				list: Vue.markRaw(ModeList)
+			},
+			modeOptions: {
+				list: {
+					length: 7
 				}
 			},
-			immediate: true
-		},
-	},
-	computed: {
-		modalLoaded: function () {
-			return { isModalContentResolved: this.isModalContentResolved, isModalTitleResolved: this.isModalTitleResolved };
-		},
-		allEventsGrouped() {
-			// groups all events of the next 7 days together
-			const currentCalendarDate = new CalendarDate(this.currentDay)
-			const mapArr = currentCalendarDate.nextSevenDays.map((d) => [new CalendarDate(d), []])
-
-			// return map of key => calendar date of next 7 days & values the respective events on that date
-			return new Map((this.events || []).filter(evt => evt.start >= this.currentDay).reduce((acc, cur) => {
-				const date = new CalendarDate(new Date(cur.datum))
-				const arr = acc.find(el => el[0].compare(date))
-				if(!arr) return acc
-				arr[1].push(cur)
-				
-				return acc
-			}, mapArr));
-		},
-		currentEvents() {
-			return (this.events || []).filter(evt => evt.end < this.dayAfterCurrentDay && evt.start >= this.currentDay);
-		},
-		dayAfterCurrentDay() {
-			let currentDay = new Date(this.currentDay);
-			currentDay.setDate(currentDay.getDate() + 1);
-			return currentDay;
-		},
-		monthFirstDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdFirstDayOfCalendarMonth);
-		},
-		monthLastDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdLastDayOfNextCalendarMonth);
-		},
+			currentDay: luxon.DateTime.now().setZone(this.timezone).startOf('day')
+		}
 	},
 	methods: {
-		showModal: function (event) {
-			this.currentlySelectedEvent = event;
-			Vue.nextTick(() => {
-				if (this.isModalContentResolved && this.isModalTitleResolved) {
-					if (this.$refs.lvmodal) this.$refs.lvmodal.show();
-				}
-				else {
-					this.isShowModal = true;
-				}
-			})
-		},
-		modalTitleResolved: function () {
-			this.isModalTitleResolved = true;
+		eventStyle(event) {
+			const styles = {};
+			if (event.farbe)
+				styles['--event-bg'] = '#' + event.farbe;
+			else if (event.type == 'reservierung')
+				styles['--event-bg'] = '#ffffff';
+			else
+				styles['--event-bg'] = '#cccccc';
 
-		},
-		modalContentResolved: function () {
-			this.isModalContentResolved = true;
-
-		},
-		modalTitleComponent(type) {
-			return this.renderers[type]?.modalTitle;
-		},
-		modalContentComponent(type) {
-			return this.renderers[type]?.modalContent;
-		},
-		calendarEventComponent(type) {
-			return this.renderers[type]?.calendarEvent;
-		},
-		getEventStyle: function(evt) {
-			const styles = {'background-color': evt.color};
-			if(evt.start.getTime() < Date.now()) styles.opacity = 0.5;
-
+			const eventEnd = luxon.DateTime.fromISO(event.isoend, { zone: this.timezone });
+			if (eventEnd < this.now)
+				styles['opacity'] = .5;
+			
 			return styles;
 		},
-		getCurrentDate: function() {
-			const today = new Date()
-			today.setHours(0,0,0)
-			return today
-		},
-		calendarDateToString: function (calendarDate) {
-
-			return calendarDate instanceof CalendarDate ?
-				[calendarDate.y, calendarDate.m + 1, calendarDate.d].join('-') :
-				null;
-
-		},
-		showRoomInfoModal: function(ort_kurzbz){
-			// getting the content_id of the ort_kurzbz
-			this.$api
-				.call(ApiOrt.getContentID(ort_kurzbz))
-				.then(res => {
-					this.roomInfoContentID = res.data;
-					this.ort_kurzbz = ort_kurzbz;
-
-					// only showing the modal after vue was able to set the reactive data
-					Vue.nextTick(() => { this.$refs.contentModal.show(); });
-				})
-				.catch(err => {
-					console.err(err);
-					this.ort_kurzbz = null;
-					this.roomInfoContentID = null;
-				});
-		},
-		showLvUebersicht: function (event){
-			this.selectedEvent= event;
-			Vue.nextTick(()=>{
-				this.$refs.lvmodal.show();
-			});
-		},
-		
-		selectDay(day) {
-			this.currentDay = day;
-			this.minimized = true;
-		},
-
-		updateRange: function (data) {
-			
-			let tmp_date = new CalendarDate(data.start);
-			// only load month data if the month or year has changed
-			if (tmp_date.m != this.calendarDate.m || tmp_date.y != this.calendarDate.y) {
-				this.calendarDate = tmp_date;
-				Vue.nextTick(() => {
-					this.loadEvents();
-				});
-			}
-		},
-		
-
-		loadEvents: function () {
-			Promise.allSettled([
-				this.$api.call(ApiLvPlan.LvPlanEvents(this.monthFirstDay, this.monthLastDay)),
-				this.$api.call(ApiLvPlan.getLvPlanReservierungen(this.monthFirstDay, this.monthLastDay))
-			]).then((result) => {
-				let promise_events = [];
-				result.forEach((promise_result) => {
-					if (promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success") {
-
-						let data = promise_result.value.data;
-						// adding additional information to the events 
-						if (data && data.forEach) {
-
-							data.forEach((el, i) => {
-								el.id = i;
-								if (el.type === 'reservierung') {
-									el.color = '#' + (el.farbe || 'FFFFFF');
-								} else {
-									el.color = '#' + (el.farbe || 'CCCCCC');
-								}
-
-								el.start = new Date(el.datum + ' ' + el.beginn);
-								el.end = new Date(el.datum + ' ' + el.ende);
-
-							});
-						}
-						promise_events = promise_events.concat(data);
-					}
-				})
-				this.events = promise_events;
-			});
-		},
-
-		setCalendarMaximized() {
-			this.minimized = false
+		updateRange(rangeInterval) {
+			this.rangeInterval = rangeInterval;
 		}
-	
+	},
+	setup() {
+		const $api = Vue.inject('$api');
 
+		const rangeInterval = Vue.ref(null);
+		
+		const { events } = useEventLoader(rangeInterval, (start, end) => {
+			return [
+				$api.call(ApiLvPlan.LvPlanEvents(start.toISODate(), end.toISODate())),
+				$api.call(ApiLvPlan.getLvPlanReservierungen(start.toISODate(), end.toISODate()))
+			];
+		});
+
+		return {
+			rangeInterval,
+			events
+		};
 	},
 	created() {
 		this.$emit('setConfig', false);
-		this.loadEvents();
 	},
 	template: /*html*/`
 	<div class="dashboard-widget-lvplan d-flex flex-column h-100">
-		<lv-modal v-if="selectedEvent" ref="lvmodal" :event="selectedEvent"  >
-			<template #modalTitle>
-				<Suspense @pending="isModalTitleResolved=false" @resolve="modalTitleResolved">
-					<component :is="modalTitleComponent(selectedEvent.type)" v-if="selectedEvent" :event="selectedEvent" ></component>
-				</Suspense>
-			</template>
-			<template #modalContent>
-				<Suspense @pending="isModalContentResolved=false" @resolve="modalContentResolved">
-					<component :is="modalContentComponent(selectedEvent.type)" v-if="selectedEvent" :event="selectedEvent" ></component>
-				</Suspense>
-			</template>
-		</lv-modal>
-		<content-modal :content_id="roomInfoContentID" dialogClass="modal-lg" ref="contentModal"/>
-		<fhc-calendar @change:range="updateRange" :initial-date="currentDay" class="border-0" class-header="p-0" @select:day="selectDay" :widget="true" v-model:minimized="minimized" :events="events" no-week-view :show-weeks="false" >
-			<template #monthPage="{event,day}">
-				<div  v-if="event.type=='moodle'">
-					<div class="d-flex small w-100" >
-						<moodle-svg></moodle-svg>
-						<span v-contrast class="flex-grow-1 text-center "><strong v-html="event.titel"></strong> - {{event.topic}}</span>
-					</div>
+		<fhc-calendar
+			v-model:date="currentDay"
+			:modes="modes"
+			:mode-options="modeOptions"
+			@update:range="updateRange"
+			:timezone="timezone"
+			:locale="$p.user_locale.value"
+			:events="events"
+		>
+			<template v-slot="{ event, mode }">
+				<div
+					v-if="!event"
+					class="h-100 d-flex justify-content-center align-items-center"
+				>
+					{{ $p.t('lehre/noLvFound') }}
 				</div>
-				<span v-else class="small" >
-					{{event.topic}}
-				</span>
-			</template>
-			<template #minimizedPage >
-				<div class="minimizedContainer flex-grow-1" style="overflow-y: auto; overflow-x: hidden">
-					<div v-if="events === null" class="d-flex h-100 justify-content-center align-items-center">
-						<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
-					</div>
-					<template v-else-if="allEventsGrouped.size" v-for="([key, value], index) in allEventsGrouped" :key="index" style="margin-top: 8px;">
-						<div class=" card-header d-grid p-0">
-							<button class="btn fhc-tertiary text-decoration-none" @click="setCalendarMaximized">{{ key.format({dateStyle: "full"}, $p.user_locale.value)}}</button>
-						</div>
-						<div role="button" @click="showLvUebersicht(evt)" v-for="evt in value" :key="evt.id" class="mx-1 list-group-item small" :style="getEventStyle(evt)">
-							<component :is="calendarEventComponent(evt.type)" :event="evt" ></component>
-						</div>
-						<div v-if="!value.length" class="list-group-item small text-center">
-							{{ $p.t('lehre/noLvFound') }}
-						</div>
-					</template>
-					<div v-else class="d-flex h-100 justify-content-center align-items-center fst-italic text-center">
-						{{ $p.t('lehre/noLvFound') }}
-					</div>
+				<component
+					v-else-if="mode == 'eventheader'"
+					:is="renderers[event.type]?.modalTitle"
+					:event="event"
+				></component>
+				<component
+					v-else-if="mode == 'event'"
+					:is="renderers[event.type]?.modalContent"
+					:event="event"
+				></component>
+				<div
+					v-else
+					:class="'event-type-' + event.type + ' ' + mode + 'PageContainer'"
+	 				:style="eventStyle(event)"
+				>
+					<component
+						:is="renderers[event.type]?.calendarEvent"
+						:event="event"
+					></component>
 				</div>
 			</template>
 		</fhc-calendar>

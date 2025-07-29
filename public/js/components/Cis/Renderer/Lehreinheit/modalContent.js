@@ -1,20 +1,23 @@
 import { numberPadding, formatDate } from "../../../../helpers/DateHelpers.js"
 import LvMenu from "../../Mylv/LvMenu.js";
 
+import ApiLvPlan from '../../../../api/factory/lvPlan.js';
+import ApiAddons from '../../../../api/factory/addons.js';
+
 export default {
+	components:{
+		LvMenu,
+	},
 	props:{
 		event: {
 			type: Object,
 			required: true,
-		},
-		lvMenu:{
-			type: Object,
-			required: false,
-			default: null,
-		},
+		}
 	},
-	components:{
-		LvMenu,
+	data() {
+		return {
+			lvMenu: []
+		};
 	},
 	computed: {
 		lektorenLinks: function () {
@@ -32,18 +35,20 @@ export default {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/CisVue/Cms/content/${this.event.ort_content_id}`
 		},
 		start_time: function () {
-			if (!this.event.start) return 'N/A';
-			if (!this.event.start instanceof Date) {
-				return this.event.start;
+			if (!this.event.beginn)
+				return 'N/A';
+			if (!(this.event.beginn instanceof Date)) {
+				return this.event.beginn;
 			}
-			return numberPadding(this.event.start.getHours()) + ":" + numberPadding(this.event.start.getMinutes());
+			return numberPadding(this.event.beginn.getHours()) + ":" + numberPadding(this.event.beginn.getMinutes());
 		},
 		end_time: function () {
-			if (!this.event.end) return 'N/A';
-			if (!this.event.end instanceof Date) {
-				return this.event.end;
+			if (!this.event.ende)
+				return 'N/A';
+			if (!(this.event.ende instanceof Date)) {
+				return this.event.ende;
 			}
-			return numberPadding(this.event.end.getHours()) + ":" + numberPadding(this.event.end.getMinutes());
+			return numberPadding(this.event.ende.getHours()) + ":" + numberPadding(this.event.ende.getMinutes());
 		}
 	},
 	methods: {
@@ -53,6 +58,22 @@ export default {
 		methodFormatDate: function (d) {
 			return formatDate(d);
 		},
+	},
+	created() {
+		if (this.event.type == 'lehreinheit') {
+			this.$api
+				.call(ApiLvPlan.getLehreinheitStudiensemester(Array.isArray(this.event.lehreinheit_id) ? this.event.lehreinheit_id[0] : this.event.lehreinheit_id))
+				.then(res => res.data)
+				.then(studiensemester_kurzbz => this.$api.call(
+					ApiAddons.getLvMenu(
+						this.event.lehrveranstaltung_id,
+						studiensemester_kurzbz
+					)
+				))
+				.then(res => {
+					this.lvMenu = res.data;
+				});
+		}
 	},
 	template: `
 	<div>
@@ -68,6 +89,14 @@ export default {
 							:''
 						}}</th>
 						<td>{{methodFormatDate(event.datum)}}</td>
+					</tr>
+					<tr>
+						<th>{{
+								$p.t('ui','zeitraum')?
+								$p.t('ui','zeitraum')+':'
+								:''
+							}}</th>
+						<td>{{start_time + ' - ' + end_time}}</td>
 					</tr>
 					<tr>
 						<th>{{
@@ -105,14 +134,6 @@ export default {
 					</tr>
 					<tr>
 						<th>{{
-								$p.t('ui','zeitraum')?
-								$p.t('ui','zeitraum')+':'
-								:''
-							}}</th>
-						<td>{{start_time + ' - ' + end_time}}</td>
-					</tr>
-					<tr>
-						<th>{{
 							$p.t('lehre','organisationseinheit')?
 							$p.t('lehre','organisationseinheit')+':'
 							:''
@@ -122,6 +143,6 @@ export default {
 				</tbody>
 		</table>
 		
-		<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-if="lvMenu" :menu="lvMenu" />
+		<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-if="lvMenu.length" :menu="lvMenu" />
 	</div>`,
 }

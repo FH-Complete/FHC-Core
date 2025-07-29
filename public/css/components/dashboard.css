@@ -1,5 +1,6 @@
 @import './calendar.css';
 @import './dashboard/news.css';
+@import './dashboard/LvPlan.css';
 
 :root{
 	--fhc-dashboard-danger: var(--fhc-danger, #842029);

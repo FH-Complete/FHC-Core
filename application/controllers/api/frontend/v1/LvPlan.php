@@ -19,6 +19,8 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use CI3_Events as Events;
+use \DateTime as DateTime;
+use \DateTimeZone as DateTimeZone;
 
 class LvPlan extends FHCAPI_Controller
 {
@@ -32,7 +34,7 @@ class LvPlan extends FHCAPI_Controller
 		parent::__construct([
 			'getRoomplan' => self::PERM_LOGGED,
             'Stunden' => self::PERM_LOGGED,
-            'Reservierungen' => self::PERM_LOGGED,
+            'getReservierungen' => self::PERM_LOGGED,
 			'LvPlanEvents' => self::PERM_LOGGED,
 			'getLehreinheitStudiensemester' => self::PERM_LOGGED,
 			'studiensemesterDateInterval' => self::PERM_LOGGED,
@@ -89,16 +91,22 @@ class LvPlan extends FHCAPI_Controller
 		}
 
 		// fetching moodle events
+		$this->load->config('calendar');
+		$tz = new DateTimeZone($this->config->item('timezone'));
+		$start = new DateTime($start_date);
+		$start->setTimezone($tz);
+		$end = new DateTime($end_date);
+		$end->setTimezone($tz);
+		$end->modify('+1 day -1 second');
 		$moodle_events = [];
 		Events::trigger(
 			'moodleCalendarEvents',
-			function & () use (&$moodle_events)
-			{
+			function & () use (&$moodle_events) {
 				return $moodle_events;
 			},
 			[
-				'start_date' => $start_date,
-				'end_date' => $end_date, 
+				'start_date' => $start->format('c'),
+				'end_date' => $end->format('c'),
 				'username' => getAuthUID()
 			]
 		);
@@ -177,55 +185,69 @@ class LvPlan extends FHCAPI_Controller
 		$this->terminateWithSuccess($stunden);
 	}
 
-    /**
-     * fetches room events from a certain date
-     * @access public
-     *
-     */
+	/**
+	 * fetches room events from a certain date
+	 * @access public
+	 *
+	 * @return void
+	 */
 	public function getRoomplan()
 	{
+		// form validation
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('ort_kurzbz', "Ort", "required");
+		$this->form_validation->set_rules('start_date', "start_date", "required");
+		$this->form_validation->set_rules('end_date', "end_date", "required");
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		// storing the post parameter in local variables
+		$ort_kurzbz = $this->input->post('ort_kurzbz', true);
+		$start_date = $this->input->post('start_date', true);
+		$end_date = $this->input->post('end_date', true);
+
+		// get data
 		$this->load->library('StundenplanLib');
-        // form validation
-        $this->load->library('form_validation');
-        $this->form_validation->set_data($_GET);
-        $this->form_validation->set_rules('ort_kurzbz',"Ort","required");
-        $this->form_validation->set_rules('start_date',"start_date","required");
-        $this->form_validation->set_rules('end_date',"end_date","required");
-        if($this->form_validation->run() === FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
 
-        // storing the get parameter in local variables
-        $ort_kurzbz = $this->input->get('ort_kurzbz', TRUE);
-        $start_date = $this->input->get('start_date', TRUE);
-        $end_date = $this->input->get('end_date', TRUE);
+		$roomplan_data = $this->stundenplanlib->getRoomplan($ort_kurzbz, $start_date, $end_date);
 
-		$roomplan_data = $this->LvPlan->lvPlanGruppierung($this->LvPlan->getRoomQuery($ort_kurzbz, $start_date, $end_date));
-
-        $roomplan_data = $this->getDataOrTerminateWithError($roomplan_data);
-		$this->stundenplanlib->expand_object_information($roomplan_data);
-
+		$roomplan_data = $this->getDataOrTerminateWithError($roomplan_data);
+		
 		$this->terminateWithSuccess($roomplan_data);
-
 	}
 	
-	// gets the reservierungen of a room if the ort_kurzbz parameter is supplied otherwise gets the reservierungen of the lvplan of a student
-    public function Reservierungen($ort_kurzbz = null)
+	/**
+	 * gets the reservierungen of a room if the ort_kurzbz parameter is
+	 * supplied otherwise gets the reservierungen of the lvplan of a student
+	 * @access public
+	 *
+	 * @param string	$ort_kurzbz
+	 * @return void
+	 */
+	public function getReservierungen($ort_kurzbz = null)
 	{
-		$this->load->library('StundenplanLib');
 		//form validation
 		$this->load->library('form_validation');
-		$this->form_validation->set_data($_GET);
+		
 		$this->form_validation->set_rules('start_date', "StartDate", "required");
 		$this->form_validation->set_rules('end_date', "EndDate", "required");
-		if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
+		
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		$this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
+		// storing the post parameter in local variables
+		$start_date = $this->input->post('start_date', true);
+		$end_date = $this->input->post('end_date', true);
 
-		// storing the get parameter in local variables
-        $start_date = $this->input->get('start_date', TRUE);
-        $end_date = $this->input->get('end_date', TRUE);
+		// get data
+		$this->load->library('StundenplanLib');
 
-		$result = $this->stundenplanlib->getReservierungen($start_date,$end_date,$ort_kurzbz);
-		$result = $this->getDataOrTerminateWithError($result);	
+		$result = $this->stundenplanlib->getReservierungen($start_date, $end_date, $ort_kurzbz);
+
+		$result = $this->getDataOrTerminateWithError($result);
+
 		$this->terminateWithSuccess($result);
 	}
 

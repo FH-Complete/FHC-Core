@@ -18,7 +18,7 @@
 export default {
 	getRoomInfo(ort_kurzbz, start_date, end_date) {
 		return {
-			method: 'get',
+			method: 'post',
 			url: '/api/frontend/v1/LvPlan/getRoomplan',
 			params: { ort_kurzbz, start_date, end_date }
 		};
@@ -39,15 +39,15 @@ export default {
 	},
 	getOrtReservierungen(ort_kurzbz, start_date, end_date) {
 		return {
-			method: 'get',
-			url: `/api/frontend/v1/LvPlan/Reservierungen/${ort_kurzbz}`,
+			method: 'post',
+			url: `/api/frontend/v1/LvPlan/getReservierungen/${ort_kurzbz}`,
 			params: { start_date, end_date }
 		};
 	},
 	getLvPlanReservierungen(start_date, end_date) {
 		return {
-			method: 'get',
-			url: '/api/frontend/v1/LvPlan/Reservierungen',
+			method: 'post',
+			url: '/api/frontend/v1/LvPlan/getReservierungen',
 			params: { start_date, end_date }
 		};
 	},

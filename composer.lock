@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1b8a408a43c62cb966fa89af338564a7",
+    "content-hash": "1de37a74ba51a66057eb2712b21340c8",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -1295,6 +1295,15 @@
                 "source": "https://github.com/lanthaler/JsonLD/tree/1.2.1"
             },
             "time": "2022-09-29T08:45:17+00:00"
+        },
+        {
+            "name": "moment/luxonjs",
+            "version": "3.6.1",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/luxon@3.6.1/build/global/luxon.min.js"
+            },
+            "type": "library"
         },
         {
             "name": "moment/momentjs",

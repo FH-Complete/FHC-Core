@@ -1,0 +1,13 @@
+/* mobile */
+@media (max-width: 991.98px) {
+	.responsive-calendar .fhc-calendar-mode-week .fhc-calendar-base-label-day .short,
+	.responsive-calendar .fhc-calendar-mode-week .fhc-calendar-base-label-dow .short,
+	.responsive-calendar .fhc-calendar-mode-month .fhc-calendar-base-label-dow .short {
+		display: block;
+	}
+	.responsive-calendar .fhc-calendar-mode-week .fhc-calendar-base-label-day .long,
+	.responsive-calendar .fhc-calendar-mode-week .fhc-calendar-base-label-dow .long,
+	.responsive-calendar .fhc-calendar-mode-month .fhc-calendar-base-label-dow .long {
+		display: none;
+	}
+}
