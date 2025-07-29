@@ -49,5 +49,12 @@ export default {
 			url: '/api/frontend/v1/Noten/saveStudentPruefung',
 			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ }
 		};
-	}
+	},
+	createPruefungen(uids, datum, lva_id, sem_kurzbz){
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/createPruefungen',
+			params: { uids, datum, lva_id, sem_kurzbz }
+		};
+	},
 };

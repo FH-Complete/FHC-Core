@@ -34,7 +34,8 @@ class Noten extends FHCAPI_Controller
 			'saveStudentenNoten' => self::PERM_LOGGED, // todo: berechtigungen!
 			'getNotenvorschlagStudent' => self::PERM_LOGGED,
 			'saveNotenvorschlag' => self::PERM_LOGGED,
-			'saveStudentPruefung' => self::PERM_LOGGED
+			'saveStudentPruefung' => self::PERM_LOGGED,
+			'createPruefungen' => self::PERM_LOGGED
 		]);
 
 		$this->load->library('AuthLib', null, 'AuthLib');
@@ -264,7 +265,6 @@ class Noten extends FHCAPI_Controller
 		$lva_id = $result->lva_id;
 		$lehreinheit_id = $result->lehreinheit_id;
 		
-//		$lehreinheit_id_pr = $result->lehreinheit_id_pr; // todo: very rare, refactor?
 		$stsem = $result->sem_kurzbz;
 		$typ = $result->typ;
 		
@@ -275,7 +275,7 @@ class Noten extends FHCAPI_Controller
 		// by retrieving it from students row in campus.vw_student_lehrveranstaltung earlier on
 		
 //		$lehreinheit_id = getLehreinheit($db, $lvid, $student_uid, $stsem);
-		$lehreinheit_id = $result->lehreinheit_id;
+//		$lehreinheit_id = $result->lehreinheit_id;
 
 		$punkte = str_replace(',', '.', $punkte);
 
@@ -296,155 +296,18 @@ class Noten extends FHCAPI_Controller
 
 		$old_note = $note;
 		
-		//Laden der Lehrveranstaltung
-		$lv_obj = new lehrveranstaltung();
-		if(!$lv_obj->load($lva_id))
-			die($lv_obj->errormsg);
-
-		//Studiengang laden
-		$stg_obj = new studiengang($lv_obj->studiengang_kz);
+		// TODO: notwendiger check?
+//		//Laden der Lehrveranstaltung
+//		$lv_obj = new lehrveranstaltung();
+//		if(!$lv_obj->load($lva_id))
+//			die($lv_obj->errormsg);
+//
+//		//Studiengang laden
+//		$stg_obj = new studiengang($lv_obj->studiengang_kz);
+//		
 		
-//		$response = savePruefung($lvid, $student_uid, $stsem, $lehreinheit_id, $datum, $typ, $note, $punkte);
-		$savedPruefung = null;
-		$extraPruefung = null;
-		if($typ == "Termin2") {
-
-			$pr = new Pruefung();
-			
-			// Wenn eine Pruefung angelegt wird, wird zuerst eine Pruefung mit 1. Termin angelegt
-			// und dort die Zeugnisnote gespeichert
-			if($pr->getPruefungen($student_uid, "Termin1", $lva_id, $stsem))
-			{
-				if ($pr->result)
-				{
-					// TODO: is this filler if branch really necessary?
-					$termin1 = 1;
-				}
-				else
-				{
-					$lvnote = new lvgesamtnote();
-					// update Termin1 note
-					if ($lvnote->load($lva_id, $student_uid, $stsem))
-					{ 
-						$pr_note = $lvnote->note;
-						$pr_punkte = $lvnote->punkte;
-						$benotungsdatum = $lvnote->benotungsdatum;
-					}
-					else // set Termin1 note to "noch nicht eingetragen"
-					{ 
-						$pr_note = 9;
-						$pr_punkte = '';
-						$benotungsdatum = $jetzt;
-					}
-
-					$pr_1 = new Pruefung();
-					$pr_1->lehreinheit_id = $lehreinheit_id;
-					$pr_1->student_uid = $student_uid;
-					$pr_1->mitarbeiter_uid = getAuthUID();
-					$pr_1->note = $pr_note;
-					$pr_1->punkte = $pr_punkte;
-					$pr_1->pruefungstyp_kurzbz = "Termin1";
-					$pr_1->datum = $benotungsdatum;
-					$pr_1->anmerkung = "";
-					$pr_1->insertamum = $jetzt;
-					$pr_1->insertvon = getAuthUID();
-					$pr_1->updateamum = null;
-					$pr_1->updatevon = null;
-					$pr_1->ext_id = null;
-					$pr_1->new = true;
-					$pr_1->save();
-					$extraPruefung = $pr_1; //"neu T1";
-				}
-
-				$prTermin2 = new Pruefung();
-				$pr_2 = new Pruefung();
-
-				// Die Pruefung wird als Termin2 eingetragen
-				if ($prTermin2->getPruefungen($student_uid, 'Termin2', $lva_id, $stsem))
-				{
-					if	($prTermin2->result)
-					{
-						$pr_2->load($prTermin2->result[0]->pruefung_id);
-						$pr_2->new = null;
-						$pr_2->updateamum = $jetzt;
-						$pr_2->updatevon = getAuthUID();
-						$old_note = $pr_2->note;
-						$pr_2->note = $note;
-						$pr_2->punkte = $punkte;
-						$pr_2->datum = $datum;
-						$pr_2->anmerkung = "";
-						$savedPruefung = $pr_2;//"update T2";
-					}
-					else
-					{
-						$pr_2->lehreinheit_id = $lehreinheit_id;
-						$pr_2->student_uid = $student_uid;
-						$pr_2->mitarbeiter_uid = getAuthUID();
-						$pr_2->note = $note;
-						$pr_2->punkte = $punkte;
-						$pr_2->pruefungstyp_kurzbz = $typ;
-						$pr_2->datum = $datum;
-						$pr_2->anmerkung = "";
-						$pr_2->insertamum = $jetzt;
-						$pr_2->insertvon = getAuthUID();
-						$pr_2->updateamum = null;
-						$pr_2->updatevon = null;
-						$pr_2->ext_id = null;
-						$pr_2->new = true;
-						$old_note = -1;
-						$savedPruefung = $pr_2;//"new T2";
-					}
-					$pr_2->save();
-				}
-			}
-			
-		} else if($typ == "Termin3") {
-			
-			$prTermin3 = new Pruefung();
-			$pr_3 = new Pruefung();
-
-			if ($prTermin3->getPruefungen($student_uid, 'Termin3', $lva_id, $stsem))
-			{
-				if	($prTermin3->result)
-				{
-					$pr_3->load($prTermin3->result[0]->pruefung_id);
-					$pr_3->new = null;
-					$pr_3->updateamum = $jetzt;
-					$pr_3->updatevon = getAuthUID();
-					$old_note = $pr_3->note;
-					$pr_3->note = $note;
-					$pr_3->punkte = $punkte;
-					$pr_3->datum = $datum;
-					$pr_3->anmerkung = "";
-					$savedPruefung = $pr_3; //"update T3";
-				}
-				else
-				{
-					$pr_3->lehreinheit_id = $lehreinheit_id;
-					$pr_3->student_uid = $student_uid;
-					$pr_3->mitarbeiter_uid = getAuthUID();
-					$pr_3->note = $note;
-					$pr_3->punkte = $punkte;
-					$pr_3->pruefungstyp_kurzbz = $typ;
-					$pr_3->datum = $datum;
-					$pr_3->anmerkung = "";
-					$pr_3->insertamum = $jetzt;
-					$pr_3->insertvon = getAuthUID();
-					$pr_3->updateamum = null;
-					$pr_3->updatevon = null;
-					$pr_3->ext_id = null;
-					$pr_3->new = true;
-					$old_note = -1;
-					$savedPruefung = $pr_3; //"new T3";
-				}
-				$pr_3->save();
-			}
-		} else {
-			$this->terminateWithError("typ is not termin2 or termin3", 'general');
-		}
-
+		$pruefungenChanged = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum);
 		
-
 		//Gesamtnote updaten
 		$lvgesamtnote = new lvgesamtnote();
 		if (!$lvgesamtnote->load($lva_id, $student_uid, $stsem))
@@ -480,9 +343,162 @@ class Noten extends FHCAPI_Controller
 //				$response = "update";
 		}
 
-		$saved = $lvgesamtnote->save($new);
+		$lvgesamtnote->save($new);
+
+		$savedPruefung = $pruefungenChanged['savedPruefung'] ?? null;
+		$extraPruefung = $pruefungenChanged['extraPruefung'] ?? null; // TODO: test
+
+		$this->terminateWithSuccess(array($savedPruefung, $lvgesamtnote, $extraPruefung));
+	}
+	
+	private function savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum) 
+	{
+		$jetzt = date("Y-m-d H:i:s");
 		
-		$this->terminateWithSuccess(array($savedPruefung, $lvgesamtnote, $saved, $extraPruefung));
+		$pruefungenChanged = [];
+		
+		if($typ == "Termin2") {
+
+			$pr = new Pruefung();
+
+			// Wenn eine Pruefung angelegt wird, wird zuerst eine Pruefung mit 1. Termin angelegt
+			// und dort die Zeugnisnote gespeichert
+			if($pr->getPruefungen($student_uid, "Termin1", $lva_id, $stsem))
+			{
+				if ($pr->result)
+				{
+					// TODO: is this filler if branch really necessary?
+					$termin1 = 1;
+				}
+				else
+				{
+					$lvnote = new lvgesamtnote();
+					// update Termin1 note
+					if ($lvnote->load($lva_id, $student_uid, $stsem))
+					{
+						$pr_note = $lvnote->note;
+						$pr_punkte = $lvnote->punkte;
+						$benotungsdatum = $lvnote->benotungsdatum;
+					}
+					else // set Termin1 note to "noch nicht eingetragen"
+					{
+						$pr_note = 9;
+						$pr_punkte = '';
+						$benotungsdatum = $jetzt;
+					}
+
+					$pr_1 = new Pruefung();
+					$pr_1->lehreinheit_id = $lehreinheit_id;
+					$pr_1->student_uid = $student_uid;
+					$pr_1->mitarbeiter_uid = getAuthUID();
+					$pr_1->note = $pr_note;
+					$pr_1->punkte = $pr_punkte;
+					$pr_1->pruefungstyp_kurzbz = "Termin1";
+					$pr_1->datum = $benotungsdatum;
+					$pr_1->anmerkung = "";
+					$pr_1->insertamum = $jetzt;
+					$pr_1->insertvon = getAuthUID();
+					$pr_1->updateamum = null;
+					$pr_1->updatevon = null;
+					$pr_1->ext_id = null;
+					$pr_1->new = true;
+					$pr_1->save();
+					$pruefungenChanged['extraPruefung'] = $pr_1; //"neu T1";
+				}
+
+				$prTermin2 = new Pruefung();
+				$pr_2 = new Pruefung();
+
+				// Die Pruefung wird als Termin2 eingetragen
+				if ($prTermin2->getPruefungen($student_uid, 'Termin2', $lva_id, $stsem))
+				{
+					if	($prTermin2->result)
+					{
+						$pr_2->load($prTermin2->result[0]->pruefung_id);
+						$pr_2->new = null;
+						$pr_2->updateamum = $jetzt;
+						$pr_2->updatevon = getAuthUID();
+						$old_note = $pr_2->note;
+						$pr_2->note = $note;
+						$pr_2->punkte = $punkte;
+						$pr_2->datum = $datum;
+						$pr_2->anmerkung = "";
+						$pruefungenChanged['savedPruefung'] = $pr_2;
+//						$savedPruefung = $pr_2;//"update T2";
+					}
+					else
+					{
+						$pr_2->lehreinheit_id = $lehreinheit_id;
+						$pr_2->student_uid = $student_uid;
+						$pr_2->mitarbeiter_uid = getAuthUID();
+						$pr_2->note = $note;
+						$pr_2->punkte = $punkte;
+						$pr_2->pruefungstyp_kurzbz = $typ;
+						$pr_2->datum = $datum;
+						$pr_2->anmerkung = "";
+						$pr_2->insertamum = $jetzt;
+						$pr_2->insertvon = getAuthUID();
+						$pr_2->updateamum = null;
+						$pr_2->updatevon = null;
+						$pr_2->ext_id = null;
+						$pr_2->new = true;
+						$old_note = -1;
+						$pruefungenChanged['savedPruefung'] = $pr_2;
+//						$savedPruefung = $pr_2;//"new T2";
+					}
+					$pr_2->save();
+				}
+			}
+
+		} else if($typ == "Termin3") {
+
+			$prTermin3 = new Pruefung();
+			$pr_3 = new Pruefung();
+
+			if ($prTermin3->getPruefungen($student_uid, 'Termin3', $lva_id, $stsem))
+			{
+				if	($prTermin3->result)
+				{
+					$pr_3->load($prTermin3->result[0]->pruefung_id);
+					$pr_3->new = null;
+					$pr_3->updateamum = $jetzt;
+					$pr_3->updatevon = getAuthUID();
+					$old_note = $pr_3->note;
+					$pr_3->note = $note;
+					$pr_3->punkte = $punkte;
+					$pr_3->datum = $datum;
+					$pr_3->anmerkung = "";
+					$pruefungenChanged['savedPruefung'] = $pr_3;
+//					$savedPruefung = $pr_3; //"update T3";
+				}
+				else
+				{
+					$pr_3->lehreinheit_id = $lehreinheit_id;
+					$pr_3->student_uid = $student_uid;
+					$pr_3->mitarbeiter_uid = getAuthUID();
+					$pr_3->note = $note;
+					$pr_3->punkte = $punkte;
+					$pr_3->pruefungstyp_kurzbz = $typ;
+					$pr_3->datum = $datum;
+					$pr_3->anmerkung = "";
+					$pr_3->insertamum = $jetzt;
+					$pr_3->insertvon = getAuthUID();
+					$pr_3->updateamum = null;
+					$pr_3->updatevon = null;
+					$pr_3->ext_id = null;
+					$pr_3->new = true;
+					$old_note = -1;
+					$pruefungenChanged['savedPruefung'] = $pr_3;
+//					$savedPruefung = $pr_3; //"new T3";
+				}
+				$pr_3->save();
+			}
+		} else {
+			// TODO: proper error phrase
+			$this->terminateWithError("Typ is not termin2 or termin3.", 'general');
+		}
+		
+		return $pruefungenChanged;
 	}
 
 	public function saveNotenvorschlag() {
@@ -539,6 +555,34 @@ class Noten extends FHCAPI_Controller
 		$lvgesamtnote->load($lv_id, $student_uid, $sem_kurzbz);
 		
 		$this->terminateWithSuccess(array($ret, $lvgesamtnote));
+	}
+	
+	public function createPruefungen() {
+		$result = $this->getPostJSON();
+
+		if(!property_exists($result, 'uids') || !property_exists($result, 'datum')) {
+			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
+		}
+
+		$uids = $result->uids;
+		$datum = $result->datum;
+		$lva_id = $result->lva_id;
+		
+		$stsem = $result->sem_kurzbz;
+		
+		$ret = [];
+		
+		foreach ($uids as $student) {
+			$student_uid = $student->uid;
+			$typ = $student->typ;
+			$note = 9; //$result->note; // TODO: parameterize for import maybe
+			$punkte = ''; // TODO: check punkte feature
+
+			$lehreinheit_id = $student->lehreinheit_id;
+			$ret[$student->uid] = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum);
+		}
+
+		$this->terminateWithSuccess($ret);
 	}
 
 }

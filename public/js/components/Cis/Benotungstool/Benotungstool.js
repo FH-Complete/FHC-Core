@@ -35,12 +35,14 @@ export const Benotungstool = {
 	},
 	data() {
 		return {
+			loading: false,
 			selectedUids: [], // shared selection state
 			selectedLehreinheit: null,
 			lehreinheiten: null,
 			tabulatorCanBeBuilt: false,
 			selectedPruefungNote: null,
 			selectedPruefungDate: new Date(), // v-model for pruefung edit datepicker
+			distinctPruefungsDates: null,
 			pruefungStudent: null,
 			pruefung: null,
 			password: '',
@@ -76,8 +78,6 @@ export const Benotungstool = {
 			{
 				event: "rowSelectionChanged",
 				handler: async (data, rows) => {
-					console.log("Selected Data:", data);
-					console.log("Selected Rows:", rows);
 					this.selectedUids = data;
 				}
 			},
@@ -107,6 +107,25 @@ export const Benotungstool = {
 			]};
 	},
 	methods: {
+		selectionArraysAreEqual(arr1, arr2) {
+			if(arr1.length !== arr2.length) return false
+
+			const sortFunc = (s1, s2) => {
+				if(s1.nachname > s2.nachname) {
+					return 1
+				} else if (s1.nachname < s2.nachname) {
+					return -1
+				} else {
+					return 0
+				}
+			}
+			const sortedArr1 = arr1.sort(sortFunc)
+			const sortedArr2 = arr2.sort(sortFunc)
+
+			const arrsREqual = sortedArr1.every((val, index) => val === sortedArr2[index]);
+
+			return arrsREqual
+		},
 		getNotenTableOptions() {
 			return {
 				height: 700,
@@ -116,6 +135,15 @@ export const Benotungstool = {
 				selectable: true,
 				selectableRangeMode: "click", // shift+click
 				selectablePersistence: false, // reset selection on table reload
+				selectableCheck: function(row){
+					const data = row.getData();
+					
+					if(data['kommPruef']) return false
+					else if(data.hoechsterAntritt >= 3) return false // 3 pruefungen counted
+					
+					return true;  // student can be selected to add pruefung
+				},
+				rowFormatter: this.unselectableFormatter,
 				columns: [
 				{
 					formatter: "rowSelection",
@@ -128,6 +156,7 @@ export const Benotungstool = {
 					width: 50,
 				},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4mail')), field: 'email', formatter: this.mailFormatter, tooltip: false, widthGrow: 1},
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4antrittCount')), field: 'hoechsterAntritt', tooltip: false, widthGrow: 1},
 				{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4vorname')), field: 'vorname',  tooltip: false, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4nachname')), field: 'nachname', widthGrow: 1},
@@ -172,13 +201,29 @@ export const Benotungstool = {
 				{title: '', width: 50, hozAlign: 'center', formatter: this.arrowFormatter, cellClick: this.saveNote},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4lvnote')), field: 'lv_note',
 					formatter: this.notenFormatter,
+					headerFilter: 'list',
+					headerFilterParams: () => {
+						return { values: ["\u00A0",...this.notenOptions.map(opt => opt.bezeichnung)] } // TODO: fix option render height lmao...
+					},
+					headerFilterFunc: this.notenFilterFunc,
 					widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4freigabe')), field: 'freigegeben', widthGrow: 1, formatter: this.freigabeFormatter},
-				{title: Vue.computed(() => this.$p.t('benotungstool/c4zeugnisnote')), field: 'note', formatter: this.notenFormatter, widthGrow: 1}, 
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4zeugnisnote')),
+					headerFilter: true,
+					field: 'note',
+					formatter: this.notenFormatter,
+					widthGrow: 1}, 
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4kommPruef')), field: 'kommPruef', widthGrow: 1, formatter: this.pruefungFormatter, hozAlign:"center", minWidth: 150}
 			],
 				persistence: false,
 			}	
+		},
+		notenFilterFunc(filterVal, rowVal) {
+			const opt = this.notenOptions.find(opt => opt.bezeichnung === filterVal)
+			if(opt.note == rowVal) return true
+			if(filterVal === "" || filterVal === null) return true
+			
+			return false
 		},
 		parseDate(timestamp) {
 			if(!timestamp) return null
@@ -196,6 +241,9 @@ export const Benotungstool = {
 			} else {
 				return 'ok'
 			}
+		},
+		unselectableFormatter(row) {
+			
 		},
 		notenFormatter(cell) {
 			const value = cell.getValue()
@@ -231,9 +279,6 @@ export const Benotungstool = {
 			}
 			
 			return value
-		},
-		handlePasswordChanged(pw) {
-			// console.log('pw:', pw)	
 		},
 		saveNote(e, cell) { // Notenvorschlag freigeben
 			const row = cell.getRow()
@@ -271,19 +316,53 @@ export const Benotungstool = {
 				return ''
 			}
 			
+			const colDef = cell.getColumn().getDefinition()
+			
+			// column is just a date, student can have any of his antritte on this date, so we need to get
+			// student.pruefungen and look for a pruefung with this cols title as date
+
+			const field = cell.getColumn().getField()
+			const studentPruefung = field != 'kommPruef' ? data.pruefungen.find(p => p.datum === field) : data['kommPruef']
+
+			// is this column/cell allowed to have an add pruefung action 			
+			const canAdd = field !== 'kommPruef' && data.hoechsterAntritt < 4 && !colDef.originalNote
+			
 			// TODO: check for some time limit maybe? old pruefungen can be changed/created
+			// TODO: it also looks ugly and unprofessional, should at some peoplt disable/hide the change action
 			
 			// Create root row div
 			const rowDiv = document.createElement('div');
-			rowDiv.className = 'row';
+			rowDiv.className = 'row flex-nowrap';
 			rowDiv.style.display = 'flex';
 			rowDiv.style.justifyContent = 'center';
 			rowDiv.style.alignItems = 'center';
 			rowDiv.style.height = '100%';
 			
-			function createCol(content) {
+			if(studentPruefung) {
+				let color = ''
+				switch(studentPruefung.pruefungstyp_kurzbz) {
+					case 'Termin1':
+						color = 'green'
+						break
+					case 'Termin2':
+						color = 'yellow'
+						break
+					case 'Termin3':
+						color = 'orange'
+						break
+					case 'kommPruef':
+						color = 'red'
+						break
+				}
+
+				rowDiv.style.borderLeft = `4px solid ${color}`;
+				rowDiv.style.marginLeft = "6px";     // small indent so text doesn't overlap
+				rowDiv.style.boxSizing = "border-box";
+			}
+			
+			function createCol(content, classParam) {
 				const colDiv = document.createElement('div');
-				colDiv.className = 'col-4';
+				colDiv.className = classParam ?? 'col-4';
 				colDiv.style.justifyContent = 'center';
 				colDiv.style.alignItems = 'center';
 				colDiv.style.height = '100%';
@@ -297,19 +376,22 @@ export const Benotungstool = {
 				return colDiv;
 			}
 			
-			const field = cell.getColumn().getField()
 			if(data[field]) {
 				const dateParts = data[field].datum.split('-')
 				const date = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`
-
+				
 				// First column (date)
-				rowDiv.appendChild(createCol(date));
+				rowDiv.appendChild(createCol(date, 'col-4 d-flex align-items-center'));
+
+				const noteDefEntry = data.note ? this.notenOptions.find(n => n.note == data[field].note) : null
 
 				// Second column (note_bezeichnung)
-				rowDiv.appendChild(createCol(data[field].note_bezeichnung || ''));
-
-				if(field === 'kommPruef' || field === 'pruefungNr0') {// no actions on kommPruef allowed
-					rowDiv.appendChild(createCol('')); // append empty col4 to have formatting similar
+				rowDiv.appendChild(createCol(noteDefEntry.bezeichnung || '', 'col-auto ms-auto d-flex justify-content-center align-items-center'));
+				
+				// no actions on kommPruef allowed
+				// no actions on termin1 aka pruefung 0 aka ursprüngliche note erlaubt
+				if(field === 'kommPruef' || colDef.originalNote) { 
+					rowDiv.appendChild(createCol('', 'col-4 d-flex justify-content-center align-items-center')); // append empty col4 to have formatting similar
 					return rowDiv
 				} 
 				
@@ -318,44 +400,42 @@ export const Benotungstool = {
 				button.className = 'btn btn-outline-secondary';
 				button.textContent = 'Change'; // TODO: phrase
 				button.addEventListener('click', () => {
-					this.openPruefungModal(data, data[field]);
+					this.openPruefungModal(data, data[field], field);
 				});
 
-				rowDiv.appendChild(createCol(button));
+				rowDiv.appendChild(createCol(button, 'col-4 d-flex justify-content-center align-items-center'));
 
 				return rowDiv;
 				
-			} else if (field !== 'kommPruef' && field !== 'pruefungNr0') { // return new btn action
+			} else if (canAdd) { // return new btn action
 				const button = document.createElement('button');
 				button.className = 'btn btn-outline-secondary';
 				button.textContent = 'Add'; // TODO: phrase
 				button.addEventListener('click', () => {
-					this.openPruefungModal(data)
+					this.openPruefungModal(data, null, field)
 				});
 
-				rowDiv.appendChild(createCol(button));
+				rowDiv.appendChild(createCol(button), 'col-4 d-flex justify-content-center align-items-center');
 
 				return rowDiv;
 			} else return ''
 		},
-		openPruefungModal(student, pruefung = null) {
+		openPruefungModal(student, pruefung = null, field) {
 			this.pruefungStudent = student
 			this.pruefung = pruefung
-			debugger
-			if(this.pruefung?.datum) {
-				const pruefungDateParts = this.pruefung?.datum?.split('-')
+			
+			const dateStr = this.pruefung?.datum ?? field
+		
+			const pruefungDateParts = dateStr.split('-')
 
-				// new date obj so datepicker picks ob the change by ref
-				const newDate = new Date()
-				newDate.setFullYear(pruefungDateParts[0])
-				newDate.setMonth(pruefungDateParts[1])
-				newDate.setDate(pruefungDateParts[2])
-				this.selectedPruefungDate = newDate
-			} else {
-				const newDate = new Date()
-				newDate.setTime(Date.now())
-				this.selectedPruefungDate = newDate
-			}
+			// new date obj so datepicker picks ob the change by ref
+			const newDate = new Date()
+			newDate.setFullYear(pruefungDateParts[0])
+			newDate.setMonth(pruefungDateParts[1])
+			newDate.setMonth(newDate.getMonth() - 1) // acount for js date month offset
+			newDate.setDate(pruefungDateParts[2])
+			this.selectedPruefungDate = newDate
+			
 			
 			if(this.pruefung?.note) {
 				this.selectedPruefungNote = this.notenOptions.find(n => n.note == this.pruefung.note)
@@ -366,9 +446,9 @@ export const Benotungstool = {
 			this.$refs.modalContainerPruefung.show()
 		},
 		pruefungTitleFormatter(cell) {
-			const col = cell.getColumn()
-			if(col.getField() === "pruefungNr0") return this.$p.t('benotungstool/c4originalZnote')
-			return col.getDefinition().title;
+			const def = cell.getColumn().getDefinition()
+			if(def.originalNote) return this.$p.t('benotungstool/c4originalZnote')
+			return def.title;
 		},
 		arrowFormatter(cell) {
 			const row = cell.getRow()
@@ -391,6 +471,17 @@ export const Benotungstool = {
 		buildMailToLink(student){
 			return 'mailto:' + student.uid +'@'+ this.domain
 		},
+		insertSortedDate(arr, dateStr) {
+			// Binary search to find insertion index
+			let left = 0, right = arr.length;
+			while (left < right) {
+				const mid = (left + right) >> 1;
+				if (arr[mid] < dateStr) left = mid + 1;
+				else right = mid;
+			}
+			arr.splice(left, 0, dateStr); // insert at index
+			return arr;
+		},
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
 		},
@@ -410,7 +501,7 @@ export const Benotungstool = {
 			this.teilnoten = data[3] ?? []
 			
 			// let pruefungenRegularColCount = 0;
-			const distinctPruefungsDates = []
+			this.distinctPruefungsDates = []
 			const cols = [...this.notenTableOptions.columns.slice(0, -1)];
 			const kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
 			
@@ -421,7 +512,7 @@ export const Benotungstool = {
 				
 				// TODO: filter kommPruef here? or change kommProf ColDefinition
 				
-				if(!distinctPruefungsDates.includes(p.datum)) distinctPruefungsDates.push(p.datum)
+				if(p.pruefungstyp_kurzbz !== 'kommPruef' && !this.distinctPruefungsDates.includes(p.datum)) this.distinctPruefungsDates.push(p.datum)
 				
 				// seperate kommPruefungen from previous pruefungen counts since the column count variability always ends with this
 				if(p.pruefungstyp_kurzbz == 'kommPruef') {
@@ -433,7 +524,6 @@ export const Benotungstool = {
 				// if(student.pruefungen.length > pruefungenRegularColCount) pruefungenRegularColCount = student.pruefungen.length
 			})
 
-			// TODO: check if note is überschreibbar!
 			this.studenten?.forEach(s => {
 				// sort students regular pruefungen by datum
 				s.pruefungen.sort((p1, p2) => {
@@ -449,7 +539,8 @@ export const Benotungstool = {
 				s.pruefungen.forEach((p, i) => {
 					s[p.datum] = p
 				})
-				
+
+				s.hoechsterAntritt = this.getAntrittCountStudent(s)
 				s.email = this.buildMailToLink(s)
 				s.lv_note = this.teilnoten[s.uid].note_lv
 				s.freigabedatum = this.parseDate(this.teilnoten[s.uid]['freigabedatum'])
@@ -466,8 +557,8 @@ export const Benotungstool = {
 				})
 				
 			})
-			
-			distinctPruefungsDates.sort((d1, d2) => {
+
+			this.distinctPruefungsDates.sort((d1, d2) => {
 				if(d1 > d2) {
 					return 1
 				} else if (d1 < d2) {
@@ -476,32 +567,38 @@ export const Benotungstool = {
 					return 0
 				}
 			})
-			distinctPruefungsDates.forEach((date, index)=>{
-				// TODO date format dd.mm.yyyy
+			this.distinctPruefungsDates.forEach((date, index)=>{
+				const dateparts = date.split('-')
+				const titledate = `${dateparts[2]}.${dateparts[1]}.${dateparts[0]}`
 				
-				// const title = 
-				
+				// TODO: should studenten without shadow pruefung Termin have their "ursprüngliche Zeugnisnote" 
+				// col filled for consistency reasons?
+			
+				// TODO: test if this holds true
+				const originalNote = index === 0
 				cols.push({
-					title: date,//this.$p.t('benotungstool/pruefungNr', [index+1]),
+					title: titledate,//this.$p.t('benotungstool/pruefungNr', [index+1]),
 					field: date,
 					formatter: this.pruefungFormatter,
 					titleFormatter: this.pruefungTitleFormatter,
 					hozAlign:"center",
 					widthGrow: 1,
-					minWidth: 150
+					minWidth: 200,
+					originalNote
 				})
 			})
-			console.log('distinctPruefungsDates', distinctPruefungsDates)
-			console.log('cols', cols)
 
 			cols.push(kommCol) // keep kommPruef Col as last
 
+			this.loading = false
+			
 			this.$refs.notenTable.tabulator.clearSort()
 			this.$refs.notenTable.tabulator.setColumns(cols)
 			this.$refs.notenTable.tabulator.setData(this.studenten);
 			this.$refs.notenTable.tabulator.redraw(true);
 		},
 		loadNoten(lv_id, sem_kurzbz) {
+			this.loading = true
 			this.$api.call(ApiNoten.getStudentenNoten(lv_id, sem_kurzbz))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
@@ -520,6 +617,7 @@ export const Benotungstool = {
 			this.$refs.notenTable.tabulator.setHeight(this.notenTableOptions.height)
 		},
 		setupCreated() {
+			this.loading = true
 			// fetch lva dropdown
 			this.$api.call(ApiLehre.getZugewieseneLv(this.viewData?.uid, this.sem_kurzbz)).then(res => {
 				this.lehrveranstaltungen = res.data
@@ -642,16 +740,32 @@ export const Benotungstool = {
 		getOptionLabelLe(option) {
 			return option.infoString
 		},
+		getPruefungstypForStudentByAntritt(student) { 
+			// when adding new pruefungen, determine the next pruefungstyp by using the antritt counter
+			switch (student.hoechsterAntritt) {
+				case 0:
+					return "Termin2"
+					break
+				case 1: 
+					return "Termin2"
+					break
+				case 2: 
+					return "Termin3"
+					break
+				default:
+					return ""
+			}
+		},
 		savePruefungEingabe() {
 			const year = this.selectedPruefungDate.getFullYear();
 			const month = String(this.selectedPruefungDate.getMonth() + 1).padStart(2, '0'); // Months are 0-based
 			const day = String(this.selectedPruefungDate.getDate()).padStart(2, '0');
 			const dateStr = `${year}-${month}-${day}`;
 			
-			// TODO: test this hypothesis
 			// first pruefung is always "Termin2" since normal note counts as Termin1
-			const pOffset = this.pruefung === null && this.pruefungStudent.pruefungen.length === 0 ? 2 : 1
-			const typ = this.pruefung ? this.pruefung.pruefungstyp_kurzbz : ('Termin'+(this.pruefungStudent.pruefungen.length + pOffset)) 
+			// const pOffset = this.pruefung === null && this.pruefungStudent.pruefungen.length === 0 ? 2 : 1
+
+			const typ = this.pruefung ? this.pruefung.pruefungstyp_kurzbz : this.getPruefungstypForStudentByAntritt(this.pruefungStudent)
 			
 			this.$api.call(ApiNoten.saveStudentPruefung(
 				this.pruefungStudent.uid,
@@ -664,54 +778,116 @@ export const Benotungstool = {
 				typ
 			)).then(res => {
 				if(res.meta.status === 'success') {
+					this.$fhcAlert.alertInfo('Prüfung für Student ' + this.pruefungStudent.uid + ' bearbeitet oder angelegt') // TODO: phrase
+					
 					const s = this.studenten.find(s => s.uid === res.data[1]?.student_uid)
-					console.log('old student freigabedatum', s.freigabedatum)
-					console.log('old student benotungsdatum', s.benotungsdatum)
 					
 					s.freigabedatum = this.parseDate(res.data[1]?.['freigabedatum'])
 					s.benotungsdatum = this.parseDate(res.data[1]?.['benotungsdatum'])
-
-					console.log('new student freigabedatum', s.freigabedatum)
-					console.log('new student benotungsdatum', s.benotungsdatum)
+					
 					s.freigegeben = this.checkFreigabe(s.freigabedatum, s.benotungsdatum, s.uid);
 					
-					// todo: update student subject grade/lv_note
 					s.lv_note = res.data[1]?.note
 					
-					// find the exact student pruefung and update that
-					
 					// add new pruefung to row
-					if(res.data[0]?.new) {			
-						// TODO: if new pruefung was of typ "Termin2", "Termin1" shadow pruefung is not available
+					if(!this.pruefung) {			
 						this.handleAddNewTermin(res.data, s)
 					} else { // update existing
-						const oldIndex = s.pruefungen.findIndex(p => p.pruefung_id == res.data[0]?.pruefung_id)
+						const oldIndex = s.pruefungen.findIndex(p => p.pruefung_id == this.pruefung.pruefung_id)
 						if(oldIndex !== -1) {
 							s.pruefungen.splice(oldIndex, 1, res.data[0])
-							s['pruefungNr'+oldIndex] = res.data[0]
+							s[res.data[0].datum] = res.data[0]
 						}
+
+						// antritte might have changed due to different benotung
+						s.hoechsterAntritt = this.getAntrittCountStudent(s)
 					}
-					
-					// // TODO: manual row update!
-					// const row = this.$refs.notenTable.tabulator.getRow(s.uid)
-					// row.update()
 
 					this.$refs.notenTable.tabulator.redraw(true)
 					
-					this.$fhcAlert.alertSuccess('Prüfung gespeichert') //  TODO: phrase
+					this.$fhcAlert.alertInfo('Prüfung gespeichert') //  TODO: phrase
 				}
 			})
 			
 			this.$refs.modalContainerPruefung.hide()
 		},
 		handleAddNewTermin(data, student){
+			const savedPruefung = data[0]
+			const extra = data[2]
+			
+			// check for extra pruefung (termin1) to add before
+			if(extra) {
+				extra.datum = extra.datum.split(' ')[0]
+				if(!this.distinctPruefungsDates.includes(extra.datum)) {
+					this.insertSortedDate(this.distinctPruefungsDates, extra.datum)
+				}
+				
+				student.pruefungen.push(extra)
+				student[extra.datum] = extra
+			}
+
+			if(!this.distinctPruefungsDates.includes(savedPruefung.datum)) {
+				this.insertSortedDate(this.distinctPruefungsDates, savedPruefung.datum)
+			}
+			
+			// add pruefung to pruefungen array
+			student.pruefungen.push(savedPruefung)
+			
+			// add pruefung to student via its datum as a field
+			student[savedPruefung.datum] = savedPruefung
+
+			// usually should be in order naturally, just to be save
+			student.pruefungen.sort((p1, p2) => {
+				if(p1.datum > p2.datum) {
+					return 1
+				} else if (p1.datum < p2.datum) {
+					return -1
+				} else {
+					return 0
+				}
+			})
+			
+			// recalculate student antritte
+			student.hoechsterAntritt = this.getAntrittCountStudent(student)
+			
+			// add col to table
+			const cols = [...this.notenTableOptions.columns.slice(0, -1)];
+			const kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
+
+
+			// TODO: could reuse cols instead of recreating all from a variable maybe
+			this.distinctPruefungsDates.forEach((date, index)=>{
+				const dateparts = date.split('-')
+				const titledate = `${dateparts[2]}.${dateparts[1]}.${dateparts[0]}`
+
+				// TODO: should studenten without shadow pruefung Termin have their "ursprüngliche Zeugnisnote" 
+				// col filled for consistency reasons?
+
+				// TODO: test if this holds true
+				const originalNote = index === 0
+				cols.push({
+					title: titledate,//this.$p.t('benotungstool/pruefungNr', [index+1]),
+					field: date,
+					formatter: this.pruefungFormatter,
+					titleFormatter: this.pruefungTitleFormatter,
+					hozAlign:"center",
+					widthGrow: 1,
+					minWidth: 200,
+					originalNote
+				})
+			})
+
+			cols.push(kommCol) // keep kommPruef Col as last
+			// redraw table
+			
+			
 			
 		},
 		saveNoteneingabe() {
 			this.$api.call(ApiNoten.saveStudentenNoten(this.password, this.changedNoten, this.lv_id, this.sem_kurzbz))
 				.then((res) => {
 				if(res.meta.status === 'success') {
-					this.$fhcAlert.alertSuccess('Noten gespeichert')
+					this.$fhcAlert.alertInfo('Noten gespeichert')
 				}
 				
 				res.data.forEach(d => {
@@ -733,12 +909,6 @@ export const Benotungstool = {
 		openNewPruefungsdatumModal() {
 			this.$refs.modalContainerNeuesPruefungsdatum.show()
 		},
-		handleChangePruefungDatum(e) {
-			// console.log('handleChangePruefungDatum', e)
-		},
-		handleChangePruefungNote(e) {
-			// console.log(e)
-		},
 		getOptionLabelNotePruefung(option) {
 			return option.bezeichnung
 		},
@@ -746,7 +916,150 @@ export const Benotungstool = {
 			this.selectedLehreinheit = e.value
 		},
 		addPruefung(){
+
+			this.$refs.modalContainerNeuesPruefungsdatum.hide()
+			
+			// filter students that already have a pruefung on datum
+			
 			// TODO: save new pruefungs entry for all selected students on selected date with default note "noch nicht eingetragen" aka 9
+
+			const year = this.selectedPruefungDate.getFullYear();
+			const month = String(this.selectedPruefungDate.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+			const day = String(this.selectedPruefungDate.getDate()).padStart(2, '0');
+			const dateStr = `${year}-${month}-${day}`;
+
+			const uids = this.selectedUids.map(student => {
+				return {
+					uid: student.uid,
+					lehreinheit_id: student.lehreinheit_id,
+					typ: this.getPruefungstypForStudentByAntritt(student)//student.hoechsterAntritt 
+				}
+			})
+			
+			this.loading = true;
+			this.$api.call(ApiNoten.createPruefungen(
+				uids, 
+				dateStr, 
+				this.lv_id,
+				this.sem_kurzbz,
+			)).then(res => {
+				if(res.meta.status === "success") {
+					this.$fhcAlert.alertInfo('Prüfung an ' + dateStr + ' angelegt') // TODO: phrase
+					
+					const pruefungen = res.data
+					uids.forEach(entry => {
+						const saved = pruefungen[entry.uid].savedPruefung
+						const extra = pruefungen[entry.uid].extraPruefung
+						
+						const student = this.studenten.find(s => s.uid == entry.uid)
+						if(!student) return
+
+						// check for extra pruefung (termin1) to add before
+						if(extra) {
+							extra.datum = extra.datum.split(' ')[0]
+							if(!this.distinctPruefungsDates.includes(extra.datum)) {
+								this.insertSortedDate(this.distinctPruefungsDates, extra.datum)
+							}
+							
+							student.pruefungen.push(extra)
+							student[extra.datum] = extra
+						}
+
+						if(!this.distinctPruefungsDates.includes(saved.datum)) {
+							this.insertSortedDate(this.distinctPruefungsDates, saved.datum)
+						}
+						
+						// add pruefung to pruefungen array
+						student.pruefungen.push(saved)
+						
+						// add pruefung to student via its datum as a field
+						student[saved.datum] = saved
+
+						// usually should be in order naturally, just to be save
+						student.pruefungen.sort((p1, p2) => {
+							if(p1.datum > p2.datum) {
+								return 1
+							} else if (p1.datum < p2.datum) {
+								return -1
+							} else {
+								return 0
+							}
+						})
+
+						// recalculate student antritte
+						student.hoechsterAntritt = this.getAntrittCountStudent(student)
+						
+					})
+					
+					// add col to table
+					const cols = [...this.notenTableOptions.columns.slice(0, -1)];
+					const kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
+
+					// TODO: could reuse cols instead of recreating all from a variable maybe
+					this.distinctPruefungsDates.forEach((date, index)=>{
+						const dateparts = date.split('-')
+						const titledate = `${dateparts[2]}.${dateparts[1]}.${dateparts[0]}`
+
+						// TODO: should studenten without shadow pruefung Termin have their "ursprüngliche Zeugnisnote" 
+						// col filled for consistency reasons?
+
+						// TODO: test if this holds true
+						const originalNote = index === 0
+						cols.push({
+							title: titledate,//this.$p.t('benotungstool/pruefungNr', [index+1]),
+							field: date,
+							formatter: this.pruefungFormatter,
+							titleFormatter: this.pruefungTitleFormatter,
+							hozAlign:"center",
+							widthGrow: 1,
+							minWidth: 150,
+							originalNote
+						})
+					})
+
+					cols.push(kommCol) // keep kommPruef Col as last
+					// redraw table
+
+					this.loading = false
+
+					this.$refs.notenTable.tabulator.clearSort()
+					this.$refs.notenTable.tabulator.setColumns(cols)
+					this.$refs.notenTable.tabulator.setData(this.studenten);
+					this.$refs.notenTable.tabulator.redraw(true);
+				}
+			})
+		},
+		getAntrittCountStudent(student) {
+			// checks for existence of a prüfung with a note that resolves to a 
+			// "angetretene Prüfung" -> anything except "entschuldigt" & "noch nicht eingetragen"
+			// and returns the next allowed pruefungstyp from the number of taken pruefungen
+			
+			// 1 -> reguläre note
+			// 2 -> erste Nachprüfung / Termin2
+			// 3 -> 2te Nachprüfung / Termin3
+			// 4 -> kommPruef
+			if(student['kommPruef']) return 4
+			
+			let pruefungsAntrittCount = 0
+			const pLen = student.pruefungen.length
+			for(let i = 0; i < pLen; i++) {
+				const p = student.pruefungen[i]
+				
+				if(p.note != 9 && p.note != 17) pruefungsAntrittCount++
+			}
+
+			// when student never had to take an exam beyond the original benotung 
+			// aka pruefungsantritt (even though it does not have to have pruefungscharacter)
+			// it still counts as an antritt, except it is coming from a notenOption like "angerechnet" 
+			// which indicates no participation at all
+			if(pruefungsAntrittCount === 0 && student.note){
+				const noteOption = this.notenOptions.find(note => note.note == student.note)
+
+				if(noteOption.lehre) return 1
+				else return 0
+			}
+			
+			return pruefungsAntrittCount
 		}
 	},
 	watch: {
@@ -754,19 +1067,18 @@ export const Benotungstool = {
 			const table = this.$refs.notenTable?.tabulator
 
 			if (!table) return;
-			console.log('selectedUids watcher newVal',newVal)
-			// Get all current rows
+
 			const allRows = table.getRows();
-			console.log('table allRows',allRows)
-			// allRows.forEach(row => {
-			// 	const rowData = row.getData();
-			//
-			// 	if (newVal.includes(rowData.uid)) {
-			// 		row.select(); // ensure row is selected
-			// 	} else {
-			// 		row.deselect(); // ensure row is deselected
-			// 	}
-			// });
+			
+			allRows.forEach(row => {
+				const rowData = row.getData();
+				const found = newVal.find(stud => stud.uid == rowData.uid)
+				if (found) {
+					row.select(); // ensure row is selected
+				} else {
+					row.deselect(); // ensure row is deselected
+				}
+			});
 		},
 		selectedLehreinheit(newVal) {
 			if(!this.$refs.notenTable) return
@@ -794,7 +1106,7 @@ export const Benotungstool = {
 		},
 		getSaveBtnClass() {
 			// return "btn btn-primary ml-2"
-			return !this.changedNoten?.length ? "btn btn-primary ml-2" : "btn btn-secondary ml-2"
+			return this.changedNoten?.length ? "btn btn-primary ml-2" : "btn btn-secondary ml-2"
 		},
 		getNewBtnClass() {
 			return "btn btn-primary ml-2"
@@ -824,34 +1136,32 @@ export const Benotungstool = {
 			<template v-slot:title>{{$p.t('benotungstool/c4addNewPruefung')}}</template>
 			<template v-slot:default>
 				<div class="row justify-content-center">
-					<div class="col-auto">
-						<div class="col-1 text-center">{{$p.t('benotungstool/c4date')}}:</div>
-						<div class="col-6">
-							<datepicker
-								v-model="selectedPruefungDate"
-								@update:model-value="handleChangePruefungDatum"
-								:clearable="false"
-								:time-picker="false"
-								:text-input="true"
-								:auto-apply="true">
-							</datepicker>
-						</div>
+
+					<div class="col-auto text-center">{{$p.t('benotungstool/c4date')}}:</div>
+					<div class="col-6">
+						<datepicker
+							v-model="selectedPruefungDate"
+							@update:model-value="handleChangePruefungDatum"
+							:clearable="false"
+							:enableTimePicker="false"
+							:text-input="true"
+							:auto-apply="true">
+						</datepicker>
 					</div>
+
 				</div>
 				
-				<div class="row justify-content-center">
-					<div class="col-auto">
-						<div class="col-1 text-center">{{$p.t('benotungstool/prueflingSelection')}}:</div>
-						<div class="col-6">
-							<Multiselect 
-								v-model="selectedUids" 
-								:options="getStudentenOptions" 
-								optionLabel="infoString" 
-								placeholder="Studenten auswählen"
-								:maxSelectedLabels="3"
-								showToggleAll
-								class="w-full md:w-20rem" />
-						</div>
+				<div class="row mt-4 justify-content-center">
+					<div class="col-auto text-center">{{$p.t('benotungstool/prueflingSelection')}}:</div>
+					<div class="col-6">
+						<Multiselect 
+							v-model="selectedUids" 
+							:options="getStudentenOptions" 
+							optionLabel="infoString" 
+							placeholder="Studenten auswählen"
+							:maxSelectedLabels="3"
+							showToggleAll
+							class="w-100" />
 					</div>
 				</div>
 				
@@ -861,7 +1171,7 @@ export const Benotungstool = {
 			</template>
 		 </bs-modal>
 
-		 <bs-modal ref="modalContainerNotenSpeichern" class="bootstrap-prompt" dialogClass="modal-lg">
+		<bs-modal ref="modalContainerNotenSpeichern" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template v-slot:title>{{ $p.t('benotungstool/noteneingabeSpeichern') }}</template>
 			<template v-slot:default>
 				<div class="row justify-content-center">
@@ -873,10 +1183,10 @@ export const Benotungstool = {
 			<template v-slot:footer>
 				<button type="button" class="btn btn-primary" @click="saveNoteneingabe">{{ $p.t('benotungstool/noteneingabeBestätigen') }}</button>
 			</template>
-		 </bs-modal>
+		</bs-modal>
 
 		<bs-modal ref="modalContainerPruefung" class="bootstrap-prompt" dialogClass="modal-lg">
-			<template v-slot:title>{{ $p.t('benotungstool/createPruefungFor') }} {{pruefungStudent?.vorname}} {{pruefungStudent?.nachname}}</template>
+			<template v-slot:title>{{ pruefung ? $p.t('benotungstool/editPruefungFor') : $p.t('benotungstool/createPruefungFor') }} {{pruefungStudent?.vorname}} {{pruefungStudent?.nachname}}</template>
 			<template v-slot:default>
 				<div class="row justify-content-center">
 					<div class="col-1 text-center">{{$p.t('benotungstool/c4date')}}:</div>
@@ -885,7 +1195,7 @@ export const Benotungstool = {
 							v-model="selectedPruefungDate"
 							@update:model-value="handleChangePruefungDatum"
 							:clearable="false"
-							:time-picker="false"
+							:enableTimePicker="false"
 							:text-input="true"
 							:auto-apply="true">
 						</datepicker>
@@ -909,6 +1219,11 @@ export const Benotungstool = {
 				<button type="button" class="btn btn-primary" @click="savePruefungEingabe">{{ $p.t('global/speichern') }}</button>
 			</template>
 		 </bs-modal>
+
+
+		<div v-show="loading" style="position: absolute; width: 100vw; height: 100vh; background: rgba(255,255,255,0.5); z-index: 8500; display: flex; justify-content: center; align-items: center;">
+			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+		</div>
 
 		<div class="row">
 			<div class="col-4">

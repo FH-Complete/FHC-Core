@@ -41939,6 +41939,26 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
+		'phrase' => 'c4antrittCount',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anzahl Prüfungsantritte',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Number of exam attempts',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
 		'phrase' => 'c4nachname',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -42391,6 +42411,26 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'English',
 				'text' => 'Create examination for',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'editPruefungFor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung bearbeiten für',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit examination for',
 				'description' => '',
 				'insertvon' => 'system'
 			)
