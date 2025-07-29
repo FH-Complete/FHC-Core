@@ -136,14 +136,19 @@ class Prestudent extends FHCAPI_Controller
 		$update_prestudent = array();
 		foreach ($array_allowed_props_prestudent as $prop)
 		{
-			$val = $this->input->post($prop);
-			if ($val !== null || $prop == 'foerderrelevant') {
+			$val = $this->input->post($prop, true);
+
+			if ($val !== null || $prop === 'foerderrelevant') {
 				$update_prestudent[$prop] = $val;
 			}
-			if (($prop == 'zgvdatum' && $val == '')
-				|| ($prop == 'zgvmadatum' && $val == '')
-				|| ($prop == 'zgvdoktordatum' && $val == '')
-				) {
+
+			// allowed to be null, but has to be in postparameter
+			if (
+				in_array($prop, ['zgvdatum', 'zgvmadatum', 'zgvdoktordatum', 'zgv_code', 'zgvmas_code', 'zgvdoktor_code'])
+				&& !isset($update_prestudent[$prop])
+				&& array_key_exists($prop, $_POST)
+			) 
+			{
 				$update_prestudent[$prop] = null;
 			}
 		}
